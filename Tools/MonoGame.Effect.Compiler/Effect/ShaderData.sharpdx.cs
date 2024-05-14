@@ -6,9 +6,9 @@ namespace MonoGame.Effect
 {
     internal partial class ShaderData
     {
-        public static ShaderData CreateHLSL(byte[] byteCode, bool isVertexShader, List<ConstantBufferData> cbuffers, int sharedIndex, Dictionary<string, SamplerStateInfo> samplerStates, bool debug)
+        public static ShaderData CreateHLSL(byte[] byteCode, ShaderStage shaderStage, List<ConstantBufferData> cbuffers, int sharedIndex, Dictionary<string, SamplerStateInfo> samplerStates, bool debug)
         {
-            var dxshader = new ShaderData(isVertexShader, sharedIndex, byteCode);
+            var dxshader = new ShaderData(shaderStage, sharedIndex, byteCode);
             dxshader._attributes = new Attribute[0];
 
             // Strip the bytecode we're gonna save!
@@ -124,10 +124,16 @@ namespace MonoGame.Effect
                     dxshader._samplers = samplers.ToArray();
 
                     // Gather all the constant buffers used by this shader.
-                    dxshader._cbuffers = new int[refelect.Description.ConstantBuffers];
+                    var bufInds = new List<int>();
+
                     for (var i = 0; i < refelect.Description.ConstantBuffers; i++)
                     {
-                        var cb = new ConstantBufferData(refelect.GetConstantBuffer(i));
+                        var constBufDX = refelect.GetConstantBuffer(i);
+                        if (constBufDX.Description.Type != SharpDX.D3DCompiler.ConstantBufferType.ConstantBuffer)
+                            continue;
+
+                        var cb = new ConstantBufferData(constBufDX);
+                        int bufferIndex = cbuffers.Count;
 
                         // Look for a duplicate cbuffer in the list.
                         for (var c = 0; c < cbuffers.Count; c++)
@@ -135,18 +141,62 @@ namespace MonoGame.Effect
                             if (cb.SameAs(cbuffers[c]))
                             {
                                 cb = null;
-                                dxshader._cbuffers[i] = c;
-                                break;
+                                bufferIndex = c;
                             }
                         }
 
+                        bufInds.Add(bufferIndex);
+
                         // Add a new cbuffer.
                         if (cb != null)
-                        {
-                            dxshader._cbuffers[i] = cbuffers.Count;
                             cbuffers.Add(cb);
-                        }
                     }
+
+                    dxshader._cbuffers = bufInds.ToArray();
+
+                    // Gather all the shader resources.
+                    var shaderResources = new List<ShaderResourceData>();
+
+                    for (var i = 0; i < refelect.Description.BoundResources; i++)
+                    {
+                        var rdesc = refelect.GetResourceBindingDescription(i);
+                        ShaderResourceType bufferType;
+
+                        switch (rdesc.Type)
+                        {
+                            case SharpDX.D3DCompiler.ShaderInputType.Structured:
+                                bufferType = ShaderResourceType.StructuredBuffer;
+                                break;
+                            case SharpDX.D3DCompiler.ShaderInputType.UnorderedAccessViewRWStructured:
+                            case SharpDX.D3DCompiler.ShaderInputType.UnorderedAccessViewRWStructuredWithCounter:
+                            case SharpDX.D3DCompiler.ShaderInputType.UnorderedAccessViewAppendStructured:
+                            case SharpDX.D3DCompiler.ShaderInputType.UnorderedAccessViewConsumeStructured:
+                                bufferType = ShaderResourceType.RWStructuredBuffer;
+                                break;
+                            case SharpDX.D3DCompiler.ShaderInputType.UnorderedAccessViewRWTyped:
+                                bufferType = ShaderResourceType.RWTexture;
+                                break;
+                            case SharpDX.D3DCompiler.ShaderInputType.ByteAddress:
+                                bufferType = ShaderResourceType.ByteBuffer;
+                                break;
+                            case SharpDX.D3DCompiler.ShaderInputType.UnorderedAccessViewRWByteAddress:
+                                bufferType = ShaderResourceType.RWByteBuffer;
+                                break;
+                            default:
+                                continue;
+                        }
+
+                        var buffer = new ShaderResourceData {
+                            Name = rdesc.Name,
+                            ElementSize = rdesc.NumSamples > 0 ? rdesc.NumSamples : 0, // NumSamples is the struct size for buffers
+                            Slot = rdesc.BindPoint,
+                            Type = bufferType,
+                        };
+
+                        shaderResources.Add(buffer);
+                    }
+
+                    dxshader._shaderResources = shaderResources.ToArray();
                 }
             }
 

@@ -8,7 +8,7 @@ using System.Threading;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
-	public abstract partial class Texture : GraphicsResource
+	public abstract partial class Texture : ShaderResource
 	{
 		internal SurfaceFormat _format;
 		internal int _levelCount;
@@ -38,6 +38,11 @@ namespace Microsoft.Xna.Framework.Graphics
 		{
 			get { return _levelCount; }
 		}
+
+        internal Texture(ShaderAccess shaderAcess) :
+            base(shaderAcess)
+        {
+        }
 
         internal static int CalculateMipLevels(int width, int height = 0, int depth = 0)
         {

@@ -497,14 +497,15 @@ namespace Microsoft.Xna.Framework.Graphics
 #endif
 
         const SurfaceFormat InvalidFormat = (SurfaceFormat)int.MaxValue;
-		internal static void GetGLFormat (this SurfaceFormat format,
+        internal static void GetGLFormat (this SurfaceFormat format,
             GraphicsDevice graphicsDevice,
+            bool isWriteable,
             out PixelInternalFormat glInternalFormat,
             out PixelFormat glFormat,
             out PixelType glType)
 		{
-			glInternalFormat = PixelInternalFormat.Rgba;
-			glFormat = PixelFormat.Rgba;
+            glInternalFormat = PixelInternalFormat.Rgba8;
+            glFormat = PixelFormat.Rgba;
 			glType = PixelType.UnsignedByte;
 
 		    var supportsSRgb = graphicsDevice.GraphicsCapabilities.SupportsSRgb;
@@ -520,38 +521,44 @@ namespace Microsoft.Xna.Framework.Graphics
 
 			switch (format) {
 			case SurfaceFormat.Color:
-				glInternalFormat = PixelInternalFormat.Rgba;
-				glFormat = PixelFormat.Rgba;
+                glInternalFormat = PixelInternalFormat.Rgba8;
+                glFormat = PixelFormat.Rgba;
 				glType = PixelType.UnsignedByte;
 				break;
             case SurfaceFormat.ColorSRgb:
                 if (!supportsSRgb)
                     goto case SurfaceFormat.Color;
-                glInternalFormat = PixelInternalFormat.Srgb;
+                glInternalFormat = PixelInternalFormat.Srgb8;
                 glFormat = PixelFormat.Rgba;
                 glType = PixelType.UnsignedByte;
                 break;
 			case SurfaceFormat.Bgr565:
+                if (isWriteable)
+                    goto case InvalidFormat;
 				glInternalFormat = PixelInternalFormat.Rgb;
 				glFormat = PixelFormat.Rgb;
 				glType = PixelType.UnsignedShort565;
 				break;
 			case SurfaceFormat.Bgra4444:
 #if IOS || ANDROID
-				glInternalFormat = PixelInternalFormat.Rgba;
-#else
 				glInternalFormat = PixelInternalFormat.Rgba4;
+#else
+                glInternalFormat = PixelInternalFormat.Rgba4;
 #endif
 				glFormat = PixelFormat.Rgba;
 				glType = PixelType.UnsignedShort4444;
 				break;
 			case SurfaceFormat.Bgra5551:
-				glInternalFormat = PixelInternalFormat.Rgba;
+                if (isWriteable)
+                    goto case InvalidFormat;
+                glInternalFormat = PixelInternalFormat.Rgba;
 				glFormat = PixelFormat.Rgba;
 				glType = PixelType.UnsignedShort5551;
 				break;
 			case SurfaceFormat.Alpha8:
-				glInternalFormat = PixelInternalFormat.Luminance;
+                if (isWriteable)
+                    goto case InvalidFormat;
+                glInternalFormat = PixelInternalFormat.Luminance;
 				glFormat = PixelFormat.Luminance;
 				glType = PixelType.UnsignedByte;
 				break;
@@ -674,14 +681,159 @@ namespace Microsoft.Xna.Framework.Graphics
                 glType = PixelType.UnsignedShort;
                 break;
 
-            case SurfaceFormat.Rgba64:
+                case SurfaceFormat.Rgba64:
                 if (!supportsNormalized)
                     goto case InvalidFormat;
                 glInternalFormat = PixelInternalFormat.Rgba16;
                 glFormat = PixelFormat.Rgba;
                 glType = PixelType.UnsignedShort;
                 break;
-            case SurfaceFormat.RgbaAtcExplicitAlpha:
+
+            case SurfaceFormat.R32Uint:
+                if (!supportsNormalized)
+                    goto case InvalidFormat;
+                glInternalFormat = PixelInternalFormat.R32ui;
+                glFormat = PixelFormat.RedInteger;
+                glType = PixelType.UnsignedInt;
+                break;
+
+            case SurfaceFormat.R32Int:
+                if (!supportsNormalized)
+                    goto case InvalidFormat;
+                glInternalFormat = PixelInternalFormat.R32i;
+                glFormat = PixelFormat.RedInteger;
+                glType = PixelType.Int;
+                break;
+
+            case SurfaceFormat.R16Uint:
+                if (!supportsNormalized)
+                    goto case InvalidFormat;
+                glInternalFormat = PixelInternalFormat.R16ui;
+                glFormat = PixelFormat.RedInteger;
+                glType = PixelType.UnsignedShort;
+                break;
+
+            case SurfaceFormat.R16Int:
+                if (!supportsNormalized)
+                    goto case InvalidFormat;
+                glInternalFormat = PixelInternalFormat.R16i;
+                glFormat = PixelFormat.RedInteger;
+                glType = PixelType.Short;
+                break;
+
+            case SurfaceFormat.R8Uint:
+                if (!supportsNormalized)
+                    goto case InvalidFormat;
+                glInternalFormat = PixelInternalFormat.R8ui;
+                glFormat = PixelFormat.RedInteger;
+                glType = PixelType.UnsignedByte;
+                break;
+
+            case SurfaceFormat.R8Int:
+                if (!supportsNormalized)
+                    goto case InvalidFormat;
+                glInternalFormat = PixelInternalFormat.R8i;
+                glFormat = PixelFormat.RedInteger;
+                glType = PixelType.Byte;
+                break;
+
+            case SurfaceFormat.Rg64Uint:
+                if (!supportsNormalized)
+                    goto case InvalidFormat;
+                glInternalFormat = PixelInternalFormat.Rg32ui;
+                glFormat = PixelFormat.RgInteger;
+                glType = PixelType.UnsignedInt;
+                break;
+
+            case SurfaceFormat.Rg64Int:
+                if (!supportsNormalized)
+                    goto case InvalidFormat;
+                glInternalFormat = PixelInternalFormat.Rg32i;
+                glFormat = PixelFormat.RgInteger;
+                glType = PixelType.Int;
+                break;
+
+            case SurfaceFormat.Rg32Uint:
+                if (!supportsNormalized)
+                    goto case InvalidFormat;
+                glInternalFormat = PixelInternalFormat.Rg16ui;
+                glFormat = PixelFormat.RgInteger;
+                glType = PixelType.UnsignedShort;
+                break;
+
+                case SurfaceFormat.Rg32Int:
+                if (!supportsNormalized)
+                    goto case InvalidFormat;
+                glInternalFormat = PixelInternalFormat.Rg16i;
+                glFormat = PixelFormat.RgInteger;
+                glType = PixelType.Short;
+                break;
+
+            case SurfaceFormat.Rg16Uint:
+                if (!supportsNormalized)
+                    goto case InvalidFormat;
+                glInternalFormat = PixelInternalFormat.Rg8ui;
+                glFormat = PixelFormat.RgInteger;
+                glType = PixelType.UnsignedByte;
+                break;
+
+            case SurfaceFormat.Rg16Int:
+                if (!supportsNormalized)
+                    goto case InvalidFormat;
+                glInternalFormat = PixelInternalFormat.Rg8i;
+                glFormat = PixelFormat.RgInteger;
+                glType = PixelType.Byte;
+                break;
+
+            case SurfaceFormat.Rgba128Uint:
+                if (!supportsNormalized)
+                    goto case InvalidFormat;
+                glInternalFormat = PixelInternalFormat.Rgba32ui;
+                glFormat = PixelFormat.RgbaInteger;
+                glType = PixelType.UnsignedInt;
+                break;
+
+            case SurfaceFormat.Rgba128Int:
+                if (!supportsNormalized)
+                    goto case InvalidFormat;
+                glInternalFormat = PixelInternalFormat.Rgba32i;
+                glFormat = PixelFormat.RgbaInteger;
+                glType = PixelType.Int;
+                break;
+
+            case SurfaceFormat.Rgba64Uint:
+                if (!supportsNormalized)
+                    goto case InvalidFormat;
+                glInternalFormat = PixelInternalFormat.Rgba16ui;
+                glFormat = PixelFormat.RgbaInteger;
+                glType = PixelType.UnsignedShort;
+                break;
+
+            case SurfaceFormat.Rgba64Int:
+                if (!supportsNormalized)
+                    goto case InvalidFormat;
+                glInternalFormat = PixelInternalFormat.Rgba16i;
+                glFormat = PixelFormat.RgbaInteger;
+                glType = PixelType.Short;
+                break;
+
+            case SurfaceFormat.Rgba32Uint:
+                if (!supportsNormalized)
+                    goto case InvalidFormat;
+                glInternalFormat = PixelInternalFormat.Rgba8ui;
+                glFormat = PixelFormat.RgbaInteger;
+                glType = PixelType.UnsignedByte;
+                break;
+
+            case SurfaceFormat.Rgba32Int:
+                if (!supportsNormalized)
+                    goto case InvalidFormat;
+                glInternalFormat = PixelInternalFormat.Rgba8i;
+                glFormat = PixelFormat.RgbaInteger;
+                glType = PixelType.Byte;
+                break;
+
+                case SurfaceFormat.RgbaAtcExplicitAlpha:
                 if (!supportsAtitc)
                     goto case InvalidFormat;
 				glInternalFormat = PixelInternalFormat.AtcRgbaExplicitAlphaAmd;
@@ -767,7 +919,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
 #endif // OPENGL
 
-                    public static int GetSyncInterval(this PresentInterval interval)
+        public static int GetSyncInterval(this PresentInterval interval)
         {
             switch (interval)
             {
@@ -840,12 +992,18 @@ namespace Microsoft.Xna.Framework.Graphics
                     // One texel in DXT3 and DXT5 is a minimum 4x4 block, which is 16 bytes
                     return 16;
                 case SurfaceFormat.Alpha8:
+                case SurfaceFormat.R8Uint:
+                case SurfaceFormat.R8Int:
                     return 1;
                 case SurfaceFormat.Bgr565:
                 case SurfaceFormat.Bgra4444:
                 case SurfaceFormat.Bgra5551:
                 case SurfaceFormat.HalfSingle:
                 case SurfaceFormat.NormalizedByte2:
+                case SurfaceFormat.R16Uint:
+                case SurfaceFormat.R16Int:
+                case SurfaceFormat.Rg16Uint:
+                case SurfaceFormat.Rg16Int:
                     return 2;
                 case SurfaceFormat.Color:
                 case SurfaceFormat.ColorSRgb:
@@ -858,12 +1016,24 @@ namespace Microsoft.Xna.Framework.Graphics
                 case SurfaceFormat.Bgra32SRgb:
                 case SurfaceFormat.Bgr32:
                 case SurfaceFormat.Bgr32SRgb:
+                case SurfaceFormat.R32Uint:
+                case SurfaceFormat.R32Int:
+                case SurfaceFormat.Rg32Uint:
+                case SurfaceFormat.Rg32Int:
+                case SurfaceFormat.Rgba32Uint:
+                case SurfaceFormat.Rgba32Int:
                     return 4;
                 case SurfaceFormat.HalfVector4:
                 case SurfaceFormat.Rgba64:
                 case SurfaceFormat.Vector2:
+                case SurfaceFormat.Rg64Uint:
+                case SurfaceFormat.Rg64Int:
+                case SurfaceFormat.Rgba64Uint:
+                case SurfaceFormat.Rgba64Int:
                     return 8;
                 case SurfaceFormat.Vector4:
+                case SurfaceFormat.Rgba128Uint:
+                case SurfaceFormat.Rgba128Int:
                     return 16;
                 default:
                     throw new ArgumentException();
@@ -964,7 +1134,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		[DebuggerHidden]
         public static void CheckGLError()
         {
-           var error = GL.GetError();
+            var error = GL.GetError();
             //Console.WriteLine(error);
             if (error != ErrorCode.NoError)
                 throw new MonoGameGLException("GL.GetError() returned " + error.ToString());

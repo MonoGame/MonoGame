@@ -23,10 +23,32 @@ namespace MonoGame.Effect.Compiler
 
             if (!parser.ParseCommandLine(args))
                 return 1;
+
+            int ret = CompileFile(options, out bool tryAgainUsingMojo);
+
+            if (tryAgainUsingMojo)
+            {
+                options.UseMojoShader = true;
+                ret = CompileFile(options, out tryAgainUsingMojo);
+            }
+
+            return ret;
+        }
+
+        private static int CompileFile(Options options, out bool tryAgainUsingMojo)
+        {
+            tryAgainUsingMojo = false;
+
+            // 
+            if (options.Profile is OpenGLShaderProfile && !options.UseMojoShader && options.IsDefined("MOJO"))
+            {
+                tryAgainUsingMojo = true;
+                return 0;
+            }
             
-            // We don't support running MGFXC on Unix platforms
+            // We don't support running MojoShader on Unix platforms
             // however Wine can be used to make it work so lets try that.
-            if (Environment.OSVersion.Platform == PlatformID.Unix)
+            if (options.UseMojoShader && Environment.OSVersion.Platform == PlatformID.Unix)
                 return WineHelper.Run(options);
 
             // Validate the input file exits.
@@ -35,7 +57,7 @@ namespace MonoGame.Effect.Compiler
                 Console.Error.WriteLine("The input file '{0}' was not found!", options.SourceFile);
                 return 1;
             }
-            
+
             // TODO: This would be where we would decide the user
             // is trying to convert an FX file to a MGFX glsl file.
             //
@@ -57,12 +79,22 @@ namespace MonoGame.Effect.Compiler
                 return 1;
             }
 
+            // Fallback to MojoShader compilation for shader model 2 and 3 shaders
+            if (options.Profile is OpenGLShaderProfile && !options.UseMojoShader)
+            {
+                if(!options.IsDefined("CONDUCTOR") && !EffectObject.DoesEffectNeedSM4OrHigher(shaderResult))
+                {
+                    tryAgainUsingMojo = true;
+                    return 0;
+                }
+            }
+
             // Create the effect object.
             EffectObject effect;
             var shaderErrorsAndWarnings = string.Empty;
             try
             {
-                effect = EffectObject.CompileEffect(shaderResult, out shaderErrorsAndWarnings);
+                effect = EffectObject.CompileEffect(shaderResult, options, out shaderErrorsAndWarnings);
 
                 if (!string.IsNullOrEmpty(shaderErrorsAndWarnings))
                     Console.Error.WriteLine(shaderErrorsAndWarnings);
@@ -88,7 +120,7 @@ namespace MonoGame.Effect.Compiler
                 Console.Error.WriteLine("Unexpected error compiling '{0}'!", options.SourceFile);
                 return 1;
             }
-            
+
             // Get the output file path.
             if (options.OutputFile == string.Empty)
                 options.OutputFile = Path.GetFileNameWithoutExtension(options.SourceFile) + ".mgfxo";

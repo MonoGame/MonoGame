@@ -89,28 +89,26 @@ namespace Microsoft.Xna.Framework.Graphics
         private readonly RenderTargetBinding[] _tempRenderTargetBinding = new RenderTargetBinding[1];
 
         internal GraphicsCapabilities GraphicsCapabilities { get; private set; }
+       
+        public ShaderResourceCollection VertexShaderResources { get; private set; }
+        public ShaderResourceCollection PixelShaderResources { get; private set; }
+        public ShaderResourceCollection HullShaderResources { get; private set; }
+        public ShaderResourceCollection DomainShaderResources { get; private set; }
+        public ShaderResourceCollection GeometryShaderResources { get; private set; }
+        public ShaderResourceCollection ComputeShaderResources { get; private set; }
 
-        /// <summary>
-        /// Gets the collection of vertex textures that support texture lookup
-        /// in the vertex shader using the texldl statement.
-        /// The vertex engine contains four texture sampler stages.
-        /// </summary>
-        public TextureCollection VertexTextures { get; private set; }
+        // For backwards compatibility. TextureCollection was replaced with ShaderResourceCollection
+        public ShaderResourceCollection Textures { get { return PixelShaderResources; } }
+        // For backwards compatibility. TextureCollection was replaced with ShaderResourceCollection
+        public ShaderResourceCollection VertexTextures { get { return VertexShaderResources; } }
 
-        /// <summary>
-        /// Returns the collection of vertex sampler states.
-        /// </summary>
-        public SamplerStateCollection VertexSamplerStates { get; private set; }
-
-        /// <summary>
-        /// Returns the collection of textures that have been assigned to the texture stages of the device.
-        /// </summary>
-        public TextureCollection Textures { get; private set; }
-
-        /// <summary>
-        /// Retrieves a collection of <see cref="SamplerState"/> objects for the current <see cref="GraphicsDevice"/>.
-        /// </summary>
         public SamplerStateCollection SamplerStates { get; private set; }
+        public SamplerStateCollection VertexSamplerStates { get; private set; }
+        public SamplerStateCollection HullSamplerStates { get; private set; }
+        public SamplerStateCollection DomainSamplerStates { get; private set; }
+        public SamplerStateCollection GeometrySamplerStates { get; private set; }
+        public SamplerStateCollection ComputeSamplerStates { get; private set; }
+
 
         /// <summary>
         /// Get or set the color a <see cref="RenderTarget2D"/> is cleared to when it is set.
@@ -140,8 +138,53 @@ namespace Microsoft.Xna.Framework.Graphics
             get { return _pixelShaderDirty; }
         }
 
+        /// <summary>
+        /// The active domain shader.
+        /// </summary>
+        private Shader _domainShader;
+        private bool _domainShaderDirty;
+        private bool DomainShaderDirty
+        {
+            get { return _domainShaderDirty; }
+        }
+
+        /// <summary>
+        /// The active hull shader.
+        /// </summary>
+        private Shader _hullShader;
+        private bool _hullShaderDirty;
+        private bool HullShaderDirty
+        {
+            get { return _hullShaderDirty; }
+        }
+
+        /// <summary>
+        /// The active geometry shader.
+        /// </summary>
+        private Shader _geometryShader;
+        private bool _geometryShaderDirty;
+        private bool GeometryShaderDirty
+        {
+            get { return _geometryShaderDirty; }
+        }
+
+        /// <summary>
+        /// The active compute shader.
+        /// </summary>
+        private Shader _computeShader;
+        private bool _computeShaderDirty;
+        private bool ComputeShaderDirty
+        {
+            get { return _computeShaderDirty; }
+        }
+
         private readonly ConstantBufferCollection _vertexConstantBuffers = new ConstantBufferCollection(ShaderStage.Vertex, 16);
         private readonly ConstantBufferCollection _pixelConstantBuffers = new ConstantBufferCollection(ShaderStage.Pixel, 16);
+        private readonly ConstantBufferCollection _hullConstantBuffers = new ConstantBufferCollection(ShaderStage.Hull, 16);
+        private readonly ConstantBufferCollection _domainConstantBuffers = new ConstantBufferCollection(ShaderStage.Domain, 16);
+        private readonly ConstantBufferCollection _geometryConstantBuffers = new ConstantBufferCollection(ShaderStage.Geometry, 16);
+        private readonly ConstantBufferCollection _computeConstantBuffers = new ConstantBufferCollection(ShaderStage.Compute, 16);
+
 
         /// <summary>
         /// The cache of effects from unique byte streams.
@@ -192,8 +235,10 @@ namespace Microsoft.Xna.Framework.Graphics
         internal event EventHandler<PresentationEventArgs> PresentationChanged;
 
         private int _maxVertexBufferSlots;
-        internal int MaxTextureSlots;
-        internal int MaxVertexTextureSlots;
+
+        internal const int MaxResourceSlotsPerStage = 16;
+        internal const int MaxUavSlotsPerStage = 8;
+        internal const int UavRegisterShiftMGFXC = 128; // this number is used in MGFXC to shift u-register bindings (see ShaderData.conductor.cs)
 
         /// <summary>
         /// Gets a value that indicates whether the object is disposed.
@@ -347,11 +392,19 @@ namespace Microsoft.Xna.Framework.Graphics
 
             PlatformSetup();
 
-            VertexTextures = new TextureCollection(this, MaxVertexTextureSlots, true);
-            VertexSamplerStates = new SamplerStateCollection(this, MaxVertexTextureSlots, true);
+            SamplerStates = new SamplerStateCollection(this, MaxResourceSlotsPerStage);
+            VertexSamplerStates = new SamplerStateCollection(this, MaxResourceSlotsPerStage);
+            HullSamplerStates = new SamplerStateCollection(this, MaxResourceSlotsPerStage);
+            DomainSamplerStates = new SamplerStateCollection(this, MaxResourceSlotsPerStage);
+            GeometrySamplerStates = new SamplerStateCollection(this, MaxResourceSlotsPerStage);
+            ComputeSamplerStates = new SamplerStateCollection(this, MaxResourceSlotsPerStage);
 
-            Textures = new TextureCollection(this, MaxTextureSlots, false);
-            SamplerStates = new SamplerStateCollection(this, MaxTextureSlots, false);
+            VertexShaderResources = new ShaderResourceCollection(ShaderStage.Vertex, MaxResourceSlotsPerStage, 0);
+            PixelShaderResources = new ShaderResourceCollection(ShaderStage.Pixel, MaxResourceSlotsPerStage, MaxUavSlotsPerStage);
+            HullShaderResources = new ShaderResourceCollection(ShaderStage.Hull, MaxResourceSlotsPerStage, 0);
+            DomainShaderResources = new ShaderResourceCollection(ShaderStage.Domain, MaxResourceSlotsPerStage, 0);
+            GeometryShaderResources = new ShaderResourceCollection(ShaderStage.Geometry, MaxResourceSlotsPerStage, 0);
+            ComputeShaderResources = new ShaderResourceCollection(ShaderStage.Compute, MaxResourceSlotsPerStage, MaxUavSlotsPerStage);
 
             _blendStateAdditive = BlendState.Additive.Clone();
             _blendStateAlphaBlend = BlendState.AlphaBlend.Clone();
@@ -414,16 +467,30 @@ namespace Microsoft.Xna.Framework.Graphics
             DepthStencilState = DepthStencilState.Default;
             RasterizerState = RasterizerState.CullCounterClockwise;
 
-            // Clear the texture and sampler collections forcing
+            // Clear sampler collections forcing
             // the state to be reapplied.
-            VertexTextures.Clear();
-            VertexSamplerStates.Clear();
-            Textures.Clear();
             SamplerStates.Clear();
+            VertexSamplerStates.Clear();
+            HullSamplerStates.Clear();
+            DomainSamplerStates.Clear();
+            GeometrySamplerStates.Clear();
+            ComputeSamplerStates.Clear();
 
             // Clear constant buffers
             _vertexConstantBuffers.Clear();
             _pixelConstantBuffers.Clear();
+            _hullConstantBuffers.Clear();
+            _domainConstantBuffers.Clear();
+            _geometryConstantBuffers.Clear();
+            _computeConstantBuffers.Clear();
+
+            // Clear shader resources
+            VertexShaderResources.Clear();
+            PixelShaderResources.Clear();
+            HullShaderResources.Clear();
+            DomainShaderResources.Clear();
+            GeometryShaderResources.Clear();
+            ComputeShaderResources.Clear();
 
             // Force set the buffers and shaders on next ApplyState() call
             _vertexBuffers = new VertexBufferBindings(_maxVertexBufferSlots);
@@ -431,6 +498,10 @@ namespace Microsoft.Xna.Framework.Graphics
             _indexBufferDirty = true;
             _vertexShaderDirty = true;
             _pixelShaderDirty = true;
+            _hullShaderDirty = true;
+            _domainShaderDirty = true;
+            _geometryShaderDirty = true;
+            _computeShaderDirty = true;
 
             // Set the default scissor rect.
             _scissorRectangleDirty = true;
@@ -1133,7 +1204,6 @@ namespace Microsoft.Xna.Framework.Graphics
         internal Shader VertexShader
         {
             get { return _vertexShader; }
-
             set
             {
                 if (_vertexShader == value)
@@ -1148,7 +1218,6 @@ namespace Microsoft.Xna.Framework.Graphics
         internal Shader PixelShader
         {
             get { return _pixelShader; }
-
             set
             {
                 if (_pixelShader == value)
@@ -1160,12 +1229,108 @@ namespace Microsoft.Xna.Framework.Graphics
             }
         }
 
+        internal Shader HullShader
+        {
+            get { return _hullShader; }
+            set
+            {
+                if (_hullShader == value)
+                    return;
+
+                _hullShader = value;
+                _hullConstantBuffers.Clear();
+                _hullShaderDirty = true;
+            }
+        }
+
+        internal Shader DomainShader
+        {
+            get { return _domainShader; }
+            set
+            {
+                if (_domainShader == value)
+                    return;
+
+                _domainShader = value;
+                _domainConstantBuffers.Clear();
+                _domainShaderDirty = true;
+            }
+        }
+
+        internal Shader GeometryShader
+        {
+            get { return _geometryShader; }
+            set
+            {
+                if (_geometryShader == value)
+                    return;
+
+                _geometryShader = value;
+                _geometryConstantBuffers.Clear();
+                _geometryShaderDirty = true;
+            }
+        }
+
+        internal Shader ComputeShader
+        {
+            get { return _computeShader; }
+            set
+            {
+                if (_computeShader == value)
+                    return;
+
+                _computeShader = value;
+                _computeConstantBuffers.Clear();
+                _computeShaderDirty = true;
+            }
+        }
+
         internal void SetConstantBuffer(ShaderStage stage, int slot, ConstantBuffer buffer)
         {
-            if (stage == ShaderStage.Vertex)
-                _vertexConstantBuffers[slot] = buffer;
-            else
-                _pixelConstantBuffers[slot] = buffer;
+            switch (stage)
+            {
+                case ShaderStage.Vertex:
+                    _vertexConstantBuffers[slot] = buffer;
+                    break;
+                case ShaderStage.Pixel:
+                    _pixelConstantBuffers[slot] = buffer;
+                    break;
+                case ShaderStage.Hull:
+                    _hullConstantBuffers[slot] = buffer;
+                    break;
+                case ShaderStage.Domain:
+                    _domainConstantBuffers[slot] = buffer;
+                    break;
+                case ShaderStage.Geometry:
+                    _geometryConstantBuffers[slot] = buffer;
+                    break;
+                case ShaderStage.Compute:
+                    _computeConstantBuffers[slot] = buffer;
+                    break;
+                default:
+                    throw new ArgumentException();
+            }
+        }
+
+        internal ShaderResourceCollection GetResourceCollectionForShaderStage(ShaderStage stage)
+        {
+            switch (stage)
+            {
+                case ShaderStage.Vertex:
+                    return VertexShaderResources;
+                case ShaderStage.Pixel:
+                    return PixelShaderResources;
+                case ShaderStage.Hull:
+                    return HullShaderResources;
+                case ShaderStage.Domain:
+                    return DomainShaderResources;
+                case ShaderStage.Geometry:
+                    return GeometryShaderResources;
+                case ShaderStage.Compute:
+                    return ComputeShaderResources;
+                default:
+                    throw new ArgumentException();
+            }
         }
 
         /// <summary>
@@ -1206,6 +1371,14 @@ namespace Microsoft.Xna.Framework.Graphics
 
             if (_indexBuffer == null)
                 throw new InvalidOperationException("Index buffer must be set before calling DrawIndexedPrimitives.");
+
+            bool isPatchPrimitives = primitiveType >= PrimitiveType.PatchListWith1ControlPoints && primitiveType <= PrimitiveType.PatchListWith32ControlPoints;
+
+            if (_hullShader == null && isPatchPrimitives)
+                throw new ArgumentException("Patch primitives can only be drawn when a hull shader is active");
+
+            if (_hullShader != null && !isPatchPrimitives)
+                throw new ArgumentException("If a hull shader is active the primitive type must be one of the patch types");
 
             if (primitiveCount <= 0)
                 throw new ArgumentOutOfRangeException("primitiveCount");
@@ -1257,6 +1430,14 @@ namespace Microsoft.Xna.Framework.Graphics
             if (primitiveCount <= 0)
                 throw new ArgumentOutOfRangeException("primitiveCount");
 
+            bool isPatchPrimitives = primitiveType >= PrimitiveType.PatchListWith1ControlPoints && primitiveType <= PrimitiveType.PatchListWith32ControlPoints;
+
+            if (_hullShader == null && isPatchPrimitives)
+                throw new ArgumentException("Patch primitives can only be drawn when a hull shader is active");
+
+            if (_hullShader != null && !isPatchPrimitives)
+                throw new ArgumentException("If a hull shader is active the primitive type must be one of the patch types");
+
             var vertexCount = GetElementCountArray(primitiveType, primitiveCount);
 
             if (vertexOffset + vertexCount > vertexData.Length)
@@ -1290,6 +1471,14 @@ namespace Microsoft.Xna.Framework.Graphics
 
             if (primitiveCount <= 0)
                 throw new ArgumentOutOfRangeException("primitiveCount");
+
+            bool isPatchPrimitives = primitiveType >= PrimitiveType.PatchListWith1ControlPoints && primitiveType <= PrimitiveType.PatchListWith32ControlPoints;
+
+            if (_hullShader == null && isPatchPrimitives)
+                throw new ArgumentException("Patch primitives can only be drawn when a hull shader is active");
+
+            if (_hullShader != null && !isPatchPrimitives)
+                throw new ArgumentException("If a hull shader is active the primitive type must be one of the patch types");
 
             var vertexCount = GetElementCountArray(primitiveType, primitiveCount);
 
@@ -1363,6 +1552,14 @@ namespace Microsoft.Xna.Framework.Graphics
 
             if (primitiveCount <= 0)
                 throw new ArgumentOutOfRangeException("primitiveCount");
+
+            bool isPatchPrimitives = primitiveType >= PrimitiveType.PatchListWith1ControlPoints && primitiveType <= PrimitiveType.PatchListWith32ControlPoints;
+
+            if (_hullShader == null && isPatchPrimitives)
+                throw new ArgumentException("Patch primitives can only be drawn when a hull shader is active");
+
+            if (_hullShader != null && !isPatchPrimitives)
+                throw new ArgumentException("If a hull shader is active the primitive type must be one of the patch types");
 
             if (indexOffset + GetElementCountArray(primitiveType, primitiveCount) > indexData.Length)
                 throw new ArgumentOutOfRangeException("primitiveCount");
@@ -1444,6 +1641,14 @@ namespace Microsoft.Xna.Framework.Graphics
             if (primitiveCount <= 0)
                 throw new ArgumentOutOfRangeException("primitiveCount");
 
+            bool isPatchPrimitives = primitiveType >= PrimitiveType.PatchListWith1ControlPoints && primitiveType <= PrimitiveType.PatchListWith32ControlPoints;
+
+            if (_hullShader == null && isPatchPrimitives)
+                throw new ArgumentException("Patch primitives can only be drawn when a hull shader is active");
+
+            if (_hullShader != null && !isPatchPrimitives)
+                throw new ArgumentException("If a hull shader is active the primitive type must be one of the patch types");
+
             if (indexOffset + GetElementCountArray(primitiveType, primitiveCount) > indexData.Length)
                 throw new ArgumentOutOfRangeException("primitiveCount");
 
@@ -1515,6 +1720,14 @@ namespace Microsoft.Xna.Framework.Graphics
             if (_indexBuffer == null)
                 throw new InvalidOperationException("Index buffer must be set before calling DrawInstancedPrimitives.");
 
+            bool isPatchPrimitives = primitiveType >= PrimitiveType.PatchListWith1ControlPoints && primitiveType <= PrimitiveType.PatchListWith32ControlPoints;
+
+            if (_hullShader == null && isPatchPrimitives)
+                throw new ArgumentException("Patch primitives can only be drawn when a hull shader is active");
+
+            if (_hullShader != null && !isPatchPrimitives)
+                throw new ArgumentException("If a hull shader is active the primitive type must be one of the patch types");
+
             if (primitiveCount <= 0)
                 throw new ArgumentOutOfRangeException("primitiveCount");
 
@@ -1525,6 +1738,106 @@ namespace Microsoft.Xna.Framework.Graphics
                 _graphicsMetrics._drawCount++;
                 _graphicsMetrics._primitiveCount += (primitiveCount * instanceCount);
             }
+        }
+
+        /// <summary>
+        /// Draw instanced geometry from the bound vertex buffers.
+        /// The draw parameters are provided by a buffer, rather than passed directly as function parameters.
+        /// </summary>
+        /// <param name="primitiveType">The type of primitives to draw.</param>
+        /// <param name="indirectDrawBuffer">The buffer containing the draw arguments (VertexCountPerInstance, InstanceCount, ...) 
+        /// <param name="alignedByteOffsetForArgs">The offset for the indirect draw buffer in bytes from where to start reading the parameters.</param>
+        public void DrawInstancedPrimitivesIndirect(PrimitiveType primitiveType, IndirectDrawBuffer indirectDrawBuffer, int alignedByteOffsetForArgs = 0)
+        {
+            if (_vertexShader == null)
+                throw new InvalidOperationException("Vertex shader must be set before calling DrawInstancedPrimitivesIndirect.");
+
+            if (_vertexBuffers.Count == 0)
+                throw new InvalidOperationException("Vertex buffer must be set before calling DrawInstancedPrimitives.");
+
+            bool isPatchPrimitives = primitiveType >= PrimitiveType.PatchListWith1ControlPoints && primitiveType <= PrimitiveType.PatchListWith32ControlPoints;
+
+            if (_hullShader == null && isPatchPrimitives)
+                throw new ArgumentException("Patch primitives can only be drawn when a hull shader is active");
+
+            if (_hullShader != null && !isPatchPrimitives)
+                throw new ArgumentException("If a hull shader is active the primitive type must be one of the patch types");
+
+            PlatformDrawInstancedPrimitivesIndirect(primitiveType, indirectDrawBuffer, alignedByteOffsetForArgs);
+
+            unchecked
+            {
+                _graphicsMetrics._drawCount++;
+            }
+        }
+
+        /// <summary>
+        /// Draw instanced geometry from the bound vertex and index buffer.
+        /// The draw parameters are provided by a buffer, rather than passed directly as function parameters.
+        /// </summary>
+        /// <param name="primitiveType">The type of primitives in the index buffer.</param>
+        /// <param name="indirectDrawBuffer">The buffer containing the draw arguments (IndexCountPerInstance, InstanceCount, ...) 
+        /// <param name="alignedByteOffsetForArgs">The offset for the indirect draw buffer in bytes from where to start reading the parameters.</param>
+        public void DrawIndexedInstancedPrimitivesIndirect(PrimitiveType primitiveType, IndirectDrawBuffer indirectDrawBuffer, int alignedByteOffsetForArgs = 0)
+        {
+            if (_vertexShader == null)
+                throw new InvalidOperationException("Vertex shader must be set before calling DrawInstancedPrimitives.");
+
+            if (_vertexBuffers.Count == 0)
+                throw new InvalidOperationException("Vertex buffer must be set before calling DrawInstancedPrimitives.");
+
+            if (_indexBuffer == null)
+                throw new InvalidOperationException("Index buffer must be set before calling DrawInstancedPrimitives.");
+
+            bool isPatchPrimitives = primitiveType >= PrimitiveType.PatchListWith1ControlPoints && primitiveType <= PrimitiveType.PatchListWith32ControlPoints;
+
+            if (_hullShader == null && isPatchPrimitives)
+                 throw new ArgumentException("Patch primitives can only be drawn when a hull shader is active");
+
+            if (_hullShader != null && !isPatchPrimitives)
+                 throw new ArgumentException("If a hull shader is active the primitive type must be one of the patch types");
+
+            PlatformDrawIndexedInstancedPrimitivesIndirect(primitiveType, indirectDrawBuffer, alignedByteOffsetForArgs);
+
+            unchecked
+            {
+                _graphicsMetrics._drawCount++;
+            }
+        }
+
+        /// <summary>
+        /// Execute the currently bound compute shader.
+        /// </summary>
+        /// <param name="threadGroupCountX">The number of thread groups dispatched in the x direction.</param>
+        /// <param name="threadGroupCountY">The number of thread groups dispatched in the y direction.</param>
+        /// <param name="threadGroupCountZ">The number of thread groups dispatched in the z direction.</param>
+        public void DispatchCompute(int threadGroupCountX, int threadGroupCountY, int threadGroupCountZ)
+        {
+            if (_computeShader == null)
+                return;
+
+            if (threadGroupCountX <= 0)
+                throw new ArgumentOutOfRangeException("threadGroupCountX");
+            if (threadGroupCountY <= 0)
+                throw new ArgumentOutOfRangeException("threadGroupCountY");
+            if (threadGroupCountZ <= 0)
+                throw new ArgumentOutOfRangeException("threadGroupCountZ");
+
+            PlatformDispatchCompute(threadGroupCountX, threadGroupCountY, threadGroupCountZ);
+        }
+
+        /// <summary>
+        /// Execute the currently bound compute shader.
+        /// The group count parameters are provided by a buffer, rather than passed directly as function parameters.
+        /// </summary>
+        /// <param name="indirectDrawBuffer">The buffer containing the group count x, y, z parameters.
+        /// <param name="alignedByteOffsetForArgs">The offset for the indirect draw buffer in bytes from where to start reading the parameters.</param>
+        public void DispatchComputeIndirect(IndirectDrawBuffer indirectDrawBuffer, int alignedByteOffsetForArgs = 0)
+        {
+            if (_computeShader == null)
+                return;
+
+            PlatformDispatchComputeIndirect(indirectDrawBuffer, alignedByteOffsetForArgs);
         }
 
         /// <summary>
@@ -1604,23 +1917,161 @@ namespace Microsoft.Xna.Framework.Graphics
             PlatformGetBackBufferData(rect, data, startIndex, elementCount);
         }
 
+        internal void CopyTextureData(Texture srcTexture, Texture dstTexture, int srcArrayIndex, int dstArrayIndex, int srcArraySize, int dstArraySize, int srcMipLevel, int dstMipLevel, int srcMipLevelCount, int dstMipLevelCount, int srcWidth, int srcHeight, int srcDepth, int dstWidth, int dstHeight, int dstDepth, int copyWidth, int copyHeight, int copyDepth, int srcOffsetX, int srcOffsetY, int srcOffsetZ, int dstOffsetX, int dstOffsetY, int dstOffsetZ)
+        {
+            if (srcArrayIndex < 0 || srcArrayIndex >= srcArraySize)
+                throw new InvalidOperationException("source array index or cubemap face out of range");
+            if (dstArrayIndex < 0 || dstArrayIndex >= dstArraySize)
+                throw new InvalidOperationException("destination array index or cubemap face out of range");
+            if (srcMipLevel < 0 || srcMipLevel >= srcMipLevelCount)
+                throw new InvalidOperationException("source mipmap level out of range");
+            if (dstMipLevel < 0 || dstMipLevel >= dstMipLevelCount)
+                throw new InvalidOperationException("destination mipmap level out of range");
+            if (srcOffsetX < 0 || srcOffsetY < 0 || srcOffsetZ < 0)
+                throw new InvalidOperationException("source offsets must not be negative");
+            if (dstOffsetX < 0 || dstOffsetY < 0 || dstOffsetZ < 0)
+                throw new InvalidOperationException("destination offsets must not be negative");
+
+            int srcMipFactor = 1 << srcMipLevel;
+            int dstMipFactor = 1 << dstMipLevel;
+
+            int srcMipWidth  = Math.Max(1, srcWidth  / srcMipFactor);
+            int srcMipHeight = Math.Max(1, srcHeight / srcMipFactor);
+            int srcMipDepth  = Math.Max(1, srcDepth  / srcMipFactor);
+
+            int dstMipWidth  = Math.Max(1, dstWidth  / dstMipFactor);
+            int dstMipHeight = Math.Max(1, dstHeight / dstMipFactor);
+            int dstMipDepth  = Math.Max(1, dstDepth  / dstMipFactor);
+
+            copyWidth  = (copyWidth  == -1 ? srcMipWidth  : copyWidth);
+            copyHeight = (copyHeight == -1 ? srcMipHeight : copyHeight);
+            copyDepth  = (copyDepth  == -1 ? srcMipDepth  : copyDepth);
+
+            if (srcOffsetX + copyWidth  > srcMipWidth)
+                throw new InvalidOperationException("source texture width is too small for the requested amount of pixels to be copied from the requested x-offset");
+            if (srcOffsetY + copyHeight > srcMipHeight)
+                throw new InvalidOperationException("source texture height is too small for the requested amount of pixels to be copied from the requested y-offset");
+            if (srcOffsetZ + copyDepth  > srcMipDepth)
+                throw new InvalidOperationException("source texture depth is too small for the requested amount of pixels to be copied from the requested z-offset");
+            if (dstOffsetX + copyWidth  > dstMipWidth)
+                throw new InvalidOperationException("destination texture width is too small for the requested amount of pixels to be copied to the requested x-offset");
+            if (dstOffsetY + copyHeight > dstMipHeight)
+                throw new InvalidOperationException("destination texture height is too small for the requested amount of pixels to be copied to the requested y-offset");
+            if (dstOffsetZ + copyDepth  > dstMipDepth)
+                throw new InvalidOperationException("destination texture depth is too small for the requested amount of pixels to be copied to the requested z-offset");
+
+            CopyTextureDataInternal(srcTexture, dstTexture, srcArrayIndex, dstArrayIndex, srcMipLevel, dstMipLevel, srcMipLevelCount, dstMipLevelCount, copyWidth, copyHeight, copyDepth, srcOffsetX, srcOffsetY, srcOffsetZ, dstOffsetX, dstOffsetY, dstOffsetZ);
+        }
+
+        internal void CopyBufferData(BufferResource srcBuffer, BufferResource dstBuffer, int numBytesToCopy, int srcOffsetInBytes, int dstOffsetInBytes)
+        {
+            if (srcOffsetInBytes < 0 || dstOffsetInBytes < 0)
+                throw new InvalidOperationException("source and destination byte offset must not be negative");
+            if (srcOffsetInBytes + numBytesToCopy > srcBuffer.ElementCount * srcBuffer.ElementStride)
+                throw new InvalidOperationException("source buffer is too small for the requested amount of data to be copied to the requested byte offset");
+            if (dstOffsetInBytes + numBytesToCopy > dstBuffer.ElementCount * dstBuffer.ElementStride)
+                throw new InvalidOperationException("destination buffer is too small for the requested amount of data to be copied to the requested byte offset");
+
+            CopyBufferDataInternal(srcBuffer, dstBuffer, numBytesToCopy, srcOffsetInBytes, dstOffsetInBytes);
+        }
+
+        internal void CopyStructuredBufferCounterValue(StructuredBuffer srcBuffer, BufferResource dstBuffer, int dstByteOffset)
+        {
+            if (srcBuffer.StructuredBufferType == StructuredBufferType.Basic)
+                throw new InvalidOperationException("CopyCounterValue only works for structured buffers of type StructuredBufferType.Append or StructuredBufferType.Counter. This buffer was created with StructuredBufferType.Basic");
+            if (dstByteOffset < 0)
+                throw new InvalidOperationException("destination byte offset must not be negative");
+            if (dstBuffer.ElementCount * dstBuffer.ElementStride < dstByteOffset + 4)
+                throw new InvalidOperationException("destination buffer is too small for the requested amount of data to be copied to the requested byte offset");
+
+            CopyStructuredBufferCounterValueInternal(srcBuffer, dstBuffer, dstByteOffset);
+        }
+
         private static int GetElementCountArray(PrimitiveType primitiveType, int primitiveCount)
         {
             switch (primitiveType)
             {
                 case PrimitiveType.LineList:
+                case PrimitiveType.LineListWithAdjacency:
                     return primitiveCount * 2;
                 case PrimitiveType.LineStrip:
+                case PrimitiveType.LineStripWithAdjacency:
                     return primitiveCount + 1;
                 case PrimitiveType.TriangleList:
+                case PrimitiveType.TriangleListWithAdjacency:
                     return primitiveCount * 3;
                 case PrimitiveType.TriangleStrip:
+                case PrimitiveType.TriangleStripWithAdjacency:
                     return primitiveCount + 2;
                 case PrimitiveType.PointList:
                     return primitiveCount;
+                case PrimitiveType.PatchListWith1ControlPoints:
+                    return primitiveCount * 1;
+                case PrimitiveType.PatchListWith2ControlPoints:
+                    return primitiveCount * 2;
+                case PrimitiveType.PatchListWith3ControlPoints:
+                    return primitiveCount * 3;
+                case PrimitiveType.PatchListWith4ControlPoints:
+                    return primitiveCount * 4;
+                case PrimitiveType.PatchListWith5ControlPoints:
+                    return primitiveCount * 5;
+                case PrimitiveType.PatchListWith6ControlPoints:
+                    return primitiveCount * 6;
+                case PrimitiveType.PatchListWith7ControlPoints:
+                    return primitiveCount * 7;
+                case PrimitiveType.PatchListWith8ControlPoints:
+                    return primitiveCount * 8;
+                case PrimitiveType.PatchListWith9ControlPoints:
+                    return primitiveCount * 9;
+                case PrimitiveType.PatchListWith10ControlPoints:
+                    return primitiveCount * 10;
+                case PrimitiveType.PatchListWith11ControlPoints:
+                    return primitiveCount * 11;
+                case PrimitiveType.PatchListWith12ControlPoints:
+                    return primitiveCount * 12;
+                case PrimitiveType.PatchListWith13ControlPoints:
+                    return primitiveCount * 13;
+                case PrimitiveType.PatchListWith14ControlPoints:
+                    return primitiveCount * 14;
+                case PrimitiveType.PatchListWith15ControlPoints:
+                    return primitiveCount * 15;
+                case PrimitiveType.PatchListWith16ControlPoints:
+                    return primitiveCount * 16;
+                case PrimitiveType.PatchListWith17ControlPoints:
+                    return primitiveCount * 17;
+                case PrimitiveType.PatchListWith18ControlPoints:
+                    return primitiveCount * 18;
+                case PrimitiveType.PatchListWith19ControlPoints:
+                    return primitiveCount * 19;
+                case PrimitiveType.PatchListWith20ControlPoints:
+                    return primitiveCount * 20;
+                case PrimitiveType.PatchListWith21ControlPoints:
+                    return primitiveCount * 21;
+                case PrimitiveType.PatchListWith22ControlPoints:
+                    return primitiveCount * 22;
+                case PrimitiveType.PatchListWith23ControlPoints:
+                    return primitiveCount * 23;
+                case PrimitiveType.PatchListWith24ControlPoints:
+                    return primitiveCount * 24;
+                case PrimitiveType.PatchListWith25ControlPoints:
+                    return primitiveCount * 25;
+                case PrimitiveType.PatchListWith26ControlPoints:
+                    return primitiveCount * 26;
+                case PrimitiveType.PatchListWith27ControlPoints:
+                    return primitiveCount * 27;
+                case PrimitiveType.PatchListWith28ControlPoints:
+                    return primitiveCount * 28;
+                case PrimitiveType.PatchListWith29ControlPoints:
+                    return primitiveCount * 29;
+                case PrimitiveType.PatchListWith30ControlPoints:
+                    return primitiveCount * 30;
+                case PrimitiveType.PatchListWith31ControlPoints:
+                    return primitiveCount * 31;
+                case PrimitiveType.PatchListWith32ControlPoints:
+                    return primitiveCount * 32;
+                default:
+                    throw new ArgumentException();
             }
-
-            throw new NotSupportedException();
         }
 
         // uniformly scales down the given rectangle by 10%

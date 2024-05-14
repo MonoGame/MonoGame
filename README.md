@@ -1,4 +1,35 @@
-﻿# MonoGame
+# MonoGame Compute Fork
+
+This fork adds modern shader features to the [MonoGame](https://github.com/MonoGame/MonoGame) framework.<br>
+Nugets are available on [nuget.org](https://www.nuget.org/profiles/cpt-max).
+
+<br>
+
+* Compute, Tessellation, and Geometry Shaders for DirectX and OpenGL
+* Structured Buffers for all Shader Stages (including Append and Consume)
+* Write directly to Textures or Vertex/Index Buffers from a Compute Shader
+* Write directly to Textures and Buffers from Pixel Shaders (DirectX only for now)
+* New Shader Compiler based on [ShaderConductor](https://github.com/cpt-max/ShaderConductor) for DesktopGL, as a replacement for MojoShader
+* Shader Model 4 and 5 support not only for DirectX, but also for DesktopGL
+* Compile Shaders natively on Linux without Wine
+* Support for Integer Surface Formats (can be used for per-pixel atomic operations)
+* Support for uint Shader Parameters
+* Indirect Draw and Indirect Compute (see [Compute Shader Guide](https://github.com/cpt-max/Docs/blob/master/MonoGame%20Compute%20Shader%20Guide.md#indirect-drawing))
+* Vertex Texture Fetch also for DesktopGL
+* CopyData functions for Textures and Buffers to copy data from one resource to another on the GPU without a shader
+
+<br>
+  
+* [Shader Samples](https://github.com/cpt-max/MonoGame-Shader-Samples/tree/overview)<br>
+* [Compute Shader Guide](https://github.com/cpt-max/Docs/blob/master/MonoGame%20Compute%20Shader%20Guide.md)<br>
+* [Build Requirements](https://github.com/cpt-max/Docs/blob/master/Build%20Requirements.md)<br>
+* [Shader Migration Guide for OpenGL](https://github.com/cpt-max/Docs/blob/master/Migrating%20shaders%20to%20ShaderConductor.md)<br>
+* [Shader Model Support for OpenGL](https://github.com/cpt-max/Docs/blob/master/Shader%20models%20for%20OpenGL.md)<br>
+* [Pull Request](https://github.com/MonoGame/MonoGame/pull/7533)<br>
+
+<br>
+
+# MonoGame
 
 MonoGame is a simple and powerful .NET framework for creating games for desktop PCs, video game consoles, and mobile devices using the C# programming language. It has been successfully used to create games such as [Streets of Rage 4](https://store.steampowered.com/app/985890/Streets_of_Rage_4/), [Carrion](https://store.steampowered.com/app/953490/CARRION/), [Celeste](https://store.steampowered.com/app/504230/Celeste/), [Stardew Valley](https://store.steampowered.com/app/413150/Stardew_Valley/), and [many others](https://monogame.net/showcase/).
 

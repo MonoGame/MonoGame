@@ -44,7 +44,15 @@ namespace Microsoft.Xna.Framework.Graphics
         /// <param name="width"></param>
         /// <param name="height"></param>
         public Texture2D(GraphicsDevice graphicsDevice, int width, int height)
-            : this(graphicsDevice, width, height, false, SurfaceFormat.Color, SurfaceType.Texture, false, 1)
+            : this(graphicsDevice, width, height, false, SurfaceFormat.Color, SurfaceType.Texture, false, 1, ShaderAccess.None)
+        {
+        }
+
+        /// <summary>
+        /// Creates a new texture of the given size
+        /// </summary>
+        public Texture2D(GraphicsDevice graphicsDevice, int width, int height, ShaderAccess shaderAccess)
+            : this(graphicsDevice, width, height, false, SurfaceFormat.Color, SurfaceType.Texture, false, 1, shaderAccess)
         {
         }
 
@@ -57,7 +65,15 @@ namespace Microsoft.Xna.Framework.Graphics
         /// <param name="mipmap"></param>
         /// <param name="format"></param>
         public Texture2D(GraphicsDevice graphicsDevice, int width, int height, bool mipmap, SurfaceFormat format)
-            : this(graphicsDevice, width, height, mipmap, format, SurfaceType.Texture, false, 1)
+            : this(graphicsDevice, width, height, mipmap, format, SurfaceType.Texture, false, 1, ShaderAccess.None)
+        {
+        }
+
+        /// <summary>
+        /// Creates a new texture of the given size
+        /// </summary>
+        public Texture2D(GraphicsDevice graphicsDevice, int width, int height, bool mipmap, SurfaceFormat format, ShaderAccess shaderAccess)
+            : this(graphicsDevice, width, height, mipmap, format, SurfaceType.Texture, false, 1, shaderAccess)
         {
         }
 
@@ -72,9 +88,8 @@ namespace Microsoft.Xna.Framework.Graphics
         /// <param name="format"></param>
         /// <param name="arraySize"></param>
         public Texture2D(GraphicsDevice graphicsDevice, int width, int height, bool mipmap, SurfaceFormat format, int arraySize)
-            : this(graphicsDevice, width, height, mipmap, format, SurfaceType.Texture, false, arraySize)
+            : this(graphicsDevice, width, height, mipmap, format, SurfaceType.Texture, false, arraySize, ShaderAccess.None)
         {
-            
         }
 
         /// <summary>
@@ -87,11 +102,17 @@ namespace Microsoft.Xna.Framework.Graphics
         /// <param name="format"></param>
         /// <param name="type"></param>
         internal Texture2D(GraphicsDevice graphicsDevice, int width, int height, bool mipmap, SurfaceFormat format, SurfaceType type)
-            : this(graphicsDevice, width, height, mipmap, format, type, false, 1)
+            : this(graphicsDevice, width, height, mipmap, format, type, false, 1, ShaderAccess.None)
         {
         }
-        
+
         protected Texture2D(GraphicsDevice graphicsDevice, int width, int height, bool mipmap, SurfaceFormat format, SurfaceType type, bool shared, int arraySize)
+            : this(graphicsDevice, width, height, mipmap, format, type, shared, arraySize, ShaderAccess.None)
+        {
+        }
+
+        protected Texture2D(GraphicsDevice graphicsDevice, int width, int height, bool mipmap, SurfaceFormat format, SurfaceType type, bool shared, int arraySize, ShaderAccess shaderAccess) :
+            base(shaderAccess)
 		{
             if (graphicsDevice == null)
                 throw new ArgumentNullException("graphicsDevice", FrameworkResources.ResourceCreationWhenDeviceIsNull);
@@ -267,6 +288,66 @@ namespace Microsoft.Xna.Framework.Graphics
 		        throw new ArgumentNullException("data");
 			this.GetData(0, null, data, 0, data.Length);
 		}
+
+        /// <summary>
+        /// Copy pixel data from this texture to another Texture2D. The copying happens on the GPU.
+        /// </summary>
+        /// <param name="copyWidth">Pixel count to copy in the X direction. A value of -1 will copy the total width of the source texture</param>
+        /// <param name="copyHeight">Pixel count to copy in the Y direction. A value of -1 will copy the total height of the source texture</param>
+        public void CopyData(Texture2D destinationTexture, int sourceArrayIndex = 0, int destinationArrayIndex = 0, int sourceMipLevel = 0, int destinationMipLevel = 0, int copyWidth = -1, int copyHeight = -1, int sourceOffsetX = 0, int sourceOffsetY = 0, int destinationOffsetX = 0, int destinationOffsetY = 0)
+        {
+            GraphicsDevice.CopyTextureData(
+                this, destinationTexture,
+                sourceArrayIndex, destinationArrayIndex,
+                ArraySize, destinationTexture.ArraySize,
+                sourceMipLevel, destinationMipLevel,
+                LevelCount, destinationTexture.LevelCount,
+                Width, Height, 1,
+                destinationTexture.Width, destinationTexture.Height, 1,
+                copyWidth, copyHeight, 1,
+                sourceOffsetX, sourceOffsetY, 0,
+                destinationOffsetX, destinationOffsetY, 0);
+        }
+
+        /// <summary>
+        /// Copy pixel data from this texture to another Texture3D. The copying happens on the GPU.
+        /// </summary>
+        /// <param name="copyWidth">Pixel count to copy in the X direction. A value of -1 will copy the total width of the source texture</param>
+        /// <param name="copyHeight">Pixel count to copy in the Y direction. A value of -1 will copy the total height of the source texture</param>
+        public void CopyData(Texture3D destinationTexture, int sourceArrayIndex = 0, int sourceMipLevel = 0, int destinationMipLevel = 0, int copyWidth = -1, int copyHeight = -1, int sourceOffsetX = 0, int sourceOffsetY = 0, int destinationOffsetX = 0, int destinationOffsetY = 0, int destinationOffsetZ = 0)
+        {
+            GraphicsDevice.CopyTextureData(
+                this, destinationTexture,
+                sourceArrayIndex, 0,
+                ArraySize, 1,
+                sourceMipLevel, destinationMipLevel,
+                LevelCount, destinationTexture.LevelCount,
+                Width, Height, 1,
+                destinationTexture.Width, destinationTexture.Height, destinationTexture.Depth,
+                copyWidth, copyHeight, 1,
+                sourceOffsetX, sourceOffsetY, 0,
+                destinationOffsetX, destinationOffsetY, destinationOffsetZ);
+        }
+
+        /// <summary>
+        /// Copy pixel data from this texture to another TextureCube. The copying happens on the GPU.
+        /// </summary>
+        /// <param name="copyWidth">Pixel count to copy in the X direction. A value of -1 will copy the total width of the source texture</param>
+        /// <param name="copyHeight">Pixel count to copy in the Y direction. A value of -1 will copy the total height of the source texture</param>
+        public void CopyData(TextureCube destinationTexture, int sourceArrayIndex = 0, CubeMapFace destinationCubeFace = 0, int sourceMipLevel = 0, int destinationMipLevel = 0, int copyWidth = -1, int copyHeight = -1, int sourceOffsetX = 0, int sourceOffsetY = 0, int destinationOffsetX = 0, int destinationOffsetY = 0)
+        {
+            GraphicsDevice.CopyTextureData(
+                this, destinationTexture,
+                sourceArrayIndex, (int)destinationCubeFace,
+                ArraySize, 6,
+                sourceMipLevel, destinationMipLevel,
+                LevelCount, destinationTexture.LevelCount,
+                Width, Height, 1,
+                destinationTexture.Size, destinationTexture.Size, 1,
+                copyWidth, copyHeight, 1,
+                sourceOffsetX, sourceOffsetY, 0,
+                destinationOffsetX, destinationOffsetY, 0);
+        }
 
         /// <summary>
         /// Creates a <see cref="Texture2D"/> from a file, supported formats bmp, gif, jpg, png, tif and dds (only for simple textures).

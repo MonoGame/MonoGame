@@ -114,8 +114,10 @@ namespace Microsoft.Xna.Framework.Graphics
 
             SupportsDepthClamp = GL.Extensions.Contains("GL_ARB_depth_clamp");
 
-            SupportsVertexTextures = false; // For now, until we implement vertex textures in OpenGL.
-
+            int maxVertexTextureSlots;
+            GL.GetInteger(GetPName.MaxVertexTextureImageUnits, out maxVertexTextureSlots);
+            GraphicsExtensions.CheckGLError();
+            SupportsVertexTextures = maxVertexTextureSlots > 0;
 
             GL.GetInteger((GetPName)GetParamName.MaxSamples, out _maxMultiSampleCount);
 

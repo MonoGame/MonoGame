@@ -170,6 +170,11 @@ namespace Microsoft.Xna.Framework.Graphics
 	    {
 	        return (int) face * _levelCount + level;
 	    }
-	}
+
+        internal override UnorderedAccessViewDescription GetUnorderedAccessViewDescription(int mipLevel)
+        {
+            throw new InvalidOperationException("TextureCube can not be written to directly from a shader.");
+        }
+    }
 }
 

@@ -174,7 +174,7 @@ namespace MonoGame.Tools.Pipeline
                     _items[_items.Count - 1].Icon = _iconFail;
                     _items[_items.Count - 1].AddDescription(_output.ErrorMessage);
                     break;
-                case OutputState.BuildErrorContinue:
+                case OutputState.BuildErrorWarningContinue:
                     _items[_items.Count - 1].AddDescription(_output.ErrorMessage);
                     break;
                 case OutputState.BuildWarning:

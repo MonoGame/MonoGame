@@ -93,6 +93,34 @@ public partial class GraphicsDevice
         throw new NotImplementedException();
     }
 
+    private void PlatformDrawInstancedPrimitivesIndirect(PrimitiveType primitiveType, IndirectDrawBuffer indirectDrawBuffer, int alignedByteOffsetForArgs)
+    {
+    }
+
+    private void PlatformDrawIndexedInstancedPrimitivesIndirect(PrimitiveType primitiveType, IndirectDrawBuffer indirectDrawBuffer, int alignedByteOffsetForArgs)
+    {
+    }
+
+    private void PlatformDispatchCompute(int threadGroupCountX, int threadGroupCountY, int threadGroupCountZ)
+    {
+    }
+
+    private void PlatformDispatchComputeIndirect(IndirectDrawBuffer indirectDrawBuffer, int alignedByteOffsetForArgs)
+    {
+    }
+
+    private void CopyTextureDataInternal(Texture srcTexture, Texture dstTexture, int srcArrayIndex, int dstArrayIndex, int srcMipLevel, int dstMipLevel, int srcMipLevelCount, int dstMipLevelCount, int copyWidth, int copyHeight, int copyDepth, int srcOffsetX, int srcOffsetY, int srcOffsetZ, int dstOffsetX, int dstOffsetY, int dstOffsetZ)
+    {
+    }
+
+    private void CopyBufferDataInternal(BufferResource scBuffer, BufferResource dstBuffer, int numBytesToCopy, int srcOffsetInBytes, int dstOffsetInBytes)
+    {
+    }
+
+    private void CopyStructuredBufferCounterValueInternal(StructuredBuffer srcBuffer, BufferResource dstBuffer, int dstByteOffset)
+    {
+    }
+
     private static Rectangle PlatformGetTitleSafeArea(int x, int y, int width, int height)
     {
         return new Rectangle(x, y, width, height);

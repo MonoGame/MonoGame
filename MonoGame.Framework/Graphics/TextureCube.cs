@@ -29,7 +29,8 @@ namespace Microsoft.Xna.Framework.Graphics
 		{
         }
 
-        internal TextureCube(GraphicsDevice graphicsDevice, int size, bool mipMap, SurfaceFormat format, bool renderTarget)
+        internal TextureCube(GraphicsDevice graphicsDevice, int size, bool mipMap, SurfaceFormat format, bool renderTarget) :
+            base(ShaderAccess.None)
         {
             if (graphicsDevice == null)
                 throw new ArgumentNullException("graphicsDevice", FrameworkResources.ResourceCreationWhenDeviceIsNull);
@@ -87,6 +88,66 @@ namespace Microsoft.Xna.Framework.Graphics
             ValidateParams(level, rect, data, startIndex, elementCount, out checkedRect);
             PlatformSetData(face, level, checkedRect, data, startIndex, elementCount);
 		}
+
+        /// <summary>
+        /// Copy pixel data from this texture to another Texture2D. The copying happens on the GPU.
+        /// </summary>
+        /// <param name="copyWidth">Pixel count to copy in the X direction. A value of -1 will copy the total width of the source texture</param>
+        /// <param name="copyHeight">Pixel count to copy in the Y direction. A value of -1 will copy the total height of the source texture</param>
+        public void CopyData(Texture2D destinationTexture, CubeMapFace sourceCubeFace = 0, int destinationArrayIndex = 0, int sourceMipLevel = 0, int destinationMipLevel = 0, int copyWidth = -1, int copyHeight = -1, int sourceOffsetX = 0, int sourceOffsetY = 0, int destinationOffsetX = 0, int destinationOffsetY = 0)
+        {
+            GraphicsDevice.CopyTextureData(
+                this, destinationTexture,
+                (int)sourceCubeFace, destinationArrayIndex,
+                6, destinationTexture.ArraySize,
+                sourceMipLevel, destinationMipLevel,
+                LevelCount, destinationTexture.LevelCount,
+                Size, Size, 6,
+                destinationTexture.Width, destinationTexture.Height, 1,
+                copyWidth, copyHeight, 1,
+                sourceOffsetX, sourceOffsetY, 0,
+                destinationOffsetX, destinationOffsetY, 0);
+        }
+
+        /// <summary>
+        /// Copy pixel data from this texture to another Texture3D. The copying happens on the GPU.
+        /// </summary>
+        /// <param name="copyWidth">Pixel count to copy in the X direction. A value of -1 will copy the total width of the source texture</param>
+        /// <param name="copyHeight">Pixel count to copy in the Y direction. A value of -1 will copy the total height of the source texture</param>
+        public void CopyData(Texture3D destinationTexture, CubeMapFace sourceCubeFace = 0, int sourceMipLevel = 0, int destinationMipLevel = 0, int copyWidth = -1, int copyHeight = -1, int sourceOffsetX = 0, int sourceOffsetY = 0, int destinationOffsetX = 0, int destinationOffsetY = 0, int destinationOffsetZ = 0)
+        {
+            GraphicsDevice.CopyTextureData(
+                this, destinationTexture,
+                0, 0,
+                6, 1,
+                sourceMipLevel, destinationMipLevel,
+                LevelCount, destinationTexture.LevelCount,
+                Size, Size, 6,
+                destinationTexture.Width, destinationTexture.Height, destinationTexture.Depth,
+                copyWidth, copyHeight, 1,
+                sourceOffsetX, sourceOffsetY, 0,
+                destinationOffsetX, destinationOffsetY, destinationOffsetZ);
+        }
+
+        /// <summary>
+        /// Copy pixel data from this texture to another TextureCube. The copying happens on the GPU.
+        /// </summary>
+        /// <param name="copyWidth">Pixel count to copy in the X direction. A value of -1 will copy the total width of the source texture</param>
+        /// <param name="copyHeight">Pixel count to copy in the Y direction. A value of -1 will copy the total height of the source texture</param>
+        public void CopyData(TextureCube destinationTexture, CubeMapFace sourceCubeFace = 0, CubeMapFace destinationCubeFace = 0, int sourceMipLevel = 0, int destinationMipLevel = 0, int copyWidth = -1, int copyHeight = -1, int sourceOffsetX = 0, int sourceOffsetY = 0, int destinationOffsetX = 0, int destinationOffsetY = 0)
+        {
+            GraphicsDevice.CopyTextureData(
+                this, destinationTexture,
+                (int)sourceCubeFace, (int)destinationCubeFace,
+                6, 6,
+                sourceMipLevel, destinationMipLevel,
+                LevelCount, destinationTexture.LevelCount,
+                Size, Size, 6,
+                destinationTexture.Size, destinationTexture.Size, 1,
+                copyWidth, copyHeight, 1,
+                sourceOffsetX, sourceOffsetY, 0,
+                destinationOffsetX, destinationOffsetY, 0);
+        }
 
         private void ValidateParams<T>(int level, Rectangle? rect, T[] data, int startIndex,
             int elementCount, out Rectangle checkedRect) where T : struct

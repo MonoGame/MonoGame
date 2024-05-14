@@ -40,7 +40,11 @@ BEGIN_CONSTANTS
     float4x4 World                              _vs(c19)          _cb(c15);
     float3x3 WorldInverseTranspose              _vs(c23)          _cb(c19);
     
+#if OPENGL
+    float4x4 Bones[SKINNED_EFFECT_MAX_BONES]    _vs(c26)          _cb(c22);
+#else
     float4x3 Bones[SKINNED_EFFECT_MAX_BONES]    _vs(c26)          _cb(c22);
+#endif
 
 MATRIX_CONSTANTS
 
@@ -53,18 +57,20 @@ END_CONSTANTS
 #include "Common.fxh"
 #include "Lighting.fxh"
 
-
 void Skin(inout VSInputNmTxWeights vin, uniform int boneCount)
 {
+#if OPENGL
+    float4x4 skinning = 0;
+#else
     float4x3 skinning = 0;
+#endif
 
-    [unroll]
-    for (int i = 0; i < boneCount; i++)
-    {
-        skinning += Bones[vin.Indices[i]] * vin.Weights[i];
-    }
+    if (boneCount > 0) skinning += Bones[vin.Indices[0]] * vin.Weights[0];
+    if (boneCount > 1) skinning += Bones[vin.Indices[1]] * vin.Weights[1];
+    if (boneCount > 2) skinning += Bones[vin.Indices[2]] * vin.Weights[2];
+    if (boneCount > 3) skinning += Bones[vin.Indices[3]] * vin.Weights[3];
 
-    vin.Position.xyz = mul(vin.Position, skinning);
+    vin.Position.xyz = mul(vin.Position, skinning).xyz;
     vin.Normal = mul(vin.Normal, (float3x3)skinning);
 }
 
