@@ -569,7 +569,7 @@ namespace MonoGame.Tools.Pipeline
 
         private void CmdHelp_Executed(object sender, EventArgs e)
         {
-            Process.Start(new ProcessStartInfo() { FileName = "https://monogame.net/articles/tools/mgcb_editor.html", UseShellExecute = true, Verb = "open" });
+            Process.Start(new ProcessStartInfo() { FileName = "https://docs.monogame.net/articles/tools/mgcb_editor.html", UseShellExecute = true, Verb = "open" });
         }
 
         private void CmdAbout_Executed(object sender, EventArgs e)
