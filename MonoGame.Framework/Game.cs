@@ -362,8 +362,6 @@ namespace Microsoft.Xna.Framework
 
         #region Events
 
-        private readonly ExitingEventArgs _exitingEventArgs = new ExitingEventArgs();
-
         /// <summary>
         /// Raised when the game gains focus.
         /// </summary>
@@ -631,10 +629,11 @@ namespace Microsoft.Xna.Framework
 
             if (_shouldExit)
             {
-                _exitingEventArgs.Cancel = false;
-                OnExiting(this, _exitingEventArgs);
+                var exitingEventArgs = new ExitingEventArgs();
 
-                if (!_exitingEventArgs.Cancel)
+                OnExiting(this, exitingEventArgs);
+
+                if (!exitingEventArgs.Cancel)
                 {
                     Platform.Exit();
                     EndRun();
