@@ -5,6 +5,10 @@ VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MonoGame.Framework.Native", "MonoGame.Framework\MonoGame.Framework.Native.csproj", "{56BA741D-6AF1-489B-AB00-338DE11B1D32}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tools", "Tools", "{65B3DC17-24BA-4C39-810F-E371AC48199A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MonoGame.Generator.CTypes", "Tools\MonoGame.Generator.CTypes\MonoGame.Generator.CTypes.csproj", "{74F12E34-D96B-4EC1-A218-BAFC83DC6220}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -18,5 +22,12 @@ Global
 		{56BA741D-6AF1-489B-AB00-338DE11B1D32}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{56BA741D-6AF1-489B-AB00-338DE11B1D32}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{56BA741D-6AF1-489B-AB00-338DE11B1D32}.Release|Any CPU.Build.0 = Release|Any CPU
+		{74F12E34-D96B-4EC1-A218-BAFC83DC6220}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{74F12E34-D96B-4EC1-A218-BAFC83DC6220}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{74F12E34-D96B-4EC1-A218-BAFC83DC6220}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{74F12E34-D96B-4EC1-A218-BAFC83DC6220}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{74F12E34-D96B-4EC1-A218-BAFC83DC6220} = {65B3DC17-24BA-4C39-810F-E371AC48199A}
 	EndGlobalSection
 EndGlobal
