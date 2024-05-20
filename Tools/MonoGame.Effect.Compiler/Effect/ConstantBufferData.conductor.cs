@@ -41,6 +41,8 @@ namespace MonoGame.Effect
         private static EffectObject.d3dx_parameter CreateDXParamForConductorParam(ShaderConductor.Parameter p)
         {
             var param = new EffectObject.d3dx_parameter();
+            var size = p.rows * p.columns * 4;
+            var data = new byte[size];
 
             param.rows = (uint)p.columns; // OpenGL to DirectX requires transpose
             param.columns = (uint)p.rows; // OpenGL to DirectX requires transpose
@@ -48,6 +50,7 @@ namespace MonoGame.Effect
             param.semantic = string.Empty;
             param.bufferOffset = p.offset;
             param.semantic = string.Empty;
+            param.data = data;
             param.member_count = 0;
 
             switch (p.type)
