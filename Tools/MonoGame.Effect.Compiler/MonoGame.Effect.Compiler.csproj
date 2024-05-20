@@ -69,6 +69,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.Direct3D.DXC" Version="1.8.2405.17" />
     <PackageReference Include="Microsoft.NETCore.App" Version="2.1.30" />
     <PackageReference Include="SharpDX" Version="4.0.1" />
     <PackageReference Include="SharpDX.D3DCompiler" Version="4.0.1" />
@@ -84,4 +85,12 @@
   <Import Project="..\..\PlayStation5\MonoGame.Effect.Compiler.targets" Condition="exists('..\..\PlayStation5\MonoGame.Effect.Compiler.targets')" />
   <Import Project="..\..\Stadia\MonoGame.Effect.Compiler.targets" Condition="exists('..\..\Stadia\MonoGame.Effect.Compiler.targets')" />
 
+  <Target Name="CopyNuGetToolFiles" AfterTargets="Build">
+    <ItemGroup>
+      <ToolFiles Include="$(NuGetPackageRoot)Microsoft.Direct3D.DXC\1.8.2405.17\build\native\bin\x64\*.dll" />
+	  <ToolFiles Include="$(NuGetPackageRoot)Microsoft.Direct3D.DXC\1.8.2405.17\build\native\bin\x64\*.exe" />
+    </ItemGroup>
+    <Copy SourceFiles="@(ToolFiles)" DestinationFolder="$(OutputPath)" />
+  </Target>
+	
 </Project>

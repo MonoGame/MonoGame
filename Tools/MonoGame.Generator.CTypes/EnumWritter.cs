@@ -1,11 +1,16 @@
+// MonoGame - Copyright (C) The MonoGame Team
+// This file is subject to the terms and conditions defined in
+// file 'LICENSE.txt', which is part of this source code package.
+
+using System;
 using System.Text;
 
 namespace MonoGame.Generator.CTypes;
 
 class EnumWritter
 {
+    private readonly Dictionary<string, Type> _types;
     private readonly StringBuilder _outputText;
-    private readonly Dictionary<string, string> _duplicateChecker;
 
     public EnumWritter()
     {
@@ -21,39 +26,42 @@ class EnumWritter
 
 
         """);
-        _duplicateChecker = [];
+
+        _types = [];
     }
 
-    public static bool IsValid(Type type)
+    private static bool IsValid(Type type)
     {
         return type.IsEnum && !type.IsNested;
     }
 
-    public bool Append(Type type)
+    public bool TryAppend(Type type)
     {
+        if (type.IsByRef)
+            type = type.GetElementType();
+
+        if (type.IsPointer)
+            type = type.GetElementType();
+
         if (!IsValid(type))
             return false;
 
-        if (_duplicateChecker.TryGetValue(type.Name, out string? dupFullName))
-        {
-            if (type.FullName != type.FullName)
-            {
-                Console.WriteLine($"""
-                WARNING: Duplicate enum name for {type.Name}:
-                - {type.FullName}
-                - {dupFullName}
+        if (_types.ContainsKey(type.Name))
+            return true;
 
-                """);
-            }
+        _types.Add(type.Name, type);
+        return true;
+    }
 
-            return false;
-        }
-        
+    private void Generate(Type type)
+    {
         var enumValues = Enum.GetValues(type);
+
+        var name = Util.GetCTypeOrEnum(type);
 
         // Write all values to output
         _outputText.AppendLine($$"""
-        enum CS{{type.Name}} : {{Util.GetCEnumType(Enum.GetUnderlyingType(type).ToString())}}
+        enum class {{name}} : {{Util.GetCType(Enum.GetUnderlyingType(type))}}
         {
         """);
         foreach (var enumValue in enumValues)
@@ -66,30 +74,33 @@ class EnumWritter
         """);
 
         _outputText.AppendLine($$"""
-        class ECS{{type.Name}}
+        static const char* {{name}}_ToString({{name}} enumValue)
         {
-        public:
-            static const char* ToString(CS{{type.Name}} enumValue)
+            switch (enumValue)
             {
-                switch (enumValue)
-                {
         """);
         foreach (var enumValue in enumValues)
         {
-            _outputText.AppendLine($"            case {enumValue}: return \"{enumValue}\";");
+            _outputText.AppendLine($"        case {name}::{enumValue}: return \"{enumValue}\";");
         }
         _outputText.AppendLine("""
-                }
-
-                return "Unknown Value";
             }
-        };
+
+            return "Unknown Value";
+        }
 
         """);
-
-        _duplicateChecker.Add(type.Name, type.FullName!);
-        return true;
     }
 
-    public void Flush(string dirPath) => File.WriteAllText(Path.Combine(dirPath, "csharp_enums.h"), _outputText.ToString());
+    public void Flush(string dirPath)
+    {
+        foreach (var pair in _types)
+            Generate(pair.Value);
+
+        var path = Path.Combine(dirPath, "csharp_enums.h");
+        var text = _outputText.ToString().ReplaceLineEndings();
+
+        File.WriteAllText(path, text);
+    }
+
 }

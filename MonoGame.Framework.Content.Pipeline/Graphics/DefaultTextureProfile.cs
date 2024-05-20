@@ -15,6 +15,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
         {
             return  platform == TargetPlatform.Android ||
                     platform == TargetPlatform.DesktopGL ||
+                    platform == TargetPlatform.DesktopVK ||
                     platform == TargetPlatform.MacOSX ||
                     platform == TargetPlatform.NativeClient ||
                     platform == TargetPlatform.RaspberryPi ||
@@ -63,6 +64,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
                             platform == TargetPlatform.WindowsPhone8 ||
                             platform == TargetPlatform.WindowsStoreApp ||
                             platform == TargetPlatform.DesktopGL ||
+                            platform == TargetPlatform.DesktopVK ||
                             platform == TargetPlatform.MacOSX ||
                             platform == TargetPlatform.NativeClient ||
                             platform == TargetPlatform.Web)

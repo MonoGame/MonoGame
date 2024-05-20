@@ -15,6 +15,13 @@ partial class TitleContainer
 
     private static Stream PlatformOpenStream(string safeName)
     {
-        return Stream.Null;
+        // TODO: How do we handle this?
+        //
+        // It seems like we still need platform specific C# code here?
+        //
+        // Or do we make the native code transform the string?
+        //
+        var absolutePath = Path.Combine(Location, safeName);
+        return File.OpenRead(absolutePath);
     }
 }

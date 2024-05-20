@@ -57,6 +57,7 @@ namespace Microsoft.Xna.Framework.Content
             'S', // Nintendo Switch
             'G', // Google Stadia
             'b', // WebAssembly and Bridge.NET
+            'V', // DesktopVK
 
             // NOTE: There are additional identifiers for consoles that 
             // are not defined in this repository.  Be sure to ask the

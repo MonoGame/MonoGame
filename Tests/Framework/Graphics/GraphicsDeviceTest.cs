@@ -617,6 +617,11 @@ namespace MonoGame.Tests.Graphics
 #endif
             foreach (var format in Enum.GetValues(typeof(SurfaceFormat)).Cast<SurfaceFormat>())
             {
+#if !MOBILE
+                // Skip the mobile formats on non-mobile platforms.
+                if (format > SurfaceFormat.Dxt5SRgb)
+                    continue;
+#endif
                 var texture = new Texture2D(gd, 4, 4, false, format);
 
                 if (supportedVertexTextureFormats.Contains(format))

@@ -7,482 +7,607 @@
 
 #include "csharp_common.h"
 
-enum CSGraphicsBackend : csint
+enum class MGSurfaceFormat : mgint
 {
-    DirectX = 0,
-    OpenGL = 1,
-    Vulkan = 2,
-    Metal = 3,
+    Color = 0,
+    Bgr565 = 1,
+    Bgra5551 = 2,
+    Bgra4444 = 3,
+    Dxt1 = 4,
+    Dxt3 = 5,
+    Dxt5 = 6,
+    NormalizedByte2 = 7,
+    NormalizedByte4 = 8,
+    Rgba1010102 = 9,
+    Rg32 = 10,
+    Rgba64 = 11,
+    Alpha8 = 12,
+    Single = 13,
+    Vector2 = 14,
+    Vector4 = 15,
+    HalfSingle = 16,
+    HalfVector2 = 17,
+    HalfVector4 = 18,
+    HdrBlendable = 19,
+    Bgr32 = 20,
+    Bgra32 = 21,
+    ColorSRgb = 30,
+    Bgr32SRgb = 31,
+    Bgra32SRgb = 32,
+    Dxt1SRgb = 33,
+    Dxt3SRgb = 34,
+    Dxt5SRgb = 35,
+    RgbPvrtc2Bpp = 50,
+    RgbPvrtc4Bpp = 51,
+    RgbaPvrtc2Bpp = 52,
+    RgbaPvrtc4Bpp = 53,
+    RgbEtc1 = 60,
+    Dxt1a = 70,
+    RgbaAtcExplicitAlpha = 80,
+    RgbaAtcInterpolatedAlpha = 81,
+    Rgb8Etc2 = 90,
+    Srgb8Etc2 = 91,
+    Rgb8A1Etc2 = 92,
+    Srgb8A1Etc2 = 93,
+    Rgba8Etc2 = 94,
+    SRgb8A8Etc2 = 95,
 };
 
-class ECSGraphicsBackend
+static const char* MGSurfaceFormat_ToString(MGSurfaceFormat enumValue)
 {
-public:
-    static const char* ToString(CSGraphicsBackend enumValue)
+    switch (enumValue)
     {
-        switch (enumValue)
-        {
-            case DirectX: return "DirectX";
-            case OpenGL: return "OpenGL";
-            case Vulkan: return "Vulkan";
-            case Metal: return "Metal";
-        }
-
-        return "Unknown Value";
+        case MGSurfaceFormat::Color: return "Color";
+        case MGSurfaceFormat::Bgr565: return "Bgr565";
+        case MGSurfaceFormat::Bgra5551: return "Bgra5551";
+        case MGSurfaceFormat::Bgra4444: return "Bgra4444";
+        case MGSurfaceFormat::Dxt1: return "Dxt1";
+        case MGSurfaceFormat::Dxt3: return "Dxt3";
+        case MGSurfaceFormat::Dxt5: return "Dxt5";
+        case MGSurfaceFormat::NormalizedByte2: return "NormalizedByte2";
+        case MGSurfaceFormat::NormalizedByte4: return "NormalizedByte4";
+        case MGSurfaceFormat::Rgba1010102: return "Rgba1010102";
+        case MGSurfaceFormat::Rg32: return "Rg32";
+        case MGSurfaceFormat::Rgba64: return "Rgba64";
+        case MGSurfaceFormat::Alpha8: return "Alpha8";
+        case MGSurfaceFormat::Single: return "Single";
+        case MGSurfaceFormat::Vector2: return "Vector2";
+        case MGSurfaceFormat::Vector4: return "Vector4";
+        case MGSurfaceFormat::HalfSingle: return "HalfSingle";
+        case MGSurfaceFormat::HalfVector2: return "HalfVector2";
+        case MGSurfaceFormat::HalfVector4: return "HalfVector4";
+        case MGSurfaceFormat::HdrBlendable: return "HdrBlendable";
+        case MGSurfaceFormat::Bgr32: return "Bgr32";
+        case MGSurfaceFormat::Bgra32: return "Bgra32";
+        case MGSurfaceFormat::ColorSRgb: return "ColorSRgb";
+        case MGSurfaceFormat::Bgr32SRgb: return "Bgr32SRgb";
+        case MGSurfaceFormat::Bgra32SRgb: return "Bgra32SRgb";
+        case MGSurfaceFormat::Dxt1SRgb: return "Dxt1SRgb";
+        case MGSurfaceFormat::Dxt3SRgb: return "Dxt3SRgb";
+        case MGSurfaceFormat::Dxt5SRgb: return "Dxt5SRgb";
+        case MGSurfaceFormat::RgbPvrtc2Bpp: return "RgbPvrtc2Bpp";
+        case MGSurfaceFormat::RgbPvrtc4Bpp: return "RgbPvrtc4Bpp";
+        case MGSurfaceFormat::RgbaPvrtc2Bpp: return "RgbaPvrtc2Bpp";
+        case MGSurfaceFormat::RgbaPvrtc4Bpp: return "RgbaPvrtc4Bpp";
+        case MGSurfaceFormat::RgbEtc1: return "RgbEtc1";
+        case MGSurfaceFormat::Dxt1a: return "Dxt1a";
+        case MGSurfaceFormat::RgbaAtcExplicitAlpha: return "RgbaAtcExplicitAlpha";
+        case MGSurfaceFormat::RgbaAtcInterpolatedAlpha: return "RgbaAtcInterpolatedAlpha";
+        case MGSurfaceFormat::Rgb8Etc2: return "Rgb8Etc2";
+        case MGSurfaceFormat::Srgb8Etc2: return "Srgb8Etc2";
+        case MGSurfaceFormat::Rgb8A1Etc2: return "Rgb8A1Etc2";
+        case MGSurfaceFormat::Srgb8A1Etc2: return "Srgb8A1Etc2";
+        case MGSurfaceFormat::Rgba8Etc2: return "Rgba8Etc2";
+        case MGSurfaceFormat::SRgb8A8Etc2: return "SRgb8A8Etc2";
     }
+
+    return "Unknown Value";
+}
+
+enum class MGDepthFormat : mgint
+{
+    None = 0,
+    Depth16 = 1,
+    Depth24 = 2,
+    Depth24Stencil8 = 3,
 };
 
-enum CSMonoGamePlatform : csint
+static const char* MGDepthFormat_ToString(MGDepthFormat enumValue)
 {
-    Android = 0,
-    iOS = 1,
-    tvOS = 2,
-    DesktopGL = 3,
-    Windows = 4,
-    WindowsUniversal = 5,
-    WebGL = 6,
-    XboxOne = 7,
-    PlayStation4 = 8,
-    PlayStation5 = 9,
-    NintendoSwitch = 10,
-    Stadia = 11,
-};
-
-class ECSMonoGamePlatform
-{
-public:
-    static const char* ToString(CSMonoGamePlatform enumValue)
+    switch (enumValue)
     {
-        switch (enumValue)
-        {
-            case Android: return "Android";
-            case iOS: return "iOS";
-            case tvOS: return "tvOS";
-            case DesktopGL: return "DesktopGL";
-            case Windows: return "Windows";
-            case WindowsUniversal: return "WindowsUniversal";
-            case WebGL: return "WebGL";
-            case XboxOne: return "XboxOne";
-            case PlayStation4: return "PlayStation4";
-            case PlayStation5: return "PlayStation5";
-            case NintendoSwitch: return "NintendoSwitch";
-            case Stadia: return "Stadia";
-        }
-
-        return "Unknown Value";
+        case MGDepthFormat::None: return "None";
+        case MGDepthFormat::Depth16: return "Depth16";
+        case MGDepthFormat::Depth24: return "Depth24";
+        case MGDepthFormat::Depth24Stencil8: return "Depth24Stencil8";
     }
+
+    return "Unknown Value";
+}
+
+enum class MGClearOptions : mgint
+{
+    Target = 1,
+    DepthBuffer = 2,
+    Stencil = 4,
 };
 
-enum CSContainmentType : csint
+static const char* MGClearOptions_ToString(MGClearOptions enumValue)
 {
-    Disjoint = 0,
-    Contains = 1,
-    Intersects = 2,
-};
-
-class ECSContainmentType
-{
-public:
-    static const char* ToString(CSContainmentType enumValue)
+    switch (enumValue)
     {
-        switch (enumValue)
-        {
-            case Disjoint: return "Disjoint";
-            case Contains: return "Contains";
-            case Intersects: return "Intersects";
-        }
-
-        return "Unknown Value";
+        case MGClearOptions::Target: return "Target";
+        case MGClearOptions::DepthBuffer: return "DepthBuffer";
+        case MGClearOptions::Stencil: return "Stencil";
     }
+
+    return "Unknown Value";
+}
+
+enum class MGShaderStage : mgint
+{
+    Vertex = 0,
+    Pixel = 1,
+    Count = 2,
 };
 
-enum CSCurveContinuity : csint
+static const char* MGShaderStage_ToString(MGShaderStage enumValue)
 {
-    Smooth = 0,
-    Step = 1,
-};
-
-class ECSCurveContinuity
-{
-public:
-    static const char* ToString(CSCurveContinuity enumValue)
+    switch (enumValue)
     {
-        switch (enumValue)
-        {
-            case Smooth: return "Smooth";
-            case Step: return "Step";
-        }
-
-        return "Unknown Value";
+        case MGShaderStage::Vertex: return "Vertex";
+        case MGShaderStage::Pixel: return "Pixel";
+        case MGShaderStage::Count: return "Count";
     }
+
+    return "Unknown Value";
+}
+
+enum class MGIndexElementSize : mgint
+{
+    SixteenBits = 0,
+    ThirtyTwoBits = 1,
 };
 
-enum CSCurveLoopType : csint
+static const char* MGIndexElementSize_ToString(MGIndexElementSize enumValue)
 {
-    Constant = 0,
-    Cycle = 1,
-    CycleOffset = 2,
-    Oscillate = 3,
-    Linear = 4,
-};
-
-class ECSCurveLoopType
-{
-public:
-    static const char* ToString(CSCurveLoopType enumValue)
+    switch (enumValue)
     {
-        switch (enumValue)
-        {
-            case Constant: return "Constant";
-            case Cycle: return "Cycle";
-            case CycleOffset: return "CycleOffset";
-            case Oscillate: return "Oscillate";
-            case Linear: return "Linear";
-        }
-
-        return "Unknown Value";
+        case MGIndexElementSize::SixteenBits: return "SixteenBits";
+        case MGIndexElementSize::ThirtyTwoBits: return "ThirtyTwoBits";
     }
+
+    return "Unknown Value";
+}
+
+enum class MGPrimitiveType : mgint
+{
+    TriangleList = 0,
+    TriangleStrip = 1,
+    LineList = 2,
+    LineStrip = 3,
+    PointList = 4,
 };
 
-enum CSCurveTangent : csint
+static const char* MGPrimitiveType_ToString(MGPrimitiveType enumValue)
 {
-    Flat = 0,
-    Linear = 1,
-    Smooth = 2,
-};
-
-class ECSCurveTangent
-{
-public:
-    static const char* ToString(CSCurveTangent enumValue)
+    switch (enumValue)
     {
-        switch (enumValue)
-        {
-            case Flat: return "Flat";
-            case Linear: return "Linear";
-            case Smooth: return "Smooth";
-        }
-
-        return "Unknown Value";
+        case MGPrimitiveType::TriangleList: return "TriangleList";
+        case MGPrimitiveType::TriangleStrip: return "TriangleStrip";
+        case MGPrimitiveType::LineList: return "LineList";
+        case MGPrimitiveType::LineStrip: return "LineStrip";
+        case MGPrimitiveType::PointList: return "PointList";
     }
+
+    return "Unknown Value";
+}
+
+enum class MGBlend : mgint
+{
+    One = 0,
+    Zero = 1,
+    SourceColor = 2,
+    InverseSourceColor = 3,
+    SourceAlpha = 4,
+    InverseSourceAlpha = 5,
+    DestinationColor = 6,
+    InverseDestinationColor = 7,
+    DestinationAlpha = 8,
+    InverseDestinationAlpha = 9,
+    BlendFactor = 10,
+    InverseBlendFactor = 11,
+    SourceAlphaSaturation = 12,
 };
 
-enum CSDisplayOrientation : csint
+static const char* MGBlend_ToString(MGBlend enumValue)
+{
+    switch (enumValue)
+    {
+        case MGBlend::One: return "One";
+        case MGBlend::Zero: return "Zero";
+        case MGBlend::SourceColor: return "SourceColor";
+        case MGBlend::InverseSourceColor: return "InverseSourceColor";
+        case MGBlend::SourceAlpha: return "SourceAlpha";
+        case MGBlend::InverseSourceAlpha: return "InverseSourceAlpha";
+        case MGBlend::DestinationColor: return "DestinationColor";
+        case MGBlend::InverseDestinationColor: return "InverseDestinationColor";
+        case MGBlend::DestinationAlpha: return "DestinationAlpha";
+        case MGBlend::InverseDestinationAlpha: return "InverseDestinationAlpha";
+        case MGBlend::BlendFactor: return "BlendFactor";
+        case MGBlend::InverseBlendFactor: return "InverseBlendFactor";
+        case MGBlend::SourceAlphaSaturation: return "SourceAlphaSaturation";
+    }
+
+    return "Unknown Value";
+}
+
+enum class MGBlendFunction : mgint
+{
+    Add = 0,
+    Subtract = 1,
+    ReverseSubtract = 2,
+    Min = 3,
+    Max = 4,
+};
+
+static const char* MGBlendFunction_ToString(MGBlendFunction enumValue)
+{
+    switch (enumValue)
+    {
+        case MGBlendFunction::Add: return "Add";
+        case MGBlendFunction::Subtract: return "Subtract";
+        case MGBlendFunction::ReverseSubtract: return "ReverseSubtract";
+        case MGBlendFunction::Min: return "Min";
+        case MGBlendFunction::Max: return "Max";
+    }
+
+    return "Unknown Value";
+}
+
+enum class MGColorWriteChannels : mgint
+{
+    None = 0,
+    Red = 1,
+    Green = 2,
+    Blue = 4,
+    Alpha = 8,
+    All = 15,
+};
+
+static const char* MGColorWriteChannels_ToString(MGColorWriteChannels enumValue)
+{
+    switch (enumValue)
+    {
+        case MGColorWriteChannels::None: return "None";
+        case MGColorWriteChannels::Red: return "Red";
+        case MGColorWriteChannels::Green: return "Green";
+        case MGColorWriteChannels::Blue: return "Blue";
+        case MGColorWriteChannels::Alpha: return "Alpha";
+        case MGColorWriteChannels::All: return "All";
+    }
+
+    return "Unknown Value";
+}
+
+enum class MGCompareFunction : mgint
+{
+    Always = 0,
+    Never = 1,
+    Less = 2,
+    LessEqual = 3,
+    Equal = 4,
+    GreaterEqual = 5,
+    Greater = 6,
+    NotEqual = 7,
+};
+
+static const char* MGCompareFunction_ToString(MGCompareFunction enumValue)
+{
+    switch (enumValue)
+    {
+        case MGCompareFunction::Always: return "Always";
+        case MGCompareFunction::Never: return "Never";
+        case MGCompareFunction::Less: return "Less";
+        case MGCompareFunction::LessEqual: return "LessEqual";
+        case MGCompareFunction::Equal: return "Equal";
+        case MGCompareFunction::GreaterEqual: return "GreaterEqual";
+        case MGCompareFunction::Greater: return "Greater";
+        case MGCompareFunction::NotEqual: return "NotEqual";
+    }
+
+    return "Unknown Value";
+}
+
+enum class MGStencilOperation : mgint
+{
+    Keep = 0,
+    Zero = 1,
+    Replace = 2,
+    Increment = 3,
+    Decrement = 4,
+    IncrementSaturation = 5,
+    DecrementSaturation = 6,
+    Invert = 7,
+};
+
+static const char* MGStencilOperation_ToString(MGStencilOperation enumValue)
+{
+    switch (enumValue)
+    {
+        case MGStencilOperation::Keep: return "Keep";
+        case MGStencilOperation::Zero: return "Zero";
+        case MGStencilOperation::Replace: return "Replace";
+        case MGStencilOperation::Increment: return "Increment";
+        case MGStencilOperation::Decrement: return "Decrement";
+        case MGStencilOperation::IncrementSaturation: return "IncrementSaturation";
+        case MGStencilOperation::DecrementSaturation: return "DecrementSaturation";
+        case MGStencilOperation::Invert: return "Invert";
+    }
+
+    return "Unknown Value";
+}
+
+enum class MGFillMode : mgint
+{
+    Solid = 0,
+    WireFrame = 1,
+};
+
+static const char* MGFillMode_ToString(MGFillMode enumValue)
+{
+    switch (enumValue)
+    {
+        case MGFillMode::Solid: return "Solid";
+        case MGFillMode::WireFrame: return "WireFrame";
+    }
+
+    return "Unknown Value";
+}
+
+enum class MGCullMode : mgint
+{
+    None = 0,
+    CullClockwiseFace = 1,
+    CullCounterClockwiseFace = 2,
+};
+
+static const char* MGCullMode_ToString(MGCullMode enumValue)
+{
+    switch (enumValue)
+    {
+        case MGCullMode::None: return "None";
+        case MGCullMode::CullClockwiseFace: return "CullClockwiseFace";
+        case MGCullMode::CullCounterClockwiseFace: return "CullCounterClockwiseFace";
+    }
+
+    return "Unknown Value";
+}
+
+enum class MGTextureAddressMode : mgint
+{
+    Wrap = 0,
+    Clamp = 1,
+    Mirror = 2,
+    Border = 3,
+};
+
+static const char* MGTextureAddressMode_ToString(MGTextureAddressMode enumValue)
+{
+    switch (enumValue)
+    {
+        case MGTextureAddressMode::Wrap: return "Wrap";
+        case MGTextureAddressMode::Clamp: return "Clamp";
+        case MGTextureAddressMode::Mirror: return "Mirror";
+        case MGTextureAddressMode::Border: return "Border";
+    }
+
+    return "Unknown Value";
+}
+
+enum class MGTextureFilter : mgint
+{
+    Linear = 0,
+    Point = 1,
+    Anisotropic = 2,
+    LinearMipPoint = 3,
+    PointMipLinear = 4,
+    MinLinearMagPointMipLinear = 5,
+    MinLinearMagPointMipPoint = 6,
+    MinPointMagLinearMipLinear = 7,
+    MinPointMagLinearMipPoint = 8,
+};
+
+static const char* MGTextureFilter_ToString(MGTextureFilter enumValue)
+{
+    switch (enumValue)
+    {
+        case MGTextureFilter::Linear: return "Linear";
+        case MGTextureFilter::Point: return "Point";
+        case MGTextureFilter::Anisotropic: return "Anisotropic";
+        case MGTextureFilter::LinearMipPoint: return "LinearMipPoint";
+        case MGTextureFilter::PointMipLinear: return "PointMipLinear";
+        case MGTextureFilter::MinLinearMagPointMipLinear: return "MinLinearMagPointMipLinear";
+        case MGTextureFilter::MinLinearMagPointMipPoint: return "MinLinearMagPointMipPoint";
+        case MGTextureFilter::MinPointMagLinearMipLinear: return "MinPointMagLinearMipLinear";
+        case MGTextureFilter::MinPointMagLinearMipPoint: return "MinPointMagLinearMipPoint";
+    }
+
+    return "Unknown Value";
+}
+
+enum class MGTextureFilterMode : mgint
 {
     Default = 0,
-    LandscapeLeft = 1,
-    LandscapeRight = 2,
-    Portrait = 4,
-    PortraitDown = 8,
-    Unknown = 16,
+    Comparison = 1,
 };
 
-class ECSDisplayOrientation
+static const char* MGTextureFilterMode_ToString(MGTextureFilterMode enumValue)
 {
-public:
-    static const char* ToString(CSDisplayOrientation enumValue)
+    switch (enumValue)
     {
-        switch (enumValue)
-        {
-            case Default: return "Default";
-            case LandscapeLeft: return "LandscapeLeft";
-            case LandscapeRight: return "LandscapeRight";
-            case Portrait: return "Portrait";
-            case PortraitDown: return "PortraitDown";
-            case Unknown: return "Unknown";
-        }
-
-        return "Unknown Value";
+        case MGTextureFilterMode::Default: return "Default";
+        case MGTextureFilterMode::Comparison: return "Comparison";
     }
+
+    return "Unknown Value";
+}
+
+enum class MGBufferType : mgint
+{
+    Index = 0,
+    Vertex = 1,
+    Constant = 2,
 };
 
-enum CSGameRunBehavior : csint
+static const char* MGBufferType_ToString(MGBufferType enumValue)
+{
+    switch (enumValue)
+    {
+        case MGBufferType::Index: return "Index";
+        case MGBufferType::Vertex: return "Vertex";
+        case MGBufferType::Constant: return "Constant";
+    }
+
+    return "Unknown Value";
+}
+
+enum class MGTextureType : mgint
+{
+    _2D = 0,
+    _3D = 1,
+    Cube = 2,
+};
+
+static const char* MGTextureType_ToString(MGTextureType enumValue)
+{
+    switch (enumValue)
+    {
+        case MGTextureType::_2D: return "_2D";
+        case MGTextureType::_3D: return "_3D";
+        case MGTextureType::Cube: return "Cube";
+    }
+
+    return "Unknown Value";
+}
+
+enum class MGRenderTargetUsage : mgint
+{
+    DiscardContents = 0,
+    PreserveContents = 1,
+    PlatformContents = 2,
+};
+
+static const char* MGRenderTargetUsage_ToString(MGRenderTargetUsage enumValue)
+{
+    switch (enumValue)
+    {
+        case MGRenderTargetUsage::DiscardContents: return "DiscardContents";
+        case MGRenderTargetUsage::PreserveContents: return "PreserveContents";
+        case MGRenderTargetUsage::PlatformContents: return "PlatformContents";
+    }
+
+    return "Unknown Value";
+}
+
+enum class MGVertexElementFormat : mgint
+{
+    Single = 0,
+    Vector2 = 1,
+    Vector3 = 2,
+    Vector4 = 3,
+    Color = 4,
+    Byte4 = 5,
+    Short2 = 6,
+    Short4 = 7,
+    NormalizedShort2 = 8,
+    NormalizedShort4 = 9,
+    HalfVector2 = 10,
+    HalfVector4 = 11,
+};
+
+static const char* MGVertexElementFormat_ToString(MGVertexElementFormat enumValue)
+{
+    switch (enumValue)
+    {
+        case MGVertexElementFormat::Single: return "Single";
+        case MGVertexElementFormat::Vector2: return "Vector2";
+        case MGVertexElementFormat::Vector3: return "Vector3";
+        case MGVertexElementFormat::Vector4: return "Vector4";
+        case MGVertexElementFormat::Color: return "Color";
+        case MGVertexElementFormat::Byte4: return "Byte4";
+        case MGVertexElementFormat::Short2: return "Short2";
+        case MGVertexElementFormat::Short4: return "Short4";
+        case MGVertexElementFormat::NormalizedShort2: return "NormalizedShort2";
+        case MGVertexElementFormat::NormalizedShort4: return "NormalizedShort4";
+        case MGVertexElementFormat::HalfVector2: return "HalfVector2";
+        case MGVertexElementFormat::HalfVector4: return "HalfVector4";
+    }
+
+    return "Unknown Value";
+}
+
+enum class MGGameRunBehavior : mgint
 {
     Asynchronous = 0,
     Synchronous = 1,
 };
 
-class ECSGameRunBehavior
+static const char* MGGameRunBehavior_ToString(MGGameRunBehavior enumValue)
 {
-public:
-    static const char* ToString(CSGameRunBehavior enumValue)
+    switch (enumValue)
     {
-        switch (enumValue)
-        {
-            case Asynchronous: return "Asynchronous";
-            case Synchronous: return "Synchronous";
-        }
-
-        return "Unknown Value";
+        case MGGameRunBehavior::Asynchronous: return "Asynchronous";
+        case MGGameRunBehavior::Synchronous: return "Synchronous";
     }
+
+    return "Unknown Value";
+}
+
+enum class MGEventType : mguint
+{
+    Quit = 0,
+    WindowMoved = 1,
+    WindowResized = 2,
+    WindowGainedFocus = 3,
+    WindowLostFocus = 4,
+    WindowClose = 5,
+    KeyDown = 6,
+    KeyUp = 7,
+    TextInput = 8,
+    MouseMove = 9,
+    MouseButtonDown = 10,
+    MouseButtonUp = 11,
+    MouseWheel = 12,
+    DropFile = 13,
+    DropComplete = 14,
 };
 
-enum CSPlaneIntersectionType : csint
+static const char* MGEventType_ToString(MGEventType enumValue)
 {
-    Front = 0,
-    Back = 1,
-    Intersecting = 2,
-};
-
-class ECSPlaneIntersectionType
-{
-public:
-    static const char* ToString(CSPlaneIntersectionType enumValue)
+    switch (enumValue)
     {
-        switch (enumValue)
-        {
-            case Front: return "Front";
-            case Back: return "Back";
-            case Intersecting: return "Intersecting";
-        }
-
-        return "Unknown Value";
+        case MGEventType::Quit: return "Quit";
+        case MGEventType::WindowMoved: return "WindowMoved";
+        case MGEventType::WindowResized: return "WindowResized";
+        case MGEventType::WindowGainedFocus: return "WindowGainedFocus";
+        case MGEventType::WindowLostFocus: return "WindowLostFocus";
+        case MGEventType::WindowClose: return "WindowClose";
+        case MGEventType::KeyDown: return "KeyDown";
+        case MGEventType::KeyUp: return "KeyUp";
+        case MGEventType::TextInput: return "TextInput";
+        case MGEventType::MouseMove: return "MouseMove";
+        case MGEventType::MouseButtonDown: return "MouseButtonDown";
+        case MGEventType::MouseButtonUp: return "MouseButtonUp";
+        case MGEventType::MouseWheel: return "MouseWheel";
+        case MGEventType::DropFile: return "DropFile";
+        case MGEventType::DropComplete: return "DropComplete";
     }
-};
 
-enum CSPlayerIndex : csint
-{
-    One = 0,
-    Two = 1,
-    Three = 2,
-    Four = 3,
-};
+    return "Unknown Value";
+}
 
-class ECSPlayerIndex
-{
-public:
-    static const char* ToString(CSPlayerIndex enumValue)
-    {
-        switch (enumValue)
-        {
-            case One: return "One";
-            case Two: return "Two";
-            case Three: return "Three";
-            case Four: return "Four";
-        }
-
-        return "Unknown Value";
-    }
-};
-
-enum CSMediaSourceType : csint
-{
-    LocalDevice = 0,
-    WindowsMediaConnect = 4,
-};
-
-class ECSMediaSourceType
-{
-public:
-    static const char* ToString(CSMediaSourceType enumValue)
-    {
-        switch (enumValue)
-        {
-            case LocalDevice: return "LocalDevice";
-            case WindowsMediaConnect: return "WindowsMediaConnect";
-        }
-
-        return "Unknown Value";
-    }
-};
-
-enum CSMediaState : csint
-{
-    Stopped = 0,
-    Playing = 1,
-    Paused = 2,
-};
-
-class ECSMediaState
-{
-public:
-    static const char* ToString(CSMediaState enumValue)
-    {
-        switch (enumValue)
-        {
-            case Stopped: return "Stopped";
-            case Playing: return "Playing";
-            case Paused: return "Paused";
-        }
-
-        return "Unknown Value";
-    }
-};
-
-enum CSVideoSoundtrackType : csint
-{
-    Music = 0,
-    Dialog = 1,
-    MusicAndDialog = 2,
-};
-
-class ECSVideoSoundtrackType
-{
-public:
-    static const char* ToString(CSVideoSoundtrackType enumValue)
-    {
-        switch (enumValue)
-        {
-            case Music: return "Music";
-            case Dialog: return "Dialog";
-            case MusicAndDialog: return "MusicAndDialog";
-        }
-
-        return "Unknown Value";
-    }
-};
-
-enum CSButtons : csint
-{
-    None = 0,
-    DPadUp = 1,
-    DPadDown = 2,
-    DPadLeft = 4,
-    DPadRight = 8,
-    Start = 16,
-    Back = 32,
-    LeftStick = 64,
-    RightStick = 128,
-    LeftShoulder = 256,
-    RightShoulder = 512,
-    BigButton = 2048,
-    A = 4096,
-    B = 8192,
-    X = 16384,
-    Y = 32768,
-    LeftThumbstickLeft = 2097152,
-    RightTrigger = 4194304,
-    LeftTrigger = 8388608,
-    RightThumbstickUp = 16777216,
-    RightThumbstickDown = 33554432,
-    RightThumbstickRight = 67108864,
-    RightThumbstickLeft = 134217728,
-    LeftThumbstickUp = 268435456,
-    LeftThumbstickDown = 536870912,
-    LeftThumbstickRight = 1073741824,
-};
-
-class ECSButtons
-{
-public:
-    static const char* ToString(CSButtons enumValue)
-    {
-        switch (enumValue)
-        {
-            case None: return "None";
-            case DPadUp: return "DPadUp";
-            case DPadDown: return "DPadDown";
-            case DPadLeft: return "DPadLeft";
-            case DPadRight: return "DPadRight";
-            case Start: return "Start";
-            case Back: return "Back";
-            case LeftStick: return "LeftStick";
-            case RightStick: return "RightStick";
-            case LeftShoulder: return "LeftShoulder";
-            case RightShoulder: return "RightShoulder";
-            case BigButton: return "BigButton";
-            case A: return "A";
-            case B: return "B";
-            case X: return "X";
-            case Y: return "Y";
-            case LeftThumbstickLeft: return "LeftThumbstickLeft";
-            case RightTrigger: return "RightTrigger";
-            case LeftTrigger: return "LeftTrigger";
-            case RightThumbstickUp: return "RightThumbstickUp";
-            case RightThumbstickDown: return "RightThumbstickDown";
-            case RightThumbstickRight: return "RightThumbstickRight";
-            case RightThumbstickLeft: return "RightThumbstickLeft";
-            case LeftThumbstickUp: return "LeftThumbstickUp";
-            case LeftThumbstickDown: return "LeftThumbstickDown";
-            case LeftThumbstickRight: return "LeftThumbstickRight";
-        }
-
-        return "Unknown Value";
-    }
-};
-
-enum CSButtonState : csint
-{
-    Released = 0,
-    Pressed = 1,
-};
-
-class ECSButtonState
-{
-public:
-    static const char* ToString(CSButtonState enumValue)
-    {
-        switch (enumValue)
-        {
-            case Released: return "Released";
-            case Pressed: return "Pressed";
-        }
-
-        return "Unknown Value";
-    }
-};
-
-enum CSGamePadDeadZone : csint
-{
-    None = 0,
-    IndependentAxes = 1,
-    Circular = 2,
-};
-
-class ECSGamePadDeadZone
-{
-public:
-    static const char* ToString(CSGamePadDeadZone enumValue)
-    {
-        switch (enumValue)
-        {
-            case None: return "None";
-            case IndependentAxes: return "IndependentAxes";
-            case Circular: return "Circular";
-        }
-
-        return "Unknown Value";
-    }
-};
-
-enum CSGamePadType : csint
-{
-    Unknown = 0,
-    GamePad = 1,
-    Wheel = 2,
-    ArcadeStick = 3,
-    FlightStick = 4,
-    DancePad = 5,
-    Guitar = 6,
-    AlternateGuitar = 7,
-    DrumKit = 8,
-    BigButtonPad = 768,
-};
-
-class ECSGamePadType
-{
-public:
-    static const char* ToString(CSGamePadType enumValue)
-    {
-        switch (enumValue)
-        {
-            case Unknown: return "Unknown";
-            case GamePad: return "GamePad";
-            case Wheel: return "Wheel";
-            case ArcadeStick: return "ArcadeStick";
-            case FlightStick: return "FlightStick";
-            case DancePad: return "DancePad";
-            case Guitar: return "Guitar";
-            case AlternateGuitar: return "AlternateGuitar";
-            case DrumKit: return "DrumKit";
-            case BigButtonPad: return "BigButtonPad";
-        }
-
-        return "Unknown Value";
-    }
-};
-
-enum CSKeys : csint
+enum class MGKeys : mgint
 {
     None = 0,
     Back = 8,
@@ -646,1459 +771,195 @@ enum CSKeys : csint
     OemClear = 254,
 };
 
-class ECSKeys
+static const char* MGKeys_ToString(MGKeys enumValue)
 {
-public:
-    static const char* ToString(CSKeys enumValue)
+    switch (enumValue)
     {
-        switch (enumValue)
-        {
-            case None: return "None";
-            case Back: return "Back";
-            case Tab: return "Tab";
-            case Enter: return "Enter";
-            case Pause: return "Pause";
-            case CapsLock: return "CapsLock";
-            case Kana: return "Kana";
-            case Kanji: return "Kanji";
-            case Escape: return "Escape";
-            case ImeConvert: return "ImeConvert";
-            case ImeNoConvert: return "ImeNoConvert";
-            case Space: return "Space";
-            case PageUp: return "PageUp";
-            case PageDown: return "PageDown";
-            case End: return "End";
-            case Home: return "Home";
-            case Left: return "Left";
-            case Up: return "Up";
-            case Right: return "Right";
-            case Down: return "Down";
-            case Select: return "Select";
-            case Print: return "Print";
-            case Execute: return "Execute";
-            case PrintScreen: return "PrintScreen";
-            case Insert: return "Insert";
-            case Delete: return "Delete";
-            case Help: return "Help";
-            case D0: return "D0";
-            case D1: return "D1";
-            case D2: return "D2";
-            case D3: return "D3";
-            case D4: return "D4";
-            case D5: return "D5";
-            case D6: return "D6";
-            case D7: return "D7";
-            case D8: return "D8";
-            case D9: return "D9";
-            case A: return "A";
-            case B: return "B";
-            case C: return "C";
-            case D: return "D";
-            case E: return "E";
-            case F: return "F";
-            case G: return "G";
-            case H: return "H";
-            case I: return "I";
-            case J: return "J";
-            case K: return "K";
-            case L: return "L";
-            case M: return "M";
-            case N: return "N";
-            case O: return "O";
-            case P: return "P";
-            case Q: return "Q";
-            case R: return "R";
-            case S: return "S";
-            case T: return "T";
-            case U: return "U";
-            case V: return "V";
-            case W: return "W";
-            case X: return "X";
-            case Y: return "Y";
-            case Z: return "Z";
-            case LeftWindows: return "LeftWindows";
-            case RightWindows: return "RightWindows";
-            case Apps: return "Apps";
-            case Sleep: return "Sleep";
-            case NumPad0: return "NumPad0";
-            case NumPad1: return "NumPad1";
-            case NumPad2: return "NumPad2";
-            case NumPad3: return "NumPad3";
-            case NumPad4: return "NumPad4";
-            case NumPad5: return "NumPad5";
-            case NumPad6: return "NumPad6";
-            case NumPad7: return "NumPad7";
-            case NumPad8: return "NumPad8";
-            case NumPad9: return "NumPad9";
-            case Multiply: return "Multiply";
-            case Add: return "Add";
-            case Separator: return "Separator";
-            case Subtract: return "Subtract";
-            case Decimal: return "Decimal";
-            case Divide: return "Divide";
-            case F1: return "F1";
-            case F2: return "F2";
-            case F3: return "F3";
-            case F4: return "F4";
-            case F5: return "F5";
-            case F6: return "F6";
-            case F7: return "F7";
-            case F8: return "F8";
-            case F9: return "F9";
-            case F10: return "F10";
-            case F11: return "F11";
-            case F12: return "F12";
-            case F13: return "F13";
-            case F14: return "F14";
-            case F15: return "F15";
-            case F16: return "F16";
-            case F17: return "F17";
-            case F18: return "F18";
-            case F19: return "F19";
-            case F20: return "F20";
-            case F21: return "F21";
-            case F22: return "F22";
-            case F23: return "F23";
-            case F24: return "F24";
-            case NumLock: return "NumLock";
-            case Scroll: return "Scroll";
-            case LeftShift: return "LeftShift";
-            case RightShift: return "RightShift";
-            case LeftControl: return "LeftControl";
-            case RightControl: return "RightControl";
-            case LeftAlt: return "LeftAlt";
-            case RightAlt: return "RightAlt";
-            case BrowserBack: return "BrowserBack";
-            case BrowserForward: return "BrowserForward";
-            case BrowserRefresh: return "BrowserRefresh";
-            case BrowserStop: return "BrowserStop";
-            case BrowserSearch: return "BrowserSearch";
-            case BrowserFavorites: return "BrowserFavorites";
-            case BrowserHome: return "BrowserHome";
-            case VolumeMute: return "VolumeMute";
-            case VolumeDown: return "VolumeDown";
-            case VolumeUp: return "VolumeUp";
-            case MediaNextTrack: return "MediaNextTrack";
-            case MediaPreviousTrack: return "MediaPreviousTrack";
-            case MediaStop: return "MediaStop";
-            case MediaPlayPause: return "MediaPlayPause";
-            case LaunchMail: return "LaunchMail";
-            case SelectMedia: return "SelectMedia";
-            case LaunchApplication1: return "LaunchApplication1";
-            case LaunchApplication2: return "LaunchApplication2";
-            case OemSemicolon: return "OemSemicolon";
-            case OemPlus: return "OemPlus";
-            case OemComma: return "OemComma";
-            case OemMinus: return "OemMinus";
-            case OemPeriod: return "OemPeriod";
-            case OemQuestion: return "OemQuestion";
-            case OemTilde: return "OemTilde";
-            case ChatPadGreen: return "ChatPadGreen";
-            case ChatPadOrange: return "ChatPadOrange";
-            case OemOpenBrackets: return "OemOpenBrackets";
-            case OemPipe: return "OemPipe";
-            case OemCloseBrackets: return "OemCloseBrackets";
-            case OemQuotes: return "OemQuotes";
-            case Oem8: return "Oem8";
-            case OemBackslash: return "OemBackslash";
-            case ProcessKey: return "ProcessKey";
-            case OemCopy: return "OemCopy";
-            case OemAuto: return "OemAuto";
-            case OemEnlW: return "OemEnlW";
-            case Attn: return "Attn";
-            case Crsel: return "Crsel";
-            case Exsel: return "Exsel";
-            case EraseEof: return "EraseEof";
-            case Play: return "Play";
-            case Zoom: return "Zoom";
-            case Pa1: return "Pa1";
-            case OemClear: return "OemClear";
-        }
-
-        return "Unknown Value";
+        case MGKeys::None: return "None";
+        case MGKeys::Back: return "Back";
+        case MGKeys::Tab: return "Tab";
+        case MGKeys::Enter: return "Enter";
+        case MGKeys::Pause: return "Pause";
+        case MGKeys::CapsLock: return "CapsLock";
+        case MGKeys::Kana: return "Kana";
+        case MGKeys::Kanji: return "Kanji";
+        case MGKeys::Escape: return "Escape";
+        case MGKeys::ImeConvert: return "ImeConvert";
+        case MGKeys::ImeNoConvert: return "ImeNoConvert";
+        case MGKeys::Space: return "Space";
+        case MGKeys::PageUp: return "PageUp";
+        case MGKeys::PageDown: return "PageDown";
+        case MGKeys::End: return "End";
+        case MGKeys::Home: return "Home";
+        case MGKeys::Left: return "Left";
+        case MGKeys::Up: return "Up";
+        case MGKeys::Right: return "Right";
+        case MGKeys::Down: return "Down";
+        case MGKeys::Select: return "Select";
+        case MGKeys::Print: return "Print";
+        case MGKeys::Execute: return "Execute";
+        case MGKeys::PrintScreen: return "PrintScreen";
+        case MGKeys::Insert: return "Insert";
+        case MGKeys::Delete: return "Delete";
+        case MGKeys::Help: return "Help";
+        case MGKeys::D0: return "D0";
+        case MGKeys::D1: return "D1";
+        case MGKeys::D2: return "D2";
+        case MGKeys::D3: return "D3";
+        case MGKeys::D4: return "D4";
+        case MGKeys::D5: return "D5";
+        case MGKeys::D6: return "D6";
+        case MGKeys::D7: return "D7";
+        case MGKeys::D8: return "D8";
+        case MGKeys::D9: return "D9";
+        case MGKeys::A: return "A";
+        case MGKeys::B: return "B";
+        case MGKeys::C: return "C";
+        case MGKeys::D: return "D";
+        case MGKeys::E: return "E";
+        case MGKeys::F: return "F";
+        case MGKeys::G: return "G";
+        case MGKeys::H: return "H";
+        case MGKeys::I: return "I";
+        case MGKeys::J: return "J";
+        case MGKeys::K: return "K";
+        case MGKeys::L: return "L";
+        case MGKeys::M: return "M";
+        case MGKeys::N: return "N";
+        case MGKeys::O: return "O";
+        case MGKeys::P: return "P";
+        case MGKeys::Q: return "Q";
+        case MGKeys::R: return "R";
+        case MGKeys::S: return "S";
+        case MGKeys::T: return "T";
+        case MGKeys::U: return "U";
+        case MGKeys::V: return "V";
+        case MGKeys::W: return "W";
+        case MGKeys::X: return "X";
+        case MGKeys::Y: return "Y";
+        case MGKeys::Z: return "Z";
+        case MGKeys::LeftWindows: return "LeftWindows";
+        case MGKeys::RightWindows: return "RightWindows";
+        case MGKeys::Apps: return "Apps";
+        case MGKeys::Sleep: return "Sleep";
+        case MGKeys::NumPad0: return "NumPad0";
+        case MGKeys::NumPad1: return "NumPad1";
+        case MGKeys::NumPad2: return "NumPad2";
+        case MGKeys::NumPad3: return "NumPad3";
+        case MGKeys::NumPad4: return "NumPad4";
+        case MGKeys::NumPad5: return "NumPad5";
+        case MGKeys::NumPad6: return "NumPad6";
+        case MGKeys::NumPad7: return "NumPad7";
+        case MGKeys::NumPad8: return "NumPad8";
+        case MGKeys::NumPad9: return "NumPad9";
+        case MGKeys::Multiply: return "Multiply";
+        case MGKeys::Add: return "Add";
+        case MGKeys::Separator: return "Separator";
+        case MGKeys::Subtract: return "Subtract";
+        case MGKeys::Decimal: return "Decimal";
+        case MGKeys::Divide: return "Divide";
+        case MGKeys::F1: return "F1";
+        case MGKeys::F2: return "F2";
+        case MGKeys::F3: return "F3";
+        case MGKeys::F4: return "F4";
+        case MGKeys::F5: return "F5";
+        case MGKeys::F6: return "F6";
+        case MGKeys::F7: return "F7";
+        case MGKeys::F8: return "F8";
+        case MGKeys::F9: return "F9";
+        case MGKeys::F10: return "F10";
+        case MGKeys::F11: return "F11";
+        case MGKeys::F12: return "F12";
+        case MGKeys::F13: return "F13";
+        case MGKeys::F14: return "F14";
+        case MGKeys::F15: return "F15";
+        case MGKeys::F16: return "F16";
+        case MGKeys::F17: return "F17";
+        case MGKeys::F18: return "F18";
+        case MGKeys::F19: return "F19";
+        case MGKeys::F20: return "F20";
+        case MGKeys::F21: return "F21";
+        case MGKeys::F22: return "F22";
+        case MGKeys::F23: return "F23";
+        case MGKeys::F24: return "F24";
+        case MGKeys::NumLock: return "NumLock";
+        case MGKeys::Scroll: return "Scroll";
+        case MGKeys::LeftShift: return "LeftShift";
+        case MGKeys::RightShift: return "RightShift";
+        case MGKeys::LeftControl: return "LeftControl";
+        case MGKeys::RightControl: return "RightControl";
+        case MGKeys::LeftAlt: return "LeftAlt";
+        case MGKeys::RightAlt: return "RightAlt";
+        case MGKeys::BrowserBack: return "BrowserBack";
+        case MGKeys::BrowserForward: return "BrowserForward";
+        case MGKeys::BrowserRefresh: return "BrowserRefresh";
+        case MGKeys::BrowserStop: return "BrowserStop";
+        case MGKeys::BrowserSearch: return "BrowserSearch";
+        case MGKeys::BrowserFavorites: return "BrowserFavorites";
+        case MGKeys::BrowserHome: return "BrowserHome";
+        case MGKeys::VolumeMute: return "VolumeMute";
+        case MGKeys::VolumeDown: return "VolumeDown";
+        case MGKeys::VolumeUp: return "VolumeUp";
+        case MGKeys::MediaNextTrack: return "MediaNextTrack";
+        case MGKeys::MediaPreviousTrack: return "MediaPreviousTrack";
+        case MGKeys::MediaStop: return "MediaStop";
+        case MGKeys::MediaPlayPause: return "MediaPlayPause";
+        case MGKeys::LaunchMail: return "LaunchMail";
+        case MGKeys::SelectMedia: return "SelectMedia";
+        case MGKeys::LaunchApplication1: return "LaunchApplication1";
+        case MGKeys::LaunchApplication2: return "LaunchApplication2";
+        case MGKeys::OemSemicolon: return "OemSemicolon";
+        case MGKeys::OemPlus: return "OemPlus";
+        case MGKeys::OemComma: return "OemComma";
+        case MGKeys::OemMinus: return "OemMinus";
+        case MGKeys::OemPeriod: return "OemPeriod";
+        case MGKeys::OemQuestion: return "OemQuestion";
+        case MGKeys::OemTilde: return "OemTilde";
+        case MGKeys::ChatPadGreen: return "ChatPadGreen";
+        case MGKeys::ChatPadOrange: return "ChatPadOrange";
+        case MGKeys::OemOpenBrackets: return "OemOpenBrackets";
+        case MGKeys::OemPipe: return "OemPipe";
+        case MGKeys::OemCloseBrackets: return "OemCloseBrackets";
+        case MGKeys::OemQuotes: return "OemQuotes";
+        case MGKeys::Oem8: return "Oem8";
+        case MGKeys::OemBackslash: return "OemBackslash";
+        case MGKeys::ProcessKey: return "ProcessKey";
+        case MGKeys::OemCopy: return "OemCopy";
+        case MGKeys::OemAuto: return "OemAuto";
+        case MGKeys::OemEnlW: return "OemEnlW";
+        case MGKeys::Attn: return "Attn";
+        case MGKeys::Crsel: return "Crsel";
+        case MGKeys::Exsel: return "Exsel";
+        case MGKeys::EraseEof: return "EraseEof";
+        case MGKeys::Play: return "Play";
+        case MGKeys::Zoom: return "Zoom";
+        case MGKeys::Pa1: return "Pa1";
+        case MGKeys::OemClear: return "OemClear";
     }
+
+    return "Unknown Value";
+}
+
+enum class MGMouseButton : mgint
+{
+    Left = 0,
+    Middle = 1,
+    Right = 2,
+    X1 = 3,
+    X2 = 4,
 };
 
-enum CSKeyState : csint
+static const char* MGMouseButton_ToString(MGMouseButton enumValue)
 {
-    Up = 0,
-    Down = 1,
-};
-
-class ECSKeyState
-{
-public:
-    static const char* ToString(CSKeyState enumValue)
+    switch (enumValue)
     {
-        switch (enumValue)
-        {
-            case Up: return "Up";
-            case Down: return "Down";
-        }
-
-        return "Unknown Value";
+        case MGMouseButton::Left: return "Left";
+        case MGMouseButton::Middle: return "Middle";
+        case MGMouseButton::Right: return "Right";
+        case MGMouseButton::X1: return "X1";
+        case MGMouseButton::X2: return "X2";
     }
-};
 
-enum CSGestureType : csint
-{
-    None = 0,
-    Tap = 1,
-    DragComplete = 2,
-    Flick = 4,
-    FreeDrag = 8,
-    Hold = 16,
-    HorizontalDrag = 32,
-    Pinch = 64,
-    PinchComplete = 128,
-    DoubleTap = 256,
-    VerticalDrag = 512,
-};
-
-class ECSGestureType
-{
-public:
-    static const char* ToString(CSGestureType enumValue)
-    {
-        switch (enumValue)
-        {
-            case None: return "None";
-            case Tap: return "Tap";
-            case DragComplete: return "DragComplete";
-            case Flick: return "Flick";
-            case FreeDrag: return "FreeDrag";
-            case Hold: return "Hold";
-            case HorizontalDrag: return "HorizontalDrag";
-            case Pinch: return "Pinch";
-            case PinchComplete: return "PinchComplete";
-            case DoubleTap: return "DoubleTap";
-            case VerticalDrag: return "VerticalDrag";
-        }
-
-        return "Unknown Value";
-    }
-};
-
-enum CSTouchLocationState : csint
-{
-    Invalid = 0,
-    Moved = 1,
-    Pressed = 2,
-    Released = 3,
-};
-
-class ECSTouchLocationState
-{
-public:
-    static const char* ToString(CSTouchLocationState enumValue)
-    {
-        switch (enumValue)
-        {
-            case Invalid: return "Invalid";
-            case Moved: return "Moved";
-            case Pressed: return "Pressed";
-            case Released: return "Released";
-        }
-
-        return "Unknown Value";
-    }
-};
-
-enum CSClearOptions : csint
-{
-    Target = 1,
-    DepthBuffer = 2,
-    Stencil = 4,
-};
-
-class ECSClearOptions
-{
-public:
-    static const char* ToString(CSClearOptions enumValue)
-    {
-        switch (enumValue)
-        {
-            case Target: return "Target";
-            case DepthBuffer: return "DepthBuffer";
-            case Stencil: return "Stencil";
-        }
-
-        return "Unknown Value";
-    }
-};
-
-enum CSColorWriteChannels : csint
-{
-    None = 0,
-    Red = 1,
-    Green = 2,
-    Blue = 4,
-    Alpha = 8,
-    All = 15,
-};
-
-class ECSColorWriteChannels
-{
-public:
-    static const char* ToString(CSColorWriteChannels enumValue)
-    {
-        switch (enumValue)
-        {
-            case None: return "None";
-            case Red: return "Red";
-            case Green: return "Green";
-            case Blue: return "Blue";
-            case Alpha: return "Alpha";
-            case All: return "All";
-        }
-
-        return "Unknown Value";
-    }
-};
-
-enum CSCubeMapFace : csint
-{
-    PositiveX = 0,
-    NegativeX = 1,
-    PositiveY = 2,
-    NegativeY = 3,
-    PositiveZ = 4,
-    NegativeZ = 5,
-};
-
-class ECSCubeMapFace
-{
-public:
-    static const char* ToString(CSCubeMapFace enumValue)
-    {
-        switch (enumValue)
-        {
-            case PositiveX: return "PositiveX";
-            case NegativeX: return "NegativeX";
-            case PositiveY: return "PositiveY";
-            case NegativeY: return "NegativeY";
-            case PositiveZ: return "PositiveZ";
-            case NegativeZ: return "NegativeZ";
-        }
-
-        return "Unknown Value";
-    }
-};
-
-enum CSEffectDirtyFlags : csint
-{
-    WorldViewProj = 1,
-    World = 2,
-    EyePosition = 4,
-    MaterialColor = 8,
-    Fog = 16,
-    FogEnable = 32,
-    AlphaTest = 64,
-    ShaderIndex = 128,
-    All = -1,
-};
-
-class ECSEffectDirtyFlags
-{
-public:
-    static const char* ToString(CSEffectDirtyFlags enumValue)
-    {
-        switch (enumValue)
-        {
-            case WorldViewProj: return "WorldViewProj";
-            case World: return "World";
-            case EyePosition: return "EyePosition";
-            case MaterialColor: return "MaterialColor";
-            case Fog: return "Fog";
-            case FogEnable: return "FogEnable";
-            case AlphaTest: return "AlphaTest";
-            case ShaderIndex: return "ShaderIndex";
-            case All: return "All";
-        }
-
-        return "Unknown Value";
-    }
-};
-
-enum CSEffectParameterClass : csint
-{
-    Scalar = 0,
-    Vector = 1,
-    Matrix = 2,
-    Object = 3,
-    Struct = 4,
-};
-
-class ECSEffectParameterClass
-{
-public:
-    static const char* ToString(CSEffectParameterClass enumValue)
-    {
-        switch (enumValue)
-        {
-            case Scalar: return "Scalar";
-            case Vector: return "Vector";
-            case Matrix: return "Matrix";
-            case Object: return "Object";
-            case Struct: return "Struct";
-        }
-
-        return "Unknown Value";
-    }
-};
-
-enum CSEffectParameterType : csint
-{
-    Void = 0,
-    Bool = 1,
-    Int32 = 2,
-    Single = 3,
-    String = 4,
-    Texture = 5,
-    Texture1D = 6,
-    Texture2D = 7,
-    Texture3D = 8,
-    TextureCube = 9,
-};
-
-class ECSEffectParameterType
-{
-public:
-    static const char* ToString(CSEffectParameterType enumValue)
-    {
-        switch (enumValue)
-        {
-            case Void: return "Void";
-            case Bool: return "Bool";
-            case Int32: return "Int32";
-            case Single: return "Single";
-            case String: return "String";
-            case Texture: return "Texture";
-            case Texture1D: return "Texture1D";
-            case Texture2D: return "Texture2D";
-            case Texture3D: return "Texture3D";
-            case TextureCube: return "TextureCube";
-        }
-
-        return "Unknown Value";
-    }
-};
-
-enum CSGraphicsDeviceStatus : csint
-{
-    Normal = 0,
-    Lost = 1,
-    NotReset = 2,
-};
-
-class ECSGraphicsDeviceStatus
-{
-public:
-    static const char* ToString(CSGraphicsDeviceStatus enumValue)
-    {
-        switch (enumValue)
-        {
-            case Normal: return "Normal";
-            case Lost: return "Lost";
-            case NotReset: return "NotReset";
-        }
-
-        return "Unknown Value";
-    }
-};
-
-enum CSGraphicsProfile : csint
-{
-    Reach = 0,
-    HiDef = 1,
-};
-
-class ECSGraphicsProfile
-{
-public:
-    static const char* ToString(CSGraphicsProfile enumValue)
-    {
-        switch (enumValue)
-        {
-            case Reach: return "Reach";
-            case HiDef: return "HiDef";
-        }
-
-        return "Unknown Value";
-    }
-};
-
-enum CSPresentInterval : csint
-{
-    Default = 0,
-    One = 1,
-    Two = 2,
-    Immediate = 3,
-};
-
-class ECSPresentInterval
-{
-public:
-    static const char* ToString(CSPresentInterval enumValue)
-    {
-        switch (enumValue)
-        {
-            case Default: return "Default";
-            case One: return "One";
-            case Two: return "Two";
-            case Immediate: return "Immediate";
-        }
-
-        return "Unknown Value";
-    }
-};
-
-enum CSRenderTargetUsage : csint
-{
-    DiscardContents = 0,
-    PreserveContents = 1,
-    PlatformContents = 2,
-};
-
-class ECSRenderTargetUsage
-{
-public:
-    static const char* ToString(CSRenderTargetUsage enumValue)
-    {
-        switch (enumValue)
-        {
-            case DiscardContents: return "DiscardContents";
-            case PreserveContents: return "PreserveContents";
-            case PlatformContents: return "PlatformContents";
-        }
-
-        return "Unknown Value";
-    }
-};
-
-enum CSSetDataOptions : csint
-{
-    None = 0,
-    Discard = 1,
-    NoOverwrite = 2,
-};
-
-class ECSSetDataOptions
-{
-public:
-    static const char* ToString(CSSetDataOptions enumValue)
-    {
-        switch (enumValue)
-        {
-            case None: return "None";
-            case Discard: return "Discard";
-            case NoOverwrite: return "NoOverwrite";
-        }
-
-        return "Unknown Value";
-    }
-};
-
-enum CSSamplerType : csint
-{
-    Sampler2D = 0,
-    SamplerCube = 1,
-    SamplerVolume = 2,
-    Sampler1D = 3,
-};
-
-class ECSSamplerType
-{
-public:
-    static const char* ToString(CSSamplerType enumValue)
-    {
-        switch (enumValue)
-        {
-            case Sampler2D: return "Sampler2D";
-            case SamplerCube: return "SamplerCube";
-            case SamplerVolume: return "SamplerVolume";
-            case Sampler1D: return "Sampler1D";
-        }
-
-        return "Unknown Value";
-    }
-};
-
-enum CSShaderStage : csint
-{
-    Vertex = 0,
-    Pixel = 1,
-};
-
-class ECSShaderStage
-{
-public:
-    static const char* ToString(CSShaderStage enumValue)
-    {
-        switch (enumValue)
-        {
-            case Vertex: return "Vertex";
-            case Pixel: return "Pixel";
-        }
-
-        return "Unknown Value";
-    }
-};
-
-enum CSSpriteEffects : csint
-{
-    None = 0,
-    FlipHorizontally = 1,
-    FlipVertically = 2,
-};
-
-class ECSSpriteEffects
-{
-public:
-    static const char* ToString(CSSpriteEffects enumValue)
-    {
-        switch (enumValue)
-        {
-            case None: return "None";
-            case FlipHorizontally: return "FlipHorizontally";
-            case FlipVertically: return "FlipVertically";
-        }
-
-        return "Unknown Value";
-    }
-};
-
-enum CSSpriteSortMode : csint
-{
-    Deferred = 0,
-    Immediate = 1,
-    Texture = 2,
-    BackToFront = 3,
-    FrontToBack = 4,
-};
-
-class ECSSpriteSortMode
-{
-public:
-    static const char* ToString(CSSpriteSortMode enumValue)
-    {
-        switch (enumValue)
-        {
-            case Deferred: return "Deferred";
-            case Immediate: return "Immediate";
-            case Texture: return "Texture";
-            case BackToFront: return "BackToFront";
-            case FrontToBack: return "FrontToBack";
-        }
-
-        return "Unknown Value";
-    }
-};
-
-enum CSBlend : csint
-{
-    One = 0,
-    Zero = 1,
-    SourceColor = 2,
-    InverseSourceColor = 3,
-    SourceAlpha = 4,
-    InverseSourceAlpha = 5,
-    DestinationColor = 6,
-    InverseDestinationColor = 7,
-    DestinationAlpha = 8,
-    InverseDestinationAlpha = 9,
-    BlendFactor = 10,
-    InverseBlendFactor = 11,
-    SourceAlphaSaturation = 12,
-};
-
-class ECSBlend
-{
-public:
-    static const char* ToString(CSBlend enumValue)
-    {
-        switch (enumValue)
-        {
-            case One: return "One";
-            case Zero: return "Zero";
-            case SourceColor: return "SourceColor";
-            case InverseSourceColor: return "InverseSourceColor";
-            case SourceAlpha: return "SourceAlpha";
-            case InverseSourceAlpha: return "InverseSourceAlpha";
-            case DestinationColor: return "DestinationColor";
-            case InverseDestinationColor: return "InverseDestinationColor";
-            case DestinationAlpha: return "DestinationAlpha";
-            case InverseDestinationAlpha: return "InverseDestinationAlpha";
-            case BlendFactor: return "BlendFactor";
-            case InverseBlendFactor: return "InverseBlendFactor";
-            case SourceAlphaSaturation: return "SourceAlphaSaturation";
-        }
-
-        return "Unknown Value";
-    }
-};
-
-enum CSBlendFunction : csint
-{
-    Add = 0,
-    Subtract = 1,
-    ReverseSubtract = 2,
-    Min = 3,
-    Max = 4,
-};
-
-class ECSBlendFunction
-{
-public:
-    static const char* ToString(CSBlendFunction enumValue)
-    {
-        switch (enumValue)
-        {
-            case Add: return "Add";
-            case Subtract: return "Subtract";
-            case ReverseSubtract: return "ReverseSubtract";
-            case Min: return "Min";
-            case Max: return "Max";
-        }
-
-        return "Unknown Value";
-    }
-};
-
-enum CSCompareFunction : csint
-{
-    Always = 0,
-    Never = 1,
-    Less = 2,
-    LessEqual = 3,
-    Equal = 4,
-    GreaterEqual = 5,
-    Greater = 6,
-    NotEqual = 7,
-};
-
-class ECSCompareFunction
-{
-public:
-    static const char* ToString(CSCompareFunction enumValue)
-    {
-        switch (enumValue)
-        {
-            case Always: return "Always";
-            case Never: return "Never";
-            case Less: return "Less";
-            case LessEqual: return "LessEqual";
-            case Equal: return "Equal";
-            case GreaterEqual: return "GreaterEqual";
-            case Greater: return "Greater";
-            case NotEqual: return "NotEqual";
-        }
-
-        return "Unknown Value";
-    }
-};
-
-enum CSCullMode : csint
-{
-    None = 0,
-    CullClockwiseFace = 1,
-    CullCounterClockwiseFace = 2,
-};
-
-class ECSCullMode
-{
-public:
-    static const char* ToString(CSCullMode enumValue)
-    {
-        switch (enumValue)
-        {
-            case None: return "None";
-            case CullClockwiseFace: return "CullClockwiseFace";
-            case CullCounterClockwiseFace: return "CullCounterClockwiseFace";
-        }
-
-        return "Unknown Value";
-    }
-};
-
-enum CSDepthFormat : csint
-{
-    None = 0,
-    Depth16 = 1,
-    Depth24 = 2,
-    Depth24Stencil8 = 3,
-};
-
-class ECSDepthFormat
-{
-public:
-    static const char* ToString(CSDepthFormat enumValue)
-    {
-        switch (enumValue)
-        {
-            case None: return "None";
-            case Depth16: return "Depth16";
-            case Depth24: return "Depth24";
-            case Depth24Stencil8: return "Depth24Stencil8";
-        }
-
-        return "Unknown Value";
-    }
-};
-
-enum CSFillMode : csint
-{
-    Solid = 0,
-    WireFrame = 1,
-};
-
-class ECSFillMode
-{
-public:
-    static const char* ToString(CSFillMode enumValue)
-    {
-        switch (enumValue)
-        {
-            case Solid: return "Solid";
-            case WireFrame: return "WireFrame";
-        }
-
-        return "Unknown Value";
-    }
-};
-
-enum CSStencilOperation : csint
-{
-    Keep = 0,
-    Zero = 1,
-    Replace = 2,
-    Increment = 3,
-    Decrement = 4,
-    IncrementSaturation = 5,
-    DecrementSaturation = 6,
-    Invert = 7,
-};
-
-class ECSStencilOperation
-{
-public:
-    static const char* ToString(CSStencilOperation enumValue)
-    {
-        switch (enumValue)
-        {
-            case Keep: return "Keep";
-            case Zero: return "Zero";
-            case Replace: return "Replace";
-            case Increment: return "Increment";
-            case Decrement: return "Decrement";
-            case IncrementSaturation: return "IncrementSaturation";
-            case DecrementSaturation: return "DecrementSaturation";
-            case Invert: return "Invert";
-        }
-
-        return "Unknown Value";
-    }
-};
-
-enum CSTextureAddressMode : csint
-{
-    Wrap = 0,
-    Clamp = 1,
-    Mirror = 2,
-    Border = 3,
-};
-
-class ECSTextureAddressMode
-{
-public:
-    static const char* ToString(CSTextureAddressMode enumValue)
-    {
-        switch (enumValue)
-        {
-            case Wrap: return "Wrap";
-            case Clamp: return "Clamp";
-            case Mirror: return "Mirror";
-            case Border: return "Border";
-        }
-
-        return "Unknown Value";
-    }
-};
-
-enum CSTextureFilter : csint
-{
-    Linear = 0,
-    Point = 1,
-    Anisotropic = 2,
-    LinearMipPoint = 3,
-    PointMipLinear = 4,
-    MinLinearMagPointMipLinear = 5,
-    MinLinearMagPointMipPoint = 6,
-    MinPointMagLinearMipLinear = 7,
-    MinPointMagLinearMipPoint = 8,
-};
-
-class ECSTextureFilter
-{
-public:
-    static const char* ToString(CSTextureFilter enumValue)
-    {
-        switch (enumValue)
-        {
-            case Linear: return "Linear";
-            case Point: return "Point";
-            case Anisotropic: return "Anisotropic";
-            case LinearMipPoint: return "LinearMipPoint";
-            case PointMipLinear: return "PointMipLinear";
-            case MinLinearMagPointMipLinear: return "MinLinearMagPointMipLinear";
-            case MinLinearMagPointMipPoint: return "MinLinearMagPointMipPoint";
-            case MinPointMagLinearMipLinear: return "MinPointMagLinearMipLinear";
-            case MinPointMagLinearMipPoint: return "MinPointMagLinearMipPoint";
-        }
-
-        return "Unknown Value";
-    }
-};
-
-enum CSTextureFilterMode : csint
-{
-    Default = 0,
-    Comparison = 1,
-};
-
-class ECSTextureFilterMode
-{
-public:
-    static const char* ToString(CSTextureFilterMode enumValue)
-    {
-        switch (enumValue)
-        {
-            case Default: return "Default";
-            case Comparison: return "Comparison";
-        }
-
-        return "Unknown Value";
-    }
-};
-
-enum CSSurfaceFormat : csint
-{
-    Color = 0,
-    Bgr565 = 1,
-    Bgra5551 = 2,
-    Bgra4444 = 3,
-    Dxt1 = 4,
-    Dxt3 = 5,
-    Dxt5 = 6,
-    NormalizedByte2 = 7,
-    NormalizedByte4 = 8,
-    Rgba1010102 = 9,
-    Rg32 = 10,
-    Rgba64 = 11,
-    Alpha8 = 12,
-    Single = 13,
-    Vector2 = 14,
-    Vector4 = 15,
-    HalfSingle = 16,
-    HalfVector2 = 17,
-    HalfVector4 = 18,
-    HdrBlendable = 19,
-    Bgr32 = 20,
-    Bgra32 = 21,
-    ColorSRgb = 30,
-    Bgr32SRgb = 31,
-    Bgra32SRgb = 32,
-    Dxt1SRgb = 33,
-    Dxt3SRgb = 34,
-    Dxt5SRgb = 35,
-    RgbPvrtc2Bpp = 50,
-    RgbPvrtc4Bpp = 51,
-    RgbaPvrtc2Bpp = 52,
-    RgbaPvrtc4Bpp = 53,
-    RgbEtc1 = 60,
-    Dxt1a = 70,
-    RgbaAtcExplicitAlpha = 80,
-    RgbaAtcInterpolatedAlpha = 81,
-    Rgb8Etc2 = 90,
-    Srgb8Etc2 = 91,
-    Rgb8A1Etc2 = 92,
-    Srgb8A1Etc2 = 93,
-    Rgba8Etc2 = 94,
-    SRgb8A8Etc2 = 95,
-};
-
-class ECSSurfaceFormat
-{
-public:
-    static const char* ToString(CSSurfaceFormat enumValue)
-    {
-        switch (enumValue)
-        {
-            case Color: return "Color";
-            case Bgr565: return "Bgr565";
-            case Bgra5551: return "Bgra5551";
-            case Bgra4444: return "Bgra4444";
-            case Dxt1: return "Dxt1";
-            case Dxt3: return "Dxt3";
-            case Dxt5: return "Dxt5";
-            case NormalizedByte2: return "NormalizedByte2";
-            case NormalizedByte4: return "NormalizedByte4";
-            case Rgba1010102: return "Rgba1010102";
-            case Rg32: return "Rg32";
-            case Rgba64: return "Rgba64";
-            case Alpha8: return "Alpha8";
-            case Single: return "Single";
-            case Vector2: return "Vector2";
-            case Vector4: return "Vector4";
-            case HalfSingle: return "HalfSingle";
-            case HalfVector2: return "HalfVector2";
-            case HalfVector4: return "HalfVector4";
-            case HdrBlendable: return "HdrBlendable";
-            case Bgr32: return "Bgr32";
-            case Bgra32: return "Bgra32";
-            case ColorSRgb: return "ColorSRgb";
-            case Bgr32SRgb: return "Bgr32SRgb";
-            case Bgra32SRgb: return "Bgra32SRgb";
-            case Dxt1SRgb: return "Dxt1SRgb";
-            case Dxt3SRgb: return "Dxt3SRgb";
-            case Dxt5SRgb: return "Dxt5SRgb";
-            case RgbPvrtc2Bpp: return "RgbPvrtc2Bpp";
-            case RgbPvrtc4Bpp: return "RgbPvrtc4Bpp";
-            case RgbaPvrtc2Bpp: return "RgbaPvrtc2Bpp";
-            case RgbaPvrtc4Bpp: return "RgbaPvrtc4Bpp";
-            case RgbEtc1: return "RgbEtc1";
-            case Dxt1a: return "Dxt1a";
-            case RgbaAtcExplicitAlpha: return "RgbaAtcExplicitAlpha";
-            case RgbaAtcInterpolatedAlpha: return "RgbaAtcInterpolatedAlpha";
-            case Rgb8Etc2: return "Rgb8Etc2";
-            case Srgb8Etc2: return "Srgb8Etc2";
-            case Rgb8A1Etc2: return "Rgb8A1Etc2";
-            case Srgb8A1Etc2: return "Srgb8A1Etc2";
-            case Rgba8Etc2: return "Rgba8Etc2";
-            case SRgb8A8Etc2: return "SRgb8A8Etc2";
-        }
-
-        return "Unknown Value";
-    }
-};
-
-enum CSBufferUsage : csint
-{
-    None = 0,
-    WriteOnly = 1,
-};
-
-class ECSBufferUsage
-{
-public:
-    static const char* ToString(CSBufferUsage enumValue)
-    {
-        switch (enumValue)
-        {
-            case None: return "None";
-            case WriteOnly: return "WriteOnly";
-        }
-
-        return "Unknown Value";
-    }
-};
-
-enum CSIndexElementSize : csint
-{
-    SixteenBits = 0,
-    ThirtyTwoBits = 1,
-};
-
-class ECSIndexElementSize
-{
-public:
-    static const char* ToString(CSIndexElementSize enumValue)
-    {
-        switch (enumValue)
-        {
-            case SixteenBits: return "SixteenBits";
-            case ThirtyTwoBits: return "ThirtyTwoBits";
-        }
-
-        return "Unknown Value";
-    }
-};
-
-enum CSPrimitiveType : csint
-{
-    TriangleList = 0,
-    TriangleStrip = 1,
-    LineList = 2,
-    LineStrip = 3,
-    PointList = 4,
-};
-
-class ECSPrimitiveType
-{
-public:
-    static const char* ToString(CSPrimitiveType enumValue)
-    {
-        switch (enumValue)
-        {
-            case TriangleList: return "TriangleList";
-            case TriangleStrip: return "TriangleStrip";
-            case LineList: return "LineList";
-            case LineStrip: return "LineStrip";
-            case PointList: return "PointList";
-        }
-
-        return "Unknown Value";
-    }
-};
-
-enum CSVertexElementFormat : csint
-{
-    Single = 0,
-    Vector2 = 1,
-    Vector3 = 2,
-    Vector4 = 3,
-    Color = 4,
-    Byte4 = 5,
-    Short2 = 6,
-    Short4 = 7,
-    NormalizedShort2 = 8,
-    NormalizedShort4 = 9,
-    HalfVector2 = 10,
-    HalfVector4 = 11,
-};
-
-class ECSVertexElementFormat
-{
-public:
-    static const char* ToString(CSVertexElementFormat enumValue)
-    {
-        switch (enumValue)
-        {
-            case Single: return "Single";
-            case Vector2: return "Vector2";
-            case Vector3: return "Vector3";
-            case Vector4: return "Vector4";
-            case Color: return "Color";
-            case Byte4: return "Byte4";
-            case Short2: return "Short2";
-            case Short4: return "Short4";
-            case NormalizedShort2: return "NormalizedShort2";
-            case NormalizedShort4: return "NormalizedShort4";
-            case HalfVector2: return "HalfVector2";
-            case HalfVector4: return "HalfVector4";
-        }
-
-        return "Unknown Value";
-    }
-};
-
-enum CSVertexElementUsage : csint
-{
-    Position = 0,
-    Color = 1,
-    TextureCoordinate = 2,
-    Normal = 3,
-    Binormal = 4,
-    Tangent = 5,
-    BlendIndices = 6,
-    BlendWeight = 7,
-    Depth = 8,
-    Fog = 9,
-    PointSize = 10,
-    Sample = 11,
-    TessellateFactor = 12,
-};
-
-class ECSVertexElementUsage
-{
-public:
-    static const char* ToString(CSVertexElementUsage enumValue)
-    {
-        switch (enumValue)
-        {
-            case Position: return "Position";
-            case Color: return "Color";
-            case TextureCoordinate: return "TextureCoordinate";
-            case Normal: return "Normal";
-            case Binormal: return "Binormal";
-            case Tangent: return "Tangent";
-            case BlendIndices: return "BlendIndices";
-            case BlendWeight: return "BlendWeight";
-            case Depth: return "Depth";
-            case Fog: return "Fog";
-            case PointSize: return "PointSize";
-            case Sample: return "Sample";
-            case TessellateFactor: return "TessellateFactor";
-        }
-
-        return "Unknown Value";
-    }
-};
-
-enum CSAudioChannels : csint
-{
-    Mono = 1,
-    Stereo = 2,
-};
-
-class ECSAudioChannels
-{
-public:
-    static const char* ToString(CSAudioChannels enumValue)
-    {
-        switch (enumValue)
-        {
-            case Mono: return "Mono";
-            case Stereo: return "Stereo";
-        }
-
-        return "Unknown Value";
-    }
-};
-
-enum CSMicrophoneState : csint
-{
-    Started = 0,
-    Stopped = 1,
-};
-
-class ECSMicrophoneState
-{
-public:
-    static const char* ToString(CSMicrophoneState enumValue)
-    {
-        switch (enumValue)
-        {
-            case Started: return "Started";
-            case Stopped: return "Stopped";
-        }
-
-        return "Unknown Value";
-    }
-};
-
-enum CSSoundState : csint
-{
-    Playing = 0,
-    Paused = 1,
-    Stopped = 2,
-};
-
-class ECSSoundState
-{
-public:
-    static const char* ToString(CSSoundState enumValue)
-    {
-        switch (enumValue)
-        {
-            case Playing: return "Playing";
-            case Paused: return "Paused";
-            case Stopped: return "Stopped";
-        }
-
-        return "Unknown Value";
-    }
-};
-
-enum CSAudioStopOptions : csint
-{
-    AsAuthored = 0,
-    Immediate = 1,
-};
-
-class ECSAudioStopOptions
-{
-public:
-    static const char* ToString(CSAudioStopOptions enumValue)
-    {
-        switch (enumValue)
-        {
-            case AsAuthored: return "AsAuthored";
-            case Immediate: return "Immediate";
-        }
-
-        return "Unknown Value";
-    }
-};
-
-enum CSCrossfadeType : csint
-{
-    Linear = 0,
-    Logarithmic = 1,
-    EqualPower = 2,
-};
-
-class ECSCrossfadeType
-{
-public:
-    static const char* ToString(CSCrossfadeType enumValue)
-    {
-        switch (enumValue)
-        {
-            case Linear: return "Linear";
-            case Logarithmic: return "Logarithmic";
-            case EqualPower: return "EqualPower";
-        }
-
-        return "Unknown Value";
-    }
-};
-
-enum CSFilterMode : csint
-{
-    LowPass = 0,
-    BandPass = 1,
-    HighPass = 2,
-};
-
-class ECSFilterMode
-{
-public:
-    static const char* ToString(CSFilterMode enumValue)
-    {
-        switch (enumValue)
-        {
-            case LowPass: return "LowPass";
-            case BandPass: return "BandPass";
-            case HighPass: return "HighPass";
-        }
-
-        return "Unknown Value";
-    }
-};
-
-enum CSMaxInstanceBehavior : csint
-{
-    FailToPlay = 0,
-    Queue = 1,
-    ReplaceOldest = 2,
-    ReplaceQuietest = 3,
-    ReplaceLowestPriority = 4,
-};
-
-class ECSMaxInstanceBehavior
-{
-public:
-    static const char* ToString(CSMaxInstanceBehavior enumValue)
-    {
-        switch (enumValue)
-        {
-            case FailToPlay: return "FailToPlay";
-            case Queue: return "Queue";
-            case ReplaceOldest: return "ReplaceOldest";
-            case ReplaceQuietest: return "ReplaceQuietest";
-            case ReplaceLowestPriority: return "ReplaceLowestPriority";
-        }
-
-        return "Unknown Value";
-    }
-};
-
-enum CSMiniFormatTag : csint
-{
-    Pcm = 0,
-    Xma = 1,
-    Xma = 1,
-    Adpcm = 2,
-    Wma = 3,
-};
-
-class ECSMiniFormatTag
-{
-public:
-    static const char* ToString(CSMiniFormatTag enumValue)
-    {
-        switch (enumValue)
-        {
-            case Pcm: return "Pcm";
-            case Xma: return "Xma";
-            case Xma: return "Xma";
-            case Adpcm: return "Adpcm";
-            case Wma: return "Wma";
-        }
-
-        return "Unknown Value";
-    }
-};
-
-enum CSVariationType : csint
-{
-    Ordered = 0,
-    OrderedFromRandom = 1,
-    Random = 2,
-    RandomNoImmediateRepeats = 3,
-    Shuffle = 4,
-};
-
-class ECSVariationType
-{
-public:
-    static const char* ToString(CSVariationType enumValue)
-    {
-        switch (enumValue)
-        {
-            case Ordered: return "Ordered";
-            case OrderedFromRandom: return "OrderedFromRandom";
-            case Random: return "Random";
-            case RandomNoImmediateRepeats: return "RandomNoImmediateRepeats";
-            case Shuffle: return "Shuffle";
-        }
-
-        return "Unknown Value";
-    }
-};
-
-enum CSRpcParameter : csint
-{
-    Volume = 0,
-    Pitch = 1,
-    ReverbSend = 2,
-    FilterFrequency = 3,
-    FilterQFactor = 4,
-    NumParameters = 5,
-};
-
-class ECSRpcParameter
-{
-public:
-    static const char* ToString(CSRpcParameter enumValue)
-    {
-        switch (enumValue)
-        {
-            case Volume: return "Volume";
-            case Pitch: return "Pitch";
-            case ReverbSend: return "ReverbSend";
-            case FilterFrequency: return "FilterFrequency";
-            case FilterQFactor: return "FilterQFactor";
-            case NumParameters: return "NumParameters";
-        }
-
-        return "Unknown Value";
-    }
-};
-
-enum CSRpcPointType : csint
-{
-    Linear = 0,
-    Fast = 1,
-    Slow = 2,
-    SinCos = 3,
-};
-
-class ECSRpcPointType
-{
-public:
-    static const char* ToString(CSRpcPointType enumValue)
-    {
-        switch (enumValue)
-        {
-            case Linear: return "Linear";
-            case Fast: return "Fast";
-            case Slow: return "Slow";
-            case SinCos: return "SinCos";
-        }
-
-        return "Unknown Value";
-    }
-};
+    return "Unknown Value";
+}
 

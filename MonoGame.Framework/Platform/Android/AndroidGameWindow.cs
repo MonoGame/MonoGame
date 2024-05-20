@@ -25,6 +25,17 @@ namespace Microsoft.Xna.Framework
 
         public override IntPtr Handle { get { return IntPtr.Zero; } }
 
+        public override Point Position
+        {
+            get
+            {
+                return Point.Zero;
+            }
+
+            set
+            {
+            }
+        }
 
         public void SetResumer(IResumeManager resumer)
         {

@@ -1,4 +1,8 @@
-﻿using System.Reflection;
+﻿// MonoGame - Copyright (C) The MonoGame Team
+// This file is subject to the terms and conditions defined in
+// file 'LICENSE.txt', which is part of this source code package.
+
+using System.Reflection;
 using MonoGame.Generator.CTypes;
 
 var repoDirectory = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "../../../../../");
@@ -6,42 +10,27 @@ var monogamePlatformDir = Path.Combine(repoDirectory, "src/monogame/include");
 var monogameFrameworkPath = Path.Combine(repoDirectory, "Artifacts/MonoGame.Framework/Native/Debug/MonoGame.Framework.dll");
 var assembly = Assembly.LoadFile(monogameFrameworkPath);
 var enumWritter = new EnumWritter();
-var structWrittter = new StructWritter(enumWritter);
-
-foreach (var type in assembly.GetTypes())
-{
-    if (type.FullName!.Contains("MonoGame.Interop"))
-    {
-        // Console.WriteLine(enumType.FullName!);
-
-        
-        //Console.WriteLine(type.Name + ": " + StructWritter.IsValid(type));
-
-        if (!type.IsClass)
-            continue;
-
-        foreach (var method in type.GetMethods())
-        {
-            if (!method.IsStatic)
-                continue;
-
-            Console.WriteLine(method.Name);
-
-            foreach (var parm in method.GetParameters())
-            {
-                Console.WriteLine(parm.ParameterType.Name + " " + parm.Name);
-                //Console.WriteLine(parm.ParameterType.Name + ": " + StructWritter.IsValid(parm.ParameterType));
-            }
-        }
-    }
-
-    if (EnumWritter.IsValid(type))
-    {
-        enumWritter.Append(type);
-    }
-}
+var structWritter = new StructWritter(enumWritter);
 
 if (!Directory.Exists(monogamePlatformDir))
     Directory.CreateDirectory(monogamePlatformDir);
 
-enumWritter.Flush(Path.Combine(monogamePlatformDir));
+foreach (var type in assembly.GetTypes())
+{
+    // Look for our interop types.
+    if (!type.FullName!.StartsWith("MonoGame.Interop."))
+        continue;
+
+    // All our interop pinvokes are static classes.
+    if (!type.IsClass || !type.IsAbstract || !type.IsSealed)
+        continue;
+
+    var writter = new PinvokeWritter(type, structWritter, enumWritter);
+    foreach (var method in type.GetMethods())
+        writter.Append(method);
+
+    writter.Flush(monogamePlatformDir);
+}
+
+enumWritter.Flush(monogamePlatformDir);
+structWritter.Flush(monogamePlatformDir);

@@ -1,0 +1,52 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClInclude Include="..\include\csharp_common.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\csharp_enums.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\csharp_MGG.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\csharp_structs.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\csharp_MGP.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\vulkan\vulkan.resources.h">
+      <Filter>vulkan</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="include">
+      <UniqueIdentifier>{c518f7c6-d7c8-4bc7-8683-1813c63d8d7f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vulkan">
+      <UniqueIdentifier>{b53b6cd0-5d2b-4afa-bc93-52eec4260217}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="sdl">
+      <UniqueIdentifier>{953c1e3f-488d-44db-8ea3-a837760f68fc}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\vulkan\MGG_Vulkan.cpp">
+      <Filter>vulkan</Filter>
+    </ClCompile>
+    <ClCompile Include="..\sdl\MGP_sdl.cpp">
+      <Filter>sdl</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Natvis Include="..\vulkan\vk_mem_alloc.natvis">
+      <Filter>vulkan</Filter>
+    </Natvis>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="..\vulkan\vulkan.rc">
+      <Filter>vulkan</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+</Project>

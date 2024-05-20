@@ -74,11 +74,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		{
             ValidateParams(level, left, top, right, bottom, front, back, data, startIndex, elementCount);
 
-            var width = right - left;
-            var height = bottom - top;
-            var depth = back - front;
-
-            PlatformSetData(level, left, top, right, bottom, front, back, data, startIndex, elementCount, width, height, depth);
+            PlatformSetData(level, left, top, right, bottom, front, back, data, startIndex, elementCount);
 		}
 
         /// <summary>
