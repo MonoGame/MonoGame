@@ -142,10 +142,7 @@ namespace MonoGame.Effect
             GLSLManipulator.RemoveOutGlPerVertex(ref glsl);
 
             // Add posFixup code, so we can compensate for differences btw DirectX and OpenGL.
-            // This is only needed if the output contains SV_POSITION.
-            // For hull shaders this is not necessary, as hull shaders are always follwed by a domain shader, which can't access SV_POSITION.
-            if (!(shaderStage == ShaderStage.HullShader))
-                GLSLManipulator.AddPosFixupUniformAndCode(ref glsl);
+            GLSLManipulator.AddPosFixupUniformAndCode(ref glsl, shaderStage);
 
             // ShaderConductor treats gl_InvocationID as uint when it must be int
             if (shaderStage == ShaderStage.HullShader || shaderStage == ShaderStage.DomainShader)
