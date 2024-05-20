@@ -44,6 +44,11 @@ namespace MonoGame.Effect
 
         public static void AddPosFixupUniformAndCode(ref string glsl)
         {
+            // make sure gl_Position is being used
+            int mainShader = glsl.LastIndexOf("void main(");
+            if (glsl.IndexOf("gl_Position =", mainShader) < 0)
+                return;
+
             // Add posFixup parameter to the vertex shader, so we can compensate for differences btw DirectX and OpenGL
             string posFixup = "uniform vec4 posFixup;";
 

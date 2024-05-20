@@ -139,13 +139,12 @@ namespace MonoGame.Effect
             // Having an explicit gl_PerVertex declaration is not necessary as it's automatically defined anyway.
             // In fact shader compilation will fail if it's present, so remove it.
             GLSLManipulator.RemoveInGlPerVertex(ref glsl);
-            bool outGlPerVertexRemoved = GLSLManipulator.RemoveOutGlPerVertex(ref glsl);
+            GLSLManipulator.RemoveOutGlPerVertex(ref glsl);
 
             // Add posFixup code, so we can compensate for differences btw DirectX and OpenGL.
             // This is only needed if the output contains SV_POSITION.
-            // We know the output contains SV_POSITION when a gl_PerVertex declaration was present.
             // For hull shaders this is not necessary, as hull shaders are always follwed by a domain shader, which can't access SV_POSITION.
-            if (outGlPerVertexRemoved && !(shaderStage == ShaderStage.HullShader))
+            if (!(shaderStage == ShaderStage.HullShader))
                 GLSLManipulator.AddPosFixupUniformAndCode(ref glsl);
 
             // ShaderConductor treats gl_InvocationID as uint when it must be int
