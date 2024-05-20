@@ -206,7 +206,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 var resourceInfo = shader.ShaderResources[r];
                 var param = _effect.Parameters[resourceInfo.parameter];
                 var resource = param.Data as ShaderResource;
-#if DEBUG
+
                 var structuredBuffer = resource as StructuredBuffer;
                 if (structuredBuffer != null && structuredBuffer.BufferType != BufferType.IndirectDrawBuffer && structuredBuffer.ElementStride != resourceInfo.elementSize)
                 { 
@@ -215,7 +215,7 @@ namespace Microsoft.Xna.Framework.Graphics
                         + "Beware that shader structs can be padded automatically, to align fields to 4, 8 or 16 byte boundaries. You may need to mimic this padding in your CPU structs.\n"
                         + "16 byte alignment is generally most efficient" );
                 }
-#endif
+
                 resourceCollection.SetResourceForBindingSlot(resource, resourceInfo.bindingSlot, resourceInfo.writeAccess, bindingSlotForCounter: resourceInfo.bindingSlotForCounter);
             }
         }
