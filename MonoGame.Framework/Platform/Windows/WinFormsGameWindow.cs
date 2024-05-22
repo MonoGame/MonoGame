@@ -162,6 +162,7 @@ namespace MonoGame.Framework
             _resizeTickTimer = new System.Timers.Timer(1) { SynchronizingObject = Form, AutoReset = false };
             _resizeTickTimer.Elapsed += OnResizeTick;
 
+            Form.FormClosing += OnFormClosing;
             Form.Activated += OnActivated;
             Form.Deactivate += OnDeactivate;
             Form.Resize += OnResize;
@@ -235,6 +236,12 @@ namespace MonoGame.Framework
             {
                 _allWindowsReaderWriterLockSlim.ExitWriteLock();
             }
+        }
+
+        private void OnFormClosing(object sender, FormClosingEventArgs e)
+        {
+            e.Cancel = true;
+            _platform.Game.Exit();
         }
 
         private void OnActivated(object sender, EventArgs eventArgs)

@@ -22,6 +22,7 @@ namespace Microsoft.Xna.Framework.Graphics
             glLastSamplerState = null;
         }
 
+        /// <summary/>
         protected override void Dispose(bool disposing)
         {
             if (!IsDisposed)

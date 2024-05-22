@@ -141,12 +141,12 @@ namespace Microsoft.Xna.Framework.Graphics
 
         /// <summary>
         /// Sets the vertex buffer data, specifying the index at which to start copying from the source data array,
-        /// the number of elements to copy from the source data array, 
+        /// the number of elements to copy from the source data array,
         /// and how far apart elements from the source data array should be when they are copied into the vertex buffer.
         /// </summary>
         /// <typeparam name="T">Type of elements in the data array.</typeparam>
         /// <param name="offsetInBytes">Offset in bytes from the beginning of the vertex buffer to the start of the copied data.</param>
-        /// <param name="data">Data array.</param>
+        /// <param name="data">Data array to be passed to the shader.</param>
         /// <param name="startIndex">Index at which to start copying from <paramref name="data"/>.
         /// Must be within the <paramref name="data"/> array bounds.</param>
         /// <param name="elementCount">Number of elements to copy from <paramref name="data"/>.
@@ -162,15 +162,16 @@ namespace Microsoft.Xna.Framework.Graphics
         /// If you specify <c>0</c> for this parameter, it will be treated as if you had specified <c>sizeof(T)</c>.
         /// With the exception of <c>0</c>, you must specify a value greater than or equal to <c>sizeof(T)</c>.</param>
         /// <remarks>
-        /// If <c>T</c> is <c>VertexPositionTexture</c>, but you want to set only the position component of the vertex data,
-        /// you would call this method as follows:
+        /// If <c>T</c> is <see cref="VertexPositionTexture"/>, but you want to set only the position component of the vertex data,
+        /// you would call this method as follows as the position is the first piece of data in the buffer:
         /// <code>
         /// Vector3[] positions = new Vector3[numVertices];
         /// vertexBuffer.SetData(0, positions, 0, numVertices, vertexBuffer.VertexDeclaration.VertexStride);
         /// </code>
         /// 
         /// Continuing from the previous example, if you want to set only the texture coordinate component of the vertex data,
-        /// you would call this method as follows (note the use of <paramref name="offsetInBytes"/>:
+        /// you would call this method as follows (note that <paramref name="offsetInBytes"/> is 12, the size of a Vector3,
+        /// representing the position):
         /// <code>
         /// Vector2[] texCoords = new Vector2[numVertices];
         /// vertexBuffer.SetData(12, texCoords, 0, numVertices, vertexBuffer.VertexDeclaration.VertexStride);
@@ -193,7 +194,7 @@ namespace Microsoft.Xna.Framework.Graphics
         /// and <c>vertexStride</c> equal to <c>sizeof(T)</c>.
         /// </summary>
         /// <typeparam name="T">Type of elements in the data array.</typeparam>
-        /// <param name="data">Data array.</param>
+        /// <param name="data">Data array to be passed to the shader.</param>
         /// <param name="startIndex">Index at which to start copying from <paramref name="data"/>.
         /// Must be within the <paramref name="data"/> array bounds.</param>
         /// <param name="elementCount">Number of elements to copy from <paramref name="data"/>.
@@ -204,14 +205,14 @@ namespace Microsoft.Xna.Framework.Graphics
             var elementSizeInBytes = ReflectionHelpers.SizeOf<T>.Get();
             SetDataInternal<T>(0, data, startIndex, elementCount, elementSizeInBytes, SetDataOptions.None);
 		}
-		
+
         /// <summary>
         /// Sets the vertex buffer data. This is the same as calling <see cref="SetData{T}(int, T[], int, int, int)"/> 
         /// with <c>offsetInBytes</c> and <c>startIndex</c> equal to <c>0</c>, <c>elementCount</c> equal to <c>data.Length</c>, 
         /// and <c>vertexStride</c> equal to <c>sizeof(T)</c>.
         /// </summary>
         /// <typeparam name="T">Type of elements in the data array.</typeparam>
-        /// <param name="data">Data array.</param>
+        /// <param name="data">Data array to be passed to the shader.</param>
         public void SetData<T>(T[] data) where T : struct
         {
             var elementSizeInBytes = ReflectionHelpers.SizeOf<T>.Get();

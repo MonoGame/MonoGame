@@ -6,6 +6,9 @@ using System;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
+    /// <summary>
+    /// Used to perform an occlusion query against the latest drawn objects.
+    /// </summary>
     public partial class OcclusionQuery : GraphicsResource
     {
         private bool _inBeginEndPair;  // true if Begin was called and End was not yet called.

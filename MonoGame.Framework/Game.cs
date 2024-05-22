@@ -87,6 +87,7 @@ namespace Microsoft.Xna.Framework
 
         }
 
+        /// <summary/>
         ~Game()
         {
             Dispose(false);
@@ -101,6 +102,7 @@ namespace Microsoft.Xna.Framework
         #region IDisposable Implementation
 
         private bool _isDisposed;
+        /// <inheritdoc cref="IDisposable.Dispose()"/>
         public void Dispose()
         {
             Dispose(true);
@@ -108,6 +110,7 @@ namespace Microsoft.Xna.Framework
             EventHelpers.Raise(this, Disposed, EventArgs.Empty);
         }
 
+        /// <summary/>
         protected virtual void Dispose(bool disposing)
         {
             if (!_isDisposed)
@@ -193,6 +196,9 @@ namespace Microsoft.Xna.Framework
             get { return _components; }
         }
 
+        /// <summary>
+        /// Gets or sets time to sleep between frames when the game is not active
+        /// </summary>
         public TimeSpan InactiveSleepTime
         {
             get { return _inactiveSleepTime; }
@@ -374,7 +380,7 @@ namespace Microsoft.Xna.Framework
         /// <summary>
         /// Raised when this game is exiting.
         /// </summary>
-        public event EventHandler<EventArgs> Exiting;
+        public event EventHandler<ExitingEventArgs> Exiting;
 
 #if WINDOWS_UAP
         [CLSCompliant(false)]
@@ -489,8 +495,6 @@ namespace Microsoft.Xna.Framework
                 DoUpdate(new GameTime());
 
                 Platform.RunLoop();
-                EndRun();
-				DoExiting();
                 break;
             default:
                 throw new ArgumentException(string.Format(
@@ -625,8 +629,18 @@ namespace Microsoft.Xna.Framework
 
             if (_shouldExit)
             {
-                Platform.Exit();
-                _shouldExit = false; //prevents perpetual exiting on platforms supporting resume.
+                var exitingEventArgs = new ExitingEventArgs();
+
+                OnExiting(this, exitingEventArgs);
+
+                if (!exitingEventArgs.Cancel)
+                {
+                    Platform.Exit();
+                    EndRun();
+                    UnloadContent();
+                }
+
+                _shouldExit = false;
             }
         }
 
@@ -737,7 +751,7 @@ namespace Microsoft.Xna.Framework
         /// </summary>
         /// <param name="sender">This <see cref="Game"/>.</param>
         /// <param name="args">The arguments to the <see cref="Exiting"/> event.</param>
-        protected virtual void OnExiting(object sender, EventArgs args)
+        protected virtual void OnExiting(object sender, ExitingEventArgs args)
         {
             EventHelpers.Raise(sender, Exiting, args);
         }
@@ -789,8 +803,6 @@ namespace Microsoft.Xna.Framework
 
             var platform = (GamePlatform)sender;
             platform.AsyncRunLoopEnded -= Platform_AsyncRunLoopEnded;
-            EndRun();
-			DoExiting();
         }
 
         #endregion Event Handlers
@@ -864,12 +876,6 @@ namespace Microsoft.Xna.Framework
             _components.ComponentAdded += Components_ComponentAdded;
             _components.ComponentRemoved += Components_ComponentRemoved;
         }
-
-		internal void DoExiting()
-		{
-			OnExiting(this, EventArgs.Empty);
-			UnloadContent();
-		}
 
         #endregion Internal Methods
 

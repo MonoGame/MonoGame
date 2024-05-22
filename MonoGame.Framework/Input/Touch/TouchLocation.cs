@@ -10,6 +10,9 @@ using System.Diagnostics;
 
 namespace Microsoft.Xna.Framework.Input.Touch
 {
+    /// <summary>
+    /// Provides methods and properties for interacting with a touch location on a touch screen device.
+    /// </summary>
     public struct TouchLocation : IEquatable<TouchLocation>
     {
 		/// <summary>
@@ -67,6 +70,9 @@ namespace Microsoft.Xna.Framework.Input.Touch
             get { return _velocity; }
         }
 
+        /// <summary>
+        /// Gets the ID of the touch location.
+        /// </summary>
 		public int Id 
 		{ 
 			get
@@ -75,6 +81,9 @@ namespace Microsoft.Xna.Framework.Input.Touch
 	        }
 		}
 
+        /// <summary>
+        /// Gets the position of the touch location.
+        /// </summary>
         public Vector2 Position 
 		{ 
 			get
@@ -82,7 +91,11 @@ namespace Microsoft.Xna.Framework.Input.Touch
 	            return _position;
 	        }
 		}
-		
+
+        /// <summary>
+        /// Gets the pressure of the touch location.
+        /// </summary>
+        /// <remarks>Only used in Android devices</remarks>
 		public float Pressure 
 		{ 
 			get
@@ -90,7 +103,10 @@ namespace Microsoft.Xna.Framework.Input.Touch
             	return _pressure;
         	}
 		}
-								
+
+        /// <summary>
+        /// Gets the current state of the touch location.
+        /// </summary>
         public TouchLocationState State 
 		{ 
 			get
@@ -98,17 +114,26 @@ namespace Microsoft.Xna.Framework.Input.Touch
 	            return _state;
 	        } 
 		}
-		
-		#endregion
-		
-		#region Constructors
 
+        #endregion
+
+        #region Constructors
+
+        /// <inheritdoc cref="TouchLocation(int, TouchLocationState, Vector2, TouchLocationState, Vector2)"/>
         public TouchLocation(int id, TouchLocationState state, Vector2 position)
             : this(id, state, position, TouchLocationState.Invalid, Vector2.Zero)
         {
         }
 
-        public TouchLocation(   int id, TouchLocationState state, Vector2 position, 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="TouchLocation"/> structure.
+        /// </summary>
+        /// <param name="id">ID of the touch location.</param>
+        /// <param name="state">Current state of the touch location.</param>
+        /// <param name="position">Position of the touch location.</param>
+        /// <param name="previousState">Previous state of this touch location.</param>
+        /// <param name="previousPosition">Previous position of this touch location.</param>
+        public TouchLocation(int id, TouchLocationState state, Vector2 position, 
                                 TouchLocationState previousState, Vector2 previousPosition)
             : this(id, state, position, previousState, previousPosition, TimeSpan.Zero, false)
         {
@@ -234,6 +259,7 @@ namespace Microsoft.Xna.Framework.Input.Touch
             return _isHighFrequency;
         }
 
+        /// <inheritdoc/>
         public override bool Equals(object obj)
         {
 			if (obj is TouchLocation)
@@ -242,6 +268,7 @@ namespace Microsoft.Xna.Framework.Input.Touch
 			return false;
 		}
 
+        /// <inheritdoc/>
         public bool Equals(TouchLocation other)
         {
             return  _id.Equals(other._id) &&
@@ -250,17 +277,24 @@ namespace Microsoft.Xna.Framework.Input.Touch
         }
 
 
-
+        /// <inheritdoc/>
         public override int GetHashCode()
         {
             return _id;
         }
 
+        /// <summary>
+        /// Gets a string representation of the <see cref="TouchLocation"/>.
+        /// </summary>
         public override string ToString()
         {
             return "Touch id:"+_id+" state:"+_state + " position:" + _position + " pressure:" + _pressure +" prevState:"+_previousState+" prevPosition:"+ _previousPosition + " previousPressure:" + _previousPressure;
         }
 
+        /// <summary>
+        /// Attempts to get the previous location of this touch location object.
+        /// </summary>
+        /// <param name="aPreviousLocation">Previous location data, as a <see cref="TouchLocation"/>.</param>
         public bool TryGetPreviousLocation(out TouchLocation aPreviousLocation)
         {
 			if (_previousState == TouchLocationState.Invalid)
@@ -297,6 +331,12 @@ namespace Microsoft.Xna.Framework.Input.Touch
             return true;
         }
 
+        /// <summary>
+        /// Returns a value that indicates whether the two values are not equal.
+        /// </summary>
+        /// <param name="value1">The value on the left of the inequality operator.</param>
+        /// <param name="value2">The value on the right of the inequality operator.</param>
+        /// <returns><see langword="true"/> if the two values are not equal; otherwise, <see langword="false"/>.</returns>
         public static bool operator !=(TouchLocation value1, TouchLocation value2)
         {
 			return  value1._id != value2._id || 
@@ -306,6 +346,12 @@ namespace Microsoft.Xna.Framework.Input.Touch
 			        value1._previousPosition != value2._previousPosition;
         }
 
+        /// <summary>
+        /// Returns a value that indicates whether the two values are equal.
+        /// </summary>
+        /// <param name="value1">The value on the left of the equality operator.</param>
+        /// <param name="value2">The value on the right of the equality operator.</param>
+        /// <returns><see langword="true"/> if the two values are equal; otherwise, <see langword="false"/>.</returns>
         public static bool operator ==(TouchLocation value1, TouchLocation value2)
         {
             return  value1._id == value2._id && 
