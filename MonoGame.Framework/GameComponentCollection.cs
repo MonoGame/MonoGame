@@ -26,7 +26,7 @@ namespace Microsoft.Xna.Framework
 
         /// <summary>
         /// Removes every <see cref="GameComponent"/> from this <see cref="GameComponentCollection"/>.
-        /// Triggers <see cref="OnComponentRemoved"/> once for each <see cref="GameComponent"/> removed.
+        /// Triggers <see cref="ComponentRemoved"/> once for each <see cref="GameComponent"/> removed.
         /// </summary>
         protected override void ClearItems()
         {
@@ -39,7 +39,7 @@ namespace Microsoft.Xna.Framework
 
         /// <summary>
         /// Inserts an element into the collection at the specified index.
-        /// Triggers <see cref="OnComponentAdded(GameComponentCollectionEventArgs)"/>.
+        /// Triggers <see cref="ComponentAdded"/>.
         /// </summary>
         /// <param name="index">The zero-based index at which item should be inserted.</param>
         /// <param name="item">The object to insert.</param>
@@ -71,7 +71,7 @@ namespace Microsoft.Xna.Framework
 
         /// <summary>
         /// Removes the element at the specified index of the <see cref="GameComponentCollection"/>.
-        /// Triggers <see cref="OnComponentRemoved(GameComponentCollectionEventArgs)"/>.
+        /// Triggers <see cref="ComponentRemoved"/>.
         /// </summary>
         /// <param name="index">The zero-based index of the element to remove.</param>
         protected override void RemoveItem(int index)
