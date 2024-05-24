@@ -182,15 +182,14 @@ namespace Microsoft.Xna.Framework
         /// Searches for the key with the lowest position greater than or equal to the specified position.
         /// </summary>
         /// <param name="position">Position to search for.</param>
-        /// <returns>The lowest index of the matching keys or, if the last element's position is less than the specified position, <c>Count</c>. </returns>
+        /// <returns>The zero-based index of the first matching position if there is a match; otherwise, a negative number that is the bitwise complement of the index of the next element that is larger than <c>position</c> or, if there is no larger element, the bitwise complement of <c>Count</c>.</returns>
         public int IndexAtPosition(float position)
         {
             int index = _keys.BinarySearch(new CurveKey(position, 0));
-            
-            //If position doesn't exist in list, return the key with the closest larger position
+
             if (index < 0)
-                return ~index;
-            
+                return index;
+
             //If several matching keys exist, return the first one
             while (index - 1 >= 0 && _keys[index - 1].Position == position)
                 index--;

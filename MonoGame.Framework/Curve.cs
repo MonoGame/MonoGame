@@ -303,7 +303,10 @@ namespace Microsoft.Xna.Framework
         private float GetCurvePosition(float position)
         {
             //only for position in curve
-            int nextIndex = Math.Max(this._keys.IndexAtPosition(position), 1);
+            int nextIndex = this._keys.IndexAtPosition(position);
+            if (nextIndex < 0)
+                nextIndex = ~nextIndex;
+            nextIndex = Math.Max(nextIndex, 1);
             CurveKey prev = _keys[nextIndex - 1];
             CurveKey next = _keys[nextIndex];
             if (prev.Continuity == CurveContinuity.Step)
