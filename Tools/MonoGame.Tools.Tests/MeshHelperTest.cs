@@ -235,5 +235,94 @@ public void TestNormalGeneration()
             Assert.AreEqual(1, geom.Vertices.PositionIndices[1]);
             Assert.AreEqual(0, geom.Vertices.PositionIndices[2]);
         }
+
+        [Test]
+        public void TestNormalGenerationMultipleGeometries()
+        {
+            var mb = MeshBuilder.StartMesh("Test");
+
+            mb.CreatePosition(new Vector3(0f, 0f, 0f));
+            mb.CreatePosition(new Vector3(1f, 0f, 0f));
+            mb.CreatePosition(new Vector3(2f, 0f, 0f));
+
+            mb.CreatePosition(new Vector3(0f, 0f, 1f));
+            mb.CreatePosition(new Vector3(1f, 0f, 1f));
+            mb.CreatePosition(new Vector3(2f, 0f, 1f));
+
+            mb.CreatePosition(new Vector3(0f, -1f, 0f));
+            mb.CreatePosition(new Vector3(1f, -1f, 0f));
+            mb.CreatePosition(new Vector3(2f, -1f, 0f));
+
+            mb.SetMaterial(material1);
+
+            mb.AddTriangleVertex(0);
+            mb.AddTriangleVertex(1);
+            mb.AddTriangleVertex(4);
+
+            mb.AddTriangleVertex(1);
+            mb.AddTriangleVertex(2);
+            mb.AddTriangleVertex(5);
+
+            mb.AddTriangleVertex(0);
+            mb.AddTriangleVertex(4);
+            mb.AddTriangleVertex(3);
+
+            mb.AddTriangleVertex(1);
+            mb.AddTriangleVertex(5);
+            mb.AddTriangleVertex(4);
+
+            mb.SetMaterial(material2);
+            mb.AddTriangleVertex(0);
+            mb.AddTriangleVertex(6);
+            mb.AddTriangleVertex(7);
+
+            mb.AddTriangleVertex(1);
+            mb.AddTriangleVertex(7);
+            mb.AddTriangleVertex(2);
+
+            mb.AddTriangleVertex(0);
+            mb.AddTriangleVertex(7);
+            mb.AddTriangleVertex(1);
+
+            mb.AddTriangleVertex(2);
+            mb.AddTriangleVertex(7);
+            mb.AddTriangleVertex(8);
+
+            var mesh = mb.FinishMesh();
+
+            var firstGeometryPositions = mesh.Geometry[0].Vertices.Positions;
+            var firstNormalChannel = mesh.Geometry[0].Vertices.Channels.Get<Vector3>(VertexChannelNames.Normal());
+            Assert.AreEqual(new Vector3(0, 0, 0), firstGeometryPositions[0]);
+            Assert.AreEqual(new Vector3(1, 0, 0), firstGeometryPositions[1]);
+            Assert.AreEqual(new Vector3(1, 0, 1), firstGeometryPositions[2]);
+
+            Assert.AreEqual(new Vector3(2, 0, 0), firstGeometryPositions[3]);
+            Assert.AreEqual(new Vector3(2, 0, 1), firstGeometryPositions[4]);
+            Assert.AreEqual(new Vector3(0, 0, 1), firstGeometryPositions[5]);
+
+            Assert.AreEqual(Vector3.UnitY, firstNormalChannel[0]);
+            Assert.AreEqual(Vector3.UnitY, firstNormalChannel[1]);
+            Assert.AreEqual(Vector3.UnitY, firstNormalChannel[2]);
+            Assert.AreEqual(Vector3.UnitY, firstNormalChannel[3]);
+            Assert.AreEqual(Vector3.UnitY, firstNormalChannel[4]);
+            Assert.AreEqual(Vector3.UnitY, firstNormalChannel[5]);
+
+
+            var secondGeometryPositions = mesh.Geometry[1].Vertices.Positions;
+            var secondNormalChannel = mesh.Geometry[1].Vertices.Channels.Get<Vector3>(VertexChannelNames.Normal()); ;
+            Assert.AreEqual(new Vector3(0, 0, 0), secondGeometryPositions[0]);
+            Assert.AreEqual(new Vector3(0, -1, 0), secondGeometryPositions[1]);
+            Assert.AreEqual(new Vector3(1, -1, 0), secondGeometryPositions[2]);
+            Assert.AreEqual(new Vector3(1, 0, 0), secondGeometryPositions[3]);
+            Assert.AreEqual(new Vector3(2, 0, 0), secondGeometryPositions[4]);
+            Assert.AreEqual(new Vector3(2, -1, 0), secondGeometryPositions[5]);
+
+            Assert.AreEqual(-Vector3.UnitZ, secondNormalChannel[0]);
+            Assert.AreEqual(-Vector3.UnitZ, secondNormalChannel[1]);
+            Assert.AreEqual(-Vector3.UnitZ, secondNormalChannel[2]);
+            Assert.AreEqual(-Vector3.UnitZ, secondNormalChannel[3]);
+            Assert.AreEqual(-Vector3.UnitZ, secondNormalChannel[4]);
+            Assert.AreEqual(-Vector3.UnitZ, secondNormalChannel[5]);
+        }
     }
 }
