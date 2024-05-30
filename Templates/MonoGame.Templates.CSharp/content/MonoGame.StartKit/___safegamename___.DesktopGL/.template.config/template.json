@@ -7,11 +7,11 @@
   "name": "MonoGame StartKit (Desktop)",
   "identity": "MonoGame.StartKit.Desktop",
   "groupIdentity": "MonoGame.StartKit",
-  "shortName": "mgskdesktop",
+  "shortName": "mg-startkit-desktop",
   "tags": {
     "language": "C#",
     "type": "project"
   },
-  "sourceName": "$safeprojectname$",
+  "sourceName": "$___safegamename___$",
   "preferNameDirectory": true
 }

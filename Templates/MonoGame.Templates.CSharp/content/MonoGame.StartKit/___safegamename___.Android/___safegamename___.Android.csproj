@@ -12,14 +12,16 @@
     <AndroidResource Include="Resources\Values\Styles.xml" />
   </ItemGroup>
   <ItemGroup>
-    <MonoGameContentReference Include="..\___safegamename___.Core\Content\___safegamename___.mgcb" Link="Content\FuelCell.mgcb" />
+    <MonoGameContentReference Include="..\___safegamename___.Core\Content\___safegamename___.mgcb">
+      <Link>Content\___safegamename___.mgcb</Link>
+    </MonoGameContentReference>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\___safegamename___.Core\___safegamename___.Core.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="MonoGame.Content.Builder.Task" Version="3.8.1.303" />
-    <PackageReference Include="MonoGame.Framework.Android" Version="3.8.1.303" />
+    <PackageReference Include="MonoGame.Content.Builder.Task" Version="*" />
+    <PackageReference Include="MonoGame.Framework.Android" Version="*" />
   </ItemGroup>  
   <Target Name="RestoreDotnetTools" BeforeTargets="Restore">
     <Message Text="Restoring dotnet tools" Importance="High" />

@@ -7,11 +7,11 @@
   "name": "MonoGame StartKit (iOS)",
   "identity": "MonoGame.StartKit.iOS",
   "groupIdentity": "MonoGame.StartKit",
-  "shortName": "mgskios",
+  "shortName": "mg-startkit-ios",
   "tags": {
     "language": "C#",
     "type": "project"
   },
-  "sourceName": "$safeprojectname$",
+  "sourceName": "$___safegamename___$",
   "preferNameDirectory": true
 }

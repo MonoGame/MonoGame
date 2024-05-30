@@ -27,7 +27,7 @@
 		<integer>2</integer>
 	</array>
 	<key>CFBundleIdentifier</key>
-	<string>com.___safegamename___.iOS</string>
+	<string>com.companyname.___safegamename___.iOS</string>
 	<key>CFBundleDisplayName</key>
 	<string>___safegamename___</string>
 </dict>
