@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
     <TargetFramework>net8.0-windows</TargetFramework>
@@ -23,8 +23,8 @@
     </MonoGameContentReference>
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="MonoGame.Content.Builder.Task" Version="*" />
-    <PackageReference Include="MonoGame.Framework.WindowsDX" Version="*" />
+    <PackageReference Include="MonoGame.Content.Builder.Task" Version="1.0.0" />
+    <PackageReference Include="MonoGame.Framework.WindowsDX" Version="1.0.0" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\___safegamename___.Core\___safegamename___.Core.csproj" />

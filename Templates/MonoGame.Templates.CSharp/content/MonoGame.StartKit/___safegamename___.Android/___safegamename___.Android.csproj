@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>net8.0-android</TargetFramework>
     <SupportedOSPlatformVersion>23</SupportedOSPlatformVersion>
@@ -20,9 +20,9 @@
     <ProjectReference Include="..\___safegamename___.Core\___safegamename___.Core.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="MonoGame.Content.Builder.Task" Version="*" />
-    <PackageReference Include="MonoGame.Framework.Android" Version="*" />
-  </ItemGroup>  
+    <PackageReference Include="MonoGame.Content.Builder.Task" Version="1.0.0" />
+    <PackageReference Include="MonoGame.Framework.Android" Version="1.0.0" />
+  </ItemGroup>
   <Target Name="RestoreDotnetTools" BeforeTargets="Restore">
     <Message Text="Restoring dotnet tools" Importance="High" />
     <Exec Command="dotnet tool restore" />
