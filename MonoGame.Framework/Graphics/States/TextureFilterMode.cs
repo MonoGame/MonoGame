@@ -5,11 +5,19 @@
 namespace Microsoft.Xna.Framework.Graphics
 {
     /// <summary>
-    /// Filtering modes for texture samplers.
+    /// Represents the texture filtering mode used for texture sampling.
     /// </summary>
     public enum TextureFilterMode
     {
+        /// <summary>
+        /// The default texture filtering mode, which performs standard texture sampling without comparison.
+        /// </summary>
         Default,
+
+        /// <summary>
+        /// The comparison texture filtering mode, which performs a comparison operation between the sampled texture
+        /// value and a reference value during texture sampling.
+        /// </summary>
         Comparison
     }
 }
