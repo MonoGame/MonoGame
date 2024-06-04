@@ -74,7 +74,7 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
         /// </param>
         public static Color ToColor(string value)
         {            
-            if (!value.Contains(","))
+            if (!value.Contains(','))
                 return Color.FromName(value);
 
             int r, g, b, a;
