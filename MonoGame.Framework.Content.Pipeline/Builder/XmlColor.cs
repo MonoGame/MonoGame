@@ -31,7 +31,7 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
         }
 
         /// <summary>
-        /// Implict XmlColor -> Color conversion
+        /// Implicit XmlColor -> Color conversion
         /// </summary>
         public static implicit operator Color(XmlColor x)
         {
@@ -39,7 +39,7 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
         }
 
         /// <summary>
-        /// Implict Color -> XmlColor conversion
+        /// Implicit Color -> XmlColor conversion
         /// </summary>
         public static implicit operator XmlColor(Color c)
         {
