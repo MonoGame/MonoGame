@@ -13,7 +13,7 @@
     <SharpDXVersion>4.0.1</SharpDXVersion>
     <AppendTargetFrameworkToOutputPath>False</AppendTargetFrameworkToOutputPath>
     <PackageOutputPath>..\Artifacts\NuGet</PackageOutputPath>
-    <NoWarn>$(NoWarn);CS0168;CS0219;CS0436;CS1574;CS1591;CS3021;CS4014;MSB4011;NU5128</NoWarn>
+    <NoWarn>$(NoWarn);CS0067;CS0168;CS0169;CS0219;CS0419;CS0436;CS0618;CS1574;CS1591;CS3021;CS4014;MSB4011;NU5128</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>
