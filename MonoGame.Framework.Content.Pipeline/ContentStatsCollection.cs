@@ -184,7 +184,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
                         collection._statsBySource.Add(stats.SourceFile, stats);
                 }
             }
-            catch (Exception ex)
+            catch
             {
                 // Assume the file didn't exist or was incorrectly
                 // formatted... either way we start from fresh data.
