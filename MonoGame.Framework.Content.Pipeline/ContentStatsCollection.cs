@@ -22,6 +22,10 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
         private readonly object _locker = new object();
         private readonly Dictionary<string, ContentStats> _statsBySource = new Dictionary<string, ContentStats>(1024);
 
+        /// <summary>
+        /// The file extension used by the content pipeline after building to store the content statistics.
+        /// <remarks><para>Read only - cannot be assigned to</para></remarks>
+        /// </summary>
         public static readonly string Extension = ".mgstats";
 
         /// <summary>
