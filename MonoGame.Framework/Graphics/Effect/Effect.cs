@@ -156,7 +156,7 @@ namespace Microsoft.Xna.Framework.Graphics
             header.Version = (int)effectCode[index++];
             header.Profile = (int)effectCode[index++];
             header.EffectKey = BitConverter.ToInt32(effectCode, index); index += 4;
-            header.HeaderSize = index;
+            header.HeaderSize = 10;
 
             if (header.Signature != MGFXHeader.MGFXSignature)
                 throw new Exception("This does not appear to be a MonoGame MGFX file!");
