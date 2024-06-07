@@ -26,7 +26,6 @@ namespace Microsoft.Xna.Framework.Media
         private NSUrl assetUrl;
         private NSObject playToEndObserver;
 
-        [CLSCompliant(false)]
         public NSUrl AssetUrl
         {
             get { return this.assetUrl; }
