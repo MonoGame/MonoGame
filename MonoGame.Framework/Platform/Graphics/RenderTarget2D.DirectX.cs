@@ -104,6 +104,7 @@ namespace Microsoft.Xna.Framework.Graphics
             SharpDX.Utilities.Dispose(ref _depthStencilView);
         }
 
+        /// <summary />
         protected override void Dispose(bool disposing)
         {
             if (disposing)
@@ -146,6 +147,7 @@ namespace Microsoft.Xna.Framework.Graphics
             }
         }
 
+        /// <summary />
         protected internal override Texture2DDescription GetTexture2DDescription()
         {
             var desc = base.GetTexture2DDescription();
