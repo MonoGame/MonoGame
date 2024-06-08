@@ -4,7 +4,7 @@
 
 namespace System
 {
-#if (!NETCOREAPP && !NETSTANDARD2_1) || NETCOREAPP1_0 || NETCOREAPP1_1
+#if (!NETCOREAPP && !NETSTANDARD2_1) || NETCOREAPP1_0 || NETCOREAPP1_1 || CONSOLE_CHECK
     internal static class MathF
     {
         public const float E = (float)Math.E;
