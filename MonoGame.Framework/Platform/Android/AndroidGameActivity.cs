@@ -10,7 +10,6 @@ using Android.Views;
 
 namespace Microsoft.Xna.Framework
 {
-	[CLSCompliant(false)]
     public class AndroidGameActivity : Activity
     {
         internal Game Game { private get; set; }
@@ -93,7 +92,6 @@ namespace Microsoft.Xna.Framework
 		}
     }
 
-	[CLSCompliant(false)]
 	public static class ActivityExtensions
     {
         public static ActivityAttribute GetActivityAttribute(this AndroidGameActivity obj)
