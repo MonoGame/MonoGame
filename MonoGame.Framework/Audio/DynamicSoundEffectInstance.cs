@@ -33,6 +33,7 @@ namespace Microsoft.Xna.Framework.Audio
             }
         }
 
+        /// <inheritdoc />
         public override SoundState State
         {
             get
@@ -275,6 +276,7 @@ namespace Microsoft.Xna.Framework.Audio
                 throw new ObjectDisposedException(null);
         }
 
+        /// <summary />
         protected override void Dispose(bool disposing)
         {
             PlatformDispose(disposing);

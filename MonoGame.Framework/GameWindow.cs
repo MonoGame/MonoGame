@@ -218,6 +218,9 @@ namespace Microsoft.Xna.Framework
             EventHelpers.Raise(this, OrientationChanged, EventArgs.Empty);
 		}
 
+        /// <summary>
+        /// Called when the window needs to be painted.
+        /// </summary>
 		protected void OnPaint ()
 		{
 		}
@@ -254,6 +257,10 @@ namespace Microsoft.Xna.Framework
             EventHelpers.Raise(this, FileDrop, e);
         }
 
+        /// <summary>
+        /// Sets the supported display orientations.
+        /// </summary>
+        /// <param name="orientations">Supported display orientations</param>
         protected internal abstract void SetSupportedOrientations (DisplayOrientation orientations);
 
 	    /// <summary>
@@ -263,6 +270,12 @@ namespace Microsoft.Xna.Framework
 		protected abstract void SetTitle (string title);
 
 #if DIRECTX && WINDOWS
+        /// <summary>
+        /// Create a <see cref="GameWindow"/> based on the given <see cref="Game"/> and a fixed starting size.
+        /// </summary>
+        /// <param name="game">The <see cref="Game"/> to create the <see cref="GameWindow"/> for.</param>
+        /// <param name="width">Initial pixel width to set for the <see cref="GameWindow"/>.</param>
+        /// <param name="height">Initial pixel height to set for the <see cref="GameWindow"/>.</param>
         public static GameWindow Create(Game game, int width, int height)
         {
             var window = new MonoGame.Framework.WinFormsGameWindow((MonoGame.Framework.WinFormsGamePlatform)game.Platform);

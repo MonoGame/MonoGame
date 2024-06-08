@@ -7,8 +7,14 @@ using System;
 namespace Microsoft.Xna.Framework
 {
     /// <summary>
-    /// A <see cref="GameComponent"/> that is drawn when its <see cref="Game"/> is drawn.
+    /// A drawable object that, when added to the <see cref="Game.Components">Game.Components</see> collection of a
+    /// <see cref="Game"/> instance, will have it's <see cref="Draw(GameTime)">Draw(GameTime)</see> method called when
+    /// <see cref="Game.Draw(GameTime)">Game.Draw(GameTime)</see> is called.
     /// </summary>
+    /// <remarks>
+    /// This inherits from <see cref="GameComponent"/> so it's <see cref="GameComponent.Update(GameTime)">Update(GameTime)</see>
+    /// method will also be called when <see cref="Game.Update(GameTime)">Game.Update(GameTime)</see> is called.
+    /// </remarks>
     public class DrawableGameComponent : GameComponent, IDrawable
     {
         private bool _initialized;
@@ -21,9 +27,17 @@ namespace Microsoft.Xna.Framework
         /// </summary>
         public Graphics.GraphicsDevice GraphicsDevice
         {
-            get { return this.Game.GraphicsDevice; } 
+            get { return this.Game.GraphicsDevice; }
         }
 
+        /// <summary>
+        /// Gets the order in which this component should be drawn, relative to other components that are in the
+        /// same <see cref="GameComponentCollection"/>.
+        /// </summary>
+        /// <remarks>
+        /// This value can be any integer.  Components in the <see cref="GameComponentCollection"/> are drawn in
+        /// ascending order based on their <b>DrawOrder</b>.
+        /// </remarks>
         public int DrawOrder
         {
             get { return _drawOrder; }
@@ -37,6 +51,10 @@ namespace Microsoft.Xna.Framework
             }
         }
 
+        /// <summary>
+        /// Gets or Sets a value that indicates whether the <see cref="Draw(GameTime)"/> method of this component
+        /// should be called.
+        /// </summary>
         public bool Visible
         {
             get { return _visible; }
@@ -65,6 +83,7 @@ namespace Microsoft.Xna.Framework
         {
         }
 
+        /// <inheritdoc />
         public override void Initialize()
         {
             if (!_initialized)
@@ -74,6 +93,7 @@ namespace Microsoft.Xna.Framework
             }
         }
 
+        /// <inheritdoc />
         protected override void Dispose(bool disposing)
         {
             if (!_disposed)

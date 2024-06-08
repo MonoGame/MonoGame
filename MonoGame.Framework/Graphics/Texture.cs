@@ -8,6 +8,9 @@ using System.Threading;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
+    /// <summary>
+    /// Represents a texture resource
+    /// </summary>
 	public abstract partial class Texture : GraphicsResource
 	{
 		internal SurfaceFormat _format;
@@ -29,11 +32,17 @@ namespace Microsoft.Xna.Framework.Graphics
             get { return _sortingKey; }
         }
 
+        /// <summary>
+        /// Gets the surface format used by this <b>Texture</b>.
+        /// </summary>
 		public SurfaceFormat Format
 		{
 			get { return _format; }
 		}
-		
+
+        /// <summary>
+        /// Gets the number of mipmap levels in this <b>Texture</b>.
+        /// </summary>
 		public int LevelCount
 		{
 			get { return _levelCount; }
@@ -110,7 +119,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 case SurfaceFormat.Dxt5:
                 case SurfaceFormat.Dxt5SRgb:
                 case SurfaceFormat.RgbPvrtc4Bpp:
-                case SurfaceFormat.RgbaPvrtc4Bpp:                    
+                case SurfaceFormat.RgbaPvrtc4Bpp:
                     pitch = ((width + 3) / 4) * _format.GetSize();
                     break;
 
@@ -122,6 +131,7 @@ namespace Microsoft.Xna.Framework.Graphics
             return pitch;
         }
 
+        /// <inheritdoc />
         internal protected override void GraphicsDeviceResetting()
         {
             PlatformGraphicsDeviceResetting();

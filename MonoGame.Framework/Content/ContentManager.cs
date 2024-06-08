@@ -229,7 +229,7 @@ namespace Microsoft.Xna.Framework.Content
         ///     <para>
         ///         Before a ContentManager can load an asset, you need to add the asset to your game project using
         ///         the steps described in
-        ///         <see href="https://monogame.net/articles/content_pipeline/index.html">Adding Content - MonoGame</see>.
+        ///         <see href="https://docs.monogame.net/articles/content_pipeline/index.html">Adding Content - MonoGame</see>.
         ///     </para>
         /// </remarks>
         /// <typeparam name="T">
@@ -299,7 +299,7 @@ namespace Microsoft.Xna.Framework.Content
         /// <remarks>
         /// Before a ContentManager can load an asset, you need to add the asset to your game project using
         /// the steps described in
-        /// <see href="https://monogame.net/articles/content_pipeline/index.html">Adding Content - MonoGame</see>.
+        /// <see href="https://docs.monogame.net/articles/content_pipeline/index.html">Adding Content - MonoGame</see>.
         /// </remarks>
         /// <typeparam name="T">
         ///     <para>

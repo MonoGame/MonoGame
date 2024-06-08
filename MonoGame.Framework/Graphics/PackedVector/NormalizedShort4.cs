@@ -42,7 +42,7 @@ namespace Microsoft.Xna.Framework.Graphics.PackedVector
         /// </summary>
         /// <param name="a">The value on the left of the inequality operator.</param>
         /// <param name="b">The value on the right of the inequality operator.</param>
-        /// <returns>true if the two value are not equal; otherwise, false.</returns
+        /// <returns>true if the two value are not equal; otherwise, false.</returns>
         public static bool operator !=(NormalizedShort4 a, NormalizedShort4 b)
 		{
 			return !a.Equals (b);

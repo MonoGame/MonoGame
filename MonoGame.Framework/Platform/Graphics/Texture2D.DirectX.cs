@@ -22,8 +22,11 @@ namespace Microsoft.Xna.Framework.Graphics
 {
     public partial class Texture2D : Texture
     {
+        /// <summary />
         protected bool Shared { get { return _shared; } }
+        /// <summary />
         protected bool Mipmap { get { return _mipmap; } }
+        /// <summary />
         protected SampleDescription SampleDescription { get { return _sampleDescription; } }
 
         private bool _shared;
@@ -197,6 +200,7 @@ namespace Microsoft.Xna.Framework.Graphics
             }
         }
 
+        /// <summary />
         protected override void Dispose(bool disposing)
         {
             if (disposing)
@@ -212,6 +216,7 @@ namespace Microsoft.Xna.Framework.Graphics
             return arraySlice * _levelCount + level;
         }
 
+        /// <summary />
         protected internal virtual Texture2DDescription GetTexture2DDescription()
         {
             var desc = new Texture2DDescription();
