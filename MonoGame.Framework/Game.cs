@@ -177,7 +177,6 @@ namespace Microsoft.Xna.Framework
         #region Properties
 
 #if ANDROID
-        [CLSCompliant(false)]
         public static AndroidGameActivity Activity { get; internal set; }
 #endif
         private static Game _instance = null;
@@ -383,7 +382,6 @@ namespace Microsoft.Xna.Framework
         public event EventHandler<ExitingEventArgs> Exiting;
 
 #if WINDOWS_UAP
-        [CLSCompliant(false)]
         public ApplicationExecutionState PreviousExecutionState { get; internal set; }
 #endif
 

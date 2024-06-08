@@ -10,7 +10,6 @@ namespace Microsoft.Xna.Framework
 {
     partial class GraphicsDeviceManager
     {
-        [CLSCompliant(false)] 
         public SwapChainPanel SwapChainPanel { get; set; }
 
         partial void PlatformPreparePresentationParameters(PresentationParameters presentationParameters)

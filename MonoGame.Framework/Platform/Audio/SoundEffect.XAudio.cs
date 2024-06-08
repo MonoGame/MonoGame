@@ -27,7 +27,6 @@ namespace Microsoft.Xna.Framework.Audio
         private static Speakers _speakers = Speakers.Stereo;
 
         // XNA does not expose this, but it exists in X3DAudio.
-        [CLSCompliant(false)]
         public static Speakers Speakers
         {
             get { return _speakers; }

@@ -35,11 +35,12 @@ namespace Microsoft.Xna.Framework.Input
         {
             PrimaryWindow.MouseState.X = x;
             PrimaryWindow.MouseState.Y = y;
-            
+
             var pt = _window.PointToScreen(new System.Drawing.Point(x, y));
             SetCursorPos(pt.X, pt.Y);
         }
 
+        /// <inheritdoc cref="Mouse.SetCursor"/>
         public static void PlatformSetCursor(MouseCursor cursor)
         {
             _window.Cursor = cursor.Cursor;

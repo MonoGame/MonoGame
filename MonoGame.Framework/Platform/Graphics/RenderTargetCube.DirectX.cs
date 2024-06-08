@@ -85,14 +85,12 @@ namespace Microsoft.Xna.Framework.Graphics
         }
 
         /// <inheritdoc/>
-        [CLSCompliant(false)]
         public RenderTargetView GetRenderTargetView(int arraySlice)
         {
             return _renderTargetViews[arraySlice];
         }
 
         /// <inheritdoc/>
-        [CLSCompliant(false)]
         public DepthStencilView GetDepthStencilView()
         {
             return _depthStencilView;
