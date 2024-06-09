@@ -88,22 +88,33 @@ namespace Microsoft.Xna.Framework.Graphics
             return true;
         }
 
+
+        /// <inheritdoc cref="Set(VertexBufferBinding[], int)"/>
+        public bool Set(params VertexBufferBinding[] vertexBufferBindings)
+        {
+            return Set(vertexBufferBindings, vertexBufferBindings.Length);
+        }
+
+        ///
         /// <summary>
         /// Binds the the specified vertex buffers to the input slots.
         /// </summary>
         /// <param name="vertexBufferBindings">The vertex buffer bindings.</param>
+        /// <param name="bindingCount">Number of bindings from the array to set, starting from index 0.</param>
         /// <returns>
         /// <see langword="true"/> if the input layout was changed; otherwise,
         /// <see langword="false"/>.
         /// </returns>
-        public bool Set(params VertexBufferBinding[] vertexBufferBindings)
+        public bool Set(VertexBufferBinding[] vertexBufferBindings, int bindingCount)
         {
             Debug.Assert(vertexBufferBindings != null);
             Debug.Assert(vertexBufferBindings.Length > 0);
-            Debug.Assert(vertexBufferBindings.Length <= _vertexBuffers.Length);
+            Debug.Assert(bindingCount > 0);
+            Debug.Assert(bindingCount <= vertexBufferBindings.Length);
+            Debug.Assert(bindingCount <= _vertexBuffers.Length);
 
             bool isDirty = false;
-            for (int i = 0; i < vertexBufferBindings.Length; i++)
+            for (int i = 0; i < bindingCount; i++)
             {
                 Debug.Assert(vertexBufferBindings[i].VertexBuffer != null);
 
@@ -121,9 +132,9 @@ namespace Microsoft.Xna.Framework.Graphics
                 isDirty = true;
             }
 
-            if (Count > vertexBufferBindings.Length)
+            if (Count > bindingCount)
             {
-                int startIndex = vertexBufferBindings.Length;
+                int startIndex = bindingCount;
                 int length = Count - startIndex;
                 Array.Clear(VertexDeclarations, startIndex, length);
                 Array.Clear(InstanceFrequencies, startIndex, length);
@@ -132,7 +143,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 isDirty = true;
             }
 
-            Count = vertexBufferBindings.Length;
+            Count = bindingCount;
             return isDirty;
         }
 
