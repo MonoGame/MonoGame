@@ -23,6 +23,8 @@ public sealed class BuildConsoleCheckTask : FrostingTask<BuildContext>
 
     private static readonly Regex hiddenMemberReplaceA = new(@"<([A-Za-z0-9_]*)>([A-Za-z0-9_]+)\|([A-Za-z0-9_]+)", RegexOptions.Compiled);
     private static readonly Regex hiddenMemberReplaceB = new(@"<([A-Za-z0-9_]*)>([A-Za-z0-9_]+)", RegexOptions.Compiled);
+    private static readonly Regex emptyArray = new(@"Array.Empty<([A-Za-z0-9_]+)>", RegexOptions.Compiled);
+    private static readonly Regex argumentNullException = new(@"ArgumentNullException\.ThrowIfNull\s+\((.*)\)", RegexOptions.Compiled);
 
     public override bool ShouldRun(BuildContext context) => context.IsRunningOnWindows();
 
@@ -201,6 +203,8 @@ public sealed class BuildConsoleCheckTask : FrostingTask<BuildContext>
     {
         source = hiddenMemberReplaceA.Replace(source, "__$1_$2_$3");
         source = hiddenMemberReplaceB.Replace(source, "__$1_$2");
+        source = emptyArray.Replace(source, "ArrayHelper<$1>.Empty");
+        source = argumentNullException.Replace(source, "ArgumentNullExceptionHelper.ThrowIfNull($1)");
 
         source = source.Replace("nint", "IntPtr");
 
