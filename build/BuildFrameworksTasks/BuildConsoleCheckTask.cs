@@ -1,82 +1,15 @@
-﻿using System.Text.RegularExpressions;
+﻿using System.Text;
+using System.Text.RegularExpressions;
 using ICSharpCode.Decompiler;
 using ICSharpCode.Decompiler.CSharp;
+using ICSharpCode.Decompiler.CSharp.Syntax;
+using ICSharpCode.Decompiler.Semantics;
 
 namespace BuildScripts;
 
 [TaskName("Build ConsoleCheck")]
 public sealed class BuildConsoleCheckTask : FrostingTask<BuildContext>
 {
-    private const string MathF = """
-    namespace System
-    {
-        internal static class MathF
-        {
-            public const float E = (float)Math.E;
-            public const float PI = (float)Math.PI;
-            public static float Sqrt(float f) { return (float)Math.Sqrt(f); }
-            public static float Pow(float x, float y) { return (float)Math.Pow(x, y); }
-            public static float Sin(float f) { return (float)Math.Sin(f); }
-            public static float Cos(float f) { return (float)Math.Cos(f); }
-            public static float Tan(float f) { return (float)Math.Tan(f); }
-            public static float Asin(float f) { return (float)Math.Asin(f); }
-            public static float Acos(float f) { return (float)Math.Acos(f); }
-            public static float Atan(float f) { return (float)Math.Atan(f); }
-            public static float Round(float f) { return (float)Math.Round(f); }
-            public static float Ceiling(float f) { return (float)Math.Ceiling(f); }
-            public static float Floor(float f) { return (float)Math.Floor(f); }
-        }
-    }
-    """;
-
-    private const string SystemNumericsVectors = """
-    namespace System.Numerics
-    {
-        public struct Matrix4x4
-        {
-            public float M11, M12, M13, M14, M21, M22, M23, M24, M31, M32, M33, M34, M41, M42, M43, M44;
-            public Matrix4x4(
-                float m11, float m12, float m13, float m14,
-                float m21, float m22, float m23, float m24,
-                float m31, float m32, float m33, float m34,
-                float m41, float m42, float m43, float m44)
-            {
-                M11 = m11; M12 = m12; M13 = m13; M14 = m14;
-                M21 = m21; M22 = m22; M23 = m23; M24 = m24;
-                M31 = m31; M32 = m32; M33 = m33; M34 = m34;
-                M41 = m41; M42 = m42; M43 = m43; M44 = m44;
-            }
-        }
-        public struct Plane
-        {
-            public Vector3 Normal;
-            public float D;
-            public Plane(float x, float y, float z, float d) : this(new Vector3(x, y, z), d) { }
-            public Plane(Vector3 normal, float d) { Normal = normal; D = d; }
-        }
-        public struct Quaternion
-        {
-            public float X, Y, Z, W;
-            public Quaternion(float x, float y, float z, float w) { X = x; Y = y; Z = z; W = w; }
-        }
-        public struct Vector2
-        {
-            public float X, Y;
-            public Vector2(float x, float y) { X = x; Y = y; }
-        }
-        public struct Vector3
-        {
-            public float X, Y, Z;
-            public Vector3(float x, float y, float z) { X = x; Y = y; Z = z; }
-        }
-        public struct Vector4
-        {
-            public float X, Y, Z, W;
-            public Vector4(float x, float y, float z, float w) { X = x; Y = y; Z = z; W = w; }
-        }
-    }
-    """;
-
     private const string ConsoleCheckProject = """
     <Project Sdk="Microsoft.NET.Sdk">
       <PropertyGroup>
@@ -88,50 +21,189 @@ public sealed class BuildConsoleCheckTask : FrostingTask<BuildContext>
     </Project>
     """;
 
+    private static readonly Regex hiddenMemberReplaceA = new(@"<([A-Za-z0-9_]*)>([A-Za-z0-9_]+)\|([A-Za-z0-9_]+)", RegexOptions.Compiled);
+    private static readonly Regex hiddenMemberReplaceB = new(@"<([A-Za-z0-9_]*)>([A-Za-z0-9_]+)", RegexOptions.Compiled);
+
     public override bool ShouldRun(BuildContext context) => context.IsRunningOnWindows();
 
     public override void Run(BuildContext context)
     {
-        var buildSettings = new DotNetBuildSettings
+        var recompileBbuildSettings = new DotNetBuildSettings
         {
             MSBuildSettings = context.DotNetBuildSettings.MSBuildSettings,
             Verbosity = context.DotNetBuildSettings.Verbosity,
             Configuration = "Release"
         };
 
-        context.DotNetBuild(context.GetProjectPath(ProjectType.Framework, "ConsoleCheck"), buildSettings);
+        context.DotNetBuild(context.GetProjectPath(ProjectType.Framework, "ConsoleCheck"), recompileBbuildSettings);
 
+        var buildDir = $"{context.BuildOutput}/MonoGame.Framework/ConsoleCheck/Recompiled";
+
+        Recompile($"{context.BuildOutput}/MonoGame.Framework/ConsoleCheck/Release/net8.0/MonoGame.Framework.dll", buildDir, out string buildProjectFile);
+
+        context.DotNetBuild(buildProjectFile, context.DotNetBuildSettings);
+    }
+
+    private static void Recompile(string oldAssembly, string newAssemblyDir, out string buildProjectFile)
+    {
+        if (!Directory.Exists(newAssemblyDir))
+            Directory.CreateDirectory(newAssemblyDir);
+
+        var decompiledSource = Decompile(oldAssembly);
+
+        File.WriteAllText($"{newAssemblyDir}/DecompiledFramework.cs", decompiledSource.ToString());
+        foreach (var file in Directory.EnumerateFiles("build/BuildFrameworksTasks/ConsoleCheckFiles"))
+            File.Copy(file, $"{newAssemblyDir}/{System.IO.Path.GetFileNameWithoutExtension(file)}", true);
+
+        using (var tupleFile = File.CreateText($"{newAssemblyDir}/ValueTuple.cs"))
+            WriteValueTuples(tupleFile, 16);
+
+        buildProjectFile = $"{newAssemblyDir}/MonoGame.Framework.csproj";
+        File.WriteAllText(buildProjectFile, ConsoleCheckProject);
+    }
+
+    private static void WriteValueTuples(StreamWriter writer, int typeCount)
+    {
+        writer.WriteLine("namespace System");
+        writer.WriteLine("{");
+        for (int count = 2; count <= typeCount; count++)
+        {
+            writer.WriteLine($"    public struct ValueTuple<{string.Join(", ", Enumerable.Range(1, count).Select(index => $"T{index}"))}>");
+            writer.WriteLine("    {");
+
+            for (int index = 1; index <= count; index++)
+                writer.WriteLine($"        public T{index} Item{index};");
+
+            writer.WriteLine($"        public ValueTuple({string.Join(", ", Enumerable.Range(1, count).Select(index => $"T{index} t{index}"))})");
+            writer.WriteLine("        {");
+            for (int index = 1; index <= count; index++)
+                writer.WriteLine($"            Item{index} = t{index};");
+            writer.WriteLine("        }");
+            writer.WriteLine("    }");
+        }
+        writer.WriteLine("}");
+    }
+
+    private static string Decompile(string assemblyPath)
+    {
         var decompilerSettings = new DecompilerSettings(LanguageVersion.CSharp5)
         {
             ShowXmlDocumentation = false,
+            NativeIntegers = false,
+            NullableReferenceTypes = false,
+            StringInterpolation = true,
+            TupleTypes = false,
+            TupleConversions = false
         };
 
-        var decompiler = new CSharpDecompiler($"{context.BuildOutput}/MonoGame.Framework/ConsoleCheck/Release/net8.0/MonoGame.Framework.dll", decompilerSettings);
+        var decompiler = new CSharpDecompiler(assemblyPath, decompilerSettings);
+        var tree = decompiler.DecompileWholeModuleAsSingleFile();
 
-        var buildDir = $"{context.BuildOutput}/MonoGame.Framework/ConsoleCheck/Recompiled";
-        if (!Directory.Exists(buildDir))
-            Directory.CreateDirectory(buildDir);
+        var sb = new StringBuilder();
 
-        var decompiled_source = decompiler.DecompileWholeModuleAsString();
+        foreach (var node in tree.Children)
+        {
+            if (node is AttributeSection)
+                continue;
 
-        decompiled_source = decompiled_source.Replace("\r\n", "\n");
+            if (node is NamespaceDeclaration)
+            {
+                foreach (var type in node.Children)
 
-        var r = new Regex(@"(.*?)<([A-Za-z0-9_]+)>([A-Za-z0-9_]+.*)", RegexOptions.Compiled | RegexOptions.Multiline);
-        decompiled_source = r.Replace(decompiled_source, "$1$2_$3");
+                    if (type is TypeDeclaration td)
+                        FixType(td);
 
-        r = new(@"^\[.*?: .*?\]\n", RegexOptions.Compiled | RegexOptions.Multiline);
-        decompiled_source = r.Replace(decompiled_source, string.Empty);
+                sb.Append(FixEverythingInSource(node.ToString()));
+                continue;
+            }
 
-        decompiled_source = decompiled_source.Replace("nint", "IntPtr");
-        decompiled_source = decompiled_source.Replace("object?", "object");
+            sb.Append(node);
+        }
 
-        File.WriteAllText($"{buildDir}/DecompiledFramework.cs", decompiled_source);
-        File.WriteAllText($"{buildDir}/MathF.cs", MathF);
-        File.WriteAllText($"{buildDir}/System.Numerics.Vectors.cs", SystemNumericsVectors);
+        return sb.ToString();
+    }
 
-        var buildProjectFile = $"{buildDir}/MonoGame.Framework.ConsoleCheck.csproj";
-        File.WriteAllText(buildProjectFile, ConsoleCheckProject);
+    private static void FixType(TypeDeclaration type)
+    {
+        foreach (var member in type.Children)
+        {
+            // fix primary constructor
+            if (member is ConstructorDeclaration cd &&
+                cd.Body.LastChild is ExpressionStatement es &&
+                es.FirstChild is InvocationExpression ie &&
+                ie.FirstChild is MemberReferenceExpression mr &&
+                mr.Target is BaseReferenceExpression &&
+                mr.MemberNameToken.Name == ".ctor")
+                cd.Body.LastChild.Remove();
+        }
 
-        context.DotNetBuild(buildProjectFile, context.DotNetBuildSettings);
+        FixInNode(type);
+    }
+
+    private static void FixInNode(AstNode node)
+    {
+        if (node is TupleAstType tuple)
+            FixTuple(tuple);
+
+        if (node is ComposedType nullable && nullable.HasNullableSpecifier && nullable.BaseType is SimpleType or PrimitiveType)
+            FixNullable(nullable);
+
+        if (node is InterpolatedStringExpression interExpr)
+            FixInterpolatedString(interExpr);
+
+        foreach (var child in node.Children)
+            FixInNode(child);
+    }
+
+    private static void FixTuple(TupleAstType tuple)
+    {
+        tuple.ReplaceWith(new SimpleType("ValueTuple", tuple.Elements.Select(x => x.Type.Clone())));
+    }
+
+    private static void FixNullable(ComposedType nullable)
+    {
+        var annotation = nullable.BaseType.Annotation<TypeResolveResult>();
+        if (annotation is not null && annotation.Type.IsReferenceType == true)
+            nullable.ReplaceWith(nullable.BaseType.Clone());
+    }
+
+    private static void FixInterpolatedString(InterpolatedStringExpression interpolationExpression)
+    {
+        var interpBuilder = new StringBuilder();
+        var interpolations = new List<Expression>();
+
+        int index = 0;
+        foreach (var content in interpolationExpression.Content)
+        {
+            if (content is Interpolation interp)
+            {
+                interpBuilder.Append($"{{{index}");
+                if (interp.Alignment != 0)
+                    interpBuilder.Append($",{interp.Alignment}");
+                if (!string.IsNullOrEmpty(interp.Suffix))
+                    interpBuilder.Append($":{interp.Suffix}");
+                interpBuilder.Append('}');
+
+                interpolations.Add(interp.Expression.Clone());
+                index++;
+            }
+            else if (content is InterpolatedStringText text)
+                interpBuilder.Append(text.Text);
+        }
+
+        interpolations.Insert(0, new PrimitiveExpression(interpBuilder.ToString(), LiteralFormat.StringLiteral));
+
+        interpolationExpression.ReplaceWith(
+            new InvocationExpression(new MemberReferenceExpression(new TypeReferenceExpression(new PrimitiveType("string")), "Format"), interpolations));
+    }
+
+    private static string FixEverythingInSource(string source)
+    {
+        source = hiddenMemberReplaceA.Replace(source, "__$1_$2_$3");
+        source = hiddenMemberReplaceB.Replace(source, "__$1_$2");
+
+        source = source.Replace("nint", "IntPtr");
+
+        return source;
     }
 }
