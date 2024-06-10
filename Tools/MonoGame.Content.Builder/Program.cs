@@ -51,8 +51,10 @@ namespace MonoGame.Content.Builder
             {
                 var currentProcess = Process.GetCurrentProcess();
                 Console.WriteLine($"Waiting for debugger to attach ({currentProcess.MainModule.FileName} PID {currentProcess.Id}).  Press any key to continue without debugger.");
-                while (!Debugger.IsAttached) {
-                    if (Console.KeyAvailable) {
+                while (!Debugger.IsAttached)
+                {
+                    if (Console.KeyAvailable)
+                    {
                         break;
                     }
                     Thread.Sleep(100);

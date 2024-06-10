@@ -456,7 +456,8 @@ namespace MonoGame.Content.Builder
                         var dstTime = File.GetLastWriteTimeUtc(dest);
                         if (srcTime <= dstTime)
                         {
-                            if (!Quiet) {
+                            if (!Quiet)
+                            {
                                 if (string.IsNullOrEmpty(c.Link))
                                     Console.WriteLine("Skipping {0}", c.SourceFile);
                                 else
@@ -485,7 +486,8 @@ namespace MonoGame.Content.Builder
 
                     var buildTime = DateTime.UtcNow - startTime;
 
-                    if (!Quiet) {
+                    if (!Quiet)
+                    {
                         if (string.IsNullOrEmpty(c.Link))
                             Console.WriteLine("{0}", c.SourceFile);
                         else
