@@ -147,6 +147,10 @@ public sealed class BuildConsoleCheckTask : FrostingTask<BuildContext>
         if (node is TupleAstType tuple)
             FixTuple(tuple);
 
+        if (node is EntityDeclaration decl && decl.HasModifier(Modifiers.Readonly) &&
+            decl is MethodDeclaration or PropertyDeclaration or OperatorDeclaration or IndexerDeclaration or TypeDeclaration or Accessor)
+            decl.Modifiers &= ~Modifiers.Readonly;
+
         if (node is ComposedType nullable && nullable.HasNullableSpecifier && nullable.BaseType is SimpleType or PrimitiveType)
             FixNullable(nullable);
 
