@@ -157,6 +157,9 @@ public sealed class BuildConsoleCheckTask : FrostingTask<BuildContext>
         if (node is InterpolatedStringExpression interExpr)
             FixInterpolatedString(interExpr);
 
+        if (node is PropertyDeclaration pd && !pd.Initializer.IsNull)
+            FixProperty(pd);
+
         foreach (var child in node.Children)
             FixInNode(child);
     }
@@ -201,6 +204,23 @@ public sealed class BuildConsoleCheckTask : FrostingTask<BuildContext>
 
         interpolationExpression.ReplaceWith(
             new InvocationExpression(new MemberReferenceExpression(new TypeReferenceExpression(new PrimitiveType("string")), "Format"), interpolations));
+    }
+
+    private static void FixProperty(PropertyDeclaration pd)
+    {
+        var field = new FieldDeclaration { Modifiers = Modifiers.Private, ReturnType = pd.ReturnType.Clone() };
+        if (pd.HasModifier(Modifiers.Static))
+            field.Modifiers |= Modifiers.Static;
+
+        var backingField = new VariableInitializer($"__{pd.Name}__backing_field", pd.Initializer.Clone());
+        field.Variables.Add(backingField);
+
+        pd.Initializer = Expression.Null;
+        pd.Parent!.InsertChildBefore(pd, field, Roles.TypeMemberRole);
+
+        var backingFieldRef = new IdentifierExpression(backingField.Name);
+        pd.Getter.Body = [new ReturnStatement(backingFieldRef)];
+        pd.Setter.Body = [new ExpressionStatement(new AssignmentExpression(backingFieldRef.Clone(), new IdentifierExpression("value")))];
     }
 
     private static string FixEverythingInSource(string source)
