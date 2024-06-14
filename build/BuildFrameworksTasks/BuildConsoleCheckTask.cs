@@ -229,6 +229,7 @@ public sealed class BuildConsoleCheckTask : FrostingTask<BuildContext>
         source = hiddenMemberReplaceB.Replace(source, "__$1_$2");
         source = emptyArray.Replace(source, "ArrayHelper<$1>.Empty");
         source = argumentNullException.Replace(source, "ArgumentNullExceptionHelper.ThrowIfNull($1)");
+        source = source.Replace("StringBuilder.AppendInterpolatedStringHandler", "StringBuilderHelper.AppendInterpolatedStringHandler");
 
         source = source.Replace("nint", "IntPtr");
 
