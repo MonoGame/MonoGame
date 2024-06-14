@@ -251,7 +251,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 // Note: for compressed format Format.GetSize() returns the size of a 4x4 block
                 var pixelToT = Format.GetSize() / tSizeInByte;
                 var tFullWidth = Math.Max(this.width >> level, 1) / 4 * pixelToT;
-                var temp = new T[Math.Max(this.height >> level, 1) / 4 * tFullWidth];
+                var temp = GetDataPool<T>.GetArray(Math.Max(this.height >> level, 1) / 4 * tFullWidth);
                 GL.GetCompressedTexImage(TextureTarget.Texture2D, level, temp);
                 GraphicsExtensions.CheckGLError();
 
@@ -268,7 +268,7 @@ namespace Microsoft.Xna.Framework.Graphics
             {
                 // we need to convert from our format size to the size of T here
                 var tFullWidth = Math.Max(this.width >> level, 1) * Format.GetSize() / tSizeInByte;
-                var temp = new T[Math.Max(this.height >> level, 1) * tFullWidth];
+                var temp = GetDataPool<T>.GetArray(Math.Max(this.height >> level, 1) * tFullWidth);
                 GL.GetTexImage(TextureTarget.Texture2D, level, glFormat, glType, temp);
                 GraphicsExtensions.CheckGLError();
 
@@ -502,6 +502,18 @@ namespace Microsoft.Xna.Framework.Graphics
 
             public static Action<SetDataRectState<T>> Action =
                 (s) => s.texture.PlatformSetDataBody(s.level, s.arraySlice, s.rect, s.data, s.startIndex, s.elementCount);
+        }
+
+        static class GetDataPool<T> where T : struct
+        {
+            private static (int length, T[] cache) cached = (0, []);
+
+            public static T[] GetArray(int length)
+            {
+                if (length > cached.length)
+                    cached = (length, new T[length]);
+                return cached.cache;
+            }
         }
     }
 }
