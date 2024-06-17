@@ -15,6 +15,14 @@ then
     exit 1
 fi
 
+# wine 8 is the minimum requirement for dotnet 8
+# wine --version will output "wine-#.# (Distro #.#.#)" or "wine-#.#"
+WINE_VERSION=$(wine --version 2>&1 | grep -oP 'wine-\d+' | sed 's/wine-//')
+if (( $WINE_VERSION < 8 )); then
+    echo "Wine version $WINE_VERSION is below the minimum required version (8.0)."
+    exit 1
+fi
+
 # init wine stuff
 export WINEARCH=win64
 export WINEPREFIX=$HOME/.winemonogame
@@ -36,7 +44,7 @@ wine64 regedit crashdialog.reg
 popd
 
 # get dotnet
-DOTNET_URL="https://download.visualstudio.microsoft.com/download/pr/46b35cfe-4b3f-4e69-8831-0937196699b1/221f862c003a0175722c131b0941e3c4/dotnet-sdk-5.0.203-win-x64.zip"
+DOTNET_URL="https://dotnetcli.azureedge.net/dotnet/Sdk/8.0.201/dotnet-sdk-8.0.201-win-x64.zip"
 curl $DOTNET_URL --output "$SCRIPT_DIR/dotnet-sdk.zip"
 7z x "$SCRIPT_DIR/dotnet-sdk.zip" -o"$WINEPREFIX/drive_c/windows/system32/"
 

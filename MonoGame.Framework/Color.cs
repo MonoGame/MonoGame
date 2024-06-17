@@ -172,11 +172,11 @@ namespace Microsoft.Xna.Framework
         /// The value is a 32-bit unsigned integer, with R in the least significant octet.
         /// </summary>
         /// <param name="packedValue">The packed value.</param>
-        [CLSCompliant(false)]
         public Color(uint packedValue)
         {
             _packedValue = packedValue;
         }
+
 
         /// <summary>
         /// Constructs an RGBA color from the XYZW unit length components of a vector.
@@ -1738,29 +1738,35 @@ namespace Microsoft.Xna.Framework
                 (int)MathHelper.LerpPrecise(value1.B, value2.B, amount),
                 (int)MathHelper.LerpPrecise(value1.A, value2.A, amount));
         }
-		
-	    /// <summary>
-        /// Multiply <see cref="Color"/> by value.
+
+        /// <summary>
+        /// Multiplies the RGBA component values of a color by the specified value.
         /// </summary>
-        /// <param name="value">Source <see cref="Color"/>.</param>
-        /// <param name="scale">Multiplicator.</param>
-        /// <returns>Multiplication result.</returns>
-	    public static Color Multiply(Color value, float scale)
+        /// <param name="value">The source color value to multiply.</param>
+        /// <param name="scale">The value to multiply the RGBA component values by.</param>
+        /// <returns>The new color value created as a result of the multiplication.</returns>
+        public static Color Multiply(Color value, float scale)
 	    {
 	        return new Color((int)(value.R * scale), (int)(value.G * scale), (int)(value.B * scale), (int)(value.A * scale));
 	    }
 	
 	    /// <summary>
-        /// Multiply <see cref="Color"/> by value.
+        /// Multiplies the RGBA component values of a color by the specified value.
         /// </summary>
-        /// <param name="value">Source <see cref="Color"/>.</param>
-        /// <param name="scale">Multiplicator.</param>
-        /// <returns>Multiplication result.</returns>
+        /// <param name="value">The source color value to multiply.</param>
+        /// <param name="scale">The value to multiply the RGBA component values by.</param>
+        /// <returns>The new color value created as a result of the multiplication.</returns>
 	    public static Color operator *(Color value, float scale)
         {
             return new Color((int)(value.R * scale), (int)(value.G * scale), (int)(value.B * scale), (int)(value.A * scale));
         }
 
+        /// <summary>
+        /// Multiplies the RGBA component values of a color by the specified value.
+        /// </summary>
+        /// <param name="scale">The value to multiply the RGBA component values by.</param>
+        /// <param name="value">The source color value to multiply.</param>
+        /// <returns>The new color value created as a result of the multiplication.</returns>
         public static Color operator *(float scale, Color value)
         {
             return new Color((int)(value.R * scale), (int)(value.G * scale), (int)(value.B * scale), (int)(value.A * scale));
@@ -1787,7 +1793,6 @@ namespace Microsoft.Xna.Framework
         /// <summary>
         /// Gets or sets packed value of this <see cref="Color"/>.
         /// </summary>
-        [CLSCompliant(false)]
         public UInt32 PackedValue
         {
             get { return _packedValue; }

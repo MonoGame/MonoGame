@@ -1,4 +1,4 @@
-// MonoGame - Copyright (C) The MonoGame Team
+// MonoGame - Copyright (C) MonoGame Foundation, Inc
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
@@ -15,10 +15,16 @@ using Microsoft.Xna.Framework.Input.Touch;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
+    /// <summary>
+    /// Contains graphics presentation parameters.
+    /// </summary>
     public class PresentationParameters
     {
         #region Constants
 
+        /// <summary>
+        /// Default presentation rate 
+        /// </summary>
         public const int DefaultPresentRate = 60;
 
         #endregion Constants
@@ -96,7 +102,6 @@ namespace Microsoft.Xna.Framework.Graphics
         }
 
 #if WINDOWS_UAP
-        [CLSCompliant(false)]
         public SwapChainPanel SwapChainPanel { get; set; }
 #endif
 

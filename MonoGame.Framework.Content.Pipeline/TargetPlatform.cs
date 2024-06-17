@@ -1,4 +1,4 @@
-﻿// MonoGame - Copyright (C) The MonoGame Team
+﻿// MonoGame - Copyright (C) MonoGame Foundation, Inc
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
@@ -78,7 +78,12 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
         /// Sony PlayStation4
         /// </summary>
         PlayStation4,
-       
+
+        /// <summary>
+        /// Sony PlayStation5
+        /// </summary>
+        PlayStation5,
+
         /// <summary>
         /// Xbox One
         /// </summary>
@@ -116,12 +121,13 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
             {
                 return base.ConvertFrom(context, culture, value);
             }
-            catch (FormatException fex)
+            catch (FormatException)
             { 
                 // convert legacy Platforms
                 if (value.Equals("Linux") || value.Equals("WindowsGL"))
                     return TargetPlatform.DesktopGL;
-                else throw fex;
+                else
+                    throw;
             }
         }
     }

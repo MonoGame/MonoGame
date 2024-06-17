@@ -1,4 +1,4 @@
-﻿// MonoGame - Copyright (C) The MonoGame Team
+﻿// MonoGame - Copyright (C) MonoGame Foundation, Inc
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
@@ -53,6 +53,8 @@ namespace MonoGame.Tests.Graphics
                 Assert.IsNotNull(adapter.CurrentDisplayMode); 
                 Assert.IsNotNull(adapter.SupportedDisplayModes);
                 Assert.GreaterOrEqual(adapter.SupportedDisplayModes.Count(), 1);
+
+                // This Assert can fail on laptops or systems with onboard graphics.
                 Assert.AreEqual(1, adapter.SupportedDisplayModes.Count(m => Equals(m, adapter.CurrentDisplayMode)));
 
                 // Seems like XNA treats aspect ratios above 16:10 as wide screen. A 1680x1050 display (exactly 16:10) was considered not to be wide screen.

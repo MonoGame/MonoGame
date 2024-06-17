@@ -1,4 +1,4 @@
-﻿// MonoGame - Copyright (C) The MonoGame Team
+﻿// MonoGame - Copyright (C) MonoGame Foundation, Inc
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
@@ -215,16 +215,16 @@ namespace Microsoft.Xna.Framework.Windows
         void HandleDropMessage(ref Message m)
         {
             IntPtr hdrop = m.WParam;
-            StringBuilder builder = new StringBuilder();
 
             uint count = DragQueryFile(hdrop, uint.MaxValue, null, 0);
 
             string[] files = new string[count];
             for (uint i = 0; i < count; i++)
             {
-                DragQueryFile(hdrop, i, builder, int.MaxValue);
+                uint buffSize = DragQueryFile(hdrop, i, null, int.MaxValue);
+                StringBuilder builder = new StringBuilder((int)buffSize);
+                DragQueryFile(hdrop, i, builder, buffSize);
                 files[i] = builder.ToString();
-                builder.Clear();
             }
 
             _window.OnFileDrop(new FileDropEventArgs(files));

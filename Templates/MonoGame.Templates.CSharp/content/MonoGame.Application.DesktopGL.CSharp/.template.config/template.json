@@ -1,9 +1,9 @@
 {
     "author": "MonoGame Team",
     "classifications": [
-        "MonoGame"
+        "MonoGame", "Games", "Desktop", "Windows", "Linux", "macOS"
     ],
-    "name": "MonoGame Cross-Platform Desktop Application (OpenGL)",
+    "name": "MonoGame Cross-Platform Desktop Application",
     "groupIdentity": "MonoGame.Application.DesktopGL",
     "identity": "MonoGame.Application.DesktopGL.CSharp",
     "shortName": "mgdesktopgl",
@@ -19,11 +19,16 @@
     "sourceName": "MGNamespace",
     "preferNameDirectory": "true",
     "description": "A MonoGame game project for Windows, Linux and macOS using OpenGL.",
-    "symbols": {
-        "framework": {
-            "type": "parameter",
-            "defaultValue": "net5.0",
-            "replaces": "net5.0"
+    "postActions": [
+        {
+            "description": "Restore NuGet packages required by this project.",
+            "manualInstructions": [
+                {
+                    "text": "Run 'dotnet restore'"
+                }
+            ],
+            "actionId": "210D431B-A78B-4D2F-B762-4ED3E3EA9025",
+            "continueOnError": true
         }
-    }
+    ]
 }

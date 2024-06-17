@@ -1,4 +1,4 @@
-﻿// MonoGame - Copyright (C) The MonoGame Team
+﻿// MonoGame - Copyright (C) MonoGame Foundation, Inc
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
@@ -1441,11 +1441,13 @@ namespace MonoGame.OpenGL
 
         internal static void LoadExtensions()
         {
-            string extstring = GL.GetString(StringName.Extensions);
-            var error = GL.GetError();
-            if (!string.IsNullOrEmpty(extstring) && error == ErrorCode.NoError)
-                Extensions.AddRange(extstring.Split(' '));
-
+            if (Extensions.Count == 0)
+            {
+                string extstring = GL.GetString(StringName.Extensions);
+                var error = GL.GetError();
+                if (!string.IsNullOrEmpty(extstring) && error == ErrorCode.NoError)
+                    Extensions.AddRange(extstring.Split(' '));
+            }
             LogExtensions();
             // now load Extensions :)
             if (GL.GenRenderbuffers == null && Extensions.Contains("GL_EXT_framebuffer_object"))

@@ -1,4 +1,4 @@
-// MonoGame - Copyright (C) The MonoGame Team
+// MonoGame - Copyright (C) MonoGame Foundation, Inc
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 ﻿
@@ -159,7 +159,7 @@ namespace Microsoft.Xna.Framework.Audio
         {
             if (codec == MiniFormatTag.Adpcm)
             {
-                PlatformInitializeAdpcm(buffer, 0, buffer.Length, sampleRate, (AudioChannels)channels, (blockAlignment + 16) * channels, loopStart, loopLength);
+                PlatformInitializeAdpcm(buffer, 0, buffer.Length, sampleRate, (AudioChannels)channels, (blockAlignment + 22) * channels, loopStart, loopLength);
                 duration = TimeSpan.FromSeconds(SoundBuffer.Duration);
                 return;
             }

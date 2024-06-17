@@ -1,4 +1,4 @@
-// MonoGame - Copyright (C) The MonoGame Team
+// MonoGame - Copyright (C) MonoGame Foundation, Inc
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
@@ -14,7 +14,6 @@ namespace MonoGame.Framework
     /// Static class for initializing a Game object for a XAML application.
     /// </summary>
     /// <typeparam name="T">A class derived from Game with a public parameterless constructor.</typeparam>
-    [CLSCompliant(false)]
     public static class XamlGame<T>
         where T : Game, new()
     {

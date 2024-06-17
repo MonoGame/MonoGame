@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PackageManifest Version="2.0.0" xmlns="http://schemas.microsoft.com/developer/vsx-schema/2011" xmlns:d="http://schemas.microsoft.com/developer/vsx-schema-design/2011">
+	<Metadata>
+		<Identity Version="3.8.1.1" Id="MonoGame.Templates.VSExtension.03a6f6d5-6ec0-45ff-a4f6-ec098d51464d" Language="en-US" Publisher="MonoGame" />
+		<DisplayName>MonoGame Framework C# project templates</DisplayName>
+		<Description xml:space="preserve">This extension contains the C# project templates for using the MonoGame Framework</Description>
+		<Tags>.NET,C#,Game development,Templates,Games,Gamedev,Project,Mono,MonoGame</Tags>
+	</Metadata>
+	<Installation>
+		<InstallationTarget Id="Microsoft.VisualStudio.Community" Version="[17.0, 18.0)">
+			<ProductArchitecture>amd64</ProductArchitecture>
+		</InstallationTarget>
+	</Installation>
+	<Dependencies>
+		<Dependency Id="Microsoft.Framework.NDP" DisplayName="Microsoft .NET Framework" d:Source="Manual" Version="[4.5,)" />
+	</Dependencies>
+	<Prerequisites>
+		<Prerequisite Id="Microsoft.VisualStudio.Component.CoreEditor" Version="[17.0,18.0)" DisplayName="Visual Studio core editor" />
+	</Prerequisites>
+	<Assets>
+		<Asset Type="Microsoft.VisualStudio.VsPackage" d:Source="Project" d:ProjectName="%CurrentProject%" Path="|%CurrentProject%;PkgdefProjectOutputGroup|" />
+		<Asset Type="Microsoft.VisualStudio.VsPackage" d:Source="File" Path="Templates.pkgdef" />
+	</Assets>
+</PackageManifest>

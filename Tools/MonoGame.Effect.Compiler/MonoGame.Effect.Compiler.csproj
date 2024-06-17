@@ -2,7 +2,8 @@
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>net5.0</TargetFramework>
+    <TargetFramework>net8.0</TargetFramework>
+    <RollForward>Major</RollForward>
     <Description>The MonoGame Framework Effect Compiler (MGFXC) command line tool is used to compile shaders.</Description>
     <BaseOutputPath>..\..\Artifacts\MonoGame.Effect.Compiler</BaseOutputPath>
     <PackAsTool>true</PackAsTool>
@@ -12,7 +13,7 @@
     <AssemblyName>mgfxc</AssemblyName>
     <UseAppHost>true</UseAppHost>
   </PropertyGroup>
-  
+
   <ItemGroup>
     <Compile Include="..\..\MonoGame.Framework\BoundingBox.cs" />
     <Compile Include="..\..\MonoGame.Framework\BoundingFrustum.cs" />
@@ -55,7 +56,6 @@
     <Compile Include="..\..\MonoGame.Framework\Design\Vector4TypeConverter.cs" />
     <Compile Include="..\..\MonoGame.Framework\Design\VectorConversion.cs" />
     <Compile Include="..\..\MonoGame.Framework\Graphics\PackedVector\IPackedVector.cs" />
-    <Compile Include="..\..\MonoGame.Framework\Utilities\BinaryWriterEx.cs" />
     <Compile Include="..\..\MonoGame.Framework\Utilities\Hash.cs" />
     <Compile Include="..\..\MonoGame.Framework\Platform\Utilities\CurrentPlatform.cs" />
     <Compile Include="..\..\MonoGame.Framework.Content.Pipeline\ExternalTool.cs" />
@@ -69,15 +69,19 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Reference Include="..\..\ThirdParty\Dependencies\SharpDX\net40\SharpDX.dll" />
-    <Reference Include="..\..\ThirdParty\Dependencies\SharpDX\SharpDX.D3DCompiler.dll" />
+    <PackageReference Include="Microsoft.NETCore.App" Version="2.1.30" />
+    <PackageReference Include="SharpDX" Version="4.0.1" />
+    <PackageReference Include="SharpDX.D3DCompiler" Version="4.0.1" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Reference Include="..\..\ThirdParty\Dependencies\CppNet\CppNet.dll" />
   </ItemGroup>
-  
+
   <Import Project="..\..\Switch\MonoGame.Effect.Compiler.targets" Condition="exists('..\..\Switch\MonoGame.Effect.Compiler.targets')" />
   <Import Project="..\..\XBoxOne\MonoGame.Effect.Compiler.targets" Condition="exists('..\..\XBoxOne\MonoGame.Effect.Compiler.targets')" />
   <Import Project="..\..\PlayStation4\MonoGame.Effect.Compiler.targets" Condition="exists('..\..\PlayStation4\MonoGame.Effect.Compiler.targets')" />
+  <Import Project="..\..\PlayStation5\MonoGame.Effect.Compiler.targets" Condition="exists('..\..\PlayStation5\MonoGame.Effect.Compiler.targets')" />
   <Import Project="..\..\Stadia\MonoGame.Effect.Compiler.targets" Condition="exists('..\..\Stadia\MonoGame.Effect.Compiler.targets')" />
 
 </Project>
-

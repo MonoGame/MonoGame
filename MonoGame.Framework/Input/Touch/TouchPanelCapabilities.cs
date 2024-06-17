@@ -1,4 +1,4 @@
-// MonoGame - Copyright (C) The MonoGame Team
+// MonoGame - Copyright (C) MonoGame Foundation, Inc
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
@@ -72,6 +72,9 @@ namespace Microsoft.Xna.Framework.Input.Touch
             }
         }
 
+        /// <summary>
+        /// Returns <see langword="true"/> if a touch device supports pressure.
+        /// </summary>
         public bool HasPressure
         {
             get

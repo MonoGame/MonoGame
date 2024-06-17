@@ -1,4 +1,4 @@
-// MonoGame - Copyright (C) The MonoGame Team
+// MonoGame - Copyright (C) MonoGame Foundation, Inc
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
@@ -11,6 +11,7 @@ namespace Microsoft.Xna.Framework.Graphics
     {
         private SharpDX.Direct3D11.SamplerState _state;
 
+        /// <inheritdoc />
         protected internal override void GraphicsDeviceResetting()
         {
             SharpDX.Utilities.Dispose(ref _state);
@@ -45,7 +46,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 // TODO: How do i do this?
                 desc.MinimumLod = 0.0f;
 
-                // To support feature level 9.1 these must 
+                // To support feature level 9.1 these must
                 // be set to these exact values.
                 desc.MaximumLod = float.MaxValue;
 

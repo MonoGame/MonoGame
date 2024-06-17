@@ -1,20 +1,16 @@
-﻿<Project Sdk="MSBuild.Sdk.Extras">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>monoandroid90</TargetFramework>
+    <TargetFramework>net8.0-android</TargetFramework>
+    <SupportedOSPlatformVersion>23</SupportedOSPlatformVersion>
     <DefineConstants>ANDROID;GLES;STBSHARP_INTERNAL</DefineConstants>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <MGOpenGL>GLES</MGOpenGL>
-    <Description>The MonoGame runtime for Android which supports Android 4.2 and newer.</Description>
+    <Description>The MonoGame runtime for Android.</Description>
     <PackageTags>monogame;.net core;core;.net standard;standard;android</PackageTags>
     <PackageId>MonoGame.Framework.Android</PackageId>
     <AppendTargetFrameworkToOutputPath>False</AppendTargetFrameworkToOutputPath>
   </PropertyGroup>
-
-  <ItemGroup>
-    <Reference Include="System.Runtime.Serialization" />
-    <Reference Include="System.Numerics" />
-  </ItemGroup>
 
   <ItemGroup>
     <Compile Remove="bin\**\*" />
@@ -73,7 +69,7 @@
     <Compile Include="Platform\Utilities\FuncLoader.Android.cs" />
     <Compile Include="Platform\Utilities\InteropHelpers.cs" />
     <Compile Include="Platform\Utilities\ReflectionHelpers.Default.cs" />
-    
+
     <Compile Include="..\ThirdParty\StbImageSharp\src\**\*.cs" LinkBase="Utilities\StbImageSharp"/>
     <Compile Include="..\ThirdParty\StbImageWriteSharp\src\**\*.cs" LinkBase="Utilities\StbImageWriteSharp"/>
   </ItemGroup>

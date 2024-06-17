@@ -1,4 +1,4 @@
-// MonoGame - Copyright (C) The MonoGame Team
+// MonoGame - Copyright (C) MonoGame Foundation, Inc
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
@@ -10,7 +10,7 @@ using Microsoft.Xna.Framework;
 namespace Microsoft.Devices.Sensors
 {
     /// <summary>
-    /// Provides Android applications access to the device’s compass sensor.
+    /// Provides Android applications access to the device's compass sensor.
     /// </summary>
     public sealed class Compass : SensorBase<CompassReading>
     {

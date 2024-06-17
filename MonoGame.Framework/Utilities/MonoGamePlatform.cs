@@ -1,4 +1,4 @@
-// MonoGame - Copyright (C) The MonoGame Team
+// MonoGame - Copyright (C) MonoGame Foundation, Inc
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
@@ -53,6 +53,11 @@ namespace MonoGame.Framework.Utilities
         /// MonoGame PlayStation 4 platform.
         /// </summary>
         PlayStation4,
+
+        /// <summary>
+        /// MonoGame PlayStation 5 platform.
+        /// </summary>
+        PlayStation5,
 
         /// <summary>
         /// MonoGame Nintendo Switch platform.

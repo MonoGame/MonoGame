@@ -1,4 +1,4 @@
-﻿// MonoGame - Copyright (C) The MonoGame Team
+﻿// MonoGame - Copyright (C) MonoGame Foundation, Inc
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
@@ -11,6 +11,17 @@ namespace MonoGame.Tests.Graphics
     [TestFixture]
     internal class EffectTest : GraphicsDeviceTestFixtureBase
     {
+        [Test]
+        public void EffectConstructorShouldAllowIndexAndCount()
+        {
+            byte[] mgfxo = EffectResource.BasicEffect.Bytecode;
+            var index = 100000;
+            var byteArray = new byte[index + mgfxo.Length];
+            mgfxo.CopyTo(byteArray, index);
+            Effect effect = null;
+            Assert.DoesNotThrow(() => { effect = new Effect(game.GraphicsDevice, byteArray, index, mgfxo.Length); });
+            effect.Dispose();
+        }
 
         [Test]
         public void EffectPassShouldSetTexture()

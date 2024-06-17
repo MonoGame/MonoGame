@@ -64,6 +64,11 @@ namespace MonoGame.Effect
 
                 case MojoShader.MOJOSHADER_symbolClass.MOJOSHADER_SYMCLASS_MATRIX_COLUMNS:
                     param.class_ = EffectObject.D3DXPARAMETER_CLASS.MATRIX_COLUMNS;
+
+                    // MojoShader optimizes matrices to occupy less registers.
+                    // This effectively convert a Matrix4x4 into Matrix4x3, Matrix4x2 or Matrix4x1.
+                    param.columns = Math.Min(param.columns, symbol.register_count);
+
                     break;
 
                 default:

@@ -1,4 +1,4 @@
-// MonoGame - Copyright (C) The MonoGame Team
+// MonoGame - Copyright (C) MonoGame Foundation, Inc
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
@@ -87,6 +87,7 @@ namespace Microsoft.Xna.Framework
 
         }
 
+        /// <summary/>
         ~Game()
         {
             Dispose(false);
@@ -101,6 +102,7 @@ namespace Microsoft.Xna.Framework
         #region IDisposable Implementation
 
         private bool _isDisposed;
+        /// <inheritdoc cref="IDisposable.Dispose()"/>
         public void Dispose()
         {
             Dispose(true);
@@ -108,6 +110,7 @@ namespace Microsoft.Xna.Framework
             EventHelpers.Raise(this, Disposed, EventArgs.Empty);
         }
 
+        /// <summary/>
         protected virtual void Dispose(bool disposing)
         {
             if (!_isDisposed)
@@ -174,7 +177,6 @@ namespace Microsoft.Xna.Framework
         #region Properties
 
 #if ANDROID
-        [CLSCompliant(false)]
         public static AndroidGameActivity Activity { get; internal set; }
 #endif
         private static Game _instance = null;
@@ -193,13 +195,16 @@ namespace Microsoft.Xna.Framework
             get { return _components; }
         }
 
+        /// <summary>
+        /// Gets or sets time to sleep between frames when the game is not active
+        /// </summary>
         public TimeSpan InactiveSleepTime
         {
             get { return _inactiveSleepTime; }
             set
             {
                 if (value < TimeSpan.Zero)
-                    throw new ArgumentOutOfRangeException("The time must be positive.", default(Exception));
+                    throw new ArgumentOutOfRangeException("The time must be positive.");
 
                 _inactiveSleepTime = value;
             }
@@ -216,11 +221,11 @@ namespace Microsoft.Xna.Framework
             {
                 if (value < TimeSpan.Zero)
                     throw new ArgumentOutOfRangeException(
-                        "The time must be positive.", default(Exception));
+                        "The time must be positive.");
                 
                 if (value < _targetElapsedTime)
                     throw new ArgumentOutOfRangeException(
-                        "The time must be at least TargetElapsedTime", default(Exception));
+                        "The time must be at least TargetElapsedTime");
 
                 _maxElapsedTime = value;
             }
@@ -258,11 +263,11 @@ namespace Microsoft.Xna.Framework
 
                 if (value <= TimeSpan.Zero)
                     throw new ArgumentOutOfRangeException(
-                        "The time must be positive and non-zero.", default(Exception));
+                        "The time must be positive and non-zero.");
 
                 if (value > _maxElapsedTime)
                     throw new ArgumentOutOfRangeException(
-                        "The time can not be larger than MaxElapsedTime", default(Exception));
+                        "The time can not be larger than MaxElapsedTime");
 
                 if (value != _targetElapsedTime)
                 {
@@ -334,7 +339,6 @@ namespace Microsoft.Xna.Framework
         /// <summary>
         /// The system window that this game is displayed on.
         /// </summary>
-        [CLSCompliant(false)]
         public GameWindow Window
         {
             get { return Platform.Window; }
@@ -375,10 +379,9 @@ namespace Microsoft.Xna.Framework
         /// <summary>
         /// Raised when this game is exiting.
         /// </summary>
-        public event EventHandler<EventArgs> Exiting;
+        public event EventHandler<ExitingEventArgs> Exiting;
 
 #if WINDOWS_UAP
-        [CLSCompliant(false)]
         public ApplicationExecutionState PreviousExecutionState { get; internal set; }
 #endif
 
@@ -404,8 +407,12 @@ namespace Microsoft.Xna.Framework
         public void ResetElapsedTime()
         {
             Platform.ResetElapsedTime();
-            _gameTimer.Reset();
-            _gameTimer.Start();
+            if (_gameTimer != null)
+            {
+                _gameTimer.Reset();
+                _gameTimer.Start();
+            }
+
             _accumulatedElapsedTime = TimeSpan.Zero;
             _gameTime.ElapsedGameTime = TimeSpan.Zero;
             _previousTicks = 0L;
@@ -486,8 +493,6 @@ namespace Microsoft.Xna.Framework
                 DoUpdate(new GameTime());
 
                 Platform.RunLoop();
-                EndRun();
-				DoExiting();
                 break;
             default:
                 throw new ArgumentException(string.Format(
@@ -532,6 +537,11 @@ namespace Microsoft.Xna.Framework
             }
 
             // Advance the accumulated elapsed time.
+            if (_gameTimer == null)
+            {
+                _gameTimer = new Stopwatch();
+                _gameTimer.Start();
+            }
             var currentTicks = _gameTimer.Elapsed.Ticks;
             _accumulatedElapsedTime += TimeSpan.FromTicks(currentTicks - _previousTicks);
             _previousTicks = currentTicks;
@@ -617,8 +627,18 @@ namespace Microsoft.Xna.Framework
 
             if (_shouldExit)
             {
-                Platform.Exit();
-                _shouldExit = false; //prevents perpetual exiting on platforms supporting resume.
+                var exitingEventArgs = new ExitingEventArgs();
+
+                OnExiting(this, exitingEventArgs);
+
+                if (!exitingEventArgs.Cancel)
+                {
+                    Platform.Exit();
+                    EndRun();
+                    UnloadContent();
+                }
+
+                _shouldExit = false;
             }
         }
 
@@ -729,7 +749,7 @@ namespace Microsoft.Xna.Framework
         /// </summary>
         /// <param name="sender">This <see cref="Game"/>.</param>
         /// <param name="args">The arguments to the <see cref="Exiting"/> event.</param>
-        protected virtual void OnExiting(object sender, EventArgs args)
+        protected virtual void OnExiting(object sender, ExitingEventArgs args)
         {
             EventHelpers.Raise(sender, Exiting, args);
         }
@@ -781,8 +801,6 @@ namespace Microsoft.Xna.Framework
 
             var platform = (GamePlatform)sender;
             platform.AsyncRunLoopEnded -= Platform_AsyncRunLoopEnded;
-            EndRun();
-			DoExiting();
         }
 
         #endregion Event Handlers
@@ -856,12 +874,6 @@ namespace Microsoft.Xna.Framework
             _components.ComponentAdded += Components_ComponentAdded;
             _components.ComponentRemoved += Components_ComponentRemoved;
         }
-
-		internal void DoExiting()
-		{
-			OnExiting(this, EventArgs.Empty);
-			UnloadContent();
-		}
 
         #endregion Internal Methods
 

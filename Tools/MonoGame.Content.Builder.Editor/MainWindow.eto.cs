@@ -1,11 +1,11 @@
-﻿// MonoGame - Copyright (C) The MonoGame Team
+﻿// MonoGame - Copyright (C) MonoGame Foundation, Inc
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System;
 using Eto;
-using Eto.Forms;
 using Eto.Drawing;
+using Eto.Forms;
 
 namespace MonoGame.Tools.Pipeline
 {
@@ -194,6 +194,7 @@ namespace MonoGame.Tools.Pipeline
             cmdRename = new Command();
             cmdRename.MenuText = "Rename";
             cmdRename.Image = Global.GetEtoIcon("Commands.Rename.png");
+            cmdRename.Shortcut = Keys.F2;
 
             cmdDelete = new Command();
             cmdDelete.MenuText = "Delete";
@@ -376,9 +377,11 @@ namespace MonoGame.Tools.Pipeline
             toolClean = cmdClean.CreateToolItem();
             toolCancelBuild = cmdCancelBuild.CreateToolItem();
 
-            ToolBar = toolbar = new ToolBar();
+            toolbar = new ToolBar();
+#if !MAC
+            ToolBar = toolbar;
             ToolBar.Style = "ToolBar";
-            
+                 
             ToolBar.Items.Add(cmdNew);
             ToolBar.Items.Add(cmdOpen);
             ToolBar.Items.Add(cmdSave);
@@ -395,6 +398,7 @@ namespace MonoGame.Tools.Pipeline
             ToolBar.Items.Add(toolRebuild);
             ToolBar.Items.Add(toolClean);
             toolbar.Items.Add(toolCancelBuild);
+#endif
         }
     }
 }

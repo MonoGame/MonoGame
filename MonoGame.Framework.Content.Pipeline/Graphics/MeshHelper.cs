@@ -1,8 +1,6 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Diagnostics;
-using System.Linq;
 
 namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 {
@@ -21,7 +19,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
         /// <summary>
         /// Generates vertex normals by accumulation of triangle face normals.
         /// </summary>
-        /// <param name="mesh">The mesh which will recieve the normals.</param>
+        /// <param name="mesh">The mesh which will receive the normals.</param>
         /// <param name="overwriteExistingNormals">Overwrite or skip over geometry with existing normals.</param>
         /// <remarks>
         /// This calls <see cref="CalculateNormals(GeometryContent, bool)"/> to do the work.
@@ -35,7 +33,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
         /// <summary>
         /// Generates vertex normals by accumulation of triangle face normals.
         /// </summary>
-        /// <param name="geom">The geometry which will recieve the normals.</param>
+        /// <param name="geom">The geometry which will receive the normals.</param>
         /// <param name="overwriteExistingNormals">Overwrite or skip over geometry with existing normals.</param>
         /// <remarks>
         /// We use a "Mean Weighted Equally" method generate vertex normals from triangle 
@@ -73,8 +71,8 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 
                 var aa = geom.Vertices.Positions[ia];
                 var bb = geom.Vertices.Positions[ib];
-                var cc = geom.Vertices.Positions[ic];                
-                
+                var cc = geom.Vertices.Positions[ic];
+
                 var faceNormal = Vector3.Cross(cc - bb, bb - aa);
                 var len = faceNormal.Length();
                 if (len > 0.0f)
@@ -97,9 +95,9 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
                     // by Shuangshuang Jin, Robert R. Lewis, David West.
                     //
 
-                    normals[positionIndices[ia]] += faceNormal;
-                    normals[positionIndices[ib]] += faceNormal;
-                    normals[positionIndices[ic]] += faceNormal;
+                    normals[ia] += faceNormal;
+                    normals[ib] += faceNormal;
+                    normals[ic] += faceNormal;
                 }
             }
 
@@ -117,7 +115,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 
                     // TODO: We could maybe void this by a better algorithm
                     // above for generating the normals.
-                    
+
                     // We have a zero length normal.  You can argue that putting
                     // anything here is better than nothing, but by leaving it to
                     // zero it allows the caller to detect this and react to it.
@@ -127,7 +125,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 
             // Set the new normals on the vertex channel.
             for (var i = 0; i < channel.Count; i++)
-                channel[i] = normals[geom.Indices[i]];
+                channel[i] = normals[i];
         }
 
         /// <summary>
@@ -140,11 +138,25 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
         public static void CalculateTangentFrames(MeshContent mesh, string textureCoordinateChannelName, string tangentChannelName, string binormalChannelName)
         {
             foreach (var geom in mesh.Geometry)
-                CalculateTangentFrames(geom, textureCoordinateChannelName, tangentChannelName, binormalChannelName);                            
+                CalculateTangentFrames(geom, textureCoordinateChannelName, tangentChannelName, binormalChannelName);
         }
 
+        /// <summary>
+        /// Generate the tangents and binormals (tangent frames) for each vertex in the mesh geometry.
+        /// </summary>
+        /// <param name="geom">The mesh geometry which will have add tangent and binormal channels added.</param>
+        /// <param name="textureCoordinateChannelName">The Vector2 texture coordinate channel used to generate tangent frames.</param>
+        /// <param name="tangentChannelName"></param>
+        /// <param name="binormalChannelName"></param>
         public static void CalculateTangentFrames(GeometryContent geom, string textureCoordinateChannelName, string tangentChannelName, string binormalChannelName)
         {
+            if (!geom.Vertices.Channels.Contains(VertexChannelNames.Normal(0)))
+            {
+                return;
+                // TODO: We could generate the normals here, but it's not working.
+                //MeshHelper.CalculateNormals(geom, true);
+            }
+
             var verts = geom.Vertices;
             var indices = geom.Indices;
             var channels = geom.Vertices.Channels;
@@ -332,7 +344,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
                 foreach (var nodeContent in node.Children)
                 {
                     var bone = nodeContent as BoneContent;
-                    if (bone == null) 
+                    if (bone == null)
                         continue;
 
                     // If we found a bone
@@ -444,7 +456,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
                     PositionIndex = verts.PositionIndices[vIndex],
                     ChannelData = new object[verts.Channels.Count]
                 };
-                
+
                 for (var channel = 0; channel < verts.Channels.Count; channel++)
                     iData.ChannelData[channel] = verts.Channels[channel][vIndex];
 
@@ -501,7 +513,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
         {
             // We don't throw here as non-optimized still works.
         }
-        
+
         /// <summary>
         /// Reverses the triangle winding order of the mesh.
         /// </summary>
@@ -634,7 +646,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 
                 for (var i = 0; i < ChannelData.Length; i++)
                 {
-                        if (!Equals(ChannelData[i], other.ChannelData[i]))
+                    if (!Equals(ChannelData[i], other.ChannelData[i]))
                         return false;
                 }
 

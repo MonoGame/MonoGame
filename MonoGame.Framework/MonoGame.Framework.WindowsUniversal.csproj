@@ -1,21 +1,23 @@
-﻿<Project Sdk="MSBuild.Sdk.Extras">
+﻿<Project Sdk="MSBuild.Sdk.Extras/2.0.54">
 
   <PropertyGroup>
     <TargetFramework>uap10.0</TargetFramework>
     <!-- TODO: NET45 is here for reflection API (Utilities\ReflectionHelpers), but does not make sense semantically -->
     <DefineConstants>WINDOWS_UAP;DIRECTX11_1;NET45;STBSHARP_INTERNAL</DefineConstants>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <TargetPlatformVersion>10.0.18362.0</TargetPlatformVersion>
+    <TargetPlatformVersion>10.0.19041.0</TargetPlatformVersion>
     <TargetPlatformMinVersion>10.0.16299.0</TargetPlatformMinVersion>
     <Description>The MonoGame runtime for UWP (Universal Windows Platform) which supports Windows 10 and Xbox One.</Description>
     <PackageTags>monogame;.net core;core;.net standard;standard;uwp</PackageTags>
     <PackageId>MonoGame.Framework.WindowsUniversal</PackageId>
     <SharpDXVersion>4.0.1</SharpDXVersion>
     <AppendTargetFrameworkToOutputPath>False</AppendTargetFrameworkToOutputPath>
+    <PackageOutputPath>..\Artifacts\NuGet</PackageOutputPath>
+    <NoWarn>$(NoWarn);CS0067;CS0168;CS0169;CS0219;CS0419;CS0436;CS0618;CS1574;CS1591;CS3021;CS4014;MSB4011;NU5128</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>
-    <SDKReference Include="WindowsMobile, Version=10.0.18362.0">
+    <SDKReference Include="WindowsMobile, Version=10.0.19041.0">
       <Name>Windows Mobile Extensions for the UWP</Name>
     </SDKReference>
   </ItemGroup>
@@ -70,7 +72,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Content Include="MonoGame.Framework.WindowsUniversal.targets" PackagePath="build;lib\uap10.0\MonoGame.Framework" />
+    <Content Include="MonoGame.Framework.WindowsUniversal.targets" PackagePath="build;lib\uap10.0.16299\MonoGame.Framework" />
   </ItemGroup>
 
   <ItemGroup>

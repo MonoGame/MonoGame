@@ -1,4 +1,4 @@
-﻿// MonoGame - Copyright (C) The MonoGame Team
+﻿// MonoGame - Copyright (C) MonoGame Foundation, Inc
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
@@ -68,7 +68,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
                             platform == TargetPlatform.Web)
                 {
                     if (format != TextureProcessorOutputFormat.DxtCompressed)
-                        throw new PlatformNotSupportedException(format + " platform only supports DXT texture compression");
+                        throw new PlatformNotSupportedException(platform + " platform only supports DXT texture compression");
                 }
             }
 

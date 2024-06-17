@@ -1,4 +1,4 @@
-// MonoGame - Copyright (C) The MonoGame Team
+// MonoGame - Copyright (C) MonoGame Foundation, Inc
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
@@ -9,6 +9,9 @@ using MonoGame.Framework.Utilities;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
+    /// <summary>
+    /// Used to set and query shader effects, and to choose techniques.
+    /// </summary>
 	public class Effect : GraphicsResource
     {
         struct MGFXHeader 
@@ -35,10 +38,23 @@ namespace Microsoft.Xna.Framework.Graphics
             public int HeaderSize;
         }
 
+        /// <summary>
+        /// Gets a collection of shader parameters used for this effect.
+        /// </summary>
         public EffectParameterCollection Parameters { get; private set; }
 
+        /// <summary>
+        /// Gets a collection of shader techniques that are defined for this effect.
+        /// </summary>
         public EffectTechniqueCollection Techniques { get; private set; }
 
+        /// <summary>
+        /// Gets or sets the active technique.
+        /// </summary>
+        /// <remarks>
+        /// If there are multiple techiques in an effect and you want to use a new technique in the next pass,
+        /// you must set <b>CurrentTechnique</b> to the new technique before making the rendering pass.
+        /// </remarks>
         public EffectTechnique CurrentTechnique { get; set; }
   
         internal ConstantBuffer[] ConstantBuffers { get; private set; }
@@ -55,7 +71,11 @@ namespace Microsoft.Xna.Framework.Graphics
             }
             this.GraphicsDevice = graphicsDevice;
 		}
-			
+
+        /// <summary>
+        /// Creates a clone of the <see cref="Effect"/>.
+        /// </summary>
+        /// <param name="cloneSource"><see cref="Effect"/> to clone.</param>
 		protected Effect(Effect cloneSource)
             : this(cloneSource.GraphicsDevice)
 		{
@@ -63,12 +83,20 @@ namespace Microsoft.Xna.Framework.Graphics
             Clone(cloneSource);
 		}
 
+        /// <inheritdoc cref="Effect(GraphicsDevice, byte[], int, int)"/>
         public Effect(GraphicsDevice graphicsDevice, byte[] effectCode)
             : this(graphicsDevice, effectCode, 0, effectCode.Length)
         {
         }
 
-
+        /// <summary>
+        /// Creates a new instance of <see cref="Effect"/>.
+        /// </summary>
+        /// <param name="graphicsDevice">Graphics device</param>
+        /// <param name="effectCode">The effect code.</param>
+        /// <param name="index"></param>
+        /// <param name="count"></param>
+        /// <exception cref="ArgumentException">This <paramref name="effectCode"/> is invalid.</exception>
         public Effect (GraphicsDevice graphicsDevice, byte[] effectCode, int index, int count)
             : this(graphicsDevice)
 		{
@@ -101,7 +129,7 @@ namespace Microsoft.Xna.Framework.Graphics
             if (!graphicsDevice.EffectCache.TryGetValue(effectKey, out cloneSource))
             {
                 using (var stream = new MemoryStream(effectCode, index + headerSize, count - headerSize, false))
-            	using (var reader = new BinaryReaderEx(stream))
+            	using (var reader = new BinaryReader(stream))
             {
                 // Create one.
                 cloneSource = new Effect(graphicsDevice);
@@ -128,7 +156,7 @@ namespace Microsoft.Xna.Framework.Graphics
             header.Version = (int)effectCode[index++];
             header.Profile = (int)effectCode[index++];
             header.EffectKey = BitConverter.ToInt32(effectCode, index); index += 4;
-            header.HeaderSize = index;
+            header.HeaderSize = 10;
 
             if (header.Signature != MGFXHeader.MGFXSignature)
                 throw new Exception("This does not appear to be a MonoGame MGFX file!");
@@ -192,10 +220,14 @@ namespace Microsoft.Xna.Framework.Graphics
             return new Effect(this);
 		}
 
+        /// <summary>
+        /// Applies the effect state just prior to rendering the effect.
+        /// </summary>
         protected internal virtual void OnApply()
         {
         }
 
+        /// <inheritdoc cref="IDisposable.Dispose()"/>
         protected override void Dispose(bool disposing)
         {
             if (!IsDisposed)
@@ -224,6 +256,9 @@ namespace Microsoft.Xna.Framework.Graphics
             base.Dispose(disposing);
         }
 
+        /// <summary>
+        /// The GraphicsDevice is resetting, so GPU resources must be recreated.
+        /// </summary>
         internal protected override void GraphicsDeviceResetting()
         {
             for (var i = 0; i < ConstantBuffers.Length; i++)

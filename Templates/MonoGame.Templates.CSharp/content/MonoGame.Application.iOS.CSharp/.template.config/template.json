@@ -1,9 +1,9 @@
 {
     "author": "MonoGame Team",
     "classifications": [
-        "MonoGame"
+        "MonoGame", "Games", "Mobile", "iOS"
     ],
-    "name": "MonoGame iPhone/iPad Application",
+    "name": "MonoGame iOS Application",
     "groupIdentity": "MonoGame.Application.iOS",
     "identity": "MonoGame.Application.iOS.CSharp",
     "shortName": "mgios",
@@ -18,8 +18,17 @@
     ],
     "sourceName": "MGNamespace",
     "preferNameDirectory": "true",
-    "description": "A MonoGame game project for iOS.",
-    "guids": [
-        "CA7AB65C-57DE-412C-AF42-E7E6EDDF2D5F"
+    "description": "A MonoGame game project for iOS compatible with iPhone and iPad devices.",
+    "postActions": [
+        {
+            "description": "Restore NuGet packages required by this project.",
+            "manualInstructions": [
+                {
+                    "text": "Run 'dotnet restore'"
+                }
+            ],
+            "actionId": "210D431B-A78B-4D2F-B762-4ED3E3EA9025",
+            "continueOnError": true
+        }
     ]
 }

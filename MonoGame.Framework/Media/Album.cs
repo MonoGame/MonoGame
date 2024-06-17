@@ -1,4 +1,4 @@
-﻿// MonoGame - Copyright (C) The MonoGame Team
+﻿// MonoGame - Copyright (C) MonoGame Foundation, Inc
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
@@ -18,6 +18,20 @@ using Android.Provider;
 
 namespace Microsoft.Xna.Framework.Media
 {
+    /// <summary>
+    /// Provides access to an album in the media library
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// The <b>Album</b> class provides information about an album, 
+    /// including the album's <see cref="Name"/>, <see cref="Artist"/>, and <see cref="Songs"/>.
+    /// </para>
+    /// <para>
+    /// You can obtain an <b>Album</b> object through the
+    /// <see cref="P:Microsoft.Xna.Framework.Media.AlbumCollection.Item(System.Int32)"/>
+    /// indexer and the <see cref="Song.Album">Song.Album</see> property.
+    /// </para>
+    /// </remarks>
     public sealed class Album : IDisposable
     {
         private Artist artist;
@@ -32,6 +46,12 @@ namespace Microsoft.Xna.Framework.Media
         private Android.Net.Uri thumbnail;
 #endif
 
+        /// <summary>
+        /// Gets the <see cref="Media.Artist"/> of the Album.
+        /// </summary>
+        /// <value>
+        /// <see cref="Media.Artist"/> of this Album.
+        /// </value>
         public Artist Artist
         {
             get
@@ -52,7 +72,7 @@ namespace Microsoft.Xna.Framework.Media
         }
 
         /// <summary>
-        /// Gets the Genre of the Album.
+        /// Gets the <see cref="Media.Genre"/> of the Album.
         /// </summary>
         public Genre Genre
         {
@@ -105,7 +125,7 @@ namespace Microsoft.Xna.Framework.Media
         }
 
         /// <summary>
-        /// Gets a SongCollection that contains the songs on the album.
+        /// Gets a <see cref="Media.SongCollection"/> that contains the songs on the Album.
         /// </summary>
         public SongCollection Songs
         {
@@ -142,9 +162,7 @@ namespace Microsoft.Xna.Framework.Media
         }
 #endif
 
-        /// <summary>
-        /// Immediately releases the unmanaged resources used by this object.
-        /// </summary>
+        /// <inheritdoc cref="IDisposable.Dispose()"/>
         public void Dispose()
         {
 #if WINDOWS_UAP
@@ -154,7 +172,6 @@ namespace Microsoft.Xna.Framework.Media
         }
         
 #if IOS && !TVOS
-        [CLSCompliant(false)]
         public UIImage GetAlbumArt(int width = 0, int height = 0)
         {
             if (width == 0)
@@ -165,7 +182,6 @@ namespace Microsoft.Xna.Framework.Media
 			return this.thumbnail.ImageWithSize(new CGSize(width, height));
         }
 #elif ANDROID
-        [CLSCompliant(false)]
         public Bitmap GetAlbumArt(int width = 0, int height = 0)
         {
             var albumArt = MediaStore.Images.Media.GetBitmap(MediaLibrary.Context.ContentResolver, this.thumbnail);
@@ -193,13 +209,11 @@ namespace Microsoft.Xna.Framework.Media
 #endif
 
 #if IOS && !TVOS
-        [CLSCompliant(false)]
         public UIImage GetThumbnail()
         {
             return this.GetAlbumArt(220, 220);
         }
 #elif ANDROID
-        [CLSCompliant(false)]
         public Bitmap GetThumbnail()
         {
             return this.GetAlbumArt(220, 220);

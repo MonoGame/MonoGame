@@ -1,20 +1,16 @@
-<Project Sdk="MSBuild.Sdk.Extras">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>xamarinios10</TargetFramework>
+    <TargetFramework>net8.0-ios</TargetFramework>
     <DefineConstants>IOS;GLES;STBSHARP_INTERNAL</DefineConstants>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <MGOpenGL>GLES</MGOpenGL>
-    <Description>The MonoGame runtime for iOS which supports iOS Versions 10 and above. </Description>
+    <Description>The MonoGame runtime for iOS amd iPadOS. </Description>
     <PackageTags>monogame;.net core;core;.net standard;standard;ios</PackageTags>
     <PackageId>MonoGame.Framework.iOS</PackageId>
     <AppendTargetFrameworkToOutputPath>False</AppendTargetFrameworkToOutputPath>
+    <SupportedOSPlatformVersion>11.2</SupportedOSPlatformVersion>
   </PropertyGroup>
-
-  <ItemGroup>
-    <Reference Include="System.Runtime.Serialization" />
-    <Reference Include="System.Numerics" />
-  </ItemGroup>
 
   <ItemGroup>
     <Compile Remove="bin\**\*" />
@@ -81,4 +77,3 @@
   <Import Project="Platform\OpenAL.targets" />
   <Import Project="Platform\Microsoft.Devices.Sensors.targets" />
 </Project>
-

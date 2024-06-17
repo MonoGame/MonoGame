@@ -1,7 +1,7 @@
 {
     "author": "MonoGame Team",
     "classifications": [
-        "MonoGame"
+        "MonoGame", "Games", "Library"
     ],
     "name": "MonoGame Shared Library Project",
     "groupIdentity": "MonoGame.Library.Shared",
