@@ -77,15 +77,22 @@ namespace Microsoft.Xna.Framework.Media
 
             if (assetUri != null)
             {
+                // Check if we have a direct asset URI.
                 _androidPlayer.SetDataSource(MediaLibrary.Context, this.assetUri);
+            }
+            else if (_name.StartsWith("file://"))
+            {
+                // Otherwise, check if this is a file URI.
+                _androidPlayer.SetDataSource(_name);
             }
             else
             {
-                var afd = Game.Activity.Assets.OpenFd(_name);
-                if (afd == null)
-                    return;
-
-                _androidPlayer.SetDataSource(afd.FileDescriptor, afd.StartOffset, afd.Length);
+                // Otherwise, assume it's a file path. (This might throw if the file doesn't exist)
+                var afd = Game.Activity?.Assets?.OpenFd(_name);
+                if (afd != null)
+                {
+                	_androidPlayer.SetDataSource(afd.FileDescriptor, afd.StartOffset, afd.Length);
+                }
             }
 
 
