@@ -166,6 +166,30 @@ namespace MonoGame.Tests.Framework
             Assert.AreEqual(null, value2);
         }
 
+        [Test]
+        public void BoundingFrustumRayIntersection()
+        {
+            
+            var testFrustum = new BoundingFrustum(Matrix.Identity);
+            var center = new Vector3(2, 0,0);
+            var direction = new Vector3(-1, 0, 0);
+
+            //simple direct intersection
+            Assert.AreEqual(1.0f,testFrustum.Intersects(new Ray(center, direction)));
+            //inside out intersection
+            Assert.AreEqual(0.0f, testFrustum.Intersects(new Ray(Vector3.Zero, Vector3.One)));
+            //facing opposite direction 
+            Assert.IsNull(testFrustum.Intersects(new Ray(center, -direction)));
+
+            Assert.NotNull(testFrustum.Intersects(new Ray(center, new Vector3(-1, .33f, 0))));
+
+            //Edge Case: Ray is on the surface facing out
+            Assert.AreEqual(0.0f, testFrustum.Intersects(new Ray(Vector3.UnitX, Vector3.UnitX)));
+
+            //Edge Case: Ray is on the surface and parallel to the frustrum
+            Assert.AreEqual(0.0f,testFrustum.Intersects(new Ray(Vector3.UnitX, Vector3.UnitY)));
+        }
+
 #if !XNA
         [Test]
         public void BoundingBoxDeconstruct()
