@@ -355,5 +355,13 @@ namespace Microsoft.Xna.Framework
         {
             return Unsafe.As<System.Numerics.Vector3, Vector3>(ref vector);
         }
+
+        /// <summary>
+        /// Returns a <see cref="Quaternion"/>.
+        /// </summary>
+        public static Quaternion ToNumerics(this System.Numerics.Quaternion quaternion)
+        {
+            return Unsafe.As<System.Numerics.Quaternion, Quaternion>(ref quaternion);
+        }
     }
 }
