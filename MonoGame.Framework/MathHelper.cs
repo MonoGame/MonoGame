@@ -325,7 +325,7 @@ namespace Microsoft.Xna.Framework
         }
 
         /// <summary>
-        /// Returns a <see cref="System.Numerics.Matrix4x4"/>.
+        /// Returns a <see cref="Matrix"/>.
         /// </summary>
         public static Matrix ToMonoGame(this System.Numerics.Matrix4x4 matrix)
         {
