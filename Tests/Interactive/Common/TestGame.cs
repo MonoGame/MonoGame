@@ -68,7 +68,7 @@ namespace MonoGame.InteractiveTests
         protected void OnExit(Universe universe)
         {
             universe.Stop();
-            OnExiting(this, EventArgs.Empty);
+            OnExiting(this, new ExitingEventArgs());
         }
 
         /// <summary>
@@ -141,7 +141,7 @@ namespace MonoGame.InteractiveTests
                 // even past GC we have a problem. Use dotMemory or https://superluminal.eu/dotnet/
                 // to analyze memory problems. Graphics memory is NOT reported here, use the platform
                 // graphics debugger to diagnose those by capturing/debugging frame data.
-                GD.C($" --- Draw : Heap {memInfo.HeapSizeBytes} bytes / " +
+                GD.LogInfo($" --- Draw : Heap {memInfo.HeapSizeBytes} bytes / " +
                      $"commit {memInfo.TotalCommittedBytes} bytes \n" +
                      $"{_fpsLabel.Text}");
                 GraphicsDebug.PrintTimers();
@@ -177,7 +177,7 @@ namespace MonoGame.InteractiveTests
             exitButton.Tapped += (sender, e) =>
             {
                 _universe.Stop();
-                OnExiting(sender, e);
+                OnExiting(sender, new ExitingEventArgs());
             };
 
             _universe.Add(exitButton);

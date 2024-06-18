@@ -31,7 +31,7 @@ namespace MonoGame.InteractiveTests
                 if (test.MatchesPlatform(PlatformInfo.MonoGamePlatform)) { _interactiveTests.Add(test); }
             }
 
-            GameDebug.C($"--Discovered {_interactiveTests.Count} tests.");
+            GameDebug.LogInfo($"--Discovered {_interactiveTests.Count} tests.");
 
             // Also turn on GraphicsDebug messages.
             GraphicsDebug.EnableOutputDebugMessagesToConsole();

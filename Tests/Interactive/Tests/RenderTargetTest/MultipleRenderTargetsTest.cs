@@ -44,7 +44,7 @@ namespace MonoGame.InteractiveTests
             _renderTarget2 = new RenderTarget2D(GraphicsDevice, w, h, false, SurfaceFormat.Color, DepthFormat.None, 0,
                 RenderTargetUsage.PreserveContents);
 
-            GameDebug.C($"-- Render targets created: {_renderTarget1.Width}x{_renderTarget1.Height}");
+            GameDebug.LogInfo($"-- Render targets created: {_renderTarget1.Width}x{_renderTarget1.Height}");
             _batch = new SpriteBatch(GraphicsDevice);
         }
 

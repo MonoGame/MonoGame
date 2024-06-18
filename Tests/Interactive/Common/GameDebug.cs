@@ -7,46 +7,25 @@ using System.Collections.Generic;
 namespace MonoGame.InteractiveTests
 {
     /// <summary>
-    /// Allows tests to output console messages including spammy messages that
-    /// may be throttled.
+    /// Allows tests to output console messages. This is separate from
+    /// GraphicsDebug which is an internal class to MonoGame platform code.
     ///
     /// On various platforms, this may be available via console output or via
-    /// a special console viewer (Console app on Mac; `adb logcat` on Android etc).
+    /// a special console viewer: Console app terminal window output on Mac;
+    /// <code>adb logcat</code> on Android and so on.
     /// </summary>
     public partial class GameDebug
     {
         /// <summary>Output a single console message.</summary>
-        public static void C(string message)
+        public static void LogInfo(string message)
         {
             System.Console.WriteLine($"MGDBG: {message}");
         }
 
         /// <summary>Output an error message to the console.</summary>
-        public static void E(string message)
+        public static void LogError(string message)
         {
             System.Console.WriteLine($"****ERROR*****:MGDBG: {message}");
-        }
-
-        /// <summary>Maintains the spam message counts to prevent spamming the console.</summary>
-        private record MessageCount(int Count)
-        {
-            public int Count { get; set; } = Count;
-        }
-        private static readonly Dictionary<string, MessageCount> MESSAGES_COUNTS_ = new();
-
-        /// <summary>Use this to output spammy messages.</summary>
-        public static void Spam(string message, int maxNumTimes = 10)
-        {
-            if (!MESSAGES_COUNTS_.TryGetValue(message, out var numTimes))
-            {
-                numTimes = new(0);
-                MESSAGES_COUNTS_.Add(message, numTimes);
-            }
-
-            if (numTimes.Count >= maxNumTimes) { return; }
-
-            System.Console.WriteLine($"MGDBG: {message} ...#{numTimes.Count}");
-            numTimes.Count++;
         }
     }
 }
