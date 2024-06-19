@@ -8,10 +8,12 @@ using PVRTexLibNET;
 
 namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 {
+    /// <inheritdoc/>
     public abstract class PvrtcBitmapContent : BitmapContent
     {
         internal byte[] _bitmapData;
 
+        /// <inheritdoc/>
         public PvrtcBitmapContent(int width, int height)
             : base(width, height)
         {
@@ -35,6 +37,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
             return 0;
         }
 
+        /// <inheritdoc/>
         public override byte[] GetPixelData()
         {
             if (_bitmapData == null)
@@ -44,6 +47,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
             return result;
         }
 
+        /// <inheritdoc/>
         public override void SetPixelData(byte[] sourceData)
         {
             var size = GetDataSize();
@@ -54,6 +58,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
             Buffer.BlockCopy(sourceData, 0, _bitmapData, 0, size);
         }
 
+        /// <inheritdoc/>
         protected override bool TryCopyFrom(BitmapContent sourceBitmap, Rectangle sourceRegion, Rectangle destinationRegion)
         {
             SurfaceFormat sourceFormat;
@@ -126,6 +131,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
             return true;
         }
 
+        /// <inheritdoc/>
         protected override bool TryCopyTo(BitmapContent destinationBitmap, Rectangle sourceRegion, Rectangle destinationRegion)
         {
             SurfaceFormat destinationFormat;
