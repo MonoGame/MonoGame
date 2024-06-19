@@ -8,7 +8,9 @@ using PVRTexLibNET;
 
 namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 {
-    /// <inheritdoc/>
+    /// <summary>
+    /// Provides properties and methods for creating and maintaining a compressed bitmap resource.
+    /// </summary>
     public abstract class PvrtcBitmapContent : BitmapContent
     {
         internal byte[] _bitmapData;

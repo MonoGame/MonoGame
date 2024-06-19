@@ -6,9 +6,7 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 {
-    /// <summary>
-    /// Provides properties and methods for creating and maintaining a compressed bitmap resource.
-    /// </summary>
+    /// <inheritdoc/>
     public class PvrtcRgb4BitmapContent : PvrtcBitmapContent
     {
         /// <summary>
