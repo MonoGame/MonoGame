@@ -4,14 +4,35 @@ using System.Globalization;
 
 namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 {
+    /// <summary>
+    /// Provides methods and properties to convert a string to a CharacterRegion object.
+    /// </summary>
 	public class CharacterRegionTypeConverter : TypeConverter
 	{
+        /// <summary>
+        /// Determines if the converter can convert from the specified source type.
+        /// </summary>
+        /// <param name="context">The type descriptor context to use.</param>
+        /// <param name="sourceType">The source type to check.</param>
+        /// <returns><c>true</c> if the converter can convert from the specified source type; otherwise, <c>false</c>.</returns>
 		public override bool CanConvertFrom(ITypeDescriptorContext context, Type sourceType)
 		{
 			return sourceType == typeof(string);
 		}
 
-
+        /// <summary>
+        /// Converts the given input object to a CharacterRegion object.
+        /// </summary>
+        /// <param name="context">The type descriptor context to use.</param>
+        /// <param name="culture">The culture information associated with the conversion.</param>
+        /// <param name="value">The object to be converted, must be a string.</param>
+        /// <returns>A CharacterRegion object representing the input string.</returns>
+        /// <exception cref="ArgumentException">Thrown if the input string is null or empty.</exception>
+        /// <remarks>
+        /// The input string can be in one of the following formats:
+        /// - A single character (eg. "a").
+        /// - A range of characters (eg. "a-z").
+        /// </remarks>
 		public override object ConvertFrom(ITypeDescriptorContext context, CultureInfo culture, object value)
 		{
 			// Input must be a string.
