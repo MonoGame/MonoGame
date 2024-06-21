@@ -151,7 +151,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 
             AlphaMode alphaMode;
             Format outputFormat;
-            var alphaDither = false;
+            // var alphaDither = false; // See below issue #6259
             switch (format)
             {
                 case SurfaceFormat.Dxt1:
@@ -161,7 +161,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
                     PrepareNVTT_DXT1(sourceData, out hasTransparency);
                     outputFormat = hasTransparency ? Format.DXT1a : Format.DXT1;
                     alphaMode = hasTransparency ? AlphaMode.Transparency : AlphaMode.None;
-                    alphaDither = true;
+                    // alphaDither = true; // See below issue #6259
                     break;
                 }
                 case SurfaceFormat.Dxt3:
