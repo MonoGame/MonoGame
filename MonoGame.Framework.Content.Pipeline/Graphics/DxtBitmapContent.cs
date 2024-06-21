@@ -9,6 +9,9 @@ using System.Runtime.InteropServices;
 
 namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 {
+    /// <summary>
+    /// Provides properties and methods for creating and maintaining a Dxt compressed bitmap resource.
+    /// </summary>
     public abstract class DxtBitmapContent : BitmapContent
     {
         private byte[] _bitmapData;
@@ -17,6 +20,10 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 
         private int _nvttWriteOffset;
 
+        /// <summary>
+        /// Creates an instance of DxtBitmapContent with the block size
+        /// </summary>
+        /// <param name="blockSize">The blockSize of the bitmap.</param>
         protected DxtBitmapContent(int blockSize)
         {
             if (!((blockSize == 8) || (blockSize == 16)))
@@ -25,6 +32,12 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
             TryGetFormat(out _format);
         }
 
+        /// <summary>
+        /// Creates an instance of DxtBitmapContent with the specified block size, width and height.
+        /// </summary>
+        /// <param name="blockSize">The blockSize of the bitmap.</param>
+        /// <param name="width">The width in pixels of the bitmap.</param>
+        /// <param name="height">The height in pixels of the bitmap.</param>
         protected DxtBitmapContent(int blockSize, int width, int height)
             : this(blockSize)
         {
@@ -32,11 +45,13 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
             Height = height;
         }
 
+        /// <inheritdoc />
         public override byte[] GetPixelData()
         {
             return _bitmapData;
         }
 
+        /// <inheritdoc/>
         public override void SetPixelData(byte[] sourceData)
         {
             _bitmapData = sourceData;
@@ -58,7 +73,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
         private void NvttEndImage()
         {
         }
-        
+
         private static void PrepareNVTT(byte[] data)
         {
             for (var x = 0; x < data.Length; x += 4)
@@ -90,6 +105,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
             }
         }
 
+        /// <inheritdoc/>
         protected override bool TryCopyFrom(BitmapContent sourceBitmap, Rectangle sourceRegion, Rectangle destinationRegion)
         {
             SurfaceFormat sourceFormat;
@@ -208,6 +224,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
             return true;
         }
 
+        /// <inheritdoc/>
         protected override bool TryCopyTo(BitmapContent destinationBitmap, Rectangle sourceRegion, Rectangle destinationRegion)
         {
             SurfaceFormat destinationFormat;
