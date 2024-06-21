@@ -4,14 +4,24 @@ using System.Collections.Generic;
 
 namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 {
-	// Describes a range of consecutive characters that should be included in the font.
+	/// <summary>
+	/// Describes a range of consecutive characters that should be included in the font.
+	/// </summary>
 	[TypeConverter(typeof(CharacterRegionTypeConverter))]
 	public struct CharacterRegion
 	{
+        /// <summary>
+        /// Represents the first character in the region.
+        /// </summary>
 	    public char Start;
+        /// <summary>
+        /// Represents the last character in the region.
+        /// </summary>
 	    public char End;
 
-		// Enumerates all characters within the region.        
+		/// <summary>
+		///  Enumerates all characters within the region.
+		/// </summary>
 	    public IEnumerable<Char> Characters()
 	    {
 	        for (var c = Start; c <= End; c++)
@@ -20,7 +30,12 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 	        }
 	    }
 
-	    // Constructor.
+	    /// <summary>
+	    /// Creates a new CharacterRegion instance.
+	    /// </summary>
+	    /// <param name="start">First <c>char</c> of the region.</param>
+	    /// <param name="end">Last <c>char</c> of the region.</param>
+	    /// <exception cref="ArgumentException">Thrown if the first character is after the last character.</exception>
         public CharacterRegion(char start, char end)
         {
             if (start > end)
@@ -29,8 +44,10 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
             Start = start;
             End = end;
         }
-		
-		// Default to just the base ASCII character set.
+
+		/// <summary>
+		/// Default to just the base ASCII character set.
+		/// </summary>
 		public static CharacterRegion Default = new CharacterRegion(' ', '~');
 
 
@@ -45,7 +62,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 			return source.GetEnumerator().MoveNext();
 		}
 
-		
+
 		/// <summary>
 		/// Select elements from an enumeration.
 		/// </summary>
