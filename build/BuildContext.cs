@@ -7,7 +7,8 @@ public enum ProjectType
     Tools,
     Templates,
     ContentPipeline,
-    MGCBEditor
+    MGCBEditor,
+    MGCBEditorLauncher
 }
 
 public class BuildContext : FrostingContext
@@ -126,6 +127,7 @@ public class BuildContext : FrostingContext
         ProjectType.Templates => $"Templates/{id}/{id}.csproj",
         ProjectType.ContentPipeline => "MonoGame.Framework.Content.Pipeline/MonoGame.Framework.Content.Pipeline.csproj",
         ProjectType.MGCBEditor => $"Tools/MonoGame.Content.Builder.Editor/MonoGame.Content.Builder.Editor.{id}.csproj",
+		ProjectType.MGCBEditorLauncher => $"Tools/MonoGame.Content.Builder.Editor.Launcher/MonoGame.Content.Builder.Editor.Launcher.{id}.csproj",
         _ => throw new ArgumentOutOfRangeException(nameof(type))
     };
 
