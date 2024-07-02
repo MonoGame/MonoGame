@@ -56,17 +56,26 @@ namespace Microsoft.Xna.Framework.Graphics
             PlatformConstruct();
 		}
 
-        /// <inheritdoc cref="VertexBuffer(GraphicsDevice, VertexDeclaration, int, BufferUsage, bool)"/>
+        /// <summary>
+        /// Creates a new instance of <see cref="VertexBuffer"/>
+        /// </summary>
+        /// <param name="graphicsDevice">The graphics device.</param>
+        /// <param name="vertexDeclaration">The vertex declaration, which describes per-vertex data.</param>
+        /// <param name="vertexCount">The number of vertices.</param>
+        /// <param name="bufferUsage">Behavior options.</param>
+        /// <exception cref="ArgumentNullException"><paramref name="graphicsDevice"/> is <see langword="null"/></exception>
         public VertexBuffer(GraphicsDevice graphicsDevice, VertexDeclaration vertexDeclaration, int vertexCount, BufferUsage bufferUsage) :
 			this(graphicsDevice, vertexDeclaration, vertexCount, bufferUsage, false)
         {
         }
 
-        /// <inheritdoc cref="VertexBuffer(GraphicsDevice, VertexDeclaration, int, BufferUsage, bool)"/>
-        /// <param name="graphicsDevice"/>
-        /// <param name="type">The data type.</param>
-        /// <param name="vertexCount"/>
-        /// <param name="bufferUsage"/>
+        /// <summary>
+        /// Creates a new instance of <see cref="VertexBuffer"/>
+        /// </summary>
+        /// <param name="graphicsDevice">The graphics device.</param>
+        /// <param name="vertexCount">The number of vertices.</param>
+        /// <param name="bufferUsage">Behavior options.</param>
+        /// <exception cref="ArgumentNullException"><paramref name="graphicsDevice"/> is <see langword="null"/></exception>
         public VertexBuffer(GraphicsDevice graphicsDevice, Type type, int vertexCount, BufferUsage bufferUsage) :
 			this(graphicsDevice, VertexDeclaration.FromType(type), vertexCount, bufferUsage, false)
 		{
@@ -98,7 +107,7 @@ namespace Microsoft.Xna.Framework.Graphics
         /// <remarks>
         /// <p>Using this operation it is easy to get certain vertex elements from a VertexBuffer.</p>
         /// <p>
-        /// For example to get the texture coordinates from a VertexBuffer of <see cref="VertexPositionTexture"/> you can call 
+        /// For example to get the texture coordinates from a VertexBuffer of <see cref="VertexPositionTexture"/> you can call
         /// GetData(4 * 3, data, elementCount, 20). 'data'should be an array of <see cref="Vector2"/> in this example.
         /// The offsetInBytes is the number of bytes taken up by the <see cref="VertexPositionTexture.Position"/> of the vertex.
         /// For vertexStride we pass the size of a <see cref="VertexPositionTexture"/>.
@@ -150,14 +159,14 @@ namespace Microsoft.Xna.Framework.Graphics
         /// <param name="startIndex">Index at which to start copying from <paramref name="data"/>.
         /// Must be within the <paramref name="data"/> array bounds.</param>
         /// <param name="elementCount">Number of elements to copy from <paramref name="data"/>.
-        /// The combination of <paramref name="startIndex"/> and <paramref name="elementCount"/> 
+        /// The combination of <paramref name="startIndex"/> and <paramref name="elementCount"/>
         /// must be within the <paramref name="data"/> array bounds.</param>
-        /// <param name="vertexStride">Specifies how far apart, in bytes, elements from <paramref name="data"/> should be when 
+        /// <param name="vertexStride">Specifies how far apart, in bytes, elements from <paramref name="data"/> should be when
         /// they are copied into the vertex buffer.
         /// In almost all cases this should be <c>sizeof(T)</c>, to create a tightly-packed vertex buffer.
-        /// If you specify <c>sizeof(T)</c>, elements from <paramref name="data"/> will be copied into the 
+        /// If you specify <c>sizeof(T)</c>, elements from <paramref name="data"/> will be copied into the
         /// vertex buffer with no padding between each element.
-        /// If you specify a value greater than <c>sizeof(T)</c>, elements from <paramref name="data"/> will be copied 
+        /// If you specify a value greater than <c>sizeof(T)</c>, elements from <paramref name="data"/> will be copied
         /// into the vertex buffer with padding between each element.
         /// If you specify <c>0</c> for this parameter, it will be treated as if you had specified <c>sizeof(T)</c>.
         /// With the exception of <c>0</c>, you must specify a value greater than or equal to <c>sizeof(T)</c>.</param>
@@ -168,7 +177,7 @@ namespace Microsoft.Xna.Framework.Graphics
         /// Vector3[] positions = new Vector3[numVertices];
         /// vertexBuffer.SetData(0, positions, 0, numVertices, vertexBuffer.VertexDeclaration.VertexStride);
         /// </code>
-        /// 
+        ///
         /// Continuing from the previous example, if you want to set only the texture coordinate component of the vertex data,
         /// you would call this method as follows (note that <paramref name="offsetInBytes"/> is 12, the size of a Vector3,
         /// representing the position):
@@ -189,7 +198,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
         /// <summary>
         /// Sets the vertex buffer data, specifying the index at which to start copying from the source data array,
-        /// and the number of elements to copy from the source data array. This is the same as calling 
+        /// and the number of elements to copy from the source data array. This is the same as calling
         /// <see cref="SetData{T}(int, T[], int, int, int)"/>  with <c>offsetInBytes</c> equal to <c>0</c>,
         /// and <c>vertexStride</c> equal to <c>sizeof(T)</c>.
         /// </summary>
@@ -198,7 +207,7 @@ namespace Microsoft.Xna.Framework.Graphics
         /// <param name="startIndex">Index at which to start copying from <paramref name="data"/>.
         /// Must be within the <paramref name="data"/> array bounds.</param>
         /// <param name="elementCount">Number of elements to copy from <paramref name="data"/>.
-        /// The combination of <paramref name="startIndex"/> and <paramref name="elementCount"/> 
+        /// The combination of <paramref name="startIndex"/> and <paramref name="elementCount"/>
         /// must be within the <paramref name="data"/> array bounds.</param>
 		public void SetData<T>(T[] data, int startIndex, int elementCount) where T : struct
         {
@@ -207,8 +216,8 @@ namespace Microsoft.Xna.Framework.Graphics
 		}
 
         /// <summary>
-        /// Sets the vertex buffer data. This is the same as calling <see cref="SetData{T}(int, T[], int, int, int)"/> 
-        /// with <c>offsetInBytes</c> and <c>startIndex</c> equal to <c>0</c>, <c>elementCount</c> equal to <c>data.Length</c>, 
+        /// Sets the vertex buffer data. This is the same as calling <see cref="SetData{T}(int, T[], int, int, int)"/>
+        /// with <c>offsetInBytes</c> and <c>startIndex</c> equal to <c>0</c>, <c>elementCount</c> equal to <c>data.Length</c>,
         /// and <c>vertexStride</c> equal to <c>sizeof(T)</c>.
         /// </summary>
         /// <typeparam name="T">Type of elements in the data array.</typeparam>
@@ -240,7 +249,7 @@ namespace Microsoft.Xna.Framework.Graphics
             if (elementCount > 1 && (elementCount * vertexStride > bufferSize))
                 throw new InvalidOperationException("The vertex stride is larger than the vertex buffer.");
             if (vertexStride < elementSizeInBytes)
-                throw new ArgumentOutOfRangeException("The vertex stride must be greater than or equal to the size of the specified data (" + elementSizeInBytes + ").");            
+                throw new ArgumentOutOfRangeException("The vertex stride must be greater than or equal to the size of the specified data (" + elementSizeInBytes + ").");
 
             PlatformSetData<T>(offsetInBytes, data, startIndex, elementCount, vertexStride, options, bufferSize, elementSizeInBytes);
         }
