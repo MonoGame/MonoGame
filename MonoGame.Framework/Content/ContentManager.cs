@@ -406,8 +406,7 @@ namespace Microsoft.Xna.Framework.Content
 			{
 				throw new ContentLoadException("The directory was not found.", directoryNotFound);
 			}
-
-S			catch (Exception exception)
+			catch (Exception exception)
 			{
 				throw new ContentLoadException("Opening stream error.", exception);
 			}
