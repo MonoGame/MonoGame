@@ -11,11 +11,6 @@ using MonoGame.Framework.Utilities;
 using Microsoft.Xna.Framework.Graphics;
 using System.Globalization;
 
-#if !WINDOWS_UAP
-using Microsoft.Xna.Framework.Audio;
-using Microsoft.Xna.Framework.Media;
-#endif
-
 namespace Microsoft.Xna.Framework.Content
 {
     /// <summary>
@@ -406,13 +401,13 @@ namespace Microsoft.Xna.Framework.Content
 			{
 				throw new ContentLoadException("The content file was not found.", fileNotFound);
 			}
-#if !WINDOWS_UAP
+
 			catch (DirectoryNotFoundException directoryNotFound)
 			{
 				throw new ContentLoadException("The directory was not found.", directoryNotFound);
 			}
-#endif
-			catch (Exception exception)
+
+S			catch (Exception exception)
 			{
 				throw new ContentLoadException("Opening stream error.", exception);
 			}

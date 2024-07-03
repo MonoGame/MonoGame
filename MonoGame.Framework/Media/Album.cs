@@ -4,9 +4,7 @@
 
 using System;
 using System.IO;
-#if WINDOWS_UAP
-using Windows.Storage.FileProperties;
-#elif IOS
+#if IOS
 using System.Drawing;
 using CoreGraphics;
 using MediaPlayer;
@@ -38,9 +36,7 @@ namespace Microsoft.Xna.Framework.Media
         private Genre genre;
         private string album;
         private SongCollection songCollection;
-#if WINDOWS_UAP
-        private StorageItemThumbnail thumbnail;
-#elif IOS && !TVOS
+#if IOS && !TVOS
         private MPMediaItemArtwork thumbnail;
 #elif ANDROID
         private Android.Net.Uri thumbnail;
@@ -89,9 +85,7 @@ namespace Microsoft.Xna.Framework.Media
         {
             get
             {
-#if WINDOWS_UAP
-                return this.thumbnail != null;
-#elif IOS && !TVOS
+#if IOS && !TVOS
                 // If album art is missing the bounds will be: Infinity, Infinity, 0, 0
                 return this.thumbnail != null && this.thumbnail.Bounds.Width != 0;
 #elif ANDROID
@@ -142,13 +136,7 @@ namespace Microsoft.Xna.Framework.Media
             this.artist = artist;
             this.genre = genre;
         }
-#if WINDOWS_UAP
-        internal Album(SongCollection songCollection, string name, Artist artist, Genre genre, StorageItemThumbnail thumbnail)
-            : this(songCollection, name, artist, genre)
-        {
-            this.thumbnail = thumbnail;
-        }
-#elif IOS && !TVOS
+#if IOS && !TVOS
         internal Album(SongCollection songCollection, string name, Artist artist, Genre genre, MPMediaItemArtwork thumbnail)
             : this(songCollection, name, artist, genre)
         {
@@ -164,12 +152,7 @@ namespace Microsoft.Xna.Framework.Media
 
         /// <inheritdoc cref="IDisposable.Dispose()"/>
         public void Dispose()
-        {
-#if WINDOWS_UAP
-            if (this.thumbnail != null)
-                this.thumbnail.Dispose();
-#endif
-        }
+        { }
         
 #if IOS && !TVOS
         public UIImage GetAlbumArt(int width = 0, int height = 0)
@@ -198,13 +181,7 @@ namespace Microsoft.Xna.Framework.Media
         /// </summary>
         public Stream GetAlbumArt()
         {
-#if WINDOWS_UAP
-            if (this.HasArt)
-                return this.thumbnail.AsStream();
-            return null;
-#else
             throw new NotImplementedException();
-#endif
         }
 #endif
 
@@ -224,14 +201,7 @@ namespace Microsoft.Xna.Framework.Media
         /// </summary>
         public Stream GetThumbnail()
         {
-#if WINDOWS_UAP
-            if (this.HasArt)
-                return this.thumbnail.AsStream();
-
-            return null;
-#else
             throw new NotImplementedException();
-#endif
         }
 #endif
 

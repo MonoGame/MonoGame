@@ -392,7 +392,6 @@ internal static class Sdl
             UiKit,
             Wayland,
             Mir,
-            WinRt,
             Android
         }
 
