@@ -3,6 +3,7 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System;
+using System.Buffers;
 using System.IO;
 using System.Runtime.InteropServices;
 using MonoGame.Framework.Utilities;
@@ -251,7 +252,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 // Note: for compressed format Format.GetSize() returns the size of a 4x4 block
                 var pixelToT = Format.GetSize() / tSizeInByte;
                 var tFullWidth = Math.Max(this.width >> level, 1) / 4 * pixelToT;
-                var temp = GetDataPool<T>.GetArray(Math.Max(this.height >> level, 1) / 4 * tFullWidth);
+                var temp = GetDataPool<T>.pool.Rent(Math.Max(this.height >> level, 1) / 4 * tFullWidth);
                 GL.GetCompressedTexImage(TextureTarget.Texture2D, level, temp);
                 GraphicsExtensions.CheckGLError();
 
@@ -263,12 +264,13 @@ namespace Microsoft.Xna.Framework.Graphics
                     var dataStart = startIndex + r * tRectWidth;
                     Array.Copy(temp, tempStart, data, dataStart, tRectWidth);
                 }
+                GetDataPool<T>.pool.Return(temp);
             }
             else
             {
                 // we need to convert from our format size to the size of T here
                 var tFullWidth = Math.Max(this.width >> level, 1) * Format.GetSize() / tSizeInByte;
-                var temp = GetDataPool<T>.GetArray(Math.Max(this.height >> level, 1) * tFullWidth);
+                var temp = GetDataPool<T>.pool.Rent(Math.Max(this.height >> level, 1) * tFullWidth);
                 GL.GetTexImage(TextureTarget.Texture2D, level, glFormat, glType, temp);
                 GraphicsExtensions.CheckGLError();
 
@@ -281,6 +283,7 @@ namespace Microsoft.Xna.Framework.Graphics
                     var dataStart = startIndex + r * tRectWidth;
                     Array.Copy(temp, tempStart, data, dataStart, tRectWidth);
                 }
+                GetDataPool<T>.pool.Return(temp);
             }
 #endif
         }
@@ -506,14 +509,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
         static class GetDataPool<T> where T : struct
         {
-            private static (int length, T[] cache) cached = (0, []);
-
-            public static T[] GetArray(int length)
-            {
-                if (length > cached.length)
-                    cached = (length, new T[length]);
-                return cached.cache;
-            }
+            public static ArrayPool<T> pool = ArrayPool<T>.Create(4096 * 4096, 1);
         }
     }
 }
