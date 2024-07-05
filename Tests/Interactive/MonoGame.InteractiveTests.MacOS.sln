@@ -5,8 +5,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MouseGetStateAndIsMouseVisi
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MonoGame.Framework.MacOS", "..\..\MonoGame.Framework\MonoGame.Framework.MacOS.csproj", "{36C538E6-C32A-4A8D-A39C-566173D7118E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lidgren.Network.MacOS", "..\..\ThirdParty\Lidgren.Network\Lidgren.Network.MacOS.csproj", "{5C3DC4FF-FE5A-4B94-B4A6-6F79E63F3130}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GamePadTest", "MacOS\GamePadTest\GamePadTest.csproj", "{E251B0C1-ED74-4210-A0D5-9E4710FEA61F}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PrimitivesTest", "MacOS\PrimitivesTest\PrimitivesTest.csproj", "{9704681E-C6DB-4946-9F31-0EF9BE63090A}"
