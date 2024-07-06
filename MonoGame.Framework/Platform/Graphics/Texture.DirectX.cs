@@ -50,6 +50,7 @@ namespace Microsoft.Xna.Framework.Graphics
             SharpDX.Utilities.Dispose(ref _texture);
         }
 
+        /// <summary />
         protected override void Dispose(bool disposing)
         {
             if (disposing)

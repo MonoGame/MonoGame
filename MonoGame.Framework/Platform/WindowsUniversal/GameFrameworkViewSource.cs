@@ -20,7 +20,6 @@ namespace MonoGame.Framework
             this._gameConstructorCustomizationDelegate = gameConstructorCustomizationDelegate;
         }
 
-        [CLSCompliant(false)]
         public IFrameworkView CreateView()
         {
             return new UAPFrameworkView<T>(_gameConstructorCustomizationDelegate);

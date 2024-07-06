@@ -22,7 +22,7 @@ namespace Microsoft.Xna.Framework.Graphics
             };
             _query = new Query(GraphicsDevice._d3dDevice, queryDescription);
         }
-        
+
         private void PlatformBegin()
         {
             var d3dContext = GraphicsDevice._d3dContext;
@@ -50,6 +50,7 @@ namespace Microsoft.Xna.Framework.Graphics
             return isComplete;
         }
 
+        /// <summary />
         protected override void Dispose(bool disposing)
         {
             if (!IsDisposed)

@@ -18,6 +18,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
     [ContentProcessor(DisplayName = "Effect - MonoGame")]
     public class EffectProcessor : ContentProcessor<EffectContent, CompiledEffectContent>
     {
+        private static readonly Regex errorOrWarning = new(@"(.*)\((\d*,\d*(?>,\d*,\d*)?)\):\s*(.*)", RegexOptions.Compiled);
         EffectProcessorDebugMode debugMode;
         string defines;
 
@@ -109,21 +110,20 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
             var errorsAndWarningArray = shaderErrorsAndWarnings.Split(new[] { "\n", "\r", Environment.NewLine },
                                                                       StringSplitOptions.RemoveEmptyEntries);
 
-            var errorOrWarning = new Regex(@"(.*)\(([0-9]*(,[0-9]+(-[0-9]+)?)?)\)\s*:\s*(.*)", RegexOptions.Compiled);
             ContentIdentity identity = null;
-            var allErrorsAndWarnings = string.Empty;
+            var allErrorsAndWarnings = new System.Text.StringBuilder();
 
             // Process all the lines.
-            for (var i = 0; i < errorsAndWarningArray.Length; i++)
+            foreach (var errorOrWarningLine in errorsAndWarningArray)
             {
-                var match = errorOrWarning.Match(errorsAndWarningArray[i]);
+                var match = errorOrWarning.Match(errorOrWarningLine);
                 if (!match.Success || match.Groups.Count != 4)
                 {
                     // Just log anything we don't recognize as a warning.
                     if (buildFailed)
-                        allErrorsAndWarnings += errorsAndWarningArray[i] + Environment.NewLine;
+                        allErrorsAndWarnings.AppendLine(errorOrWarningLine);
                     else
-                        context.Logger.LogWarning(string.Empty, input.Identity, errorsAndWarningArray[i]);
+                        context.Logger.LogWarning(string.Empty, input.Identity, errorOrWarningLine);
 
                     continue;
                 }
@@ -141,27 +141,26 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
                     fileName = Path.Combine(folder, fileName);
                 }
 
+                var newIdentity = new ContentIdentity(fileName, input.Identity.SourceTool, lineAndColumn);
+
                 // If we got an exception then we'll be throwing an exception 
                 // below, so just gather the lines to throw later.
                 if (buildFailed)
                 {
                     if (identity == null)
                     {
-                        identity = new ContentIdentity(fileName, input.Identity.SourceTool, lineAndColumn);
-                        allErrorsAndWarnings = errorsAndWarningArray[i] + Environment.NewLine;
+                        identity = newIdentity;
+                        allErrorsAndWarnings.AppendLine(message);
                     }
                     else
-                        allErrorsAndWarnings += errorsAndWarningArray[i] + Environment.NewLine;
+                        allErrorsAndWarnings.AppendLine(errorOrWarningLine);
                 }
                 else
-                {
-                    identity = new ContentIdentity(fileName, input.Identity.SourceTool, lineAndColumn);
-                    context.Logger.LogWarning(string.Empty, identity, message, string.Empty);
-                }
+                    context.Logger.LogWarning(string.Empty, newIdentity, message);
             }
 
             if (buildFailed)
-                throw new InvalidContentException(allErrorsAndWarnings, identity ?? input.Identity);
+                throw new InvalidContentException(allErrorsAndWarnings.ToString(), identity ?? input.Identity);
         }
     }
 }

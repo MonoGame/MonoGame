@@ -17,8 +17,14 @@ namespace MonoGame.Content.Builder
         [CommandLineParameter(
             Name = "launchdebugger",
             Flag = "d",
-            Description = "Wait for debugger to attach before building content.")]
+            Description = "Launch the debugger before building content.")]
         public bool LaunchDebugger = false;
+
+        [CommandLineParameter(
+            Name = "waitfordebugger",
+            Flag = "a",
+            Description = "Wait for debugger to attach before building content.")]
+        public bool WaitForDebuggerToAttach = false;
 
         [CommandLineParameter(
             Name = "quiet",
@@ -299,7 +305,7 @@ namespace MonoGame.Content.Builder
 
             // If the intent is to debug build, break at the original location
             // of any exception, eg, within the actual importer/processor.
-            if (LaunchDebugger)
+            if (LaunchDebugger || WaitForDebuggerToAttach)
                 _manager.RethrowExceptions = false;
 
             // Feed all the assembly references to the pipeline manager
@@ -450,10 +456,13 @@ namespace MonoGame.Content.Builder
                         var dstTime = File.GetLastWriteTimeUtc(dest);
                         if (srcTime <= dstTime)
                         {
-                            if (string.IsNullOrEmpty(c.Link))
-                                Console.WriteLine("Skipping {0}", c.SourceFile);
-                            else
-                                Console.WriteLine("Skipping {0} => {1}", c.SourceFile, c.Link);
+                            if (!Quiet)
+                            {
+                                if (string.IsNullOrEmpty(c.Link))
+                                    Console.WriteLine("Skipping {0}", c.SourceFile);
+                                else
+                                    Console.WriteLine("Skipping {0} => {1}", c.SourceFile, c.Link);
+                            }
 
                             // Copy the stats from the previous stats collection.
                             _manager.ContentStats.CopyPreviousStats(c.SourceFile);
@@ -477,10 +486,13 @@ namespace MonoGame.Content.Builder
 
                     var buildTime = DateTime.UtcNow - startTime;
 
-                    if (string.IsNullOrEmpty(c.Link))
-                        Console.WriteLine("{0}", c.SourceFile);
-                    else
-                        Console.WriteLine("{0} => {1}", c.SourceFile, c.Link);
+                    if (!Quiet)
+                    {
+                        if (string.IsNullOrEmpty(c.Link))
+                            Console.WriteLine("{0}", c.SourceFile);
+                        else
+                            Console.WriteLine("{0} => {1}", c.SourceFile, c.Link);
+                    }
 
                     // Record content stats on the copy.
                     _manager.ContentStats.RecordStats(c.SourceFile, dest, "CopyItem", typeof(File), (float)buildTime.TotalSeconds);

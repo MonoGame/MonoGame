@@ -177,7 +177,6 @@ namespace Microsoft.Xna.Framework
         #region Properties
 
 #if ANDROID
-        [CLSCompliant(false)]
         public static AndroidGameActivity Activity { get; internal set; }
 #endif
         private static Game _instance = null;
@@ -380,10 +379,9 @@ namespace Microsoft.Xna.Framework
         /// <summary>
         /// Raised when this game is exiting.
         /// </summary>
-        public event EventHandler<EventArgs> Exiting;
+        public event EventHandler<ExitingEventArgs> Exiting;
 
 #if WINDOWS_UAP
-        [CLSCompliant(false)]
         public ApplicationExecutionState PreviousExecutionState { get; internal set; }
 #endif
 
@@ -495,8 +493,6 @@ namespace Microsoft.Xna.Framework
                 DoUpdate(new GameTime());
 
                 Platform.RunLoop();
-                EndRun();
-				DoExiting();
                 break;
             default:
                 throw new ArgumentException(string.Format(
@@ -631,8 +627,18 @@ namespace Microsoft.Xna.Framework
 
             if (_shouldExit)
             {
-                Platform.Exit();
-                _shouldExit = false; //prevents perpetual exiting on platforms supporting resume.
+                var exitingEventArgs = new ExitingEventArgs();
+
+                OnExiting(this, exitingEventArgs);
+
+                if (!exitingEventArgs.Cancel)
+                {
+                    Platform.Exit();
+                    EndRun();
+                    UnloadContent();
+                }
+
+                _shouldExit = false;
             }
         }
 
@@ -743,7 +749,7 @@ namespace Microsoft.Xna.Framework
         /// </summary>
         /// <param name="sender">This <see cref="Game"/>.</param>
         /// <param name="args">The arguments to the <see cref="Exiting"/> event.</param>
-        protected virtual void OnExiting(object sender, EventArgs args)
+        protected virtual void OnExiting(object sender, ExitingEventArgs args)
         {
             EventHelpers.Raise(sender, Exiting, args);
         }
@@ -795,8 +801,6 @@ namespace Microsoft.Xna.Framework
 
             var platform = (GamePlatform)sender;
             platform.AsyncRunLoopEnded -= Platform_AsyncRunLoopEnded;
-            EndRun();
-			DoExiting();
         }
 
         #endregion Event Handlers
@@ -870,12 +874,6 @@ namespace Microsoft.Xna.Framework
             _components.ComponentAdded += Components_ComponentAdded;
             _components.ComponentRemoved += Components_ComponentRemoved;
         }
-
-		internal void DoExiting()
-		{
-			OnExiting(this, EventArgs.Empty);
-			UnloadContent();
-		}
 
         #endregion Internal Methods
 

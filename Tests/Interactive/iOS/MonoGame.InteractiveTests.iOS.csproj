@@ -90,10 +90,6 @@
     <Folder Include="Content\Textures\" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\ThirdParty\Lidgren.Network\Lidgren.Network.iOS.csproj">
-      <Project>{734EAA48-F1CA-481A-B391-0285BC0E8B40}</Project>
-      <Name>Lidgren.Network.iOS</Name>
-    </ProjectReference>
     <ProjectReference Include="..\..\..\MonoGame.Framework\MonoGame.Framework.iOS.csproj">
       <Project>{DB8508BB-9849-4CC2-BC0F-8EB5DACB3C47}</Project>
       <Name>MonoGame.Framework.iOS</Name>

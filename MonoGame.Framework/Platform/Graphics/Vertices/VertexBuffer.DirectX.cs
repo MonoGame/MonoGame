@@ -211,6 +211,7 @@ namespace Microsoft.Xna.Framework.Graphics
             }
         }
 
+        /// <summary /
         protected override void Dispose(bool disposing)
         {
             if (disposing)

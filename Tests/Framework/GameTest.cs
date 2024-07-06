@@ -279,7 +279,7 @@ namespace MonoGame.Tests {
 
                 protected override void OnActivated(object sender, EventArgs args) { ActivatedCount++; base.OnActivated(sender, args); }
                 protected override void OnDeactivated(object sender, EventArgs args) { DeactivatedCount++; base.OnDeactivated(sender, args); }
-                protected override void OnExiting(object sender, EventArgs args) { ExitingCount++; base.OnExiting(sender, args); }
+                protected override void OnExiting(object sender, ExitingEventArgs args) { ExitingCount++; base.OnExiting(sender, args); }
                 protected override void Dispose(bool disposing) { DisposeCount++; base.Dispose(disposing); }
             }
 

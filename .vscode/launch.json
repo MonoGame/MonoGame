@@ -25,6 +25,20 @@
             "cwd": "${workspaceFolder}/Artifacts/MonoGame.Content.Builder.Editor/Mac/Debug",
             "console": "internalConsole",
             "stopAtEntry": false
+        },
+        {
+            "name": "Attach to Process",
+            "type": "coreclr",
+            "request": "attach",
+            "processId": "${input.processid}",
+        }
+    ],
+    "inputs": [
+        {
+            "id": "processid",
+            "type": "promptString",
+            "default": "0",
+            "description": "Enter Process Id of process to attach to."
         }
     ]
 }

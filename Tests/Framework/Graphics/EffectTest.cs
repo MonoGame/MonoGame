@@ -11,6 +11,17 @@ namespace MonoGame.Tests.Graphics
     [TestFixture]
     internal class EffectTest : GraphicsDeviceTestFixtureBase
     {
+        [Test]
+        public void EffectConstructorShouldAllowIndexAndCount()
+        {
+            byte[] mgfxo = EffectResource.BasicEffect.Bytecode;
+            var index = 100000;
+            var byteArray = new byte[index + mgfxo.Length];
+            mgfxo.CopyTo(byteArray, index);
+            Effect effect = null;
+            Assert.DoesNotThrow(() => { effect = new Effect(game.GraphicsDevice, byteArray, index, mgfxo.Length); });
+            effect.Dispose();
+        }
 
         [Test]
         public void EffectPassShouldSetTexture()

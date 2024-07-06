@@ -248,7 +248,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
         /// <summary>
         /// The rendering information for debugging and profiling.
-        /// The metrics are reset every frame after draw within <see cref="GraphicsDevice.Present"/>. 
+        /// The metrics are reset every frame after draw within <see cref="GraphicsDevice.Present"/>.
         /// </summary>
         public GraphicsMetrics Metrics { get { return _graphicsMetrics; } set { _graphicsMetrics = value; } }
 
@@ -621,9 +621,11 @@ namespace Microsoft.Xna.Framework.Graphics
             }
         }
 
-        /// <inheritdoc cref="Clear(Color)"/>
-        /// <param name="color">Set this color value in all buffers.</param>
+        /// <summary>
+        /// Clears resource buffers.
+        /// </summary>
         /// <param name="options">Options for clearing a buffer.</param>
+        /// <param name="color">Set this color value in all buffers.</param>
         /// <param name="depth">Set this depth value in the buffer.</param>
         /// <param name="stencil">Set this stencil value in the buffer.</param>
         public void Clear(ClearOptions options, Color color, float depth, int stencil)
@@ -636,7 +638,13 @@ namespace Microsoft.Xna.Framework.Graphics
             }
         }
 
-        /// <inheritdoc cref="Clear(ClearOptions, Color, float, int)"/>
+        /// <summary>
+        /// Clears resource buffers.
+        /// </summary>
+        /// <param name="options">Options for clearing a buffer.</param>
+        /// <param name="color">Set this color value in all buffers.</param>
+        /// <param name="depth">Set this depth value in the buffer.</param>
+        /// <param name="stencil">Set this stencil value in the buffer.</param>
         public void Clear(ClearOptions options, Vector4 color, float depth, int stencil)
 		{
             PlatformClear(options, color, depth, stencil);
@@ -754,7 +762,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
             // Update the back buffer.
             OnPresentationChanged();
-            
+
             EventHelpers.Raise(this, PresentationChanged, new PresentationEventArgs(PresentationParameters));
             EventHelpers.Raise(this, DeviceReset, EventArgs.Empty);
        }
@@ -915,8 +923,13 @@ namespace Microsoft.Xna.Framework.Graphics
 			}
 		}
 
-        /// <inheritdoc cref="SetRenderTarget(RenderTarget2D)"/>
-        /// <param name="renderTarget"/>
+        /// <summary>
+        /// Sets a new render target for this <see cref="GraphicsDevice"/>.
+        /// </summary>
+        /// <param name="renderTarget">
+        /// A new render target for the device, or <see langword="null"/>
+        /// to set the device render target to the back buffer of the device.
+        /// </param>
         /// <param name="cubeMapFace">The cube map face type.</param>
         public void SetRenderTarget(RenderTargetCube renderTarget, CubeMapFace cubeMapFace)
         {
@@ -1059,7 +1072,7 @@ namespace Microsoft.Xna.Framework.Graphics
         }
 
         /// <summary>
-        /// Sets or binds a vertex buffer to a device. 
+        /// Sets or binds a vertex buffer to a device.
         /// </summary>
         /// <param name="vertexBuffer">A vertex buffer.</param>
         public void SetVertexBuffer(VertexBuffer vertexBuffer)
@@ -1069,8 +1082,10 @@ namespace Microsoft.Xna.Framework.Graphics
                                    : _vertexBuffers.Set(vertexBuffer, 0);
         }
 
-        /// <inheritdoc cref="SetVertexBuffer(VertexBuffer)"/>
-        /// <param name="vertexBuffer"/>
+        /// <summary>
+        /// Sets or binds a vertex buffer to a device.
+        /// </summary>
+        /// <param name="vertexBuffer">A vertex buffer.</param>
         /// <param name="vertexOffset">The offset (in bytes) from the beginning of the buffer.</param>
         /// <exception cref="ArgumentOutOfRangeException">
         /// <paramref name="vertexOffset"/> is less than 0
@@ -1096,7 +1111,7 @@ namespace Microsoft.Xna.Framework.Graphics
         /// </summary>
         /// <param name="vertexBuffers">An array of vertex buffers.</param>
         /// <exception cref="ArgumentOutOfRangeException">
-        /// Length of <paramref name="vertexBuffers"/> is more than max allowed number of vertex buffers. 
+        /// Length of <paramref name="vertexBuffers"/> is more than max allowed number of vertex buffers.
         /// </exception>
         public void SetVertexBuffers(params VertexBufferBinding[] vertexBuffers)
         {
@@ -1454,7 +1469,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 throw new ArgumentOutOfRangeException("vertexDeclaration", "Vertex stride of vertexDeclaration should be at least as big as the stride of the actual vertices.");
 
             PlatformDrawUserIndexedPrimitives<T>(primitiveType, vertexData, vertexOffset, numVertices, indexData, indexOffset, primitiveCount, vertexDeclaration);
-            
+
             unchecked
             {
                 _graphicsMetrics._drawCount++;
@@ -1540,7 +1555,10 @@ namespace Microsoft.Xna.Framework.Graphics
             GetBackBufferData(null, data, 0, data.Length);
         }
 
-        /// <inheritdoc cref="GetBackBufferData{T}(T[])"/>
+        /// <summary>
+        /// Gets the Pixel data of what is currently drawn on screen.
+        /// The format is whatever the current format of the backbuffer is.
+        /// </summary>
         /// <typeparam name="T">A byte[] of size (ViewPort.Width * ViewPort.Height * 4)</typeparam>
         /// <param name="data">Array of data.</param>
         /// <param name="startIndex">The first element to use.</param>
@@ -1550,7 +1568,10 @@ namespace Microsoft.Xna.Framework.Graphics
             GetBackBufferData(null, data, startIndex, elementCount);
         }
 
-        /// <inheritdoc cref="GetBackBufferData{T}(T[], int, int)"/>
+        /// <summary>
+        /// Gets the Pixel data of what is currently drawn on screen.
+        /// The format is whatever the current format of the backbuffer is.
+        /// </summary>
         /// <typeparam name="T">A byte[] of size (ViewPort.Width * ViewPort.Height * 4)</typeparam>
         /// <param name="rect">
         /// The section of the back buffer to copy.

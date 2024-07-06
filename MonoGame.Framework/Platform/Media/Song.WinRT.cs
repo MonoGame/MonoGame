@@ -16,7 +16,6 @@ namespace Microsoft.Xna.Framework.Media
         
 		private MusicProperties musicProperties;
 
-        [CLSCompliant(false)]
         public StorageFile StorageFile
         {
             get { return this.musicProperties.File; }

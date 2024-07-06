@@ -126,12 +126,13 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
             {
                 return base.ConvertFrom(context, culture, value);
             }
-            catch (FormatException fex)
+            catch (FormatException)
             { 
                 // convert legacy Platforms
                 if (value.Equals("Linux") || value.Equals("WindowsGL"))
                     return TargetPlatform.DesktopGL;
-                else throw fex;
+                else
+                    throw;
             }
         }
     }

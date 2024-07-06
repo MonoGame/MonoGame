@@ -12,7 +12,6 @@ using MonoGame.OpenGL;
 
 namespace Microsoft.Xna.Framework
 {
-    [CLSCompliant(false)]
     public class AndroidGameWindow : GameWindow, IDisposable
     {
         internal MonoGameAndroidGameView GameView { get; private set; }
