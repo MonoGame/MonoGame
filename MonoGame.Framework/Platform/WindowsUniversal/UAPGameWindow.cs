@@ -53,6 +53,18 @@ namespace Microsoft.Xna.Framework
 
         #region Public Properties
 
+        public override Point Position
+        {
+            get
+            {
+                return Point.Zero;
+            }
+
+            set
+            {
+            }
+        }
+
         public override IntPtr Handle { get { return Marshal.GetIUnknownForObject(_coreWindow); } }
 
         public override string ScreenDeviceName { get { return String.Empty; } } // window.Title
