@@ -18,13 +18,13 @@
     <DefineConstants>$(DefineConstants);DIRECTX</DefineConstants>
   </PropertyGroup>
   <ItemGroup>
-    <MonoGameContentReference Include="..\___safegamename___.Core\Content\___SafeGameName___.mgcb">
+    <MonoGameContentReference Include="..\___SafeGameName___.Core\Content\___SafeGameName___.mgcb">
       <Link>Content\___SafeGameName___.mgcb</Link>
     </MonoGameContentReference>
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="MonoGame.Content.Builder.Task" Version="1.0.0" />
-    <PackageReference Include="MonoGame.Framework.WindowsDX" Version="1.0.0" />
+    <PackageReference Include="MonoGame.Content.Builder.Task" Version="3.8.*" />
+    <PackageReference Include="MonoGame.Framework.WindowsDX" Version="3.8.*" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\___SafeGameName___.Core\___SafeGameName___.Core.csproj">
