@@ -21,11 +21,22 @@ jobs:
         with:
           dotnet-version: '8.0.x'
 
+      - name: Setup Xmake
+        uses: xmake-io/github-action-setup-xmake@v1
+        with:
+          xmake-version: latest
+
       - name: Setup Java
         uses: actions/setup-java@v4
         with:
           distribution: 'microsoft'
           java-version: '11'
+
+      - name: Install Vulkan SDK
+        uses: humbletim/install-vulkan-sdk@v1.1.1
+        with:
+            version: 1.3.283.0
+            cache: true
 
       - name: Disable annotations
         run: echo "::remove-matcher owner=csc::"

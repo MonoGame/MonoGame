@@ -6,10 +6,15 @@
 set_kind("shared")
 set_basename("monogame.native")
 add_defines("DLL_EXPORT")
+add_rules("mode.release", "mode.debug")
 
 -- Always include the common bits.
 add_files("common/*.cpp")
 add_includedirs("include")
+
+-- Required dependencies.
+add_requires("libsdl 2.30.*")
+add_requires("vulkansdk")
 
 target("desktopvk")
 
@@ -18,20 +23,14 @@ target("desktopvk")
     -- SDL is supported on all desktop platforms.
     add_defines("MG_SDL2")
     add_files("sdl/*.cpp")
-    add_includedirs("../../ThirdParty/Dependencies/SDL/include")
-    add_links("SDL2-static")
-    if is_plat("windows") then
-        add_linkdirs("../../ThirdParty/Dependencies/SDL/Windows/x64")
-        add_links("winmm", "imm32", "user32", "gdi32", "advapi32", "setupapi", "ole32", "oleaut32", "version", "shell32")
-    end
+    add_packages("libsdl")
 
     -- Vulkan is supported for all desktop platforms.
     add_defines("MG_VULKAN");
     add_files("vulkan/*.cpp")
-    add_includedirs("../../ThirdParty/Dependencies/VulkanSDK/Include")
+    add_packages("vulkansdk")
     if is_plat("windows") then
         add_files("vulkan/vulkan.rc")
-        add_linkdirs("../../ThirdParty/Dependencies/VulkanSDK/Lib/Windows")
     end
     add_links("volk")
 
