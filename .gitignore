@@ -88,5 +88,9 @@ IDE/MonoDevelop/MonoDevelop.MonoGame/templates/Common/MonoGame.Framework.dll.con
 # CAKE
 .cake/**
 
+# Xmake
+.xmake
+vsxmake2022
+
 # docfx
 _*
