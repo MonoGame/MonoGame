@@ -17,7 +17,6 @@
             "type": "coreclr",
 			"request": "launch",
 			"preLaunchTask": "Debug DesktopGL Build",
-			"program": "${workspaceFolder}/AutoPong.DesktopGL/bin/Debug/net8.0/AutoPong.DesktopGL.exe",
         },
         {
             "name": "iOS Debug",
@@ -30,7 +29,6 @@
             "type": "coreclr",
 			"request": "launch",
 			"preLaunchTask": "Debug WindowsDX Build",
-			"program": "${workspaceFolder}/AutoPong.WindowsDX/bin/Debug/net8.0-windows/AutoPong.WindowsDX.exe",
         }
     ]
 }
