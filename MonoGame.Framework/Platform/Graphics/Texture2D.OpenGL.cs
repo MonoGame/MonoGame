@@ -509,7 +509,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
         static class GetDataPool<T> where T : struct
         {
-            public static ArrayPool<T> pool = ArrayPool<T>.Create(4096 * 4096, 1);
+            public static ArrayPool<T> pool = ArrayPool<T>.Create(int.MaxValue, 1);
         }
     }
 }
