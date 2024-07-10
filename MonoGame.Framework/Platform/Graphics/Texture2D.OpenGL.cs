@@ -252,7 +252,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 // Note: for compressed format Format.GetSize() returns the size of a 4x4 block
                 var pixelToT = Format.GetSize() / tSizeInByte;
                 var tFullWidth = Math.Max(this.width >> level, 1) / 4 * pixelToT;
-                var temp = GetDataPool<T>.pool.Rent(Math.Max(this.height >> level, 1) / 4 * tFullWidth);
+                var temp = GetDataPool<T>.Pool.Rent(Math.Max(this.height >> level, 1) / 4 * tFullWidth);
                 GL.GetCompressedTexImage(TextureTarget.Texture2D, level, temp);
                 GraphicsExtensions.CheckGLError();
 
@@ -264,13 +264,13 @@ namespace Microsoft.Xna.Framework.Graphics
                     var dataStart = startIndex + r * tRectWidth;
                     Array.Copy(temp, tempStart, data, dataStart, tRectWidth);
                 }
-                GetDataPool<T>.pool.Return(temp);
+                GetDataPool<T>.Pool.Return(temp);
             }
             else
             {
                 // we need to convert from our format size to the size of T here
                 var tFullWidth = Math.Max(this.width >> level, 1) * Format.GetSize() / tSizeInByte;
-                var temp = GetDataPool<T>.pool.Rent(Math.Max(this.height >> level, 1) * tFullWidth);
+                var temp = GetDataPool<T>.Pool.Rent(Math.Max(this.height >> level, 1) * tFullWidth);
                 GL.GetTexImage(TextureTarget.Texture2D, level, glFormat, glType, temp);
                 GraphicsExtensions.CheckGLError();
 
@@ -283,7 +283,7 @@ namespace Microsoft.Xna.Framework.Graphics
                     var dataStart = startIndex + r * tRectWidth;
                     Array.Copy(temp, tempStart, data, dataStart, tRectWidth);
                 }
-                GetDataPool<T>.pool.Return(temp);
+                GetDataPool<T>.Pool.Return(temp);
             }
 #endif
         }
@@ -507,9 +507,10 @@ namespace Microsoft.Xna.Framework.Graphics
                 (s) => s.texture.PlatformSetDataBody(s.level, s.arraySlice, s.rect, s.data, s.startIndex, s.elementCount);
         }
 
-        static class GetDataPool<T> where T : struct
+        private static class GetDataPool<T> where T : struct
         {
-            public static ArrayPool<T> pool = ArrayPool<T>.Create(int.MaxValue, 1);
+            // use int.MaxValue so arrays of any length can be saved in pool
+            public static readonly ArrayPool<T> Pool = ArrayPool<T>.Create(int.MaxValue, 1);
         }
     }
 }
