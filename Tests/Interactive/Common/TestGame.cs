@@ -144,6 +144,7 @@ namespace MonoGame.InteractiveTests
                 GD.LogInfo($" --- Draw : Heap {memInfo.HeapSizeBytes} bytes / " +
                      $"commit {memInfo.TotalCommittedBytes} bytes \n" +
                      $"{_fpsLabel.Text}");
+                // Enable this once graphics debug changes are in.
                 // GraphicsDebug.PrintTimers();
                 _consoleOutputStopwatch = Stopwatch.StartNew();
             }
