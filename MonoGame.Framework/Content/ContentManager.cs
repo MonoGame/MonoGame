@@ -42,9 +42,7 @@ namespace Microsoft.Xna.Framework.Content
             'a', // Android
             'd', // DesktopGL
             'X', // MacOSX
-            'W', // WindowsStoreApp
             'n', // NativeClient
-            'M', // WindowsPhone8
             'r', // RaspberryPi
             'P', // PlayStation4
             '5', // PlayStation5
@@ -61,6 +59,8 @@ namespace Microsoft.Xna.Framework.Content
             // Legacy identifiers... these could be reused in the
             // future if we feel enough time has passed.
 
+            'W', // WindowsStoreApp
+            'M', // WindowsPhone8
             'm', // WindowsPhone7.0 (XNA)
             'p', // PlayStationMobile
             'v', // PSVita
