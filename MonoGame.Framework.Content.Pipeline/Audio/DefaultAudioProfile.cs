@@ -20,8 +20,6 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Audio
                     platform == TargetPlatform.NativeClient ||
                     platform == TargetPlatform.RaspberryPi ||
                     platform == TargetPlatform.Windows ||
-                    platform == TargetPlatform.WindowsPhone8 ||
-                    platform == TargetPlatform.WindowsStoreApp ||
                     platform == TargetPlatform.iOS ||
                     platform == TargetPlatform.Web;
         }
@@ -46,9 +44,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Audio
             // Most platforms will use AAC ("mp4") by default
             var targetFormat = ConversionFormat.Aac;
 
-            if (    platform == TargetPlatform.Windows ||
-                    platform == TargetPlatform.WindowsPhone8 ||
-                    platform == TargetPlatform.WindowsStoreApp)
+            if ( platform == TargetPlatform.Windows )
                 targetFormat = ConversionFormat.WindowsMedia;
 
             else if (platform == TargetPlatform.DesktopGL)
