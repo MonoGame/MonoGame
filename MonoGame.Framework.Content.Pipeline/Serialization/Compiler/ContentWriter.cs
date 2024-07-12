@@ -47,9 +47,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
             'a', // Android
             'd', // DesktopGL
             'X', // MacOSX
-            'W', // WindowsStoreApp
             'n', // NativeClient
-            'M', // WindowsPhone8
             'r', // RaspberryPi
             'P', // PlayStation4
             '5', // PlayStation5
