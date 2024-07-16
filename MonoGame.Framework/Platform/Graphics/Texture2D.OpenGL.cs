@@ -392,10 +392,14 @@ namespace Microsoft.Xna.Framework.Graphics
             using (Bitmap image = BitmapFactory.DecodeStream(stream, null, new BitmapFactory.Options
             {
                 InScaled = false,
+#pragma warning disable CA1422
                 InDither = false,
+#pragma warning restore CA1422
                 InJustDecodeBounds = false,
+#pragma warning disable CS0618
                 InPurgeable = true,
                 InInputShareable = true,
+#pragma warning restore CS0618
             }))
             {
                 var width = image.Width;
