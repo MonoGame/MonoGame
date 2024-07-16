@@ -10,6 +10,7 @@ using CoreGraphics;
 using MediaPlayer;
 using UIKit;
 #elif ANDROID
+using Android.Content;
 using Android.Graphics;
 using Android.Provider;
 #endif
