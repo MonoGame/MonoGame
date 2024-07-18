@@ -28,8 +28,6 @@ namespace MonoGame.Framework.Utilities
                 return MonoGamePlatform.WebGL;
 #elif WINDOWS && DIRECTX
                 return MonoGamePlatform.Windows;
-#elif WINDOWS_UAP
-                return MonoGamePlatform.WindowsUniversal;
 #elif SWITCH
                 return MonoGamePlatform.NintendoSwitch;
 #elif XB1

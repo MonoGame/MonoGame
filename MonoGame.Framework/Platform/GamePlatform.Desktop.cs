@@ -4,10 +4,6 @@
 
 using System;
 
-#if WINDOWS_UAP
-using Windows.UI.ViewManagement;
-#endif
-
 namespace Microsoft.Xna.Framework
 {
     partial class GamePlatform
@@ -18,8 +14,6 @@ namespace Microsoft.Xna.Framework
             return new SdlGamePlatform(game);
 #elif WINDOWS && DIRECTX
             return new MonoGame.Framework.WinFormsGamePlatform(game);
-#elif WINDOWS_UAP
-            return new UAPGamePlatform(game);
 #endif
         }
    }

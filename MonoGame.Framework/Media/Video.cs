@@ -59,10 +59,6 @@ namespace Microsoft.Xna.Framework.Media
         internal Video(string fileName)
         {
             FileName = fileName;
-
-#if !WINDOWS_UAP
-            PlatformInitialize();
-#endif
         }
 
         /// <summary/>

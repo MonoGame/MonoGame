@@ -11,11 +11,6 @@ using MonoGame.Framework.Utilities;
 using Microsoft.Xna.Framework.Graphics;
 using System.Globalization;
 
-#if !WINDOWS_UAP
-using Microsoft.Xna.Framework.Audio;
-using Microsoft.Xna.Framework.Media;
-#endif
-
 namespace Microsoft.Xna.Framework.Content
 {
     /// <summary>
@@ -47,9 +42,7 @@ namespace Microsoft.Xna.Framework.Content
             'a', // Android
             'd', // DesktopGL
             'X', // MacOSX
-            'W', // WindowsStoreApp
             'n', // NativeClient
-            'M', // WindowsPhone8
             'r', // RaspberryPi
             'P', // PlayStation4
             '5', // PlayStation5
@@ -66,6 +59,8 @@ namespace Microsoft.Xna.Framework.Content
             // Legacy identifiers... these could be reused in the
             // future if we feel enough time has passed.
 
+            'W', // WindowsStoreApp
+            'M', // WindowsPhone8
             'm', // WindowsPhone7.0 (XNA)
             'p', // PlayStationMobile
             'v', // PSVita
@@ -406,12 +401,11 @@ namespace Microsoft.Xna.Framework.Content
 			{
 				throw new ContentLoadException("The content file was not found.", fileNotFound);
 			}
-#if !WINDOWS_UAP
+
 			catch (DirectoryNotFoundException directoryNotFound)
 			{
 				throw new ContentLoadException("The directory was not found.", directoryNotFound);
 			}
-#endif
 			catch (Exception exception)
 			{
 				throw new ContentLoadException("Opening stream error.", exception);

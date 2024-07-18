@@ -12,12 +12,6 @@ using SharpDX.DXGI;
 using MapFlags = SharpDX.Direct3D11.MapFlags;
 using Resource = SharpDX.Direct3D11.Resource;
 
-#if WINDOWS_UAP
-using Windows.Graphics.Imaging;
-using Windows.Storage.Streams;
-using System.Threading.Tasks;
-#endif
-
 namespace Microsoft.Xna.Framework.Graphics
 {
     public partial class Texture2D : Texture
