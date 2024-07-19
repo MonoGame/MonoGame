@@ -59,6 +59,8 @@ namespace Microsoft.Xna.Framework.Media
         internal Video(string fileName)
         {
             FileName = fileName;
+
+            PlatformInitialize();
         }
 
         /// <summary/>
