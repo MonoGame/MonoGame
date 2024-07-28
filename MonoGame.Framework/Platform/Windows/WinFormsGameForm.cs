@@ -61,7 +61,7 @@ namespace Microsoft.Xna.Framework.Windows
         #region Events
 
         public event EventHandler<HorizontalMouseWheelEventArgs> MouseHorizontalWheel;
-     //   public event EventHandler<EventHandler<Evetar SettingsChanged;
+        public event EventHandler<EventArgs> SettingChanged;
 
         #endregion
 
@@ -127,7 +127,7 @@ namespace Microsoft.Xna.Framework.Windows
                     break;
 
                 case WM_SETTING­CHANGE:
-                    HandleSettingChange(ref m);
+                    HandleSettingChange();
                 break;
 #endif
                 case WM_SYSCOMMAND:
@@ -187,9 +187,9 @@ namespace Microsoft.Xna.Framework.Windows
             base.WndProc(ref m);
         }
 
-        private void HandleSettingChange(ref Message m)
+        private void HandleSettingChange()
         {
-            
+            EventHelpers.Raise(this, SettingChanged, EventArgs.Empty);
         }
 
         void HandleKeyMessage(ref Message m)

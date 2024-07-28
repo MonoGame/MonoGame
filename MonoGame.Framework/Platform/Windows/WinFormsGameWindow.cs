@@ -48,6 +48,7 @@ namespace MonoGame.Framework
         private readonly System.Timers.Timer _resizeTickTimer;
 
         private bool _isleftMouseButtonDown;
+        private bool _isMouseKeysEnabled;
 
         #region Internal Properties
 
@@ -174,17 +175,25 @@ namespace MonoGame.Framework
 
             Form.KeyPress += OnKeyPress;
 
-            if(MouseKeysManager.IsEnabled())
+            _isMouseKeysEnabled = MouseKeysManager.IsEnabled();
+            if (_isMouseKeysEnabled)
             {
                 Form.MouseDown += Form_MouseDown;
                 Form.MouseUp += Form_MouseUp;
             }
+            Form.SettingChanged += Form_SettingChanged;
+
             RegisterToAllWindows();
+        }
+
+        private void Form_SettingChanged(object sender, EventArgs e)
+        {
+            _isMouseKeysEnabled = MouseKeysManager.IsEnabled();
         }
 
         private void Form_MouseDown(object sender, MouseEventArgs e)
         {
-            if(e.Button==MouseButtons.Left)
+            if(_isMouseKeysEnabled && e.Button==MouseButtons.Left)
             {
                 _isleftMouseButtonDown = true;
             }
