@@ -14,6 +14,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Input.Touch;
 using Microsoft.Xna.Framework.Windows;
+using Microsoft.Xna.Framework.Windows.Accessibility;
 using ButtonState = Microsoft.Xna.Framework.Input.ButtonState;
 using Keys = Microsoft.Xna.Framework.Input.Keys;
 using Point = System.Drawing.Point;
@@ -134,6 +135,7 @@ namespace MonoGame.Framework
 
         public bool IsFullScreen { get; private set; }
         public bool HardwareModeSwitch { get; private set; }
+        private bool _leftMouseButtonDown;
 
         #endregion
 
@@ -171,7 +173,24 @@ namespace MonoGame.Framework
 
             Form.KeyPress += OnKeyPress;
 
+            if(MouseKeysManager.IsEnabled())
+            {
+                Form.MouseDown += Form_MouseDown;
+                Form.MouseUp += Form_MouseUp;
+            }
             RegisterToAllWindows();
+
+            //System.Windows.Forms.MessageBox.Show("h");
+        }
+
+        private void Form_MouseDown(object sender, MouseEventArgs e)
+        {
+            _leftMouseButtonDown = true;
+        }
+
+        private void Form_MouseUp(object sender, MouseEventArgs e)
+        {
+            _leftMouseButtonDown = false;
         }
 
         [StructLayout(LayoutKind.Sequential)]
@@ -324,6 +343,15 @@ namespace MonoGame.Framework
 
             if (touchState.HasValue)
                 TouchPanelState.AddEvent(0, touchState.Value, new Vector2(MouseState.X, MouseState.Y), true);
+
+            if(_leftMouseButtonDown)
+            {
+                MouseState.LeftButton = ButtonState.Pressed;
+            }
+            else
+            {
+                MouseState.LeftButton = ButtonState.Released;
+            }
         } 
 
         private void OnMouseEnter(object sender, EventArgs e)

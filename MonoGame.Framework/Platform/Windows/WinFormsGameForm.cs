@@ -52,6 +52,8 @@ namespace Microsoft.Xna.Framework.Windows
 
         public const int WM_SYSCOMMAND = 0x0112;
 
+        public const int WM_SETTING­CHANGE = 0x001A;
+
         public bool AllowAltF4 = true;
 
         internal bool IsResizing { get; set; }
@@ -59,6 +61,7 @@ namespace Microsoft.Xna.Framework.Windows
         #region Events
 
         public event EventHandler<HorizontalMouseWheelEventArgs> MouseHorizontalWheel;
+     //   public event EventHandler<EventHandler<Evetar SettingsChanged;
 
         #endregion
 
@@ -122,6 +125,10 @@ namespace Microsoft.Xna.Framework.Windows
                 case WM_DROPFILES:
                     HandleDropMessage(ref m);
                     break;
+
+                case WM_SETTING­CHANGE:
+                    HandleSettingChange(ref m);
+                break;
 #endif
                 case WM_SYSCOMMAND:
 
@@ -178,6 +185,11 @@ namespace Microsoft.Xna.Framework.Windows
             }
 
             base.WndProc(ref m);
+        }
+
+        private void HandleSettingChange(ref Message m)
+        {
+            
         }
 
         void HandleKeyMessage(ref Message m)
