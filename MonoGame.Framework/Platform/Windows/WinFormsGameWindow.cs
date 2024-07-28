@@ -47,6 +47,8 @@ namespace MonoGame.Framework
         private bool _isResizeTickEnabled;
         private readonly System.Timers.Timer _resizeTickTimer;
 
+        private bool _isleftMouseButtonDown;
+
         #region Internal Properties
 
         internal Game Game { get; private set; }
@@ -135,7 +137,6 @@ namespace MonoGame.Framework
 
         public bool IsFullScreen { get; private set; }
         public bool HardwareModeSwitch { get; private set; }
-        private bool _leftMouseButtonDown;
 
         #endregion
 
@@ -183,12 +184,18 @@ namespace MonoGame.Framework
 
         private void Form_MouseDown(object sender, MouseEventArgs e)
         {
-            _leftMouseButtonDown = true;
+            if(e.Button==MouseButtons.Left)
+            {
+                _isleftMouseButtonDown = true;
+            }
         }
 
         private void Form_MouseUp(object sender, MouseEventArgs e)
         {
-            _leftMouseButtonDown = false;
+            if (e.Button == MouseButtons.Left)
+            {
+                _isleftMouseButtonDown = false;
+            }
         }
 
         [StructLayout(LayoutKind.Sequential)]
@@ -342,7 +349,7 @@ namespace MonoGame.Framework
             if (touchState.HasValue)
                 TouchPanelState.AddEvent(0, touchState.Value, new Vector2(MouseState.X, MouseState.Y), true);
 
-            if(_leftMouseButtonDown)
+            if(_isleftMouseButtonDown)
             {
                 MouseState.LeftButton = ButtonState.Pressed;
             }
