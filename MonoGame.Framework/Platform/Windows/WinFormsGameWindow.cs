@@ -179,8 +179,6 @@ namespace MonoGame.Framework
                 Form.MouseUp += Form_MouseUp;
             }
             RegisterToAllWindows();
-
-            //System.Windows.Forms.MessageBox.Show("h");
         }
 
         private void Form_MouseDown(object sender, MouseEventArgs e)
