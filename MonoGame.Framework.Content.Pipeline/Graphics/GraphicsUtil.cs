@@ -160,7 +160,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
             if (context.TargetProfile == GraphicsProfile.Reach)
             {
                 if (!IsPowerOfTwo(face.Width) || !IsPowerOfTwo(face.Height))
-                    throw new PipelineException("DXT compression requires width and height must be powers of two in Reach graphics profile.");                
+                    throw new PipelineException("DXT compression requires width and height must be powers of two in Reach graphics profile.");
             }
 
             // Test the alpha channel to figure out if we have alpha.
@@ -175,8 +175,8 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
             // between DXT1 for cutouts and DXT5 for fractional alpha.
             //
             // DXT3 however can produce better results for high frequency
-            // alpha like a chain link fence where is DXT5 is better for 
-            // low frequency alpha like clouds.  I don't know how we can 
+            // alpha like a chain link fence where is DXT5 is better for
+            // low frequency alpha like clouds.  I don't know how we can
             // pick the right thing in this case without a hint.
             //
             if (isSpriteFont)
@@ -184,7 +184,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
             else if (alphaRange == AlphaRange.Opaque)
                 content.ConvertBitmapType(typeof(Dxt1BitmapContent));
             else if (alphaRange == AlphaRange.Cutout)
-                content.ConvertBitmapType(typeof(Dxt3BitmapContent));
+                content.ConvertBitmapType(typeof(Dxt3BitmapContent)); // TODO: this will need to change to Dxt5, I think
             else
                 content.ConvertBitmapType(typeof(Dxt5BitmapContent));
         }

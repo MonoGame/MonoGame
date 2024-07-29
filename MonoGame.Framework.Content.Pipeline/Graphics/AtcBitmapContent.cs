@@ -4,7 +4,7 @@
 
 using System;
 using Microsoft.Xna.Framework.Graphics;
-using ATI.TextureConverter;
+using Microsoft.Xna.Framework.Content.Pipeline.Utilities;
 
 namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 {
@@ -67,26 +67,39 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
             }
 
             // Convert to full colour 32-bit format. Floating point would be preferred for processing, but it appears the ATICompressor does not support this
-            var colorBitmap = new PixelBitmapContent<Color>(sourceRegion.Width, sourceRegion.Height);
-            BitmapContent.Copy(sourceBitmap, sourceRegion, colorBitmap, new Rectangle(0, 0, colorBitmap.Width, colorBitmap.Height));
-            sourceBitmap = colorBitmap;
+            // var colorBitmap = new PixelBitmapContent<Color>(sourceRegion.Width, sourceRegion.Height);
+            // BitmapContent.Copy(sourceBitmap, sourceRegion, colorBitmap, new Rectangle(0, 0, colorBitmap.Width, colorBitmap.Height));
+            // sourceBitmap = colorBitmap;
 
-			ATICompressor.CompressionFormat targetFormat;
-			switch (format)
+            var sourceData = sourceBitmap.GetPixelData();
+            if (!BasisU.TryEncodeBytes(
+                    sourceBitmap: this,
+                    width: Width,
+                    height: Height,
+                    hasAlpha: true,
+                    isLinearColor: true,
+                    format: format,
+                    out var compressedBytes))
             {
-				case SurfaceFormat.RgbaAtcExplicitAlpha:
-					targetFormat = ATICompressor.CompressionFormat.AtcRgbaExplicitAlpha;
-					break;
-				case SurfaceFormat.RgbaAtcInterpolatedAlpha:
-					targetFormat = ATICompressor.CompressionFormat.AtcRgbaInterpolatedAlpha;
-					break;
-				default:
-					return false;
-			}
-
-			var sourceData = sourceBitmap.GetPixelData();
-			var compressedData = ATICompressor.Compress(sourceData, Width, Height, targetFormat);
-			SetPixelData(compressedData);
+                return false;
+            }
+            SetPixelData(compressedBytes);
+			// ATICompressor.CompressionFormat targetFormat;
+			// switch (format)
+   //          {
+			// 	case SurfaceFormat.RgbaAtcExplicitAlpha:
+			// 		targetFormat = ATICompressor.CompressionFormat.AtcRgbaExplicitAlpha;
+			// 		break;
+			// 	case SurfaceFormat.RgbaAtcInterpolatedAlpha:
+			// 		targetFormat = ATICompressor.CompressionFormat.AtcRgbaInterpolatedAlpha;
+			// 		break;
+			// 	default:
+			// 		return false;
+			// }
+   //
+			// var sourceData = sourceBitmap.GetPixelData();
+			// var compressedData = ATICompressor.Compress(sourceData, Width, Height, targetFormat);
+			// SetPixelData(compressedData);
 
 			return true;
         }

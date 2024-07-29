@@ -4,16 +4,17 @@
 
 using System;
 using Microsoft.Xna.Framework.Graphics;
-using Nvidia.TextureTools;
+// using Nvidia.TextureTools;
 using System.Runtime.InteropServices;
+using Microsoft.Xna.Framework.Content.Pipeline.Utilities;
 
 namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 {
     public abstract class DxtBitmapContent : BitmapContent
     {
         private byte[] _bitmapData;
-        private int _blockSize;
-        private SurfaceFormat _format;
+        // private int _blockSize;
+        // private SurfaceFormat _format;
 
         private int _nvttWriteOffset;
 
@@ -21,8 +22,8 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
         {
             if (!((blockSize == 8) || (blockSize == 16)))
                 throw new ArgumentException("Invalid block size");
-            _blockSize = blockSize;
-            TryGetFormat(out _format);
+            // _blockSize = blockSize;
+            // TryGetFormat(out _format);
         }
 
         protected DxtBitmapContent(int blockSize, int width, int height)
@@ -42,12 +43,14 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
             _bitmapData = sourceData;
         }
 
+        [Obsolete]
         private void NvttBeginImage(int size, int width, int height, int depth, int face, int miplevel)
         {
             _bitmapData = new byte[size];
             _nvttWriteOffset = 0;
         }
 
+        [Obsolete]
         private bool NvttWriteImage(IntPtr data, int length)
         {
             Marshal.Copy(data, _bitmapData, _nvttWriteOffset, length);
@@ -55,10 +58,12 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
             return true;
         }
 
+        [Obsolete]
         private void NvttEndImage()
         {
         }
-        
+
+        [Obsolete]
         private static void PrepareNVTT(byte[] data)
         {
             for (var x = 0; x < data.Length; x += 4)
@@ -71,6 +76,22 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
             }
         }
 
+        private static void HasAnyAlpha(byte[] data, out bool hasTransparency)
+        {
+            hasTransparency = false;
+            for (var x = 0; x < data.Length; x += 4)
+            {
+                // Look for non-opaque pixels.
+                var alpha = data[x + 3];
+                if (alpha < 255)
+                {
+                    hasTransparency = true;
+                    break; // no need to process entire image if we identify alpha early.
+                }
+            }
+        }
+
+        [Obsolete]
         private static void PrepareNVTT_DXT1(byte[] data, out bool hasTransparency)
         {
             hasTransparency = false;
@@ -127,83 +148,109 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
                 }
             }
 
-            // NVTT wants 8bit data in BGRA format.
-            var colorBitmap = new PixelBitmapContent<Color>(sourceBitmap.Width, sourceBitmap.Height);
-            BitmapContent.Copy(sourceBitmap, colorBitmap);
-            var sourceData = colorBitmap.GetPixelData();
-            var dataHandle = GCHandle.Alloc(sourceData, GCHandleType.Pinned);
+            var sourceData = sourceBitmap.GetPixelData();
 
-            AlphaMode alphaMode;
-            Format outputFormat;
-            var alphaDither = false;
+            bool isLinear = false;
             switch (format)
             {
-                case SurfaceFormat.Dxt1:
                 case SurfaceFormat.Dxt1SRgb:
-                {
-                    bool hasTransparency;
-                    PrepareNVTT_DXT1(sourceData, out hasTransparency);
-                    outputFormat = hasTransparency ? Format.DXT1a : Format.DXT1;
-                    alphaMode = hasTransparency ? AlphaMode.Transparency : AlphaMode.None;
-                    alphaDither = true;
-                    break;
-                }
-                case SurfaceFormat.Dxt3:
                 case SurfaceFormat.Dxt3SRgb:
-                {
-                    PrepareNVTT(sourceData);
-                    outputFormat = Format.DXT3;
-                    alphaMode = AlphaMode.Transparency;
-                    break;
-                }
-                case SurfaceFormat.Dxt5:
                 case SurfaceFormat.Dxt5SRgb:
-                {
-                    PrepareNVTT(sourceData);
-                    outputFormat = Format.DXT5;
-                    alphaMode = AlphaMode.Transparency;
+                    isLinear = true;
                     break;
-                }
-                default:
-                    throw new InvalidOperationException("Invalid DXT surface format!");
             }
+            HasAnyAlpha(sourceData, out var hasAlpha);
 
-            // Do all the calls to the NVTT wrapper within this handler
-            // so we properly clean up if things blow up.
-            try
+            if (!BasisU.TryEncodeBytes(
+                    sourceBitmap: sourceBitmap,
+                    width: Width,
+                    height: Height,
+                    hasAlpha: hasAlpha,
+                    isLinearColor: isLinear,
+                    format: format,
+                    out var compressedBytes))
             {
-                var dataPtr = dataHandle.AddrOfPinnedObject();
-
-                var inputOptions = new InputOptions();
-                inputOptions.SetTextureLayout(TextureType.Texture2D, colorBitmap.Width, colorBitmap.Height, 1);
-                inputOptions.SetMipmapData(dataPtr, colorBitmap.Width, colorBitmap.Height, 1, 0, 0);
-                inputOptions.SetMipmapGeneration(false);
-                inputOptions.SetGamma(1.0f, 1.0f);
-                inputOptions.SetAlphaMode(alphaMode);
-
-                var compressionOptions = new CompressionOptions();
-                compressionOptions.SetFormat(outputFormat);
-                compressionOptions.SetQuality(Quality.Normal);
-
-                // TODO: This isn't working which keeps us from getting the
-                // same alpha dither behavior on DXT1 as XNA.
-                //
-                // See https://github.com/MonoGame/MonoGame/issues/6259
-                //
-                //if (alphaDither)
-                    //compressionOptions.SetQuantization(false, false, true);
-
-                var outputOptions = new OutputOptions();
-                outputOptions.SetOutputHeader(false);
-                outputOptions.SetOutputOptionsOutputHandler(NvttBeginImage, NvttWriteImage, NvttEndImage);
-
-                var dxtCompressor = new Compressor();
-                dxtCompressor.Compress(inputOptions, compressionOptions, outputOptions);
+                return false;
             }
-            finally
-            {
-                dataHandle.Free();
-            }
+            SetPixelData(compressedBytes);
+
+            // NVTT wants 8bit data in BGRA format.
+            // var colorBitmap = new PixelBitmapContent<Color>(sourceBitmap.Width, sourceBitmap.Height);
+            // BitmapContent.Copy(sourceBitmap, colorBitmap);
+            // var sourceData = colorBitmap.GetPixelData();
+            // var dataHandle = GCHandle.Alloc(sourceData, GCHandleType.Pinned);
+            //
+            // AlphaMode alphaMode;
+            // Format outputFormat;
+            // var alphaDither = false;
+            // switch (format)
+            // {
+            //     case SurfaceFormat.Dxt1:
+            //     case SurfaceFormat.Dxt1SRgb:
+            //     {
+            //         bool hasTransparency;
+            // PrepareNVTT_DXT1(sourceData, out hasTransparency);
+            //         outputFormat = hasTransparency ? Format.DXT1a : Format.DXT1;
+            //         alphaMode = hasTransparency ? AlphaMode.Transparency : AlphaMode.None;
+            //         alphaDither = true;
+            //         break;
+            //     }
+            //     case SurfaceFormat.Dxt3:
+            //     case SurfaceFormat.Dxt3SRgb:
+            //     {
+            //         PrepareNVTT(sourceData);
+            //         outputFormat = Format.DXT3;
+            //         alphaMode = AlphaMode.Transparency;
+            //         break;
+            //     }
+            //     case SurfaceFormat.Dxt5:
+            //     case SurfaceFormat.Dxt5SRgb:
+            //     {
+            //         PrepareNVTT(sourceData);
+            //         outputFormat = Format.DXT5;
+            //         alphaMode = AlphaMode.Transparency;
+            //         break;
+            //     }
+            //     default:
+            //         throw new InvalidOperationException("Invalid DXT surface format!");
+            // }
+            //
+            // // Do all the calls to the NVTT wrapper within this handler
+            // // so we properly clean up if things blow up.
+            // try
+            // {
+            //     var dataPtr = dataHandle.AddrOfPinnedObject();
+            //
+            //     var inputOptions = new InputOptions();
+            //     inputOptions.SetTextureLayout(TextureType.Texture2D, colorBitmap.Width, colorBitmap.Height, 1);
+            //     inputOptions.SetMipmapData(dataPtr, colorBitmap.Width, colorBitmap.Height, 1, 0, 0);
+            //     inputOptions.SetMipmapGeneration(false);
+            //     inputOptions.SetGamma(1.0f, 1.0f);
+            //     inputOptions.SetAlphaMode(alphaMode);
+            //
+            //     var compressionOptions = new CompressionOptions();
+            //     compressionOptions.SetFormat(outputFormat);
+            //     compressionOptions.SetQuality(Quality.Normal);
+            //
+            //     // TODO: This isn't working which keeps us from getting the
+            //     // same alpha dither behavior on DXT1 as XNA.
+            //     //
+            //     // See https://github.com/MonoGame/MonoGame/issues/6259
+            //     //
+            //     //if (alphaDither)
+            //         //compressionOptions.SetQuantization(false, false, true);
+            //
+            //     var outputOptions = new OutputOptions();
+            //     outputOptions.SetOutputHeader(false);
+            //     outputOptions.SetOutputOptionsOutputHandler(NvttBeginImage, NvttWriteImage, NvttEndImage);
+            //
+            //     var dxtCompressor = new Compressor();
+            //     dxtCompressor.Compress(inputOptions, compressionOptions, outputOptions);
+            // }
+            // finally
+            // {
+            //     dataHandle.Free();
+            // }
 
             return true;
         }

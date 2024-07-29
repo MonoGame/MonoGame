@@ -215,10 +215,10 @@ namespace MonoGame.Tests.ContentPipeline
 
             for (var p = 0; p < rgba.Length; p += 4)
             {
-                Assert.That(rgba[p + 0], Is.EqualTo(color.R).Within(range));
-                Assert.That(rgba[p + 1], Is.EqualTo(color.G).Within(range));
-                Assert.That(rgba[p + 2], Is.EqualTo(color.B).Within(range));
-                Assert.That(rgba[p + 3], Is.EqualTo(color.A).Within(range));
+                Assert.That(rgba[p + 0], Is.EqualTo(color.R).Within(range), "Red is not within tolerance");
+                Assert.That(rgba[p + 1], Is.EqualTo(color.G).Within(range), "Green is not within tolerance");
+                Assert.That(rgba[p + 2], Is.EqualTo(color.B).Within(range), "Blue is not within tolerance");
+                Assert.That(rgba[p + 3], Is.EqualTo(color.A).Within(range), "Alpha is not within tolerance");
             }
         }
 
@@ -235,20 +235,36 @@ namespace MonoGame.Tests.ContentPipeline
         }
 
         [Test]
-        public void BitmapCompress()
+        public void BitmapCompress_Dxt1()
         {
-            var Transparent = new Color(0, 0, 0, 0);
-            var Grey16Premult = new Color(16, 16, 16, 16);
             BitmapConvertAssert(typeof(Dxt1BitmapContent), Color.Red, 64, 64, 0);
             BitmapConvertAssert(typeof(Dxt1BitmapContent), Color.Green, 32, 34, 2);
             BitmapConvertAssert(typeof(Dxt1BitmapContent), Color.Blue, 8, 9, 0);
-            BitmapConvertAssert(typeof(Dxt1BitmapContent), Transparent, 16, 16, 0);
-            //BitmapConvertAssert(typeof(Dxt1BitmapContent), Grey16Premult, 16, 16, Transparent, 0);
+
+            // BasisU does not support Bcn1 alpha punch-through, also known as Dxt1a. Therefor, the alpha channel is lost and always assumed to be opaque.
+            //  this is a test regression, and the following line _used_ to work.
+            //BitmapConvertAssert(typeof(Dxt1BitmapContent), new Color(0, 0, 0, 0), 16, 16, 0);
+        }
+
+        [Test]
+        public void BitmapCompress_Dxt3()
+        {
+            var Transparent = new Color(0, 0, 0, 0);
+            var Grey16Premult = new Color(16, 16, 16, 16);
+
             BitmapConvertAssert(typeof(Dxt3BitmapContent), Color.Red, 64, 64, 0);
             BitmapConvertAssert(typeof(Dxt3BitmapContent), Color.Green, 32, 34, 2);
             BitmapConvertAssert(typeof(Dxt3BitmapContent), Color.Blue, 8, 9, 0);
             BitmapConvertAssert(typeof(Dxt3BitmapContent), Transparent, 16, 16, 0);
             BitmapConvertAssert(typeof(Dxt3BitmapContent), Grey16Premult, 16, 16, Grey16Premult, 1);
+        }
+
+        [Test]
+        public void BitmapCompress_Dxt5()
+        {
+            var Transparent = new Color(0, 0, 0, 0);
+            var Grey16Premult = new Color(16, 16, 16, 16);
+
             BitmapConvertAssert(typeof(Dxt5BitmapContent), Color.Red, 64, 64, 0);
             BitmapConvertAssert(typeof(Dxt5BitmapContent), Color.Green, 32, 34, 2);
             BitmapConvertAssert(typeof(Dxt5BitmapContent), Color.Blue, 8, 9, 0);

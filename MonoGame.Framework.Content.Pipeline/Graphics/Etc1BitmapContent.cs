@@ -3,8 +3,8 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System;
+using Microsoft.Xna.Framework.Content.Pipeline.Utilities;
 using Microsoft.Xna.Framework.Graphics;
-using PVRTexLibNET;
 
 namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 {
@@ -81,21 +81,19 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
                 }
             }
 
-            // Create the texture object in the PVR library
-            var sourceData = sourceBitmap.GetPixelData();
-            var rgba32F = (PixelFormat)0x2020202061626772; // static const PixelType PVRStandard32PixelType = PixelType('r', 'g', 'b', 'a', 32, 32, 32, 32);
-            using (var pvrTexture = PVRTexture.CreateTexture(sourceData, (uint)sourceBitmap.Width, (uint)sourceBitmap.Height, 1,
-                rgba32F, true, VariableType.Float, ColourSpace.lRGB))
+            if (!BasisU.TryEncodeBytes(
+                    sourceBitmap: this,
+                    width: Width,
+                    height: Height,
+                    hasAlpha: false,
+                    isLinearColor: true, // TODO: support etc2
+                    format: sourceFormat,
+                    out var compressedBytes))
             {
-                // Resize the bitmap if needed
-                if ((sourceBitmap.Width != Width) || (sourceBitmap.Height != Height))
-                    pvrTexture.Resize((uint)Width, (uint)Height, 1, ResizeMode.Cubic);
-                pvrTexture.Transcode(PixelFormat.ETC1, VariableType.UnsignedByte, ColourSpace.lRGB /*, CompressorQuality.ETCMediumPerceptual, true*/);
-                var texDataSize = pvrTexture.GetTextureDataSize(0);
-                var texData = new byte[texDataSize];
-                pvrTexture.GetTextureData(texData, texDataSize);
-                SetPixelData(texData);
+                return false;
             }
+            SetPixelData(compressedBytes);
+
             return true;
         }
 
