@@ -1,9 +1,11 @@
+// MonoGame - Copyright (C) MonoGame Foundation, Inc
+// This file is subject to the terms and conditions defined in
+// file 'LICENSE.txt', which is part of this source code package.
+
 using System;
 using System.IO;
 using Microsoft.Xna.Framework.Content.Pipeline.Graphics;
 using Microsoft.Xna.Framework.Graphics;
-using QoiSharp;
-using QoiSharp.Codec;
 using KtxSharp;
 using StbImageWriteSharp;
 
@@ -299,7 +301,7 @@ internal static class BasisU
         return true;
     }
 
-    public static unsafe bool TryWritePngFile(
+    public static bool TryWritePngFile(
         BitmapContent sourceBitmap,
         int width,
         int height,
@@ -318,25 +320,6 @@ internal static class BasisU
         var writer = new ImageWriter(); // TODO: cache this instance.
         writer.WritePng(data, colorBitmap.Width, colorBitmap.Height, ColorComponents.RedGreenBlueAlpha, fileStream);
         fileStream.Close();
-        return true;
-    }
-
-    public static bool TryWriteQoiFile(
-        byte[] pixelBytes,
-        int width,
-        int height,
-        bool hasAlpha,
-        bool isLinearColor,
-        out string qoiFilePath)
-    {
-        var channels = hasAlpha ? Channels.RgbWithAlpha : Channels.Rgb;
-        var colorSpace = isLinearColor ? ColorSpace.Linear : ColorSpace.SRgb;
-        var image = new QoiImage(pixelBytes, width, height, channels, colorSpace);
-        var bytes = QoiEncoder.Encode(image);
-
-
-        qoiFilePath = $"tempImage_{Guid.NewGuid().ToString()}.qoi"; // TODO: get a project relative path.
-        File.WriteAllBytes(qoiFilePath, bytes);
         return true;
     }
 
