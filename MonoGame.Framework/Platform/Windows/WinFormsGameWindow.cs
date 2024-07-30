@@ -8,6 +8,7 @@ using System.Drawing;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Threading;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -214,7 +215,7 @@ namespace MonoGame.Framework
 
         private void Form_MouseDown(object sender, MouseEventArgs e)
         {
-            if(_isMouseKeysEnabled && e.Button==MouseButtons.Left)
+            if (_isMouseKeysEnabled && e.Button == MouseButtons.Left)
             {
                 _isleftMouseButtonDown = true;
             }
@@ -224,7 +225,10 @@ namespace MonoGame.Framework
         {
             if (e.Button == MouseButtons.Left)
             {
-                _isleftMouseButtonDown = false;
+                Task.Delay(100).ContinueWith((x) =>
+                {
+                    _isleftMouseButtonDown = false;
+                });
             }
         }
 
@@ -379,8 +383,8 @@ namespace MonoGame.Framework
             if (touchState.HasValue)
                 TouchPanelState.AddEvent(0, touchState.Value, new Vector2(MouseState.X, MouseState.Y), true);
 
-            if(_isleftMouseButtonDown)
-            {
+            if (_isleftMouseButtonDown)
+            {                
                 MouseState.LeftButton = ButtonState.Pressed;
             }
             else
