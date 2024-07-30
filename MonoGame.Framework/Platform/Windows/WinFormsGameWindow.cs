@@ -49,6 +49,7 @@ namespace MonoGame.Framework
 
         private bool _isleftMouseButtonDown;
         private bool _isMouseKeysEnabled;
+        private bool _subscribedToMouseKeyEvents;
 
         #region Internal Properties
 
@@ -175,20 +176,40 @@ namespace MonoGame.Framework
 
             Form.KeyPress += OnKeyPress;
 
-            _isMouseKeysEnabled = MouseKeysManager.IsEnabled();
-            if (_isMouseKeysEnabled)
-            {
-                Form.MouseDown += Form_MouseDown;
-                Form.MouseUp += Form_MouseUp;
-            }
+            UpdateMouseKeys();
+
             Form.SettingChanged += Form_SettingChanged;
 
             RegisterToAllWindows();
         }
 
-        private void Form_SettingChanged(object sender, EventArgs e)
+        private void UpdateMouseKeys()
         {
             _isMouseKeysEnabled = MouseKeysManager.IsEnabled();
+
+            if (_isMouseKeysEnabled)
+            {
+                if (!_subscribedToMouseKeyEvents)
+                {
+                    Form.MouseDown += Form_MouseDown;
+                    Form.MouseUp += Form_MouseUp;
+                    _subscribedToMouseKeyEvents = true;
+                }
+            }
+            else
+            {
+                if (_subscribedToMouseKeyEvents)
+                {
+                    Form.MouseDown -= Form_MouseDown;
+                    Form.MouseUp -= Form_MouseUp;
+                    _subscribedToMouseKeyEvents = false;
+                }
+            }
+        }
+
+        private void Form_SettingChanged(object sender, EventArgs e)
+        {
+            UpdateMouseKeys();
         }
 
         private void Form_MouseDown(object sender, MouseEventArgs e)
