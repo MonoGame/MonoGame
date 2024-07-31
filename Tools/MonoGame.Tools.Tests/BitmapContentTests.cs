@@ -235,6 +235,32 @@ namespace MonoGame.Tests.ContentPipeline
         }
 
         [Test]
+        public void BitmapCompress_Atc_Interpolated()
+        {
+            // validate that we can compress an atc interpolated texture
+            BitmapConvert(typeof(AtcInterpolatedBitmapContent), Color.Red, 64, 64);
+        }
+
+
+        [Test]
+        public void BitmapCompress_Etc1()
+        {
+            // validate that we can compress an atc interpolated texture
+            BitmapConvert(typeof(Etc1BitmapContent), Color.Red, 64, 64);
+        }
+
+        [Test]
+        public void BitmapCompress_Pvrtc()
+        {
+            // validate that we can compress a pvrtc rgb texture
+            BitmapConvert(typeof(PvrtcRgb4BitmapContent), Color.Red, 64, 64);
+
+            // validate that we can compress a pvrtc rgb texture
+            BitmapConvert(typeof(PvrtcRgba4BitmapContent), Color.Red, 64, 64);
+
+        }
+
+        [Test]
         public void BitmapCompress_Dxt1()
         {
             BitmapConvertAssert(typeof(Dxt1BitmapContent), Color.Red, 64, 64, 0);

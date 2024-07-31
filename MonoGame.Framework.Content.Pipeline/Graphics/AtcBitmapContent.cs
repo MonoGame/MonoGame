@@ -71,9 +71,9 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
             // BitmapContent.Copy(sourceBitmap, sourceRegion, colorBitmap, new Rectangle(0, 0, colorBitmap.Width, colorBitmap.Height));
             // sourceBitmap = colorBitmap;
 
-            var sourceData = sourceBitmap.GetPixelData();
+            // rg, basisU isn't printing an output path for ATC textures.
             if (!BasisU.TryEncodeBytes(
-                    sourceBitmap: this,
+                    sourceBitmap: sourceBitmap,
                     width: Width,
                     height: Height,
                     hasAlpha: true,

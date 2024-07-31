@@ -100,9 +100,8 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
                     break;
             }
 
-            var sourceData = sourceBitmap.GetPixelData();
             if (!BasisU.TryEncodeBytes(
-                    sourceBitmap: this,
+                    sourceBitmap: sourceBitmap,
                     width: Width,
                     height: Height,
                     hasAlpha: hasAlpha,

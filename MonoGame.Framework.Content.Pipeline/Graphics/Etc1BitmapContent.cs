@@ -56,6 +56,9 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
             if (!sourceBitmap.TryGetFormat(out sourceFormat))
                 return false;
 
+            SurfaceFormat format;
+            TryGetFormat(out format);
+
             // A shortcut for copying the entire bitmap to another bitmap of the same type and format
             if (SurfaceFormat.RgbEtc1 == sourceFormat && (sourceRegion == new Rectangle(0, 0, Width, Height)) && sourceRegion == destinationRegion)
             {
@@ -82,12 +85,12 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
             }
 
             if (!BasisU.TryEncodeBytes(
-                    sourceBitmap: this,
+                    sourceBitmap: sourceBitmap,
                     width: Width,
                     height: Height,
                     hasAlpha: false,
                     isLinearColor: true, // TODO: support etc2
-                    format: sourceFormat,
+                    format: format,
                     out var compressedBytes))
             {
                 return false;

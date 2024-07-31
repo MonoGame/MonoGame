@@ -270,7 +270,7 @@ internal static class BasisU
     {
         encodedBytes = Array.Empty<byte>();
 
-        if (!TryGetBasisUFormat(format, out var basisUFormat, out _))
+        if (!TryGetBasisUFormat(format, out var basisUFormat, out var basisUError))
         {
             // TODO: is there a way to log?
             return false;
@@ -346,11 +346,12 @@ internal static class BasisU
         //  basisu -unpack foo.ktx2 -ktx_only -linear -format_only 2
         var linearFlag = basisUFormat.isLinearColorSpace ? "-linear" : "";
         // var linearFlag = "";
-        var argStr = $"-unpack -file {basisFileName} -ktx_only -format_only {basisUFormat.code} {linearFlag}";
+        // -ktx_only
+        var argStr = $"-unpack -file {basisFileName}  -format_only {basisUFormat.code} {linearFlag}";
         var exitCode = Run(
             args: argStr,
             stdOut: out var stdOut,
-            stdErr: out _);
+            stdErr: out var stdErr);
         // TODO: is there a standard logging practice to log stdErr/stdOut if the exitCode is non-zero?
         var isSuccess = exitCode == 0;
         if (!isSuccess)
@@ -401,7 +402,7 @@ internal static class BasisU
         var argStr = $"-file {absImageFileName} -uastc -ktx2 -output_file {intermediateFileName}";
         var exitCode = Run(
             args: argStr,
-            stdOut: out _,
+            stdOut: out var stdOut,
             stdErr: out stdErr);
         // TODO: is there a standard logging practice to log stdErr/stdOut if the exitCode is non-zero?
         var isSuccess = exitCode == 0;
