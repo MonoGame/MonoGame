@@ -172,6 +172,25 @@ internal static class BasisU
         return ExternalTool.Run("basisu", args, out stdOut, out stdErr, stdIn);
     }
 
+    /// <summary>
+    /// <para>
+    ///     Convert a <see cref="SurfaceFormat"/> into a <see cref="BasisUFormat"/>.
+    ///     Not all surface formats are supported. If the given format is not supported,
+    ///     then this method returns false, and the <see cref="error"/> out param will
+    ///     include an explanation of why the format isn't supported.
+    /// </para>
+    /// <para>
+    ///     The set of basisu formats are defined here,
+    ///     https://github.com/BinomialLLC/basis_universal/blob/master/transcoder/basisu_transcoder.h#L49
+    /// </para>
+    /// </summary>
+    /// <param name="format"></param>
+    /// <param name="basisUFormat"></param>
+    /// <param name="error"></param>
+    /// <returns>
+    ///     True if the <see cref="BasisUFormat"/> out param has been set.
+    ///     False otherwise, and the <see cref="error"/> out param will include an error message.
+    /// </returns>
     public static bool TryGetBasisUFormat(SurfaceFormat format, out BasisUFormat basisUFormat, out string error)
     {
         basisUFormat = default;

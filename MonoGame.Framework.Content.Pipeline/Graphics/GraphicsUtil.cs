@@ -182,9 +182,11 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
             if (isSpriteFont)
                 CompressFontDXT3(content);
             else if (alphaRange == AlphaRange.Opaque)
+
                 content.ConvertBitmapType(typeof(Dxt1BitmapContent));
             else if (alphaRange == AlphaRange.Cutout)
-                content.ConvertBitmapType(typeof(Dxt3BitmapContent)); // TODO: this will need to change to Dxt5, I think
+                // BasisU does not support DXT1a, so to support alpha, we must use DXT5
+                content.ConvertBitmapType(typeof(Dxt5BitmapContent));
             else
                 content.ConvertBitmapType(typeof(Dxt5BitmapContent));
         }
@@ -198,13 +200,8 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
                 return;
             }
 
-            var face = content.Faces[0][0];
-			var alphaRange = CalculateAlphaRange(face);
-
-            if (alphaRange == AlphaRange.Full)
-                content.ConvertBitmapType(typeof(AtcExplicitBitmapContent));
-            else
-                content.ConvertBitmapType(typeof(AtcInterpolatedBitmapContent));
+            // basisU only supports ATC Interpolated, so the alphaRange is irrelevant.
+            content.ConvertBitmapType(typeof(AtcInterpolatedBitmapContent));
         }
 
         static public void CompressEtc1(ContentProcessorContext context, TextureContent content, bool isSpriteFont)
