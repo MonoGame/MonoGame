@@ -7,6 +7,7 @@ using System.IO;
 using Microsoft.Xna.Framework.Content.Pipeline.Graphics;
 using Microsoft.Xna.Framework.Graphics;
 using KtxSharp;
+using MonoGame.Framework.Content;
 using StbImageWriteSharp;
 
 namespace Microsoft.Xna.Framework.Content.Pipeline.Utilities;
@@ -297,32 +298,38 @@ internal static class BasisU
         out byte[] encodedBytes)
     {
         encodedBytes = Array.Empty<byte>();
+        var context = ContextScopeFactory.ActiveContext;
 
-        if (!TryGetBasisUFormat(format, out var basisUFormat, out var basisUError))
+        if (!TryGetBasisUFormat(format, out var basisUFormat, out var error))
         {
-            // TODO: is there a way to log?
+            context.Logger.LogWarning(null, context.SourceIdentity, "unable to find valid basisu format for target-format=[{0}], error=[{1}]", format, error);
             return false;
         }
 
         if (!TryWritePngFile(sourceBitmap, width, height, hasAlpha, isLinearColor, out var imageFile))
         {
+            context.Logger.LogWarning(null, context.SourceIdentity,"unable to write intermediate png for bitmap conversion");
             return false;
         }
 
         var intermediateFileName = imageFile + ".ktx";
 
-        if (!TryBuildIntermediateFile(imageFile, intermediateFileName, out var stdErr))
+        if (!TryBuildIntermediateFile(imageFile, intermediateFileName, out error))
         {
+            context.Logger.LogWarning(null, context.SourceIdentity,"unable to write intermediate ktx file for input=[{0}] error=[{1}]", imageFile, error);
             return false;
         }
 
-        if (!TryUnpackKtx(intermediateFileName, basisUFormat, out var ktxFileName))
+        if (!TryUnpackKtx(intermediateFileName, basisUFormat, context, out var ktxFileName, out error))
         {
-            return false;
+            context.Logger.LogWarning(null, context.SourceIdentity,"unable to unpack ktx file for input=[{0}] format=[{1}] error=[{2}]", intermediateFileName, basisUFormat, error);
+            throw new PipelineException("unable to unpack ktx file for input=[{0}] format=[{1}] error=[{2}]",
+                intermediateFileName, basisUFormat, error);
         }
 
         if (!TryReadKtx(ktxFileName, out encodedBytes))
         {
+            context.Logger.LogWarning(null, context.SourceIdentity,"unable to read unpacked ktx file");
             return false;
         }
 
@@ -337,7 +344,10 @@ internal static class BasisU
         bool isLinearColor,
         out string pngFileName)
     {
+        var context = ContextScopeFactory.ActiveContext;
+
         pngFileName = $"tempImage_{Guid.NewGuid().ToString()}.png"; // TODO: get a project relative path.
+        pngFileName = Path.Combine(context.IntermediateDirectory, pngFileName);
         using var fileStream = File.OpenWrite(pngFileName);
 
         // in order to save a png, we need a colorBitmap.
@@ -365,11 +375,13 @@ internal static class BasisU
     public static bool TryUnpackKtx(
         string basisFileName,
         BasisUFormat basisUFormat,
-        out string outputKtxFileName
+        IContentContext context,
+        out string outputKtxFileName,
+        out string error
     )
     {
         outputKtxFileName = null;
-
+        basisFileName = Path.GetFullPath(basisFileName);
         // taken from the basisu docs, https://github.com/MonoGame/MonoGame.Tool.BasisUniversal
         //  basisu -unpack foo.ktx2 -ktx_only -linear -format_only 2
         var linearFlag = basisUFormat.isLinearColorSpace ? "-linear" : "";
@@ -378,8 +390,8 @@ internal static class BasisU
         var exitCode = Run(
             args: argStr,
             stdOut: out var stdOut,
-            stdErr: out _,
-            workingDirectory: "."); // TODO: fix
+            stdErr: out error,
+            workingDirectory: context.IntermediateDirectory);
         // TODO: is there a standard logging practice to log stdErr/stdOut if the exitCode is non-zero?
         var isSuccess = exitCode == 0;
         if (!isSuccess)
@@ -415,11 +427,11 @@ internal static class BasisU
 
         var parsedKtxFileName = !string.IsNullOrEmpty(outputKtxFileName);
 
-        // outputKtxFileName = Path.Combine(context.IntermediateDirectory, outputKtxFileName ?? "");
+        outputKtxFileName = Path.Combine(context.IntermediateDirectory, outputKtxFileName ?? "");
 
         if (!parsedKtxFileName)
         {
-            // error = "could not identify output ktx file name. " + error;
+            error = "could not identify output ktx file name. " + error;
         }
 
         return parsedKtxFileName;
@@ -439,7 +451,6 @@ internal static class BasisU
             args: argStr,
             stdOut: out var stdOut,
             stdErr: out stdErr);
-        // TODO: is there a standard logging practice to log stdErr/stdOut if the exitCode is non-zero?
         var isSuccess = exitCode == 0;
         return isSuccess;
     }

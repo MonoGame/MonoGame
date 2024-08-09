@@ -3,10 +3,9 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System;
-using Microsoft.Xna.Framework.Graphics;
-// using Nvidia.TextureTools;
-using System.Runtime.InteropServices;
 using Microsoft.Xna.Framework.Content.Pipeline.Utilities;
+using Microsoft.Xna.Framework.Graphics;
+using MonoGame.Framework.Utilities;
 
 namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 {

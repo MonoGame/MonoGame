@@ -5,7 +5,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
+using Microsoft.Xna.Framework.Content.Pipeline;
 using Microsoft.Xna.Framework.Graphics;
+using MonoGame.Framework.Content;
+using MonoGame.Tools.Tests;
 
 namespace MonoGame.Tests.ContentPipeline
 {
@@ -224,12 +227,14 @@ namespace MonoGame.Tests.ContentPipeline
 
         static void BitmapConvertAssert(Type bitmapType, Color color, int w, int h, int range)
         {
+            using var _ = ContextScopeFactory.BeginContext(new TestBitmapProcessorContext());
             var b = BitmapConvert(bitmapType, color, w, h);
             BitmapAssert(b, color, range);
         }
 
         static void BitmapConvertAssert(Type bitmapType, Color color, int w, int h, Color compare, int range)
         {
+            using var _ = ContextScopeFactory.BeginContext(new TestBitmapProcessorContext());
             var b = BitmapConvert(bitmapType, color, w, h);
             BitmapAssert(b, compare, range);
         }
@@ -246,6 +251,7 @@ namespace MonoGame.Tests.ContentPipeline
         public void BitmapCompress_Etc1()
         {
             // validate that we can compress an atc interpolated texture
+            using var _ = ContextScopeFactory.BeginContext(new TestBitmapProcessorContext());
             BitmapConvert(typeof(Etc1BitmapContent), Color.Red, 64, 64);
         }
 
@@ -253,11 +259,17 @@ namespace MonoGame.Tests.ContentPipeline
         public void BitmapCompress_Pvrtc()
         {
             // validate that we can compress a pvrtc rgb texture
-            BitmapConvert(typeof(PvrtcRgb4BitmapContent), Color.Red, 64, 64);
+            using (var _ = ContextScopeFactory.BeginContext(new TestBitmapProcessorContext()))
+            {
+                BitmapConvert(typeof(PvrtcRgb4BitmapContent), Color.Red, 64, 64);
+            }
+
 
             // validate that we can compress a pvrtc rgb texture
-            BitmapConvert(typeof(PvrtcRgba4BitmapContent), Color.Red, 64, 64);
-
+            using (var _ = ContextScopeFactory.BeginContext(new TestBitmapProcessorContext()))
+            {
+                BitmapConvert(typeof(PvrtcRgba4BitmapContent), Color.Red, 64, 64);
+            }
         }
 
         [Test]
