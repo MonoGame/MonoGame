@@ -48,6 +48,11 @@ internal struct BasisUFormat
         this.isLinearColorSpace = isLinearColorSpace;
     }
 
+    public override string ToString()
+    {
+        return $"basisu(name={name}, code={code}, linear={isLinearColorSpace})";
+    }
+
     /// <summary>
     /// <see cref="SurfaceFormat.RgbEtc1"/>
     /// Opaque only, returns RGB or alpha data if cDecodeFlagsTranscodeAlphaDataToOpaqueFormats flag is specified
@@ -166,10 +171,14 @@ internal static class BasisU
     /// <param name="stdOut">The standard output buffer from the basisu process</param>
     /// <param name="stdErr">The standard error buffer from the basisu process</param>
     /// <param name="stdIn">The standard input buffer for the basisu process. By default, no standard input is sent to the process. </param>
+    /// <param name="workingDirectory">
+    /// An optional working directory for basisU. When basisU unpacks ktx files, it will put them in the working dir,
+    /// so the only way to control the output is to control the working dir.
+    /// </param>
     /// <returns>The exit code for the basisu process. </returns>
-    public static int Run(string args, out string stdOut, out string stdErr, string stdIn=null)
+    public static int Run(string args, out string stdOut, out string stdErr, string stdIn=null, string workingDirectory=null)
     {
-        return ExternalTool.Run("basisu", args, out stdOut, out stdErr, stdIn);
+        return ExternalTool.Run("basisu", args, out stdOut, out stdErr, stdIn, workingDirectory);
     }
 
     /// <summary>
@@ -365,12 +374,12 @@ internal static class BasisU
         //  basisu -unpack foo.ktx2 -ktx_only -linear -format_only 2
         var linearFlag = basisUFormat.isLinearColorSpace ? "-linear" : "";
         // var linearFlag = "";
-        // -ktx_only
-        var argStr = $"-unpack -file {basisFileName}  -format_only {basisUFormat.code} {linearFlag}";
+        var argStr = $"-unpack -file {basisFileName} -ktx_only -format_only {basisUFormat.code} {linearFlag}";
         var exitCode = Run(
             args: argStr,
             stdOut: out var stdOut,
-            stdErr: out var stdErr);
+            stdErr: out _,
+            workingDirectory: "."); // TODO: fix
         // TODO: is there a standard logging practice to log stdErr/stdOut if the exitCode is non-zero?
         var isSuccess = exitCode == 0;
         if (!isSuccess)
@@ -405,6 +414,13 @@ internal static class BasisU
         }
 
         var parsedKtxFileName = !string.IsNullOrEmpty(outputKtxFileName);
+
+        // outputKtxFileName = Path.Combine(context.IntermediateDirectory, outputKtxFileName ?? "");
+
+        if (!parsedKtxFileName)
+        {
+            // error = "could not identify output ktx file name. " + error;
+        }
 
         return parsedKtxFileName;
     }
