@@ -177,7 +177,7 @@ namespace MonoGame.Framework.Content
             public override ContentBuildLogger Logger => _context.Logger;
             public override ContentIdentity SourceIdentity => _context.SourceIdentity;
         }
-        
+
         private class ContentImporterContextAdapter : ContextScope
         {
             private readonly ContentImporterContext _context;

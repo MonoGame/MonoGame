@@ -85,17 +85,10 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
                 }
             }
 
-            if (!BasisU.TryEncodeBytes(
-                    sourceBitmap: sourceBitmap,
-                    width: Width,
-                    height: Height,
-                    hasAlpha: false,
-                    isLinearColor: true, // TODO: support etc2
-                    format: format,
-                    out var compressedBytes))
-            {
-                return false;
-            }
+            BasisU.EncodeBytes(
+                sourceBitmap: sourceBitmap,
+                format: format,
+                out var compressedBytes);
             SetPixelData(compressedBytes);
 
             return true;

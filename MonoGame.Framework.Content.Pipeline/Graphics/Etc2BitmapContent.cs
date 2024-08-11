@@ -9,72 +9,47 @@ using MonoGame.Framework.Utilities;
 
 namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 {
-    public abstract class DxtBitmapContent : BitmapContent
+    /// <summary>
+    /// Supports the processing of a texture compressed using ETC2.
+    /// </summary>
+    public class Etc2BitmapContent : BitmapContent
     {
-        private byte[] _bitmapData;
-        private int _blockSize;
-        private SurfaceFormat _format;
+        private const SurfaceFormat FORMAT = SurfaceFormat.Rgba8Etc2;
+        byte[] _data;
 
-        private int _nvttWriteOffset;
-
-        protected DxtBitmapContent(int blockSize)
+        /// <summary>
+        /// Initializes a new instance of Etc2BitmapContent.
+        /// </summary>
+        protected Etc2BitmapContent()
+            : base()
         {
-            if (!((blockSize == 8) || (blockSize == 16)))
-                throw new ArgumentException("Invalid block size");
-            _blockSize = blockSize;
-            TryGetFormat(out _format);
         }
 
-        protected DxtBitmapContent(int blockSize, int width, int height)
-            : this(blockSize)
+        /// <summary>
+        /// Initializes a new instance of Etc2BitmapContent with the specified width or height.
+        /// </summary>
+        /// <param name="width">Width in pixels of the bitmap resource.</param>
+        /// <param name="height">Height in pixels of the bitmap resource.</param>
+        public Etc2BitmapContent(int width, int height)
+            : base(width, height)
         {
-            Width = width;
-            Height = height;
         }
 
         public override byte[] GetPixelData()
         {
-            return _bitmapData;
+            return _data;
         }
 
         public override void SetPixelData(byte[] sourceData)
         {
-            _bitmapData = sourceData;
-        }
+            int bytesRequired = ((Width + 3) >> 2) * ((Height + 3) >> 2) * FORMAT.GetSize();
+            if (bytesRequired != sourceData.Length)
+                throw new ArgumentException("ETC2 bitmap with width " + Width + " and height " + Height + " needs "
+                    + bytesRequired + " bytes. Received " + sourceData.Length + " bytes");
 
-        private static void HasAnyAlpha(byte[] data, out bool hasTransparency)
-        {
-            hasTransparency = false;
-            for (var x = 0; x < data.Length; x += 4)
-            {
-                // Look for non-opaque pixels.
-                var alpha = data[x + 3];
-                if (alpha < 255)
-                {
-                    hasTransparency = true;
-                    break; // no need to process entire image if we identify alpha early.
-                }
-            }
-        }
-
-        [Obsolete]
-        private static void PrepareNVTT_DXT1(byte[] data, out bool hasTransparency)
-        {
-            hasTransparency = false;
-
-            for (var x = 0; x < data.Length; x += 4)
-            {
-                // NVTT wants BGRA where our source is RGBA so
-                // we swap the red and blue channels.
-                data[x] ^= data[x + 2];
-                data[x + 2] ^= data[x];
-                data[x] ^= data[x + 2];
-
-                // Look for non-opaque pixels.
-                var alpha = data[x + 3];
-                if (alpha < 255)
-                    hasTransparency = true;
-            }
+            if (_data == null || _data.Length != bytesRequired)
+                _data = new byte[bytesRequired];
+            Buffer.BlockCopy(sourceData, 0, _data, 0, bytesRequired);
         }
 
         protected override bool TryCopyFrom(BitmapContent sourceBitmap, Rectangle sourceRegion, Rectangle destinationRegion)
@@ -87,15 +62,12 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
             TryGetFormat(out format);
 
             // A shortcut for copying the entire bitmap to another bitmap of the same type and format
-            if (format == sourceFormat && (sourceRegion == new Rectangle(0, 0, Width, Height)) && sourceRegion == destinationRegion)
+            if (FORMAT == sourceFormat && (sourceRegion == new Rectangle(0, 0, Width, Height)) && sourceRegion == destinationRegion)
             {
                 SetPixelData(sourceBitmap.GetPixelData());
                 return true;
             }
 
-            // TODO: Add a XNA unit test to see what it does
-            // my guess is that this is invalid for DXT.
-            //
             // Destination region copy is not yet supported
             if (destinationRegion != new Rectangle(0, 0, Width, Height))
                 return false;
@@ -129,19 +101,35 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
             if (!destinationBitmap.TryGetFormat(out destinationFormat))
                 return false;
 
-            SurfaceFormat format;
-            TryGetFormat(out format);
-
             // A shortcut for copying the entire bitmap to another bitmap of the same type and format
-            var fullRegion = new Rectangle(0, 0, Width, Height);
-            if ((format == destinationFormat) && (sourceRegion == fullRegion) && (sourceRegion == destinationRegion))
+            if (FORMAT == destinationFormat && (sourceRegion == new Rectangle(0, 0, Width, Height)) && sourceRegion == destinationRegion)
             {
                 destinationBitmap.SetPixelData(GetPixelData());
                 return true;
             }
 
-            // No other support for copying from a DXT texture yet
+            // No other support for copying from a ETC2 texture yet
             return false;
+        }
+
+        /// <summary>
+        /// Gets the corresponding GPU texture format for the specified bitmap type.
+        /// </summary>
+        /// <param name="format">Format being retrieved.</param>
+        /// <returns>The GPU texture format of the bitmap type.</returns>
+        public override bool TryGetFormat(out SurfaceFormat format)
+        {
+            format = FORMAT;
+            return true;
+        }
+
+        /// <summary>
+        /// Returns a string description of the bitmap.
+        /// </summary>
+        /// <returns>Description of the bitmap.</returns>
+        public override string ToString()
+        {
+            return "ETC2 " + Width + "x" + Height;
         }
     }
 }

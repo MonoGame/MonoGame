@@ -243,6 +243,7 @@ namespace MonoGame.Tests.ContentPipeline
         public void BitmapCompress_Atc_Interpolated()
         {
             // validate that we can compress an atc interpolated texture
+            using var _ = ContextScopeFactory.BeginContext(new TestBitmapProcessorContext());
             BitmapConvert(typeof(AtcInterpolatedBitmapContent), Color.Red, 64, 64);
         }
 
@@ -253,6 +254,14 @@ namespace MonoGame.Tests.ContentPipeline
             // validate that we can compress an atc interpolated texture
             using var _ = ContextScopeFactory.BeginContext(new TestBitmapProcessorContext());
             BitmapConvert(typeof(Etc1BitmapContent), Color.Red, 64, 64);
+        }
+
+        [Test]
+        public void BitmapCompress_Etc2()
+        {
+            // validate that we can compress an atc interpolated texture
+            using var _ = ContextScopeFactory.BeginContext(new TestBitmapProcessorContext());
+            BitmapConvert(typeof(Etc2BitmapContent), Color.Red, 64, 64);
         }
 
         [Test]

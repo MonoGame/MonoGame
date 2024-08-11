@@ -89,29 +89,10 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
                 }
             }
 
-
-            bool hasAlpha = false;
-            switch (format)
-            {
-                case SurfaceFormat.RgbaPvrtc4Bpp:
-                    hasAlpha = true;
-                    break;
-                case SurfaceFormat.RgbPvrtc4Bpp:
-                    hasAlpha = false;
-                    break;
-            }
-
-            if (!BasisU.TryEncodeBytes(
-                    sourceBitmap: sourceBitmap,
-                    width: Width,
-                    height: Height,
-                    hasAlpha: hasAlpha,
-                    isLinearColor: true,
-                    format: format,
-                    out var compressedBytes))
-            {
-                return false;
-            }
+            BasisU.EncodeBytes(
+                sourceBitmap: sourceBitmap,
+                format: format,
+                out var compressedBytes);
 
             SetPixelData(compressedBytes);
 

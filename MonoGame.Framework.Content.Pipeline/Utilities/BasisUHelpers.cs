@@ -179,7 +179,7 @@ internal static class BasisU
     /// <returns>The exit code for the basisu process. </returns>
     public static int Run(string args, out string stdOut, out string stdErr, string stdIn=null, string workingDirectory=null)
     {
-        return ExternalTool.Run("basisu", args, out stdOut, out stdErr, stdIn, workingDirectory);
+        return ExternalTool.Run("dotnet", "mgcb-basisu " + args, out stdOut, out stdErr, stdIn, workingDirectory);
     }
 
     /// <summary>
@@ -288,27 +288,41 @@ internal static class BasisU
         }
     }
 
-    public static bool TryEncodeBytes(
+    public static void EncodeBytes(
         BitmapContent sourceBitmap,
-        int width,
-        int height,
-        bool hasAlpha,
-        bool isLinearColor,
         SurfaceFormat format,
         out byte[] encodedBytes)
     {
+        if (!TryEncodeBytes(
+                sourceBitmap,
+                format,
+                out encodedBytes,
+                out var error))
+        {
+            var context = ContextScopeFactory.ActiveContext;
+            throw new PipelineException(error + $" src=[{context.SourceIdentity.SourceFilename}]");
+        }
+    }
+
+    public static bool TryEncodeBytes(
+        BitmapContent sourceBitmap,
+        SurfaceFormat format,
+        out byte[] encodedBytes,
+        out string failureMessage)
+    {
+        failureMessage = null;
         encodedBytes = Array.Empty<byte>();
         var context = ContextScopeFactory.ActiveContext;
 
         if (!TryGetBasisUFormat(format, out var basisUFormat, out var error))
         {
-            context.Logger.LogWarning(null, context.SourceIdentity, "unable to find valid basisu format for target-format=[{0}], error=[{1}]", format, error);
+            failureMessage = $"unable to find valid basisu format for target-format=[{format}], error=[{error}]";
             return false;
         }
 
-        if (!TryWritePngFile(sourceBitmap, width, height, hasAlpha, isLinearColor, out var imageFile))
+        if (!TryWritePngFile(sourceBitmap, out var imageFile))
         {
-            context.Logger.LogWarning(null, context.SourceIdentity,"unable to write intermediate png for bitmap conversion");
+            failureMessage = "unable to write intermediate png for bitmap conversion";
             return false;
         }
 
@@ -316,20 +330,19 @@ internal static class BasisU
 
         if (!TryBuildIntermediateFile(imageFile, intermediateFileName, out error))
         {
-            context.Logger.LogWarning(null, context.SourceIdentity,"unable to write intermediate ktx file for input=[{0}] error=[{1}]", imageFile, error);
+            failureMessage = $"unable to write intermediate ktx file for input=[{imageFile}] error=[{error}]";
             return false;
         }
 
         if (!TryUnpackKtx(intermediateFileName, basisUFormat, context, out var ktxFileName, out error))
         {
-            context.Logger.LogWarning(null, context.SourceIdentity,"unable to unpack ktx file for input=[{0}] format=[{1}] error=[{2}]", intermediateFileName, basisUFormat, error);
-            throw new PipelineException("unable to unpack ktx file for input=[{0}] format=[{1}] error=[{2}]",
-                intermediateFileName, basisUFormat, error);
+            failureMessage = $"unable to unpack ktx file for input=[{intermediateFileName}] format=[{basisUFormat}] error=[{error}]";
+            return false;
         }
 
         if (!TryReadKtx(ktxFileName, out encodedBytes))
         {
-            context.Logger.LogWarning(null, context.SourceIdentity,"unable to read unpacked ktx file");
+            failureMessage = "unable to read unpacked ktx file";
             return false;
         }
 
@@ -338,10 +351,6 @@ internal static class BasisU
 
     public static bool TryWritePngFile(
         BitmapContent sourceBitmap,
-        int width,
-        int height,
-        bool hasAlpha,
-        bool isLinearColor,
         out string pngFileName)
     {
         var context = ContextScopeFactory.ActiveContext;
@@ -392,7 +401,7 @@ internal static class BasisU
             stdOut: out var stdOut,
             stdErr: out error,
             workingDirectory: context.IntermediateDirectory);
-        // TODO: is there a standard logging practice to log stdErr/stdOut if the exitCode is non-zero?
+        error = error + $" argStr=[{argStr}]";
         var isSuccess = exitCode == 0;
         if (!isSuccess)
             return false;

@@ -1,0 +1,13 @@
+{
+  "version": 1,
+  "isRoot": true,
+  "tools": {
+    "mgcb-basisu": {
+      "version": "1.16.4.2",
+      "commands": [
+        "mgcb-basisu"
+      ],
+      "rollForward": false
+    }
+  }
+}
