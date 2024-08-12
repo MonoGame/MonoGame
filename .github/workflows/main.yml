@@ -25,24 +25,76 @@ jobs:
         uses: actions/setup-java@v4
         with:
           distribution: 'microsoft'
-          java-version: '11'
+          java-version: '17'
 
       - name: Disable annotations
         run: echo "::remove-matcher owner=csc::"
 
+      - name: install wine64 on linux
+        run: |
+          sudo apt install p7zip-full curl
+          sudo dpkg --add-architecture i386 
+          sudo mkdir -pm755 /etc/apt/keyrings
+          sudo wget -O /etc/apt/keyrings/winehq-archive.key https://dl.winehq.org/wine-builds/winehq.key
+          sudo wget -NP /etc/apt/sources.list.d/ https://dl.winehq.org/wine-builds/ubuntu/dists/jammy/winehq-jammy.sources
+          sudo apt update && sudo apt install --install-recommends winehq-stable
+        if: runner.os == 'Linux'
+
+      - name: Install Arial Font
+        run: |
+          echo "ttf-mscorefonts-installer msttcorefonts/accepted-mscorefonts-eula select true" | sudo debconf-set-selections
+          sudo apt install -y ttf-mscorefonts-installer
+          sudo fc-cache
+          fc-match Arial
+        if: runner.os == 'Linux'
+
+      - name: install wine64 on macos
+        run: |
+          brew install wine-stable p7zip freeimage freetype
+          sudo mkdir -p /usr/local/lib
+          sudo ln -s /opt/homebrew/lib/libfreetype.dylib /usr/local/lib/libfreetype6.dylib
+          sudo ln -s /opt/homebrew/lib/libfreeimage.dylib /usr/local/lib/libfreeimage.dylib
+        if: runner.os == 'macOS'
+
+      - name: Setup Wine 
+        run: wget -qO- https://monogame.net/downloads/net8_mgfxc_wine_setup.sh | bash
+        if: runner.os != 'Windows'
+
       - name: Install required workloads
         run:   |
               if [ "$RUNNER_OS" == "Linux" ]; then
-                    echo "MICROSOFT SUPPORT ANDROID WORKLOAD ON LINUX PLZZZ!"
+                    dotnet workload install android
               elif [ "$RUNNER_OS" == "Windows" ]; then
                     dotnet.exe workload install android ios macos
               else
-                    dotnet workload install android ios macos
+                    dotnet workload install android
               fi
         shell: bash
 
       - name: Build
         run: dotnet run --project build/Build.csproj -- --target=Default
+
+      - name: Test
+        run: dotnet test Tools/MonoGame.Tools.Tests/MonoGame.Tools.Tests.csproj --blame-hang-timeout 1m -c Release
+        env:
+          DOTNET_ROOT: ${{github.workspace}}/dotnet64
+          MGFXC_WINE_PATH: /home/runner/.winemonogame
+          CI: true
+        if: runner.os == 'Linux'
+
+      - name: Test
+        run: dotnet test Tools/MonoGame.Tools.Tests/MonoGame.Tools.Tests.csproj --blame-hang-timeout 1m -c Release
+        env:
+          DOTNET_ROOT: ${{github.workspace}}/dotnet64
+          MGFXC_WINE_PATH: /Users/runner/.winemonogame
+          CI: true
+        if: runner.os == 'macOS'
+
+      - name: Test
+        run: dotnet test Tools/MonoGame.Tools.Tests/MonoGame.Tools.Tests.csproj --blame-hang-timeout 1m -c Release
+        env:
+          CI: true
+        if: runner.os == 'Windows'
 
       - name: Expose GitHub Runtime
         uses: crazy-max/ghaction-github-runtime@v3
@@ -88,3 +140,4 @@ jobs:
               removeArtifacts: true
               artifacts: "nugets/*.nupkg"
               token: ${{ secrets.GITHUB_TOKEN }}
+
