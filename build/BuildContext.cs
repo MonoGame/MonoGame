@@ -21,7 +21,9 @@ public class BuildContext : FrostingContext
         var repositoryUrl = context.Argument("build-repository", DefaultRepositoryUrl);
         var buildConfiguration = context.Argument("build-configuration", "Release");
         BuildOutput = context.Argument("build-output", "artifacts");
-        Version = context.Argument("build-version", DefaultBaseVersion + ".1-develop");
+
+        var nugetTarget = context.Argument("nuget-target", "develop");
+        Version = context.Argument("build-version", DefaultBaseVersion + ".1-" + nugetTarget);
         NuGetsDirectory = $"{BuildOutput}/NuGet/";
 
         if (context.BuildSystem().IsRunningOnGitHubActions)
@@ -35,7 +37,7 @@ public class BuildContext : FrostingContext
             }
             else if (workflow.RefType == GitHubActionsRefType.Branch && workflow.RefName != "refs/heads/master")
             {
-                Version = $"{DefaultBaseVersion}.{workflow.RunNumber}-develop";
+                Version = $"{DefaultBaseVersion}.{workflow.RunNumber}-{nugetTarget}";
             }
             else
             {

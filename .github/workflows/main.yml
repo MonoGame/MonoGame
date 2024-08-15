@@ -1,6 +1,17 @@
-name: Build
+name: MonoGame Build
+env:
+  MONOGAME_NUGETS: MonoGame_Nugets
 
-on: [push, pull_request]
+on: 
+  push:
+    tags:
+      - 'v*.Pre.*'
+    branches: [ main, develop ]
+
+  pull_request:
+    branches: [ main, develop ]
+
+  workflow_dispatch:
 
 jobs:
   build:
@@ -41,7 +52,22 @@ jobs:
               fi
         shell: bash
 
-      - name: Build
+      - if: ${{ github.event_name == 'workflow_dispatch'}}
+        name: Check if tag contains '.Pre.'
+        id: check_preview
+        run: |
+          if [[ "${GITHUB_REF}" == *".Pre."* ]]; then
+            echo "is_preview=true" >> $GITHUB_OUTPUT
+          else
+            echo "is_preview=false" >> $GITHUB_OUTPUT
+          fi
+
+      - if: ${{ github.ref != 'refs/heads/main' }}
+        name: Preview Build
+        run: dotnet run --project build/Build.csproj -- --target=Default --nuget-target=preview
+
+      - if: ${{ github.ref == 'refs/heads/main' }}
+        name: Release Build
         run: dotnet run --project build/Build.csproj -- --target=Default
 
       - name: Expose GitHub Runtime
@@ -52,11 +78,12 @@ jobs:
         env:
           ACTIONS_RUNTIME_TOKEN: ${{ env.ACTIONS_RUNTIME_TOKEN }}
           ACTIONS_RUNTIME_URL: "${{ env.ACTIONS_RUNTIME_URL }}"
+
   deploy:
       name: Deploy
       needs: [ build ]
       runs-on: ubuntu-latest
-      if: ${{ github.event_name == 'push' }}
+      if: ${{ github.event_name == 'workflow_dispatch' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop') }}
       permissions:
           packages: write
           contents: write
@@ -76,3 +103,8 @@ jobs:
             run: dotnet run --project build/Build.csproj -- --target=DeployNuGetsToGithub
             env:
               GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+          - name: Push Marketplace Nugets
+            run: dotnet run --project build/Build.csproj -- --target=DeployNuGetsToMarketplace
+            env:
+              GITHUB_TOKEN: ${{ secrets.NUGET_API_KEY }}
