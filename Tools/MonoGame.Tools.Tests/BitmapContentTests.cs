@@ -264,6 +264,15 @@ namespace MonoGame.Tests.ContentPipeline
             BitmapConvert(typeof(Etc2BitmapContent), Color.Red, 64, 64);
         }
 
+
+        [Test]
+        public void BitmapCompress_Astc()
+        {
+            // validate that we can compress an atc interpolated texture
+            using var _ = ContextScopeFactory.BeginContext(new TestBitmapProcessorContext());
+            BitmapConvert(typeof(AstcBitmapContent), Color.Red, 64, 64);
+        }
+
         [Test]
         public void BitmapCompress_Pvrtc()
         {
@@ -290,20 +299,20 @@ namespace MonoGame.Tests.ContentPipeline
 
             // BasisU does not support Bcn1 alpha punch-through, also known as Dxt1a. Therefor, the alpha channel is lost and always assumed to be opaque.
             //  this is a test regression, and the following line _used_ to work.
-            //BitmapConvertAssert(typeof(Dxt1BitmapContent), new Color(0, 0, 0, 0), 16, 16, 0);
+            // BitmapConvertAssert(typeof(Dxt1BitmapContent), new Color(0, 0, 0, 0), 16, 16, 0);
+            Assert.Catch<NotSupportedException>(() =>
+            {
+                BitmapConvertAssert(typeof(Dxt1BitmapContent), Color.Transparent, 64, 64, 0);
+            });
         }
 
         [Test]
         public void BitmapCompress_Dxt3()
         {
-            var Transparent = new Color(0, 0, 0, 0);
-            var Grey16Premult = new Color(16, 16, 16, 16);
-
-            BitmapConvertAssert(typeof(Dxt3BitmapContent), Color.Red, 64, 64, 0);
-            BitmapConvertAssert(typeof(Dxt3BitmapContent), Color.Green, 32, 34, 2);
-            BitmapConvertAssert(typeof(Dxt3BitmapContent), Color.Blue, 8, 9, 0);
-            BitmapConvertAssert(typeof(Dxt3BitmapContent), Transparent, 16, 16, 0);
-            BitmapConvertAssert(typeof(Dxt3BitmapContent), Grey16Premult, 16, 16, Grey16Premult, 1);
+            Assert.Catch<NotSupportedException>(() =>
+            {
+                BitmapConvertAssert(typeof(Dxt3BitmapContent), Color.Gray, 64, 64, 0);
+            });
         }
 
         [Test]

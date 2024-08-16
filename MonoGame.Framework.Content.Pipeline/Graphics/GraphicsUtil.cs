@@ -188,6 +188,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
                 // BasisU does not support DXT1a, so to support alpha, we must use DXT5
                 content.ConvertBitmapType(typeof(Dxt5BitmapContent));
             else
+                // full range alpha is best supported by DXT5
                 content.ConvertBitmapType(typeof(Dxt5BitmapContent));
         }
 
@@ -204,6 +205,19 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
             content.ConvertBitmapType(typeof(AtcInterpolatedBitmapContent));
         }
 
+        static public void CompressAstc(ContentProcessorContext context, TextureContent content, bool isSpriteFont)
+        {
+            // If sharp alpha is required (for a font texture page), use 16-bit color instead of PVR
+            if (isSpriteFont)
+            {
+                CompressColor16Bit(context, content);
+                return;
+            }
+
+            // astc supports rgba
+            content.ConvertBitmapType(typeof(AstcBitmapContent));
+        }
+
         static public void CompressEtc1(ContentProcessorContext context, TextureContent content, bool isSpriteFont)
         {
             // If sharp alpha is required (for a font texture page), use 16-bit color instead of PVR
@@ -216,9 +230,9 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
             var face = content.Faces[0][0];
             var alphaRange = CalculateAlphaRange(face);
 
-            // Use BGRA4444 for textures with non-opaque alpha values
+            // Use ETC2 when the image has alpha
             if (alphaRange != AlphaRange.Opaque)
-                content.ConvertBitmapType(typeof(PixelBitmapContent<Bgra4444>));
+                content.ConvertBitmapType(typeof(Etc2BitmapContent));
             else
             {
                 // PVR SGX does not handle non-POT ETC1 textures.
@@ -230,7 +244,9 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
                     content.ConvertBitmapType(typeof(PixelBitmapContent<Bgr565>));
                 }
                 else
+                    // use ETC1 when there is no alpha
                     content.ConvertBitmapType(typeof(Etc1BitmapContent));
+
             }
         }
 
@@ -246,6 +262,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
             else
                 content.ConvertBitmapType(typeof(PixelBitmapContent<Bgra4444>));
         }
+
 
         // Compress the greyscale font texture page using a specially-formulated DXT3 mode
         static public unsafe void CompressFontDXT3(TextureContent content)

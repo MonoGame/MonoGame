@@ -69,7 +69,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
             // rg, basisU isn't printing an output path for ATC textures.
             BasisU.EncodeBytes(
                 sourceBitmap: sourceBitmap,
-                format: format,
+                destinationFormat: format,
                 out var compressedBytes);
             SetPixelData(compressedBytes);
 

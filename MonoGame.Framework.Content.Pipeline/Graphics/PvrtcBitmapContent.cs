@@ -91,7 +91,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 
             BasisU.EncodeBytes(
                 sourceBitmap: sourceBitmap,
-                format: format,
+                destinationFormat: format,
                 out var compressedBytes);
 
             SetPixelData(compressedBytes);

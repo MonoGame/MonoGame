@@ -108,11 +108,6 @@
       <PackagePath>runtimes\linux-x64\native\linux</PackagePath>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="..\ThirdParty\Dependencies\basisu\MacOS\basisu" Visible="false">
-      <Link>osx\basisu</Link>
-      <PackagePath>runtimes\osx\native</PackagePath>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
     <Content Include="..\ThirdParty\Dependencies\FreeImage.NET\MacOS\libfreeimage.dylib" Visible="false">
       <Link>libFreeImage.dylib</Link>
       <PackagePath>runtimes\osx\native\libFreeImage.dylib</PackagePath>

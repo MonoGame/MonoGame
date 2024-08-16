@@ -11,8 +11,26 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 
     public class AstcBitmapContent : BitmapContent
     {
-        private SurfaceFormat FORMAT => throw new NotImplementedException("astc is not a valid surface format yet");
+        private SurfaceFormat FORMAT => SurfaceFormat.ASTC_4x4_Rgba;
         internal byte[] _bitmapData;
+
+        /// <summary>
+        /// Initializes a new instance of AstcBitmapContent.
+        /// </summary>
+        protected AstcBitmapContent()
+            : base()
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of AstcBitmapContent with the specified width or height.
+        /// </summary>
+        /// <param name="width">Width in pixels of the bitmap resource.</param>
+        /// <param name="height">Height in pixels of the bitmap resource.</param>
+        public AstcBitmapContent(int width, int height)
+            : base(width, height)
+        {
+        }
 
         public override byte[] GetPixelData()
         {
@@ -63,7 +81,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 
             BasisU.EncodeBytes(
                 sourceBitmap: sourceBitmap,
-                format: format,
+                destinationFormat: format,
                 out var compressedBytes);
             SetPixelData(compressedBytes);
 

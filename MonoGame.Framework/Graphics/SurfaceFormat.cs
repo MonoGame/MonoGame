@@ -183,6 +183,10 @@ namespace Microsoft.Xna.Framework.Graphics
         /// Etc2 SRGB8A8 EAC (Android/iOS withh OpenglES 3.0)
 		/// </summary>
         SRgb8A8Etc2 = 95,
+        /// <summary>
+        /// Adaptive scalable texture compression ; 4x4 matrix using rgba channel interpretation
+        /// </summary>
+        ASTC_4x4_Rgba = 96,
 
         #endregion
     }

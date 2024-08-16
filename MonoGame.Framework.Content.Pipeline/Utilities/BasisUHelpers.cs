@@ -41,18 +41,37 @@ internal struct BasisUFormat
     /// </summary>
     public string name;
 
+    /// <summary>
+    /// BasisU supports a -uastc flag when building intermediate files. When the intermediate file
+    /// is built with the uastc flag, it can produce higher quality compressions. However, not all
+    /// formats are compatible with uastc (namely, ATC).
+    /// </summary>
+    public bool nonUastcCompatible;
+
     // Instead of constructing one of these yourself, please use one of the many predefined static class members.
-    private BasisUFormat(int code, string name, bool isLinearColorSpace=false)
+    private BasisUFormat(int code, string name, bool isLinearColorSpace=false, bool nonUastcCompatible=false)
     {
         this.code = code;
         this.name = name;
         this.isLinearColorSpace = isLinearColorSpace;
+        this.nonUastcCompatible = nonUastcCompatible;
     }
 
     public override string ToString()
     {
-        return $"basisu(name={name}, code={code}, linear={isLinearColorSpace})";
+        return $"basisu(name={name}, code={code}, linear={isLinearColorSpace} uastc={!nonUastcCompatible})";
     }
+
+
+    /// <summary>
+    /// <see cref="SurfaceFormat.ASTC_4x4"/>
+    /// // Opaque+alpha, ASTC 4x4, alpha channel will be opaque for opaque .basis files. Transcoder uses RGB/RGBA/L/LA modes, void extent, and up to two ([0,47] and [0,255]) endpoint precisions.
+    /// </summary>
+    public static readonly BasisUFormat Astc_4x4_Rgba = new BasisUFormat(
+        code: 10,
+        name: "cTFASTC_4x4_RGBA",
+        isLinearColorSpace: true
+    );
 
     /// <summary>
     /// <see cref="SurfaceFormat.RgbEtc1"/>
@@ -92,7 +111,11 @@ internal struct BasisUFormat
     public static readonly BasisUFormat RgbaAtcInterpolatedAlpha = new BasisUFormat(
         code: 12,
         name: "cTFATC_RGBA",
-        isLinearColorSpace: true
+        isLinearColorSpace: true,
+
+        // from observation, if the ATC intermediate texture is created with the uastc flag,
+        // then it is not convertable to ATC.
+        nonUastcCompatible: true
     );
 
     /// <summary>
@@ -207,6 +230,11 @@ internal static class BasisU
         error = "";
         switch (format)
         {
+            // ASTC format
+            case SurfaceFormat.ASTC_4x4_Rgba:
+                basisUFormat = BasisUFormat.Astc_4x4_Rgba;
+                return true;
+
             // ATC formats
             case SurfaceFormat.RgbaAtcExplicitAlpha:
                 // explicit ATC rgba isn't supported. RGB is, but not RGBA explicit.
@@ -288,14 +316,28 @@ internal static class BasisU
         }
     }
 
+    /// <summary>
+    /// This method will use BasisU to compress the byte array backing a <see cref="BitmapContent"/>.
+    /// This method can only be called if there is an active context in the <see cref="ContextScopeFactory"/>
+    /// </summary>
+    /// <param name="sourceBitmap">
+    /// The bitmap that will be used to source the image to undergo compression
+    /// </param>
+    /// <param name="destinationFormat">
+    /// The <see cref="SurfaceFormat"/> that declares the type of compression.
+    /// </param>
+    /// <param name="encodedBytes">
+    /// When the compression is complete, the compressed bytes will be stored in this byte array.
+    /// </param>
+    /// <exception cref="PipelineException"></exception>
     public static void EncodeBytes(
         BitmapContent sourceBitmap,
-        SurfaceFormat format,
+        SurfaceFormat destinationFormat,
         out byte[] encodedBytes)
     {
         if (!TryEncodeBytes(
                 sourceBitmap,
-                format,
+                destinationFormat,
                 out encodedBytes,
                 out var error))
         {
@@ -304,7 +346,7 @@ internal static class BasisU
         }
     }
 
-    public static bool TryEncodeBytes(
+    private static bool TryEncodeBytes(
         BitmapContent sourceBitmap,
         SurfaceFormat format,
         out byte[] encodedBytes,
@@ -328,7 +370,7 @@ internal static class BasisU
 
         var intermediateFileName = imageFile + ".ktx";
 
-        if (!TryBuildIntermediateFile(imageFile, intermediateFileName, out error))
+        if (!TryBuildIntermediateFile(imageFile, basisUFormat,  intermediateFileName, out error))
         {
             failureMessage = $"unable to write intermediate ktx file for input=[{imageFile}] error=[{error}]";
             return false;
@@ -349,7 +391,7 @@ internal static class BasisU
         return true;
     }
 
-    public static bool TryWritePngFile(
+    private static bool TryWritePngFile(
         BitmapContent sourceBitmap,
         out string pngFileName)
     {
@@ -370,7 +412,7 @@ internal static class BasisU
         return true;
     }
 
-    public static bool TryReadKtx(string inputKtxFileName, out byte[] compressedBytes)
+    private static bool TryReadKtx(string inputKtxFileName, out byte[] compressedBytes)
     {
         var bytes = File.ReadAllBytes(inputKtxFileName);
         using var stream = new MemoryStream(bytes);
@@ -381,7 +423,7 @@ internal static class BasisU
         return true;
     }
 
-    public static bool TryUnpackKtx(
+    private static bool TryUnpackKtx(
         string basisFileName,
         BasisUFormat basisUFormat,
         IContentContext context,
@@ -446,16 +488,15 @@ internal static class BasisU
         return parsedKtxFileName;
     }
 
-    public static bool TryBuildIntermediateFile(
+    private static bool TryBuildIntermediateFile(
         string imageFileName,
+        BasisUFormat format,
         string intermediateFileName,
         out string stdErr)
     {
         var absImageFileName = Path.GetFullPath(imageFileName);
-        // taken from the basisu docs, https://github.com/MonoGame/MonoGame.Tool.BasisUniversal
-        //  basisu -file foo.png -ktx2
-        // var uastcFlag = "-uastc";
-        var argStr = $"-file {absImageFileName} -uastc -ktx2 -output_file {intermediateFileName}";
+        var uastcFlag = format.nonUastcCompatible ? "": "-uastc";
+        var argStr = $"-file {absImageFileName} {uastcFlag} -ktx2 -output_file {intermediateFileName}";
         var exitCode = Run(
             args: argStr,
             stdOut: out var stdOut,

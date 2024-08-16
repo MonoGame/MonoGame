@@ -31,6 +31,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
                 case TextureProcessorOutputFormat.DxtCompressed:
                 case TextureProcessorOutputFormat.Etc1Compressed:
                 case TextureProcessorOutputFormat.PvrCompressed:
+                case TextureProcessorOutputFormat.AstcCompressed:
                     return true;
             }
             return false;
@@ -117,6 +118,10 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
             {
                 case TextureProcessorOutputFormat.AtcCompressed:
                     GraphicsUtil.CompressAti(context, content, isSpriteFont);
+                    break;
+
+                case TextureProcessorOutputFormat.AstcCompressed:
+                    GraphicsUtil.CompressAstc(context, content, isSpriteFont);
                     break;
 
                 case TextureProcessorOutputFormat.Color16Bit:
