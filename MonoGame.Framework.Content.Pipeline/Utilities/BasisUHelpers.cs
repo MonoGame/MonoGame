@@ -397,6 +397,7 @@ internal static class BasisU
     {
         var context = ContextScopeFactory.ActiveContext;
 
+        // unfortunately, basisU requires an input _file_.
         pngFileName = $"tempImage_{Guid.NewGuid().ToString()}.png"; // TODO: get a project relative path.
         pngFileName = Path.Combine(context.IntermediateDirectory, pngFileName);
         using var fileStream = File.OpenWrite(pngFileName);
