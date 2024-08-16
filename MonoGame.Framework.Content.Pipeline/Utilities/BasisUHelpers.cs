@@ -356,39 +356,66 @@ internal static class BasisU
         encodedBytes = Array.Empty<byte>();
         var context = ContextScopeFactory.ActiveContext;
 
-        if (!TryGetBasisUFormat(format, out var basisUFormat, out var error))
+        // these files will likely be created during this method, and should be
+        //  deleted before exiting the function.
+        string pngFileName = null;
+        string intermediateFileName = null;
+        string ktxFileName = null;
+
+        try
         {
-            failureMessage = $"unable to find valid basisu format for target-format=[{format}], error=[{error}]";
-            return false;
-        }
+            if (!TryGetBasisUFormat(format, out var basisUFormat, out var error))
+            {
+                failureMessage = $"unable to find valid basisu format for target-format=[{format}], error=[{error}]";
+                return false;
+            }
 
-        if (!TryWritePngFile(sourceBitmap, out var imageFile))
+            if (!TryWritePngFile(sourceBitmap, out pngFileName))
+            {
+                failureMessage = "unable to write intermediate png for bitmap conversion";
+                return false;
+            }
+
+            intermediateFileName = pngFileName + ".ktx";
+
+            if (!TryBuildIntermediateFile(pngFileName, basisUFormat, intermediateFileName, out error))
+            {
+                failureMessage = $"unable to write intermediate ktx file for input=[{pngFileName}] error=[{error}]";
+                return false;
+            }
+
+            if (!TryUnpackKtx(intermediateFileName, basisUFormat, context, out ktxFileName, out error))
+            {
+                failureMessage =
+                    $"unable to unpack ktx file for input=[{intermediateFileName}] format=[{basisUFormat}] error=[{error}]";
+                return false;
+            }
+
+            if (!TryReadKtx(ktxFileName, out encodedBytes))
+            {
+                failureMessage = "unable to read unpacked ktx file";
+                return false;
+            }
+
+            return true;
+        }
+        finally
         {
-            failureMessage = "unable to write intermediate png for bitmap conversion";
-            return false;
+            if (!string.IsNullOrEmpty(pngFileName))
+            {
+                ExternalTool.DeleteFile(pngFileName);
+            }
+
+            if (!string.IsNullOrEmpty(intermediateFileName))
+            {
+                ExternalTool.DeleteFile(intermediateFileName);
+            }
+
+            if (!string.IsNullOrEmpty(ktxFileName))
+            {
+                ExternalTool.DeleteFile(ktxFileName);
+            }
         }
-
-        var intermediateFileName = imageFile + ".ktx";
-
-        if (!TryBuildIntermediateFile(imageFile, basisUFormat,  intermediateFileName, out error))
-        {
-            failureMessage = $"unable to write intermediate ktx file for input=[{imageFile}] error=[{error}]";
-            return false;
-        }
-
-        if (!TryUnpackKtx(intermediateFileName, basisUFormat, context, out var ktxFileName, out error))
-        {
-            failureMessage = $"unable to unpack ktx file for input=[{intermediateFileName}] format=[{basisUFormat}] error=[{error}]";
-            return false;
-        }
-
-        if (!TryReadKtx(ktxFileName, out encodedBytes))
-        {
-            failureMessage = "unable to read unpacked ktx file";
-            return false;
-        }
-
-        return true;
     }
 
     private static bool TryWritePngFile(
