@@ -14,7 +14,7 @@ public enum ProjectType
 public class BuildContext : FrostingContext
 {
     public static readonly string DefaultRepositoryUrl = "https://github.com/MonoGame/MonoGame";
-    public static readonly string DefaultBaseVersion = "3.8.1";
+    public static readonly string DefaultBaseVersion = "3.8.2";
 
     public BuildContext(ICakeContext context) : base(context)
     {
