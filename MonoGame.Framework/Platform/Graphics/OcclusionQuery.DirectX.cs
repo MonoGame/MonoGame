@@ -1,4 +1,4 @@
-// MonoGame - Copyright (C) The MonoGame Team
+// MonoGame - Copyright (C) MonoGame Foundation, Inc
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
@@ -22,7 +22,7 @@ namespace Microsoft.Xna.Framework.Graphics
             };
             _query = new Query(GraphicsDevice._d3dDevice, queryDescription);
         }
-        
+
         private void PlatformBegin()
         {
             var d3dContext = GraphicsDevice._d3dContext;
@@ -50,6 +50,7 @@ namespace Microsoft.Xna.Framework.Graphics
             return isComplete;
         }
 
+        /// <summary />
         protected override void Dispose(bool disposing)
         {
             if (!IsDisposed)

@@ -1,4 +1,4 @@
-﻿// MonoGame - Copyright (C) The MonoGame Team
+﻿// MonoGame - Copyright (C) MonoGame Foundation, Inc
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
@@ -226,6 +226,16 @@ namespace MonoGame.Tools.Pipeline
         {
             var dialog = new DeleteDialog(PipelineController.Instance, items);
             return dialog.Show(this);
+        }
+
+        public AskResult ShowReloadProjectDialog()
+        {
+            var result = MessageBox.Show(this, "The project file has been updated outside of the editor, do you want to reload the project? (Any unsaved changes will be lost)", "Reload Project", MessageBoxButtons.YesNo, MessageBoxType.Question);
+
+            if (result == DialogResult.Yes)
+                return AskResult.Yes;
+
+            return AskResult.No;
         }
 
         public bool ShowEditDialog(string title, string text, string oldname, bool file, out string newname)
@@ -595,7 +605,10 @@ namespace MonoGame.Tools.Pipeline
 #if IDE
                 MonoDevelop.Ide.IdeApp.Workbench.OpenDocument(filePath, MonoDevelop.Ide.Gui.OpenDocumentOptions.Default);
 #else
-                Process.Start(new ProcessStartInfo() { FileName = filePath, UseShellExecute = true, Verb = "open" });
+                if (File.Exists(filePath))
+                    Process.Start(new ProcessStartInfo() { FileName = filePath, UseShellExecute = true, Verb = "open" });
+                else
+                    ShowError("File not found", "The file was not found, did you forget to update file path in project?");
 #endif
             }
         }
@@ -622,7 +635,10 @@ namespace MonoGame.Tools.Pipeline
             if (PipelineController.Instance.SelectedItem != null)
             {
                 var filePath = PipelineController.Instance.GetFullPath(PipelineController.Instance.SelectedItem.Location);
-                Process.Start(new ProcessStartInfo() { FileName = filePath, UseShellExecute = true, Verb = "open" });
+                if (Directory.Exists(filePath))
+                    Process.Start(new ProcessStartInfo() { FileName = filePath, UseShellExecute = true, Verb = "open" });
+                else
+                    ShowError("Directory Not Found", "The containing directory was not found, did you forget to update file path in project?");
             }
         }
 

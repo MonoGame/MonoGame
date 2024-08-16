@@ -1,4 +1,4 @@
-// MonoGame - Copyright (C) The MonoGame Team
+// MonoGame - Copyright (C) MonoGame Foundation, Inc
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
@@ -8,6 +8,21 @@ using MonoGame.Framework.Utilities;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
+    /// <summary>
+    /// Represents a set of six 2D textures, one for each face of a cube.
+    /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         A texel represents the smallest unit of a texture that can be read from or written to by the GPU. A texel
+    ///         is composed of 1 to 4 components. Specifically, a texel may be any one of the available texture formats
+    ///         represented in the <see cref="SurfaceFormat"/>  enumeration.
+    ///     </para>
+    ///     <para>
+    ///         A cube texture is a collection of six textures, one for each face of the cube. All faces must be present
+    ///         in the cube texture. Also, a cube map surface must be the same pixel size in all three dimensions
+    ///         (x, y, and z).
+    ///     </para>
+    /// </remarks>
 	public partial class TextureCube : Texture
 	{
 		internal int size;
@@ -23,7 +38,17 @@ namespace Microsoft.Xna.Framework.Graphics
                 return size;
             }
         }
-		
+
+        /// <summary>
+        /// Creates an uninitialized <b>TextureCube</b> resource of the specified dimensions
+        /// </summary>
+        /// <param name="graphicsDevice">The graphics device that will display the cube texture.</param>
+        /// <param name="size">The width and height, in pixels, of the cube texture.</param>
+        /// <param name="mipMap"><b>true</b> if mimapping is enabled for this cube texture; otherwise, <b>false</b>.</param>
+        /// <param name="format">The surface format used by this cube texture.</param>
+        /// <exception cref="ArgumentNullException"> The <paramref name="graphicsDevice"/> parameter is null.</exception>
+        /// <exception cref="ArgumentOutOfRangeException">The <paramref name="size"/> parameter is less than or equal to zero.</exception>
+
 		public TextureCube (GraphicsDevice graphicsDevice, int size, bool mipMap, SurfaceFormat format)
             : this(graphicsDevice, size, mipMap, format, false)
 		{
@@ -45,11 +70,27 @@ namespace Microsoft.Xna.Framework.Graphics
         }
 
         /// <summary>
-        /// Gets a copy of cube texture data specifying a cubemap face.
+        /// Copies the texture cube data into an array.
         /// </summary>
-        /// <typeparam name="T"></typeparam>
+        /// <typeparam name="T">The type of the elements in the array.</typeparam>
         /// <param name="cubeMapFace">The cube map face.</param>
-        /// <param name="data">The data.</param>
+        /// <param name="data">The array of data to copy.</param>
+        /// <exception cref="ArgumentException">
+        /// One of the following conditions is true:
+        /// <list type="bullet">
+        ///     <item>
+        ///         <description>
+        ///             The <typeparamref name="T"/> type size is invalid for the format of this texture.
+        ///         </description>
+        ///     </item>
+        ///     <item>
+        ///         <description>
+        ///             The <paramref name="data"/> array parameter is too small.
+        ///         </description>
+        ///     </item>
+        /// </list>
+        /// </exception>
+        /// <exception cref="ArgumentNullException">The <paramref name="data"/> parameter is null.</exception>
         public void GetData<T>(CubeMapFace cubeMapFace, T[] data) where T : struct
         {
             if (data == null)
@@ -57,11 +98,86 @@ namespace Microsoft.Xna.Framework.Graphics
             GetData(cubeMapFace, 0, null, data, 0, data.Length);
         }
 
+        /// <summary>
+        /// Copies the texture cube data into an array.
+        /// </summary>
+        /// <typeparam name="T">The type of the elements in the array.</typeparam>
+        /// <param name="cubeMapFace">The cube map face.</param>
+        /// <param name="data">The array of data to copy.</param>
+        /// <param name="startIndex">The index of the element in the array at which to start copying.</param>
+        /// <param name="elementCount">The number of elements to copy.</param>
+        /// <exception cref="ArgumentException">
+        /// One of the following conditions is true:
+        /// <list type="bullet">
+        ///     <item>
+        ///         <description>
+        ///             The <typeparamref name="T"/> type size is invalid for the format of this texture.
+        ///         </description>
+        ///     </item>
+        ///     <item>
+        ///         <description>
+        ///             The <paramref name="startIndex"/> parameter is less than zero or is greater than or equal to the
+        ///             length of the data array.
+        ///         </description>
+        ///     </item>
+        ///     <item>
+        ///         <description>
+        ///             The <paramref name="data"/> array parameter is too small.
+        ///         </description>
+        ///     </item>
+        /// </list>
+        /// </exception>
+        /// <exception cref="ArgumentNullException">The <paramref name="data"/> parameter is null.</exception>
 	    public void GetData<T>(CubeMapFace cubeMapFace, T[] data, int startIndex, int elementCount) where T : struct
 	    {
 	        GetData(cubeMapFace, 0, null, data, startIndex, elementCount);
 	    }
 
+        /// <summary>
+        /// Copies the texture cube data into an array.
+        /// </summary>
+        /// <typeparam name="T">The type of the elements in the array.</typeparam>
+        /// <param name="cubeMapFace">The cube map face.</param>
+        /// <param name="level">The mipmap level to copy from.</param>
+        /// <param name="rect">
+        /// The section of the texture where the data will be placed.  null indicates the data will be copied over the
+        /// entire texture.
+        /// </param>
+        /// <param name="data">The array of data to copy.</param>
+        /// <param name="startIndex">The index of the element in the array at which to start copying.</param>
+        /// <param name="elementCount">The number of elements to copy.</param>
+        /// <exception cref="ArgumentException">
+        /// One of the following conditions is true:
+        /// <list type="bullet">
+        ///     <item>
+        ///         <description>
+        ///             The <paramref name="level"/> parameter is larger than the number of levels in this texture.
+        ///         </description>
+        ///     </item>
+        ///     <item>
+        ///         <description>
+        ///             The <paramref name="rect"/> is outside the bounds of the texture.
+        ///         </description>
+        ///     </item>
+        ///     <item>
+        ///         <description>
+        ///             The <typeparamref name="T"/> type size is invalid for the format of this texture.
+        ///         </description>
+        ///     </item>
+        ///     <item>
+        ///         <description>
+        ///             The <paramref name="startIndex"/> parameter is less than zero or is greater than or equal to the
+        ///             length of the data array.
+        ///         </description>
+        ///     </item>
+        ///     <item>
+        ///         <description>
+        ///             The <paramref name="data"/> array parameter is too small.
+        ///         </description>
+        ///     </item>
+        /// </list>
+        /// </exception>
+        /// <exception cref="ArgumentNullException">The <paramref name="data"/> parameter is null.</exception>
 	    public void GetData<T>(CubeMapFace cubeMapFace, int level, Rectangle? rect, T[] data, int startIndex, int elementCount) where T : struct
 	    {
             Rectangle checkedRect;
@@ -69,6 +185,28 @@ namespace Microsoft.Xna.Framework.Graphics
 	        PlatformGetData(cubeMapFace, level, checkedRect, data, startIndex, elementCount);
 	    }
 
+        /// <summary>
+        /// Copies an array of data to the texture cube.
+        /// </summary>
+        /// <typeparam name="T">The type of the elements in the array.</typeparam>
+        /// <param name="face">The Cubemap face.</param>
+        /// <param name="data">The array of data to copy.</param>
+        /// <exception cref="ArgumentException">
+        /// One of the following conditions is true:
+        /// <list type="bullet">
+        ///     <item>
+        ///         <description>
+        ///             The <typeparamref name="T"/> type size is invalid for the format of this texture.
+        ///         </description>
+        ///     </item>
+        ///     <item>
+        ///         <description>
+        ///             The <paramref name="data"/> array parameter is too small.
+        ///         </description>
+        ///     </item>
+        /// </list>
+        /// </exception>
+        /// <exception cref="ArgumentNullException">The <paramref name="data"/> parameter is null.</exception>
 		public void SetData<T> (CubeMapFace face, T[] data) where T : struct
 		{
             if (data == null)
@@ -76,11 +214,86 @@ namespace Microsoft.Xna.Framework.Graphics
             SetData(face, 0, null, data, 0, data.Length);
 		}
 
+        /// <summary>
+        /// Copies an array of data to the texture cube.
+        /// </summary>
+        /// <typeparam name="T">The type of the elements in the array.</typeparam>
+        /// <param name="face">The Cubemap face.</param>
+        /// <param name="data">The array of data to copy.</param>
+        /// <param name="startIndex">The index of the element in the array at which to start copying.</param>
+        /// <param name="elementCount">The number of elements to copy.</param>
+        /// <exception cref="ArgumentException">
+        /// One of the following conditions is true:
+        /// <list type="bullet">
+        ///     <item>
+        ///         <description>
+        ///             The <typeparamref name="T"/> type size is invalid for the format of this texture.
+        ///         </description>
+        ///     </item>
+        ///     <item>
+        ///         <description>
+        ///             The <paramref name="startIndex"/> parameter is less than zero or is greater than or equal to the
+        ///             length of the data array.
+        ///         </description>
+        ///     </item>
+        ///     <item>
+        ///         <description>
+        ///             The <paramref name="data"/> array parameter is too small.
+        ///         </description>
+        ///     </item>
+        /// </list>
+        /// </exception>
+        /// <exception cref="ArgumentNullException">The <paramref name="data"/> parameter is null.</exception>
         public void SetData<T>(CubeMapFace face, T[] data, int startIndex, int elementCount) where T : struct
 		{
             SetData(face, 0, null, data, startIndex, elementCount);
 		}
-		
+
+        /// <summary>
+        /// Copies an array of data to the texture cube.
+        /// </summary>
+        /// <typeparam name="T">The type of the elements in the array.</typeparam>
+        /// <param name="face">The Cubemap face.</param>
+        /// <param name="level">The mipmap level where the data will be placed.</param>
+        /// <param name="rect">
+        /// The section of the texture where the data will be placed.  null indicates the data will be copied over the
+        /// entire texture.
+        /// </param>
+        /// <param name="data">The array of data to copy.</param>
+        /// <param name="startIndex">The index of the element in the array at which to start copying.</param>
+        /// <param name="elementCount">The number of elements to copy.</param>
+        /// <exception cref="ArgumentException">
+        /// One of the following conditions is true:
+        /// <list type="bullet">
+        ///     <item>
+        ///         <description>
+        ///             The <paramref name="level"/> parameter is larger than the number of levels in this texture.
+        ///         </description>
+        ///     </item>
+        ///     <item>
+        ///         <description>
+        ///             The <paramref name="rect"/> is outside the bounds of the texture.
+        ///         </description>
+        ///     </item>
+        ///     <item>
+        ///         <description>
+        ///             The <typeparamref name="T"/> type size is invalid for the format of this texture.
+        ///         </description>
+        ///     </item>
+        ///     <item>
+        ///         <description>
+        ///             The <paramref name="startIndex"/> parameter is less than zero or is greater than or equal to the
+        ///             length of the data array.
+        ///         </description>
+        ///     </item>
+        ///     <item>
+        ///         <description>
+        ///             The <paramref name="data"/> array parameter is too small.
+        ///         </description>
+        ///     </item>
+        /// </list>
+        /// </exception>
+        /// <exception cref="ArgumentNullException">The <paramref name="data"/> parameter is null.</exception>
         public void SetData<T>(CubeMapFace face, int level, Rectangle? rect, T[] data, int startIndex, int elementCount) where T : struct
         {
             Rectangle checkedRect;

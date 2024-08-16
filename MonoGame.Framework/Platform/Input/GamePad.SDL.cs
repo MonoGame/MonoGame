@@ -1,4 +1,4 @@
-﻿// MonoGame - Copyright (C) The MonoGame Team
+﻿// MonoGame - Copyright (C) MonoGame Foundation, Inc
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
@@ -20,6 +20,9 @@ namespace Microsoft.Xna.Framework.Input
         private static readonly Dictionary<int, GamePadInfo> Gamepads = new Dictionary<int, GamePadInfo>();
         private static readonly Dictionary<int, int> _translationTable = new Dictionary<int, int>();
 
+        /// <summary>
+        /// Initialies the internal database of gamepad mappings for an SDL context
+        /// </summary>
         public static void InitDatabase()
         {
             using (var stream = ReflectionHelpers.GetAssembly(typeof(GamePad)).GetManifestResourceStream("gamecontrollerdb.txt"))

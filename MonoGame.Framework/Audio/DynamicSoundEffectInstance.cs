@@ -1,4 +1,4 @@
-﻿// MonoGame - Copyright (C) The MonoGame Team
+﻿// MonoGame - Copyright (C) MonoGame Foundation, Inc
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
@@ -33,6 +33,7 @@ namespace Microsoft.Xna.Framework.Audio
             }
         }
 
+        /// <inheritdoc />
         public override SoundState State
         {
             get
@@ -275,6 +276,7 @@ namespace Microsoft.Xna.Framework.Audio
                 throw new ObjectDisposedException(null);
         }
 
+        /// <summary />
         protected override void Dispose(bool disposing)
         {
             PlatformDispose(disposing);

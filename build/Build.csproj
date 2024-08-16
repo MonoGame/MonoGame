@@ -1,0 +1,39 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+    <RunWorkingDirectory>$(MSBuildProjectDirectory)</RunWorkingDirectory>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Using Include="Cake.Frosting" />
+    <Using Include="Cake.Common.Build" />
+    <Using Include="Cake.Common.Build.GitHubActions" />
+    <Using Include="Cake.Common.Build.GitHubActions.Data" />
+    <Using Include="Cake.Common.Diagnostics" />
+    <Using Include="Cake.Common.Tools.DotNet" />
+    <Using Include="Cake.Common.Tools.DotNet.Build" />
+    <Using Include="Cake.Common.Tools.DotNet.MSBuild" />
+    <Using Include="Cake.Common.Tools.DotNet.Pack" />
+    <Using Include="Cake.Common.Tools.DotNet.Publish" />
+    <Using Include="Cake.Common.Tools.MSBuild" />
+    <Using Include="Cake.Common.IO" />
+    <Using Include="Cake.Common" />
+    <Using Include="Cake.Core" />
+    <Using Include="Cake.Core.Diagnostics" />
+    <Using Include="Cake.Core.IO" />
+    <Using Include="Cake.FileHelpers" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Cake.FileHelpers" Version="7.0.0" />
+    <PackageReference Include="Cake.Frosting" Version="4.0.0" />
+    <PackageReference Include="NuGet.Packaging" Version="6.10.1" />
+    <PackageReference Include="System.Formats.Asn1" Version="8.0.1" />
+  </ItemGroup>
+
+</Project>

@@ -458,7 +458,7 @@ namespace Microsoft.Xna.Framework
         /// </summary>
         /// <param name="other">The <see cref="BoundingBox"/> to compare with this <see cref="BoundingBox"/>.</param>
         /// <returns>
-        ///   <code>true</code> if <see cref="other"/> is equal to this <see cref="BoundingBox"/>,
+        ///   <code>true</code> if <paramref name="other"/> is equal to this <see cref="BoundingBox"/>,
         ///   <code>false</code> if it is not.
         /// </returns>
         public bool Equals(BoundingBox other)
@@ -471,7 +471,7 @@ namespace Microsoft.Xna.Framework
         /// </summary>
         /// <param name="obj">The <see cref="Object"/> to compare with this <see cref="BoundingBox"/>.</param>
         /// <returns>
-        ///   <code>true</code> if <see cref="obj"/> is equal to this <see cref="BoundingBox"/>,
+        ///   <code>true</code> if <paramref name="obj"/> is equal to this <see cref="BoundingBox"/>,
         ///   <code>false</code> if it is not.
         /// </returns>
         public override bool Equals(object obj)
@@ -666,7 +666,7 @@ namespace Microsoft.Xna.Framework
         /// </param>
         public void Intersects(ref Plane plane, out PlaneIntersectionType result)
         {
-            // See http://zach.in.tu-clausthal.de/teaching/cg_literatur/lighthouse3d_view_frustum_culling/index.html
+            // See https://cgvr.informatik.uni-bremen.de/teaching/cg_literatur/lighthouse3d_view_frustum_culling/index.html
 
             Vector3 positiveVertex;
             Vector3 negativeVertex;
@@ -755,7 +755,7 @@ namespace Microsoft.Xna.Framework
         /// <param name="a">A <see cref="BoundingBox"/> to compare the other.</param>
         /// <param name="b">A <see cref="BoundingBox"/> to compare the other.</param>
         /// <returns>
-        ///   <code>true</code> if <see cref="a"/> is equal to this <see cref="b"/>,
+        ///   <code>true</code> if <paramref name="a"/> is equal to this <paramref name="b"/>,
         ///   <code>false</code> if it is not.
         /// </returns>
         public static bool operator ==(BoundingBox a, BoundingBox b)
@@ -769,7 +769,7 @@ namespace Microsoft.Xna.Framework
         /// <param name="a">A <see cref="BoundingBox"/> to compare the other.</param>
         /// <param name="b">A <see cref="BoundingBox"/> to compare the other.</param>
         /// <returns>
-        ///   <code>true</code> if <see cref="a"/> is not equal to this <see cref="b"/>,
+        ///   <code>true</code> if <paramref name="a"/> is not equal to this <paramref name="b"/>,
         ///   <code>false</code> if it is.
         /// </returns>
         public static bool operator !=(BoundingBox a, BoundingBox b)
