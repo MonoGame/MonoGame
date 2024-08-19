@@ -182,13 +182,10 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
             if (isSpriteFont)
                 CompressFontDXT3(content);
             else if (alphaRange == AlphaRange.Opaque)
-
                 content.ConvertBitmapType(typeof(Dxt1BitmapContent));
             else if (alphaRange == AlphaRange.Cutout)
-                // BasisU does not support DXT1a, so to support alpha, we must use DXT5
-                content.ConvertBitmapType(typeof(Dxt5BitmapContent));
+                content.ConvertBitmapType(typeof(Dxt3BitmapContent));
             else
-                // full range alpha is best supported by DXT5
                 content.ConvertBitmapType(typeof(Dxt5BitmapContent));
         }
 
