@@ -27,9 +27,13 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
         {
             switch (format)
             {
+#pragma warning disable CS0618 // Type or member is obsolete
+                case TextureProcessorOutputFormat.Etc1Compressed:
+#pragma warning restore CS0618 // Type or member is obsolete
+
                 case TextureProcessorOutputFormat.AtcCompressed:
                 case TextureProcessorOutputFormat.DxtCompressed:
-                case TextureProcessorOutputFormat.Etc1Compressed:
+                case TextureProcessorOutputFormat.EtcCompressed:
                 case TextureProcessorOutputFormat.PvrCompressed:
                 case TextureProcessorOutputFormat.AstcCompressed:
                     return true;
@@ -45,7 +49,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
                 if (platform == TargetPlatform.iOS)
                     format = TextureProcessorOutputFormat.PvrCompressed;
                 else if (platform == TargetPlatform.Android)
-                    format = TextureProcessorOutputFormat.Etc1Compressed;
+                    format = TextureProcessorOutputFormat.EtcCompressed;
                 else
                     format = TextureProcessorOutputFormat.DxtCompressed;
             }
@@ -88,8 +92,12 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
                     requiresPowerOfTwo = context.TargetProfile == GraphicsProfile.Reach;
                     break;
 
-                case TextureProcessorOutputFormat.PvrCompressed:
+#pragma warning disable CS0618 // Type or member is obsolete
                 case TextureProcessorOutputFormat.Etc1Compressed:
+#pragma warning restore CS0618 // Type or member is obsolete
+
+                case TextureProcessorOutputFormat.PvrCompressed:
+                case TextureProcessorOutputFormat.EtcCompressed:
                     requiresPowerOfTwo = true;
                     break;
             }
@@ -132,8 +140,14 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
                     GraphicsUtil.CompressDxt(context, content, isSpriteFont);
                     break;
 
+#pragma warning disable CS0618 // Type or member is obsolete
                 case TextureProcessorOutputFormat.Etc1Compressed:
+#pragma warning restore CS0618 // Type or member is obsolete
                     GraphicsUtil.CompressEtc1(context, content, isSpriteFont);
+                    break;
+
+                case TextureProcessorOutputFormat.EtcCompressed:
+                    GraphicsUtil.CompressEtc(context, content, isSpriteFont);
                     break;
 
                 case TextureProcessorOutputFormat.PvrCompressed:

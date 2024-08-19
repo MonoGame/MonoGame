@@ -218,6 +218,37 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
             content.ConvertBitmapType(typeof(AstcBitmapContent));
         }
 
+        static public void CompressEtc(ContentProcessorContext context, TextureContent content, bool isSpriteFont)
+        {
+            // If sharp alpha is required (for a font texture page), use 16-bit color instead of PVR
+            if (isSpriteFont)
+            {
+                CompressColor16Bit(context, content);
+                return;
+            }
+
+            var face = content.Faces[0][0];
+            var alphaRange = CalculateAlphaRange(face);
+
+            // confirm texture meets ETC requirements
+            if (!IsPowerOfTwo(face.Width) || !IsPowerOfTwo(face.Height))
+            {
+                context.Logger.LogWarning(null, content.Identity, "ETC compression requires width and height to be powers of two due to hardware restrictions on some devices. Falling back to BGR565.");
+                content.ConvertBitmapType(typeof(PixelBitmapContent<Bgr565>));
+                return;
+            }
+
+            if (alphaRange == AlphaRange.Opaque)
+            {
+                // ETC1 does not support alpha, which is fine since the data is all opaque
+                content.ConvertBitmapType(typeof(Etc1BitmapContent));
+                return;
+            }
+
+            // Use ETC2
+            content.ConvertBitmapType(typeof(Etc2BitmapContent));
+        }
+
         static public void CompressEtc1(ContentProcessorContext context, TextureContent content, bool isSpriteFont)
         {
             // If sharp alpha is required (for a font texture page), use 16-bit color instead of PVR
@@ -230,9 +261,9 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
             var face = content.Faces[0][0];
             var alphaRange = CalculateAlphaRange(face);
 
-            // Use ETC2 when the image has alpha
+            // Use BGRA4444 for textures with non-opaque alpha values
             if (alphaRange != AlphaRange.Opaque)
-                content.ConvertBitmapType(typeof(Etc2BitmapContent));
+                content.ConvertBitmapType(typeof(PixelBitmapContent<Bgra4444>));
             else
             {
                 // PVR SGX does not handle non-POT ETC1 textures.
