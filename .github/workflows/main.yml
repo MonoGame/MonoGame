@@ -72,7 +72,19 @@ jobs:
           - name: Expose GitHub Runtime
             uses: crazy-max/ghaction-github-runtime@v3
 
-          - name: Push GitHub Nugets
-            run: dotnet run --project build/Build.csproj -- --target=DeployNuGetsToGithub
+          - name: Push Nugets
+            run: dotnet run --project build/Build.csproj -- --target=Deploy
             env:
               GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+              NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}
+
+          - name: Make a Release
+            if: github.ref_type == 'tag'
+            uses: ncipollo/release-action@v1
+            with:
+              name: 'MonoGame ${{ github.ref_name }}'
+              tag: ${{ github.ref_name }}
+              allowUpdates: true
+              removeArtifacts: true
+              artifacts: "nugets/*.nupkg"
+              token: ${{ secrets.GITHUB_TOKEN }}

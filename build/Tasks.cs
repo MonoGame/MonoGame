@@ -29,6 +29,11 @@ public sealed class BuildTemplatesTask : FrostingTask<BuildContext> { }
 [IsDependentOn(typeof(BuildTemplatesTask))]
 public sealed class BuildAllTask : FrostingTask<BuildContext> { }
 
+[TaskName("Deploy")]
+[IsDependentOn(typeof(DeployNuGetsToGitHubTask))]
+[IsDependentOn(typeof(DeployNuGetsToNuGetOrgTask))]
+public sealed class DeployTask : FrostingTask<BuildContext> { }
+
 [TaskName("Default")]
 [IsDependentOn(typeof(BuildAllTask))]
 public sealed class DefaultTask : FrostingTask<BuildContext> { }
