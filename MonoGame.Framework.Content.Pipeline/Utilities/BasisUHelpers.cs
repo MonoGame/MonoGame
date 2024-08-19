@@ -202,7 +202,7 @@ internal static class BasisU
     /// <returns>The exit code for the basisu process. </returns>
     public static int Run(string args, out string stdOut, out string stdErr, string stdIn=null, string workingDirectory=null)
     {
-        return ExternalTool.Run("dotnet", "mgcb-basisu " + args, out stdOut, out stdErr, stdIn, workingDirectory);
+        return ExternalTool.RunDotnetTool("mgcb-basisu", args, out stdOut, out stdErr, stdIn, workingDirectory);
     }
 
     /// <summary>
@@ -282,10 +282,8 @@ internal static class BasisU
             case SurfaceFormat.Dxt3SRgb:
                 // Dxt3 is not supported by basisU
                 //  https://github.com/BinomialLLC/basis_universal/issues/63#issuecomment-535778254
-                // error = "Dxt3 is not supported in basisU. Dxt3 is rarely used. Use Dxt5 instead.";
-                // return false;
-                basisUFormat = BasisUFormat.Dxt5; // best effort?
-                return true;
+                error = "Dxt3 is not supported in basisU. Dxt3 is rarely used. Use Dxt5 instead.";
+                return false;
             case SurfaceFormat.Dxt5: // dxt5 is often called Bc3
                 basisUFormat = BasisUFormat.Dxt5;
                 return true;
@@ -370,11 +368,7 @@ internal static class BasisU
                 return false;
             }
 
-            if (!TryWritePngFile(sourceBitmap, out pngFileName))
-            {
-                failureMessage = "unable to write intermediate png for bitmap conversion";
-                return false;
-            }
+            PngFileHelper.WritePngToIntermediate(sourceBitmap, out pngFileName);
 
             intermediateFileName = pngFileName + ".ktx";
 
@@ -391,7 +385,7 @@ internal static class BasisU
                 return false;
             }
 
-            if (!TryReadKtx(ktxFileName, out encodedBytes))
+            if (!KtxFileHelper.TryReadKtx(ktxFileName, out encodedBytes))
             {
                 failureMessage = "unable to read unpacked ktx file";
                 return false;
@@ -418,40 +412,7 @@ internal static class BasisU
         }
     }
 
-    private static bool TryWritePngFile(
-        BitmapContent sourceBitmap,
-        out string pngFileName)
-    {
-        var context = ContextScopeFactory.ActiveContext;
-
-        // unfortunately, basisU requires an input _file_.
-        pngFileName = $"tempImage_{Guid.NewGuid().ToString()}.png"; // TODO: get a project relative path.
-        pngFileName = Path.Combine(context.IntermediateDirectory, pngFileName);
-        using var fileStream = File.OpenWrite(pngFileName);
-
-        // in order to save a png, we need a colorBitmap.
-        var colorBitmap = new PixelBitmapContent<Color>(sourceBitmap.Width, sourceBitmap.Height);
-        BitmapContent.Copy(sourceBitmap, colorBitmap);
-
-        var data = colorBitmap.GetPixelData();
-        var writer = new ImageWriter(); // TODO: cache this instance.
-        writer.WritePng(data, colorBitmap.Width, colorBitmap.Height, ColorComponents.RedGreenBlueAlpha, fileStream);
-        fileStream.Close();
-        return true;
-    }
-
-    private static bool TryReadKtx(string inputKtxFileName, out byte[] compressedBytes)
-    {
-        var bytes = File.ReadAllBytes(inputKtxFileName);
-        using var stream = new MemoryStream(bytes);
-        // KtxLoader.CheckIfInputIsValid()
-        var ktx = KtxLoader.LoadInput(stream);
-
-        compressedBytes = ktx.textureData.textureDataOfMipmapLevel[0];
-        return true;
-    }
-
-    private static bool TryUnpackKtx(
+    public static bool TryUnpackKtx(
         string basisFileName,
         BasisUFormat basisUFormat,
         IContentContext context,

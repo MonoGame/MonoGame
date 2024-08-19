@@ -85,9 +85,9 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
                 }
             }
 
-            BasisU.EncodeBytes(
+            Crunch.EncodeBytes(
                 sourceBitmap: sourceBitmap,
-                destinationFormat: format,
+                crunchFormat: CrunchFormat.Etc1,
                 out var compressedBytes);
             SetPixelData(compressedBytes);
 

@@ -8,6 +8,13 @@
         "mgcb-basisu"
       ],
       "rollForward": false
+    },
+    "mgcb-crunch": {
+      "version": "1.16.4.1",
+      "commands": [
+        "mgcb-crunch"
+      ],
+      "rollForward": false
     }
   }
 }

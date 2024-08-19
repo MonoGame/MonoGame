@@ -27,6 +27,15 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
             return result;
         }
 
+        /// <summary>
+        /// Run a dotnet tool. The tool should be installed in a .config/dotnet-tools.json file somewhere in the project lineage.
+        /// </summary>
+        public static int RunDotnetTool(string toolName, string args, out string stdOut, out string stdErr, string stdIn=null, string workingDirectory=null)
+        {
+            var finalizedArgs = toolName + " " + args;
+            return ExternalTool.Run("dotnet", finalizedArgs, out stdOut, out stdErr, stdIn, workingDirectory);
+        }
+
         public static int Run(string command, string arguments, out string stdout, out string stderr, string stdin = null, string workingDirectory=null)
         {
             // This particular case is likely to be the most common and thus

@@ -122,26 +122,36 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
             switch (format)
             {
                 case SurfaceFormat.Dxt1 when hasTransparency:
-                    throw new NotSupportedException(
-                        "The Dxt1 texture has alpha, but Monogame does not support Dxt1a. Please use Dxt5. ");
+                case SurfaceFormat.Dxt1SRgb when hasTransparency:
                 case SurfaceFormat.Dxt1a:
-                    // Dxt1a is a variant of Dxt1 with 1 bit for alpha, often called "punch-through".
-                    //  neither basisU or sbt_dxt support dxt1a.
-                    //  I've found this article to be helpful understanding punch-through,
-                    //  https://www.reedbeta.com/blog/understanding-bcn-texture-compression-formats/#degeneracy-and-breaking-it
-                    throw new NotSupportedException(
-                        "Monogame no longer supports Dxt3 texture compression. Please use Dxt5.");
-                case SurfaceFormat.Dxt3SRgb:
-                case SurfaceFormat.Dxt3:
-                    // Dxt3 is often ignored by modern compression tools and is not supported by basisU.
-                    throw new NotSupportedException(
-                        "Monogame no longer supports Dxt3 texture compression. Please use Dxt5.");
-                default:
-                    BasisU.EncodeBytes(
+                    Crunch.EncodeBytes(
                         sourceBitmap: sourceBitmap,
-                        destinationFormat: format,
+                        crunchFormat: CrunchFormat.Dxt1A,
                         out compressedBytes);
                     break;
+                case SurfaceFormat.Dxt1:
+                case SurfaceFormat.Dxt1SRgb:
+                    Crunch.EncodeBytes(
+                        sourceBitmap: sourceBitmap,
+                        crunchFormat: CrunchFormat.Dxt1,
+                        out compressedBytes);
+                    break;
+                case SurfaceFormat.Dxt3SRgb:
+                case SurfaceFormat.Dxt3:
+                    Crunch.EncodeBytes(
+                        sourceBitmap: sourceBitmap,
+                        crunchFormat: CrunchFormat.Dxt3,
+                        out compressedBytes);
+                    break;
+                case SurfaceFormat.Dxt5:
+                case SurfaceFormat.Dxt5SRgb:
+                    Crunch.EncodeBytes(
+                        sourceBitmap: sourceBitmap,
+                        crunchFormat: CrunchFormat.Dxt5,
+                        out compressedBytes);
+                    break;
+                default:
+                    throw new PipelineException($"{nameof(DxtBitmapContent)} cannot compress format=[{format}]");
             }
 
             SetPixelData(compressedBytes);
