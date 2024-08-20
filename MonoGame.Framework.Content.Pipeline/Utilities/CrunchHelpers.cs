@@ -10,12 +10,19 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Utilities
 {
 
     /// <summary>
+    /// <para>
     /// The <see cref="CrunchFormat"/> holds all information required to invoke the
     /// Crunch tool for a given configuration.
+    /// </para>
     ///
+    /// <para>
     /// As of August 19 2024, the only important field is the <see cref="formatString"/>,
     /// but Crunch supports many compression-option flags that may become important.
+    /// </para>
     ///
+    /// <para>
+    /// This is marked as internal because it is not part of the original XNA api.
+    /// </para>
     /// </summary>
     internal struct CrunchFormat
     {
@@ -111,6 +118,13 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Utilities
             formatString = "ETC2A"
         };
     }
+
+    /// <summary>
+    /// Utilities for using the Crunch tool.
+    /// <para>
+    /// This is marked as internal because it is not part of the original XNA api.
+    /// </para>
+    /// </summary>
     internal static class Crunch
     {
         /// <summary>

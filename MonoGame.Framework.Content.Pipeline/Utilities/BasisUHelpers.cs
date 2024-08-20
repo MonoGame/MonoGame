@@ -6,9 +6,7 @@ using System;
 using System.IO;
 using Microsoft.Xna.Framework.Content.Pipeline.Graphics;
 using Microsoft.Xna.Framework.Graphics;
-using KtxSharp;
 using MonoGame.Framework.Content;
-using StbImageWriteSharp;
 
 namespace Microsoft.Xna.Framework.Content.Pipeline.Utilities;
 
@@ -21,6 +19,9 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Utilities;
 /// <para>
 /// The <see cref="BasisUFormat"/> struct captures the enum value, the human readable name, and flag information
 /// for the various basisU formats that apply to Monogame.
+/// </para>
+/// <para>
+/// This is marked as internal because it is not part of the original XNA api.
 /// </para>
 /// </summary>
 internal struct BasisUFormat
@@ -185,6 +186,9 @@ internal struct BasisUFormat
 
 /// <summary>
 /// Utilities for using the Basis Universal tool.
+/// <para>
+/// This is marked as internal because it is not part of the original XNA api.
+/// </para>
 /// </summary>
 internal static class BasisU
 {

@@ -13,6 +13,9 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Utilities;
 
 /// <summary>
 /// Utility methods for interacting with .png files
+/// <para>
+/// This is marked as internal because it is not part of the original XNA api.
+/// </para>
 /// </summary>
 internal static class PngFileHelper
 {
@@ -52,6 +55,9 @@ internal static class PngFileHelper
 
 /// <summary>
 /// Utility methods for .ktx files
+/// <para>
+/// This is marked as internal because it is not part of the original XNA api.
+/// </para>
 /// </summary>
 internal static class KtxFileHelper
 {

@@ -66,7 +66,6 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
                 }
             }
 
-            // rg, basisU isn't printing an output path for ATC textures.
             BasisU.EncodeBytes(
                 sourceBitmap: sourceBitmap,
                 destinationFormat: format,

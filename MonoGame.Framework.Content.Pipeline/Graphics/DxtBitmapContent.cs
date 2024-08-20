@@ -56,26 +56,6 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
             }
         }
 
-        [Obsolete]
-        private static void PrepareNVTT_DXT1(byte[] data, out bool hasTransparency)
-        {
-            hasTransparency = false;
-
-            for (var x = 0; x < data.Length; x += 4)
-            {
-                // NVTT wants BGRA where our source is RGBA so
-                // we swap the red and blue channels.
-                data[x] ^= data[x + 2];
-                data[x + 2] ^= data[x];
-                data[x] ^= data[x + 2];
-
-                // Look for non-opaque pixels.
-                var alpha = data[x + 3];
-                if (alpha < 255)
-                    hasTransparency = true;
-            }
-        }
-
         protected override bool TryCopyFrom(BitmapContent sourceBitmap, Rectangle sourceRegion, Rectangle destinationRegion)
         {
             SurfaceFormat sourceFormat;
