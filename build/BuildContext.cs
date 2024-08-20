@@ -41,22 +41,18 @@ public class BuildContext : FrostingContext
             var workflow = context.BuildSystem().GitHubActions.Environment.Workflow;
             repositoryUrl = $"https://github.com/{workflow.Repository}";
 
-            if (workflow.RefType == GitHubActionsRefType.Tag)
-            {
-                var baseVersion = workflow.RefName;
-                if (Regex.IsMatch(baseVersion, @"v\d+.\d+.\d+"))
-                {
-                    VersionBase = baseVersion[1..];
-                }
-                else
-                {
-                    throw new Exception($"Invalid tag: {baseVersion}");
-                }
-            }
-
             if (workflow.Repository != "MonoGame/MonoGame")
             {
                 Version = $"{VersionBase}.{workflow.RunNumber}-{workflow.RepositoryOwner}";
+            }
+            else if (workflow.RefType == GitHubActionsRefType.Tag)
+            {
+                var baseVersion = workflow.RefName;
+                if (!Regex.IsMatch(baseVersion, @"v\d+.\d+.\d+"))
+                    throw new Exception($"Invalid tag: {baseVersion}");
+                
+                VersionBase = baseVersion[1..];
+                Version = $"{VersionBase}.{workflow.RunNumber}";
             }
             else if (workflow.RefType == GitHubActionsRefType.Branch && workflow.RefName != "refs/heads/master")
             {
