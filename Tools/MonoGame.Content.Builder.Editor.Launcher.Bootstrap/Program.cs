@@ -17,7 +17,7 @@ namespace MonoGame.Content.Builder.Editor.Launcher.Bootstrap
                 RuntimeInformation.IsOSPlatform(OSPlatform.Linux) ? "mgcb-editor-linux" :
                 throw new NotImplementedException("Unsupported Operating System");
 
-            Process.Start("dotnet", $"{executable} \"{string.Join("\" \"", args)}\"");
+            Process.Start(executable, $"\"{string.Join("\" \"", args)}\"");
         }
     }
 }
