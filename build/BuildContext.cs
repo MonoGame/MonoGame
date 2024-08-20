@@ -52,7 +52,7 @@ public class BuildContext : FrostingContext
                     throw new Exception($"Invalid tag: {baseVersion}");
                 
                 VersionBase = baseVersion[1..];
-                Version = $"{VersionBase}.{workflow.RunNumber}";
+                Version = VersionBase;
             }
             else if (workflow.RefType == GitHubActionsRefType.Branch && workflow.RefName != "refs/heads/master")
             {
