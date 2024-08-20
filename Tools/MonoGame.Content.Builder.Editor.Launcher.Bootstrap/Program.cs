@@ -17,7 +17,18 @@ namespace MonoGame.Content.Builder.Editor.Launcher.Bootstrap
                 RuntimeInformation.IsOSPlatform(OSPlatform.Linux) ? "mgcb-editor-linux" :
                 throw new NotImplementedException("Unsupported Operating System");
 
-            Process.Start(executable, $"\"{string.Join("\" \"", args)}\"");
+            // We invoke the tool directly without the `dotnet-` if it exists.
+            // See: https://github.com/MonoGame/MonoGame/pulls/8448.
+            var isInPath = Environment
+                .GetEnvironmentVariable("PATH")
+                .Split(Path.PathSeparator)
+                .Select(x => Path.Combine(x, executable))
+                .Any(File.Exists);
+
+            if (isInPath)
+                Process.Start(executable, $"\"{string.Join("\" \"", args)}\"");
+            else
+                Process.Start("dotnet", $"{executable} \"{string.Join("\" \"", args)}\"");
         }
     }
 }
