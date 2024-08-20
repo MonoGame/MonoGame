@@ -47,8 +47,8 @@ public class BuildContext : FrostingContext
             }
             else if (workflow.RefType == GitHubActionsRefType.Tag)
             {
-                var baseVersion = workflow.RefName;
-                if (!Regex.IsMatch(baseVersion, @"v\d+.\d+.\d+"))
+                var baseVersion = workflow.RefName.Split('/')[^1];
+                if (!VersionRegex.IsMatch(baseVersion))
                     throw new Exception($"Invalid tag: {baseVersion}");
                 
                 VersionBase = baseVersion[1..];
