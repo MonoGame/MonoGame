@@ -252,13 +252,9 @@ namespace MonoGame.Tests.ContentPipeline
         [Test]
         public void BitmapCompress_Atc_Explicit()
         {
-            // unfortunately, neither basisU or crunch support ATC explicit.
-            //  in this case, a PipelineException is thrown, and this test validates it.
+            // validate that we can compress an atc explicit texture
             using var _ = ContextScopeFactory.BeginContext(new TestBitmapProcessorContext());
-            Assert.Throws<PipelineException>(() =>
-            {
-                BitmapConvert(typeof(AtcExplicitBitmapContent), Color.Red, 64, 64);
-            });
+            BitmapConvert(typeof(AtcExplicitBitmapContent), Color.Red, 64, 64);
         }
 
 

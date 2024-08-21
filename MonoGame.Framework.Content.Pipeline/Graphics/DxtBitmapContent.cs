@@ -3,8 +3,14 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System;
+using System.IO;
+using BCnEncoder.Encoder;
+using BCnEncoder.Shared;
 using Microsoft.Xna.Framework.Content.Pipeline.Utilities;
 using Microsoft.Xna.Framework.Graphics;
+using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.PixelFormats;
+
 
 namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 {
@@ -104,20 +110,23 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
                 case SurfaceFormat.Dxt1 when hasTransparency:
                 case SurfaceFormat.Dxt1SRgb when hasTransparency:
                 case SurfaceFormat.Dxt1a:
-                    Crunch.EncodeBytes(
+                    BcnUtil.Encode(
                         sourceBitmap: sourceBitmap,
-                        crunchFormat: CrunchFormat.Dxt1A,
+                        destinationFormat: CompressionFormat.Bc1WithAlpha,
                         out compressedBytes);
                     break;
                 case SurfaceFormat.Dxt1:
                 case SurfaceFormat.Dxt1SRgb:
-                    Crunch.EncodeBytes(
+
+                    BcnUtil.Encode(
                         sourceBitmap: sourceBitmap,
-                        crunchFormat: CrunchFormat.Dxt1,
+                        destinationFormat: CompressionFormat.Bc1,
                         out compressedBytes);
                     break;
                 case SurfaceFormat.Dxt3SRgb:
                 case SurfaceFormat.Dxt3:
+                    // the bcnEncoder does not perform well enough encoding BC2/DXT3
+                    //  specifically, the alpha channel seems to be off. Maybe it has something to do with the premult?
                     Crunch.EncodeBytes(
                         sourceBitmap: sourceBitmap,
                         crunchFormat: CrunchFormat.Dxt3,
@@ -125,9 +134,9 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
                     break;
                 case SurfaceFormat.Dxt5:
                 case SurfaceFormat.Dxt5SRgb:
-                    Crunch.EncodeBytes(
+                    BcnUtil.Encode(
                         sourceBitmap: sourceBitmap,
-                        crunchFormat: CrunchFormat.Dxt5,
+                        destinationFormat: CompressionFormat.Bc3,
                         out compressedBytes);
                     break;
                 default:

@@ -3,6 +3,7 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System;
+using BCnEncoder.Shared;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Content.Pipeline.Utilities;
 
@@ -66,10 +67,23 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
                 }
             }
 
-            BasisU.EncodeBytes(
+            CompressionFormat compressionFormat;
+            switch (format)
+            {
+                case SurfaceFormat.RgbaAtcExplicitAlpha:
+                    compressionFormat = CompressionFormat.AtcExplicitAlpha;
+                    break;
+                case SurfaceFormat.RgbaAtcInterpolatedAlpha:
+                    compressionFormat = CompressionFormat.AtcInterpolatedAlpha;
+                    break;
+                default:
+                    throw new PipelineException();
+            }
+            BcnUtil.Encode(
                 sourceBitmap: sourceBitmap,
-                destinationFormat: format,
+                destinationFormat: compressionFormat,
                 out var compressedBytes);
+
             SetPixelData(compressedBytes);
 
 			return true;

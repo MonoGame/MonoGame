@@ -198,8 +198,13 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
                 return;
             }
 
-            // basisU only supports ATC Interpolated, so the alphaRange is irrelevant.
-            content.ConvertBitmapType(typeof(AtcInterpolatedBitmapContent));
+            var face = content.Faces[0][0];
+            var alphaRange = CalculateAlphaRange(face);
+
+            if (alphaRange == AlphaRange.Full)
+                content.ConvertBitmapType(typeof(AtcExplicitBitmapContent));
+            else
+                content.ConvertBitmapType(typeof(AtcInterpolatedBitmapContent));
         }
 
         static public void CompressAstc(ContentProcessorContext context, TextureContent content, bool isSpriteFont)
