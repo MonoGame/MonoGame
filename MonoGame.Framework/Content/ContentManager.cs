@@ -48,7 +48,6 @@ namespace Microsoft.Xna.Framework.Content
             '5', // PlayStation5
             'O', // XboxOne
             'S', // Nintendo Switch
-            'G', // Google Stadia
             'b', // WebAssembly and Bridge.NET
 
             // NOTE: There are additional identifiers for consoles that

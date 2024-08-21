@@ -37,7 +37,6 @@ We support a growing list of platforms across the desktop, mobile, and console s
   * PlayStation 5
   * Xbox One (XDK only) (GDK coming soon)
   * Nintendo Switch
-  * Google Stadia
 
 ## Support and Contributions
 
