@@ -3,13 +3,9 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System;
-using System.IO;
-using BCnEncoder.Encoder;
 using BCnEncoder.Shared;
 using Microsoft.Xna.Framework.Content.Pipeline.Utilities;
 using Microsoft.Xna.Framework.Graphics;
-using SixLabors.ImageSharp;
-using SixLabors.ImageSharp.PixelFormats;
 
 
 namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
