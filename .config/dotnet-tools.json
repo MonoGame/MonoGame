@@ -10,7 +10,7 @@
       "rollForward": false
     },
     "mgcb-crunch": {
-      "version": "1.16.4.1",
+      "version": "1.0.4.2",
       "commands": [
         "mgcb-crunch"
       ],
