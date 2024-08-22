@@ -83,11 +83,6 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
         Switch,
 
         /// <summary>
-        /// Google Stadia
-        /// </summary>
-        Stadia,
-
-        /// <summary>
         /// WebAssembly and Bridge.NET
         /// </summary>
         Web
