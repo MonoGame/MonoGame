@@ -4,6 +4,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Threading;
 using Microsoft.Xna.Framework.Content.Pipeline;
 using MonoGame.Framework.Content.Pipeline.Builder;
 
@@ -51,13 +52,16 @@ namespace MonoGame.Framework.Content
     /// </summary>
     public static class ContextScopeFactory
     {
-        private static List<IContentContext> _contextStack = new List<IContentContext>(1);
-        private static IContentContext _activeContext;
+        private static AsyncLocal<List<IContentContext>> _contextStack = new AsyncLocal<List<IContentContext>>
+        {
+            Value = new List<IContentContext>(1)
+        };
+        private static AsyncLocal<IContentContext> _activeContext = new AsyncLocal<IContentContext>();
 
         /// <summary>
         /// Returns true when the <see cref="ActiveContext"/> is a valid <see cref="IContentContext"/> instance.
         /// </summary>
-        public static bool HasActiveContext => _activeContext != null;
+        public static bool HasActiveContext => _activeContext.Value != null;
 
         /// <summary>
         /// Access the latest <see cref="IContentContext"/> operation.
@@ -65,6 +69,12 @@ namespace MonoGame.Framework.Content
         /// accessor will throw a <see cref="PipelineException"/>.
         ///
         /// Use the <see cref="HasActiveContext"/> to check if there is an active context.
+        ///
+        /// <para>
+        /// Each Task-chain may have its own unique ActiveContext, but if a task-chain
+        /// does not have an active context, then the parent task's active context will be used
+        /// recursively. This is the behaviour of AsyncLocal.
+        /// </para>
         /// </summary>
         /// <exception cref="PipelineException"></exception>
         public static IContentContext ActiveContext
@@ -77,7 +87,7 @@ namespace MonoGame.Framework.Content
                         $"Cannot access {nameof(ActiveContext)} because there is no active context. Make sure that {nameof(ContextScopeFactory)}.{nameof(BeginContext)} has been called with the `using` keyword");
                 }
 
-                return _activeContext;
+                return _activeContext.Value;
             }
         }
 
@@ -126,8 +136,11 @@ namespace MonoGame.Framework.Content
         /// </returns>
         public static IContentContext BeginContext(IContentContext scope)
         {
-            _contextStack.Add(scope);
-            _activeContext = scope;
+            if (_contextStack.Value == null)
+                _contextStack.Value = new List<IContentContext>(1);
+
+            _contextStack.Value.Add(scope);
+            _activeContext.Value = scope;
             return scope;
         }
 
@@ -150,15 +163,15 @@ namespace MonoGame.Framework.Content
             /// </summary>
             public virtual void Dispose()
             {
-                _contextStack.Remove(this);
+                _contextStack.Value.Remove(this);
 
                 // if someone else has already claimed the activeContext, then we don't need to care.
-                if (_activeContext != this) return;
+                if (_activeContext.Value != this) return;
 
                 // either use the "most recent" (aka, last) context, or if the list is empty,
                 //  there is no context.
-                _activeContext = _contextStack.Count > 0
-                    ? _contextStack[^1]
+                _activeContext.Value = _contextStack.Value.Count > 0
+                    ? _contextStack.Value[^1]
                     : null;
             }
 
