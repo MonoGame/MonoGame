@@ -30,15 +30,8 @@ namespace Microsoft.Xna.Framework.Audio
     {
         #region Internal Constructors
 
-        internal Microphone()
-        {
-
-        }
-
-        internal Microphone(string name)
-        {
-            Name = name;
-        }
+        internal Microphone() { }
+        internal Microphone(string name) => Name = name;
 
         #endregion
 
@@ -60,59 +53,46 @@ namespace Microsoft.Xna.Framework.Audio
         /// </summary>
         public TimeSpan BufferDuration
         {
-            get { return _bufferDuration; }
+            get => _bufferDuration;
             set
             {
                 if (value.TotalMilliseconds < 100 || value.TotalMilliseconds > 1000)
                     throw new ArgumentOutOfRangeException("Buffer duration must be a value between 100 and 1000 milliseconds.");
                 if (value.TotalMilliseconds % 10 != 0)
                     throw new ArgumentOutOfRangeException("Buffer duration must be 10ms aligned (BufferDuration % 10 == 0)");
+
                 _bufferDuration = value;
             }
         }
 
-        // always true on mobile, this can't be queried on any platform (it was most probably only set to true if the headset was plugged in an XInput controller)
-#if IOS || ANDROID
-        private const bool _isHeadset = true;
-#else
-        private const bool _isHeadset = false;
-#endif
         /// <summary>
         /// Determines if the microphone is a wired headset.
         /// Note: XNA could know if a headset microphone was plugged in an Xbox 360 controller but MonoGame can't.
         /// Hence, this is always true on mobile platforms, and always false otherwise.
         /// </summary>
-        public bool IsHeadset
-        {
-            get { return _isHeadset; }
-        }
-
-        private int _sampleRate = 44100; // XNA default is 44100, don't know if it supports any other rates
+        // always true on mobile, this can't be queried on any platform (it was most probably only set to true if the headset was plugged in an XInput controller)
+#if IOS || ANDROID
+        public const bool IsHeadset = true;
+#else
+        public const bool IsHeadset = false;
+#endif
 
         /// <summary>
         /// Returns the sample rate of the captured audio.
         /// Note: default value is 44100hz
         /// </summary>
-        public int SampleRate
-        {
-            get { return _sampleRate; }
-        }
-
-        private MicrophoneState _state = MicrophoneState.Stopped;
+        public static int SampleRate => 44100; // XNA default is 44100, don't know if it supports any other rates
 
         /// <summary>
         /// Returns the state of the Microphone. 
         /// </summary>
-        public MicrophoneState State
-        {
-            get { return _state; }
-        }
+        public MicrophoneState State { get; private set; } = MicrophoneState.Stopped;
 
         #endregion
 
         #region Static Members
 
-        private static List<Microphone> _allMicrophones = null;
+        private static List<Microphone> AllMicrophones = null;
 
         /// <summary>
         /// Returns all compatible microphones.
@@ -122,9 +102,9 @@ namespace Microsoft.Xna.Framework.Audio
             get
             {
                 SoundEffect.Initialize();                
-                if (_allMicrophones == null)
-                    _allMicrophones = new List<Microphone>();
-                return new ReadOnlyCollection<Microphone>(_allMicrophones);
+                AllMicrophones ??= [];
+
+                return new(AllMicrophones);
             }
         }
 
@@ -135,8 +115,11 @@ namespace Microsoft.Xna.Framework.Audio
         /// </summary>
         public static Microphone Default
         {
-            get { SoundEffect.Initialize(); return _default; }
-        }       
+            get {
+                SoundEffect.Initialize();
+                return _default;
+            }
+        }
 
         #endregion
 
@@ -147,50 +130,37 @@ namespace Microsoft.Xna.Framework.Audio
         /// </summary>
         /// <param name="sizeInBytes">Size, in bytes</param>
         /// <returns>TimeSpan of the duration.</returns>
-        public TimeSpan GetSampleDuration(int sizeInBytes)
-        {
+        public static TimeSpan GetSampleDuration(int sizeInBytes)
             // this should be 10ms aligned
             // this assumes 16bit mono data
-            return SoundEffect.GetSampleDuration(sizeInBytes, _sampleRate, AudioChannels.Mono);
-        }
+            => SoundEffect.GetSampleDuration(sizeInBytes, SampleRate, AudioChannels.Mono);
 
         /// <summary>
         /// Returns the size, in bytes, of the array required to hold the specified duration of 16-bit PCM data. 
         /// </summary>
         /// <param name="duration">TimeSpan of the duration of the sample.</param>
         /// <returns>Size, in bytes, of the buffer.</returns>
-        public int GetSampleSizeInBytes(TimeSpan duration)
-        {
+        public static int GetSampleSizeInBytes(TimeSpan duration)
             // this should be 10ms aligned
             // this assumes 16bit mono data
-            return SoundEffect.GetSampleSizeInBytes(duration, _sampleRate, AudioChannels.Mono);
-        }
+            => SoundEffect.GetSampleSizeInBytes(duration, SampleRate, AudioChannels.Mono);
 
         /// <summary>
         /// Starts microphone capture.
         /// </summary>
-        public void Start()
-        {
-            PlatformStart();
-        }
+        public void Start() => PlatformStart();
 
         /// <summary>
         /// Stops microphone capture.
         /// </summary>
-        public void Stop()
-        {
-            PlatformStop();
-        }
+        public void Stop() => PlatformStop();
 
         /// <summary>
         /// Gets the latest available data from the microphone.
         /// </summary>
         /// <param name="buffer">Buffer, in bytes, of the captured data (16-bit PCM).</param>
         /// <returns>The buffer size, in bytes, of the captured data.</returns>
-        public int GetData(byte[] buffer)
-        {
-            return GetData(buffer, 0, buffer.Length);
-        }
+        public int GetData(byte[] buffer) => GetData(buffer, 0, buffer.Length);
 
         /// <summary>
         /// Gets the latest available data from the microphone.
@@ -200,9 +170,7 @@ namespace Microsoft.Xna.Framework.Audio
         /// <param name="count">Amount, in bytes.</param>
         /// <returns>The buffer size, in bytes, of the captured data.</returns>
         public int GetData(byte[] buffer, int offset, int count)
-        {
-            return PlatformGetData(buffer, offset, count);
-        }
+            => PlatformGetData(buffer, offset, count);
 
         #endregion
 
@@ -219,18 +187,20 @@ namespace Microsoft.Xna.Framework.Audio
 
         internal static void UpdateMicrophones()
         {
+            if (AllMicrophones == null) return;
+
             // querying all running microphones for new samples available
-            if (_allMicrophones != null)
-                for (int i = 0; i < _allMicrophones.Count; i++)
-                    _allMicrophones[i].Update();
+            for (int i = 0; i < AllMicrophones.Count; i++)
+                AllMicrophones[i].Update();
         }
 
         internal static void StopMicrophones()
         {
+            if (AllMicrophones == null) return;
+
             // stopping all running microphones before shutting down audio devices
-            if (_allMicrophones != null)
-                for (int i = 0; i < _allMicrophones.Count; i++)
-                    _allMicrophones[i].Stop();
+            for (int i = 0; i < AllMicrophones.Count; i++)
+                AllMicrophones[i].Stop();
         }
 
         #endregion

@@ -156,38 +156,38 @@ namespace Microsoft.Xna.Framework.Audio
                 throw new NoAudioHardwareException("Audio has failed to initialize. Call SoundEffect.Initialize() before sound operation to get more specific errors.");
 
             if (sampleRate < 8000 || sampleRate > 48000)
-                throw new ArgumentOutOfRangeException("sampleRate");
+                throw new ArgumentOutOfRangeException(nameof(sampleRate));
             if ((int)channels != 1 && (int)channels != 2)
-                throw new ArgumentOutOfRangeException("channels");
+                throw new ArgumentOutOfRangeException(nameof(channels));
 
             if (buffer == null || buffer.Length == 0)
-                throw new ArgumentException("Ensure that the buffer length is non-zero.", "buffer");
+                throw new ArgumentException("Ensure that the buffer length is non-zero.", nameof(buffer));
 
             var blockAlign = (int)channels * 2;
             if (count <= 0)
-                throw new ArgumentException("Ensure that the count is greater than zero.", "count");
+                throw new ArgumentException("Ensure that the count is greater than zero.", nameof(count));
             if ((count % blockAlign) != 0)
-                throw new ArgumentException("Ensure that the count meets the block alignment requirements for the number of channels.", "count");
+                throw new ArgumentException("Ensure that the count meets the block alignment requirements for the number of channels.", nameof(count));
 
             if (offset < 0)
-                throw new ArgumentException("The offset cannot be negative.", "offset");
+                throw new ArgumentException("The offset cannot be negative.", nameof(offset));
             if (((ulong)count + (ulong)offset) > (ulong)buffer.Length)
-                throw new ArgumentException("Ensure that the offset+count region lines within the buffer.", "offset");
+                throw new ArgumentException("Ensure that the offset+count region lines within the buffer.", nameof(offset));
 
             var totalSamples = count / blockAlign;
 
             if (loopStart < 0)
-                throw new ArgumentException("The loopStart cannot be negative.", "loopStart");
+                throw new ArgumentException("The loopStart cannot be negative.", nameof(loopStart));
             if (loopStart > totalSamples)
-                throw new ArgumentException("The loopStart cannot be greater than the total number of samples.", "loopStart");
+                throw new ArgumentException("The loopStart cannot be greater than the total number of samples.", nameof(loopStart));
 
             if (loopLength == 0)
                 loopLength = totalSamples - loopStart;
 
             if (loopLength < 0)
-                throw new ArgumentException("The loopLength cannot be negative.", "loopLength");
+                throw new ArgumentException("The loopLength cannot be negative.", nameof(loopLength));
             if (((ulong)loopStart + (ulong)loopLength) > (ulong)totalSamples)
-                throw new ArgumentException("Ensure that the loopStart+loopLength region lies within the sample range.", "loopLength");
+                throw new ArgumentException("Ensure that the loopStart+loopLength region lies within the sample range.", nameof(loopLength));
 
             _duration = GetSampleDuration(count, sampleRate, channels);
 
@@ -202,10 +202,7 @@ namespace Microsoft.Xna.Framework.Audio
         /// Releases unmanaged resources and performs other cleanup operations before the
         /// <see cref="Microsoft.Xna.Framework.Audio.SoundEffect"/> is reclaimed by garbage collection.
         /// </summary>
-        ~SoundEffect()
-        {
-            Dispose(false);
-        }
+        ~SoundEffect() => Dispose(false);
 
         #endregion
 
@@ -247,11 +244,9 @@ namespace Microsoft.Xna.Framework.Audio
         /// </remarks>
         public static SoundEffect FromFile(string path)
         {
-            if (path == null)
-                throw new ArgumentNullException("path");
-
-            using (var stream = File.OpenRead(path))
-                return FromStream(stream);
+            ArgumentNullException.ThrowIfNull(path);
+            using var stream = File.OpenRead(path);
+            return FromStream(stream);
         }
 
         /// <summary>
@@ -271,13 +266,7 @@ namespace Microsoft.Xna.Framework.Audio
         /// </item>
         /// </list>
         /// </remarks>
-        public static SoundEffect FromStream(Stream stream)
-        {
-            if (stream == null)
-                throw new ArgumentNullException("stream");
-
-            return new SoundEffect(stream);
-        }
+        public static SoundEffect FromStream(Stream stream) => stream == null ? throw new ArgumentNullException(nameof(stream)) : new SoundEffect(stream);
 
         /// <summary>
         /// Returns the duration for 16-bit PCM audio.
@@ -289,13 +278,13 @@ namespace Microsoft.Xna.Framework.Audio
         public static TimeSpan GetSampleDuration(int sizeInBytes, int sampleRate, AudioChannels channels)
         {
             if (sizeInBytes < 0)
-                throw new ArgumentException("Buffer size cannot be negative.", "sizeInBytes");
+                throw new ArgumentException("Buffer size cannot be negative.", nameof(sizeInBytes));
             if (sampleRate < 8000 || sampleRate > 48000)
-                throw new ArgumentOutOfRangeException("sampleRate");
+                throw new ArgumentOutOfRangeException(nameof(sampleRate));
 
             var numChannels = (int)channels;
             if (numChannels != 1 && numChannels != 2)
-                throw new ArgumentOutOfRangeException("channels");
+                throw new ArgumentOutOfRangeException(nameof(channels));
 
             if (sizeInBytes == 0)
                 return TimeSpan.Zero;
@@ -320,13 +309,13 @@ namespace Microsoft.Xna.Framework.Audio
         public static int GetSampleSizeInBytes(TimeSpan duration, int sampleRate, AudioChannels channels)
         {
             if (duration < TimeSpan.Zero || duration > TimeSpan.FromMilliseconds(0x7FFFFFF))
-                throw new ArgumentOutOfRangeException("duration");
+                throw new ArgumentOutOfRangeException(nameof(duration));
             if (sampleRate < 8000 || sampleRate > 48000)
-                throw new ArgumentOutOfRangeException("sampleRate");
+                throw new ArgumentOutOfRangeException(nameof(sampleRate));
 
             var numChannels = (int)channels;
             if (numChannels != 1 && numChannels != 2)
-                throw new ArgumentOutOfRangeException("channels");
+                throw new ArgumentOutOfRangeException(nameof(channels));
 
             // Reference
             // http://tinyurl.com/hq9slfy
@@ -454,7 +443,7 @@ namespace Microsoft.Xna.Framework.Audio
             set
             {
                 if (value <= 0f)
-                    throw new ArgumentOutOfRangeException ("value", "value of DistanceScale");
+                    throw new ArgumentOutOfRangeException(nameof(value), "value of DistanceScale");
 
                 _distanceScale = value;
             }
@@ -478,7 +467,7 @@ namespace Microsoft.Xna.Framework.Audio
                 //   although the documentation does not say it throws an error we will anyway
                 //   just so it is like the DistanceScale
                 if (value < 0.0f)
-                    throw new ArgumentOutOfRangeException ("value", "value of DopplerScale");
+                    throw new ArgumentOutOfRangeException(nameof(value), "value of DopplerScale");
 
                 _dopplerScale = value;
             }
@@ -495,9 +484,7 @@ namespace Microsoft.Xna.Framework.Audio
             get { return speedOfSound; }
             set
             {
-                if (value <= 0.0f)
-                    throw new ArgumentOutOfRangeException();
-
+                ArgumentOutOfRangeException.ThrowIfLessThanOrEqual(value, 0.0f);
                 speedOfSound = value;
             }
         }

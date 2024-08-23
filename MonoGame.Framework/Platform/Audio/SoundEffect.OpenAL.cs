@@ -29,16 +29,8 @@ namespace Microsoft.Xna.Framework.Audio
         {
             byte[] buffer;
 
-            ALFormat format;
-            int freq;
-            int channels;
-            int blockAlignment;
-            int bitsPerSample;
-            int samplesPerBlock;
-            int sampleCount;
-            buffer = AudioLoader.Load(stream, out format, out freq, out channels, out blockAlignment, out bitsPerSample, out samplesPerBlock, out sampleCount);
-
-            duration = TimeSpan.FromSeconds((float)sampleCount / (float)freq);
+            buffer = AudioLoader.Load(stream, out ALFormat format, out int freq, out int channels, out int blockAlignment, out int bitsPerSample, out int _, out int sampleCount);
+            duration = TimeSpan.FromSeconds(sampleCount / freq);
 
             PlatformInitializeBuffer(buffer, buffer.Length, format, channels, freq, blockAlignment, bitsPerSample, 0, 0);
         }

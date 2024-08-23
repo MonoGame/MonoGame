@@ -42,10 +42,10 @@ namespace Microsoft.Xna.Framework.Audio
         internal static void PopulateCaptureDevices()
         {
             // clear microphones
-            if (_allMicrophones != null)
-                _allMicrophones.Clear();
+            if (AllMicrophones != null)
+                AllMicrophones.Clear();
             else
-                _allMicrophones = new List<Microphone>();
+                AllMicrophones = [];
 
             _default = null;
 
@@ -67,7 +67,7 @@ namespace Microsoft.Xna.Framework.Audio
                     break;
 
                 var microphone = new Microphone(deviceIdentifier);
-                _allMicrophones.Add(microphone);
+                AllMicrophones.Add(microphone);
                 if (deviceIdentifier == defaultDevice)
                     _default = microphone;
 
@@ -85,12 +85,12 @@ namespace Microsoft.Xna.Framework.Audio
 
         internal void PlatformStart()
         {
-            if (_state == MicrophoneState.Started)
+            if (State == MicrophoneState.Started)
                 return;
 
             _captureDevice = Alc.CaptureOpenDevice(
                 Name,
-                (uint)_sampleRate,
+                (uint)SampleRate,
                 ALFormat.Mono16,
                 GetSampleSizeInBytes(_bufferDuration));
 
@@ -101,7 +101,7 @@ namespace Microsoft.Xna.Framework.Audio
                 Alc.CaptureStart(_captureDevice);
                 CheckALCError("Failed to start capture.");
 
-                _state = MicrophoneState.Started;
+                State = MicrophoneState.Started;
             }
             else
             {
@@ -111,7 +111,7 @@ namespace Microsoft.Xna.Framework.Audio
 
         internal void PlatformStop()
         {
-            if (_state == MicrophoneState.Started)
+            if (State == MicrophoneState.Started)
             {
                 Alc.CaptureStop(_captureDevice);
                 CheckALCError("Failed to stop capture.");
@@ -119,12 +119,12 @@ namespace Microsoft.Xna.Framework.Audio
                 CheckALCError("Failed to close capture device.");
                 _captureDevice = IntPtr.Zero;
             }
-            _state = MicrophoneState.Stopped;
+            State = MicrophoneState.Stopped;
         }
 
         internal int GetQueuedSampleCount()
         {
-            if (_state == MicrophoneState.Stopped || BufferReady == null)
+            if (State == MicrophoneState.Stopped || BufferReady == null)
                 return 0;
 
             int[] values = new int[1];
@@ -138,9 +138,7 @@ namespace Microsoft.Xna.Framework.Audio
         internal void Update()
         {
             if (GetQueuedSampleCount() > 0)
-            {
                 BufferReady.Invoke(this, EventArgs.Empty);
-            }
         }
 
         internal int PlatformGetData(byte[] buffer, int offset, int count)
@@ -148,23 +146,20 @@ namespace Microsoft.Xna.Framework.Audio
             int sampleCount = GetQueuedSampleCount();
             sampleCount = Math.Min(count / 2, sampleCount); // 16bit adjust
 
-            if (sampleCount > 0)
-            {
-                var handle = GCHandle.Alloc(buffer, GCHandleType.Pinned);
-                try
-                {
-                    Alc.CaptureSamples(_captureDevice, handle.AddrOfPinnedObject() + offset, sampleCount);
-                    CheckALCError("Failed to capture samples.");
-                }
-                finally
-                {
-                    handle.Free();
-                }
+            if (sampleCount <= 0) return 0;
 
-                return sampleCount * 2; // 16bit adjust
+            GCHandle handle = GCHandle.Alloc(buffer, GCHandleType.Pinned);
+            try
+            {
+                Alc.CaptureSamples(_captureDevice, handle.AddrOfPinnedObject() + offset, sampleCount);
+                CheckALCError("Failed to capture samples.");
+            }
+            finally
+            {
+                handle.Free();
             }
 
-            return 0;
+            return sampleCount * 2; // 16bit adjust
         }
     }
 }
