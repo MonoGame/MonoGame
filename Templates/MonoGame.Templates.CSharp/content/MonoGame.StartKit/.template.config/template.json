@@ -2,16 +2,29 @@
   "$schema": "http://json.schemastore.org/template",
   "author": "MonoGame Team",
   "classifications": [
-    "MonoGame", "Games", "Mobile",
+    "MonoGame", "Games", "Mobile", "Android", "iOS", "Desktop", "Windows", "Linux", "macOS"
   ],
   "name": "MonoGame StartKit",
   "identity": "MonoGame.StartKit",
   "groupIdentity": "MonoGame.StartKit",
-  "shortName": "mg-startkit",
+  "shortName": "mgstartkit",
   "tags": {
     "language": "C#",
     "type": "project"
   },
-  "sourceName": "$___SafeGameName___$",
-  "preferNameDirectory": true
+  "sourceName": "___SafeGameName___",
+  "preferNameDirectory": true,
+  "description": "A 2D MonoGame solution for all supported Mobile and Desktop platforms.",
+    "postActions": [
+        {
+            "description": "Restore NuGet packages required by this project.",
+            "manualInstructions": [
+                {
+                    "text": "Run 'dotnet restore'"
+                }
+            ],
+            "actionId": "210D431B-A78B-4D2F-B762-4ED3E3EA9025",
+            "continueOnError": true
+        }
+    ]
 }
