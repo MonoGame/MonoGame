@@ -4,7 +4,7 @@
         {
 			"label": "Debug Android Build",
 			"type": "shell",
-			"command": "dotnet build -p:Configuration=Debug ${workspaceFolder}/___SafeGameName___.Android/___SafeGameName___.Android.csproj \"/t:Install;_Run\" /p:AndroidAttachDebugger=true /p:AndroidSdbHostPort=10000",
+			"command": "dotnet build -p:Configuration=Debug ${workspaceFolder}/___SafeGameName___.Android/___SafeGameName___.Android.csproj \"/t:Install;_Run\" /p:AndroidAttachDebugger=true /p:AndroidSdbHostPort=10000"
 		},
 		{
 			"label": "Debug DesktopGL Build",

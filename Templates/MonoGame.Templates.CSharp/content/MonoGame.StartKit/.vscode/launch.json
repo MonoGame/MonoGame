@@ -17,6 +17,7 @@
             "type": "coreclr",
 			"request": "launch",
 			"preLaunchTask": "Debug DesktopGL Build",
+			"program": "${workspaceFolder}/___SafeGameName___.DesktopGL/bin/Debug/net8.0/___SafeGameName___.DesktopGL.exe",
         },
         {
             "name": "iOS Debug",
@@ -29,6 +30,7 @@
             "type": "coreclr",
 			"request": "launch",
 			"preLaunchTask": "Debug WindowsDX Build",
+			"program": "${workspaceFolder}/___SafeGameName___.WindowsDX/bin/Debug/net8.0-windows/___SafeGameName___.WindowsDX.exe",
         }
     ]
 }
