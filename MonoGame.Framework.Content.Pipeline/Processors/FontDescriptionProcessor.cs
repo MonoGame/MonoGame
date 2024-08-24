@@ -81,12 +81,6 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
 
                 var glyphData = new HashSet<GlyphData>(glyphs.Select(x => x.Data));
 
-                // Optimize.
-                foreach (GlyphData glyph in glyphData)
-                {
-                    GlyphCropper.Crop(glyph);
-                }
-
                 // We need to know how to pack the glyphs.
                 bool requiresPot, requiresSquare;
                 texProfile.Requirements(context, TextureFormat, out requiresPot, out requiresSquare);
