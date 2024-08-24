@@ -150,12 +150,13 @@ struct MGP_Event
 {
 union {
     MGEventType Type;
-    MG_FIELD_OFFSET(4, MGP_KeyEvent, Key);
-    MG_FIELD_OFFSET(4, MGP_MouseMoveEvent, MouseMove);
-    MG_FIELD_OFFSET(4, MGP_MouseButtonEvent, MouseButton);
-    MG_FIELD_OFFSET(4, MGP_MouseWheelEvent, MouseWheel);
-    MG_FIELD_OFFSET(4, MGP_DropEvent, Drop);
-    MG_FIELD_OFFSET(4, MGP_WindowEvent, Window);
+    MG_FIELD_OFFSET(4, mgulong, Timestamp);
+    MG_FIELD_OFFSET(12, MGP_KeyEvent, Key);
+    MG_FIELD_OFFSET(12, MGP_MouseMoveEvent, MouseMove);
+    MG_FIELD_OFFSET(12, MGP_MouseButtonEvent, MouseButton);
+    MG_FIELD_OFFSET(12, MGP_MouseWheelEvent, MouseWheel);
+    MG_FIELD_OFFSET(12, MGP_DropEvent, Drop);
+    MG_FIELD_OFFSET(12, MGP_WindowEvent, Window);
 };
 };
 #pragma pack(pop)

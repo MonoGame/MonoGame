@@ -264,6 +264,8 @@ mgbool MGP_Platform_PollEvent(MGP_Platform* platform, MGP_Event& event_)
 
     while (SDL_PollEvent(&ev) == 1)
     {
+        event_.Timestamp = SDL_GetTicks64();
+
         switch (ev.type)
         {
         case SDL_QUIT:

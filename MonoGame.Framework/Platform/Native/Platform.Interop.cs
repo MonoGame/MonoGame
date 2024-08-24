@@ -99,21 +99,24 @@ internal struct MGP_Event
     public EventType Type;
 
     [FieldOffset(4)]
+    public ulong Timestamp;
+
+    [FieldOffset(12)]
     public MGP_KeyEvent Key;
 
-    [FieldOffset(4)]
+    [FieldOffset(12)]
     public MGP_MouseMoveEvent MouseMove;
 
-    [FieldOffset(4)]
+    [FieldOffset(12)]
     public MGP_MouseButtonEvent MouseButton;
 
-    [FieldOffset(4)]
+    [FieldOffset(12)]
     public MGP_MouseWheelEvent MouseWheel;
 
-    [FieldOffset(4)]
+    [FieldOffset(12)]
     public MGP_DropEvent Drop;
 
-    [FieldOffset(4)]
+    [FieldOffset(12)]
     public MGP_WindowEvent Window;
 
 }
