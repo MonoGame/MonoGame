@@ -1,4 +1,4 @@
-﻿// MonoGame - Copyright (C) The MonoGame Team
+﻿// MonoGame - Copyright (C) MonoGame Foundation, Inc
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
@@ -103,7 +103,6 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
             //    case TargetPlatform.Windows:
             //    case TargetPlatform.Linux:
             //    case TargetPlatform.MacOSX:
-            //    case TargetPlatform.WindowsStoreApp:
             //        return true;
             //    default:
             //        return false;

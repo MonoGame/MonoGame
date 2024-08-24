@@ -1,4 +1,4 @@
-// MonoGame - Copyright (C) The MonoGame Team
+// MonoGame - Copyright (C) MonoGame Foundation, Inc
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
@@ -286,19 +286,16 @@ namespace Microsoft.Xna.Framework.Graphics
         }
 
 #if IOS
-        [CLSCompliant(false)]
         public static Texture2D FromStream(GraphicsDevice graphicsDevice, UIImage uiImage)
         {
             return PlatformFromStream(graphicsDevice, uiImage.CGImage);
         }
 #elif ANDROID
-        [CLSCompliant(false)]
         public static Texture2D FromStream(GraphicsDevice graphicsDevice, Bitmap bitmap)
         {
             return PlatformFromStream(graphicsDevice, bitmap);
         }
 
-        [CLSCompliant(false)]
         public void Reload(Bitmap image)
         {
             var width = image.Width;

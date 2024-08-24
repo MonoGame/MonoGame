@@ -1,4 +1,4 @@
-// MonoGame - Copyright (C) The MonoGame Team
+// MonoGame - Copyright (C) MonoGame Foundation, Inc
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
@@ -35,11 +35,6 @@ namespace MonoGame.Framework.Utilities
         Windows,
 
         /// <summary>
-        /// MonoGame Windows universal platform.
-        /// </summary>
-        WindowsUniversal,
-
-        /// <summary>
         /// MonoGame WebGL platform.
         /// </summary>
         WebGL,
@@ -62,11 +57,6 @@ namespace MonoGame.Framework.Utilities
         /// <summary>
         /// MonoGame Nintendo Switch platform.
         /// </summary>
-        NintendoSwitch,
-
-        /// <summary>
-        /// MonoGame Google Stadia platform.
-        /// </summary>
-        Stadia
+        NintendoSwitch
     }
 }

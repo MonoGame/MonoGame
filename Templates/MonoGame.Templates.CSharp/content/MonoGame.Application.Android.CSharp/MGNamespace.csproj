@@ -1,6 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net6.0-android</TargetFramework>
+    <TargetFramework>net8.0-android</TargetFramework>
     <SupportedOSPlatformVersion>23</SupportedOSPlatformVersion>
     <OutputType>Exe</OutputType>
     <ApplicationId>com.companyname.MGNamespace</ApplicationId>
@@ -8,8 +8,8 @@
     <ApplicationDisplayVersion>1.0</ApplicationDisplayVersion>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="MonoGame.Content.Builder.Task" Version="3.8.1.1-develop" />
-    <PackageReference Include="MonoGame.Framework.Android" Version="3.8.1.1-develop" />
+    <PackageReference Include="MonoGame.Content.Builder.Task" Version="3.8.2.1-develop" />
+    <PackageReference Include="MonoGame.Framework.Android" Version="3.8.2.1-develop" />
   </ItemGroup>
   <Target Name="RestoreDotnetTools" BeforeTargets="Restore">
     <Message Text="Restoring dotnet tools" Importance="High" />

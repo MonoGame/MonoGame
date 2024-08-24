@@ -1,4 +1,4 @@
-// MonoGame - Copyright (C) The MonoGame Team
+// MonoGame - Copyright (C) MonoGame Foundation, Inc
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
@@ -142,7 +142,12 @@ namespace Microsoft.Xna.Framework.Input
                 return ((_buttons & Buttons.BigButton) == Buttons.BigButton) ? ButtonState.Pressed : ButtonState.Released;
             }
         }
-        
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="GamePadButtons"/> structure,
+        /// setting the specified buttons to pressed in.
+        /// </summary>
+        /// <param name="buttons">Buttons to be set as pressed in.</param>
         public GamePadButtons(Buttons buttons)
         {
             _buttons = buttons;

@@ -1,4 +1,4 @@
-// MonoGame - Copyright (C) The MonoGame Team
+// MonoGame - Copyright (C) MonoGame Foundation, Inc
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
@@ -21,7 +21,7 @@ namespace MonoGame.Effect.Compiler
                 Console.Error.WriteLine("Setup instructions:");
                 Console.Error.WriteLine("- Create 64 bit wine prefix");
                 Console.Error.WriteLine("- Install d3dcompiler_47 using winetricks");
-                Console.Error.WriteLine("- Install .NET 6");
+                Console.Error.WriteLine("- Install .NET 8");
                 Console.Error.WriteLine("- Setup MGFXC_WINE_PATH environmental variable to point to a valid wine prefix");
                 Console.Error.WriteLine("");
                 return -1;

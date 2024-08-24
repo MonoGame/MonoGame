@@ -1,4 +1,4 @@
-// MonoGame - Copyright (C) The MonoGame Team
+// MonoGame - Copyright (C) MonoGame Foundation, Inc
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
@@ -19,6 +19,9 @@ using Android.Runtime;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
+    /// <summary>
+    /// Provides methods to retrieve and manipulate graphics adapters.
+    /// </summary>
     public sealed class GraphicsAdapter : IDisposable
     {
         /// <summary>
@@ -59,11 +62,15 @@ namespace Microsoft.Xna.Framework.Graphics
         }
 #endif
 
+        /// <inheritdoc />
         public void Dispose()
         {
         }
 
 #if DESKTOPGL
+        /// <summary>
+        /// Gets a string used for presentation to the user.
+        /// </summary>
         public string Description {
             get {
                 try {
@@ -76,9 +83,16 @@ namespace Microsoft.Xna.Framework.Graphics
         }
 #else
         string _description = string.Empty;
+
+        /// <summary>
+        /// Gets a string used for presentation to the user.
+        /// </summary>
         public string Description { get { return _description; } private set { _description = value; } }
 #endif
 
+        /// <summary>
+        /// Gets the current display mode.
+        /// </summary>
         public DisplayMode CurrentDisplayMode
         {
             get
@@ -112,11 +126,17 @@ namespace Microsoft.Xna.Framework.Graphics
             }
         }
 
+        /// <summary>
+        /// Gets the default adapter.
+        /// </summary>
         public static GraphicsAdapter DefaultAdapter
         {
             get { return Adapters[0]; }
         }
 
+        /// <summary>
+        /// Gets a read-only collection of available adapters on the system.
+        /// </summary>
         public static ReadOnlyCollection<GraphicsAdapter> Adapters
         {
             get
@@ -136,7 +156,7 @@ namespace Microsoft.Xna.Framework.Graphics
         }
 
         /// <summary>
-        /// Used to request creation of the reference graphics device, 
+        /// Used to request creation of the reference graphics device,
         /// or the default hardware accelerated device (when set to false).
         /// </summary>
         /// <remarks>
@@ -299,6 +319,9 @@ namespace Microsoft.Xna.Framework.Graphics
             };
 #endif
 
+        /// <summary>
+        /// Gets a collection of supported display modes for the current adapter.
+        /// </summary>
         public DisplayModeCollection SupportedDisplayModes
         {
             get
@@ -315,7 +338,7 @@ namespace Microsoft.Xna.Framework.Graphics
 #if DESKTOPGL
                     _displayIndex = displayIndex;
                     modes.Clear();
-                    
+
                     var modeCount = Sdl.Display.GetNumDisplayModes(displayIndex);
 
                     for (int i = 0;i < modeCount;i++)
@@ -392,6 +415,14 @@ namespace Microsoft.Xna.Framework.Graphics
             }
         }
 
+        /// <summary>
+        /// Returns a value that indicates whether the specified graphics profile is supported by the current adapter.
+        /// </summary>
+        /// <param name="graphicsProfile">The graphics profile to check for support.</param>
+        /// <returns></returns>
+        /// <exception cref="InvalidOperationException">
+        /// The <paramref name="graphicsProfile"/> parameter is not a valid <see cref="GraphicsProfile"/> enum value.
+        /// </exception>
         public bool IsProfileSupported(GraphicsProfile graphicsProfile)
         {
             if(UseReferenceDevice)

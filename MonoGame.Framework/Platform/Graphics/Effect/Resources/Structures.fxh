@@ -28,8 +28,8 @@ struct VSInputTx
 struct VSInputTxVc
 {
     float4 Position : POSITION;
-    float2 TexCoord : TEXCOORD;
     float4 Color    : COLOR;
+    float2 TexCoord : TEXCOORD;
 };
 
 struct VSInputNm

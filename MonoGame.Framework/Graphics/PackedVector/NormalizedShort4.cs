@@ -1,4 +1,4 @@
-// MonoGame - Copyright (C) The MonoGame Team
+// MonoGame - Copyright (C) MonoGame Foundation, Inc
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
@@ -7,31 +7,59 @@ using System;
 
 namespace Microsoft.Xna.Framework.Graphics.PackedVector
 {
+    /// <summary>
+    /// Packed vector type containing four 16-bit signed normalized values, ranging from −1 to 1.
+    /// </summary>
     public struct NormalizedShort4 : IPackedVector<ulong>, IEquatable<NormalizedShort4>
 	{
 		private ulong short4Packed;
 
+        /// <summary>
+        /// Initializes a new instance of this structure.
+        /// </summary>
+        /// <param name="vector">
+        /// A <see cref="Vector4"/> value who's components contain the initial values for this structure.
+        /// </param>
         public NormalizedShort4(Vector4 vector)
 		{
             short4Packed = PackInFour(vector.X, vector.Y, vector.Z, vector.W);
 		}
 
+        /// <summary>
+        /// Initializes a new instance of this structure.
+        /// </summary>
+        /// <param name="x">The initial x-component value for this structure.</param>
+        /// <param name="y">The initial y-component value for this structure.</param>
+        /// <param name="z">The initial z-component value for this structure.</param>
+        /// <param name="w">The initial 2-component value for this structure.</param>
         public NormalizedShort4(float x, float y, float z, float w)
 		{
             short4Packed = PackInFour(x, y, z, w);
 		}
 
+        /// <summary>
+        /// Returns a value that indicates whether the two value are not equal.
+        /// </summary>
+        /// <param name="a">The value on the left of the inequality operator.</param>
+        /// <param name="b">The value on the right of the inequality operator.</param>
+        /// <returns>true if the two value are not equal; otherwise, false.</returns>
         public static bool operator !=(NormalizedShort4 a, NormalizedShort4 b)
 		{
 			return !a.Equals (b);
 		}
 
+        /// <summary>
+        /// Returns a value that indicates whether the two values are equal.
+        /// </summary>
+        /// <param name="a">The value on the left of the equality operator.</param>
+        /// <param name="b">The value on the right of the equality operator.</param>
+        /// <returns>true if the two values are equal; otherwise, false.</returns>
         public static bool operator ==(NormalizedShort4 a, NormalizedShort4 b)
 		{
 			return a.Equals (b);
 		}
 
-        [CLSCompliant(false)]
+        /// <inheritdoc />
         public ulong PackedValue
         {
             get
@@ -44,21 +72,25 @@ namespace Microsoft.Xna.Framework.Graphics.PackedVector
             }
 		}
 
+        /// <inheritdoc />
         public override bool Equals(object obj)
         {
             return (obj is NormalizedShort4) && Equals((NormalizedShort4)obj);
         }
 
+        /// <inheritdoc />
         public bool Equals(NormalizedShort4 other)
         {
             return short4Packed.Equals(other.short4Packed);
         }
 
+        /// <inheritdoc />
 		public override int GetHashCode ()
 		{
 			return short4Packed.GetHashCode();
 		}
 
+        /// <inheritdoc />
 		public override string ToString ()
 		{
             return short4Packed.ToString("X");
@@ -84,6 +116,7 @@ namespace Microsoft.Xna.Framework.Graphics.PackedVector
             short4Packed = PackInFour(vector.X, vector.Y, vector.Z, vector.W);
 		}
 
+        /// <inheritdoc />
 		public Vector4 ToVector4 ()
 		{
             const float maxVal = 0x7FFF;

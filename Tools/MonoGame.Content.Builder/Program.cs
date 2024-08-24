@@ -1,8 +1,10 @@
-﻿// MonoGame - Copyright (C) The MonoGame Team
+﻿// MonoGame - Copyright (C) MonoGame Foundation, Inc
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System;
+using System.Diagnostics;
+using System.Threading;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
@@ -43,6 +45,19 @@ namespace MonoGame.Content.Builder
                 } catch (NotImplementedException) {
                     // not implemented under Mono
                     Console.Error.WriteLine("The debugger is not implemented under Mono and thus is not supported on your platform.");
+                }
+            }
+            if (content.WaitForDebuggerToAttach)
+            {
+                var currentProcess = Process.GetCurrentProcess();
+                Console.WriteLine($"Waiting for debugger to attach ({currentProcess.MainModule.FileName} PID {currentProcess.Id}).  Press any key to continue without debugger.");
+                while (!Debugger.IsAttached)
+                {
+                    if (Console.KeyAvailable)
+                    {
+                        break;
+                    }
+                    Thread.Sleep(100);
                 }
             }
 

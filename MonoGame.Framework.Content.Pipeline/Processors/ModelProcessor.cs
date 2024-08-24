@@ -1,4 +1,4 @@
-﻿// MonoGame - Copyright (C) The MonoGame Team
+﻿// MonoGame - Copyright (C) MonoGame Foundation, Inc
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
@@ -12,6 +12,9 @@ using Microsoft.Xna.Framework.Graphics.PackedVector;
 
 namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
 {
+    /// <summary>
+    /// Processes a game asset mesh to a model content that is optimal for runtime.
+    /// </summary>
     [ContentProcessor(DisplayName = "Model - MonoGame")]
     public class ModelProcessor : ContentProcessor<NodeContent, ModelContent>
     {
@@ -28,12 +31,22 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
 
         #endregion
 
+        /// <summary>
+        /// Initializes a new instance of <b>ModelProcessor</b>.
+        /// </summary>
         public ModelProcessor() { }
 
         #region Properties
 
+        /// <summary>
+        /// Gets or Sets the background color used for transparency
+        /// </summary>
         public virtual Color ColorKeyColor { get; set; }
 
+        /// <summary>
+        /// Gets or Sets a value that indicates whether colors identified by the <see cref="ColorKeyColor"/> will be
+        /// marked as transparent (Alpha 0).  The default value is <b>false</b>.
+        /// </summary>
         [DefaultValue(true)]
         public virtual bool ColorKeyEnabled
         {
@@ -41,8 +54,15 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
             set { _colorKeyEnabled = value; }
         }
 
+        /// <summary>
+        /// Gets or Sets the default effect class to apply to this model. The default value is <b>BasicEffect</b>
+        /// </summary>
         public virtual MaterialProcessorDefaultEffect DefaultEffect { get; set; }
 
+        /// <summary>
+        /// Gets or Sets a value that indicates whether this will generate MipMpas for the selected texture. The default
+        /// value is <b>false</b>.
+        /// </summary>
         [DefaultValue(true)]
         public virtual bool GenerateMipmaps
         {
@@ -50,8 +70,16 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
             set { _generateMipmaps = value; }
         }
 
+        /// <summary>
+        /// Gets or Sets a value that indicates whether model tangents should be generated for use in Normal Mapping.
+        /// The default value is <b>false</b>.
+        /// </summary>
         public virtual bool GenerateTangentFrames { get; set; }
 
+        /// <summary>
+        /// Gets or Sets a value that indicates whether the selected texture will be treated as an Alpha Mask.
+        /// The default value is <b>true</b>.
+        /// </summary>
         [DefaultValue(true)]
         public virtual bool PremultiplyTextureAlpha
         {
@@ -59,6 +87,10 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
             set { _premultiplyTextureAlpha = value; }
         }
 
+        /// <summary>
+        /// Gets or Sets a value that indicates whether the selected texture will be treated as an Vertex Color Mask.
+        /// The default value is <b>true</b>.
+        /// </summary>
         [DefaultValue(true)]
         public virtual bool PremultiplyVertexColors
         {
@@ -66,14 +98,30 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
             set { _premultiplyVertexColors = value; }
         }
 
+        /// <summary>
+        /// Gets or Sets a value that indicates if the model texture(s) dimensions should be resized to the next largest
+        /// power of 2 size. (e.g. 128x128 or 512x512). The default value is <b>false</b>.
+        /// </summary>
         public virtual bool ResizeTexturesToPowerOfTwo { get; set; }
 
+        /// <summary>
+        /// Gets or Sets the default model x-axis rotation number, in degrees of rotation. The default value is <b>0.0f</b>.
+        /// </summary>
         public virtual float RotationX { get; set; }
 
+        /// <summary>
+        /// Gets or Sets the default model y-axis rotation number, in degrees of rotation. The default value is <b>0.0f</b>.
+        /// </summary>
         public virtual float RotationY { get; set; }
 
+        /// <summary>
+        /// Gets or Sets the default model z-axis rotation number, in degrees of rotation. The default value is <b>0.0f</b>.
+        /// </summary>
         public virtual float RotationZ { get; set; }
 
+        /// <summary>
+        /// Gets or Sets the default model scale.  The default value is <b>1.0f</b>.
+        /// </summary>
         [DefaultValue(1.0f)]
         public virtual float Scale
         {
@@ -81,8 +129,15 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
             set { _scale = value; }
         }
 
+        /// <summary>
+        /// Gets or Sets a value indicating whether the winding order is swapped.  This is useful for models that appear
+        ///  to be drawn inside out.  The default value is <b>false</b>.
+        /// </summary>
         public virtual bool SwapWindingOrder { get; set; }
 
+        /// <summary>
+        /// Gets or Sets the format of the texture to process (e.g. raw color, DXT).  The default value is <b>compressed</b>.
+        /// </summary>
 		[DefaultValue(typeof(TextureProcessorOutputFormat), "Compressed")]
         public virtual TextureProcessorOutputFormat TextureFormat
         {
@@ -92,6 +147,12 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
 
         #endregion
 
+        /// <summary>
+        /// Converts mesh content to model content.
+        /// <param name="input">The root node content.</param>
+        /// <param name="context">Context for the specified processor.</param>
+        /// </summary>
+        /// <returns>The model content.</returns>
         public override ModelContent Process(NodeContent input, ContentProcessorContext context)
         {
             _identity = input.Identity;
@@ -151,7 +212,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
             var parts = new List<ModelMeshPartContent>();
             var vertexBuffer = new VertexBufferContent();
             var indexBuffer = new IndexCollection();
-			
+
 			if (GenerateTangentFrames)
             {
                 context.Logger.LogMessage("Generating tangent frames.");
@@ -206,6 +267,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
             return new ModelMeshContent(mesh.Name, mesh, parent, bounds, parts);
         }
 
+        /// <summary />
         protected virtual MaterialContent ConvertMaterial(MaterialContent material, ContentProcessorContext context)
         {
             var parameters = new OpaqueDataDictionary();
@@ -220,6 +282,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
             return context.Convert<MaterialContent, MaterialContent>(material, "MaterialProcessor", parameters);
         }
 
+        /// <summary />
         protected virtual void ProcessGeometryUsingMaterial(MaterialContent material,
                                                             IEnumerable<GeometryContent> geometryCollection,
                                                             ContentProcessorContext context)
@@ -252,7 +315,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
             {
                 // Just check for a "Texture" which should cover custom Effects
                 // and BasicEffect which can have an optional texture.
-                textureChannels = material.Textures.ContainsKey("Texture") ? 1 : 0;                
+                textureChannels = material.Textures.ContainsKey("Texture") ? 1 : 0;
             }
 
             // By default we must set the vertex color property
@@ -262,7 +325,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
             // If we run into a geometry that requires vertex
             // color we need a seperate material for it.
             var colorMaterial = material.Clone();
-            colorMaterial.OpaqueData["VertexColorEnabled"] = true;    
+            colorMaterial.OpaqueData["VertexColorEnabled"] = true;
 
             foreach (var geometry in geometryCollection)
             {
@@ -275,7 +338,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
                 {
                     if (!geometry.Vertices.Channels.Contains(VertexChannelNames.TextureCoordinate(i)))
                         throw new InvalidContentException(
-                            string.Format("The mesh \"{0}\", using {1}, contains geometry that is missing texture coordinates for channel {2}.", 
+                            string.Format("The mesh \"{0}\", using {1}, contains geometry that is missing texture coordinates for channel {2}.",
                             geometry.Parent.Name,
                             MaterialProcessor.GetDefaultEffect(material),
                             i),
@@ -295,11 +358,12 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
                     if (!geometry.Vertices.Channels.Contains(weightsName))
                         throw new InvalidContentException(
                             string.Format("The skinned mesh \"{0}\" contains geometry without any vertex weights.", geometry.Parent.Name),
-                            _identity);                    
+                            _identity);
                 }
             }
         }
 
+        /// <summary />
         protected virtual void ProcessVertexChannel(GeometryContent geometry,
                                                     int vertexChannelIndex,
                                                     ContentProcessorContext context)
@@ -315,7 +379,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
 
         private static void ProcessWeightsChannel(GeometryContent geometry, int vertexChannelIndex, ContentIdentity identity)
         {
-            // NOTE: Portions of this code is from the XNA CPU Skinning 
+            // NOTE: Portions of this code is from the XNA CPU Skinning
             // sample under Ms-PL, (c) Microsoft Corporation.
 
             // create a map of Name->Index of the bones
@@ -324,7 +388,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
             {
                 throw new InvalidContentException(
                     "Skeleton not found. Meshes that contain a Weights vertex channel cannot be processed without access to the skeleton data.",
-                    identity);                     
+                    identity);
             }
 
             var boneIndices = new Dictionary<string, int>();
@@ -342,7 +406,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
                         vertexChannel.Name,
                         vertexChannel.ElementType.FullName,
                         "Microsoft.Xna.Framework.Content.Pipeline.Graphics.BoneWeightCollection"),
-                    identity);                          
+                    identity);
             }
             var outputIndices = new Byte4[inputWeights.Count];
             var outputWeights = new Vector4[inputWeights.Count];

@@ -1,4 +1,4 @@
-// MonoGame - Copyright (C) The MonoGame Team
+// MonoGame - Copyright (C) MonoGame Foundation, Inc
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
@@ -11,6 +11,9 @@ using MonoGame.Framework.Utilities;
 
 namespace Microsoft.Xna.Framework.Content
 {
+    /// <summary>
+    /// Defines a manager that constructs and keeps track of <see cref="ContentTypeReader"/> objects.
+    /// </summary>
     public sealed class ContentTypeReaderManager
     {
         private static readonly object _locker;
@@ -21,7 +24,7 @@ namespace Microsoft.Xna.Framework.Content
 
         private static readonly string _assemblyName;
 
-        private static readonly bool _isRunningOnNetCore = Type.GetType("System.Private.CoreLib") != null;
+        private static readonly bool _isRunningOnNetCore = typeof(object).Assembly.GetName().Name == "System.Private.CoreLib";
 
         static ContentTypeReaderManager()
         {
@@ -30,6 +33,15 @@ namespace Microsoft.Xna.Framework.Content
             _assemblyName = ReflectionHelpers.GetAssembly(typeof(ContentTypeReaderManager)).FullName;
         }
 
+        /// <summary>
+        /// Creates a new instance of the <see cref="ContentReader"/> class initialized for the specified type.
+        /// </summary>
+        /// <param name="targetType">The type the <see cref="ContentReader"/> will handle.</param>
+        /// <returns>
+        /// The <see cref="ContentReader"/> created by this method if a content reader of the specified type has been
+        /// registered with this content manager; otherwise, null.
+        /// </returns>
+        /// <exception cref="ArgumentNullException">If the <paramref name="targetType"/> parameter is null.</exception>
         public ContentTypeReader GetTypeReader(Type targetType)
         {
             if (targetType.IsArray && targetType.GetArrayRank() > 1)
@@ -51,7 +63,7 @@ namespace Microsoft.Xna.Framework.Content
             // Trick to prevent the linker removing the code, but not actually execute the code
             if (falseflag)
             {
-                // Dummy variables required for it to work on iDevices ** DO NOT DELETE ** 
+                // Dummy variables required for it to work on iDevices ** DO NOT DELETE **
                 // This forces the classes not to be optimized out when deploying to iDevices
                 var hByteReader = new ByteReader();
                 var hSByteReader = new SByteReader();
@@ -99,7 +111,7 @@ namespace Microsoft.Xna.Framework.Content
 
                 // At the moment the Video class doesn't exist
                 // on all platforms... Allow it to compile anyway.
-#if ANDROID || (IOS && !TVOS) || MONOMAC || (WINDOWS && !OPENGL) || WINDOWS_UAP
+#if ANDROID || (IOS && !TVOS) || MONOMAC || (WINDOWS && !OPENGL)
                 var hVideoReader = new VideoReader();
 #endif
             }
@@ -152,7 +164,7 @@ namespace Microsoft.Xna.Framework.Content
                                 catch (TargetInvocationException ex)
                                 {
                                     // If you are getting here, the Mono runtime is most likely not able to JIT the type.
-                                    // In particular, MonoTouch needs help instantiating types that are only defined in strings in Xnb files. 
+                                    // In particular, MonoTouch needs help instantiating types that are only defined in strings in Xnb files.
                                     throw new InvalidOperationException(
                                         "Failed to get default constructor for ContentTypeReader. To work around, add a creation function to ContentTypeReaderManager.AddTypeCreator() " +
                                         "with the following failed type string: " + originalReaderTypeString, ex);
@@ -194,17 +206,13 @@ namespace Microsoft.Xna.Framework.Content
         }
 
         /// <summary>
-        /// Removes Version, Culture and PublicKeyToken from a type string.
+        /// Removes the Version, Culture, and PublicKeyToken from a fully-qualified type name string.
         /// </summary>
         /// <remarks>
         /// Supports multiple generic types (e.g. Dictionary&lt;TKey,TValue&gt;) and nested generic types (e.g. List&lt;List&lt;int&gt;&gt;).
-        /// </remarks> 
-        /// <param name="type">
-        /// A <see cref="System.String"/>
-        /// </param>
-        /// <returns>
-        /// A <see cref="System.String"/>
-        /// </returns>
+        /// </remarks>
+        /// <param name="type">A string containing the fully-qualified type name to prepare.</param>
+        /// <returns>A new string with the Version, Culture and PublicKeyToken removed.</returns>
         public static string PrepareType(string type)
         {
             //Needed to support nested types
@@ -221,7 +229,6 @@ namespace Microsoft.Xna.Framework.Content
             if (preparedType.Contains("PublicKeyToken"))
                 preparedType = Regex.Replace(preparedType, @"(.+?), Version=.+?$", "$1");
 
-            // TODO: For WinRT this is most likely broken!
             preparedType = preparedType.Replace(", Microsoft.Xna.Framework.Graphics", string.Format(", {0}", _assemblyName));
             preparedType = preparedType.Replace(", Microsoft.Xna.Framework.Video", string.Format(", {0}", _assemblyName));
             preparedType = preparedType.Replace(", Microsoft.Xna.Framework", string.Format(", {0}", _assemblyName));
@@ -238,20 +245,21 @@ namespace Microsoft.Xna.Framework.Content
         private static Dictionary<string, Func<ContentTypeReader>> typeCreators = new Dictionary<string, Func<ContentTypeReader>>();
 
         /// <summary>
-        /// Adds the type creator.
+        /// Registers a function to create a <see cref="ContentTypeReader"/> instance used to read an object of the
+        /// type specified.
         /// </summary>
-        /// <param name='typeString'>
-        /// Type string.
-        /// </param>
-        /// <param name='createFunction'>
-        /// Create function.
-        /// </param>
+        /// <param name='typeString'>A string containing the fully-qualified type name of the object type.</param>
+        /// <param name='createFunction'>The function responsible for creating an instance of the <see cref="ContentTypeReader"/> class.</param>
+        /// <exception cref="ArgumentNullException">If the <paramref name="typeString"/> parameter is null or an empty string.</exception>
         public static void AddTypeCreator(string typeString, Func<ContentTypeReader> createFunction)
         {
             if (!typeCreators.ContainsKey(typeString))
                 typeCreators.Add(typeString, createFunction);
         }
 
+        /// <summary>
+        /// Clears all content type creators that were registered with <see cref="AddTypeCreator(string, Func{ContentTypeReader})"/>
+        /// </summary>
         public static void ClearTypeCreators()
         {
             typeCreators.Clear();
