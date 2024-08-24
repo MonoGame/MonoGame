@@ -299,7 +299,7 @@ namespace Microsoft.Xna.Framework.Graphics
         ///     <item>
         ///         <description>
         ///             The <paramref name="arraySlice"/> parameter is less than zero or is greater than or equal to the
-        ///             <see cref="ArraySize"/> of this texture.
+        ///             internal array buffer of this texture.
         ///         </description>
         ///     </item>
         ///     <item>
@@ -493,7 +493,7 @@ namespace Microsoft.Xna.Framework.Graphics
         ///     <item>
         ///         <description>
         ///             The <paramref name="arraySlice"/> parameter is less than zero or is greater than or equal to the
-        ///             <see cref="ArraySize"/> of this texture.
+        ///             internal array buffer of this texture.
         ///         </description>
         ///     </item>
         ///     <item>

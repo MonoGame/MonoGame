@@ -82,6 +82,5 @@
   <Import Project="..\..\XBoxOne\MonoGame.Effect.Compiler.targets" Condition="exists('..\..\XBoxOne\MonoGame.Effect.Compiler.targets')" />
   <Import Project="..\..\PlayStation4\MonoGame.Effect.Compiler.targets" Condition="exists('..\..\PlayStation4\MonoGame.Effect.Compiler.targets')" />
   <Import Project="..\..\PlayStation5\MonoGame.Effect.Compiler.targets" Condition="exists('..\..\PlayStation5\MonoGame.Effect.Compiler.targets')" />
-  <Import Project="..\..\Stadia\MonoGame.Effect.Compiler.targets" Condition="exists('..\..\Stadia\MonoGame.Effect.Compiler.targets')" />
 
 </Project>

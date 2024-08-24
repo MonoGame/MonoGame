@@ -31,8 +31,6 @@ body:
     options:
       - MonoGame Android Application (mgandroid)
       - MonoGame Cross-Platform Desktop Application (mgdesktopgl)
-      - MonoGame Windows Universal CoreApp Application (mguwpcore)
-      - MonoGame Windows Universal XAML Application (mguwpxaml)
       - MonoGame Windows Desktop Application (mgwindowsdx)
       - MonoGame iOS Application (mgios)
       - N/A

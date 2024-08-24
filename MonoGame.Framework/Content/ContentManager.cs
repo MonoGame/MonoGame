@@ -11,11 +11,6 @@ using MonoGame.Framework.Utilities;
 using Microsoft.Xna.Framework.Graphics;
 using System.Globalization;
 
-#if !WINDOWS_UAP
-using Microsoft.Xna.Framework.Audio;
-using Microsoft.Xna.Framework.Media;
-#endif
-
 namespace Microsoft.Xna.Framework.Content
 {
     /// <summary>
@@ -47,25 +42,24 @@ namespace Microsoft.Xna.Framework.Content
             'a', // Android
             'd', // DesktopGL
             'X', // MacOSX
-            'W', // WindowsStoreApp
             'n', // NativeClient
-            'M', // WindowsPhone8
             'r', // RaspberryPi
             'P', // PlayStation4
             '5', // PlayStation5
             'O', // XboxOne
             'S', // Nintendo Switch
-            'G', // Google Stadia
             'b', // WebAssembly and Bridge.NET
 
-            // NOTE: There are additional identifiers for consoles that 
+            // NOTE: There are additional identifiers for consoles that
             // are not defined in this repository.  Be sure to ask the
             // console port maintainers to ensure no collisions occur.
 
-            
+
             // Legacy identifiers... these could be reused in the
             // future if we feel enough time has passed.
 
+            'W', // WindowsStoreApp
+            'M', // WindowsPhone8
             'm', // WindowsPhone7.0 (XNA)
             'p', // PlayStationMobile
             'v', // PSVita
@@ -173,7 +167,6 @@ namespace Microsoft.Xna.Framework.Content
 		}
 
         /// <inheritdoc cref="ContentManager.ContentManager(IServiceProvider)"/>
-        /// <param name="serviceProvider" />
         /// <param name="rootDirectory">The root directory the ContentManager will search for content in.</param>
         public ContentManager(IServiceProvider serviceProvider, string rootDirectory)
 		{
@@ -229,7 +222,7 @@ namespace Microsoft.Xna.Framework.Content
         ///     <para>
         ///         Before a ContentManager can load an asset, you need to add the asset to your game project using
         ///         the steps described in
-        ///         <see href="https://docs.monogame.net/articles/content_pipeline/index.html">Adding Content - MonoGame</see>.
+        ///         <see href="https://docs.monogame.net/articles/getting_started/content_pipeline/index.html">Adding Content - MonoGame</see>.
         ///     </para>
         /// </remarks>
         /// <typeparam name="T">
@@ -255,15 +248,15 @@ namespace Microsoft.Xna.Framework.Content
         /// <exception cref="ContentLoadException">
         /// The type of the <paramref name="assetName"/> in the file does not match the type of asset requested as
         /// specified by <typeparamref name="T"/>.
-        /// 
+        ///
         /// -or-
-        /// 
+        ///
         /// A content file matching the <paramref name="assetName"/> parameter could not be found.
         ///
         /// -or-
         ///
         /// The specified path in the <paramref name="assetName"/> parameter is invalid (for example, a
-        /// directory in the path does not exist).        
+        /// directory in the path does not exist).
         ///
         /// -or-
         ///
@@ -299,7 +292,7 @@ namespace Microsoft.Xna.Framework.Content
         /// <remarks>
         /// Before a ContentManager can load an asset, you need to add the asset to your game project using
         /// the steps described in
-        /// <see href="https://docs.monogame.net/articles/content_pipeline/index.html">Adding Content - MonoGame</see>.
+        /// <see href="https://docs.monogame.net/articles/getting_started/content_pipeline/index.html">Adding Content - MonoGame</see>.
         /// </remarks>
         /// <typeparam name="T">
         ///     <para>
@@ -324,15 +317,15 @@ namespace Microsoft.Xna.Framework.Content
         /// <exception cref="ContentLoadException">
         /// The type of the <paramref name="assetName"/> in the file does not match the type of asset requested as
         /// specified by <typeparamref name="T"/>.
-        /// 
+        ///
         /// -or-
-        /// 
+        ///
         /// A content file matching the <paramref name="assetName"/> parameter could not be found.
         ///
         /// -or-
         ///
         /// The specified path in the <paramref name="assetName"/> parameter is invalid (for example, a
-        /// directory in the path does not exist).        
+        /// directory in the path does not exist).
         ///
         /// -or-
         ///
@@ -350,11 +343,11 @@ namespace Microsoft.Xna.Framework.Content
             }
 
             T result = default(T);
-            
+
             // On some platforms, name and slash direction matter.
             // We store the asset by a /-separating key rather than how the
             // path to the file was passed to us to avoid
-            // loading "content/asset1.xnb" and "content\\ASSET1.xnb" as if they were two 
+            // loading "content/asset1.xnb" and "content\\ASSET1.xnb" as if they were two
             // different files. This matches stock XNA behavior.
             // The dictionary will ignore case differences
             var key = assetName.Replace('\\', '/');
@@ -384,14 +377,14 @@ namespace Microsoft.Xna.Framework.Content
             {
                 var assetPath = Path.Combine(RootDirectory, assetName) + ".xnb";
 
-                // This is primarily for editor support. 
+                // This is primarily for editor support.
                 // Setting the RootDirectory to an absolute path is useful in editor
-                // situations, but TitleContainer can ONLY be passed relative paths.                
+                // situations, but TitleContainer can ONLY be passed relative paths.
 #if DESKTOPGL || WINDOWS
-                if (Path.IsPathRooted(assetPath))                
-                    stream = File.OpenRead(assetPath);                
+                if (Path.IsPathRooted(assetPath))
+                    stream = File.OpenRead(assetPath);
                 else
-#endif                
+#endif
                 stream = TitleContainer.OpenStream(assetPath);
 #if ANDROID
                 // Read the asset into memory in one go. This results in a ~50% reduction
@@ -407,12 +400,11 @@ namespace Microsoft.Xna.Framework.Content
 			{
 				throw new ContentLoadException("The content file was not found.", fileNotFound);
 			}
-#if !WINDOWS_UAP
+
 			catch (DirectoryNotFoundException directoryNotFound)
 			{
 				throw new ContentLoadException("The directory was not found.", directoryNotFound);
 			}
-#endif
 			catch (Exception exception)
 			{
 				throw new ContentLoadException("Opening stream error.", exception);
@@ -431,7 +423,7 @@ namespace Microsoft.Xna.Framework.Content
 			{
 				throw new ObjectDisposedException("ContentManager");
 			}
-						
+
 			string originalAssetName = assetName;
 			object result = null;
 
@@ -446,7 +438,7 @@ namespace Microsoft.Xna.Framework.Content
                         ((GraphicsResource)result).Name = originalAssetName;
                 }
             }
-            
+
 			if (result == null)
 				throw new ContentLoadException("Could not load " + originalAssetName + " asset!");
 
@@ -503,7 +495,7 @@ namespace Microsoft.Xna.Framework.Content
 
             var reader = new ContentReader(this, decompressedStream,
                                                         originalAssetName, version, recordDisposableObject);
-            
+
             return reader;
         }
 
@@ -528,14 +520,14 @@ namespace Microsoft.Xna.Framework.Content
         {
             foreach (var asset in LoadedAssets)
             {
-                // This never executes as asset.Key is never null.  This just forces the 
+                // This never executes as asset.Key is never null.  This just forces the
                 // linker to include the ReloadAsset function when AOT compiled.
                 if (asset.Key == null)
                     ReloadAsset(asset.Key, Convert.ChangeType(asset.Value, asset.Value.GetType()));
 
                 var methodInfo = ReflectionHelpers.GetMethodInfo(typeof(ContentManager), "ReloadAsset");
                 var genericMethod = methodInfo.MakeGenericMethod(asset.Value.GetType());
-                genericMethod.Invoke(this, new object[] { asset.Key, Convert.ChangeType(asset.Value, asset.Value.GetType()) }); 
+                genericMethod.Invoke(this, new object[] { asset.Key, Convert.ChangeType(asset.Value, asset.Value.GetType()) });
             }
         }
 

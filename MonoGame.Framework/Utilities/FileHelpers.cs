@@ -16,14 +16,8 @@ namespace MonoGame.Framework.Utilities
         public static readonly char ForwardSlash = '/';
         public static readonly string ForwardSlashString = new string(ForwardSlash, 1);
         public static readonly char BackwardSlash = '\\';
-
-#if WINDOWS_UAP
-        public static readonly char NotSeparator = ForwardSlash;
-        public static readonly char Separator = BackwardSlash;
-#else
         public static readonly char NotSeparator = Path.DirectorySeparatorChar == BackwardSlash ? ForwardSlash : BackwardSlash;
         public static readonly char Separator = Path.DirectorySeparatorChar;
-#endif
 
         public static string NormalizeFilePathSeparators(string name)
         {
