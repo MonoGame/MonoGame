@@ -20,8 +20,6 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
                     platform == TargetPlatform.NativeClient ||
                     platform == TargetPlatform.RaspberryPi ||
                     platform == TargetPlatform.Windows ||
-                    platform == TargetPlatform.WindowsPhone8 ||
-                    platform == TargetPlatform.WindowsStoreApp ||
                     platform == TargetPlatform.iOS ||
                     platform == TargetPlatform.Web;
         }
@@ -61,8 +59,6 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
                         throw new PlatformNotSupportedException("iOS platform only supports PVR texture compression");
                 }
                 else if (platform == TargetPlatform.Windows ||
-                            platform == TargetPlatform.WindowsPhone8 ||
-                            platform == TargetPlatform.WindowsStoreApp ||
                             platform == TargetPlatform.DesktopGL ||
                             platform == TargetPlatform.DesktopVK ||
                             platform == TargetPlatform.MacOSX ||

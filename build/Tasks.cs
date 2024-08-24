@@ -9,7 +9,6 @@ namespace BuildScripts;
 [IsDependentOn(typeof(BuildWindowsDXTask))]
 [IsDependentOn(typeof(BuildAndroidTask))]
 [IsDependentOn(typeof(BuildiOSTask))]
-[IsDependentOn(typeof(BuildUWPTask))]
 [IsDependentOn(typeof(BuildContentPipelineTask))]
 public sealed class BuildFrameworksTask : FrostingTask<BuildContext> { }
 
@@ -30,6 +29,11 @@ public sealed class BuildTemplatesTask : FrostingTask<BuildContext> { }
 [IsDependentOn(typeof(BuildToolsTask))]
 [IsDependentOn(typeof(BuildTemplatesTask))]
 public sealed class BuildAllTask : FrostingTask<BuildContext> { }
+
+[TaskName("Deploy")]
+[IsDependentOn(typeof(DeployNuGetsToGitHubTask))]
+[IsDependentOn(typeof(DeployNuGetsToNuGetOrgTask))]
+public sealed class DeployTask : FrostingTask<BuildContext> { }
 
 [TaskName("Default")]
 [IsDependentOn(typeof(BuildAllTask))]

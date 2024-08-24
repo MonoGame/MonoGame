@@ -51,22 +51,10 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
         MacOSX,
 
         /// <summary>
-        /// Windows Store App
-        /// (MonoGame)
-        /// </summary>
-        WindowsStoreApp,
-
-        /// <summary>
         /// Google Chrome Native Client
         /// (MonoGame)
         /// </summary>
         NativeClient,
-
-        /// <summary>
-        /// Windows Phone 8
-        /// (MonoGame)
-        /// </summary>
-        WindowsPhone8,
 
         /// <summary>
         /// Raspberry Pi
@@ -93,11 +81,6 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
         /// Nintendo Switch
         /// </summary>
         Switch,
-
-        /// <summary>
-        /// Google Stadia
-        /// </summary>
-        Stadia,
 
         /// <summary>
         /// WebAssembly and Bridge.NET

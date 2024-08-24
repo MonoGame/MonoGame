@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net8.0-ios</TargetFramework>
+    <OutputType>Exe</OutputType>
+    <Nullable>disable</Nullable>
+    <ImplicitUsings>false</ImplicitUsings>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+    <SupportedOSPlatformVersion>11.0</SupportedOSPlatformVersion>
+    <Configurations>Debug;Release</Configurations>
+    <Platforms>iPhoneSimulator;iPhone;AnyCPU</Platforms>
+    <RunAOTCompilation>True</RunAOTCompilation>    
+    <WarningLevel>4</WarningLevel>
+    <IPhoneResourcePrefix>Resources</IPhoneResourcePrefix>
+    <RootNamespace>MonoGame.InteractiveTests</RootNamespace>
+    <AssemblyName>MonoGameInteractiveTestsiOS</AssemblyName>
+    <DefineConstants>IOS;</DefineConstants>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|iPhoneSimulator' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\iPhoneSimulator\Debug</OutputPath>
+    <DefineConstants>DEBUG;</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <CreatePackage>false</CreatePackage>
+    <CodesignKey>iPhone Developer</CodesignKey>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|iPhone' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\iPhone\Release</OutputPath>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <CreatePackage>false</CreatePackage>
+    <CodesignKey>iPhone Developer</CodesignKey>
+    <CodesignEntitlements>Entitlements.plist</CodesignEntitlements>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|iPhoneSimulator' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\iPhoneSimulator\Release</OutputPath>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <CreatePackage>false</CreatePackage>
+    <CodesignKey>iPhone Developer</CodesignKey>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|iPhone' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\iPhone\Debug</OutputPath>
+    <DefineConstants>DEBUG;</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <CodesignKey>iPhone Developer</CodesignKey>
+    <DeviceSpecificBuild>true</DeviceSpecificBuild>
+    <CodesignEntitlements>Entitlements.plist</CodesignEntitlements>
+  </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject>MonoGame.InteractiveTests.iOS.Application</StartupObject>
+  </PropertyGroup>
+  <PropertyGroup>
+   <CreatePackage>false</CreatePackage>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Xml" />
+    <Reference Include="System.Core" />
+  </ItemGroup>
+    <ItemGroup>
+    <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\Contents.json" />
+    <ImageAsset Include="Assets.xcassets\Contents.json" />
+    <None Include="Info.plist" />
+    <None Include="Entitlements.plist" />    
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Main.cs" />
+    <Compile Include="AppDelegate.cs" />
+    <Compile Include="RootViewController.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Guide\" />
+    <Folder Include="Content\" />
+    <Folder Include="Content\Fonts\" />
+    <Folder Include="Content\Textures\" />
+    <Folder Include="Content\Effect\" />
+  </ItemGroup>
+  <Import Project="..\..\Common\MonoGame.Interactive.Common.projitems" Label="Shared" />
+  <Import Project="..\..\Tests\MonoGame.Interactive.Tests.projitems" Label="Shared" />
+
+  <PropertyGroup>
+    <MonoGamePlatform>iOS</MonoGamePlatform>
+  </PropertyGroup>
+  <ItemGroup Condition="'$(MonoGamePlatform)' == 'iOS'" >
+     <ProjectReference Include="..\..\..\..\MonoGame.Framework\MonoGame.Framework.iOS.csproj" /> 
+    <Content Include="..\..\..\Assets\Effects\Mobile\test.fx.ogl.mgfxo">
+      <Link>Content\Effect\test.fx.mgfxo</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="MonoGame.Content.Builder.Task" Version="3.8.1.303" />    
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="..\..\..\Assets\Fonts\Default.xnb">
+      <Link>Content\Fonts\Default.xnb</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\Assets\Textures\white-1.xnb">
+      <Link>Content\Textures\white-1.xnb</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\Assets\Textures\LogoOnly_64px.png">
+      <Link>Content\Textures\LogoOnly_64px.png</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>    
+</Project>

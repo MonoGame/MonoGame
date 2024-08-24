@@ -17,7 +17,6 @@ namespace MonoGame.Tests.Framework
             get { throw new NotImplementedException(); }
         }
 
-        // TODO: Make this common so that all platforms have it!
         public override Point Position { get; set; }
 
         public override DisplayOrientation CurrentOrientation
