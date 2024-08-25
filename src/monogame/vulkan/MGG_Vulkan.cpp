@@ -15,11 +15,11 @@
 #include <vulkan/vulkan.h>
 
 #define VOLK_IMPLEMENTATION
-#include <Volk/volk.h>
+#include <volk.h>
 
 #define VMA_IMPLEMENTATION
 #define VMA_STATIC_VULKAN_FUNCTIONS 1
-#include <vma/vk_mem_alloc.h>
+#include <vk_mem_alloc.h>
 
 #if defined(MG_SDL2)
 #include <SDL_vulkan.h>

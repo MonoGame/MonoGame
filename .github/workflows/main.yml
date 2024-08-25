@@ -21,10 +21,14 @@ jobs:
         with:
           dotnet-version: '8.0.x'
 
-      - name: Setup Xmake
-        uses: xmake-io/github-action-setup-xmake@v1
+      - name: Add msbuild to PATH
+        if: runner.os == 'Windows'
+        uses: microsoft/setup-msbuild@v1.0.2
+
+      - name: Setup Premake5
+        uses: abel0b/setup-premake@v2.4
         with:
-          xmake-version: latest
+          version: "5.0.0-beta2"
 
       - name: Setup Java
         uses: actions/setup-java@v4

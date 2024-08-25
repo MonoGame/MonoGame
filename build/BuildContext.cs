@@ -170,17 +170,4 @@ public class BuildContext : FrostingContext
 
         return processOutput.Any(match => match.StartsWith($"{workload} "));
     }
-
-    public int XMake(string workingDir, params string[] args)
-    {
-        return this.StartProcess(
-            "xmake",
-            new ProcessSettings()
-            {
-                WorkingDirectory = workingDir,
-                Arguments = string.Join(" ", args),
-                RedirectStandardOutput = false,
-            }
-        );
-    }
 }

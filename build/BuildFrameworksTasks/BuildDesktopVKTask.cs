@@ -9,20 +9,26 @@ public sealed class BuildDesktopVKTask : FrostingTask<BuildContext>
 
     public override void Run(BuildContext context)
     {
-        int exit = context.XMake(@"src\monogame\", "f -m debug -v -y");
-        if (exit < 0)
-            throw new Exception($"Setting debug config failed! {exit}");
+        // TODO: This should be moved to its own seperate
+        // build process so that it doesn't run on all MG builds.
+        {
+            var buildDir = "src/monogame/external/sdl2/sdl/build";
+            context.CreateDirectory(buildDir);
+            context.StartProcess("cmake", new ProcessSettings { WorkingDirectory = buildDir, Arguments = "-A x64 -D CMAKE_MSVC_RUNTIME_LIBRARY=MultiThreaded ../" });
+            context.StartProcess("msbuild", new ProcessSettings { WorkingDirectory = buildDir, Arguments = "SDL2.sln /p:Configuration=Release /p:Platform=x64" });
+        }
 
-        exit = context.XMake(@"src\monogame\", "-r");
+        // Generate the native projects.
+        var exit = context.StartProcess("premake5", new ProcessSettings { WorkingDirectory = "src/monogame", Arguments = "clean" });
         if (exit < 0)
-            throw new Exception($"Rebuild debug failed! {exit}");
+            throw new Exception($"Setting Premake clean failed! {exit}");
+        exit = context.StartProcess("premake5", new ProcessSettings { WorkingDirectory = "src/monogame", Arguments = "--os=windows --verbose vs2022" });
+        if (exit < 0)
+            throw new Exception($"Setting Premake generation failed! {exit}");
 
-        exit = context.XMake(@"src\monogame\", "f -m release -v -y");
+        // Build it.
+        exit = context.StartProcess("msbuild", new ProcessSettings { WorkingDirectory = "src/monogame", Arguments = "monogame.sln /p:Configuration=Release /p:Platform=x64" });
         if (exit < 0)
-            throw new Exception($"Setting release config failed! {exit}");
-
-        exit = context.XMake(@"src\monogame\", "-r");
-        if (exit < 0)
-            throw new Exception($"Rebuild release failed! {exit}");
+            throw new Exception($"Setting build failed! {exit}");
     }
 }
