@@ -5,11 +5,15 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using Microsoft.Win32;
 using Microsoft.Xna.Framework.Content.Pipeline.Graphics;
 using MonoGame.Framework.Utilities;
+using RoyT.TrueType;
+using RoyT.TrueType.Helpers;
+using RoyT.TrueType.Tables.Name;
 using Glyph = Microsoft.Xna.Framework.Content.Pipeline.Graphics.Glyph;
 
 namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
@@ -34,6 +38,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
             var output = new SpriteFontContent(input);
             var fontFile = FindFont(input.FontName, input.Style.ToString());
 
+            // Look for fonts by filename
             if (string.IsNullOrWhiteSpace(fontFile))
             {
                 var directories = new List<string> { Path.GetDirectoryName(input.Identity.SourceFilename) };
@@ -41,7 +46,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
 
                 // Add special per platform directories
                 if (CurrentPlatform.OS == OS.Windows)
-                    directories.Add(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Windows), "Fonts"));
+                    directories.Add(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Fonts)));
                 else if (CurrentPlatform.OS == OS.MacOSX)
                 {
                     directories.Add(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Personal), "Library", "Fonts"));
@@ -234,6 +239,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
         {
             if (CurrentPlatform.OS == OS.Windows)
             {
+#pragma warning disable CA1416 // Validate platform compatibility
                 var fontDirectory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Windows), "Fonts");
                 foreach (var key in new RegistryKey[] { Registry.LocalMachine, Registry.CurrentUser })
                 {
@@ -250,10 +256,15 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
                             if (nulIndex != -1)
                                 fontPath = fontPath.Substring(0, nulIndex);
 
-                            return Path.IsPathRooted(fontPath) ? fontPath : Path.Combine(fontDirectory, fontPath);
+                            fontPath = Path.IsPathRooted(fontPath) ? fontPath : Path.Combine(fontDirectory, fontPath);
+                            if (MatchFont(fontPath, name, style))
+                            {
+                                return fontPath;
+                            }
                         }
                     }
                 }
+#pragma warning restore CA1416 // Validate platform compatibility
             }
             else if (CurrentPlatform.OS == OS.Linux)
             {
@@ -288,6 +299,26 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
             }
 
             return String.Empty;
+        }
+
+        private static bool MatchFont(string fontPath, string fontName, string fontStyle)
+        {
+            try
+            {
+                var font = fontPath.EndsWith(".ttc", StringComparison.OrdinalIgnoreCase)
+                    ? TrueTypeFont.FromCollectionFile(fontPath)[0]
+                    : TrueTypeFont.FromFile(fontPath);
+
+                var usCulture = CultureInfo.GetCultureInfo("en-US");
+                var family = NameHelper.GetName(NameId.FontFamilyName, usCulture, font);
+                var subfamily = NameHelper.GetName(NameId.FontSubfamilyName, usCulture, font);
+                return family == fontName && subfamily == fontStyle;
+            }
+            catch (Exception)
+            {
+                // Let's not crash when a font cannot be parsed
+                return false;
+            }
         }
     }
 }
