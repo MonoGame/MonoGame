@@ -15,7 +15,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Utilities;
 /// The <see cref="Encode"/> method uses the https://github.com/Nominom/BCnEncoder.NET/tree/master
 /// library to encode various block based compression formats
 /// </summary>
-public static class BcnUtil
+internal static class BcnUtil
 {
     /// <summary>
     /// Compress the given <see cref="sourceBitmap"/> to the desired block format <see cref="destinationFormat"/>.

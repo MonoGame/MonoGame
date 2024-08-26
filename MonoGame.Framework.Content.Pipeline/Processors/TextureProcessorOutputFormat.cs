@@ -30,7 +30,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
 
         /// <summary>
         /// The SurfaceFormat value, of the input TextureContent object, is converted to an appropriate compressed format for the target platform.
-        /// This can include PVRTC for iOS, DXT for desktop, Windows 8 and Windows Phone 8, and ETC1 or BGRA4444 for Android.
+        /// This can include PVRTC for iOS, DXT for desktop, Windows 8 and Windows Phone 8, and ETC1/2 or BGRA4444 for Android.
         /// </summary>
         Compressed,
 
