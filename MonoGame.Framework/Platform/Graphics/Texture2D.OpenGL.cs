@@ -225,64 +225,65 @@ namespace Microsoft.Xna.Framework.Graphics
         private void PlatformGetData<T>(int level, int arraySlice, Rectangle rect, T[] data, int startIndex, int elementCount)
             where T : struct
         {
-            Threading.EnsureUIThread();
-
+            Threading.BlockOnUIThread(() =>
+            {
 #if GLES
-            // TODO: check for non renderable formats (formats that can't be attached to FBO)
+                // TODO: check for non renderable formats (formats that can't be attached to FBO)
 
-            var framebufferId = 0;
-            GL.GenFramebuffers(1, out framebufferId);
-            GraphicsExtensions.CheckGLError();
-            GL.BindFramebuffer(FramebufferTarget.Framebuffer, framebufferId);
-            GraphicsExtensions.CheckGLError();
-            GL.FramebufferTexture2D(FramebufferTarget.Framebuffer, FramebufferAttachment.ColorAttachment0, TextureTarget.Texture2D, this.glTexture, 0);
-            GraphicsExtensions.CheckGLError();
+                var framebufferId = 0;
+                GL.GenFramebuffers(1, out framebufferId);
+                GraphicsExtensions.CheckGLError();
+                GL.BindFramebuffer(FramebufferTarget.Framebuffer, framebufferId);
+                GraphicsExtensions.CheckGLError();
+                GL.FramebufferTexture2D(FramebufferTarget.Framebuffer, FramebufferAttachment.ColorAttachment0, TextureTarget.Texture2D, this.glTexture, 0);
+                GraphicsExtensions.CheckGLError();
 
-            GL.ReadPixels(rect.X, rect.Y, rect.Width, rect.Height, this.glFormat, this.glType, data);
-            GraphicsExtensions.CheckGLError();
-            GL.DeleteFramebuffers(1, ref framebufferId);
+                GL.ReadPixels(rect.X, rect.Y, rect.Width, rect.Height, this.glFormat, this.glType, data);
+                GraphicsExtensions.CheckGLError();
+                GL.DeleteFramebuffers(1, ref framebufferId);
 #else
-            var tSizeInByte = ReflectionHelpers.SizeOf<T>.Get();
-            GL.BindTexture(TextureTarget.Texture2D, this.glTexture);
-            GL.PixelStore(PixelStoreParameter.PackAlignment, Math.Min(tSizeInByte, 8));
+                var tSizeInByte = ReflectionHelpers.SizeOf<T>.Get();
+                GL.BindTexture(TextureTarget.Texture2D, this.glTexture);
+                GL.PixelStore(PixelStoreParameter.PackAlignment, Math.Min(tSizeInByte, 8));
 
-            if (glFormat == GLPixelFormat.CompressedTextureFormats)
-            {
-                // Note: for compressed format Format.GetSize() returns the size of a 4x4 block
-                var pixelToT = Format.GetSize() / tSizeInByte;
-                var tFullWidth = Math.Max(this.width >> level, 1) / 4 * pixelToT;
-                var temp = new T[Math.Max(this.height >> level, 1) / 4 * tFullWidth];
-                GL.GetCompressedTexImage(TextureTarget.Texture2D, level, temp);
-                GraphicsExtensions.CheckGLError();
-
-                var rowCount = rect.Height / 4;
-                var tRectWidth = rect.Width / 4 * Format.GetSize() / tSizeInByte;
-                for (var r = 0; r < rowCount; r++)
+                if (glFormat == GLPixelFormat.CompressedTextureFormats)
                 {
-                    var tempStart = rect.X / 4 * pixelToT + (rect.Top / 4 + r) * tFullWidth;
-                    var dataStart = startIndex + r * tRectWidth;
-                    Array.Copy(temp, tempStart, data, dataStart, tRectWidth);
-                }
-            }
-            else
-            {
-                // we need to convert from our format size to the size of T here
-                var tFullWidth = Math.Max(this.width >> level, 1) * Format.GetSize() / tSizeInByte;
-                var temp = new T[Math.Max(this.height >> level, 1) * tFullWidth];
-                GL.GetTexImage(TextureTarget.Texture2D, level, glFormat, glType, temp);
-                GraphicsExtensions.CheckGLError();
+                    // Note: for compressed format Format.GetSize() returns the size of a 4x4 block
+                    var pixelToT = Format.GetSize() / tSizeInByte;
+                    var tFullWidth = Math.Max(this.width >> level, 1) / 4 * pixelToT;
+                    var temp = new T[Math.Max(this.height >> level, 1) / 4 * tFullWidth];
+                    GL.GetCompressedTexImage(TextureTarget.Texture2D, level, temp);
+                    GraphicsExtensions.CheckGLError();
 
-                var pixelToT = Format.GetSize() / tSizeInByte;
-                var rowCount = rect.Height;
-                var tRectWidth = rect.Width * pixelToT;
-                for (var r = 0; r < rowCount; r++)
-                {
-                    var tempStart = rect.X * pixelToT + (r + rect.Top) * tFullWidth;
-                    var dataStart = startIndex + r * tRectWidth;
-                    Array.Copy(temp, tempStart, data, dataStart, tRectWidth);
+                    var rowCount = rect.Height / 4;
+                    var tRectWidth = rect.Width / 4 * Format.GetSize() / tSizeInByte;
+                    for (var r = 0; r < rowCount; r++)
+                    {
+                        var tempStart = rect.X / 4 * pixelToT + (rect.Top / 4 + r) * tFullWidth;
+                        var dataStart = startIndex + r * tRectWidth;
+                        Array.Copy(temp, tempStart, data, dataStart, tRectWidth);
+                    }
                 }
-            }
+                else
+                {
+                    // we need to convert from our format size to the size of T here
+                    var tFullWidth = Math.Max(this.width >> level, 1) * Format.GetSize() / tSizeInByte;
+                    var temp = new T[Math.Max(this.height >> level, 1) * tFullWidth];
+                    GL.GetTexImage(TextureTarget.Texture2D, level, glFormat, glType, temp);
+                    GraphicsExtensions.CheckGLError();
+
+                    var pixelToT = Format.GetSize() / tSizeInByte;
+                    var rowCount = rect.Height;
+                    var tRectWidth = rect.Width * pixelToT;
+                    for (var r = 0; r < rowCount; r++)
+                    {
+                        var tempStart = rect.X * pixelToT + (r + rect.Top) * tFullWidth;
+                        var dataStart = startIndex + r * tRectWidth;
+                        Array.Copy(temp, tempStart, data, dataStart, tRectWidth);
+                    }
+                }
 #endif
+            });
         }
 
 #if IOS
