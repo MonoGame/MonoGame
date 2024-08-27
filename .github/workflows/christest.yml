@@ -1,5 +1,9 @@
 name: Test Mgcb
-on: workflow_dispatch
+on:
+  workflow_dispatch:
+    inputs:
+      checkoutRef:
+        type: string
 jobs:
   main:
     runs-on: ${{ matrix.os }}
@@ -12,6 +16,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           submodules: recursive
+          ref: ${{inputs.checkoutRef}}
 
       - name: Setup .NET Core SDK
         uses: actions/setup-dotnet@v4
