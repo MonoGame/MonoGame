@@ -40,6 +40,11 @@ internal static class PngFileHelper
         // unfortunately, basisU requires an input _file_.
         pngFileName = $"tempImage_{Guid.NewGuid().ToString()}.png"; // TODO: get a project relative path.
         pngFileName = Path.Combine(context.IntermediateDirectory, pngFileName);
+        var directory = Path.GetDirectoryName(pngFileName);
+        if (!Directory.Exists(directory))
+        {
+            Directory.CreateDirectory(directory);
+        }
         using var fileStream = File.OpenWrite(pngFileName);
 
         // in order to save a png, we need a colorBitmap.
