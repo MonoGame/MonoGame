@@ -235,7 +235,7 @@ internal static class BasisU
         switch (format)
         {
             // ASTC format
-            case SurfaceFormat.ASTC_4x4_Rgba:
+            case SurfaceFormat.Astc4X4Rgba:
                 basisUFormat = BasisUFormat.Astc_4x4_Rgba;
                 return true;
 

@@ -11,7 +11,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 
     public class AstcBitmapContent : BitmapContent
     {
-        private SurfaceFormat FORMAT => SurfaceFormat.ASTC_4x4_Rgba;
+        private SurfaceFormat FORMAT => SurfaceFormat.Astc4X4Rgba;
         internal byte[] _bitmapData;
 
         /// <summary>
