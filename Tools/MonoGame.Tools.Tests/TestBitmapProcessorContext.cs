@@ -7,7 +7,7 @@ using MonoGame.Tests.ContentPipeline;
 namespace MonoGame.Tools.Tests
 {
 
-    public class TestBitmapProcessorContext : ContextScopeFactory.ContextScope
+    internal class TestBitmapProcessorContext : ContextScopeFactory.ContextScope
     {
         public override string IntermediateDirectory { get; }
         public override ContentBuildLogger Logger { get; } = new TestContentBuildLogger();

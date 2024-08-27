@@ -19,7 +19,7 @@ namespace MonoGame.Framework.Content
     /// However, because those types are part of the XNA namespace, they cannot be modified directly.
     /// This interface is an adapter over those types.
     /// </summary>
-    public interface IContentContext : IDisposable
+    internal interface IContentContext : IDisposable
     {
         /// <inheritdoc cref="ContentImporterContext.IntermediateDirectory"/>
         public string IntermediateDirectory { get; }
@@ -50,7 +50,7 @@ namespace MonoGame.Framework.Content
     /// </para>
     ///
     /// </summary>
-    public static class ContextScopeFactory
+    internal static class ContextScopeFactory
     {
         private static AsyncLocal<List<IContentContext>> _contextStack = new AsyncLocal<List<IContentContext>>
         {
