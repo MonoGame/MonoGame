@@ -1,0 +1,31 @@
+name: Test Mgcb
+on: workflow_dispatch
+jobs:
+  main:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        # macos-14 is an M1 machine
+        os: [ubuntu-latest, windows-latest, macos-13, macos-14]
+    steps:
+      - name: Clone repository
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Setup .NET Core SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+      
+      - name: Build (unix)
+        if: matrix.os != 'windows-latest'
+        run: ./build.sh
+
+      - name: Build (win)
+        if: matrix.os == 'windows-latest'
+        run: ./build.ps1
+
+      - name: Run MGCB
+        working-directory: ./testProject
+        run: ../Artifacts/MonoGame.Content.Builder/Release/mgcb --@=./configfile.mgcb

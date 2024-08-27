@@ -1,0 +1,23 @@
+#----------------------------- Global Properties ----------------------------#
+
+/outputDir:christest/bin
+/intermediateDir:christest/obj
+/platform:DesktopGL
+/config:
+/profile:Reach
+/compress:False
+
+#-------------------------------- References --------------------------------#
+
+
+#---------------------------------- Content ---------------------------------#
+
+#begin hell.jpg
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:hell.jpg
