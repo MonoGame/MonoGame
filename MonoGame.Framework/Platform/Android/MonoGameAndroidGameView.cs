@@ -1148,13 +1148,28 @@ namespace Microsoft.Xna.Framework
 
         #region Key and Motion
 
+        private bool IsKeyboard(InputDevice device)
+        {
+            if (device == null)
+                return false;
+            var sources = device.Sources;
+            return (sources & InputSourceType.Keyboard) == InputSourceType.Keyboard && device.VendorId != 0 && device.ProductId != 0;
+        }
+
+        private bool IsGamePad(InputDevice device) {
+            if (device == null)
+                return false;
+            var sources = device.Sources;
+            return ((sources & InputSourceType.Gamepad) == InputSourceType.Gamepad || (sources & InputSourceType.Joystick) == InputSourceType.Joystick) && device.VendorId != 0 && device.ProductId != 0 ;
+        }
+
         public override bool OnKeyDown(Keycode keyCode, KeyEvent e)
         {
             bool handled = false;
-            if (GamePad.OnKeyDown(keyCode, e))
+            if (IsGamePad (e.Device) && GamePad.OnKeyDown(keyCode, e))
                 return true;
 
-            handled = Keyboard.KeyDown(keyCode);
+            handled = IsKeyboard (e.Device) && Keyboard.KeyDown(keyCode);
 
             // we need to handle the Back key here because it doesn't work any other way
             if (keyCode == Keycode.Back)
@@ -1184,14 +1199,14 @@ namespace Microsoft.Xna.Framework
         {
             if (keyCode == Keycode.Back)
                 GamePad.Back = false;
-            if (GamePad.OnKeyUp(keyCode, e))
+            if (IsGamePad (e.Device) && GamePad.OnKeyUp(keyCode, e))
                 return true;
-            return Keyboard.KeyUp(keyCode);
+            return IsKeyboard (e.Device) && Keyboard.KeyUp(keyCode);
         }
 
         public override bool OnGenericMotionEvent(MotionEvent e)
         {
-            if (GamePad.OnGenericMotionEvent(e))
+            if (IsGamePad (e.Device) && GamePad.OnGenericMotionEvent(e))
                 return true;
 
             return base.OnGenericMotionEvent(e);
