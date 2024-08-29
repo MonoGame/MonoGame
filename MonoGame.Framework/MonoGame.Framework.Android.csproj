@@ -13,6 +13,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="MonoGame.Library.OpenAL" Version="1.23.1.7" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Compile Remove="bin\**\*" />
     <Compile Remove="obj\**\*" />
     <Compile Remove="Platform\**\*" />
@@ -76,21 +80,6 @@
 
   <ItemGroup>
     <None Include="MonoGame.Framework.Android.targets" Pack="true" PackagePath="build" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <EmbeddedNativeLibrary Include="..\ThirdParty\Dependencies\openal-soft\libs\armeabi-v7a\libopenal32.so">
-      <Link>libs\armeabi-v7a\libopenal32.so</Link>
-    </EmbeddedNativeLibrary>
-    <EmbeddedNativeLibrary Include="..\ThirdParty\Dependencies\openal-soft\libs\arm64-v8a\libopenal32.so">
-      <Link>libs\arm64-v8a\libopenal32.so</Link>
-    </EmbeddedNativeLibrary>
-    <EmbeddedNativeLibrary Include="..\ThirdParty\Dependencies\openal-soft\libs\x86\libopenal32.so">
-      <Link>libs\x86\libopenal32.so</Link>
-    </EmbeddedNativeLibrary>
-    <EmbeddedNativeLibrary Include="..\ThirdParty\Dependencies\openal-soft\libs\x86_64\libopenal32.so">
-      <Link>libs\x86_64\libopenal32.so</Link>
-    </EmbeddedNativeLibrary>
   </ItemGroup>
 
   <Import Project="Platform\OpenGL.targets" />

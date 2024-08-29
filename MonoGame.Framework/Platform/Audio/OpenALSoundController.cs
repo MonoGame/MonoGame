@@ -103,6 +103,8 @@ namespace Microsoft.Xna.Framework.Audio
         public bool SupportsEfx { get; private set; }
         public bool SupportsIeee { get; private set; }
 
+        public bool SupportsStereoAngles { get; private set;}
+
         /// <summary>
         /// Sets up the hardware resources used by the controller.
         /// </summary>
@@ -118,6 +120,8 @@ namespace Microsoft.Xna.Framework.Audio
 
             if (Alc.IsExtensionPresent(_device, "ALC_EXT_CAPTURE"))
                 Microphone.PopulateCaptureDevices();
+
+            SupportsStereoAngles = AL.IsExtensionPresent ("AL_EXT_STEREO_ANGLES");
 
             // We have hardware here and it is ready
 
