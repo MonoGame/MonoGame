@@ -178,18 +178,6 @@ internal struct MGP_Event
     public MGP_ControllerEvent Controller;
 }
 
-[StructLayout(LayoutKind.Sequential)]
-internal struct MGP_GamePadState
-{
-    public bool IsConnected;
-    public int PacketNumber;
-    public Buttons Buttons;
-    public Vector2 ThumbstickL;
-    public Vector2 ThumbstickR;
-    public float TriggerL;
-    public float TriggerR;
-}
-
 [MGHandle]
 internal readonly struct MGP_Platform { }
 
