@@ -42,7 +42,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
         public LocalizedFontProcessor ()
         {
               PremultiplyAlpha = true;
-              textureFormat = TextureProcessorOutputFormat.Color;
+              TextureFormat = TextureProcessorOutputFormat.Color;
         }
 
         /// <summary>
