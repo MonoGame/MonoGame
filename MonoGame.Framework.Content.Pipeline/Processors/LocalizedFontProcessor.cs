@@ -36,13 +36,13 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
         [DefaultValue(true)]
         public virtual bool PremultiplyAlpha { get; set; }
 
-        [DefaultValue(typeof(TextureProcessorOutputFormat), "Compressed")]
+        [DefaultValue(typeof(TextureProcessorOutputFormat), "Color")]
         public virtual TextureProcessorOutputFormat TextureFormat { get; set; }
 
         public LocalizedFontProcessor ()
         {
               PremultiplyAlpha = true;
-              TextureFormat = TextureProcessorOutputFormat.Compressed;
+              textureFormat = TextureProcessorOutputFormat.Color;
         }
 
         /// <summary>
