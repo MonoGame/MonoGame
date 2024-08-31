@@ -39,5 +39,6 @@ MG_EXPORT void MGP_Window_SetTitle(MGP_Window* window, const char* title);
 MG_EXPORT void MGP_Window_Show(MGP_Window* window, mgbool show);
 MG_EXPORT void MGP_Window_GetPosition(MGP_Window* window, mgint& x, mgint& y);
 MG_EXPORT void MGP_Window_SetPosition(MGP_Window* window, mgint x, mgint y);
-MG_EXPORT void MGP_Input_SetMouseVisible(MGP_Platform* platform, mgbool visible);
-MG_EXPORT void MGP_Input_WarpMousePosition(MGP_Window* window, mgint x, mgint y);
+MG_EXPORT void MGP_Mouse_SetVisible(MGP_Platform* platform, mgbool visible);
+MG_EXPORT void MGP_Mouse_WarpPosition(MGP_Window* window, mgint x, mgint y);
+MG_EXPORT mgint MGP_GamePad_GetMaxSupported();

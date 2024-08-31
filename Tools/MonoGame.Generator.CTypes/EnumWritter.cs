@@ -55,33 +55,43 @@ class EnumWritter
 
     private void Generate(Type type)
     {
+        var enumNames = Enum.GetNames(type);
         var enumValues = Enum.GetValues(type);
 
         var name = Util.GetCTypeOrEnum(type);
+
+        if (name == "MGControllerInput")
+            name = name;
 
         // Write all values to output
         _outputText.AppendLine($$"""
         enum class {{name}} : {{Util.GetCType(Enum.GetUnderlyingType(type))}}
         {
         """);
-        foreach (var enumValue in enumValues)
+        for (int i = 0; i < enumNames.Length; i++)
         {
-            _outputText.AppendLine($"    {enumValue} = {((Enum)enumValue).ToString("d")},");
+            var enumValue = (Enum)enumValues.GetValue(i);
+            _outputText.AppendLine($"    {enumNames[i]} = {enumValue.ToString("d")},");
         }
         _outputText.AppendLine("""
         };
 
         """);
 
+        // TODO: This causes issues with enums that have repeat
+        // values causing the `switch` to not work.
+        //
+        // We don't use this feature now anyway.
+        /*
         _outputText.AppendLine($$"""
         static const char* {{name}}_ToString({{name}} enumValue)
         {
             switch (enumValue)
             {
         """);
-        foreach (var enumValue in enumValues)
+        for (int i = 0; i < enumNames.Length; i++)
         {
-            _outputText.AppendLine($"        case {name}::{enumValue}: return \"{enumValue}\";");
+            _outputText.AppendLine($"        case {name}::{enumNames[i]}: return \"{enumNames[i]}\";");
         }
         _outputText.AppendLine("""
             }
@@ -90,6 +100,7 @@ class EnumWritter
         }
 
         """);
+        */
     }
 
     public void Flush(string dirPath)

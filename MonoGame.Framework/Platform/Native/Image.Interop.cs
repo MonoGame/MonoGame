@@ -9,7 +9,7 @@ namespace MonoGame.Interop;
 
 
 /// <summary>
-/// MonoGame image native calls.
+/// MonoGame native calls for high performance reading and writing of images.
 /// </summary>
 internal static unsafe partial class MGI
 {

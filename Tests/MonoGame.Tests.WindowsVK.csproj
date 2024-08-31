@@ -50,7 +50,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\MonoGame.Framework\MonoGame.Framework.Native.csproj" />
-    <ProjectReference Include="..\src\monogame\vsxmake2022\desktopvk\desktopvk.vcxproj" />
+    <ProjectReference Include="..\src\monogame\desktopvk.vcxproj" />
 
 	  <Content Include="..\Artifacts\monogame.native\windows\desktopvk\$(Configuration)\monogame.native.dll">
 		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>

@@ -145,6 +145,13 @@ struct MGP_WindowEvent
     mgint Data2;
 };
 
+struct MGP_ControllerEvent
+{
+    mgint Id;
+    MGControllerInput Input;
+    mgshort Value;
+};
+
 #pragma pack(push,1)
 struct MGP_Event
 {
@@ -157,6 +164,7 @@ union {
     MG_FIELD_OFFSET(12, MGP_MouseWheelEvent, MouseWheel);
     MG_FIELD_OFFSET(12, MGP_DropEvent, Drop);
     MG_FIELD_OFFSET(12, MGP_WindowEvent, Window);
+    MG_FIELD_OFFSET(12, MGP_ControllerEvent, Controller);
 };
 };
 #pragma pack(pop)

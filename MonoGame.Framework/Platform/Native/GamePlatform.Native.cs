@@ -207,6 +207,24 @@ class NativeGamePlatform : GamePlatform
                     break;
                 }
 
+                case EventType.ControllerAdded:
+                {
+                    GamePad.Add(event_.Controller.Id);
+                    break;
+                }
+
+                case EventType.ControllerRemoved:
+                {
+                    GamePad.Remove(event_.Controller.Id);
+                    break;
+                }
+
+                case EventType.ControllerStateChange:
+                {
+                    GamePad.ChangeState(event_.Controller.Id, event_.Timestamp, event_.Controller.Input, event_.Controller.Value);
+                    break;
+                }
+
                 case EventType.DropFile:
                 {
                     var file = Marshal.PtrToStringUTF8(event_.Drop.File);
@@ -297,7 +315,7 @@ class NativeGamePlatform : GamePlatform
 
     protected override unsafe void OnIsMouseVisibleChanged()
     {
-        MGP.Input_SetMouseVisible(Handle, Game.IsMouseVisible);
+        MGP.Mouse_SetVisible(Handle, Game.IsMouseVisible);
     }
 
     protected unsafe override void Dispose(bool disposing)

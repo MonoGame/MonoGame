@@ -31,6 +31,10 @@ internal enum EventType : uint
     MouseButtonUp,
     MouseWheel,
 
+    ControllerAdded,
+    ControllerRemoved,
+    ControllerStateChange,
+
     DropFile,
     DropComplete,
 }
@@ -84,6 +88,57 @@ internal struct MGP_MouseWheelEvent
     public int ScrollH;
 }
 
+internal enum ControllerInput : int
+{
+    INVALID = -1,
+
+    A,
+    B,
+    X,
+    Y,
+    Back,
+    Guide,
+    Start,
+    LeftStick,
+    RightStick,
+    LeftShoulder,
+    RightShoulder,
+    DpadUp,
+    DpadDown,
+    DpadLeft,
+    DpadRight,
+    Misc1,
+    Paddle1,
+    Paddle2,
+    Paddle3,
+    Paddle4,
+    Touchpad,
+    LAST_BUTTON = Touchpad,
+
+    LeftStickX,
+    LeftStickY,
+    RightStickX,
+    RightStickY,
+    LeftTrigger,
+    RightTrigger,
+    LAST_TRIGGER = RightTrigger,
+}
+
+[StructLayout(LayoutKind.Sequential)]
+internal struct MGP_ControllerEvent
+{
+    public int Id;
+
+    public ControllerInput Input;
+
+    /// <summary>
+    /// For a axis input this can range from -32768 to 32767.
+    /// For a button input the value is 0 or 1.
+    /// </summary>
+    public short Value;
+}
+
+
 [StructLayout(LayoutKind.Sequential)]
 internal struct MGP_DropEvent
 {
@@ -119,6 +174,20 @@ internal struct MGP_Event
     [FieldOffset(12)]
     public MGP_WindowEvent Window;
 
+    [FieldOffset(12)]
+    public MGP_ControllerEvent Controller;
+}
+
+[StructLayout(LayoutKind.Sequential)]
+internal struct MGP_GamePadState
+{
+    public bool IsConnected;
+    public int PacketNumber;
+    public Buttons Buttons;
+    public Vector2 ThumbstickL;
+    public Vector2 ThumbstickR;
+    public float TriggerL;
+    public float TriggerR;
 }
 
 [MGHandle]
@@ -215,13 +284,16 @@ internal static unsafe partial class MGP
 
     #endregion
 
-    #region Input
+    #region Mouse
 
-    [LibraryImport(MonoGameNativeDLL, EntryPoint = "MGP_Input_SetMouseVisible", StringMarshalling = StringMarshalling.Utf8)]
-    public static partial void Input_SetMouseVisible(MGP_Platform* platform, [MarshalAs(UnmanagedType.U1)] bool visible);
+    [LibraryImport(MonoGameNativeDLL, EntryPoint = "MGP_Mouse_SetVisible", StringMarshalling = StringMarshalling.Utf8)]
+    public static partial void Mouse_SetVisible(MGP_Platform* platform, [MarshalAs(UnmanagedType.U1)] bool visible);
 
-    [LibraryImport(MonoGameNativeDLL, EntryPoint = "MGP_Input_WarpMousePosition", StringMarshalling = StringMarshalling.Utf8)]
-    public static partial void Input_WarpMousePosition(MGP_Window* window, int x, int y);
+    [LibraryImport(MonoGameNativeDLL, EntryPoint = "MGP_Mouse_WarpPosition", StringMarshalling = StringMarshalling.Utf8)]
+    public static partial void Mouse_WarpPosition(MGP_Window* window, int x, int y);
+
+    [LibraryImport(MonoGameNativeDLL, EntryPoint = "MGP_GamePad_GetMaxSupported", StringMarshalling = StringMarshalling.Utf8)]
+    public static partial int GamePad_GetMaxSupported();
 
     #endregion
 }

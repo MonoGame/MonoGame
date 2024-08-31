@@ -36,7 +36,7 @@ public static partial class Mouse
 
         var window = PrimaryWindow as NativeGameWindow;
 
-        MGP.Input_WarpMousePosition(window._handle, x, y);
+        MGP.Mouse_WarpPosition(window._handle, x, y);
     }
 
     public static unsafe void PlatformSetCursor(MouseCursor cursor)

@@ -246,6 +246,79 @@ static int UTF8ToUnicode(int utf8)
         return -1;
 }
 
+static MGControllerInput FromSDLButton(Uint8 button)
+{
+    switch (button)
+    {
+    default:
+        return MGControllerInput::INVALID;
+    case SDL_CONTROLLER_BUTTON_A:
+        return MGControllerInput::A;
+    case SDL_CONTROLLER_BUTTON_B:
+        return MGControllerInput::B;
+    case SDL_CONTROLLER_BUTTON_X:
+        return MGControllerInput::X;
+    case SDL_CONTROLLER_BUTTON_Y:
+        return MGControllerInput::Y;
+    case SDL_CONTROLLER_BUTTON_BACK:
+        return MGControllerInput::Back;
+    case SDL_CONTROLLER_BUTTON_GUIDE:
+        return MGControllerInput::Guide;
+    case SDL_CONTROLLER_BUTTON_START:
+        return MGControllerInput::Start;
+    case SDL_CONTROLLER_BUTTON_LEFTSTICK:
+        return MGControllerInput::LeftStick;
+    case SDL_CONTROLLER_BUTTON_RIGHTSTICK:
+        return MGControllerInput::RightStick;
+    case SDL_CONTROLLER_BUTTON_LEFTSHOULDER:
+        return MGControllerInput::LeftShoulder;
+    case SDL_CONTROLLER_BUTTON_RIGHTSHOULDER:
+        return MGControllerInput::RightShoulder;
+    case SDL_CONTROLLER_BUTTON_DPAD_UP:
+        return MGControllerInput::DpadUp;
+    case SDL_CONTROLLER_BUTTON_DPAD_DOWN:
+        return MGControllerInput::DpadDown;
+    case SDL_CONTROLLER_BUTTON_DPAD_LEFT:
+        return MGControllerInput::DpadLeft;
+    case SDL_CONTROLLER_BUTTON_DPAD_RIGHT:
+        return MGControllerInput::DpadRight;
+    case SDL_CONTROLLER_BUTTON_MISC1:
+        return MGControllerInput::Misc1;
+    case SDL_CONTROLLER_BUTTON_PADDLE1:
+        return MGControllerInput::Paddle1;
+    case SDL_CONTROLLER_BUTTON_PADDLE2:
+        return MGControllerInput::Paddle2;
+    case SDL_CONTROLLER_BUTTON_PADDLE3:
+        return MGControllerInput::Paddle3;
+    case SDL_CONTROLLER_BUTTON_PADDLE4:
+        return MGControllerInput::Paddle4;
+    case SDL_CONTROLLER_BUTTON_TOUCHPAD:
+        return MGControllerInput::Touchpad;
+    }
+}
+
+
+static MGControllerInput FromSDLAxis(Uint8 axis)
+{
+    switch (axis)
+    {
+    default:
+        return MGControllerInput::INVALID;
+    case SDL_CONTROLLER_AXIS_LEFTX:
+        return MGControllerInput::LeftStickX;
+    case SDL_CONTROLLER_AXIS_LEFTY:
+        return MGControllerInput::LeftStickY;
+    case SDL_CONTROLLER_AXIS_RIGHTX:
+        return MGControllerInput::RightStickX;
+    case SDL_CONTROLLER_AXIS_RIGHTY:
+        return MGControllerInput::RightStickY;
+    case SDL_CONTROLLER_AXIS_TRIGGERLEFT:
+        return MGControllerInput::LeftTrigger;
+    case SDL_CONTROLLER_AXIS_TRIGGERRIGHT:
+        return MGControllerInput::RightTrigger;
+    }
+}
+
 mgbool MGP_Platform_PollEvent(MGP_Platform* platform, MGP_Event& event_)
 {
 	assert(platform != nullptr);
@@ -264,7 +337,9 @@ mgbool MGP_Platform_PollEvent(MGP_Platform* platform, MGP_Event& event_)
 
     while (SDL_PollEvent(&ev) == 1)
     {
-        event_.Timestamp = SDL_GetTicks64();
+        // TODO: We cannot call SDL_GetTicks64 as it is different from
+        // SDL_GetTicks() and controller and keyboard events return SDL_GetTicks().
+        event_.Timestamp = SDL_GetTicks();
 
         switch (ev.type)
         {
@@ -272,22 +347,48 @@ mgbool MGP_Platform_PollEvent(MGP_Platform* platform, MGP_Event& event_)
             event_.Type = MGEventType::Quit;
             return true;
 
-        /*
-        case Sdl.EventType.JoyDeviceAdded:
-            Joystick.AddDevices();
+        case SDL_EventType::SDL_JOYDEVICEADDED:
             break;
-        case Sdl.EventType.JoyDeviceRemoved:
-            Joystick.RemoveDevice(ev.JoystickDevice.Which);
+        case SDL_EventType::SDL_JOYDEVICEREMOVED:
             break;
-        case Sdl.EventType.ControllerDeviceRemoved:
-            GamePad.RemoveDevice(ev.ControllerDevice.Which);
+
+        case SDL_EventType::SDL_CONTROLLERDEVICEADDED:
+            SDL_GameControllerOpen(ev.cdevice.which);
+            event_.Type = MGEventType::ControllerAdded;
+            event_.Timestamp = ev.cdevice.timestamp;
+            event_.Controller.Id = SDL_JoystickGetDeviceInstanceID(ev.cdevice.which);
+            event_.Controller.Input = MGControllerInput::INVALID;
+            event_.Controller.Value = 0;
+            return true;
+        case SDL_EventType::SDL_CONTROLLERDEVICEREMOVED:
+            event_.Type = MGEventType::ControllerRemoved;
+            event_.Timestamp = ev.cdevice.timestamp;
+            event_.Controller.Id = ev.cdevice.which;
+            event_.Controller.Input = MGControllerInput::INVALID;
+            event_.Controller.Value = 0;
+            return true;
+        case SDL_EventType::SDL_CONTROLLERBUTTONUP:
+            event_.Type = MGEventType::ControllerStateChange;
+            event_.Timestamp = ev.cbutton.timestamp;
+            event_.Controller.Id = ev.cbutton.which;
+            event_.Controller.Input = FromSDLButton(ev.cbutton.button);
+            event_.Controller.Value = 0;
+            return true;
+        case SDL_EventType::SDL_CONTROLLERBUTTONDOWN:
+            event_.Type = MGEventType::ControllerStateChange;
+            event_.Timestamp = ev.cbutton.timestamp;
+            event_.Controller.Id = ev.cbutton.which;
+            event_.Controller.Input = FromSDLButton(ev.cbutton.button);
+            event_.Controller.Value = 1;
+            return true;
+        case SDL_EventType::SDL_CONTROLLERAXISMOTION:
+            event_.Type = MGEventType::ControllerStateChange;
+            event_.Timestamp = ev.caxis.timestamp;
+            event_.Controller.Id = ev.caxis.which;
+            event_.Controller.Input = FromSDLAxis(ev.caxis.axis);
+            event_.Controller.Value = ev.caxis.value;
+            return true;
             break;
-        case Sdl.EventType.ControllerButtonUp:
-        case Sdl.EventType.ControllerButtonDown:
-        case Sdl.EventType.ControllerAxisMotion:
-            GamePad.UpdatePacketInfo(ev.ControllerDevice.Which, ev.ControllerDevice.TimeStamp);
-            break;
-        */
 
         case SDL_EventType::SDL_MOUSEMOTION:
             event_.Type = MGEventType::MouseMove;
@@ -465,7 +566,6 @@ mgbool MGP_Platform_PollEvent(MGP_Platform* platform, MGP_Event& event_)
             event_.Drop.Window = MGP_WindowFromId(platform, ev.drop.windowID);
             event_.Drop.File = nullptr;
             return true;
-
         }
     }
 
@@ -629,14 +729,19 @@ void MGP_Window_SetPosition(MGP_Window* window, mgint x, mgint y)
 	SDL_SetWindowPosition(window->window, x, y);
 }
 
-void MGP_Input_SetMouseVisible(MGP_Platform* platform, mgbool visible)
+void MGP_Mouse_SetVisible(MGP_Platform* platform, mgbool visible)
 {
     assert(platform != nullptr);
     SDL_ShowCursor(visible ? SDL_ENABLE : SDL_DISABLE);
 }
 
-void MGP_Input_WarpMousePosition(MGP_Window* window, mgint x, mgint y)
+void MGP_Mouse_WarpPosition(MGP_Window* window, mgint x, mgint y)
 {
     assert(window != nullptr);
     SDL_WarpMouseInWindow(window->window, x, y);
+}
+
+mgint MGP_GamePad_GetMaxSupported()
+{
+    return 16;
 }
