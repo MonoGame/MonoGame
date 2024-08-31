@@ -60,9 +60,6 @@ class EnumWritter
 
         var name = Util.GetCTypeOrEnum(type);
 
-        if (name == "MGControllerInput")
-            name = name;
-
         // Write all values to output
         _outputText.AppendLine($$"""
         enum class {{name}} : {{Util.GetCType(Enum.GetUnderlyingType(type))}}
