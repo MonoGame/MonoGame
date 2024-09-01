@@ -271,7 +271,6 @@ namespace Microsoft.Xna.Framework.Graphics
                     // we need to convert from our format size to the size of T here
                     var tFullWidth = Math.Max(this.width >> level, 1) * Format.GetSize() / tSizeInByte;
                     var temp = GetDataPool<T>.Pool.Rent(Math.Max(this.height >> level, 1) * tFullWidth);
-                    var temp = new T[Math.Max(this.height >> level, 1) * tFullWidth];
                     GL.GetTexImage(TextureTarget.Texture2D, level, glFormat, glType, temp);
                     GraphicsExtensions.CheckGLError();
 
