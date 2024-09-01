@@ -34,7 +34,7 @@ namespace Microsoft.Xna.Framework
         /// </summary>
         public virtual bool AllowAltF4 { get { return _allowAltF4; } set { _allowAltF4 = value; } }
 
-#if (WINDOWS && !WINDOWS_UAP) || DESKTOPGL
+#if WINDOWS || DESKTOPGL
         /// <summary>
         /// The location of this window on the desktop, eg: global coordinate space
         /// which stretches across all screens.
@@ -52,7 +52,6 @@ namespace Microsoft.Xna.Framework
 		///
 		/// For WindowsDX this is the Win32 window handle (HWND).
 		/// For DesktopGL this is the SDL window handle.
-		/// For UWP this is a handle to an IUnknown interface for the CoreWindow.
 	    /// </summary>
 		public abstract IntPtr Handle { get; }
 
@@ -65,10 +64,6 @@ namespace Microsoft.Xna.Framework
         /// <summary>
         /// Gets or sets the title of the game window.
         /// </summary>
-        /// <remarks>
-        /// For UWP this has no effect. The title should be
-        /// set by using the DisplayName property found in the app manifest file.
-        /// </remarks>
         public string Title {
 			get { return _title; }
 			set {
@@ -128,7 +123,7 @@ namespace Microsoft.Xna.Framework
 	    /// </summary>
 		public event EventHandler<EventArgs> ScreenDeviceNameChanged;
 
-#if WINDOWS || WINDOWS_UAP || DESKTOPGL|| ANGLE
+#if WINDOWS || DESKTOPGL|| ANGLE
 
         /// <summary>
 		/// Use this event to user text input.
@@ -233,7 +228,7 @@ namespace Microsoft.Xna.Framework
             EventHelpers.Raise(this, ScreenDeviceNameChanged, EventArgs.Empty);
 		}
 
-#if WINDOWS || WINDOWS_UAP || DESKTOPGL || ANGLE
+#if WINDOWS || DESKTOPGL || ANGLE
 	    /// <summary>
 	    /// Called when the window receives text input. Raises the <see cref="TextInput"/> event.
 	    /// </summary>

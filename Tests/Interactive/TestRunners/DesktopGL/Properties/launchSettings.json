@@ -1,0 +1,32 @@
+{
+  "profiles": {
+    "TouchTest": {
+      "commandName": "Project",
+      "commandLineArgs": "touch "
+    },
+    "AllTests": {
+      "commandName": "Project",
+      "commandLineArgs": "test"
+    },
+    "TextureTest": {
+      "commandName": "Project",
+      "commandLineArgs": "texture"
+    },
+    "RenderTargetTest": {
+      "commandName": "Project",
+      "commandLineArgs": "\"RenderTarget Test\""
+    },
+    "Multiple Render Targets": {
+      "commandName": "Project",
+      "commandLineArgs": "\"multiple render targets\""
+    },
+    "AlphaBlend Test": {
+      "commandName": "Project",
+      "commandLineArgs": "alpha blend"
+    },
+    "Shader Test": {
+      "commandName": "Project",
+      "commandLineArgs": "\"shader test\""
+    }
+  }
+}

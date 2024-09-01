@@ -27,7 +27,6 @@ We support a growing list of platforms across the desktop, mobile, and console s
 
 * Desktop PCs
   * Windows 8.1 and up (OpenGL & DirectX)
-  * Windows Store Apps (UWP)
   * Linux (OpenGL)
   * macOS 10.15 and up (OpenGL)
 * Mobile/Tablet Devices
@@ -36,9 +35,8 @@ We support a growing list of platforms across the desktop, mobile, and console s
 * Consoles (for registered developers)
   * PlayStation 4
   * PlayStation 5
-  * Xbox One (both UWP and XDK)
+  * Xbox One (XDK only) (GDK coming soon)
   * Nintendo Switch
-  * Google Stadia
 
 ## Support and Contributions
 
