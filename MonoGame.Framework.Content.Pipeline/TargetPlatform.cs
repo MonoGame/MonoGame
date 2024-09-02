@@ -91,6 +91,15 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
         /// All desktop versions using Vulkan.
         /// </summary>
         DesktopVK,
+        
+        /// Windows GDK
+        /// </summary>
+        WindowsGDK,
+
+        /// <summary>
+        /// Xbox Series
+        /// </summary>
+        XboxSeries
     }
 
 
