@@ -35,6 +35,7 @@
   <ItemGroup>
     <Compile Include="Platform\Input\InputKeyEventArgs.cs" />
     <Compile Include="Platform\Utilities\AssemblyHelper.cs" />
+    <Compile Include="Platform\Threading.cs" />
   </ItemGroup>
 
   <ItemGroup>

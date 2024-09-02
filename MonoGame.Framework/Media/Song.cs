@@ -48,7 +48,7 @@ namespace Microsoft.Xna.Framework.Media
             get { return disposed; }
         }
 
-#if ANDROID || OPENAL || WEB || IOS
+#if ANDROID || OPENAL || WEB || IOS || NATIVE
         internal delegate void FinishedPlayingHandler(object sender, EventArgs args);
 #if !DESKTOPGL
         event FinishedPlayingHandler DonePlaying;

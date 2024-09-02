@@ -4,6 +4,7 @@
 
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
+using System.Collections.Generic;
 using System.Runtime.InteropServices;
 
 namespace MonoGame.Interop;
@@ -224,9 +225,6 @@ internal static unsafe partial class MGP
     [LibraryImport(MonoGameNativeDLL, EntryPoint = "MGP_Platform_ExitFullScreen", StringMarshalling = StringMarshalling.Utf8)]
     public static partial void Platform_ExitFullScreen(MGP_Platform* platform);
 
-    [LibraryImport(MonoGameNativeDLL, EntryPoint = "MGP_Platform_Exit", StringMarshalling = StringMarshalling.Utf8)]
-    public static partial void Platform_Exit(MGP_Platform* platform);
-
     #endregion
 
     #region Window
@@ -269,6 +267,14 @@ internal static unsafe partial class MGP
 
     [LibraryImport(MonoGameNativeDLL, EntryPoint = "MGP_Window_SetPosition", StringMarshalling = StringMarshalling.Utf8)]
     public static partial void Window_SetPosition(MGP_Window* window, int x, int y);
+
+    [LibraryImport(MonoGameNativeDLL, EntryPoint = "MGP_Window_ShowMessageBox", StringMarshalling = StringMarshalling.Utf8)]
+    public static partial int Window_ShowMessageBox(
+         MGP_Window* window,
+         string title,
+         string description,
+         string[] buttons,
+         int count);
 
     #endregion
 

@@ -33,6 +33,9 @@ static class Util
 
     public static string GetCTypeOrEnum(Type type, string functionPointerName = null)
     {
+        if (type.IsArray)
+            return GetCTypeOrEnum(type.GetElementType()) + "*";
+
         if (type.IsByRef)
             return GetCTypeOrEnum(type.GetElementType()) + "&";
 
@@ -49,9 +52,27 @@ static class Util
     {
         var type = param.ParameterType;
 
-        var result = new StringBuilder();
+        if (type.FullName.Contains("String[]"))
+            type = type;
 
-        if (type.IsFunctionPointer)
+            var result = new StringBuilder();
+
+        if (type.BaseType != null && type.BaseType.FullName == "System.MulticastDelegate")
+        {
+            var invokeMethod = type.GetMethod("Invoke");
+
+            result.Append("void (*");
+            result.Append(param.Name);
+            result.Append(")(");
+
+            var args = new List<string>();
+            foreach (var arg in invokeMethod.GetParameters())
+                args.Add(GetCTypeOrEnum(arg.ParameterType));
+
+            result.Append(string.Join(",", args));
+            result.Append(")");
+        }
+        else if (type.IsFunctionPointer)
         {
             result.Append(GetCTypeOrEnum(type.GetFunctionPointerReturnType()));
             result.Append(" (*");

@@ -600,12 +600,6 @@ void MGP_Platform_ExitFullScreen(MGP_Platform* platform)
 	assert(platform != nullptr);
 }
 
-void MGP_Platform_Exit(MGP_Platform* platform)
-{
-	assert(platform != nullptr);
-	//platform->exit = true;
-}
-
 MGP_Window* MGP_Window_Create(
     MGP_Platform* platform,
     mgint width,
@@ -744,4 +738,35 @@ void MGP_Mouse_WarpPosition(MGP_Window* window, mgint x, mgint y)
 mgint MGP_GamePad_GetMaxSupported()
 {
     return 16;
+}
+
+mgint MGP_Window_ShowMessageBox(MGP_Window* window, const char* title, const char* description, const char** buttons, mgint count)
+{
+    SDL_MessageBoxData data;
+    data.window = window->window;
+    data.title = title;
+    data.message = description;
+    data.colorScheme = nullptr;
+    data.flags = SDL_MESSAGEBOX_BUTTONS_LEFT_TO_RIGHT;
+
+    auto bdata = new SDL_MessageBoxButtonData[count];
+    for (int i = 0; i < count; i++)
+    {
+        bdata[i].buttonid = i;
+        bdata[i].text = buttons[i];
+        bdata[i].flags = 0;
+    }
+
+    data.numbuttons = count;
+    data.buttons = bdata;
+
+    int hit = -1;
+    int error = SDL_ShowMessageBox(&data, &hit);
+
+    delete [] bdata;
+
+    if (error == 0)
+        return hit;
+
+    return -1;
 }

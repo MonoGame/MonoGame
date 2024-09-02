@@ -8,6 +8,7 @@ using Microsoft.Xna.Framework.Input;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using MonoGame.Interop;
+using System.Threading;
 
 namespace Microsoft.Xna.Framework;
 
@@ -39,6 +40,7 @@ class NativeGamePlatform : GamePlatform
         Window = _window;
 
         Mouse.WindowHandle = _window.Handle;
+        MessageBox._window = _window._handle;
     }
 
     internal static unsafe MGG_GraphicsSystem* GraphicsSystem
@@ -56,7 +58,7 @@ class NativeGamePlatform : GamePlatform
 
     public override unsafe void Exit()
     {
-        MGP.Platform_Exit(Handle);
+        Interlocked.Increment(ref _isExiting);
     }
 
     public override unsafe void RunLoop()
@@ -68,6 +70,8 @@ class NativeGamePlatform : GamePlatform
             PollEvents();
 
             Game.Tick();
+
+            Threading.Run();
 
             if (_isExiting > 0 && ShouldExit())
                 break;
