@@ -11,6 +11,23 @@ namespace Microsoft.Xna.Framework.Graphics;
 
 public partial class Texture2D : Texture
 {
+    /// <summary>
+    /// Wrap a texture handle without owning the native texture.
+    /// </summary>
+    internal unsafe Texture2D(GraphicsDevice graphicsDevice, MGG_Texture* handle, int width, int height, bool mipmap, SurfaceFormat format, SurfaceType type, int arraySize)
+    {
+        this.GraphicsDevice = graphicsDevice;
+        this.Handle = handle;
+        this.Owned = false;
+        this.width = width;
+        this.height = height;
+        this.TexelWidth = 1f / (float)width;
+        this.TexelHeight = 1f / (float)height;
+        this._format = format;
+        this._levelCount = mipmap ? CalculateMipLevels(width, height) : 1;
+        this.ArraySize = arraySize;
+    }
+
     private unsafe void PlatformConstruct(int width, int height, bool mipmap, SurfaceFormat format, SurfaceType type, bool shared)
     {
         // Ignore creation calls for RenderTargets and Swapchains.

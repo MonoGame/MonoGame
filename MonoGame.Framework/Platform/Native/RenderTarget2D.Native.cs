@@ -25,7 +25,7 @@ public partial class RenderTarget2D
 
     private unsafe void PlatformGraphicsDeviceResetting()
     {
-        if (Handle != null)
+        if (Handle != null && Owned)
         {
             MGG.Texture_Destroy(GraphicsDevice.Handle, Handle);
             Handle = null;

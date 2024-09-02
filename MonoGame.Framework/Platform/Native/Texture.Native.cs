@@ -8,10 +8,11 @@ namespace Microsoft.Xna.Framework.Graphics;
 public abstract partial class Texture
 {
     internal unsafe MGG_Texture* Handle;
+    internal bool Owned = true;
 
     private unsafe void PlatformGraphicsDeviceResetting()
     {
-        if (Handle != null)
+        if (Handle != null && Owned)
         {
             MGG.Texture_Destroy(GraphicsDevice.Handle, Handle);
             Handle = null;

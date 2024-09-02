@@ -227,6 +227,13 @@ enum class MGVertexElementFormat : mgint
     HalfVector4 = 11,
 };
 
+enum class MGMediaState : mgint
+{
+    Stopped = 0,
+    Playing = 1,
+    Paused = 2,
+};
+
 enum class MGGameRunBehavior : mgint
 {
     Asynchronous = 0,

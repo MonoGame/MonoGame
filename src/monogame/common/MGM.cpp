@@ -20,7 +20,7 @@ MGM_Song* MGM_Song_Create(const char* mediaFilePath)
 	assert(mediaFilePath != nullptr);
 
 	// TODO: This should detect the media format using
-	// standard native format parsing libraries that are
+	// standard native format decoder libraries that are
 	// portable to all our target platforms:
 	//
 	// libvorbis
@@ -90,3 +90,94 @@ void MGM_Song_Destroy(MGM_Song* song)
 	assert(song != nullptr);
 	delete song;
 }
+
+
+struct MGM_Video
+{
+	mguint width;
+	mguint height;
+	mgfloat fps;
+	mgulong duration;
+	mgint cachedFrames;
+};
+
+MGM_Video* MGM_Video_Create(const char* mediaFilePath, mgint cachedFrameNum, mgint& width, mgint& height, mgfloat& fps, mgulong& duration)
+{
+	assert(mediaFilePath != nullptr);
+
+	// TODO: Like Song above we should detect the media
+	// format from a native decoder libraries that are
+	// portable to all our target platforms:
+	//
+	// libtheora - free but limited quality/performance
+	// OpenH264 -
+	// ???
+	//
+	// It should then spin up thread which decodes the
+	// video/audio streams.
+
+	auto video = new MGM_Video();
+	video->duration = duration = 0;
+	video->width = width = 0;
+	video->height = height = 0;
+	video->fps = fps = 0.0f;
+	video->cachedFrames = cachedFrameNum;
+
+	return video;
+}
+
+void MGM_Video_Destroy(MGM_Video* video)
+{
+	assert(video != nullptr);
+	delete video;
+}
+
+MGMediaState MGM_Video_GetState(MGM_Video* video)
+{
+	assert(video != nullptr);
+	return MGMediaState::Stopped;
+}
+
+mgulong MGM_Video_GetPosition(MGM_Video* video)
+{
+	assert(video != nullptr);
+	return 0;
+}
+
+void MGM_Video_SetVolume(MGM_Video* video, mgfloat volume)
+{
+	assert(video != nullptr);
+}
+
+void MGM_Video_SetLooped(MGM_Video* video, mgbool looped)
+{
+	assert(video != nullptr);
+}
+
+void MGM_Video_Play(MGM_Video* video)
+{
+	assert(video != nullptr);
+}
+
+void MGM_Video_Pause(MGM_Video* video)
+{
+	assert(video != nullptr);
+}
+
+void MGM_Video_Resume(MGM_Video* video)
+{
+	assert(video != nullptr);
+}
+
+void MGM_Video_Stop(MGM_Video* video)
+{
+	assert(video != nullptr);
+}
+
+void MGM_Video_GetFrame(MGM_Video* video, mguint& frame, MGG_Texture*& handle)
+{
+	assert(video != nullptr);
+	frame = 0;
+	handle = nullptr;
+}
+
