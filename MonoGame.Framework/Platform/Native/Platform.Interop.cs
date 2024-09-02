@@ -89,6 +89,25 @@ internal struct MGP_MouseWheelEvent
     public int ScrollH;
 }
 
+internal enum SystemCursor : int
+{
+    Arrow,
+    IBeam,
+    Wait,
+    Crosshair,
+    WaitArrow,
+    SizeNWSE,
+    SizeNESW,
+    SizeWE,
+    SizeNS,
+    SizeAll,
+    No,
+    Hand
+}
+
+[MGHandle]
+internal readonly struct MGP_Cursor { }
+
 internal enum ControllerInput : int
 {
     INVALID = -1,
@@ -268,6 +287,9 @@ internal static unsafe partial class MGP
     [LibraryImport(MonoGameNativeDLL, EntryPoint = "MGP_Window_SetPosition", StringMarshalling = StringMarshalling.Utf8)]
     public static partial void Window_SetPosition(MGP_Window* window, int x, int y);
 
+    [LibraryImport(MonoGameNativeDLL, EntryPoint = "MGP_Window_SetCursor", StringMarshalling = StringMarshalling.Utf8)]
+    public static partial void Window_SetCursor(MGP_Window* window, MGP_Cursor* cursor);        
+
     [LibraryImport(MonoGameNativeDLL, EntryPoint = "MGP_Window_ShowMessageBox", StringMarshalling = StringMarshalling.Utf8)]
     public static partial int Window_ShowMessageBox(
          MGP_Window* window,
@@ -286,8 +308,19 @@ internal static unsafe partial class MGP
     [LibraryImport(MonoGameNativeDLL, EntryPoint = "MGP_Mouse_WarpPosition", StringMarshalling = StringMarshalling.Utf8)]
     public static partial void Mouse_WarpPosition(MGP_Window* window, int x, int y);
 
+    [LibraryImport(MonoGameNativeDLL, EntryPoint = "MGP_Cursor_Create", StringMarshalling = StringMarshalling.Utf8)]
+    public static partial MGP_Cursor* Cursor_Create(SystemCursor cursor);
+
+    [LibraryImport(MonoGameNativeDLL, EntryPoint = "MGP_Cursor_CreateCustom", StringMarshalling = StringMarshalling.Utf8)]
+    public static partial MGP_Cursor* Cursor_CreateCustom(byte[] rgba, int width, int height, int originx, int originy);
+
+    [LibraryImport(MonoGameNativeDLL, EntryPoint = "MGP_Cursor_Destroy", StringMarshalling = StringMarshalling.Utf8)]
+    public static partial void Cursor_Destroy(MGP_Cursor* cursor);
+
+    #endregion
+
+
     [LibraryImport(MonoGameNativeDLL, EntryPoint = "MGP_GamePad_GetMaxSupported", StringMarshalling = StringMarshalling.Utf8)]
     public static partial int GamePad_GetMaxSupported();
 
-    #endregion
 }

@@ -177,6 +177,12 @@ struct MGP_Window
     SDL_Window* window = nullptr;
 };
 
+struct MGP_Cursor
+{
+    SDL_Cursor* cursor;
+};
+
+
 MGP_Platform* MGP_Platform_Create(MGGameRunBehavior& behavior)
 {
 	SDL_Init(
@@ -723,6 +729,14 @@ void MGP_Window_SetPosition(MGP_Window* window, mgint x, mgint y)
 	SDL_SetWindowPosition(window->window, x, y);
 }
 
+void MGP_Window_SetCursor(MGP_Window* window, MGP_Cursor* cursor)
+{
+    assert(window != nullptr);
+    assert(cursor != nullptr);
+    
+    SDL_SetCursor(cursor->cursor);
+}
+
 void MGP_Mouse_SetVisible(MGP_Platform* platform, mgbool visible)
 {
     assert(platform != nullptr);
@@ -733,6 +747,32 @@ void MGP_Mouse_WarpPosition(MGP_Window* window, mgint x, mgint y)
 {
     assert(window != nullptr);
     SDL_WarpMouseInWindow(window->window, x, y);
+}
+
+MGP_Cursor* MGP_Cursor_Create(MGSystemCursor cursor_)
+{
+    auto cursor = new MGP_Cursor();
+    cursor->cursor = SDL_CreateSystemCursor((SDL_SystemCursor)cursor_);
+    return cursor;
+}
+
+MGP_Cursor* MGP_Cursor_CreateCustom(mgbyte* rgba, mgint width, mgint height, mgint originx, mgint originy)
+{
+    assert(rgba != nullptr);
+
+    auto cursor = new MGP_Cursor();
+
+    auto surface = SDL_CreateRGBSurfaceFrom(rgba, width, height, 32, width * 4, 0x000000ff, 0x0000FF00, 0x00FF0000, 0xFF000000);
+    cursor->cursor = SDL_CreateColorCursor(surface, originx, originy);
+
+    return cursor;
+}
+
+void MGP_Cursor_Destroy(MGP_Cursor* cursor)
+{
+    assert(cursor != nullptr);
+    SDL_FreeCursor(cursor->cursor);
+    delete cursor;
 }
 
 mgint MGP_GamePad_GetMaxSupported()

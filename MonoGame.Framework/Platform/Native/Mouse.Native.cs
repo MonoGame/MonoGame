@@ -41,8 +41,9 @@ public static partial class Mouse
 
     public static unsafe void PlatformSetCursor(MouseCursor cursor)
     {
-        // TODO: Multiple window support.
+        // TODO: Multiple window support?
 
-        //Sdl.Mouse.SetCursor(cursor.Handle);
+        var window = PrimaryWindow as NativeGameWindow;
+        MGP.Window_SetCursor(window._handle, (MGP_Cursor*)cursor.Handle);
     }
 }

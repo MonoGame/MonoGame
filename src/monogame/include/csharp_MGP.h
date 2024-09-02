@@ -16,6 +16,7 @@
 
 struct MGP_Platform;
 struct MGP_Window;
+struct MGP_Cursor;
 
 MG_EXPORT MGP_Platform* MGP_Platform_Create(MGGameRunBehavior& behavior);
 MG_EXPORT void MGP_Platform_Destroy(MGP_Platform* platform);
@@ -38,7 +39,11 @@ MG_EXPORT void MGP_Window_SetTitle(MGP_Window* window, const char* title);
 MG_EXPORT void MGP_Window_Show(MGP_Window* window, mgbool show);
 MG_EXPORT void MGP_Window_GetPosition(MGP_Window* window, mgint& x, mgint& y);
 MG_EXPORT void MGP_Window_SetPosition(MGP_Window* window, mgint x, mgint y);
+MG_EXPORT void MGP_Window_SetCursor(MGP_Window* window, MGP_Cursor* cursor);
 MG_EXPORT mgint MGP_Window_ShowMessageBox(MGP_Window* window, const char* title, const char* description, const char** buttons, mgint count);
 MG_EXPORT void MGP_Mouse_SetVisible(MGP_Platform* platform, mgbool visible);
 MG_EXPORT void MGP_Mouse_WarpPosition(MGP_Window* window, mgint x, mgint y);
+MG_EXPORT MGP_Cursor* MGP_Cursor_Create(MGSystemCursor cursor);
+MG_EXPORT MGP_Cursor* MGP_Cursor_CreateCustom(mgbyte* rgba, mgint width, mgint height, mgint originx, mgint originy);
+MG_EXPORT void MGP_Cursor_Destroy(MGP_Cursor* cursor);
 MG_EXPORT mgint MGP_GamePad_GetMaxSupported();

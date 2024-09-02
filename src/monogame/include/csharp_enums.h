@@ -469,3 +469,19 @@ enum class MGControllerInput : mgint
     INVALID = -1,
 };
 
+enum class MGSystemCursor : mgint
+{
+    Arrow = 0,
+    IBeam = 1,
+    Wait = 2,
+    Crosshair = 3,
+    WaitArrow = 4,
+    SizeNWSE = 5,
+    SizeNESW = 6,
+    SizeWE = 7,
+    SizeNS = 8,
+    SizeAll = 9,
+    No = 10,
+    Hand = 11,
+};
+
