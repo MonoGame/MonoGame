@@ -28,6 +28,9 @@ internal static unsafe partial class MGM
     [LibraryImport(MonoGameNativeDLL, EntryPoint = "MGM_Song_Create", StringMarshalling = StringMarshalling.Utf8)]
     public static partial MGM_Song* Song_Create(string mediaFilePath);
 
+    [LibraryImport(MonoGameNativeDLL, EntryPoint = "MGM_Song_Destroy", StringMarshalling = StringMarshalling.Utf8)]
+    public static partial void Song_Destroy(MGM_Song* song);
+
     [LibraryImport(MonoGameNativeDLL, EntryPoint = "MGM_Song_GetDuration", StringMarshalling = StringMarshalling.Utf8)]
     public static partial ulong Song_GetDuration(MGM_Song* song);
 
@@ -51,9 +54,6 @@ internal static unsafe partial class MGM
 
     [LibraryImport(MonoGameNativeDLL, EntryPoint = "MGM_Song_Stop", StringMarshalling = StringMarshalling.Utf8)]
     public static partial void Song_Stop(MGM_Song* song);
-
-    [LibraryImport(MonoGameNativeDLL, EntryPoint = "MGM_Song_Destroy", StringMarshalling = StringMarshalling.Utf8)]
-    public static partial void Song_Destroy(MGM_Song* song);
 
     #endregion
 

@@ -3,13 +3,18 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System;
+using System.Runtime.InteropServices;
 
-namespace Microsoft.Xna.Framework.Audio;
 
-partial class WaveBank
+namespace MonoGame.Interop;
+
+
+/// <summary>
+/// MonoGame native calls for platform audio features.
+/// </summary>
+internal static unsafe partial class MGA
 {
-    private SoundEffectInstance PlatformCreateStream(StreamInfo stream)
-    {
-        throw new NotSupportedException();
-    }
+
 }
+
+
