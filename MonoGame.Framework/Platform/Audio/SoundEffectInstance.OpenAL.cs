@@ -21,6 +21,8 @@ namespace Microsoft.Xna.Framework.Audio
         float frequency;
         int pauseCount;
 
+        float[] panAngles = new float[2];
+
         internal readonly object sourceMutex = new object();
         
         internal OpenALSoundController controller;
@@ -123,20 +125,16 @@ namespace Microsoft.Xna.Framework.Audio
 			AL.DistanceModel (ALDistanceModel.InverseDistanceClamped);
             ALHelper.CheckError("Failed set source distance.");
 			// Pan
-			AL.Source (SourceId, ALSource3f.Position, _pan, 0f, 0f);
-            ALHelper.CheckError("Failed to set source pan.");
+            PlatformSetPan (_pan);
             // Velocity
 			AL.Source (SourceId, ALSource3f.Velocity, 0f, 0f, 0f);
             ALHelper.CheckError("Failed to set source pan.");
 			// Volume
-            AL.Source(SourceId, ALSourcef.Gain, _alVolume);
-            ALHelper.CheckError("Failed to set source volume.");
+            PlatformSetVolume (_alVolume);
 			// Looping
-			AL.Source (SourceId, ALSourceb.Looping, IsLooped);
-            ALHelper.CheckError("Failed to set source loop state.");
+			PlatformSetIsLooped (IsLooped);
 			// Pitch
-			AL.Source (SourceId, ALSourcef.Pitch, XnaPitchToAlPitch(_pitch));
-            ALHelper.CheckError("Failed to set source pitch.");
+            PlatformSetPitch (_pitch);
 
             ApplyReverb ();
             ApplyFilter ();
@@ -219,18 +217,31 @@ namespace Microsoft.Xna.Framework.Audio
 
         private void PlatformSetPan(float value)
         {
+            _pan = value;
+
             if (HasSourceId)
             {
-                AL.Source(SourceId, ALSource3f.Position, value, 0.0f, 0.1f);
+                AL.Source(SourceId, ALSource3f.Position, _pan, 0.0f, -1f);
                 ALHelper.CheckError("Failed to set source pan.");
+                if (controller.SupportsStereoAngles)
+                {
+                    // pan between -60 degrees when fully left (-1) and 60 degrees when fully right (1)
+                    float angle = (float)Math.PI / 6f;
+                    panAngles[0] = (1.0f - _pan) * angle;
+                    panAngles[1]= (1.0f + _pan) * -angle;
+                    AL.alSourcefv(SourceId, ALSourcef.StereoAngles, panAngles);
+                    ALHelper.CheckError("Failed to set source position.");
+                }
             }
         }
 
         private void PlatformSetPitch(float value)
         {
+            _pitch = value;
+
             if (HasSourceId)
             {
-                AL.Source(SourceId, ALSourcef.Pitch, XnaPitchToAlPitch(value));
+                AL.Source(SourceId, ALSourcef.Pitch, XnaPitchToAlPitch(_pitch));
                 ALHelper.CheckError("Failed to set source pitch.");
             }
         }
