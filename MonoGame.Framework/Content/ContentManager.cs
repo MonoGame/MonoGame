@@ -167,6 +167,7 @@ namespace Microsoft.Xna.Framework.Content
 		}
 
         /// <inheritdoc cref="ContentManager.ContentManager(IServiceProvider)"/>
+        /// <param name="serviceProvider"/>
         /// <param name="rootDirectory">The root directory the ContentManager will search for content in.</param>
         public ContentManager(IServiceProvider serviceProvider, string rootDirectory)
 		{
@@ -230,8 +231,8 @@ namespace Microsoft.Xna.Framework.Content
         ///         The type of asset to load.
         ///     </para>
         ///     <para>
-        ///         <see cref="Effect"/>, <see cref="Model"/>, <see cref="SoundEffect"/>,
-        ///         <see cref="Song"/>, <see cref="SpriteFont"/>, <see cref="Texture"/>, <see cref="Texture2D"/>,
+        ///         <see cref="Effect"/>, <see cref="Model"/>, <see cref="Audio.SoundEffect"/>,
+        ///         <see cref="Media.Song"/>, <see cref="SpriteFont"/>, <see cref="Texture"/>, <see cref="Texture2D"/>,
         ///         and <see cref="TextureCube"/> are all supported by default by the standard Content Pipeline
         ///         processor, but additional types may be loaded by extending the processor.
         ///     </para>
@@ -299,8 +300,8 @@ namespace Microsoft.Xna.Framework.Content
         ///         The type of asset to load.
         ///     </para>
         ///     <para>
-        ///         <see cref="Effect"/>, <see cref="Model"/>, <see cref="SoundEffect"/>,
-        ///         <see cref="Song"/>, <see cref="SpriteFont"/>, <see cref="Texture"/>, <see cref="Texture2D"/>,
+        ///         <see cref="Effect"/>, <see cref="Model"/>, <see cref="Audio.SoundEffect"/>,
+        ///         <see cref="Media.Song"/>, <see cref="SpriteFont"/>, <see cref="Texture"/>, <see cref="Texture2D"/>,
         ///         and <see cref="TextureCube"/> are all supported by default by the standard Content Pipeline
         ///         processor, but additional types may be loaded by extending the processor.
         ///     </para>
