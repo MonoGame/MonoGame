@@ -3,6 +3,7 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System;
+using Microsoft.Xna.Framework.Graphics;
 using MonoGame.Interop;
 
 
@@ -13,9 +14,27 @@ public partial class SoundEffectInstance : IDisposable
     internal unsafe MGA_Voice* Voice;
 
 
-    private void PlatformApply3D(AudioListener listener, AudioEmitter emitter)
+    private unsafe void PlatformApply3D(AudioListener listener, AudioEmitter emitter)
     {
-        // TODO: Implement me.
+        var listener_ = new Listener()
+        {
+            Position = listener.Position,
+            Forward = listener.Forward,
+            Up = listener.Up,
+            Velocity = listener.Velocity,
+        };
+
+        var emitter_ = new Emitter()
+        {
+            Position = emitter.Position,
+            Forward = emitter.Forward,
+            Up = emitter.Up,
+            Velocity = emitter.Velocity,
+            DopplerScale = emitter.DopplerScale
+        };
+
+        if (Voice != null)
+            MGA.Voice_Apply3D(Voice, in listener_, in emitter_, SoundEffect.DistanceScale);
     }
 
     private unsafe void PlatformPause()
@@ -70,17 +89,20 @@ public partial class SoundEffectInstance : IDisposable
 
     internal unsafe void PlatformSetReverbMix(float mix)
     {
-        // TODO: Implement me.
+        if (Voice != null)
+            MGA.Voice_SetReverbMix(Voice, mix);
     }
 
     internal unsafe void PlatformSetFilter(FilterMode mode, float filterQ, float frequency)
     {
-        // TODO: Implement me.
+        if (Voice != null)
+            MGA.Voice_SetFilterMode(Voice, mode, filterQ, frequency);
     }
 
     internal unsafe void PlatformClearFilter()
     {
-        // TODO: Implement me.
+        if (Voice != null)
+            MGA.Voice_ClearFilterMode(Voice);
     }
 
     private unsafe void PlatformDispose(bool disposing)

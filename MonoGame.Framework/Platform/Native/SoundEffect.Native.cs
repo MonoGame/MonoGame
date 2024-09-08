@@ -90,6 +90,7 @@ public sealed partial class SoundEffect
         MGA.Buffer_InitializeFormat(Buffer, header, buffer, bufferSize, loopStart, loopLength);
     }
 
+    // TODO: This should go away after we move to FAudio's Xact implementation.
     private unsafe void PlatformInitializeXact(MiniFormatTag codec, byte[] buffer, int channels, int sampleRate, int blockAlignment, int loopStart, int loopLength, out TimeSpan duration)
     {
         // This is only the platform specific non-streaming
@@ -125,8 +126,34 @@ public sealed partial class SoundEffect
         }
     }
 
-    internal static void PlatformSetReverbSettings(ReverbSettings reverbSettings)
+    internal unsafe static void PlatformSetReverbSettings(ReverbSettings reverbSettings)
     {
-        // TODO!
+        var settings = new MonoGame.Interop.ReverbSettings
+        {
+            ReflectionsDelayMs = reverbSettings.ReflectionsDelayMs,
+            ReverbDelayMs = reverbSettings.ReverbDelayMs,
+            PositionLeft = reverbSettings.PositionLeft,
+            PositionRight = reverbSettings.PositionRight,
+            PositionLeftMatrix = reverbSettings.PositionLeftMatrix,
+            PositionRightMatrix = reverbSettings.PositionRightMatrix,
+            EarlyDiffusion = reverbSettings.EarlyDiffusion,
+            LateDiffusion = reverbSettings.LateDiffusion,
+            LowEqGain = reverbSettings.LowEqGain,
+            LowEqCutoff = reverbSettings.LowEqCutoff,
+            HighEqGain = reverbSettings.HighEqGain,
+            HighEqCutoff = reverbSettings.HighEqCutoff,
+            RearDelayMs = reverbSettings.RearDelayMs,
+            RoomFilterFrequencyHz = reverbSettings.RoomFilterFrequencyHz,
+            RoomFilterMainDb = reverbSettings.RoomFilterMainDb,
+            RoomFilterHighFrequencyDb = reverbSettings.RoomFilterHighFrequencyDb,
+            ReflectionsGainDb = reverbSettings.ReflectionsGainDb,
+            ReverbGainDb = reverbSettings.ReverbGainDb,
+            DecayTimeSec = reverbSettings.DecayTimeSec,
+            DensityPct = reverbSettings.DensityPct,
+            RoomSizeFeet = reverbSettings.RoomSizeFeet,
+            WetDryMixPct = reverbSettings.WetDryMixPct
+        };
+
+        MGA.System_SetReverbSettings(System, in settings);
     }
 }

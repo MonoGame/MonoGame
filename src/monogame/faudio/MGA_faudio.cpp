@@ -44,6 +44,11 @@ mgint MGA_System_GetMaxInstances()
 	return INT_MAX;
 }
 
+void MGA_System_SetReverbSettings(MGA_System* system, ReverbSettings& settings)
+{
+	assert(system != nullptr);
+}
+
 MGA_Buffer* MGA_Buffer_Create()
 {
 	auto buffer = new MGA_Buffer();
@@ -150,6 +155,26 @@ void MGA_Voice_SetPitch(MGA_Voice* voice, mgfloat pitch)
 }
 
 void MGA_Voice_SetVolume(MGA_Voice* voice, mgfloat volume)
+{
+	assert(voice != nullptr);
+}
+
+void MGA_Voice_SetReverbMix(MGA_Voice* voice, mgfloat mix)
+{
+	assert(voice != nullptr);
+}
+
+void MGA_Voice_SetFilterMode(MGA_Voice* voice, MGFilterMode mode, mgfloat filterQ, mgfloat frequency)
+{
+	assert(voice != nullptr);
+}
+
+void MGA_Voice_ClearFilterMode(MGA_Voice* voice)
+{
+	assert(voice != nullptr);
+}
+
+void MGA_Voice_Apply3D(MGA_Voice* voice, Listener& listener, Emitter& emitter, mgfloat distanceScale)
 {
 	assert(voice != nullptr);
 }

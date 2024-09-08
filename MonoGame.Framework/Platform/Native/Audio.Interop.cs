@@ -2,14 +2,13 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
-using Microsoft.Xna.Framework.Audio;
 using System;
 using System.Runtime.InteropServices;
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Audio;
 
 
 namespace MonoGame.Interop;
-
-
 
 [MGHandle]
 internal readonly struct MGA_System { }
@@ -19,6 +18,51 @@ internal readonly struct MGA_Buffer { }
 
 [MGHandle]
 internal readonly struct MGA_Voice { }
+
+
+internal struct ReverbSettings
+{
+    public float ReflectionsDelayMs;
+    public float ReverbDelayMs;
+    public float PositionLeft;
+    public float PositionRight;
+    public float PositionLeftMatrix;
+    public float PositionRightMatrix;
+    public float EarlyDiffusion;
+    public float LateDiffusion;
+    public float LowEqGain;
+    public float LowEqCutoff;
+    public float HighEqGain;
+    public float HighEqCutoff;
+    public float RearDelayMs;
+    public float RoomFilterFrequencyHz;
+    public float RoomFilterMainDb;
+    public float RoomFilterHighFrequencyDb;
+    public float ReflectionsGainDb;
+    public float ReverbGainDb;
+    public float DecayTimeSec;
+    public float DensityPct;
+    public float RoomSizeFeet;
+    public float WetDryMixPct;
+}
+
+internal struct Listener
+{
+    public Vector3 Position;
+    public Vector3 Forward;
+    public Vector3 Up;
+    public Vector3 Velocity;
+};
+
+internal struct Emitter
+{
+    public Vector3 Position;
+    public Vector3 Forward;
+    public Vector3 Up;
+    public Vector3 Velocity;
+    public float DopplerScale;
+};
+
 
 
 /// <summary>
@@ -41,6 +85,9 @@ internal static unsafe partial class MGA
 
     [LibraryImport(MonoGameNativeDLL, EntryPoint = "MGA_System_GetMaxInstances", StringMarshalling = StringMarshalling.Utf8)]
     public static partial int System_GetMaxInstances();
+
+    [LibraryImport(MonoGameNativeDLL, EntryPoint = "MGA_System_SetReverbSettings", StringMarshalling = StringMarshalling.Utf8)]
+    public static partial void System_SetReverbSettings(MGA_System* system, in ReverbSettings settings);
 
     #endregion
 
@@ -73,6 +120,7 @@ internal static unsafe partial class MGA
         int loopStart,
         int loopLength);
 
+    // TODO: This should go away after we move to FAudio's Xact implementation.
     [LibraryImport(MonoGameNativeDLL, EntryPoint = "MGA_Buffer_InitializeXact", StringMarshalling = StringMarshalling.Utf8)]
     public static partial void Buffer_InitializeXact(
         MGA_Buffer* buffer,
@@ -124,6 +172,18 @@ internal static unsafe partial class MGA
 
     [LibraryImport(MonoGameNativeDLL, EntryPoint = "MGA_Voice_SetVolume", StringMarshalling = StringMarshalling.Utf8)]
     public static partial void Voice_SetVolume(MGA_Voice* voice, float volume);
+
+    [LibraryImport(MonoGameNativeDLL, EntryPoint = "MGA_Voice_SetReverbMix", StringMarshalling = StringMarshalling.Utf8)]
+    public static partial void Voice_SetReverbMix(MGA_Voice* voice, float mix);
+
+    [LibraryImport(MonoGameNativeDLL, EntryPoint = "MGA_Voice_SetFilterMode", StringMarshalling = StringMarshalling.Utf8)]
+    public static partial void Voice_SetFilterMode(MGA_Voice* voice, FilterMode mode, float filterQ, float frequency);
+
+    [LibraryImport(MonoGameNativeDLL, EntryPoint = "MGA_Voice_ClearFilterMode", StringMarshalling = StringMarshalling.Utf8)]
+    public static partial void Voice_ClearFilterMode(MGA_Voice* voice);
+
+    [LibraryImport(MonoGameNativeDLL, EntryPoint = "MGA_Voice_Apply3D", StringMarshalling = StringMarshalling.Utf8)]
+    public static partial void Voice_Apply3D(MGA_Voice* voice, in Listener listener, in Emitter emitter, float distanceScale);
 
     #endregion
 }
