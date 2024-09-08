@@ -7,6 +7,13 @@
 
 #include "csharp_common.h"
 
+enum class MGSoundState : mgint
+{
+    Playing = 0,
+    Paused = 1,
+    Stopped = 2,
+};
+
 enum class MGSurfaceFormat : mgint
 {
     Color = 0,

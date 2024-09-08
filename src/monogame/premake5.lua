@@ -83,6 +83,20 @@ function vulkan()
 
 end
 
+
+-- FAudio is supported for all desktop platforms.
+function faudio()
+
+   defines { "MG_FAUDIO" }
+
+   files 
+   { 
+      "faudio/**.h",
+      "faudio/**.cpp",
+   }
+
+end
+
 function configs()
 
    filter "configurations:Debug"
@@ -102,6 +116,7 @@ project "desktopvk"
    common("desktopvk")
    sdl2()
    vulkan()
+   faudio()
    configs()
 
 
