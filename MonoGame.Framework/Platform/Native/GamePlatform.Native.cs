@@ -273,7 +273,16 @@ class NativeGamePlatform : GamePlatform
 
     public override unsafe void BeforeInitialize()
     {
-        MGP.Platform_BeforeInitialize(Handle);
+        var gdm = Game.graphicsDeviceManager;
+        if (gdm == null)
+        {
+            // TODO: ???
+        }
+        else
+        {
+            var pp = Game.GraphicsDevice.PresentationParameters;
+            _window.OnPresentationChanged(pp);
+        }
 
         base.BeforeInitialize();        
     }
@@ -295,18 +304,15 @@ class NativeGamePlatform : GamePlatform
 
     public override unsafe void EnterFullScreen()
     {
-        MGP.Platform_EnterFullScreen(Handle);
     }
 
     public override unsafe void ExitFullScreen()
     {
-        MGP.Platform_ExitFullScreen(Handle);
     }
 
     public override void BeginScreenDeviceChange(bool willBeFullScreen)
     {
     }
-
     public override void EndScreenDeviceChange(string screenDeviceName, int clientWidth, int clientHeight)
     {
 

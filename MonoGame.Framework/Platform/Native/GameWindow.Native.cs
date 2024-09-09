@@ -58,10 +58,14 @@ internal class NativeGameWindow : GameWindow
         }
     }
 
-    public bool IsFullScreen;
+    public bool IsFullScreen { get; private set; }
+
+    public bool HardwareModeSwitch { get; private set; }
 
     public override DisplayOrientation CurrentOrientation { get; }
+
     public override IntPtr Handle { get; }
+
     public override string ScreenDeviceName { get; }
 
     public override unsafe Point Position
@@ -124,61 +128,57 @@ internal class NativeGameWindow : GameWindow
 
     public override void BeginScreenDeviceChange(bool willBeFullScreen)
     {
-
     }
 
     public override void EndScreenDeviceChange(string screenDeviceName, int clientWidth, int clientHeight)
     {
-
     }
 
     protected internal override void SetSupportedOrientations(DisplayOrientation orientations)
     {
     }
 
-    public void OnPresentationChanged(PresentationParameters pp)
+    public unsafe void OnPresentationChanged(PresentationParameters pp)
     {
-        /*
         if (pp.IsFullScreen && pp.HardwareModeSwitch && IsFullScreen && HardwareModeSwitch)
         {
-            if (_platform.IsActive)
-            {
-                // stay in hardware full screen, need to call ResizeTargets so the displaymode can be switched
-                _platform.Game.GraphicsDevice.ResizeTargets();
-            }
-            else
-            {
-                // This needs to be called in case the user presses the Windows key while the focus is on the second monitor,
-                //	which (sometimes) causes the window to exit fullscreen mode, but still keeps it visible
-                MinimizeFullScreen();
-            }
+            // Nothing changed... what do we do here?
         }
         else if (pp.IsFullScreen && (!IsFullScreen || pp.HardwareModeSwitch != HardwareModeSwitch))
-        */
+        {
+            IsFullScreen = pp.IsFullScreen;
+            HardwareModeSwitch = pp.HardwareModeSwitch;
 
-        //if (pp.IsFullScreen && !IsFullScreen)
-            //EnterFullScreen(pp);
-        //else if (!pp.IsFullScreen && IsFullScreen)
-            //ExitFullScreen();
+            MGP.Window_EnterFullScreen(_handle, HardwareModeSwitch);
+        }
+        else if (!pp.IsFullScreen && IsFullScreen)
+        {
+            IsFullScreen = pp.IsFullScreen;
+
+            MGP.Window_ExitFullScreen(_handle);
+        }
 
         ClientResize(pp.BackBufferWidth, pp.BackBufferHeight);
     }
 
-    public void ClientResize(int width, int height)
+    public unsafe void ClientResize(int width, int height)
     {
         if (_width == width && _height == height)
             return;
 
-        _width = width;
-        _height = height;
+        if (!IsFullScreen)
+            MGP.Window_SetClientSize(_handle, width, height);
 
-        UpdateBackBufferSize();
+        UpdateBackBufferSize(width, height);
 
         OnClientSizeChanged();
     }
 
-    private void UpdateBackBufferSize()
+    private void UpdateBackBufferSize(int width, int height)
     {
+        _width = width;
+        _height = height;
+
         // TODO: Implement sperate swap change logic for
         // non-primary windows.
 
@@ -193,10 +193,6 @@ internal class NativeGameWindow : GameWindow
 
         var manager = _platform.Game.graphicsDeviceManager;
         if (manager.GraphicsDevice == null)
-            return;
-
-        if (_width == manager.PreferredBackBufferWidth &&
-            _height == manager.PreferredBackBufferHeight)
             return;
 
         manager.PreferredBackBufferWidth = _width;

@@ -596,16 +596,6 @@ mgbool MGP_Platform_BeforeDraw(MGP_Platform* platform)
 	return true;
 }
 
-void MGP_Platform_EnterFullScreen(MGP_Platform* platform)
-{
-	assert(platform != nullptr);
-}
-
-void MGP_Platform_ExitFullScreen(MGP_Platform* platform)
-{
-	assert(platform != nullptr);
-}
-
 MGP_Window* MGP_Window_Create(
     MGP_Platform* platform,
     mgint width,
@@ -729,12 +719,37 @@ void MGP_Window_SetPosition(MGP_Window* window, mgint x, mgint y)
 	SDL_SetWindowPosition(window->window, x, y);
 }
 
+void MGP_Window_SetClientSize(MGP_Window* window, mgint width, mgint height)
+{
+    assert(window != nullptr);
+    SDL_SetWindowSize(window->window, width, height);
+}
+
 void MGP_Window_SetCursor(MGP_Window* window, MGP_Cursor* cursor)
 {
     assert(window != nullptr);
     assert(cursor != nullptr);
     
     SDL_SetCursor(cursor->cursor);
+}
+
+void MGP_Window_EnterFullScreen(MGP_Window* window, mgbool useHardwareModeSwitch)
+{
+    assert(window != nullptr);
+
+    Uint32 flags;
+    if (useHardwareModeSwitch)
+        flags = SDL_WINDOW_FULLSCREEN;
+    else
+        flags = SDL_WINDOW_FULLSCREEN_DESKTOP;
+
+    SDL_SetWindowFullscreen(window->window, flags);
+}
+
+void MGP_Window_ExitFullScreen(MGP_Window* window)
+{
+    assert(window != nullptr);
+    SDL_SetWindowFullscreen(window->window, 0);
 }
 
 void MGP_Mouse_SetVisible(MGP_Platform* platform, mgbool visible)

@@ -238,12 +238,6 @@ internal static unsafe partial class MGP
     [return: MarshalAs(UnmanagedType.U1)]
     public static partial bool Platform_BeforeDraw(MGP_Platform* platform);
 
-    [LibraryImport(MonoGameNativeDLL, EntryPoint = "MGP_Platform_EnterFullScreen", StringMarshalling = StringMarshalling.Utf8)]
-    public static partial void Platform_EnterFullScreen(MGP_Platform* platform);
-
-    [LibraryImport(MonoGameNativeDLL, EntryPoint = "MGP_Platform_ExitFullScreen", StringMarshalling = StringMarshalling.Utf8)]
-    public static partial void Platform_ExitFullScreen(MGP_Platform* platform);
-
     #endregion
 
     #region Window
@@ -287,6 +281,9 @@ internal static unsafe partial class MGP
     [LibraryImport(MonoGameNativeDLL, EntryPoint = "MGP_Window_SetPosition", StringMarshalling = StringMarshalling.Utf8)]
     public static partial void Window_SetPosition(MGP_Window* window, int x, int y);
 
+    [LibraryImport(MonoGameNativeDLL, EntryPoint = "MGP_Window_SetClientSize", StringMarshalling = StringMarshalling.Utf8)]
+    public static partial void Window_SetClientSize(MGP_Window* window, int width, int height);
+
     [LibraryImport(MonoGameNativeDLL, EntryPoint = "MGP_Window_SetCursor", StringMarshalling = StringMarshalling.Utf8)]
     public static partial void Window_SetCursor(MGP_Window* window, MGP_Cursor* cursor);        
 
@@ -297,6 +294,12 @@ internal static unsafe partial class MGP
          string description,
          string[] buttons,
          int count);
+
+    [LibraryImport(MonoGameNativeDLL, EntryPoint = "MGP_Window_EnterFullScreen", StringMarshalling = StringMarshalling.Utf8)]
+    public static partial void Window_EnterFullScreen(MGP_Window* window, [MarshalAs(UnmanagedType.U1)] bool useHardwareModeSwitch);
+
+    [LibraryImport(MonoGameNativeDLL, EntryPoint = "MGP_Window_ExitFullScreen", StringMarshalling = StringMarshalling.Utf8)]
+    public static partial void Window_ExitFullScreen(MGP_Window* window);
 
     #endregion
 
