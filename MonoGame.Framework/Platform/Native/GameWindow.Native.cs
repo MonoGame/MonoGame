@@ -113,6 +113,10 @@ internal class NativeGameWindow : GameWindow
 
         _windows[(nint)_handle] = this;
 
+        var icon = AssemblyHelper.GetDefaultWindowIcon();
+        if (icon != null)
+            MGP.Window_SetIconBitmap(_handle, icon, icon.Length);
+
         Handle = MGP.Window_GetNativeHandle(_handle);
     }
 

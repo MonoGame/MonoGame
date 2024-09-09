@@ -252,6 +252,9 @@ internal static unsafe partial class MGP
     [LibraryImport(MonoGameNativeDLL, EntryPoint = "MGP_Window_Destroy", StringMarshalling = StringMarshalling.Utf8)]
     public static partial void Window_Destroy(MGP_Window* window);
 
+    [LibraryImport(MonoGameNativeDLL, EntryPoint = "MGP_Window_SetIconBitmap", StringMarshalling = StringMarshalling.Utf8)]
+    public static partial void Window_SetIconBitmap(MGP_Window* window, byte[] icon, int length);
+
     [LibraryImport(MonoGameNativeDLL, EntryPoint = "MGP_Window_GetNativeHandle", StringMarshalling = StringMarshalling.Utf8)]
     public static partial nint Window_GetNativeHandle(MGP_Window* window);
 

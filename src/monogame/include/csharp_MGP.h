@@ -28,6 +28,7 @@ MG_EXPORT mgbool MGP_Platform_BeforeUpdate(MGP_Platform* platform);
 MG_EXPORT mgbool MGP_Platform_BeforeDraw(MGP_Platform* platform);
 MG_EXPORT MGP_Window* MGP_Window_Create(MGP_Platform* platform, mgint width, mgint height, const char* title);
 MG_EXPORT void MGP_Window_Destroy(MGP_Window* window);
+MG_EXPORT void MGP_Window_SetIconBitmap(MGP_Window* window, mgbyte* icon, mgint length);
 MG_EXPORT void* MGP_Window_GetNativeHandle(MGP_Window* window);
 MG_EXPORT mgbool MGP_Window_GetAllowUserResizing(MGP_Window* window);
 MG_EXPORT void MGP_Window_SetAllowUserResizing(MGP_Window* window, mgbool allow);
