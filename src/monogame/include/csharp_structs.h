@@ -7,6 +7,56 @@
 
 #include "csharp_common.h"
 
+struct ReverbSettings
+{
+    mgfloat ReflectionsDelayMs;
+    mgfloat ReverbDelayMs;
+    mgfloat PositionLeft;
+    mgfloat PositionRight;
+    mgfloat PositionLeftMatrix;
+    mgfloat PositionRightMatrix;
+    mgfloat EarlyDiffusion;
+    mgfloat LateDiffusion;
+    mgfloat LowEqGain;
+    mgfloat LowEqCutoff;
+    mgfloat HighEqGain;
+    mgfloat HighEqCutoff;
+    mgfloat RearDelayMs;
+    mgfloat RoomFilterFrequencyHz;
+    mgfloat RoomFilterMainDb;
+    mgfloat RoomFilterHighFrequencyDb;
+    mgfloat ReflectionsGainDb;
+    mgfloat ReverbGainDb;
+    mgfloat DecayTimeSec;
+    mgfloat DensityPct;
+    mgfloat RoomSizeFeet;
+    mgfloat WetDryMixPct;
+};
+
+struct Vector3
+{
+    mgfloat X;
+    mgfloat Y;
+    mgfloat Z;
+};
+
+struct Listener
+{
+    Vector3 Position;
+    Vector3 Forward;
+    Vector3 Up;
+    Vector3 Velocity;
+};
+
+struct Emitter
+{
+    Vector3 Position;
+    Vector3 Forward;
+    Vector3 Up;
+    Vector3 Velocity;
+    mgfloat DopplerScale;
+};
+
 struct MGG_DisplayMode
 {
     mgint width;

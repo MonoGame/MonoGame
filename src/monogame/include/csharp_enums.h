@@ -14,6 +14,13 @@ enum class MGSoundState : mgint
     Stopped = 2,
 };
 
+enum class MGFilterMode : mgint
+{
+    LowPass = 0,
+    BandPass = 1,
+    HighPass = 2,
+};
+
 enum class MGSurfaceFormat : mgint
 {
     Color = 0,
