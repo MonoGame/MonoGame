@@ -4,10 +4,10 @@
   "classifications": [
     "MonoGame", "Games", "Mobile", "Android", "iOS", "Desktop", "Windows", "Linux", "macOS"
   ],
-  "name": "MonoGame StartKit",
-  "identity": "MonoGame.StartKit",
-  "groupIdentity": "MonoGame.StartKit",
-  "shortName": "mgstartkit",
+  "name": "MonoGame 2D StartKit",
+  "identity": "MonoGame.2D.StartKit",
+  "groupIdentity": "MonoGame.2D.StartKit",
+  "shortName": "mg2dstartkit",
   "tags": {
     "language": "C#",
     "type": "project"
