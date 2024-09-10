@@ -252,6 +252,27 @@ void MGP_Platform_BeforeInitialize(MGP_Platform* platform)
 	assert(platform != nullptr);
 }
 
+MGMonoGamePlatform MGP_Platform_GetPlatform()
+{
+#if _WIN32
+    return MGMonoGamePlatform::Windows;
+#else
+    assert(false);
+    return (MGMonoGamePlatform)-1;
+#endif
+}
+
+MGGraphicsBackend MGP_Platform_GetGraphicsBackend()
+{
+#if MG_VULKAN
+    return MGGraphicsBackend::Vulkan;
+#else
+    assert(false);
+    return (MGGraphicsBackend)-1;
+#endif
+
+}
+
 static MGP_Window* MGP_WindowFromId(MGP_Platform* platform, Uint32 windowId)
 {
     assert(platform != nullptr);

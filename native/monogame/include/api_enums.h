@@ -485,6 +485,28 @@ enum class MGControllerInput : mgint
     INVALID = -1,
 };
 
+enum class MGMonoGamePlatform : mgint
+{
+    Android = 0,
+    iOS = 1,
+    tvOS = 2,
+    DesktopGL = 3,
+    Windows = 4,
+    WebGL = 5,
+    XboxOne = 6,
+    PlayStation4 = 7,
+    PlayStation5 = 8,
+    NintendoSwitch = 9,
+};
+
+enum class MGGraphicsBackend : mgint
+{
+    DirectX = 0,
+    OpenGL = 1,
+    Vulkan = 2,
+    Metal = 3,
+};
+
 enum class MGSystemCursor : mgint
 {
     Arrow = 0,

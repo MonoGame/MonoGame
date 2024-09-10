@@ -12,7 +12,6 @@ partial class TitleContainer
 {
     static partial void PlatformInit()
     {
-
     }
 
     private static Stream PlatformOpenStream(string safeName)

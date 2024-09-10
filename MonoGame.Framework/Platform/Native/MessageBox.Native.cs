@@ -21,6 +21,6 @@ public static partial class MessageBox
 
     private static void PlatformCancel(int? result)
     {
-
+        // TODO: How should we do this?
     }
 }

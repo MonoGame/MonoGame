@@ -10,12 +10,10 @@ public sealed partial class TextureCollection
 {
     private void PlatformInit()
     {
-
     }
 
     private void PlatformClear()
     {
-
     }
 
     private unsafe void PlatformSetTextures(GraphicsDevice device)

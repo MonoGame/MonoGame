@@ -4,6 +4,7 @@
 
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
+using MonoGame.Framework.Utilities;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 
@@ -240,6 +241,12 @@ internal static unsafe partial class MGP
 
     [LibraryImport(MonoGameNativeDLL, EntryPoint = "MGP_Platform_MakePath", StringMarshalling = StringMarshalling.Utf8)]
     public static partial string Platform_MakePath(string location, string path);
+
+    [LibraryImport(MonoGameNativeDLL, EntryPoint = "MGP_Platform_GetPlatform", StringMarshalling = StringMarshalling.Utf8)]
+    public static partial MonoGamePlatform Platform_GetPlatform();
+
+    [LibraryImport(MonoGameNativeDLL, EntryPoint = "MGP_Platform_GetGraphicsBackend", StringMarshalling = StringMarshalling.Utf8)]
+    public static partial GraphicsBackend Platform_GetGraphicsBackend();
 
     #endregion
 

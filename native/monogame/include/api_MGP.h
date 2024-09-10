@@ -25,6 +25,8 @@ MG_EXPORT mgbool MGP_Platform_BeforeRun(MGP_Platform* platform);
 MG_EXPORT mgbool MGP_Platform_BeforeUpdate(MGP_Platform* platform);
 MG_EXPORT mgbool MGP_Platform_BeforeDraw(MGP_Platform* platform);
 MG_EXPORT const char* MGP_Platform_MakePath(const char* location, const char* path);
+MG_EXPORT MGMonoGamePlatform MGP_Platform_GetPlatform();
+MG_EXPORT MGGraphicsBackend MGP_Platform_GetGraphicsBackend();
 MG_EXPORT MGP_Window* MGP_Window_Create(MGP_Platform* platform, mgint width, mgint height, const char* title);
 MG_EXPORT void MGP_Window_Destroy(MGP_Window* window);
 MG_EXPORT void MGP_Window_SetIconBitmap(MGP_Window* window, mgbyte* icon, mgint length);
