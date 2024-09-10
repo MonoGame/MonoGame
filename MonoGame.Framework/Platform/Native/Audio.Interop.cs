@@ -6,6 +6,7 @@ using System;
 using System.Runtime.InteropServices;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Audio;
+using MonoGame.Framework.Utilities;
 
 
 namespace MonoGame.Interop;
@@ -146,8 +147,14 @@ internal static unsafe partial class MGA
     [LibraryImport(MonoGameNativeDLL, EntryPoint = "MGA_Voice_Destroy", StringMarshalling = StringMarshalling.Utf8)]
     public static partial void Voice_Destroy(MGA_Voice* voice);
 
+    [LibraryImport(MonoGameNativeDLL, EntryPoint = "MGA_Voice_GetBufferCount", StringMarshalling = StringMarshalling.Utf8)]
+    public static partial int Voice_GetBufferCount(MGA_Voice* voice);
+
+    [LibraryImport(MonoGameNativeDLL, EntryPoint = "MGA_Voice_SetBuffer", StringMarshalling = StringMarshalling.Utf8)]
+    public static partial void Voice_SetBuffer(MGA_Voice* voice, MGA_Buffer* buffer);
+
     [LibraryImport(MonoGameNativeDLL, EntryPoint = "MGA_Voice_AppendBuffer", StringMarshalling = StringMarshalling.Utf8)]
-    public static partial void Voice_AppendBuffer(MGA_Voice* voice, MGA_Buffer* buffer, [MarshalAs(UnmanagedType.U1)] bool clear);
+    public static partial void Voice_AppendBuffer(MGA_Voice* voice, byte[] buffer, int offset, int count, [MarshalAs(UnmanagedType.U1)] bool clear);
 
     [LibraryImport(MonoGameNativeDLL, EntryPoint = "MGA_Voice_Play", StringMarshalling = StringMarshalling.Utf8)]
     public static partial void Voice_Play(MGA_Voice* voice, [MarshalAs(UnmanagedType.U1)] bool looped);

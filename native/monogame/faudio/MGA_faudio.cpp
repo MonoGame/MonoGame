@@ -102,20 +102,41 @@ void MGA_Voice_Destroy(MGA_Voice* voice)
 	delete voice;
 }
 
-void MGA_Voice_AppendBuffer(MGA_Voice* voice, MGA_Buffer* buffer, mgbool clear)
+mgint MGA_Voice_GetBufferCount(MGA_Voice* voice)
+{
+	assert(voice != nullptr);
+	return 0;
+}
+
+void MGA_Voice_SetBuffer(MGA_Voice* voice, MGA_Buffer* buffer)
 {
 	assert(voice != nullptr);
 
-	if (clear)
-	{
-		// Stop and remove any pending buffers first.
-	}
+	// Stop and remove any pending buffers first.
 
 	// Append a buffer if we got one.
 	if (buffer)
 	{
 
 	}
+}
+
+void MGA_Voice_AppendBuffer(MGA_Voice* voice, mgbyte* buffer, mgint offset, mgint count, mgbool clear)
+{
+	assert(voice != nullptr);
+	assert(buffer != nullptr);
+
+	if (clear)
+	{
+		// Stop and remove any pending buffers first.
+	}
+
+	// The idea here is that for streaming cases and dynamic buffers
+	// we internally allocate a big chunk of memory for it and
+	// break it up into smaller buffers for submission.
+		
+	// Allocate a dynamic buffer that can be reused later.	
+	// Append the buffer.
 }
 
 void MGA_Voice_Play(MGA_Voice* voice, mgbool looped)

@@ -238,6 +238,9 @@ internal static unsafe partial class MGP
     [return: MarshalAs(UnmanagedType.U1)]
     public static partial bool Platform_BeforeDraw(MGP_Platform* platform);
 
+    [LibraryImport(MonoGameNativeDLL, EntryPoint = "MGP_Platform_MakePath", StringMarshalling = StringMarshalling.Utf8)]
+    public static partial string Platform_MakePath(string location, string path);
+
     #endregion
 
     #region Window

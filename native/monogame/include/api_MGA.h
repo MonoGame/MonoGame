@@ -28,7 +28,9 @@ MG_EXPORT void MGA_Buffer_InitializeXact(MGA_Buffer* buffer, mguint codec, mgbyt
 MG_EXPORT mgulong MGA_Buffer_GetDuration(MGA_Buffer* buffer);
 MG_EXPORT MGA_Voice* MGA_Voice_Create();
 MG_EXPORT void MGA_Voice_Destroy(MGA_Voice* voice);
-MG_EXPORT void MGA_Voice_AppendBuffer(MGA_Voice* voice, MGA_Buffer* buffer, mgbool clear);
+MG_EXPORT mgint MGA_Voice_GetBufferCount(MGA_Voice* voice);
+MG_EXPORT void MGA_Voice_SetBuffer(MGA_Voice* voice, MGA_Buffer* buffer);
+MG_EXPORT void MGA_Voice_AppendBuffer(MGA_Voice* voice, mgbyte* buffer, mgint offset, mgint count, mgbool clear);
 MG_EXPORT void MGA_Voice_Play(MGA_Voice* voice, mgbool looped);
 MG_EXPORT void MGA_Voice_Pause(MGA_Voice* voice);
 MG_EXPORT void MGA_Voice_Resume(MGA_Voice* voice);

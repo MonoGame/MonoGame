@@ -111,7 +111,7 @@ public sealed partial class SoundEffect
         if (instance.Voice == null)
             instance.Voice = MGA.Voice_Create();
 
-        MGA.Voice_AppendBuffer(instance.Voice, Buffer, true);
+        MGA.Voice_SetBuffer(instance.Voice, Buffer);
     }
 
     private unsafe void PlatformDispose(bool disposing)
