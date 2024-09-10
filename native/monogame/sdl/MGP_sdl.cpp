@@ -8,6 +8,10 @@
 
 #include <sdl.h>
 
+#if _WIN32
+#include <combaseapi.h>
+#endif
+
 
 struct MGP_Platform
 {
@@ -211,6 +215,36 @@ void MGP_Platform_Destroy(MGP_Platform* platform)
 		MGP_Window_Destroy(window);
 
 	delete platform;
+}
+
+const char* MGP_Platform_MakePath(const char* location, const char* path)
+{
+    assert(location != nullptr);
+    assert(path != nullptr);
+
+    size_t length = strlen(path) + 1;
+    if (location[0])
+        length += strlen(location) + 1;
+
+#if _WIN32
+    // Windows requires marshaled strings to be allocated like this.
+    char* fpath = (char*)CoTaskMemAlloc(length);    
+#else
+    char* fpath = (char*)malloc(length);
+#endif
+
+    if (location[0])
+    {
+        strcpy_s(fpath, length, location);
+        strcat_s(fpath, length, MG_PATH_SEPARATOR);
+        strcat_s(fpath, length, path);
+    }
+    else
+    {
+        strcpy_s(fpath, length, path);
+    }
+
+    return fpath;
 }
 
 void MGP_Platform_BeforeInitialize(MGP_Platform* platform)

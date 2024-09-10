@@ -3,6 +3,8 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System.IO;
+using MonoGame.Interop;
+
 
 namespace Microsoft.Xna.Framework;
 
@@ -15,13 +17,8 @@ partial class TitleContainer
 
     private static Stream PlatformOpenStream(string safeName)
     {
-        // TODO: How do we handle this?
-        //
-        // It seems like we still need platform specific C# code here?
-        //
-        // Or do we make the native code transform the string?
-        //
-        var absolutePath = Path.Combine(Location, safeName);
+        var absolutePath = MGP.Platform_MakePath(Location, safeName);
+
         return File.OpenRead(absolutePath);
     }
 }

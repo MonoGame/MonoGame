@@ -109,14 +109,14 @@ MGM_Video* MGM_Video_Create(const char* mediaFilePath, mgint cachedFrameNum, mgi
 
 	// TODO: Like Song above we should detect the media
 	// format from a native decoder libraries that are
-	// portable to all our target platforms:
-	//
-	// libtheora - free but limited quality/performance
-	// OpenH264 -
-	// ???
+	// portable to all our target platforms.
 	//
 	// It should then spin up thread which decodes the
 	// video/audio streams.
+
+	// TOOD: Ideally we just support OpenH264+AAC which is pretty
+	// much industry standard now.  Anything else is not
+	// importaint unless a new standard comes around.
 
 	auto video = new MGM_Video();
 	video->duration = duration = 0;

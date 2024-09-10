@@ -20,6 +20,11 @@
 #define MG_GENERATE_TRAP() __builtin_trap()
 #endif
 
+#ifdef _MSC_VER
+#define MG_PATH_SEPARATOR "\\"
+#else
+#define MG_PATH_SEPARATOR "/"
+#endif
 
 inline void MG_Print_StdError(const char* file, int line, const char* message)
 {
