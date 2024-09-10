@@ -2,9 +2,9 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
-#include "csharp_MGA.h"
+#include "api_MGA.h"
 
-#include "stl_common.h"
+#include "mg_common.h"
 
 
 // TODO: Implement against the C++ API for FAudio.

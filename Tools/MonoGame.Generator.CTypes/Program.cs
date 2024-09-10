@@ -6,7 +6,7 @@ using System.Reflection;
 using MonoGame.Generator.CTypes;
 
 var repoDirectory = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "../../../../../");
-var monogamePlatformDir = Path.Combine(repoDirectory, "src/monogame/include");
+var monogamePlatformDir = Path.Combine(repoDirectory, "native/monogame/include");
 var monogameFrameworkPath = Path.Combine(repoDirectory, "Artifacts/MonoGame.Framework/Native/Debug/MonoGame.Framework.dll");
 var assembly = Assembly.LoadFile(monogameFrameworkPath);
 var enumWritter = new EnumWritter();

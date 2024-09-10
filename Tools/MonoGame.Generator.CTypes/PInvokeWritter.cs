@@ -36,16 +36,14 @@ class PinvokeWritter
         // This file is subject to the terms and conditions defined in
         // file 'LICENSE.txt', which is part of this source code package.
                         
-        //
         // This code is auto generated, don't modify it by hand.
         // To regenerate it run: Tools/MonoGame.Generator.CTypes
-        //
 
         #pragma once
 
-        #include "csharp_common.h"
-        #include "csharp_enums.h"
-        #include "csharp_structs.h"
+        #include "api_common.h"
+        #include "api_enums.h"
+        #include "api_structs.h"
         
 
         
@@ -136,7 +134,7 @@ class PinvokeWritter
         foreach (var method in _methods)
             GenerateMethod(method);
 
-        var path = Path.Combine(dirPath, $"csharp_{_name}.h");
+        var path = Path.Combine(dirPath, $"api_{_name}.h");
         var text = _outputText.ToString().ReplaceLineEndings();
 
         File.WriteAllText(path, text);

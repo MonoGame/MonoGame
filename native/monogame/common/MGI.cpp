@@ -2,7 +2,7 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
-#include "csharp_MGI.h"
+#include "api_MGI.h"
 
 #define STBI_NO_PSD
 #define STBI_NO_BMP

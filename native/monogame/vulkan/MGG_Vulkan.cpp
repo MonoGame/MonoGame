@@ -2,9 +2,8 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
-#include "csharp_MGG.h"
+#include "api_MGG.h"
 
-#include "stl_common.h"
 #include "mg_common.h"
 
 

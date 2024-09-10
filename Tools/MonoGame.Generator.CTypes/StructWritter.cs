@@ -22,14 +22,16 @@ class StructWritter
         _enumWritter = enumWritter;
 
         _outputText = new StringBuilder($"""
-        //
+        // MonoGame - Copyright (C) The MonoGame Team
+        // This file is subject to the terms and conditions defined in
+        // file 'LICENSE.txt', which is part of this source code package.
+
         // This code is auto generated, don't modify it by hand.
         // To regenerate it run: Tools/MonoGame.Generator.CTypes
-        //
 
         #pragma once
 
-        #include "csharp_common.h"
+        #include "api_common.h"
 
 
         """);
@@ -135,7 +137,7 @@ class StructWritter
         foreach (var pair in _types)
             Generate(pair.Value);
 
-        var path = Path.Combine(dirPath, "csharp_structs.h");
+        var path = Path.Combine(dirPath, "api_structs.h");
         var text = _outputText.ToString().ReplaceLineEndings();
 
         File.WriteAllText(path, text);

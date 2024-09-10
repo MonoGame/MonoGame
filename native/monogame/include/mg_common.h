@@ -5,6 +5,13 @@
 #pragma once
 
 #include <stdio.h>
+#include <assert.h>
+
+#include <vector>
+#include <string>
+#include <queue>
+#include <map>
+#include <functional>
 
 
 #ifdef _MSC_VER
@@ -36,8 +43,20 @@ inline void MG_Print_StdOut(const char* file, int line, const char* message)
 #define MG_NOT_IMPLEMEMTED	MG_ERROR_PRINT("NOT IMPLEMENTED!"); MG_GENERATE_TRAP()
 
 
+template <class T>
+void mg_remove(std::vector<T>& vector, const T& element)
+{
+    auto new_end = std::remove(vector.begin(), vector.end(), element);
+    assert(new_end != vector.end());
+    vector.erase(new_end, vector.end());
+}
 
-
+template <class T>
+bool mg_contains(std::vector<T>& vector, const T& element)
+{
+    auto found = std::find(vector.begin(), vector.end(), element);
+    return found != vector.end();
+}
 
 
 

@@ -4,9 +4,9 @@
 
 struct MGG_Texture;
 
-#include "csharp_MGM.h"
+#include "api_MGM.h"
 
-#include "stl_common.h"
+#include "mg_common.h"
 
 
 struct MGM_Song
