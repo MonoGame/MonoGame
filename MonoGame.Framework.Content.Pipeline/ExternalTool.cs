@@ -66,9 +66,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
             };
 
             if (!string.IsNullOrEmpty(workingDirectory))
-            {
                 processInfo.WorkingDirectory = workingDirectory;
-            }
 
             EnsureExecutable(fullPath);
 

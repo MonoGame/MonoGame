@@ -7,6 +7,7 @@ using Microsoft.Xna.Framework.Content.Pipeline.Graphics;
 using Microsoft.Xna.Framework.Content.Pipeline.Processors;
 using NUnit.Framework;
 using Microsoft.Xna.Framework.Graphics.PackedVector;
+using MonoGame.Framework.Content;
 
 namespace MonoGame.Tests.ContentPipeline
 {
@@ -90,6 +91,7 @@ namespace MonoGame.Tests.ContentPipeline
             var input = new Texture2DContent();
             input.Faces[0] = face;
 
+            using var scope = ContextScopeFactory.BeginContext(context);
             var output = processor.Process(input, context);
 
             Assert.NotNull(output);
@@ -136,6 +138,7 @@ namespace MonoGame.Tests.ContentPipeline
             var input = new Texture2DContent();
             input.Faces[0] = face;
 
+            using var scope = ContextScopeFactory.BeginContext(context);
             var output = processor.Process(input, context);
 
             Assert.NotNull(output);
@@ -183,6 +186,7 @@ namespace MonoGame.Tests.ContentPipeline
             var input = new Texture2DContent();
             input.Faces[0] = face;
 
+            using var scope = ContextScopeFactory.BeginContext(context);
             var output = processor.Process(input, context);
 
             Assert.NotNull(output);
@@ -227,6 +231,7 @@ namespace MonoGame.Tests.ContentPipeline
             var input = new Texture2DContent();
             input.Faces[0] = face;
 
+            using var scope = ContextScopeFactory.BeginContext(context);
             var output = processor.Process(input, context);
 
             Assert.NotNull(output);
@@ -262,6 +267,7 @@ namespace MonoGame.Tests.ContentPipeline
             var input = new Texture2DContent();
             input.Faces[0] = face;
 
+            using var scope = ContextScopeFactory.BeginContext(context);
             var output = processor.Process(input, context);
 
             Assert.NotNull(output);
