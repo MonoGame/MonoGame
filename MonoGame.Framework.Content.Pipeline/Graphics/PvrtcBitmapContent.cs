@@ -3,8 +3,8 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System;
+using Microsoft.Xna.Framework.Content.Pipeline.Utilities;
 using Microsoft.Xna.Framework.Graphics;
-using PVRTexLibNET;
 
 namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 {
@@ -88,41 +88,26 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
                 }
             }
 
-            PixelFormat targetFormat;
-            switch (format)
+            BasisU.EncodeBytes(
+                sourceBitmap: sourceBitmap,
+                destinationFormat: format,
+                out var compressedBytes);
+
+            // Need to pad out the data that may come back from basisU & KTX.
+            //  Pvrtc has a minimum size as referenced here, https://github.com/BinomialLLC/basis_universal/issues/30
+            //  however, when the texture is loaded back from the KTX data, it can lose some padding.
+            //  To counter that, fill in zero's for the remaining data.
+            var expectedSize = GetDataSize();
+            if (expectedSize > compressedBytes.Length)
             {
-                case SurfaceFormat.RgbPvrtc2Bpp:
-                    targetFormat = PixelFormat.PVRTCI_2bpp_RGB;
-                    break;
-                case SurfaceFormat.RgbaPvrtc2Bpp:
-                    targetFormat = PixelFormat.PVRTCI_2bpp_RGBA;
-                    break;
-                case SurfaceFormat.RgbPvrtc4Bpp:
-                    targetFormat = PixelFormat.PVRTCI_4bpp_RGB;
-                    break;
-                case SurfaceFormat.RgbaPvrtc4Bpp:
-                    targetFormat = PixelFormat.PVRTCI_4bpp_RGBA;
-                    break;
-                default:
-                    return false;
+                var nextBytes = new byte[expectedSize];
+                Array.Copy(compressedBytes, nextBytes, compressedBytes.Length);
+                compressedBytes = nextBytes;
             }
 
-            // Create the texture object in the PVR library
-            var sourceData = sourceBitmap.GetPixelData();
-            var rgba32F = (PixelFormat)0x2020202061626772; // static const PixelType PVRStandard32PixelType = PixelType('r', 'g', 'b', 'a', 32, 32, 32, 32);
-            using (var pvrTexture = PVRTexture.CreateTexture(sourceData, (uint)sourceBitmap.Width, (uint)sourceBitmap.Height, 1,
-                rgba32F, true, VariableType.Float, ColourSpace.lRGB))
-            {
-                // Resize the bitmap if needed
-                if ((sourceBitmap.Width != Width) || (sourceBitmap.Height != Height))
-                    pvrTexture.Resize((uint)Width, (uint)Height, 1, ResizeMode.Cubic);
-                // On Linux, anything less than CompressorQuality.PVRTCHigh crashes in libpthread.so at the end of compression
-                pvrTexture.Transcode(targetFormat, VariableType.UnsignedByte, ColourSpace.lRGB, CompressorQuality.PVRTCHigh);
-                var texDataSize = pvrTexture.GetTextureDataSize(0);
-                var texData = new byte[texDataSize];
-                pvrTexture.GetTextureData(texData, texDataSize);
-                SetPixelData(texData);
-            }
+
+            SetPixelData(compressedBytes);
+
             return true;
         }
 

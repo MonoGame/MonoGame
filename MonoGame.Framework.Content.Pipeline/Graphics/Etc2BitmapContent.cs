@@ -9,26 +9,27 @@ using Microsoft.Xna.Framework.Graphics;
 namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 {
     /// <summary>
-    /// Supports the processing of a texture compressed using ETC1.
+    /// Supports the processing of a texture compressed using ETC2.
     /// </summary>
-    public class Etc1BitmapContent : BitmapContent
+    public class Etc2BitmapContent : BitmapContent
     {
+        private const SurfaceFormat FORMAT = SurfaceFormat.Rgba8Etc2;
         byte[] _data;
 
         /// <summary>
-        /// Initializes a new instance of Etc1BitmapContent.
+        /// Initializes a new instance of Etc2BitmapContent.
         /// </summary>
-        protected Etc1BitmapContent()
+        protected Etc2BitmapContent()
             : base()
         {
         }
 
         /// <summary>
-        /// Initializes a new instance of Etc1BitmapContent with the specified width or height.
+        /// Initializes a new instance of Etc2BitmapContent with the specified width or height.
         /// </summary>
         /// <param name="width">Width in pixels of the bitmap resource.</param>
         /// <param name="height">Height in pixels of the bitmap resource.</param>
-        public Etc1BitmapContent(int width, int height)
+        public Etc2BitmapContent(int width, int height)
             : base(width, height)
         {
         }
@@ -40,9 +41,9 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 
         public override void SetPixelData(byte[] sourceData)
         {
-            int bytesRequired = ((Width + 3) >> 2) * ((Height + 3) >> 2) * SurfaceFormat.RgbEtc1.GetSize();
+            int bytesRequired = ((Width + 3) >> 2) * ((Height + 3) >> 2) * FORMAT.GetSize();
             if (bytesRequired != sourceData.Length)
-                throw new ArgumentException("ETC1 bitmap with width " + Width + " and height " + Height + " needs "
+                throw new ArgumentException("ETC2 bitmap with width " + Width + " and height " + Height + " needs "
                     + bytesRequired + " bytes. Received " + sourceData.Length + " bytes");
 
             if (_data == null || _data.Length != bytesRequired)
@@ -60,7 +61,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
             TryGetFormat(out format);
 
             // A shortcut for copying the entire bitmap to another bitmap of the same type and format
-            if (SurfaceFormat.RgbEtc1 == sourceFormat && (sourceRegion == new Rectangle(0, 0, Width, Height)) && sourceRegion == destinationRegion)
+            if (FORMAT == sourceFormat && (sourceRegion == new Rectangle(0, 0, Width, Height)) && sourceRegion == destinationRegion)
             {
                 SetPixelData(sourceBitmap.GetPixelData());
                 return true;
@@ -86,7 +87,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 
             Crunch.EncodeBytes(
                 sourceBitmap: sourceBitmap,
-                crunchFormat: CrunchFormat.Etc1,
+                crunchFormat: CrunchFormat.Etc2A,
                 out var compressedBytes);
             SetPixelData(compressedBytes);
 
@@ -100,13 +101,13 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
                 return false;
 
             // A shortcut for copying the entire bitmap to another bitmap of the same type and format
-            if (SurfaceFormat.RgbEtc1 == destinationFormat && (sourceRegion == new Rectangle(0, 0, Width, Height)) && sourceRegion == destinationRegion)
+            if (FORMAT == destinationFormat && (sourceRegion == new Rectangle(0, 0, Width, Height)) && sourceRegion == destinationRegion)
             {
                 destinationBitmap.SetPixelData(GetPixelData());
                 return true;
             }
 
-            // No other support for copying from a ETC1 texture yet
+            // No other support for copying from a ETC2 texture yet
             return false;
         }
 
@@ -117,7 +118,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
         /// <returns>The GPU texture format of the bitmap type.</returns>
         public override bool TryGetFormat(out SurfaceFormat format)
         {
-            format = SurfaceFormat.RgbEtc1;
+            format = FORMAT;
             return true;
         }
 
@@ -127,7 +128,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
         /// <returns>Description of the bitmap.</returns>
         public override string ToString()
         {
-            return "ETC1 " + Width + "x" + Height;
+            return "ETC2 " + Width + "x" + Height;
         }
     }
 }

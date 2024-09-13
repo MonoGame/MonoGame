@@ -1,24 +1,33 @@
-﻿// MonoGame - Copyright (C) MonoGame Foundation, Inc
+// MonoGame - Copyright (C) MonoGame Foundation, Inc
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System;
-using BCnEncoder.Shared;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Content.Pipeline.Utilities;
 
 namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 {
-    public abstract class AtcBitmapContent : BitmapContent
+
+    public class AstcBitmapContent : BitmapContent
     {
+        private SurfaceFormat FORMAT => SurfaceFormat.Astc4X4Rgba;
         internal byte[] _bitmapData;
 
-        public AtcBitmapContent()
+        /// <summary>
+        /// Initializes a new instance of AstcBitmapContent.
+        /// </summary>
+        protected AstcBitmapContent()
             : base()
         {
         }
 
-        public AtcBitmapContent(int width, int height)
+        /// <summary>
+        /// Initializes a new instance of AstcBitmapContent with the specified width or height.
+        /// </summary>
+        /// <param name="width">Width in pixels of the bitmap resource.</param>
+        /// <param name="height">Height in pixels of the bitmap resource.</param>
+        public AstcBitmapContent(int width, int height)
             : base(width, height)
         {
         }
@@ -33,7 +42,8 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
             _bitmapData = sourceData;
         }
 
-		protected override bool TryCopyFrom(BitmapContent sourceBitmap, Rectangle sourceRegion, Rectangle destinationRegion)
+        protected override bool TryCopyFrom(BitmapContent sourceBitmap, Rectangle sourceRegion,
+            Rectangle destinationRegion)
         {
             SurfaceFormat sourceFormat;
             if (!sourceBitmap.TryGetFormat(out sourceFormat))
@@ -43,7 +53,8 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
             TryGetFormat(out format);
 
             // A shortcut for copying the entire bitmap to another bitmap of the same type and format
-            if (format == sourceFormat && (sourceRegion == new Rectangle(0, 0, Width, Height)) && sourceRegion == destinationRegion)
+            if (format == sourceFormat && (sourceRegion == new Rectangle(0, 0, Width, Height)) &&
+                sourceRegion == destinationRegion)
             {
                 SetPixelData(sourceBitmap.GetPixelData());
                 return true;
@@ -54,7 +65,8 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
                 return false;
 
             // If the source is not Vector4 or requires resizing, send it through BitmapContent.Copy
-            if (!(sourceBitmap is PixelBitmapContent<Vector4>) || sourceRegion.Width != destinationRegion.Width || sourceRegion.Height != destinationRegion.Height)
+            if (!(sourceBitmap is PixelBitmapContent<Vector4>) || sourceRegion.Width != destinationRegion.Width ||
+                sourceRegion.Height != destinationRegion.Height)
             {
                 try
                 {
@@ -67,29 +79,17 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
                 }
             }
 
-            CompressionFormat compressionFormat;
-            switch (format)
-            {
-                case SurfaceFormat.RgbaAtcExplicitAlpha:
-                    compressionFormat = CompressionFormat.AtcExplicitAlpha;
-                    break;
-                case SurfaceFormat.RgbaAtcInterpolatedAlpha:
-                    compressionFormat = CompressionFormat.AtcInterpolatedAlpha;
-                    break;
-                default:
-                    throw new PipelineException();
-            }
-            BcnUtil.Encode(
+            BasisU.EncodeBytes(
                 sourceBitmap: sourceBitmap,
-                destinationFormat: compressionFormat,
+                destinationFormat: format,
                 out var compressedBytes);
-
             SetPixelData(compressedBytes);
 
-			return true;
+            return true;
         }
 
-        protected override bool TryCopyTo(BitmapContent destinationBitmap, Rectangle sourceRegion, Rectangle destinationRegion)
+        protected override bool TryCopyTo(BitmapContent destinationBitmap, Rectangle sourceRegion,
+            Rectangle destinationRegion)
         {
             SurfaceFormat destinationFormat;
             if (!destinationBitmap.TryGetFormat(out destinationFormat))
@@ -99,14 +99,21 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
             TryGetFormat(out format);
 
             // A shortcut for copying the entire bitmap to another bitmap of the same type and format
-            if (format == destinationFormat && (sourceRegion == new Rectangle(0, 0, Width, Height)) && sourceRegion == destinationRegion)
+            if (format == destinationFormat && (sourceRegion == new Rectangle(0, 0, Width, Height)) &&
+                sourceRegion == destinationRegion)
             {
                 destinationBitmap.SetPixelData(GetPixelData());
                 return true;
             }
 
-            // No other support for copying from a ATC texture yet
+            // No other support for copying from a ASTC texture yet
             return false;
+        }
+
+        public override bool TryGetFormat(out SurfaceFormat format)
+        {
+            format = FORMAT;
+            return true;
         }
     }
 }

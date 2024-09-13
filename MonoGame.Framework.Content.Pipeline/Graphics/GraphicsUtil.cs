@@ -160,7 +160,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
             if (context.TargetProfile == GraphicsProfile.Reach)
             {
                 if (!IsPowerOfTwo(face.Width) || !IsPowerOfTwo(face.Height))
-                    throw new PipelineException("DXT compression requires width and height must be powers of two in Reach graphics profile.");                
+                    throw new PipelineException("DXT compression requires width and height must be powers of two in Reach graphics profile.");
             }
 
             // Test the alpha channel to figure out if we have alpha.
@@ -175,8 +175,8 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
             // between DXT1 for cutouts and DXT5 for fractional alpha.
             //
             // DXT3 however can produce better results for high frequency
-            // alpha like a chain link fence where is DXT5 is better for 
-            // low frequency alpha like clouds.  I don't know how we can 
+            // alpha like a chain link fence where is DXT5 is better for
+            // low frequency alpha like clouds.  I don't know how we can
             // pick the right thing in this case without a hint.
             //
             if (isSpriteFont)
@@ -199,12 +199,67 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
             }
 
             var face = content.Faces[0][0];
-			var alphaRange = CalculateAlphaRange(face);
+            var alphaRange = CalculateAlphaRange(face);
 
             if (alphaRange == AlphaRange.Full)
                 content.ConvertBitmapType(typeof(AtcExplicitBitmapContent));
             else
                 content.ConvertBitmapType(typeof(AtcInterpolatedBitmapContent));
+        }
+
+        static public void CompressAstc(ContentProcessorContext context, TextureContent content, bool isSpriteFont)
+        {
+            // If sharp alpha is required (for a font texture page), use 16-bit color instead of PVR
+            if (isSpriteFont)
+            {
+                CompressColor16Bit(context, content);
+                return;
+            }
+
+            // astc supports rgba
+            content.ConvertBitmapType(typeof(AstcBitmapContent));
+        }
+
+        static public void CompressEtc(ContentProcessorContext context, TextureContent content, bool isSpriteFont)
+        {
+            // If sharp alpha is required (for a font texture page), use 16-bit color instead of PVR
+            if (isSpriteFont)
+            {
+                CompressColor16Bit(context, content);
+                return;
+            }
+
+            var face = content.Faces[0][0];
+            var alphaRange = CalculateAlphaRange(face);
+
+
+            // confirm texture meets ETC requirements
+            if (!IsPowerOfTwo(face.Width) || !IsPowerOfTwo(face.Height))
+            {
+                // pick a fallback format based on the alpha range.
+                if (alphaRange != AlphaRange.Opaque)
+                {
+                    context.Logger.LogWarning(null, content.Identity, "ETC compression requires width and height to be powers of two due to hardware restrictions on some devices. Falling back to BGR565.");
+                    content.ConvertBitmapType(typeof(PixelBitmapContent<Bgra4444>));
+                }
+                else
+                {
+                    context.Logger.LogWarning(null, content.Identity, "ETC compression requires width and height to be powers of two due to hardware restrictions on some devices. Falling back to BGR565.");
+                    content.ConvertBitmapType(typeof(PixelBitmapContent<Bgr565>));
+                }
+
+                return;
+            }
+
+            if (alphaRange == AlphaRange.Opaque)
+            {
+                // ETC1 does not support alpha, which is fine since the data is all opaque
+                content.ConvertBitmapType(typeof(Etc1BitmapContent));
+                return;
+            }
+
+            // Use ETC2
+            content.ConvertBitmapType(typeof(Etc2BitmapContent));
         }
 
         static public void CompressEtc1(ContentProcessorContext context, TextureContent content, bool isSpriteFont)
@@ -233,7 +288,9 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
                     content.ConvertBitmapType(typeof(PixelBitmapContent<Bgr565>));
                 }
                 else
+                    // use ETC1 when there is no alpha
                     content.ConvertBitmapType(typeof(Etc1BitmapContent));
+
             }
         }
 
@@ -249,6 +306,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
             else
                 content.ConvertBitmapType(typeof(PixelBitmapContent<Bgra4444>));
         }
+
 
         // Compress the greyscale font texture page using a specially-formulated DXT3 mode
         static public unsafe void CompressFontDXT3(TextureContent content)
