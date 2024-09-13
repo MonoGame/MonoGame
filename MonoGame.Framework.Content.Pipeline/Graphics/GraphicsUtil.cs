@@ -232,11 +232,22 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
             var face = content.Faces[0][0];
             var alphaRange = CalculateAlphaRange(face);
 
+
             // confirm texture meets ETC requirements
             if (!IsPowerOfTwo(face.Width) || !IsPowerOfTwo(face.Height))
             {
-                context.Logger.LogWarning(null, content.Identity, "ETC compression requires width and height to be powers of two due to hardware restrictions on some devices. Falling back to BGR565.");
-                content.ConvertBitmapType(typeof(PixelBitmapContent<Bgr565>));
+                // pick a fallback format based on the alpha range.
+                if (alphaRange != AlphaRange.Opaque)
+                {
+                    context.Logger.LogWarning(null, content.Identity, "ETC compression requires width and height to be powers of two due to hardware restrictions on some devices. Falling back to BGR565.");
+                    content.ConvertBitmapType(typeof(PixelBitmapContent<Bgra4444>));
+                }
+                else
+                {
+                    context.Logger.LogWarning(null, content.Identity, "ETC compression requires width and height to be powers of two due to hardware restrictions on some devices. Falling back to BGR565.");
+                    content.ConvertBitmapType(typeof(PixelBitmapContent<Bgr565>));
+                }
+
                 return;
             }
 

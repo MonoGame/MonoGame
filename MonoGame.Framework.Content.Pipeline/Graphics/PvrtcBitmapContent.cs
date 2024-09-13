@@ -93,6 +93,19 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
                 destinationFormat: format,
                 out var compressedBytes);
 
+            // Need to pad out the data that may come back from basisU & KTX.
+            //  Pvrtc has a minimum size as referenced here, https://github.com/BinomialLLC/basis_universal/issues/30
+            //  however, when the texture is loaded back from the KTX data, it can lose some padding.
+            //  To counter that, fill in zero's for the remaining data.
+            var expectedSize = GetDataSize();
+            if (expectedSize > compressedBytes.Length)
+            {
+                var nextBytes = new byte[expectedSize];
+                Array.Copy(compressedBytes, nextBytes, compressedBytes.Length);
+                compressedBytes = nextBytes;
+            }
+
+
             SetPixelData(compressedBytes);
 
             return true;

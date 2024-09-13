@@ -189,6 +189,15 @@ namespace MonoGame.Framework.Content
             public override string IntermediateDirectory => _context.IntermediateDirectory;
             public override ContentBuildLogger Logger => _context.Logger;
             public override ContentIdentity SourceIdentity => _context.SourceIdentity;
+
+            public override void Dispose()
+            {
+                base.Dispose();
+                if (_context is IDisposable disposable)
+                {
+                    disposable.Dispose();
+                }
+            }
         }
 
         private class ContentImporterContextAdapter : ContextScope
