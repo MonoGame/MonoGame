@@ -29,7 +29,7 @@ namespace Microsoft.Xna.Framework.Input
             while (Joysticks.ContainsKey(id))
                 id++;
 
-            if (id > _lastConnectedIndex)
+            if (id != _lastConnectedIndex)
                 _lastConnectedIndex = id;
 
             Joysticks.Add(id, jdevice);

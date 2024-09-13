@@ -73,6 +73,10 @@ namespace Microsoft.Xna.Framework.Graphics
         /// Creates a new instance of <see cref="VertexBuffer"/>
         /// </summary>
         /// <param name="graphicsDevice">The graphics device.</param>
+        /// <param name="type">
+        /// The data type.
+        /// Must be a value type which implements the <see cref="IVertexType"/> interface.
+        /// </param>
         /// <param name="vertexCount">The number of vertices.</param>
         /// <param name="bufferUsage">Behavior options.</param>
         /// <exception cref="ArgumentNullException"><paramref name="graphicsDevice"/> is <see langword="null"/></exception>
