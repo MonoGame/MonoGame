@@ -23,6 +23,7 @@ struct MGG_Texture;
 struct MGG_SamplerState;
 struct MGG_Shader;
 struct MGG_InputLayout;
+struct MGG_OcclusionQuery;
 
 MG_EXPORT void MGG_EffectResource_GetBytecode(const char* name, mgbyte*& bytecode, mgint& size);
 MG_EXPORT MGG_GraphicsSystem* MGG_GraphicsSystem_Create();
@@ -74,3 +75,8 @@ MG_EXPORT MGG_InputLayout* MGG_InputLayout_Create(MGG_GraphicsDevice* device, MG
 MG_EXPORT void MGG_InputLayout_Destroy(MGG_GraphicsDevice* device, MGG_InputLayout* layout);
 MG_EXPORT MGG_Shader* MGG_Shader_Create(MGG_GraphicsDevice* device, MGShaderStage stage, mgbyte* bytecode, mgint sizeInBytes);
 MG_EXPORT void MGG_Shader_Destroy(MGG_GraphicsDevice* device, MGG_Shader* shader);
+MG_EXPORT MGG_OcclusionQuery* MGG_OcclusionQuery_Create(MGG_GraphicsDevice* device);
+MG_EXPORT void MGG_OcclusionQuery_Destroy(MGG_GraphicsDevice* device, MGG_OcclusionQuery* query);
+MG_EXPORT void MGG_OcclusionQuery_Begin(MGG_GraphicsDevice* device, MGG_OcclusionQuery* query);
+MG_EXPORT void MGG_OcclusionQuery_End(MGG_GraphicsDevice* device, MGG_OcclusionQuery* query);
+MG_EXPORT mgbool MGG_OcclusionQuery_GetResult(MGG_GraphicsDevice* device, MGG_OcclusionQuery* query, mgint& pixelCount);

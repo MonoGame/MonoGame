@@ -25,6 +25,7 @@ internal struct PtrTo<T>
 [MGHandle] internal readonly struct MGG_SamplerState { }
 [MGHandle] internal readonly struct MGG_Shader { }
 [MGHandle] internal readonly struct MGG_InputLayout { }
+[MGHandle] internal readonly struct MGG_OcclusionQuery { }
 
 
 [StructLayout(LayoutKind.Sequential)]
@@ -405,6 +406,26 @@ internal static unsafe partial class MGG
 
     [LibraryImport(MonoGameNativeDLL, EntryPoint = "MGG_Shader_Destroy", StringMarshalling = StringMarshalling.Utf8)]
     public static partial void Shader_Destroy(MGG_GraphicsDevice* device, MGG_Shader* shader);
+
+    #endregion
+
+    #region Occlusion Query
+
+    [LibraryImport(MonoGameNativeDLL, EntryPoint = "MGG_OcclusionQuery_Create", StringMarshalling = StringMarshalling.Utf8)]
+    public static partial MGG_OcclusionQuery* OcclusionQuery_Create(MGG_GraphicsDevice* device);
+
+    [LibraryImport(MonoGameNativeDLL, EntryPoint = "MGG_OcclusionQuery_Destroy", StringMarshalling = StringMarshalling.Utf8)]
+    public static partial void OcclusionQuery_Destroy(MGG_GraphicsDevice* device, MGG_OcclusionQuery* query);
+
+    [LibraryImport(MonoGameNativeDLL, EntryPoint = "MGG_OcclusionQuery_Begin", StringMarshalling = StringMarshalling.Utf8)]
+    public static partial void OcclusionQuery_Begin(MGG_GraphicsDevice* device, MGG_OcclusionQuery* query);
+
+    [LibraryImport(MonoGameNativeDLL, EntryPoint = "MGG_OcclusionQuery_End", StringMarshalling = StringMarshalling.Utf8)]
+    public static partial void OcclusionQuery_End(MGG_GraphicsDevice* device, MGG_OcclusionQuery* query);
+
+    [LibraryImport(MonoGameNativeDLL, EntryPoint = "MGG_OcclusionQuery_GetResult", StringMarshalling = StringMarshalling.Utf8)]
+    [return: MarshalAs(UnmanagedType.U1)]
+    public static partial bool OcclusionQuery_GetResult(MGG_GraphicsDevice* device, MGG_OcclusionQuery* query, out int pixelCount);
 
     #endregion
 }

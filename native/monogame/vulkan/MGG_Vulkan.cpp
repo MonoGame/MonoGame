@@ -405,6 +405,10 @@ struct MGG_SamplerState
 	MGG_SamplerState_Info info;
 };
 
+struct MGG_OcclusionQuery
+{
+	// TODO!
+};
 
 struct MGG_GraphicsSystem
 {
@@ -3954,4 +3958,55 @@ void MGG_Shader_Destroy(MGG_GraphicsDevice* device, MGG_Shader* shader)
 
 	mg_remove(device->all_shaders, shader);
 	delete shader;
+}
+
+MGG_OcclusionQuery* MGG_OcclusionQuery_Create(MGG_GraphicsDevice* device)
+{
+	assert(device != nullptr);
+
+	auto query = new MGG_OcclusionQuery();
+
+	// TODO: Implement!
+
+	return query;
+}
+
+void MGG_OcclusionQuery_Destroy(MGG_GraphicsDevice* device, MGG_OcclusionQuery* query)
+{
+	assert(device != nullptr);
+	assert(query != nullptr);
+
+	if (!query)
+		return;
+
+	// TODO: Implement!
+
+	delete query;
+}
+
+void MGG_OcclusionQuery_Begin(MGG_GraphicsDevice* device, MGG_OcclusionQuery* query)
+{
+	assert(device != nullptr);
+	assert(query != nullptr);
+
+	// TODO: Implement!
+}
+
+void MGG_OcclusionQuery_End(MGG_GraphicsDevice* device, MGG_OcclusionQuery* query)
+{
+	assert(device != nullptr);
+	assert(query != nullptr);
+
+	// TODO: Implement!
+}
+
+mgbool MGG_OcclusionQuery_GetResult(MGG_GraphicsDevice* device, MGG_OcclusionQuery* query, mgint& pixelCount)
+{
+	assert(device != nullptr);
+	assert(query != nullptr);
+
+	// TODO: Implement!
+
+	pixelCount = 0;
+	return true;
 }

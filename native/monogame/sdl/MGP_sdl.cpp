@@ -254,8 +254,8 @@ void MGP_Platform_BeforeInitialize(MGP_Platform* platform)
 
 MGMonoGamePlatform MGP_Platform_GetPlatform()
 {
-#if _WIN32
-    return MGMonoGamePlatform::Windows;
+#if MG_VULKAN
+    return MGMonoGamePlatform::DesktopVK;
 #else
     assert(false);
     return (MGMonoGamePlatform)-1;

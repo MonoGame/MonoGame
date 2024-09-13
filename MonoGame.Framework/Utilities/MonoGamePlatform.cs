@@ -57,6 +57,11 @@ namespace MonoGame.Framework.Utilities
         /// <summary>
         /// MonoGame Nintendo Switch platform.
         /// </summary>
-        NintendoSwitch
+        NintendoSwitch,
+
+        /// <summary>
+        /// All desktop versions using Vulkan.
+        /// </summary>
+        DesktopVK,
     }
 }
