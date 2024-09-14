@@ -22,6 +22,7 @@ namespace Microsoft.Xna.Framework.Audio
         int pauseCount;
 
         float[] panAngles = new float[2];
+        AudioChannels sourceChannels;
 
         internal readonly object sourceMutex = new object();
         
@@ -124,7 +125,10 @@ namespace Microsoft.Xna.Framework.Audio
             // Distance Model
 			AL.DistanceModel (ALDistanceModel.InverseDistanceClamped);
             ALHelper.CheckError("Failed set source distance.");
-			// Pan
+            // Pan
+            AL.GetBuffer(_effect.SoundBuffer.OpenALDataBuffer, ALGetBufferi.Channels, out int channels);
+            ALHelper.CheckError("Failed to get buffer channels");
+            sourceChannels = (channels == 2) ? AudioChannels.Stereo : AudioChannels.Mono;
             PlatformSetPan (_pan);
             // Velocity
 			AL.Source (SourceId, ALSource3f.Velocity, 0f, 0f, 0f);
@@ -221,16 +225,40 @@ namespace Microsoft.Xna.Framework.Audio
 
             if (HasSourceId)
             {
-                AL.Source(SourceId, ALSource3f.Position, _pan, 0.0f, -1f);
-                ALHelper.CheckError("Failed to set source pan.");
-                if (controller.SupportsStereoAngles)
+                // Pan value  |   -1.0   |    0.0   |   +1.0   |
+                // Output     |   Left   | Centered |   Right  |
+                // - The proportion of cross channel audio mixed for each speaker may change depending on the
+                //   platform/driver OpenAL implementation
+
+                float maxPanAngle = (float)Math.PI / 3f;
+                switch (sourceChannels)
                 {
-                    // pan between -60 degrees when fully left (-1) and 60 degrees when fully right (1)
-                    float angle = (float)Math.PI / 6f;
-                    panAngles[0] = (1.0f - _pan) * angle;
-                    panAngles[1]= (1.0f + _pan) * -angle;
-                    AL.alSourcefv(SourceId, ALSourcef.StereoAngles, panAngles);
-                    ALHelper.CheckError("Failed to set source position.");
+                    case AudioChannels.Mono:
+                        // Simulate pan via 3D emitter positioning
+                        // - Rotates the emitter position +/- 60 degrees around the listener while keeping a constant distance
+                        // - OpenAL only applies 3D positions to mono channel sources
+                        Vector2 pannedPosition = Vector2.Rotate(new Vector2(0, -1), _pan * maxPanAngle);
+                        AL.Source(SourceId, ALSource3f.Position, pannedPosition.X, 0.0f, pannedPosition.Y);
+                        ALHelper.CheckError("Failed to set source position.");
+                        break;
+
+                    case AudioChannels.Stereo:
+                        // Pan via StereoAngles extension
+                        // - The panAngles array is set according to these angles (shown as degrees counter-clockwise):
+                        //     Pan value                | -1.0 |  0.0 | +1.0 |
+                        //     panAngles[0] (Output L)  |  +90 |  +30 |  -30 |
+                        //     panAngles[1] (Output R)  |  +30 |  -30 |  -90 |
+                        // - OpenAL only applies StereoAngles to stereo channel sources if the extension is available
+                        // - If unsupported no panning can occur as 3D positioning (mono sources only) is also unavailable
+                        if (!controller.SupportsStereoAngles)
+                            return;
+                        float panAngle = _pan * -maxPanAngle;
+                        float centeredOffsetAngle = (float)Math.PI / 6f;
+                        panAngles[0] = panAngle + centeredOffsetAngle;
+                        panAngles[1] = panAngle - centeredOffsetAngle;
+                        AL.alSourcefv(SourceId, ALSourcef.StereoAngles, panAngles);
+                        ALHelper.CheckError("Failed to set source stereo angles.");
+                        break;
                 }
             }
         }
