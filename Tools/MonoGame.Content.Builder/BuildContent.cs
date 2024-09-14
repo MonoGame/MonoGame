@@ -403,16 +403,12 @@ namespace MonoGame.Content.Builder
                 }
                 catch (PipelineException ex)
                 {
-                    Console.Error.WriteLine("{0}: error: {1}", c.SourceFile, ex.Message);
-                    if (ex.InnerException != null)
-                        Console.Error.WriteLine(ex.InnerException.ToString());
+                    Console.Error.WriteLine("{0}: error: {1}. {2}", c.SourceFile, ex.Message, ex.InnerException != null ? ex.InnerException : string.Empty);
                     ++errorCount;
                 }
                 catch (Exception ex)
                 {
-                    Console.Error.WriteLine("{0}: error: {1}", c.SourceFile, ex.Message);
-                    if (ex.InnerException != null)
-                        Console.Error.WriteLine(ex.InnerException.ToString());
+                    Console.Error.WriteLine("{0}: error: {1}. {2}", c.SourceFile, ex.Message, ex.InnerException != null ? ex.InnerException : string.Empty);
                     ++errorCount;
                 }
             }
