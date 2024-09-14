@@ -1087,4 +1087,14 @@
       <Link>Assets\Effects\Stock\Structures.fxh</Link>
     </Content>
   </ItemGroup>
+  <ItemGroup>
+    <Content Include="..\MonoGame.Content.Builder.Task\MonoGame.Content.Builder.Task.targets">
+      <Link>MonoGame.Content.Builder.Task.targets</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\\MonoGame.Content.Builder.Task\MonoGame.Content.Builder.Task.props">
+      <Link>MonoGame.Content.Builder.Task.props</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
 </Project>

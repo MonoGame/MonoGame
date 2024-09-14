@@ -20,7 +20,20 @@
             "type": "coreclr",
             "request": "attach",
             "processId": "${input.processid}",
-        }
+        },
+        {
+            "name": "MonoGame.Tests",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "build-tests",
+            "program": "${workspaceFolder}/Artifacts/Tests/DesktopGL/Debug/MonoGame.Tests",
+            "args": [
+                "--test=MonoGame.Tests.Graphics.SpriteBatchTest.Draw_normal"
+            ],
+            "cwd": "${workspaceFolder}/Artifacts/Tests/DesktopGL/Debug/",
+            "console": "internalConsole",
+            "stopAtEntry": false
+        },
     ],
     "inputs": [
         {

@@ -11,10 +11,14 @@ public sealed class UploadArtifactsTask : AsyncFrostingTask<BuildContext>
         var os = context.Environment.Platform.Family switch
         {
             PlatformFamily.Windows => "windows",
-            PlatformFamily.OSX => "mac",
+            PlatformFamily.OSX => "macos",
             _ => "linux"
         };
 
         await context.GitHubActions().Commands.UploadArtifact(new DirectoryPath(context.NuGetsDirectory.FullPath), $"nuget-{os}");
+        await context.GitHubActions().Commands.UploadArtifact(new DirectoryPath(System.IO.Path.Combine(context.BuildOutput, "Tests", "Tools", "Release")), $"tests-tools-{os}");
+        await context.GitHubActions().Commands.UploadArtifact(new DirectoryPath(System.IO.Path.Combine(context.BuildOutput, "Tests", "DesktopGL", "Release")), $"tests-desktopgl-{os}");
+        if (context.IsRunningOnWindows())
+            await context.GitHubActions().Commands.UploadArtifact(new DirectoryPath(System.IO.Path.Combine(context.BuildOutput, "Tests", "WindowsDX", "Release")), $"tests-windowsdx-{os}");
     }
 }

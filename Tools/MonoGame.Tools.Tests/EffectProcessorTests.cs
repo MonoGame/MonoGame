@@ -10,9 +10,7 @@ using TwoMGFX;
 
 namespace MonoGame.Tests.ContentPipeline
 {
-#if MACOS || LINUX
-    [Ignore("Does not work on CI yet. need to get wine working.")]
-#endif
+    [Category("Effects")]
     class EffectProcessorTests
     {
         class ImporterContext : ContentImporterContext

@@ -9,6 +9,7 @@ public enum ProjectType
     Framework,
     Tools,
     Templates,
+    Tests,
     ContentPipeline,
     MGCBEditor,
     MGCBEditorLauncher
@@ -24,7 +25,7 @@ public class BuildContext : FrostingContext
     {
         var repositoryUrl = context.Argument("build-repository", DefaultRepositoryUrl);
         var buildConfiguration = context.Argument("build-configuration", "Release");
-        BuildOutput = context.Argument("build-output", "artifacts");
+        BuildOutput = context.Argument("build-output", "Artifacts");
         NuGetsDirectory = $"{BuildOutput}/NuGet/";
 
         var tags = GitAliases.GitTags(context, ".");
@@ -150,6 +151,7 @@ public class BuildContext : FrostingContext
         ProjectType.Framework => $"MonoGame.Framework/MonoGame.Framework.{id}.csproj",
         ProjectType.Tools => $"Tools/{id}/{id}.csproj",
         ProjectType.Templates => $"Templates/{id}/{id}.csproj",
+        ProjectType.Tests => $"Tests/{id}.csproj",
         ProjectType.ContentPipeline => "MonoGame.Framework.Content.Pipeline/MonoGame.Framework.Content.Pipeline.csproj",
         ProjectType.MGCBEditor => $"Tools/MonoGame.Content.Builder.Editor/MonoGame.Content.Builder.Editor.{id}.csproj",
 		ProjectType.MGCBEditorLauncher => $"Tools/MonoGame.Content.Builder.Editor.Launcher/MonoGame.Content.Builder.Editor.Launcher.{id}.csproj",
