@@ -167,7 +167,7 @@ struct MGG_GraphicsAdapter
 	VkPhysicalDeviceFeatures features = { 0 };
 	VkPhysicalDeviceMemoryProperties memory = { 0 };
 
-	MGG_DisplayMode current = { 0 };
+	MGG_DisplayMode current = { MGSurfaceFormat::Color, 0, 0 };
 
 	std::vector<MGG_DisplayMode> modes;
 };

@@ -61,9 +61,9 @@ struct Emitter
 
 struct MGG_DisplayMode
 {
+    MGSurfaceFormat format;
     mgint width;
     mgint height;
-    MGSurfaceFormat format;
 };
 
 struct MGG_GraphicsAdaptor_Info

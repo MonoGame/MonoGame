@@ -14,13 +14,13 @@
 #include <functional>
 
 
-#ifdef _MSC_VER
+#if defined(_WIN32)
 #define MG_GENERATE_TRAP() __debugbreak()
 #else
 #define MG_GENERATE_TRAP() __builtin_trap()
 #endif
 
-#ifdef _MSC_VER
+#if defined(_WIN32)
 #define MG_PATH_SEPARATOR "\\"
 #else
 #define MG_PATH_SEPARATOR "/"
