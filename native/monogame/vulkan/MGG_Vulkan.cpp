@@ -3353,7 +3353,44 @@ void MGG_Buffer_SetData(MGG_GraphicsDevice* device, MGG_Buffer*& buffer, mgint o
 	// copying over data still in use.  See NX.
 
 	if (discard)
+	{
+		auto last = buffer;
+
 		buffer = MGVK_BufferDiscard(device, buffer);
+
+		// Fix any active mapping of the buffer that
+		// was just discarded for another.
+
+		switch (buffer->type)
+		{
+		case MGBufferType::Constant:
+			for (int i=0; i < (int)MGShaderStage::Count; i++)
+			{
+				if (device->uniforms[i] == last)
+				{
+					device->uniforms[i] = buffer;
+					device->uniformsDirty |= 1 << (int)i;
+				}		
+			}
+			break;
+
+		case MGBufferType::Vertex:
+			for (int i = 0; i < 8; i++)
+			{
+				if (device->vertexBuffers[i] == last)
+				{
+					device->vertexBuffers[i] = buffer;
+					device->vertexBuffersDirty |= 1 << i;
+				}
+			}
+			break;
+
+		case MGBufferType::Index:
+			if (device->indexBuffer == last)
+				device->indexBuffer = buffer;
+			break;
+		}
+	}
 
 	// Do the copy and flush.
 	MGVK_BufferCopyAndFlush(device, buffer, offset, data, length);
