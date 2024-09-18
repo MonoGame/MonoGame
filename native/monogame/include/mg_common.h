@@ -4,6 +4,8 @@
 
 #pragma once
 
+#include "api_common.h"
+
 #include <stdio.h>
 #include <assert.h>
 
@@ -47,6 +49,9 @@ inline void MG_Print_StdOut(const char* file, int line, const char* message)
 
 #define MG_NOT_IMPLEMEMTED	MG_ERROR_PRINT("NOT IMPLEMENTED!"); MG_GENERATE_TRAP()
 
+
+mguint MG_ComputeHash(const mgbyte* value, mgint length);
+mguint MG_ComputeHash(mguint value, mguint result = 0x811c9dc5);
 
 template <class T>
 void mg_remove(std::vector<T>& vector, const T& element)

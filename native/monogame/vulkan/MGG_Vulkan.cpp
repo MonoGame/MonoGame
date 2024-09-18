@@ -48,45 +48,6 @@ T MG_AlignUp(T value, const T alignment)
 
 struct MGVK_Program;
 
-static mguint _MGG_ComputeHash(const mgbyte* value, mgint length)
-{
-	// This is a 32-bit FNV-1a hash based on public domain code from:
-	// http://www.isthe.com/chongo/tech/comp/fnv
-	//
-	mguint result = (mguint)0x811c9dc5;
-	while (length-- > 0)
-	{
-		result ^= (mguint)*value;
-		result +=
-			(result << 1) +
-			(result << 4) +
-			(result << 7) +
-			(result << 8) +
-			(result << 24);
-		++value;
-	}
-
-	return result;
-}
-
-static mguint _MGG_ComputeHash(mguint value, mguint result = 0x811c9dc5)
-{
-	// This is a 32-bit FNV-1a hash based on public domain code from:
-	// http://www.isthe.com/chongo/tech/comp/fnv
-	//
-
-	result ^= value;
-	result +=
-		(result << 1) +
-		(result << 4) +
-		(result << 7) +
-		(result << 8) +
-		(result << 24);
-
-	return result;
-}
-
-
 typedef uint32_t FrameCounter;
 
 const FrameCounter kFreeFrames = 2;
@@ -251,7 +212,7 @@ struct MGG_GraphicsDevice
 	bool pipelineStateDirty = false;
 	MGVK_PipelineState pipelineState;
 
-	MGG_Buffer* uniforms[2] = { 0 };
+	MGG_Buffer* uniforms[2] = { nullptr, nullptr };
 	uint32_t uniformsDirty = 0;
 
 	VkDescriptorSet descriptorSets[2] = { 0 };
@@ -2045,7 +2006,7 @@ static void MGVK_UpdateRenderPass(MGG_GraphicsDevice* device, FrameCounter curre
 	}
 
 	// Lookup the texture set in the cache.
-	uint32_t hash = _MGG_ComputeHash((mgbyte*)&device->targets, sizeof(MGVK_TargetSet));
+	uint32_t hash = MG_ComputeHash((mgbyte*)&device->targets, sizeof(MGVK_TargetSet));
 	MGVK_TargetSetCache* cached = device->targetCache[hash];
 	if (!cached)
 	{
@@ -2189,8 +2150,8 @@ static void MGVK_UpdateDescriptors(MGG_GraphicsDevice* device, FrameCounter curr
 	MGVK_DescriptorInfo* info;
 
 	// First generate a hash of the new state.
-	uint32_t hash = _MGG_ComputeHash(shader->uniformSlots);
-	hash = _MGG_ComputeHash(shader->textureSlots, hash);
+	uint32_t hash = MG_ComputeHash(shader->uniformSlots);
+	hash = MG_ComputeHash(shader->textureSlots, hash);
 	uint32_t dirty = shader->textureSlots;
 	for (int i = 0; i < 16; i++)
 	{
@@ -2200,15 +2161,15 @@ static void MGVK_UpdateDescriptors(MGG_GraphicsDevice* device, FrameCounter curr
 
 		device->textures[i]->frame = currentFrame;
 
-		hash = _MGG_ComputeHash(device->textures[i]->id, hash);
-		hash = _MGG_ComputeHash(device->samplers[i]->id, hash);
+		hash = MG_ComputeHash(device->textures[i]->id, hash);
+		hash = MG_ComputeHash(device->samplers[i]->id, hash);
 
 		// Early out if there are no more used slots.
 		dirty &= ~mask;
 		if (!dirty)
 			break;
 	}
-	//hash = _MGG_ComputeHash(frame_index);
+	//hash = MG_ComputeHash(frame_index);
 
 	// Do we have this same descriptor cached?
 	info = shader->usedSets[hash];
@@ -2336,7 +2297,7 @@ static VkPipeline MGVK_CreatePipeline(MGG_GraphicsDevice* device)
 	// collision detection and resolution.
 
 	// First see if we've cached this state before.
-	uint32_t hash = _MGG_ComputeHash((mgbyte*)&device->pipelineState, sizeof(MGVK_PipelineState));
+	uint32_t hash = MG_ComputeHash((mgbyte*)&device->pipelineState, sizeof(MGVK_PipelineState));
 	auto itr = device->pipelines.find(hash);
 	if (itr != device->pipelines.end())
 		return itr->second.cache;
@@ -2767,7 +2728,7 @@ MGG_BlendState* MGG_BlendState_Create(MGG_GraphicsDevice* device, MGG_BlendState
 	assert(infos != nullptr);
 
 	// First check the cache.
-	uint32_t hash = _MGG_ComputeHash((mgbyte*)infos, sizeof(MGG_BlendState_Info) * 4);
+	uint32_t hash = MG_ComputeHash((mgbyte*)infos, sizeof(MGG_BlendState_Info) * 4);
 	MGG_BlendState* cached = device->blendStates[hash];
 	if (cached)
 	{
@@ -2875,7 +2836,7 @@ MGG_DepthStencilState* MGG_DepthStencilState_Create(MGG_GraphicsDevice* device, 
 	assert(info != nullptr);
 
 	// First check the cache.
-	uint32_t hash = _MGG_ComputeHash((mgbyte*)info, sizeof(MGG_DepthStencilState_Info));
+	uint32_t hash = MG_ComputeHash((mgbyte*)info, sizeof(MGG_DepthStencilState_Info));
 	MGG_DepthStencilState* cached = device->depthStencilStates[hash];
 	if (cached)
 	{
@@ -2965,7 +2926,7 @@ MGG_RasterizerState* MGG_RasterizerState_Create(MGG_GraphicsDevice* device, MGG_
 	assert(info != nullptr);
 
 	// First check the cache.
-	uint32_t hash = _MGG_ComputeHash((mgbyte*)info, sizeof(MGG_RasterizerState_Info));
+	uint32_t hash = MG_ComputeHash((mgbyte*)info, sizeof(MGG_RasterizerState_Info));
 	MGG_RasterizerState* cached = device->rasterizerStates[hash];
 	if (cached)
 	{
