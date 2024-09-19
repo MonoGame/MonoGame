@@ -16,6 +16,11 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Input.Touch;
 using Microsoft.Xna.Framework.Content;
+using ___SafeGameName___.Core.ScreenManagers;
+using ___SafeGameName___.Core.Screens;
+
+
+
 #if !__IOS__
 using Microsoft.Xna.Framework.Media;
 #endif
@@ -64,6 +69,9 @@ public class ___SafeGameName___Game : Microsoft.Xna.Framework.Game
     // have a level file present. This allows us to not need to check for the file
     // or handle exceptions, both of which can add unnecessary time to level loading.
     private const int numberOfLevels = 3;
+    private const int textEdgeSpacing = 10;
+
+    ScreenManager screenManager;
 
     public ___SafeGameName___Game()
     {
@@ -76,6 +84,15 @@ public class ___SafeGameName___Game : Microsoft.Xna.Framework.Game
         graphics.SupportedOrientations = DisplayOrientation.LandscapeLeft | DisplayOrientation.LandscapeRight;
 
         Accelerometer.Initialize();
+
+        // Create the screen manager component.
+        screenManager = new ScreenManager(this);
+
+        Components.Add(screenManager);
+
+        // Activate the first screens.
+        screenManager.AddScreen(new BackgroundScreen(), null);
+        screenManager.AddScreen(new MainMenuScreen(), null);
     }
 
     /// <summary>
@@ -170,6 +187,8 @@ public class ___SafeGameName___Game : Microsoft.Xna.Framework.Game
 #endif
         bool continuePressed =
             keyboardState.IsKeyDown(Keys.Space) ||
+            keyboardState.IsKeyDown(Keys.Up) ||
+            keyboardState.IsKeyDown(Keys.W) ||
             gamePadState.IsButtonDown(Buttons.A) ||
             touchState.AnyTouch();
 
@@ -246,7 +265,8 @@ public class ___SafeGameName___Game : Microsoft.Xna.Framework.Game
 
         // Draw time remaining. Uses modulo division to cause blinking when the
         // player is running out of time.
-        string timeString = "TIME: " + level.TimeRemaining.Minutes.ToString("00") + ":" + level.TimeRemaining.Seconds.ToString("00");
+        string drawableString = "TIME: " + level.TimeRemaining.Minutes.ToString("00") + ":" + level.TimeRemaining.Seconds.ToString("00");
+        var timeDimensions = hudFont.MeasureString(drawableString);
         Color timeColor;
         if (level.TimeRemaining > WarningTime ||
             level.ReachedExit ||
@@ -258,12 +278,13 @@ public class ___SafeGameName___Game : Microsoft.Xna.Framework.Game
         {
             timeColor = Color.Red;
         }
-        DrawShadowedString(hudFont, timeString, hudLocation, timeColor);
+        DrawShadowedString(hudFont, drawableString, hudLocation + new Vector2(textEdgeSpacing, textEdgeSpacing), timeColor);
 
         // Draw score
-        float timeHeight = hudFont.MeasureString(timeString).Y;
-        DrawShadowedString(hudFont, "SCORE: " + level.Score.ToString(), hudLocation + new Vector2(0.0f, timeHeight * 1.2f), Color.Yellow);
-       
+        drawableString = "SCORE: " + level.Score.ToString();
+        var scoreDimensions = hudFont.MeasureString(drawableString);
+        DrawShadowedString(hudFont, drawableString, hudLocation + new Vector2(hudLocation.X + backbufferWidth - scoreDimensions.X - textEdgeSpacing, textEdgeSpacing), Color.Yellow);
+
         // Determine the status overlay message to show.
         Texture2D status = null;
         if (level.TimeRemaining == TimeSpan.Zero)
