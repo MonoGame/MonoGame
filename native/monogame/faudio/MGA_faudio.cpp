@@ -49,8 +49,9 @@ void MGA_System_SetReverbSettings(MGA_System* system, ReverbSettings& settings)
 	assert(system != nullptr);
 }
 
-MGA_Buffer* MGA_Buffer_Create()
+MGA_Buffer* MGA_Buffer_Create(MGA_System* system)
 {
+	assert(system != nullptr);
 	auto buffer = new MGA_Buffer();
 	return buffer;
 }
@@ -90,8 +91,9 @@ mgulong MGA_Buffer_GetDuration(MGA_Buffer* buffer)
 	return 0;
 }
 
-MGA_Voice* MGA_Voice_Create()
+MGA_Voice* MGA_Voice_Create(MGA_System* system)
 {
+	assert(system != nullptr);
 	auto voice = new MGA_Voice();
 	return voice;
 }

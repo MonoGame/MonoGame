@@ -11,7 +11,7 @@ public sealed partial class DynamicSoundEffectInstance : SoundEffectInstance
 {
     private unsafe void PlatformCreate()
     {
-        Voice = MGA.Voice_Create();
+        Voice = MGA.Voice_Create(SoundEffect.System);
     }
 
     private unsafe int PlatformGetPendingBufferCount()

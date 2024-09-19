@@ -95,7 +95,7 @@ internal static unsafe partial class MGA
     #region Buffer
 
     [LibraryImport(MonoGameNativeDLL, EntryPoint = "MGA_Buffer_Create", StringMarshalling = StringMarshalling.Utf8)]
-    public static partial MGA_Buffer* Buffer_Create();
+    public static partial MGA_Buffer* Buffer_Create(MGA_System* system);
 
     [LibraryImport(MonoGameNativeDLL, EntryPoint = "MGA_Buffer_Destroy", StringMarshalling = StringMarshalling.Utf8)]
     public static partial void Buffer_Destroy(MGA_Buffer* buffer);
@@ -142,7 +142,7 @@ internal static unsafe partial class MGA
     #region Voice
 
     [LibraryImport(MonoGameNativeDLL, EntryPoint = "MGA_Voice_Create", StringMarshalling = StringMarshalling.Utf8)]
-    public static partial MGA_Voice* Voice_Create();
+    public static partial MGA_Voice* Voice_Create(MGA_System* system);
 
     [LibraryImport(MonoGameNativeDLL, EntryPoint = "MGA_Voice_Destroy", StringMarshalling = StringMarshalling.Utf8)]
     public static partial void Voice_Destroy(MGA_Voice* voice);

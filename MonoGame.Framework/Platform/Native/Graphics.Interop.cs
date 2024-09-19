@@ -31,9 +31,9 @@ internal struct PtrTo<T>
 [StructLayout(LayoutKind.Sequential)]
 internal struct MGG_DisplayMode
 {
+    public SurfaceFormat format;
     public int width;
     public int height;
-    public SurfaceFormat format;
 }
 
 [StructLayout(LayoutKind.Sequential)]

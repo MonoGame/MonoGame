@@ -69,7 +69,7 @@ public sealed partial class SoundEffect
 
             unsafe
             {
-                Buffer = MGA.Buffer_Create();
+                Buffer = MGA.Buffer_Create(System);
                 MGA.Buffer_InitializeFormat(Buffer, headerData, waveData, waveData.Length, 0, 0);
 
                 var milliseconds = MGA.Buffer_GetDuration(Buffer);
@@ -80,13 +80,13 @@ public sealed partial class SoundEffect
 
     private unsafe void PlatformInitializePcm(byte[] buffer, int offset, int count, int sampleBits, int sampleRate, AudioChannels channels, int loopStart, int loopLength)
     {
-        Buffer = MGA.Buffer_Create();
+        Buffer = MGA.Buffer_Create(System);
         MGA.Buffer_InitializePCM(Buffer, buffer, offset, count, sampleBits, sampleRate, (int)channels, loopStart, loopLength);
     }
 
     private unsafe void PlatformInitializeFormat(byte[] header, byte[] buffer, int bufferSize, int loopStart, int loopLength)
     {
-        Buffer = MGA.Buffer_Create();
+        Buffer = MGA.Buffer_Create(System);
         MGA.Buffer_InitializeFormat(Buffer, header, buffer, bufferSize, loopStart, loopLength);
     }
 
@@ -96,7 +96,7 @@ public sealed partial class SoundEffect
         // This is only the platform specific non-streaming
         // Xact sound handling as PCM is already handled.
 
-        Buffer = MGA.Buffer_Create();
+        Buffer = MGA.Buffer_Create(System);
         MGA.Buffer_InitializeXact(Buffer, (uint)codec, buffer, buffer.Length, sampleRate, blockAlignment, channels, loopStart, loopLength);
 
         var milliseconds = MGA.Buffer_GetDuration(Buffer);
@@ -109,7 +109,7 @@ public sealed partial class SoundEffect
         // already have a valid voice assigned.
 
         if (instance.Voice == null)
-            instance.Voice = MGA.Voice_Create();
+            instance.Voice = MGA.Voice_Create(System);
 
         MGA.Voice_SetBuffer(instance.Voice, Buffer);
     }
