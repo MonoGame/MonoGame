@@ -189,23 +189,26 @@ class Level : IDisposable
             case 'X':
                 return LoadExitTile(x, y);
 
-            // Gem
-            case 'G':
-                return LoadGemTile(x, y);
+            // Minimal value Gem
+            case '1':
+                return LoadGemTile(x, y, tileType);
+            // Mediuam value Gem
+            case '2':
+                return LoadGemTile(x, y, tileType);
+            // Maximum value Gem
+            case '3':
+                return LoadGemTile(x, y, tileType);
 
             // Floating platform
             case '-':
                 return LoadTile("Platform", TileCollision.Platform);
 
-            // Various enemies
+            // Various enemy types
             case 'A':
-                return LoadEnemyTile(x, y, "MonsterA");
             case 'B':
-                return LoadEnemyTile(x, y, "MonsterB");
             case 'C':
-                return LoadEnemyTile(x, y, "MonsterC");
             case 'D':
-                return LoadEnemyTile(x, y, "MonsterD");
+                return LoadEnemyTile(x, y, tileType);
 
             // Platform block
             case '~':
@@ -216,7 +219,7 @@ class Level : IDisposable
                 return LoadVarietyTile("BlockB", 2, TileCollision.Passable);
 
             // Player 1 start point
-            case '1':
+            case 'P':
                 return LoadStartTile(x, y);
 
             // Impassable block
@@ -293,10 +296,10 @@ class Level : IDisposable
     /// <summary>
     /// Instantiates an enemy and puts him in the level.
     /// </summary>
-    private Tile LoadEnemyTile(int x, int y, string spriteSet)
+    private Tile LoadEnemyTile(int x, int y, char monsterType)
     {
         Vector2 position = RectangleExtensions.GetBottomCenter(GetBounds(x, y));
-        enemies.Add(new Enemy(this, position, spriteSet));
+        enemies.Add(new Enemy(this, position, "Monster" + monsterType));
 
         return new Tile(null, TileCollision.Passable);
     }
@@ -304,10 +307,10 @@ class Level : IDisposable
     /// <summary>
     /// Instantiates a gem and puts it in the level.
     /// </summary>
-    private Tile LoadGemTile(int x, int y)
+    private Tile LoadGemTile(int x, int y, char gemType)
     {
         Point position = GetBounds(x, y).Center;
-        gems.Add(new Gem(this, new Vector2(position.X, position.Y)));
+        gems.Add(new Gem(this, new Vector2(position.X, position.Y), gemType));
 
         return new Tile(null, TileCollision.Passable);
     }
@@ -466,7 +469,7 @@ class Level : IDisposable
     /// <param name="collectedBy">The player who collected this gem.</param>
     private void OnGemCollected(Gem gem, Player collectedBy)
     {
-        score += gem.PointValue;
+        score += gem.Value;
 
         gem.OnCollected(collectedBy);
     }

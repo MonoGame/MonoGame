@@ -25,8 +25,8 @@ class Gem
     private Vector2 origin;
     private SoundEffect collectedSound;
 
-    public readonly int PointValue = 30;
-    public readonly Color Color = Color.Yellow;
+    public int Value = 10;
+    public readonly Color Color = Color.Green;
 
     // The gem is animated from a base position along the Y axis.
     private Vector2 basePosition;
@@ -63,10 +63,28 @@ class Gem
     /// <summary>
     /// Constructs a new gem.
     /// </summary>
-    public Gem(Level level, Vector2 position)
+    public Gem(Level level, Vector2 position, char gemType)
     {
         this.level = level;
         this.basePosition = position;
+
+        switch (gemType)
+        {
+            case '1':
+                Value = 10;
+                Color = Color.Green;
+                break;
+
+            case '2':
+                Value = 30;
+                Color = Color.Yellow;
+                break;
+
+            case '3':
+                Value = 50;
+                Color = Color.Red;
+                break;
+        }
 
         LoadContent();
     }
