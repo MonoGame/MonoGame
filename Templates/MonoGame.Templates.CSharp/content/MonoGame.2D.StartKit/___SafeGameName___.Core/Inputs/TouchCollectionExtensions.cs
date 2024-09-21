@@ -11,7 +11,7 @@
 using Microsoft.Xna.Framework.Input.Touch;
 #endregion
 
-namespace ___SafeGameName___.Core;
+namespace ___SafeGameName___.Core.Inputs;
 
 /// <summary>
 /// Provides extension methods for the TouchCollection type.

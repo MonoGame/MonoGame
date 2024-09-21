@@ -12,7 +12,7 @@ using Microsoft.Xna.Framework;
 using System;
 #endregion
 
-namespace ___SafeGameName___.Core;
+namespace ___SafeGameName___.Core.Inputs;
 
 /// <summary>
 /// A static encapsulation of accelerometer input to provide games with a polling-based

@@ -9,7 +9,7 @@
 
 #region Using Statements
 using System;
-
+using ___SafeGameName___.Core.Inputs;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;

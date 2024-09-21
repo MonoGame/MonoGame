@@ -7,14 +7,13 @@
 
 #region Using Statements
 using System;
-
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Input.Touch;
 #endregion
 
-namespace ___SafeGameName___.Core;
+namespace ___SafeGameName___.Core.Inputs;
 
 class VirtualGamePad
 {
@@ -68,7 +67,7 @@ class VirtualGamePad
     {
         //Work out what buttons are pressed based on the touchState
         Buttons buttonsPressed = 0;
-        
+
         foreach (var touch in touchState)
         {
             if (touch.State == TouchLocationState.Moved || touch.State == TouchLocationState.Pressed)
@@ -88,28 +87,28 @@ class VirtualGamePad
 
         //Combine the buttons of the real gamepad
         var gpButtons = gpState.Buttons;
-        buttonsPressed |= (gpButtons.A == ButtonState.Pressed ? Buttons.A : 0);
-        buttonsPressed |= (gpButtons.B == ButtonState.Pressed ? Buttons.B : 0);
-        buttonsPressed |= (gpButtons.X == ButtonState.Pressed ? Buttons.X : 0);
-        buttonsPressed |= (gpButtons.Y == ButtonState.Pressed ? Buttons.Y : 0);
+        buttonsPressed |= gpButtons.A == ButtonState.Pressed ? Buttons.A : 0;
+        buttonsPressed |= gpButtons.B == ButtonState.Pressed ? Buttons.B : 0;
+        buttonsPressed |= gpButtons.X == ButtonState.Pressed ? Buttons.X : 0;
+        buttonsPressed |= gpButtons.Y == ButtonState.Pressed ? Buttons.Y : 0;
 
-        buttonsPressed |= (gpButtons.Start == ButtonState.Pressed ? Buttons.Start : 0);
-        buttonsPressed |= (gpButtons.Back == ButtonState.Pressed ? Buttons.Back : 0);
+        buttonsPressed |= gpButtons.Start == ButtonState.Pressed ? Buttons.Start : 0;
+        buttonsPressed |= gpButtons.Back == ButtonState.Pressed ? Buttons.Back : 0;
 
         buttonsPressed |= gpState.IsButtonDown(Buttons.DPadDown) ? Buttons.DPadDown : 0;
         buttonsPressed |= gpState.IsButtonDown(Buttons.DPadLeft) ? Buttons.DPadLeft : 0;
         buttonsPressed |= gpState.IsButtonDown(Buttons.DPadRight) ? Buttons.DPadRight : 0;
         buttonsPressed |= gpState.IsButtonDown(Buttons.DPadUp) ? Buttons.DPadUp : 0;
 
-        buttonsPressed |= (gpButtons.BigButton == ButtonState.Pressed ? Buttons.BigButton : 0);
-        buttonsPressed |= (gpButtons.LeftShoulder == ButtonState.Pressed ? Buttons.LeftShoulder : 0);
-        buttonsPressed |= (gpButtons.RightShoulder == ButtonState.Pressed ? Buttons.RightShoulder : 0);
+        buttonsPressed |= gpButtons.BigButton == ButtonState.Pressed ? Buttons.BigButton : 0;
+        buttonsPressed |= gpButtons.LeftShoulder == ButtonState.Pressed ? Buttons.LeftShoulder : 0;
+        buttonsPressed |= gpButtons.RightShoulder == ButtonState.Pressed ? Buttons.RightShoulder : 0;
 
-        buttonsPressed |= (gpButtons.LeftStick == ButtonState.Pressed ? Buttons.LeftStick : 0);
-        buttonsPressed |= (gpButtons.RightStick == ButtonState.Pressed ? Buttons.RightStick : 0);
+        buttonsPressed |= gpButtons.LeftStick == ButtonState.Pressed ? Buttons.LeftStick : 0;
+        buttonsPressed |= gpButtons.RightStick == ButtonState.Pressed ? Buttons.RightStick : 0;
 
         var buttons = new GamePadButtons(buttonsPressed);
-        
+
         return new GamePadState(gpState.ThumbSticks, gpState.Triggers, buttons, gpState.DPad);
     }
 }
