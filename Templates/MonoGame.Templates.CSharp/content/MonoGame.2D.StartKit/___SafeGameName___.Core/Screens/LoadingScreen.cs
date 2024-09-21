@@ -9,6 +9,8 @@
 
 #region Using Statements
 using System;
+using ___SafeGameName___.Core;
+using ___SafeGameName___.Core.Localization;
 using ___SafeGameName___.ScreenManagers;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -140,7 +142,7 @@ class LoadingScreen : GameScreen
             SpriteBatch spriteBatch = ScreenManager.SpriteBatch;
             SpriteFont font = ScreenManager.Font;
 
-            const string message = "Loading...";
+            string message = Resources.Loading;
 
             // Center the text in the viewport.
             Viewport viewport = ScreenManager.GraphicsDevice.Viewport;

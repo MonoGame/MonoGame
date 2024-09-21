@@ -8,6 +8,7 @@
 #endregion
 
 #region Using Statements
+using ___SafeGameName___.Core.Localization;
 using Microsoft.Xna.Framework;
 using System;
 #endregion
@@ -34,7 +35,7 @@ public static class Accelerometer
         // make sure we don't initialize the Accelerometer twice
         if (isInitialized)
         {
-            throw new InvalidOperationException("Initialize can only be called once");
+            throw new InvalidOperationException(Resources.ErrorAccelerometerInitializeOnce);
         }
 
         // remember that we are initialized
@@ -50,7 +51,7 @@ public static class Accelerometer
         // make sure we've initialized the Accelerometer before we try to get the state
         if (!isInitialized)
         {
-            throw new InvalidOperationException("You must Initialize before you can call GetState");
+            throw new InvalidOperationException(Resources.ErrorAccelerometerMustInitialize);
         }
 
         // create a new value for our state
@@ -93,6 +94,6 @@ public struct AccelerometerState
     /// <returns>A new string describing the state.</returns>
     public override string ToString()
     {
-        return string.Format("Acceleration: {0}, IsActive: {1}", Acceleration, IsActive);
+        return string.Format(Resources.ErrorAccelerometerToString, Acceleration, IsActive);
     }
 }

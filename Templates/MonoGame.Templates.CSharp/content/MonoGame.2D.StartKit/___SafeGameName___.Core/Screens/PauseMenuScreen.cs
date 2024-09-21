@@ -8,6 +8,8 @@
 #endregion
 
 #region Using Statements
+using ___SafeGameName___.Core;
+using ___SafeGameName___.Core.Localization;
 using Microsoft.Xna.Framework;
 #endregion
 
@@ -26,11 +28,11 @@ class PauseMenuScreen : MenuScreen
     /// Constructor.
     /// </summary>
     public PauseMenuScreen()
-        : base("Paused")
+        : base(Resources.Paused)
     {
         // Create our menu entries.
-        MenuEntry resumeGameMenuEntry = new MenuEntry("Resume Game");
-        MenuEntry quitGameMenuEntry = new MenuEntry("Quit Game");
+        MenuEntry resumeGameMenuEntry = new MenuEntry(Resources.Resume);
+        MenuEntry quitGameMenuEntry = new MenuEntry(Resources.Quit);
         
         // Hook up menu event handlers.
         resumeGameMenuEntry.Selected += OnCancel;
@@ -52,7 +54,7 @@ class PauseMenuScreen : MenuScreen
     /// </summary>
     void QuitGameMenuEntrySelected(object sender, PlayerIndexEventArgs e)
     {
-        const string message = "Are you sure you want to quit this game?";
+        string message = Resources.QuitQuestion;
 
         MessageBoxScreen confirmQuitMessageBox = new MessageBoxScreen(message);
 

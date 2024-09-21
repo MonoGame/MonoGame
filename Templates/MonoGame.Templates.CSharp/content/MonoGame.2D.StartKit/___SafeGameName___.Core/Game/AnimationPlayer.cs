@@ -9,6 +9,7 @@
 
 #region Using Statements
 using System;
+using ___SafeGameName___.Core.Localization;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 #endregion
@@ -72,7 +73,7 @@ struct AnimationPlayer
     public void Draw(GameTime gameTime, SpriteBatch spriteBatch, Vector2 position, SpriteEffects spriteEffects)
     {
         if (Animation == null)
-            throw new NotSupportedException("No animation is currently playing.");
+            throw new NotSupportedException(Resources.ErrorNoAnimation);
 
         // Process passing time.
         time += (float)gameTime.ElapsedGameTime.TotalSeconds;

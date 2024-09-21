@@ -8,6 +8,8 @@
 #endregion
 
 #region Using Statements
+using ___SafeGameName___.Core;
+using ___SafeGameName___.Core.Localization;
 using ___SafeGameName___.ScreenManagers;
 using Microsoft.Xna.Framework;
 #endregion
@@ -26,21 +28,24 @@ class MainMenuScreen : MenuScreen
     /// Constructor fills in the menu contents.
     /// </summary>
     public MainMenuScreen()
-        : base("Main Menu")
+        : base(Resources.MainMenu)
     {
         // Create our menu entries.
-        MenuEntry playGameMenuEntry = new MenuEntry("Play Game");
-        MenuEntry optionsMenuEntry = new MenuEntry("Options");
-        MenuEntry exitMenuEntry = new MenuEntry("Exit");
+        MenuEntry aboutMenuEntry = new MenuEntry(Resources.About);
+        MenuEntry playMenuEntry = new MenuEntry(Resources.Play);
+        MenuEntry optionsMenuEntry = new MenuEntry(Resources.Options);
+        MenuEntry exitMenuEntry = new MenuEntry(Resources.Exit);
 
         // Hook up menu event handlers.
-        playGameMenuEntry.Selected += PlayGameMenuEntrySelected;
+        playMenuEntry.Selected += PlayMenuEntrySelected;
         optionsMenuEntry.Selected += OptionsMenuEntrySelected;
+        aboutMenuEntry.Selected += AboutMenuEntrySelected;
         exitMenuEntry.Selected += OnCancel;
 
         // Add entries to the menu.
-        MenuEntries.Add(playGameMenuEntry);
+        MenuEntries.Add(playMenuEntry);
         MenuEntries.Add(optionsMenuEntry);
+        MenuEntries.Add(aboutMenuEntry);
         MenuEntries.Add(exitMenuEntry);
     }
 
@@ -53,7 +58,7 @@ class MainMenuScreen : MenuScreen
     /// <summary>
     /// Event handler for when the Play Game menu entry is selected.
     /// </summary>
-    void PlayGameMenuEntrySelected(object sender, PlayerIndexEventArgs e)
+    void PlayMenuEntrySelected(object sender, PlayerIndexEventArgs e)
     {
         LoadingScreen.Load(ScreenManager, true, e.PlayerIndex,
                            new GameplayScreen());
@@ -68,13 +73,21 @@ class MainMenuScreen : MenuScreen
         ScreenManager.AddScreen(new OptionsMenuScreen(), e.PlayerIndex);
     }
 
+    /// <summary>
+    /// Event handler for when the Options menu entry is selected.
+    /// </summary>
+    void AboutMenuEntrySelected(object sender, PlayerIndexEventArgs e)
+    {
+        //ScreenManager.AddScreen(new AboutMenuScreen(), e.PlayerIndex);
+    }
+
 
     /// <summary>
     /// When the user cancels the main menu, ask if they want to exit the sample.
     /// </summary>
     protected override void OnCancel(PlayerIndex playerIndex)
     {
-        const string message = "Are you sure you want to exit this sample?";
+        string message = Resources.ExitQuestion;
 
         MessageBoxScreen confirmExitMessageBox = new MessageBoxScreen(message);
 

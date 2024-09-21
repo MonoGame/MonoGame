@@ -30,6 +30,7 @@ abstract class MenuScreen : GameScreen
     List<MenuEntry> menuEntries = new List<MenuEntry>();
     int selectedEntry = 0;
     string menuTitle;
+    Color menuTitleColor = new Color(0, 0, 0); // default color is black. use new Color(192, 192, 192) for off white
 
     #endregion
 
@@ -228,7 +229,7 @@ abstract class MenuScreen : GameScreen
         // Draw the menu title centered on the screen
         Vector2 titlePosition = new Vector2(graphics.Viewport.Width / 2, 80);
         Vector2 titleOrigin = font.MeasureString(menuTitle) / 2;
-        Color titleColor = new Color(192, 192, 192) * TransitionAlpha;
+        Color titleColor = menuTitleColor * TransitionAlpha;
         float titleScale = 1.25f;
 
         titlePosition.Y -= transitionOffset * 100;

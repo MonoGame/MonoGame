@@ -15,6 +15,7 @@ using System.Reflection.Metadata;
 using System.Threading;
 using ___SafeGameName___.Core;
 using ___SafeGameName___.Core.Inputs;
+using ___SafeGameName___.Core.Localization;
 using ___SafeGameName___.Screens;
 using GameStateManagement.Inputs;
 using Microsoft.Xna.Framework;
@@ -53,7 +54,7 @@ class GameplayScreen : GameScreen
     private Texture2D diedOverlay;
 
     // Meta-level game state.
-    private int levelIndex = -1;
+    private int levelIndex = 0;
     private Level level;
     private bool wasContinuePressed;
 
@@ -73,7 +74,7 @@ class GameplayScreen : GameScreen
     // levels in our content are 0-based and that all numbers under this constant
     // have a level file present. This allows us to not need to check for the file
     // or handle exceptions, both of which can add unnecessary time to level loading.
-    private const int numberOfLevels = 3;
+    private const int numberOfLevels = 5;
     private const int textEdgeSpacing = 10;
 
     #endregion
@@ -154,7 +155,7 @@ class GameplayScreen : GameScreen
             level.Dispose();
 
         // Load the level.
-        string levelPath = string.Format("Content/Levels/{0}.txt", levelIndex);
+        string levelPath = string.Format("Content/Levels/{0:00}.txt", levelIndex);
         using (Stream fileStream = TitleContainer.OpenStream(levelPath))
             level = new Level(ScreenManager.Game.Services, fileStream, levelIndex);
     }
@@ -330,7 +331,7 @@ class GameplayScreen : GameScreen
 
         // Draw time remaining. Uses modulo division to cause blinking when the
         // player is running out of time.
-        string drawableString = "TIME: " + level.TimeRemaining.Minutes.ToString("00") + ":" + level.TimeRemaining.Seconds.ToString("00");
+        string drawableString = Resources.Time + level.TimeRemaining.Minutes.ToString("00") + ":" + level.TimeRemaining.Seconds.ToString("00");
         var timeDimensions = hudFont.MeasureString(drawableString);
         Color timeColor;
         if (level.TimeRemaining > WarningTime ||
@@ -346,7 +347,7 @@ class GameplayScreen : GameScreen
         DrawShadowedString(hudFont, drawableString, hudLocation + new Vector2(textEdgeSpacing, textEdgeSpacing), timeColor);
 
         // Draw score
-        drawableString = "SCORE: " + level.Score.ToString();
+        drawableString = Resources.Score + level.Score.ToString();
         var scoreDimensions = hudFont.MeasureString(drawableString);
         DrawShadowedString(hudFont, drawableString, hudLocation + new Vector2(hudLocation.X + backbufferWidth - scoreDimensions.X - textEdgeSpacing, textEdgeSpacing), Color.Yellow);
 

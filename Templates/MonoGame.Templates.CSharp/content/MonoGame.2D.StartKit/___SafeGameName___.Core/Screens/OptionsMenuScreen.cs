@@ -8,6 +8,8 @@
 #endregion
 
 #region Using Statements
+using ___SafeGameName___.Core;
+using ___SafeGameName___.Core.Localization;
 using Microsoft.Xna.Framework;
 #endregion
 
@@ -52,7 +54,7 @@ class OptionsMenuScreen : MenuScreen
     /// Constructor.
     /// </summary>
     public OptionsMenuScreen()
-        : base("Options")
+        : base(Resources.Options)
     {
         // Create our menu entries.
         ungulateMenuEntry = new MenuEntry(string.Empty);
@@ -62,7 +64,7 @@ class OptionsMenuScreen : MenuScreen
 
         SetMenuEntryText();
 
-        MenuEntry back = new MenuEntry("Back");
+        MenuEntry back = new MenuEntry(Resources.Back);
 
         // Hook up menu event handlers.
         ungulateMenuEntry.Selected += UngulateMenuEntrySelected;

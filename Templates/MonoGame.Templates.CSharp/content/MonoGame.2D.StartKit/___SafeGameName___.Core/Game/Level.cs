@@ -18,6 +18,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Audio;
 using ___SafeGameName___.Core.Inputs;
+using ___SafeGameName___.Core.Localization;
 #endregion
 
 namespace ___SafeGameName___.Core;
@@ -137,7 +138,7 @@ class Level : IDisposable
             {
                 lines.Add(line);
                 if (line.Length != width)
-                    throw new Exception(String.Format("The length of line {0} is different from all preceeding lines.", lines.Count));
+                    throw new Exception(String.Format(Resources.ErrorLevelLineLength, lines.Count));
                 line = reader.ReadLine();
             }
         }
@@ -158,9 +159,9 @@ class Level : IDisposable
 
         // Verify that the level has a beginning and an end.
         if (Player == null)
-            throw new NotSupportedException("A level must have a starting point.");
+            throw new NotSupportedException(Resources.ErrorLevelStartingPoint);
         if (exit == InvalidPosition)
-            throw new NotSupportedException("A level must have an exit.");
+            throw new NotSupportedException(Resources.ErrorLevelExit);
 
     }
 
@@ -229,7 +230,7 @@ class Level : IDisposable
 
             // Unknown tile type character
             default:
-                throw new NotSupportedException(String.Format("Unsupported tile type character '{0}' at position {1}, {2}.", tileType, x, y));
+                throw new NotSupportedException(String.Format(Resources.ErrorUnsupportedTileType, tileType, x, y));
         }
     }
 
@@ -273,7 +274,7 @@ class Level : IDisposable
     private Tile LoadStartTile(int x, int y)
     {
         if (Player != null)
-            throw new NotSupportedException("A level may only have one starting point.");
+            throw new NotSupportedException(Resources.ErrorLevelOneStartingPoint);
 
         start = RectangleExtensions.GetBottomCenter(GetBounds(x, y));
         player = new Player(this, start);
@@ -287,7 +288,7 @@ class Level : IDisposable
     private Tile LoadExitTile(int x, int y)
     {
         if (exit != InvalidPosition)
-            throw new NotSupportedException("A level may only have one exit.");
+            throw new NotSupportedException(Resources.ErrorLevelOneExit);
 
         exit = GetBounds(x, y).Center;
 

@@ -128,14 +128,23 @@
 /processorParam:TextureFormat=Compressed
 /build:Fonts/Hud.spritefont
 
-#begin Levels/0.txt
-/copy:Levels/0.txt
+#begin Levels/00.txt
+/copy:Levels/00.txt
 
-#begin Levels/1.txt
-/copy:Levels/1.txt
+#begin Levels/01.txt
+/copy:Levels/01.txt
 
-#begin Levels/2.txt
-/copy:Levels/2.txt
+#begin Levels/02.txt
+/copy:Levels/02.txt
+
+#begin Levels/03.txt
+/copy:Levels/03.txt
+
+#begin Levels/04.txt
+/copy:Levels/04.txt
+
+#begin Levels/05.txt
+/copy:Levels/05.txt
 
 #begin Overlays/you_died.png
 /importer:TextureImporter
