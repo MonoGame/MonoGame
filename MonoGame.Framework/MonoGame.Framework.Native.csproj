@@ -20,13 +20,18 @@
     <Compile Remove="Properties\**\*" />
     <Compile Remove="Utilities\System.Numerics.Vectors\**\*" />
     <Compile Include="Platform\Native\**\*" />
+    <Compile Include="Platform\Utilities\ReflectionHelpers.Default.cs" />	  
   </ItemGroup>
 
   <ItemGroup>
     <None Remove="Platform\**\*" />
     <None Remove="Utilities\System.Numerics.Vectors\**\*" />
   </ItemGroup>
-
+	
+  <!--
+        We leave this because we made it part of the public API, but the native
+        backend doesn't use it to load or save textures.
+  -->
   <ItemGroup>
     <Compile Include="..\ThirdParty\StbImageSharp\src\**\*.cs" LinkBase="Utilities\StbImageSharp" />
 	<Compile Include="..\ThirdParty\StbImageWriteSharp\src\**\*.cs" LinkBase="Utilities\StbImageWriteSharp" />
