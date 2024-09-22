@@ -2,10 +2,11 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
-using MonoGame.Interop;
-using System.Runtime.InteropServices;
 using System;
-using static Microsoft.Xna.Framework.Graphics.Texture2D;
+using System.Runtime.InteropServices;
+using MonoGame.Interop;
+using MonoGame.Framework.Utilities;
+
 
 namespace Microsoft.Xna.Framework.Graphics;
 
@@ -19,7 +20,7 @@ public partial class Texture3D : Texture
     private unsafe void PlatformSetData<T>(int level, int left, int top, int right, int bottom, int front, int back, T[] data, int startIndex, int elementCount)
     {
         var dataHandle = GCHandle.Alloc(data, GCHandleType.Pinned);
-        var elementSizeInByte = Marshal.SizeOf(typeof(T));
+        var elementSizeInByte = ReflectionHelpers.FastSizeOf<T>();
         var startBytes = startIndex * elementSizeInByte;
         var dataPtr = (IntPtr)(dataHandle.AddrOfPinnedObject().ToInt64() + startBytes);
 
@@ -47,7 +48,7 @@ public partial class Texture3D : Texture
     private unsafe void PlatformGetData<T>(int level, int left, int top, int right, int bottom, int front, int back, T[] data, int startIndex, int elementCount) where T : struct
     {
         var dataHandle = GCHandle.Alloc(data, GCHandleType.Pinned);
-        var elementSizeInByte = Marshal.SizeOf(typeof(T));
+        var elementSizeInByte = ReflectionHelpers.FastSizeOf<T>();
         var startBytes = startIndex * elementSizeInByte;
         var dataPtr = (IntPtr)(dataHandle.AddrOfPinnedObject().ToInt64() + startBytes);
 

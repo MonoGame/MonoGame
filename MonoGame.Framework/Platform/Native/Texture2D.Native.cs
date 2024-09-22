@@ -4,9 +4,11 @@
 
 using System;
 using System.IO;
-using System.Reflection.Emit;
 using System.Runtime.InteropServices;
 using MonoGame.Interop;
+using MonoGame.Framework.Utilities;
+
+
 namespace Microsoft.Xna.Framework.Graphics;
 
 public partial class Texture2D : Texture
@@ -40,7 +42,7 @@ public partial class Texture2D : Texture
     private void PlatformSetData<T>(int level, T[] data, int startIndex, int elementCount) where T : struct
     {
         var dataHandle = GCHandle.Alloc(data, GCHandleType.Pinned);
-        var elementSizeInByte = Marshal.SizeOf(typeof(T));
+        var elementSizeInByte = ReflectionHelpers.FastSizeOf<T>();
         var startBytes = startIndex * elementSizeInByte;
         var dataPtr = (IntPtr)(dataHandle.AddrOfPinnedObject().ToInt64() + startBytes);
 
@@ -67,7 +69,7 @@ public partial class Texture2D : Texture
     private void PlatformSetData<T>(int level, int arraySlice, Rectangle rect, T[] data, int startIndex, int elementCount) where T : struct
     {
         var dataHandle = GCHandle.Alloc(data, GCHandleType.Pinned);
-        var elementSizeInByte = Marshal.SizeOf(typeof(T));
+        var elementSizeInByte = ReflectionHelpers.FastSizeOf<T>();
         var startBytes = startIndex * elementSizeInByte;
         var dataPtr = (IntPtr)(dataHandle.AddrOfPinnedObject().ToInt64() + startBytes);
 
@@ -94,7 +96,7 @@ public partial class Texture2D : Texture
     private unsafe void PlatformGetData<T>(int level, int arraySlice, Rectangle rect, T[] data, int startIndex, int elementCount) where T : struct
     {
         var dataHandle = GCHandle.Alloc(data, GCHandleType.Pinned);
-        var elementSizeInByte = Marshal.SizeOf(typeof(T));
+        var elementSizeInByte = ReflectionHelpers.FastSizeOf<T>();
         var startBytes = startIndex * elementSizeInByte;
         var dataPtr = (IntPtr)(dataHandle.AddrOfPinnedObject().ToInt64() + startBytes);
 

@@ -5,7 +5,8 @@
 using System;
 using System.Runtime.InteropServices;
 using MonoGame.Interop;
-using static System.Net.Mime.MediaTypeNames;
+using MonoGame.Framework.Utilities;
+
 
 namespace Microsoft.Xna.Framework.Graphics;
 
@@ -22,7 +23,7 @@ public partial class TextureCube
     private unsafe void PlatformSetData<T>(CubeMapFace face, int level, Rectangle rect, T[] data, int startIndex, int elementCount)
     {
         var dataHandle = GCHandle.Alloc(data, GCHandleType.Pinned);
-        var elementSizeInByte = Marshal.SizeOf(typeof(T));
+        var elementSizeInByte = ReflectionHelpers.FastSizeOf<T>();
         var startBytes = startIndex * elementSizeInByte;
         var dataPtr = (IntPtr)(dataHandle.AddrOfPinnedObject().ToInt64() + startBytes);
 
@@ -49,7 +50,7 @@ public partial class TextureCube
     private unsafe void PlatformGetData<T>(CubeMapFace face, int level, Rectangle rect, T[] data, int startIndex, int elementCount) where T : struct
     {
         var dataHandle = GCHandle.Alloc(data, GCHandleType.Pinned);
-        var elementSizeInByte = Marshal.SizeOf(typeof(T));
+        var elementSizeInByte = ReflectionHelpers.FastSizeOf<T>();
         var startBytes = startIndex * elementSizeInByte;
         var dataPtr = (IntPtr)(dataHandle.AddrOfPinnedObject().ToInt64() + startBytes);
 

@@ -2,10 +2,10 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
-using MonoGame.Interop;
 using System;
 using System.Collections.Generic;
-using System.Runtime.InteropServices;
+using MonoGame.Interop;
+using MonoGame.Framework.Utilities;
 
 
 namespace Microsoft.Xna.Framework.Graphics;
@@ -327,8 +327,7 @@ public partial class GraphicsDevice
     {
         DynamicIndexBuffer buffer;
 
-        var indexType = typeof(T);
-        var indexSize = Marshal.SizeOf(indexType);
+        var indexSize = ReflectionHelpers.FastSizeOf<T>();
         var indexElementSize = indexSize == 2 ? IndexElementSize.SixteenBits : IndexElementSize.ThirtyTwoBits;
 
         var requiredIndexCount = Math.Max(indexCount, 6000);
