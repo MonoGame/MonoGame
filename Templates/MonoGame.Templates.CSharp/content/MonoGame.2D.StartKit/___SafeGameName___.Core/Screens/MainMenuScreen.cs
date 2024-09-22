@@ -78,7 +78,7 @@ class MainMenuScreen : MenuScreen
     /// </summary>
     void AboutMenuEntrySelected(object sender, PlayerIndexEventArgs e)
     {
-        //ScreenManager.AddScreen(new AboutMenuScreen(), e.PlayerIndex);
+        ScreenManager.AddScreen(new AboutScreen(), e.PlayerIndex);
     }
 
 

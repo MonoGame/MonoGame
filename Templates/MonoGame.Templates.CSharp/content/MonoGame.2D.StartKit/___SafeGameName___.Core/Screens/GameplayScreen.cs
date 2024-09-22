@@ -240,7 +240,7 @@ class GameplayScreen : GameScreen
 
         if (input.IsPauseGame(ControllingPlayer) || gamePadDisconnected)
         {
-            ScreenManager.AddScreen(new PauseMenuScreen(), ControllingPlayer);
+            ScreenManager.AddScreen(new PauseScreen(), ControllingPlayer);
         }
         else
         {

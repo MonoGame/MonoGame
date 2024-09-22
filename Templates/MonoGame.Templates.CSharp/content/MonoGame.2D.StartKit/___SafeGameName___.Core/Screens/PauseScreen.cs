@@ -19,7 +19,7 @@ namespace ___SafeGameName___.Screens;
 /// The pause menu comes up over the top of the game,
 /// giving the player options to resume or quit.
 /// </summary>
-class PauseMenuScreen : MenuScreen
+class PauseScreen : MenuScreen
 {
     #region Initialization
 
@@ -27,7 +27,7 @@ class PauseMenuScreen : MenuScreen
     /// <summary>
     /// Constructor.
     /// </summary>
-    public PauseMenuScreen()
+    public PauseScreen()
         : base(Resources.Paused)
     {
         // Create our menu entries.
