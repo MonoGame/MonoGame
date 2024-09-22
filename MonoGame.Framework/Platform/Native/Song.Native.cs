@@ -23,7 +23,8 @@ public sealed partial class Song : IEquatable<Song>, IDisposable
 
     private unsafe void PlatformDispose(bool disposing)
     {
-        _self.Free();
+        if (_self.IsAllocated)
+            _self.Free();
 
         if (_song != null)
         {
