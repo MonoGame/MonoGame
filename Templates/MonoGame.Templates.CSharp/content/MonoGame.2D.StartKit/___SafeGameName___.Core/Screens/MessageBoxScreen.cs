@@ -9,6 +9,7 @@
 
 #region Using Statements
 using System;
+using ___SafeGameName___.Core.Localization;
 using GameStateManagement.Inputs;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
@@ -55,8 +56,8 @@ class MessageBoxScreen : GameScreen
     /// </summary>
     public MessageBoxScreen(string message, bool includeUsageText)
     {
-        string usageText = $"{Environment.NewLine}OK = A button, Space, Enter{Environment.NewLine}Cancel = B button, Esc"; 
-        
+        string usageText = $"{Environment.NewLine}{Environment.NewLine}{Resources.YesButtonText}{Environment.NewLine}{Resources.NoButtonText}";
+
         if (includeUsageText)
             this.message = message + usageText;
         else
@@ -163,7 +164,6 @@ class MessageBoxScreen : GameScreen
 
         spriteBatch.End();
     }
-
 
     #endregion
 }

@@ -121,7 +121,7 @@
     <value>Play</value>
   </data>
   <data name="Options" xml:space="preserve">
-    <value>Options</value>
+    <value>Settings</value>
   </data>
   <data name="Exit" xml:space="preserve">
     <value>Exit</value>
@@ -188,5 +188,11 @@
   </data>
   <data name="About" xml:space="preserve">
     <value>About</value>
+  </data>
+  <data name="NoButtonText" xml:space="preserve">
+    <value>Yes = A button, Space, Enter</value>
+  </data>
+  <data name="YesButtonText" xml:space="preserve">
+    <value>No = B button, Esc</value>
   </data>
 </root>

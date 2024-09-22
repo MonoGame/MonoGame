@@ -121,7 +121,7 @@
     <value>Jouer</value>
   </data>
   <data name="Options" xml:space="preserve">
-    <value>Options</value>
+    <value>Paramètres</value>
   </data>
   <data name="Exit" xml:space="preserve">
     <value>Sortie</value>
@@ -188,5 +188,11 @@
   </data>
   <data name="About" xml:space="preserve">
     <value>À Propos</value>
+  </data>
+  <data name="NoButtonText" xml:space="preserve">
+    <value>Oui = A button, Space, Enter</value>
+  </data>
+  <data name="YesButtonText" xml:space="preserve">
+    <value>Non = B button, Esc</value>
   </data>
 </root>

@@ -205,7 +205,16 @@ namespace ___SafeGameName___.Core.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Options.
+        ///   Looks up a localized string similar to Yes = A button, Space, Enter.
+        /// </summary>
+        internal static string NoButtonText {
+            get {
+                return ResourceManager.GetString("NoButtonText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Settings.
         /// </summary>
         internal static string Options {
             get {
@@ -273,6 +282,15 @@ namespace ___SafeGameName___.Core.Localization {
         internal static string Time {
             get {
                 return ResourceManager.GetString("Time", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to No = B button, Esc.
+        /// </summary>
+        internal static string YesButtonText {
+            get {
+                return ResourceManager.GetString("YesButtonText", resourceCulture);
             }
         }
     }
