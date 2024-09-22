@@ -184,6 +184,11 @@ class Player
     {
         GetInput(keyboardState, gamePadState, accelState, orientation);
 
+        Move(gameTime);
+    }
+
+    public void Move(GameTime gameTime)
+    {
         ApplyPhysics(gameTime);
 
         if (IsAlive && IsOnGround)
