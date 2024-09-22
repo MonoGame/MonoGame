@@ -15,6 +15,7 @@ public partial class DepthStencilState
         {
             MGG_DepthStencilState_Info info;
             info.depthBufferEnable = DepthBufferEnable;
+            info.depthBufferWriteEnable = DepthBufferWriteEnable;
             info.depthBufferFunction = DepthBufferFunction;
             info.referenceStencil = ReferenceStencil;
             info.stencilEnable = StencilEnable;
