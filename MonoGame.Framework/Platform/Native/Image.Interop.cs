@@ -13,7 +13,7 @@ namespace MonoGame.Interop;
 /// </summary>
 internal static unsafe partial class MGI
 {
-    [LibraryImport("monogame", EntryPoint = "MGI_ReadRGBA", StringMarshalling = StringMarshalling.Utf8)]
+    [LibraryImport(MGP.MonoGameNativeDLL, EntryPoint = "MGI_ReadRGBA", StringMarshalling = StringMarshalling.Utf8)]
     public static partial void ReadRGBA(
         byte* data,
         int dataBytes,
@@ -21,7 +21,7 @@ internal static unsafe partial class MGI
         out int height,
         out byte* rgba);
 
-    [LibraryImport("monogame", EntryPoint = "MGI_WriteJpg", StringMarshalling = StringMarshalling.Utf8)]
+    [LibraryImport(MGP.MonoGameNativeDLL, EntryPoint = "MGI_WriteJpg", StringMarshalling = StringMarshalling.Utf8)]
     public static partial void WriteJpg(
         byte* data,
         int dataBytes,
@@ -31,7 +31,7 @@ internal static unsafe partial class MGI
         out byte* jpg,
         out int jpgBytes);
 
-    [LibraryImport("monogame", EntryPoint = "MGI_WritePng", StringMarshalling = StringMarshalling.Utf8)]
+    [LibraryImport(MGP.MonoGameNativeDLL, EntryPoint = "MGI_WritePng", StringMarshalling = StringMarshalling.Utf8)]
     public static partial void WritePng(
         byte* data,
         int dataBytes,
