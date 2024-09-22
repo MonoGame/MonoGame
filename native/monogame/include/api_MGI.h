@@ -13,6 +13,6 @@
 
 
 
-MG_EXPORT void MGI_ReadRGBA(mgbyte* data, mgint dataBytes, mgint& width, mgint& height, mgbyte*& rgba);
+MG_EXPORT void MGI_ReadRGBA(mgbyte* data, mgint dataBytes, mgbool zeroTransparentPixels, mgint& width, mgint& height, mgbyte*& rgba);
 MG_EXPORT void MGI_WriteJpg(mgbyte* data, mgint dataBytes, mgint width, mgint height, mgint quality, mgbyte*& jpg, mgint& jpgBytes);
 MG_EXPORT void MGI_WritePng(mgbyte* data, mgint dataBytes, mgint width, mgint height, mgbyte*& png, mgint& pngBytes);

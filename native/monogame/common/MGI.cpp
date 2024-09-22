@@ -22,23 +22,23 @@
 #include "stb_image_write.h"
 
 
-void MGI_ReadRGBA(mgbyte* data, mgint dataBytes, mgint* width, mgint* height, mgbyte** rgba)
+void MGI_ReadRGBA(mgbyte* data, mgint dataBytes, mgbool zeroTransparentPixels, mgint& width, mgint& height, mgbyte*& rgba)
 {
-	*width = 0;
-	*height = 0;
-	*rgba = nullptr;
+	width = 0;
+	height = 0;
+	rgba = nullptr;
 
 	int c, w, h;
 	auto image = stbi_load_from_memory(data, dataBytes, &w, &h, &c, 4);
 	if (image == nullptr)
 	{
-		*width = 0;
-		*height = 0;
+		width = 0;
+		height = 0;
 		return;
 	}
 
 	// If the original image before conversion had alpha...
-	if (c == 4)
+	if (zeroTransparentPixels && c == 4)
 	{
 		// XNA blacks out any pixels with an alpha of zero.
 		for (int i = 0; i < w * h; i += 4)
@@ -52,9 +52,9 @@ void MGI_ReadRGBA(mgbyte* data, mgint dataBytes, mgint* width, mgint* height, mg
 		}
 	}
 
-	*rgba = image;
-	*width = w;
-	*height = h;
+	rgba = image;
+	width = w;
+	height = h;
 }
 
 struct mem_image
@@ -92,26 +92,26 @@ static void mem_image_write(void* context, void* data, int size)
 	image->offset = offset;
 }
 
-void MGI_WriteJpg(mgbyte* data, mgint dataBytes, mgint width, mgint height, mgint quality, mgbyte** jpg, mgint* jpgBytes)
+void MGI_WriteJpg(mgbyte* data, mgint dataBytes, mgint width, mgint height, mgint quality, mgbyte*& jpg, mgint& jpgBytes)
 {
-	*jpg = nullptr;
-	*jpgBytes = 0;
+	jpg = nullptr;
+	jpgBytes = 0;
 
 	mem_image image;
 	stbi_write_jpg_to_func(mem_image_write, &image, width, height, 4, data, quality);
 
-	*jpg = (mgbyte*)realloc(image.data, image.offset);
-	*jpgBytes = image.dataBytes;
+	jpg = (mgbyte*)realloc(image.data, image.offset);
+	jpgBytes = image.dataBytes;
 }
 
-void MGI_WritePng(mgbyte* data, mgint dataBytes, mgint width, mgint height, mgbyte** png, mgint* pngBytes)
+void MGI_WritePng(mgbyte* data, mgint dataBytes, mgint width, mgint height, mgbyte*& png, mgint& pngBytes)
 {
-	*png = nullptr;
-	*pngBytes = 0;
+	png = nullptr;
+	pngBytes = 0;
 
 	mem_image image;
 	stbi_write_png_to_func(mem_image_write, &image, width, height, 4, data, 4);
 
-	*png = (mgbyte*)realloc(image.data, image.offset);
-	*pngBytes = image.dataBytes;
+	png = (mgbyte*)realloc(image.data, image.offset);
+	pngBytes = image.dataBytes;
 }

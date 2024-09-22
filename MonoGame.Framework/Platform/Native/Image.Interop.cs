@@ -17,6 +17,7 @@ internal static unsafe partial class MGI
     public static partial void ReadRGBA(
         byte* data,
         int dataBytes,
+        [MarshalAs(UnmanagedType.U1)] bool zeroTransparentPixels,
         out int width,
         out int height,
         out byte* rgba);
