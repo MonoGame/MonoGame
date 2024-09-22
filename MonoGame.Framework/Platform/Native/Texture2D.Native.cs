@@ -190,7 +190,6 @@ public partial class Texture2D : Texture
         // Do the processing.
         colorProcessor(bytes);
 
-        texture = new Texture2D(graphicsDevice, width, height);
         texture.SetData(bytes);
         return texture;
     }
