@@ -1,7 +1,7 @@
 
 namespace BuildScripts;
 
-[TaskName("Build ToolTests")]
+[TaskName("Build Tool Tests")]
 [IsDependentOn(typeof(BuildContentPipelineTask))]
 public sealed class BuildToolTestsTask : FrostingTask<BuildContext>
 {

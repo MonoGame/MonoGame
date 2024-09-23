@@ -23,22 +23,27 @@ public sealed class BuildToolsTask : FrostingTask<BuildContext> { }
 [IsDependentOn(typeof(BuildVSTemplatesTask))]
 public sealed class BuildTemplatesTask : FrostingTask<BuildContext> { }
 
-[TaskName("Build Tests")]
+[TaskName("Build All Tests")]
+[IsDependentOn(typeof(BuildTestsTask))]
 [IsDependentOn(typeof(BuildToolTestsTask))]
-public sealed class BuildTestsTask : FrostingTask<BuildContext> { }
+public sealed class BuildAllTestsTask : FrostingTask<BuildContext> { }
 
 
 [TaskName("Build All")]
 [IsDependentOn(typeof(BuildFrameworksTask))]
 [IsDependentOn(typeof(BuildToolsTask))]
 [IsDependentOn(typeof(BuildTemplatesTask))]
-[IsDependentOn(typeof(BuildTestsTask))]
+[IsDependentOn(typeof(BuildAllTestsTask))]
 public sealed class BuildAllTask : FrostingTask<BuildContext> { }
 
 [TaskName("Deploy")]
 [IsDependentOn(typeof(DeployNuGetsToGitHubTask))]
 [IsDependentOn(typeof(DeployNuGetsToNuGetOrgTask))]
 public sealed class DeployTask : FrostingTask<BuildContext> { }
+
+[TaskName("Test")]
+[IsDependentOn(typeof(DownloadTestArtifactsTask))]
+public sealed class TestTask : FrostingTask<BuildContext> {}
 
 [TaskName("Default")]
 [IsDependentOn(typeof(BuildAllTask))]

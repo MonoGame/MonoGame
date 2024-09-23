@@ -11,9 +11,7 @@ using NUnit.Framework;
 
 namespace MonoGame.Tests.ContentPipeline
 {
-#if MACOS && CI
-    [Ignore("Hanging on Mac in CI?")]
-#endif
+    [Category("Audio")]
     class AudioContentTests
     {
         [Test]

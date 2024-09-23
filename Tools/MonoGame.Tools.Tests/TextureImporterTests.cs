@@ -106,7 +106,7 @@ namespace MonoGame.Tests.ContentPipeline
         /// </summary>
         [Test]
 #if MACOS || LINUX
-        [Ignore("Does not work on Unix based systems. We need to get wine working on CI.")]
+        [Ignore("Does not work on Unix based systems. Its odd the test passes?")]
 #endif
         public void ImportImageWithBadContent( )
         {

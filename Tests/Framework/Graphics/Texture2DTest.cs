@@ -9,11 +9,14 @@ using NUnit.Framework;
 namespace MonoGame.Tests.Graphics
 {
     [TestFixture]
+    [NonParallelizable]
     class Texture2DTest : GraphicsDeviceTestFixtureBase
     {
+        [Test]
         [TestCase(1, 1)]
         [TestCase(8, 8)]
         [TestCase(31, 7)]
+        [RunOnUI]
         public void ShouldSetAndGetData(int width, int height)
         {
             var dataSize = width * height;
@@ -30,9 +33,11 @@ namespace MonoGame.Tests.Graphics
             texture2D.Dispose();
         }
 
+        [Test]
         [TestCase(1, 1)]
         [TestCase(8, 8)]
         [TestCase(31, 7)]
+        [RunOnUI]
         public void ShouldSetAndGetDataForLevel(int width, int height)
         {
             var texture2D = new Texture2D(gd, width, height, true, SurfaceFormat.Color);
@@ -56,6 +61,7 @@ namespace MonoGame.Tests.Graphics
         }
 
         [Test]
+        [RunOnUI]
         public void ShouldGetDataFromRectangle()
         {
             const int dataSize = 128 * 128;
@@ -80,10 +86,12 @@ namespace MonoGame.Tests.Graphics
         }
 		
 #if DIRECTX
+        [Test]
         [TestCase(SurfaceFormat.Color, false)]
         [TestCase(SurfaceFormat.Color, true)]
         [TestCase(SurfaceFormat.ColorSRgb, false)]
         [TestCase(SurfaceFormat.ColorSRgb, true)]
+        [RunOnUI]
         public void DrawWithSRgbFormats(SurfaceFormat textureFormat, bool sRgbSourceTexture)
         {
             PrepareFrameCapture();
@@ -134,12 +142,14 @@ namespace MonoGame.Tests.Graphics
 #endif
 
 #if !XNA
+        [Test]
         [TestCase(1, 1)]
         [TestCase(8, 8)]
         [TestCase(31, 7)]
 #if DESKTOPGL
         [Ignore("Not yet implemented in OpenGL")]
 #endif
+        [RunOnUI]
         public void ShouldSetAndGetDataForTextureArray(int width, int height)
         {
             const int arraySize = 4;
@@ -167,6 +177,7 @@ namespace MonoGame.Tests.Graphics
 
 #if DIRECTX
         [Test]
+        [RunOnUI]
         public void TextureArrayAsRenderTargetAndShaderResource()
         {
             PrepareFrameCapture();
@@ -223,6 +234,7 @@ namespace MonoGame.Tests.Graphics
 #endif
 
         [Test]
+        [RunOnUI]
         public void SetDataRowPitch()
         {
             PrepareFrameCapture();

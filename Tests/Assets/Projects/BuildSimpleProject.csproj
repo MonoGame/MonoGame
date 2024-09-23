@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
-  <Import Project="..\..\..\..\..\..\Tools\MonoGame.Content.Builder.Task\MonoGame.Content.Builder.Task.props" />
+  <Import Project="../../MonoGame.Content.Builder.Task.props" Condition="Exists('../../MonoGame.Content.Builder.Task.props')" />
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>net8.0</TargetFramework>
@@ -12,5 +12,5 @@
   <ItemGroup>
     <MonoGameContentReference Include="Content\Content.mgcb" />
   </ItemGroup>
-  <Import Project="..\..\..\..\..\..\Tools\MonoGame.Content.Builder.Task\MonoGame.Content.Builder.Task.targets" />
+  <Import Project="../../MonoGame.Content.Builder.Task.targets" Condition="Exists('../../MonoGame.Content.Builder.Task.targets')" />
 </Project>

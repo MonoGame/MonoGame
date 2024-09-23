@@ -10,9 +10,11 @@ using NUnit.Framework;
 namespace MonoGame.Tests.Graphics
 {
     [TestFixture]
+    [NonParallelizable]
     internal class GraphicsDeviceManagerTest
     {
         [Test]
+        [RunOnUI]
         public void DefaultParameterValidation()
         {
             var game = new Game();
@@ -37,6 +39,7 @@ namespace MonoGame.Tests.Graphics
         }
 
         [Test]
+        [RunOnUI]
         public void InitializeEventCount()
         {
             var game = new TestGameBase();
@@ -72,6 +75,7 @@ namespace MonoGame.Tests.Graphics
         }
 
         [Test]
+        [RunOnUI]
         public void DoNotModifyPresentationParametersDirectly()
         {
             var game = new TestGameBase();
@@ -93,6 +97,7 @@ namespace MonoGame.Tests.Graphics
         }
 
         [Test]
+        [RunOnUI]
         public void PreparingDeviceSettings()
         {
             var game = new TestGameBase();
@@ -131,6 +136,7 @@ namespace MonoGame.Tests.Graphics
         }
 
         [Test]
+        [RunOnUI]
         public void PreparingDeviceSettingsEventChangeGraphicsProfile()
         {
             var game = new TestGameBase();
@@ -169,6 +175,7 @@ namespace MonoGame.Tests.Graphics
         }
 
         [Test]
+        [RunOnUI]
         public void PreparingDeviceSettingsArgsPresentationParametersAreApplied()
         {
             var game = new TestGameBase();
@@ -202,6 +209,7 @@ namespace MonoGame.Tests.Graphics
         }
 
         [Test]
+        [RunOnUI]
         public void PreparingDeviceSettingsArgsThrowsWhenPPSetToNull()
         {
             var game = new TestGameBase();
@@ -222,6 +230,7 @@ namespace MonoGame.Tests.Graphics
         }
 
         [Test]
+        [RunOnUI]
         public void ApplyChangesReturnsWhenNoSetterCalled()
         {
             var game = new TestGameBase();
@@ -252,6 +261,7 @@ namespace MonoGame.Tests.Graphics
         }
 
         [Test]
+        [RunOnUI]
         public void ApplyChangesInvokesPreparingDeviceSettings()
         {
             var game = new TestGameBase();
@@ -277,6 +287,7 @@ namespace MonoGame.Tests.Graphics
         }
 
         [Test]
+        [RunOnUI]
         public void ApplyChangesResetsDevice()
         {
             var game = new TestGameBase();
@@ -296,6 +307,7 @@ namespace MonoGame.Tests.Graphics
         }
 
         [Test]
+        [RunOnUI]
         public void DeviceDisposingInvokedAfterDeviceDisposed()
         {
             var game = new TestGameBase();
@@ -326,6 +338,7 @@ namespace MonoGame.Tests.Graphics
     internal class GraphicsDeviceManagerFixtureTest : GraphicsDeviceTestFixtureBase
     {
         [Test]
+        [RunOnUI]
         public void ResettingDeviceTriggersResetEvents()
         {
             var resetCount = 0;
@@ -347,6 +360,7 @@ namespace MonoGame.Tests.Graphics
         }
         
         [Test]
+        [RunOnUI]
         public void NewDeviceDoesNotTriggerReset()
         {
             var resetCount = 0;
@@ -370,6 +384,7 @@ namespace MonoGame.Tests.Graphics
         }
 
         [Test]
+        [RunOnUI]
         public void ClientSizeChangedOnDeviceReset()
         {
             var count = 0;
@@ -396,6 +411,7 @@ namespace MonoGame.Tests.Graphics
 #if DESKTOPGL
         [Ignore("Expected 2 but got 3. Needs Investigating")]
 #endif
+        [RunOnUI]
         public void MultiSampleCountRoundsDown()
         {
             gdm.PreferMultiSampling = true;
@@ -412,11 +428,13 @@ namespace MonoGame.Tests.Graphics
 
         }
 
+        [Test]
         [TestCase(false)]
         [TestCase(true)]
 #if DESKTOPGL
         [Ignore("Expected not 1024 but got 1024. Needs Investigating")]
 #endif
+        [RunOnUI]
         public void MSAAEnabled(bool enabled)
         {
             gdm.PreferMultiSampling = enabled;
@@ -492,6 +510,7 @@ namespace MonoGame.Tests.Graphics
         }
 
         [Test]
+        [RunOnUI]
         public void UnsupportedMultiSampleCountDoesNotThrowException()
         {
             gdm.PreferMultiSampling = true;
@@ -513,6 +532,7 @@ namespace MonoGame.Tests.Graphics
 
 #if DIRECTX
         [Test]
+        [RunOnUI]
         public void TooHighMultiSampleCountClampedToMaxSupported()
         {
             var maxMultiSampleCount = gd.GraphicsCapabilities.MaxMultiSampleCount;
