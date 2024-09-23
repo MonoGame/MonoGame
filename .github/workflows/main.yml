@@ -75,7 +75,7 @@ jobs:
         run: dotnet run --project build/Build.csproj -- --target=Default
 
       - name: Test
-        run: dotnet test Tools/MonoGame.Tools.Tests/MonoGame.Tools.Tests.csproj --blame-hang-timeout 1m -c Release --filter="TestCategory!=Audio & TestCategory!=Effects"
+        run: dotnet test Tools/MonoGame.Tools.Tests/MonoGame.Tools.Tests.csproj --blame-hang-timeout 1m -c Release --filter="TestCategory!=Audio"
         env:
           DOTNET_ROOT: ${{github.workspace}}/dotnet64
           MGFXC_WINE_PATH: /home/runner/.winemonogame
@@ -83,7 +83,7 @@ jobs:
         if: runner.os == 'Linux'
 
       - name: Test
-        run: dotnet test Tools/MonoGame.Tools.Tests/MonoGame.Tools.Tests.csproj --blame-hang-timeout 1m -c Release --filter="TestCategory!=Audio & TestCategory!=Effects"
+        run: dotnet test Tools/MonoGame.Tools.Tests/MonoGame.Tools.Tests.csproj --blame-hang-timeout 1m -c Release --filter="TestCategory!=Audio"
         env:
           DOTNET_ROOT: ${{github.workspace}}/dotnet64
           MGFXC_WINE_PATH: /Users/runner/.winemonogame
