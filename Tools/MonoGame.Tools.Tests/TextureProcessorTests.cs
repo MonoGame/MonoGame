@@ -11,6 +11,7 @@ using MonoGame.Framework.Content;
 
 namespace MonoGame.Tests.ContentPipeline
 {
+    [TestFixture]
     class TextureProcessorTests
     {
         [Test]
@@ -297,7 +298,7 @@ namespace MonoGame.Tests.ContentPipeline
 
         [Test]
 #if WINDOWS
-        [Ignore("This one crashes on windows?")]
+        //[Ignore("This one crashes on windows?")]
 #endif
         public void CompressDefaultiOSOpaqueSquarePOT()
         {
