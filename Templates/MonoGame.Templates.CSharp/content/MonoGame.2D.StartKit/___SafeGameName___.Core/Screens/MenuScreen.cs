@@ -82,6 +82,14 @@ abstract class MenuScreen : GameScreen
 
             if (selectedEntry < 0)
                 selectedEntry = menuEntries.Count - 1;
+
+            while (!menuEntries[selectedEntry].Enabled)
+            {
+                selectedEntry--;
+
+                if (selectedEntry < 0)
+                    selectedEntry = menuEntries.Count - 1;
+            }
         }
 
         // Move to the next menu entry?
@@ -91,6 +99,8 @@ abstract class MenuScreen : GameScreen
 
             if (selectedEntry >= menuEntries.Count)
                 selectedEntry = 0;
+
+            SetNextEnabledMenu();
         }
 
         // Accept or cancel the menu? We pass in our ControllingPlayer, which may
@@ -107,6 +117,17 @@ abstract class MenuScreen : GameScreen
         else if (input.IsMenuCancel(ControllingPlayer, out playerIndex))
         {
             OnCancel(playerIndex);
+        }
+    }
+
+    private void SetNextEnabledMenu()
+    {
+        while (!menuEntries[selectedEntry].Enabled)
+        {
+            selectedEntry++;
+
+            if (selectedEntry >= menuEntries.Count)
+                selectedEntry = 0;
         }
     }
 
@@ -186,6 +207,8 @@ abstract class MenuScreen : GameScreen
                                                    bool coveredByOtherScreen)
     {
         base.Update(gameTime, otherScreenHasFocus, coveredByOtherScreen);
+
+        SetNextEnabledMenu();
 
         // Update each nested MenuEntry object.
         for (int i = 0; i < menuEntries.Count; i++)

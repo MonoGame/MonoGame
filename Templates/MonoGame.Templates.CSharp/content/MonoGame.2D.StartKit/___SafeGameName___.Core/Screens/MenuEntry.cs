@@ -44,6 +44,7 @@ class MenuEntry
     /// each frame in Update.
     /// </summary>
     Vector2 position;
+    private bool enabled;
 
     #endregion
 
@@ -69,6 +70,11 @@ class MenuEntry
         set { position = value; }
     }
 
+    public bool Enabled
+    {
+        get { return enabled; }
+        set { enabled = value; }
+    }
 
     #endregion
 
@@ -99,9 +105,10 @@ class MenuEntry
     /// <summary>
     /// Constructs a new menu entry with the specified text.
     /// </summary>
-    public MenuEntry(string text)
+    public MenuEntry(string text, bool enabled = true)
     {
         this.text = text;
+        this.enabled = enabled;
     }
 
 
@@ -115,12 +122,6 @@ class MenuEntry
     /// </summary>
     public virtual void Update(MenuScreen screen, bool isSelected, GameTime gameTime)
     {
-        // there is no such thing as a selected item on Windows Phone, so we always
-        // force isSelected to be false
-#if WINDOWS_PHONE
-        isSelected = false;
-#endif
-
         // When the menu selection changes, entries gradually fade between
         // their selected and deselected appearance, rather than instantly
         // popping to the new state.
@@ -138,14 +139,16 @@ class MenuEntry
     /// </summary>
     public virtual void Draw(MenuScreen screen, bool isSelected, GameTime gameTime)
     {
-        // there is no such thing as a selected item on Windows Phone, so we always
-        // force isSelected to be false
-#if WINDOWS_PHONE
-        isSelected = false;
-#endif
-
-        // Draw the selected entry in yellow, otherwise white.
-        Color color = isSelected ? Color.Yellow : Color.White;
+        Color color;
+        if (enabled)
+        {
+            // Draw the selected entry in yellow, otherwise white.
+            color = isSelected ? Color.Yellow : Color.White;
+        }
+        else
+        {
+            color = Color.Gray;
+        }
 
         // Pulsate the size of the selected menu entry.
         double time = gameTime.TotalGameTime.TotalSeconds;
