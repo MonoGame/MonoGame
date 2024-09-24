@@ -11,6 +11,7 @@
 using ___SafeGameName___.Core;
 using ___SafeGameName___.Core.Localization;
 using Microsoft.Xna.Framework;
+using System;
 #endregion
 
 namespace ___SafeGameName___.Screens;
@@ -24,26 +25,8 @@ class AboutScreen : MenuScreen
 {
     #region Fields
 
-    MenuEntry ungulateMenuEntry;
-    MenuEntry languageMenuEntry;
-    MenuEntry frobnicateMenuEntry;
-    MenuEntry elfMenuEntry;
-
-    enum Ungulate
-    {
-        BactrianCamel,
-        Dromedary,
-        Llama,
-    }
-
-    static Ungulate currentUngulate = Ungulate.Dromedary;
-
-    static string[] languages = { "C#", "French", "Deoxyribonucleic acid" };
-    static int currentLanguage = 0;
-
-    static bool frobnicate = true;
-
-    static int elf = 23;
+    MenuEntry builtWithMonoGameMenuEntry;
+    MenuEntry monoGameWebsiteMenuEntry;
 
     #endregion
 
@@ -57,94 +40,33 @@ class AboutScreen : MenuScreen
         : base(Resources.About)
     {
         // Create our menu entries.
-        ungulateMenuEntry = new MenuEntry(string.Empty);
-        languageMenuEntry = new MenuEntry(string.Empty);
-        frobnicateMenuEntry = new MenuEntry(string.Empty);
-        elfMenuEntry = new MenuEntry(string.Empty);
-
-        SetMenuEntryText();
-
+        builtWithMonoGameMenuEntry = new MenuEntry("#BuiltWithMonoGame", false);
+        monoGameWebsiteMenuEntry = new MenuEntry("MonoGame Site");
         MenuEntry back = new MenuEntry(Resources.Back);
 
         // Hook up menu event handlers.
-        ungulateMenuEntry.Selected += UngulateMenuEntrySelected;
-        languageMenuEntry.Selected += LanguageMenuEntrySelected;
-        frobnicateMenuEntry.Selected += FrobnicateMenuEntrySelected;
-        elfMenuEntry.Selected += ElfMenuEntrySelected;
+        monoGameWebsiteMenuEntry.Selected += MonoGameWebsiteMenuSelected;
         back.Selected += OnCancel;
         
         // Add entries to the menu.
-        MenuEntries.Add(ungulateMenuEntry);
-        MenuEntries.Add(languageMenuEntry);
-        MenuEntries.Add(frobnicateMenuEntry);
-        MenuEntries.Add(elfMenuEntry);
+        MenuEntries.Add(builtWithMonoGameMenuEntry);
+        MenuEntries.Add(monoGameWebsiteMenuEntry);
         MenuEntries.Add(back);
     }
-
-
-    /// <summary>
-    /// Fills in the latest values for the options screen menu text.
-    /// </summary>
-    void SetMenuEntryText()
-    {
-        ungulateMenuEntry.Text = "Preferred ungulate: " + currentUngulate;
-        languageMenuEntry.Text = "Language: " + languages[currentLanguage];
-        frobnicateMenuEntry.Text = "Frobnicate: " + (frobnicate ? "on" : "off");
-        elfMenuEntry.Text = "elf: " + elf;
-    }
-
 
     #endregion
 
     #region Handle Input
 
-
     /// <summary>
-    /// Event handler for when the Ungulate menu entry is selected.
+    /// Event handler for when the MonoGame Website menu entry is selected.
     /// </summary>
-    void UngulateMenuEntrySelected(object sender, PlayerIndexEventArgs e)
+    void MonoGameWebsiteMenuSelected(object sender, PlayerIndexEventArgs e)
     {
-        currentUngulate++;
-
-        if (currentUngulate > Ungulate.Llama)
-            currentUngulate = 0;
-
-        SetMenuEntryText();
+        // Launch defaut browser to the MonoGame website
+        // More tweaks required to make this work on all platforms :)
+        System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo("https://www.monogame.net/") { UseShellExecute = true });
     }
-
-
-    /// <summary>
-    /// Event handler for when the Language menu entry is selected.
-    /// </summary>
-    void LanguageMenuEntrySelected(object sender, PlayerIndexEventArgs e)
-    {
-        currentLanguage = (currentLanguage + 1) % languages.Length;
-
-        SetMenuEntryText();
-    }
-
-
-    /// <summary>
-    /// Event handler for when the Frobnicate menu entry is selected.
-    /// </summary>
-    void FrobnicateMenuEntrySelected(object sender, PlayerIndexEventArgs e)
-    {
-        frobnicate = !frobnicate;
-
-        SetMenuEntryText();
-    }
-
-
-    /// <summary>
-    /// Event handler for when the Elf menu entry is selected.
-    /// </summary>
-    void ElfMenuEntrySelected(object sender, PlayerIndexEventArgs e)
-    {
-        elf++;
-
-        SetMenuEntryText();
-    }
-
 
     #endregion
 }
