@@ -20,7 +20,7 @@ namespace ___SafeGameName___.Screens;
 /// screen, and gives the user a chance to configure the game
 /// in various hopefully useful ways.
 /// </summary>
-class OptionsMenuScreen : MenuScreen
+class SettingsScreen : MenuScreen
 {
     #region Fields
 
@@ -53,7 +53,7 @@ class OptionsMenuScreen : MenuScreen
     /// <summary>
     /// Constructor.
     /// </summary>
-    public OptionsMenuScreen()
+    public SettingsScreen()
         : base(Resources.Options)
     {
         // Create our menu entries.
