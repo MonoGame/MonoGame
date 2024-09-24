@@ -399,12 +399,7 @@ namespace MonoGame.Effect
                     {
                         var a = new ShaderData.Attribute();
 
-                        // TODO: These are unused at runtime under the
-                        // new native backends, we will remove them soon.               
-                        a.location = 0;
-                        a.name = null;
-
-                        var m = Regex.Match(a.name, @"(\D+)(\d+)?");
+                        var m = Regex.Match(input.name, @"(\D+)(\d+)?");
                         if (m.Groups[2].Success)
                             a.index = int.Parse(m.Groups[2].Value);
                         else
@@ -475,6 +470,11 @@ namespace MonoGame.Effect
                         }
 
                         offset += size;
+
+                        // TODO: These are unused at runtime under the
+                        // new native backends, we will remove them soon.               
+                        a.location = 0;
+                        a.name = string.Empty;
 
                         attributes.Add(a);
                     }
