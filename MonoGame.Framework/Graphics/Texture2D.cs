@@ -725,7 +725,7 @@ namespace Microsoft.Xna.Framework.Graphics
         /// </remarks>
         public static Texture2D FromStream(GraphicsDevice graphicsDevice, Stream stream)
         {
-            return FromStream(graphicsDevice, stream, null);
+            return FromStream(graphicsDevice, stream, DefaultColorProcessors.ZeroTransparentPixels);
         }
 
         /// <summary>

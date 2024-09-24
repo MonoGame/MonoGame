@@ -117,13 +117,12 @@ public partial class Texture2D : Texture
         dataHandle.Free();
     }
 
-    private static Texture2D PlatformFromStream(GraphicsDevice graphicsDevice, Stream stream)
-    {
-        return PlatformFromStream(graphicsDevice, stream, null);
-    }
-
     private static unsafe Texture2D PlatformFromStream(GraphicsDevice graphicsDevice, Stream stream, Action<byte[]> colorProcessor)
     {
+        // HACK: Clear the default zero action as we do this natively.
+        if (colorProcessor == DefaultColorProcessors.ZeroTransparentPixels)
+            colorProcessor = null;
+
         // Simply read it all into memory as it will be fast
         // for most cases and simplifies the native API.
 
