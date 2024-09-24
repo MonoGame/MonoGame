@@ -48,7 +48,7 @@ MG_EXPORT void MGG_GraphicsDevice_SetConstantBuffer(MGG_GraphicsDevice* device, 
 MG_EXPORT void MGG_GraphicsDevice_SetTexture(MGG_GraphicsDevice* device, MGShaderStage stage, mgint slot, MGG_Texture* texture);
 MG_EXPORT void MGG_GraphicsDevice_SetSamplerState(MGG_GraphicsDevice* device, MGShaderStage stage, mgint slot, MGG_SamplerState* state);
 MG_EXPORT void MGG_GraphicsDevice_SetIndexBuffer(MGG_GraphicsDevice* device, MGIndexElementSize size, MGG_Buffer* buffer);
-MG_EXPORT void MGG_GraphicsDevice_SetVertexBuffer(MGG_GraphicsDevice* device, mgint slot, MGG_Buffer* buffer, mgint strideInBytes, mgint vertexOffset);
+MG_EXPORT void MGG_GraphicsDevice_SetVertexBuffer(MGG_GraphicsDevice* device, mgint slot, MGG_Buffer* buffer, mgint vertexOffset);
 MG_EXPORT void MGG_GraphicsDevice_SetShader(MGG_GraphicsDevice* device, MGShaderStage stage, MGG_Shader* shader);
 MG_EXPORT void MGG_GraphicsDevice_SetInputLayout(MGG_GraphicsDevice* device, MGG_InputLayout* layout);
 MG_EXPORT void MGG_GraphicsDevice_Draw(MGG_GraphicsDevice* device, MGPrimitiveType primitiveType, mgint vertexStart, mgint vertexCount);
@@ -71,7 +71,7 @@ MG_EXPORT MGG_Texture* MGG_RenderTarget_Create(MGG_GraphicsDevice* device, MGTex
 MG_EXPORT void MGG_Texture_Destroy(MGG_GraphicsDevice* device, MGG_Texture* texture);
 MG_EXPORT void MGG_Texture_SetData(MGG_GraphicsDevice* device, MGG_Texture* texture, mgint level, mgint slice, mgint x, mgint y, mgint z, mgint width, mgint height, mgint depth, mgbyte* data, mgint dataBytes);
 MG_EXPORT void MGG_Texture_GetData(MGG_GraphicsDevice* device, MGG_Texture* texture, mgint level, mgint slice, mgint x, mgint y, mgint z, mgint width, mgint height, mgint depth, mgbyte* data, mgint dataBytes);
-MG_EXPORT MGG_InputLayout* MGG_InputLayout_Create(MGG_GraphicsDevice* device, MGG_Shader* vertexShader, MGG_InputElement* elements, mgint count);
+MG_EXPORT MGG_InputLayout* MGG_InputLayout_Create(MGG_GraphicsDevice* device, mgint* strides, mgint streamCount, MGG_InputElement* elements, mgint elementCount);
 MG_EXPORT void MGG_InputLayout_Destroy(MGG_GraphicsDevice* device, MGG_InputLayout* layout);
 MG_EXPORT MGG_Shader* MGG_Shader_Create(MGG_GraphicsDevice* device, MGShaderStage stage, mgbyte* bytecode, mgint sizeInBytes);
 MG_EXPORT void MGG_Shader_Destroy(MGG_GraphicsDevice* device, MGG_Shader* shader);

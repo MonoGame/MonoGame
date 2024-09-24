@@ -12,9 +12,10 @@ namespace Microsoft.Xna.Framework.Graphics;
 
 partial class VertexInputLayout
 {
-    public MGG_InputElement[] GenerateInputElements(VertexAttribute[] inputs)
+    public void GenerateInputElements(VertexAttribute[] inputs, out MGG_InputElement[] elements, out int[] strides)
     {
-        var list = new List<MGG_InputElement>();
+        elements = new MGG_InputElement[inputs.Length];
+        strides = new int[Count];
 
         var missingShaderInputs = false;
 
@@ -37,16 +38,18 @@ partial class VertexInputLayout
 
             for (int j = 0; j < Count; j++)
             {
-                var elements = VertexDeclarations[j].InternalVertexElements;
+                var declaration = VertexDeclarations[j];
+                var vertexElements = declaration.InternalVertexElements;
                 var instanceFrequencies = InstanceFrequencies[j];
                 
-                foreach (var vertexElement in elements)
+                foreach (var vertexElement in vertexElements)
                 {
                     if (vertexElement.VertexElementUsage == attr.usage &&
                         vertexElement.UsageIndex == attr.index)
                     {
                         found = true;
-                        list.Add(vertexElement.AsInputElement(j, instanceFrequencies));
+                        elements[i] = vertexElement.AsInputElement(j, instanceFrequencies);
+                        strides[j] = declaration.VertexStride;
                         break;
                     }
                 }
@@ -63,16 +66,13 @@ partial class VertexInputLayout
         {
             // TODO: This should reference the documentation for more information on this issue.
 
-            var elements = string.Join(",  ", inputs.Select((x) => x.ToShaderSemantic()));
             var message =   "An error occurred while preparing to draw.\n\n" +
                             "The set VertexDeclaration does not provide all the elements " +
                             "required by the current vertex shader:\n\n\t" +
-                            elements + "\n\n" +
+                            string.Join(",  ", inputs.Select((x) => x.ToShaderSemantic())) + "\n\n" +
                             "To fix the error change your VertexDeclaration or your Effect.";
 
             throw new InvalidOperationException(message);
         }
-
-        return list.ToArray();
     }
 }

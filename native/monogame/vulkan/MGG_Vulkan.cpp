@@ -176,7 +176,6 @@ struct MGG_GraphicsDevice
 
 	uint64_t vertexBuffersDirty = 0;
 	MGG_Buffer* vertexBuffers[8] = { 0 };
-	uint32_t vertexStrides[8] = { 0 };
 	uint32_t vertexOffsets[8] = { 0 };
 
 	MGG_Buffer* indexBuffer = nullptr;
@@ -289,8 +288,10 @@ struct MGG_Texture
 
 struct MGG_InputLayout
 {
-	VkVertexInputAttributeDescription* attributes;
-	mgint attributeCount;
+	VkVertexInputAttributeDescription* attributes = nullptr;
+	VkVertexInputBindingDescription* bindings = nullptr;
+	mgint streamCount = 0;
+	mgint attributeCount = 0;
 };
 
 struct MGVK_DescriptorInfo
@@ -1134,7 +1135,6 @@ MGG_GraphicsDevice* MGG_GraphicsDevice_Create(MGG_GraphicsSystem* system, MGG_Gr
 	memset(device->descriptorSets, 0, sizeof(device->descriptorSets));
 	memset(device->dynamicOffsets, 0, sizeof(device->dynamicOffsets));
 	memset(device->vertexBuffers, 0, sizeof(device->vertexBuffers));
-	memset(device->vertexStrides, 0, sizeof(device->vertexStrides));
 	memset(device->vertexOffsets, 0, sizeof(device->vertexOffsets));	
 	memset(device->uniforms, 0, sizeof(device->uniforms));
 	memset(device->textures, 0, sizeof(device->textures));
@@ -1957,7 +1957,7 @@ void MGG_GraphicsDevice_SetIndexBuffer(MGG_GraphicsDevice* device, MGIndexElemen
 	device->indexBufferSize = size;
 }
 
-void MGG_GraphicsDevice_SetVertexBuffer(MGG_GraphicsDevice* device, mgint slot, MGG_Buffer* buffer, mgint strideInBytes, mgint vertexOffset)
+void MGG_GraphicsDevice_SetVertexBuffer(MGG_GraphicsDevice* device, mgint slot, MGG_Buffer* buffer, mgint vertexOffset)
 {
 	assert(device != nullptr);
 	assert(buffer != nullptr);
@@ -1967,7 +1967,6 @@ void MGG_GraphicsDevice_SetVertexBuffer(MGG_GraphicsDevice* device, mgint slot, 
 	assert(vertexOffset == 0);
 
 	device->vertexBuffers[slot] = buffer;
-	device->vertexStrides[slot] = strideInBytes;
 	device->vertexOffsets[slot] = vertexOffset;
 	device->vertexBuffersDirty |= 1 << slot;
 }
@@ -2348,19 +2347,15 @@ static VkPipeline MGVK_CreatePipeline(MGG_GraphicsDevice* device)
 	pipelineInfo.pStages = stages;
 	pipelineInfo.layout = pstate.program->layout;
 
-	// TODO: Support multiple vertex buffers here!
-	VkVertexInputBindingDescription bindingDescription;
-	bindingDescription.binding = 0;
-	bindingDescription.stride = device->vertexStrides[0];
-	bindingDescription.inputRate = VK_VERTEX_INPUT_RATE_VERTEX;
 	VkPipelineVertexInputStateCreateInfo vertexInputInfo;
 	memset(&vertexInputInfo, 0, sizeof(vertexInputInfo));
 	vertexInputInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
-	vertexInputInfo.vertexBindingDescriptionCount = 1;
-	vertexInputInfo.pVertexBindingDescriptions = &bindingDescription;
+	vertexInputInfo.vertexBindingDescriptionCount = pstate.layout->streamCount;
+	vertexInputInfo.pVertexBindingDescriptions = pstate.layout->bindings;
 	vertexInputInfo.vertexAttributeDescriptionCount = pstate.layout->attributeCount;
 	vertexInputInfo.pVertexAttributeDescriptions = pstate.layout->attributes;
 	pipelineInfo.pVertexInputState = &vertexInputInfo;
+
 
 	VkPipelineInputAssemblyStateCreateInfo inputAssembly;
 	memset(&inputAssembly, 0, sizeof(inputAssembly));
@@ -3731,23 +3726,34 @@ void MGG_Texture_GetData(MGG_GraphicsDevice* device, MGG_Texture* texture, mgint
 		MGVK_BeginFrame(cmd);
 }
 
-MGG_InputLayout* MGG_InputLayout_Create(MGG_GraphicsDevice* device, MGG_Shader* vertexShader, MGG_InputElement* elements, mgint count)
+MGG_InputLayout* MGG_InputLayout_Create(
+	MGG_GraphicsDevice* device,
+	mgint* strides,
+	mgint streamCount,
+	MGG_InputElement* elements,
+	mgint elementCount
+	)
 {
 	assert(device != nullptr);
+	assert(streamCount >= 0);
+	assert(strides != nullptr);
 	assert(elements != nullptr);
-	assert(vertexShader != nullptr);
-	assert(count >= 0);
+	assert(elementCount >= 0);
 
 	auto layout = new MGG_InputLayout();
 
-	// TODO: Should vertexShader be used here for something?
-	// Maybe not for Vulkan.
+	layout->streamCount = streamCount;
+	auto bindings = layout->bindings = new VkVertexInputBindingDescription[streamCount];
+	for (int i = 0; i < streamCount; i++)
+	{
+		bindings[i].binding = i;
+		bindings[i].stride = strides[i];
+		bindings[i].inputRate = VK_VERTEX_INPUT_RATE_VERTEX; // Support instance rates.
+	}
 
-	layout->attributeCount = count;
-
-	auto attrs = layout->attributes = new VkVertexInputAttributeDescription[count];
-
-	for (int i = 0; i < count; i++)
+	layout->attributeCount = elementCount;
+	auto attrs = layout->attributes = new VkVertexInputAttributeDescription[elementCount];
+	for (int i = 0; i < elementCount; i++)
 	{
 		attrs[i].location = i;
 		attrs[i].binding = elements[i].VertexBufferSlot;
@@ -3768,6 +3774,7 @@ void MGG_InputLayout_Destroy(MGG_GraphicsDevice* device, MGG_InputLayout* layout
 
 	//remove_by_value(device->layouts, layout);
 
+	delete [] layout->bindings;
 	delete [] layout->attributes;
 	delete layout;
 }

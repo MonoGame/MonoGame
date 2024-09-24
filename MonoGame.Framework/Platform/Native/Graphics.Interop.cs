@@ -250,7 +250,7 @@ internal static unsafe partial class MGG
     public static partial void GraphicsDevice_SetIndexBuffer(MGG_GraphicsDevice* device, IndexElementSize size, MGG_Buffer* buffer);
 
     [LibraryImport(MGP.MonoGameNativeDLL, EntryPoint = "MGG_GraphicsDevice_SetVertexBuffer", StringMarshalling = StringMarshalling.Utf8)]
-    public static partial void GraphicsDevice_SetVertexBuffer(MGG_GraphicsDevice* device, int slot, MGG_Buffer* buffer, int strideInBytes, int vertexOffset);
+    public static partial void GraphicsDevice_SetVertexBuffer(MGG_GraphicsDevice* device, int slot, MGG_Buffer* buffer, int vertexOffset);
 
     [LibraryImport(MGP.MonoGameNativeDLL, EntryPoint = "MGG_GraphicsDevice_SetShader", StringMarshalling = StringMarshalling.Utf8)]
     public static partial void GraphicsDevice_SetShader(MGG_GraphicsDevice* device, ShaderStage stage, MGG_Shader* shader);
@@ -386,9 +386,11 @@ internal static unsafe partial class MGG
     [LibraryImport(MGP.MonoGameNativeDLL, EntryPoint = "MGG_InputLayout_Create", StringMarshalling = StringMarshalling.Utf8)]
     public static partial MGG_InputLayout* InputLayout_Create(
         MGG_GraphicsDevice* device,
-        MGG_Shader* vertexShader,
-        MGG_InputElement* elements,
-        int count);
+        int[] strides,
+        int streamCount,
+        MGG_InputElement[] elements,
+        int elementCount
+        );
 
     [LibraryImport(MGP.MonoGameNativeDLL, EntryPoint = "MGG_InputLayout_Destroy", StringMarshalling = StringMarshalling.Utf8)]
     public static partial void InputLayout_Destroy(MGG_GraphicsDevice* device, MGG_InputLayout* layout);

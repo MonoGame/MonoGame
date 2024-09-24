@@ -37,16 +37,14 @@ partial class Shader
         // vb bindings and this vertex shader.
 
         var vertexInputLayout = vertexBuffers.ToImmutable();
-        var inputElements = vertexInputLayout.GenerateInputElements(Attributes);
+        vertexInputLayout.GenerateInputElements(Attributes, out var inputElements, out var streamStrides);
 
-        fixed (MGG_InputElement* elements = inputElements)
-        {
-            inputLayout.Ptr = MGG.InputLayout_Create(
-                GraphicsDevice.Handle,
-                Handle,
-                elements,
-                inputElements.Length);
-        }
+        inputLayout.Ptr = MGG.InputLayout_Create(
+            GraphicsDevice.Handle,
+            streamStrides,
+            streamStrides.Length,
+            inputElements,
+            inputElements.Length);
 
         _cache.Add(vertexInputLayout, inputLayout);
 
