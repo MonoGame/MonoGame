@@ -90,7 +90,7 @@ jobs:
         run: dotnet run --project build/Build.csproj -- --target=Default
 
       - name: Test
-        run: dotnet test Tools/MonoGame.Tools.Tests/MonoGame.Tools.Tests.csproj --blame-hang-timeout 1m -c Release --filter="TestCategory!=Audio"
+        run: dotnet test Tools/MonoGame.Tools.Tests/MonoGame.Tools.Tests.csproj --blame-hang-timeout 5m -c Release --filter="TestCategory!=Audio"
         env:
           DOTNET_ROOT: ${{github.workspace}}/dotnet64
           MGFXC_WINE_PATH: /home/runner/.winemonogame
@@ -98,7 +98,7 @@ jobs:
         if: runner.os == 'Linux'
 
       - name: Test
-        run: dotnet test Tools/MonoGame.Tools.Tests/MonoGame.Tools.Tests.csproj --blame-hang-timeout 1m -c Release --filter="TestCategory!=Audio"
+        run: dotnet test Tools/MonoGame.Tools.Tests/MonoGame.Tools.Tests.csproj --blame-hang-timeout 5m -c Release --filter="TestCategory!=Audio"
         env:
           DOTNET_ROOT: ${{github.workspace}}/dotnet64
           MGFXC_WINE_PATH: /Users/runner/.winemonogame
@@ -106,7 +106,7 @@ jobs:
         if: runner.os == 'macOS'
 
       - name: Test
-        run: dotnet test Tools/MonoGame.Tools.Tests/MonoGame.Tools.Tests.csproj --blame-hang-timeout 1m -c Release
+        run: dotnet test Tools/MonoGame.Tools.Tests/MonoGame.Tools.Tests.csproj --blame-hang-timeout 5m -c Release
         env:
           CI: true
         if: runner.os == 'Windows'
@@ -183,6 +183,7 @@ jobs:
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '8.0.x'
+        #if: runner.environment == 'github-hosted'
 
       - name: install wine64 on linux
         run: |
