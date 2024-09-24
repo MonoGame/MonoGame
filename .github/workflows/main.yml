@@ -168,7 +168,7 @@ jobs:
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '8.0.x'
-        if: runner.environment == 'github-hosted'
+        #if: runner.environment == 'github-hosted'
 
       - name: install wine64 on linux
         run: |
