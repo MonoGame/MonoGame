@@ -197,7 +197,7 @@ namespace Microsoft.Xna.Framework.Audio
                 int frequency = DEFAULT_FREQUENCY;
                 int updateSize = DEFAULT_UPDATE_SIZE;
                 int updateBuffers = DEFAULT_UPDATE_BUFFER_COUNT;
-                if (Android.OS.Build.VERSION.SdkInt >= Android.OS.BuildVersionCodes.JellyBeanMr1)
+                if (OperatingSystem.IsAndroidVersionAtLeast(17))
                 {
                     Android.Util.Log.Debug("OAL", Game.Activity.PackageManager.HasSystemFeature(PackageManager.FeatureAudioLowLatency) ? "Supports low latency audio playback." : "Does not support low latency audio playback.");
 
@@ -214,7 +214,7 @@ namespace Microsoft.Xna.Framework.Audio
 
                     // If 4.4 or higher, then we don't need to double buffer on the application side.
                     // See http://stackoverflow.com/a/15006327
-                    if (Android.OS.Build.VERSION.SdkInt >= Android.OS.BuildVersionCodes.Kitkat)
+                    if (OperatingSystem.IsAndroidVersionAtLeast (19))
                     {
                         updateBuffers = 1;
                     }

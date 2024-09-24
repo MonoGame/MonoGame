@@ -11,6 +11,7 @@ using MonoGame.Framework.Content;
 
 namespace MonoGame.Tests.ContentPipeline
 {
+    [TestFixture]
     class TextureProcessorTests
     {
         [Test]

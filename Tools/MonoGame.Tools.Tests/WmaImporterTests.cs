@@ -9,6 +9,7 @@ using NUnit.Framework;
 
 namespace MonoGame.Tests.ContentPipeline
 {
+    [Category("Audio")]
     class WmaImporterTests
     {
         [Test]

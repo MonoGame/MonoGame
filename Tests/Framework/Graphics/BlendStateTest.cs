@@ -10,15 +10,18 @@ using NUnit.Framework;
 namespace MonoGame.Tests.Graphics
 {
     [TestFixture]
+    [NonParallelizable]
     internal class BlendStateTest : GraphicsDeviceTestFixtureBase
     {
         [Test]
+        [RunOnUI]
         public void ShouldNotBeAbleToSetNullBlendState()
         {
             Assert.Throws<ArgumentNullException>(() => game.GraphicsDevice.BlendState = null);
         }
 
         [Test]
+        [RunOnUI]
         public void ShouldNotBeAbleToMutateStateObjectAfterBindingToGraphicsDevice()
         {
             var blendState = new BlendState();
@@ -38,6 +41,7 @@ namespace MonoGame.Tests.Graphics
         }
 
         [Test]
+        [RunOnUI]
         public void ShouldNotBeAbleToMutateDefaultStateObjects()
         {
             DoAsserts(BlendState.Additive, d => Assert.Throws<InvalidOperationException>(d));
@@ -83,6 +87,7 @@ namespace MonoGame.Tests.Graphics
 #if DESKTOPGL
         [Ignore("Fails similarity test. Needs Investigating")]
 #endif
+        [RunOnUI]
         public void VisualTests()
         {
             var blends = new[]
