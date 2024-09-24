@@ -212,8 +212,11 @@ class GameplayScreen : GameScreen
             }
 
             // update our level, passing down the GameTime along with all of our input states
-            level.Update(gameTime, keyboardState, gamePadState,
-                         accelerometerState, ScreenManager.Game.Window.CurrentOrientation);
+            level.Update(gameTime,
+                keyboardState,
+                gamePadState,
+                accelerometerState,
+                ScreenManager.Game.Window.CurrentOrientation);
 
             if (level.Player.Velocity != Vector2.Zero)
                 virtualGamePad.NotifyPlayerIsMoving();

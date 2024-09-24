@@ -379,12 +379,18 @@ class Level : IDisposable
     /// Updates all objects in the world, performs collision between them,
     /// and handles the time limit with scoring.
     /// </summary>
+    /// <param name="gameTime">Provides a snapshot of timing values.</param>
+    /// <param name="keyboardState">Provides a snapshot of timing values.</param>
+    /// <param name="gamePadState">Provides a snapshot of timing values.</param>
+    /// <param name="accelerometerState">Provides a snapshot of timing values.</param>
+    /// <param name="displayOrientation">Provides a snapshot of timing values.</param>
     public void Update(
         GameTime gameTime, 
         KeyboardState keyboardState, 
         GamePadState gamePadState, 
-        AccelerometerState accelState,
-        DisplayOrientation orientation)
+        AccelerometerState accelerometerState,
+        DisplayOrientation displayOrientation,
+        bool readyToPlay = true)
     {
         // Pause while the player is dead or time is expired.
         if (!Player.IsAlive || TimeRemaining == TimeSpan.Zero)
@@ -402,24 +408,27 @@ class Level : IDisposable
         }
         else
         {
-            timeRemaining -= gameTime.ElapsedGameTime;
-            Player.Update(gameTime, keyboardState, gamePadState, accelState, orientation);
-            UpdateGems(gameTime);
-
-            // Falling off the bottom of the level kills the player.
-            if (Player.BoundingRectangle.Top >= Height * Tile.Height)
-                OnPlayerKilled(null);
-
-            UpdateEnemies(gameTime);
-
-            // The player has reached the exit if they are standing on the ground and
-            // his bounding rectangle contains the center of the exit tile. They can only
-            // exit when they have collected all of the gems.
-            if (Player.IsAlive &&
-                Player.IsOnGround &&
-                Player.BoundingRectangle.Contains(exit))
+            if (readyToPlay)
             {
-                OnExitReached();
+                timeRemaining -= gameTime.ElapsedGameTime;
+                Player.Update(gameTime, keyboardState, gamePadState, accelerometerState, displayOrientation);
+                UpdateGems(gameTime);
+
+                // Falling off the bottom of the level kills the player.
+                if (Player.BoundingRectangle.Top >= Height * Tile.Height)
+                    OnPlayerKilled(null);
+
+                UpdateEnemies(gameTime);
+
+                // The player has reached the exit if they are standing on the ground and
+                // his bounding rectangle contains the center of the exit tile. They can only
+                // exit when they have collected all of the gems.
+                if (Player.IsAlive &&
+                    Player.IsOnGround &&
+                    Player.BoundingRectangle.Contains(exit))
+                {
+                    OnExitReached();
+                }
             }
         }
 

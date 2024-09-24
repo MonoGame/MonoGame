@@ -8,12 +8,12 @@
 #endregion
 
 #region Using Statements
-using System;
 using ___SafeGameName___.Core.Inputs;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using System;
 #endregion
 
 namespace ___SafeGameName___.Core;
@@ -77,7 +77,7 @@ class Player
     private const float JumpLaunchVelocity = -3500.0f;
     private const float GravityAcceleration = 3400.0f;
     private const float MaxFallSpeed = 550.0f;
-    private const float JumpControlPower = 0.14f; 
+    private const float JumpControlPower = 0.14f;
 
     // Input configuration
     private const float MoveStickScale = 1.0f;
@@ -97,9 +97,32 @@ class Player
     /// Current user movement input.
     /// </summary>
     private float movement;
+    public float Movement
+    {
+        get
+        {
+            return movement;
+        }
+        set
+        {
+            movement = value;
+        }
+    }
 
     // Jumping state
     private bool isJumping;
+    public bool IsJumping
+    {
+        get
+        {
+            return isJumping;
+        }
+        set
+        {
+            isJumping = value;
+        }
+    }
+
     private bool wasJumping;
     private float jumpTime;
 
@@ -175,14 +198,19 @@ class Player
     /// once per frame. We also pass the game's orientation because when using the accelerometer,
     /// we need to reverse our motion when the orientation is in the LandscapeRight orientation.
     /// </remarks>
+    /// <param name="gameTime">Provides a snapshot of timing values.</param>
+    /// <param name="keyboardState">Provides a snapshot of timing values.</param>
+    /// <param name="gamePadState">Provides a snapshot of timing values.</param>
+    /// <param name="accelerometerState">Provides a snapshot of timing values.</param>
+    /// <param name="displayOrientation">Provides a snapshot of timin
     public void Update(
-        GameTime gameTime, 
-        KeyboardState keyboardState, 
-        GamePadState gamePadState, 
-        AccelerometerState accelState,
-        DisplayOrientation orientation)
+        GameTime gameTime,
+        KeyboardState keyboardState,
+        GamePadState gamePadState,
+        AccelerometerState accelerometerState,
+        DisplayOrientation displayOrientation)
     {
-        GetInput(keyboardState, gamePadState, accelState, orientation);
+        GetInput(keyboardState, gamePadState, accelerometerState, displayOrientation);
 
         Move(gameTime);
     }
@@ -211,11 +239,15 @@ class Player
     /// <summary>
     /// Gets player horizontal movement and jump commands from input.
     /// </summary>
+    /// <param name="keyboardState">Provides a snapshot of timing values.</param>
+    /// <param name="gamePadState">Provides a snapshot of timing values.</param>
+    /// <param name="accelerometerState">Provides a snapshot of timing values.</param>
+    /// <param name="displayOrientation">Provides a snapshot of timing values.</param>
     private void GetInput(
-        KeyboardState keyboardState, 
+        KeyboardState keyboardState,
         GamePadState gamePadState,
-        AccelerometerState accelState, 
-        DisplayOrientation orientation)
+        AccelerometerState accelerometerState,
+        DisplayOrientation displayOrientation)
     {
         // Get analog horizontal movement.
         movement = gamePadState.ThumbSticks.Left.X * MoveStickScale;
@@ -225,13 +257,13 @@ class Player
             movement = 0.0f;
 
         // Move the player with accelerometer
-        if (Math.Abs(accelState.Acceleration.Y) > 0.10f)
+        if (Math.Abs(accelerometerState.Acceleration.Y) > 0.10f)
         {
             // set our movement speed
-            movement = MathHelper.Clamp(-accelState.Acceleration.Y * AccelerometerScale, -1f, 1f);
+            movement = MathHelper.Clamp(-accelerometerState.Acceleration.Y * AccelerometerScale, -1f, 1f);
 
             // if we're in the LandscapeLeft orientation, we must reverse our movement
-            if (orientation == DisplayOrientation.LandscapeRight)
+            if (displayOrientation == DisplayOrientation.LandscapeRight)
                 movement = -movement;
         }
 
