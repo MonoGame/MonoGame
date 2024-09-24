@@ -58,6 +58,12 @@ class StructWritter
 
     public bool TryAppend(Type type)
     {
+        if (type.ToString().Contains("MGG_InputElement"))
+            type = type;
+
+        if (type.IsArray)
+            type = type.GetElementType();
+
         if (type.IsPointer || type.IsByRef)
         {
             type = type.GetElementType();
