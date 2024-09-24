@@ -28,12 +28,16 @@ partial class Shader
 
     internal unsafe MGG_InputLayout* GetOrCreateLayout(VertexBufferBindings vertexBuffers)
     {
+        // First check the cache.
         PtrTo<MGG_InputLayout> inputLayout;
         if (_cache.TryGetValue(vertexBuffers, out inputLayout))
             return inputLayout.Ptr;
 
+        // Generate and cache a new layout based on the current
+        // vb bindings and this vertex shader.
+
         var vertexInputLayout = vertexBuffers.ToImmutable();
-        var inputElements = vertexInputLayout.GetInputElements();
+        var inputElements = vertexInputLayout.GenerateInputElements(Attributes);
 
         fixed (MGG_InputElement* elements = inputElements)
         {

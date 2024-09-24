@@ -3750,7 +3750,7 @@ MGG_InputLayout* MGG_InputLayout_Create(MGG_GraphicsDevice* device, MGG_Shader* 
 	for (int i = 0; i < count; i++)
 	{
 		attrs[i].location = i;
-		attrs[i].binding = 0; // TODO: multiple vertex streams
+		attrs[i].binding = elements[i].VertexBufferSlot;
 		attrs[i].format = ToVkFormat(elements[i].Format);
 		attrs[i].offset = elements[i].AlignedByteOffset;
 	}

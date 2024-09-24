@@ -398,13 +398,18 @@ namespace MonoGame.Effect
                     foreach (var input in sorted)
                     {
                         var a = new ShaderData.Attribute();
-                        a.name = input.name;
-                        a.index = 0;
-                        a.location = offset;
+
+                        // TODO: These are unused at runtime under the
+                        // new native backends, we will remove them soon.               
+                        a.location = 0;
+                        a.name = null;
 
                         var m = Regex.Match(a.name, @"(\D+)(\d+)?");
                         if (m.Groups[2].Success)
                             a.index = int.Parse(m.Groups[2].Value);
+                        else
+                            a.index = 0;
+
                         if (m.Groups[1].Success)
                         {
                             switch (m.Groups[1].Value.ToUpper())

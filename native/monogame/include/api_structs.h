@@ -149,10 +149,8 @@ struct MGG_SamplerState_Info
 
 struct MGG_InputElement
 {
-    void* SemanticName;
-    mguint SemanticIndex;
+    mguint VertexBufferSlot;
     MGVertexElementFormat Format;
-    mguint InputSlot;
     mguint AlignedByteOffset;
     mguint InstanceDataStepRate;
 };
