@@ -131,7 +131,7 @@ namespace Microsoft.Xna.Framework.Graphics
         /// </exception>
         public void SetData<T>(T[] data, int startIndex, int elementCount, SetDataOptions options) where T : struct
         {
-            var elementSizeInBytes = ReflectionHelpers.SizeOf<T>.Get();
+            var elementSizeInBytes = ReflectionHelpers.FastSizeOf<T>();
             base.SetDataInternal<T>(0, data, startIndex, elementCount, elementSizeInBytes, options);
         }
     }

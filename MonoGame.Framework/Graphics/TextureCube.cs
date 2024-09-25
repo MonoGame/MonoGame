@@ -312,7 +312,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 throw new ArgumentException("Rectangle must be inside the texture bounds", "rect");
             if (data == null)
                 throw new ArgumentNullException("data");
-            var tSize = ReflectionHelpers.SizeOf<T>.Get();
+            var tSize = ReflectionHelpers.FastSizeOf<T>();
             var fSize = Format.GetSize();
             if (tSize > fSize || fSize % tSize != 0)
                 throw new ArgumentException("Type T is of an invalid size for the format of this texture.", "T");

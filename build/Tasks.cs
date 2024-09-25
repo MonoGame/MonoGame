@@ -2,8 +2,8 @@
 namespace BuildScripts;
 
 [TaskName("Build Frameworks")]
-[IsDependentOn(typeof(BuildConsoleCheckTask))]
 [IsDependentOn(typeof(BuildNativeTask))]
+[IsDependentOn(typeof(BuildDesktopVKTask))]
 [IsDependentOn(typeof(BuildDesktopGLTask))]
 [IsDependentOn(typeof(BuildWindowsDXTask))]
 [IsDependentOn(typeof(BuildAndroidTask))]

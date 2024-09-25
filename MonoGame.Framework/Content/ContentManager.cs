@@ -49,6 +49,7 @@ namespace Microsoft.Xna.Framework.Content
             'O', // XboxOne
             'S', // Nintendo Switch
             'b', // WebAssembly and Bridge.NET
+            'V', // DesktopVK
 
             // NOTE: There are additional identifiers for consoles that
             // are not defined in this repository.  Be sure to ask the

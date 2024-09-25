@@ -5,6 +5,17 @@
     "version": "0.2.0",
     "configurations": [
         {
+            "name": "Generator: CTypes",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "generator-ctypes",
+            "program": "${workspaceFolder}/Tools/MonoGame.Generator.CTypes/bin/Debug/net8.0/MonoGame.Generator.CTypes",
+            "args": [],
+            "cwd": "${workspaceFolder}/Tools/MonoGame.Generator.CTypes/bin/Debug/net8.0",
+            "console": "internalConsole",
+            "stopAtEntry": false
+        },
+        {
             "name": "MGCB Editor (Mac)",
             "type": "coreclr",
             "request": "launch",

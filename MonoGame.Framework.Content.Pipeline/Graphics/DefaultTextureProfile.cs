@@ -15,6 +15,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
         {
             return  platform == TargetPlatform.Android ||
                     platform == TargetPlatform.DesktopGL ||
+                    platform == TargetPlatform.DesktopVK ||
                     platform == TargetPlatform.MacOSX ||
                     platform == TargetPlatform.NativeClient ||
                     platform == TargetPlatform.RaspberryPi ||
@@ -64,6 +65,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
                 }
                 else if (platform == TargetPlatform.Windows ||
                             platform == TargetPlatform.DesktopGL ||
+                            platform == TargetPlatform.DesktopVK ||
                             platform == TargetPlatform.MacOSX ||
                             platform == TargetPlatform.NativeClient ||
                             platform == TargetPlatform.Web)

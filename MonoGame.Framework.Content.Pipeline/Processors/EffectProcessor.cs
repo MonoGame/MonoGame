@@ -95,6 +95,8 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
                 case TargetPlatform.RaspberryPi:
                 case TargetPlatform.Web:
                     return "OpenGL";
+                case TargetPlatform.DesktopVK:
+                    return "Vulkan";
             }
 
             return platform.ToString();

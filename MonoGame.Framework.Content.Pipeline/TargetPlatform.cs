@@ -85,7 +85,12 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
         /// <summary>
         /// WebAssembly and Bridge.NET
         /// </summary>
-        Web
+        Web,
+
+        /// <summary>
+        /// All desktop versions using Vulkan.
+        /// </summary>
+        DesktopVK,
     }
 
 
