@@ -114,6 +114,13 @@ public class BuildContext : FrostingContext
             Configuration = buildConfiguration,
             SelfContained = false
         };
+        // SelfContained needs to be default for MacOS
+        DotNetPublishSettingsForMac = new DotNetPublishSettings
+        {
+            MSBuildSettings = DotNetMSBuildSettings,
+            Verbosity = DotNetVerbosity.Minimal,
+            Configuration = buildConfiguration
+        };
 
         Console.WriteLine($"Version: {Version}");
         Console.WriteLine($"RepositoryUrl: {repositoryUrl}");
@@ -141,6 +148,8 @@ public class BuildContext : FrostingContext
     public DotNetPackSettings DotNetPackSettings { get; }
 
     public DotNetPublishSettings DotNetPublishSettings { get; }
+
+    public DotNetPublishSettings DotNetPublishSettingsForMac { get; }
 
     public MSBuildSettings MSBuildSettings { get; }
 
