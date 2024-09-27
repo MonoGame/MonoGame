@@ -11,7 +11,7 @@ with.
     <!--
     Modify this string to change the font that will be imported.
     -->
-    <FontName>Arial Bold</FontName>
+    <FontName>Tahoma</FontName>
 
     <!--
     Size is a float value, measured in points. Modify this value to change
@@ -53,7 +53,7 @@ with.
     <CharacterRegions>
       <CharacterRegion>
         <Start>&#32;</Start>
-        <End>&#126;</End>
+        <End>&#255;</End>
       </CharacterRegion>
     </CharacterRegions>
   </Asset>
