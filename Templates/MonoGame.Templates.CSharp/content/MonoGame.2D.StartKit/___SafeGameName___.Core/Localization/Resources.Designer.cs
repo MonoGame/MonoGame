@@ -79,6 +79,15 @@ namespace ___SafeGameName___.Core.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Display Mode : {0}.
+        /// </summary>
+        internal static string DisplayMode {
+            get {
+                return ResourceManager.GetString("DisplayMode", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Initialize can only be called once.
         /// </summary>
         internal static string ErrorAccelerometerInitializeOnce {
@@ -187,6 +196,24 @@ namespace ___SafeGameName___.Core.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Fullscreen.
+        /// </summary>
+        internal static string FullScreen {
+            get {
+                return ResourceManager.GetString("FullScreen", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Language: .
+        /// </summary>
+        internal static string Language {
+            get {
+                return ResourceManager.GetString("Language", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Loading....
         /// </summary>
         internal static string Loading {
@@ -205,20 +232,11 @@ namespace ___SafeGameName___.Core.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Yes = A button, Space, Enter.
+        ///   Looks up a localized string similar to No = B button, Esc.
         /// </summary>
         internal static string NoButtonText {
             get {
                 return ResourceManager.GetString("NoButtonText", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Settings.
-        /// </summary>
-        internal static string Options {
-            get {
-                return ResourceManager.GetString("Options", resourceCulture);
             }
         }
         
@@ -277,6 +295,15 @@ namespace ___SafeGameName___.Core.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Settings.
+        /// </summary>
+        internal static string Settings {
+            get {
+                return ResourceManager.GetString("Settings", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to TIME: .
         /// </summary>
         internal static string Time {
@@ -286,7 +313,16 @@ namespace ___SafeGameName___.Core.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to No = B button, Esc.
+        ///   Looks up a localized string similar to Windowed.
+        /// </summary>
+        internal static string Windowed {
+            get {
+                return ResourceManager.GetString("Windowed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Yes = A Button, Space, Enter.
         /// </summary>
         internal static string YesButtonText {
             get {
