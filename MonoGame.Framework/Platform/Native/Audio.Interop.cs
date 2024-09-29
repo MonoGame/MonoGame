@@ -140,7 +140,7 @@ internal static unsafe partial class MGA
     #region Voice
 
     [LibraryImport(MGP.MonoGameNativeDLL, EntryPoint = "MGA_Voice_Create", StringMarshalling = StringMarshalling.Utf8)]
-    public static partial MGA_Voice* Voice_Create(MGA_System* system);
+    public static partial MGA_Voice* Voice_Create(MGA_System* system, int sampleRate = 0, int channels = 0);
 
     [LibraryImport(MGP.MonoGameNativeDLL, EntryPoint = "MGA_Voice_Destroy", StringMarshalling = StringMarshalling.Utf8)]
     public static partial void Voice_Destroy(MGA_Voice* voice);
@@ -152,7 +152,7 @@ internal static unsafe partial class MGA
     public static partial void Voice_SetBuffer(MGA_Voice* voice, MGA_Buffer* buffer);
 
     [LibraryImport(MGP.MonoGameNativeDLL, EntryPoint = "MGA_Voice_AppendBuffer", StringMarshalling = StringMarshalling.Utf8)]
-    public static partial void Voice_AppendBuffer(MGA_Voice* voice, byte[] buffer, int offset, int count, [MarshalAs(UnmanagedType.U1)] bool clear);
+    public static partial void Voice_AppendBuffer(MGA_Voice* voice, byte* buffer, uint size);
 
     [LibraryImport(MGP.MonoGameNativeDLL, EntryPoint = "MGA_Voice_Play", StringMarshalling = StringMarshalling.Utf8)]
     public static partial void Voice_Play(MGA_Voice* voice, [MarshalAs(UnmanagedType.U1)] bool looped);
@@ -168,6 +168,9 @@ internal static unsafe partial class MGA
 
     [LibraryImport(MGP.MonoGameNativeDLL, EntryPoint = "MGA_Voice_GetState", StringMarshalling = StringMarshalling.Utf8)]
     public static partial SoundState Voice_GetState(MGA_Voice* voice);
+
+    [LibraryImport(MGP.MonoGameNativeDLL, EntryPoint = "MGA_Voice_GetPosition", StringMarshalling = StringMarshalling.Utf8)]
+    public static partial ulong Voice_GetPosition(MGA_Voice* voice);
 
     [LibraryImport(MGP.MonoGameNativeDLL, EntryPoint = "MGA_Voice_SetPan", StringMarshalling = StringMarshalling.Utf8)]
     public static partial void Voice_SetPan(MGA_Voice* voice, float pan);

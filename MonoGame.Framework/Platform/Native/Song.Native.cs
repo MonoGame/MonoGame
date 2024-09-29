@@ -3,33 +3,102 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System;
-using System.Runtime.InteropServices;
+using System.Threading;
+using Microsoft.Xna.Framework.Audio;
 using MonoGame.Interop;
+
 
 namespace Microsoft.Xna.Framework.Media;
 
 public sealed partial class Song : IEquatable<Song>, IDisposable
 {
-    private unsafe MGM_Song* _song;
+    private unsafe MGM_AudioDecoder* _decoder;
+    private unsafe MGA_Voice* _voice;
 
-    private GCHandle _self;
+    private MGM_AudioDecoderInfo _info;
+
+    private readonly ManualResetEvent _stop = new ManualResetEvent(false);
+    private Thread _thread;
+
+    private float _volume = 1.0f;
+
+    private unsafe void DecoderStream()
+    {
+        bool start_voice = true;
+        bool finished = false;
+
+        Console.WriteLine("DecoderStream");
+
+        while (true)
+        {
+            // Do we need to stop?
+            if (_stop.WaitOne(0))
+                break;
+
+            var count = MGA.Voice_GetBufferCount(_voice);
+            if (count > 2)
+            {
+                // TODO: This sucks... add OnBufferEnd type of callback
+                // into the voice API so we don't have useless sleeps.
+                Thread.Sleep(100);
+                continue;
+            }
+
+            finished = MGM.AudioDecoder_Decode(_decoder, out var buffer, out var size);
+
+            if (size > 0)
+            {
+                MGA.Voice_AppendBuffer(_voice, buffer, size);
+
+                if (start_voice)
+                {
+                    MGA.Voice_Play(_voice, false);
+                    start_voice = false;
+                }
+            }
+
+            if (finished)
+            {
+                // Signal on the main thread.
+                Threading.OnUIThread(() => DonePlaying(this, EventArgs.Empty));
+                break;
+            }
+        }
+
+        // We're done streaming.
+    }
 
     #region The playback API used by MediaPlayer
 
     private unsafe void PlatformInitialize(string fileName)
     {
-        _song = MGM.Song_Create(fileName);
+        var absolutePath = MGP.Platform_MakePath(TitleContainer.Location, fileName);
+
+        _decoder = MGM.AudioDecoder_Create(absolutePath, out _info);
+        if (_decoder == null)
+            return;
+
+        SoundEffect.Initialize();
+
+        _voice = MGA.Voice_Create(SoundEffect.System, _info.samplerate, _info.channels);
+
+        _duration = TimeSpan.FromMilliseconds(_info.duration);
     }
 
     private unsafe void PlatformDispose(bool disposing)
     {
-        if (_self.IsAllocated)
-            _self.Free();
+        Stop();
 
-        if (_song != null)
+        if (_voice != null)
         {
-            MGM.Song_Destroy(_song);
-            _song = null;
+            MGA.Voice_Destroy(_voice);
+            _voice = null;
+        }
+
+        if (_decoder != null)
+        {
+            MGM.AudioDecoder_Destroy(_decoder);
+            _decoder = null;
         }
     }
 
@@ -38,29 +107,19 @@ public sealed partial class Song : IEquatable<Song>, IDisposable
         return _playCount;
     }
 
-    private unsafe TimeSpan PlatformGetDuration()
-    {
-        if (_song == null)
-            return TimeSpan.Zero;
-
-        var milliseconds = MGM.Song_GetDuration(_song);
-        return TimeSpan.FromMilliseconds(milliseconds);
-    }
-
     internal unsafe float Volume
     {
         get
         {
-            if (_song == null)
-                return 0.0f;
-
-            return MGM.Song_GetVolume(_song);
+            return _volume;
         }
 
         set
         {
-            if (_song != null)
-                MGM.Song_SetVolume(_song, value);
+            _volume = value;
+
+            if (_voice != null)
+                MGA.Voice_SetVolume(_voice, _volume);
         }
     }
 
@@ -68,34 +127,17 @@ public sealed partial class Song : IEquatable<Song>, IDisposable
     {
         get
         {
-            if (_song == null)
+            if (_voice == null)
                 return TimeSpan.Zero;
 
-            var milliseconds = MGM.Song_GetPosition(_song);
+            var milliseconds = MGA.Voice_GetPosition(_voice);
             return TimeSpan.FromMilliseconds(milliseconds);
         }
     }
 
-    internal static void FinishedCallback(nint callbackData)
-    {
-        var self = GCHandle.FromIntPtr(callbackData);
-        var song = self.Target as Song;
-
-        // This could happen if we were disposed.
-        if (song == null)
-            return;
-
-        // This callback is likely coming from a platform
-        // specific native thread.  So queue the event to
-        // the main game thread for processing on the
-        // next tick.
-
-        Threading.OnUIThread(() => song.DonePlaying(song, EventArgs.Empty));
-    }
-
     internal unsafe void Play(TimeSpan? startPosition, FinishedPlayingHandler handler)
     {
-        if (_song == null)
+        if (_decoder == null)
             return;
 
         ulong milliseconds = 0;
@@ -105,36 +147,49 @@ public sealed partial class Song : IEquatable<Song>, IDisposable
         // Only setup the finished callback once.
         if (DonePlaying == null)
             DonePlaying += handler;
-        if (!_self.IsAllocated)
-            _self = GCHandle.Alloc(this, GCHandleType.Weak);
 
-        MGM.Song_Play(_song, milliseconds, FinishedCallback, (nint)_self);
+        // Stop the current playback which cleans stuff up.
+        Stop();
+        
+        // Move the decoder to the new position.
+        MGM.AudioDecoder_SetPosition(_decoder, milliseconds);
+
+        // The thread does the rest of the work.
+        _stop.Reset();
+        _thread = new Thread(DecoderStream);
+        _thread.Start();
 
         _playCount++;
     }
 
     internal unsafe void Pause()
     {
-        if (_song == null)
+        if (_voice == null)
             return;
 
-        MGM.Song_Pause(_song);
+        // The thread will stop processing on its own.
+        MGA.Voice_Pause(_voice);
     }
 
     internal unsafe void Resume()
     {
-        if (_song == null)
+        if (_voice == null)
             return;
 
-        MGM.Song_Resume(_song);
+        MGA.Voice_Resume(_voice);
     }
 
     internal unsafe void Stop()
     {
-        if (_song == null)
+        if (_thread == null)
             return;
 
-        MGM.Song_Stop(_song);
+        MGA.Voice_Stop(_voice, false);
+
+        // Halt the thread.
+        _stop.Set();
+        _thread.Join();
+        _thread = null;        
     }
 
 

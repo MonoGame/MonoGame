@@ -12,27 +12,18 @@
 #include "api_structs.h"
 
 
-struct MGM_Song;
-struct MGM_Video;
+struct MGM_AudioDecoder;
+struct MGM_VideoDecoder;
+struct MGG_GraphicsDevice;
+struct MGG_Texture;
 
-MG_EXPORT MGM_Song* MGM_Song_Create(const char* mediaFilePath);
-MG_EXPORT void MGM_Song_Destroy(MGM_Song* song);
-MG_EXPORT mgulong MGM_Song_GetDuration(MGM_Song* song);
-MG_EXPORT mgulong MGM_Song_GetPosition(MGM_Song* song);
-MG_EXPORT mgfloat MGM_Song_GetVolume(MGM_Song* song);
-MG_EXPORT void MGM_Song_SetVolume(MGM_Song* song, mgfloat volume);
-MG_EXPORT void MGM_Song_Play(MGM_Song* song, mgulong startPositionMs, void (*callback)(void*), void* callbackData);
-MG_EXPORT void MGM_Song_Pause(MGM_Song* song);
-MG_EXPORT void MGM_Song_Resume(MGM_Song* song);
-MG_EXPORT void MGM_Song_Stop(MGM_Song* song);
-MG_EXPORT MGM_Video* MGM_Video_Create(const char* mediaFilePath, mgint cachedFrameNum, mgint& width, mgint& height, mgfloat& fps, mgulong& duration);
-MG_EXPORT void MGM_Video_Destroy(MGM_Video* video);
-MG_EXPORT MGMediaState MGM_Video_GetState(MGM_Video* video);
-MG_EXPORT mgulong MGM_Video_GetPosition(MGM_Video* video);
-MG_EXPORT void MGM_Video_SetVolume(MGM_Video* video, mgfloat volume);
-MG_EXPORT void MGM_Video_SetLooped(MGM_Video* video, mgbool looped);
-MG_EXPORT void MGM_Video_Play(MGM_Video* video);
-MG_EXPORT void MGM_Video_Pause(MGM_Video* video);
-MG_EXPORT void MGM_Video_Resume(MGM_Video* video);
-MG_EXPORT void MGM_Video_Stop(MGM_Video* video);
-MG_EXPORT void MGM_Video_GetFrame(MGM_Video* video, mguint& frame, MGG_Texture*& handle);
+MG_EXPORT MGM_AudioDecoder* MGM_AudioDecoder_Create(const char* filepath, MGM_AudioDecoderInfo& info);
+MG_EXPORT void MGM_AudioDecoder_Destroy(MGM_AudioDecoder* decoder);
+MG_EXPORT void MGM_AudioDecoder_SetPosition(MGM_AudioDecoder* decoder, mgulong timeMS);
+MG_EXPORT mgbool MGM_AudioDecoder_Decode(MGM_AudioDecoder* decoder, mgbyte*& buffer, mguint& size);
+MG_EXPORT MGM_VideoDecoder* MGM_VideoDecoder_Create(MGG_GraphicsDevice* device, const char* filepath, MGM_VideoDecoderInfo& info);
+MG_EXPORT void MGM_VideoDecoder_Destroy(MGM_VideoDecoder* decoder);
+MG_EXPORT MGM_AudioDecoder* MGM_VideoDecoder_GetAudioDecoder(MGM_VideoDecoder* decoder, MGM_AudioDecoderInfo& info);
+MG_EXPORT mgulong MGM_VideoDecoder_GetPosition(MGM_VideoDecoder* decoder);
+MG_EXPORT void MGM_VideoDecoder_SetLooped(MGM_VideoDecoder* decoder, mgbool looped);
+MG_EXPORT MGG_Texture* MGM_VideoDecoder_Decode(MGM_VideoDecoder* decoder);

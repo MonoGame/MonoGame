@@ -171,7 +171,7 @@ namespace Microsoft.Xna.Framework.Media
         /// </summary>
         public TimeSpan Duration
         {
-            get { return PlatformGetDuration(); }
+            get { return _duration; }
         }
 
         /// <summary>
