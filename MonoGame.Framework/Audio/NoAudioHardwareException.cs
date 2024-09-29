@@ -13,11 +13,7 @@ namespace Microsoft.Xna.Framework.Audio
     /// The exception thrown when no audio hardware is present, or driver issues are detected.
     /// </summary>
     [DataContract]
-#if WINDOWS_UAP
-    public sealed class NoAudioHardwareException : Exception
-#else
     public sealed class NoAudioHardwareException : ExternalException
-#endif
     {
         /// <param name="msg">A message describing the error.</param>
         public NoAudioHardwareException(string msg)

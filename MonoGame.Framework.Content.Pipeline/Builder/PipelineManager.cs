@@ -86,8 +86,8 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
         /// </summary>
         public bool CompressContent { get; set; }
 
-        /// <summary>        
-        /// If true exceptions thrown from within an importer or processor are caught and then 
+        /// <summary>
+        /// If true exceptions thrown from within an importer or processor are caught and then
         /// thrown from the context. Default value is true.
         /// </summary>
         public bool RethrowExceptions { get; set; }
@@ -108,7 +108,7 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
 
 	        RegisterCustomConverters();
 
-            // Load the previous content stats.            
+            // Load the previous content stats.
             ContentStats = new ContentStatsCollection();
             ContentStats.PreviousStats = ContentStatsCollection.Read(intermediateDir);
         }
@@ -157,9 +157,9 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
                 try
                 {
                     Assembly a;
-                    if (string.IsNullOrEmpty(assemblyPath))                                            
-                        a = Assembly.GetExecutingAssembly();                    
-                    else                    
+                    if (string.IsNullOrEmpty(assemblyPath))
+                        a = Assembly.GetExecutingAssembly();
+                    else
                         a = Assembly.LoadFrom(assemblyPath);
 
                     exportedTypes = a.GetTypes();
@@ -182,7 +182,7 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
 
                 foreach (var t in exportedTypes)
                 {
-                    if (t.IsAbstract) 
+                    if (t.IsAbstract)
                         continue;
 
                     if (t.GetInterface(@"IContentImporter") != null)
@@ -242,7 +242,7 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
 
             List<Type> types = new List<Type>();
 
-            foreach (var item in _importers) 
+            foreach (var item in _importers)
             {
                 types.Add(item.type);
             }
@@ -254,14 +254,14 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
         {
             if (_processors == null)
                 ResolveAssemblies();
-            
+
             List<Type> types = new List<Type>();
-            
-            foreach (var item in _processors) 
+
+            foreach (var item in _processors)
             {
                 types.Add(item.type);
             }
-            
+
             return types.ToArray();
         }
 
@@ -535,7 +535,7 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
         {
             sourceFilepath = PathHelper.Normalize(sourceFilepath);
             ResolveOutputFilepath(sourceFilepath, ref outputFilepath);
-            
+
             ResolveImporterAndProcessor(sourceFilepath, ref importerName, ref processorName);
 
             // Record what we're building and how.
@@ -570,12 +570,12 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
             // Keep track of all build events. (Required to resolve automatic names "AssetName_n".)
             TrackPipelineBuildEvent(pipelineEvent);
 
-            var rebuild = pipelineEvent.NeedsRebuild(this, cachedEvent);            
+            var rebuild = pipelineEvent.NeedsRebuild(this, cachedEvent);
             if (rebuild)
                 Logger.LogMessage("{0}", pipelineEvent.SourceFile);
             else
                 Logger.LogMessage("Skipping {0}", pipelineEvent.SourceFile);
-            
+
             Logger.Indent();
             try
             {
@@ -604,7 +604,7 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
                             Parameters = assetCachedEvent.Parameters,
                         };
 
-                        // Give the asset a chance to rebuild.                    
+                        // Give the asset a chance to rebuild.
                         BuildContent(depEvent, assetCachedEvent, assetEventFilepath);
                     }
                 }
@@ -665,7 +665,10 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
             {
                 try
                 {
-                    var importContext = new PipelineImporterContext(this);
+
+                    var importContext = new PipelineImporterContext(this, pipelineEvent);
+                    using var _ = ContextScopeFactory.BeginContext(importContext, pipelineEvent);
+
                     importedObject = importer.Import(pipelineEvent.SourceFile, importContext);
                 }
                 catch (PipelineException)
@@ -683,7 +686,8 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
             }
             else
             {
-                var importContext = new PipelineImporterContext(this);
+                var importContext = new PipelineImporterContext(this, pipelineEvent);
+                using var _ = ContextScopeFactory.BeginContext(importContext, pipelineEvent);
                 importedObject = importer.Import(pipelineEvent.SourceFile, importContext);
             }
 
@@ -714,6 +718,7 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
                 try
                 {
                     var processContext = new PipelineProcessorContext(this, pipelineEvent);
+                    using var _ = ContextScopeFactory.BeginContext(processContext);
                     processedObject = processor.Process(importedObject, processContext);
                 }
                 catch (PipelineException)
@@ -732,6 +737,7 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
             else
             {
                 var processContext = new PipelineProcessorContext(this, pipelineEvent);
+                using var _ = ContextScopeFactory.BeginContext(processContext);
                 processedObject = processor.Process(importedObject, processContext);
             }
 

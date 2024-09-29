@@ -29,7 +29,7 @@ namespace Microsoft.Xna.Framework
         private bool _preferHalfPixelOffset = false;
         private bool _wantFullScreen;
         private GraphicsProfile _graphicsProfile;
-        
+
         // dirty flag for ApplyChanges
         private bool _shouldApplyChanges;
 
@@ -64,7 +64,7 @@ namespace Microsoft.Xna.Framework
             _preferredDepthStencilFormat = DepthFormat.Depth24;
             _synchronizedWithVerticalRetrace = true;
 
-            // Assume the window client size as the default back 
+            // Assume the window client size as the default back
             // buffer resolution in the landscape orientation.
             var clientBounds = _game.Window.ClientBounds;
             if (clientBounds.Width >= clientBounds.Height)
@@ -231,9 +231,8 @@ namespace Microsoft.Xna.Framework
         }
 
         /// <summary>
-        /// Raised by <see cref="CreateDevice()"/> or <see cref="ApplyChanges"/>. Allows users
-        /// to override the <see cref="PresentationParameters"/> to pass to the
-        /// <see cref="Graphics.GraphicsDevice"/>.
+        /// Raised by <see cref="ApplyChanges"/>. Allows users to override the <see cref="PresentationParameters"/> to
+        /// pass to the <see cref="Graphics.GraphicsDevice">GraphicsDevice</see>.
         /// </summary>
         public event EventHandler<PreparingDeviceSettingsEventArgs> PreparingDeviceSettings;
 
@@ -608,7 +607,9 @@ namespace Microsoft.Xna.Framework
         /// <remarks>
         /// Vsync limits the frame rate of the game to the monitor referesh rate to prevent screen tearing.
         /// When called at startup this will automatically set the vsync mode during initialization.  If
-        /// set after startup you must call ApplyChanges() for the vsync mode to be changed.
+        /// set after startup you must call ApplyChanges() for the vsync mode to be changed.  Depending on
+        /// a user's video card settings, vsync settings can be ignored and cause unexpected behaviour in
+        /// frame rate.
         /// </remarks>
         public bool SynchronizeWithVerticalRetrace
         {

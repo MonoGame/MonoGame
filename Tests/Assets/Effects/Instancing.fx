@@ -2,6 +2,8 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
+#include "include.fxh"
+
 float4x4 View;
 float4x4 Projection;
 
@@ -36,18 +38,10 @@ VSOutput VS(VSInput input, float4x4 worldTransposed : BLENDWEIGHT)
     return output;
 }
 
-float4 PS(PSInput input) : COLOR0
+float4 PS(PSInput input) : SV_TARGET0
 {
     return float4(input.TexCoord.xy, 0, 1);
 }
-
-#if SM4
-#define PS_PROFILE ps_4_0
-#define VS_PROFILE vs_4_0
-#else
-#define PS_PROFILE ps_3_0
-#define VS_PROFILE vs_3_0
-#endif
 
 technique
 {

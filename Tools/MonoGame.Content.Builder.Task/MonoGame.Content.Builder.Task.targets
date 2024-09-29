@@ -58,7 +58,8 @@
         <Link>%(MonoGameContentReference.Link)</Link>
         <FullDir>%(MonoGameContentReference.RootDir)%(MonoGameContentReference.Directory)</FullDir>
         <ContentFolder>%(MonoGameContentReference.ContentFolder)</ContentFolder>
-        <OutputFolder>%(MonoGameContentReference.Filename)</OutputFolder>
+        <OutputFolder>%(MonoGameContentReference.OutputFolder)</OutputFolder>
+        <OutputFolder Condition="'%(MonoGameContentReference.OutputFolder)' == '' ">%(MonoGameContentReference.Filename)</OutputFolder>
       </ContentReference>
 
       <!--
@@ -137,12 +138,12 @@
 
     <!-- Remove this line if they make dotnet tool restore part of dotnet restore build -->
     <!-- https://github.com/dotnet/sdk/issues/4241 -->
-    <Exec Command="$(DotnetCommand) tool restore" />
+    <Exec Command="&quot;$(DotnetCommand)&quot; tool restore" />
 
     <!-- Execute MGCB from the project directory so we use the correct manifest. -->
     <Exec
       Condition="'%(ContentReference.FullPath)' != ''"
-      Command="$(DotnetCommand) $(MGCBCommand) $(MonoGameMGCBAdditionalArguments) /@:&quot;%(ContentReference.FullPath)&quot; /platform:$(MonoGamePlatform) /outputDir:&quot;%(ContentReference.ContentOutputDir)&quot; /intermediateDir:&quot;%(ContentReference.ContentIntermediateOutputDir)&quot; /workingDir:&quot;%(ContentReference.FullDir)&quot;"
+      Command="&quot;$(DotnetCommand)&quot; &quot;$(MGCBCommand)&quot; $(MonoGameMGCBAdditionalArguments) /@:&quot;%(ContentReference.FullPath)&quot; /platform:$(MonoGamePlatform) /outputDir:&quot;%(ContentReference.ContentOutputDir)&quot; /intermediateDir:&quot;%(ContentReference.ContentIntermediateOutputDir)&quot; /workingDir:&quot;%(ContentReference.FullDir)&quot;"
       WorkingDirectory="$(MSBuildProjectDirectory)" />
 
     <ItemGroup>

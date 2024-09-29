@@ -27,7 +27,16 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
             return result;
         }
 
-        public static int Run(string command, string arguments, out string stdout, out string stderr, string stdin = null)
+        /// <summary>
+        /// Run a dotnet tool. The tool should be installed in a .config/dotnet-tools.json file somewhere in the project lineage.
+        /// </summary>
+        public static int RunDotnetTool(string toolName, string args, out string stdOut, out string stdErr, string stdIn=null, string workingDirectory=null)
+        {
+            var finalizedArgs = toolName + " " + args;
+            return ExternalTool.Run("dotnet", finalizedArgs, out stdOut, out stdErr, stdIn, workingDirectory);
+        }
+
+        public static int Run(string command, string arguments, out string stdout, out string stderr, string stdin = null, string workingDirectory=null)
         {
             // This particular case is likely to be the most common and thus
             // warrants its own specific error message rather than falling
@@ -55,6 +64,9 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
                 RedirectStandardError = true,
                 RedirectStandardInput = true,
             };
+
+            if (!string.IsNullOrEmpty(workingDirectory))
+                processInfo.WorkingDirectory = workingDirectory;
 
             EnsureExecutable(fullPath);
 
@@ -157,12 +169,12 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
             return null;
         }
 
-        /// <summary>   
-        /// Ensures the specified executable has the executable bit set.  If the    
-        /// executable doesn't have the executable bit set on Linux or Mac OS, then 
-        /// Mono will refuse to execute it. 
-        /// </summary>  
-        /// <param name="path">The full path to the executable.</param> 
+        /// <summary>
+        /// Ensures the specified executable has the executable bit set.  If the
+        /// executable doesn't have the executable bit set on Linux or Mac OS, then
+        /// Mono will refuse to execute it.
+        /// </summary>
+        /// <param name="path">The full path to the executable.</param>
         private static void EnsureExecutable(string path)
         {
             if (!path.StartsWith("/home") && !path.StartsWith("/Users"))
@@ -175,8 +187,8 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
             }
             catch
             {
-                // This platform may not have chmod in the path, in which case we can't 
-                // do anything reasonable here. 
+                // This platform may not have chmod in the path, in which case we can't
+                // do anything reasonable here.
             }
         }
 
@@ -191,7 +203,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
                 File.Delete(filePath);
             }
             catch (Exception)
-            {                    
+            {
             }
         }
     }

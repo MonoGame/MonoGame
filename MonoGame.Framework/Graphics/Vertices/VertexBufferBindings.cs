@@ -165,5 +165,23 @@ namespace Microsoft.Xna.Framework.Graphics
 
             return bindings;
         }
+
+        /// <summary>
+        /// Creates an <see cref="ImmutableVertexInputLayout"/> that can be used as a key in the
+        /// <see cref="InputLayoutCache"/>.
+        /// </summary>
+        /// <returns>The <see cref="ImmutableVertexInputLayout"/>.</returns>
+        internal ImmutableVertexInputLayout ToImmutable()
+        {
+            int count = Count;
+
+            var vertexDeclarations = new VertexDeclaration[count];
+            Array.Copy(VertexDeclarations, vertexDeclarations, count);
+
+            var instanceFrequencies = new int[count];
+            Array.Copy(InstanceFrequencies, instanceFrequencies, count);
+
+            return new ImmutableVertexInputLayout(vertexDeclarations, instanceFrequencies);
+        }
     }
 }

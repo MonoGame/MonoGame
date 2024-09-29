@@ -8,12 +8,14 @@ using System.Drawing;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Threading;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Input.Touch;
 using Microsoft.Xna.Framework.Windows;
+using Microsoft.Xna.Framework.Windows.Accessibility;
 using ButtonState = Microsoft.Xna.Framework.Input.ButtonState;
 using Keys = Microsoft.Xna.Framework.Input.Keys;
 using Point = System.Drawing.Point;
@@ -45,6 +47,10 @@ namespace MonoGame.Framework
 
         private bool _isResizeTickEnabled;
         private readonly System.Timers.Timer _resizeTickTimer;
+
+        private bool _isleftMouseButtonDown;
+        private bool _isMouseKeysEnabled;
+        private bool _subscribedToMouseKeyEvents;
 
         #region Internal Properties
 
@@ -162,6 +168,7 @@ namespace MonoGame.Framework
             _resizeTickTimer = new System.Timers.Timer(1) { SynchronizingObject = Form, AutoReset = false };
             _resizeTickTimer.Elapsed += OnResizeTick;
 
+            Form.FormClosing += OnFormClosing;
             Form.Activated += OnActivated;
             Form.Deactivate += OnDeactivate;
             Form.Resize += OnResize;
@@ -170,7 +177,59 @@ namespace MonoGame.Framework
 
             Form.KeyPress += OnKeyPress;
 
+            UpdateMouseKeys();
+
+            Form.SettingChanged += Form_SettingChanged;
+
             RegisterToAllWindows();
+        }
+
+        private void UpdateMouseKeys()
+        {
+            _isMouseKeysEnabled = MouseKeysManager.IsEnabled();
+
+            if (_isMouseKeysEnabled)
+            {
+                if (!_subscribedToMouseKeyEvents)
+                {
+                    Form.MouseDown += Form_MouseDown;
+                    Form.MouseUp += Form_MouseUp;
+                    _subscribedToMouseKeyEvents = true;
+                }
+            }
+            else
+            {
+                if (_subscribedToMouseKeyEvents)
+                {
+                    Form.MouseDown -= Form_MouseDown;
+                    Form.MouseUp -= Form_MouseUp;
+                    _subscribedToMouseKeyEvents = false;
+                }
+            }
+        }
+
+        private void Form_SettingChanged(object sender, EventArgs e)
+        {
+            UpdateMouseKeys();
+        }
+
+        private void Form_MouseDown(object sender, MouseEventArgs e)
+        {
+            if (_isMouseKeysEnabled && e.Button == MouseButtons.Left)
+            {
+                _isleftMouseButtonDown = true;
+            }
+        }
+
+        private void Form_MouseUp(object sender, MouseEventArgs e)
+        {
+            if (e.Button == MouseButtons.Left)
+            {
+                Task.Delay(100).ContinueWith((x) =>
+                {
+                    _isleftMouseButtonDown = false;
+                });
+            }
         }
 
         [StructLayout(LayoutKind.Sequential)]
@@ -235,6 +294,12 @@ namespace MonoGame.Framework
             {
                 _allWindowsReaderWriterLockSlim.ExitWriteLock();
             }
+        }
+
+        private void OnFormClosing(object sender, FormClosingEventArgs e)
+        {
+            e.Cancel = true;
+            _platform.Game.Exit();
         }
 
         private void OnActivated(object sender, EventArgs eventArgs)
@@ -317,6 +382,15 @@ namespace MonoGame.Framework
 
             if (touchState.HasValue)
                 TouchPanelState.AddEvent(0, touchState.Value, new Vector2(MouseState.X, MouseState.Y), true);
+
+            if (_isleftMouseButtonDown)
+            {                
+                MouseState.LeftButton = ButtonState.Pressed;
+            }
+            else
+            {
+                MouseState.LeftButton = ButtonState.Released;
+            }
         } 
 
         private void OnMouseEnter(object sender, EventArgs e)

@@ -48,9 +48,7 @@ namespace MonoGame.Tests.ContentPipeline
         }
 
         [Test]
-#if DESKTOPGL
-        [Ignore("Disabled until latest NVTT is merged on Mac!")]
-#endif
+        [Ignore("Disabled until latest assimp is merged on Mac and Linux or windows!")]
         public void Dude()
         {
             var context = new TestImporterContext("TestObj", "TestBin");

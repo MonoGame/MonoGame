@@ -28,6 +28,8 @@ namespace MonoGame.Effect
 
         public static readonly ShaderProfile DirectX_11 = FromName("DirectX_11");
 
+        public static readonly ShaderProfile Vulkan = FromName("Vulkan");
+
         /// <summary>
         /// Returns all the loaded shader profiles.
         /// </summary>

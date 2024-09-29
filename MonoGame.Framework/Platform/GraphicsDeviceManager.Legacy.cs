@@ -6,10 +6,6 @@ using System;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input.Touch;
 
-#if WINDOWS_UAP
-using Windows.UI.Xaml.Controls;
-#endif
-
 #if ANDROID
 using Android.Views;
 #endif
@@ -32,13 +28,11 @@ namespace Microsoft.Xna.Framework
         private bool _hardwareModeSwitch = true;
         private bool _preferHalfPixelOffset = false;
 
-#if (WINDOWS || WINDOWS_UAP) && DIRECTX
+#if WINDOWS && DIRECTX
         private bool _firstLaunch = true;
 #endif
 
-#if !WINRT || WINDOWS_UAP
         private bool _wantFullScreen = false;
-#endif
         public static readonly int DefaultBackBufferHeight = 480;
         public static readonly int DefaultBackBufferWidth = 800;
 
@@ -177,50 +171,7 @@ namespace Microsoft.Xna.Framework
             if (_graphicsDevice == null)
                 return;
 
-#if WINDOWS_UAP
-
-            // TODO:  Does this need to occur here?
-            _game.Window.SetSupportedOrientations(_supportedOrientations);
-
-            _graphicsDevice.PresentationParameters.BackBufferFormat = _preferredBackBufferFormat;
-            _graphicsDevice.PresentationParameters.BackBufferWidth = _preferredBackBufferWidth;
-            _graphicsDevice.PresentationParameters.BackBufferHeight = _preferredBackBufferHeight;
-            _graphicsDevice.PresentationParameters.DepthStencilFormat = _preferredDepthStencilFormat;
-            
-            // TODO: We probably should be resetting the whole device
-            // if this changes as we are targeting a different 
-            // hardware feature level.
-            _graphicsDevice.GraphicsProfile = GraphicsProfile;
-
-#if WINDOWS_UAP
-			_graphicsDevice.PresentationParameters.DeviceWindowHandle = IntPtr.Zero;
-			_graphicsDevice.PresentationParameters.SwapChainPanel = this.SwapChainPanel;
-            _graphicsDevice.PresentationParameters.IsFullScreen = _wantFullScreen;
-#else
-            _graphicsDevice.PresentationParameters.IsFullScreen = false;
-
-			// The graphics device can use a XAML panel or a window
-			// to created the default swapchain target.
-            if (this.SwapChainBackgroundPanel != null)
-            {
-                _graphicsDevice.PresentationParameters.DeviceWindowHandle = IntPtr.Zero;
-                _graphicsDevice.PresentationParameters.SwapChainBackgroundPanel = this.SwapChainBackgroundPanel;
-            }
-            else
-            {
-                _graphicsDevice.PresentationParameters.DeviceWindowHandle = _game.Window.Handle;
-                _graphicsDevice.PresentationParameters.SwapChainBackgroundPanel = null;
-            }
-#endif
-			// Update the back buffer.
-			_graphicsDevice.CreateSizeDependentResources();
-            _graphicsDevice.ApplyRenderTargets(null);
-
-#if WINDOWS_UAP
-            ((UAPGameWindow)_game.Window).SetClientSize(_preferredBackBufferWidth, _preferredBackBufferHeight);
-#endif
-
-#elif WINDOWS && DIRECTX
+#if WINDOWS && DIRECTX
 
             _graphicsDevice.PresentationParameters.BackBufferFormat = _preferredBackBufferFormat;
             _graphicsDevice.PresentationParameters.BackBufferWidth = _preferredBackBufferWidth;
@@ -302,7 +253,7 @@ namespace Microsoft.Xna.Framework
             TouchPanel.DisplayWidth = _graphicsDevice.PresentationParameters.BackBufferWidth;
             TouchPanel.DisplayHeight = _graphicsDevice.PresentationParameters.BackBufferHeight;
 
-#if (WINDOWS || WINDOWS_UAP) && DIRECTX
+#if WINDOWS && DIRECTX
 
             if (!_firstLaunch)
             {
@@ -324,7 +275,7 @@ namespace Microsoft.Xna.Framework
             var presentationParameters = new PresentationParameters();
             presentationParameters.DepthStencilFormat = DepthFormat.Depth24;
 
-#if (WINDOWS || WINRT) && !DESKTOPGL
+#if WINDOWS && !DESKTOPGL
             _game.Window.SetSupportedOrientations(_supportedOrientations);
 
             presentationParameters.BackBufferFormat = _preferredBackBufferFormat;
@@ -333,13 +284,7 @@ namespace Microsoft.Xna.Framework
             presentationParameters.DepthStencilFormat = _preferredDepthStencilFormat;
             presentationParameters.IsFullScreen = false;
 
-#if WINDOWS_UAP
-			presentationParameters.DeviceWindowHandle = IntPtr.Zero;
-			presentationParameters.SwapChainPanel = this.SwapChainPanel;
-#else
             presentationParameters.DeviceWindowHandle = _game.Window.Handle;
-#endif
-
 #else
 
 #if MONOMAC || DESKTOPGL
@@ -351,7 +296,7 @@ namespace Microsoft.Xna.Framework
             presentationParameters.IsFullScreen = true;
 #endif // MONOMAC
 
-#endif // WINDOWS || WINRT
+#endif // WINDOWS
 
             // TODO: Implement multisampling (aka anti-alising) for all platforms!
             var preparingDeviceSettingsHandler = PreparingDeviceSettings;
@@ -390,16 +335,10 @@ namespace Microsoft.Xna.Framework
         {
             IsFullScreen = !IsFullScreen;
 
-#if ((WINDOWS || WINDOWS_UAP) && DIRECTX) || DESKTOPGL
+#if (WINDOWS && DIRECTX) || DESKTOPGL
             ApplyChanges();
 #endif
         }
-
-
-#if WINDOWS_UAP
-        [CLSCompliant(false)]
-        public SwapChainPanel SwapChainPanel { get; set; }
-#endif
 
         public GraphicsProfile GraphicsProfile { get; set; }
 
@@ -415,23 +354,13 @@ namespace Microsoft.Xna.Framework
         {
             get
             {
-#if WINDOWS_UAP
-                return _wantFullScreen;
-#elif WINRT
-                return true;
-#else
                 if (_graphicsDevice != null)
                     return _graphicsDevice.PresentationParameters.IsFullScreen;
                 return _wantFullScreen;
-#endif
             }
             set
             {
-#if WINDOWS_UAP
-                _wantFullScreen = value;
-#elif WINRT
-                // Just ignore this as it is not relevant on Windows 8
-#elif WINDOWS && DIRECTX
+#if WINDOWS && DIRECTX
                 _wantFullScreen = value;
 #else
                 _wantFullScreen = value;

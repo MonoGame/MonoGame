@@ -34,13 +34,13 @@ namespace Microsoft.Xna.Framework
         /// </summary>
         public virtual bool AllowAltF4 { get { return _allowAltF4; } set { _allowAltF4 = value; } }
 
-#if (WINDOWS && !WINDOWS_UAP) || DESKTOPGL
         /// <summary>
         /// The location of this window on the desktop, eg: global coordinate space
         /// which stretches across all screens.
+        /// 
+        /// May be zero on platforms where it is not supported.
         /// </summary>
         public abstract Point Position { get; set; }
-#endif
 
 	    /// <summary>
 	    /// The display orientation on a mobile device.
@@ -52,7 +52,6 @@ namespace Microsoft.Xna.Framework
 		///
 		/// For WindowsDX this is the Win32 window handle (HWND).
 		/// For DesktopGL this is the SDL window handle.
-		/// For UWP this is a handle to an IUnknown interface for the CoreWindow.
 	    /// </summary>
 		public abstract IntPtr Handle { get; }
 
@@ -65,10 +64,6 @@ namespace Microsoft.Xna.Framework
         /// <summary>
         /// Gets or sets the title of the game window.
         /// </summary>
-        /// <remarks>
-        /// For UWP this has no effect. The title should be
-        /// set by using the DisplayName property found in the app manifest file.
-        /// </remarks>
         public string Title {
 			get { return _title; }
 			set {
@@ -128,7 +123,7 @@ namespace Microsoft.Xna.Framework
 	    /// </summary>
 		public event EventHandler<EventArgs> ScreenDeviceNameChanged;
 
-#if WINDOWS || WINDOWS_UAP || DESKTOPGL|| ANGLE
+#if WINDOWS || DESKTOPGL|| ANGLE || NATIVE
 
         /// <summary>
 		/// Use this event to user text input.
@@ -233,7 +228,8 @@ namespace Microsoft.Xna.Framework
             EventHelpers.Raise(this, ScreenDeviceNameChanged, EventArgs.Empty);
 		}
 
-#if WINDOWS || WINDOWS_UAP || DESKTOPGL || ANGLE
+#if WINDOWS || DESKTOPGL || ANGLE || NATIVE
+
 	    /// <summary>
 	    /// Called when the window receives text input. Raises the <see cref="TextInput"/> event.
 	    /// </summary>
@@ -270,6 +266,12 @@ namespace Microsoft.Xna.Framework
 		protected abstract void SetTitle (string title);
 
 #if DIRECTX && WINDOWS
+        /// <summary>
+        /// Create a <see cref="GameWindow"/> based on the given <see cref="Game"/> and a fixed starting size.
+        /// </summary>
+        /// <param name="game">The <see cref="Game"/> to create the <see cref="GameWindow"/> for.</param>
+        /// <param name="width">Initial pixel width to set for the <see cref="GameWindow"/>.</param>
+        /// <param name="height">Initial pixel height to set for the <see cref="GameWindow"/>.</param>
         public static GameWindow Create(Game game, int width, int height)
         {
             var window = new MonoGame.Framework.WinFormsGameWindow((MonoGame.Framework.WinFormsGamePlatform)game.Platform);

@@ -111,7 +111,7 @@ namespace Microsoft.Xna.Framework.Content
 
                 // At the moment the Video class doesn't exist
                 // on all platforms... Allow it to compile anyway.
-#if ANDROID || (IOS && !TVOS) || MONOMAC || (WINDOWS && !OPENGL) || WINDOWS_UAP
+#if ANDROID || (IOS && !TVOS) || MONOMAC || (WINDOWS && !OPENGL)
                 var hVideoReader = new VideoReader();
 #endif
             }
@@ -229,7 +229,6 @@ namespace Microsoft.Xna.Framework.Content
             if (preparedType.Contains("PublicKeyToken"))
                 preparedType = Regex.Replace(preparedType, @"(.+?), Version=.+?$", "$1");
 
-            // TODO: For WinRT this is most likely broken!
             preparedType = preparedType.Replace(", Microsoft.Xna.Framework.Graphics", string.Format(", {0}", _assemblyName));
             preparedType = preparedType.Replace(", Microsoft.Xna.Framework.Video", string.Format(", {0}", _assemblyName));
             preparedType = preparedType.Replace(", Microsoft.Xna.Framework", string.Format(", {0}", _assemblyName));

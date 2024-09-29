@@ -60,9 +60,7 @@ namespace Microsoft.Xna.Framework.Media
         {
             FileName = fileName;
 
-#if !WINDOWS_UAP
             PlatformInitialize();
-#endif
         }
 
         /// <summary/>
@@ -85,7 +83,7 @@ namespace Microsoft.Xna.Framework.Media
         {
             if (!_disposed)
             {
-                //PlatformDispose(disposing);
+                PlatformDispose(disposing);
                 _disposed = true;
             }
         }

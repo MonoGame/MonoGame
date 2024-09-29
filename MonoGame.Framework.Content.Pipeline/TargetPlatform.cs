@@ -51,22 +51,10 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
         MacOSX,
 
         /// <summary>
-        /// Windows Store App
-        /// (MonoGame)
-        /// </summary>
-        WindowsStoreApp,
-
-        /// <summary>
         /// Google Chrome Native Client
         /// (MonoGame)
         /// </summary>
         NativeClient,
-
-        /// <summary>
-        /// Windows Phone 8
-        /// (MonoGame)
-        /// </summary>
-        WindowsPhone8,
 
         /// <summary>
         /// Raspberry Pi
@@ -95,14 +83,14 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
         Switch,
 
         /// <summary>
-        /// Google Stadia
-        /// </summary>
-        Stadia,
-
-        /// <summary>
         /// WebAssembly and Bridge.NET
         /// </summary>
-        Web
+        Web,
+
+        /// <summary>
+        /// All desktop versions using Vulkan.
+        /// </summary>
+        DesktopVK,
     }
 
 
@@ -121,12 +109,13 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
             {
                 return base.ConvertFrom(context, culture, value);
             }
-            catch (FormatException fex)
+            catch (FormatException)
             { 
                 // convert legacy Platforms
                 if (value.Equals("Linux") || value.Equals("WindowsGL"))
                     return TargetPlatform.DesktopGL;
-                else throw fex;
+                else
+                    throw;
             }
         }
     }

@@ -5,6 +5,17 @@
     "version": "0.2.0",
     "configurations": [
         {
+            "name": "Generator: CTypes",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "generator-ctypes",
+            "program": "${workspaceFolder}/Tools/MonoGame.Generator.CTypes/bin/Debug/net8.0/MonoGame.Generator.CTypes",
+            "args": [],
+            "cwd": "${workspaceFolder}/Tools/MonoGame.Generator.CTypes/bin/Debug/net8.0",
+            "console": "internalConsole",
+            "stopAtEntry": false
+        },
+        {
             "name": "MGCB Editor (Mac)",
             "type": "coreclr",
             "request": "launch",
@@ -14,6 +25,33 @@
             "cwd": "${workspaceFolder}/Artifacts/MonoGame.Content.Builder.Editor/Mac/Debug",
             "console": "internalConsole",
             "stopAtEntry": false
+        },
+        {
+            "name": "Attach to Process",
+            "type": "coreclr",
+            "request": "attach",
+            "processId": "${input.processid}",
+        },
+        {
+            "name": "MonoGame.Tests",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "build-tests",
+            "program": "${workspaceFolder}/Artifacts/Tests/DesktopGL/Debug/MonoGame.Tests",
+            "args": [
+                "--test=MonoGame.Tests.Graphics.SpriteBatchTest.Draw_normal"
+            ],
+            "cwd": "${workspaceFolder}/Artifacts/Tests/DesktopGL/Debug/",
+            "console": "internalConsole",
+            "stopAtEntry": false
+        },
+    ],
+    "inputs": [
+        {
+            "id": "processid",
+            "type": "promptString",
+            "default": "0",
+            "description": "Enter Process Id of process to attach to."
         }
     ]
 }

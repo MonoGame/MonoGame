@@ -24,5 +24,6 @@ public sealed class BuildMGCBEditorTask : FrostingTask<BuildContext>
 
         context.DotNetPublish(context.GetProjectPath(ProjectType.MGCBEditor, platform), context.DotNetPublishSettings);
         context.DotNetPack(context.GetProjectPath(ProjectType.Tools, "MonoGame.Content.Builder.Editor.Launcher.Bootstrap"), context.DotNetPackSettings);
+		context.DotNetPack(context.GetProjectPath(ProjectType.MGCBEditorLauncher, platform), context.DotNetPackSettings);
     }
 }

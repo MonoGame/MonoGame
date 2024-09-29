@@ -35,11 +35,6 @@ namespace MonoGame.Framework.Utilities
         Windows,
 
         /// <summary>
-        /// MonoGame Windows universal platform.
-        /// </summary>
-        WindowsUniversal,
-
-        /// <summary>
         /// MonoGame WebGL platform.
         /// </summary>
         WebGL,
@@ -65,8 +60,8 @@ namespace MonoGame.Framework.Utilities
         NintendoSwitch,
 
         /// <summary>
-        /// MonoGame Google Stadia platform.
+        /// All desktop versions using Vulkan.
         /// </summary>
-        Stadia
+        DesktopVK,
     }
 }

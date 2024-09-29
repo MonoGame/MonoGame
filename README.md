@@ -27,7 +27,6 @@ We support a growing list of platforms across the desktop, mobile, and console s
 
 * Desktop PCs
   * Windows 8.1 and up (OpenGL & DirectX)
-  * Windows Store Apps (UWP)
   * Linux (OpenGL)
   * macOS 10.15 and up (OpenGL)
 * Mobile/Tablet Devices
@@ -36,9 +35,8 @@ We support a growing list of platforms across the desktop, mobile, and console s
 * Consoles (for registered developers)
   * PlayStation 4
   * PlayStation 5
-  * Xbox One (both UWP and XDK)
+  * Xbox One (XDK only) (GDK coming soon)
   * Nintendo Switch
-  * Google Stadia
 
 ## Support and Contributions
 
@@ -84,7 +82,7 @@ A high level breakdown of the components of the framework:
 * Our [issue tracker](https://github.com/MonoGame/MonoGame/issues) is on GitHub.
 * Use our [community forums](http://community.monogame.net/) for support questions.
 * You can [join the Discord server](https://discord.gg/monogame) and chat live with the core developers and other users.
-* The [official documentation](https://monogame.net/articles/index.html) is on our website.
+* The [official documentation](https://docs.monogame.net/articles/index.html) is on our website.
 * Download [release](https://github.com/MonoGame/MonoGame/releases) and [development](https://github.com/orgs/MonoGame/packages) packages.
 * Follow [@MonoGameTeam](https://twitter.com/monogameteam) on Twitter.
 

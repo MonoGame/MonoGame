@@ -52,8 +52,9 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
         {
             var processor = _manager.CreateProcessor(processorName, processorParameters);
             var processContext = new PipelineProcessorContext(_manager, new PipelineBuildEvent { Parameters = processorParameters } );
+            using var _ = ContextScopeFactory.BeginContext(processContext);
             var processedObject = processor.Process(input, processContext);
-           
+
             // Add its dependencies and built assets to ours.
             _pipelineEvent.Dependencies.AddRangeUnique(processContext._pipelineEvent.Dependencies);
             _pipelineEvent.BuildAsset.AddRangeUnique(processContext._pipelineEvent.BuildAsset);

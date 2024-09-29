@@ -4,10 +4,6 @@
 
 using System;
 
-#if WINDOWS_UAP
-using Windows.UI.Xaml.Controls;
-#endif
-
 #if IOS
 using UIKit;
 using Microsoft.Xna.Framework.Input.Touch;
@@ -100,11 +96,6 @@ namespace Microsoft.Xna.Framework.Graphics
             get { return deviceWindowHandle; }
             set { deviceWindowHandle = value; }
         }
-
-#if WINDOWS_UAP
-        [CLSCompliant(false)]
-        public SwapChainPanel SwapChainPanel { get; set; }
-#endif
 
         /// <summary>
         /// Get or set the depth stencil format for the back buffer.

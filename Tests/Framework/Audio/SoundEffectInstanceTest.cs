@@ -14,6 +14,7 @@ using System.Diagnostics;
 
 namespace MonoGame.Tests.Audio
 {
+    [Category("Audio")]
     class SoundEffectInstanceTest
     {
         [SetUp]

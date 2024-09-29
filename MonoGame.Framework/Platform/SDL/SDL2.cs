@@ -392,7 +392,6 @@ internal static class Sdl
             UiKit,
             Wayland,
             Mir,
-            WinRt,
             Android
         }
 
@@ -997,6 +996,14 @@ internal static class Sdl
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         public delegate int d_sdl_gamecontrolleraddmappingsfromrw(IntPtr rw, int freew);
         public static d_sdl_gamecontrolleraddmappingsfromrw AddMappingFromRw = FuncLoader.LoadFunction<d_sdl_gamecontrolleraddmappingsfromrw>(NativeLibrary, "SDL_GameControllerAddMappingsFromRW");
+
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        public delegate bool d_sdl_gamecontrollerhasbutton(IntPtr gamecontroller, Button button);
+        public static d_sdl_gamecontrollerhasbutton HasButton = FuncLoader.LoadFunction<d_sdl_gamecontrollerhasbutton>(NativeLibrary, "SDL_GameControllerHasButton");
+
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        public delegate bool d_sdl_gamecontrollerhasaxis(IntPtr gamecontroller, Axis axis);
+        public static d_sdl_gamecontrollerhasaxis HasAxis = FuncLoader.LoadFunction<d_sdl_gamecontrollerhasaxis>(NativeLibrary, "SDL_GameControllerHasAxis");
 
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         public delegate void d_sdl_gamecontrollerclose(IntPtr gamecontroller);
