@@ -97,6 +97,10 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
                     return "OpenGL";
                 case TargetPlatform.DesktopVK:
                     return "Vulkan";
+                case TargetPlatform.WindowsGDK:
+                case TargetPlatform.XboxOne:
+                case TargetPlatform.XboxSeries:
+                    return "GDK";
             }
 
             return platform.ToString();

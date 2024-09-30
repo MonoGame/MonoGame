@@ -55,6 +55,8 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
             'S', // Nintendo Switch
             'b', // WebAssembly and Bridge.NET
             'V', // DesktopVK (Vulkan)
+            'G', // Windows GDK
+            's', // Xbox Series
         };
 
         /// <summary>
