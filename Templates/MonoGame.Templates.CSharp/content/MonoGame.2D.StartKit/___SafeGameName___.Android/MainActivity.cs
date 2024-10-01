@@ -1,11 +1,3 @@
-//-----------------------------------------------------------------------------
-// MainActivity.cs
-//
-// MonoGame Foundation Game Platform
-// Copyright (C) MonoGame Foundation. All rights reserved.
-//-----------------------------------------------------------------------------
-
-#region Using Statements
 using Android.App;
 using Android.Content.PM;
 using Android.OS;
@@ -14,7 +6,6 @@ using Android.Views;
 using Microsoft.Xna.Framework;
 
 using ___SafeGameName___.Core;
-#endregion
 
 namespace ___SafeGameName___.Android;
 

@@ -1,18 +1,6 @@
-﻿//-----------------------------------------------------------------------------
-// Program.cs
-//
-// MonoGame Foundation Game Platform
-// Copyright (C) MonoGame Foundation. All rights reserved.
-//-----------------------------------------------------------------------------
-
-#region Using Statements
-using System;
-
+﻿using ___SafeGameName___.Core;
 using Foundation;
 using UIKit;
-
-using ___SafeGameName___.Core;
-#endregion
 
 namespace ___SafeGameName___.iOS;
 

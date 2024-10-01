@@ -1,7 +1,12 @@
-﻿
-using ___SafeGameName___.Core;
+﻿using ___SafeGameName___.Core;
 using System.Windows.Forms;
 
-Application.SetHighDpiMode(HighDpiMode.SystemAware);  // Adjust the mode as needed
-using var game = new ___SafeGameName___Game();
-game.Run();
+internal class Program
+{
+    private static void Main(string[] args)
+    {
+        Application.SetHighDpiMode(HighDpiMode.SystemAware);  // Adjust the mode as needed
+        using var game = new ___SafeGameName___Game();
+        game.Run();
+    }
+}

@@ -1,5 +1,10 @@
-﻿
-using ___SafeGameName___.Core;
+﻿using ___SafeGameName___.Core;
 
-using var game = new ___SafeGameName___Game();
-game.Run();
+internal class Program
+{
+    private static void Main(string[] args)
+    {
+        using var game = new ___SafeGameName___Game();
+        game.Run();
+    }
+}
