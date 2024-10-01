@@ -1,60 +1,54 @@
-#region File Description
-//-----------------------------------------------------------------------------
-// ___SafeGameName___Game.cs
-//
-// MonoGame Foundation Game Platform
-// Copyright (C) MonoGame Foundation. All rights reserved.
-//-----------------------------------------------------------------------------
-#endregion
-
-#region Using Statements
-using System;
-using System.IO;
-
-using Microsoft.Xna.Framework;
 using ___SafeGameName___.ScreenManagers;
 using ___SafeGameName___.Screens;
-using System.IO.Pipes;
-using System.Reflection.Emit;
-
-
+using Microsoft.Xna.Framework;
 
 #if !__IOS__
 using Microsoft.Xna.Framework.Media;
 #endif
-#endregion
 
 namespace ___SafeGameName___.Core;
 
 /// <summary>
-/// This is the main type for your game
+/// This is the main entry point for your game
 /// </summary>
 public class ___SafeGameName___Game : Game
 {
     // Resources for drawing.
-    private GraphicsDeviceManager graphics;
+    private GraphicsDeviceManager graphicsDeviceManager;
 
     ScreenManager screenManager;
 
     public ___SafeGameName___Game()
     {
+        graphicsDeviceManager = new GraphicsDeviceManager(this);
+        // Add it as a service so we can shared 1 instance and grab it as necessary
+        Services.AddService(typeof(GraphicsDeviceManager), graphicsDeviceManager);
+
         Content.RootDirectory = "Content";
 
-        graphics = new GraphicsDeviceManager(this);
-
-        graphics.IsFullScreen = false;
+        graphicsDeviceManager.IsFullScreen = false;
 
         //graphics.PreferredBackBufferWidth = 800;
         //graphics.PreferredBackBufferHeight = 480;
-        graphics.SupportedOrientations = DisplayOrientation.LandscapeLeft | DisplayOrientation.LandscapeRight;
+        graphicsDeviceManager.SupportedOrientations = DisplayOrientation.LandscapeLeft | DisplayOrientation.LandscapeRight;
 
         // Create the screen manager component.
         screenManager = new ScreenManager(this);
 
         Components.Add(screenManager);
+    }
 
-        // Activate the first screens.
+    /// <summary>
+    /// Override Game.Initialize().  Sets up the ScreenManager.
+    /// </summary>
+    protected override void Initialize()
+    {
+        base.Initialize();
+
+        // add the background screen to the screen manager
         screenManager.AddScreen(new BackgroundScreen(), null);
+
+        // add the main menu screen to the screen manager
         screenManager.AddScreen(new MainMenuScreen(), null);
     }
 }
