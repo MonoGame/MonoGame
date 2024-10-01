@@ -1,28 +1,8 @@
-﻿#region File Description
-//-----------------------------------------------------------------------------
-// Enemy.cs
-//
-// MonoGame Foundation Game Platform
-// Copyright (C) MonoGame Foundation. All rights reserved.
-//-----------------------------------------------------------------------------
-#endregion
-
-#region Using Statements
-using System;
+﻿using System;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-#endregion
 
 namespace ___SafeGameName___.Core;
-
-/// <summary>
-/// Facing direction along the X axis.
-/// </summary>
-enum FaceDirection
-{
-    Left = -1,
-    Right = 1,
-}
 
 /// <summary>
 /// A monster who is impeding the progress of our fearless adventurer.
