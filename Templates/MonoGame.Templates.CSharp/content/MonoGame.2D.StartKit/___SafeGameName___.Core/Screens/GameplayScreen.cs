@@ -8,15 +8,9 @@
 #endregion
 
 #region Using Statements
-using System;
-using System.IO;
-using System.Reflection.Emit;
-using System.Reflection.Metadata;
-using System.Threading;
 using ___SafeGameName___.Core;
 using ___SafeGameName___.Core.Inputs;
 using ___SafeGameName___.Core.Localization;
-using ___SafeGameName___.Screens;
 using GameStateManagement.Inputs;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
@@ -24,6 +18,8 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Input.Touch;
 using Microsoft.Xna.Framework.Media;
+using System;
+using System.IO;
 #endregion
 
 namespace ___SafeGameName___.Screens;
@@ -69,12 +65,13 @@ class GameplayScreen : GameScreen
     private AccelerometerState accelerometerState;
 
     private VirtualGamePad virtualGamePad;
+    private Texture2D backpack;
 
     // The number of levels in the Levels directory of our content. We assume that
     // levels in our content are 0-based and that all numbers under this constant
     // have a level file present. This allows us to not need to check for the file
     // or handle exceptions, both of which can add unnecessary time to level loading.
-    private const int numberOfLevels = 5;
+    private const int numberOfLevels = 3;
     private const int textEdgeSpacing = 10;
 
     #endregion
@@ -126,6 +123,9 @@ class GameplayScreen : GameScreen
         catch { }
 #endif
         LoadNextLevel();
+
+        // TODO maybe a nice backpack icon?
+        backpack = content.Load<Texture2D>("Sprites/backpack");
 
         // once the load has finished, we use ResetElapsedTime to tell the game's
         // timing mechanism that we have just finished a very long frame, and that
@@ -381,6 +381,8 @@ class GameplayScreen : GameScreen
 
         if (touchState.IsConnected)
             virtualGamePad.Draw(spriteBatch);
+
+        spriteBatch.Draw(backpack, new Vector2((backbufferWidth - backpack.Width) / 2, textEdgeSpacing), Color.White);
     }
 
     private void DrawShadowedString(SpriteFont font, string value, Vector2 position, Color color)
