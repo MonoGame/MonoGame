@@ -41,13 +41,14 @@ class AboutScreen : MenuScreen
     {
         // Create our menu entries.
         builtWithMonoGameMenuEntry = new MenuEntry("#BuiltWithMonoGame", false);
-        monoGameWebsiteMenuEntry = new MenuEntry("MonoGame Site");
+        monoGameWebsiteMenuEntry = new MenuEntry(Resources.MonoGameSite);
+        // Need to add attribution link <a href="https://www.flaticon.com/free-icons/backpack" title="backpack icons">Backpack icons created by Freepik - Flaticon</a>
         MenuEntry back = new MenuEntry(Resources.Back);
 
         // Hook up menu event handlers.
         monoGameWebsiteMenuEntry.Selected += MonoGameWebsiteMenuSelected;
         back.Selected += OnCancel;
-        
+
         // Add entries to the menu.
         MenuEntries.Add(builtWithMonoGameMenuEntry);
         MenuEntries.Add(monoGameWebsiteMenuEntry);
@@ -63,9 +64,17 @@ class AboutScreen : MenuScreen
     /// </summary>
     void MonoGameWebsiteMenuSelected(object sender, PlayerIndexEventArgs e)
     {
-        // Launch defaut browser to the MonoGame website
+        LaunchDefaultBrowser("https://www.monogame.net/");
+    }
+
+    /// <summary>
+    /// Launch defaut browser using the URL that's been passed in
+    /// <param name="url">
+    /// </summary>
+    private static void LaunchDefaultBrowser(string url)
+    {
         // More tweaks required to make this work on all platforms :)
-        System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo("https://www.monogame.net/") { UseShellExecute = true });
+        System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo(url) { UseShellExecute = true });
     }
 
     #endregion
