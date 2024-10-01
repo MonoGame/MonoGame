@@ -9,6 +9,7 @@
 
 #region Using Statements
 using System;
+using System.Runtime.CompilerServices;
 using ___SafeGameName___.Core.Localization;
 using GameStateManagement.Inputs;
 using Microsoft.Xna.Framework;
@@ -28,6 +29,9 @@ class MessageBoxScreen : GameScreen
 
     string message;
     Texture2D gradientTexture;
+    private readonly bool toastMessage;
+    private readonly TimeSpan toastDuration;
+    private TimeSpan toastTimer;
 
     #endregion
 
@@ -46,7 +50,7 @@ class MessageBoxScreen : GameScreen
     /// usage text prompt.
     /// </summary>
     public MessageBoxScreen(string message)
-        : this(message, true)
+        : this(message, true, TimeSpan.Zero)
     { }
 
 
@@ -54,14 +58,18 @@ class MessageBoxScreen : GameScreen
     /// Constructor lets the caller specify whether to include the standard
     /// "A=ok, B=cancel" usage text prompt.
     /// </summary>
-    public MessageBoxScreen(string message, bool includeUsageText)
+    public MessageBoxScreen(string message, bool includeUsageText, TimeSpan toastDuration, bool toastMessage = false)
     {
         string usageText = $"{Environment.NewLine}{Environment.NewLine}{Resources.YesButtonText}{Environment.NewLine}{Resources.NoButtonText}";
 
-        if (includeUsageText)
+        if (includeUsageText && !toastMessage)
             this.message = message + usageText;
         else
             this.message = message;
+
+        this.toastMessage = toastMessage;
+        this.toastDuration = toastDuration;
+        this.toastTimer = TimeSpan.Zero;
 
         IsPopup = true;
 
@@ -94,6 +102,12 @@ class MessageBoxScreen : GameScreen
     /// </summary>
     public override void HandleInput(InputState input, GameTime gameTime)
     {
+        // Ignore input if this is a ToastMessage
+        if (toastMessage)
+        {
+            return;
+        }
+
         PlayerIndex playerIndex;
 
         // We pass in our ControllingPlayer, which may either be null (to
@@ -122,8 +136,29 @@ class MessageBoxScreen : GameScreen
 
     #endregion
 
-    #region Draw
+    #region Update and Draw
+    /// <summary>
+    /// Updates the screen, particularly for toast messages.
+    /// </summary>
+    public override void Update(GameTime gameTime, bool otherScreenHasFocus, bool coveredByOtherScreen)
+    {
+        base.Update(gameTime, otherScreenHasFocus, coveredByOtherScreen);
 
+        // Handle toast duration countdown.
+        if (toastMessage)
+        {
+            toastTimer += gameTime.ElapsedGameTime;
+            if (toastTimer >= toastDuration)
+            {
+                // Raise the accepted event, then exit the message box.
+                if (Accepted != null)
+                    Accepted(this, new PlayerIndexEventArgs(PlayerIndex.One));
+
+                // Exit the screen when the toast time has elapsed.
+                ExitScreen();
+            }
+        }
+    }
 
     /// <summary>
     /// Draws the message box.
