@@ -1,20 +1,9 @@
-#region File Description
-//-----------------------------------------------------------------------------
-// Player.cs
-//
-// MonoGame Foundation Game Platform
-// Copyright (C) MonoGame Foundation. All rights reserved.
-//-----------------------------------------------------------------------------
-#endregion
-
-#region Using Statements
 using ___SafeGameName___.Core.Inputs;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using System;
-#endregion
 
 namespace ___SafeGameName___.Core;
 
