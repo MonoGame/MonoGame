@@ -45,8 +45,6 @@ public class ScreenManager : DrawableGameComponent
 
     bool traceEnabled;
 
-    Game game;
-
     #endregion
 
     #region Properties
