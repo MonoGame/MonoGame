@@ -207,4 +207,16 @@
   <data name="Language" xml:space="preserve">
     <value>Langue: </value>
   </data>
+  <data name="ParticleEffect" xml:space="preserve">
+    <value>Effet De Particules:</value>
+  </data>
+  <data name="LetsGo" xml:space="preserve">
+    <value>Allons-y!!!!</value>
+  </data>
+  <data name="MonoGameSite" xml:space="preserve">
+    <value>Site MonoGame</value>
+  </data>
+  <data name="English" xml:space="preserve">
+    <value>anglais (Anglais) </value>
+  </data>
 </root>

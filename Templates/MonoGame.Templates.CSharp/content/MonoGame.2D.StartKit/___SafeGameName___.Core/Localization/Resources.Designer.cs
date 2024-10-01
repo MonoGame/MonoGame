@@ -88,6 +88,15 @@ namespace ___SafeGameName___.Core.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to english (English).
+        /// </summary>
+        internal static string English {
+            get {
+                return ResourceManager.GetString("English", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Initialize can only be called once.
         /// </summary>
         internal static string ErrorAccelerometerInitializeOnce {
@@ -214,6 +223,15 @@ namespace ___SafeGameName___.Core.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Let&apos;s GO!!!!.
+        /// </summary>
+        internal static string LetsGo {
+            get {
+                return ResourceManager.GetString("LetsGo", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Loading....
         /// </summary>
         internal static string Loading {
@@ -232,11 +250,29 @@ namespace ___SafeGameName___.Core.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to MonoGame Site.
+        /// </summary>
+        internal static string MonoGameSite {
+            get {
+                return ResourceManager.GetString("MonoGameSite", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to No = B button, Esc.
         /// </summary>
         internal static string NoButtonText {
             get {
                 return ResourceManager.GetString("NoButtonText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Particle Effect:.
+        /// </summary>
+        internal static string ParticleEffect {
+            get {
+                return ResourceManager.GetString("ParticleEffect", resourceCulture);
             }
         }
         
