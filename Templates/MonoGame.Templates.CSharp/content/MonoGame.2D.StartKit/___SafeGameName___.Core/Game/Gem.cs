@@ -1,25 +1,14 @@
-﻿#region File Description
-//-----------------------------------------------------------------------------
-// Gem.cs
-//
-// MonoGame Foundation Game Platform
-// Copyright (C) MonoGame Foundation. All rights reserved.
-//-----------------------------------------------------------------------------
-#endregion
-
-#region Using Statements
-using System;
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
+﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Audio;
-#endregion
+using Microsoft.Xna.Framework.Graphics;
+using System;
 
 namespace ___SafeGameName___.Core;
 
 /// <summary>
 /// A valuable item the player can collect.
 /// </summary>
-class Gem
+partial class Gem
 {
     private Texture2D texture;
     private Vector2 origin;
@@ -30,7 +19,13 @@ class Gem
 
     // The gem is animated from a base position along the Y axis.
     private Vector2 basePosition;
+    private Vector2 levelDimensions;
     private float bounce;
+
+    // Bounce control constants
+    const float BounceHeight = 0.18f;
+    const float BounceRate = 3.0f;
+    const float BounceSync = -0.75f;
 
     public Level Level
     {
@@ -60,13 +55,21 @@ class Gem
         }
     }
 
+    Vector2 scale;
+    public Vector2 Scale { get => scale; set => scale = value; }
+
+    Vector2 collectedPosition;
+
+    public GemState State { get; set; } = GemState.Waiting;
+
     /// <summary>
     /// Constructs a new gem.
     /// </summary>
-    public Gem(Level level, Vector2 position, char gemType)
+    public Gem(Level level, Vector2 position, char gemType, Vector2 levelDimensions)
     {
         this.level = level;
         this.basePosition = position;
+        this.levelDimensions = levelDimensions;
 
         switch (gemType)
         {
@@ -86,6 +89,8 @@ class Gem
                 break;
         }
 
+        collectedPosition = new Vector2(levelDimensions.X / 2, 20.0f);
+
         LoadContent();
     }
 
@@ -104,15 +109,37 @@ class Gem
     /// </summary>
     public void Update(GameTime gameTime)
     {
-        // Bounce control constants
-        const float BounceHeight = 0.18f;
-        const float BounceRate = 3.0f;
-        const float BounceSync = -0.75f;
+        switch (State)
+        {
+            case GemState.Collected:
+                break;
 
-        // Bounce along a sine curve over time.
-        // Include the X coordinate so that neighboring gems bounce in a nice wave pattern.            
-        double t = gameTime.TotalGameTime.TotalSeconds * BounceRate + Position.X * BounceSync;
-        bounce = (float)Math.Sin(t) * BounceHeight * texture.Height;
+            case GemState.Collecting:
+                if (basePosition.Y > collectedPosition.Y)
+                {
+                    // Move towards top centre of the screen.
+                    Vector2 direction = collectedPosition - basePosition;
+                    direction.Normalize();
+                    basePosition += direction * 256 * (float)gameTime.ElapsedGameTime.TotalSeconds;
+                    scale /= 1.010f;
+                }
+
+                if (basePosition.Y <= collectedPosition.Y)
+                {
+                    State = GemState.Collected;
+                }
+                break;
+
+            case GemState.Waiting:
+                // Bounce along a sine curve over time.
+                // Include the X coordinate so that neighboring gems bounce in a nice wave pattern.
+                double t = gameTime.TotalGameTime.TotalSeconds * BounceRate + Position.X * BounceSync;
+                bounce = (float)Math.Sin(t) * BounceHeight * texture.Height;
+                scale = new Vector2(1.0f, 1.0f);
+                break;
+            default:
+                break;
+        }
     }
 
     /// <summary>
@@ -132,6 +159,6 @@ class Gem
     /// </summary>
     public void Draw(GameTime gameTime, SpriteBatch spriteBatch)
     {
-        spriteBatch.Draw(texture, Position, null, Color, 0.0f, origin, 1.0f, SpriteEffects.None, 0.0f);
+        spriteBatch.Draw(texture, Position, null, Color, 0.0f, origin, scale, SpriteEffects.None, 0.0f);
     }
 }
