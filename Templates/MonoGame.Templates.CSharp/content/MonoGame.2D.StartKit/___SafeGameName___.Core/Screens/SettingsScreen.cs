@@ -1,150 +1,131 @@
-#region File Description
-//-----------------------------------------------------------------------------
-// OptionsMenuScreen.cs
-//
-// Microsoft XNA Community Game Platform
-// Copyright (C) Microsoft Corporation. All rights reserved.
-//-----------------------------------------------------------------------------
-#endregion
-
-#region Using Statements
-using ___SafeGameName___.Core;
+using ___SafeGameName___.Core.Effects;
 using ___SafeGameName___.Core.Localization;
+using ___SafeGameName___.ScreenManagers;
 using Microsoft.Xna.Framework;
-#endregion
+using System.Collections.Generic;
+using System.Globalization;
 
 namespace ___SafeGameName___.Screens;
 
 /// <summary>
-/// The options screen is brought up over the top of the main menu
+/// The settings screen is brought up over the top of the main menu
 /// screen, and gives the user a chance to configure the game
 /// in various hopefully useful ways.
 /// </summary>
 class SettingsScreen : MenuScreen
 {
     #region Fields
-
-    MenuEntry ungulateMenuEntry;
+    MenuEntry fullscreenMenuEntry;
     MenuEntry languageMenuEntry;
-    MenuEntry frobnicateMenuEntry;
-    MenuEntry elfMenuEntry;
-
-    enum Ungulate
-    {
-        BactrianCamel,
-        Dromedary,
-        Llama,
-    }
-
-    static Ungulate currentUngulate = Ungulate.Dromedary;
-
-    static string[] languages = { "C#", "French", "Deoxyribonucleic acid" };
+    MenuEntry particleEffectMenuEntry;
+    private MenuEntry backMenuEntry;
+    static List<CultureInfo> languages;
     static int currentLanguage = 0;
 
-    static bool frobnicate = true;
+    private GraphicsDeviceManager gdm;
 
-    static int elf = 23;
-
+    static ParticleEffectType currentParticleEffect = ParticleEffectType.Fireworks;
+    public static ParticleEffectType CurrentParticleEffect { get => currentParticleEffect; }
     #endregion
-
     #region Initialization
-
 
     /// <summary>
     /// Constructor.
     /// </summary>
     public SettingsScreen()
-        : base(Resources.Options)
+        : base(Resources.Settings)
     {
+        List<CultureInfo> cultures = LocalizationManager.GetSupportedCultures();
+        languages = new List<CultureInfo>();
+        for (int i = 0; i < cultures.Count; i++)
+        {
+            languages.Add(cultures[i]);
+        }
+
         // Create our menu entries.
-        ungulateMenuEntry = new MenuEntry(string.Empty);
+        fullscreenMenuEntry = new MenuEntry(string.Empty);
         languageMenuEntry = new MenuEntry(string.Empty);
-        frobnicateMenuEntry = new MenuEntry(string.Empty);
-        elfMenuEntry = new MenuEntry(string.Empty);
-
-        SetMenuEntryText();
-
-        MenuEntry back = new MenuEntry(Resources.Back);
+        particleEffectMenuEntry = new MenuEntry(string.Empty);
+        backMenuEntry = new MenuEntry(string.Empty);
 
         // Hook up menu event handlers.
-        ungulateMenuEntry.Selected += UngulateMenuEntrySelected;
+        fullscreenMenuEntry.Selected += FullScreenMenuEntrySelected;
         languageMenuEntry.Selected += LanguageMenuEntrySelected;
-        frobnicateMenuEntry.Selected += FrobnicateMenuEntrySelected;
-        elfMenuEntry.Selected += ElfMenuEntrySelected;
-        back.Selected += OnCancel;
-        
+        particleEffectMenuEntry.Selected += ParticleEffectMenuEntrySelected;
+        backMenuEntry.Selected += OnCancel;
+
         // Add entries to the menu.
-        MenuEntries.Add(ungulateMenuEntry);
+        MenuEntries.Add(fullscreenMenuEntry);
         MenuEntries.Add(languageMenuEntry);
-        MenuEntries.Add(frobnicateMenuEntry);
-        MenuEntries.Add(elfMenuEntry);
-        MenuEntries.Add(back);
+        MenuEntries.Add(particleEffectMenuEntry);
+        MenuEntries.Add(backMenuEntry);
     }
 
+    public override void LoadContent()
+    {
+        base.LoadContent();
+
+        SetMenuEntryText();
+    }
 
     /// <summary>
     /// Fills in the latest values for the options screen menu text.
     /// </summary>
     void SetMenuEntryText()
     {
-        ungulateMenuEntry.Text = "Preferred ungulate: " + currentUngulate;
-        languageMenuEntry.Text = "Language: " + languages[currentLanguage];
-        frobnicateMenuEntry.Text = "Frobnicate: " + (frobnicate ? "on" : "off");
-        elfMenuEntry.Text = "elf: " + elf;
+        if (gdm == null)
+        {
+            gdm = ScreenManager.Game.Services.GetService<GraphicsDeviceManager>();
+        }
+        fullscreenMenuEntry.Text = string.Format(Resources.DisplayMode, gdm.IsFullScreen ? Resources.FullScreen : Resources.Windowed);
+
+        var selectedLanguage = languages[currentLanguage].DisplayName;
+        if (selectedLanguage.Contains("Invariant"))
+        {
+            selectedLanguage = Resources.English;
+        }
+        languageMenuEntry.Text = Resources.Language + selectedLanguage;
+        ;
+        particleEffectMenuEntry.Text = Resources.ParticleEffect + currentParticleEffect;
+        backMenuEntry.Text = Resources.Back;
     }
 
-
     #endregion
-
     #region Handle Input
-
-
     /// <summary>
-    /// Event handler for when the Ungulate menu entry is selected.
+    /// Event handler for when the Fullscreen menu entry is selected.
     /// </summary>
-    void UngulateMenuEntrySelected(object sender, PlayerIndexEventArgs e)
+    void FullScreenMenuEntrySelected(object sender, PlayerIndexEventArgs e)
     {
-        currentUngulate++;
-
-        if (currentUngulate > Ungulate.Llama)
-            currentUngulate = 0;
+        gdm.ToggleFullScreen();
 
         SetMenuEntryText();
     }
-
 
     /// <summary>
     /// Event handler for when the Language menu entry is selected.
     /// </summary>
     void LanguageMenuEntrySelected(object sender, PlayerIndexEventArgs e)
     {
-        currentLanguage = (currentLanguage + 1) % languages.Length;
+        currentLanguage = (currentLanguage + 1) % languages.Count;
+
+        var selectedLanguage = languages[currentLanguage].Name;
+        LocalizationManager.SetCulture(selectedLanguage);
 
         SetMenuEntryText();
     }
 
-
-    /// <summary>
-    /// Event handler for when the Frobnicate menu entry is selected.
-    /// </summary>
-    void FrobnicateMenuEntrySelected(object sender, PlayerIndexEventArgs e)
+    private void ParticleEffectMenuEntrySelected(object sender, PlayerIndexEventArgs e)
     {
-        frobnicate = !frobnicate;
+        currentParticleEffect++;
+
+        if (currentParticleEffect > ParticleEffectType.Confetti)
+        {
+            currentParticleEffect = 0;
+        }
 
         SetMenuEntryText();
     }
-
-
-    /// <summary>
-    /// Event handler for when the Elf menu entry is selected.
-    /// </summary>
-    void ElfMenuEntrySelected(object sender, PlayerIndexEventArgs e)
-    {
-        elf++;
-
-        SetMenuEntryText();
-    }
-
 
     #endregion
 }
