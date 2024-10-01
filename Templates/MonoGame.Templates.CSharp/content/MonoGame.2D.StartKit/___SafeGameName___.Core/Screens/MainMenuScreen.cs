@@ -1,14 +1,5 @@
-﻿#region File Description
-//-----------------------------------------------------------------------------
-// MainMenuScreen.cs
-//
-// Microsoft XNA Community Game Platform
-// Copyright (C) Microsoft Corporation. All rights reserved.
-//-----------------------------------------------------------------------------
-#endregion
-
-#region Using Statements
-using ___SafeGameName___.Core;
+﻿using ___SafeGameName___.Core;
+using ___SafeGameName___.Core.Effects;
 using ___SafeGameName___.Core.Inputs;
 using ___SafeGameName___.Core.Localization;
 using ___SafeGameName___.ScreenManagers;
@@ -16,9 +7,8 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using System;
 using System.IO;
-using System.Reflection.Emit;
-#endregion
 
 namespace ___SafeGameName___.Screens;
 
@@ -32,6 +22,8 @@ class MainMenuScreen : MenuScreen
     private Level level;
     private bool readyToPlay;
     private PlayerIndex playerIndex;
+    private ParticleManager particleManager;
+    private Texture2D particleTexture;
     #endregion
 
     #region Initialization
@@ -46,18 +38,18 @@ class MainMenuScreen : MenuScreen
         // Create our menu entries.
         MenuEntry aboutMenuEntry = new MenuEntry(Resources.About);
         MenuEntry playMenuEntry = new MenuEntry(Resources.Play);
-        MenuEntry optionsMenuEntry = new MenuEntry(Resources.Options);
+        MenuEntry settingsMenuEntry = new MenuEntry(Resources.Settings);
         MenuEntry exitMenuEntry = new MenuEntry(Resources.Exit);
 
         // Hook up menu event handlers.
         playMenuEntry.Selected += PlayMenuEntrySelected;
-        optionsMenuEntry.Selected += OptionsMenuEntrySelected;
+        settingsMenuEntry.Selected += SettingsMenuEntrySelected;
         aboutMenuEntry.Selected += AboutMenuEntrySelected;
         exitMenuEntry.Selected += OnCancel;
 
         // Add entries to the menu.
         MenuEntries.Add(playMenuEntry);
-        MenuEntries.Add(optionsMenuEntry);
+        MenuEntries.Add(settingsMenuEntry);
         MenuEntries.Add(aboutMenuEntry);
         MenuEntries.Add(exitMenuEntry);
     }
@@ -75,6 +67,10 @@ class MainMenuScreen : MenuScreen
         string levelPath = "Content/Levels/00.txt";
         using (Stream fileStream = TitleContainer.OpenStream(levelPath))
             level = new Level(ScreenManager.Game.Services, fileStream, 00);
+
+        // Create a particle manager at the center of the screen
+        particleTexture = content.Load<Texture2D>("Sprites/blank");
+        particleManager = new ParticleManager(particleTexture, new Vector2(400, 200));
     }
 
     /// <summary>
@@ -108,6 +104,8 @@ class MainMenuScreen : MenuScreen
         bool coveredByOtherScreen)
     {
         base.Update(gameTime, otherScreenHasFocus, coveredByOtherScreen);
+
+        particleManager.Update(gameTime);
 
         if (readyToPlay)
         {
@@ -148,6 +146,8 @@ class MainMenuScreen : MenuScreen
 
         level.Draw(gameTime, spriteBatch);
 
+        particleManager.Draw(spriteBatch);
+
         spriteBatch.End();
 
         base.Draw(gameTime);
@@ -161,14 +161,24 @@ class MainMenuScreen : MenuScreen
     /// </summary>
     void PlayMenuEntrySelected(object sender, PlayerIndexEventArgs e)
     {
-        playerIndex = e.PlayerIndex;
-        readyToPlay = true;
+        // Let's kick off some celebratory particles
+        // TODO We could cosition the manager anywhere particleManager.Position = new Vector2(somewhere.X, somewhere.Y);
+        particleManager.Emit(100, SettingsScreen.CurrentParticleEffect);  // Emit 100 particles
+
+        var toastMessageBox = new MessageBoxScreen(Resources.LetsGo, false, new TimeSpan(0, 0, 1), true);
+        toastMessageBox.Accepted += (sender, e) =>
+        {
+            playerIndex = e.PlayerIndex;
+            readyToPlay = true;
+
+        };
+        ScreenManager.AddScreen(toastMessageBox, e.PlayerIndex);
     }
 
     /// <summary>
     /// Event handler for when the Options menu entry is selected.
     /// </summary>
-    void OptionsMenuEntrySelected(object sender, PlayerIndexEventArgs e)
+    void SettingsMenuEntrySelected(object sender, PlayerIndexEventArgs e)
     {
         ScreenManager.AddScreen(new SettingsScreen(), e.PlayerIndex);
     }
