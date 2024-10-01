@@ -1,4 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
+using System.Runtime.CompilerServices;
 
 namespace ___SafeGameName___.Core.Effects;
 

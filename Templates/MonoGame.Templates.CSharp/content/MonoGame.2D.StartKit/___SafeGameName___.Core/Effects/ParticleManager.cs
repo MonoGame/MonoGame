@@ -10,14 +10,40 @@ public class ParticleManager
     private List<Particle> particles;
     private Random random;
     private Texture2D texture;
-    private Vector2 emitterPosition;
+    private Vector2 position;
+    private Vector2 textureOrigin;
+
+    public Vector2 Position
+    {
+        get => position;
+        set => position = value;
+    }
+    public Texture2D Texture
+    {
+        get => texture;
+        set => texture = value;
+    }
+    public int ParticleCount {
+        get
+        {
+            if (particles != null)
+            {
+                return particles.Count;
+            }
+            else
+            {
+                return 0;
+            }
+        }
+    }
 
     public ParticleManager(Texture2D texture, Vector2 position)
     {
-        particles = new List<Particle>();
-        random = new Random();
+        this.particles = new List<Particle>();
+        this.random = new Random();
         this.texture = texture;
-        emitterPosition = position;
+        this.textureOrigin = new Vector2(texture.Width / 2, texture.Height / 2);
+        this.position = position;
     }
 
     // Emit particles based on the effect type
@@ -47,7 +73,7 @@ public class ParticleManager
             Color color = new Color(random.Next(256), random.Next(256), random.Next(256)); // Random colors for fireworks
             float scale = (float)random.NextDouble() * 0.5f + 0.5f;
 
-            particles.Add(new Particle(emitterPosition, velocity, lifetime, color, scale));
+            particles.Add(new Particle(position, velocity, lifetime, color, scale));
         }
     }
 
@@ -61,7 +87,7 @@ public class ParticleManager
             Color color = Color.White * ((float)random.NextDouble() * 0.5f + 0.5f); // Light sparkly effect
             float scale = (float)random.NextDouble() * 0.2f + 0.2f;
 
-            particles.Add(new Particle(emitterPosition, velocity, lifetime, color, scale));
+            particles.Add(new Particle(position, velocity, lifetime, color, scale));
         }
     }
 
@@ -75,7 +101,7 @@ public class ParticleManager
             Color color = new Color(random.Next(256), random.Next(256), random.Next(256)); // Bright colors for confetti
             float scale = (float)random.NextDouble() * 0.3f + 0.3f;
 
-            particles.Add(new Particle(emitterPosition, velocity, lifetime, color, scale));
+            particles.Add(new Particle(position, velocity, lifetime, color, scale));
         }
     }
 
@@ -97,8 +123,16 @@ public class ParticleManager
         {
             if (particle.IsAlive())
             {
-                spriteBatch.Draw(texture, particle.Position, null, particle.Color, 0f,
-                    new Vector2(texture.Width / 2, texture.Height / 2), particle.Scale, SpriteEffects.None, 0f);
+                spriteBatch.Draw(
+                    texture,
+                    particle.Position,
+                    null,
+                    particle.Color,
+                    0.0f,
+                    textureOrigin,
+                    particle.Scale,
+                    SpriteEffects.None,
+                    0f);
             }
         }
     }
