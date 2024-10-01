@@ -1,25 +1,13 @@
-﻿#region File Description
-//-----------------------------------------------------------------------------
-// Level.cs
-//
-// MonoGame Foundation Game Platform
-// Copyright (C) MonoGame Foundation. All rights reserved.
-//-----------------------------------------------------------------------------
-#endregion
-
-#region Using Statements
-using System;
-using System.Collections.Generic;
-using System.IO;
-
+﻿using ___SafeGameName___.Core.Inputs;
+using ___SafeGameName___.Core.Localization;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
-using Microsoft.Xna.Framework.Audio;
-using ___SafeGameName___.Core.Inputs;
-using ___SafeGameName___.Core.Localization;
-#endregion
+using System;
+using System.Collections.Generic;
+using System.IO;
 
 namespace ___SafeGameName___.Core;
 
@@ -84,7 +72,6 @@ class Level : IDisposable
     private SoundEffect exitReachedSound;
 
     #region Loading
-
     /// <summary>
     /// Constructs a new level.
     /// </summary>
@@ -220,13 +207,17 @@ class Level : IDisposable
             case ':':
                 return LoadVarietyTile("BlockB", 2, TileCollision.Passable);
 
-            // Player 1 start point
-            case 'P':
-                return LoadStartTile(x, y);
-
             // Impassable block
             case '#':
                 return LoadVarietyTile("BlockA", 7, TileCollision.Impassable);
+
+            // Breakable block
+            case ';': // TODO Not yet used in any levels. FIXME :) 
+                return LoadVarietyTile("BlockB", 2, TileCollision.Breakable);
+
+            // Player 1 start point
+            case 'P':
+                return LoadStartTile(x, y);
 
             // Unknown tile type character
             default:
@@ -250,7 +241,6 @@ class Level : IDisposable
         return new Tile(Content.Load<Texture2D>("Tiles/" + name), collision);
     }
 
-
     /// <summary>
     /// Loads a tile with a random appearance.
     /// </summary>
@@ -266,7 +256,6 @@ class Level : IDisposable
         int index = random.Next(variationCount);
         return LoadTile(baseName + index, collision);
     }
-
 
     /// <summary>
     /// Instantiates a player, puts him in the level, and remembers where to put him when he is resurrected.
@@ -312,7 +301,7 @@ class Level : IDisposable
     private Tile LoadGemTile(int x, int y, char gemType)
     {
         Point position = GetBounds(x, y).Center;
-        gems.Add(new Gem(this, new Vector2(position.X, position.Y), gemType));
+        gems.Add(new Gem(this, new Vector2(position.X, position.Y), gemType, new Vector2(Width * Tile.Width, Height * Tile.Height)));
 
         return new Tile(null, TileCollision.Passable);
     }
@@ -324,11 +313,9 @@ class Level : IDisposable
     {
         Content.Unload();
     }
-
     #endregion
 
     #region Bounds and collision
-
     /// <summary>
     /// Gets the collision mode of the tile at a particular location.
     /// This method handles tiles outside of the levels boundries by making it
@@ -349,7 +336,7 @@ class Level : IDisposable
 
     /// <summary>
     /// Gets the bounding rectangle of a tile in world space.
-    /// </summary>        
+    /// </summary>
     public Rectangle GetBounds(int x, int y)
     {
         return new Rectangle(x * Tile.Width, y * Tile.Height, Tile.Width, Tile.Height);
@@ -370,11 +357,9 @@ class Level : IDisposable
     {
         get { return tiles.GetLength(1); }
     }
-
     #endregion
 
     #region Update
-
     /// <summary>
     /// Updates all objects in the world, performs collision between them,
     /// and handles the time limit with scoring.
@@ -385,9 +370,9 @@ class Level : IDisposable
     /// <param name="accelerometerState">Provides a snapshot of timing values.</param>
     /// <param name="displayOrientation">Provides a snapshot of timing values.</param>
     public void Update(
-        GameTime gameTime, 
-        KeyboardState keyboardState, 
-        GamePadState gamePadState, 
+        GameTime gameTime,
+        KeyboardState keyboardState,
+        GamePadState gamePadState,
         AccelerometerState accelerometerState,
         DisplayOrientation displayOrientation,
         bool readyToPlay = true)
@@ -448,10 +433,25 @@ class Level : IDisposable
 
             gem.Update(gameTime);
 
-            if (gem.BoundingCircle.Intersects(Player.BoundingRectangle))
+            switch (gem.State)
             {
-                gems.RemoveAt(i--);
-                OnGemCollected(gem, Player);
+                case GemState.Collected:
+                    gems.RemoveAt(i--);
+                    break;
+
+                case GemState.Collecting:
+                    break;
+
+                case GemState.Waiting:
+                    if (gem.BoundingCircle.Intersects(Player.BoundingRectangle))
+                    {
+                        gem.Scale = new Vector2(1.5f, 1.5f);
+                        gem.State = GemState.Collecting;
+                        OnGemCollected(gem, Player);
+                    }
+                    break;
+                default:
+                    break;
             }
         }
     }
@@ -514,11 +514,9 @@ class Level : IDisposable
     {
         Player.Reset(start);
     }
-
     #endregion
 
     #region Draw
-
     /// <summary>
     /// Draw everything in the level from background to foreground.
     /// </summary>
@@ -562,6 +560,5 @@ class Level : IDisposable
             }
         }
     }
-
     #endregion
 }
