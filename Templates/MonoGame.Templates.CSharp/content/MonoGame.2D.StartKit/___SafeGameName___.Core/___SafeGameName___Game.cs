@@ -1,9 +1,15 @@
+using ___SafeGameName___.Core.Localization;
+using ___SafeGameName___.Core.Settings;
 using ___SafeGameName___.ScreenManagers;
 using ___SafeGameName___.Screens;
 using Microsoft.Xna.Framework;
 
 #if !__IOS__
 using Microsoft.Xna.Framework.Media;
+using System;
+using System.Collections.Generic;
+using System.Globalization;
+using System.Runtime.InteropServices;
 #endif
 
 namespace ___SafeGameName___.Core;
@@ -14,15 +20,36 @@ namespace ___SafeGameName___.Core;
 public class ___SafeGameName___Game : Game
 {
     // Resources for drawing.
-    private GraphicsDeviceManager graphicsDeviceManager;
+    GraphicsDeviceManager graphicsDeviceManager;
 
     ScreenManager screenManager;
+
+    SettingsManager settingsManager;
 
     public ___SafeGameName___Game()
     {
         graphicsDeviceManager = new GraphicsDeviceManager(this);
         // Add it as a service so we can shared 1 instance and grab it as necessary
         Services.AddService(typeof(GraphicsDeviceManager), graphicsDeviceManager);
+
+        ISettingsStorage storage;
+        // The platform-specific code will be in the platform-specific project
+        if (OperatingSystem.IsAndroid() || OperatingSystem.IsIOS())
+        {
+            storage = new MobileSettingsStorage();
+        }
+        else if (OperatingSystem.IsWindows() || OperatingSystem.IsLinux() || OperatingSystem.IsMacOS())
+        {
+            storage = new DesktopSettingsStorage();
+        }
+        else
+        {
+            // For now, we'll throw an exception if we don't know the platform
+            throw new PlatformNotSupportedException();
+        }
+
+        settingsManager = new SettingsManager(storage);
+        Services.AddService(typeof(SettingsManager), settingsManager);
 
         Content.RootDirectory = "Content";
 
@@ -44,6 +71,20 @@ public class ___SafeGameName___Game : Game
     protected override void Initialize()
     {
         base.Initialize();
+
+        // Load the settings
+        settingsManager.Load();
+
+        // Get a list of all languages our app supports
+        List<CultureInfo> cultures = LocalizationManager.GetSupportedCultures();
+        var languages = new List<CultureInfo>();
+        for (int i = 0; i < cultures.Count; i++)
+        {
+            languages.Add(cultures[i]);
+        }
+
+        var selectedLanguage = languages[settingsManager.Settings.Language].Name;
+        LocalizationManager.SetCulture(selectedLanguage);
 
         // add the background screen to the screen manager
         screenManager.AddScreen(new BackgroundScreen(), null);

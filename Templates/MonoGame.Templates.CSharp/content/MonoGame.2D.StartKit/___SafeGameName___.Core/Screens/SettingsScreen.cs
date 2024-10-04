@@ -1,5 +1,7 @@
+using ___SafeGameName___.Core;
 using ___SafeGameName___.Core.Effects;
 using ___SafeGameName___.Core.Localization;
+using ___SafeGameName___.Core.Settings;
 using ___SafeGameName___.ScreenManagers;
 using Microsoft.Xna.Framework;
 using System.Collections.Generic;
@@ -14,7 +16,6 @@ namespace ___SafeGameName___.Screens;
 /// </summary>
 class SettingsScreen : MenuScreen
 {
-    #region Fields
     MenuEntry fullscreenMenuEntry;
     MenuEntry languageMenuEntry;
     MenuEntry particleEffectMenuEntry;
@@ -26,8 +27,8 @@ class SettingsScreen : MenuScreen
 
     static ParticleEffectType currentParticleEffect = ParticleEffectType.Fireworks;
     public static ParticleEffectType CurrentParticleEffect { get => currentParticleEffect; }
-    #endregion
-    #region Initialization
+
+    private SettingsManager settingsManager;
 
     /// <summary>
     /// Constructor.
@@ -65,18 +66,30 @@ class SettingsScreen : MenuScreen
     {
         base.LoadContent();
 
-        SetMenuEntryText();
+        // Lazy Load some things
+        gdm ??= ScreenManager.Game.Services.GetService<GraphicsDeviceManager>();
+
+        settingsManager ??= ScreenManager.Game.Services.GetService<SettingsManager>();
+
+        settingsManager.Settings.PropertyChanged += (s, e) =>
+        {
+            SetLanguageText();
+
+            settingsManager.Save();
+        };
+
+        currentLanguage = settingsManager.Settings.Language;
+        currentParticleEffect = settingsManager.Settings.ParticleEffect;
+        gdm.IsFullScreen = settingsManager.Settings.FullScreen;
+
+        SetLanguageText();
     }
 
     /// <summary>
     /// Fills in the latest values for the options screen menu text.
     /// </summary>
-    void SetMenuEntryText()
+    void SetLanguageText()
     {
-        if (gdm == null)
-        {
-            gdm = ScreenManager.Game.Services.GetService<GraphicsDeviceManager>();
-        }
         fullscreenMenuEntry.Text = string.Format(Resources.DisplayMode, gdm.IsFullScreen ? Resources.FullScreen : Resources.Windowed);
 
         var selectedLanguage = languages[currentLanguage].DisplayName;
@@ -85,13 +98,14 @@ class SettingsScreen : MenuScreen
             selectedLanguage = Resources.English;
         }
         languageMenuEntry.Text = Resources.Language + selectedLanguage;
-        ;
+
         particleEffectMenuEntry.Text = Resources.ParticleEffect + currentParticleEffect;
+
         backMenuEntry.Text = Resources.Back;
+
+        Title = Resources.Settings;
     }
 
-    #endregion
-    #region Handle Input
     /// <summary>
     /// Event handler for when the Fullscreen menu entry is selected.
     /// </summary>
@@ -99,7 +113,7 @@ class SettingsScreen : MenuScreen
     {
         gdm.ToggleFullScreen();
 
-        SetMenuEntryText();
+        settingsManager.Settings.FullScreen = gdm.IsFullScreen;
     }
 
     /// <summary>
@@ -112,7 +126,7 @@ class SettingsScreen : MenuScreen
         var selectedLanguage = languages[currentLanguage].Name;
         LocalizationManager.SetCulture(selectedLanguage);
 
-        SetMenuEntryText();
+        settingsManager.Settings.Language = currentLanguage;
     }
 
     private void ParticleEffectMenuEntrySelected(object sender, PlayerIndexEventArgs e)
@@ -124,8 +138,6 @@ class SettingsScreen : MenuScreen
             currentParticleEffect = 0;
         }
 
-        SetMenuEntryText();
+        settingsManager.Settings.ParticleEffect = currentParticleEffect;
     }
-
-    #endregion
 }

@@ -21,6 +21,7 @@
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
     <EmbeddedResource Update="Localization\Resources.fr-FR.resx" />
+    <EmbeddedResource Update="Localization\Resources.es-ES.resx" />
     <!-- GERMAN : Be sure to add just a .resx file to the Localization directory
     EmbeddedResource Update="Localization\Resources.de-DE.resx" / -->
   </ItemGroup>

@@ -25,17 +25,11 @@ namespace ___SafeGameName___.Screens;
 /// </summary>
 abstract class MenuScreen : GameScreen
 {
-    #region Fields
-
     List<MenuEntry> menuEntries = new List<MenuEntry>();
     int selectedEntry = 0;
     string menuTitle;
+    public string Title { get => menuTitle; set => menuTitle = value; }
     Color menuTitleColor = new Color(0, 0, 0); // default color is black. use new Color(192, 192, 192) for off white
-
-    #endregion
-
-    #region Properties
-
 
     /// <summary>
     /// Gets the list of menu entries, so derived classes can add
@@ -45,9 +39,6 @@ abstract class MenuScreen : GameScreen
     {
         get { return menuEntries; }
     }
-
-
-    #endregion
 
     #region Initialization
 

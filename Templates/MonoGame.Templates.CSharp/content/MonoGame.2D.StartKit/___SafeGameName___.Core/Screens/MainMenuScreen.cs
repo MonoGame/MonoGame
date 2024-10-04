@@ -2,6 +2,7 @@
 using ___SafeGameName___.Core.Effects;
 using ___SafeGameName___.Core.Inputs;
 using ___SafeGameName___.Core.Localization;
+using ___SafeGameName___.Core.Settings;
 using ___SafeGameName___.ScreenManagers;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
@@ -24,6 +25,11 @@ class MainMenuScreen : MenuScreen
     private PlayerIndex playerIndex;
     private ParticleManager particleManager;
     private Texture2D particleTexture;
+    private SettingsManager settingsManager;
+    private MenuEntry aboutMenuEntry;
+    private MenuEntry playMenuEntry;
+    private MenuEntry settingsMenuEntry;
+    private MenuEntry exitMenuEntry;
     #endregion
 
     #region Initialization
@@ -36,10 +42,10 @@ class MainMenuScreen : MenuScreen
         : base(Resources.MainMenu)
     {
         // Create our menu entries.
-        MenuEntry aboutMenuEntry = new MenuEntry(Resources.About);
-        MenuEntry playMenuEntry = new MenuEntry(Resources.Play);
-        MenuEntry settingsMenuEntry = new MenuEntry(Resources.Settings);
-        MenuEntry exitMenuEntry = new MenuEntry(Resources.Exit);
+        aboutMenuEntry = new MenuEntry(Resources.About);
+        playMenuEntry = new MenuEntry(Resources.Play);
+        settingsMenuEntry = new MenuEntry(Resources.Settings);
+        exitMenuEntry = new MenuEntry(Resources.Exit);
 
         // Hook up menu event handlers.
         playMenuEntry.Selected += PlayMenuEntrySelected;
@@ -52,6 +58,16 @@ class MainMenuScreen : MenuScreen
         MenuEntries.Add(settingsMenuEntry);
         MenuEntries.Add(aboutMenuEntry);
         MenuEntries.Add(exitMenuEntry);
+    }
+
+    private void SetLanguageText()
+    {
+        aboutMenuEntry.Text = Resources.About;
+        playMenuEntry.Text = Resources.Play;
+        settingsMenuEntry.Text = Resources.Settings;
+        exitMenuEntry.Text = Resources.Exit;
+
+        Title = Resources.MainMenu;
     }
 
     /// <summary>
@@ -71,6 +87,14 @@ class MainMenuScreen : MenuScreen
         // Create a particle manager at the center of the screen
         particleTexture = content.Load<Texture2D>("Sprites/blank");
         particleManager = new ParticleManager(particleTexture, new Vector2(400, 200));
+
+        settingsManager ??= ScreenManager.Game.Services.GetService<SettingsManager>();
+        settingsManager.Settings.PropertyChanged += (s, e) =>
+        {
+            SetLanguageText();
+        };
+
+        SetLanguageText();
     }
 
     /// <summary>
