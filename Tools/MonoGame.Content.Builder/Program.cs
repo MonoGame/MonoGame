@@ -13,7 +13,7 @@ namespace MonoGame.Content.Builder
 {
     class Program
     {
-        public class AssertListener : TraceListener
+        class AssertListener : TraceListener
         {
             public override void Write(string message)
             {
