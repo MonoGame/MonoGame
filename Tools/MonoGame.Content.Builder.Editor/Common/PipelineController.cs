@@ -38,8 +38,13 @@ namespace MonoGame.Tools.Pipeline
             Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ?? "", "../../../MonoGame.Content.Builder/Debug/mgcb.dll"),
             Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ?? "", "../../../../../../MonoGame.Content.Builder/Debug/mgcb.dll"),
 #else
+#if MAC
+            Path.Combine(Path.GetDirectoryName(System.AppContext.BaseDirectory) ?? "", "../../../MonoGame.Content.Builder/Release/mgcb.dll"),
+            Path.Combine(Path.GetDirectoryName(System.AppContext.BaseDirectory) ?? "", "../../../../../../MonoGame.Content.Builder/Release/mgcb.dll"),
+#else
             Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ?? "", "../../../MonoGame.Content.Builder/Release/mgcb.dll"),
             Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ?? "", "../../../../../../MonoGame.Content.Builder/Release/mgcb.dll"),
+#endif
 #endif
         };
 
@@ -108,7 +113,11 @@ namespace MonoGame.Tools.Pipeline
             ProjectOpen = false;
 
             _templateItems = new List<ContentItemTemplate>();
+#if MAC
+            var root = Path.GetDirectoryName(System.AppContext.BaseDirectory) ?? "";
+#else
             var root = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ?? "";
+#endif
             var templatesPath = Path.Combine(root, "Templates");
 
 #if IDE

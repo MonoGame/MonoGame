@@ -75,6 +75,11 @@ jobs:
         run: wget -qO- https://monogame.net/downloads/net9_mgfxc_wine_setup.sh | bash
         if: runner.os != 'Windows'
 
+      - uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: latest-stable
+        if: runner.os == 'macOS'
+
       - name: Install required workloads
         run:   |
               if [ "$RUNNER_OS" == "Linux" ]; then
@@ -82,7 +87,7 @@ jobs:
               elif [ "$RUNNER_OS" == "Windows" ]; then
                     dotnet.exe workload install android ios macos
               else
-                    dotnet workload install android
+                    dotnet workload install android macos ios
               fi
         shell: bash
 

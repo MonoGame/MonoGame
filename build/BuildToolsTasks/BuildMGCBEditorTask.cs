@@ -22,7 +22,10 @@ public sealed class BuildMGCBEditorTask : FrostingTask<BuildContext>
             _ => "Linux"
         };
 
-        context.DotNetPublish(context.GetProjectPath(ProjectType.MGCBEditor, platform), context.DotNetPublishSettings);
+        if (context.Environment.Platform.Family != PlatformFamily.OSX)
+            context.DotNetPublish(context.GetProjectPath(ProjectType.MGCBEditor, platform), context.DotNetPublishSettings);
+        else
+            context.DotNetPublish(context.GetProjectPath(ProjectType.MGCBEditor, platform), context.DotNetPublishSettingsForMac);
         context.DotNetPack(context.GetProjectPath(ProjectType.Tools, "MonoGame.Content.Builder.Editor.Launcher.Bootstrap"), context.DotNetPackSettings);
 		context.DotNetPack(context.GetProjectPath(ProjectType.MGCBEditorLauncher, platform), context.DotNetPackSettings);
     }
