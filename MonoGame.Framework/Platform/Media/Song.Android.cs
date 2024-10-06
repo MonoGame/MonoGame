@@ -16,7 +16,6 @@ namespace Microsoft.Xna.Framework.Media
         private Artist artist;
         private Genre genre;
         private string name;
-        private TimeSpan duration;
         private TimeSpan position;
         private Android.Net.Uri assetUri;
 
@@ -37,8 +36,8 @@ namespace Microsoft.Xna.Framework.Media
             this.artist = artist;
             this.genre = genre;
             this.name = name;
-            this.duration = duration;
             this.assetUri = assetUri;
+            _duration = duration;
         }
 
         private void PlatformInitialize(string fileName)
@@ -166,11 +165,6 @@ namespace Microsoft.Xna.Framework.Media
         private Genre PlatformGetGenre()
         {
             return this.genre;
-        }
-
-        private TimeSpan PlatformGetDuration()
-        {
-            return this.assetUri != null ? this.duration : _duration;
         }
 
         private bool PlatformIsProtected()

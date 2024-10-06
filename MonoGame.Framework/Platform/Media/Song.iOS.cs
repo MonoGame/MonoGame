@@ -17,7 +17,6 @@ namespace Microsoft.Xna.Framework.Media
         private Artist artist;
         private Genre genre;
         private string title;
-        private TimeSpan duration;
         #if !TVOS
         private MPMediaItem mediaItem;
         #endif
@@ -41,11 +40,11 @@ namespace Microsoft.Xna.Framework.Media
             this.artist = artist;
             this.genre = genre;
             this.title = title;
-            this.duration = duration;
             #if !TVOS
             this.mediaItem = mediaItem;
             #endif
             this.assetUrl = assetUrl;
+            _duration = duration;
         }
 
         private void PlatformInitialize(string fileName)
@@ -191,15 +190,6 @@ namespace Microsoft.Xna.Framework.Media
         private Genre PlatformGetGenre()
         {
             return this.genre;
-        }
-
-        private TimeSpan PlatformGetDuration()
-        {
-            #if !TVOS
-            if (this.mediaItem != null)
-                return this.duration;
-            #endif
-            return _duration;
         }
 
         private bool PlatformIsProtected()
