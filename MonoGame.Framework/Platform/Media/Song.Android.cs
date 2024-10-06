@@ -15,7 +15,6 @@ namespace Microsoft.Xna.Framework.Media
         private Album album;
         private Artist artist;
         private Genre genre;
-        private string name;
         private TimeSpan position;
         private Android.Net.Uri assetUri;
 
@@ -35,9 +34,11 @@ namespace Microsoft.Xna.Framework.Media
             this.album = album;
             this.artist = artist;
             this.genre = genre;
-            this.name = name;
             this.assetUri = assetUri;
             _duration = duration;
+
+            if (this.assetUri != null)
+                _name = name;
         }
 
         private void PlatformInitialize(string fileName)
@@ -175,11 +176,6 @@ namespace Microsoft.Xna.Framework.Media
         private bool PlatformIsRated()
         {
             return false;
-        }
-
-        private string PlatformGetName()
-        {
-            return this.assetUri != null ? this.name : Path.GetFileNameWithoutExtension(_name);
         }
 
         private int PlatformGetPlayCount()

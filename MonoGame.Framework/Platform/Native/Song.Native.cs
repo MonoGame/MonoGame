@@ -3,6 +3,7 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System;
+using System.IO;
 using System.Threading;
 using Microsoft.Xna.Framework.Audio;
 using MonoGame.Interop;
@@ -237,12 +238,6 @@ public sealed partial class Song : IEquatable<Song>, IDisposable
     {
         // Not Supported.
         return 0;
-    }
-
-    private string PlatformGetName()
-    {
-        // Not Supported.
-        return string.Empty;
     }
 
     #endregion

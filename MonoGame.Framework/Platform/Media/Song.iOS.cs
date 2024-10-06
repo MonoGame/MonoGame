@@ -16,7 +16,6 @@ namespace Microsoft.Xna.Framework.Media
         private Album album;
         private Artist artist;
         private Genre genre;
-        private string title;
         #if !TVOS
         private MPMediaItem mediaItem;
         #endif
@@ -39,12 +38,13 @@ namespace Microsoft.Xna.Framework.Media
             this.album = album;
             this.artist = artist;
             this.genre = genre;
-            this.title = title;
             #if !TVOS
             this.mediaItem = mediaItem;
             #endif
             this.assetUrl = assetUrl;
             _duration = duration;
+            if (!string.IsNullOrEmpty(title))
+                _name = title;
         }
 
         private void PlatformInitialize(string fileName)
@@ -200,11 +200,6 @@ namespace Microsoft.Xna.Framework.Media
         private bool PlatformIsRated()
         {
             return false;
-        }
-
-        private string PlatformGetName()
-        {
-            return this.title ?? Path.GetFileNameWithoutExtension(_name);
         }
 
         private int PlatformGetPlayCount()
