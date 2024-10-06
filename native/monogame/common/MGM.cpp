@@ -6,180 +6,174 @@ struct MGG_Texture;
 
 #include "api_MGM.h"
 
-#include "mg_common.h"
+#include "MGM_common.h"
+#include "api_MGA.h"
+#include "api_MGG.h"
+
+#include <stdio.h>
 
 
-struct MGM_Song
+void MGM_ReadSignature(const char* filepath, MGM_SIGNATURE)
 {
-	mgulong duration;
+	memset(signature, 0, 16);
 
-	void (*finishCallback)(void*);
-	void* finishData;
-};
+	FILE* handle = fopen(filepath, "rb");
+	if (handle == nullptr)
+		return;
 
-MGM_Song* MGM_Song_Create(const char* mediaFilePath)
+	fread(signature, 1, 16, handle);
+	fclose(handle);
+}
+
+MGM_AudioDecoder* MGM_AudioDecoder_TryCreate_Ogg(MGM_SIGNATURE)
 {
-	assert(mediaFilePath != nullptr);
-
-	// TODO: This should detect the media format using
-	// standard native format decoder libraries that are
-	// portable to all our target platforms:
+	// TODO: Implement me!
 	//
-	// libvorbis
-	// minimp3
-	// wave ??
-	// mp4 ??
-	// FLAC ??
+	// - This should be moved into its own CPP.
+	// - We need to add Ogg support to native build.
+	// - How do we compile Ogg for consoles?
+	// 
+	return nullptr;
+}
+
+MGM_AudioDecoder* MGM_AudioDecoder_TryCreate_Mp3(MGM_SIGNATURE)
+{
+	// TODO: Implement me!
 	//
-	// It should then spin up thread which decodes the
-	// audio and streams buffers to a native SoundEffect.
-
-	auto song = new MGM_Song();
-	song->duration = 0;
-	song->finishCallback = nullptr;
-	song->finishData = nullptr;
-	return song;
-}
-
-mgulong MGM_Song_GetDuration(MGM_Song* song)
-{
-	assert(song != nullptr);
-	return song->duration;
-}
-
-mgulong MGM_Song_GetPosition(MGM_Song* song)
-{
-	assert(song != nullptr);
-	return 0;
-}
-
-mgfloat MGM_Song_GetVolume(MGM_Song* song)
-{
-	assert(song != nullptr);
-	return 0;
-}
-
-void MGM_Song_SetVolume(MGM_Song* song, mgfloat volume)
-{
-	assert(song != nullptr);
-}
-
-void MGM_Song_Pause(MGM_Song* song)
-{
-	assert(song != nullptr);
-}
-
-void MGM_Song_Play(MGM_Song* song, mgulong startPositionMs, void (*callback)(void*), void* callbackData)
-{
-	assert(song != nullptr);
-
-	song->finishCallback = callback;
-	song->finishData = callbackData;
-}
-
-void MGM_Song_Resume(MGM_Song* song)
-{
-	assert(song != nullptr);
-}
-
-void MGM_Song_Stop(MGM_Song* song)
-{
-	assert(song != nullptr);
-}
-
-void MGM_Song_Destroy(MGM_Song* song)
-{
-	assert(song != nullptr);
-	delete song;
-}
-
-
-struct MGM_Video
-{
-	mguint width;
-	mguint height;
-	mgfloat fps;
-	mgulong duration;
-	mgint cachedFrames;
-};
-
-MGM_Video* MGM_Video_Create(const char* mediaFilePath, mgint cachedFrameNum, mgint& width, mgint& height, mgfloat& fps, mgulong& duration)
-{
-	assert(mediaFilePath != nullptr);
-
-	// TODO: Like Song above we should detect the media
-	// format from a native decoder libraries that are
-	// portable to all our target platforms.
+	// - This should be moved into its own CPP.
+	// - Should we use a single header mp3 decoder?
 	//
-	// It should then spin up thread which decodes the
-	// video/audio streams.
-
-	// TOOD: Ideally we just support OpenH264+AAC which is pretty
-	// much industry standard now.  Anything else is not
-	// importaint unless a new standard comes around.
-
-	auto video = new MGM_Video();
-	video->duration = duration = 0;
-	video->width = width = 0;
-	video->height = height = 0;
-	video->fps = fps = 0.0f;
-	video->cachedFrames = cachedFrameNum;
-
-	return video;
+	return nullptr;
 }
 
-void MGM_Video_Destroy(MGM_Video* video)
+#if defined(_WIN32)
+
+MGM_AudioDecoder* MGM_AudioDecoder_Create(const char* filepath, MGM_AudioDecoderInfo& info)
 {
-	assert(video != nullptr);
-	delete video;
+	assert(filepath != nullptr);
+
+	MGM_SIGNATURE;
+	MGM_ReadSignature(filepath, signature);
+
+	// Try the common decoders.
+	MGM_AudioDecoder* decoder = nullptr;
+	decoder = decoder ? decoder : MGM_AudioDecoder_TryCreate_Ogg(signature);
+	decoder = decoder ? decoder : MGM_AudioDecoder_TryCreate_Mp3(signature);
+
+	if (decoder == nullptr)
+	{
+		info.samplerate = 0;
+		info.channels = 0;
+		info.duration = 0;
+		return nullptr;
+	}
+
+	decoder->Initialize(filepath, info);
+	return decoder;
 }
 
-MGMediaState MGM_Video_GetState(MGM_Video* video)
+#endif
+
+void MGM_AudioDecoder_Destroy(MGM_AudioDecoder* decoder)
 {
-	assert(video != nullptr);
-	return MGMediaState::Stopped;
+	assert(decoder != nullptr);
+	delete decoder;
 }
 
-mgulong MGM_Video_GetPosition(MGM_Video* video)
+void MGM_AudioDecoder_SetPosition(MGM_AudioDecoder* decoder, mgulong timeMS)
 {
-	assert(video != nullptr);
-	return 0;
+	assert(decoder != nullptr);
+	decoder->SetPosition(timeMS);
 }
 
-void MGM_Video_SetVolume(MGM_Video* video, mgfloat volume)
+mgbool MGM_AudioDecoder_Decode(MGM_AudioDecoder* decoder, mgbyte*& buffer, mguint& size)
 {
-	assert(video != nullptr);
+	assert(decoder != nullptr);
+	return decoder->Decode(buffer, size);
 }
 
-void MGM_Video_SetLooped(MGM_Video* video, mgbool looped)
+
+
+MGM_VideoDecoder* MGM_VideoDecoder_TryCreate_Theora(MGM_SIGNATURE)
 {
-	assert(video != nullptr);
+	// TODO: Implement me!
+	//
+	// - This should be moved into its own CPP.
+	// - We need to add Theora support to native build.
+	// - How do we compile Theora for consoles?
+	// 
+	return nullptr;
 }
 
-void MGM_Video_Play(MGM_Video* video)
+MGM_VideoDecoder* MGM_VideoDecoder_TryCreate_OpenH264(MGM_SIGNATURE)
 {
-	assert(video != nullptr);
+	// TODO: Implement me!
+	//
+	// See https://github.com/cisco/openh264
+	// 
+	// - This should be moved into its own CPP.
+	// - We need to add lib to native build.
+	// - How do we compile lib for consoles?
+	//
+	return nullptr;
 }
 
-void MGM_Video_Pause(MGM_Video* video)
+#if defined(_WIN32)
+
+MGM_VideoDecoder* MGM_VideoDecoder_Create(MGG_GraphicsDevice* device, const char* filepath, MGM_VideoDecoderInfo& info)
 {
-	assert(video != nullptr);
+	assert(filepath != nullptr);
+
+	MGM_SIGNATURE;
+	MGM_ReadSignature(filepath, signature);
+
+	// Try the common decoders.
+	MGM_VideoDecoder* decoder = nullptr;
+	decoder = decoder ? decoder : MGM_VideoDecoder_TryCreate_Theora(signature);
+	decoder = decoder ? decoder : MGM_VideoDecoder_TryCreate_OpenH264(signature);
+
+	if (decoder == nullptr)
+	{
+		info.width = 0;
+		info.height = 0;
+		info.fps = 0;
+		info.duration = 0;
+		return nullptr;
+	}
+
+	decoder->Initialize(filepath, info);
+	return decoder;
 }
 
-void MGM_Video_Resume(MGM_Video* video)
+#endif
+
+void MGM_VideoDecoder_Destroy(MGM_VideoDecoder* decoder)
 {
-	assert(video != nullptr);
+	assert(decoder != nullptr);
+	delete decoder;
 }
 
-void MGM_Video_Stop(MGM_Video* video)
+MGM_AudioDecoder* MGM_VideoDecoder_GetAudioDecoder(MGM_VideoDecoder* decoder, MGM_AudioDecoderInfo& info)
 {
-	assert(video != nullptr);
+	assert(decoder != nullptr);
+	return decoder->GetAudioDecoder(info);
 }
 
-void MGM_Video_GetFrame(MGM_Video* video, mguint& frame, MGG_Texture*& handle)
+mgulong MGM_VideoDecoder_GetPosition(MGM_VideoDecoder* decoder)
 {
-	assert(video != nullptr);
-	frame = 0;
-	handle = nullptr;
+	assert(decoder != nullptr);
+	return decoder->GetPosition();
+}
+
+void MGM_VideoDecoder_SetLooped(MGM_VideoDecoder* decoder, mgbool looped)
+{
+	assert(decoder != nullptr);
+	decoder->SetLooped(looped);
+}
+
+MGG_Texture* MGM_VideoDecoder_Decode(MGM_VideoDecoder* decoder)
+{
+	assert(decoder != nullptr);
+	return decoder->Decode();
 }
 

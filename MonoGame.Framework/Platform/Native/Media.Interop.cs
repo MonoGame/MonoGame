@@ -4,93 +4,122 @@
 
 using System;
 using System.Runtime.InteropServices;
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Media;
 
 namespace MonoGame.Interop;
 
 
 [MGHandle]
-internal readonly struct MGM_Song { }
+internal readonly struct MGM_AudioDecoder{ }
 
 [MGHandle]
-internal readonly struct MGM_Video { }
+internal readonly struct MGM_VideoDecoder { }
+
+struct MGM_AudioDecoderInfo
+{
+    /// <summary>
+    /// The audio samples per second, per channel.
+    /// </summary>
+    public int samplerate;
+
+    /// <summary>
+    /// The number of audio channels (typically 1 or 2).
+    /// </summary>
+    public int channels;
+
+    /// <summary>
+    /// The estimated duration of the audio in milliseconds.
+    /// </summary>
+    public ulong duration;
+}
+
+
+struct MGM_VideoDecoderInfo
+{
+    /// <summary>
+    /// The width of the video frames.
+    /// </summary>
+    public int width;
+
+    /// <summary>
+    /// The height of the video frames.
+    /// </summary>
+    public int height;
+
+    /// <summary>
+    /// The number of frames per second.
+    /// </summary>
+    public float fps;
+
+    /// <summary>
+    /// The estimated duration of the video in milliseconds.
+    /// </summary>
+    public ulong duration;
+}
 
 
 internal static unsafe partial class MGM
 {
-    #region Song
+    #region Audio Decoder
 
-    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    public delegate void NativeFinishedCallback(nint callbackData);
+    /// <summary>
+    /// This returns an audio decoder that returns a stream of PCM data from an audio file.
+    /// </summary>
+    /// <param name="filepath">The absolute file path to the audio file.</param>
+    /// <param name="info">Returns information about the opened audio file.</param>
+    /// <returns>Returns the audio decoder ready to read data or null if the format is unsupported.</returns>
+    [LibraryImport(MGP.MonoGameNativeDLL, EntryPoint = "MGM_AudioDecoder_Create", StringMarshalling = StringMarshalling.Utf8)]
+    public static partial MGM_AudioDecoder* AudioDecoder_Create(string filepath, out MGM_AudioDecoderInfo info);
 
-    [LibraryImport(MGP.MonoGameNativeDLL, EntryPoint = "MGM_Song_Create", StringMarshalling = StringMarshalling.Utf8)]
-    public static partial MGM_Song* Song_Create(string mediaFilePath);
+    /// <summary>
+    /// This releases all internal resources, closes the file, and destroys the audio decoder.
+    /// </summary>
+    [LibraryImport(MGP.MonoGameNativeDLL, EntryPoint = "MGM_AudioDecoder_Destroy", StringMarshalling = StringMarshalling.Utf8)]
+    public static partial void AudioDecoder_Destroy(MGM_AudioDecoder* decoder);
+   
+    /// <summary>
+    /// Set the position of the audio decoder in milliseconds.
+    /// </summary>
+    /// <param name="decoder">The decoder.</param>
+    /// <param name="timeMS">The time in millseconds from the start of the audio file.</param>
+    [LibraryImport(MGP.MonoGameNativeDLL, EntryPoint = "MGM_AudioDecoder_SetPosition", StringMarshalling = StringMarshalling.Utf8)]
+    public static partial void AudioDecoder_SetPosition(MGM_AudioDecoder* decoder, ulong timeMS);
 
-    [LibraryImport(MGP.MonoGameNativeDLL, EntryPoint = "MGM_Song_Destroy", StringMarshalling = StringMarshalling.Utf8)]
-    public static partial void Song_Destroy(MGM_Song* song);
-
-    [LibraryImport(MGP.MonoGameNativeDLL, EntryPoint = "MGM_Song_GetDuration", StringMarshalling = StringMarshalling.Utf8)]
-    public static partial ulong Song_GetDuration(MGM_Song* song);
-
-    [LibraryImport(MGP.MonoGameNativeDLL, EntryPoint = "MGM_Song_GetPosition", StringMarshalling = StringMarshalling.Utf8)]
-    public static partial ulong Song_GetPosition(MGM_Song* song);
-
-    [LibraryImport(MGP.MonoGameNativeDLL, EntryPoint = "MGM_Song_GetVolume", StringMarshalling = StringMarshalling.Utf8)]
-    public static partial float Song_GetVolume(MGM_Song* song);
-
-    [LibraryImport(MGP.MonoGameNativeDLL, EntryPoint = "MGM_Song_SetVolume", StringMarshalling = StringMarshalling.Utf8)]
-    public static partial void Song_SetVolume(MGM_Song* song, float volume);
-
-    [LibraryImport(MGP.MonoGameNativeDLL, EntryPoint = "MGM_Song_Play", StringMarshalling = StringMarshalling.Utf8)]
-    public static partial void Song_Play(MGM_Song* song, ulong startPositionMs, [MarshalAs(UnmanagedType.FunctionPtr)] NativeFinishedCallback callback, nint callbackData);
-
-    [LibraryImport(MGP.MonoGameNativeDLL, EntryPoint = "MGM_Song_Pause", StringMarshalling = StringMarshalling.Utf8)]
-    public static partial void Song_Pause(MGM_Song* song);
-
-    [LibraryImport(MGP.MonoGameNativeDLL, EntryPoint = "MGM_Song_Resume", StringMarshalling = StringMarshalling.Utf8)]
-    public static partial void Song_Resume(MGM_Song* song);
-
-    [LibraryImport(MGP.MonoGameNativeDLL, EntryPoint = "MGM_Song_Stop", StringMarshalling = StringMarshalling.Utf8)]
-    public static partial void Song_Stop(MGM_Song* song);
+    /// <summary>
+    /// Decode some PCM data from the audio file.
+    /// </summary>
+    /// <param name="decoder"></param>
+    /// <param name="buffer"></param>
+    /// <param name="size"></param>
+    /// <returns>Returns true if we've reached the end of the file.</returns>
+    [LibraryImport(MGP.MonoGameNativeDLL, EntryPoint = "MGM_AudioDecoder_Decode", StringMarshalling = StringMarshalling.Utf8)]
+    [return:MarshalAs(UnmanagedType.U1)]
+    public static partial bool AudioDecoder_Decode(MGM_AudioDecoder* decoder, out byte* buffer, out uint size);
 
     #endregion
 
 
     #region Video
 
-    [LibraryImport(MGP.MonoGameNativeDLL, EntryPoint = "MGM_Video_Create", StringMarshalling = StringMarshalling.Utf8)]
-    public static partial MGM_Video* Video_Create(string mediaFilePath, int cachedFrameNum, out int width, out int height, out float fps, out ulong duration);
+    [LibraryImport(MGP.MonoGameNativeDLL, EntryPoint = "MGM_VideoDecoder_Create", StringMarshalling = StringMarshalling.Utf8)]
+    public static partial MGM_VideoDecoder* VideoDecoder_Create(MGG_GraphicsDevice* device, string filepath, out MGM_VideoDecoderInfo info);
 
-    [LibraryImport(MGP.MonoGameNativeDLL, EntryPoint = "MGM_Video_Destroy", StringMarshalling = StringMarshalling.Utf8)]
-    public static partial void Video_Destroy(MGM_Video* video);
+    [LibraryImport(MGP.MonoGameNativeDLL, EntryPoint = "MGM_VideoDecoder_Destroy", StringMarshalling = StringMarshalling.Utf8)]
+    public static partial void VideoDecoder_Destroy(MGM_VideoDecoder* decoder);
 
-    [LibraryImport(MGP.MonoGameNativeDLL, EntryPoint = "MGM_Video_GetState", StringMarshalling = StringMarshalling.Utf8)]
-    public static partial MediaState Video_GetState(MGM_Video* video);
+    [LibraryImport(MGP.MonoGameNativeDLL, EntryPoint = "MGM_VideoDecoder_GetAudioDecoder", StringMarshalling = StringMarshalling.Utf8)]
+    public static partial MGM_AudioDecoder* VideoDecoder_GetAudioDecoder(MGM_VideoDecoder* decoder, out MGM_AudioDecoderInfo info);
 
-    [LibraryImport(MGP.MonoGameNativeDLL, EntryPoint = "MGM_Video_GetPosition", StringMarshalling = StringMarshalling.Utf8)]
-    public static partial ulong Video_GetPosition(MGM_Video* video);
+    [LibraryImport(MGP.MonoGameNativeDLL, EntryPoint = "MGM_VideoDecoder_GetPosition", StringMarshalling = StringMarshalling.Utf8)]
+    public static partial ulong VideoDecoder_GetPosition(MGM_VideoDecoder* decoder);
 
-    [LibraryImport(MGP.MonoGameNativeDLL, EntryPoint = "MGM_Video_SetVolume", StringMarshalling = StringMarshalling.Utf8)]
-    public static partial void Video_SetVolume(MGM_Video* video, float volume);
+    [LibraryImport(MGP.MonoGameNativeDLL, EntryPoint = "MGM_VideoDecoder_SetLooped", StringMarshalling = StringMarshalling.Utf8)]
+    public static partial void VideoDecoder_SetLooped(MGM_VideoDecoder* decoder, [MarshalAs(UnmanagedType.U1)] bool looped);
 
-    [LibraryImport(MGP.MonoGameNativeDLL, EntryPoint = "MGM_Video_SetLooped", StringMarshalling = StringMarshalling.Utf8)]
-    public static partial void Video_SetLooped(MGM_Video* video, [MarshalAs(UnmanagedType.U1)] bool looped);
-
-    [LibraryImport(MGP.MonoGameNativeDLL, EntryPoint = "MGM_Video_Play", StringMarshalling = StringMarshalling.Utf8)]
-    public static partial void Video_Play(MGM_Video* video);
-
-    [LibraryImport(MGP.MonoGameNativeDLL, EntryPoint = "MGM_Video_Pause", StringMarshalling = StringMarshalling.Utf8)]
-    public static partial void Video_Pause(MGM_Video* video);
-
-    [LibraryImport(MGP.MonoGameNativeDLL, EntryPoint = "MGM_Video_Resume", StringMarshalling = StringMarshalling.Utf8)]
-    public static partial void Video_Resume(MGM_Video* video);
-
-    [LibraryImport(MGP.MonoGameNativeDLL, EntryPoint = "MGM_Video_Stop", StringMarshalling = StringMarshalling.Utf8)]
-    public static partial void Video_Stop(MGM_Video* video);
-
-    [LibraryImport(MGP.MonoGameNativeDLL, EntryPoint = "MGM_Video_GetFrame", StringMarshalling = StringMarshalling.Utf8)]
-    public static partial void Video_GetFrame(MGM_Video* video, out uint frame, out MGG_Texture* handle);
-
+    [LibraryImport(MGP.MonoGameNativeDLL, EntryPoint = "MGM_VideoDecoder_Decode", StringMarshalling = StringMarshalling.Utf8)]
+    public static partial MGG_Texture* VideoDecoder_Decode(MGM_VideoDecoder* decoder);
 
     #endregion
 }
