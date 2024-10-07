@@ -50,3 +50,5 @@ MG_EXPORT MGP_Cursor* MGP_Cursor_Create(MGSystemCursor cursor);
 MG_EXPORT MGP_Cursor* MGP_Cursor_CreateCustom(mgbyte* rgba, mgint width, mgint height, mgint originx, mgint originy);
 MG_EXPORT void MGP_Cursor_Destroy(MGP_Cursor* cursor);
 MG_EXPORT mgint MGP_GamePad_GetMaxSupported();
+MG_EXPORT void MGP_GamePad_GetCaps(MGP_Platform* platform, mgint identifer, MGP_ControllerCaps* caps);
+MG_EXPORT mgbool MGP_GamePad_SetVibration(MGP_Platform* platform, mgint identifer, mgfloat leftMotor, mgfloat rightMotor, mgfloat leftTrigger, mgfloat rightTrigger);

@@ -234,3 +234,14 @@ union {
 };
 #pragma pack(pop)
 
+struct MGP_ControllerCaps
+{
+    void* Identifier;
+    void* DisplayName;
+    MGGamePadType GamePadType;
+    mguint InputFlags;
+    mgbool HasLeftVibrationMotor;
+    mgbool HasRightVibrationMotor;
+    mgbool HasVoiceSupport;
+};
+
