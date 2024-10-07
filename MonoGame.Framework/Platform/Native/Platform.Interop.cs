@@ -199,6 +199,20 @@ internal struct MGP_Event
     public MGP_ControllerEvent Controller;
 }
 
+
+[StructLayout(LayoutKind.Sequential)]
+internal struct MGP_ControllerCaps
+{
+    public nint Identifier;
+    public nint DisplayName;
+    public GamePadType GamePadType;
+    public uint InputFlags;
+    public bool HasLeftVibrationMotor;
+    public bool HasRightVibrationMotor;
+    public bool HasVoiceSupport;
+}
+
+
 [MGHandle]
 internal readonly struct MGP_Platform { }
 
@@ -335,8 +349,17 @@ internal static unsafe partial class MGP
 
     #endregion
 
+    #region GamePad
 
     [LibraryImport(MonoGameNativeDLL, EntryPoint = "MGP_GamePad_GetMaxSupported", StringMarshalling = StringMarshalling.Utf8)]
     public static partial int GamePad_GetMaxSupported();
 
+    [LibraryImport(MonoGameNativeDLL, EntryPoint = "MGP_GamePad_GetCaps", StringMarshalling = StringMarshalling.Utf8)]
+    public static partial void GamePad_GetCaps(MGP_Platform* platform, int identifer, MGP_ControllerCaps* caps);
+
+    [LibraryImport(MonoGameNativeDLL, EntryPoint = "MGP_GamePad_SetVibration", StringMarshalling = StringMarshalling.Utf8)]
+    [return: MarshalAs(UnmanagedType.U1)]
+    public static partial bool GamePad_SetVibration(MGP_Platform* platform, int identifer, float leftMotor, float rightMotor, float leftTrigger, float rightTrigger);
+
+    #endregion
 }
