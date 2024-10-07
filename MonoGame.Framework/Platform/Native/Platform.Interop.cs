@@ -269,8 +269,8 @@ internal static unsafe partial class MGP
     [LibraryImport(MonoGameNativeDLL, EntryPoint = "MGP_Window_Create", StringMarshalling = StringMarshalling.Utf8)]
     public static partial MGP_Window* Window_Create(
         MGP_Platform* platform,
-        int width,
-        int height,
+        ref int width,
+        ref int height,
         string title);
 
     [LibraryImport(MonoGameNativeDLL, EntryPoint = "MGP_Window_Destroy", StringMarshalling = StringMarshalling.Utf8)]
@@ -289,11 +289,11 @@ internal static unsafe partial class MGP
     [LibraryImport(MonoGameNativeDLL, EntryPoint = "MGP_Window_SetAllowUserResizing", StringMarshalling = StringMarshalling.Utf8)]
     public static partial void Window_SetAllowUserResizing(MGP_Window* window, [MarshalAs(UnmanagedType.U1)] bool allow);
 
-    [LibraryImport(MonoGameNativeDLL, EntryPoint = "MGP_Window_GetIsBoderless", StringMarshalling = StringMarshalling.Utf8)]
+    [LibraryImport(MonoGameNativeDLL, EntryPoint = "MGP_Window_GetIsBorderless", StringMarshalling = StringMarshalling.Utf8)]
     [return: MarshalAs(UnmanagedType.U1)]
     public static partial bool Window_GetIsBorderless(MGP_Window* window);
 
-    [LibraryImport(MonoGameNativeDLL, EntryPoint = "MGP_Window_SetIsBoderless", StringMarshalling = StringMarshalling.Utf8)]
+    [LibraryImport(MonoGameNativeDLL, EntryPoint = "MGP_Window_SetIsBorderless", StringMarshalling = StringMarshalling.Utf8)]
     public static partial void Window_SetIsBorderless(MGP_Window* window, [MarshalAs(UnmanagedType.U1)] bool borderless);
 
     [LibraryImport(MonoGameNativeDLL, EntryPoint = "MGP_Window_SetTitle", StringMarshalling = StringMarshalling.Utf8)]

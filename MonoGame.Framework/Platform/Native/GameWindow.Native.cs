@@ -105,10 +105,11 @@ internal class NativeGameWindow : GameWindow
 
         var title = Title == null ? AssemblyHelper.GetDefaultWindowTitle() : Title;
 
+        // Create the window which size may be changed by the platform.
         _handle = MGP.Window_Create(
             platform.Handle,
-            _width,
-            _height,
+            ref _width,
+            ref _height,
             title);
 
         _windows[(nint)_handle] = this;
