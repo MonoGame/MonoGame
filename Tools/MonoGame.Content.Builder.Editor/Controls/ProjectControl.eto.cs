@@ -48,9 +48,12 @@ namespace MonoGame.Tools.Pipeline
         {
             var items = new List<IProjectItem>();
 
-            foreach (TreeGridItem selected in _treeView.SelectedItems)
+            foreach (TreeGridItem selected in _treeView.SelectedItems) {
+                if (selected is null)
+                    continue;
                 if (selected.Tag is IProjectItem)
                     items.Add(selected.Tag as IProjectItem);
+            }
 
             PipelineController.Instance.SelectionChanged(items);
         }

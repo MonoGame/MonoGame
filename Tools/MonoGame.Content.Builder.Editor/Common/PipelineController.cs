@@ -36,13 +36,16 @@ namespace MonoGame.Tools.Pipeline
         {
 #if DEBUG
             Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ?? "", "../../../MonoGame.Content.Builder/Debug/mgcb.dll"),
+            Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ?? "", "../../../../../../../../MonoGame.Content.Builder/Debug/mgcb.dll"),
             Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ?? "", "../../../../../../MonoGame.Content.Builder/Debug/mgcb.dll"),
 #else
 #if MAC
             Path.Combine(Path.GetDirectoryName(System.AppContext.BaseDirectory) ?? "", "../../../MonoGame.Content.Builder/Release/mgcb.dll"),
+            Path.Combine(Path.GetDirectoryName(System.AppContext.BaseDirectory) ?? "", "../../../../../../../../MonoGame.Content.Builder/Release/mgcb.dll"),
             Path.Combine(Path.GetDirectoryName(System.AppContext.BaseDirectory) ?? "", "../../../../../../MonoGame.Content.Builder/Release/mgcb.dll"),
 #else
             Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ?? "", "../../../MonoGame.Content.Builder/Release/mgcb.dll"),
+            Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ?? "", "../../../../../../../../MonoGame.Content.Builder/Release/mgcb.dll"),
             Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ?? "", "../../../../../../MonoGame.Content.Builder/Release/mgcb.dll"),
 #endif
 #endif
@@ -823,6 +826,10 @@ namespace MonoGame.Tools.Pipeline
 
             foreach (var file in files)
             {
+                var fi = new FileInfo(file);
+                if (fi.Attributes.HasFlag(FileAttributes.Hidden))
+                    continue;
+
                 var item = new IncludeItem();
                 item.SourcePath = file;
 
@@ -832,6 +839,9 @@ namespace MonoGame.Tools.Pipeline
 
                     item.RelativeDestPath = PathHelper.GetRelativePath(ProjectLocation, file);
                     item.IncludeType = IncludeType.Link;
+                    // We actually want to place this file under the initialDirectory if one is set.
+                    if (!item.RelativeDestPath.Contains (relative))
+                        item.RelativeDestPath = Path.Combine(relative, Path.GetFileNameWithoutExtension(file));
                 }
                 else
                 {
