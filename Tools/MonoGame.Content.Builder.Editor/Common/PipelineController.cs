@@ -795,21 +795,20 @@ namespace MonoGame.Tools.Pipeline
 
         private bool IncludeDirectory(List<IncludeItem> items, string initialDirectory, string folder, ref bool repeat, ref IncludeType action)
         {
-            var relative = Util.GetRelativePath(initialDirectory, ProjectLocation);
-
             if (!IncludeFiles(items, initialDirectory, Directory.GetFiles(folder), ref repeat, ref action))
                 return false;
             
             foreach(var dir in Directory.GetDirectories(folder))
             {
                 var dirname = Path.GetFileName(dir);
-                var initdir = Path.Combine(initialDirectory, dirname);
+                var initdir = Path.Combine(initialDirectory, folder, dirname);
+                var relative = Util.GetRelativePath(initdir, ProjectLocation);
                 var diritem = new IncludeItem
                 {
                     SourcePath = initdir,
                     IsDirectory = true,
                     IncludeType = IncludeType.Create,
-                    RelativeDestPath = Path.Combine(relative, dirname)
+                    RelativeDestPath = relative,
                 };
                 items.Add(diritem);
 
