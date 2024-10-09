@@ -95,7 +95,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
 
             var dotnetRoot = Environment.GetEnvironmentVariable ("DOTNET_ROOT");
             if (!string.IsNullOrEmpty(dotnetRoot))
-                processInfo.EnvironmentVariables.Add("DOTNET_ROOT", dotnetRoot);
+                processInfo.EnvironmentVariables["DOTNET_ROOT"] = dotnetRoot;
 
             EnsureExecutable(fullPath);
 
