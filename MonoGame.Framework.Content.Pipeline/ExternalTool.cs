@@ -55,6 +55,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
         /// </summary>
         public static int RunDotnetTool(string toolName, string args, out string stdOut, out string stdErr, string stdIn=null, string workingDirectory=null)
         {
+            RestoreDotnetTools ();
             var exe = FindCommand (toolName);
             var finalizedArgs =  args;
             return ExternalTool.Run(exe, finalizedArgs, out stdOut, out stdErr, stdIn, workingDirectory);
