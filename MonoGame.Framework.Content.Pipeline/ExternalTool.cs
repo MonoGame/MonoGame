@@ -42,6 +42,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
             if (Directory.Exists (Path.Combine(path, toolName))) 
                 return;
             Run (exe, $"tool {command} {toolName} --tool-path {path}", out string stdOut, out string stdErr,  workingDirectory: path);
+            Console.WriteLine($"DEBUG! {stdOut} {stdErr}");
         }
 
         public static void RestoreDotnetTools()
@@ -58,7 +59,9 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
             RestoreDotnetTools ();
             var exe = FindCommand (toolName);
             var finalizedArgs =  args;
-            return ExternalTool.Run(exe, finalizedArgs, out stdOut, out stdErr, stdIn, workingDirectory);
+            var r =  ExternalTool.Run(exe, finalizedArgs, out stdOut, out stdErr, stdIn, workingDirectory);
+            Console.WriteLine($"DEBUG! {stdOut} {stdErr}");
+            return r;
         }
 
         public static int Run(string command, string arguments, out string stdout, out string stderr, string stdin = null, string workingDirectory=null)
@@ -94,11 +97,14 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
                 processInfo.WorkingDirectory = workingDirectory;
 
             var dotnetRoot = Environment.GetEnvironmentVariable ("DOTNET_ROOT");
-            if (!string.IsNullOrEmpty(dotnetRoot))
+            if (!string.IsNullOrEmpty(dotnetRoot)) {
+                Console.WriteLine ($"DEBUG! DOTNET_ROOT: {dotnetRoot}");
                 processInfo.EnvironmentVariables["DOTNET_ROOT"] = dotnetRoot;
+            }
 
             EnsureExecutable(fullPath);
 
+            Console.WriteLine ($"DEBUG! Exec: {command} {arguments}");
             using (var process = new Process())
             {
                 process.StartInfo = processInfo;
