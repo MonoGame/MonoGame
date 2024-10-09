@@ -38,9 +38,13 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
                 path= Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "linux");
             if (CurrentPlatform.OS == OS.MacOSX)
                 path= Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "osx");
-            var exe = CurrentPlatform.OS == OS.Windows ? "dotnet.exe" : "dotnet";
             if (Directory.Exists (Path.Combine(path, toolName))) 
                 return;
+            var exe = CurrentPlatform.OS == OS.Windows ? "dotnet.exe" : "dotnet";
+            var dotnetRoot = Environment.GetEnvironmentVariable ("DOTNET_ROOT");
+            if (!string.IsNullOrEmpty(dotnetRoot)) {
+                exe = Path.Combine(dotnetRoot, exe);
+            }
             Run (exe, $"tool {command} {toolName} --tool-path {path}", out string stdOut, out string stdErr,  workingDirectory: path);
             Console.WriteLine($"DEBUG! {stdOut} {stdErr}");
         }

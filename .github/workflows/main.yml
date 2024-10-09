@@ -105,7 +105,7 @@ jobs:
       - name: Test
         run: dotnet test Tools/MonoGame.Tools.Tests/MonoGame.Tools.Tests.csproj --blame-hang-timeout 5m -c Release --filter="TestCategory!=Audio"
         env:
-          DOTNET_ROOT: ${{github.workspace}}/dotnet64
+          #DOTNET_ROOT: ${{github.workspace}}/dotnet64
           MGFXC_WINE_PATH: /Users/runner/.winemonogame
           CI: true
         if: runner.os == 'macOS'
