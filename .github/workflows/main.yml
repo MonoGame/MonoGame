@@ -231,10 +231,13 @@ jobs:
           path: tests-windowsdx
         if: runner.os == 'Windows'
 
-      - name: Install Tools
-        run: |
-          dotnet tool install --create-manifest-if-needed mgcb-basisu
-          dotnet tool install --create-manifest-if-needed mgcb-crunch
+      # - name: Install Tools
+      #   run: |
+      #     dotnet tool install --create-manifest-if-needed mgcb-basisu
+      #     dotnet tool install --create-manifest-if-needed mgcb-crunch
+      - name: Set Permissions
+        run: chmod -R u+w tests-tools tests-desktopgl
+        if: runner.os != 'Windows'
 
       - name: Run Tools Tests
         run: dotnet test tests-tools/MonoGame.Tools.Tests.dll --blame-hang-timeout 1m --filter="TestCategory!=Effects"
