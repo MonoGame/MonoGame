@@ -87,7 +87,7 @@
   <!-- Restore the dotnet-mgcb tool to a known location. -->
   <Target Name="RestoreContentCompiler" Condition="!Exists ('$(MGCBToolDirectory)\$(MGCBCommand)')">
     <MakeDir Directories="$(MGCBToolDirectory)"/>
-    <Exec Command="$(DotnetCommand) tool install dotnet-mgcb --tool-path ." WorkingDirectory="$(MGCBToolDirectory)" />
+    <Exec Command="&quot;$(DotnetCommand)&quot; tool install dotnet-mgcb --tool-path ." WorkingDirectory="$(MGCBToolDirectory)" />
   </Target>
 
   <!--
