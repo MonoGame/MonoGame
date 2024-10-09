@@ -40,6 +40,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
                 path= Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "osx");
             if (Directory.Exists (Path.Combine(path, toolName))) 
                 return;
+            Directory.CreateDirectory (path);
             var exe = CurrentPlatform.OS == OS.Windows ? "dotnet.exe" : "dotnet";
             var dotnetRoot = Environment.GetEnvironmentVariable ("DOTNET_ROOT");
             if (!string.IsNullOrEmpty(dotnetRoot)) {
