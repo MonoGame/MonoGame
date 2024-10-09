@@ -31,7 +31,7 @@ namespace MonoGame.Tests.ContentPipeline
             var tool = FindTool(buildTool);
             var psi = new ProcessStartInfo(tool)
             {
-                Arguments = $"build {projectFile} -t:IncludeContent {string.Join(" ", parameters)} -tl:off -bl -p:DotnetCommand=\"{tool}\"",
+                Arguments = $"build \"{projectFile}\" -t:IncludeContent {string.Join(" ", parameters)} -tl:off -bl -p:DotnetCommand=\"{tool}\"",
                 WorkingDirectory = root,
                 UseShellExecute = false,
                 RedirectStandardOutput = true,
@@ -72,11 +72,11 @@ namespace MonoGame.Tests.ContentPipeline
                 Directory.Delete(outputPath, recursive: true);
 
             var result = RunBuild("dotnet", Path.Combine(root, "Assets", "Projects", "BuildSimpleProject.csproj"), new string[] {
-                "-p:MGCBCommand=" + Path.Combine(root, "mgcb.dll")
+                $"-p:MGCBCommand=\"{Path.Combine(root, "mgcb.dll")}\""
             });
             Assert.AreEqual(true, result, "Content Build should have succeeded.");
             var contentFont = Path.Combine(outputPath, "DesktopGL", "Content", "ContentFont.xnb");
-            Assert.IsTrue(File.Exists(contentFont), "'" + contentFont + "' should exist.");
+            Assert.IsTrue(File.Exists(contentFont), $"'{contentFont}' should exist.");
         }
     }
 }

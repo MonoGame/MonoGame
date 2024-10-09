@@ -8,12 +8,15 @@ public sealed class BuildMGCBEditorTask : FrostingTask<BuildContext>
 {
     public override void Run(BuildContext context)
     {
-        context.ReplaceRegexInFiles(
-            @"<key>CFBundleShortVersionString<\/key>\s*<string>([^\s]*)<\/string>",
-            "Tools/MonoGame.Content.Builder.Editor/Info.plist",
-            $"<key>CFBundleShortVersionString</key>\n\t<string>{context.Version}</string>",
-            RegexOptions.Singleline
-        );
+        if (context.BuildSystem().IsRunningOnGitHubActions)
+        {
+            context.ReplaceRegexInFiles(
+                "Tools/MonoGame.Content.Builder.Editor/Info.plist",
+                @"<key>CFBundleShortVersionString<\/key>\s*<string>([^\s]*)<\/string>",
+                $"<key>CFBundleShortVersionString</key>\n\t<string>{context.Version}</string>",
+                RegexOptions.Singleline
+            );
+        }
 
         var platform = context.Environment.Platform.Family switch
         {
