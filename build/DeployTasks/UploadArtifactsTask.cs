@@ -15,10 +15,32 @@ public sealed class UploadArtifactsTask : AsyncFrostingTask<BuildContext>
             _ => "linux"
         };
 
+        // Clean up build tools if installed
+        // otherwise we get permission issues after extraction
+        var path = System.IO.Path.Combine(context.BuildOutput, "Tests", "Tools", "Release", "osx");
+        DeleteToolStore (path);
+        path = System.IO.Path.Combine(context.BuildOutput, "Tests", "Tools", "Release", "linux");
+        DeleteToolStore (path);
+        path = System.IO.Path.Combine(context.BuildOutput, "Tests", "Tools", "Release");
+        DeleteToolStore (path);
+
         await context.GitHubActions().Commands.UploadArtifact(new DirectoryPath(context.NuGetsDirectory.FullPath), $"nuget-{os}");
         await context.GitHubActions().Commands.UploadArtifact(new DirectoryPath(System.IO.Path.Combine(context.BuildOutput, "Tests", "Tools", "Release")), $"tests-tools-{os}");
         await context.GitHubActions().Commands.UploadArtifact(new DirectoryPath(System.IO.Path.Combine(context.BuildOutput, "Tests", "DesktopGL", "Release")), $"tests-desktopgl-{os}");
         if (context.IsRunningOnWindows())
             await context.GitHubActions().Commands.UploadArtifact(new DirectoryPath(System.IO.Path.Combine(context.BuildOutput, "Tests", "WindowsDX", "Release")), $"tests-windowsdx-{os}");
+    }
+
+    void DeleteToolStore (string path)
+    {
+        if (System.IO.Directory.Exists (path)) {
+            var store = System.IO.Path.Combine (path, ".store");
+            if (System.IO.Directory.Exists (store)) {
+                System.IO.Directory.Delete (store, recursive: true);
+                foreach (var file in System.IO.Directory.GetFiles (path, "mgcb-*", System.IO.SearchOption.TopDirectoryOnly)) {
+                    System.IO.File.Delete (file);
+                }
+            }
+        }
     }
 }
