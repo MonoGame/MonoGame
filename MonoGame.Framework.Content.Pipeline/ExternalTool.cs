@@ -46,7 +46,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
             if (!string.IsNullOrEmpty(dotnetRoot)) {
                 exe = Path.Combine(dotnetRoot, exe);
             }
-            Run (exe, $"tool {command} {toolName} --tool-path {path}", out string stdOut, out string stdErr,  workingDirectory: path);
+            Run (exe, $"tool {command} {toolName} --tool-path .", out string stdOut, out string stdErr,  workingDirectory: path);
             Console.WriteLine($"DEBUG! {stdOut} {stdErr}");
         }
 
