@@ -31,7 +31,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
             return result;
         }
 
-        public static void RestoreDotnetTool (string command, string toolName)
+        public static void RestoreDotnetTool(string command, string toolName)
         {
             string path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory);
             if (CurrentPlatform.OS == OS.Linux)
@@ -44,10 +44,10 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
             Run (exe, $"tool {command} {toolName} --tool-path {path}", out string stdOut, out string stdErr,  workingDirectory: path);
         }
 
-        public static void RestoreDotnetTools ()
+        public static void RestoreDotnetTools()
         {
-            RestoreDotnetTool ("install", Crunch);
-            RestoreDotnetTool ("install", BasisU);
+            RestoreDotnetTool("install", Crunch);
+            RestoreDotnetTool("install", BasisU);
         }
 
         /// <summary>
@@ -92,6 +92,10 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
 
             if (!string.IsNullOrEmpty(workingDirectory))
                 processInfo.WorkingDirectory = workingDirectory;
+
+            var dotnetRoot = Environment.GetEnvironmentVariable ("DOTNET_ROOT");
+            if (!string.IsNullOrEmpty(dotnetRoot))
+                processInfo.EnvironmentVariables.Add("DOTNET_ROOT", dotnetRoot);
 
             EnsureExecutable(fullPath);
 
