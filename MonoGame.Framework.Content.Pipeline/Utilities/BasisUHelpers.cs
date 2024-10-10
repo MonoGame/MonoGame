@@ -206,7 +206,7 @@ internal static class BasisU
     /// <returns>The exit code for the basisu process. </returns>
     public static int Run(string args, out string stdOut, out string stdErr, string stdIn=null, string workingDirectory=null)
     {
-        return ExternalTool.RunDotnetTool("mgcb-basisu", args, out stdOut, out stdErr, stdIn, workingDirectory);
+        return ExternalTool.RunDotnetTool(ExternalTool.BasisU, args, out stdOut, out stdErr, stdIn, workingDirectory);
     }
 
     /// <summary>

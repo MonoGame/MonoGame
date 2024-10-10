@@ -5,6 +5,7 @@
 using System;
 using System.Diagnostics;
 using System.IO;
+using System.Net;
 using System.Threading;
 using MonoGame.Framework.Utilities;
 
@@ -17,6 +18,9 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
     /// </summary>
     internal class ExternalTool
     {
+        public static string Crunch = "mgcb-crunch";
+        public static string BasisU = "mgcb-basisu";
+
         public static int Run(string command, string arguments)
         {
             string stdout, stderr;
@@ -27,13 +31,42 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
             return result;
         }
 
+        public static void RestoreDotnetTool(string command, string toolName)
+        {
+            string path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory);
+            if (CurrentPlatform.OS == OS.Linux)
+                path= Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "linux");
+            if (CurrentPlatform.OS == OS.MacOSX)
+                path= Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "osx");
+            if (Directory.Exists (Path.Combine(path, toolName))) 
+                return;
+            Directory.CreateDirectory (path);
+            var exe = CurrentPlatform.OS == OS.Windows ? "dotnet.exe" : "dotnet";
+            var dotnetRoot = Environment.GetEnvironmentVariable ("DOTNET_ROOT");
+            if (!string.IsNullOrEmpty(dotnetRoot)) {
+                exe = Path.Combine(dotnetRoot, exe);
+            }
+            Run (exe, $"tool {command} {toolName} --tool-path .", out string stdOut, out string stdErr,  workingDirectory: path);
+            Debug.WriteLine($"DEBUG! {stdOut} {stdErr}");
+        }
+
+        public static void RestoreDotnetTools()
+        {
+            RestoreDotnetTool("install", Crunch);
+            RestoreDotnetTool("install", BasisU);
+        }
+
         /// <summary>
         /// Run a dotnet tool. The tool should be installed in a .config/dotnet-tools.json file somewhere in the project lineage.
         /// </summary>
         public static int RunDotnetTool(string toolName, string args, out string stdOut, out string stdErr, string stdIn=null, string workingDirectory=null)
         {
-            var finalizedArgs = toolName + " " + args;
-            return ExternalTool.Run("dotnet", finalizedArgs, out stdOut, out stdErr, stdIn, workingDirectory);
+            RestoreDotnetTools ();
+            var exe = FindCommand (toolName);
+            var finalizedArgs =  args;
+            var r =  ExternalTool.Run(exe, finalizedArgs, out stdOut, out stdErr, stdIn, workingDirectory);
+            Debug.WriteLine($"DEBUG! {stdOut} {stdErr}");
+            return r;
         }
 
         public static int Run(string command, string arguments, out string stdout, out string stderr, string stdin = null, string workingDirectory=null)
@@ -68,8 +101,14 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
             if (!string.IsNullOrEmpty(workingDirectory))
                 processInfo.WorkingDirectory = workingDirectory;
 
+            var dotnetRoot = Environment.GetEnvironmentVariable ("DOTNET_ROOT");
+            if (!string.IsNullOrEmpty(dotnetRoot)) {
+                processInfo.EnvironmentVariables["DOTNET_ROOT"] = dotnetRoot;
+            }
+
             EnsureExecutable(fullPath);
 
+            Debug.WriteLine ($"DEBUG! Exec: {command} {arguments}");
             using (var process = new Process())
             {
                 process.StartInfo = processInfo;
