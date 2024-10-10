@@ -23,6 +23,8 @@ public sealed class UploadArtifactsTask : AsyncFrostingTask<BuildContext>
         DeleteToolStore (path);
         path = System.IO.Path.Combine(context.BuildOutput, "Tests", "Tools", "Release");
         DeleteToolStore (path);
+        path = System.IO.Path.Combine(context.BuildOutput, "Tests", "Tools", "Release", "tools");
+        System.IO.Directory.Delete (path, recursive: true);
 
         await context.GitHubActions().Commands.UploadArtifact(new DirectoryPath(context.NuGetsDirectory.FullPath), $"nuget-{os}");
         await context.GitHubActions().Commands.UploadArtifact(new DirectoryPath(System.IO.Path.Combine(context.BuildOutput, "Tests", "Tools", "Release")), $"tests-tools-{os}");
