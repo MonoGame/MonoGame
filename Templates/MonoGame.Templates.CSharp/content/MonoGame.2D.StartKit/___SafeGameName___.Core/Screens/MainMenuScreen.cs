@@ -24,7 +24,6 @@ class MainMenuScreen : MenuScreen
     private bool readyToPlay;
     private PlayerIndex playerIndex;
     private ParticleManager particleManager;
-    private Texture2D particleTexture;
     private SettingsManager settingsManager;
     private MenuEntry aboutMenuEntry;
     private MenuEntry playMenuEntry;
@@ -84,10 +83,6 @@ class MainMenuScreen : MenuScreen
         using (Stream fileStream = TitleContainer.OpenStream(levelPath))
             level = new Level(ScreenManager.Game.Services, fileStream, 00);
 
-        // Create a particle manager at the center of the screen
-        particleTexture = content.Load<Texture2D>("Sprites/blank");
-        particleManager = new ParticleManager(particleTexture, new Vector2(400, 200));
-
         settingsManager ??= ScreenManager.Game.Services.GetService<SettingsManager>();
         settingsManager.Settings.PropertyChanged += (s, e) =>
         {
@@ -95,6 +90,8 @@ class MainMenuScreen : MenuScreen
         };
 
         SetLanguageText();
+
+        particleManager ??= ScreenManager.Game.Services.GetService<ParticleManager>();
     }
 
     /// <summary>
@@ -186,7 +183,7 @@ class MainMenuScreen : MenuScreen
     void PlayMenuEntrySelected(object sender, PlayerIndexEventArgs e)
     {
         // Let's kick off some celebratory particles
-        // TODO We could cosition the manager anywhere particleManager.Position = new Vector2(somewhere.X, somewhere.Y);
+        // TODO We could position the manager anywhere particleManager.Position = new Vector2(somewhere.X, somewhere.Y);
         particleManager.Emit(100, SettingsScreen.CurrentParticleEffect);  // Emit 100 particles
 
         var toastMessageBox = new MessageBoxScreen(Resources.LetsGo, false, new TimeSpan(0, 0, 1), true);

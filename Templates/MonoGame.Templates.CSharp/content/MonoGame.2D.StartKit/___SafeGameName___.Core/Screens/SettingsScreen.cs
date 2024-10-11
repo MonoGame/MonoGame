@@ -4,6 +4,7 @@ using ___SafeGameName___.Core.Localization;
 using ___SafeGameName___.Core.Settings;
 using ___SafeGameName___.ScreenManagers;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using System.Collections.Generic;
 using System.Globalization;
 
@@ -29,6 +30,7 @@ class SettingsScreen : MenuScreen
     public static ParticleEffectType CurrentParticleEffect { get => currentParticleEffect; }
 
     private SettingsManager settingsManager;
+    private ParticleManager particleManager;
 
     /// <summary>
     /// Constructor.
@@ -83,6 +85,30 @@ class SettingsScreen : MenuScreen
         gdm.IsFullScreen = settingsManager.Settings.FullScreen;
 
         SetLanguageText();
+
+        particleManager ??= ScreenManager.Game.Services.GetService<ParticleManager>();
+    }
+
+    public override void Update(GameTime gameTime,
+       bool otherScreenHasFocus,
+       bool coveredByOtherScreen)
+    {
+        base.Update(gameTime, otherScreenHasFocus, coveredByOtherScreen);
+
+        particleManager.Update(gameTime);
+    }
+
+    public override void Draw(GameTime gameTime)
+    {
+        SpriteBatch spriteBatch = ScreenManager.SpriteBatch;
+
+        spriteBatch.Begin();
+
+        particleManager.Draw(spriteBatch);
+
+        spriteBatch.End();
+
+        base.Draw(gameTime);
     }
 
     /// <summary>
@@ -139,5 +165,7 @@ class SettingsScreen : MenuScreen
         }
 
         settingsManager.Settings.ParticleEffect = currentParticleEffect;
+
+        particleManager.Emit(100, currentParticleEffect);  // Emit 100 particles
     }
 }

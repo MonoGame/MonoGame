@@ -1,15 +1,17 @@
+using ___SafeGameName___.Core.Effects;
 using ___SafeGameName___.Core.Localization;
 using ___SafeGameName___.Core.Settings;
 using ___SafeGameName___.ScreenManagers;
 using ___SafeGameName___.Screens;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
+
 
 #if !__IOS__
 using Microsoft.Xna.Framework.Media;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
-using System.Runtime.InteropServices;
 #endif
 
 namespace ___SafeGameName___.Core;
@@ -25,6 +27,8 @@ public class ___SafeGameName___Game : Game
     ScreenManager screenManager;
 
     SettingsManager settingsManager;
+    private Texture2D particleTexture;
+    private ParticleManager particleManager;
 
     public ___SafeGameName___Game()
     {
@@ -91,5 +95,15 @@ public class ___SafeGameName___Game : Game
 
         // add the main menu screen to the screen manager
         screenManager.AddScreen(new MainMenuScreen(), null);
+    }
+
+    protected override void LoadContent()
+    {
+        // Create a particle manager at the center of the screen
+        particleTexture = Content.Load<Texture2D>("Sprites/blank");
+        particleManager = new ParticleManager(particleTexture, new Vector2(400, 200));
+
+        // Let's reuse the particle manager across the game
+        Services.AddService(typeof(ParticleManager), particleManager);
     }
 }
