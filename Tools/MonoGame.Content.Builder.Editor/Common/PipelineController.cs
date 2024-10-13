@@ -839,7 +839,7 @@ namespace MonoGame.Tools.Pipeline
                     item.RelativeDestPath = PathHelper.GetRelativePath(ProjectLocation, file);
                     item.IncludeType = IncludeType.Link;
                     // We actually want to place this file under the initialDirectory if one is set.
-                    if (!item.RelativeDestPath.Contains (relative))
+                    if (!item.RelativeDestPath.Contains(relative))
                         item.RelativeDestPath = Path.Combine(relative, Path.GetFileNameWithoutExtension(file));
                 }
                 else
