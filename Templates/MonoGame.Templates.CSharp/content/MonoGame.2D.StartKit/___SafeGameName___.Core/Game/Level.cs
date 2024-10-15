@@ -71,6 +71,13 @@ class Level : IDisposable
 
     private SoundEffect exitReachedSound;
 
+    // The number of levels in the Levels directory of our content. We assume that
+    // levels in our content are 0-based and that all numbers under this constant
+    // have a level file present. This allows us to not need to check for the file
+    // or handle exceptions, both of which can add unnecessary time to level loading.
+    public const int NUMBER_OF_LEVELS = 5;
+    private const int NUMBER_OF_LAYERS = 3;
+
     #region Loading
     /// <summary>
     /// Constructs a new level.
@@ -96,7 +103,7 @@ class Level : IDisposable
         for (int i = 0; i < layers.Length; ++i)
         {
             // Choose a random segment if each background layer for level variety.
-            int segmentIndex = levelIndex;
+            int segmentIndex = levelIndex % NUMBER_OF_LAYERS;
             layers[i] = Content.Load<Texture2D>("Backgrounds/Layer" + i + "_" + segmentIndex);
         }
 

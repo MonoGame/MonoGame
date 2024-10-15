@@ -67,11 +67,6 @@ class GameplayScreen : GameScreen
     private VirtualGamePad virtualGamePad;
     private Texture2D backpack;
 
-    // The number of levels in the Levels directory of our content. We assume that
-    // levels in our content are 0-based and that all numbers under this constant
-    // have a level file present. This allows us to not need to check for the file
-    // or handle exceptions, both of which can add unnecessary time to level loading.
-    private const int numberOfLevels = 3;
     private const int textEdgeSpacing = 10;
 
     #endregion
@@ -148,7 +143,7 @@ class GameplayScreen : GameScreen
     private void LoadNextLevel()
     {
         // move to the next level
-        levelIndex = (levelIndex + 1) % numberOfLevels;
+        levelIndex = (levelIndex + 1) % Level.NUMBER_OF_LEVELS;
 
         // Unloads the content for the current level before loading the next one.
         if (level != null)
