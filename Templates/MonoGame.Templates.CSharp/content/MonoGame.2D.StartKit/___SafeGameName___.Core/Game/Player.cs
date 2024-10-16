@@ -113,7 +113,10 @@ class Player
     }
 
     private bool wasJumping;
+    private float initialFallYPosition;
+    private bool isFalling;
     private float jumpTime;
+    private const float MaxSafeFallDistance = -250f;  // adjust as needed
 
     private Rectangle localBounds;
     /// <summary>
@@ -361,11 +364,39 @@ class Player
                 // Reached the apex of the jump
                 jumpTime = 0.0f;
             }
+
+            // Reset fall state when jumping
+            isFalling = false;
         }
         else
         {
             // Continues not jumping or cancels a jump in progress
             jumpTime = 0.0f;
+
+            // Player begins falling (not on ground and not jumping)
+            if (!IsOnGround && !isJumping && !isFalling)
+            {
+                // Set initial fall position
+                initialFallYPosition = position.Y;
+                isFalling = true;
+            }
+
+            // If the player lands after falling
+            if (IsOnGround && isFalling)
+            {
+                float fallDistance = initialFallYPosition - position.Y;
+
+                // Check if fall distance exceeds safe threshold
+                // If player falls too far we kill them
+                if (fallDistance < MaxSafeFallDistance)
+                {
+
+                    OnKilled(null);
+                }
+
+                // Reset fall state after landing
+                isFalling = false;
+            }
         }
         wasJumping = isJumping;
 
