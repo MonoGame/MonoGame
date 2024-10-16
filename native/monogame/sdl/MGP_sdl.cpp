@@ -662,8 +662,8 @@ mgbool MGP_Platform_BeforeDraw(MGP_Platform* platform)
 
 MGP_Window* MGP_Window_Create(
     MGP_Platform* platform,
-    mgint width,
-    mgint height,
+    mgint& width,
+    mgint& height,
     const char* title)
 {
 	assert(platform != nullptr);
