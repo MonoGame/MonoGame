@@ -454,6 +454,12 @@ class Player
                                 // Perform further collisions with the new bounds.
                                 bounds = BoundingRectangle;
                             }
+
+                            // Handle Breakable tiles when hit from below
+                            if (collision == TileCollision.Breakable && depth.Y < 0 && previousBottom > tileBounds.Top)
+                            {
+                                level.BreakTile(x, y);
+                            }
                         }
                         else if (collision == TileCollision.Impassable) // Ignore platforms.
                         {
@@ -467,6 +473,10 @@ class Player
                 }
             }
         }
+
+        // Falling off the bottom of the level kills the player.
+        if (BoundingRectangle.Top >= level.Height * Tile.Height)
+            OnKilled(null);
 
         // Save the new bounds bottom.
         previousBottom = bounds.Bottom;
