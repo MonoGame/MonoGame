@@ -54,11 +54,14 @@ class Level : IDisposable
     }
     bool reachedExit;
 
-    public TimeSpan TimeRemaining
+    public TimeSpan TimeTaken
     {
-        get { return timeRemaining; }
+        get { return timeTaken; }
     }
-    TimeSpan timeRemaining;
+    TimeSpan timeTaken;
+
+    private TimeSpan maximumTimeToCompleteLevel = TimeSpan.FromMinutes(2.0);
+    public TimeSpan MaximumTimeToCompleteLevel { get => maximumTimeToCompleteLevel; }
 
     private const int PointsPerSecond = 5;
 
@@ -78,7 +81,6 @@ class Level : IDisposable
     public const int NUMBER_OF_LEVELS = 5;
     private const int NUMBER_OF_LAYERS = 3;
 
-    #region Loading
     /// <summary>
     /// Constructs a new level.
     /// </summary>
@@ -88,14 +90,17 @@ class Level : IDisposable
     /// <param name="fileStream">
     /// A stream containing the tile data.
     /// </param>
-    public Level(IServiceProvider serviceProvider, Stream fileStream, int levelIndex)
+    public Level(IServiceProvider serviceProvider, string levelPath, int levelIndex)
     {
         // Create a new content manager to load content used just by this level.
         content = new ContentManager(serviceProvider, "Content");
 
-        timeRemaining = TimeSpan.FromMinutes(2.0);
+        timeTaken = TimeSpan.Zero;
 
-        LoadTiles(fileStream);
+        using (Stream fileStream = TitleContainer.OpenStream(levelPath))
+        {
+            LoadTiles(fileStream);
+        }
 
         // Load background layer textures. For now, all levels must
         // use the same backgrounds and only use the left-most part of them.
@@ -219,7 +224,7 @@ class Level : IDisposable
                 return LoadVarietyTile("BlockA", 7, TileCollision.Impassable);
 
             // Breakable block
-            case ';': // TODO Not yet used in any levels. FIXME :) 
+            case ';':
                 return LoadVarietyTile("BlockB", 2, TileCollision.Breakable);
 
             // Player 1 start point
@@ -320,9 +325,7 @@ class Level : IDisposable
     {
         Content.Unload();
     }
-    #endregion
 
-    #region Bounds and collision
     /// <summary>
     /// Gets the collision mode of the tile at a particular location.
     /// This method handles tiles outside of the levels boundries by making it
@@ -364,9 +367,7 @@ class Level : IDisposable
     {
         get { return tiles.GetLength(1); }
     }
-    #endregion
 
-    #region Update
     /// <summary>
     /// Updates all objects in the world, performs collision between them,
     /// and handles the time limit with scoring.
@@ -384,8 +385,8 @@ class Level : IDisposable
         DisplayOrientation displayOrientation,
         bool readyToPlay = true)
     {
-        // Pause while the player is dead or time is expired.
-        if (!Player.IsAlive || TimeRemaining == TimeSpan.Zero)
+        // Pause while the player is dead or we've reached maximum time allowed.
+        if (!Player.IsAlive || TimeTaken == MaximumTimeToCompleteLevel)
         {
             // Still want to perform physics on the player.
             Player.ApplyPhysics(gameTime);
@@ -394,21 +395,19 @@ class Level : IDisposable
         {
             // Animate the time being converted into points.
             int seconds = (int)Math.Round(gameTime.ElapsedGameTime.TotalSeconds * 100.0f);
-            seconds = Math.Min(seconds, (int)Math.Ceiling(TimeRemaining.TotalSeconds));
-            timeRemaining -= TimeSpan.FromSeconds(seconds);
+            seconds = Math.Min(seconds, (int)Math.Ceiling(TimeTaken.TotalSeconds));
+            timeTaken += TimeSpan.FromSeconds(seconds);
             score += seconds * PointsPerSecond;
         }
         else
         {
             if (readyToPlay)
             {
-                timeRemaining -= gameTime.ElapsedGameTime;
-                Player.Update(gameTime, keyboardState, gamePadState, accelerometerState, displayOrientation);
-                UpdateGems(gameTime);
+                timeTaken += gameTime.ElapsedGameTime;
 
-                // Falling off the bottom of the level kills the player.
-                if (Player.BoundingRectangle.Top >= Height * Tile.Height)
-                    OnPlayerKilled(null);
+                Player.Update(gameTime, keyboardState, gamePadState, accelerometerState, displayOrientation);
+
+                UpdateGems(gameTime);
 
                 UpdateEnemies(gameTime);
 
@@ -424,9 +423,10 @@ class Level : IDisposable
             }
         }
 
-        // Clamp the time remaining at zero.
-        if (timeRemaining < TimeSpan.Zero)
-            timeRemaining = TimeSpan.Zero;
+        if (timeTaken > maximumTimeToCompleteLevel)
+        {
+            timeTaken = maximumTimeToCompleteLevel;
+        }
     }
 
     /// <summary>
@@ -521,9 +521,7 @@ class Level : IDisposable
     {
         Player.Reset(start);
     }
-    #endregion
 
-    #region Draw
     /// <summary>
     /// Draw everything in the level from background to foreground.
     /// </summary>
@@ -567,5 +565,20 @@ class Level : IDisposable
             }
         }
     }
-    #endregion
+
+    // BreakTile method should handle triggering its destruction animation
+    internal void BreakTile(int x, int y)
+    {
+        RemoveTile(x, y);
+
+        // TODO Use Particle effect to explode the removed tile
+
+    }
+
+    internal void RemoveTile(int x, int y)
+    {
+        // By making the tile passable with no nexture, it no longer "exists" in the game world
+        // Thus making the level layout dynamic
+        tiles[x, y] = new Tile(null, TileCollision.Passable);
+    }
 }

@@ -66,7 +66,7 @@ class MainMenuScreen : MenuScreen
         settingsMenuEntry.Text = Resources.Settings;
         exitMenuEntry.Text = Resources.Exit;
 
-        Title = Resources.MainMenu;
+        Title = "___SafeGameName___"; // TODO uncomment this if you want it to use Resources.* instead Resources.MainMenu;
     }
 
     /// <summary>
@@ -80,8 +80,7 @@ class MainMenuScreen : MenuScreen
 
         // Load the level.
         string levelPath = "Content/Levels/00.txt";
-        using (Stream fileStream = TitleContainer.OpenStream(levelPath))
-            level = new Level(ScreenManager.Game.Services, fileStream, 00);
+        level = new Level(ScreenManager.Game.Services, levelPath, 00);
 
         settingsManager ??= ScreenManager.Game.Services.GetService<SettingsManager>();
         settingsManager.Settings.PropertyChanged += (s, e) =>

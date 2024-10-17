@@ -1,13 +1,3 @@
-#region File Description
-//-----------------------------------------------------------------------------
-// GameplayScreen.cs
-//
-// Microsoft XNA Community Game Platform
-// Copyright (C) Microsoft Corporation. All rights reserved.
-//-----------------------------------------------------------------------------
-#endregion
-
-#region Using Statements
 using ___SafeGameName___.Core;
 using ___SafeGameName___.Core.Inputs;
 using ___SafeGameName___.Core.Localization;
@@ -20,7 +10,6 @@ using Microsoft.Xna.Framework.Input.Touch;
 using Microsoft.Xna.Framework.Media;
 using System;
 using System.IO;
-#endregion
 
 namespace ___SafeGameName___.Screens;
 
@@ -66,7 +55,6 @@ class GameplayScreen : GameScreen
 
     private VirtualGamePad virtualGamePad;
     private Texture2D backpack;
-
     private const int textEdgeSpacing = 10;
 
     #endregion
@@ -119,7 +107,6 @@ class GameplayScreen : GameScreen
 #endif
         LoadNextLevel();
 
-        // TODO maybe a nice backpack icon?
         backpack = content.Load<Texture2D>("Sprites/backpack");
 
         // once the load has finished, we use ResetElapsedTime to tell the game's
@@ -151,8 +138,7 @@ class GameplayScreen : GameScreen
 
         // Load the level.
         string levelPath = string.Format("Content/Levels/{0:00}.txt", levelIndex);
-        using (Stream fileStream = TitleContainer.OpenStream(levelPath))
-            level = new Level(ScreenManager.Game.Services, fileStream, levelIndex);
+        level = new Level(ScreenManager.Game.Services, levelPath, levelIndex);
     }
 
     private void ReloadCurrentLevel()
@@ -269,12 +255,16 @@ class GameplayScreen : GameScreen
                 {
                     level.StartNewLife();
                 }
-                else if (level.TimeRemaining == TimeSpan.Zero)
+                else if (level.TimeTaken == level.MaximumTimeToCompleteLevel)
                 {
                     if (level.ReachedExit)
+                    {
                         LoadNextLevel();
+                    }
                     else
+                    {
                         ReloadCurrentLevel();
+                    }
                 }
             }
 
@@ -327,14 +317,14 @@ class GameplayScreen : GameScreen
 
         Vector2 center = new Vector2(baseScreenSize.X / 2, baseScreenSize.Y / 2);
 
-        // Draw time remaining. Uses modulo division to cause blinking when the
+        // Draw time taken. Uses modulo division to cause blinking when the
         // player is running out of time.
-        string drawableString = Resources.Time + level.TimeRemaining.Minutes.ToString("00") + ":" + level.TimeRemaining.Seconds.ToString("00");
+        string drawableString = Resources.Time + level.TimeTaken.Minutes.ToString("00") + ":" + level.TimeTaken.Seconds.ToString("00");
         var timeDimensions = hudFont.MeasureString(drawableString);
         Color timeColor;
-        if (level.TimeRemaining > WarningTime ||
+        if (level.TimeTaken < level.MaximumTimeToCompleteLevel - WarningTime ||
             level.ReachedExit ||
-            (int)level.TimeRemaining.TotalSeconds % 2 == 0)
+            (int)level.TimeTaken.TotalSeconds % 2 == 0)
         {
             timeColor = Color.Yellow;
         }
@@ -351,7 +341,7 @@ class GameplayScreen : GameScreen
 
         // Determine the status overlay message to show.
         Texture2D status = null;
-        if (level.TimeRemaining == TimeSpan.Zero)
+        if (level.TimeTaken == level.MaximumTimeToCompleteLevel)
         {
             if (level.ReachedExit)
             {
