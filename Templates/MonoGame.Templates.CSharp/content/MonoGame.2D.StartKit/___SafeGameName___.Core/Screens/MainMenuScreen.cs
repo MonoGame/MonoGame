@@ -78,9 +78,12 @@ class MainMenuScreen : MenuScreen
         if (content == null)
             content = new ContentManager(ScreenManager.Game.Services, "Content");
 
+        particleManager ??= ScreenManager.Game.Services.GetService<ParticleManager>();
+
         // Load the level.
         string levelPath = "Content/Levels/00.txt";
         level = new Level(ScreenManager.Game.Services, levelPath, 00);
+        level.ParticleManager = particleManager;
 
         settingsManager ??= ScreenManager.Game.Services.GetService<SettingsManager>();
         settingsManager.Settings.PropertyChanged += (s, e) =>
@@ -89,8 +92,6 @@ class MainMenuScreen : MenuScreen
         };
 
         SetLanguageText();
-
-        particleManager ??= ScreenManager.Game.Services.GetService<ParticleManager>();
     }
 
     /// <summary>
@@ -124,8 +125,6 @@ class MainMenuScreen : MenuScreen
         bool coveredByOtherScreen)
     {
         base.Update(gameTime, otherScreenHasFocus, coveredByOtherScreen);
-
-        particleManager.Update(gameTime);
 
         if (readyToPlay)
         {
@@ -166,8 +165,6 @@ class MainMenuScreen : MenuScreen
 
         level.Draw(gameTime, spriteBatch);
 
-        particleManager.Draw(spriteBatch);
-
         spriteBatch.End();
 
         base.Draw(gameTime);
@@ -181,10 +178,6 @@ class MainMenuScreen : MenuScreen
     /// </summary>
     void PlayMenuEntrySelected(object sender, PlayerIndexEventArgs e)
     {
-        // Let's kick off some celebratory particles
-        // TODO We could position the manager anywhere particleManager.Position = new Vector2(somewhere.X, somewhere.Y);
-        particleManager.Emit(100, SettingsScreen.CurrentParticleEffect);  // Emit 100 particles
-
         var toastMessageBox = new MessageBoxScreen(Resources.LetsGo, false, new TimeSpan(0, 0, 1), true);
         toastMessageBox.Accepted += (sender, e) =>
         {

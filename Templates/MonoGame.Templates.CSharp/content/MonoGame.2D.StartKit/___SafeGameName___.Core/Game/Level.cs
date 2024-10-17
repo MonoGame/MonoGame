@@ -1,5 +1,7 @@
-﻿using ___SafeGameName___.Core.Inputs;
+﻿using ___SafeGameName___.Core.Effects;
+using ___SafeGameName___.Core.Inputs;
 using ___SafeGameName___.Core.Localization;
+using ___SafeGameName___.Screens;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Content;
@@ -8,6 +10,7 @@ using Microsoft.Xna.Framework.Input;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Reflection.Emit;
 
 namespace ___SafeGameName___.Core;
 
@@ -368,6 +371,10 @@ class Level : IDisposable
         get { return tiles.GetLength(1); }
     }
 
+    private ParticleManager particleManager;
+    private bool particlesExploding;
+    public ParticleManager ParticleManager { get => particleManager; set => particleManager = value; }
+
     /// <summary>
     /// Updates all objects in the world, performs collision between them,
     /// and handles the time limit with scoring.
@@ -385,6 +392,16 @@ class Level : IDisposable
         DisplayOrientation displayOrientation,
         bool readyToPlay = true)
     {
+        particleManager.Update(gameTime);
+
+        if (ReachedExit
+            && !particlesExploding)
+        {
+            particleManager.Position = Player.Position;
+            particleManager.Emit(100, SettingsScreen.CurrentParticleEffect);
+            particlesExploding = true;
+        }
+
         // Pause while the player is dead or we've reached maximum time allowed.
         if (!Player.IsAlive || TimeTaken == MaximumTimeToCompleteLevel)
         {
@@ -542,6 +559,8 @@ class Level : IDisposable
 
         for (int i = EntityLayer + 1; i < layers.Length; ++i)
             spriteBatch.Draw(layers[i], Vector2.Zero, Color.White);
+
+        particleManager.Draw(spriteBatch);
     }
 
     /// <summary>
@@ -571,8 +590,9 @@ class Level : IDisposable
     {
         RemoveTile(x, y);
 
-        // TODO Use Particle effect to explode the removed tile
-
+        // Use Particle effect to explode the removed tile
+        particleManager.Position = new Vector2(Player.Position.X, Player.Position.Y - 20);
+        particleManager.Emit(50, ParticleEffectType.Confetti, Color.SandyBrown);
     }
 
     internal void RemoveTile(int x, int y)

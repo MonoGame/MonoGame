@@ -1,4 +1,5 @@
 using ___SafeGameName___.Core;
+using ___SafeGameName___.Core.Effects;
 using ___SafeGameName___.Core.Inputs;
 using ___SafeGameName___.Core.Localization;
 using GameStateManagement.Inputs;
@@ -9,7 +10,6 @@ using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Input.Touch;
 using Microsoft.Xna.Framework.Media;
 using System;
-using System.IO;
 
 namespace ___SafeGameName___.Screens;
 
@@ -55,6 +55,7 @@ class GameplayScreen : GameScreen
 
     private VirtualGamePad virtualGamePad;
     private Texture2D backpack;
+    private ParticleManager particleManager;
     private const int textEdgeSpacing = 10;
 
     #endregion
@@ -105,6 +106,9 @@ class GameplayScreen : GameScreen
         }
         catch { }
 #endif
+
+        particleManager ??= ScreenManager.Game.Services.GetService<ParticleManager>();
+
         LoadNextLevel();
 
         backpack = content.Load<Texture2D>("Sprites/backpack");
@@ -139,6 +143,7 @@ class GameplayScreen : GameScreen
         // Load the level.
         string levelPath = string.Format("Content/Levels/{0:00}.txt", levelIndex);
         level = new Level(ScreenManager.Game.Services, levelPath, levelIndex);
+        level.ParticleManager = particleManager;
     }
 
     private void ReloadCurrentLevel()
@@ -271,9 +276,6 @@ class GameplayScreen : GameScreen
             wasContinuePressed = continuePressed;
 
             virtualGamePad.Update(gameTime);
-
-
-
         }
     }
 
