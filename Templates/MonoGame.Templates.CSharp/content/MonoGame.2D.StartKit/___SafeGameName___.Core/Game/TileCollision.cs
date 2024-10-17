@@ -25,9 +25,8 @@ enum TileCollision
 
     /// <summary>
     /// A breakable tile is one which behaves like a platform tile except when the
-    /// player is below it. A player can jump up and break the tile.
-    /// If a gem is above it, it will fall down and either hit the play
-    /// or onto the platform/impassable tile below, Mario style.
+    /// player is below it, the player jumps up the tile breaks/disappears.
+    /// Our version of Mario :).
     /// </summary>
-    Breakable = 3, // TODO : Implement breakable tiles
+    Breakable = 3,
 }
