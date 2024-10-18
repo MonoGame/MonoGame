@@ -421,13 +421,13 @@ class Level : IDisposable
         }
         else
         {
+            UpdateGems(gameTime);
+
             if (readyToPlay)
             {
                 timeTaken += gameTime.ElapsedGameTime;
 
                 Player.Update(gameTime, keyboardState, gamePadState, accelerometerState, displayOrientation);
-
-                UpdateGems(gameTime);
 
                 UpdateEnemies(gameTime);
 

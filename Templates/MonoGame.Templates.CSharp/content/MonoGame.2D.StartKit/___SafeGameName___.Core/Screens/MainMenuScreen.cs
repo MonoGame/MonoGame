@@ -162,7 +162,7 @@ class MainMenuScreen : MenuScreen
 
     private void UpdateTutorialSteps(GameTime gameTime)
     {
-        if (gameTime.TotalGameTime - timeSinceLastMessage > TimeSpan.FromSeconds(2))
+        if (gameTime.TotalGameTime - timeSinceLastMessage > TimeSpan.FromSeconds(3)) // Should the showtime be in settings?
         {
             tutorialStep++;
             timeSinceLastMessage = gameTime.TotalGameTime;
@@ -215,7 +215,7 @@ class MainMenuScreen : MenuScreen
             case 0:
                 message = Resources.CollectThese;
                 textSize = font.MeasureString(message);
-                backgroundRectangle = new Rectangle((int)level.Gems[0].Position.X - hPad,
+                backgroundRectangle = new Rectangle((int)level.Gems[0].Position.X - 50 - hPad,
                                                       (int)level.Gems[0].Position.Y - vPad - 60,
                                                       (int)textSize.X + hPad * 2,
                                                       (int)textSize.Y + vPad * 2);
@@ -224,7 +224,7 @@ class MainMenuScreen : MenuScreen
             case 1:
                 message = Resources.GetToHere;
                 textSize = font.MeasureString(message);
-                backgroundRectangle = new Rectangle((int)level.Exit.X - hPad,
+                backgroundRectangle = new Rectangle((int)level.Exit.X - 50 - hPad,
                                                       (int)level.Exit.Y - vPad - 60,
                                                       (int)textSize.X + hPad * 2,
                                                       (int)textSize.Y + vPad * 2);
@@ -233,7 +233,7 @@ class MainMenuScreen : MenuScreen
             case 2:
                 message = Resources.DontDie;
                 textSize = font.MeasureString(message);
-                backgroundRectangle = new Rectangle((int)level.Player.Position.X - hPad,
+                backgroundRectangle = new Rectangle((int)level.Player.Position.X - 50 - hPad,
                                                       (int)level.Player.Position.Y - vPad - 100,
                                                       (int)textSize.X + hPad * 2,
                                                       (int)textSize.Y + vPad * 2);
@@ -269,6 +269,8 @@ class MainMenuScreen : MenuScreen
     /// </summary>
     private void TutorialMenuEntrySelected(object sender, PlayerIndexEventArgs e)
     {
+        // You could create another screen and show the tutorial there.
+        // But modern games, have a more dynamic main menu
         showTutorial = true;
     }
 

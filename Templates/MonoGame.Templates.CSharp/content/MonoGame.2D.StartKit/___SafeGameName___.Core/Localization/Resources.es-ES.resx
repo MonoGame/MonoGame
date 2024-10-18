@@ -223,12 +223,12 @@
     <value>Tutorial</value>
   </data>
   <data name="CollectThese" xml:space="preserve">
-    <value>Collect These!</value>
+    <value>¡Colecciona estos!</value>
   </data>
   <data name="GetToHere" xml:space="preserve">
-    <value>Get To Here!</value>
+    <value>¡Llegue hasta aquí!</value>
   </data>
   <data name="DontDie" xml:space="preserve">
-    <value>Don't Die!</value>
+    <value>¡No mueras!</value>
   </data>
 </root>
