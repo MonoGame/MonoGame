@@ -9,7 +9,6 @@ using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using System;
-using System.IO;
 
 namespace ___SafeGameName___.Screens;
 
@@ -18,21 +17,21 @@ namespace ___SafeGameName___.Screens;
 /// </summary>
 class MainMenuScreen : MenuScreen
 {
-    #region Fields
     private ContentManager content;
     private Level level;
     private bool readyToPlay;
     private PlayerIndex playerIndex;
     private ParticleManager particleManager;
     private SettingsManager settingsManager;
-    private MenuEntry aboutMenuEntry;
     private MenuEntry playMenuEntry;
+    private MenuEntry tutorialMenuEntry;
     private MenuEntry settingsMenuEntry;
+    private MenuEntry aboutMenuEntry;
     private MenuEntry exitMenuEntry;
-    #endregion
-
-    #region Initialization
-
+    private Texture2D gradientTexture;
+    private bool showTutorial;
+    private int tutorialStep = -1;
+    private TimeSpan timeSinceLastMessage;
 
     /// <summary>
     /// Constructor fills in the menu contents.
@@ -41,19 +40,22 @@ class MainMenuScreen : MenuScreen
         : base(Resources.MainMenu)
     {
         // Create our menu entries.
-        aboutMenuEntry = new MenuEntry(Resources.About);
         playMenuEntry = new MenuEntry(Resources.Play);
+        tutorialMenuEntry = new MenuEntry(Resources.Tutorial);
         settingsMenuEntry = new MenuEntry(Resources.Settings);
+        aboutMenuEntry = new MenuEntry(Resources.About);
         exitMenuEntry = new MenuEntry(Resources.Exit);
 
         // Hook up menu event handlers.
         playMenuEntry.Selected += PlayMenuEntrySelected;
+        tutorialMenuEntry.Selected += TutorialMenuEntrySelected;
         settingsMenuEntry.Selected += SettingsMenuEntrySelected;
         aboutMenuEntry.Selected += AboutMenuEntrySelected;
         exitMenuEntry.Selected += OnCancel;
 
         // Add entries to the menu.
         MenuEntries.Add(playMenuEntry);
+        MenuEntries.Add(tutorialMenuEntry);
         MenuEntries.Add(settingsMenuEntry);
         MenuEntries.Add(aboutMenuEntry);
         MenuEntries.Add(exitMenuEntry);
@@ -92,6 +94,8 @@ class MainMenuScreen : MenuScreen
         };
 
         SetLanguageText();
+
+        gradientTexture = content.Load<Texture2D>("Sprites/gradient");
     }
 
     /// <summary>
@@ -106,9 +110,7 @@ class MainMenuScreen : MenuScreen
 
         content.Unload();
     }
-    #endregion
 
-    #region Update and Draw
     /// <summary>
     /// Allows the game to run logic such as updating the world,
     /// checking for collisions, gathering input, and playing audio.
@@ -151,6 +153,26 @@ class MainMenuScreen : MenuScreen
             Accelerometer.GetState(),
             ScreenManager.Game.Window.CurrentOrientation,
             readyToPlay);
+
+        if (showTutorial)
+        {
+            UpdateTutorialSteps(gameTime);
+        }
+    }
+
+    private void UpdateTutorialSteps(GameTime gameTime)
+    {
+        if (gameTime.TotalGameTime - timeSinceLastMessage > TimeSpan.FromSeconds(2))
+        {
+            tutorialStep++;
+            timeSinceLastMessage = gameTime.TotalGameTime;
+
+            if (tutorialStep > 2)
+            {
+                tutorialStep = -1;
+                showTutorial = false;
+            }
+        }
     }
 
     /// <summary>
@@ -158,20 +180,74 @@ class MainMenuScreen : MenuScreen
     /// </summary>
     public override void Draw(GameTime gameTime)
     {
-        // Our player and enemy are both actually just text strings.
         SpriteBatch spriteBatch = ScreenManager.SpriteBatch;
 
         spriteBatch.Begin();
 
         level.Draw(gameTime, spriteBatch);
 
+        if (showTutorial)
+        {
+            DrawTutorialSteps(spriteBatch);
+        }
+
         spriteBatch.End();
 
         base.Draw(gameTime);
     }
-    #endregion
 
-    #region Handle Input
+    private void DrawTutorialSteps(SpriteBatch spriteBatch)
+    {
+        SpriteFont font = ScreenManager.Font;
+        Viewport viewport = ScreenManager.GraphicsDevice.Viewport;
+        Vector2 viewportSize = new Vector2(viewport.Width, viewport.Height);
+
+        // The background includes a border somewhat larger than the text itself.
+        const int hPad = 32;
+        const int vPad = 16;
+
+        Rectangle backgroundRectangle = Rectangle.Empty;
+        Vector2 textSize;
+        string message = string.Empty;
+
+        switch (tutorialStep)
+        {
+            case 0:
+                message = Resources.CollectThese;
+                textSize = font.MeasureString(message);
+                backgroundRectangle = new Rectangle((int)level.Gems[0].Position.X - hPad,
+                                                      (int)level.Gems[0].Position.Y - vPad - 60,
+                                                      (int)textSize.X + hPad * 2,
+                                                      (int)textSize.Y + vPad * 2);
+                break;
+
+            case 1:
+                message = Resources.GetToHere;
+                textSize = font.MeasureString(message);
+                backgroundRectangle = new Rectangle((int)level.Exit.X - hPad,
+                                                      (int)level.Exit.Y - vPad - 60,
+                                                      (int)textSize.X + hPad * 2,
+                                                      (int)textSize.Y + vPad * 2);
+                break;
+
+            case 2:
+                message = Resources.DontDie;
+                textSize = font.MeasureString(message);
+                backgroundRectangle = new Rectangle((int)level.Player.Position.X - hPad,
+                                                      (int)level.Player.Position.Y - vPad - 100,
+                                                      (int)textSize.X + hPad * 2,
+                                                      (int)textSize.Y + vPad * 2);
+                break;
+        }
+
+        Vector2 textPosition = new Vector2(backgroundRectangle.X + hPad, backgroundRectangle.Y + vPad);
+
+        // Draw the background rectangle.
+        spriteBatch.Draw(gradientTexture, backgroundRectangle, Color.White);
+
+        // Draw the tutorial text.
+        spriteBatch.DrawString(font, message, textPosition, Color.White);
+    }
 
     /// <summary>
     /// Event handler for when the Play menu entry is selected.
@@ -186,6 +262,14 @@ class MainMenuScreen : MenuScreen
 
         };
         ScreenManager.AddScreen(toastMessageBox, e.PlayerIndex);
+    }
+
+    /// <summary>
+    /// Event handler for when the Tutorial menu entry is selected.
+    /// </summary>
+    private void TutorialMenuEntrySelected(object sender, PlayerIndexEventArgs e)
+    {
+        showTutorial = true;
     }
 
     /// <summary>
@@ -227,6 +311,4 @@ class MainMenuScreen : MenuScreen
     {
         ScreenManager.Game.Exit();
     }
-
-    #endregion
 }

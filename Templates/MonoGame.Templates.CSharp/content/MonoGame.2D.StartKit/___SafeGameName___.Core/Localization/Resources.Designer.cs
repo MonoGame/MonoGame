@@ -79,11 +79,29 @@ namespace ___SafeGameName___.Core.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Collect These!.
+        /// </summary>
+        internal static string CollectThese {
+            get {
+                return ResourceManager.GetString("CollectThese", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Display Mode : {0}.
         /// </summary>
         internal static string DisplayMode {
             get {
                 return ResourceManager.GetString("DisplayMode", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Don&apos;t Die!.
+        /// </summary>
+        internal static string DontDie {
+            get {
+                return ResourceManager.GetString("DontDie", resourceCulture);
             }
         }
         
@@ -210,6 +228,15 @@ namespace ___SafeGameName___.Core.Localization {
         internal static string FullScreen {
             get {
                 return ResourceManager.GetString("FullScreen", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Get To Here!.
+        /// </summary>
+        internal static string GetToHere {
+            get {
+                return ResourceManager.GetString("GetToHere", resourceCulture);
             }
         }
         
@@ -345,6 +372,15 @@ namespace ___SafeGameName___.Core.Localization {
         internal static string Time {
             get {
                 return ResourceManager.GetString("Time", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Tutorial.
+        /// </summary>
+        internal static string Tutorial {
+            get {
+                return ResourceManager.GetString("Tutorial", resourceCulture);
             }
         }
         

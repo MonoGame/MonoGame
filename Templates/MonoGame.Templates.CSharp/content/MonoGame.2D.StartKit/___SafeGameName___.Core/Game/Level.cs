@@ -10,7 +10,6 @@ using Microsoft.Xna.Framework.Input;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Reflection.Emit;
 
 namespace ___SafeGameName___.Core;
 
@@ -35,11 +34,15 @@ class Level : IDisposable
     Player player;
 
     private List<Gem> gems = new List<Gem>();
+    internal List<Gem> Gems { get => gems; set => gems = value; }
+
+
     private List<Enemy> enemies = new List<Enemy>();
 
     // Key locations in the level.        
     private Vector2 start;
     private Point exit = InvalidPosition;
+    internal Point Exit { get => exit; set => exit = value; }
     private static readonly Point InvalidPosition = new Point(-1, -1);
 
     // Level game state.
