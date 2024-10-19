@@ -24,6 +24,11 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
         public static string BasisU = "mgcb-basisu";
         private static string BasisUVersion = "1.16.4.2";
 
+        static ExternalTool()
+        {
+            RestoreDotnetTools ();
+        }
+
         public static int Run(string command, string arguments)
         {
             string stdout, stderr;
@@ -34,7 +39,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
             return result;
         }
 
-        public static void RestoreDotnetTool(string command, string toolName, string toolVersion, string path)
+        static void RestoreDotnetTool(string command, string toolName, string toolVersion, string path)
         {
             Directory.CreateDirectory(path);
             var exe = CurrentPlatform.OS == OS.Windows ? "dotnet.exe" : "dotnet";
@@ -50,7 +55,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
             }
         }
 
-        public static void RestoreDotnetTools()
+        static void RestoreDotnetTools()
         {
             var version = Assembly.GetExecutingAssembly().GetName().Version.ToString();
             string path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory);
@@ -71,7 +76,6 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
         /// </summary>
         public static int RunDotnetTool(string toolName, string args, out string stdOut, out string stdErr, string stdIn=null, string workingDirectory=null)
         {
-            RestoreDotnetTools();
             var exe = FindCommand(toolName);
             var finalizedArgs =  args;
             return ExternalTool.Run(exe, finalizedArgs, out stdOut, out stdErr, stdIn, workingDirectory);
