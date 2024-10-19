@@ -76,8 +76,6 @@
     <PackageReference Include="AssimpNet" Version="5.0.0-beta1" IncludeAssets="compile;runtime;build" ExcludeAssets="native" />
     <PackageReference Include="MonoGame.Library.Assimp" Version="5.3.1.1" />
     <PackageReference Include="BCnEncoder.Net" Version="2.1.0" />
-    <PackageReference Include="BCnEncoder.Net.ImageSharp" Version="1.1.1" />
-    <PackageReference Include="SixLabors.ImageSharp" Version="3.1.5" />
     <PackageReference Include="Microsoft.NETCore.App" Version="2.1.30" />
     <PackageReference Include="RoyT.TrueType" Version="0.2.0" />
     <PackageReference Include="SharpDX" Version="4.0.1" />

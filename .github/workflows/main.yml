@@ -105,7 +105,6 @@ jobs:
       - name: Test
         run: dotnet test Tools/MonoGame.Tools.Tests/MonoGame.Tools.Tests.csproj --blame-hang-timeout 5m -c Release --filter="TestCategory!=Audio"
         env:
-          DOTNET_ROOT: ${{github.workspace}}/dotnet64
           MGFXC_WINE_PATH: /Users/runner/.winemonogame
           CI: true
         if: runner.os == 'macOS'
@@ -216,7 +215,7 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: tests-tools-${{ matrix.platform }}
-          path: tests-tools
+          path: tests tools
 
       - name: Download tests-desktopgl-${{ matrix.platform }}
         uses: actions/download-artifact@v3
@@ -231,13 +230,8 @@ jobs:
           path: tests-windowsdx
         if: runner.os == 'Windows'
 
-      - name: Install Tools
-        run: |
-          dotnet tool install --create-manifest-if-needed mgcb-basisu
-          dotnet tool install --create-manifest-if-needed mgcb-crunch
-
       - name: Run Tools Tests
-        run: dotnet test tests-tools/MonoGame.Tools.Tests.dll --blame-hang-timeout 1m --filter="TestCategory!=Effects"
+        run: dotnet test "tests tools/MonoGame.Tools.Tests.dll" --blame-hang-timeout 1m --filter="TestCategory!=Effects"
         env:
           CI: true
 

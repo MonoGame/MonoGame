@@ -3,7 +3,11 @@
   <PropertyGroup>
     <DotnetCommand Condition="'$(DotnetCommand)' == ''">dotnet</DotnetCommand>
     <EnableMGCBItems Condition="'$(EnableMGCBItems)' == ''">true</EnableMGCBItems>
+    <!-- Allow users the ability to disble tool restoration if needed -->
+    <AutoRestoreMGCBTool Condition="'$(AutoRestoreMGCBTool)' == ''">true</AutoRestoreMGCBTool>
+    <MGCBToolDirectory>$(MSBuildThisFileDirectory)dotnet-tools/</MGCBToolDirectory>
     <MGCBCommand Condition="'$(MGCBCommand)' == ''">mgcb</MGCBCommand>
+    <MonoGameVersion Condition="'$(MonoGameVersion)' == ''">3.8.1.1-develop</MonoGameVersion>
   </PropertyGroup>
 
 </Project>

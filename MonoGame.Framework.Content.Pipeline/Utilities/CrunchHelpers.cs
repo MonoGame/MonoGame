@@ -137,7 +137,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Utilities
         /// <returns>The exit code for the basisu process. </returns>
         private static int Run(string args, out string stdOut, out string stdErr)
         {
-            return ExternalTool.RunDotnetTool("mgcb-crunch", args, out stdOut, out stdErr);
+            return ExternalTool.RunDotnetTool(ExternalTool.Crunch, args, out stdOut, out stdErr);
         }
 
         /// <summary>
@@ -233,7 +233,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Utilities
         )
         {
             errorMessage = null;
-            var argStr = $"-file {pngFileName} -{format.formatString} -out {intermediateFileName} -fileformat ktx -forceprimaryencoding -noNormalDetection";
+            var argStr = $"-file \"{pngFileName}\" -{format.formatString} -out \"{intermediateFileName}\" -fileformat ktx -forceprimaryencoding -noNormalDetection";
             var exitCode = Run(
                 args: argStr,
                 stdOut: out var stdOut,

@@ -206,7 +206,7 @@ internal static class BasisU
     /// <returns>The exit code for the basisu process. </returns>
     public static int Run(string args, out string stdOut, out string stdErr, string stdIn=null, string workingDirectory=null)
     {
-        return ExternalTool.RunDotnetTool("mgcb-basisu", args, out stdOut, out stdErr, stdIn, workingDirectory);
+        return ExternalTool.RunDotnetTool(ExternalTool.BasisU, args, out stdOut, out stdErr, stdIn, workingDirectory);
     }
 
     /// <summary>
@@ -430,7 +430,7 @@ internal static class BasisU
         //  basisu -unpack foo.ktx2 -ktx_only -linear -format_only 2
         var linearFlag = basisUFormat.isLinearColorSpace ? "-linear" : "";
         // var linearFlag = "";
-        var argStr = $"-unpack -file {basisFileName} -ktx_only -format_only {basisUFormat.code} {linearFlag}";
+        var argStr = $"-unpack -file \"{basisFileName}\" -ktx_only -format_only {basisUFormat.code} {linearFlag}";
         var exitCode = Run(
             args: argStr,
             stdOut: out var stdOut,
@@ -489,7 +489,7 @@ internal static class BasisU
     {
         var absImageFileName = Path.GetFullPath(imageFileName);
         var uastcFlag = format.nonUastcCompatible ? "": "-uastc";
-        var argStr = $"-file {absImageFileName} {uastcFlag} -ktx2 -output_file {intermediateFileName}";
+        var argStr = $"-file \"{absImageFileName}\" {uastcFlag} -ktx2 -output_file \"{intermediateFileName}\"";
         var exitCode = Run(
             args: argStr,
             stdOut: out var stdOut,
