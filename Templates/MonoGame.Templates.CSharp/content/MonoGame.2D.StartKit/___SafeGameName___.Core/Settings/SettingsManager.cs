@@ -7,7 +7,7 @@ internal class SettingsManager
     public SettingsManager(ISettingsStorage storage)
     {
         this.storage = storage;
-        settings = this.storage.LoadSettings() ?? new ___SafeGameName___Settings();
+        Load();
     }
 
     public ___SafeGameName___Settings Settings => settings;
