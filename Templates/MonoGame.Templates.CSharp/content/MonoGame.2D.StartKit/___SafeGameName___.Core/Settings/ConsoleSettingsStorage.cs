@@ -2,16 +2,8 @@
 
 public class ConsoleSettingsStorage : BaseSettingsStorage
 {
-    // Use console-specific APIs to handle save data
-    public override void SaveSettings(___SafeGameName___Settings gameSettings)
+    // Use console-specific or Native APIs to handle save data
+    public ConsoleSettingsStorage()
     {
-        // Console specific save implementation
-    }
-
-    public override ___SafeGameName___Settings LoadSettings()
-    {
-        // Console specific load implementation
-        return null; // TODO This is just a placeholder
     }
 }
-

@@ -22,7 +22,8 @@ public class ___SafeGameName___Settings : INotifyPropertyChanged
             }
         }
     }
-    public int Language {
+    public int Language
+    {
         get => language;
         set
         {

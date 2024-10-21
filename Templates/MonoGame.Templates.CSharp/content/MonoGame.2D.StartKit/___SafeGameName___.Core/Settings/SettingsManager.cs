@@ -1,8 +1,11 @@
 ﻿namespace ___SafeGameName___.Core.Settings;
-internal class SettingsManager
+internal class SettingsManager<T> where T : new()
 {
     private readonly ISettingsStorage storage;
-    private ___SafeGameName___Settings settings;
+    public ISettingsStorage Storage => storage;
+
+    private T settings;
+    public T Settings => settings;
 
     public SettingsManager(ISettingsStorage storage)
     {
@@ -10,15 +13,13 @@ internal class SettingsManager
         Load();
     }
 
-    public ___SafeGameName___Settings Settings => settings;
-
     public void Save()
     {
-        storage.SaveSettings(settings);
+        storage.SaveSettings<T>(settings);
     }
 
     public void Load()
     {
-        settings = storage.LoadSettings() ?? new ___SafeGameName___Settings();
+        settings = storage.LoadSettings<T>();
     }
 }
