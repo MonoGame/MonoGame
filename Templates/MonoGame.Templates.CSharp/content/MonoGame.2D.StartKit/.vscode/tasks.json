@@ -1,0 +1,25 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+        {
+			"label": "Debug Android Build",
+			"type": "shell",
+			"command": "dotnet build -p:Configuration=Debug ${workspaceFolder}/___SafeGameName___.Android/___SafeGameName___.Android.csproj \"/t:Install;_Run\" /p:AndroidAttachDebugger=true /p:AndroidSdbHostPort=10000"
+		},
+		{
+			"label": "Debug DesktopGL Build",
+			"type": "shell",
+			"command": "dotnet build -p:Configuration=Debug ${workspaceFolder}/___SafeGameName___.DesktopGL/___SafeGameName___.DesktopGL.csproj"
+		},
+        {
+			"label": "Debug iOS Build",
+			"type": "shell",
+			"command": "dotnet build -p:Configuration=Debug ${workspaceFolder}/___SafeGameName___.iOS/___SafeGameName___.iOS.csproj"
+		},
+        {
+			"label": "Debug WindowsDX Build",
+			"type": "shell",
+			"command": "dotnet build -p:Configuration=Debug ${workspaceFolder}/___SafeGameName___.WindowsDX/___SafeGameName___.WindowsDX.csproj"
+		},
+	]
+}
