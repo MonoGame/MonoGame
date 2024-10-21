@@ -2,6 +2,7 @@ using ___SafeGameName___.Core;
 using ___SafeGameName___.Core.Effects;
 using ___SafeGameName___.Core.Inputs;
 using ___SafeGameName___.Core.Localization;
+using ___SafeGameName___.Core.Settings;
 using GameStateManagement.Inputs;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
@@ -10,6 +11,7 @@ using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Input.Touch;
 using Microsoft.Xna.Framework.Media;
 using System;
+using System.IO;
 
 namespace ___SafeGameName___.Screens;
 
@@ -56,6 +58,7 @@ class GameplayScreen : GameScreen
     private VirtualGamePad virtualGamePad;
     private Texture2D backpack;
     private ParticleManager particleManager;
+    private SettingsManager<___SafeGameName___Leaderboard> leaderboardManager;
     private const int textEdgeSpacing = 10;
 
     #endregion
@@ -109,6 +112,8 @@ class GameplayScreen : GameScreen
 
         particleManager ??= ScreenManager.Game.Services.GetService<ParticleManager>();
 
+        leaderboardManager ??= ScreenManager.Game.Services.GetService<SettingsManager<___SafeGameName___Leaderboard>>();
+
         LoadNextLevel();
 
         backpack = content.Load<Texture2D>("Sprites/backpack");
@@ -141,10 +146,15 @@ class GameplayScreen : GameScreen
             level.Dispose();
 
         // Load the level.
-        string levelPath = string.Format("Content/Levels/{0:00}.txt", levelIndex);
+        var levelPath = string.Format("Content/Levels/{0:00}.txt", levelIndex);
         level = new Level(ScreenManager.Game.Services, levelPath, levelIndex);
         level.ParticleManager = particleManager;
-    }
+
+        var levelFileName = Path.GetFileName(levelPath);
+        var leaderboardFileName = Path.ChangeExtension(levelFileName, ".json");
+        leaderboardManager.Storage.SettingsFileName = leaderboardFileName;
+        level.LeaderboardManager = leaderboardManager;
+}
 
     private void ReloadCurrentLevel()
     {

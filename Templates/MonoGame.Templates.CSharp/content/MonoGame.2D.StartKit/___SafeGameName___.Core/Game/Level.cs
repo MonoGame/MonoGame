@@ -1,6 +1,7 @@
 ﻿using ___SafeGameName___.Core.Effects;
 using ___SafeGameName___.Core.Inputs;
 using ___SafeGameName___.Core.Localization;
+using ___SafeGameName___.Core.Settings;
 using ___SafeGameName___.Screens;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Audio;
@@ -65,7 +66,7 @@ class Level : IDisposable
         get { return timeTaken; }
     }
     TimeSpan timeTaken;
-
+    private string levelPath;
     private TimeSpan maximumTimeToCompleteLevel = TimeSpan.FromMinutes(2.0);
     public TimeSpan MaximumTimeToCompleteLevel { get => maximumTimeToCompleteLevel; }
 
@@ -102,6 +103,7 @@ class Level : IDisposable
         content = new ContentManager(serviceProvider, "Content");
 
         timeTaken = TimeSpan.Zero;
+        this.levelPath = levelPath;
 
         using (Stream fileStream = TitleContainer.OpenStream(levelPath))
         {
@@ -376,7 +378,14 @@ class Level : IDisposable
 
     private ParticleManager particleManager;
     private bool particlesExploding;
+
     public ParticleManager ParticleManager { get => particleManager; set => particleManager = value; }
+
+    private SettingsManager<___SafeGameName___Leaderboard> settingsManager;
+    private int gemsCollected;
+    private bool saved;
+
+    public SettingsManager<___SafeGameName___Leaderboard> LeaderboardManager { get => settingsManager; set => settingsManager = value; }
 
     /// <summary>
     /// Updates all objects in the world, performs collision between them,
@@ -413,6 +422,54 @@ class Level : IDisposable
         }
         else if (ReachedExit)
         {
+            // If it's the MainMenu/Tutorial level, ignore stats and giving it a score.
+            if (levelPath.Contains("00.txt"))
+                return;
+
+            var changed = false;
+
+            int index = -1 ;
+            for(int i = 0; i < settingsManager.Settings.Leaderboard.Count; i++)
+            {
+                if (settingsManager.Settings.Leaderboard[i].FastestTime == timeTaken)
+                {
+                    index = i;
+                    break;
+                }
+            }
+
+            // If it already exists update it, otherwise add it
+            if (index != -1)
+            {
+                if (settingsManager.Settings.Leaderboard[index].FastestTime != timeTaken)
+                {
+                    settingsManager.Settings.Leaderboard[index].FastestTime = timeTaken;
+                    changed = true;
+                }
+
+                if (settingsManager.Settings.Leaderboard[index].GemsCollected != gemsCollected)
+                {
+                    settingsManager.Settings.Leaderboard[index].GemsCollected = gemsCollected;
+                    changed = true;
+                }
+            }
+            else
+            {
+                var newStats = new LevelStatistics()
+                {
+                    FastestTime = timeTaken,
+                    GemsCollected = gemsCollected,
+                };
+
+                settingsManager.Settings.Leaderboard.Add(newStats);
+                changed = true;
+            }
+
+            if (changed && !saved)
+            {
+                settingsManager.Save();
+                saved = true;
+            }
             // Animate the time being converted into points.
             int seconds = (int)Math.Round(gameTime.ElapsedGameTime.TotalSeconds * 100.0f);
             seconds = Math.Min(seconds, (int)Math.Ceiling(TimeTaken.TotalSeconds));
@@ -472,6 +529,7 @@ class Level : IDisposable
                 case GemState.Waiting:
                     if (gem.BoundingCircle.Intersects(Player.BoundingRectangle))
                     {
+                        gemsCollected++;
                         gem.Scale = new Vector2(1.5f, 1.5f);
                         gem.State = GemState.Collecting;
                         OnGemCollected(gem, Player);

@@ -22,7 +22,8 @@ class MainMenuScreen : MenuScreen
     private bool readyToPlay;
     private PlayerIndex playerIndex;
     private ParticleManager particleManager;
-    private SettingsManager settingsManager;
+    private SettingsManager<___SafeGameName___Settings> settingsManager;
+    private SettingsManager<___SafeGameName___Leaderboard> leaderboardManager;
     private MenuEntry playMenuEntry;
     private MenuEntry tutorialMenuEntry;
     private MenuEntry settingsMenuEntry;
@@ -82,18 +83,19 @@ class MainMenuScreen : MenuScreen
 
         particleManager ??= ScreenManager.Game.Services.GetService<ParticleManager>();
 
-        // Load the level.
-        string levelPath = "Content/Levels/00.txt";
-        level = new Level(ScreenManager.Game.Services, levelPath, 00);
-        level.ParticleManager = particleManager;
-
-        settingsManager ??= ScreenManager.Game.Services.GetService<SettingsManager>();
+        settingsManager ??= ScreenManager.Game.Services.GetService<SettingsManager<___SafeGameName___Settings>>();
         settingsManager.Settings.PropertyChanged += (s, e) =>
         {
             SetLanguageText();
         };
 
         SetLanguageText();
+
+        // Load the level.
+        string levelPath = "Content/Levels/00.txt";
+        level = new Level(ScreenManager.Game.Services, levelPath, 00);
+        level.ParticleManager = particleManager;
+        level.LeaderboardManager = leaderboardManager;
 
         gradientTexture = content.Load<Texture2D>("Sprites/gradient");
     }

@@ -29,7 +29,7 @@ class SettingsScreen : MenuScreen
     static ParticleEffectType currentParticleEffect = ParticleEffectType.Fireworks;
     public static ParticleEffectType CurrentParticleEffect { get => currentParticleEffect; }
 
-    private SettingsManager settingsManager;
+    private SettingsManager<___SafeGameName___Settings> settingsManager;
     private ParticleManager particleManager;
 
     /// <summary>
@@ -71,7 +71,7 @@ class SettingsScreen : MenuScreen
         // Lazy Load some things
         gdm ??= ScreenManager.Game.Services.GetService<GraphicsDeviceManager>();
 
-        settingsManager ??= ScreenManager.Game.Services.GetService<SettingsManager>();
+        settingsManager ??= ScreenManager.Game.Services.GetService<SettingsManager<___SafeGameName___Settings>>();
 
         settingsManager.Settings.PropertyChanged += (s, e) =>
         {

@@ -26,7 +26,8 @@ public class ___SafeGameName___Game : Game
 
     ScreenManager screenManager;
 
-    SettingsManager settingsManager;
+    SettingsManager<___SafeGameName___Settings> settingsManager;
+    SettingsManager<___SafeGameName___Leaderboard> leaderboardManager;
     private Texture2D particleTexture;
     private ParticleManager particleManager;
 
@@ -52,8 +53,12 @@ public class ___SafeGameName___Game : Game
             throw new PlatformNotSupportedException();
         }
 
-        settingsManager = new SettingsManager(storage);
-        Services.AddService(typeof(SettingsManager), settingsManager);
+        // This will also load the settings file, if it exists
+        settingsManager = new SettingsManager<___SafeGameName___Settings>(storage);
+        Services.AddService(typeof(SettingsManager<___SafeGameName___Settings>), settingsManager);
+
+        leaderboardManager = new SettingsManager<___SafeGameName___Leaderboard>(storage);
+        Services.AddService(typeof(SettingsManager<___SafeGameName___Leaderboard>), leaderboardManager);
 
         Content.RootDirectory = "Content";
 
@@ -75,9 +80,6 @@ public class ___SafeGameName___Game : Game
     protected override void Initialize()
     {
         base.Initialize();
-
-        // Load the settings
-        settingsManager.Load();
 
         // Get a list of all languages our app supports
         List<CultureInfo> cultures = LocalizationManager.GetSupportedCultures();
