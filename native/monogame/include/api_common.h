@@ -20,7 +20,11 @@ typedef double               mgdouble;
 #define MG_FIELD_OFFSET(off, type, name) struct { char _pad_##name[off]; type name; }
 
 #ifdef DLL_EXPORT
+#ifdef _WIN32
 #define MG_EXPORT extern "C" __declspec(dllexport)
+#else
+#define MG_EXPORT extern "C" __attribute__((visibility("default")))
+#endif
 #else
 #define MG_EXPORT extern "C"
 #endif
