@@ -26,33 +26,29 @@ public sealed class BuildNativeDesktopVKTask : FrostingTask<BuildContext>
     {
         int exit;
 
-        // Build SDL2
         {
             var buildDir = "native/monogame/external/sdl2/sdl/build";
             context.CreateDirectory(buildDir);
 
-            exit = context.StartProcess("cmake", new ProcessSettings {
-                WorkingDirectory = buildDir,
-                Arguments = "-A x64 -D CMAKE_MSVC_RUNTIME_LIBRARY=MultiThreaded ../"
-            });
+            exit = context.StartProcess("cmake", new ProcessSettings { WorkingDirectory = buildDir, Arguments = "-A x64 -D CMAKE_MSVC_RUNTIME_LIBRARY=MultiThreaded ../" });
             if (exit != 0)
                 throw new Exception($"SDL2 Cmake failed! {exit}");
 
-            exit = context.StartProcess("msbuild", new ProcessSettings {
-                WorkingDirectory = buildDir,
-                Arguments = "SDL2.sln /p:Configuration=Release /p:Platform=x64"
-            });
+            exit = context.StartProcess("msbuild", new ProcessSettings { WorkingDirectory = buildDir, Arguments = "SDL2.sln /p:Configuration=Release /p:Platform=x64" });
             if (exit != 0)
                 throw new Exception($"SDL2 build failed! {exit}");
         }
 
-        // Generate and build native project
-        GenerateNativeProject(context, "windows");
+        // Generate the native projects.
+        exit = context.StartProcess("premake5", new ProcessSettings { WorkingDirectory = "native/monogame", Arguments = "clean" });
+        if (exit != 0)
+            throw new Exception($"Premake clean failed! {exit}");
+        exit = context.StartProcess("premake5", new ProcessSettings { WorkingDirectory = "native/monogame", Arguments = "--os=windows --verbose vs2022" });
+        if (exit != 0)
+            throw new Exception($"Premake generation failed! {exit}");
 
-        exit = context.StartProcess("msbuild", new ProcessSettings {
-            WorkingDirectory = "native/monogame",
-            Arguments = "monogame.sln /p:Configuration=Release /p:Platform=x64"
-        });
+        // Build it.
+        exit = context.StartProcess("msbuild", new ProcessSettings { WorkingDirectory = "native/monogame", Arguments = "monogame.sln /p:Configuration=Release /p:Platform=x64" });
         if (exit != 0)
             throw new Exception($"Native build failed! {exit}");
     }
@@ -81,38 +77,55 @@ public sealed class BuildNativeDesktopVKTask : FrostingTask<BuildContext>
             processorCount = 1;
         }
 
-        // Build SDL2
+        // Build SDL2 first (keeping the CMake build for SDL2)
         {
-            var buildDir = "native/monogame/external/sdl2/sdl/build";
-            context.CreateDirectory(buildDir);
+            var sdlBuildDir = "native/monogame/external/sdl2/sdl/build";
+            context.CreateDirectory(sdlBuildDir);
 
-            context.Log.Information($"Building SDL2 in {buildDir}");
+            context.Log.Information($"Building SDL2 in {sdlBuildDir}");
 
-            exit = context.StartProcess("cmake", new ProcessSettings {
-                WorkingDirectory = buildDir,
+            exit = context.StartProcess("cmake", new ProcessSettings
+            {
+                WorkingDirectory = sdlBuildDir,
                 Arguments = "-DCMAKE_BUILD_TYPE=Release -DCMAKE_POSITION_INDEPENDENT_CODE=ON ../"
             });
             if (exit != 0)
                 throw new Exception($"SDL2 Cmake failed! {exit}");
 
-            exit = context.StartProcess("make", new ProcessSettings {
-                WorkingDirectory = buildDir,
+            exit = context.StartProcess("make", new ProcessSettings
+            {
+                WorkingDirectory = sdlBuildDir,
                 Arguments = $"-j{processorCount}"
             });
             if (exit != 0)
                 throw new Exception($"SDL2 build failed! {exit}");
         }
 
-        // Generate and build native project
-        context.Log.Information("Generating native project files...");
+        // Generate and build native project using Premake (similar to Windows and macOS)
+        context.Log.Information("Generating native project with Premake...");
+
+        // Use the existing GenerateNativeProject helper method
         GenerateNativeProject(context, "linux");
 
-        context.Log.Information("Building native project...");
-        // Use the correct configuration and target from the Makefile
-        exit = context.StartProcess("make", new ProcessSettings {
+        // Set environment variables for the build
+        var buildSettings = new ProcessSettings
+        {
             WorkingDirectory = "native/monogame",
-            Arguments = "config=release desktopvk"  // Specify both config and target
-        });
+            Arguments = $"config=release_x64 -j{processorCount}"
+        };
+
+        // Add Vulkan SDK to environment if available
+        if (!string.IsNullOrEmpty(Environment.GetEnvironmentVariable("VULKAN_SDK")))
+        {
+            buildSettings.EnvironmentVariables = new Dictionary<string, string>
+            {
+                { "VULKAN_SDK", Environment.GetEnvironmentVariable("VULKAN_SDK") ?? "" }
+            };
+        }
+
+        // Build the project
+        context.Log.Information("Building native project...");
+        exit = context.StartProcess("make", buildSettings);
         if (exit != 0)
             throw new Exception($"Native build failed! {exit}");
 
