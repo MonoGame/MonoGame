@@ -111,7 +111,7 @@ public sealed class BuildNativeDesktopVKTask : FrostingTask<BuildContext>
         var buildSettings = new ProcessSettings
         {
             WorkingDirectory = "native/monogame",
-            Arguments = $"config=desktopvk -j{processorCount}"
+            Arguments = $"config=release -j{processorCount}"
         };
 
         // Add Vulkan SDK to environment if available
