@@ -3,130 +3,122 @@
 -- file 'LICENSE.txt', which is part of this source code package.
 
 function common(project_name)
-    platform_target_path = "../../Artifacts/monogame.native/%{cfg.system}/" .. project_name .. "/%{cfg.buildcfg}"
 
-    kind "SharedLib"
-    language "C++"
-    architecture "x64"
-    defines { "DLL_EXPORT" }
-    targetdir( platform_target_path )
-    targetname "monogame.native"
+   platform_target_path = "../../Artifacts/monogame.native/%{cfg.system}/" .. project_name .. "/%{cfg.buildcfg}"
 
-    files
-    {
-        "include/**.h",
-        "common/**.h",
-        "common/**.cpp",
-    }
-    includedirs
-    {
-        "include",
-    }
+   kind "SharedLib"
+   language "C++"
+   architecture "x64"
+   defines { "DLL_EXPORT" }
+   targetdir( platform_target_path )
+   targetname "monogame.native"
 
-    -- Add Linux-specific settings
-    filter { "system:linux" }
-    buildoptions { "-fPIC" }
-    linkoptions { '-Wl,-rpath,\\$$ORIGIN' }
+   files 
+   { 
+      "include/**.h",
+      "common/**.h",
+      "common/**.cpp",
+   }
+   includedirs 
+   {
+      "include",      
+   }
+
 end
 
 -- SDL is supported on all desktop platforms.
 function sdl2()
-    defines { "MG_SDL2" }
 
-    files
-    {
-        "sdl/**.h",
-        "sdl/**.cpp",
-    }
+   defines { "MG_SDL2" }
 
-    includedirs
-    {
-        "external/sdl2/sdl/include",
-    }
+   files 
+   { 
+      "sdl/**.h",
+      "sdl/**.cpp",
+   }
 
-    filter { "system:windows" }
-    links
-    {
-        "external/sdl2/sdl/build/Release/SDL2-static.lib",
-        "winmm",
-        "imm32",
-        "user32",
-        "gdi32",
-        "advapi32",
-        "setupapi",
-        "ole32",
-        "oleaut32",
-        "version",
-        "shell32"
-    }
+   includedirs 
+   {
+      "external/sdl2/sdl/include",      
+   }
 
-    filter { "system:linux" }
-    libdirs { "external/sdl2/sdl/build" }
-    links { "SDL2" }
+   filter { "system:windows" }
+      links 
+      { 
+         "external/sdl2/sdl/build/Release/SDL2-static.lib",
+         "winmm",
+         "imm32",
+         "user32",
+         "gdi32",
+         "advapi32",
+         "setupapi",
+         "ole32",
+         "oleaut32",
+         "version",
+         "shell32"
+      }
 
 end
 
 -- Vulkan is supported for all desktop platforms.
 function vulkan()
-    defines { "MG_VULKAN" }
 
-    files
-    {
-        "vulkan/**.h",
-        "vulkan/**.cpp",
-    }
+   defines { "MG_VULKAN" }
 
-    filter "system:windows"
-    files { "vulkan/**.rc", }
+   files 
+   { 
+      "vulkan/**.h",
+      "vulkan/**.cpp",
+   }
 
-    includedirs
-    {
-        "external/vulkan-headers/include",
-        "external/volk",
-        "external/vma/include",
-    }
+   filter "system:windows"
+      files { "vulkan/**.rc", }
 
-    filter { "system:linux" }
-    includedirs { os.getenv("VULKAN_SDK") .. "/include" }
-    libdirs { os.getenv("VULKAN_SDK") .. "/lib" }
-    links { "vulkan" }
+   includedirs 
+   {
+      "external/vulkan-headers/include",      
+      "external/volk",      
+      "external/vma/include",      
+   }
+
 end
+
 
 -- FAudio is supported for all desktop platforms.
 function faudio()
-    defines { "MG_FAUDIO" }
 
-    files
-    {
-        "faudio/**.h",
-        "faudio/**.cpp",
-    }
+   defines { "MG_FAUDIO" }
+
+   files 
+   { 
+      "faudio/**.h",
+      "faudio/**.cpp",
+   }
+
 end
 
 function configs()
-    filter "configurations:Debug"
-    defines { "DEBUG" }
-    symbols "On"
 
-    filter "configurations:Release"
-    defines { "NDEBUG" }
-    optimize "On"
+   filter "configurations:Debug"
+      defines { "DEBUG" }
+      symbols "On"
+
+   filter "configurations:Release"
+      defines { "NDEBUG" }
+      optimize "On"
+
 end
 
 workspace "monogame"
-configurations { "Debug", "Release" }
-
--- Add Linux specific settings
-filter { "system:linux" }
-system "linux"
-toolset "gcc"
+   configurations { "Debug", "Release" }
 
 project "desktopvk"
-common("desktopvk")
-sdl2()
-vulkan()
-faudio()
-configs()
+   common("desktopvk")
+   sdl2()
+   vulkan()
+   faudio()
+   configs()
+
 
 project "windowsdx"
-common("windowsdx")
+   common("windowsdx")
