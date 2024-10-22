@@ -1,9 +1,4 @@
-using Cake.Core;
-using Cake.Core.Diagnostics;
-using Cake.Frosting;
-using System;
 using System.Diagnostics;
-using System.Runtime.InteropServices;
 
 namespace BuildScripts;
 
