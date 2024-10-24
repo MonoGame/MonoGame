@@ -11,5 +11,10 @@ public sealed class DownloadArtifactsTask : AsyncFrostingTask<BuildContext>
         context.CreateDirectory("nugets");
         foreach (var os in new[] { "windows", "macos", "linux" })
             await context.GitHubActions().Commands.DownloadArtifact($"nuget-{os}", "nugets");
+
+        if (context.IsRunningOnWindows())
+        {
+            await context.GitHubActions().Commands.DownloadArtifact("MonoGame.Templates.VSExtension.vsix", "vsix");
+        }
     }
 }
