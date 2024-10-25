@@ -9,6 +9,13 @@ public sealed class DeployVsixToGitHubTask : FrostingTask<BuildContext>
 
     public override void Run(BuildContext context)
     {
+        // Confirm for testing purposes the fil is there.
+        context.Information("Files in 'vsix' directory:");
+        foreach (var file in context.GetFiles("vsix/*"))
+        {
+            context.Information(file.FullPath);
+        }
+
         var repositoryOwner = context.GitHubActions().Environment.Workflow.RepositoryOwner;
         context.DotNetNuGetPush($"vsix/*.vsix", new()
         {

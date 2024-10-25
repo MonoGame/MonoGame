@@ -22,6 +22,13 @@ public sealed class DeployVsixToMarketplaceTask : FrostingTask<BuildContext>
 
     public override void Run(BuildContext context)
     {
+        // Confirm for testing purposes the fil is there.
+        context.Information("Files in 'vsix' directory:");
+        foreach (var file in context.GetFiles("vsix/*"))
+        {
+            context.Information(file.FullPath);
+        }
+
         context.DotNetNuGetPush($"vsix/*.vsix", new()
         {
             ApiKey = context.EnvironmentVariable("NUGET_API_KEY"),
