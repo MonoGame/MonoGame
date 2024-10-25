@@ -39,7 +39,6 @@ public sealed class BuildAllTask : FrostingTask<BuildContext> { }
 [TaskName("Deploy")]
 [IsDependentOn(typeof(DeployNuGetsToGitHubTask))]
 [IsDependentOn(typeof(DeployNuGetsToNuGetOrgTask))]
-[IsDependentOn(typeof(DeployVsixToGitHubTask))]
 [IsDependentOn(typeof(DeployVsixToMarketplaceTask))]
 public sealed class DeployTask : FrostingTask<BuildContext> { }
 
