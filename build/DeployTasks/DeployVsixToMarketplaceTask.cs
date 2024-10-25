@@ -1,4 +1,7 @@
 ﻿
+using System.Net.Http.Headers;
+using System.Text;
+
 namespace BuildScripts;
 
 [TaskName("DeployVsixToMarketplaceTask")]
@@ -11,7 +14,7 @@ public sealed class DeployVsixToMarketplaceTask : FrostingTask<BuildContext>
         {
             var workflow = context.BuildSystem().GitHubActions.Environment.Workflow;
             if (workflow.RefType == GitHubActionsRefType.Tag &&
-                !string.IsNullOrWhiteSpace(context.EnvironmentVariable("NUGET_API_KEY")))
+                !string.IsNullOrWhiteSpace(context.EnvironmentVariable("MARKETPLACE_PAT")))
             {
                 return true;
             }
@@ -22,17 +25,33 @@ public sealed class DeployVsixToMarketplaceTask : FrostingTask<BuildContext>
 
     public override void Run(BuildContext context)
     {
-        // Confirm for testing purposes the fil is there.
-        context.Information("Files in 'vsix' directory:");
-        foreach (var file in context.GetFiles("vsix/*"))
+        var pat = context.EnvironmentVariable("MARKETPLACE_PAT");
+        var publisher = "MonoGame";
+        var extensionName = "MonoGame.Templates.VSExtension";
+
+        var filePath = "vsix/MonoGame.Templates.VSExtension.vsix";
+        if (!File.Exists(filePath))
         {
-            context.Information(file.FullPath);
+            context.Error("VSIX file not found!");
+            return;
         }
 
-        context.DotNetNuGetPush($"vsix/*.vsix", new()
+        var client = new HttpClient();
+        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", Convert.ToBase64String(Encoding.ASCII.GetBytes($":{pat}")));
+
+        using var fileStream = File.OpenRead(filePath);
+        using var content = new StreamContent(fileStream);
+        content.Headers.ContentType = new MediaTypeHeaderValue("application/octet-stream");
+
+        var response = client.PutAsync($"https://marketplace.visualstudio.com/_apis/gallery/publishers/{publisher}/vsextensions/{extensionName}/versions", content).Result;
+
+        if (response.IsSuccessStatusCode)
         {
-            ApiKey = context.EnvironmentVariable("NUGET_API_KEY"),
-            Source = $"https://api.nuget.org/v3/index.json"
-        });
+            context.Information("Successfully uploaded the VSIX to the Visual Studio Marketplace.");
+        }
+        else
+        {
+            context.Error($"Failed to upload VSIX. Response: {response.StatusCode} - {response.ReasonPhrase}");
+        }
     }
 }

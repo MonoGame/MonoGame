@@ -14,12 +14,5 @@ public sealed class DownloadArtifactsTask : AsyncFrostingTask<BuildContext>
 
         context.CreateDirectory("vsix");
         await context.GitHubActions().Commands.DownloadArtifact("MonoGame.Templates.VSExtension.vsix", "vsix");
-
-        // Confirm for testing purposes the fil is there.
-        context.Information("Files in 'vsix' directory:");
-        foreach (var file in context.GetFiles("vsix/*"))
-        {
-            context.Information(file.FullPath);
-        }
     }
 }

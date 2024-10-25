@@ -9,15 +9,15 @@ public sealed class DeployVsixToGitHubTask : FrostingTask<BuildContext>
 
     public override void Run(BuildContext context)
     {
-        // Confirm for testing purposes the fil is there.
-        context.Information("Files in 'vsix' directory:");
-        foreach (var file in context.GetFiles("vsix/*"))
+        var filePath = "vsix/MonoGame.Templates.VSExtension.vsix";
+        if (!File.Exists(filePath))
         {
-            context.Information(file.FullPath);
+            context.Error("VSIX file not found!");
+            return;
         }
 
         var repositoryOwner = context.GitHubActions().Environment.Workflow.RepositoryOwner;
-        context.DotNetNuGetPush($"vsix/*.vsix", new()
+        context.DotNetNuGetPush(filePath, new()
         {
             ApiKey = context.EnvironmentVariable("GITHUB_TOKEN"),
             Source = $"https://nuget.pkg.github.com/{repositoryOwner}/index.json"
