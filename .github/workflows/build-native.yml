@@ -80,7 +80,7 @@ jobs:
         with:
           name: native-lib-${{ matrix.platform }}-${{ github.sha }}
           path: |
-            artifacts/DesktopVK/Release/${{ matrix.artifact }}
+            Artifacts/monogame.native/${{ matrix.platform }}/desktopvk/Release/${{ matrix.artifact }}
           retention-days: 90
           if-no-files-found: error
 
