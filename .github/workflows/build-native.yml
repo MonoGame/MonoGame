@@ -1,6 +1,15 @@
 name: Build Native Libraries
 
-on: [push, pull_request]
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'native/monogame/**'
+      - '.github/workflows/build-native.yml'
+  pull_request:
+    paths:
+      - 'native/monogame/**'
+      - '.github/workflows/build-native.yml'
 
 jobs:
   build-native:
@@ -69,9 +78,10 @@ jobs:
       - name: Upload Native Library
         uses: actions/upload-artifact@v3
         with:
-          name: native-lib-${{ matrix.platform }}
+          name: native-lib-${{ matrix.platform }}-${{ github.sha }}
           path: |
             artifacts/DesktopVK/Release/${{ matrix.artifact }}
+          retention-days: 90
           if-no-files-found: error
 
   # Create a combined artifact with all native libraries
@@ -87,6 +97,7 @@ jobs:
       - name: Combine native libraries
         uses: actions/upload-artifact@v3
         with:
-          name: native-libraries-all
+          name: native-libraries-all-${{ github.sha }}
           path: native-libs/*
+          retention-days: 90
           if-no-files-found: error
