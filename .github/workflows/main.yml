@@ -158,7 +158,7 @@ jobs:
               tag: ${{ github.ref_name }}
               allowUpdates: true
               removeArtifacts: true
-              artifacts: "nugets/*.nupkg;MonoGame.Templates.VSExtension/net472/*.vsix"
+              artifacts: "nugets/*.nupkg;vsix/MonoGame.Templates.VSExtension.vsix"
               token: ${{ secrets.GITHUB_TOKEN }}
 
   tests:
