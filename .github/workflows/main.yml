@@ -149,6 +149,7 @@ jobs:
             env:
               GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
               NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}
+              MARKETPLACE_PAT: ${{ secrets.MARKETPLACE_PAT }}
 
           - name: Make a Release
             if: github.ref_type == 'tag'
