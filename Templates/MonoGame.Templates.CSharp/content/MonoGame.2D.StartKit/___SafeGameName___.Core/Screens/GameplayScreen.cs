@@ -154,7 +154,7 @@ class GameplayScreen : GameScreen
         var leaderboardFileName = Path.ChangeExtension(levelFileName, ".json");
         leaderboardManager.Storage.SettingsFileName = leaderboardFileName;
         level.LeaderboardManager = leaderboardManager;
-}
+    }
 
     private void ReloadCurrentLevel()
     {

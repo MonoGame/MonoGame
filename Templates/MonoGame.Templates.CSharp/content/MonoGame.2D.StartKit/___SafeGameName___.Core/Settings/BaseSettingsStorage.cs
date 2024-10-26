@@ -13,7 +13,18 @@ public abstract class BaseSettingsStorage : ISettingsStorage
 
     protected static Environment.SpecialFolder SpecialFolderPath { get; set; }
 
-    public string SettingsFileName { get; set; }
+    private string settingsFileName;
+    public string SettingsFileName
+    {
+        get => settingsFileName;
+
+        set {
+            if (settingsFileName != value)
+            {
+                settingsFileName = value;
+            }
+        }
+    }
     protected string SettingsFilePath => Path.Combine(Environment.GetFolderPath(SpecialFolderPath), "___SafeGameName___", SettingsFileName);
 
     public virtual void SaveSettings<T>(T settings) where T : new()

@@ -7,9 +7,9 @@ namespace ___SafeGameName___.Core.Settings
 {
     internal class ___SafeGameName___Leaderboard : INotifyPropertyChanged
     {
-        private List<LevelStatistics> leaderboard = new List<LevelStatistics>();
-
-        internal List<LevelStatistics> Leaderboard { get => leaderboard; set => leaderboard = value; }
+        // TODO public string PlayerName { get; set; }
+        public TimeSpan FastestTime { get; set; }
+        public int GemsCollected { get; set; }
 
         // INotifyPropertyChanged implementation
         public event PropertyChangedEventHandler PropertyChanged;
@@ -17,12 +17,5 @@ namespace ___SafeGameName___.Core.Settings
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
-    }
-
-    public class LevelStatistics
-    {
-        // TODO public string PlayerName { get; set; }
-        public TimeSpan FastestTime { get; set; }
-        public int GemsCollected { get; set; }
     }
 }

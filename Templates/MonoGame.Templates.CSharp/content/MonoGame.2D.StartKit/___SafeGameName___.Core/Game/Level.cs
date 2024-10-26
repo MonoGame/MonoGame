@@ -427,43 +427,19 @@ class Level : IDisposable
                 return;
 
             var changed = false;
-
-            int index = -1 ;
-            for(int i = 0; i < settingsManager.Settings.Leaderboard.Count; i++)
-            {
-                if (settingsManager.Settings.Leaderboard[i].FastestTime == timeTaken)
-                {
-                    index = i;
-                    break;
-                }
-            }
-
             // If it already exists update it, otherwise add it
-            if (index != -1)
+            if (settingsManager.Settings.FastestTime != timeTaken)
             {
-                if (settingsManager.Settings.Leaderboard[index].FastestTime != timeTaken)
-                {
-                    settingsManager.Settings.Leaderboard[index].FastestTime = timeTaken;
-                    changed = true;
-                }
-
-                if (settingsManager.Settings.Leaderboard[index].GemsCollected != gemsCollected)
-                {
-                    settingsManager.Settings.Leaderboard[index].GemsCollected = gemsCollected;
-                    changed = true;
-                }
-            }
-            else
-            {
-                var newStats = new LevelStatistics()
-                {
-                    FastestTime = timeTaken,
-                    GemsCollected = gemsCollected,
-                };
-
-                settingsManager.Settings.Leaderboard.Add(newStats);
+                settingsManager.Settings.FastestTime = timeTaken;
                 changed = true;
             }
+
+            if (settingsManager.Settings.GemsCollected != gemsCollected)
+            {
+                settingsManager.Settings.GemsCollected = gemsCollected;
+                changed = true;
+            }
+
 
             if (changed && !saved)
             {
