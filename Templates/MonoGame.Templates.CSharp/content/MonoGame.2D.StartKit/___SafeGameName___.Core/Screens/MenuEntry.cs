@@ -1,18 +1,7 @@
-#region File Description
-//-----------------------------------------------------------------------------
-// MenuEntry.cs
-//
-// XNA Community Game Platform
-// Copyright (C) Microsoft Corporation. All rights reserved.
-//-----------------------------------------------------------------------------
-#endregion
-
-#region Using Statements
-using System;
 using ___SafeGameName___.ScreenManagers;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-#endregion
+using System;
 
 namespace ___SafeGameName___.Screens;
 
@@ -24,8 +13,6 @@ namespace ___SafeGameName___.Screens;
 /// </summary>
 class MenuEntry
 {
-    #region Fields
-
     /// <summary>
     /// The text rendered for this entry.
     /// </summary>
@@ -45,11 +32,6 @@ class MenuEntry
     /// </summary>
     Vector2 position;
     private bool enabled;
-
-    #endregion
-
-    #region Properties
-
 
     /// <summary>
     /// Gets or sets the text of this menu entry.
@@ -76,11 +58,6 @@ class MenuEntry
         set { enabled = value; }
     }
 
-    #endregion
-
-    #region Events
-
-
     /// <summary>
     /// Event raised when the menu entry is selected.
     /// </summary>
@@ -96,12 +73,6 @@ class MenuEntry
             Selected(this, new PlayerIndexEventArgs(playerIndex));
     }
 
-
-    #endregion
-
-    #region Initialization
-
-
     /// <summary>
     /// Constructs a new menu entry with the specified text.
     /// </summary>
@@ -110,12 +81,6 @@ class MenuEntry
         this.text = text;
         this.enabled = enabled;
     }
-
-
-    #endregion
-
-    #region Update and Draw
-
 
     /// <summary>
     /// Updates the menu entry.
@@ -188,7 +153,4 @@ class MenuEntry
     {
         return (int)screen.ScreenManager.Font.MeasureString(Text).X;
     }
-
-
-    #endregion
 }

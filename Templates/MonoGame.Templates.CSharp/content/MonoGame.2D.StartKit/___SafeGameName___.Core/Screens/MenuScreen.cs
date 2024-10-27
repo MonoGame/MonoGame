@@ -1,13 +1,3 @@
-#region File Description
-//-----------------------------------------------------------------------------
-// MenuScreen.cs
-//
-// XNA Community Game Platform
-// Copyright (C) Microsoft Corporation. All rights reserved.
-//-----------------------------------------------------------------------------
-#endregion
-
-#region Using Statements
 using System;
 using System.Collections.Generic;
 using Microsoft.Xna.Framework;
@@ -15,7 +5,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input.Touch;
 using Microsoft.Xna.Framework.Input;
 using GameStateManagement.Inputs;
-#endregion
+using ___SafeGameName___.Core;
 
 namespace ___SafeGameName___.Screens;
 
@@ -40,9 +30,6 @@ abstract class MenuScreen : GameScreen
         get { return menuEntries; }
     }
 
-    #region Initialization
-
-
     /// <summary>
     /// Constructor.
     /// </summary>
@@ -54,18 +41,37 @@ abstract class MenuScreen : GameScreen
         TransitionOffTime = TimeSpan.FromSeconds(0.5);
     }
 
-
-    #endregion
-
-    #region Handle Input
-
-
     /// <summary>
     /// Responds to user input, changing the selected entry and accepting
     /// or cancelling the menu.
     /// </summary>
     public override void HandleInput(InputState input, GameTime gameTime)
     {
+        if (___SafeGameName___Game.IsMobile)
+        {
+            var touchState = input.CurrentTouchState;
+            if (touchState.Count > 0)
+            {
+                foreach (var touch in touchState)
+                {
+                    if (touch.State == TouchLocationState.Pressed)
+                    {
+                        var touchLocation = touch.Position;
+                        TextSelectedCheck(touchLocation);
+                    }
+                }
+            }
+        }
+        else if (___SafeGameName___Game.IsDesktop)
+        {
+            var mouseState = input.CurrentMouseState;
+            if (mouseState.LeftButton == ButtonState.Pressed)
+            {
+                var mouseLocation = mouseState.Position.ToVector2();
+                TextSelectedCheck(mouseLocation);
+            }
+        }
+
         // Move to the previous menu entry?
         if (input.IsMenuUp(ControllingPlayer))
         {
@@ -111,6 +117,21 @@ abstract class MenuScreen : GameScreen
         }
     }
 
+    private void TextSelectedCheck(Vector2 touchLocation)
+    {
+        for (int i = 0; i < menuEntries.Count; i++)
+        {
+            Vector2 textSize = ScreenManager.Font.MeasureString(menuEntries[i].Text);
+            var entryBounds = new Rectangle((int)menuEntries[i].Position.X, (int)menuEntries[i].Position.Y, (int)textSize.X, (int)textSize.Y);
+            if (entryBounds.Contains(touchLocation))
+            {
+                selectedEntry = i;
+                OnSelectEntry(selectedEntry, ControllingPlayer ?? PlayerIndex.One);
+                break;
+            }
+        }
+    }
+
     private void SetNextEnabledMenu()
     {
         while (!menuEntries[selectedEntry].Enabled)
@@ -148,12 +169,6 @@ abstract class MenuScreen : GameScreen
     {
         OnCancel(e.PlayerIndex);
     }
-
-
-    #endregion
-
-    #region Update and Draw
-
 
     /// <summary>
     /// Allows the screen the chance to position the menu entries. By default
@@ -210,7 +225,6 @@ abstract class MenuScreen : GameScreen
         }
     }
 
-
     /// <summary>
     /// Draws the menu.
     /// </summary>
@@ -253,7 +267,4 @@ abstract class MenuScreen : GameScreen
 
         spriteBatch.End();
     }
-
-
-    #endregion
 }

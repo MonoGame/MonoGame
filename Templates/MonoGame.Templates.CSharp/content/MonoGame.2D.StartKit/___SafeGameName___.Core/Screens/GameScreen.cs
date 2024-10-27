@@ -197,7 +197,6 @@ public abstract class GameScreen
 
     GestureType enabledGestures = GestureType.None;
 
-
     #endregion
 
     #region Initialization

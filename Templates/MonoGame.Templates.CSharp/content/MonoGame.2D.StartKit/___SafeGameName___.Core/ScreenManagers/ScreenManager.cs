@@ -35,7 +35,7 @@ public class ScreenManager : DrawableGameComponent
     List<GameScreen> screens = new List<GameScreen>();
     List<GameScreen> screensToUpdate = new List<GameScreen>();
 
-    InputState input = new InputState();
+    InputState inputState = new InputState();
 
     SpriteBatch spriteBatch;
     SpriteFont font;
@@ -155,7 +155,7 @@ public class ScreenManager : DrawableGameComponent
     public override void Update(GameTime gameTime)
     {
         // Read the keyboard and gamepad.
-        input.Update();
+        inputState.Update(gameTime, GraphicsDevice.Viewport);
 
         // Make a copy of the master screen list, to avoid confusion if
         // the process of updating one screen adds or removes others.
@@ -185,7 +185,7 @@ public class ScreenManager : DrawableGameComponent
                 // give it a chance to handle input.
                 if (!otherScreenHasFocus)
                 {
-                    screen.HandleInput(input, gameTime);
+                    screen.HandleInput(inputState, gameTime);
 
                     otherScreenHasFocus = true;
                 }

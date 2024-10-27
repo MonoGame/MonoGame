@@ -9,9 +9,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "___SafeGameName___.iOS", "_
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "___SafeGameName___.Core", "___SafeGameName___.Core\___SafeGameName___.Core.csproj", "{47BD21C1-2170-456C-AF98-6D92C5F73BA9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "___SafeGameName___.DesktopGL", "___SafeGameName___.DesktopGL\___SafeGameName___.DesktopGL.csproj", "{85B968E5-2E46-45A3-AD10-1F3F1FB6F9B6}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "___SafeGameName___.DesktopGL", "___SafeGameName___.DesktopGL\___SafeGameName___.DesktopGL.csproj", "{85B968E5-2E46-45A3-AD10-1F3F1FB6F9B6}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "___SafeGameName___.WindowsDX", "___SafeGameName___.WindowsDX\___SafeGameName___.WindowsDX.csproj", "{0BBBD441-30E0-43E7-B691-EA19A797AA9B}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Platforms", "Platforms", "{B4A0E918-51B4-40FF-9845-60F2616B3F27}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -72,6 +74,12 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{6161B64E-0BF7-42D9-B2BA-6BB16460BFE3} = {B4A0E918-51B4-40FF-9845-60F2616B3F27}
+		{109593E3-17AE-4482-9556-4B2068F9479B} = {B4A0E918-51B4-40FF-9845-60F2616B3F27}
+		{85B968E5-2E46-45A3-AD10-1F3F1FB6F9B6} = {B4A0E918-51B4-40FF-9845-60F2616B3F27}
+		{0BBBD441-30E0-43E7-B691-EA19A797AA9B} = {B4A0E918-51B4-40FF-9845-60F2616B3F27}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {51ECE597-0299-4753-B7F5-4E8EDECD7BB4}

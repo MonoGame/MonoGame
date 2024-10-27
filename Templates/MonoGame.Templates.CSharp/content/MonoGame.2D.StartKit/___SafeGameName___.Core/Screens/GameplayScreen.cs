@@ -97,7 +97,6 @@ class GameplayScreen : GameScreen
 
         virtualGamePad = new VirtualGamePad(baseScreenSize, globalTransformation, content.Load<Texture2D>("Sprites/VirtualControlArrow"));
 
-#if !__IOS__
         //Known issue that you get exceptions if you use Media PLayer while connected to your PC
         //See http://social.msdn.microsoft.com/Forums/en/windowsphone7series/thread/c8a243d2-d360-46b1-96bd-62b1ef268c66
         //Which means its impossible to test this from VS.
@@ -107,8 +106,9 @@ class GameplayScreen : GameScreen
             MediaPlayer.IsRepeating = true;
             MediaPlayer.Play(content.Load<Song>("Sounds/Music"));
         }
-        catch { }
-#endif
+        catch
+        {
+        }
 
         particleManager ??= ScreenManager.Game.Services.GetService<ParticleManager>();
 
@@ -246,15 +246,14 @@ class GameplayScreen : GameScreen
             keyboardState = input.CurrentKeyboardStates[playerIndex];
             gamePadState = virtualGamePad.GetState(touchState, input.CurrentGamePadStates[playerIndex]);
 
-            touchState = input.TouchState;
+            touchState = input.CurrentTouchState;
 
-            accelerometerState = input.AccelerometerState;
+            accelerometerState = input.CurrentAccelerometerState;
 
-#if !NETFX_CORE && !__IOS__
             // Exit the game when back is pressed.
             if (gamePadState.Buttons.Back == ButtonState.Pressed)
                 ScreenManager.Game.Exit();
-#endif
+
             bool continuePressed =
                 keyboardState.IsKeyDown(Keys.Space) ||
                 keyboardState.IsKeyDown(Keys.Up) ||

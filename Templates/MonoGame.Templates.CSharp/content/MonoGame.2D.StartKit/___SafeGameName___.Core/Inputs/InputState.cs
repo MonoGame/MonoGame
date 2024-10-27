@@ -1,19 +1,11 @@
-#region File Description
-//-----------------------------------------------------------------------------
-// InputState.cs
-//
-// Microsoft XNA Community Game Platform
-// Copyright (C) Microsoft Corporation. All rights reserved.
-//-----------------------------------------------------------------------------
-#endregion
-
-#region Using Statements
+using ___SafeGameName___.Core;
 using ___SafeGameName___.Core.Inputs;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Input.Touch;
+using System;
 using System.Collections.Generic;
-#endregion
 
 namespace GameStateManagement.Inputs;
 
@@ -25,26 +17,30 @@ namespace GameStateManagement.Inputs;
 /// </summary>
 public class InputState
 {
-    #region Fields
-
     public const int MaxInputs = 4;
 
-    public readonly KeyboardState[] CurrentKeyboardStates;
+    public AccelerometerState CurrentAccelerometerState;
     public readonly GamePadState[] CurrentGamePadStates;
+    public readonly KeyboardState[] CurrentKeyboardStates;
+    public MouseState CurrentMouseState;
+    public TouchCollection CurrentTouchState;
 
-    public readonly KeyboardState[] LastKeyboardStates;
+    public AccelerometerState LastAccelerometerState;
     public readonly GamePadState[] LastGamePadStates;
+    public readonly KeyboardState[] LastKeyboardStates;
+    public MouseState LastMouseState;
+    public TouchCollection LastTouchState;
 
     public readonly bool[] GamePadWasConnected;
 
-    public TouchCollection TouchState;
     public readonly List<GestureSample> Gestures = new List<GestureSample>();
 
-    public AccelerometerState AccelerometerState;
-    #endregion
+    public Vector2 CursorLocation;
 
-    #region Initialization
-
+    /// <summary>
+    /// Cursor move speed in pixels per second
+    /// </summary>
+    private const float cursorMoveSpeed = 250.0f;
 
     /// <summary>
     /// Constructs a new input state.
@@ -58,19 +54,29 @@ public class InputState
         LastGamePadStates = new GamePadState[MaxInputs];
 
         GamePadWasConnected = new bool[MaxInputs];
+
+        if (___SafeGameName___Game.IsMobile)
+        {
+            TouchPanel.EnabledGestures = GestureType.Tap;
+        }
+        else if (___SafeGameName___Game.IsDesktop)
+        {
+
+        }
+        else
+        {
+            // For now, we'll throw an exception if we don't know the platform
+            throw new PlatformNotSupportedException();
+        }
     }
 
-
-    #endregion
-
-    #region Public Methods
-
-
     /// <summary>
-    /// Reads the latest state of the keyboard and gamepad.
+    /// Reads the latest state of all the inputs.
     /// </summary>
-    public void Update()
+    public void Update(GameTime gameTime, Viewport viewport)
     {
+        CurrentAccelerometerState = Accelerometer.GetState();
+
         for (int i = 0; i < MaxInputs; i++)
         {
             LastKeyboardStates[i] = CurrentKeyboardStates[i];
@@ -87,7 +93,12 @@ public class InputState
             }
         }
 
-        TouchState = TouchPanel.GetState();
+        LastMouseState = CurrentMouseState;
+        CurrentMouseState = Mouse.GetState();
+
+        int touchCount = 0;
+        LastTouchState = CurrentTouchState;
+        CurrentTouchState = TouchPanel.GetState();
 
         Gestures.Clear();
         while (TouchPanel.IsGestureAvailable)
@@ -95,7 +106,64 @@ public class InputState
             Gestures.Add(TouchPanel.ReadGesture());
         }
 
-        AccelerometerState = Accelerometer.GetState();
+        foreach (TouchLocation location in CurrentTouchState)
+        {
+            switch (location.State)
+            {
+                case TouchLocationState.Pressed:
+                    touchCount++;
+                    CursorLocation = location.Position;
+                    break;
+                case TouchLocationState.Moved:
+                    break;
+                case TouchLocationState.Released:
+                    break;
+            }
+        }
+
+        if (CurrentMouseState.LeftButton == ButtonState.Released && LastMouseState.LeftButton == ButtonState.Pressed)
+        {
+            CursorLocation.X = CurrentMouseState.X;
+            CursorLocation.Y = CurrentMouseState.Y;
+            touchCount = 1;
+        }
+
+        if (CurrentMouseState.MiddleButton == ButtonState.Released && LastMouseState.MiddleButton == ButtonState.Pressed)
+        {
+            touchCount = 2;
+        }
+
+        if (CurrentMouseState.RightButton == ButtonState.Released && LastMouseState.RightButton == ButtonState.Pressed)
+        {
+            touchCount = 3;
+        }
+
+        // Update the cursor location by listening for left thumbstick input on
+        // the GamePad and direction key input on the Keyboard, making sure to
+        // keep the cursor inside the screen boundary
+        /* TODO float elapsedTime = (float)gameTime.ElapsedGameTime.TotalSeconds;
+        CursorLocation.X += CurrentGamePadState.ThumbSticks.Left.X * elapsedTime * cursorMoveSpeed;
+        CursorLocation.Y -= CurrentGamePadState.ThumbSticks.Left.Y * elapsedTime * cursorMoveSpeed;
+
+        if (CurrentKeyboardState.IsKeyDown(Keys.Up))
+        {
+            CursorLocation.Y -= elapsedTime * cursorMoveSpeed;
+        }
+        if (CurrentKeyboardState.IsKeyDown(Keys.Down))
+        {
+            CursorLocation.Y += elapsedTime * cursorMoveSpeed;
+        }
+        if (CurrentKeyboardState.IsKeyDown(Keys.Left))
+        {
+            CursorLocation.X -= elapsedTime * cursorMoveSpeed;
+        }
+        if (CurrentKeyboardState.IsKeyDown(Keys.Right))
+        {
+            CursorLocation.X += elapsedTime * cursorMoveSpeed;
+        } */
+
+        CursorLocation.X = MathHelper.Clamp(CursorLocation.X, 0f, viewport.Width);
+        CursorLocation.Y = MathHelper.Clamp(CursorLocation.Y, 0f, viewport.Height);
     }
 
 
@@ -233,7 +301,4 @@ public class InputState
                IsNewButtonPress(Buttons.Back, controllingPlayer, out playerIndex) ||
                IsNewButtonPress(Buttons.Start, controllingPlayer, out playerIndex);
     }
-
-
-    #endregion
 }

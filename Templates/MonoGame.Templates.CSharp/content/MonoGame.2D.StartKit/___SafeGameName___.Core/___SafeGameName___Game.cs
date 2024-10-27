@@ -5,14 +5,9 @@ using ___SafeGameName___.ScreenManagers;
 using ___SafeGameName___.Screens;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-
-
-#if !__IOS__
-using Microsoft.Xna.Framework.Media;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
-#endif
 
 namespace ___SafeGameName___.Core;
 
@@ -31,6 +26,9 @@ public class ___SafeGameName___Game : Game
     private Texture2D particleTexture;
     private ParticleManager particleManager;
 
+    public readonly static bool IsMobile = OperatingSystem.IsAndroid() || OperatingSystem.IsIOS();
+    public readonly static bool IsDesktop = OperatingSystem.IsMacOS() || OperatingSystem.IsLinux() || OperatingSystem.IsWindows();
+
     public ___SafeGameName___Game()
     {
         graphicsDeviceManager = new GraphicsDeviceManager(this);
@@ -39,13 +37,17 @@ public class ___SafeGameName___Game : Game
 
         ISettingsStorage storage;
         // The platform-specific code will be in the platform-specific project
-        if (OperatingSystem.IsAndroid() || OperatingSystem.IsIOS())
+        if (IsMobile)
         {
             storage = new MobileSettingsStorage();
+            graphicsDeviceManager.IsFullScreen = true;
+            IsMouseVisible = false;
         }
-        else if (OperatingSystem.IsWindows() || OperatingSystem.IsLinux() || OperatingSystem.IsMacOS())
+        else if (IsDesktop)
         {
             storage = new DesktopSettingsStorage();
+            graphicsDeviceManager.IsFullScreen = false;
+            IsMouseVisible = true;
         }
         else
         {
@@ -61,8 +63,6 @@ public class ___SafeGameName___Game : Game
         Services.AddService(typeof(SettingsManager<___SafeGameName___Leaderboard>), leaderboardManager);
 
         Content.RootDirectory = "Content";
-
-        graphicsDeviceManager.IsFullScreen = false;
 
         //graphics.PreferredBackBufferWidth = 800;
         //graphics.PreferredBackBufferHeight = 480;
