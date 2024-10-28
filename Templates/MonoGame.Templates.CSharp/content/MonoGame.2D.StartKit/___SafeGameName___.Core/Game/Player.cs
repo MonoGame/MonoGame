@@ -3,6 +3,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using Microsoft.Xna.Framework.Input.Touch;
 using System;
 
 namespace ___SafeGameName___.Core;
@@ -241,6 +242,13 @@ class Player
         AccelerometerState accelerometerState,
         DisplayOrientation displayOrientation)
     {
+        /* TODO TidyUp Inputs 
+        HandleKeyboardInput(keyboardState);
+        HandleGamepadInput(gamePadState);
+        HandleAccelerometerInput(accelerometerState, displayOrientation);
+        HandleMouseAndTouchInput(playerPosition);
+        */
+
         // Get analog horizontal movement.
         movement = gamePadState.ThumbSticks.Left.X * MoveStickScale;
 
@@ -279,6 +287,63 @@ class Player
             keyboardState.IsKeyDown(Keys.Space) ||
             keyboardState.IsKeyDown(Keys.Up) ||
             keyboardState.IsKeyDown(Keys.W);
+
+        // Mouse Input
+        var mouseState = Mouse.GetState();
+        if (mouseState.LeftButton == ButtonState.Pressed)
+        {
+            HandleClickInput(mouseState.Position.ToVector2());
+        }
+
+        // Touch Input
+        var touchCollection = TouchPanel.GetState();
+        foreach (var touch in touchCollection)
+        {
+            if (touch.State == TouchLocationState.Pressed)
+            {
+                HandleClickInput(touch.Position);
+            }
+        }
+    }
+
+    private void HandleClickInput(Vector2 clickPosition)
+    {
+        // Convert the screen position to world position if necessary (depends on your camera).
+
+        Vector2 playerPosition = Position; // Assuming this is the center of the player
+
+        // Thresholds to decide "above" and "ahead/behind"
+        float jumpThresholdY = playerPosition.Y - 50; // Adjust as needed for the "above head" area
+        float moveThresholdX = 20f; // Minimal X distance to trigger forward/backward movement
+
+        // Determine if the click is above the player's head for jump
+        bool shouldJump = clickPosition.Y < jumpThresholdY;
+
+        // Determine if the click is ahead or behind for horizontal movement
+        bool shouldMoveRight = clickPosition.X > playerPosition.X + moveThresholdX;
+        bool shouldMoveLeft = clickPosition.X < playerPosition.X - moveThresholdX;
+
+        if (shouldJump)
+        {
+            // Trigger jump
+            isJumping = true;
+        }
+        else if (shouldMoveRight)
+        {
+            // Move right
+            movement = 1.0f;
+        }
+        else if (shouldMoveLeft)
+        {
+            // Move left
+            movement = -1.0f;
+        }
+        else
+        {
+            // No movement input
+            movement = 0.0f;
+        }
+
     }
 
     /// <summary>
