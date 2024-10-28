@@ -232,6 +232,15 @@ namespace ___SafeGameName___.Core.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Gems Collected.
+        /// </summary>
+        internal static string GemsCollected {
+            get {
+                return ResourceManager.GetString("GemsCollected", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Get To Here!.
         /// </summary>
         internal static string GetToHere {
@@ -255,6 +264,15 @@ namespace ___SafeGameName___.Core.Localization {
         internal static string LetsGo {
             get {
                 return ResourceManager.GetString("LetsGo", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Level Completed!.
+        /// </summary>
+        internal static string LevelCompleted {
+            get {
+                return ResourceManager.GetString("LevelCompleted", resourceCulture);
             }
         }
         
@@ -376,6 +394,15 @@ namespace ___SafeGameName___.Core.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Time Ran Out!.
+        /// </summary>
+        internal static string TimeRanOut {
+            get {
+                return ResourceManager.GetString("TimeRanOut", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Tutorial.
         /// </summary>
         internal static string Tutorial {
@@ -399,6 +426,15 @@ namespace ___SafeGameName___.Core.Localization {
         internal static string YesButtonText {
             get {
                 return ResourceManager.GetString("YesButtonText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to You DIED!.
+        /// </summary>
+        internal static string YouDied {
+            get {
+                return ResourceManager.GetString("YouDied", resourceCulture);
             }
         }
     }

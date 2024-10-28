@@ -231,4 +231,16 @@
   <data name="DontDie" xml:space="preserve">
     <value>¡No mueras!</value>
   </data>
+  <data name="LevelCompleted" xml:space="preserve">
+    <value>¡Nivel Completado!</value>
+  </data>
+  <data name="TimeRanOut" xml:space="preserve">
+    <value>¡Se Acabó el Tiempo!</value>
+  </data>
+  <data name="YouDied" xml:space="preserve">
+    <value>¡Has Muerto!</value>
+  </data>
+  <data name="GemsCollected" xml:space="preserve">
+    <value>Gemas Recolectadas</value>
+  </data>
 </root>
