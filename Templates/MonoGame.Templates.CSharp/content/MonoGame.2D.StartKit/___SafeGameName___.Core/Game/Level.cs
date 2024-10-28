@@ -72,6 +72,12 @@ class Level : IDisposable
 
     private const int PointsPerSecond = 5;
 
+    public int GemsCollected
+    {
+        get { return gemsCollected; }
+    }
+    private int gemsCollected;
+
     // Level content.        
     public ContentManager Content
     {
@@ -382,7 +388,6 @@ class Level : IDisposable
     public ParticleManager ParticleManager { get => particleManager; set => particleManager = value; }
 
     private SettingsManager<___SafeGameName___Leaderboard> settingsManager;
-    private int gemsCollected;
     private bool saved;
 
     public SettingsManager<___SafeGameName___Leaderboard> LeaderboardManager { get => settingsManager; set => settingsManager = value; }
