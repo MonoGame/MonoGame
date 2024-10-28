@@ -22,8 +22,6 @@ namespace ___SafeGameName___.Screens;
 /// </summary>
 class GameplayScreen : GameScreen
 {
-    #region Fields
-
     ContentManager content;
 
     float pauseAlpha;
@@ -35,10 +33,6 @@ class GameplayScreen : GameScreen
 
     // Global content.
     private SpriteFont hudFont;
-
-    private Texture2D winOverlay;
-    private Texture2D loseOverlay;
-    private Texture2D diedOverlay;
 
     // Meta-level game state.
     private int levelIndex = 0;
@@ -59,12 +53,16 @@ class GameplayScreen : GameScreen
     private Texture2D backpack;
     private ParticleManager particleManager;
     private SettingsManager<___SafeGameName___Leaderboard> leaderboardManager;
+    private string endOfLevelMessage;
+    private EndOfLevelMessageState endOfLevelMessgeState;
     private const int textEdgeSpacing = 10;
 
-    #endregion
-
-    #region Initialization
-
+    enum EndOfLevelMessageState
+    {
+        NotShowing,
+        Show,
+        Showing,
+    }
 
     /// <summary>
     /// Constructor.
@@ -89,10 +87,6 @@ class GameplayScreen : GameScreen
         // Load fonts
         hudFont = content.Load<SpriteFont>("Fonts/Hud");
 
-        // Load overlay textures
-        winOverlay = content.Load<Texture2D>("Overlays/you_win");
-        loseOverlay = content.Load<Texture2D>("Overlays/you_lose");
-        diedOverlay = content.Load<Texture2D>("Overlays/you_died");
         ScalePresentationArea();
 
         virtualGamePad = new VirtualGamePad(baseScreenSize, globalTransformation, content.Load<Texture2D>("Sprites/VirtualControlArrow"));
@@ -154,6 +148,8 @@ class GameplayScreen : GameScreen
         var leaderboardFileName = Path.ChangeExtension(levelFileName, ".json");
         leaderboardManager.Storage.SettingsFileName = leaderboardFileName;
         level.LeaderboardManager = leaderboardManager;
+
+        endOfLevelMessgeState = EndOfLevelMessageState.NotShowing;
     }
 
     private void ReloadCurrentLevel()
@@ -169,12 +165,6 @@ class GameplayScreen : GameScreen
     {
         content.Unload();
     }
-
-
-    #endregion
-
-    #region Update and Draw
-
 
     /// <summary>
     /// Allows the game to run logic such as updating the world,
@@ -216,7 +206,43 @@ class GameplayScreen : GameScreen
 
             if (level.Player.Velocity != Vector2.Zero)
                 virtualGamePad.NotifyPlayerIsMoving();
+
+            switch (endOfLevelMessgeState)
+            {
+                case EndOfLevelMessageState.NotShowing:
+                    if (level.TimeTaken == level.MaximumTimeToCompleteLevel)
+                    {
+                        if (level.ReachedExit)
+                        {
+                            endOfLevelMessage = GetLevelStats(Resources.LevelCompleted);
+                        }
+                        else
+                        {
+                            endOfLevelMessage = GetLevelStats(Resources.TimeRanOut);
+                        }
+
+                        endOfLevelMessgeState = EndOfLevelMessageState.Show;
+                    }
+                    else if (!level.Player.IsAlive)
+                    {
+                        endOfLevelMessage = GetLevelStats(Resources.YouDied);
+                        endOfLevelMessgeState = EndOfLevelMessageState.Show;
+                    }
+                    break;
+                case EndOfLevelMessageState.Showing:
+                    break;
+            }
         }
+    }
+
+    private string GetLevelStats(string messageTitle)
+    {
+        var message = messageTitle + Environment.NewLine + Environment.NewLine +
+            Resources.Score + ": " + level.Score + Environment.NewLine +
+            Resources.Time + ": " + level.TimeTaken + Environment.NewLine +
+            Resources.GemsCollected + ": " + level.GemsCollected;
+
+        return message;
     }
 
     /// <summary>
@@ -254,16 +280,20 @@ class GameplayScreen : GameScreen
             if (gamePadState.Buttons.Back == ButtonState.Pressed)
                 ScreenManager.Game.Exit();
 
-            bool continuePressed =
-                keyboardState.IsKeyDown(Keys.Space) ||
-                keyboardState.IsKeyDown(Keys.Up) ||
-                keyboardState.IsKeyDown(Keys.W) ||
-                gamePadState.IsButtonDown(Buttons.A) ||
-                touchState.AnyTouch();
+            if (endOfLevelMessgeState == EndOfLevelMessageState.Show && IsActive)
+            {
+                var toastMessageBox = new MessageBoxScreen(endOfLevelMessage, false, new TimeSpan(0, 0, 5), true);
+                toastMessageBox.Accepted += (sender, e) =>
+                {
+                    wasContinuePressed = true;
+                };
+                endOfLevelMessgeState = EndOfLevelMessageState.Showing;
+                ScreenManager.AddScreen(toastMessageBox, ControllingPlayer);
+            }
 
             // Perform the appropriate action to advance the game and
             // to get the player back to playing.
-            if (!wasContinuePressed && continuePressed)
+            if (wasContinuePressed)
             {
                 if (!level.Player.IsAlive)
                 {
@@ -280,9 +310,9 @@ class GameplayScreen : GameScreen
                         ReloadCurrentLevel();
                     }
                 }
-            }
 
-            wasContinuePressed = continuePressed;
+                wasContinuePressed = false;
+            }
 
             virtualGamePad.Update(gameTime);
         }
@@ -350,31 +380,6 @@ class GameplayScreen : GameScreen
         var scoreDimensions = hudFont.MeasureString(drawableString);
         DrawShadowedString(hudFont, drawableString, hudLocation + new Vector2(hudLocation.X + backbufferWidth - scoreDimensions.X - textEdgeSpacing, textEdgeSpacing), Color.Yellow);
 
-        // Determine the status overlay message to show.
-        Texture2D status = null;
-        if (level.TimeTaken == level.MaximumTimeToCompleteLevel)
-        {
-            if (level.ReachedExit)
-            {
-                status = winOverlay;
-            }
-            else
-            {
-                status = loseOverlay;
-            }
-        }
-        else if (!level.Player.IsAlive)
-        {
-            status = diedOverlay;
-        }
-
-        if (status != null)
-        {
-            // Draw status message.
-            Vector2 statusSize = new Vector2(status.Width, status.Height);
-            spriteBatch.Draw(status, center - statusSize / 2, Color.White);
-        }
-
         if (touchState.IsConnected)
             virtualGamePad.Draw(spriteBatch);
 
@@ -388,5 +393,4 @@ class GameplayScreen : GameScreen
         spriteBatch.DrawString(font, value, position + new Vector2(1.0f, 1.0f), Color.Black);
         spriteBatch.DrawString(font, value, position, color);
     }
-    #endregion
 }

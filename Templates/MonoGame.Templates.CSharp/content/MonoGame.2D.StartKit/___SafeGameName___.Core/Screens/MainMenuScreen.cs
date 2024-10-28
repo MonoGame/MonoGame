@@ -259,7 +259,6 @@ class MainMenuScreen : MenuScreen
         {
             playerIndex = e.PlayerIndex;
             readyToPlay = true;
-
         };
         ScreenManager.AddScreen(toastMessageBox, e.PlayerIndex);
     }
