@@ -380,7 +380,7 @@ namespace MonoGame.Effect
 
                 // First gather the uniforms.
                 VkStruct globals;
-                if (structs.TryGetValue("%type__MG_Globals", out globals))
+                if (structs.TryGetValue("%type__Globals", out globals))
                 {
                     foreach (var member in globals.members.Values)
                         cbuffer.AddParameter(member.name, member.type, 0, member.offset);
@@ -449,24 +449,29 @@ namespace MonoGame.Effect
                         }
 
                         int size;
-                        if (input.type.StartsWith("v"))
+                        int len;
+                        int inputTypeStringStartIndex;
+                        if (input.type.StartsWith("v") && char.IsDigit(input.type[1]))
                         {
-                            int len = (int)char.GetNumericValue(input.type[1]);
-                            switch (input.type.Substring(2))
-                            {
-                                case "int":
-                                case "float":
-                                    size = len * 4;
-                                    break;
-                                default:
-                                    errorsAndWarnings += string.Format("Unknown vertex shader input type '{0}'.", input.type);
-                                    throw new ShaderCompilerException();
-                            }
+                            len = (int)char.GetNumericValue(input.type[1]);
+                            inputTypeStringStartIndex = 2;
                         }
                         else
                         {
-                            errorsAndWarnings += string.Format("Unknown vertex shader input type '{0}'.", input.type);
-                            throw new ShaderCompilerException();
+                            len = 1;
+                            inputTypeStringStartIndex = 0;
+                        }
+
+                        switch (input.type.Substring(inputTypeStringStartIndex))
+                        {
+                            case "int":
+                            case "uint":
+                            case "float":
+                                size = len * 4;
+                                break;
+                            default:
+                                errorsAndWarnings += string.Format("Unknown vertex shader input type '{0}'.", input.type);
+                                throw new ShaderCompilerException();
                         }
 
                         offset += size;
