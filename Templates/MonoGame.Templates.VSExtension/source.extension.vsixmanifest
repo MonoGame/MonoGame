@@ -9,22 +9,13 @@
   <Installation>
     <!-- All the versions of VS2019 -->
     <InstallationTarget Version="[16.0, 17.0)" Id="Microsoft.VisualStudio.Community">
-      <ProductArchitecture>amd64</ProductArchitecture>
+      <ProductArchitecture>x86</ProductArchitecture>
     </InstallationTarget>
     <InstallationTarget Version="[16.0, 17.0)" Id="Microsoft.VisualStudio.Pro">
-      <ProductArchitecture>amd64</ProductArchitecture>
+      <ProductArchitecture>x86</ProductArchitecture>
     </InstallationTarget>
     <InstallationTarget Version="[16.0, 17.0)" Id="Microsoft.VisualStudio.Enterprise">
-      <ProductArchitecture>amd64</ProductArchitecture>
-    </InstallationTarget>
-    <InstallationTarget Version="[16.0, 17.0)" Id="Microsoft.VisualStudio.Community">
-      <ProductArchitecture>arm64</ProductArchitecture>
-    </InstallationTarget>
-    <InstallationTarget Version="[16.0, 17.0)" Id="Microsoft.VisualStudio.Pro">
-      <ProductArchitecture>arm64</ProductArchitecture>
-    </InstallationTarget>
-    <InstallationTarget Version="[16.0, 17.0)" Id="Microsoft.VisualStudio.Enterprise">
-      <ProductArchitecture>arm64</ProductArchitecture>
+      <ProductArchitecture>x86</ProductArchitecture>
     </InstallationTarget>
 
     <!-- All the versions of VS2022 -->
