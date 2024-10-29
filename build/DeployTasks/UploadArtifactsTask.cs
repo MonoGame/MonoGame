@@ -21,7 +21,10 @@ public sealed class UploadArtifactsTask : AsyncFrostingTask<BuildContext>
         if (context.IsRunningOnWindows())
         {
             await context.GitHubActions().Commands.UploadArtifact(new DirectoryPath(System.IO.Path.Combine(context.BuildOutput, "Tests", "WindowsDX", "Release")), $"tests-windowsdx-{os}");
-            await context.GitHubActions().Commands.UploadArtifact(new DirectoryPath(System.IO.Path.Combine(context.BuildOutput, "MonoGame.Templates.VSExtension", "net472")), "MonoGame.Templates.VSExtension.vsix");
+
+            // Assuming that the .vsix file has already been created and is located at this exact path.
+            var vsixFilePath = System.IO.Path.Combine(context.BuildOutput, "MonoGame.Templates.VSExtension", "net472", "MonoGame.Templates.VSExtension.vsix");
+            await context.GitHubActions().Commands.UploadArtifact(new FilePath(vsixFilePath), "MonoGame.Templates.VSExtension.vsix");
         }
     }
 }
