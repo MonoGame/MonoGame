@@ -47,7 +47,7 @@ We support a growing list of platforms across the desktop, mobile, and console s
 
 ## [Samples](https://github.com/MonoGame/MonoGame.Samples)
 
-Check out the awesome []"full game" samples](https://github.com/MonoGame/MonoGame.Samples) maintained by the MonoGame team:
+Check out the awesome ["full game"] samples](https://github.com/MonoGame/MonoGame.Samples) maintained by the MonoGame team:
 
 [Platformer 2D Sample](https://github.com/MonoGame/MonoGame.Samples/blob/3.8.2/Platformer2D/README.md) | [NeonShooter](https://github.com/MonoGame/MonoGame.Samples/blob/3.8.2/NeonShooter/README.md)|
 |-|-|
