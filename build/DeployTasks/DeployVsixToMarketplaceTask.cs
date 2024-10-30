@@ -23,7 +23,7 @@ public sealed class DeployVsixToMarketplaceTask : FrostingTask<BuildContext>
         return false;
     }
 
-    public override void Run(BuildContext context)
+    public override async void Run(BuildContext context)
     {
         var pat = context.EnvironmentVariable("MARKETPLACE_PAT");
         var publisher = "MonoGame";
@@ -43,7 +43,7 @@ public sealed class DeployVsixToMarketplaceTask : FrostingTask<BuildContext>
         using var content = new StreamContent(fileStream);
         content.Headers.ContentType = new MediaTypeHeaderValue("application/octet-stream");
 
-        var response = client.PutAsync($"https://marketplace.visualstudio.com/_apis/gallery/publishers/{publisher}/vsextensions/{extensionName}/versions", content).Result;
+        var response = await client.PutAsync($"https://marketplace.visualstudio.com/_apis/gallery/publishers/{publisher}/vsextensions/{extensionName}/versions", content);
 
         if (response.IsSuccessStatusCode)
         {
