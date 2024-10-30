@@ -32,7 +32,7 @@ We support a growing list of platforms across the desktop, mobile, and console s
 * Mobile/Tablet Devices
   * Android 6.0 and up (OpenGL)
   * iPhone/iPad 10.0 and up (OpenGL)
-* Consoles (for registered developers)
+* [Consoles (for registered developers)](https://docs.monogame.net/articles/console_access.html)
   * PlayStation 4
   * PlayStation 5
   * Xbox One (XDK only) (GDK coming soon)
@@ -40,9 +40,28 @@ We support a growing list of platforms across the desktop, mobile, and console s
 
 ## Getting started
 - [Getting started →](https://docs.monogame.net/articles/getting_started/index.html)
+- ["How To" Guides →](https://docs.monogame.net/articles/getting_to_know/howto/)
 - [Documentation Hub →](https://docs.monogame.net/)
-- [API Reference →](https://docs.monogame.net/articles/tutorials.html)
-- [Tutorials →](https://docs.monogame.net/articles/tutorials.html)
+- [API Reference →](https://docs.monogame.net/api/index.html)
+- [Community Tutorials →](https://docs.monogame.net/articles/tutorials.html)
+
+## [Samples](https://github.com/MonoGame/MonoGame.Samples)
+
+Check out the awesome []"full game" samples](https://github.com/MonoGame/MonoGame.Samples) maintained by the MonoGame team:
+
+[Platformer 2D Sample](https://github.com/MonoGame/MonoGame.Samples/blob/3.8.2/Platformer2D/README.md) | [NeonShooter](https://github.com/MonoGame/MonoGame.Samples/blob/3.8.2/NeonShooter/README.md)|
+|-|-|
+Supported on all platforms | Supported on all platforms |
+[![Platformer 2D Sample](https://raw.githubusercontent.com/MonoGame/MonoGame.Samples/refs/heads/3.8.2/Images/Platformer2D-Sample.png)](https://github.com/MonoGame/MonoGame.Samples/blob/3.8.2/Platformer2D/README.md) | [![NeonShooter Sample](https://raw.githubusercontent.com/MonoGame/MonoGame.Samples/refs/heads/3.8.2/Images/NeonShooter-Sample.png)](https://github.com/MonoGame/MonoGame.Samples/blob/3.8.2/NeonShooter/README.md) |
+The [Platformer 2D](https://github.com/MonoGame/MonoGame.Samples/blob/3.8.2/Platformer2D/README.md) sample is a basic 2D platformer pulled from the original XNA samples and upgraded for MonoGame.| [Neon Shooter](https://github.com/MonoGame/MonoGame.Samples/blob/3.8.2/NeonShooter/README.md) Is a graphically intensive twin-stick shooter with particle effects and save data from Michael Hoffman |
+|||
+
+| [Auto Pong Sample](https://github.com/MonoGame/MonoGame.Samples/blob/3.8.2/AutoPong/README.md) | [Ship Game 3D](https://github.com/MonoGame/MonoGame.Samples/blob/3.8.2/ShipGame/README.md) |
+|-|-|
+| Supported on all platforms | GL / DX/ iOS / Android |
+| [![Auto Pong Sample](https://raw.githubusercontent.com/MonoGame/MonoGame.Samples/refs/heads/3.8.2/Images/AutoPong_1.gif)](https://github.com/MonoGame/MonoGame.Samples/blob/3.8.2/AutoPong/README.md) | [![ShipGame 3D Sample](https://raw.githubusercontent.com/MonoGame/MonoGame.Samples/refs/heads/3.8.2/Images/ShipGame.gif)](https://github.com/MonoGame/MonoGame.Samples/blob/3.8.2/ShipGame/README.md) |
+| A short [sample project](https://github.com/MonoGame/MonoGame.Samples/blob/3.8.2/AutoPong/README.md) showing you how to make the classic game of pong, with generated soundfx, in 300 lines of code. | 3D Ship Game (Descent clone) sample, pulled from the XNA archives and updated for MonoGame |
+|||
 
 ## Support and Contributions
 
@@ -78,8 +97,8 @@ A high level breakdown of the components of the framework:
 * Project templates are in [Templates](Templates).
 * See [Tests](Tests) for the framework unit tests.
 * See [Tools/Tests](Tools/MonoGame.Tools.Tests) for the content pipeline and other tool tests.
-* [mgcb](Tools/MonoGame.Content.Builder) is the command line tool for content processing.
-* [mgfxc](Tools/MonoGame.Effect.Compiler) is the command line effect compiler tool.
+* The [mgcb](Tools/MonoGame.Content.Builder) is a command line tool for content processing.
+* The [mgfxc](Tools/MonoGame.Effect.Compiler) is a command line effect compiler tool.
 * The [mgcb-editor](Tools/MonoGame.Content.Builder.Editor) tool is a GUI frontend for content processing.
 
 ## Helpful Links
@@ -90,6 +109,7 @@ A high level breakdown of the components of the framework:
 * The [official documentation](https://docs.monogame.net/articles/index.html) is on our website.
 * Download [release](https://github.com/MonoGame/MonoGame/releases) and [development](https://github.com/orgs/MonoGame/packages) packages.
 * Follow [@MonoGameTeam](https://twitter.com/monogameteam) on Twitter.
+* Get premium content on [Patreon](https://www.patreon.com/bePatron?u=3142012) (coming soon)
 
 ## License
 
