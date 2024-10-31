@@ -9,7 +9,8 @@
  One framework for creating powerful cross-platfrom games
 
 [Supported Platforms](#supported-platforms) • 
-[Getting started](#getting-started) • 
+[Resources](#resources) • 
+[Samples](#samples) • 
 [Support and Contributions](#support-and-contributions) • 
 [Source Code](#source-code) • 
 [Helpful Links](#helpful-links) • 
@@ -38,16 +39,16 @@ We support a growing list of platforms across the desktop, mobile, and console s
   * Xbox One (XDK only) (GDK coming soon)
   * Nintendo Switch
 
-## Getting started
+## Resources
 - [Getting started →](https://docs.monogame.net/articles/getting_started/index.html)
 - ["How To" Guides →](https://docs.monogame.net/articles/getting_to_know/howto/)
 - [Documentation Hub →](https://docs.monogame.net/)
 - [API Reference →](https://docs.monogame.net/api/index.html)
 - [Community Tutorials →](https://docs.monogame.net/articles/tutorials.html)
 
-## [Samples](https://github.com/MonoGame/MonoGame.Samples)
+## Samples
 
-Check out the awesome ["full game" samples](https://github.com/MonoGame/MonoGame.Samples) maintained by the MonoGame team:
+Check out the awesome [game samples](https://github.com/MonoGame/MonoGame.Samples) maintained by the MonoGame team:
 
 [Platformer 2D Sample](https://github.com/MonoGame/MonoGame.Samples/blob/3.8.2/Platformer2D/README.md) | [NeonShooter](https://github.com/MonoGame/MonoGame.Samples/blob/3.8.2/NeonShooter/README.md)|
 |-|-|
@@ -58,7 +59,7 @@ The [Platformer 2D](https://github.com/MonoGame/MonoGame.Samples/blob/3.8.2/Plat
 
 | [Auto Pong Sample](https://github.com/MonoGame/MonoGame.Samples/blob/3.8.2/AutoPong/README.md) | [Ship Game 3D](https://github.com/MonoGame/MonoGame.Samples/blob/3.8.2/ShipGame/README.md) |
 |-|-|
-| Supported on all platforms | GL / DX/ iOS / Android |
+| Supported on all platforms | GL / DX / iOS / Android |
 | [![Auto Pong Sample](https://raw.githubusercontent.com/MonoGame/MonoGame.Samples/refs/heads/3.8.2/Images/AutoPong_1.gif)](https://github.com/MonoGame/MonoGame.Samples/blob/3.8.2/AutoPong/README.md) | [![ShipGame 3D Sample](https://raw.githubusercontent.com/MonoGame/MonoGame.Samples/refs/heads/3.8.2/Images/ShipGame.gif)](https://github.com/MonoGame/MonoGame.Samples/blob/3.8.2/ShipGame/README.md) |
 | A short [sample project](https://github.com/MonoGame/MonoGame.Samples/blob/3.8.2/AutoPong/README.md) showing you how to make the classic game of pong, with generated soundfx, in 300 lines of code. | 3D Ship Game (Descent clone) sample, pulled from the XNA archives and updated for MonoGame |
 |||
