@@ -1,5 +1,7 @@
 <div align="center">
- <img height="128" alt="MonoGame" src="https://raw.githubusercontent.com/MonoGame/MonoGame.Logo/refs/heads/master/FullColorOnLight/LogoOnly_128px.png">
+ <a href="https://monogame.net/">
+   <img height="128" alt="MonoGame" src="https://raw.githubusercontent.com/MonoGame/MonoGame.Logo/refs/heads/master/FullColorOnLight/LogoOnly_128px.png">
+ </a>
  <h1>MonoGame</h1>
 
  [![Join the chat at https://discord.gg/monogame](https://img.shields.io/discord/355231098122272778?style=flat-square&color=%237289DA&label=Discord%20server&logo=discord&logoColor=white)](https://discord.gg/monogame) 
