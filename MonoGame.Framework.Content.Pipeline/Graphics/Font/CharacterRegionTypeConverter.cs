@@ -22,12 +22,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
                 throw new ArgumentException("Input string cannot be null or empty.");
             }
 
-            // Supported input formats:
-            //  A
-            //  A-Z
-            //  32-127
-            //  0x20-0x7F
-
+            // Parse as single character or range (e.g., "A", "A-Z", "32-127", "0x20-0x7F").
             var splitStr = source.Split('-');
             var split = new char[splitStr.Length];
             for (int i = 0; i < splitStr.Length; i++)
@@ -60,9 +55,32 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
             }
             else
             {
-                if (int.TryParse(value, NumberStyles.HexNumber, CultureInfo.InvariantCulture, out int hexResult))
+                // Check if the value is hexadecimal with the "0x" prefix
+                if (value.StartsWith("0x", StringComparison.OrdinalIgnoreCase))
                 {
-                    return (char)hexResult;
+                    // Remove "0x" prefix and parse as hexadecimal
+                    value = value.Substring(2);
+                    if (int.TryParse(value, NumberStyles.HexNumber, CultureInfo.InvariantCulture, out int hexResult))
+                    {
+                        return (char)hexResult;
+                    }
+                    else
+                    {
+                        throw new ArgumentException($"Invalid hexadecimal codepoint: {value}");
+                    }
+                }
+                // Handle decimal entity format (e.g., "&#12354;")
+                else if (value.StartsWith("&#") && value.EndsWith(";"))
+                {
+                    var numericPart = value.Substring(2, value.Length - 3);
+                    if (int.TryParse(numericPart, out int entityResult))
+                    {
+                        return (char)entityResult;
+                    }
+                    else
+                    {
+                        throw new ArgumentException($"Invalid decimal entity codepoint: {value}");
+                    }
                 }
                 else if (int.TryParse(value, out int intResult))
                 {
@@ -71,11 +89,8 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
                 else
                 {
                     throw new ArgumentException($"Invalid character or codepoint: {value}");
-                    // TODO Do we still need this - return (char)(int)intConverter.ConvertFromInvariantString(value);
                 }
             }
         }
-
-        static TypeConverter intConverter = TypeDescriptor.GetConverter(typeof(int));
     }
 }
