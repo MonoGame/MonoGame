@@ -11,7 +11,7 @@ with.
     <!--
     Modify this string to change the font that will be imported.
     -->
-    <FontName>Tahoma</FontName>
+    <FontName>Arial</FontName>
 
     <!--
     Size is a float value, measured in points. Modify this value to change
@@ -46,14 +46,40 @@ with.
     <!--
     CharacterRegions control what letters are available in the font. Every
     character from Start to End will be built and made available for drawing. The
-    default range is from 32, (ASCII space), to 126, ('~'), covering the basic Latin
-    character set. The characters are ordered according to the Unicode standard.
+    default range is from 32, (ASCII space), to 254, ('■'), covering the basic Latin
+    character set as well as extended character set.
+    The characters are ordered according to the Unicode standard.
     See the documentation for more information.
     -->
     <CharacterRegions>
+      <!-- Latin Character and Extended Set -->
       <CharacterRegion>
         <Start>&#32;</Start>
-        <End>&#255;</End>
+        <End>&#254;</End>
+      </CharacterRegion>
+
+      <!-- Hiragana (U+3040 - U+309F) -->
+      <CharacterRegion>
+        <Start>&#12352;</Start>
+        <End>&#12447;</End>
+      </CharacterRegion>
+
+      <!-- Katakana (U+30A0 - U+30FF) -->
+      <CharacterRegion>
+        <Start>&#12448;</Start>
+        <End>&#12543;</End>
+      </CharacterRegion>
+
+      <!-- Common Kanji (CJK Unified Ideographs - typically U+4E00 to U+9FFF) -->
+      <CharacterRegion>
+        <Start>&#19968;</Start>
+        <End>&#40879;</End>
+      </CharacterRegion>
+
+      <!-- Cyrillic Character Set -->
+      <CharacterRegion>
+        <Start>&#1040;</Start>
+        <End>&#1103;</End>
       </CharacterRegion>
     </CharacterRegions>
   </Asset>

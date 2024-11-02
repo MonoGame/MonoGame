@@ -219,6 +219,9 @@
   <data name="English" xml:space="preserve">
     <value>anglais (Anglais) </value>
   </data>
+  <data name="Tutorial" xml:space="preserve">
+    <value>Tutorial</value>
+  </data>
   <data name="CollectThese" xml:space="preserve">
     <value>Collectionnez-les!</value>
   </data>
