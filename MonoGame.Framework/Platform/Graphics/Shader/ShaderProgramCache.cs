@@ -37,7 +37,7 @@ namespace Microsoft.Xna.Framework.Graphics
     /// </summary>
     internal class ShaderProgramCache : IDisposable
     {
-        private readonly Dictionary<(int, int), ShaderProgram> _programCache = new Dictionary<(int, int), ShaderProgram>();
+        private readonly Dictionary<ulong, ShaderProgram> _programCache = new Dictionary<ulong, ShaderProgram>();
         GraphicsDevice _graphicsDevice;
         bool disposed;
 
@@ -69,7 +69,7 @@ namespace Microsoft.Xna.Framework.Graphics
             // buffers here as well.  This would allow us to optimize
             // setting uniforms to only when a constant buffer changes.
 
-            var key = (vertexShader.HashKey, pixelShader.HashKey);
+            var key = ((ulong)(uint)vertexShader.HashKey << 32) | (uint)pixelShader.HashKey;
     
             if(!_programCache.TryGetValue(key, out var shaderProgram))
             {
