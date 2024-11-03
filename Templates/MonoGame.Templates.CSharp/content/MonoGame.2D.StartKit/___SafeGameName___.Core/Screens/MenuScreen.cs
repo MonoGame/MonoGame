@@ -121,8 +121,11 @@ abstract class MenuScreen : GameScreen
     {
         for (int i = 0; i < menuEntries.Count; i++)
         {
-            Vector2 textSize = ScreenManager.Font.MeasureString(menuEntries[i].Text);
+            var textSize = ScreenManager.Font.MeasureString(menuEntries[i].Text);
             var entryBounds = new Rectangle((int)menuEntries[i].Position.X, (int)menuEntries[i].Position.Y, (int)textSize.X, (int)textSize.Y);
+
+            touchLocation.Y += 5; // TODO work out why this magic nunber is needed
+
             if (entryBounds.Contains(touchLocation))
             {
                 selectedEntry = i;
