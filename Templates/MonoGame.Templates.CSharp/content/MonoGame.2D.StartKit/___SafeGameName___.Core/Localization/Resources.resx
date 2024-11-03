@@ -243,4 +243,7 @@
   <data name="GemsCollected" xml:space="preserve">
     <value>Gems Collected</value>
   </data>
+  <data name="NewHighScore" xml:space="preserve">
+    <value>CONGRATULATIONS!! You set a new high score.</value>
+  </data>
 </root>

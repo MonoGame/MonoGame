@@ -304,6 +304,15 @@ namespace ___SafeGameName___.Core.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to CONGRATULATIONS!! You set a new fastest time..
+        /// </summary>
+        internal static string NewHighScore {
+            get {
+                return ResourceManager.GetString("NewHighScore", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to No = B button, Esc.
         /// </summary>
         internal static string NoButtonText {

@@ -243,4 +243,7 @@
   <data name="GemsCollected" xml:space="preserve">
     <value>Gemas Recolectadas</value>
   </data>
+  <data name="NewHighScore" xml:space="preserve">
+    <value>¡FELICITACIONES! Has conseguido un nuevo récord.</value>
+  </data>
 </root>
