@@ -66,9 +66,10 @@ class MainMenuScreen : MenuScreen
         aboutMenuEntry.Text = Resources.About;
         playMenuEntry.Text = Resources.Play;
         settingsMenuEntry.Text = Resources.Settings;
+        tutorialMenuEntry.Text = Resources.Tutorial;
         exitMenuEntry.Text = Resources.Exit;
 
-        Title = "___SafeGameName___"; // TODO uncomment this if you want it to use Resources.* instead Resources.MainMenu;
+        Title = "___SafeGameName___"; // TODO uncomment this if you want it to use Resources.MainMenu instead;
     }
 
     /// <summary>

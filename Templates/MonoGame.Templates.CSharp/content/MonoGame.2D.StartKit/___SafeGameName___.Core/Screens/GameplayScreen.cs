@@ -237,10 +237,15 @@ class GameplayScreen : GameScreen
 
     private string GetLevelStats(string messageTitle)
     {
-        var message = messageTitle + Environment.NewLine + Environment.NewLine +
+        var message = messageTitle + Environment.NewLine + Environment.NewLine;
+
+        if (level.NewHighScore)
+            message += Resources.NewHighScore + Environment.NewLine + Environment.NewLine;
+
+        message +=
             Resources.Score + ": " + level.Score + Environment.NewLine +
             Resources.Time + ": " + level.TimeTaken + Environment.NewLine +
-            Resources.GemsCollected + ": " + level.GemsCollected;
+            Resources.GemsCollected + $": {level.GemsCollected:D2}/ {level.GemsCount:D2}";
 
         return message;
     }

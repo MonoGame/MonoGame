@@ -1,20 +1,8 @@
-#region File Description
-//-----------------------------------------------------------------------------
-// LoadingScreen.cs
-//
-// Microsoft XNA Community Game Platform
-// Copyright (C) Microsoft Corporation. All rights reserved.
-//-----------------------------------------------------------------------------
-#endregion
-
-#region Using Statements
-using System;
-using ___SafeGameName___.Core;
 using ___SafeGameName___.Core.Localization;
 using ___SafeGameName___.ScreenManagers;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-#endregion
+using System;
 
 namespace ___SafeGameName___.Screens;
 
@@ -34,17 +22,10 @@ namespace ___SafeGameName___.Screens;
 /// </summary>
 class LoadingScreen : GameScreen
 {
-    #region Fields
-
     bool loadingIsSlow;
     bool otherScreensAreGone;
 
     GameScreen[] screensToLoad;
-
-    #endregion
-
-    #region Initialization
-
 
     /// <summary>
     /// The constructor is private: loading screens should
@@ -78,12 +59,6 @@ class LoadingScreen : GameScreen
 
         screenManager.AddScreen(loadingScreen, controllingPlayer);
     }
-
-
-    #endregion
-
-    #region Update and Draw
-
 
     /// <summary>
     /// Updates the loading screen.
@@ -158,7 +133,4 @@ class LoadingScreen : GameScreen
             spriteBatch.End();
         }
     }
-
-
-    #endregion
 }
