@@ -59,8 +59,8 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
                 if (value.StartsWith("0x", StringComparison.OrdinalIgnoreCase))
                 {
                     // Remove "0x" prefix and parse as hexadecimal
-                    value = value.Substring(2);
-                    if (int.TryParse(value, NumberStyles.HexNumber, CultureInfo.InvariantCulture, out int hexResult))
+                    var numericPart = value.Substring(2);
+                    if (int.TryParse(numericPart, NumberStyles.HexNumber, CultureInfo.InvariantCulture, out int hexResult))
                     {
                         return (char)hexResult;
                     }
