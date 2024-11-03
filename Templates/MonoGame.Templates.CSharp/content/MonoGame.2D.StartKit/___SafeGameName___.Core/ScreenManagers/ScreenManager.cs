@@ -1,24 +1,12 @@
-﻿#region File Description
-//-----------------------------------------------------------------------------
-// ScreenManager.cs
-//
-// Microsoft XNA Community Game Platform
-// Copyright (C) Microsoft Corporation. All rights reserved.
-//-----------------------------------------------------------------------------
-#endregion
-
-#region Using Statements
-using System;
-using System.Diagnostics;
-using System.Collections.Generic;
+﻿using ___SafeGameName___.Core.Inputs;
+using ___SafeGameName___.Screens;
+using GameStateManagement.Inputs;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input.Touch;
-using ___SafeGameName___.Screens;
-using GameStateManagement.Inputs;
-using ___SafeGameName___.Core.Inputs;
-#endregion
+using System.Collections.Generic;
+using System.Diagnostics;
 
 namespace ___SafeGameName___.ScreenManagers;
 
@@ -30,8 +18,6 @@ namespace ___SafeGameName___.ScreenManagers;
 /// </summary>
 public class ScreenManager : DrawableGameComponent
 {
-    #region Fields
-
     List<GameScreen> screens = new List<GameScreen>();
     List<GameScreen> screensToUpdate = new List<GameScreen>();
 
@@ -44,11 +30,6 @@ public class ScreenManager : DrawableGameComponent
     bool isInitialized;
 
     bool traceEnabled;
-
-    #endregion
-
-    #region Properties
-
 
     /// <summary>
     /// A default SpriteBatch shared by all the screens. This saves
@@ -80,11 +61,6 @@ public class ScreenManager : DrawableGameComponent
         get { return traceEnabled; }
         set { traceEnabled = value; }
     }
-
-    #endregion
-
-    #region Initialization
-
 
     /// <summary>
     /// Constructs a new screen manager component.
@@ -142,12 +118,6 @@ public class ScreenManager : DrawableGameComponent
             screen.UnloadContent();
         }
     }
-
-
-    #endregion
-
-    #region Update and Draw
-
 
     /// <summary>
     /// Allows each screen to run logic.
@@ -231,12 +201,6 @@ public class ScreenManager : DrawableGameComponent
         }
     }
 
-
-    #endregion
-
-    #region Public Methods
-
-
     /// <summary>
     /// Adds a new screen to the screen manager.
     /// </summary>
@@ -312,7 +276,4 @@ public class ScreenManager : DrawableGameComponent
 
         spriteBatch.End();
     }
-
-
-    #endregion
 }
