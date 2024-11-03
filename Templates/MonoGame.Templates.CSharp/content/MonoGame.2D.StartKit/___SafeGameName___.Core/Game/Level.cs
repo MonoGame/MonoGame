@@ -72,11 +72,23 @@ class Level : IDisposable
 
     private const int PointsPerSecond = 5;
 
+    private int gemsCollected;
     public int GemsCollected
     {
         get { return gemsCollected; }
     }
-    private int gemsCollected;
+
+    private int gemsCount;
+    public int GemsCount
+    {
+        get { return gemsCount; }
+    }
+
+    private bool newHighScore;
+    public bool NewHighScore
+    {
+        get { return newHighScore; }
+    }
 
     // Level content.        
     public ContentManager Content
@@ -128,6 +140,8 @@ class Level : IDisposable
 
         // Load sounds.
         exitReachedSound = Content.Load<SoundEffect>("Sounds/ExitReached");
+
+        gemsCount = gems.Count;
     }
 
     /// <summary>
@@ -390,7 +404,20 @@ class Level : IDisposable
     private SettingsManager<___SafeGameName___Leaderboard> settingsManager;
     private bool saved;
 
-    public SettingsManager<___SafeGameName___Leaderboard> LeaderboardManager { get => settingsManager; set => settingsManager = value; }
+    public SettingsManager<___SafeGameName___Leaderboard> LeaderboardManager
+    {
+        get => settingsManager;
+
+        set
+        {
+            if (value != null
+                && settingsManager != value)
+            {
+                settingsManager = value;
+                settingsManager.Load();
+            }
+        }
+    }
 
     /// <summary>
     /// Updates all objects in the world, performs collision between them,
@@ -431,25 +458,33 @@ class Level : IDisposable
             if (levelPath.Contains("00.txt"))
                 return;
 
-            var changed = false;
-            // If it already exists update it, otherwise add it
-            if (settingsManager.Settings.FastestTime != timeTaken)
+            if (!saved)
             {
-                settingsManager.Settings.FastestTime = timeTaken;
-                changed = true;
-            }
+                if (timeTaken < settingsManager.Settings.FastestTime
+                    || gemsCollected > settingsManager.Settings.GemsCollected)
+                {
+                    newHighScore = true;
+                }
 
-            if (settingsManager.Settings.GemsCollected != gemsCollected)
-            {
-                settingsManager.Settings.GemsCollected = gemsCollected;
-                changed = true;
-            }
+                if (newHighScore)
+                {
+                    // If it already exists update it, otherwise add it
+                    if (settingsManager.Settings.FastestTime != timeTaken)
+                    {
+                        settingsManager.Settings.FastestTime = timeTaken;
+                    }
 
+                    if (settingsManager.Settings.GemsCollected < gemsCollected)
+                    {
+                        settingsManager.Settings.GemsCollected = gemsCollected;
+                    }
 
-            if (changed && !saved)
-            {
-                settingsManager.Save();
-                saved = true;
+                    if (!saved)
+                    {
+                        settingsManager.Save();
+                        saved = true;
+                    }
+                }
             }
             // Animate the time being converted into points.
             int seconds = (int)Math.Round(gameTime.ElapsedGameTime.TotalSeconds * 100.0f);
