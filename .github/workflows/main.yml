@@ -149,6 +149,7 @@ jobs:
             env:
               GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
               NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}
+              MARKETPLACE_PAT: ${{ secrets.MARKETPLACE_PAT }}
 
           - name: Make a Release
             if: github.ref_type == 'tag'
@@ -158,7 +159,7 @@ jobs:
               tag: ${{ github.ref_name }}
               allowUpdates: true
               removeArtifacts: true
-              artifacts: "nugets/*.nupkg"
+              artifacts: "nugets/*.nupkg;vsix/MonoGame.Templates.VSExtension.vsix"
               token: ${{ secrets.GITHUB_TOKEN }}
 
   tests:
