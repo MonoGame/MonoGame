@@ -125,7 +125,7 @@ class Enemy
             {
                 waitTime = MaxWaitTime;
             }
-            else
+            else if (!Level.Paused)
             {
                 // Move in the current direction.
                 Vector2 velocity = new Vector2((int)direction * MoveSpeed * elapsed, 0.0f);
