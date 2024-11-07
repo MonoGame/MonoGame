@@ -110,7 +110,7 @@ class Enemy
         if (waitTime > 0)
         {
             // Wait for some amount of time.
-            waitTime = Math.Max(0.0f, waitTime - (float)gameTime.ElapsedGameTime.TotalSeconds);
+            waitTime = Math.Max(0.0f, waitTime - elapsed);
             if (waitTime <= 0.0f)
             {
                 // Then turn around.
@@ -143,6 +143,7 @@ class Enemy
         if (!Level.Player.IsAlive ||
             Level.ReachedExit ||
             Level.TimeTaken == Level.MaximumTimeToCompleteLevel ||
+            Level.Paused ||
             waitTime > 0)
         {
             sprite.PlayAnimation(idleAnimation);

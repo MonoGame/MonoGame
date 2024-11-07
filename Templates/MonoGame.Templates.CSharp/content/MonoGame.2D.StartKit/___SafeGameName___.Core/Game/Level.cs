@@ -419,6 +419,8 @@ class Level : IDisposable
         }
     }
 
+    public bool Paused { get; internal set; }
+
     /// <summary>
     /// Updates all objects in the world, performs collision between them,
     /// and handles the time limit with scoring.

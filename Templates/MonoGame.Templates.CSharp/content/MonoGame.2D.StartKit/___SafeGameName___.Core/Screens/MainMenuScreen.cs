@@ -78,6 +78,8 @@ class MainMenuScreen : MenuScreen
     /// </summary>
     public override void LoadContent()
     {
+        base.LoadContent();
+
         if (content == null)
             content = new ContentManager(ScreenManager.Game.Services, "Content");
 

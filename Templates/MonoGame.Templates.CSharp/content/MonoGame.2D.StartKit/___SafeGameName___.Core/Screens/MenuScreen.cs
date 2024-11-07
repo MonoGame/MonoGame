@@ -42,6 +42,15 @@ abstract class MenuScreen : GameScreen
     }
 
     /// <summary>
+    /// LoadContent will be called once per game and is the place to load
+    /// all of your content for the game and ScaleOurPresentationArea befor we start.
+    /// </summary>
+    public override void LoadContent()
+    {
+        base.LoadContent();
+    }
+
+    /// <summary>
     /// Responds to user input, changing the selected entry and accepting
     /// or cancelling the menu.
     /// </summary>

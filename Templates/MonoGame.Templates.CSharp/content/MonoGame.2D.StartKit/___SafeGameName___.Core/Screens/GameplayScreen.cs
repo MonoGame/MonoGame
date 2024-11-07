@@ -271,9 +271,11 @@ class GameplayScreen : GameScreen
         if (input.IsPauseGame(ControllingPlayer) || gamePadDisconnected)
         {
             ScreenManager.AddScreen(new PauseScreen(), ControllingPlayer);
+            level.Paused = true;
         }
         else
         {
+            level.Paused = false;
             keyboardState = input.CurrentKeyboardStates[playerIndex];
             gamePadState = virtualGamePad.GetState(touchState, input.CurrentGamePadStates[playerIndex]);
 
