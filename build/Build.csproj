@@ -33,7 +33,7 @@
     <PackageReference Include="Cake.FileHelpers" Version="7.0.0" />
     <PackageReference Include="Cake.Frosting" Version="4.2.0" />
     <PackageReference Include="Cake.Git" Version="4.0.0" />
-    <PackageReference Include="NuGet.Packaging" Version="6.10.1" />
+    <PackageReference Include="NuGet.Packaging" Version="6.11.1" />
     <PackageReference Include="System.Formats.Asn1" Version="8.0.1" />
   </ItemGroup>
 
