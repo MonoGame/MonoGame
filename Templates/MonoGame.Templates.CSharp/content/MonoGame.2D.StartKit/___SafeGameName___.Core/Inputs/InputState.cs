@@ -42,6 +42,12 @@ public class InputState
     /// </summary>
     private const float cursorMoveSpeed = 250.0f;
 
+    private bool isMouseWheelScrolledDown;
+    public bool IsMouseWheelScrolledDown => isMouseWheelScrolledDown;
+
+    private bool isMouseWheelScrolledUp;
+    public bool IsMouseWheelScrolledUp => isMouseWheelScrolledUp;
+
     /// <summary>
     /// Constructs a new input state.
     /// </summary>
@@ -138,6 +144,9 @@ public class InputState
             touchCount = 3;
         }
 
+        isMouseWheelScrolledUp = false;
+        isMouseWheelScrolledDown = false;
+
         if (CurrentMouseState.ScrollWheelValue != LastMouseState.ScrollWheelValue)
         {
             int scrollWheelDelta = CurrentMouseState.ScrollWheelValue - LastMouseState.ScrollWheelValue;
@@ -145,13 +154,13 @@ public class InputState
             // Handle the scroll wheel event based on the delta
             if (scrollWheelDelta > 0)
             {
-                // Mouse wheel scrolled up
-                // Do something, like zoom in or scroll up
+                // Mouse wheel scrolled down
+                isMouseWheelScrolledDown = true;
             }
             else if (scrollWheelDelta < 0)
             {
-                // Mouse wheel scrolled down
-                // Do something, like zoom out or scroll down
+                // Mouse wheel scrolled up
+                isMouseWheelScrolledUp = true;
             }
         }
 
@@ -286,7 +295,8 @@ public class InputState
 
         return IsNewKeyPress(Keys.Up, controllingPlayer, out playerIndex) ||
                IsNewButtonPress(Buttons.DPadUp, controllingPlayer, out playerIndex) ||
-               IsNewButtonPress(Buttons.LeftThumbstickUp, controllingPlayer, out playerIndex);
+               IsNewButtonPress(Buttons.LeftThumbstickUp, controllingPlayer, out playerIndex) ||
+               IsMouseWheelScrolledUp;
     }
 
 
@@ -301,7 +311,8 @@ public class InputState
 
         return IsNewKeyPress(Keys.Down, controllingPlayer, out playerIndex) ||
                IsNewButtonPress(Buttons.DPadDown, controllingPlayer, out playerIndex) ||
-               IsNewButtonPress(Buttons.LeftThumbstickDown, controllingPlayer, out playerIndex);
+               IsNewButtonPress(Buttons.LeftThumbstickDown, controllingPlayer, out playerIndex) ||
+               IsMouseWheelScrolledDown;
     }
 
 
