@@ -214,19 +214,19 @@ jobs:
         if: runner.os != 'Windows' && runner.environment == 'github-hosted'
 
       - name: Download tests-tools-${{ matrix.platform }}
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: tests-tools-${{ matrix.platform }}
           path: tests-tools
 
       - name: Download tests-desktopgl-${{ matrix.platform }}
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: tests-desktopgl-${{ matrix.platform }}
           path: tests-desktopgl
           
       - name: Download tests-windowsdx-${{ matrix.platform }}
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: tests-windowsdx-${{ matrix.platform }}
           path: tests-windowsdx
