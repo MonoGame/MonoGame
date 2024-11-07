@@ -138,29 +138,46 @@ public class InputState
             touchCount = 3;
         }
 
-        // Update the cursor location by listening for left thumbstick input on
-        // the GamePad and direction key input on the Keyboard, making sure to
-        // keep the cursor inside the screen boundary
-        /* TODO float elapsedTime = (float)gameTime.ElapsedGameTime.TotalSeconds;
-        CursorLocation.X += CurrentGamePadState.ThumbSticks.Left.X * elapsedTime * cursorMoveSpeed;
-        CursorLocation.Y -= CurrentGamePadState.ThumbSticks.Left.Y * elapsedTime * cursorMoveSpeed;
+        if (CurrentMouseState.ScrollWheelValue != LastMouseState.ScrollWheelValue)
+        {
+            int scrollWheelDelta = CurrentMouseState.ScrollWheelValue - LastMouseState.ScrollWheelValue;
 
-        if (CurrentKeyboardState.IsKeyDown(Keys.Up))
+            // Handle the scroll wheel event based on the delta
+            if (scrollWheelDelta > 0)
+            {
+                // Mouse wheel scrolled up
+                // Do something, like zoom in or scroll up
+            }
+            else if (scrollWheelDelta < 0)
+            {
+                // Mouse wheel scrolled down
+                // Do something, like zoom out or scroll down
+            }
+        }
+
+        // Update the cursor location by listening for left thumbstick input on
+        // the 1st GamePad and direction key input on the Keyboard, making sure to
+        // keep the cursor inside the screen boundary
+        float elapsedTime = (float)gameTime.ElapsedGameTime.TotalSeconds;
+        CursorLocation.X += CurrentGamePadStates[0].ThumbSticks.Left.X * elapsedTime * cursorMoveSpeed;
+        CursorLocation.Y -= CurrentGamePadStates[0].ThumbSticks.Left.Y * elapsedTime * cursorMoveSpeed;
+
+        if (CurrentKeyboardStates[0].IsKeyDown(Keys.Up))
         {
             CursorLocation.Y -= elapsedTime * cursorMoveSpeed;
         }
-        if (CurrentKeyboardState.IsKeyDown(Keys.Down))
+        if (CurrentKeyboardStates[0].IsKeyDown(Keys.Down))
         {
             CursorLocation.Y += elapsedTime * cursorMoveSpeed;
         }
-        if (CurrentKeyboardState.IsKeyDown(Keys.Left))
+        if (CurrentKeyboardStates[0].IsKeyDown(Keys.Left))
         {
             CursorLocation.X -= elapsedTime * cursorMoveSpeed;
         }
-        if (CurrentKeyboardState.IsKeyDown(Keys.Right))
+        if (CurrentKeyboardStates[0].IsKeyDown(Keys.Right))
         {
             CursorLocation.X += elapsedTime * cursorMoveSpeed;
-        } */
+        }
 
         CursorLocation.X = MathHelper.Clamp(CursorLocation.X, 0f, viewport.Width);
         CursorLocation.Y = MathHelper.Clamp(CursorLocation.Y, 0f, viewport.Height);
