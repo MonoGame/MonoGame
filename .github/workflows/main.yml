@@ -171,14 +171,20 @@ jobs:
         include:
           - os: windows
             platform: windows
+            shell: cmd
           - os: macos
             platform: macos
+            shell: bash
           - os: ubuntu-latest
             platform: linux
+            shell: bash
             filter: --where="Category != Audio"
           # - os: linux
           #   platform: linux
       fail-fast: false
+    defaults:
+      run:
+        shell: ${{ matrix.shell }}
     steps:
       - name: Clone repository
         uses: actions/checkout@v4
@@ -243,7 +249,6 @@ jobs:
           CI: true
 
       - name: Run DirectX Tests
-        shell: cmd
         run: dotnet MonoGame.Tests.dll
         env:
           CI: true
