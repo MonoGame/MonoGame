@@ -8,6 +8,7 @@
   <PropertyGroup>
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <ApplicationIcon>../___SafeGameName___.Core/Content/Icon.ico</ApplicationIcon>
+    <AssemblyName>___SafeGameName___</AssemblyName>
   </PropertyGroup>
   <ItemGroup>
     <MonoGameContentReference Include="..\___SafeGameName___.Core\Content\___SafeGameName___.mgcb">

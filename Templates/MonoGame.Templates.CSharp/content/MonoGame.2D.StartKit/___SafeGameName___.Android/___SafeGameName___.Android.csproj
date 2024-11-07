@@ -6,6 +6,7 @@
     <ApplicationId>com.companyname.___SafeGameName___</ApplicationId>
     <ApplicationVersion>1</ApplicationVersion>
     <ApplicationDisplayVersion>1.0</ApplicationDisplayVersion>
+    <AssemblyName>___SafeGameName___</AssemblyName>
   </PropertyGroup>
   <ItemGroup>
     <AndroidResource Include="Resources\Drawable\Splash.png" />
