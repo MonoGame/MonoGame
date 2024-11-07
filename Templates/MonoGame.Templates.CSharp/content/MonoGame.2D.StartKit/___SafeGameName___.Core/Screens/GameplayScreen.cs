@@ -27,9 +27,6 @@ class GameplayScreen : GameScreen
     float pauseAlpha;
 
     private SpriteBatch spriteBatch;
-    Vector2 baseScreenSize = new Vector2(800, 480);
-    private Matrix globalTransformation;
-    int backbufferWidth, backbufferHeight;
 
     // Global content.
     private SpriteFont hudFont;
@@ -79,6 +76,8 @@ class GameplayScreen : GameScreen
     /// </summary>
     public override void LoadContent()
     {
+        base.LoadContent();
+
         if (content == null)
             content = new ContentManager(ScreenManager.Game.Services, "Content");
 
@@ -87,9 +86,7 @@ class GameplayScreen : GameScreen
         // Load fonts
         hudFont = content.Load<SpriteFont>("Fonts/Hud");
 
-        ScalePresentationArea();
-
-        virtualGamePad = new VirtualGamePad(baseScreenSize, globalTransformation, content.Load<Texture2D>("Sprites/VirtualControlArrow"));
+        virtualGamePad = new VirtualGamePad(BaseScreenSize, GlobalTransformation, content.Load<Texture2D>("Sprites/VirtualControlArrow"));
 
         //Known issue that you get exceptions if you use Media PLayer while connected to your PC
         //See http://social.msdn.microsoft.com/Forums/en/windowsphone7series/thread/c8a243d2-d360-46b1-96bd-62b1ef268c66
@@ -116,18 +113,6 @@ class GameplayScreen : GameScreen
         // timing mechanism that we have just finished a very long frame, and that
         // it should not try to catch up.
         ScreenManager.Game.ResetElapsedTime();
-    }
-
-    public void ScalePresentationArea()
-    {
-        //Work out how much we need to scale our graphics to fill the screen
-        backbufferWidth = ScreenManager.GraphicsDevice.PresentationParameters.BackBufferWidth;
-        backbufferHeight = ScreenManager.GraphicsDevice.PresentationParameters.BackBufferHeight;
-        float horScaling = backbufferWidth / baseScreenSize.X;
-        float verScaling = backbufferHeight / baseScreenSize.Y;
-        Vector3 screenScalingFactor = new Vector3(horScaling, verScaling, 1);
-        globalTransformation = Matrix.CreateScale(screenScalingFactor);
-        System.Diagnostics.Debug.WriteLine("Screen Size - Width[" + ScreenManager.GraphicsDevice.PresentationParameters.BackBufferWidth + "] Height [" + ScreenManager.GraphicsDevice.PresentationParameters.BackBufferHeight + "]");
     }
 
     private void LoadNextLevel()
@@ -188,22 +173,17 @@ class GameplayScreen : GameScreen
         else
             pauseAlpha = Math.Max(pauseAlpha - 1f / 32, 0);
 
+        level.Paused = !IsActive;
+
+        // update our level, passing down the GameTime along with all of our input states
+        level.Update(gameTime,
+            keyboardState,
+            gamePadState,
+            accelerometerState,
+            ScreenManager.Game.Window.CurrentOrientation);
+
         if (IsActive)
         {
-            //Confirm the screen has not been resized by the user
-            if (backbufferHeight != ScreenManager.GraphicsDevice.PresentationParameters.BackBufferHeight ||
-            backbufferWidth != ScreenManager.GraphicsDevice.PresentationParameters.BackBufferWidth)
-            {
-                ScalePresentationArea();
-            }
-
-            // update our level, passing down the GameTime along with all of our input states
-            level.Update(gameTime,
-                keyboardState,
-                gamePadState,
-                accelerometerState,
-                ScreenManager.Game.Window.CurrentOrientation);
-
             if (level.Player.Velocity != Vector2.Zero)
                 virtualGamePad.NotifyPlayerIsMoving();
 
@@ -271,11 +251,9 @@ class GameplayScreen : GameScreen
         if (input.IsPauseGame(ControllingPlayer) || gamePadDisconnected)
         {
             ScreenManager.AddScreen(new PauseScreen(), ControllingPlayer);
-            level.Paused = true;
         }
         else
         {
-            level.Paused = false;
             keyboardState = input.CurrentKeyboardStates[playerIndex];
             gamePadState = virtualGamePad.GetState(touchState, input.CurrentGamePadStates[playerIndex]);
 
@@ -337,7 +315,7 @@ class GameplayScreen : GameScreen
         // Our player and enemy are both actually just text strings.
         SpriteBatch spriteBatch = ScreenManager.SpriteBatch;
 
-        spriteBatch.Begin(SpriteSortMode.Immediate, null, null, null, null, null, globalTransformation);
+        spriteBatch.Begin(SpriteSortMode.Immediate, null, null, null, null, null, GlobalTransformation);
 
         level.Draw(gameTime, spriteBatch);
 
@@ -363,7 +341,7 @@ class GameplayScreen : GameScreen
         //Vector2 center = new Vector2(titleSafeArea.X + titleSafeArea.Width / 2.0f,
         //                             titleSafeArea.Y + titleSafeArea.Height / 2.0f);
 
-        Vector2 center = new Vector2(baseScreenSize.X / 2, baseScreenSize.Y / 2);
+        Vector2 center = new Vector2(BaseScreenSize.X / 2, BaseScreenSize.Y / 2);
 
         // Draw time taken. Uses modulo division to cause blinking when the
         // player is running out of time.
@@ -385,12 +363,12 @@ class GameplayScreen : GameScreen
         // Draw score
         drawableString = Resources.Score + level.Score.ToString();
         var scoreDimensions = hudFont.MeasureString(drawableString);
-        DrawShadowedString(hudFont, drawableString, hudLocation + new Vector2(hudLocation.X + backbufferWidth - scoreDimensions.X - textEdgeSpacing, textEdgeSpacing), Color.Yellow);
+        DrawShadowedString(hudFont, drawableString, hudLocation + new Vector2(hudLocation.X + BackbufferWidth - scoreDimensions.X - textEdgeSpacing, textEdgeSpacing), Color.Yellow);
 
         if (touchState.IsConnected)
             virtualGamePad.Draw(spriteBatch);
 
-        spriteBatch.Draw(backpack, new Vector2((backbufferWidth - backpack.Width) / 2, textEdgeSpacing), Color.White);
+        spriteBatch.Draw(backpack, new Vector2((BackbufferWidth - backpack.Width) / 2, textEdgeSpacing), Color.White);
     }
 
     private void DrawShadowedString(SpriteFont font, string value, Vector2 position, Color color)

@@ -1,20 +1,8 @@
-﻿#region File Description
-//-----------------------------------------------------------------------------
-// GameScreen.cs
-//
-// Microsoft XNA Community Game Platform
-// Copyright (C) Microsoft Corporation. All rights reserved.
-//-----------------------------------------------------------------------------
-#endregion
-
-#region Using Statements
-using System;
+﻿using ___SafeGameName___.ScreenManagers;
+using GameStateManagement.Inputs;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input.Touch;
-using System.IO;
-using GameStateManagement.Inputs;
-using ___SafeGameName___.ScreenManagers;
-#endregion
+using System;
 
 namespace ___SafeGameName___.Screens;
 
@@ -27,8 +15,10 @@ namespace ___SafeGameName___.Screens;
 /// </summary>
 public abstract class GameScreen
 {
-    #region Properties
-
+    Vector2 baseScreenSize = new Vector2(800, 480);
+    private Matrix globalTransformation;
+    int backbufferWidth;
+    int backbufferHeight;
 
     /// <summary>
     /// Normally when one screen is brought up over the top of another,
@@ -195,29 +185,26 @@ public abstract class GameScreen
         }
     }
 
+    public int BackbufferWidth { get => backbufferWidth; set => backbufferWidth = value; }
+    public int BackbufferHeight { get => backbufferHeight; set => backbufferHeight = value; }
+    public Vector2 BaseScreenSize { get => baseScreenSize; set => baseScreenSize = value; }
+    public Matrix GlobalTransformation { get => globalTransformation; set => globalTransformation = value; }
+
     GestureType enabledGestures = GestureType.None;
 
-    #endregion
-
-    #region Initialization
-
-
     /// <summary>
-    /// Load graphics content for the screen.
+    /// Load graphics content for the screen, but 1st scale the presentation area.
     /// </summary>
-    public virtual void LoadContent() { }
+    public virtual void LoadContent()
+    {
+        ScalePresentationArea();
+    }
 
 
     /// <summary>
     /// Unload content for the screen.
     /// </summary>
     public virtual void UnloadContent() { }
-
-
-    #endregion
-
-    #region Update and Draw
-
 
     /// <summary>
     /// Allows the screen to run logic, such as updating the transition position.
@@ -269,6 +256,13 @@ public abstract class GameScreen
                 screenState = ScreenState.Active;
             }
         }
+
+        //Confirm the screen has not been resized by the user
+        if (BackbufferHeight != ScreenManager.GraphicsDevice.PresentationParameters.BackBufferHeight ||
+        BackbufferWidth != ScreenManager.GraphicsDevice.PresentationParameters.BackBufferWidth)
+        {
+            ScalePresentationArea();
+        }
     }
 
 
@@ -315,12 +309,6 @@ public abstract class GameScreen
     /// </summary>
     public virtual void Draw(GameTime gameTime) { }
 
-
-    #endregion
-
-    #region Public Methods
-
-
     /// <summary>
     /// Tells the screen to go away. Unlike ScreenManager.RemoveScreen, which
     /// instantly kills the screen, this method respects the transition timings
@@ -340,6 +328,15 @@ public abstract class GameScreen
         }
     }
 
-
-    #endregion
+    public void ScalePresentationArea()
+    {
+        //Work out how much we need to scale our graphics to fill the screen
+        backbufferWidth = ScreenManager.GraphicsDevice.PresentationParameters.BackBufferWidth;
+        backbufferHeight = ScreenManager.GraphicsDevice.PresentationParameters.BackBufferHeight;
+        float horScaling = backbufferWidth / baseScreenSize.X;
+        float verScaling = backbufferHeight / baseScreenSize.Y;
+        Vector3 screenScalingFactor = new Vector3(horScaling, verScaling, 1);
+        globalTransformation = Matrix.CreateScale(screenScalingFactor);
+        System.Diagnostics.Debug.WriteLine("Screen Size - Width[" + ScreenManager.GraphicsDevice.PresentationParameters.BackBufferWidth + "] Height [" + ScreenManager.GraphicsDevice.PresentationParameters.BackBufferHeight + "]");
+    }
 }

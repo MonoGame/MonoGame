@@ -185,7 +185,7 @@ class MainMenuScreen : MenuScreen
     {
         SpriteBatch spriteBatch = ScreenManager.SpriteBatch;
 
-        spriteBatch.Begin();
+        spriteBatch.Begin(SpriteSortMode.Immediate, null, null, null, null, null, GlobalTransformation);
 
         level.Draw(gameTime, spriteBatch);
 
