@@ -60,7 +60,7 @@ class MessageBoxScreen : GameScreen
     /// </summary>
     public MessageBoxScreen(string message, bool includeUsageText, TimeSpan toastDuration, bool toastMessage = false)
     {
-        string usageText = $"{Environment.NewLine}{Environment.NewLine}{Resources.YesButtonText}{Environment.NewLine}{Resources.NoButtonText}";
+        string usageText = $"{Environment.NewLine}{Environment.NewLine}{Resources.YesButtonHelp}{Environment.NewLine}{Resources.NoButtonHelp}";
 
         if (includeUsageText && !toastMessage)
             this.message = message + usageText;

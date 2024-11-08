@@ -190,10 +190,10 @@
     <value>About</value>
   </data>
   <data name="NoButtonText" xml:space="preserve">
-    <value>No = B button, Esc</value>
+    <value>No</value>
   </data>
   <data name="YesButtonText" xml:space="preserve">
-    <value>Yes = A Button, Space, Enter</value>
+    <value>Yes</value>
   </data>
   <data name="DisplayMode" xml:space="preserve">
     <value>Display Mode : {0}</value>
@@ -208,7 +208,7 @@
     <value>Language: </value>
   </data>
   <data name="ParticleEffect" xml:space="preserve">
-    <value>Particle Effect:</value>
+    <value>Particle Effect: </value>
   </data>
   <data name="LetsGo" xml:space="preserve">
     <value>Let's GO!!!!</value>
@@ -245,5 +245,14 @@
   </data>
   <data name="NewHighScore" xml:space="preserve">
     <value>CONGRATULATIONS!! You set a new high score.</value>
+  </data>
+  <data name="YesButtonHelp" xml:space="preserve">
+    <value>Yes = A Button, Space, Enter</value>
+  </data>
+  <data name="NoButtonHelp" xml:space="preserve">
+    <value>No = B button, Esc</value>
+  </data>
+  <data name="ShowVirtualGamePad" xml:space="preserve">
+    <value>Show Virtual GamePad: </value>
   </data>
 </root>

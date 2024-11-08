@@ -304,7 +304,7 @@ namespace ___SafeGameName___.Core.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to CONGRATULATIONS!! You set a new fastest time..
+        ///   Looks up a localized string similar to CONGRATULATIONS!! You set a new high score..
         /// </summary>
         internal static string NewHighScore {
             get {
@@ -315,6 +315,15 @@ namespace ___SafeGameName___.Core.Localization {
         /// <summary>
         ///   Looks up a localized string similar to No = B button, Esc.
         /// </summary>
+        internal static string NoButtonHelp {
+            get {
+                return ResourceManager.GetString("NoButtonHelp", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to No.
+        /// </summary>
         internal static string NoButtonText {
             get {
                 return ResourceManager.GetString("NoButtonText", resourceCulture);
@@ -322,7 +331,7 @@ namespace ___SafeGameName___.Core.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Particle Effect:.
+        ///   Looks up a localized string similar to Particle Effect: .
         /// </summary>
         internal static string ParticleEffect {
             get {
@@ -394,6 +403,15 @@ namespace ___SafeGameName___.Core.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Show Virtual GamePad: .
+        /// </summary>
+        internal static string ShowVirtualGamePad {
+            get {
+                return ResourceManager.GetString("ShowVirtualGamePad", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to TIME: .
         /// </summary>
         internal static string Time {
@@ -431,6 +449,15 @@ namespace ___SafeGameName___.Core.Localization {
         
         /// <summary>
         ///   Looks up a localized string similar to Yes = A Button, Space, Enter.
+        /// </summary>
+        internal static string YesButtonHelp {
+            get {
+                return ResourceManager.GetString("YesButtonHelp", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Yes.
         /// </summary>
         internal static string YesButtonText {
             get {

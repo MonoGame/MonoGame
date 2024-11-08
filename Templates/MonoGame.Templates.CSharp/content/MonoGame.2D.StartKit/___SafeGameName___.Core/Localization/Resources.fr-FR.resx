@@ -246,4 +246,7 @@
   <data name="NewHighScore" xml:space="preserve">
     <value>FÉLICITATIONS !! Vous avez établi un nouveau record.</value>
   </data>
+  <data name="ShowVirtualGamePad" xml:space="preserve">
+    <value>Afficher le GamePad virtuel: </value>
+  </data>
 </root>
