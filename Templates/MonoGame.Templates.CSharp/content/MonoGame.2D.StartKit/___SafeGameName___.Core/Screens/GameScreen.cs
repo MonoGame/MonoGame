@@ -15,11 +15,6 @@ namespace ___SafeGameName___.Screens;
 /// </summary>
 public abstract class GameScreen
 {
-    Vector2 baseScreenSize = new Vector2(800, 480);
-    private Matrix globalTransformation;
-    int backbufferWidth;
-    int backbufferHeight;
-
     /// <summary>
     /// Normally when one screen is brought up over the top of another,
     /// the first screen will transition off to make room for the new
@@ -185,11 +180,6 @@ public abstract class GameScreen
         }
     }
 
-    public int BackbufferWidth { get => backbufferWidth; set => backbufferWidth = value; }
-    public int BackbufferHeight { get => backbufferHeight; set => backbufferHeight = value; }
-    public Vector2 BaseScreenSize { get => baseScreenSize; set => baseScreenSize = value; }
-    public Matrix GlobalTransformation { get => globalTransformation; set => globalTransformation = value; }
-
     GestureType enabledGestures = GestureType.None;
 
     /// <summary>
@@ -197,7 +187,7 @@ public abstract class GameScreen
     /// </summary>
     public virtual void LoadContent()
     {
-        ScalePresentationArea();
+        ScreenManager.ScalePresentationArea();
     }
 
 
@@ -258,10 +248,10 @@ public abstract class GameScreen
         }
 
         //Confirm the screen has not been resized by the user
-        if (BackbufferHeight != ScreenManager.GraphicsDevice.PresentationParameters.BackBufferHeight ||
-        BackbufferWidth != ScreenManager.GraphicsDevice.PresentationParameters.BackBufferWidth)
+        if (ScreenManager.BackbufferHeight != ScreenManager.GraphicsDevice.PresentationParameters.BackBufferHeight
+            || ScreenManager.BackbufferWidth != ScreenManager.GraphicsDevice.PresentationParameters.BackBufferWidth)
         {
-            ScalePresentationArea();
+            ScreenManager.ScalePresentationArea();
         }
     }
 
@@ -326,17 +316,5 @@ public abstract class GameScreen
             // Otherwise flag that it should transition off and then exit.
             isExiting = true;
         }
-    }
-
-    public void ScalePresentationArea()
-    {
-        //Work out how much we need to scale our graphics to fill the screen
-        backbufferWidth = ScreenManager.GraphicsDevice.PresentationParameters.BackBufferWidth;
-        backbufferHeight = ScreenManager.GraphicsDevice.PresentationParameters.BackBufferHeight;
-        float horScaling = backbufferWidth / baseScreenSize.X;
-        float verScaling = backbufferHeight / baseScreenSize.Y;
-        Vector3 screenScalingFactor = new Vector3(horScaling, verScaling, 1);
-        globalTransformation = Matrix.CreateScale(screenScalingFactor);
-        System.Diagnostics.Debug.WriteLine("Screen Size - Width[" + ScreenManager.GraphicsDevice.PresentationParameters.BackBufferWidth + "] Height [" + ScreenManager.GraphicsDevice.PresentationParameters.BackBufferHeight + "]");
     }
 }

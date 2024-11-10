@@ -31,6 +31,18 @@ public class ScreenManager : DrawableGameComponent
 
     bool traceEnabled;
 
+    int backbufferWidth;
+    public int BackbufferWidth { get => backbufferWidth; set => backbufferWidth = value; }
+
+    int backbufferHeight;
+    public int BackbufferHeight { get => backbufferHeight; set => backbufferHeight = value; }
+
+    Vector2 baseScreenSize = new Vector2(800, 480);
+    public Vector2 BaseScreenSize { get => baseScreenSize; set => baseScreenSize = value; }
+
+    private Matrix globalTransformation;
+    public Matrix GlobalTransformation { get => globalTransformation; set => globalTransformation = value; }
+
     /// <summary>
     /// A default SpriteBatch shared by all the screens. This saves
     /// each screen having to bother creating their own local instance.
@@ -275,5 +287,17 @@ public class ScreenManager : DrawableGameComponent
                          Color.Black * alpha);
 
         spriteBatch.End();
+    }
+
+    public void ScalePresentationArea()
+    {
+        //Work out how much we need to scale our graphics to fill the screen
+        backbufferWidth = GraphicsDevice.PresentationParameters.BackBufferWidth;
+        backbufferHeight = GraphicsDevice.PresentationParameters.BackBufferHeight;
+        float horScaling = backbufferWidth / baseScreenSize.X;
+        float verScaling = backbufferHeight / baseScreenSize.Y;
+        Vector3 screenScalingFactor = new Vector3(horScaling, verScaling, 1);
+        globalTransformation = Matrix.CreateScale(screenScalingFactor);
+        System.Diagnostics.Debug.WriteLine("Screen Size - Width[" + backbufferWidth + "] Height [" + backbufferHeight + "]");
     }
 }

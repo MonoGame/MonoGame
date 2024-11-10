@@ -1,11 +1,11 @@
-using System;
-using System.Collections.Generic;
+using ___SafeGameName___.Core;
+using GameStateManagement.Inputs;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Input.Touch;
 using Microsoft.Xna.Framework.Input;
-using GameStateManagement.Inputs;
-using ___SafeGameName___.Core;
+using Microsoft.Xna.Framework.Input.Touch;
+using System;
+using System.Collections.Generic;
 
 namespace ___SafeGameName___.Screens;
 
@@ -202,7 +202,7 @@ abstract class MenuScreen : GameScreen
             MenuEntry menuEntry = menuEntries[i];
             
             // each entry is to be centered horizontally
-            position.X = ScreenManager.GraphicsDevice.Viewport.Width / 2 - menuEntry.GetWidth(this) / 2;
+            position.X = ScreenManager.BaseScreenSize.X / 2 - menuEntry.GetWidth(this) / 2;
 
             if (ScreenState == ScreenState.TransitionOn)
                 position.X -= transitionOffset * 256;
@@ -249,7 +249,7 @@ abstract class MenuScreen : GameScreen
         SpriteBatch spriteBatch = ScreenManager.SpriteBatch;
         SpriteFont font = ScreenManager.Font;
 
-        spriteBatch.Begin();
+        spriteBatch.Begin(SpriteSortMode.Deferred, null, null, null, null, null, ScreenManager.GlobalTransformation);
 
         // Draw each menu entry in turn.
         for (int i = 0; i < menuEntries.Count; i++)
@@ -267,7 +267,7 @@ abstract class MenuScreen : GameScreen
         float transitionOffset = (float)Math.Pow(TransitionPosition, 2);
 
         // Draw the menu title centered on the screen
-        Vector2 titlePosition = new Vector2(graphics.Viewport.Width / 2, 80);
+        Vector2 titlePosition = new Vector2(ScreenManager.BaseScreenSize.X / 2, 80);
         Vector2 titleOrigin = font.MeasureString(menuTitle) / 2;
         Color titleColor = menuTitleColor * TransitionAlpha;
         float titleScale = 1.25f;

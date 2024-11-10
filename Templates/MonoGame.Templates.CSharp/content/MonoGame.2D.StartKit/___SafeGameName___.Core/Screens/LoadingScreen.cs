@@ -119,16 +119,14 @@ class LoadingScreen : GameScreen
 
             string message = Resources.Loading;
 
-            // Center the text in the viewport.
-            Viewport viewport = ScreenManager.GraphicsDevice.Viewport;
-            Vector2 viewportSize = new Vector2(viewport.Width, viewport.Height);
+            // Center the text in the BaseScreenSize, the GlobalTransformation will scale everything for us.
             Vector2 textSize = font.MeasureString(message);
-            Vector2 textPosition = (viewportSize - textSize) / 2;
+            Vector2 textPosition = (ScreenManager.BaseScreenSize - textSize) / 2;
 
             Color color = Color.White * TransitionAlpha;
 
             // Draw the text.
-            spriteBatch.Begin();
+            spriteBatch.Begin(SpriteSortMode.Deferred, null, null, null, null, null, ScreenManager.GlobalTransformation);
             spriteBatch.DrawString(font, message, textPosition, color);
             spriteBatch.End();
         }

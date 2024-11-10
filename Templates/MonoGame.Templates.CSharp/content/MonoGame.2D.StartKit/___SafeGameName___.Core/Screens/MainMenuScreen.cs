@@ -185,7 +185,7 @@ class MainMenuScreen : MenuScreen
     {
         SpriteBatch spriteBatch = ScreenManager.SpriteBatch;
 
-        spriteBatch.Begin(SpriteSortMode.Immediate, null, null, null, null, null, GlobalTransformation);
+        spriteBatch.Begin(SpriteSortMode.Deferred, null, null, null, null, null, ScreenManager.GlobalTransformation);
 
         level.Draw(gameTime, spriteBatch);
 
@@ -202,8 +202,6 @@ class MainMenuScreen : MenuScreen
     private void DrawTutorialSteps(SpriteBatch spriteBatch)
     {
         SpriteFont font = ScreenManager.Font;
-        Viewport viewport = ScreenManager.GraphicsDevice.Viewport;
-        Vector2 viewportSize = new Vector2(viewport.Width, viewport.Height);
 
         // The background includes a border somewhat larger than the text itself.
         const int hPad = 32;

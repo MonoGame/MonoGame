@@ -1,17 +1,4 @@
-#region File Description
-//-----------------------------------------------------------------------------
-// PauseMenuScreen.cs
-//
-// Microsoft XNA Community Game Platform
-// Copyright (C) Microsoft Corporation. All rights reserved.
-//-----------------------------------------------------------------------------
-#endregion
-
-#region Using Statements
-using ___SafeGameName___.Core;
 using ___SafeGameName___.Core.Localization;
-using Microsoft.Xna.Framework;
-#endregion
 
 namespace ___SafeGameName___.Screens;
 
@@ -21,9 +8,6 @@ namespace ___SafeGameName___.Screens;
 /// </summary>
 class PauseScreen : MenuScreen
 {
-    #region Initialization
-
-
     /// <summary>
     /// Constructor.
     /// </summary>
@@ -42,12 +26,6 @@ class PauseScreen : MenuScreen
         MenuEntries.Add(resumeGameMenuEntry);
         MenuEntries.Add(quitGameMenuEntry);
     }
-
-
-    #endregion
-
-    #region Handle Input
-
 
     /// <summary>
     /// Event handler for when the Quit Game menu entry is selected.
@@ -74,7 +52,4 @@ class PauseScreen : MenuScreen
         LoadingScreen.Load(ScreenManager, false, null, new BackgroundScreen(),
                                                        new MainMenuScreen());
     }
-
-
-    #endregion
 }

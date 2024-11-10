@@ -1,19 +1,7 @@
-﻿#region File Description
-//-----------------------------------------------------------------------------
-// BackgroundScreen.cs
-//
-// Microsoft XNA Community Game Platform
-// Copyright (C) Microsoft Corporation. All rights reserved.
-//-----------------------------------------------------------------------------
-#endregion
-
-#region Using Statements
-using System;
-using Microsoft.Xna.Framework;
+﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
-using static System.TimeZoneInfo;
-#endregion
+using System;
 
 namespace ___SafeGameName___.Screens;
 
@@ -24,15 +12,8 @@ namespace ___SafeGameName___.Screens;
 /// </summary>
 class BackgroundScreen : GameScreen
 {
-    #region Fields
-
     ContentManager content;
     Texture2D backgroundTexture;
-
-    #endregion
-
-    #region Initialization
-
 
     /// <summary>
     /// Constructor.
@@ -68,12 +49,6 @@ class BackgroundScreen : GameScreen
         content.Unload();
     }
 
-
-    #endregion
-
-    #region Update and Draw
-
-
     /// <summary>
     /// Updates the background screen. Unlike most screens, this should not
     /// transition off even if it has been covered by another screen: it is
@@ -94,17 +69,13 @@ class BackgroundScreen : GameScreen
     public override void Draw(GameTime gameTime)
     {
         SpriteBatch spriteBatch = ScreenManager.SpriteBatch;
-        Viewport viewport = ScreenManager.GraphicsDevice.Viewport;
-        Rectangle fullscreen = new Rectangle(0, 0, viewport.Width, viewport.Height);
+        Rectangle fullscreen = new Rectangle(0, 0, (int)ScreenManager.BaseScreenSize.X, (int)ScreenManager.BaseScreenSize.Y);
 
-        spriteBatch.Begin();
+        spriteBatch.Begin(SpriteSortMode.Deferred, null, null, null, null, null, ScreenManager.GlobalTransformation);
 
         spriteBatch.Draw(backgroundTexture, fullscreen,
                          new Color(TransitionAlpha, TransitionAlpha, TransitionAlpha));
 
         spriteBatch.End();
     }
-
-
-    #endregion
 }

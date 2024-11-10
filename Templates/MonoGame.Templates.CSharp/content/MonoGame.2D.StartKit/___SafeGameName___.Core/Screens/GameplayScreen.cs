@@ -86,7 +86,7 @@ class GameplayScreen : GameScreen
         // Load fonts
         hudFont = content.Load<SpriteFont>("Fonts/Hud");
 
-        virtualGamePad = new VirtualGamePad(BaseScreenSize, GlobalTransformation, content.Load<Texture2D>("Sprites/VirtualControlArrow"));
+        virtualGamePad = new VirtualGamePad(ScreenManager.BaseScreenSize, ScreenManager.GlobalTransformation, content.Load<Texture2D>("Sprites/VirtualControlArrow"));
 
         //Known issue that you get exceptions if you use Media PLayer while connected to your PC
         //See http://social.msdn.microsoft.com/Forums/en/windowsphone7series/thread/c8a243d2-d360-46b1-96bd-62b1ef268c66
@@ -315,7 +315,7 @@ class GameplayScreen : GameScreen
         // Our player and enemy are both actually just text strings.
         SpriteBatch spriteBatch = ScreenManager.SpriteBatch;
 
-        spriteBatch.Begin(SpriteSortMode.Immediate, null, null, null, null, null, GlobalTransformation);
+        spriteBatch.Begin(SpriteSortMode.Deferred, null, null, null, null, null, ScreenManager.GlobalTransformation);
 
         level.Draw(gameTime, spriteBatch);
 
@@ -338,10 +338,6 @@ class GameplayScreen : GameScreen
     {
         Rectangle titleSafeArea = ScreenManager.GraphicsDevice.Viewport.TitleSafeArea;
         Vector2 hudLocation = new Vector2(titleSafeArea.X, titleSafeArea.Y);
-        //Vector2 center = new Vector2(titleSafeArea.X + titleSafeArea.Width / 2.0f,
-        //                             titleSafeArea.Y + titleSafeArea.Height / 2.0f);
-
-        Vector2 center = new Vector2(BaseScreenSize.X / 2, BaseScreenSize.Y / 2);
 
         // Draw time taken. Uses modulo division to cause blinking when the
         // player is running out of time.
@@ -363,12 +359,12 @@ class GameplayScreen : GameScreen
         // Draw score
         drawableString = Resources.Score + level.Score.ToString();
         var scoreDimensions = hudFont.MeasureString(drawableString);
-        DrawShadowedString(hudFont, drawableString, hudLocation + new Vector2(hudLocation.X + BackbufferWidth - scoreDimensions.X - textEdgeSpacing, textEdgeSpacing), Color.Yellow);
+        DrawShadowedString(hudFont, drawableString, hudLocation + new Vector2(hudLocation.X + ScreenManager.BaseScreenSize.X - scoreDimensions.X - textEdgeSpacing, textEdgeSpacing), Color.Yellow);
 
         if (touchState.IsConnected)
             virtualGamePad.Draw(spriteBatch);
 
-        spriteBatch.Draw(backpack, new Vector2((BackbufferWidth - backpack.Width) / 2, textEdgeSpacing), Color.White);
+        spriteBatch.Draw(backpack, new Vector2((ScreenManager.BaseScreenSize.X - backpack.Width) / 2, textEdgeSpacing), Color.White);
     }
 
     private void DrawShadowedString(SpriteFont font, string value, Vector2 position, Color color)
