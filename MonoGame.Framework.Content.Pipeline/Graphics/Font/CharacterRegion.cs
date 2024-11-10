@@ -24,7 +24,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
         public CharacterRegion(char start, char end)
         {
             if (start > end)
-                throw new ArgumentException();
+                throw new ArgumentException($"The start character '{start}' must not be greater than the end character '{end}'.");
 
             Start = start;
             End = end;
