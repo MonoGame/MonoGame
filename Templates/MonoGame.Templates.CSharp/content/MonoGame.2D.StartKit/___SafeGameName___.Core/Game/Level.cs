@@ -462,8 +462,9 @@ class Level : IDisposable
 
             if (!saved)
             {
+                // We only flag a high score, if it's a faster time and all gems were collected.
                 if (timeTaken < settingsManager.Settings.FastestTime
-                    || gemsCollected > settingsManager.Settings.GemsCollected)
+                    && gemsCollected == gemsCount)
                 {
                     newHighScore = true;
                 }
