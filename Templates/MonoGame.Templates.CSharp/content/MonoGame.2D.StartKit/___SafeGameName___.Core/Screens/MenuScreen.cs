@@ -65,8 +65,7 @@ abstract class MenuScreen : GameScreen
                 {
                     if (touch.State == TouchLocationState.Pressed)
                     {
-                        var touchLocation = touch.Position;
-                        TextSelectedCheck(touchLocation);
+                        TextSelectedCheck(input.CurrentCursorLocation);
                     }
                 }
             }
@@ -76,8 +75,7 @@ abstract class MenuScreen : GameScreen
             var mouseState = input.CurrentMouseState;
             if (mouseState.LeftButton == ButtonState.Pressed)
             {
-                var mouseLocation = mouseState.Position.ToVector2();
-                TextSelectedCheck(mouseLocation);
+                TextSelectedCheck(input.CurrentCursorLocation);
             }
         }
 

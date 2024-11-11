@@ -294,10 +294,12 @@ public class ScreenManager : DrawableGameComponent
         //Work out how much we need to scale our graphics to fill the screen
         backbufferWidth = GraphicsDevice.PresentationParameters.BackBufferWidth;
         backbufferHeight = GraphicsDevice.PresentationParameters.BackBufferHeight;
-        float horScaling = backbufferWidth / baseScreenSize.X;
-        float verScaling = backbufferHeight / baseScreenSize.Y;
-        Vector3 screenScalingFactor = new Vector3(horScaling, verScaling, 1);
+        float horizontalScalingFactor = backbufferWidth / baseScreenSize.X;
+        float verticalScalingFactor = backbufferHeight / baseScreenSize.Y;
+        Vector3 screenScalingFactor = new Vector3(horizontalScalingFactor, verticalScalingFactor, 1);
         globalTransformation = Matrix.CreateScale(screenScalingFactor);
         System.Diagnostics.Debug.WriteLine("Screen Size - Width[" + backbufferWidth + "] Height [" + backbufferHeight + "]");
+
+        inputState.UpdateScalingFactor(horizontalScalingFactor, verticalScalingFactor);
     }
 }

@@ -35,18 +35,31 @@ public class InputState
 
     public readonly List<GestureSample> Gestures = new List<GestureSample>();
 
-    public Vector2 CursorLocation;
-
     /// <summary>
     /// Cursor move speed in pixels per second
     /// </summary>
     private const float cursorMoveSpeed = 250.0f;
 
+    private Vector2 currentCursorLocation;
+    /// <summary>
+    /// Current location of our Cursor
+    /// </summary>
+    public Vector2 CurrentCursorLocation => currentCursorLocation;
+
     private bool isMouseWheelScrolledDown;
+    /// <summary>
+    /// Has the user scrolled the mouse wheel down?
+    /// </summary>
     public bool IsMouseWheelScrolledDown => isMouseWheelScrolledDown;
 
     private bool isMouseWheelScrolledUp;
+    /// <summary>
+    /// Has the user scrolled the mouse wheel up?
+    /// </summary>
     public bool IsMouseWheelScrolledUp => isMouseWheelScrolledUp;
+
+    private float horizontalScalingFactor = 1.0f;
+    private float verticalScalingFactor = 1.0f;
 
     /// <summary>
     /// Constructs a new input state.
@@ -118,7 +131,8 @@ public class InputState
             {
                 case TouchLocationState.Pressed:
                     touchCount++;
-                    CursorLocation = location.Position;
+                    currentCursorLocation.X = location.Position.X / horizontalScalingFactor;
+                    currentCursorLocation.Y = location.Position.Y / verticalScalingFactor;
                     break;
                 case TouchLocationState.Moved:
                     break;
@@ -129,8 +143,8 @@ public class InputState
 
         if (CurrentMouseState.LeftButton == ButtonState.Released && LastMouseState.LeftButton == ButtonState.Pressed)
         {
-            CursorLocation.X = CurrentMouseState.X;
-            CursorLocation.Y = CurrentMouseState.Y;
+            currentCursorLocation.X = CurrentMouseState.X / horizontalScalingFactor;
+            currentCursorLocation.Y = CurrentMouseState.Y / verticalScalingFactor;
             touchCount = 1;
         }
 
@@ -168,28 +182,28 @@ public class InputState
         // the 1st GamePad and direction key input on the Keyboard, making sure to
         // keep the cursor inside the screen boundary
         float elapsedTime = (float)gameTime.ElapsedGameTime.TotalSeconds;
-        CursorLocation.X += CurrentGamePadStates[0].ThumbSticks.Left.X * elapsedTime * cursorMoveSpeed;
-        CursorLocation.Y -= CurrentGamePadStates[0].ThumbSticks.Left.Y * elapsedTime * cursorMoveSpeed;
+        currentCursorLocation.X += CurrentGamePadStates[0].ThumbSticks.Left.X * elapsedTime * cursorMoveSpeed;
+        currentCursorLocation.Y -= CurrentGamePadStates[0].ThumbSticks.Left.Y * elapsedTime * cursorMoveSpeed;
 
         if (CurrentKeyboardStates[0].IsKeyDown(Keys.Up))
         {
-            CursorLocation.Y -= elapsedTime * cursorMoveSpeed;
+            currentCursorLocation.Y -= elapsedTime * cursorMoveSpeed;
         }
         if (CurrentKeyboardStates[0].IsKeyDown(Keys.Down))
         {
-            CursorLocation.Y += elapsedTime * cursorMoveSpeed;
+            currentCursorLocation.Y += elapsedTime * cursorMoveSpeed;
         }
         if (CurrentKeyboardStates[0].IsKeyDown(Keys.Left))
         {
-            CursorLocation.X -= elapsedTime * cursorMoveSpeed;
+            currentCursorLocation.X -= elapsedTime * cursorMoveSpeed;
         }
         if (CurrentKeyboardStates[0].IsKeyDown(Keys.Right))
         {
-            CursorLocation.X += elapsedTime * cursorMoveSpeed;
+            currentCursorLocation.X += elapsedTime * cursorMoveSpeed;
         }
 
-        CursorLocation.X = MathHelper.Clamp(CursorLocation.X, 0f, viewport.Width);
-        CursorLocation.Y = MathHelper.Clamp(CursorLocation.Y, 0f, viewport.Height);
+        currentCursorLocation.X = MathHelper.Clamp(currentCursorLocation.X, 0f, viewport.Width);
+        currentCursorLocation.Y = MathHelper.Clamp(currentCursorLocation.Y, 0f, viewport.Height);
     }
 
 
@@ -328,5 +342,11 @@ public class InputState
         return IsNewKeyPress(Keys.Escape, controllingPlayer, out playerIndex) ||
                IsNewButtonPress(Buttons.Back, controllingPlayer, out playerIndex) ||
                IsNewButtonPress(Buttons.Start, controllingPlayer, out playerIndex);
+    }
+
+    internal void UpdateScalingFactor(float horizontalScalingFactor, float verticalScalingFactor)
+    {
+        this.horizontalScalingFactor = horizontalScalingFactor;
+        this.verticalScalingFactor = verticalScalingFactor;
     }
 }
