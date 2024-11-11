@@ -152,7 +152,7 @@ class Player
     public void LoadContent()
     {
         // Load animated textures.
-        idleAnimation = new Animation(Level.Content.Load<Texture2D>("Sprites/Player/Idle"), 0.1f, true);
+        idleAnimation = new Animation(Level.Content.Load<Texture2D>("Sprites/Player/Idle"), 0.6f, true);
         runAnimation = new Animation(Level.Content.Load<Texture2D>("Sprites/Player/Run"), 0.1f, true);
         jumpAnimation = new Animation(Level.Content.Load<Texture2D>("Sprites/Player/Jump"), 0.1f, false);
         celebrateAnimation = new Animation(Level.Content.Load<Texture2D>("Sprites/Player/Celebrate"), 0.1f, false);
