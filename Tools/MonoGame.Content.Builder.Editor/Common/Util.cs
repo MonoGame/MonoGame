@@ -62,7 +62,8 @@ namespace MonoGame.Tools.Pipeline
         {
             var exe = command;
             var args = arguments;
-            if (command.EndsWith (".dll")) {
+            if (command.EndsWith (".dll"))
+            {
                 // we are referencing the dll directly. We need to call dotnet to host.
                 exe = Global.Unix ? "dotnet" : "dotnet.exe";
                 args = $"\"{command}\" {arguments}";

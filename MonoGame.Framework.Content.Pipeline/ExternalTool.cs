@@ -48,10 +48,11 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
             {
                 exe = Path.Combine(dotnetRoot, exe);
             }
-            if (Run(exe, $"tool {command} {toolName} --version {toolVersion} --tool-path .", out string _, out string _,  workingDirectory: path) != 0)
+            if (Run(exe, $"tool {command} {toolName} --version {toolVersion} --tool-path .", out string stdout, out string stderr,  workingDirectory: path) != 0)
             {
                 // install the latest
-                Run(exe, $"tool {command} {toolName} --tool-path .", out _, out _,  workingDirectory: path);
+                Debug.WriteLine ($"{command} returned {stdout} {stderr}. Trying backup path.");
+                Run(exe, $"tool {command} {toolName} --tool-path .", out stdout, out stderr,  workingDirectory: path);
             }
         }
 
