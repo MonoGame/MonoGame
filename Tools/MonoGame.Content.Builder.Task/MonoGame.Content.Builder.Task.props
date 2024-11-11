@@ -7,7 +7,7 @@
     <AutoRestoreMGCBTool Condition="'$(AutoRestoreMGCBTool)' == ''">true</AutoRestoreMGCBTool>
     <MGCBToolDirectory>$(MSBuildThisFileDirectory)dotnet-tools/</MGCBToolDirectory>
     <MGCBCommand Condition="'$(MGCBCommand)' == ''">mgcb</MGCBCommand>
-    <MonoGameVersion Condition="'$(MonoGameVersion)' == ''">3.8.1.1-develop</MonoGameVersion>
+    <MonoGameVersion Condition="'$(MonoGameVersion)' == ''">3.8.2.0</MonoGameVersion>
   </PropertyGroup>
 
 </Project>
