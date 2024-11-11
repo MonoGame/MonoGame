@@ -12,7 +12,7 @@ public sealed class BuildMGCBTask : FrostingTask<BuildContext>
         {
             context.ReplaceRegexInFiles(
                 "Tools/MonoGame.Content.Builder.Task/MonoGame.Content.Builder.Task.props",
-                @"<MonoGameVersion Condition=""'$(MonoGameVersion)' == ''"">([^\s]*)<\/MonoGameVersion>",
+                @"<MonoGameVersion Condition=""'\$\(MonoGameVersion\)' == ''"">([^\s]*)<\/MonoGameVersion>",
                 $"<MonoGameVersion Condition=\"'$(MonoGameVersion)' == ''\">{context.Version}</MonoGameVersion>",
                 RegexOptions.Singleline
             );
