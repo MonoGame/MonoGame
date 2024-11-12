@@ -185,6 +185,12 @@ jobs:
         run: wget -qO- https://monogame.net/downloads/net9_mgfxc_wine_setup.sh | bash
         if: runner.os != 'Windows' && runner.environment == 'github-hosted'
 
+      - name: Download Nuget
+        uses: actions/download-artifact@v3
+        with:
+          name: nuget-${{ matrix.platform }}
+          path: nuget
+
       - name: Download tests-tools-${{ matrix.platform }}
         uses: actions/download-artifact@v4
         with:
