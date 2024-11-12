@@ -345,6 +345,10 @@ namespace Microsoft.Xna.Framework.Content
             {
                 throw new ObjectDisposedException("ContentManager");
             }
+            if(Path.IsPathRooted(assetName))
+            {
+                throw new ContentLoadException("assetName '" + assetName + "' cannot be a rooted (absolute) path. Remove any leading drive letters (e.g. 'C:'), forward slashes or backslashes");
+            }
 
             T result = default(T);
 
