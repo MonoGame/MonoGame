@@ -168,13 +168,13 @@ public class InputState
             // Handle the scroll wheel event based on the delta
             if (scrollWheelDelta > 0)
             {
-                // Mouse wheel scrolled down
-                isMouseWheelScrolledDown = true;
+                // Mouse wheel scrolled up
+                isMouseWheelScrolledUp = true;
             }
             else if (scrollWheelDelta < 0)
             {
-                // Mouse wheel scrolled up
-                isMouseWheelScrolledUp = true;
+                // Mouse wheel scrolled down
+                isMouseWheelScrolledDown = true;
             }
         }
 
