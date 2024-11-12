@@ -9,7 +9,7 @@ namespace MonoGame.Tests.Content
     {
         [TestCase("C:\\image.png")]
         [TestCase("\\image.png")]
-        [TestCase("//image.png")]
+        [TestCase("/image.png")]
         public void ThrowExceptionIfAssetNameIsRootedPath(string assetName)
         {
             GameServiceContainer services = new GameServiceContainer();
