@@ -101,16 +101,6 @@
       <PackagePath>runtimes\linux-x64\native</PackagePath>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="..\ThirdParty\Dependencies\ffmpeg\Linux\x64\ffmpeg" Visible="false">
-      <Link>linux\ffmpeg</Link>
-      <PackagePath>runtimes\linux-x64\native\linux</PackagePath>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\ThirdParty\Dependencies\ffmpeg\Linux\x64\ffprobe" Visible="false">
-      <Link>linux\ffprobe</Link>
-      <PackagePath>runtimes\linux-x64\native\linux</PackagePath>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
     <Content Include="..\ThirdParty\Dependencies\FreeImage.NET\MacOS\libfreeimage.dylib" Visible="false">
       <Link>libFreeImage.dylib</Link>
       <PackagePath>runtimes\osx\native\libFreeImage.dylib</PackagePath>
@@ -123,25 +113,6 @@
     </Content>
     <Content Include="..\ThirdParty\Dependencies\SharpFont\x64\libpng16.16.dylib" Visible="false">
       <PackagePath>runtimes\osx\native</PackagePath>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\ThirdParty\Dependencies\ffmpeg\MacOS\ffmpeg" Visible="false">
-      <Link>osx\ffmpeg</Link>
-      <PackagePath>runtimes\osx\native\osx</PackagePath>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\ThirdParty\Dependencies\ffmpeg\MacOS\ffprobe" Visible="false">
-      <Link>osx\ffprobe</Link>
-      <PackagePath>runtimes\osx\native\osx</PackagePath>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-
-    <Content Include="..\ThirdParty\Dependencies\ffmpeg\Windows\x64\ffmpeg.exe" Visible="false">
-      <PackagePath>runtimes\win-x64\native</PackagePath>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\ThirdParty\Dependencies\ffmpeg\Windows\x64\ffprobe.exe" Visible="false">
-      <PackagePath>runtimes\win-x64\native</PackagePath>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="..\ThirdParty\Dependencies\FreeImage.NET\Windows\FreeImage.dll" Visible="false">

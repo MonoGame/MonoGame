@@ -23,6 +23,10 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
         private static string CrunchVersion = "1.0.4.2";
         public static string BasisU = "mgcb-basisu";
         private static string BasisUVersion = "1.16.4.2";
+        public static string FFmpeg = "mgcb-ffmpeg";
+        private static string FFmpegVersion = "7.0.0.6";
+        public static string FFprobe = "mgcb-ffprobe";
+        private static string FFprobeVersion = "7.0.0.6";
 
         static ExternalTool()
         {
@@ -69,6 +73,8 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
                 return;
             RestoreDotnetTool("install", Crunch, CrunchVersion, path);
             RestoreDotnetTool("install", BasisU, BasisUVersion, path);
+            RestoreDotnetTool("install", FFmpeg, FFmpegVersion, path);
+            RestoreDotnetTool("install", FFprobe, FFprobeVersion, path);
             File.WriteAllText(versionFile, version);
         }
 
