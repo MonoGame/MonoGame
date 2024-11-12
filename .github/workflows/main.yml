@@ -61,7 +61,7 @@ jobs:
                     fc-match Arial
                     wget -qO- https://monogame.net/downloads/net9_mgfxc_wine_setup.sh | bash
               elif [ "$RUNNER_OS" == "Windows" ]; then
-                    dotnet.exe workload install android ios macos --version 8.0.402.0
+                    dotnet.exe workload install android
               else
                     dotnet workload install android macos ios --version 8.0.402.0
                     brew install wine-stable p7zip freeimage freetype

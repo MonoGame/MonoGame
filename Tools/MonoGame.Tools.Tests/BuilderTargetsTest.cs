@@ -57,7 +57,8 @@ namespace MonoGame.Tests.ContentPipeline
                 process.BeginOutputReadLine();
                 process.BeginErrorReadLine();
                 if (!process.WaitForExit(60000)) {// wait for 60 seconds
-                    process.Kill ();
+                    process.Kill();
+                    process.WaitForExit();
                 }
                 return process.ExitCode == 0;
             }
