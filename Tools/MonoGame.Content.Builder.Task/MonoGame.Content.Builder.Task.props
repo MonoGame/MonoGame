@@ -5,7 +5,8 @@
     <EnableMGCBItems Condition="'$(EnableMGCBItems)' == ''">true</EnableMGCBItems>
     <!-- Allow users the ability to disble tool restoration if needed -->
     <AutoRestoreMGCBTool Condition="'$(AutoRestoreMGCBTool)' == ''">true</AutoRestoreMGCBTool>
-    <MGCBToolDirectory>$(MSBuildThisFileDirectory)dotnet-tools/</MGCBToolDirectory>
+    <MGCBToolDirectory Condition="'$(MGCBToolDirectory)' == ''">$(MSBuildThisFileDirectory)dotnet-tools/</MGCBToolDirectory>
+    <MGCBToolDirectory Condition="'$(MGCBToolDirectory)' != '' And !HasTrailingSlash('$(MGCBToolDirectory)')">$(MGCBToolDirectory)/</MGCBToolDirectory>
     <MGCBCommand Condition="'$(MGCBCommand)' == ''">mgcb</MGCBCommand>
     <MonoGameVersion Condition="'$(MonoGameVersion)' == ''">3.8.2.0</MonoGameVersion>
   </PropertyGroup>
