@@ -167,7 +167,7 @@ public class ScreenManager : DrawableGameComponent
                 // give it a chance to handle input.
                 if (!otherScreenHasFocus)
                 {
-                    screen.HandleInput(inputState, gameTime);
+                    screen.HandleInput(gameTime, inputState);
 
                     otherScreenHasFocus = true;
                 }

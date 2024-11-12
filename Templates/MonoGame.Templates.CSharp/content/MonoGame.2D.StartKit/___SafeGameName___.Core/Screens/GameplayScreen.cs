@@ -46,7 +46,6 @@ class GameplayScreen : GameScreen
     private TouchCollection touchState;
     private AccelerometerState accelerometerState;
 
-    private VirtualGamePad virtualGamePad;
     private Texture2D backpack;
     private ParticleManager particleManager;
     private SettingsManager<___SafeGameName___Leaderboard> leaderboardManager;
@@ -86,20 +85,8 @@ class GameplayScreen : GameScreen
         // Load fonts
         hudFont = content.Load<SpriteFont>("Fonts/Hud");
 
-        virtualGamePad = new VirtualGamePad(ScreenManager.BaseScreenSize, ScreenManager.GlobalTransformation, content.Load<Texture2D>("Sprites/VirtualControlArrow"));
-
-        //Known issue that you get exceptions if you use Media PLayer while connected to your PC
-        //See http://social.msdn.microsoft.com/Forums/en/windowsphone7series/thread/c8a243d2-d360-46b1-96bd-62b1ef268c66
-        //Which means its impossible to test this from VS.
-        //So we have to catch the exception and throw it away
-        try
-        {
-            MediaPlayer.IsRepeating = true;
-            MediaPlayer.Play(content.Load<Song>("Sounds/Music"));
-        }
-        catch
-        {
-        }
+        MediaPlayer.IsRepeating = true;
+        MediaPlayer.Play(content.Load<Song>("Sounds/Music"));
 
         particleManager ??= ScreenManager.Game.Services.GetService<ParticleManager>();
 
@@ -184,9 +171,6 @@ class GameplayScreen : GameScreen
 
         if (IsActive)
         {
-            if (level.Player.Velocity != Vector2.Zero)
-                virtualGamePad.NotifyPlayerIsMoving();
-
             switch (endOfLevelMessgeState)
             {
                 case EndOfLevelMessageState.NotShowing:
@@ -234,9 +218,9 @@ class GameplayScreen : GameScreen
     /// Lets the game respond to player input. Unlike the Update method,
     /// this will only be called when the gameplay screen is active.
     /// </summary>
-    public override void HandleInput(InputState input, GameTime gameTime)
+    public override void HandleInput(GameTime gameTime, InputState inputState)
     {
-        ArgumentNullException.ThrowIfNull(input);
+        ArgumentNullException.ThrowIfNull(inputState);
 
         // Get all of our input states for the active player profile.
         int playerIndex = (int)ControllingPlayer.Value;
@@ -246,20 +230,20 @@ class GameplayScreen : GameScreen
         // whether a gamepad was ever plugged in, because we don't want to pause
         // on PC if they are playing with a keyboard and have no gamepad at all!
         bool gamePadDisconnected = !gamePadState.IsConnected &&
-                                   input.GamePadWasConnected[playerIndex];
+                                   inputState.GamePadWasConnected[playerIndex];
 
-        if (input.IsPauseGame(ControllingPlayer) || gamePadDisconnected)
+        if (inputState.IsPauseGame(ControllingPlayer) || gamePadDisconnected)
         {
             ScreenManager.AddScreen(new PauseScreen(), ControllingPlayer);
         }
         else
         {
-            keyboardState = input.CurrentKeyboardStates[playerIndex];
-            gamePadState = virtualGamePad.GetState(touchState, input.CurrentGamePadStates[playerIndex]);
+            keyboardState = inputState.CurrentKeyboardStates[playerIndex];
+            gamePadState = inputState.CurrentGamePadStates[playerIndex];
 
-            touchState = input.CurrentTouchState;
+            touchState = inputState.CurrentTouchState;
 
-            accelerometerState = input.CurrentAccelerometerState;
+            accelerometerState = inputState.CurrentAccelerometerState;
 
             // Exit the game when back is pressed.
             if (gamePadState.Buttons.Back == ButtonState.Pressed)
@@ -298,8 +282,6 @@ class GameplayScreen : GameScreen
 
                 wasContinuePressed = false;
             }
-
-            virtualGamePad.Update(gameTime);
         }
     }
 
@@ -360,9 +342,6 @@ class GameplayScreen : GameScreen
         drawableString = Resources.Score + level.Score.ToString();
         var scoreDimensions = hudFont.MeasureString(drawableString);
         DrawShadowedString(hudFont, drawableString, hudLocation + new Vector2(hudLocation.X + ScreenManager.BaseScreenSize.X - scoreDimensions.X - textEdgeSpacing, textEdgeSpacing), Color.Yellow);
-
-        if (touchState.IsConnected)
-            virtualGamePad.Draw(spriteBatch);
 
         spriteBatch.Draw(backpack, new Vector2((ScreenManager.BaseScreenSize.X - backpack.Width) / 2, textEdgeSpacing), Color.White);
     }

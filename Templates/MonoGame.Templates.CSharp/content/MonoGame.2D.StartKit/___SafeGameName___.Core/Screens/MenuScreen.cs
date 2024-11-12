@@ -54,33 +54,37 @@ abstract class MenuScreen : GameScreen
     /// Responds to user input, changing the selected entry and accepting
     /// or cancelling the menu.
     /// </summary>
-    public override void HandleInput(InputState input, GameTime gameTime)
+    public override void HandleInput(GameTime gameTime, InputState inputState)
     {
         if (___SafeGameName___Game.IsMobile)
         {
-            var touchState = input.CurrentTouchState;
+            var touchState = inputState.CurrentTouchState;
             if (touchState.Count > 0)
             {
                 foreach (var touch in touchState)
                 {
                     if (touch.State == TouchLocationState.Pressed)
                     {
-                        TextSelectedCheck(input.CurrentCursorLocation);
+                        TextSelectedCheck(inputState.CurrentCursorLocation);
                     }
                 }
             }
         }
         else if (___SafeGameName___Game.IsDesktop)
         {
-            var mouseState = input.CurrentMouseState;
+            var mouseState = inputState.CurrentMouseState;
             if (mouseState.LeftButton == ButtonState.Pressed)
             {
-                TextSelectedCheck(input.CurrentCursorLocation);
+                TextSelectedCheck(inputState.CurrentCursorLocation);
+            }
+            else if (mouseState.MiddleButton == ButtonState.Pressed)
+            {
+                OnSelectEntry(selectedEntry, PlayerIndex.One);
             }
         }
 
         // Move to the previous menu entry?
-        if (input.IsMenuUp(ControllingPlayer))
+        if (inputState.IsMenuUp(ControllingPlayer))
         {
             selectedEntry--;
 
@@ -97,7 +101,7 @@ abstract class MenuScreen : GameScreen
         }
 
         // Move to the next menu entry?
-        if (input.IsMenuDown(ControllingPlayer))
+        if (inputState.IsMenuDown(ControllingPlayer))
         {
             selectedEntry++;
 
@@ -114,11 +118,11 @@ abstract class MenuScreen : GameScreen
         // OnSelectEntry and OnCancel, so they can tell which player triggered them.
         PlayerIndex playerIndex;
 
-        if (input.IsMenuSelect(ControllingPlayer, out playerIndex))
+        if (inputState.IsMenuSelect(ControllingPlayer, out playerIndex))
         {
             OnSelectEntry(selectedEntry, playerIndex);
         }
-        else if (input.IsMenuCancel(ControllingPlayer, out playerIndex))
+        else if (inputState.IsMenuCancel(ControllingPlayer, out playerIndex))
         {
             OnCancel(playerIndex);
         }

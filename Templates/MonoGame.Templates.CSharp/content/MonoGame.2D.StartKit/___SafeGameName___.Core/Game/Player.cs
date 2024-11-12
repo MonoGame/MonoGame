@@ -203,7 +203,7 @@ class Player
         AccelerometerState accelerometerState,
         DisplayOrientation displayOrientation)
     {
-        GetInput(keyboardState, gamePadState, accelerometerState, displayOrientation);
+        HandleInput(keyboardState, gamePadState, accelerometerState, displayOrientation);
 
         Move(gameTime);
     }
@@ -236,7 +236,7 @@ class Player
     /// <param name="gamePadState">Provides a snapshot of timing values.</param>
     /// <param name="accelerometerState">Provides a snapshot of timing values.</param>
     /// <param name="displayOrientation">Provides a snapshot of timing values.</param>
-    private void GetInput(
+    private void HandleInput(
         KeyboardState keyboardState,
         GamePadState gamePadState,
         AccelerometerState accelerometerState,
@@ -299,9 +299,19 @@ class Player
         var touchCollection = TouchPanel.GetState();
         foreach (var touch in touchCollection)
         {
-            if (touch.State == TouchLocationState.Pressed)
+            switch (touch.State)
             {
-                HandleClickInput(touch.Position);
+                case TouchLocationState.Invalid:
+                    break;
+                case TouchLocationState.Moved:
+                    break;
+                case TouchLocationState.Pressed:
+                    HandleClickInput(touch.Position);
+                    break;
+                case TouchLocationState.Released:
+                    break;
+                default:
+                    break;
             }
         }
     }
@@ -455,7 +465,6 @@ class Player
                 // If player falls too far we kill them
                 if (fallDistance < MaxSafeFallDistance)
                 {
-
                     OnKilled(null);
                 }
 

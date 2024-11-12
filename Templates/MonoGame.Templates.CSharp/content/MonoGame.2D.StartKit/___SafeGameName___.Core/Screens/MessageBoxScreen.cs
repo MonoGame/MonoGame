@@ -100,7 +100,7 @@ class MessageBoxScreen : GameScreen
     /// <summary>
     /// Responds to user input, accepting or cancelling the message box.
     /// </summary>
-    public override void HandleInput(InputState input, GameTime gameTime)
+    public override void HandleInput(GameTime gameTime, InputState inputState)
     {
         // Ignore input if this is a ToastMessage
         if (toastMessage)
@@ -115,7 +115,7 @@ class MessageBoxScreen : GameScreen
         // controlling player, the InputState helper returns to us which player
         // actually provided the input. We pass that through to our Accepted and
         // Cancelled events, so they can tell which player triggered them.
-        if (input.IsMenuSelect(ControllingPlayer, out playerIndex))
+        if (inputState.IsMenuSelect(ControllingPlayer, out playerIndex))
         {
             // Raise the accepted event, then exit the message box.
             if (Accepted != null)
@@ -123,7 +123,7 @@ class MessageBoxScreen : GameScreen
 
             ExitScreen();
         }
-        else if (input.IsMenuCancel(ControllingPlayer, out playerIndex))
+        else if (inputState.IsMenuCancel(ControllingPlayer, out playerIndex))
         {
             // Raise the cancelled event, then exit the message box.
             if (Cancelled != null)
