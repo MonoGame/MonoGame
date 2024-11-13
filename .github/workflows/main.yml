@@ -83,11 +83,11 @@ jobs:
       - name: Install required workloads
         run:   |
               if [ "$RUNNER_OS" == "Linux" ]; then
-                    dotnet workload install android
+                    dotnet workload install android --version 8.0.402.0
               elif [ "$RUNNER_OS" == "Windows" ]; then
                     dotnet.exe workload install android ios macos
               else
-                    dotnet workload install android macos ios
+                    dotnet workload install android macos ios --version 8.0.402.0
               fi
         shell: bash
 
@@ -189,7 +189,7 @@ jobs:
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '8.0.x'
-        #if: runner.environment == 'github-hosted'
+        if: runner.environment == 'github-hosted'
 
       - name: install wine64 on linux
         run: |
@@ -214,19 +214,19 @@ jobs:
         if: runner.os != 'Windows' && runner.environment == 'github-hosted'
 
       - name: Download tests-tools-${{ matrix.platform }}
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: tests-tools-${{ matrix.platform }}
           path: tests-tools
 
       - name: Download tests-desktopgl-${{ matrix.platform }}
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: tests-desktopgl-${{ matrix.platform }}
           path: tests-desktopgl
           
       - name: Download tests-windowsdx-${{ matrix.platform }}
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: tests-windowsdx-${{ matrix.platform }}
           path: tests-windowsdx
