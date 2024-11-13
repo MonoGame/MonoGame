@@ -64,10 +64,8 @@ jobs:
                     dotnet.exe workload install android
               else
                     dotnet workload install android macos ios --version 8.0.402.0
-                    brew install wine-stable p7zip freeimage freetype
+                    brew install wine-stable p7zip
                     sudo mkdir -p /usr/local/lib
-                    sudo ln -s /opt/homebrew/lib/libfreetype.dylib /usr/local/lib/libfreetype6.dylib
-                    sudo ln -s /opt/homebrew/lib/libfreeimage.dylib /usr/local/lib/libfreeimage.dylib
                     wget -qO- https://monogame.net/downloads/net9_mgfxc_wine_setup.sh | bash
               fi
         shell: bash
