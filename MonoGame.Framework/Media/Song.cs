@@ -56,6 +56,7 @@ namespace Microsoft.Xna.Framework.Media
         event FinishedPlayingHandler DonePlaying;
 #endif
 #endif
+
         internal Song(string fileName, int durationMS)
             : this(fileName)
         {
@@ -64,10 +65,10 @@ namespace Microsoft.Xna.Framework.Media
 
         internal Song(string fileName)
         {
-            _filePath = fileName;
-            _name = GetPlatformAdjustedPath(fileName); // Adjust path for platform compatibility
+            _filePath = fileName; // Used _filePath instead of _name for file path storage
+            _name = GetPlatformAdjustedPath(fileName); // Adjusted path for platform compatibility
 
-            PlatformInitialize(_filePath);
+            PlatformInitialize(_filePath); // Used _filePath here for initialization
         }
 
         // Platform-specific file path adjustments
@@ -84,10 +85,9 @@ namespace Microsoft.Xna.Framework.Media
 
         internal string FilePath
         {
-            get { return _filePath; }
+            get { return _filePath; } // Return _filePath instead of _name
         }
 
-        /// <summary/>
         ~Song()
         {
             Dispose(false);
@@ -112,7 +112,7 @@ namespace Microsoft.Xna.Framework.Media
             Dispose(true);
             GC.SuppressFinalize(this);
         }
-        
+
         void Dispose(bool disposing)
         {
             if (!disposed)
@@ -129,9 +129,9 @@ namespace Microsoft.Xna.Framework.Media
         /// <summary>
         /// Gets the hash code for this instance.
         /// </summary>
-        public override int GetHashCode ()
+        public override int GetHashCode()
         {
-            return base.GetHashCode ();
+            return base.GetHashCode();
         }
 
         /// <summary>
@@ -152,12 +152,12 @@ namespace Microsoft.Xna.Framework.Media
         /// <inheritdoc/>
         public override bool Equals(Object obj)
         {
-            if(obj == null)
+            if (obj == null)
             {
                 return false;
             }
 
-            return Equals(obj as Song);  
+            return Equals(obj as Song);
         }
 
         /// <summary>
@@ -165,7 +165,7 @@ namespace Microsoft.Xna.Framework.Media
         /// </summary>
         public static bool operator ==(Song song1, Song song2)
         {
-            if((object)song1 == null)
+            if ((object)song1 == null)
             {
                 return (object)song2 == null;
             }

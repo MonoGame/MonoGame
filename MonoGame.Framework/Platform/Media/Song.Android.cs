@@ -80,7 +80,7 @@ namespace Microsoft.Xna.Framework.Media
                 // Check if we have a direct asset URI.
                 _androidPlayer.SetDataSource(MediaLibrary.Context, this.assetUri);
             }
-            else if (_name.StartsWith("file://"))
+            else if (_filePath.StartsWith("file://"))
             {
                 // Otherwise, check if this is a file URI.
                 _androidPlayer.SetDataSource(_name);
@@ -194,4 +194,3 @@ namespace Microsoft.Xna.Framework.Media
         }
     }
 }
-
