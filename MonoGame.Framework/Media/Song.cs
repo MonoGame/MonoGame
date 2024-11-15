@@ -17,6 +17,7 @@ namespace Microsoft.Xna.Framework.Media
         private int _playCount = 0;
         private TimeSpan _duration = TimeSpan.Zero;
         bool disposed;
+
         /// <summary>
         /// Gets the <see cref="Album"/> on which the Song appears.
         /// </summary>
@@ -61,12 +62,29 @@ namespace Microsoft.Xna.Framework.Media
             _duration = TimeSpan.FromMilliseconds(durationMS);
         }
 
-		internal Song(string fileName)
-		{
+        internal Song(string fileName)
+        {
             _filePath = fileName;
-            _name = Path.GetFileNameWithoutExtension(fileName);
+            _name = GetPlatformAdjustedPath(fileName); // Adjust path for platform compatibility
 
-            PlatformInitialize(fileName);
+            PlatformInitialize(_filePath);
+        }
+
+        // Platform-specific file path adjustments
+        private string GetPlatformAdjustedPath(string fileName)
+        {
+#if ANDROID
+            // Android expects file paths without the file extension for assets
+            return Path.GetFileNameWithoutExtension(fileName);
+#else
+            // For other platforms, retain the full file path
+            return fileName;
+#endif
+        }
+
+        internal string FilePath
+        {
+            get { return _filePath; }
         }
 
         /// <summary/>
@@ -74,11 +92,6 @@ namespace Microsoft.Xna.Framework.Media
         {
             Dispose(false);
         }
-
-        internal string FilePath
-		{
-			get { return _filePath; }
-		}
 
         /// <summary>
         /// Returns a song that can be played via <see cref="MediaPlayer"/>.
@@ -94,7 +107,7 @@ namespace Microsoft.Xna.Framework.Media
         }
 
         /// <inheritdoc cref="IDisposable.Dispose()"/>
-		public void Dispose()
+        public void Dispose()
         {
             Dispose(true);
             GC.SuppressFinalize(this);
@@ -117,9 +130,9 @@ namespace Microsoft.Xna.Framework.Media
         /// Gets the hash code for this instance.
         /// </summary>
         public override int GetHashCode ()
-		{
-			return base.GetHashCode ();
-		}
+        {
+            return base.GetHashCode ();
+        }
 
         /// <summary>
         /// Determines whether two instances of <see cref="Song"/> are equal.
@@ -132,41 +145,41 @@ namespace Microsoft.Xna.Framework.Media
 #if DIRECTX
             return song != null && song.FilePath == FilePath;
 #else
-			return ((object)song != null) && (Name == song.Name);
+            return ((object)song != null) && (Name == song.Name);
 #endif
-		}
+        }
 
         /// <inheritdoc/>
         public override bool Equals(Object obj)
-		{
-			if(obj == null)
-			{
-				return false;
-			}
-			
-			return Equals(obj as Song);  
-		}
+        {
+            if(obj == null)
+            {
+                return false;
+            }
+
+            return Equals(obj as Song);  
+        }
 
         /// <summary>
         /// Determines whether the specified Song instances are equal.
         /// </summary>
-		public static bool operator ==(Song song1, Song song2)
-		{
-			if((object)song1 == null)
-			{
-				return (object)song2 == null;
-			}
+        public static bool operator ==(Song song1, Song song2)
+        {
+            if((object)song1 == null)
+            {
+                return (object)song2 == null;
+            }
 
-			return song1.Equals(song2);
-		}
+            return song1.Equals(song2);
+        }
 
         /// <summary>
         /// Determines whether the specified Song instances are not equal.
         /// </summary>
         public static bool operator !=(Song song1, Song song2)
-		{
-		    return !(song1 == song2);
-		}
+        {
+            return !(song1 == song2);
+        }
 
         /// <summary>
         /// Gets the duration of the <see cref="Song"/>.
@@ -232,4 +245,3 @@ namespace Microsoft.Xna.Framework.Media
         }
     }
 }
-
