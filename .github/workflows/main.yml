@@ -186,7 +186,7 @@ jobs:
         if: runner.os != 'Windows' && runner.environment == 'github-hosted'
 
       - name: Download Nuget
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: nuget-${{ matrix.platform }}
           path: Artifacts/NuGet
