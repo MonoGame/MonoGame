@@ -175,7 +175,7 @@ namespace Microsoft.Xna.Framework
                 frustum.Far.Normal
             ];
 
-            // allNormals = box normals + frustum normals + cross products of box normals and frustum normals
+            // allAxes = box normals + frustum normals + cross products of box normals and frustum normals
             Vector3[] allAxes = new Vector3[23]; // 3 + 5 + 3 * 5
 
             allAxes[0] = boxNormals[0];
