@@ -61,7 +61,7 @@ jobs:
                     fc-match Arial
                     wget -qO- https://monogame.net/downloads/net9_mgfxc_wine_setup.sh | bash
               elif [ "$RUNNER_OS" == "Windows" ]; then
-                    dotnet.exe workload install android ios macos
+                    dotnet.exe workload install android
               else
                     dotnet workload install android macos ios --version 8.0.402.0
                     brew install wine-stable p7zip freeimage freetype
@@ -185,11 +185,17 @@ jobs:
         run: wget -qO- https://monogame.net/downloads/net9_mgfxc_wine_setup.sh | bash
         if: runner.os != 'Windows' && runner.environment == 'github-hosted'
 
+      - name: Download Nuget
+        uses: actions/download-artifact@v4
+        with:
+          name: nuget-${{ matrix.platform }}
+          path: Artifacts/NuGet
+
       - name: Download tests-tools-${{ matrix.platform }}
         uses: actions/download-artifact@v4
         with:
           name: tests-tools-${{ matrix.platform }}
-          path: tests-tools
+          path: tests tools
 
       - name: Download tests-desktopgl-${{ matrix.platform }}
         uses: actions/download-artifact@v4
@@ -204,13 +210,8 @@ jobs:
           path: tests-windowsdx
         if: runner.os == 'Windows'
 
-      - name: Install Tools
-        run: |
-          dotnet tool install --create-manifest-if-needed mgcb-basisu
-          dotnet tool install --create-manifest-if-needed mgcb-crunch
-
       - name: Run Tools Tests
-        run: dotnet test tests-tools/MonoGame.Tools.Tests.dll --blame-hang-timeout 1m --filter="TestCategory!=Effects"
+        run: dotnet test "tests tools/MonoGame.Tools.Tests.dll" --blame-hang-timeout 1m --filter="TestCategory!=Effects"
         env:
           CI: true
 
