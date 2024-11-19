@@ -345,7 +345,7 @@ namespace Microsoft.Xna.Framework.Content
             {
                 throw new ObjectDisposedException("ContentManager");
             }
-            if(Path.IsPathRooted(assetName))
+            if (Path.IsPathRooted(assetName))
             {
                 throw new ContentLoadException("assetName '" + assetName + "' cannot be a rooted (absolute) path. Remove any leading drive letters (e.g. 'C:'), forward slashes or backslashes");
             }
@@ -375,6 +375,39 @@ namespace Microsoft.Xna.Framework.Content
 
             loadedAssets[key] = result;
             return result;
+		}
+
+        /// <summary />
+		protected T ReadAsset<T>(string assetName, Action<IDisposable> recordDisposableObject)
+		{
+			if (string.IsNullOrEmpty(assetName))
+			{
+				throw new ArgumentNullException("assetName");
+			}
+			if (disposed)
+			{
+				throw new ObjectDisposedException("ContentManager");
+			}
+
+			string originalAssetName = assetName;
+			object result = null;
+
+            // Try to load as XNB file
+            var stream = OpenStream(assetName);
+            using (var xnbReader = new BinaryReader(stream))
+            {
+                using (var reader = GetContentReaderFromXnb(assetName, stream, xnbReader, recordDisposableObject))
+                {
+                    result = reader.ReadAsset<T>();
+                    if (result is GraphicsResource)
+                        ((GraphicsResource)result).Name = originalAssetName;
+                }
+            }
+
+			if (result == null)
+				throw new ContentLoadException("Could not load " + originalAssetName + " asset!");
+
+			return (T)result;
 		}
 
         /// <summary />
@@ -418,39 +451,6 @@ namespace Microsoft.Xna.Framework.Content
 				throw new ContentLoadException("Opening stream error.", exception);
 			}
 			return stream;
-		}
-
-        /// <summary />
-		protected T ReadAsset<T>(string assetName, Action<IDisposable> recordDisposableObject)
-		{
-			if (string.IsNullOrEmpty(assetName))
-			{
-				throw new ArgumentNullException("assetName");
-			}
-			if (disposed)
-			{
-				throw new ObjectDisposedException("ContentManager");
-			}
-
-			string originalAssetName = assetName;
-			object result = null;
-
-            // Try to load as XNB file
-            var stream = OpenStream(assetName);
-            using (var xnbReader = new BinaryReader(stream))
-            {
-                using (var reader = GetContentReaderFromXnb(assetName, stream, xnbReader, recordDisposableObject))
-                {
-                    result = reader.ReadAsset<T>();
-                    if (result is GraphicsResource)
-                        ((GraphicsResource)result).Name = originalAssetName;
-                }
-            }
-
-			if (result == null)
-				throw new ContentLoadException("Could not load " + originalAssetName + " asset!");
-
-			return (T)result;
 		}
 
         private ContentReader GetContentReaderFromXnb(string originalAssetName, Stream stream, BinaryReader xnbReader, Action<IDisposable> recordDisposableObject)
