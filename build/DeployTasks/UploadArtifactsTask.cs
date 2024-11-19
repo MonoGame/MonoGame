@@ -57,16 +57,20 @@ public sealed class UploadArtifactsTask : AsyncFrostingTask<BuildContext>
 
     void DeleteToolStore(BuildContext context, string path)
     {
-        if (System.IO.Directory.Exists(path)) {
-            var store = System.IO.Path.Combine (path, ".store");
-            if (System.IO.Directory.Exists(store)) {
+        if (System.IO.Directory.Exists(path))
+        {
+            var store = System.IO.Path.Combine(path, ".store");
+            if (System.IO.Directory.Exists(store))
+            {
                 context.Log.Information($"Deleting: {store}");
                 System.IO.Directory.Delete(store, recursive: true);
-                foreach (var file in System.IO.Directory.GetFiles(path, "mgcb-*", System.IO.SearchOption.TopDirectoryOnly)) {
+                foreach (var file in System.IO.Directory.GetFiles(path, "mgcb-*", System.IO.SearchOption.TopDirectoryOnly))
+                {
                     context.Log.Information($"Deleting: {file}");
                     System.IO.File.Delete(file);
                 }
-                foreach (var file in System.IO.Directory.GetFiles(path, "tools_version.txt", System.IO.SearchOption.TopDirectoryOnly)) {
+                foreach (var file in System.IO.Directory.GetFiles(path, "tools_version.txt", System.IO.SearchOption.TopDirectoryOnly))
+                {
                     context.Log.Information($"Deleting: {file}");
                     System.IO.File.Delete(file);
                 }
