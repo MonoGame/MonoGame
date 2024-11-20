@@ -70,6 +70,7 @@ namespace Microsoft.Xna.Framework.Content
             'l', // Linux
         };
 
+        private static readonly string[] supportedTexture2DExtensions = new string[] { ".bmp", ".jpg", ".jpeg", ".png" };
 
         static partial void PlatformStaticInit();
 
@@ -148,7 +149,7 @@ namespace Microsoft.Xna.Framework.Content
         /// </summary>
         /// <remarks>
         ///     <para>
-        ///         By default, the ContentMangaer searches for content in the directory where the executable is located.
+        ///         By default, the ContentManager searches for content in the directory where the executable is located.
         ///     </para>
         ///     <para>
         ///         When creating a new ContentManager, if no instance of <see cref="Game"/> is otherwise required by
@@ -297,6 +298,7 @@ namespace Microsoft.Xna.Framework.Content
         /// Before a ContentManager can load an asset, you need to add the asset to your game project using
         /// the steps described in
         /// <see href="https://docs.monogame.net/articles/getting_started/content_pipeline/index.html">Adding Content - MonoGame</see>.
+        /// <br>BMP, PNG and JPG files can be loaded as Texture2D without using the content pipeline. The assetName must not contain extension.
         /// </remarks>
         /// <typeparam name="T">
         ///     <para>
@@ -372,8 +374,8 @@ namespace Microsoft.Xna.Framework.Content
 
             // Load the asset.
             result = ReadAsset<T>(assetName, null);
-
             loadedAssets[key] = result;
+
             return result;
 		}
 
@@ -392,20 +394,52 @@ namespace Microsoft.Xna.Framework.Content
 			string originalAssetName = assetName;
 			object result = null;
 
-            // Try to load as XNB file
-            var stream = OpenStream(assetName);
-            using (var xnbReader = new BinaryReader(stream))
+            try
             {
-                using (var reader = GetContentReaderFromXnb(assetName, stream, xnbReader, recordDisposableObject))
+                // Try to load as XNB file
+                var stream = OpenStream(assetName);
+                using (var xnbReader = new BinaryReader(stream))
                 {
-                    result = reader.ReadAsset<T>();
-                    if (result is GraphicsResource)
-                        ((GraphicsResource)result).Name = originalAssetName;
+                    using (var reader = GetContentReaderFromXnb(assetName, stream, xnbReader, recordDisposableObject))
+                    {
+                        result = reader.ReadAsset<T>();
+                        if (result is GraphicsResource)
+                        {
+                            ((GraphicsResource)result).Name = originalAssetName;
+                        }
+                    }
+                }
+            }
+            catch (ContentLoadException)
+            {
+                try
+                {
+                    // If the file is not found, we try searching a file with differents extensions
+                    // based on the type of asset searched (e.g. '.bmp' and '.png' for a Texture2D)
+                    switch (typeof(T).Name)
+                    {
+                        case nameof(Texture2D):
+                            result = LoadTexture2DHeuristically(assetName);
+                            break;
+                        // Futures cases here (see relevant GitHub Issues):
+                        // Video
+                        // Song
+                        // SoundEffect
+                        // Texture3D (?)
+                        default:
+                            break;
+                    }
+                }
+                catch
+                {
+                    result = null;
                 }
             }
 
 			if (result == null)
+            {
 				throw new ContentLoadException("Could not load " + originalAssetName + " asset!");
+            }
 
 			return (T)result;
 		}
@@ -416,7 +450,7 @@ namespace Microsoft.Xna.Framework.Content
 			Stream stream;
 			try
             {
-                var assetPath = Path.Combine(RootDirectory, assetName) + ".xnb";
+                string assetPath = Path.Combine(RootDirectory, assetName) + ".xnb";
 
                 // This is primarily for editor support.
                 // Setting the RootDirectory to an absolute path is useful in editor
@@ -441,7 +475,6 @@ namespace Microsoft.Xna.Framework.Content
 			{
 				throw new ContentLoadException("The content file was not found.", fileNotFound);
 			}
-
 			catch (DirectoryNotFoundException directoryNotFound)
 			{
 				throw new ContentLoadException("The directory was not found.", directoryNotFound);
@@ -450,6 +483,7 @@ namespace Microsoft.Xna.Framework.Content
 			{
 				throw new ContentLoadException("Opening stream error.", exception);
 			}
+            
 			return stream;
 		}
 
@@ -505,6 +539,27 @@ namespace Microsoft.Xna.Framework.Content
                                                         originalAssetName, version, recordDisposableObject);
 
             return reader;
+        }
+    
+        object LoadTexture2DHeuristically(string assetName)
+        {
+            IGraphicsDeviceService graphicsDeviceService = serviceProvider.GetService(typeof(IGraphicsDeviceService)) as IGraphicsDeviceService;
+            
+            foreach (string extension in supportedTexture2DExtensions)
+            {
+                string assetPath = Path.Combine(RootDirectory, assetName);
+                assetPath = Path.ChangeExtension(assetPath, extension);
+
+                using Stream file = TitleContainer.OpenStreamNoException(assetPath);
+                if (file != null)
+                {
+                    Texture2D result = Texture2D.FromStream(graphicsDeviceService.GraphicsDevice, file, DefaultColorProcessors.PremultiplyAlpha);
+
+                    return result;
+                }
+            }
+
+            return null;
         }
 
         internal void RecordDisposable(IDisposable disposable)
@@ -575,7 +630,9 @@ namespace Microsoft.Xna.Framework.Content
 		    foreach (var disposable in disposableAssets)
 		    {
 		        if (disposable != null)
+                {
 		            disposable.Dispose();
+                }
 		    }
 			disposableAssets.Clear();
 		    loadedAssets.Clear();
