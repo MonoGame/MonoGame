@@ -1,4 +1,4 @@
-Depending on the [platform](https://docs.monogame.net/articles/platforms.html) that you are targeting, MonoGame has different sets of requirements.
+Depending on the [platform](https://docs.monogame.net/articles/getting_started/platforms.html) that you are targeting, MonoGame has different sets of requirements.
 
 For desktop platforms
 ====================
@@ -12,14 +12,9 @@ When it comes to IDE, [Visual Studio 2022](https://visualstudio.microsoft.com/vs
 
 Desktop development is possible from any operating system supporting the above mentioned software.
 
-For UWP platforms
-====================
-
-MonoGame requires the latest Windows 10 SDK.
-You can install it by selecting the Universal App workload when installing Visual Studio 2022.
-Building and publishing for UWP is only supported with Visual Studio 2022.
-
-UWP development is not possible from macOS or Linux.
+::: info UWP Deprecation
+The **UWP** platform is being deprecated as of the `3.8.2` release due to Microsoft reducing/removing support for this deployment mechanism.
+:::
 
 For mobile platforms
 ====================

@@ -4,23 +4,23 @@
 
 #include "include.fxh"
 
-sampler s0;
+DECLARE_TEXTURE(s, 0);
 
-float4 red    = float4(1,0,0,1);
-float4 orange = float4(1,.5,0,1);
-float4 yellow = float4(1,1,0,1);
-float4 green  = float4(0,1,0,1);
-float4 blue   = float4(0,0,1,1);
-float4 indigo = float4(.3,0,.8,1);
-float4 violet = float4(1,.8,1,1);
+static float4 red    = float4(1,0,0,1);
+static float4 orange = float4(1, .5, 0, 1);
+static float4 yellow = float4(1, 1, 0, 1);
+static float4 green = float4(0, 1, 0, 1);
+static float4 blue = float4(0, 0, 1, 1);
+static float4 indigo = float4(.3, 0, .8, 1);
+static float4 violet = float4(1, .8, 1, 1);
 
-float step = 1.0/7;
+static float step = 1.0 / 7;
 
 float4 PixelShaderFunction( float4 inPosition : SV_Position,
 			    float4 inColor : COLOR0,
-			    float2 coords : TEXCOORD0 ) : COLOR0
+			    float2 coords : TEXCOORD0 ) : SV_TARGET0
 {
-    float4 color = tex2D(s0, coords);
+    float4 color = SAMPLE_TEXTURE(s, coords);
 
 	if (!any(color)) return color;
 

@@ -192,7 +192,10 @@ namespace MonoGame.Content.Builder
             sourceFile = PathHelper.Normalize(sourceFile);
 
             // Remove duplicates... keep this new one.
-            var previous = _content.FindIndex(e => string.Equals(e.SourceFile, sourceFile, StringComparison.InvariantCultureIgnoreCase));
+            var previous = _content.FindIndex(e => {
+                return string.Equals(e.SourceFile, sourceFile, StringComparison.InvariantCultureIgnoreCase) &&
+                    string.Equals(e.OutputFile, link ?? e.OutputFile, StringComparison.InvariantCultureIgnoreCase);
+            });
             if (previous != -1)
                 _content.RemoveAt(previous);
 
@@ -403,16 +406,12 @@ namespace MonoGame.Content.Builder
                 }
                 catch (PipelineException ex)
                 {
-                    Console.Error.WriteLine("{0}: error: {1}", c.SourceFile, ex.Message);
-                    if (ex.InnerException != null)
-                        Console.Error.WriteLine(ex.InnerException.ToString());
+                    Console.Error.WriteLine("{0}: error: {1}. {2}", c.SourceFile, ex.Message, ex.InnerException != null ? ex.InnerException : string.Empty);
                     ++errorCount;
                 }
                 catch (Exception ex)
                 {
-                    Console.Error.WriteLine("{0}: error: {1}", c.SourceFile, ex.Message);
-                    if (ex.InnerException != null)
-                        Console.Error.WriteLine(ex.InnerException.ToString());
+                    Console.Error.WriteLine("{0}: error: {1}. {2}", c.SourceFile, ex.Message, ex.InnerException != null ? ex.InnerException : string.Empty);
                     ++errorCount;
                 }
             }

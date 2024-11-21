@@ -2,44 +2,75 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
+using MonoGame.Interop;
+using System;
+
 namespace Microsoft.Xna.Framework.Audio;
 
 public sealed partial class DynamicSoundEffectInstance : SoundEffectInstance
 {
-    private void PlatformCreate()
+    private unsafe void PlatformCreate()
     {
+        Voice = MGA.Voice_Create(SoundEffect.System, _sampleRate, (int)_channels);
     }
 
-    private int PlatformGetPendingBufferCount()
+    private unsafe int PlatformGetPendingBufferCount()
     {
+        if (Voice != null)
+            return MGA.Voice_GetBufferCount(Voice);
+
         return 0;
     }
 
-    private void PlatformPlay()
+    private unsafe void PlatformPlay()
     {
+        if (Voice != null)
+            MGA.Voice_Play(Voice, true);
     }
 
-    private void PlatformPause()
+    private unsafe void PlatformPause()
     {
+        if (Voice != null)
+            MGA.Voice_Pause(Voice);
     }
 
-    private void PlatformResume()
+    private unsafe void PlatformResume()
     {
+        if (Voice != null)
+            MGA.Voice_Resume(Voice);
     }
 
-    private void PlatformStop()
+    private unsafe void PlatformStop()
     {
+        if (Voice != null)
+            MGA.Voice_Stop(Voice, true);
     }
 
-    private void PlatformSubmitBuffer(byte[] buffer, int offset, int count)
+    private unsafe void PlatformSubmitBuffer(byte[] buffer, int offset, int count)
     {
+        if (Voice != null)
+        {
+            fixed (byte* ptr = buffer)
+                MGA.Voice_AppendBuffer(Voice, ptr + offset, (uint)count);
+        }
     }
 
-    private void PlatformDispose(bool disposing)
+    private unsafe void PlatformDispose(bool disposing)
     {
+        if (disposing)
+        {
+            if (Voice != null)
+            {
+                MGA.Voice_Destroy(Voice);
+                Voice = null;
+            }
+        }
     }
 
     private void PlatformUpdateQueue()
     {
+        // TODO: This really shouldn't be per-instance
+        // instead this should be handled internally by
+        // the native sound system.
     }
 }

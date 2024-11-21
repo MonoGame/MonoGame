@@ -18,6 +18,7 @@
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
     <PackageReference Include="MonoGame.Library.SDL" Version="2.26.5.5" />
+    <PackageReference Include="MonoGame.Library.OpenAL" Version="1.23.1.7" />
     <PackageReference Include="NVorbis" Version="0.10.4" />
   </ItemGroup>
 
@@ -88,27 +89,6 @@
   </ItemGroup>
 
   <ItemGroup Condition="'$(CopyContentFiles)' == 'True'">
-    <Content Include="..\ThirdParty\Dependencies\openal-soft\Windows\x86\soft_oal.dll">
-      <Link>x86\soft_oal.dll</Link>
-      <PackagePath>runtimes\win-x86\native</PackagePath>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\ThirdParty\Dependencies\openal-soft\Windows\x64\soft_oal.dll">
-      <Link>x64\soft_oal.dll</Link>
-      <PackagePath>runtimes\win-x64\native</PackagePath>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\ThirdParty\Dependencies\openal-soft\Linux\x64\libopenal.so.1">
-      <Link>x64\libopenal.so.1</Link>
-      <PackagePath>runtimes\linux-x64\native</PackagePath>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\ThirdParty\Dependencies\openal-soft\MacOS\Universal\libopenal.1.dylib">
-      <Link>libopenal.1.dylib</Link>
-      <PackagePath>runtimes\osx\native</PackagePath>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-
     <Content Include="MonoGame.Framework.DesktopGL.targets" PackagePath="build" />
   </ItemGroup>
 

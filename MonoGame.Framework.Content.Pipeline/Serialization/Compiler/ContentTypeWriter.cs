@@ -104,7 +104,6 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
             //    case TargetPlatform.Windows:
             //    case TargetPlatform.Linux:
             //    case TargetPlatform.MacOSX:
-            //    case TargetPlatform.WindowsStoreApp:
             //        return true;
             //    default:
             //        return false;

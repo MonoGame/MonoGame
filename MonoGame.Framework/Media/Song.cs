@@ -13,7 +13,8 @@ namespace Microsoft.Xna.Framework.Media
     public sealed partial class Song : IEquatable<Song>, IDisposable
     {
         private string _name;
-		private int _playCount = 0;
+        private string _filePath;
+        private int _playCount = 0;
         private TimeSpan _duration = TimeSpan.Zero;
         bool disposed;
         /// <summary>
@@ -22,9 +23,6 @@ namespace Microsoft.Xna.Framework.Media
         public Album Album
         {
             get { return PlatformGetAlbum(); }
-#if WINDOWS_UAP
-            internal set { PlatformSetAlbum(value); }
-#endif
         }
 
         /// <summary>
@@ -51,7 +49,7 @@ namespace Microsoft.Xna.Framework.Media
             get { return disposed; }
         }
 
-#if ANDROID || OPENAL || WEB || IOS
+#if ANDROID || OPENAL || WEB || IOS || NATIVE
         internal delegate void FinishedPlayingHandler(object sender, EventArgs args);
 #if !DESKTOPGL
         event FinishedPlayingHandler DonePlaying;
@@ -64,8 +62,9 @@ namespace Microsoft.Xna.Framework.Media
         }
 
 		internal Song(string fileName)
-		{			
-			_name = fileName;
+		{
+            _filePath = fileName;
+            _name = Path.GetFileNameWithoutExtension(fileName);
 
             PlatformInitialize(fileName);
         }
@@ -78,7 +77,7 @@ namespace Microsoft.Xna.Framework.Media
 
         internal string FilePath
 		{
-			get { return _name; }
+			get { return _filePath; }
 		}
 
         /// <summary>
@@ -174,7 +173,7 @@ namespace Microsoft.Xna.Framework.Media
         /// </summary>
         public TimeSpan Duration
         {
-            get { return PlatformGetDuration(); }
+            get { return _duration; }
         }
 
         /// <summary>
@@ -198,7 +197,7 @@ namespace Microsoft.Xna.Framework.Media
         /// </summary>
         public string Name
         {
-            get { return PlatformGetName(); }
+            get { return _name; }
         }
 
         /// <summary>

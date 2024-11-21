@@ -10,9 +10,6 @@ using FreeImageAPI;
 
 namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 {
-    /// <summary>
-    /// Class providing utility methods for graphics processing
-    /// </summary>
     public static class GraphicsUtil
     {
         internal static BitmapContent Resize(this BitmapContent bitmap, int newWidth, int newHeight)
@@ -52,10 +49,6 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
             return src;
         }
 
-        /// <summary>
-        /// Swaps the red and blue color channels in a BGRA byte array.
-        /// </summary>
-        /// <param name="data">The byte array to swap the color channels in.</param>
         public static void BGRAtoRGBA(byte[] data)
         {
             for (var x = 0; x < data.Length; x += 4)
@@ -66,11 +59,6 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
             }
         }
 
-        /// <summary>
-        /// Checks if a value is of a power of 2.
-        /// </summary>
-        /// <param name="x">Value to check.</param>
-        /// <returns><c>true</c> if the value is a power of 2, otherwise <c>false</c>.</returns>
         public static bool IsPowerOfTwo(int x)
         {
             return (x & (x - 1)) == 0;
@@ -135,14 +123,6 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
             return result;
         }
 
-        /// <summary>
-        /// Compresses the given <see cref="TextureContent"/> using PVRT-C1 compression.
-        /// If the content is a font texture page that requires sharp alpha, it falls back to 16-bit color compression.
-        /// The content must have a width and height that are powers of two and equal.
-        /// </summary>
-        /// <param name="context">The content processor context.</param>
-        /// <param name="content">The texture content to compress.</param>
-        /// <param name="isSpriteFont">Indicates whether the content is a font texture page that requires sharp alpha.</param>
         public static void CompressPvrtc(ContentProcessorContext context, TextureContent content, bool isSpriteFont)
         {
             // If sharp alpha is required (for a font texture page), use 16-bit color instead of PVR
@@ -173,13 +153,6 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
                 content.ConvertBitmapType(typeof(PvrtcRgba4BitmapContent));
         }
 
-        /// <summary>
-        /// Compresses a texture using the DXT (DirectX Texture Compression) format.
-        /// </summary>
-        /// <param name="context">The content processor context.</param>
-        /// <param name="content">The texture content to compress.</param>
-        /// <param name="isSpriteFont">Indicates whether the texture is a sprite font.</param>
-        /// <exception cref="PipelineException">Thrown if the texture with and height is not a power of two.</exception>
         public static void CompressDxt(ContentProcessorContext context, TextureContent content, bool isSpriteFont)
         {
             var face = content.Faces[0][0];
@@ -216,14 +189,6 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
                 content.ConvertBitmapType(typeof(Dxt5BitmapContent));
         }
 
-        /// <summary>
-        /// Compresses the given <see cref="TextureContent"/> using Ati compression.
-        /// If the content is a font texture page that requires sharp alpha, it falls back to 16-bit color compression.
-        /// The content must have a width and height that are powers of two and equal.
-        /// </summary>
-        /// <param name="context">The content processor context.</param>
-        /// <param name="content">The texture content to compress.</param>
-        /// <param name="isSpriteFont">Indicates whether the content is a font texture page that requires sharp alpha.</param>
         static public void CompressAti(ContentProcessorContext context, TextureContent content, bool isSpriteFont)
         {
             // If sharp alpha is required (for a font texture page), use 16-bit color instead of PVR
@@ -234,7 +199,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
             }
 
             var face = content.Faces[0][0];
-			var alphaRange = CalculateAlphaRange(face);
+            var alphaRange = CalculateAlphaRange(face);
 
             if (alphaRange == AlphaRange.Full)
                 content.ConvertBitmapType(typeof(AtcExplicitBitmapContent));
@@ -242,14 +207,61 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
                 content.ConvertBitmapType(typeof(AtcInterpolatedBitmapContent));
         }
 
-        /// <summary>
-        /// Compresses the given <see cref="TextureContent"/> using ETC1 compression.
-        /// If the content is a font texture page that requires sharp alpha, it falls back to 16-bit color compression.
-        /// The content must have a width and height that are powers of two and equal.
-        /// </summary>
-        /// <param name="context">The content processor context.</param>
-        /// <param name="content">The texture content to compress.</param>
-        /// <param name="isSpriteFont">Indicates whether the content is a font texture page that requires sharp alpha.</param>
+        static public void CompressAstc(ContentProcessorContext context, TextureContent content, bool isSpriteFont)
+        {
+            // If sharp alpha is required (for a font texture page), use 16-bit color instead of PVR
+            if (isSpriteFont)
+            {
+                CompressColor16Bit(context, content);
+                return;
+            }
+
+            // astc supports rgba
+            content.ConvertBitmapType(typeof(AstcBitmapContent));
+        }
+
+        static public void CompressEtc(ContentProcessorContext context, TextureContent content, bool isSpriteFont)
+        {
+            // If sharp alpha is required (for a font texture page), use 16-bit color instead of PVR
+            if (isSpriteFont)
+            {
+                CompressColor16Bit(context, content);
+                return;
+            }
+
+            var face = content.Faces[0][0];
+            var alphaRange = CalculateAlphaRange(face);
+
+
+            // confirm texture meets ETC requirements
+            if (!IsPowerOfTwo(face.Width) || !IsPowerOfTwo(face.Height))
+            {
+                // pick a fallback format based on the alpha range.
+                if (alphaRange != AlphaRange.Opaque)
+                {
+                    context.Logger.LogWarning(null, content.Identity, "ETC compression requires width and height to be powers of two due to hardware restrictions on some devices. Falling back to BGR565.");
+                    content.ConvertBitmapType(typeof(PixelBitmapContent<Bgra4444>));
+                }
+                else
+                {
+                    context.Logger.LogWarning(null, content.Identity, "ETC compression requires width and height to be powers of two due to hardware restrictions on some devices. Falling back to BGR565.");
+                    content.ConvertBitmapType(typeof(PixelBitmapContent<Bgr565>));
+                }
+
+                return;
+            }
+
+            if (alphaRange == AlphaRange.Opaque)
+            {
+                // ETC1 does not support alpha, which is fine since the data is all opaque
+                content.ConvertBitmapType(typeof(Etc1BitmapContent));
+                return;
+            }
+
+            // Use ETC2
+            content.ConvertBitmapType(typeof(Etc2BitmapContent));
+        }
+
         static public void CompressEtc1(ContentProcessorContext context, TextureContent content, bool isSpriteFont)
         {
             // If sharp alpha is required (for a font texture page), use 16-bit color instead of PVR
@@ -276,20 +288,12 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
                     content.ConvertBitmapType(typeof(PixelBitmapContent<Bgr565>));
                 }
                 else
+                    // use ETC1 when there is no alpha
                     content.ConvertBitmapType(typeof(Etc1BitmapContent));
+
             }
         }
 
-        /// <summary>
-        /// Compresses the given <see cref="TextureContent"/> using 16-bit color compression.
-        /// </summary>
-        /// <remarks>
-        /// If the content has opaque alpha, it converts it to BGR565.
-        /// If the content has cutout alpha, it converts it to BGRA5551.
-        /// Otherwise, it converts it to BGRA4444.
-        /// </remarks>
-        /// <param name="context">The content processor context.</param>
-        /// <param name="content">The texture content to compress.</param>
         static public void CompressColor16Bit(ContentProcessorContext context, TextureContent content)
         {
             var face = content.Faces[0][0];
@@ -303,11 +307,8 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
                 content.ConvertBitmapType(typeof(PixelBitmapContent<Bgra4444>));
         }
 
-        /// <summary>
-        /// Compresses the font texture using DXT3 compression.
-        /// </summary>
-        /// <param name="content">The texture content to compress.</param>
-        /// <exception cref="PipelineException">Thrown if the font texture has more than one face.</exception>
+
+        // Compress the greyscale font texture page using a specially-formulated DXT3 mode
         static public unsafe void CompressFontDXT3(TextureContent content)
         {
             if (content.Faces.Count > 1)

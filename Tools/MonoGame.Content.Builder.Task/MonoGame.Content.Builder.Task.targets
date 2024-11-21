@@ -58,7 +58,8 @@
         <Link>%(MonoGameContentReference.Link)</Link>
         <FullDir>%(MonoGameContentReference.RootDir)%(MonoGameContentReference.Directory)</FullDir>
         <ContentFolder>%(MonoGameContentReference.ContentFolder)</ContentFolder>
-        <OutputFolder>%(MonoGameContentReference.Filename)</OutputFolder>
+        <OutputFolder>%(MonoGameContentReference.OutputFolder)</OutputFolder>
+        <OutputFolder Condition="'%(MonoGameContentReference.OutputFolder)' == '' ">%(MonoGameContentReference.Filename)</OutputFolder>
       </ContentReference>
 
       <!--
@@ -81,6 +82,15 @@
 
     </ItemGroup>
 
+  </Target>
+
+  <!-- Restore the dotnet-mgcb tool to a known location. -->
+  <!-- Use MGCBToolAdditionalArguments to provide additional arguments to the install
+   for example a path to your custom NuGet.config file.
+  -->
+  <Target Name="RestoreContentCompiler" Condition=" '$(AutoRestoreMGCBTool)' == 'true' And !Exists ('$(MGCBToolDirectory)$(MGCBCommand)')">
+    <MakeDir Directories="$(MGCBToolDirectory)"/>
+    <Exec Command="&quot;$(DotnetCommand)&quot; tool install $(MGCBToolAdditionalArguments) dotnet-mgcb --version $(MonoGameVersion) --tool-path ." WorkingDirectory="$(MGCBToolDirectory)" ContinueOnError="true" />
   </Target>
 
   <!--
@@ -133,16 +143,18 @@
       - ExtraContent: built content files
         - ContentDir: the relative path of the embedded folder to contain the content files
   -->
-  <Target Name="RunContentBuilder" DependsOnTargets="PrepareContentBuilder">
+  <Target Name="RunContentBuilder" DependsOnTargets="RestoreContentCompiler;PrepareContentBuilder">
 
-    <!-- Remove this line if they make dotnet tool restore part of dotnet restore build -->
-    <!-- https://github.com/dotnet/sdk/issues/4241 -->
-    <Exec Command="$(DotnetCommand) tool restore" />
+    <PropertyGroup>
+      <_Command Condition="Exists ('$(MGCBToolDirectory)$(MGCBCommand)')">&quot;$(MGCBToolDirectory)$(MGCBCommand)&quot;</_Command>
+      <!-- Fallback to old behaviour this allows people to override $(MGCBCommand) with the mgcb.dll -->
+      <_Command Condition=" '$(_Command)' == '' ">&quot;$(DotnetCommand)&quot; &quot;$(MGCBCommand)&quot;</_Command>
+    </PropertyGroup>
 
     <!-- Execute MGCB from the project directory so we use the correct manifest. -->
     <Exec
       Condition="'%(ContentReference.FullPath)' != ''"
-      Command="$(DotnetCommand) $(MGCBCommand) $(MonoGameMGCBAdditionalArguments) /@:&quot;%(ContentReference.FullPath)&quot; /platform:$(MonoGamePlatform) /outputDir:&quot;%(ContentReference.ContentOutputDir)&quot; /intermediateDir:&quot;%(ContentReference.ContentIntermediateOutputDir)&quot; /workingDir:&quot;%(ContentReference.FullDir)&quot;"
+      Command="$(_Command) $(MonoGameMGCBAdditionalArguments) /@:&quot;%(ContentReference.FullPath)&quot; /platform:$(MonoGamePlatform) /outputDir:&quot;%(ContentReference.ContentOutputDir)&quot; /intermediateDir:&quot;%(ContentReference.ContentIntermediateOutputDir)&quot; /workingDir:&quot;%(ContentReference.FullDir)&quot;"
       WorkingDirectory="$(MSBuildProjectDirectory)" />
 
     <ItemGroup>

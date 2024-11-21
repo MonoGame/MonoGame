@@ -51,22 +51,10 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
         MacOSX,
 
         /// <summary>
-        /// Windows Store App
-        /// (MonoGame)
-        /// </summary>
-        WindowsStoreApp,
-
-        /// <summary>
         /// Google Chrome Native Client
         /// (MonoGame)
         /// </summary>
         NativeClient,
-
-        /// <summary>
-        /// Windows Phone 8
-        /// (MonoGame)
-        /// </summary>
-        WindowsPhone8,
 
         /// <summary>
         /// Raspberry Pi
@@ -95,14 +83,23 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
         Switch,
 
         /// <summary>
-        /// Google Stadia
-        /// </summary>
-        Stadia,
-
-        /// <summary>
         /// WebAssembly and Bridge.NET
         /// </summary>
-        Web
+        Web,
+
+        /// <summary>
+        /// All desktop versions using Vulkan.
+        /// </summary>
+        DesktopVK,
+        
+        /// Windows GDK
+        /// </summary>
+        WindowsGDK,
+
+        /// <summary>
+        /// Xbox Series
+        /// </summary>
+        XboxSeries
     }
 
 

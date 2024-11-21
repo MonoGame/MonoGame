@@ -87,8 +87,6 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
             switch (platform)
             {
                 case TargetPlatform.Windows:
-                case TargetPlatform.WindowsPhone8:
-                case TargetPlatform.WindowsStoreApp:
                     return "DirectX_11";
                 case TargetPlatform.iOS:
                 case TargetPlatform.Android:
@@ -97,6 +95,12 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
                 case TargetPlatform.RaspberryPi:
                 case TargetPlatform.Web:
                     return "OpenGL";
+                case TargetPlatform.DesktopVK:
+                    return "Vulkan";
+                case TargetPlatform.WindowsGDK:
+                case TargetPlatform.XboxOne:
+                case TargetPlatform.XboxSeries:
+                    return "GDK";
             }
 
             return platform.ToString();

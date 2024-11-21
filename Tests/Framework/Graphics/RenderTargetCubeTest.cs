@@ -10,9 +10,11 @@ using NUnit.Framework;
 namespace MonoGame.Tests.Graphics
 {
     [TestFixture]
+    [NonParallelizable]
     class RenderTargetCubeTest : GraphicsDeviceTestFixtureBase
     {
         [Test]
+        [RunOnUI]
         public void ZeroSizeShouldFailTest()
         {
             RenderTargetCube renderTarget;
@@ -20,6 +22,7 @@ namespace MonoGame.Tests.Graphics
         }
 
         [Test]
+        [RunOnUI]
         public void NullDeviceShouldThrowArgumentNullException()
         {
             Assert.Throws<ArgumentNullException>(() => 
@@ -30,9 +33,11 @@ namespace MonoGame.Tests.Graphics
             GC.GetTotalMemory(true); // collect uninitialized renderTarget
         }
 
+        [Test]
         [TestCase(1)]
         [TestCase(8)]
         [TestCase(31)]
+        [RunOnUI]
         public void ShouldClearRenderTargetAndGetData(int size)
         {
             var dataSize = size * size;
@@ -66,7 +71,8 @@ namespace MonoGame.Tests.Graphics
 
             renderTargetCube.Dispose();
         }
-                
+
+        [Test]
         [TestCase(SurfaceFormat.Color, SurfaceFormat.Color)]
         // unsupported renderTarget formats
         [TestCase(SurfaceFormat.Alpha8, SurfaceFormat.Color)]
@@ -81,6 +87,7 @@ namespace MonoGame.Tests.Graphics
 #endif
         [TestCase(SurfaceFormat.NormalizedByte2, SurfaceFormat.Color)]
         [TestCase(SurfaceFormat.NormalizedByte4, SurfaceFormat.Color)]
+        [RunOnUI]
         public void PreferredSurfaceFormatTest(SurfaceFormat preferredSurfaceFormat, SurfaceFormat expectedSurfaceFormat)
         {                    
             var renderTarget = new RenderTargetCube(gd, 16, false, preferredSurfaceFormat, DepthFormat.None);

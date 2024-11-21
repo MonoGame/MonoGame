@@ -784,7 +784,10 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
             {
                 try
                 {
-                    var importContext = new PipelineImporterContext(this);
+
+                    var importContext = new PipelineImporterContext(this, pipelineEvent);
+                    using var _ = ContextScopeFactory.BeginContext(importContext, pipelineEvent);
+
                     importedObject = importer.Import(pipelineEvent.SourceFile, importContext);
                 }
                 catch (PipelineException)
@@ -802,7 +805,8 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
             }
             else
             {
-                var importContext = new PipelineImporterContext(this);
+                var importContext = new PipelineImporterContext(this, pipelineEvent);
+                using var _ = ContextScopeFactory.BeginContext(importContext, pipelineEvent);
                 importedObject = importer.Import(pipelineEvent.SourceFile, importContext);
             }
 
@@ -833,6 +837,7 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
                 try
                 {
                     var processContext = new PipelineProcessorContext(this, pipelineEvent);
+                    using var _ = ContextScopeFactory.BeginContext(processContext);
                     processedObject = processor.Process(importedObject, processContext);
                 }
                 catch (PipelineException)
@@ -851,6 +856,7 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
             else
             {
                 var processContext = new PipelineProcessorContext(this, pipelineEvent);
+                using var _ = ContextScopeFactory.BeginContext(processContext);
                 processedObject = processor.Process(importedObject, processContext);
             }
 

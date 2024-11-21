@@ -47,16 +47,16 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
             'a', // Android
             'd', // DesktopGL
             'X', // MacOSX
-            'W', // WindowsStoreApp
             'n', // NativeClient
-            'M', // WindowsPhone8
             'r', // RaspberryPi
             'P', // PlayStation4
             '5', // PlayStation5
             'O', // XboxOne
             'S', // Nintendo Switch
-            'G', // Google Stadia
             'b', // WebAssembly and Bridge.NET
+            'V', // DesktopVK (Vulkan)
+            'G', // Windows GDK
+            's', // Xbox Series
         };
 
         /// <summary>
