@@ -1792,10 +1792,10 @@ namespace Microsoft.Xna.Framework
         public static Color operator *(Color color1, Color color2)
         {
             return new Color(
-                (color1.R / 255f) * (color2.R / 255f),
-                (color1.G / 255f) * (color2.G / 255f),
-                (color1.B / 255f) * (color2.B / 255f),
-                (color1.A / 255f) * (color2.A / 255f)
+                (color1.R * color2.R) / 255,
+                (color1.G * color2.G) / 255,
+                (color1.B * color2.B) / 255,
+                (color1.A * color2.A) / 255
             );
         }
         
