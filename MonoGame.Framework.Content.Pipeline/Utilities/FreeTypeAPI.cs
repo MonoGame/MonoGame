@@ -52,19 +52,6 @@ namespace FreeTypeAPI
         public int version_patch;
 
         public uint num_modules;
-
-        public fixed long modules[128];
-
-        public FT_ListRec renderers;
-        public nint cur_renderer;
-        public nint auto_hinter;
-
-        public fixed long debug_hooks[4];
-
-        public fixed long lcd_geometry[6];
-
-        public int refcount;
-
     };
 
     struct FT_Generic
@@ -75,7 +62,7 @@ namespace FreeTypeAPI
 
     struct FT_BBox
     {
-        public long xMin, yMin, xMax, yMax;
+        public CLong xMin, yMin, xMax, yMax;
     }
 
     struct FT_ListRec
@@ -85,17 +72,17 @@ namespace FreeTypeAPI
 
     struct FT_Vector
     {
-        public long x, y;
+        public CLong x, y;
     }
 
     struct FT_Matrix
     {
-        public long xx, xy, yx, yy;
+        public CLong xx, xy, yx, yy;
     }
 
     struct FT_Glyph_Metrics
     {
-        public long width, height, horiBearingX, horiBearingY, horiAdvance, vertBearingX, vertBearingY, vertAdvance;
+        public CLong width, height, horiBearingX, horiBearingY, horiAdvance, vertBearingX, vertBearingY, vertAdvance;
     }
 
     struct FT_Size_Metrics
@@ -103,13 +90,13 @@ namespace FreeTypeAPI
         public ushort x_ppem;
         public ushort y_ppem;
 
-        public long x_scale;
-        public long y_scale;
+        public CLong x_scale;
+        public CLong y_scale;
 
-        public long ascender;
-        public long descender;
-        public long height;
-        public long max_advance;
+        public CLong ascender;
+        public CLong descender;
+        public CLong height;
+        public CLong max_advance;
     }
 
     unsafe struct FT_Size
@@ -155,13 +142,13 @@ namespace FreeTypeAPI
 
     unsafe struct FT_Face
     {
-        public long num_faces;
-        public long face_index;
+        public CLong num_faces;
+        public CLong face_index;
 
-        public long face_flags;
-        public long style_flags;
+        public CLong face_flags;
+        public CLong style_flags;
 
-        public long num_glyphs;
+        public CLong num_glyphs;
 
         public nint family_name;
         public nint style_name;
@@ -212,8 +199,8 @@ namespace FreeTypeAPI
         public FT_Generic generic;
 
         public FT_Glyph_Metrics metrics;
-        public long linearHoriAdvance;
-        public long linearVertAdvance;
+        public CLong linearHoriAdvance;
+        public CLong linearVertAdvance;
         public FT_Vector advance;
 
         public FT_Glyph_Format format;
@@ -228,10 +215,10 @@ namespace FreeTypeAPI
         public FT_SubGlyph* subglyphs;
 
         public nint control_data;
-        public long control_len;
+        public CLong control_len;
 
-        public long lsb_delta;
-        public long rsb_delta;
+        public CLong lsb_delta;
+        public CLong rsb_delta;
 
         public nint other;
 
@@ -252,7 +239,7 @@ namespace FreeTypeAPI
 
         [LibraryImport(Library, StringMarshalling = StringMarshalling.Utf8)]
         [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-        public static partial int FT_New_Face(FT_Library* library, string filepathname, long face_index, out FT_Face* aface);
+        public static partial int FT_New_Face(FT_Library* library, string filepathname, CLong face_index, out FT_Face* aface);
 
         [LibraryImport(Library, StringMarshalling = StringMarshalling.Utf8)]
         [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
@@ -260,7 +247,7 @@ namespace FreeTypeAPI
 
         [LibraryImport(Library, StringMarshalling = StringMarshalling.Utf8)]
         [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-        public static partial uint FT_Get_Char_Index(FT_Face* face, ulong charcode);
+        public static partial uint FT_Get_Char_Index(FT_Face* face, CULong charcode);
 
         [LibraryImport(Library, StringMarshalling = StringMarshalling.Utf8)]
         [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
@@ -272,6 +259,6 @@ namespace FreeTypeAPI
 
         [LibraryImport(Library, StringMarshalling = StringMarshalling.Utf8)]
         [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-        public static partial int FT_Set_Char_Size(FT_Face* face, long char_width, long char_height,  uint horz_resolution, uint vert_resolution);
+        public static partial int FT_Set_Char_Size(FT_Face* face, CLong char_width, CLong char_height,  uint horz_resolution, uint vert_resolution);
     }
 }

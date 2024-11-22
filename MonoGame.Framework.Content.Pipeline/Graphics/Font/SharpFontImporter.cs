@@ -38,7 +38,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
             // Rasterize each character in turn.
             foreach (char character in characters)
             {
-                uint glyphIndex = FreeType.FT_Get_Char_Index(face, character);
+                uint glyphIndex = FreeType.FT_Get_Char_Index(face, new CULong(character));
                 if (!glyphMaps.TryGetValue(glyphIndex, out GlyphData glyphData))
                 {
                     glyphData = ImportGlyph(glyphIndex, face);
@@ -51,10 +51,10 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
             Glyphs = glyphList;
 
             // Store the font height.
-            LineSpacing = face->size->metrics.height >> 6;
+            LineSpacing = face->size->metrics.height.Value >> 6;
 
             // The height used to calculate the Y offset for each character.
-            YOffsetMin = -face->size->metrics.ascender >> 6;
+            YOffsetMin = -face->size->metrics.ascender.Value >> 6;
 
             CheckError(FreeType.FT_Done_Face(face));
             CheckError(FreeType.FT_Done_FreeType(library));
@@ -73,10 +73,10 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
         {
             const uint dpi = 96;
 
-            CheckError(FreeType.FT_New_Face(library, fontName, 0, out FT_Face* face));
+            CheckError(FreeType.FT_New_Face(library, fontName, new CLong(0), out FT_Face* face));
 
             var fixedSize = ((int)options.Size) << 6;
-            CheckError(FreeType.FT_Set_Char_Size(face, 0, fixedSize, dpi, dpi));
+            CheckError(FreeType.FT_Set_Char_Size(face, new CLong(0), new CLong(fixedSize), dpi, dpi));
 
             return face;
         }
@@ -127,8 +127,8 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 
             if (glyphBitmap == null)
             {
-                var gHA = face->glyph->metrics.horiAdvance >> 6;
-                var gVA = face->size->metrics.height >> 6;
+                var gHA = face->glyph->metrics.horiAdvance.Value >> 6;
+                var gVA = face->size->metrics.height.Value >> 6;
 
                 gHA = gHA > 0 ? gHA : gVA;
                 gVA = gVA > 0 ? gVA : gHA;
@@ -138,18 +138,18 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 
             // not sure about this at all
             var abc = new ABCFloat();
-            abc.A = face->glyph->metrics.horiBearingX >> 6;
-            abc.B = face->glyph->metrics.width >> 6;
-            abc.C = (face->glyph->metrics.horiAdvance >> 6) - (abc.A + abc.B);
+            abc.A = face->glyph->metrics.horiBearingX.Value >> 6;
+            abc.B = face->glyph->metrics.width.Value >> 6;
+            abc.C = (face->glyph->metrics.horiAdvance.Value >> 6) - (abc.A + abc.B);
             abc.A -= face->glyph->bitmap_left;
             abc.B += face->glyph->bitmap_left;
 
             // Construct the output Glyph object.
             return new GlyphData(glyphIndex, glyphBitmap)
             {
-                XOffset = -(face->glyph->advance.x >> 6),
-                XAdvance = face->glyph->metrics.horiAdvance >> 6,
-                YOffset = -(face->glyph->metrics.horiBearingY >> 6),
+                XOffset = -(face->glyph->advance.x.Value >> 6),
+                XAdvance = face->glyph->metrics.horiAdvance.Value >> 6,
+                YOffset = -(face->glyph->metrics.horiBearingY.Value >> 6),
                 CharacterWidths = abc
             };
         }
