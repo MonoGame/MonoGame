@@ -32,7 +32,6 @@
             "request": "launch",
             "preLaunchTask": "Build: mgcb",
             "program": "${workspaceFolder}/Artifacts/MonoGame.Content.Builder/Debug/mgcb",
-            "cwd": "/Users/harry/Projects/ContentTest/",
             "console": "internalConsole",
             "stopAtEntry": false
         },
