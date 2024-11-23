@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>net8.0-android</TargetFramework>
-    <SupportedOSPlatformVersion>23</SupportedOSPlatformVersion>
+    <SupportedOSPlatformVersion>29</SupportedOSPlatformVersion>
     <OutputType>Exe</OutputType>
     <ApplicationId>com.companyname.___SafeGameName___</ApplicationId>
     <ApplicationVersion>1</ApplicationVersion>
