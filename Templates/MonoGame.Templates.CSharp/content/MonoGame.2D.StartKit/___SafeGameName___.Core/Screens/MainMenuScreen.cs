@@ -4,6 +4,7 @@ using ___SafeGameName___.Core.Inputs;
 using ___SafeGameName___.Core.Localization;
 using ___SafeGameName___.Core.Settings;
 using ___SafeGameName___.ScreenManagers;
+using GameStateManagement.Inputs;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
@@ -149,18 +150,24 @@ class MainMenuScreen : MenuScreen
             }
         }
 
-        // update our level, passing down the GameTime along with all of our input states
-        level.Update(gameTime,
-            Keyboard.GetState(),
-            GamePad.GetState(PlayerIndex.One),
-            Accelerometer.GetState(),
-            ScreenManager.Game.Window.CurrentOrientation,
-            readyToPlay);
-
         if (showTutorial)
         {
             UpdateTutorialSteps(gameTime);
         }
+    }
+
+    /// <summary>
+    /// Responds to user input.
+    /// </summary>
+    public override void HandleInput(GameTime gameTime, InputState inputState)
+    {
+        base.HandleInput(gameTime, inputState);
+
+        // update our level, passing down the GameTime along with all of our input states
+        level.Update(gameTime,
+            inputState,
+            ScreenManager.Game.Window.CurrentOrientation,
+            readyToPlay);
     }
 
     private void UpdateTutorialSteps(GameTime gameTime)

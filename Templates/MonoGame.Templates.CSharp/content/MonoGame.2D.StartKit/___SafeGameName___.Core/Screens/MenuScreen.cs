@@ -56,6 +56,8 @@ abstract class MenuScreen : GameScreen
     /// </summary>
     public override void HandleInput(GameTime gameTime, InputState inputState)
     {
+        base.HandleInput(gameTime, inputState);
+
         if (___SafeGameName___Game.IsMobile)
         {
             var touchState = inputState.CurrentTouchState;

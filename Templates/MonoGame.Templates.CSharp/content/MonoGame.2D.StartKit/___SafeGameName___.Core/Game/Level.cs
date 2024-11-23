@@ -3,6 +3,7 @@ using ___SafeGameName___.Core.Inputs;
 using ___SafeGameName___.Core.Localization;
 using ___SafeGameName___.Core.Settings;
 using ___SafeGameName___.Screens;
+using GameStateManagement.Inputs;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Content;
@@ -432,9 +433,7 @@ class Level : IDisposable
     /// <param name="displayOrientation">Provides a snapshot of timing values.</param>
     public void Update(
         GameTime gameTime,
-        KeyboardState keyboardState,
-        GamePadState gamePadState,
-        AccelerometerState accelerometerState,
+        InputState inputState,
         DisplayOrientation displayOrientation,
         bool readyToPlay = true)
     {
@@ -503,7 +502,7 @@ class Level : IDisposable
             {
                 timeTaken += gameTime.ElapsedGameTime;
 
-                Player.Update(gameTime, keyboardState, gamePadState, accelerometerState, displayOrientation);
+                Player.Update(gameTime, inputState, displayOrientation);
 
                 UpdateEnemies(gameTime);
 

@@ -163,13 +163,6 @@ class GameplayScreen : GameScreen
 
         level.Paused = !IsActive;
 
-        // update our level, passing down the GameTime along with all of our input states
-        level.Update(gameTime,
-            currentKeyboardState,
-            currentGamePadState,
-            currentAccelerometerState,
-            ScreenManager.Game.Window.CurrentOrientation);
-
         if (IsActive)
         {
             switch (endOfLevelMessgeState)
@@ -223,6 +216,8 @@ class GameplayScreen : GameScreen
     {
         ArgumentNullException.ThrowIfNull(inputState);
 
+        base.HandleInput(gameTime, inputState);
+
         // Get all of our input states for the active player profile.
         int playerIndex = (int)ControllingPlayer.Value;
 
@@ -238,6 +233,11 @@ class GameplayScreen : GameScreen
         }
         else
         {
+            // update our level, passing down the GameTime along with all of our input states
+            level.Update(gameTime,
+                inputState,
+                ScreenManager.Game.Window.CurrentOrientation);
+
             currentKeyboardState = inputState.CurrentKeyboardStates[playerIndex];
             previousGamePadState = inputState.LastGamePadStates[playerIndex];
             currentGamePadState = inputState.CurrentGamePadStates[playerIndex];

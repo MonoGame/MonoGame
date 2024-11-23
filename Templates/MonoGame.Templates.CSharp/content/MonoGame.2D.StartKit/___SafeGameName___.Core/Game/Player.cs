@@ -1,4 +1,5 @@
 using ___SafeGameName___.Core.Inputs;
+using GameStateManagement.Inputs;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
@@ -192,18 +193,14 @@ class Player
     /// we need to reverse our motion when the orientation is in the LandscapeRight orientation.
     /// </remarks>
     /// <param name="gameTime">Provides a snapshot of timing values.</param>
-    /// <param name="keyboardState">Provides a snapshot of timing values.</param>
-    /// <param name="gamePadState">Provides a snapshot of timing values.</param>
-    /// <param name="accelerometerState">Provides a snapshot of timing values.</param>
+    /// <param name="inputState">Provides a snapshot of our input states.</param>
     /// <param name="displayOrientation">Provides a snapshot of timin
     public void Update(
         GameTime gameTime,
-        KeyboardState keyboardState,
-        GamePadState gamePadState,
-        AccelerometerState accelerometerState,
+        InputState inputState,
         DisplayOrientation displayOrientation)
     {
-        HandleInput(keyboardState, gamePadState, accelerometerState, displayOrientation);
+        HandleInput(inputState, displayOrientation);
 
         Move(gameTime);
     }
@@ -232,35 +229,23 @@ class Player
     /// <summary>
     /// Gets player horizontal movement and jump commands from input.
     /// </summary>
-    /// <param name="keyboardState">Provides a snapshot of timing values.</param>
-    /// <param name="gamePadState">Provides a snapshot of timing values.</param>
-    /// <param name="accelerometerState">Provides a snapshot of timing values.</param>
-    /// <param name="displayOrientation">Provides a snapshot of timing values.</param>
+    /// <param name="inputState">Provides a snapshot the state of inputs.</param>
     private void HandleInput(
-        KeyboardState keyboardState,
-        GamePadState gamePadState,
-        AccelerometerState accelerometerState,
+        InputState inputState,
         DisplayOrientation displayOrientation)
     {
-        /* TODO TidyUp Inputs 
-        HandleKeyboardInput(keyboardState);
-        HandleGamepadInput(gamePadState);
-        HandleAccelerometerInput(accelerometerState, displayOrientation);
-        HandleMouseAndTouchInput(playerPosition);
-        */
-
         // Get analog horizontal movement.
-        movement = gamePadState.ThumbSticks.Left.X * MoveStickScale;
+        movement = inputState.CurrentGamePadStates[0].ThumbSticks.Left.X * MoveStickScale;
 
         // Ignore small movements to prevent running in place.
         if (Math.Abs(movement) < 0.5f)
             movement = 0.0f;
 
         // Move the player with accelerometer
-        if (Math.Abs(accelerometerState.Acceleration.Y) > 0.10f)
+        if (Math.Abs(inputState.CurrentAccelerometerState.Acceleration.Y) > 0.10f)
         {
             // set our movement speed
-            movement = MathHelper.Clamp(-accelerometerState.Acceleration.Y * AccelerometerScale, -1f, 1f);
+            movement = MathHelper.Clamp(-inputState.CurrentAccelerometerState.Acceleration.Y * AccelerometerScale, -1f, 1f);
 
             // if we're in the LandscapeLeft orientation, we must reverse our movement
             if (displayOrientation == DisplayOrientation.LandscapeRight)
@@ -268,51 +253,30 @@ class Player
         }
 
         // If any digital horizontal movement input is found, override the analog movement.
-        if (gamePadState.IsButtonDown(Buttons.DPadLeft) ||
-            keyboardState.IsKeyDown(Keys.Left) ||
-            keyboardState.IsKeyDown(Keys.A))
+        if (inputState.CurrentGamePadStates[0].IsButtonDown(Buttons.DPadLeft) ||
+            inputState.CurrentKeyboardStates[0].IsKeyDown(Keys.Left) ||
+            inputState.CurrentKeyboardStates[0].IsKeyDown(Keys.A))
         {
             movement = -1.0f;
         }
-        else if (gamePadState.IsButtonDown(Buttons.DPadRight) ||
-                 keyboardState.IsKeyDown(Keys.Right) ||
-                 keyboardState.IsKeyDown(Keys.D))
+        else if (inputState.CurrentGamePadStates[0].IsButtonDown(Buttons.DPadRight) ||
+                 inputState.CurrentKeyboardStates[0].IsKeyDown(Keys.Right) ||
+                 inputState.CurrentKeyboardStates[0].IsKeyDown(Keys.D))
         {
             movement = 1.0f;
         }
 
         // Check if the player wants to jump.
         isJumping =
-            gamePadState.IsButtonDown(JumpButton) ||
-            keyboardState.IsKeyDown(Keys.Space) ||
-            keyboardState.IsKeyDown(Keys.Up) ||
-            keyboardState.IsKeyDown(Keys.W);
+            inputState.CurrentGamePadStates[0].IsButtonDown(JumpButton) ||
+            inputState.CurrentKeyboardStates[0].IsKeyDown(Keys.Space) ||
+            inputState.CurrentKeyboardStates[0].IsKeyDown(Keys.Up) ||
+            inputState.CurrentKeyboardStates[0].IsKeyDown(Keys.W);
 
-        // Mouse Input
-        var mouseState = Mouse.GetState();
-        if (mouseState.LeftButton == ButtonState.Pressed)
+        // Handle Mouse and Touch Input
+        if (inputState.CurrentMouseState.LeftButton == ButtonState.Pressed)
         {
-            HandleClickInput(mouseState.Position.ToVector2());
-        }
-
-        // Touch Input
-        var touchCollection = TouchPanel.GetState();
-        foreach (var touch in touchCollection)
-        {
-            switch (touch.State)
-            {
-                case TouchLocationState.Invalid:
-                    break;
-                case TouchLocationState.Moved:
-                    break;
-                case TouchLocationState.Pressed:
-                    HandleClickInput(touch.Position);
-                    break;
-                case TouchLocationState.Released:
-                    break;
-                default:
-                    break;
-            }
+            HandleClickInput(inputState.CurrentCursorLocation);
         }
     }
 

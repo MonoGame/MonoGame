@@ -46,6 +46,12 @@ public class InputState
     /// </summary>
     public Vector2 CurrentCursorLocation => currentCursorLocation;
 
+    private Vector2 lastCursorLocation;
+    /// <summary>
+    /// Current location of our Cursor
+    /// </summary>
+    public Vector2 LastCursorLocation => lastCursorLocation;
+
     private bool isMouseWheelScrolledDown;
     /// <summary>
     /// Has the user scrolled the mouse wheel down?
@@ -122,6 +128,9 @@ public class InputState
             {
                 case TouchLocationState.Pressed:
                     touchCount++;
+                    lastCursorLocation.X = currentCursorLocation.X;
+                    lastCursorLocation.Y = currentCursorLocation.Y;
+
                     currentCursorLocation.X = location.Position.X / horizontalScalingFactor;
                     currentCursorLocation.Y = location.Position.Y / verticalScalingFactor;
                     break;
@@ -134,6 +143,9 @@ public class InputState
 
         if (CurrentMouseState.LeftButton == ButtonState.Released && LastMouseState.LeftButton == ButtonState.Pressed)
         {
+            lastCursorLocation.X = currentCursorLocation.X;
+            lastCursorLocation.Y = currentCursorLocation.Y;
+
             currentCursorLocation.X = CurrentMouseState.X / horizontalScalingFactor;
             currentCursorLocation.Y = CurrentMouseState.Y / verticalScalingFactor;
             touchCount = 1;
@@ -173,8 +185,15 @@ public class InputState
         // the 1st GamePad and direction key input on the Keyboard, making sure to
         // keep the cursor inside the screen boundary
         float elapsedTime = (float)gameTime.ElapsedGameTime.TotalSeconds;
-        currentCursorLocation.X += CurrentGamePadStates[0].ThumbSticks.Left.X * elapsedTime * cursorMoveSpeed;
-        currentCursorLocation.Y -= CurrentGamePadStates[0].ThumbSticks.Left.Y * elapsedTime * cursorMoveSpeed;
+
+        if (CurrentGamePadStates[0].IsConnected)
+        {
+            lastCursorLocation.X = currentCursorLocation.X;
+            lastCursorLocation.Y = currentCursorLocation.Y;
+
+            currentCursorLocation.X += CurrentGamePadStates[0].ThumbSticks.Left.X * elapsedTime * cursorMoveSpeed;
+            currentCursorLocation.Y -= CurrentGamePadStates[0].ThumbSticks.Left.Y * elapsedTime * cursorMoveSpeed;
+        }
 
         if (CurrentKeyboardStates[0].IsKeyDown(Keys.Up))
         {

@@ -1,21 +1,9 @@
-#region File Description
-//-----------------------------------------------------------------------------
-// MessageBoxScreen.cs
-//
-// Microsoft XNA Community Game Platform
-// Copyright (C) Microsoft Corporation. All rights reserved.
-//-----------------------------------------------------------------------------
-#endregion
-
-#region Using Statements
-using System;
-using System.Runtime.CompilerServices;
 using ___SafeGameName___.Core.Localization;
 using GameStateManagement.Inputs;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
-#endregion
+using System;
 
 namespace ___SafeGameName___.Screens;
 
@@ -25,24 +13,15 @@ namespace ___SafeGameName___.Screens;
 /// </summary>
 class MessageBoxScreen : GameScreen
 {
-    #region Fields
-
     string message;
     Texture2D gradientTexture;
     private readonly bool toastMessage;
     private readonly TimeSpan toastDuration;
     private TimeSpan toastTimer;
 
-    #endregion
-
-    #region Events
 
     public event EventHandler<PlayerIndexEventArgs> Accepted;
     public event EventHandler<PlayerIndexEventArgs> Cancelled;
-
-    #endregion
-
-    #region Initialization
 
 
     /// <summary>
@@ -92,16 +71,13 @@ class MessageBoxScreen : GameScreen
     }
 
 
-    #endregion
-
-    #region Handle Input
-
-
     /// <summary>
     /// Responds to user input, accepting or cancelling the message box.
     /// </summary>
     public override void HandleInput(GameTime gameTime, InputState inputState)
     {
+        base.HandleInput(gameTime, inputState);
+
         // Ignore input if this is a ToastMessage
         if (toastMessage)
         {
@@ -134,9 +110,6 @@ class MessageBoxScreen : GameScreen
     }
 
 
-    #endregion
-
-    #region Update and Draw
     /// <summary>
     /// Updates the screen, particularly for toast messages.
     /// </summary>
@@ -197,6 +170,4 @@ class MessageBoxScreen : GameScreen
 
         spriteBatch.End();
     }
-
-    #endregion
 }
