@@ -41,10 +41,11 @@ class GameplayScreen : GameScreen
 
     // We store our input states so that we only poll once per frame, 
     // then we use the same input state wherever needed
-    private GamePadState gamePadState;
-    private KeyboardState keyboardState;
-    private TouchCollection touchState;
-    private AccelerometerState accelerometerState;
+    private GamePadState currentGamePadState;
+    private GamePadState previousGamePadState;
+    private KeyboardState currentKeyboardState;
+    private TouchCollection currentTouchState;
+    private AccelerometerState currentAccelerometerState;
 
     private Texture2D backpack;
     private ParticleManager particleManager;
@@ -164,9 +165,9 @@ class GameplayScreen : GameScreen
 
         // update our level, passing down the GameTime along with all of our input states
         level.Update(gameTime,
-            keyboardState,
-            gamePadState,
-            accelerometerState,
+            currentKeyboardState,
+            currentGamePadState,
+            currentAccelerometerState,
             ScreenManager.Game.Window.CurrentOrientation);
 
         if (IsActive)
@@ -229,8 +230,7 @@ class GameplayScreen : GameScreen
         // they unplug the active gamepad. This requires us to keep track of
         // whether a gamepad was ever plugged in, because we don't want to pause
         // on PC if they are playing with a keyboard and have no gamepad at all!
-        bool gamePadDisconnected = !gamePadState.IsConnected &&
-                                   inputState.GamePadWasConnected[playerIndex];
+        bool gamePadDisconnected = !currentGamePadState.IsConnected && previousGamePadState.IsConnected;
 
         if (inputState.IsPauseGame(ControllingPlayer) || gamePadDisconnected)
         {
@@ -238,15 +238,16 @@ class GameplayScreen : GameScreen
         }
         else
         {
-            keyboardState = inputState.CurrentKeyboardStates[playerIndex];
-            gamePadState = inputState.CurrentGamePadStates[playerIndex];
+            currentKeyboardState = inputState.CurrentKeyboardStates[playerIndex];
+            previousGamePadState = inputState.LastGamePadStates[playerIndex];
+            currentGamePadState = inputState.CurrentGamePadStates[playerIndex];
 
-            touchState = inputState.CurrentTouchState;
+            currentTouchState = inputState.CurrentTouchState;
 
-            accelerometerState = inputState.CurrentAccelerometerState;
+            currentAccelerometerState = inputState.CurrentAccelerometerState;
 
             // Exit the game when back is pressed.
-            if (gamePadState.Buttons.Back == ButtonState.Pressed)
+            if (currentGamePadState.Buttons.Back == ButtonState.Pressed)
                 ScreenManager.Game.Exit();
 
             if (endOfLevelMessgeState == EndOfLevelMessageState.Show && IsActive)

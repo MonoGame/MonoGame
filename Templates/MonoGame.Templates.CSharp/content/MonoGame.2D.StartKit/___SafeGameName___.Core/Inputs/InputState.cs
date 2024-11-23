@@ -19,19 +19,19 @@ public class InputState
 {
     public const int MaxInputs = 4;
 
+    // Current Inputstates
     public AccelerometerState CurrentAccelerometerState;
     public readonly GamePadState[] CurrentGamePadStates;
     public readonly KeyboardState[] CurrentKeyboardStates;
     public MouseState CurrentMouseState;
     public TouchCollection CurrentTouchState;
 
+    // Last Inputstates
     public AccelerometerState LastAccelerometerState;
     public readonly GamePadState[] LastGamePadStates;
     public readonly KeyboardState[] LastKeyboardStates;
     public MouseState LastMouseState;
     public TouchCollection LastTouchState;
-
-    public readonly bool[] GamePadWasConnected;
 
     public readonly List<GestureSample> Gestures = new List<GestureSample>();
 
@@ -72,8 +72,6 @@ public class InputState
         LastKeyboardStates = new KeyboardState[MaxInputs];
         LastGamePadStates = new GamePadState[MaxInputs];
 
-        GamePadWasConnected = new bool[MaxInputs];
-
         if (___SafeGameName___Game.IsMobile)
         {
             TouchPanel.EnabledGestures = GestureType.Tap;
@@ -103,13 +101,6 @@ public class InputState
 
             CurrentKeyboardStates[i] = Keyboard.GetState();
             CurrentGamePadStates[i] = GamePad.GetState((PlayerIndex)i);
-
-            // Keep track of whether a gamepad has ever been
-            // connected, so we can detect if it is unplugged.
-            if (CurrentGamePadStates[i].IsConnected)
-            {
-                GamePadWasConnected[i] = true;
-            }
         }
 
         LastMouseState = CurrentMouseState;
