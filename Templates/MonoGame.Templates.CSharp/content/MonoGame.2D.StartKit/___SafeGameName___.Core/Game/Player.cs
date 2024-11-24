@@ -274,7 +274,7 @@ class Player
             inputState.CurrentKeyboardStates[0].IsKeyDown(Keys.W);
 
         // Handle Mouse and Touch Input
-        if (inputState.CurrentMouseState.LeftButton == ButtonState.Pressed)
+        if (inputState.CurrentTouchState.Count > 0 || inputState.CurrentMouseState.LeftButton == ButtonState.Pressed)
         {
             HandleClickInput(inputState.CurrentCursorLocation);
         }
