@@ -354,6 +354,30 @@ public class InputState
                IsNewButtonPress(Buttons.Start, controllingPlayer, out playerIndex);
     }
 
+    /// <summary>
+    /// Checks if player has selected next
+    /// on either keyboard or gamepad.
+    /// </summary>
+    public bool IsSelectNext(PlayerIndex? controllingPlayer)
+    {
+        PlayerIndex playerIndex;
+
+        return IsNewKeyPress(Keys.Right, controllingPlayer, out playerIndex) ||
+               IsNewButtonPress(Buttons.DPadRight, controllingPlayer, out playerIndex);
+    }
+
+    /// <summary>
+    /// Checks if player has selected previous
+    /// on either keyboard or gamepad.
+    /// </summary>
+    public bool IsSelectPrevious(PlayerIndex? controllingPlayer)
+    {
+        PlayerIndex playerIndex;
+
+        return IsNewKeyPress(Keys.Left, controllingPlayer, out playerIndex) ||
+               IsNewButtonPress(Buttons.DPadLeft, controllingPlayer, out playerIndex);
+    }
+
     internal void UpdateScalingFactor(float horizontalScalingFactor, float verticalScalingFactor)
     {
         this.horizontalScalingFactor = horizontalScalingFactor;

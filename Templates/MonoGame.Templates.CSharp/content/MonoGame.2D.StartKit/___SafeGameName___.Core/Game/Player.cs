@@ -283,7 +283,6 @@ class Player
     private void HandleClickInput(Vector2 clickPosition)
     {
         // Convert the screen position to world position if necessary (depends on your camera).
-
         Vector2 playerPosition = Position; // Assuming this is the center of the player
 
         // Thresholds to decide "above" and "ahead/behind"

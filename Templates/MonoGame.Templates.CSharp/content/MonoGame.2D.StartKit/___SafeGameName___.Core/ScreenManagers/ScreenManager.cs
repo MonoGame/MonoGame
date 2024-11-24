@@ -5,6 +5,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input.Touch;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 
@@ -291,15 +292,48 @@ public class ScreenManager : DrawableGameComponent
 
     public void ScalePresentationArea()
     {
-        //Work out how much we need to scale our graphics to fill the screen
+        // Fetch screen dimensions
         backbufferWidth = GraphicsDevice.PresentationParameters.BackBufferWidth;
         backbufferHeight = GraphicsDevice.PresentationParameters.BackBufferHeight;
-        float horizontalScalingFactor = backbufferWidth / baseScreenSize.X;
-        float verticalScalingFactor = backbufferHeight / baseScreenSize.Y;
-        Vector3 screenScalingFactor = new Vector3(horizontalScalingFactor, verticalScalingFactor, 1);
-        globalTransformation = Matrix.CreateScale(screenScalingFactor);
-        System.Diagnostics.Debug.WriteLine("Screen Size - Width[" + backbufferWidth + "] Height [" + backbufferHeight + "]");
 
-        inputState.UpdateScalingFactor(horizontalScalingFactor, verticalScalingFactor);
+        // Input scalling will go off base values
+        float horizontalInputScalingFactor = backbufferWidth / baseScreenSize.X;
+        float verticalInputScalingFactor = backbufferHeight / baseScreenSize.Y;
+
+        // Calculate aspect ratios
+        float baseAspectRatio = baseScreenSize.X / baseScreenSize.Y;
+        float screenAspectRatio = backbufferWidth / (float)backbufferHeight;
+
+        // Determine uniform scaling factor
+        float scalingFactor;
+        float horizontalOffset = 0;
+        float verticalOffset = 0;
+
+        if (screenAspectRatio > baseAspectRatio)
+        {
+            // Wider screen: scale by height
+            scalingFactor = backbufferHeight / baseScreenSize.Y;
+
+            // Centre things horizontally.
+            horizontalOffset = (backbufferWidth - baseScreenSize.X * scalingFactor) / 2;
+        }
+        else
+        {
+            // Taller screen: scale by width
+            scalingFactor = backbufferWidth / baseScreenSize.X;
+
+            // Centre things vertically.
+            verticalOffset = (backbufferHeight - baseScreenSize.Y * scalingFactor) / 2;
+        }
+
+        // Update the transformation matrix
+        globalTransformation = Matrix.CreateScale(scalingFactor) *
+                               Matrix.CreateTranslation(horizontalOffset, verticalOffset, 0);
+
+        // Update the input scaling as needed
+        inputState.UpdateScalingFactor(horizontalInputScalingFactor, verticalInputScalingFactor);
+
+        // Debug info
+        Debug.WriteLine($"Screen Size - Width[{backbufferWidth}] Height[{backbufferHeight}] ScalingFactor[{scalingFactor}]");
     }
 }
