@@ -159,7 +159,7 @@ class SettingsScreen : MenuScreen
     {
         currentParticleEffect++;
 
-        if (currentParticleEffect > ParticleEffectType.Confetti)
+        if (currentParticleEffect > ParticleEffectType.Sparkles)
         {
             currentParticleEffect = 0;
         }

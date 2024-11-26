@@ -5,7 +5,8 @@
 /// </summary>
 public enum ParticleEffectType
 {
+    Confetti,
+    Explosions,
     Fireworks,
     Sparkles,
-    Confetti,
 }
