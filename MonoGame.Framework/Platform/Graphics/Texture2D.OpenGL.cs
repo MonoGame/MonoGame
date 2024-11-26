@@ -264,6 +264,13 @@ namespace Microsoft.Xna.Framework.Graphics
                     Array.Copy(temp, tempStart, data, dataStart, tRectWidth);
                 }
             }
+
+            //If we want the full texture rect == (0,0,width,height), we dont have to allocate a temp buffer to copy from.
+            else if (rect.X == 0 && rect.Y == 0 && this.width == rect.Width && this.height == rect.Height)
+            {
+                GL.GetTexImage(TextureTarget.Texture2D, level, glFormat, glType, data);
+                GraphicsExtensions.CheckGLError();
+            }
             else
             {
                 // we need to convert from our format size to the size of T here
