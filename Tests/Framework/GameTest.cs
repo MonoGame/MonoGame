@@ -36,6 +36,7 @@ namespace MonoGame.Tests {
 		}
 
 		[TestFixture]
+		[Category("GameTest")]
 		public class Disposal : FixtureBase {
 			[TestCase ("Components")]
 			[TestCase ("Content")]
@@ -130,6 +131,7 @@ namespace MonoGame.Tests {
 		}
 
 		[TestFixture]
+		[Category("GameTest")]
 		public class Behaviors : FixtureBase {
 			[Test, Ignore("Fix me!")]
 			public void Nongraphical_run_succeeds ()
@@ -176,6 +178,7 @@ namespace MonoGame.Tests {
         }
 
         [TestFixture]
+		[Category("GameTest")]
         public class Misc
         {
             [Test]

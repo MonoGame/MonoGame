@@ -8,6 +8,7 @@ using NUnit.Framework;
 
 namespace MonoGame.Tests.Visual {
 	[TestFixture]
+	[NonParallelizable]
 	class MiscellaneousTests : VisualTestFixtureBase
     {
 		[Test]
@@ -21,6 +22,7 @@ namespace MonoGame.Tests.Visual {
 #else
         [Ignore ("Microsoft.Xna.Framework.Graphics.MonoGameGLException : GL.GetError() returned 1286. Invesigate")]
 #endif
+		[RunOnUI]
 		public void DrawOrder_falls_back_to_order_of_addition_to_Game ()
 		{
 			Game.PreDrawWith += (sender, e) => {
@@ -34,6 +36,7 @@ namespace MonoGame.Tests.Visual {
 		[TestCase(true)]
 		[TestCase(false)]
         [Ignore("Fix me!")]
+		[RunOnUI]
 		public void TexturedQuad_lighting (bool enableLighting)
 		{
 			Game.Components.Add (new TexturedQuadComponent (Game, enableLighting));
@@ -41,6 +44,7 @@ namespace MonoGame.Tests.Visual {
 		}
 
 		[Test, Ignore("Fix me!")]
+		[RunOnUI]
 		public void SpaceshipModel ()
 		{
 			Game.Components.Add (new SpaceshipModelDrawComponent(Game));

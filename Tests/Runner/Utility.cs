@@ -355,6 +355,8 @@ namespace MonoGame.Tests {
             type = "DirectX";
 #elif DESKTOPGL
             type = "OpenGL";
+#elif VULKAN
+            type = "Vulkan";
 #else
             throw new Exception("Make sure the effect path is set up correctly for this platform!");
 #endif

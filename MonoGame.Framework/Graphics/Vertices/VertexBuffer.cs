@@ -73,6 +73,10 @@ namespace Microsoft.Xna.Framework.Graphics
         /// Creates a new instance of <see cref="VertexBuffer"/>
         /// </summary>
         /// <param name="graphicsDevice">The graphics device.</param>
+        /// <param name="type">
+        /// The data type.
+        /// Must be a value type which implements the <see cref="IVertexType"/> interface.
+        /// </param>
         /// <param name="vertexCount">The number of vertices.</param>
         /// <param name="bufferUsage">Behavior options.</param>
         /// <exception cref="ArgumentNullException"><paramref name="graphicsDevice"/> is <see langword="null"/></exception>
@@ -115,7 +119,7 @@ namespace Microsoft.Xna.Framework.Graphics
         /// </remarks>
         public void GetData<T> (int offsetInBytes, T[] data, int startIndex, int elementCount, int vertexStride = 0) where T : struct
         {
-            var elementSizeInBytes = ReflectionHelpers.SizeOf<T>.Get();
+            var elementSizeInBytes = ReflectionHelpers.FastSizeOf<T>();
             if (vertexStride == 0)
                 vertexStride = elementSizeInBytes;
 
@@ -144,7 +148,7 @@ namespace Microsoft.Xna.Framework.Graphics
         /// <inheritdoc cref="GetData{T}(int, T[], int, int, int)"/>
         public void GetData<T>(T[] data) where T : struct
         {
-            var elementSizeInByte = ReflectionHelpers.SizeOf<T>.Get();
+            var elementSizeInByte = ReflectionHelpers.FastSizeOf<T>();
             this.GetData<T>(0, data, 0, data.Length, elementSizeInByte);
         }
 
@@ -211,7 +215,7 @@ namespace Microsoft.Xna.Framework.Graphics
         /// must be within the <paramref name="data"/> array bounds.</param>
 		public void SetData<T>(T[] data, int startIndex, int elementCount) where T : struct
         {
-            var elementSizeInBytes = ReflectionHelpers.SizeOf<T>.Get();
+            var elementSizeInBytes = ReflectionHelpers.FastSizeOf<T>();
             SetDataInternal<T>(0, data, startIndex, elementCount, elementSizeInBytes, SetDataOptions.None);
 		}
 
@@ -224,7 +228,7 @@ namespace Microsoft.Xna.Framework.Graphics
         /// <param name="data">Data array to be passed to the shader.</param>
         public void SetData<T>(T[] data) where T : struct
         {
-            var elementSizeInBytes = ReflectionHelpers.SizeOf<T>.Get();
+            var elementSizeInBytes = ReflectionHelpers.FastSizeOf<T>();
             SetDataInternal<T>(0, data, 0, data.Length, elementSizeInBytes, SetDataOptions.None);
         }
 
@@ -234,7 +238,7 @@ namespace Microsoft.Xna.Framework.Graphics
             if (data == null)
                 throw new ArgumentNullException("data");
 
-            var elementSizeInBytes = ReflectionHelpers.SizeOf<T>.Get();
+            var elementSizeInBytes = ReflectionHelpers.FastSizeOf<T>();
             var bufferSize = VertexCount * VertexDeclaration.VertexStride;
 
             if (vertexStride == 0)

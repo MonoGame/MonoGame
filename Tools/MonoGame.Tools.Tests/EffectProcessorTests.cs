@@ -10,6 +10,7 @@ using TwoMGFX;
 
 namespace MonoGame.Tests.ContentPipeline
 {
+    [Category("Effects")]
     class EffectProcessorTests
     {
         class ImporterContext : ContentImporterContext

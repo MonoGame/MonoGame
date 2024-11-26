@@ -12,7 +12,9 @@ using Microsoft.Xna.Framework;
 
 namespace MonoGame.Tests.Audio
 {
+
     [TestFixture]
+    [Category("Audio")]
     public class XactTests
     {
         private AudioEngine _audioEngine;
@@ -353,6 +355,30 @@ namespace MonoGame.Tests.Audio
             Assert.Throws<IndexOutOfRangeException>(() => cue.SetVariable("Cue Private", 1.0f));
 
             cue.Dispose();
+        }
+
+        [Test]
+        public void WaveBankPlays()
+        {
+            var waveBank = new WaveBank(_audioEngine, @"Assets\Audio\Win\Tests.xwb");
+            Assert.False(waveBank.IsInUse);
+            Assert.False(waveBank.IsDisposed);
+            Assert.True(waveBank.IsPrepared);
+
+            var sei = _soundBank.GetSoundEffectInstance (0, 0, out bool streaming);
+            sei.Play ();
+            Assert.True(sei.State == SoundState.Playing);
+            sei = _soundBank.GetSoundEffectInstance (0, 1, out streaming);
+            sei.Play ();
+            Assert.True(sei.State == SoundState.Playing);
+            sei = _soundBank.GetSoundEffectInstance (0, 2, out streaming);
+            sei.Play ();
+            Assert.True(sei.State == SoundState.Playing);
+
+            waveBank.Dispose();
+            Assert.True(waveBank.IsDisposed);
+            Assert.False(waveBank.IsInUse);
+            Assert.False(waveBank.IsPrepared);
         }
 
         private void SleepWhileAudioEngineUpdates(int ms)

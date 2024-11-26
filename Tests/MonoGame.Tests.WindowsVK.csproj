@@ -1,0 +1,65 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <RollForward>Major</RollForward>
+    <IsPackable>false</IsPackable>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <GenerateProgramFile>false</GenerateProgramFile>
+    <DefineConstants>WINDOWS;VULKAN;DESKTOP</DefineConstants>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="NUnitLite" Version="3.13.2" />
+    <PackageReference Include="NUnit3TestAdapter" Version="4.5.0" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.7.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Remove="bin\**\*" />
+    <Compile Remove="Framework\WindowsDX\**" />
+    <Compile Remove="obj\**\*" />
+    <Compile Remove="Properties/**/*" />
+    <Compile Remove="Interactive/**/*" />
+    <Compile Remove="Runner/iOS/**/*" />
+
+    <Compile Remove="Framework/SDL/**/*" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="Assets/**/*" CopyToOutputDirectory="PreserveNewest" />
+
+    <Content Include="..\MonoGame.Framework\Platform\Graphics\Effect\Resources\*.fx*">
+      <Link>Assets\Effects\Stock\%(Filename)%(Extension)</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Remove="Framework\WindowsDX\**" />
+    <None Remove="Framework\WindowsDX\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Remove="Framework\Audio\DynamicSoundEffectInstanceTest.cs" />
+    <Compile Remove="Framework\Audio\SoundEffectInstanceTest.cs" />
+    <Compile Remove="Framework\Audio\SoundEffectTest.cs" />
+    <Compile Remove="Framework\Audio\XactTest.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\MonoGame.Framework\MonoGame.Framework.Native.csproj" />
+    <ProjectReference Include="..\src\monogame\desktopvk.vcxproj" />
+
+	  <Content Include="..\Artifacts\monogame.native\windows\desktopvk\$(Configuration)\monogame.native.dll">
+		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </Content>
+	  
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Framework\Audio\" />
+  </ItemGroup>
+
+</Project>

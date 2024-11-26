@@ -9,9 +9,11 @@ using NUnit.Framework;
 namespace MonoGame.Tests.Graphics
 {
     [TestFixture]
+    [NonParallelizable]
     internal class EffectTest : GraphicsDeviceTestFixtureBase
     {
         [Test]
+        [RunOnUI]
         public void EffectConstructorShouldAllowIndexAndCount()
         {
             byte[] mgfxo = EffectResource.BasicEffect.Bytecode;
@@ -24,6 +26,7 @@ namespace MonoGame.Tests.Graphics
         }
 
         [Test]
+        [RunOnUI]
         public void EffectPassShouldSetTexture()
         {
             var texture = new Texture2D(game.GraphicsDevice, 1, 1, false, SurfaceFormat.Color);
@@ -45,6 +48,7 @@ namespace MonoGame.Tests.Graphics
         }
 
         [Test]
+        [RunOnUI]
         public void EffectPassShouldSetTextureOnSubsequentCalls()
         {
             var texture = new Texture2D(game.GraphicsDevice, 1, 1, false, SurfaceFormat.Color);
@@ -73,6 +77,7 @@ namespace MonoGame.Tests.Graphics
         }
 
         [Test]
+        [RunOnUI]
         public void EffectPassShouldSetTextureEvenIfNull()
         {
             var texture = new Texture2D(game.GraphicsDevice, 1, 1, false, SurfaceFormat.Color);
@@ -94,6 +99,7 @@ namespace MonoGame.Tests.Graphics
         }
 
         [Test]
+        [RunOnUI]
         public void EffectPassShouldOverrideTextureIfNotExplicitlySet()
         {
             var texture = new Texture2D(game.GraphicsDevice, 1, 1, false, SurfaceFormat.Color);
@@ -117,6 +123,7 @@ namespace MonoGame.Tests.Graphics
 #if DESKTOPGL
         [Ignore("Fails under OpenGL!")]
 #endif
+        [RunOnUI]
         public void EffectParameterShouldBeSetIfSetByNameAndGetByIndex()
         {
             // This relies on the parameters permanently being on the same index.

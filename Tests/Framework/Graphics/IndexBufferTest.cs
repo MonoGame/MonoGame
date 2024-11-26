@@ -9,9 +9,11 @@ using Microsoft.Xna.Framework.Graphics;
 namespace MonoGame.Tests.Graphics
 {
     [TestFixture]
+    [NonParallelizable]
     class IndexBufferTest: GraphicsDeviceTestFixtureBase
     {
         [Test]
+        [RunOnUI]
         public void ShouldSetAndGetData()
         {   
             var savedData = new short[] { 1, 2, 3, 4 };
@@ -26,6 +28,7 @@ namespace MonoGame.Tests.Graphics
         }
 
         [Test]
+        [RunOnUI]
         public void ShouldSetAndGetData_elementCount()
         {
             var savedData = new short[] { 1, 2, 3, 4 };
@@ -43,6 +46,7 @@ namespace MonoGame.Tests.Graphics
         }
 
         [Test]
+        [RunOnUI]
         public void ShouldSetAndGetData_startIndex()
         {
             var savedData = new short[] { 1, 2, 3, 4 };
@@ -60,6 +64,7 @@ namespace MonoGame.Tests.Graphics
         }
 
         [Test]
+        [RunOnUI]
         public void ShouldSetAndGetData_offsetInBytes()
         {
             var savedData = new short[] { 1, 2, 3, 4 };
@@ -75,6 +80,7 @@ namespace MonoGame.Tests.Graphics
         }
         
         [Test]
+        [RunOnUI]
         public void NullDeviceShouldThrowArgumentNullException()
         {
             Assert.Throws<ArgumentNullException>(() => 

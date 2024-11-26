@@ -20,3 +20,11 @@
 /processorParam:TextureFormat=Compressed
 /build:ContentFont.spritefont
 
+#begin Texture/LogoOnly_64px.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:TextureFormat=Compressed
+/build:../../Textures/LogoOnly_64px.png;Textures/LogoOnly_64px
+
+/processorParam:TextureFormat=Color16bit
+/build:../../Textures/LogoOnly_64px.png;Textures#tcf_rgba4444/LogoOnly_64px

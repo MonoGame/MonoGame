@@ -48,8 +48,10 @@ namespace Microsoft.Xna.Framework.Content
             '5', // PlayStation5
             'O', // XboxOne
             'S', // Nintendo Switch
-            'G', // Google Stadia
             'b', // WebAssembly and Bridge.NET
+            'V', // DesktopVK
+            'G', // Windows GDK
+            's', // Xbox Series
 
             // NOTE: There are additional identifiers for consoles that
             // are not defined in this repository.  Be sure to ask the
@@ -168,6 +170,7 @@ namespace Microsoft.Xna.Framework.Content
 		}
 
         /// <inheritdoc cref="ContentManager.ContentManager(IServiceProvider)"/>
+        /// <param name="serviceProvider"/>
         /// <param name="rootDirectory">The root directory the ContentManager will search for content in.</param>
         public ContentManager(IServiceProvider serviceProvider, string rootDirectory)
 		{
@@ -223,7 +226,7 @@ namespace Microsoft.Xna.Framework.Content
         ///     <para>
         ///         Before a ContentManager can load an asset, you need to add the asset to your game project using
         ///         the steps described in
-        ///         <see href="https://docs.monogame.net/articles/content_pipeline/index.html">Adding Content - MonoGame</see>.
+        ///         <see href="https://docs.monogame.net/articles/getting_started/content_pipeline/index.html">Adding Content - MonoGame</see>.
         ///     </para>
         /// </remarks>
         /// <typeparam name="T">
@@ -231,8 +234,8 @@ namespace Microsoft.Xna.Framework.Content
         ///         The type of asset to load.
         ///     </para>
         ///     <para>
-        ///         <see cref="Effect"/>, <see cref="Model"/>, <see cref="SoundEffect"/>,
-        ///         <see cref="Song"/>, <see cref="SpriteFont"/>, <see cref="Texture"/>, <see cref="Texture2D"/>,
+        ///         <see cref="Effect"/>, <see cref="Model"/>, <see cref="Audio.SoundEffect"/>,
+        ///         <see cref="Media.Song"/>, <see cref="SpriteFont"/>, <see cref="Texture"/>, <see cref="Texture2D"/>,
         ///         and <see cref="TextureCube"/> are all supported by default by the standard Content Pipeline
         ///         processor, but additional types may be loaded by extending the processor.
         ///     </para>
@@ -293,15 +296,15 @@ namespace Microsoft.Xna.Framework.Content
         /// <remarks>
         /// Before a ContentManager can load an asset, you need to add the asset to your game project using
         /// the steps described in
-        /// <see href="https://docs.monogame.net/articles/content_pipeline/index.html">Adding Content - MonoGame</see>.
+        /// <see href="https://docs.monogame.net/articles/getting_started/content_pipeline/index.html">Adding Content - MonoGame</see>.
         /// </remarks>
         /// <typeparam name="T">
         ///     <para>
         ///         The type of asset to load.
         ///     </para>
         ///     <para>
-        ///         <see cref="Effect"/>, <see cref="Model"/>, <see cref="SoundEffect"/>,
-        ///         <see cref="Song"/>, <see cref="SpriteFont"/>, <see cref="Texture"/>, <see cref="Texture2D"/>,
+        ///         <see cref="Effect"/>, <see cref="Model"/>, <see cref="Audio.SoundEffect"/>,
+        ///         <see cref="Media.Song"/>, <see cref="SpriteFont"/>, <see cref="Texture"/>, <see cref="Texture2D"/>,
         ///         and <see cref="TextureCube"/> are all supported by default by the standard Content Pipeline
         ///         processor, but additional types may be loaded by extending the processor.
         ///     </para>
@@ -341,6 +344,10 @@ namespace Microsoft.Xna.Framework.Content
             if (disposed)
             {
                 throw new ObjectDisposedException("ContentManager");
+            }
+            if(Path.IsPathRooted(assetName))
+            {
+                throw new ContentLoadException("assetName '" + assetName + "' cannot be a rooted (absolute) path. Remove any leading drive letters (e.g. 'C:'), forward slashes or backslashes");
             }
 
             T result = default(T);

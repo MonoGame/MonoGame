@@ -994,6 +994,14 @@ internal static class Sdl
         public static d_sdl_gamecontrolleraddmappingsfromrw AddMappingFromRw = FuncLoader.LoadFunction<d_sdl_gamecontrolleraddmappingsfromrw>(NativeLibrary, "SDL_GameControllerAddMappingsFromRW");
 
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        public delegate bool d_sdl_gamecontrollerhasbutton(IntPtr gamecontroller, Button button);
+        public static d_sdl_gamecontrollerhasbutton HasButton = FuncLoader.LoadFunction<d_sdl_gamecontrollerhasbutton>(NativeLibrary, "SDL_GameControllerHasButton");
+
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        public delegate bool d_sdl_gamecontrollerhasaxis(IntPtr gamecontroller, Axis axis);
+        public static d_sdl_gamecontrollerhasaxis HasAxis = FuncLoader.LoadFunction<d_sdl_gamecontrollerhasaxis>(NativeLibrary, "SDL_GameControllerHasAxis");
+
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         public delegate void d_sdl_gamecontrollerclose(IntPtr gamecontroller);
         public static d_sdl_gamecontrollerclose Close = FuncLoader.LoadFunction<d_sdl_gamecontrollerclose>(NativeLibrary, "SDL_GameControllerClose");
 
