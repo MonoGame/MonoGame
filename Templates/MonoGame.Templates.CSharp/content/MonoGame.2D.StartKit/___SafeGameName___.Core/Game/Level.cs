@@ -56,47 +56,49 @@ class Level : IDisposable
     }
     int score;
 
+    bool reachedExit;
     public bool ReachedExit
     {
         get { return reachedExit; }
     }
-    bool reachedExit;
 
+
+    TimeSpan timeTaken;
     public TimeSpan TimeTaken
     {
         get { return timeTaken; }
     }
-    TimeSpan timeTaken;
+
     private string levelPath;
     private TimeSpan maximumTimeToCompleteLevel = TimeSpan.FromMinutes(2.0);
     public TimeSpan MaximumTimeToCompleteLevel { get => maximumTimeToCompleteLevel; }
 
     private const int PointsPerSecond = 5;
 
-    private int gemsCollected;
+    int gemsCollected;
     public int GemsCollected
     {
         get { return gemsCollected; }
     }
 
-    private int gemsCount;
+    int gemsCount;
     public int GemsCount
     {
         get { return gemsCount; }
     }
 
-    private bool newHighScore;
+    bool newHighScore;
     public bool NewHighScore
     {
         get { return newHighScore; }
     }
 
+    ContentManager content;
     // Level content.        
     public ContentManager Content
     {
         get { return content; }
     }
-    ContentManager content;
 
     private SoundEffect exitReachedSound;
 
@@ -669,7 +671,7 @@ class Level : IDisposable
     {
         RemoveTile(x, y);
 
-        // Use Particle effect to explode the removed tile
+        // Use Particle effect to explode the removed tile, above the player's head
         particleManager.Position = new Vector2(Player.Position.X, Player.Position.Y - 20);
         particleManager.Emit(50, ParticleEffectType.Confetti, Color.SandyBrown);
     }
