@@ -1,7 +1,7 @@
-﻿using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
-using System;
+﻿using System;
 using System.Collections.Generic;
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 
 namespace ___SafeGameName___.Core.Effects;
 
@@ -86,7 +86,8 @@ public class ParticleManager
             }
             float scale = (float)random.NextDouble() * 0.3f + 0.3f;
 
-            particles.Add(new Particle(emitPosition, velocity, lifetime, actualParticalColor, scale));
+            var particle = new Particle(emitPosition, velocity, lifetime, actualParticalColor, scale);
+            particles.Add(particle);
         }
     }
 
@@ -113,14 +114,8 @@ public class ParticleManager
 
             float scale = (float)random.NextDouble() * 0.4f + 0.2f;
 
-            var particle = new Particle
-                (
-                    emitPosition,
-                    velocity,
-                    lifetime,
-                    actualParticleColor,
-                    scale
-                );
+            // Give these a tail
+            var particle = new Particle(emitPosition, velocity, lifetime, actualParticleColor, scale, 10);
             particles.Add(particle);
         }
     }
@@ -146,7 +141,7 @@ public class ParticleManager
 
             var particle = new Particle(emitPosition, velocity, lifetime, actualParticalColor, scale);
 
-            // Chain another emitter when each particle dies.
+            // Trigger another emitter when each particle dies.
             particle.OnDeath += FireworkParticle_OnDeath;
 
             particles.Add(particle);
@@ -172,7 +167,8 @@ public class ParticleManager
             }
             float scale = (float)random.NextDouble() * 0.2f + 0.2f;
 
-            particles.Add(new Particle(emitPosition, velocity, lifetime, actualParticalColor, scale));
+            var particle = new Particle(emitPosition, velocity, lifetime, actualParticalColor, scale);
+            particles.Add(particle);
         }
     }
 
@@ -189,7 +185,11 @@ public class ParticleManager
     {
         for (int i = particles.Count - 1; i >= 0; i--)
         {
+            // Fade particle colour over lifetime
+            particles[i].Color.A = (byte)(255f * particles[i].LifeTime / 0.5f);
+
             particles[i].Update(gameTime);
+
             if (!particles[i].IsAlive)
             {
                 particles.RemoveAt(i);
@@ -197,12 +197,29 @@ public class ParticleManager
         }
     }
 
+
+    /// <summary>
+    /// Controls the "density" of the tail
+    /// Dense Tail (t += 1f): A continuous, almost solid-looking trail.Ideal for effects like glowing streaks.
+	/// Sparse Tail (t += 10f): A dotted, fragmented appearance.Useful for effects like spark trails or light debris.
+    /// </summary>
+    const float tailDensity = 5f;
+
     public void Draw(SpriteBatch spriteBatch)
     {
         foreach (Particle particle in particles)
         {
             if (particle.IsAlive)
             {
+                // Calculate the direction and length of the tail
+                Vector2 tailDirection = particle.Position - particle.PreviousPosition;
+                float tailLength = particle.TailLength * tailDirection.Length();
+
+                // Normalize the tail direction
+                if (tailDirection != Vector2.Zero)
+                    tailDirection.Normalize();
+
+                // Draw the this particle's texture
                 spriteBatch.Draw(
                     texture,
                     particle.Position,
@@ -213,6 +230,27 @@ public class ParticleManager
                     particle.Scale,
                     SpriteEffects.None,
                     0f);
+
+                // Draw the particle's tail
+                for (float t = 0; t < tailLength; t += tailDensity)
+                {
+                    Vector2 tailPosition = particle.Position - tailDirection * t;
+
+                    // Fade out the tail
+                    float alpha = MathHelper.Clamp(1f - (t / tailLength), 0f, 1f);
+                    Color tailColor = particle.Color * alpha;
+
+                    spriteBatch.Draw(
+                        texture,
+                        tailPosition,
+                        null,
+                        tailColor,
+                        0f,
+                        textureOrigin,
+                        particle.Scale * 0.8f, // Shrink the tail particle slightly
+                        SpriteEffects.None,
+                        0f);
+                }
             }
         }
     }
