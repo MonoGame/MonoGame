@@ -172,6 +172,10 @@ public class ParticleManager
         }
     }
 
+    /// <summary>
+    /// Event fireed when the Fireworks particle dies
+    /// </summary>
+    /// <param name="particlePosition"></param>
     private void FireworkParticle_OnDeath(Vector2 particlePosition)
     {
         EmitExplosions(5, particlePosition);
@@ -185,9 +189,6 @@ public class ParticleManager
     {
         for (int i = particles.Count - 1; i >= 0; i--)
         {
-            // Fade particle colour over lifetime
-            particles[i].Color.A = (byte)(255f * particles[i].LifeTime / 0.5f);
-
             particles[i].Update(gameTime);
 
             if (!particles[i].IsAlive)

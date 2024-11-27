@@ -9,22 +9,26 @@ namespace ___SafeGameName___.Core.Effects;
 /// </summary>
 public class Particle
 {
-    public Vector2 Position;
-    public Vector2 Velocity;
-    public float LifeTime;
     public Color Color;
-    public float Scale;
+
+    public float LifeTime;
+
+    public Vector2 Position;
     public Vector2 PreviousPosition;
+
+    public float Scale;
+
+    /// <summary>
+    /// The length of the lines drawn for each particle.
+    /// </summary>
+    public float TailLength;
+
+    public Vector2 Velocity;
 
     /// <summary>
     /// Check if the particle is still alive
     /// </summary>
     public bool IsAlive => LifeTime > 0;
-
-    /// <summary>
-    /// The length of the lines drawn for each particle.
-    /// </summary>
-    public float TailLength { get; internal set; }
 
     /// <summary>
     /// Triggered when the particle "dies"
@@ -43,16 +47,24 @@ public class Particle
         TailLength = tailLength;
     }
 
-    // Update particle's position and reduce its lifespan
+
     public void Update(GameTime gameTime)
     {
+        // Store the elapsedTime, to avoid Property getter overhead
+        // As well as just into it ticks over a second giving use weird results
         var elapsedTime = (float)gameTime.ElapsedGameTime.TotalSeconds;
 
         // Store previous position before updating
         PreviousPosition = Position;
 
+        // Update particle's position
         Position += Velocity * elapsedTime;
+
+        // reduce particle's lifespan
         LifeTime -= elapsedTime;
+
+        // Fade particle colour over lifetime
+        Color.A = (byte)(255f * LifeTime / 0.5f);
 
         if (!IsAlive)
         {
