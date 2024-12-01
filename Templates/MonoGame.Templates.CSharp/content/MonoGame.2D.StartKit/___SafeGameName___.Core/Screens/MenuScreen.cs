@@ -1,11 +1,11 @@
+using System;
+using System.Collections.Generic;
 using ___SafeGameName___.Core;
-using GameStateManagement.Inputs;
+using ___SafeGameName___.Core.Inputs;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Input.Touch;
-using System;
-using System.Collections.Generic;
 
 namespace ___SafeGameName___.Screens;
 
@@ -204,7 +204,7 @@ abstract class MenuScreen : GameScreen
         for (int i = 0; i < menuEntries.Count; i++)
         {
             MenuEntry menuEntry = menuEntries[i];
-            
+
             // each entry is to be centered horizontally
             position.X = ScreenManager.BaseScreenSize.X / 2 - menuEntry.GetWidth(this) / 2;
 

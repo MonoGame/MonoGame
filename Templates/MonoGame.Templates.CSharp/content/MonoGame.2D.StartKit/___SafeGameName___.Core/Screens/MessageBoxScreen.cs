@@ -1,9 +1,9 @@
+using System;
+using ___SafeGameName___.Core.Inputs;
 using ___SafeGameName___.Core.Localization;
-using GameStateManagement.Inputs;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
-using System;
 
 namespace ___SafeGameName___.Screens;
 

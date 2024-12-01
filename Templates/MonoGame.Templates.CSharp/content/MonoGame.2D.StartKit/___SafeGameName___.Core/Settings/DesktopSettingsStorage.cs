@@ -1,6 +1,4 @@
 ﻿using System;
-using System.IO;
-using System.Text.Json;
 
 namespace ___SafeGameName___.Core.Settings;
 

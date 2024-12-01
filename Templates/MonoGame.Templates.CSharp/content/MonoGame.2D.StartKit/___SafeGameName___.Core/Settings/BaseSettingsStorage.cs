@@ -18,7 +18,8 @@ public abstract class BaseSettingsStorage : ISettingsStorage
     {
         get => settingsFileName;
 
-        set {
+        set
+        {
             if (settingsFileName != value)
             {
                 settingsFileName = value;

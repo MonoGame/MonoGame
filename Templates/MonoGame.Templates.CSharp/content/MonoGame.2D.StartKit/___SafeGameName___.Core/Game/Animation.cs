@@ -1,16 +1,4 @@
-﻿#region File Description
-//-----------------------------------------------------------------------------
-// Animation.cs
-//
-// MonoGame Foundation Game Platform
-// Copyright (C) MonoGame Foundation. All rights reserved.
-//-----------------------------------------------------------------------------
-#endregion
-
-#region Using Statements
-using System;
-using Microsoft.Xna.Framework.Graphics;
-#endregion
+﻿using Microsoft.Xna.Framework.Graphics;
 
 namespace ___SafeGameName___.Core;
 

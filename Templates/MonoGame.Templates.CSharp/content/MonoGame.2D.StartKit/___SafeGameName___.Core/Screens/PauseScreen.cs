@@ -17,7 +17,7 @@ class PauseScreen : MenuScreen
         // Create our menu entries.
         MenuEntry resumeGameMenuEntry = new MenuEntry(Resources.Resume);
         MenuEntry quitGameMenuEntry = new MenuEntry(Resources.Quit);
-        
+
         // Hook up menu event handlers.
         resumeGameMenuEntry.Selected += OnCancel;
         quitGameMenuEntry.Selected += QuitGameMenuEntrySelected;

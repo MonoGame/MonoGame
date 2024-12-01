@@ -1,15 +1,4 @@
-﻿#region File Description
-//-----------------------------------------------------------------------------
-// TouchCollectionExtensions.cs
-//
-// MonoGame Foundation Game Platform
-// Copyright (C) MonoGame Foundation. All rights reserved.
-//-----------------------------------------------------------------------------
-#endregion
-
-#region Using Statements
-using Microsoft.Xna.Framework.Input.Touch;
-#endregion
+﻿using Microsoft.Xna.Framework.Input.Touch;
 
 namespace ___SafeGameName___.Core.Inputs;
 

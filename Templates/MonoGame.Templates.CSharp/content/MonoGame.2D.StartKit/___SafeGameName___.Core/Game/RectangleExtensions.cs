@@ -1,17 +1,5 @@
-﻿#region File Description
-//-----------------------------------------------------------------------------
-// RectangleExtensions.cs
-//
-// MonoGame Foundation Game Platform
-// Copyright (C) MonoGame Foundation. All rights reserved.
-//-----------------------------------------------------------------------------
-#endregion
-
-#region Using Statements
-using System;
-
+﻿using System;
 using Microsoft.Xna.Framework;
-#endregion
 
 namespace ___SafeGameName___.Core;
 

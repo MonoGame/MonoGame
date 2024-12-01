@@ -1,8 +1,8 @@
+using System;
 using ___SafeGameName___.Core.Localization;
 using ___SafeGameName___.ScreenManagers;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using System;
 
 namespace ___SafeGameName___.Screens;
 

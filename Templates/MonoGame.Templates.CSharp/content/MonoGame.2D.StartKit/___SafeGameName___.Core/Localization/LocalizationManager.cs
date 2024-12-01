@@ -1,17 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Globalization;
-using System.Linq;
 using System.Reflection;
 using System.Resources;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 
 namespace ___SafeGameName___.Core.Localization;
 
 internal class LocalizationManager
 {
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <returns>A list of Supported CultureInfo, based on what languages we currently install.</returns>
     public static List<CultureInfo> GetSupportedCultures()
     {
         // Create a list to hold supported cultures

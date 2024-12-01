@@ -7,37 +7,40 @@ namespace ___SafeGameName___.Core.Effects;
 
 public class ParticleManager
 {
-    private List<Particle> particles;
     private Random random;
-    private Texture2D texture;
-    private Vector2 position;
-    private Vector2 textureOrigin;
 
+    private Vector2 position;
+    /// <summary>
+    /// Position where these particles eminate from
+    /// </summary>
     public Vector2 Position
     {
         get => position;
         set => position = value;
     }
+
+    private Vector2 textureOrigin;
+    private Texture2D texture;
+    /// <summary>
+    /// Texture to be used for this set of particles
+    /// </summary>
     public Texture2D Texture
     {
         get => texture;
         set => texture = value;
     }
-    public int ParticleCount
-    {
-        get
-        {
-            if (particles != null)
-            {
-                return particles.Count;
-            }
-            else
-            {
-                return 0;
-            }
-        }
-    }
 
+    private List<Particle> particles;
+    /// <summary>
+    /// How many particles still left to be shown
+    /// </summary>
+    public int ParticleCount => particles != null ? particles.Count : 0;
+
+    /// <summary>
+    /// ParticleManager constructor
+    /// </summary>
+    /// <param name="texture"></param>
+    /// <param name="position"></param>
     public ParticleManager(Texture2D texture, Vector2 position)
     {
         this.particles = new List<Particle>();
@@ -47,7 +50,12 @@ public class ParticleManager
         this.position = position;
     }
 
-    // Emit particles based on the effect type
+    /// <summary>
+    /// Emit built-in particles based on the effect type
+    /// </summary>
+    /// <param name="numberOfParticles"></param>
+    /// <param name="effectType"></param>
+    /// <param name="color"></param>
     public void Emit(int numberOfParticles, ParticleEffectType effectType, Color? color = null)
     {
         switch (effectType)
@@ -67,107 +75,161 @@ public class ParticleManager
         }
     }
 
-    // Emit particles for Confetti effect
+    /// <summary>
+    /// Emit particles for Confetti effect
+    /// </summary>
+    /// <param name="numberOfParticles"></param>
+    /// <param name="emitPosition"></param>
+    /// <param name="color"></param>
     private void EmitConfetti(int numberOfParticles, Vector2 emitPosition, Color? color = null)
     {
         for (int i = 0; i < numberOfParticles; i++)
         {
-            Vector2 velocity = new Vector2((float)(random.NextDouble() * 2 - 1), (float)(random.NextDouble())) * 100;
+            // Generate a random direction vector
+            Vector2 randomDirection = new Vector2(
+                (float)(random.NextDouble() * 2 - 1),   // X component in range [-1, 1]
+                (float)random.NextDouble()              // Y component in range [0, 1]
+            );
+
+            // Normalize the direction vector
+            randomDirection.Normalize();
+
+            // Generate a random speed in a reasonable range
+            float speed = (float)random.NextDouble() * 200 + 50; // Speed between 50 and 250
+
+            Vector2 velocity = new Vector2((float)(random.NextDouble() * 2 - 1), (float)random.NextDouble()) * 200;
             float lifetime = (float)random.NextDouble() * 3f + 1f;
 
-            Color actualParticalColor;
-            if (color.HasValue)
-            {
-                actualParticalColor = color.Value;
-            }
-            else
-            {
-                actualParticalColor = new Color(random.Next(256), random.Next(256), random.Next(256)); // Bright colors for confetti
-            }
-            float scale = (float)random.NextDouble() * 0.3f + 0.3f;
+            // Determine the particle's color
+            Color actualParticleColor = color ?? new Color(random.Next(256), random.Next(256), random.Next(256)); // Bright colors for confetti
 
-            var particle = new Particle(emitPosition, velocity, lifetime, actualParticalColor, scale);
+            float scale = (float)random.NextDouble() * 0.5f + 0.3f;
+
+            var particle = new Particle(emitPosition, randomDirection, speed, lifetime, actualParticleColor, scale);
             particles.Add(particle);
         }
     }
 
+    /// <summary>
+    /// Emit particles for Explosions effect
+    /// </summary>
+    /// <param name="numberOfParticles"></param>
+    /// <param name="emitPosition"></param>
+    /// <param name="color"></param>
     private void EmitExplosions(int numberOfParticles, Vector2 emitPosition, Color? color = null)
     {
-
         for (int i = 0; i < numberOfParticles; i++)
         {
-            // Calculate velocity with more explosive characteristics
-            float angle = (float)(random.NextDouble() * Math.PI * 2);
-            float speed = (float)(random.NextDouble() * 200 + 100);
-            Vector2 velocity = new Vector2(
-                (float)Math.Cos(angle) * speed,
-                (float)Math.Sin(angle) * speed
+            // Calculate a random direction for the explosion
+            float angle = (float)(random.NextDouble() * Math.PI * 2); // Random angle in radians
+            Vector2 direction = new Vector2(
+                (float)Math.Cos(angle),
+                (float)Math.Sin(angle)
             );
 
-            float lifetime = (float)random.NextDouble() * 1.5f + 0.5f;
+            // Generate a random speed for explosive velocity
+            float speed = (float)(random.NextDouble() * 300 + 100); // Speed between 100 and 400
 
+            // Generate a random lifetime
+            float lifetime = (float)random.NextDouble() * 1.5f + 0.5f; // Lifetime between 0.5 and 2 seconds
+
+            // Determine the particle's color
             Color actualParticleColor = color ?? new Color(
-                random.Next(200, 256),  // High red
-                random.Next(100, 200),  // Medium green
-                random.Next(0, 100)     // Low blue
+                random.Next(200, 256), // High red
+                random.Next(100, 200), // Medium green
+                random.Next(0, 100)    // Low blue
             );
 
-            float scale = (float)random.NextDouble() * 0.4f + 0.2f;
+            // Generate a random scale for the particle
+            float scale = (float)random.NextDouble() * 0.5f + 0.2f;
 
-            // Give these a tail
-            var particle = new Particle(emitPosition, velocity, lifetime, actualParticleColor, scale, 10);
+            // Create the particle give it a tail
+            var particle = new Particle(emitPosition, direction, speed, lifetime, actualParticleColor, scale, 10);
+
+            // Add the particle to the collection
             particles.Add(particle);
         }
     }
 
-    // Emit particles for Fireworks effect
+    /// <summary>
+    /// Emit particles for Fireworks effect
+    /// </summary>
+    /// <param name="numberOfParticles"></param>
+    /// <param name="emitPosition"></param>
+    /// <param name="color"></param>
     private void EmitFireworks(int numberOfParticles, Vector2 emitPosition, Color? color = null)
     {
         for (int i = 0; i < numberOfParticles; i++)
         {
-            Vector2 velocity = new Vector2((float)(random.NextDouble() * 2 - 1), (float)(random.NextDouble() * 2 - 1)) * 150;
-            float lifetime = (float)random.NextDouble() * 2f + 1f;
+            // Generate a random angle for each particle
+            float angle = (float)(random.NextDouble() * Math.PI * 2); // Full 360 degrees in radians
 
-            Color actualParticalColor;
-            if (color.HasValue)
-            {
-                actualParticalColor = color.Value;
-            }
-            else
-            {
-                actualParticalColor = new Color(random.Next(256), random.Next(256), random.Next(256)); // Random colors for fireworks
-            }
+            // Create a unit direction vector based on the angle
+            Vector2 direction = new Vector2(
+                (float)Math.Cos(angle),
+                (float)Math.Sin(angle)
+            );
+
+            // Assign a random speed for explosive effect
+            float speed = (float)random.NextDouble() * 300 + 100; // Speed between 100 and 400
+
+            // Generate a random lifetime for the particle
+            float lifetime = (float)random.NextDouble() * 2f + 1f; // Lifetime between 1 and 3 seconds
+
+            // Assign a color to the particle
+            Color actualParticleColor = color ?? new Color(
+                random.Next(256), // Random red component
+                random.Next(256), // Random green component
+                random.Next(256)  // Random blue component
+            );
+
+            // Assign a random scale for each particle
             float scale = (float)random.NextDouble() * 0.5f + 0.5f;
 
-            var particle = new Particle(emitPosition, velocity, lifetime, actualParticalColor, scale);
+            // Create the particle with the direction and speed
+            var particle = new Particle(emitPosition, direction, speed, lifetime, actualParticleColor, scale);
 
-            // Trigger another emitter when each particle dies.
+            // Attach an event to trigger additional effects on particle death
             particle.OnDeath += FireworkParticle_OnDeath;
 
+            // Add the particle to the collection
             particles.Add(particle);
         }
     }
 
-    // Emit particles for Sparkles effect
+    /// <summary>
+    /// Emit particles for Sparkles effect
+    /// </summary>
+    /// <param name="numberOfParticles"></param>
+    /// <param name="emitPosition"></param>
+    /// <param name="color"></param>
     private void EmitSparkles(int numberOfParticles, Vector2 emitPosition, Color? color = null)
     {
         for (int i = 0; i < numberOfParticles; i++)
         {
-            Vector2 velocity = new Vector2((float)(random.NextDouble() * 2 - 1), (float)(random.NextDouble() * 2 - 1)) * 50;
-            float lifetime = (float)random.NextDouble() * 1f + 0.5f;
+            // Calculate a random direction for the sparkles
+            float angle = (float)(random.NextDouble() * Math.PI * 2); // Random angle in radians
+            Vector2 direction = new Vector2(
+                (float)Math.Cos(angle),
+                (float)Math.Sin(angle)
+            );
 
-            Color actualParticalColor;
-            if (color.HasValue)
-            {
-                actualParticalColor = color.Value;
-            }
-            else
-            {
-                actualParticalColor = Color.White * ((float)random.NextDouble() * 0.5f + 0.5f); // Light sparkly effect
-            }
-            float scale = (float)random.NextDouble() * 0.2f + 0.2f;
+            // Generate a random speed for the sparkle
+            float speed = (float)(random.NextDouble() * 300); // Speed between 0 and 300
 
-            var particle = new Particle(emitPosition, velocity, lifetime, actualParticalColor, scale);
+            // Generate a random lifetime
+            float lifetime = (float)random.NextDouble() * 1f + 0.5f; // Lifetime between 0.5 and 1.5 seconds
+
+            // Determine the particle's color
+            Color actualParticleColor = color ?? Color.White * ((float)random.NextDouble() * 0.5f + 0.5f); // Light sparkly effect
+
+            // Generate a random scale for the particle
+            float scale = (float)random.NextDouble() * 0.5f + 0.2f;
+
+            // Create the particle using the new constructor
+            var particle = new Particle(emitPosition, direction, speed, lifetime, actualParticleColor, scale);
+
+            // Add the particle to the collection
             particles.Add(particle);
         }
     }

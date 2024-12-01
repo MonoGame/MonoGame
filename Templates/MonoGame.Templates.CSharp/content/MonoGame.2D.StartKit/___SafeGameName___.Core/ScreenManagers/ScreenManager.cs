@@ -1,13 +1,11 @@
-﻿using ___SafeGameName___.Core.Inputs;
+﻿using System.Collections.Generic;
+using System.Diagnostics;
+using ___SafeGameName___.Core.Inputs;
 using ___SafeGameName___.Screens;
-using GameStateManagement.Inputs;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input.Touch;
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
 
 namespace ___SafeGameName___.ScreenManagers;
 
@@ -214,6 +212,21 @@ public class ScreenManager : DrawableGameComponent
         }
     }
 
+    protected override void Dispose(bool disposing)
+    {
+        try
+        {
+            if (disposing)
+            {
+                spriteBatch?.Dispose();
+            }
+        }
+        finally
+        {
+            base.Dispose(disposing);
+        }
+    }
+
     /// <summary>
     /// Adds a new screen to the screen manager.
     /// </summary>
@@ -281,7 +294,7 @@ public class ScreenManager : DrawableGameComponent
     {
         Viewport viewport = GraphicsDevice.Viewport;
 
-        spriteBatch.Begin();
+        spriteBatch.Begin(SpriteSortMode.Deferred, null, null, null, null, null, GlobalTransformation);
 
         spriteBatch.Draw(blankTexture,
                          new Rectangle(0, 0, viewport.Width, viewport.Height),
@@ -296,7 +309,7 @@ public class ScreenManager : DrawableGameComponent
         backbufferWidth = GraphicsDevice.PresentationParameters.BackBufferWidth;
         backbufferHeight = GraphicsDevice.PresentationParameters.BackBufferHeight;
 
-        // Input scalling will go off base values
+        // Input scaling will go off base values
         float horizontalInputScalingFactor = backbufferWidth / baseScreenSize.X;
         float verticalInputScalingFactor = backbufferHeight / baseScreenSize.Y;
 

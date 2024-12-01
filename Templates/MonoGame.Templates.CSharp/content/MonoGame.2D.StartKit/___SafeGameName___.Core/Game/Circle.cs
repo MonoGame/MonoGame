@@ -1,16 +1,4 @@
-﻿#region File Description
-//-----------------------------------------------------------------------------
-// Circle.cs
-//
-// MonoGame Foundation Game Platform
-// Copyright (C) MonoGame Foundation. All rights reserved.
-//-----------------------------------------------------------------------------
-#endregion
-
-#region Using Statements
-using System;
-using Microsoft.Xna.Framework;
-#endregion
+﻿using Microsoft.Xna.Framework;
 
 namespace ___SafeGameName___.Core;
 

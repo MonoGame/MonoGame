@@ -6,4 +6,3 @@ public interface ISettingsStorage
     void SaveSettings<T>(T settings) where T : new();
     T LoadSettings<T>() where T : new();
 }
-

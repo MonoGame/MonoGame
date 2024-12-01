@@ -1,3 +1,6 @@
+using System;
+using System.Collections.Generic;
+using System.Globalization;
 using ___SafeGameName___.Core.Effects;
 using ___SafeGameName___.Core.Localization;
 using ___SafeGameName___.Core.Settings;
@@ -5,9 +8,6 @@ using ___SafeGameName___.ScreenManagers;
 using ___SafeGameName___.Screens;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using System;
-using System.Collections.Generic;
-using System.Globalization;
 
 namespace ___SafeGameName___.Core;
 

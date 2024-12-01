@@ -1,4 +1,5 @@
 ﻿namespace ___SafeGameName___.Core.Settings;
+
 internal class SettingsManager<T> where T : new()
 {
     private readonly ISettingsStorage storage;

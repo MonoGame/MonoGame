@@ -1,8 +1,8 @@
-﻿using ___SafeGameName___.ScreenManagers;
-using GameStateManagement.Inputs;
+﻿using System;
+using ___SafeGameName___.Core.Inputs;
+using ___SafeGameName___.ScreenManagers;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input.Touch;
-using System;
 
 namespace ___SafeGameName___.Screens;
 

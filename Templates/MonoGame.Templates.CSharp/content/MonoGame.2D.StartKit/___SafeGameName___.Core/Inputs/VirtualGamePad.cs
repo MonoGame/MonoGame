@@ -1,17 +1,8 @@
-﻿//-----------------------------------------------------------------------------
-// VirtualGamePad.cs
-//
-// MonoGame Foundation Game Platform
-// Copyright (C) MonoGame Foundation. All rights reserved.
-//-----------------------------------------------------------------------------
-
-#region Using Statements
-using System;
+﻿using System;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Input.Touch;
-#endregion
 
 namespace ___SafeGameName___.Core.Inputs;
 

@@ -1,13 +1,11 @@
-using ___SafeGameName___.Core;
-using ___SafeGameName___.Core.Inputs;
+using System;
+using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Input.Touch;
-using System;
-using System.Collections.Generic;
 
-namespace GameStateManagement.Inputs;
+namespace ___SafeGameName___.Core.Inputs;
 
 /// <summary>
 /// Helper for reading input from keyboard, gamepad, and touch input. This class 

@@ -1,17 +1,15 @@
-﻿using ___SafeGameName___.Core.Effects;
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
+using ___SafeGameName___.Core.Effects;
 using ___SafeGameName___.Core.Inputs;
 using ___SafeGameName___.Core.Localization;
 using ___SafeGameName___.Core.Settings;
 using ___SafeGameName___.Screens;
-using GameStateManagement.Inputs;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Input;
-using System;
-using System.Collections.Generic;
-using System.IO;
 
 namespace ___SafeGameName___.Core;
 

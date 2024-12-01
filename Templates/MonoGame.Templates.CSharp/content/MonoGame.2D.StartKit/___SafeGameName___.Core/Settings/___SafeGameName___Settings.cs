@@ -1,6 +1,6 @@
-﻿using ___SafeGameName___.Core.Effects;
-using System.ComponentModel;
+﻿using System.ComponentModel;
 using System.Runtime.CompilerServices;
+using ___SafeGameName___.Core.Effects;
 
 namespace ___SafeGameName___.Core.Settings;
 

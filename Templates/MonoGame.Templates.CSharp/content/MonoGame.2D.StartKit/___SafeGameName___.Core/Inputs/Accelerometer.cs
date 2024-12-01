@@ -1,17 +1,6 @@
-#region File Description
-//-----------------------------------------------------------------------------
-// Accelerometer.cs
-//
-// MonoGame Foundation Game Platform
-// Copyright (C) MonoGame Foundation. All rights reserved.
-//-----------------------------------------------------------------------------
-#endregion
-
-#region Using Statements
+using System;
 using ___SafeGameName___.Core.Localization;
 using Microsoft.Xna.Framework;
-using System;
-#endregion
 
 namespace ___SafeGameName___.Core.Inputs;
 

@@ -1,15 +1,13 @@
-﻿using ___SafeGameName___.Core;
+﻿using System;
+using ___SafeGameName___.Core;
 using ___SafeGameName___.Core.Effects;
 using ___SafeGameName___.Core.Inputs;
 using ___SafeGameName___.Core.Localization;
 using ___SafeGameName___.Core.Settings;
 using ___SafeGameName___.ScreenManagers;
-using GameStateManagement.Inputs;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Input;
-using System;
 
 namespace ___SafeGameName___.Screens;
 
