@@ -62,8 +62,8 @@ Once you choose a test, interact with it; exit by clicking the button on the top
 
 ## Writing Interactive Tests
 
-The easiest way is to copy over the simplest test such as [Texture Basic Test](.\Tests\TextureTest\TextureBasicTest.cs).
- - Extend from `TestGame` example in [Texture Basic Test](.\Tests\TextureTest\TextureBasicTest.cs). 
+The easiest way is to copy over the simplest test such as [Texture Basic Test](./Tests/TextureTest/TextureBasicTest.cs).
+ - Extend from `TestGame` example in [Texture Basic Test](./Tests/TextureTest/TextureBasicTest.cs).
  - Fill in `LoadContent`, `Update`, `Draw` as needed.
  - Add UI elements to the `_universe` in your `InitializeGui`.
 
