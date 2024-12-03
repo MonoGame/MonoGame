@@ -462,7 +462,7 @@ namespace Microsoft.Xna.Framework.Content
                     switch (typeof(T).Name)
                     {
                         case nameof(Texture2D):
-                            result = LoadTexture2DHeuristically(assetName);
+                            result = LoadTexture2DFromImageFile(assetName);
                             break;
                         // Futures cases here (see relevant GitHub Issues):
                         // Video
@@ -541,7 +541,7 @@ namespace Microsoft.Xna.Framework.Content
             return reader;
         }
     
-        Texture2D LoadTexture2DHeuristically(string assetName)
+        Texture2D LoadTexture2DFromImageFile(string assetName)
         {
             IGraphicsDeviceService graphicsDeviceService = serviceProvider.GetService(typeof(IGraphicsDeviceService)) as IGraphicsDeviceService;
             
