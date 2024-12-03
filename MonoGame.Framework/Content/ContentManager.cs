@@ -541,7 +541,7 @@ namespace Microsoft.Xna.Framework.Content
             return reader;
         }
     
-        object LoadTexture2DHeuristically(string assetName)
+        Texture2D LoadTexture2DHeuristically(string assetName)
         {
             IGraphicsDeviceService graphicsDeviceService = serviceProvider.GetService(typeof(IGraphicsDeviceService)) as IGraphicsDeviceService;
             
