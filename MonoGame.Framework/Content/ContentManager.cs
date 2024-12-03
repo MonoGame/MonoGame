@@ -70,7 +70,7 @@ namespace Microsoft.Xna.Framework.Content
             'l', // Linux
         };
 
-        private static readonly string[] supportedTexture2DExtensions = new string[] { ".bmp", ".jpg", ".jpeg", ".png" };
+        private static readonly string[] supportedTexture2DExtensions = new string[] { ".png", ".jpg", ".jpeg", ".bmp" };
 
         static partial void PlatformStaticInit();
 

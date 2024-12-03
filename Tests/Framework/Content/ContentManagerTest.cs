@@ -38,7 +38,7 @@ namespace MonoGame.Tests.Content
         [TestCase("UniqueBmp")]
         [TestCase("UniqueJpg")]
         [TestCase("UniqueJpeg")]
-        // Tests loading from a PNG/BMP/JPG/JPEG file when a corresponding XNB file doesn't exist
+        // Tests loading from a PNG/JPG/JPEG/BMP file when a corresponding XNB file doesn't exist
         public void CorrectlyLoadTextureFromAlternativeImageFormatsWhenNoXnb(string assetName)
         {
             ContentManager content = new ContentManager(game.Services);
@@ -49,7 +49,7 @@ namespace MonoGame.Tests.Content
         }
 
         [Test]
-        // Tests that an exception is raised when no XNB, PNG, BMP or JP(E)P exists for a content name
+        // Tests that an exception is raised when no XNB, PNG, JPG, JPEG or BMP exists for a content name
         public void ThrowExceptionIfNoAssetInAnySupportedImageFormats()
         {
             ContentManager content = new ContentManager(game.Services);
