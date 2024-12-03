@@ -380,6 +380,49 @@ namespace Microsoft.Xna.Framework.Content
 		}
 
         /// <summary />
+		protected virtual Stream OpenStream(string assetName)
+		{
+			Stream stream;
+			try
+            {
+                string assetPath = Path.Combine(RootDirectory, assetName) + ".xnb";
+
+                // This is primarily for editor support.
+                // Setting the RootDirectory to an absolute path is useful in editor
+                // situations, but TitleContainer can ONLY be passed relative paths.
+#if DESKTOPGL || WINDOWS
+                if (Path.IsPathRooted(assetPath))
+                    stream = File.OpenRead(assetPath);
+                else
+#endif
+                stream = TitleContainer.OpenStream(assetPath);
+#if ANDROID
+                // Read the asset into memory in one go. This results in a ~50% reduction
+                // in load times on Android due to slow Android asset streams.
+                MemoryStream memStream = new MemoryStream();
+                stream.CopyTo(memStream);
+                memStream.Seek(0, SeekOrigin.Begin);
+                stream.Close();
+                stream = memStream;
+#endif
+			}
+			catch (FileNotFoundException fileNotFound)
+			{
+				throw new ContentLoadException("The content file was not found.", fileNotFound);
+			}
+			catch (DirectoryNotFoundException directoryNotFound)
+			{
+				throw new ContentLoadException("The directory was not found.", directoryNotFound);
+			}
+			catch (Exception exception)
+			{
+				throw new ContentLoadException("Opening stream error.", exception);
+			}
+            
+			return stream;
+		}
+
+        /// <summary />
 		protected T ReadAsset<T>(string assetName, Action<IDisposable> recordDisposableObject)
 		{
 			if (string.IsNullOrEmpty(assetName))
@@ -442,49 +485,6 @@ namespace Microsoft.Xna.Framework.Content
             }
 
 			return (T)result;
-		}
-
-        /// <summary />
-		protected virtual Stream OpenStream(string assetName)
-		{
-			Stream stream;
-			try
-            {
-                string assetPath = Path.Combine(RootDirectory, assetName) + ".xnb";
-
-                // This is primarily for editor support.
-                // Setting the RootDirectory to an absolute path is useful in editor
-                // situations, but TitleContainer can ONLY be passed relative paths.
-#if DESKTOPGL || WINDOWS
-                if (Path.IsPathRooted(assetPath))
-                    stream = File.OpenRead(assetPath);
-                else
-#endif
-                stream = TitleContainer.OpenStream(assetPath);
-#if ANDROID
-                // Read the asset into memory in one go. This results in a ~50% reduction
-                // in load times on Android due to slow Android asset streams.
-                MemoryStream memStream = new MemoryStream();
-                stream.CopyTo(memStream);
-                memStream.Seek(0, SeekOrigin.Begin);
-                stream.Close();
-                stream = memStream;
-#endif
-			}
-			catch (FileNotFoundException fileNotFound)
-			{
-				throw new ContentLoadException("The content file was not found.", fileNotFound);
-			}
-			catch (DirectoryNotFoundException directoryNotFound)
-			{
-				throw new ContentLoadException("The directory was not found.", directoryNotFound);
-			}
-			catch (Exception exception)
-			{
-				throw new ContentLoadException("Opening stream error.", exception);
-			}
-            
-			return stream;
 		}
 
         private ContentReader GetContentReaderFromXnb(string originalAssetName, Stream stream, BinaryReader xnbReader, Action<IDisposable> recordDisposableObject)
