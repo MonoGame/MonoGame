@@ -219,8 +219,17 @@ jobs:
         env:
           CI: true
 
-      - name: Run DirectX Tests
-        run: dotnet MonoGame.Tests.dll
+      # Run the DirectX tests in two steps: first the audio, then the rest.
+      # This is because the audio tests has some incompatibilities within the runner with ContentManagerTests.
+      - name: Run DirectX Audio Tests
+        run: dotnet test --filter Category=Audio MonoGame.Tests.dll 
+        env:
+          CI: true
+        working-directory: tests-windowsdx
+        if: runner.os == 'Windows'
+        
+      - name: Run DirectX All Tests Except Audio
+        run: dotnet test --filter Category!=Audio MonoGame.Tests.dll 
         env:
           CI: true
         working-directory: tests-windowsdx

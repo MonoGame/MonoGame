@@ -298,7 +298,7 @@ namespace Microsoft.Xna.Framework.Content
         /// Before a ContentManager can load an asset, you need to add the asset to your game project using
         /// the steps described in
         /// <see href="https://docs.monogame.net/articles/getting_started/content_pipeline/index.html">Adding Content - MonoGame</see>.
-        /// <br>BMP, PNG and JPG files can be loaded as Texture2D without using the content pipeline. The assetName must not contain extension.
+        /// <br>PNG, JPG/JPEG and BMP files can be loaded as Texture2D without using the content pipeline. The assetName must not contain extension.
         /// </remarks>
         /// <typeparam name="T">
         ///     <para>
