@@ -161,7 +161,7 @@ public class BuildContext : FrostingContext
         ProjectType.Extension => $"Templates/{id}/{id}.csproj",
         ProjectType.Framework => $"MonoGame.Framework/MonoGame.Framework.{id}.csproj",
         ProjectType.Tools => $"Tools/{id}/{id}.csproj",
-        ProjectType.Templates => $"ThirdParty/MonoGame.Templates/CSharp/{id}.csproj",
+        ProjectType.Templates => $"external/MonoGame.Templates/CSharp/{id}.csproj",
         ProjectType.Tests => $"Tests/{id}.csproj",
         ProjectType.ContentPipeline => "MonoGame.Framework.Content.Pipeline/MonoGame.Framework.Content.Pipeline.csproj",
         ProjectType.MGCBEditor => $"Tools/MonoGame.Content.Builder.Editor/MonoGame.Content.Builder.Editor.{id}.csproj",
