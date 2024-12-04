@@ -23,5 +23,5 @@
 	path = native/monogame/external/vma
 	url = https://github.com/LunarG/VulkanMemoryAllocator.git
 [submodule "ThirdParty/MonoGame.Templates"]
-	path = ThirdParty/MonoGame.Templates
+	path = external/MonoGame.Templates
 	url = git@github.com:MonoGame/MonoGame.Templates.git
