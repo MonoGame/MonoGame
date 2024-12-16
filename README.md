@@ -86,6 +86,8 @@ There are several options on our [Donation Page](https://monogame.net/donate/).
 
 The full source code is available here from GitHub:
 
+**Make sure you have a github account and your git client configured with your ssh key** otherwise the submodules step will fail.
+
 * Clone the source: `git clone https://github.com/MonoGame/MonoGame.git`
 * Set up the submodules: `git submodule update --init`
 * Open the solution for your target platform to build the game framework.
