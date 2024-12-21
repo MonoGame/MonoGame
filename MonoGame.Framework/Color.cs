@@ -386,8 +386,18 @@ namespace Microsoft.Xna.Framework
                 this._packedValue = (this._packedValue & 0x00ffffff) | ((uint)value << 24);
             }
         }
-		
-	/// <summary>
+
+        /// <summary>
+        /// Converts a <see cref="System.Numerics.Vector4"/> to a <see cref="Vector4"/> by mapping XYZW -> RGBA.
+        /// </summary>
+        /// <param name="value">The converted value.</param>
+        /// <returns></returns>
+        public static implicit operator Color(System.Numerics.Vector4 value)
+        {
+            return new Color(value.X, value.Y, value.Z, value.W);
+        }
+
+	    /// <summary>
         /// Compares whether two <see cref="Color"/> instances are equal.
         /// </summary>
         /// <param name="a"><see cref="Color"/> instance on the left of the equal sign.</param>
