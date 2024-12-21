@@ -453,17 +453,17 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
                 if (aiMaterial.HasBumpScaling)
                     material.OpaqueData.Add("BumpScaling", aiMaterial.BumpScaling);
                 if (aiMaterial.HasColorAmbient)
-                    material.OpaqueData.Add("AmbientColor", (Color)aiMaterial.ColorAmbient);
+                    material.OpaqueData.Add("AmbientColor", new Vector3(aiMaterial.ColorAmbient.X, aiMaterial.ColorAmbient.Y, aiMaterial.ColorAmbient.Z));
                 if (aiMaterial.HasColorDiffuse)
-                    material.OpaqueData.Add("DiffuseColor", (Color)aiMaterial.ColorDiffuse);
+                    material.OpaqueData.Add("DiffuseColor", new Vector3(aiMaterial.ColorDiffuse.X, aiMaterial.ColorDiffuse.Y, aiMaterial.ColorDiffuse.Z));
                 if (aiMaterial.HasColorEmissive)
-                    material.OpaqueData.Add("EmissiveColor", (Color)aiMaterial.ColorEmissive);
+                    material.OpaqueData.Add("EmissiveColor",  new Vector3(aiMaterial.ColorEmissive.X, aiMaterial.ColorEmissive.Y, aiMaterial.ColorEmissive.Z));
                 if (aiMaterial.HasColorReflective)
-                    material.OpaqueData.Add("ReflectiveColor", (Color)aiMaterial.ColorReflective);
+                    material.OpaqueData.Add("ReflectiveColor", new Vector3(aiMaterial.ColorReflective.X, aiMaterial.ColorReflective.Y, aiMaterial.ColorReflective.Z));
                 if (aiMaterial.HasColorSpecular)
-                    material.OpaqueData.Add("SpecularColor", (Color)aiMaterial.ColorSpecular);
+                    material.OpaqueData.Add("SpecularColor", new Vector3(aiMaterial.ColorSpecular.X, aiMaterial.ColorSpecular.Y, aiMaterial.ColorSpecular.Z));
                 if (aiMaterial.HasColorTransparent)
-                    material.OpaqueData.Add("TransparentColor", (Color)aiMaterial.ColorTransparent);
+                    material.OpaqueData.Add("TransparentColor", new Vector3(aiMaterial.ColorTransparent.X, aiMaterial.ColorTransparent.Y, aiMaterial.ColorTransparent.Z));
                 if (aiMaterial.HasOpacity)
                     material.OpaqueData.Add("Opacity", aiMaterial.Opacity);
                 if (aiMaterial.HasReflectivity)
@@ -626,7 +626,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
             // Vertices
             var baseVertex = mesh.Positions.Count;
             foreach (var vert in aiMesh.Vertices)
-                mesh.Positions.Add(vert);
+                mesh.Positions.Add((Vector3)vert);
             geom.Vertices.AddRange(Enumerable.Range(baseVertex, aiMesh.VertexCount));
             geom.Indices.AddRange(aiMesh.GetIndices());
 
@@ -680,7 +680,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
                 geom.Vertices.Channels.Add(VertexChannelNames.TextureCoordinate(i), aiMesh.TextureCoordinateChannels[i].Select(s => new Vector2(s.X, s.Y)));
 
             for (var i = 0; i < aiMesh.VertexColorChannelCount; i++)
-                geom.Vertices.Channels.Add(VertexChannelNames.Color(i), aiMesh.VertexColorChannels[i].Select(s => (Vector4)s));
+                geom.Vertices.Channels.Add(VertexChannelNames.Color(i), aiMesh.VertexColorChannels[i].Select(s => (Color)s));
 
             return geom;
         }
@@ -1080,7 +1080,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
                             // Lerp between previous and next translation key.
                             var nextTranslationKey = translationKeys[prevTranslationIndex + 1];
                             var nextTranslationTime = nextTranslationKey.Time;
-                            var nextTranslation = nextTranslationKey.Value;
+                            var nextTranslation = (Vector3)nextTranslationKey.Value;
                             var amount = (float)((time - prevTranslationTime) / (nextTranslationTime - prevTranslationTime));
                             translation = Vector3.Lerp(prevTranslation.Value, nextTranslation, amount);
                         }
