@@ -150,7 +150,7 @@ namespace Microsoft.Xna.Framework
 
         /// <summary>
         ///   Determines if this <see cref="BoundingBox"/> contains or intersects with a specified <see cref="BoundingFrustum"/>.
-        ///   This method is precise, but might affect performance.
+        ///   This method is precise and will significantly affect performance.
         /// </summary>
         /// <param name="frustum">The <see cref="BoundingFrustum"/> to test for overlap.</param>
         /// <returns>
