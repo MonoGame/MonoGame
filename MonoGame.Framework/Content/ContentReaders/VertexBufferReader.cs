@@ -6,9 +6,7 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace Microsoft.Xna.Framework.Content
 {
-    #if !NET45
     [System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.All)]
-    #endif
     class VertexBufferReader : ContentTypeReader<VertexBuffer>
     {
         protected internal override VertexBuffer Read(ContentReader input, VertexBuffer existingInstance)

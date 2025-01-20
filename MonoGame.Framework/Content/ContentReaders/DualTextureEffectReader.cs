@@ -6,9 +6,7 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace Microsoft.Xna.Framework.Content
 {
-    #if !NET45
     [System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.All)]
-    #endif
     class DualTextureEffectReader : ContentTypeReader<DualTextureEffect>
     {
         protected internal override DualTextureEffect Read(ContentReader input, DualTextureEffect existingInstance)
