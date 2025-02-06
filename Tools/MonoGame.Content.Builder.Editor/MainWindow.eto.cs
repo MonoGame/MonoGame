@@ -165,7 +165,7 @@ namespace MonoGame.Tools.Pipeline
 
             cmdSaveAs = new Command();
             cmdSaveAs.MenuText = "Save As...";
-            cmdSave.ToolTip = "Save As";
+            cmdSaveAs.ToolTip = "Save As";
             cmdSaveAs.Image = Global.GetEtoIcon("Commands.SaveAs.png");
 
             cmdExit = new Command();
