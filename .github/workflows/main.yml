@@ -48,7 +48,7 @@ jobs:
       - name: Install Dependencies
         run:   |
               if [ "$RUNNER_OS" == "Linux" ]; then
-                    dotnet workload install android --version 8.0.402.0
+                    dotnet workload install android
                     sudo apt install p7zip-full curl
                     sudo dpkg --add-architecture i386 
                     sudo mkdir -pm755 /etc/apt/keyrings
@@ -59,13 +59,16 @@ jobs:
                     sudo apt install -y ttf-mscorefonts-installer
                     sudo fc-cache
                     fc-match Arial
+                    wine64 --version
                     wget -qO- https://monogame.net/downloads/net9_mgfxc_wine_setup.sh | bash
               elif [ "$RUNNER_OS" == "Windows" ]; then
                     dotnet.exe workload install android
               else
-                    dotnet workload install android macos ios --version 8.0.402.0
+                    dotnet workload install android macos ios
                     brew install wine-stable p7zip
                     sudo mkdir -p /usr/local/lib
+                    ls -n /Applications/ | grep Xcode*
+                    sudo xcode-select -s /Applications/Xcode_16.2.app/Contents/Developer
                     wget -qO- https://monogame.net/downloads/net9_mgfxc_wine_setup.sh | bash
               fi
         shell: bash
