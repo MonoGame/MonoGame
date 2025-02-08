@@ -35,7 +35,7 @@ public sealed class BuildDesktopVKTask : FrostingTask<BuildContext>
             throw new Exception($"Premake generation failed! {exit}");
 
         // Build it.
-        exit = context.StartProcess("msbuild", new ProcessSettings { WorkingDirectory = "native/monogame", Arguments = "monogame.sln /p:Configuration=Release /p:Platform=x64" });
+        exit = context.StartProcess("msbuild", new ProcessSettings { WorkingDirectory = "native/monogame", Arguments = "generated/monogame.sln /p:Configuration=Release /p:Platform=x64" });
         if (exit != 0)
             throw new Exception($"Native build failed! {exit}");
     }
