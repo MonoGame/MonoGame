@@ -1,6 +1,8 @@
 -- MonoGame - Copyright (C) MonoGame Foundation, Inc
 -- This file is subject to the terms and conditions defined in
 -- file 'LICENSE.txt', which is part of this source code package.
+require "external/premake-cmake/cmake"
+require "external/premake-androidmk/androidmk"
 
 function common(project_name)
 
@@ -8,7 +10,7 @@ function common(project_name)
 
    kind "SharedLib"
    language "C++"
-   architecture "x64"
+   cppdialect "C++17"
    defines { "DLL_EXPORT" }
    targetdir( platform_target_path )
    targetname "monogame.native"
@@ -23,6 +25,22 @@ function common(project_name)
    {
       "include",      
    }
+
+end
+
+function android()
+   defines { "MG_ANDROID" }
+
+   files 
+   { 
+      "android/**.h",
+      "android/**.cpp",
+   }
+   
+   -- Android-specific configurations
+   filter "system:android"
+      defines { "ANDROID" }
+      links { "log", "android" }
 
 end
 
@@ -43,9 +61,13 @@ function sdl2()
    }
 
    filter { "system:windows" }
+      libdirs
+      {
+         "external/sdl2/sdl/build/Release"
+      }
       links 
       { 
-         "external/sdl2/sdl/build/Release/SDL2-static.lib",
+         "SDL2-static",
          "winmm",
          "imm32",
          "user32",
@@ -57,6 +79,18 @@ function sdl2()
          "version",
          "shell32"
       }
+   filter { "system:macosx" }
+      buildoptions { "-fobjc-arc", "-arch x86_64", "-arch arm64" } 
+      libdirs
+      {
+         "external/sdl2/sdl/build"
+      }
+      links
+      {
+         "SDL2-2.0.0",
+         "Cocoa.framework",
+         "CoreAudio.framework",
+      }
 
 end
 
@@ -65,14 +99,14 @@ function vulkan()
 
    defines { "MG_VULKAN" }
 
+   filter "system:macosx"
+      prebuildcommands { 'find ../vulkan -type f -name "*.vk.mgfxo" -print0 | xargs -0 -I {} xxd -i {} {}.h ' }
+
    files 
    { 
       "vulkan/**.h",
       "vulkan/**.cpp",
    }
-
-   filter "system:windows"
-      files { "vulkan/**.rc", }
 
    includedirs 
    {
@@ -81,6 +115,8 @@ function vulkan()
       "external/vma/include",      
    }
 
+   filter "system:windows"
+      files { "vulkan/**.rc", }
 end
 
 
@@ -110,15 +146,46 @@ function configs()
 end
 
 workspace "monogame"
+   location "generated"
    configurations { "Debug", "Release" }
+   platforms { "x86", "x86_64", "arm", "arm64", "universal" }
+   -- Architecture-specific global settings
+   filter "platforms:x86"
+      architecture "x86"
+
+   filter "platforms:x86_64"
+      architecture "x86_64"
+
+   filter "platforms:arm"
+      architecture "arm"
+
+   filter "platforms:arm64"
+      architecture "arm64"
+
+   filter "platforms:universal"
+      architecture "universal"
 
 project "desktopvk"
+   removeplatforms { "x86", "arm", "arm64", "x86_64" }
    common("desktopvk")
    sdl2()
    vulkan()
    faudio()
    configs()
 
+if os.target() == "windows" then
+   project "windowsdx"
+      removeplatforms { "x86", "arm" }
+      defines { "MG_WINDOWSDX" }
+      common("windowsdx")
+else
+   print("Skipping windowsdx: Not building on Windows")
+end
 
-project "windowsdx"
-   common("windowsdx")
+-- project "androidvk"
+--    removeplatforms { "universal" }
+--    common("androidvk")
+--    android()
+--    vulkan()
+--    faudio()
+--    configs()

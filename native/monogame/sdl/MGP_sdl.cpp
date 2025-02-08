@@ -11,7 +11,9 @@
 #if _WIN32
 #include <combaseapi.h>
 #endif
-
+#if __APPLE__ 
+#define _MAX_PATH PATH_MAX
+#endif
 
 struct MGP_Platform
 {
@@ -20,7 +22,7 @@ struct MGP_Platform
     std::map<mgint, SDL_GameController*> controllers;
 };
 
-static std::map<int, MGKeys> s_keymap
+static const std::map<mgint, MGKeys> s_keymap
 {
     { 8, MGKeys::Back },
     { 9, MGKeys::Tab },
@@ -236,13 +238,27 @@ const char* MGP_Platform_MakePath(const char* location, const char* path)
 
     if (location[0])
     {
+#if _WIN32
         strcpy_s(fpath, length, location);
         strcat_s(fpath, length, MG_PATH_SEPARATOR);
         strcat_s(fpath, length, path);
+#elif __APPLE__
+        strlcpy(fpath, location, length);
+        strlcat(fpath, MG_PATH_SEPARATOR, length);
+        strlcpy(fpath, path, length);
+#else
+#error NOT IMPLEMENTED!
+#endif
     }
     else
     {
+#if _WIN32
         strcpy_s(fpath, length, path);
+#elif __APPLE__     
+        strlcpy(fpath, path, length);
+#else
+#error NOT IMPLEMENTED!
+#endif
     }
 
     return fpath;
@@ -624,7 +640,13 @@ mgbool MGP_Platform_PollEvent(MGP_Platform* platform, MGP_Event& event_)
             event_.Drop.Window = MGP_WindowFromId(platform, ev.drop.windowID);
 
             static char TempPath[_MAX_PATH];
+#if _WIN32
             strcpy_s(TempPath, _MAX_PATH, ev.drop.file);
+#elif __APPLE__
+            strlcpy(TempPath, ev.drop.file, _MAX_PATH);
+#else
+#error NOT IMPLEMENTED!
+#endif
             SDL_free(ev.drop.file);
 
             event_.Drop.File = TempPath;
@@ -978,7 +1000,7 @@ mgbool MGP_GamePad_SetVibration(MGP_Platform* platform, mgint identifer, mgfloat
     if (pair == platform->controllers.end())
         return false;
 
-    auto supported = SDL_GameControllerRumble(pair->second, (UINT16)(leftMotor * 0xFFFF), (UINT16)(rightMotor * 0xFFFF), INT_MAX);
+    auto supported = SDL_GameControllerRumble(pair->second, (mgushort)(leftMotor * 0xFFFF), (mgushort)(rightMotor * 0xFFFF), INT_MAX);
     return supported == 0;
 }
 
