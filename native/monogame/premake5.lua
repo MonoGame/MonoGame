@@ -166,7 +166,7 @@ workspace "monogame"
       architecture "universal"
 
 project "desktopvk"
-   removeplatforms { "x86", "arm", "arm64", "x86_64" }
+   removeplatforms { "x86", "arm", "arm64" }
    common("desktopvk")
    sdl2()
    vulkan()
