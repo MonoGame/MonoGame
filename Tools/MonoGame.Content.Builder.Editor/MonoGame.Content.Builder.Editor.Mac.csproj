@@ -12,6 +12,7 @@
     <AssemblyName>mgcb-editor-mac</AssemblyName>
     <AssemblyTitle>MGCB Editor</AssemblyTitle>
     <RuntimeIdentifiers>osx-x64;osx-arm64</RuntimeIdentifiers>
+    <TrimMode>copy</TrimMode>
   </PropertyGroup>
 
   <ItemGroup>
