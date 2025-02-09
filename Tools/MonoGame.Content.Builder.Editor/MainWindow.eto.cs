@@ -158,13 +158,14 @@ namespace MonoGame.Tools.Pipeline
             cmdImport.MenuText = "Import";
 
             cmdSave = new Command();
-            cmdSave.MenuText = "Save...";
+            cmdSave.MenuText = "Save";
             cmdSave.ToolTip = "Save";
             cmdSave.Image = Global.GetEtoIcon("Commands.Save.png");
             cmdSave.Shortcut = Application.Instance.CommonModifier | Keys.S;
 
             cmdSaveAs = new Command();
-            cmdSaveAs.MenuText = "Save As";
+            cmdSaveAs.MenuText = "Save As...";
+            cmdSaveAs.ToolTip = "Save As";
             cmdSaveAs.Image = Global.GetEtoIcon("Commands.SaveAs.png");
 
             cmdExit = new Command();
