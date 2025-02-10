@@ -13,7 +13,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="MonoGame.Library.OpenAL" Version="1.23.1.7" />
+    <PackageReference Include="MonoGame.Library.OpenAL" Version="1.23.1.10" />
   </ItemGroup>
 
   <ItemGroup>

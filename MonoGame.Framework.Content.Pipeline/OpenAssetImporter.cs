@@ -1,10 +1,11 @@
-﻿// MonoGame - Copyright (C) MonoGame Foundation, Inc
+// MonoGame - Copyright (C) MonoGame Foundation, Inc
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Numerics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -250,7 +251,6 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
         /// </summary>
         public bool XnaComptatible { get; set; }
 
-        /// <inheritdoc/>
         public override NodeContent Import(string filename, ContentImporterContext context)
         {
             if (filename == null)
@@ -380,16 +380,16 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
                     material.Textures.Add("Bump", ImportTextureContentRef(aiMaterial.TextureHeight));
 
                 if (aiMaterial.HasColorDiffuse)
-                    material.DiffuseColor = ToXna(aiMaterial.ColorDiffuse);
+                    material.DiffuseColor = new Vector3(aiMaterial.ColorDiffuse.X, aiMaterial.ColorDiffuse.Y, aiMaterial.ColorDiffuse.Z);
 
                 if (aiMaterial.HasColorEmissive)
-                    material.EmissiveColor = ToXna(aiMaterial.ColorEmissive);
+                    material.EmissiveColor = new Vector3(aiMaterial.ColorEmissive.X, aiMaterial.ColorEmissive.Y, aiMaterial.ColorEmissive.Z);
 
                 if (aiMaterial.HasOpacity)
                     material.Alpha = aiMaterial.Opacity;
 
                 if (aiMaterial.HasColorSpecular)
-                    material.SpecularColor = ToXna(aiMaterial.ColorSpecular);
+                    material.SpecularColor = new Vector3(aiMaterial.ColorSpecular.X, aiMaterial.ColorSpecular.Y, aiMaterial.ColorSpecular.Z);
 
                 if (aiMaterial.HasShininessStrength)
                     material.SpecularPower = aiMaterial.Shininess;
@@ -456,17 +456,17 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
                 if (aiMaterial.HasBumpScaling)
                     material.OpaqueData.Add("BumpScaling", aiMaterial.BumpScaling);
                 if (aiMaterial.HasColorAmbient)
-                    material.OpaqueData.Add("AmbientColor", ToXna(aiMaterial.ColorAmbient));
+                    material.OpaqueData.Add("AmbientColor", new Vector3(aiMaterial.ColorAmbient.X, aiMaterial.ColorAmbient.Y, aiMaterial.ColorAmbient.Z));
                 if (aiMaterial.HasColorDiffuse)
-                    material.OpaqueData.Add("DiffuseColor", ToXna(aiMaterial.ColorDiffuse));
+                    material.OpaqueData.Add("DiffuseColor", new Vector3(aiMaterial.ColorDiffuse.X, aiMaterial.ColorDiffuse.Y, aiMaterial.ColorDiffuse.Z));
                 if (aiMaterial.HasColorEmissive)
-                    material.OpaqueData.Add("EmissiveColor", ToXna(aiMaterial.ColorEmissive));
+                    material.OpaqueData.Add("EmissiveColor",  new Vector3(aiMaterial.ColorEmissive.X, aiMaterial.ColorEmissive.Y, aiMaterial.ColorEmissive.Z));
                 if (aiMaterial.HasColorReflective)
-                    material.OpaqueData.Add("ReflectiveColor", ToXna(aiMaterial.ColorReflective));
+                    material.OpaqueData.Add("ReflectiveColor", new Vector3(aiMaterial.ColorReflective.X, aiMaterial.ColorReflective.Y, aiMaterial.ColorReflective.Z));
                 if (aiMaterial.HasColorSpecular)
-                    material.OpaqueData.Add("SpecularColor", ToXna(aiMaterial.ColorSpecular));
+                    material.OpaqueData.Add("SpecularColor", new Vector3(aiMaterial.ColorSpecular.X, aiMaterial.ColorSpecular.Y, aiMaterial.ColorSpecular.Z));
                 if (aiMaterial.HasColorTransparent)
-                    material.OpaqueData.Add("TransparentColor", ToXna(aiMaterial.ColorTransparent));
+                    material.OpaqueData.Add("TransparentColor", new Vector3(aiMaterial.ColorTransparent.X, aiMaterial.ColorTransparent.Y, aiMaterial.ColorTransparent.Z));
                 if (aiMaterial.HasOpacity)
                     material.OpaqueData.Add("Opacity", aiMaterial.Opacity);
                 if (aiMaterial.HasReflectivity)
@@ -517,7 +517,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
                 {
                     Name = aiNode.Name,
                     Identity = _identity,
-                    Transform = ToXna(GetRelativeTransform(aiNode, aiParent))
+                    Transform = GetRelativeTransform(aiNode, aiParent)
                 };
 
                 foreach (var meshIndex in aiNode.MeshIndices)
@@ -548,7 +548,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
                     _pivots.Add(originalName, pivot);
                 }
 
-                Matrix transform = ToXna(aiNode.Transform);
+                Matrix transform = aiNode.Transform;
                 if (aiNode.Name.EndsWith("_Translation"))
                     pivot.Translation = transform;
                 else if (aiNode.Name.EndsWith("_RotationOffset"))
@@ -586,7 +586,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
                 {
                     Name = aiNode.Name,
                     Identity = _identity,
-                    Transform = ToXna(GetRelativeTransform(aiNode, aiParent))
+                    Transform = GetRelativeTransform(aiNode, aiParent)
                 };
             }
 
@@ -629,7 +629,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
             // Vertices
             var baseVertex = mesh.Positions.Count;
             foreach (var vert in aiMesh.Vertices)
-                mesh.Positions.Add(ToXna(vert));
+                mesh.Positions.Add((Vector3)vert);
             geom.Vertices.AddRange(Enumerable.Range(baseVertex, aiMesh.VertexCount));
             geom.Indices.AddRange(aiMesh.GetIndices());
 
@@ -677,13 +677,13 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
 
             // Individual channels go here
             if (aiMesh.HasNormals)
-                geom.Vertices.Channels.Add(VertexChannelNames.Normal(), aiMesh.Normals.Select(ToXna));
+                geom.Vertices.Channels.Add(VertexChannelNames.Normal(), aiMesh.Normals.Select(s => (Vector3)s));
 
             for (var i = 0; i < aiMesh.TextureCoordinateChannelCount; i++)
-                geom.Vertices.Channels.Add(VertexChannelNames.TextureCoordinate(i), aiMesh.TextureCoordinateChannels[i].Select(ToXnaTexCoord));
+                geom.Vertices.Channels.Add(VertexChannelNames.TextureCoordinate(i), aiMesh.TextureCoordinateChannels[i].Select(s => new Vector2(s.X, s.Y)));
 
             for (var i = 0; i < aiMesh.VertexColorChannelCount; i++)
-                geom.Vertices.Channels.Add(VertexChannelNames.Color(i), aiMesh.VertexColorChannels[i].Select(ToXnaColor));
+                geom.Vertices.Channels.Add(VertexChannelNames.Color(i), aiMesh.VertexColorChannels[i].Select(s => (Color)s));
 
             return geom;
         }
@@ -730,7 +730,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
                     if (mesh.HasBones)
                         foreach (var bone in mesh.Bones)
                             if (!offsetMatrices.ContainsKey(bone.Name))
-                                offsetMatrices[bone.Name] = ToXna(bone.OffsetMatrix);
+                                offsetMatrices[bone.Name] = bone.OffsetMatrix;
 
             return offsetMatrices;
         }
@@ -812,7 +812,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
                     {
                         Name = aiNode.Name.Replace(mangling, string.Empty),
                         Identity = _identity,
-                        Transform = ToXna(GetRelativeTransform(aiNode, aiParent))
+                        Transform = GetRelativeTransform(aiNode, aiParent)
                     };
                 }
                 else if (_bones.Contains(aiNode))
@@ -880,7 +880,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
                         // Offset matrices are not provided by Assimp. :(
                         // Let's hope that the skeleton was exported in bind pose.
                         // (Otherwise we are just importing garbage.)
-                        node.Transform = ToXna(GetRelativeTransform(aiNode, aiParent));
+                        node.Transform = GetRelativeTransform(aiNode, aiParent);
                     }
                 }
             }
@@ -955,24 +955,24 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
                         scaleKeys = aiChannel.ScalingKeys;
 
                         Debug.Assert(pivot.Scaling.HasValue);
-                        Debug.Assert(!aiChannel.HasRotationKeys || (aiChannel.RotationKeyCount == 1 && (aiChannel.RotationKeys[0].Value == new Assimp.Quaternion(1, 0, 0, 0) || aiChannel.RotationKeys[0].Value == new Assimp.Quaternion(0, 0, 0, 0))));
-                        Debug.Assert(!aiChannel.HasPositionKeys || (aiChannel.PositionKeyCount == 1 && aiChannel.PositionKeys[0].Value == new Vector3D(0, 0, 0)));
+                        Debug.Assert(!aiChannel.HasRotationKeys || (aiChannel.RotationKeyCount == 1 && (aiChannel.RotationKeys[0].Value == new Quaternion(1, 0, 0, 0) || aiChannel.RotationKeys[0].Value == new Quaternion(0, 0, 0, 0))));
+                        Debug.Assert(!aiChannel.HasPositionKeys || (aiChannel.PositionKeyCount == 1 && aiChannel.PositionKeys[0].Value == new Vector3(0, 0, 0)));
                     }
                     else if (aiChannel.NodeName.EndsWith("_$AssimpFbx$_Rotation"))
                     {
                         rotationKeys = aiChannel.RotationKeys;
 
                         Debug.Assert(pivot.Rotation.HasValue);
-                        Debug.Assert(!aiChannel.HasScalingKeys || (aiChannel.ScalingKeyCount == 1 && aiChannel.ScalingKeys[0].Value == new Vector3D(1, 1, 1)));
-                        Debug.Assert(!aiChannel.HasPositionKeys || (aiChannel.PositionKeyCount == 1 && aiChannel.PositionKeys[0].Value == new Vector3D(0, 0, 0)));
+                        Debug.Assert(!aiChannel.HasScalingKeys || (aiChannel.ScalingKeyCount == 1 && aiChannel.ScalingKeys[0].Value == new Vector3(1, 1, 1)));
+                        Debug.Assert(!aiChannel.HasPositionKeys || (aiChannel.PositionKeyCount == 1 && aiChannel.PositionKeys[0].Value == new Vector3(0, 0, 0)));
                     }
                     else if (aiChannel.NodeName.EndsWith("_$AssimpFbx$_Translation"))
                     {
                         translationKeys = aiChannel.PositionKeys;
 
                         Debug.Assert(pivot.Translation.HasValue);
-                        Debug.Assert(!aiChannel.HasScalingKeys || (aiChannel.ScalingKeyCount == 1 && aiChannel.ScalingKeys[0].Value == new Vector3D(1, 1, 1)));
-                        Debug.Assert(!aiChannel.HasRotationKeys || (aiChannel.RotationKeyCount == 1 && (aiChannel.RotationKeys[0].Value == new Assimp.Quaternion(1, 0, 0, 0) || aiChannel.RotationKeys[0].Value == new Assimp.Quaternion(0, 0, 0, 0))));
+                        Debug.Assert(!aiChannel.HasScalingKeys || (aiChannel.ScalingKeyCount == 1 && aiChannel.ScalingKeys[0].Value == new Vector3(1, 1, 1)));
+                        Debug.Assert(!aiChannel.HasRotationKeys || (aiChannel.RotationKeyCount == 1 && (aiChannel.RotationKeys[0].Value == new Quaternion(1, 0, 0, 0) || aiChannel.RotationKeys[0].Value == new Quaternion(0, 0, 0, 0))));
                     }
                     else
                     {
@@ -1010,7 +1010,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
                     if (scaleIndex != -1)
                     {
                         // Scaling key found.
-                        scale = ToXna(scaleKeys[scaleIndex].Value);
+                        scale = scaleKeys[scaleIndex].Value;
                         prevScaleIndex = scaleIndex;
                         prevScaleTime = time;
                         prevScale = scale;
@@ -1023,7 +1023,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
                             // Lerp between previous and next scaling key.
                             var nextScaleKey = scaleKeys[prevScaleIndex + 1];
                             var nextScaleTime = nextScaleKey.Time;
-                            var nextScale = ToXna(nextScaleKey.Value);
+                            var nextScale = nextScaleKey.Value;
                             var amount = (float)((time - prevScaleTime) / (nextScaleTime - prevScaleTime));
                             scale = Vector3.Lerp(prevScale.Value, nextScale, amount);
                         }
@@ -1040,7 +1040,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
                     if (rotationIndex != -1)
                     {
                         // Rotation key found.
-                        rotation = ToXna(rotationKeys[rotationIndex].Value);
+                        rotation = rotationKeys[rotationIndex].Value;
                         prevRotationIndex = rotationIndex;
                         prevRotationTime = time;
                         prevRotation = rotation;
@@ -1053,7 +1053,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
                             // Lerp between previous and next rotation key.
                             var nextRotationKey = rotationKeys[prevRotationIndex + 1];
                             var nextRotationTime = nextRotationKey.Time;
-                            var nextRotation = ToXna(nextRotationKey.Value);
+                            var nextRotation = nextRotationKey.Value;
                             var amount = (float)((time - prevRotationTime) / (nextRotationTime - prevRotationTime));
                             rotation = Quaternion.Slerp(prevRotation.Value, nextRotation, amount);
                         }
@@ -1070,7 +1070,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
                     if (translationIndex != -1)
                     {
                         // Translation key found.
-                        translation = ToXna(translationKeys[translationIndex].Value);
+                        translation = translationKeys[translationIndex].Value;
                         prevTranslationIndex = translationIndex;
                         prevTranslationTime = time;
                         prevTranslation = translation;
@@ -1083,7 +1083,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
                             // Lerp between previous and next translation key.
                             var nextTranslationKey = translationKeys[prevTranslationIndex + 1];
                             var nextTranslationTime = nextTranslationKey.Time;
-                            var nextTranslation = ToXna(nextTranslationKey.Value);
+                            var nextTranslation = (Vector3)nextTranslationKey.Value;
                             var amount = (float)((time - prevTranslationTime) / (nextTranslationTime - prevTranslationTime));
                             translation = Vector3.Lerp(prevTranslation.Value, nextTranslation, amount);
                         }
@@ -1170,107 +1170,5 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
             int index = name.IndexOf("_$AssimpFbx$", StringComparison.Ordinal);
             return (index >= 0) ? name.Remove(index) : name;
         }
-
-        #region Conversion Helpers
-
-        /// <summary>
-        /// Converts a Matrix4x4 to a Xna Matrix.
-        /// </summary>
-        /// <param name="matrix">Matrix4x4 to convert.</param>
-        /// <returns>Xna matrix.</returns>
-        [DebuggerStepThrough]
-        public static Matrix ToXna(Matrix4x4 matrix)
-        {
-            var result = Matrix.Identity;
-
-            result.M11 = matrix.A1;
-            result.M12 = matrix.B1;
-            result.M13 = matrix.C1;
-            result.M14 = matrix.D1;
-
-            result.M21 = matrix.A2;
-            result.M22 = matrix.B2;
-            result.M23 = matrix.C2;
-            result.M24 = matrix.D2;
-
-            result.M31 = matrix.A3;
-            result.M32 = matrix.B3;
-            result.M33 = matrix.C3;
-            result.M34 = matrix.D3;
-
-            result.M41 = matrix.A4;
-            result.M42 = matrix.B4;
-            result.M43 = matrix.C4;
-            result.M44 = matrix.D4;
-
-            return result;
-        }
-
-        /// <summary>
-        /// Converts a Vector2D to a Xna Vector2.
-        /// </summary>
-        /// <param name="vector">Vector2D to convert.</param>
-        /// <returns>Xna vector2.</returns>
-        [DebuggerStepThrough]
-        public static Vector2 ToXna(Vector2D vector)
-        {
-            return new Vector2(vector.X, vector.Y);
-        }
-
-        /// <summary>
-        /// Converts a Vector3D to a Xna Vector3.
-        /// </summary>
-        /// <param name="vector">Vector3D to convert.</param>
-        /// <returns>Xna vector3.</returns>
-        [DebuggerStepThrough]
-        public static Vector3 ToXna(Vector3D vector)
-        {
-            return new Vector3(vector.X, vector.Y, vector.Z);
-        }
-
-        /// <summary>
-        /// Converts a Quaternion to a Xna Quaternion.
-        /// </summary>
-        /// <param name="quaternion">Quaternion to convert.</param>
-        /// <returns>Xna quaternion.</returns>
-        [DebuggerStepThrough]
-        public static Quaternion ToXna(Assimp.Quaternion quaternion)
-        {
-            return new Quaternion(quaternion.X, quaternion.Y, quaternion.Z, quaternion.W);
-        }
-
-        /// <summary>
-        /// Converts a Color4D to a Xna color without alpha.
-        /// </summary>
-        /// <param name="color">Color4D to convert.</param>
-        /// <returns>Xna Vector3.</returns>
-        [DebuggerStepThrough]
-        public static Vector3 ToXna(Color4D color)
-        {
-            return new Vector3(color.R, color.G, color.B);
-        }
-
-        /// <summary>
-        /// Converts a Vector3D to a Xna vector2 representing a texture coordinate.
-        /// </summary>
-        /// <param name="vector">Vector3D to convert.</param>
-        /// <returns>Xna vector2.</returns>
-        [DebuggerStepThrough]
-        public static Vector2 ToXnaTexCoord(Vector3D vector)
-        {
-            return new Vector2(vector.X, vector.Y);
-        }
-
-        /// <summary>
-        /// Converts a Color4D to a Xna color with alpha.
-        /// </summary>
-        /// <param name="color">Color4D to convert.</param>
-        /// <returns>Xna Color.</returns>
-        [DebuggerStepThrough]
-        public static Color ToXnaColor(Color4D color)
-        {
-            return new Color(color.R, color.G, color.B, color.A);
-        }
-        #endregion
     }
 }

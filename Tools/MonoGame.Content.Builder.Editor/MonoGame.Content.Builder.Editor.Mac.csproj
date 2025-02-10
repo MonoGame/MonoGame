@@ -31,8 +31,6 @@
   <ItemGroup>
     <PackageReference Include="Eto.Forms" Version="2.8.3" />
     <PackageReference Include="Eto.Platform.macOS" Version="2.8.3" />
-    <PackageReference Include="AssimpNet" Version="5.0.0-beta1" ExcludeAssets="runtime;native" />
-    <PackageReference Include="MonoGame.Library.Assimp" Version="5.3.1.1" />
   </ItemGroup>
 
   <ItemGroup>
