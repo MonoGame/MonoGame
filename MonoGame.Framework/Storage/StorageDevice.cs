@@ -1,4 +1,3 @@
-using Microsoft.Xna.Framework;
 using System;
 using System.IO;
 using System.Threading;
@@ -6,10 +5,7 @@ using System.Threading.Tasks;
 
 namespace Microsoft.Xna.Framework.Storage
 {
-    public delegate Task<StorageDevice> ShowSelectorAsync(PlayerIndex? player, int sizeInBytes, int directoryCount, CancellationToken cancellationToken = default);
-    public delegate Task<StorageContainer> OpenContainerAsync(string displayName, CancellationToken cancellationToken = default);
-
-    public sealed class StorageDevice
+    partial class StorageDevice
     {
         private readonly PlayerIndex? _player;
         private readonly int _sizeInBytes;
@@ -33,8 +29,9 @@ namespace Microsoft.Xna.Framework.Storage
                 }
                 catch (Exception)
                 {
-                    StorageDeviceHelper.Path = StorageRoot;
-                    return StorageDeviceHelper.FreeSpace;
+                    /* TODO StorageDeviceHelper.Path = StorageRoot;
+                    return StorageDeviceHelper.FreeSpace;*/
+                    return -1;
                 }
             }
         }
@@ -64,15 +61,14 @@ namespace Microsoft.Xna.Framework.Storage
                 }
                 catch (Exception)
                 {
-                    StorageDeviceHelper.Path = StorageRoot;
-                    return StorageDeviceHelper.TotalSpace;
+                    /* TODO StorageDeviceHelper.Path = StorageRoot;
+                    return StorageDeviceHelper.TotalSpace; */
+                    return -1;
                 }
             }
         }
 
         private string GetDevicePath => _storageContainer?._storagePath ?? StorageRoot;
-
-        public static event EventHandler<EventArgs> DeviceChanged;
 
         public Task<StorageContainer> OpenContainerAsync(string displayName, CancellationToken cancellationToken = default)
         {
@@ -83,21 +79,6 @@ namespace Microsoft.Xna.Framework.Storage
         {
             _storageContainer = new StorageContainer(this, displayName, _player);
             return _storageContainer;
-        }
-
-        public static Task<StorageDevice> ShowSelectorAsync(int sizeInBytes, int directoryCount, CancellationToken cancellationToken = default)
-        {
-            return ShowSelectorAsync(null, sizeInBytes, directoryCount, cancellationToken);
-        }
-
-        public static Task<StorageDevice> ShowSelectorAsync(PlayerIndex? player, int sizeInBytes, int directoryCount, CancellationToken cancellationToken = default)
-        {
-            return Task.Run(() => Show(player, sizeInBytes, directoryCount), cancellationToken);
-        }
-
-        private static StorageDevice Show(PlayerIndex? player, int sizeInBytes, int directoryCount)
-        {
-            return new StorageDevice(player, sizeInBytes, directoryCount);
         }
 
         internal static string StorageRoot
