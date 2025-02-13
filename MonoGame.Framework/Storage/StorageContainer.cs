@@ -19,7 +19,7 @@ namespace Microsoft.Xna.Framework.Storage
     /// Contains a logical collection of files used for user-data storage.
     /// </summary>			
     /// <remarks>MSDN documentation contains related conceptual article: http://msdn.microsoft.com/en-us/library/bb200105.aspx#ID4EDB</remarks>
-    public class StorageContainer : IDisposable
+    partial class StorageContainer : IDisposable
     {
         internal readonly string _storagePath;
         private readonly StorageDevice _device;
