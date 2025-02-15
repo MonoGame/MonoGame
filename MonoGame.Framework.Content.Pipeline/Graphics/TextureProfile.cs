@@ -80,12 +80,12 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
             catch (EntryPointNotFoundException ex)
             {
                 context.Logger.LogImportantMessage("Could not find the entry point to compress the texture. " + ex.ToString());
-                throw es;
+                throw ex;
             }
             catch (DllNotFoundException ex)
             {
                 context.Logger.LogImportantMessage("Could not compress texture. Required shared lib is missing. " + ex.ToString());
-                throw es;
+                throw ex;
             }
             catch (Exception ex)
             {
