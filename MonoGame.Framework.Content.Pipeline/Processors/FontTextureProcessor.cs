@@ -69,7 +69,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
                         });
                         if (re == Rectangle.Empty)
                         {
-                            // we have found the top, left of a image.
+                            // we have found the top, left of a image. 
                             // we now need to scan for the 'bounds'
                             int top = y;
                             int bottom = y;
@@ -110,7 +110,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
             var output = new SpriteFontContent();
 
             // extract the glyphs from the texture and map them to a list of characters.
-            // we need to call GtCharacterForIndex for each glyph in the Texture to
+            // we need to call GtCharacterForIndex for each glyph in the Texture to 
             // get the char for that glyph, by default we start at ' ' then '!' and then ASCII
             // after that.
             BitmapContent face = input.Faces[0][0];

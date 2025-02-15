@@ -45,7 +45,7 @@ namespace Microsoft.Xna.Framework.Graphics
                     desc.BackFace.PassOperation = GetStencilOp(CounterClockwiseStencilPass);
                 }
                 else
-                {   //use same settings as frontFace
+                {   //use same settings as frontFace 
                     desc.BackFace.Comparison = StencilFunction.ToComparison();
                     desc.BackFace.DepthFailOperation = GetStencilOp(StencilDepthBufferFail);
                     desc.BackFace.FailOperation = GetStencilOp(StencilFail);

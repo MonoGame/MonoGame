@@ -14,8 +14,8 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
         /// <summary>
         /// Creates an instance of Dxt1BitmapContent with the specified width and height.
         /// </summary>
-        /// <param name="width">The width in pixels of the bitmap.</param>
-        /// <param name="height">The height in pixels of the bitmap.</param>
+        /// <param name="width">The width, in pixels, of the bitmap.</param>
+        /// <param name="height">The height, in pixels, of the bitmap.</param>
         public Dxt1BitmapContent(int width, int height)
             : base(8, width, height)
         {

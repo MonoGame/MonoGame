@@ -259,7 +259,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Intermediate
             foreach (var externalReference in _externalReferences.Values)
             {
                 Xml.WriteStartElement("ExternalReference");
-
+                
                 Xml.WriteAttributeString("ID", externalReference.ID);
                 Xml.WriteAttributeString("TargetType", externalReference.TargetType);
 
@@ -279,5 +279,5 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Intermediate
         {
             Xml.WriteString(Serializer.GetFullTypeName(type));
         }
-    }
+    }        
 }

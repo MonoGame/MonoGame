@@ -34,7 +34,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
 
             // Hook into assembly loading events to gather any new
             // enumeration types that are found.
-            AppDomain.CurrentDomain.AssemblyLoad += (sender, args) => ScanAssembly(args.LoadedAssembly);
+            AppDomain.CurrentDomain.AssemblyLoad += (sender, args) => ScanAssembly(args.LoadedAssembly);            
         }
 
         private static void ScanAssembly(Assembly ass)

@@ -29,7 +29,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 _targetBlendState[3].GetState(ref desc.RenderTarget[3]);
                 desc.IndependentBlendEnable = _independentBlendEnable;
 
-                // This is a new DX11 feature we should consider
+                // This is a new DX11 feature we should consider 
                 // exposing as part of the extended MonoGame API.
                 desc.AlphaToCoverageEnable = false;
 

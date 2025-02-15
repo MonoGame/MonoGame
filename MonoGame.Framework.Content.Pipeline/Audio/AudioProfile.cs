@@ -54,6 +54,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Audio
         /// <returns>The quality used for conversion which could be different from the suggested quality.</returns>
         public abstract ConversionQuality ConvertStreamingAudio(TargetPlatform platform, ConversionQuality quality, AudioContent content, ref string outputFileName);
 
+        
         /// <summary>
         /// Calculates the sample rate based on the conversion quality and the source sample rate.
         /// </summary>

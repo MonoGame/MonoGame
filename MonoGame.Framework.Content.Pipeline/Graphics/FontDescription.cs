@@ -166,7 +166,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 	    [ContentSerializerIgnore]
 	    public ICollection<char> Characters
 	    {
-	        get { return characters; }
+	        get { return characters; } 
             internal set { characters = new HashSet<char>(value); }
 	    }
 
@@ -205,14 +205,14 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 		/// <param name="spacing">The amount of space, in pixels, to insert between letters in a string.</param>
 		/// <param name="fontStyle">The font style for the font.</param>
 		/// <param name="useKerning">true if kerning information is used when drawing characters; false otherwise.</param>
-		public FontDescription(string fontName, float size, float spacing, FontDescriptionStyle fontStyle, bool useKerning)
+		public FontDescription(string fontName, float size, float spacing, FontDescriptionStyle fontStyle, bool useKerning)            
 		{
 			// Write to the properties so the validation is run
 			FontName = fontName;
 			Size = size;
 			Spacing = spacing;
 			Style = fontStyle;
-			UseKerning = useKerning;
+			UseKerning = useKerning;			
 		}
 	}
 }

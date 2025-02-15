@@ -46,7 +46,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Intermediate
 
         /// <summary/>
         protected internal virtual void Initialize(IntermediateSerializer serializer)
-        {
+        {     
         }
 
         /// <summary>

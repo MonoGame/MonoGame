@@ -71,13 +71,13 @@ namespace Microsoft.Xna.Framework.Graphics
 
                 _infoQueue.ClearStoredMessages();
             }
-
+            
             if (_cachedMessages.Count > 0)
             {
                 message = _cachedMessages.Dequeue();
                 return true;
             }
-
+            
             // No messages to grab from DirectX.
             message = null;
             return false;

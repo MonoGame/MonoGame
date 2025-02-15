@@ -247,7 +247,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
 
         /// <summary>
         /// This disables some Assimp model loading features so that
-        /// the resulting content is the same as what the XNA FbxImporter
+        /// the resulting content is the same as what the XNA FbxImporter 
         /// </summary>
         public bool XnaComptatible { get; set; }
 
@@ -302,7 +302,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
                     PostProcessSteps.OptimizeMeshes |
                     PostProcessSteps.Triangulate
 
-                    // Unused:
+                    // Unused: 
                     //PostProcessSteps.CalculateTangentSpace
                     //PostProcessSteps.Debone |
                     //PostProcessSteps.FindInstances |      // No effect + slow?
@@ -329,7 +329,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
                 if (_xnaCompatible)
                     ImportXnaMaterials();
                 else
-                    ImportMaterials();
+                    ImportMaterials(); 
 
                 ImportNodes();      // Create _pivots and _rootNode (incl. children).
                 ImportSkeleton();   // Create skeleton (incl. animations) and add to _rootNode.
@@ -358,7 +358,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
             _materials = new List<MaterialContent>();
             foreach (var aiMaterial in _scene.Materials)
             {
-                // TODO: What about AlphaTestMaterialContent, DualTextureMaterialContent,
+                // TODO: What about AlphaTestMaterialContent, DualTextureMaterialContent, 
                 // EffectMaterialContent, EnvironmentMapMaterialContent, and SkinnedMaterialContent?
 
                 var material = new BasicMaterialContent
@@ -412,7 +412,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
             }
 
             return texture;
-        }
+        }            
 
         /// <summary>
         /// Returns all the Assimp <see cref="Material"/> features as a <see cref="MaterialContent"/>.
@@ -666,8 +666,8 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
                 if (missingBoneWeights)
                 {
                     _context.Logger.LogWarning(
-                        string.Empty,
-                        _identity,
+                        string.Empty, 
+                        _identity, 
                         "No bone weights found for one or more vertices of skinned mesh '{0}'.",
                         aiMesh.Name);
                 }

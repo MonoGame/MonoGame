@@ -98,8 +98,8 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
             bool processAsset = !string.IsNullOrEmpty(processorName);
             _manager.ResolveImporterAndProcessor(sourceFilepath, ref importerName, ref processorName);
 
-            var buildEvent = new PipelineBuildEvent
-            {
+            var buildEvent = new PipelineBuildEvent 
+            { 
                 SourceFile = sourceFilepath,
                 Importer = importerName,
                 Processor = processAsset ? processorName : null,

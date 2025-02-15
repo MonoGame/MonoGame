@@ -6,9 +6,10 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 {
     /// <summary>
     /// Provides a collection of child <see cref="NodeContent"/> objects for a content item.
-    ///
-    /// Links from a child object to its parent are maintained as the collection contents are modified.
     /// </summary>
+    /// <remarks>
+    /// Links from a child object to its parent are maintained as the collection contents are modified.
+    /// </remarks>
     public class NodeContentCollection : ChildCollection<NodeContent, NodeContent>
     {
         /// <summary>

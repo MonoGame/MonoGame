@@ -47,7 +47,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Intermediate
         public bool MoveToElement(string elementName)
         {
             var nodeType = Xml.MoveToContent();
-            return  nodeType == XmlNodeType.Element &&
+            return  nodeType == XmlNodeType.Element && 
                     Xml.Name == elementName;
         }
 
@@ -116,7 +116,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Intermediate
                     Xml.MoveToElement();
                 }
             }
-
+            
             return ReadRawObject(format, typeSerializer, existingInstance);
         }
 
@@ -130,7 +130,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Intermediate
         /// <returns>The deserialized object of type T.</returns>
         public T ReadObject<T>(ContentSerializerAttribute format, T existingInstance)
         {
-            return ReadObject(format, Serializer.GetTypeSerializer(typeof(T)), existingInstance);
+            return ReadObject(format, Serializer.GetTypeSerializer(typeof(T)), existingInstance);            
         }
 
         /// <summary>
@@ -144,7 +144,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Intermediate
         /// </exception>
         public T ReadRawObject<T>(ContentSerializerAttribute format)
         {
-            return ReadRawObject(format, Serializer.GetTypeSerializer(typeof(T)), default(T));
+            return ReadRawObject(format, Serializer.GetTypeSerializer(typeof(T)), default(T));         
         }
 
         /// <summary>
@@ -156,7 +156,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Intermediate
         /// <returns>The deserialized object of type T.</returns>
         public T ReadRawObject<T>(ContentSerializerAttribute format, ContentTypeSerializer typeSerializer)
         {
-            return ReadRawObject(format, typeSerializer, default(T));
+            return ReadRawObject(format, typeSerializer, default(T));         
         }
 
         /// <summary>
@@ -208,7 +208,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Intermediate
         /// </exception>
         public T ReadRawObject<T>(ContentSerializerAttribute format, T existingInstance)
         {
-            return ReadRawObject(format, Serializer.GetTypeSerializer(typeof(T)), existingInstance);
+            return ReadRawObject(format, Serializer.GetTypeSerializer(typeof(T)), existingInstance);           
         }
 
         /// <summary>
@@ -236,7 +236,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Intermediate
 
             if (string.IsNullOrEmpty(str))
                 return;
-
+            
             // Do we already have one for this?
             Action<object> prevFixup;
             if (!_resourceFixups.TryGetValue(str, out prevFixup))
@@ -349,7 +349,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Intermediate
         }
 
         /// <summary>
-        /// Reads the next type in the
+        /// Reads the next type in the 
         /// </summary>
         /// <returns></returns>
         public Type ReadTypeName()

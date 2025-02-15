@@ -36,7 +36,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
         }
 
         /// <summary>
-        /// Gets or sets the alpha function property.
+        /// Gets or Sets the compare function for alpha tests.
         /// </summary>
         public CompareFunction? AlphaFunction
         {

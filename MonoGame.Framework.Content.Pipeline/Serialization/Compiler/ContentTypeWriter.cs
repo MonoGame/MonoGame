@@ -47,7 +47,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
 
             _targetType = targetType;
         }
-
+        
         /// <summary>
         /// Gets the assembly qualified name of the runtime loader for this type.
         /// </summary>

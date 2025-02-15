@@ -23,7 +23,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Builder.Convertors
         /// <inheritdoc/>
         public override object ConvertTo(ITypeDescriptorContext context, System.Globalization.CultureInfo culture, object value, Type destinationType)
         {
-            if (destinationType != typeof (string))
+            if (destinationType != typeof (string))            
                 return base.ConvertTo(context, culture, value, destinationType);
 
             var color = (Color)value;
@@ -65,7 +65,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Builder.Convertors
                     }
                 }
                 else // Assume the string is in the MonoGame "r,g,b,a" format
-                {
+                {                    
                     string[] values = (strValue).Split(new char[] { ',' }, StringSplitOptions.None);
                     if (values.Length == 4)
                     {

@@ -58,17 +58,17 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
         private readonly Dictionary<string, OpaqueDataDictionary> _processorDefaultValues;
 
         /// <summary>
-        /// Gets or sets the project directory.
+        /// Gets or sets the directory that contains the content project.
         /// </summary>
         public string ProjectDirectory { get; private set; }
 
         /// <summary>
-        /// Gets or sets the output directory.
+        /// Gets or sets the directory that contains the results of the project.
         /// </summary>
         public string OutputDirectory { get; private set; }
 
         /// <summary>
-        /// Gets or sets the intermediate directory.
+        /// Gets or sets the directory that is used for temporary files created by the content build process.
         /// </summary>
         public string IntermediateDirectory { get; private set; }
 
@@ -118,9 +118,9 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
         /// <summary>
         /// Creates a new instance of PipelineManager.
         /// </summary>
-        /// <param name="projectDir">Project directory.</param>
-        /// <param name="outputDir">Output directory.</param>
-        /// <param name="intermediateDir">Intermediate directory.</param>
+        /// <param name="projectDir">The directory that contains the content project./param>
+        /// <param name="outputDir">The directory that contains the results of the project.</param>
+        /// <param name="intermediateDir">The directory that is used for temporary files created by the content build process</param>
         public PipelineManager(string projectDir, string outputDir, string intermediateDir)
         {
             _pipelineBuildEvents = new Dictionary<string, List<PipelineBuildEvent>>();
@@ -336,7 +336,7 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
         /// Returns the importer type name based on the file extension.
         /// </summary>
         /// <param name="ext">File extension to search for.</param>
-        /// <returns>Importer type name or <c>null</c> if not found.</returns>
+        /// <returns>Importer type name or <see langword="null"/> if not found.</returns>
         public string FindImporterByExtension(string ext)
         {
             if (_importers == null)
@@ -376,7 +376,7 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
         /// Gets the default processor for an importer.
         /// </summary>
         /// <param name="importer">Name of the importer.</param>
-        /// <returns>Name of the processor or <c>null</c> if not found.</returns>
+        /// <returns>Name of the processor or <see langword="null"/> if not found.</returns>
         public string FindDefaultProcessor(string importer)
         {
             if (_importers == null)
@@ -396,7 +396,7 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
         /// Gets the processor type.
         /// </summary>
         /// <param name="name">Name of the processor.</param>
-        /// <returns>Type of the processor or <c>null</c> if not found.</returns>
+        /// <returns>Type of the processor or <see langword="null"/> if not found.</returns>
         public Type GetProcessorType(string name)
         {
             if (_processors == null)
@@ -438,7 +438,7 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
         /// Creates an instance of a processor.
         /// </summary>
         /// <param name="name">Name of the processor.</param>
-        /// <param name="processorParameters">Opaque data dictionary containing the processor parameters.</param>
+        /// <param name="processorParameters" cref="OpaqueDataDictionary">Opaque data dictionary containing the processor parameters.</param>
         /// <returns>Content processor.</returns>
         public IContentProcessor CreateProcessor(string name, OpaqueDataDictionary processorParameters)
         {
@@ -539,8 +539,8 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
         /// Validate a list of processor parameters for a given processor type.
         /// </summary>
         /// <param name="name">Name of the processor type.</param>
-        /// <param name="processorParameters">Opaque data dictionary containing the processor parameters.</param>
-        /// <returns>Opaque data dictionary containing the validated parameters.</returns>
+        /// <param name="processorParameters"  cref="OpaqueDataDictionary">Opaque data dictionary containing the processor parameters.</param>
+        /// <returns  cref="OpaqueDataDictionary">Opaque data dictionary containing the validated parameters.</returns>
         public OpaqueDataDictionary ValidateProcessorParameters(string name, OpaqueDataDictionary processorParameters)
         {
             var result = new OpaqueDataDictionary();
@@ -614,7 +614,7 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
         /// <param name="outputFilepath">Output file path.</param>
         /// <param name="importerName">Name of the importer to use.</param>
         /// <param name="processorName">Name of the processor to use.</param>
-        /// <param name="processorParameters">Processor parameters.</param>
+        /// <param name="processorParameters" cref="OpaqueDataDictionary">Opaque data dictionary containing the processor parameters.</param>
         public void RegisterContent(string sourceFilepath, string outputFilepath = null, string importerName = null, string processorName = null, OpaqueDataDictionary processorParameters = null)
         {
             sourceFilepath = PathHelper.Normalize(sourceFilepath);
@@ -642,7 +642,7 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
         /// <param name="outputFilepath">Output file path.</param>
         /// <param name="importerName">Name of the importer to use.</param>
         /// <param name="processorName">Name of the processor to use.</param>
-        /// <param name="processorParameters">Processor parameters.</param>
+        /// <param name="processorParameters" cref="OpaqueDataDictionary">Opaque data dictionary containing the processor parameters.</param>
         /// <returns>PipelineBuildEvent instance.</returns>
         public PipelineBuildEvent BuildContent(string sourceFilepath, string outputFilepath = null, string importerName = null, string processorName = null, OpaqueDataDictionary processorParameters = null)
         {

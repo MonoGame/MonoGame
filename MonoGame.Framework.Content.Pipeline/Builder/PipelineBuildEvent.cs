@@ -82,8 +82,11 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
         public DateTime ProcessorTime { get; set; }
 
         /// <summary>
-        /// Gets or sets the parameters as an opaque dictionary.
+        /// Gets or sets the parameters of this build event.
         /// </summary>
+        /// <remarks>
+        /// Parameter are stored in an <see cref="OpaqueDataDictionary"/>
+        /// </remarks>
         [XmlIgnore]
         public OpaqueDataDictionary Parameters { get; set; }
 

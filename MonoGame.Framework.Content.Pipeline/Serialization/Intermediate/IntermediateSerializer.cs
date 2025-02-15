@@ -191,14 +191,14 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Intermediate
                 if (type.IsPrimitive)
                     throw new NotImplementedException(string.Format("Unhandled primitive type `{0}`!", type.FullName));
 
-                // We still don't have a serializer then we
+                // We still don't have a serializer then we 
                 // fallback to the reflection based serializer.
                 serializer = new ReflectiveSerializer(type);
             }
 
             Debug.Assert(serializer.TargetType == type, "Target type mismatch!");
 
-            // We cache the serializer before we initialize it to
+            // We cache the serializer before we initialize it to 
             // avoid a stack overflow on recursive types.
             _serializers.Add(type, serializer);
             serializer.Initialize(this);
