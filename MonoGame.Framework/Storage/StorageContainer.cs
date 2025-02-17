@@ -54,8 +54,8 @@ namespace Microsoft.Xna.Framework.Storage
         /// <summary>
         /// Initializes a new instance of the <see cref="StorageContainer"/> class.
         /// </summary>
-        /// <param name='_device'>The attached storage-device.</param>
-        /// <param name='_titleName'> name.</param>
+        /// <param name='device'>The attached storage-device.</param>
+        /// <param name='displayName'> name.</param>
         /// <param name='playerIndex'>The <see cref="PlayerIndex"/> of the player to save the data.</param>
         internal StorageContainer(StorageDevice device, string displayName, PlayerIndex? playerIndex)
         {
