@@ -59,7 +59,7 @@ namespace Microsoft.Xna.Framework.Storage
         /// <param name='playerIndex'>The <see cref="PlayerIndex"/> of the player to save the data.</param>
         internal StorageContainer(StorageDevice device, string displayName, PlayerIndex? playerIndex)
         {
-            if (string.IsNullOrEmpty(_displayName))
+            if (string.IsNullOrEmpty(displayName))
                 throw new ArgumentNullException("A title name has to be provided in parameter name.");
 
             _storageDevice = device;

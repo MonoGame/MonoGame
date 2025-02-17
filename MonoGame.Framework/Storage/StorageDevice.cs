@@ -9,7 +9,7 @@ namespace Microsoft.Xna.Framework.Storage
     {
         private readonly PlayerIndex? _player;
         private StorageContainer _storageContainer;
-        private static readonly DriveInfo _driveInfo = new DriveInfo(StorageRoot);
+        private static DriveInfo _driveInfo;
 
         /// <summary>
         /// Gets the amount of free space on the device.
@@ -30,7 +30,7 @@ namespace Microsoft.Xna.Framework.Storage
         }
 
         /// <summary>
-        /// Gets whether the device is connected or not.
+        /// Gets whether the device is connected, therefore ready or not.
         /// </summary>
         public bool IsConnected
         {
@@ -89,16 +89,20 @@ namespace Microsoft.Xna.Framework.Storage
 
         public Task<StorageContainer> OpenContainerAsync(string displayName, CancellationToken cancellationToken = default)
         {
-            return Task.Run(() => Open(displayName), cancellationToken);
+            return Task.Run(() => OpenContainer(displayName), cancellationToken);
         }
 
-        private StorageContainer Open(string displayName)
+        public StorageContainer OpenContainer(string displayName)
         {
             ArgumentNullException.ThrowIfNullOrEmpty(displayName);
 
             try
             {
                 _storageContainer = new StorageContainer(this, displayName, _player);
+
+                if (_driveInfo == null)
+                    _driveInfo = new DriveInfo(StorageRoot);
+
                 return _storageContainer;
             }
             catch (Exception)
