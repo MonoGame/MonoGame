@@ -70,14 +70,14 @@ namespace Microsoft.Xna.Framework.Storage
             _player = player;
         }
 
-        public void DeleteContainerAsync(string titleName, CancellationToken cancellationToken = default)
+        public void DeleteContainerAsync(string displayName, CancellationToken cancellationToken = default)
         {
-            Task.Run(() => DeleteContainer(titleName), cancellationToken);
+            Task.Run(() => DeleteContainer(displayName), cancellationToken);
         }
 
-        public void DeleteContainer(string titleName)
+        public void DeleteContainer(string displayName)
         {
-            ArgumentNullException.ThrowIfNull(titleName);
+            ArgumentNullException.ThrowIfNull(displayName);
 
             // If we are not connected, the Container should is not being used,
             // therefore we can safely delete it.
