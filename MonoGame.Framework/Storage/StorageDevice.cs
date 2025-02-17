@@ -12,6 +12,8 @@ namespace Microsoft.Xna.Framework.Storage
         private readonly int _directoryCount;
         private StorageContainer _storageContainer;
 
+        private string GetDevicePath => _storageContainer?._storagePath ?? StorageRoot;
+
         internal StorageDevice(PlayerIndex? player, int sizeInBytes, int directoryCount)
         {
             _player = player;
@@ -19,17 +21,42 @@ namespace Microsoft.Xna.Framework.Storage
             _directoryCount = directoryCount;
         }
 
-        private string GetDevicePath => _storageContainer?._storagePath ?? StorageRoot;
-
-        public Task<StorageContainer> OpenContainerAsync(string displayName, CancellationToken cancellationToken = default)
+        public void DeleteContainerAsync(string titleName, CancellationToken cancellationToken = default)
         {
-            return Task.Run(() => Open(displayName), cancellationToken);
+            Task.Run(() => DeleteContainer(titleName), cancellationToken);
         }
 
-        private StorageContainer Open(string displayName)
+        public void DeleteContainer(string titleName)
         {
-            _storageContainer = new StorageContainer(this, displayName, _player);
-            return _storageContainer;
+            ArgumentNullException.ThrowIfNull(titleName);
+
+            // If we are not connected, the Container should is not being used,
+            // therefore we can safely delete it.
+            if (!IsConnected)
+            {
+                // TODO actually delete things.
+            }
+        }
+
+        public Task<StorageContainer> OpenContainerAsync(string titleName, CancellationToken cancellationToken = default)
+        {
+            return Task.Run(() => Open(titleName), cancellationToken);
+        }
+
+        private StorageContainer Open(string titleName)
+        {
+            ArgumentNullException.ThrowIfNull(titleName);
+
+            try
+            {
+                _storageContainer = new StorageContainer(this, titleName, _player);
+                File.Exists(GetDevicePath);
+                return _storageContainer;
+            }
+            catch (Exception)
+            {
+                return null;
+            }
         }
     }
 }

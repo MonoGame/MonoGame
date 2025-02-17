@@ -41,29 +41,7 @@ namespace Microsoft.Xna.Framework.Storage
         {
             get
             {
-#if LINUX
-                string osConfigDir = Environment.GetEnvironmentVariable("XDG_DATA_HOME");
-                if (string.IsNullOrEmpty(osConfigDir))
-                {
-                    osConfigDir = Environment.GetEnvironmentVariable("HOME");
-                    if (string.IsNullOrEmpty(osConfigDir))
-                    {
-                        return "."; // Oh well.
-                    }
-                    osConfigDir += "/.local/share";
-                }
-                return osConfigDir;
-#elif MAC
-                string osConfigDir = Environment.GetEnvironmentVariable("HOME");
-                if (string.IsNullOrEmpty(osConfigDir))
-                {
-                    return "."; // Oh well.
-                }
-                osConfigDir += "/Library/Application Support";
-                return osConfigDir;
-#else
                 return Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
-#endif
             }
         }
 
