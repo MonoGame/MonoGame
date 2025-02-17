@@ -1,10 +1,14 @@
 ﻿using System;
 using System.IO;
+using System.Runtime.InteropServices;
 
 namespace Microsoft.Xna.Framework.Storage
 {
     partial class StorageDevice
     {
+        /// <summary>
+        /// Gets the amount of free space on the device.
+        /// </summary>
         public long FreeSpace
         {
             get
@@ -22,6 +26,9 @@ namespace Microsoft.Xna.Framework.Storage
             }
         }
 
+        /// <summary>
+        /// Gets whether the device is connected.
+        /// </summary>
         public bool IsConnected
         {
             get
@@ -37,36 +44,47 @@ namespace Microsoft.Xna.Framework.Storage
             }
         }
 
+        /// <summary>
+        ///
+        /// </summary>
         internal static string StorageRoot
         {
             get
             {
-#if LINUX
-                string osConfigDir = Environment.GetEnvironmentVariable("XDG_DATA_HOME");
-                if (string.IsNullOrEmpty(osConfigDir))
+                if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
                 {
-                    osConfigDir = Environment.GetEnvironmentVariable("HOME");
+                    string osConfigDir = Environment.GetEnvironmentVariable("XDG_DATA_HOME");
                     if (string.IsNullOrEmpty(osConfigDir))
                     {
-                        return "."; // Oh well.
+                        string homeDir = Environment.GetEnvironmentVariable("HOME");
+                        if (string.IsNullOrEmpty(homeDir))
+                        {
+                            return "."; // Fallback to current directory
+                        }
+                        osConfigDir = Path.Combine(homeDir, ".local", "share");
                     }
-                    osConfigDir += "/.local/share";
+                    return osConfigDir;
                 }
-                return osConfigDir;
-#elif MAC
-                string osConfigDir = Environment.GetEnvironmentVariable("HOME");
-                if (string.IsNullOrEmpty(osConfigDir))
+                else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
                 {
-                    return "."; // Oh well.
+                    string osConfigDir = Environment.GetEnvironmentVariable("HOME");
+                    if (string.IsNullOrEmpty(osConfigDir))
+                    {
+                        return "."; // Fallback to current directory
+                    }
+                    osConfigDir = Path.Combine(osConfigDir, "Library", "Application Support");
+                    return osConfigDir;
                 }
-                osConfigDir += "/Library/Application Support";
-                return osConfigDir;
-#else
-                return Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
-#endif
+                else // Windows?
+                {
+                    return Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+                }
             }
         }
 
+        /// <summary>
+        /// Gets the total amount of space on the device.
+        /// </summary>
         public long TotalSpace
         {
             get
