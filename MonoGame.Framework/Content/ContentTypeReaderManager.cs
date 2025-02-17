@@ -72,7 +72,7 @@ namespace Microsoft.Xna.Framework.Content
                 var hBoundingSphereReader = new BoundingSphereReader();
                 var hBoundingFrustumReader = new BoundingFrustumReader();
                 var hRayReader = new RayReader();
-                var hCharListReader = new ListReader<Char>();
+                var hCharListReader = new ListReader<char>();
                 var hRectangleListReader = new ListReader<Rectangle>();
                 var hRectangleArrayReader = new ArrayReader<Rectangle>();
                 var hVector3ListReader = new ListReader<Vector3>();

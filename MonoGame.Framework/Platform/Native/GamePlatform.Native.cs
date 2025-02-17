@@ -41,6 +41,7 @@ class NativeGamePlatform : GamePlatform
 
         Mouse.WindowHandle = _window.Handle;
         MessageBox._window = _window._handle;
+        GamePad.Handle = Handle;
     }
 
     internal static unsafe MGG_GraphicsSystem* GraphicsSystem

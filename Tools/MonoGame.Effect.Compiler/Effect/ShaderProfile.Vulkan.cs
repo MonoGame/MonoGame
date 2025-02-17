@@ -380,7 +380,7 @@ namespace MonoGame.Effect
 
                 // First gather the uniforms.
                 VkStruct globals;
-                if (structs.TryGetValue("%type__MG_Globals", out globals))
+                if (structs.TryGetValue("%type__Globals", out globals))
                 {
                     foreach (var member in globals.members.Values)
                         cbuffer.AddParameter(member.name, member.type, 0, member.offset);

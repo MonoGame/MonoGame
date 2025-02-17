@@ -4,8 +4,8 @@
 
 using Eto;
 using Eto.Mac.Forms;
-using MonoMac.AppKit;
-using MonoMac.Foundation;
+using AppKit;
+using Foundation;
 
 namespace MonoGame.Tools.Pipeline
 {

@@ -67,7 +67,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
             Filename = filename;
 
             string stdout, stderr;
-            var result = ExternalTool.Run("ffprobe",
+            var result = ExternalTool.RunDotnetTool(ExternalTool.FFmpeg,
                 string.Format("-i \"{0}\" -show_format -select_streams v -show_streams -print_format ini", Filename), out stdout, out stderr);
 
             var lines = stdout.Split(Environment.NewLine.ToCharArray(), StringSplitOptions.RemoveEmptyEntries);

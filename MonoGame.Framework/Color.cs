@@ -386,8 +386,18 @@ namespace Microsoft.Xna.Framework
                 this._packedValue = (this._packedValue & 0x00ffffff) | ((uint)value << 24);
             }
         }
-		
-	/// <summary>
+
+        /// <summary>
+        /// Converts a <see cref="System.Numerics.Vector4"/> to a <see cref="Vector4"/> by mapping XYZW -> RGBA.
+        /// </summary>
+        /// <param name="value">The converted value.</param>
+        /// <returns></returns>
+        public static implicit operator Color(System.Numerics.Vector4 value)
+        {
+            return new Color(value.X, value.Y, value.Z, value.W);
+        }
+
+	    /// <summary>
         /// Compares whether two <see cref="Color"/> instances are equal.
         /// </summary>
         /// <param name="a"><see cref="Color"/> instance on the left of the equal sign.</param>
@@ -1749,6 +1759,17 @@ namespace Microsoft.Xna.Framework
 	    {
 	        return new Color((int)(value.R * scale), (int)(value.G * scale), (int)(value.B * scale), (int)(value.A * scale));
 	    }
+
+        /// <summary>
+        /// Multiplies the Alpha component value of a color by the specified value.
+        /// </summary>
+        /// <param name="value">The source color value to multiply.</param>
+        /// <param name="scale">The value to multiply the Alpha component value by.</param>
+        /// <returns>The new color value created as a result of the multiplication.</returns>
+        public static Color MultiplyAlpha(Color value, float scale)
+	    {
+	        return new Color(value.R, value.G, value.B, (int)(value.A * scale));
+	    }
 	
 	    /// <summary>
         /// Multiplies the RGBA component values of a color by the specified value.
@@ -1772,6 +1793,22 @@ namespace Microsoft.Xna.Framework
             return new Color((int)(value.R * scale), (int)(value.G * scale), (int)(value.B * scale), (int)(value.A * scale));
         }
 
+        /// <summary>
+        /// Multiplies two colors compenent-wise.
+        /// </summary>
+        /// <param name="color1">The first color to be multiplied.</param>
+        /// <param name="color2">The second color to be multiplied.</param>
+        /// <returns>The new color value created as a result of the multiplication.</returns>
+        public static Color operator *(Color color1, Color color2)
+        {
+            return new Color(
+                (color1.R * color2.R) / 255,
+                (color1.G * color2.G) / 255,
+                (color1.B * color2.B) / 255,
+                (color1.A * color2.A) / 255
+            );
+        }
+        
         /// <summary>
         /// Gets a <see cref="Vector3"/> representation for this object.
         /// </summary>

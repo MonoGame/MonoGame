@@ -15,8 +15,9 @@
 
 struct MGP_Platform
 {
-	std::vector<MGP_Window*> windows;
+    std::vector<MGP_Window*> windows;
     std::queue<MGP_Event> queued_events;
+    std::map<mgint, SDL_GameController*> controllers;
 };
 
 static std::map<int, MGKeys> s_keymap
@@ -418,20 +419,28 @@ mgbool MGP_Platform_PollEvent(MGP_Platform* platform, MGP_Event& event_)
             break;
 
         case SDL_EventType::SDL_CONTROLLERDEVICEADDED:
-            SDL_GameControllerOpen(ev.cdevice.which);
+        {
+            auto controller = SDL_GameControllerOpen(ev.cdevice.which);
+            platform->controllers.emplace(ev.cdevice.which, controller);
             event_.Type = MGEventType::ControllerAdded;
             event_.Timestamp = ev.cdevice.timestamp;
-            event_.Controller.Id = SDL_JoystickGetDeviceInstanceID(ev.cdevice.which);
+            event_.Controller.Id = ev.cdevice.which;
             event_.Controller.Input = MGControllerInput::INVALID;
             event_.Controller.Value = 0;
             return true;
+        }
         case SDL_EventType::SDL_CONTROLLERDEVICEREMOVED:
+        {
+            auto controller = platform->controllers[ev.cdevice.which];
+            platform->controllers.erase(ev.cdevice.which);
+            SDL_GameControllerClose(controller);
             event_.Type = MGEventType::ControllerRemoved;
             event_.Timestamp = ev.cdevice.timestamp;
             event_.Controller.Id = ev.cdevice.which;
             event_.Controller.Input = MGControllerInput::INVALID;
             event_.Controller.Value = 0;
             return true;
+        }
         case SDL_EventType::SDL_CONTROLLERBUTTONUP:
             event_.Type = MGEventType::ControllerStateChange;
             event_.Timestamp = ev.cbutton.timestamp;
@@ -657,8 +666,8 @@ mgbool MGP_Platform_BeforeDraw(MGP_Platform* platform)
 
 MGP_Window* MGP_Window_Create(
     MGP_Platform* platform,
-    mgint width,
-    mgint height,
+    mgint& width,
+    mgint& height,
     const char* title)
 {
 	assert(platform != nullptr);
@@ -821,6 +830,37 @@ void MGP_Window_ExitFullScreen(MGP_Window* window)
     SDL_SetWindowFullscreen(window->window, 0);
 }
 
+mgint MGP_Window_ShowMessageBox(MGP_Window* window, const char* title, const char* description, const char** buttons, mgint count)
+{
+    SDL_MessageBoxData data;
+    data.window = window->window;
+    data.title = title;
+    data.message = description;
+    data.colorScheme = nullptr;
+    data.flags = SDL_MESSAGEBOX_BUTTONS_LEFT_TO_RIGHT;
+
+    auto bdata = new SDL_MessageBoxButtonData[count];
+    for (int i = 0; i < count; i++)
+    {
+        bdata[i].buttonid = i;
+        bdata[i].text = buttons[i];
+        bdata[i].flags = 0;
+    }
+
+    data.numbuttons = count;
+    data.buttons = bdata;
+
+    int hit = -1;
+    int error = SDL_ShowMessageBox(&data, &hit);
+
+    delete[] bdata;
+
+    if (error == 0)
+        return hit;
+
+    return -1;
+}
+
 void MGP_Mouse_SetVisible(MGP_Platform* platform, mgbool visible)
 {
     assert(platform != nullptr);
@@ -864,33 +904,85 @@ mgint MGP_GamePad_GetMaxSupported()
     return 16;
 }
 
-mgint MGP_Window_ShowMessageBox(MGP_Window* window, const char* title, const char* description, const char** buttons, mgint count)
+inline uint32_t HasSDLButton(SDL_GameController* controller, SDL_GameControllerButton button)
 {
-    SDL_MessageBoxData data;
-    data.window = window->window;
-    data.title = title;
-    data.message = description;
-    data.colorScheme = nullptr;
-    data.flags = SDL_MESSAGEBOX_BUTTONS_LEFT_TO_RIGHT;
+    return SDL_GameControllerHasButton(controller, button) ? (1 << (uint32_t)FromSDLButton(button)) : 0;
+}
 
-    auto bdata = new SDL_MessageBoxButtonData[count];
-    for (int i = 0; i < count; i++)
+inline uint32_t HasSDLAxis(SDL_GameController* controller, SDL_GameControllerAxis axis)
+{
+    return SDL_GameControllerHasAxis(controller, axis) ? (1 << (uint32_t)FromSDLAxis(axis)) : 0;
+}
+
+void MGP_GamePad_GetCaps(MGP_Platform* platform, mgint identifer, MGP_ControllerCaps* caps)
+{
+    assert(platform);
+
+    auto pair = platform->controllers.find(identifer);
+    if (pair == platform->controllers.end())
     {
-        bdata[i].buttonid = i;
-        bdata[i].text = buttons[i];
-        bdata[i].flags = 0;
+        // Not connected or unknown... so nothing to set.
+        caps->Identifier = nullptr;
+        caps->DisplayName = nullptr;
+        caps->GamePadType = MGGamePadType::Unknown;
+        caps->InputFlags = 0;
+        caps->HasLeftVibrationMotor = false;
+        caps->HasRightVibrationMotor = false;
+        caps->HasVoiceSupport = false;
+        return;
     }
 
-    data.numbuttons = count;
-    data.buttons = bdata;
+    auto controller = pair->second;
 
-    int hit = -1;
-    int error = SDL_ShowMessageBox(&data, &hit);
+    // This doesn't need to be thread safe, but be valid
+    // long enough for the caller to copy it.
+    static char identifier[34];
+    {
+        auto joystick = SDL_GameControllerGetJoystick(controller);
+        auto guid = SDL_JoystickGetGUID(joystick);
+        SDL_GUIDToString(guid, identifier, 34);
+    }
 
-    delete [] bdata;
+    // Not connected or unknown... so nothing to set.
+    caps->Identifier = (void*)identifier;
+    caps->DisplayName = (void*)SDL_GameControllerName(controller);
+    caps->GamePadType = MGGamePadType::GamePad;
+    caps->HasRightVibrationMotor = caps->HasLeftVibrationMotor = SDL_GameControllerHasRumble(controller);
+    caps->HasVoiceSupport = false;
 
-    if (error == 0)
-        return hit;
-
-    return -1;
+    caps->InputFlags = 0;
+    caps->InputFlags |= HasSDLButton(controller, SDL_CONTROLLER_BUTTON_A);
+    caps->InputFlags |= HasSDLButton(controller, SDL_CONTROLLER_BUTTON_B);
+    caps->InputFlags |= HasSDLButton(controller, SDL_CONTROLLER_BUTTON_X);
+    caps->InputFlags |= HasSDLButton(controller, SDL_CONTROLLER_BUTTON_Y);
+    caps->InputFlags |= HasSDLButton(controller, SDL_CONTROLLER_BUTTON_DPAD_UP);
+    caps->InputFlags |= HasSDLButton(controller, SDL_CONTROLLER_BUTTON_DPAD_DOWN);
+    caps->InputFlags |= HasSDLButton(controller, SDL_CONTROLLER_BUTTON_DPAD_LEFT);
+    caps->InputFlags |= HasSDLButton(controller, SDL_CONTROLLER_BUTTON_DPAD_RIGHT);
+    caps->InputFlags |= HasSDLButton(controller, SDL_CONTROLLER_BUTTON_BACK);
+    caps->InputFlags |= HasSDLButton(controller, SDL_CONTROLLER_BUTTON_START);
+    caps->InputFlags |= HasSDLButton(controller, SDL_CONTROLLER_BUTTON_GUIDE);
+    caps->InputFlags |= HasSDLButton(controller, SDL_CONTROLLER_BUTTON_LEFTSHOULDER);
+    caps->InputFlags |= HasSDLButton(controller, SDL_CONTROLLER_BUTTON_RIGHTSHOULDER);
+    caps->InputFlags |= HasSDLButton(controller, SDL_CONTROLLER_BUTTON_LEFTSTICK);
+    caps->InputFlags |= HasSDLButton(controller, SDL_CONTROLLER_BUTTON_RIGHTSTICK);
+    caps->InputFlags |= HasSDLAxis(controller, SDL_CONTROLLER_AXIS_TRIGGERLEFT);
+    caps->InputFlags |= HasSDLAxis(controller, SDL_CONTROLLER_AXIS_TRIGGERRIGHT);
+    caps->InputFlags |= HasSDLAxis(controller, SDL_CONTROLLER_AXIS_LEFTX);
+    caps->InputFlags |= HasSDLAxis(controller, SDL_CONTROLLER_AXIS_LEFTY);
+    caps->InputFlags |= HasSDLAxis(controller, SDL_CONTROLLER_AXIS_RIGHTX);
+    caps->InputFlags |= HasSDLAxis(controller, SDL_CONTROLLER_AXIS_RIGHTY);
 }
+
+mgbool MGP_GamePad_SetVibration(MGP_Platform* platform, mgint identifer, mgfloat leftMotor, mgfloat rightMotor, mgfloat leftTrigger, mgfloat rightTrigger)
+{
+    assert(platform);
+
+    auto pair = platform->controllers.find(identifer);
+    if (pair == platform->controllers.end())
+        return false;
+
+    auto supported = SDL_GameControllerRumble(pair->second, (UINT16)(leftMotor * 0xFFFF), (UINT16)(rightMotor * 0xFFFF), INT_MAX);
+    return supported == 0;
+}
+

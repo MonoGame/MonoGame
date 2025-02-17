@@ -261,13 +261,6 @@ enum class MGVertexElementFormat : mgint
     HalfVector4 = 11,
 };
 
-enum class MGMediaState : mgint
-{
-    Stopped = 0,
-    Playing = 1,
-    Paused = 2,
-};
-
 enum class MGGameRunBehavior : mgint
 {
     Asynchronous = 0,
@@ -543,5 +536,19 @@ enum class MGSystemCursor : mgint
     SizeAll = 9,
     No = 10,
     Hand = 11,
+};
+
+enum class MGGamePadType : mgint
+{
+    Unknown = 0,
+    GamePad = 1,
+    Wheel = 2,
+    ArcadeStick = 3,
+    FlightStick = 4,
+    DancePad = 5,
+    Guitar = 6,
+    AlternateGuitar = 7,
+    DrumKit = 8,
+    BigButtonPad = 768,
 };
 

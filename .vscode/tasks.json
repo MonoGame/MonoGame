@@ -2,7 +2,19 @@
     "version": "2.0.0",
     "tasks": [
         {
-            "label": "mgcb-editor-mac",
+            "label": "Build: mgcb",
+            "command": "dotnet",
+            "type": "process",
+            "args": [
+                "build",
+                "${workspaceFolder}/Tools/MonoGame.Content.Builder/MonoGame.Content.Builder.csproj",
+                "/property:GenerateFullPaths=true",
+                "/consoleloggerparameters:NoSummary"
+            ],
+            "problemMatcher": "$msCompile"
+        },
+        {
+            "label": "Build: mgcb-editor-mac",
             "command": "dotnet",
             "type": "process",
             "args": [
