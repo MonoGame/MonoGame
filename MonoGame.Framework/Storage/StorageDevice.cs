@@ -65,7 +65,7 @@ namespace Microsoft.Xna.Framework.Storage
             }
         }
 
-        internal StorageDevice(PlayerIndex? player)
+        public StorageDevice(PlayerIndex? player)
         {
             _player = player;
         }
@@ -77,7 +77,7 @@ namespace Microsoft.Xna.Framework.Storage
 
         public void DeleteContainer(string displayName)
         {
-            ArgumentNullException.ThrowIfNull(displayName);
+            ArgumentNullException.ThrowIfNullOrEmpty(displayName);
 
             // If we are not connected, the Container should is not being used,
             // therefore we can safely delete it.
@@ -94,7 +94,7 @@ namespace Microsoft.Xna.Framework.Storage
 
         private StorageContainer Open(string displayName)
         {
-            ArgumentNullException.ThrowIfNull(displayName);
+            ArgumentNullException.ThrowIfNullOrEmpty(displayName);
 
             try
             {
