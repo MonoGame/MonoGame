@@ -7,8 +7,6 @@ using System.IO;
 
 namespace Microsoft.Xna.Framework.Storage
 {
-    //	Implementation on Windows
-    //	
     //	User storage is in the My Documents folder of the user who is currently logged in, in the SavedGames folder. 
     //	A subfolder is created for each game according to the titleName passed to the BeginOpenContainer method. 
     //	When no PlayerIndex is specified, content is saved in the AllPlayers folder. When a PlayerIndex is specified, 
@@ -18,81 +16,73 @@ namespace Microsoft.Xna.Framework.Storage
     /// <summary>
     /// Contains a logical collection of files used for user-data storage.
     /// </summary>			
-    /// <remarks>MSDN documentation contains related conceptual article: http://msdn.microsoft.com/en-us/library/bb200105.aspx#ID4EDB</remarks>
+    /// <remarks>MSDN documentation contains related conceptual article: https://learn.microsoft.com/en-us/previous-versions/windows/xna/bb199074(v=xnagamestudio.40)</remarks>
     partial class StorageContainer : IDisposable
     {
         internal readonly string _storagePath;
-        private readonly StorageDevice _device;
-        private readonly string _name;
         private readonly PlayerIndex? _playerIndex;
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="Microsoft.Xna.Framework.Storage.StorageContainer"/> class.
-        /// </summary>
-        /// <param name='_device'>The attached storage-device.</param>
-        /// <param name='_name'> name.</param>
-        /// <param name='playerIndex'>The player index of the player to save the data.</param>
-        internal StorageContainer(StorageDevice device, string name, PlayerIndex? playerIndex)
-        {
-            if (string.IsNullOrEmpty(name))
-                throw new ArgumentNullException("A title name has to be provided in parameter name.");
-
-            _device = device;
-            _name = name;
-            _playerIndex = playerIndex;
-
-            // From the examples the root is based on MyDocuments folder
-#if LINUX || MONOMAC
-            // We already have a SaveData folder on Mac/Linux.
-            var saved = StorageDevice.StorageRoot;
-#else
-			var root = StorageDevice.StorageRoot;
-			var saved = Path.Combine(root,"SavedGames");
-#endif
-            _storagePath = Path.Combine(saved, name);
-
-            var playerSave = string.Empty;
-            if (playerIndex.HasValue)
-            {
-                playerSave = Path.Combine(_storagePath, "Player" + (int)playerIndex.Value);
-            }
-
-            if (!string.IsNullOrEmpty(playerSave))
-                _storagePath = Path.Combine(_storagePath, "Player" + (int)playerIndex);
-
-            // Create the "device" if need be
-            if (!Directory.Exists(_storagePath))
-                Directory.CreateDirectory(_storagePath);
-        }
-
-        /// <summary>
-        /// Returns display name of the title.
-        /// </summary>
-        public string DisplayName
-        {
-            get { return _name; }
-        }
 
         /// <summary>
         /// Gets a bool value indicating whether the instance has been disposed.
         /// </summary>
         public bool IsDisposed { get; private set; }
 
+        private readonly string _displayName;
+        /// <summary>
+        /// Returns display name of the title.
+        /// </summary>
+        public string DisplayName
+        {
+            get { return _displayName; }
+        }
+
+        private readonly StorageDevice _storageDevice;
         /// <summary>
         /// Returns the <see cref="StorageDevice"/> that holds logical files for the container.
         /// </summary>
 		public StorageDevice StorageDevice
         {
 
-            get { return _device; }
+            get { return _storageDevice; }
         }
-
-        // TODO: Implement the Disposing function.  Find sample first
 
         /// <summary>
         /// Fired when <see cref="Dispose"/> is called or object if finalized or collected by the garbage collector.
         /// </summary>
         public event EventHandler<EventArgs> Disposing;
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="StorageContainer"/> class.
+        /// </summary>
+        /// <param name='_device'>The attached storage-device.</param>
+        /// <param name='_titleName'> name.</param>
+        /// <param name='playerIndex'>The <see cref="PlayerIndex"/> of the player to save the data.</param>
+        internal StorageContainer(StorageDevice device, string displayName, PlayerIndex? playerIndex)
+        {
+            if (string.IsNullOrEmpty(_displayName))
+                throw new ArgumentNullException("A title name has to be provided in parameter name.");
+
+            _storageDevice = device;
+            _displayName = displayName;
+            _playerIndex = playerIndex;
+
+            // From the examples the root is based on MyDocuments folder
+#if DESKTOPGL
+            // We already have a SaveData folder on Mac/Linux.
+            var saved = StorageDevice.StorageRoot;
+#else
+            var root = StorageDevice.StorageRoot;
+            var saved = Path.Combine(root, "SavedGames");
+#endif
+            _storagePath = Path.Combine(saved, _displayName);
+
+            // If we have a PlayerIndex use that, otherwise save to AllPlayers folder
+            _storagePath = _playerIndex.HasValue ? Path.Combine(_storagePath, "Player" + (int)_playerIndex.Value) : Path.Combine(_storagePath, "AllPlayers");
+
+            // Create the "device" if need be
+            if (!Directory.Exists(_storagePath))
+                Directory.CreateDirectory(_storagePath);
+        }
 
         /// <summary>
         /// Creates a new directory in the storage-container.
@@ -181,8 +171,8 @@ namespace Microsoft.Xna.Framework.Storage
         /// </summary>
         public void Dispose()
         {
+            Disposing?.Invoke(this, null);
 
-            // Fill this in when we figure out what we should be disposing
             IsDisposed = true;
         }
 
@@ -212,17 +202,15 @@ namespace Microsoft.Xna.Framework.Storage
             return Directory.GetDirectories(_storagePath);
         }
 
-        /*
         /// <summary>
         /// Returns list of directory names with given search pattern.
         /// </summary>
         /// <param name="searchPattern">A search pattern that supports single-character ("?") and multicharacter ("*") wildcards.</param>
         /// <returns>List of matched directory names.</returns>
-		public string[] GetDirectoryNames (string searchPattern)
-		{
-			throw new NotImplementedException ();
-		}
-        */
+        public string[] GetDirectoryNames(string searchPattern)
+        {
+            return Directory.GetDirectories(_storagePath, searchPattern);
+        }
 
         /// <summary>
         /// Returns list of file names in the storage-container.
