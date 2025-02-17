@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace Microsoft.Xna.Framework.Storage
 {
-    partial class StorageDevice
+    public sealed partial class StorageDevice
     {
         private readonly PlayerIndex? _player;
         private StorageContainer _storageContainer;
