@@ -189,7 +189,7 @@ namespace Microsoft.Xna.Framework.Storage
             // relative so combine with our path
             var filePath = Path.Combine(_storagePath, file);
 
-            // return A new file with read/write access.
+            // return A boolean relating to the file's existence
             return File.Exists(filePath);
         }
 
