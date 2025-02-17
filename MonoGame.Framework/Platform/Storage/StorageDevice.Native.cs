@@ -7,46 +7,38 @@ namespace Microsoft.Xna.Framework.Storage
     partial class StorageDevice
     {
         /// <summary>
-        /// Gets the amount of free space on the device.
+        /// Gets the root directory path for storing application data, adapted to the operating system's conventions.
         /// </summary>
-        public long FreeSpace
-        {
-            get
-            {
-                try
-                {
-                    return new DriveInfo(GetDevicePath).AvailableFreeSpace;
-                }
-                catch (Exception)
-                {
-                    /* TODO StorageDeviceHelper.Path = StorageRoot;
-                    return StorageDeviceHelper.FreeSpace;*/
-                    return -1;
-                }
-            }
-        }
-
-        /// <summary>
-        /// Gets whether the device is connected.
-        /// </summary>
-        public bool IsConnected
-        {
-            get
-            {
-                try
-                {
-                    return new DriveInfo(GetDevicePath).IsReady;
-                }
-                catch (Exception)
-                {
-                    return true;
-                }
-            }
-        }
-
-        /// <summary>
-        ///
-        /// </summary>
+        /// <remarks>
+        /// This property determines the appropriate storage location for application data based on the current operating system:
+        /// <list type="bullet">
+        /// <item>
+        /// <term>Linux:</term>
+        /// <description>
+        /// Returns the value of the <c>XDG_DATA_HOME</c> environment variable if set; 
+        /// otherwise, it defaults to <c>$HOME/.local/share</c>. If the home directory cannot be determined, 
+        /// it falls back to the current working directory ("<c>.</c>").
+        /// </description>
+        /// </item>
+        /// <item>
+        /// <term>macOS:</term>
+        /// <description>
+        /// Returns the user's <c>Library/Application Support</c> directory. If the home directory is unavailable,
+        /// it falls back to the current working directory ("<c>.</c>").
+        /// </description>
+        /// </item>
+        /// <item>
+        /// <term>Windows:</term>
+        /// <description>
+        /// Returns the path to the user's <c>LocalApplicationData</c> folder (e.g., <c>C:\Users\Username\AppData\Local</c>).
+        /// </description>
+        /// </item>
+        /// </list>
+        /// This approach ensures that application data is stored in a location consistent with each operating system's guidelines.
+        /// </remarks>
+        /// <returns>
+        /// A string representing the root directory path for application data storage.
+        /// </returns>
         internal static string StorageRoot
         {
             get
@@ -78,26 +70,6 @@ namespace Microsoft.Xna.Framework.Storage
                 else // Windows?
                 {
                     return Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
-                }
-            }
-        }
-
-        /// <summary>
-        /// Gets the total amount of space on the device.
-        /// </summary>
-        public long TotalSpace
-        {
-            get
-            {
-                try
-                {
-                    return new DriveInfo(GetDevicePath).TotalSize;
-                }
-                catch (Exception)
-                {
-                    /* TODO StorageDeviceHelper.Path = StorageRoot;
-                    return StorageDeviceHelper.TotalSpace; */
-                    return -1;
                 }
             }
         }
