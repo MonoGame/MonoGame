@@ -8,17 +8,66 @@ namespace Microsoft.Xna.Framework.Storage
     partial class StorageDevice
     {
         private readonly PlayerIndex? _player;
-        private readonly int _sizeInBytes;
-        private readonly int _directoryCount;
         private StorageContainer _storageContainer;
+        private static readonly DriveInfo _driveInfo = new DriveInfo(StorageRoot);
 
-        private string GetDevicePath => _storageContainer?._storagePath ?? StorageRoot;
+        /// <summary>
+        /// Gets the amount of free space on the device.
+        /// </summary>
+        public long FreeSpace
+        {
+            get
+            {
+                try
+                {
+                    return _driveInfo.AvailableFreeSpace;
+                }
+                catch (Exception)
+                {
+                    return 0;
+                }
+            }
+        }
 
-        internal StorageDevice(PlayerIndex? player, int sizeInBytes, int directoryCount)
+        /// <summary>
+        /// Gets whether the device is connected or not.
+        /// </summary>
+        public bool IsConnected
+        {
+            get
+            {
+                try
+                {
+                    return _driveInfo.IsReady;
+                }
+                catch (Exception)
+                {
+                    return false; // TODO Should this be true?
+                }
+            }
+        }
+
+        /// <summary>
+        /// Gets the total amount of space on the device.
+        /// </summary>
+        public long TotalSpace
+        {
+            get
+            {
+                try
+                {
+                    return _driveInfo.TotalSize;
+                }
+                catch (Exception)
+                {
+                    return 0;
+                }
+            }
+        }
+
+        internal StorageDevice(PlayerIndex? player)
         {
             _player = player;
-            _sizeInBytes = sizeInBytes;
-            _directoryCount = directoryCount;
         }
 
         public void DeleteContainerAsync(string titleName, CancellationToken cancellationToken = default)
@@ -38,19 +87,18 @@ namespace Microsoft.Xna.Framework.Storage
             }
         }
 
-        public Task<StorageContainer> OpenContainerAsync(string titleName, CancellationToken cancellationToken = default)
+        public Task<StorageContainer> OpenContainerAsync(string displayName, CancellationToken cancellationToken = default)
         {
-            return Task.Run(() => Open(titleName), cancellationToken);
+            return Task.Run(() => Open(displayName), cancellationToken);
         }
 
-        private StorageContainer Open(string titleName)
+        private StorageContainer Open(string displayName)
         {
-            ArgumentNullException.ThrowIfNull(titleName);
+            ArgumentNullException.ThrowIfNull(displayName);
 
             try
             {
-                _storageContainer = new StorageContainer(this, titleName, _player);
-                File.Exists(GetDevicePath);
+                _storageContainer = new StorageContainer(this, displayName, _player);
                 return _storageContainer;
             }
             catch (Exception)
