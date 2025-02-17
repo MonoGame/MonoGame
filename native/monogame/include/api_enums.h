@@ -228,6 +228,23 @@ enum class MGRenderTargetUsage : mgint
     PlatformContents = 2,
 };
 
+enum class MGVertexElementUsage : mgint
+{
+    Position = 0,
+    Color = 1,
+    TextureCoordinate = 2,
+    Normal = 3,
+    Binormal = 4,
+    Tangent = 5,
+    BlendIndices = 6,
+    BlendWeight = 7,
+    Depth = 8,
+    Fog = 9,
+    PointSize = 10,
+    Sample = 11,
+    TessellateFactor = 12,
+};
+
 enum class MGVertexElementFormat : mgint
 {
     Single = 0,
@@ -495,10 +512,12 @@ enum class MGMonoGamePlatform : mgint
     Windows = 4,
     WebGL = 5,
     XboxOne = 6,
-    PlayStation4 = 7,
-    PlayStation5 = 8,
-    NintendoSwitch = 9,
-    DesktopVK = 10,
+    WindowsGDK = 7,
+    XboxSeries = 8,
+    PlayStation4 = 9,
+    PlayStation5 = 10,
+    NintendoSwitch = 11,
+    DesktopVK = 12,
 };
 
 enum class MGGraphicsBackend : mgint
@@ -507,6 +526,7 @@ enum class MGGraphicsBackend : mgint
     OpenGL = 1,
     Vulkan = 2,
     Metal = 3,
+    DirectX12 = 4,
 };
 
 enum class MGSystemCursor : mgint

@@ -393,8 +393,6 @@ namespace MonoGame.Effect
                     // Sort by the location.
                     var sorted = inputs.Values.OrderBy(f=>f.location);
 
-                    int offset = 0;
-
                     foreach (var input in sorted)
                     {
                         var a = new ShaderData.Attribute();
@@ -447,29 +445,6 @@ namespace MonoGame.Effect
                                     break;
                             }                        
                         }
-
-                        int size;
-                        if (input.type.StartsWith("v"))
-                        {
-                            int len = (int)char.GetNumericValue(input.type[1]);
-                            switch (input.type.Substring(2))
-                            {
-                                case "int":
-                                case "float":
-                                    size = len * 4;
-                                    break;
-                                default:
-                                    errorsAndWarnings += string.Format("Unknown vertex shader input type '{0}'.", input.type);
-                                    throw new ShaderCompilerException();
-                            }
-                        }
-                        else
-                        {
-                            errorsAndWarnings += string.Format("Unknown vertex shader input type '{0}'.", input.type);
-                            throw new ShaderCompilerException();
-                        }
-
-                        offset += size;
 
                         // TODO: These are unused at runtime under the
                         // new native backends, we will remove them soon.               

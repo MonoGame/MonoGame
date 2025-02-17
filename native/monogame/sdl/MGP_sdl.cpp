@@ -256,6 +256,8 @@ MGMonoGamePlatform MGP_Platform_GetPlatform()
 {
 #if MG_VULKAN
     return MGMonoGamePlatform::DesktopVK;
+#elif MG_DIRECTX12
+    return MGMonoGamePlatform::Windows;
 #else
     assert(false);
     return (MGMonoGamePlatform)-1;
@@ -266,6 +268,8 @@ MGGraphicsBackend MGP_Platform_GetGraphicsBackend()
 {
 #if MG_VULKAN
     return MGGraphicsBackend::Vulkan;
+#elif MG_DIRECTX12
+    return MGGraphicsBackend::DirectX12;
 #else
     assert(false);
     return (MGGraphicsBackend)-1;
@@ -669,7 +673,7 @@ MGP_Window* MGP_Window_Create(
 
 	Uint32 flags = SDL_WINDOW_HIDDEN;// | SDL_WINDOW_FULLSCREEN_DESKTOP;
 
-#if MG_VULKAN
+#if defined(MG_VULKAN) || defined(MG_DIRECTX12)
 	flags |= SDL_WINDOW_VULKAN;
 #else
 	#error Not implemented

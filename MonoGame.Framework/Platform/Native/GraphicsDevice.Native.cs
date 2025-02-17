@@ -87,6 +87,12 @@ public partial class GraphicsDevice
             _viewport.MinDepth,
             _viewport.MaxDepth);
 
+        _scissorRectangle = new Rectangle(
+            0,
+            0,
+            PresentationParameters.BackBufferWidth,
+            PresentationParameters.BackBufferHeight);
+
         // Begin a new frame it if was previously rendering.
         if (_currentFrame > -1)
         {
@@ -115,6 +121,15 @@ public partial class GraphicsDevice
         _vertexBuffersDirty = true;
         Textures.Dirty();
         SamplerStates.Dirty();
+
+        MGG.GraphicsDevice_SetViewport(
+            Handle,
+            _viewport.X,
+            _viewport.Y,
+            _viewport.Width,
+            _viewport.Height,
+            _viewport.MinDepth,
+            _viewport.MaxDepth);
 
         PlatformApplyDefaultRenderTarget();
     }
