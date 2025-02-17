@@ -66,15 +66,15 @@ namespace Microsoft.Xna.Framework.Storage
             _displayName = displayName;
             _playerIndex = playerIndex;
 
-            // From the examples the root is based on MyDocuments folder
-#if DESKTOPGL
-            // We already have a SaveData folder on Mac/Linux.
-            var saved = StorageDevice.StorageRoot;
+            // TODO Do we want to be consistent and put everything under SavedGames across all platforms?
+#if DESKTOPGL 
+            // We already have a SaveData folder on Desktop.
+            var savedGames = StorageDevice.StorageRoot;
 #else
-            var root = StorageDevice.StorageRoot;
-            var saved = Path.Combine(root, "SavedGames");
+            var storageRoot = StorageDevice.StorageRoot;
+            var savedGames = Path.Combine(storageRoot, "SavedGames");
 #endif
-            _storagePath = Path.Combine(saved, _displayName);
+            _storagePath = Path.Combine(savedGames, _displayName);
 
             // If we have a PlayerIndex use that, otherwise save to AllPlayers folder
             _storagePath = _playerIndex.HasValue ? Path.Combine(_storagePath, "Player" + (int)_playerIndex.Value) : Path.Combine(_storagePath, "AllPlayers");
