@@ -1,11 +1,14 @@
 ﻿using System;
 using System.IO;
 using System.Runtime.InteropServices;
+using MonoGame.Framework.Utilities;
 
 namespace Microsoft.Xna.Framework.Storage
 {
     partial class StorageDevice
     {
+        private static DriveInfo _driveInfo;
+
         /// <summary>
         /// Gets the root directory path for storing application data, adapted to the operating system's conventions.
         /// </summary>
@@ -43,7 +46,8 @@ namespace Microsoft.Xna.Framework.Storage
         {
             get
             {
-                if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+                
+                if (CurrentPlatform.OS == OS.Linux)
                 {
                     string osConfigDir = Environment.GetEnvironmentVariable("XDG_DATA_HOME");
                     if (string.IsNullOrEmpty(osConfigDir))
@@ -57,7 +61,7 @@ namespace Microsoft.Xna.Framework.Storage
                     }
                     return osConfigDir;
                 }
-                else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+                else if (CurrentPlatform.OS == OS.MacOSX)
                 {
                     string osConfigDir = Environment.GetEnvironmentVariable("HOME");
                     if (string.IsNullOrEmpty(osConfigDir))
@@ -72,6 +76,36 @@ namespace Microsoft.Xna.Framework.Storage
                     return Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
                 }
             }
+        }
+
+        private void PlatformDeleteContainer(string containerName)
+        {
+            throw new NotImplementedException();
+        }
+
+        private long PlatformFreeSpace()
+        {
+            return _driveInfo.AvailableFreeSpace;
+        }
+
+        private bool PlatformIsConnected()
+        {
+            return _driveInfo.IsReady;
+        }
+
+        private StorageContainer PlatformOpenContainer(string containerName)
+        {
+            _storageContainer = new StorageContainer(this, containerName, _player);
+
+            if (_driveInfo == null)
+                _driveInfo = new DriveInfo(StorageRoot);
+
+            return _storageContainer;
+        }
+
+        private long PlatformTotalSpace()
+        {
+            return _driveInfo.TotalSize;
         }
     }
 }
