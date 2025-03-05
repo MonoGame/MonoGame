@@ -78,6 +78,7 @@
     <Compile Include="..\ThirdParty\StbImageSharp\src\**\*.cs" LinkBase="Utilities\StbImageSharp" />
     <Compile Include="..\ThirdParty\StbImageWriteSharp\src\**\*.cs" LinkBase="Utilities\StbImageWriteSharp" />
     <Compile Include="Platform\Storage\StorageDevice.Desktop.cs" />
+    <Compile Include="Platform\Storage\StorageContainer.Desktop.cs" />
   </ItemGroup>
 
   <ItemGroup>
