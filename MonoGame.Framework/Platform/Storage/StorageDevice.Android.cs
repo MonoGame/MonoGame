@@ -12,5 +12,30 @@ namespace Microsoft.Xna.Framework.Storage
                 return Environment.GetFolderPath(Environment.SpecialFolder.Personal);
             }
         }
+
+        private long PlatformTotalSpace()
+        {
+            throw new NotImplementedException();
+        }
+
+        private bool PlatformIsConnected()
+        {
+            throw new NotImplementedException();
+        }
+
+        private long PlatformFreeSpace()
+        {
+            throw new NotImplementedException();
+        }
+
+        private StorageContainer PlatformOpenContainer(string containerName)
+        {
+            throw new NotImplementedException();
+        }
+
+        private void PlatformDeleteContainer(string containerName)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
