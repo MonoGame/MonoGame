@@ -19,7 +19,6 @@ namespace Microsoft.Xna.Framework.Storage
     /// <remarks>MSDN documentation contains related conceptual article: https://learn.microsoft.com/en-us/previous-versions/windows/xna/bb199074(v=xnagamestudio.40)</remarks>
     public partial class StorageContainer : IDisposable
     {
-        internal readonly string _storagePath;
         private readonly PlayerIndex? _playerIndex;
 
         /// <summary>
@@ -27,13 +26,13 @@ namespace Microsoft.Xna.Framework.Storage
         /// </summary>
         public bool IsDisposed { get; private set; }
 
-        private readonly string _displayName;
+        private readonly string _containerName;
         /// <summary>
-        /// Returns display name of the title.
+        /// Returns container name of the title.
         /// </summary>
-        public string DisplayName
+        public string ContainterName
         {
-            get { return _displayName; }
+            get { return _containerName; }
         }
 
         private readonly StorageDevice _storageDevice;
@@ -55,16 +54,18 @@ namespace Microsoft.Xna.Framework.Storage
         /// Initializes a new instance of the <see cref="StorageContainer"/> class.
         /// </summary>
         /// <param name='device'>The attached storage-device.</param>
-        /// <param name='displayName'> name.</param>
+        /// <param name='containerName'> name.</param>
         /// <param name='playerIndex'>The <see cref="PlayerIndex"/> of the player to save the data.</param>
-        internal StorageContainer(StorageDevice device, string displayName, PlayerIndex? playerIndex)
+        internal StorageContainer(StorageDevice device, string containerName, PlayerIndex? playerIndex)
         {
-            if (string.IsNullOrEmpty(displayName))
-                throw new ArgumentNullException("A title name has to be provided in parameter name.");
+            if (string.IsNullOrEmpty(containerName))
+                throw new ArgumentNullException(nameof(containerName), "A title name must be provided.");
 
             _storageDevice = device;
-            _displayName = displayName;
+            _containerName = containerName;
             _playerIndex = playerIndex;
+
+            PlatformInitialize();
 
             // TODO Do we want to be consistent and put everything under SavedGames across all platforms?
 #if DESKTOPGL 
@@ -74,47 +75,32 @@ namespace Microsoft.Xna.Framework.Storage
             var storageRoot = StorageDevice.StorageRoot;
             var savedGames = Path.Combine(storageRoot, "SavedGames");
 #endif
-            _storagePath = Path.Combine(savedGames, _displayName);
-
-            // If we have a PlayerIndex use that, otherwise save to AllPlayers folder
-            _storagePath = _playerIndex.HasValue ? Path.Combine(_storagePath, "Player" + (int)_playerIndex.Value) : Path.Combine(_storagePath, "AllPlayers");
-
-            // Create the "device" if need be
-            if (!Directory.Exists(_storagePath))
-                Directory.CreateDirectory(_storagePath);
+            CreateDirectory(savedGames);
         }
 
         /// <summary>
         /// Creates a new directory in the storage-container.
         /// </summary>
-        /// <param name="directory">Relative path of the directory to be created.</param>
-		public void CreateDirectory(string directory)
+        /// <param name="directoryName">Relative path of the directory to be created.</param>
+        public void CreateDirectory(string directoryName)
         {
-            if (string.IsNullOrEmpty(directory))
-                throw new ArgumentNullException("Parameter directory must contain a value.");
+            if (string.IsNullOrEmpty(directoryName))
+                throw new ArgumentNullException(nameof(directoryName), "A directory name must be provided.");
 
-            // relative so combine with our path
-            var dirPath = Path.Combine(_storagePath, directory);
-
-            // Now let's try to create it
-            Directory.CreateDirectory(dirPath);
+            PlatformCreateDirectory(directoryName);
         }
 
         /// <summary>
         /// Creates a file in the storage-container.
         /// </summary>
-        /// <param name="file">Relative path of the file to be created.</param>
+        /// <param name="fileName">Relative path of the file to be created.</param>
         /// <returns>Returns <see cref="Stream"/> for the created file.</returns>
-        public Stream CreateFile(string file)
+        public Stream CreateFile(string fileName)
         {
-            if (string.IsNullOrEmpty(file))
-                throw new ArgumentNullException("Parameter file must contain a value.");
+            if (string.IsNullOrEmpty(fileName))
+                throw new ArgumentNullException(nameof(fileName), "A file name must be provided.");
 
-            // relative so combine with our path
-            var filePath = Path.Combine(_storagePath, file);
-
-            // return A new file with read/write access.
-            return File.Create(filePath);
+            return PlatformCreateFile(fileName);
         }
 
         /// <summary>
@@ -126,12 +112,10 @@ namespace Microsoft.Xna.Framework.Storage
             if (string.IsNullOrEmpty(directory))
                 throw new ArgumentNullException("Parameter directory must contain a value.");
 
-            // relative so combine with our path
-            var dirPath = Path.Combine(_storagePath, directory);
-
-            // Now let's try to delete itd
-            Directory.Delete(dirPath);
+            PlatformDeleteDirectory(directory);
         }
+
+
 
         /// <summary>
         /// Deletes a file from the storage-container.
@@ -142,13 +126,8 @@ namespace Microsoft.Xna.Framework.Storage
             if (string.IsNullOrEmpty(file))
                 throw new ArgumentNullException("Parameter file must contain a value.");
 
-            // relative so combine with our path
-            var filePath = Path.Combine(_storagePath, file);
-
-            // Now let's try to delete it
-            File.Delete(filePath);
+            PlatformDeleteFile(file);
         }
-
 
         /// <summary>
         /// Returns true if specified path exists in the storage-container, false otherwise.
@@ -160,21 +139,10 @@ namespace Microsoft.Xna.Framework.Storage
             if (string.IsNullOrEmpty(directory))
                 throw new ArgumentNullException("Parameter directory must contain a value.");
 
-            // relative so combine with our path
-            var dirPath = Path.Combine(_storagePath, directory);
-
-            return Directory.Exists(dirPath);
+            return PlatformDirectoryExists(directory);
         }
 
-        /// <summary>
-        /// Disposes un-managed objects referenced by this object.
-        /// </summary>
-        public void Dispose()
-        {
-            Disposing?.Invoke(this, null);
 
-            IsDisposed = true;
-        }
 
         /// <summary>
         /// Returns true if the specified file exists in the storage-container, false otherwise.
@@ -186,11 +154,8 @@ namespace Microsoft.Xna.Framework.Storage
             if (string.IsNullOrEmpty(file))
                 throw new ArgumentNullException("Parameter file must contain a value.");
 
-            // relative so combine with our path
-            var filePath = Path.Combine(_storagePath, file);
+            return PlatformFileExists(file);
 
-            // return A boolean relating to the file's existence
-            return File.Exists(filePath);
         }
 
         /// <summary>
@@ -199,7 +164,7 @@ namespace Microsoft.Xna.Framework.Storage
         /// <returns>List of directory names.</returns>
         public string[] GetDirectoryNames()
         {
-            return Directory.GetDirectories(_storagePath);
+            return PlatformGetDirectoryNames();
         }
 
         /// <summary>
@@ -209,7 +174,10 @@ namespace Microsoft.Xna.Framework.Storage
         /// <returns>List of matched directory names.</returns>
         public string[] GetDirectoryNames(string searchPattern)
         {
-            return Directory.GetDirectories(_storagePath, searchPattern);
+            if (string.IsNullOrEmpty(searchPattern))
+                throw new ArgumentNullException("Parameter searchPattern must contain a value.");
+
+            return PlatformGetDirectoryNames(searchPattern);
         }
 
         /// <summary>
@@ -218,7 +186,7 @@ namespace Microsoft.Xna.Framework.Storage
         /// <returns>List of file names.</returns>
         public string[] GetFileNames()
         {
-            return Directory.GetFiles(_storagePath);
+            return PlatformGetFileNames();
         }
 
         /// <summary>
@@ -231,9 +199,8 @@ namespace Microsoft.Xna.Framework.Storage
             if (string.IsNullOrEmpty(searchPattern))
                 throw new ArgumentNullException("Parameter searchPattern must contain a value.");
 
-            return Directory.GetFiles(_storagePath, searchPattern);
+            return PlatformGetFileNames(searchPattern);
         }
-
 
         /// <summary>
         /// Opens a file contained in storage-container.
@@ -271,9 +238,17 @@ namespace Microsoft.Xna.Framework.Storage
             if (string.IsNullOrEmpty(file))
                 throw new ArgumentNullException("Parameter file must contain a value.");
 
-            // relative so combine with our path
-            var filePath = Path.Combine(_storagePath, file);
-            return File.Open(filePath, fileMode, fileAccess, fileShare);
+            return PlatformOpenFile(file, fileMode, fileAccess, fileShare);
+        }
+
+        /// <summary>
+        /// Disposes un-managed objects referenced by this object.
+        /// </summary>
+        public void Dispose()
+        {
+            Disposing?.Invoke(this, null);
+
+            IsDisposed = true;
         }
     }
 }

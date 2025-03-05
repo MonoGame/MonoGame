@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
@@ -9,7 +10,6 @@ namespace Microsoft.Xna.Framework.Storage
     {
         private readonly PlayerIndex? _player;
         private StorageContainer _storageContainer;
-        private static DriveInfo _driveInfo;
 
         /// <summary>
         /// Gets the amount of free space on the device.
@@ -20,7 +20,7 @@ namespace Microsoft.Xna.Framework.Storage
             {
                 try
                 {
-                    return _driveInfo.AvailableFreeSpace;
+                    return PlatformFreeSpace();
                 }
                 catch (Exception)
                 {
@@ -38,7 +38,7 @@ namespace Microsoft.Xna.Framework.Storage
             {
                 try
                 {
-                    return _driveInfo.IsReady;
+                    return PlatformIsConnected();
                 }
                 catch (Exception)
                 {
@@ -56,7 +56,7 @@ namespace Microsoft.Xna.Framework.Storage
             {
                 try
                 {
-                    return _driveInfo.TotalSize;
+                    return PlatformTotalSpace();
                 }
                 catch (Exception)
                 {
@@ -70,43 +70,41 @@ namespace Microsoft.Xna.Framework.Storage
             _player = player;
         }
 
-        public void DeleteContainerAsync(string displayName, CancellationToken cancellationToken = default)
+        public void DeleteContainerAsync(string containerName, CancellationToken cancellationToken = default)
         {
-            Task.Run(() => DeleteContainer(displayName), cancellationToken);
+            Task.Run(() => DeleteContainer(containerName), cancellationToken);
         }
 
-        public void DeleteContainer(string displayName)
+        public void DeleteContainer(string containerName)
         {
-            ArgumentNullException.ThrowIfNullOrEmpty(displayName);
+            if (string.IsNullOrEmpty(containerName))
+                throw new ArgumentNullException(nameof(containerName), "A container name must be provided.");
 
             // If we are not connected, the Container should is not being used,
             // therefore we can safely delete it.
             if (!IsConnected)
             {
-                // TODO actually delete things.
+                PlatformDeleteContainer(containerName);
             }
         }
 
-        public Task<StorageContainer> OpenContainerAsync(string displayName, CancellationToken cancellationToken = default)
+        public Task<StorageContainer> OpenContainerAsync(string containerName, CancellationToken cancellationToken = default)
         {
-            return Task.Run(() => OpenContainer(displayName), cancellationToken);
+            return Task.Run(() => OpenContainer(containerName), cancellationToken);
         }
 
-        public StorageContainer OpenContainer(string displayName)
+        public StorageContainer OpenContainer(string containerName)
         {
-            ArgumentNullException.ThrowIfNullOrEmpty(displayName);
+            if (string.IsNullOrEmpty(containerName))
+                throw new ArgumentNullException(nameof(containerName), "A container name must be provided.");
 
             try
             {
-                _storageContainer = new StorageContainer(this, displayName, _player);
-
-                if (_driveInfo == null)
-                    _driveInfo = new DriveInfo(StorageRoot);
-
-                return _storageContainer;
+                return PlatformOpenContainer(containerName);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                Debug.WriteLine($"Failed to open storage container: {ex.Message}");
                 return null;
             }
         }
