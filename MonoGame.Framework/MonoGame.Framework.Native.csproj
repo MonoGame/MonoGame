@@ -21,9 +21,11 @@
     <Compile Remove="Platform\**\*" />
     <Compile Remove="Properties\**\*" />
     <Compile Remove="Utilities\System.Numerics.Vectors\**\*" />
+    <Compile Remove="MonoGame\**\*" /> 
     <Compile Include="Platform\Native\**\*" />
     <Compile Include="Platform\Utilities\ReflectionHelpers.Default.cs" />
     <Compile Remove="Devices\**\*" />
+    <Compile Include="Platform\Storage\StorageContainer.Native.cs" />
   </ItemGroup>
 
   <ItemGroup>

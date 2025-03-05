@@ -76,6 +76,7 @@
     <Compile Include="..\ThirdParty\StbImageSharp\src\**\*.cs" LinkBase="Utilities\StbImageSharp" />
     <Compile Include="..\ThirdParty\StbImageWriteSharp\src\**\*.cs" LinkBase="Utilities\StbImageWriteSharp" />
     <Compile Include="Platform\Storage\StorageDevice.Android.cs" />
+    <Compile Include="Platform\Storage\StorageContainer.Android.cs" />
   </ItemGroup>
 
   <ItemGroup>
