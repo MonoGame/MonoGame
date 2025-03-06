@@ -4,6 +4,7 @@
 
 using System;
 using System.IO;
+using Java.Nio.FileNio.Attributes;
 
 namespace Microsoft.Xna.Framework.Storage
 {
@@ -66,16 +67,6 @@ namespace Microsoft.Xna.Framework.Storage
             _playerIndex = playerIndex;
 
             PlatformInitialize();
-
-            // TODO Do we want to be consistent and put everything under SavedGames across all platforms?
-#if DESKTOPGL 
-            // We already have a SaveData folder on Desktop.
-            var savedGames = StorageDevice.StorageRoot;
-#else
-            var storageRoot = StorageDevice.StorageRoot;
-            var savedGames = Path.Combine(storageRoot, "SavedGames");
-#endif
-            CreateDirectory(savedGames);
         }
 
         /// <summary>
@@ -107,39 +98,37 @@ namespace Microsoft.Xna.Framework.Storage
         /// Deletes specified directory for the storage-container.
         /// </summary>
         /// <param name="directory">The relative path of the directory to be deleted.</param>
-        public void DeleteDirectory(string directory)
+        public void DeleteDirectory(string directoryName)
         {
-            if (string.IsNullOrEmpty(directory))
-                throw new ArgumentNullException("Parameter directory must contain a value.");
+            if (string.IsNullOrEmpty(directoryName))
+                throw new ArgumentNullException(nameof(directoryName), "A directory name must be provided.");
 
-            PlatformDeleteDirectory(directory);
+            PlatformDeleteDirectory(directoryName);
         }
-
-
 
         /// <summary>
         /// Deletes a file from the storage-container.
         /// </summary>
-        /// <param name="file">The relative path of the file to be deleted.</param>
-        public void DeleteFile(string file)
+        /// <param name="fileName">The relative path of the file to be deleted.</param>
+        public void DeleteFile(string fileName)
         {
-            if (string.IsNullOrEmpty(file))
-                throw new ArgumentNullException("Parameter file must contain a value.");
+            if (string.IsNullOrEmpty(fileName))
+                throw new ArgumentNullException(nameof(fileName), "A file name must be provided.");
 
-            PlatformDeleteFile(file);
+            PlatformDeleteFile(fileName);
         }
 
         /// <summary>
         /// Returns true if specified path exists in the storage-container, false otherwise.
         /// </summary>
-        /// <param name="directory">The relative path of directory to query for.</param>
+        /// <param name="directoryName">The relative path of directory to query for.</param>
         /// <returns>True if queried directory exists, false otherwise.</returns>
-        public bool DirectoryExists(string directory)
+        public bool DirectoryExists(string directoryName)
         {
-            if (string.IsNullOrEmpty(directory))
-                throw new ArgumentNullException("Parameter directory must contain a value.");
+            if (string.IsNullOrEmpty(directoryName))
+                throw new ArgumentNullException(nameof(directoryName), "A directory name must be provided.");
 
-            return PlatformDirectoryExists(directory);
+            return PlatformDirectoryExists(directoryName);
         }
 
 
@@ -147,14 +136,14 @@ namespace Microsoft.Xna.Framework.Storage
         /// <summary>
         /// Returns true if the specified file exists in the storage-container, false otherwise.
         /// </summary>
-        /// <param name="file">The relative path of file to query for.</param>
+        /// <param name="fileName">The relative path of file to query for.</param>
         /// <returns>True if queried file exists, false otherwise.</returns>
-        public bool FileExists(string file)
+        public bool FileExists(string fileName)
         {
-            if (string.IsNullOrEmpty(file))
-                throw new ArgumentNullException("Parameter file must contain a value.");
+            if (string.IsNullOrEmpty(fileName))
+                throw new ArgumentNullException(nameof(fileName), "A file name must be provided.");
 
-            return PlatformFileExists(file);
+            return PlatformFileExists(fileName);
 
         }
 
@@ -175,7 +164,7 @@ namespace Microsoft.Xna.Framework.Storage
         public string[] GetDirectoryNames(string searchPattern)
         {
             if (string.IsNullOrEmpty(searchPattern))
-                throw new ArgumentNullException("Parameter searchPattern must contain a value.");
+                throw new ArgumentNullException(nameof(searchPattern), "A search pattern must be provided.");
 
             return PlatformGetDirectoryNames(searchPattern);
         }
@@ -197,7 +186,7 @@ namespace Microsoft.Xna.Framework.Storage
         public string[] GetFileNames(string searchPattern)
         {
             if (string.IsNullOrEmpty(searchPattern))
-                throw new ArgumentNullException("Parameter searchPattern must contain a value.");
+                throw new ArgumentNullException(nameof(searchPattern), "A search pattern must be provided.");
 
             return PlatformGetFileNames(searchPattern);
         }
@@ -205,40 +194,40 @@ namespace Microsoft.Xna.Framework.Storage
         /// <summary>
         /// Opens a file contained in storage-container.
         /// </summary>
-        /// <param name="file">Relative path of the file.</param>
+        /// <param name="fileName">Relative path of the file.</param>
         /// <param name="fileMode"><see cref="FileMode"/> that specifies how the file is opened.</param>
         /// <returns><see cref="Stream"/> object for the opened file.</returns>
-        public Stream OpenFile(string file, FileMode fileMode)
+        public Stream OpenFile(string fileName, FileMode fileMode)
         {
-            return OpenFile(file, fileMode, FileAccess.ReadWrite, FileShare.ReadWrite);
+            return OpenFile(fileName, fileMode, FileAccess.ReadWrite, FileShare.ReadWrite);
         }
 
         /// <summary>
         /// Opens a file contained in storage-container.
         /// </summary>
-        /// <param name="file">Relative path of the file.</param>
+        /// <param name="fileName">Relative path of the file.</param>
         /// <param name="fileMode"><see cref="FileMode"/> that specifies how the file is opened.</param>
         /// <param name="fileAccess"><see cref="FileAccess"/> that specifies access mode.</param>
         /// <returns><see cref="Stream"/> object for the opened file.</returns>
-        public Stream OpenFile(string file, FileMode fileMode, FileAccess fileAccess)
+        public Stream OpenFile(string fileName, FileMode fileMode, FileAccess fileAccess)
         {
-            return OpenFile(file, fileMode, fileAccess, FileShare.ReadWrite);
+            return OpenFile(fileName, fileMode, fileAccess, FileShare.ReadWrite);
         }
 
         /// <summary>
         /// Opens a file contained in storage-container.
         /// </summary>
-        /// <param name="file">Relative path of the file.</param>
+        /// <param name="fileName">Relative path of the file.</param>
         /// <param name="fileMode"><see cref="FileMode"/> that specifies how the file is opened.</param>
         /// <param name="fileAccess"><see cref="FileAccess"/> that specifies access mode.</param>
         /// <param name="fileShare">A bitwise combination of <see cref="FileShare"/> enumeration values that specifies access modes for other stream objects.</param>
         /// <returns><see cref="Stream"/> object for the opened file.</returns>
-        public Stream OpenFile(string file, FileMode fileMode, FileAccess fileAccess, FileShare fileShare)
+        public Stream OpenFile(string fileName, FileMode fileMode, FileAccess fileAccess, FileShare fileShare)
         {
-            if (string.IsNullOrEmpty(file))
-                throw new ArgumentNullException("Parameter file must contain a value.");
+            if (string.IsNullOrEmpty(fileName))
+                throw new ArgumentNullException(nameof(fileName), "A file name must be provided.");
 
-            return PlatformOpenFile(file, fileMode, fileAccess, fileShare);
+            return PlatformOpenFile(fileName, fileMode, fileAccess, fileShare);
         }
 
         /// <summary>

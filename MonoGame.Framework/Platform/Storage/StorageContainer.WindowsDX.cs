@@ -5,9 +5,10 @@ namespace Microsoft.Xna.Framework.Storage
 {
     partial class StorageContiner
     {
-        private void PlatformInitialize()
+        private string PlatformInitialize()
         {
-            throw new NotImplementedException();
+            var storageRoot = StorageDevice.StorageRoot;
+            return Path.Combine(storageRoot, "SavedGames");
         }
 
         private Stream PlatformOpenFile(string file, FileMode fileMode, FileAccess fileAccess, FileShare fileShare)
