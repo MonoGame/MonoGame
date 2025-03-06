@@ -1,6 +1,4 @@
-﻿using System;
-using System.IO;
-using System.Runtime.InteropServices;
+﻿using System.IO;
 
 namespace Microsoft.Xna.Framework.Storage
 {
@@ -11,11 +9,13 @@ namespace Microsoft.Xna.Framework.Storage
         private void PlatformCreateDirectory(string directoryName)
         {
             // relative so combine with our path
-            var dirPath = Path.Combine(_storagePath, directoryName);
+            var directoryPath = Path.Combine(_storagePath, directoryName);
 
             // Create the "directory" if need be
-            if (!Directory.Exists(dirPath))
-                Directory.CreateDirectory(dirPath);
+            if (!Directory.Exists(directoryPath))
+            {
+                Directory.CreateDirectory(directoryPath);
+            }
         }
 
         private Stream PlatformCreateFile(string fileName)
@@ -27,41 +27,42 @@ namespace Microsoft.Xna.Framework.Storage
             return File.Create(filePath);
         }
 
-        private void PlatformDeleteDirectory(string directory)
+        private void PlatformDeleteDirectory(string directoryName)
         {
             // relative so combine with our path
-            var dirPath = Path.Combine(_storagePath, directory);
+            var directoryPath = Path.Combine(_storagePath, directoryName);
 
             // Now let's try to delete itd
-            Directory.Delete(dirPath);
+            if (Directory.Exists(directoryPath))
+            {
+                Directory.Delete(directoryPath);
+            }
         }
 
-        private void PlatformDeleteFile(string file)
+        private void PlatformDeleteFile(string fileName)
         {
             // relative so combine with our path
-            var filePath = Path.Combine(_storagePath, file);
-
-            // Now let's delete it if it exists
+            var filePath = Path.Combine(_storagePath, fileName);
+            
             if (File.Exists(filePath))
             {
                 File.Delete(filePath);
             }
         }
 
-        private bool PlatformDirectoryExists(string directory)
+        private bool PlatformDirectoryExists(string directoryName)
         {
             // relative so combine with our path
-            var dirPath = Path.Combine(_storagePath, directory);
+            var directoryPath = Path.Combine(_storagePath, directoryName);
 
-            return Directory.Exists(dirPath);
+            return Directory.Exists(directoryPath);
         }
 
-        private bool PlatformFileExists(string file)
+        private bool PlatformFileExists(string fileName)
         {
             // relative so combine with our path
-            var filePath = Path.Combine(_storagePath, file);
+            var filePath = Path.Combine(_storagePath, fileName);
 
-            // return A boolean relating to the file's existence
             return File.Exists(filePath);
         }
 
@@ -87,18 +88,25 @@ namespace Microsoft.Xna.Framework.Storage
 
         private void PlatformInitialize()
         {
-            var savedGames = StorageDevice.StorageRoot;
+            var savedGames = Path.Combine(StorageDevice.StorageRoot, "SavedGames");
 
             _storagePath = Path.Combine(savedGames, _containerName);
 
             // If we have a PlayerIndex use that, otherwise save to AllPlayers folder
             _storagePath = _playerIndex.HasValue ? Path.Combine(_storagePath, "Player" + (int)_playerIndex.Value) : Path.Combine(_storagePath, "AllPlayers");
+
+            // Create the "directory" if need be
+            if (!Directory.Exists(_storagePath))
+            {
+                Directory.CreateDirectory(_storagePath);
+            }
         }
 
-        private Stream PlatformOpenFile(string file, FileMode fileMode, FileAccess fileAccess, FileShare fileShare)
+        private Stream PlatformOpenFile(string fileName, FileMode fileMode, FileAccess fileAccess, FileShare fileShare)
         {
             // relative so combine with our path
-            var filePath = Path.Combine(_storagePath, file);
+            var filePath = Path.Combine(_storagePath, fileName);
+
             return File.Open(filePath, fileMode, fileAccess, fileShare);
         }
     }

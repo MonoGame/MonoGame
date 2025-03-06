@@ -74,6 +74,11 @@ namespace Microsoft.Xna.Framework.Storage
             }
         }
 
+        private string PlatformInitialize()
+        {
+            throw new NotImplementedException();
+        }
+
         private long PlatformTotalSpace()
         {
             throw new NotImplementedException();

@@ -5,6 +5,8 @@ namespace Microsoft.Xna.Framework.Storage
 {
     partial class StorageDevice
     {
+        private static DriveInfo _driveInfo;
+
         internal static string StorageRoot
         {
             get
@@ -13,29 +15,34 @@ namespace Microsoft.Xna.Framework.Storage
             }
         }
 
-        private long PlatformTotalSpace()
-        {
-            throw new NotImplementedException();
-        }
-
-        private bool PlatformIsConnected()
+        private void PlatformDeleteContainer(string containerName)
         {
             throw new NotImplementedException();
         }
 
         private long PlatformFreeSpace()
         {
-            throw new NotImplementedException();
+            return _driveInfo.AvailableFreeSpace;
+        }
+
+        private bool PlatformIsConnected()
+        {
+            return _driveInfo.IsReady;
         }
 
         private StorageContainer PlatformOpenContainer(string containerName)
         {
-            throw new NotImplementedException();
+            _storageContainer = new StorageContainer(this, containerName, _player);
+
+            if (_driveInfo == null)
+                _driveInfo = new DriveInfo(StorageRoot);
+
+            return _storageContainer;
         }
 
-        private void PlatformDeleteContainer(string containerName)
+        private long PlatformTotalSpace()
         {
-            throw new NotImplementedException();
+            return _driveInfo.TotalSize;
         }
     }
 }
