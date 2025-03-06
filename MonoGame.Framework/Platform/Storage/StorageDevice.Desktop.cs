@@ -46,7 +46,6 @@ namespace Microsoft.Xna.Framework.Storage
         {
             get
             {
-                
                 if (CurrentPlatform.OS == OS.Linux)
                 {
                     string osConfigDir = Environment.GetEnvironmentVariable("XDG_DATA_HOME");
