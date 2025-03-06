@@ -74,11 +74,11 @@
     <Compile Include="Platform\Utilities\FuncLoader.iOS.cs" />
     <Compile Include="Platform\Utilities\InteropHelpers.cs" />
     <Compile Include="Platform\Utilities\ReflectionHelpers.Default.cs" />
+    <Compile Include="Platform\Storage\StorageDevice.iOS.cs" />
+    <Compile Include="Platform\Storage\StorageContainer.Android.Desktop.iOS.cs" />
 
     <Compile Include="..\ThirdParty\StbImageSharp\src\**\*.cs" LinkBase="Utilities\StbImageSharp" />
     <Compile Include="..\ThirdParty\StbImageWriteSharp\src\**\*.cs" LinkBase="Utilities\StbImageWriteSharp" />
-    <Compile Include="Platform\Storage\StorageDevice.iOS.cs" />
-    <Compile Include="Platform\Storage\StorageContainer.iOS.cs" />
   </ItemGroup>
 
   <ItemGroup>
