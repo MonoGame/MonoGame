@@ -4,7 +4,6 @@
 
 using System;
 using System.IO;
-using Java.Nio.FileNio.Attributes;
 
 namespace Microsoft.Xna.Framework.Storage
 {
