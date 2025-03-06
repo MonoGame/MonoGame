@@ -29,7 +29,7 @@ namespace MonoGame.Tests.Framework
             var device = new StorageDevice(PlayerIndex.One);
             var container = device.OpenContainer(MY_GAME);
             Assert.IsNotNull(container);
-            Assert.AreEqual(MY_GAME, container.DisplayName);
+            Assert.AreEqual(MY_GAME, container.ContainterName);
             Assert.AreEqual(device, container.StorageDevice);
             Assert.AreEqual(true, device.IsConnected);
             Assert.AreNotEqual(0, device.TotalSpace);
@@ -37,11 +37,11 @@ namespace MonoGame.Tests.Framework
         }
 
         [Test]
-        public void OpenContainer_ShouldThrowException_OnInvalidDisplayName()
+        public void OpenContainer_ShouldThrowException_OnInvalidContainerName()
         {
             var device = new StorageDevice(PlayerIndex.One);
-            Assert.Throws<ArgumentNullException>(() => device.OpenContainer(null), "Value cannot be null. (Parameter 'displayName')");
-            Assert.Throws<ArgumentException>(() => device.OpenContainer(string.Empty), "The value cannot be an empty string. (Parameter 'displayName')");
+            Assert.Throws<ArgumentNullException>(() => device.OpenContainer(null), "Value cannot be null. (Parameter 'ContainerName')");
+            Assert.Throws<ArgumentException>(() => device.OpenContainer(string.Empty), "The value cannot be an empty string. (Parameter 'ContainerName')");
         }
 
         [Test]
@@ -50,15 +50,15 @@ namespace MonoGame.Tests.Framework
             var device = new StorageDevice(PlayerIndex.One);
             var container = await device.OpenContainerAsync(MY_GAME);
             Assert.IsNotNull(container);
-            Assert.AreEqual(MY_GAME, container.DisplayName);
+            Assert.AreEqual(MY_GAME, container.ContainterName);
         }
 
         [Test]
-        public void OpenContainerAsync_ShouldThrowException_OnInvalidDisplayName()
+        public void OpenContainerAsync_ShouldThrowException_OnInvalidContainerName()
         {
             var device = new StorageDevice(PlayerIndex.One);
-            Assert.ThrowsAsync<ArgumentNullException>(() => device.OpenContainerAsync(null), "Value cannot be null. (Parameter 'displayName')");
-            Assert.ThrowsAsync<ArgumentException>(() => device.OpenContainerAsync(string.Empty), "The value cannot be an empty string. (Parameter 'displayName')");
+            Assert.ThrowsAsync<ArgumentNullException>(() => device.OpenContainerAsync(null), "Value cannot be null. (Parameter 'ContainerName')");
+            Assert.ThrowsAsync<ArgumentException>(() => device.OpenContainerAsync(string.Empty), "The value cannot be an empty string. (Parameter 'ContainerName')");
         }
     }
 }
