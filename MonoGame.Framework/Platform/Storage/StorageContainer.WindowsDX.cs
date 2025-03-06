@@ -3,9 +3,9 @@ using System.IO;
 
 namespace Microsoft.Xna.Framework.Storage
 {
-    partial class StorageContiner
+    public partial class StorageContiner
     {
-        private string PlatformInitialize()
+        private void PlatformInitialize()
         {
             var storageRoot = StorageDevice.StorageRoot;
             return Path.Combine(storageRoot, "SavedGames");

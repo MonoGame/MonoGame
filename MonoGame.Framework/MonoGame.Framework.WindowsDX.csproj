@@ -59,7 +59,7 @@
     <Compile Include="Platform\Desktop\Devices\Sensors\Accelerometer.cs" />
     <Compile Include="Platform\Desktop\Devices\Sensors\Compass.cs" />
     <Compile Include="Platform\Storage\StorageDevice.WindowsDX.cs" />
-    <Compile Include="Platform\Storage\StorageContainer.WindowsDX.cs" />
+    <Compile Include="Platform\Storage\StorageContainer.Android.Desktop.iOS.cs" />
   </ItemGroup>
 
   <ItemGroup>
