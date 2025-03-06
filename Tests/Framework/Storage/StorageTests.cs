@@ -1,11 +1,8 @@
-﻿using System;
-using System.IO;
-using System.Threading;
-using System.Threading.Tasks;
-using NUnit.Framework;
+﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Storage;
-using Microsoft.Xna.Framework;
-using System.ComponentModel.Design;
+using NUnit.Framework;
+using System;
+using System.Threading.Tasks;
 
 namespace MonoGame.Tests.Framework
 {
@@ -40,8 +37,8 @@ namespace MonoGame.Tests.Framework
         public void OpenContainer_ShouldThrowException_OnInvalidContainerName()
         {
             var device = new StorageDevice(PlayerIndex.One);
-            Assert.Throws<ArgumentNullException>(() => device.OpenContainer(null), "Value cannot be null. (Parameter 'ContainerName')");
-            Assert.Throws<ArgumentException>(() => device.OpenContainer(string.Empty), "The value cannot be an empty string. (Parameter 'ContainerName')");
+            Assert.Throws<ArgumentNullException>(() => device.OpenContainer(null), "A container name must be provided. (Parameter 'containerName')");
+            Assert.Throws<ArgumentNullException>(() => device.OpenContainer(string.Empty), "A container name must be provided. (Parameter 'containerName')");
         }
 
         [Test]
@@ -57,8 +54,8 @@ namespace MonoGame.Tests.Framework
         public void OpenContainerAsync_ShouldThrowException_OnInvalidContainerName()
         {
             var device = new StorageDevice(PlayerIndex.One);
-            Assert.ThrowsAsync<ArgumentNullException>(() => device.OpenContainerAsync(null), "Value cannot be null. (Parameter 'ContainerName')");
-            Assert.ThrowsAsync<ArgumentException>(() => device.OpenContainerAsync(string.Empty), "The value cannot be an empty string. (Parameter 'ContainerName')");
+            Assert.ThrowsAsync<ArgumentNullException>(() => device.OpenContainerAsync(null), "A container name must be provided. (Parameter 'containerName')");
+            Assert.ThrowsAsync<ArgumentNullException>(() => device.OpenContainerAsync(string.Empty), "A container name must be provided. (Parameter 'containerName')");
         }
     }
 }
