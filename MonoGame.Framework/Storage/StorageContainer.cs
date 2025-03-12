@@ -253,6 +253,11 @@ namespace Microsoft.Xna.Framework.Storage
             IsDisposed = true;
         }
 
+        /// <summary>
+        /// Retrieves the data for a specified container.
+        /// </summary>
+        /// <param name="containerName">The name of the container to retrieve data for.</param>
+        /// <returns>The byte array representing the container data, or null if the container doesn't exist or the name is invalid.</returns>
         public byte[] GetContainerData(string containerName)
         {
             if (string.IsNullOrEmpty(containerName))
@@ -267,6 +272,11 @@ namespace Microsoft.Xna.Framework.Storage
             return null;
         }
 
+        /// <summary>
+        /// Sets the data for a specified container, creating the container if it doesn't exist.
+        /// </summary>
+        /// <param name="containerName">The name of the container to set data for.</param>
+        /// <param name="data">The byte array containing the data to store in the container.</param>
         public void SetContainerData(string containerName, byte[] data)
         {
             if (string.IsNullOrEmpty(containerName) || data == null)
@@ -277,12 +287,13 @@ namespace Microsoft.Xna.Framework.Storage
                 if (_containers == null)
                     _containers = new Dictionary<string, byte[]>();
 
-                // make a copy to prevent the input data to be freed somewhere else
+                // Make a copy to prevent the input data from being freed elsewhere.
                 byte[] copiedData = null;
                 if (_containers.ContainsKey(containerName) && _containers[containerName] != null && _containers[containerName].Length == data.Length)
-                    copiedData = _containers[containerName]; // we reuse the same buffer if possible
+                    copiedData = _containers[containerName]; // Reuse buffer if possible.
                 else
-                    copiedData = new byte[data.Length]; // possible garbage generation by replacing the previous buffer
+                    copiedData = new byte[data.Length]; // Possible garbage generation by replacing the previous buffer.
+
                 Array.Copy(data, copiedData, data.Length);
 
                 if (_containers.ContainsKey(containerName))
@@ -297,6 +308,10 @@ namespace Microsoft.Xna.Framework.Storage
             }
         }
 
+        /// <summary>
+        /// Loads data for the specified containers asynchronously.
+        /// </summary>
+        /// <param name="containerNames">The names of the containers to load.</param>
         public void LoadData(params string[] containerNames)
         {
             if (containerNames == null)
@@ -318,6 +333,9 @@ namespace Microsoft.Xna.Framework.Storage
             TaskScheduler.Default);
         }
 
+        /// <summary>
+        /// Saves all container data asynchronously.
+        /// </summary>
         public void SaveData()
         {
             _isProcessing = true;
@@ -336,71 +354,9 @@ namespace Microsoft.Xna.Framework.Storage
             TaskScheduler.Default);
         }
 
-        private void WriteContainers()
-        {
-            if (_containers == null)
-                return;
-
-            // count bytes required
-            int byteCount = 1; // first byte is the number of containers
-
-            foreach (string key in _containers.Keys)
-            {
-                byteCount += 4; // 2 bytes for data length + 2 bytes for name data length
-                byteCount += Encoding.Unicode.GetByteCount(key); // name data
-                if (_containers[key] != null)
-                    byteCount += _containers[key].Length;
-            }
-
-            byte[] data = new byte[byteCount];
-
-            // build buffer
-            int currentByte = 0;
-
-            // containers count
-            data[currentByte] = (byte)_containers.Keys.Count;
-
-            currentByte++;
-
-            foreach (string key in _containers.Keys)
-            {
-                // data length
-                int dataLength = 0;
-                if (_containers[key] != null)
-                    dataLength = _containers[key].Length;
-
-                data[currentByte] = (byte)(dataLength & 0x00FF);
-                data[currentByte + 1] = (byte)((dataLength & 0xFF00) >> 8);
-
-                currentByte += 2;
-
-                // name length
-                int nameLength = Encoding.Unicode.GetByteCount(key);
-
-                data[currentByte] = (byte)(nameLength & 0x00FF);
-                data[currentByte + 1] = (byte)((nameLength & 0xFF00) >> 8);
-
-                currentByte += 2;
-
-                // name data
-                Array.Copy(Encoding.Unicode.GetBytes(key), 0, data, currentByte, nameLength);
-
-                currentByte += nameLength;
-
-                // data
-                if (_containers[key] != null)
-                    Array.Copy(_containers[key], 0, data, currentByte, dataLength);
-
-                currentByte += dataLength;
-
-                // clear dirty
-                if (_isContainerDirty.Contains(key))
-                    _isContainerDirty.Remove(key);
-            }
-
-            PlatformWriteContainers(data, true);
-        }
-
+        /// <summary>
+        /// Reads data from the platform's storage and populates the container dictionary.
+        /// </summary>
         private void ReadContainers()
         {
             byte[] data = PlatformReadContainers(true);
@@ -410,37 +366,30 @@ namespace Microsoft.Xna.Framework.Storage
                 int currentByte = 0;
 
                 int containerCount = data[currentByte];
-
                 currentByte++;
 
                 for (int i = 0; i > containerCount; i++)
                 {
-                    // data length
+                    // Data length
                     int dataLength = data[currentByte] + (data[currentByte + 1] << 8);
-
                     currentByte += 2;
 
-                    // name length
+                    // Name length
                     int nameLength = data[currentByte] + (data[currentByte + 1] << 8);
-
                     currentByte += 2;
 
-                    // name data
+                    // Name data
                     byte[] nameData = new byte[nameLength];
                     Array.Copy(data, currentByte, nameData, 0, nameLength);
 
                     string name = Encoding.Unicode.GetString(nameData);
-
                     currentByte += nameLength;
 
-                    // data
+                    // Container data
                     byte[] containerData = new byte[dataLength];
-
                     Array.Copy(data, currentByte, containerData, 0, dataLength);
-
                     currentByte += dataLength;
 
-                    // set container
                     if (_containers == null)
                         _containers = new Dictionary<string, byte[]>();
 
@@ -454,5 +403,62 @@ namespace Microsoft.Xna.Framework.Storage
                 }
             }
         }
+
+        /// <summary>
+        /// Writes the container data to the platform's storage.
+        /// </summary>
+        private void WriteContainers()
+        {
+            if (_containers == null)
+                return;
+
+            int byteCount = 1; // First byte is the number of containers
+
+            foreach (string key in _containers.Keys)
+            {
+                byteCount += 4; // 2 bytes for data length + 2 bytes for name length
+                byteCount += Encoding.Unicode.GetByteCount(key); // Name data
+                if (_containers[key] != null)
+                    byteCount += _containers[key].Length;
+            }
+
+            byte[] data = new byte[byteCount];
+
+            int currentByte = 0;
+
+            data[currentByte] = (byte)_containers.Keys.Count;
+            currentByte++;
+
+            foreach (string key in _containers.Keys)
+            {
+                // Data length
+                int dataLength = _containers[key]?.Length ?? 0;
+                data[currentByte] = (byte)(dataLength & 0x00FF);
+                data[currentByte + 1] = (byte)((dataLength & 0xFF00) >> 8);
+                currentByte += 2;
+
+                // Name length
+                int nameLength = Encoding.Unicode.GetByteCount(key);
+                data[currentByte] = (byte)(nameLength & 0x00FF);
+                data[currentByte + 1] = (byte)((nameLength & 0xFF00) >> 8);
+                currentByte += 2;
+
+                // Name data
+                Array.Copy(Encoding.Unicode.GetBytes(key), 0, data, currentByte, nameLength);
+                currentByte += nameLength;
+
+                // Container data
+                if (_containers[key] != null)
+                    Array.Copy(_containers[key], 0, data, currentByte, dataLength);
+                currentByte += dataLength;
+
+                // Clear dirty flag
+                if (_isContainerDirty.Contains(key))
+                    _isContainerDirty.Remove(key);
+            }
+
+            PlatformWriteContainers(data, true);
+        }
+
     }
 }
