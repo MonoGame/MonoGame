@@ -43,7 +43,7 @@ namespace Microsoft.Xna.Framework.Storage
         {
             // relative so combine with our path
             var filePath = Path.Combine(_storagePath, fileName);
-            
+
             if (File.Exists(filePath))
             {
                 File.Delete(filePath);
@@ -108,6 +108,16 @@ namespace Microsoft.Xna.Framework.Storage
             var filePath = Path.Combine(_storagePath, fileName);
 
             return File.Open(filePath, fileMode, fileAccess, fileShare);
+        }
+
+        private byte[] PlatformReadContainers(bool value)
+        {
+            throw new NotImplementedException();
+        }
+
+        private void PlatformWriteContainers(byte[] data, bool value)
+        {
+            throw new NotImplementedException();
         }
     }
 }
