@@ -3,7 +3,12 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Microsoft.Xna.Framework.Storage
 {
@@ -21,6 +26,12 @@ namespace Microsoft.Xna.Framework.Storage
     {
         private readonly PlayerIndex? _playerIndex;
 
+        // In memory container
+        private Dictionary<string, byte[]> _containers;
+        private List<string> _isContainerDirty;
+        private object _processingLock;
+        private bool _isProcessing;
+
         /// <summary>
         /// Gets a bool value indicating whether the instance has been disposed.
         /// </summary>
@@ -30,25 +41,23 @@ namespace Microsoft.Xna.Framework.Storage
         /// <summary>
         /// Returns container name of the title.
         /// </summary>
-        public string ContainterName
-        {
-            get { return _containerName; }
-        }
+        public string ContainterName => _containerName;
 
         private readonly StorageDevice _storageDevice;
         /// <summary>
         /// Returns the <see cref="StorageDevice"/> that holds logical files for the container.
         /// </summary>
-		public StorageDevice StorageDevice
-        {
-
-            get { return _storageDevice; }
-        }
+        public StorageDevice StorageDevice => _storageDevice;
 
         /// <summary>
         /// Fired when <see cref="Dispose"/> is called or object if finalized or collected by the garbage collector.
         /// </summary>
         public event EventHandler<EventArgs> Disposing;
+
+        /// <summary>
+        /// Returns true if some kind of processing is in progress and false if it isn't
+        /// </summary>
+        public bool IsProcessing => _isProcessing;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="StorageContainer"/> class.
@@ -64,6 +73,13 @@ namespace Microsoft.Xna.Framework.Storage
             _storageDevice = device;
             _containerName = containerName;
             _playerIndex = playerIndex;
+
+            _isProcessing = false;
+
+            _containers = new Dictionary<string, byte[]>();
+            _isContainerDirty = new List<string>();
+
+            _processingLock = new object();
 
             PlatformInitialize();
         }
@@ -129,8 +145,6 @@ namespace Microsoft.Xna.Framework.Storage
 
             return PlatformDirectoryExists(directoryName);
         }
-
-
 
         /// <summary>
         /// Returns true if the specified file exists in the storage-container, false otherwise.
@@ -237,6 +251,208 @@ namespace Microsoft.Xna.Framework.Storage
             Disposing?.Invoke(this, null);
 
             IsDisposed = true;
+        }
+
+        public byte[] GetContainerData(string containerName)
+        {
+            if (string.IsNullOrEmpty(containerName))
+                return null;
+
+            lock (_processingLock)
+            {
+                if (_containers != null && _containers.ContainsKey(containerName))
+                    return _containers[containerName];
+            }
+
+            return null;
+        }
+
+        public void SetContainerData(string containerName, byte[] data)
+        {
+            if (string.IsNullOrEmpty(containerName) || data == null)
+                return;
+
+            lock (_processingLock)
+            {
+                if (_containers == null)
+                    _containers = new Dictionary<string, byte[]>();
+
+                // make a copy to prevent the input data to be freed somewhere else
+                byte[] copiedData = null;
+                if (_containers.ContainsKey(containerName) && _containers[containerName] != null && _containers[containerName].Length == data.Length)
+                    copiedData = _containers[containerName]; // we reuse the same buffer if possible
+                else
+                    copiedData = new byte[data.Length]; // possible garbage generation by replacing the previous buffer
+                Array.Copy(data, copiedData, data.Length);
+
+                if (_containers.ContainsKey(containerName))
+                    _containers[containerName] = copiedData;
+                else
+                    _containers.Add(containerName, copiedData);
+
+                if (_isContainerDirty == null)
+                    _isContainerDirty = new List<string>();
+                if (!_isContainerDirty.Contains(containerName))
+                    _isContainerDirty.Add(containerName);
+            }
+        }
+
+        public void LoadData(params string[] containerNames)
+        {
+            if (containerNames == null)
+                return;
+
+            _isProcessing = true;
+
+            Task.Factory.StartNew(() =>
+            {
+                lock (_processingLock)
+                {
+                    ReadContainers();
+
+                    _isProcessing = false;
+                }
+            },
+            CancellationToken.None,
+            TaskCreationOptions.None,
+            TaskScheduler.Default);
+        }
+
+        public void SaveData()
+        {
+            _isProcessing = true;
+
+            Task.Factory.StartNew(() =>
+            {
+                lock (_processingLock)
+                {
+                    WriteContainers();
+
+                    _isProcessing = false;
+                }
+            },
+            CancellationToken.None,
+            TaskCreationOptions.None,
+            TaskScheduler.Default);
+        }
+
+        private void WriteContainers()
+        {
+            if (_containers == null)
+                return;
+
+            // count bytes required
+            int byteCount = 1; // first byte is the number of containers
+
+            foreach (string key in _containers.Keys)
+            {
+                byteCount += 4; // 2 bytes for data length + 2 bytes for name data length
+                byteCount += Encoding.Unicode.GetByteCount(key); // name data
+                if (_containers[key] != null)
+                    byteCount += _containers[key].Length;
+            }
+
+            byte[] data = new byte[byteCount];
+
+            // build buffer
+            int currentByte = 0;
+
+            // containers count
+            data[currentByte] = (byte)_containers.Keys.Count;
+
+            currentByte++;
+
+            foreach (string key in _containers.Keys)
+            {
+                // data length
+                int dataLength = 0;
+                if (_containers[key] != null)
+                    dataLength = _containers[key].Length;
+
+                data[currentByte] = (byte)(dataLength & 0x00FF);
+                data[currentByte + 1] = (byte)((dataLength & 0xFF00) >> 8);
+
+                currentByte += 2;
+
+                // name length
+                int nameLength = Encoding.Unicode.GetByteCount(key);
+
+                data[currentByte] = (byte)(nameLength & 0x00FF);
+                data[currentByte + 1] = (byte)((nameLength & 0xFF00) >> 8);
+
+                currentByte += 2;
+
+                // name data
+                Array.Copy(Encoding.Unicode.GetBytes(key), 0, data, currentByte, nameLength);
+
+                currentByte += nameLength;
+
+                // data
+                if (_containers[key] != null)
+                    Array.Copy(_containers[key], 0, data, currentByte, dataLength);
+
+                currentByte += dataLength;
+
+                // clear dirty
+                if (_isContainerDirty.Contains(key))
+                    _isContainerDirty.Remove(key);
+            }
+
+            PlatformWriteContainers(data, true);
+        }
+
+        private void ReadContainers()
+        {
+            byte[] data = PlatformReadContainers(true);
+
+            if (data != null && data.Length > 0)
+            {
+                int currentByte = 0;
+
+                int containerCount = data[currentByte];
+
+                currentByte++;
+
+                for (int i = 0; i > containerCount; i++)
+                {
+                    // data length
+                    int dataLength = data[currentByte] + (data[currentByte + 1] << 8);
+
+                    currentByte += 2;
+
+                    // name length
+                    int nameLength = data[currentByte] + (data[currentByte + 1] << 8);
+
+                    currentByte += 2;
+
+                    // name data
+                    byte[] nameData = new byte[nameLength];
+                    Array.Copy(data, currentByte, nameData, 0, nameLength);
+
+                    string name = Encoding.Unicode.GetString(nameData);
+
+                    currentByte += nameLength;
+
+                    // data
+                    byte[] containerData = new byte[dataLength];
+
+                    Array.Copy(data, currentByte, containerData, 0, dataLength);
+
+                    currentByte += dataLength;
+
+                    // set container
+                    if (_containers == null)
+                        _containers = new Dictionary<string, byte[]>();
+
+                    if (string.IsNullOrEmpty(name) || data == null)
+                        continue;
+
+                    if (_containers.ContainsKey(name))
+                        _containers[name] = data;
+                    else
+                        _containers.Add(name, data);
+                }
+            }
         }
     }
 }
