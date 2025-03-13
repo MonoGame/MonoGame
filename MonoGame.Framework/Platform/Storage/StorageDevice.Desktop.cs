@@ -79,7 +79,7 @@ namespace Microsoft.Xna.Framework.Storage
 
         private void PlatformDeleteContainer(string containerName)
         {
-            throw new NotImplementedException();
+            _storageContainer.DeleteDirectory(containerName);
         }
 
         private long PlatformFreeSpace()
