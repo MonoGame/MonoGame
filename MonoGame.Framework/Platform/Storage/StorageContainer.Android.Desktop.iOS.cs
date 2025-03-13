@@ -6,6 +6,7 @@ namespace Microsoft.Xna.Framework.Storage
     public partial class StorageContainer
     {
         internal string _storagePath;
+        internal const string SAVE_DATA_FILENAME = "save.data";
 
         private void PlatformCreateDirectory(string directoryName)
         {
@@ -111,14 +112,53 @@ namespace Microsoft.Xna.Framework.Storage
             return File.Open(filePath, fileMode, fileAccess, fileShare);
         }
 
-        private byte[] PlatformReadContainers(bool value)
+        private byte[] PlatformReadContainers(bool mount) // mount variable used in other platforms
         {
-            throw new NotImplementedException();
+            try
+            {
+                if (PlatformFileExists(SAVE_DATA_FILENAME))
+                {
+                    // Open the file in read-only mode with shared access for reading
+                    using (var stream = PlatformOpenFile(SAVE_DATA_FILENAME, FileMode.Open, FileAccess.Read, FileShare.Read))
+                    {
+                        if (stream.Length == 0)
+                            return null; // Handle empty file case gracefully
+
+                        // Read entire stream into a byte array
+                        using (var memoryStream = new MemoryStream())
+                        {
+                            stream.CopyTo(memoryStream);
+                            return memoryStream.ToArray();
+                        }
+                    }
+                }
+                else
+                {
+                    Console.WriteLine($"File: {Path.Combine(_storagePath, SAVE_DATA_FILENAME)}, does NOT exist.");
+                    return null;
+                }
+            }
+            catch (Exception ex)
+            {
+                // Log or handle unexpected errors
+                Console.WriteLine($"Error reading {Path.Combine(_storagePath, SAVE_DATA_FILENAME)}. Error: {ex.Message}");
+                return null;
+            }
         }
 
-        private void PlatformWriteContainers(byte[] data, bool value)
+        private void PlatformWriteContainers(byte[] data, bool mount) // mount variable used in other platforms
         {
-            throw new NotImplementedException();
+            if (data == null || data.Length == 0)
+                return;
+
+            // If the file exists, delete it to ensure clean data
+            PlatformDeleteFile(SAVE_DATA_FILENAME);
+
+            // Create a new file and write the data
+            using (var fileStream = PlatformCreateFile(SAVE_DATA_FILENAME))
+            {
+                fileStream.Write(data, 0, data.Length);
+            }
         }
     }
 }
