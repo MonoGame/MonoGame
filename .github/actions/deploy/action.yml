@@ -1,33 +1,31 @@
 name: Deploy
+description: 'Deploys the MonoGame NuGet packages and makes a release'
+inputs:
+  shell:
+    description: 'Shell to use for the action'
+    required: true
 
-on:
-  workflow_call:
-    inputs:
-      os:
-        required: true
-        type: string
+runs:
+  using: "composite"
+  steps:
+    - name: Expose GitHub Runtime
+      uses: crazy-max/ghaction-github-runtime@v3
 
-jobs:
-  deploy:
-    runs-on: ${{ inputs.os }}
-    steps:
-      - name: Expose GitHub Runtime
-        uses: crazy-max/ghaction-github-runtime@v3
+    - name: Push Nugets
+      run: dotnet run --project build/Build.csproj -- --target=Deploy
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}
+        MARKETPLACE_PAT: ${{ secrets.MARKETPLACE_PAT }}
+      shell: ${{ inputs.shell }}
 
-      - name: Push Nugets
-        run: dotnet run --project build/Build.csproj -- --target=Deploy
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}
-          MARKETPLACE_PAT: ${{ secrets.MARKETPLACE_PAT }}
-
-      - name: Make a Release
-        if: github.ref_type == 'tag'
-        uses: ncipollo/release-action@v1
-        with:
-          name: "MonoGame ${{ github.ref_name }}"
-          tag: ${{ github.ref_name }}
-          allowUpdates: true
-          removeArtifacts: true
-          artifacts: "nugets/*.nupkg;vsix/MonoGame.Templates.VSExtension.vsix"
-          token: ${{ secrets.GITHUB_TOKEN }}
+    - name: Make a Release
+      if: github.ref_type == 'tag'
+      uses: ncipollo/release-action@v1
+      with:
+        name: "MonoGame ${{ github.ref_name }}"
+        tag: ${{ github.ref_name }}
+        allowUpdates: true
+        removeArtifacts: true
+        artifacts: "nugets/*.nupkg;vsix/MonoGame.Templates.VSExtension.vsix"
+        token: ${{ secrets.GITHUB_TOKEN }}

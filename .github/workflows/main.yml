@@ -18,27 +18,29 @@ jobs:
             shell: bash
             filter: --where="Category != Audio"
     runs-on: ${{ matrix.os }}
+    env:
+      CI: true    
     steps:
       - name: Clone repository
         uses: actions/checkout@v4
         with:
           submodules: recursive      
+
       - uses: ./.github/actions/checkdependencies
         name: Check Dependencies
         with:
-          os: ${{ matrix.os }}
+          platform: ${{ matrix.platform }}
+          shell: ${{ matrix.shell }}
+
       - uses: ./.github/actions/build
         name: Build
         with:
-          os: ${{ matrix.os }}
           platform: ${{ matrix.platform }}
           shell: ${{ matrix.shell }}
-          filter: ${{ matrix.filter }}
 
       - uses: ./.github/actions/tests
         name: Tests
         with:
-          os: ${{ matrix.os }}
           platform: ${{ matrix.platform }}
           shell: ${{ matrix.shell }}
           filter: ${{ matrix.filter }}
@@ -46,7 +48,6 @@ jobs:
       - uses: ./.github/actions/tests-graphics
         name: Graphics Tests
         with:
-          os: ${{ matrix.os }}
           platform: ${{ matrix.platform }}
           shell: ${{ matrix.shell }}
           filter: ${{ matrix.filter }}
@@ -55,5 +56,5 @@ jobs:
       - uses: ./.github/actions/deploy
         name: Deploy
         with:
-          os: ${{ matrix.os }}
+          shell: ${{ matrix.shell }}
         if: ${{ github.event_name == 'push' && success() }}

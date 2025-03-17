@@ -1,27 +1,19 @@
 name: Graphics Tests Workflow
+description: 'Graphics tests action to run the MonoGame Framework graphics tests'
+inputs:
+  platform:
+    description: 'Platform to run the action on'
+    required: true
+  shell:
+    description: 'Shell to use for the action'
+    required: true
+  filter:
+    description: 'Filter to apply to the tests'
+    required: true
 
-on:
-  workflow_call:
-    inputs:
-      os:
-        required: true
-        type: string
-      platform:
-        required: true
-        type: string
-      shell:
-        required: true
-        type: string
-      filter:
-        required: true
-        type: string
-jobs:
-  tests:
-    runs-on: ${{ inputs.os }}
-    defaults:
-      run:
-        shell: ${{ inputs.shell }}
-    steps:
+runs:
+  using: "composite"
+  steps:
       - name: Download Nuget
         uses: actions/download-artifact@v4
         with:
@@ -49,146 +41,122 @@ jobs:
 
       - name: Run Graphics.BlendStateTest Tests
         run: dotnet MonoGame.Tests.dll --timeout=300000 --test MonoGame.Tests.Graphics.BlendStateTest
-        env:
-          CI: true
         working-directory: tests-desktopgl
+        shell: ${{ inputs.shell }}
 
       - name: Run Graphics.DepthStencilStateTest Tests
         run: dotnet MonoGame.Tests.dll --timeout=300000 --test MonoGame.Tests.Graphics.DepthStencilStateTest
-        env:
-          CI: true
         working-directory: tests-desktopgl
+        shell: ${{ inputs.shell }}
 
       - name: Run Graphics.EffectTest Tests
         run: dotnet MonoGame.Tests.dll --timeout=300000 --test MonoGame.Tests.Graphics.EffectTest
-        env:
-          CI: true
         working-directory: tests-desktopgl
+        shell: ${{ inputs.shell }}
 
       - name: Run Graphics.GraphicsAdapterTest Tests
         run: dotnet MonoGame.Tests.dll --timeout=300000 --test MonoGame.Tests.Graphics.GraphicsAdapterTest
-        env:
-          CI: true
         working-directory: tests-desktopgl
+        shell: ${{ inputs.shell }}
 
       # This test hangs on MacOS?
       - name: Run Graphics.GraphicsDeviceTest Tests
-        run: dotnet MonoGame.Tests.dll --timeout=300000 --test MonoGame.Tests.Graphics.GraphicsDeviceTest
-        env:
-          CI: true
-        working-directory: tests-desktopgl
         if: ${{ inputs.platform != 'macos' }}
+        run: dotnet MonoGame.Tests.dll --timeout=300000 --test MonoGame.Tests.Graphics.GraphicsDeviceTest
+        working-directory: tests-desktopgl
+        shell: ${{ inputs.shell }}
 
       - name: Run Graphics.IndexBufferTest Tests
         run: dotnet MonoGame.Tests.dll --timeout=300000 --test MonoGame.Tests.Graphics.IndexBufferTest
-        env:
-          CI: true
         working-directory: tests-desktopgl
+        shell: ${{ inputs.shell }}
 
       - name: Run Graphics.MiscellaneousTests Tests
         run: dotnet MonoGame.Tests.dll --timeout=300000 --test MonoGame.Tests.Graphics.MiscellaneousTests
-        env:
-          CI: true
         working-directory: tests-desktopgl
+        shell: ${{ inputs.shell }}
 
       - name: Run Graphics.ModelTest Tests
         run: dotnet MonoGame.Tests.dll --timeout=300000 --test MonoGame.Tests.Graphics.ModelTest
-        env:
-          CI: true
         working-directory: tests-desktopgl
+        shell: ${{ inputs.shell }}
 
       - name: Run Graphics.OcclusionQueryTest Tests
         run: dotnet MonoGame.Tests.dll --timeout=300000 --test MonoGame.Tests.Graphics.OcclusionQueryTest
-        env:
-          CI: true
         working-directory: tests-desktopgl
+        shell: ${{ inputs.shell }}
 
       - name: Run Graphics.RasterizerStateTest Tests
         run: dotnet MonoGame.Tests.dll --timeout=300000 --test MonoGame.Tests.Graphics.RasterizerStateTest
-        env:
-          CI: true
         working-directory: tests-desktopgl
+        shell: ${{ inputs.shell }}
 
       - name: Run Graphics.RenderTarget2DTest Tests
         run: dotnet MonoGame.Tests.dll --timeout=300000 --test MonoGame.Tests.Graphics.RenderTarget2DTest
-        env:
-          CI: true
         working-directory: tests-desktopgl
+        shell: ${{ inputs.shell }}
 
       - name: Run Graphics.RenderTargetCubeTest Tests
         run: dotnet MonoGame.Tests.dll --timeout=300000 --test MonoGame.Tests.Graphics.RenderTargetCubeTest
-        env:
-          CI: true
         working-directory: tests-desktopgl
+        shell: ${{ inputs.shell }}
 
       - name: Run Graphics.SamplerStateTest Tests
         run: dotnet MonoGame.Tests.dll --timeout=300000 --test MonoGame.Tests.Graphics.SamplerStateTest
-        env:
-          CI: true
         working-directory: tests-desktopgl
+        shell: ${{ inputs.shell }}
 
       - name: Run Graphics.ScissorRectangleTest Tests
         run: dotnet MonoGame.Tests.dll --timeout=300000 --test MonoGame.Tests.Graphics.ScissorRectangleTest
-        env:
-          CI: true
         working-directory: tests-desktopgl
+        shell: ${{ inputs.shell }}
 
       - name: Run Graphics.ShaderTest Tests
         run: dotnet MonoGame.Tests.dll --timeout=300000 --test MonoGame.Tests.Graphics.ShaderTest
-        env:
-          CI: true
         working-directory: tests-desktopgl
+        shell: ${{ inputs.shell }}
 
       - name: Run Graphics.SpriteBatchTest Tests
         run: dotnet MonoGame.Tests.dll --timeout=300000 --test MonoGame.Tests.Graphics.SpriteBatchTest
-        env:
-          CI: true
         working-directory: tests-desktopgl
+        shell: ${{ inputs.shell }}
 
       - name: Run Graphics.SpriteFontTest Tests
         run: dotnet MonoGame.Tests.dll --timeout=300000 --test MonoGame.Tests.Graphics.SpriteFontTest
-        env:
-          CI: true
         working-directory: tests-desktopgl
+        shell: ${{ inputs.shell }}
 
       - name: Run Graphics.Texture2DNonVisualTest Tests
         run: dotnet MonoGame.Tests.dll --timeout=300000 --test MonoGame.Tests.Graphics.Texture2DNonVisualTest
-        env:
-          CI: true
         working-directory: tests-desktopgl
+        shell: ${{ inputs.shell }}
 
       - name: Run Graphics.Texture2DTest Tests
         run: dotnet MonoGame.Tests.dll --timeout=300000 --test MonoGame.Tests.Graphics.Texture2DTest
-        env:
-          CI: true
         working-directory: tests-desktopgl
+        shell: ${{ inputs.shell }}
 
       - name: Run Graphics.Texture3DNonVisualTest Tests
         run: dotnet MonoGame.Tests.dll --timeout=300000 --test MonoGame.Tests.Graphics.Texture3DNonVisualTest
-        env:
-          CI: true
         working-directory: tests-desktopgl
+        shell: ${{ inputs.shell }}
 
       - name: Run Graphics.Texture3DTest Tests
         run: dotnet MonoGame.Tests.dll --timeout=300000 --test MonoGame.Tests.Graphics.Texture3DTest
-        env:
-          CI: true
         working-directory: tests-desktopgl
+        shell: ${{ inputs.shell }}
 
       - name: Run Graphics.TextureCubeTest Tests
         run: dotnet MonoGame.Tests.dll --timeout=300000 --test MonoGame.Tests.Graphics.TextureCubeTest
-        env:
-          CI: true
         working-directory: tests-desktopgl
+        shell: ${{ inputs.shell }}
 
       - name: Run Graphics.VertexBufferTest Tests
         run: dotnet MonoGame.Tests.dll --timeout=300000 --test MonoGame.Tests.Graphics.VertexBufferTest
-        env:
-          CI: true
         working-directory: tests-desktopgl
+        shell: ${{ inputs.shell }}
 
       - name: Run Graphics.ViewportTest Tests
         run: dotnet MonoGame.Tests.dll --timeout=300000 --test MonoGame.Tests.Graphics.ViewportTest
-        env:
-          CI: true
         working-directory: tests-desktopgl
+        shell: ${{ inputs.shell }}

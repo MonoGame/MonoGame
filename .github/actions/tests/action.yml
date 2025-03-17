@@ -1,27 +1,19 @@
 name: Tests Workflow
+description: 'Tests action to run the MonoGame Framework tests'
+inputs:
+  platform:
+    description: 'Platform to run the action on'
+    required: true
+  shell:
+    description: 'Shell to use for the action'
+    required: true
+  filter:
+    description: 'Filter to apply to the tests'
+    required: true
 
-on:
-  workflow_call:
-    inputs:
-      os:
-        required: true
-        type: string
-      platform:
-        required: true
-        type: string
-      shell:
-        required: true
-        type: string
-      filter:
-        required: true
-        type: string
-jobs:
-  tests:
-    runs-on: ${{ inputs.os }}
-    defaults:
-      run:
-        shell: ${{ inputs.shell }}
-    steps:
+runs:
+  using: "composite"
+  steps:
       - name: Download Nuget
         uses: actions/download-artifact@v4
         with:
@@ -49,22 +41,19 @@ jobs:
 
       - name: Run Tools Tests
         run: dotnet test "tests tools/MonoGame.Tools.Tests.dll" --blame-hang-timeout 1m --filter="TestCategory!=Effects"
-        env:
-          CI: true
+        shell: ${{ inputs.shell }}
 
       - name: Run DirectX Audio Tests
-        run: dotnet test --filter Category=Audio MonoGame.Tests.dll
-        env:
-          CI: true
-        working-directory: tests-windowsdx
         if: ${{ inputs.platform == 'windows' }}
+        run: dotnet test --filter Category=Audio MonoGame.Tests.dll
+        working-directory: tests-windowsdx
+        shell: ${{ inputs.shell }}
 
       - name: Run DirectX All Tests Except Audio
-        run: dotnet test --filter Category!=Audio MonoGame.Tests.dll
-        env:
-          CI: true
-        working-directory: tests-windowsdx
         if: ${{ inputs.platform == 'windows' }}
+        run: dotnet test --filter Category!=Audio MonoGame.Tests.dll
+        working-directory: tests-windowsdx
+        shell: ${{ inputs.shell }}
 
       # Run the DesktopGL tests on all platforms using NUnitLite runner not dotnet test
       # We have to run this is bits because the tests crash if too many are run in one go?
@@ -73,27 +62,24 @@ jobs:
         env:
           CI: true
         working-directory: tests-desktopgl
+        shell: ${{ inputs.shell }}
 
       - name: Run Audio Tests
         run: dotnet MonoGame.Tests.dll --timeout=300000 --test MonoGame.Tests.Audio
-        env:
-          CI: true
         working-directory: tests-desktopgl
+        shell: ${{ inputs.shell }}
 
       - name: Run Input Tests
         run: dotnet MonoGame.Tests.dll --timeout=300000 --test MonoGame.Tests.Input
-        env:
-          CI: true
         working-directory: tests-desktopgl
+        shell: ${{ inputs.shell }}
 
       - name: Run Visual Tests
         run: dotnet MonoGame.Tests.dll --timeout=300000 --test MonoGame.Tests.Visual
-        env:
-          CI: true
         working-directory: tests-desktopgl
+        shell: ${{ inputs.shell }}
 
       - name: Run Game Tests
         run: dotnet MonoGame.Tests.dll --timeout=300000 --where="Category = GameTest"
-        env:
-          CI: true
         working-directory: tests-desktopgl
+        shell: ${{ inputs.shell }}

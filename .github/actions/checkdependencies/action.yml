@@ -1,97 +1,90 @@
-name: Check Dependencies
+name: 'Check Dependencies'
+description: 'Check Dependencies for MonoGame'
+inputs:
+  platform:
+    description: 'Platform to run the action on'
+    required: true
+  shell:
+    description: 'Shell to use for the action'
+    required: true
 
-on:
-  workflow_call:
-    inputs:
-      os:
-        required: true
-        type: string
-      platform:
-        required: true
-        type: string
-      shell:
-        required: true
-        type: string
+runs:
+  using: "composite"
+  steps:
+    - name: Setup .NET Core SDK
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: "8.0.x"
 
-jobs:
-  build:
-    name: Build on ${{ inputs.os }}
-    runs-on: ${{ inputs.os }}
-    defaults:
-      run:
-        shell: ${{ inputs.shell }}
-    env:
-      CI: true
-    steps:
-      - name: Setup .NET Core SDK
-        uses: actions/setup-dotnet@v4
-        with:
-          dotnet-version: "8.0.x"
+    - name: Add msbuild to PATH
+      if: inputs.platform == 'windows'
+      uses: microsoft/setup-msbuild@v1.0.2
 
-      - name: Add msbuild to PATH
-        if: inputs.platform == 'windows'
-        uses: microsoft/setup-msbuild@v1.0.2
+    - name: Setup Premake5
+      uses: abel0b/setup-premake@v2.4
+      with:
+        version: "5.0.0-beta2"
 
-      - name: Setup Premake5
-        uses: abel0b/setup-premake@v2.4
-        with:
-          version: "5.0.0-beta2"
+    - name: Setup Java
+      uses: actions/setup-java@v4
+      with:
+        distribution: "microsoft"
+        java-version: "17"
 
-      - name: Setup Java
-        uses: actions/setup-java@v4
-        with:
-          distribution: "microsoft"
-          java-version: "17"
+    - name: Install Vulkan SDK
+      uses: humbletim/setup-vulkan-sdk@523828e49cd4afabce369c39c7ee6543a2b7a735
+      with:
+        vulkan-query-version: 1.3.283.0
+        vulkan-use-cache: true
 
-      - name: Install Vulkan SDK
-        uses: humbletim/setup-vulkan-sdk@523828e49cd4afabce369c39c7ee6543a2b7a735
-        with:
-          vulkan-query-version: 1.3.283.0
-          vulkan-use-cache: true
+    - name: Disable Annotations
+      run: echo "::remove-matcher owner=csc::"
+      shell: ${{ inputs.shell }}
 
-      - name: Disable Annotations
-        run: echo "::remove-matcher owner=csc::"
+    ## Install Dependencies
 
-      ## Install Dependencies
+    - name: Install Windows Dependencies
+      if: ${{ inputs.platform == 'windows' }}
+      run: |
+        dotnet.exe workload install android
+      shell: ${{ inputs.shell }}
 
-      - name: Install Windows Dependencies
-        if: ${{ inputs.platform == 'windows' }}
-        run: |
-          dotnet.exe workload install android
+    - name: Install Mac Dependencies
+      if: ${{ inputs.platform == 'macos' }}
+      run: |
+        dotnet workload install android macos ios
+        brew install wine-stable p7zip
+        sudo mkdir -p /usr/local/lib
+        ls -n /Applications/ | grep Xcode*
+        sudo xcode-select -s /Applications/Xcode_16.2.app/Contents/Developer
+        wget -qO- https://monogame.net/downloads/net9_mgfxc_wine_setup.sh | bash
+      shell: ${{ inputs.shell }}
 
-      - name: Install Mac Dependencies
-        if: ${{ inputs.platform == 'macos' }}
-        run: |
-          dotnet workload install android macos ios
-          brew install wine-stable p7zip
-          sudo mkdir -p /usr/local/lib
-          ls -n /Applications/ | grep Xcode*
-          sudo xcode-select -s /Applications/Xcode_16.2.app/Contents/Developer
-          wget -qO- https://monogame.net/downloads/net9_mgfxc_wine_setup.sh | bash
+    - name: Install Linux Dependencies
+      if: ${{ inputs.platform == 'linux' }}
+      run: |
+        dotnet workload install android
+        sudo apt install p7zip-full curl
+        sudo dpkg --add-architecture i386 
+        sudo mkdir -pm755 /etc/apt/keyrings
+        sudo wget -O /etc/apt/keyrings/winehq-archive.key https://dl.winehq.org/wine-builds/winehq.key
+        sudo wget -NP /etc/apt/sources.list.d/ https://dl.winehq.org/wine-builds/ubuntu/dists/jammy/winehq-jammy.sources
+        sudo apt update && sudo apt install --install-recommends winehq-stable
+        echo "ttf-mscorefonts-installer msttcorefonts/accepted-mscorefonts-eula select true" | sudo debconf-set-selections
+        sudo apt install -y ttf-mscorefonts-installer
+        sudo fc-cache
+        fc-match Arial
+        wine64 --version
+        wget -qO- https://monogame.net/downloads/net9_mgfxc_wine_setup.sh | bash
+      shell: ${{ inputs.shell }}
 
-      - name: Install Linux Dependencies
-        if: ${{ inputs.platform == 'linux' }}
-        run: |
-          dotnet workload install android
-          sudo apt install p7zip-full curl
-          sudo dpkg --add-architecture i386 
-          sudo mkdir -pm755 /etc/apt/keyrings
-          sudo wget -O /etc/apt/keyrings/winehq-archive.key https://dl.winehq.org/wine-builds/winehq.key
-          sudo wget -NP /etc/apt/sources.list.d/ https://dl.winehq.org/wine-builds/ubuntu/dists/jammy/winehq-jammy.sources
-          sudo apt update && sudo apt install --install-recommends winehq-stable
-          echo "ttf-mscorefonts-installer msttcorefonts/accepted-mscorefonts-eula select true" | sudo debconf-set-selections
-          sudo apt install -y ttf-mscorefonts-installer
-          sudo fc-cache
-          fc-match Arial
-          wine64 --version
-          wget -qO- https://monogame.net/downloads/net9_mgfxc_wine_setup.sh | bash
+    ## Arial Font Setup
 
-      ## Arial Font Setup
-
-      - name: Install Arial Font
-        run: |
-          echo "ttf-mscorefonts-installer msttcorefonts/accepted-mscorefonts-eula select true" | sudo debconf-set-selections
-          sudo apt install -y ttf-mscorefonts-installer
-          sudo fc-cache
-          fc-match Arial
-        if: ${{ inputs.platform == 'linux' }}
+    - name: Install Arial Font
+      run: |
+        echo "ttf-mscorefonts-installer msttcorefonts/accepted-mscorefonts-eula select true" | sudo debconf-set-selections
+        sudo apt install -y ttf-mscorefonts-installer
+        sudo fc-cache
+        fc-match Arial
+      if: ${{ inputs.platform == 'linux' }}
+      shell: ${{ inputs.shell }}
