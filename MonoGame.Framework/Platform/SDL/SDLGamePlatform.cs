@@ -152,7 +152,7 @@ namespace Microsoft.Xna.Framework
                         char character = (char)ev.Key.Keysym.Sym;
                         _view.OnKeyDown(new InputKeyEventArgs(key));
                         if (char.IsControl(character))
-                            _view.OnTextInput(new TextInputEventArgs(character, key));
+                            _view.OnTextInput(new TextInputEventArgs(character, 0));
                         break;
                     }
                     case Sdl.EventType.KeyUp:
@@ -163,9 +163,11 @@ namespace Microsoft.Xna.Framework
                         break;
                     }
                     case Sdl.EventType.TextInput:
+                    case Sdl.EventType.TextEditing:
                         if (_view.IsTextInputHandled)
                         {
                             int len = 0;
+                            int index = 0;
                             int utf8character = 0; // using an int to encode multibyte characters longer than 2 bytes
                             byte currentByte = 0;
                             int charByteSize = 0; // UTF8 char length to decode
@@ -203,12 +205,17 @@ namespace Microsoft.Xna.Framework
 
                                         // SDL returns UTF8-encoded characters while C# char type is UTF16-encoded (and limited to the 0-FFFF range / does not support surrogate pairs)
                                         // so we need to convert it to Unicode codepoint and check if it's within the supported range
-                                        int codepoint = UTF8ToUnicode(utf8character);
+                                        int codePoint = UTF8ToUnicode(utf8character);
 
-                                        if (codepoint >= 0 && codepoint < 0xFFFF)
+                                        if (codePoint >= 0)
                                         {
-                                            _view.OnTextInput(new TextInputEventArgs((char)codepoint, KeyboardUtil.ToXna(codepoint)));
+                                            if(ev.Type == Sdl.EventType.TextInput)
+                                                _view.OnTextInput(new TextInputEventArgs((uint)codePoint, (uint)index));
+                                            else
+                                                _view.OnTextEditing(new TextInputEventArgs((uint)codePoint, (uint)index));
                                             // UTF16 characters beyond 0xFFFF are not supported (and would require a surrogate encoding that is not supported by the char type)
+                                            index++;
+                                            if (codePoint > 0xFFFF) index++;
                                         }
                                     }
 

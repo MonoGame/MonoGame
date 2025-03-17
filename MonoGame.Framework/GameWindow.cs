@@ -139,13 +139,30 @@ namespace Microsoft.Xna.Framework
         internal bool IsTextInputHandled { get { return TextInput != null; } }
 
         /// <summary>
+		/// Use this event to user text editing(composition).
+		/// 
+		/// This event is not raised by noncharacter keys except control characters such as backspace, tab, carriage return and escape.
+		/// This event also supports key repeat.
+		/// </summary>
+		/// <remarks>
+		/// This event is only supported on desktop platforms.
+		/// </remarks>
+		public event EventHandler<TextInputEventArgs> TextEditing;
+
+        /// <summary>
         /// Buffered keyboard KeyDown event.
         /// </summary>
+		/// <remarks>
+		/// This event is only supported on desktop platforms.
+		/// </remarks>
 		public event EventHandler<InputKeyEventArgs> KeyDown;
 
         /// <summary>
         /// Buffered keyboard KeyUp event.
         /// </summary>
+		/// <remarks>
+		/// This event is only supported on desktop platforms.
+		/// </remarks>
         public event EventHandler<InputKeyEventArgs> KeyUp;
 
 #endif
@@ -237,6 +254,10 @@ namespace Microsoft.Xna.Framework
 		internal void OnTextInput(TextInputEventArgs e)
 		{
             EventHelpers.Raise(this, TextInput, e);
+		}
+		internal void OnTextEditing(TextInputEventArgs e)
+		{
+            EventHelpers.Raise(this, TextEditing, e);
 		}
         internal void OnKeyDown(InputKeyEventArgs e)
 	    {

@@ -119,7 +119,7 @@ class NativeGamePlatform : GamePlatform
                 {
                     var window = NativeGameWindow.FromHandle(event_.Key.Window);
                     var key = event_.Key.Key;
-                    var character = (char)event_.Key.Character;
+                    var character = event_.Key.CodePoint;
 
                     if (!Keyboard.Keys.Contains(key))
                         Keyboard.Keys.Add(key);
@@ -128,8 +128,8 @@ class NativeGamePlatform : GamePlatform
                     { 
                         window.OnKeyDown(new InputKeyEventArgs(key));
 
-                        if (window.IsTextInputHandled && char.IsControl(character))
-                            window.OnTextInput(new TextInputEventArgs(character, key));
+                        if (window.IsTextInputHandled && char.IsControl((char)character))
+                            window.OnTextInput(new TextInputEventArgs(character, 0));
                     }
 
                     break;
@@ -153,9 +153,21 @@ class NativeGamePlatform : GamePlatform
                     var window = NativeGameWindow.FromHandle(event_.Key.Window);
                     if (window != null && window.IsTextInputHandled)
                     {
-                        var key = event_.Key.Key;
-                        var character = (char)event_.Key.Character;
-                        window.OnTextInput(new TextInputEventArgs(character, key));
+                        var character = event_.Text.CharacterCodePoint;
+                        var index = event_.Text.CharacterIndex;
+                        window.OnTextInput(new TextInputEventArgs(character, index));
+                    }
+                    break;
+                }
+
+                case EventType.TextEditing:
+                {
+                    var window = NativeGameWindow.FromHandle(event_.Key.Window);
+                    if (window != null)
+                    {
+                        var character = event_.Text.CharacterCodePoint;
+                        var index = event_.Text.CharacterIndex;
+                        window.OnTextEditing(new TextInputEventArgs(character, index));
                     }
                     break;
                 }

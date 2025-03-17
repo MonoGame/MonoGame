@@ -49,6 +49,7 @@
     <Compile Include="Platform\TitleContainer.Desktop.cs" />
     <Compile Include="Platform\Utilities\AssemblyHelper.cs" />
     <Compile Include="Platform\Utilities\CurrentPlatform.cs" />
+    <Compile Include="Platform\Utilities\FuncLoader.Desktop.cs" />
     <Compile Include="Platform\Utilities\ReflectionHelpers.Legacy.cs" />
     <Compile Include="Platform\Utilities\TimerHelper.cs" />
     <Compile Include="Platform\Windows\Accessibility\MouseKeys.cs" />

@@ -12,25 +12,30 @@ namespace Microsoft.Xna.Framework
     /// </summary>
     public struct TextInputEventArgs
     {
+
+        /// <summary>
+        /// The character from the text event.
+        /// </summary>
+        public readonly uint CharacterCodePoint;
+
+        /// <summary>
+        /// The character position of string.
+        /// </summary>
+        public readonly uint CharacterIndex;
         /// <summary>
         /// Creates an instance of <see cref="TextInputEventArgs"/>.
         /// </summary>
-        /// <param name="character">Character for the key that was pressed.</param>
-        /// <param name="key">The pressed key.</param>
-        public TextInputEventArgs(char character, Keys key = Keys.None)
+        /// <param name="characterCodePoint">The character from the text event</param>
+        /// <param name="characterIndex">The character position of string.</param>
+        public TextInputEventArgs(uint characterCodePoint, uint characterIndex = 0)
         {
-            Character = character;
-            Key = key;
+            CharacterCodePoint = characterCodePoint;
+            CharacterIndex = characterIndex;
         }
 
         /// <summary>
-        /// The character for the key that was pressed.
+        /// the formatted character from the text event.
         /// </summary>
-        public readonly char Character;
-
-        /// <summary>
-        /// The pressed key.
-        /// </summary>
-        public readonly Keys Key;
+        public string Character => char.ConvertFromUtf32((int)CharacterCodePoint);
     }
 }
