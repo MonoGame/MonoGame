@@ -19,6 +19,10 @@ jobs:
             filter: --where="Category != Audio"
     runs-on: ${{ matrix.os }}
     steps:
+      - name: Clone repository
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive      
       - uses: ./.github/workflows/checkdependencies
         name: Check Dependencies
         with:

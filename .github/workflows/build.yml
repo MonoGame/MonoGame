@@ -26,11 +26,6 @@ jobs:
     env:
       CI: true
     steps:
-      - name: Clone repository
-        uses: actions/checkout@v4
-        with:
-          submodules: recursive
-
       - name: Build
         run: dotnet run --project build/Build.csproj -- --target=Default
 

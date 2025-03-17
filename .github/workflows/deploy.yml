@@ -11,9 +11,6 @@ jobs:
   deploy:
     runs-on: ${{ inputs.os }}
     steps:
-      - name: Clone Repository
-        uses: actions/checkout@v4
-
       - name: Expose GitHub Runtime
         uses: crazy-max/ghaction-github-runtime@v3
 
