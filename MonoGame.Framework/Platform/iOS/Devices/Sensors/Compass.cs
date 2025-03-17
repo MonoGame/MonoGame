@@ -22,6 +22,7 @@ namespace Microsoft.Devices.Sensors
         /// Event that is triggered when the user calibrates the compass
         /// </summary>
         public event EventHandler<CalibrationEventArgs> Calibrate;
+        static readonly CMMotionManager motionManager = new CMMotionManager();
 
         /// <summary>
         /// Gets a value indicating whether the compass is supported on the current device.

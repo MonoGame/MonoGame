@@ -23,6 +23,7 @@
     <Compile Remove="Platform\**\*" />
     <Compile Remove="Properties\**\*" />
     <Compile Remove="Utilities\System.Numerics.Vectors\**\*" />
+    <Compile Remove="Microsoft\**\*" />
   </ItemGroup>
 
   <ItemGroup>
@@ -85,5 +86,5 @@
 
   <Import Project="Platform\OpenGL.targets" />
   <Import Project="Platform\OpenAL.targets" />
-  <Import Project="Platform\Microsoft.Devices.Sensors.targets" />
+  <Import Project="Microsoft.Devices.Sensors.targets" />
 </Project>
