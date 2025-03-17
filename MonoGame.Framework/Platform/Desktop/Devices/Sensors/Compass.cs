@@ -57,7 +57,7 @@ namespace Microsoft.Devices.Sensors
         }
 
         /// <summary>
-        /// Stops data acquisition from the accelerometer.
+        /// Stops data acquisition from the compass.
         /// </summary>
         public override void Stop()
         {
