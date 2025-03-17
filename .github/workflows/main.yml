@@ -19,11 +19,11 @@ jobs:
             filter: --where="Category != Audio"
     runs-on: ${{ matrix.os }}
     steps:
-      - uses: checkdependencies.yml
+      - uses: ./.github/workflows/checkdependencies
         name: Check Dependencies
         with:
           os: ${{ matrix.os }}
-      - uses: build.yml
+      - uses: ./.github/workflows/build
         name: Build
         with:
           os: ${{ matrix.os }}
@@ -31,7 +31,7 @@ jobs:
           shell: ${{ matrix.shell }}
           filter: ${{ matrix.filter }}
 
-      - uses: tests.yml
+      - uses: ./.github/workflows/tests
         name: Tests
         with:
           os: ${{ matrix.os }}
@@ -39,7 +39,7 @@ jobs:
           shell: ${{ matrix.shell }}
           filter: ${{ matrix.filter }}
 
-      - uses: tests-graphics.yml
+      - uses: ./.github/workflows/tests-graphics
         name: Graphics Tests
         with:
           os: ${{ matrix.os }}
@@ -48,7 +48,7 @@ jobs:
           filter: ${{ matrix.filter }}
         if: ${{ runner.environment != 'github-hosted'}}
 
-      - uses: deploy.yml
+      - uses: ./.github/workflows/deploy
         name: Deploy
         with:
           os: ${{ matrix.os }}
