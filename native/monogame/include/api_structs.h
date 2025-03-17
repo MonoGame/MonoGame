@@ -173,8 +173,15 @@ struct MGM_VideoDecoderInfo
 struct MGP_KeyEvent
 {
     void* Window;
-    mguint Character;
+    mguint CodePoint;
     MGKeys Key;
+};
+
+struct MGP_TextEvent
+{
+    void* Window;
+    mguint CharacterCodePoint;
+    mguint CharacterIndex;
 };
 
 struct MGP_MouseMoveEvent
@@ -224,6 +231,7 @@ union {
     MGEventType Type;
     MG_FIELD_OFFSET(4, mgulong, Timestamp);
     MG_FIELD_OFFSET(12, MGP_KeyEvent, Key);
+    MG_FIELD_OFFSET(12, MGP_TextEvent, Text);
     MG_FIELD_OFFSET(12, MGP_MouseMoveEvent, MouseMove);
     MG_FIELD_OFFSET(12, MGP_MouseButtonEvent, MouseButton);
     MG_FIELD_OFFSET(12, MGP_MouseWheelEvent, MouseWheel);

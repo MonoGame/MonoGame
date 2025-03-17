@@ -27,6 +27,7 @@ internal enum EventType : uint
     KeyDown,
     KeyUp,
     TextInput,
+    TextEditing,
 
     MouseMove,
     MouseButtonDown,
@@ -54,8 +55,16 @@ internal struct MGP_WindowEvent
 internal struct MGP_KeyEvent
 {
     public nint Window;
-    public uint Character;
+    public uint CodePoint;
     public Keys Key;
+}
+
+[StructLayout(LayoutKind.Sequential)]
+internal struct MGP_TextEvent
+{
+    public nint Window;
+    public uint CharacterCodePoint;
+    public uint CharacterIndex;
 }
 
 [StructLayout(LayoutKind.Sequential)]
@@ -179,6 +188,9 @@ internal struct MGP_Event
 
     [FieldOffset(12)]
     public MGP_KeyEvent Key;
+
+    [FieldOffset(12)]
+    public MGP_TextEvent Text;
 
     [FieldOffset(12)]
     public MGP_MouseMoveEvent MouseMove;

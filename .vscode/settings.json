@@ -2,5 +2,36 @@
     "dotnetCoreExplorer.searchpatterns": [
         "Artifacts/Tests/**/MonoGame.Tests.dll",
         "Artifacts/Tests/**/MonoGame.Tools.Tests.dll"
-    ]
+    ],
+    "files.associations": {
+        "*.json.liquid": "json",
+        "*.yaml.liquid": "yaml",
+        "*.md.liquid": "markdown",
+        "*.js.liquid": "liquid-javascript",
+        "*.css.liquid": "liquid-css",
+        "*.scss.liquid": "liquid-scss",
+        "*.cginclude": "shaderlab",
+        "*.csv": "csv",
+        "sdl_error.h": "c",
+        "sdl_stdinc.h": "c",
+        "common.h": "c",
+        "sdl_androidmessagebox.h": "c",
+        "sdl_internal.h": "c",
+        "sdl_androidvideo.h": "c",
+        "sdl_android.h": "c",
+        "sdl_events_c.h": "c",
+        "sdl_keyboard_c.h": "c",
+        "sdl_clipboard.h": "c",
+        "sdl_config.h": "c",
+        "sdl_windows.h": "c",
+        "sdl_n3dstouch.h": "c",
+        "sdl_windowsclipboard.h": "c",
+        "sdl_loadso.h": "c",
+        "sdl_uikitvideo.h": "c",
+        "sdl_sysvideo.h": "c",
+        "close_code.h": "c",
+        "begin_code.h": "c",
+        "sdl_hints.h": "c",
+        "sdl_timer.h": "c"
+    }
 }

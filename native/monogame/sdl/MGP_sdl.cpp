@@ -504,7 +504,7 @@ mgbool MGP_Platform_PollEvent(MGP_Platform* platform, MGP_Event& event_)
             event_.Type = MGEventType::KeyDown;
 
             event_.Key.Window = MGP_WindowFromId(platform, ev.key.windowID);
-            event_.Key.Character = ev.key.keysym.sym;
+            event_.Key.CodePoint = ev.key.keysym.sym;
             event_.Key.Key = ToXNA(ev.key.keysym.sym);
 
             return true;
@@ -514,79 +514,26 @@ mgbool MGP_Platform_PollEvent(MGP_Platform* platform, MGP_Event& event_)
             event_.Type = MGEventType::KeyUp;
 
             event_.Key.Window = MGP_WindowFromId(platform, ev.key.windowID);
-            event_.Key.Character = ev.key.keysym.sym;
+            event_.Key.CodePoint = ev.key.keysym.sym;
             event_.Key.Key = ToXNA(ev.key.keysym.sym);
 
             return true;
         }
 
-        case SDL_TEXTINPUT:
+        case SDL_EventType::SDL_TEXTEDITING:
+        {
+            event_.Type = MGEventType::TextEditing;
+            event_.Text.Window = MGP_WindowFromId(platform, ev.text.windowID);
+            break;
+        }
+        case SDL_EventType::SDL_TEXTINPUT:
         {
             event_.Type = MGEventType::TextInput;
-            event_.Key.Window = MGP_WindowFromId(platform, ev.text.windowID);
-
-            int len = 0;
-            int utf8character = 0; // using an int to encode multibyte characters longer than 2 bytes
-            mgbyte currentByte = 0;
-            int charByteSize = 0; // UTF8 char length to decode
-            int remainingShift = 0;
-            while ((currentByte = ev.text.text[len]) != 0)
-            {
-                // we're reading the first UTF8 byte, we need to check if it's multibyte
-                if (charByteSize == 0)
-                {
-                    if (currentByte < 192)
-                        charByteSize = 1;
-                    else if (currentByte < 224)
-                        charByteSize = 2;
-                    else if (currentByte < 240)
-                        charByteSize = 3;
-                    else
-                        charByteSize = 4;
-
-                    utf8character = 0;
-                    remainingShift = 4;
-                }
-
-                // assembling the character
-                utf8character <<= 8;
-                utf8character |= currentByte;
-
-                charByteSize--;
-                remainingShift--;
-
-                if (charByteSize == 0) // finished decoding the current character
-                {
-                    utf8character <<= remainingShift * 8; // shifting it to full UTF8 scope
-
-                    // SDL returns UTF8-encoded characters while C# char type is UTF16-encoded (and limited to the 0-FFFF range / does not support surrogate pairs)
-                    // so we need to convert it to Unicode codepoint and check if it's within the supported range
-                    int codepoint = UTF8ToUnicode(utf8character);
-                    if (codepoint >= 0 && codepoint < 0xFFFF)
-                    {
-                        event_.Key.Character = codepoint;
-                        event_.Key.Key = ToXNA(codepoint);
-
-                        platform->queued_events.push(event_);
-
-                        // UTF16 characters beyond 0xFFFF are not supported (and would require a surrogate encoding that is not supported by the char type)
-                    }
-                }
-
-                len++;
-            }
-
-            if (platform->queued_events.size() > 0)
-            {
-                event_ = platform->queued_events.front();
-                platform->queued_events.pop();
-                return true;
-            }
-
+            event_.Text.Window = MGP_WindowFromId(platform, ev.text.windowID);
             break;
         }
 
-        case SDL_WINDOWEVENT:
+        case SDL_EventType::SDL_WINDOWEVENT:
         {
             event_.Window.Window = MGP_WindowFromId(platform, ev.window.windowID);
 
@@ -618,7 +565,7 @@ mgbool MGP_Platform_PollEvent(MGP_Platform* platform, MGP_Event& event_)
             break;
         }
 
-        case SDL_DROPFILE:
+        case SDL_EventType::SDL_DROPFILE:
         {
             event_.Type = MGEventType::DropFile;
             event_.Drop.Window = MGP_WindowFromId(platform, ev.drop.windowID);
@@ -631,7 +578,7 @@ mgbool MGP_Platform_PollEvent(MGP_Platform* platform, MGP_Event& event_)
             return true;
         }
 
-        case SDL_DROPCOMPLETE:
+        case SDL_EventType::SDL_DROPCOMPLETE:
             event_.Type = MGEventType::DropComplete;
             event_.Drop.Window = MGP_WindowFromId(platform, ev.drop.windowID);
             event_.Drop.File = nullptr;
@@ -639,6 +586,70 @@ mgbool MGP_Platform_PollEvent(MGP_Platform* platform, MGP_Event& event_)
         }
     }
 
+    if(event_.Type == MGEventType::TextEditing || event_.Type == MGEventType::TextInput)
+    {
+        int len = 0;
+        int index = 0;
+        int utf8character = 0; // using an int to encode multibyte characters longer than 2 bytes
+        mgbyte currentByte = 0;
+        int charByteSize = 0; // UTF8 char length to decode
+        int remainingShift = 0;
+        while ((currentByte = ev.text.text[len]) != 0)
+        {
+            // we're reading the first UTF8 byte, we need to check if it's multibyte
+            if (charByteSize == 0)
+            {
+                if (currentByte < 192)
+                    charByteSize = 1;
+                else if (currentByte < 224)
+                    charByteSize = 2;
+                else if (currentByte < 240)
+                    charByteSize = 3;
+                else
+                    charByteSize = 4;
+
+                utf8character = 0;
+                remainingShift = 4;
+            }
+
+            // assembling the character
+            utf8character <<= 8;
+            utf8character |= currentByte;
+
+            charByteSize--;
+            remainingShift--;
+
+            if (charByteSize == 0) // finished decoding the current character
+            {
+                utf8character <<= remainingShift * 8; // shifting it to full UTF8 scope
+
+                // SDL returns UTF8-encoded characters while C# char type is UTF16-encoded (and limited to the 0-FFFF range / does not support surrogate pairs)
+                // so we need to convert it to Unicode codepoint and check if it's within the supported range
+                int codepoint = UTF8ToUnicode(utf8character);
+                if (codepoint >= 0)
+                {
+                    event_.Text.CharacterCodePoint = codepoint;
+                    event_.Text.CharacterIndex = index;
+
+                    platform->queued_events.push(event_);
+
+                    index++;
+                    if (codePoint > 0xFFFF) index++;
+
+                    // UTF16 characters beyond 0xFFFF are not supported (and would require a surrogate encoding that is not supported by the char type)
+                }
+            }
+
+            len++;
+        }
+
+        if (platform->queued_events.size() > 0)
+        {
+            event_ = platform->queued_events.front();
+            platform->queued_events.pop();
+            return true;
+        }
+    }
     return false;
 }
 
