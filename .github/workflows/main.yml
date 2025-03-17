@@ -23,11 +23,11 @@ jobs:
         uses: actions/checkout@v4
         with:
           submodules: recursive      
-      - uses: ./.github/workflows/checkdependencies
+      - uses: ./.github/actions/checkdependencies
         name: Check Dependencies
         with:
           os: ${{ matrix.os }}
-      - uses: ./.github/workflows/build
+      - uses: ./.github/actions/build
         name: Build
         with:
           os: ${{ matrix.os }}
@@ -35,7 +35,7 @@ jobs:
           shell: ${{ matrix.shell }}
           filter: ${{ matrix.filter }}
 
-      - uses: ./.github/workflows/tests
+      - uses: ./.github/actions/tests
         name: Tests
         with:
           os: ${{ matrix.os }}
@@ -43,7 +43,7 @@ jobs:
           shell: ${{ matrix.shell }}
           filter: ${{ matrix.filter }}
 
-      - uses: ./.github/workflows/tests-graphics
+      - uses: ./.github/actions/tests-graphics
         name: Graphics Tests
         with:
           os: ${{ matrix.os }}
@@ -52,7 +52,7 @@ jobs:
           filter: ${{ matrix.filter }}
         if: ${{ runner.environment != 'github-hosted'}}
 
-      - uses: ./.github/workflows/deploy
+      - uses: ./.github/actions/deploy
         name: Deploy
         with:
           os: ${{ matrix.os }}
