@@ -1,0 +1,54 @@
+name: Build
+
+on:
+  workflow_call:
+    inputs:
+      os:
+        required: true
+        type: string
+      platform:
+        required: true
+        type: string
+      shell:
+        required: true
+        type: string
+      filter:
+        required: true
+        type: string
+
+jobs:
+  build:
+    name: Build on ${{ inputs.os }}
+    runs-on: ${{ inputs.os }}
+    defaults:
+      run:
+        shell: ${{ inputs.shell }}
+    env:
+      CI: true
+    steps:
+      - name: Clone repository
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Build
+        run: dotnet run --project build/Build.csproj -- --target=Default
+
+      - name: Run Tests Windows
+        if: ${{ inputs.platform == 'windows' }}
+        run: |
+          dotnet test Tools/MonoGame.Tools.Tests/MonoGame.Tools.Tests.csproj --blame-hang-timeout 5m -c Release
+
+      - name: Run Tests Linux/Mac
+        if: ${{ inputs.platform != 'windows' }}
+        run: |
+          MGFXC_WINE_PATH=/Users/runner/.winemonogame dotnet test Tools/MonoGame.Tools.Tests/MonoGame.Tools.Tests.csproj --blame-hang-timeout 5m -c Release --filter="TestCategory!=Audio"
+
+      - name: Expose GitHub Runtime
+        uses: crazy-max/ghaction-github-runtime@v3
+
+      - name: Upload Artifacts
+        run: dotnet run --project build/Build.csproj -- --target=UploadArtifacts
+        env:
+          ACTIONS_RUNTIME_TOKEN: ${{ env.ACTIONS_RUNTIME_TOKEN }}
+          ACTIONS_RUNTIME_URL: "${{ env.ACTIONS_RUNTIME_URL }}"

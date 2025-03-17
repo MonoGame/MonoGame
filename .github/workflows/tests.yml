@@ -1,0 +1,104 @@
+name: Tests Workflow
+
+on:
+  workflow_call:
+    inputs:
+      os:
+        required: true
+        type: string
+      platform:
+        required: true
+        type: string
+      shell:
+        required: true
+        type: string
+      filter:
+        required: true
+        type: string
+jobs:
+  tests:
+    runs-on: ${{ inputs.os }}
+    defaults:
+      run:
+        shell: ${{ inputs.shell }}
+    steps:
+      - name: Clone repository
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Download Nuget
+        uses: actions/download-artifact@v4
+        with:
+          name: nuget-${{ inputs.platform }}
+          path: Artifacts/NuGet
+
+      - name: Download tests-tools
+        uses: actions/download-artifact@v4
+        with:
+          name: tests-tools-${{ inputs.platform }}
+          path: tests tools
+
+      - name: Download tests-desktopgl
+        uses: actions/download-artifact@v4
+        with:
+          name: tests-desktopgl-${{ inputs.platform }}
+          path: tests-desktopgl
+
+      - name: Download tests-windowsdx
+        uses: actions/download-artifact@v4
+        with:
+          name: tests-windowsdx-${{ inputs.platform }}
+          path: tests-windowsdx
+        if: ${{ inputs.platform == 'windows' }}
+
+      - name: Run Tools Tests
+        run: dotnet test "tests tools/MonoGame.Tools.Tests.dll" --blame-hang-timeout 1m --filter="TestCategory!=Effects"
+        env:
+          CI: true
+
+      - name: Run DirectX Audio Tests
+        run: dotnet test --filter Category=Audio MonoGame.Tests.dll
+        env:
+          CI: true
+        working-directory: tests-windowsdx
+        if: ${{ inputs.platform == 'windows' }}
+
+      - name: Run DirectX All Tests Except Audio
+        run: dotnet test --filter Category!=Audio MonoGame.Tests.dll
+        env:
+          CI: true
+        working-directory: tests-windowsdx
+        if: ${{ inputs.platform == 'windows' }}
+
+      # Run the DesktopGL tests on all platforms using NUnitLite runner not dotnet test
+      # We have to run this is bits because the tests crash if too many are run in one go?
+      - name: Run Framework Tests
+        run: dotnet MonoGame.Tests.dll --timeout=300000 --test MonoGame.Tests.Framework ${{inputs.filter}}
+        env:
+          CI: true
+        working-directory: tests-desktopgl
+
+      - name: Run Audio Tests
+        run: dotnet MonoGame.Tests.dll --timeout=300000 --test MonoGame.Tests.Audio
+        env:
+          CI: true
+        working-directory: tests-desktopgl
+
+      - name: Run Input Tests
+        run: dotnet MonoGame.Tests.dll --timeout=300000 --test MonoGame.Tests.Input
+        env:
+          CI: true
+        working-directory: tests-desktopgl
+
+      - name: Run Visual Tests
+        run: dotnet MonoGame.Tests.dll --timeout=300000 --test MonoGame.Tests.Visual
+        env:
+          CI: true
+        working-directory: tests-desktopgl
+
+      - name: Run Game Tests
+        run: dotnet MonoGame.Tests.dll --timeout=300000 --where="Category = GameTest"
+        env:
+          CI: true
+        working-directory: tests-desktopgl
