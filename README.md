@@ -117,3 +117,5 @@ A high level breakdown of the components of the framework:
 ## License
 
 The MonoGame project is under the [Microsoft Public License](https://opensource.org/licenses/MS-PL) except for a few portions of the code. See the [LICENSE.txt](LICENSE.txt) file for more details. Third-party libraries used by MonoGame are under their own licenses. Please refer to those libraries for details on the license they use.
+
+#kickme
