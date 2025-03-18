@@ -32,6 +32,19 @@
         "close_code.h": "c",
         "begin_code.h": "c",
         "sdl_hints.h": "c",
-        "sdl_timer.h": "c"
+        "sdl_timer.h": "c",
+        "xtree": "cpp",
+        "utility": "cpp",
+        "deque": "cpp",
+        "iterator": "cpp",
+        "list": "cpp",
+        "vector": "cpp",
+        "xhash": "cpp",
+        "initializer_list": "cpp",
+        "xstring": "cpp",
+        "xutility": "cpp",
+        "algorithm": "cpp",
+        "map": "cpp",
+        "xmemory": "cpp"
     }
 }

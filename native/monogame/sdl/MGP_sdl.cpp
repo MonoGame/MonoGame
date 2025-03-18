@@ -625,10 +625,10 @@ mgbool MGP_Platform_PollEvent(MGP_Platform* platform, MGP_Event& event_)
 
                 // SDL returns UTF8-encoded characters while C# char type is UTF16-encoded (and limited to the 0-FFFF range / does not support surrogate pairs)
                 // so we need to convert it to Unicode codepoint and check if it's within the supported range
-                int codepoint = UTF8ToUnicode(utf8character);
-                if (codepoint >= 0)
+                int codePoint = UTF8ToUnicode(utf8character);
+                if (codePoint >= 0)
                 {
-                    event_.Text.CharacterCodePoint = codepoint;
+                    event_.Text.CharacterCodePoint = codePoint;
                     event_.Text.CharacterIndex = index;
 
                     platform->queued_events.push(event_);
