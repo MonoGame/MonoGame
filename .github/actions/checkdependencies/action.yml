@@ -86,5 +86,5 @@ runs:
         sudo apt install -y ttf-mscorefonts-installer
         sudo fc-cache
         fc-match Arial
-      if: ${{ inputs.platform == 'linux' }}
+      if: ${{ inputs.platform != 'windows' }}
       shell: ${{ inputs.shell }}
