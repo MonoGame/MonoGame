@@ -46,12 +46,14 @@ runs:
     - name: Install Windows Dependencies
       if: ${{ inputs.platform == 'windows' }}
       run: |
+        echo 'Installing additional Windows Dependencies'
         dotnet.exe workload install android
       shell: ${{ inputs.shell }}
 
     - name: Install Mac Dependencies
       if: ${{ inputs.platform == 'macos' }}
       run: |
+        echo 'Installing additional Mac Dependencies'
         dotnet workload install android macos ios
         brew install wine-stable p7zip
         sudo mkdir -p /usr/local/lib
@@ -63,6 +65,7 @@ runs:
     - name: Install Linux Dependencies
       if: ${{ inputs.platform == 'linux' }}
       run: |
+        echo 'Installing additional Linux Dependencies'
         dotnet workload install android
         sudo apt install p7zip-full curl
         sudo dpkg --add-architecture i386 
