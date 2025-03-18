@@ -8,7 +8,8 @@ using Microsoft.Xna.Framework;
 namespace Microsoft.Devices.Sensors
 {
     /// <summary>
-    /// Provides Android applications access to the device's compass sensor.
+    /// Provides Desktop applications access to the device's compass sensor.
+    /// Currently stubs, for cross-platform development.
     /// </summary>
     public sealed class Compass : SensorBase<CompassReading>
     {
