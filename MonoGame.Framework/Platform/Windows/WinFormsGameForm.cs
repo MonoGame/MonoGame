@@ -158,9 +158,9 @@ namespace Microsoft.Xna.Framework.Windows
 
         public void CenterOnPrimaryMonitor()
         {
-             Location = new System.Drawing.Point(
-                 (Screen.PrimaryScreen.WorkingArea.Width  - Width ) / 2,
-                 (Screen.PrimaryScreen.WorkingArea.Height - Height) / 2);
+            Location = new System.Drawing.Point(
+                (Screen.PrimaryScreen.WorkingArea.Width  - Width ) / 2,
+                (Screen.PrimaryScreen.WorkingArea.Height - Height) / 2);
         }
 
 
@@ -225,7 +225,7 @@ namespace Microsoft.Xna.Framework.Windows
                     HandleDropMessage(ref m);
                     break;
 
-                case WM_SETTING­CHANGE:
+                case WM_SETTINGCHANGE:
                     HandleSettingChange();
                     break;
                 case WM_SYSCOMMAND:
