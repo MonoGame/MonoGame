@@ -25,10 +25,10 @@ namespace Microsoft.Xna.Framework.Windows
             var lowword = msg.LParam.ToInt32();
 
             return new System.Drawing.Point()
-                       {
-                           X = (short)(lowword),
-                           Y = (short)(lowword >> 16),
-                       };
+            {
+                X = (short)(lowword),
+                Y = (short)(lowword >> 16),
+            };
         }
     }
 
@@ -54,7 +54,7 @@ namespace Microsoft.Xna.Framework.Windows
         public const int WM_KEYUP                           = 0x0101;
         public const int WM_SYSKEYDOWN                      = 0x0104;
         public const int WM_SYSKEYUP                        = 0x0105;
-        public const int WM_TABLET_QUERYSYSTEMGESTURESTA    = (0x02C0 + 12);
+        public const int WM_TABLET_QUERYSYSTEMGESTURESTA    = 0x02CC;
 
         public const int WM_ENTERSIZEMOVE                   = 0x0231;
         public const int WM_EXITSIZEMOVE                    = 0x0232;
@@ -62,7 +62,7 @@ namespace Microsoft.Xna.Framework.Windows
 
         public const int WM_SYSCOMMAND                      = 0x0112;
 
-        public const int WM_SETTING­CHANGE                   = 0x001A;
+        public const int WM_SETTINGCHANGE                   = 0x001A;
 
 
         public const int WM_INPUTLANGCHANGE                 = 0x0051;
@@ -442,7 +442,7 @@ namespace Microsoft.Xna.Framework.Windows
                 case System.Windows.Forms.Keys.ShiftKey:
                     // left shift is 0x2A, right shift is 0x36. IsExtendedKey is always false.
                     return ((scancode & 0x1FF) == 0x36)
-                               ? Microsoft.Xna.Framework.Input.Keys.RightShift
+                                ? Microsoft.Xna.Framework.Input.Keys.RightShift
                                 : Microsoft.Xna.Framework.Input.Keys.LeftShift;
                 // Note that the Alt key is now refered to as Menu.
                 case System.Windows.Forms.Keys.Menu:

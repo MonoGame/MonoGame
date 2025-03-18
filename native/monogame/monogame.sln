@@ -1,0 +1,26 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "desktopvk", "desktopvk.vcxproj", "{60D6243F-CC40-D9B5-157F-8A5B8128B70A}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "windowsdx", "windowsdx.vcxproj", "{CC33DB03-389E-8F7A-81DC-4020ED856DCF}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x64 = Debug|x64
+		Release|x64 = Release|x64
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{60D6243F-CC40-D9B5-157F-8A5B8128B70A}.Debug|x64.ActiveCfg = Debug|x64
+		{60D6243F-CC40-D9B5-157F-8A5B8128B70A}.Debug|x64.Build.0 = Debug|x64
+		{60D6243F-CC40-D9B5-157F-8A5B8128B70A}.Release|x64.ActiveCfg = Release|x64
+		{60D6243F-CC40-D9B5-157F-8A5B8128B70A}.Release|x64.Build.0 = Release|x64
+		{CC33DB03-389E-8F7A-81DC-4020ED856DCF}.Debug|x64.ActiveCfg = Debug|x64
+		{CC33DB03-389E-8F7A-81DC-4020ED856DCF}.Debug|x64.Build.0 = Debug|x64
+		{CC33DB03-389E-8F7A-81DC-4020ED856DCF}.Release|x64.ActiveCfg = Release|x64
+		{CC33DB03-389E-8F7A-81DC-4020ED856DCF}.Release|x64.Build.0 = Release|x64
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

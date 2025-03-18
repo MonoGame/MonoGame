@@ -1,0 +1,131 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{60D6243F-CC40-D9B5-157F-8A5B8128B70A}</ProjectGuid>
+    <IgnoreWarnCompileDuplicatedFilename>true</IgnoreWarnCompileDuplicatedFilename>
+    <Keyword>Win32Proj</Keyword>
+    <RootNamespace>desktopvk</RootNamespace>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <CharacterSet>Unicode</CharacterSet>
+    <PlatformToolset>v143</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <CharacterSet>Unicode</CharacterSet>
+    <PlatformToolset>v143</PlatformToolset>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <LinkIncremental>true</LinkIncremental>
+    <OutDir>..\..\Artifacts\monogame.native\windows\desktopvk\Debug\</OutDir>
+    <IntDir>obj\Debug\desktopvk\</IntDir>
+    <TargetName>monogame.native</TargetName>
+    <TargetExt>.dll</TargetExt>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <LinkIncremental>false</LinkIncremental>
+    <OutDir>..\..\Artifacts\monogame.native\windows\desktopvk\Release\</OutDir>
+    <IntDir>obj\Release\desktopvk\</IntDir>
+    <TargetName>monogame.native</TargetName>
+    <TargetExt>.dll</TargetExt>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <PreprocessorDefinitions>DLL_EXPORT;MG_SDL2;MG_VULKAN;MG_FAUDIO;DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>include;external\sdl2\sdl\include;external\vulkan-headers\include;external\volk;external\vma\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
+      <Optimization>Disabled</Optimization>
+      <ExternalWarningLevel>Level3</ExternalWarningLevel>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>DLL_EXPORT;MG_SDL2;MG_VULKAN;MG_FAUDIO;DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>include;external\sdl2\sdl\include;external\vulkan-headers\include;external\volk;external\vma\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>external\sdl2\sdl\build\Release\SDL2-static.lib;winmm.lib;imm32.lib;user32.lib;gdi32.lib;advapi32.lib;setupapi.lib;ole32.lib;oleaut32.lib;version.lib;shell32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <ImportLibrary>..\..\Artifacts\monogame.native\windows\desktopvk\Debug\monogame.native.lib</ImportLibrary>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <PreprocessorDefinitions>DLL_EXPORT;MG_SDL2;MG_VULKAN;MG_FAUDIO;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>include;external\sdl2\sdl\include;external\vulkan-headers\include;external\volk;external\vma\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <Optimization>Full</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <MinimalRebuild>false</MinimalRebuild>
+      <StringPooling>true</StringPooling>
+      <ExternalWarningLevel>Level3</ExternalWarningLevel>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>DLL_EXPORT;MG_SDL2;MG_VULKAN;MG_FAUDIO;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>include;external\sdl2\sdl\include;external\vulkan-headers\include;external\volk;external\vma\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <AdditionalDependencies>external\sdl2\sdl\build\Release\SDL2-static.lib;winmm.lib;imm32.lib;user32.lib;gdi32.lib;advapi32.lib;setupapi.lib;ole32.lib;oleaut32.lib;version.lib;shell32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <ImportLibrary>..\..\Artifacts\monogame.native\windows\desktopvk\Release\monogame.native.lib</ImportLibrary>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClInclude Include="common\stb_image.h" />
+    <ClInclude Include="common\stb_image_write.h" />
+    <ClInclude Include="include\MGM_common.h" />
+    <ClInclude Include="include\api_MGA.h" />
+    <ClInclude Include="include\api_MGG.h" />
+    <ClInclude Include="include\api_MGI.h" />
+    <ClInclude Include="include\api_MGM.h" />
+    <ClInclude Include="include\api_MGP.h" />
+    <ClInclude Include="include\api_common.h" />
+    <ClInclude Include="include\api_enums.h" />
+    <ClInclude Include="include\api_structs.h" />
+    <ClInclude Include="include\mg_common.h" />
+    <ClInclude Include="vulkan\vulkan.resources.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="common\MGI.cpp" />
+    <ClCompile Include="common\MGM.cpp" />
+    <ClCompile Include="common\mg_hash.cpp" />
+    <ClCompile Include="faudio\MGA_faudio.cpp" />
+    <ClCompile Include="sdl\MGP_sdl.cpp" />
+    <ClCompile Include="vulkan\MGG_Vulkan.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="vulkan\vulkan.rc" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>
