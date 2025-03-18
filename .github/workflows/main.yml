@@ -1,6 +1,6 @@
 name: Main MonoGame build workflow
 
-on: [push, pull_request]
+on: [pull_request]
 
 jobs:
   # Runs preliminary build and validation on the self-hosted runners to ensure build cohoesion
