@@ -11,10 +11,6 @@ inputs:
 runs:
   using: "composite"
   steps:
-    - name: Run settings
-      run: echo Platform: ${{ inputs.platform }} - Shell: ${{ inputs.shell }}
-      shell: ${{ inputs.shell }}
-
     - name: Build
       run: dotnet run --project build/Build.csproj -- --target=Default
       shell: ${{ inputs.shell }}
@@ -22,7 +18,7 @@ runs:
     - name: Run Tests Windows
       if: ${{ inputs.platform == 'windows' }}
       run: |
-        echo 'Running Windows Tests'
+        echo '-> Running Windows Tests'
         dotnet test Tools/MonoGame.Tools.Tests/MonoGame.Tools.Tests.csproj --blame-hang-timeout 5m -c Release
       shell: ${{ inputs.shell }}
       env:
@@ -31,7 +27,7 @@ runs:
     - name: Run Tests Linux/Mac
       if: ${{ inputs.platform != 'windows' }}
       run: |
-        echo 'Running Mac/Linux Tests'
+        echo '-> Running Mac/Linux Tests'
         MGFXC_WINE_PATH=/home/runner/.winemonogame dotnet test Tools/MonoGame.Tools.Tests/MonoGame.Tools.Tests.csproj --blame-hang-timeout 5m -c Release --filter="TestCategory!=Audio"
       shell: ${{ inputs.shell }}
       env:
