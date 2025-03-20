@@ -129,6 +129,19 @@ function faudio()
 
 end
 
+-- Xaudio is supported on Windows and Xbox.
+function xaudio()
+
+   defines { "MG_XAUDIO" }
+
+   files 
+   { 
+      "xaudio/**.h",
+      "xaudio/**.cpp",
+   }
+
+end
+
 function configs()
 
    filter "configurations:Debug"
@@ -156,5 +169,5 @@ project "windowsdx"
    common("windowsdx")
    sdl2()
    directx12()
-   faudio()
+   xaudio()
    configs()
