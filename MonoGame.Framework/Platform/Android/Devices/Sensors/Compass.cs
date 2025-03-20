@@ -6,6 +6,7 @@ using System;
 using Android.Content;
 using Android.Hardware;
 using Microsoft.Xna.Framework;
+using static Android.Hardware.SensorPrivacyManager;
 
 namespace Microsoft.Devices.Sensors
 {
@@ -30,6 +31,8 @@ namespace Microsoft.Devices.Sensors
         {
             if (sensorManager == null)
                 Initialize();
+
+            return sensorMagneticField != null;
         }
 
         /// <summary>
