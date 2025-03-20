@@ -331,7 +331,7 @@ void Graphics::Texture::GetData(DeviceResources* device, uint32_t subResId, uint
     const CD3DX12_TEXTURE_COPY_LOCATION copyDest(readbackBuffer.Get(), bufferFootprint);
     const CD3DX12_TEXTURE_COPY_LOCATION copySrc(impl->m_res.Get(), subResId);
 
-    CD3DX12_BOX sourceRegion(x, y, x + w, y + h);
+    D3D12_BOX sourceRegion { x, y, 0, x + w, y + h, 1 };
     cmdList->CopyTextureRegion(&copyDest, 0, 0, 0, &copySrc, &sourceRegion);
 
     const D3D12_RESOURCE_BARRIER revertBarrier = CD3DX12_RESOURCE_BARRIER::Transition(

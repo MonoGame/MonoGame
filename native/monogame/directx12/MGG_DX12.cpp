@@ -449,8 +449,12 @@ void MGG_GraphicsDevice_GetCaps(MGG_GraphicsDevice* device, MGG_GraphicsDevice_C
 	caps.MaxVertexBufferSlots = 16;
 	caps.MaxVertexTextureSlots = 16;
 
-	// DirectX 12 shader profile from pipeline.
+	// The shader profile id from the pipeline.
+#if defined(_GAMING_XBOX)	
+	caps.ShaderProfile = 21;	// For Xbox One and Xbox Series X/S.
+#else
 	caps.ShaderProfile = 2;
+#endif
 }
 
 void MGG_GraphicsDevice_ResizeSwapchain(
@@ -501,6 +505,10 @@ void MGG_GraphicsDevice_ResizeSwapchain(
 mgint MGG_GraphicsDevice_BeginFrame(MGG_GraphicsDevice* device)
 {
 	assert(device != nullptr);
+
+#if defined(_GAMING_XBOX)
+	device->resources->WaitForOrigin();
+#endif
 
 	auto frameIndex = device->resources->Prepare();
 
