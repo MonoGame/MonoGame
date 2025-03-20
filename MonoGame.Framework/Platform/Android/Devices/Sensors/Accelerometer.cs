@@ -29,7 +29,7 @@ namespace Microsoft.Devices.Sensors
         public static bool PlatformIsSupported()
         {
             if (sensorManager == null)
-                PlatformInitialize();
+                Initialize();
             return sensor != null;
         }
 
@@ -42,7 +42,7 @@ namespace Microsoft.Devices.Sensors
                 throw new ObjectDisposedException(GetType().Name);
             if (sensorManager == null)
             {
-                PlatformInitialize();
+                Initialize();
                 state = sensor != null ? SensorState.Initializing : SensorState.NotSupported;
             }
             return state;
