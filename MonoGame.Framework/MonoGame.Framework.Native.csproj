@@ -21,7 +21,8 @@
     <Compile Remove="Properties\**\*" />
     <Compile Remove="Utilities\System.Numerics.Vectors\**\*" />
     <Compile Include="Platform\Native\**\*" />
-    <Compile Include="Platform\Utilities\ReflectionHelpers.Default.cs" />	  
+    <Compile Include="Platform\Utilities\ReflectionHelpers.Default.cs" />
+    <Compile Remove="Microsoft\**\*" />
   </ItemGroup>
 
   <ItemGroup>
@@ -49,5 +50,6 @@
   <ItemGroup>
     <Folder Include="Platform\Graphics\Vertices\" />
   </ItemGroup>
-	
+
+  <Import Project="Microsoft.Devices.Sensors.targets" />
 </Project>

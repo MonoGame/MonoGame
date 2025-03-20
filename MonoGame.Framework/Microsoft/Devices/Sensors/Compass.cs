@@ -3,6 +3,7 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System;
+using System.Runtime.InteropServices;
 using Microsoft.Xna.Framework;
 
 namespace Microsoft.Devices.Sensors
@@ -16,49 +17,50 @@ namespace Microsoft.Devices.Sensors
         /// <summary>
         /// Gets whether the device on which the application is running supports the compass sensor.
         /// </summary>
-        internal static bool PlatformIsSupported()
-        {
-            return false;
-        }
+        public static bool IsSupported => PlatformIsSupported();
 
         /// <summary>
         /// Gets the current state of the compass. The value is a member of the SensorState enumeration.
         /// </summary>
-        internal SensorState PlatformSensorState()
-        {
-            return SensorState.NotSupported;
-        }
+        public SensorState State => PlatformSensorState();
 
-        internal void PlatformCompass()
+        /// <summary>
+        /// Creates a new instance of the Compass object.
+        /// </summary>
+        public Compass()
         {
+            PlatformCompass();
         }
 
         /// <summary>
         /// Initializes the platform resources required for the compass sensor.
         /// </summary>
-        internal static void PlatformInitialize()
+        static void Initialize()
         {
+            PlatformInitialize();
         }
 
         /// <summary>
         /// Starts data acquisition from the compass.
         /// </summary>
-        internal void PlatformStart()
+        public override void Start()
         {
-            throw new PlatformNotSupportedException();
+            PlatformStart();
         }
 
         /// <summary>
         /// Stops data acquisition from the compass.
         /// </summary>
-        internal void PlatformStop()
+        public override void Stop()
         {
-            throw new PlatformNotSupportedException();
+            PlatformStop();
         }
 
-        internal void PlatformDispose(bool disposing)
+        protected override void Dispose(bool disposing)
         {
-            
+            PlatformDispose(disposing);
+
+            base.Dispose(disposing);
         }
     }
 }

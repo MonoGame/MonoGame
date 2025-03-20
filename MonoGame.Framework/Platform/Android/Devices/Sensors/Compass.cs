@@ -12,7 +12,7 @@ namespace Microsoft.Devices.Sensors
     /// <summary>
     /// Provides Android applications access to the device's compass sensor.
     /// </summary>
-    public sealed class Compass : SensorBase<CompassReading>
+    public sealed partial class Compass : SensorBase<CompassReading>
     {
         static readonly int MaxSensorCount = 10;
         static SensorManager sensorManager;
@@ -26,35 +26,28 @@ namespace Microsoft.Devices.Sensors
         /// <summary>
         /// Gets whether the device on which the application is running supports the compass sensor.
         /// </summary>
-        public static bool IsSupported
+        internal static bool PlatformIsSupported()
         {
-            get
-            {
-                if (sensorManager == null)
-                    Initialize();
-                return sensorMagneticField != null;
-            }
+            if (sensorManager == null)
+                Initialize();
         }
 
         /// <summary>
         /// Gets the current state of the compass. The value is a member of the SensorState enumeration.
         /// </summary>
-        public SensorState State
+        internal SensorState PlatformSensorState()
         {
-            get
-            {
-                if (IsDisposed)
-                    throw new ObjectDisposedException(GetType().Name);
-                if (sensorManager == null)
-                    Initialize();
-                return state;
-            }
+            if (IsDisposed)
+                throw new ObjectDisposedException(GetType().Name);
+            if (sensorManager == null)
+                Initialize();
+            return state;
         }
 
         /// <summary>
         /// Creates a new instance of the Compass object.
         /// </summary>
-        public Compass()
+        internal void PlatformCompass()
         {
             if (instanceCount >= MaxSensorCount)
                 throw new SensorFailedException("The limit of 10 simultaneous instances of the Compass class per application has been exceeded.");
@@ -67,20 +60,20 @@ namespace Microsoft.Devices.Sensors
         /// <summary>
         /// Initializes the platform resources required for the compass sensor.
         /// </summary>
-        static void Initialize()
+        static void PlatformInitialize()
         {
             sensorManager = (SensorManager)Game.Activity.GetSystemService(Context.SensorService);
             sensorMagneticField = sensorManager.GetDefaultSensor(SensorType.MagneticField);
             sensorAccelerometer = sensorManager.GetDefaultSensor(SensorType.Accelerometer);
         }
 
-        void ActivityPaused(object sender, EventArgs eventArgs)
+        void PlatformActivityPaused(object sender, EventArgs eventArgs)
         {
             sensorManager.UnregisterListener(listener, sensorMagneticField);
             sensorManager.UnregisterListener(listener, sensorAccelerometer);
         }
 
-        void ActivityResumed(object sender, EventArgs eventArgs)
+        void PlatformActivityResumed(object sender, EventArgs eventArgs)
         {
             sensorManager.RegisterListener(listener, sensorAccelerometer, SensorDelay.Game);
             sensorManager.RegisterListener(listener, sensorMagneticField, SensorDelay.Game);
@@ -89,7 +82,7 @@ namespace Microsoft.Devices.Sensors
         /// <summary>
         /// Starts data acquisition from the compass.
         /// </summary>
-        public override void Start()
+        internal void PlatformStart()
         {
             if (IsDisposed)
                 throw new ObjectDisposedException(GetType().Name);
@@ -120,7 +113,7 @@ namespace Microsoft.Devices.Sensors
         /// <summary>
         /// Stops data acquisition from the accelerometer.
         /// </summary>
-        public override void Stop()
+        internal void PlatformStop()
         {
             if (IsDisposed)
                 throw new ObjectDisposedException(GetType().Name);
@@ -137,7 +130,7 @@ namespace Microsoft.Devices.Sensors
             state = SensorState.Disabled;
         }
 
-        protected override void Dispose(bool disposing)
+        internal void PlatformDispose(bool disposing)
         {
             if (!IsDisposed)
             {
@@ -154,7 +147,6 @@ namespace Microsoft.Devices.Sensors
                     }
                 }
             }
-            base.Dispose(disposing);
         }
 
         class SensorListener : Java.Lang.Object, ISensorEventListener
@@ -225,4 +217,3 @@ namespace Microsoft.Devices.Sensors
         }
     }
 }
-

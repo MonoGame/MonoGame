@@ -3,6 +3,7 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System;
+using System.Runtime.InteropServices;
 using Microsoft.Xna.Framework;
 
 namespace Microsoft.Devices.Sensors
@@ -16,57 +17,60 @@ namespace Microsoft.Devices.Sensors
         /// <summary>
         /// Gets or sets whether the device on which the application is running supports the accelerometer sensor.
         /// </summary>
-        internal static bool PlatformIsSupported()
-        {
-            return false; // Not in Desktop
-        }
+        public static bool IsSupported => PlatformIsSupported();
 
         /// <summary>
         /// Gets the current state of the accelerometer. The value is a member of the SensorState enumeration.
         /// </summary>
-        internal SensorState PlatformSensorState()
-        {
-            return SensorState.NotSupported;
-        }
+        public SensorState State => PlatformSensorState();
 
-        internal void PlatformAccelerometer()
+        /// <summary>
+        /// Creates a new instance of the Accelerometer object.
+        /// </summary>
+        public Accelerometer()
         {
+            PlatformAccelerometer();
         }
 
         /// <summary>
         /// Initializes the platform resources required for the accelerometer sensor.
         /// </summary>
-        internal static void PlatformInitialize()
+        static void Initialize()
         {
+            PlatformInitialize();
         }
 
-        internal void PlatformActivityPaused(object sender, EventArgs eventArgs)
+        void ActivityPaused(object sender, EventArgs eventArgs)
         {
+            PlatformActivityPaused(sender, eventArgs);
         }
 
-        internal void PlatformActivityResumed(object sender, EventArgs eventArgs)
+        void ActivityResumed(object sender, EventArgs eventArgs)
         {
+            PlatformActivityResumed(sender, eventArgs);
         }
 
         /// <summary>
         /// Starts data acquisition from the accelerometer.
         /// </summary>
-        internal void PlatformStart()
+        public override void Start()
         {
-            throw new PlatformNotSupportedException();
+            PlatformStart();
         }
 
         /// <summary>
         /// Stops data acquisition from the accelerometer.
         /// </summary>
-        internal void PlatformStop()
+        public override void Stop()
         {
-            throw new PlatformNotSupportedException();
+            PlatformStop();
         }
 
-        internal void PlatformDispose(bool disposing)
+        protected override void Dispose(bool disposing)
         {
-            
+            PlatformDispose(disposing);
+
+            base.Dispose(disposing);
         }
     }
 }
