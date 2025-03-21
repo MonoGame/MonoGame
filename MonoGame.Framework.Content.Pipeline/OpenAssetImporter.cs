@@ -1147,7 +1147,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
             if (parent == null && ancestor != null)
                 throw new ArgumentException(string.Format("Node \"{0}\" is not an ancestor of \"{1}\".", ancestor.Name, node.Name));
 
-            return transform;
+            return Matrix4x4.Transpose(transform);
         }
 
         /// <summary>
