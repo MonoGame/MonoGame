@@ -490,13 +490,31 @@ namespace Microsoft.Xna.Framework.Windows
                     {
                         char[] lpBuf = new char[(int)length >> 1];
                         ImmGetCompositionStringW(himc, GCS_COMPSTR, lpBuf, length);
-                        int[] codePoints = StringInfo.ParseCombiningCharacters(new string(lpBuf));
-                        uint index = 0;
-                        for (int i = 0; i < codePoints.Length; i++)
+
+                        char codePoint = '\0';
+                        for (int i = 0; i < lpBuf.Length; i++)
                         {
-                            uint codePoint = (uint)codePoints[i];
-                            _window.OnTextEditing(new TextInputEventArgs(codePoint, index));
-                            index += (uint)char.ConvertFromUtf32((int)codePoint).Length;
+                            char c = lpBuf[i];
+                            if (c >= 0xD800 && c < 0xE000)
+                            {
+                                if (c < 0xDC00)
+                                {
+                                    codePoint = c;
+                                }
+                                else
+                                {
+                                    if (codePoint != 0)
+                                    {
+                                        _window.OnTextEditing(new TextInputEventArgs((uint)char.ConvertToUtf32(codePoint, c), (uint)i));
+                                    }
+                                    codePoint = '\0';
+                                }
+                            }
+                            else
+                            {
+                                _window.OnTextEditing(new TextInputEventArgs(c, (uint)i));
+                                codePoint = '\0';
+                            }
                         }
                     }
                     ImmReleaseContext(Handle, himc);
