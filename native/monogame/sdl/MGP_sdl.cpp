@@ -870,15 +870,15 @@ mgint MGP_Window_ShowMessageBox(MGP_Window* window, const char* title, const cha
     return -1;
 }
 
-mgbool MGP_Window_GetTextInputState(MGP_Window* window)
+mgbool MGP_Window_GetIsUsingTextInput(MGP_Window* window)
 {
     return window->window == SDL_GetKeyboardFocus() && SDL_IsTextInputActive();
 }
 
-void MGP_Window_SetTextInputState(MGP_Window* window, mgbool state)
+void MGP_Window_SetIsUsingTextInput(MGP_Window* window, mgbool state)
 {
     SDL_SetWindowInputFocus(window->window);
-    if (MGP_Window_GetTextInputState(window) != state)
+    if (MGP_Window_GetIsUsingTextInput(window) != state)
     {
         if (state)
         {
