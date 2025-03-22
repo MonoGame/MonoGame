@@ -474,7 +474,7 @@ namespace Microsoft.Xna.Framework.Windows
                     {
                         if (hs != 0)
                         {
-                            _window.OnTextInput(new TextInputEventArgs(char.ConvertFromUtf32(char.ConvertToUtf32(hs, c))));
+                            _window.OnTextInput(new TextInputEventArgs(hs.ToString() + c));
                         }
                         hs = '\0';
                     }
