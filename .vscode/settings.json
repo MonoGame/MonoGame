@@ -45,6 +45,15 @@
         "xutility": "cpp",
         "algorithm": "cpp",
         "map": "cpp",
-        "xmemory": "cpp"
+        "xmemory": "cpp",
+        "sdl_vitagles_pvr_c.h": "c",
+        "stdlib.h": "c",
+        "chrono": "c",
+        "xlocale": "c",
+        "array": "c",
+        "span": "c",
+        "xiosbase": "c",
+        "system_error": "c",
+        "queue": "c"
     }
 }

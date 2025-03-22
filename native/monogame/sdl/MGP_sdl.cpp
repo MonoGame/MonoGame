@@ -180,6 +180,8 @@ struct MGP_Window
 	std::string identifier;
 
     SDL_Window* window = nullptr;
+
+    SDL_Rect textInputRect;
 };
 
 struct MGP_Cursor
@@ -866,6 +868,71 @@ mgint MGP_Window_ShowMessageBox(MGP_Window* window, const char* title, const cha
         return hit;
 
     return -1;
+}
+
+mgbool MGP_Window_GetTextInputState(MGP_Window* window)
+{
+    return window->window == SDL_GetKeyboardFocus() && SDL_IsTextInputActive();
+}
+
+void MGP_Window_SetTextInputState(MGP_Window* window, mgbool state)
+{
+    SDL_SetWindowInputFocus(window->window);
+    if (MGP_Window_GetTextInputState(window) != state)
+    {
+        if (state)
+        {
+            SDL_StartTextInput();
+            SDL_SetTextInputRect(&window->textInputRect);
+        }
+        else
+        {
+            SDL_StopTextInput();
+        }
+    }
+}
+
+void MGP_Window_GetIMEPosition(MGP_Window* window, mgint& x, mgint& y, mgint& width, mgint& height)
+{
+    x = window->textInputRect.x;
+    y = window->textInputRect.y;
+    width = window->textInputRect.w;
+    height = window->textInputRect.h;
+}
+
+void MGP_Window_SetIMEPosition(MGP_Window* window, mgint x, mgint y, mgint width, mgint height)
+{
+    window->textInputRect = { x, y, width, height };
+    if (window->window == SDL_GetKeyboardFocus())
+    {
+        SDL_SetTextInputRect(&window->textInputRect);
+    }
+}
+
+mgint MGP_Window_GetClipboardText(MGP_Window* window, char* textBuf, mgint bufLength)
+{
+    mgint result = 0;
+    char* sdlReturned = SDL_GetClipboardText();
+    if (bufLength <= 0 || textBuf == nullptr) bufLength = 0x7FFFFFFF;
+    for (result = 0; result < bufLength; result++)
+    {
+        if (textBuf != nullptr)
+        {
+            textBuf[result] = sdlReturned[result];
+        }
+
+        if (sdlReturned[result] == 0)
+        {
+            break;
+        }
+    }
+    SDL_free(sdlReturned);
+    return result;
+}
+
+void MGP_Window_SetClipboardText(MGP_Window* window, const char* textBuf)
+{
+    SDL_SetClipboardText(textBuf);
 }
 
 void MGP_Mouse_SetVisible(MGP_Platform* platform, mgbool visible)

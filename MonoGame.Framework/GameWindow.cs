@@ -212,11 +212,23 @@ namespace Microsoft.Xna.Framework
 
 #if WINDOWS || DESKTOPGL || ANGLE || NATIVE
 
-	    /// <summary>
-	    /// Called when the window receives text input. Raises the <see cref="TextInput"/> event.
-	    /// </summary>
-	    /// <param name="e">Parameters to the <see cref="TextInput"/> event.</param>
-		internal void OnTextInput(TextInputEventArgs e)
+        /// <summary>
+	    /// Set Text Input State. If this is true, OnTextInput and OnTextEditing will available, IME will open.
+        /// </summary>
+		public abstract bool IsInputingText {get; set; }
+        /// <summary>
+	    /// Get or set position Of IME(Input Method Editor).
+        /// </summary>
+		public abstract Rectangle IMEPosition { get; set; }
+        /// <summary>
+	    /// Get or set clipboard Text.
+        /// </summary>
+		public abstract string ClipboardText { get; set; }
+        /// <summary>
+        /// Called when the window receives text input. Raises the <see cref="TextInput"/> event.
+        /// </summary>
+        /// <param name="e">Parameters to the <see cref="TextInput"/> event.</param>
+        internal void OnTextInput(TextInputEventArgs e)
 		{
             EventHelpers.Raise(this, TextInput, e);
 		}

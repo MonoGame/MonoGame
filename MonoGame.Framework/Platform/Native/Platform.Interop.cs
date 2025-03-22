@@ -7,6 +7,7 @@ using Microsoft.Xna.Framework.Input;
 using MonoGame.Framework.Utilities;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
+using System.Text;
 
 namespace MonoGame.Interop;
 
@@ -324,7 +325,7 @@ internal static unsafe partial class MGP
     public static partial void Window_SetClientSize(MGP_Window* window, int width, int height);
 
     [LibraryImport(MonoGameNativeDLL, EntryPoint = "MGP_Window_SetCursor", StringMarshalling = StringMarshalling.Utf8)]
-    public static partial void Window_SetCursor(MGP_Window* window, MGP_Cursor* cursor);        
+    public static partial void Window_SetCursor(MGP_Window* window, MGP_Cursor* cursor);
 
     [LibraryImport(MonoGameNativeDLL, EntryPoint = "MGP_Window_ShowMessageBox", StringMarshalling = StringMarshalling.Utf8)]
     public static partial int Window_ShowMessageBox(
@@ -333,6 +334,25 @@ internal static unsafe partial class MGP
          string description,
          string[] buttons,
          int count);
+
+    [LibraryImport(MonoGameNativeDLL, EntryPoint = "MGP_Window_GetTextInputState", StringMarshalling = StringMarshalling.Utf8)]
+    [return: MarshalAs(UnmanagedType.U1)]
+    public static partial bool Window_GetTextInputState(MGP_Window* window);
+
+    [LibraryImport(MonoGameNativeDLL, EntryPoint = "MGP_Window_SetTextInputState", StringMarshalling = StringMarshalling.Utf8)]
+    public static partial void Window_SetTextInputState(MGP_Window* window, [MarshalAs(UnmanagedType.U1)] bool state);
+
+    [LibraryImport(MonoGameNativeDLL, EntryPoint = "MGP_Window_GetIMEPosition", StringMarshalling = StringMarshalling.Utf8)]
+    public static partial void Window_GetIMEPosition(MGP_Window* window, ref int x, ref int y, ref int width, ref int height);
+
+    [LibraryImport(MonoGameNativeDLL, EntryPoint = "MGP_Window_SetIMEPosition", StringMarshalling = StringMarshalling.Utf8)]
+    public static partial void Window_SetIMEPosition(MGP_Window* window, int x, int y, int width, int height);
+
+    [LibraryImport(MonoGameNativeDLL, EntryPoint = "MGP_Window_GetClipboardText", StringMarshalling = StringMarshalling.Utf8)]
+    public static partial int Window_GetClipboardText(MGP_Window* window, byte[] textBuf, int bufLength);
+
+    [LibraryImport(MonoGameNativeDLL, EntryPoint = "MGP_Window_SetClipboardText", StringMarshalling = StringMarshalling.Utf8)]
+    public static partial void Window_SetClipboardText(MGP_Window* window, byte[] textBuf);
 
     [LibraryImport(MonoGameNativeDLL, EntryPoint = "MGP_Window_EnterFullScreen", StringMarshalling = StringMarshalling.Utf8)]
     public static partial void Window_EnterFullScreen(MGP_Window* window, [MarshalAs(UnmanagedType.U1)] bool useHardwareModeSwitch);

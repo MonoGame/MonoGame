@@ -74,6 +74,31 @@ namespace MonoGame.Framework
             }
         }
 
+        public override bool IsInputingText
+        {
+            get => Form.Focused && Form.ImeMode == ImeMode.On;
+            set
+            {
+                Form.Focus();
+                if(IsInputingText != value)
+                {
+                    Form.ImeMode = value ? ImeMode.On : ImeMode.Off;
+                }
+            }
+        }
+
+        public override Rectangle IMEPosition
+        {
+            get => Form.TextInputRect;
+            set => Form.TextInputRect = value;
+        }
+
+        public override string ClipboardText
+        {
+            get => Clipboard.GetText();
+            set => Clipboard.SetText(value);
+        }
+
         public override bool AllowUserResizing
         {
             get { return _isResizable; }
