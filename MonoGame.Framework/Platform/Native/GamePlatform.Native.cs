@@ -157,7 +157,8 @@ class NativeGamePlatform : GamePlatform
                                 textEventCache += char.ConvertFromUtf32((int)event_.Text.CharacterCodePoint);
                             }
                             window.OnTextInput(new TextInputEventArgs(textEventCache));
-                            goto textFinished;
+                            if (event_.Type != EventType.TextInput)
+                                goto textFinished;
                         }
                         break;
                     }
@@ -173,7 +174,8 @@ class NativeGamePlatform : GamePlatform
                                 textEventCache += char.ConvertFromUtf32((int)event_.Text.CharacterCodePoint);
                             }
                             window.OnTextEditing(new TextInputEventArgs(textEventCache));
-                            goto textFinished;
+                            if (event_.Type != EventType.TextEditing)
+                                goto textFinished;
                         }
                         break;
                     }
