@@ -548,7 +548,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
                     _pivots.Add(originalName, pivot);
                 }
 
-                Matrix transform = aiNode.Transform;
+                Matrix transform = Matrix.Transpose(aiNode.Transform);
                 if (aiNode.Name.EndsWith("_Translation"))
                     pivot.Translation = transform;
                 else if (aiNode.Name.EndsWith("_RotationOffset"))
@@ -730,7 +730,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
                     if (mesh.HasBones)
                         foreach (var bone in mesh.Bones)
                             if (!offsetMatrices.ContainsKey(bone.Name))
-                                offsetMatrices[bone.Name] = bone.OffsetMatrix;
+                                offsetMatrices[bone.Name] = Matrix.Transpose(bone.OffsetMatrix);
 
             return offsetMatrices;
         }
