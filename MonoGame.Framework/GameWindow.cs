@@ -131,7 +131,7 @@ namespace Microsoft.Xna.Framework
 		/// </remarks>
 		public event EventHandler<TextInputEventArgs> TextInput;
 
-        internal bool IsTextInputHandled { get { return TextInput != null; } }
+        internal bool IsTextInputHandled { get { return TextInput != null && IsInputingText; } }
 
         /// <summary>
 		/// Use this event to user text editing(composition).
@@ -143,6 +143,8 @@ namespace Microsoft.Xna.Framework
 		/// This event is only supported on desktop platforms.
 		/// </remarks>
 		public event EventHandler<TextInputEventArgs> TextEditing;
+
+        internal bool IsTextEditingHandled { get { return TextEditing != null && IsInputingText; } }
 
         /// <summary>
         /// Buffered keyboard KeyDown event.

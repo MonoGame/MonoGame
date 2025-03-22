@@ -195,6 +195,9 @@ namespace MonoGame.Framework
             Form.ResizeEnd += OnResizeEnd;
 
             Form.KeyPress += OnKeyPress;
+            UpdateMouseKeys();
+
+            Form.SettingChanged += Form_SettingChanged;
 
             RegisterToAllWindows();
         }
@@ -373,12 +376,6 @@ namespace MonoGame.Framework
 
         [DllImport("user32.dll")]
         private static extern short VkKeyScanEx(char ch, IntPtr dwhkl);
-
-        private void OnKeyPress(object sender, KeyPressEventArgs e)
-        {
-            var key = (Keys) (VkKeyScanEx(e.KeyChar, InputLanguage.CurrentInputLanguage.Handle) & 0xff);
-            OnTextInput(new TextInputEventArgs(e.KeyChar, 0));
-        }
 
         internal void Initialize(int width, int height)
         {

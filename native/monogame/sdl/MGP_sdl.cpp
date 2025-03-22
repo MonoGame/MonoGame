@@ -591,7 +591,6 @@ mgbool MGP_Platform_PollEvent(MGP_Platform* platform, MGP_Event& event_)
     if(event_.Type == MGEventType::TextEditing || event_.Type == MGEventType::TextInput)
     {
         int len = 0;
-        int index = 0;
         int utf8character = 0; // using an int to encode multibyte characters longer than 2 bytes
         mgbyte currentByte = 0;
         int charByteSize = 0; // UTF8 char length to decode
@@ -631,17 +630,18 @@ mgbool MGP_Platform_PollEvent(MGP_Platform* platform, MGP_Event& event_)
                 if (codePoint >= 0)
                 {
                     event_.Text.CharacterCodePoint = codePoint;
-                    event_.Text.CharacterIndex = index;
-
                     platform->queued_events.push(event_);
-
-                    index += codePoint > 0xFFFF ? 2 : 1;
-
                     // UTF16 characters beyond 0xFFFF are not supported (and would require a surrogate encoding that is not supported by the char type)
                 }
             }
 
             len++;
+        }
+
+        if (len > 0)
+        {
+            event_.Text.CharacterCodePoint = 0;
+            platform->queued_events.push(event_);
         }
 
         if (platform->queued_events.size() > 0)

@@ -14,28 +14,16 @@ namespace Microsoft.Xna.Framework
     {
 
         /// <summary>
-        /// The character from the text event.
+        /// The text or character from the text event.
         /// </summary>
-        public readonly uint CharacterCodePoint;
-
-        /// <summary>
-        /// The character position of string.
-        /// </summary>
-        public readonly uint CharacterIndex;
+        public readonly string Text;
         /// <summary>
         /// Creates an instance of <see cref="TextInputEventArgs"/>.
         /// </summary>
-        /// <param name="characterCodePoint">The character from the text event</param>
-        /// <param name="characterIndex">The character position of string.</param>
-        public TextInputEventArgs(uint characterCodePoint, uint characterIndex = 0)
+        /// <param name="text">The text or character from the text event</param>
+        public TextInputEventArgs(string text)
         {
-            CharacterCodePoint = characterCodePoint;
-            CharacterIndex = characterIndex;
+            Text = text;
         }
-
-        /// <summary>
-        /// the formatted character from the text event.
-        /// </summary>
-        public string Character => char.ConvertFromUtf32((int)CharacterCodePoint);
     }
 }

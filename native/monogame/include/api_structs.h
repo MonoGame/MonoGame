@@ -181,7 +181,6 @@ struct MGP_TextEvent
 {
     void* Window;
     mguint CharacterCodePoint;
-    mguint CharacterIndex;
 };
 
 struct MGP_MouseMoveEvent
