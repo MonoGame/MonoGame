@@ -445,6 +445,7 @@ mgbool Internal_HandelTextEvent(MGP_Platform* platform, SDL_Event& event_SDL, MG
         platform->queued_events.pop();
         return true;
     }
+    return false;
 }
 
 mgbool MGP_Platform_PollEvent(MGP_Platform* platform, MGP_Event& event_)
