@@ -456,8 +456,14 @@ namespace Microsoft.Xna.Framework.Windows
         private char hs = '\0';
         void HandleCharMessage(ref Message m)
         {
+            if (_window == null) return;
             if (m.Msg == WM_CHAR || m.Msg == WM_UNICHAR)
             {
+                if(!_window.IsTextInputHandled)
+                {
+                    hs = '\0';
+                    return;
+                }
                 char c = (char)m.WParam;
                 if (c >= 0xD800 && c < 0xE000)
                 {
@@ -469,19 +475,23 @@ namespace Microsoft.Xna.Framework.Windows
                     {
                         if (hs != 0)
                         {
-                            _window.OnTextInput(new TextInputEventArgs((uint)char.ConvertToUtf32(hs, c), 0));
+                            _window.OnTextInput(new TextInputEventArgs(char.ConvertFromUtf32(char.ConvertToUtf32(hs, c))));
                         }
                         hs = '\0';
                     }
                 }
                 else
                 {
-                    _window.OnTextInput(new TextInputEventArgs(c, 0));
+                    _window.OnTextInput(new TextInputEventArgs(c.ToString()));
                     hs = '\0';
                 }
             }
             else
             {
+                if (!_window.IsTextEditingHandled)
+                {
+                    return;
+                }
                 if ((((uint)m.LParam) & GCS_COMPSTR) != 0)
                 {
                     IntPtr himc = ImmGetContext(Handle);
@@ -490,32 +500,7 @@ namespace Microsoft.Xna.Framework.Windows
                     {
                         char[] lpBuf = new char[(int)length >> 1];
                         ImmGetCompositionStringW(himc, GCS_COMPSTR, lpBuf, length);
-
-                        char codePoint = '\0';
-                        for (int i = 0; i < lpBuf.Length; i++)
-                        {
-                            char c = lpBuf[i];
-                            if (c >= 0xD800 && c < 0xE000)
-                            {
-                                if (c < 0xDC00)
-                                {
-                                    codePoint = c;
-                                }
-                                else
-                                {
-                                    if (codePoint != 0)
-                                    {
-                                        _window.OnTextEditing(new TextInputEventArgs((uint)char.ConvertToUtf32(codePoint, c), (uint)i));
-                                    }
-                                    codePoint = '\0';
-                                }
-                            }
-                            else
-                            {
-                                _window.OnTextEditing(new TextInputEventArgs(c, (uint)i));
-                                codePoint = '\0';
-                            }
-                        }
+                        _window.OnTextEditing(new TextInputEventArgs(new string(lpBuf)));
                     }
                     ImmReleaseContext(Handle, himc);
                 }

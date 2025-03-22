@@ -65,7 +65,6 @@ internal struct MGP_TextEvent
 {
     public nint Window;
     public uint CharacterCodePoint;
-    public uint CharacterIndex;
 }
 
 [StructLayout(LayoutKind.Sequential)]

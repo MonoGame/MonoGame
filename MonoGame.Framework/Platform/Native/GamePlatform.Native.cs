@@ -127,9 +127,6 @@ class NativeGamePlatform : GamePlatform
                     if (window != null)
                     { 
                         window.OnKeyDown(new InputKeyEventArgs(key));
-
-                        if (window.IsTextInputHandled && char.IsControl((char)character))
-                            window.OnTextInput(new TextInputEventArgs(character, 0));
                     }
 
                     break;
@@ -153,9 +150,12 @@ class NativeGamePlatform : GamePlatform
                     var window = NativeGameWindow.FromHandle(event_.Key.Window);
                     if (window != null && window.IsTextInputHandled)
                     {
-                        var character = event_.Text.CharacterCodePoint;
-                        var index = event_.Text.CharacterIndex;
-                        window.OnTextInput(new TextInputEventArgs(character, index));
+                        string textEventCache = char.ConvertFromUtf32((int)event_.Text.CharacterCodePoint);
+                        while (MGP.Platform_PollEvent(Handle, out event_) && event_.Type == EventType.TextInput && event_.Text.CharacterCodePoint != 0)
+                        {
+                            textEventCache += char.ConvertFromUtf32((int)event_.Text.CharacterCodePoint);
+                        }
+                        window.OnTextInput(new TextInputEventArgs(textEventCache));
                     }
                     break;
                 }
@@ -163,11 +163,14 @@ class NativeGamePlatform : GamePlatform
                 case EventType.TextEditing:
                 {
                     var window = NativeGameWindow.FromHandle(event_.Key.Window);
-                    if (window != null)
+                    if (window != null && window.IsTextEditingHandled)
                     {
-                        var character = event_.Text.CharacterCodePoint;
-                        var index = event_.Text.CharacterIndex;
-                        window.OnTextEditing(new TextInputEventArgs(character, index));
+                        string textEventCache = char.ConvertFromUtf32((int)event_.Text.CharacterCodePoint);
+                        while (MGP.Platform_PollEvent(Handle, out event_) && event_.Type == EventType.TextEditing && event_.Text.CharacterCodePoint != 0)
+                        {
+                            textEventCache += char.ConvertFromUtf32((int)event_.Text.CharacterCodePoint);
+                        }
+                        window.OnTextEditing(new TextInputEventArgs(textEventCache));
                     }
                     break;
                 }
