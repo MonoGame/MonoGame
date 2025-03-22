@@ -6,6 +6,7 @@ using System;
 using System.Globalization;
 using System.Runtime.InteropServices;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Windows.Forms;
 using Microsoft.Xna.Framework.Input.Touch;
 using MonoGame.Framework;
@@ -45,104 +46,115 @@ namespace Microsoft.Xna.Framework.Windows
         private readonly WinFormsGameWindow _window;
 
         #region Win32 Constants
-        public const int WM_SETFOCUS                        = 0x0007;
-        public const int WM_MOUSEHWHEEL                     = 0x020E;
-        public const int WM_POINTERUP                       = 0x0247;
-        public const int WM_POINTERDOWN                     = 0x0246;
-        public const int WM_POINTERUPDATE                   = 0x0245;
-        public const int WM_KEYDOWN                         = 0x0100;
-        public const int WM_KEYUP                           = 0x0101;
-        public const int WM_SYSKEYDOWN                      = 0x0104;
-        public const int WM_SYSKEYUP                        = 0x0105;
-        public const int WM_TABLET_QUERYSYSTEMGESTURESTA    = 0x02CC;
+        public const int WM_SETFOCUS = 0x0007;
+        public const int WM_MOUSEHWHEEL = 0x020E;
+        public const int WM_POINTERUP = 0x0247;
+        public const int WM_POINTERDOWN = 0x0246;
+        public const int WM_POINTERUPDATE = 0x0245;
+        public const int WM_KEYDOWN = 0x0100;
+        public const int WM_KEYUP = 0x0101;
+        public const int WM_SYSKEYDOWN = 0x0104;
+        public const int WM_SYSKEYUP = 0x0105;
+        public const int WM_TABLET_QUERYSYSTEMGESTURESTA = 0x02CC;
 
-        public const int WM_ENTERSIZEMOVE                   = 0x0231;
-        public const int WM_EXITSIZEMOVE                    = 0x0232;
-        public const int WM_DROPFILES                       = 0x0233;
+        public const int WM_ENTERSIZEMOVE = 0x0231;
+        public const int WM_EXITSIZEMOVE = 0x0232;
+        public const int WM_DROPFILES = 0x0233;
 
-        public const int WM_SYSCOMMAND                      = 0x0112;
+        public const int WM_SYSCOMMAND = 0x0112;
 
-        public const int WM_SETTINGCHANGE                   = 0x001A;
+        public const int WM_SETTINGCHANGE = 0x001A;
 
 
-        public const int WM_INPUTLANGCHANGE                 = 0x0051;
+        public const int WM_INPUTLANGCHANGE = 0x0051;
 
-        public const int WM_IME_STARTCOMPOSITION            = 0x010D;
-        public const int WM_IME_ENDCOMPOSITION              = 0x010E;
-        public const int WM_IME_COMPOSITION                 = 0x010F;
+        public const int WM_IME_STARTCOMPOSITION = 0x010D;
+        public const int WM_IME_ENDCOMPOSITION = 0x010E;
+        public const int WM_IME_COMPOSITION = 0x010F;
 
-        public const int WM_IME_SETCONTEXT                  = 0x0281;
-        public const int WM_IME_NOTIFY                      = 0x0282;
+        public const int WM_IME_SETCONTEXT = 0x0281;
+        public const int WM_IME_NOTIFY = 0x0282;
         //parm for WM_IME_NOTIFY
-            public const int IMN_CLOSESTATUSWINDOW          = 0x0001;
-            public const int IMN_OPENSTATUSWINDOW           = 0x0002;
-            public const int IMN_CHANGECANDIDATE            = 0x0003;
-            public const int IMN_CLOSECANDIDATE             = 0x0004;
-            public const int IMN_OPENCANDIDATE              = 0x0005;
-            public const int IMN_SETCONVERSIONMODE          = 0x0006;
-            public const int IMN_SETSENTENCEMODE            = 0x0007;
-            public const int IMN_SETOPENSTATUS              = 0x0008;
-            public const int IMN_SETCANDIDATEPOS            = 0x0009;
-            public const int IMN_SETCOMPOSITIONFONT         = 0x000A;
-            public const int IMN_SETCOMPOSITIONWINDOW       = 0x000B;
-            public const int IMN_SETSTATUSWINDOWPOS         = 0x000C;
-            public const int IMN_GUIDELINE                  = 0x000D;
-            public const int IMN_PRIVATE                    = 0x000E;
+        public const int IMN_CLOSESTATUSWINDOW = 0x0001;
+        public const int IMN_OPENSTATUSWINDOW = 0x0002;
+        public const int IMN_CHANGECANDIDATE = 0x0003;
+        public const int IMN_CLOSECANDIDATE = 0x0004;
+        public const int IMN_OPENCANDIDATE = 0x0005;
+        public const int IMN_SETCONVERSIONMODE = 0x0006;
+        public const int IMN_SETSENTENCEMODE = 0x0007;
+        public const int IMN_SETOPENSTATUS = 0x0008;
+        public const int IMN_SETCANDIDATEPOS = 0x0009;
+        public const int IMN_SETCOMPOSITIONFONT = 0x000A;
+        public const int IMN_SETCOMPOSITIONWINDOW = 0x000B;
+        public const int IMN_SETSTATUSWINDOWPOS = 0x000C;
+        public const int IMN_GUIDELINE = 0x000D;
+        public const int IMN_PRIVATE = 0x000E;
 
 
-        public const int WM_IME_CONTROL                     = 0x0283;
-        public const int WM_IME_COMPOSITIONFULL             = 0x0284;
-        public const int WM_IME_SELECT                      = 0x0285;
-        public const int WM_IME_CHAR                        = 0x0286;
+        public const int WM_IME_CONTROL = 0x0283;
+        public const int WM_IME_COMPOSITIONFULL = 0x0284;
+        public const int WM_IME_SELECT = 0x0285;
+        public const int WM_IME_CHAR = 0x0286;
 
-        public const int WM_CHAR                            = 0x0102;
-        public const int WM_UNICHAR                         = 0x0109;
-        public const int UNICODE_NOCHAR                     = 0xFFFF;
+        public const int WM_CHAR = 0x0102;
+        public const int WM_UNICHAR = 0x0109;
+        public const int UNICODE_NOCHAR = 0xFFFF;
 
-        public const int VK_PROCESSKEY                      = 0xE5;
+        public const int VK_PROCESSKEY = 0xE5;
 
         // parameter of ImmGetCompositionString
-        public const int GCS_COMPREADSTR                    = 0x0001;
-        public const int GCS_COMPREADATTR                   = 0x0002;
-        public const int GCS_COMPREADCLAUSE                 = 0x0004;
-        public const int GCS_COMPSTR                        = 0x0008;
-        public const int GCS_COMPATTR                       = 0x0010;
-        public const int GCS_COMPCLAUSE                     = 0x0020;
-        public const int GCS_CURSORPOS                      = 0x0080;
-        public const int GCS_DELTASTART                     = 0x0100;
-        public const int GCS_RESULTREADSTR                  = 0x0200;
-        public const int GCS_RESULTREADCLAUSE               = 0x0400;
-        public const int GCS_RESULTSTR                      = 0x0800;
-        public const int GCS_RESULTCLAUSE                   = 0x1000;
+        public const int GCS_COMPREADSTR = 0x0001;
+        public const int GCS_COMPREADATTR = 0x0002;
+        public const int GCS_COMPREADCLAUSE = 0x0004;
+        public const int GCS_COMPSTR = 0x0008;
+        public const int GCS_COMPATTR = 0x0010;
+        public const int GCS_COMPCLAUSE = 0x0020;
+        public const int GCS_CURSORPOS = 0x0080;
+        public const int GCS_DELTASTART = 0x0100;
+        public const int GCS_RESULTREADSTR = 0x0200;
+        public const int GCS_RESULTREADCLAUSE = 0x0400;
+        public const int GCS_RESULTSTR = 0x0800;
+        public const int GCS_RESULTCLAUSE = 0x1000;
 
         // dwIndex for ImmSetCompositionString API
-        public const int SCS_SETSTR                         = (GCS_COMPREADSTR|GCS_COMPSTR);
-        public const int SCS_CHANGEATTR                     = (GCS_COMPREADATTR|GCS_COMPATTR);
-        public const int SCS_CHANGECLAUSE                   = (GCS_COMPREADCLAUSE|GCS_COMPCLAUSE);
-        public const int SCS_SETRECONVERTSTRING             = 0x00010000;
-        public const int SCS_QUERYRECONVERTSTRING           = 0x00020000;
+        public const int SCS_SETSTR = (GCS_COMPREADSTR | GCS_COMPSTR);
+        public const int SCS_CHANGEATTR = (GCS_COMPREADATTR | GCS_COMPATTR);
+        public const int SCS_CHANGECLAUSE = (GCS_COMPREADCLAUSE | GCS_COMPCLAUSE);
+        public const int SCS_SETRECONVERTSTRING = 0x00010000;
+        public const int SCS_QUERYRECONVERTSTRING = 0x00020000;
 
         // dwAction for ImmNotifyIME
-        public const int NI_OPENCANDIDATE                   = 0x0010;
-        public const int NI_CLOSECANDIDATE                  = 0x0011;
-        public const int NI_SELECTCANDIDATESTR              = 0x0012;
-        public const int NI_CHANGECANDIDATELIST             = 0x0013;
-        public const int NI_FINALIZECONVERSIONRESULT        = 0x0014;
-        public const int NI_COMPOSITIONSTR                  = 0x0015;
-        public const int NI_SETCANDIDATE_PAGESTART          = 0x0016;
-        public const int NI_SETCANDIDATE_PAGESIZE           = 0x0017;
-        public const int NI_IMEMENUSELECTED                 = 0x0018;
+        public const int NI_OPENCANDIDATE = 0x0010;
+        public const int NI_CLOSECANDIDATE = 0x0011;
+        public const int NI_SELECTCANDIDATESTR = 0x0012;
+        public const int NI_CHANGECANDIDATELIST = 0x0013;
+        public const int NI_FINALIZECONVERSIONRESULT = 0x0014;
+        public const int NI_COMPOSITIONSTR = 0x0015;
+        public const int NI_SETCANDIDATE_PAGESTART = 0x0016;
+        public const int NI_SETCANDIDATE_PAGESIZE = 0x0017;
+        public const int NI_IMEMENUSELECTED = 0x0018;
 
         // dwIndex for ImmNotifyIME/NI_COMPOSITIONSTR
-        public const int CPS_COMPLETE                       = 0x0001;
-        public const int CPS_CONVERT                        = 0x0002;
-        public const int CPS_REVERT                         = 0x0003;
-        public const int CPS_CANCEL                         = 0x0004;
+        public const int CPS_COMPLETE = 0x0001;
+        public const int CPS_CONVERT = 0x0002;
+        public const int CPS_REVERT = 0x0003;
+        public const int CPS_CANCEL = 0x0004;
+
+
+
+        public const int CFS_DEFAULT        = 0x0000;
+        public const int CFS_RECT           = 0x0001;
+        public const int CFS_POINT          = 0x0002;
+        public const int CFS_FORCE_POSITION = 0x0020;
+        public const int CFS_CANDIDATEPOS   = 0x0040;
+        public const int CFS_EXCLUDE        = 0x0080;
         #endregion
 
         public bool AllowAltF4 = true;
 
         internal bool IsResizing { get; set; }
+
+        protected override bool CanEnableIme => true;
 
         #region Events
 
@@ -158,7 +170,7 @@ namespace Microsoft.Xna.Framework.Windows
         public void CenterOnPrimaryMonitor()
         {
             Location = new System.Drawing.Point(
-                (Screen.PrimaryScreen.WorkingArea.Width  - Width ) / 2,
+                (Screen.PrimaryScreen.WorkingArea.Width - Width) / 2,
                 (Screen.PrimaryScreen.WorkingArea.Height - Height) / 2);
         }
 
@@ -284,21 +296,60 @@ namespace Microsoft.Xna.Framework.Windows
             base.WndProc(ref m);
         }
 
+        struct POINT
+        {
+            public int x;
+            public int y;
+        }
+
+        struct RECT
+        {
+            public int left;
+            public int top;
+            public int right;
+            public int bottom;
+        }
+
+        struct COMPOSITIONFORM
+        {
+            public uint dwStyle;
+            public POINT ptCurrentPos;
+            public RECT rcArea;
+        }
+
+
+        struct CANDIDATEFORM
+        {
+            public uint dwIndex;
+            public uint dwStyle;
+            public POINT ptCurrentPos;
+            public RECT rcArea;
+        }
+
         [DllImport("user32.dll", CallingConvention = CallingConvention.Winapi)]
         private static extern IntPtr GetKeyboardLayout(uint idThread); //HKL
 
         [DllImport("Imm32.dll", CallingConvention = CallingConvention.Winapi)]
-        private static extern uint ImmGetContext(IntPtr hWnd); //HIMC
+        private static extern IntPtr ImmGetContext(IntPtr hWnd); //HIMC
         [DllImport("Imm32.dll", CallingConvention = CallingConvention.Winapi)]
-        private static extern bool ImmReleaseContext(IntPtr hWnd, uint himc);
+        private static extern bool ImmReleaseContext(IntPtr hWnd, IntPtr himc);
         [DllImport("Imm32.dll", CallingConvention = CallingConvention.Winapi)]
-        private static extern bool ImmNotifyIME(uint HIMC, uint dwAction, uint dwIndex, uint dwValue);
+        private static extern bool ImmNotifyIME(IntPtr himc, uint dwAction, uint dwIndex, uint dwValue);
 
         [DllImport("Imm32.dll", CharSet = CharSet.Unicode, CallingConvention = CallingConvention.Winapi)]
-        private static extern bool ImmSetCompositionStringW(uint himc, uint dwIndex, string lpComp, uint dwCompLen, string lpRead, uint dwReadLen);
+        private static extern bool ImmSetCompositionStringW(IntPtr himc, uint dwIndex, string lpComp, uint dwCompLen, string lpRead, uint dwReadLen);
 
         [DllImport("Imm32.dll", CharSet = CharSet.Unicode, CallingConvention = CallingConvention.Winapi)]
-        private static extern uint ImmGetCompositionStringW(uint himc, uint wd, char[] lpBuf, uint dwBufLen);
+        private static extern uint ImmGetCompositionStringW(IntPtr himc, uint wd, char[] lpBuf, uint dwBufLen);
+
+        [DllImport("Imm32.dll", CharSet = CharSet.Unicode, CallingConvention = CallingConvention.Winapi)]
+        private static extern bool ImmGetCompositionWindow(IntPtr himc, ref COMPOSITIONFORM lpCompForm);
+
+        [DllImport("Imm32.dll", CharSet = CharSet.Unicode, CallingConvention = CallingConvention.Winapi)]
+        private static extern bool ImmSetCompositionWindow(IntPtr himc, ref COMPOSITIONFORM lpCompForm);
+
+        [DllImport("Imm32.dll", CharSet = CharSet.Unicode, CallingConvention = CallingConvention.Winapi)]
+        private static extern bool ImmSetCandidateWindow(IntPtr himc, ref CANDIDATEFORM lpCompForm);
 
         private void HandleIMELanguageChange()
         {
@@ -309,7 +360,7 @@ namespace Microsoft.Xna.Framework.Windows
             if (prveLang != nextLang)
             {
                 lang = hkl;
-                uint himc = ImmGetContext(Handle);
+                IntPtr himc = ImmGetContext(Handle);
                 ImmNotifyIME(himc, NI_COMPOSITIONSTR, CPS_CANCEL, 0);
                 ImmSetCompositionStringW(himc, SCS_SETSTR, "\0", 2, "\0", 2);
                 ImmNotifyIME(himc, NI_CLOSECANDIDATE, 0, 0);
@@ -317,6 +368,58 @@ namespace Microsoft.Xna.Framework.Windows
                 getReadingString = null;
                 showReadingWindow = null;
                 EventHelpers.Raise(this, SettingChanged, EventArgs.Empty);
+            }
+        }
+
+        public Rectangle TextInputRect
+        {
+            get
+            {
+                COMPOSITIONFORM cof = new COMPOSITIONFORM();
+                IntPtr himc = ImmGetContext(Handle);
+                if (himc != IntPtr.Zero)
+                {
+                    ImmGetCompositionWindow(himc, ref cof);
+                    ImmReleaseContext(Handle, himc);
+                }
+                return new Rectangle(
+                    cof.rcArea.left,
+                    cof.rcArea.top,
+                    cof.rcArea.right - cof.rcArea.left,
+                    cof.rcArea.bottom - cof.rcArea.top
+                );
+            }
+            set
+            {
+                if (value.Width <= 0) value.Width = 1;
+                if (value.Height <= 0) value.Height = 1;
+                IntPtr himc = ImmGetContext(Handle);
+                if (himc != IntPtr.Zero)
+                {
+                    COMPOSITIONFORM cof = new COMPOSITIONFORM();
+                    CANDIDATEFORM caf = new CANDIDATEFORM();
+
+                    cof.dwStyle = CFS_RECT;
+                    cof.ptCurrentPos.x = value.X;
+                    cof.ptCurrentPos.y = value.Y;
+                    cof.rcArea.left = value.X;
+                    cof.rcArea.right = value.X + value.Width;
+                    cof.rcArea.top = value.Y;
+                    cof.rcArea.bottom = value.Y + value.Height;
+                    ImmSetCompositionWindow(himc, ref cof);
+
+                    caf.dwIndex = 0;
+                    caf.dwStyle = CFS_EXCLUDE;
+                    caf.ptCurrentPos.x = value.X;
+                    caf.ptCurrentPos.y = value.Y;
+                    caf.rcArea.left = value.X;
+                    caf.rcArea.right = value.X + value.Width;
+                    caf.rcArea.top = value  .Y;
+                    caf.rcArea.bottom = value.Y + value.Height;
+                    ImmSetCandidateWindow(himc, ref caf);
+
+                    ImmReleaseContext(Handle, himc);
+                }
             }
         }
 
@@ -384,7 +487,7 @@ namespace Microsoft.Xna.Framework.Windows
             {
                 if ((((uint)m.LParam) & GCS_COMPSTR) != 0)
                 {
-                    uint himc = ImmGetContext(Handle);
+                    IntPtr himc = ImmGetContext(Handle);
                     uint length = ImmGetCompositionStringW(himc, GCS_COMPSTR, null, 0);
                     if (length != 0)
                     {
