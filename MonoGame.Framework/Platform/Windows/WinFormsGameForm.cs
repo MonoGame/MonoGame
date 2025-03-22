@@ -388,8 +388,6 @@ namespace Microsoft.Xna.Framework.Windows
             }
             set
             {
-                if (value.Width <= 0) value.Width = 1;
-                if (value.Height <= 0) value.Height = 1;
                 IntPtr himc = ImmGetContext(Handle);
                 if (himc != IntPtr.Zero)
                 {
@@ -411,7 +409,7 @@ namespace Microsoft.Xna.Framework.Windows
                     caf.ptCurrentPos.y = value.Y;
                     caf.rcArea.left = value.X;
                     caf.rcArea.right = value.X + value.Width;
-                    caf.rcArea.top = value  .Y;
+                    caf.rcArea.top = value.Y;
                     caf.rcArea.bottom = value.Y + value.Height;
                     ImmSetCandidateWindow(himc, ref caf);
 
