@@ -635,8 +635,7 @@ mgbool MGP_Platform_PollEvent(MGP_Platform* platform, MGP_Event& event_)
 
                     platform->queued_events.push(event_);
 
-                    index++;
-                    if (codePoint > 0xFFFF) index++;
+                    index += codePoint > 0xFFFF ? 2 : 1;
 
                     // UTF16 characters beyond 0xFFFF are not supported (and would require a surrogate encoding that is not supported by the char type)
                 }
