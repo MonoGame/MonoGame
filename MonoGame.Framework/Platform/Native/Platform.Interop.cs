@@ -334,15 +334,15 @@ internal static unsafe partial class MGP
          string[] buttons,
          int count);
 
-    [LibraryImport(MonoGameNativeDLL, EntryPoint = "MGP_Window_GetTextInputState", StringMarshalling = StringMarshalling.Utf8)]
+    [LibraryImport(MonoGameNativeDLL, EntryPoint = "MGP_Window_GetIsUsingTextInput", StringMarshalling = StringMarshalling.Utf8)]
     [return: MarshalAs(UnmanagedType.U1)]
-    public static partial bool Window_GetTextInputState(MGP_Window* window);
+    public static partial bool Window_GetIsUsingTextInput(MGP_Window* window);
 
-    [LibraryImport(MonoGameNativeDLL, EntryPoint = "MGP_Window_SetTextInputState", StringMarshalling = StringMarshalling.Utf8)]
-    public static partial void Window_SetTextInputState(MGP_Window* window, [MarshalAs(UnmanagedType.U1)] bool state);
+    [LibraryImport(MonoGameNativeDLL, EntryPoint = "MGP_Window_SetIsUsingTextInput", StringMarshalling = StringMarshalling.Utf8)]
+    public static partial void Window_SetIsUsingTextInput(MGP_Window* window, [MarshalAs(UnmanagedType.U1)] bool state);
 
     [LibraryImport(MonoGameNativeDLL, EntryPoint = "MGP_Window_GetIMEPosition", StringMarshalling = StringMarshalling.Utf8)]
-    public static partial void Window_GetIMEPosition(MGP_Window* window, ref int x, ref int y, ref int width, ref int height);
+    public static partial void Window_GetIMEPosition(MGP_Window* window, out int x, out int y, out int width, out int height);
 
     [LibraryImport(MonoGameNativeDLL, EntryPoint = "MGP_Window_SetIMEPosition", StringMarshalling = StringMarshalling.Utf8)]
     public static partial void Window_SetIMEPosition(MGP_Window* window, int x, int y, int width, int height);

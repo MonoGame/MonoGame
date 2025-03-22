@@ -38,8 +38,8 @@ internal class NativeGameWindow : GameWindow
 
     public override unsafe bool IsInputingText
     {
-        get => MGP.Window_GetTextInputState(_handle);
-        set => MGP.Window_SetTextInputState(_handle, value);
+        get => MGP.Window_GetIsUsingTextInput(_handle);
+        set => MGP.Window_SetIsUsingTextInput(_handle, value);
     }
 
     public override unsafe Rectangle IMEPosition
@@ -47,7 +47,7 @@ internal class NativeGameWindow : GameWindow
         get
         {
             Rectangle rectangle = new Rectangle();
-            MGP.Window_GetIMEPosition(_handle, ref rectangle.X, ref rectangle.Y, ref rectangle.Width, ref rectangle.Height);
+            MGP.Window_GetIMEPosition(_handle, out rectangle.X, out rectangle.Y, out rectangle.Width, out rectangle.Height);
             return rectangle;
         }
         set => MGP.Window_SetIMEPosition(_handle, value.X, value.Y, value.Width, value.Height);
