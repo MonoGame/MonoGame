@@ -41,8 +41,6 @@ namespace Microsoft.Xna.Framework.Windows
 
 
         private IntPtr lang;
-        private GetReadingString getReadingString;
-        private ShowReadingWindow showReadingWindow;
         private readonly WinFormsGameWindow _window;
 
         #region Win32 Constants
@@ -366,8 +364,6 @@ namespace Microsoft.Xna.Framework.Windows
                 ImmSetCompositionStringW(himc, SCS_SETSTR, "\0", 2, "\0", 2);
                 ImmNotifyIME(himc, NI_CLOSECANDIDATE, 0, 0);
                 ImmReleaseContext(Handle, himc);
-                getReadingString = null;
-                showReadingWindow = null;
                 EventHelpers.Raise(this, SettingChanged, EventArgs.Empty);
             }
         }
