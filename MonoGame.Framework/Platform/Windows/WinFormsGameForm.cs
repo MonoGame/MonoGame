@@ -181,13 +181,11 @@ namespace Microsoft.Xna.Framework.Windows
         protected override void WndProc(ref Message m)
         {
             var state = TouchLocationState.Invalid;
-
-            if (m.Msg != WM_CHAR) hs = '\0';
+            m.Result = IntPtr.Zero;
 
             switch (m.Msg)
             {
                 case WM_SETFOCUS:
-                    m.Result = IntPtr.Zero;
                     return;
                 case WM_TABLET_QUERYSYSTEMGESTURESTA:
                     {
@@ -263,7 +261,13 @@ namespace Microsoft.Xna.Framework.Windows
                     {
                         break;
                     }
-                    _window.OnTextInput(new TextInputEventArgs(char.ConvertFromUtf32((int)m.WParam)));
+                    int utf32Char = (int)m.WParam;
+                    if (utf32Char == 0xFFFF)
+                    {
+                        m.Result = new IntPtr(1);
+                        return;
+                    }
+                    _window.OnTextInput(new TextInputEventArgs(char.ConvertFromUtf32(utf32Char)));
                     break;
 
                 case WM_IME_STARTCOMPOSITION:
