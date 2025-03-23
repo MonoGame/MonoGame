@@ -452,6 +452,7 @@ namespace Microsoft.Xna.Framework.Windows
         }
 
         private char hs = '\0';
+        private bool needSendEndEvent = true;
         void HandleCharMessage(ref Message m)
         {
             if (_window == null) return;
@@ -486,6 +487,11 @@ namespace Microsoft.Xna.Framework.Windows
             }
             else
             {
+                if (m.Msg == WM_IME_STARTCOMPOSITION)
+                {
+                    needSendEndEvent = true;
+                }
+
                 if (!_window.IsTextEditingHandled)
                 {
                     return;
@@ -506,7 +512,26 @@ namespace Microsoft.Xna.Framework.Windows
 
                 if ((((uint)m.LParam) & GCS_RESULTSTR) != 0)
                 {
+                    IntPtr himc = ImmGetContext(Handle);
+                    uint length = ImmGetCompositionStringW(himc, GCS_RESULTSTR, null, 0);
+                    if (length != 0)
+                    {
+                        char[] lpBuf = new char[(int)length >> 1];
+                        ImmGetCompositionStringW(himc, GCS_RESULTSTR, lpBuf, length);
+                        _window.OnTextEditing(new TextInputEventArgs(new string(lpBuf)));
+                    }
+                    ImmReleaseContext(Handle, himc);
                     _window.OnTextEditing(new TextInputEventArgs(string.Empty));
+                    needSendEndEvent = false;
+                }
+
+                if (m.Msg == WM_IME_ENDCOMPOSITION)
+                {
+                    if(needSendEndEvent)
+                    {
+                        _window.OnTextEditing(new TextInputEventArgs(string.Empty));
+                    }
+                    needSendEndEvent = true;
                 }
             }
         }
