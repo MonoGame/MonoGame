@@ -68,13 +68,13 @@ namespace MonoGame.Framework
             }
         }
 
-        public override bool IsInputingText
+        public override bool IsUsingTextInput
         {
             get => Form.Focused && Form.ImeMode == ImeMode.On;
             set
             {
                 Form.Focus();
-                if(IsInputingText != value)
+                if(IsUsingTextInput != value)
                 {
                     Form.ImeMode = value ? ImeMode.On : ImeMode.Off;
                 }
