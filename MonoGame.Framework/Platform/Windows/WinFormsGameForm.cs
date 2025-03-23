@@ -487,51 +487,61 @@ namespace Microsoft.Xna.Framework.Windows
             }
             else
             {
-                if (m.Msg == WM_IME_STARTCOMPOSITION)
+                switch(m.Msg)
                 {
-                    needSendEndEvent = true;
-                }
+                    case WM_IME_STARTCOMPOSITION:
+                        needSendEndEvent = true;
+                        break;
 
-                if (!_window.IsTextEditingHandled)
-                {
-                    return;
-                }
+                    case WM_IME_ENDCOMPOSITION:
+                        if (!_window.IsTextEditingHandled)
+                        {
+                            break;
+                        }
 
-                if ((((uint)m.LParam) & GCS_COMPSTR) != 0)
-                {
-                    IntPtr himc = ImmGetContext(Handle);
-                    uint length = ImmGetCompositionStringW(himc, GCS_COMPSTR, null, 0);
-                    if (length != 0)
-                    {
-                        char[] lpBuf = new char[(int)length >> 1];
-                        ImmGetCompositionStringW(himc, GCS_COMPSTR, lpBuf, length);
-                        _window.OnTextEditing(new TextInputEventArgs(new string(lpBuf)));
-                    }
-                    ImmReleaseContext(Handle, himc);
-                }
+                        if (needSendEndEvent)
+                        {
+                            _window.OnTextEditing(new TextInputEventArgs(string.Empty));
+                        }
 
-                if ((((uint)m.LParam) & GCS_RESULTSTR) != 0)
-                {
-                    IntPtr himc = ImmGetContext(Handle);
-                    uint length = ImmGetCompositionStringW(himc, GCS_RESULTSTR, null, 0);
-                    if (length != 0)
-                    {
-                        char[] lpBuf = new char[(int)length >> 1];
-                        ImmGetCompositionStringW(himc, GCS_RESULTSTR, lpBuf, length);
-                        _window.OnTextEditing(new TextInputEventArgs(new string(lpBuf)));
-                    }
-                    ImmReleaseContext(Handle, himc);
-                    _window.OnTextEditing(new TextInputEventArgs(string.Empty));
-                    needSendEndEvent = false;
-                }
+                        needSendEndEvent = true;
+                        break;
 
-                if (m.Msg == WM_IME_ENDCOMPOSITION)
-                {
-                    if(needSendEndEvent)
-                    {
-                        _window.OnTextEditing(new TextInputEventArgs(string.Empty));
-                    }
-                    needSendEndEvent = true;
+                    case WM_IME_COMPOSITION:
+                        if (!_window.IsTextEditingHandled)
+                        {
+                            break;
+                        }
+
+                        if ((((uint)m.LParam) & GCS_COMPSTR) != 0)
+                        {
+                            IntPtr himc = ImmGetContext(Handle);
+                            uint length = ImmGetCompositionStringW(himc, GCS_COMPSTR, null, 0);
+                            if (length != 0)
+                            {
+                                char[] lpBuf = new char[(int)length >> 1];
+                                ImmGetCompositionStringW(himc, GCS_COMPSTR, lpBuf, length);
+                                _window.OnTextEditing(new TextInputEventArgs(new string(lpBuf)));
+                            }
+                            ImmReleaseContext(Handle, himc);
+                        }
+
+                        if ((((uint)m.LParam) & GCS_RESULTSTR) != 0)
+                        {
+                            IntPtr himc = ImmGetContext(Handle);
+                            uint length = ImmGetCompositionStringW(himc, GCS_RESULTSTR, null, 0);
+                            if (length != 0)
+                            {
+                                char[] lpBuf = new char[(int)length >> 1];
+                                ImmGetCompositionStringW(himc, GCS_RESULTSTR, lpBuf, length);
+                                _window.OnTextEditing(new TextInputEventArgs(new string(lpBuf)));
+                            }
+                            ImmReleaseContext(Handle, himc);
+                            _window.OnTextEditing(new TextInputEventArgs(string.Empty));
+                            needSendEndEvent = false;
+                        }
+
+                        break;
                 }
             }
         }
