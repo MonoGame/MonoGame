@@ -913,7 +913,7 @@ mgint MGP_Window_GetClipboardText(MGP_Window* window, char* textBuf, mgint bufLe
 {
     mgint result = 0;
     char* sdlReturned = SDL_GetClipboardText();
-    if (bufLength <= 0 || textBuf == nullptr) bufLength = 0x7FFFFFFF;
+    if (textBuf == nullptr) bufLength = 0x7FFFFFFF;
     for (result = 0; result < bufLength; result++)
     {
         if (textBuf != nullptr)
