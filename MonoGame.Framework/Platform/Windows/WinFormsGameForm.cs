@@ -40,6 +40,9 @@ namespace Microsoft.Xna.Framework.Windows
         private delegate bool ShowReadingWindow(uint himc, bool bShow);
 
 
+
+        private char hs = '\0';
+        private bool needSendEndEvent = true;
         private IntPtr lang;
         private readonly WinFormsGameWindow _window;
 
@@ -179,6 +182,8 @@ namespace Microsoft.Xna.Framework.Windows
         {
             var state = TouchLocationState.Invalid;
 
+            if (m.Msg != WM_CHAR) hs = '\0';
+
             switch (m.Msg)
             {
                 case WM_SETFOCUS:
@@ -225,12 +230,96 @@ namespace Microsoft.Xna.Framework.Windows
                     HandleKeyMessage(ref m);
                     break;
                 case WM_CHAR:
-                case WM_UNICHAR:
-                case WM_IME_STARTCOMPOSITION:
-                case WM_IME_ENDCOMPOSITION:
-                case WM_IME_COMPOSITION:
-                    HandleCharMessage(ref m);
+                    if (!_window.IsTextInputHandled)
+                    {
+                        hs = '\0';
+                        break;
+                    }
+                    char c = (char)m.WParam;
+                    if (c >= 0xD800 && c < 0xE000)
+                    {
+                        if (c < 0xDC00)
+                        {
+                            hs = c;
+                        }
+                        else
+                        {
+                            if (hs != 0)
+                            {
+                                _window.OnTextInput(new TextInputEventArgs(hs.ToString() + c));
+                            }
+                            hs = '\0';
+                        }
+                    }
+                    else
+                    {
+                        _window.OnTextInput(new TextInputEventArgs(c.ToString()));
+                        hs = '\0';
+                    }
                     break;
+
+                case WM_UNICHAR:
+                    if (!_window.IsTextInputHandled)
+                    {
+                        break;
+                    }
+                    _window.OnTextInput(new TextInputEventArgs(char.ConvertFromUtf32((int)m.WParam)));
+                    break;
+
+                case WM_IME_STARTCOMPOSITION:
+                    needSendEndEvent = true;
+                    break;
+
+                case WM_IME_ENDCOMPOSITION:
+                    if (!_window.IsTextEditingHandled)
+                    {
+                        break;
+                    }
+
+                    if (needSendEndEvent)
+                    {
+                        _window.OnTextEditing(new TextInputEventArgs(string.Empty));
+                    }
+
+                    needSendEndEvent = true;
+                    break;
+
+                case WM_IME_COMPOSITION:
+                    if (!_window.IsTextEditingHandled)
+                    {
+                        break;
+                    }
+
+                    if ((((uint)m.LParam) & GCS_COMPSTR) != 0)
+                    {
+                        IntPtr himc = ImmGetContext(Handle);
+                        uint length = ImmGetCompositionStringW(himc, GCS_COMPSTR, null, 0);
+                        if (length != 0)
+                        {
+                            char[] lpBuf = new char[(int)length >> 1];
+                            ImmGetCompositionStringW(himc, GCS_COMPSTR, lpBuf, length);
+                            _window.OnTextEditing(new TextInputEventArgs(new string(lpBuf)));
+                        }
+                        ImmReleaseContext(Handle, himc);
+                    }
+
+                    if ((((uint)m.LParam) & GCS_RESULTSTR) != 0)
+                    {
+                        IntPtr himc = ImmGetContext(Handle);
+                        uint length = ImmGetCompositionStringW(himc, GCS_RESULTSTR, null, 0);
+                        if (length != 0)
+                        {
+                            char[] lpBuf = new char[(int)length >> 1];
+                            ImmGetCompositionStringW(himc, GCS_RESULTSTR, lpBuf, length);
+                            _window.OnTextEditing(new TextInputEventArgs(new string(lpBuf)));
+                        }
+                        ImmReleaseContext(Handle, himc);
+                        _window.OnTextEditing(new TextInputEventArgs(string.Empty));
+                        needSendEndEvent = false;
+                    }
+
+                    break;
+
                 case WM_DROPFILES:
                     HandleDropMessage(ref m);
                     break;
@@ -449,101 +538,6 @@ namespace Microsoft.Xna.Framework.Windows
                 }
             }
 
-        }
-
-        private char hs = '\0';
-        private bool needSendEndEvent = true;
-        void HandleCharMessage(ref Message m)
-        {
-            if (_window == null) return;
-            if (m.Msg == WM_CHAR || m.Msg == WM_UNICHAR)
-            {
-                if(!_window.IsTextInputHandled)
-                {
-                    hs = '\0';
-                    return;
-                }
-                char c = (char)m.WParam;
-                if (c >= 0xD800 && c < 0xE000)
-                {
-                    if (c < 0xDC00)
-                    {
-                        hs = c;
-                    }
-                    else
-                    {
-                        if (hs != 0)
-                        {
-                            _window.OnTextInput(new TextInputEventArgs(hs.ToString() + c));
-                        }
-                        hs = '\0';
-                    }
-                }
-                else
-                {
-                    _window.OnTextInput(new TextInputEventArgs(c.ToString()));
-                    hs = '\0';
-                }
-            }
-            else
-            {
-                switch(m.Msg)
-                {
-                    case WM_IME_STARTCOMPOSITION:
-                        needSendEndEvent = true;
-                        break;
-
-                    case WM_IME_ENDCOMPOSITION:
-                        if (!_window.IsTextEditingHandled)
-                        {
-                            break;
-                        }
-
-                        if (needSendEndEvent)
-                        {
-                            _window.OnTextEditing(new TextInputEventArgs(string.Empty));
-                        }
-
-                        needSendEndEvent = true;
-                        break;
-
-                    case WM_IME_COMPOSITION:
-                        if (!_window.IsTextEditingHandled)
-                        {
-                            break;
-                        }
-
-                        if ((((uint)m.LParam) & GCS_COMPSTR) != 0)
-                        {
-                            IntPtr himc = ImmGetContext(Handle);
-                            uint length = ImmGetCompositionStringW(himc, GCS_COMPSTR, null, 0);
-                            if (length != 0)
-                            {
-                                char[] lpBuf = new char[(int)length >> 1];
-                                ImmGetCompositionStringW(himc, GCS_COMPSTR, lpBuf, length);
-                                _window.OnTextEditing(new TextInputEventArgs(new string(lpBuf)));
-                            }
-                            ImmReleaseContext(Handle, himc);
-                        }
-
-                        if ((((uint)m.LParam) & GCS_RESULTSTR) != 0)
-                        {
-                            IntPtr himc = ImmGetContext(Handle);
-                            uint length = ImmGetCompositionStringW(himc, GCS_RESULTSTR, null, 0);
-                            if (length != 0)
-                            {
-                                char[] lpBuf = new char[(int)length >> 1];
-                                ImmGetCompositionStringW(himc, GCS_RESULTSTR, lpBuf, length);
-                                _window.OnTextEditing(new TextInputEventArgs(new string(lpBuf)));
-                            }
-                            ImmReleaseContext(Handle, himc);
-                            _window.OnTextEditing(new TextInputEventArgs(string.Empty));
-                            needSendEndEvent = false;
-                        }
-
-                        break;
-                }
-            }
         }
 
         [DllImport("shell32.dll", CharSet = CharSet.Unicode)]
