@@ -34,7 +34,7 @@ namespace MonoGame.Tests.Framework
             get { throw new NotImplementedException(); }
         }
 
-        public override bool IsInputingText { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        public override bool IsUsingTextInput { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
         public override Rectangle IMEPosition { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
         public override string ClipboardText { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
 

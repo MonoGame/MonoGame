@@ -131,7 +131,7 @@ namespace Microsoft.Xna.Framework
 		/// </remarks>
 		public event EventHandler<TextInputEventArgs> TextInput;
 
-        internal bool IsTextInputHandled { get { return TextInput != null && IsInputingText; } }
+        internal bool IsTextInputHandled { get { return TextInput != null && IsUsingTextInput; } }
 
         /// <summary>
 		/// Use this event to user text editing(composition).
@@ -144,7 +144,7 @@ namespace Microsoft.Xna.Framework
 		/// </remarks>
 		public event EventHandler<TextInputEventArgs> TextEditing;
 
-        internal bool IsTextEditingHandled { get { return TextEditing != null && IsInputingText; } }
+        internal bool IsTextEditingHandled { get { return TextEditing != null && IsUsingTextInput; } }
 
         /// <summary>
         /// Buffered keyboard KeyDown event.
@@ -217,7 +217,7 @@ namespace Microsoft.Xna.Framework
         /// <summary>
 	    /// Set Text Input State. If this is true, OnTextInput and OnTextEditing will available, IME will open.
         /// </summary>
-		public abstract bool IsInputingText {get; set; }
+		public abstract bool IsUsingTextInput {get; set; }
         /// <summary>
 	    /// Get or set position Of IME(Input Method Editor).
         /// </summary>

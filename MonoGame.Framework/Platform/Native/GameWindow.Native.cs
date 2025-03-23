@@ -36,7 +36,7 @@ internal class NativeGameWindow : GameWindow
 
 
 
-    public override unsafe bool IsInputingText
+    public override unsafe bool IsUsingTextInput
     {
         get => MGP.Window_GetIsUsingTextInput(_handle);
         set => MGP.Window_SetIsUsingTextInput(_handle, value);

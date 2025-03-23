@@ -59,13 +59,13 @@ namespace Microsoft.Xna.Framework
             }
         }
 
-        public override bool IsInputingText
+        public override bool IsUsingTextInput
         {
             get => _handle == Sdl.Keyboard.GetKeyboardFocus() && Sdl.Text.IsTextInputActive();
             set
             {
                 Sdl.Keyboard.SetWindowInputFocus(_handle);
-                if (IsInputingText != value)
+                if (IsUsingTextInput != value)
                 {
                     if (value)
                     {
