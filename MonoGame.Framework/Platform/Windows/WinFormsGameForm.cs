@@ -489,6 +489,7 @@ namespace Microsoft.Xna.Framework.Windows
                 {
                     return;
                 }
+
                 if ((((uint)m.LParam) & GCS_COMPSTR) != 0)
                 {
                     IntPtr himc = ImmGetContext(Handle);
@@ -500,6 +501,11 @@ namespace Microsoft.Xna.Framework.Windows
                         _window.OnTextEditing(new TextInputEventArgs(new string(lpBuf)));
                     }
                     ImmReleaseContext(Handle, himc);
+                }
+
+                if ((((uint)m.LParam) & GCS_RESULTSTR) != 0)
+                {
+                    _window.OnTextEditing(new TextInputEventArgs(string.Empty));
                 }
             }
         }
