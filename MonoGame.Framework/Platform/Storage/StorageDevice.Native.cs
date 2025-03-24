@@ -84,11 +84,6 @@ namespace Microsoft.Xna.Framework.Storage
             throw new NotImplementedException();
         }
 
-        private bool PlatformIsConnected()
-        {
-            throw new NotImplementedException();
-        }
-
         private long PlatformFreeSpace()
         {
             throw new NotImplementedException();
