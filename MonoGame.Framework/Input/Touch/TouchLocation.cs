@@ -1,42 +1,6 @@
-#region License
-// /*
-// Microsoft Public License (Ms-PL)
-// MonoGame - Copyright (C) 2009-2010 The MonoGame Team
-// 
-// All rights reserved.
-// 
-// This license governs use of the accompanying software. If you use the software, you accept this license. If you do not
-// accept the license, do not use the software.
-// 
-// 1. Definitions
-// The terms "reproduce," "reproduction," "derivative works," and "distribution" have the same meaning here as under 
-// U.S. copyright law.
-// 
-// A "contribution" is the original software, or any additions or changes to the software.
-// A "contributor" is any person that distributes its contribution under this license.
-// "Licensed patents" are a contributor's patent claims that read directly on its contribution.
-// 
-// 2. Grant of Rights
-// (A) Copyright Grant- Subject to the terms of this license, including the license conditions and limitations in section 3, 
-// each contributor grants you a non-exclusive, worldwide, royalty-free copyright license to reproduce its contribution, prepare derivative works of its contribution, and distribute its contribution or any derivative works that you create.
-// (B) Patent Grant- Subject to the terms of this license, including the license conditions and limitations in section 3, 
-// each contributor grants you a non-exclusive, worldwide, royalty-free license under its licensed patents to make, have made, use, sell, offer for sale, import, and/or otherwise dispose of its contribution in the software or derivative works of the contribution in the software.
-// 
-// 3. Conditions and Limitations
-// (A) No Trademark License- This license does not grant you rights to use any contributors' name, logo, or trademarks.
-// (B) If you bring a patent claim against any contributor over patents that you claim are infringed by the software, 
-// your patent license from such contributor to the software ends automatically.
-// (C) If you distribute any portion of the software, you must retain all copyright, patent, trademark, and attribution 
-// notices that are present in the software.
-// (D) If you distribute any portion of the software in source code form, you may do so only under this license by including 
-// a complete copy of this license with your distribution. If you distribute any portion of the software in compiled or object 
-// code form, you may only do so under a license that complies with this license.
-// (E) The software is licensed "as-is." You bear the risk of using it. The contributors give no express warranties, guarantees
-// or conditions. You may have additional consumer rights under your local laws which this license cannot change. To the extent
-// permitted under your local laws, the contributors exclude the implied warranties of merchantability, fitness for a particular
-// purpose and non-infringement.
-// */
-#endregion License
+// MonoGame - Copyright (C) MonoGame Foundation, Inc
+// This file is subject to the terms and conditions defined in
+// file 'LICENSE.txt', which is part of this source code package.
 
 #region Using clause
 using System;
@@ -46,6 +10,9 @@ using System.Diagnostics;
 
 namespace Microsoft.Xna.Framework.Input.Touch
 {
+    /// <summary>
+    /// Provides methods and properties for interacting with a touch location on a touch screen device.
+    /// </summary>
     public struct TouchLocation : IEquatable<TouchLocation>
     {
 		/// <summary>
@@ -103,6 +70,9 @@ namespace Microsoft.Xna.Framework.Input.Touch
             get { return _velocity; }
         }
 
+        /// <summary>
+        /// Gets the ID of the touch location.
+        /// </summary>
 		public int Id 
 		{ 
 			get
@@ -111,6 +81,9 @@ namespace Microsoft.Xna.Framework.Input.Touch
 	        }
 		}
 
+        /// <summary>
+        /// Gets the position of the touch location.
+        /// </summary>
         public Vector2 Position 
 		{ 
 			get
@@ -118,7 +91,11 @@ namespace Microsoft.Xna.Framework.Input.Touch
 	            return _position;
 	        }
 		}
-		
+
+        /// <summary>
+        /// Gets the pressure of the touch location.
+        /// </summary>
+        /// <remarks>Only used in Android devices</remarks>
 		public float Pressure 
 		{ 
 			get
@@ -126,7 +103,10 @@ namespace Microsoft.Xna.Framework.Input.Touch
             	return _pressure;
         	}
 		}
-								
+
+        /// <summary>
+        /// Gets the current state of the touch location.
+        /// </summary>
         public TouchLocationState State 
 		{ 
 			get
@@ -134,17 +114,26 @@ namespace Microsoft.Xna.Framework.Input.Touch
 	            return _state;
 	        } 
 		}
-		
-		#endregion
-		
-		#region Constructors
 
+        #endregion
+
+        #region Constructors
+
+        /// <inheritdoc cref="TouchLocation(int, TouchLocationState, Vector2, TouchLocationState, Vector2)"/>
         public TouchLocation(int id, TouchLocationState state, Vector2 position)
             : this(id, state, position, TouchLocationState.Invalid, Vector2.Zero)
         {
         }
 
-        public TouchLocation(   int id, TouchLocationState state, Vector2 position, 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="TouchLocation"/> structure.
+        /// </summary>
+        /// <param name="id">ID of the touch location.</param>
+        /// <param name="state">Current state of the touch location.</param>
+        /// <param name="position">Position of the touch location.</param>
+        /// <param name="previousState">Previous state of this touch location.</param>
+        /// <param name="previousPosition">Previous position of this touch location.</param>
+        public TouchLocation(int id, TouchLocationState state, Vector2 position, 
                                 TouchLocationState previousState, Vector2 previousPosition)
             : this(id, state, position, previousState, previousPosition, TimeSpan.Zero, false)
         {
@@ -270,6 +259,7 @@ namespace Microsoft.Xna.Framework.Input.Touch
             return _isHighFrequency;
         }
 
+        /// <inheritdoc/>
         public override bool Equals(object obj)
         {
 			if (obj is TouchLocation)
@@ -278,6 +268,7 @@ namespace Microsoft.Xna.Framework.Input.Touch
 			return false;
 		}
 
+        /// <inheritdoc/>
         public bool Equals(TouchLocation other)
         {
             return  _id.Equals(other._id) &&
@@ -286,17 +277,24 @@ namespace Microsoft.Xna.Framework.Input.Touch
         }
 
 
-
+        /// <inheritdoc/>
         public override int GetHashCode()
         {
             return _id;
         }
 
+        /// <summary>
+        /// Gets a string representation of the <see cref="TouchLocation"/>.
+        /// </summary>
         public override string ToString()
         {
             return "Touch id:"+_id+" state:"+_state + " position:" + _position + " pressure:" + _pressure +" prevState:"+_previousState+" prevPosition:"+ _previousPosition + " previousPressure:" + _previousPressure;
         }
 
+        /// <summary>
+        /// Attempts to get the previous location of this touch location object.
+        /// </summary>
+        /// <param name="aPreviousLocation">Previous location data, as a <see cref="TouchLocation"/>.</param>
         public bool TryGetPreviousLocation(out TouchLocation aPreviousLocation)
         {
 			if (_previousState == TouchLocationState.Invalid)
@@ -333,6 +331,12 @@ namespace Microsoft.Xna.Framework.Input.Touch
             return true;
         }
 
+        /// <summary>
+        /// Returns a value that indicates whether the two values are not equal.
+        /// </summary>
+        /// <param name="value1">The value on the left of the inequality operator.</param>
+        /// <param name="value2">The value on the right of the inequality operator.</param>
+        /// <returns><see langword="true"/> if the two values are not equal; otherwise, <see langword="false"/>.</returns>
         public static bool operator !=(TouchLocation value1, TouchLocation value2)
         {
 			return  value1._id != value2._id || 
@@ -342,6 +346,12 @@ namespace Microsoft.Xna.Framework.Input.Touch
 			        value1._previousPosition != value2._previousPosition;
         }
 
+        /// <summary>
+        /// Returns a value that indicates whether the two values are equal.
+        /// </summary>
+        /// <param name="value1">The value on the left of the equality operator.</param>
+        /// <param name="value2">The value on the right of the equality operator.</param>
+        /// <returns><see langword="true"/> if the two values are equal; otherwise, <see langword="false"/>.</returns>
         public static bool operator ==(TouchLocation value1, TouchLocation value2)
         {
             return  value1._id == value2._id && 

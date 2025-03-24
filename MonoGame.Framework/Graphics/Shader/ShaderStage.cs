@@ -4,5 +4,7 @@
     {
         Vertex,
         Pixel,
+
+        Count,
     }
 }

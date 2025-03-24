@@ -1,8 +1,10 @@
-﻿// MonoGame - Copyright (C) The MonoGame Team
+﻿// MonoGame - Copyright (C) MonoGame Foundation, Inc
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System;
+using System.Diagnostics;
+using System.Threading;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
@@ -11,11 +13,38 @@ namespace MonoGame.Content.Builder
 {
     class Program
     {
+        class AssertListener : TraceListener
+        {
+            public override void Write(string message)
+            {
+                Console.Write(message);
+            }
+
+            public override void WriteLine(string message)
+            {
+                Console.WriteLine(message);
+            }
+
+            public override void Fail(string message, string detailMessage)
+            {
+                Console.WriteLine(message);
+
+                if (!string.IsNullOrEmpty(detailMessage))
+                    Console.WriteLine(detailMessage);
+            }
+        }
+
         static int Main(string[] args)
         {
             // We force all stderr to redirect to stdout
             // to avoid any out of order console output.
             Console.SetError(Console.Out);
+
+            // Hook in our own trace listener so that errors
+            // from asserts appear in the output logging instead
+            // of having silent failures.
+            Trace.Listeners.Clear();
+            Trace.Listeners.Add(new AssertListener());
 
             if (!Environment.Is64BitProcess && Environment.OSVersion.Platform != PlatformID.Unix)
             {
@@ -43,6 +72,19 @@ namespace MonoGame.Content.Builder
                 } catch (NotImplementedException) {
                     // not implemented under Mono
                     Console.Error.WriteLine("The debugger is not implemented under Mono and thus is not supported on your platform.");
+                }
+            }
+            if (content.WaitForDebuggerToAttach)
+            {
+                var currentProcess = Process.GetCurrentProcess();
+                Console.WriteLine($"Waiting for debugger to attach ({currentProcess.MainModule.FileName} PID {currentProcess.Id}).  Press any key to continue without debugger.");
+                while (!Debugger.IsAttached)
+                {
+                    if (Console.KeyAvailable)
+                    {
+                        break;
+                    }
+                    Thread.Sleep(100);
                 }
             }
 

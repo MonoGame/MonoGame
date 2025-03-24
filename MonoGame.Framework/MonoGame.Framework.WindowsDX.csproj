@@ -9,6 +9,8 @@
     <PackageTags>monogame;.net core;core;.net standard;standard;windowsdx</PackageTags>
     <PackageId>MonoGame.Framework.WindowsDX</PackageId>
     <AppendTargetFrameworkToOutputPath>False</AppendTargetFrameworkToOutputPath>
+    <IsAotCompatible>false</IsAotCompatible>
+	<IsTrimmable>false</IsTrimmable>
   </PropertyGroup>
 
   <ItemGroup>
@@ -51,6 +53,12 @@
     <Compile Include="Platform\Utilities\CurrentPlatform.cs" />
     <Compile Include="Platform\Utilities\ReflectionHelpers.Legacy.cs" />
     <Compile Include="Platform\Utilities\TimerHelper.cs" />
+    <Compile Include="Platform\Windows\Accessibility\MouseKeys.cs" />
+    <Compile Include="Platform\Windows\Accessibility\MouseKeysFlags.cs" />
+    <Compile Include="Platform\Windows\Accessibility\MouseKeysManager.cs" />
+    <Compile Include="Platform\Windows\Accessibility\NativeMethods.cs" />
+    <Compile Include="Platform\Windows\Accessibility\SPI.cs" />
+    <Compile Include="Platform\Windows\Accessibility\SPIF.cs" />
     <Compile Include="Platform\Windows\HorizontalMouseWheelEventArgs.cs" />
     <Compile Include="Platform\Windows\WinFormsGameForm.cs" />
     <Compile Include="Platform\Windows\WinFormsGamePlatform.cs" />

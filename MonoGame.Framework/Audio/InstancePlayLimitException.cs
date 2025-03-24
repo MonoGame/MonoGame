@@ -1,4 +1,4 @@
-// MonoGame - Copyright (C) The MonoGame Team
+// MonoGame - Copyright (C) MonoGame Foundation, Inc
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
@@ -15,11 +15,7 @@ namespace Microsoft.Xna.Framework.Audio
     /// Most platforms have a hard limit on how many sounds can be played simultaneously. This exception is thrown when that limit is exceeded.
     /// </remarks>
     [DataContract]
-#if WINDOWS_UAP
-    public sealed class InstancePlayLimitException : Exception
-#else
     public sealed class InstancePlayLimitException : ExternalException
-#endif
 	{
 	}
 }

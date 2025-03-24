@@ -1,7 +1,9 @@
-﻿// MonoGame - Copyright (C) The MonoGame Team
+﻿// MonoGame - Copyright (C) MonoGame Foundation, Inc
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
+using System;
+using Android.OS;
 using Android.Views;
 
 namespace Microsoft.Xna.Framework.Input
@@ -35,7 +37,10 @@ namespace Microsoft.Xna.Framework.Input
             var capabilities = new GamePadCapabilities();
             capabilities.IsConnected = true;
             capabilities.GamePadType = GamePadType.GamePad;
-            capabilities.HasLeftVibrationMotor = capabilities.HasRightVibrationMotor = device.Vibrator.HasVibrator;
+            capabilities.HasLeftVibrationMotor = capabilities.HasRightVibrationMotor =
+                !OperatingSystem.IsAndroidVersionAtLeast (31) ?
+                    device.Vibrator.HasVibrator :
+                    device.VibratorManager.DefaultVibrator.HasVibrator;
 
             // build out supported inputs from what the gamepad exposes
             int[] keyMap = new int[16];
@@ -63,7 +68,7 @@ namespace Microsoft.Xna.Framework.Input
             // get a bool[] with indices matching the keyMap
             bool[] hasMap = new bool[16];
             // HasKeys() was defined in Kitkat / API19 / Android 4.4
-            if (Android.OS.Build.VERSION.SdkInt < Android.OS.BuildVersionCodes.Kitkat)
+            if (!OperatingSystem.IsAndroidVersionAtLeast(19))
             {
                 var keyMap2 = new Keycode[keyMap.Length];
                 for(int i=0; i<keyMap.Length;i++)
@@ -178,10 +183,17 @@ namespace Microsoft.Xna.Framework.Input
             if (gamePad == null)
                 return false;
 
-            var vibrator = gamePad._device.Vibrator;
+            var vibrator = !OperatingSystem.IsAndroidVersionAtLeast (31) ? gamePad._device.Vibrator : gamePad._device.VibratorManager.DefaultVibrator;
             if (!vibrator.HasVibrator)
                 return false;
-            vibrator.Vibrate(500);
+            if (!OperatingSystem.IsAndroidVersionAtLeast (26))
+            {
+                vibrator.Vibrate(500);
+            }
+            else
+            {
+                vibrator.Vibrate (VibrationEffect.CreateOneShot(500, VibrationEffect.DefaultAmplitude));
+            }
             return true;
         }
 

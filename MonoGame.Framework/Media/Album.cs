@@ -1,37 +1,54 @@
-﻿// MonoGame - Copyright (C) The MonoGame Team
+﻿// MonoGame - Copyright (C) MonoGame Foundation, Inc
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System;
 using System.IO;
-#if WINDOWS_UAP
-using Windows.Storage.FileProperties;
-#elif IOS
+#if IOS
 using System.Drawing;
 using CoreGraphics;
 using MediaPlayer;
 using UIKit;
 #elif ANDROID
+using Android.Content;
 using Android.Graphics;
 using Android.Provider;
 #endif
 
 namespace Microsoft.Xna.Framework.Media
 {
+    /// <summary>
+    /// Provides access to an album in the media library
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// The <b>Album</b> class provides information about an album, 
+    /// including the album's <see cref="Name"/>, <see cref="Artist"/>, and <see cref="Songs"/>.
+    /// </para>
+    /// <para>
+    /// You can obtain an <b>Album</b> object through the
+    /// <see cref="P:Microsoft.Xna.Framework.Media.AlbumCollection.Item(System.Int32)"/>
+    /// indexer and the <see cref="Song.Album">Song.Album</see> property.
+    /// </para>
+    /// </remarks>
     public sealed class Album : IDisposable
     {
         private Artist artist;
         private Genre genre;
         private string album;
         private SongCollection songCollection;
-#if WINDOWS_UAP
-        private StorageItemThumbnail thumbnail;
-#elif IOS && !TVOS
+#if IOS && !TVOS
         private MPMediaItemArtwork thumbnail;
 #elif ANDROID
         private Android.Net.Uri thumbnail;
 #endif
 
+        /// <summary>
+        /// Gets the <see cref="Media.Artist"/> of the Album.
+        /// </summary>
+        /// <value>
+        /// <see cref="Media.Artist"/> of this Album.
+        /// </value>
         public Artist Artist
         {
             get
@@ -52,7 +69,7 @@ namespace Microsoft.Xna.Framework.Media
         }
 
         /// <summary>
-        /// Gets the Genre of the Album.
+        /// Gets the <see cref="Media.Genre"/> of the Album.
         /// </summary>
         public Genre Genre
         {
@@ -69,9 +86,7 @@ namespace Microsoft.Xna.Framework.Media
         {
             get
             {
-#if WINDOWS_UAP
-                return this.thumbnail != null;
-#elif IOS && !TVOS
+#if IOS && !TVOS
                 // If album art is missing the bounds will be: Infinity, Infinity, 0, 0
                 return this.thumbnail != null && this.thumbnail.Bounds.Width != 0;
 #elif ANDROID
@@ -105,7 +120,7 @@ namespace Microsoft.Xna.Framework.Media
         }
 
         /// <summary>
-        /// Gets a SongCollection that contains the songs on the album.
+        /// Gets a <see cref="Media.SongCollection"/> that contains the songs on the Album.
         /// </summary>
         public SongCollection Songs
         {
@@ -122,13 +137,7 @@ namespace Microsoft.Xna.Framework.Media
             this.artist = artist;
             this.genre = genre;
         }
-#if WINDOWS_UAP
-        internal Album(SongCollection songCollection, string name, Artist artist, Genre genre, StorageItemThumbnail thumbnail)
-            : this(songCollection, name, artist, genre)
-        {
-            this.thumbnail = thumbnail;
-        }
-#elif IOS && !TVOS
+#if IOS && !TVOS
         internal Album(SongCollection songCollection, string name, Artist artist, Genre genre, MPMediaItemArtwork thumbnail)
             : this(songCollection, name, artist, genre)
         {
@@ -142,19 +151,11 @@ namespace Microsoft.Xna.Framework.Media
         }
 #endif
 
-        /// <summary>
-        /// Immediately releases the unmanaged resources used by this object.
-        /// </summary>
+        /// <inheritdoc cref="IDisposable.Dispose()"/>
         public void Dispose()
-        {
-#if WINDOWS_UAP
-            if (this.thumbnail != null)
-                this.thumbnail.Dispose();
-#endif
-        }
+        { }
         
 #if IOS && !TVOS
-        [CLSCompliant(false)]
         public UIImage GetAlbumArt(int width = 0, int height = 0)
         {
             if (width == 0)
@@ -165,10 +166,15 @@ namespace Microsoft.Xna.Framework.Media
 			return this.thumbnail.ImageWithSize(new CGSize(width, height));
         }
 #elif ANDROID
-        [CLSCompliant(false)]
         public Bitmap GetAlbumArt(int width = 0, int height = 0)
         {
-            var albumArt = MediaStore.Images.Media.GetBitmap(MediaLibrary.Context.ContentResolver, this.thumbnail);
+            Bitmap albumArt;
+            if (!OperatingSystem.IsAndroidVersionAtLeast (29)) {
+                albumArt = MediaStore.Images.Media.GetBitmap(MediaLibrary.Context.ContentResolver, this.thumbnail);
+            } else {
+                var source = ImageDecoder.CreateSource (MediaLibrary.Context.ContentResolver, this.thumbnail);
+                albumArt = ImageDecoder.DecodeBitmap (source);
+            }
             if (width == 0 || height == 0)
                 return albumArt;
 
@@ -182,24 +188,16 @@ namespace Microsoft.Xna.Framework.Media
         /// </summary>
         public Stream GetAlbumArt()
         {
-#if WINDOWS_UAP
-            if (this.HasArt)
-                return this.thumbnail.AsStream();
-            return null;
-#else
             throw new NotImplementedException();
-#endif
         }
 #endif
 
 #if IOS && !TVOS
-        [CLSCompliant(false)]
         public UIImage GetThumbnail()
         {
             return this.GetAlbumArt(220, 220);
         }
 #elif ANDROID
-        [CLSCompliant(false)]
         public Bitmap GetThumbnail()
         {
             return this.GetAlbumArt(220, 220);
@@ -210,14 +208,7 @@ namespace Microsoft.Xna.Framework.Media
         /// </summary>
         public Stream GetThumbnail()
         {
-#if WINDOWS_UAP
-            if (this.HasArt)
-                return this.thumbnail.AsStream();
-
-            return null;
-#else
             throw new NotImplementedException();
-#endif
         }
 #endif
 

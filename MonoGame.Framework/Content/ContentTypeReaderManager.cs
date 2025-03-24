@@ -1,4 +1,4 @@
-// MonoGame - Copyright (C) The MonoGame Team
+// MonoGame - Copyright (C) MonoGame Foundation, Inc
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
@@ -11,6 +11,9 @@ using MonoGame.Framework.Utilities;
 
 namespace Microsoft.Xna.Framework.Content
 {
+    /// <summary>
+    /// Defines a manager that constructs and keeps track of <see cref="ContentTypeReader"/> objects.
+    /// </summary>
     public sealed class ContentTypeReaderManager
     {
         private static readonly object _locker;
@@ -30,6 +33,15 @@ namespace Microsoft.Xna.Framework.Content
             _assemblyName = ReflectionHelpers.GetAssembly(typeof(ContentTypeReaderManager)).FullName;
         }
 
+        /// <summary>
+        /// Creates a new instance of the <see cref="ContentReader"/> class initialized for the specified type.
+        /// </summary>
+        /// <param name="targetType">The type the <see cref="ContentReader"/> will handle.</param>
+        /// <returns>
+        /// The <see cref="ContentReader"/> created by this method if a content reader of the specified type has been
+        /// registered with this content manager; otherwise, null.
+        /// </returns>
+        /// <exception cref="ArgumentNullException">If the <paramref name="targetType"/> parameter is null.</exception>
         public ContentTypeReader GetTypeReader(Type targetType)
         {
             if (targetType.IsArray && targetType.GetArrayRank() > 1)
@@ -42,11 +54,14 @@ namespace Microsoft.Xna.Framework.Content
             return null;
         }
 
+#if NET45
         // Trick to prevent the linker removing the code, but not actually execute the code
         static bool falseflag = false;
+#endif
 
         internal ContentTypeReader[] LoadAssetReaders(ContentReader reader)
         {
+#if NET45
 #pragma warning disable 0219, 0649
             // Trick to prevent the linker removing the code, but not actually execute the code
             if (falseflag)
@@ -60,7 +75,7 @@ namespace Microsoft.Xna.Framework.Content
                 var hBoundingSphereReader = new BoundingSphereReader();
                 var hBoundingFrustumReader = new BoundingFrustumReader();
                 var hRayReader = new RayReader();
-                var hCharListReader = new ListReader<Char>();
+                var hCharListReader = new ListReader<char>();
                 var hRectangleListReader = new ListReader<Rectangle>();
                 var hRectangleArrayReader = new ArrayReader<Rectangle>();
                 var hVector3ListReader = new ListReader<Vector3>();
@@ -99,11 +114,12 @@ namespace Microsoft.Xna.Framework.Content
 
                 // At the moment the Video class doesn't exist
                 // on all platforms... Allow it to compile anyway.
-#if ANDROID || (IOS && !TVOS) || MONOMAC || (WINDOWS && !OPENGL) || WINDOWS_UAP
+#if ANDROID || (IOS && !TVOS) || MONOMAC || (WINDOWS && !OPENGL)
                 var hVideoReader = new VideoReader();
 #endif
             }
 #pragma warning restore 0219, 0649
+#endif
 
             // The first content byte i read tells me the number of content readers in this XNB file
             var numberOfReaders = reader.Read7BitEncodedInt();
@@ -139,7 +155,19 @@ namespace Microsoft.Xna.Framework.Content
 
                         readerTypeString = PrepareType(readerTypeString);
 
-                        var l_readerType = Type.GetType(readerTypeString);
+                        Type l_readerType = null;
+                        try
+                        {
+                            // this might fail in AOT context and we need to properly warn the user on what to do if it happens
+#pragma warning disable IL2057
+                            l_readerType = Type.GetType(readerTypeString);
+#pragma warning restore IL2057
+                        }
+                        catch (NotSupportedException e)
+                        {
+                            throw new NotSupportedException("It seems that you are using PublishAot and trying to load assets with a reflection-based serializer (which is not natively supported). To work around this error, call ContentTypeReaderManager.AddTypeCreator() in your Game constructor with the type mentionned in the following message: " + e.Message);
+                        }
+
                         if (l_readerType != null)
                         {
                             ContentTypeReader typeReader;
@@ -194,17 +222,13 @@ namespace Microsoft.Xna.Framework.Content
         }
 
         /// <summary>
-        /// Removes Version, Culture and PublicKeyToken from a type string.
+        /// Removes the Version, Culture, and PublicKeyToken from a fully-qualified type name string.
         /// </summary>
         /// <remarks>
         /// Supports multiple generic types (e.g. Dictionary&lt;TKey,TValue&gt;) and nested generic types (e.g. List&lt;List&lt;int&gt;&gt;).
         /// </remarks>
-        /// <param name="type">
-        /// A <see cref="System.String"/>
-        /// </param>
-        /// <returns>
-        /// A <see cref="System.String"/>
-        /// </returns>
+        /// <param name="type">A string containing the fully-qualified type name to prepare.</param>
+        /// <returns>A new string with the Version, Culture and PublicKeyToken removed.</returns>
         public static string PrepareType(string type)
         {
             //Needed to support nested types
@@ -221,7 +245,6 @@ namespace Microsoft.Xna.Framework.Content
             if (preparedType.Contains("PublicKeyToken"))
                 preparedType = Regex.Replace(preparedType, @"(.+?), Version=.+?$", "$1");
 
-            // TODO: For WinRT this is most likely broken!
             preparedType = preparedType.Replace(", Microsoft.Xna.Framework.Graphics", string.Format(", {0}", _assemblyName));
             preparedType = preparedType.Replace(", Microsoft.Xna.Framework.Video", string.Format(", {0}", _assemblyName));
             preparedType = preparedType.Replace(", Microsoft.Xna.Framework", string.Format(", {0}", _assemblyName));
@@ -238,20 +261,21 @@ namespace Microsoft.Xna.Framework.Content
         private static Dictionary<string, Func<ContentTypeReader>> typeCreators = new Dictionary<string, Func<ContentTypeReader>>();
 
         /// <summary>
-        /// Adds the type creator.
+        /// Registers a function to create a <see cref="ContentTypeReader"/> instance used to read an object of the
+        /// type specified.
         /// </summary>
-        /// <param name='typeString'>
-        /// Type string.
-        /// </param>
-        /// <param name='createFunction'>
-        /// Create function.
-        /// </param>
+        /// <param name='typeString'>A string containing the fully-qualified type name of the object type.</param>
+        /// <param name='createFunction'>The function responsible for creating an instance of the <see cref="ContentTypeReader"/> class.</param>
+        /// <exception cref="ArgumentNullException">If the <paramref name="typeString"/> parameter is null or an empty string.</exception>
         public static void AddTypeCreator(string typeString, Func<ContentTypeReader> createFunction)
         {
             if (!typeCreators.ContainsKey(typeString))
                 typeCreators.Add(typeString, createFunction);
         }
 
+        /// <summary>
+        /// Clears all content type creators that were registered with <see cref="AddTypeCreator(string, Func{ContentTypeReader})"/>
+        /// </summary>
         public static void ClearTypeCreators()
         {
             typeCreators.Clear();

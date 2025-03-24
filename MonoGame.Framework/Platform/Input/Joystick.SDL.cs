@@ -1,4 +1,4 @@
-﻿// MonoGame - Copyright (C) The MonoGame Team
+﻿// MonoGame - Copyright (C) MonoGame Foundation, Inc
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
@@ -29,7 +29,7 @@ namespace Microsoft.Xna.Framework.Input
             while (Joysticks.ContainsKey(id))
                 id++;
 
-            if (id > _lastConnectedIndex)
+            if (id != _lastConnectedIndex)
                 _lastConnectedIndex = id;
 
             Joysticks.Add(id, jdevice);

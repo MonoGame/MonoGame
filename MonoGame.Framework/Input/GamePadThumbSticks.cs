@@ -1,4 +1,4 @@
-// MonoGame - Copyright (C) The MonoGame Team
+// MonoGame - Copyright (C) MonoGame Foundation, Inc
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
@@ -9,7 +9,7 @@ namespace Microsoft.Xna.Framework.Input
     /// </summary>
     public struct GamePadThumbSticks
     {
-#if DIRECTX && !WINDOWS_UAP
+#if DIRECTX
         // XInput Xbox 360 Controller dead zones
         // Dead zones are slightly different between left and right sticks, this may come from Microsoft usability tests
         private const float leftThumbDeadZone = SharpDX.XInput.Gamepad.LeftThumbDeadZone / (float)short.MaxValue;
@@ -42,6 +42,12 @@ namespace Microsoft.Xna.Framework.Input
             get { return _right; }
         }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="GamePadThumbSticks"/> struct,
+        /// setting positions of the sticks. 
+        /// </summary>
+        /// <param name="leftPosition">Position of the left controller stick.</param>
+        /// <param name="rightPosition">Position of the right controller stick.</param>
         public GamePadThumbSticks(Vector2 leftPosition, Vector2 rightPosition)
             : this(leftPosition, rightPosition, GamePadDeadZone.None, GamePadDeadZone.None)
         {

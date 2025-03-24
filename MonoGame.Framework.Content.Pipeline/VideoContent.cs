@@ -1,4 +1,4 @@
-﻿// MonoGame - Copyright (C) The MonoGame Team
+﻿// MonoGame - Copyright (C) MonoGame Foundation, Inc
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
@@ -67,7 +67,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
             Filename = filename;
 
             string stdout, stderr;
-            var result = ExternalTool.Run("ffprobe",
+            var result = ExternalTool.RunDotnetTool(ExternalTool.FFmpeg,
                 string.Format("-i \"{0}\" -show_format -select_streams v -show_streams -print_format ini", Filename), out stdout, out stderr);
 
             var lines = stdout.Split(Environment.NewLine.ToCharArray(), StringSplitOptions.RemoveEmptyEntries);
@@ -104,6 +104,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
             }
         }
 
+        /// <summary/>
         ~VideoContent()
         {
             Dispose(false);
@@ -118,6 +119,11 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
             GC.SuppressFinalize(this);
         }
 
+        /// <inheritdoc cref="Dispose()"/>
+        /// <param name="disposing">
+        /// <see langword="true"/> to release both managed and unmanaged resources;
+        /// <see langword="false"/> to release only unmanaged resources.
+        /// </param>
         protected virtual void Dispose(bool disposing)
         {
             if (!_disposed)

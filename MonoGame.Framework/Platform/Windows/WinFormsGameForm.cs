@@ -1,4 +1,4 @@
-﻿// MonoGame - Copyright (C) The MonoGame Team
+﻿// MonoGame - Copyright (C) MonoGame Foundation, Inc
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
@@ -52,6 +52,8 @@ namespace Microsoft.Xna.Framework.Windows
 
         public const int WM_SYSCOMMAND = 0x0112;
 
+        public const int WM_SETTING­CHANGE = 0x001A;
+
         public bool AllowAltF4 = true;
 
         internal bool IsResizing { get; set; }
@@ -59,6 +61,7 @@ namespace Microsoft.Xna.Framework.Windows
         #region Events
 
         public event EventHandler<HorizontalMouseWheelEventArgs> MouseHorizontalWheel;
+        public event EventHandler<EventArgs> SettingChanged;
 
         #endregion
 
@@ -122,6 +125,10 @@ namespace Microsoft.Xna.Framework.Windows
                 case WM_DROPFILES:
                     HandleDropMessage(ref m);
                     break;
+
+                case WM_SETTING­CHANGE:
+                    HandleSettingChange();
+                break;
 #endif
                 case WM_SYSCOMMAND:
 
@@ -180,6 +187,11 @@ namespace Microsoft.Xna.Framework.Windows
             base.WndProc(ref m);
         }
 
+        private void HandleSettingChange()
+        {
+            EventHelpers.Raise(this, SettingChanged, EventArgs.Empty);
+        }
+
         void HandleKeyMessage(ref Message m)
         {
             long virtualKeyCode = m.WParam.ToInt64();
@@ -223,7 +235,7 @@ namespace Microsoft.Xna.Framework.Windows
             {
                 uint buffSize = DragQueryFile(hdrop, i, null, int.MaxValue);
                 StringBuilder builder = new StringBuilder((int)buffSize);
-                DragQueryFile(hdrop, i, builder, buffSize);
+                DragQueryFile(hdrop, i, builder, buffSize + 1); // Extra byte for null terminator
                 files[i] = builder.ToString();
             }
 

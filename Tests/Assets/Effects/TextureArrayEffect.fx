@@ -1,4 +1,4 @@
-// MonoGame - Copyright (C) The MonoGame Team
+// MonoGame - Copyright (C) MonoGame Foundation, Inc
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
@@ -27,7 +27,7 @@ VSOutput VS_Main(uint VertexID : SV_VertexID)
     return output;
 }
 
-float4 PS_Main(PSInput input) : COLOR0
+float4 PS_Main(PSInput input) : SV_TARGET0
 {
     return Texture.Sample(TextureSampler, float3(input.TexCoord, (uint) input.PositionSS.x % 4));
 }

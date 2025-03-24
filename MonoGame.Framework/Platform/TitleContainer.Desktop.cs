@@ -1,4 +1,4 @@
-// MonoGame - Copyright (C) The MonoGame Team
+// MonoGame - Copyright (C) MonoGame Foundation, Inc
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
@@ -16,8 +16,11 @@ namespace Microsoft.Xna.Framework
 #if DESKTOPGL
             // Check for the package Resources Folder first. This is where the assets
             // will be bundled.
-            if (CurrentPlatform.OS == OS.MacOSX)
+            if (CurrentPlatform.OS == OS.MacOSX) {
                 Location = Path.Combine (AppDomain.CurrentDomain.BaseDirectory, "..", "Resources");
+                if (!Directory.Exists (Location))
+                    Location = Path.Combine (AppDomain.CurrentDomain.BaseDirectory, "..", "..", "Resources");
+            }
             if (!Directory.Exists (Location))
 #endif
             Location = AppDomain.CurrentDomain.BaseDirectory;

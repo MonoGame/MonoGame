@@ -1,9 +1,12 @@
-// MonoGame - Copyright (C) The MonoGame Team
+// MonoGame - Copyright (C) MonoGame Foundation, Inc
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
 namespace Microsoft.Xna.Framework.Input
 {
+    /// <summary>
+    /// A struct that represents which directions on the directional pad of a controller are being pressed.
+    /// </summary>
     public struct GamePadDPad
     {
         /// <summary>

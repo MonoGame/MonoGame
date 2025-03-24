@@ -102,22 +102,22 @@ namespace Microsoft.Xna.Framework
         }
 
         /// <summary>
-        ///   Check if this <see cref="BoundingBox"/> contains a <see cref="BoundingFrustum"/>.
+        ///   Determines if this <see cref="BoundingBox"/> contains or intersects with a specified <see cref="BoundingFrustum"/>.
+        ///   NOTE: This method may return false positives (indicating an intersection or containment when there is none)
+        ///   to improve performance. Use with caution if precision is critical.
         /// </summary>
         /// <param name="frustum">The <see cref="BoundingFrustum"/> to test for overlap.</param>
         /// <returns>
-        ///   A value indicating if this <see cref="BoundingBox"/> contains,
-        ///   intersects with or is disjoint with <paramref name="frustum"/>.
+        ///   A <see cref="ContainmentType"/> value indicating whether this <see cref="BoundingBox"/>
+        ///   contains or intersects the <paramref name="frustum"/>.
         /// </returns>
         public ContainmentType Contains(BoundingFrustum frustum)
         {
-            //TODO: bad done here need a fix. 
-            //Because question is not frustum contain box but reverse and this is not the same
             int i;
             ContainmentType contained;
             Vector3[] corners = frustum.GetCorners();
 
-            // First we check if frustum is in box
+            // First we check every corner of a frustum
             for (i = 0; i < corners.Length; i++)
             {
                 this.Contains(ref corners[i], out contained);
@@ -128,13 +128,13 @@ namespace Microsoft.Xna.Framework
             if (i == corners.Length) // This means we checked all the corners and they were all contain or instersect
                 return ContainmentType.Contains;
 
-            if (i != 0)             // if i is not equal to zero, we can fastpath and say that this box intersects
+            if (i != 0)              // If i is not equal to zero, we can fastpath and say that this box intersects
                 return ContainmentType.Intersects;
 
 
-            // If we get here, it means the first (and only) point we checked was actually contained in the frustum.
-            // So we assume that all other points will also be contained. If one of the points is disjoint, we can
-            // exit immediately saying that the result is Intersects
+            // If we get here, it means the first (and only) point we checked was disjoint from frustum.
+            // So we assume that if all other points of frustum are inside the box, then box contains the frustum.
+            // Otherwise we exit immediately saying that the result is Intersects
             i++;
             for (; i < corners.Length; i++)
             {
@@ -144,7 +144,7 @@ namespace Microsoft.Xna.Framework
 
             }
 
-            // If we get here, then we know all the points were actually contained, therefore result is Contains
+            // If we get here, then we know that only one point is disjoint, therefore result is Contains
             return ContainmentType.Contains;
         }
 
@@ -458,7 +458,7 @@ namespace Microsoft.Xna.Framework
         /// </summary>
         /// <param name="other">The <see cref="BoundingBox"/> to compare with this <see cref="BoundingBox"/>.</param>
         /// <returns>
-        ///   <code>true</code> if <see cref="other"/> is equal to this <see cref="BoundingBox"/>,
+        ///   <code>true</code> if <paramref name="other"/> is equal to this <see cref="BoundingBox"/>,
         ///   <code>false</code> if it is not.
         /// </returns>
         public bool Equals(BoundingBox other)
@@ -471,7 +471,7 @@ namespace Microsoft.Xna.Framework
         /// </summary>
         /// <param name="obj">The <see cref="Object"/> to compare with this <see cref="BoundingBox"/>.</param>
         /// <returns>
-        ///   <code>true</code> if <see cref="obj"/> is equal to this <see cref="BoundingBox"/>,
+        ///   <code>true</code> if <paramref name="obj"/> is equal to this <see cref="BoundingBox"/>,
         ///   <code>false</code> if it is not.
         /// </returns>
         public override bool Equals(object obj)
@@ -666,7 +666,7 @@ namespace Microsoft.Xna.Framework
         /// </param>
         public void Intersects(ref Plane plane, out PlaneIntersectionType result)
         {
-            // See http://zach.in.tu-clausthal.de/teaching/cg_literatur/lighthouse3d_view_frustum_culling/index.html
+            // See https://cgvr.informatik.uni-bremen.de/teaching/cg_literatur/lighthouse3d_view_frustum_culling/index.html
 
             Vector3 positiveVertex;
             Vector3 negativeVertex;
@@ -755,7 +755,7 @@ namespace Microsoft.Xna.Framework
         /// <param name="a">A <see cref="BoundingBox"/> to compare the other.</param>
         /// <param name="b">A <see cref="BoundingBox"/> to compare the other.</param>
         /// <returns>
-        ///   <code>true</code> if <see cref="a"/> is equal to this <see cref="b"/>,
+        ///   <code>true</code> if <paramref name="a"/> is equal to this <paramref name="b"/>,
         ///   <code>false</code> if it is not.
         /// </returns>
         public static bool operator ==(BoundingBox a, BoundingBox b)
@@ -769,7 +769,7 @@ namespace Microsoft.Xna.Framework
         /// <param name="a">A <see cref="BoundingBox"/> to compare the other.</param>
         /// <param name="b">A <see cref="BoundingBox"/> to compare the other.</param>
         /// <returns>
-        ///   <code>true</code> if <see cref="a"/> is not equal to this <see cref="b"/>,
+        ///   <code>true</code> if <paramref name="a"/> is not equal to this <paramref name="b"/>,
         ///   <code>false</code> if it is.
         /// </returns>
         public static bool operator !=(BoundingBox a, BoundingBox b)

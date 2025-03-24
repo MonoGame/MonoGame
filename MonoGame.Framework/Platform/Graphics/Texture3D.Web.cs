@@ -1,4 +1,4 @@
-// MonoGame - Copyright (C) The MonoGame Team
+// MonoGame - Copyright (C) MonoGame Foundation, Inc
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
@@ -30,10 +30,7 @@ namespace Microsoft.Xna.Framework.Graphics
             int back,
             T[] data,
             int startIndex,
-            int elementCount,
-            int width, 
-            int height, 
-            int depth)
+            int elementCount)
         {
             throw new NotImplementedException();
         }

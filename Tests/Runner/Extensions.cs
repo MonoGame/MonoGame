@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -10,6 +11,7 @@ using System.Text.RegularExpressions;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using NUnit.Framework;
+using NUnit.Framework.Internal;
 
 namespace MonoGame.Tests {
 	static class Extensions {
@@ -63,6 +65,18 @@ namespace MonoGame.Tests {
 			return null;
 		}
 
+		static ConcurrentDictionary<string, TestContext.TestAdapter> tests = new ConcurrentDictionary<string, TestContext.TestAdapter>();
+
+        public static void RegisterTestWtihContext (TestContext context, TestContext.TestAdapter test)
+        {
+            tests.TryAdd(context.Test.ID, test);
+        }
+
+		public static void UnRegisterTestWtihContext (TestContext context)
+        {
+			tests.Clear ();
+        }
+
 		public static StackFrame GetTestEntryStackFrame (this StackTrace self)
 		{
 			var stackFrame = self.FindTestEntryFrame ();
@@ -77,9 +91,12 @@ namespace MonoGame.Tests {
 			// TODO: Add support for a custom attribute to override
 			//       the calculated name.
 			//var method = self.GetMethod ();
+			if (!tests.TryGetValue (self.Test.ID, out TestContext.TestAdapter test)) {
+				test = self.Test;
+			}
 
-			var fullTypeName = self.Test.FullName.Remove (
-				self.Test.FullName.Length - (self.Test.Name.Length + 1));
+			var fullTypeName = test.FullName.Remove (
+				test.FullName.Length - (test.Name.Length + 1));
 
 			var tokens = fullTypeName.Split('.');
 			var typeName = tokens [tokens.Length - 1];
@@ -95,15 +112,18 @@ namespace MonoGame.Tests {
 		{
 			// TODO: Add support for a custom attribute to override
 			//       the calculated name.
+			if (!tests.TryGetValue (self.Test.ID, out TestContext.TestAdapter test)) {
+				test = self.Test;
+			}
 
 			if (maxFrameNumber == 0)
-				return self.Test.Name.ReplaceInvalidFileNameChars() + "-{0}.png";
+				return test.Name.ReplaceInvalidFileNameChars() + "-{0}.png";
 			if (maxFrameNumber == 1)
-				return self.Test.Name.ReplaceInvalidFileNameChars() + ".png";
+				return test.Name.ReplaceInvalidFileNameChars() + ".png";
 
 			int numDigits = 1 + (int)Math.Log10 (maxFrameNumber + 1);
 
-			var builder = new StringBuilder (self.Test.Name.ReplaceInvalidFileNameChars ());
+			var builder = new StringBuilder (test.Name.ReplaceInvalidFileNameChars ());
 			builder.Append ("-{0:");
 			builder.Append ('0', numDigits);
 			builder.Append ("}.png");

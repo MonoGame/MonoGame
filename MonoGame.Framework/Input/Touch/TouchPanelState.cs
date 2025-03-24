@@ -1,4 +1,4 @@
-﻿// MonoGame - Copyright (C) The MonoGame Team
+﻿// MonoGame - Copyright (C) MonoGame Foundation, Inc
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
@@ -7,6 +7,10 @@ using System.Collections.Generic;
 
 namespace Microsoft.Xna.Framework.Input.Touch
 {
+    /// <summary>
+    /// Represents specific information about the state of the touch panel,
+    /// including the current state of touch locations and gestures.
+    /// </summary>
     public class TouchPanelState
     {
         /// <summary>
@@ -141,6 +145,9 @@ namespace Microsoft.Xna.Framework.Input.Touch
             }
         }
 
+        /// <summary>
+        /// Returns the current touch panel state
+        /// </summary>
         public TouchCollection GetState()
         {
             //Clear out touches from previous frames that were released on the same frame they were touched that haven't been seen
@@ -331,8 +338,14 @@ namespace Microsoft.Xna.Framework.Input.Touch
         /// </summary>
         public GestureType EnabledGestures { get; set; }
 
+        /// <summary>
+        /// Gets or sets whether mouse touch points are enabled.
+        /// </summary>
         public bool EnableMouseTouchPoint { get; set; }
 
+        /// <summary>
+        /// Gets or sets whether mouse gestures are enabled.
+        /// </summary>
         public bool EnableMouseGestures { get; set; }
 
         /// <summary>

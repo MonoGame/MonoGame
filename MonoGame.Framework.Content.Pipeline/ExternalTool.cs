@@ -1,10 +1,12 @@
-﻿// MonoGame - Copyright (C) The MonoGame Team
+﻿// MonoGame - Copyright (C) MonoGame Foundation, Inc
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System;
 using System.Diagnostics;
 using System.IO;
+using System.Net;
+using System.Reflection;
 using System.Threading;
 using MonoGame.Framework.Utilities;
 
@@ -17,6 +19,20 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
     /// </summary>
     internal class ExternalTool
     {
+        public static string Crunch = "mgcb-crunch";
+        private static string CrunchVersion = "1.0.4.2";
+        public static string BasisU = "mgcb-basisu";
+        private static string BasisUVersion = "1.16.4.2";
+        public static string FFmpeg = "mgcb-ffmpeg";
+        private static string FFmpegVersion = "7.0.0.6";
+        public static string FFprobe = "mgcb-ffprobe";
+        private static string FFprobeVersion = "7.0.0.6";
+
+        static ExternalTool()
+        {
+            RestoreDotnetTools ();
+        }
+
         public static int Run(string command, string arguments)
         {
             string stdout, stderr;
@@ -27,7 +43,52 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
             return result;
         }
 
-        public static int Run(string command, string arguments, out string stdout, out string stderr, string stdin = null)
+        static void RestoreDotnetTool(string command, string toolName, string toolVersion, string path)
+        {
+            Directory.CreateDirectory(path);
+            var exe = CurrentPlatform.OS == OS.Windows ? "dotnet.exe" : "dotnet";
+            var dotnetRoot = Environment.GetEnvironmentVariable("DOTNET_ROOT");
+            if (!string.IsNullOrEmpty(dotnetRoot))
+            {
+                exe = Path.Combine(dotnetRoot, exe);
+            }
+            if (Run(exe, $"tool {command} {toolName} --version {toolVersion} --tool-path .", out string stdout, out string stderr,  workingDirectory: path) != 0)
+            {
+                // install the latest
+                Debug.WriteLine ($"{command} returned {stdout} {stderr}. Trying backup path.");
+                Run(exe, $"tool {command} {toolName} --tool-path .", out stdout, out stderr,  workingDirectory: path);
+            }
+        }
+
+        static void RestoreDotnetTools()
+        {
+            var version = Assembly.GetExecutingAssembly().GetName().Version.ToString();
+            string path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory);
+            if (CurrentPlatform.OS == OS.Linux)
+                path= Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "linux");
+            if (CurrentPlatform.OS == OS.MacOSX)
+                path= Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "osx");
+            var versionFile = Path.Combine(path, $"tools_version.txt");
+            if (File.Exists(versionFile) && File.ReadAllText(versionFile) == version)
+                return;
+            RestoreDotnetTool("install", Crunch, CrunchVersion, path);
+            RestoreDotnetTool("install", BasisU, BasisUVersion, path);
+            RestoreDotnetTool("install", FFmpeg, FFmpegVersion, path);
+            RestoreDotnetTool("install", FFprobe, FFprobeVersion, path);
+            File.WriteAllText(versionFile, version);
+        }
+
+        /// <summary>
+        /// Run a dotnet tool. The tool should be installed in a .config/dotnet-tools.json file somewhere in the project lineage.
+        /// </summary>
+        public static int RunDotnetTool(string toolName, string args, out string stdOut, out string stdErr, string stdIn=null, string workingDirectory=null)
+        {
+            var exe = FindCommand(toolName);
+            var finalizedArgs =  args;
+            return ExternalTool.Run(exe, finalizedArgs, out stdOut, out stdErr, stdIn, workingDirectory);
+        }
+
+        public static int Run(string command, string arguments, out string stdout, out string stderr, string stdin = null, string workingDirectory=null)
         {
             // This particular case is likely to be the most common and thus
             // warrants its own specific error message rather than falling
@@ -55,6 +116,15 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
                 RedirectStandardError = true,
                 RedirectStandardInput = true,
             };
+
+            if (!string.IsNullOrEmpty(workingDirectory))
+                processInfo.WorkingDirectory = workingDirectory;
+
+            var dotnetRoot = Environment.GetEnvironmentVariable("DOTNET_ROOT");
+            if (!string.IsNullOrEmpty(dotnetRoot))
+            {
+                processInfo.EnvironmentVariables["DOTNET_ROOT"] = dotnetRoot;
+            }
 
             EnsureExecutable(fullPath);
 
@@ -157,12 +227,12 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
             return null;
         }
 
-        /// <summary>   
-        /// Ensures the specified executable has the executable bit set.  If the    
-        /// executable doesn't have the executable bit set on Linux or Mac OS, then 
-        /// Mono will refuse to execute it. 
-        /// </summary>  
-        /// <param name="path">The full path to the executable.</param> 
+        /// <summary>
+        /// Ensures the specified executable has the executable bit set.  If the
+        /// executable doesn't have the executable bit set on Linux or Mac OS, then
+        /// Mono will refuse to execute it.
+        /// </summary>
+        /// <param name="path">The full path to the executable.</param>
         private static void EnsureExecutable(string path)
         {
             if (!path.StartsWith("/home") && !path.StartsWith("/Users"))
@@ -175,8 +245,8 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
             }
             catch
             {
-                // This platform may not have chmod in the path, in which case we can't 
-                // do anything reasonable here. 
+                // This platform may not have chmod in the path, in which case we can't
+                // do anything reasonable here.
             }
         }
 
@@ -191,7 +261,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
                 File.Delete(filePath);
             }
             catch (Exception)
-            {                    
+            {
             }
         }
     }
