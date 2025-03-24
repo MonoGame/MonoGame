@@ -25,11 +25,6 @@ namespace Microsoft.Xna.Framework.Storage
             return _driveInfo.AvailableFreeSpace;
         }
 
-        private bool PlatformIsConnected()
-        {
-            return _driveInfo.IsReady;
-        }
-
         private StorageContainer PlatformOpenContainer(string containerName)
         {
             _storageContainer = new StorageContainer(this, containerName, _player);
