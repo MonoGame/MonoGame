@@ -84,9 +84,6 @@
     <EmbeddedResource Include="MonoGame.bmp">
       <LogicalName>MonoGame.bmp</LogicalName>
     </EmbeddedResource>
-    <EmbeddedResource Include="..\ThirdParty\SDL_GameControllerDB\gamecontrollerdb.txt">
-      <LogicalName>gamecontrollerdb.txt</LogicalName>
-    </EmbeddedResource>
   </ItemGroup>
 
   <ItemGroup Condition="'$(CopyContentFiles)' == 'True'">

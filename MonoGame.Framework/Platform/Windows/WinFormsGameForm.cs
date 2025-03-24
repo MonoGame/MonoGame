@@ -235,7 +235,7 @@ namespace Microsoft.Xna.Framework.Windows
             {
                 uint buffSize = DragQueryFile(hdrop, i, null, int.MaxValue);
                 StringBuilder builder = new StringBuilder((int)buffSize);
-                DragQueryFile(hdrop, i, builder, buffSize);
+                DragQueryFile(hdrop, i, builder, buffSize + 1); // Extra byte for null terminator
                 files[i] = builder.ToString();
             }
 
