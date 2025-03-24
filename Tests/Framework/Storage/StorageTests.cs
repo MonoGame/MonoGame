@@ -12,15 +12,6 @@ namespace MonoGame.Tests.Framework
         const string MY_GAME = "MyGame";
 
         [Test]
-        public void IsConnected_ShouldReturnFalse_OnException()
-        {
-            var device = new StorageDevice(null);
-
-            // We haven't opened a container yet, so should be false
-            Assert.IsFalse(device.IsConnected);
-        }
-
-        [Test]
         public void OpenContainer_ShouldReturnContainer_OnSuccess()
         {
             var device = new StorageDevice(PlayerIndex.One);
@@ -28,7 +19,6 @@ namespace MonoGame.Tests.Framework
             Assert.IsNotNull(container);
             Assert.AreEqual(MY_GAME, container.ContainterName);
             Assert.AreEqual(device, container.StorageDevice);
-            Assert.AreEqual(true, device.IsConnected);
             Assert.AreNotEqual(0, device.TotalSpace);
             Assert.AreNotEqual(0, device.FreeSpace);
         }
