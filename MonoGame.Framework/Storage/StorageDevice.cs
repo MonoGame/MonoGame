@@ -29,24 +29,6 @@ namespace Microsoft.Xna.Framework.Storage
         }
 
         /// <summary>
-        /// Gets whether the device is connected, therefore ready or not.
-        /// </summary>
-        public bool IsConnected
-        {
-            get
-            {
-                try
-                {
-                    return PlatformIsConnected();
-                }
-                catch (Exception)
-                {
-                    return false; // TODO Should this be true?
-                }
-            }
-        }
-
-        /// <summary>
         /// Gets the total amount of space on the device.
         /// </summary>
         public long TotalSpace
@@ -79,12 +61,8 @@ namespace Microsoft.Xna.Framework.Storage
             if (string.IsNullOrEmpty(containerName))
                 throw new ArgumentNullException(nameof(containerName), "A container name must be provided.");
 
-            // If we are not connected, the Container should is not being used,
-            // therefore we can safely delete it.
-            if (!IsConnected)
-            {
-                PlatformDeleteContainer(containerName);
-            }
+            // safely delete it.
+            PlatformDeleteContainer(containerName);
         }
 
         public Task<StorageContainer> OpenContainerAsync(string containerName, CancellationToken cancellationToken = default)
