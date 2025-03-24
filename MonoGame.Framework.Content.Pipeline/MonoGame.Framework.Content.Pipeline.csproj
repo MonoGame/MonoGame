@@ -70,7 +70,7 @@
 
 
   <ItemGroup>
-    <PackageReference Include="AssimpNetter" Version="5.4.3" />
+    <PackageReference Include="AssimpNetter" Version="5.4.3.3" />
     <PackageReference Include="BCnEncoder.Net" Version="2.1.0" />
     <PackageReference Include="Microsoft.NETCore.App" Version="2.1.30" />
     <PackageReference Include="MonoGame.Library.FreeImage" Version="3.18.0.3" />

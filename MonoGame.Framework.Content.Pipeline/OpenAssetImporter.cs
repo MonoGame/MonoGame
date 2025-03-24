@@ -16,6 +16,9 @@ using MonoGame.Framework.Utilities;
 
 namespace Microsoft.Xna.Framework.Content.Pipeline
 {
+    /// <summary>
+    /// Implementation of the content importer for common open 3D asset formats
+    /// </summary>
     [ContentImporter(
         ".dae", // Collada
         ".gltf", "glb", // glTF
@@ -44,7 +47,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
         ".pk3", // Quake III Map/BSP
         ".mdc", // Return to Castle Wolfenstein
         ".md5", // Doom 3
-        ".smd", ".vta", // Valve Model 
+        ".smd", ".vta", // Valve Model
         ".ogex", // Open Game Engine Exchange
         ".3d", // Unreal
         ".b3d", // BlitzBasic 3D
@@ -67,9 +70,9 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
         // Bones are represented by regular nodes, but there is no flag indicating whether
         // a node is a bone. A mesh in Assimp references deformation bones (= bones that
         // affect vertices) by name. That means, we can identify the nodes that represent
-        // deformation bones. But there is no way to identify helper bones (= bones that 
-        // belong to the skeleton, but do not affect vertices). As described in 
-        // http://assimp.sourceforge.net/lib_html/data.html and 
+        // deformation bones. But there is no way to identify helper bones (= bones that
+        // belong to the skeleton, but do not affect vertices). As described in
+        // http://assimp.sourceforge.net/lib_html/data.html and
         // http://gamedev.stackexchange.com/questions/26382/i-cant-figure-out-how-to-animate-my-loaded-model-with-assimp/26442#26442
         // we can only guess which nodes belong to a skeleton:
         // --> Limitation #3: The skeleton needs to be a direct child of the root node or
@@ -130,7 +133,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
         ///   <i>OriginalName</i>_$AssimpFbx$_<i>TransformName</i>
         /// </para>
         /// <para>
-        /// where <i>TransformName</i> is one of: 
+        /// where <i>TransformName</i> is one of:
         /// </para>
         /// <para>
         ///   Translation, RotationOffset, RotationPivot, PreRotation, Rotation, PostRotation,
@@ -237,7 +240,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
         }
 
         internal OpenAssetImporter(string importerName, bool xnaCompatible)
-        {            
+        {
             _importerName = importerName;
             _xnaCompatible = xnaCompatible;
         }
@@ -326,7 +329,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
                 if (_xnaCompatible)
                     ImportXnaMaterials();
                 else
-                    ImportMaterials();  
+                    ImportMaterials(); 
 
                 ImportNodes();      // Create _pivots and _rootNode (incl. children).
                 ImportSkeleton();   // Create skeleton (incl. animations) and add to _rootNode.
@@ -545,7 +548,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
                     _pivots.Add(originalName, pivot);
                 }
 
-                Matrix transform = aiNode.Transform;
+                Matrix transform = Matrix.Transpose(aiNode.Transform);
                 if (aiNode.Name.EndsWith("_Translation"))
                     pivot.Translation = transform;
                 else if (aiNode.Name.EndsWith("_RotationOffset"))
@@ -727,7 +730,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
                     if (mesh.HasBones)
                         foreach (var bone in mesh.Bones)
                             if (!offsetMatrices.ContainsKey(bone.Name))
-                                offsetMatrices[bone.Name] = bone.OffsetMatrix;
+                                offsetMatrices[bone.Name] = Matrix.Transpose(bone.OffsetMatrix);
 
             return offsetMatrices;
         }
@@ -1144,7 +1147,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
             if (parent == null && ancestor != null)
                 throw new ArgumentException(string.Format("Node \"{0}\" is not an ancestor of \"{1}\".", ancestor.Name, node.Name));
 
-            return transform;
+            return Matrix4x4.Transpose(transform);
         }
 
         /// <summary>

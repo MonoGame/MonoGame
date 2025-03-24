@@ -54,11 +54,14 @@ namespace Microsoft.Xna.Framework.Content
             return null;
         }
 
+#if NET45
         // Trick to prevent the linker removing the code, but not actually execute the code
         static bool falseflag = false;
+#endif
 
         internal ContentTypeReader[] LoadAssetReaders(ContentReader reader)
         {
+#if NET45
 #pragma warning disable 0219, 0649
             // Trick to prevent the linker removing the code, but not actually execute the code
             if (falseflag)
@@ -116,6 +119,7 @@ namespace Microsoft.Xna.Framework.Content
 #endif
             }
 #pragma warning restore 0219, 0649
+#endif
 
             // The first content byte i read tells me the number of content readers in this XNB file
             var numberOfReaders = reader.Read7BitEncodedInt();
@@ -151,7 +155,19 @@ namespace Microsoft.Xna.Framework.Content
 
                         readerTypeString = PrepareType(readerTypeString);
 
-                        var l_readerType = Type.GetType(readerTypeString);
+                        Type l_readerType = null;
+                        try
+                        {
+                            // this might fail in AOT context and we need to properly warn the user on what to do if it happens
+#pragma warning disable IL2057
+                            l_readerType = Type.GetType(readerTypeString);
+#pragma warning restore IL2057
+                        }
+                        catch (NotSupportedException e)
+                        {
+                            throw new NotSupportedException("It seems that you are using PublishAot and trying to load assets with a reflection-based serializer (which is not natively supported). To work around this error, call ContentTypeReaderManager.AddTypeCreator() in your Game constructor with the type mentionned in the following message: " + e.Message);
+                        }
+
                         if (l_readerType != null)
                         {
                             ContentTypeReader typeReader;

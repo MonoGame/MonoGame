@@ -12,6 +12,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
     public abstract class ContentTypeWriter
     {
         private readonly Type _targetType;
+        /// <summary/>
         protected int _typeVersion;
 
         /// <summary>

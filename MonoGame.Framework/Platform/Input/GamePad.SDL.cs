@@ -20,28 +20,6 @@ namespace Microsoft.Xna.Framework.Input
         private static readonly Dictionary<int, GamePadInfo> Gamepads = new Dictionary<int, GamePadInfo>();
         private static readonly Dictionary<int, int> _translationTable = new Dictionary<int, int>();
 
-        /// <summary>
-        /// Initialies the internal database of gamepad mappings for an SDL context
-        /// </summary>
-        public static void InitDatabase()
-        {
-            using (var stream = ReflectionHelpers.GetAssembly(typeof(GamePad)).GetManifestResourceStream("gamecontrollerdb.txt"))
-            {
-                if (stream != null)
-                {
-                    using (var reader = new BinaryReader(stream))
-                    {
-                        try
-                        {
-                            var src = Sdl.RwFromMem(reader.ReadBytes((int)stream.Length), (int)stream.Length);
-                            Sdl.GameController.AddMappingFromRw(src, 1);
-                        }
-                        catch { }
-                    }
-                }
-            }
-        }
-
         internal static void AddDevice(int deviceId)
         {
             var gamepad = new GamePadInfo();

@@ -9,6 +9,9 @@ using Microsoft.Xna.Framework.Content.Pipeline.Processors;
 
 namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 {
+    /// <summary>
+    /// Base class for handling texture profiles.
+    /// </summary>
     public abstract class TextureProfile
     {
         private static readonly LoadedTypeCollection<TextureProfile> _profiles = new LoadedTypeCollection<TextureProfile>();
@@ -91,6 +94,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
             }
         }
 
+        /// <summary/>
         protected abstract void PlatformCompressTexture(ContentProcessorContext context, TextureContent content, TextureProcessorOutputFormat format, bool isSpriteFont);
     }
 }
