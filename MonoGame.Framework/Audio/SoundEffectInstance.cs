@@ -54,12 +54,16 @@ namespace Microsoft.Xna.Framework.Audio
             get { return _pitch; }
             set
             {
+                // XAct sounds effects don't have pitch limits
+                if (!_isXAct)
+                {
+                    #if IOS || ANDROID
+                    value = Math.Clamp(value, -1, 1);
+                    #else
+                    value = Math.Clamp(value, -10, 10);
+                    #endif
+                }
                 _pitch = value;
-                #if IOS || ANDROID
-                value = Math.Clamp(value, -1, 1);
-                #endif
-
-                value = Math.Clamp(value, -10, 10);
                 PlatformSetPitch(value);
             }
         }
