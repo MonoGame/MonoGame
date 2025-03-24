@@ -70,12 +70,12 @@ namespace Microsoft.Devices.Sensors
             sensor = sensorManager.GetDefaultSensor(SensorType.Accelerometer);
         }
 
-        void PlatformActivityPaused(object sender, EventArgs eventArgs)
+        void ActivityPaused(object sender, EventArgs eventArgs)
         {
             sensorManager.UnregisterListener(listener, sensor);
         }
 
-        void PlatformActivityResumed(object sender, EventArgs eventArgs)
+        void ActivityResumed(object sender, EventArgs eventArgs)
         {
             sensorManager.RegisterListener(listener, sensor, SensorDelay.Game);
         }

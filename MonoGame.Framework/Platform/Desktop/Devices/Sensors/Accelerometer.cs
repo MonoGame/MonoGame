@@ -40,14 +40,6 @@ namespace Microsoft.Devices.Sensors
         {
         }
 
-        internal void PlatformActivityPaused(object sender, EventArgs eventArgs)
-        {
-        }
-
-        internal void PlatformActivityResumed(object sender, EventArgs eventArgs)
-        {
-        }
-
         /// <summary>
         /// Starts data acquisition from the accelerometer.
         /// </summary>

@@ -124,13 +124,5 @@ namespace Microsoft.Devices.Sensors
         internal static void PlatformInitialize()
 		{
 		}
-
-        internal void PlatformActivityPaused(object sender, EventArgs eventArgs)
-        {
-        }
-
-        internal void PlatformActivityResumed(object sender, EventArgs eventArgs)
-        {
-        }
     }
 }
