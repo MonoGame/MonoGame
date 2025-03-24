@@ -21,11 +21,13 @@ namespace Microsoft.Xna.Framework.Content
 		
 		Type keyType;
 		Type valueType;
-		
+
+        /// <summary/>
         public DictionaryReader()
         {
         }
 
+        /// <summary/>
         protected internal override void Initialize(ContentTypeReaderManager manager)
         {
 			keyType = typeof(TKey);
@@ -35,11 +37,13 @@ namespace Microsoft.Xna.Framework.Content
 			valueReader = manager.GetTypeReader(valueType);
         }
 
+        /// <summary/>
         public override bool CanDeserializeIntoExistingObject
         {
             get { return true; }
         }
 
+        /// <summary/>
         protected internal override Dictionary<TKey, TValue> Read(ContentReader input, Dictionary<TKey, TValue> existingInstance)
         {
             int count = input.ReadInt32();
