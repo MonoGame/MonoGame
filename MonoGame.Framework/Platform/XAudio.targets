@@ -1,8 +1,0 @@
-<Project>
-  <ItemGroup>
-    <Compile Include="Platform\Audio\DynamicSoundEffectInstance.XAudio.cs" />
-    <Compile Include="Platform\Audio\Microphone.Default.cs" />
-    <Compile Include="Platform\Audio\SoundEffect.XAudio.cs" />
-    <Compile Include="Platform\Audio\SoundEffectInstance.XAudio.cs" />
-  </ItemGroup>
-</Project>

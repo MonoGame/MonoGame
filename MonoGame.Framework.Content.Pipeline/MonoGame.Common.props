@@ -1,7 +1,0 @@
-<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <PropertyGroup>
-    <MonoGameInstallDirectory Condition=" '$(MonoGameInstallDirectory)' == '' And Exists('/usr/lib/mono/xbuild/MonoGame/v3.0/MonoGame.Common.props') ">/usr/lib/mono/xbuild/</MonoGameInstallDirectory>
-    <MonoGameInstallDirectory Condition=" '$(MonoGameInstallDirectory)' == '' And Exists('/Library/Frameworks/Mono.framework/External/xbuild/MonoGame/v3.0/MonoGame.Common.props') ">/Library/Frameworks/Mono.framework/External/xbuild</MonoGameInstallDirectory>
-    <MonoGameInstallDirectory Condition=" '$(MonoGameInstallDirectory)' == '' ">$(MSBuildProgramFiles32)</MonoGameInstallDirectory>
-  </PropertyGroup>
-</Project>

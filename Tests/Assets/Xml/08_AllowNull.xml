@@ -1,6 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<XnaContent>
-  <Asset Type="AllowNull">
-    <a Null="true"></a> <!-- This should throw an exception -->
-  </Asset>
-</XnaContent>

@@ -1,8 +1,0 @@
-{
-  "profiles": {
-    "MonoGame.Tests.WindowsVK": {
-      "commandName": "Project",
-      "nativeDebugging": true
-    }
-  }
-}
