@@ -21,7 +21,7 @@ public sealed class BuildVSTemplatesTask : FrostingTask<BuildContext>
         filePath = "Templates/MonoGame.Templates.VSExtension/Templates.pkgdef";
         context.ReplaceRegexInFiles(filePath, versionRegEx, shortVersion, RegexOptions.Singleline);
 
-        var vsTemplatesProject = context.GetProjectPath(ProjectType.Templates, "MonoGame.Templates.VSExtension");
+        var vsTemplatesProject = context.GetProjectPath(ProjectType.Extension, "MonoGame.Templates.VSExtension");
         context.DotNetRestore(vsTemplatesProject);
         context.MSBuild(vsTemplatesProject, context.MSBuildSettings);
     }

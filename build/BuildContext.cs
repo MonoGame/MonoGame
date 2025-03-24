@@ -6,6 +6,7 @@ namespace BuildScripts;
 
 public enum ProjectType
 {
+    Extension,
     Framework,
     Tools,
     Templates,
@@ -17,7 +18,7 @@ public enum ProjectType
 
 public class BuildContext : FrostingContext
 {
-    public static string VersionBase = "1.0.0";
+    public static string VersionBase = "3.8.2";
     public static readonly Regex VersionRegex = new(@"^v\d+.\d+.\d+", RegexOptions.Compiled | RegexOptions.IgnoreCase);
     public static readonly string DefaultRepositoryUrl = "https://github.com/MonoGame/MonoGame";
 
@@ -157,9 +158,10 @@ public class BuildContext : FrostingContext
 
     public string GetProjectPath(ProjectType type, string id = "") => type switch
     {
+        ProjectType.Extension => $"Templates/{id}/{id}.csproj",
         ProjectType.Framework => $"MonoGame.Framework/MonoGame.Framework.{id}.csproj",
         ProjectType.Tools => $"Tools/{id}/{id}.csproj",
-        ProjectType.Templates => $"Templates/{id}/{id}.csproj",
+        ProjectType.Templates => $"external/MonoGame.Templates/CSharp/{id}.csproj",
         ProjectType.Tests => $"Tests/{id}.csproj",
         ProjectType.ContentPipeline => "MonoGame.Framework.Content.Pipeline/MonoGame.Framework.Content.Pipeline.csproj",
         ProjectType.MGCBEditor => $"Tools/MonoGame.Content.Builder.Editor/MonoGame.Content.Builder.Editor.{id}.csproj",

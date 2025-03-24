@@ -192,7 +192,10 @@ namespace MonoGame.Content.Builder
             sourceFile = PathHelper.Normalize(sourceFile);
 
             // Remove duplicates... keep this new one.
-            var previous = _content.FindIndex(e => string.Equals(e.SourceFile, sourceFile, StringComparison.InvariantCultureIgnoreCase));
+            var previous = _content.FindIndex(e => {
+                return string.Equals(e.SourceFile, sourceFile, StringComparison.InvariantCultureIgnoreCase) &&
+                    string.Equals(e.OutputFile, link ?? e.OutputFile, StringComparison.InvariantCultureIgnoreCase);
+            });
             if (previous != -1)
                 _content.RemoveAt(previous);
 
