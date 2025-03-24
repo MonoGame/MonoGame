@@ -28,7 +28,7 @@ runs:
       if: ${{ inputs.platform != 'windows' }}
       run: |
         echo '-> Running Mac/Linux Tests'
-        MGFXC_WINE_PATH=/home/runner/.winemonogame dotnet test Tools/MonoGame.Tools.Tests/MonoGame.Tools.Tests.csproj --blame-hang-timeout 5m -c Release --filter="TestCategory!=Audio"
+        dotnet test Tools/MonoGame.Tools.Tests/MonoGame.Tools.Tests.csproj --blame-hang-timeout 5m -c Release --filter="TestCategory!=Audio"
       shell: ${{ inputs.shell }}
       env:
         CI: true
