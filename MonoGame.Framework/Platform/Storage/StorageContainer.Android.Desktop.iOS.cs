@@ -34,7 +34,7 @@ namespace Microsoft.Xna.Framework.Storage
             // relative so combine with our path
             var directoryPath = Path.Combine(_storagePath, directoryName);
 
-            // Now let's try to delete itd
+            // Now let's try to delete it
             if (Directory.Exists(directoryPath))
             {
                 Directory.Delete(directoryPath);

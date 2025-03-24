@@ -17,7 +17,7 @@ namespace MonoGame.Tests.Framework
             var device = new StorageDevice(PlayerIndex.One);
             var container = device.OpenContainer(MY_GAME);
             Assert.IsNotNull(container);
-            Assert.AreEqual(MY_GAME, container.ContainterName);
+            Assert.AreEqual(MY_GAME, container.ContainerName);
             Assert.AreEqual(device, container.StorageDevice);
             Assert.AreNotEqual(0, device.TotalSpace);
             Assert.AreNotEqual(0, device.FreeSpace);
@@ -37,7 +37,7 @@ namespace MonoGame.Tests.Framework
             var device = new StorageDevice(PlayerIndex.One);
             var container = await device.OpenContainerAsync(MY_GAME);
             Assert.IsNotNull(container);
-            Assert.AreEqual(MY_GAME, container.ContainterName);
+            Assert.AreEqual(MY_GAME, container.ContainerName);
         }
 
         [Test]

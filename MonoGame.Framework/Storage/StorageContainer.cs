@@ -41,7 +41,7 @@ namespace Microsoft.Xna.Framework.Storage
         /// <summary>
         /// Returns container name of the title.
         /// </summary>
-        public string ContainterName => _containerName;
+        public string ContainerName => _containerName;
 
         private readonly StorageDevice _storageDevice;
         /// <summary>
