@@ -76,7 +76,6 @@ namespace MonoGame.Effect.Compiler
             var proc = new Process();
             proc.StartInfo.FileName = wineExecutable;
             proc.StartInfo.Arguments = "dotnet ";
-            proc.StartInfo.WorkingDirectory = Path.GetDirectoryName(assemblyLocation);
             proc.StartInfo.UseShellExecute = false;
             proc.StartInfo.CreateNoWindow = true;
             proc.StartInfo.AddPathArgument(assemblyLocation);
@@ -121,7 +120,6 @@ namespace MonoGame.Effect.Compiler
             proc.StartInfo.FileName = wineExecutable;
             proc.StartInfo.Arguments = "winepath.exe -w \"" + localPath + "\"";
             proc.StartInfo.UseShellExecute = false;
-            proc.StartInfo.WorkingDirectory = Path.GetDirectoryName(assemblyLocation);
             proc.StartInfo.RedirectStandardOutput = true;
             proc.Start();
 
