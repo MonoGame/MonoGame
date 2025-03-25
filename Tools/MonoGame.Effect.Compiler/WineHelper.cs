@@ -32,8 +32,8 @@ namespace MonoGame.Effect.Compiler
             catch (Exception)
             {
                 proc.StartInfo.FileName = "wine";
-                return;
             }
+
             try {
                 proc.Start();
                 proc.WaitForExit();

@@ -18,21 +18,25 @@ namespace Microsoft.Xna.Framework.Content
     {
         ContentTypeReader elementReader;
 
+        /// <summary/>
         public ListReader()
         {
         }
 
+        /// <summary/>
         protected internal override void Initialize(ContentTypeReaderManager manager)
         {
 			Type readerType = typeof(T);
 			elementReader = manager.GetTypeReader(readerType);
         }
 
+        /// <summary/>
         public override bool CanDeserializeIntoExistingObject
         {
             get { return true; }
         }
 
+        /// <summary/>
         protected internal override List<T> Read(ContentReader input, List<T> existingInstance)
         {
             int count = input.ReadInt32();

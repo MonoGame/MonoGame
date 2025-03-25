@@ -17,16 +17,19 @@ namespace Microsoft.Xna.Framework.Content
     {
         ContentTypeReader elementReader;
 
+        /// <summary/>
         public ArrayReader()
         {
         }
 
+        /// <summary/>
         protected internal override void Initialize(ContentTypeReaderManager manager)
 		{
 			Type readerType = typeof(T);
 			elementReader = manager.GetTypeReader(readerType);
         }
 
+        /// <summary/>
         protected internal override T[] Read(ContentReader input, T[] existingInstance)
         {
             uint count = input.ReadUInt32();

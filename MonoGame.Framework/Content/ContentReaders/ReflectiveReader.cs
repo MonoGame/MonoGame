@@ -27,17 +27,19 @@ namespace Microsoft.Xna.Framework.Content
 
         private ContentTypeReader _baseTypeReader;
 
-
+        /// <summary/>
         public ReflectiveReader() 
             : base(typeof(T))
         {
         }
 
+        /// <summary/>
         public override bool CanDeserializeIntoExistingObject
         {
             get { return TargetType.IsClass(); }
         }
 
+        /// <summary/>
         protected internal override void Initialize(ContentTypeReaderManager manager)
         {
             base.Initialize(manager);
@@ -170,7 +172,8 @@ namespace Microsoft.Xna.Framework.Content
                 setter(parent, obj2);
             };
         }
-      
+
+        /// <summary/>
         protected internal override object Read(ContentReader input, object existingInstance)
         {
             T obj;
