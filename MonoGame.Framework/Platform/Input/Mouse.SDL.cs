@@ -60,7 +60,7 @@ namespace Microsoft.Xna.Framework.Input
             if (CurrentPlatform.OS == OS.MacOSX)
             {
                 var scale = ((SdlGameWindow)PrimaryWindow).Scale;
-                y = (int)(y * scale);
+                x = (int)(x / scale);
                 y = (int)(y / scale);
             }
 
