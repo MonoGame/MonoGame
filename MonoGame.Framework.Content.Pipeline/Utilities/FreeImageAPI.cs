@@ -94,7 +94,7 @@ namespace FreeImageAPI
 
     partial class FreeImage
     {
-        private const string NativeLibName = "FreeImage";
+        private const string NativeLibName = "freeimage";
 
         [DllImport(NativeLibName, EntryPoint = "FreeImage_ConvertFromRawBits")]
         public static extern IntPtr ConvertFromRawBits(byte[] bits, int width, int height, int pitch, uint bpp, uint red_mask, uint green_mask, uint blue_mask, bool topdown);

@@ -91,7 +91,7 @@ mgulong MGA_Buffer_GetDuration(MGA_Buffer* buffer)
 	return 0;
 }
 
-MGA_Voice* MGA_Voice_Create(MGA_System* system)
+MGA_Voice* MGA_Voice_Create(MGA_System* system, mgint sampleRate, mgint channels)
 {
 	assert(system != nullptr);
 	auto voice = new MGA_Voice();
@@ -123,15 +123,10 @@ void MGA_Voice_SetBuffer(MGA_Voice* voice, MGA_Buffer* buffer)
 	}
 }
 
-void MGA_Voice_AppendBuffer(MGA_Voice* voice, mgbyte* buffer, mgint offset, mgint count, mgbool clear)
+void MGA_Voice_AppendBuffer(MGA_Voice* voice, mgbyte* buffer, mguint size)
 {
 	assert(voice != nullptr);
 	assert(buffer != nullptr);
-
-	if (clear)
-	{
-		// Stop and remove any pending buffers first.
-	}
 
 	// The idea here is that for streaming cases and dynamic buffers
 	// we internally allocate a big chunk of memory for it and
@@ -165,6 +160,12 @@ MGSoundState MGA_Voice_GetState(MGA_Voice* voice)
 {
 	assert(voice != nullptr);
 	return MGSoundState::Stopped;
+}
+
+mgulong MGA_Voice_GetPosition(MGA_Voice* voice)
+{
+	assert(voice != nullptr);
+	return 0;
 }
 
 void MGA_Voice_SetPan(MGA_Voice* voice, mgfloat pan)

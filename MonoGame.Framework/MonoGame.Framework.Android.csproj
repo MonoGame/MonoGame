@@ -10,10 +10,11 @@
     <PackageTags>monogame;.net core;core;.net standard;standard;android</PackageTags>
     <PackageId>MonoGame.Framework.Android</PackageId>
     <AppendTargetFrameworkToOutputPath>False</AppendTargetFrameworkToOutputPath>
+    <IsAotCompatible>true</IsAotCompatible>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="MonoGame.Library.OpenAL" Version="1.23.1.7" />
+    <PackageReference Include="MonoGame.Library.OpenAL" Version="1.23.1.10" />
   </ItemGroup>
 
   <ItemGroup>

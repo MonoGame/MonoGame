@@ -155,6 +155,21 @@ struct MGG_InputElement
     mguint InstanceDataStepRate;
 };
 
+struct MGM_AudioDecoderInfo
+{
+    mgint samplerate;
+    mgint channels;
+    mgulong duration;
+};
+
+struct MGM_VideoDecoderInfo
+{
+    mgint width;
+    mgint height;
+    mgfloat fps;
+    mgulong duration;
+};
+
 struct MGP_KeyEvent
 {
     void* Window;
@@ -218,4 +233,15 @@ union {
 };
 };
 #pragma pack(pop)
+
+struct MGP_ControllerCaps
+{
+    void* Identifier;
+    void* DisplayName;
+    MGGamePadType GamePadType;
+    mguint InputFlags;
+    mgbool HasLeftVibrationMotor;
+    mgbool HasRightVibrationMotor;
+    mgbool HasVoiceSupport;
+};
 

@@ -28,7 +28,7 @@ namespace MonoGame.Tools.Pipeline
 #elif WPF
             var app = new Application(Platforms.Wpf);
 #else
-            var app = new Application(Platforms.Mac64);
+            var app = new Application(Platforms.macOS);
 #endif
 
             app.Style = "PipelineTool";

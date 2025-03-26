@@ -9,6 +9,7 @@
     <PackageId>MonoGame.Framework.DesktopGL</PackageId>
     <AppendTargetFrameworkToOutputPath>False</AppendTargetFrameworkToOutputPath>
     <CopyContentFiles>True</CopyContentFiles>
+    <IsAotCompatible>true</IsAotCompatible>
   </PropertyGroup>
 
   <!-- NETFX reference assemblies let us target .NET Framework on Mac/Linux without Mono -->
@@ -18,7 +19,7 @@
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
     <PackageReference Include="MonoGame.Library.SDL" Version="2.26.5.5" />
-    <PackageReference Include="MonoGame.Library.OpenAL" Version="1.23.1.7" />
+    <PackageReference Include="MonoGame.Library.OpenAL" Version="1.23.1.10" />
     <PackageReference Include="NVorbis" Version="0.10.4" />
   </ItemGroup>
 
@@ -82,9 +83,6 @@
   <ItemGroup>
     <EmbeddedResource Include="MonoGame.bmp">
       <LogicalName>MonoGame.bmp</LogicalName>
-    </EmbeddedResource>
-    <EmbeddedResource Include="..\ThirdParty\SDL_GameControllerDB\gamecontrollerdb.txt">
-      <LogicalName>gamecontrollerdb.txt</LogicalName>
     </EmbeddedResource>
   </ItemGroup>
 

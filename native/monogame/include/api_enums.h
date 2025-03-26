@@ -244,13 +244,6 @@ enum class MGVertexElementFormat : mgint
     HalfVector4 = 11,
 };
 
-enum class MGMediaState : mgint
-{
-    Stopped = 0,
-    Playing = 1,
-    Paused = 2,
-};
-
 enum class MGGameRunBehavior : mgint
 {
     Asynchronous = 0,
@@ -495,10 +488,12 @@ enum class MGMonoGamePlatform : mgint
     Windows = 4,
     WebGL = 5,
     XboxOne = 6,
-    PlayStation4 = 7,
-    PlayStation5 = 8,
-    NintendoSwitch = 9,
-    DesktopVK = 10,
+    WindowsGDK = 7,
+    XboxSeries = 8,
+    PlayStation4 = 9,
+    PlayStation5 = 10,
+    NintendoSwitch = 11,
+    DesktopVK = 12,
 };
 
 enum class MGGraphicsBackend : mgint
@@ -507,6 +502,7 @@ enum class MGGraphicsBackend : mgint
     OpenGL = 1,
     Vulkan = 2,
     Metal = 3,
+    DirectX12 = 4,
 };
 
 enum class MGSystemCursor : mgint
@@ -523,5 +519,19 @@ enum class MGSystemCursor : mgint
     SizeAll = 9,
     No = 10,
     Hand = 11,
+};
+
+enum class MGGamePadType : mgint
+{
+    Unknown = 0,
+    GamePad = 1,
+    Wheel = 2,
+    ArcadeStick = 3,
+    FlightStick = 4,
+    DancePad = 5,
+    Guitar = 6,
+    AlternateGuitar = 7,
+    DrumKit = 8,
+    BigButtonPad = 768,
 };
 

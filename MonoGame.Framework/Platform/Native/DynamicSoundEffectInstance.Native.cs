@@ -11,7 +11,7 @@ public sealed partial class DynamicSoundEffectInstance : SoundEffectInstance
 {
     private unsafe void PlatformCreate()
     {
-        Voice = MGA.Voice_Create(SoundEffect.System);
+        Voice = MGA.Voice_Create(SoundEffect.System, _sampleRate, (int)_channels);
     }
 
     private unsafe int PlatformGetPendingBufferCount()
@@ -49,7 +49,10 @@ public sealed partial class DynamicSoundEffectInstance : SoundEffectInstance
     private unsafe void PlatformSubmitBuffer(byte[] buffer, int offset, int count)
     {
         if (Voice != null)
-            MGA.Voice_AppendBuffer(Voice, buffer, offset, count, false);
+        {
+            fixed (byte* ptr = buffer)
+                MGA.Voice_AppendBuffer(Voice, ptr + offset, (uint)count);
+        }
     }
 
     private unsafe void PlatformDispose(bool disposing)

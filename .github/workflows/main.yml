@@ -37,79 +37,57 @@ jobs:
           java-version: '17'
 
       - name: Install Vulkan SDK
-        uses: humbletim/install-vulkan-sdk@v1.1.1
+        uses: humbletim/setup-vulkan-sdk@523828e49cd4afabce369c39c7ee6543a2b7a735
         with:
-            version: 1.3.283.0
-            cache: true
+          vulkan-query-version: 1.3.283.0
+          vulkan-use-cache: true
 
-      - name: Disable annotations
+      - name: Disable Annotations
         run: echo "::remove-matcher owner=csc::"
 
-      - name: install wine64 on linux
-        run: |
-          sudo apt install p7zip-full curl
-          sudo dpkg --add-architecture i386 
-          sudo mkdir -pm755 /etc/apt/keyrings
-          sudo wget -O /etc/apt/keyrings/winehq-archive.key https://dl.winehq.org/wine-builds/winehq.key
-          sudo wget -NP /etc/apt/sources.list.d/ https://dl.winehq.org/wine-builds/ubuntu/dists/jammy/winehq-jammy.sources
-          sudo apt update && sudo apt install --install-recommends winehq-stable
-        if: runner.os == 'Linux'
-
-      - name: Install Arial Font
-        run: |
-          echo "ttf-mscorefonts-installer msttcorefonts/accepted-mscorefonts-eula select true" | sudo debconf-set-selections
-          sudo apt install -y ttf-mscorefonts-installer
-          sudo fc-cache
-          fc-match Arial
-        if: runner.os == 'Linux'
-
-      - name: install wine64 on macos
-        run: |
-          brew install wine-stable p7zip freeimage freetype
-          sudo mkdir -p /usr/local/lib
-          sudo ln -s /opt/homebrew/lib/libfreetype.dylib /usr/local/lib/libfreetype6.dylib
-          sudo ln -s /opt/homebrew/lib/libfreeimage.dylib /usr/local/lib/libfreeimage.dylib
-        if: runner.os == 'macOS'
-
-      - name: Setup Wine 
-        run: wget -qO- https://monogame.net/downloads/net9_mgfxc_wine_setup.sh | bash
-        if: runner.os != 'Windows'
-
-      - name: Install required workloads
+      - name: Install Dependencies
         run:   |
               if [ "$RUNNER_OS" == "Linux" ]; then
                     dotnet workload install android
+                    sudo apt install p7zip-full curl
+                    sudo dpkg --add-architecture i386 
+                    sudo mkdir -pm755 /etc/apt/keyrings
+                    sudo wget -O /etc/apt/keyrings/winehq-archive.key https://dl.winehq.org/wine-builds/winehq.key
+                    sudo wget -NP /etc/apt/sources.list.d/ https://dl.winehq.org/wine-builds/ubuntu/dists/jammy/winehq-jammy.sources
+                    sudo apt update && sudo apt install --install-recommends winehq-stable
+                    echo "ttf-mscorefonts-installer msttcorefonts/accepted-mscorefonts-eula select true" | sudo debconf-set-selections
+                    sudo apt install -y ttf-mscorefonts-installer
+                    sudo fc-cache
+                    fc-match Arial
+                    wine64 --version
+                    wget -qO- https://monogame.net/downloads/net9_mgfxc_wine_setup.sh | bash
               elif [ "$RUNNER_OS" == "Windows" ]; then
-                    dotnet.exe workload install android ios macos
+                    dotnet.exe workload install android
               else
-                    dotnet workload install android
+                    dotnet workload install android macos ios
+                    brew install wine-stable p7zip
+                    sudo mkdir -p /usr/local/lib
+                    ls -n /Applications/ | grep Xcode*
+                    sudo xcode-select -s /Applications/Xcode_16.2.app/Contents/Developer
+                    wget -qO- https://monogame.net/downloads/net9_mgfxc_wine_setup.sh | bash
               fi
         shell: bash
 
       - name: Build
         run: dotnet run --project build/Build.csproj -- --target=Default
 
-      - name: Test
-        run: dotnet test Tools/MonoGame.Tools.Tests/MonoGame.Tools.Tests.csproj --blame-hang-timeout 5m -c Release --filter="TestCategory!=Audio"
-        env:
-          DOTNET_ROOT: ${{github.workspace}}/dotnet64
-          MGFXC_WINE_PATH: /home/runner/.winemonogame
-          CI: true
-        if: runner.os == 'Linux'
-
-      - name: Test
-        run: dotnet test Tools/MonoGame.Tools.Tests/MonoGame.Tools.Tests.csproj --blame-hang-timeout 5m -c Release --filter="TestCategory!=Audio"
-        env:
-          DOTNET_ROOT: ${{github.workspace}}/dotnet64
-          MGFXC_WINE_PATH: /Users/runner/.winemonogame
-          CI: true
-        if: runner.os == 'macOS'
-
-      - name: Test
-        run: dotnet test Tools/MonoGame.Tools.Tests/MonoGame.Tools.Tests.csproj --blame-hang-timeout 5m -c Release
+      - name: Run Tests
+        run:   |
+              if [ "$RUNNER_OS" == "Windows" ]; then
+                    dotnet test Tools/MonoGame.Tools.Tests/MonoGame.Tools.Tests.csproj --blame-hang-timeout 5m -c Release
+              elif [ "$RUNNER_OS" == "Linux" ]; then
+                    MGFXC_WINE_PATH=/home/runner/.winemonogame dotnet test Tools/MonoGame.Tools.Tests/MonoGame.Tools.Tests.csproj --blame-hang-timeout 5m -c Release --filter="TestCategory!=Audio"
+              else
+                    MGFXC_WINE_PATH=/Users/runner/.winemonogame dotnet test Tools/MonoGame.Tools.Tests/MonoGame.Tools.Tests.csproj --blame-hang-timeout 5m -c Release --filter="TestCategory!=Audio"
+              fi
         env:
           CI: true
-        if: runner.os == 'Windows'
+        shell: bash
 
       - name: Expose GitHub Runtime
         uses: crazy-max/ghaction-github-runtime@v3
@@ -144,6 +122,7 @@ jobs:
             env:
               GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
               NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}
+              MARKETPLACE_PAT: ${{ secrets.MARKETPLACE_PAT }}
 
           - name: Make a Release
             if: github.ref_type == 'tag'
@@ -153,7 +132,7 @@ jobs:
               tag: ${{ github.ref_name }}
               allowUpdates: true
               removeArtifacts: true
-              artifacts: "nugets/*.nupkg"
+              artifacts: "nugets/*.nupkg;vsix/MonoGame.Templates.VSExtension.vsix"
               token: ${{ secrets.GITHUB_TOKEN }}
 
   tests:
@@ -165,14 +144,20 @@ jobs:
         include:
           - os: windows
             platform: windows
+            shell: cmd
           - os: macos
             platform: macos
+            shell: bash
           - os: ubuntu-latest
             platform: linux
+            shell: bash
             filter: --where="Category != Audio"
           # - os: linux
           #   platform: linux
       fail-fast: false
+    defaults:
+      run:
+        shell: ${{ matrix.shell }}
     steps:
       - name: Clone repository
         uses: actions/checkout@v4
@@ -183,7 +168,7 @@ jobs:
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '8.0.x'
-        #if: runner.environment == 'github-hosted'
+        if: runner.environment == 'github-hosted'
 
       - name: install wine64 on linux
         run: |
@@ -207,38 +192,47 @@ jobs:
         run: wget -qO- https://monogame.net/downloads/net9_mgfxc_wine_setup.sh | bash
         if: runner.os != 'Windows' && runner.environment == 'github-hosted'
 
+      - name: Download Nuget
+        uses: actions/download-artifact@v4
+        with:
+          name: nuget-${{ matrix.platform }}
+          path: Artifacts/NuGet
+
       - name: Download tests-tools-${{ matrix.platform }}
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: tests-tools-${{ matrix.platform }}
-          path: tests-tools
+          path: tests tools
 
       - name: Download tests-desktopgl-${{ matrix.platform }}
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: tests-desktopgl-${{ matrix.platform }}
           path: tests-desktopgl
           
       - name: Download tests-windowsdx-${{ matrix.platform }}
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: tests-windowsdx-${{ matrix.platform }}
           path: tests-windowsdx
         if: runner.os == 'Windows'
 
-      - name: Install Tools
-        run: |
-          dotnet tool install --create-manifest-if-needed mgcb-basisu
-          dotnet tool install --create-manifest-if-needed mgcb-crunch
-
       - name: Run Tools Tests
-        run: dotnet test tests-tools/MonoGame.Tools.Tests.dll --blame-hang-timeout 1m --filter="TestCategory!=Effects"
+        run: dotnet test "tests tools/MonoGame.Tools.Tests.dll" --blame-hang-timeout 1m --filter="TestCategory!=Effects"
         env:
           CI: true
 
-      - name: Run DirectX Tests
-        shell: cmd
-        run: dotnet MonoGame.Tests.dll
+      # Run the DirectX tests in two steps: first the audio, then the rest.
+      # This is because the audio tests has some incompatibilities within the runner with ContentManagerTests.
+      - name: Run DirectX Audio Tests
+        run: dotnet test --filter Category=Audio MonoGame.Tests.dll 
+        env:
+          CI: true
+        working-directory: tests-windowsdx
+        if: runner.os == 'Windows'
+        
+      - name: Run DirectX All Tests Except Audio
+        run: dotnet test --filter Category!=Audio MonoGame.Tests.dll 
         env:
           CI: true
         working-directory: tests-windowsdx
