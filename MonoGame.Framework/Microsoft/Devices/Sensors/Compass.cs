@@ -17,12 +17,24 @@ namespace Microsoft.Devices.Sensors
         /// <summary>
         /// Gets whether the device on which the application is running supports the compass sensor.
         /// </summary>
-        public static bool IsSupported => PlatformIsSupported();
+        public static bool IsSupported
+        {
+            get
+            {
+                return PlatformIsSupported();
+            }
+        }
 
         /// <summary>
         /// Gets the current state of the compass. The value is a member of the SensorState enumeration.
         /// </summary>
-        public SensorState State => PlatformSensorState();
+        public SensorState State
+        {
+            get
+            {
+                return PlatformSensorState();
+            }
+        }
 
         /// <summary>
         /// Creates a new instance of the Compass object.
