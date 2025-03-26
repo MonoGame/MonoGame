@@ -5,7 +5,7 @@
 using System;
 using Microsoft.Xna.Framework;
 
-namespace Microsoft.Devices.Sensors
+namespace MonoGame.Devices.Sensors
 {
     /// <summary>
     /// Provides Desktop applications access to the device's compass sensor.
