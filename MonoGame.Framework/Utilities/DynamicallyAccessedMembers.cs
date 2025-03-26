@@ -27,12 +27,14 @@ namespace System.Diagnostics.CodeAnalysis
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Struct | AttributeTargets.Method | AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Interface | AttributeTargets.Parameter | AttributeTargets.ReturnValue | AttributeTargets.GenericParameter, Inherited = false)]
     public sealed class DynamicallyAccessedMembersAttribute : Attribute
     {
+        private DynamicallyAccessedMemberTypes _memberTypes;
+
         public DynamicallyAccessedMembersAttribute(DynamicallyAccessedMemberTypes memberTypes)
         {
-            MemberTypes = memberTypes;
+            _memberTypes = memberTypes;
         }
 
-        public DynamicallyAccessedMemberTypes MemberTypes { get; }
+        public DynamicallyAccessedMemberTypes MemberTypes { get { return _memberTypes; } }
     }
 }
 #endif

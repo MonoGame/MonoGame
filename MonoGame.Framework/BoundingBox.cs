@@ -159,21 +159,21 @@ namespace Microsoft.Xna.Framework
         /// </returns>
         public ContainmentType ContainsPrecise(BoundingFrustum frustum)
         {
-            Vector3[] boxNormals =
-            [
+            Vector3[] boxNormals = new Vector3[]
+            {
                 Vector3.Up,
                 Vector3.Right,
                 Vector3.Forward
-            ];
+            };
 
-            Vector3[] frustumNormals =
-            [
+            Vector3[] frustumNormals = new Vector3[]
+            {
                 frustum.Left.Normal,
                 frustum.Right.Normal,
                 frustum.Top.Normal,
                 frustum.Bottom.Normal,
                 frustum.Far.Normal
-            ];
+            };
 
             // allAxes = box normals + frustum normals + cross products of box normals and frustum normals
             Vector3[] allAxes = new Vector3[23]; // 3 + 5 + 3 * 5
