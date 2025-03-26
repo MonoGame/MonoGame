@@ -1,15 +1,15 @@
 <Project>
   <ItemGroup>
-    <Compile Include="Microsoft\Devices\Sensors\AccelerometerFailedException.cs" />
-    <Compile Include="Microsoft\Devices\Sensors\AccelerometerReading.cs" />
-    <Compile Include="Microsoft\Devices\Sensors\CalibrationEventArgs.cs" />
-    <Compile Include="Microsoft\Devices\Sensors\CompassReading.cs" />
-    <Compile Include="Microsoft\Devices\Sensors\ISensorReading.cs" />
-    <Compile Include="Microsoft\Devices\Sensors\SensorBase.cs" />
-    <Compile Include="Microsoft\Devices\Sensors\SensorFailedException.cs" />
-    <Compile Include="Microsoft\Devices\Sensors\SensorReadingEventArgs.cs" />
-    <Compile Include="Microsoft\Devices\Sensors\SensorState.cs" />
-    <Compile Include="Microsoft\Devices\Sensors\Accelerometer.cs" />
-    <Compile Include="Microsoft\Devices\Sensors\Compass.cs" />
+    <Compile Include="MonoGame\Devices\Sensors\AccelerometerFailedException.cs" />
+    <Compile Include="MonoGame\Devices\Sensors\AccelerometerReading.cs" />
+    <Compile Include="MonoGame\Devices\Sensors\CalibrationEventArgs.cs" />
+    <Compile Include="MonoGame\Devices\Sensors\CompassReading.cs" />
+    <Compile Include="MonoGame\Devices\Sensors\ISensorReading.cs" />
+    <Compile Include="MonoGame\Devices\Sensors\SensorBase.cs" />
+    <Compile Include="MonoGame\Devices\Sensors\SensorFailedException.cs" />
+    <Compile Include="MonoGame\Devices\Sensors\SensorReadingEventArgs.cs" />
+    <Compile Include="MonoGame\Devices\Sensors\SensorState.cs" />
+    <Compile Include="MonoGame\Devices\Sensors\Accelerometer.cs" />
+    <Compile Include="MonoGame\Devices\Sensors\Compass.cs" />
   </ItemGroup>
 </Project>
