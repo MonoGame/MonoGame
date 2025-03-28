@@ -29,7 +29,7 @@
     <Compile Remove="Platform\**\*" />
     <Compile Remove="Properties\**\*" />
     <Compile Remove="Utilities\System.Numerics.Vectors\**\*" />
-    <Compile Remove="Microsoft\**\*" />
+    <Compile Remove="MonoGame\**\*" />
   </ItemGroup>
 
   <ItemGroup>
@@ -95,5 +95,5 @@
 
   <Import Project="Platform\OpenGL.targets" />
   <Import Project="Platform\OpenAL.targets" />
-  <Import Project="Microsoft.Devices.Sensors.targets" />
+  <Import Project="MonoGame.Framework.Devices.Sensors.targets" />
 </Project>

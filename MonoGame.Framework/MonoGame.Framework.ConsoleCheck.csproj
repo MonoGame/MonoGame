@@ -16,6 +16,7 @@
     <Compile Remove="Platform\**\*" />
     <Compile Remove="Properties\**\*" />
     <Compile Remove="Utilities\System.Numerics.Vectors\**\*" />
+    <Compile Remove="MonoGame\**\*" />
   </ItemGroup>
 
   <ItemGroup>
@@ -60,6 +61,8 @@
     <Compile Include="Platform\Windows\WinFormsGameForm.cs" />
     <Compile Include="Platform\Windows\WinFormsGamePlatform.cs" />
     <Compile Include="Platform\Windows\WinFormsGameWindow.cs" />
+    <Compile Include="Platform\Desktop\Devices\Sensors\Accelerometer.cs" />
+    <Compile Include="Platform\Desktop\Devices\Sensors\Compass.cs" />
   </ItemGroup> 
 
   <ItemGroup>
@@ -91,4 +94,5 @@
   
   <Import Project="Platform\DirectX.targets" />
   <Import Project="Platform\XAudio.targets" />
+  <Import Project="MonoGame.Framework.Devices.Sensors.targets" />
 </Project>

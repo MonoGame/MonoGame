@@ -5,7 +5,7 @@ using Microsoft.Xna.Framework;
 using CoreMotion;
 using Foundation;
 
-namespace Microsoft.Devices.Sensors
+namespace MonoGame.Framework.Devices.Sensors
 {
     /// <summary>
     /// Class to provide methods and properties to read device compass data.

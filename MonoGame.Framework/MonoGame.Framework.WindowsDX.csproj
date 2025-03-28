@@ -19,7 +19,7 @@
     <Compile Remove="Platform\**\*" />
     <Compile Remove="Properties\**\*" />
     <Compile Remove="Utilities\System.Numerics.Vectors\**\*" />
-    <Compile Remove="Microsoft\**\*" />
+    <Compile Remove="MonoGame\**\*" />
   </ItemGroup>
 
   <ItemGroup>
@@ -97,5 +97,5 @@
 
   <Import Project="Platform\DirectX.targets" />
   <Import Project="Platform\XAudio.targets" />
-  <Import Project="Microsoft.Devices.Sensors.targets" />
+  <Import Project="MonoGame.Framework.Devices.Sensors.targets" />
 </Project>

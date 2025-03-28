@@ -6,16 +6,16 @@ using System;
 using System.Runtime.InteropServices;
 using Microsoft.Xna.Framework;
 
-namespace Microsoft.Devices.Sensors
+namespace MonoGame.Framework.Devices.Sensors
 {
     /// <summary>
-    /// Provides Desktop applications access to the device's accelerometer sensor.
+    /// Provides Desktop applications access to the device's compass sensor.
     /// Currently stubs, for cross-platform development.
     /// </summary>
-    public sealed partial class Accelerometer : SensorBase<AccelerometerReading>
+    public sealed partial class Compass : SensorBase<CompassReading>
     {
         /// <summary>
-        /// Gets or sets whether the device on which the application is running supports the accelerometer sensor.
+        /// Gets whether the device on which the application is running supports the compass sensor.
         /// </summary>
         public static bool IsSupported
         {
@@ -26,7 +26,7 @@ namespace Microsoft.Devices.Sensors
         }
 
         /// <summary>
-        /// Gets the current state of the accelerometer. The value is a member of the SensorState enumeration.
+        /// Gets the current state of the compass. The value is a member of the SensorState enumeration.
         /// </summary>
         public SensorState State
         {
@@ -37,15 +37,15 @@ namespace Microsoft.Devices.Sensors
         }
 
         /// <summary>
-        /// Creates a new instance of the Accelerometer object.
+        /// Creates a new instance of the Compass object.
         /// </summary>
-        public Accelerometer()
+        public Compass()
         {
-            PlatformAccelerometer();
+            PlatformCompass();
         }
 
         /// <summary>
-        /// Initializes the platform resources required for the accelerometer sensor.
+        /// Initializes the platform resources required for the compass sensor.
         /// </summary>
         static void Initialize()
         {
@@ -53,7 +53,7 @@ namespace Microsoft.Devices.Sensors
         }
 
         /// <summary>
-        /// Starts data acquisition from the accelerometer.
+        /// Starts data acquisition from the compass.
         /// </summary>
         public override void Start()
         {
@@ -61,7 +61,7 @@ namespace Microsoft.Devices.Sensors
         }
 
         /// <summary>
-        /// Stops data acquisition from the accelerometer.
+        /// Stops data acquisition from the compass.
         /// </summary>
         public override void Stop()
         {
