@@ -1,4 +1,4 @@
-﻿// MonoGame - Copyright (C) MonoGame Foundation, Inc
+// MonoGame - Copyright (C) MonoGame Foundation, Inc
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
@@ -60,7 +60,7 @@ namespace Microsoft.Xna.Framework.Audio
                 {
                     var validPitchRange = 10;
                     #if IOS || ANDROID
-                    highestAbsoluteValue = 1;
+                    validPitchRange = 1;
                     #endif
 
                     if (value < -validPitchRange)
