@@ -95,5 +95,5 @@
 
   <Import Project="Platform\OpenGL.targets" />
   <Import Project="Platform\OpenAL.targets" />
-  <Import Project="MonoGame.Devices.Sensors.targets" />
+  <Import Project="MonoGame.Framework.Devices.Sensors.targets" />
 </Project>

@@ -5,7 +5,7 @@
 using System;
 using Microsoft.Xna.Framework;
 
-namespace MonoGame.Devices.Sensors
+namespace MonoGame.Framework.Devices.Sensors
 {
     /// <summary>
     /// Provides properties for compass readings.

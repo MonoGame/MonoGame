@@ -8,7 +8,7 @@ using Android.Hardware;
 using Microsoft.Xna.Framework;
 using static Android.Hardware.SensorPrivacyManager;
 
-namespace MonoGame.Devices.Sensors
+namespace MonoGame.Framework.Devices.Sensors
 {
     /// <summary>
     /// Provides Android applications access to the device's compass sensor.

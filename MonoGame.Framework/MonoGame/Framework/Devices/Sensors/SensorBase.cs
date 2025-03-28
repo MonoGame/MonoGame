@@ -5,7 +5,7 @@
 using Microsoft.Xna.Framework;
 using System;
 
-namespace MonoGame.Devices.Sensors
+namespace MonoGame.Framework.Devices.Sensors
 {
 	public abstract class SensorBase<TSensorReading> : IDisposable
 		where TSensorReading : ISensorReading

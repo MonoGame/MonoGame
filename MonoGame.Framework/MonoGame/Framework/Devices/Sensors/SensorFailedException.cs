@@ -4,7 +4,7 @@
 
 using System;
 
-namespace MonoGame.Devices.Sensors
+namespace MonoGame.Framework.Devices.Sensors
 {
     /// <summary>
     /// Represents errors related to sensors.

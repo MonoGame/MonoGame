@@ -97,5 +97,5 @@
 
   <Import Project="Platform\DirectX.targets" />
   <Import Project="Platform\XAudio.targets" />
-  <Import Project="MonoGame.Devices.Sensors.targets" />
+  <Import Project="MonoGame.Framework.Devices.Sensors.targets" />
 </Project>

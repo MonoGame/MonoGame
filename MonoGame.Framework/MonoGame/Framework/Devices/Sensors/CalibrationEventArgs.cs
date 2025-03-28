@@ -4,7 +4,7 @@
 
 using System;
 
-namespace MonoGame.Devices.Sensors
+namespace MonoGame.Framework.Devices.Sensors
 {
     /// <summary>
     /// Provides data for Calibrate and events.

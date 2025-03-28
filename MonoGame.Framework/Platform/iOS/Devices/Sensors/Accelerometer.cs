@@ -5,7 +5,7 @@ using Microsoft.Xna.Framework;
 using CoreMotion;
 using Foundation;
 
-namespace MonoGame.Devices.Sensors
+namespace MonoGame.Framework.Devices.Sensors
 {
     /// <summary>
     /// Provides methods to access accelerometer data from the device

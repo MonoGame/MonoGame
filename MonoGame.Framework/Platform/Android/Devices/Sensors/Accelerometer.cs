@@ -7,7 +7,7 @@ using Android.Content;
 using Android.Hardware;
 using Microsoft.Xna.Framework;
 
-namespace MonoGame.Devices.Sensors
+namespace MonoGame.Framework.Devices.Sensors
 {
     /// <summary>
     /// Provides Android applications access to the device's accelerometer sensor.
