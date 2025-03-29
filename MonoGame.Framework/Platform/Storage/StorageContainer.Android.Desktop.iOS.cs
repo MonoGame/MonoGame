@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
 
 namespace Microsoft.Xna.Framework.Storage
 {
@@ -159,6 +160,29 @@ namespace Microsoft.Xna.Framework.Storage
             {
                 fileStream.Write(data, 0, data.Length);
             }
+        }
+
+        public static string PlatformSanitizeFileName(string fileName)
+        {
+            var truncatedFileName = TruncateFileName(fileName);
+
+            // Replace invalid filename characters with underscores
+            var invalidChars = Path.GetInvalidFileNameChars();
+            var sanitizedFileName = string.Concat(truncatedFileName.Select(c => invalidChars.Contains(c) ? '_' : c));
+
+            // Optionally trim trailing periods/spaces (common issue in Windows)
+            return sanitizedFileName.Trim().TrimEnd('.');
+        }
+
+        private const int MAXFILENAMELENGTH = 240;
+
+        public static string TruncateFileName(string fileName)
+        {
+            if (fileName.Length > MAXFILENAMELENGTH)
+            {
+                return fileName.Substring(0, MAXFILENAMELENGTH);
+            }
+            return fileName;
         }
     }
 }
