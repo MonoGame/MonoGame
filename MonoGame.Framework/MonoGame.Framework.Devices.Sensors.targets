@@ -1,0 +1,15 @@
+<Project>
+  <ItemGroup>
+    <Compile Include="MonoGame\Framework\Devices\Sensors\AccelerometerFailedException.cs" />
+    <Compile Include="MonoGame\Framework\Devices\Sensors\AccelerometerReading.cs" />
+    <Compile Include="MonoGame\Framework\Devices\Sensors\CalibrationEventArgs.cs" />
+    <Compile Include="MonoGame\Framework\Devices\Sensors\CompassReading.cs" />
+    <Compile Include="MonoGame\Framework\Devices\Sensors\ISensorReading.cs" />
+    <Compile Include="MonoGame\Framework\Devices\Sensors\SensorBase.cs" />
+    <Compile Include="MonoGame\Framework\Devices\Sensors\SensorFailedException.cs" />
+    <Compile Include="MonoGame\Framework\Devices\Sensors\SensorReadingEventArgs.cs" />
+    <Compile Include="MonoGame\Framework\Devices\Sensors\SensorState.cs" />
+    <Compile Include="MonoGame\Framework\Devices\Sensors\Accelerometer.cs" />
+    <Compile Include="MonoGame\Framework\Devices\Sensors\Compass.cs" />
+  </ItemGroup>
+</Project>

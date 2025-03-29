@@ -5,76 +5,77 @@ using Microsoft.Xna.Framework;
 using CoreMotion;
 using Foundation;
 
-namespace Microsoft.Devices.Sensors
+namespace MonoGame.Framework.Devices.Sensors
 {
     /// <summary>
     /// Provides methods to access accelerometer data from the device
     /// </summary>
-	public sealed class Accelerometer : SensorBase<AccelerometerReading>
+	public sealed partial class Accelerometer : SensorBase<AccelerometerReading>
 	{
-        static readonly int MaxSensorCount = 10;
-        static int instanceCount;
+		static readonly int MaxSensorCount = 10;
+		static int instanceCount;
 		private static bool started = false;
 		private static SensorState state = IsSupported ? SensorState.Initializing : SensorState.NotSupported;
+		static readonly CMMotionManager motionManager = new CMMotionManager();
 
         /// <summary>
         /// Check if an accelerometer is supported on the current device
         /// </summary>
         /// <returns>true if an accelerometer is supported</returns>
-		public static bool IsSupported
+		internal static bool PlatformIsSupported()
 		{
-			get { return motionManager.AccelerometerAvailable; }
+			return motionManager.AccelerometerAvailable;
 		}
 
         /// <summary>
         /// Check the current state of the accelerometer
         /// </summary>
         /// <returns>Returns current <see cref="SensorState">SensorState</see></returns>
-		public SensorState State
+		public SensorState PlatformSensorState()
 		{
-			get { return state; }
+			return state;
 		}
 
-		private static event CMAccelerometerHandler readingChanged;
+        private static event CMAccelerometerHandler readingChanged;
 
         /// <summary>
         /// Create a new instance of Accelerometer
         /// </summary>
         /// <exception cref="AccelerometerFailedException">No default sensor is found</exception>
         /// <exception cref="SensorFailedException">The maximum limit of Accelerometer instances has been reached (10)</exception>
-		public Accelerometer()
+		internal void PlatformAccelerometer()
 		{
 			if (!IsSupported)
-                throw new AccelerometerFailedException("Failed to start accelerometer data acquisition. No default sensor found.", -1);
-            else if (instanceCount >= MaxSensorCount)
-                throw new SensorFailedException("The limit of 10 simultaneous instances of the Accelerometer class per application has been exceeded.");
+				throw new AccelerometerFailedException("Failed to start accelerometer data acquisition. No default sensor found.", -1);
+			else if (instanceCount >= MaxSensorCount)
+				throw new SensorFailedException("The limit of 10 simultaneous instances of the Accelerometer class per application has been exceeded.");
 
-            ++instanceCount;
+			++instanceCount;
 
-			this.TimeBetweenUpdatesChanged += this.UpdateInterval;
-			readingChanged += ReadingChangedHandler;
+            this.TimeBetweenUpdatesChanged += this.UpdateInterval;
+            readingChanged += ReadingChangedHandler;
 
-		}
+        }
 
         /// <inheritdoc cref="IDisposable.Dispose()"/>
-        protected override void Dispose (bool disposing)
-        {
-            if (!IsDisposed)
-            {
-                if (disposing)
-                {
-                    if (started)
-                        Stop();
-                    --instanceCount;
-                }
-            }
-            base.Dispose(disposing);
-        }
+		internal void PlatformDispose(bool disposing)
+		{
+			if (!IsDisposed)
+			{
+				if (disposing)
+				{
+					if (started)
+						Stop();
+					--instanceCount;
+				}
+			}
+		}
+
         /// <summary>
         /// Begin collecting accelerometer data
         /// </summary>
         /// <exception cref="AccelerometerFailedException">Accelerometer is already started</exception>
-		public override void Start()
+		internal void PlatformStart()
 		{
 			if (started == false)
 			{
@@ -83,42 +84,45 @@ namespace Microsoft.Devices.Sensors
 				state = SensorState.Ready;
 			}
 			else
-                throw new AccelerometerFailedException("Failed to start accelerometer data acquisition. Data acquisition already started.", -1);
+				throw new AccelerometerFailedException("Failed to start accelerometer data acquisition. Data acquisition already started.", -1);
 		}
 
         /// <summary>
         /// Stop collection accelerometer data
         /// </summary>
-		public override void Stop()
+		internal void PlatformStop()
 		{
 			motionManager.StopAccelerometerUpdates();
 			started = false;
 			state = SensorState.Disabled;
 		}
 
-		private void AccelerometerHandler(CMAccelerometerData data, NSError error)
-		{
-			readingChanged(data, error);
-		}
+        private void AccelerometerHandler(CMAccelerometerData data, NSError error)
+        {
+            readingChanged(data, error);
+        }
 
 		private void ReadingChangedHandler(CMAccelerometerData data, NSError error)
-        {
-            AccelerometerReading reading = new AccelerometerReading();
-            this.IsDataValid = error == null;
-            if (this.IsDataValid)
-            {
-                this.IsDataValid = true;
-                reading.Acceleration = new Vector3((float)data.Acceleration.X, (float)data.Acceleration.Y, (float)data.Acceleration.Z);
-                reading.Timestamp = DateTime.UtcNow;
-                this.CurrentValue = reading;
-                this.IsDataValid = error == null;
-            }
+		{
+			AccelerometerReading reading = new AccelerometerReading();
+			this.IsDataValid = error == null;
+			if (this.IsDataValid)
+			{
+				this.IsDataValid = true;
+				reading.Acceleration = new Vector3((float)data.Acceleration.X, (float)data.Acceleration.Y, (float)data.Acceleration.Z);
+				reading.Timestamp = DateTime.UtcNow;
+				this.CurrentValue = reading;
+				this.IsDataValid = error == null;
+			}
 		}
 
 		private void UpdateInterval(object sender, EventArgs args)
 		{
 			motionManager.AccelerometerUpdateInterval = this.TimeBetweenUpdates.TotalSeconds;
 		}
-	}
-}
 
+        internal static void PlatformInitialize()
+		{
+		}
+    }
+}
