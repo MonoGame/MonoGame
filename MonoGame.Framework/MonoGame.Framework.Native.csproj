@@ -22,7 +22,7 @@
     <Compile Remove="Utilities\System.Numerics.Vectors\**\*" />
     <Compile Include="Platform\Native\**\*" />
     <Compile Include="Platform\Utilities\ReflectionHelpers.Default.cs" />
-    <Compile Remove="MonoGame\**\*" />
+    <Compile Remove="Devices\**\*" />
   </ItemGroup>
 
   <ItemGroup>
