@@ -5,6 +5,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -70,7 +71,7 @@ namespace Microsoft.Xna.Framework.Storage
                 throw new ArgumentNullException(nameof(containerName), "A title name must be provided.");
 
             _storageDevice = device;
-            _containerName = containerName;
+            _containerName = PlatformSanitizeFileName(containerName);
             _playerIndex = playerIndex;
 
             _isProcessing = false;
@@ -458,6 +459,5 @@ namespace Microsoft.Xna.Framework.Storage
 
             PlatformWriteContainers(data, true);
         }
-
     }
 }
