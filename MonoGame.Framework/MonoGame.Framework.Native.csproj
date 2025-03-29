@@ -21,7 +21,8 @@
     <Compile Remove="Properties\**\*" />
     <Compile Remove="Utilities\System.Numerics.Vectors\**\*" />
     <Compile Include="Platform\Native\**\*" />
-    <Compile Include="Platform\Utilities\ReflectionHelpers.Default.cs" />	  
+    <Compile Include="Platform\Utilities\ReflectionHelpers.Default.cs" />
+    <Compile Remove="MonoGame\**\*" />
   </ItemGroup>
 
   <ItemGroup>
@@ -42,10 +43,13 @@
     <Compile Include="Platform\Input\InputKeyEventArgs.cs" />
     <Compile Include="Platform\Utilities\AssemblyHelper.cs" />
     <Compile Include="Platform\Threading.cs" />
+    <Compile Include="Platform\Desktop\Devices\Sensors\Accelerometer.cs" />
+    <Compile Include="Platform\Desktop\Devices\Sensors\Compass.cs" />
   </ItemGroup>
 
   <ItemGroup>
     <Folder Include="Platform\Graphics\Vertices\" />
   </ItemGroup>
-	
+
+  <Import Project="MonoGame.Framework.Devices.Sensors.targets" />
 </Project>

@@ -297,8 +297,8 @@ namespace Microsoft.Xna.Framework.Content
         /// <remarks>
         /// Before a ContentManager can load an asset, you need to add the asset to your game project using
         /// the steps described in
-        /// <see href="https://docs.monogame.net/articles/getting_started/content_pipeline/index.html">Adding Content - MonoGame</see>.
-        /// <br>PNG, JPG/JPEG and BMP files can be loaded as Texture2D without using the content pipeline. The assetName must not contain extension.
+        /// <see href="https://docs.monogame.net/articles/getting_started/content_pipeline/index.html">Adding Content - MonoGame</see>. <br/>
+        /// PNG, JPG/JPEG and BMP files can be loaded as Texture2D without using the content pipeline. The assetName must not contain extension.
         /// </remarks>
         /// <typeparam name="T">
         ///     <para>
@@ -459,18 +459,9 @@ namespace Microsoft.Xna.Framework.Content
                 {
                     // If the file is not found, we try searching a file with differents extensions
                     // based on the type of asset searched (e.g. '.bmp' and '.png' for a Texture2D)
-                    switch (typeof(T).Name)
+                    if (typeof(Texture2D).IsAssignableFrom(typeof(T)))
                     {
-                        case nameof(Texture2D):
-                            result = LoadTexture2DFromImageFile(assetName);
-                            break;
-                        // Futures cases here (see relevant GitHub Issues):
-                        // Video
-                        // Song
-                        // SoundEffect
-                        // Texture3D (?)
-                        default:
-                            break;
+                        result = LoadTexture2DFromImageFile(assetName);
                     }
                 }
                 catch
@@ -550,12 +541,14 @@ namespace Microsoft.Xna.Framework.Content
                 string assetPath = Path.Combine(RootDirectory, assetName);
                 assetPath = Path.ChangeExtension(assetPath, extension);
 
-                using Stream file = TitleContainer.OpenStreamNoException(assetPath);
-                if (file != null)
+                using (Stream file = TitleContainer.OpenStreamNoException(assetPath))
                 {
-                    Texture2D result = Texture2D.FromStream(graphicsDeviceService.GraphicsDevice, file, DefaultColorProcessors.PremultiplyAlpha);
+                    if (file != null)
+                    {
+                        Texture2D result = Texture2D.FromStream(graphicsDeviceService.GraphicsDevice, file, DefaultColorProcessors.PremultiplyAlpha);
 
-                    return result;
+                        return result;
+                    }
                 }
             }
 

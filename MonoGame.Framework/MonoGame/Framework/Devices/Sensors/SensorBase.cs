@@ -5,14 +5,11 @@
 using Microsoft.Xna.Framework;
 using System;
 
-namespace Microsoft.Devices.Sensors
+namespace MonoGame.Framework.Devices.Sensors
 {
 	public abstract class SensorBase<TSensorReading> : IDisposable
 		where TSensorReading : ISensorReading
 	{
-#if IOS
-        protected static readonly CoreMotion.CMMotionManager motionManager = new CoreMotion.CMMotionManager();
-#endif
         bool disposed;
 		private TimeSpan timeBetweenUpdates;
 	    private TSensorReading currentValue;
