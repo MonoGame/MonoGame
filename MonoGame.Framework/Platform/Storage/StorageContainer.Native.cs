@@ -75,5 +75,10 @@ namespace Microsoft.Xna.Framework.Storage
         {
             throw new NotImplementedException();
         }
+
+        public static string PlatformSanitizeFileName(string fileName)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
