@@ -118,7 +118,7 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
         /// <summary>
         /// Creates a new instance of PipelineManager.
         /// </summary>
-        /// <param name="projectDir">The directory that contains the content project./param>
+        /// <param name="projectDir">The directory that contains the content project.</param>
         /// <param name="outputDir">The directory that contains the results of the project.</param>
         /// <param name="intermediateDir">The directory that is used for temporary files created by the content build process</param>
         public PipelineManager(string projectDir, string outputDir, string intermediateDir)

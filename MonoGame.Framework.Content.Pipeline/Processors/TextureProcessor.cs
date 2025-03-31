@@ -37,7 +37,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
         /// <summary>
         /// Gets or sets the color key flag.
         /// <remarks>
-        /// Must be set to <see langword="true"> to use the color key.
+        /// Must be set to <see langword="true"/> to use the color key.
         /// </remarks>
         /// </summary>
         [DefaultValueAttribute(true)]
