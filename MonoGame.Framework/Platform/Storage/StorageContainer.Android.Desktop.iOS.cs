@@ -135,14 +135,14 @@ namespace Microsoft.Xna.Framework.Storage
                 }
                 else
                 {
-                    Console.WriteLine($"File: {Path.Combine(_storagePath, SAVE_DATA_FILENAME)}, does NOT exist.");
+                    Console.WriteLine("File: {0}, does NOT exist.", Path.Combine(_storagePath, SAVE_DATA_FILENAME));
                     return null;
                 }
             }
             catch (Exception ex)
             {
                 // Log or handle unexpected errors
-                Console.WriteLine($"Error reading {Path.Combine(_storagePath, SAVE_DATA_FILENAME)}. Error: {ex.Message}");
+                Console.WriteLine("Error reading {0}. Error: {ex.Message}", Path.Combine(_storagePath, SAVE_DATA_FILENAME));
                 return null;
             }
         }

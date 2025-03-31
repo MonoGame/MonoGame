@@ -51,7 +51,7 @@ namespace Microsoft.Xna.Framework.Storage
             _player = player;
         }
 
-        public void DeleteContainerAsync(string containerName, CancellationToken cancellationToken = default)
+        public void DeleteContainerAsync(string containerName, CancellationToken cancellationToken)
         {
             Task.Run(() => DeleteContainer(containerName), cancellationToken);
         }
@@ -59,13 +59,13 @@ namespace Microsoft.Xna.Framework.Storage
         public void DeleteContainer(string containerName)
         {
             if (string.IsNullOrEmpty(containerName))
-                throw new ArgumentNullException(nameof(containerName), "A container name must be provided.");
+                throw new ArgumentNullException("containerName", "A container name must be provided.");
 
             // safely delete it.
             PlatformDeleteContainer(containerName);
         }
 
-        public Task<StorageContainer> OpenContainerAsync(string containerName, CancellationToken cancellationToken = default)
+        public Task<StorageContainer> OpenContainerAsync(string containerName, CancellationToken cancellationToken)
         {
             return Task.Run(() => OpenContainer(containerName), cancellationToken);
         }
@@ -73,7 +73,7 @@ namespace Microsoft.Xna.Framework.Storage
         public StorageContainer OpenContainer(string containerName)
         {
             if (string.IsNullOrEmpty(containerName))
-                throw new ArgumentNullException(nameof(containerName), "A container name must be provided.");
+                throw new ArgumentNullException("containerName", "A container name must be provided.");
 
             try
             {
@@ -81,7 +81,7 @@ namespace Microsoft.Xna.Framework.Storage
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"Failed to open storage container: {ex.Message}");
+                Debug.WriteLine("Failed to open storage container: {0}", ex.Message);
                 return null;
             }
         }
