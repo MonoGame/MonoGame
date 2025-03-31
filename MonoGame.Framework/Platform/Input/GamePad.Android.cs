@@ -63,7 +63,7 @@ namespace Microsoft.Xna.Framework.Input
             keyMap[13] = (int)Keycode.DpadUp;
 
             keyMap[14] = (int)Keycode.ButtonStart;
-            keyMap[15] = (int)Keycode.Back;
+            keyMap[15] = (int)Keycode.ButtonSelect;
 
             // get a bool[] with indices matching the keyMap
             bool[] hasMap = new bool[16];
@@ -359,7 +359,7 @@ namespace Microsoft.Xna.Framework.Input
 
                 case Keycode.ButtonStart:
                     return Buttons.Start;
-                case Keycode.Back:
+                case Keycode.ButtonSelect:
                     return Buttons.Back;
             }
 
