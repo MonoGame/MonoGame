@@ -283,7 +283,26 @@ namespace Microsoft.Xna.Framework.Input
             gamePad._leftTrigger = e.GetAxisValue(Axis.Brake);
             gamePad._rightTrigger = e.GetAxisValue(Axis.Gas);
 
-            if(!gamePad.DPadButtons)
+            // We set the Trigger buttons here, because it never fires in OnKeyDown
+            if (gamePad._leftTrigger > 0f)
+            {
+                gamePad._buttons |= Buttons.LeftTrigger;
+            }
+            else
+            {
+                gamePad._buttons &= Buttons.LeftTrigger;
+            }
+
+            if (gamePad._rightTrigger > 0f)
+            {
+                gamePad._buttons |= Buttons.RightTrigger;
+            }
+            else
+            {
+                gamePad._buttons &= Buttons.RightTrigger;
+            }
+
+            if (!gamePad.DPadButtons)
             {
                 if(e.GetAxisValue(Axis.HatX) < 0)
                 {
