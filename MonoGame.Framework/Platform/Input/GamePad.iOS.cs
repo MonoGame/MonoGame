@@ -187,6 +187,11 @@ namespace Microsoft.Xna.Framework.Input
                         buttons |= Buttons.RightStick;
                     }
 
+                    if (controller.ExtendedGamepad.ButtonHome.IsPressed)
+                    {
+                        buttons |= Buttons.BigButton;
+                    }
+
                     leftThumbStickPosition.X = controller.ExtendedGamepad.LeftThumbstick.XAxis.Value;
                     leftThumbStickPosition.Y = controller.ExtendedGamepad.LeftThumbstick.YAxis.Value;
                     rightThumbStickPosition.X = controller.ExtendedGamepad.RightThumbstick.XAxis.Value;
