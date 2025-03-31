@@ -41,13 +41,25 @@ namespace Microsoft.Xna.Framework.Storage
         /// <summary>
         /// Returns container name of the title.
         /// </summary>
-        public string ContainerName => _containerName;
+        public string ContainerName
+        {
+            get
+            {
+                return _containerName;
+            }
+        }
 
         private readonly StorageDevice _storageDevice;
         /// <summary>
         /// Returns the <see cref="StorageDevice"/> that holds logical files for the container.
         /// </summary>
-        public StorageDevice StorageDevice => _storageDevice;
+        public StorageDevice StorageDevice
+        {
+            get
+            {
+                return _storageDevice;
+            }
+        }
 
         /// <summary>
         /// Fired when <see cref="Dispose"/> is called or object if finalized or collected by the garbage collector.
@@ -57,7 +69,13 @@ namespace Microsoft.Xna.Framework.Storage
         /// <summary>
         /// Returns true if some kind of processing is in progress and false if it isn't
         /// </summary>
-        public bool IsProcessing => _isProcessing;
+        public bool IsProcessing
+        {
+            get
+            {
+                return _isProcessing;
+            }
+        }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="StorageContainer"/> class.
@@ -68,7 +86,7 @@ namespace Microsoft.Xna.Framework.Storage
         internal StorageContainer(StorageDevice device, string containerName, PlayerIndex? playerIndex)
         {
             if (string.IsNullOrEmpty(containerName))
-                throw new ArgumentNullException(nameof(containerName), "A title name must be provided.");
+                throw new ArgumentNullException("containerName", "A title name must be provided.");
 
             _storageDevice = device;
             _containerName = PlatformSanitizeFileName(containerName);
@@ -91,7 +109,7 @@ namespace Microsoft.Xna.Framework.Storage
         public void CreateDirectory(string directoryName)
         {
             if (string.IsNullOrEmpty(directoryName))
-                throw new ArgumentNullException(nameof(directoryName), "A directory name must be provided.");
+                throw new ArgumentNullException("directoryName", "A directory name must be provided.");
 
             PlatformCreateDirectory(directoryName);
         }
@@ -104,7 +122,7 @@ namespace Microsoft.Xna.Framework.Storage
         public Stream CreateFile(string fileName)
         {
             if (string.IsNullOrEmpty(fileName))
-                throw new ArgumentNullException(nameof(fileName), "A file name must be provided.");
+                throw new ArgumentNullException("fileName", "A file name must be provided.");
 
             return PlatformCreateFile(fileName);
         }
@@ -116,7 +134,7 @@ namespace Microsoft.Xna.Framework.Storage
         public void DeleteDirectory(string directoryName)
         {
             if (string.IsNullOrEmpty(directoryName))
-                throw new ArgumentNullException(nameof(directoryName), "A directory name must be provided.");
+                throw new ArgumentNullException("directoryName", "A directory name must be provided.");
 
             PlatformDeleteDirectory(directoryName);
         }
@@ -128,7 +146,7 @@ namespace Microsoft.Xna.Framework.Storage
         public void DeleteFile(string fileName)
         {
             if (string.IsNullOrEmpty(fileName))
-                throw new ArgumentNullException(nameof(fileName), "A file name must be provided.");
+                throw new ArgumentNullException("fileName", "A file name must be provided.");
 
             PlatformDeleteFile(fileName);
         }
@@ -141,7 +159,7 @@ namespace Microsoft.Xna.Framework.Storage
         public bool DirectoryExists(string directoryName)
         {
             if (string.IsNullOrEmpty(directoryName))
-                throw new ArgumentNullException(nameof(directoryName), "A directory name must be provided.");
+                throw new ArgumentNullException("directoryName", "A directory name must be provided.");
 
             return PlatformDirectoryExists(directoryName);
         }
@@ -154,7 +172,7 @@ namespace Microsoft.Xna.Framework.Storage
         public bool FileExists(string fileName)
         {
             if (string.IsNullOrEmpty(fileName))
-                throw new ArgumentNullException(nameof(fileName), "A file name must be provided.");
+                throw new ArgumentNullException("fileName", "A file name must be provided.");
 
             return PlatformFileExists(fileName);
 
@@ -177,7 +195,7 @@ namespace Microsoft.Xna.Framework.Storage
         public string[] GetDirectoryNames(string searchPattern)
         {
             if (string.IsNullOrEmpty(searchPattern))
-                throw new ArgumentNullException(nameof(searchPattern), "A search pattern must be provided.");
+                throw new ArgumentNullException("searchPattern", "A search pattern must be provided.");
 
             return PlatformGetDirectoryNames(searchPattern);
         }
@@ -199,7 +217,7 @@ namespace Microsoft.Xna.Framework.Storage
         public string[] GetFileNames(string searchPattern)
         {
             if (string.IsNullOrEmpty(searchPattern))
-                throw new ArgumentNullException(nameof(searchPattern), "A search pattern must be provided.");
+                throw new ArgumentNullException("searchPattern", "A search pattern must be provided.");
 
             return PlatformGetFileNames(searchPattern);
         }
@@ -238,7 +256,7 @@ namespace Microsoft.Xna.Framework.Storage
         public Stream OpenFile(string fileName, FileMode fileMode, FileAccess fileAccess, FileShare fileShare)
         {
             if (string.IsNullOrEmpty(fileName))
-                throw new ArgumentNullException(nameof(fileName), "A file name must be provided.");
+                throw new ArgumentNullException("fileName", "A file name must be provided.");
 
             return PlatformOpenFile(fileName, fileMode, fileAccess, fileShare);
         }
@@ -248,7 +266,10 @@ namespace Microsoft.Xna.Framework.Storage
         /// </summary>
         public void Dispose()
         {
-            Disposing?.Invoke(this, null);
+            if (Disposing != null)
+            {
+                Disposing.Invoke(this, null);
+            }
 
             IsDisposed = true;
         }
@@ -432,7 +453,11 @@ namespace Microsoft.Xna.Framework.Storage
             foreach (string key in _containers.Keys)
             {
                 // Data length
-                int dataLength = _containers[key]?.Length ?? 0;
+                int dataLength = 0;
+                if (_containers[key] != null)
+                {
+                    dataLength = _containers[key].Length;
+                }
                 data[currentByte] = (byte)(dataLength & 0x00FF);
                 data[currentByte + 1] = (byte)((dataLength & 0xFF00) >> 8);
                 currentByte += 2;
