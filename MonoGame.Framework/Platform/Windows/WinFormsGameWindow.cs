@@ -204,6 +204,7 @@ namespace MonoGame.Framework
                     Form.MouseDown -= Form_MouseDown;
                     Form.MouseUp -= Form_MouseUp;
                     _subscribedToMouseKeyEvents = false;
+                    _isleftMouseButtonDown = false;
                 }
             }
         }
@@ -225,10 +226,7 @@ namespace MonoGame.Framework
         {
             if (e.Button == MouseButtons.Left)
             {
-                Task.Delay(100).ContinueWith((x) =>
-                {
-                    _isleftMouseButtonDown = false;
-                });
+                _isleftMouseButtonDown = false;
             }
         }
 
