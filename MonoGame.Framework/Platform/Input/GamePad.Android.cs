@@ -43,7 +43,7 @@ namespace Microsoft.Xna.Framework.Input
                     device.VibratorManager.DefaultVibrator.HasVibrator;
 
             // build out supported inputs from what the gamepad exposes
-            int[] keyMap = new int[16];
+            int[] keyMap = new int[17];
             keyMap[0] = (int)Keycode.ButtonA;
             keyMap[1] = (int)Keycode.ButtonB;
             keyMap[2] = (int)Keycode.ButtonX;
@@ -64,6 +64,8 @@ namespace Microsoft.Xna.Framework.Input
 
             keyMap[14] = (int)Keycode.ButtonStart;
             keyMap[15] = (int)Keycode.ButtonSelect;
+
+            keyMap[16] = (int)Keycode.ButtonMode;
 
             // get a bool[] with indices matching the keyMap
             bool[] hasMap = new bool[16];
@@ -380,6 +382,8 @@ namespace Microsoft.Xna.Framework.Input
                     return Buttons.Start;
                 case Keycode.ButtonSelect:
                     return Buttons.Back;
+                case Keycode.ButtonMode:
+                    return Buttons.BigButton;
             }
 
             return 0;
