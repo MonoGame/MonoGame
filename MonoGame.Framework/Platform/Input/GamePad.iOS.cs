@@ -22,7 +22,7 @@ namespace Microsoft.Xna.Framework.Input
             return false;
         }
 
-        static void AssingIndex(GCControllerPlayerIndex index)
+        static void AssignIndex(GCControllerPlayerIndex index)
         {
             if (IndexIsUsed(index))
                 return;
@@ -42,7 +42,7 @@ namespace Microsoft.Xna.Framework.Input
         {
             var ind = (GCControllerPlayerIndex)index;
 
-            AssingIndex(ind);
+            AssignIndex(ind);
 
             foreach (var controller in GCController.Controllers)
             {
@@ -117,7 +117,7 @@ namespace Microsoft.Xna.Framework.Input
             float leftTriggerValue = 0;
             float rightTriggerValue = 0;
 
-            AssingIndex(ind);
+            AssignIndex(ind);
 
             foreach (var controller in GCController.Controllers)
             {
@@ -179,13 +179,11 @@ namespace Microsoft.Xna.Framework.Input
 
                     if (controller.ExtendedGamepad.LeftThumbstickButton.IsPressed)
                     {
-                        Down = ButtonState.Pressed;
                         buttons |= Buttons.LeftStick;
                     }
 
                     if (controller.ExtendedGamepad.RightThumbstickButton.IsPressed)
                     {
-                        Down = ButtonState.Pressed;
                         buttons |= Buttons.RightStick;
                     }
 
