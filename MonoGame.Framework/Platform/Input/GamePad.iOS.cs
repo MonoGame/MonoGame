@@ -190,7 +190,7 @@ namespace Microsoft.Xna.Framework.Input
                     }
 
                     if (controller.ExtendedGamepad.RightThumbstickButton != null
-                    && controller.ExtendedGamepad.LeftThumbstickButton.IsPressed)
+                    && controller.ExtendedGamepad.RightThumbstickButton.IsPressed)
                     {
                         buttons |= Buttons.RightStick;
                     }
