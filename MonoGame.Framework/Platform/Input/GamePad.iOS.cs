@@ -151,10 +151,16 @@ namespace Microsoft.Xna.Framework.Input
                     if (controller.ExtendedGamepad.RightTrigger.IsPressed)
                         buttons |= Buttons.RightTrigger;
 
-                    if (controller.ExtendedGamepad.ButtonMenu.IsPressed)
+                    if (controller.ExtendedGamepad.ButtonMenu != null
+                    && controller.ExtendedGamepad.ButtonMenu.IsPressed)
+                    {
                         buttons |= Buttons.Start;
+                    }
+                        
                     if (controller.ExtendedGamepad.ButtonOptions?.IsPressed == true)
+                    {
                         buttons |= Buttons.Back;
+                    }
 
                     if (controller.ExtendedGamepad.DPad.Up.IsPressed)
                     {
@@ -177,17 +183,20 @@ namespace Microsoft.Xna.Framework.Input
                         buttons |= Buttons.DPadRight;
                     }
 
-                    if (controller.ExtendedGamepad.LeftThumbstickButton.IsPressed)
+                    if (controller.ExtendedGamepad.LeftThumbstickButton != null
+                    && controller.ExtendedGamepad.LeftThumbstickButton.IsPressed)
                     {
                         buttons |= Buttons.LeftStick;
                     }
 
-                    if (controller.ExtendedGamepad.RightThumbstickButton.IsPressed)
+                    if (controller.ExtendedGamepad.RightThumbstickButton != null
+                    && controller.ExtendedGamepad.LeftThumbstickButton.IsPressed)
                     {
                         buttons |= Buttons.RightStick;
                     }
 
-                    if (controller.ExtendedGamepad.ButtonHome.IsPressed)
+                    if (controller.ExtendedGamepad.ButtonHome != null
+                    && controller.ExtendedGamepad.ButtonHome.IsPressed)
                     {
                         buttons |= Buttons.BigButton;
                     }
