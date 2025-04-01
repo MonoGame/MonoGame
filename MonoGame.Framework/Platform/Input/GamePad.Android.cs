@@ -142,41 +142,41 @@ namespace Microsoft.Xna.Framework.Input
 
         private static GamePadState PlatformGetState(int index, GamePadDeadZone leftDeadZoneMode, GamePadDeadZone rightDeadZoneMode)
         {
+            if (index < 0 || index >= GamePads.Length)
+                return GamePadState.Default;
+
             var gamePad = GamePads[index];
-            GamePadState state = GamePadState.Default;
-            if (gamePad != null && gamePad._isConnected)
+
+            if (gamePad == null || !gamePad._isConnected)
             {
-                // Check if the device was disconnected
-                var dvc = InputDevice.GetDevice(gamePad._deviceId);
-                if (dvc == null)
-                {
-                    Android.Util.Log.Debug("MonoGame", "Detected controller disconnect [" + index + "] ");
-                    gamePad._isConnected = false;
-                    return state;
-                }
-
-                GamePadThumbSticks thumbSticks = new GamePadThumbSticks(gamePad._leftStick, gamePad._rightStick, leftDeadZoneMode, rightDeadZoneMode);
-
-                state = new GamePadState(
-                    thumbSticks,
-                    new GamePadTriggers(gamePad._leftTrigger, gamePad._rightTrigger),
-                    new GamePadButtons(gamePad._buttons),
-                    new GamePadDPad(gamePad._buttons));
-            }
-            // we need to add the default "no gamepad connected but the user hit back"
-            // behaviour here
-            else {
                 if (index == 0 && Back)
                 {
-                    // Consume state
-                    state = new GamePadState(new GamePadThumbSticks(), new GamePadTriggers(), new GamePadButtons(Buttons.Back), new GamePadDPad());
-                    state.IsConnected = false;
+                    return new GamePadState(
+                        new GamePadThumbSticks(),
+                        new GamePadTriggers(),
+                        new GamePadButtons(Buttons.Back),
+                        new GamePadDPad())
+                    {
+                        IsConnected = false
+                    };
                 }
-                else
-                    state = new GamePadState();
+
+                return GamePadState.Default;
             }
 
-            return state;
+            var dvc = InputDevice.GetDevice(gamePad._deviceId);
+            if (dvc == null)
+            {
+                Android.Util.Log.Debug("MonoGame", $"Detected controller disconnect [{index}]");
+                gamePad._isConnected = false;
+                return GamePadState.Default;
+            }
+
+            return new GamePadState(
+                new GamePadThumbSticks(gamePad._leftStick, gamePad._rightStick, leftDeadZoneMode, rightDeadZoneMode),
+                new GamePadTriggers(gamePad._leftTrigger, gamePad._rightTrigger),
+                new GamePadButtons(gamePad._buttons),
+                new GamePadDPad(gamePad._buttons));
         }
 
         private static bool PlatformSetVibration(int index, float leftMotor, float rightMotor, float leftTrigger, float rightTrigger)
