@@ -382,8 +382,6 @@ namespace Microsoft.Xna.Framework.Input
                     return Buttons.Start;
                 case Keycode.ButtonSelect:
                     return Buttons.Back;
-                case Keycode.ButtonMode:
-                    return Buttons.BigButton;
             }
 
             return 0;
