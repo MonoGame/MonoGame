@@ -19,9 +19,15 @@
 [License](#license)
 </div>
 
-## Overview
+## MonoGame Content Builder Package
 
-**MonoGame** is a simple and powerful .NET framework for creating games for desktop PCs, video game consoles, and mobile devices using the C# programming language. It has been successfully used to create games such as [Streets of Rage 4](https://store.steampowered.com/app/985890/Streets_of_Rage_4/), [Carrion](https://store.steampowered.com/app/953490/CARRION/), [Celeste](https://store.steampowered.com/app/504230/Celeste/), [Stardew Valley](https://store.steampowered.com/app/413150/Stardew_Valley/), and [many others](https://monogame.net/showcase/). 
+This package contains the extensions needed for dotnet projects to build "Content Pipeline" projects, this enables the normal 'dotnet build' process to utilize the backend content building system for MonoGame.
+
+For more details, view the [documentation page](https://docs.monogame.net/articles/getting_to_know/whatis/content_pipeline/) for the MonoGame Content Pipeline
+
+## MonoGame Overview
+
+**MonoGame** is a simple and powerful .NET framework for creating games for desktop PCs, video game consoles, and mobile devices using the C# programming language.
 
 It is an open-source re-implementation of the discontinued [Microsoft's XNA Framework](https://msdn.microsoft.com/en-us/library/bb200104.aspx).
 
@@ -43,7 +49,6 @@ We support a growing list of platforms across the desktop, mobile, and console s
   * Nintendo Switch
 
 ## Resources
-
 - [Getting started →](https://docs.monogame.net/articles/getting_started/index.html)
 - ["How To" Guides →](https://docs.monogame.net/articles/getting_to_know/howto/)
 - [Documentation Hub →](https://docs.monogame.net/)

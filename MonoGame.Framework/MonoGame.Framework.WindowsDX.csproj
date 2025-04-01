@@ -10,8 +10,13 @@
     <PackageId>MonoGame.Framework.WindowsDX</PackageId>
     <AppendTargetFrameworkToOutputPath>False</AppendTargetFrameworkToOutputPath>
     <IsAotCompatible>false</IsAotCompatible>
-	<IsTrimmable>false</IsTrimmable>
+	  <IsTrimmable>false</IsTrimmable>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
   </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="..\README.md" Pack="true" PackagePath="\"/>
+  </ItemGroup>
 
   <ItemGroup>
     <Compile Remove="bin\**\*" />
