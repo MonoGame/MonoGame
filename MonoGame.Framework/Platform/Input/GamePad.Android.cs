@@ -151,6 +151,8 @@ namespace Microsoft.Xna.Framework.Input
             {
                 if (index == 0 && Back)
                 {
+                    Back = false;
+
                     return new GamePadState(
                         new GamePadThumbSticks(),
                         new GamePadTriggers(),
