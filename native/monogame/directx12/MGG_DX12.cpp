@@ -88,16 +88,14 @@ struct MGG_GraphicsDevice
 	std::queue<MGG_Buffer*> destroyBuffers;
 	std::queue<MGG_Texture*> destroyTextures;
 
-	MGG_Buffer* discarded = nullptr;
-	MGG_Buffer* pending = nullptr;
-	MGG_Buffer* free = nullptr;
+	std::vector<MGG_Buffer*> discarded;
+	std::vector<MGG_Buffer*> pending;
+	std::vector<MGG_Buffer*> free;
 };
 
 struct MGG_Buffer
 {
 	mgint frame;
-
-	MGG_Buffer* next = nullptr;
 
 	MGBufferType type;
 
@@ -586,25 +584,12 @@ void MGG_GraphicsDevice_Present(MGG_GraphicsDevice* device, mgint currentFrame, 
 
 	// Move the pending buffers to the free list 
 	// for reuse on the next frame.
-	if (device->pending != nullptr)
-	{
-		auto last = device->pending;
-		while (true)
-		{
-			if (last->next == nullptr)
-				break;
-			last = last->next;
-		}
-
-		last->next = device->free;
-		device->free = device->pending;
-		device->pending = nullptr;
-	}
+	device->free.insert(device->free.end(), device->pending.begin(), device->pending.end());
+	device->pending.clear();
 
 	// Buffers discarded this frame can be moved
 	// into the pending list for a future frame.
-	device->pending = device->discarded;
-	device->discarded = nullptr;
+	std::swap(device->pending, device->discarded);
 
 	// Cleanup resources for the next frame.
 	MGDX_DestroyFrameResources(device, device->frame, false);
@@ -1170,51 +1155,42 @@ static MGG_Buffer* MGDX_BufferDiscard(MGG_GraphicsDevice* device, MGG_Buffer* bu
 	auto dataSize = buffer->dataSize;
 	auto type = buffer->type;
 
-	// Discard the current buffer.
-	assert(buffer->next == nullptr);
-	buffer->next = device->discarded;
-	device->discarded = buffer;
-	buffer = nullptr;
+	// Add it to the discard list.
+	device->discarded.push_back(buffer);
 
-	// Search for the best fit from the free list.	
-	MGG_Buffer** curr = &device->free;
-	MGG_Buffer** best = nullptr;
-	while (*curr != nullptr)
+	// Search for the best fit from the free list.		
+	MGG_Buffer* best = nullptr;
+	for (int i=0; i < device->free.size(); i++)
 	{
-		if ((*curr)->type == type)
-		{
-			auto currSize = (*curr)->actualSize;
+		auto curr = device->free[i];
 
-			if (currSize >= dataSize)
+		if (curr->type != type)
+			continue;
+		auto currSize = curr->actualSize;
+
+		if (currSize < dataSize)
+			continue;
+
+		if (best == nullptr || best->actualSize > currSize)
+		{
+			best = curr;
+
+			if (currSize == dataSize)
 			{
-				if (best == nullptr || (*best)->actualSize > currSize)
-				{
-					//best = curr;
-					//if (currSize == dataSize)
-						//break;
-				}
+				device->free[i] = device->free.back();
+				device->free.pop_back();
+				break;
 			}
 		}
-
-		curr = &(*curr)->next;
-	}
-
-	// Did we find a match?
-	if (best != nullptr)
-	{
-		buffer = *best;
-		*best = buffer->next;
-		buffer->next = nullptr;
-		buffer->dataSize = dataSize;
-		//buffer->dirtyMin = 0;
-		//buffer->dirtyMax = 0;
-		return buffer;
 	}
 
 	// We didn't find a match, so allocate a new one.
-	buffer = MGG_Buffer_Create(device, type, dataSize);
+	if (best == nullptr)
+		best = MGG_Buffer_Create(device, type, dataSize);
 
-	return buffer;
+	best->dataSize = dataSize;
+
+	return best;
 }
 
 

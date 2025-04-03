@@ -121,61 +121,6 @@ struct CD3DX12_VIEWPORT : public D3D12_VIEWPORT
 };
 
 //------------------------------------------------------------------------------------------------
-struct CD3DX12_BOX : public D3D12_BOX
-{
-    CD3DX12_BOX() = default;
-    explicit CD3DX12_BOX( const D3D12_BOX& o ) noexcept :
-        D3D12_BOX( o )
-    {}
-    explicit CD3DX12_BOX(
-        LONG Left,
-        LONG Right ) noexcept
-    {
-        left = static_cast<UINT>(Left);
-        top = 0;
-        front = 0;
-        right = static_cast<UINT>(Right);
-        bottom = 1;
-        back = 1;
-    }
-    explicit CD3DX12_BOX(
-        LONG Left,
-        LONG Top,
-        LONG Right,
-        LONG Bottom ) noexcept
-    {
-        left = static_cast<UINT>(Left);
-        top = static_cast<UINT>(Top);
-        front = 0;
-        right = static_cast<UINT>(Right);
-        bottom = static_cast<UINT>(Bottom);
-        back = 1;
-    }
-    explicit CD3DX12_BOX(
-        LONG Left,
-        LONG Top,
-        LONG Front,
-        LONG Right,
-        LONG Bottom,
-        LONG Back ) noexcept
-    {
-        left = static_cast<UINT>(Left);
-        top = static_cast<UINT>(Top);
-        front = static_cast<UINT>(Front);
-        right = static_cast<UINT>(Right);
-        bottom = static_cast<UINT>(Bottom);
-        back = static_cast<UINT>(Back);
-    }
-};
-inline bool operator==( const D3D12_BOX& l, const D3D12_BOX& r ) noexcept
-{
-    return l.left == r.left && l.top == r.top && l.front == r.front &&
-        l.right == r.right && l.bottom == r.bottom && l.back == r.back;
-}
-inline bool operator!=( const D3D12_BOX& l, const D3D12_BOX& r ) noexcept
-{ return !( l == r ); }
-
-//------------------------------------------------------------------------------------------------
 struct CD3DX12_DEPTH_STENCIL_DESC : public D3D12_DEPTH_STENCIL_DESC
 {
     CD3DX12_DEPTH_STENCIL_DESC() = default;
