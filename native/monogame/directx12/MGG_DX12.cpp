@@ -1296,7 +1296,10 @@ void MGG_Buffer_SetData(MGG_GraphicsDevice* device, MGG_Buffer*& buffer, mgint o
 
 		case MGBufferType::Index:
 			if (device->indexBuffer == last)
+			{
 				device->indexBuffer = buffer;
+				device->indexBufferDirty = true;
+			}
 			break;
 		}
 	}
