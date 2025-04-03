@@ -3,7 +3,7 @@ using System.IO;
 using MonoGame.Interop;
 using System.Runtime.InteropServices;
 
-internal unsafe class MGReadOnlyStream : Stream
+internal unsafe class ReadOnlyAssetStream : Stream
 {
     private MG_Asset* _asset;
     private long _length;
@@ -29,7 +29,7 @@ internal unsafe class MGReadOnlyStream : Stream
         }
     }
 
-    public MGReadOnlyStream(string assetname)
+    public ReadOnlyAssetStream(string assetname)
     {
         if (!MG.AssetOpen(assetname, out _asset, out _length))
             throw new FileNotFoundException("Asset not found", assetname);
@@ -110,6 +110,6 @@ internal static unsafe partial class MG
 
     public static Stream OpenRead(string path)
     {
-        return new MGReadOnlyStream(path);
+        return new ReadOnlyAssetStream(path);
     }
 }
