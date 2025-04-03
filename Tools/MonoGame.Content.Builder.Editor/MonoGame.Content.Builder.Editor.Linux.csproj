@@ -11,7 +11,12 @@
     <AssemblyName>mgcb-editor-linux</AssemblyName>
     <AssemblyTitle>MGCB Editor</AssemblyTitle>
     <RuntimeIdentifiers>linux-x64</RuntimeIdentifiers>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
   </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="README.md" Pack="true" PackagePath="\"/>
+  </ItemGroup>
 
   <ItemGroup>
     <None Remove="**\*.glade" />
