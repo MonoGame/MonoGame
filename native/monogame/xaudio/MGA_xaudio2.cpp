@@ -6,6 +6,7 @@
 
 #include "mg_common.h"
 
+#include <vector>
 
 #define XAUDIO2_HELPER_FUNCTIONS
 #include <xaudio2.h>
@@ -24,11 +25,11 @@ struct MGA_System
 
 struct MGA_Buffer
 {
-	tWAVEFORMATEX* format = nullptr;
+	WAVEFORMATEX* format = nullptr;
 	XAUDIO2_BUFFER buffer;
-	XAUDIO2_BUFFER bufferLooped ;
 	XAUDIO2_BUFFER_WMA* wmaBuffer = nullptr;
 	uint8_t* data = nullptr;
+	uint32_t length = 0;
 };
 
 struct MGA_Voice
@@ -45,6 +46,7 @@ struct MGA_Voice
 	bool paused = false;
 };
 
+static std::vector<MGA_Buffer*> s_FreeStreamingBuffers;
 
 MGA_System* MGA_System_Create()
 {
@@ -92,6 +94,11 @@ MGA_System* MGA_System_Create()
 void MGA_System_Destroy(MGA_System* system)
 {
 	assert(system != nullptr);
+
+	// Release the streaming buffers.
+	for (auto free : s_FreeStreamingBuffers)
+		MGA_Buffer_Destroy(free);
+	s_FreeStreamingBuffers.clear();
 
 	// TODO: We're assuming here the C# side is cleaning up
 	// buffers/voices, but if we want this to be a good C++
@@ -175,6 +182,55 @@ void MGA_Buffer_InitializeFormat(MGA_Buffer* buffer, mgbyte* waveHeader, mgbyte*
 	assert(waveHeader != nullptr);
 	assert(waveData != nullptr);
 	assert(length > 0);
+
+	auto wformat = (WAVEFORMATEX*)waveHeader;
+
+	if (wformat->wFormatTag == WAVE_FORMAT_ADPCM)
+	{
+		// We are assuming MSADPCM here!
+
+		auto format = (ADPCMWAVEFORMAT*)malloc(sizeof(ADPCMWAVEFORMAT) + (7 * sizeof(ADPCMCOEFSET)));
+		memset(format, 0, sizeof(ADPCMWAVEFORMAT));
+		format->wfx.wFormatTag = WAVE_FORMAT_ADPCM;
+		format->wfx.nSamplesPerSec = wformat->nSamplesPerSec;
+		format->wfx.nChannels = wformat->nChannels;
+		format->wfx.nBlockAlign = wformat->nBlockAlign;
+		format->wfx.wBitsPerSample = wformat->wBitsPerSample;
+		format->wfx.nAvgBytesPerSec = wformat->nAvgBytesPerSec;
+		format->wfx.cbSize = 32;
+		format->wSamplesPerBlock = (wformat->nBlockAlign * 2) / (wformat->nChannels) - 12;
+		format->wNumCoef = 7;
+		format->aCoef[0] = { 256, 0 };
+		format->aCoef[1] = { 512, -256 };
+		format->aCoef[2] = { 0, 0 };
+		format->aCoef[3] = { 192, 64 };
+		format->aCoef[4] = { 240, 0 };
+		format->aCoef[5] = { 460, -208 };
+		format->aCoef[6] = { 392, -232 };
+
+		buffer->format = (WAVEFORMATEX*)format;
+
+		// Buffer should be block aligned.
+		assert((length % wformat->nBlockAlign) == 0);
+
+		buffer->length = length;
+		buffer->data = (uint8_t*)malloc(length);
+		memcpy(buffer->data, waveData, length);
+
+		memset(&buffer->buffer, 0, sizeof(XAUDIO2_BUFFER));
+		buffer->buffer.pAudioData = buffer->data;
+		buffer->buffer.AudioBytes = length;
+		buffer->buffer.LoopBegin = loopStart;
+		buffer->buffer.LoopLength = loopLength;
+		buffer->buffer.LoopCount = 0;
+		buffer->buffer.Flags = 0;
+		buffer->buffer.pContext = nullptr;
+	}
+	else if (wformat->wFormatTag == WAVE_FORMAT_WMAUDIO2)
+	{
+		// TODO: The API here needs to change to pass
+		// additional data for this format to work.
+	}
 }
 
 void MGA_Buffer_InitializePCM(MGA_Buffer* buffer, mgbyte* waveData, mgint offset, mgint length, mgint sampleBits, mgint sampleRate, mgint channels, mgint loopStart, mgint loopLength)
@@ -192,26 +248,25 @@ void MGA_Buffer_InitializePCM(MGA_Buffer* buffer, mgbyte* waveData, mgint offset
 	format->nBlockAlign = (WORD)channels * 2;
 	format->wBitsPerSample = 16;
 	format->nAvgBytesPerSec = format->nSamplesPerSec * format->nBlockAlign;
-	format->cbSize = sizeof(WAVEFORMATEX);
+	format->cbSize = 0;
 	buffer->format = format;
 
+	// Buffer should be block aligned.
+	assert((length % format->nBlockAlign) == 0);
+
+	buffer->length = length;
 	buffer->data = (uint8_t*)malloc(length);
-	memcpy(buffer->data, waveData + offset, length);
+	if (waveData)
+		memcpy(buffer->data, waveData + offset, length);
 
 	memset(&buffer->buffer, 0, sizeof(XAUDIO2_BUFFER));
 	buffer->buffer.pAudioData = buffer->data;
 	buffer->buffer.AudioBytes = length;
+	buffer->buffer.LoopBegin = loopStart;
+	buffer->buffer.LoopLength = loopLength;
+	buffer->buffer.LoopCount = 0;
 	buffer->buffer.Flags = 0;
-	buffer->buffer.pContext = buffer->data;
-
-	memset(&buffer->bufferLooped, 0, sizeof(XAUDIO2_BUFFER));
-	buffer->bufferLooped.pAudioData = buffer->data;
-	buffer->bufferLooped.AudioBytes = length;
-	buffer->bufferLooped.LoopBegin = loopStart;
-	buffer->bufferLooped.LoopLength = loopLength;
-	buffer->bufferLooped.LoopCount = XAUDIO2_LOOP_INFINITE;
-	buffer->bufferLooped.Flags = 0;
-	buffer->bufferLooped.pContext = buffer->data;
+	buffer->buffer.pContext = nullptr;
 }
 
 void MGA_Buffer_InitializeXact(MGA_Buffer* buffer, mguint codec, mgbyte* waveData, mgint length, mgint sampleRate, mgint blockAlignment, mgint channels, mgint loopStart, mgint loopLength)
@@ -220,8 +275,76 @@ void MGA_Buffer_InitializeXact(MGA_Buffer* buffer, mguint codec, mgbyte* waveDat
 	assert(waveData != nullptr);
 	assert(length > 0);
 
-	// TODO
+	if (codec == 0x2) // Adpcm
+	{
+		auto format = (ADPCMWAVEFORMAT*)malloc(sizeof(ADPCMWAVEFORMAT) + (7 * sizeof(ADPCMCOEFSET)));
+		memset(format, 0, sizeof(ADPCMWAVEFORMAT));
+		format->wfx.wFormatTag = WAVE_FORMAT_ADPCM;
+		format->wfx.nSamplesPerSec = sampleRate;
+		format->wfx.nChannels = channels;
+		format->wfx.nBlockAlign = blockAlignment;
+		format->wfx.wBitsPerSample = 4;
+		format->wfx.nAvgBytesPerSec = (sampleRate * 4) / 8;
+		format->wfx.cbSize = 32;
+		format->wSamplesPerBlock = (blockAlignment * 2) / (channels) - 12;
+		format->wNumCoef = 7;
+		format->aCoef[0] = { 256, 0 };
+		format->aCoef[1] = { 512, -256 };
+		format->aCoef[2] = { 0, 0 };
+		format->aCoef[3] = { 192, 64 };
+		format->aCoef[4] = { 240, 0 };
+		format->aCoef[5] = { 460, -208 };
+		format->aCoef[6] = { 392, -232 };
 
+		buffer->format = (WAVEFORMATEX*)format;
+
+		// Buffer should be block aligned.
+		assert((length % blockAlignment) == 0);
+
+		buffer->length = length;
+		buffer->data = (uint8_t*)malloc(length);
+		memcpy(buffer->data, waveData, length);
+
+		memset(&buffer->buffer, 0, sizeof(XAUDIO2_BUFFER));
+		buffer->buffer.pAudioData = buffer->data;
+		buffer->buffer.AudioBytes = length;
+		buffer->buffer.LoopBegin = loopStart;
+		buffer->buffer.LoopLength = loopLength;
+		buffer->buffer.LoopCount = 0;
+		buffer->buffer.Flags = 0;
+		buffer->buffer.pContext = nullptr;
+	}
+	else if (codec == 0x1) // Platform specific!
+	{
+#if defined(_GAMING_XBOX)
+
+		// XSDPCM
+		auto format = (ADPCMWAVEFORMAT*)malloc(50);
+		memcpy(format, waveData, 50);
+		buffer->format = (WAVEFORMATEX*)format;
+
+		length -= 50;
+		buffer->length = length;
+		buffer->data = (uint8_t*)malloc(length);
+		memcpy(buffer->data, waveData + 50, length);
+
+		memset(&buffer->buffer, 0, sizeof(XAUDIO2_BUFFER));
+		buffer->buffer.pAudioData = buffer->data;
+		buffer->buffer.AudioBytes = length;
+		buffer->buffer.LoopBegin = loopStart;
+		buffer->buffer.LoopLength = loopLength;
+		buffer->buffer.LoopCount = 0;
+		buffer->buffer.Flags = 0;
+		buffer->buffer.pContext = nullptr;
+
+#else
+		// Support XWMA on Windows?
+#endif
+	}
+	else
+	{
+		// Others are not supported yet!
+	}
 }
 
 mgulong MGA_Buffer_GetDuration(MGA_Buffer* buffer)
@@ -242,7 +365,10 @@ class VoiceCallbacks : public IXAudio2VoiceCallback
 
 	void OnBufferEnd(void* pBufferContext)
 	{
-		//free(pBufferContext);
+		if (pBufferContext == nullptr)
+			return;
+
+		s_FreeStreamingBuffers.push_back((MGA_Buffer*)pBufferContext);
 	}
 };
 
@@ -298,40 +424,37 @@ void MGA_Voice_AppendBuffer(MGA_Voice* voice, mgbyte* buffer, mguint size)
 	assert(voice != nullptr);
 	assert(buffer != nullptr);
 
-	//if (clear)
+	// Find a free buffer.
+	MGA_Buffer* free = nullptr;
+	for (int i = 0; i < s_FreeStreamingBuffers.size(); i++)
 	{
-		// Stop and remove any pending buffers first.
+		auto f = s_FreeStreamingBuffers[i];
+		if (f->length < size)
+			continue;
+
+		free = f;
+		s_FreeStreamingBuffers.erase(s_FreeStreamingBuffers.begin() + i);
 	}
 
-	//if (clear && voice->voice)
-	//{
-		//voice->voice->Stop();
-		//voice->voice->FlushSourceBuffers();
-	//}
+	auto format = voice->buffer->format;
 
-	if (!voice->voice)
+	if (free == nullptr)
 	{
-		/*
-		tWAVEFORMATEX format;
-		format.wFormatTag = WAVE_FORMAT_PCM;
-		format.nSamplesPerSec = sampleRate;
-		format.nChannels = (WORD)channels;
-		format.nBlockAlign = (WORD)channels * 2;
-		format.wBitsPerSample = 16;
-		format.nAvgBytesPerSec = format.nSamplesPerSec * format.nBlockAlign;
-		format.cbSize = sizeof(WAVEFORMATEX);
-
-		auto hr = voice->system->audio->CreateSourceVoice(&voice->voice, buffer->format, XAUDIO2_VOICE_USEFILTER, XAUDIO2_DEFAULT_FREQ_RATIO, &MGA_VoiceCallbacksHandler);
-		assert(hr == S_OK);
-		*/
+		free = new MGA_Buffer;
+		MGA_Buffer_InitializePCM(free, nullptr, 0, size, 16, format->wBitsPerSample, format->nChannels, 0, 0);
 	}
 
-	// The idea here is that for streaming cases and dynamic buffers
-	// we internally allocate a big chunk of memory for it and
-	// break it up into smaller buffers for submission.
-		
-	// Allocate a dynamic buffer that can be reused later.	
-	// Append the buffer.
+	memcpy(free->data, buffer, size);
+
+	if (MGA_Voice_GetState(voice) != MGSoundState::Playing)
+		return;
+
+	auto xbuffer = free->buffer;
+	xbuffer.LoopBegin = xbuffer.LoopLength = xbuffer.LoopCount = 0;
+	xbuffer.pContext = free;
+
+	voice->voice->SubmitSourceBuffer(&xbuffer, nullptr);
+
 }
 
 void MGA_Voice_Play(MGA_Voice* voice, mgbool looped)
@@ -345,8 +468,13 @@ void MGA_Voice_Play(MGA_Voice* voice, mgbool looped)
 
 		voice->looped = looped;
 
-		auto buffer = looped ? &voice->buffer->bufferLooped : &voice->buffer->buffer;
-		voice->voice->SubmitSourceBuffer(buffer, voice->buffer->wmaBuffer);
+		auto buffer = voice->buffer->buffer;
+		if (looped)
+			buffer.LoopCount = XAUDIO2_LOOP_INFINITE;
+		else
+			buffer.LoopBegin = buffer.LoopLength = buffer.LoopCount = 0;
+
+		voice->voice->SubmitSourceBuffer(&buffer, voice->buffer->wmaBuffer);
 	}
 
 	voice->voice->Start();
