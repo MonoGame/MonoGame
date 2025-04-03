@@ -253,17 +253,38 @@ public partial class GraphicsDevice
         if (_pixelShader == null)
             throw new InvalidOperationException("A pixel shader must be set!");
 
+        bool layoutChanged = false;
+
+        // Change the vertex shader first as it can cause changes
+        // to other states that the shader depends on.
+        if (_vertexShaderDirty)
+        {
+            MGG.GraphicsDevice_SetShader(Handle, ShaderStage.Vertex, _vertexShader.Handle);
+            _vertexBuffersDirty = true;
+            unchecked { _graphicsMetrics._vertexShaderCount++; }
+        }
+
+        if (_pixelShaderDirty)
+        {
+            MGG.GraphicsDevice_SetShader(Handle, ShaderStage.Pixel, _pixelShader.Handle);
+            unchecked { _graphicsMetrics._pixelShaderCount++; }
+        }
+
         if (_indexBufferDirty)
         {
             if (_indexBuffer != null)
                 MGG.GraphicsDevice_SetIndexBuffer(Handle, _indexBuffer.IndexElementSize, _indexBuffer.Handle);
-            _indexBufferDirty = false;
         }
 
-        if (_vertexBuffersDirty && _vertexBuffers.Count > 0)
+        if (layoutChanged || _vertexBuffersDirty)
         {
-            var numBuffers = _vertexBuffers.Count;
-            for (var slot = 0; slot < numBuffers; slot++)
+            var layout = _vertexShader.GetOrCreateLayout(_vertexBuffers);
+            MGG.GraphicsDevice_SetInputLayout(Handle, layout);
+        }
+
+        if (_vertexBuffersDirty)
+       {
+            for (var slot = 0; slot < _vertexBuffers.Count; slot++)
             {
                 var vertexBufferBinding = _vertexBuffers.Get(slot);
                 var buffer = vertexBufferBinding.VertexBuffer;
@@ -271,27 +292,6 @@ public partial class GraphicsDevice
                 MGG.GraphicsDevice_SetVertexBuffer(Handle, slot, buffer.Handle, vertexBufferBinding.VertexOffset);
             }
         }
-
-        if (_vertexShaderDirty)
-        {
-            MGG.GraphicsDevice_SetShader(Handle, ShaderStage.Vertex, _vertexShader.Handle);
-            unchecked { _graphicsMetrics._vertexShaderCount++; }
-        }
-
-        if (_vertexShaderDirty || _vertexBuffersDirty)
-        {
-            var layout = _vertexShader.GetOrCreateLayout(_vertexBuffers);
-            MGG.GraphicsDevice_SetInputLayout(Handle, layout);
-            _vertexShaderDirty = _vertexBuffersDirty = false;
-        }
-
-        if (_pixelShaderDirty)
-        {
-            MGG.GraphicsDevice_SetShader(Handle, ShaderStage.Pixel, _pixelShader.Handle);
-            _pixelShaderDirty = false;
-            unchecked { _graphicsMetrics._pixelShaderCount++; }
-        }
-
         _vertexConstantBuffers.SetConstantBuffers(this);
         _pixelConstantBuffers.SetConstantBuffers(this);
 
@@ -300,6 +300,11 @@ public partial class GraphicsDevice
 
         Textures.SetTextures(this);
         SamplerStates.PlatformSetSamplers(this);
+
+        _indexBufferDirty = false;
+        _vertexBuffersDirty = false;
+        _vertexShaderDirty = false;
+        _pixelShaderDirty = false;
     }
 
     private int SetUserVertexBuffer<T>(T[] vertexData, int vertexOffset, int vertexCount, VertexDeclaration vertexDecl)
