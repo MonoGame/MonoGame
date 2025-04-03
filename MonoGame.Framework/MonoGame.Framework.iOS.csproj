@@ -18,6 +18,7 @@
     <None Include="..\README.md" Pack="true" PackagePath="\"/>
   </ItemGroup>
 
+<<<<<<< HEAD
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <CreatePackage>false</CreatePackage>
   </PropertyGroup>
@@ -28,6 +29,8 @@
     <None Include="..\README.md" Pack="true" PackagePath="\"/>
   </ItemGroup>
 
+=======
+>>>>>>> 616ef0fb7 (Update packages with ReadMe references (#8693))
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <CreatePackage>false</CreatePackage>
   </PropertyGroup>
