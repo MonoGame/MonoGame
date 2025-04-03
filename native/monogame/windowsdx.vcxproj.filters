@@ -1,0 +1,60 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="common">
+      <UniqueIdentifier>{AEFEE3F6-9AA0-0ECD-835B-22216F9C951D}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include">
+      <UniqueIdentifier>{89AF369E-F58E-B539-FEA6-40106A051C9B}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="common\stb_image.h">
+      <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="common\stb_image_write.h">
+      <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="include\MGM_common.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\api_MGA.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\api_MGG.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\api_MGI.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\api_MGM.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\api_MGP.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\api_common.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\api_enums.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\api_structs.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\mg_common.h">
+      <Filter>include</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="common\MGI.cpp">
+      <Filter>common</Filter>
+    </ClCompile>
+    <ClCompile Include="common\MGM.cpp">
+      <Filter>common</Filter>
+    </ClCompile>
+    <ClCompile Include="common\mg_hash.cpp">
+      <Filter>common</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>

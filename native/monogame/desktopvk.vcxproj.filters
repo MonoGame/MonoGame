@@ -1,0 +1,86 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="common">
+      <UniqueIdentifier>{AEFEE3F6-9AA0-0ECD-835B-22216F9C951D}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="faudio">
+      <UniqueIdentifier>{7D5DEAFC-69FF-14D3-52BA-28273EFB9B23}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include">
+      <UniqueIdentifier>{89AF369E-F58E-B539-FEA6-40106A051C9B}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="sdl">
+      <UniqueIdentifier>{68A9880B-D4B2-887C-5D2E-9F7CC936947C}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vulkan">
+      <UniqueIdentifier>{F6FEA123-E2A0-CCF9-CB5B-E04DB79C534A}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="common\stb_image.h">
+      <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="common\stb_image_write.h">
+      <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="include\MGM_common.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\api_MGA.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\api_MGG.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\api_MGI.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\api_MGM.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\api_MGP.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\api_common.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\api_enums.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\api_structs.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\mg_common.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="vulkan\vulkan.resources.h">
+      <Filter>vulkan</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="common\MGI.cpp">
+      <Filter>common</Filter>
+    </ClCompile>
+    <ClCompile Include="common\MGM.cpp">
+      <Filter>common</Filter>
+    </ClCompile>
+    <ClCompile Include="common\mg_hash.cpp">
+      <Filter>common</Filter>
+    </ClCompile>
+    <ClCompile Include="faudio\MGA_faudio.cpp">
+      <Filter>faudio</Filter>
+    </ClCompile>
+    <ClCompile Include="sdl\MGP_sdl.cpp">
+      <Filter>sdl</Filter>
+    </ClCompile>
+    <ClCompile Include="vulkan\MGG_Vulkan.cpp">
+      <Filter>vulkan</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="vulkan\vulkan.rc">
+      <Filter>vulkan</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+</Project>
