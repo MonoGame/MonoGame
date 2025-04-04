@@ -174,7 +174,7 @@ struct MGG_GraphicsDevice
 	VkSwapchainKHR swapchain = VK_NULL_HANDLE;
 	uint32_t swapchain_image_index = 0;
 
-	uint64_t vertexBuffersDirty = 0;
+	uint64_t vertexBuffersDirty = 0xFFFFFFFF;
 	MGG_Buffer* vertexBuffers[8] = { 0 };
 	uint32_t vertexOffsets[8] = { 0 };
 
