@@ -61,7 +61,6 @@ namespace Microsoft.Xna.Framework.Windows
         #region Events
 
         public event EventHandler<HorizontalMouseWheelEventArgs> MouseHorizontalWheel;
-        public event EventHandler<EventArgs> SettingChanged;
 
         #endregion
 
@@ -125,10 +124,6 @@ namespace Microsoft.Xna.Framework.Windows
                 case WM_DROPFILES:
                     HandleDropMessage(ref m);
                     break;
-
-                case WM_SETTING­CHANGE:
-                    HandleSettingChange();
-                break;
 #endif
                 case WM_SYSCOMMAND:
 
@@ -185,11 +180,6 @@ namespace Microsoft.Xna.Framework.Windows
             }
 
             base.WndProc(ref m);
-        }
-
-        private void HandleSettingChange()
-        {
-            EventHelpers.Raise(this, SettingChanged, EventArgs.Empty);
         }
 
         void HandleKeyMessage(ref Message m)
