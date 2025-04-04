@@ -9,7 +9,14 @@
     <PackageTags>monogame;.net core;core;.net standard;standard;windowsdx</PackageTags>
     <PackageId>MonoGame.Framework.WindowsDX</PackageId>
     <AppendTargetFrameworkToOutputPath>False</AppendTargetFrameworkToOutputPath>
+    <IsAotCompatible>false</IsAotCompatible>
+	  <IsTrimmable>false</IsTrimmable>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
   </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="..\README.md" Pack="true" PackagePath="\"/>
+  </ItemGroup>
 
   <ItemGroup>
     <Compile Remove="bin\**\*" />
@@ -17,6 +24,7 @@
     <Compile Remove="Platform\**\*" />
     <Compile Remove="Properties\**\*" />
     <Compile Remove="Utilities\System.Numerics.Vectors\**\*" />
+    <Compile Remove="Devices\**\*" />
   </ItemGroup>
 
   <ItemGroup>
@@ -55,6 +63,8 @@
     <Compile Include="Platform\Windows\WinFormsGameForm.cs" />
     <Compile Include="Platform\Windows\WinFormsGamePlatform.cs" />
     <Compile Include="Platform\Windows\WinFormsGameWindow.cs" />
+    <Compile Include="Platform\Desktop\Devices\Sensors\Accelerometer.cs" />
+    <Compile Include="Platform\Desktop\Devices\Sensors\Compass.cs" />
   </ItemGroup>
 
   <ItemGroup>
@@ -86,4 +96,5 @@
 
   <Import Project="Platform\DirectX.targets" />
   <Import Project="Platform\XAudio.targets" />
+  <Import Project="MonoGame.Framework.Devices.Sensors.targets" />
 </Project>

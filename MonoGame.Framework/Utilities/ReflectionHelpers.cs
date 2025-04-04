@@ -4,6 +4,7 @@
 
 using System;
 using System.Reflection;
+using System.Runtime.InteropServices;
 
 namespace MonoGame.Framework.Utilities
 {
@@ -174,5 +175,20 @@ namespace MonoGame.Framework.Utilities
 #endif
             return false;
         }
+
+        // Returns the cached size of the unmanaged type in bytes.
+        public static int FastSizeOf<T>()
+        {
+            return SizeOf<T>.Get();
+        }
+
+        /// <summary>
+        /// Fallback handler for Marshal.SizeOf(type)
+        /// </summary>
+        internal static int ManagedSizeOf(Type type)
+        {
+            return Marshal.SizeOf<Type>(type);
+        }
+
     }
 }

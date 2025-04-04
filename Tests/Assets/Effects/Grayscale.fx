@@ -4,13 +4,14 @@
 
 #include "include.fxh"
 
-sampler s0;
+DECLARE_TEXTURE(s, 0);
 
 float4 PixelShaderFunction( float4 inPosition : SV_Position,
 			    float4 inColor : COLOR0,
-			    float2 coords : TEXCOORD0 ) : COLOR0
+			    float2 coords : TEXCOORD0 ) : SV_TARGET0
 {
-    float4 color = tex2D(s0, coords);
+    float4 color = SAMPLE_TEXTURE(s, coords);
+    
 	color.rgb = color.r;
 
     return color;

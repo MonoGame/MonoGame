@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>net8.0</TargetFramework>
+    <TargetFramework>net8.0-macos</TargetFramework>
     <RollForward>Major</RollForward>
     <BaseOutputPath>..\..\Artifacts\MonoGame.Content.Builder.Editor\Mac</BaseOutputPath>
     <DefineConstants>MONOMAC;MAC</DefineConstants>
@@ -11,10 +11,13 @@
     <ErrorOnDuplicatePublishOutputFiles>false</ErrorOnDuplicatePublishOutputFiles>
     <AssemblyName>mgcb-editor-mac</AssemblyName>
     <AssemblyTitle>MGCB Editor</AssemblyTitle>
-    <MacBundleName>$(AssemblyTitle)</MacBundleName>
-    <PublishSingleFile>false</PublishSingleFile>
-    <RuntimeIdentifiers>osx-x64</RuntimeIdentifiers>
+    <RuntimeIdentifiers>osx-x64;osx-arm64</RuntimeIdentifiers>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
   </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="README.md" Pack="true" PackagePath="\"/>
+  </ItemGroup>
 
   <ItemGroup>
     <None Remove="Platform\**\*" />
@@ -31,8 +34,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Eto.Forms" Version="2.6.1" />
-    <PackageReference Include="Eto.Platform.Mac64" Version="2.6.1" />
+    <PackageReference Include="Eto.Forms" Version="2.8.3" />
+    <PackageReference Include="Eto.Platform.macOS" Version="2.8.3" />
   </ItemGroup>
 
   <ItemGroup>

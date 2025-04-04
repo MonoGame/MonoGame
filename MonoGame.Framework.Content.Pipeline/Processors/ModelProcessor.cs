@@ -60,7 +60,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
         public virtual MaterialProcessorDefaultEffect DefaultEffect { get; set; }
 
         /// <summary>
-        /// Gets or Sets a value that indicates whether this will generate MipMpas for the selected texture. The default
+        /// Gets or Sets a value that indicates whether this will generate MipMaps for the selected texture. The default
         /// value is <b>false</b>.
         /// </summary>
         [DefaultValue(true)]

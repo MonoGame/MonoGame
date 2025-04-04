@@ -33,7 +33,7 @@ VSOutput VS_Main(float2 xy : POSITION)
     return output;
 }
 
-float4 PS_Main(VSOutput input) : COLOR0
+float4 PS_Main(VSOutput input) : SV_TARGET0
 {
     return input.Color;
 }

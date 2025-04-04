@@ -3,6 +3,8 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System.IO;
+using MonoGame.Interop;
+
 
 namespace Microsoft.Xna.Framework;
 
@@ -10,11 +12,12 @@ partial class TitleContainer
 {
     static partial void PlatformInit()
     {
-
     }
 
     private static Stream PlatformOpenStream(string safeName)
     {
-        return Stream.Null;
+        var absolutePath = MGP.Platform_MakePath(Location, safeName);
+
+        return File.OpenRead(absolutePath);
     }
 }

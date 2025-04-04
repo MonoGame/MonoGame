@@ -39,19 +39,26 @@ namespace Microsoft.Xna.Framework.Graphics
                         if (_bytecode != null)
                             return _bytecode;
 
-                        var assembly = ReflectionHelpers.GetAssembly(typeof(EffectResource));
-
-                        var stream = assembly.GetManifestResourceStream(_name);
-                        using (var ms = new MemoryStream())
-                        {
-                            stream.CopyTo(ms);
-                            _bytecode = ms.ToArray();
-                        }
+                        _bytecode = PlatformGetBytecode(_name);
                     }
                 }
 
                 return _bytecode;
             }
         }
+
+#if !NATIVE
+        private static byte[] PlatformGetBytecode(string name)
+        {            
+            var assembly = ReflectionHelpers.GetAssembly(typeof(EffectResource));
+
+            var stream = assembly.GetManifestResourceStream(name);
+            using (var ms = new MemoryStream())
+            {
+                stream.CopyTo(ms);
+                return ms.ToArray();
+            }
+        }
+#endif
     }
 }

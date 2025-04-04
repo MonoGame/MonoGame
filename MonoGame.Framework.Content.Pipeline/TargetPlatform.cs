@@ -83,14 +83,24 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
         Switch,
 
         /// <summary>
-        /// Google Stadia
-        /// </summary>
-        Stadia,
-
-        /// <summary>
         /// WebAssembly and Bridge.NET
         /// </summary>
-        Web
+        Web,
+
+        /// <summary>
+        /// All desktop versions using Vulkan.
+        /// </summary>
+        DesktopVK,
+
+        /// <summary>
+        /// Windows GDK
+        /// </summary>
+        WindowsGDK,
+
+        /// <summary>
+        /// Xbox Series
+        /// </summary>
+        XboxSeries
     }
 
 

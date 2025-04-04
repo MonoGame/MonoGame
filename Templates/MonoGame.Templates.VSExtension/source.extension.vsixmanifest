@@ -1,24 +1,43 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PackageManifest Version="2.0.0" xmlns="http://schemas.microsoft.com/developer/vsx-schema/2011" xmlns:d="http://schemas.microsoft.com/developer/vsx-schema-design/2011">
-	<Metadata>
-		<Identity Version="3.8.1.1" Id="MonoGame.Templates.VSExtension.03a6f6d5-6ec0-45ff-a4f6-ec098d51464d" Language="en-US" Publisher="MonoGame" />
-		<DisplayName>MonoGame Framework C# project templates</DisplayName>
-		<Description xml:space="preserve">This extension contains the C# project templates for using the MonoGame Framework</Description>
-		<Tags>.NET,C#,Game development,Templates,Games,Gamedev,Project,Mono,MonoGame</Tags>
-	</Metadata>
-	<Installation>
-		<InstallationTarget Id="Microsoft.VisualStudio.Community" Version="[17.0, 18.0)">
-			<ProductArchitecture>amd64</ProductArchitecture>
-		</InstallationTarget>
-	</Installation>
-	<Dependencies>
-		<Dependency Id="Microsoft.Framework.NDP" DisplayName="Microsoft .NET Framework" d:Source="Manual" Version="[4.5,)" />
-	</Dependencies>
-	<Prerequisites>
-		<Prerequisite Id="Microsoft.VisualStudio.Component.CoreEditor" Version="[17.0,18.0)" DisplayName="Visual Studio core editor" />
-	</Prerequisites>
-	<Assets>
-		<Asset Type="Microsoft.VisualStudio.VsPackage" d:Source="Project" d:ProjectName="%CurrentProject%" Path="|%CurrentProject%;PkgdefProjectOutputGroup|" />
-		<Asset Type="Microsoft.VisualStudio.VsPackage" d:Source="File" Path="Templates.pkgdef" />
-	</Assets>
+  <Metadata>
+    <Identity Version="3.8.3.0" Id="MonoGame.Templates.VSExtension.03a6f6d5-6ec0-45ff-a4f6-ec098d51464d" Language="en-US" Publisher="MonoGame" />
+    <DisplayName>MonoGame Framework C# project templates</DisplayName>
+    <Description xml:space="preserve">This extension contains the C# project templates for using the MonoGame Framework</Description>
+    <Tags>.NET,C#,Game development,Templates,Games,Gamedev,Project,Mono,MonoGame</Tags>
+  </Metadata>
+  <Installation>
+    <InstallationTarget Version="[17.0, 18.0)" Id="Microsoft.VisualStudio.Community">
+      <ProductArchitecture>amd64</ProductArchitecture>
+    </InstallationTarget>
+    <InstallationTarget Version="[17.0, 18.0)" Id="Microsoft.VisualStudio.Pro">
+      <ProductArchitecture>amd64</ProductArchitecture>
+    </InstallationTarget>
+    <InstallationTarget Version="[17.0, 18.0)" Id="Microsoft.VisualStudio.Enterprise">
+      <ProductArchitecture>amd64</ProductArchitecture>
+    </InstallationTarget>
+    <InstallationTarget Version="[17.0, 18.0)" Id="Microsoft.VisualStudio.Community">
+      <ProductArchitecture>arm64</ProductArchitecture>
+    </InstallationTarget>
+    <InstallationTarget Version="[17.0, 18.0)" Id="Microsoft.VisualStudio.Pro">
+      <ProductArchitecture>arm64</ProductArchitecture>
+    </InstallationTarget>
+    <InstallationTarget Version="[17.0, 18.0)" Id="Microsoft.VisualStudio.Enterprise">
+      <ProductArchitecture>arm64</ProductArchitecture>
+    </InstallationTarget>
+  </Installation>
+  <Dependencies>
+    <Dependency Id="Microsoft.Framework.NDP" DisplayName="Microsoft .NET Framework" d:Source="Manual" Version="[4.7.2,)" />
+  </Dependencies>
+  <Prerequisites>
+    <Prerequisite Id="Microsoft.VisualStudio.Component.CoreEditor" Version="[17.0,18.0)" DisplayName="Visual Studio core editor" />
+  </Prerequisites>
+  <Assets>
+    <Asset Type="Microsoft.VisualStudio.VsPackage" d:Source="Project" d:ProjectName="%CurrentProject%" Path="|%CurrentProject%;PkgdefProjectOutputGroup|" />
+    <Asset Type="Microsoft.VisualStudio.VsPackage" d:Source="File" Path="Templates.pkgdef" />
+    <!-- This does not seem to work? -->
+    <Asset Type="Microsoft.VisualStudio.Icon" d:Source="File" Path="../../Images/Icon.png" />
+    <!--Need a decent preview image -->
+    <Asset Type="Microsoft.VisualStudio.PreviewImage" d:Source="File" Path="../../Images/Icon.png" />
+  </Assets>
 </PackageManifest>

@@ -6,7 +6,12 @@
     <IncludeBuildOutput>false</IncludeBuildOutput>
     <SuppressDependenciesWhenPacking>true</SuppressDependenciesWhenPacking>
     <Description>MSBuild task to automatically build content for MonoGame.</Description>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
   </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="README.md" Pack="true" PackagePath="\"/>
+  </ItemGroup>
 
   <ItemGroup>
     <Content Include="MonoGame.Content.Builder.Task.props" PackagePath="build" />
@@ -21,7 +26,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\MonoGame.Content.Builder\MonoGame.Content.Builder.csproj" />
+    <ProjectReference Include="..\MonoGame.Content.Builder\MonoGame.Content.Builder.csproj" PrivateAssets="all" />
   </ItemGroup>
 
 </Project>

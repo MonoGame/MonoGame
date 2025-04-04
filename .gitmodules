@@ -10,3 +10,18 @@
 [submodule "ThirdParty/StbImageWriteSharp"]
 	path = ThirdParty/StbImageWriteSharp
 	url = https://github.com/StbSharp/StbImageWriteSharp.git
+[submodule "src/monogame/external/sdl2"]
+	path = native/monogame/external/sdl2
+	url = https://github.com/MonoGame/MonoGame.Library.SDL.git
+[submodule "src/monogame/external/vulkan-headers"]
+	path = native/monogame/external/vulkan-headers
+	url = https://github.com/KhronosGroup/Vulkan-Headers.git
+[submodule "src/monogame/external/volk"]
+	path = native/monogame/external/volk
+	url = https://github.com/zeux/volk.git
+[submodule "src/monogame/external/vma"]
+	path = native/monogame/external/vma
+	url = https://github.com/LunarG/VulkanMemoryAllocator.git
+[submodule "external/MonoGame.Templates"]
+	path = external/MonoGame.Templates
+	url = https://github.com/MonoGame/MonoGame.Templates.git

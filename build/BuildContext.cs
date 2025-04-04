@@ -1,11 +1,16 @@
+using Cake.Git;
+using Microsoft.VisualBasic;
+using System.Text.RegularExpressions;
 
 namespace BuildScripts;
 
 public enum ProjectType
 {
+    Extension,
     Framework,
     Tools,
     Templates,
+    Tests,
     ContentPipeline,
     MGCBEditor,
     MGCBEditorLauncher
@@ -13,16 +18,25 @@ public enum ProjectType
 
 public class BuildContext : FrostingContext
 {
+    public static string VersionBase = "3.8.3";
+    public static readonly Regex VersionRegex = new(@"^v\d+.\d+.\d+", RegexOptions.Compiled | RegexOptions.IgnoreCase);
     public static readonly string DefaultRepositoryUrl = "https://github.com/MonoGame/MonoGame";
-    public static readonly string DefaultBaseVersion = "3.8.2";
 
     public BuildContext(ICakeContext context) : base(context)
     {
         var repositoryUrl = context.Argument("build-repository", DefaultRepositoryUrl);
         var buildConfiguration = context.Argument("build-configuration", "Release");
-        BuildOutput = context.Argument("build-output", "artifacts");
-        Version = context.Argument("build-version", DefaultBaseVersion + ".1-develop");
+        BuildOutput = context.Argument("build-output", "Artifacts");
         NuGetsDirectory = $"{BuildOutput}/NuGet/";
+
+        var tags = GitAliases.GitTags(context, ".");
+        foreach (var tag in tags)
+        {
+            if (VersionRegex.IsMatch(tag.FriendlyName))
+            {
+                VersionBase = tag.FriendlyName[1..];
+            }
+        }
 
         if (context.BuildSystem().IsRunningOnGitHubActions)
         {
@@ -31,16 +45,29 @@ public class BuildContext : FrostingContext
 
             if (workflow.Repository != "MonoGame/MonoGame")
             {
-                Version = $"{DefaultBaseVersion}.{workflow.RunNumber}-{workflow.RepositoryOwner}";
+                Version = $"{VersionBase}.{workflow.RunNumber}-{workflow.RepositoryOwner}";
+            }
+            else if (workflow.RefType == GitHubActionsRefType.Tag)
+            {
+                var baseVersion = workflow.RefName.Split('/')[^1];
+                if (!VersionRegex.IsMatch(baseVersion))
+                    throw new Exception($"Invalid tag: {baseVersion}");
+                
+                VersionBase = baseVersion[1..];
+                Version = VersionBase;
             }
             else if (workflow.RefType == GitHubActionsRefType.Branch && workflow.RefName != "refs/heads/master")
             {
-                Version = $"{DefaultBaseVersion}.{workflow.RunNumber}-develop";
+                Version = $"{VersionBase}.{workflow.RunNumber}-develop";
             }
             else
             {
-                Version = $"{DefaultBaseVersion}.{workflow.RunNumber}";
+                Version = $"{VersionBase}.{workflow.RunNumber}";
             }
+        }
+        else
+        {
+            Version = context.Argument("build-version", VersionBase + ".1-develop");
         }
 
         DotNetMSBuildSettings = new DotNetMSBuildSettings();
@@ -88,6 +115,13 @@ public class BuildContext : FrostingContext
             Configuration = buildConfiguration,
             SelfContained = false
         };
+        // SelfContained needs to be default for MacOS
+        DotNetPublishSettingsForMac = new DotNetPublishSettings
+        {
+            MSBuildSettings = DotNetMSBuildSettings,
+            Verbosity = DotNetVerbosity.Minimal,
+            Configuration = buildConfiguration
+        };
 
         Console.WriteLine($"Version: {Version}");
         Console.WriteLine($"RepositoryUrl: {repositoryUrl}");
@@ -116,15 +150,19 @@ public class BuildContext : FrostingContext
 
     public DotNetPublishSettings DotNetPublishSettings { get; }
 
+    public DotNetPublishSettings DotNetPublishSettingsForMac { get; }
+
     public MSBuildSettings MSBuildSettings { get; }
 
     public MSBuildSettings MSPackSettings { get; }
 
     public string GetProjectPath(ProjectType type, string id = "") => type switch
     {
+        ProjectType.Extension => $"Templates/{id}/{id}.csproj",
         ProjectType.Framework => $"MonoGame.Framework/MonoGame.Framework.{id}.csproj",
         ProjectType.Tools => $"Tools/{id}/{id}.csproj",
-        ProjectType.Templates => $"Templates/{id}/{id}.csproj",
+        ProjectType.Templates => $"external/MonoGame.Templates/CSharp/{id}.csproj",
+        ProjectType.Tests => $"Tests/{id}.csproj",
         ProjectType.ContentPipeline => "MonoGame.Framework.Content.Pipeline/MonoGame.Framework.Content.Pipeline.csproj",
         ProjectType.MGCBEditor => $"Tools/MonoGame.Content.Builder.Editor/MonoGame.Content.Builder.Editor.{id}.csproj",
 		ProjectType.MGCBEditorLauncher => $"Tools/MonoGame.Content.Builder.Editor.Launcher/MonoGame.Content.Builder.Editor.Launcher.{id}.csproj",

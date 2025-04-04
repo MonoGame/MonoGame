@@ -4,8 +4,11 @@ using Microsoft.Xna.Framework.Graphics;
 using NUnit.Framework;
 
 namespace MonoGame.Tests.Graphics {
+      [TestFixture]
+      [NonParallelizable]
 	class ViewportTest : GraphicsDeviceTestFixtureBase {
 		[Test]
+            [RunOnUI]
 		public void Affects_draw_origin ()
 		{
             PrepareFrameCapture();
@@ -27,6 +30,7 @@ namespace MonoGame.Tests.Graphics {
 		}
 
 		[Test]
+            [RunOnUI]
 		public void Does_not_clip_device_clear ()
 		{
             PrepareFrameCapture();
@@ -45,6 +49,7 @@ namespace MonoGame.Tests.Graphics {
 		}
 
 		[Test]
+            [RunOnUI]
 		public void Clips_SpriteBatch_draws ()
 		{
             PrepareFrameCapture();

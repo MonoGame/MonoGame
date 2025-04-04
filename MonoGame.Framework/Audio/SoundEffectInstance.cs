@@ -1,4 +1,4 @@
-﻿// MonoGame - Copyright (C) MonoGame Foundation, Inc
+// MonoGame - Copyright (C) MonoGame Foundation, Inc
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
@@ -20,13 +20,14 @@ namespace Microsoft.Xna.Framework.Audio
         private float _pan;
         private float _volume;
         private float _pitch;
+        private bool _isLooped;
 
         /// <summary>Enables or Disables whether the SoundEffectInstance should repeat after playback.</summary>
         /// <remarks>This value has no effect on an already playing sound.</remarks>
         public virtual bool IsLooped
-        { 
-            get { return PlatformGetIsLooped(); }
-            set { PlatformSetIsLooped(value); }
+        {
+            get { return _isLooped; }
+            set { _isLooped = value; }
         }
 
         /// <summary>Gets or sets the pan, or speaker balance..</summary>
@@ -45,16 +46,33 @@ namespace Microsoft.Xna.Framework.Audio
         }
 
         /// <summary>Gets or sets the pitch adjustment.</summary>
-        /// <value>Pitch adjustment, ranging from -1.0 (down an octave) to 0.0 (no change) to 1.0 (up an octave). Values outside of this range will throw an Exception.</value>
+        /// <value>Pitch adjustment, where -1.0 is down an octave, 0.0 is no change, and 1.0 is up an octave.</value>
+        /// <remarks>
+        /// Android and iOS will be clamped this to [-1.0, 1.0]. DesktopGL and WindowsDX will clamp this to [-10.0, 10.0].
+        /// </remarks>
         public float Pitch
         {
             get { return _pitch; }
             set
             {
                 // XAct sounds effects don't have pitch limits
-                if (!_isXAct && (value < -1.0f || value > 1.0f))
-                    throw new ArgumentOutOfRangeException();
+                if (!_isXAct)
+                {
+                    var validPitchRange = 10;
+                    #if IOS || ANDROID
+                    validPitchRange = 1;
+                    #endif
 
+                    if (value < -validPitchRange)
+                    {
+                        value = -validPitchRange;
+                    }
+
+                    if (value > validPitchRange)
+                    {
+                        value = validPitchRange;
+                    }
+                }
                 _pitch = value;
                 PlatformSetPitch(value);
             }
@@ -94,13 +112,8 @@ namespace Microsoft.Xna.Framework.Audio
         {
             _pan = 0.0f;
             _volume = 1.0f;
-            _pitch = 0.0f;            
-        }
-
-        internal SoundEffectInstance(byte[] buffer, int sampleRate, int channels)
-            : this()
-        {
-            PlatformInitialize(buffer, sampleRate, channels);
+            _pitch = 0.0f;
+            _isLooped = false;
         }
 
         /// <summary>
@@ -143,10 +156,12 @@ namespace Microsoft.Xna.Framework.Audio
             if (_isDisposed)
                 throw new ObjectDisposedException("SoundEffectInstance");
 
-            if (State == SoundState.Playing)
+            var state = State;
+
+            if (state == SoundState.Playing)
                 return;
 
-            if (State == SoundState.Paused)
+            if (state == SoundState.Paused)
             {
                 Resume();
                 return;
@@ -154,7 +169,7 @@ namespace Microsoft.Xna.Framework.Audio
 
             // We don't need to check if we're at the instance play limit
             // if we're resuming from a paused state.
-            if (State != SoundState.Paused)
+            if (state != SoundState.Paused)
             {
                 if (!SoundEffectInstancePool.SoundsAvailable)
                     throw new InstancePlayLimitException();

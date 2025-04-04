@@ -3,88 +3,117 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System;
+using Microsoft.Xna.Framework.Graphics;
+using MonoGame.Interop;
+
 
 namespace Microsoft.Xna.Framework.Audio;
 
 public partial class SoundEffectInstance : IDisposable
 {
-    private void PlatformInitialize(byte[] buffer, int sampleRate, int channels)
-    {
+    internal unsafe MGA_Voice* Voice;
 
+
+    private unsafe void PlatformApply3D(AudioListener listener, AudioEmitter emitter)
+    {
+        var listener_ = new Listener()
+        {
+            Position = listener.Position,
+            Forward = listener.Forward,
+            Up = listener.Up,
+            Velocity = listener.Velocity,
+        };
+
+        var emitter_ = new Emitter()
+        {
+            Position = emitter.Position,
+            Forward = emitter.Forward,
+            Up = emitter.Up,
+            Velocity = emitter.Velocity,
+            DopplerScale = emitter.DopplerScale
+        };
+
+        if (Voice != null)
+            MGA.Voice_Apply3D(Voice, in listener_, in emitter_, SoundEffect.DistanceScale);
     }
 
-    private void PlatformApply3D(AudioListener listener, AudioEmitter emitter)
+    private unsafe void PlatformPause()
     {
-
+        if (Voice != null)
+            MGA.Voice_Pause(Voice);
     }
 
-    private void PlatformPause()
+    private unsafe void PlatformPlay()
     {
-
+        if (Voice != null)
+            MGA.Voice_Play(Voice, _isLooped);
     }
 
-    private void PlatformPlay()
+    private unsafe void PlatformResume()
     {
-
+        if (Voice != null)
+            MGA.Voice_Resume(Voice);
     }
 
-    private void PlatformResume()
+    private unsafe void PlatformStop(bool immediate)
     {
-
+        if (Voice != null)
+            MGA.Voice_Stop(Voice, immediate);
     }
 
-    private void PlatformStop(bool immediate)
+    private unsafe void PlatformSetPan(float pan)
     {
-
+        if (Voice != null)
+            MGA.Voice_SetPan(Voice, pan);
     }
 
-    private void PlatformSetIsLooped(bool value)
+    private unsafe void PlatformSetPitch(float pitch)
     {
-
+        if (Voice != null)
+            MGA.Voice_SetPitch(Voice, pitch);
     }
 
-    private bool PlatformGetIsLooped()
+    private unsafe SoundState PlatformGetState()
     {
-        return false;
-    }
+        if (Voice != null)
+            return MGA.Voice_GetState(Voice);
 
-    private void PlatformSetPan(float value)
-    {
-
-    }
-
-    private void PlatformSetPitch(float value)
-    {
-
-    }
-
-    private SoundState PlatformGetState()
-    {
         return SoundState.Stopped;
     }
 
-    private void PlatformSetVolume(float value)
+    private unsafe void PlatformSetVolume(float volume)
     {
-
+        if (Voice != null)
+            MGA.Voice_SetVolume(Voice, volume);
     }
 
-    internal void PlatformSetReverbMix(float mix)
+    internal unsafe void PlatformSetReverbMix(float mix)
     {
-
+        if (Voice != null)
+            MGA.Voice_SetReverbMix(Voice, mix);
     }
 
-    internal void PlatformSetFilter(FilterMode mode, float filterQ, float frequency)
+    internal unsafe void PlatformSetFilter(FilterMode mode, float filterQ, float frequency)
     {
-
+        if (Voice != null)
+            MGA.Voice_SetFilterMode(Voice, mode, filterQ, frequency);
     }
 
-    internal void PlatformClearFilter()
+    internal unsafe void PlatformClearFilter()
     {
-
+        if (Voice != null)
+            MGA.Voice_ClearFilterMode(Voice);
     }
 
-    private void PlatformDispose(bool disposing)
+    private unsafe void PlatformDispose(bool disposing)
     {
-
+        if (disposing)
+        {
+            if (Voice != null)
+            {
+                MGA.Voice_Destroy(Voice);
+                Voice = null;
+            }
+        }
     }
 }

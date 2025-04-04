@@ -141,11 +141,6 @@ namespace Microsoft.Xna.Framework.Media
             return null;
         }
 
-        private TimeSpan PlatformGetDuration()
-        {
-            return _duration;
-        }
-
         private bool PlatformIsProtected()
         {
             return false;

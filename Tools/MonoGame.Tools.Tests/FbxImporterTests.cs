@@ -48,9 +48,6 @@ namespace MonoGame.Tests.ContentPipeline
         }
 
         [Test]
-#if DESKTOPGL
-        [Ignore("Disabled until latest NVTT is merged on Mac!")]
-#endif
         public void Dude()
         {
             var context = new TestImporterContext("TestObj", "TestBin");
@@ -229,7 +226,7 @@ namespace MonoGame.Tests.ContentPipeline
             // returned a bigger animation duration that is correct.  Looking
             // at the content of the FBX ascii i can see the math is:
             // 
-            //  (57732697500 - 1924423250) / 46186158000 = 1.208 seconds
+            //  (57732697500 - 1924423250) / 46186158000 = 1.2083333 seconds
             //
             // Which is the correct result and what our FBX importer returns.
             // I highly suspect that XNA was wrong.
@@ -239,7 +236,7 @@ namespace MonoGame.Tests.ContentPipeline
 #if XNA
             Assert.AreEqual(12670000, animationContent.Duration.Ticks);
 #else
-            Assert.AreEqual(12080000, animationContent.Duration.Ticks);            
+            Assert.AreEqual(12083333, animationContent.Duration.Ticks);            
 #endif
 
             // TODO: XNA assigns the identity to null on all NodeContent
