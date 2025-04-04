@@ -198,6 +198,7 @@ namespace MonoGame.Framework
             UpdateMouseKeys();
 
             Form.SettingChanged += Form_SettingChanged;
+            Form.KeyPress += OnKeyPress;
 
             RegisterToAllWindows();
         }
