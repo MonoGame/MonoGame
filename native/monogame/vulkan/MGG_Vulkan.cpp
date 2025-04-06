@@ -6,6 +6,10 @@
 
 #include "mg_common.h"
 
+#if defined(MG_ANDROID)
+#include <android/native_activity.h>
+#include <android/native_window.h>
+#endif
 
 #define VULKAN_HPP_DISPATCH_LOADER_DYNAMIC 1
 #define VULKAN_HPP_NO_EXCEPTIONS
@@ -22,6 +26,8 @@
 
 #if defined(MG_SDL2)
 #include <SDL_vulkan.h>
+#include <sdl.h>
+#include <SDL_video.h>
 #endif
 
 #ifdef _WIN32
@@ -29,6 +35,16 @@
 #include <vulkan/vulkan_win32.h>
 #include "vulkan.resources.h"
 #endif
+
+#ifdef __APPLE__
+#include "AlphaTestEffect.vk.mgfxo.h"
+#include "BasicEffect.vk.mgfxo.h"
+#include "DualTextureEffect.vk.mgfxo.h"
+#include "EnvironmentMapEffect.vk.mgfxo.h"
+#include "SkinnedEffect.vk.mgfxo.h"
+#include "SpriteEffect.vk.mgfxo.h"
+#endif
+
 
 #define VK_CHECK_RESULT(vkr)															\
 {																						\
@@ -167,6 +183,8 @@ struct MGG_GraphicsDevice
 
 #if defined(MG_SDL2)
 	SDL_Window* window = nullptr;
+#elif defined(MG_ANDROID)
+	ANativeWindow* window = nullptr;
 #else
 #error Not Implemented
 #endif
@@ -554,6 +572,7 @@ void MGG_EffectResource_GetBytecode(const char* name, mgbyte*& bytecode, mgint& 
 	bytecode = nullptr;
 	size = 0;
 
+#ifdef _WIN32
 	// Get the handle of this DLL.
 	HMODULE module;
 	::GetModuleHandleExA(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS, (LPCSTR)&MGG_EffectResource_GetBytecode, &module);
@@ -586,6 +605,38 @@ void MGG_EffectResource_GetBytecode(const char* name, mgbyte*& bytecode, mgint& 
 		return;
 
 	bytecode = (mgbyte*)LockResource(global);
+#else
+	if (strcmp(name, "AlphaTestEffect") == 0)
+	{
+		bytecode = ___vulkan_AlphaTestEffect_vk_mgfxo;
+		size = ___vulkan_AlphaTestEffect_vk_mgfxo_len;
+	}
+	else if (strcmp(name, "BasicEffect") == 0)
+	{
+		bytecode = ___vulkan_BasicEffect_vk_mgfxo;
+		size = ___vulkan_BasicEffect_vk_mgfxo_len;
+	}
+	else if (strcmp(name, "DualTextureEffect") == 0)
+	{
+		bytecode = ___vulkan_DualTextureEffect_vk_mgfxo;
+		size = ___vulkan_DualTextureEffect_vk_mgfxo_len;
+	}
+	else if (strcmp(name, "EnvironmentMapEffect") == 0)
+	{
+		bytecode = ___vulkan_EnvironmentMapEffect_vk_mgfxo;
+		size = ___vulkan_EnvironmentMapEffect_vk_mgfxo_len;
+	}
+	else if (strcmp(name, "SkinnedEffect") == 0)
+	{
+		bytecode = ___vulkan_SkinnedEffect_vk_mgfxo;
+		size = ___vulkan_SkinnedEffect_vk_mgfxo_len;
+	}
+	else if (strcmp(name, "SpriteEffect") == 0)
+	{
+		bytecode = ___vulkan_SpriteEffect_vk_mgfxo;
+		size = ___vulkan_SpriteEffect_vk_mgfxo_len;
+	}
+#endif
 }
 
 uint64_t CheckValidationLayerSupport(const std::vector<const char*>& validationLayers)
@@ -642,6 +693,7 @@ MGG_GraphicsSystem* MGG_GraphicsSystem_Create()
 
 		SDL_Vulkan_GetInstanceExtensions(nullptr, &count, instanceExtensions.data());
 	}
+#elif defined (MG_ANDROID)
 #else
 #error Not Implemented!
 #endif
@@ -793,6 +845,37 @@ void MGG_GraphicsAdapter_GetInfo(MGG_GraphicsAdapter* adapter, MGG_GraphicsAdapt
 	info.CurrentDisplayMode.height = monitorInfo.rcMonitor.bottom - monitorInfo.rcMonitor.top;
 	info.CurrentDisplayMode.format = MGSurfaceFormat::Color;
 
+#elif __APPLE__
+	if (adapter->modes.size() == 0)
+	{
+		int numDisplays = SDL_GetNumVideoDisplays();
+		for (int i = 0; i < numDisplays; ++i)
+		{
+			SDL_DisplayMode mode;
+			SDL_GetDesktopDisplayMode(i, &mode);
+
+			MGG_DisplayMode displayMode;
+			displayMode.width = mode.w;
+			displayMode.height = mode.h;
+			displayMode.format = MGSurfaceFormat::Color;
+
+			adapter->modes.push_back(displayMode);
+		}
+	}
+	info.DisplayModeCount = adapter->modes.size();
+	info.DisplayModes = adapter->modes.data();
+
+	// No window, so we can't get the current display mode from a window
+    if (adapter->modes.size() > 0)
+    {
+        info.CurrentDisplayMode = adapter->modes[0]; // Default to the first mode
+    }
+    else
+    {
+        info.CurrentDisplayMode.width = 0;
+        info.CurrentDisplayMode.height = 0;
+        info.CurrentDisplayMode.format = MGSurfaceFormat::Color;
+    }
 #else
 #error NOT IMPLEMENTED!
 #endif
@@ -1277,6 +1360,7 @@ void MGVK_RecreateSwapChain(
 
 		device->window = sdl_window;
 	}
+#elif defined (MG_ANDROID)
 #else
 #error Not Implemented
 #endif
