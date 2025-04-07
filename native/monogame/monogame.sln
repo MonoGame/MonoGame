@@ -1,6 +1,4 @@
-﻿
-Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 17
+﻿# Visual Studio Version 17
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "desktopvk", "desktopvk.vcxproj", "{60D6243F-CC40-D9B5-157F-8A5B8128B70A}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "windowsdx", "windowsdx.vcxproj", "{CC33DB03-389E-8F7A-81DC-4020ED856DCF}"
