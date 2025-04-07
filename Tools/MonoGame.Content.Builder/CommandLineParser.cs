@@ -15,7 +15,7 @@ namespace MonoGame.Content.Builder
 {
     /// <summary>
     /// Adapted from this generic command line argument parser:
-    /// http://blogs.msdn.com/b/shawnhar/archive/2012/04/20/a-reusable-reflection-based-command-line-parser.aspx     
+    /// https://shawnhargreaves.com/blog/a-reusable-reflection-based-command-line-parser.html     
     /// </summary>
     public class MGBuildParser
     {
