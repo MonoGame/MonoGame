@@ -90,5 +90,13 @@ namespace MonoGame.Tests.Graphics
             });
             GC.GetTotalMemory(true); // collect uninitialized IndexBuffer
         }
+
+        [Test]
+        [RunOnUI]
+        public void TypedConstructorShouldWork()
+        {
+            var indexBuffer = new IndexBuffer(gd, typeof(short), 12, BufferUsage.None);
+            indexBuffer.Dispose();
+        }
     }
 }
