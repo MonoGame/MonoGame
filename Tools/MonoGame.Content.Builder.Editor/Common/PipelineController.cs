@@ -136,7 +136,6 @@ namespace MonoGame.Tools.Pipeline
                 LoadTemplates(templatesPath);
 #endif
 
-            RestoreMGCB();
             UpdateMenu();
 
             view.UpdateRecentList(PipelineSettings.Default.ProjectHistory);
@@ -582,22 +581,6 @@ namespace MonoGame.Tools.Pipeline
             _buildTask.ContinueWith((e) => View.Invoke(UpdateMenu));
 
             UpdateMenu();       
-        }
-
-        private void RestoreMGCB()
-        {
-            var appDataPath = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
-            var version = Assembly.GetExecutingAssembly().GetName().Version.ToString();
-            var workingDirectory = Path.Combine(appDataPath, "mgcb-dotnet-tool", version);
-            if (Directory.Exists(workingDirectory))
-                return;
-            Directory.CreateDirectory(workingDirectory);
-            var dotnet = Global.Unix ? "dotnet" : "dotnet.exe";
-            if (Util.Run(dotnet, $"tool install dotnet-mgcb --version {version} --tool-path .", workingDirectory) != 0)
-            {
-                // install the latest
-                Util.Run(dotnet, $"tool install dotnet-mgcb --tool-path .", workingDirectory);
-            }
         }
 
         private void DoBuild(string commands)
