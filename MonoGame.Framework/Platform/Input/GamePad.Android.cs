@@ -92,18 +92,21 @@ namespace Microsoft.Xna.Framework.Input
             // this will need fixing
             capabilities.HasLeftXThumbStick = hasMap[4];
             capabilities.HasLeftYThumbStick = hasMap[4];
+            capabilities.HasLeftStickButton = hasMap[4];
+
             capabilities.HasRightXThumbStick = hasMap[5];
             capabilities.HasRightYThumbStick = hasMap[5];
+            capabilities.HasRightStickButton = hasMap[5];
 
             capabilities.HasLeftShoulderButton = hasMap[6];
             capabilities.HasRightShoulderButton = hasMap[7];
             capabilities.HasLeftTrigger = hasMap[8];
             capabilities.HasRightTrigger = hasMap[9];
 
-            capabilities.HasDPadDownButton = hasMap[10];
-            capabilities.HasDPadLeftButton = hasMap[11];
-            capabilities.HasDPadRightButton = hasMap[12];
-            capabilities.HasDPadUpButton = hasMap[13];
+            capabilities.HasDPadDownButton = true;
+            capabilities.HasDPadLeftButton = true;
+            capabilities.HasDPadRightButton = true;
+            capabilities.HasDPadUpButton = true;
 
             capabilities.HasStartButton = hasMap[14];
             capabilities.HasBackButton = hasMap[15];
@@ -294,7 +297,7 @@ namespace Microsoft.Xna.Framework.Input
             }
             else
             {
-                gamePad._buttons &= Buttons.LeftTrigger;
+                gamePad._buttons &= ~Buttons.LeftTrigger;
             }
 
             if (gamePad._rightTrigger > 0f)
@@ -303,7 +306,7 @@ namespace Microsoft.Xna.Framework.Input
             }
             else
             {
-                gamePad._buttons &= Buttons.RightTrigger;
+                gamePad._buttons &= ~Buttons.RightTrigger;
             }
 
             if (!gamePad.DPadButtons)

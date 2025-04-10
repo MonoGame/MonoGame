@@ -59,7 +59,7 @@ namespace Microsoft.Xna.Framework.Input
             //All iOS controllers have these basics
             var capabilities = new GamePadCapabilities()
             {
-                IsConnected = false,
+                IsConnected = true,
                 GamePadType = GamePadType.GamePad,
             };
             if (controller.ExtendedGamepad != null)
@@ -80,8 +80,10 @@ namespace Microsoft.Xna.Framework.Input
                 capabilities.HasRightTrigger = true;
                 capabilities.HasLeftXThumbStick = true;
                 capabilities.HasLeftYThumbStick = true;
+                capabilities.HasLeftStickButton = true;
                 capabilities.HasRightXThumbStick = true;
                 capabilities.HasRightYThumbStick = true;
+                capabilities.HasRightStickButton = true;
             }
             else if (controller.Gamepad != null)
             {
@@ -212,6 +214,11 @@ namespace Microsoft.Xna.Framework.Input
                         buttons |= Buttons.X;
                     if (controller.Gamepad.ButtonY.IsPressed)
                         buttons |= Buttons.Y;
+
+                    if (controller.Gamepad.LeftShoulder.IsPressed)
+                        buttons |= Buttons.LeftShoulder;
+                    if (controller.Gamepad.RightShoulder.IsPressed)
+                        buttons |= Buttons.RightShoulder;
 
                     if (controller.Gamepad.DPad.Up.IsPressed)
                     {
