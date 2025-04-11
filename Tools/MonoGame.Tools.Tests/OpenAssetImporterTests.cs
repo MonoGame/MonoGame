@@ -25,9 +25,19 @@ namespace MonoGame.Tests.ContentPipeline
         }
 
         [Test]
-#if DESKTOPGL
-        [Ignore("This crashes inside Assimp on Mac!")]
-#endif
+        public void MeshAnimatedCharacterImport ()
+        {
+            var context = new TestImporterContext("TestObj", "TestBin");
+            var importer = new OpenAssetImporter();
+
+            var nodeContent = importer.Import("Assets/Models/MeshAnimatedCharacter.glb", context);
+            Assert.AreEqual("character", nodeContent.Name);
+            Assert.IsNull(nodeContent.Parent);
+            
+            Assert.AreEqual(0, nodeContent.Animations.Count);
+        }
+
+        [Test]
         public void BlenderTests()
         {
             var context = new TestImporterContext("TestObj", "TestBin");

@@ -47,6 +47,35 @@ namespace MonoGame.Tests.ContentPipeline
 #endif
         }
 
+#if !XNA
+        [Test]
+        public void MeshAnimatedCharacterImport ()
+        {
+            var context = new TestImporterContext("TestObj", "TestBin");
+            var importer = new FbxImporter();
+
+            var nodeContent = importer.Import("Assets/Models/MeshAnimatedCharacter.fbx", context);
+            Assert.AreEqual("RootNode", nodeContent.Name);
+            Assert.IsNull(nodeContent.Parent);
+            
+            Assert.AreEqual(0, nodeContent.Animations.Count);
+        }
+
+        [Test]
+        public void NonSkeletonAnimationImport ()
+        {
+            var context = new TestImporterContext("TestObj", "TestBin");
+            var importer = new FbxImporter();
+
+            var nodeContent = importer.Import("Assets/Models/NonSkeletonAnimated.fbx", context);
+            Assert.AreEqual("Cube", nodeContent.Name);
+            Assert.IsNotNull(nodeContent.Parent);
+            Assert.AreEqual("RootNode", nodeContent.Parent.Name, $"Parent should be RootNode but was {nodeContent.Parent}");
+
+            Assert.AreEqual(1, nodeContent.Animations.Count);
+        }
+#endif
+
         [Test]
         public void Dude()
         {
