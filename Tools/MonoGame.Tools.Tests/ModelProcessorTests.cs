@@ -2,6 +2,7 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
+using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content.Pipeline;
 using Microsoft.Xna.Framework.Content.Pipeline.Graphics;
@@ -320,6 +321,44 @@ namespace MonoGame.Tests.ContentPipeline
             NormalMappingModelProcessor processor = new NormalMappingModelProcessor();
             var processorContext = new TestProcessorContext(TargetPlatform.Windows, "level1_costum.xnb");
 
+            ModelContent output = null;
+            // Validate that the custom processor does not throw an exception when normals are missing from the mesh
+            Assert.DoesNotThrow(() => output = processor.Process(nodeContent, processorContext));
+
+            // Test some basics.
+            Assert.NotNull(output);
+            Assert.NotNull(output.Meshes);
+        }
+
+        [Test]
+        public void ProcessNonSkeletonMeshAnimation ()
+        {
+            var importer = new FbxImporter();
+            var context = new TestImporterContext("TestObj", "TestBin");
+            var nodeContent = importer.Import("Assets/Models/NonSkeletonAnimated.fbx", context);
+
+            ModelProcessor processor = new ModelProcessor();
+            var processorContext = new TestProcessorContext(TargetPlatform.DesktopGL, "NonSkeletonAnimated.xnb");
+            ModelContent output = null;
+            // Validate that the custom processor does not throw an exception when normals are missing from the mesh
+            Assert.DoesNotThrow(() => output = processor.Process(nodeContent, processorContext));
+
+            // Test some basics.
+            Assert.NotNull(output);
+            Assert.NotNull(output.Meshes);
+        }
+
+        [Test]
+        [TestCase ("fbx")]
+        [TestCase ("glb")]
+        public void ProcessMeshAnimatedCharacterCharacter (string extension)
+        {
+            var importer = new OpenAssetImporter();
+            var context = new TestImporterContext("TestObj", "TestBin");
+            var nodeContent = importer.Import($"Assets/Models/MeshAnimatedCharacter.{extension}", context);
+
+            ModelProcessor processor = new ModelProcessor();
+            var processorContext = new TestProcessorContext(TargetPlatform.DesktopGL, "MeshAnimatedCharacter.xnb");
             ModelContent output = null;
             // Validate that the custom processor does not throw an exception when normals are missing from the mesh
             Assert.DoesNotThrow(() => output = processor.Process(nodeContent, processorContext));
