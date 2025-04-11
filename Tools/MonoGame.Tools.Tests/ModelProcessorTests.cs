@@ -367,5 +367,25 @@ namespace MonoGame.Tests.ContentPipeline
             Assert.NotNull(output);
             Assert.NotNull(output.Meshes);
         }
+
+        [Test]
+        [TestCase ("fbx")]
+        [TestCase ("glb")]
+        public void AnimatedModelProcessorTests (string extension)
+        {
+            var importer = new OpenAssetImporter();
+            var context = new TestImporterContext("TestObj", "TestBin");
+            var nodeContent = importer.Import($"Assets/Models/MeshAnimatedCharacter.{extension}", context);
+
+            AnimatedModelProcessor processor = new AnimatedModelProcessor();
+            var processorContext = new TestProcessorContext(TargetPlatform.DesktopGL, "MeshAnimatedCharacter.xnb");
+            ModelContent output = null;
+            // Validate that the custom processor does not throw an exception when normals are missing from the mesh
+            Assert.DoesNotThrow(() => output = processor.Process(nodeContent, processorContext));
+
+            // Test some basics.
+            Assert.NotNull(output);
+            Assert.NotNull(output.Meshes);
+        }
     }
 }
