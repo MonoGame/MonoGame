@@ -189,7 +189,8 @@ void MGA_Buffer_InitializeFormat(MGA_Buffer* buffer, mgbyte* waveHeader, mgbyte*
 	{
 		// We are assuming MSADPCM here!
 
-		auto format = (ADPCMWAVEFORMAT*)malloc(sizeof(ADPCMWAVEFORMAT) + (7 * sizeof(ADPCMCOEFSET)));
+		const size_t size = sizeof(ADPCMWAVEFORMAT) + (7 * sizeof(ADPCMCOEFSET));
+		auto format = (ADPCMWAVEFORMAT*)malloc(size);
 		memset(format, 0, sizeof(ADPCMWAVEFORMAT));
 		format->wfx.wFormatTag = WAVE_FORMAT_ADPCM;
 		format->wfx.nSamplesPerSec = wformat->nSamplesPerSec;
@@ -197,8 +198,8 @@ void MGA_Buffer_InitializeFormat(MGA_Buffer* buffer, mgbyte* waveHeader, mgbyte*
 		format->wfx.nBlockAlign = wformat->nBlockAlign;
 		format->wfx.wBitsPerSample = wformat->wBitsPerSample;
 		format->wfx.nAvgBytesPerSec = wformat->nAvgBytesPerSec;
-		format->wfx.cbSize = 32;
-		format->wSamplesPerBlock = (wformat->nBlockAlign * 2) / (wformat->nChannels) - 12;
+		format->wfx.cbSize = size - sizeof(WAVEFORMATEX);
+		format->wSamplesPerBlock = (format->wfx.nBlockAlign / format->wfx.nChannels - 7) * 2 + 2;
 		format->wNumCoef = 7;
 		format->aCoef[0] = { 256, 0 };
 		format->aCoef[1] = { 512, -256 };
@@ -207,6 +208,11 @@ void MGA_Buffer_InitializeFormat(MGA_Buffer* buffer, mgbyte* waveHeader, mgbyte*
 		format->aCoef[4] = { 240, 0 };
 		format->aCoef[5] = { 460, -208 };
 		format->aCoef[6] = { 392, -232 };
+
+		// NOTE: XAudio only supports up to 512 as the samples per block.
+		// Larger values are not supported and the sound will be wrong.
+		if (format->wSamplesPerBlock > 512)
+			format->wSamplesPerBlock = 512;
 
 		buffer->format = (WAVEFORMATEX*)format;
 
@@ -277,7 +283,10 @@ void MGA_Buffer_InitializeXact(MGA_Buffer* buffer, mguint codec, mgbyte* waveDat
 
 	if (codec == 0x2) // Adpcm
 	{
-		auto format = (ADPCMWAVEFORMAT*)malloc(sizeof(ADPCMWAVEFORMAT) + (7 * sizeof(ADPCMCOEFSET)));
+		// We are assuming MSADPCM here!
+
+		const size_t size = sizeof(ADPCMWAVEFORMAT) + (7 * sizeof(ADPCMCOEFSET));
+		auto format = (ADPCMWAVEFORMAT*)malloc(size);
 		memset(format, 0, sizeof(ADPCMWAVEFORMAT));
 		format->wfx.wFormatTag = WAVE_FORMAT_ADPCM;
 		format->wfx.nSamplesPerSec = sampleRate;
@@ -285,7 +294,7 @@ void MGA_Buffer_InitializeXact(MGA_Buffer* buffer, mguint codec, mgbyte* waveDat
 		format->wfx.nBlockAlign = blockAlignment;
 		format->wfx.wBitsPerSample = 4;
 		format->wfx.nAvgBytesPerSec = (sampleRate * 4) / 8;
-		format->wfx.cbSize = 32;
+		format->wfx.cbSize = size - sizeof(WAVEFORMATEX);
 		format->wSamplesPerBlock = (blockAlignment * 2) / (channels) - 12;
 		format->wNumCoef = 7;
 		format->aCoef[0] = { 256, 0 };
@@ -295,6 +304,11 @@ void MGA_Buffer_InitializeXact(MGA_Buffer* buffer, mguint codec, mgbyte* waveDat
 		format->aCoef[4] = { 240, 0 };
 		format->aCoef[5] = { 460, -208 };
 		format->aCoef[6] = { 392, -232 };
+
+		// NOTE: XAudio only supports up to 512 as the samples per block.
+		// Larger values are not supported and the sound will be wrong.
+		if (format->wSamplesPerBlock > 512)
+			format->wSamplesPerBlock = 512;
 
 		buffer->format = (WAVEFORMATEX*)format;
 
