@@ -4,10 +4,16 @@
 
 using System;
 
-namespace Microsoft.Devices.Sensors
+namespace MonoGame.Framework.Devices.Sensors
 {
+    /// <summary>
+    /// Represents errors related to sensors.
+    /// </summary>
 	public class SensorFailedException : Exception
 	{
+        /// <summary>
+        /// Error Id.
+        /// </summary>
 		public int ErrorId { get; protected set; }
 
         internal SensorFailedException(string message)

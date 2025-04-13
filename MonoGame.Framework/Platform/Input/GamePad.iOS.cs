@@ -22,7 +22,7 @@ namespace Microsoft.Xna.Framework.Input
             return false;
         }
 
-        static void AssingIndex(GCControllerPlayerIndex index)
+        static void AssignIndex(GCControllerPlayerIndex index)
         {
             if (IndexIsUsed(index))
                 return;
@@ -42,7 +42,7 @@ namespace Microsoft.Xna.Framework.Input
         {
             var ind = (GCControllerPlayerIndex)index;
 
-            AssingIndex(ind);
+            AssignIndex(ind);
 
             foreach (var controller in GCController.Controllers)
             {
@@ -117,7 +117,7 @@ namespace Microsoft.Xna.Framework.Input
             float leftTriggerValue = 0;
             float rightTriggerValue = 0;
 
-            AssingIndex(ind);
+            AssignIndex(ind);
 
             foreach (var controller in GCController.Controllers)
             {
@@ -151,10 +151,16 @@ namespace Microsoft.Xna.Framework.Input
                     if (controller.ExtendedGamepad.RightTrigger.IsPressed)
                         buttons |= Buttons.RightTrigger;
 
-                    if (controller.ExtendedGamepad.ButtonMenu.IsPressed)
+                    if (controller.ExtendedGamepad.ButtonMenu != null
+                    && controller.ExtendedGamepad.ButtonMenu.IsPressed)
+                    {
                         buttons |= Buttons.Start;
+                    }
+                        
                     if (controller.ExtendedGamepad.ButtonOptions?.IsPressed == true)
+                    {
                         buttons |= Buttons.Back;
+                    }
 
                     if (controller.ExtendedGamepad.DPad.Up.IsPressed)
                     {
@@ -175,6 +181,18 @@ namespace Microsoft.Xna.Framework.Input
                     {
                         Right = ButtonState.Pressed;
                         buttons |= Buttons.DPadRight;
+                    }
+
+                    if (controller.ExtendedGamepad.LeftThumbstickButton != null
+                    && controller.ExtendedGamepad.LeftThumbstickButton.IsPressed)
+                    {
+                        buttons |= Buttons.LeftStick;
+                    }
+
+                    if (controller.ExtendedGamepad.RightThumbstickButton != null
+                    && controller.ExtendedGamepad.RightThumbstickButton.IsPressed)
+                    {
+                        buttons |= Buttons.RightStick;
                     }
 
                     leftThumbStickPosition.X = controller.ExtendedGamepad.LeftThumbstick.XAxis.Value;

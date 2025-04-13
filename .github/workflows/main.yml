@@ -37,10 +37,10 @@ jobs:
           java-version: '17'
 
       - name: Install Vulkan SDK
-        uses: humbletim/install-vulkan-sdk@v1.1.1
+        uses: humbletim/setup-vulkan-sdk@523828e49cd4afabce369c39c7ee6543a2b7a735
         with:
-            version: 1.3.283.0
-            cache: true
+          vulkan-query-version: 1.3.283.0
+          vulkan-use-cache: true
 
       - name: Disable Annotations
         run: echo "::remove-matcher owner=csc::"

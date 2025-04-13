@@ -1,4 +1,4 @@
-﻿// MonoGame - Copyright (C) MonoGame Foundation, Inc
+// MonoGame - Copyright (C) MonoGame Foundation, Inc
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
@@ -46,16 +46,33 @@ namespace Microsoft.Xna.Framework.Audio
         }
 
         /// <summary>Gets or sets the pitch adjustment.</summary>
-        /// <value>Pitch adjustment, ranging from -1.0 (down an octave) to 0.0 (no change) to 1.0 (up an octave). Values outside of this range will throw an Exception.</value>
+        /// <value>Pitch adjustment, where -1.0 is down an octave, 0.0 is no change, and 1.0 is up an octave.</value>
+        /// <remarks>
+        /// Android and iOS will be clamped this to [-1.0, 1.0]. DesktopGL and WindowsDX will clamp this to [-10.0, 10.0].
+        /// </remarks>
         public float Pitch
         {
             get { return _pitch; }
             set
             {
                 // XAct sounds effects don't have pitch limits
-                if (!_isXAct && (value < -1.0f || value > 1.0f))
-                    throw new ArgumentOutOfRangeException();
+                if (!_isXAct)
+                {
+                    var validPitchRange = 10;
+                    #if IOS || ANDROID
+                    validPitchRange = 1;
+                    #endif
 
+                    if (value < -validPitchRange)
+                    {
+                        value = -validPitchRange;
+                    }
+
+                    if (value > validPitchRange)
+                    {
+                        value = validPitchRange;
+                    }
+                }
                 _pitch = value;
                 PlatformSetPitch(value);
             }

@@ -10,6 +10,43 @@ namespace MonoGame.Effect.Compiler
 {
     public static class WineHelper
     {
+        static string wineExecutable = "wine";
+        static WineHelper()
+        {
+            if (Environment.OSVersion.Platform != PlatformID.Unix)
+                throw new PlatformNotSupportedException("WineHelper is only supported on Unix platforms.");
+
+            var proc = new Process();
+            proc.StartInfo.FileName = "wine64";
+            proc.StartInfo.Arguments = "--version";
+            proc.StartInfo.UseShellExecute = false;
+            proc.StartInfo.CreateNoWindow = true;
+            try {
+                proc.Start();
+                proc.WaitForExit();
+                if (proc.ExitCode == 0) {
+                    wineExecutable = "wine64";
+                    return;
+                }
+            }
+            catch (Exception)
+            {
+                proc.StartInfo.FileName = "wine";
+            }
+
+            try {
+                proc.Start();
+                proc.WaitForExit();
+                if (proc.ExitCode == 0) {
+                    wineExecutable = "wine";
+                    return;
+                }
+            }
+            catch (Exception)
+            {
+                throw new PlatformNotSupportedException("Wine is not installed on this system.");
+            }
+        }
         public static int Run(Options options)
         {
             var mgfxcwine = Environment.GetEnvironmentVariable("MGFXC_WINE_PATH");
@@ -37,8 +74,10 @@ namespace MonoGame.Effect.Compiler
             var output = ToPrefixPath(options.OutputFile);
 
             var proc = new Process();
-            proc.StartInfo.FileName = "wine64";
+            proc.StartInfo.FileName = wineExecutable;
             proc.StartInfo.Arguments = "dotnet ";
+            proc.StartInfo.UseShellExecute = false;
+            proc.StartInfo.CreateNoWindow = true;
             proc.StartInfo.AddPathArgument(assemblyLocation);
             proc.StartInfo.AddPathArgument(input);
             proc.StartInfo.AddPathArgument(output);
@@ -76,8 +115,9 @@ namespace MonoGame.Effect.Compiler
 
         public static string ToPrefixPath(string localPath)
         {
+            var assemblyLocation = typeof(Program).Assembly.Location;
             var proc = new Process();
-            proc.StartInfo.FileName = "wine64";
+            proc.StartInfo.FileName = wineExecutable;
             proc.StartInfo.Arguments = "winepath.exe -w \"" + localPath + "\"";
             proc.StartInfo.UseShellExecute = false;
             proc.StartInfo.RedirectStandardOutput = true;
