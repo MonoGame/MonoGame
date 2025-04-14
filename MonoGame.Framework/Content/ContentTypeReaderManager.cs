@@ -31,6 +31,75 @@ namespace Microsoft.Xna.Framework.Content
             _locker = new object();
             _contentReadersCache = new Dictionary<Type, ContentTypeReader>(255);
             _assemblyName = ReflectionHelpers.GetAssembly(typeof(ContentTypeReaderManager)).FullName;
+
+            // cache the most common type readers to avoid the most common AOT/trimming related issues
+            string readerNamespace = typeof(ContentTypeReader).Namespace + ".";
+
+            AddTypeCreator(typeof(ByteReader).FullName, () => new ByteReader());
+            AddTypeCreator(typeof(SByteReader).FullName, () => new SByteReader());
+            AddTypeCreator(typeof(DateTimeReader).FullName, () => new DateTimeReader());
+            AddTypeCreator(typeof(DecimalReader).FullName, () => new DecimalReader());
+            AddTypeCreator(typeof(BoundingSphereReader).FullName, () => new BoundingSphereReader());
+            AddTypeCreator(typeof(BoundingFrustumReader).FullName, () => new BoundingFrustumReader());
+            AddTypeCreator(typeof(RayReader).FullName, () => new RayReader());
+            AddTypeCreator(typeof(SpriteFontReader).FullName, () => new SpriteFontReader());
+            AddTypeCreator(typeof(Texture2DReader).FullName, () => new Texture2DReader());
+            AddTypeCreator(typeof(CharReader).FullName, () => new CharReader());
+            AddTypeCreator(typeof(RectangleReader).FullName, () => new RectangleReader());
+            AddTypeCreator(typeof(StringReader).FullName, () => new StringReader());
+            AddTypeCreator(typeof(Vector2Reader).FullName, () => new Vector2Reader());
+            AddTypeCreator(typeof(Vector3Reader).FullName, () => new Vector3Reader());
+            AddTypeCreator(typeof(Vector4Reader).FullName, () => new Vector4Reader());
+            AddTypeCreator(typeof(CurveReader).FullName, () => new CurveReader());
+            AddTypeCreator(typeof(IndexBufferReader).FullName, () => new IndexBufferReader());
+            AddTypeCreator(typeof(BoundingBoxReader).FullName, () => new BoundingBoxReader());
+            AddTypeCreator(typeof(MatrixReader).FullName, () => new MatrixReader());
+            AddTypeCreator(typeof(BasicEffectReader).FullName, () => new BasicEffectReader());
+            AddTypeCreator(typeof(VertexBufferReader).FullName, () => new VertexBufferReader());
+            AddTypeCreator(typeof(AlphaTestEffectReader).FullName, () => new AlphaTestEffectReader());
+            AddTypeCreator(typeof(EffectMaterialReader).FullName, () => new EffectMaterialReader());
+            AddTypeCreator(typeof(ExternalReferenceReader).FullName, () => new ExternalReferenceReader());
+            AddTypeCreator(typeof(SoundEffectReader).FullName, () => new SoundEffectReader());
+            AddTypeCreator(typeof(SongReader).FullName, () => new SongReader());
+            AddTypeCreator(typeof(ModelReader).FullName, () => new ModelReader());
+            AddTypeCreator(typeof(Int32Reader).FullName, () => new Int32Reader());
+            AddTypeCreator(typeof(EffectReader).FullName, () => new EffectReader());
+            AddTypeCreator(typeof(SingleReader).FullName, () => new SingleReader());
+
+            // At the moment the Video class doesn't exist
+            // on all platforms... Allow it to compile anyway.
+#if ANDROID || (IOS && !TVOS) || MONOMAC || (WINDOWS && !OPENGL)
+            AddTypeCreator(typeof(VideoReader).FullName, () =>  new VideoReader());
+#endif
+
+            AddTypeCreator(typeof(EnumReader<Graphics.SpriteEffects>).FullName, () => new EnumReader<Graphics.SpriteEffects>());
+            AddTypeCreator(typeof(EnumReader<Graphics.Blend>).FullName, () => new EnumReader<Graphics.Blend>());
+
+            AddTypeCreator(typeof(NullableReader<Rectangle>).FullName, () => new NullableReader<Rectangle>());
+
+            AddTypeCreator(typeof(ArrayReader<int>).FullName, () => new ArrayReader<int>());
+            AddTypeCreator(typeof(ArrayReader<float>).FullName, () => new ArrayReader<float>());
+            AddTypeCreator(typeof(ArrayReader<char>).FullName, () => new ArrayReader<char>());
+            AddTypeCreator(typeof(ArrayReader<string>).FullName, () => new ArrayReader<string>());
+            AddTypeCreator(typeof(ArrayReader<Point>).FullName, () => new ArrayReader<Point>());
+            AddTypeCreator(typeof(ArrayReader<Vector2>).FullName, () => new ArrayReader<Vector2>());
+            AddTypeCreator(typeof(ArrayReader<Vector3>).FullName, () => new ArrayReader<Vector3>());
+            AddTypeCreator(typeof(ArrayReader<Matrix>).FullName, () => new ArrayReader<Matrix>());
+            AddTypeCreator(typeof(ArrayReader<Rectangle>).FullName, () => new ArrayReader<Rectangle>());
+            AddTypeCreator(typeof(ArrayReader<Color>).FullName, () => new ArrayReader<Color>());
+            AddTypeCreator(typeof(ArrayReader<StringReader>).FullName, () => new ArrayReader<StringReader>());
+
+            AddTypeCreator(typeof(ListReader<int>).FullName, () => new ListReader<int>());
+            AddTypeCreator(typeof(ListReader<float>).FullName, () => new ListReader<float>());
+            AddTypeCreator(typeof(ListReader<char>).FullName, () => new ListReader<char>());
+            AddTypeCreator(typeof(ListReader<string>).FullName, () => new ListReader<string>());
+            AddTypeCreator(typeof(ListReader<Point>).FullName, () => new ListReader<Point>());
+            AddTypeCreator(typeof(ListReader<Vector2>).FullName, () => new ListReader<Vector2>());
+            AddTypeCreator(typeof(ListReader<Vector3>).FullName, () => new ListReader<Vector3>());
+            AddTypeCreator(typeof(ListReader<Matrix>).FullName, () => new ListReader<Matrix>());
+            AddTypeCreator(typeof(ListReader<Rectangle>).FullName, () => new ListReader<Rectangle>());
+            AddTypeCreator(typeof(ListReader<Color>).FullName, () => new ListReader<Color>());
+            AddTypeCreator(typeof(ListReader<StringReader>).FullName, () => new ListReader<StringReader>());
         }
 
         /// <summary>
@@ -54,73 +123,8 @@ namespace Microsoft.Xna.Framework.Content
             return null;
         }
 
-#if NET45
-        // Trick to prevent the linker removing the code, but not actually execute the code
-        static bool falseflag = false;
-#endif
-
         internal ContentTypeReader[] LoadAssetReaders(ContentReader reader)
         {
-#if NET45
-#pragma warning disable 0219, 0649
-            // Trick to prevent the linker removing the code, but not actually execute the code
-            if (falseflag)
-            {
-                // Dummy variables required for it to work on iDevices ** DO NOT DELETE **
-                // This forces the classes not to be optimized out when deploying to iDevices
-                var hByteReader = new ByteReader();
-                var hSByteReader = new SByteReader();
-                var hDateTimeReader = new DateTimeReader();
-                var hDecimalReader = new DecimalReader();
-                var hBoundingSphereReader = new BoundingSphereReader();
-                var hBoundingFrustumReader = new BoundingFrustumReader();
-                var hRayReader = new RayReader();
-                var hCharListReader = new ListReader<char>();
-                var hRectangleListReader = new ListReader<Rectangle>();
-                var hRectangleArrayReader = new ArrayReader<Rectangle>();
-                var hVector3ListReader = new ListReader<Vector3>();
-                var hStringListReader = new ListReader<StringReader>();
-                var hIntListReader = new ListReader<Int32>();
-                var hSpriteFontReader = new SpriteFontReader();
-                var hTexture2DReader = new Texture2DReader();
-                var hCharReader = new CharReader();
-                var hRectangleReader = new RectangleReader();
-                var hStringReader = new StringReader();
-                var hVector2Reader = new Vector2Reader();
-                var hVector3Reader = new Vector3Reader();
-                var hVector4Reader = new Vector4Reader();
-                var hCurveReader = new CurveReader();
-                var hIndexBufferReader = new IndexBufferReader();
-                var hBoundingBoxReader = new BoundingBoxReader();
-                var hMatrixReader = new MatrixReader();
-                var hBasicEffectReader = new BasicEffectReader();
-                var hVertexBufferReader = new VertexBufferReader();
-                var hAlphaTestEffectReader = new AlphaTestEffectReader();
-                var hEnumSpriteEffectsReader = new EnumReader<Graphics.SpriteEffects>();
-                var hArrayFloatReader = new ArrayReader<float>();
-                var hArrayVector2Reader = new ArrayReader<Vector2>();
-                var hListVector2Reader = new ListReader<Vector2>();
-                var hArrayMatrixReader = new ArrayReader<Matrix>();
-                var hEnumBlendReader = new EnumReader<Graphics.Blend>();
-                var hNullableRectReader = new NullableReader<Rectangle>();
-                var hEffectMaterialReader = new EffectMaterialReader();
-                var hExternalReferenceReader = new ExternalReferenceReader();
-                var hSoundEffectReader = new SoundEffectReader();
-                var hSongReader = new SongReader();
-                var hModelReader = new ModelReader();
-                var hInt32Reader = new Int32Reader();
-                var hEffectReader = new EffectReader();
-                var hSingleReader = new SingleReader();
-
-                // At the moment the Video class doesn't exist
-                // on all platforms... Allow it to compile anyway.
-#if ANDROID || (IOS && !TVOS) || MONOMAC || (WINDOWS && !OPENGL)
-                var hVideoReader = new VideoReader();
-#endif
-            }
-#pragma warning restore 0219, 0649
-#endif
-
             // The first content byte i read tells me the number of content readers in this XNB file
             var numberOfReaders = reader.Read7BitEncodedInt();
             var contentReaders = new ContentTypeReader[numberOfReaders];
@@ -263,6 +267,7 @@ namespace Microsoft.Xna.Framework.Content
         /// <summary>
         /// Registers a function to create a <see cref="ContentTypeReader"/> instance used to read an object of the
         /// type specified.
+        /// Call this method to register content readers that may fail loading when trimming or PublishAot are used.
         /// </summary>
         /// <param name='typeString'>A string containing the fully-qualified type name of the object type.</param>
         /// <param name='createFunction'>The function responsible for creating an instance of the <see cref="ContentTypeReader"/> class.</param>
