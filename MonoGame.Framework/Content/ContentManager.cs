@@ -468,6 +468,12 @@ namespace Microsoft.Xna.Framework.Content
                 {
                     result = null;
                 }
+
+                // preserve the original error and stack trace
+                if (result == null)
+                {
+                    throw;
+                }
             }
 
 			if (result == null)
