@@ -29,15 +29,19 @@ namespace Microsoft.Xna.Framework.Input
 
                 for (int i = 0; i < buttons.Count; i++)
                 {
+                    // SDL2 expect reverse button order
+                    // SDL3 has a flag to reverse that but SDL2 doesn't
+                    int reverseIndex = buttons.Count - i - 1;
+
                     buttonData[i] = new Sdl.Window.MessageBoxButtonData();
                     buttonData[i].flags = 0;
-                    buttonData[i].buttonid = i;
+                    buttonData[i].buttonid = reverseIndex;
                     buttonData[i].text = IntPtr.Zero;
 
                     if (buttons[i] != null)
                     {
                         // convert to C string pointer data because we need to marshal a struct array
-                        byte[] bytes = Encoding.UTF8.GetBytes(buttons[i]);
+                        byte[] bytes = Encoding.UTF8.GetBytes(buttons[reverseIndex]);
                         IntPtr mem = Marshal.AllocHGlobal(bytes.Length + 1);
                         Marshal.Copy(bytes, 0, mem, bytes.Length);
                         unsafe
