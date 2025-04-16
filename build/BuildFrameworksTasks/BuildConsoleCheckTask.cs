@@ -7,5 +7,5 @@ public sealed class BuildConsoleCheckTask : FrostingTask<BuildContext>
     public override bool ShouldRun(BuildContext context) => context.IsRunningOnWindows();
 
     public override void Run(BuildContext context)
-        => context.DotNetBuild(context.GetProjectPath(ProjectType.Framework, "ConsoleCheck"), context.DotNetBuildSettings);
+        => context.DotNetPack(context.GetProjectPath(ProjectType.Framework, "ConsoleCheck"), context.DotNetPackSettings);
 }

@@ -9,6 +9,7 @@ using MonoGame.Interop;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Text;
 
 namespace Microsoft.Xna.Framework;
 
@@ -31,6 +32,41 @@ internal class NativeGameWindow : GameWindow
             return window;
 
         return null;
+    }
+
+
+
+    public override unsafe bool IsUsingTextInput
+    {
+        get => MGP.Window_GetIsUsingTextInput(_handle);
+        set => MGP.Window_SetIsUsingTextInput(_handle, value);
+    }
+
+    public override unsafe Rectangle IMEPosition
+    {
+        get
+        {
+            Rectangle rectangle = new Rectangle();
+            MGP.Window_GetIMEPosition(_handle, out rectangle.X, out rectangle.Y, out rectangle.Width, out rectangle.Height);
+            return rectangle;
+        }
+        set => MGP.Window_SetIMEPosition(_handle, value.X, value.Y, value.Width, value.Height);
+    }
+
+    public override unsafe string ClipboardText
+    {
+        get
+        {
+            int length = MGP.Window_GetClipboardText(_handle, null, 0);
+            byte[] buffer = new byte[length];
+            MGP.Window_GetClipboardText(_handle, buffer, length);
+            return UTF8Encoding.UTF8.GetString(buffer);
+        }
+        set
+        {
+            byte[] buffer = Encoding.UTF8.GetBytes(value + '\0');
+            MGP.Window_SetClipboardText(_handle, buffer);
+        }
     }
 
     public override unsafe bool AllowUserResizing

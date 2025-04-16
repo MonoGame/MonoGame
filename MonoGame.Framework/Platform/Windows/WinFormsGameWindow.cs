@@ -68,6 +68,31 @@ namespace MonoGame.Framework
             }
         }
 
+        public override bool IsUsingTextInput
+        {
+            get => Form.Focused && Form.ImeMode == ImeMode.On;
+            set
+            {
+                Form.Focus();
+                if(IsUsingTextInput != value)
+                {
+                    Form.ImeMode = value ? ImeMode.On : ImeMode.Off;
+                }
+            }
+        }
+
+        public override Rectangle IMEPosition
+        {
+            get => Form.TextInputRect;
+            set => Form.TextInputRect = value;
+        }
+
+        public override string ClipboardText
+        {
+            get => Clipboard.GetText();
+            set => Clipboard.SetText(value);
+        }
+
         public override bool AllowUserResizing
         {
             get { return _isResizable; }
@@ -169,6 +194,10 @@ namespace MonoGame.Framework
             Form.ResizeBegin += OnResizeBegin;
             Form.ResizeEnd += OnResizeEnd;
 
+            Form.KeyPress += OnKeyPress;
+            UpdateMouseKeys();
+
+            Form.SettingChanged += Form_SettingChanged;
             Form.KeyPress += OnKeyPress;
 
             RegisterToAllWindows();
@@ -348,12 +377,6 @@ namespace MonoGame.Framework
 
         [DllImport("user32.dll")]
         private static extern short VkKeyScanEx(char ch, IntPtr dwhkl);
-
-        private void OnKeyPress(object sender, KeyPressEventArgs e)
-        {
-            var key = (Keys) (VkKeyScanEx(e.KeyChar, InputLanguage.CurrentInputLanguage.Handle) & 0xff);
-            OnTextInput(new TextInputEventArgs(e.KeyChar, key));
-        }
 
         internal void Initialize(int width, int height)
         {
