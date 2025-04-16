@@ -74,6 +74,20 @@ namespace MonoGame.Tests.ContentPipeline
 
             Assert.AreEqual(1, nodeContent.Animations.Count);
         }
+
+        [Test]
+        public void NonSkeletonAnimationCubeImport ()
+        {
+            var context = new TestImporterContext("TestObj", "TestBin");
+            var importer = new FbxImporter();
+
+            var nodeContent = importer.Import("Assets/Models/NonSkeletonAnimatedCube.fbx", context);
+            Assert.AreEqual("Cube", nodeContent.Name);
+            Assert.IsNotNull(nodeContent.Parent);
+            Assert.AreEqual("RootNode", nodeContent.Parent.Name, $"Parent should be RootNode but was {nodeContent.Parent}");
+
+            Assert.AreEqual(2, nodeContent.Animations.Count);
+        }
 #endif
 
         [Test]
