@@ -55,6 +55,7 @@ runs:
       run: |
         echo 'Installing additional Mac Dependencies'
         dotnet workload install android macos ios
+        brew install cmake
         brew install wine-stable p7zip
         sudo mkdir -p /usr/local/lib
         ls -n /Applications/ | grep Xcode*
