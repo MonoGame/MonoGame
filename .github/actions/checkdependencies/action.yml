@@ -57,9 +57,6 @@ runs:
         dotnet workload install android macos ios
         brew install cmake
         brew install wine-stable p7zip
-        sudo mkdir -p /usr/local/lib
-        ls -n /Applications/ | grep Xcode*
-        sudo xcode-select -s /Applications/Xcode_16.2.app/Contents/Developer
         wget -qO- https://monogame.net/downloads/net9_mgfxc_wine_setup.sh | bash
       shell: ${{ inputs.shell }}
 
