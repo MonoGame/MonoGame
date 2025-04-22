@@ -552,7 +552,8 @@ namespace Microsoft.Xna.Framework.Content
                 string assetPath = Path.Combine(RootDirectory, assetName);
                 assetPath = Path.ChangeExtension(assetPath, extension);
 
-                return File.Exists(assetPath);
+                if (File.Exists(assetPath))
+                    return true;
             }
 
             return false;
