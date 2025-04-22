@@ -1,4 +1,5 @@
-﻿using System;
+﻿using MonoGame.Framework.Utilities;
+using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -29,9 +30,9 @@ namespace Microsoft.Xna.Framework.Input
 
                 for (int i = 0; i < buttons.Count; i++)
                 {
-                    // SDL2 expect reverse button order
+                    // We need to reverse button order on Windows only
                     // SDL3 has a flag to reverse that but SDL2 doesn't
-                    int reverseIndex = buttons.Count - i - 1;
+                    int reverseIndex = (CurrentPlatform.OS == OS.Windows ? buttons.Count - i - 1 : i);
 
                     buttonData[i] = new Sdl.Window.MessageBoxButtonData();
                     buttonData[i].flags = 0;
