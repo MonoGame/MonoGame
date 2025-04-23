@@ -212,7 +212,8 @@ namespace Microsoft.Xna.Framework.Content
                         else
                             throw new ContentLoadException(
                                     "Could not find ContentTypeReader Type. Please ensure the name of the Assembly that contains the Type matches the assembly in the full type name: " +
-                                    originalReaderTypeString + " (" + readerTypeString + ")");
+                                    originalReaderTypeString + " (" + readerTypeString + "). " +
+                                    " If you are using trimming, PublishAOT, or targeting mobile platforms, you should call ContentTypeReaderManager.AddTypeCreator() on that reader type somewhere in your code.");
                     }
 
                     var targetType = contentReaders[i].TargetType;
