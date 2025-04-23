@@ -68,11 +68,12 @@ namespace MonoGame.Tools.Pipeline
                 exe = Global.Unix ? "dotnet" : "dotnet.exe";
                 args = $"\"{command}\" {arguments}";
             }
+
             var _buildProcess = new Process
             {
                 StartInfo = new ProcessStartInfo
                 {
-                    FileName = $"\"{exe}\"",
+                    FileName = exe,
                     Arguments = args,
                     WorkingDirectory = workingDirectory,
                     CreateNoWindow = true,
@@ -82,7 +83,12 @@ namespace MonoGame.Tools.Pipeline
                     StandardOutputEncoding = encoding
                 }
             };
-            _buildProcess.OutputDataReceived += (sender, args) => output(args.Data);
+
+            _buildProcess.OutputDataReceived += (sender, args) =>
+            {
+                if (args.Data != null)
+                    output(args.Data);
+            };
             return _buildProcess;
         }
     }
