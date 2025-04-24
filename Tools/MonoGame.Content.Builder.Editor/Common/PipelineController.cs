@@ -512,11 +512,8 @@ namespace MonoGame.Tools.Pipeline
             } catch (ArgumentException) {
                 encoding = Encoding.UTF8;
             }
-            
-            
-            var appDataPath = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
-            var version = Assembly.GetExecutingAssembly().GetName().Version.ToString ();
-            var mgcbCommand = Path.Combine(appDataPath, "mgcb-dotnet-tool", version, "mgcb");
+
+            var mgcbCommand = "";
             var currentDir = Environment.CurrentDirectory;
             foreach (var path in _mgcbSearchPaths)
             {
@@ -528,17 +525,15 @@ namespace MonoGame.Tools.Pipeline
                     break;
                 }
             }
-            // allow the users to override the path with an environment variable
-            // the same as the MSBuild property in the .targets
-            var mgcbUserPath = Environment.GetEnvironmentVariable("MGCBCommand");
-            if (!string.IsNullOrEmpty(mgcbUserPath) && File.Exists(mgcbUserPath))
+            if (string.IsNullOrEmpty(mgcbCommand))
             {
-                mgcbCommand = mgcbUserPath;
+                mgcbCommand = Global.Unix ? "dotnet" : "dotnet.exe";
+                commands = "mgcb " + commands;
             }
 
             try
             {
-                _buildProcess = Util.CreateProcess(mgcbCommand, commands, Path.GetDirectoryName (_project.OriginalPath), encoding, (s) => View.OutputAppend (s));
+                _buildProcess = Util.CreateProcess(mgcbCommand, commands, Path.GetDirectoryName(_project.OriginalPath), encoding, s => View.OutputAppend(s));
                 // Fire off the process.
                 Console.WriteLine(_buildProcess.StartInfo.FileName + " " + _buildProcess.StartInfo.Arguments);
                 Environment.CurrentDirectory = _buildProcess.StartInfo.WorkingDirectory;
@@ -558,7 +553,8 @@ namespace MonoGame.Tools.Pipeline
                     View.OutputAppend(ex.ToString());
                 }
             }
-            finally {
+            finally
+            {
                 Environment.CurrentDirectory = currentDir;
             }
 
