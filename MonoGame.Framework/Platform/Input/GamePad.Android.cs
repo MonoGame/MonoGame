@@ -110,6 +110,7 @@ namespace Microsoft.Xna.Framework.Input
 
             capabilities.HasStartButton = hasMap[14];
             capabilities.HasBackButton = hasMap[15];
+            capabilities.HasBigButton = hasMap[16];
 
             return capabilities;
         }
@@ -387,6 +388,8 @@ namespace Microsoft.Xna.Framework.Input
                     return Buttons.Start;
                 case Keycode.ButtonSelect:
                     return Buttons.Back;
+                case Keycode.ButtonMode:
+                    return Buttons.BigButton;
             }
 
             return 0;
