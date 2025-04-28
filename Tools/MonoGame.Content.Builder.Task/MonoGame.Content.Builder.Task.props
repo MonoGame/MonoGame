@@ -4,7 +4,7 @@
     <!-- MGCB does not natively support ARM64 because it relies on x64 DLLs. -->
     <!-- Windows on ARM64 has an x64 emulator, but we need to use the x64 dotnet host process to be able to load those DLLs at runtime. -->
     <!-- Fortunately, the x64 dotnet toolchain can be installed alongside the native ARM64 toolchain; we just need to run it from the correct directory. -->
-    <DotnetCommand Condition="'$(DotnetCommand)' == '' And 'OS' == 'Windows_NT' And '$(PROCESSOR_ARCHITECTURE)' == 'ARM64'">$(ProgramFiles)\dotnet\x64\dotnet</DotnetCommand>
+    <DotnetCommand Condition="'$(DotnetCommand)' == '' And '$(OS)' == 'Windows_NT' And '$(PROCESSOR_ARCHITECTURE)' == 'ARM64'">$(ProgramFiles)\dotnet\x64\dotnet</DotnetCommand>
     <DotnetCommand Condition="'$(DotnetCommand)' == ''">dotnet</DotnetCommand>
     <EnableMGCBItems Condition="'$(EnableMGCBItems)' == ''">true</EnableMGCBItems>
     <!-- Allow users the ability to disble tool restoration if needed -->
