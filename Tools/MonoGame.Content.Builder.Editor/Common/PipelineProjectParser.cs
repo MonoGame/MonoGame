@@ -175,7 +175,7 @@ namespace MonoGame.Tools.Pipeline
                 sourceFile = split[0];
 
                 if (split.Length > 0)
-                    link = split[1].Replace('\\', '/');
+                    link = PathHelper.Normalize(split[1]);
             }
 
             // Make sure the source file is relative to the project.
