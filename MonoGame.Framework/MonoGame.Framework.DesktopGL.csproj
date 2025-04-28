@@ -74,7 +74,7 @@
     <Compile Include="Platform\Input\KeysHelper.cs" />
     <Compile Include="Platform\Input\Mouse.SDL.cs" />
     <Compile Include="Platform\Input\MouseCursor.SDL.cs" />
-    <Compile Include="Platform\Input\MessageBox.Default.cs" />
+    <Compile Include="Platform\Input\MessageBox.SDL.cs" />
     <Compile Include="Platform\Graphics\GraphicsContext.SDL.cs" />
     <Compile Include="Platform\Graphics\OpenGL.SDL.cs" />
     <Compile Include="Platform\Graphics\WindowInfo.SDL.cs" />
