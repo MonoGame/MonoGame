@@ -491,6 +491,30 @@ internal static class Sdl
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         public delegate int d_sdl_getwindowborderssize(IntPtr window, out int top, out int left, out int right, out int bottom);
         public static d_sdl_getwindowborderssize GetBorderSize = FuncLoader.LoadFunction<d_sdl_getwindowborderssize>(NativeLibrary, "SDL_GetWindowBordersSize");
+
+        [StructLayout(LayoutKind.Sequential)]
+        public struct MessageBoxData
+        {
+            public uint flags;
+            public IntPtr window;
+            public string title;
+            public string message;
+            public int numbuttons;
+            public IntPtr buttons;
+            public IntPtr colorScheme;
+        }
+
+        [StructLayout(LayoutKind.Sequential)]
+        public struct MessageBoxButtonData
+        {
+            public uint flags;
+            public int buttonid;
+            public IntPtr text;
+        }
+
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        public delegate int d_sdl_showmessagebox(ref MessageBoxData messageboxdata, out int buttonid);
+        public static d_sdl_showmessagebox ShowMessageBox = FuncLoader.LoadFunction<d_sdl_showmessagebox>(NativeLibrary, "SDL_ShowMessageBox");
     }
 
     public static class Display
