@@ -311,6 +311,10 @@ namespace Microsoft.Xna.Framework.Input
         /// <summary>
         /// Returns cumulative scroll wheel value since the game start.
         /// </summary>
+        /// <remarks>
+        /// The current mouse wheel value is incremented when the wheel is scrolled up and decremented on scroll down.
+        /// This is a real value showing the current position since the game started, to capture the delta, store the value and comnpare to the previous frame.
+        /// </remarks>
         public int ScrollWheelValue
         {
             get
@@ -323,6 +327,10 @@ namespace Microsoft.Xna.Framework.Input
         /// <summary>
         /// Returns the cumulative horizontal scroll wheel value since the game start
         /// </summary>
+        /// <remarks>
+        /// The current mouse wheel value is incremented when the wheel is scrolled up and decremented on scroll down.
+        /// This is a real value showing the current position since the game started, to capture the delta, store the value and comnpare to the previous frame.
+        /// </remarks>
         public int HorizontalScrollWheelValue
         {
             get

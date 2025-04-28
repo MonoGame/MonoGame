@@ -453,21 +453,34 @@ namespace Microsoft.Xna.Framework.Content
                     }
                 }
             }
-            catch (ContentLoadException)
+            catch (ContentLoadException ex)
             {
-                try
+                // If the file is not found, we try searching a file with differents extensions
+                // based on the type of asset searched (e.g. '.bmp' and '.png' for a Texture2D)
+                if (ex.InnerException != null &&
+                    (ex.InnerException is FileNotFoundException ||
+                    ex.InnerException is DirectoryNotFoundException))
                 {
-                    // If the file is not found, we try searching a file with differents extensions
-                    // based on the type of asset searched (e.g. '.bmp' and '.png' for a Texture2D)
-                    if (typeof(Texture2D).IsAssignableFrom(typeof(T)))
+                    // only try if an image file exist to avoid loosing the original error
+                    if (typeof(Texture2D).IsAssignableFrom(typeof(T)) &&
+                        ImageFileExists(assetName))
                     {
-                        result = LoadTexture2DFromImageFile(assetName);
+                        try
+                        {
+                            result = LoadTexture2DFromImageFile(assetName);
+                        }
+                        catch (Exception e)
+                        {
+                            throw new ContentLoadException("Could not load image file of " + originalAssetName + " asset!", e);
+                        }
                     }
+                    // no alternaive file, rethrow original error as-is
+                    else
+                        throw;
                 }
-                catch
-                {
-                    result = null;
-                }
+                // if it's a different exception, rethrow it as-is
+                else
+                    throw;
             }
 
 			if (result == null)
@@ -531,8 +544,22 @@ namespace Microsoft.Xna.Framework.Content
 
             return reader;
         }
+
+        internal bool ImageFileExists(string assetName)
+        {
+            foreach (string extension in supportedTexture2DExtensions)
+            {
+                string assetPath = Path.Combine(RootDirectory, assetName);
+                assetPath = Path.ChangeExtension(assetPath, extension);
+
+                if (File.Exists(assetPath))
+                    return true;
+            }
+
+            return false;
+        }
     
-        Texture2D LoadTexture2DFromImageFile(string assetName)
+        internal Texture2D LoadTexture2DFromImageFile(string assetName)
         {
             IGraphicsDeviceService graphicsDeviceService = serviceProvider.GetService(typeof(IGraphicsDeviceService)) as IGraphicsDeviceService;
             
