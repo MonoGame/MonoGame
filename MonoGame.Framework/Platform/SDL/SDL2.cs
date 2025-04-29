@@ -491,30 +491,6 @@ internal static class Sdl
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         public delegate int d_sdl_getwindowborderssize(IntPtr window, out int top, out int left, out int right, out int bottom);
         public static d_sdl_getwindowborderssize GetBorderSize = FuncLoader.LoadFunction<d_sdl_getwindowborderssize>(NativeLibrary, "SDL_GetWindowBordersSize");
-
-        [StructLayout(LayoutKind.Sequential)]
-        public struct MessageBoxData
-        {
-            public uint flags;
-            public IntPtr window;
-            public string title;
-            public string message;
-            public int numbuttons;
-            public IntPtr buttons;
-            public IntPtr colorScheme;
-        }
-
-        [StructLayout(LayoutKind.Sequential)]
-        public struct MessageBoxButtonData
-        {
-            public uint flags;
-            public int buttonid;
-            public IntPtr text;
-        }
-
-        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-        public delegate int d_sdl_showmessagebox(ref MessageBoxData messageboxdata, out int buttonid);
-        public static d_sdl_showmessagebox ShowMessageBox = FuncLoader.LoadFunction<d_sdl_showmessagebox>(NativeLibrary, "SDL_ShowMessageBox");
     }
 
     public static class Display
@@ -852,6 +828,14 @@ internal static class Sdl
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         public delegate Keymod d_sdl_getmodstate();
         public static d_sdl_getmodstate GetModState = FuncLoader.LoadFunction<d_sdl_getmodstate>(NativeLibrary, "SDL_GetModState");
+
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        public delegate IntPtr d_sdl_istextinputactive();
+        public static d_sdl_istextinputactive GetKeyboardFocus = FuncLoader.LoadFunction<d_sdl_istextinputactive>(NativeLibrary, "SDL_GetKeyboardFocus");
+
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        public delegate int d_sdl_setwindowinputfocus(IntPtr window);
+        public static d_sdl_setwindowinputfocus SetWindowInputFocus = FuncLoader.LoadFunction<d_sdl_setwindowinputfocus>(NativeLibrary, "SDL_SetWindowInputFocus");
     }
 
     public static class Joystick
@@ -1237,5 +1221,75 @@ internal static class Sdl
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         public unsafe delegate void d_sdl_free(IntPtr ptr);
         public static d_sdl_free SDL_Free = FuncLoader.LoadFunction<d_sdl_free>(NativeLibrary, "SDL_free");
+    }
+
+    public static class Text
+    {
+
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        public delegate void d_sdl_settextinputrect(ref Rectangle rect);
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        public delegate void d_sdl_starttextinput();
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        public delegate void d_sdl_stoptextinput();
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        public delegate bool d_sdl_istextinputactive();
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        public delegate bool d_sdl_istextinputshown();
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        public delegate bool d_sdl_hasprimaryselectiontext();
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        private delegate nint d_sdl_getprimaryselectiontext();
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        private delegate int d_sdl_setprimaryselectiontext(ref byte text);
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        public delegate bool d_sdl_hasclipboardtext();
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        private delegate nint d_sdl_getclipboardtext();
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        private delegate int d_sdl_setclipboardtext(ref byte text);
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        public delegate void d_sdl_free(nint ptr);
+
+        public static d_sdl_free SDL_Free = FuncLoader.LoadFunction<d_sdl_free>(NativeLibrary, "SDL_free");
+        public static d_sdl_settextinputrect SetTextInputRect = FuncLoader.LoadFunction<d_sdl_settextinputrect>(NativeLibrary, "SDL_SetTextInputRect");
+        public static d_sdl_starttextinput StartTextInput = FuncLoader.LoadFunction<d_sdl_starttextinput>(NativeLibrary, "SDL_StartTextInput");
+        public static d_sdl_stoptextinput StopTextInput = FuncLoader.LoadFunction<d_sdl_stoptextinput>(NativeLibrary, "SDL_StopTextInput");
+        public static d_sdl_istextinputactive IsTextInputActive = FuncLoader.LoadFunction<d_sdl_istextinputactive>(NativeLibrary, "SDL_IsTextInputActive");
+        public static d_sdl_istextinputshown IsTextInputShown = FuncLoader.LoadFunction<d_sdl_istextinputshown>(NativeLibrary, "SDL_IsTextInputShown");
+        public static d_sdl_hasprimaryselectiontext HasPrimarySelectionText = FuncLoader.LoadFunction<d_sdl_hasprimaryselectiontext>(NativeLibrary, "SDL_HasPrimarySelectionText");
+        private static d_sdl_getprimaryselectiontext _SDL_GetPrimarySelectionText = FuncLoader.LoadFunction<d_sdl_getprimaryselectiontext>(NativeLibrary, "SDL_GetPrimarySelectionText");
+        private static d_sdl_setprimaryselectiontext _SDL_SetPrimarySelectionText = FuncLoader.LoadFunction<d_sdl_setprimaryselectiontext>(NativeLibrary, "SDL_SetPrimarySelectionText");
+        public static d_sdl_hasclipboardtext HasClipboardText = FuncLoader.LoadFunction<d_sdl_hasclipboardtext>(NativeLibrary, "SDL_HasClipboardText");
+        private static d_sdl_getclipboardtext _SDL_GetClipboardText = FuncLoader.LoadFunction<d_sdl_getclipboardtext>(NativeLibrary, "SDL_GetClipboardText");
+        private static d_sdl_setclipboardtext _SDL_SetClipboardText = FuncLoader.LoadFunction<d_sdl_setclipboardtext>(NativeLibrary, "SDL_SetClipboardText");
+
+        public static string GetPrimarySelectionText()
+        {
+            nint ptr = _SDL_GetPrimarySelectionText();
+            string result = InteropHelpers.Utf8ToString(ptr);
+            SDL_Free(ptr);
+            return result;
+        }
+
+        public static int SetPrimarySelectionText(string text)
+        {
+            byte[] bytes = Encoding.UTF8.GetBytes(text + "\0");
+            return _SDL_SetPrimarySelectionText(ref bytes[0]);
+        }
+
+        public static string GetClipboardText()
+        {
+            nint ptr = _SDL_GetClipboardText();
+            string result = InteropHelpers.Utf8ToString(ptr);
+            SDL_Free(ptr);
+            return result;
+        }
+
+        public static int SetClipboardText(string text)
+        {
+            byte[] bytes = Encoding.UTF8.GetBytes(text + "\0");
+            return _SDL_SetClipboardText(ref bytes[0]);
+        }
     }
 }

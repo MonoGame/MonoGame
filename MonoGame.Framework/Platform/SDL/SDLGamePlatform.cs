@@ -11,6 +11,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using MonoGame.Framework.Utilities;
 using System.Text;
+using System.Reflection;
 
 namespace Microsoft.Xna.Framework
 {
@@ -150,8 +151,6 @@ namespace Microsoft.Xna.Framework
                             _keys.Add(key);
                         char character = (char)ev.Key.Keysym.Sym;
                         _view.OnKeyDown(new InputKeyEventArgs(key));
-                        if (char.IsControl(character))
-                            _view.OnTextInput(new TextInputEventArgs(character, key));
                         break;
                     }
                     case Sdl.EventType.KeyUp:
@@ -161,57 +160,77 @@ namespace Microsoft.Xna.Framework
                         _view.OnKeyUp(new InputKeyEventArgs(key));
                         break;
                     }
+                    case Sdl.EventType.TextEditing:
                     case Sdl.EventType.TextInput:
-                        if (_view.IsTextInputHandled)
+                        switch (ev.Type)
                         {
-                            int len = 0;
-                            int utf8character = 0; // using an int to encode multibyte characters longer than 2 bytes
-                            byte currentByte = 0;
-                            int charByteSize = 0; // UTF8 char length to decode
-                            int remainingShift = 0;
-                            unsafe
+                            case Sdl.EventType.TextEditing:
+                                if (_view.IsTextEditingHandled) break;
+                                continue;
+                            case Sdl.EventType.TextInput:
+                                if (_view.IsTextInputHandled) break;
+                                continue;
+                        }
+                        int len = 0;
+                        int utf8character = 0; // using an int to encode multibyte characters longer than 2 bytes
+                        byte currentByte = 0;
+                        int charByteSize = 0; // UTF8 char length to decode
+                        int remainingShift = 0;
+                        unsafe
+                        {
+                            string textEventCache = string.Empty;
+                            while ((currentByte = Marshal.ReadByte((IntPtr)ev.Text.Text, len)) != 0)
                             {
-                                while ((currentByte = Marshal.ReadByte((IntPtr)ev.Text.Text, len)) != 0)
+                                // we're reading the first UTF8 byte, we need to check if it's multibyte
+                                if (charByteSize == 0)
                                 {
-                                    // we're reading the first UTF8 byte, we need to check if it's multibyte
-                                    if (charByteSize == 0)
+                                    if (currentByte < 192)
+                                        charByteSize = 1;
+                                    else if (currentByte < 224)
+                                        charByteSize = 2;
+                                    else if (currentByte < 240)
+                                        charByteSize = 3;
+                                    else
+                                        charByteSize = 4;
+
+                                    utf8character = 0;
+                                    remainingShift = 4;
+                                }
+
+                                // assembling the character
+                                utf8character <<= 8;
+                                utf8character |= currentByte;
+
+                                charByteSize--;
+                                remainingShift--;
+
+                                if (charByteSize == 0) // finished decoding the current character
+                                {
+                                    utf8character <<= remainingShift * 8; // shifting it to full UTF8 scope
+
+                                    // SDL returns UTF8-encoded characters while C# char type is UTF16-encoded (and limited to the 0-FFFF range / does not support surrogate pairs)
+                                    // so we need to convert it to Unicode codepoint and check if it's within the supported range
+                                    int codePoint = UTF8ToUnicode(utf8character);
+
+                                    if (codePoint >= 0)
                                     {
-                                        if (currentByte < 192)
-                                            charByteSize = 1;
-                                        else if (currentByte < 224)
-                                            charByteSize = 2;
-                                        else if (currentByte < 240)
-                                            charByteSize = 3;
-                                        else
-                                            charByteSize = 4;
-
-                                        utf8character = 0;
-                                        remainingShift = 4;
+                                        textEventCache += char.ConvertFromUtf32(codePoint);
+                                        // UTF16 characters beyond 0xFFFF are not supported (and would require a surrogate encoding that is not supported by the char type)
                                     }
+                                }
 
-                                    // assembling the character
-                                    utf8character <<= 8;
-                                    utf8character |= currentByte;
-
-                                    charByteSize--;
-                                    remainingShift--;
-
-                                    if (charByteSize == 0) // finished decoding the current character
-                                    {
-                                        utf8character <<= remainingShift * 8; // shifting it to full UTF8 scope
-
-                                        // SDL returns UTF8-encoded characters while C# char type is UTF16-encoded (and limited to the 0-FFFF range / does not support surrogate pairs)
-                                        // so we need to convert it to Unicode codepoint and check if it's within the supported range
-                                        int codepoint = UTF8ToUnicode(utf8character);
-
-                                        if (codepoint >= 0 && codepoint < 0xFFFF)
-                                        {
-                                            _view.OnTextInput(new TextInputEventArgs((char)codepoint, KeyboardUtil.ToXna(codepoint)));
-                                            // UTF16 characters beyond 0xFFFF are not supported (and would require a surrogate encoding that is not supported by the char type)
-                                        }
-                                    }
-
-                                    len++;
+                                len++;
+                            }
+                            if (textEventCache.Length > 0)
+                            {
+                                switch (ev.Type)
+                                {
+                                    case Sdl.EventType.TextEditing:
+                                        _view.OnTextEditing(new TextInputEventArgs(textEventCache));
+                                        break;
+                                    case Sdl.EventType.TextInput:
+                                        _view.OnTextInput(new TextInputEventArgs(textEventCache));
+                                        break;
                                 }
                             }
                         }

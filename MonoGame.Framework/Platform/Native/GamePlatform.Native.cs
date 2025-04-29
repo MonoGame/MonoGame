@@ -85,6 +85,7 @@ class NativeGamePlatform : GamePlatform
     {
         while (MGP.Platform_PollEvent(Handle, out MGP_Event event_))
         {
+            textFinished:;
             switch (event_.Type)
             {
                 case EventType.Quit:
@@ -100,151 +101,170 @@ class NativeGamePlatform : GamePlatform
                     break;
 
                 case EventType.WindowResized:
-                { 
-                    var window = NativeGameWindow.FromHandle(event_.Window.Window);
-                    if (window != null)
-                        window.ClientResize(event_.Window.Data1, event_.Window.Data2);
-                    break;
-                }
+                    {
+                        var window = NativeGameWindow.FromHandle(event_.Window.Window);
+                        if (window != null)
+                            window.ClientResize(event_.Window.Data1, event_.Window.Data2);
+                        break;
+                    }
 
                 case EventType.WindowClose:
-                { 
-                    var window = NativeGameWindow.FromHandle(event_.Window.Window);
-                    if (Window == window)
-                        _isExiting++;
-                    break;
-                }
+                    {
+                        var window = NativeGameWindow.FromHandle(event_.Window.Window);
+                        if (Window == window)
+                            _isExiting++;
+                        break;
+                    }
 
                 case EventType.KeyDown:
-                {
-                    var window = NativeGameWindow.FromHandle(event_.Key.Window);
-                    var key = event_.Key.Key;
-                    var character = (char)event_.Key.Character;
+                    {
+                        var window = NativeGameWindow.FromHandle(event_.Key.Window);
+                        var key = event_.Key.Key;
+                        var character = event_.Key.CodePoint;
 
-                    if (!Keyboard.Keys.Contains(key))
-                        Keyboard.Keys.Add(key);
+                        if (!Keyboard.Keys.Contains(key))
+                            Keyboard.Keys.Add(key);
 
-                    if (window != null)
-                    { 
-                        window.OnKeyDown(new InputKeyEventArgs(key));
+                        if (window != null)
+                        {
+                            window.OnKeyDown(new InputKeyEventArgs(key));
+                        }
 
-                        if (window.IsTextInputHandled && char.IsControl(character))
-                            window.OnTextInput(new TextInputEventArgs(character, key));
+                        break;
                     }
-
-                    break;
-                }
 
                 case EventType.KeyUp:
-                {
-                    var window = NativeGameWindow.FromHandle(event_.Key.Window);
-                    var key = event_.Key.Key;
+                    {
+                        var window = NativeGameWindow.FromHandle(event_.Key.Window);
+                        var key = event_.Key.Key;
 
-                    Keyboard.Keys.Remove(key);
+                        Keyboard.Keys.Remove(key);
 
-                    if (window != null)
-                        window.OnKeyUp(new InputKeyEventArgs(key));
+                        if (window != null)
+                            window.OnKeyUp(new InputKeyEventArgs(key));
 
-                    break;
-                }
+                        break;
+                    }
 
                 case EventType.TextInput:
-                {
-                    var window = NativeGameWindow.FromHandle(event_.Key.Window);
-                    if (window != null && window.IsTextInputHandled)
                     {
-                        var key = event_.Key.Key;
-                        var character = (char)event_.Key.Character;
-                        window.OnTextInput(new TextInputEventArgs(character, key));
+                        var window = NativeGameWindow.FromHandle(event_.Key.Window);
+                        if (window != null && window.IsTextInputHandled)
+                        {
+                            string textEventCache = char.ConvertFromUtf32((int)event_.Text.CharacterCodePoint);
+                            while (MGP.Platform_PollEvent(Handle, out event_) && event_.Type == EventType.TextInput && event_.Text.CharacterCodePoint != 0)
+                            {
+                                textEventCache += char.ConvertFromUtf32((int)event_.Text.CharacterCodePoint);
+                            }
+                            window.OnTextInput(new TextInputEventArgs(textEventCache));
+                            if (event_.Type != EventType.TextInput)
+                                goto textFinished;
+                        }
+                        break;
                     }
-                    break;
-                }
+
+                case EventType.TextEditing:
+                    {
+                        var window = NativeGameWindow.FromHandle(event_.Key.Window);
+                        if (window != null && window.IsTextEditingHandled)
+                        {
+                            string textEventCache = char.ConvertFromUtf32((int)event_.Text.CharacterCodePoint);
+                            while (MGP.Platform_PollEvent(Handle, out event_) && event_.Type == EventType.TextEditing && event_.Text.CharacterCodePoint != 0)
+                            {
+                                textEventCache += char.ConvertFromUtf32((int)event_.Text.CharacterCodePoint);
+                            }
+                            window.OnTextEditing(new TextInputEventArgs(textEventCache));
+                            if (event_.Type != EventType.TextEditing)
+                                goto textFinished;
+                        }
+                        break;
+                    }
 
                 case EventType.MouseMove:
-                {
-                    var window = NativeGameWindow.FromHandle(event_.MouseMove.Window);
-                    if (window != null)
                     {
-                        window.MouseState.X = event_.MouseMove.X;
-                        window.MouseState.Y = event_.MouseMove.Y;
+                        var window = NativeGameWindow.FromHandle(event_.MouseMove.Window);
+                        if (window != null)
+                        {
+                            window.MouseState.X = event_.MouseMove.X;
+                            window.MouseState.Y = event_.MouseMove.Y;
+                        }
+                        break;
                     }
-                    break;
-                }
 
                 case EventType.MouseWheel:
-                {
-                    var window = NativeGameWindow.FromHandle(event_.MouseWheel.Window);
-                    if (window != null)
                     {
-                        window.MouseState.ScrollWheelValue = event_.MouseWheel.Scroll;
-                        window.MouseState.HorizontalScrollWheelValue = event_.MouseWheel.ScrollH;
+                        var window = NativeGameWindow.FromHandle(event_.MouseWheel.Window);
+                        if (window != null)
+                        {
+                            window.MouseState.ScrollWheelValue = event_.MouseWheel.Scroll;
+                            window.MouseState.HorizontalScrollWheelValue = event_.MouseWheel.ScrollH;
+                        }
+                        break;
                     }
-                    break;
-                }
 
                 case EventType.MouseButtonUp:
                 case EventType.MouseButtonDown:
-                {
-                    var window = NativeGameWindow.FromHandle(event_.MouseButton.Window);
-                    if (window != null)
                     {
-                        var state = event_.Type == EventType.MouseButtonDown ? ButtonState.Pressed : ButtonState.Released;
-
-                        switch (event_.MouseButton.Button)
+                        var window = NativeGameWindow.FromHandle(event_.MouseButton.Window);
+                        if (window != null)
                         {
-                            case MouseButton.Left:
-                                window.MouseState.LeftButton = state;
-                                break;
-                            case MouseButton.Right:
-                                window.MouseState.RightButton = state;
-                                break;
-                            case MouseButton.Middle:
-                                window.MouseState.MiddleButton = state;
-                                break;
-                            case MouseButton.X1:
-                                window.MouseState.XButton1 = state;
-                                break;
-                            case MouseButton.X2:
-                                window.MouseState.XButton2 = state;
-                                break;
-                         }
+                            var state = event_.Type == EventType.MouseButtonDown ? ButtonState.Pressed : ButtonState.Released;
+
+                            switch (event_.MouseButton.Button)
+                            {
+                                case MouseButton.Left:
+                                    window.MouseState.LeftButton = state;
+                                    break;
+                                case MouseButton.Right:
+                                    window.MouseState.RightButton = state;
+                                    break;
+                                case MouseButton.Middle:
+                                    window.MouseState.MiddleButton = state;
+                                    break;
+                                case MouseButton.X1:
+                                    window.MouseState.XButton1 = state;
+                                    break;
+                                case MouseButton.X2:
+                                    window.MouseState.XButton2 = state;
+                                    break;
+                            }
+                        }
+                        break;
                     }
-                    break;
-                }
 
                 case EventType.ControllerAdded:
-                {
-                    GamePad.Add(event_.Controller.Id);
-                    break;
-                }
+                    {
+                        GamePad.Add(event_.Controller.Id);
+                        break;
+                    }
 
                 case EventType.ControllerRemoved:
-                {
-                    GamePad.Remove(event_.Controller.Id);
-                    break;
-                }
+                    {
+                        GamePad.Remove(event_.Controller.Id);
+                        break;
+                    }
 
                 case EventType.ControllerStateChange:
-                {
-                    GamePad.ChangeState(event_.Controller.Id, event_.Timestamp, event_.Controller.Input, event_.Controller.Value);
-                    break;
-                }
+                    {
+                        GamePad.ChangeState(event_.Controller.Id, event_.Timestamp, event_.Controller.Input, event_.Controller.Value);
+                        break;
+                    }
 
                 case EventType.DropFile:
-                {
-                    var file = Marshal.PtrToStringUTF8(event_.Drop.File);
-                    _dropList.Add(file);
-                    break;
-                }
+                    {
+                        var file = Marshal.PtrToStringUTF8(event_.Drop.File);
+                        _dropList.Add(file);
+                        break;
+                    }
 
                 case EventType.DropComplete:
-                {
-                    var window = NativeGameWindow.FromHandle(event_.Drop.Window);
-                    if (window != null )
-                        window.OnFileDrop(new FileDropEventArgs(_dropList.ToArray()));
-                    _dropList.Clear();
-                    break;
-                }
+                    {
+                        var window = NativeGameWindow.FromHandle(event_.Drop.Window);
+                        if (window != null)
+                            window.OnFileDrop(new FileDropEventArgs(_dropList.ToArray()));
+                        _dropList.Clear();
+                        break;
+                    }
             }
         }
     }
