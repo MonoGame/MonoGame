@@ -27,7 +27,7 @@ namespace Microsoft.Xna.Framework
 	    /// </summary>
 		public abstract Rectangle ClientBounds { get; }
 
-	    internal bool _allowAltF4 = true;
+		internal bool _allowAltF4 = true;
 
         /// <summary>
         /// Gets or sets a bool that enables usage of Alt+F4 for window closing on desktop platforms. Value is true by default.
@@ -136,16 +136,35 @@ namespace Microsoft.Xna.Framework
 		/// </remarks>
 		public event EventHandler<TextInputEventArgs> TextInput;
 
-        internal bool IsTextInputHandled { get { return TextInput != null; } }
+        internal bool IsTextInputHandled { get { return TextInput != null && IsUsingTextInput; } }
+
+        /// <summary>
+		/// Use this event to user text editing(composition).
+		/// 
+		/// This event is not raised by noncharacter keys except control characters such as backspace, tab, carriage return and escape.
+		/// This event also supports key repeat.
+		/// </summary>
+		/// <remarks>
+		/// This event is only supported on desktop platforms.
+		/// </remarks>
+		public event EventHandler<TextInputEventArgs> TextEditing;
+
+        internal bool IsTextEditingHandled { get { return TextEditing != null && IsUsingTextInput; } }
 
         /// <summary>
         /// Buffered keyboard KeyDown event.
         /// </summary>
+		/// <remarks>
+		/// This event is only supported on desktop platforms.
+		/// </remarks>
 		public event EventHandler<InputKeyEventArgs> KeyDown;
 
         /// <summary>
         /// Buffered keyboard KeyUp event.
         /// </summary>
+		/// <remarks>
+		/// This event is only supported on desktop platforms.
+		/// </remarks>
         public event EventHandler<InputKeyEventArgs> KeyUp;
 
 #endif
@@ -204,7 +223,7 @@ namespace Microsoft.Xna.Framework
 		protected void OnDeactivated ()
 		{
 		}
-         
+
 	    /// <summary>
 	    /// Called when <see cref="CurrentOrientation"/> changed. Raises the <see cref="OnOrientationChanged"/> event.
 	    /// </summary>
@@ -230,22 +249,38 @@ namespace Microsoft.Xna.Framework
 
 #if WINDOWS || DESKTOPGL || ANGLE || NATIVE
 
-	    /// <summary>
-	    /// Called when the window receives text input. Raises the <see cref="TextInput"/> event.
-	    /// </summary>
-	    /// <param name="e">Parameters to the <see cref="TextInput"/> event.</param>
-		internal void OnTextInput(TextInputEventArgs e)
+        /// <summary>
+	    /// Set Text Input State. If this is true, OnTextInput and OnTextEditing will available, IME will open.
+        /// </summary>
+		public abstract bool IsUsingTextInput {get; set; }
+        /// <summary>
+	    /// Get or set position Of IME(Input Method Editor).
+        /// </summary>
+		public abstract Rectangle IMEPosition { get; set; }
+        /// <summary>
+	    /// Get or set clipboard Text.
+        /// </summary>
+		public abstract string ClipboardText { get; set; }
+        /// <summary>
+        /// Called when the window receives text input. Raises the <see cref="TextInput"/> event.
+        /// </summary>
+        /// <param name="e">Parameters to the <see cref="TextInput"/> event.</param>
+        internal void OnTextInput(TextInputEventArgs e)
 		{
             EventHelpers.Raise(this, TextInput, e);
 		}
+		internal void OnTextEditing(TextInputEventArgs e)
+		{
+            EventHelpers.Raise(this, TextEditing, e);
+		}
         internal void OnKeyDown(InputKeyEventArgs e)
-	    {
+		{
             EventHelpers.Raise(this, KeyDown, e);
-	    }
+		}
         internal void OnKeyUp(InputKeyEventArgs e)
-	    {
+		{
             EventHelpers.Raise(this, KeyUp, e);
-	    }
+		}
 #endif
 
         internal void OnFileDrop(FileDropEventArgs e)

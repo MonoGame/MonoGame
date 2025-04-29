@@ -180,6 +180,8 @@ struct MGP_Window
 	std::string identifier;
 
     SDL_Window* window = nullptr;
+
+    SDL_Rect textInputRect;
 };
 
 struct MGP_Cursor
@@ -381,6 +383,71 @@ static MGControllerInput FromSDLAxis(Uint8 axis)
     }
 }
 
+mgbool Internal_HandelTextEvent(MGP_Platform* platform, SDL_Event& event_SDL, MGP_Event& event_MGP)
+{
+    int len = 0;
+    int utf8character = 0; // using an int to encode multibyte characters longer than 2 bytes
+    mgbyte currentByte = 0;
+    int charByteSize = 0; // UTF8 char length to decode
+    int remainingShift = 0;
+    while ((currentByte = event_SDL.text.text[len]) != 0)
+    {
+        // we're reading the first UTF8 byte, we need to check if it's multibyte
+        if (charByteSize == 0)
+        {
+            if (currentByte < 192)
+                charByteSize = 1;
+            else if (currentByte < 224)
+                charByteSize = 2;
+            else if (currentByte < 240)
+                charByteSize = 3;
+            else
+                charByteSize = 4;
+
+            utf8character = 0;
+            remainingShift = 4;
+        }
+
+        // assembling the character
+        utf8character <<= 8;
+        utf8character |= currentByte;
+
+        charByteSize--;
+        remainingShift--;
+
+        if (charByteSize == 0) // finished decoding the current character
+        {
+            utf8character <<= remainingShift * 8; // shifting it to full UTF8 scope
+
+            // SDL returns UTF8-encoded characters while C# char type is UTF16-encoded (and limited to the 0-FFFF range / does not support surrogate pairs)
+            // so we need to convert it to Unicode codepoint and check if it's within the supported range
+            int codePoint = UTF8ToUnicode(utf8character);
+            if (codePoint >= 0)
+            {
+                event_MGP.Text.CharacterCodePoint = codePoint;
+                platform->queued_events.push(event_MGP);
+                // UTF16 characters beyond 0xFFFF are not supported (and would require a surrogate encoding that is not supported by the char type)
+            }
+        }
+
+        len++;
+    }
+
+    if (len > 0)
+    {
+        event_MGP.Text.CharacterCodePoint = 0;
+        platform->queued_events.push(event_MGP);
+    }
+
+    if (platform->queued_events.size() > 0)
+    {
+        event_MGP = platform->queued_events.front();
+        platform->queued_events.pop();
+        return true;
+    }
+    return false;
+}
+
 mgbool MGP_Platform_PollEvent(MGP_Platform* platform, MGP_Event& event_)
 {
 	assert(platform != nullptr);
@@ -504,7 +571,7 @@ mgbool MGP_Platform_PollEvent(MGP_Platform* platform, MGP_Event& event_)
             event_.Type = MGEventType::KeyDown;
 
             event_.Key.Window = MGP_WindowFromId(platform, ev.key.windowID);
-            event_.Key.Character = ev.key.keysym.sym;
+            event_.Key.CodePoint = ev.key.keysym.sym;
             event_.Key.Key = ToXNA(ev.key.keysym.sym);
 
             return true;
@@ -514,79 +581,26 @@ mgbool MGP_Platform_PollEvent(MGP_Platform* platform, MGP_Event& event_)
             event_.Type = MGEventType::KeyUp;
 
             event_.Key.Window = MGP_WindowFromId(platform, ev.key.windowID);
-            event_.Key.Character = ev.key.keysym.sym;
+            event_.Key.CodePoint = ev.key.keysym.sym;
             event_.Key.Key = ToXNA(ev.key.keysym.sym);
 
             return true;
         }
 
-        case SDL_TEXTINPUT:
+        case SDL_EventType::SDL_TEXTEDITING:
+        {
+            event_.Type = MGEventType::TextEditing;
+            event_.Text.Window = MGP_WindowFromId(platform, ev.text.windowID);
+            return Internal_HandelTextEvent(platform, ev, event_);
+        }
+        case SDL_EventType::SDL_TEXTINPUT:
         {
             event_.Type = MGEventType::TextInput;
-            event_.Key.Window = MGP_WindowFromId(platform, ev.text.windowID);
-
-            int len = 0;
-            int utf8character = 0; // using an int to encode multibyte characters longer than 2 bytes
-            mgbyte currentByte = 0;
-            int charByteSize = 0; // UTF8 char length to decode
-            int remainingShift = 0;
-            while ((currentByte = ev.text.text[len]) != 0)
-            {
-                // we're reading the first UTF8 byte, we need to check if it's multibyte
-                if (charByteSize == 0)
-                {
-                    if (currentByte < 192)
-                        charByteSize = 1;
-                    else if (currentByte < 224)
-                        charByteSize = 2;
-                    else if (currentByte < 240)
-                        charByteSize = 3;
-                    else
-                        charByteSize = 4;
-
-                    utf8character = 0;
-                    remainingShift = 4;
-                }
-
-                // assembling the character
-                utf8character <<= 8;
-                utf8character |= currentByte;
-
-                charByteSize--;
-                remainingShift--;
-
-                if (charByteSize == 0) // finished decoding the current character
-                {
-                    utf8character <<= remainingShift * 8; // shifting it to full UTF8 scope
-
-                    // SDL returns UTF8-encoded characters while C# char type is UTF16-encoded (and limited to the 0-FFFF range / does not support surrogate pairs)
-                    // so we need to convert it to Unicode codepoint and check if it's within the supported range
-                    int codepoint = UTF8ToUnicode(utf8character);
-                    if (codepoint >= 0 && codepoint < 0xFFFF)
-                    {
-                        event_.Key.Character = codepoint;
-                        event_.Key.Key = ToXNA(codepoint);
-
-                        platform->queued_events.push(event_);
-
-                        // UTF16 characters beyond 0xFFFF are not supported (and would require a surrogate encoding that is not supported by the char type)
-                    }
-                }
-
-                len++;
-            }
-
-            if (platform->queued_events.size() > 0)
-            {
-                event_ = platform->queued_events.front();
-                platform->queued_events.pop();
-                return true;
-            }
-
-            break;
+            event_.Text.Window = MGP_WindowFromId(platform, ev.text.windowID);
+            return Internal_HandelTextEvent(platform, ev, event_);
         }
 
-        case SDL_WINDOWEVENT:
+        case SDL_EventType::SDL_WINDOWEVENT:
         {
             event_.Window.Window = MGP_WindowFromId(platform, ev.window.windowID);
 
@@ -618,7 +632,7 @@ mgbool MGP_Platform_PollEvent(MGP_Platform* platform, MGP_Event& event_)
             break;
         }
 
-        case SDL_DROPFILE:
+        case SDL_EventType::SDL_DROPFILE:
         {
             event_.Type = MGEventType::DropFile;
             event_.Drop.Window = MGP_WindowFromId(platform, ev.drop.windowID);
@@ -631,14 +645,13 @@ mgbool MGP_Platform_PollEvent(MGP_Platform* platform, MGP_Event& event_)
             return true;
         }
 
-        case SDL_DROPCOMPLETE:
+        case SDL_EventType::SDL_DROPCOMPLETE:
             event_.Type = MGEventType::DropComplete;
             event_.Drop.Window = MGP_WindowFromId(platform, ev.drop.windowID);
             event_.Drop.File = nullptr;
             return true;
         }
     }
-
     return false;
 }
 
@@ -855,6 +868,71 @@ mgint MGP_Window_ShowMessageBox(MGP_Window* window, const char* title, const cha
         return hit;
 
     return -1;
+}
+
+mgbool MGP_Window_GetIsUsingTextInput(MGP_Window* window)
+{
+    return window->window == SDL_GetKeyboardFocus() && SDL_IsTextInputActive();
+}
+
+void MGP_Window_SetIsUsingTextInput(MGP_Window* window, mgbool state)
+{
+    SDL_SetWindowInputFocus(window->window);
+    if (MGP_Window_GetIsUsingTextInput(window) != state)
+    {
+        if (state)
+        {
+            SDL_StartTextInput();
+            SDL_SetTextInputRect(&window->textInputRect);
+        }
+        else
+        {
+            SDL_StopTextInput();
+        }
+    }
+}
+
+void MGP_Window_GetIMEPosition(MGP_Window* window, mgint& x, mgint& y, mgint& width, mgint& height)
+{
+    x = window->textInputRect.x;
+    y = window->textInputRect.y;
+    width = window->textInputRect.w;
+    height = window->textInputRect.h;
+}
+
+void MGP_Window_SetIMEPosition(MGP_Window* window, mgint x, mgint y, mgint width, mgint height)
+{
+    window->textInputRect = { x, y, width, height };
+    if (window->window == SDL_GetKeyboardFocus())
+    {
+        SDL_SetTextInputRect(&window->textInputRect);
+    }
+}
+
+mgint MGP_Window_GetClipboardText(MGP_Window* window, char* textBuf, mgint bufLength)
+{
+    mgint result = 0;
+    char* sdlReturned = SDL_GetClipboardText();
+    if (textBuf == nullptr) bufLength = 0x7FFFFFFF;
+    for (result = 0; result < bufLength; result++)
+    {
+        if (textBuf != nullptr)
+        {
+            textBuf[result] = sdlReturned[result];
+        }
+
+        if (sdlReturned[result] == 0)
+        {
+            break;
+        }
+    }
+    SDL_free(sdlReturned);
+    return result;
+}
+
+void MGP_Window_SetClipboardText(MGP_Window* window, const char* textBuf)
+{
+    SDL_SetClipboardText(textBuf);
 }
 
 void MGP_Mouse_SetVisible(MGP_Platform* platform, mgbool visible)
