@@ -340,6 +340,7 @@ internal static unsafe partial class MGP
     public static partial void Window_ExitFullScreen(MGP_Window* window);
 
     [LibraryImport(MonoGameNativeDLL, EntryPoint = "MGP_Window_GetIsUsingTextInput", StringMarshalling = StringMarshalling.Utf8)]
+    [return: MarshalAs(UnmanagedType.U1)]
     public static partial bool Window_GetIsUsingTextInput(MGP_Window* window);
 
     [LibraryImport(MonoGameNativeDLL, EntryPoint = "MGP_Window_SetIsUsingTextInput", StringMarshalling = StringMarshalling.Utf8)]
