@@ -78,11 +78,11 @@ jobs:
           platform: ${{ matrix.platform }}
           shell: ${{ matrix.shell }}
 
-      - uses: ./.github/actions/build
-        name: Build
-        with:
-          platform: ${{ matrix.platform }}
-          shell: ${{ matrix.shell }}
+      # - uses: ./.github/actions/build
+      #   name: Build
+      #   with:
+      #     platform: ${{ matrix.platform }}
+      #     shell: ${{ matrix.shell }}
 
       - uses: ./.github/actions/tests
         name: Tests

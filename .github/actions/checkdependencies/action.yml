@@ -58,12 +58,18 @@ runs:
         brew install cmake
         brew install wine-stable p7zip
         ls -n /Applications/ | grep Xcode*
+      shell: ${{ inputs.shell }}
+
+    - name: If Hosted, setup environment
+      if: ${{ inputs.platform == 'macos' && runner.environment != 'github-hosted' }}
+      run: |
+        echo 'Setup Mac Environment'
+        sudo mkdir -p /usr/local/lib
         sudo xcode-select -s /Applications/Xcode_16.2.app/Contents/Developer
-        wget -qO- https://monogame.net/downloads/net9_mgfxc_wine_setup.sh | bash
       shell: ${{ inputs.shell }}
 
     - name: Install Linux Dependencies
-      if: ${{ inputs.platform == 'linux' }}
+      if: ${{ inputs.platform == 'linux'}}
       run: |
         echo 'Installing additional Linux Dependencies'
         dotnet workload install android
@@ -78,6 +84,12 @@ runs:
         sudo fc-cache
         fc-match Arial
         wine64 --version
+      shell: ${{ inputs.shell }}
+
+    - name: Run MonoGame Setup script on Linux or MacOS
+      if: ${{ inputs.platform == 'linux' || inputs.platform == 'macos' }}
+      run: |
+        echo 'Installing additional Linux Dependencies'
         wget -qO- https://monogame.net/downloads/net9_mgfxc_wine_setup.sh | bash
       shell: ${{ inputs.shell }}
 
