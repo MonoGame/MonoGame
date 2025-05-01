@@ -95,7 +95,7 @@ runs:
       shell: ${{ inputs.shell }}
 
     - name: Run MonoGame Setup script on Linux or MacOS
-      if: ${{ inputs.platform == 'linux' || inputs.platform == 'macos' }}
+      if: ${{ (inputs.platform == 'linux' || inputs.platform == 'macos') && runner.environment == 'github-hosted' }}
       run: |
         echo`--------------------------------------------------------------------------------`
         echo 'Installing additional Linux Dependencies'
