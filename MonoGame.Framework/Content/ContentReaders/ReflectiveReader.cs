@@ -11,7 +11,13 @@ using MonoGame.Framework.Utilities;
 
 namespace Microsoft.Xna.Framework.Content
 {
-    internal class ReflectiveReader<T> : ContentTypeReader
+    /// <summary>
+    /// This type is not meant to be used directly by MonoGame users.
+    /// Its purpose is to allow to work-around AOT issues when loading assets with the ContentManager fail due to the absence of runtime-reflection support in that context (i.e. missing types due to trimming and inability to statically discover them at compile-time).
+    /// If ContentManager.Load() throws an NotSupportedExeception, the message should provide insights on how to fix it.
+    /// </summary>
+    [System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.All)]
+    public class ReflectiveReader<T> : ContentTypeReader
     {
         delegate void ReadElement(ContentReader input, object parent);
 
@@ -21,17 +27,19 @@ namespace Microsoft.Xna.Framework.Content
 
         private ContentTypeReader _baseTypeReader;
 
-
+        /// <summary/>
         public ReflectiveReader() 
             : base(typeof(T))
         {
         }
 
+        /// <summary/>
         public override bool CanDeserializeIntoExistingObject
         {
             get { return TargetType.IsClass(); }
         }
 
+        /// <summary/>
         protected internal override void Initialize(ContentTypeReaderManager manager)
         {
             base.Initialize(manager);
@@ -164,7 +172,8 @@ namespace Microsoft.Xna.Framework.Content
                 setter(parent, obj2);
             };
         }
-      
+
+        /// <summary/>
         protected internal override object Read(ContentReader input, object existingInstance)
         {
             T obj;

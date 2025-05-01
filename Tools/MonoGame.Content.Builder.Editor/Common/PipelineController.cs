@@ -25,11 +25,6 @@ namespace MonoGame.Tools.Pipeline
         private Task _buildTask;
         private Process _buildProcess;
 
-        private FileSystemWatcher _projectFileWatcher;
-        private bool _reloadProjectPrompted;
-        private bool _projectFileWatcherIgnoreEvent;
-        private DateTime _lastWriteTime;
-
         private readonly List<ContentItemTemplate> _templateItems;
 
         private static readonly string [] _mgcbSearchPaths = new []       
@@ -136,7 +131,6 @@ namespace MonoGame.Tools.Pipeline
                 LoadTemplates(templatesPath);
 #endif
 
-            RestoreMGCB();
             UpdateMenu();
 
             view.UpdateRecentList(PipelineSettings.Default.ProjectHistory);
@@ -145,26 +139,6 @@ namespace MonoGame.Tools.Pipeline
         public static PipelineController Create(IView view)
         {
             return new PipelineController(view);
-        }
-
-        public void SetupProjectFileWatcher(string projectFilePath)
-        {
-            // Setup a file watcher to watch for changes to the project file outside of the editor
-            var dirName = Path.GetDirectoryName(projectFilePath)!;
-            var fileName = Path.GetFileName(projectFilePath);
-            if (_projectFileWatcher == null)
-            {
-                _projectFileWatcher = new FileSystemWatcher(dirName);
-                _projectFileWatcher.Filter = fileName;
-                _projectFileWatcher.EnableRaisingEvents = true;
-                _projectFileWatcher.Changed += ProjectFileWatcherOnChanged;
-            }
-            else
-            {
-                _projectFileWatcher.Path = dirName;
-                _projectFileWatcher.Filter = fileName;
-            }
-            _projectFileWatcherIgnoreEvent = false;
         }
 
         public void OnProjectModified()
@@ -220,8 +194,6 @@ namespace MonoGame.Tools.Pipeline
             _project.OriginalPath = projectFilePath;
             ProjectOpen = true;
             ProjectDirty = true;
-
-            SetupProjectFileWatcher(projectFilePath);
 
             UpdateTree();
 
@@ -331,8 +303,6 @@ namespace MonoGame.Tools.Pipeline
                 return;
             }
 
-            SetupProjectFileWatcher(projectFilePath);
-
             UpdateTree();
             View.UpdateTreeItem(_project);
 
@@ -340,46 +310,6 @@ namespace MonoGame.Tools.Pipeline
                 OnProjectLoaded();
 
             UpdateMenu();
-        }
-
-        private void ProjectFileWatcherOnChanged(object sender, FileSystemEventArgs e)
-        {
-            var previousWriteTime = _lastWriteTime;
-            _lastWriteTime = File.GetLastWriteTime(e.FullPath);
-
-            if (_lastWriteTime - previousWriteTime < TimeSpan.FromSeconds(0.1))
-            {
-                // Probably a duplicated event. Ignore
-                return;
-            }
-
-            if (_projectFileWatcherIgnoreEvent)
-            {
-                // Expected trigger from saving the project file. Ignore
-                _projectFileWatcherIgnoreEvent = false;
-                return;
-            }
-
-            if (!_reloadProjectPrompted)
-            {
-                _reloadProjectPrompted = true;
-                View.Invoke(() => PromptReloadProject(e.FullPath));
-            }
-        }
-
-        private void PromptReloadProject(string fullPath)
-        {
-            if (MainWindow.Instance.ShowReloadProjectDialog() == AskResult.Yes)
-            {
-                ProjectDirty = false;
-                OpenProject(fullPath);
-            }
-            else
-            {
-                ProjectDirty = true;
-                UpdateMenu();
-            }
-            _reloadProjectPrompted = false;
         }
 
         public void ClearRecentList()
@@ -398,13 +328,6 @@ namespace MonoGame.Tools.Pipeline
             // save the project if they need too.
             if (!AskSaveProject())
                 return;
-
-            // Uninitialize the File Watcher
-            if (_projectFileWatcher != null)
-            {
-                _projectFileWatcher.Changed -= ProjectFileWatcherOnChanged;
-                _projectFileWatcher = null;
-            }
 
             ProjectOpen = false;
             ProjectDirty = false;
@@ -459,12 +382,7 @@ namespace MonoGame.Tools.Pipeline
 
                 _project.OriginalPath = newFilePath;
 				View.SetTreeRoot(_project);
-
-                SetupProjectFileWatcher(newFilePath); // New file needs a new file watcher
             }
-
-            // Make sure the file watcher doesn't trigger from our file save
-            _projectFileWatcherIgnoreEvent = true;
 
             // Do the save.
             ProjectDirty = false;
@@ -584,22 +502,6 @@ namespace MonoGame.Tools.Pipeline
             UpdateMenu();       
         }
 
-        private void RestoreMGCB()
-        {
-            var appDataPath = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
-            var version = Assembly.GetExecutingAssembly().GetName().Version.ToString();
-            var workingDirectory = Path.Combine(appDataPath, "mgcb-dotnet-tool", version);
-            if (Directory.Exists(workingDirectory))
-                return;
-            Directory.CreateDirectory(workingDirectory);
-            var dotnet = Global.Unix ? "dotnet" : "dotnet.exe";
-            if (Util.Run(dotnet, $"tool install dotnet-mgcb --version {version} --tool-path .", workingDirectory) != 0)
-            {
-                // install the latest
-                Util.Run(dotnet, $"tool install dotnet-mgcb --tool-path .", workingDirectory);
-            }
-        }
-
         private void DoBuild(string commands)
         {
             Encoding encoding;
@@ -610,11 +512,8 @@ namespace MonoGame.Tools.Pipeline
             } catch (ArgumentException) {
                 encoding = Encoding.UTF8;
             }
-            
-            
-            var appDataPath = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
-            var version = Assembly.GetExecutingAssembly().GetName().Version.ToString ();
-            var mgcbCommand = Path.Combine(appDataPath, "mgcb-dotnet-tool", version, "mgcb");
+
+            var mgcbCommand = "";
             var currentDir = Environment.CurrentDirectory;
             foreach (var path in _mgcbSearchPaths)
             {
@@ -626,17 +525,15 @@ namespace MonoGame.Tools.Pipeline
                     break;
                 }
             }
-            // allow the users to override the path with an environment variable
-            // the same as the MSBuild property in the .targets
-            var mgcbUserPath = Environment.GetEnvironmentVariable("MGCBCommand");
-            if (!string.IsNullOrEmpty(mgcbUserPath) && File.Exists(mgcbUserPath))
+            if (string.IsNullOrEmpty(mgcbCommand))
             {
-                mgcbCommand = mgcbUserPath;
+                mgcbCommand = Global.Unix ? "dotnet" : "dotnet.exe";
+                commands = "mgcb " + commands;
             }
 
             try
             {
-                _buildProcess = Util.CreateProcess(mgcbCommand, commands, Path.GetDirectoryName (_project.OriginalPath), encoding, (s) => View.OutputAppend (s));
+                _buildProcess = Util.CreateProcess(mgcbCommand, commands, Path.GetDirectoryName(_project.OriginalPath), encoding, s => View.OutputAppend(s));
                 // Fire off the process.
                 Console.WriteLine(_buildProcess.StartInfo.FileName + " " + _buildProcess.StartInfo.Arguments);
                 Environment.CurrentDirectory = _buildProcess.StartInfo.WorkingDirectory;
@@ -656,7 +553,8 @@ namespace MonoGame.Tools.Pipeline
                     View.OutputAppend(ex.ToString());
                 }
             }
-            finally {
+            finally
+            {
                 Environment.CurrentDirectory = currentDir;
             }
 

@@ -13,7 +13,12 @@
     <AssemblyName>mgcb-editor-windows</AssemblyName>
     <AssemblyTitle>MGCB Editor</AssemblyTitle>
     <RuntimeIdentifiers>win-x64</RuntimeIdentifiers>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
   </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="README.md" Pack="true" PackagePath="\"/>
+  </ItemGroup>
 
   <ItemGroup>
     <None Remove="Platform\**\*" />

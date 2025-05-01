@@ -5,11 +5,20 @@
 using System;
 using Microsoft.Xna.Framework;
 
-namespace Microsoft.Devices.Sensors
+namespace MonoGame.Framework.Devices.Sensors
 {
+    /// <summary>
+    /// Stores values from an accelerometer event
+    /// </summary>
 	public struct AccelerometerReading : ISensorReading
 	{
+        /// <summary>
+        /// Acceleration vector
+        /// </summary>
 		public Vector3 Acceleration { get; internal set; }
+        /// <summary>
+        /// Timestamp of the accelerometer reading
+        /// </summary>
 		public DateTimeOffset Timestamp { get; internal set; }
 	}
 }

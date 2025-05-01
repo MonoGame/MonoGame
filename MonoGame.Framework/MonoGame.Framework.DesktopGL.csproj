@@ -9,7 +9,13 @@
     <PackageId>MonoGame.Framework.DesktopGL</PackageId>
     <AppendTargetFrameworkToOutputPath>False</AppendTargetFrameworkToOutputPath>
     <CopyContentFiles>True</CopyContentFiles>
+    <IsAotCompatible>true</IsAotCompatible>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
   </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="..\README.md" Pack="true" PackagePath="\"/>
+  </ItemGroup>
 
   <!-- NETFX reference assemblies let us target .NET Framework on Mac/Linux without Mono -->
   <ItemGroup>
@@ -17,7 +23,7 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
-    <PackageReference Include="MonoGame.Library.SDL" Version="2.26.5.5" />
+    <PackageReference Include="MonoGame.Library.SDL" Version="2.32.2.1" />
     <PackageReference Include="MonoGame.Library.OpenAL" Version="1.23.1.10" />
     <PackageReference Include="NVorbis" Version="0.10.4" />
   </ItemGroup>
@@ -28,6 +34,7 @@
     <Compile Remove="Platform\**\*" />
     <Compile Remove="Properties\**\*" />
     <Compile Remove="Utilities\System.Numerics.Vectors\**\*" />
+    <Compile Remove="Devices\**\*" />
   </ItemGroup>
 
   <ItemGroup>
@@ -67,13 +74,15 @@
     <Compile Include="Platform\Input\KeysHelper.cs" />
     <Compile Include="Platform\Input\Mouse.SDL.cs" />
     <Compile Include="Platform\Input\MouseCursor.SDL.cs" />
-    <Compile Include="Platform\Input\MessageBox.Default.cs" />
+    <Compile Include="Platform\Input\MessageBox.SDL.cs" />
     <Compile Include="Platform\Graphics\GraphicsContext.SDL.cs" />
     <Compile Include="Platform\Graphics\OpenGL.SDL.cs" />
     <Compile Include="Platform\Graphics\WindowInfo.SDL.cs" />
     <Compile Include="Platform\Graphics\GraphicsAdapter.Legacy.cs" />
     <Compile Include="Platform\GamePlatform.Desktop.cs" />
     <Compile Include="Platform\GraphicsDeviceManager.SDL.cs" />
+    <Compile Include="Platform\Desktop\Devices\Sensors\Accelerometer.cs" />
+    <Compile Include="Platform\Desktop\Devices\Sensors\Compass.cs" />
 
     <Compile Include="..\ThirdParty\StbImageSharp\src\**\*.cs" LinkBase="Utilities\StbImageSharp" />
     <Compile Include="..\ThirdParty\StbImageWriteSharp\src\**\*.cs" LinkBase="Utilities\StbImageWriteSharp" />
@@ -83,9 +92,6 @@
     <EmbeddedResource Include="MonoGame.bmp">
       <LogicalName>MonoGame.bmp</LogicalName>
     </EmbeddedResource>
-    <EmbeddedResource Include="..\ThirdParty\SDL_GameControllerDB\gamecontrollerdb.txt">
-      <LogicalName>gamecontrollerdb.txt</LogicalName>
-    </EmbeddedResource>
   </ItemGroup>
 
   <ItemGroup Condition="'$(CopyContentFiles)' == 'True'">
@@ -94,4 +100,5 @@
 
   <Import Project="Platform\OpenGL.targets" />
   <Import Project="Platform\OpenAL.targets" />
+  <Import Project="MonoGame.Framework.Devices.Sensors.targets" />
 </Project>
