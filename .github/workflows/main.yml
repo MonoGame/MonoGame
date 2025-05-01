@@ -13,43 +13,43 @@ concurrency:
 
 jobs:
   # Runs preliminary build and validation on the self-hosted runners to ensure build cohoesion
-  build-and-validate:
-    strategy:
-      matrix:
-        include:
-          - os: windows-latest
-            platform: windows
-            shell: cmd
-          - os: macos-latest
-            platform: macos
-            shell: bash
-          - os: ubuntu-latest
-            platform: linux
-            shell: bash
-    runs-on: ${{ matrix.os }}
-    env:
-      CI: true    
-    steps:
-      - name: Clone repository
-        uses: actions/checkout@v4
-        with:
-          submodules: recursive      
+  # build-and-validate:
+  #   strategy:
+  #     matrix:
+  #       include:
+  #         - os: windows-latest
+  #           platform: windows
+  #           shell: cmd
+  #         - os: macos-latest
+  #           platform: macos
+  #           shell: bash
+  #         - os: ubuntu-latest
+  #           platform: linux
+  #           shell: bash
+  #   runs-on: ${{ matrix.os }}
+  #   env:
+  #     CI: true    
+  #   steps:
+  #     - name: Clone repository
+  #       uses: actions/checkout@v4
+  #       with:
+  #         submodules: recursive      
 
-      - uses: ./.github/actions/checkdependencies
-        name: Check Dependencies
-        with:
-          platform: ${{ matrix.platform }}
-          shell: ${{ matrix.shell }}
+  #     - uses: ./.github/actions/checkdependencies
+  #       name: Check Dependencies
+  #       with:
+  #         platform: ${{ matrix.platform }}
+  #         shell: ${{ matrix.shell }}
 
-      - uses: ./.github/actions/build
-        name: Build
-        with:
-          platform: ${{ matrix.platform }}
-          shell: ${{ matrix.shell }}
+  #     - uses: ./.github/actions/build
+  #       name: Build
+  #       with:
+  #         platform: ${{ matrix.platform }}
+  #         shell: ${{ matrix.shell }}
 
   test:
     # Deeper build and test cycle on self-hosted runners with deploy if successful
-    needs: [ build-and-validate ]
+    # needs: [ build-and-validate ]
     strategy:
       matrix:
         include:
