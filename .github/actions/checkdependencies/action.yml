@@ -46,14 +46,18 @@ runs:
     - name: Install Windows Dependencies
       if: ${{ inputs.platform == 'windows' }}
       run: |
+        echo`--------------------------------------------------------------------------------`
         echo 'Installing additional Windows Dependencies'
+        echo`--------------------------------------------------------------------------------`
         dotnet.exe workload install android
       shell: ${{ inputs.shell }}
 
     - name: Install Mac Dependencies
       if: ${{ inputs.platform == 'macos' }}
       run: |
+        echo`--------------------------------------------------------------------------------`
         echo 'Installing additional Mac Dependencies'
+        echo`--------------------------------------------------------------------------------`
         dotnet workload install android macos ios
         brew install cmake
         brew install wine-stable p7zip
@@ -61,9 +65,11 @@ runs:
       shell: ${{ inputs.shell }}
 
     - name: If Hosted, setup environment
-      if: ${{ inputs.platform == 'macos' && runner.environment != 'github-hosted' }}
+      if: ${{ inputs.platform == 'macos' && runner.environment == 'github-hosted' }}
       run: |
+        echo`--------------------------------------------------------------------------------`
         echo 'Setup Mac Environment'
+        echo`--------------------------------------------------------------------------------`
         sudo mkdir -p /usr/local/lib
         sudo xcode-select -s /Applications/Xcode_16.2.app/Contents/Developer
       shell: ${{ inputs.shell }}
@@ -71,7 +77,9 @@ runs:
     - name: Install Linux Dependencies
       if: ${{ inputs.platform == 'linux'}}
       run: |
+        echo`--------------------------------------------------------------------------------`
         echo 'Installing additional Linux Dependencies'
+        echo`--------------------------------------------------------------------------------`
         dotnet workload install android
         sudo apt install p7zip-full curl
         sudo dpkg --add-architecture i386 
@@ -89,7 +97,9 @@ runs:
     - name: Run MonoGame Setup script on Linux or MacOS
       if: ${{ inputs.platform == 'linux' || inputs.platform == 'macos' }}
       run: |
+        echo`--------------------------------------------------------------------------------`
         echo 'Installing additional Linux Dependencies'
+        echo`--------------------------------------------------------------------------------`
         wget -qO- https://monogame.net/downloads/net9_mgfxc_wine_setup.sh | bash
       shell: ${{ inputs.shell }}
 
@@ -97,6 +107,9 @@ runs:
 
     - name: Install Arial Font
       run: |
+        echo`--------------------------------------------------------------------------------`
+        echo 'Installing Arial Font'
+        echo`--------------------------------------------------------------------------------`
         echo "ttf-mscorefonts-installer msttcorefonts/accepted-mscorefonts-eula select true" | sudo debconf-set-selections
         sudo apt install -y ttf-mscorefonts-installer
         sudo fc-cache
