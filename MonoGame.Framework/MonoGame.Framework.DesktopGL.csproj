@@ -48,7 +48,7 @@
   <!-- Song support with Vorbis, depends on OpenAL -->
   <ItemGroup>
     <PackageReference Include="NVorbis" Version="0.10.4" />
-    <Compile Include="Platform\Media\OggStream.cs" />
+    <Compile Include="Platform\Media\OggStream.NVorbis.cs" />
     <Compile Include="Platform\Media\Song.NVorbis.cs" />
   </ItemGroup>
 
