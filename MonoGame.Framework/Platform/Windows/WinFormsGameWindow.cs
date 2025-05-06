@@ -240,7 +240,7 @@ namespace MonoGame.Framework
 
         private void OnFormClosing(object sender, FormClosingEventArgs e)
         {
-            e.Cancel = true;
+            // TODO WHY? e.Cancel = true;
             _platform.Game.Exit();
         }
 
