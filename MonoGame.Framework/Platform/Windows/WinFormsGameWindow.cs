@@ -194,12 +194,6 @@ namespace MonoGame.Framework
             Form.ResizeBegin += OnResizeBegin;
             Form.ResizeEnd += OnResizeEnd;
 
-            Form.KeyPress += OnKeyPress;
-            UpdateMouseKeys();
-
-            Form.SettingChanged += Form_SettingChanged;
-            Form.KeyPress += OnKeyPress;
-
             RegisterToAllWindows();
         }
 
@@ -353,7 +347,7 @@ namespace MonoGame.Framework
 
             if (touchState.HasValue)
                 TouchPanelState.AddEvent(0, touchState.Value, new Vector2(MouseState.X, MouseState.Y), true);
-        } 
+        }
 
         private void OnMouseEnter(object sender, EventArgs e)
         {

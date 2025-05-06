@@ -327,9 +327,6 @@ namespace Microsoft.Xna.Framework.Windows
                     HandleDropMessage(ref m);
                     break;
 
-                case WM_SETTINGCHANGE:
-                    HandleSettingChange();
-                    break;
                 case WM_SYSCOMMAND:
 
                     var wParam = m.WParam.ToInt32();
@@ -456,7 +453,6 @@ namespace Microsoft.Xna.Framework.Windows
                 ImmSetCompositionStringW(himc, SCS_SETSTR, "\0", 2, "\0", 2);
                 ImmNotifyIME(himc, NI_CLOSECANDIDATE, 0, 0);
                 ImmReleaseContext(Handle, himc);
-                EventHelpers.Raise(this, SettingChanged, EventArgs.Empty);
             }
         }
 
@@ -508,11 +504,6 @@ namespace Microsoft.Xna.Framework.Windows
                     ImmReleaseContext(Handle, himc);
                 }
             }
-        }
-
-        private void HandleSettingChange()
-        {
-            EventHelpers.Raise(this, SettingChanged, EventArgs.Empty);
         }
 
         void HandleKeyMessage(ref Message m)
