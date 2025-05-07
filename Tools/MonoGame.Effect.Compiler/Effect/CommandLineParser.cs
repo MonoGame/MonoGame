@@ -17,7 +17,7 @@ namespace MonoGame.Effect
     // Reusable, reflection based helper for parsing commandline options.
     //
     // From Shawn Hargreaves Blog:
-    // http://blogs.msdn.com/b/shawnhar/archive/2012/04/20/a-reusable-reflection-based-command-line-parser.aspx
+    // https://shawnhargreaves.com/blog/a-reusable-reflection-based-command-line-parser.html
     //
     public class CommandLineParser
     {
