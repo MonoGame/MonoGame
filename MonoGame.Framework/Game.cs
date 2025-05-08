@@ -613,9 +613,9 @@ namespace Microsoft.Xna.Framework
 
                 if (!exitingEventArgs.Cancel)
                 {
+                    UnloadContent();
                     Platform.Exit();
                     EndRun();
-                    UnloadContent();
                 }
 
                 _shouldExit = false;
