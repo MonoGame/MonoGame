@@ -1,9 +1,11 @@
 <Project>
-  <PropertyGroup>
+  <PropertyGroup Condition="$(DefineConstants.Contains('NO_AUDIO')) != 'true'">
     <DefineConstants>$(DefineConstants);OPENAL</DefineConstants>
   </PropertyGroup>
 
-  <ItemGroup>
+  <ItemGroup Condition="$(DefineConstants.Contains('NO_AUDIO')) != 'true'">
+    <PackageReference Include="MonoGame.Library.OpenAL" Version="1.23.1.10" />
+	
     <Compile Include="Platform\Audio\AudioLoader.cs" />
     <Compile Include="Platform\Audio\DynamicSoundEffectInstance.OpenAL.cs" />
     <Compile Include="Platform\Audio\Microphone.OpenAL.cs" />
@@ -12,5 +14,19 @@
     <Compile Include="Platform\Audio\OpenALSoundController.cs" />
     <Compile Include="Platform\Audio\SoundEffect.OpenAL.cs" />
     <Compile Include="Platform\Audio\SoundEffectInstance.OpenAL.cs" />
+	
+	<PackageReference Include="NVorbis" Version="0.10.4" />
+
+    <Compile Include="Platform\Media\OggStream.NVorbis.cs" />
+    <Compile Include="Platform\Media\Song.NVorbis.cs" />
+  </ItemGroup>
+  
+  <ItemGroup Condition="$(DefineConstants.Contains('NO_AUDIO'))">
+    <Compile Include="Platform\Audio\DynamicSoundEffectInstance.Default.cs" />
+    <Compile Include="Platform\Audio\Microphone.Default.cs" />
+    <Compile Include="Platform\Audio\SoundEffect.Default.cs" />
+    <Compile Include="Platform\Audio\SoundEffectInstance.Default.cs" />
+	
+    <Compile Include="Platform\Media\Song.Default.cs" />
   </ItemGroup>
 </Project>
