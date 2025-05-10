@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net8.0-ios</TargetFramework>
@@ -69,11 +69,7 @@
     <Compile Include="Platform\Input\MessageBox.iOS.cs" />
     <Compile Include="Platform\Input\Mouse.Default.cs" />
     <Compile Include="Platform\Input\MouseCursor.Default.cs" />
-    <Compile Include="Platform\Media\MediaLibrary.iOS.cs" />
     <Compile Include="Platform\Media\MediaPlayer.Default.cs" />
-    <Compile Include="Platform\Media\Song.iOS.cs" />
-    <Compile Include="Platform\Media\Video.iOS.cs" />
-    <Compile Include="Platform\Media\VideoPlayer.iOS.cs" />
     <Compile Include="Platform\TitleContainer.MacOS.cs" />
     <Compile Include="Platform\Utilities\FuncLoader.iOS.cs" />
     <Compile Include="Platform\Utilities\InteropHelpers.cs" />
