@@ -88,12 +88,16 @@
   <!-- Use MGCBToolAdditionalArguments to provide additional arguments to the install
    for example a path to your custom NuGet.config file.
   -->
-  <Target Name="RestoreContentCompiler" Condition=" '$(AutoRestoreMGCBTool)' == 'true' And !Exists ('$(MGCBToolDirectory)$(MGCBCommand)')">
-    <MakeDir Directories="$(MGCBToolDirectory)"/>
-    <Exec Command="&quot;$(DotnetCommand)&quot; tool install $(MGCBToolAdditionalArguments) dotnet-mgcb --version $(MonoGameVersion) --tool-path ." WorkingDirectory="$(MGCBToolDirectory)" ContinueOnError="true" />
-  </Target>
+	<Target Name="RestoreContentCompiler" Condition=" '$(AutoRestoreMGCBTool)' == 'true' ">
+		<MakeDir Directories="$(MSBuildProjectDirectory)"/>
+		<Exec
+		  Command="check-mgcb.cmd"
+		  WorkingDirectory="$(MSBuildProjectDirectory)"
+		  ContinueOnError="true" />
+	</Target>
 
-  <!--
+
+	<!--
     =====================
     PrepareContentBuilder
     =====================
