@@ -79,6 +79,11 @@ namespace Microsoft.Xna.Framework.Media
             {
                 throw new NotImplementedException();				
             }
+
+            set
+            {
+                throw new NotImplementedException();
+            }
         }
 
         private Album PlatformGetAlbum()
