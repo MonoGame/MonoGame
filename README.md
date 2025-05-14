@@ -8,7 +8,7 @@
  ![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/monogame/monogame/main.yml?style=flat-square)
  [![Donate](https://img.shields.io/badge/donate-F1465A?style=flat-square&logo=monogame&logoColor=FFFFFF)](https://monogame.net/donate/) 
 
- One framework for creating powerful cross-platfrom games
+ One framework for creating powerful cross-platform games
 
 [Supported Platforms](#supported-platforms) • 
 [Resources](#resources) • 
