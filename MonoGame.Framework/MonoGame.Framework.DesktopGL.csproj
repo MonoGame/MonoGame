@@ -25,7 +25,6 @@
     </PackageReference>
     <PackageReference Include="MonoGame.Library.SDL" Version="2.32.2.1" />
     <PackageReference Include="MonoGame.Library.OpenAL" Version="1.23.1.10" />
-    <PackageReference Include="NVorbis" Version="0.10.4" />
   </ItemGroup>
 
   <ItemGroup>
@@ -45,10 +44,16 @@
   <ItemGroup>
     <Compile Remove="Graphics\GraphicsAdapter.cs" />
   </ItemGroup>
+  
+  <!-- Song support with Vorbis, depends on OpenAL -->
+  <ItemGroup>
+    <PackageReference Include="NVorbis" Version="0.10.4" />
+    <Compile Include="Platform\Media\OggStream.NVorbis.cs" />
+    <Compile Include="Platform\Media\Song.NVorbis.cs" />
+  </ItemGroup>
 
   <ItemGroup>
     <Compile Include="Platform\TitleContainer.Desktop.cs" />
-    <Compile Include="Platform\Audio\OggStream.cs" />
     <Compile Include="Platform\Audio\Xact\WaveBank.Default.cs" />
     <Compile Include="Platform\Graphics\OpenGL.Common.cs" />
     <Compile Include="Platform\Graphics\Texture2D.StbSharp.cs" />
@@ -62,7 +67,6 @@
     <Compile Include="Platform\Utilities\ReflectionHelpers.Default.cs" />
     <Compile Include="Platform\Media\MediaLibrary.Default.cs" />
     <Compile Include="Platform\Media\MediaPlayer.Default.cs" />
-    <Compile Include="Platform\Media\Song.NVorbis.cs" />
     <Compile Include="Platform\Media\VideoPlayer.Default.cs" />
     <Compile Include="Platform\Media\Video.Default.cs" />
     <Compile Include="Platform\Input\GamePad.SDL.cs" />
@@ -74,7 +78,7 @@
     <Compile Include="Platform\Input\KeysHelper.cs" />
     <Compile Include="Platform\Input\Mouse.SDL.cs" />
     <Compile Include="Platform\Input\MouseCursor.SDL.cs" />
-    <Compile Include="Platform\Input\MessageBox.Default.cs" />
+    <Compile Include="Platform\Input\MessageBox.SDL.cs" />
     <Compile Include="Platform\Graphics\GraphicsContext.SDL.cs" />
     <Compile Include="Platform\Graphics\OpenGL.SDL.cs" />
     <Compile Include="Platform\Graphics\WindowInfo.SDL.cs" />

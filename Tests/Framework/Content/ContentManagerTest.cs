@@ -55,7 +55,9 @@ namespace MonoGame.Tests.Content
             ContentManager content = new ContentManager(game.Services);
 
             var exception = Assert.Throws<ContentLoadException>(() => content.Load<Texture2D>(Paths.Texture("NotExisting")));
-            StringAssert.StartsWith("Could not load", exception.Message);
+            StringAssert.StartsWith("The content file was not found.", exception.Message);
+            Assert.IsNotNull(exception.InnerException);
+            StringAssert.StartsWith("Could not find file", exception.InnerException.Message);
         }
 
         [Test]
@@ -65,7 +67,9 @@ namespace MonoGame.Tests.Content
             ContentManager content = new ContentManager(game.Services);
 
             var exception = Assert.Throws<ContentLoadException>(() => content.Load<SoundEffect>(Paths.Texture("UniquePng")));
-            StringAssert.StartsWith("Could not load", exception.Message);
+            StringAssert.StartsWith("The content file was not found.", exception.Message);
+            Assert.IsNotNull(exception.InnerException);
+            StringAssert.StartsWith("Could not find file", exception.InnerException.Message);
         }
     }
 }
