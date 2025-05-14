@@ -371,6 +371,7 @@ namespace Microsoft.Xna.Framework.Audio
 
             return readSamples != BufferSize;
         }
+      
         internal void CastBuffer(float[] inBuffer, short[] outBuffer, int length)
         {
             for (int i = 0; i < length; i++)
