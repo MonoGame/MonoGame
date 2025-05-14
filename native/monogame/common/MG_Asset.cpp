@@ -22,14 +22,17 @@ mgbool MG_Asset_Open(const char* path, MG_Asset*& handle, mglong& length)
     }
     return true;
 }
+
 mgint MG_Asset_Read(MG_Asset* handle,  mgbyte* buffer, mglong count)
 {
     return fread(buffer, 1, count, handle->file);
 }
+
 mglong MG_Asset_Seek(MG_Asset* handle, mglong offset, mgint whence)
 {
     return fseek(handle->file, offset, whence);
 }
+
 void MG_Asset_Close(MG_Asset* handle)
 {
     fclose(handle->file);
