@@ -591,6 +591,12 @@
     <Content Update="..\..\Tests\Assets\Models\NonSkeletonAnimated.fbx">
       <Link>Assets\Models\NonSkeletonAnimated.fbx</Link>
     </Content>
+    <Content Update="..\..\Tests\Assets\Models\MeshAnimatedCharacter.fbx">
+      <Link>Assets\Models\MeshAnimatedCharacter.fbx</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\Models\MeshAnimatedCharacter.glb">
+      <Link>Assets\Models\MeshAnimatedCharacter.glb</Link>
+    </Content>
     <Content Update="..\..\Tests\Assets\Models\BlenderDefaultCube.xnb">
       <Link>Assets\Models\BlenderDefaultCube.xnb</Link>
     </Content>
