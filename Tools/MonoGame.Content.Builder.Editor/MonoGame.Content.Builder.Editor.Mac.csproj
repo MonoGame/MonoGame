@@ -13,6 +13,7 @@
     <AssemblyTitle>MGCB Editor</AssemblyTitle>
     <RuntimeIdentifiers>osx-x64;osx-arm64</RuntimeIdentifiers>
     <PackageReadmeFile>README.md</PackageReadmeFile>
+    <TrimMode>copy</TrimMode>
   </PropertyGroup>
 
   <ItemGroup>
