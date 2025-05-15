@@ -24,9 +24,6 @@
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <CreatePackage>false</CreatePackage>
   </PropertyGroup>
-  <ItemGroup>
-    <PackageReference Include="MonoGame.Library.OpenAL" Version="1.23.1.10" />
-  </ItemGroup>
 
   <ItemGroup>
     <Compile Remove="bin\**\*" />
