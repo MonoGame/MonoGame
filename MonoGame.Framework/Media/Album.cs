@@ -165,7 +165,7 @@ namespace Microsoft.Xna.Framework.Media
 
 			return this.thumbnail.ImageWithSize(new CGSize(width, height));
         }
-#elif ANDROID
+#elif ANDROID && !NO_AUDIO
         public Bitmap GetAlbumArt(int width = 0, int height = 0)
         {
             Bitmap albumArt;
@@ -197,7 +197,7 @@ namespace Microsoft.Xna.Framework.Media
         {
             return this.GetAlbumArt(220, 220);
         }
-#elif ANDROID
+#elif ANDROID && !NO_AUDIO
         public Bitmap GetThumbnail()
         {
             return this.GetAlbumArt(220, 220);
