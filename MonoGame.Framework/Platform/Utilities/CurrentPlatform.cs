@@ -25,6 +25,7 @@ namespace MonoGame.Framework.Utilities
             if (_init)
                 return;
 
+            _os = OS.Unknown;
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             {
                 _os = OS.Windows;
