@@ -1,5 +1,4 @@
 using Cake.Git;
-using Microsoft.VisualBasic;
 using System.Text.RegularExpressions;
 
 namespace BuildScripts;

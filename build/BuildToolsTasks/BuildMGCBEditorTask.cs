@@ -25,6 +25,13 @@ public sealed class BuildMGCBEditorTask : FrostingTask<BuildContext>
             _ => "Linux"
         };
 
+        var runtime = context.Environment.Platform.Family switch
+        {
+            PlatformFamily.Windows => context.DotNetPublishSettings.Runtime = "win-x64",
+            PlatformFamily.OSX => context.DotNetPublishSettings.Runtime = "osx",
+            _ => context.DotNetPublishSettings.Runtime = "linux-x64"
+        };
+
         if (context.Environment.Platform.Family != PlatformFamily.OSX)
             context.DotNetPublish(context.GetProjectPath(ProjectType.MGCBEditor, platform), context.DotNetPublishSettings);
         else
