@@ -13,7 +13,7 @@ namespace MonoGame.Effect
 	{
 
         private const string Header = "MGFX";
-        private const int Version = 10;
+        internal const int Version = 10;
 
         /// <summary>
         /// Writes the effect for loading later.
