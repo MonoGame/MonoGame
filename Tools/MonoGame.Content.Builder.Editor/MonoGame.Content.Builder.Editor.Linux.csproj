@@ -12,6 +12,7 @@
     <AssemblyTitle>MGCB Editor</AssemblyTitle>
     <RuntimeIdentifiers>linux-x64</RuntimeIdentifiers>
     <PackageReadmeFile>README.md</PackageReadmeFile>
+    <RuntimeIdentifier>linux-x64</RuntimeIdentifier>
   </PropertyGroup>
 
   <ItemGroup>
