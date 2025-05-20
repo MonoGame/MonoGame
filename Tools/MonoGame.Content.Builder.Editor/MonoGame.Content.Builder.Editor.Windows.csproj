@@ -14,6 +14,7 @@
     <AssemblyTitle>MGCB Editor</AssemblyTitle>
     <RuntimeIdentifiers>win-x64</RuntimeIdentifiers>
     <PackageReadmeFile>README.md</PackageReadmeFile>
+    <RuntimeIdentifier>win-x64</RuntimeIdentifier>
   </PropertyGroup>
 
   <ItemGroup>
