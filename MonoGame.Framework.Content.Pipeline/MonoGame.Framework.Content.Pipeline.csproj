@@ -11,7 +11,6 @@
     <PackageId>MonoGame.Framework.Content.Pipeline</PackageId>
     <AssemblyName>MonoGame.Framework.Content.Pipeline</AssemblyName>
     <RootNamespace>Microsoft.Xna.Framework.Content.Pipeline</RootNamespace>
-    <CopyContentFiles>True</CopyContentFiles>
     <AppendTargetFrameworkToOutputPath>False</AppendTargetFrameworkToOutputPath>
     <DefineConstants>STBSHARP_INTERNAL</DefineConstants>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
@@ -83,8 +82,10 @@
     <PackageReference Include="LibKTX" Version="0.9.2" />
   </ItemGroup>
 
-  <ItemGroup Condition="'$(CopyContentFiles)' == 'True'">
-    <Content Include="..\ThirdParty\Dependencies\CppNet\CppNet.dll" PackagePath="lib\net8.0" Visible="false" />
+  <ItemGroup>
+    <Content Include="..\ThirdParty\Dependencies\CppNet\CppNet.dll" PackagePath="lib\net8.0" Visible="false">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="..\ThirdParty\Dependencies\MojoShader\Windows\libmojoshader_64.dll" Visible="false">
       <PackagePath>runtimes\win-x64\native</PackagePath>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
