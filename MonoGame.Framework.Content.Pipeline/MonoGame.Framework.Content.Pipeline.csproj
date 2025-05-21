@@ -19,7 +19,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Include="README.md" Pack="true" PackagePath="\"/>
+    <None Include="README.md" Pack="true" PackagePath="\" />
   </ItemGroup>
 
   <ItemGroup>
@@ -61,18 +61,16 @@
     </Reference>
   </ItemGroup>
 
-  <ItemGroup Condition="'$(SolutionName)' != 'MonoGame.Framework.WindowsDX'">
+  <ItemGroup>
     <ProjectReference Include="..\MonoGame.Framework\MonoGame.Framework.DesktopGL.csproj">
       <PrivateAssets>All</PrivateAssets>
     </ProjectReference>
-  </ItemGroup>
-
-  <ItemGroup Condition="'$(SolutionName)' == 'MonoGame.Framework.WindowsDX'">
-    <ProjectReference Include="..\MonoGame.Framework\MonoGame.Framework.WindowsDX.csproj">
-      <PrivateAssets>All</PrivateAssets>
+    <ProjectReference Include="..\Tools\MonoGame.Effect.Compiler\MonoGame.Effect.Compiler.csproj">
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+      <OutputItemType>Content</OutputItemType>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </ProjectReference>
   </ItemGroup>
-
 
   <ItemGroup>
     <PackageReference Include="AssimpNetter" Version="5.4.3.3" />
@@ -97,12 +95,6 @@
     <!-- NuGet warns if we copy assemblies but don't reference them; we suppress those warnings. -->
     <NoWarn>NU5100</NoWarn>
   </PropertyGroup>
-
-  <ItemGroup>
-    <Content Include="..\Artifacts\MonoGame.Effect.Compiler\$(Configuration)\*" Exclude="..\Artifacts\MonoGame.Effect.Compiler\$(Configuration)\*.nupkg" Visible="false">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-  </ItemGroup>
 
   <Import Project="..\Switch\MonoGame.Framework.Content.Pipeline.targets" Condition="exists('..\Switch\MonoGame.Framework.Content.Pipeline.targets')" />
   <Import Project="..\XBoxOne\MonoGame.Framework.Content.Pipeline.targets" Condition="exists('..\XBoxOne\MonoGame.Framework.Content.Pipeline.targets')" />
