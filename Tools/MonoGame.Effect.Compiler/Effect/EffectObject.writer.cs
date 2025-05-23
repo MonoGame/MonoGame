@@ -13,7 +13,39 @@ namespace MonoGame.Effect
 	{
 
         private const string Header = "MGFX";
-        private const int Version = 10;
+        internal const int Version = 10;
+        
+        static int ComputeHash(Stream stream)
+        {
+            System.Diagnostics.Debug.Assert(stream.CanSeek);
+
+            unchecked
+            {
+                const int p = 16777619;
+                var hash = (int)2166136261;
+
+                var prevPosition = stream.Position;
+                stream.Position = 0;
+
+                var data = new byte[1024];
+                int length;
+                while((length = stream.Read(data, 0, data.Length)) != 0)
+                {
+                    for (var i = 0; i < length; i++)
+                        hash = (hash ^ data[i]) * p;
+                }
+
+                // Restore stream position.
+                stream.Position = prevPosition;
+
+                hash += hash << 13;
+                hash ^= hash >> 7;
+                hash += hash << 3;
+                hash ^= hash >> 17;
+                hash += hash << 5;
+                return hash;
+            }
+        }
 
         /// <summary>
         /// Writes the effect for loading later.
@@ -30,47 +62,47 @@ namespace MonoGame.Effect
             writer.Write(profile);
 
             // Write the rest to a memory stream.
-            using(MemoryStream memStream = new MemoryStream())
-            using(BinaryWriter memWriter = new BinaryWriter(memStream))
+            using (MemoryStream memStream = new MemoryStream())
+            using (BinaryWriter memWriter = new BinaryWriter(memStream))
             {
-            // Write all the constant buffers.
+                // Write all the constant buffers.
                 memWriter.Write(ConstantBuffers.Count);
-            foreach (var cbuffer in ConstantBuffers)
+                foreach (var cbuffer in ConstantBuffers)
                     cbuffer.Write(memWriter, options);
 
-            // Write all the shaders.
+                // Write all the shaders.
                 memWriter.Write(Shaders.Count);
-            foreach (var shader in Shaders)
+                foreach (var shader in Shaders)
                     shader.Write(memWriter, options);
 
-            // Write the parameters.
+                // Write the parameters.
                 WriteParameters(memWriter, Parameters, Parameters.Length);
 
-            // Write the techniques.
+                // Write the techniques.
                 memWriter.Write(Techniques.Length);
-            foreach (var technique in Techniques)
-            {
+                foreach (var technique in Techniques)
+                {
                     memWriter.Write(technique.name);
                     WriteAnnotations(memWriter, technique.annotation_handles);
 
-                // Write the passes.
+                    // Write the passes.
                     memWriter.Write((int)technique.pass_count);
-                for (var p = 0; p < technique.pass_count; p++)
-                {
-                    var pass = technique.pass_handles[p];
+                    for (var p = 0; p < technique.pass_count; p++)
+                    {
+                        var pass = technique.pass_handles[p];
 
                         memWriter.Write(pass.name);
                         WriteAnnotations(memWriter, pass.annotation_handles);
 
-                    // Write the index for the vertex and pixel shaders.
-                    var vertexShader = GetShaderIndex(STATE_CLASS.VERTEXSHADER, pass.states);
-                    var pixelShader = GetShaderIndex(STATE_CLASS.PIXELSHADER, pass.states);
+                        // Write the index for the vertex and pixel shaders.
+                        var vertexShader = GetShaderIndex(STATE_CLASS.VERTEXSHADER, pass.states);
+                        var pixelShader = GetShaderIndex(STATE_CLASS.PIXELSHADER, pass.states);
                         memWriter.Write(vertexShader);
                         memWriter.Write(pixelShader);
 
-                    // Write the state objects too!
-					if (pass.blendState != null)
-					{
+                        // Write the state objects too!
+                        if (pass.blendState != null)
+                        {
                             memWriter.Write(true);
                             memWriter.Write((byte)pass.blendState.AlphaBlendFunction);
                             memWriter.Write((byte)pass.blendState.AlphaDestinationBlend);
@@ -87,12 +119,12 @@ namespace MonoGame.Effect
                             memWriter.Write((byte)pass.blendState.ColorWriteChannels2);
                             memWriter.Write((byte)pass.blendState.ColorWriteChannels3);
                             memWriter.Write(pass.blendState.MultiSampleMask);
-					}
-					else
+                        }
+                        else
                             memWriter.Write(false);
 
-					if (pass.depthStencilState != null)
-					{
+                        if (pass.depthStencilState != null)
+                        {
                             memWriter.Write(true);
                             memWriter.Write((byte)pass.depthStencilState.CounterClockwiseStencilDepthBufferFail);
                             memWriter.Write((byte)pass.depthStencilState.CounterClockwiseStencilFail);
@@ -110,12 +142,12 @@ namespace MonoGame.Effect
                             memWriter.Write((byte)pass.depthStencilState.StencilPass);
                             memWriter.Write(pass.depthStencilState.StencilWriteMask);
                             memWriter.Write(pass.depthStencilState.TwoSidedStencilMode);
-					}
-					else
+                        }
+                        else
                             memWriter.Write(false);
 
-					if (pass.rasterizerState != null)
-					{
+                        if (pass.rasterizerState != null)
+                        {
                             memWriter.Write(true);
                             memWriter.Write((byte)pass.rasterizerState.CullMode);
                             memWriter.Write(pass.rasterizerState.DepthBias);
@@ -123,15 +155,15 @@ namespace MonoGame.Effect
                             memWriter.Write(pass.rasterizerState.MultiSampleAntiAlias);
                             memWriter.Write(pass.rasterizerState.ScissorTestEnable);
                             memWriter.Write(pass.rasterizerState.SlopeScaleDepthBias);
-					}
-					else
+                        }
+                        else
                             memWriter.Write(false);
                     }
                 }
 
                 // Calculate a hash code from memory stream
                 // and write it to the header.
-                var effectKey = MonoGame.Framework.Utilities.Hash.ComputeHash(memStream);
+                var effectKey = ComputeHash(memStream);
                 writer.Write((Int32)effectKey);
 
                 //write content from memory stream to final stream.
