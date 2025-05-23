@@ -6,6 +6,8 @@ on:
   push:
     branches:
       - master
+    tags:
+      - v*
 
 jobs:
   build:
@@ -21,7 +23,7 @@ jobs:
         with:
           submodules: recursive
 
-      - name: Setup .NET Core SDK ${{ matrix.dotnet-version }}
+      - name: Setup .NET Core SDK
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '8.0.x'
@@ -114,7 +116,7 @@ jobs:
           - name: Clone Repository
             uses: actions/checkout@v4
 
-          - name: Setup .NET ${{ matrix.dotnet-version }}
+          - name: Setup .NET
             uses: actions/setup-dotnet@v4
             with:
               dotnet-version: '8.0.x'
@@ -169,7 +171,7 @@ jobs:
         with:
           submodules: recursive
 
-      - name: Setup .NET Core SDK ${{ matrix.dotnet-version }}
+      - name: Setup .NET Core SDK
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '8.0.x'
