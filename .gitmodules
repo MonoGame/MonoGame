@@ -25,3 +25,9 @@
 [submodule "external/MonoGame.Templates"]
 	path = external/MonoGame.Templates
 	url = https://github.com/MonoGame/MonoGame.Templates.git
+[submodule "native/monogame/external/premake-androidmk"]
+	path = native/monogame/external/premake-androidmk
+	url = https://github.com/Meoo/premake-androidmk.git
+[submodule "native/monogame/external/premake-cmake"]
+	path = native/monogame/external/premake-cmake
+	url = https://github.com/Jarod42/premake-cmake.git
