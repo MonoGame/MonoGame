@@ -458,7 +458,7 @@ internal static class BasisU
 
         // move backwards through the lines because the output we are looking for
         //  should be at the end of the output
-        const string logPrefix = "Wrote KTX file \"";
+        const string logPrefix = "Wrote .KTX file \"";
         const string logSuffix = "\"";
         for (var i = lines.Length - 1; i >= 0; i--)
         {
