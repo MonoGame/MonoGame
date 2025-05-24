@@ -85,7 +85,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
                 }
             }
 
-            Crunch.EncodeBytes(
+            CrunchHelpers.EncodeBytes(
                 sourceBitmap: sourceBitmap,
                 crunchFormat: CrunchFormat.Etc2A,
                 out var compressedBytes);
