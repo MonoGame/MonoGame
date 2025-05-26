@@ -83,7 +83,7 @@ jobs:
       - name: Build
         run: dotnet run --project build/Build.csproj -- --target=Default
 
-      - name: Run Tests
+      - name: Run Tools Tests
         run:   |
               if [ "$RUNNER_OS" == "Windows" ]; then
                     dotnet test Tools/MonoGame.Tools.Tests/MonoGame.Tools.Tests.csproj --blame-hang-timeout 5m -c Release
@@ -205,12 +205,6 @@ jobs:
           name: nuget-${{ matrix.platform }}
           path: Artifacts/NuGet
 
-      - name: Download tests-tools-${{ matrix.platform }}
-        uses: actions/download-artifact@v4
-        with:
-          name: tests-tools-${{ matrix.platform }}
-          path: tests tools
-
       - name: Download tests-desktopgl-${{ matrix.platform }}
         uses: actions/download-artifact@v4
         with:
@@ -223,11 +217,6 @@ jobs:
           name: tests-windowsdx-${{ matrix.platform }}
           path: tests-windowsdx
         if: runner.os == 'Windows'
-
-      - name: Run Tools Tests
-        run: dotnet test "tests tools/MonoGame.Tools.Tests.dll" --blame-hang-timeout 1m --filter="TestCategory!=Effects"
-        env:
-          CI: true
 
       # Run the DirectX tests in two steps: first the audio, then the rest.
       # This is because the audio tests has some incompatibilities within the runner with ContentManagerTests.

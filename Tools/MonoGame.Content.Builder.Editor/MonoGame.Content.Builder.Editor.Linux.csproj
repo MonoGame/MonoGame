@@ -11,6 +11,7 @@
     <AssemblyName>mgcb-editor-linux</AssemblyName>
     <AssemblyTitle>MGCB Editor</AssemblyTitle>
     <PackageReadmeFile>README.md</PackageReadmeFile>
+    <DisableMonoGameToolAssets>True</DisableMonoGameToolAssets>
   </PropertyGroup>
 
   <ItemGroup>
@@ -46,11 +47,9 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\MonoGame.Framework\MonoGame.Framework.DesktopGL.csproj">
-      <AdditionalProperties>CopyContentFiles=False</AdditionalProperties>
       <ExcludeAssets>contentFiles;native;runtime</ExcludeAssets>
     </ProjectReference>
     <ProjectReference Include="..\..\MonoGame.Framework.Content.Pipeline\MonoGame.Framework.Content.Pipeline.csproj">
-      <AdditionalProperties>CopyContentFiles=False</AdditionalProperties>
       <ExcludeAssets>contentFiles;native;runtime</ExcludeAssets>
     </ProjectReference>
   </ItemGroup>
