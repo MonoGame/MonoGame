@@ -236,7 +236,7 @@ namespace MonoGame.Effect
                     RedirectStandardInput = true,
                 };
 
-                using (var process = new Process())
+                using (var process = new Process { StartInfo = processInfo })
                 {
                     process.Start();
 
