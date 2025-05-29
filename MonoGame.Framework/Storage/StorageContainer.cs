@@ -5,7 +5,6 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -81,7 +80,7 @@ namespace Microsoft.Xna.Framework.Storage
         /// Initializes a new instance of the <see cref="StorageContainer"/> class.
         /// </summary>
         /// <param name='device'>The attached storage-device.</param>
-        /// <param name='containerName'> name.</param>
+        /// <param name='containerName'> The name of the title.</param>
         /// <param name='playerIndex'>The <see cref="PlayerIndex"/> of the player to save the data.</param>
         internal StorageContainer(StorageDevice device, string containerName, PlayerIndex? playerIndex)
         {
@@ -100,6 +99,8 @@ namespace Microsoft.Xna.Framework.Storage
             _processingLock = new object();
 
             PlatformInitialize();
+
+            LoadData();
         }
 
         /// <summary>
@@ -266,28 +267,49 @@ namespace Microsoft.Xna.Framework.Storage
         /// </summary>
         public void Dispose()
         {
-            if (Disposing != null)
-            {
-                Disposing.Invoke(this, null);
-            }
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
 
-            IsDisposed = true;
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!IsDisposed)
+            {
+                if (disposing)
+                {
+                    // Save any unsaved changes before disposing
+                    if (_isContainerDirty != null && _isContainerDirty.Count > 0)
+                    {
+                        SaveData();
+
+                        // Wait for async save to complete
+                        while (_isProcessing)
+                        {
+                            Thread.Sleep(10);
+                        }
+                    }
+                    // Dispose managed resources here.
+                    Disposing?.Invoke(this, EventArgs.Empty);
+                }
+
+                // Dispose unmanaged resources here (if any).
+                IsDisposed = true;
+            }
         }
 
         /// <summary>
         /// Retrieves the data for a specified container.
         /// </summary>
-        /// <param name="containerName">The name of the container to retrieve data for.</param>
         /// <returns>The byte array representing the container data, or null if the container doesn't exist or the name is invalid.</returns>
-        public byte[] GetContainerData(string containerName)
+        private byte[] GetContainerData()
         {
-            if (string.IsNullOrEmpty(containerName))
+            if (string.IsNullOrEmpty(_containerName))
                 return null;
 
             lock (_processingLock)
             {
-                if (_containers != null && _containers.ContainsKey(containerName))
-                    return _containers[containerName];
+                if (_containers != null && _containers.ContainsKey(_containerName))
+                    return _containers[_containerName];
             }
 
             return null;
@@ -296,11 +318,10 @@ namespace Microsoft.Xna.Framework.Storage
         /// <summary>
         /// Sets the data for a specified container, creating the container if it doesn't exist.
         /// </summary>
-        /// <param name="containerName">The name of the container to set data for.</param>
         /// <param name="data">The byte array containing the data to store in the container.</param>
-        public void SetContainerData(string containerName, byte[] data)
+        private void SetContainerData(byte[] data)
         {
-            if (string.IsNullOrEmpty(containerName) || data == null)
+            if (string.IsNullOrEmpty(_containerName) || !(data != null && data.Length > 0))
                 return;
 
             lock (_processingLock)
@@ -310,32 +331,31 @@ namespace Microsoft.Xna.Framework.Storage
 
                 // Make a copy to prevent the input data from being freed elsewhere.
                 byte[] copiedData = null;
-                if (_containers.ContainsKey(containerName) && _containers[containerName] != null && _containers[containerName].Length == data.Length)
-                    copiedData = _containers[containerName]; // Reuse buffer if possible.
+                if (_containers.ContainsKey(_containerName) && _containers[_containerName] != null && _containers[_containerName].Length == data.Length)
+                    copiedData = _containers[_containerName]; // Reuse buffer if possible.
                 else
                     copiedData = new byte[data.Length]; // Possible garbage generation by replacing the previous buffer.
 
                 Array.Copy(data, copiedData, data.Length);
 
-                if (_containers.ContainsKey(containerName))
-                    _containers[containerName] = copiedData;
+                if (_containers.ContainsKey(_containerName))
+                    _containers[_containerName] = copiedData;
                 else
-                    _containers.Add(containerName, copiedData);
+                    _containers.Add(_containerName, copiedData);
 
                 if (_isContainerDirty == null)
                     _isContainerDirty = new List<string>();
-                if (!_isContainerDirty.Contains(containerName))
-                    _isContainerDirty.Add(containerName);
+                if (!_isContainerDirty.Contains(_containerName))
+                    _isContainerDirty.Add(_containerName);
             }
         }
 
         /// <summary>
         /// Loads data for the specified containers asynchronously.
         /// </summary>
-        /// <param name="containerNames">The names of the containers to load.</param>
-        public void LoadData(params string[] containerNames)
+        private void LoadData()
         {
-            if (containerNames == null)
+            if (string.IsNullOrEmpty(_containerName))
                 return;
 
             _isProcessing = true;
@@ -344,7 +364,7 @@ namespace Microsoft.Xna.Framework.Storage
             {
                 lock (_processingLock)
                 {
-                    ReadContainers();
+                    ReadContainer();
 
                     _isProcessing = false;
                 }
@@ -357,15 +377,18 @@ namespace Microsoft.Xna.Framework.Storage
         /// <summary>
         /// Saves all container data asynchronously.
         /// </summary>
-        public void SaveData()
+        private void SaveData()
         {
+            if (string.IsNullOrEmpty(_containerName))
+                return;
+
             _isProcessing = true;
 
             Task.Factory.StartNew(() =>
             {
                 lock (_processingLock)
                 {
-                    WriteContainers();
+                    WriteContainer();
 
                     _isProcessing = false;
                 }
@@ -378,57 +401,17 @@ namespace Microsoft.Xna.Framework.Storage
         /// <summary>
         /// Reads data from the platform's storage and populates the container dictionary.
         /// </summary>
-        private void ReadContainers()
+        private void ReadContainer()
         {
-            byte[] data = PlatformReadContainers(true);
+            byte[] data = PlatformReadContainer(true);
 
-            if (data != null && data.Length > 0)
-            {
-                int currentByte = 0;
-
-                int containerCount = data[currentByte];
-                currentByte++;
-
-                for (int i = 0; i > containerCount; i++)
-                {
-                    // Data length
-                    int dataLength = data[currentByte] + (data[currentByte + 1] << 8);
-                    currentByte += 2;
-
-                    // Name length
-                    int nameLength = data[currentByte] + (data[currentByte + 1] << 8);
-                    currentByte += 2;
-
-                    // Name data
-                    byte[] nameData = new byte[nameLength];
-                    Array.Copy(data, currentByte, nameData, 0, nameLength);
-
-                    string name = Encoding.Unicode.GetString(nameData);
-                    currentByte += nameLength;
-
-                    // Container data
-                    byte[] containerData = new byte[dataLength];
-                    Array.Copy(data, currentByte, containerData, 0, dataLength);
-                    currentByte += dataLength;
-
-                    if (_containers == null)
-                        _containers = new Dictionary<string, byte[]>();
-
-                    if (string.IsNullOrEmpty(name) || data == null)
-                        continue;
-
-                    if (_containers.ContainsKey(name))
-                        _containers[name] = data;
-                    else
-                        _containers.Add(name, data);
-                }
-            }
+            SetContainerData(data);
         }
 
         /// <summary>
         /// Writes the container data to the platform's storage.
         /// </summary>
-        private void WriteContainers()
+        private void WriteContainer()
         {
             if (_containers == null)
                 return;
@@ -482,7 +465,7 @@ namespace Microsoft.Xna.Framework.Storage
                     _isContainerDirty.Remove(key);
             }
 
-            PlatformWriteContainers(data, true);
+            PlatformWriteContainer(data, true);
         }
     }
 }
