@@ -123,7 +123,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
                 case SurfaceFormat.Dxt3:
                     // the bcnEncoder does not perform well enough encoding BC2/DXT3
                     //  specifically, the alpha channel seems to be off. Maybe it has something to do with the premult?
-                    Crunch.EncodeBytes(
+                    CrunchHelpers.EncodeBytes(
                         sourceBitmap: sourceBitmap,
                         crunchFormat: CrunchFormat.Dxt3,
                         out compressedBytes);

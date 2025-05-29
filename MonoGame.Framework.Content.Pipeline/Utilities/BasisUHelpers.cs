@@ -7,6 +7,7 @@ using System.IO;
 using Microsoft.Xna.Framework.Content.Pipeline.Graphics;
 using Microsoft.Xna.Framework.Graphics;
 using MonoGame.Framework.Content;
+using MonoGame.Tool;
 
 namespace Microsoft.Xna.Framework.Content.Pipeline.Utilities;
 
@@ -206,7 +207,7 @@ internal static class BasisU
     /// <returns>The exit code for the basisu process. </returns>
     public static int Run(string args, out string stdOut, out string stdErr, string stdIn=null, string workingDirectory=null)
     {
-        return ExternalTool.RunDotnetTool(ExternalTool.BasisU, args, out stdOut, out stdErr, stdIn, workingDirectory);
+        return Basisu.Run(args, out stdOut, out stdErr, stdIn, workingDirectory);
     }
 
     /// <summary>
@@ -457,7 +458,7 @@ internal static class BasisU
 
         // move backwards through the lines because the output we are looking for
         //  should be at the end of the output
-        const string logPrefix = "Wrote KTX file \"";
+        const string logPrefix = "Wrote .KTX file \"";
         const string logSuffix = "\"";
         for (var i = lines.Length - 1; i >= 0; i--)
         {
