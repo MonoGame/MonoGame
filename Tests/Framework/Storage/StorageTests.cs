@@ -2,7 +2,6 @@
 using Microsoft.Xna.Framework.Storage;
 using NUnit.Framework;
 using System;
-using System.Threading.Tasks;
 
 namespace MonoGame.Tests.Framework
 {
@@ -10,9 +9,10 @@ namespace MonoGame.Tests.Framework
     public class StorageDeviceTests
     {
         const string MY_GAME = "MyGame";
+        const string ALL_PLAYERS = "AllPlayers";
 
         [Test]
-        public void OpenContainer_ShouldReturnContainer_OnSuccess()
+        public void OpenContainer_WhenPlayerIndexIsNotNull_ShouldReturnContainer_OnSuccess()
         {
             var device = new StorageDevice(PlayerIndex.One);
             var container = device.OpenContainer(MY_GAME);
@@ -24,11 +24,21 @@ namespace MonoGame.Tests.Framework
         }
 
         [Test]
-        public void OpenContainer_ShouldThrowException_OnInvalidContainerName()
+        public void OpenContainer_WhenPlayerIndexIsNotNull_ShouldThrowException_OnInvalidContainerName()
         {
             var device = new StorageDevice(PlayerIndex.One);
             Assert.Throws<ArgumentNullException>(() => device.OpenContainer(null), "A container name must be provided. (Parameter 'containerName')");
             Assert.Throws<ArgumentNullException>(() => device.OpenContainer(string.Empty), "A container name must be provided. (Parameter 'containerName')");
+        }
+
+        [Test]
+        public void StoragePath_WhenPlayerIndexIsNull_ShouldContainAllPlayers_OnSuccess()
+        {
+            var device = new StorageDevice(null);
+            var container = device.OpenContainer(MY_GAME);
+            Assert.IsNotNull(container._storagePath);
+            Assert.IsNotEmpty(container._storagePath);
+            Assert.AreEqual(true, container._storagePath.EndsWith(ALL_PLAYERS));
         }
     }
 }
