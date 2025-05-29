@@ -113,7 +113,7 @@ namespace Microsoft.Xna.Framework.Storage
             return File.Open(filePath, fileMode, fileAccess, fileShare);
         }
 
-        private byte[] PlatformReadContainers(bool mount) // mount variable used in other platforms
+        private byte[] PlatformReadContainer(bool mount) // mount variable used in other platforms
         {
             try
             {
@@ -147,7 +147,7 @@ namespace Microsoft.Xna.Framework.Storage
             }
         }
 
-        private void PlatformWriteContainers(byte[] data, bool mount) // mount variable used in other platforms
+        private void PlatformWriteContainer(byte[] data, bool mount) // mount variable used in other platforms
         {
             if (data == null || data.Length == 0)
                 return;
