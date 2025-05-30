@@ -418,7 +418,7 @@ namespace Microsoft.Xna.Framework.Content
 			{
 				throw new ContentLoadException("Opening stream error.", exception);
 			}
-            
+
 			return stream;
 		}
 
@@ -558,22 +558,40 @@ namespace Microsoft.Xna.Framework.Content
 
             return false;
         }
-    
+
         internal Texture2D LoadTexture2DFromImageFile(string assetName)
         {
             IGraphicsDeviceService graphicsDeviceService = serviceProvider.GetService(typeof(IGraphicsDeviceService)) as IGraphicsDeviceService;
-            
+
             foreach (string extension in supportedTexture2DExtensions)
             {
                 string assetPath = Path.Combine(RootDirectory, assetName);
                 assetPath = Path.ChangeExtension(assetPath, extension);
 
-                using (Stream file = TitleContainer.OpenStreamNoException(assetPath))
-                {
-                    if (file != null)
-                    {
-                        Texture2D result = Texture2D.FromStream(graphicsDeviceService.GraphicsDevice, file, DefaultColorProcessors.PremultiplyAlpha);
+                Stream stream = null;
 
+                // Handle absolute paths the same way as XNB loading
+#if DESKTOPGL || WINDOWS
+                if (Path.IsPathRooted(assetPath))
+                    stream = File.OpenRead(assetPath);
+                else
+#endif
+                stream = TitleContainer.OpenStreamNoException(assetPath);
+#if ANDROID
+                // Read the asset into memory in one go. This results in a ~50% reduction
+                // in load times on Android due to slow Android asset streams.
+                MemoryStream memStream = new MemoryStream();
+                stream.CopyTo(memStream);
+                memStream.Seek(0, SeekOrigin.Begin);
+                stream.Close();
+                stream = memStream;
+#endif
+
+                if (stream != null)
+                {
+                    using (stream)
+                    {
+                        Texture2D result = Texture2D.FromStream(graphicsDeviceService.GraphicsDevice, stream);
                         return result;
                     }
                 }
