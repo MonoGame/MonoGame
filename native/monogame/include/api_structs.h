@@ -149,6 +149,8 @@ struct MGG_SamplerState_Info
 
 struct MGG_InputElement
 {
+    MGVertexElementUsage SemanticUsage;
+    mguint SemanticIndex;
     mguint VertexBufferSlot;
     MGVertexElementFormat Format;
     mguint AlignedByteOffset;

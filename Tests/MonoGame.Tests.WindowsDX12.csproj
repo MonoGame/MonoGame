@@ -7,7 +7,7 @@
     <IsPackable>false</IsPackable>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <GenerateProgramFile>false</GenerateProgramFile>
-    <DefineConstants>WINDOWS;VULKAN;DESKTOP</DefineConstants>
+    <DefineConstants>WINDOWS;DIRECTX12</DefineConstants>
   </PropertyGroup>
 
   <ItemGroup>
@@ -50,9 +50,9 @@
 
   <ItemGroup>
     <ProjectReference Include="..\MonoGame.Framework\MonoGame.Framework.Native.csproj" />
-    <ProjectReference Include="..\native\monogame\desktopvk.vcxproj" />
+    <ProjectReference Include="..\native\monogame\windowsdx.vcxproj" />
 
-	  <Content Include="..\Artifacts\monogame.native\windows\desktopvk\$(Configuration)\monogame.native.dll">
+	  <Content Include="..\Artifacts\monogame.native\windows\windowsdx\$(Configuration)\monogame.native.dll">
 		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 	  </Content>
 	  
