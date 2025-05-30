@@ -129,9 +129,7 @@ namespace MonoGame.Framework
                 {
                     _window.Dispose();
                 }
-                _window = null;
-                Window = null;
-#if !GDKX
+#if !GDKX && !NO_AUDIO
                 Microsoft.Xna.Framework.Media.MediaManagerState.CheckShutdown();
 #endif
             }
