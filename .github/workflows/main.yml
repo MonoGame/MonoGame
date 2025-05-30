@@ -90,9 +90,13 @@ jobs:
           sudo fc-cache
           fc-match Arial
 
+      - name: Dotnet Restore Templates
+        if: runner.environment == 'github-hosted' && runner.os == 'Windows'
+        run: |
+          dotnet restore dotnet restore Templates/MonoGame.Templates.VSExtension
+
       - name: Build
         run: |
-          dotnet restore
           dotnet run --project build/Build.csproj -- --target=Default
 
       - name: Run Tools Tests
