@@ -93,7 +93,7 @@ jobs:
       - name: Dotnet Restore Templates
         if: runner.environment == 'github-hosted' && runner.os == 'Windows'
         run: |
-          dotnet restore dotnet restore Templates/MonoGame.Templates.VSExtension
+          dotnet restore Templates/MonoGame.Templates.VSExtension
 
       - name: Build
         run: |
