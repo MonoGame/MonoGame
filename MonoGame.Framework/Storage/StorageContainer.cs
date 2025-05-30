@@ -288,8 +288,12 @@ namespace Microsoft.Xna.Framework.Storage
                             Thread.Sleep(10);
                         }
                     }
+
                     // Dispose managed resources here.
-                    Disposing?.Invoke(this, EventArgs.Empty);
+                    if (Disposing != null)
+                    {
+                        Disposing.Invoke(this, EventArgs.Empty);
+                    }
                 }
 
                 // Dispose unmanaged resources here (if any).
