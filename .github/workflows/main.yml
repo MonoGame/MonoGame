@@ -91,7 +91,9 @@ jobs:
           fc-match Arial
 
       - name: Build
-        run: dotnet run --project build/Build.csproj -- --target=Default
+        run: |
+          echo "insert dotnet restore here"
+          dotnet run --project build/Build.csproj -- --target=Default
 
       - name: Run Tools Tests
         run:   |
