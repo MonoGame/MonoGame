@@ -15,7 +15,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [windows-latest, macos-latest, ubuntu-latest]
+        os: [windows-latest, macos-latest, ubuntu-24.04]
       fail-fast: false
     steps:
       - name: Clone repository
@@ -60,7 +60,7 @@ jobs:
                     sudo dpkg --add-architecture i386 
                     sudo mkdir -pm755 /etc/apt/keyrings
                     sudo wget -O /etc/apt/keyrings/winehq-archive.key https://dl.winehq.org/wine-builds/winehq.key
-                    sudo wget -NP /etc/apt/sources.list.d/ https://dl.winehq.org/wine-builds/ubuntu/dists/jammy/winehq-jammy.sources
+                    sudo wget -NP /etc/apt/sources.list.d/ https://dl.winehq.org/wine-builds/ubuntu/dists/noble/winehq-noble.sources
                     sudo apt update && sudo apt install --install-recommends winehq-stable
                     echo "ttf-mscorefonts-installer msttcorefonts/accepted-mscorefonts-eula select true" | sudo debconf-set-selections
                     sudo apt install -y ttf-mscorefonts-installer
@@ -106,7 +106,7 @@ jobs:
           ACTIONS_RUNTIME_URL: "${{ env.ACTIONS_RUNTIME_URL }}"
   deploy:
       name: Deploy
-      needs: [ build ]
+      needs: [ build, tests ]
       runs-on: ubuntu-latest
       if: ${{ github.event_name == 'push' }}
       permissions:
@@ -155,7 +155,7 @@ jobs:
           - os: macos
             platform: macos
             shell: bash
-          - os: ubuntu-latest
+          - os: ubuntu-24.04
             platform: linux
             shell: bash
             filter: --where="Category != Audio"
@@ -183,7 +183,7 @@ jobs:
           sudo dpkg --add-architecture i386 
           sudo mkdir -pm755 /etc/apt/keyrings
           sudo wget -O /etc/apt/keyrings/winehq-archive.key https://dl.winehq.org/wine-builds/winehq.key
-          sudo wget -NP /etc/apt/sources.list.d/ https://dl.winehq.org/wine-builds/ubuntu/dists/jammy/winehq-jammy.sources
+          sudo wget -NP /etc/apt/sources.list.d/ https://dl.winehq.org/wine-builds/ubuntu/dists/noble/winehq-noble.sources
           sudo apt update && sudo apt install --install-recommends winehq-stable
         if: runner.os == 'Linux' && runner.environment == 'github-hosted'
 
