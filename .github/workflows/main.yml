@@ -92,7 +92,7 @@ jobs:
 
       - name: Build
         run: |
-          echo "insert dotnet restore here"
+          dotnet restore
           dotnet run --project build/Build.csproj -- --target=Default
 
       - name: Run Tools Tests
