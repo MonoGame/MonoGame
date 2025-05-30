@@ -28,6 +28,16 @@ jobs:
         with:
           dotnet-version: '8.0.x'
 
+      - name: Setup DotNet on linux/Windows
+        run: |
+          dotnet workload install android
+        if: runner.environment == 'github-hosted' && (runner.os == 'Linux' || runner.os == 'windows')
+
+      - name: Setup DotNet on MacOS
+        run: |
+          dotnet workload install android macos ios
+        if: runner.environment == 'github-hosted' && runner.os == 'macos'
+
       - name: Add msbuild to PATH
         if: runner.os == 'Windows'
         uses: microsoft/setup-msbuild@v1.0.2
@@ -52,33 +62,33 @@ jobs:
       - name: Disable Annotations
         run: echo "::remove-matcher owner=csc::"
 
-      - name: Install Dependencies
-        run:   |
-              if [ "$RUNNER_OS" == "Linux" ]; then
-                    dotnet workload install android
-                    sudo apt install p7zip-full curl
-                    sudo dpkg --add-architecture i386 
-                    sudo mkdir -pm755 /etc/apt/keyrings
-                    sudo wget -O /etc/apt/keyrings/winehq-archive.key https://dl.winehq.org/wine-builds/winehq.key
-                    sudo wget -NP /etc/apt/sources.list.d/ https://dl.winehq.org/wine-builds/ubuntu/dists/noble/winehq-noble.sources
-                    sudo apt update && sudo apt install --install-recommends winehq-stable
-                    echo "ttf-mscorefonts-installer msttcorefonts/accepted-mscorefonts-eula select true" | sudo debconf-set-selections
-                    sudo apt install -y ttf-mscorefonts-installer
-                    sudo fc-cache
-                    fc-match Arial
-                    wine64 --version
-                    wget -qO- https://monogame.net/downloads/net9_mgfxc_wine_setup.sh | bash
-              elif [ "$RUNNER_OS" == "Windows" ]; then
-                    dotnet.exe workload install android
-              else
-                    dotnet workload install android macos ios
-                    brew install wine-stable p7zip
-                    sudo mkdir -p /usr/local/lib
-                    ls -n /Applications/ | grep Xcode*
-                    sudo xcode-select -s /Applications/Xcode_16.2.app/Contents/Developer
-                    wget -qO- https://monogame.net/downloads/net9_mgfxc_wine_setup.sh | bash
-              fi
-        shell: bash
+      - name: install wine64 on linux
+        run: |
+          sudo apt install p7zip-full curl
+          sudo dpkg --add-architecture i386 
+          sudo mkdir -pm755 /etc/apt/keyrings
+          sudo wget -O /etc/apt/keyrings/winehq-archive.key https://dl.winehq.org/wine-builds/winehq.key
+          sudo wget -NP /etc/apt/sources.list.d/ https://dl.winehq.org/wine-builds/ubuntu/dists/noble/winehq-noble.sources
+          sudo apt update && sudo apt install --install-recommends winehq-stable
+          wget -qO- https://monogame.net/downloads/net9_mgfxc_wine_setup.sh | bash
+        if: runner.environment == 'github-hosted' && runner.os == 'Linux'
+
+      - name: install wine64 on MacOs
+        run: |
+          brew install wine-stable p7zip
+          sudo mkdir -p /usr/local/lib
+          ls -n /Applications/ | grep Xcode*
+          sudo xcode-select -s /Applications/Xcode_16.2.app/Contents/Developer
+          wget -qO- https://monogame.net/downloads/net9_mgfxc_wine_setup.sh | bash
+        if: runner.environment == 'github-hosted' && runner.os == 'macos'
+
+      - name: Install Arial Font
+        run: |
+          echo "ttf-mscorefonts-installer msttcorefonts/accepted-mscorefonts-eula select true" | sudo debconf-set-selections
+          sudo apt install -y ttf-mscorefonts-installer
+          sudo fc-cache
+          fc-match Arial
+        if: runner.environment == 'github-hosted' && runner.os == 'Linux'
 
       - name: Build
         run: dotnet run --project build/Build.csproj -- --target=Default
