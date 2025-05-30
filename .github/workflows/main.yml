@@ -23,7 +23,9 @@ jobs:
       - name: Setup .NET Core SDK
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: '8.0.x'
+          dotnet-version: |
+            '8.0.x'
+            '9.0.x'
 
       - name: Setup DotNet on linux/Windows
         if: runner.environment == 'github-hosted' && (runner.os == 'Linux' || runner.os == 'windows')
