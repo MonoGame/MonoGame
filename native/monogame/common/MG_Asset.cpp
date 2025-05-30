@@ -20,6 +20,23 @@ mgbool MG_Asset_Open(const char* path, MG_Asset*& handle, mglong& length)
         delete handle;
         return false;
     }
+
+    if (fseek(handle->file, 0, SEEK_END) != 0)
+    {
+        //unable to seek file for some reason
+        delete handle;
+        return false;
+    }
+
+    length = ftell(handle->file);
+
+    if (fseek(handle->file, 0, SEEK_SET) != 0)
+    {
+        //unable to seek back to file start for some reason
+        delete handle;
+        return false;
+    }
+
     return true;
 }
 
