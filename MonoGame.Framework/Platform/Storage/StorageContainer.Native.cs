@@ -66,12 +66,12 @@ namespace Microsoft.Xna.Framework.Storage
             throw new NotImplementedException();
         }
 
-        private byte[] PlatformReadContainers(bool value)
+        private byte[] PlatformReadContainer(bool value)
         {
             throw new NotImplementedException();
         }
 
-        private void PlatformWriteContainers(byte[] data, bool value)
+        private void PlatformWriteContainer(byte[] data, bool value)
         {
             throw new NotImplementedException();
         }
