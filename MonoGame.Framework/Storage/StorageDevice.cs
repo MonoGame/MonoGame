@@ -77,11 +77,17 @@ namespace Microsoft.Xna.Framework.Storage
 
             try
             {
-                return PlatformOpenContainer(containerName);
+                _storageContainer = PlatformOpenContainer(containerName);
+                if (_storageContainer == null)
+                {
+                    Debug.WriteLine("Failed to open storage container: {0}", containerName);
+                    return null;
+                }
+                return _storageContainer;
             }
             catch (Exception ex)
             {
-                Debug.WriteLine("Failed to open storage container: {0}", ex.Message);
+                Debug.WriteLine("Failed to open storage container: {0}. Error {1}", containerName, ex.Message);
                 return null;
             }
         }

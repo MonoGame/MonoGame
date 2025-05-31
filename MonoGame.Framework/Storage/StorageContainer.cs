@@ -320,7 +320,7 @@ namespace Microsoft.Xna.Framework.Storage
         }
 
         /// <summary>
-        /// Sets the data for a specified container, creating the container if it doesn't exist.
+        /// Sets the data for the current container, creating the container if it doesn't exist.
         /// </summary>
         /// <param name="data">The byte array containing the data to store in the container.</param>
         private void SetContainerData(byte[] data)
