@@ -8,6 +8,8 @@ using System.Reflection;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using MonoGame.Framework.Utilities;
+using static Sdl.Window;
+using static Sdl;
 
 namespace Microsoft.Xna.Framework
 {
@@ -57,6 +59,51 @@ namespace Microsoft.Xna.Framework
             }
         }
 
+        public override bool IsUsingTextInput
+        {
+            get => _handle == Sdl.Keyboard.GetKeyboardFocus() && Sdl.Text.IsTextInputActive();
+            set
+            {
+                Sdl.Keyboard.SetWindowInputFocus(_handle);
+                if (IsUsingTextInput != value)
+                {
+                    if (value)
+                    {
+                        Sdl.Text.StartTextInput();
+                        Sdl.Text.SetTextInputRect(ref textInputRect);
+                    }
+                    else
+                    {
+                        Sdl.Text.StartTextInput();
+                    }
+                }
+            }
+        }
+
+        public override Rectangle IMEPosition
+        {
+            get => new Rectangle (
+                textInputRect.X,
+                textInputRect.Y,
+                textInputRect.Width,
+                textInputRect.Height
+            );
+            set
+            {
+                textInputRect.X = value.X;
+                textInputRect.Y = value.Y;
+                textInputRect.Width = value.Width;
+                textInputRect.Height = value.Height;
+                Sdl.Text.SetTextInputRect(ref textInputRect);
+            }
+        }
+
+        public override string ClipboardText
+        {
+            get => Sdl.Text.GetClipboardText();
+            set => Sdl.Text.SetClipboardText(value);
+        }
+
         public override DisplayOrientation CurrentOrientation
         {
             get { return DisplayOrientation.Default; }
@@ -93,6 +140,7 @@ namespace Microsoft.Xna.Framework
         private string _screenDeviceName;
         private int _width, _height;
         private bool _wasMoved, _supressMoved;
+        private Sdl.Rectangle textInputRect;
 
         public SdlGameWindow(Game game)
         {
