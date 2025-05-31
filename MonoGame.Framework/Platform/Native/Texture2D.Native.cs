@@ -154,7 +154,7 @@ public partial class Texture2D : Texture
         }
 
         var texture = new Texture2D(graphicsDevice, width, height);
-        var rgbaBytes = width * height;
+        var rgbaBytes = (width * height) * 4;
 
         if (colorProcessor == null)
         {
