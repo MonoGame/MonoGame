@@ -27,7 +27,7 @@ It is an open-source re-implementation of the discontinued [Microsoft's XNA Fram
 
 ## Supported Platforms
 
-We support a growing list of platforms across the desktop, mobile, and console space. If there is a platform we don't support, please [make a request](https://github.com/MonoGame/MonoGame/issues) or [come help us](CONTRIBUTING.md) add it.
+We support a growing list of platforms across the desktop, mobile, and console space. If there is a platform we do not support, please [make a request](https://github.com/MonoGame/MonoGame/issues) or [come help us](CONTRIBUTING.md) add it.
 
 * Desktop PCs
   * Windows 8.1 and up (OpenGL & DirectX)
@@ -44,11 +44,11 @@ We support a growing list of platforms across the desktop, mobile, and console s
 
 ## Resources
 
-* [Getting started →](https://docs.monogame.net/articles/getting_started/index.html)
+* [Getting started →](https://docs.monogame.net/articles/tutorials/building_2d_games/)
 * ["How To" Guides →](https://docs.monogame.net/articles/getting_to_know/howto/)
 * [Documentation Hub →](https://docs.monogame.net/)
 * [API Reference →](https://docs.monogame.net/api/index.html)
-* [Community Tutorials →](https://docs.monogame.net/articles/tutorials.html)
+* [Community Tutorials →](https://docs.monogame.net/articles/tutorials/)
 
 ## Samples
 
@@ -78,7 +78,7 @@ If you are interested in contributing fixes or features to MonoGame, please read
 
 ### Subscription
 
-If you'd like to help the project by supporting us financially, consider supporting us via a subscription for the price of a monthly coffee.
+If you would like to help the project by supporting us financially, consider supporting us via a subscription for the price of a monthly coffee.
 
 Money goes towards hosting, new hardware and if enough people subscribe a dedicated developer.
 
