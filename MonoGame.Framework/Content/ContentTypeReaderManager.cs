@@ -61,7 +61,7 @@ namespace Microsoft.Xna.Framework.Content
             AddTypeCreator(typeof(DoubleReader).FullName, () => new DoubleReader());
             AddTypeCreator(typeof(DualTextureEffectReader).FullName, () => new DualTextureEffectReader());
             AddTypeCreator(typeof(EffectMaterialReader).FullName, () => new EffectMaterialReader());
-            AddTypeCreator(typeof(EffectReader).FullName, () => new EffectReader());
+            AddTypeCreator(typeof(ContentReader).Namespace + ".EffectReader, " + typeof(ContentReader).Assembly.FullName, () => new EffectReader());
             AddTypeCreator(typeof(EnumReader<Graphics.SpriteEffects>).FullName, () => new EnumReader<Graphics.SpriteEffects>());
             AddTypeCreator(typeof(EnumReader<Graphics.Blend>).FullName, () => new EnumReader<Graphics.Blend>());
             AddTypeCreator(typeof(EnvironmentMapEffectReader).FullName, () => new EnvironmentMapEffectReader());
