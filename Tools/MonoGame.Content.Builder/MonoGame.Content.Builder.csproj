@@ -13,13 +13,8 @@
     <ErrorOnDuplicatePublishOutputFiles>false</ErrorOnDuplicatePublishOutputFiles>
     <AssemblyName>mgcb</AssemblyName>
     <UseAppHost>true</UseAppHost>
-    <PackageReadmeFile>README.md</PackageReadmeFile>
     <DisableMonoGameToolAssets>False</DisableMonoGameToolAssets>
   </PropertyGroup>
-
-  <ItemGroup>
-    <None Include="README.md" Pack="true" PackagePath="\"/>
-  </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\..\MonoGame.Framework\MonoGame.Framework.DesktopGL.csproj">
