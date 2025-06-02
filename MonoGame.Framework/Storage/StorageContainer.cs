@@ -323,7 +323,7 @@ namespace Microsoft.Xna.Framework.Storage
         /// Sets the data for the current container, creating the container if it doesn't exist.
         /// </summary>
         /// <param name="data">The byte array containing the data to store in the container.</param>
-        private void SetContainerData(byte[] data)
+        public void SetContainerData(byte[] data)
         {
             if (string.IsNullOrEmpty(_containerName) || !(data != null && data.Length > 0))
                 return;
@@ -381,7 +381,7 @@ namespace Microsoft.Xna.Framework.Storage
         /// <summary>
         /// Saves all container data asynchronously.
         /// </summary>
-        private void SaveData()
+        public void SaveData()
         {
             if (string.IsNullOrEmpty(_containerName))
                 return;
