@@ -10,13 +10,8 @@
     <AppendTargetFrameworkToOutputPath>False</AppendTargetFrameworkToOutputPath>
     <AssemblyName>mgcb-editor-linux</AssemblyName>
     <AssemblyTitle>MGCB Editor</AssemblyTitle>
-    <PackageReadmeFile>README.md</PackageReadmeFile>
     <DisableMonoGameToolAssets>True</DisableMonoGameToolAssets>
   </PropertyGroup>
-
-  <ItemGroup>
-    <None Include="README.md" Pack="true" PackagePath="\"/>
-  </ItemGroup>
 
   <ItemGroup>
     <None Remove="**\*.glade" />

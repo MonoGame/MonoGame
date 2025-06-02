@@ -12,13 +12,8 @@
     <AssemblyName>mgcb-editor-mac</AssemblyName>
     <AssemblyTitle>MGCB Editor</AssemblyTitle>
     <RuntimeIdentifiers>osx-x64;osx-arm64</RuntimeIdentifiers>
-    <PackageReadmeFile>README.md</PackageReadmeFile>
     <DisableMonoGameToolAssets>True</DisableMonoGameToolAssets>
   </PropertyGroup>
-
-  <ItemGroup>
-    <None Include="README.md" Pack="true" PackagePath="\"/>
-  </ItemGroup>
 
   <ItemGroup>
     <None Remove="Platform\**\*" />
