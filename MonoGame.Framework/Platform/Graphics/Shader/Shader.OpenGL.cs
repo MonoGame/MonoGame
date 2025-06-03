@@ -52,7 +52,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 GraphicsDevice.DisposeShader(_shaderHandle);
                 _shaderHandle = -1;
 
-                throw new ShaderCompilerException(Stage, errorLog, _glslCode);
+                throw new ShaderCompilerException(SourceFile, Entrypoint, Stage, errorLog, _glslCode);
             }
 
             return _shaderHandle;

@@ -16,6 +16,21 @@ namespace Microsoft.Xna.Framework.Graphics
     public sealed class ShaderCompilerException : Exception
     {
         /// <summary>
+        /// The relative shader source file.
+        /// </summary>
+        public string SourceFile { get; }
+
+        /// <summary>
+        /// The shader entrypoint function.
+        /// </summary>
+        public string Entrypoint { get; }
+
+        /// <summary>
+        /// The shader stage.
+        /// </summary>
+        ShaderStage Stage { get; }
+
+        /// <summary>
         /// The error logging from the shader compiler.
         /// </summary>
         public string Errors { get; }
@@ -25,28 +40,33 @@ namespace Microsoft.Xna.Framework.Graphics
         /// </summary>
         public string SourceCode { get; }
 
-        private static string GetMessage(ShaderStage stage)
+        private static string GetMessage(string sourceFile, string entrypoint, ShaderStage stage)
         {
             switch (stage)
             {
                 case ShaderStage.Pixel:
-                    return "Failed to compile pixel shader.";
+                    return $"Failed to compile pixel shader {entrypoint}. See {sourceFile}.";
 
                 default:
                 case ShaderStage.Vertex:
-                    return "Failed to compile vertex shader.";
+                    return $"Failed to compile vertex shader {entrypoint}. See {sourceFile}.";
             }
         }
 
         /// <summary>
         /// Constructor.
         /// </summary>
-        /// <param name="stage">The stage that failed to compile.</param>
+        /// <param name="sourceFile">The relative shader source file.</param>
+        /// <param name="entrypoint">The shader entrypoint function.</param>
+        /// <param name="stage">The shader stage.</param>
         /// <param name="errors">The error logging from the shader compiler.</param>
         /// <param name="sourceCode">The source code that was being compiled.</param>
-        public ShaderCompilerException(ShaderStage stage, string errors, string sourceCode)
-            : base(GetMessage(stage))
+        public ShaderCompilerException(string sourceFile, string entrypoint, ShaderStage stage, string errors, string sourceCode)
+            : base(GetMessage(sourceFile, entrypoint, stage))
         {
+            SourceFile = sourceFile;
+            Entrypoint = entrypoint;
+            Stage = stage;
             Errors = errors;
             SourceCode = sourceCode;
         }
@@ -57,11 +77,19 @@ namespace Microsoft.Xna.Framework.Graphics
             return $"""
 {base.ToString()}
 
-Shader Compiler Errors:
+---------------------------------------------------------------------------------------------------
+Source File: {SourceFile}
+Stage: {Stage}
+Entrypoint: {Entrypoint}
+
 {Errors}
 
-Shader Source Code:
+
+Source Code:
+
 {SourceCode}
+
+---------------------------------------------------------------------------------------------------
 """;                    
         }
     }
