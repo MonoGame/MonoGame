@@ -18,27 +18,27 @@ namespace Microsoft.Xna.Framework.Graphics
         /// <summary>
         /// The relative shader source file.
         /// </summary>
-        public string SourceFile { get; }
+        public string SourceFile { get; private set; }
 
         /// <summary>
         /// The shader entrypoint function.
         /// </summary>
-        public string Entrypoint { get; }
+        public string Entrypoint { get; private set; }
 
         /// <summary>
         /// The shader stage.
         /// </summary>
-        ShaderStage Stage { get; }
+        public ShaderStage Stage { get; private set; }
 
         /// <summary>
         /// The error logging from the shader compiler.
         /// </summary>
-        public string Errors { get; }
+        public string Errors { get; private set; }
 
         /// <summary>
         /// The source code being compiled.
         /// </summary>
-        public string SourceCode { get; }
+        public string SourceCode { get; private set; }
 
         private static string GetMessage(string sourceFile, string entrypoint, ShaderStage stage)
         {
