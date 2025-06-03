@@ -84,15 +84,6 @@
 
   </Target>
 
-  <!-- Restore the dotnet-mgcb tool to a known location. -->
-  <!-- Use MGCBToolAdditionalArguments to provide additional arguments to the install
-   for example a path to your custom NuGet.config file.
-  -->
-  <Target Name="RestoreContentCompiler" Condition=" '$(AutoRestoreMGCBTool)' == 'true' And !Exists ('$(MGCBToolDirectory)$(MGCBCommand)')">
-    <MakeDir Directories="$(MGCBToolDirectory)"/>
-    <Exec Command="&quot;$(DotnetCommand)&quot; tool install $(MGCBToolAdditionalArguments) dotnet-mgcb --version $(MonoGameVersion) --tool-path ." WorkingDirectory="$(MGCBToolDirectory)" ContinueOnError="true" />
-  </Target>
-
   <!--
     =====================
     PrepareContentBuilder
@@ -132,6 +123,21 @@
 
   </Target>
 
+  <Target Name="_RestoreMGCBTool" Condition="'$(AutoRestoreMGCBTool)' == 'true'"
+        Inputs="$(MSBuildProjectFullPath)"
+        Outputs="$(IntermediateOutputPath)mgcb.tool.restore">
+    <Exec
+      Condition="'$(DotnetCommand)' == ''"
+      Command="&quot;$(DotnetCommand)&quot; tool restore"
+      WorkingDirectory="$(MSBuildProjectDirectory)"
+      ContinueOnError="true"
+    />
+    <Touch Files="$(IntermediateOutputPath)mgcb.tool.restore" AlwaysCreate="true" />
+    <ItemGroup>
+      <FileWrites Include="$(IntermediateOutputPath)mgcb.tool.restore" />
+    </ItemGroup>
+  </Target>
+
   <!--
     =================
     RunContentBuilder
@@ -143,11 +149,9 @@
       - ExtraContent: built content files
         - ContentDir: the relative path of the embedded folder to contain the content files
   -->
-  <Target Name="RunContentBuilder" DependsOnTargets="RestoreContentCompiler;PrepareContentBuilder">
+  <Target Name="RunContentBuilder" DependsOnTargets="_RestoreMGCBTool;PrepareContentBuilder">
 
     <PropertyGroup>
-      <_Command Condition="Exists ('$(MGCBToolDirectory)$(MGCBCommand)')">&quot;$(MGCBToolDirectory)$(MGCBCommand)&quot;</_Command>
-      <!-- Fallback to old behaviour this allows people to override $(MGCBCommand) with the mgcb.dll -->
       <_Command Condition=" '$(_Command)' == '' ">&quot;$(DotnetCommand)&quot; &quot;$(MGCBCommand)&quot;</_Command>
     </PropertyGroup>
 
@@ -173,6 +177,8 @@
     ==============
 
     Include ExtraContent as platform-specific content in the project output.
+    Runs just before the complile step. But after the project references have been resolved.
+    This allows for content pipeline extensions to be built first.
 
     Outputs:
       - AndroidAsset: built content files if Android
@@ -184,7 +190,8 @@
     DependsOnTargets="RunContentBuilder"
     Condition="'$(EnableMGCBItems)' == 'true' OR '@(MonoGameContentReference)' != ''"
     Outputs="%(ExtraContent.RecursiveDir)%(ExtraContent.Filename)%(ExtraContent.Extension)"
-    BeforeTargets="BeforeBuild">
+    BeforeTargets="BeforeCompile"
+    AfterTargets="ResolveProjectReferences">
 
     <!-- Call CreateItem on each piece of ExtraContent so it's easy to switch the item type by platform. -->
     <CreateItem
