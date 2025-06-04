@@ -55,7 +55,7 @@ namespace MonoGame.Effect.Compiler
             if (string.IsNullOrEmpty(mgfxcwine))
             {
                 string os = RuntimeInformation.IsOSPlatform(OSPlatform.OSX) ? "macos" : "linux";
-                Console.Error.WriteLine($"Error: MGFXC0001: MGFXC effect compiler requires a valid Wine installation to be able to compile shaders. Please visit https://monogame.net/MGFX1000?tab={os} for instructions on how to set up Wine.");
+                Console.Error.WriteLine($"Error: MGFXC0001: MGFXC effect compiler requires a valid Wine installation to be able to compile shaders. Please visit https://docs.monogame.net/errors/mgfx0001?tab={os} for more details.");
                 return -1;
             }
 
