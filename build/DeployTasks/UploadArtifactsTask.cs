@@ -52,7 +52,7 @@ public sealed class UploadArtifactsTask : AsyncFrostingTask<BuildContext>
 
             // Assuming that the .vsix file has already been created and is located at this exact path.
             var vsixFilePath = System.IO.Path.Combine(context.BuildOutput, "MonoGame.Templates.VSExtension", "net472", "MonoGame.Templates.VSExtension.vsix");
-            await context.GitHubActions().Commands.UploadArtifact(new FilePath(vsixFilePath), "MonoGame.Templates.VSExtension.vsix");
+            await context.GitHubActions().Commands.UploadArtifact(new FilePath(vsixFilePath), $"MonoGame.Templates.VSExtension.{version}.vsix");
         }
     }
 
