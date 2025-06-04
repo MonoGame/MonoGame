@@ -3,7 +3,6 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System;
-using System.IO;
 using System.Threading;
 using Microsoft.Xna.Framework.Audio;
 using MonoGame.Interop;
@@ -45,7 +44,9 @@ public sealed partial class Song : IEquatable<Song>, IDisposable
                 continue;
             }
 
-            finished = MGM.AudioDecoder_Decode(_decoder, out var buffer, out var size);
+            uint size;
+            byte* buffer;
+            finished = MGM.AudioDecoder_Decode(_decoder, &buffer, &size) == 0 ? false : true;
 
             if (size > 0)
             {
@@ -53,7 +54,7 @@ public sealed partial class Song : IEquatable<Song>, IDisposable
 
                 if (start_voice)
                 {
-                    MGA.Voice_Play(_voice, false);
+                    MGA.Voice_Play(_voice, 0);
                     start_voice = false;
                 }
             }
@@ -75,7 +76,10 @@ public sealed partial class Song : IEquatable<Song>, IDisposable
     {
         var absolutePath = MGP.Platform_MakePath(TitleContainer.Location, fileName);
 
-        _decoder = MGM.AudioDecoder_Create(absolutePath, out _info);
+        fixed (byte* p = System.Text.Encoding.UTF8.GetBytes(absolutePath + '\0'))
+        fixed (MGM_AudioDecoderInfo* i = &_info)
+            _decoder = MGM.AudioDecoder_Create(p, i);
+
         if (_decoder == null)
             return;
 
@@ -185,7 +189,7 @@ public sealed partial class Song : IEquatable<Song>, IDisposable
         if (_thread == null)
             return;
 
-        MGA.Voice_Stop(_voice, false);
+        MGA.Voice_Stop(_voice, 0);
 
         // Halt the thread.
         _stop.Set();

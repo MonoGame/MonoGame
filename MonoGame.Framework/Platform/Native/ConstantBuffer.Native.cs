@@ -4,9 +4,7 @@
 
 using MonoGame.Interop;
 using System;
-using System.Collections.Generic;
-using System.Reflection.Metadata;
-using System.Runtime.InteropServices;
+
 
 namespace Microsoft.Xna.Framework.Graphics;
 
@@ -33,7 +31,8 @@ internal partial class ConstantBuffer
         if (_dirty)
         {
             fixed (byte* data = &_buffer[0])
-                MGG.Buffer_SetData(GraphicsDevice.Handle, ref Handle, 0, data, _buffer.Length, true);
+            fixed (MGG_Buffer** h = &Handle)
+                MGG.Buffer_SetData(GraphicsDevice.Handle, h, 0, data, _buffer.Length, 1);
             _dirty = false;
         }
 

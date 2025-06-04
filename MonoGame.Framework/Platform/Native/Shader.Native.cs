@@ -4,7 +4,7 @@
 
 using MonoGame.Interop;
 using System.Collections.Generic;
-using System.Runtime.InteropServices;
+
 
 namespace Microsoft.Xna.Framework.Graphics;
 
@@ -39,12 +39,14 @@ partial class Shader
         var vertexInputLayout = vertexBuffers.ToImmutable();
         vertexInputLayout.GenerateInputElements(Attributes, out var inputElements, out var streamStrides);
 
-        inputLayout.Ptr = MGG.InputLayout_Create(
-            GraphicsDevice.Handle,
-            streamStrides,
-            streamStrides.Length,
-            inputElements,
-            inputElements.Length);
+        fixed (int* s = streamStrides)
+        fixed (MGG_InputElement* i = inputElements)
+            inputLayout.Ptr = MGG.InputLayout_Create(
+                GraphicsDevice.Handle,
+                s,
+                streamStrides.Length,
+                i,
+                inputElements.Length);
 
         _cache.Add(vertexInputLayout, inputLayout);
 
