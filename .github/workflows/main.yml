@@ -9,6 +9,9 @@ on:
     branches:
       - master
 
+concurrency:
+  group: ${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
   build:
