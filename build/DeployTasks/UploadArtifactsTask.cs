@@ -21,9 +21,10 @@ public sealed class UploadArtifactsTask : AsyncFrostingTask<BuildContext>
         // Plus in windows hidden files (like the .store directory)
         // are ignored. This causes `dotnet tool` to error.
         var path = System.IO.Path.Combine(context.BuildOutput, "Tests", "Tools", "Release", "dotnet-tools");
-        if (System.IO.Directory.Exists(path)) {
-            context.Log.Information ($"Deleting: {path}");
-            System.IO.Directory.Delete (path, recursive: true);
+        if (System.IO.Directory.Exists(path))
+        {
+            context.Log.Information($"Deleting: {path}");
+            System.IO.Directory.Delete(path, recursive: true);
         }
         if (context.IsRunningOnMacOs())
         {
@@ -40,13 +41,14 @@ public sealed class UploadArtifactsTask : AsyncFrostingTask<BuildContext>
             path = System.IO.Path.Combine(context.BuildOutput, "Tests", "Tools", "Release");
             DeleteToolStore(context, path);
         }
-       
 
-        await context.GitHubActions().Commands.UploadArtifact(new DirectoryPath(context.NuGetsDirectory.FullPath), $"nuget-{os}");
-        await context.GitHubActions().Commands.UploadArtifact(new DirectoryPath(System.IO.Path.Combine(context.BuildOutput, "Tests", "DesktopGL", "Release")), $"tests-desktopgl-{os}");
+        var version = BuildContext.CalculateVersion(context);
+
+        await context.GitHubActions().Commands.UploadArtifact(new DirectoryPath(context.NuGetsDirectory.FullPath), $"nuget-{os}.{version}");
+        await context.GitHubActions().Commands.UploadArtifact(new DirectoryPath(System.IO.Path.Combine(context.BuildOutput, "Tests", "DesktopGL", "Release")), $"tests-desktopgl-{os}.{version}");
         if (context.IsRunningOnWindows())
         {
-            await context.GitHubActions().Commands.UploadArtifact(new DirectoryPath(System.IO.Path.Combine(context.BuildOutput, "Tests", "WindowsDX", "Release")), $"tests-windowsdx-{os}");
+            await context.GitHubActions().Commands.UploadArtifact(new DirectoryPath(System.IO.Path.Combine(context.BuildOutput, "Tests", "WindowsDX", "Release")), $"tests-windowsdx-{os}.{version}");
 
             // Assuming that the .vsix file has already been created and is located at this exact path.
             var vsixFilePath = System.IO.Path.Combine(context.BuildOutput, "MonoGame.Templates.VSExtension", "net472", "MonoGame.Templates.VSExtension.vsix");
