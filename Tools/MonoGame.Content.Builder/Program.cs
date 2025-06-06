@@ -54,10 +54,13 @@ namespace MonoGame.Content.Builder
 
             var content = new BuildContent();
 
+            // Get the assembly version
+            var versionString = $"v{System.Reflection.Assembly.GetExecutingAssembly().GetName().Version}";
+
             // Parse the command line.
             var parser = new MGBuildParser(content)
             {
-                Title = "MonoGame Content Builder\n" +
+                Title = $"MonoGame Content Builder: {versionString}\n" +
                         "Builds optimized game content for MonoGame projects."
             };
 
