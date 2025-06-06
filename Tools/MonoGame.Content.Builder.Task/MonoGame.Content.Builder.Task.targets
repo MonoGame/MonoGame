@@ -151,7 +151,7 @@
       - ExtraContent: built content files
         - ContentDir: the relative path of the embedded folder to contain the content files
   -->
-  <Target Name="RunContentBuilder" DependsOnTargets="_RestoreMGCBTool;PrepareContentBuilder">
+  <Target Name="RunContentBuilder" DependsOnTargets="PrepareContentBuilder">
 
     <PropertyGroup>
       <_Command Condition=" '$(_Command)' == '' ">&quot;$(DotnetCommand)&quot; &quot;$(MGCBCommand)&quot;</_Command>
