@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
-    <DefineConstants>XNADESIGNPROVIDED;NATIVE;SUPPORTS_EFX;NETSTANDARD;STBSHARP_INTERNAL</DefineConstants>
+    <DefineConstants>XNADESIGNPROVIDED;NATIVE;NETSTANDARD;STBSHARP_INTERNAL</DefineConstants>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <Description>The MonoGame Native platform.</Description>
     <PackageTags>monogame;.net core;core;.net standard;standard;native</PackageTags>
