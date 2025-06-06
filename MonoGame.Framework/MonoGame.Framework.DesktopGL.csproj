@@ -1,8 +1,8 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
-    <DefineConstants>OPENGL;OPENAL;XNADESIGNPROVIDED;LINUX;DESKTOPGL;SUPPORTS_EFX;NETSTANDARD;STBSHARP_INTERNAL</DefineConstants>
+    <DefineConstants>OPENGL;XNADESIGNPROVIDED;DESKTOPGL;NETSTANDARD;STBSHARP_INTERNAL</DefineConstants>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <Description>The MonoGame runtime supporting Windows, Linux and macOS using SDL2 and OpenGL.</Description>
     <PackageTags>monogame;.net core;core;.net standard;standard;desktopgl</PackageTags>
@@ -17,14 +17,8 @@
     <None Include="..\README-packages.md" Pack="true" PackagePath="\"/>
   </ItemGroup>
 
-  <!-- NETFX reference assemblies let us target .NET Framework on Mac/Linux without Mono -->
   <ItemGroup>
-    <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.0">
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-      <PrivateAssets>all</PrivateAssets>
-    </PackageReference>
     <PackageReference Include="MonoGame.Library.SDL" Version="2.32.2.1" />
-    <PackageReference Include="MonoGame.Library.OpenAL" Version="1.23.1.10" />
   </ItemGroup>
 
   <ItemGroup>
@@ -43,13 +37,6 @@
 
   <ItemGroup>
     <Compile Remove="Graphics\GraphicsAdapter.cs" />
-  </ItemGroup>
-  
-  <!-- Song support with Vorbis, depends on OpenAL -->
-  <ItemGroup>
-    <PackageReference Include="NVorbis" Version="0.10.4" />
-    <Compile Include="Platform\Media\OggStream.NVorbis.cs" />
-    <Compile Include="Platform\Media\Song.NVorbis.cs" />
   </ItemGroup>
 
   <ItemGroup>
