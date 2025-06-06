@@ -13,7 +13,7 @@ namespace MonoGame.Effect
 	{
 
         private const string Header = "MGFX";
-        internal const int Version = 10;
+        internal const int Version = 11;
         
         static int ComputeHash(Stream stream)
         {

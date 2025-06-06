@@ -70,6 +70,7 @@ namespace MonoGame.Effect.Compiler
             try
             {
                 shaderResult = ShaderResult.FromFile(sourceFilepath, options, new ConsoleEffectCompilerOutput());
+                shaderResult.RelativeFilePath = options.SourceFile;
 
                 foreach (var dependency in shaderResult.Dependencies)
                 {
