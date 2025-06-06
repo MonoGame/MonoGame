@@ -8,7 +8,6 @@
     <AutoRestoreMGCBTool Condition="'$(AutoRestoreMGCBTool)' == '' And '$(MGCBCommand)' != ''">false</AutoRestoreMGCBTool>
     <AutoRestoreMGCBTool Condition="'$(AutoRestoreMGCBTool)' == ''">true</AutoRestoreMGCBTool>
     <MGCBCommand Condition="'$(MGCBCommand)' == ''">mgcb</MGCBCommand>
-    <MonoGameVersion Condition="'$(MonoGameVersion)' == ''">3.8.4.0</MonoGameVersion>
   </PropertyGroup>
 
 </Project>
