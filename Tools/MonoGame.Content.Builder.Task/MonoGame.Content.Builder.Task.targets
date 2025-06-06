@@ -123,11 +123,13 @@
 
   </Target>
 
-  <Target Name="_RestoreMGCBTool" Condition="'$(AutoRestoreMGCBTool)' == 'true'"
+  <Target Name="_RestoreMGCBTool"
+        Condition="'$(AutoRestoreMGCBTool)' == 'true'"
+        AfterTargets="Restore"
         Inputs="$(MSBuildProjectFullPath)"
         Outputs="$(IntermediateOutputPath)mgcb.tool.restore">
     <Exec
-      Condition="'$(DotnetCommand)' == ''"
+      Condition="'$(DotnetCommand)' != ''"
       Command="&quot;$(DotnetCommand)&quot; tool restore"
       WorkingDirectory="$(MSBuildProjectDirectory)"
       ContinueOnError="true"
