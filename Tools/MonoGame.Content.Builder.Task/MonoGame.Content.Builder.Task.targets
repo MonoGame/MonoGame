@@ -125,7 +125,7 @@
 
   <Target Name="_RestoreMGCBTool"
         Condition="'$(AutoRestoreMGCBTool)' == 'true'"
-        AfterTargets="Restore"
+        BeforeTargets="CollectPackageReferences"
         Inputs="$(MSBuildProjectFullPath)"
         Outputs="$(IntermediateOutputPath)mgcb.tool.restore">
     <Exec
