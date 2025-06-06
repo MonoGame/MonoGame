@@ -504,9 +504,6 @@ namespace MonoGame.Content.Builder
             }
 
             var name = Assembly.GetEntryAssembly().GetName().Name;
-            // If it looks like a fully qualified name, get just the last part
-            if (name.Contains("."))
-                name = name.Split('.').Last();
 
             if (!string.IsNullOrEmpty(Title))
             {
