@@ -3364,10 +3364,12 @@ void MGG_Buffer_GetData(MGG_GraphicsDevice* device, MGG_Buffer* buffer, mgint of
 	assert(dataBytes > 0);
 	assert(dataStride > 0);
 
-	if (buffer->push)
-		memcpy(data, buffer->push + offset, dataCount * dataBytes);
-	else
-		memcpy(data, buffer->mapped + offset, dataCount * dataBytes);
+	mgbyte* src = buffer->push ? buffer->push : buffer->mapped;
+
+	for (int i = 0; i < dataCount; ++i)
+	{
+		memcpy(data + i * dataBytes, src + offset + (i * dataStride), dataBytes);
+	}
 }
 
 MGG_Texture* MGG_Texture_Create(
