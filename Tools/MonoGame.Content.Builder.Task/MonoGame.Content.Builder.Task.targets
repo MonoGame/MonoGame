@@ -123,10 +123,18 @@
 
   </Target>
 
+  <Target Name="_CollectDotnetToolConfigFiles">
+    <ItemGroup>
+      <_DotnetToolConfigFiles Include="$(SolutionDir)/.config/dotnet-tools.json" Condition="Exists('$(SolutionDir)/.config/dotnet-tools.json')" />
+      <_DotnetToolConfigFiles Include="$(MSBuildProjectDirectory)/.config/dotnet-tools.json" Condition="Exists('$(MSBuildProjectDirectory)/.config/dotnet-tools.json')" />
+    </ItemGroup>
+  </Target>
+
   <Target Name="_RestoreMGCBTool"
         Condition="'$(AutoRestoreMGCBTool)' == 'true'"
         BeforeTargets="CollectPackageReferences"
-        Inputs="$(MSBuildProjectFullPath)"
+        DependsOnTargets="_CollectDotnetToolConfigFiles"
+        Inputs="$(MSBuildProjectFullPath);@(_DotnetToolConfigFiles);$(ProjectAssetsFile)"
         Outputs="$(IntermediateOutputPath)mgcb.tool.restore">
     <Exec
       Condition="'$(DotnetCommand)' != ''"
