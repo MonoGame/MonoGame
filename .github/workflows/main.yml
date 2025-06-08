@@ -1,13 +1,6 @@
 name: Build
 
-on:
-  pull_request:
-
-  push:
-    tags:
-      - v*
-    branches:
-      - master
+on: [push, pull_request]
 
 concurrency:
   group: ${{ github.ref }}
