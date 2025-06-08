@@ -57,11 +57,6 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
         public abstract GraphicsProfile TargetProfile { get; }
 
         /// <summary>
-        /// Gets the directory that contains the content project.
-        /// </summary>
-        public abstract string ProjectDirectory { get; }
-
-        /// <summary>
         /// Initializes a new instance of ContentProcessorContext.
         /// </summary>
         public ContentProcessorContext()
@@ -116,6 +111,18 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
             );
 
         /// <summary>
+        /// Initiates a nested build of the specified asset and then loads the result into memory.
+        /// </summary>
+        /// <typeparam name="TInput">Type of the input.</typeparam>
+        /// <typeparam name="TOutput">Type of the converted output.</typeparam>
+        /// <param name="sourceAsset">Reference to the source asset.</param>
+        /// <param name="importer">Optional importer for this content.</param>
+        /// <param name="processor">Optional processor for this content.</param>
+        /// <returns>Copy of the final converted content.</returns>
+        /// <remarks>An example of usage would be a mesh processor calling BuildAndLoadAsset to build any associated textures and replace the original .tga file references with an embedded copy of the converted texture.</remarks>
+        public abstract TOutput BuildAndLoadAsset<TInput,TOutput>(ExternalReference<TInput> sourceAsset, IContentImporter importer, IContentProcessor processor);
+
+        /// <summary>
         /// Initiates a nested build of an additional asset.
         /// </summary>
         /// <typeparam name="TInput">Type of the input.</typeparam>
@@ -153,6 +160,24 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
             );
 
         /// <summary>
+        /// Initiates a nested build of an additional asset.
+        /// </summary>
+        /// <typeparam name="TInput">Type of the input.</typeparam>
+        /// <typeparam name="TOutput">Type of the output.</typeparam>
+        /// <param name="sourceAsset">Reference to the source asset.</param>
+        /// <param name="importer">Optional importer for this content.</param>
+        /// <param name="processor">Optional processor for this content.</param>
+        /// <param name="assetName">Optional name of the final compiled content.</param>
+        /// <returns>Reference to the final compiled content. The build work is not required to complete before returning. Therefore, this file may not be up to date when BuildAsset returns but it will be available for loading by the game at runtime.</returns>
+        /// <remarks>An example of usage for BuildAsset is being called by a mesh processor to request that any related textures used are also built, replacing the original TGA file references with new references to the converted texture files.</remarks>
+        public abstract ExternalReference<TOutput> BuildAsset<TInput,TOutput>(
+            ExternalReference<TInput> sourceAsset,
+            IContentImporter importer,
+            IContentProcessor processor,
+            string? assetName = null
+            );
+
+        /// <summary>
         /// Converts a content item object using the specified content processor.
         /// </summary>
         /// <typeparam name="TInput">Type of the input content.</typeparam>
@@ -177,10 +202,16 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
         /// <param name="processorName">Optional processor for this content.</param>
         /// <param name="processorParameters">Optional parameters for the processor.</param>
         /// <returns>Reference of the final converted content.</returns>
-        public abstract TOutput Convert<TInput,TOutput>(
-            TInput input,
-            string processorName,
-            OpaqueDataDictionary processorParameters
-            );
+        public abstract TOutput Convert<TInput, TOutput>(TInput input, string processorName, OpaqueDataDictionary processorParameters);
+
+        /// <summary>
+        /// Converts a content item object using the specified content processor.
+        /// </summary>
+        /// <typeparam name="TInput">Type of the input content.</typeparam>
+        /// <typeparam name="TOutput">Type of the converted output.</typeparam>
+        /// <param name="input">Source content to be converted.</param>
+        /// <param name="processor">Optional processor for this content.</param>
+        /// <returns>Reference of the final converted content.</returns>
+        public abstract TOutput Convert<TInput, TOutput>(TInput input, IContentProcessor processor);
     }
 }

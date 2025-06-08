@@ -17,7 +17,19 @@ partial class TitleContainer
 
     private static Stream PlatformOpenStream(string safeName)
     {
-        var absolutePath = MGP.Platform_MakePath(Location, safeName);
-        return MG.OpenRead(absolutePath);
+        try
+        {
+            var absolutePath = MGP.Platform_MakePath(Location, safeName);
+            return MG.OpenRead(absolutePath);
+        }
+        catch
+        {
+            return null;
+        }
+    }
+
+    private static Stream PlatformOpenWriteStream(string safeName)
+    {
+        throw new NotImplementedException();
     }
 }

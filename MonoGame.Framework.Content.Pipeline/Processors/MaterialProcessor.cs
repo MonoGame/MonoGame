@@ -124,15 +124,17 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
         /// <remarks>textureName can be used to determine which processor to use. For example, if a texture is being used as a normal map, the user may not want to use the ModelTextureProcessor on it, which compresses textures.</remarks>
         protected virtual ExternalReference<TextureContent> BuildTexture(string textureName, ExternalReference<TextureContent> texture, ContentProcessorContext context)
         {
-            var parameters = new OpaqueDataDictionary();
-            parameters.Add("ColorKeyColor", ColorKeyColor);
-            parameters.Add("ColorKeyEnabled", ColorKeyEnabled);
-            parameters.Add("GenerateMipmaps", GenerateMipmaps);
-            parameters.Add("PremultiplyAlpha", PremultiplyTextureAlpha);
-            parameters.Add("ResizeToPowerOfTwo", ResizeTexturesToPowerOfTwo);
-            parameters.Add("TextureFormat", TextureFormat);
+            var processor = new TextureProcessor
+            {
+                ColorKeyColor = ColorKeyColor,
+                ColorKeyEnabled = ColorKeyEnabled,
+                GenerateMipmaps = GenerateMipmaps,
+                PremultiplyAlpha = PremultiplyTextureAlpha,
+                ResizeToPowerOfTwo = ResizeTexturesToPowerOfTwo,
+                TextureFormat = TextureFormat
+            };
 
-            return context.BuildAsset<TextureContent, TextureContent>(texture, "TextureProcessor", parameters, "TextureImporter", null);
+            return context.BuildAsset<TextureContent, TextureContent>(texture, new TextureImporter(), processor);
         }
 
         /// <summary>
