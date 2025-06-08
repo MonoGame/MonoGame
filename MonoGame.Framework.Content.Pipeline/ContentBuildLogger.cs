@@ -114,7 +114,7 @@ public class ContentBuildLogger
 
         foreach (var subMessage in message.Split(['\r', '\n'], StringSplitOptions.None))
         {
-            var time = ShowRealTime ? DateTime.Now.ToString("HH:mm:ss.fff") : _stopWatch.Elapsed.ToString("hh:mm:ss.fff");
+            var time = ShowRealTime ? DateTime.Now.ToString("HH:mm:ss.fff") : _stopWatch.Elapsed.ToString("hh\\:mm\\:ss\\.fff");
             Console.WriteLine($"{time} [{level.ToString()[0]}] {IndentString}{subMessage}");
         }
 
