@@ -2,6 +2,10 @@ name: Build
 
 on: [push, pull_request]
 
+concurrency:
+  group: ${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+  
 jobs:
   build:
     name: build-${{ matrix.os }}
