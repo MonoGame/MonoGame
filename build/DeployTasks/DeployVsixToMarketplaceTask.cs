@@ -11,6 +11,9 @@ public sealed class DeployVsixToMarketplaceTask : FrostingTask<BuildContext>
 {
     public override bool ShouldRun(BuildContext context)
     {
+#if DEBUG
+        return true;
+#else
         if (context.BuildSystem().IsRunningOnGitHubActions)
         {
             var workflow = context.BuildSystem().GitHubActions.Environment.Workflow;
@@ -22,13 +25,12 @@ public sealed class DeployVsixToMarketplaceTask : FrostingTask<BuildContext>
         }
 
         return false;
+#endif
     }
 
     public override void Run(BuildContext context)
     {
         var pat = context.EnvironmentVariable("MARKETPLACE_PAT");
-        var publisher = "MonoGame";
-        var extensionName = "MonoGame.Templates.VSExtension";
         var vsixPath = "vsix/MonoGame.Templates.VSExtension.vsix";
 
         if (!File.Exists(vsixPath))
@@ -38,40 +40,28 @@ public sealed class DeployVsixToMarketplaceTask : FrostingTask<BuildContext>
         }
 
         // Find VsixPublisher.exe location - adjust as needed for your environment
-        var programFilesX86 = Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86);
-        var vsixPublisherPath = System.IO.Path.Combine(
-            programFilesX86,
-            "Microsoft Visual Studio",
-            "2022",
-            "Enterprise", // May need to check for other editions (Professional, Community)
-            "VSSDK",
-            "VisualStudioIntegration",
-            "Tools",
-            "Bin",
-            "VsixPublisher.exe");
+        var programFiles = Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles);
+        string vsixPublisherPath = string.Empty;
 
-        if (!File.Exists(vsixPublisherPath))
+        context.Log.Information("Looking for VsixPublisher in VS Edition locations...");
+        // Try to find it in other edition folders
+        foreach (var edition in new[] { "Enterprise", "Professional", "Community" })
         {
-            context.Log.Information("Looking for VsixPublisher in alternate locations...");
-            // Try to find it in other edition folders
-            foreach (var edition in new[] { "Professional", "Community" })
-            {
-                var alternatePath = System.IO.Path.Combine(
-                    programFilesX86,
-                    "Microsoft Visual Studio",
-                    "2022",
-                    edition,
-                    "VSSDK",
-                    "VisualStudioIntegration",
-                    "Tools",
-                    "Bin",
-                    "VsixPublisher.exe");
+            var vsEditionPath = System.IO.Path.Combine(
+                programFiles,
+                "Microsoft Visual Studio",
+                "2022",
+                edition,
+                "VSSDK",
+                "VisualStudioIntegration",
+                "Tools",
+                "Bin",
+                "VsixPublisher.exe");
 
-                if (File.Exists(alternatePath))
-                {
-                    vsixPublisherPath = alternatePath;
-                    break;
-                }
+            if (File.Exists(vsEditionPath))
+            {
+                vsixPublisherPath = vsEditionPath;
+                break;
             }
         }
 
@@ -81,27 +71,13 @@ public sealed class DeployVsixToMarketplaceTask : FrostingTask<BuildContext>
             return;
         }
 
-        // Create manifest file
-        var manifestPath = System.IO.Path.Combine(System.IO.Path.GetTempPath(), "publish-manifest.json");
-        var manifest = new
-        {
-            publisher = publisher,
-            extensionName = extensionName,
-            qnaEnabled = true,
-            categories = new[] { "templates" }, // Adjust categories as needed
-            identity = new { internalName = extensionName },
-            overview = "overview.md", // You might need to create this file
-            priceCategory = "free",
-            helpMarkdown = "", // Optional help markdown
-            assetFiles = new[] {
-                new {
-                    pathOnDisk = vsixPath,
-                    targetPath = extensionName + ".vsix"
-                }
-            }
-        };
+        var manifestPath = "vsix/publishManifest.json";
 
-        File.WriteAllText(manifestPath, JsonSerializer.Serialize(manifest, new JsonSerializerOptions { WriteIndented = true }));
+        if (!File.Exists(manifestPath))
+        {
+            context.Error("publishManifest.json not found!");
+            return;
+        }
 
         // Run VsixPublisher
         var processSettings = new ProcessSettings
@@ -125,11 +101,5 @@ public sealed class DeployVsixToMarketplaceTask : FrostingTask<BuildContext>
         {
             context.Error($"Failed to upload VSIX. Exit code: {exitCode}{Environment.NewLine}Error:{stdError}");
         }*/
-
-        // Clean up the temporary manifest file
-        if (File.Exists(manifestPath))
-        {
-            File.Delete(manifestPath);
-        }
     }
 }
