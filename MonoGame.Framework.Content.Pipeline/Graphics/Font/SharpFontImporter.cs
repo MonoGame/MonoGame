@@ -142,6 +142,13 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
             abc.B = face->glyph->bitmap.width;
             abc.C = (face->glyph->metrics.horiAdvance.Value >> 6) - (abc.A + abc.B);
 
+            // nkast fix, but only when necessary, this way we can have nice arial fonts without breaking the crucial Kingthings Petrock.
+            if ((*face->glyph).bitmap_left < 0)
+            {
+                abc.A -= face->glyph->bitmap_left;
+                abc.B += face->glyph->bitmap_left;
+            }
+
             return new GlyphData(glyphIndex, glyphBitmap)
             {
                 XOffset = face->glyph->bitmap_left,
