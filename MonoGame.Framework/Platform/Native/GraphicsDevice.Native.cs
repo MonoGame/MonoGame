@@ -122,15 +122,6 @@ public partial class GraphicsDevice
         Textures.Dirty();
         SamplerStates.Dirty();
 
-        MGG.GraphicsDevice_SetViewport(
-            Handle,
-            _viewport.X,
-            _viewport.Y,
-            _viewport.Width,
-            _viewport.Height,
-            _viewport.MinDepth,
-            _viewport.MaxDepth);
-
         PlatformApplyDefaultRenderTarget();
     }
 
@@ -178,6 +169,20 @@ public partial class GraphicsDevice
     private unsafe void PlatformApplyDefaultRenderTarget()
     {
         BeginFrame();
+
+        _viewport = new Viewport(
+            0,
+            0,
+            PresentationParameters.BackBufferWidth,
+            PresentationParameters.BackBufferHeight,
+            _viewport.MinDepth,
+            _viewport.MaxDepth);
+
+        _scissorRectangle = new Rectangle(
+            0,
+            0,
+            PresentationParameters.BackBufferWidth,
+            PresentationParameters.BackBufferHeight);
 
         MGG.GraphicsDevice_SetRenderTargets(Handle, null, 0);
     }
