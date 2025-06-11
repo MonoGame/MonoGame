@@ -1,6 +1,14 @@
 name: Build
 
-on: [push, pull_request]
+on:
+  pull_request:
+
+  push:
+    tags:
+      - v*
+    branches:
+      - master
+
 
 jobs:
   build:
@@ -8,7 +16,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [windows-latest, macos-latest, ubuntu-latest]
+        os: [windows-latest, macos-latest, ubuntu-24.04]
       fail-fast: false
     steps:
       - name: Clone repository
@@ -16,10 +24,20 @@ jobs:
         with:
           submodules: recursive
 
-      - name: Setup .NET Core SDK ${{ matrix.dotnet-version }}
+      - name: Setup .NET Core SDK
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '8.0.x'
+
+      - name: Setup DotNet on linux/Windows
+        if: runner.environment == 'github-hosted' && (runner.os == 'Linux' || runner.os == 'windows')
+        run: |
+          dotnet workload install android
+
+      - name: Setup DotNet on MacOS
+        if: runner.environment == 'github-hosted' && runner.os == 'macos'
+        run: |
+          dotnet workload install android macos ios
 
       - name: Add msbuild to PATH
         if: runner.os == 'Windows'
@@ -45,38 +63,44 @@ jobs:
       - name: Disable Annotations
         run: echo "::remove-matcher owner=csc::"
 
-      - name: Install Dependencies
-        run:   |
-              if [ "$RUNNER_OS" == "Linux" ]; then
-                    dotnet workload install android
-                    sudo apt install p7zip-full curl
-                    sudo dpkg --add-architecture i386 
-                    sudo mkdir -pm755 /etc/apt/keyrings
-                    sudo wget -O /etc/apt/keyrings/winehq-archive.key https://dl.winehq.org/wine-builds/winehq.key
-                    sudo wget -NP /etc/apt/sources.list.d/ https://dl.winehq.org/wine-builds/ubuntu/dists/jammy/winehq-jammy.sources
-                    sudo apt update && sudo apt install --install-recommends winehq-stable
-                    echo "ttf-mscorefonts-installer msttcorefonts/accepted-mscorefonts-eula select true" | sudo debconf-set-selections
-                    sudo apt install -y ttf-mscorefonts-installer
-                    sudo fc-cache
-                    fc-match Arial
-                    wine64 --version
-                    wget -qO- https://monogame.net/downloads/net9_mgfxc_wine_setup.sh | bash
-              elif [ "$RUNNER_OS" == "Windows" ]; then
-                    dotnet.exe workload install android
-              else
-                    dotnet workload install android macos ios
-                    brew install wine-stable p7zip
-                    sudo mkdir -p /usr/local/lib
-                    ls -n /Applications/ | grep Xcode*
-                    sudo xcode-select -s /Applications/Xcode_16.2.app/Contents/Developer
-                    wget -qO- https://monogame.net/downloads/net9_mgfxc_wine_setup.sh | bash
-              fi
-        shell: bash
+      - name: install wine64 on linux
+        if: runner.environment == 'github-hosted' && runner.os == 'Linux'
+        run: |
+          sudo apt install p7zip-full curl
+          sudo dpkg --add-architecture i386 
+          sudo mkdir -pm755 /etc/apt/keyrings
+          sudo wget -O /etc/apt/keyrings/winehq-archive.key https://dl.winehq.org/wine-builds/winehq.key
+          sudo wget -NP /etc/apt/sources.list.d/ https://dl.winehq.org/wine-builds/ubuntu/dists/noble/winehq-noble.sources
+          sudo apt update && sudo apt install --install-recommends winehq-stable
+          wget -qO- https://monogame.net/downloads/net9_mgfxc_wine_setup.sh | bash
+
+      - name: install wine64 on MacOS
+        if: runner.environment == 'github-hosted' && runner.os == 'macos'
+        run: |
+          brew install wine-stable p7zip
+          sudo mkdir -p /usr/local/lib
+          ls -n /Applications/ | grep Xcode*
+          sudo xcode-select -s /Applications/Xcode_16.2.app/Contents/Developer
+          wget -qO- https://monogame.net/downloads/net9_mgfxc_wine_setup.sh | bash
+
+      - name: Install Arial Font
+        if: runner.environment == 'github-hosted' && runner.os == 'Linux'
+        run: |
+          echo "ttf-mscorefonts-installer msttcorefonts/accepted-mscorefonts-eula select true" | sudo debconf-set-selections
+          sudo apt install -y ttf-mscorefonts-installer
+          sudo fc-cache
+          fc-match Arial
+
+      - name: Dotnet Restore Templates
+        if: runner.environment == 'github-hosted' && runner.os == 'Windows'
+        run: |
+          dotnet restore Templates/MonoGame.Templates.VSExtension
 
       - name: Build
-        run: dotnet run --project build/Build.csproj -- --target=Default
+        run: |
+          dotnet run --project build/Build.csproj -- --target=Default
 
-      - name: Run Tests
+      - name: Run Tools Tests
         run:   |
               if [ "$RUNNER_OS" == "Windows" ]; then
                     dotnet test Tools/MonoGame.Tools.Tests/MonoGame.Tools.Tests.csproj --blame-hang-timeout 5m -c Release
@@ -99,7 +123,7 @@ jobs:
           ACTIONS_RUNTIME_URL: "${{ env.ACTIONS_RUNTIME_URL }}"
   deploy:
       name: Deploy
-      needs: [ build ]
+      needs: [ build, tests ]
       runs-on: ubuntu-latest
       if: ${{ github.event_name == 'push' }}
       permissions:
@@ -109,7 +133,7 @@ jobs:
           - name: Clone Repository
             uses: actions/checkout@v4
 
-          - name: Setup .NET ${{ matrix.dotnet-version }}
+          - name: Setup .NET
             uses: actions/setup-dotnet@v4
             with:
               dotnet-version: '8.0.x'
@@ -148,7 +172,7 @@ jobs:
           - os: macos
             platform: macos
             shell: bash
-          - os: ubuntu-latest
+          - os: ubuntu-24.04
             platform: linux
             shell: bash
             filter: --where="Category != Audio"
@@ -164,45 +188,39 @@ jobs:
         with:
           submodules: recursive
 
-      - name: Setup .NET Core SDK ${{ matrix.dotnet-version }}
+      - name: Setup .NET Core SDK
+        if: runner.environment == 'github-hosted'
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '8.0.x'
-        if: runner.environment == 'github-hosted'
 
       - name: install wine64 on linux
+        if: runner.os == 'Linux' && runner.environment == 'github-hosted'
         run: |
           sudo apt install p7zip-full curl
           sudo dpkg --add-architecture i386 
           sudo mkdir -pm755 /etc/apt/keyrings
           sudo wget -O /etc/apt/keyrings/winehq-archive.key https://dl.winehq.org/wine-builds/winehq.key
-          sudo wget -NP /etc/apt/sources.list.d/ https://dl.winehq.org/wine-builds/ubuntu/dists/jammy/winehq-jammy.sources
+          sudo wget -NP /etc/apt/sources.list.d/ https://dl.winehq.org/wine-builds/ubuntu/dists/noble/winehq-noble.sources
           sudo apt update && sudo apt install --install-recommends winehq-stable
-        if: runner.os == 'Linux' && runner.environment == 'github-hosted'
 
       - name: Install Arial Font
+        if: runner.os == 'Linux' && runner.environment == 'github-hosted'
         run: |
           echo "ttf-mscorefonts-installer msttcorefonts/accepted-mscorefonts-eula select true" | sudo debconf-set-selections
           sudo apt install -y ttf-mscorefonts-installer
           sudo fc-cache
           fc-match Arial
-        if: runner.os == 'Linux' && runner.environment == 'github-hosted'
 
       - name: Setup Wine 
-        run: wget -qO- https://monogame.net/downloads/net9_mgfxc_wine_setup.sh | bash
         if: runner.os != 'Windows' && runner.environment == 'github-hosted'
+        run: wget -qO- https://monogame.net/downloads/net9_mgfxc_wine_setup.sh | bash
 
       - name: Download Nuget
         uses: actions/download-artifact@v4
         with:
           name: nuget-${{ matrix.platform }}
           path: Artifacts/NuGet
-
-      - name: Download tests-tools-${{ matrix.platform }}
-        uses: actions/download-artifact@v4
-        with:
-          name: tests-tools-${{ matrix.platform }}
-          path: tests tools
 
       - name: Download tests-desktopgl-${{ matrix.platform }}
         uses: actions/download-artifact@v4
@@ -211,32 +229,27 @@ jobs:
           path: tests-desktopgl
           
       - name: Download tests-windowsdx-${{ matrix.platform }}
+        if: runner.os == 'Windows'
         uses: actions/download-artifact@v4
         with:
           name: tests-windowsdx-${{ matrix.platform }}
           path: tests-windowsdx
-        if: runner.os == 'Windows'
-
-      - name: Run Tools Tests
-        run: dotnet test "tests tools/MonoGame.Tools.Tests.dll" --blame-hang-timeout 1m --filter="TestCategory!=Effects"
-        env:
-          CI: true
 
       # Run the DirectX tests in two steps: first the audio, then the rest.
       # This is because the audio tests has some incompatibilities within the runner with ContentManagerTests.
       - name: Run DirectX Audio Tests
+        if: runner.os == 'Windows'
         run: dotnet test --filter Category=Audio MonoGame.Tests.dll 
         env:
           CI: true
         working-directory: tests-windowsdx
-        if: runner.os == 'Windows'
         
       - name: Run DirectX All Tests Except Audio
+        if: runner.os == 'Windows'
         run: dotnet test --filter Category!=Audio MonoGame.Tests.dll 
         env:
           CI: true
         working-directory: tests-windowsdx
-        if: runner.os == 'Windows'
 
       # Run the DesktopGL tests on all platforms using NUnitLite runner not dotnet test
       # We have to run this is bits because the tests crash if too many are run in one go?
@@ -247,11 +260,11 @@ jobs:
         working-directory: tests-desktopgl
 
       - name: Run Audio Tests
+        if: runner.environment != 'github-hosted'
         run: dotnet MonoGame.Tests.dll --timeout=300000 --test MonoGame.Tests.Audio
         env:
           CI: true
         working-directory: tests-desktopgl
-        if: runner.environment != 'github-hosted'
 
       - name: Run Input Tests
         run: dotnet MonoGame.Tests.dll --timeout=300000 --test MonoGame.Tests.Input
@@ -272,170 +285,170 @@ jobs:
         working-directory: tests-desktopgl
 
       - name: Run Graphics.BlendStateTest Tests
+        if: runner.environment != 'github-hosted'
         run: dotnet MonoGame.Tests.dll --timeout=300000 --test MonoGame.Tests.Graphics.BlendStateTest
         env:
           CI: true
         working-directory: tests-desktopgl
-        if: runner.environment != 'github-hosted'
 
       - name: Run Graphics.DepthStencilStateTest Tests
+        if: runner.environment != 'github-hosted'
         run: dotnet MonoGame.Tests.dll --timeout=300000 --test MonoGame.Tests.Graphics.DepthStencilStateTest
         env:
           CI: true
         working-directory: tests-desktopgl
-        if: runner.environment != 'github-hosted'
 
       - name: Run Graphics.EffectTest Tests
+        if: runner.environment != 'github-hosted'
         run: dotnet MonoGame.Tests.dll --timeout=300000 --test MonoGame.Tests.Graphics.EffectTest
         env:
           CI: true
         working-directory: tests-desktopgl
-        if: runner.environment != 'github-hosted'
 
       - name: Run Graphics.GraphicsAdapterTest Tests
+        if: runner.environment != 'github-hosted'
         run: dotnet MonoGame.Tests.dll --timeout=300000 --test MonoGame.Tests.Graphics.GraphicsAdapterTest
         env:
           CI: true
         working-directory: tests-desktopgl
-        if: runner.environment != 'github-hosted'
 
       # This test hangs on MacOS?
       # - name: Run Graphics.GraphicsDeviceTest Tests
+      #   if: runner.environment != 'github-hosted'
       #   run: dotnet MonoGame.Tests.dll --timeout=300000 --test MonoGame.Tests.Graphics.GraphicsDeviceTest
       #   env:
       #     CI: true
       #   working-directory: tests-desktopgl
-      #   if: runner.environment != 'github-hosted'
 
       - name: Run Graphics.IndexBufferTest Tests
+        if: runner.environment != 'github-hosted'
         run: dotnet MonoGame.Tests.dll --timeout=300000 --test MonoGame.Tests.Graphics.IndexBufferTest
         env:
           CI: true
         working-directory: tests-desktopgl
-        if: runner.environment != 'github-hosted'
 
       - name: Run Graphics.MiscellaneousTests Tests
+        if: runner.environment != 'github-hosted'
         run: dotnet MonoGame.Tests.dll --timeout=300000 --test MonoGame.Tests.Graphics.MiscellaneousTests
         env:
           CI: true
         working-directory: tests-desktopgl
-        if: runner.environment != 'github-hosted'
 
       - name: Run Graphics.ModelTest Tests
+        if: runner.environment != 'github-hosted'
         run: dotnet MonoGame.Tests.dll --timeout=300000 --test MonoGame.Tests.Graphics.ModelTest
         env:
           CI: true
         working-directory: tests-desktopgl
-        if: runner.environment != 'github-hosted'
 
       - name: Run Graphics.OcclusionQueryTest Tests
+        if: runner.environment != 'github-hosted'
         run: dotnet MonoGame.Tests.dll --timeout=300000 --test MonoGame.Tests.Graphics.OcclusionQueryTest
         env:
           CI: true
         working-directory: tests-desktopgl
-        if: runner.environment != 'github-hosted'
 
       - name: Run Graphics.RasterizerStateTest Tests
+        if: runner.environment != 'github-hosted'
         run: dotnet MonoGame.Tests.dll --timeout=300000 --test MonoGame.Tests.Graphics.RasterizerStateTest
         env:
           CI: true
         working-directory: tests-desktopgl
-        if: runner.environment != 'github-hosted'
 
       - name: Run Graphics.RenderTarget2DTest Tests
+        if: runner.environment != 'github-hosted'
         run: dotnet MonoGame.Tests.dll --timeout=300000 --test MonoGame.Tests.Graphics.RenderTarget2DTest
         env:
           CI: true
         working-directory: tests-desktopgl
-        if: runner.environment != 'github-hosted'
 
       - name: Run Graphics.RenderTargetCubeTest Tests
+        if: runner.environment != 'github-hosted'
         run: dotnet MonoGame.Tests.dll --timeout=300000 --test MonoGame.Tests.Graphics.RenderTargetCubeTest
         env:
           CI: true
         working-directory: tests-desktopgl
-        if: runner.environment != 'github-hosted'
 
       - name: Run Graphics.SamplerStateTest Tests
+        if: runner.environment != 'github-hosted'
         run: dotnet MonoGame.Tests.dll --timeout=300000 --test MonoGame.Tests.Graphics.SamplerStateTest
         env:
           CI: true
         working-directory: tests-desktopgl
-        if: runner.environment != 'github-hosted'
 
       - name: Run Graphics.ScissorRectangleTest Tests
+        if: runner.environment != 'github-hosted'
         run: dotnet MonoGame.Tests.dll --timeout=300000 --test MonoGame.Tests.Graphics.ScissorRectangleTest
         env:
           CI: true
         working-directory: tests-desktopgl
-        if: runner.environment != 'github-hosted'
 
       - name: Run Graphics.ShaderTest Tests
+        if: runner.environment != 'github-hosted'
         run: dotnet MonoGame.Tests.dll --timeout=300000 --test MonoGame.Tests.Graphics.ShaderTest
         env:
           CI: true
         working-directory: tests-desktopgl
-        if: runner.environment != 'github-hosted'
 
       - name: Run Graphics.SpriteBatchTest Tests
+        if: runner.environment != 'github-hosted'
         run: dotnet MonoGame.Tests.dll --timeout=300000 --test MonoGame.Tests.Graphics.SpriteBatchTest
         env:
           CI: true
         working-directory: tests-desktopgl
-        if: runner.environment != 'github-hosted'
 
       - name: Run Graphics.SpriteFontTest Tests
+        if: runner.environment != 'github-hosted'
         run: dotnet MonoGame.Tests.dll --timeout=300000 --test MonoGame.Tests.Graphics.SpriteFontTest
         env:
           CI: true
         working-directory: tests-desktopgl
-        if: runner.environment != 'github-hosted'
 
       - name: Run Graphics.Texture2DNonVisualTest Tests
+        if: runner.environment != 'github-hosted'
         run: dotnet MonoGame.Tests.dll --timeout=300000 --test MonoGame.Tests.Graphics.Texture2DNonVisualTest
         env:
           CI: true
         working-directory: tests-desktopgl
-        if: runner.environment != 'github-hosted'
 
       - name: Run Graphics.Texture2DTest Tests
+        if: runner.environment != 'github-hosted'
         run: dotnet MonoGame.Tests.dll --timeout=300000 --test MonoGame.Tests.Graphics.Texture2DTest
         env:
           CI: true
         working-directory: tests-desktopgl
-        if: runner.environment != 'github-hosted'
 
       - name: Run Graphics.Texture3DNonVisualTest Tests
+        if: runner.environment != 'github-hosted'
         run: dotnet MonoGame.Tests.dll --timeout=300000 --test MonoGame.Tests.Graphics.Texture3DNonVisualTest
         env:
           CI: true
         working-directory: tests-desktopgl
-        if: runner.environment != 'github-hosted'
 
       - name: Run Graphics.Texture3DTest Tests
+        if: runner.environment != 'github-hosted'
         run: dotnet MonoGame.Tests.dll --timeout=300000 --test MonoGame.Tests.Graphics.Texture3DTest
         env:
           CI: true
         working-directory: tests-desktopgl
-        if: runner.environment != 'github-hosted'
 
       - name: Run Graphics.TextureCubeTest Tests
+        if: runner.environment != 'github-hosted'
         run: dotnet MonoGame.Tests.dll --timeout=300000 --test MonoGame.Tests.Graphics.TextureCubeTest
         env:
           CI: true
         working-directory: tests-desktopgl
-        if: runner.environment != 'github-hosted'
 
       - name: Run Graphics.VertexBufferTest Tests
+        if: runner.environment != 'github-hosted'
         run: dotnet MonoGame.Tests.dll --timeout=300000 --test MonoGame.Tests.Graphics.VertexBufferTest
         env:
           CI: true
         working-directory: tests-desktopgl
-        if: runner.environment != 'github-hosted'
 
       - name: Run Graphics.ViewportTest Tests
+        if: runner.environment != 'github-hosted'
         run: dotnet MonoGame.Tests.dll --timeout=300000 --test MonoGame.Tests.Graphics.ViewportTest
         env:
           CI: true
         working-directory: tests-desktopgl
-        if: runner.environment != 'github-hosted'

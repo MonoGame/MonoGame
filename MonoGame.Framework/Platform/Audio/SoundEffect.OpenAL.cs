@@ -248,6 +248,9 @@ namespace Microsoft.Xna.Framework.Audio
                 OpenALSoundController.Efx.DeleteEffect((int)ReverbEffect);
             }
             OpenALSoundController.DestroyInstance();
+#if DESKTOPGL
+            OggStreamer.Instance.Shutdown();
+#endif
         }
     }
 }

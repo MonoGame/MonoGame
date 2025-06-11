@@ -5,6 +5,7 @@
 using System;
 using System.IO;
 using BCnEncoder.Encoder;
+using BCnEncoder.Decoder;
 using BCnEncoder.Shared;
 using KtxSharp;
 using Microsoft.Xna.Framework.Content.Pipeline.Graphics;
@@ -57,5 +58,28 @@ internal static class BcnUtil
         ktxStream.Seek(0, SeekOrigin.Begin);
         var ktx = KtxLoader.LoadInput(ktxStream);
         compressedBytes = ktx.textureData.textureDataOfMipmapLevel[0];
+    }
+
+    public static PixelBitmapContent<Vector4> Decode(
+        byte[] compressedBytes,
+        CompressionFormat format,
+        int width,
+        int height)
+    {
+        var decoder = new BcDecoder();
+        using MemoryStream stream = new MemoryStream(compressedBytes);
+        Toolkit.HighPerformance.Memory2D<ColorRgba32> pixels = decoder.DecodeRaw2D(stream, width, height, format);
+
+        PixelBitmapContent<Vector4> resultBitmap = new PixelBitmapContent<Vector4>(width, height);
+        for (int x = 0; x < width; x++)
+        {
+            for (int y = 0; y < height; y++)
+            {
+                ColorRgba32 pixel = pixels.Span[y, x];
+                resultBitmap.SetPixel(x, y, new Vector4(pixel.r / 255f, pixel.g / 255f, pixel.b / 255f, pixel.a / 255f));
+            }
+        }
+
+        return resultBitmap;
     }
 }
