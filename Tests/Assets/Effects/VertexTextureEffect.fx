@@ -1,4 +1,4 @@
-// MonoGame - Copyright (C) The MonoGame Team
+// MonoGame - Copyright (C) MonoGame Foundation, Inc
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
@@ -33,7 +33,7 @@ VSOutput VS_Main(float2 xy : POSITION)
     return output;
 }
 
-float4 PS_Main(VSOutput input) : COLOR0
+float4 PS_Main(VSOutput input) : SV_TARGET0
 {
     return input.Color;
 }

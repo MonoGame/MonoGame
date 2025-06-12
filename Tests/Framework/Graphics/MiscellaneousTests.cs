@@ -3,9 +3,12 @@ using NUnit.Framework;
 
 namespace MonoGame.Tests.Graphics
 {
+    [TestFixture]
+    [NonParallelizable]
     internal class MiscellaneousTests : GraphicsDeviceTestFixtureBase
     {
         [Test]
+        [RunOnUI]
         public void Colored3DCube()
         {
             PrepareFrameCapture();

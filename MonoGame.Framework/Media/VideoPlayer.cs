@@ -1,17 +1,18 @@
-// MonoGame - Copyright (C) The MonoGame Team
+// MonoGame - Copyright (C) MonoGame Foundation, Inc
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System;
 using System.Diagnostics;
 using System.Threading;
-#if WINDOWS_UAP
-using System.Threading.Tasks;
-#endif
 using Microsoft.Xna.Framework.Graphics;
 
 namespace Microsoft.Xna.Framework.Media
 {
+    /// <summary>
+    /// Provides methods and properties to play back, pause, resume, and stop <see cref="Video"/>.
+    /// <see cref="VideoPlayer"/> also exposes repeat, volume, and play position information.
+    /// </summary>
     public sealed partial class VideoPlayer : IDisposable
     {
         #region Fields
@@ -78,7 +79,7 @@ namespace Microsoft.Xna.Framework.Media
         }
 
         /// <summary>
-        /// Gets the media playback state, MediaState.
+        /// Gets the media playback state, <see cref="MediaState"/>.
         /// </summary>
         public MediaState State
         { 
@@ -92,7 +93,7 @@ namespace Microsoft.Xna.Framework.Media
         }
 
         /// <summary>
-        /// Gets the Video that is currently playing.
+        /// Gets the <see cref="Media.Video"/> that is currently playing.
         /// </summary>
         public Video Video { get { return _currentVideo; } }
 
@@ -119,6 +120,9 @@ namespace Microsoft.Xna.Framework.Media
 
         #region Public API
 
+        /// <summary>
+        /// Creates a new instance of <see cref="VideoPlayer"/> class.
+        /// </summary>
         public VideoPlayer()
         {
             _state = MediaState.Stopped;
@@ -152,11 +156,7 @@ namespace Microsoft.Xna.Framework.Media
                 }
                 var sleepTime = i*sleepTimeFactor;
                 Debug.WriteLine("PlatformGetTexture returned null ({0}) sleeping for {1} ms", i + 1, sleepTime);
-#if WINDOWS_UAP
-                Task.Delay(sleepTime).Wait();
-#else
                 Thread.Sleep(sleepTime); //Sleep for longer and longer times
-#endif
             }
             if (texture == null)
             {
@@ -180,7 +180,7 @@ namespace Microsoft.Xna.Framework.Media
         }
 
         /// <summary>
-        /// Plays a Video.
+        /// Plays a <see cref="Video"/>.
         /// </summary>
         /// <param name="video">Video to play.</param>
         public void Play(Video video)
@@ -224,11 +224,7 @@ namespace Microsoft.Xna.Framework.Media
                 }
                 var sleepTime = i*sleepTimeFactor;
                 Debug.WriteLine("State != MediaState.Playing ({0}) sleeping for {1} ms", i + 1, sleepTime);
-#if WINDOWS_UAP
-                Task.Delay(sleepTime).Wait();
-#else
                 Thread.Sleep(sleepTime); //Sleep for longer and longer times
-#endif
             }
             if (State != MediaState.Playing )
             {
@@ -280,9 +276,7 @@ namespace Microsoft.Xna.Framework.Media
 
         #region IDisposable Implementation
 
-        /// <summary>
-        /// Immediately releases the unmanaged resources used by this object.
-        /// </summary>
+        /// <inheritdoc cref="IDisposable.Dispose()"/>
         public void Dispose()
         {
             Dispose(true);

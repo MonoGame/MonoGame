@@ -1,4 +1,4 @@
-﻿// MonoGame - Copyright (C) The MonoGame Team
+﻿// MonoGame - Copyright (C) MonoGame Foundation, Inc
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
@@ -6,7 +6,7 @@ using System;
 using System.Globalization;
 using System.IO;
 using System.Linq;
-
+using MonoGame.Tool;
 
 namespace Microsoft.Xna.Framework.Content.Pipeline.Audio
 {
@@ -20,8 +20,6 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Audio
                     platform == TargetPlatform.NativeClient ||
                     platform == TargetPlatform.RaspberryPi ||
                     platform == TargetPlatform.Windows ||
-                    platform == TargetPlatform.WindowsPhone8 ||
-                    platform == TargetPlatform.WindowsStoreApp ||
                     platform == TargetPlatform.iOS ||
                     platform == TargetPlatform.Web;
         }
@@ -46,9 +44,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Audio
             // Most platforms will use AAC ("mp4") by default
             var targetFormat = ConversionFormat.Aac;
 
-            if (    platform == TargetPlatform.Windows ||
-                    platform == TargetPlatform.WindowsPhone8 ||
-                    platform == TargetPlatform.WindowsStoreApp)
+            if ( platform == TargetPlatform.Windows )
                 targetFormat = ConversionFormat.WindowsMedia;
 
             else if (platform == TargetPlatform.DesktopGL)
@@ -68,8 +64,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Audio
         public static void ProbeFormat(string sourceFile, out AudioFileType audioFileType, out AudioFormat audioFormat, out TimeSpan duration, out int loopStart, out int loopLength)
         {
             string ffprobeStdout, ffprobeStderr;
-            var ffprobeExitCode = ExternalTool.Run(
-                "ffprobe",
+            var ffprobeExitCode = FFprobe.Run(
                 string.Format("-i \"{0}\" -show_format -show_entries streams -v quiet -of flat", sourceFile),
                 out ffprobeStdout,
                 out ffprobeStderr);
@@ -281,8 +276,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Audio
         public static void WritePcmFile(AudioContent content, string saveToFile, int bitRate = 192000, int? sampeRate = null)
         {
             string ffmpegStdout, ffmpegStderr;
-            var ffmpegExitCode = ExternalTool.Run(
-                "ffmpeg",
+            var ffmpegExitCode = FFmpeg.Run(
                 string.Format(
                     "-y -i \"{0}\" -vn -c:a pcm_s16le -b:a {2} {3} -f:a wav -strict experimental \"{1}\"",
                     content.FileName,
@@ -366,8 +360,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Audio
                 int ffmpegExitCode;
                 do
                 {
-                    ffmpegExitCode = ExternalTool.Run(
-                        "ffmpeg",
+                    ffmpegExitCode = FFmpeg.Run(
                         string.Format(
                             "-y -i \"{0}\" -vn -c:a {1} -b:a {2} -ar {3} -f:a {4} -strict experimental \"{5}\"",
                             content.FileName,

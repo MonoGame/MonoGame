@@ -1,4 +1,4 @@
-﻿// MonoGame - Copyright (C) The MonoGame Team
+﻿// MonoGame - Copyright (C) MonoGame Foundation, Inc
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
@@ -9,10 +9,24 @@ using NUnit.Framework;
 namespace MonoGame.Tests.Graphics
 {
     [TestFixture]
+    [NonParallelizable]
     internal class EffectTest : GraphicsDeviceTestFixtureBase
     {
+        [Test]
+        [RunOnUI]
+        public void EffectConstructorShouldAllowIndexAndCount()
+        {
+            byte[] mgfxo = EffectResource.BasicEffect.Bytecode;
+            var index = 100000;
+            var byteArray = new byte[index + mgfxo.Length];
+            mgfxo.CopyTo(byteArray, index);
+            Effect effect = null;
+            Assert.DoesNotThrow(() => { effect = new Effect(game.GraphicsDevice, byteArray, index, mgfxo.Length); });
+            effect.Dispose();
+        }
 
         [Test]
+        [RunOnUI]
         public void EffectPassShouldSetTexture()
         {
             var texture = new Texture2D(game.GraphicsDevice, 1, 1, false, SurfaceFormat.Color);
@@ -34,6 +48,7 @@ namespace MonoGame.Tests.Graphics
         }
 
         [Test]
+        [RunOnUI]
         public void EffectPassShouldSetTextureOnSubsequentCalls()
         {
             var texture = new Texture2D(game.GraphicsDevice, 1, 1, false, SurfaceFormat.Color);
@@ -62,6 +77,7 @@ namespace MonoGame.Tests.Graphics
         }
 
         [Test]
+        [RunOnUI]
         public void EffectPassShouldSetTextureEvenIfNull()
         {
             var texture = new Texture2D(game.GraphicsDevice, 1, 1, false, SurfaceFormat.Color);
@@ -83,6 +99,7 @@ namespace MonoGame.Tests.Graphics
         }
 
         [Test]
+        [RunOnUI]
         public void EffectPassShouldOverrideTextureIfNotExplicitlySet()
         {
             var texture = new Texture2D(game.GraphicsDevice, 1, 1, false, SurfaceFormat.Color);
@@ -106,6 +123,7 @@ namespace MonoGame.Tests.Graphics
 #if DESKTOPGL
         [Ignore("Fails under OpenGL!")]
 #endif
+        [RunOnUI]
         public void EffectParameterShouldBeSetIfSetByNameAndGetByIndex()
         {
             // This relies on the parameters permanently being on the same index.

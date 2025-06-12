@@ -1,4 +1,4 @@
-﻿// MonoGame - Copyright (C) The MonoGame Team
+﻿// MonoGame - Copyright (C) MonoGame Foundation, Inc
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
@@ -179,6 +179,16 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Audio
             DefaultAudioProfile.ConvertToFormat(this, formatType, quality, saveToFile);
         }
 
+        /// <summary>
+        /// Sets the data and properties for the audio content.
+        /// </summary>
+        /// <param name="data">The audio data to be set.</param>
+        /// <param name="format">The audio format.</param>
+        /// <param name="duration">The duration of the audio.</param>
+        /// <param name="loopStart">The start position of the loop.</param>
+        /// <param name="loopLength">The length of the loop.</param>
+        /// <exception cref="ArgumentNullException">Thrown when the data or format is null.</exception>
+        /// <remarks>The values for LoopStart and LoopLength are consumed as a number of samples and not a concrete unit of time.</remarks>
         public void SetData(byte[] data, AudioFormat format, TimeSpan duration, int loopStart, int loopLength)
         {
             if (data == null)
@@ -193,6 +203,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Audio
             _loopLength = loopLength;
         }
 
+        /// <inheritdoc cref="IDisposable.Dispose()"/>
         public void Dispose()
         {
             _disposed = true;

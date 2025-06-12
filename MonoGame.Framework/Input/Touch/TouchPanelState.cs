@@ -1,4 +1,4 @@
-﻿// MonoGame - Copyright (C) The MonoGame Team
+﻿// MonoGame - Copyright (C) MonoGame Foundation, Inc
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
@@ -7,6 +7,10 @@ using System.Collections.Generic;
 
 namespace Microsoft.Xna.Framework.Input.Touch
 {
+    /// <summary>
+    /// Represents specific information about the state of the touch panel,
+    /// including the current state of touch locations and gestures.
+    /// </summary>
     public class TouchPanelState
     {
         /// <summary>
@@ -54,6 +58,13 @@ namespace Microsoft.Xna.Framework.Input.Touch
         internal readonly Queue<GestureSample> GestureList = new Queue<GestureSample>();
 
         private TouchPanelCapabilities Capabilities = new TouchPanelCapabilities();
+
+
+        /// <summary>
+        /// Raised when a new touch event is processed. Clients can use this
+        /// to obtain per-frame touch events beyond the scope of gestures/touch panel.
+        /// </summary>
+        public event EventHandler<TouchLocation> OnTouchEvent;
 
         internal readonly GameWindow Window;
 
@@ -134,6 +145,9 @@ namespace Microsoft.Xna.Framework.Input.Touch
             }
         }
 
+        /// <summary>
+        /// Returns the current touch panel state
+        /// </summary>
         public TouchCollection GetState()
         {
             //Clear out touches from previous frames that were released on the same frame they were touched that haven't been seen
@@ -151,6 +165,19 @@ namespace Microsoft.Xna.Framework.Input.Touch
             var result = (_touchState.Count > 0) ? new TouchCollection(_touchState.ToArray()) : TouchCollection.Empty;
             AgeTouches(_touchState);
             return result;
+        }
+
+        internal void AddHighResolutionTouchEvent(int id, TouchLocationState state, Vector2 position)
+        {
+            //Try to find the touch id.
+            int touchId;
+            if (!_touchIds.TryGetValue(id, out touchId))
+            {
+                return;
+            }
+            var evt = new TouchLocation(touchId, state, position * _touchScale, CurrentTimestamp,
+                /* isHighFrequencyEvent */ true);
+            EventHelpers.Raise(this, OnTouchEvent, evt);
         }
 
         internal void AddEvent(int id, TouchLocationState state, Vector2 position)
@@ -191,7 +218,8 @@ namespace Microsoft.Xna.Framework.Input.Touch
             {
                 // If we got here that means either the device is sending
                 // us bad, out of order, or old touch events.  In any case
-                // just ignore them.
+                // just ignore them (but release existing ones, so we are
+                // not trapped forever in a bad state).
                 return;
             }
 
@@ -200,14 +228,16 @@ namespace Microsoft.Xna.Framework.Input.Touch
                 // Add the new touch event keeping the list from getting
                 // too large if no one happens to be requesting the state.
                 var evt = new TouchLocation(touchId, state, position * _touchScale, CurrentTimestamp);
+                EventHelpers.Raise(this, OnTouchEvent, evt);
 
                 if (!isMouse || EnableMouseTouchPoint)
                 {
                     ApplyTouch(_touchState, evt);
                 }
 
-                //If we have gestures enabled then collect events for those too.
-                //We also have to keep tracking any touches while we know about touches so we don't miss releases even if gesture recognition is disabled
+                // If we have gestures enabled then collect events for those too.
+                // We also have to keep tracking any touches while we know about touches
+                // so we don't miss releases even if gesture recognition is disabled
                 if ((EnabledGestures != GestureType.None || _gestureState.Count > 0) && (!isMouse || EnableMouseGestures))
                 {
                     ApplyTouch(_gestureState, evt);
@@ -308,9 +338,21 @@ namespace Microsoft.Xna.Framework.Input.Touch
         /// </summary>
         public GestureType EnabledGestures { get; set; }
 
+        /// <summary>
+        /// Gets or sets whether mouse touch points are enabled.
+        /// </summary>
         public bool EnableMouseTouchPoint { get; set; }
 
+        /// <summary>
+        /// Gets or sets whether mouse gestures are enabled.
+        /// </summary>
         public bool EnableMouseGestures { get; set; }
+
+        /// <summary>
+        /// Gets or sets if high-frequency touch event processing is enabled.
+        /// See <see cref="TouchPanel.EnableHighFrequencyTouch" /> for more details.
+        /// </summary>
+        public bool EnableHighFrequencyTouch { get; set; }
 
         /// <summary>
         /// Returns true if a touch gesture is available.

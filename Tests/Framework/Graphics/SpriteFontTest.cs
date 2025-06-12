@@ -1,71 +1,6 @@
-﻿#region License
-/*
-Microsoft Public License (Ms-PL)
-MonoGame - Copyright © 2009-2012 The MonoGame Team
-
-All rights reserved.
-
-This license governs use of the accompanying software. If you use the software,
-you accept this license. If you do not accept the license, do not use the
-software.
-
-1. Definitions
-
-The terms "reproduce," "reproduction," "derivative works," and "distribution"
-have the same meaning here as under U.S. copyright law.
-
-A "contribution" is the original software, or any additions or changes to the
-software.
-
-A "contributor" is any person that distributes its contribution under this
-license.
-
-"Licensed patents" are a contributor's patent claims that read directly on its
-contribution.
-
-2. Grant of Rights
-
-(A) Copyright Grant- Subject to the terms of this license, including the
-license conditions and limitations in section 3, each contributor grants you a
-non-exclusive, worldwide, royalty-free copyright license to reproduce its
-contribution, prepare derivative works of its contribution, and distribute its
-contribution or any derivative works that you create.
-
-(B) Patent Grant- Subject to the terms of this license, including the license
-conditions and limitations in section 3, each contributor grants you a
-non-exclusive, worldwide, royalty-free license under its licensed patents to
-make, have made, use, sell, offer for sale, import, and/or otherwise dispose of
-its contribution in the software or derivative works of the contribution in the
-software.
-
-3. Conditions and Limitations
-
-(A) No Trademark License- This license does not grant you rights to use any
-contributors' name, logo, or trademarks.
-
-(B) If you bring a patent claim against any contributor over patents that you
-claim are infringed by the software, your patent license from such contributor
-to the software ends automatically.
-
-(C) If you distribute any portion of the software, you must retain all
-copyright, patent, trademark, and attribution notices that are present in the
-software.
-
-(D) If you distribute any portion of the software in source code form, you may
-do so only under this license by including a complete copy of this license with
-your distribution. If you distribute any portion of the software in compiled or
-object code form, you may only do so under a license that complies with this
-license.
-
-(E) The software is licensed "as-is." You bear the risk of using it. The
-contributors give no express warranties, guarantees or conditions. You may have
-additional consumer rights under your local laws which this license cannot
-change. To the extent permitted under your local laws, the contributors exclude
-the implied warranties of merchantability, fitness for a particular purpose and
-non-infringement.
-*/
-#endregion License
-
+﻿// MonoGame - Copyright (C) MonoGame Foundation, Inc
+// This file is subject to the terms and conditions defined in
+// file 'LICENSE.txt', which is part of this source code package.
 using System;
 using System.Text;
 using Microsoft.Xna.Framework;
@@ -75,6 +10,7 @@ using NUnit.Framework;
 
 namespace MonoGame.Tests.Graphics {
 	[TestFixture]
+    [NonParallelizable]
 	class SpriteFontTest : GraphicsDeviceTestFixtureBase {
 
 		private SpriteBatch _spriteBatch;
@@ -98,6 +34,7 @@ namespace MonoGame.Tests.Graphics {
 	        base.TearDown();
 	    }
 
+        [Test]
         [TestCase("Default", "The quick brown fox jumps over the lazy dog. 1234567890", 605, 21)]
         [TestCase("Default", "The quick brown fox jumps\nover the lazy dog.\n1234567890", 275, 59)]
         [TestCase("Default", "The quick brown fox jumps over the lazy dog.\r1234567890", 594, 21)]
@@ -122,6 +59,7 @@ namespace MonoGame.Tests.Graphics {
         [TestCase("SegoeKeycaps", "The quick brown fox jumps over the lazy dog. 1234567890", 988, 20)]
         [TestCase("SegoeKeycaps", "The quick brown fox jumps\nover the lazy dog.\n1234567890", 448, 58)]
         [TestCase("SegoeKeycaps", "!", 16, 20)] // LSB=1, W=15, RSB=0
+        [RunOnUI]
         public void MeasureString_returns_correct_values(string fontName, string text, float width, float height)
         {
             var font = game.Content.Load<SpriteFont>(Paths.Font(fontName));
@@ -131,6 +69,7 @@ namespace MonoGame.Tests.Graphics {
         }
 
 		[Test]
+        [RunOnUI]
 		public void Plain ()
 		{
             PrepareFrameCapture();
@@ -148,6 +87,7 @@ namespace MonoGame.Tests.Graphics {
 		}
 
 		[Test]
+        [RunOnUI]
 		public void Rotated ()
 		{
             PrepareFrameCapture();
@@ -173,6 +113,7 @@ namespace MonoGame.Tests.Graphics {
 		}
 
 		[Test]
+        [RunOnUI]
 		public void Scaled ()
 		{
             PrepareFrameCapture();
@@ -197,9 +138,11 @@ namespace MonoGame.Tests.Graphics {
             CheckFrames();
 		}
 
+        [Test]
 		[TestCase(SpriteEffects.FlipHorizontally)]
 		[TestCase(SpriteEffects.FlipVertically)]
 		[TestCase(SpriteEffects.FlipHorizontally | SpriteEffects.FlipVertically)]
+        [RunOnUI]
 		public void Draw_with_SpriteEffects (SpriteEffects effects)
 		{
             PrepareFrameCapture();
@@ -225,6 +168,7 @@ namespace MonoGame.Tests.Graphics {
 		}
 
 		[Test]
+        [RunOnUI]
 		public void Origins_rotated ()
 		{
             PrepareFrameCapture();
@@ -274,6 +218,7 @@ namespace MonoGame.Tests.Graphics {
 		}
 
 		[Test]
+        [RunOnUI]
 		public void Origins_scaled ()
 		{
             PrepareFrameCapture();
@@ -323,6 +268,7 @@ namespace MonoGame.Tests.Graphics {
 		}
         
 		[Test]
+        [RunOnUI]
 		public void Draw_with_LayerDepth()
 		{
             PrepareFrameCapture();
@@ -462,6 +408,7 @@ namespace MonoGame.Tests.Graphics {
 		}
         
 		[Test]
+        [RunOnUI]
 		public void Hullabaloo ()
 		{
             PrepareFrameCapture();
@@ -477,6 +424,7 @@ namespace MonoGame.Tests.Graphics {
 		}
 
 		[Test]
+        [RunOnUI]
 		public void Hullabaloo2 ()
 		{
             PrepareFrameCapture();
@@ -491,7 +439,7 @@ namespace MonoGame.Tests.Graphics {
             CheckFrames();
 		}
 
-		
+		[Test]
         [TestCase("The quick brown fox jumps over the lazy dog. 1234567890", TestName = "Multiline_noNewline")]
         [TestCase("The quick brown fox jumps\nover the lazy dog.\n1234567890", TestName = "Multiline_Newline")]
         [TestCase("The quick brown fox jumps over the lazy dog.\r1234567890", TestName = "Multiline_CarriageReturn")]
@@ -501,6 +449,7 @@ So he wrote a routine
 To ask 'What's it all mean?'
 But the answer was still '42'.
                 R Humphries, Sutton Coldfield", TestName = "Multiline_verbatimString")]
+        [RunOnUI]
 		public void Multiline (string text)
 		{
             PrepareFrameCapture();
@@ -543,6 +492,7 @@ But the answer was still '42'.
 		}
 
 		[Test]
+        [RunOnUI]
 		public void Font_spacing_is_respected ()
 		{
             PrepareFrameCapture();
@@ -569,9 +519,11 @@ But the answer was still '42'.
             CheckFrames();
 		}
 
+        [Test]
         [TestCase("The rain in España stays mainly in the plain - now in français")]
         [TestCase("\x1f")]
         [TestCase("\x7f")]
+        [RunOnUI]
         public void Throws_when_drawing_unavailable_characters(string text)
 		{
             _spriteBatch.Begin ();
@@ -580,18 +532,22 @@ But the answer was still '42'.
             _spriteBatch.End ();
 		}
 
+        [Test]
         [TestCase('ñ')]
         [TestCase((char)127)]
         [TestCase((char)31)]
+        [RunOnUI]
         public void Throws_when_setting_unavailable_DefaultCharacter(char character)
 		{
             Assert.Throws<ArgumentException> (() =>
                 _defaultFont.DefaultCharacter = character);
 		}
 
+        [Test]
         [TestCase((char)32)]
         [TestCase((char)63)]
         [TestCase((char)126)]
+        [RunOnUI]
         public void Does_not_throw_when_setting_available_DefaultCharacter(char character)
         {
             Assert.DoesNotThrow(() => _defaultFont.DefaultCharacter = character);

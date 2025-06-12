@@ -1,4 +1,4 @@
-﻿// MonoGame - Copyright (C) The MonoGame Team
+﻿// MonoGame - Copyright (C) MonoGame Foundation, Inc
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
@@ -52,29 +52,30 @@ namespace Microsoft.Xna.Framework.Audio
 
             // Dequeue all the submitted buffers
             _voice.FlushSourceBuffers();
-
-            while (_queuedBuffers.Count > 0)
-            {
-                var buffer = _queuedBuffers.Dequeue();
-                buffer.Stream.Dispose();
-                _bufferPool.Return(_pooledBuffers.Dequeue());
-            }
         }
 
         private void PlatformSubmitBuffer(byte[] buffer, int offset, int count)
         {
-            // we need to copy so datastream does not pin the buffer that the user might modify later
-            byte[] pooledBuffer;
-            pooledBuffer = _bufferPool.Get(count);
-            _pooledBuffers.Enqueue(pooledBuffer);
-            Buffer.BlockCopy(buffer, offset, pooledBuffer, 0, count);
+            // XAudio2 callbacks are sent from a different thread,
+            // so we need to lock our queues
+            lock (_queuedBuffers)
+            {
+                if (_queuedBuffers.Count >= 64)
+                    throw new ArgumentException("You have reached the limit of 64 queued buffers of XAudio2. Please use PendingBufferCount to avoid submitting that many buffers.");
 
-            var stream = DataStream.Create(pooledBuffer, true, false, 0, true);
-            var audioBuffer = new AudioBuffer(stream);
-            audioBuffer.AudioBytes = count;
+                // we need to copy so datastream does not pin the buffer that the user might modify later
+                byte[] pooledBuffer;
+                pooledBuffer = _bufferPool.Get(count);
+                _pooledBuffers.Enqueue(pooledBuffer);
+                Buffer.BlockCopy(buffer, offset, pooledBuffer, 0, count);
 
-            _voice.SubmitSourceBuffer(audioBuffer, null);
-            _queuedBuffers.Enqueue(audioBuffer);
+                var stream = DataStream.Create(pooledBuffer, true, false, 0, true);
+                var audioBuffer = new AudioBuffer(stream);
+                audioBuffer.AudioBytes = count;
+
+                _voice.SubmitSourceBuffer(audioBuffer, null);
+                _queuedBuffers.Enqueue(audioBuffer);
+            }
         }
 
         private void PlatformUpdateQueue()
@@ -86,11 +87,14 @@ namespace Microsoft.Xna.Framework.Audio
         {
             if (disposing)
             {
-                while (_queuedBuffers.Count > 0)
+                lock (_queuedBuffers)
                 {
-                    var buffer = _queuedBuffers.Dequeue();
-                    buffer.Stream.Dispose();
-                    _bufferPool.Return(_pooledBuffers.Dequeue());
+                    while (_queuedBuffers.Count > 0)
+                    {
+                        var buffer = _queuedBuffers.Dequeue();
+                        buffer.Stream.Dispose();
+                        _bufferPool.Return(_pooledBuffers.Dequeue());
+                    }
                 }
             }
             // _voice is disposed by SoundEffectInstance.PlatformDispose
@@ -98,15 +102,20 @@ namespace Microsoft.Xna.Framework.Audio
 
         private void OnBufferEnd(IntPtr obj)
         {
-            // Release the buffer
-            if (_queuedBuffers.Count > 0)
+            // XAudio2 callbacks are sent from a different thread,
+            // so we need to lock our queues
+            lock (_queuedBuffers)
             {
-                var buffer = _queuedBuffers.Dequeue();
-                buffer.Stream.Dispose();
-                _bufferPool.Return(_pooledBuffers.Dequeue());
-            }
+                // Release the buffer
+                if (_queuedBuffers.Count > 0)
+                {
+                    var buffer = _queuedBuffers.Dequeue();
+                    buffer.Stream.Dispose();
+                    _bufferPool.Return(_pooledBuffers.Dequeue());
+                }
 
-            CheckBufferCount();
+                CheckBufferCount();
+            }
         }
 
     }
