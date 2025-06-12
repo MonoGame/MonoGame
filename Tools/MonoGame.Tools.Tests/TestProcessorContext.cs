@@ -1,11 +1,12 @@
 ﻿using System;
+using System.IO;
 using Microsoft.Xna.Framework.Content.Pipeline;
 using Microsoft.Xna.Framework.Content.Pipeline.Graphics;
 using Microsoft.Xna.Framework.Graphics;
 
 namespace MonoGame.Tests.ContentPipeline
 {
-    class TestProcessorContext : ContentProcessorContext
+    class TestProcessorContext : ContentProcessorContext, IDisposable
     {
         private readonly TargetPlatform _targetPlatform;
         private readonly string _outputFilename;
@@ -17,6 +18,8 @@ namespace MonoGame.Tests.ContentPipeline
             _targetPlatform = targetPlatform;
             _outputFilename = outputFilename;
             _logger = new TestContentBuildLogger();
+            var id = Guid.NewGuid().ToString();
+            IntermediateDirectory = Path.Combine("test", id);
         }
 
         public override string BuildConfiguration
@@ -24,10 +27,7 @@ namespace MonoGame.Tests.ContentPipeline
             get { return "Debug"; }
         }
 
-        public override string IntermediateDirectory
-        {
-            get { throw new NotImplementedException(); }
-        }
+        public override string IntermediateDirectory { get; }
 
         public override ContentBuildLogger Logger
         {
@@ -106,6 +106,12 @@ namespace MonoGame.Tests.ContentPipeline
             }
 
             throw new NotImplementedException();
+        }
+
+        public void Dispose()
+        {
+            if (Directory.Exists(IntermediateDirectory))
+                Directory.Delete(IntermediateDirectory, recursive: true);
         }
     }
 }

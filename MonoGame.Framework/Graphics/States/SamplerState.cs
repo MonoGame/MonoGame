@@ -1,4 +1,4 @@
-// MonoGame - Copyright (C) The MonoGame Team
+// MonoGame - Copyright (C) MonoGame Foundation, Inc
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
@@ -6,6 +6,9 @@ using System;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
+    /// <summary>
+    /// Contains sampler state, which determines how to sample texture data.
+    /// </summary>
     public partial class SamplerState : GraphicsResource
     {
         static SamplerState()
@@ -18,11 +21,83 @@ namespace Microsoft.Xna.Framework.Graphics
             PointWrap = new SamplerState("SamplerState.PointWrap", TextureFilter.Point, TextureAddressMode.Wrap);
         }
 
+        /// <summary>
+        /// Contains default state for anisotropic filtering and texture coordinate clamping.
+        /// </summary>
+        /// <remarks>
+        /// This built-in state object has the following settings:
+        /// <code>
+        /// Filter = TextureFilter.Anisotropic,
+        /// AddressU = TextureAddressMode.Clamp,
+        /// AddressV = TextureAddressMode.Clamp,
+        /// AddressW = TextureAddressMode.Clamp,
+        /// </code>
+        /// </remarks>
         public static readonly SamplerState AnisotropicClamp;
+        /// <summary>
+        /// Contains default state for anisotropic filtering and texture coordinate wrapping.
+        /// </summary>
+        /// <remarks>
+        /// This built-in state object has the following settings:
+        /// <code>
+        /// Filter = TextureFilter.Anisotropic,
+        /// AddressU = TextureAddressMode.Wrap,
+        /// AddressV = TextureAddressMode.Wrap,
+        /// AddressW = TextureAddressMode.Wrap,
+        /// </code>
+        /// </remarks>
         public static readonly SamplerState AnisotropicWrap;
+        /// <summary>
+        /// Contains default state for linear filtering and texture coordinate clamping.
+        /// </summary>
+        /// <remarks>
+        /// This built-in state object has the following settings:
+        /// <code>
+        /// Filter = TextureFilter.Linear,
+        /// AddressU = TextureAddressMode.Clamp,
+        /// AddressV = TextureAddressMode.Clamp,
+        /// AddressW = TextureAddressMode.Clamp,
+        /// </code>
+        /// </remarks>
         public static readonly SamplerState LinearClamp;
+        /// <summary>
+        /// Contains default state for linear filtering and texture coordinate wrapping.
+        /// </summary>
+        /// <remarks>
+        /// This built-in state object has the following settings:
+        /// <code>
+        /// Filter = TextureFilter.Linear,
+        /// AddressU = TextureAddressMode.Wrap,
+        /// AddressV = TextureAddressMode.Wrap,
+        /// AddressW = TextureAddressMode.Wrap,
+        /// </code>
+        /// </remarks>
         public static readonly SamplerState LinearWrap;
+        /// <summary>
+        /// Contains default state for point filtering and texture coordinate clamping.
+        /// </summary>
+        /// <remarks>
+        /// This built-in state object has the following settings:
+        /// <code>
+        /// Filter = TextureFilter.Point,
+        /// AddressU = TextureAddressMode.Clamp,
+        /// AddressV = TextureAddressMode.Clamp,
+        /// AddressW = TextureAddressMode.Clamp,
+        /// </code>
+        /// </remarks>
         public static readonly SamplerState PointClamp;
+        /// <summary>
+        /// Contains default state for point filtering and texture coordinate wrapping.
+        /// </summary>
+        /// <remarks>
+        /// This built-in state object has the following settings:
+        /// <code>
+        /// Filter = TextureFilter.Point,
+        /// AddressU = TextureAddressMode.Wrap,
+        /// AddressV = TextureAddressMode.Wrap,
+        /// AddressW = TextureAddressMode.Wrap,
+        /// </code>
+        /// </remarks>
         public static readonly SamplerState PointWrap;
 
         private readonly bool _defaultStateObject;
@@ -38,6 +113,9 @@ namespace Microsoft.Xna.Framework.Graphics
         private TextureFilterMode _filterMode;
         private CompareFunction _comparisonFunction;
 
+        /// <summary>
+        /// Gets or sets the texture-address mode for the u-coordinate.
+        /// </summary>
         public TextureAddressMode AddressU
         {
             get { return _addressU; }
@@ -48,6 +126,9 @@ namespace Microsoft.Xna.Framework.Graphics
             }
         }
 
+        /// <summary>
+        /// Gets or sets the texture-address mode for the v-coordinate.
+        /// </summary>
         public TextureAddressMode AddressV
         {
             get { return _addressV; }
@@ -58,6 +139,9 @@ namespace Microsoft.Xna.Framework.Graphics
             }
         }
 
+        /// <summary>
+        /// Gets or sets the texture-address mode for the w-coordinate.
+        /// </summary>
         public TextureAddressMode AddressW
         {
             get { return _addressW; }
@@ -68,6 +152,10 @@ namespace Microsoft.Xna.Framework.Graphics
             }
         }
 
+        /// <summary>
+        /// Gets or sets the color to use for texels outside of range,
+        /// when <see cref="TextureAddressMode.Border"/> is used.
+        /// </summary>
         public Color BorderColor
         {
             get { return _borderColor; }
@@ -78,6 +166,9 @@ namespace Microsoft.Xna.Framework.Graphics
             }
         }
 
+        /// <summary>
+        /// Gets or sets the type of filtering during sampling.
+        /// </summary>
         public TextureFilter Filter
         {
             get { return _filter; }
@@ -88,6 +179,14 @@ namespace Microsoft.Xna.Framework.Graphics
             }
         }
 
+        /// <summary>
+        /// Gets or sets the maximum anisotropy.
+        /// The default value is 4.
+        /// </summary>
+        /// <remarks>
+        /// Use anisotropic filtering to reduce blur and aliasing effects
+        /// when texturing a surface that will be viewed at an extreme viewing angle.
+        /// </remarks>
         public int MaxAnisotropy
         {
             get { return _maxAnisotropy; }
@@ -98,6 +197,12 @@ namespace Microsoft.Xna.Framework.Graphics
             }
         }
 
+        /// <summary>
+        /// Gets or sets the level of detail (LOD) index of the largest map to use.
+        /// </summary>
+        /// <value>
+        /// The maximum LOD, which ranges from 0 to n-1, where n is the index of the largest map.
+        /// </value>
         public int MaxMipLevel
         {
             get { return _maxMipLevel; }
@@ -108,6 +213,14 @@ namespace Microsoft.Xna.Framework.Graphics
             }
         }
 
+        /// <summary>
+        /// Gets or sets the mipmap LOD bias. The default value is 0. <para/>
+        /// A negative value indicates a larger mipmap level; a positive value indicates a smaller mipmap level.
+        /// </summary>
+        /// <remarks>
+        /// Mipmap LOD bias offsets the mipmap level from which a texture is sampled
+        /// (the result is computed using trilinear texturing between the nearest two levels).
+        /// </remarks>
         public float MipMapLevelOfDetailBias
         {
             get { return _mipMapLevelOfDetailBias; }
@@ -131,6 +244,9 @@ namespace Microsoft.Xna.Framework.Graphics
             }
         }
 
+        /// <summary>
+        /// Gets or sets filtering mode for texture samplers.
+        /// </summary>
         public TextureFilterMode FilterMode
         {
             get { return _filterMode; }
@@ -158,6 +274,10 @@ namespace Microsoft.Xna.Framework.Graphics
                 throw new InvalidOperationException("You cannot modify the sampler state after it has been bound to the graphics device!");
         }
 
+        /// <summary>
+        /// Creates a new instance of the <see cref="SamplerState"/> class
+        /// with default values equivalent to <see cref="LinearWrap"/>.
+        /// </summary>
         public SamplerState()
         {
             Filter = TextureFilter.Linear;
@@ -205,6 +325,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
         partial void PlatformDispose();
 
+        /// <summary/>
         protected override void Dispose(bool disposing)
         {
             if (!IsDisposed)

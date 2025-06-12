@@ -1,4 +1,4 @@
-﻿// MonoGame - Copyright (C) The MonoGame Team
+﻿// MonoGame - Copyright (C) MonoGame Foundation, Inc
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
@@ -20,7 +20,7 @@ internal static class Sdl
         else if (CurrentPlatform.OS == OS.Linux)
             return FuncLoader.LoadLibraryExt("libSDL2-2.0.so.0");
         else if (CurrentPlatform.OS == OS.MacOSX)
-            return FuncLoader.LoadLibraryExt("libSDL2.dylib");
+            return FuncLoader.LoadLibraryExt("libSDL2-2.0.0.dylib");
         else
             return FuncLoader.LoadLibraryExt("sdl2");
     }
@@ -166,6 +166,18 @@ internal static class Sdl
                 return false;
 
             return version == (Version)obj;
+        }
+
+        public override int GetHashCode()
+        {
+            unchecked
+            {
+                int hash = 17;
+                hash = hash * 23 + Major.GetHashCode();
+                hash = hash * 23 + Minor.GetHashCode();
+                hash = hash * 23 + Patch.GetHashCode();
+                return hash;
+            }
         }
 
         public static bool operator !=(Version version1, Version version2)
@@ -380,7 +392,6 @@ internal static class Sdl
             UiKit,
             Wayland,
             Mir,
-            WinRt,
             Android
         }
 
@@ -465,7 +476,7 @@ internal static class Sdl
 
         public static void SetTitle(IntPtr handle, string title)
         {
-            var bytes = Encoding.UTF8.GetBytes(title);
+            var bytes = Encoding.UTF8.GetBytes(title + '\0');
             SDL_SetWindowTitle(handle, ref bytes[0]);
         }
 
@@ -480,6 +491,30 @@ internal static class Sdl
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         public delegate int d_sdl_getwindowborderssize(IntPtr window, out int top, out int left, out int right, out int bottom);
         public static d_sdl_getwindowborderssize GetBorderSize = FuncLoader.LoadFunction<d_sdl_getwindowborderssize>(NativeLibrary, "SDL_GetWindowBordersSize");
+
+        [StructLayout(LayoutKind.Sequential)]
+        public struct MessageBoxData
+        {
+            public uint flags;
+            public IntPtr window;
+            public string title;
+            public string message;
+            public int numbuttons;
+            public IntPtr buttons;
+            public IntPtr colorScheme;
+        }
+
+        [StructLayout(LayoutKind.Sequential)]
+        public struct MessageBoxButtonData
+        {
+            public uint flags;
+            public int buttonid;
+            public IntPtr text;
+        }
+
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        public delegate int d_sdl_showmessagebox(ref MessageBoxData messageboxdata, out int buttonid);
+        public static d_sdl_showmessagebox ShowMessageBox = FuncLoader.LoadFunction<d_sdl_showmessagebox>(NativeLibrary, "SDL_ShowMessageBox");
     }
 
     public static class Display
@@ -981,6 +1016,14 @@ internal static class Sdl
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         public delegate int d_sdl_gamecontrolleraddmappingsfromrw(IntPtr rw, int freew);
         public static d_sdl_gamecontrolleraddmappingsfromrw AddMappingFromRw = FuncLoader.LoadFunction<d_sdl_gamecontrolleraddmappingsfromrw>(NativeLibrary, "SDL_GameControllerAddMappingsFromRW");
+
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        public delegate bool d_sdl_gamecontrollerhasbutton(IntPtr gamecontroller, Button button);
+        public static d_sdl_gamecontrollerhasbutton HasButton = FuncLoader.LoadFunction<d_sdl_gamecontrollerhasbutton>(NativeLibrary, "SDL_GameControllerHasButton");
+
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        public delegate bool d_sdl_gamecontrollerhasaxis(IntPtr gamecontroller, Axis axis);
+        public static d_sdl_gamecontrollerhasaxis HasAxis = FuncLoader.LoadFunction<d_sdl_gamecontrollerhasaxis>(NativeLibrary, "SDL_GameControllerHasAxis");
 
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         public delegate void d_sdl_gamecontrollerclose(IntPtr gamecontroller);

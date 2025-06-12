@@ -1,8 +1,9 @@
-﻿// MonoGame - Copyright (C) The MonoGame Team
+﻿// MonoGame - Copyright (C) MonoGame Foundation, Inc
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System;
+using System.Diagnostics;
 using System.IO;
 using System.Threading;
 using Microsoft.Xna.Framework.Audio;
@@ -11,7 +12,9 @@ using Microsoft.Xna.Framework;
 
 namespace MonoGame.Tests.Audio
 {
+
     [TestFixture]
+    [Category("Audio")]
     public class XactTests
     {
         private AudioEngine _audioEngine;
@@ -354,13 +357,46 @@ namespace MonoGame.Tests.Audio
             cue.Dispose();
         }
 
+        [Test]
+        public void WaveBankPlays()
+        {
+            var waveBank = new WaveBank(_audioEngine, @"Assets\Audio\Win\Tests.xwb");
+            Assert.False(waveBank.IsInUse);
+            Assert.False(waveBank.IsDisposed);
+            Assert.True(waveBank.IsPrepared);
+
+            var sei = _soundBank.GetSoundEffectInstance (0, 0, out bool streaming);
+            sei.Play ();
+            Assert.True(sei.State == SoundState.Playing);
+            sei = _soundBank.GetSoundEffectInstance (0, 1, out streaming);
+            sei.Play ();
+            Assert.True(sei.State == SoundState.Playing);
+            sei = _soundBank.GetSoundEffectInstance (0, 2, out streaming);
+            sei.Play ();
+            Assert.True(sei.State == SoundState.Playing);
+
+            waveBank.Dispose();
+            Assert.True(waveBank.IsDisposed);
+            Assert.False(waveBank.IsInUse);
+            Assert.False(waveBank.IsPrepared);
+        }
+
         private void SleepWhileAudioEngineUpdates(int ms)
         {
+            Stopwatch stopwatch = new Stopwatch();
+            stopwatch.Start();
+
             int cycles = ms / 10;
             for (int i = 0; i < cycles; i++)
             {
                 _audioEngine.Update();
                 Thread.Sleep(10);
+
+                if (stopwatch.Elapsed.TotalMilliseconds > ms)
+                {
+                    stopwatch.Stop();
+                    break;
+                }
             }
         }
     }

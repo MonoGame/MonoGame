@@ -1,4 +1,4 @@
-﻿// MonoGame - Copyright (C) The MonoGame Team
+﻿// MonoGame - Copyright (C) MonoGame Foundation, Inc
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
@@ -6,22 +6,28 @@ using System;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
+    /// <summary>
+    /// Represents a collection of <see cref="Texture"/> objects. This class cannot be inherited.
+    /// </summary>
     public sealed partial class TextureCollection
     {
         private readonly GraphicsDevice _graphicsDevice;
         private readonly Texture[] _textures;
-        private readonly bool _applyToVertexStage;
+        private ShaderStage _stage;
         private int _dirty;
 
-        internal TextureCollection(GraphicsDevice graphicsDevice, int maxTextures, bool applyToVertexStage)
+        internal TextureCollection(GraphicsDevice graphicsDevice, int maxTextures, ShaderStage stage)
         {
             _graphicsDevice = graphicsDevice;
             _textures = new Texture[maxTextures];
-            _applyToVertexStage = applyToVertexStage;
+            _stage = stage;
             _dirty = int.MaxValue;
             PlatformInit();
         }
 
+        /// <summary>
+        /// Gets or sets the <see cref="Texture"/> at the specified sampler number.
+        /// </summary>
         public Texture this[int index]
         {
             get
@@ -30,7 +36,7 @@ namespace Microsoft.Xna.Framework.Graphics
             }
             set
             {
-                if (_applyToVertexStage && !_graphicsDevice.GraphicsCapabilities.SupportsVertexTextures)
+                if (_stage == ShaderStage.Vertex && !_graphicsDevice.GraphicsCapabilities.SupportsVertexTextures)
                     throw new NotSupportedException("Vertex textures are not supported on this device.");
 
                 if (_textures[index] == value)
@@ -60,8 +66,9 @@ namespace Microsoft.Xna.Framework.Graphics
 
         internal void SetTextures(GraphicsDevice device)
         {
-            if (_applyToVertexStage && !device.GraphicsCapabilities.SupportsVertexTextures)
+            if (_stage == ShaderStage.Vertex && !device.GraphicsCapabilities.SupportsVertexTextures)
                 return;
+
             PlatformSetTextures(device);
         }
     }

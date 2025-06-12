@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-    <TargetFramework>net6.0</TargetFramework>
+    <TargetFramework>net8.0</TargetFramework>
     <RollForward>Major</RollForward>
     <Description>The MonoGame Framework Content Builder Editor (MGCB-Editor) is a graphical tool used for editing your content projects ready for processing.</Description>
     <BaseOutputPath>..\..\Artifacts\MonoGame.Content.Builder.Editor\Linux</BaseOutputPath>
@@ -10,7 +10,7 @@
     <AppendTargetFrameworkToOutputPath>False</AppendTargetFrameworkToOutputPath>
     <AssemblyName>mgcb-editor-linux</AssemblyName>
     <AssemblyTitle>MGCB Editor</AssemblyTitle>
-    <RuntimeIdentifiers>linux-x64</RuntimeIdentifiers>
+    <DisableMonoGameToolAssets>True</DisableMonoGameToolAssets>
   </PropertyGroup>
 
   <ItemGroup>
@@ -35,17 +35,17 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Eto.Forms" Version="2.6.0" />
-    <PackageReference Include="Eto.Platform.Gtk" Version="2.6.0" />
-    <PackageReference Include="GtkSharp" Version="3.24.24.34" />
+    <PackageReference Include="Eto.Forms" Version="2.8.3" />
+    <PackageReference Include="Eto.Platform.Gtk" Version="2.8.3" />
+    <PackageReference Include="GtkSharp" Version="3.24.24.95" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\..\MonoGame.Framework\MonoGame.Framework.DesktopGL.csproj">
-      <AdditionalProperties>CopyContentFiles=False</AdditionalProperties>
+      <ExcludeAssets>contentFiles;native;runtime</ExcludeAssets>
     </ProjectReference>
     <ProjectReference Include="..\..\MonoGame.Framework.Content.Pipeline\MonoGame.Framework.Content.Pipeline.csproj">
-      <AdditionalProperties>CopyContentFiles=False</AdditionalProperties>
+      <ExcludeAssets>contentFiles;native;runtime</ExcludeAssets>
     </ProjectReference>
   </ItemGroup>
 

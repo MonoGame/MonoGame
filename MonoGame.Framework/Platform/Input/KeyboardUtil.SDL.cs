@@ -1,4 +1,4 @@
-﻿// MonoGame - Copyright (C) The MonoGame Team
+﻿// MonoGame - Copyright (C) MonoGame Foundation, Inc
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
@@ -18,6 +18,7 @@ namespace Microsoft.Xna.Framework.Input
             _map.Add(13, Keys.Enter);
             _map.Add(27, Keys.Escape);
             _map.Add(32, Keys.Space);
+            _map.Add(35, Keys.Oem8);
             _map.Add(39, Keys.OemQuotes);
             _map.Add(43, Keys.Add);
             _map.Add(44, Keys.OemComma);
