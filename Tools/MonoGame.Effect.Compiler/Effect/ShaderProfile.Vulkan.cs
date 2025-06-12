@@ -223,52 +223,7 @@ namespace MonoGame.Effect
                 }
                 toolArgs += "\"" + hlslFile + "\"";
 
-                var processInfo = new ProcessStartInfo
-                {
-                    Arguments = toolArgs,
-                    CreateNoWindow = true,
-                    WindowStyle = ProcessWindowStyle.Hidden,
-                    ErrorDialog = false,
-                    FileName = "dxc",
-                    UseShellExecute = false,
-                    RedirectStandardOutput = true,
-                    RedirectStandardError = true,
-                    RedirectStandardInput = true,
-                };
-
-                using (var process = new Process { StartInfo = processInfo })
-                {
-                    process.Start();
-
-                    var stdoutThread = new Thread(new ThreadStart(() =>
-                    {
-                        var memory = new MemoryStream();
-                        process.StandardOutput.BaseStream.CopyTo(memory);
-                        var bytes = new byte[memory.Position];
-                        memory.Seek(0, SeekOrigin.Begin);
-                        memory.Read(bytes, 0, bytes.Length);
-                        stdout = System.Text.Encoding.ASCII.GetString(bytes);
-                    }));
-                    stdoutThread.Start();
-
-                    var stderrThread = new Thread(new ThreadStart(() =>
-                    {
-                        var memory = new MemoryStream();
-                        process.StandardError.BaseStream.CopyTo(memory);
-                        var bytes = new byte[memory.Position];
-                        memory.Seek(0, SeekOrigin.Begin);
-                        memory.Read(bytes, 0, bytes.Length);
-                        stderr = System.Text.Encoding.ASCII.GetString(bytes);
-                    }));
-                    stderrThread.Start();
-
-                    process.WaitForExit();
-
-                    stdoutThread.Join();
-                    stderrThread.Join();
-
-                    toolResult = process.ExitCode;
-                }
+                toolResult = RunTool("dxc", toolArgs, out stdout, out stderr);
 
                 errorsAndWarnings += stderr;
 
