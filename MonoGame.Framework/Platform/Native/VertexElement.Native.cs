@@ -13,6 +13,8 @@ partial struct VertexElement
     {
         var element = new MGG_InputElement();
 
+        element.SemanticUsage = VertexElementUsage;
+        element.SemanticIndex = (uint)this.UsageIndex;
         element.VertexBufferSlot = (uint)vbSlot;
         element.Format = _format;
         element.AlignedByteOffset = (uint)_offset;
