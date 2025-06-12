@@ -36,6 +36,20 @@
             "stopAtEntry": false
         },
         {
+            "name": "MGFX",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "Build: mgcb",
+            "program": "${workspaceFolder}/Artifacts/MonoGame.Content.Builder/Debug/mgfxc",
+            "args": [
+                "${workspaceFolder}/Artifacts/Tests/DesktopGL/Debug/Assets/Effects/Grayscale.fx",
+                "{workspaceFolder}/Artifacts/Tests/DesktopGL/Debug/Assets/Effects/Grayscale.mgfxo",
+                "/Profile:DirectX_11"
+            ],
+            "console": "internalConsole",
+            "stopAtEntry": false
+        },
+        {
             "name": "Attach to Process",
             "type": "coreclr",
             "request": "attach",
