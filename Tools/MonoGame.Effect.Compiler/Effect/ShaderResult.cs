@@ -14,6 +14,7 @@ namespace MonoGame.Effect
         public ShaderInfo ShaderInfo { get; private set; }
 
         public string FilePath { get; private set; }
+        public string RelativeFilePath { get; set; }
 
         public string FileContent { get; private set; }
 
