@@ -58,7 +58,8 @@ public partial class IndexBuffer
         //
         var discard = _isDynamic && options != SetDataOptions.NoOverwrite;
 
-        MGG.Buffer_SetData(GraphicsDevice.Handle, ref Handle, offsetInBytes, (byte*)dataPtr, dataBytes, discard);
+        fixed (MGG_Buffer** h = &Handle)
+            MGG.Buffer_SetData(GraphicsDevice.Handle, h, offsetInBytes, (byte*)dataPtr, dataBytes, (byte)(discard ? 1 : 0));
 
         dataHandle.Free();
     }

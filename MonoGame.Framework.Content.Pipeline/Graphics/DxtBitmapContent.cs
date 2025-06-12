@@ -123,7 +123,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
                 case SurfaceFormat.Dxt3:
                     // the bcnEncoder does not perform well enough encoding BC2/DXT3
                     //  specifically, the alpha channel seems to be off. Maybe it has something to do with the premult?
-                    Crunch.EncodeBytes(
+                    CrunchHelpers.EncodeBytes(
                         sourceBitmap: sourceBitmap,
                         crunchFormat: CrunchFormat.Dxt3,
                         out compressedBytes);
@@ -161,7 +161,29 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
                 return true;
             }
 
-            // No other support for copying from a DXT texture yet
+            if ((destinationFormat == SurfaceFormat.Vector4)
+                && (format == SurfaceFormat.Dxt1 || format == SurfaceFormat.Dxt3 || format == SurfaceFormat.Dxt5))
+            {
+                CompressionFormat bcnFormat = default;
+                switch (format)
+                {
+                    case SurfaceFormat.Dxt1:
+                        bcnFormat = CompressionFormat.Bc1;
+                        break;
+                    case SurfaceFormat.Dxt3:
+                        bcnFormat = CompressionFormat.Bc2;
+                        break;
+                    case SurfaceFormat.Dxt5:
+                        bcnFormat = CompressionFormat.Bc3;
+                        break;
+                }
+
+                PixelBitmapContent<Vector4> pixelBitmapContent = BcnUtil.Decode(_bitmapData, bcnFormat, Width, Height);
+                destinationBitmap.SetPixelData(pixelBitmapContent.GetPixelData());
+                return true;
+            }
+
+            // Unsupported SurfaceFormat(s) for bitmap copying
             return false;
         }
     }

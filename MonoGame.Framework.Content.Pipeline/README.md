@@ -1,8 +1,7 @@
-<div align="center">
- <a href="https://monogame.net/">
-   <img height="128" alt="MonoGame" src="https://raw.githubusercontent.com/MonoGame/MonoGame.Logo/refs/heads/master/FullColorOnLight/LogoOnly_128px.png">
- </a>
- <h1>MonoGame</h1>
+# MonoGame Content Pipeline
+
+![MonoGame](https://raw.githubusercontent.com/MonoGame/MonoGame.Logo/refs/heads/master/FullColorOnLight/LogoOnly_128px.png)
+
 
  [![Join the chat at https://discord.gg/monogame](https://img.shields.io/discord/355231098122272778?style=flat-square&color=%237289DA&label=Discord%20server&logo=discord&logoColor=white)](https://discord.gg/monogame) 
  ![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/monogame/monogame/main.yml?style=flat-square)
@@ -37,7 +36,7 @@ It is an open-source re-implementation of the discontinued [Microsoft's XNA Fram
 
 ## Supported Platforms
 
-We support a growing list of platforms across the desktop, mobile, and console space. If there is a platform we don't support, please [make a request](https://github.com/MonoGame/MonoGame/issues) or [come help us](CONTRIBUTING.md) add it.
+We support a growing list of platforms across the desktop, mobile, and console space. If there is a platform we do not support, please [make a request](https://github.com/MonoGame/MonoGame/issues) or [come help us](CONTRIBUTING.md) add it.
 
 * Desktop PCs
   * Windows 8.1 and up (OpenGL & DirectX)
@@ -53,11 +52,12 @@ We support a growing list of platforms across the desktop, mobile, and console s
   * Nintendo Switch
 
 ## Resources
-- [Getting started →](https://docs.monogame.net/articles/getting_started/index.html)
-- ["How To" Guides →](https://docs.monogame.net/articles/getting_to_know/howto/)
-- [Documentation Hub →](https://docs.monogame.net/)
-- [API Reference →](https://docs.monogame.net/api/index.html)
-- [Community Tutorials →](https://docs.monogame.net/articles/tutorials.html)
+
+* [Getting started →](https://docs.monogame.net/articles/tutorials/building_2d_games/)
+* ["How To" Guides →](https://docs.monogame.net/articles/getting_to_know/howto/)
+* [Documentation Hub →](https://docs.monogame.net/)
+* [API Reference →](https://docs.monogame.net/api/index.html)
+* [Community Tutorials →](https://docs.monogame.net/articles/tutorials/)
 
 ## Samples
 
@@ -85,9 +85,9 @@ If you need help using MonoGame or have other questions we suggest you post on [
 
 If you are interested in contributing fixes or features to MonoGame, please read our [contributors guide](CONTRIBUTING.md) first.
 
-### Subscription
+## Subscription
 
-If you'd like to help the project by supporting us financially, consider supporting us via a subscription for the price of a monthly coffee.
+If you would like to help the project by supporting us financially, consider supporting us via a subscription for the price of a monthly coffee.
 
 Money goes towards hosting, new hardware and if enough people subscribe a dedicated developer.
 

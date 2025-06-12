@@ -26,6 +26,7 @@ namespace MonoGame.Effect
         Queue<FieldInfo> _requiredOptions = new Queue<FieldInfo>();
         Dictionary<string, FieldInfo> _optionalOptions = new Dictionary<string, FieldInfo>();
 
+        List<string> _requiredUsageArguments = new List<string>();
         List<string> _requiredUsageHelp = new List<string>();
         List<string> _optionalUsageHelp = new List<string>();
 
@@ -46,7 +47,10 @@ namespace MonoGame.Effect
                     // Record a required option.
                     _requiredOptions.Enqueue(field);
 
-                    _requiredUsageHelp.Add(string.Format("<{0}> {1}", fieldName, description));
+                    _requiredUsageArguments.Add(string.Format("<{0}>", fieldName));
+
+                    if (!string.IsNullOrEmpty(description))
+                        _requiredUsageHelp.Add(string.Format("{0} {1}", fieldName, description));
                 }
                 else
                 {
@@ -219,7 +223,14 @@ namespace MonoGame.Effect
             }
             Console.Error.WriteLine(message, args);
             Console.Error.WriteLine();
-            Console.Error.WriteLine("Usage: {0} {1}", name, string.Join(" ", _requiredUsageHelp));
+            Console.Error.WriteLine("Usage: {0} {1}", name, string.Join(" ", _requiredUsageArguments));
+
+            if (_requiredUsageHelp.Count > 0)
+            {
+                Console.Error.WriteLine();
+                foreach (string required in _requiredUsageHelp)
+                    Console.Error.WriteLine("    {0}", required);
+            }
 
             if (_optionalUsageHelp.Count > 0)
             {

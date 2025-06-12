@@ -111,6 +111,8 @@ namespace Microsoft.Xna.Framework.Input
             capabilities.HasStartButton = hasMap[14];
             capabilities.HasBackButton = hasMap[15];
 
+            capabilities.DisplayName = device.Name;
+
             return capabilities;
         }
     }

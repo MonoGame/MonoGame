@@ -10,6 +10,7 @@ namespace MonoGame.Effect
         public string SourceFile;
 
         [CommandLineParser.Required]
+        [CommandLineParser.Name("OutputFile", "\t - The output file path.  Use a .h extension to generate a C header file.")]
         public string OutputFile = string.Empty;
 
         [CommandLineParser.ProfileName]

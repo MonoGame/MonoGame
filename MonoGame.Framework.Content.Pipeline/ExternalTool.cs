@@ -19,20 +19,6 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
     /// </summary>
     internal class ExternalTool
     {
-        public static string Crunch = "mgcb-crunch";
-        private static string CrunchVersion = "1.0.4.2";
-        public static string BasisU = "mgcb-basisu";
-        private static string BasisUVersion = "1.16.4.2";
-        public static string FFmpeg = "mgcb-ffmpeg";
-        private static string FFmpegVersion = "7.0.0.6";
-        public static string FFprobe = "mgcb-ffprobe";
-        private static string FFprobeVersion = "7.0.0.6";
-
-        static ExternalTool()
-        {
-            RestoreDotnetTools ();
-        }
-
         public static int Run(string command, string arguments)
         {
             string stdout, stderr;
@@ -58,24 +44,6 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
                 Debug.WriteLine ($"{command} returned {stdout} {stderr}. Trying backup path.");
                 Run(exe, $"tool {command} {toolName} --tool-path .", out stdout, out stderr,  workingDirectory: path);
             }
-        }
-
-        static void RestoreDotnetTools()
-        {
-            var version = Assembly.GetExecutingAssembly().GetName().Version.ToString();
-            string path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory);
-            if (CurrentPlatform.OS == OS.Linux)
-                path= Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "linux");
-            if (CurrentPlatform.OS == OS.MacOSX)
-                path= Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "osx");
-            var versionFile = Path.Combine(path, $"tools_version.txt");
-            if (File.Exists(versionFile) && File.ReadAllText(versionFile) == version)
-                return;
-            RestoreDotnetTool("install", Crunch, CrunchVersion, path);
-            RestoreDotnetTool("install", BasisU, BasisUVersion, path);
-            RestoreDotnetTool("install", FFmpeg, FFmpegVersion, path);
-            RestoreDotnetTool("install", FFprobe, FFprobeVersion, path);
-            File.WriteAllText(versionFile, version);
         }
 
         /// <summary>

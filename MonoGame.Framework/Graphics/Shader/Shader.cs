@@ -97,12 +97,29 @@ namespace Microsoft.Xna.Framework.Graphics
 
         public VertexAttribute[] Attributes { get; private set; }
 
-        internal Shader(GraphicsDevice device, BinaryReader reader)
+        public string Entrypoint { get; private set; }
+
+        public string SourceFile { get; private set; }
+
+        internal Shader(GraphicsDevice device, int version, BinaryReader reader)
         {
             GraphicsDevice = device;
 
             var isVertexShader = reader.ReadBoolean();
             Stage = isVertexShader ? ShaderStage.Vertex : ShaderStage.Pixel;
+
+            if (version > 10)
+            {
+                // We don't really need these at runtime unless there is an
+                // error with the shader and this information is very useful.
+                SourceFile = reader.ReadString();
+                Entrypoint = reader.ReadString();
+            }
+            else
+            {
+                SourceFile = "<unknown>";
+                Entrypoint = "<unknown>";
+            }
 
             var shaderLength = reader.ReadInt32();
             var shaderBytecode = reader.ReadBytes(shaderLength);

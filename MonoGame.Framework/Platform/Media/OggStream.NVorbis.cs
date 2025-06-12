@@ -280,7 +280,7 @@ namespace Microsoft.Xna.Framework.Audio
         }
     }
 
-    internal class OggStreamer : IDisposable
+    internal class OggStreamer
     {
         public readonly XRamExtension XRam = new XRamExtension();
 
@@ -314,49 +314,34 @@ namespace Microsoft.Xna.Framework.Audio
                 lock (singletonMutex)
                 {
                     if (instance == null)
-                        throw new InvalidOperationException("No instance running");
+                        instance = new OggStreamer();
                     return instance;
                 }
             }
-            private set { lock (singletonMutex) instance = value; }
         }
 
-        public OggStreamer(int bufferSize = DefaultBufferSize, float updateRate = DefaultUpdateRate)
+        private OggStreamer(int bufferSize = DefaultBufferSize, float updateRate = DefaultUpdateRate)
         {
             UpdateRate = updateRate;
             BufferSize = bufferSize;
             pendingFinish = false;
 
-            lock (singletonMutex)
+            underlyingThread = new Thread(EnsureBuffersFilled)
             {
-                if (instance != null)
-                    throw new InvalidOperationException("Already running");
-
-                Instance = this;
-                underlyingThread = new Thread(EnsureBuffersFilled)
-                {
-                    Priority = ThreadPriority.Lowest,
-                    IsBackground = true
-                };
-                underlyingThread.Start();
-            }
+                Priority = ThreadPriority.Lowest,
+                IsBackground = true
+            };
+            underlyingThread.Start();
 
             readSampleBuffer = new float[bufferSize];
             castBuffer = new short[bufferSize];
         }
 
-        public void Dispose()
+        public void Shutdown()
         {
-            lock (singletonMutex)
-            {
-                Debug.Assert(Instance == this, "Two instances running, somehow...?");
-
-                cancelled = true;
-                lock (iterationMutex)
-                    streams.Clear();
-
-                Instance = null;
-            }
+            cancelled = true;
+            lock (iterationMutex)
+                streams.Clear();
         }
 
         internal bool AddStream(OggStream stream)
@@ -386,7 +371,8 @@ namespace Microsoft.Xna.Framework.Audio
 
             return readSamples != BufferSize;
         }
-        static void CastBuffer(float[] inBuffer, short[] outBuffer, int length)
+      
+        internal void CastBuffer(float[] inBuffer, short[] outBuffer, int length)
         {
             for (int i = 0; i < length; i++)
             {
@@ -397,7 +383,7 @@ namespace Microsoft.Xna.Framework.Audio
             }
         }
 
-        void EnsureBuffersFilled()
+        internal void EnsureBuffersFilled()
         {
             while (!cancelled)
             {

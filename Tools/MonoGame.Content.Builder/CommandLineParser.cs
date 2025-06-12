@@ -503,7 +503,7 @@ namespace MonoGame.Content.Builder
                 return;
             }
 
-            var name = Path.GetFileNameWithoutExtension(Process.GetCurrentProcess().ProcessName);
+            var name = Assembly.GetEntryAssembly().GetName().Name;
 
             if (!string.IsNullOrEmpty(Title))
             {

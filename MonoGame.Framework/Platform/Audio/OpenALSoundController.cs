@@ -92,8 +92,6 @@ namespace Microsoft.Xna.Framework.Audio
         private const int DEFAULT_FREQUENCY = 48000;
         private const int DEFAULT_UPDATE_SIZE = 512;
         private const int DEFAULT_UPDATE_BUFFER_COUNT = 2;
-#elif DESKTOPGL
-        private static OggStreamer _oggstreamer;
 #endif
         private List<int> availableSourcesCollection;
         private List<int> inUseSourcesCollection;
@@ -270,9 +268,6 @@ namespace Microsoft.Xna.Framework.Audio
 #endif
 
                 _context = Alc.CreateContext(_device, attribute);
-#if DESKTOPGL
-                _oggstreamer = new OggStreamer();
-#endif
 
                 AlcHelper.CheckError("Could not create OpenAL context");
 
@@ -386,10 +381,6 @@ namespace Microsoft.Xna.Framework.Audio
             {
                 if (disposing)
                 {
-#if DESKTOPGL
-                    if(_oggstreamer != null)
-                        _oggstreamer.Dispose();
-#endif
                     for (int i = 0; i < allSourcesArray.Length; i++)
                     {
                         AL.DeleteSource(allSourcesArray[i]);

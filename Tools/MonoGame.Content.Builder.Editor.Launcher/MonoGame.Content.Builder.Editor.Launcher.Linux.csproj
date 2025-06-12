@@ -15,14 +15,14 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Content Include="..\..\Artifacts\MonoGame.Content.Builder.Editor\Linux\Release\publish\**\*">
+    <None Include="..\..\Artifacts\MonoGame.Content.Builder.Editor\Linux\Release\publish\**\*">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <Link>mgcb-editor-linux-data\%(RecursiveDir)%(Filename)%(Extension)</Link>
-    </Content>
-    <Content Include="mgcb-editor-linux\*">
+    </None>
+    <None Include="mgcb-editor-linux\*">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <Link>mgcb-editor-linux-data\%(RecursiveDir)%(Filename)%(Extension)</Link>
-    </Content>
+    </None>
   </ItemGroup>
 
 </Project>

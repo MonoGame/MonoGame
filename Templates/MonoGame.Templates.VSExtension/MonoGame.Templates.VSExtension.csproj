@@ -33,6 +33,7 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="System.Text.Json" Version="8.0.5" />
+    <PackageReference Include="Microsoft.Net.Sdk.Compilers.Toolset" Version="9.0.300" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Templates.pkgdef">

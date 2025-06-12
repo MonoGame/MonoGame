@@ -15,10 +15,10 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Content Include="..\..\Artifacts\MonoGame.Content.Builder.Editor\Windows\Release\publish\**\*">
+    <None Include="..\..\Artifacts\MonoGame.Content.Builder.Editor\Windows\Release\publish\**\*">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <Link>mgcb-editor-windows-data\%(RecursiveDir)%(Filename)%(Extension)</Link>
-    </Content>
+    </None>
   </ItemGroup>
 
 </Project>
