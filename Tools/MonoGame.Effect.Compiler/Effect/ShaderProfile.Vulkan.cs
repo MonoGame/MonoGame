@@ -2,7 +2,6 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
-using Microsoft.Xna.Framework.Content.Pipeline;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -10,6 +9,8 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using MonoGame.Effect.TPGParser;
 using Microsoft.Xna.Framework.Graphics;
+using System.Diagnostics;
+using System.Threading;
 
 namespace MonoGame.Effect
 {
@@ -172,8 +173,8 @@ namespace MonoGame.Effect
                 File.WriteAllText(hlslFile, shaderContent);
 
                 // Run HlslCrossCompiler.exe to convert temp.fx to a .glsl
-                string stdout;
-                string stderr;
+                string stdout = string.Empty;
+                string stderr = string.Empty;
                 string toolArgs;
                 int toolResult;
 
@@ -222,7 +223,8 @@ namespace MonoGame.Effect
                 }
                 toolArgs += "\"" + hlslFile + "\"";
 
-                toolResult = ExternalTool.Run("dxc", toolArgs, out stdout, out stderr);
+                toolResult = RunTool("dxc", toolArgs, out stdout, out stderr);
+
                 errorsAndWarnings += stderr;
 
                 // jcf: this tool doesn't seem to use stderr for output
@@ -393,8 +395,6 @@ namespace MonoGame.Effect
                     // Sort by the location.
                     var sorted = inputs.Values.OrderBy(f=>f.location);
 
-                    int offset = 0;
-
                     foreach (var input in sorted)
                     {
                         var a = new ShaderData.Attribute();
@@ -447,34 +447,6 @@ namespace MonoGame.Effect
                                     break;
                             }                        
                         }
-
-                        int size;
-                        int len;
-                        int inputTypeStringStartIndex;
-                        if (input.type.StartsWith("v") && char.IsDigit(input.type[1]))
-                        {
-                            len = (int)char.GetNumericValue(input.type[1]);
-                            inputTypeStringStartIndex = 2;
-                        }
-                        else
-                        {
-                            len = 1;
-                            inputTypeStringStartIndex = 0;
-                        }
-
-                        switch (input.type.Substring(inputTypeStringStartIndex))
-                        {
-                            case "int":
-                            case "uint":
-                            case "float":
-                                size = len * 4;
-                                break;
-                            default:
-                                errorsAndWarnings += string.Format("Unknown vertex shader input type '{0}'.", input.type);
-                                throw new ShaderCompilerException();
-                        }
-
-                        offset += size;
 
                         // TODO: These are unused at runtime under the
                         // new native backends, we will remove them soon.               
@@ -634,7 +606,13 @@ namespace MonoGame.Effect
             finally
             {
                 foreach (var file in cleanup)
-                    ExternalTool.DeleteFile(file);
+                {
+                    try
+                    {
+                        File.Delete(file);
+                    }
+                    catch { }
+                }
             }
         }
     }

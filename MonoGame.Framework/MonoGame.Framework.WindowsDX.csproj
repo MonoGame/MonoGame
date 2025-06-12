@@ -10,8 +10,13 @@
     <PackageId>MonoGame.Framework.WindowsDX</PackageId>
     <AppendTargetFrameworkToOutputPath>False</AppendTargetFrameworkToOutputPath>
     <IsAotCompatible>false</IsAotCompatible>
-	<IsTrimmable>false</IsTrimmable>
+	  <IsTrimmable>false</IsTrimmable>
+    <PackageReadmeFile>README-packages.md</PackageReadmeFile>
   </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="..\README-packages.md" Pack="true" PackagePath="\"/>
+  </ItemGroup>
 
   <ItemGroup>
     <Compile Remove="bin\**\*" />
@@ -19,6 +24,7 @@
     <Compile Remove="Platform\**\*" />
     <Compile Remove="Properties\**\*" />
     <Compile Remove="Utilities\System.Numerics.Vectors\**\*" />
+    <Compile Remove="Devices\**\*" />
   </ItemGroup>
 
   <ItemGroup>
@@ -40,29 +46,18 @@
     <Compile Include="Platform\Input\MessageBox.Windows.cs" />
     <Compile Include="Platform\Input\Mouse.Windows.cs" />
     <Compile Include="Platform\Input\MouseCursor.Windows.cs" />
-
     <Compile Include="Platform\Media\MediaLibrary.Default.cs" />
-    <Compile Include="Platform\Media\MediaManagerState.cs" />
-    <Compile Include="Platform\Media\MediaPlayer.WMS.cs" />
-    <Compile Include="Platform\Media\Song.WMS.cs" />
-    <Compile Include="Platform\Media\Video.WMS.cs" />
-    <Compile Include="Platform\Media\VideoPlayer.WMS.cs" />
-    <Compile Include="Platform\Media\VideoSampleGrabber.cs" />
     <Compile Include="Platform\TitleContainer.Desktop.cs" />
     <Compile Include="Platform\Utilities\AssemblyHelper.cs" />
     <Compile Include="Platform\Utilities\CurrentPlatform.cs" />
     <Compile Include="Platform\Utilities\ReflectionHelpers.Legacy.cs" />
     <Compile Include="Platform\Utilities\TimerHelper.cs" />
-    <Compile Include="Platform\Windows\Accessibility\MouseKeys.cs" />
-    <Compile Include="Platform\Windows\Accessibility\MouseKeysFlags.cs" />
-    <Compile Include="Platform\Windows\Accessibility\MouseKeysManager.cs" />
-    <Compile Include="Platform\Windows\Accessibility\NativeMethods.cs" />
-    <Compile Include="Platform\Windows\Accessibility\SPI.cs" />
-    <Compile Include="Platform\Windows\Accessibility\SPIF.cs" />
     <Compile Include="Platform\Windows\HorizontalMouseWheelEventArgs.cs" />
     <Compile Include="Platform\Windows\WinFormsGameForm.cs" />
     <Compile Include="Platform\Windows\WinFormsGamePlatform.cs" />
     <Compile Include="Platform\Windows\WinFormsGameWindow.cs" />
+    <Compile Include="Platform\Desktop\Devices\Sensors\Accelerometer.cs" />
+    <Compile Include="Platform\Desktop\Devices\Sensors\Compass.cs" />
   </ItemGroup>
 
   <ItemGroup>
@@ -77,16 +72,10 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.NETCore.App" Version="2.1.30" />
     <PackageReference Include="Microsoft.NETCore.Jit" Version="2.0.8" />
-    <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.0">
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-      <PrivateAssets>all</PrivateAssets>
-    </PackageReference>
     <PackageReference Version="4.0.1" Include="SharpDX" />
     <PackageReference Version="4.0.1" Include="SharpDX.Direct2D1" />
     <PackageReference Version="4.0.1" Include="SharpDX.Direct3D11" />
     <PackageReference Version="4.0.1" Include="SharpDX.DXGI" />
-    <PackageReference Version="4.0.1" Include="SharpDX.MediaFoundation" />
-    <PackageReference Version="4.0.1" Include="SharpDX.XAudio2" />
     <PackageReference Version="4.0.1" Include="SharpDX.XInput" />
     <PackageReference Include="System.Net.Http" Version="4.3.4" />
     <PackageReference Include="System.Security.Cryptography.X509Certificates" Version="4.3.2" />
@@ -94,4 +83,5 @@
 
   <Import Project="Platform\DirectX.targets" />
   <Import Project="Platform\XAudio.targets" />
+  <Import Project="MonoGame.Framework.Devices.Sensors.targets" />
 </Project>

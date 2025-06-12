@@ -11,10 +11,11 @@
     <PackageId>MonoGame.Framework.Android</PackageId>
     <AppendTargetFrameworkToOutputPath>False</AppendTargetFrameworkToOutputPath>
     <IsAotCompatible>true</IsAotCompatible>
+    <PackageReadmeFile>README-packages.md</PackageReadmeFile>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="MonoGame.Library.OpenAL" Version="1.23.1.10" />
+    <None Include="..\README-packages.md" Pack="true" PackagePath="\"/>
   </ItemGroup>
 
   <ItemGroup>
@@ -23,6 +24,7 @@
     <Compile Remove="Platform\**\*" />
     <Compile Remove="Properties\**\*" />
     <Compile Remove="Utilities\System.Numerics.Vectors\**\*" />
+    <Compile Remove="Devices\**\*" />
   </ItemGroup>
 
   <ItemGroup>
@@ -64,19 +66,15 @@
     <Compile Include="Platform\Input\MessageBox.Android.cs" />
     <Compile Include="Platform\Input\Mouse.Default.cs" />
     <Compile Include="Platform\Input\MouseCursor.Default.cs" />
-    <Compile Include="Platform\Media\MediaLibrary.Android.cs" />
     <Compile Include="Platform\Media\MediaPlayer.Default.cs" />
-    <Compile Include="Platform\Media\Song.Android.cs" />
-    <Compile Include="Platform\Media\Video.Android.cs" />
-    <Compile Include="Platform\Media\VideoPlayer.Android.cs" />
     <Compile Include="Platform\PrimaryThreadLoader.cs" />
     <Compile Include="Platform\TitleContainer.Android.cs" />
     <Compile Include="Platform\Utilities\FuncLoader.Android.cs" />
     <Compile Include="Platform\Utilities\InteropHelpers.cs" />
     <Compile Include="Platform\Utilities\ReflectionHelpers.Default.cs" />
 
-    <Compile Include="..\ThirdParty\StbImageSharp\src\**\*.cs" LinkBase="Utilities\StbImageSharp"/>
-    <Compile Include="..\ThirdParty\StbImageWriteSharp\src\**\*.cs" LinkBase="Utilities\StbImageWriteSharp"/>
+    <Compile Include="..\ThirdParty\StbImageSharp\src\**\*.cs" LinkBase="Utilities\StbImageSharp" />
+    <Compile Include="..\ThirdParty\StbImageWriteSharp\src\**\*.cs" LinkBase="Utilities\StbImageWriteSharp" />
   </ItemGroup>
 
   <ItemGroup>
@@ -85,5 +83,5 @@
 
   <Import Project="Platform\OpenGL.targets" />
   <Import Project="Platform\OpenAL.targets" />
-  <Import Project="Platform\Microsoft.Devices.Sensors.targets" />
+  <Import Project="MonoGame.Framework.Devices.Sensors.targets" />
 </Project>

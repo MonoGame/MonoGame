@@ -118,7 +118,7 @@ namespace Microsoft.Xna.Framework.Media
 			}
 		}
 
-#if !DIRECTX
+#if !DIRECTX || NO_AUDIO
         internal void SetVolume(float volume)
         {
             int count = songs.Count;
@@ -132,7 +132,7 @@ namespace Microsoft.Xna.Framework.Media
             songs.Add(song);
         }
 
-#if !DIRECTX
+#if !DIRECTX || NO_AUDIO
         internal void Stop()
         {
             int count = songs.Count;

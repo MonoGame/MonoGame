@@ -297,8 +297,8 @@ namespace Microsoft.Xna.Framework.Content
         /// <remarks>
         /// Before a ContentManager can load an asset, you need to add the asset to your game project using
         /// the steps described in
-        /// <see href="https://docs.monogame.net/articles/getting_started/content_pipeline/index.html">Adding Content - MonoGame</see>.
-        /// <br>PNG, JPG/JPEG and BMP files can be loaded as Texture2D without using the content pipeline. The assetName must not contain extension.
+        /// <see href="https://docs.monogame.net/articles/getting_started/content_pipeline/index.html">Adding Content - MonoGame</see>. <br/>
+        /// PNG, JPG/JPEG and BMP files can be loaded as Texture2D without using the content pipeline. The assetName must not contain extension.
         /// </remarks>
         /// <typeparam name="T">
         ///     <para>
@@ -418,7 +418,7 @@ namespace Microsoft.Xna.Framework.Content
 			{
 				throw new ContentLoadException("Opening stream error.", exception);
 			}
-            
+
 			return stream;
 		}
 
@@ -453,30 +453,34 @@ namespace Microsoft.Xna.Framework.Content
                     }
                 }
             }
-            catch (ContentLoadException)
+            catch (ContentLoadException ex)
             {
-                try
+                // If the file is not found, we try searching a file with differents extensions
+                // based on the type of asset searched (e.g. '.bmp' and '.png' for a Texture2D)
+                if (ex.InnerException != null &&
+                    (ex.InnerException is FileNotFoundException ||
+                    ex.InnerException is DirectoryNotFoundException))
                 {
-                    // If the file is not found, we try searching a file with differents extensions
-                    // based on the type of asset searched (e.g. '.bmp' and '.png' for a Texture2D)
-                    switch (typeof(T).Name)
+                    // only try if an image file exist to avoid loosing the original error
+                    if (typeof(Texture2D).IsAssignableFrom(typeof(T)) &&
+                        ImageFileExists(assetName))
                     {
-                        case nameof(Texture2D):
+                        try
+                        {
                             result = LoadTexture2DFromImageFile(assetName);
-                            break;
-                        // Futures cases here (see relevant GitHub Issues):
-                        // Video
-                        // Song
-                        // SoundEffect
-                        // Texture3D (?)
-                        default:
-                            break;
+                        }
+                        catch (Exception e)
+                        {
+                            throw new ContentLoadException("Could not load image file of " + originalAssetName + " asset!", e);
+                        }
                     }
+                    // no alternaive file, rethrow original error as-is
+                    else
+                        throw;
                 }
-                catch
-                {
-                    result = null;
-                }
+                // if it's a different exception, rethrow it as-is
+                else
+                    throw;
             }
 
 			if (result == null)
@@ -540,22 +544,56 @@ namespace Microsoft.Xna.Framework.Content
 
             return reader;
         }
-    
-        Texture2D LoadTexture2DFromImageFile(string assetName)
+
+        internal bool ImageFileExists(string assetName)
         {
-            IGraphicsDeviceService graphicsDeviceService = serviceProvider.GetService(typeof(IGraphicsDeviceService)) as IGraphicsDeviceService;
-            
             foreach (string extension in supportedTexture2DExtensions)
             {
                 string assetPath = Path.Combine(RootDirectory, assetName);
                 assetPath = Path.ChangeExtension(assetPath, extension);
 
-                using Stream file = TitleContainer.OpenStreamNoException(assetPath);
-                if (file != null)
-                {
-                    Texture2D result = Texture2D.FromStream(graphicsDeviceService.GraphicsDevice, file, DefaultColorProcessors.PremultiplyAlpha);
+                if (File.Exists(assetPath))
+                    return true;
+            }
 
-                    return result;
+            return false;
+        }
+
+        internal Texture2D LoadTexture2DFromImageFile(string assetName)
+        {
+            IGraphicsDeviceService graphicsDeviceService = serviceProvider.GetService(typeof(IGraphicsDeviceService)) as IGraphicsDeviceService;
+
+            foreach (string extension in supportedTexture2DExtensions)
+            {
+                string assetPath = Path.Combine(RootDirectory, assetName);
+                assetPath = Path.ChangeExtension(assetPath, extension);
+
+                Stream stream = null;
+
+                // Handle absolute paths the same way as XNB loading
+#if DESKTOPGL || WINDOWS
+                if (Path.IsPathRooted(assetPath))
+                    stream = File.OpenRead(assetPath);
+                else
+#endif
+                stream = TitleContainer.OpenStreamNoException(assetPath);
+#if ANDROID
+                // Read the asset into memory in one go. This results in a ~50% reduction
+                // in load times on Android due to slow Android asset streams.
+                MemoryStream memStream = new MemoryStream();
+                stream.CopyTo(memStream);
+                memStream.Seek(0, SeekOrigin.Begin);
+                stream.Close();
+                stream = memStream;
+#endif
+
+                if (stream != null)
+                {
+                    using (stream)
+                    {
+                        Texture2D result = Texture2D.FromStream(graphicsDeviceService.GraphicsDevice, stream, DefaultColorProcessors.PremultiplyAlpha);
+                        return result;
+                    }
                 }
             }
 

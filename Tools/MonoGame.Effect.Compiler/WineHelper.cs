@@ -4,6 +4,7 @@
 
 using System;
 using System.Diagnostics;
+using System.Runtime.InteropServices;
 using System.IO;
 
 namespace MonoGame.Effect.Compiler
@@ -32,8 +33,8 @@ namespace MonoGame.Effect.Compiler
             catch (Exception)
             {
                 proc.StartInfo.FileName = "wine";
-                return;
             }
+
             try {
                 proc.Start();
                 proc.WaitForExit();
@@ -53,21 +54,16 @@ namespace MonoGame.Effect.Compiler
 
             if (string.IsNullOrEmpty(mgfxcwine))
             {
-                Console.Error.WriteLine("MGFXC effect compiler requires a valid Wine installation to be able to compile shaders.");
-                Console.Error.WriteLine("");
-                Console.Error.WriteLine("Setup instructions:");
-                Console.Error.WriteLine("- Create 64 bit wine prefix");
-                Console.Error.WriteLine("- Install d3dcompiler_47 using winetricks");
-                Console.Error.WriteLine("- Install .NET 8");
-                Console.Error.WriteLine("- Setup MGFXC_WINE_PATH environmental variable to point to a valid wine prefix");
-                Console.Error.WriteLine("");
+                string os = RuntimeInformation.IsOSPlatform(OSPlatform.OSX) ? "macos" : "linux";
+                Console.Error.WriteLine($"Error: MGFXC0001: MGFXC effect compiler requires a valid Wine installation to be able to compile shaders. Please visit https://docs.monogame.net/errors/mgfx0001?tab={os} for more details.");
                 return -1;
             }
 
             Environment.SetEnvironmentVariable("WINEARCH", "win64");
-            Environment.SetEnvironmentVariable("WINEDLLOVERRIDES", "d3dcompiler_47=n");
+            Environment.SetEnvironmentVariable("WINEDLLOVERRIDES", "d3dcompiler_47=n,explorer.exe=e,services.exe=f");
             Environment.SetEnvironmentVariable("WINEPREFIX", mgfxcwine);
             Environment.SetEnvironmentVariable("WINEDEBUG", "-all");
+            Environment.SetEnvironmentVariable("MVK_CONFIG_LOG_LEVEL", "0"); // hide MoltenVK logs
 
             var assemblyLocation = typeof(Program).Assembly.Location;
             var input = ToPrefixPath(options.SourceFile);
@@ -76,7 +72,6 @@ namespace MonoGame.Effect.Compiler
             var proc = new Process();
             proc.StartInfo.FileName = wineExecutable;
             proc.StartInfo.Arguments = "dotnet ";
-            proc.StartInfo.WorkingDirectory = Path.GetDirectoryName(assemblyLocation);
             proc.StartInfo.UseShellExecute = false;
             proc.StartInfo.CreateNoWindow = true;
             proc.StartInfo.AddPathArgument(assemblyLocation);
@@ -121,7 +116,6 @@ namespace MonoGame.Effect.Compiler
             proc.StartInfo.FileName = wineExecutable;
             proc.StartInfo.Arguments = "winepath.exe -w \"" + localPath + "\"";
             proc.StartInfo.UseShellExecute = false;
-            proc.StartInfo.WorkingDirectory = Path.GetDirectoryName(assemblyLocation);
             proc.StartInfo.RedirectStandardOutput = true;
             proc.Start();
 

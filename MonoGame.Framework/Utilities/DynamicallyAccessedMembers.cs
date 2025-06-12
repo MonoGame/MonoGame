@@ -1,6 +1,6 @@
 // fake attribute for backward compatibility with .NET 4.5
 
-#if NET45
+#if !NET5_0_OR_GREATER
 namespace System.Diagnostics.CodeAnalysis
 {
     [Flags]
@@ -27,12 +27,14 @@ namespace System.Diagnostics.CodeAnalysis
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Struct | AttributeTargets.Method | AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Interface | AttributeTargets.Parameter | AttributeTargets.ReturnValue | AttributeTargets.GenericParameter, Inherited = false)]
     public sealed class DynamicallyAccessedMembersAttribute : Attribute
     {
+        private DynamicallyAccessedMemberTypes _memberTypes;
+
         public DynamicallyAccessedMembersAttribute(DynamicallyAccessedMemberTypes memberTypes)
         {
-            MemberTypes = memberTypes;
+            _memberTypes = memberTypes;
         }
 
-        public DynamicallyAccessedMemberTypes MemberTypes { get; }
+        public DynamicallyAccessedMemberTypes MemberTypes { get { return _memberTypes; } }
     }
 }
 #endif

@@ -10,7 +10,7 @@
     <MGCBToolDirectory Condition="'$(MGCBToolDirectory)' == ''">$(MSBuildThisFileDirectory)dotnet-tools/</MGCBToolDirectory>
     <MGCBToolDirectory Condition="'$(MGCBToolDirectory)' != '' And !HasTrailingSlash('$(MGCBToolDirectory)')">$(MGCBToolDirectory)/</MGCBToolDirectory>
     <MGCBCommand Condition="'$(MGCBCommand)' == ''">mgcb</MGCBCommand>
-    <MonoGameVersion Condition="'$(MonoGameVersion)' == ''">3.8.2.0</MonoGameVersion>
+    <MonoGameVersion Condition="'$(MonoGameVersion)' == ''">3.8.4.0</MonoGameVersion>
   </PropertyGroup>
 
 </Project>

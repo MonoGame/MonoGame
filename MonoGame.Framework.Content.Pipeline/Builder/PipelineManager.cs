@@ -116,9 +116,14 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
         public bool RethrowExceptions { get; set; }
 
         /// <summary>
+        /// If true, messages which are non-essential to the build process will be suppressed.
+        /// </summary>
+        public bool Quiet { get; set; }
+
+        /// <summary>
         /// Creates a new instance of PipelineManager.
         /// </summary>
-        /// <param name="projectDir">The directory that contains the content project./param>
+        /// <param name="projectDir">The directory that contains the content project.</param>
         /// <param name="outputDir">The directory that contains the results of the project.</param>
         /// <param name="intermediateDir">The directory that is used for temporary files created by the content build process</param>
         public PipelineManager(string projectDir, string outputDir, string intermediateDir)
@@ -686,7 +691,7 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
             var rebuild = pipelineEvent.NeedsRebuild(this, cachedEvent);
             if (rebuild)
                 Logger.LogMessage("{0}", pipelineEvent.SourceFile);
-            else
+            else if (!Quiet)
                 Logger.LogMessage("Skipping {0}", pipelineEvent.SourceFile);
 
             Logger.Indent();
