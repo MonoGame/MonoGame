@@ -1,0 +1,13 @@
+{
+  "$schema": "http://json.schemastore.org/vsix-publish",
+  "categories": [ "templates" ], // The categories of the extension. Between 1 and 3 categories are required.
+  "identity": {
+    "internalName": "MonoGame.Templates.VSExtension" // If not specified, we try to generate the name from the display name of the extension in the vsixmanifest file.
+    // Required if the display name is not the actual name of the extension.
+  },
+  "overview": "overview.md", // Path to the "readme" file that gets uploaded to the Marketplace. Required.
+  "priceCategory": "free", // Either "free", "trial", or "paid". Defaults to "free".
+  "publisher": "MonoGame Foundation", // The name of the publisher. Required.
+  "private": false, // Specifies whether or not the extension should be public when uploaded. Defaults to false.
+  "qna": true // Specifies whether or not the extension should have a Q&A section. Defaults to true.
+}
