@@ -122,6 +122,15 @@ public partial class GraphicsDevice
         Textures.Dirty();
         SamplerStates.Dirty();
 
+        MGG.GraphicsDevice_SetViewport(
+            Handle,
+            _viewport.X,
+            _viewport.Y,
+            _viewport.Width,
+            _viewport.Height,
+            _viewport.MinDepth,
+            _viewport.MaxDepth);
+
         PlatformApplyDefaultRenderTarget();
     }
 
