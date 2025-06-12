@@ -796,12 +796,13 @@ namespace MonoGame.Effect
         private d3dx_state CreateShader(ShaderResult shaderResult, string shaderFunction, string shaderProfile, bool isVertexShader, ref string errorsAndWarnings)
         {
             // Check if this shader has already been created.
-            var shaderData = Shaders.Find(shader => shader.ShaderFunctionName == shaderFunction && shader.ShaderProfile == shaderProfile);
+            var shaderData = Shaders.Find(shader => shader.Entrypoint == shaderFunction && shader.ShaderProfile == shaderProfile);
             if (shaderData == null)
             {
                 // Compile and create the shader.
                 shaderData = shaderResult.Profile.CreateShader(shaderResult, shaderFunction, shaderProfile, isVertexShader, this, ref errorsAndWarnings);
-                shaderData.ShaderFunctionName = shaderFunction;
+                shaderData.SourceFile = shaderResult.RelativeFilePath;
+                shaderData.Entrypoint = shaderFunction;
                 shaderData.ShaderProfile = shaderProfile;
             }
 
