@@ -12,6 +12,7 @@ function common(project_name)
    defines { "DLL_EXPORT" }
    targetdir( platform_target_path )
    targetname "monogame.native"
+   cppdialect "C++17"
 
    files 
    { 
@@ -84,6 +85,37 @@ function vulkan()
 end
 
 
+-- DirectX12 is supported on Xbox and Windows.
+function directx12()
+
+   defines { "MG_DIRECTX12" }
+
+   files 
+   { 
+      "directx12/**.h",
+      "directx12/**.cpp",
+   }
+
+    filter "system:windows"
+      files { "directx12/**.rc", }
+
+   -- includedirs 
+   -- {
+      -- "external/vulkan-headers/include",      
+      -- "external/volk",      
+      -- "external/vma/include",      
+   -- }
+
+   filter { "system:windows" }
+      links 
+      { 
+         "dxguid",
+         "dxgi",
+         "d3d12",
+      }
+
+end
+
 -- FAudio is supported for all desktop platforms.
 function faudio()
 
@@ -93,6 +125,19 @@ function faudio()
    { 
       "faudio/**.h",
       "faudio/**.cpp",
+   }
+
+end
+
+-- Xaudio is supported on Windows and Xbox.
+function xaudio()
+
+   defines { "MG_XAUDIO" }
+
+   files 
+   { 
+      "xaudio/**.h",
+      "xaudio/**.cpp",
    }
 
 end
@@ -122,3 +167,7 @@ project "desktopvk"
 
 project "windowsdx"
    common("windowsdx")
+   sdl2()
+   directx12()
+   xaudio()
+   configs()
