@@ -1,4 +1,4 @@
-﻿// MonoGame - Copyright (C) The MonoGame Team
+﻿// MonoGame - Copyright (C) MonoGame Foundation, Inc
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
@@ -15,23 +15,28 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
         {
             return  platform == TargetPlatform.Android ||
                     platform == TargetPlatform.DesktopGL ||
+                    platform == TargetPlatform.DesktopVK ||
                     platform == TargetPlatform.MacOSX ||
                     platform == TargetPlatform.NativeClient ||
                     platform == TargetPlatform.RaspberryPi ||
                     platform == TargetPlatform.Windows ||
-                    platform == TargetPlatform.WindowsPhone8 ||
-                    platform == TargetPlatform.WindowsStoreApp ||
-                    platform == TargetPlatform.iOS;
+                    platform == TargetPlatform.iOS ||
+                    platform == TargetPlatform.Web;
         }
 
         private static bool IsCompressedTextureFormat(TextureProcessorOutputFormat format)
         {
             switch (format)
             {
+#pragma warning disable CS0618 // Type or member is obsolete
+                case TextureProcessorOutputFormat.Etc1Compressed:
+#pragma warning restore CS0618 // Type or member is obsolete
+
                 case TextureProcessorOutputFormat.AtcCompressed:
                 case TextureProcessorOutputFormat.DxtCompressed:
-                case TextureProcessorOutputFormat.Etc1Compressed:
+                case TextureProcessorOutputFormat.EtcCompressed:
                 case TextureProcessorOutputFormat.PvrCompressed:
+                case TextureProcessorOutputFormat.AstcCompressed:
                     return true;
             }
             return false;
@@ -45,7 +50,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
                 if (platform == TargetPlatform.iOS)
                     format = TextureProcessorOutputFormat.PvrCompressed;
                 else if (platform == TargetPlatform.Android)
-                    format = TextureProcessorOutputFormat.Etc1Compressed;
+                    format = TextureProcessorOutputFormat.EtcCompressed;
                 else
                     format = TextureProcessorOutputFormat.DxtCompressed;
             }
@@ -59,14 +64,14 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
                         throw new PlatformNotSupportedException("iOS platform only supports PVR texture compression");
                 }
                 else if (platform == TargetPlatform.Windows ||
-                            platform == TargetPlatform.WindowsPhone8 ||
-                            platform == TargetPlatform.WindowsStoreApp ||
                             platform == TargetPlatform.DesktopGL ||
+                            platform == TargetPlatform.DesktopVK ||
                             platform == TargetPlatform.MacOSX ||
-                            platform == TargetPlatform.NativeClient)
+                            platform == TargetPlatform.NativeClient ||
+                            platform == TargetPlatform.Web)
                 {
                     if (format != TextureProcessorOutputFormat.DxtCompressed)
-                        throw new PlatformNotSupportedException(format + " platform only supports DXT texture compression");
+                        throw new PlatformNotSupportedException(platform + " platform only supports DXT texture compression");
                 }
             }
 
@@ -89,8 +94,12 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
                     requiresPowerOfTwo = context.TargetProfile == GraphicsProfile.Reach;
                     break;
 
-                case TextureProcessorOutputFormat.PvrCompressed:
+#pragma warning disable CS0618 // Type or member is obsolete
                 case TextureProcessorOutputFormat.Etc1Compressed:
+#pragma warning restore CS0618 // Type or member is obsolete
+
+                case TextureProcessorOutputFormat.PvrCompressed:
+                case TextureProcessorOutputFormat.EtcCompressed:
                     requiresPowerOfTwo = true;
                     break;
             }
@@ -118,23 +127,33 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
             switch (format)
             {
                 case TextureProcessorOutputFormat.AtcCompressed:
-                    GraphicsUtil.CompressAti(content);
+                    GraphicsUtil.CompressAti(context, content, isSpriteFont);
+                    break;
+
+                case TextureProcessorOutputFormat.AstcCompressed:
+                    GraphicsUtil.CompressAstc(context, content, isSpriteFont);
                     break;
 
                 case TextureProcessorOutputFormat.Color16Bit:
-                    GraphicsUtil.CompressColor16Bit(content);
+                    GraphicsUtil.CompressColor16Bit(context, content);
                     break;
 
                 case TextureProcessorOutputFormat.DxtCompressed:
-                    GraphicsUtil.CompressDxt(context.TargetProfile, content, isSpriteFont);
+                    GraphicsUtil.CompressDxt(context, content, isSpriteFont);
                     break;
 
+#pragma warning disable CS0618 // Type or member is obsolete
                 case TextureProcessorOutputFormat.Etc1Compressed:
-                    GraphicsUtil.CompressEtc1(content);
+#pragma warning restore CS0618 // Type or member is obsolete
+                    GraphicsUtil.CompressEtc1(context, content, isSpriteFont);
+                    break;
+
+                case TextureProcessorOutputFormat.EtcCompressed:
+                    GraphicsUtil.CompressEtc(context, content, isSpriteFont);
                     break;
 
                 case TextureProcessorOutputFormat.PvrCompressed:
-                    GraphicsUtil.CompressPvrtc(content, isSpriteFont);
+                    GraphicsUtil.CompressPvrtc(context, content, isSpriteFont);
                     break;
             }
         }

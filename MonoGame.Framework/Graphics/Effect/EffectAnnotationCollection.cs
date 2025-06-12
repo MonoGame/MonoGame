@@ -2,7 +2,10 @@ using System.Collections.Generic;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
-	public class EffectAnnotationCollection : IEnumerable<EffectAnnotation>
+    /// <summary>
+    /// Represents a collection of <see cref="EffectAnnotation"/> objects.
+    /// </summary>
+    public class EffectAnnotationCollection : IEnumerable<EffectAnnotation>
 	{
         internal static readonly EffectAnnotationCollection Empty = new EffectAnnotationCollection(new EffectAnnotation[0]);
 
@@ -13,17 +16,27 @@ namespace Microsoft.Xna.Framework.Graphics
             _annotations = annotations;
         }
 
+        /// <summary>
+        /// Gets the number of elements contained in the collection.
+        /// </summary>
 		public int Count 
         {
 			get { return _annotations.Length; }
 		}
-		
-		public EffectAnnotation this[int index]
+
+        /// <summary>
+        /// Retrieves the <see cref="EffectAnnotation"/> at the specified index in the collection.
+        /// </summary>
+        public EffectAnnotation this[int index]
         {
             get { return _annotations[index]; }
         }
-		
-		public EffectAnnotation this[string name]
+
+        /// <summary>
+        /// Retrieves a <see cref="EffectAnnotation"/> from the collection, given the name of the annotation.
+        /// </summary>
+        /// <param name="name">The name of the annotation to retrieve.</param>
+        public EffectAnnotation this[string name]
         {
             get 
             {
@@ -35,7 +48,8 @@ namespace Microsoft.Xna.Framework.Graphics
 				return null;
 			}
         }
-		
+
+        /// <inheritdoc/>
 		public IEnumerator<EffectAnnotation> GetEnumerator()
         {
             return ((IEnumerable<EffectAnnotation>)_annotations).GetEnumerator();

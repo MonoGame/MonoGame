@@ -1,4 +1,4 @@
-﻿// MonoGame - Copyright (C) The MonoGame Team
+﻿// MonoGame - Copyright (C) MonoGame Foundation, Inc
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
@@ -9,6 +9,9 @@ using Microsoft.Xna.Framework.Content.Pipeline.Processors;
 
 namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 {
+    /// <summary>
+    /// Base class for handling texture profiles.
+    /// </summary>
     public abstract class TextureProfile
     {
         private static readonly LoadedTypeCollection<TextureProfile> _profiles = new LoadedTypeCollection<TextureProfile>();
@@ -65,7 +68,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
             // Handle this common compression format.
             if (format == TextureProcessorOutputFormat.Color16Bit)
             {
-                GraphicsUtil.CompressColor16Bit(content);
+                GraphicsUtil.CompressColor16Bit(context, content);
                 return;
             }
 
@@ -91,6 +94,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
             }
         }
 
+        /// <summary/>
         protected abstract void PlatformCompressTexture(ContentProcessorContext context, TextureContent content, TextureProcessorOutputFormat format, bool isSpriteFont);
     }
 }

@@ -1,4 +1,4 @@
-﻿// MonoGame - Copyright (C) The MonoGame Team
+﻿// MonoGame - Copyright (C) MonoGame Foundation, Inc
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
@@ -6,6 +6,12 @@ using System;
 
 namespace Microsoft.Xna.Framework.Content.Pipeline
 {
+    /// <summary>
+    /// Provides an opaque data dictionary for use in the Content Pipeline.
+    /// </summary>
+    /// <remarks>
+    /// This is equivilant to a <see cref="NamedValueDictionary{T}">NamedValueDictionary</see> where the type of the values is Object.
+    /// </remarks>
     [ContentSerializerCollectionItemName("Data")]
     public sealed class OpaqueDataDictionary : NamedValueDictionary<Object>
     {

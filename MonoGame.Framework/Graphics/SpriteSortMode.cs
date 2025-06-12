@@ -1,4 +1,4 @@
-// MonoGame - Copyright (C) The MonoGame Team
+// MonoGame - Copyright (C) MonoGame Foundation, Inc
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
@@ -23,10 +23,12 @@ namespace Microsoft.Xna.Framework.Graphics
         Texture,
         /// <summary>
         /// Same as <see cref="SpriteSortMode.Deferred"/>, except sprites are sorted by depth in back-to-front order prior to drawing.
+        /// An unstable sort is used, which means sprites with equal depth may not have their order preserved.
         /// </summary>
         BackToFront,
         /// <summary>
         /// Same as <see cref="SpriteSortMode.Deferred"/>, except sprites are sorted by depth in front-to-back order prior to drawing.
+        /// An unstable sort is used, which means sprites with equal depth may not have their order preserved.
         /// </summary>
         FrontToBack
     }

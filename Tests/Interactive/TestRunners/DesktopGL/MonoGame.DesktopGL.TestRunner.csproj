@@ -1,0 +1,68 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+    <RollForward>Major</RollForward>
+    <PublishReadyToRun>false</PublishReadyToRun>
+    <TieredCompilation>false</TieredCompilation>
+    <MonoGamePlatform>DesktopGL</MonoGamePlatform>    
+    <RootNamespace>MonoGame.InteractiveTests</RootNamespace>
+    <AssemblyName>MonoGameInteractiveTests</AssemblyName>
+    <StartupObject>MonoGame.InteractiveTests.TestRunner</StartupObject>    
+  </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <ApplicationIcon>Icon.ico</ApplicationIcon>
+  </PropertyGroup>
+  <ItemGroup>
+    <None Remove="Icon.ico" />
+    <None Remove="Icon.bmp" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Icon.ico" />
+    <EmbeddedResource Include="Icon.bmp" />
+  </ItemGroup>
+  <Import Project="..\..\Common\MonoGame.Interactive.Common.projitems" Label="Shared" />
+  <Import Project="..\..\Tests\MonoGame.Interactive.Tests.projitems" Label="Shared" />
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\..\MonoGame.Framework\MonoGame.Framework.DesktopGL.csproj">
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\MonoGame.Framework.Content.Pipeline\MonoGame.Framework.Content.Pipeline.csproj" /> 
+  </ItemGroup>
+  <Target Name="RestoreDotnetTools" BeforeTargets="Restore">
+    <Message Text="Restoring dotnet tools" Importance="High" />
+    <Exec Command="dotnet tool restore" />
+  </Target>
+  <ItemGroup>
+    <Folder Include="Content\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="..\..\..\Assets\Fonts\Default.xnb">
+      <Link>Content\Fonts\Default.xnb</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\Assets\Textures\white-1.xnb">
+      <Link>Content\Textures\white-1.xnb</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\Assets\Textures\LogoOnly_64px.png">
+      <Link>Content\Textures\LogoOnly_64px.png</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\Assets\Effects\Mobile\test.fx.ogl.mgfxo">
+      <Link>Content\Effect\test.fx.mgfxo</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+   <PropertyGroup>
+   <LangVersion>latestMajor</LangVersion>
+   <ProduceReferenceAssembly>False</ProduceReferenceAssembly>
+   <ErrorReport>none</ErrorReport>
+   <RunAnalyzersDuringBuild>False</RunAnalyzersDuringBuild>
+   <RunAnalyzersDuringLiveAnalysis>False</RunAnalyzersDuringLiveAnalysis>
+   <EnableNETAnalyzers>False</EnableNETAnalyzers>
+   <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+ </PropertyGroup>
+</Project>

@@ -1,0 +1,56 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0-macos</TargetFramework>
+    <RollForward>Major</RollForward>
+    <BaseOutputPath>..\..\Artifacts\MonoGame.Content.Builder.Editor\Mac</BaseOutputPath>
+    <DefineConstants>MONOMAC;MAC</DefineConstants>
+    <AppendTargetFrameworkToOutputPath>False</AppendTargetFrameworkToOutputPath>
+    <SupportedOSPlatformVersion>10.15</SupportedOSPlatformVersion>
+    <ErrorOnDuplicatePublishOutputFiles>false</ErrorOnDuplicatePublishOutputFiles>
+    <AssemblyName>mgcb-editor-mac</AssemblyName>
+    <AssemblyTitle>MGCB Editor</AssemblyTitle>
+    <RuntimeIdentifiers>osx-x64;osx-arm64</RuntimeIdentifiers>
+    <DisableMonoGameToolAssets>True</DisableMonoGameToolAssets>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="Platform\**\*" />
+    <Compile Remove="Platform\**\*" />
+
+    <Compile Include="Platform\Mac\**\*.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="Templates\*">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Link>Templates\%(Filename)%(Extension)</Link>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Eto.Forms" Version="2.8.3" />
+    <PackageReference Include="Eto.Platform.macOS" Version="2.8.3" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\MonoGame.Framework\MonoGame.Framework.DesktopGL.csproj">
+      <ExcludeAssets>contentFiles;native;runtime</ExcludeAssets>
+    </ProjectReference>
+    <ProjectReference Include="..\..\MonoGame.Framework.Content.Pipeline\MonoGame.Framework.Content.Pipeline.csproj">
+      <ExcludeAssets>contentFiles;native;runtime</ExcludeAssets>
+    </ProjectReference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="Icon.icns" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <BundleResource Include="Icon.icns" />
+  </ItemGroup>
+
+  <Import Project="MonoGame.Content.Builder.Editor.targets" />
+
+</Project>

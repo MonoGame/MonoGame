@@ -1,4 +1,4 @@
-// MonoGame - Copyright (C) The MonoGame Team
+// MonoGame - Copyright (C) MonoGame Foundation, Inc
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
@@ -8,25 +8,29 @@ using Microsoft.Xna.Framework.Input;
 namespace Microsoft.Xna.Framework
 {
     /// <summary>
-    /// This class is used for the game window's TextInput event as EventArgs.
+    /// This class is used in the <see cref="GameWindow.TextInput"/> event as <see cref="EventArgs"/>.
     /// </summary>
-    public class TextInputEventArgs : EventArgs
+    public struct TextInputEventArgs
     {
-        char character;
+        /// <summary>
+        /// Creates an instance of <see cref="TextInputEventArgs"/>.
+        /// </summary>
+        /// <param name="character">Character for the key that was pressed.</param>
+        /// <param name="key">The pressed key.</param>
         public TextInputEventArgs(char character, Keys key = Keys.None)
         {
-            this.character = character;
-            this.Key = key;
+            Character = character;
+            Key = key;
         }
-        public char Character
-        {
-            get
-            {
-                return character;
-            }
-        }
-        public Keys Key {
-            get; private set;
-        }
+
+        /// <summary>
+        /// The character for the key that was pressed.
+        /// </summary>
+        public readonly char Character;
+
+        /// <summary>
+        /// The pressed key.
+        /// </summary>
+        public readonly Keys Key;
     }
 }

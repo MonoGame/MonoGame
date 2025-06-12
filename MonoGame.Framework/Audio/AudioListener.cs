@@ -1,4 +1,4 @@
-// MonoGame - Copyright (C) The MonoGame Team
+// MonoGame - Copyright (C) MonoGame Foundation, Inc
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
@@ -13,6 +13,9 @@ namespace Microsoft.Xna.Framework.Audio
     /// </summary>
 	public class AudioListener
 	{
+	    /// <summary>
+	    /// Create an <see cref="AudioListener"/> instance.
+	    /// </summary>
 		public AudioListener ()
 		{
 			Forward = Vector3.Forward;

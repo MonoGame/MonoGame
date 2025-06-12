@@ -4,6 +4,7 @@
 
 using System;
 using System.Diagnostics;
+using System.Runtime.CompilerServices;
 using System.Runtime.Serialization;
 
 namespace Microsoft.Xna.Framework
@@ -122,6 +123,15 @@ namespace Microsoft.Xna.Framework
         #region Operators
 
         /// <summary>
+        /// Converts a <see cref="System.Numerics.Vector2"/> to a <see cref="Vector2"/>.
+        /// </summary>
+        /// <param name="value">The converted value.</param>
+        public static implicit operator Vector2(System.Numerics.Vector2 value)
+        {
+            return new Vector2(value.X, value.Y);
+        }
+
+        /// <summary>
         /// Inverts values in the specified <see cref="Vector2"/>.
         /// </summary>
         /// <param name="value">Source <see cref="Vector2"/> on the right of the sub sign.</param>
@@ -204,6 +214,7 @@ namespace Microsoft.Xna.Framework
         /// <param name="value1">Source <see cref="Vector2"/> on the left of the div sign.</param>
         /// <param name="value2">Divisor <see cref="Vector2"/> on the right of the div sign.</param>
         /// <returns>The result of dividing the vectors.</returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Vector2 operator /(Vector2 value1, Vector2 value2)
         {
             value1.X /= value2.X;
@@ -217,6 +228,7 @@ namespace Microsoft.Xna.Framework
         /// <param name="value1">Source <see cref="Vector2"/> on the left of the div sign.</param>
         /// <param name="divider">Divisor scalar on the right of the div sign.</param>
         /// <returns>The result of dividing a vector by a scalar.</returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Vector2 operator /(Vector2 value1, float divider)
         {
             float factor = 1 / divider;
@@ -341,6 +353,38 @@ namespace Microsoft.Xna.Framework
         }
 
         /// <summary>
+        /// Round the members of this <see cref="Vector2"/> towards positive infinity.
+        /// </summary>
+        public void Ceiling()
+        {
+            X = MathF.Ceiling(X);
+            Y = MathF.Ceiling(Y);
+        }
+
+        /// <summary>
+        /// Creates a new <see cref="Vector2"/> that contains members from another vector rounded towards positive infinity.
+        /// </summary>
+        /// <param name="value">Source <see cref="Vector2"/>.</param>
+        /// <returns>The rounded <see cref="Vector2"/>.</returns>
+        public static Vector2 Ceiling(Vector2 value)
+        {
+            value.X = MathF.Ceiling(value.X);
+            value.Y = MathF.Ceiling(value.Y);
+            return value;
+        }
+
+        /// <summary>
+        /// Creates a new <see cref="Vector2"/> that contains members from another vector rounded towards positive infinity.
+        /// </summary>
+        /// <param name="value">Source <see cref="Vector2"/>.</param>
+        /// <param name="result">The rounded <see cref="Vector2"/>.</param>
+        public static void Ceiling(ref Vector2 value, out Vector2 result)
+        {
+            result.X = MathF.Ceiling(value.X);
+            result.Y = MathF.Ceiling(value.Y);
+        }
+
+        /// <summary>
         /// Clamps the specified value within a range.
         /// </summary>
         /// <param name="value1">The value to clamp.</param>
@@ -376,7 +420,7 @@ namespace Microsoft.Xna.Framework
         public static float Distance(Vector2 value1, Vector2 value2)
         {
             float v1 = value1.X - value2.X, v2 = value1.Y - value2.Y;
-            return (float)Math.Sqrt((v1 * v1) + (v2 * v2));
+            return MathF.Sqrt((v1 * v1) + (v2 * v2));
         }
 
         /// <summary>
@@ -388,7 +432,7 @@ namespace Microsoft.Xna.Framework
         public static void Distance(ref Vector2 value1, ref Vector2 value2, out float result)
         {
             float v1 = value1.X - value2.X, v2 = value1.Y - value2.Y;
-            result = (float)Math.Sqrt((v1 * v1) + (v2 * v2));
+            result = MathF.Sqrt((v1 * v1) + (v2 * v2));
         }
 
         /// <summary>
@@ -515,6 +559,38 @@ namespace Microsoft.Xna.Framework
         }
 
         /// <summary>
+        /// Round the members of this <see cref="Vector2"/> towards negative infinity.
+        /// </summary>
+        public void Floor()
+        {
+            X = MathF.Floor(X);
+            Y = MathF.Floor(Y);
+        }
+
+        /// <summary>
+        /// Creates a new <see cref="Vector2"/> that contains members from another vector rounded towards negative infinity.
+        /// </summary>
+        /// <param name="value">Source <see cref="Vector2"/>.</param>
+        /// <returns>The rounded <see cref="Vector2"/>.</returns>
+        public static Vector2 Floor(Vector2 value)
+        {
+            value.X = MathF.Floor(value.X);
+            value.Y = MathF.Floor(value.Y);
+            return value;
+        }
+
+        /// <summary>
+        /// Creates a new <see cref="Vector2"/> that contains members from another vector rounded towards negative infinity.
+        /// </summary>
+        /// <param name="value">Source <see cref="Vector2"/>.</param>
+        /// <param name="result">The rounded <see cref="Vector2"/>.</param>
+        public static void Floor(ref Vector2 value, out Vector2 result)
+        {
+            result.X = MathF.Floor(value.X);
+            result.Y = MathF.Floor(value.Y);
+        }
+
+        /// <summary>
         /// Gets the hash code of this <see cref="Vector2"/>.
         /// </summary>
         /// <returns>Hash code of this <see cref="Vector2"/>.</returns>
@@ -561,7 +637,7 @@ namespace Microsoft.Xna.Framework
         /// <returns>The length of this <see cref="Vector2"/>.</returns>
         public float Length()
         {
-            return (float)Math.Sqrt((X * X) + (Y * Y));
+            return MathF.Sqrt((X * X) + (Y * Y));
         }
 
         /// <summary>
@@ -759,7 +835,7 @@ namespace Microsoft.Xna.Framework
         /// </summary>
         public void Normalize()
         {
-            float val = 1.0f / (float)Math.Sqrt((X * X) + (Y * Y));
+            float val = 1.0f / MathF.Sqrt((X * X) + (Y * Y));
             X *= val;
             Y *= val;
         }
@@ -771,7 +847,7 @@ namespace Microsoft.Xna.Framework
         /// <returns>Unit vector.</returns>
         public static Vector2 Normalize(Vector2 value)
         {
-            float val = 1.0f / (float)Math.Sqrt((value.X * value.X) + (value.Y * value.Y));
+            float val = 1.0f / MathF.Sqrt((value.X * value.X) + (value.Y * value.Y));
             value.X *= val;
             value.Y *= val;
             return value;
@@ -784,7 +860,7 @@ namespace Microsoft.Xna.Framework
         /// <param name="result">Unit vector as an output parameter.</param>
         public static void Normalize(ref Vector2 value, out Vector2 result)
         {
-            float val = 1.0f / (float)Math.Sqrt((value.X * value.X) + (value.Y * value.Y));
+            float val = 1.0f / MathF.Sqrt((value.X * value.X) + (value.Y * value.Y));
             result.X = value.X * val;
             result.Y = value.Y * val;
         }
@@ -815,6 +891,38 @@ namespace Microsoft.Xna.Framework
             float val = 2.0f * ((vector.X * normal.X) + (vector.Y * normal.Y));
             result.X = vector.X - (normal.X * val);
             result.Y = vector.Y - (normal.Y * val);
+        }
+
+        /// <summary>
+        /// Round the members of this <see cref="Vector2"/> to the nearest integer value.
+        /// </summary>
+        public void Round()
+        {
+            X = MathF.Round(X);
+            Y = MathF.Round(Y);
+        }
+
+        /// <summary>
+        /// Creates a new <see cref="Vector2"/> that contains members from another vector rounded to the nearest integer value.
+        /// </summary>
+        /// <param name="value">Source <see cref="Vector2"/>.</param>
+        /// <returns>The rounded <see cref="Vector2"/>.</returns>
+        public static Vector2 Round(Vector2 value)
+        {
+            value.X = MathF.Round(value.X);
+            value.Y = MathF.Round(value.Y);
+            return value;
+        }
+
+        /// <summary>
+        /// Creates a new <see cref="Vector2"/> that contains members from another vector rounded to the nearest integer value.
+        /// </summary>
+        /// <param name="value">Source <see cref="Vector2"/>.</param>
+        /// <param name="result">The rounded <see cref="Vector2"/>.</param>
+        public static void Round(ref Vector2 value, out Vector2 result)
+        {
+            result.X = MathF.Round(value.X);
+            result.Y = MathF.Round(value.Y);
         }
 
         /// <summary>
@@ -1079,7 +1187,7 @@ namespace Microsoft.Xna.Framework
             result.X = x;
             result.Y = y;
         }
-
+        
         /// <summary>
         /// Apply transformation on normals within array of <see cref="Vector2"/> by the specified <see cref="Matrix"/> and places the results in an another array.
         /// </summary>
@@ -1144,6 +1252,98 @@ namespace Microsoft.Xna.Framework
                 destinationArray[i] = new Vector2((normal.X * matrix.M11) + (normal.Y * matrix.M21),
                                                   (normal.X * matrix.M12) + (normal.Y * matrix.M22));
             }
+        }
+
+        /// <summary>
+        /// Rotates a vector by the specified number of radians
+        /// </summary>
+        /// <param name="value">The vector to be rotated.</param>
+        /// <param name="radians">The amount to rotate the vector.</param>
+        /// <returns>A rotated copy of value.</returns>
+        /// <remarks>
+        /// A positive angle and negative angle
+        /// would rotate counterclockwise and clockwise,
+        /// respectively
+        /// </remarks>
+        public static Vector2 Rotate(Vector2 value, float radians)
+        {
+            float cos = MathF.Cos(radians);
+            float sin = MathF.Sin(radians);
+
+            return new Vector2(value.X * cos - value.Y * sin, value.X * sin + value.Y * cos);
+        }
+
+        /// <summary>
+        /// Rotates a <see cref="Vector2"/> by the specified number of radians
+        /// </summary>
+        /// <param name="radians">The amount to rotate this <see cref="Vector2"/>.</param>
+        /// <remarks>
+        /// A positive angle and negative angle
+        /// would rotate counterclockwise and clockwise,
+        /// respectively
+        /// </remarks>
+        public void Rotate(float radians)
+        {
+            float cos = MathF.Cos(radians);
+            float sin = MathF.Sin(radians);
+
+            float oldx = X;
+
+            X = X * cos - Y * sin;
+            Y = oldx * sin + Y * cos;
+        }
+
+        /// <summary>
+        /// Rotates a <see cref="Vector2"/> around another <see cref="Vector2"/> representing a location
+        /// </summary>
+        /// <param name="value">The <see cref="Vector2"/> to be rotated</param>
+        /// <param name="origin">The origin location to be rotated around</param>
+        /// <param name="radians">The amount to rotate by in radians</param>
+        /// <returns>The rotated <see cref="Vector2"/></returns>
+        /// <remarks>
+        /// A positive angle and negative angle
+        /// would rotate counterclockwise and clockwise,
+        /// respectively
+        /// </remarks>
+        public static Vector2 RotateAround(Vector2 value, Vector2 origin, float radians)
+        {
+            return Rotate(value - origin, radians) + origin;
+        }
+
+        /// <summary>
+        /// Rotates a <see cref="Vector2"/> around another <see cref="Vector2"/> representing a location
+        /// </summary>
+        /// <param name="origin">The origin location to be rotated around</param>
+        /// <param name="radians">The amount to rotate by in radians</param>
+        /// <remarks>
+        /// A positive angle and negative angle
+        /// would rotate counterclockwise and clockwise,
+        /// respectively
+        /// </remarks>
+        public void RotateAround(Vector2 origin, float radians)
+        {
+            this -= origin;
+            Rotate(radians);
+            this += origin;
+        }
+
+        /// <summary>
+        /// Deconstruction method for <see cref="Vector2"/>.
+        /// </summary>
+        /// <param name="x"></param>
+        /// <param name="y"></param>
+        public void Deconstruct(out float x, out float y)
+        {
+            x = X;
+            y = Y;
+        }
+
+        /// <summary>
+        /// Returns a <see cref="System.Numerics.Vector2"/>.
+        /// </summary>
+        public System.Numerics.Vector2 ToNumerics()
+        {
+            return new System.Numerics.Vector2(this.X, this.Y);
         }
 
         #endregion

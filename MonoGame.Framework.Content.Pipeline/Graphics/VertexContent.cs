@@ -1,4 +1,4 @@
-﻿// MonoGame - Copyright (C) The MonoGame Team
+﻿// MonoGame - Copyright (C) MonoGame Foundation, Inc
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
@@ -200,6 +200,9 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
         /// <param name="index">Index of the vertex to be removed.</param>
         public void RemoveAt(int index)
         {
+            if (index < 0 || index >= VertexCount)
+                throw new ArgumentOutOfRangeException("index");
+
             positionIndices.Items.RemoveAt(index);
 
             foreach (var channel in channels)
@@ -213,8 +216,15 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
         /// <param name="count">Number of indices to remove.</param>
         public void RemoveRange(int index, int count)
         {
-            for (var i = index; i < index + count; i++)
-                RemoveAt(i);
+            if (index < 0 || index >= VertexCount)
+                throw new ArgumentOutOfRangeException("index");
+            if (count < 0 || (index+count) > VertexCount)
+                throw new ArgumentOutOfRangeException("count");
+
+            positionIndices.RemoveRange(index, count);
+
+            foreach (var channel in channels)
+                channel.RemoveRange(index, count);
         }
     }
 }

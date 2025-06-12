@@ -1,16 +1,17 @@
-// MonoGame - Copyright (C) The MonoGame Team
+// MonoGame - Copyright (C) MonoGame Foundation, Inc
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System;
 using System.Collections.Generic;
-using Microsoft.Xna.Framework.Graphics;
 using System.Diagnostics;
-using Microsoft.Xna.Framework.Utilities;
+using Microsoft.Xna.Framework.Graphics;
+using MonoGame.Framework.Utilities;
 
 namespace Microsoft.Xna.Framework.Content
 {
-	internal class EffectMaterialReader : ContentTypeReader<EffectMaterial>
+    [System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.All)]
+    internal class EffectMaterialReader : ContentTypeReader<EffectMaterial>
 	{
 		protected internal override EffectMaterial Read (ContentReader input, EffectMaterial existingInstance)
 		{
@@ -30,6 +31,9 @@ namespace Microsoft.Xna.Framework.Content
 					}
 					else if (ReflectionHelpers.IsAssignableFromType(typeof(int), itemType)) {
 						parameter.SetValue((int) item.Value);
+					}
+					else if (ReflectionHelpers.IsAssignableFromType(typeof(int[]), itemType)) {
+						parameter.SetValue((int[]) item.Value);
 					}
 					else if (ReflectionHelpers.IsAssignableFromType(typeof(bool), itemType)) {
 						parameter.SetValue((bool) item.Value);

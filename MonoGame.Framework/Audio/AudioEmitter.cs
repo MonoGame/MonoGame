@@ -1,4 +1,4 @@
-// MonoGame - Copyright (C) The MonoGame Team
+// MonoGame - Copyright (C) MonoGame Foundation, Inc
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
@@ -40,7 +40,7 @@ namespace Microsoft.Xna.Framework.Audio
             set
             {
                 if (value < 0.0f)
-                    throw new ArgumentOutOfRangeException("AudioEmitter.DopplerScale must be greater than or equal to 0.0f");
+                    throw new ArgumentOutOfRangeException("value", "AudioEmitter.DopplerScale must be greater than or equal to 0.0f");
 
                 _dopplerScale = value;
             }

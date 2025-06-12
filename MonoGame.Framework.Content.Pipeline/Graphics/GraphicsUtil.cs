@@ -1,4 +1,4 @@
-﻿// MonoGame - Copyright (C) The MonoGame Team
+﻿// MonoGame - Copyright (C) MonoGame Foundation, Inc
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
@@ -30,14 +30,14 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 
             // Resize
             var newfi = FreeImage.Rescale(fi, newWidth, newHeight, FREE_IMAGE_FILTER.FILTER_BICUBIC);
-            FreeImage.UnloadEx(ref fi);
+            FreeImage.Unload(fi);
 
             // Convert back to PixelBitmapContent<Vector4>
             src = new PixelBitmapContent<Vector4>(newWidth, newHeight);
             bytes = new byte[SurfaceFormat.Vector4.GetSize() * newWidth * newHeight];
             FreeImage.ConvertToRawBits(bytes, newfi, SurfaceFormat.Vector4.GetSize() * newWidth, 128, 0, 0, 0, true);
             src.SetPixelData(bytes);
-            FreeImage.UnloadEx(ref newfi);
+            FreeImage.Unload(newfi);
             // Convert back to source type if required
             if (format != SurfaceFormat.Vector4)
             {
@@ -123,12 +123,12 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
             return result;
         }
 
-        public static void CompressPvrtc(TextureContent content, bool isSpriteFont)
+        public static void CompressPvrtc(ContentProcessorContext context, TextureContent content, bool isSpriteFont)
         {
             // If sharp alpha is required (for a font texture page), use 16-bit color instead of PVR
             if (isSpriteFont)
             {
-                CompressColor16Bit(content);
+                CompressColor16Bit(context, content);
                 return;
             }
 
@@ -136,11 +136,12 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
             var width = content.Faces[0][0].Height;
             var height = content.Faces[0][0].Width;
 
-			if (!IsPowerOfTwo(width) || !IsPowerOfTwo(height))
-				throw new PipelineException("PVR compression requires width and height must be powers of two.");
-
-			if (width != height)
-				throw new PipelineException("PVR compression requires square textures.");
+			if (!IsPowerOfTwo(width) || !IsPowerOfTwo(height) || (width != height))
+            {
+                context.Logger.LogWarning(null, content.Identity, "PVR compression requires width and height to be powers of two and equal. Falling back to 16-bit color.");
+                CompressColor16Bit(context, content);
+                return;
+            }
 
             var face = content.Faces[0][0];
 
@@ -152,19 +153,32 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
                 content.ConvertBitmapType(typeof(PvrtcRgba4BitmapContent));
         }
 
-        public static void CompressDxt(GraphicsProfile profile, TextureContent content, bool isSpriteFont)
+        public static void CompressDxt(ContentProcessorContext context, TextureContent content, bool isSpriteFont)
         {
             var face = content.Faces[0][0];
 
-            if (profile == GraphicsProfile.Reach)
+            if (context.TargetProfile == GraphicsProfile.Reach)
             {
                 if (!IsPowerOfTwo(face.Width) || !IsPowerOfTwo(face.Height))
-                    throw new PipelineException("DXT compression requires width and height must be powers of two in Reach graphics profile.");                
+                    throw new PipelineException("DXT compression requires width and height must be powers of two in Reach graphics profile.");
             }
 
             // Test the alpha channel to figure out if we have alpha.
             var alphaRange = CalculateAlphaRange(face);
 
+            // TODO: This isn't quite right.
+            //
+            // We should be generating DXT1 textures for cutout alpha
+            // as DXT1 supports 1bit alpha and it uses less memory.
+            //
+            // XNA never generated DXT3 for textures... it always picked
+            // between DXT1 for cutouts and DXT5 for fractional alpha.
+            //
+            // DXT3 however can produce better results for high frequency
+            // alpha like a chain link fence where is DXT5 is better for
+            // low frequency alpha like clouds.  I don't know how we can
+            // pick the right thing in this case without a hint.
+            //
             if (isSpriteFont)
                 CompressFontDXT3(content);
             else if (alphaRange == AlphaRange.Opaque)
@@ -175,10 +189,17 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
                 content.ConvertBitmapType(typeof(Dxt5BitmapContent));
         }
 
-        static public void CompressAti(TextureContent content)
+        static public void CompressAti(ContentProcessorContext context, TextureContent content, bool isSpriteFont)
         {
-			var face = content.Faces[0][0];
-			var alphaRange = CalculateAlphaRange(face);
+            // If sharp alpha is required (for a font texture page), use 16-bit color instead of PVR
+            if (isSpriteFont)
+            {
+                CompressColor16Bit(context, content);
+                return;
+            }
+
+            var face = content.Faces[0][0];
+            var alphaRange = CalculateAlphaRange(face);
 
             if (alphaRange == AlphaRange.Full)
                 content.ConvertBitmapType(typeof(AtcExplicitBitmapContent));
@@ -186,8 +207,70 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
                 content.ConvertBitmapType(typeof(AtcInterpolatedBitmapContent));
         }
 
-        static public void CompressEtc1(TextureContent content)
+        static public void CompressAstc(ContentProcessorContext context, TextureContent content, bool isSpriteFont)
         {
+            // If sharp alpha is required (for a font texture page), use 16-bit color instead of PVR
+            if (isSpriteFont)
+            {
+                CompressColor16Bit(context, content);
+                return;
+            }
+
+            // astc supports rgba
+            content.ConvertBitmapType(typeof(AstcBitmapContent));
+        }
+
+        static public void CompressEtc(ContentProcessorContext context, TextureContent content, bool isSpriteFont)
+        {
+            // If sharp alpha is required (for a font texture page), use 16-bit color instead of PVR
+            if (isSpriteFont)
+            {
+                CompressColor16Bit(context, content);
+                return;
+            }
+
+            var face = content.Faces[0][0];
+            var alphaRange = CalculateAlphaRange(face);
+
+
+            // confirm texture meets ETC requirements
+            if (!IsPowerOfTwo(face.Width) || !IsPowerOfTwo(face.Height))
+            {
+                // pick a fallback format based on the alpha range.
+                if (alphaRange != AlphaRange.Opaque)
+                {
+                    context.Logger.LogWarning(null, content.Identity, "ETC compression requires width and height to be powers of two due to hardware restrictions on some devices. Falling back to BGR565.");
+                    content.ConvertBitmapType(typeof(PixelBitmapContent<Bgra4444>));
+                }
+                else
+                {
+                    context.Logger.LogWarning(null, content.Identity, "ETC compression requires width and height to be powers of two due to hardware restrictions on some devices. Falling back to BGR565.");
+                    content.ConvertBitmapType(typeof(PixelBitmapContent<Bgr565>));
+                }
+
+                return;
+            }
+
+            if (alphaRange == AlphaRange.Opaque)
+            {
+                // ETC1 does not support alpha, which is fine since the data is all opaque
+                content.ConvertBitmapType(typeof(Etc1BitmapContent));
+                return;
+            }
+
+            // Use ETC2
+            content.ConvertBitmapType(typeof(Etc2BitmapContent));
+        }
+
+        static public void CompressEtc1(ContentProcessorContext context, TextureContent content, bool isSpriteFont)
+        {
+            // If sharp alpha is required (for a font texture page), use 16-bit color instead of PVR
+            if (isSpriteFont)
+            {
+                CompressColor16Bit(context, content);
+                return;
+            }
+
             var face = content.Faces[0][0];
             var alphaRange = CalculateAlphaRange(face);
 
@@ -200,12 +283,18 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
                 // https://code.google.com/p/libgdx/issues/detail?id=1310
                 // Since we already enforce POT for PVR and DXT in Reach, we will also enforce POT for ETC1
                 if (!IsPowerOfTwo(face.Width) || !IsPowerOfTwo(face.Height))
-                    throw new PipelineException("ETC1 compression require width and height must be powers of two due to hardware restrictions on some devices.");
-                content.ConvertBitmapType(typeof(Etc1BitmapContent));
+                {
+                    context.Logger.LogWarning(null, content.Identity, "ETC1 compression requires width and height to be powers of two due to hardware restrictions on some devices. Falling back to BGR565.");
+                    content.ConvertBitmapType(typeof(PixelBitmapContent<Bgr565>));
+                }
+                else
+                    // use ETC1 when there is no alpha
+                    content.ConvertBitmapType(typeof(Etc1BitmapContent));
+
             }
         }
 
-        static public void CompressColor16Bit(TextureContent content)
+        static public void CompressColor16Bit(ContentProcessorContext context, TextureContent content)
         {
             var face = content.Faces[0][0];
             var alphaRange = CalculateAlphaRange(face);
@@ -217,6 +306,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
             else
                 content.ConvertBitmapType(typeof(PixelBitmapContent<Bgra4444>));
         }
+
 
         // Compress the greyscale font texture page using a specially-formulated DXT3 mode
         static public unsafe void CompressFontDXT3(TextureContent content)

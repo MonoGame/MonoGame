@@ -303,6 +303,41 @@ namespace Microsoft.Xna.Framework
         }
 
         /// <summary>
+        /// Round the members of this <see cref="Vector3"/> towards positive infinity.
+        /// </summary>
+        public void Ceiling()
+        {
+            X = MathF.Ceiling(X);
+            Y = MathF.Ceiling(Y);
+            Z = MathF.Ceiling(Z);
+        }
+
+        /// <summary>
+        /// Creates a new <see cref="Vector3"/> that contains members from another vector rounded towards positive infinity.
+        /// </summary>
+        /// <param name="value">Source <see cref="Vector3"/>.</param>
+        /// <returns>The rounded <see cref="Vector3"/>.</returns>
+        public static Vector3 Ceiling(Vector3 value)
+        {
+            value.X = MathF.Ceiling(value.X);
+            value.Y = MathF.Ceiling(value.Y);
+            value.Z = MathF.Ceiling(value.Z);
+            return value;
+        }
+
+        /// <summary>
+        /// Creates a new <see cref="Vector3"/> that contains members from another vector rounded towards positive infinity.
+        /// </summary>
+        /// <param name="value">Source <see cref="Vector3"/>.</param>
+        /// <param name="result">The rounded <see cref="Vector3"/>.</param>
+        public static void Ceiling(ref Vector3 value, out Vector3 result)
+        {
+            result.X = MathF.Ceiling(value.X);
+            result.Y = MathF.Ceiling(value.Y);
+            result.Z = MathF.Ceiling(value.Z);
+        }
+
+        /// <summary>
         /// Clamps the specified value within a range.
         /// </summary>
         /// <param name="value1">The value to clamp.</param>
@@ -369,7 +404,7 @@ namespace Microsoft.Xna.Framework
         {
             float result;
             DistanceSquared(ref value1, ref value2, out result);
-            return (float)Math.Sqrt(result);
+            return MathF.Sqrt(result);
         }
 
         /// <summary>
@@ -381,7 +416,7 @@ namespace Microsoft.Xna.Framework
         public static void Distance(ref Vector3 value1, ref Vector3 value2, out float result)
         {
             DistanceSquared(ref value1, ref value2, out result);
-            result = (float)Math.Sqrt(result);
+            result = MathF.Sqrt(result);
         }
 
         /// <summary>
@@ -517,6 +552,41 @@ namespace Microsoft.Xna.Framework
         }
 
         /// <summary>
+        /// Round the members of this <see cref="Vector3"/> towards negative infinity.
+        /// </summary>
+        public void Floor()
+        {
+            X = MathF.Floor(X);
+            Y = MathF.Floor(Y);
+            Z = MathF.Floor(Z);
+        }
+
+        /// <summary>
+        /// Creates a new <see cref="Vector3"/> that contains members from another vector rounded towards negative infinity.
+        /// </summary>
+        /// <param name="value">Source <see cref="Vector3"/>.</param>
+        /// <returns>The rounded <see cref="Vector3"/>.</returns>
+        public static Vector3 Floor(Vector3 value)
+        {
+            value.X = MathF.Floor(value.X);
+            value.Y = MathF.Floor(value.Y);
+            value.Z = MathF.Floor(value.Z);
+            return value;
+        }
+
+        /// <summary>
+        /// Creates a new <see cref="Vector3"/> that contains members from another vector rounded towards negative infinity.
+        /// </summary>
+        /// <param name="value">Source <see cref="Vector3"/>.</param>
+        /// <param name="result">The rounded <see cref="Vector3"/>.</param>
+        public static void Floor(ref Vector3 value, out Vector3 result)
+        {
+            result.X = MathF.Floor(value.X);
+            result.Y = MathF.Floor(value.Y);
+            result.Z = MathF.Floor(value.Z);
+        }
+
+        /// <summary>
         /// Gets the hash code of this <see cref="Vector3"/>.
         /// </summary>
         /// <returns>Hash code of this <see cref="Vector3"/>.</returns>
@@ -568,8 +638,7 @@ namespace Microsoft.Xna.Framework
         /// <returns>The length of this <see cref="Vector3"/>.</returns>
         public float Length()
         {
-            float result = DistanceSquared(this, zero);
-            return (float)Math.Sqrt(result);
+            return MathF.Sqrt((X * X) + (Y * Y) + (Z * Z));
         }
 
         /// <summary>
@@ -578,7 +647,7 @@ namespace Microsoft.Xna.Framework
         /// <returns>The squared length of this <see cref="Vector3"/>.</returns>
         public float LengthSquared()
         {
-            return DistanceSquared(this, zero);
+            return (X * X) + (Y * Y) + (Z * Z);
         }
 
         /// <summary>
@@ -781,7 +850,11 @@ namespace Microsoft.Xna.Framework
         /// </summary>
         public void Normalize()
         {
-            Normalize(ref this, out this);
+            float factor = MathF.Sqrt((X * X) + (Y * Y) + (Z * Z));
+            factor = 1f / factor;
+            X *= factor;
+            Y *= factor;
+            Z *= factor;
         }
 
         /// <summary>
@@ -791,7 +864,7 @@ namespace Microsoft.Xna.Framework
         /// <returns>Unit vector.</returns>
         public static Vector3 Normalize(Vector3 value)
         {
-            float factor = Distance(value, zero);
+            float factor = MathF.Sqrt((value.X * value.X) + (value.Y * value.Y) + (value.Z * value.Z));
             factor = 1f / factor;
             return new Vector3(value.X * factor, value.Y * factor, value.Z * factor);
         }
@@ -803,7 +876,7 @@ namespace Microsoft.Xna.Framework
         /// <param name="result">Unit vector as an output parameter.</param>
         public static void Normalize(ref Vector3 value, out Vector3 result)
         {
-            float factor = Distance(value, zero);
+            float factor = MathF.Sqrt((value.X * value.X) + (value.Y * value.Y) + (value.Z * value.Z));
             factor = 1f / factor;
             result.X = value.X * factor;
             result.Y = value.Y * factor;
@@ -848,6 +921,41 @@ namespace Microsoft.Xna.Framework
             result.X = vector.X - (2.0f * normal.X) * dotProduct;
             result.Y = vector.Y - (2.0f * normal.Y) * dotProduct;
             result.Z = vector.Z - (2.0f * normal.Z) * dotProduct;
+        }
+
+        /// <summary>
+        /// Round the members of this <see cref="Vector3"/> towards the nearest integer value.
+        /// </summary>
+        public void Round()
+        {
+            X = MathF.Round(X);
+            Y = MathF.Round(Y);
+            Z = MathF.Round(Z);
+        }
+
+        /// <summary>
+        /// Creates a new <see cref="Vector3"/> that contains members from another vector rounded to the nearest integer value.
+        /// </summary>
+        /// <param name="value">Source <see cref="Vector3"/>.</param>
+        /// <returns>The rounded <see cref="Vector3"/>.</returns>
+        public static Vector3 Round(Vector3 value)
+        {
+            value.X = MathF.Round(value.X);
+            value.Y = MathF.Round(value.Y);
+            value.Z = MathF.Round(value.Z);
+            return value;
+        }
+
+        /// <summary>
+        /// Creates a new <see cref="Vector3"/> that contains members from another vector rounded to the nearest integer value.
+        /// </summary>
+        /// <param name="value">Source <see cref="Vector3"/>.</param>
+        /// <param name="result">The rounded <see cref="Vector3"/>.</param>
+        public static void Round(ref Vector3 value, out Vector3 result)
+        {
+            result.X = MathF.Round(value.X);
+            result.Y = MathF.Round(value.Y);
+            result.Z = MathF.Round(value.Z);
         }
 
         /// <summary>
@@ -1214,9 +1322,39 @@ namespace Microsoft.Xna.Framework
 
         #endregion
 
+        /// <summary>
+        /// Deconstruction method for <see cref="Vector3"/>.
+        /// </summary>
+        /// <param name="x"></param>
+        /// <param name="y"></param>
+        /// <param name="z"></param>
+        public void Deconstruct(out float x, out float y, out float z)
+        {
+            x = X;
+            y = Y;
+            z = Z;
+        }
+
+        /// <summary>
+        /// Returns a <see cref="System.Numerics.Vector3"/>.
+        /// </summary>
+        public System.Numerics.Vector3 ToNumerics()
+        {
+            return new System.Numerics.Vector3(this.X, this.Y, this.Z);
+        }
+
         #endregion
 
         #region Operators
+
+        /// <summary>
+        /// Converts a <see cref="System.Numerics.Vector3"/> to a <see cref="Vector3"/>.
+        /// </summary>
+        /// <param name="value">The converted value.</param>
+        public static implicit operator Vector3(System.Numerics.Vector3 value)
+        {
+            return new Vector3(value.X, value.Y, value.Z);
+        }
 
         /// <summary>
         /// Compares whether two <see cref="Vector3"/> instances are equal.

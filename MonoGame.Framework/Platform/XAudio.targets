@@ -1,0 +1,31 @@
+<Project>
+  <ItemGroup Condition="$(DefineConstants.Contains('NO_AUDIO')) != 'true'">
+    <PackageReference Version="4.0.1" Include="SharpDX.MediaFoundation" />
+    <PackageReference Version="4.0.1" Include="SharpDX.XAudio2" />
+	
+    <Compile Include="Platform\Audio\DynamicSoundEffectInstance.XAudio.cs" />
+    <Compile Include="Platform\Audio\Microphone.Default.cs" />
+    <Compile Include="Platform\Audio\SoundEffect.XAudio.cs" />
+    <Compile Include="Platform\Audio\SoundEffectInstance.XAudio.cs" />
+	
+    <Compile Include="Platform\Media\MediaManagerState.cs" />
+    <Compile Include="Platform\Media\VideoSampleGrabber.cs" />
+	
+    <Compile Include="Platform\Media\MediaPlayer.WMS.cs" />
+    <Compile Include="Platform\Media\Song.WMS.cs" />
+    <Compile Include="Platform\Media\Video.WMS.cs" />
+    <Compile Include="Platform\Media\VideoPlayer.WMS.cs" />
+  </ItemGroup>
+  
+  <ItemGroup Condition="$(DefineConstants.Contains('NO_AUDIO'))">
+    <Compile Include="Platform\Audio\DynamicSoundEffectInstance.Default.cs" />
+    <Compile Include="Platform\Audio\Microphone.Default.cs" />
+    <Compile Include="Platform\Audio\SoundEffect.Default.cs" />
+    <Compile Include="Platform\Audio\SoundEffectInstance.Default.cs" />
+	
+	<Compile Include="Platform\Media\MediaPlayer.Default.cs" />
+    <Compile Include="Platform\Media\Song.Default.cs" />
+	<Compile Include="Platform\Media\Video.Default.cs" />
+	<Compile Include="Platform\Media\VideoPlayer.Default.cs" />
+  </ItemGroup>
+</Project>

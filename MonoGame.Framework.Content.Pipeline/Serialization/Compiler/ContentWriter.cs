@@ -1,4 +1,4 @@
-﻿// MonoGame - Copyright (C) The MonoGame Team
+﻿// MonoGame - Copyright (C) MonoGame Foundation, Inc
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
@@ -47,15 +47,16 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
             'a', // Android
             'd', // DesktopGL
             'X', // MacOSX
-            'W', // WindowsStoreApp
             'n', // NativeClient
-            'p', // PlayStationMobile
-            'M', // WindowsPhone8
             'r', // RaspberryPi
             'P', // PlayStation4
-            'v', // PSVita
+            '5', // PlayStation5
             'O', // XboxOne
             'S', // Nintendo Switch
+            'b', // WebAssembly and Bridge.NET
+            'V', // DesktopVK (Vulkan)
+            'G', // Windows GDK
+            's', // Xbox Series
         };
 
         /// <summary>
@@ -263,7 +264,9 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
                 typeWriter = compiler.GetTypeWriter(type);
 
                 typeWriters.Add(typeWriter);
-			    typeWriterMap.Add(typeWriter.GetType(), index);
+                if (!typeWriterMap.ContainsKey(typeWriter.GetType()))
+                    typeWriterMap.Add(typeWriter.GetType(), index);
+
                 typeMap.Add(type, typeWriter);
 
                 typeWriter.OnAddedToContentWriter(this);

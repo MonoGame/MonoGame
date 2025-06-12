@@ -1,14 +1,14 @@
-// MonoGame - Copyright (C) The MonoGame Team
+// MonoGame - Copyright (C) MonoGame Foundation, Inc
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
-using System;
 using Microsoft.Xna.Framework.Audio;
 
 
 namespace Microsoft.Xna.Framework.Content
 {
-	internal class SoundEffectReader : ContentTypeReader<SoundEffect>
+    [System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.All)]
+    internal class SoundEffectReader : ContentTypeReader<SoundEffect>
 	{
 		protected internal override SoundEffect Read(ContentReader input, SoundEffect existingInstance)
 		{         
@@ -40,7 +40,7 @@ namespace Microsoft.Xna.Framework.Content
 
             // Read the audio data buffer.
             var dataSize = input.ReadInt32();
-            var data = input.ContentManager.GetScratchBuffer(dataSize);
+            var data = ContentManager.ScratchBufferPool.Get(dataSize);
             input.Read(data, 0, dataSize);
 
             var loopStart = input.ReadInt32();
@@ -52,6 +52,8 @@ namespace Microsoft.Xna.Framework.Content
 
             // Store the original asset name for debugging later.
             effect.Name = input.AssetName;
+
+            ContentManager.ScratchBufferPool.Return(data);
 
             return effect;
         }

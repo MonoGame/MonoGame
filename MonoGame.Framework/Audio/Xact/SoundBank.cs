@@ -1,4 +1,4 @@
-// MonoGame - Copyright (C) The MonoGame Team
+// MonoGame - Copyright (C) MonoGame Foundation, Inc
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
@@ -6,7 +6,7 @@ using System;
 using System.IO;
 using System.Diagnostics;
 using System.Collections.Generic;
-using Microsoft.Xna.Framework.Utilities;
+using MonoGame.Framework.Utilities;
 
 namespace Microsoft.Xna.Framework.Audio
 {
@@ -37,7 +37,7 @@ namespace Microsoft.Xna.Framework.Audio
 
             _audioengine = audioEngine;
 
-            using (var stream = AudioEngine.OpenStream(fileName))
+            using (var stream = AudioEngine.OpenStream(fileName, true))
             using (var reader = new BinaryReader(stream))
             {
                 // Thanks to Liandril for "xactxtract" for some of the offsets.
@@ -332,6 +332,7 @@ namespace Microsoft.Xna.Framework.Audio
             GC.SuppressFinalize(this);
         }
 
+        /// <summary/>
         ~SoundBank()
         {
             Dispose(false);

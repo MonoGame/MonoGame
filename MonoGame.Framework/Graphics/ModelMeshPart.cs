@@ -1,13 +1,26 @@
-﻿using System;
+using System;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
+    /// <summary>
+    /// Represents a batch of geometry information to submit to the graphics device during rendering.
+    /// Each <b>ModelMeshPart</b> is a subdivision of a <see cref="ModelMesh"/> object.
+    /// The <see cref="ModelMesh"/> class is split into multiple <b>ModelMeshPart</b> objects,
+    /// typically based on material information.
+    /// </summary>
+    /// <remarks>
+    /// It is not necessary to use this class directly.
+    /// In advanced rendering scenarios, it is possible to draw using <b>ModelMeshPart</b> properties in combination
+    /// with the vertex and index buffers on <see cref="ModelMesh"/>.
+    /// However, in most cases, <see cref="ModelMesh.Draw()"/> will be sufficient.
+    /// </remarks>
 	public sealed class ModelMeshPart
 	{
-		// Summary:
-		//     Gets or sets the material Effect for this mesh part. Reference page contains
-		//     code sample.
         private Effect _effect;
+
+        /// <summary>
+        /// Gets or sets the material <see cref="Effect"/> for this mesh part.
+        /// </summary>
         public Effect Effect 
         {
             get 
@@ -44,39 +57,39 @@ namespace Microsoft.Xna.Framework.Graphics
             }
         }
 
-		//
-		// Summary:
-		//     Gets the index buffer for this mesh part.
+        /// <summary>
+        /// Gets the index buffer for this mesh part.
+        /// </summary>
 		public IndexBuffer IndexBuffer { get; set; }
 
-		//
-		// Summary:
-		//     Gets the number of vertices used during a draw call.
+        /// <summary>
+        /// Gets the number of vertices used during a draw call.
+        /// </summary>
 		public int NumVertices { get; set; }
 
-		//
-		// Summary:
-		//     Gets the number of primitives to render.
+        /// <summary>
+        /// Gets the number of primitives to render.
+        /// </summary>
 		public int PrimitiveCount { get; set; }
 
-		//
-		// Summary:
-		//     Gets the location in the index array at which to start reading vertices.
+        /// <summary>
+        /// Gets the location in the index array at which to start reading vertices.
+        /// </summary>
 		public int StartIndex { get; set; }
 
-		//
-		// Summary:
-		//     Gets or sets an object identifying this model mesh part.
+        /// <summary>
+        /// Gets or sets an object identifying this model mesh part.
+        /// </summary>
 		public object Tag { get; set; }
 
-		//
-		// Summary:
-		//     Gets the vertex buffer for this mesh part.
+        /// <summary>
+        /// Gets the vertex buffer for this mesh part.
+        /// </summary>
 		public VertexBuffer VertexBuffer { get; set; }
 
-		//
-		// Summary:
-		//     Gets the offset (in vertices) from the top of vertex buffer.
+        /// <summary>
+        /// Gets the offset (in vertices) from the top of vertex buffer.
+        /// </summary>
 		public int VertexOffset { get; set; }
 
 		internal int VertexBufferIndex { get; set; }
@@ -86,46 +99,12 @@ namespace Microsoft.Xna.Framework.Graphics
 		internal int EffectIndex { get; set; }
 		
 		internal ModelMesh parent;
-	}
 
-	//// Summary:
-	////     Represents a batch of geometry information to submit to the graphics device
-	////     during rendering. Each ModelMeshPart is a subdivision of a ModelMesh object.
-	////     The ModelMesh class is split into multiple ModelMeshPart objects, typically
-	////     based on material information.
-	//public sealed class ModelMeshPart
-	//{
-	//    // Summary:
-	//    //     Gets or sets the material Effect for this mesh part. Reference page contains
-	//    //     code sample.
-	//    public Effect Effect { get { throw new NotImplementedException(); } set { throw new NotImplementedException(); } }
-	//    //
-	//    // Summary:
-	//    //     Gets the index buffer for this mesh part.
-	//    public IndexBuffer IndexBuffer { get { throw new NotImplementedException(); } }
-	//    //
-	//    // Summary:
-	//    //     Gets the number of vertices used during a draw call.
-	//    public int NumVertices { get { throw new NotImplementedException(); } }
-	//    //
-	//    // Summary:
-	//    //     Gets the number of primitives to render.
-	//    public int PrimitiveCount { get { throw new NotImplementedException(); } }
-	//    //
-	//    // Summary:
-	//    //     Gets the location in the index array at which to start reading vertices.
-	//    public int StartIndex { get { throw new NotImplementedException(); } }
-	//    //
-	//    // Summary:
-	//    //     Gets or sets an object identifying this model mesh part.
-	//    public object Tag { get { throw new NotImplementedException(); } set { throw new NotImplementedException(); } }
-	//    //
-	//    // Summary:
-	//    //     Gets the vertex buffer for this mesh part.
-	//    public VertexBuffer VertexBuffer { get { throw new NotImplementedException(); } }
-	//    //
-	//    // Summary:
-	//    //     Gets the offset (in vertices) from the top of vertex buffer.
-	//    public int VertexOffset { get { throw new NotImplementedException(); } }
-	//}
+        /// <summary>
+        /// Using this constructor is strongly discouraged. Adding meshes to models at runtime is
+        /// not supported and may lead to <see cref="NullReferenceException"/>s if parent is not set.
+        /// </summary>
+        [Obsolete("This constructor is deprecated and will be made internal in a future release.")]
+        public ModelMeshPart() { }
+	}
 }

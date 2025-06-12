@@ -1,4 +1,4 @@
-// MonoGame - Copyright (C) The MonoGame Team
+// MonoGame - Copyright (C) MonoGame Foundation, Inc
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
@@ -124,6 +124,11 @@ namespace Microsoft.Xna.Framework.Audio
                 sound.Stop(options);
         }
 
+        /// <summary>
+        /// Set the volume for this <see cref="AudioCategory"/>.
+        /// </summary>
+        /// <param name="volume">The new volume of the category.</param>
+        /// <exception cref="ArgumentException">If the volume is less than zero.</exception>
         public void SetVolume(float volume)
         {
             if (volume < 0)

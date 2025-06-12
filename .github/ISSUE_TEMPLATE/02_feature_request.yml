@@ -1,0 +1,26 @@
+name: Feature Request
+description: Propose a feature to be added or removed from MonoGame.
+labels: ["Feature Request"]
+body:
+- type: markdown
+  attributes:
+    value: |
+      Thank you for taking the time to submit this feature request.
+      Please note that feature requests will be reviewed and discussed, which takes time, before approval or denial.
+      Please use the following template to help us gather the information we need to start this process.
+- type: textarea
+  id: intent
+  validations:
+    required: true
+  attributes:
+    label: Intent
+    description: Please describe the intent of this new feature.
+    placeholder: Intent
+- type: textarea
+  id: motivation
+  validations:
+    required: true
+  attributes:
+    label: Motivation
+    description: Please describe the motivation for wanting this feature to be implemented.  How does it benefit the users of MonoGame?
+    placeholder: Motivation

@@ -14,7 +14,7 @@ namespace Microsoft.Xna.Framework
     	/// <summary>
         /// Represents the mathematical constant e(2.71828175).
         /// </summary>
-        public const float E = (float)Math.E;
+        public const float E = MathF.E;
         
         /// <summary>
         /// Represents the log base ten of e(0.4342945).
@@ -29,7 +29,7 @@ namespace Microsoft.Xna.Framework
         /// <summary>
         /// Represents the value of pi(3.14159274).
         /// </summary>
-        public const float Pi = (float)Math.PI;
+        public const float Pi = MathF.PI;
         
         /// <summary>
         /// Represents the value of pi divided by two(1.57079637).
@@ -45,6 +45,12 @@ namespace Microsoft.Xna.Framework
         /// Represents the value of pi times two(6.28318548).
         /// </summary>
         public const float TwoPi = (float)(Math.PI * 2.0);
+        
+        /// <summary>
+        /// Represents the value of pi times two(6.28318548).
+        /// This is an alias of TwoPi.
+        /// </summary>
+        public const float Tau = TwoPi;
         
         /// <summary>
         /// Returns the Cartesian coordinate for one axis of a point that is defined by a given triangle and two normalized barycentric (areal) coordinates.
@@ -72,7 +78,7 @@ namespace Microsoft.Xna.Framework
         public static float CatmullRom(float value1, float value2, float value3, float value4, float amount)
         {
             // Using formula from http://www.mvps.org/directx/articles/catmull/
-            // Internally using doubles not to lose precission
+            // Internally using doubles not to lose precision
             double amountSquared = amount * amount;
             double amountCubed = amountSquared * amount;
             return (float)(0.5 * (2.0 * value2 +
@@ -136,7 +142,7 @@ namespace Microsoft.Xna.Framework
         /// <returns>The result of the Hermite spline interpolation.</returns>
         public static float Hermite(float value1, float tangent1, float value2, float tangent2, float amount)
         {
-            // All transformed to double not to lose precission
+            // All transformed to double not to lose precision
             // Otherwise, for high numbers of param:amount the result is NaN instead of Infinity
             double v1 = value1, v2 = value2, t1 = tangent1, t2 = tangent2, s = amount, result;
             double sCubed = s * s * s;
@@ -259,14 +265,14 @@ namespace Microsoft.Xna.Framework
 
             return result;
         }
-        
+
         /// <summary>
         /// Converts radians to degrees.
         /// </summary>
         /// <param name="radians">The angle in radians.</param>
         /// <returns>The angle in degrees.</returns>
         /// <remarks>
-        /// This method uses double precission internally,
+        /// This method uses double precision internally,
         /// though it returns single float
         /// Factor = 180 / pi
         /// </remarks>
@@ -274,14 +280,14 @@ namespace Microsoft.Xna.Framework
         { 
             return (float)(radians * 57.295779513082320876798154814105);
         }
-        
+
         /// <summary>
         /// Converts degrees to radians.
         /// </summary>
         /// <param name="degrees">The angle in degrees.</param>
         /// <returns>The angle in radians.</returns>
         /// <remarks>
-        /// This method uses double precission internally,
+        /// This method uses double precision internally,
         /// though it returns single float
         /// Factor = pi / 180
         /// </remarks>
@@ -307,14 +313,14 @@ namespace Microsoft.Xna.Framework
             return angle;
         }
 
- 	/// <summary>
+ 	    /// <summary>
         /// Determines if value is powered by two.
         /// </summary>
         /// <param name="value">A value.</param>
         /// <returns><c>true</c> if <c>value</c> is powered by two; otherwise <c>false</c>.</returns>
-	public static bool IsPowerOfTwo(int value)
-	{
-	     return (value > 0) && ((value & (value - 1)) == 0);
-	}
+	    public static bool IsPowerOfTwo(int value)
+	    {
+	         return (value > 0) && ((value & (value - 1)) == 0);
+	    }
     }
 }

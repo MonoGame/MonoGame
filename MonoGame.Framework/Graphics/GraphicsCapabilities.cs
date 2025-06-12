@@ -1,4 +1,4 @@
-// MonoGame - Copyright (C) The MonoGame Team
+// MonoGame - Copyright (C) MonoGame Foundation, Inc
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
@@ -30,11 +30,11 @@ namespace Microsoft.Xna.Framework.Graphics
         /// </summary>
 		internal bool SupportsTextureFilterAnisotropic { get; private set; }
 
-		internal bool SupportsDepth24 { get; private set; }
+        internal bool SupportsDepth24 { get; private set; }
 
-		internal bool SupportsPackedDepthStencil { get; private set; }
+        internal bool SupportsPackedDepthStencil { get; private set; }
 
-		internal bool SupportsDepthNonLinear { get; private set; }
+        internal bool SupportsDepthNonLinear { get; private set; }
 
         /// <summary>
         /// Gets the support for DXT1
@@ -57,6 +57,11 @@ namespace Microsoft.Xna.Framework.Graphics
         internal bool SupportsEtc1 { get; private set; }
 
         /// <summary>
+        /// Gets the support for ETC2
+        /// </summary>
+        internal bool SupportsEtc2 { get; private set; }
+
+        /// <summary>
         /// Gets the support for ATITC
         /// </summary>
         internal bool SupportsAtitc { get; private set; }
@@ -69,12 +74,34 @@ namespace Microsoft.Xna.Framework.Graphics
         /// and texture sRGB are supported.
         /// </summary>
         internal bool SupportsSRgb { get; private set; }
-        
+
         internal bool SupportsTextureArrays { get; private set; }
 
         internal bool SupportsDepthClamp { get; private set; }
 
         internal bool SupportsVertexTextures { get; private set; }
+
+        /// <summary>
+        /// True, if the underlying platform supports floating point textures. 
+        /// For Direct3D platforms this is always <code>true</code>.
+        /// For OpenGL Desktop platforms it is always <code>true</code>.
+        /// For OpenGL Mobile platforms it requires `GL_EXT_color_buffer_float`.
+        /// If the requested format is not supported an <code>NotSupportedException</code>
+        /// will be thrown.
+        /// </summary>
+        internal bool SupportsFloatTextures { get; private set; }
+
+        /// <summary>
+        /// True, if the underlying platform supports half floating point textures. 
+        /// For Direct3D platforms this is always <code>true</code>.
+        /// For OpenGL Desktop platforms it is always <code>true</code>.
+        /// For OpenGL Mobile platforms it requires `GL_EXT_color_buffer_half_float`.
+        /// If the requested format is not supported an <code>NotSupportedException</code>
+        /// will be thrown.
+        /// </summary>
+        internal bool SupportsHalfFloatTextures { get; private set; }
+
+        internal bool SupportsNormalized { get; private set; }
 
         /// <summary>
         /// Gets the max texture anisotropy. This value typically lies
@@ -94,5 +121,9 @@ namespace Microsoft.Xna.Framework.Graphics
         }
 
         internal bool SupportsInstancing { get; private set; }
+
+        internal bool SupportsBaseIndexInstancing { get; private set; }
+
+        internal bool SupportsSeparateBlendStates { get; private set; }
     }
 }

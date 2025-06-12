@@ -18,8 +18,11 @@ namespace Microsoft.Xna.Framework.Graphics
     /// <summary>
     /// Built-in effect for rendering skinned character models.
     /// </summary>
-    public class SkinnedEffect : Effect, IEffectMatrices, IEffectLights, IEffectFog
+    public class SkinnedEffect : Effect, IEffectMatrices, IEffectLights, IEffectFog, IEffectBones
     {
+        /// <summary>
+        /// The maximum number of bones.
+        /// </summary>
         public const int MaxBones = 72;
         
         #region Effect Parameters

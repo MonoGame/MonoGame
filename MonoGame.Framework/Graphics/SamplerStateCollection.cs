@@ -1,13 +1,14 @@
-// MonoGame - Copyright (C) The MonoGame Team
+// MonoGame - Copyright (C) MonoGame Foundation, Inc
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
-//
-// Author: Kenneth James Pouncey
 
 using System;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
+    /// <summary>
+    /// Represents a collection of <see cref="SamplerState"/> objects,
+    /// </summary>
     public sealed partial class SamplerStateCollection
 	{
         private readonly GraphicsDevice _graphicsDevice;
@@ -21,9 +22,9 @@ namespace Microsoft.Xna.Framework.Graphics
 
         private readonly SamplerState[] _samplers;
         private readonly SamplerState[] _actualSamplers;
-        private readonly bool _applyToVertexStage;
+        private readonly ShaderStage _stage;
 
-		internal SamplerStateCollection(GraphicsDevice device, int maxSamplers, bool applyToVertexStage)
+		internal SamplerStateCollection(GraphicsDevice device, int maxSamplers, ShaderStage stage)
 		{
 		    _graphicsDevice = device;
 
@@ -36,19 +37,22 @@ namespace Microsoft.Xna.Framework.Graphics
 
             _samplers = new SamplerState[maxSamplers];
             _actualSamplers = new SamplerState[maxSamplers];
-            _applyToVertexStage = applyToVertexStage;
+            _stage = stage;
 
 		    Clear();
         }
-		
-		public SamplerState this [int index] 
+
+        /// <summary>
+        /// Gets or sets the <see cref="SamplerState"/> at the specified index in the collection.
+        /// </summary>
+        public SamplerState this [int index]
         {
-			get 
-            { 
-                return _samplers[index]; 
+			get
+            {
+                return _samplers[index];
             }
 
-			set 
+			set
             {
                 if (value == null)
                     throw new ArgumentNullException("value");

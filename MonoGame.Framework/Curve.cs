@@ -13,7 +13,7 @@ namespace Microsoft.Xna.Framework
     /// </summary>
     // TODO : [TypeConverter(typeof(ExpandableObjectConverter))]
     [DataContract]
-    public class Curve
+    public class Curve : ICurveEvaluator<float>
     {
         #region Private Fields
 
@@ -303,36 +303,32 @@ namespace Microsoft.Xna.Framework
         private float GetCurvePosition(float position)
         {
             //only for position in curve
-            CurveKey prev = this._keys[0];
-            CurveKey next;
-            for (int i = 1; i < this._keys.Count; ++i)
+            int nextIndex = this._keys.IndexAtPosition(position);
+            if (nextIndex < 0)
+                nextIndex = ~nextIndex;
+            nextIndex = Math.Max(nextIndex, 1);
+            CurveKey prev = _keys[nextIndex - 1];
+            CurveKey next = _keys[nextIndex];
+            if (prev.Continuity == CurveContinuity.Step)
             {
-                next = this.Keys[i];
-                if (next.Position >= position)
+                if (position >= 1f)
                 {
-                    if (prev.Continuity == CurveContinuity.Step)
-                    {
-                        if (position >= 1f)
-                        {
-                            return next.Value;
-                        }
-                        return prev.Value;
-                    }
-                    float t = (position - prev.Position) / (next.Position - prev.Position);//to have t in [0,1]
-                    float ts = t * t;
-                    float tss = ts * t;
-                    //After a lot of search on internet I have found all about spline function
-                    // and bezier (phi'sss ancien) but finaly use hermite curve 
-                    //http://en.wikipedia.org/wiki/Cubic_Hermite_spline
-                    //P(t) = (2*t^3 - 3t^2 + 1)*P0 + (t^3 - 2t^2 + t)m0 + (-2t^3 + 3t^2)P1 + (t^3-t^2)m1
-                    //with P0.value = prev.value , m0 = prev.tangentOut, P1= next.value, m1 = next.TangentIn
-                    return (2 * tss - 3 * ts + 1f) * prev.Value + (tss - 2 * ts + t) * prev.TangentOut + (3 * ts - 2 * tss) * next.Value + (tss - ts) * next.TangentIn;
+                    return next.Value;
                 }
-                prev = next;
+                return prev.Value;
             }
-            return 0f;
+            float t = (position - prev.Position) / (next.Position - prev.Position);//to have t in [0,1]
+            float ts = t * t;
+            float tss = ts * t;
+            //After a lot of search on internet I have found all about spline function
+            // and bezier (phi'sss ancien) but finaly use hermite curve 
+            //http://en.wikipedia.org/wiki/Cubic_Hermite_spline
+            //P(t) = (2*t^3 - 3t^2 + 1)*P0 + (t^3 - 2t^2 + t)m0 + (-2t^3 + 3t^2)P1 + (t^3-t^2)m1
+            //with P0.value = prev.value , m0 = prev.tangentOut, P1= next.value, m1 = next.TangentIn
+            return (2 * tss - 3 * ts + 1f) * prev.Value + (tss - 2 * ts + t) * prev.TangentOut + (3 * ts - 2 * tss) * next.Value + (tss - ts) * next.TangentIn;
         }
 
         #endregion
     }
+
 }

@@ -1,4 +1,4 @@
-// MonoGame - Copyright (C) The MonoGame Team
+// MonoGame - Copyright (C) MonoGame Foundation, Inc
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
@@ -6,7 +6,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using Microsoft.Xna.Framework.Utilities;
+using System.Xml;
+using MonoGame.Framework.Utilities;
 
 namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Intermediate
 {
@@ -174,7 +175,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Intermediate
                             continue;
                         
                         // We failed to find a required element.
-                        throw new InvalidContentException(string.Format("The Xml element `{0}` is required!", info.Attribute.ElementName));
+                        throw input.NewInvalidContentException(null, "The Xml element `{0}` is required, but element `{1}` was found at line {2}:{3}. Try changing the element order or adding missing elements.", info.Attribute.ElementName, input.Xml.Name, ((IXmlLineInfo)input.Xml).LineNumber, ((IXmlLineInfo)input.Xml).LinePosition);
                     }
                 }
 

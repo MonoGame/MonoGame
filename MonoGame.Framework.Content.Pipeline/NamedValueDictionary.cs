@@ -1,4 +1,4 @@
-﻿// MonoGame - Copyright (C) The MonoGame Team
+﻿// MonoGame - Copyright (C) MonoGame Foundation, Inc
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
@@ -8,6 +8,10 @@ using System.Collections.Generic;
 
 namespace Microsoft.Xna.Framework.Content.Pipeline
 {
+    /// <summary>
+    /// Provides a named value dictionary for use in the Content Pipeline.
+    /// </summary>
+    /// <typeparam name="T">Type of the value stored in the dictionary</typeparam>
     public class NamedValueDictionary<T> : IDictionary<string, T>
     {
         readonly Dictionary<string, T> dict = new Dictionary<string,T>();

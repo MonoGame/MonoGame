@@ -1,4 +1,4 @@
-// MonoGame - Copyright (C) The MonoGame Team
+// MonoGame - Copyright (C) MonoGame Foundation, Inc
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
@@ -56,19 +56,24 @@ namespace Microsoft.Xna.Framework.Audio
         {            
         }
 
-        internal static Stream OpenStream(string filePath)
+        internal static Stream OpenStream(string filePath, bool useMemoryStream = false)
         {
             var stream = TitleContainer.OpenStream(filePath);
 
-#if ANDROID
             // Read the asset into memory in one go. This results in a ~50% reduction
             // in load times on Android due to slow Android asset streams.
-            var memStream = new MemoryStream();
-            stream.CopyTo(memStream);
-            memStream.Seek(0, SeekOrigin.Begin);
-            stream.Close();
-            stream = memStream;
+#if ANDROID
+            useMemoryStream = true;
 #endif
+
+            if (useMemoryStream)
+            {
+                var memStream = new MemoryStream();
+                stream.CopyTo(memStream);
+                memStream.Seek(0, SeekOrigin.Begin);
+                stream.Dispose();
+                stream = memStream;
+            }
 
             return stream;
         }
@@ -376,6 +381,7 @@ namespace Microsoft.Xna.Framework.Audio
             GC.SuppressFinalize(this);
         }
 
+        /// <summary/>
         ~AudioEngine()
         {
             Dispose(false);

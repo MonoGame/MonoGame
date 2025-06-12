@@ -1,4 +1,4 @@
-﻿// MonoGame - Copyright (C) The MonoGame Team
+﻿// MonoGame - Copyright (C) MonoGame Foundation, Inc
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
@@ -22,7 +22,6 @@ namespace Microsoft.Xna.Framework
         /// <param name="handler"><see cref="EventHandler{TEventArgs}"/> to be invoked</param>
         /// <param name="e">The <typeparamref name="TEventArgs"/> passed to <see cref="EventHandler{TEventArgs}"/></param>
         internal static void Raise<TEventArgs>(object sender, EventHandler<TEventArgs> handler, TEventArgs e)
-            where TEventArgs : EventArgs
         {
             if (handler != null)
                 handler(sender, e);

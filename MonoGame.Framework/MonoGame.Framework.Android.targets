@@ -1,0 +1,8 @@
+<Project>
+
+  <PropertyGroup>
+    <MonoGamePlatform>Android</MonoGamePlatform>
+  </PropertyGroup>
+
+</Project>
+

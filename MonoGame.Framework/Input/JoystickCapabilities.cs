@@ -1,4 +1,4 @@
-﻿// MonoGame - Copyright (C) The MonoGame Team
+﻿// MonoGame - Copyright (C) MonoGame Foundation, Inc
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
@@ -20,6 +20,12 @@ namespace Microsoft.Xna.Framework.Input
         /// </summary>
         /// <value>String representing the unique identifier of the joystick.</value>
         public string Identifier { get; internal set; }
+
+        /// <summary>
+        /// Gets the joystick's display name.
+        /// </summary>
+        /// <value>String representing the display name of the joystick.</value>
+        public string DisplayName { get; internal set; }
 
         /// <summary>
         /// Gets a value indicating if the joystick is a gamepad.
@@ -101,7 +107,7 @@ namespace Microsoft.Xna.Framework.Input
         /// <returns>A <see cref="T:System.String"/> that represents the current <see cref="T:Microsoft.Xna.Framework.Input.JoystickCapabilities"/>.</returns>
         public override string ToString()
         {
-            return "[JoystickCapabilities: IsConnected=" + IsConnected + ", Identifier=" + Identifier + ", IsGamepad=" + IsGamepad + " , AxisCount=" + AxisCount + ", ButtonCount=" + ButtonCount + ", HatCount=" + HatCount + "]";
+            return "[JoystickCapabilities: IsConnected=" + IsConnected + ", Identifier=" + Identifier + ", DisplayName=" + DisplayName + ", IsGamepad=" + IsGamepad + " , AxisCount=" + AxisCount + ", ButtonCount=" + ButtonCount + ", HatCount=" + HatCount + "]";
         }
     }
 }

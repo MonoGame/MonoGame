@@ -18,7 +18,6 @@ namespace Microsoft.Xna.Framework
     {
         static Color()
         {
-            TransparentBlack = new Color(0);
             Transparent = new Color(0);
             AliceBlue = new Color(0xfffff8f0);
             AntiqueWhite = new Color(0xffd7ebfa);
@@ -173,11 +172,11 @@ namespace Microsoft.Xna.Framework
         /// The value is a 32-bit unsigned integer, with R in the least significant octet.
         /// </summary>
         /// <param name="packedValue">The packed value.</param>
-        [CLSCompliant(false)]
         public Color(uint packedValue)
         {
             _packedValue = packedValue;
         }
+
 
         /// <summary>
         /// Constructs an RGBA color from the XYZW unit length components of a vector.
@@ -387,8 +386,18 @@ namespace Microsoft.Xna.Framework
                 this._packedValue = (this._packedValue & 0x00ffffff) | ((uint)value << 24);
             }
         }
-		
-	/// <summary>
+
+        /// <summary>
+        /// Converts a <see cref="System.Numerics.Vector4"/> to a <see cref="Vector4"/> by mapping XYZW -> RGBA.
+        /// </summary>
+        /// <param name="value">The converted value.</param>
+        /// <returns></returns>
+        public static implicit operator Color(System.Numerics.Vector4 value)
+        {
+            return new Color(value.X, value.Y, value.Z, value.W);
+        }
+
+	    /// <summary>
         /// Compares whether two <see cref="Color"/> instances are equal.
         /// </summary>
         /// <param name="a"><see cref="Color"/> instance on the left of the equal sign.</param>
@@ -430,14 +439,6 @@ namespace Microsoft.Xna.Framework
         }
 
         #region Color Bank
-        /// <summary>
-        /// TransparentBlack color (R:0,G:0,B:0,A:0).
-        /// </summary>
-        public static Color TransparentBlack
-        {
-            get;
-            private set;
-        }
         
         /// <summary>
         /// Transparent color (R:0,G:0,B:0,A:0).
@@ -1747,29 +1748,67 @@ namespace Microsoft.Xna.Framework
                 (int)MathHelper.LerpPrecise(value1.B, value2.B, amount),
                 (int)MathHelper.LerpPrecise(value1.A, value2.A, amount));
         }
-		
-	/// <summary>
-        /// Multiply <see cref="Color"/> by value.
+
+        /// <summary>
+        /// Multiplies the RGBA component values of a color by the specified value.
         /// </summary>
-        /// <param name="value">Source <see cref="Color"/>.</param>
-        /// <param name="scale">Multiplicator.</param>
-        /// <returns>Multiplication result.</returns>
-	public static Color Multiply(Color value, float scale)
-	{
-	    return new Color((int)(value.R * scale), (int)(value.G * scale), (int)(value.B * scale), (int)(value.A * scale));
-	}
+        /// <param name="value">The source color value to multiply.</param>
+        /// <param name="scale">The value to multiply the RGBA component values by.</param>
+        /// <returns>The new color value created as a result of the multiplication.</returns>
+        public static Color Multiply(Color value, float scale)
+	    {
+	        return new Color((int)(value.R * scale), (int)(value.G * scale), (int)(value.B * scale), (int)(value.A * scale));
+	    }
+
+        /// <summary>
+        /// Multiplies the Alpha component value of a color by the specified value.
+        /// </summary>
+        /// <param name="value">The source color value to multiply.</param>
+        /// <param name="scale">The value to multiply the Alpha component value by.</param>
+        /// <returns>The new color value created as a result of the multiplication.</returns>
+        public static Color MultiplyAlpha(Color value, float scale)
+	    {
+	        return new Color(value.R, value.G, value.B, (int)(value.A * scale));
+	    }
 	
-	/// <summary>
-        /// Multiply <see cref="Color"/> by value.
+	    /// <summary>
+        /// Multiplies the RGBA component values of a color by the specified value.
         /// </summary>
-        /// <param name="value">Source <see cref="Color"/>.</param>
-        /// <param name="scale">Multiplicator.</param>
-        /// <returns>Multiplication result.</returns>
-	public static Color operator *(Color value, float scale)
+        /// <param name="value">The source color value to multiply.</param>
+        /// <param name="scale">The value to multiply the RGBA component values by.</param>
+        /// <returns>The new color value created as a result of the multiplication.</returns>
+	    public static Color operator *(Color value, float scale)
         {
             return new Color((int)(value.R * scale), (int)(value.G * scale), (int)(value.B * scale), (int)(value.A * scale));
         }
 
+        /// <summary>
+        /// Multiplies the RGBA component values of a color by the specified value.
+        /// </summary>
+        /// <param name="scale">The value to multiply the RGBA component values by.</param>
+        /// <param name="value">The source color value to multiply.</param>
+        /// <returns>The new color value created as a result of the multiplication.</returns>
+        public static Color operator *(float scale, Color value)
+        {
+            return new Color((int)(value.R * scale), (int)(value.G * scale), (int)(value.B * scale), (int)(value.A * scale));
+        }
+
+        /// <summary>
+        /// Multiplies two colors compenent-wise.
+        /// </summary>
+        /// <param name="color1">The first color to be multiplied.</param>
+        /// <param name="color2">The second color to be multiplied.</param>
+        /// <returns>The new color value created as a result of the multiplication.</returns>
+        public static Color operator *(Color color1, Color color2)
+        {
+            return new Color(
+                (color1.R * color2.R) / 255,
+                (color1.G * color2.G) / 255,
+                (color1.B * color2.B) / 255,
+                (color1.A * color2.A) / 255
+            );
+        }
+        
         /// <summary>
         /// Gets a <see cref="Vector3"/> representation for this object.
         /// </summary>
@@ -1791,7 +1830,6 @@ namespace Microsoft.Xna.Framework
         /// <summary>
         /// Gets or sets packed value of this <see cref="Color"/>.
         /// </summary>
-        [CLSCompliant(false)]
         public UInt32 PackedValue
         {
             get { return _packedValue; }
@@ -1869,5 +1907,61 @@ namespace Microsoft.Xna.Framework
         }
 
         #endregion
+
+        /// <summary>
+        /// Deconstruction method for <see cref="Color"/>.
+        /// </summary>
+        /// <param name="r">Red component value from 0 to 255.</param>
+        /// <param name="g">Green component value from 0 to 255.</param>
+        /// <param name="b">Blue component value from 0 to 255.</param>
+        public void Deconstruct(out byte r, out byte g, out byte b)
+        {
+            r = R;
+            g = G;
+            b = B;
+        }
+
+        /// <summary>
+        /// Deconstruction method for <see cref="Color"/>.
+        /// </summary>
+        /// <param name="r">Red component value from 0.0f to 1.0f.</param>
+        /// <param name="g">Green component value from 0.0f to 1.0f.</param>
+        /// <param name="b">Blue component value from 0.0f to 1.0f.</param>
+        public void Deconstruct(out float r, out float g, out float b)
+        {
+            r = R / 255f;
+            g = G / 255f;
+            b = B / 255f;
+        }
+
+        /// <summary>
+        /// Deconstruction method for <see cref="Color"/> with Alpha.
+        /// </summary>
+        /// <param name="r">Red component value from 0 to 255.</param>
+        /// <param name="g">Green component value from 0 to 255.</param>
+        /// <param name="b">Blue component value from 0 to 255.</param>
+        /// <param name="a">Alpha component value from 0 to 255.</param>
+        public void Deconstruct(out byte r, out byte g, out byte b, out byte a)
+        {
+            r = R;
+            g = G;
+            b = B;
+            a = A;
+        }
+
+        /// <summary>
+        /// Deconstruction method for <see cref="Color"/> with Alpha.
+        /// </summary>
+        /// <param name="r">Red component value from 0.0f to 1.0f.</param>
+        /// <param name="g">Green component value from 0.0f to 1.0f.</param>
+        /// <param name="b">Blue component value from 0.0f to 1.0f.</param>
+        /// <param name="a">Alpha component value from 0.0f to 1.0f.</param>
+        public void Deconstruct(out float r, out float g, out float b, out float a)
+        {
+            r = R / 255f;
+            g = G / 255f;
+            b = B / 255f;
+            a = A / 255f;
+        }
     }
 }

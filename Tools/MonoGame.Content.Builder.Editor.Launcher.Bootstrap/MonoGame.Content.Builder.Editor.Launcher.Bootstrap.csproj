@@ -1,0 +1,17 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+    <RollForward>Major</RollForward>
+    <Description>The MonoGame Framework Content Builder Editor (MGCB-Editor) is a graphical tool used for editing your content projects ready for processing.</Description>
+    <BaseOutputPath>..\..\Artifacts\MonoGame.Content.Builder.Editor.Launcher\Bootstrap</BaseOutputPath>
+    <PackAsTool>true</PackAsTool>
+    <ToolCommandName>mgcb-editor</ToolCommandName>
+    <PackageId>dotnet-mgcb-editor</PackageId>
+    <AppendTargetFrameworkToOutputPath>False</AppendTargetFrameworkToOutputPath>
+    <AssemblyName>mgcb-editor</AssemblyName>
+    <ImplicitUsings>true</ImplicitUsings>
+  </PropertyGroup>
+
+</Project>

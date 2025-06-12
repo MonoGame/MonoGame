@@ -1,4 +1,4 @@
-﻿// MonoGame - Copyright (C) The MonoGame Team
+﻿// MonoGame - Copyright (C) MonoGame Foundation, Inc
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
@@ -7,6 +7,7 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace Microsoft.Xna.Framework.Content
 {
+    [System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.All)]
     internal class Texture3DReader : ContentTypeReader<Texture3D>
     {
         protected internal override Texture3D Read(ContentReader reader, Texture3D existingInstance)
@@ -20,7 +21,7 @@ namespace Microsoft.Xna.Framework.Content
             int levelCount = reader.ReadInt32();
 
             if (existingInstance == null)
-                texture = new Texture3D(reader.GraphicsDevice, width, height, depth, levelCount > 1, format);
+                texture = new Texture3D(reader.GetGraphicsDevice(), width, height, depth, levelCount > 1, format);
             else
                 texture = existingInstance;
 
@@ -31,7 +32,7 @@ namespace Microsoft.Xna.Framework.Content
                 for (int i = 0; i < levelCount; i++)
                 {
                     int dataSize = reader.ReadInt32();
-                    byte[] data = reader.ContentManager.GetScratchBuffer(dataSize);
+                    byte[] data = ContentManager.ScratchBufferPool.Get(dataSize);
                     reader.Read(data, 0, dataSize);
                     texture.SetData(i, 0, 0, width, height, 0, depth, data, 0, dataSize);
 
@@ -39,6 +40,8 @@ namespace Microsoft.Xna.Framework.Content
                     width = Math.Max(width >> 1, 1);
                     height = Math.Max(height >> 1, 1);
                     depth = Math.Max(depth >> 1, 1);
+
+                    ContentManager.ScratchBufferPool.Return(data);
                 }
 #if OPENGL
             });

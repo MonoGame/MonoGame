@@ -1,4 +1,4 @@
-﻿// MonoGame - Copyright (C) The MonoGame Team
+﻿// MonoGame - Copyright (C) MonoGame Foundation, Inc
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
@@ -13,7 +13,13 @@ namespace Microsoft.Xna.Framework.Audio
     /// </summary>
     public enum MicrophoneState
     {
+        /// <summary>
+        /// The <see cref="Microphone"/> audio capture has started.
+        /// </summary>
         Started,
+        /// <summary>
+        /// The <see cref="Microphone"/> audio capture has stopped.
+        /// </summary>
         Stopped
     }
 
@@ -115,6 +121,7 @@ namespace Microsoft.Xna.Framework.Audio
         {
             get
             {
+                SoundEffect.Initialize();                
                 if (_allMicrophones == null)
                     _allMicrophones = new List<Microphone>();
                 return new ReadOnlyCollection<Microphone>(_allMicrophones);
@@ -128,7 +135,7 @@ namespace Microsoft.Xna.Framework.Audio
         /// </summary>
         public static Microphone Default
         {
-            get { return _default; }
+            get { SoundEffect.Initialize(); return _default; }
         }       
 
         #endregion

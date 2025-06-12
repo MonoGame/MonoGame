@@ -1,4 +1,4 @@
-﻿// MonoGame - Copyright (C) The MonoGame Team
+﻿// MonoGame - Copyright (C) MonoGame Foundation, Inc
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
@@ -8,81 +8,6 @@ using System.Linq;
 
 namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 {
-    internal class CharacterCollection : ICollection<char>
-    {
-        private List<char> _items;
-
-        public CharacterCollection()
-        {
-            _items = new List<char>();
-        }
-
-        public CharacterCollection(IEnumerable<char> characters)
-        {
-            _items = new List<char>();
-            foreach (var c in characters)
-                Add(c);
-        }
-
-        #region ICollection<char> Members
-
-        public void Add(char item)
-        {
-            if (!_items.Contains(item))
-                _items.Add(item);
-        }
-
-        public void Clear()
-        {
-            _items.Clear();
-        }
-
-        public bool Contains(char item)
-        {
-            return _items.Contains(item);
-        }
-
-        public void CopyTo(char[] array, int arrayIndex)
-        {
-            _items.CopyTo(array, arrayIndex);
-        }
-
-        public int Count
-        {
-            get { return _items.Count; }
-        }
-
-        public bool IsReadOnly
-        {
-            get { return false; }
-        }
-
-        public bool Remove(char item)
-        {
-            return _items.Remove(item);
-        }
-
-        #endregion
-
-        #region IEnumerable<char> Members
-
-        public IEnumerator<char> GetEnumerator()
-        {
-            return _items.GetEnumerator();
-        }
-
-        #endregion
-
-        #region IEnumerable Members
-
-        System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
-        {
-            return _items.GetEnumerator();
-        }
-
-        #endregion
-    }
-
 	/// <summary>
 	/// Provides information to the FontDescriptionProcessor describing which font to rasterize, which font size to utilize, and which Unicode characters to include in the processor output.
 	/// </summary>
@@ -94,7 +19,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
         private float spacing;
         private FontDescriptionStyle style;
         private bool useKerning;
-	    private CharacterCollection characters = new CharacterCollection();
+	    private ICollection<char> characters = new HashSet<char>();
 
 		/// <summary>
 		/// Gets or sets the name of the font, such as "Times New Roman" or "Arial". This value cannot be null or empty.
@@ -234,12 +159,15 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
                 }
             }
         }
-		
+
+        /// <summary>
+        /// Retrieves the set of characters to include in the processor output.
+        /// </summary>
 	    [ContentSerializerIgnore]
 	    public ICollection<char> Characters
 	    {
 	        get { return characters; } 
-            internal set { characters = new CharacterCollection(value); }
+            internal set { characters = new HashSet<char>(value); }
 	    }
 
         internal FontDescription()

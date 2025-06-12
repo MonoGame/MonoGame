@@ -1,4 +1,4 @@
-﻿// MonoGame - Copyright (C) The MonoGame Team
+﻿// MonoGame - Copyright (C) MonoGame Foundation, Inc
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
@@ -25,6 +25,11 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
         /// Gets the logger interface used for status messages or warnings.
         /// </summary>
         public abstract ContentBuildLogger Logger { get; }
+
+        /// <summary>
+        /// Gets the ContentIdentity representing the source asset imported.
+        /// </summary>
+        public abstract ContentIdentity SourceIdentity { get; }
 
         /// <summary>
         /// Gets the output path of the content processor.

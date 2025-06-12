@@ -1,4 +1,4 @@
-﻿// MonoGame - Copyright (C) The MonoGame Team
+﻿// MonoGame - Copyright (C) MonoGame Foundation, Inc
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
@@ -89,10 +89,6 @@ namespace Microsoft.Xna.Framework.Graphics
 
             // Take care of the single copy case!
             else if (rows == 1 || (rows == 4 && columns == 4)) {
-                // take care of shader compiler optimization
-                int len = rows * columns * elementSize;
-                if (_buffer.Length - offset > len)
-                len = _buffer.Length - offset;
                 Buffer.BlockCopy(data as Array, 0, _buffer, offset, rows*columns*elementSize);
             } else
             {

@@ -1,4 +1,4 @@
-﻿// MonoGame - Copyright (C) The MonoGame Team
+﻿// MonoGame - Copyright (C) MonoGame Foundation, Inc
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
@@ -221,5 +221,12 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
         {
             Items.RemoveAt(index);
         }
+
+        /// <summary>
+        /// Removes a range of values from the channel.
+        /// </summary>
+        /// <param name="index">The zero-based starting index of the range of elements to remove.</param>
+        /// <param name="count"> The number of elements to remove.</param>
+        internal abstract void RemoveRange(int index, int count);
     }
 }

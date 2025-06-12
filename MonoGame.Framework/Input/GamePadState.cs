@@ -1,4 +1,4 @@
-﻿// MonoGame - Copyright (C) The MonoGame Team
+﻿// MonoGame - Copyright (C) MonoGame Foundation, Inc
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
@@ -7,7 +7,7 @@ namespace Microsoft.Xna.Framework.Input
     /// <summary>
     /// Represents specific information about the state of the controller,
     /// including the current state of buttons and sticks.
-    /// 
+    ///
     /// This is implemented as a partial struct to allow for individual platforms
     /// to offer additional data without separate state queries to GamePad.
     /// </summary>
@@ -59,7 +59,7 @@ namespace Microsoft.Xna.Framework.Input
         /// using the specified GamePadThumbSticks, GamePadTriggers, GamePadButtons, and GamePadDPad.
         /// </summary>
         /// <param name="thumbSticks">Initial thumbstick state.</param>
-        /// <param name="triggers">Initial trigger state..</param>
+        /// <param name="triggers">Initial trigger state.</param>
         /// <param name="buttons">Initial button state.</param>
         /// <param name="dPad">Initial directional pad state.</param>
         public GamePadState(GamePadThumbSticks thumbSticks, GamePadTriggers triggers, GamePadButtons buttons, GamePadDPad dPad) : this()
@@ -74,15 +74,29 @@ namespace Microsoft.Xna.Framework.Input
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="T:Microsoft.Xna.Framework.Input.GamePadState"/> struct.
+        /// Initializes a new instance of the <see cref="T:Microsoft.Xna.Framework.Input.GamePadState"/> struct
         /// using the specified stick, trigger, and button values.
         /// </summary>
         /// <param name="leftThumbStick">Left stick value. Each axis is clamped between −1.0 and 1.0.</param>
         /// <param name="rightThumbStick">Right stick value. Each axis is clamped between −1.0 and 1.0.</param>
         /// <param name="leftTrigger">Left trigger value. This value is clamped between 0.0 and 1.0.</param>
         /// <param name="rightTrigger">Right trigger value. This value is clamped between 0.0 and 1.0.</param>
-        /// <param name="buttons"> Array or parameter list of Buttons to initialize as pressed.</param>
-        public GamePadState(Vector2 leftThumbStick, Vector2 rightThumbStick, float leftTrigger, float rightTrigger, Buttons buttons)
+        /// <param name="button">Button(s) to initialize as pressed.</param>
+        public GamePadState(Vector2 leftThumbStick, Vector2 rightThumbStick, float leftTrigger, float rightTrigger, Buttons button)
+            : this(new GamePadThumbSticks(leftThumbStick, rightThumbStick), new GamePadTriggers(leftTrigger, rightTrigger), new GamePadButtons(button), new GamePadDPad(button))
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="T:Microsoft.Xna.Framework.Input.GamePadState"/> struct
+        /// using the specified stick, trigger, and button values.
+        /// </summary>
+        /// <param name="leftThumbStick">Left stick value. Each axis is clamped between −1.0 and 1.0.</param>
+        /// <param name="rightThumbStick">Right stick value. Each axis is clamped between −1.0 and 1.0.</param>
+        /// <param name="leftTrigger">Left trigger value. This value is clamped between 0.0 and 1.0.</param>
+        /// <param name="rightTrigger">Right trigger value. This value is clamped between 0.0 and 1.0.</param>
+        /// <param name="buttons"> Array of Buttons to initialize as pressed.</param>
+        public GamePadState(Vector2 leftThumbStick, Vector2 rightThumbStick, float leftTrigger, float rightTrigger, Buttons[] buttons)
             : this(new GamePadThumbSticks(leftThumbStick, rightThumbStick), new GamePadTriggers(leftTrigger, rightTrigger), new GamePadButtons(buttons), new GamePadDPad(buttons))
         {
         }
@@ -92,7 +106,7 @@ namespace Microsoft.Xna.Framework.Input
         /// values for platform-specific fields.
         /// </summary>
         partial void PlatformConstruct();
-  
+
         /// <summary>
         /// Gets the button mask along with 'virtual buttons' like LeftThumbstickLeft.
         /// </summary>
@@ -101,7 +115,7 @@ namespace Microsoft.Xna.Framework.Input
             var result = Buttons._buttons;
 
             result |= ThumbSticks._virtualButtons;
-            
+
             if (DPad.Down == ButtonState.Pressed)
                 result |= Microsoft.Xna.Framework.Input.Buttons.DPadDown;
             if (DPad.Up == ButtonState.Pressed)
@@ -121,6 +135,7 @@ namespace Microsoft.Xna.Framework.Input
         /// <param name="button">Buttons to query. Specify a single button, or combine multiple buttons using a bitwise OR operation.</param>
         public bool IsButtonDown(Buttons button)
         {
+            if (button == Microsoft.Xna.Framework.Input.Buttons.None) return false;
             return (GetVirtualButtons() & button) == button;
         }
 
@@ -201,7 +216,7 @@ namespace Microsoft.Xna.Framework.Input
             if (!IsConnected)
                 return "[GamePadState: IsConnected = 0]";
 
-            return "[GamePadState: IsConnected=" + (IsConnected ? "1" : "0") + 
+            return "[GamePadState: IsConnected=" + (IsConnected ? "1" : "0") +
                    ", PacketNumber=" + PacketNumber.ToString("00000") +
                    ", Buttons=" + Buttons +
                    ", DPad=" + DPad +

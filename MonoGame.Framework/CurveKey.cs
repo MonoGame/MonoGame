@@ -3,7 +3,6 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System;
-using System.ComponentModel;
 using System.Runtime.Serialization;
 
 namespace Microsoft.Xna.Framework
@@ -175,21 +174,25 @@ namespace Microsoft.Xna.Framework
 
         #region Inherited Methods
 
+        /// <inheritdoc/>
         public int CompareTo(CurveKey other)
         {
             return this._position.CompareTo(other._position);
         }
 
+        /// <inheritdoc/>
         public bool Equals(CurveKey other)
         {
             return (this == other);
         }
 
+        /// <inheritdoc/>
         public override bool Equals(object obj)
         {
             return (obj as CurveKey) != null && Equals((CurveKey)obj);
         }
 
+        /// <inheritdoc/>
         public override int GetHashCode()
         {
             return this._position.GetHashCode() ^ this._value.GetHashCode() ^ this._tangentIn.GetHashCode() ^

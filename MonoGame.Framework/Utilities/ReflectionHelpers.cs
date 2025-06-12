@@ -1,7 +1,12 @@
-﻿using System;
-using System.Reflection;
+﻿// MonoGame - Copyright (C) MonoGame Foundation, Inc
+// This file is subject to the terms and conditions defined in
+// file 'LICENSE.txt', which is part of this source code package.
 
-namespace Microsoft.Xna.Framework.Utilities
+using System;
+using System.Reflection;
+using System.Runtime.InteropServices;
+
+namespace MonoGame.Framework.Utilities
 {
     internal static partial class ReflectionHelpers
     {
@@ -170,5 +175,22 @@ namespace Microsoft.Xna.Framework.Utilities
 #endif
             return false;
         }
+
+        // Returns the cached size of the unmanaged type in bytes.
+        public static int FastSizeOf<T>()
+        {
+            return SizeOf<T>.Get();
+        }
+
+        /// <summary>
+        /// Fallback handler for Marshal.SizeOf(type)
+        /// </summary>
+        [Obsolete("This shouldn't be used because it is not PublishAot-compliant (but we're only using it in WindowsDX code, which isn't AOT-compatible, so it's fine for the time being)")]
+        internal static int ManagedSizeOf(Type type)
+        {
+            // to make this AOT-compliant, we should be using Marshal.SizeOf<T>() but it isn't possible here without using reflection (which we can't if we want AOT compatibility)
+            return Marshal.SizeOf(type);
+        }
+
     }
 }

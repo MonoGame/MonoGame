@@ -1,13 +1,17 @@
-// MonoGame - Copyright (C) The MonoGame Team
+// MonoGame - Copyright (C) MonoGame Foundation, Inc
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System;
 using System.Diagnostics;
 using System.IO;
+using MonoGame.Framework.Utilities;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
+    /// <summary>
+    /// Used to set and query shader effects, and to choose techniques.
+    /// </summary>
 	public class Effect : GraphicsResource
     {
         struct MGFXHeader 
@@ -25,7 +29,7 @@ namespace Microsoft.Xna.Framework.Graphics
             /// We should avoid supporting old versions for very long if at all 
             /// as users should be rebuilding content when packaging their game.
             /// </remarks>
-            public const int MGFXVersion = 8;
+            public const int MGFXVersion = 10;
 
             public int Signature;
             public int Version;
@@ -34,10 +38,23 @@ namespace Microsoft.Xna.Framework.Graphics
             public int HeaderSize;
         }
 
+        /// <summary>
+        /// Gets a collection of shader parameters used for this effect.
+        /// </summary>
         public EffectParameterCollection Parameters { get; private set; }
 
+        /// <summary>
+        /// Gets a collection of shader techniques that are defined for this effect.
+        /// </summary>
         public EffectTechniqueCollection Techniques { get; private set; }
 
+        /// <summary>
+        /// Gets or sets the active technique.
+        /// </summary>
+        /// <remarks>
+        /// If there are multiple techiques in an effect and you want to use a new technique in the next pass,
+        /// you must set <b>CurrentTechnique</b> to the new technique before making the rendering pass.
+        /// </remarks>
         public EffectTechnique CurrentTechnique { get; set; }
   
         internal ConstantBuffer[] ConstantBuffers { get; private set; }
@@ -54,7 +71,11 @@ namespace Microsoft.Xna.Framework.Graphics
             }
             this.GraphicsDevice = graphicsDevice;
 		}
-			
+
+        /// <summary>
+        /// Creates a clone of the <see cref="Effect"/>.
+        /// </summary>
+        /// <param name="cloneSource"><see cref="Effect"/> to clone.</param>
 		protected Effect(Effect cloneSource)
             : this(cloneSource.GraphicsDevice)
 		{
@@ -62,12 +83,20 @@ namespace Microsoft.Xna.Framework.Graphics
             Clone(cloneSource);
 		}
 
+        /// <inheritdoc cref="Effect(GraphicsDevice, byte[], int, int)"/>
         public Effect(GraphicsDevice graphicsDevice, byte[] effectCode)
             : this(graphicsDevice, effectCode, 0, effectCode.Length)
         {
         }
 
-
+        /// <summary>
+        /// Creates a new instance of <see cref="Effect"/>.
+        /// </summary>
+        /// <param name="graphicsDevice">Graphics device</param>
+        /// <param name="effectCode">The effect code.</param>
+        /// <param name="index"></param>
+        /// <param name="count"></param>
+        /// <exception cref="ArgumentException">This <paramref name="effectCode"/> is invalid.</exception>
         public Effect (GraphicsDevice graphicsDevice, byte[] effectCode, int index, int count)
             : this(graphicsDevice)
 		{
@@ -106,6 +135,10 @@ namespace Microsoft.Xna.Framework.Graphics
                 cloneSource = new Effect(graphicsDevice);
                     cloneSource.ReadEffect(reader);
 
+                // Check file tail to ensure we parsed the content correctly.
+                    var tail = reader.ReadInt32();
+                    if (tail != MGFXHeader.MGFXSignature) throw new ArgumentException("The MGFX effect code was not parsed correctly.", "effectCode");                    
+
                 // Cache the effect for later in its original unmodified state.
                     graphicsDevice.EffectCache.Add(effectKey, cloneSource);
                 }
@@ -123,7 +156,7 @@ namespace Microsoft.Xna.Framework.Graphics
             header.Version = (int)effectCode[index++];
             header.Profile = (int)effectCode[index++];
             header.EffectKey = BitConverter.ToInt32(effectCode, index); index += 4;
-            header.HeaderSize = index;
+            header.HeaderSize = 10;
 
             if (header.Signature != MGFXHeader.MGFXSignature)
                 throw new Exception("This does not appear to be a MonoGame MGFX file!");
@@ -187,10 +220,14 @@ namespace Microsoft.Xna.Framework.Graphics
             return new Effect(this);
 		}
 
+        /// <summary>
+        /// Applies the effect state just prior to rendering the effect.
+        /// </summary>
         protected internal virtual void OnApply()
         {
         }
 
+        /// <inheritdoc cref="IDisposable.Dispose()"/>
         protected override void Dispose(bool disposing)
         {
             if (!IsDisposed)
@@ -219,6 +256,9 @@ namespace Microsoft.Xna.Framework.Graphics
             base.Dispose(disposing);
         }
 
+        /// <summary>
+        /// The GraphicsDevice is resetting, so GPU resources must be recreated.
+        /// </summary>
         internal protected override void GraphicsDeviceResetting()
         {
             for (var i = 0; i < ConstantBuffers.Length; i++)
@@ -231,64 +271,58 @@ namespace Microsoft.Xna.Framework.Graphics
 		{
 			// TODO: Maybe we should be reading in a string 
 			// table here to save some bytes in the file.
+			
+            ConstantBuffers = new ConstantBuffer[reader.ReadInt32()];
 
-			// Read in all the constant buffers.
-			var buffers = (int)reader.ReadByte ();
-			ConstantBuffers = new ConstantBuffer[buffers];
-			for (var c = 0; c < buffers; c++) 
-            {				
-				var name = reader.ReadString ();               
-
-				// Create the backing system memory buffer.
-				var sizeInBytes = (int)reader.ReadInt16 ();
-
-				// Read the parameter index values.
-				var parameters = new int[reader.ReadByte ()];
-				var offsets = new int[parameters.Length];
-				for (var i = 0; i < parameters.Length; i++) 
-                {
-					parameters [i] = (int)reader.ReadByte ();
-					offsets [i] = (int)reader.ReadUInt16 ();
-				}
-
-                var buffer = new ConstantBuffer(GraphicsDevice,
-				                                sizeInBytes,
-				                                parameters,
-				                                offsets,
-				                                name);
-                ConstantBuffers[c] = buffer;
-            }
-
-            // Read in all the shader objects.
-            var shaders = (int)reader.ReadByte();
-            _shaders = new Shader[shaders];
-            for (var s = 0; s < shaders; s++)
-                _shaders[s] = new Shader(GraphicsDevice, reader);
-
-            // Read in the parameters.
-            Parameters = ReadParameters(reader);
-
-            // Read the techniques.
-            var techniqueCount = (int)reader.ReadByte();
-            var techniques = new EffectTechnique[techniqueCount];
-            for (var t = 0; t < techniqueCount; t++)
+            for (var c = 0; c < ConstantBuffers.Length; c++)
             {
                 var name = reader.ReadString();
 
-                var annotations = ReadAnnotations(reader);
+                // Create the backing system memory buffer.
+                var sizeInBytes = (int)reader.ReadInt16();
 
+                // Read the parameter index values.
+                var parameters = new int[reader.ReadInt32()];
+                var offsets = new int[parameters.Length];
+                for (var i = 0; i < parameters.Length; i++)
+                {
+                    parameters[i] = reader.ReadInt32();
+                    offsets[i] = (int)reader.ReadUInt16();
+                }
+
+                ConstantBuffers[c] = new ConstantBuffer(GraphicsDevice,
+                                                sizeInBytes,
+                                                parameters,
+                                                offsets,
+                                                name);                 
+            }
+
+            _shaders = new Shader[reader.ReadInt32()];
+
+            for (var s = 0; s < _shaders.Length; s++)
+                _shaders[s] = new Shader(GraphicsDevice, reader);
+
+            Parameters = ReadParameters(reader);
+
+            var techniques = new EffectTechnique[reader.ReadInt32()];
+
+            for (var t = 0; t < techniques.Length; t++)
+            {
+                var name = reader.ReadString();
+                var annotations = ReadAnnotations(reader);
                 var passes = ReadPasses(reader, this, _shaders);
 
                 techniques[t] = new EffectTechnique(this, name, passes, annotations);
             }
 
             Techniques = new EffectTechniqueCollection(techniques);
+
             CurrentTechnique = Techniques[0];
         }
 
         private static EffectAnnotationCollection ReadAnnotations(BinaryReader reader)
         {
-            var count = (int)reader.ReadByte();
+            var count = reader.ReadInt32();
             if (count == 0)
                 return EffectAnnotationCollection.Empty;
 
@@ -301,25 +335,20 @@ namespace Microsoft.Xna.Framework.Graphics
 
         private static EffectPassCollection ReadPasses(BinaryReader reader, Effect effect, Shader[] shaders)
         {
-            var count = (int)reader.ReadByte();
-            var passes = new EffectPass[count];
+            var passes = new EffectPass[reader.ReadInt32()];
 
-            for (var i = 0; i < count; i++)
+            for (var i = 0; i < passes.Length; i++)
             {
                 var name = reader.ReadString();
                 var annotations = ReadAnnotations(reader);
 
                 // Get the vertex shader.
-                Shader vertexShader = null;
-                var shaderIndex = (int)reader.ReadByte();
-                if (shaderIndex != 255)
-                    vertexShader = shaders[shaderIndex];
+                var shaderIndex = reader.ReadInt32();
+                Shader vertexShader = shaderIndex < 0 ? null : shaders[shaderIndex];
 
                 // Get the pixel shader.
-                Shader pixelShader = null;
-                shaderIndex = (int)reader.ReadByte();
-                if (shaderIndex != 255)
-                    pixelShader = shaders[shaderIndex];
+                shaderIndex = reader.ReadInt32();
+                Shader pixelShader = shaderIndex < 0 ? null : shaders[shaderIndex];
 
 				BlendState blend = null;
 				DepthStencilState depth = null;
@@ -385,7 +414,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
 		private static EffectParameterCollection ReadParameters(BinaryReader reader)
 		{
-			var count = (int)reader.ReadByte();			
+            var count = reader.ReadInt32();
             if (count == 0)
                 return EffectParameterCollection.Empty;
 
@@ -454,6 +483,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
 			return new EffectParameterCollection(parameters);
 		}
+
         #endregion // Effect File Reader
-	}
+    }
 }

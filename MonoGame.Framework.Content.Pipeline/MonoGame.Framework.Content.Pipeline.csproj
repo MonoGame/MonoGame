@@ -1,0 +1,112 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <Import Project="..\MonoGame.props" />
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <BaseOutputPath>..\Artifacts\MonoGame.Framework.Content.Pipeline</BaseOutputPath>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <Description>The Monogame Content Pipeline for Windows, Mac and Linux is used to compile raw content to xnb files.</Description>
+    <PackageTags>monogame;content;content pipeline</PackageTags>
+    <PackageId>MonoGame.Framework.Content.Pipeline</PackageId>
+    <AssemblyName>MonoGame.Framework.Content.Pipeline</AssemblyName>
+    <RootNamespace>Microsoft.Xna.Framework.Content.Pipeline</RootNamespace>
+    <AppendTargetFrameworkToOutputPath>False</AppendTargetFrameworkToOutputPath>
+    <DefineConstants>STBSHARP_INTERNAL</DefineConstants>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <DisableMonoGameToolAssets>True</DisableMonoGameToolAssets>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="README.md" Pack="true" PackagePath="\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Remove="bin\**\*" />
+    <Compile Remove="obj\**\*" />
+    <Compile Remove="Properties\**\*" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Include="..\MonoGame.Framework\Platform\Utilities\CurrentPlatform.cs">
+      <Link>Utilities\CurrentPlatform.cs</Link>
+    </Compile>
+    <Compile Include="..\MonoGame.Framework\Utilities\Hash.cs">
+      <Link>Utilities\Hash.cs</Link>
+    </Compile>
+    <Compile Include="..\MonoGame.Framework\Utilities\ReflectionHelpers.cs">
+      <Link>Utilities\ReflectionHelpers.cs</Link>
+    </Compile>
+    <Compile Include="..\MonoGame.Framework\Platform\Utilities\AssemblyHelper.cs">
+      <Link>Utilities\AssemblyHelper.cs</Link>
+    </Compile>
+    <Compile Include="..\MonoGame.Framework\Platform\Utilities\ReflectionHelpers.Default.cs">
+      <Link>Utilities\ReflectionHelpers.Default.cs</Link>
+    </Compile>
+    <Compile Include="..\MonoGame.Framework\Graphics\GraphicsExtensions.cs">
+      <Link>Utilities\GraphicsExtensions.cs</Link>
+    </Compile>
+    <Compile Include="..\MonoGame.Framework\Content\ContentExtensions.cs">
+      <Link>Utilities\ContentExtensions.cs</Link>
+    </Compile>
+
+    <Compile Include="..\ThirdParty\StbImageSharp\src\**\*.cs" LinkBase="Utilities\StbImageSharp" />
+    <Compile Include="..\ThirdParty\StbImageWriteSharp\src\**\*.cs" LinkBase="Utilities\StbImageWriteSharp" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="CppNet">
+      <HintPath>..\ThirdParty\Dependencies\CppNet\CppNet.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\MonoGame.Framework\MonoGame.Framework.DesktopGL.csproj">
+      <PrivateAssets>All</PrivateAssets>
+    </ProjectReference>
+    <ProjectReference Include="..\Tools\MonoGame.Effect.Compiler\MonoGame.Effect.Compiler.csproj">
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+      <OutputItemType>Content</OutputItemType>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </ProjectReference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="AssimpNetter" Version="5.4.3.3" />
+    <PackageReference Include="BCnEncoder.Net" Version="2.1.0" />
+    <PackageReference Include="Microsoft.NETCore.App" Version="2.1.30" />
+    <PackageReference Include="MonoGame.Library.FreeImage" Version="3.18.0.3" />
+    <PackageReference Include="MonoGame.Library.FreeType" Version="2.13.2.2" />
+    <PackageReference Include="MonoGame.Tool.Basisu" Version="1.60.0.2" />
+    <PackageReference Include="MonoGame.Tool.Crunch" Version="1.0.4.4" />
+    <PackageReference Include="MonoGame.Tool.FFmpeg" Version="7.0.0.8" />
+    <PackageReference Include="MonoGame.Tool.FFprobe" Version="7.0.0.8" />
+    <PackageReference Include="SharpDX" Version="4.0.1" />
+    <PackageReference Include="SharpDX.D3DCompiler" Version="4.0.1" />
+    <PackageReference Include="LibKTX" Version="0.9.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="..\ThirdParty\Dependencies\CppNet\CppNet.dll" PackagePath="lib\net8.0" Visible="false">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\ThirdParty\Dependencies\MojoShader\Windows\libmojoshader_64.dll" Visible="false">
+      <PackagePath>runtimes\win-x64\native</PackagePath>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <PropertyGroup>
+    <!-- NuGet warns if we copy assemblies but don't reference them; we suppress those warnings. -->
+    <NoWarn>NU5100</NoWarn>
+  </PropertyGroup>
+
+  <Import Project="..\Switch\MonoGame.Framework.Content.Pipeline.targets" Condition="exists('..\Switch\MonoGame.Framework.Content.Pipeline.targets')" />
+  <Import Project="..\XBoxOne\MonoGame.Framework.Content.Pipeline.targets" Condition="exists('..\XBoxOne\MonoGame.Framework.Content.Pipeline.targets')" />
+  <Import Project="..\PlayStation4\MonoGame.Framework.Content.Pipeline.targets" Condition="exists('..\PlayStation4\MonoGame.Framework.Content.Pipeline.targets')" />
+  <Import Project="..\PlayStation5\MonoGame.Framework.Content.Pipeline.targets" Condition="exists('..\PlayStation5\MonoGame.Framework.Content.Pipeline.targets')" />
+  <Import Project="..\PSVita\MonoGame.Framework.Content.Pipeline.targets" Condition="exists('..\PSVita\MonoGame.Framework.Content.Pipeline.targets')" />
+  <Import Project="..\GDKX\MonoGame.Framework.Content.Pipeline.targets" Condition="exists('..\GDKX\MonoGame.Framework.Content.Pipeline.targets')" />
+
+</Project>

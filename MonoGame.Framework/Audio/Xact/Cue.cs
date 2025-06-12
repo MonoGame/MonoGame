@@ -1,4 +1,4 @@
-// MonoGame - Copyright (C) The MonoGame Team
+// MonoGame - Copyright (C) MonoGame Foundation, Inc
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
@@ -46,7 +46,7 @@ namespace Microsoft.Xna.Framework.Audio
             get 
             {
                 if (_curSound != null)
-                    return _curSound.Playing;
+                    return _curSound.Playing || _curSound.IsPaused;
 
                 return false;
             }
@@ -64,6 +64,8 @@ namespace Microsoft.Xna.Framework.Audio
             }
         }
 
+        /// <summary>Returns whether the cue is stopping playback.</summary>
+        /// <remarks>Current implementation will always return <see langword="false"/>.</remarks>
         public bool IsStopping
         {
             get
@@ -73,13 +75,24 @@ namespace Microsoft.Xna.Framework.Audio
             }
         }
 
+        /// <summary>Returns whether the cue is preparing to play.</summary>
+        /// <remarks>Current implementation will always return <see langword="false"/>.</remarks>
         public bool IsPreparing 
         {
             get { return false; }
         }
 
+        /// <summary>Returns whether the cue is prepared to play.</summary>
+        /// <remarks>
+        /// This property returns <see langword="true"/> only if the cue is prepared but has not yet been played.
+        /// Cues that are played return <see langword="true"/>
+        /// for <see cref="IsPlaying"/> if they are currently playing
+        /// or <see langword="true"/> for <see cref="IsStopped"/> if they are stopped.
+        /// </remarks>
         public bool IsPrepared { get; internal set; }
 
+        /// <summary>Returns whether the cue has been created.</summary>
+        /// <remarks>Current implementation will always return <see langword="false"/>.</remarks>
         public bool IsCreated { get; internal set; }
 
         /// <summary>Gets the friendly name of the cue.</summary>
@@ -255,7 +268,7 @@ namespace Microsoft.Xna.Framework.Audio
                     direction /= distance;
                 var right = Vector3.Cross(listener.Up, listener.Forward);
                 var slope = Vector3.Dot(direction, listener.Forward);
-                var angle = MathHelper.ToDegrees((float)Math.Acos(slope));
+                var angle = MathHelper.ToDegrees(MathF.Acos(slope));
                 var j = FindVariable("OrientationAngle");
                 _variables[j].SetValue(angle);
                 if (_curSound != null)

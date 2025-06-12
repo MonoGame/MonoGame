@@ -1,14 +1,16 @@
-// MonoGame - Copyright (C) The MonoGame Team
+// MonoGame - Copyright (C) MonoGame Foundation, Inc
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System;
 using System.IO;
-using Microsoft.Xna.Framework.Utilities;
-using MonoGame.Utilities;
+using MonoGame.Framework.Utilities;
 
 namespace Microsoft.Xna.Framework
 {
+    /// <summary>
+    /// Provides functionality for opening a stream in the title storage area.
+    /// </summary>
     public static partial class TitleContainer
     {
         static partial void PlatformInit();
@@ -22,10 +24,12 @@ namespace Microsoft.Xna.Framework
         static internal string Location { get; private set; }
 
         /// <summary>
-        /// Returns an open stream to an exsiting file in the title storage area.
+        /// Returns an open stream to an existing file in the title storage area.
         /// </summary>
         /// <param name="name">The filepath relative to the title storage area.</param>
-        /// <returns>A open stream or null if the file is not found.</returns>
+        /// <returns>An open stream if file is found.</returns>
+        /// <exception cref="ArgumentNullException">If name is null or invalid.</exception>
+        /// <exception cref="FileNotFoundException">If file is not found.</exception>
         public static Stream OpenStream(string name)
         {
             if (string.IsNullOrEmpty(name))
@@ -59,6 +63,30 @@ namespace Microsoft.Xna.Framework
             return stream;
         }
 
+        /// <summary>
+        /// Faster version of <see cref="OpenStream"/> as it doesn't rely on exceptions in error cases.
+        /// </summary>
+        internal static Stream OpenStreamNoException(string name)
+        {
+            if (string.IsNullOrEmpty(name) || Path.IsPathRooted(name))
+            {
+                return null;
+            }
+
+            string safeName = NormalizeRelativePath(name);
+            Stream stream;
+            try
+            {
+                stream = PlatformOpenStream(safeName);
+                
+                return stream;
+            }
+            catch (Exception ex)
+            {
+                return null;
+            }
+        }
+
         private static Exception FileNotFoundException(string name, Exception inner)
         {
             return new FileNotFoundException("Error loading \"" + name + "\". File not found.", inner);
@@ -66,7 +94,7 @@ namespace Microsoft.Xna.Framework
 
         internal static string NormalizeRelativePath(string name)
         {
-            var uri = new Uri("file:///" + name);
+            var uri = new Uri("file:///" + FileHelpers.UrlEncode(name));
             var path = uri.LocalPath;
             path = path.Substring(1);
             return path.Replace(FileHelpers.NotSeparator, FileHelpers.Separator);
