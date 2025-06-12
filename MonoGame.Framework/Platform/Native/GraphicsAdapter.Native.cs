@@ -7,7 +7,6 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Runtime.InteropServices;
-using System.Threading;
 
 namespace Microsoft.Xna.Framework.Graphics;
 
@@ -26,7 +25,7 @@ partial class GraphicsAdapter
                 break;
 
             MGG_GraphicsAdaptor_Info info;
-            MGG.GraphicsAdapter_GetInfo(handle, out info);
+            MGG.GraphicsAdapter_GetInfo(handle, &info);
 
             var adapter = new GraphicsAdapter();
             adapter.Handle = handle;

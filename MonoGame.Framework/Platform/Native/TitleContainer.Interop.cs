@@ -31,7 +31,7 @@ internal unsafe class ReadOnlyAssetStream : Stream
 
     public ReadOnlyAssetStream(string assetname)
     {
-        if (!MG.AssetOpen(assetname, out _asset, out _length))
+        if (MG.AssetOpen(assetname, out _asset, out _length) == 0)
             throw new FileNotFoundException("Asset not found", assetname);
     }
 
@@ -47,7 +47,9 @@ internal unsafe class ReadOnlyAssetStream : Stream
         if (count == 0)
             return 0;
 
-        var bytesRead = MG.AssetRead(_asset, buffer, count);
+        int bytesRead;
+        fixed (byte* b = buffer)
+            bytesRead = MG.AssetRead(_asset, b, count);
         _position += bytesRead;
 
         return bytesRead;
@@ -95,18 +97,17 @@ internal static unsafe partial class MG
 {
     public const string MonoGameNativeDLL = "monogame.native";
 
-    [LibraryImport(MonoGameNativeDLL, EntryPoint = "MG_Asset_Open", StringMarshalling = StringMarshalling.Utf8)]
-    [return: MarshalAs(UnmanagedType.U1)]
-    public static partial bool AssetOpen(string assetname, out MG_Asset* file, out long length);
+    [DllImport(MonoGameNativeDLL, EntryPoint = "MG_Asset_Open", ExactSpelling = true)]
+    public static extern byte AssetOpen(string assetname, out MG_Asset* file, out long length);
 
-    [LibraryImport(MonoGameNativeDLL, EntryPoint = "MG_Asset_Read", StringMarshalling = StringMarshalling.Utf8)]
-    public static partial int AssetRead(MG_Asset* file, byte[] buffer, int count);
+    [DllImport(MonoGameNativeDLL, EntryPoint = "MG_Asset_Read", ExactSpelling = true)]
+    public static extern int AssetRead(MG_Asset* file, byte* buffer, int count);
 
-    [LibraryImport(MonoGameNativeDLL, EntryPoint = "MG_Asset_Seek", StringMarshalling = StringMarshalling.Utf8)]
-    public static partial long AssetSeek(MG_Asset* file, long offset, int origin);
+    [DllImport(MonoGameNativeDLL, EntryPoint = "MG_Asset_Seek", ExactSpelling = true)]
+    public static extern long AssetSeek(MG_Asset* file, long offset, int origin);
 
-    [LibraryImport(MonoGameNativeDLL, EntryPoint = "MG_Asset_Close", StringMarshalling = StringMarshalling.Utf8)]
-    public static partial void AssetClose(MG_Asset* file);
+    [DllImport(MonoGameNativeDLL, EntryPoint = "MG_Asset_Close", ExactSpelling = true)]
+    public static extern void AssetClose(MG_Asset* file);
 
     public static Stream OpenRead(string path)
     {

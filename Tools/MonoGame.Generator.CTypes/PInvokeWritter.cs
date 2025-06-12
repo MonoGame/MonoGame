@@ -83,7 +83,7 @@ class PinvokeWritter
         if (!method.IsStatic)
             return false;
 
-        var import = method.GetCustomAttribute<LibraryImportAttribute>();
+        var import = method.GetCustomAttribute<DllImportAttribute>();
         if (import == null)
             return false;
 
@@ -110,7 +110,7 @@ class PinvokeWritter
 
     private void GenerateMethod(MethodInfo method)
     {
-        var import = method.GetCustomAttribute<LibraryImportAttribute>();
+        var import = method.GetCustomAttribute<DllImportAttribute>();
 
         var rtype = Util.GetCTypeOrEnum(method.ReturnType);
         var fname = import.EntryPoint ?? method.Name;

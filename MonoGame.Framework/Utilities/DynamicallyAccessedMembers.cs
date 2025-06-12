@@ -1,6 +1,6 @@
 // fake attribute for backward compatibility with .NET 4.5
 
-#if NET45
+#if !NET5_0_OR_GREATER
 namespace System.Diagnostics.CodeAnalysis
 {
     [Flags]

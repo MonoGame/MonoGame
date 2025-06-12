@@ -140,7 +140,7 @@ public partial class Texture2D : Texture
             MGI.ReadRGBA(
                 (byte*)handle.AddrOfPinnedObject(),
                 dataLength,
-                colorProcessor == null ? true : false,
+                (byte)(colorProcessor == null ? 1 : 0),
                 out width,
                 out height,
                 out rgba);
@@ -240,7 +240,7 @@ public partial class Texture2D : Texture
             MGI.ReadRGBA(
                 (byte*)handle.AddrOfPinnedObject(),
                 dataLength,
-                true,
+                1,
                 out width,
                 out height,
                 out rgba);

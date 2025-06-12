@@ -70,7 +70,9 @@ public sealed partial class SoundEffect
             unsafe
             {
                 Buffer = MGA.Buffer_Create(System);
-                MGA.Buffer_InitializeFormat(Buffer, headerData, waveData, waveData.Length, 0, 0);
+                fixed (byte* h = headerData)
+                fixed (byte* w = waveData)
+                    MGA.Buffer_InitializeFormat(Buffer, h, w, waveData.Length, 0, 0);
 
                 var milliseconds = MGA.Buffer_GetDuration(Buffer);
                 duration = TimeSpan.FromMilliseconds(milliseconds);
@@ -81,13 +83,16 @@ public sealed partial class SoundEffect
     private unsafe void PlatformInitializePcm(byte[] buffer, int offset, int count, int sampleBits, int sampleRate, AudioChannels channels, int loopStart, int loopLength)
     {
         Buffer = MGA.Buffer_Create(System);
-        MGA.Buffer_InitializePCM(Buffer, buffer, offset, count, sampleBits, sampleRate, (int)channels, loopStart, loopLength);
+        fixed (byte* b = buffer)
+            MGA.Buffer_InitializePCM(Buffer, b, offset, count, sampleBits, sampleRate, (int)channels, loopStart, loopLength);
     }
 
     private unsafe void PlatformInitializeFormat(byte[] header, byte[] buffer, int bufferSize, int loopStart, int loopLength)
     {
         Buffer = MGA.Buffer_Create(System);
-        MGA.Buffer_InitializeFormat(Buffer, header, buffer, bufferSize, loopStart, loopLength);
+        fixed (byte* h = header)
+        fixed (byte* b = buffer)
+            MGA.Buffer_InitializeFormat(Buffer, h, b, bufferSize, loopStart, loopLength);
     }
 
     // TODO: This should go away after we move to FAudio's Xact implementation.
@@ -97,7 +102,8 @@ public sealed partial class SoundEffect
         // Xact sound handling as PCM is already handled.
 
         Buffer = MGA.Buffer_Create(System);
-        MGA.Buffer_InitializeXact(Buffer, (uint)codec, buffer, buffer.Length, sampleRate, blockAlignment, channels, loopStart, loopLength);
+        fixed (byte* b = buffer)
+            MGA.Buffer_InitializeXact(Buffer, (uint)codec, b, buffer.Length, sampleRate, blockAlignment, channels, loopStart, loopLength);
 
         var milliseconds = MGA.Buffer_GetDuration(Buffer);
         duration = TimeSpan.FromMilliseconds(milliseconds);
@@ -154,6 +160,6 @@ public sealed partial class SoundEffect
             WetDryMixPct = reverbSettings.WetDryMixPct
         };
 
-        MGA.System_SetReverbSettings(System, in settings);
+        MGA.System_SetReverbSettings(System, &settings);
     }
 }

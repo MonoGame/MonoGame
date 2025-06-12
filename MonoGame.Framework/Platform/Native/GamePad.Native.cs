@@ -223,6 +223,6 @@ static partial class GamePad
         if (!_stateByIndex.TryGetValue(index, out var state))
             return false;
 
-        return MGP.GamePad_SetVibration(Handle, state.Identifier, leftMotor, rightMotor, leftTrigger, rightTrigger);
+        return MGP.GamePad_SetVibration(Handle, state.Identifier, leftMotor, rightMotor, leftTrigger, rightTrigger) == 0 ? false : true;
     }
 }

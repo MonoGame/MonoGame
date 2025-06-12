@@ -118,7 +118,7 @@ namespace MonoGame.Tools.Pipeline
 
             _templateItems = new List<ContentItemTemplate>();
 #if MAC
-            var root = Path.GetDirectoryName(System.AppContext.BaseDirectory) ?? "";
+            var root = Path.Combine(Path.GetDirectoryName(System.AppContext.BaseDirectory) ?? "", "Resources");
 #else
             var root = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ?? "";
 #endif
