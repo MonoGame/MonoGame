@@ -13,11 +13,38 @@ namespace MonoGame.Content.Builder
 {
     class Program
     {
+        class AssertListener : TraceListener
+        {
+            public override void Write(string message)
+            {
+                Console.Write(message);
+            }
+
+            public override void WriteLine(string message)
+            {
+                Console.WriteLine(message);
+            }
+
+            public override void Fail(string message, string detailMessage)
+            {
+                Console.WriteLine(message);
+
+                if (!string.IsNullOrEmpty(detailMessage))
+                    Console.WriteLine(detailMessage);
+            }
+        }
+
         static int Main(string[] args)
         {
             // We force all stderr to redirect to stdout
             // to avoid any out of order console output.
             Console.SetError(Console.Out);
+
+            // Hook in our own trace listener so that errors
+            // from asserts appear in the output logging instead
+            // of having silent failures.
+            Trace.Listeners.Clear();
+            Trace.Listeners.Add(new AssertListener());
 
             if (!Environment.Is64BitProcess && Environment.OSVersion.Platform != PlatformID.Unix)
             {
@@ -27,10 +54,12 @@ namespace MonoGame.Content.Builder
 
             var content = new BuildContent();
 
+            var versionString = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version;
+
             // Parse the command line.
             var parser = new MGBuildParser(content)
             {
-                Title = "MonoGame Content Builder\n" +
+                Title = $"MonoGame Content Builder: v{versionString}\n" +
                         "Builds optimized game content for MonoGame projects."
             };
 

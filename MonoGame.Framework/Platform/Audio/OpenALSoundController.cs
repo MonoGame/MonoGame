@@ -92,8 +92,6 @@ namespace Microsoft.Xna.Framework.Audio
         private const int DEFAULT_FREQUENCY = 48000;
         private const int DEFAULT_UPDATE_SIZE = 512;
         private const int DEFAULT_UPDATE_BUFFER_COUNT = 2;
-#elif DESKTOPGL
-        private static OggStreamer _oggstreamer;
 #endif
         private List<int> availableSourcesCollection;
         private List<int> inUseSourcesCollection;
@@ -102,6 +100,8 @@ namespace Microsoft.Xna.Framework.Audio
         public bool SupportsAdpcm { get; private set; }
         public bool SupportsEfx { get; private set; }
         public bool SupportsIeee { get; private set; }
+
+        public bool SupportsStereoAngles { get; private set;}
 
         /// <summary>
         /// Sets up the hardware resources used by the controller.
@@ -118,6 +118,8 @@ namespace Microsoft.Xna.Framework.Audio
 
             if (Alc.IsExtensionPresent(_device, "ALC_EXT_CAPTURE"))
                 Microphone.PopulateCaptureDevices();
+
+            SupportsStereoAngles = AL.IsExtensionPresent ("AL_EXT_STEREO_ANGLES");
 
             // We have hardware here and it is ready
 
@@ -193,7 +195,7 @@ namespace Microsoft.Xna.Framework.Audio
                 int frequency = DEFAULT_FREQUENCY;
                 int updateSize = DEFAULT_UPDATE_SIZE;
                 int updateBuffers = DEFAULT_UPDATE_BUFFER_COUNT;
-                if (Android.OS.Build.VERSION.SdkInt >= Android.OS.BuildVersionCodes.JellyBeanMr1)
+                if (OperatingSystem.IsAndroidVersionAtLeast(17))
                 {
                     Android.Util.Log.Debug("OAL", Game.Activity.PackageManager.HasSystemFeature(PackageManager.FeatureAudioLowLatency) ? "Supports low latency audio playback." : "Does not support low latency audio playback.");
 
@@ -210,7 +212,7 @@ namespace Microsoft.Xna.Framework.Audio
 
                     // If 4.4 or higher, then we don't need to double buffer on the application side.
                     // See http://stackoverflow.com/a/15006327
-                    if (Android.OS.Build.VERSION.SdkInt >= Android.OS.BuildVersionCodes.Kitkat)
+                    if (OperatingSystem.IsAndroidVersionAtLeast (19))
                     {
                         updateBuffers = 1;
                     }
@@ -266,9 +268,6 @@ namespace Microsoft.Xna.Framework.Audio
 #endif
 
                 _context = Alc.CreateContext(_device, attribute);
-#if DESKTOPGL
-                _oggstreamer = new OggStreamer();
-#endif
 
                 AlcHelper.CheckError("Could not create OpenAL context");
 
@@ -382,10 +381,6 @@ namespace Microsoft.Xna.Framework.Audio
             {
                 if (disposing)
                 {
-#if DESKTOPGL
-                    if(_oggstreamer != null)
-                        _oggstreamer.Dispose();
-#endif
                     for (int i = 0; i < allSourcesArray.Length; i++)
                     {
                         AL.DeleteSource(allSourcesArray[i]);

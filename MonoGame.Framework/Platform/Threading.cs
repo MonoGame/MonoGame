@@ -43,7 +43,9 @@ namespace Microsoft.Xna.Framework
             {
                 var item = Queue.Dequeue();
                 item.Action.Invoke(item.State);
-                item.ResetEvent.Set();
+
+                if (item.ResetEvent != null)
+                    item.ResetEvent.Set();
             }
 
             public struct QueuedAction
@@ -147,6 +149,41 @@ namespace Microsoft.Xna.Framework
                 ReturnResetEvent(resetEvent);
             }
 #endif
+        }
+
+        /// <summary>
+        /// Queues the action to occur on the UI thread and returns immediately.
+        /// </summary>
+        /// <param name="action">The action to be run on the UI thread</param>
+        internal static void OnUIThread(Action action)
+        {
+            if (action == null)
+                throw new ArgumentNullException("action");
+
+            OnUIThread(_metaAction, action);
+        }
+
+        /// <summary>
+        /// Queues the action to occur on the UI thread and returns immediately.
+        /// </summary>
+        /// <param name="action">The action to be run on the UI thread</param>
+        /// <param name="state">The data to pass to <paramref name="action"/></param>.
+        internal static void OnUIThread<TState>(Action<TState> action, TState state = default)
+        {
+            if (action == null)
+                throw new ArgumentNullException("action");
+
+            var queuedAction = new StateActionHelper<TState>.QueuedAction
+            {
+                Action = action,
+                State = state
+            };
+
+            lock (_queuedActions)
+            {
+                StateActionHelper<TState>.Queue.Enqueue(queuedAction);
+                _queuedActions.Add(StateActionHelper<TState>.DequeueAction);
+            }
         }
 
         static ManualResetEventSlim RentResetEvent()

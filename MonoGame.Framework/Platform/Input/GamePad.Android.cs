@@ -2,6 +2,8 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
+using System;
+using Android.OS;
 using Android.Views;
 
 namespace Microsoft.Xna.Framework.Input
@@ -35,10 +37,13 @@ namespace Microsoft.Xna.Framework.Input
             var capabilities = new GamePadCapabilities();
             capabilities.IsConnected = true;
             capabilities.GamePadType = GamePadType.GamePad;
-            capabilities.HasLeftVibrationMotor = capabilities.HasRightVibrationMotor = device.Vibrator.HasVibrator;
+            capabilities.HasLeftVibrationMotor = capabilities.HasRightVibrationMotor =
+                !OperatingSystem.IsAndroidVersionAtLeast (31) ?
+                    device.Vibrator.HasVibrator :
+                    device.VibratorManager.DefaultVibrator.HasVibrator;
 
             // build out supported inputs from what the gamepad exposes
-            int[] keyMap = new int[16];
+            int[] keyMap = new int[17];
             keyMap[0] = (int)Keycode.ButtonA;
             keyMap[1] = (int)Keycode.ButtonB;
             keyMap[2] = (int)Keycode.ButtonX;
@@ -58,12 +63,14 @@ namespace Microsoft.Xna.Framework.Input
             keyMap[13] = (int)Keycode.DpadUp;
 
             keyMap[14] = (int)Keycode.ButtonStart;
-            keyMap[15] = (int)Keycode.Back;
+            keyMap[15] = (int)Keycode.ButtonSelect;
+
+            keyMap[16] = (int)Keycode.ButtonMode;
 
             // get a bool[] with indices matching the keyMap
             bool[] hasMap = new bool[16];
             // HasKeys() was defined in Kitkat / API19 / Android 4.4
-            if (Android.OS.Build.VERSION.SdkInt < Android.OS.BuildVersionCodes.Kitkat)
+            if (!OperatingSystem.IsAndroidVersionAtLeast(19))
             {
                 var keyMap2 = new Keycode[keyMap.Length];
                 for(int i=0; i<keyMap.Length;i++)
@@ -85,8 +92,11 @@ namespace Microsoft.Xna.Framework.Input
             // this will need fixing
             capabilities.HasLeftXThumbStick = hasMap[4];
             capabilities.HasLeftYThumbStick = hasMap[4];
+            capabilities.HasLeftStickButton = hasMap[4];
+
             capabilities.HasRightXThumbStick = hasMap[5];
             capabilities.HasRightYThumbStick = hasMap[5];
+            capabilities.HasRightStickButton = hasMap[5];
 
             capabilities.HasLeftShoulderButton = hasMap[6];
             capabilities.HasRightShoulderButton = hasMap[7];
@@ -100,6 +110,8 @@ namespace Microsoft.Xna.Framework.Input
 
             capabilities.HasStartButton = hasMap[14];
             capabilities.HasBackButton = hasMap[15];
+
+            capabilities.DisplayName = device.Name;
 
             return capabilities;
         }
@@ -135,41 +147,43 @@ namespace Microsoft.Xna.Framework.Input
 
         private static GamePadState PlatformGetState(int index, GamePadDeadZone leftDeadZoneMode, GamePadDeadZone rightDeadZoneMode)
         {
+            if (index < 0 || index >= GamePads.Length)
+                return GamePadState.Default;
+
             var gamePad = GamePads[index];
-            GamePadState state = GamePadState.Default;
-            if (gamePad != null && gamePad._isConnected)
+
+            if (gamePad == null || !gamePad._isConnected)
             {
-                // Check if the device was disconnected
-                var dvc = InputDevice.GetDevice(gamePad._deviceId);
-                if (dvc == null)
-                {
-                    Android.Util.Log.Debug("MonoGame", "Detected controller disconnect [" + index + "] ");
-                    gamePad._isConnected = false;
-                    return state;
-                }
-
-                GamePadThumbSticks thumbSticks = new GamePadThumbSticks(gamePad._leftStick, gamePad._rightStick, leftDeadZoneMode, rightDeadZoneMode);
-
-                state = new GamePadState(
-                    thumbSticks,
-                    new GamePadTriggers(gamePad._leftTrigger, gamePad._rightTrigger),
-                    new GamePadButtons(gamePad._buttons),
-                    new GamePadDPad(gamePad._buttons));
-            }
-            // we need to add the default "no gamepad connected but the user hit back"
-            // behaviour here
-            else {
                 if (index == 0 && Back)
                 {
-                    // Consume state
-                    state = new GamePadState(new GamePadThumbSticks(), new GamePadTriggers(), new GamePadButtons(Buttons.Back), new GamePadDPad());
-                    state.IsConnected = false;
+                    Back = false;
+
+                    return new GamePadState(
+                        new GamePadThumbSticks(),
+                        new GamePadTriggers(),
+                        new GamePadButtons(Buttons.Back),
+                        new GamePadDPad())
+                    {
+                        IsConnected = false
+                    };
                 }
-                else
-                    state = new GamePadState();
+
+                return GamePadState.Default;
             }
 
-            return state;
+            var dvc = InputDevice.GetDevice(gamePad._deviceId);
+            if (dvc == null)
+            {
+                Android.Util.Log.Debug("MonoGame", $"Detected controller disconnect [{index}]");
+                gamePad._isConnected = false;
+                return GamePadState.Default;
+            }
+
+            return new GamePadState(
+                new GamePadThumbSticks(gamePad._leftStick, gamePad._rightStick, leftDeadZoneMode, rightDeadZoneMode),
+                new GamePadTriggers(gamePad._leftTrigger, gamePad._rightTrigger),
+                new GamePadButtons(gamePad._buttons),
+                new GamePadDPad(gamePad._buttons));
         }
 
         private static bool PlatformSetVibration(int index, float leftMotor, float rightMotor, float leftTrigger, float rightTrigger)
@@ -178,10 +192,17 @@ namespace Microsoft.Xna.Framework.Input
             if (gamePad == null)
                 return false;
 
-            var vibrator = gamePad._device.Vibrator;
+            var vibrator = !OperatingSystem.IsAndroidVersionAtLeast (31) ? gamePad._device.Vibrator : gamePad._device.VibratorManager.DefaultVibrator;
             if (!vibrator.HasVibrator)
                 return false;
-            vibrator.Vibrate(500);
+            if (!OperatingSystem.IsAndroidVersionAtLeast (26))
+            {
+                vibrator.Vibrate(500);
+            }
+            else
+            {
+                vibrator.Vibrate (VibrationEffect.CreateOneShot(500, VibrationEffect.DefaultAmplitude));
+            }
             return true;
         }
 
@@ -271,7 +292,26 @@ namespace Microsoft.Xna.Framework.Input
             gamePad._leftTrigger = e.GetAxisValue(Axis.Brake);
             gamePad._rightTrigger = e.GetAxisValue(Axis.Gas);
 
-            if(!gamePad.DPadButtons)
+            // We set the Trigger buttons here, because it never fires in OnKeyDown
+            if (gamePad._leftTrigger > 0f)
+            {
+                gamePad._buttons |= Buttons.LeftTrigger;
+            }
+            else
+            {
+                gamePad._buttons &= ~Buttons.LeftTrigger;
+            }
+
+            if (gamePad._rightTrigger > 0f)
+            {
+                gamePad._buttons |= Buttons.RightTrigger;
+            }
+            else
+            {
+                gamePad._buttons &= ~Buttons.RightTrigger;
+            }
+
+            if (!gamePad.DPadButtons)
             {
                 if(e.GetAxisValue(Axis.HatX) < 0)
                 {
@@ -347,7 +387,7 @@ namespace Microsoft.Xna.Framework.Input
 
                 case Keycode.ButtonStart:
                     return Buttons.Start;
-                case Keycode.Back:
+                case Keycode.ButtonSelect:
                     return Buttons.Back;
             }
 

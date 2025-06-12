@@ -581,8 +581,8 @@ namespace MonoGame.Tests.ContentPipeline
         }
 
         [Test]
-#if DESKTOPGL
-        [Ignore("Fails on Mac build server some reason.")]
+#if MACOS && CI
+         [Ignore("Fails on Mac build server some reason.")]
 #endif
         public void Colors()
         {

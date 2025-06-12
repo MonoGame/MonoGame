@@ -17,10 +17,7 @@ namespace MonoGame.Tests.Framework
             get { throw new NotImplementedException(); }
         }
 
-        // TODO: Make this common so that all platforms have it!
-#if WINDOWS || DESKTOPGL
         public override Point Position { get; set; }
-#endif
 
         public override DisplayOrientation CurrentOrientation
         {

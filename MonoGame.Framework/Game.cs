@@ -613,9 +613,9 @@ namespace Microsoft.Xna.Framework
 
                 if (!exitingEventArgs.Cancel)
                 {
+                    UnloadContent();
                     Platform.Exit();
                     EndRun();
-                    UnloadContent();
                 }
 
                 _shouldExit = false;
@@ -672,7 +672,7 @@ namespace Microsoft.Xna.Framework
         protected virtual void Initialize()
         {
             // TODO: This should be removed once all platforms use the new GraphicsDeviceManager
-#if !(WINDOWS && DIRECTX)
+#if !(WINDOWS && DIRECTX) && !NATIVE
             applyChanges(graphicsDeviceManager);
 #endif
 
@@ -791,7 +791,7 @@ namespace Microsoft.Xna.Framework
         //        break entirely the possibility that additional platforms could
         //        be added by third parties without changing MonoGame itself.
 
-#if !(WINDOWS && DIRECTX)
+#if !(WINDOWS && DIRECTX) && !NATIVE
         internal void applyChanges(GraphicsDeviceManager manager)
         {
 			Platform.BeginScreenDeviceChange(GraphicsDevice.PresentationParameters.IsFullScreen);

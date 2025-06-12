@@ -9,6 +9,11 @@
     <IsPackable>false</IsPackable>
     <GenerateProgramFile>false</GenerateProgramFile>
     <DefineConstants>DESKTOPGL</DefineConstants>
+    <DefineConstants Condition=" $([MSBuild]::IsOsPlatform('osx')) " >$(DefineConstants);MACOS</DefineConstants>
+    <DefineConstants Condition=" $([MSBuild]::IsOsPlatform('windows')) " >$(DefineConstants);WINDOWS</DefineConstants>
+    <DefineConstants Condition=" $([MSBuild]::IsOsPlatform('linux')) " >$(DefineConstants);LINUX</DefineConstants>
+    <!-- We can check if an environment variable is set using MSBuild properties. -->
+    <DefineConstants Condition=" '$(CI)' != '' " >$(DefineConstants);CI</DefineConstants>
     <BaseOutputPath>..\..\Artifacts\Tests\Tools</BaseOutputPath>
     <AppendTargetFrameworkToOutputPath>False</AppendTargetFrameworkToOutputPath>
     <UseAppHost>true</UseAppHost>
@@ -22,7 +27,11 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\MonoGame.Framework\MonoGame.Framework.DesktopGL.csproj" />
-    <ProjectReference Include="..\..\MonoGame.Framework.Content.Pipeline\MonoGame.Framework.Content.Pipeline.csproj" />
+    <ProjectReference Include="..\..\MonoGame.Framework.Content.Pipeline\MonoGame.Framework.Content.Pipeline.csproj">
+      <AdditionalProperties>DisableMonoGameToolAssets=False</AdditionalProperties>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Tools\MonoGame.Content.Builder\MonoGame.Content.Builder.csproj" />
+    <ProjectReference Include="..\..\Tools\MonoGame.Effect.Compiler\MonoGame.Effect.Compiler.csproj" ReferenceOutputAssembly="false" />
   </ItemGroup>
 
   <ItemGroup>
@@ -1078,6 +1087,16 @@
     </Content>
     <Content Update="..\..\MonoGame.Framework\Platform\Graphics\Effect\Resources\Structures.fxh">
       <Link>Assets\Effects\Stock\Structures.fxh</Link>
+    </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="..\MonoGame.Content.Builder.Task\MonoGame.Content.Builder.Task.targets">
+      <Link>MonoGame.Content.Builder.Task.targets</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\\MonoGame.Content.Builder.Task\MonoGame.Content.Builder.Task.props">
+      <Link>MonoGame.Content.Builder.Task.props</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
 </Project>

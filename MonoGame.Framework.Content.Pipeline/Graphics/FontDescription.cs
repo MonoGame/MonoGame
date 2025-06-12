@@ -159,7 +159,10 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
                 }
             }
         }
-		
+
+        /// <summary>
+        /// Retrieves the set of characters to include in the processor output.
+        /// </summary>
 	    [ContentSerializerIgnore]
 	    public ICollection<char> Characters
 	    {

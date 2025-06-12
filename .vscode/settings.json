@@ -1,0 +1,6 @@
+{
+    "dotnetCoreExplorer.searchpatterns": [
+        "Artifacts/Tests/**/MonoGame.Tests.dll",
+        "Artifacts/Tests/**/MonoGame.Tools.Tests.dll"
+    ]
+}

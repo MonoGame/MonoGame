@@ -2,6 +2,7 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
+using System;
 using System.Collections.Generic;
 
 namespace Microsoft.Xna.Framework.Input
@@ -95,14 +96,6 @@ namespace Microsoft.Xna.Framework.Input
 
         internal KeyboardState(List<Keys> keys, bool capsLock = false, bool numLock = false) : this()
         {
-            _keys0 = 0;
-            _keys1 = 0;
-            _keys2 = 0;
-            _keys3 = 0;
-            _keys4 = 0;
-            _keys5 = 0;
-            _keys6 = 0;
-            _keys7 = 0;
             _modifiers = (byte)(0 | (capsLock ? CapsLockModifier : 0) | (numLock ? NumLockModifier : 0));
 
             if (keys != null)
@@ -118,14 +111,6 @@ namespace Microsoft.Xna.Framework.Input
         /// <param name="numLock">Num Lock state.</param>
         public KeyboardState(Keys[] keys, bool capsLock = false, bool numLock = false) : this()
         {
-            _keys0 = 0;
-            _keys1 = 0;
-            _keys2 = 0;
-            _keys3 = 0;
-            _keys4 = 0;
-            _keys5 = 0;
-            _keys6 = 0;
-            _keys7 = 0;
             _modifiers = (byte)(0 | (capsLock ? CapsLockModifier : 0) | (numLock ? NumLockModifier : 0));
 
             if (keys != null)
@@ -139,16 +124,6 @@ namespace Microsoft.Xna.Framework.Input
         /// <param name="keys">List of keys to be flagged as pressed on initialization.</param>
         public KeyboardState(params Keys[] keys) : this()
         {
-            _keys0 = 0;
-            _keys1 = 0;
-            _keys2 = 0;
-            _keys3 = 0;
-            _keys4 = 0;
-            _keys5 = 0;
-            _keys6 = 0;
-            _keys7 = 0;
-            _modifiers = 0;
-
             if (keys != null)
                 foreach (Keys k in keys)
                     InternalSetKey(k);

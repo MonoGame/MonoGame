@@ -10,7 +10,7 @@ namespace MonoGame.Framework.Utilities
     public enum GraphicsBackend
     {
         /// <summary>
-        /// Represents the Microsoft DirectX graphics backend.
+        /// Represents the Microsoft DirectX 11 graphics backend.
         /// </summary>
         DirectX,
 
@@ -27,6 +27,11 @@ namespace MonoGame.Framework.Utilities
         /// <summary>
         /// Represents the Apple Metal graphics backend.
         /// </summary>
-        Metal
+        Metal,
+
+        /// <summary>
+        /// Represents the Microsoft DirectX 12 graphics backend. (GDKX only for now)
+        /// </summary>
+        DirectX12
     }
 }

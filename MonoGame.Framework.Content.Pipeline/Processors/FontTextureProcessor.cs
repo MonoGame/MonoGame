@@ -10,25 +10,43 @@ using Microsoft.Xna.Framework.Content.Pipeline.Graphics;
 
 namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
 {
+    /// <summary>
+    /// Class to provide methods to handle processing of font textures.
+    /// </summary>
     [ContentProcessorAttribute(DisplayName = "Font Texture - MonoGame")]
     public class FontTextureProcessor : ContentProcessor<Texture2DContent, SpriteFontContent>
     {
         private Color transparentPixel = Color.Magenta;
 
+        /// <summary>
+        /// Gets or sets the first character of the font.
+        /// </summary>
         [DefaultValue(' ')]
         public virtual char FirstCharacter { get; set; }
 
+        /// <summary>
+        /// Gets or sets the flag that indicates if the alpha channel should be premultiplied.
+        /// </summary>
         [DefaultValue(true)]
         public virtual bool PremultiplyAlpha { get; set; }
 
+        /// <inheritdoc cref="TextureProcessorOutputFormat"/>
         public virtual TextureProcessorOutputFormat TextureFormat { get; set; }
 
+        /// <summary>
+        /// Creates a new FontTextureProcessor.
+        /// </summary>
         public FontTextureProcessor()
         {
             FirstCharacter = ' ';
             PremultiplyAlpha = true;
         }
 
+        /// <summary>
+        /// Gets the character for the specified index relative to the first character.
+        /// </summary>
+        /// <param name="index">Character index.</param>
+        /// <returns>Character at index.</returns>
         protected virtual char GetCharacterForIndex(int index)
         {
             return (char)(((int)FirstCharacter) + index);
@@ -86,6 +104,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
             return glyphs;
         }
 
+        /// <inheritdoc/>
         public override SpriteFontContent Process(Texture2DContent input, ContentProcessorContext context)
         {
             var output = new SpriteFontContent();

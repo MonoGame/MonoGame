@@ -3,6 +3,7 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -13,6 +14,7 @@ using Microsoft.Xna.Framework.Graphics;
 using MonoGame.Tests.Components;
 using MonoGame.Tests.Utilities;
 using NUnit.Framework;
+using NUnit.Framework.Internal;
 
 namespace MonoGame.Tests.Graphics
 {
@@ -162,7 +164,7 @@ namespace MonoGame.Tests.Graphics
             var referenceImageDirectory = Paths.ReferenceImage(folderName);
             var outputDirectory = Paths.CapturedFrame(folderName);
             var fileName = TestContext.CurrentContext.GetTestFrameFileNameFormat(_totalFramesExpected);
-            var capturedImagePath = Path.Combine(outputDirectory, fileName);
+            var capturedImagePath = Path.Combine(TestContext.CurrentContext.TestDirectory, outputDirectory, fileName);
             var referenceImagePath = Path.Combine(referenceImageDirectory, fileName);
             
             var allResults = new List<FrameComparisonResult>();

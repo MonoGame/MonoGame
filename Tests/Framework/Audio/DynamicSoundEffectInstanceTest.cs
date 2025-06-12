@@ -11,6 +11,7 @@ using NUnit.Framework;
 
 namespace MonoGame.Tests.Audio
 {
+    [Category("Audio")]
     class DynamicSoundEffectInstanceTest
     {
         [SetUp]

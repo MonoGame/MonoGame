@@ -49,6 +49,9 @@ namespace Microsoft.Xna.Framework.Content
             'O', // XboxOne
             'S', // Nintendo Switch
             'b', // WebAssembly and Bridge.NET
+            'V', // DesktopVK
+            'G', // Windows GDK
+            's', // Xbox Series
 
             // NOTE: There are additional identifiers for consoles that
             // are not defined in this repository.  Be sure to ask the
@@ -67,6 +70,7 @@ namespace Microsoft.Xna.Framework.Content
             'l', // Linux
         };
 
+        private static readonly string[] supportedTexture2DExtensions = new string[] { ".png", ".jpg", ".jpeg", ".bmp" };
 
         static partial void PlatformStaticInit();
 
@@ -145,7 +149,7 @@ namespace Microsoft.Xna.Framework.Content
         /// </summary>
         /// <remarks>
         ///     <para>
-        ///         By default, the ContentMangaer searches for content in the directory where the executable is located.
+        ///         By default, the ContentManager searches for content in the directory where the executable is located.
         ///     </para>
         ///     <para>
         ///         When creating a new ContentManager, if no instance of <see cref="Game"/> is otherwise required by
@@ -167,6 +171,7 @@ namespace Microsoft.Xna.Framework.Content
 		}
 
         /// <inheritdoc cref="ContentManager.ContentManager(IServiceProvider)"/>
+        /// <param name="serviceProvider"/>
         /// <param name="rootDirectory">The root directory the ContentManager will search for content in.</param>
         public ContentManager(IServiceProvider serviceProvider, string rootDirectory)
 		{
@@ -230,8 +235,8 @@ namespace Microsoft.Xna.Framework.Content
         ///         The type of asset to load.
         ///     </para>
         ///     <para>
-        ///         <see cref="Effect"/>, <see cref="Model"/>, <see cref="SoundEffect"/>,
-        ///         <see cref="Song"/>, <see cref="SpriteFont"/>, <see cref="Texture"/>, <see cref="Texture2D"/>,
+        ///         <see cref="Effect"/>, <see cref="Model"/>, <see cref="Audio.SoundEffect"/>,
+        ///         <see cref="Media.Song"/>, <see cref="SpriteFont"/>, <see cref="Texture"/>, <see cref="Texture2D"/>,
         ///         and <see cref="TextureCube"/> are all supported by default by the standard Content Pipeline
         ///         processor, but additional types may be loaded by extending the processor.
         ///     </para>
@@ -292,15 +297,16 @@ namespace Microsoft.Xna.Framework.Content
         /// <remarks>
         /// Before a ContentManager can load an asset, you need to add the asset to your game project using
         /// the steps described in
-        /// <see href="https://docs.monogame.net/articles/getting_started/content_pipeline/index.html">Adding Content - MonoGame</see>.
+        /// <see href="https://docs.monogame.net/articles/getting_started/content_pipeline/index.html">Adding Content - MonoGame</see>. <br/>
+        /// PNG, JPG/JPEG and BMP files can be loaded as Texture2D without using the content pipeline. The assetName must not contain extension.
         /// </remarks>
         /// <typeparam name="T">
         ///     <para>
         ///         The type of asset to load.
         ///     </para>
         ///     <para>
-        ///         <see cref="Effect"/>, <see cref="Model"/>, <see cref="SoundEffect"/>,
-        ///         <see cref="Song"/>, <see cref="SpriteFont"/>, <see cref="Texture"/>, <see cref="Texture2D"/>,
+        ///         <see cref="Effect"/>, <see cref="Model"/>, <see cref="Audio.SoundEffect"/>,
+        ///         <see cref="Media.Song"/>, <see cref="SpriteFont"/>, <see cref="Texture"/>, <see cref="Texture2D"/>,
         ///         and <see cref="TextureCube"/> are all supported by default by the standard Content Pipeline
         ///         processor, but additional types may be loaded by extending the processor.
         ///     </para>
@@ -341,6 +347,10 @@ namespace Microsoft.Xna.Framework.Content
             {
                 throw new ObjectDisposedException("ContentManager");
             }
+            if (Path.IsPathRooted(assetName))
+            {
+                throw new ContentLoadException("assetName '" + assetName + "' cannot be a rooted (absolute) path. Remove any leading drive letters (e.g. 'C:'), forward slashes or backslashes");
+            }
 
             T result = default(T);
 
@@ -364,8 +374,8 @@ namespace Microsoft.Xna.Framework.Content
 
             // Load the asset.
             result = ReadAsset<T>(assetName, null);
-
             loadedAssets[key] = result;
+
             return result;
 		}
 
@@ -375,7 +385,7 @@ namespace Microsoft.Xna.Framework.Content
 			Stream stream;
 			try
             {
-                var assetPath = Path.Combine(RootDirectory, assetName) + ".xnb";
+                string assetPath = Path.Combine(RootDirectory, assetName) + ".xnb";
 
                 // This is primarily for editor support.
                 // Setting the RootDirectory to an absolute path is useful in editor
@@ -400,7 +410,6 @@ namespace Microsoft.Xna.Framework.Content
 			{
 				throw new ContentLoadException("The content file was not found.", fileNotFound);
 			}
-
 			catch (DirectoryNotFoundException directoryNotFound)
 			{
 				throw new ContentLoadException("The directory was not found.", directoryNotFound);
@@ -409,6 +418,7 @@ namespace Microsoft.Xna.Framework.Content
 			{
 				throw new ContentLoadException("Opening stream error.", exception);
 			}
+
 			return stream;
 		}
 
@@ -427,20 +437,56 @@ namespace Microsoft.Xna.Framework.Content
 			string originalAssetName = assetName;
 			object result = null;
 
-            // Try to load as XNB file
-            var stream = OpenStream(assetName);
-            using (var xnbReader = new BinaryReader(stream))
+            try
             {
-                using (var reader = GetContentReaderFromXnb(assetName, stream, xnbReader, recordDisposableObject))
+                // Try to load as XNB file
+                var stream = OpenStream(assetName);
+                using (var xnbReader = new BinaryReader(stream))
                 {
-                    result = reader.ReadAsset<T>();
-                    if (result is GraphicsResource)
-                        ((GraphicsResource)result).Name = originalAssetName;
+                    using (var reader = GetContentReaderFromXnb(assetName, stream, xnbReader, recordDisposableObject))
+                    {
+                        result = reader.ReadAsset<T>();
+                        if (result is GraphicsResource)
+                        {
+                            ((GraphicsResource)result).Name = originalAssetName;
+                        }
+                    }
                 }
+            }
+            catch (ContentLoadException ex)
+            {
+                // If the file is not found, we try searching a file with differents extensions
+                // based on the type of asset searched (e.g. '.bmp' and '.png' for a Texture2D)
+                if (ex.InnerException != null &&
+                    (ex.InnerException is FileNotFoundException ||
+                    ex.InnerException is DirectoryNotFoundException))
+                {
+                    // only try if an image file exist to avoid loosing the original error
+                    if (typeof(Texture2D).IsAssignableFrom(typeof(T)) &&
+                        ImageFileExists(assetName))
+                    {
+                        try
+                        {
+                            result = LoadTexture2DFromImageFile(assetName);
+                        }
+                        catch (Exception e)
+                        {
+                            throw new ContentLoadException("Could not load image file of " + originalAssetName + " asset!", e);
+                        }
+                    }
+                    // no alternaive file, rethrow original error as-is
+                    else
+                        throw;
+                }
+                // if it's a different exception, rethrow it as-is
+                else
+                    throw;
             }
 
 			if (result == null)
+            {
 				throw new ContentLoadException("Could not load " + originalAssetName + " asset!");
+            }
 
 			return (T)result;
 		}
@@ -497,6 +543,61 @@ namespace Microsoft.Xna.Framework.Content
                                                         originalAssetName, version, recordDisposableObject);
 
             return reader;
+        }
+
+        internal bool ImageFileExists(string assetName)
+        {
+            foreach (string extension in supportedTexture2DExtensions)
+            {
+                string assetPath = Path.Combine(RootDirectory, assetName);
+                assetPath = Path.ChangeExtension(assetPath, extension);
+
+                if (File.Exists(assetPath))
+                    return true;
+            }
+
+            return false;
+        }
+
+        internal Texture2D LoadTexture2DFromImageFile(string assetName)
+        {
+            IGraphicsDeviceService graphicsDeviceService = serviceProvider.GetService(typeof(IGraphicsDeviceService)) as IGraphicsDeviceService;
+
+            foreach (string extension in supportedTexture2DExtensions)
+            {
+                string assetPath = Path.Combine(RootDirectory, assetName);
+                assetPath = Path.ChangeExtension(assetPath, extension);
+
+                Stream stream = null;
+
+                // Handle absolute paths the same way as XNB loading
+#if DESKTOPGL || WINDOWS
+                if (Path.IsPathRooted(assetPath))
+                    stream = File.OpenRead(assetPath);
+                else
+#endif
+                stream = TitleContainer.OpenStreamNoException(assetPath);
+#if ANDROID
+                // Read the asset into memory in one go. This results in a ~50% reduction
+                // in load times on Android due to slow Android asset streams.
+                MemoryStream memStream = new MemoryStream();
+                stream.CopyTo(memStream);
+                memStream.Seek(0, SeekOrigin.Begin);
+                stream.Close();
+                stream = memStream;
+#endif
+
+                if (stream != null)
+                {
+                    using (stream)
+                    {
+                        Texture2D result = Texture2D.FromStream(graphicsDeviceService.GraphicsDevice, stream, DefaultColorProcessors.PremultiplyAlpha);
+                        return result;
+                    }
+                }
+            }
+
+            return null;
         }
 
         internal void RecordDisposable(IDisposable disposable)
@@ -567,7 +668,9 @@ namespace Microsoft.Xna.Framework.Content
 		    foreach (var disposable in disposableAssets)
 		    {
 		        if (disposable != null)
+                {
 		            disposable.Dispose();
+                }
 		    }
 			disposableAssets.Clear();
 		    loadedAssets.Clear();

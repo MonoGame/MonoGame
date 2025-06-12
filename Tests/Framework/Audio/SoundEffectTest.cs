@@ -12,6 +12,7 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace MonoGame.Tests.Audio
 {
+    [Category("Audio")]
     public class SoundEffectTests
     {
         [SetUp]

@@ -2,6 +2,8 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
+using System;
+
 namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
 {
     /// <summary>
@@ -28,7 +30,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
 
         /// <summary>
         /// The SurfaceFormat value, of the input TextureContent object, is converted to an appropriate compressed format for the target platform.
-        /// This can include PVRTC for iOS, DXT for desktop, Windows 8 and Windows Phone 8, and ETC1 or BGRA4444 for Android.
+        /// This can include PVRTC for iOS, DXT for desktop, Windows 8 and Windows Phone 8, and ETC1/2 or BGRA4444 for Android.
         /// </summary>
         Compressed,
 
@@ -40,6 +42,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
         /// <summary>
         /// The input texture is compressed using ETC1 texture compression.  Used on Android platforms.
         /// </summary>
+        [Obsolete("Prefer " + nameof(EtcCompressed) + " when possible.")]
         Etc1Compressed,
 
         /// <summary>
@@ -51,5 +54,18 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
         /// The input texture is compressed using ATI texture compression.  Used on some Android platforms.
         /// </summary>
         AtcCompressed,
+
+        /// <summary>
+        /// The input texture is compressed using ETC texture compression.
+        /// The best ETC option will be selected given the image data.
+        /// Used on Android platforms.
+        /// This option should be preferred over <see cref="Etc1Compressed"/> whenever possible.
+        /// </summary>
+        EtcCompressed,
+
+        /// <summary>
+        /// The input texture is compressed using Adaptive Scalable Texture Compression. Used on some Mobile and Intel platforms.
+        /// </summary>
+        AstcCompressed,
     }
 }

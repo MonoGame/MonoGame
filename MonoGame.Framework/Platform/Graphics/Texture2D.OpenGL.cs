@@ -244,13 +244,15 @@ namespace Microsoft.Xna.Framework.Graphics
                 GL.DeleteFramebuffers(1, ref framebufferId);
 #else
                 var tSizeInByte = ReflectionHelpers.SizeOf<T>.Get();
+                var pixelToT = Format.GetSize() / tSizeInByte;
+
                 GL.BindTexture(TextureTarget.Texture2D, this.glTexture);
                 GL.PixelStore(PixelStoreParameter.PackAlignment, Math.Min(tSizeInByte, 8));
+
 
                 if (glFormat == GLPixelFormat.CompressedTextureFormats)
                 {
                     // Note: for compressed format Format.GetSize() returns the size of a 4x4 block
-                    var pixelToT = Format.GetSize() / tSizeInByte;
                     var tFullWidth = Math.Max(this.width >> level, 1) / 4 * pixelToT;
                     var temp = GetDataPool<T>.Pool.Rent(Math.Max(this.height >> level, 1) / 4 * tFullWidth);
                     GL.GetCompressedTexImage(TextureTarget.Texture2D, level, temp);
@@ -266,6 +268,12 @@ namespace Microsoft.Xna.Framework.Graphics
                     }
                     GetDataPool<T>.Pool.Return(temp);
                 }
+                //If we want the full texture rect == (0,0,width,height), we dont have to allocate a temp buffer to copy from.
+                else if (rect.X == 0 && rect.Y == 0 && this.width == rect.Width && this.height == rect.Height && pixelToT == 1)
+                {
+                    GL.GetTexImage(TextureTarget.Texture2D, level, glFormat, glType, data);
+                    GraphicsExtensions.CheckGLError();
+                }
                 else
                 {
                     // we need to convert from our format size to the size of T here
@@ -274,7 +282,6 @@ namespace Microsoft.Xna.Framework.Graphics
                     GL.GetTexImage(TextureTarget.Texture2D, level, glFormat, glType, temp);
                     GraphicsExtensions.CheckGLError();
 
-                    var pixelToT = Format.GetSize() / tSizeInByte;
                     var rowCount = rect.Height;
                     var tRectWidth = rect.Width * pixelToT;
                     for (var r = 0; r < rowCount; r++)
@@ -395,10 +402,14 @@ namespace Microsoft.Xna.Framework.Graphics
             using (Bitmap image = BitmapFactory.DecodeStream(stream, null, new BitmapFactory.Options
             {
                 InScaled = false,
+#pragma warning disable CA1422
                 InDither = false,
+#pragma warning restore CA1422
                 InJustDecodeBounds = false,
+#pragma warning disable CS0618
                 InPurgeable = true,
                 InInputShareable = true,
+#pragma warning restore CS0618
             }))
             {
                 var width = image.Width;

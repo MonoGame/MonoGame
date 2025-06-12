@@ -6,5 +6,8 @@ namespace BuildScripts;
 public sealed class BuildContentPipelineTask : FrostingTask<BuildContext>
 {
     public override void Run(BuildContext context)
-        => context.DotNetPack(context.GetProjectPath(ProjectType.ContentPipeline), context.DotNetPackSettings);
+    {
+        var builderPath = context.GetProjectPath(ProjectType.ContentPipeline);
+        context.DotNetPack(builderPath, context.DotNetPackSettings);
+    }
 }

@@ -6,6 +6,7 @@ using System;
 using System.Linq;
 using Microsoft.Xna.Framework.Media;
 using System.Globalization;
+using MonoGame.Tool;
 
 namespace Microsoft.Xna.Framework.Content.Pipeline
 {
@@ -67,8 +68,15 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
             Filename = filename;
 
             string stdout, stderr;
-            var result = ExternalTool.Run("ffprobe",
-                string.Format("-i \"{0}\" -show_format -select_streams v -show_streams -print_format ini", Filename), out stdout, out stderr);
+            var result = FFmpeg.Run(
+                string.Format("-i \"{0}\" -show_format -select_streams v -show_streams -print_format ini", Filename),
+                out stdout,
+                out stderr);
+
+            if (result != 0)
+            {
+                throw new Exception($"ffmpeg exited with {result}:\n{stderr}");
+            }
 
             var lines = stdout.Split(Environment.NewLine.ToCharArray(), StringSplitOptions.RemoveEmptyEntries);
             foreach (var line in lines)

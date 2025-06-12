@@ -7,15 +7,15 @@ using System.Linq;
 using Microsoft.Xna.Framework.Graphics;
 using NUnit.Framework;
 
+namespace MonoGame.Tests.Graphics
+{
+    [TestFixture]
+    class GraphicsAdapterTest
+    {
 // HACK: Only enable for XNA and DirectX which are the 
 // only platforms which currently correctly implement 
 // the GraphicsAdapter API.
 #if XNA || DIRECTX
-
-namespace MonoGame.Tests.Graphics
-{
-    class GraphicsAdapterTest
-    {
         private static bool Equals(DisplayMode m1, DisplayMode m2)
         {
             return m1.Width == m2.Width &&
@@ -138,7 +138,8 @@ namespace MonoGame.Tests.Graphics
             Assert.AreEqual(selectedDepthFormat, DepthFormat.None);
             Assert.AreEqual(selectedMultiSampleCount, 0);
         }
+#endif // XNA || DIRECTX
     }
 }
 
-#endif // XNA || DIRECTX
+

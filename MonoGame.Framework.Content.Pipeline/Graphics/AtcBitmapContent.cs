@@ -3,35 +3,50 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System;
+using BCnEncoder.Shared;
 using Microsoft.Xna.Framework.Graphics;
-using ATI.TextureConverter;
+using Microsoft.Xna.Framework.Content.Pipeline.Utilities;
 
 namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 {
+    /// <summary>
+    /// Provides properties and methods for creating and maintaining an ATC compressed bitmap resource.
+    /// </summary>
     public abstract class AtcBitmapContent : BitmapContent
     {
         internal byte[] _bitmapData;
 
+        /// <summary>
+        /// Initializes a new instance of AtcBitmapContent.
+        /// </summary>
         public AtcBitmapContent()
             : base()
         {
         }
 
+        /// <summary>
+        /// Initializes a new instance of AtcBitmapContent with the specified width or height.
+        /// </summary>
+        /// <param name="width">Width, in pixels, of the bitmap resource.</param>
+        /// <param name="height">Height, in pixels, of the bitmap resource.</param>
         public AtcBitmapContent(int width, int height)
             : base(width, height)
         {
         }
 
+        /// <inheritdoc/>
         public override byte[] GetPixelData()
         {
             return _bitmapData;
         }
 
+        /// <inheritdoc/>
         public override void SetPixelData(byte[] sourceData)
         {
             _bitmapData = sourceData;
         }
 
+        /// <inheritdoc/>
 		protected override bool TryCopyFrom(BitmapContent sourceBitmap, Rectangle sourceRegion, Rectangle destinationRegion)
         {
             SurfaceFormat sourceFormat;
@@ -66,31 +81,29 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
                 }
             }
 
-            // Convert to full colour 32-bit format. Floating point would be preferred for processing, but it appears the ATICompressor does not support this
-            var colorBitmap = new PixelBitmapContent<Color>(sourceRegion.Width, sourceRegion.Height);
-            BitmapContent.Copy(sourceBitmap, sourceRegion, colorBitmap, new Rectangle(0, 0, colorBitmap.Width, colorBitmap.Height));
-            sourceBitmap = colorBitmap;
-
-			ATICompressor.CompressionFormat targetFormat;
-			switch (format)
+            CompressionFormat compressionFormat;
+            switch (format)
             {
-				case SurfaceFormat.RgbaAtcExplicitAlpha:
-					targetFormat = ATICompressor.CompressionFormat.AtcRgbaExplicitAlpha;
-					break;
-				case SurfaceFormat.RgbaAtcInterpolatedAlpha:
-					targetFormat = ATICompressor.CompressionFormat.AtcRgbaInterpolatedAlpha;
-					break;
-				default:
-					return false;
-			}
+                case SurfaceFormat.RgbaAtcExplicitAlpha:
+                    compressionFormat = CompressionFormat.AtcExplicitAlpha;
+                    break;
+                case SurfaceFormat.RgbaAtcInterpolatedAlpha:
+                    compressionFormat = CompressionFormat.AtcInterpolatedAlpha;
+                    break;
+                default:
+                    throw new PipelineException();
+            }
+            BcnUtil.Encode(
+                sourceBitmap: sourceBitmap,
+                destinationFormat: compressionFormat,
+                out var compressedBytes);
 
-			var sourceData = sourceBitmap.GetPixelData();
-			var compressedData = ATICompressor.Compress(sourceData, Width, Height, targetFormat);
-			SetPixelData(compressedData);
+            SetPixelData(compressedBytes);
 
 			return true;
         }
 
+        /// <inheritdoc/>
         protected override bool TryCopyTo(BitmapContent destinationBitmap, Rectangle sourceRegion, Rectangle destinationRegion)
         {
             SurfaceFormat destinationFormat;
@@ -107,7 +120,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
                 return true;
             }
 
-            // No other support for copying from a ATC texture yet
+            // No other support for copying from an ATC texture yet
             return false;
         }
     }

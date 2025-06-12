@@ -4,22 +4,12 @@
 
 #include "include.fxh"
 
-Texture2D SourceTexture;
-Texture2D OtherTexture;
+DECLARE_TEXTURE(SourceTexture, 0);
+DECLARE_TEXTURE(OtherTexture, 1);
 
-sampler2D SourceSampler = sampler_state
+float4 PS_Main(float2 uv : TEXCOORD0) : SV_TARGET0
 {
-    Texture = (SourceTexture);
-};
-
-sampler2D OtherSampler = sampler_state
-{
-    Texture = (OtherTexture);
-};
-
-float4 PS_Main(float2 uv : TEXCOORD0) : COLOR0
-{
-    return tex2D(SourceSampler, uv) + tex2D(OtherSampler, uv);
+    return SAMPLE_TEXTURE(SourceTexture, uv) + SAMPLE_TEXTURE(OtherTexture, uv);
 }
 
 technique

@@ -69,7 +69,8 @@ namespace MonoGame.OpenAL
     {
         Pitch = 0x1003,
         Gain = 0x100A,
-        ReferenceDistance = 0x1020
+        ReferenceDistance = 0x1020,
+        StereoAngles = 0x1030
     }
 
     internal enum ALGetSourcei
@@ -197,28 +198,31 @@ namespace MonoGame.OpenAL
         {
 #if DESKTOPGL
             if (CurrentPlatform.OS == OS.Windows)
-                return FuncLoader.LoadLibraryExt("soft_oal.dll");
+                return FuncLoader.LoadLibraryExt("openal.dll");
             else if (CurrentPlatform.OS == OS.Linux)
-                return FuncLoader.LoadLibraryExt("libopenal.so.1");
+                return FuncLoader.LoadLibraryExt("libopenal.so");
             else if (CurrentPlatform.OS == OS.MacOSX)
-                return FuncLoader.LoadLibraryExt("libopenal.1.dylib");
+                return FuncLoader.LoadLibraryExt("libopenal.dylib");
             else
                 return FuncLoader.LoadLibraryExt("openal");
 #elif ANDROID
-            var ret = FuncLoader.LoadLibrary("libopenal32.so");
+            var ret = FuncLoader.LoadLibrary("libopenal.so");
 
             if (ret == IntPtr.Zero)
             {
                 var appFilesDir = Environment.GetFolderPath(Environment.SpecialFolder.Personal);
                 var appDir = Path.GetDirectoryName(appFilesDir);
-                var lib = Path.Combine(appDir, "lib", "libopenal32.so");
+                var lib = Path.Combine(appDir, "lib", "libopenal.so");
 
                 ret = FuncLoader.LoadLibrary(lib);
             }
 
             return ret;
 #else
-            return FuncLoader.LoadLibrary("/System/Library/Frameworks/OpenAL.framework/OpenAL");
+            var ret =  FuncLoader.LoadLibrary("libopenal.dylib");
+            if (ret ==IntPtr.Zero)
+                ret = FuncLoader.LoadLibrary(Path.Combine (Path.GetDirectoryName (typeof (AL).Assembly.Location), "libopenal.dylib"));
+            return ret;
 #endif
         }
 
@@ -421,6 +425,10 @@ namespace MonoGame.OpenAL
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         internal delegate void d_alsource3f(int sourceId, ALSource3f i, float x, float y, float z);
         internal static d_alsource3f alSource3f = FuncLoader.LoadFunction<d_alsource3f>(NativeLibrary, "alSource3f");
+
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        internal delegate void d_alsourcefv(int sourceId, ALSourcef i, float[] values);
+        internal static d_alsourcefv alSourcefv = FuncLoader.LoadFunction<d_alsourcefv>(NativeLibrary, "alSourcefv");
 
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         internal delegate void d_algetsourcei(int sourceId, ALGetSourcei i, out int state);
@@ -662,7 +670,7 @@ namespace MonoGame.OpenAL
             }
             try
             {
-                setBufferMode = (XRamExtension.SetBufferModeDelegate)Marshal.GetDelegateForFunctionPointer(AL.alGetProcAddress("EAXSetBufferMode"), typeof(XRamExtension.SetBufferModeDelegate));
+                setBufferMode = Marshal.GetDelegateForFunctionPointer<XRamExtension.SetBufferModeDelegate>(AL.alGetProcAddress("EAXSetBufferMode"));
             }
             catch (Exception)
             {
@@ -755,19 +763,19 @@ namespace MonoGame.OpenAL
                 return;
             }
 
-            alGenEffects = (alGenEffectsDelegate)Marshal.GetDelegateForFunctionPointer(AL.alGetProcAddress("alGenEffects"), typeof(alGenEffectsDelegate));
-            alDeleteEffects = (alDeleteEffectsDelegate)Marshal.GetDelegateForFunctionPointer(AL.alGetProcAddress("alDeleteEffects"), typeof(alDeleteEffectsDelegate));
-            alEffectf = (alEffectfDelegate)Marshal.GetDelegateForFunctionPointer(AL.alGetProcAddress("alEffectf"), typeof(alEffectfDelegate));
-            alEffecti = (alEffectiDelegate)Marshal.GetDelegateForFunctionPointer(AL.alGetProcAddress("alEffecti"), typeof(alEffectiDelegate));
-            alGenAuxiliaryEffectSlots = (alGenAuxiliaryEffectSlotsDelegate)Marshal.GetDelegateForFunctionPointer(AL.alGetProcAddress("alGenAuxiliaryEffectSlots"), typeof(alGenAuxiliaryEffectSlotsDelegate));
-            alDeleteAuxiliaryEffectSlots = (alDeleteAuxiliaryEffectSlotsDelegate)Marshal.GetDelegateForFunctionPointer(AL.alGetProcAddress("alDeleteAuxiliaryEffectSlots"), typeof(alDeleteAuxiliaryEffectSlotsDelegate));
-            alAuxiliaryEffectSloti = (alAuxiliaryEffectSlotiDelegate)Marshal.GetDelegateForFunctionPointer(AL.alGetProcAddress("alAuxiliaryEffectSloti"), typeof(alAuxiliaryEffectSlotiDelegate));
-            alAuxiliaryEffectSlotf = (alAuxiliaryEffectSlotfDelegate)Marshal.GetDelegateForFunctionPointer(AL.alGetProcAddress("alAuxiliaryEffectSlotf"), typeof(alAuxiliaryEffectSlotfDelegate));
+            alGenEffects = Marshal.GetDelegateForFunctionPointer<alGenEffectsDelegate>(AL.alGetProcAddress("alGenEffects"));
+            alDeleteEffects = Marshal.GetDelegateForFunctionPointer<alDeleteEffectsDelegate>(AL.alGetProcAddress("alDeleteEffects"));
+            alEffectf = Marshal.GetDelegateForFunctionPointer<alEffectfDelegate>(AL.alGetProcAddress("alEffectf"));
+            alEffecti = Marshal.GetDelegateForFunctionPointer<alEffectiDelegate>(AL.alGetProcAddress("alEffecti"));
+            alGenAuxiliaryEffectSlots = Marshal.GetDelegateForFunctionPointer<alGenAuxiliaryEffectSlotsDelegate>(AL.alGetProcAddress("alGenAuxiliaryEffectSlots"));
+            alDeleteAuxiliaryEffectSlots = Marshal.GetDelegateForFunctionPointer<alDeleteAuxiliaryEffectSlotsDelegate>(AL.alGetProcAddress("alDeleteAuxiliaryEffectSlots"));
+            alAuxiliaryEffectSloti = Marshal.GetDelegateForFunctionPointer<alAuxiliaryEffectSlotiDelegate>(AL.alGetProcAddress("alAuxiliaryEffectSloti"));
+            alAuxiliaryEffectSlotf = Marshal.GetDelegateForFunctionPointer<alAuxiliaryEffectSlotfDelegate>(AL.alGetProcAddress("alAuxiliaryEffectSlotf"));
 
-            alGenFilters = (alGenFiltersDelegate)Marshal.GetDelegateForFunctionPointer(AL.alGetProcAddress("alGenFilters"), typeof(alGenFiltersDelegate));
-            alFilteri = (alFilteriDelegate)Marshal.GetDelegateForFunctionPointer(AL.alGetProcAddress("alFilteri"), typeof(alFilteriDelegate));
-            alFilterf = (alFilterfDelegate)Marshal.GetDelegateForFunctionPointer(AL.alGetProcAddress("alFilterf"), typeof(alFilterfDelegate));
-            alDeleteFilters = (alDeleteFiltersDelegate)Marshal.GetDelegateForFunctionPointer(AL.alGetProcAddress("alDeleteFilters"), typeof(alDeleteFiltersDelegate));
+            alGenFilters = Marshal.GetDelegateForFunctionPointer<alGenFiltersDelegate>(AL.alGetProcAddress("alGenFilters"));
+            alFilteri = Marshal.GetDelegateForFunctionPointer<alFilteriDelegate>(AL.alGetProcAddress("alFilteri"));
+            alFilterf = Marshal.GetDelegateForFunctionPointer<alFilterfDelegate>(AL.alGetProcAddress("alFilterf"));
+            alDeleteFilters = Marshal.GetDelegateForFunctionPointer<alDeleteFiltersDelegate>(AL.alGetProcAddress("alDeleteFilters"));
 
             IsInitialized = true;
         }

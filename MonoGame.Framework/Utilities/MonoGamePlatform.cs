@@ -43,6 +43,16 @@ namespace MonoGame.Framework.Utilities
         /// MonoGame Xbox One platform.
         /// </summary>
         XboxOne,
+        
+        /// <summary>
+        /// MonoGame Windows GDK platform.
+        /// </summary>
+        WindowsGDK,
+
+        /// <summary>
+        /// MonoGame Xbox Series platform.
+        /// </summary>
+        XboxSeries,
 
         /// <summary>
         /// MonoGame PlayStation 4 platform.
@@ -57,6 +67,11 @@ namespace MonoGame.Framework.Utilities
         /// <summary>
         /// MonoGame Nintendo Switch platform.
         /// </summary>
-        NintendoSwitch
+        NintendoSwitch,
+
+        /// <summary>
+        /// All desktop versions using Vulkan.
+        /// </summary>
+        DesktopVK,
     }
 }

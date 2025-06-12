@@ -80,6 +80,11 @@ namespace MonoGame.Framework
 
         public override bool BeforeDraw(GameTime gameTime)
         {
+#if GDKX
+            var device = Game.GraphicsDevice;
+            if (device != null)
+                device.PlatformPrepare(); // maybe add a Prepare() to GraphicsDevice, could be useful for other backend?
+#endif
             return true;
         }
 
@@ -123,10 +128,10 @@ namespace MonoGame.Framework
                 if (_window != null)
                 {
                     _window.Dispose();
-                    _window = null;
-                    Window = null;
                 }
+#if !GDKX && !NO_AUDIO
                 Microsoft.Xna.Framework.Media.MediaManagerState.CheckShutdown();
+#endif
             }
 
             base.Dispose(disposing);

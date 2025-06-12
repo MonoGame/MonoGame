@@ -5,13 +5,33 @@
     "version": "0.2.0",
     "configurations": [
         {
+            "name": "Generator: CTypes",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "generator-ctypes",
+            "program": "${workspaceFolder}/Tools/MonoGame.Generator.CTypes/bin/Debug/net8.0/MonoGame.Generator.CTypes",
+            "args": [],
+            "cwd": "${workspaceFolder}/Tools/MonoGame.Generator.CTypes/bin/Debug/net8.0",
+            "console": "internalConsole",
+            "stopAtEntry": false
+        },
+        {
             "name": "MGCB Editor (Mac)",
             "type": "coreclr",
             "request": "launch",
-            "preLaunchTask": "mgcb-editor-mac",
-            "program": "${workspaceFolder}/Artifacts/MonoGame.Content.Builder.Editor/Mac/Debug/MGCB Editor.app/Contents/MacOS/mgcb-editor-mac",
+            "preLaunchTask": "Build: mgcb-editor-mac",
+            "program": "${workspaceFolder}/Artifacts/MonoGame.Content.Builder.Editor/Mac/Debug/mgcb-editor-mac.app/Contents/MacOS/mgcb-editor-mac",
             "args": [],
             "cwd": "${workspaceFolder}/Artifacts/MonoGame.Content.Builder.Editor/Mac/Debug",
+            "console": "internalConsole",
+            "stopAtEntry": false
+        },
+        {
+            "name": "MGCB",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "Build: mgcb",
+            "program": "${workspaceFolder}/Artifacts/MonoGame.Content.Builder/Debug/mgcb",
             "console": "internalConsole",
             "stopAtEntry": false
         },
@@ -20,6 +40,19 @@
             "type": "coreclr",
             "request": "attach",
             "processId": "${input.processid}",
+        },
+        {
+            "name": "MonoGame.Tests",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "build-tests",
+            "program": "${workspaceFolder}/Artifacts/Tests/DesktopGL/Debug/MonoGame.Tests",
+            "args": [
+                "--test=MonoGame.Tests.Graphics.SpriteBatchTest.Draw_normal"
+            ],
+            "cwd": "${workspaceFolder}/Artifacts/Tests/DesktopGL/Debug/",
+            "console": "internalConsole",
+            "stopAtEntry": false
         }
     ],
     "inputs": [

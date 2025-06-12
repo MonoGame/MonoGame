@@ -41,11 +41,15 @@ namespace Microsoft.Xna.Framework.Graphics
         private void PlatformSetData<T>(
             int level,
             int left, int top, int right, int bottom, int front, int back,
-            T[] data, int startIndex, int elementCount, int width, int height, int depth)
+            T[] data, int startIndex, int elementCount)
         {
 #if GLES
             throw new NotSupportedException("OpenGL ES 2.0 doesn't support 3D textures.");
 #else
+            var width = right - left;
+            var height = bottom - top;
+            var depth = back - front;
+
             Threading.BlockOnUIThread(() =>
             {
                 var elementSizeInByte = Marshal.SizeOf<T>();
