@@ -120,6 +120,8 @@ internal struct MGG_SamplerState_Info
 [StructLayout(LayoutKind.Sequential)]
 internal struct MGG_InputElement
 {
+    public VertexElementUsage SemanticUsage;
+    public uint SemanticIndex;
     public uint VertexBufferSlot;
     public VertexElementFormat Format;
     public uint AlignedByteOffset;
