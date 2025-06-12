@@ -3,7 +3,6 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System;
-using Microsoft.Xna.Framework.Graphics;
 using MonoGame.Interop;
 
 
@@ -34,7 +33,7 @@ public partial class SoundEffectInstance : IDisposable
         };
 
         if (Voice != null)
-            MGA.Voice_Apply3D(Voice, in listener_, in emitter_, SoundEffect.DistanceScale);
+            MGA.Voice_Apply3D(Voice, &listener_, &emitter_, SoundEffect.DistanceScale);
     }
 
     private unsafe void PlatformPause()
@@ -46,7 +45,7 @@ public partial class SoundEffectInstance : IDisposable
     private unsafe void PlatformPlay()
     {
         if (Voice != null)
-            MGA.Voice_Play(Voice, _isLooped);
+            MGA.Voice_Play(Voice, (byte)(_isLooped ? 1 : 0));
     }
 
     private unsafe void PlatformResume()
@@ -58,7 +57,7 @@ public partial class SoundEffectInstance : IDisposable
     private unsafe void PlatformStop(bool immediate)
     {
         if (Voice != null)
-            MGA.Voice_Stop(Voice, immediate);
+            MGA.Voice_Stop(Voice, (byte)(immediate ? 1 : 0));
     }
 
     private unsafe void PlatformSetPan(float pan)
