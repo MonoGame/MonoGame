@@ -37,7 +37,7 @@ public partial class GraphicsDevice
 
         // Get the device caps.
         MGG_GraphicsDevice_Caps caps;
-        MGG.GraphicsDevice_GetCaps(Handle, out caps);
+        MGG.GraphicsDevice_GetCaps(Handle, &caps);
 
         MaxTextureSlots = caps.MaxTextureSlots;
         MaxVertexTextureSlots = caps.MaxVertexTextureSlots;
@@ -139,7 +139,7 @@ public partial class GraphicsDevice
         BeginFrame();
 
         PlatformBeginApplyState();
-        MGG.GraphicsDevice_Clear(Handle, options, ref color, depth, stencil);
+        MGG.GraphicsDevice_Clear(Handle, options, &color, depth, stencil);
     }
 
     private unsafe void PlatformDispose()
@@ -178,6 +178,20 @@ public partial class GraphicsDevice
     private unsafe void PlatformApplyDefaultRenderTarget()
     {
         BeginFrame();
+
+        _viewport = new Viewport(
+            0,
+            0,
+            PresentationParameters.BackBufferWidth,
+            PresentationParameters.BackBufferHeight,
+            _viewport.MinDepth,
+            _viewport.MaxDepth);
+
+        _scissorRectangle = new Rectangle(
+            0,
+            0,
+            PresentationParameters.BackBufferWidth,
+            PresentationParameters.BackBufferHeight);
 
         MGG.GraphicsDevice_SetRenderTargets(Handle, null, 0);
     }
@@ -448,9 +462,9 @@ public partial class GraphicsDevice
         throw new NotImplementedException();
     }
 
-    private static Rectangle PlatformGetTitleSafeArea(int x, int y, int width, int height)
+    private static unsafe Rectangle PlatformGetTitleSafeArea(int x, int y, int width, int height)
     {
-        MGG.GraphicsDevice_GetTitleSafeArea(ref x, ref y, ref width, ref height);
+        MGG.GraphicsDevice_GetTitleSafeArea(&x, &y, &width, &height);
 
         return new Rectangle(x, y, width, height);
     }
