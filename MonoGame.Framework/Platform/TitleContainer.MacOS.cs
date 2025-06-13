@@ -15,23 +15,26 @@ namespace Microsoft.Xna.Framework
 {
     partial class TitleContainer
     {
+        private static string CacheLocation { get; set; } = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), CACHE_PATH);
+
         static partial void PlatformInit()
         {
             Location = NSBundle.MainBundle.ResourcePath;
-#if IOS
             SupportRetina = UIScreen.MainScreen.Scale >= 2.0f;
             RetinaScale = (int)Math.Round(UIScreen.MainScreen.Scale);
-#endif
         }
 
-#if IOS
         static internal bool SupportRetina { get; private set; }
         static internal int RetinaScale { get; private set; }
-#endif
 
         private static Stream PlatformOpenStream(string safeName)
         {
-#if IOS
+            var cachePath = Path.Combine(CacheLocation, safeName);
+            if (File.Exists(cachePath))
+            {
+                return File.OpenRead(cachePath);
+            }
+
             var absolutePath = Path.Combine(Location, safeName);
             if (SupportRetina)
             {
@@ -46,11 +49,23 @@ namespace Microsoft.Xna.Framework
                         return File.OpenRead(absolutePathX);
                 }
             }
-            return File.OpenRead(absolutePath);
-#else
-            var absolutePath = Path.Combine(Location, safeName);
-            return File.OpenRead(absolutePath);
-#endif
+            if (File.Exists(absolutePath))
+            {
+                return File.OpenRead(absolutePath);
+            }
+
+            return null;
+        }
+
+        private static Stream PlatformOpenWriteStream(string safeName)
+        {
+            var absolutePath = Path.Combine(CacheLocation, safeName);
+            var dirPath = Path.GetDirectoryName(absolutePath);
+            if (!Directory.Exists(dirPath))
+            {
+                Directory.CreateDirectory(dirPath);
+            }
+            return File.OpenWrite(absolutePath);
         }
     }
 }
