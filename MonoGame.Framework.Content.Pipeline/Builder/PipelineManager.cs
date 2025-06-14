@@ -969,7 +969,11 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
         /// <returns>The asset name.</returns>
         public string GetAssetName(string sourceFileName, string importerName, string processorName, OpaqueDataDictionary processorParameters)
         {
-            Debug.Assert(Path.IsPathRooted(sourceFileName), "Absolute path expected.");
+            // If the source file is non-rooted we can assume it is relative
+            // to the project directory... if it is not then we should get a
+            // file not found error later in content processing.
+            if (!Path.IsPathRooted(sourceFileName))
+                sourceFileName = Path.Combine(ProjectDirectory, sourceFileName);
 
             // Get source file name, which is used for lookup in _pipelineBuildEvents.
             sourceFileName = PathHelper.Normalize(sourceFileName);
