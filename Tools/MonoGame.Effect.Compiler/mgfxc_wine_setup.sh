@@ -51,8 +51,7 @@ curl $DOTNET_URL --output "$SCRIPT_DIR/dotnet-sdk.zip"
 # get d3dcompiler_47
 FIREFOX_URL="https://download-installer.cdn.mozilla.net/pub/firefox/releases/62.0.3/win64/ach/Firefox%20Setup%2062.0.3.exe"
 curl $FIREFOX_URL --output "$SCRIPT_DIR/firefox.exe"
-7z x "$SCRIPT_DIR/firefox.exe" -o"$SCRIPT_DIR/firefox_data/"
-cp -f "$SCRIPT_DIR/firefox_data/core/d3dcompiler_47.dll" "$WINEPREFIX/drive_c/windows/system32/d3dcompiler_47.dll"
+7z e "$SCRIPT_DIR/firefox.exe" "core/d3dcompiler_47.dll" -o"$WINEPREFIX/drive_c/windows/system32/" -aoa
 
 # append MGFXC_WINE_PATH env variable
 echo -e "\nexport MGFXC_WINE_PATH=$HOME/.winemonogame" >> ~/.profile
