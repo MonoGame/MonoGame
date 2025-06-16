@@ -298,7 +298,9 @@ namespace Microsoft.Xna.Framework.Content
         /// <exception cref="ArgumentNullException">If the <paramref name="typeString"/> parameter is null or an empty string.</exception>
         public static void AddTypeCreator<T>(Func<ContentTypeReader> createFunction) where T : ContentTypeReader
         {
-            typeCreators.TryAdd(typeof(T), createFunction);
+            var type = typeof(T);
+            if (!typeCreators.ContainsKey(type))
+                typeCreators.Add(type, createFunction);
         }
 
         /// <summary>
