@@ -17,7 +17,7 @@ namespace Microsoft.Xna.Framework.Content
     /// Its purpose is to allow to work-around AOT issues when loading assets with the ContentManager fail due to the absence of runtime-reflection support in that context (i.e. missing types due to trimming and inability to statically discover them at compile-time).
     /// If ContentManager.Load() throws an NotSupportedExeception, the message should provide insights on how to fix it.
     /// </summary>
-    [System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.All)]
+    [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.All)]
     public class ReflectiveReader<
         [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors
                                     | DynamicallyAccessedMemberTypes.NonPublicConstructors
@@ -55,13 +55,10 @@ namespace Microsoft.Xna.Framework.Content
             if (baseType != null && baseType != typeof(object))
 				_baseTypeReader = manager.GetTypeReader(baseType);
 
-            // TargetType is based on T, which has been annotated.
-            #pragma warning disable IL2702
-            _constructor = TargetType.GetDefaultConstructor();
+            _constructor = ContentExtensions.GetDefaultConstructor<T>();
+            var properties = ContentExtensions.GetAllProperties<T>();
+            var fields = ContentExtensions.GetAllFields<T>();
 
-            var properties = TargetType.GetAllProperties();
-            var fields = TargetType.GetAllFields();
-            #pragma warning restore IL2702
             _readers = new List<ReadElement>(fields.Length + properties.Length);
 
             // Gather the properties.

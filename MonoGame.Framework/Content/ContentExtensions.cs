@@ -30,14 +30,34 @@ namespace Microsoft.Xna.Framework.Content
 #endif
         }
 
+
         /// <summary>
-        /// Retrieves all non-static properties belonging to <paramref name="type"/>.
+        /// Retrieves all non-static constructors belonging to <typeparamref name="T"/>.
         /// </summary>
-        /// <param name="type">Type to retrieve the properties from.</param>
+        /// <typeparam name="T">Type to retrieve the constructors from.</typeparam>
+        /// <returns>List of found non-static constructors</returns>
+        public static ConstructorInfo GetDefaultConstructor<
+            [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors | DynamicallyAccessedMemberTypes.NonPublicConstructors)]
+            T>()
+        {
+#if NET45
+            var typeInfo = typeof(T).GetTypeInfo();
+            var ctor = typeInfo.DeclaredConstructors.FirstOrDefault(c => !c.IsStatic && c.GetParameters().Length == 0);
+            return ctor;
+#else
+            var attrs = BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance;
+            return typeof(T).GetConstructor(attrs, null, new Type[0], null);
+#endif
+        }
+
+        /// <summary>
+        /// Retrieves all non-static properties belonging to <typeparamref name="T"/>.
+        /// </summary>
+        /// <typeparam name="T">Type to retrieve the properties from.</typeparam>
         /// <returns>List of found non-static properties</returns>
-        public static PropertyInfo[] GetAllProperties(
+        public static PropertyInfo[] GetAllProperties<
             [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicProperties | DynamicallyAccessedMemberTypes.NonPublicProperties)]
-            this Type type)
+            T>()
         {
 
             // Sometimes, overridden properties of abstract classes can show up even with 
@@ -46,7 +66,7 @@ namespace Microsoft.Xna.Framework.Content
             // its get method with that of it's base class. If they're the same
             // Then it's an overridden property.
 #if NET45
-            PropertyInfo[] infos= type.GetTypeInfo().DeclaredProperties.ToArray();
+            PropertyInfo[] infos= typeof(T).GetTypeInfo().DeclaredProperties.ToArray();
             var nonStaticPropertyInfos = from p in infos
                                          where (p.GetMethod != null) && (!p.GetMethod.IsStatic) &&
                                          (p.GetMethod == p.GetMethod.GetRuntimeBaseDefinition())
@@ -54,31 +74,30 @@ namespace Microsoft.Xna.Framework.Content
             return nonStaticPropertyInfos.ToArray();
 #else
             const BindingFlags attrs = BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly;
-            var allProps = type.GetProperties(attrs).ToList();
+            var allProps = typeof(T).GetProperties(attrs).ToList();
             var props = allProps.FindAll(p => p.GetGetMethod(true) != null && p.GetGetMethod(true) == p.GetGetMethod(true).GetBaseDefinition()).ToArray();
             return props;
 #endif
         }
 
         /// <summary>
-        /// Retrieves all non-static fields belonging to <paramref name="type"/>.
+        /// Retrieves all non-static fields belonging to <typeparamref name="T"/>.
         /// </summary>
-        /// <param name="type">Type to retrieve the fields from.</param>
+        /// <typeparam name="T">Type to retrieve the fields from.</typeparam>
         /// <returns>List of found non-static fields</returns>
-        public static FieldInfo[] GetAllFields(
+        public static FieldInfo[] GetAllFields<
             [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicFields | DynamicallyAccessedMemberTypes.NonPublicFields)]
-            this Type type
-            )
+            T>()
         {
 #if NET45
-            FieldInfo[] fields= type.GetTypeInfo().DeclaredFields.ToArray();
+            FieldInfo[] fields= typeof(T).GetTypeInfo().DeclaredFields.ToArray();
             var nonStaticFields = from field in fields
                     where !field.IsStatic
                     select field;
             return nonStaticFields.ToArray();
 #else
             var attrs = BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly;
-            return type.GetFields(attrs);
+            return typeof(T).GetFields(attrs);
 #endif
         }
 
