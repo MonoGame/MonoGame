@@ -27,11 +27,13 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
         {
         }
 
+        /// <inheritdoc />
         public override bool CanDeserializeIntoExistingObject
         {
             get { return TargetType.IsClass; }
         }
 
+        /// <inheritdoc />
         protected override void Initialize(ContentCompiler compiler)
         {
             _compiler = compiler;
@@ -47,8 +49,8 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
             if (typeVersion != null)
                 _typeVersion = typeVersion.TypeVersion;
 
-            _properties = TargetType.GetAllProperties().Where(IsValidProperty).ToArray();
-            _fields = TargetType.GetAllFields().Where(IsValidField).ToArray();
+            _properties = ContentExtensions.GetAllProperties<T>().Where(IsValidProperty).ToArray();
+            _fields = ContentExtensions.GetAllFields<T>().Where(IsValidField).ToArray();
         }
 
         /// <inheritdoc/>

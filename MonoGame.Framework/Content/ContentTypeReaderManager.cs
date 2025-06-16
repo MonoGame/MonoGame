@@ -295,7 +295,6 @@ namespace Microsoft.Xna.Framework.Content
         /// </summary>
         /// <typeparam name="T">The content reader type.</typeparam>
         /// <param name='createFunction'>The function responsible for creating an instance of the <see cref="ContentTypeReader"/> class.</param>
-        /// <exception cref="ArgumentNullException">If the <paramref name="typeString"/> parameter is null or an empty string.</exception>
         public static void AddTypeCreator<T>(Func<ContentTypeReader> createFunction) where T : ContentTypeReader
         {
             var type = typeof(T);
