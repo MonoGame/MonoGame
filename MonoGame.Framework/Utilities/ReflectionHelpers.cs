@@ -3,6 +3,7 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using System.Runtime.InteropServices;
 
@@ -75,12 +76,18 @@ namespace MonoGame.Framework.Utilities
             return false;
         }
 
-        public static MethodInfo GetMethodInfo(Type type, string methodName)
+        /// <summary>
+        /// Retrieves the method info a given type and method name.
+        /// </summary>
+        /// <typeparam name="T">Type to retrieve the method from</typeparam>
+        /// <param name="methodName">Name of the method</param>
+        /// <returns>Retrieved method.</returns>
+        public static MethodInfo GetMethodInfo<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.NonPublicMethods)]T>(string methodName)
         {
 #if NET45            
-            return type.GetTypeInfo().GetDeclaredMethod(methodName);
+            return typeof(T).GetTypeInfo().GetDeclaredMethod(methodName);
 #else
-            return type.GetMethod(methodName, BindingFlags.NonPublic | BindingFlags.Instance);
+            return typeof(T).GetMethod(methodName, BindingFlags.NonPublic | BindingFlags.Instance);
 #endif
         }
 

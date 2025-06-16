@@ -1,12 +1,24 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using System.Linq;
 
 namespace Microsoft.Xna.Framework.Content
 {
+    /// <summary>
+    /// Methods to retrieve information about types, such as constructors, properties, and fields.
+    /// </summary>
     internal static class ContentExtensions
     {
-        public static ConstructorInfo GetDefaultConstructor(this Type type)
+        /// <summary>
+        /// Retrieves all non-static constructors belonging to <paramref name="type"/>.
+        /// </summary>
+        /// <param name="type">Type to retrieve the constructors from.</param>
+        /// <returns>List of found non-static constructors</returns>
+        public static ConstructorInfo GetDefaultConstructor(
+            [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors | DynamicallyAccessedMemberTypes.NonPublicConstructors)]
+            this Type type
+            )
         {
 #if NET45
             var typeInfo = type.GetTypeInfo();
@@ -18,7 +30,14 @@ namespace Microsoft.Xna.Framework.Content
 #endif
         }
 
-        public static PropertyInfo[] GetAllProperties(this Type type)
+        /// <summary>
+        /// Retrieves all non-static properties belonging to <paramref name="type"/>.
+        /// </summary>
+        /// <param name="type">Type to retrieve the properties from.</param>
+        /// <returns>List of found non-static properties</returns>
+        public static PropertyInfo[] GetAllProperties(
+            [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicProperties | DynamicallyAccessedMemberTypes.NonPublicProperties)]
+            this Type type)
         {
 
             // Sometimes, overridden properties of abstract classes can show up even with 
@@ -41,8 +60,15 @@ namespace Microsoft.Xna.Framework.Content
 #endif
         }
 
-
-        public static FieldInfo[] GetAllFields(this Type type)
+        /// <summary>
+        /// Retrieves all non-static fields belonging to <paramref name="type"/>.
+        /// </summary>
+        /// <param name="type">Type to retrieve the fields from.</param>
+        /// <returns>List of found non-static fields</returns>
+        public static FieldInfo[] GetAllFields(
+            [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicFields | DynamicallyAccessedMemberTypes.NonPublicFields)]
+            this Type type
+            )
         {
 #if NET45
             FieldInfo[] fields= type.GetTypeInfo().DeclaredFields.ToArray();
@@ -56,6 +82,11 @@ namespace Microsoft.Xna.Framework.Content
 #endif
         }
 
+        /// <summary>
+        /// Whether <paramref name="type"/> is a <see langword="class" />.
+        /// </summary>
+        /// <param name="type">Type to determine.</param>
+        /// <returns>Whether <paramref name="type"/> is a <see langword="class" />.</returns>
         public static bool IsClass(this Type type)
         {
 #if NET45

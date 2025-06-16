@@ -11,10 +11,11 @@
     <CopyContentFiles>True</CopyContentFiles>
     <IsAotCompatible>true</IsAotCompatible>
     <PackageReadmeFile>README-packages.md</PackageReadmeFile>
+    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
   </PropertyGroup>
 
   <ItemGroup>
-    <None Include="..\README-packages.md" Pack="true" PackagePath="\"/>
+    <None Include="..\README-packages.md" Pack="true" PackagePath="\" />
   </ItemGroup>
 
   <ItemGroup>

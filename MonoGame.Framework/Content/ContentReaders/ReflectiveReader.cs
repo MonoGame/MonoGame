@@ -8,6 +8,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using MonoGame.Framework.Utilities;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Microsoft.Xna.Framework.Content
 {
@@ -17,7 +18,13 @@ namespace Microsoft.Xna.Framework.Content
     /// If ContentManager.Load() throws an NotSupportedExeception, the message should provide insights on how to fix it.
     /// </summary>
     [System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.All)]
-    public class ReflectiveReader<T> : ContentTypeReader
+    public class ReflectiveReader<
+        [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors
+                                    | DynamicallyAccessedMemberTypes.NonPublicConstructors
+                                    | DynamicallyAccessedMemberTypes.PublicProperties
+                                    | DynamicallyAccessedMemberTypes.NonPublicProperties
+                                    | DynamicallyAccessedMemberTypes.PublicFields
+                                    | DynamicallyAccessedMemberTypes.NonPublicFields)] T> : ContentTypeReader
     {
         delegate void ReadElement(ContentReader input, object parent);
 
@@ -48,10 +55,13 @@ namespace Microsoft.Xna.Framework.Content
             if (baseType != null && baseType != typeof(object))
 				_baseTypeReader = manager.GetTypeReader(baseType);
 
+            // TargetType is based on T, which has been annotated.
+            #pragma warning disable IL2702
             _constructor = TargetType.GetDefaultConstructor();
 
             var properties = TargetType.GetAllProperties();
             var fields = TargetType.GetAllFields();
+            #pragma warning restore IL2702
             _readers = new List<ReadElement>(fields.Length + properties.Length);
 
             // Gather the properties.
