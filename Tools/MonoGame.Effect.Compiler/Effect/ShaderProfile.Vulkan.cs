@@ -11,6 +11,7 @@ using MonoGame.Effect.TPGParser;
 using Microsoft.Xna.Framework.Graphics;
 using System.Diagnostics;
 using System.Threading;
+using Microsoft.Xna.Framework.Content.Pipeline;
 
 namespace MonoGame.Effect
 {
@@ -223,7 +224,7 @@ namespace MonoGame.Effect
                 }
                 toolArgs += "\"" + hlslFile + "\"";
 
-                toolResult = RunTool("dxc", toolArgs, out stdout, out stderr);
+                toolResult = ExternalTool.Run("dxc", toolArgs, out stdout, out stderr);
 
                 errorsAndWarnings += stderr;
 
