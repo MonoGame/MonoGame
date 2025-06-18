@@ -53,12 +53,21 @@ inline void MG_Print_StdOut(const char* file, int line, const char* message)
 mguint MG_ComputeHash(const mgbyte* value, mgint length);
 mguint MG_ComputeHash(mguint value, mguint result = 0x811c9dc5);
 
+// Removes the element preserving order.
 template <class T>
 void mg_remove(std::vector<T>& vector, const T& element)
 {
     auto new_end = std::remove(vector.begin(), vector.end(), element);
     assert(new_end != vector.end());
     vector.erase(new_end, vector.end());
+}
+
+// Removes the element without preserving order.
+template <class T>
+void mg_remove_fast(std::vector<T>& vector, int index)
+{
+    vector[index] = std::move(vector.back());
+    vector.pop_back();
 }
 
 template <class T>

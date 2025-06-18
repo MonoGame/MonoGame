@@ -5,9 +5,7 @@
 using System;
 using System.IO;
 
-#if OPENAL
 using MonoGame.OpenAL;
-#endif
 #if IOS
 using AudioToolbox;
 using AudioUnit;

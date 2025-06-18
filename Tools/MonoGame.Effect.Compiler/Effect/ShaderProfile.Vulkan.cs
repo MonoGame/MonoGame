@@ -11,6 +11,7 @@ using MonoGame.Effect.TPGParser;
 using Microsoft.Xna.Framework.Graphics;
 using System.Diagnostics;
 using System.Threading;
+using Microsoft.Xna.Framework.Content.Pipeline;
 
 namespace MonoGame.Effect
 {
@@ -223,52 +224,7 @@ namespace MonoGame.Effect
                 }
                 toolArgs += "\"" + hlslFile + "\"";
 
-                var processInfo = new ProcessStartInfo
-                {
-                    Arguments = toolArgs,
-                    CreateNoWindow = true,
-                    WindowStyle = ProcessWindowStyle.Hidden,
-                    ErrorDialog = false,
-                    FileName = "dxc",
-                    UseShellExecute = false,
-                    RedirectStandardOutput = true,
-                    RedirectStandardError = true,
-                    RedirectStandardInput = true,
-                };
-
-                using (var process = new Process { StartInfo = processInfo })
-                {
-                    process.Start();
-
-                    var stdoutThread = new Thread(new ThreadStart(() =>
-                    {
-                        var memory = new MemoryStream();
-                        process.StandardOutput.BaseStream.CopyTo(memory);
-                        var bytes = new byte[memory.Position];
-                        memory.Seek(0, SeekOrigin.Begin);
-                        memory.Read(bytes, 0, bytes.Length);
-                        stdout = System.Text.Encoding.ASCII.GetString(bytes);
-                    }));
-                    stdoutThread.Start();
-
-                    var stderrThread = new Thread(new ThreadStart(() =>
-                    {
-                        var memory = new MemoryStream();
-                        process.StandardError.BaseStream.CopyTo(memory);
-                        var bytes = new byte[memory.Position];
-                        memory.Seek(0, SeekOrigin.Begin);
-                        memory.Read(bytes, 0, bytes.Length);
-                        stderr = System.Text.Encoding.ASCII.GetString(bytes);
-                    }));
-                    stderrThread.Start();
-
-                    process.WaitForExit();
-
-                    stdoutThread.Join();
-                    stderrThread.Join();
-
-                    toolResult = process.ExitCode;
-                }
+                toolResult = ExternalTool.Run("dxc", toolArgs, out stdout, out stderr);
 
                 errorsAndWarnings += stderr;
 
@@ -440,8 +396,6 @@ namespace MonoGame.Effect
                     // Sort by the location.
                     var sorted = inputs.Values.OrderBy(f=>f.location);
 
-                    int offset = 0;
-
                     foreach (var input in sorted)
                     {
                         var a = new ShaderData.Attribute();
@@ -494,34 +448,6 @@ namespace MonoGame.Effect
                                     break;
                             }                        
                         }
-
-                        int size;
-                        int len;
-                        int inputTypeStringStartIndex;
-                        if (input.type.StartsWith("v") && char.IsDigit(input.type[1]))
-                        {
-                            len = (int)char.GetNumericValue(input.type[1]);
-                            inputTypeStringStartIndex = 2;
-                        }
-                        else
-                        {
-                            len = 1;
-                            inputTypeStringStartIndex = 0;
-                        }
-
-                        switch (input.type.Substring(inputTypeStringStartIndex))
-                        {
-                            case "int":
-                            case "uint":
-                            case "float":
-                                size = len * 4;
-                                break;
-                            default:
-                                errorsAndWarnings += string.Format("Unknown vertex shader input type '{0}'.", input.type);
-                                throw new ShaderCompilerException();
-                        }
-
-                        offset += size;
 
                         // TODO: These are unused at runtime under the
                         // new native backends, we will remove them soon.               
