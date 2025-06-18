@@ -25,7 +25,6 @@ namespace Microsoft.Xna.Framework
         /// The fourth player index.
         /// </summary>
         Four = 3,
-#if !PLAYSTATION4 && !PLAYSTATION5
         /// <summary>
         /// The fifth player index.
         /// </summary>
@@ -42,6 +41,5 @@ namespace Microsoft.Xna.Framework
         /// The eighth player index.
         /// </summary>
         Eight = 7
-#endif
     }
 }
