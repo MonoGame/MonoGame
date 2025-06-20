@@ -15,6 +15,11 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Include="..\..\MonoGame.Framework.Content.Pipeline\ExternalTool.cs" />
+    <Compile Include="..\..\MonoGame.Framework\Platform\Utilities\CurrentPlatform.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
     <None Include="..\..\ThirdParty\Dependencies\MojoShader\Windows\libmojoshader_64.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
