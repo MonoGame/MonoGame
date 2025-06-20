@@ -45,6 +45,7 @@
       <ExcludeAssets>contentFiles;native;runtime</ExcludeAssets>
     </ProjectReference>
     <ProjectReference Include="..\..\MonoGame.Framework.Content.Pipeline\MonoGame.Framework.Content.Pipeline.csproj">
+      <AdditionalProperties>DisableMonoGameToolAssets=True</AdditionalProperties>
       <ExcludeAssets>contentFiles;native;runtime</ExcludeAssets>
     </ProjectReference>
   </ItemGroup>

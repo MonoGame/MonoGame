@@ -13,7 +13,6 @@
     <ErrorOnDuplicatePublishOutputFiles>false</ErrorOnDuplicatePublishOutputFiles>
     <AssemblyName>mgcb</AssemblyName>
     <UseAppHost>true</UseAppHost>
-    <DisableMonoGameToolAssets>False</DisableMonoGameToolAssets>
   </PropertyGroup>
 
   <ItemGroup>
@@ -21,9 +20,7 @@
       <IncludeAssets>compile</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </ProjectReference>
-    <ProjectReference Include="..\..\MonoGame.Framework.Content.Pipeline\MonoGame.Framework.Content.Pipeline.csproj">
-      <AdditionalProperties>DisableMonoGameToolAssets=False</AdditionalProperties>
-    </ProjectReference>
+    <ProjectReference Include="..\..\MonoGame.Framework.Content.Pipeline\MonoGame.Framework.Content.Pipeline.csproj" />
   </ItemGroup>
 
 </Project>
