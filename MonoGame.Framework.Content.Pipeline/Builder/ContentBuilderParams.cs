@@ -6,6 +6,7 @@ using System.CommandLine;
 using System.CommandLine.Binding;
 using Microsoft.Xna.Framework.Content.Pipeline;
 using Microsoft.Xna.Framework.Graphics;
+using MonoGame.Framework.Content.Pipeline.Builder.Server;
 
 namespace MonoGame.Framework.Content.Pipeline.Builder;
 
@@ -120,7 +121,9 @@ public record ContentBuilderParams
         rootCommand.AddCommand(buildCommand);
 
         var serverCommand = new Command("server", "Start a content server.");
-        var serverPortOption = new Option<ushort>(
+
+        // so place custom options here...
+        /*var serverPortOption = new Option<ushort>(
                 name: "--port",
                 description: "The port to be used for the content server mode.",
                 getDefaultValue: () => defaultValues.ServerPort);
@@ -128,7 +131,9 @@ public record ContentBuilderParams
         serverCommand.SetHandler(
             (contentBuilder, serverPortOption) => ret = contentBuilder with { Mode = ContentBuilderMode.Server, ServerPort = serverPortOption },
             rootOptions,
-            serverPortOption);
+            serverPortOption);*/
+
+
         rootCommand.AddCommand(serverCommand);
 
         rootCommand.Invoke(args);
@@ -205,14 +210,13 @@ public record ContentBuilderParams
     public LogLevel LogLevel { get; init; } = LogLevel.Info;
 
     /// <summary>
-    /// Server port to use for the listening for content requests in <see cref="ContentBuilderMode.Server"/> mode.
-    /// </summary>
-    /// <value>7771 by default.</value>
-    public ushort ServerPort { get; init; } = 7771;
-
-    /// <summary>
     /// Should the content builder skip cleaning up old content cache data after the build is finished in <see cref="ContentBuilderMode.Builder"/> mode.
     /// </summary>
     /// <value><c>false</c> by default.</value>
     public bool SkipClean { get; init; } = false;
+
+    /// <summary>
+    /// 
+    /// </summary>
+    public List<ContentServer> Servers { get; init; } = [ new NetworkContentServer() ];
 }

@@ -2,10 +2,12 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
+using System.Collections;
 using System.Net;
 using System.Reflection;
 using Microsoft.Xna.Framework.Content.Pipeline;
 using Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler;
+using MonoGame.Framework.Content.Pipeline.Builder.Server;
 
 namespace MonoGame.Framework.Content.Pipeline.Builder;
 
@@ -126,7 +128,10 @@ public abstract class ContentBuilder
             }
             File.Copy(filePath, outputPath);
 
-            contentFileCache = new ContentFileCache();
+            contentFileCache = new ContentFileCache
+            {
+                ContentRoot = contentInfo.ContentRoot
+            };
             contentFileCache.AddDependency(this, relativePath);
             contentFileCache.AddOutputFile(this, outputPath);
             ContentCache.WriteContentFileCache(this, relativePath, contentFileCache);
@@ -182,6 +187,22 @@ public abstract class ContentBuilder
         }
 
         return (contentFileCache, processedObject);
+    }
+
+    private ContentFileCache? CheckContentCache(string relativePath, ContentInfo contentInfo)
+    {
+        if (!contentInfo.ShouldBuild)
+        {
+            return ContentCache.ReadContentFileCache(this, relativePath, contentInfo.ContentRoot);
+        }
+
+        if (!ContentBuilderHelper.GetImporter(relativePath, contentInfo.Importer, out IContentImporter importer) ||
+            !ContentBuilderHelper.GetProcessor(importer, contentInfo.Processor, out IContentProcessor processor))
+        {
+            return null;
+        }
+
+        return ContentCache.ReadContentFileCache(this, relativePath, contentInfo.ContentRoot, true, importer, processor);
     }
 
     /// <summary>
@@ -265,93 +286,102 @@ public abstract class ContentBuilder
         Logger.PopFile();
     }
 
+    class ContentRequest
+    {
+        public required string InputPath { get; init; }
+
+        public required ContentInfo ContentInfo { get; init; }
+
+        public required ContentServer Server { get; set; }
+
+        public required ContentRequestedArgs Args { get; set; }
+    }
+
+    private readonly Queue<ContentRequest> _contentRequestQueue = [];
+    private object _contentRequestLock = new();
+
     private void RunServer()
     {
         Console.CancelKeyPress += delegate
         {
+            foreach (var server in Parameters.Servers)
+            {
+                server.StopListening();
+            }
+
             // We don't want to call CleanCache in server mode as we don't go through all the files!
             ContentCache.FlushCache(this);
         };
 
-        Logger.Log($"Starting server on: http://localhost:{Parameters.ServerPort}/");
+        foreach (var server in Parameters.Servers)
+        {
+            server.Logger = Logger;
+            server.ContentRequested += ServerContentRequested;
+            server.StartListening();
+        }
+
         while (true)
         {
-            if (!HttpListener.IsSupported)
+            ContentRequest? request = null;
+
+            lock (_contentRequestQueue)
             {
-                Logger.Log("HttpListener is not supported on this system.");
-                return;
+                if (_contentRequestQueue.Count > 0)
+                {
+                    request = _contentRequestQueue.Dequeue();
+                }
             }
 
-            var listener = new HttpListener();
-            listener.Prefixes.Add($"http://*:{Parameters.ServerPort}/");
-            listener.Start();
-            Logger.Log("Listening...");
-
-            while (true)
+            if (request != null)
             {
-                try
+                BuildAndWriteContent(request.InputPath, request.ContentInfo);
+                request.Args.FilePath = Path.Combine(Parameters.RootedOutputDirectory, Path.Combine(request.ContentInfo.ContentRoot, request.ContentInfo.GetOutputPath(request.InputPath)));
+                request.Server.NotifyContentRequestCompiled();
+            }
+            else
+            {
+                lock (_contentRequestLock)
                 {
-                    RunServerCycle(listener);
-                }
-                catch (Exception ex)
-                {
-                    Logger.Log(LogLevel.Error, $"Error during a cycle: {ex}");
+                    Monitor.Wait(_contentRequestLock);
                 }
             }
         }
     }
 
-    void RunServerCycle(HttpListener listener)
+    private void ServerContentRequested(object? server, ContentRequestedArgs args)
     {
-        var context = listener.GetContext();
-        var request = context.Request;
-        var relativePath = request.Headers["path"] ?? "";
-        var filePath = Path.Combine(Parameters.RootedOutputDirectory, relativePath);
-
-        if (_outputContent.TryGetValue(relativePath, out var inputPath))
+        if (server is not ContentServer contentServer)
         {
-            if (_content.TryGetValue(inputPath, out ContentInfo? contentInfo))
-            {
-                BuildAndWriteContent(inputPath, contentInfo);
-            }
-        }
-
-        var response = context.Response;
-        var fileExists = File.Exists(filePath);
-        var currentLastModifiedTime = fileExists ? File.GetLastWriteTimeUtc(filePath).Ticks : 0;
-
-        var sentLastModifiedTimeStr = request.Headers["LastModifiedTime"];
-        try
-        {
-            if (fileExists && sentLastModifiedTimeStr != null)
-            {
-                var sentLastModifiedTime = long.Parse(sentLastModifiedTimeStr);
-
-                if (sentLastModifiedTime == currentLastModifiedTime)
-                {
-                    fileExists = false;
-                }
-            }
-        }
-        catch
-        {
-            Logger.Log(LogLevel.Error, $"Sent last modified time is invalid so ignoring it: {sentLastModifiedTimeStr}");
-        }
-
-        if (!fileExists)
-        {
-            response.ContentLength64 = 1;
-            response.OutputStream.Write([0], 0, 1);
-            response.OutputStream.Close();
             return;
         }
 
-        var lastModifiedTime = BitConverter.GetBytes(currentLastModifiedTime);
-        var buffer = File.ReadAllBytes(filePath);
+        if (_outputContent.TryGetValue(args.ContentPath, out var inputPath))
+        {
+            if (_content.TryGetValue(inputPath, out ContentInfo? contentInfo))
+            {
+                if (CheckContentCache(inputPath, contentInfo) is not null)
+                {
+                    // we've already found a valid cached version of content, so no need for any compilation here
+                    args.FilePath = Path.Combine(Parameters.RootedOutputDirectory, Path.Combine(contentInfo.ContentRoot, contentInfo.GetOutputPath(inputPath)));
+                    return;
+                }
 
-        response.ContentLength64 = lastModifiedTime.Length + buffer.Length;
-        response.OutputStream.Write(lastModifiedTime, 0, lastModifiedTime.Length);
-        response.OutputStream.Write(buffer, 0, buffer.Length);
-        response.OutputStream.Close();
+                args.CompilationStarted = true;
+                lock (_contentRequestQueue)
+                {
+                    _contentRequestQueue.Enqueue(new ContentRequest
+                    {
+                        InputPath = inputPath,
+                        ContentInfo = contentInfo,
+                        Server = contentServer,
+                        Args = args
+                    });
+                    lock (_contentRequestLock)
+                    {
+                        Monitor.Pulse(_contentRequestLock);
+                    }
+                }
+            }
+        }
     }
 }
