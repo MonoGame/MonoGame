@@ -86,7 +86,7 @@ void MGM_AudioDecoder_SetPosition(MGM_AudioDecoder* decoder, mgulong timeMS)
 	decoder->SetPosition(timeMS);
 }
 
-mgbool MGM_AudioDecoder_Decode(MGM_AudioDecoder* decoder, mgbyte*& buffer, mguint& size)
+mgbyte MGM_AudioDecoder_Decode(MGM_AudioDecoder* decoder, mgbyte*& buffer, mguint& size)
 {
 	assert(decoder != nullptr);
 	return decoder->Decode(buffer, size);
@@ -165,7 +165,7 @@ mgulong MGM_VideoDecoder_GetPosition(MGM_VideoDecoder* decoder)
 	return decoder->GetPosition();
 }
 
-void MGM_VideoDecoder_SetLooped(MGM_VideoDecoder* decoder, mgbool looped)
+void MGM_VideoDecoder_SetLooped(MGM_VideoDecoder* decoder, mgbyte looped)
 {
 	assert(decoder != nullptr);
 	decoder->SetLooped(looped);

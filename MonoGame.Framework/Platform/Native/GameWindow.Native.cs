@@ -2,11 +2,11 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
+using System;
+using System.Collections.Generic;
 using Microsoft.Xna.Framework.Graphics;
 using MonoGame.Framework.Utilities;
 using MonoGame.Interop;
-using System;
-using System.Collections.Generic;
 
 namespace Microsoft.Xna.Framework;
 
@@ -74,7 +74,7 @@ internal class NativeGameWindow : GameWindow
 
             if (!IsFullScreen)
             {
-                MGP.Window_GetPosition(_handle, &x, &y);
+                MGP.Window_GetPosition(_handle, out x, out y);
             }
 
             return new Point(x, y);
@@ -106,10 +106,9 @@ internal class NativeGameWindow : GameWindow
         var title = Title == null ? AssemblyHelper.GetDefaultWindowTitle() : Title;
 
         // Create the window which size may be changed by the platform.
-        fixed (int* w = &_width)
-        fixed (int* h = &_height)
-        fixed (byte* t = System.Text.Encoding.UTF8.GetBytes(title + '\0'))
-            _handle = MGP.Window_Create(platform.Handle, w, h, t);
+        byte* _title = stackalloc byte[StringInterop.GetMaxSize(title)];
+        StringInterop.CopyString(_title, title);
+        _handle = MGP.Window_Create(platform.Handle, ref _width, ref _height, _title);
 
         _windows[(nint)_handle] = this;
 
@@ -209,8 +208,9 @@ internal class NativeGameWindow : GameWindow
 
     protected override unsafe void SetTitle(string title)
     {
-        fixed (byte* t = System.Text.Encoding.UTF8.GetBytes(title + '\0'))
-            MGP.Window_SetTitle(_handle, t);
+        byte* _title = stackalloc byte[StringInterop.GetMaxSize(title)];
+        StringInterop.CopyString(_title, title);
+        MGP.Window_SetTitle(_handle, _title);
     }
 
     internal unsafe void Show(bool show)
