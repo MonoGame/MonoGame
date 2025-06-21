@@ -22,7 +22,7 @@ public partial class Texture3D : Texture
         var dataHandle = GCHandle.Alloc(data, GCHandleType.Pinned);
         var elementSizeInByte = ReflectionHelpers.FastSizeOf<T>();
         var startBytes = startIndex * elementSizeInByte;
-        var dataPtr = (IntPtr)(dataHandle.AddrOfPinnedObject().ToInt64() + startBytes);
+        var dataPtr = (nint)(dataHandle.AddrOfPinnedObject().ToInt64() + startBytes);
 
         var width = right - left;
         var height = bottom - top;
@@ -50,7 +50,7 @@ public partial class Texture3D : Texture
         var dataHandle = GCHandle.Alloc(data, GCHandleType.Pinned);
         var elementSizeInByte = ReflectionHelpers.FastSizeOf<T>();
         var startBytes = startIndex * elementSizeInByte;
-        var dataPtr = (IntPtr)(dataHandle.AddrOfPinnedObject().ToInt64() + startBytes);
+        var dataPtr = (nint)(dataHandle.AddrOfPinnedObject().ToInt64() + startBytes);
 
         var width = right - left;
         var height = bottom - top;
