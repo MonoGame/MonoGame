@@ -1973,9 +1973,9 @@ namespace Microsoft.Xna.Framework
         /// <param name="l">Luminosity (or brightness) component from 0.0f to 1.0f.</param>
         public void ToHSVL(out float h, out float s, out float v, out float l)
         {
-            double r = c.R / 255.0;
-            double g = c.G / 255.0;
-            double b = c.B / 255.0;
+            double r = R / 255.0;
+            double g = G / 255.0;
+            double b = B / 255.0;
 
             double max = Math.Max(r, Math.Max(g, b));
             double min = Math.Min(r, Math.Min(g, b));
