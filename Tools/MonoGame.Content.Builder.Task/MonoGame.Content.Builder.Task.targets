@@ -141,9 +141,11 @@
       Command="&quot;$(DotnetCommand)&quot; tool restore"
       WorkingDirectory="$(MSBuildProjectDirectory)"
       ContinueOnError="true"
-    />
+    >
+      <Output TaskParameter="ExitCode" PropertyName="_MGCBToolRestoreExitCode" />
+    </Exec>
     <MakeDir Directories="$(IntermediateOutputPath)" Condition="!Exists('$(IntermediateOutputPath)')" />
-    <Touch Files="$(IntermediateOutputPath)mgcb.tool.restore" AlwaysCreate="true" />
+    <Touch Files="$(IntermediateOutputPath)mgcb.tool.restore" AlwaysCreate="true" Condition="'$(_MGCBToolRestoreExitCode)' == '0'" />
     <ItemGroup>
       <FileWrites Include="$(IntermediateOutputPath)mgcb.tool.restore" />
     </ItemGroup>
