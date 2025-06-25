@@ -142,6 +142,7 @@
       WorkingDirectory="$(MSBuildProjectDirectory)"
       ContinueOnError="true"
     />
+    <MakeDir Directories="$(IntermediateOutputPath)" Condition="!Exists('$(IntermediateOutputPath)')" />
     <Touch Files="$(IntermediateOutputPath)mgcb.tool.restore" AlwaysCreate="true" />
     <ItemGroup>
       <FileWrites Include="$(IntermediateOutputPath)mgcb.tool.restore" />
