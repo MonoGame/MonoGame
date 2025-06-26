@@ -7,6 +7,11 @@ namespace Microsoft.Xna.Framework
     /// <summary>
     /// Defines the index of player for various MonoGame components.
     /// </summary>
+    /// <remarks>
+    /// Use <see cref="GamePad.MaximumGamePadCount" /> to determine the number of supported gamepads on the current 
+    /// platform to ensure that a valid <see cref="PlayerIndex" /> is used when accessing gamepad input.
+    /// Not all platforms support all eight player indices.
+    /// </remarks>
     public enum PlayerIndex
     {
         /// <summary>
