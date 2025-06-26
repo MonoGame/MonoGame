@@ -1,4 +1,4 @@
-﻿// MonoGame - Copyright (C) The MonoGame Team
+﻿// MonoGame - Copyright (C) MonoGame Foundation, Inc
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
@@ -14,6 +14,7 @@ namespace MonoGame.Effect
         public ShaderInfo ShaderInfo { get; private set; }
 
         public string FilePath { get; private set; }
+        public string RelativeFilePath { get; set; }
 
         public string FileContent { get; private set; }
 

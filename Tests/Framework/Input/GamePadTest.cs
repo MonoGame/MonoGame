@@ -1,4 +1,4 @@
-﻿// MonoGame - Copyright (C) The MonoGame Team
+﻿// MonoGame - Copyright (C) MonoGame Foundation, Inc
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
@@ -315,7 +315,12 @@ namespace MonoGame.Tests.Input
 
             foreach (var button in allButtons)
             {
-                if (pressedButtons.Contains(button))
+                if (button == Buttons.None)
+                {
+                    Assert.IsFalse(state.IsButtonDown(button));
+                    Assert.IsFalse(state.IsButtonUp(button));
+                }
+                else if (pressedButtons.Contains(button))
                 {
                     Assert.IsTrue(state.IsButtonDown(button));
                     Assert.IsFalse(state.IsButtonUp(button));

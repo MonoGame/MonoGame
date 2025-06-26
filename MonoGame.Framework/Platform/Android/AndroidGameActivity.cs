@@ -1,4 +1,4 @@
-// MonoGame - Copyright (C) The MonoGame Team
+// MonoGame - Copyright (C) MonoGame Foundation, Inc
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
@@ -10,7 +10,6 @@ using Android.Views;
 
 namespace Microsoft.Xna.Framework
 {
-	[CLSCompliant(false)]
     public class AndroidGameActivity : Activity
     {
         internal Game Game { private get; set; }
@@ -93,7 +92,6 @@ namespace Microsoft.Xna.Framework
 		}
     }
 
-	[CLSCompliant(false)]
 	public static class ActivityExtensions
     {
         public static ActivityAttribute GetActivityAttribute(this AndroidGameActivity obj)

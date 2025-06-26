@@ -1,4 +1,4 @@
-﻿// MonoGame - Copyright (C) The MonoGame Team
+﻿// MonoGame - Copyright (C) MonoGame Foundation, Inc
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
@@ -50,13 +50,6 @@ namespace MonoGame.Effect
             // For now GLSL is only supported via translation
             // using MojoShader which works from HLSL bytecode.
             var bytecode = EffectObject.CompileHLSL(shaderResult, shaderFunction, shaderProfile, ref errorsAndWarnings);
-
-            // First look to see if we already created this same shader.
-            foreach (var shader in effect.Shaders)
-            {
-                if (bytecode.SequenceEqual(shader.Bytecode))
-                    return shader;
-            }
 
             var shaderInfo = shaderResult.ShaderInfo;
             var shaderData = ShaderData.CreateGLSL(bytecode, isVertexShader, effect.ConstantBuffers, effect.Shaders.Count, shaderInfo.SamplerStates, shaderResult.Debug);

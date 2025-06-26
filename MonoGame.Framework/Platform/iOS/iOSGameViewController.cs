@@ -1,4 +1,4 @@
-// MonoGame - Copyright (C) The MonoGame Team
+// MonoGame - Copyright (C) MonoGame Foundation, Inc
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
@@ -8,6 +8,7 @@ using System.Drawing;
 using UIKit;
 using Foundation;
 using CoreGraphics;
+using ObjCRuntime;
 
 namespace Microsoft.Xna.Framework
 {

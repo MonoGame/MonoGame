@@ -13,6 +13,10 @@ namespace MonoGame.Effect
 
 		public bool IsVertexShader { get; private set; }
 
+        public string SourceFile { get; set; }
+
+        public string Entrypoint { get; set; }
+
 		public struct Sampler
 		{
 			public MojoShader.MOJOSHADER_samplerType type;
@@ -53,6 +57,8 @@ namespace MonoGame.Effect
 
 		// The index of the shader in the shared list.
 		public int SharedIndex { get; private set; }
+
+        public string ShaderProfile { get; set; }
 
 #endregion // Non-Serialized Stuff
 

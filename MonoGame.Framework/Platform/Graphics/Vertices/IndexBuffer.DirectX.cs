@@ -1,4 +1,4 @@
-﻿// MonoGame - Copyright (C) The MonoGame Team
+﻿// MonoGame - Copyright (C) MonoGame Foundation, Inc
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
@@ -110,7 +110,7 @@ namespace Microsoft.Xna.Framework.Graphics
             }
         }
 
-        private void PlatformSetDataInternal<T>(int offsetInBytes, T[] data, int startIndex, int elementCount, SetDataOptions options) where T : struct
+        private void PlatformSetData<T>(int offsetInBytes, T[] data, int startIndex, int elementCount, SetDataOptions options) where T : struct
         {
             GenerateIfRequired();
 
@@ -161,6 +161,7 @@ namespace Microsoft.Xna.Framework.Graphics
             }
         }
 
+        /// <summary />
         protected override void Dispose(bool disposing)
         {
             if (disposing)

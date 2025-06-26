@@ -1,4 +1,4 @@
-// MonoGame - Copyright (C) The MonoGame Team
+// MonoGame - Copyright (C) MonoGame Foundation, Inc
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
@@ -22,7 +22,9 @@ namespace Microsoft.Xna.Framework
             _gameWindow = new AndroidGameWindow(Game.Activity, game);
             Window = _gameWindow;
 
+#if !NO_AUDIO
             MediaLibrary.Context = Game.Activity;
+#endif
         }
 
         protected override void Dispose(bool disposing)

@@ -8,68 +8,76 @@ namespace MonoGame.Tests.ContentPipeline
     [TestFixture]
     public class BuilderTargetsTest
     {
-        string[] msBuildFolders = new string[]
+        string FindTool (string toolName)
         {
-            Path.Combine ("MSBuild", "15.0", "Bin", "MSBuild.exe"),
-            Path.Combine ("MSBuild", "14.0", "Bin", "MSBuild.exe"),
-        };
-        string FindBuildTool(string buildTool)
-        {
-            if (Environment.OSVersion.Platform == PlatformID.Win32NT && buildTool == "msbuild")
+            var dotnetRoot = Environment.GetEnvironmentVariable ("DOTNET_ROOT");
+            TestContext.WriteLine ("DOTNET_ROOT=" + dotnetRoot);
+            if (!string.IsNullOrEmpty (dotnetRoot))
             {
-                var programFiles = Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86);
-                foreach (var path in msBuildFolders)
+                var dotNetExe = Path.Combine (dotnetRoot, OperatingSystem.IsWindows() ? "dotnet.exe" : "dotnet");
+                TestContext.WriteLine ("DOTNET_EXE=" + dotNetExe);
+                if (File.Exists (dotNetExe))
                 {
-                    if (File.Exists(Path.Combine(programFiles, path)))
-                        return Path.Combine(programFiles, path);
+                    TestContext.WriteLine ("returning:" + dotNetExe);
+                    return dotNetExe;
                 }
             }
-            return buildTool;
+            TestContext.WriteLine ("returning:" + toolName);
+            return toolName;
         }
         bool RunBuild(string buildTool, string projectFile, params string[] parameters)
         {
             var root = Path.GetDirectoryName(typeof(BuilderTargetsTest).Assembly.Location);
-            var psi = new ProcessStartInfo(FindBuildTool(buildTool))
+            var tool = FindTool(buildTool);
+            var psi = new ProcessStartInfo(tool)
             {
-                Arguments = projectFile + " /t:BuildContent " + string.Join(" ", parameters) + " /noconsolelogger \"/flp1:LogFile=build.log;Encoding=UTF-8;Verbosity=Diagnostic\"",
+                Arguments = $"build \"{projectFile}\" -t:IncludeContent {string.Join(" ", parameters)} -tl:off -bl -p:DotnetCommand=\"{tool}\"",
                 WorkingDirectory = root,
-                UseShellExecute = true,
+                UseShellExecute = false,
+                RedirectStandardOutput = true,
+                RedirectStandardError = true,
+                CreateNoWindow = true
             };
+            TestContext.WriteLine (psi.FileName + " " + psi.Arguments);
             using (var process = Process.Start(psi))
             {
-                process.WaitForExit();
+                process.OutputDataReceived += (sender, e) => {
+                if (!string.IsNullOrEmpty(e.Data))
+                {
+                    TestContext.WriteLine($"Output: {e.Data}");
+                }
+                };
+
+                process.ErrorDataReceived += (sender, e) => {
+                    if (!string.IsNullOrEmpty(e.Data))
+                    {
+                        TestContext.WriteLine($"Error: {e.Data}");
+                    }
+                };
+                process.BeginOutputReadLine();
+                process.BeginErrorReadLine();
+                if (!process.WaitForExit(60000)) {// wait for 60 seconds
+                    process.Kill();
+                    process.WaitForExit();
+                }
                 return process.ExitCode == 0;
             }
         }
 
-        static object[] BuilderTargetsBuildTools = new object[] {
-            "msbuild",
-            "xbuild",
-        };
-
         [Test]
-        [TestCaseSource("BuilderTargetsBuildTools")]
-#if DESKTOPGL
-        [Ignore("Fails on Mac build server with xbuild for some reason.")]
-#else
-        [Ignore("This test need to be rewritten to properly test Tools\\MonoGame.Content.Builder instead of the old builder targets.")]
-#endif
-        public void BuildSimpleProject(string buildTool)
+        public void BuildSimpleProject()
         {
-            if (buildTool == "xbuild" && Environment.OSVersion.Platform == PlatformID.Win32NT)
-                Assert.Ignore("Skipping xbuild tests on windows");
-
             var root = Path.GetDirectoryName(typeof(BuilderTargetsTest).Assembly.Location);
             var outputPath = Path.Combine(root, "Assets", "Projects", "Content", "bin");
             if (Directory.Exists(outputPath))
                 Directory.Delete(outputPath, recursive: true);
 
-            var result = RunBuild(buildTool, Path.Combine("Assets", "Projects", "BuildSimpleProject.csproj"), new string[] {
-                "/p:MonoGameContentBuilderExe=" + Path.Combine(root, "MGCB.exe")
+            var result = RunBuild("dotnet", Path.Combine(root, "Assets", "Projects", "BuildSimpleProject.csproj"), new string[] {
+                $"-p:MGCBCommand=\"{Path.Combine(root, "mgcb.dll")}\""
             });
             Assert.AreEqual(true, result, "Content Build should have succeeded.");
             var contentFont = Path.Combine(outputPath, "DesktopGL", "Content", "ContentFont.xnb");
-            Assert.IsTrue(File.Exists(contentFont), "'" + contentFont + "' should exist.");
+            Assert.IsTrue(File.Exists(contentFont), $"'{contentFont}' should exist.");
         }
     }
 }

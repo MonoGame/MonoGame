@@ -1,4 +1,4 @@
-﻿// MonoGame - Copyright (C) The MonoGame Team
+﻿// MonoGame - Copyright (C) MonoGame Foundation, Inc
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
@@ -24,7 +24,6 @@ namespace Microsoft.Xna.Framework.Audio
         private float _reverbMix;
 
         private bool _paused;
-        private bool _loop;
 
         private void PlatformInitialize(byte[] buffer, int sampleRate, int channels)
         {
@@ -162,7 +161,7 @@ namespace Microsoft.Xna.Framework.Audio
             if (_voice != null && SoundEffect.MasterVoice != null)
             {
                 // Choose the correct buffer depending on if we are looped.            
-                var buffer = _loop ? _effect._loopedBuffer : _effect._buffer;
+                var buffer = _isLooped ? _effect._loopedBuffer : _effect._buffer;
 
                 if (_voice.State.BuffersQueued > 0)
                 {
@@ -182,7 +181,7 @@ namespace Microsoft.Xna.Framework.Audio
             if (_voice != null && SoundEffect.MasterVoice != null)
             {
                 // Restart the sound if (and only if) it stopped playing
-                if (!_loop)
+                if (!_isLooped)
                 {
                     if (_voice.State.BuffersQueued == 0)
                     {
@@ -207,24 +206,14 @@ namespace Microsoft.Xna.Framework.Audio
                 }
                 else
                 {
-                    if (_loop)
+                    if (_isLooped)
                         _voice.ExitLoop();
                     else
                         _voice.Stop((int)PlayFlags.Tails);
                 }
             }
-
+            
             _paused = false;
-        }
-
-        private void PlatformSetIsLooped(bool value)
-        {
-            _loop = value;
-        }
-
-        private bool PlatformGetIsLooped()
-        {
-            return _loop;
         }
 
         private void PlatformSetPan(float value)
@@ -307,7 +296,7 @@ namespace Microsoft.Xna.Framework.Audio
 
             // NOTE: This is copy of what XAudio2.SemitonesToFrequencyRatio() does
             // which avoids the native call and is actually more accurate.
-             var pitch = (float)Math.Pow(2.0, value);
+             var pitch = MathF.Pow(2.0f, value);
              _voice.SetFrequencyRatio(pitch);
         }
 

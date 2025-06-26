@@ -3,7 +3,14 @@
   <PropertyGroup>
     <DotnetCommand Condition="'$(DotnetCommand)' == ''">dotnet</DotnetCommand>
     <EnableMGCBItems Condition="'$(EnableMGCBItems)' == ''">true</EnableMGCBItems>
-    <MGCBPath Condition="'$(MGCBPath)' == ''">$(MSBuildThisFileDirectory)\..\tools\netcoreapp3.1\any\mgcb.dll</MGCBPath>
+    <!-- Allow users the ability to disble tool restoration if needed -->
+    <!-- If the user is using a custom $(MGCBCommand) , disable auto restore. -->
+    <AutoRestoreMGCBTool Condition="'$(AutoRestoreMGCBTool)' == '' And '$(MGCBCommand)' != ''">false</AutoRestoreMGCBTool>
+    <AutoRestoreMGCBTool Condition="'$(AutoRestoreMGCBTool)' == ''">true</AutoRestoreMGCBTool>
+    <MGCBToolDirectory Condition="'$(MGCBToolDirectory)' == ''">$(MSBuildThisFileDirectory)dotnet-tools/</MGCBToolDirectory>
+    <MGCBToolDirectory Condition="'$(MGCBToolDirectory)' != '' And !HasTrailingSlash('$(MGCBToolDirectory)')">$(MGCBToolDirectory)/</MGCBToolDirectory>
+    <MGCBCommand Condition="'$(MGCBCommand)' == ''">mgcb</MGCBCommand>
+    <MonoGameVersion Condition="'$(MonoGameVersion)' == ''">3.8.4.0</MonoGameVersion>
   </PropertyGroup>
 
 </Project>

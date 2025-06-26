@@ -1,4 +1,4 @@
-// MonoGame - Copyright (C) The MonoGame Team
+// MonoGame - Copyright (C) MonoGame Foundation, Inc
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
@@ -34,13 +34,13 @@ namespace Microsoft.Xna.Framework
         /// </summary>
         public virtual bool AllowAltF4 { get { return _allowAltF4; } set { _allowAltF4 = value; } }
 
-#if (WINDOWS && !WINDOWS_UAP) || DESKTOPGL
         /// <summary>
         /// The location of this window on the desktop, eg: global coordinate space
         /// which stretches across all screens.
+        /// 
+        /// May be zero on platforms where it is not supported.
         /// </summary>
         public abstract Point Position { get; set; }
-#endif
 
 	    /// <summary>
 	    /// The display orientation on a mobile device.
@@ -52,7 +52,6 @@ namespace Microsoft.Xna.Framework
 		///
 		/// For WindowsDX this is the Win32 window handle (HWND).
 		/// For DesktopGL this is the SDL window handle.
-		/// For UWP this is a handle to an IUnknown interface for the CoreWindow.
 	    /// </summary>
 		public abstract IntPtr Handle { get; }
 
@@ -65,10 +64,6 @@ namespace Microsoft.Xna.Framework
         /// <summary>
         /// Gets or sets the title of the game window.
         /// </summary>
-        /// <remarks>
-        /// For UWP this has no effect. The title should be
-        /// set by using the DisplayName property found in the app manifest file.
-        /// </remarks>
         public string Title {
 			get { return _title; }
 			set {
@@ -128,7 +123,7 @@ namespace Microsoft.Xna.Framework
 	    /// </summary>
 		public event EventHandler<EventArgs> ScreenDeviceNameChanged;
 
-#if WINDOWS || WINDOWS_UAP || DESKTOPGL|| ANGLE
+#if WINDOWS || DESKTOPGL|| ANGLE || NATIVE
 
         /// <summary>
 		/// Use this event to user text input.
@@ -218,6 +213,9 @@ namespace Microsoft.Xna.Framework
             EventHelpers.Raise(this, OrientationChanged, EventArgs.Empty);
 		}
 
+        /// <summary>
+        /// Called when the window needs to be painted.
+        /// </summary>
 		protected void OnPaint ()
 		{
 		}
@@ -230,11 +228,11 @@ namespace Microsoft.Xna.Framework
             EventHelpers.Raise(this, ScreenDeviceNameChanged, EventArgs.Empty);
 		}
 
-#if WINDOWS || WINDOWS_UAP || DESKTOPGL || ANGLE
+#if WINDOWS || DESKTOPGL || ANGLE || NATIVE
+
 	    /// <summary>
 	    /// Called when the window receives text input. Raises the <see cref="TextInput"/> event.
 	    /// </summary>
-	    /// <param name="sender">The game window.</param>
 	    /// <param name="e">Parameters to the <see cref="TextInput"/> event.</param>
 		internal void OnTextInput(TextInputEventArgs e)
 		{
@@ -255,6 +253,10 @@ namespace Microsoft.Xna.Framework
             EventHelpers.Raise(this, FileDrop, e);
         }
 
+        /// <summary>
+        /// Sets the supported display orientations.
+        /// </summary>
+        /// <param name="orientations">Supported display orientations</param>
         protected internal abstract void SetSupportedOrientations (DisplayOrientation orientations);
 
 	    /// <summary>
@@ -264,7 +266,6 @@ namespace Microsoft.Xna.Framework
 		protected abstract void SetTitle (string title);
 
 #if DIRECTX && WINDOWS
-    
         /// <summary>
         /// Create an additional window. Only available in WindowsDX.
         /// </summary>

@@ -1,15 +1,17 @@
-// MonoGame - Copyright (C) The MonoGame Team
+// MonoGame - Copyright (C) MonoGame Foundation, Inc
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
-using MonoGame.OpenGL;
 using System;
-using System.Collections.Generic;
+using MonoGame.OpenGL;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
     public partial class RenderTarget2D
     {
+        private static Action<RenderTarget2D> DisposeAction =
+            (t) => t.GraphicsDevice.PlatformDeleteRenderTarget(t);
+
         int IRenderTarget.GLTexture
         {
             get { return glTexture; }
@@ -34,26 +36,23 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             Threading.BlockOnUIThread(() =>
             {
-                graphicsDevice.PlatformCreateRenderTarget(this, width, height, mipMap, this.Format, preferredDepthFormat, preferredMultiSampleCount, usage);
+                graphicsDevice.PlatformCreateRenderTarget(
+                    this, width, height, mipMap, this.Format, preferredDepthFormat, preferredMultiSampleCount, usage);
             });
-            
-            
         }
 
         private void PlatformGraphicsDeviceResetting()
         {
         }
 
+        /// <summary/>
         protected override void Dispose(bool disposing)
         {
             if (!IsDisposed)
             {
                 if (GraphicsDevice != null)
                 {
-                    Threading.BlockOnUIThread(() =>
-                    {
-                        this.GraphicsDevice.PlatformDeleteRenderTarget(this);
-                    });
+                    Threading.BlockOnUIThread(DisposeAction, this);
                 }
             }
 

@@ -6,6 +6,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
 using Microsoft.Xna.Framework.Graphics;
+using MonoGame.Framework.Content;
+using MonoGame.Tools.Tests;
 
 namespace MonoGame.Tests.ContentPipeline
 {
@@ -173,6 +175,8 @@ namespace MonoGame.Tests.ContentPipeline
         [Test]
         public void BitmapCompressFullNoResize()
         {
+            using var _ = ContextScopeFactory.BeginContext(new TestBitmapProcessorContext());
+
 #if !XNA
             BitmapCompressFullNoResize<byte>(56);
 #endif
@@ -215,40 +219,113 @@ namespace MonoGame.Tests.ContentPipeline
 
             for (var p = 0; p < rgba.Length; p += 4)
             {
-                Assert.That(rgba[p + 0], Is.EqualTo(color.R).Within(range));
-                Assert.That(rgba[p + 1], Is.EqualTo(color.G).Within(range));
-                Assert.That(rgba[p + 2], Is.EqualTo(color.B).Within(range));
-                Assert.That(rgba[p + 3], Is.EqualTo(color.A).Within(range));
+                Assert.That(rgba[p + 0], Is.EqualTo(color.R).Within(range), "Red is not within tolerance");
+                Assert.That(rgba[p + 1], Is.EqualTo(color.G).Within(range), "Green is not within tolerance");
+                Assert.That(rgba[p + 2], Is.EqualTo(color.B).Within(range), "Blue is not within tolerance");
+                Assert.That(rgba[p + 3], Is.EqualTo(color.A).Within(range), "Alpha is not within tolerance");
             }
         }
 
         static void BitmapConvertAssert(Type bitmapType, Color color, int w, int h, int range)
         {
+            using var _ = ContextScopeFactory.BeginContext(new TestBitmapProcessorContext());
             var b = BitmapConvert(bitmapType, color, w, h);
             BitmapAssert(b, color, range);
         }
 
         static void BitmapConvertAssert(Type bitmapType, Color color, int w, int h, Color compare, int range)
         {
+            using var _ = ContextScopeFactory.BeginContext(new TestBitmapProcessorContext());
             var b = BitmapConvert(bitmapType, color, w, h);
             BitmapAssert(b, compare, range);
         }
 
         [Test]
-        public void BitmapCompress()
+        public void BitmapCompress_Atc_Interpolated()
         {
-            var Transparent = new Color(0, 0, 0, 0);
-            var Grey16Premult = new Color(16, 16, 16, 16);
+            // validate that we can compress an atc interpolated texture
+            using var _ = ContextScopeFactory.BeginContext(new TestBitmapProcessorContext());
+            BitmapConvert(typeof(AtcInterpolatedBitmapContent), Color.Red, 64, 64);
+        }
+
+        [Test]
+        public void BitmapCompress_Atc_Explicit()
+        {
+            // validate that we can compress an atc explicit texture
+            using var _ = ContextScopeFactory.BeginContext(new TestBitmapProcessorContext());
+            BitmapConvert(typeof(AtcExplicitBitmapContent), Color.Red, 64, 64);
+        }
+
+
+        [Test]
+        public void BitmapCompress_Etc1()
+        {
+            // validate that we can compress an atc interpolated texture
+            using var _ = ContextScopeFactory.BeginContext(new TestBitmapProcessorContext());
+            BitmapConvert(typeof(Etc1BitmapContent), Color.Red, 64, 64);
+        }
+
+        [Test]
+        public void BitmapCompress_Etc2()
+        {
+            // validate that we can compress an atc interpolated texture
+            using var _ = ContextScopeFactory.BeginContext(new TestBitmapProcessorContext());
+            BitmapConvert(typeof(Etc2BitmapContent), Color.Red, 64, 64);
+        }
+
+
+        [Test]
+        public void BitmapCompress_Astc()
+        {
+            // validate that we can compress an atc interpolated texture
+            using var _ = ContextScopeFactory.BeginContext(new TestBitmapProcessorContext());
+            BitmapConvert(typeof(AstcBitmapContent), Color.Red, 64, 64);
+        }
+
+        [Test]
+        public void BitmapCompress_Pvrtc()
+        {
+            // validate that we can compress a pvrtc rgb texture
+            using (var _ = ContextScopeFactory.BeginContext(new TestBitmapProcessorContext()))
+            {
+                BitmapConvert(typeof(PvrtcRgb4BitmapContent), Color.Red, 64, 64);
+            }
+
+
+            // validate that we can compress a pvrtc rgb texture
+            using (var _ = ContextScopeFactory.BeginContext(new TestBitmapProcessorContext()))
+            {
+                BitmapConvert(typeof(PvrtcRgba4BitmapContent), Color.Red, 64, 64);
+            }
+        }
+
+        [Test]
+        public void BitmapCompress_Dxt1()
+        {
             BitmapConvertAssert(typeof(Dxt1BitmapContent), Color.Red, 64, 64, 0);
             BitmapConvertAssert(typeof(Dxt1BitmapContent), Color.Green, 32, 34, 2);
             BitmapConvertAssert(typeof(Dxt1BitmapContent), Color.Blue, 8, 9, 0);
-            BitmapConvertAssert(typeof(Dxt1BitmapContent), Transparent, 16, 16, 0);
-            //BitmapConvertAssert(typeof(Dxt1BitmapContent), Grey16Premult, 16, 16, Transparent, 0);
+            BitmapConvertAssert(typeof(Dxt1BitmapContent), Color.Transparent, 64, 64, 0);
+        }
+
+        [Test]
+        public void BitmapCompress_Dxt3()
+        {
+            var Transparent = new Color(0, 0, 0, 0);
+            var Grey16Premult = new Color(16, 16, 16, 16);
             BitmapConvertAssert(typeof(Dxt3BitmapContent), Color.Red, 64, 64, 0);
             BitmapConvertAssert(typeof(Dxt3BitmapContent), Color.Green, 32, 34, 2);
             BitmapConvertAssert(typeof(Dxt3BitmapContent), Color.Blue, 8, 9, 0);
             BitmapConvertAssert(typeof(Dxt3BitmapContent), Transparent, 16, 16, 0);
             BitmapConvertAssert(typeof(Dxt3BitmapContent), Grey16Premult, 16, 16, Grey16Premult, 1);
+        }
+
+        [Test]
+        public void BitmapCompress_Dxt5()
+        {
+            var Transparent = new Color(0, 0, 0, 0);
+            var Grey16Premult = new Color(16, 16, 16, 16);
+
             BitmapConvertAssert(typeof(Dxt5BitmapContent), Color.Red, 64, 64, 0);
             BitmapConvertAssert(typeof(Dxt5BitmapContent), Color.Green, 32, 34, 2);
             BitmapConvertAssert(typeof(Dxt5BitmapContent), Color.Blue, 8, 9, 0);

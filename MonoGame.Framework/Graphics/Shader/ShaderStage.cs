@@ -1,8 +1,14 @@
-﻿namespace Microsoft.Xna.Framework.Graphics
+﻿// MonoGame - Copyright (C) MonoGame Foundation, Inc
+// This file is subject to the terms and conditions defined in
+// file 'LICENSE.txt', which is part of this source code package.
+
+namespace Microsoft.Xna.Framework.Graphics
 {
-    internal enum ShaderStage
+    public enum ShaderStage
     {
         Vertex,
         Pixel,
+
+        Count,
     }
 }

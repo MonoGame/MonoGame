@@ -1,4 +1,4 @@
-// MonoGame - Copyright (C) The MonoGame Team
+// MonoGame - Copyright (C) MonoGame Foundation, Inc
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
@@ -27,7 +27,6 @@ namespace Microsoft.Xna.Framework.Audio
         private static Speakers _speakers = Speakers.Stereo;
 
         // XNA does not expose this, but it exists in X3DAudio.
-        [CLSCompliant(false)]
         public static Speakers Speakers
         {
             get { return _speakers; }
@@ -97,7 +96,7 @@ namespace Microsoft.Xna.Framework.Audio
             {
                 if (Device == null)
                 {
-#if !WINDOWS_UAP && DEBUG
+#if DEBUG
                     try
                     {
                         //Fails if the XAudio2 SDK is not installed
@@ -113,11 +112,7 @@ namespace Microsoft.Xna.Framework.Audio
                 }
 
                 // Just use the default device.
-#if WINDOWS_UAP
-                string deviceId = null;
-#else
                 const int deviceId = 0;
-#endif
 
                 if (MasterVoice == null)
                 {
@@ -126,13 +121,9 @@ namespace Microsoft.Xna.Framework.Audio
                 }
 
                 // The autodetected value of MasterVoice.ChannelMask corresponds to the speaker layout.
-#if WINDOWS_UAP
-                Speakers = (Speakers)MasterVoice.ChannelMask;
-#else
                 Speakers = Device.Version == XAudio2Version.Version27 ?
                     Device.GetDeviceDetails(deviceId).OutputFormat.ChannelMask:
                     (Speakers) MasterVoice.ChannelMask;
-#endif
             }
             catch
             {
@@ -196,7 +187,7 @@ namespace Microsoft.Xna.Framework.Audio
             {
                 duration = TimeSpan.FromSeconds((float)loopLength / sampleRate);
 
-                CreateBuffers(  new WaveFormatAdpcm(sampleRate, channels, blockAlignment),
+                CreateBuffers(  new WaveFormatAdpcm(sampleRate, channels, (blockAlignment + 22) * channels),
                                 ToDataStream(0, buffer, buffer.Length),
                                 loopStart,
                                 loopLength);

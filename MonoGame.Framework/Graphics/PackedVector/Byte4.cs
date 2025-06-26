@@ -1,4 +1,4 @@
-﻿// MonoGame - Copyright (C) The MonoGame Team
+﻿// MonoGame - Copyright (C) MonoGame Foundation, Inc
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
@@ -14,21 +14,23 @@ namespace Microsoft.Xna.Framework.Graphics.PackedVector
         uint packedValue;
 
         /// <summary>
-        /// Initializes a new instance of the Byte4 class.
+        /// Initializes a new instance of this structure.
         /// </summary>
-        /// <param name="vector">A vector containing the initial values for the components of the Byte4 structure.</param>
+        /// <param name="vector">
+        /// A <see cref="Vector4"/> value who's components contain the initial values for this structure.
+        /// </param>
         public Byte4(Vector4 vector)
         {
             packedValue = Pack(ref vector);
         }
 
         /// <summary>
-        /// Initializes a new instance of the Byte4 class.
+        /// Initializes a new instance of this structure.
         /// </summary>
-        /// <param name="x">Initial value for the x component.</param>
-        /// <param name="y">Initial value for the y component.</param>
-        /// <param name="z">Initial value for the z component.</param>
-        /// <param name="w">Initial value for the w component.</param>
+        /// <param name="x">The initial x-component value for this structure.</param>
+        /// <param name="y">The initial y-component value for this structure.</param>
+        /// <param name="z">The initial z-component value for this structure.</param>
+        /// <param name="w">The initial 2-component value for this structure.</param>
         public Byte4(float x, float y, float z, float w)
         {
             var vector = new Vector4(x, y, z, w);
@@ -36,32 +38,28 @@ namespace Microsoft.Xna.Framework.Graphics.PackedVector
         }
 
         /// <summary>
-        /// Compares the current instance of a class to another instance to determine whether they are different.
+        /// Returns a value that indicates whether the two value are not equal.
         /// </summary>
-        /// <param name="a">The object to the left of the equality operator.</param>
-        /// <param name="b">The object to the right of the equality operator.</param>
-        /// <returns>true if the objects are different; false otherwise.</returns>
+        /// <param name="a">The value on the left of the inequality operator.</param>
+        /// <param name="b">The value on the right of the inequality operator.</param>
+        /// <returns>true if the two value are not equal; otherwise, false.</returns>
         public static bool operator !=(Byte4 a, Byte4 b)
         {
             return a.PackedValue != b.PackedValue;
         }
 
         /// <summary>
-        /// Compares the current instance of a class to another instance to determine whether they are the same.
+        /// Returns a value that indicates whether the two values are equal.
         /// </summary>
-        /// <param name="a">The object to the left of the equality operator.</param>
-        /// <param name="b">The object to the right of the equality operator.</param>
-        /// <returns>true if the objects are the same; false otherwise.</returns>
+        /// <param name="a">The value on the left of the equality operator.</param>
+        /// <param name="b">The value on the right of the equality operator.</param>
+        /// <returns>true if the two values are equal; otherwise, false.</returns>
         public static bool operator ==(Byte4 a, Byte4 b)
         {
             return a.PackedValue == b.PackedValue;
         }
 
-        /// <summary>
-        /// Directly gets or sets the packed representation of the value.
-        /// </summary>
-        /// <value>The packed representation of the value.</value>
-        [CLSCompliant(false)]
+        /// <inheritdoc />
         public uint PackedValue
         {
             get
@@ -74,11 +72,7 @@ namespace Microsoft.Xna.Framework.Graphics.PackedVector
             }
         }
 
-        /// <summary>
-        /// Returns a value that indicates whether the current instance is equal to a specified object.
-        /// </summary>
-        /// <param name="obj">The object with which to make the comparison.</param>
-        /// <returns>true if the current instance is equal to the specified object; false otherwise.</returns>
+        /// <inheritdoc />
         public override bool Equals(object obj)
         {
             if (obj is Byte4)
@@ -86,66 +80,45 @@ namespace Microsoft.Xna.Framework.Graphics.PackedVector
             return false;
         }
 
-        /// <summary>
-        /// Returns a value that indicates whether the current instance is equal to a specified object.
-        /// </summary>
-        /// <param name="other">The object with which to make the comparison.</param>
-        /// <returns>true if the current instance is equal to the specified object; false otherwise.</returns>
+        /// <inheritdoc />
         public bool Equals(Byte4 other)
         {
             return this == other;
         }
 
-        /// <summary>
-        /// Gets the hash code for the current instance.
-        /// </summary>
-        /// <returns>Hash code for the instance.</returns>
+        /// <inheritdoc />
         public override int GetHashCode()
         {
             return packedValue.GetHashCode();
         }
 
-        /// <summary>
-        /// Returns a string representation of the current instance.
-        /// </summary>
-        /// <returns>String that represents the object.</returns>
+        /// <inheritdoc />
         public override string ToString()
         {
             return packedValue.ToString("x8");
         }
 
-        /// <summary>
-        /// Packs a vector into a uint.
-        /// </summary>
-        /// <param name="vector">The vector containing the values to pack.</param>
-        /// <returns>The ulong containing the packed values.</returns>
         static uint Pack(ref Vector4 vector)
         {
             const float max = 255.0f;
             const float min = 0.0f;
 
             // clamp the value between min and max values
-            var byte4 = (uint) Math.Round(MathHelper.Clamp(vector.X, min, max)) & 0xFF;
-            var byte3 = ((uint) Math.Round(MathHelper.Clamp(vector.Y, min, max)) & 0xFF) << 0x8;
-            var byte2 = ((uint) Math.Round(MathHelper.Clamp(vector.Z, min, max)) & 0xFF) << 0x10;
-            var byte1 = ((uint) Math.Round(MathHelper.Clamp(vector.W, min, max)) & 0xFF) << 0x18;
+            var byte4 = (uint) MathF.Round(MathHelper.Clamp(vector.X, min, max)) & 0xFF;
+            var byte3 = ((uint) MathF.Round(MathHelper.Clamp(vector.Y, min, max)) & 0xFF) << 0x8;
+            var byte2 = ((uint) MathF.Round(MathHelper.Clamp(vector.Z, min, max)) & 0xFF) << 0x10;
+            var byte1 = ((uint) MathF.Round(MathHelper.Clamp(vector.W, min, max)) & 0xFF) << 0x18;
 
             return byte4 | byte3 | byte2 | byte1;
         }
 
-        /// <summary>
-        /// Sets the packed representation from a Vector4.
-        /// </summary>
-        /// <param name="vector">The vector to create the packed representation from.</param>
+        /// <inheritdoc />
         void IPackedVector.PackFromVector4(Vector4 vector)
         {
             packedValue = Pack(ref vector);
         }
 
-        /// <summary>
-        /// Expands the packed representation into a Vector4.
-        /// </summary>
-        /// <returns>The expanded vector.</returns>
+        /// <inheritdoc />
         public Vector4 ToVector4()
         {
             return new Vector4(

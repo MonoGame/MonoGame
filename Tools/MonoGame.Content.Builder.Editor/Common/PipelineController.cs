@@ -1,4 +1,4 @@
-﻿// MonoGame - Copyright (C) The MonoGame Team
+﻿// MonoGame - Copyright (C) MonoGame Foundation, Inc
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
@@ -12,7 +12,6 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using MonoGame.Content.Builder;
-using MonoGame.Tools.Pipeline.Utilities;
 using PathHelper = MonoGame.Framework.Content.Pipeline.Builder.PathHelper;
 
 namespace MonoGame.Tools.Pipeline
@@ -31,11 +30,25 @@ namespace MonoGame.Tools.Pipeline
         private static readonly string [] _mgcbSearchPaths = new []       
         {
 #if DEBUG
-            Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "../../../MonoGame.Content.Builder/Debug"),
-            Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "../../../../../../MonoGame.Content.Builder/Debug"),
+#if MAC
+            Path.Combine(Path.GetDirectoryName(System.AppContext.BaseDirectory) ?? "", "../../../MonoGame.Content.Builder/Debug/mgcb.dll"),
+            Path.Combine(Path.GetDirectoryName(System.AppContext.BaseDirectory) ?? "", "../../../../../MonoGame.Content.Builder/Debug/mgcb.dll"),
 #else
-            Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "../../../MonoGame.Content.Builder/Release"),
-            Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "../../../../../../MonoGame.Content.Builder/Release"),
+            Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ?? "", "../../../MonoGame.Content.Builder/Debug/mgcb.dll"),
+            Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ?? "", "../../../../../../../../MonoGame.Content.Builder/Debug/mgcb.dll"),
+            Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ?? "", "../../../../../../MonoGame.Content.Builder/Debug/mgcb.dll"),
+#endif
+#else
+#if MAC
+            Path.Combine(Path.GetDirectoryName(System.AppContext.BaseDirectory) ?? "", "../../../MonoGame.Content.Builder/Release/mgcb.dll"),
+            Path.Combine(Path.GetDirectoryName(System.AppContext.BaseDirectory) ?? "", "../../../../../../../../MonoGame.Content.Builder/Release/mgcb.dll"),
+            Path.Combine(Path.GetDirectoryName(System.AppContext.BaseDirectory) ?? "", "../../../../../../MonoGame.Content.Builder/Release/mgcb.dll"),
+            Path.Combine(Path.GetDirectoryName(System.AppContext.BaseDirectory) ?? "", "../../../../../MonoGame.Content.Builder/Release/mgcb.dll"),
+#else
+            Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ?? "", "../../../MonoGame.Content.Builder/Release/mgcb.dll"),
+            Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ?? "", "../../../../../../../../MonoGame.Content.Builder/Release/mgcb.dll"),
+            Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ?? "", "../../../../../../MonoGame.Content.Builder/Release/mgcb.dll"),
+#endif
 #endif
         };
 
@@ -104,21 +117,18 @@ namespace MonoGame.Tools.Pipeline
             ProjectOpen = false;
 
             _templateItems = new List<ContentItemTemplate>();
-            var root = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-            var macPath = Path.Combine(root, "..", "Resources");
-            var windowsAndLinuxPath = Path.Combine(root, "Templates");
+#if MAC
+            var root = Path.Combine(Path.GetDirectoryName(System.AppContext.BaseDirectory) ?? "", "Resources");
+#else
+            var root = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ?? "";
+#endif
+            var templatesPath = Path.Combine(root, "Templates");
 
 #if IDE
             LoadTemplates(root);
 #else
-            if (Directory.Exists(macPath))
-            {
-                LoadTemplates(macPath);
-            }
-            else
-            {
-                LoadTemplates(windowsAndLinuxPath);
-            }
+            if (Directory.Exists(templatesPath))
+                LoadTemplates(templatesPath);
 #endif
 
             UpdateMenu();
@@ -502,27 +512,28 @@ namespace MonoGame.Tools.Pipeline
             } catch (ArgumentException) {
                 encoding = Encoding.UTF8;
             }
-            
+
+            var mgcbCommand = "";
             var currentDir = Environment.CurrentDirectory;
+            foreach (var path in _mgcbSearchPaths)
+            {
+                var fullPath = Path.Combine(currentDir, path);
+
+                if (File.Exists(fullPath))
+                {
+                    mgcbCommand = fullPath;
+                    break;
+                }
+            }
+            if (string.IsNullOrEmpty(mgcbCommand))
+            {
+                mgcbCommand = Global.Unix ? "dotnet" : "dotnet.exe";
+                commands = "mgcb " + commands;
+            }
+
             try
             {
-                // Prepare the process.
-                _buildProcess = new Process
-                {
-                    StartInfo = new ProcessStartInfo
-                    {
-                        FileName = "mgcb",
-                        Arguments = commands,
-                        WorkingDirectory = Path.GetDirectoryName(_project.OriginalPath),
-                        CreateNoWindow = true,
-                        WindowStyle = ProcessWindowStyle.Hidden,
-                        UseShellExecute = false,
-                        RedirectStandardOutput = true,
-                        StandardOutputEncoding = encoding
-                    }.ResolveDotnetApp(_mgcbSearchPaths, waitForExit: true)
-                };
-                _buildProcess.OutputDataReceived += (sender, args) => View.OutputAppend(args.Data);
-
+                _buildProcess = Util.CreateProcess(mgcbCommand, commands, Path.GetDirectoryName(_project.OriginalPath), encoding, s => View.OutputAppend(s));
                 // Fire off the process.
                 Console.WriteLine(_buildProcess.StartInfo.FileName + " " + _buildProcess.StartInfo.Arguments);
                 Environment.CurrentDirectory = _buildProcess.StartInfo.WorkingDirectory;
@@ -542,7 +553,8 @@ namespace MonoGame.Tools.Pipeline
                     View.OutputAppend(ex.ToString());
                 }
             }
-            finally {
+            finally
+            {
                 Environment.CurrentDirectory = currentDir;
             }
 
@@ -697,21 +709,20 @@ namespace MonoGame.Tools.Pipeline
 
         private bool IncludeDirectory(List<IncludeItem> items, string initialDirectory, string folder, ref bool repeat, ref IncludeType action)
         {
-            var relative = Util.GetRelativePath(initialDirectory, ProjectLocation);
-
             if (!IncludeFiles(items, initialDirectory, Directory.GetFiles(folder), ref repeat, ref action))
                 return false;
             
             foreach(var dir in Directory.GetDirectories(folder))
             {
                 var dirname = Path.GetFileName(dir);
-                var initdir = Path.Combine(initialDirectory, dirname);
+                var initdir = Path.Combine(initialDirectory, folder, dirname);
+                var relative = Util.GetRelativePath(initdir, ProjectLocation);
                 var diritem = new IncludeItem
                 {
                     SourcePath = initdir,
                     IsDirectory = true,
                     IncludeType = IncludeType.Create,
-                    RelativeDestPath = Path.Combine(relative, dirname)
+                    RelativeDestPath = relative,
                 };
                 items.Add(diritem);
 
@@ -728,6 +739,10 @@ namespace MonoGame.Tools.Pipeline
 
             foreach (var file in files)
             {
+                var fi = new FileInfo(file);
+                if (fi.Attributes.HasFlag(FileAttributes.Hidden))
+                    continue;
+
                 var item = new IncludeItem();
                 item.SourcePath = file;
 
@@ -737,6 +752,9 @@ namespace MonoGame.Tools.Pipeline
 
                     item.RelativeDestPath = PathHelper.GetRelativePath(ProjectLocation, file);
                     item.IncludeType = IncludeType.Link;
+                    // We actually want to place this file under the initialDirectory if one is set.
+                    if (!item.RelativeDestPath.Contains(relative))
+                        item.RelativeDestPath = Path.Combine(relative, Path.GetFileNameWithoutExtension(file));
                 }
                 else
                 {

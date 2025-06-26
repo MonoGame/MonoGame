@@ -1,16 +1,20 @@
-﻿// MonoGame - Copyright (C) The MonoGame Team
+﻿// MonoGame - Copyright (C) MonoGame Foundation, Inc
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System;
+using System.Diagnostics;
 using System.IO;
+using System.Threading;
 using Microsoft.Xna.Framework.Audio;
 using NUnit.Framework;
 using Microsoft.Xna.Framework;
 
 namespace MonoGame.Tests.Audio
 {
+
     [TestFixture]
+    [Category("Audio")]
     public class XactTests
     {
         private AudioEngine _audioEngine;
@@ -194,8 +198,30 @@ namespace MonoGame.Tests.Audio
             Assert.False(cue.IsStopped);
             Assert.False(cue.IsStopping);
 
-            cue.Play ();
-            cue.Stop (AudioStopOptions.Immediate);
+            // Make sure play, pause, resume and stop are working
+            cue.Play();
+            SleepWhileAudioEngineUpdates(100);
+            Assert.True(cue.IsPlaying);
+            Assert.False(cue.IsPaused);
+            Assert.False(cue.IsStopped);
+
+            cue.Pause();
+            SleepWhileAudioEngineUpdates(100);
+            Assert.True(cue.IsPlaying);
+            Assert.True(cue.IsPaused);
+            Assert.False(cue.IsStopped);
+
+            cue.Resume();
+            SleepWhileAudioEngineUpdates(100);
+            Assert.True(cue.IsPlaying);
+            Assert.False(cue.IsPaused);
+            Assert.False(cue.IsStopped);
+
+            cue.Stop(AudioStopOptions.Immediate);
+            SleepWhileAudioEngineUpdates(100);
+            Assert.False(cue.IsPlaying);
+            Assert.False(cue.IsPaused);
+            Assert.True(cue.IsStopped);
 
             cue = _soundBank.GetCue ("blast_mono");
 
@@ -230,8 +256,40 @@ namespace MonoGame.Tests.Audio
             Assert.Throws<ArgumentNullException>(() => _soundBank.PlayCue("blast_mono", null, null));
             Assert.Throws<ArgumentNullException>(() => _soundBank.PlayCue("blast_mono", new AudioListener(), null));
 
-            // TODO: Add actual playback tests!
-            //_soundBank.PlayCue("blast_mono");
+#if !XNA
+            // Make sure play, pause, resume and stop are working
+            _soundBank.PlayCue("blast_mono");
+            SleepWhileAudioEngineUpdates(100);
+            Assert.AreEqual(1, _audioEngine.ActiveCues.Count);
+
+            if (_audioEngine.ActiveCues.Count == 1)
+            {
+                var cue = _audioEngine.ActiveCues[0];
+                Assert.True(cue.IsPlaying);
+                Assert.False(cue.IsPaused);
+                Assert.False(cue.IsStopped);
+
+                cue.Pause();
+                SleepWhileAudioEngineUpdates(100);
+                Assert.True(cue.IsPlaying);
+                Assert.True(cue.IsPaused);
+                Assert.False(cue.IsStopped);
+
+                cue.Resume();
+                SleepWhileAudioEngineUpdates(100);
+                Assert.True(cue.IsPlaying);
+                Assert.False(cue.IsPaused);
+                Assert.False(cue.IsStopped);
+
+                cue.Stop(AudioStopOptions.Immediate);
+                SleepWhileAudioEngineUpdates(100);
+                Assert.False(cue.IsPlaying);
+                Assert.False(cue.IsPaused);
+                Assert.True(cue.IsStopped);
+
+                Assert.AreEqual(0, _audioEngine.ActiveCues.Count);
+            }
+#endif
         }
 
         [Test]
@@ -297,6 +355,49 @@ namespace MonoGame.Tests.Audio
             Assert.Throws<IndexOutOfRangeException>(() => cue.SetVariable("Cue Private", 1.0f));
 
             cue.Dispose();
+        }
+
+        [Test]
+        public void WaveBankPlays()
+        {
+            var waveBank = new WaveBank(_audioEngine, @"Assets\Audio\Win\Tests.xwb");
+            Assert.False(waveBank.IsInUse);
+            Assert.False(waveBank.IsDisposed);
+            Assert.True(waveBank.IsPrepared);
+
+            var sei = _soundBank.GetSoundEffectInstance (0, 0, out bool streaming);
+            sei.Play ();
+            Assert.True(sei.State == SoundState.Playing);
+            sei = _soundBank.GetSoundEffectInstance (0, 1, out streaming);
+            sei.Play ();
+            Assert.True(sei.State == SoundState.Playing);
+            sei = _soundBank.GetSoundEffectInstance (0, 2, out streaming);
+            sei.Play ();
+            Assert.True(sei.State == SoundState.Playing);
+
+            waveBank.Dispose();
+            Assert.True(waveBank.IsDisposed);
+            Assert.False(waveBank.IsInUse);
+            Assert.False(waveBank.IsPrepared);
+        }
+
+        private void SleepWhileAudioEngineUpdates(int ms)
+        {
+            Stopwatch stopwatch = new Stopwatch();
+            stopwatch.Start();
+
+            int cycles = ms / 10;
+            for (int i = 0; i < cycles; i++)
+            {
+                _audioEngine.Update();
+                Thread.Sleep(10);
+
+                if (stopwatch.Elapsed.TotalMilliseconds > ms)
+                {
+                    stopwatch.Stop();
+                    break;
+                }
+            }
         }
     }
 }

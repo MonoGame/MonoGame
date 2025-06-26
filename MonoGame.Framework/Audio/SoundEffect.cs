@@ -1,4 +1,4 @@
-// MonoGame - Copyright (C) The MonoGame Team
+// MonoGame - Copyright (C) MonoGame Foundation, Inc
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 ﻿
@@ -164,9 +164,6 @@ namespace Microsoft.Xna.Framework.Audio
                 throw new ArgumentException("Ensure that the buffer length is non-zero.", "buffer");
 
             var blockAlign = (int)channels * 2;
-            if ((count % blockAlign) != 0)
-                throw new ArgumentException("Ensure that the buffer meets the block alignment requirements for the number of channels.", "buffer");
-
             if (count <= 0)
                 throw new ArgumentException("Ensure that the count is greater than zero.", "count");
             if ((count % blockAlign) != 0)

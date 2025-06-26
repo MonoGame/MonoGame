@@ -1,4 +1,4 @@
-﻿// MonoGame - Copyright (C) The MonoGame Team
+﻿// MonoGame - Copyright (C) MonoGame Foundation, Inc
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
@@ -51,29 +51,10 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
         MacOSX,
 
         /// <summary>
-        /// Windows Store App
-        /// (MonoGame)
-        /// </summary>
-        WindowsStoreApp,
-
-        /// <summary>
         /// Google Chrome Native Client
         /// (MonoGame)
         /// </summary>
         NativeClient,
-
-        /// <summary>
-        /// Sony PlayStation Mobile (PS Vita)
-        /// (MonoGame)
-        /// </summary>
-        [Obsolete("PlayStation Mobile is no longer supported")]
-        PlayStationMobile,
-
-        /// <summary>
-        /// Windows Phone 8
-        /// (MonoGame)
-        /// </summary>
-        WindowsPhone8,
 
         /// <summary>
         /// Raspberry Pi
@@ -87,10 +68,10 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
         PlayStation4,
 
         /// <summary>
-        /// PlayStation Vita
+        /// Sony PlayStation5
         /// </summary>
-        PSVita,
-       
+        PlayStation5,
+
         /// <summary>
         /// Xbox One
         /// </summary>
@@ -102,14 +83,24 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
         Switch,
 
         /// <summary>
-        /// Google Stadia
-        /// </summary>
-        Stadia,
-
-        /// <summary>
         /// WebAssembly and Bridge.NET
         /// </summary>
-        Web
+        Web,
+
+        /// <summary>
+        /// All desktop versions using Vulkan.
+        /// </summary>
+        DesktopVK,
+
+        /// <summary>
+        /// Windows GDK
+        /// </summary>
+        WindowsGDK,
+
+        /// <summary>
+        /// Xbox Series
+        /// </summary>
+        XboxSeries
     }
 
 
@@ -128,12 +119,13 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
             {
                 return base.ConvertFrom(context, culture, value);
             }
-            catch (FormatException fex)
+            catch (FormatException)
             { 
                 // convert legacy Platforms
                 if (value.Equals("Linux") || value.Equals("WindowsGL"))
                     return TargetPlatform.DesktopGL;
-                else throw fex;
+                else
+                    throw;
             }
         }
     }

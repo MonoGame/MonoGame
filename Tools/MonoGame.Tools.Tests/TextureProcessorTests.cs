@@ -7,9 +7,11 @@ using Microsoft.Xna.Framework.Content.Pipeline.Graphics;
 using Microsoft.Xna.Framework.Content.Pipeline.Processors;
 using NUnit.Framework;
 using Microsoft.Xna.Framework.Graphics.PackedVector;
+using MonoGame.Framework.Content;
 
 namespace MonoGame.Tests.ContentPipeline
 {
+    [TestFixture]
     class TextureProcessorTests
     {
         [Test]
@@ -90,6 +92,7 @@ namespace MonoGame.Tests.ContentPipeline
             var input = new Texture2DContent();
             input.Faces[0] = face;
 
+            using var scope = ContextScopeFactory.BeginContext(context);
             var output = processor.Process(input, context);
 
             Assert.NotNull(output);
@@ -136,6 +139,7 @@ namespace MonoGame.Tests.ContentPipeline
             var input = new Texture2DContent();
             input.Faces[0] = face;
 
+            using var scope = ContextScopeFactory.BeginContext(context);
             var output = processor.Process(input, context);
 
             Assert.NotNull(output);
@@ -183,6 +187,7 @@ namespace MonoGame.Tests.ContentPipeline
             var input = new Texture2DContent();
             input.Faces[0] = face;
 
+            using var scope = ContextScopeFactory.BeginContext(context);
             var output = processor.Process(input, context);
 
             Assert.NotNull(output);
@@ -227,6 +232,7 @@ namespace MonoGame.Tests.ContentPipeline
             var input = new Texture2DContent();
             input.Faces[0] = face;
 
+            using var scope = ContextScopeFactory.BeginContext(context);
             var output = processor.Process(input, context);
 
             Assert.NotNull(output);
@@ -262,6 +268,7 @@ namespace MonoGame.Tests.ContentPipeline
             var input = new Texture2DContent();
             input.Faces[0] = face;
 
+            using var scope = ContextScopeFactory.BeginContext(context);
             var output = processor.Process(input, context);
 
             Assert.NotNull(output);
@@ -364,7 +371,7 @@ namespace MonoGame.Tests.ContentPipeline
         [Test]
         public void CompressDefaultAndroidAlphaSquarePOT()
         {
-            CompressDefault<PixelBitmapContent<Bgra4444>>(TargetPlatform.Android, Color.Red * 0.5f);
+            CompressDefault<Etc2BitmapContent>(TargetPlatform.Android, Color.Red * 0.5f);
         }
 
         [Test]
@@ -376,7 +383,7 @@ namespace MonoGame.Tests.ContentPipeline
         [Test]
         public void CompressDefaultAndroidAlphaNonSquarePOT()
         {
-            CompressDefault<PixelBitmapContent<Bgra4444>>(TargetPlatform.Android, Color.Red * 0.5f, 8, 16);
+            CompressDefault<Etc2BitmapContent>(TargetPlatform.Android, Color.Red * 0.5f, 8, 16);
         }
 
         [Test]

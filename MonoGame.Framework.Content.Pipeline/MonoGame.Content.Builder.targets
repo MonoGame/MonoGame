@@ -1,5 +1,5 @@
 <!--
-  MonoGame - Copyright (C) The MonoGame Team
+  MonoGame - Copyright (C) MonoGame Foundation, Inc
   This file is subject to the terms and conditions defined in
   file 'LICENSE.txt', which is part of this source code package.
 -->
@@ -35,26 +35,23 @@
       <Header>/platform:$(MonoGamePlatform)</Header>
     </PropertyGroup>
 
-    <!-- Get all Mono Game Content References and store them in a list -->
+    <!-- Get all MonoGame Content References and store them in a list -->
     <!-- We do this here so we are compatible with xbuild -->
     <CollectContentReferences ContentReferences="@(MonoGameContentReference)" MonoGamePlatform="$(MonoGamePlatform)">
         <Output TaskParameter="Output" ItemName="ContentReferences"/>
     </CollectContentReferences>
 
-    <Error Text="The MonoGamePlatform property was not defined in the project!  It must be set to Windows, WindowsGL, WindowsStoreApp, WindowsPhone8, MacOSX, iOS, Linux, DesktopGL, RaspberryPi, Android, NativeClient, PlayStation4, PSVita, XboxOne or PlayStationMobile."
+    <Error Text="The MonoGamePlatform property was not defined in the project!  It must be set to Windows, WindowsGL, , MacOSX, iOS, Linux, DesktopGL, RaspberryPi, Android, NativeClient, PlayStation4, PSVita, XboxOne or PlayStationMobile."
        Condition="	'$(MonoGamePlatform)' != 'Windows' And
 			'$(MonoGamePlatform)' != 'iOS' And       
 			'$(MonoGamePlatform)' != 'Android' And       
 			'$(MonoGamePlatform)' != 'Linux' And           
 			'$(MonoGamePlatform)' != 'DesktopGL' And           
 			'$(MonoGamePlatform)' != 'MacOSX' And       
-			'$(MonoGamePlatform)' != 'WindowsStoreApp' And       
 			'$(MonoGamePlatform)' != 'NativeClient' And       
-			'$(MonoGamePlatform)' != 'PlayStationMobile' And       
-			'$(MonoGamePlatform)' != 'WindowsPhone8' And       
 			'$(MonoGamePlatform)' != 'RaspberryPi' And       
 			'$(MonoGamePlatform)' != 'PlayStation4' And       
-			'$(MonoGamePlatform)' != 'PSVita' And       
+			'$(MonoGamePlatform)' != 'PlayStation5' And       
 			'$(MonoGamePlatform)' != 'XboxOne' And 
 			'$(MonoGamePlatform)' != 'WindowsGL'" />
 
@@ -80,7 +77,7 @@
     </BuildDependsOn>
   </PropertyGroup>
 
-  <Target Name="RunContentBuilder">
+  <Target Name="RunContentBuilder" DependsOnTargets="Compile">
     <Exec Condition=" '%(ContentReferences.FullPath)' != '' "
           Command="$(MonoGameContentBuilderCmd) $(MonoGameMGCBAdditionalArguments) $(Header) /@:&quot;%(ContentReferences.FullPath)&quot; /outputDir:&quot;%(ContentReferences.ContentOutputDir)&quot; /intermediateDir:&quot;%(ContentReferences.ContentIntermediateOutputDir)&quot;"
           WorkingDirectory="%(ContentReferences.RootDir)%(ContentReferences.Directory)" />

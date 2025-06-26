@@ -2,17 +2,21 @@
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <TargetFramework>net8.0</TargetFramework>
+    <RollForward>Major</RollForward>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <IsPackable>false</IsPackable>
     <GenerateProgramFile>false</GenerateProgramFile>
     <DefineConstants>DESKTOPGL</DefineConstants>
+    <DefineConstants Condition=" $([MSBuild]::IsOsPlatform('osx')) " >$(DefineConstants);MACOS</DefineConstants>
+    <DefineConstants Condition=" $([MSBuild]::IsOsPlatform('windows')) " >$(DefineConstants);WINDOWS</DefineConstants>
+    <DefineConstants Condition=" $([MSBuild]::IsOsPlatform('linux')) " >$(DefineConstants);LINUX</DefineConstants>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="NUnitLite" Version="3.11.0" />
-    <PackageReference Include="NUnit3TestAdapter" Version="3.11.0" />
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.5.0" />
+    <PackageReference Include="NUnitLite" Version="3.13.2" />
+    <PackageReference Include="NUnit3TestAdapter" Version="4.5.0" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.7.2" />
   </ItemGroup>
 
   <ItemGroup>

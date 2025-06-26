@@ -1,4 +1,4 @@
-﻿// MonoGame - Copyright (C) The MonoGame Team
+﻿// MonoGame - Copyright (C) MonoGame Foundation, Inc
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
@@ -130,8 +130,9 @@ namespace Microsoft.Xna.Framework.Graphics
                 foreach (Effect effect in mesh.Effects)
                 {
 					IEffectMatrices effectMatricies = effect as IEffectMatrices;
-					if (effectMatricies == null) {
-						throw new InvalidOperationException();
+					if (effectMatricies == null)
+                    {
+						throw new InvalidOperationException("This model contains a custom effect which does not implement the IEffectMatrices interface, so it cannot be drawn using Model.Draw. Instead, call ModelMesh.Draw after setting the appropriate effect parameters.");
 					}
                     effectMatricies.World = sharedDrawBoneMatrices[mesh.ParentBone.Index] * world;
                     effectMatricies.View = view;

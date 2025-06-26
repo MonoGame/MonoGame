@@ -1,4 +1,4 @@
-// MonoGame - Copyright (C) The MonoGame Team
+// MonoGame - Copyright (C) MonoGame Foundation, Inc
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
@@ -36,6 +36,7 @@ namespace MonoGame.Tests {
 		}
 
 		[TestFixture]
+		[Category("GameTest")]
 		public class Disposal : FixtureBase {
 			[TestCase ("Components")]
 			[TestCase ("Content")]
@@ -130,6 +131,7 @@ namespace MonoGame.Tests {
 		}
 
 		[TestFixture]
+		[Category("GameTest")]
 		public class Behaviors : FixtureBase {
 			[Test, Ignore("Fix me!")]
 			public void Nongraphical_run_succeeds ()
@@ -164,9 +166,19 @@ namespace MonoGame.Tests {
 				//Assert.That(_game, Has.Property("UpdateCount").GreaterThan(11));
 				//Assert.That(_game, Has.Property("DrawCount").EqualTo(10));
 			}
-		}
+
+            [Test]
+            public void GameTickTest()
+            {
+                // should not throw an exception
+                Game.ResetElapsedTime();
+                Assert.DoesNotThrow(() => Game.Tick());
+                Game.ResetElapsedTime();
+            }
+        }
 
         [TestFixture]
+		[Category("GameTest")]
         public class Misc
         {
             [Test]
@@ -213,6 +225,8 @@ namespace MonoGame.Tests {
 
                 g.Dispose();
             }
+
+
 
             private class ExitTestGame : CountCallsGame
             {
@@ -268,7 +282,7 @@ namespace MonoGame.Tests {
 
                 protected override void OnActivated(object sender, EventArgs args) { ActivatedCount++; base.OnActivated(sender, args); }
                 protected override void OnDeactivated(object sender, EventArgs args) { DeactivatedCount++; base.OnDeactivated(sender, args); }
-                protected override void OnExiting(object sender, EventArgs args) { ExitingCount++; base.OnExiting(sender, args); }
+                protected override void OnExiting(object sender, ExitingEventArgs args) { ExitingCount++; base.OnExiting(sender, args); }
                 protected override void Dispose(bool disposing) { DisposeCount++; base.Dispose(disposing); }
             }
 

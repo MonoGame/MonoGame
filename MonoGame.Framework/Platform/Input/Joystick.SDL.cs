@@ -1,4 +1,4 @@
-﻿// MonoGame - Copyright (C) The MonoGame Team
+﻿// MonoGame - Copyright (C) MonoGame Foundation, Inc
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
@@ -12,15 +12,24 @@ namespace Microsoft.Xna.Framework.Input
         internal static Dictionary<int, IntPtr> Joysticks = new Dictionary<int, IntPtr>();
         private static int _lastConnectedIndex = -1;
 
+        internal static void AddDevices()
+        {
+            int numJoysticks = Sdl.Joystick.NumJoysticks();
+            for (int i = 0; i < numJoysticks; i++)
+                AddDevice(i);
+        }
+
         internal static void AddDevice(int deviceId)
         {
             var jdevice = Sdl.Joystick.Open(deviceId);
+            if (Joysticks.ContainsValue(jdevice)) return;
+
             var id = 0;
 
             while (Joysticks.ContainsKey(id))
                 id++;
 
-            if (id > _lastConnectedIndex)
+            if (id != _lastConnectedIndex)
                 _lastConnectedIndex = id;
 
             Joysticks.Add(id, jdevice);

@@ -1,0 +1,107 @@
+name: Bug Report
+description: Create a bug report to help us improve MonoGame.
+body:
+- type: markdown
+  attributes:
+    value: |
+      If this is a general question about MonoGame, please ask on the [community site](https://monogame.net/community) or [join the discord](https://discord.gg/monogame).
+- type: checkboxes
+  id: prerequisites
+  attributes:
+    label: Prerequisites
+    options:
+      - label: I have verified this issue is present in the `develop` branch
+        required: true
+      - label: I have searched [open](https://github.com/MonoGame/MonoGame/issues) and [closed](https://github.com/MonoGame/MonoGame/issues?q=is%3Aissue+is%3Aclosed) issues to ensure it has not already been reported.
+        required: true
+- type: input
+  id: monogame-version
+  validations:
+    required: true
+  attributes:
+    label: MonoGame Version
+    placeholder: MonoGame 3.8.1.303
+    description: Which version of MonoGame does this bug occur in.
+- type: dropdown
+  id: monogame-platform
+  validations:
+    required: true
+  attributes:
+    label: Which MonoGame platform are you using?
+    options:
+      - MonoGame Android Application (mgandroid)
+      - MonoGame Cross-Platform Desktop Application (mgdesktopgl)
+      - MonoGame Windows Desktop Application (mgwindowsdx)
+      - MonoGame iOS Application (mgios)
+      - N/A
+- type: input
+  id: operating-system
+  validations:
+    required: true
+  attributes:
+    label: Operating System
+    placeholder: Windows, Mac, or Linux
+    description: Which operating system are you using?
+- type: textarea
+  id: description
+  validations:
+    required: true
+  attributes:
+    label: Description
+    placeholder: Description
+    description: Please describe the bug you encountered.
+- type: textarea
+  id: reproduction
+  validations:
+      required: true
+  attributes:
+    label: Steps to Reproduce
+    placeholder: |
+      Reproduction steps
+      Include code inside markdown code blocks like the following:
+
+      ```cs
+      public void Foo()
+      {
+          return bar;
+      }
+      ```
+    description: |
+      Please include the steps we can take to reproduce the problem.
+      Where possible, include text as text rather than screenshots so it can be searchable.
+      Please put code inside [markdown code blocks](https://docs.github.com/en/get-started/writing-on-github/getting-started-with-writing-and-formatting-on-github/basic-writing-and-formatting-syntax#quoting-code)
+- type: input
+  id: minimal-repo
+  validations:
+    required: false
+  attributes:
+    label: Minimal Example Repo
+    placeholder: https://github.com/MyGithub/ExampleRepo
+    description: |
+      If possible, please include a link to a repo where you have uploaded a minimal example that demonstrates the issue.
+- type: textarea
+  id: expected-behavior
+  validations:
+    required: true
+  attributes:
+    label: Expected Behavior
+    placeholder: When I perform this action, I expect this result to occur.
+    description: Provide a description of the expected behavior.
+- type: textarea
+  id: resulting-behavior
+  validations:
+    required: true
+  attributes:
+    label: Resulting Behavior
+    placeholder: This is the resulting behavior observed.
+    description: |
+      Provide a description of the resulting behavior observed.
+      Please include any error messages and/or stack traces if possible.
+- type: textarea
+  id: other-info
+  validations:
+    required: false
+  attributes:
+    label: Files
+    description: |
+      Please upload any files or images here that can be useful in describing or reproducing this issue.  If the file type cannot be supported, it can be zipped and then uploaded instead.
