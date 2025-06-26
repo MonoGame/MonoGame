@@ -62,6 +62,10 @@ namespace MonoGame.Tests.Graphics {
         [TestCase("fontMenuBold01", "THE QUICK BROWN FOX JUMPS OVER THE LAZY DOG. 1234567890!@", 1383, 59)]
         [TestCase("fontMenuBold01", "the quick brown fox jumps over the lazy dog. 1234567890!@",  1383, 59)]
         [TestCase("fontMenuBold01", "The quick brown fox jumps over the lazy dog. 1234567890",  1342, 59)]
+        [TestCase("Roboto", "The quick brown fox jumps over the lazy dog. 1234567890", 421, 19)]
+        [TestCase("Roboto", "The quick brown fox jumps over the lazy dog.\r1234567890", 417, 19)]
+        [TestCase("Roboto", "The quick brown fox jumps\nover the lazy dog.\n1234567890", 195, 57)]
+        [TestCase("Roboto", "The quick brown fox jumps over the lazy dog. 1234567890!@", 439, 19)]
         [RunOnUI]
         public void MeasureString_returns_correct_values(string fontName, string text, float width, float height)
         {
