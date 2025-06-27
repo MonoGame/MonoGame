@@ -1983,5 +1983,43 @@ namespace Microsoft.Xna.Framework
             b = B / 255f;
             a = A / 255f;
         }
+        
+        /// <summary>
+        /// Converts <see cref="Color"/> into HSVL components.
+        /// </summary>
+        /// <param name="h">Hue component from 0.0f to 360.0f.</param>
+        /// <param name="s">Saturation component from 0.0f to 1.0f.</param>
+        /// <param name="v">Value component from 0.0f to 1.0f.</param>
+        /// <param name="l">Luminosity (or brightness) component from 0.0f to 1.0f.</param>
+        public void ToHSVL(out float h, out float s, out float v, out float l)
+        {
+            double r = R / 255.0;
+            double g = G / 255.0;
+            double b = B / 255.0;
+
+            double max = Math.Max(r, Math.Max(g, b));
+            double min = Math.Min(r, Math.Min(g, b));
+            double delta = max - min;
+
+            // hue
+            h = 0.0f;
+            if (max == r)
+                h = (float)((60.0 * ((g - b) / delta) + 360.0) % 360.0);
+            else if (max == g)
+                h = (float)((60.0 * ((b - r) / delta) + 360.0) % 360.0);
+            else if (max == b)
+                h = (float)((60.0 * ((r - g) / delta) + 360.0) % 360.0);
+
+            // saturation
+            s = 0.0f;
+            if (max != 0.0)
+                s = (float)((delta / max) * 100.0);
+
+            // value
+            v = (float)(max * 100.0);
+
+            // luminosity
+            l = (float)((max + min) / 2.0);
+        }
     }
 }
