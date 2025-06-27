@@ -24,6 +24,19 @@ public static partial class MathHelper
         private readonly ulong _inc;
 
         /// <summary>
+        /// State of the random number generator.
+        /// </summary>
+        public ulong State
+        {
+            get => _state;
+            set
+            {
+                _state = value;
+                PCG32(); // Advance state to ensure we don't return the same number twice.
+            }
+        }
+
+        /// <summary>
         /// Initiaze a random number generator.
         /// </summary>
         public Random() : this((ulong)System.Environment.TickCount) { }
