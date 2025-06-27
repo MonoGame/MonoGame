@@ -125,13 +125,13 @@
 
   <Target Name="_CollectDotnetToolConfigFiles">
     <ItemGroup>
-      <_DotnetToolConfigFiles Include="$(SolutionDir)/.config/dotnet-tools.json" Condition="Exists('$(SolutionDir)/.config/dotnet-tools.json')" />
+      <_DotnetToolConfigFiles Include="$(SolutionDir).config/dotnet-tools.json" Condition=" '$(SolutionDir)' != '' And Exists('$(SolutionDir).config/dotnet-tools.json')" />
       <_DotnetToolConfigFiles Include="$(MSBuildProjectDirectory)/.config/dotnet-tools.json" Condition="Exists('$(MSBuildProjectDirectory)/.config/dotnet-tools.json')" />
     </ItemGroup>
   </Target>
 
   <Target Name="_RestoreMGCBTool"
-        Condition="'$(AutoRestoreMGCBTool)' == 'true'"
+        Condition="'$(AutoRestoreMGCBTool)' == 'true' And '$(DesignTimeBuild)' != 'true'"
         BeforeTargets="CollectPackageReferences"
         DependsOnTargets="_CollectDotnetToolConfigFiles"
         Inputs="$(MSBuildProjectFullPath);@(_DotnetToolConfigFiles);$(ProjectAssetsFile)"
@@ -201,7 +201,7 @@
   <Target
     Name="IncludeContent"
     DependsOnTargets="RunContentBuilder"
-    Condition="'$(EnableMGCBItems)' == 'true' OR '@(MonoGameContentReference)' != ''"
+    Condition="'$(EnableMGCBItems)' == 'true' OR '@(MonoGameContentReference)' != '' And '$(DesignTimeBuild)' != 'true'"
     Outputs="%(ExtraContent.RecursiveDir)%(ExtraContent.Filename)%(ExtraContent.Extension)"
     BeforeTargets="BeforeCompile"
     AfterTargets="ResolveProjectReferences">
