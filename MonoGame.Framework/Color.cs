@@ -6,6 +6,7 @@ using System;
 using System.Text;
 using System.Runtime.Serialization;
 using System.Diagnostics;
+using System.Runtime.CompilerServices;
 
 namespace Microsoft.Xna.Framework
 {
@@ -395,6 +396,16 @@ namespace Microsoft.Xna.Framework
         public static implicit operator Color(System.Numerics.Vector4 value)
         {
             return new Color(value.X, value.Y, value.Z, value.W);
+        }
+
+        /// <summary>
+        /// Converts a <see cref="System.Drawing.Color"/> to a <see cref="Color"/>.
+        /// </summary>
+        /// <param name="value">The converted value.</param>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static implicit operator Color(System.Drawing.Color value)
+        {
+            return new Color(value.R, value.G, value.B, value.A);
         }
 
 	    /// <summary>
@@ -1826,7 +1837,17 @@ namespace Microsoft.Xna.Framework
         {
             return new Vector4(R / 255.0f, G / 255.0f, B / 255.0f, A / 255.0f);
         }
-	
+
+        /// <summary>
+        /// Converts this <see cref="Color"/> to a <see cref="System.Drawing.Color"/>.
+        /// </summary>
+        /// <returns>The converted <see cref="System.Drawing.Color"/>.</returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public System.Drawing.Color ToDrawing()
+        {
+            return System.Drawing.Color.FromArgb(A, R, G, B);
+        }
+
         /// <summary>
         /// Gets or sets packed value of this <see cref="Color"/>.
         /// </summary>
