@@ -272,5 +272,28 @@ namespace MonoGame.Tests.Framework
             Assert.AreEqual(height, rectangle.Height);
         }
 #endif
+
+        [Test]
+        public void ToDrawing()
+        {
+            Rectangle rect = new Rectangle(1, 2, 3, 4);
+
+            var expected = new System.Drawing.Rectangle(rect.X, rect.Y, rect.Width, rect.Height);
+            var actual = rect.ToDrawing();
+
+            Assert.AreEqual(expected, actual);
+        }
+
+        [Test]
+        public void ImplicitOperator()
+        {
+            var drawingRect = new System.Drawing.Rectangle(1, 2, 3, 4);
+            var xnaRect = new Rectangle(1, 2, 3, 4);
+
+            Assert.AreEqual(drawingRect.X, xnaRect.X);
+            Assert.AreEqual(drawingRect.Y, xnaRect.Y);
+            Assert.AreEqual(drawingRect.Width, xnaRect.Width);
+            Assert.AreEqual(drawingRect.Height, xnaRect.Height);
+        }
     }
 }
