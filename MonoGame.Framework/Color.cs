@@ -406,7 +406,7 @@ namespace Microsoft.Xna.Framework
         public static implicit operator Color(System.Drawing.Color value)
         {
             return new Color(value.R, value.G, value.B, value.A);
-        }
+        }        
 
 	    /// <summary>
         /// Compares whether two <see cref="Color"/> instances are equal.
@@ -1846,8 +1846,8 @@ namespace Microsoft.Xna.Framework
         public System.Drawing.Color ToDrawing()
         {
             return System.Drawing.Color.FromArgb(A, R, G, B);
-        }
-
+        }        
+	
         /// <summary>
         /// Gets or sets packed value of this <see cref="Color"/>.
         /// </summary>
