@@ -201,7 +201,7 @@
   <Target
     Name="IncludeContent"
     DependsOnTargets="RunContentBuilder"
-    Condition="'$(EnableMGCBItems)' == 'true' OR '@(MonoGameContentReference)' != '' And '$(DesignTimeBuild)' != 'true'"
+    Condition="('$(EnableMGCBItems)' == 'true' OR '@(MonoGameContentReference)' != '') And '$(DesignTimeBuild)' != 'true'"
     Outputs="%(ExtraContent.RecursiveDir)%(ExtraContent.Filename)%(ExtraContent.Extension)"
     BeforeTargets="BeforeCompile"
     AfterTargets="ResolveProjectReferences">
