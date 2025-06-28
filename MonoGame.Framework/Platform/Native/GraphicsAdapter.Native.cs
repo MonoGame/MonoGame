@@ -25,7 +25,7 @@ partial class GraphicsAdapter
                 break;
 
             MGG_GraphicsAdaptor_Info info;
-            MGG.GraphicsAdapter_GetInfo(handle, &info);
+            MGG.GraphicsAdapter_GetInfo(handle, out info);
 
             var adapter = new GraphicsAdapter();
             adapter.Handle = handle;

@@ -385,7 +385,7 @@ static MGControllerInput FromSDLAxis(Uint8 axis)
     }
 }
 
-mgbool MGP_Platform_PollEvent(MGP_Platform* platform, MGP_Event& event_)
+mgbyte MGP_Platform_PollEvent(MGP_Platform* platform, MGP_Event& event_)
 {
 	assert(platform != nullptr);
 
@@ -646,19 +646,19 @@ mgbool MGP_Platform_PollEvent(MGP_Platform* platform, MGP_Event& event_)
     return false;
 }
 
-mgbool MGP_Platform_BeforeRun(MGP_Platform* platform)
+mgbyte MGP_Platform_BeforeRun(MGP_Platform* platform)
 {
 	assert(platform != nullptr);
 	return true;
 }
 
-mgbool MGP_Platform_BeforeUpdate(MGP_Platform* platform)
+mgbyte MGP_Platform_BeforeUpdate(MGP_Platform* platform)
 {
 	assert(platform != nullptr);
 	return true;
 }
 
-mgbool MGP_Platform_BeforeDraw(MGP_Platform* platform)
+mgbyte MGP_Platform_BeforeDraw(MGP_Platform* platform)
 {
 	assert(platform != nullptr);
 	return true;
@@ -727,7 +727,7 @@ void* MGP_Window_GetNativeHandle(MGP_Window* window)
 	return window->window;
 }
 
-mgbool MGP_Window_GetAllowUserResizing(MGP_Window* window)
+mgbyte MGP_Window_GetAllowUserResizing(MGP_Window* window)
 {
 	assert(window != nullptr);
 	assert(window->window != nullptr);
@@ -740,7 +740,7 @@ mgbool MGP_Window_GetAllowUserResizing(MGP_Window* window)
 	return false;
 }
 
-void MGP_Window_SetAllowUserResizing(MGP_Window* window, mgbool allow)
+void MGP_Window_SetAllowUserResizing(MGP_Window* window, mgbyte allow)
 {
 	assert(window != nullptr);
 	assert(window->window != nullptr);
@@ -748,7 +748,7 @@ void MGP_Window_SetAllowUserResizing(MGP_Window* window, mgbool allow)
 	SDL_SetWindowResizable(window->window, allow ? SDL_TRUE : SDL_FALSE);
 }
 
-mgbool MGP_Window_GetIsBoderless(MGP_Window* window)
+mgbyte MGP_Window_GetIsBoderless(MGP_Window* window)
 {
 	assert(window != nullptr);
 
@@ -760,7 +760,7 @@ mgbool MGP_Window_GetIsBoderless(MGP_Window* window)
 	return false;
 }
 
-void MGP_Window_SetIsBoderless(MGP_Window* window, mgbool borderless)
+void MGP_Window_SetIsBoderless(MGP_Window* window, mgbyte borderless)
 {
 	assert(window != nullptr);
 
@@ -775,7 +775,7 @@ void MGP_Window_SetTitle(MGP_Window* window, const char* title)
     SDL_SetWindowTitle(window->window, title);
 }
 
-void MGP_Window_Show(MGP_Window* window, mgbool show)
+void MGP_Window_Show(MGP_Window* window, mgbyte show)
 {
 	assert(window != nullptr);
 
@@ -811,7 +811,7 @@ void MGP_Window_SetCursor(MGP_Window* window, MGP_Cursor* cursor)
     SDL_SetCursor(cursor->cursor);
 }
 
-void MGP_Window_EnterFullScreen(MGP_Window* window, mgbool useHardwareModeSwitch)
+void MGP_Window_EnterFullScreen(MGP_Window* window, mgbyte useHardwareModeSwitch)
 {
     assert(window != nullptr);
 
@@ -861,7 +861,7 @@ mgint MGP_Window_ShowMessageBox(MGP_Window* window, const char* title, const cha
     return -1;
 }
 
-void MGP_Mouse_SetVisible(MGP_Platform* platform, mgbool visible)
+void MGP_Mouse_SetVisible(MGP_Platform* platform, mgbyte visible)
 {
     assert(platform != nullptr);
     SDL_ShowCursor(visible ? SDL_ENABLE : SDL_DISABLE);
@@ -974,7 +974,7 @@ void MGP_GamePad_GetCaps(MGP_Platform* platform, mgint identifer, MGP_Controller
     caps->InputFlags |= HasSDLAxis(controller, SDL_CONTROLLER_AXIS_RIGHTY);
 }
 
-mgbool MGP_GamePad_SetVibration(MGP_Platform* platform, mgint identifer, mgfloat leftMotor, mgfloat rightMotor, mgfloat leftTrigger, mgfloat rightTrigger)
+mgbyte MGP_GamePad_SetVibration(MGP_Platform* platform, mgint identifer, mgfloat leftMotor, mgfloat rightMotor, mgfloat leftTrigger, mgfloat rightTrigger)
 {
     assert(platform);
 

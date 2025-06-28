@@ -249,7 +249,7 @@ namespace MonoGame.Effect.Compiler
         {
             public void WriteWarning(string file, int line, int column, string message)
             {
-                Console.WriteLine("{0}({1},{2}): warning PREPROCESS01: {3}", ConvertToNative(file), line, column, ConvertMessage(message));
+                Console.Error.WriteLine("{0}({1},{2}): warning PREPROCESS01: {3}", ConvertToNative(file), line, column, ConvertMessage(message));
             }
 
             public void WriteError(string file, int line, int column, string message)

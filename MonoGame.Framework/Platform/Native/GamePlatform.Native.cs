@@ -32,7 +32,7 @@ class NativeGamePlatform : GamePlatform
     public unsafe NativeGamePlatform(Game game) : base(game)
     {
         GameRunBehavior behavior;
-        Handle = MGP.Platform_Create(&behavior);
+        Handle = MGP.Platform_Create(out behavior);
 
         DefaultRunBehavior = behavior;
 
@@ -85,7 +85,7 @@ class NativeGamePlatform : GamePlatform
     private unsafe void PollEvents()
     {
         MGP_Event event_;
-        while (MGP.Platform_PollEvent(Handle, &event_) != 0)
+        while (MGP.Platform_PollEvent(Handle, out event_) != 0)
         {
             switch (event_.Type)
             {

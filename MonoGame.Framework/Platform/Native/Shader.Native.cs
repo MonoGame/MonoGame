@@ -43,6 +43,7 @@ partial class Shader
         fixed (MGG_InputElement* i = inputElements)
             inputLayout.Ptr = MGG.InputLayout_Create(
                 GraphicsDevice.Handle,
+                Handle,
                 s,
                 streamStrides.Length,
                 i,

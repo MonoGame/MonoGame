@@ -136,7 +136,7 @@ void MGA_Voice_AppendBuffer(MGA_Voice* voice, mgbyte* buffer, mguint size)
 	// Append the buffer.
 }
 
-void MGA_Voice_Play(MGA_Voice* voice, mgbool looped)
+void MGA_Voice_Play(MGA_Voice* voice, mgbyte looped)
 {
 	assert(voice != nullptr);
 }
@@ -151,7 +151,7 @@ void MGA_Voice_Resume(MGA_Voice* voice)
 	assert(voice != nullptr);
 }
 
-void MGA_Voice_Stop(MGA_Voice* voice, mgbool immediate)
+void MGA_Voice_Stop(MGA_Voice* voice, mgbyte immediate)
 {
 	assert(voice != nullptr);
 }
