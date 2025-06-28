@@ -331,6 +331,28 @@ namespace MonoGame.Tests.ContentPipeline
         }
 
         [Test]
+        [TestCase("tanknotexture.fbx")]
+        [TestCase("tankascii.fbx")]
+        [TestCase("tank.obj")]
+        [TestCase("tank.glb")]
+        public void ProcessModelMesh(string file)
+        {
+            var importer = new FbxImporter();
+            var context = new TestImporterContext("TestObj", "TestBin");
+            var nodeContent = importer.Import($"Assets/Models/{file}", context);
+
+            ModelProcessor processor = new ModelProcessor();
+            var processorContext = new TestProcessorContext(TargetPlatform.DesktopGL, "tankvertexcolors.xnb");
+            ModelContent output = null;
+            // Validate that the custom processor does not throw an exception when normals are missing from the mesh
+            Assert.DoesNotThrow(() => output = processor.Process(nodeContent, processorContext));
+
+            // Test some basics.
+            Assert.NotNull(output);
+            Assert.NotNull(output.Meshes);
+        }
+
+        [Test]
         public void ProcessNonSkeletonMeshAnimation ()
         {
             var importer = new FbxImporter();
