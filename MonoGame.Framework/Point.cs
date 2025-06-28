@@ -219,6 +219,26 @@ namespace Microsoft.Xna.Framework
         }
 
         /// <summary>
+        /// Converts this <see cref="Point"/> to a <see cref="System.Drawing.Point"/>.
+        /// </summary>
+        /// <returns>The converted <see cref="System.Drawing.Point"/>.</returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public System.Drawing.Point ToDrawing()
+        {
+            return new System.Drawing.Point(X, Y);
+        }
+
+        /// <summary>
+        /// Converts a <see cref="System.Drawing.Point"/> to a <see cref="Point"/>.
+        /// </summary>
+        /// <param name="value">The converted value.</param>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static implicit operator Point(System.Drawing.Point value)
+        {
+            return new Point(value.X, value.Y);
+        }
+
+        /// <summary>
         /// Deconstruction method for <see cref="Point"/>.
         /// </summary>
         /// <param name="x"></param>
