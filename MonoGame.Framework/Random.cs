@@ -19,7 +19,7 @@ public static partial class MathHelper
     /// </summary>
     public class Random
     {
-        // state
+        // State
         private ulong _state;
         private readonly ulong _inc;
 
