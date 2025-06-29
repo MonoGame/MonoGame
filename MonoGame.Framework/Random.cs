@@ -37,12 +37,12 @@ public static partial class MathHelper
         }
 
         /// <summary>
-        /// Initiaze a random number generator.
+        /// Initialize a random number generator.
         /// </summary>
         public Random() : this((ulong)System.Environment.TickCount) { }
 
         /// <summary>
-        /// Initiaze a random number generator. Specified in two parts, state initializer (a.k.a. seed) and a sequence selection constant (a.k.a. stream id).
+        /// Initialize a random number generator. Specified in two parts, state initializer (a.k.a. seed) and a sequence selection constant (a.k.a. stream id).
         /// </summary>
         /// <param name="state">State initializer (a.k.a. seed).</param>
         /// <param name="streamID">Sequence selection constant (a.k.a. stream id). Defaults to 0.</param>
@@ -108,10 +108,10 @@ public static partial class MathHelper
         }
 
         /// <summary>
-        /// Generate a random number with an exclusive <paramref name="maxValue"/> upperbound.
+        /// Generate a random number with an exclusive <paramref name="maxValue"/> upper bound.
         /// </summary>
         /// <param name="maxValue">Exclusive upper bound.</param>
-        /// <returns>A random number with an exclusive <paramref name="maxValue"/> upperbound.</returns>
+        /// <returns>A random number with an exclusive <paramref name="maxValue"/> upper bound.</returns>
         public int Next(int maxValue)
         {
             if (maxValue < 0)
@@ -148,8 +148,8 @@ public static partial class MathHelper
         /// <summary>
         /// Generate a random float ranging from <paramref name="minValue"/> to <paramref name="maxValue"/>.
         /// </summary>
-        /// <param name="minValue">Lower bound. MUST be greater than Zero</param>
-        /// <param name="maxValue">Upper bound. MUST be greater than Zero</param>
+        /// <param name="minValue">Lower bound. MUST be greater than zero.</param>
+        /// <param name="maxValue">Upper bound. MUST be greater than zero.</param>
         /// <returns>A random float ranging from <paramref name="minValue"/> to <paramref name="maxValue"/>.</returns>
         public float NextFloat(float minValue, float maxValue)
         {
