@@ -193,10 +193,10 @@ namespace MonoGame.Tests.Framework
             if (minValue == int.MaxValue) maxValue = minValue;
 
             Assert.That(resultInt1 >= minValue && resultInt1 <= maxValue);
-            Assert.That(resultInt2 >= minValue && resultInt1 <= maxValue);
-            Assert.That(resultInt3 >= minValue && resultInt1 <= maxValue);
-            Assert.That(resultInt4 >= minValue && resultInt1 <= maxValue);
-            Assert.That(resultInt5 >= minValue && resultInt1 <= maxValue);
+            Assert.That(resultInt2 >= minValue && resultInt2 <= maxValue);
+            Assert.That(resultInt3 >= minValue && resultInt3 <= maxValue);
+            Assert.That(resultInt4 >= minValue && resultInt4 <= maxValue);
+            Assert.That(resultInt5 >= minValue && resultInt5 <= maxValue);
         }
 
         [TestCase(float.MinValue, float.MaxValue)]
@@ -219,10 +219,10 @@ namespace MonoGame.Tests.Framework
             if (maxValue < 0) maxValue = 0;
 
             Assert.That(resultInt1 >= minValue && resultInt1 <= maxValue);
-            Assert.That(resultInt2 >= minValue && resultInt1 <= maxValue);
-            Assert.That(resultInt3 >= minValue && resultInt1 <= maxValue);
-            Assert.That(resultInt4 >= minValue && resultInt1 <= maxValue);
-            Assert.That(resultInt5 >= minValue && resultInt1 <= maxValue);
+            Assert.That(resultInt2 >= minValue && resultInt2 <= maxValue);
+            Assert.That(resultInt3 >= minValue && resultInt3 <= maxValue);
+            Assert.That(resultInt4 >= minValue && resultInt4 <= maxValue);
+            Assert.That(resultInt5 >= minValue && resultInt5 <= maxValue);
         }
     }
 }
