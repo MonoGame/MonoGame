@@ -15,7 +15,6 @@
     <DefineConstants>STBSHARP_INTERNAL</DefineConstants>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <PackageReadmeFile>README.md</PackageReadmeFile>
-    <DisableMonoGameToolAssets>True</DisableMonoGameToolAssets>
   </PropertyGroup>
 
   <ItemGroup>

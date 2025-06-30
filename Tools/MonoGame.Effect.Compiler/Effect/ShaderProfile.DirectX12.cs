@@ -9,6 +9,7 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using Microsoft.Win32;
 using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Content.Pipeline;
 
 namespace MonoGame.Effect
 {
@@ -79,7 +80,7 @@ namespace MonoGame.Effect
 
                 // Compile the shader once just to get reflection info.
                 string stdout, stderr;
-                var result = RunTool("dxc", toolArgs + "\"" + inputFile + "\"", out reflectionData, out stderr);
+                var result = ExternalTool.Run("dxc", toolArgs + "\"" + inputFile + "\"", out reflectionData, out stderr);
                 errorsAndWarnings += stderr;
                 if (result > 0)
                     throw new ShaderCompilerException();
@@ -102,7 +103,7 @@ namespace MonoGame.Effect
                 }
 
                 toolArgs += "/Fo " + "\"" + outputFile + "\"" + " ";
-                result = RunTool("dxc", toolArgs + "\"" + inputFile + "\"", out stdout, out stderr);
+                result = ExternalTool.Run("dxc", toolArgs + "\"" + inputFile + "\"", out stdout, out stderr);
                 errorsAndWarnings += stderr;
                 if (result > 0)
                     throw new ShaderCompilerException();
@@ -113,8 +114,8 @@ namespace MonoGame.Effect
             finally
             {
                 // Cleanup.
-                DeleteFile(inputFile);
-                DeleteFile(outputFile);
+                ExternalTool.DeleteFile(inputFile);
+                ExternalTool.DeleteFile(outputFile);
             }
 
             // First look to see if we already created this same shader.
