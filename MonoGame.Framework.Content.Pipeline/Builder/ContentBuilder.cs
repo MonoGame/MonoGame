@@ -2,8 +2,6 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
-using System.Collections;
-using System.Net;
 using System.Reflection;
 using Microsoft.Xna.Framework.Content.Pipeline;
 using Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler;
@@ -16,6 +14,19 @@ namespace MonoGame.Framework.Content.Pipeline.Builder;
 /// </summary>
 public abstract class ContentBuilder
 {
+    private class ContentRequest
+    {
+        public required string InputPath { get; init; }
+
+        public required ContentInfo ContentInfo { get; init; }
+
+        public required ContentServer Server { get; set; }
+
+        public required ContentRequestedArgs Args { get; set; }
+    }
+
+    private readonly Queue<ContentRequest> _contentRequestQueue = [];
+    private readonly object _contentRequestLock = new();
     private readonly Dictionary<string, ContentInfo> _content = [];
     private readonly Dictionary<string, string> _outputContent = [];
     private uint _succeededToBuild = 0;
@@ -23,7 +34,7 @@ public abstract class ContentBuilder
 
     /// <summary>
     /// Parameters to be used by the <see cref="ContentBuilder"/> or any of its subsystems.
-    /// 
+    ///
     /// Can be passed from CLI args, see <see cref="Run(string[])"/>.
     /// </summary>
     public ContentBuilderParams Parameters { get; set; } = new ContentBuilderParams();
@@ -285,20 +296,6 @@ public abstract class ContentBuilder
         Logger.Log($"{_succeededToBuild} succeeded, {_failedToBuild} failed");
         Logger.PopFile();
     }
-
-    class ContentRequest
-    {
-        public required string InputPath { get; init; }
-
-        public required ContentInfo ContentInfo { get; init; }
-
-        public required ContentServer Server { get; set; }
-
-        public required ContentRequestedArgs Args { get; set; }
-    }
-
-    private readonly Queue<ContentRequest> _contentRequestQueue = [];
-    private object _contentRequestLock = new();
 
     private void RunServer()
     {

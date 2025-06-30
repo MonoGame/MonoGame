@@ -1,10 +1,15 @@
-#pragma warning disable 1591
+// MonoGame - Copyright (C) MonoGame Foundation, Inc
+// This file is subject to the terms and conditions defined in
+// file 'LICENSE.txt', which is part of this source code package.
 
 using System.Net;
 using Microsoft.Xna.Framework.Content.Pipeline;
 
 namespace MonoGame.Framework.Content.Pipeline.Builder.Server;
 
+/// <summary>
+/// A <see cref="ContentServer"/> that is hosting a network.
+/// </summary>
 public class NetworkContentServer : ContentServer
 {
     private HttpListener _httpListener = new();
@@ -19,6 +24,7 @@ public class NetworkContentServer : ContentServer
     [ContentServerParameter("port", "The port to be used for the content server mode.")]
     public ushort Port { get; init; } = 7771;
 
+    /// <inheritdoc/>
     public override void NotifyContentRequestCompiled()
     {
         lock (_waitLock)
@@ -27,6 +33,7 @@ public class NetworkContentServer : ContentServer
         }
     }
 
+    /// <inheritdoc/>
     public override void StartListening()
     {
         StopListening();
@@ -47,6 +54,7 @@ public class NetworkContentServer : ContentServer
         _listeningThread.Start();
     }
 
+    /// <inheritdoc/>
     public override void StopListening()
     {
         if (_listeningThread == null || _httpListener == null)

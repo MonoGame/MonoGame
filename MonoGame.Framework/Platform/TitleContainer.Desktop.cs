@@ -35,16 +35,5 @@ namespace Microsoft.Xna.Framework
 
             return null;
         }
-
-        private static Stream PlatformOpenWriteStream(string safeName)
-        {
-            var absolutePath = Path.Combine(Location, safeName);
-            var dirPath = Path.GetDirectoryName(absolutePath);
-            if (!Directory.Exists(dirPath))
-            {
-                Directory.CreateDirectory(dirPath);
-            }
-            return File.OpenWrite(absolutePath);
-        }
     }
 }
