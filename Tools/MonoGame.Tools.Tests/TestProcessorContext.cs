@@ -54,11 +54,6 @@ namespace MonoGame.Tests.ContentPipeline
         {
             get { throw new NotImplementedException(); }
         }
-
-        public override string ProjectDirectory
-        {
-            get { throw new NotImplementedException(); }
-        }
 #endif
 
         public override TargetPlatform TargetPlatform
