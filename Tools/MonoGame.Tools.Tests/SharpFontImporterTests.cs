@@ -16,14 +16,19 @@ namespace MonoGame.Tests.ContentPipeline
     {
         record ABCGlyphData(char Character, float SpacingA, float SpacingB, float SpacingC);
 
-        [TestCase]
-        public void ValidateABCSpacings()
+        [TestCase("arial", 12)]
+        public void ValidateABCSpacings(string fontname, float fontsize)
         {
             SharpFontImporter SFImp = new SharpFontImporter();
-            SFImp.Import(new FontDescription("arial", 12, 0, FontDescriptionStyle.Regular, true)
+
+            string findFontPath = FindFont(fontname, "regular");
+            Assert.False(string.IsNullOrWhiteSpace(findFontPath), $"Font: {fontname} was not found.");
+            Assert.True(File.Exists(findFontPath), $"Font: {fontname} does not exist at {findFontPath}.");
+
+            SFImp.Import(new FontDescription(fontname, fontsize, 0, FontDescriptionStyle.Regular, true)
             {
-                CharacterRegions = [new CharacterRegion((char)32, (char)127)]
-            }, FindFont("arial", "regular"));
+                CharacterRegions = [new CharacterRegion((char)32, (char)127)] //32 to 127 are all printable ascii chars
+            }, findFontPath);
 
             IEnumerable<ABCGlyphData> sourceOfTruthGlyphs = JsonSerializer.Deserialize<IEnumerable<ABCGlyphData>>(SourceOfTruthJSON);
 
