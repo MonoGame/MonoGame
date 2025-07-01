@@ -14,33 +14,33 @@ using MonoGame.Framework.Content.Pipeline.Builder.Server;
 
 namespace MonoGame.Framework.Content.Pipeline.Builder;
 
-sealed class ColorConverter : IYamlTypeConverter
-{
-    public bool Accepts(Type type) => type == typeof(Color);
-
-    public object? ReadYaml(IParser parser, Type type, ObjectDeserializer rootDeserializer)
-    {
-        var scalar = parser.Consume<Scalar>();
-        var color = new Color();
-        var split = scalar.Value.Split(",");
-
-        color.R = byte.Parse(split[0]);
-        color.G = byte.Parse(split[1]);
-        color.B = byte.Parse(split[2]);
-        color.A = byte.Parse(split[3]);
-
-        return color;
-    }
-
-    public void WriteYaml(IEmitter emitter, object? value, Type type, ObjectSerializer serializer)
-    {
-        var color = (Color)(value ?? new Color());
-        emitter.Emit(new Scalar($"{color.R},{color.G},{color.B},{color.A}"));
-    }
-}
-
 class ContentBuilderHelper
 {
+    sealed class ColorConverter : IYamlTypeConverter
+    {
+        public bool Accepts(Type type) => type == typeof(Color);
+
+        public object? ReadYaml(IParser parser, Type type, ObjectDeserializer rootDeserializer)
+        {
+            var scalar = parser.Consume<Scalar>();
+            var color = new Color();
+            var split = scalar.Value.Split(",");
+
+            color.R = byte.Parse(split[0]);
+            color.G = byte.Parse(split[1]);
+            color.B = byte.Parse(split[2]);
+            color.A = byte.Parse(split[3]);
+
+            return color;
+        }
+
+        public void WriteYaml(IEmitter emitter, object? value, Type type, ObjectSerializer serializer)
+        {
+            var color = (Color)(value ?? new Color());
+            emitter.Emit(new Scalar($"{color.R},{color.G},{color.B},{color.A}"));
+        }
+    }
+
     record ImporterInfo
     {
         public required ContentImporterAttribute? Attribute { get; init; }
