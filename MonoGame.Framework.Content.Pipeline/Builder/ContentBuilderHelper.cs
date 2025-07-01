@@ -10,6 +10,7 @@ using YamlDotNet.Core;
 using YamlDotNet.Core.Events;
 using YamlDotNet.Serialization;
 using YamlDotNet.Serialization.NamingConventions;
+using MonoGame.Framework.Content.Pipeline.Builder.Server;
 
 namespace MonoGame.Framework.Content.Pipeline.Builder;
 
@@ -40,19 +41,27 @@ sealed class ColorConverter : IYamlTypeConverter
 
 class ContentBuilderHelper
 {
-    private struct ImporterInfo
+    record ImporterInfo
     {
-        public ContentImporterAttribute? attribute;
-        public Type type;
-    };
+        public required ContentImporterAttribute? Attribute { get; init; }
+        public required Type Type { get; init; }
+    }
 
-    private struct ProcessorInfo
+    record ProcessorInfo
     {
-        public ContentProcessorAttribute? attribute;
-        public Type type;
-    };
+        public required ContentProcessorAttribute? Attribute { get; init; }
+        public required Type Type { get; init; }
+    }
+
+    record ServerPropertyInfo
+    {
+        public required ContentServerParameterAttribute Attribute { get; init; }
+        public required PropertyInfo PropertyInfo { get; init; }
+    }
+
     private static readonly List<ImporterInfo> _importers = [];
     private static readonly List<ProcessorInfo> _processors = [];
+    private static readonly Dictionary<Type, List<ServerPropertyInfo>> _serverOptions = [];
 
     static ContentBuilderHelper()
     {
@@ -71,33 +80,56 @@ class ContentBuilderHelper
 
         foreach (var a in AppDomain.CurrentDomain.GetAssemblies())
         {
-            Type[] exportedTypes = a.GetTypes();
-            foreach (var t in exportedTypes)
+            foreach (var t in a.GetTypes())
             {
-                if (t.IsAbstract)
+                if (t.IsAbstract || t.IsInterface)
                     continue;
 
-                if (t.GetInterface(@"IContentImporter") != null)
+                if (t.GetInterface(nameof(IContentImporter)) != null)
                 {
                     serilizer.WithTagMapping("!" + t.ToString(), t);
                     deserializer.WithTagMapping("!" + t.ToString(), t);
 
                     _importers.Add(new ImporterInfo
                     {
-                        attribute = GetImporterAttribute(t),
-                        type = t
+                        Attribute = GetImporterAttribute(t),
+                        Type = t
                     });
                 }
-                else if (t.GetInterface(@"IContentProcessor") != null)
+                else if (t.GetInterface(nameof(IContentProcessor)) != null)
                 {
                     serilizer.WithTagMapping("!" + t.ToString(), t);
                     deserializer.WithTagMapping("!" + t.ToString(), t);
 
                     _processors.Add(new ProcessorInfo
                     {
-                        attribute = GetProcessorAttribute(t),
-                        type = t
+                        Attribute = GetProcessorAttribute(t),
+                        Type = t
                     });
+                }
+                else if (t.IsSubclassOf(typeof(ContentServer)))
+                {
+                    var props = new List<ServerPropertyInfo>();
+                    foreach (var propInfo in t.GetProperties())
+                    {
+                        if (!propInfo.CanRead || !propInfo.CanWrite)
+                        {
+                            continue;
+                        }
+
+                        var attributes = propInfo.GetCustomAttributes(typeof(ContentServerParameterAttribute), false);
+                        if (attributes.Length == 0)
+                        {
+                            continue;
+                        }
+
+                        props.Add(new ServerPropertyInfo
+                        {
+                            Attribute = (ContentServerParameterAttribute)attributes[0],
+                            PropertyInfo = propInfo
+                        });
+                    }
+                    _serverOptions[t] = props;
                 }
             }
         }
@@ -202,9 +234,9 @@ class ContentBuilderHelper
         foreach (var info in _importers)
         {
             string fileExtension = Path.GetExtension(relativePath);
-            if (info.attribute?.FileExtensions.Any(e => e.Equals(fileExtension, StringComparison.InvariantCultureIgnoreCase)) ?? false)
+            if (info.Attribute?.FileExtensions.Any(e => e.Equals(fileExtension, StringComparison.InvariantCultureIgnoreCase)) ?? false)
             {
-                outImporter = (IContentImporter)Activator.CreateInstance(info.type)!;
+                outImporter = (IContentImporter)Activator.CreateInstance(info.Type)!;
                 return true;
             }
         }
@@ -225,14 +257,33 @@ class ContentBuilderHelper
 
         foreach (var processor in _processors)
         {
-            if (processor.type.Name == attribute.DefaultProcessor)
+            if (processor.Type.Name == attribute.DefaultProcessor)
             {
-                outProcessor = (IContentProcessor)Activator.CreateInstance(processor.type)!;
+                outProcessor = (IContentProcessor)Activator.CreateInstance(processor.Type)!;
                 return true;
             }
         }
 
         outProcessor = null!;
         return false;
+    }
+
+    public static IEnumerable<Type> GetServerTypes()
+    {
+        foreach (var pair in _serverOptions)
+        {
+            yield return pair.Key;
+        }
+    }
+
+    public static IEnumerable<(ContentServerParameterAttribute attribute, PropertyInfo propertyInfo)> GetServerProperties(Type serverType)
+    {
+        if (_serverOptions.TryGetValue(serverType, out var ret))
+        {
+            foreach (var serverPropertyInfo in ret)
+            {
+                yield return (serverPropertyInfo.Attribute, serverPropertyInfo.PropertyInfo);
+            }
+        }
     }
 }

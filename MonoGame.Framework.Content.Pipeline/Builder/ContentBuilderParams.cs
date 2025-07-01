@@ -4,6 +4,9 @@
 
 using System.CommandLine;
 using System.CommandLine.Binding;
+using System.CommandLine.Builder;
+using System.CommandLine.Parsing;
+using System.Reflection;
 using Microsoft.Xna.Framework.Content.Pipeline;
 using Microsoft.Xna.Framework.Graphics;
 using MonoGame.Framework.Content.Pipeline.Builder.Server;
@@ -16,11 +19,11 @@ namespace MonoGame.Framework.Content.Pipeline.Builder;
 /// </summary>
 public record ContentBuilderParams
 {
-    class GlobalBuilderOptions : BinderBase<ContentBuilderParams>
+    class RootOptions : BinderBase<ContentBuilderParams>
     {
         private readonly Func<BindingContext, ContentBuilderParams> _contentBuilderArgsFunc;
 
-        public GlobalBuilderOptions(RootCommand rootCommand)
+        public RootOptions(RootCommand rootCommand)
         {
             var defaultValues = new ContentBuilderParams();
 
@@ -94,6 +97,52 @@ public record ContentBuilderParams
         protected override ContentBuilderParams GetBoundValue(BindingContext bindingContext) => _contentBuilderArgsFunc(bindingContext);
     }
 
+    class ServerOptions : BinderBase<List<ContentServer>>
+    {
+        private readonly Func<BindingContext, List<ContentServer>> _contentBuilderArgsFunc;
+
+        public ServerOptions(Command rootCommand)
+        {
+            var contentServers = new List<ContentServer>();
+            var options = new List<(Type, PropertyInfo, Option)>();
+
+            foreach (var serverType in ContentBuilderHelper.GetServerTypes())
+            {
+                var contentServer = (ContentServer)Activator.CreateInstance(serverType)!;
+                foreach (var (attribute, propertyInfo) in ContentBuilderHelper.GetServerProperties(serverType))
+                {
+                    var optionType = typeof(Option<>).MakeGenericType(propertyInfo.PropertyType);
+                    var option = (Option)Activator.CreateInstance(optionType, new object[] {
+                        "--" + attribute.Name,
+                        attribute.Description
+                    })!;
+                    option.SetDefaultValueFactory(() => propertyInfo.GetValue(contentServer));
+                    rootCommand.AddGlobalOption(option);
+
+                    options.Add((serverType, propertyInfo, option));
+                }
+                contentServers.Add(contentServer);
+            }
+
+            _contentBuilderArgsFunc = (bindingContext) =>
+            {
+                foreach (var (type, propInfo, option) in options)
+                {
+                    var value = bindingContext.ParseResult.GetValueForOption(option);
+                    if (value != null)
+                    {
+                        var server = contentServers.Find(s => s.GetType() == type);
+                        propInfo.SetValue(server, value);
+                    }
+                }
+
+                return contentServers;
+            };
+        }
+
+        protected override List<ContentServer> GetBoundValue(BindingContext bindingContext) => _contentBuilderArgsFunc(bindingContext);
+    }
+
     /// <summary>
     /// Parses out the main entry point args into a <see cref="ContentBuilderParams"/> to be used by <see cref="ContentBuilder"/>.
     /// </summary>
@@ -106,7 +155,7 @@ public record ContentBuilderParams
         var ret = new ContentBuilderParams();
         var defaultValues = new ContentBuilderParams();
         var rootCommand = new RootCommand("Content builder and conntent server for MonoGame.");
-        var rootOptions = new GlobalBuilderOptions(rootCommand);
+        var rootOptions = new RootOptions(rootCommand);
 
         var buildCommand = new Command("build", "Build all the content.");
         var skipCleanOption = new Option<bool>(
@@ -121,22 +170,25 @@ public record ContentBuilderParams
         rootCommand.AddCommand(buildCommand);
 
         var serverCommand = new Command("server", "Start a content server.");
-
-        // so place custom options here...
-        /*var serverPortOption = new Option<ushort>(
-                name: "--port",
-                description: "The port to be used for the content server mode.",
-                getDefaultValue: () => defaultValues.ServerPort);
-        serverCommand.AddOption(serverPortOption);
+        var sererOptions = new ServerOptions(serverCommand);
         serverCommand.SetHandler(
-            (contentBuilder, serverPortOption) => ret = contentBuilder with { Mode = ContentBuilderMode.Server, ServerPort = serverPortOption },
+            (contentBuilder, sererOptions) => ret = contentBuilder with { Mode = ContentBuilderMode.Server, Servers = sererOptions },
             rootOptions,
-            serverPortOption);*/
-
-
+            sererOptions);
         rootCommand.AddCommand(serverCommand);
 
-        rootCommand.Invoke(args);
+        bool helpShown = false;
+        var parser = new CommandLineBuilder(rootCommand)
+            .UseDefaults()
+            .UseHelp(ctx => helpShown = true)
+            .Build();
+        parser.Invoke(args);
+
+        if (helpShown)
+        {
+            ret = ret with { Mode = ContentBuilderMode.None };
+        }
+
         return ret;
     }
 
@@ -216,7 +268,8 @@ public record ContentBuilderParams
     public bool SkipClean { get; init; } = false;
 
     /// <summary>
-    /// 
+    /// A list of servers to start up when the <see cref="Mode"/> is set to <see cref="ContentBuilderMode.Server"/>.
     /// </summary>
-    public List<ContentServer> Servers { get; init; } = [ new NetworkContentServer() ];
+    /// <value>A collection of <see cref="ContentServer"/> classes found by scaning all referenced assemblies.</value>
+    public List<ContentServer> Servers { get; init; } = [];
 }

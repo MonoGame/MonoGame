@@ -222,6 +222,12 @@ public abstract class ContentBuilder
     /// <param name="parameters">A <see cref="ContentBuilderParams"/> describing both the platform paramteres for the content compilation as well as the configuration of the <see cref="ContentBuilder"/> itself.</param>
     public void Run(ContentBuilderParams parameters)
     {
+        if (parameters.Mode == ContentBuilderMode.None)
+        {
+            // This means we are just showing the help menu.
+            return;
+        }
+
         Parameters = parameters;
         Directory.SetCurrentDirectory(Parameters.WorkingDirectory);
 
