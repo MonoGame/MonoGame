@@ -20,11 +20,14 @@ public class NetworkContentProvider : IContentProvider
     public NetworkContentProvider()
     {
         _client = new HttpClient { Timeout = TimeSpan.FromMinutes(30) };
-#if ANDROID || IOS
-        _location = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "MonoGameCache");
-#else
-        _location = AppDomain.CurrentDomain.BaseDirectory;
-#endif
+        if (OperatingSystem.IsWindows() || OperatingSystem.IsMacOS() || OperatingSystem.IsMacCatalyst() || OperatingSystem.IsLinux())
+        {
+            _location = AppDomain.CurrentDomain.BaseDirectory;
+        }
+        else
+        {
+            _location = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "MonoGameCache");
+        }
         _modifiedTimes = LoadModifiedTimes();
     }
 
