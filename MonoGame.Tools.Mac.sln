@@ -27,8 +27,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MonoGame.Content.Builder.Ed
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MonoGame.Content.Builder.Editor.Launcher.Bootstrap", "Tools\MonoGame.Content.Builder.Editor.Launcher.Bootstrap\MonoGame.Content.Builder.Editor.Launcher.Bootstrap.csproj", "{E7E8B7C4-8EDE-492B-9283-166A23F32E15}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{827E0CD3-B72D-47B6-A68D-7590B98EB39B}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MonoGame.Framework.DebugAdapters", "src\MonoGame.Framework.DebugAdapters\MonoGame.Framework.DebugAdapters.csproj", "{FA790B5C-06FE-442D-8BC7-8C63C8038C40}"
 EndProject
 Global
@@ -164,9 +162,6 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
-	EndGlobalSection
-	GlobalSection(NestedProjects) = preSolution
-		{FA790B5C-06FE-442D-8BC7-8C63C8038C40} = {827E0CD3-B72D-47B6-A68D-7590B98EB39B}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {1F3D65DD-4771-4627-84FB-4A001F338B6C}

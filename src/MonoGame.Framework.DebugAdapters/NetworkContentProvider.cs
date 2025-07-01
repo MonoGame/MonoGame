@@ -19,13 +19,13 @@ public class NetworkContentProvider : IContentProvider
 
     public NetworkContentProvider()
     {
-        _client = new HttpClient();
-        _modifiedTimes = LoadModifiedTimes();
+        _client = new HttpClient { Timeout = TimeSpan.FromMinutes(30) };
 #if ANDROID || IOS
         _location = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "MonoGameCache");
 #else
         _location = AppDomain.CurrentDomain.BaseDirectory;
 #endif
+        _modifiedTimes = LoadModifiedTimes();
     }
 
     /// <summary>
@@ -40,7 +40,11 @@ public class NetworkContentProvider : IContentProvider
         _client.DefaultRequestHeaders.Add("Path", relativePath);
         if (_modifiedTimes.TryGetValue(relativePath, out var lastModifiedTime))
         {
-            _client.DefaultRequestHeaders.Add("LastModifiedTime", lastModifiedTime.ToString());
+            var absolutePath = Path.Combine(_location, relativePath);
+            if (File.Exists(absolutePath)) // TODO: Maybe also cache information about the write time of the file and use that as well
+            {
+                _client.DefaultRequestHeaders.Add("LastModifiedTime", lastModifiedTime.ToString());
+            }
         }
 
         try
@@ -125,14 +129,14 @@ public class NetworkContentProvider : IContentProvider
         }
     }
 
-    private FileStream? OpenWriteStream(string safeName)
+    private FileStream? OpenWriteStream(string relativePath)
     {
-        var absolutePath = Path.Combine(_location, safeName);
+        var absolutePath = Path.Combine(_location, relativePath);
         var dirPath = Path.GetDirectoryName(absolutePath);
         if (!string.IsNullOrEmpty(dirPath) && !Directory.Exists(dirPath))
         {
             Directory.CreateDirectory(dirPath);
         }
-        return File.Exists(absolutePath) ? File.OpenWrite(absolutePath) : null;
+        return File.OpenWrite(absolutePath);
     }
 }
