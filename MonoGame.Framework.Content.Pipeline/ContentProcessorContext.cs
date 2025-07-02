@@ -57,6 +57,11 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
         public abstract GraphicsProfile TargetProfile { get; }
 
         /// <summary>
+        /// Gets the directory that contains the content project.
+        /// </summary>
+        public abstract string ProjectDirectory { get; }
+
+        /// <summary>
         /// Initializes a new instance of ContentProcessorContext.
         /// </summary>
         public ContentProcessorContext()

@@ -74,43 +74,43 @@ internal static unsafe partial class MGA
     #region System
 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    public delegate void NativeFinishedCallback(nint callbackData);
+    public delegate void NativeFinishedCallback(IntPtr callbackData);
 
-    [LibraryImport(MGP.MonoGameNativeDLL, EntryPoint = "MGA_System_Create", StringMarshalling = StringMarshalling.Utf8)]
-    public static partial MGA_System* System_Create();
+    [DllImport(MGP.MonoGameNativeDLL, EntryPoint = "MGA_System_Create", ExactSpelling = true)]
+    public static extern MGA_System* System_Create();
 
-    [LibraryImport(MGP.MonoGameNativeDLL, EntryPoint = "MGA_System_Destroy", StringMarshalling = StringMarshalling.Utf8)]
-    public static partial void System_Destroy(MGA_System* system);
+    [DllImport(MGP.MonoGameNativeDLL, EntryPoint = "MGA_System_Destroy", ExactSpelling = true)]
+    public static extern void System_Destroy(MGA_System* system);
 
-    [LibraryImport(MGP.MonoGameNativeDLL, EntryPoint = "MGA_System_GetMaxInstances", StringMarshalling = StringMarshalling.Utf8)]
-    public static partial int System_GetMaxInstances();
+    [DllImport(MGP.MonoGameNativeDLL, EntryPoint = "MGA_System_GetMaxInstances", ExactSpelling = true)]
+    public static extern int System_GetMaxInstances();
 
-    [LibraryImport(MGP.MonoGameNativeDLL, EntryPoint = "MGA_System_SetReverbSettings", StringMarshalling = StringMarshalling.Utf8)]
-    public static partial void System_SetReverbSettings(MGA_System* system, in ReverbSettings settings);
+    [DllImport(MGP.MonoGameNativeDLL, EntryPoint = "MGA_System_SetReverbSettings", ExactSpelling = true)]
+    public static extern void System_SetReverbSettings(MGA_System* system, ReverbSettings* settings);
 
     #endregion
 
     #region Buffer
 
-    [LibraryImport(MGP.MonoGameNativeDLL, EntryPoint = "MGA_Buffer_Create", StringMarshalling = StringMarshalling.Utf8)]
-    public static partial MGA_Buffer* Buffer_Create(MGA_System* system);
+    [DllImport(MGP.MonoGameNativeDLL, EntryPoint = "MGA_Buffer_Create", ExactSpelling = true)]
+    public static extern MGA_Buffer* Buffer_Create(MGA_System* system);
 
-    [LibraryImport(MGP.MonoGameNativeDLL, EntryPoint = "MGA_Buffer_Destroy", StringMarshalling = StringMarshalling.Utf8)]
-    public static partial void Buffer_Destroy(MGA_Buffer* buffer);
+    [DllImport(MGP.MonoGameNativeDLL, EntryPoint = "MGA_Buffer_Destroy", ExactSpelling = true)]
+    public static extern void Buffer_Destroy(MGA_Buffer* buffer);
 
-    [LibraryImport(MGP.MonoGameNativeDLL, EntryPoint = "MGA_Buffer_InitializeFormat", StringMarshalling = StringMarshalling.Utf8)]
-    public static partial void Buffer_InitializeFormat(
+    [DllImport(MGP.MonoGameNativeDLL, EntryPoint = "MGA_Buffer_InitializeFormat", ExactSpelling = true)]
+    public static extern void Buffer_InitializeFormat(
         MGA_Buffer* buffer,
-        byte[] waveHeader,
-        byte[] waveData,
+        byte* waveHeader,
+        byte* waveData,
         int length,
         int loopStart,
         int loopLength);
 
-    [LibraryImport(MGP.MonoGameNativeDLL, EntryPoint = "MGA_Buffer_InitializePCM", StringMarshalling = StringMarshalling.Utf8)]
-    public static partial void Buffer_InitializePCM(
+    [DllImport(MGP.MonoGameNativeDLL, EntryPoint = "MGA_Buffer_InitializePCM", ExactSpelling = true)]
+    public static extern void Buffer_InitializePCM(
         MGA_Buffer* buffer,
-        byte[] waveData,
+        byte* waveData,
         int offset,
         int length,
         int sampleBits,
@@ -119,12 +119,11 @@ internal static unsafe partial class MGA
         int loopStart,
         int loopLength);
 
-    // TODO: This should go away after we move to FAudio's Xact implementation.
-    [LibraryImport(MGP.MonoGameNativeDLL, EntryPoint = "MGA_Buffer_InitializeXact", StringMarshalling = StringMarshalling.Utf8)]
-    public static partial void Buffer_InitializeXact(
+    [DllImport(MGP.MonoGameNativeDLL, EntryPoint = "MGA_Buffer_InitializeXact", ExactSpelling = true)]
+    public static extern void Buffer_InitializeXact(
         MGA_Buffer* buffer,
         uint codec,
-        byte[] waveData,
+        byte* waveData,
         int length,
         int sampleRate,
         int blockAlignment,
@@ -132,66 +131,66 @@ internal static unsafe partial class MGA
         int loopStart,
         int loopLength);
 
-    [LibraryImport(MGP.MonoGameNativeDLL, EntryPoint = "MGA_Buffer_GetDuration", StringMarshalling = StringMarshalling.Utf8)]
-    public static partial ulong Buffer_GetDuration(MGA_Buffer* buffer);
+    [DllImport(MGP.MonoGameNativeDLL, EntryPoint = "MGA_Buffer_GetDuration", ExactSpelling = true)]
+    public static extern ulong Buffer_GetDuration(MGA_Buffer* buffer);
 
     #endregion
 
     #region Voice
 
-    [LibraryImport(MGP.MonoGameNativeDLL, EntryPoint = "MGA_Voice_Create", StringMarshalling = StringMarshalling.Utf8)]
-    public static partial MGA_Voice* Voice_Create(MGA_System* system, int sampleRate = 0, int channels = 0);
+    [DllImport(MGP.MonoGameNativeDLL, EntryPoint = "MGA_Voice_Create", ExactSpelling = true)]
+    public static extern MGA_Voice* Voice_Create(MGA_System* system, int sampleRate = 0, int channels = 0);
 
-    [LibraryImport(MGP.MonoGameNativeDLL, EntryPoint = "MGA_Voice_Destroy", StringMarshalling = StringMarshalling.Utf8)]
-    public static partial void Voice_Destroy(MGA_Voice* voice);
+    [DllImport(MGP.MonoGameNativeDLL, EntryPoint = "MGA_Voice_Destroy", ExactSpelling = true)]
+    public static extern void Voice_Destroy(MGA_Voice* voice);
 
-    [LibraryImport(MGP.MonoGameNativeDLL, EntryPoint = "MGA_Voice_GetBufferCount", StringMarshalling = StringMarshalling.Utf8)]
-    public static partial int Voice_GetBufferCount(MGA_Voice* voice);
+    [DllImport(MGP.MonoGameNativeDLL, EntryPoint = "MGA_Voice_GetBufferCount", ExactSpelling = true)]
+    public static extern int Voice_GetBufferCount(MGA_Voice* voice);
 
-    [LibraryImport(MGP.MonoGameNativeDLL, EntryPoint = "MGA_Voice_SetBuffer", StringMarshalling = StringMarshalling.Utf8)]
-    public static partial void Voice_SetBuffer(MGA_Voice* voice, MGA_Buffer* buffer);
+    [DllImport(MGP.MonoGameNativeDLL, EntryPoint = "MGA_Voice_SetBuffer", ExactSpelling = true)]
+    public static extern void Voice_SetBuffer(MGA_Voice* voice, MGA_Buffer* buffer);
 
-    [LibraryImport(MGP.MonoGameNativeDLL, EntryPoint = "MGA_Voice_AppendBuffer", StringMarshalling = StringMarshalling.Utf8)]
-    public static partial void Voice_AppendBuffer(MGA_Voice* voice, byte* buffer, uint size);
+    [DllImport(MGP.MonoGameNativeDLL, EntryPoint = "MGA_Voice_AppendBuffer", ExactSpelling = true)]
+    public static extern void Voice_AppendBuffer(MGA_Voice* voice, byte* buffer, uint size);
 
-    [LibraryImport(MGP.MonoGameNativeDLL, EntryPoint = "MGA_Voice_Play", StringMarshalling = StringMarshalling.Utf8)]
-    public static partial void Voice_Play(MGA_Voice* voice, [MarshalAs(UnmanagedType.U1)] bool looped);
+    [DllImport(MGP.MonoGameNativeDLL, EntryPoint = "MGA_Voice_Play", ExactSpelling = true)]
+    public static extern void Voice_Play(MGA_Voice* voice, byte looped);
 
-    [LibraryImport(MGP.MonoGameNativeDLL, EntryPoint = "MGA_Voice_Pause", StringMarshalling = StringMarshalling.Utf8)]
-    public static partial void Voice_Pause(MGA_Voice* voice);
+    [DllImport(MGP.MonoGameNativeDLL, EntryPoint = "MGA_Voice_Pause", ExactSpelling = true)]
+    public static extern void Voice_Pause(MGA_Voice* voice);
 
-    [LibraryImport(MGP.MonoGameNativeDLL, EntryPoint = "MGA_Voice_Resume", StringMarshalling = StringMarshalling.Utf8)]
-    public static partial void Voice_Resume(MGA_Voice* voice);
+    [DllImport(MGP.MonoGameNativeDLL, EntryPoint = "MGA_Voice_Resume", ExactSpelling = true)]
+    public static extern void Voice_Resume(MGA_Voice* voice);
 
-    [LibraryImport(MGP.MonoGameNativeDLL, EntryPoint = "MGA_Voice_Stop", StringMarshalling = StringMarshalling.Utf8)]
-    public static partial void Voice_Stop(MGA_Voice* voice, [MarshalAs(UnmanagedType.U1)] bool immediate);
+    [DllImport(MGP.MonoGameNativeDLL, EntryPoint = "MGA_Voice_Stop", ExactSpelling = true)]
+    public static extern void Voice_Stop(MGA_Voice* voice, byte immediate);
 
-    [LibraryImport(MGP.MonoGameNativeDLL, EntryPoint = "MGA_Voice_GetState", StringMarshalling = StringMarshalling.Utf8)]
-    public static partial SoundState Voice_GetState(MGA_Voice* voice);
+    [DllImport(MGP.MonoGameNativeDLL, EntryPoint = "MGA_Voice_GetState", ExactSpelling = true)]
+    public static extern SoundState Voice_GetState(MGA_Voice* voice);
 
-    [LibraryImport(MGP.MonoGameNativeDLL, EntryPoint = "MGA_Voice_GetPosition", StringMarshalling = StringMarshalling.Utf8)]
-    public static partial ulong Voice_GetPosition(MGA_Voice* voice);
+    [DllImport(MGP.MonoGameNativeDLL, EntryPoint = "MGA_Voice_GetPosition", ExactSpelling = true)]
+    public static extern ulong Voice_GetPosition(MGA_Voice* voice);
 
-    [LibraryImport(MGP.MonoGameNativeDLL, EntryPoint = "MGA_Voice_SetPan", StringMarshalling = StringMarshalling.Utf8)]
-    public static partial void Voice_SetPan(MGA_Voice* voice, float pan);
+    [DllImport(MGP.MonoGameNativeDLL, EntryPoint = "MGA_Voice_SetPan", ExactSpelling = true)]
+    public static extern void Voice_SetPan(MGA_Voice* voice, float pan);
 
-    [LibraryImport(MGP.MonoGameNativeDLL, EntryPoint = "MGA_Voice_SetPitch", StringMarshalling = StringMarshalling.Utf8)]
-    public static partial void Voice_SetPitch(MGA_Voice* voice, float pitch);
+    [DllImport(MGP.MonoGameNativeDLL, EntryPoint = "MGA_Voice_SetPitch", ExactSpelling = true)]
+    public static extern void Voice_SetPitch(MGA_Voice* voice, float pitch);
 
-    [LibraryImport(MGP.MonoGameNativeDLL, EntryPoint = "MGA_Voice_SetVolume", StringMarshalling = StringMarshalling.Utf8)]
-    public static partial void Voice_SetVolume(MGA_Voice* voice, float volume);
+    [DllImport(MGP.MonoGameNativeDLL, EntryPoint = "MGA_Voice_SetVolume", ExactSpelling = true)]
+    public static extern void Voice_SetVolume(MGA_Voice* voice, float volume);
 
-    [LibraryImport(MGP.MonoGameNativeDLL, EntryPoint = "MGA_Voice_SetReverbMix", StringMarshalling = StringMarshalling.Utf8)]
-    public static partial void Voice_SetReverbMix(MGA_Voice* voice, float mix);
+    [DllImport(MGP.MonoGameNativeDLL, EntryPoint = "MGA_Voice_SetReverbMix", ExactSpelling = true)]
+    public static extern void Voice_SetReverbMix(MGA_Voice* voice, float mix);
 
-    [LibraryImport(MGP.MonoGameNativeDLL, EntryPoint = "MGA_Voice_SetFilterMode", StringMarshalling = StringMarshalling.Utf8)]
-    public static partial void Voice_SetFilterMode(MGA_Voice* voice, FilterMode mode, float filterQ, float frequency);
+    [DllImport(MGP.MonoGameNativeDLL, EntryPoint = "MGA_Voice_SetFilterMode", ExactSpelling = true)]
+    public static extern void Voice_SetFilterMode(MGA_Voice* voice, FilterMode mode, float filterQ, float frequency);
 
-    [LibraryImport(MGP.MonoGameNativeDLL, EntryPoint = "MGA_Voice_ClearFilterMode", StringMarshalling = StringMarshalling.Utf8)]
-    public static partial void Voice_ClearFilterMode(MGA_Voice* voice);
+    [DllImport(MGP.MonoGameNativeDLL, EntryPoint = "MGA_Voice_ClearFilterMode", ExactSpelling = true)]
+    public static extern void Voice_ClearFilterMode(MGA_Voice* voice);
 
-    [LibraryImport(MGP.MonoGameNativeDLL, EntryPoint = "MGA_Voice_Apply3D", StringMarshalling = StringMarshalling.Utf8)]
-    public static partial void Voice_Apply3D(MGA_Voice* voice, in Listener listener, in Emitter emitter, float distanceScale);
+    [DllImport(MGP.MonoGameNativeDLL, EntryPoint = "MGA_Voice_Apply3D", ExactSpelling = true)]
+    public static extern void Voice_Apply3D(MGA_Voice* voice, Listener* listener, Emitter* emitter, float distanceScale);
 
     #endregion
 }

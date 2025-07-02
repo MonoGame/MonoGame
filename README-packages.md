@@ -1,14 +1,12 @@
-<div align="center">
- <a href="https://monogame.net/">
-   <img height="128" alt="MonoGame" src="https://raw.githubusercontent.com/MonoGame/MonoGame.Logo/refs/heads/master/FullColorOnLight/LogoOnly_128px.png">
- </a>
- <h1>MonoGame</h1>
+# MonoGame
+
+![MonoGame](https://raw.githubusercontent.com/MonoGame/MonoGame.Logo/refs/heads/master/FullColorOnLight/LogoOnly_128px.png)
 
  [![Join the chat at https://discord.gg/monogame](https://img.shields.io/discord/355231098122272778?style=flat-square&color=%237289DA&label=Discord%20server&logo=discord&logoColor=white)](https://discord.gg/monogame) 
  ![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/monogame/monogame/main.yml?style=flat-square)
  [![Donate](https://img.shields.io/badge/donate-F1465A?style=flat-square&logo=monogame&logoColor=FFFFFF)](https://monogame.net/donate/) 
 
- One framework for creating powerful cross-platfrom games
+ One framework for creating powerful cross-platform games
 
 [Supported Platforms](#supported-platforms) • 
 [Resources](#resources) • 
@@ -17,23 +15,16 @@
 [Source Code](#source-code) • 
 [Helpful Links](#helpful-links) • 
 [License](#license)
-</div>
 
-## MonoGame Content Builder Task Package
+## Overview
 
-This package contains the extensions needed for dotnet projects to recognize "Content Pipeline" projects and assign a 'MonoGameContentReference' Build Action for content files (.mgcb), this enables the normal 'dotnet build' process to utilize the backend content building system for MonoGame.
-
-For more details, view the [documentation page](https://docs.monogame.net/articles/getting_to_know/whatis/content_pipeline/) for the MonoGame Content Pipeline
-
-## MonoGame Overview
-
-**MonoGame** is a simple and powerful .NET framework for creating games for desktop PCs, video game consoles, and mobile devices using the C# programming language.
+**MonoGame** is a simple and powerful .NET framework for creating games for desktop PCs, video game consoles, and mobile devices using the C# programming language. It has been successfully used to create games such as [Streets of Rage 4](https://store.steampowered.com/app/985890/Streets_of_Rage_4/), [Carrion](https://store.steampowered.com/app/953490/CARRION/), [Celeste](https://store.steampowered.com/app/504230/Celeste/), [Stardew Valley](https://store.steampowered.com/app/413150/Stardew_Valley/), and [many others](https://monogame.net/showcase/). 
 
 It is an open-source re-implementation of the discontinued [Microsoft's XNA Framework](https://msdn.microsoft.com/en-us/library/bb200104.aspx).
 
 ## Supported Platforms
 
-We support a growing list of platforms across the desktop, mobile, and console space. If there is a platform we don't support, please [make a request](https://github.com/MonoGame/MonoGame/issues) or [come help us](CONTRIBUTING.md) add it.
+We support a growing list of platforms across the desktop, mobile, and console space. If there is a platform we do not support, please [make a request](https://github.com/MonoGame/MonoGame/issues) or [come help us](CONTRIBUTING.md) add it.
 
 * Desktop PCs
   * Windows 8.1 and up (OpenGL & DirectX)
@@ -49,21 +40,22 @@ We support a growing list of platforms across the desktop, mobile, and console s
   * Nintendo Switch
 
 ## Resources
-- [Getting started →](https://docs.monogame.net/articles/getting_started/index.html)
-- ["How To" Guides →](https://docs.monogame.net/articles/getting_to_know/howto/)
-- [Documentation Hub →](https://docs.monogame.net/)
-- [API Reference →](https://docs.monogame.net/api/index.html)
-- [Community Tutorials →](https://docs.monogame.net/articles/tutorials.html)
+
+* [Getting started →](https://docs.monogame.net/articles/tutorials/building_2d_games/)
+* ["How To" Guides →](https://docs.monogame.net/articles/getting_to_know/howto/)
+* [Documentation Hub →](https://docs.monogame.net/)
+* [API Reference →](https://docs.monogame.net/api/index.html)
+* [Community Tutorials →](https://docs.monogame.net/articles/tutorials/)
 
 ## Samples
 
 Check out the awesome [game samples](https://github.com/MonoGame/MonoGame.Samples) maintained by the MonoGame team:
 
-[Platformer 2D Sample](https://github.com/MonoGame/MonoGame.Samples/blob/3.8.2/Platformer2D/README.md) | [NeonShooter](https://github.com/MonoGame/MonoGame.Samples/blob/3.8.2/NeonShooter/README.md)|
+|[Platformer 2D Sample](https://github.com/MonoGame/MonoGame.Samples/blob/3.8.2/Platformer2D/README.md) | [NeonShooter](https://github.com/MonoGame/MonoGame.Samples/blob/3.8.2/NeonShooter/README.md)|
 |-|-|
-Supported on all platforms | Supported on all platforms |
-[![Platformer 2D Sample](https://raw.githubusercontent.com/MonoGame/MonoGame.Samples/refs/heads/3.8.2/Images/Platformer2D-Sample.png)](https://github.com/MonoGame/MonoGame.Samples/blob/3.8.2/Platformer2D/README.md) | [![NeonShooter Sample](https://raw.githubusercontent.com/MonoGame/MonoGame.Samples/refs/heads/3.8.2/Images/NeonShooter-Sample.png)](https://github.com/MonoGame/MonoGame.Samples/blob/3.8.2/NeonShooter/README.md) |
-The [Platformer 2D](https://github.com/MonoGame/MonoGame.Samples/blob/3.8.2/Platformer2D/README.md) sample is a basic 2D platformer pulled from the original XNA samples and upgraded for MonoGame.| [Neon Shooter](https://github.com/MonoGame/MonoGame.Samples/blob/3.8.2/NeonShooter/README.md) Is a graphically intensive twin-stick shooter with particle effects and save data from Michael Hoffman |
+|Supported on all platforms | Supported on all platforms |
+|[![Platformer 2D Sample](https://raw.githubusercontent.com/MonoGame/MonoGame.Samples/refs/heads/3.8.2/Images/Platformer2D-Sample.png)](https://github.com/MonoGame/MonoGame.Samples/blob/3.8.2/Platformer2D/README.md) | [![NeonShooter Sample](https://raw.githubusercontent.com/MonoGame/MonoGame.Samples/refs/heads/3.8.2/Images/NeonShooter-Sample.png)](https://github.com/MonoGame/MonoGame.Samples/blob/3.8.2/NeonShooter/README.md) |
+|The [Platformer 2D](https://github.com/MonoGame/MonoGame.Samples/blob/3.8.2/Platformer2D/README.md) sample is a basic 2D platformer pulled from the original XNA samples and upgraded for MonoGame.| [Neon Shooter](https://github.com/MonoGame/MonoGame.Samples/blob/3.8.2/NeonShooter/README.md) Is a graphically intensive twin-stick shooter with particle effects and save data from Michael Hoffman |
 |||
 
 | [Auto Pong Sample](https://github.com/MonoGame/MonoGame.Samples/blob/3.8.2/AutoPong/README.md) | [Ship Game 3D](https://github.com/MonoGame/MonoGame.Samples/blob/3.8.2/ShipGame/README.md) |
@@ -81,9 +73,9 @@ If you need help using MonoGame or have other questions we suggest you post on [
 
 If you are interested in contributing fixes or features to MonoGame, please read our [contributors guide](CONTRIBUTING.md) first.
 
-### Subscription
+## Subscription
 
-If you'd like to help the project by supporting us financially, consider supporting us via a subscription for the price of a monthly coffee.
+If you would like to help the project by supporting us financially, consider supporting us via a subscription for the price of a monthly coffee.
 
 Money goes towards hosting, new hardware and if enough people subscribe a dedicated developer.
 
