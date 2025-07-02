@@ -44,15 +44,19 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
         // Size of the temp surface used for GDI+ rasterization.
         const int MaxGlyphSize = 1024;
 
+        const long FT_STYLE_FLAG_ITALIC = 1;
+        const long FT_STYLE_FLAG_BOLD = 2;
+
         public void Import(FontDescription options, string fontName)
         {
             CheckError(FreeType.FT_Init_FreeType(out FT_Library* library));
 
             // Create a bunch of GDI+ objects.
-            var face = CreateFontFace(library, options, fontName);
+            FT_Face* face = CreateFontFace(library, options, fontName);
 
-            Italicized = options.Style.HasFlag(FontDescriptionStyle.Italic) && !face.StyleFlags.HasFlag(StyleFlags.Italic);
-            Emboldened = options.Style.HasFlag(FontDescriptionStyle.Bold) && !face.StyleFlags.HasFlag(StyleFlags.Bold);
+            Italicized = options.Style.HasFlag(FontDescriptionStyle.Italic) && ((face->style_flags.Value & FT_STYLE_FLAG_ITALIC) != 0);
+
+            Emboldened = options.Style.HasFlag(FontDescriptionStyle.Bold) && ((face->style_flags.Value & FT_STYLE_FLAG_BOLD) != 0);
             bool draw3Times = options.Size > 15;
 
             // Which characters do we want to include?
@@ -91,7 +95,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
             if (error == 0)
                 return;
 
-            throw new Exception("An error occured in freetype."); // TODO: Fill the error
+            throw new Exception("An error occurred in freetype."); // TODO: Fill the error
         }
 
         // Attempts to instantiate the requested GDI+ font object.
@@ -116,8 +120,8 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
             // Render the character.
             BitmapContent glyphBitmap = null;
             var abc = new ABCFloat();
-            int finalWidth = face->glyph->bitmap.width;
-            int finalHeight = face->glyph->bitmap.rows;
+            var finalWidth = face->glyph->bitmap.width;
+            var finalHeight = face->glyph->bitmap.rows;
 
             if (finalWidth > 0 && finalHeight > 0)
             {
@@ -155,11 +159,11 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 
                 if (embolden)
                 {
-                    Embolden(ref gpixelAlphas, ref abc, finalWidth, finalHeight, ref finalWidth, ref finalHeight, draw3Times);
+                    Embolden(ref gpixelAlphas, ref abc, finalWidth, finalHeight, ref face->glyph->bitmap.width, ref face->glyph->bitmap.rows, draw3Times);
                 }
                 if (italicize)
                 {
-                    Italicize(ref gpixelAlphas, ref abc, finalWidth, finalHeight, ref finalWidth);
+                    Italicize(ref gpixelAlphas, ref abc, finalWidth, finalHeight, ref face->glyph->bitmap.width);
                 }
 
                 glyphBitmap.SetPixelData(gpixelAlphas);
@@ -177,9 +181,9 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
             }
 
             // I wouldn't say I'm a 100% sure, but I feel a lot surer about this than what it was before.
-            abc.A += face.Glyph.Metrics.HorizontalBearingX >> 6;
-            abc.B += face.Glyph.Metrics.Width >> 6;
-            abc.C += (face.Glyph.Metrics.HorizontalAdvance >> 6) - (abc.A + abc.B) + finalWidth - face.Glyph.Bitmap.Width;
+            abc.A += face->glyph->metrics.horiBearingX.Value >> 6;
+            abc.B += face->glyph->bitmap.width >> 6;
+            abc.C += (face->glyph->metrics.horiAdvance.Value >> 6) - (abc.A + abc.B) + finalWidth - face->glyph->bitmap.width;
 
             // nkast fix, but only when necessary, this way we can have nice arial fonts without breaking the crucial Kingthings Petrock.
             if ((*face->glyph).bitmap_left < 0)
@@ -222,13 +226,13 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
             }
         }
 
-        private void Embolden(ref byte[] bitmap, ref ABCFloat charSize, int initialWidth, int height, ref int finalWidth, ref int finalHeight, bool draw3times)
+        private void Embolden(ref byte[] bitmap, ref ABCFloat charSize, long initialWidth, long height, ref uint finalWidth, ref uint finalHeight, bool draw3times)
         {
-            finalWidth = initialWidth + (draw3times ? 2 : 1);
+            finalWidth = (uint)(initialWidth + (draw3times ? 2 : 1));
             charSize.A -= draw3times ? 2 : 1;
             charSize.C -= draw3times ? 2 : 1;
             int kLimit = draw3times ? 1 : 0;
-            finalHeight += draw3times ? 1 : 0;
+            finalHeight += (uint)(draw3times ? 1 : 0);
             byte[] destination = new byte[finalWidth * finalHeight];
             byte orig, dest;
             for (int i = 0; i < height; i++)
@@ -251,16 +255,16 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
             bitmap = destination;
         }
 
-        private void Italicize(ref byte[] bitmap, ref ABCFloat charSize, int initialWidth, int height, ref int finalWidth)
+        private void Italicize(ref byte[] bitmap, ref ABCFloat charSize, long initialWidth, long height, ref uint finalWidth)
         {
             double displacement = Math.Tan(0.349066);//20 degrees converted to radians
-            finalWidth += (int)Math.Ceiling(displacement * height);
-            int extraWidth = finalWidth - initialWidth;
+            finalWidth += (uint)Math.Ceiling(displacement * height);
+            var extraWidth = finalWidth - initialWidth;
             charSize.A -= extraWidth;
             charSize.C -= extraWidth;
             byte[] destination = new byte[finalWidth * height];
             double currentDisplacement = 0;
-            for (int row = height - 1; row >= 0; row--, currentDisplacement += displacement)
+            for (var row = height - 1; row >= 0; row--, currentDisplacement += displacement)
             {
                 double leftVal = Math.Ceiling(currentDisplacement) - currentDisplacement;
                 double rightVal = currentDisplacement - Math.Floor(currentDisplacement);
@@ -268,8 +272,8 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
                     leftVal = 1;
                 for (int j = 0; j < initialWidth; j++)
                 {
-                    int OrigPos = row * initialWidth + j;
-                    int DestPos = row * finalWidth + j + (int)Math.Floor(currentDisplacement);
+                    var OrigPos = row * initialWidth + j;
+                    var DestPos = row * finalWidth + j + (int)Math.Floor(currentDisplacement);
                     if (destination[DestPos] + bitmap[OrigPos] * leftVal > byte.MaxValue)
                     {
                         destination[DestPos] = byte.MaxValue;
