@@ -94,9 +94,15 @@
       <PackagePath>runtimes\win-x64\native</PackagePath>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-	<Content Include="..\Artifacts\monogame.native.pipeline\windows\$(Configuration)\monogame.native.pipeline.dll">
+    <Content Include="..\Artifacts\monogame.native.pipeline\$(Configuration)\mgpipeline.dll" Condition=" '$(OS)' == 'Windows_NT' ">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-	</Content>
+    </Content>
+    <Content Include="..\Artifacts\monogame.native.pipeline\$(Configuration)\libmgpipeline.so" Condition=" '$([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform($([System.Runtime.InteropServices.OSPlatform]::Linux)))' ">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Artifacts\monogame.native.pipeline\$(Configuration)\libmgpipeline.dylib" Condition=" '$([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform($([System.Runtime.InteropServices.OSPlatform]::OSX)))' ">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
 
   <PropertyGroup>

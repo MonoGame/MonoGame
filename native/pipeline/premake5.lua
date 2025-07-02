@@ -3,14 +3,14 @@
 -- file 'LICENSE.txt', which is part of this source code package.
 
 function pipeline_native()
-    platform_target_path = "../../Artifacts/monogame.native.pipeline/%{cfg.system}/%{cfg.buildcfg}"
+    platform_target_path = "../../Artifacts/monogame.native.pipeline/%{cfg.buildcfg}"
 
     kind "SharedLib"
     language "C++"
     architecture "x64"
-    defines { "DLL_EXPORT" }
+    defines { "DLL_EXPORT", "STB_IMAGE_IMPLEMENTATION" }
     targetdir(platform_target_path)
-    targetname "monogame.native.pipeline"
+    targetname "mgpipeline"
     cppdialect "C++17"
 
     files {

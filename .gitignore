@@ -101,3 +101,5 @@ _*
 /native/**/*.csproj
 /native/**/*.vcxproj
 /native/**/*.vcxproj.filters
+/native/**/*.make
+/native/**/Makefile

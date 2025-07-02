@@ -78,23 +78,29 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
 
             unsafe
             {
-                MGCP_Bitmap* nativeBitmap = MGCP.MP_ImportBitmap(filename);
-                if (nativeBitmap == null || nativeBitmap->data == IntPtr.Zero)
-                    throw new InvalidContentException($"TextureImporter failed to load '{filename}'");
+                MGCP_Bitmap bitmap = default;
+                IntPtr err = MGCP.MP_ImportBitmap(filename, ref bitmap);
+                if (err != IntPtr.Zero)
+                {
+                    string errorMsg = System.Runtime.InteropServices.Marshal.PtrToStringAnsi(err);
+                    throw new InvalidContentException($"TextureImporter failed to load '{filename}': {errorMsg}");
+                }
+                if (bitmap.data == IntPtr.Zero)
+                    throw new InvalidContentException($"TextureImporter failed to load '{filename}': native returned null data");
 
-                int width = nativeBitmap->width;
-                int height = nativeBitmap->height;
+                int width = bitmap.width;
+                int height = bitmap.height;
                 int pixelCount = width * height;
 
-                if (nativeBitmap->is_16_bit)
+                if (bitmap.is_16_bit)
                 {
-                    AddFace<Rgba64>(output, nativeBitmap->data, width, height, pixelCount, 8);
+                    AddFace<Rgba64>(output, bitmap.data, width, height, pixelCount, 8);
                 }
                 else
                 {
-                    AddFace<Color>(output, nativeBitmap->data, width, height, pixelCount, 4);
+                    AddFace<Color>(output, bitmap.data, width, height, pixelCount, 4);
                 }
-                MGCP.MP_FreeBitmap(nativeBitmap);
+                MGCP.MP_FreeBitmap(ref bitmap);
             }
             return output;
         }

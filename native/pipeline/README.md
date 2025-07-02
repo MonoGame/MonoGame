@@ -4,5 +4,5 @@ This folder contains the source code for the new native (C++) pipeline library f
 
 ## Structure
 - All C++ source code for the native pipeline will live here.
-- The library will be built as `monogame.native.pipeline` (dll/so/dylib).
+- The library will be built as `mgpipeline` (dll/so/dylib).
 - External dependencies (e.g., stb) will be referenced via submodules in `/external/stb`.

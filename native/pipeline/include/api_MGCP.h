@@ -13,5 +13,5 @@
 
 
 
-MG_EXPORT MGCP_Bitmap* MP_ImportBitmap(const char* fullpathToFile);
-MG_EXPORT void MP_FreeBitmap(MGCP_Bitmap* bitmap);
+MG_EXPORT void* MP_ImportBitmap(const char* fullpathToFile, MGCP_Bitmap& bitmap);
+MG_EXPORT void MP_FreeBitmap(MGCP_Bitmap& bitmap);
