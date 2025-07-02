@@ -187,12 +187,25 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
             //			else
             //			{
             if (!TrueTypeFileExtensions.Contains(fileExtension))
+            {
                 throw new PipelineException("Unknown file extension " + fileExtension);
+            }
 
             importer = new SharpFontImporter();
 
             // Import the source font data.
             importer.Import(options, fontName);
+
+            context.Logger.Indent();
+            if (importer.Emboldened)
+            {
+                context.Logger.LogMessage("Bold effect simulated");
+            }
+            if (importer.Italicized)
+            {
+                context.Logger.LogMessage("Italic effect simulated");
+            }
+            context.Logger.Unindent();
 
             lineSpacing = importer.LineSpacing;
             yOffsetMin = importer.YOffsetMin;
@@ -296,8 +309,8 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
             return String.Empty;
         }
 
-         private static bool MatchFont(string fontPath, string fontName, string fontStyle)
-         {
+        private static bool MatchFont(string fontPath, string fontName, string fontStyle)
+        {
             // TODO: Implement this with FreeType lib
             /*try
             {
@@ -317,6 +330,6 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
             }*/
 
             return true;
-         }
+        }
     }
 }
