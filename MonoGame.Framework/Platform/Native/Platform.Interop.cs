@@ -27,6 +27,7 @@ internal enum EventType : uint
 
     KeyDown,
     KeyUp,
+    TextEditing,
     TextInput,
 
     MouseMove,
@@ -55,9 +56,16 @@ internal struct MGP_WindowEvent
 internal struct MGP_KeyEvent
 {
     public nint Window;
-    public uint Character;
+    public uint CodePoint;
     public Keys Key;
 }
+
+[StructLayout(LayoutKind.Sequential)]
+struct MGP_TextEvent
+{
+    public nint Window;
+    public uint CharacterCodePoint;
+};
 
 [StructLayout(LayoutKind.Sequential)]
 internal struct MGP_MouseMoveEvent
@@ -180,6 +188,9 @@ internal struct MGP_Event
 
     [FieldOffset(12)]
     public MGP_KeyEvent Key;
+
+    [FieldOffset(12)]
+    public MGP_TextEvent Text;
 
     [FieldOffset(12)]
     public MGP_MouseMoveEvent MouseMove;
@@ -351,6 +362,25 @@ internal static unsafe partial class MGP
 
     [DllImport(MonoGameNativeDLL, EntryPoint = "MGP_Window_ExitFullScreen", ExactSpelling = true)]
     public static extern void Window_ExitFullScreen(MGP_Window* window);
+
+    [LibraryImport(MonoGameNativeDLL, EntryPoint = "MGP_Window_GetIsUsingTextInput", StringMarshalling = StringMarshalling.Utf8)]
+    [return: MarshalAs(UnmanagedType.U1)]
+    public static partial bool Window_GetIsUsingTextInput(MGP_Window* window);
+
+    [LibraryImport(MonoGameNativeDLL, EntryPoint = "MGP_Window_SetIsUsingTextInput", StringMarshalling = StringMarshalling.Utf8)]
+    public static partial void Window_SetIsUsingTextInput(MGP_Window* window, [MarshalAs(UnmanagedType.U1)] bool state);
+
+    [LibraryImport(MonoGameNativeDLL, EntryPoint = "MGP_Window_GetIMEPosition", StringMarshalling = StringMarshalling.Utf8)]
+    public static partial void Window_GetIMEPosition(MGP_Window* window, out int x, out int y, out int width, out int height);
+
+    [LibraryImport(MonoGameNativeDLL, EntryPoint = "MGP_Window_SetIMEPosition", StringMarshalling = StringMarshalling.Utf8)]
+    public static partial void Window_SetIMEPosition(MGP_Window* window, int x, int y, int width, int height);
+
+    [LibraryImport(MonoGameNativeDLL, EntryPoint = "MGP_Window_GetClipboardText", StringMarshalling = StringMarshalling.Utf8)]
+    public static partial int Window_GetClipboardText(MGP_Window* window, byte[] textBuf, int bufLength);
+
+    [LibraryImport(MonoGameNativeDLL, EntryPoint = "MGP_Window_SetClipboardText", StringMarshalling = StringMarshalling.Utf8)]
+    public static partial int Window_SetClipboardText(MGP_Window* window, byte[] textBuf);
 
     #endregion
 
