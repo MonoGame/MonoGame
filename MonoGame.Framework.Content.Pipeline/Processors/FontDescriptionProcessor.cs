@@ -82,12 +82,6 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
 
                 var glyphData = new HashSet<GlyphData>(glyphs.Select(x => x.Data));
 
-                // Optimize.
-                foreach (GlyphData glyph in glyphData)
-                {
-                    GlyphCropper.Crop(glyph);
-                }
-
                 // We need to know how to pack the glyphs.
                 bool requiresPot, requiresSquare;
                 texProfile.Requirements(context, TextureFormat, out requiresPot, out requiresSquare);
@@ -176,16 +170,9 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
             IFontImporter importer;
 
             var TrueTypeFileExtensions = new List<string> { ".ttf", ".ttc", ".otf" };
-            //var BitmapFileExtensions = new List<string> { ".bmp", ".png", ".gif" };
 
             string fileExtension = Path.GetExtension(fontName).ToLowerInvariant();
 
-            //			if (BitmapFileExtensions.Contains(fileExtension))
-            //			{
-            //				importer = new BitmapImporter();
-            //			}
-            //			else
-            //			{
             if (!TrueTypeFileExtensions.Contains(fileExtension))
             {
                 throw new PipelineException("Unknown file extension " + fileExtension);
