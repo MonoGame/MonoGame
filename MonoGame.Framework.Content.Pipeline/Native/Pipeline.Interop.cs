@@ -3,12 +3,19 @@ using System.Runtime.InteropServices;
 
 namespace MonoGame.Framework.Content.Pipeline.Interop;
 
+internal enum TextureFormat
+{
+    Rgba8,
+    Rgba16,
+    RgbaF,
+}
+
 [StructLayout(LayoutKind.Sequential)]
 internal unsafe struct MGCP_Bitmap
 {
     public int width;
     public int height;
-    public bool is_16_bit;
+    public TextureFormat format;
     public IntPtr data;
 }
 

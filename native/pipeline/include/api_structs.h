@@ -13,7 +13,7 @@ struct MGCP_Bitmap
 {
     mgint width;
     mgint height;
-    mgbool is_16_bit;
+    MGTextureFormat format;
     void* data;
 };
 

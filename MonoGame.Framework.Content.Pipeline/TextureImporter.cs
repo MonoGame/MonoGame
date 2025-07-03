@@ -92,14 +92,19 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
                 int height = bitmap.height;
                 int pixelCount = width * height;
 
-                if (bitmap.is_16_bit)
+                switch (bitmap.format)
                 {
-                    AddFace<Rgba64>(output, bitmap.data, width, height, pixelCount, 8);
+                    case TextureFormat.Rgba8:
+                        AddFace<Color>(output, bitmap.data, width, height, pixelCount, 4);
+                        break;
+                    case TextureFormat.Rgba16:
+                        AddFace<Rgba64>(output, bitmap.data, width, height, pixelCount, 8);
+                        break;
+                    case TextureFormat.RgbaF:
+                        AddFace<Vector4>(output, bitmap.data, width, height, pixelCount, 16);
+                        break;
                 }
-                else
-                {
-                    AddFace<Color>(output, bitmap.data, width, height, pixelCount, 4);
-                }
+                
                 MGCP.MP_FreeBitmap(ref bitmap);
             }
             return output;

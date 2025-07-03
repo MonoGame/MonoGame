@@ -6,18 +6,27 @@
 void* MP_ImportBitmap(const char* fullpathToFile, MGCP_Bitmap& bitmap)
 {
     FILE* f;
-    int is_16_bit;
     int width, height, channels;
     void* data = nullptr;
 
     f = stbi__fopen(fullpathToFile, "rb");
     if (!f) goto err;
-    is_16_bit = stbi_is_16_bit_from_file(f);
 
-    if (is_16_bit)
+    if (stbi_is_hdr_from_file(f))
+    {
+		bitmap.format = MGTextureFormat::RgbaF;
+        data = stbi_loadf_from_file(f, &width, &height, &channels, 4);
+	}
+    else if (stbi_is_16_bit_from_file(f))
+    {
+		bitmap.format = MGTextureFormat::Rgba16;
         data = stbi_load_from_file_16(f, &width, &height, &channels, 4);
+    }
     else
+    {
+		bitmap.format = MGTextureFormat::Rgba8;
         data = stbi_load_from_file(f, &width, &height, &channels, 4);
+    }
 
     fclose(f);
 
@@ -26,7 +35,6 @@ void* MP_ImportBitmap(const char* fullpathToFile, MGCP_Bitmap& bitmap)
 
     bitmap.width = width;
     bitmap.height = height;
-    bitmap.is_16_bit = is_16_bit ? true : false;
 
     bitmap.data = data;
     return nullptr;
