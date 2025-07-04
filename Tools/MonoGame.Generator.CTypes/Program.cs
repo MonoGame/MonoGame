@@ -38,9 +38,9 @@ void GenerateCTypeBindings(string repoDirectory, string outputDirectory, string 
             // All our interop pinvokes are static classes.
             if (!type.IsClass || !type.IsAbstract || !type.IsSealed)
                 continue;
-
+          
             var writter = new PinvokeWritter(type, structWritter, enumWritter);
-            foreach (var method in type.GetMethods())
+            foreach (var method in type.GetMethods(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static))
                 writter.Append(method);
 
             writter.Flush(monogamePlatformDir);

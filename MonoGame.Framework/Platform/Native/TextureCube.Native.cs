@@ -25,7 +25,7 @@ public partial class TextureCube
         var dataHandle = GCHandle.Alloc(data, GCHandleType.Pinned);
         var elementSizeInByte = ReflectionHelpers.FastSizeOf<T>();
         var startBytes = startIndex * elementSizeInByte;
-        var dataPtr = (IntPtr)(dataHandle.AddrOfPinnedObject().ToInt64() + startBytes);
+        var dataPtr = (nint)(dataHandle.AddrOfPinnedObject().ToInt64() + startBytes);
 
         var width = rect.Right - rect.Left;
         var height = rect.Bottom - rect.Top;
@@ -52,7 +52,7 @@ public partial class TextureCube
         var dataHandle = GCHandle.Alloc(data, GCHandleType.Pinned);
         var elementSizeInByte = ReflectionHelpers.FastSizeOf<T>();
         var startBytes = startIndex * elementSizeInByte;
-        var dataPtr = (IntPtr)(dataHandle.AddrOfPinnedObject().ToInt64() + startBytes);
+        var dataPtr = (nint)(dataHandle.AddrOfPinnedObject().ToInt64() + startBytes);
 
         var width = rect.Right - rect.Left;
         var height = rect.Bottom - rect.Top;
