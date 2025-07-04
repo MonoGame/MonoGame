@@ -80,7 +80,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
             IntPtr err = MGCP.MP_ImportBitmap(filename, ref bitmap);
             if (err != IntPtr.Zero)
             {
-                string errorMsg = System.Runtime.InteropServices.Marshal.PtrToStringAnsi(err);
+                string errorMsg = System.Runtime.InteropServices.Marshal.PtrToStringUTF8(err);
                 throw new InvalidContentException($"TextureImporter failed to load '{filename}': {errorMsg}");
             }
             if (bitmap.data == IntPtr.Zero)

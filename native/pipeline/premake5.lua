@@ -14,6 +14,12 @@ function pipeline_native()
         "STB_IMAGE_WRITE_IMPLEMENTATION",
         "STB_IMAGE_RESIZE_IMPLEMENTATION",
     }
+    filter "system:windows"
+        defines { 
+            "STBI_WINDOWS_UTF8",
+            "STBIW_WINDOWS_UTF8",
+        }
+    filter {}
     targetdir(platform_target_path)
     targetname "mgpipeline"
     cppdialect "C++17"

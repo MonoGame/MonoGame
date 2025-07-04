@@ -58,7 +58,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
                 IntPtr err = MGCP.MP_ResizeBitmap(ref srcBitmap, ref dstBitmap);
                 if (err != IntPtr.Zero)
                 {
-                    string errorMsg = System.Runtime.InteropServices.Marshal.PtrToStringAnsi(err);
+                    string errorMsg = System.Runtime.InteropServices.Marshal.PtrToStringUTF8(err);
                     throw new InvalidContentException($"Bitmap resize failed: {errorMsg}");
                 }
 

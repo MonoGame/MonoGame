@@ -20,7 +20,7 @@ public sealed class BuildContentPipelineTask : FrostingTask<BuildContext>
 
             exit = context.StartProcess("msbuild", new ProcessSettings { WorkingDirectory = "native/pipeline", Arguments = "pipeline.sln /p:Configuration=Release /p:Platform=x64" });
             if (exit != 0)
-                throw new Exception($"Native Pipeline build failed! {exit}");
+                throw new Exception($"Native Pipeline build failed with msbuild! {exit}");
         }
         else
         {
@@ -29,6 +29,8 @@ public sealed class BuildContentPipelineTask : FrostingTask<BuildContext>
                 throw new Exception($"Native Pipeline Premake generation failed! {exit}");
 
             exit = context.StartProcess("make", new ProcessSettings { WorkingDirectory = "native/pipeline", Arguments = "config=release" });
+            if (exit != 0)
+                throw new Exception($"Native Pipeline build failed with make! {exit}");
         }
 
         var builderPath = context.GetProjectPath(ProjectType.ContentPipeline);

@@ -66,7 +66,12 @@ internal static class PngFileHelper
                 format = TextureFormat.Png,
                 data = srcPtr
             };
-            MGCP.MP_ExportBitmap(ref bitmap, pngFileName);
+            IntPtr err = MGCP.MP_ExportBitmap(ref bitmap, pngFileName);
+            if (err != IntPtr.Zero)
+            {
+                string errorMsg = System.Runtime.InteropServices.Marshal.PtrToStringUTF8(err);
+                throw new InvalidContentException($"Unable to write PNG file '{pngFileName}': {errorMsg}");
+            }
         }
         finally
         {
