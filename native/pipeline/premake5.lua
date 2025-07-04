@@ -7,18 +7,21 @@ function pipeline_native()
 
     kind "SharedLib"
     language "C++"
-    architecture "x64"
+
     defines { 
         "DLL_EXPORT", 
         "STB_IMAGE_IMPLEMENTATION",
         "STB_IMAGE_WRITE_IMPLEMENTATION",
         "STB_IMAGE_RESIZE_IMPLEMENTATION",
     }
+    
     filter "system:windows"
+        architecture "x64"
         defines { 
             "STBI_WINDOWS_UTF8",
             "STBIW_WINDOWS_UTF8",
         }
+
     filter {}
     targetdir(platform_target_path)
     targetname "mgpipeline"
@@ -45,4 +48,10 @@ project "monogame_native_pipeline"
         symbols "On"
     filter "configurations:Release"
         defines { "NDEBUG" }
+        filter "system:windows"
+            buildoptions { "/MT" }
         optimize "On"
+
+    filter "system:macosx"
+      buildoptions { "-arch x86_64", "-arch arm64" }
+      linkoptions { "-arch x86_64", "-arch arm64" }

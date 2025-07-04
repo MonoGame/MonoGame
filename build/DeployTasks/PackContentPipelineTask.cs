@@ -12,7 +12,10 @@ namespace BuildScripts
         public override void Run(BuildContext context)
         {
             // Pack the MonoGame.Content.Pipeline project including native libs
-            context.DotNetPack(context.GetProjectPath(ProjectType.ContentPipeline), context.DotNetPackSettings);
+            var builderPath = context.GetProjectPath(ProjectType.ContentPipeline);
+            context.DotNetPackSettings.MSBuildSettings.WithProperty("DisableMonoGameToolAssets", "True");
+            context.DotNetPack(builderPath, context.DotNetPackSettings);
+            context.DotNetPackSettings.MSBuildSettings.Properties.Remove("DisableMonoGameToolAssets");
             context.CopyDirectory(new DirectoryPath(context.NuGetsDirectory.FullPath), "nugets");
         }
     }

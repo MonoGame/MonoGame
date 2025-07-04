@@ -109,8 +109,7 @@ void* MP_ResizeBitmap(MGCP_Bitmap& srcBitmap, MGCP_Bitmap& dstBitmap)
         return (void*)"Unsupported source bitmap pixel format for resizing.";
     }
 
-    const int channel_count = 4;
-    int dst_bytes = dstBitmap.width * dstBitmap.height * channel_count * bpp;
+    int dst_bytes = dstBitmap.width * dstBitmap.height * bpp;
     dstBitmap.data = malloc(dst_bytes);
     dstBitmap.type = srcBitmap.type;
 
