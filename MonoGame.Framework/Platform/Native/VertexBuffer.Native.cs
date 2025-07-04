@@ -24,7 +24,7 @@ public partial class VertexBuffer
         var elementSizeInBytes = ReflectionHelpers.FastSizeOf<T>();
         var startBytes = startIndex * elementSizeInBytes;
         var dataHandle = GCHandle.Alloc(data, GCHandleType.Pinned);
-        var dataPtr = (IntPtr)(dataHandle.AddrOfPinnedObject().ToInt64() + startBytes);
+        var dataPtr = (nint)(dataHandle.AddrOfPinnedObject().ToInt64() + startBytes);
 
         MGG.Buffer_GetData(GraphicsDevice.Handle, Handle, offsetInBytes, (byte*)dataPtr, elementCount, elementSizeInBytes, vertexStride);
 
@@ -36,7 +36,7 @@ public partial class VertexBuffer
         var startBytes = startIndex * elementSizeInBytes;
         var dataBytes = elementCount * elementSizeInBytes;
         var dataHandle = GCHandle.Alloc(data, GCHandleType.Pinned);
-        var dataPtr = (IntPtr)(dataHandle.AddrOfPinnedObject().ToInt64() + startBytes);
+        var dataPtr = (nint)(dataHandle.AddrOfPinnedObject().ToInt64() + startBytes);
 
         // TODO: We need to figure out the correct behavior 
         // for SetDataOptions.None on a dynamic buffer.
@@ -45,8 +45,7 @@ public partial class VertexBuffer
         //
         var discard = _isDynamic && options != SetDataOptions.NoOverwrite;
 
-        fixed (MGG_Buffer** h = &Handle)
-            MGG.Buffer_SetData(GraphicsDevice.Handle, h, offsetInBytes, (byte*)dataPtr, dataBytes, (byte)(discard ? 1 : 0));
+        MGG.Buffer_SetData(GraphicsDevice.Handle, ref Handle, offsetInBytes, (byte*)dataPtr, dataBytes, (byte)(discard ? 1 : 0));
 
         dataHandle.Free();
     }

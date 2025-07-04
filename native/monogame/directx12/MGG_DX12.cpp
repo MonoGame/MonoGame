@@ -173,28 +173,30 @@ struct MGG_GraphicsSystem
 	std::vector<MGG_GraphicsAdapter*> adapters;
 };
 
-void MGG_EffectResource_GetBytecode(const char* name, mgbyte*& bytecode, mgint& size)
+void MGG_EffectResource_GetBytecode(mgbyte* name, mgbyte*& bytecode, mgint& size)
 {
 	bytecode = nullptr;
 	size = 0;
 
+	// TODO: Move this to use the new MGFXC header generation.
+	// 
 	// Get the handle of this DLL.
 	HMODULE module;
 	::GetModuleHandleExA(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS, (LPCSTR)&MGG_EffectResource_GetBytecode, &module);
 
 	LPCWSTR id = L"";
 
-	if (strcmp(name, "AlphaTestEffect") == 0)
+	if (strcmp((const char*)name, "AlphaTestEffect") == 0)
 		id = MAKEINTRESOURCEW(C_AlphaTestEffect);
-	else if (strcmp(name, "BasicEffect") == 0)
+	else if (strcmp((const char*)name, "BasicEffect") == 0)
 		id = MAKEINTRESOURCEW(C_BasicEffect);
-	else if (strcmp(name, "DualTextureEffect") == 0)
+	else if (strcmp((const char*)name, "DualTextureEffect") == 0)
 		id = MAKEINTRESOURCEW(C_DualTextureEffect);
-	else if (strcmp(name, "EnvironmentMapEffect") == 0)
+	else if (strcmp((const char*)name, "EnvironmentMapEffect") == 0)
 		id = MAKEINTRESOURCEW(C_EnvironmentMapEffect);
-	else if (strcmp(name, "SkinnedEffect") == 0)
+	else if (strcmp((const char*)name, "SkinnedEffect") == 0)
 		id = MAKEINTRESOURCEW(C_SkinnedEffect);
-	else if (strcmp(name, "SpriteEffect") == 0)
+	else if (strcmp((const char*)name, "SpriteEffect") == 0)
 		id = MAKEINTRESOURCEW(C_SpriteEffect);
 
 	auto handle = ::FindResourceW(module, id, L"BIN");
@@ -1611,6 +1613,7 @@ static const DXGI_FORMAT MGVertexElementFormatToDXGI_FORMAT[] =
 
 MGG_InputLayout* MGG_InputLayout_Create(
 	MGG_GraphicsDevice* device,
+	MGG_Shader* vertexShader,
 	mgint* strides,
 	mgint streamCount,
 	MGG_InputElement* elements,
@@ -1618,6 +1621,7 @@ MGG_InputLayout* MGG_InputLayout_Create(
 	)
 {
 	assert(device != nullptr);
+	assert(vertexShader != nullptr);
 	assert(streamCount >= 0);
 	assert(strides != nullptr);
 	assert(elements != nullptr);
@@ -1749,7 +1753,7 @@ void MGG_OcclusionQuery_End(MGG_GraphicsDevice* device, MGG_OcclusionQuery* quer
 	query->fence = device->resources->GetCommandQueue()->SignalFence();
 }
 
-mgbool MGG_OcclusionQuery_GetResult(MGG_GraphicsDevice* device, MGG_OcclusionQuery* query, mgint& pixelCount)
+mgbyte MGG_OcclusionQuery_GetResult(MGG_GraphicsDevice* device, MGG_OcclusionQuery* query, mgint& pixelCount)
 {
 	assert(device != nullptr);
 	assert(query != nullptr);

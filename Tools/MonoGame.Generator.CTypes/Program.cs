@@ -26,7 +26,7 @@ foreach (var type in assembly.GetTypes())
         continue;
 
     var writter = new PinvokeWritter(type, structWritter, enumWritter);
-    foreach (var method in type.GetMethods())
+    foreach (var method in type.GetMethods(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static))
         writter.Append(method);
 
     writter.Flush(monogamePlatformDir);
