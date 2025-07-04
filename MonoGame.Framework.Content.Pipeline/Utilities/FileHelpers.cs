@@ -7,7 +7,7 @@ using System.IO;
 using KtxSharp;
 using Microsoft.Xna.Framework.Content.Pipeline.Graphics;
 using MonoGame.Framework.Content;
-using StbImageWriteSharp;
+using MonoGame.Framework.Content.Pipeline.Interop;
 
 namespace Microsoft.Xna.Framework.Content.Pipeline.Utilities;
 
@@ -45,16 +45,26 @@ internal static class PngFileHelper
         {
             Directory.CreateDirectory(directory);
         }
-        using var fileStream = File.OpenWrite(pngFileName);
 
         // in order to save a png, we need a colorBitmap.
         var colorBitmap = new PixelBitmapContent<Color>(sourceBitmap.Width, sourceBitmap.Height);
         BitmapContent.Copy(sourceBitmap, colorBitmap);
 
-        var data = colorBitmap.GetPixelData();
-        var writer = new ImageWriter();
-        writer.WritePng(data, colorBitmap.Width, colorBitmap.Height, ColorComponents.RedGreenBlueAlpha, fileStream);
-        fileStream.Close();
+        unsafe
+        {
+            fixed (byte* data = colorBitmap.GetPixelData())
+            {
+                MGCP_Bitmap bitmap = new MGCP_Bitmap
+                {
+                    width = colorBitmap.Width,
+                    height = colorBitmap.Height,
+                    type = TextureType.Rgba8,
+                    format = TextureFormat.Png,
+                    data = (IntPtr)data
+                };
+                MGCP.MP_ExportBitmap(ref bitmap, pngFileName);
+            }
+        }
     }
 }
 

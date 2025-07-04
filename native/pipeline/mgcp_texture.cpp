@@ -67,6 +67,21 @@ inline stbir_filter MP_HeuristicFilter(mgint srcMeasure, mgint dstMeasure)
 	return STBIR_FILTER_DEFAULT;
 }
 
+inline mgint MP_GetBpp(MGTextureType type)
+{
+    switch (type)
+    {
+    case MGTextureType::Rgba8:
+        return 4;
+    case MGTextureType::Rgba16:
+        return 8;
+    case MGTextureType::RgbaF:
+        return 16;
+    default:
+        return 0; // Unsupported type
+    }
+}
+
 void* MP_ResizeBitmap(MGCP_Bitmap& srcBitmap, MGCP_Bitmap& dstBitmap)
 {
     stbir_datatype data_type;
@@ -77,19 +92,18 @@ void* MP_ResizeBitmap(MGCP_Bitmap& srcBitmap, MGCP_Bitmap& dstBitmap)
         return (void*)"Invalid input bitmap or dimensions for resizing.";
     }
 
+	bpp = MP_GetBpp(srcBitmap.type);
+
     switch (srcBitmap.type)
     {
     case MGTextureType::Rgba8:
         data_type = STBIR_TYPE_UINT8;
-        bpp = sizeof(stbi_uc);
         break;
     case MGTextureType::Rgba16:
         data_type = STBIR_TYPE_UINT16;
-		bpp = sizeof(stbi_us);
         break;
     case MGTextureType::RgbaF:
         data_type = STBIR_TYPE_FLOAT;
-		bpp = sizeof(float);
         break;
     default:
         return (void*)"Unsupported source bitmap pixel format for resizing.";
@@ -130,5 +144,55 @@ void* MP_ResizeBitmap(MGCP_Bitmap& srcBitmap, MGCP_Bitmap& dstBitmap)
 
 void* MP_ExportBitmap(MGCP_Bitmap& bitmap, const char* exportPath)
 {
+    int bpp;
+    int errno;
+
+    if (!bitmap.data || bitmap.width <= 0 || bitmap.height <= 0)
+    {
+        return (void*)"Invalid bitmap data or dimensions for export.";
+    }
+
+	bpp = MP_GetBpp(bitmap.type);
+    if (bpp == 0)
+    {
+        return (void*)"Unsupported bitmap pixel format for export.";
+	}
+
+    switch (bitmap.format)
+    {
+    case MGTextureFormat::Png:
+        if (bitmap.type == MGTextureType::RgbaF)
+            return (void*)"Exporting float textures to PNG is not supported.";
+		errno = stbi_write_png(exportPath, bitmap.width, bitmap.height, 4, bitmap.data, bitmap.width * bpp);
+		break;
+    case MGTextureFormat::Jpeg:
+        if (bitmap.type != MGTextureType::Rgba8)
+			return (void*)"Exporting non-RGBA8 textures to JPEG is not supported.";
+        errno = stbi_write_jpg(exportPath, bitmap.width, bitmap.height, 4, bitmap.data, 100);
+		break;
+    case MGTextureFormat::Tga:
+		if (bitmap.type != MGTextureType::Rgba8)
+            return (void*)"Exporting non-RGBA8 textures to TGA is not supported.";
+		errno = stbi_write_tga(exportPath, bitmap.width, bitmap.height, 4, bitmap.data);
+		break;
+    case MGTextureFormat::Hdr:
+        if (bitmap.type != MGTextureType::RgbaF)
+            return (void*)"Exporting non-RGBAF textures to HDR is not supported.";
+        errno = stbi_write_hdr(exportPath, bitmap.width, bitmap.height, 4, (float*)bitmap.data);
+		break;
+    case MGTextureFormat::Bmp:
+        if (bitmap.type != MGTextureType::Rgba8)
+            return (void*)"Exporting non-RGBA8 textures to BMP is not supported.";
+        errno = stbi_write_bmp(exportPath, bitmap.width, bitmap.height, 4, bitmap.data);
+		break;
+    default:
+		return (void*)"Unsupported bitmap format for export.";
+    }
+
+    if (errno == 0)
+    {
+        return (void*)stbi_failure_reason();
+	}
+
     return nullptr;
 }
