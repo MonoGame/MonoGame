@@ -4,6 +4,7 @@
 
 using System;
 using System.IO;
+using System.Runtime.InteropServices;
 using KtxSharp;
 using Microsoft.Xna.Framework.Content.Pipeline.Graphics;
 using MonoGame.Framework.Content;
@@ -50,19 +51,28 @@ internal static class PngFileHelper
         var colorBitmap = new PixelBitmapContent<Color>(sourceBitmap.Width, sourceBitmap.Height);
         BitmapContent.Copy(sourceBitmap, colorBitmap);
 
-        unsafe
+        GCHandle srcHandle = default;
+        try
         {
-            fixed (byte* data = colorBitmap.GetPixelData())
+            byte[] src = colorBitmap.GetPixelData();
+            srcHandle = GCHandle.Alloc(src, GCHandleType.Pinned);
+            IntPtr srcPtr = srcHandle.AddrOfPinnedObject();
+
+            MGCP_Bitmap bitmap = new MGCP_Bitmap
             {
-                MGCP_Bitmap bitmap = new MGCP_Bitmap
-                {
-                    width = colorBitmap.Width,
-                    height = colorBitmap.Height,
-                    type = TextureType.Rgba8,
-                    format = TextureFormat.Png,
-                    data = (IntPtr)data
-                };
-                MGCP.MP_ExportBitmap(ref bitmap, pngFileName);
+                width = colorBitmap.Width,
+                height = colorBitmap.Height,
+                type = TextureType.Rgba8,
+                format = TextureFormat.Png,
+                data = srcPtr
+            };
+            MGCP.MP_ExportBitmap(ref bitmap, pngFileName);
+        }
+        finally
+        {
+            if (srcHandle.IsAllocated)
+            {
+                srcHandle.Free();
             }
         }
     }

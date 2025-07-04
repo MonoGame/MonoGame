@@ -4,6 +4,7 @@
 
 using System;
 using System.IO;
+using System.Runtime.InteropServices;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Graphics.PackedVector;
 using MonoGame.Framework.Content.Pipeline.Interop;
@@ -33,33 +34,42 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 
             var newBytes = new byte[intermediateFormat.GetSize() * newWidth * newHeight];
 
-            unsafe
+            GCHandle srcHandle = default;
+            try
             {
-                fixed (byte *bytes = src.GetPixelData())
+                byte[] srcPixelData = src.GetPixelData();
+                srcHandle = GCHandle.Alloc(srcPixelData, GCHandleType.Pinned);
+                IntPtr srcPtr = srcHandle.AddrOfPinnedObject();
+
+                var srcBitmap = new MGCP_Bitmap
                 {
-                    var srcBitmap = new MGCP_Bitmap
-                    {
-                        width = src.Width,
-                        height = src.Height,
-                        type = TextureType.RgbaF,
-                        data = (IntPtr)bytes,
-                    };
+                    width = src.Width,
+                    height = src.Height,
+                    type = TextureType.RgbaF,
+                    data = srcPtr,
+                };
 
-                    var dstBitmap = new MGCP_Bitmap
-                    {
-                        width = newWidth,
-                        height = newHeight,
-                    };
+                var dstBitmap = new MGCP_Bitmap
+                {
+                    width = newWidth,
+                    height = newHeight,
+                };
 
-                    IntPtr err = MGCP.MP_ResizeBitmap(ref srcBitmap, ref dstBitmap);
-                    if (err != IntPtr.Zero)
-                    {
-                        string errorMsg = System.Runtime.InteropServices.Marshal.PtrToStringAnsi(err);
-                        throw new InvalidContentException($"Bitmap resize failed: {errorMsg}");
-                    }
-                    
-                    System.Runtime.InteropServices.Marshal.Copy(dstBitmap.data, newBytes, 0, newBytes.Length);
-                    MGCP.MP_FreeBitmap(ref dstBitmap);
+                IntPtr err = MGCP.MP_ResizeBitmap(ref srcBitmap, ref dstBitmap);
+                if (err != IntPtr.Zero)
+                {
+                    string errorMsg = System.Runtime.InteropServices.Marshal.PtrToStringAnsi(err);
+                    throw new InvalidContentException($"Bitmap resize failed: {errorMsg}");
+                }
+
+                Marshal.Copy(dstBitmap.data, newBytes, 0, newBytes.Length);
+                MGCP.MP_FreeBitmap(ref dstBitmap);
+            }
+            finally
+            {
+                if (srcHandle.IsAllocated)
+                {
+                    srcHandle.Free();
                 }
             }
 

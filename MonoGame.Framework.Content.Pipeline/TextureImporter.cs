@@ -76,39 +76,36 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
 
             var output = new Texture2DContent { Identity = new ContentIdentity(filename) };
 
-            unsafe
+            MGCP_Bitmap bitmap = default;
+            IntPtr err = MGCP.MP_ImportBitmap(filename, ref bitmap);
+            if (err != IntPtr.Zero)
             {
-                MGCP_Bitmap bitmap = default;
-                IntPtr err = MGCP.MP_ImportBitmap(filename, ref bitmap);
-                if (err != IntPtr.Zero)
-                {
-                    string errorMsg = System.Runtime.InteropServices.Marshal.PtrToStringAnsi(err);
-                    throw new InvalidContentException($"TextureImporter failed to load '{filename}': {errorMsg}");
-                }
-                if (bitmap.data == IntPtr.Zero)
-                    throw new InvalidContentException($"TextureImporter failed to load '{filename}': native returned null data");
-
-                int width = bitmap.width;
-                int height = bitmap.height;
-                int pixelCount = width * height;
-
-                switch (bitmap.type)
-                {
-                    case TextureType.Rgba8:
-                        AddFace<Color>(output, bitmap.data, width, height, pixelCount, 4);
-                        break;
-                    case TextureType.Rgba16:
-                        AddFace<Rgba64>(output, bitmap.data, width, height, pixelCount, 8);
-                        break;
-                    case TextureType.RgbaF:
-                        AddFace<Vector4>(output, bitmap.data, width, height, pixelCount, 16);
-                        break;
-                    default:
-                        throw new InvalidContentException("TextureImporter does not support the specified texture format.");
-                }
-                
-                MGCP.MP_FreeBitmap(ref bitmap);
+                string errorMsg = System.Runtime.InteropServices.Marshal.PtrToStringAnsi(err);
+                throw new InvalidContentException($"TextureImporter failed to load '{filename}': {errorMsg}");
             }
+            if (bitmap.data == IntPtr.Zero)
+                throw new InvalidContentException($"TextureImporter failed to load '{filename}': native returned null data");
+
+            int width = bitmap.width;
+            int height = bitmap.height;
+            int pixelCount = width * height;
+
+            switch (bitmap.type)
+            {
+                case TextureType.Rgba8:
+                    AddFace<Color>(output, bitmap.data, width, height, pixelCount, 4);
+                    break;
+                case TextureType.Rgba16:
+                    AddFace<Rgba64>(output, bitmap.data, width, height, pixelCount, 8);
+                    break;
+                case TextureType.RgbaF:
+                    AddFace<Vector4>(output, bitmap.data, width, height, pixelCount, 16);
+                    break;
+                default:
+                    throw new InvalidContentException("TextureImporter does not support the specified texture format.");
+            }
+
+            MGCP.MP_FreeBitmap(ref bitmap);
             return output;
         }
 

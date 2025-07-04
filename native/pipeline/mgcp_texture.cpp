@@ -19,17 +19,17 @@ void* MP_ImportBitmap(const char* importPath, MGCP_Bitmap& bitmap)
 
     if (stbi_is_hdr_from_file(f))
     {
-		bitmap.type = MGTextureType::RgbaF;
+        bitmap.type = MGTextureType::RgbaF;
         data = stbi_loadf_from_file(f, &width, &height, &channels, 4);
-	}
+    }
     else if (stbi_is_16_bit_from_file(f))
     {
-		bitmap.type = MGTextureType::Rgba16;
+        bitmap.type = MGTextureType::Rgba16;
         data = stbi_load_from_file_16(f, &width, &height, &channels, 4);
     }
     else
     {
-		bitmap.type = MGTextureType::Rgba8;
+        bitmap.type = MGTextureType::Rgba8;
         data = stbi_load_from_file(f, &width, &height, &channels, 4);
     }
 
@@ -52,7 +52,7 @@ void MP_FreeBitmap(MGCP_Bitmap& bitmap)
 {
     if (bitmap.data)
         stbi_image_free(bitmap.data);
-	bitmap.data = nullptr;
+    bitmap.data = nullptr;
 }
 
 inline stbir_filter MP_HeuristicFilter(mgint srcMeasure, mgint dstMeasure)
@@ -60,11 +60,11 @@ inline stbir_filter MP_HeuristicFilter(mgint srcMeasure, mgint dstMeasure)
     if (dstMeasure != 1 && (srcMeasure == srcMeasure / dstMeasure * dstMeasure || srcMeasure == dstMeasure + 1))
         return STBIR_FILTER_BOX;
 
-	mgint power = powf(2.0f, floorf(log2f((float)srcMeasure / dstMeasure)));
+    mgint power = powf(2.0f, floorf(log2f((float)srcMeasure / dstMeasure)));
     if (power > 1 && srcMeasure / power == dstMeasure)
         return STBIR_FILTER_CATMULLROM;
 
-	return STBIR_FILTER_DEFAULT;
+    return STBIR_FILTER_DEFAULT;
 }
 
 inline mgint MP_GetBpp(MGTextureType type)
@@ -92,7 +92,7 @@ void* MP_ResizeBitmap(MGCP_Bitmap& srcBitmap, MGCP_Bitmap& dstBitmap)
         return (void*)"Invalid input bitmap or dimensions for resizing.";
     }
 
-	bpp = MP_GetBpp(srcBitmap.type);
+    bpp = MP_GetBpp(srcBitmap.type);
 
     switch (srcBitmap.type)
     {
@@ -109,36 +109,36 @@ void* MP_ResizeBitmap(MGCP_Bitmap& srcBitmap, MGCP_Bitmap& dstBitmap)
         return (void*)"Unsupported source bitmap pixel format for resizing.";
     }
 
-	const int channel_count = 4;
-	int dst_bytes = dstBitmap.width * dstBitmap.height * channel_count * bpp;
-	dstBitmap.data = malloc(dst_bytes);
+    const int channel_count = 4;
+    int dst_bytes = dstBitmap.width * dstBitmap.height * channel_count * bpp;
+    dstBitmap.data = malloc(dst_bytes);
     dstBitmap.type = srcBitmap.type;
 
     if (!dstBitmap.data)
     {
         return (void*)"Failed to allocate memory for resized bitmap.";
-	}
+    }
 
     STBIR_RESIZE resize;
 
     stbir_resize_init(&resize,
         srcBitmap.data, srcBitmap.width, srcBitmap.height, 0,
-		dstBitmap.data, dstBitmap.width, dstBitmap.height, 0,
+        dstBitmap.data, dstBitmap.width, dstBitmap.height, 0,
         STBIR_4CHANNEL, data_type);
 
     resize.horizontal_edge = STBIR_EDGE_CLAMP;
     resize.vertical_edge = STBIR_EDGE_CLAMP;
 
-	resize.horizontal_filter = MP_HeuristicFilter(srcBitmap.width, dstBitmap.width);
+    resize.horizontal_filter = MP_HeuristicFilter(srcBitmap.width, dstBitmap.width);
     resize.vertical_filter = MP_HeuristicFilter(srcBitmap.height, dstBitmap.height);
 
     if (!stbir_resize_extended(&resize))
     {
-		free(dstBitmap.data);
+        free(dstBitmap.data);
         return (void*)stbi_failure_reason();
-	}
+    }
 
-	return nullptr;
+    return nullptr;
 
 }
 
@@ -152,47 +152,47 @@ void* MP_ExportBitmap(MGCP_Bitmap& bitmap, const char* exportPath)
         return (void*)"Invalid bitmap data or dimensions for export.";
     }
 
-	bpp = MP_GetBpp(bitmap.type);
+    bpp = MP_GetBpp(bitmap.type);
     if (bpp == 0)
     {
         return (void*)"Unsupported bitmap pixel format for export.";
-	}
+    }
 
     switch (bitmap.format)
     {
     case MGTextureFormat::Png:
         if (bitmap.type == MGTextureType::RgbaF)
             return (void*)"Exporting float textures to PNG is not supported.";
-		errno = stbi_write_png(exportPath, bitmap.width, bitmap.height, 4, bitmap.data, bitmap.width * bpp);
-		break;
+        errno = stbi_write_png(exportPath, bitmap.width, bitmap.height, 4, bitmap.data, bitmap.width * bpp);
+        break;
     case MGTextureFormat::Jpeg:
         if (bitmap.type != MGTextureType::Rgba8)
-			return (void*)"Exporting non-RGBA8 textures to JPEG is not supported.";
+            return (void*)"Exporting non-RGBA8 textures to JPEG is not supported.";
         errno = stbi_write_jpg(exportPath, bitmap.width, bitmap.height, 4, bitmap.data, 100);
-		break;
+        break;
     case MGTextureFormat::Tga:
-		if (bitmap.type != MGTextureType::Rgba8)
+        if (bitmap.type != MGTextureType::Rgba8)
             return (void*)"Exporting non-RGBA8 textures to TGA is not supported.";
-		errno = stbi_write_tga(exportPath, bitmap.width, bitmap.height, 4, bitmap.data);
-		break;
+        errno = stbi_write_tga(exportPath, bitmap.width, bitmap.height, 4, bitmap.data);
+        break;
     case MGTextureFormat::Hdr:
         if (bitmap.type != MGTextureType::RgbaF)
             return (void*)"Exporting non-RGBAF textures to HDR is not supported.";
         errno = stbi_write_hdr(exportPath, bitmap.width, bitmap.height, 4, (float*)bitmap.data);
-		break;
+        break;
     case MGTextureFormat::Bmp:
         if (bitmap.type != MGTextureType::Rgba8)
             return (void*)"Exporting non-RGBA8 textures to BMP is not supported.";
         errno = stbi_write_bmp(exportPath, bitmap.width, bitmap.height, 4, bitmap.data);
-		break;
+        break;
     default:
-		return (void*)"Unsupported bitmap format for export.";
+        return (void*)"Unsupported bitmap format for export.";
     }
 
     if (errno == 0)
     {
         return (void*)stbi_failure_reason();
-	}
+    }
 
     return nullptr;
 }
