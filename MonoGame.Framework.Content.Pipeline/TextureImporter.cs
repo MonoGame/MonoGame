@@ -92,17 +92,19 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
                 int height = bitmap.height;
                 int pixelCount = width * height;
 
-                switch (bitmap.format)
+                switch (bitmap.type)
                 {
-                    case TextureFormat.Rgba8:
+                    case TextureType.Rgba8:
                         AddFace<Color>(output, bitmap.data, width, height, pixelCount, 4);
                         break;
-                    case TextureFormat.Rgba16:
+                    case TextureType.Rgba16:
                         AddFace<Rgba64>(output, bitmap.data, width, height, pixelCount, 8);
                         break;
-                    case TextureFormat.RgbaF:
+                    case TextureType.RgbaF:
                         AddFace<Vector4>(output, bitmap.data, width, height, pixelCount, 16);
                         break;
+                    default:
+                        throw new InvalidContentException("TextureImporter does not support the specified texture format.");
                 }
                 
                 MGCP.MP_FreeBitmap(ref bitmap);

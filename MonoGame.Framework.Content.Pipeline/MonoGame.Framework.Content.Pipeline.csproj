@@ -75,7 +75,6 @@
     <PackageReference Include="AssimpNetter" Version="5.4.3.3" />
     <PackageReference Include="BCnEncoder.Net" Version="2.1.0" />
     <PackageReference Include="Microsoft.NETCore.App" Version="2.1.30" />
-    <PackageReference Include="MonoGame.Library.FreeImage" Version="3.18.0.3" />
     <PackageReference Include="MonoGame.Library.FreeType" Version="2.13.2.2" />
     <PackageReference Include="MonoGame.Tool.Basisu" Version="1.60.0.2" />
     <PackageReference Include="MonoGame.Tool.Crunch" Version="1.0.4.4" />

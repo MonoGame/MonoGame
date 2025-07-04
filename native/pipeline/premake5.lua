@@ -8,7 +8,12 @@ function pipeline_native()
     kind "SharedLib"
     language "C++"
     architecture "x64"
-    defines { "DLL_EXPORT", "STB_IMAGE_IMPLEMENTATION" }
+    defines { 
+        "DLL_EXPORT", 
+        "STB_IMAGE_IMPLEMENTATION",
+        "STB_IMAGE_WRITE_IMPLEMENTATION",
+        "STB_IMAGE_RESIZE_IMPLEMENTATION",
+    }
     targetdir(platform_target_path)
     targetname "mgpipeline"
     cppdialect "C++17"

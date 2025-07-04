@@ -9,10 +9,24 @@
 
 #include "api_common.h"
 
-enum class MGTextureFormat : mgint
+enum class MGTextureType : mgint
 {
     Rgba8 = 0,
     Rgba16 = 1,
     RgbaF = 2,
+};
+
+enum class MGTextureFormat : mgint
+{
+    Unknown = 0,
+    Jpeg = 1,
+    Png = 2,
+    Tga = 3,
+    Bmp = 4,
+    Psd = 5,
+    Gif = 6,
+    Hdr = 7,
+    Pic = 8,
+    Pnm = 9,
 };
 

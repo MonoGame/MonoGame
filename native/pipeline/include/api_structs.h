@@ -13,6 +13,7 @@ struct MGCP_Bitmap
 {
     mgint width;
     mgint height;
+    MGTextureType type;
     MGTextureFormat format;
     void* data;
 };
