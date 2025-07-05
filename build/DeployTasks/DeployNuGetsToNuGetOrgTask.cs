@@ -2,7 +2,7 @@
 namespace BuildScripts;
 
 [TaskName("DeployNuGetsToNuGetOrgTask")]
-[IsDependentOn(typeof(DownloadArtifactsTask))]
+[IsDependentOn(typeof(PackContentPipelineTask))]
 public sealed class DeployNuGetsToNuGetOrgTask : FrostingTask<BuildContext>
 {
     public override bool ShouldRun(BuildContext context)

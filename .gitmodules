@@ -25,3 +25,6 @@
 [submodule "external/MonoGame.Templates"]
 	path = external/MonoGame.Templates
 	url = https://github.com/MonoGame/MonoGame.Templates.git
+[submodule "external/stb"]
+	path = external/stb
+	url = https://github.com/nothings/stb

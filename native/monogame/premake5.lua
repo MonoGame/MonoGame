@@ -22,7 +22,8 @@ function common(project_name)
    }
    includedirs 
    {
-      "include",      
+      "include",
+      "../../external/stb",
    }
 
 end

@@ -4,10 +4,11 @@
 
 using System;
 using System.IO;
+using System.Runtime.InteropServices;
 using KtxSharp;
 using Microsoft.Xna.Framework.Content.Pipeline.Graphics;
 using MonoGame.Framework.Content;
-using StbImageWriteSharp;
+using MonoGame.Framework.Content.Pipeline.Interop;
 
 namespace Microsoft.Xna.Framework.Content.Pipeline.Utilities;
 
@@ -45,16 +46,40 @@ internal static class PngFileHelper
         {
             Directory.CreateDirectory(directory);
         }
-        using var fileStream = File.OpenWrite(pngFileName);
 
         // in order to save a png, we need a colorBitmap.
         var colorBitmap = new PixelBitmapContent<Color>(sourceBitmap.Width, sourceBitmap.Height);
         BitmapContent.Copy(sourceBitmap, colorBitmap);
 
-        var data = colorBitmap.GetPixelData();
-        var writer = new ImageWriter();
-        writer.WritePng(data, colorBitmap.Width, colorBitmap.Height, ColorComponents.RedGreenBlueAlpha, fileStream);
-        fileStream.Close();
+        GCHandle srcHandle = default;
+        try
+        {
+            byte[] src = colorBitmap.GetPixelData();
+            srcHandle = GCHandle.Alloc(src, GCHandleType.Pinned);
+            IntPtr srcPtr = srcHandle.AddrOfPinnedObject();
+
+            MGCP_Bitmap bitmap = new MGCP_Bitmap
+            {
+                width = colorBitmap.Width,
+                height = colorBitmap.Height,
+                type = TextureType.Rgba8,
+                format = TextureFormat.Png,
+                data = srcPtr
+            };
+            IntPtr err = MGCP.MP_ExportBitmap(ref bitmap, pngFileName);
+            if (err != IntPtr.Zero)
+            {
+                string errorMsg = System.Runtime.InteropServices.Marshal.PtrToStringUTF8(err);
+                throw new InvalidContentException($"Unable to write PNG file '{pngFileName}': {errorMsg}");
+            }
+        }
+        finally
+        {
+            if (srcHandle.IsAllocated)
+            {
+                srcHandle.Free();
+            }
+        }
     }
 }
 

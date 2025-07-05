@@ -44,6 +44,15 @@ public sealed class UploadArtifactsTask : AsyncFrostingTask<BuildContext>
 
         var version = BuildContext.CalculateVersion(context);
 
+        // Upload mgpipeline native libraries
+        var buildConf = context.Argument("build-configuration", "Release");
+        var mgDir = System.IO.Path.Combine(context.BuildOutput, "mgpipeline", buildConf);
+        if (System.IO.Directory.Exists(mgDir))
+        {
+            await context.GitHubActions().Commands.UploadArtifact(new DirectoryPath(mgDir), $"mgpipeline-{os}.{version}");
+        }
+
+        // Upload NuGet packages
         await context.GitHubActions().Commands.UploadArtifact(new DirectoryPath(context.NuGetsDirectory.FullPath), $"nuget-{os}.{version}");
         await context.GitHubActions().Commands.UploadArtifact(new DirectoryPath(System.IO.Path.Combine(context.BuildOutput, "Tests", "DesktopGL", "Release")), $"tests-desktopgl-{os}");
         if (context.IsRunningOnWindows())

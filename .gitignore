@@ -95,3 +95,11 @@ vsxmake2022
 
 # docfx
 _*
+
+# Premake generated files
+/native/**/*.sln
+/native/**/*.csproj
+/native/**/*.vcxproj
+/native/**/*.vcxproj.filters
+/native/**/*.make
+/native/**/Makefile

@@ -49,9 +49,6 @@
     <Compile Include="..\MonoGame.Framework\Content\ContentExtensions.cs">
       <Link>Utilities\ContentExtensions.cs</Link>
     </Compile>
-
-    <Compile Include="..\ThirdParty\StbImageSharp\src\**\*.cs" LinkBase="Utilities\StbImageSharp" />
-    <Compile Include="..\ThirdParty\StbImageWriteSharp\src\**\*.cs" LinkBase="Utilities\StbImageWriteSharp" />
   </ItemGroup>
 
   <ItemGroup>
@@ -75,7 +72,6 @@
     <PackageReference Include="AssimpNetter" Version="5.4.3.3" />
     <PackageReference Include="BCnEncoder.Net" Version="2.1.0" />
     <PackageReference Include="Microsoft.NETCore.App" Version="2.1.30" />
-    <PackageReference Include="MonoGame.Library.FreeImage" Version="3.18.0.3" />
     <PackageReference Include="MonoGame.Library.FreeType" Version="2.13.2.2" />
     <PackageReference Include="MonoGame.Tool.Basisu" Version="1.60.0.2" />
     <PackageReference Include="MonoGame.Tool.Crunch" Version="1.0.4.4" />
@@ -92,6 +88,18 @@
     </Content>
     <Content Include="..\ThirdParty\Dependencies\MojoShader\Windows\libmojoshader_64.dll" Visible="false">
       <PackagePath>runtimes\win-x64\native</PackagePath>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Artifacts\mgpipeline\$(Configuration)\mgpipeline.dll" Condition="Exists('..\Artifacts\mgpipeline\$(Configuration)\mgpipeline.dll')" Visible="false">
+      <PackagePath>runtimes\win-x64\native</PackagePath>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Artifacts\mgpipeline\$(Configuration)\libmgpipeline.so" Condition="Exists('..\Artifacts\mgpipeline\$(Configuration)\libmgpipeline.so')" Visible="false">
+      <PackagePath>runtimes\linux-x64\native</PackagePath>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Artifacts\mgpipeline\$(Configuration)\libmgpipeline.dylib" Condition="Exists('..\Artifacts\mgpipeline\$(Configuration)\libmgpipeline.dylib')" Visible="false">
+      <PackagePath>runtimes\osx\native</PackagePath>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
