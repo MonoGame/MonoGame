@@ -5,6 +5,7 @@
 using System;
 using System.Runtime.Serialization;
 using System.Diagnostics;
+using System.Runtime.CompilerServices;
 
 namespace Microsoft.Xna.Framework
 {
@@ -225,6 +226,16 @@ namespace Microsoft.Xna.Framework
         public static bool operator !=(Rectangle a, Rectangle b)
         {
             return !(a == b);
+        }
+
+        /// <summary>
+        /// Converts a <see cref="System.Drawing.Rectangle"/> to a <see cref="Rectangle"/>.
+        /// </summary>
+        /// <param name="value">The converted value.</param>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static implicit operator Rectangle(System.Drawing.Rectangle value)
+        {
+            return new Rectangle(value.X, value.Y, value.Width, value.Height);
         }
 
         #endregion
@@ -532,6 +543,16 @@ namespace Microsoft.Xna.Framework
             y = Y;
             width = Width;
             height = Height;
+        }
+
+        /// <summary>
+        /// Converts this <see cref="Rectangle"/> to a <see cref="System.Drawing.Rectangle"/>.
+        /// </summary>
+        /// <returns>The converted <see cref="System.Drawing.Rectangle"/>.</returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public System.Drawing.Rectangle ToDrawing()
+        {
+            return new System.Drawing.Rectangle(X, Y, Width, Height);
         }
 
         #endregion

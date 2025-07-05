@@ -242,5 +242,29 @@ namespace MonoGame.Tests.Framework
             Assert.AreEqual(a2, color2.A / 255f);
         }
 #endif
+
+        [Test]
+        public void ToDrawing()
+        {
+            Color color = new Color(1, 2, 3, 4);
+
+            var expected = System.Drawing.Color.FromArgb(color.A, color.R, color.G, color.B);
+            var actual = color.ToDrawing();
+
+            Assert.AreEqual(expected, actual);
+        }
+
+        [Test]
+        public void ImplicitOperator()
+        {
+            var drawingColor = System.Drawing.Color.FromArgb(1, 2, 3, 4);
+            var xnaColor = new Color(2, 3, 4, 1);
+
+            Assert.AreEqual(drawingColor.R, xnaColor.R);
+            Assert.AreEqual(drawingColor.G, xnaColor.G);
+            Assert.AreEqual(drawingColor.B, xnaColor.B);
+            Assert.AreEqual(drawingColor.A, xnaColor.A);
+
+        }
     }
 }
