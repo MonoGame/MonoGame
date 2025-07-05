@@ -84,11 +84,17 @@
 
   </Target>
 
+  <!-- When running on Windows ARM64, verify that the X64 DotNet toolchain is installed. -->
+  <Target Name="ValidateDotnetInstallation">
+    <Error Text="Please install the X64 .NET runtime to use the MonoGame content pipeline on ARM64."
+           Condition="'$(DotnetCommand)' == '$(DotnetX64OnArm64Path)' And !Exists('$(DotnetX64OnArm64Path)')" />
+  </Target>
+
   <!-- Restore the dotnet-mgcb tool to a known location. -->
   <!-- Use MGCBToolAdditionalArguments to provide additional arguments to the install
    for example a path to your custom NuGet.config file.
   -->
-  <Target Name="RestoreContentCompiler" Condition=" '$(AutoRestoreMGCBTool)' == 'true' And !Exists ('$(MGCBToolDirectory)$(MGCBCommand)')">
+  <Target Name="RestoreContentCompiler" DependsOnTargets="ValidateDotNetInstallation" Condition=" '$(AutoRestoreMGCBTool)' == 'true' And !Exists ('$(MGCBToolDirectory)$(MGCBCommand)')">
     <MakeDir Directories="$(MGCBToolDirectory)"/>
     <Exec Command="&quot;$(DotnetCommand)&quot; tool install $(MGCBToolAdditionalArguments) dotnet-mgcb --version $(MonoGameVersion) --tool-path ." WorkingDirectory="$(MGCBToolDirectory)" ContinueOnError="true" />
   </Target>
@@ -143,7 +149,7 @@
       - ExtraContent: built content files
         - ContentDir: the relative path of the embedded folder to contain the content files
   -->
-  <Target Name="RunContentBuilder" DependsOnTargets="RestoreContentCompiler;PrepareContentBuilder">
+  <Target Name="RunContentBuilder" DependsOnTargets="ValidateDotnetInstallation;RestoreContentCompiler;PrepareContentBuilder">
 
     <PropertyGroup>
       <_Command Condition="Exists ('$(MGCBToolDirectory)$(MGCBCommand)')">&quot;$(MGCBToolDirectory)$(MGCBCommand)&quot;</_Command>
