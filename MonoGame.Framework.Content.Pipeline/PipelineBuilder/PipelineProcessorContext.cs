@@ -4,6 +4,7 @@
 
 using System;
 using System.IO;
+using System.Reflection;
 using Microsoft.Xna.Framework.Content.Pipeline;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -54,8 +55,10 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
         /// <inheritdoc/>
         public override ContentIdentity SourceIdentity { get { return new ContentIdentity(_pipelineEvent.SourceFile); } }
 
-        /// <inheritdoc/>
-        public override string ProjectDirectory { get { return _manager.ProjectDirectory; } }
+        /// <summary>
+        /// Gets the directory that contains the content project.
+        /// </summary>
+        public string ProjectDirectory { get { return _manager.ProjectDirectory; } }
 
         /// <inheritdoc/>
         public override void AddDependency(string filename)
@@ -70,12 +73,12 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
         }
 
         /// <inheritdoc/>
-        public override TOutput Convert<TInput, TOutput>(   TInput input,
+        public override TOutput Convert<TInput, TOutput>(TInput input,
                                                             string processorName,
                                                             OpaqueDataDictionary processorParameters)
         {
             var processor = _manager.CreateProcessor(processorName, processorParameters);
-            var processContext = new PipelineProcessorContext(_manager, new PipelineBuildEvent { Parameters = processorParameters } );
+            var processContext = new PipelineProcessorContext(_manager, new PipelineBuildEvent { Parameters = processorParameters });
             using var _ = ContextScopeFactory.BeginContext(processContext);
             var processedObject = processor.Process(input, processContext);
 
@@ -86,8 +89,23 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
             return (TOutput)processedObject;
         }
 
-        /// <inheritdoc/>
-        public override TOutput BuildAndLoadAsset<TInput, TOutput>( ExternalReference<TInput> sourceAsset,
+        public override TOutput Convert<TInput, TOutput>(TInput input, IContentProcessor processor)
+        {
+            var processorName = processor.GetType().Name.ToString();
+            var processorParameters = new OpaqueDataDictionary();
+
+            foreach (var prop in processor.GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance))
+            {
+                if (prop.CanRead && prop.CanWrite)
+                {
+                    processorParameters.Add(prop.Name, prop.GetValue(processor)!);
+                }
+            }
+
+            return Convert<TInput, TOutput>(input, processorName, processorParameters);
+        }
+
+        public override TOutput BuildAndLoadAsset<TInput, TOutput>(ExternalReference<TInput> sourceAsset,
                                                                     string processorName,
                                                                     OpaqueDataDictionary processorParameters,
                                                                     string importerName)
@@ -101,8 +119,8 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
             bool processAsset = !string.IsNullOrEmpty(processorName);
             _manager.ResolveImporterAndProcessor(sourceFilepath, ref importerName, ref processorName);
 
-            var buildEvent = new PipelineBuildEvent 
-            { 
+            var buildEvent = new PipelineBuildEvent
+            {
                 SourceFile = sourceFilepath,
                 Importer = importerName,
                 Processor = processAsset ? processorName : null,
@@ -117,8 +135,24 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
             return (TOutput)processedObject;
         }
 
-        /// <inheritdoc/>
-        public override ExternalReference<TOutput> BuildAsset<TInput, TOutput>( ExternalReference<TInput> sourceAsset,
+        public override TOutput BuildAndLoadAsset<TInput, TOutput>(ExternalReference<TInput> sourceAsset, IContentImporter importer, IContentProcessor processor)
+        {
+            var importerName = importer.GetType().Name;
+            var processorName = processor.GetType().Name;
+            var processorParameters = new OpaqueDataDictionary();
+
+            foreach (var prop in processor.GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance))
+            {
+                if (prop.CanRead && prop.CanWrite)
+                {
+                    processorParameters.Add(prop.Name, prop.GetValue(processor)!);
+                }
+            }
+
+            return BuildAndLoadAsset<TInput, TOutput>(sourceAsset, processorName, processorParameters, importerName);
+        }
+
+        public override ExternalReference<TOutput> BuildAsset<TInput, TOutput>(ExternalReference<TInput> sourceAsset,
                                                                                 string processorName,
                                                                                 OpaqueDataDictionary processorParameters,
                                                                                 string importerName,
@@ -134,6 +168,23 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
             _pipelineEvent.BuildAsset.AddUnique(buildEvent.DestFile);
 
             return new ExternalReference<TOutput>(buildEvent.DestFile);
+        }
+
+        public override ExternalReference<TOutput> BuildAsset<TInput, TOutput>(ExternalReference<TInput> sourceAsset, IContentImporter importer, IContentProcessor processor, string? assetName)
+        {
+            var importerName = importer.GetType().Name;
+            var processorName = processor.GetType().Name;
+            var processorParameters = new OpaqueDataDictionary();
+
+            foreach (var prop in processor.GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance))
+            {
+                if (prop.CanRead && prop.CanWrite)
+                {
+                    processorParameters.Add(prop.Name, prop.GetValue(processor)!);
+                }
+            }
+
+            return BuildAsset<TInput, TOutput>(sourceAsset, processorName, processorParameters, importerName, assetName);
         }
     }
 }

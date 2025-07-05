@@ -11,7 +11,14 @@ namespace Microsoft.Xna.Framework
     {
         private static Stream PlatformOpenStream(string safeName)
         {
-            return Android.App.Application.Context.Assets.Open(safeName);
+            try
+            {
+                return Android.App.Application.Context.Assets.Open(safeName);
+            }
+            catch
+            {
+                return null;
+            }
         }
     }
 }

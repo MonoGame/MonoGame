@@ -270,16 +270,18 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
         /// <summary />
         protected virtual MaterialContent ConvertMaterial(MaterialContent material, ContentProcessorContext context)
         {
-            var parameters = new OpaqueDataDictionary();
-            parameters.Add("ColorKeyColor", ColorKeyColor);
-            parameters.Add("ColorKeyEnabled", ColorKeyEnabled);
-            parameters.Add("GenerateMipmaps", GenerateMipmaps);
-            parameters.Add("PremultiplyTextureAlpha", PremultiplyTextureAlpha);
-            parameters.Add("ResizeTexturesToPowerOfTwo", ResizeTexturesToPowerOfTwo);
-            parameters.Add("TextureFormat", TextureFormat);
-            parameters.Add("DefaultEffect", DefaultEffect);
-
-            return context.Convert<MaterialContent, MaterialContent>(material, "MaterialProcessor", parameters);
+            var processor = new MaterialProcessor
+            {
+                ColorKeyColor = ColorKeyColor,
+                ColorKeyEnabled = ColorKeyEnabled,
+                GenerateMipmaps = GenerateMipmaps,
+                PremultiplyTextureAlpha = PremultiplyTextureAlpha,
+                ResizeTexturesToPowerOfTwo = ResizeTexturesToPowerOfTwo,
+                TextureFormat = TextureFormat,
+                DefaultEffect = DefaultEffect
+            };
+            
+            return context.Convert<MaterialContent, MaterialContent>(material, processor);
         }
 
         /// <summary />
