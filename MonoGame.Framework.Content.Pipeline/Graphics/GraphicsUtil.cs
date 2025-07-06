@@ -35,11 +35,14 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
             var newBytes = new byte[intermediateFormat.GetSize() * newWidth * newHeight];
 
             GCHandle srcHandle = default;
+            GCHandle dstHandle = default;
             try
             {
                 byte[] srcPixelData = src.GetPixelData();
                 srcHandle = GCHandle.Alloc(srcPixelData, GCHandleType.Pinned);
                 IntPtr srcPtr = srcHandle.AddrOfPinnedObject();
+                dstHandle = GCHandle.Alloc(newBytes, GCHandleType.Pinned);
+                IntPtr dstPtr = dstHandle.AddrOfPinnedObject();
 
                 var srcBitmap = new MGCP_Bitmap
                 {
@@ -53,6 +56,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
                 {
                     width = newWidth,
                     height = newHeight,
+                    data = dstPtr,
                 };
 
                 IntPtr err = MGCP.MP_ResizeBitmap(ref srcBitmap, ref dstBitmap);
@@ -61,16 +65,13 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
                     string errorMsg = System.Runtime.InteropServices.Marshal.PtrToStringUTF8(err);
                     throw new InvalidContentException($"Bitmap resize failed: {errorMsg}");
                 }
-
-                Marshal.Copy(dstBitmap.data, newBytes, 0, newBytes.Length);
-                MGCP.MP_FreeBitmap(ref dstBitmap);
             }
             finally
             {
                 if (srcHandle.IsAllocated)
-                {
                     srcHandle.Free();
-                }
+                if (dstHandle.IsAllocated)
+                    dstHandle.Free();
             }
 
             switch (intermediateFormat)

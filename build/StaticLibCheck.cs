@@ -1,7 +1,21 @@
 using Cake.Common.Tools.VSWhere.Latest;
 namespace BuildScripts;
 
-public class StaticLibCheckTask
+/// <summary>
+/// Validates dynamic library dependencies for platform-specific builds.
+/// </summary>
+/// <remarks>
+/// <para>
+/// This class is used in the build process to ensure that generated native libraries (.dll, .so, .dylib)
+/// only link against a set of approved system libraries for each supported platform (Windows, Linux, macOS).
+/// It helps prevent accidental linkage to disallowed or non-system libraries, which could cause portability or licensing issues.
+/// </para>
+/// <para>
+/// Usage:
+/// Call <see cref="StaticLibCheck.Check"/> during your build pipeline, passing the build context and the folder to check.
+/// </para>
+/// </remarks>
+public class StaticLibCheck
 {
     private static readonly string[] ValidWindowsLibs = {
         "WS2_32.dll",

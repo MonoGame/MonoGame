@@ -92,6 +92,11 @@ void* MP_ResizeBitmap(MGCP_Bitmap& srcBitmap, MGCP_Bitmap& dstBitmap)
         return (void*)"Invalid input bitmap or dimensions for resizing.";
     }
 
+    if (!dstBitmap.data)
+    {
+		return (void*)"Should allocate memory for destination bitmap data before resizing.";
+    }
+
     bpp = MP_GetBpp(srcBitmap.type);
 
     switch (srcBitmap.type)
@@ -109,14 +114,7 @@ void* MP_ResizeBitmap(MGCP_Bitmap& srcBitmap, MGCP_Bitmap& dstBitmap)
         return (void*)"Unsupported source bitmap pixel format for resizing.";
     }
 
-    int dst_bytes = dstBitmap.width * dstBitmap.height * bpp;
-    dstBitmap.data = malloc(dst_bytes);
     dstBitmap.type = srcBitmap.type;
-
-    if (!dstBitmap.data)
-    {
-        return (void*)"Failed to allocate memory for resized bitmap.";
-    }
 
     STBIR_RESIZE resize;
 
@@ -133,7 +131,6 @@ void* MP_ResizeBitmap(MGCP_Bitmap& srcBitmap, MGCP_Bitmap& dstBitmap)
 
     if (!stbir_resize_extended(&resize))
     {
-        free(dstBitmap.data);
         return (void*)stbi_failure_reason();
     }
 

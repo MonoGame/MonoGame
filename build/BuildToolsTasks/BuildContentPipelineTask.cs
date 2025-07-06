@@ -42,7 +42,7 @@ public sealed class BuildContentPipelineTask : FrostingTask<BuildContext>
                 throw new Exception($"Native Pipeline build failed with make! {exit}");
         }
 
-        StaticLibCheckTask staticLibCheck = new StaticLibCheckTask();
+        StaticLibCheck staticLibCheck = new StaticLibCheck();
         staticLibCheck.Check(context, "native/pipeline");
 
         var builderPath = context.GetProjectPath(ProjectType.ContentPipeline);
