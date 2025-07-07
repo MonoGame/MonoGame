@@ -74,27 +74,27 @@ namespace Microsoft.Xna.Framework.Media
         {
             // Prepare the player
             _androidPlayer.Reset();
+            
 
             if (assetUri != null)
             {
                 // Check if we have a direct asset URI.
                 _androidPlayer.SetDataSource(MediaLibrary.Context, this.assetUri);
             }
-            else if (_name.StartsWith("file://"))
+            else if (_filePath.StartsWith("file://"))
             {
                 // Otherwise, check if this is a file URI.
-                _androidPlayer.SetDataSource(_name);
+                _androidPlayer.SetDataSource(_filePath);
             }
             else
             {
                 // Otherwise, assume it's a file path. (This might throw if the file doesn't exist)
-                var afd = Game.Activity?.Assets?.OpenFd(_name);
+                var afd = Game.Activity?.Assets?.OpenFd(_filePath);
                 if (afd != null)
                 {
                 	_androidPlayer.SetDataSource(afd.FileDescriptor, afd.StartOffset, afd.Length);
                 }
             }
-
 
             _androidPlayer.Prepare();
             _androidPlayer.Looping = MediaPlayer.IsRepeating;

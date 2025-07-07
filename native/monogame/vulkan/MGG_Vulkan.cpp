@@ -174,7 +174,7 @@ struct MGG_GraphicsDevice
 	VkSwapchainKHR swapchain = VK_NULL_HANDLE;
 	uint32_t swapchain_image_index = 0;
 
-	uint64_t vertexBuffersDirty = 0;
+	uint64_t vertexBuffersDirty = 0xFFFFFFFF;
 	MGG_Buffer* vertexBuffers[8] = { 0 };
 	uint32_t vertexOffsets[8] = { 0 };
 
@@ -382,7 +382,7 @@ struct MGG_GraphicsSystem
 
 static void MGVK_BufferCopyAndFlush(MGG_GraphicsDevice* device, MGG_Buffer* buffer, int destOffset, mgbyte* data, int dataBytes);
 static MGG_Buffer* MGVK_Buffer_Create(MGG_GraphicsDevice* device, MGBufferType type, mgint sizeInBytes, bool no_push);
-static void MGVK_DestroyFrameResources(MGG_GraphicsDevice* device, mgint currentFrame, mgbool free_all);
+static void MGVK_DestroyFrameResources(MGG_GraphicsDevice* device, mgint currentFrame, mgbyte free_all);
 static void MGVK_UpdateRenderPass(MGG_GraphicsDevice* device, FrameCounter currentFrame, MGVK_CmdBuffer& cmd);
 static void MGVK_TransitionImageLayout(MGG_GraphicsDevice* device, MGG_Texture* texture, int32_t level, VkImageLayout newLayout);
 
@@ -549,28 +549,30 @@ static VkImageAspectFlags DetermineAspectMask(VkFormat format)
 	return result;
 }
 
-void MGG_EffectResource_GetBytecode(const char* name, mgbyte*& bytecode, mgint& size)
+void MGG_EffectResource_GetBytecode(mgbyte* name, mgbyte*& bytecode, mgint& size)
 {
 	bytecode = nullptr;
 	size = 0;
 
+	// TODO: Move this to use the new MGFXC header generation.
+	
 	// Get the handle of this DLL.
 	HMODULE module;
 	::GetModuleHandleExA(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS, (LPCSTR)&MGG_EffectResource_GetBytecode, &module);
 
 	LPCSTR id = "";
 
-	if (strcmp(name, "AlphaTestEffect") == 0)
+	if (strcmp((const char*)name, "AlphaTestEffect") == 0)
 		id = MAKEINTRESOURCEA(C_AlphaTestEffect);
-	else if (strcmp(name, "BasicEffect") == 0)
+	else if (strcmp((const char*)name, "BasicEffect") == 0)
 		id = MAKEINTRESOURCEA(C_BasicEffect);
-	else if (strcmp(name, "DualTextureEffect") == 0)
+	else if (strcmp((const char*)name, "DualTextureEffect") == 0)
 		id = MAKEINTRESOURCEA(C_DualTextureEffect);
-	else if (strcmp(name, "EnvironmentMapEffect") == 0)
+	else if (strcmp((const char*)name, "EnvironmentMapEffect") == 0)
 		id = MAKEINTRESOURCEA(C_EnvironmentMapEffect);
-	else if (strcmp(name, "SkinnedEffect") == 0)
+	else if (strcmp((const char*)name, "SkinnedEffect") == 0)
 		id = MAKEINTRESOURCEA(C_SkinnedEffect);
-	else if (strcmp(name, "SpriteEffect") == 0)
+	else if (strcmp((const char*)name, "SpriteEffect") == 0)
 		id = MAKEINTRESOURCEA(C_SpriteEffect);
 
 	auto handle = ::FindResourceA(module, id, "BIN");
@@ -1618,7 +1620,7 @@ static void MGVK_DestroyPipelines(MGG_GraphicsDevice* device, std::function<bool
 	}
 }
 
-static void MGVK_DestroyFrameResources(MGG_GraphicsDevice* device, mgint currentFrame, mgbool free_all)
+static void MGVK_DestroyFrameResources(MGG_GraphicsDevice* device, mgint currentFrame, mgbyte free_all)
 {
 	assert(device != nullptr);
 	assert(currentFrame >= 0);
@@ -3288,7 +3290,7 @@ void MGG_Buffer_Destroy(MGG_GraphicsDevice* device, MGG_Buffer* buffer)
 	device->destroyBuffers.push(buffer);
 }
 
-void MGG_Buffer_SetData(MGG_GraphicsDevice* device, MGG_Buffer*& buffer, mgint offset, mgbyte* data, mgint length, mgbool discard)
+void MGG_Buffer_SetData(MGG_GraphicsDevice* device, MGG_Buffer*& buffer, mgint offset, mgbyte* data, mgint length, mgbyte discard)
 {
 	assert(device != nullptr);
 	assert(buffer != nullptr);
@@ -4005,7 +4007,7 @@ void MGG_OcclusionQuery_End(MGG_GraphicsDevice* device, MGG_OcclusionQuery* quer
 	// TODO: Implement!
 }
 
-mgbool MGG_OcclusionQuery_GetResult(MGG_GraphicsDevice* device, MGG_OcclusionQuery* query, mgint& pixelCount)
+mgbyte MGG_OcclusionQuery_GetResult(MGG_GraphicsDevice* device, MGG_OcclusionQuery* query, mgint& pixelCount)
 {
 	assert(device != nullptr);
 	assert(query != nullptr);

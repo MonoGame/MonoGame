@@ -25,7 +25,7 @@ public sealed partial class DynamicSoundEffectInstance : SoundEffectInstance
     private unsafe void PlatformPlay()
     {
         if (Voice != null)
-            MGA.Voice_Play(Voice, true);
+            MGA.Voice_Play(Voice, 1);
     }
 
     private unsafe void PlatformPause()
@@ -43,7 +43,7 @@ public sealed partial class DynamicSoundEffectInstance : SoundEffectInstance
     private unsafe void PlatformStop()
     {
         if (Voice != null)
-            MGA.Voice_Stop(Voice, true);
+            MGA.Voice_Stop(Voice, 1);
     }
 
     private unsafe void PlatformSubmitBuffer(byte[] buffer, int offset, int count)

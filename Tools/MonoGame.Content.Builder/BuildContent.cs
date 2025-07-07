@@ -305,6 +305,7 @@ namespace MonoGame.Content.Builder
             _manager = new PipelineManager(projectDirectory, outputPath, intermediatePath);
             _manager.Logger = new ConsoleLogger();
             _manager.CompressContent = CompressContent;
+            _manager.Quiet = Quiet;
 
             // If the intent is to debug build, break at the original location
             // of any exception, eg, within the actual importer/processor.

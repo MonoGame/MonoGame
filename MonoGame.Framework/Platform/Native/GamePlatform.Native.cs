@@ -31,7 +31,8 @@ class NativeGamePlatform : GamePlatform
 
     public unsafe NativeGamePlatform(Game game) : base(game)
     {
-        Handle = MGP.Platform_Create(out GameRunBehavior behavior);
+        GameRunBehavior behavior;
+        Handle = MGP.Platform_Create(out behavior);
 
         DefaultRunBehavior = behavior;
 
@@ -83,7 +84,8 @@ class NativeGamePlatform : GamePlatform
 
     private unsafe void PollEvents()
     {
-        while (MGP.Platform_PollEvent(Handle, out MGP_Event event_))
+        MGP_Event event_;
+        while (MGP.Platform_PollEvent(Handle, out event_) != 0)
         {
             switch (event_.Type)
             {
@@ -290,17 +292,17 @@ class NativeGamePlatform : GamePlatform
 
     public override unsafe bool BeforeRun()
     {        
-        return MGP.Platform_BeforeRun(Handle);
+        return MGP.Platform_BeforeRun(Handle) == 0 ? false : true;
     }
 
     public override unsafe bool BeforeUpdate(GameTime gameTime)
     {
-        return MGP.Platform_BeforeUpdate(Handle);
+        return MGP.Platform_BeforeUpdate(Handle) == 0 ? false : true;
     }
 
     public override unsafe bool BeforeDraw(GameTime gameTime)
     {
-        return MGP.Platform_BeforeDraw(Handle);
+        return MGP.Platform_BeforeDraw(Handle) == 0 ? false : true;
     }
 
     public override unsafe void EnterFullScreen()
@@ -326,7 +328,7 @@ class NativeGamePlatform : GamePlatform
 
     protected override unsafe void OnIsMouseVisibleChanged()
     {
-        MGP.Mouse_SetVisible(Handle, Game.IsMouseVisible);
+        MGP.Mouse_SetVisible(Handle, (byte)(Game.IsMouseVisible ? 1 : 0));
     }
 
     protected unsafe override void Dispose(bool disposing)

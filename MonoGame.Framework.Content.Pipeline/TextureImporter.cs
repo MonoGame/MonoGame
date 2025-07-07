@@ -6,9 +6,7 @@ using System;
 using System.IO;
 using Microsoft.Xna.Framework.Content.Pipeline.Graphics;
 using Microsoft.Xna.Framework.Graphics.PackedVector;
-using FreeImageAPI;
-using MonoGame.Framework.Utilities;
-using StbImageSharp;
+using MonoGame.Framework.Content.Pipeline.Interop;
 
 namespace Microsoft.Xna.Framework.Content.Pipeline
 {
@@ -55,7 +53,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
         /// <summary>
         /// Initializes a new instance of TextureImporter.
         /// </summary>
-        public TextureImporter( )
+        public TextureImporter()
         {
         }
 
@@ -74,139 +72,54 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
             {
                 case ".dds":
                     return DdsLoader.Import(filename, context);
-                case ".bmp":
-                    return LoadImage(filename);
             }
 
             var output = new Texture2DContent { Identity = new ContentIdentity(filename) };
 
-            var format = FreeImage.GetFileType(filename, 0);
-            var fBitmap = FreeImage.Load(format, filename, 0);
-            //if freeimage can not recognize the image type
-            if(format == FREE_IMAGE_FORMAT.FIF_UNKNOWN)
-                throw new ContentLoadException("TextureImporter failed to load '" + filename + "'");
-            //if freeimage can recognize the file headers but can't read its contents
-            else if(fBitmap == IntPtr.Zero)
-                throw new InvalidContentException("TextureImporter couldn't understand the contents of '" + filename + "'", output.Identity);
-            BitmapContent face = null;
-            var height = (int) FreeImage.GetHeight(fBitmap);
-            var width = (int) FreeImage.GetWidth(fBitmap);
-            //uint bpp = FreeImage.GetBPP(fBitmap);
-            var imageType = FreeImage.GetImageType(fBitmap);
-
-            // Swizzle channels and expand to include an alpha channel
-            fBitmap = ConvertAndSwapChannels(fBitmap, imageType);
-
-            // The bits per pixel and image type may have changed
-            uint bpp = FreeImage.GetBPP(fBitmap);
-            imageType = FreeImage.GetImageType(fBitmap);
-            var pitch = (int) FreeImage.GetPitch(fBitmap);
-            var redMask = FreeImage.GetRedMask(fBitmap);
-            var greenMask = FreeImage.GetGreenMask(fBitmap);
-            var blueMask = FreeImage.GetBlueMask(fBitmap);
-
-            // Create the byte array for the data
-            byte[] bytes = new byte[((width * height * bpp - 1) / 8) + 1];
-
-            //Converts the pixel data to bytes, do not try to use this call to switch the color channels because that only works for 16bpp bitmaps
-            FreeImage.ConvertToRawBits(bytes, fBitmap, pitch, bpp, redMask, greenMask, blueMask, true);
-            // Create the Pixel bitmap content depending on the image type
-            switch(imageType)
+            MGCP_Bitmap bitmap = default;
+            IntPtr err = MGCP.MP_ImportBitmap(filename, ref bitmap);
+            if (err != IntPtr.Zero)
             {
-                //case FREE_IMAGE_TYPE.FIT_BITMAP:
-                default:
-                    face = new PixelBitmapContent<Color>(width, height);
-                    break;
-                case FREE_IMAGE_TYPE.FIT_RGBA16:
-                    face = new PixelBitmapContent<Rgba64>(width, height);
-                    break;
-                case FREE_IMAGE_TYPE.FIT_RGBAF:
-                    face = new PixelBitmapContent<Vector4>(width, height);
-                    break;
+                string errorMsg = System.Runtime.InteropServices.Marshal.PtrToStringUTF8(err);
+                throw new InvalidContentException($"TextureImporter failed to load '{filename}': {errorMsg}");
             }
-            FreeImage.Unload(fBitmap);
+            if (bitmap.data == IntPtr.Zero)
+                throw new InvalidContentException($"TextureImporter failed to load '{filename}': native returned null data");
 
+            int width = bitmap.width;
+            int height = bitmap.height;
+            int pixelCount = width * height;
+
+            switch (bitmap.type)
+            {
+                case TextureType.Rgba8:
+                    AddFace<Color>(output, bitmap.data, width, height, pixelCount, 4);
+                    break;
+                case TextureType.Rgba16:
+                    AddFace<Rgba64>(output, bitmap.data, width, height, pixelCount, 8);
+                    break;
+                case TextureType.RgbaF:
+                    AddFace<Vector4>(output, bitmap.data, width, height, pixelCount, 16);
+                    break;
+                default:
+                    throw new InvalidContentException("TextureImporter does not support the specified texture format.");
+            }
+
+            MGCP.MP_FreeBitmap(ref bitmap);
+            return output;
+        }
+
+        /// <summary>
+        /// Adds a face to the texture content with the specified pixel format.
+        /// </summary>
+        private unsafe void AddFace<T>(Texture2DContent output, IntPtr data, int width, int height, int pixelCount, int bytesPerPixel)
+            where T : struct, IEquatable<T>
+        {
+            var face = new PixelBitmapContent<T>(width, height);
+            var bytes = new byte[pixelCount * bytesPerPixel];
+            System.Runtime.InteropServices.Marshal.Copy(data, bytes, 0, bytes.Length);
             face.SetPixelData(bytes);
             output.Faces[0].Add(face);
-            return output;
-        }
-        /// <summary>
-        /// Expands images to have an alpha channel and swaps red and blue channels
-        /// </summary>
-        /// <param name="fBitmap">Image to process</param>
-        /// <param name="imageType">Type of the image for the procedure</param>
-        /// <returns></returns>
-        private static IntPtr ConvertAndSwapChannels(IntPtr fBitmap, FREE_IMAGE_TYPE imageType)
-        {
-            IntPtr bgra;
-            switch(imageType)
-            {
-                // Return BGRA images as is
-
-                case FREE_IMAGE_TYPE.FIT_RGBAF:
-                case FREE_IMAGE_TYPE.FIT_RGBA16:
-                    break;
-
-                // Add an alpha channel to BGRA images without one
-
-                case FREE_IMAGE_TYPE.FIT_RGBF:
-                    bgra = FreeImage.ConvertToType(fBitmap, FREE_IMAGE_TYPE.FIT_RGBAF, true);
-                    FreeImage.Unload(fBitmap);
-                    fBitmap = bgra;
-                    break;
-
-                case FREE_IMAGE_TYPE.FIT_RGB16:
-                    bgra = FreeImage.ConvertToType(fBitmap, FREE_IMAGE_TYPE.FIT_RGBA16, true);
-                    FreeImage.Unload(fBitmap);
-                    fBitmap = bgra;
-                    break;
-
-
-                // Add an alpha channel to RGB images
-                // Swap the red and blue channels of RGBA images
-
-                default:
-                    // Bitmap and other formats are converted to 32-bit by default
-                    bgra = FreeImage.ConvertTo32Bits(fBitmap);
-                    SwitchRedAndBlueChannels(bgra);
-                    FreeImage.Unload(fBitmap);
-                    fBitmap = bgra;
-                    break;
-            }
-
-            return fBitmap;
-        }
-        /// <summary>
-        /// Switches the red and blue channels
-        /// </summary>
-        /// <param name="fBitmap">image</param>
-        private static void SwitchRedAndBlueChannels(IntPtr fBitmap)
-        {
-            var r = FreeImage.GetChannel(fBitmap, FREE_IMAGE_COLOR_CHANNEL.FICC_RED);
-            var b = FreeImage.GetChannel(fBitmap, FREE_IMAGE_COLOR_CHANNEL.FICC_BLUE);
-            FreeImage.SetChannel(fBitmap, b, FREE_IMAGE_COLOR_CHANNEL.FICC_RED);
-            FreeImage.SetChannel(fBitmap, r, FREE_IMAGE_COLOR_CHANNEL.FICC_BLUE);
-            FreeImage.Unload(r);
-            FreeImage.Unload(b);
-        }
-
-        // Loads BMP using StbSharp. This allows us to load BMP files containing BITMAPV4HEADER and BITMAPV5HEADER
-        // structures, which FreeImage does not support.
-        TextureContent LoadImage(string filename)
-        {
-            var output = new Texture2DContent { Identity = new ContentIdentity(filename) };
-
-            ImageResult result;
-            using (var stream = File.Open(filename, FileMode.Open, FileAccess.Read, FileShare.Read))
-            {
-                result = ImageResult.FromStream(stream, ColorComponents.RedGreenBlueAlpha);
-            }
-
-            var face = new PixelBitmapContent<Color>(result.Width, result.Height);
-            face.SetPixelData(result.Data);
-            output.Faces[0].Add(face);
-
-            return output;
         }
     }
 }

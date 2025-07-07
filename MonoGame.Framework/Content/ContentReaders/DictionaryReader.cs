@@ -8,19 +8,26 @@ using MonoGame.Framework.Utilities;
 
 namespace Microsoft.Xna.Framework.Content
 {
-
-    internal class DictionaryReader<TKey, TValue> : ContentTypeReader<Dictionary<TKey, TValue>>
+    /// <summary>
+    /// This type is not meant to be used directly by MonoGame users.
+    /// Its purpose is to allow to work-around AOT issues when loading assets with the ContentManager fail due to the absence of runtime-reflection support in that context (i.e. missing types due to trimming and inability to statically discover them at compile-time).
+    /// If ContentManager.Load() throws an NotSupportedExeception, the message should provide insights on how to fix it.
+    /// </summary>
+    [System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.All)]
+    public class DictionaryReader<TKey, TValue> : ContentTypeReader<Dictionary<TKey, TValue>>
     {
         ContentTypeReader keyReader;
 		ContentTypeReader valueReader;
 		
 		Type keyType;
 		Type valueType;
-		
+
+        /// <summary/>
         public DictionaryReader()
         {
         }
 
+        /// <summary/>
         protected internal override void Initialize(ContentTypeReaderManager manager)
         {
 			keyType = typeof(TKey);
@@ -30,11 +37,13 @@ namespace Microsoft.Xna.Framework.Content
 			valueReader = manager.GetTypeReader(valueType);
         }
 
+        /// <summary/>
         public override bool CanDeserializeIntoExistingObject
         {
             get { return true; }
         }
 
+        /// <summary/>
         protected internal override Dictionary<TKey, TValue> Read(ContentReader input, Dictionary<TKey, TValue> existingInstance)
         {
             int count = input.ReadInt32();

@@ -27,7 +27,9 @@ namespace Microsoft.Xna.Framework
         /// Returns an open stream to an existing file in the title storage area.
         /// </summary>
         /// <param name="name">The filepath relative to the title storage area.</param>
-        /// <returns>A open stream or null if the file is not found.</returns>
+        /// <returns>An open stream if file is found.</returns>
+        /// <exception cref="ArgumentNullException">If name is null or invalid.</exception>
+        /// <exception cref="FileNotFoundException">If file is not found.</exception>
         public static Stream OpenStream(string name)
         {
             if (string.IsNullOrEmpty(name))
@@ -59,6 +61,30 @@ namespace Microsoft.Xna.Framework
             }
 
             return stream;
+        }
+
+        /// <summary>
+        /// Faster version of <see cref="OpenStream"/> as it doesn't rely on exceptions in error cases.
+        /// </summary>
+        internal static Stream OpenStreamNoException(string name)
+        {
+            if (string.IsNullOrEmpty(name) || Path.IsPathRooted(name))
+            {
+                return null;
+            }
+
+            string safeName = NormalizeRelativePath(name);
+            Stream stream;
+            try
+            {
+                stream = PlatformOpenStream(safeName);
+                
+                return stream;
+            }
+            catch (Exception ex)
+            {
+                return null;
+            }
         }
 
         private static Exception FileNotFoundException(string name, Exception inner)

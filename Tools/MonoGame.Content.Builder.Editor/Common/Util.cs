@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Diagnostics;
 using System.IO;
 using System.Runtime.InteropServices;
+using System.Text;
 
 namespace MonoGame.Tools.Pipeline
 {
@@ -45,6 +47,43 @@ namespace MonoGame.Tools.Pipeline
             result = Uri.UnescapeDataString(result);
 
             return result;
+        }
+
+        public static int Run(string command, string arguments, string workingDirectory)
+        {
+            var process = CreateProcess(command, arguments, workingDirectory, Encoding.UTF8, (s) => Console.WriteLine(s));
+            process.Start();
+            process.BeginOutputReadLine();
+            process.WaitForExit();
+            return process.ExitCode;
+        }
+
+        public static Process CreateProcess(string command, string arguments, string workingDirectory, Encoding encoding, Action<string> output)
+        {
+            var exe = command;
+            var args = arguments;
+            if (command.EndsWith(".dll"))
+            {
+                // we are referencing the dll directly. We need to call dotnet to host.
+                exe = Global.Unix ? "dotnet" : "dotnet.exe";
+                args = $"\"{command}\" {arguments}";
+            }
+            var _buildProcess = new Process
+            {
+                StartInfo = new ProcessStartInfo
+                {
+                    FileName = exe,
+                    Arguments = args,
+                    WorkingDirectory = workingDirectory,
+                    CreateNoWindow = true,
+                    WindowStyle = ProcessWindowStyle.Hidden,
+                    UseShellExecute = false,
+                    RedirectStandardOutput = true,
+                    StandardOutputEncoding = encoding
+                }
+            };
+            _buildProcess.OutputDataReceived += (sender, args) => output(args.Data);
+            return _buildProcess;
         }
     }
 }

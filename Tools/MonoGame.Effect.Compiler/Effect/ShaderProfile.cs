@@ -5,10 +5,12 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
-using Microsoft.Xna.Framework.Content.Pipeline;
+using System.Threading;
 using MonoGame.Effect.TPGParser;
 
 namespace MonoGame.Effect

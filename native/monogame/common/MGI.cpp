@@ -22,7 +22,7 @@
 #include "stb_image_write.h"
 
 
-void MGI_ReadRGBA(mgbyte* data, mgint dataBytes, mgbool zeroTransparentPixels, mgint& width, mgint& height, mgbyte*& rgba)
+void MGI_ReadRGBA(mgbyte* data, mgint dataBytes, mgbyte zeroTransparentPixels, mgint& width, mgint& height, mgbyte*& rgba)
 {
 	width = 0;
 	height = 0;

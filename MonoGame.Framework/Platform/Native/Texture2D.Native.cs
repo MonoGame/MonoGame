@@ -44,7 +44,7 @@ public partial class Texture2D : Texture
         var dataHandle = GCHandle.Alloc(data, GCHandleType.Pinned);
         var elementSizeInByte = ReflectionHelpers.FastSizeOf<T>();
         var startBytes = startIndex * elementSizeInByte;
-        var dataPtr = (IntPtr)(dataHandle.AddrOfPinnedObject().ToInt64() + startBytes);
+        var dataPtr = (nint)(dataHandle.AddrOfPinnedObject().ToInt64() + startBytes);
 
         unsafe
         {
@@ -71,7 +71,7 @@ public partial class Texture2D : Texture
         var dataHandle = GCHandle.Alloc(data, GCHandleType.Pinned);
         var elementSizeInByte = ReflectionHelpers.FastSizeOf<T>();
         var startBytes = startIndex * elementSizeInByte;
-        var dataPtr = (IntPtr)(dataHandle.AddrOfPinnedObject().ToInt64() + startBytes);
+        var dataPtr = (nint)(dataHandle.AddrOfPinnedObject().ToInt64() + startBytes);
 
         unsafe
         {
@@ -98,7 +98,7 @@ public partial class Texture2D : Texture
         var dataHandle = GCHandle.Alloc(data, GCHandleType.Pinned);
         var elementSizeInByte = ReflectionHelpers.FastSizeOf<T>();
         var startBytes = startIndex * elementSizeInByte;
-        var dataPtr = (IntPtr)(dataHandle.AddrOfPinnedObject().ToInt64() + startBytes);
+        var dataPtr = (nint)(dataHandle.AddrOfPinnedObject().ToInt64() + startBytes);
 
         MGG.Texture_GetData(
             GraphicsDevice.Handle,
@@ -140,7 +140,7 @@ public partial class Texture2D : Texture
             MGI.ReadRGBA(
                 (byte*)handle.AddrOfPinnedObject(),
                 dataLength,
-                colorProcessor == null ? true : false,
+                (byte)(colorProcessor == null ? 1 : 0),
                 out width,
                 out height,
                 out rgba);
@@ -154,7 +154,7 @@ public partial class Texture2D : Texture
         }
 
         var texture = new Texture2D(graphicsDevice, width, height);
-        var rgbaBytes = width * height;
+        var rgbaBytes = (width * height) * 4;
 
         if (colorProcessor == null)
         {
@@ -240,7 +240,7 @@ public partial class Texture2D : Texture
             MGI.ReadRGBA(
                 (byte*)handle.AddrOfPinnedObject(),
                 dataLength,
-                true,
+                1,
                 out width,
                 out height,
                 out rgba);

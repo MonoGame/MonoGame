@@ -27,7 +27,7 @@ partial class OcclusionQuery
 
     private unsafe bool PlatformGetResult(out int pixelCount)
     {
-        return MGG.OcclusionQuery_GetResult(GraphicsDevice.Handle, Handle, out pixelCount);
+        return MGG.OcclusionQuery_GetResult(GraphicsDevice.Handle, Handle, out pixelCount) == 0 ? false : true;
     }
 
     protected unsafe override void Dispose(bool disposing)

@@ -35,7 +35,7 @@ public partial class IndexBuffer
         var elementSizeInBytes = ReflectionHelpers.FastSizeOf<T>();
         var startBytes = startIndex * elementSizeInBytes;
         var dataHandle = GCHandle.Alloc(data, GCHandleType.Pinned);
-        var dataPtr = (IntPtr)(dataHandle.AddrOfPinnedObject().ToInt64() + startBytes);
+        var dataPtr = (nint)(dataHandle.AddrOfPinnedObject().ToInt64() + startBytes);
         var dataStride = IndexElementSize == IndexElementSize.SixteenBits ? 2 : 4;
 
         MGG.Buffer_GetData(GraphicsDevice.Handle, Handle, offsetInBytes, (byte*)dataPtr, elementCount, elementSizeInBytes, dataStride);
@@ -49,7 +49,7 @@ public partial class IndexBuffer
         var startBytes = startIndex * elementSizeInBytes;
         var dataBytes = elementCount * elementSizeInBytes;
         var dataHandle = GCHandle.Alloc(data, GCHandleType.Pinned);
-        var dataPtr = (IntPtr)(dataHandle.AddrOfPinnedObject().ToInt64() + startBytes);
+        var dataPtr = (nint)(dataHandle.AddrOfPinnedObject().ToInt64() + startBytes);
 
         // TODO: We need to figure out the correct behavior 
         // for SetDataOptions.None on a dynamic buffer.
@@ -58,7 +58,7 @@ public partial class IndexBuffer
         //
         var discard = _isDynamic && options != SetDataOptions.NoOverwrite;
 
-        MGG.Buffer_SetData(GraphicsDevice.Handle, ref Handle, offsetInBytes, (byte*)dataPtr, dataBytes, discard);
+        MGG.Buffer_SetData(GraphicsDevice.Handle, ref Handle, offsetInBytes, (byte*)dataPtr, dataBytes, (byte)(discard ? 1 : 0));
 
         dataHandle.Free();
     }

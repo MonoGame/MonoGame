@@ -92,12 +92,6 @@ namespace MonoGame.Tests.ContentPipeline
             ImportStandard("Assets/Textures/LogoOnly_64px.tga", SurfaceFormat.Color, 64);
         }
 
-        [Test]
-        public void ImportTif( )
-        {
-            ImportStandard("Assets/Textures/LogoOnly_64px.tif", SurfaceFormat.Color, 64);
-        }
-
         /// <summary>
         /// This test tries to load a tiff file encoded in rgbf, but freeimage seems to be failing to read files with this encoding
         /// Might be necessary to modify this test with future updates of freeimage.
@@ -105,9 +99,6 @@ namespace MonoGame.Tests.ContentPipeline
         /// Note that the image was created with Freeimage from a bitmap
         /// </summary>
         [Test]
-#if MACOS || LINUX
-        [Ignore("Does not work on Unix based systems. Its odd the test passes?")]
-#endif
         public void ImportImageWithBadContent( )
         {
             Assert.Throws(typeof(InvalidContentException), ( ) => ImportStandard("Assets/Textures/rgbf.tif", SurfaceFormat.Vector4, 64));
