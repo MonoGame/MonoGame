@@ -13,6 +13,7 @@
 
 
 
-MG_EXPORT void MGI_ReadRGBA(mgbyte* data, mgint dataBytes, mgbyte zeroTransparentPixels, mgint& width, mgint& height, mgbyte*& rgba);
-MG_EXPORT void MGI_WriteJpg(mgbyte* data, mgint dataBytes, mgint width, mgint height, mgint quality, mgbyte*& jpg, mgint& jpgBytes);
-MG_EXPORT void MGI_WritePng(mgbyte* data, mgint dataBytes, mgint width, mgint height, mgbyte*& png, mgint& pngBytes);
+MG_EXPORT void* MP_ImportBitmap(const char* importPath, MGCP_Bitmap& bitmap);
+MG_EXPORT void MP_FreeBitmap(MGCP_Bitmap& bitmap);
+MG_EXPORT void* MP_ResizeBitmap(MGCP_Bitmap& srcBitmap, MGCP_Bitmap& dstBitmap);
+MG_EXPORT void* MP_ExportBitmap(MGCP_Bitmap& bitmap, const char* exportPath);

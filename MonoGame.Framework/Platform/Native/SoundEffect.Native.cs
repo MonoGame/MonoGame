@@ -160,6 +160,6 @@ public sealed partial class SoundEffect
             WetDryMixPct = reverbSettings.WetDryMixPct
         };
 
-        MGA.System_SetReverbSettings(System, &settings);
+        MGA.System_SetReverbSettings(System, in settings);
     }
 }
