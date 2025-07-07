@@ -1969,27 +1969,31 @@ namespace Microsoft.Xna.Framework
         /// </summary>
         /// <param name="h">Hue component value from 0.0f to 360.0f</param>
         /// <param name="s">Saturation component</param>
-        private void ToHS(out float h, out float s)
+        private void ToHS(out float h, out float s, out double max, out double min)
         {
-            double r = R / 255.0;
-            double g = G / 255.0;
-            double b = B / 255.0;
+            double r = R / 255f;
+            double g = G / 255f;
+            double b = B / 255f;
 
-            double max = Math.Max(Math.Max(r, g), b);
-            double min = Math.Min(Math.Min(r, g), b);
+            max = Math.Max(r, Math.Max(g, b));
+            min = Math.Min(r, Math.Min(g, b));
             double delta = max - min;
 
-            // calculating hue
-            h = 0.0f;
-            if (max == r)
-                h = (float)((60.0 * ((g - b) / delta) + 360.0) % 360.0);
-            else if (max == g)
-                h = (float)((60.0 * ((b - r) / delta) + 360.0) % 360.0);
-            else if (max == b)
-                h = (float)((60.0 * ((r - g) / delta) + 360.0) % 360.0);
 
+            // calculating hue
+            if (delta == 0f)
+                h = 0.0f;
+            else if (max == r)
+                h = (float)(60.0 * (((g - b) / delta) % 6.0));
+            else if (max == g)
+                h = (float)(60.0 * (((b - r) / delta) + 2.0));
+            else
+                h = (float)((60.0 * (((r - g) / delta)) + 4.0));
+
+            if (h < 0.0f)
+                h += 360.0f;
             // calculating saturation
-            s = 0.0f;
+                s = 0.0f;
             if (max != 0.0)
                 s = (float)((delta / max) * 100.0);
             
@@ -1998,29 +2002,31 @@ namespace Microsoft.Xna.Framework
         /// Converts <see cref="Color"/> into HSL components.
         /// </summary>
         /// <param name="h">Hue component from 0.0f to 360.0f.</param>
-        /// <param name="s">Saturation component from 0.0f to 1.0f.</param>
-        /// <param name="l">Luminosity (or brightness) component from 0.0f to 1.0f.</param>
+        /// <param name="s">Saturation component from 0.0f to 100.0f.</param>
+        /// <param name="l">Luminosity (or brightness) component from 0.0f to 100.0f.</param>
         public void ToHSL(out float h, out float s, out float l)
         {
-            ToHS(h, s);
+            double max, min;
+            ToHS(out h, out s, out max, out min);
 
             // luminosity
-            l = (float)((max + min) / 2.0);
+            l = (float)((max + min) / 2.0) * 100.0f;
         }
 
         /// <summary>
         /// Converts <see cref="Color"/> into HSV components 
         /// </summary>
         /// <param name="h">Hue component value from 0.0f to 360.0f</param>
-        /// <param name="s">Saturation component value from 0.0f to 1.0f</param>
-        /// <param name="v">Value component value from 0.0f to 1.0f</param>
+        /// <param name="s">Saturation component value from 0.0f to 100.0f</param>
+        /// <param name="v">Value component value from 0.0f to 100.0f</param>
         public void ToHSV(out float h, out float s, out float v)
         {
-            ToHS(h, s);
+            double max, min;
+            ToHS(out h, out s, out max, out min);
 
             // value
             v = (float)(max * 100.0);
-        }
+        } 
 
         /// <summary>
         /// Converts the Hue value to either an R, G or B value
@@ -2045,11 +2051,13 @@ namespace Microsoft.Xna.Framework
         /// Creates a <see cref="Color"/> from HSL values
         /// </summary>
         /// <param name="h">Hue component value, from 0.0f to 360.0f</param>
-        /// <param name="s">Saturation component value, from 0.0f to 1.0f</param>
-        /// <param name="l">Luminosity (brightness) component value, from 0.0f to 1.0f</param>
+        /// <param name="s">Saturation component value, from 0.0f to 100.0f</param>
+        /// <param name="l">Luminosity (brightness) component value, from 0.0f to 100.0f</param>
         /// <returns><see cref="Color"/> with the HSL values</returns>
         public Color FromHSL(float h, float s, float l)
         {
+            s /= 100;
+            l /= 100;
             //converting hue to be between 1 and 0
             h /= 360.0f;
             h %= 1;
@@ -2087,45 +2095,58 @@ namespace Microsoft.Xna.Framework
         /// <returns><see cref="Color"/> with the HSV values</returns>
         public Color FromHSV(float h, float s, float v)
         {
-            float r, g, b; //defining values for easier colour conversion at end
+            //defining values for easier colour conversion at end
+            float r = 0f;
+            float g = 0f;
+            float b = 0f;
 
-            h /= 360.0f;
+            h %= 360.0f;
+            s /= 100;
+            v /= 100;
 
+            if (s == 0)
+                r = g = b = v;
             //working out which segment of colour wheel the hue is.
-            int i = (int)(h * 6.0f);
-            int f = (int)(h * 6.0f) - i;
-            i = i % 6;
+            int i = (int)(h / 60.0f);
+            int f = (int)(h / 60.0f) - i;
             float p = v * (1.0f - s);
             float q = v * (1.0f - s * f);
             float t = v * (1.0f - s * (1.0f - f));
 
             switch (i)
             {
-                case 1:
+                case 0:
                     r = v;
                     g = t;
                     b = p;
                     break;
-                case 2:
+                case 1:
                     r = q;
                     g = v;
                     b = p;
                     break;
-                case 3:
+                case 2:
                     r = p;
                     g = v;
                     b = t;
+                    break;
+                case 3:
+                    r = p;
+                    g = q;
+                    b = v;
                     break;
                 case 4:
                     r = t;
                     g = p;
                     b = v;
                     break;
-                case 5:
+                default:
                     r = v;
                     g = p;
                     b = q;
                     break;
+                     
+
             }
 
             return new Color(r, g, b);
