@@ -55,6 +55,9 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
         public override ContentIdentity SourceIdentity { get { return new ContentIdentity(_pipelineEvent.SourceFile); } }
 
         /// <inheritdoc/>
+        public override string ProjectDirectory { get { return _manager.ProjectDirectory; } }
+
+        /// <inheritdoc/>
         public override void AddDependency(string filename)
         {
             _pipelineEvent.Dependencies.AddUnique(filename);

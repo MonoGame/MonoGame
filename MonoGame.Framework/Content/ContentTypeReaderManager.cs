@@ -61,12 +61,12 @@ namespace Microsoft.Xna.Framework.Content
             AddTypeCreator(typeof(DoubleReader).FullName, () => new DoubleReader());
             AddTypeCreator(typeof(DualTextureEffectReader).FullName, () => new DualTextureEffectReader());
             AddTypeCreator(typeof(EffectMaterialReader).FullName, () => new EffectMaterialReader());
-            AddTypeCreator(typeof(EffectReader).FullName, () => new EffectReader());
+            AddTypeCreator(typeof(EffectReader).FullName + ", " + _assemblyName, () => new EffectReader());
             AddTypeCreator(typeof(EnumReader<Graphics.SpriteEffects>).FullName, () => new EnumReader<Graphics.SpriteEffects>());
             AddTypeCreator(typeof(EnumReader<Graphics.Blend>).FullName, () => new EnumReader<Graphics.Blend>());
             AddTypeCreator(typeof(EnvironmentMapEffectReader).FullName, () => new EnvironmentMapEffectReader());
-            AddTypeCreator(typeof(ExternalReferenceReader).FullName, () => new ExternalReferenceReader());
-            AddTypeCreator(typeof(IndexBufferReader).FullName, () => new IndexBufferReader());
+            AddTypeCreator(typeof(ExternalReferenceReader).FullName + ", " + _assemblyName, () => new ExternalReferenceReader());
+            AddTypeCreator(typeof(IndexBufferReader).FullName + ", " + _assemblyName, () => new IndexBufferReader());
             AddTypeCreator(typeof(Int16Reader).FullName, () => new Int16Reader());
             AddTypeCreator(typeof(Int32Reader).FullName, () => new Int32Reader());
             AddTypeCreator(typeof(Int64Reader).FullName, () => new Int64Reader());
@@ -96,7 +96,7 @@ namespace Microsoft.Xna.Framework.Content
             AddTypeCreator(typeof(SkinnedEffectReader).FullName, () => new SkinnedEffectReader());
             AddTypeCreator(typeof(SongReader).FullName, () => new SongReader());
             AddTypeCreator(typeof(SoundEffectReader).FullName, () => new SoundEffectReader());
-            AddTypeCreator(typeof(SpriteFontReader).FullName, () => new SpriteFontReader());
+            AddTypeCreator(typeof(SpriteFontReader).FullName + ", " + _assemblyName, () => new SpriteFontReader());
             AddTypeCreator(typeof(StringReader).FullName, () => new StringReader());
             AddTypeCreator(typeof(Texture2DReader).FullName, () => new Texture2DReader());
             AddTypeCreator(typeof(Texture3DReader).FullName, () => new Texture3DReader());
@@ -153,7 +153,6 @@ namespace Microsoft.Xna.Framework.Content
                 for (var i = 0; i < numberOfReaders; i++)
                 {
                     // This string tells us what reader we need to decode the following data
-                    // string readerTypeString = reader.ReadString();
                     string originalReaderTypeString = reader.ReadString();
 
                     Func<ContentTypeReader> readerFunc;
@@ -164,8 +163,6 @@ namespace Microsoft.Xna.Framework.Content
                     }
                     else
                     {
-                        //System.Diagnostics.Debug.WriteLine(originalReaderTypeString);
-
                         // Need to resolve namespace differences
                         string readerTypeString = originalReaderTypeString;
 
@@ -174,14 +171,16 @@ namespace Microsoft.Xna.Framework.Content
                         Type l_readerType = null;
                         try
                         {
-                            // this might fail in AOT context and we need to properly warn the user on what to do if it happens
+                            // This might fail in AOT context and we need to properly warn the user on what to do if it happens
 #pragma warning disable IL2057
                             l_readerType = Type.GetType(readerTypeString);
 #pragma warning restore IL2057
                         }
                         catch (NotSupportedException e)
                         {
-                            throw new NotSupportedException("It seems that you are using PublishAot and trying to load assets with a reflection-based serializer (which is not natively supported). To work around this error, call ContentTypeReaderManager.AddTypeCreator() in your Game constructor with the type mentionned in the following message: " + e.Message);
+                            // This will not trigger on recent NativeAOT versions, it will crash later on GetDefaultConstructor() with a native access violation
+                            // but we keep this catch block for backward compatibility with older NativeAOT
+                            throw new NotSupportedException("It seems that you are using PublishAot and trying to load assets with a reflection-based serializer (which is not natively supported). To work around this error, call ContentTypeReaderManager.AddTypeCreator() in your Game constructor with the following type: " + originalReaderTypeString);
                         }
 
                         if (l_readerType != null)
@@ -200,6 +199,11 @@ namespace Microsoft.Xna.Framework.Content
                                     throw new InvalidOperationException(
                                         "Failed to get default constructor for ContentTypeReader. To work around, add a creation function to ContentTypeReaderManager.AddTypeCreator() " +
                                         "with the following failed type string: " + originalReaderTypeString, ex);
+                                }
+                                // Catching non-CLS compliant exceptions to catch native exceptions like Access Violations on NativeAOT
+                                catch
+                                {
+                                    throw new NotSupportedException("It seems that you are using PublishAot and trying to load assets with a reflection-based serializer (which is not natively supported). To work around this error, call ContentTypeReaderManager.AddTypeCreator() in your Game constructor with the following type: " + originalReaderTypeString);
                                 }
 
                                 needsInitialize[i] = true;

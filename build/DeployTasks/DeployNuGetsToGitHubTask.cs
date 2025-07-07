@@ -2,7 +2,7 @@
 namespace BuildScripts;
 
 [TaskName("DeployNuGetsToGithub")]
-[IsDependentOn(typeof(DownloadArtifactsTask))]
+[IsDependentOn(typeof(PackContentPipelineTask))]
 public sealed class DeployNuGetsToGitHubTask : FrostingTask<BuildContext>
 {
     public override bool ShouldRun(BuildContext context) => context.BuildSystem().IsRunningOnGitHubActions;

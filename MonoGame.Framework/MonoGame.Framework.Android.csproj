@@ -11,15 +11,11 @@
     <PackageId>MonoGame.Framework.Android</PackageId>
     <AppendTargetFrameworkToOutputPath>False</AppendTargetFrameworkToOutputPath>
     <IsAotCompatible>true</IsAotCompatible>
-    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageReadmeFile>README-packages.md</PackageReadmeFile>
   </PropertyGroup>
 
   <ItemGroup>
-    <None Include="..\README.md" Pack="true" PackagePath="\"/>
-  </ItemGroup>
-
-  <ItemGroup>
-    <PackageReference Include="MonoGame.Library.OpenAL" Version="1.23.1.10" />
+    <None Include="..\README-packages.md" Pack="true" PackagePath="\"/>
   </ItemGroup>
 
   <ItemGroup>
@@ -70,11 +66,7 @@
     <Compile Include="Platform\Input\MessageBox.Android.cs" />
     <Compile Include="Platform\Input\Mouse.Default.cs" />
     <Compile Include="Platform\Input\MouseCursor.Default.cs" />
-    <Compile Include="Platform\Media\MediaLibrary.Android.cs" />
     <Compile Include="Platform\Media\MediaPlayer.Default.cs" />
-    <Compile Include="Platform\Media\Song.Android.cs" />
-    <Compile Include="Platform\Media\Video.Android.cs" />
-    <Compile Include="Platform\Media\VideoPlayer.Android.cs" />
     <Compile Include="Platform\PrimaryThreadLoader.cs" />
     <Compile Include="Platform\TitleContainer.Android.cs" />
     <Compile Include="Platform\Utilities\FuncLoader.Android.cs" />
