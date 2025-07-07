@@ -2040,14 +2040,20 @@ namespace Microsoft.Xna.Framework
             else
                 return c;
         }
-
-
+        
+        /// <summary>
+        /// Creates a <see cref="Color"/> from HSL values
+        /// </summary>
+        /// <param name="h">Hue component value, from 0.0f to 360.0f</param>
+        /// <param name="s">Saturation component value, from 0.0f to 1.0f</param>
+        /// <param name="l">Luminosity (brightness) component value, from 0.0f to 1.0f</param>
+        /// <returns><see cref="Color"/> with the HSL values</returns>
         public Color FromHSL(float h, float s, float l)
         {
             //converting hue to be between 1 and 0
             h /= 360.0f;
             h %= 1;
-            
+
             float r, g, b; //defining values for easier colour conversion at end
 
             if (s == 0)
@@ -2078,7 +2084,7 @@ namespace Microsoft.Xna.Framework
         /// <param name="h">Hue component value, ranging from 0.0f to 360.0f</param>
         /// <param name="s">Saturation component value, ranging from 0.0f to 1.0f</param>
         /// <param name="v">Value component value, ranging from 0.0f to 1.0f</param>
-        /// <returns></returns>
+        /// <returns><see cref="Color"/> with the HSV values</returns>
         public Color FromHSV(float h, float s, float v)
         {
             float r, g, b; //defining values for easier colour conversion at end
