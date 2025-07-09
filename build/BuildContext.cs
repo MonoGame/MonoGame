@@ -12,6 +12,7 @@ public enum ProjectType
     Templates,
     Tests,
     ContentPipeline,
+    DevTools,
     MGCBEditor,
     MGCBEditorLauncher
 }
@@ -125,6 +126,7 @@ public class BuildContext : FrostingContext
         ProjectType.Templates => $"external/MonoGame.Templates/CSharp/{id}.csproj",
         ProjectType.Tests => $"Tests/{id}.csproj",
         ProjectType.ContentPipeline => "MonoGame.Framework.Content.Pipeline/MonoGame.Framework.Content.Pipeline.csproj",
+        ProjectType.DevTools => "src/MonoGame.Framework.DevTools/MonoGame.Framework.DevTools.csproj",
         ProjectType.MGCBEditor => $"Tools/MonoGame.Content.Builder.Editor/MonoGame.Content.Builder.Editor.{id}.csproj",
         ProjectType.MGCBEditorLauncher => $"Tools/MonoGame.Content.Builder.Editor.Launcher/MonoGame.Content.Builder.Editor.Launcher.{id}.csproj",
         _ => throw new ArgumentOutOfRangeException(nameof(type))
