@@ -5,6 +5,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -26,10 +27,15 @@ namespace Microsoft.Xna.Framework.Storage
         private readonly PlayerIndex? _playerIndex;
 
         // In memory container
+        // Use relative file names as keys
         private Dictionary<string, byte[]> _containers;
         private List<string> _isContainerDirty;
         private object _processingLock;
         private bool _isProcessing;
+
+        // In-memory directory tracking
+        // Use relative directory names as keys
+        private readonly HashSet<string> _directories = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
         /// <summary>
         /// Gets a bool value indicating whether the instance has been disposed.
@@ -355,27 +361,21 @@ namespace Microsoft.Xna.Framework.Storage
         }
 
         /// <summary>
-        /// Loads data for the specified containers asynchronously.
+        /// Loads the container's data from persistent storage (disk).
         /// </summary>
-        private void LoadData()
+        public void LoadData()
         {
             if (string.IsNullOrEmpty(_containerName))
                 return;
 
             _isProcessing = true;
 
-            Task.Factory.StartNew(() =>
+            lock (_processingLock)
             {
-                lock (_processingLock)
-                {
-                    ReadContainer();
+                ReadContainer();
 
-                    _isProcessing = false;
-                }
-            },
-            CancellationToken.None,
-            TaskCreationOptions.None,
-            TaskScheduler.Default);
+                _isProcessing = false;
+            }
         }
 
         /// <summary>
@@ -388,28 +388,12 @@ namespace Microsoft.Xna.Framework.Storage
 
             _isProcessing = true;
 
-            Task.Factory.StartNew(() =>
+            lock (_processingLock)
             {
-                lock (_processingLock)
-                {
-                    WriteContainer();
+                WriteContainer();
 
-                    _isProcessing = false;
-                }
-            },
-            CancellationToken.None,
-            TaskCreationOptions.None,
-            TaskScheduler.Default);
-        }
-
-        /// <summary>
-        /// Reads data from the platform's storage and populates the container dictionary.
-        /// </summary>
-        private void ReadContainer()
-        {
-            byte[] data = PlatformReadContainer(true);
-
-            SetContainerData(data);
+                _isProcessing = false;
+            }
         }
 
         /// <summary>
@@ -420,56 +404,110 @@ namespace Microsoft.Xna.Framework.Storage
             if (_containers == null)
                 return;
 
-            int byteCount = 1; // First byte is the number of containers
-
-            foreach (string key in _containers.Keys)
+            // Serialize directories and files
+            // Format: [dirCount][dirLen][dirName]...[fileCount][fileNameLen][fileName][fileDataLen][fileData]...
+            lock (_processingLock)
             {
-                byteCount += 4; // 2 bytes for data length + 2 bytes for name length
-                byteCount += Encoding.Unicode.GetByteCount(key); // Name data
-                if (_containers[key] != null)
-                    byteCount += _containers[key].Length;
-            }
+                var dirList = (_directories != null) ? _directories.ToList() : new List<string>();
+                var fileList = _containers.Keys.ToList();
 
-            byte[] data = new byte[byteCount];
-
-            int currentByte = 0;
-
-            data[currentByte] = (byte)_containers.Keys.Count;
-            currentByte++;
-
-            foreach (string key in _containers.Keys)
-            {
-                // Data length
-                int dataLength = 0;
-                if (_containers[key] != null)
+                int byteCount = 1; // 1 byte for dir count
+                foreach (var dir in dirList)
                 {
-                    dataLength = _containers[key].Length;
+                    byteCount += 2; // dir name length
+                    byteCount += Encoding.Unicode.GetByteCount(dir);
                 }
-                data[currentByte] = (byte)(dataLength & 0x00FF);
-                data[currentByte + 1] = (byte)((dataLength & 0xFF00) >> 8);
-                currentByte += 2;
+                byteCount += 1; // 1 byte for file count
+                foreach (var file in fileList)
+                {
+                    byteCount += 2; // file name length
+                    byteCount += Encoding.Unicode.GetByteCount(file);
+                    byteCount += 4; // file data length (int)
+                    if (_containers[file] != null)
+                        byteCount += _containers[file].Length;
+                }
 
-                // Name length
-                int nameLength = Encoding.Unicode.GetByteCount(key);
-                data[currentByte] = (byte)(nameLength & 0x00FF);
-                data[currentByte + 1] = (byte)((nameLength & 0xFF00) >> 8);
-                currentByte += 2;
+                byte[] data = new byte[byteCount];
+                int currentByte = 0;
 
-                // Name data
-                Array.Copy(Encoding.Unicode.GetBytes(key), 0, data, currentByte, nameLength);
-                currentByte += nameLength;
+                // Directories
+                data[currentByte++] = (byte)dirList.Count;
+                foreach (var dir in dirList)
+                {
+                    int nameLen = Encoding.Unicode.GetByteCount(dir);
+                    data[currentByte++] = (byte)(nameLen & 0xFF);
+                    data[currentByte++] = (byte)((nameLen >> 8) & 0xFF);
+                    Array.Copy(Encoding.Unicode.GetBytes(dir), 0, data, currentByte, nameLen);
+                    currentByte += nameLen;
+                }
 
-                // Container data
-                if (_containers[key] != null)
-                    Array.Copy(_containers[key], 0, data, currentByte, dataLength);
-                currentByte += dataLength;
+                // Files
+                data[currentByte++] = (byte)fileList.Count;
+                foreach (var file in fileList)
+                {
+                    int nameLen = Encoding.Unicode.GetByteCount(file);
+                    data[currentByte++] = (byte)(nameLen & 0xFF);
+                    data[currentByte++] = (byte)((nameLen >> 8) & 0xFF);
+                    Array.Copy(Encoding.Unicode.GetBytes(file), 0, data, currentByte, nameLen);
+                    currentByte += nameLen;
+                    int fileLen = _containers[file]?.Length ?? 0;
+                    data[currentByte++] = (byte)(fileLen & 0xFF);
+                    data[currentByte++] = (byte)((fileLen >> 8) & 0xFF);
+                    data[currentByte++] = (byte)((fileLen >> 16) & 0xFF);
+                    data[currentByte++] = (byte)((fileLen >> 24) & 0xFF);
+                    if (fileLen > 0)
+                    {
+                        Array.Copy(_containers[file], 0, data, currentByte, fileLen);
+                        currentByte += fileLen;
+                    }
+                    if (_isContainerDirty.Contains(file))
+                        _isContainerDirty.Remove(file);
+                }
 
-                // Clear dirty flag
-                if (_isContainerDirty.Contains(key))
-                    _isContainerDirty.Remove(key);
+                PlatformWriteContainer(data, true);
             }
+        }
 
-            PlatformWriteContainer(data, true);
+        /// <summary>
+        /// Reads data from the platform's storage and populates the container dictionary.
+        /// </summary>
+        private void ReadContainer()
+        {
+            byte[] data = PlatformReadContainer(true);
+            if (data == null || data.Length == 0)
+                return;
+
+            lock (_processingLock)
+            {
+                int currentByte = 0;
+                // Directories
+                int dirCount = data[currentByte++];
+                _directories?.Clear();
+                for (int i = 0; i < dirCount; i++)
+                {
+                    int nameLen = data[currentByte++] | (data[currentByte++] << 8);
+                    string dir = Encoding.Unicode.GetString(data, currentByte, nameLen);
+                    currentByte += nameLen;
+                    _directories.Add(dir);
+                }
+                // Files
+                int fileCount = data[currentByte++];
+                _containers?.Clear();
+                for (int i = 0; i < fileCount; i++)
+                {
+                    int nameLen = data[currentByte++] | (data[currentByte++] << 8);
+                    string file = Encoding.Unicode.GetString(data, currentByte, nameLen);
+                    currentByte += nameLen;
+                    int fileLen = data[currentByte++] | (data[currentByte++] << 8) | (data[currentByte++] << 16) | (data[currentByte++] << 24);
+                    byte[] fileData = new byte[fileLen];
+                    if (fileLen > 0)
+                    {
+                        Array.Copy(data, currentByte, fileData, 0, fileLen);
+                        currentByte += fileLen;
+                    }
+                    _containers[file] = fileData;
+                }
+            }
         }
     }
 }
