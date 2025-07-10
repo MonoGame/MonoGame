@@ -6,6 +6,13 @@
 
 #include "mg_common.h"
 
+#include "AlphaTestEffect.vk.mgfxo.h"
+#include "BasicEffect.vk.mgfxo.h"
+#include "DualTextureEffect.vk.mgfxo.h"
+#include "EnvironmentMapEffect.vk.mgfxo.h"
+#include "SkinnedEffect.vk.mgfxo.h"
+#include "SpriteEffect.vk.mgfxo.h"
+#include "mg_effect.h"
 
 #define VULKAN_HPP_DISPATCH_LOADER_DYNAMIC 1
 #define VULKAN_HPP_NO_EXCEPTIONS
@@ -27,7 +34,6 @@
 #ifdef _WIN32
 #include <Windows.h>
 #include <vulkan/vulkan_win32.h>
-#include "vulkan.resources.h"
 #endif
 
 #define VK_CHECK_RESULT(vkr)															\
@@ -547,47 +553,6 @@ static VkImageAspectFlags DetermineAspectMask(VkFormat format)
 		break;
 	}
 	return result;
-}
-
-void MGG_EffectResource_GetBytecode(mgbyte* name, mgbyte*& bytecode, mgint& size)
-{
-	bytecode = nullptr;
-	size = 0;
-
-	// TODO: Move this to use the new MGFXC header generation.
-	
-	// Get the handle of this DLL.
-	HMODULE module;
-	::GetModuleHandleExA(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS, (LPCSTR)&MGG_EffectResource_GetBytecode, &module);
-
-	LPCSTR id = "";
-
-	if (strcmp((const char*)name, "AlphaTestEffect") == 0)
-		id = MAKEINTRESOURCEA(C_AlphaTestEffect);
-	else if (strcmp((const char*)name, "BasicEffect") == 0)
-		id = MAKEINTRESOURCEA(C_BasicEffect);
-	else if (strcmp((const char*)name, "DualTextureEffect") == 0)
-		id = MAKEINTRESOURCEA(C_DualTextureEffect);
-	else if (strcmp((const char*)name, "EnvironmentMapEffect") == 0)
-		id = MAKEINTRESOURCEA(C_EnvironmentMapEffect);
-	else if (strcmp((const char*)name, "SkinnedEffect") == 0)
-		id = MAKEINTRESOURCEA(C_SkinnedEffect);
-	else if (strcmp((const char*)name, "SpriteEffect") == 0)
-		id = MAKEINTRESOURCEA(C_SpriteEffect);
-
-	auto handle = ::FindResourceA(module, id, "BIN");
-	if (handle == nullptr)
-		return;
-
-	size = ::SizeofResource(module, handle);
-	if (size == 0)
-		return;
-
-	HGLOBAL global = ::LoadResource(module, handle);
-	if (global == nullptr)
-		return;
-
-	bytecode = (mgbyte*)LockResource(global);
 }
 
 uint64_t CheckValidationLayerSupport(const std::vector<const char*>& validationLayers)

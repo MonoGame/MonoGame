@@ -73,9 +73,6 @@ function vulkan()
       "vulkan/**.cpp",
    }
 
-   filter "system:windows"
-      files { "vulkan/**.rc", }
-
    includedirs 
    {
       "external/vulkan-headers/include",      
@@ -96,9 +93,6 @@ function directx12()
       "directx12/**.h",
       "directx12/**.cpp",
    }
-
-    filter "system:windows"
-      files { "directx12/**.rc", }
 
    -- includedirs 
    -- {
