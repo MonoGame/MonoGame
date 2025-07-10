@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <OutputType>exe</OutputType>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <WasmNativeDebugSymbols>true</WasmNativeDebugSymbols>
+    <WasmNativeStrip>false</WasmNativeStrip>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Reference Include="MonoGame.Framework.DesktopGL">
+        <HintPath>../Artifacts/MonoGame.Framework/DesktopGL/Release/MonoGame.Framework.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+</Project>

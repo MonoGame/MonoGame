@@ -28,7 +28,7 @@ namespace Microsoft.Xna.Framework.Content
             if (graphicsDeviceService == null)
                 throw new InvalidOperationException("No Graphics Device Service");
 
-            return graphicsDeviceService.GraphicsDevice;
+            return graphicsDeviceService._GraphicsDevice;
         }
     }
 }

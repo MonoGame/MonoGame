@@ -122,6 +122,7 @@ namespace Microsoft.Xna.Framework
             }
             catch (Exception ex)
             {
+                Console.WriteLine(ex);
                 throw new NoSuitableGraphicsDeviceException("Failed to create graphics device!", ex);
             }
         }
@@ -131,12 +132,21 @@ namespace Microsoft.Xna.Framework
             if (_graphicsDevice != null)
                 return;
 
-            _graphicsDevice = new GraphicsDevice(gdi.Adapter, gdi.GraphicsProfile, this.PreferHalfPixelOffset, gdi.PresentationParameters);
+            Console.WriteLine("fdsfsf");
+
+            try
+            {
+                _graphicsDevice = new GraphicsDevice(gdi.Adapter, gdi.GraphicsProfile, this.PreferHalfPixelOffset, gdi.PresentationParameters);
+            }
+            catch (System.Exception e)
+            {
+                Console.WriteLine(e);
+            }
             _shouldApplyChanges = false;
 
             // hook up reset events
-            GraphicsDevice.DeviceReset     += (sender, args) => OnDeviceReset(args);
-            GraphicsDevice.DeviceResetting += (sender, args) => OnDeviceResetting(args);
+            _GraphicsDevice.DeviceReset     += (sender, args) => OnDeviceReset(args);
+            _GraphicsDevice.DeviceResetting += (sender, args) => OnDeviceResetting(args);
 
             // update the touchpanel display size when the graphicsdevice is reset
             _graphicsDevice.DeviceReset += UpdateTouchPanel;
@@ -147,6 +157,7 @@ namespace Microsoft.Xna.Framework
 
         void IGraphicsDeviceManager.CreateDevice()
         {
+            Console.WriteLine("CreateDevice");
             CreateDevice();
         }
 
@@ -193,7 +204,7 @@ namespace Microsoft.Xna.Framework
         public event EventHandler<EventArgs> DeviceReset;
 
         /// <summary>
-        /// Called when a <see cref="GraphicsDevice"/> is created. Raises the <see cref="DeviceCreated"/> event.
+        /// Called when a <see cref="_GraphicsDevice"/> is created. Raises the <see cref="DeviceCreated"/> event.
         /// </summary>
         /// <param name="e"></param>
         protected void OnDeviceCreated(EventArgs e)
@@ -202,7 +213,7 @@ namespace Microsoft.Xna.Framework
         }
 
         /// <summary>
-        /// Called when a <see cref="GraphicsDevice"/> is disposed. Raises the <see cref="DeviceDisposing"/> event.
+        /// Called when a <see cref="_GraphicsDevice"/> is disposed. Raises the <see cref="DeviceDisposing"/> event.
         /// </summary>
         /// <param name="e"></param>
         protected void OnDeviceDisposing(EventArgs e)
@@ -317,8 +328,8 @@ namespace Microsoft.Xna.Framework
                 // always initialize MultiSampleCount to the maximum, if users want to overwrite
                 // this they have to respond to the PreparingDeviceSettingsEvent and modify
                 // args.GraphicsDeviceInformation.PresentationParameters.MultiSampleCount
-                presentationParameters.MultiSampleCount = GraphicsDevice != null
-                    ? GraphicsDevice.GraphicsCapabilities.MaxMultiSampleCount
+                presentationParameters.MultiSampleCount = _GraphicsDevice != null
+                    ? _GraphicsDevice.GraphicsCapabilities.MaxMultiSampleCount
                     : 32;
             }
             else
@@ -361,7 +372,7 @@ namespace Microsoft.Xna.Framework
             // PrepareDeviceSettings event this information should be applied to the GraphicsDevice
             var gdi = DoPreparingDeviceSettings();
 
-            if (gdi.GraphicsProfile != GraphicsDevice.GraphicsProfile)
+            if (gdi.GraphicsProfile != _GraphicsDevice.GraphicsProfile)
             {
                 // if the GraphicsProfile changed we need to create a new GraphicsDevice
                 DisposeGraphicsDevice();
@@ -369,7 +380,7 @@ namespace Microsoft.Xna.Framework
                 return;
             }
 
-            GraphicsDevice.Reset(gdi.PresentationParameters);
+            _GraphicsDevice.Reset(gdi.PresentationParameters);
         }
 
         private void DisposeGraphicsDevice()
@@ -434,7 +445,7 @@ namespace Microsoft.Xna.Framework
         /// <summary>
         /// Returns the graphics device for this manager.
         /// </summary>
-        public GraphicsDevice GraphicsDevice
+        public GraphicsDevice _GraphicsDevice
         {
             get
             {
@@ -494,7 +505,7 @@ namespace Microsoft.Xna.Framework
             get { return _preferHalfPixelOffset; }
             set
             {
-                if (this.GraphicsDevice != null)
+                if (this._GraphicsDevice != null)
                     throw new InvalidOperationException("Setting PreferHalfPixelOffset is not allowed after the creation of GraphicsDevice.");
                 _preferHalfPixelOffset = value;
             }

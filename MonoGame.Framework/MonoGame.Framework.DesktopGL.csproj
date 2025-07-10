@@ -11,6 +11,10 @@
     <CopyContentFiles>True</CopyContentFiles>
     <IsAotCompatible>true</IsAotCompatible>
     <PackageReadmeFile>README-packages.md</PackageReadmeFile>
+    <DefineConstants>$(DefineConstants);GLES</DefineConstants>
+    <GenerateSerializationAssemblies>Off</GenerateSerializationAssemblies>
+    <DebugType>full</DebugType>
+    <DebugSymbols>true</DebugSymbols>
   </PropertyGroup>
 
   <ItemGroup>

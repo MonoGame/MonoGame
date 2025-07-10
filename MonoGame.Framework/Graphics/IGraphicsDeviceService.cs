@@ -14,7 +14,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		/// <summary>
 		/// The provided <see cref="Graphics.GraphicsDevice"/>.
 		/// </summary>
-		GraphicsDevice GraphicsDevice { get; }
+		GraphicsDevice _GraphicsDevice { get; }
 
         /// <summary>
         /// Raised when a new <see cref="Graphics.GraphicsDevice"/> has been created.
@@ -22,20 +22,19 @@ namespace Microsoft.Xna.Framework.Graphics
 		event EventHandler<EventArgs> DeviceCreated;
 
         /// <summary>
-        /// Raised when the <see cref="GraphicsDevice"/> is disposed.
+        /// Raised when the <see cref="_GraphicsDevice"/> is disposed.
         /// </summary>
         event EventHandler<EventArgs> DeviceDisposing;
 
         /// <summary>
-        /// Raised when the <see cref="GraphicsDevice"/> has reset.
+        /// Raised when the <see cref="_GraphicsDevice"/> has reset.
         /// </summary>
         /// <seealso cref="Microsoft.Xna.Framework.Graphics.GraphicsDevice.Reset()"/>
         event EventHandler<EventArgs> DeviceReset;
 
         /// <summary>
-        /// Raised before the <see cref="GraphicsDevice"/> is resetting.
+        /// Raised before the <see cref="_GraphicsDevice"/> is resetting.
         /// </summary>
         event EventHandler<EventArgs> DeviceResetting;
     }
 }
-

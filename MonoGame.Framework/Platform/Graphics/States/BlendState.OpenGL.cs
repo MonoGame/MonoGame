@@ -2,6 +2,7 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
+using System;
 using MonoGame.OpenGL;
 
 namespace Microsoft.Xna.Framework.Graphics
@@ -10,18 +11,29 @@ namespace Microsoft.Xna.Framework.Graphics
     {
         internal void PlatformApplyState(GraphicsDevice device, bool force = false)
         {
+            Console.WriteLine("PlatformApplyState A");
             var blendEnabled = !(this.ColorSourceBlend == Blend.One &&
                                  this.ColorDestinationBlend == Blend.Zero &&
                                  this.AlphaSourceBlend == Blend.One &&
                                  this.AlphaDestinationBlend == Blend.Zero);
             if (force || blendEnabled != device._lastBlendEnable)
             {
+                Console.WriteLine("PlatformApplyState B");
                 if (blendEnabled)
+                {
+                    Console.WriteLine("PlatformApplyState Enable");
                     GL.Enable(EnableCap.Blend);
+                }
                 else
+                {
+                    Console.WriteLine("PlatformApplyState Enable B");
                     GL.Disable(EnableCap.Blend);
+                }
+                Console.WriteLine("PlatformApplyState C");
                 GraphicsExtensions.CheckGLError();
+                Console.WriteLine("PlatformApplyState D");
                 device._lastBlendEnable = blendEnabled;
+                Console.WriteLine("PlatformApplyState E");
             }
             if (_independentBlendEnable)
             {
@@ -110,4 +122,3 @@ namespace Microsoft.Xna.Framework.Graphics
         }
     }
 }
-

@@ -591,7 +591,7 @@ namespace Microsoft.Xna.Framework.Content
                 {
                     using (stream)
                     {
-                        Texture2D result = Texture2D.FromStream(graphicsDeviceService.GraphicsDevice, stream, DefaultColorProcessors.PremultiplyAlpha);
+                        Texture2D result = Texture2D.FromStream(graphicsDeviceService._GraphicsDevice, stream, DefaultColorProcessors.PremultiplyAlpha);
                         return result;
                     }
                 }

@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>RaylibSharp Examples</title>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    </head>
+
+    <body>
+        <div id="canvas_wrapper">
+            <canvas
+                class="emscripten"
+                id="canvas"
+                oncontextmenu="event.preventDefault()"
+                tabindex="-1"
+            ></canvas>
+            <!-- Spinner is removed when .NET is loaded -->
+        </div>
+        <div id="spinner"><div id="spinner_animation"></div></div>
+
+        <script type="module" src="./main.js"></script>
+    </body>
+</html>

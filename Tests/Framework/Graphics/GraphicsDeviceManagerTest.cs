@@ -32,7 +32,7 @@ namespace MonoGame.Tests.Graphics
             Assert.False(gdm.PreferMultiSampling);
             Assert.AreEqual(GraphicsProfile.Reach, gdm.GraphicsProfile);
             Assert.True(gdm.SynchronizeWithVerticalRetrace);
-            Assert.Null(gdm.GraphicsDevice);
+            Assert.Null(gdm._GraphicsDevice);
             Assert.AreEqual(DisplayOrientation.Default, gdm.SupportedOrientations);
 
             game.Dispose();
@@ -166,7 +166,7 @@ namespace MonoGame.Tests.Graphics
             // assert that PreparingDeviceSettings is invoked, but the GraphicsProfile of the gdm did not change
             Assert.That(invoked);
             Assert.AreEqual(GraphicsProfile.Reach, gdm.GraphicsProfile);
-            Assert.AreEqual(GraphicsProfile.HiDef, gdm.GraphicsDevice.GraphicsProfile);
+            Assert.AreEqual(GraphicsProfile.HiDef, gdm._GraphicsDevice.GraphicsProfile);
 
             Assert.AreEqual(creationCount, 1);
             Assert.AreEqual(resetCount, 0);
@@ -186,7 +186,7 @@ namespace MonoGame.Tests.Graphics
             game.PreInitializeWith += (sender, args) =>
             {
                 Assert.AreEqual(RenderTargetUsage.DiscardContents,
-                    gdm.GraphicsDevice.PresentationParameters.RenderTargetUsage);
+                    gdm._GraphicsDevice.PresentationParameters.RenderTargetUsage);
 
                 gdm.PreparingDeviceSettings += (s, a) =>
                 {
@@ -203,7 +203,7 @@ namespace MonoGame.Tests.Graphics
             gdm.ApplyChanges();
 
             Assert.That(invoked);
-            Assert.AreEqual(RenderTargetUsage.PreserveContents, gdm.GraphicsDevice.PresentationParameters.RenderTargetUsage);
+            Assert.AreEqual(RenderTargetUsage.PreserveContents, gdm._GraphicsDevice.PresentationParameters.RenderTargetUsage);
 
             game.Dispose();
         }
@@ -318,12 +318,12 @@ namespace MonoGame.Tests.Graphics
             gdm.DeviceDisposing += (sender, args) =>
             {
                 invoked = true;
-                Assert.IsTrue(gdm.GraphicsDevice.IsDisposed);
+                Assert.IsTrue(gdm._GraphicsDevice.IsDisposed);
             };
 
             game.InitializeOnly();
 
-            Assert.IsFalse(gdm.GraphicsDevice.IsDisposed);
+            Assert.IsFalse(gdm._GraphicsDevice.IsDisposed);
             Assert.IsFalse(invoked);
             // change the graphics profile so the current device needs to be disposed
             gdm.GraphicsProfile = GraphicsProfile.HiDef;
@@ -358,7 +358,7 @@ namespace MonoGame.Tests.Graphics
             Assert.AreEqual(1, resetCount);
             Assert.AreEqual(1, resettingCount);
         }
-        
+
         [Test]
         [RunOnUI]
         public void NewDeviceDoesNotTriggerReset()
@@ -524,9 +524,9 @@ namespace MonoGame.Tests.Graphics
             Assert.DoesNotThrow(()=>gdm.ApplyChanges(), "GraphicDeviceManager.ApplyChanges()");
             Assert.DoesNotThrow(() =>
             {
-                var pp = gdm.GraphicsDevice.PresentationParameters.Clone();
+                var pp = gdm._GraphicsDevice.PresentationParameters.Clone();
                 pp.MultiSampleCount = 10000; // Set too high. In DX11 is max 32.
-                gdm.GraphicsDevice.Reset(pp);
+                gdm._GraphicsDevice.Reset(pp);
             }, "GraphicsDevice.Reset(PresentationParameters)");
         }
 
@@ -559,7 +559,7 @@ namespace MonoGame.Tests.Graphics
             gdm.GraphicsDevice.Reset(pp3);
             Assert.AreEqual
                 (maxMultiSampleCount, gdm.GraphicsDevice.PresentationParameters.MultiSampleCount);
-            
+
         }
 #endif
     }
