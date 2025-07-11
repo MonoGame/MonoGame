@@ -76,11 +76,11 @@ namespace Microsoft.Xna.Framework.Audio
         /// Initializes a new instance of the AudioEngine class by reading out the specified XACT <paramref name="settingsFile"/>
         /// </summary>
         /// <param name="settingsFile">Path to a XACT settings file.</param>
-        /// <exception cref="ArgumentNullException">Invoked if <paramref name="settingsFile"/> is <see cref="String.IsNullOrEmpty"/></exception>
+        /// <exception cref="ArgumentException">Invoked if <paramref name="settingsFile"/> is <see cref="String.IsNullOrEmpty"/></exception>
         public AudioEngine(string settingsFile)
         {
             if (string.IsNullOrEmpty(settingsFile))
-                throw new ArgumentNullException("settingsFile");
+                throw new ArgumentException("'settingsFile' cannot be left null or empty!", "settingsFile");
 
             // Read the xact settings file
             // Credits to alisci01 for initial format documentation
