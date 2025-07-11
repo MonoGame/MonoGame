@@ -1,5 +1,4 @@
 using Cake.Git;
-using Microsoft.VisualBasic;
 using System.Text.RegularExpressions;
 
 namespace BuildScripts;
@@ -118,6 +117,8 @@ public class BuildContext : FrostingContext
 
     public MSBuildSettings MSPackSettings { get; }
 
+    public string ShellWorkingDir { get; set; } = Directory.GetCurrentDirectory();
+
     public string GetProjectPath(ProjectType type, string id = "") => type switch
     {
         ProjectType.Extension => $"Templates/{id}/{id}.csproj",
@@ -131,6 +132,14 @@ public class BuildContext : FrostingContext
         ProjectType.MGCBEditorLauncher => $"Tools/MonoGame.Content.Builder.Editor.Launcher/MonoGame.Content.Builder.Editor.Launcher.{id}.csproj",
         _ => throw new ArgumentOutOfRangeException(nameof(type))
     };
+
+    public void Shell(string command, string args)
+    {
+        if (this.StartProcess(command, new ProcessSettings { WorkingDirectory = ShellWorkingDir, Arguments = args }) != 0)
+        {
+            throw new Exception($"Execution failed for: {command} {args}");
+        }
+    }
 
     public bool IsWorkloadInstalled(string workload)
     {
