@@ -59,7 +59,7 @@ function sdl2()
         libdirs { "external/sdl2/sdl/build" }
         linkoptions { "-Wl,-force_load,external/sdl2/sdl/build/libSDL2.a" }
 		links { "SDL2" }
-		links { "Cocoa", "IOKit", "ForceFeedback", "CoreAudio", "AudioToolbox", "CoreGraphics", "CoreFoundation", "Metal" }
+		links { "IOKit", "ForceFeedback", "CoreAudio", "AudioToolbox", "CoreGraphics", "CoreFoundation", "Metal" }
 
 	filter {"system:linux"}
         libdirs { "external/sdl2/sdl/build" }
@@ -152,11 +152,11 @@ project "desktopvk"
     faudio()
     configs()
     
-filter "system:windows"
+if os.target() == "windows" then
     project "windowsdx"
         common("windowsdx")
         sdl2()
         directx12()
         xaudio()
         configs()
-filter {}
+end
