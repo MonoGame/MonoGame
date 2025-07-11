@@ -2,10 +2,12 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
+using MonoGame.Framework.Utilities;
+using MonoGame.Interop;
 using System;
 using System.Collections.Generic;
-using MonoGame.Interop;
-using MonoGame.Framework.Utilities;
+using System.Drawing;
+using System.Runtime.InteropServices;
 
 
 namespace Microsoft.Xna.Framework.Graphics;
@@ -457,9 +459,33 @@ public partial class GraphicsDevice
         MGG.GraphicsDevice_DrawIndexedInstanced(Handle, primitiveType, primitiveCount, startIndex, baseVertex, instanceCount);
     }
 
-    private void PlatformGetBackBufferData<T>(Rectangle? rect, T[] data, int startIndex, int count) where T : struct
+    private unsafe void PlatformGetBackBufferData<T>(Rectangle? rect, T[] data, int startIndex, int count) where T : struct
     {
-        throw new NotImplementedException();
+        var rectangle = rect ?? new Rectangle(0, 0, PresentationParameters.BackBufferWidth, PresentationParameters.BackBufferHeight);
+        var tSize = Marshal.SizeOf<T>();
+        GCHandle dataHandle = default;
+        try
+        {
+            dataHandle = GCHandle.Alloc(
+                data, GCHandleType.Pinned);
+            IntPtr pData = dataHandle.AddrOfPinnedObject();
+            MGG.GraphicsDevice_GetBackBufferData(
+                Handle,
+                rectangle.X,
+                rectangle.Y,
+                rectangle.Width,
+                rectangle.Height,
+                pData + startIndex * tSize,
+                count,
+                tSize);
+        }
+        finally
+        {
+            if (dataHandle.IsAllocated)
+            {
+                dataHandle.Free();
+            }
+        }
     }
 
     private static unsafe Rectangle PlatformGetTitleSafeArea(int x, int y, int width, int height)

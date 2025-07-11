@@ -270,6 +270,17 @@ internal static unsafe partial class MGG
     [DllImport(MGP.MonoGameNativeDLL, EntryPoint = "MGG_GraphicsDevice_DrawIndexedInstanced", ExactSpelling = true)]
     public static extern void GraphicsDevice_DrawIndexedInstanced(MGG_GraphicsDevice* device, PrimitiveType primitiveType, int primitiveCount, int indexStart, int vertexStart, int instanceCount);
 
+    [DllImport(MGP.MonoGameNativeDLL, EntryPoint = "MGG_GraphicsDevice_GetBackBufferData", ExactSpelling = true)]
+    public static extern void GraphicsDevice_GetBackBufferData(
+        MGG_GraphicsDevice* device,
+        int x,
+        int y,
+        int width,
+        int height,
+        IntPtr data,
+        int count,
+        int dataBytes);
+
     #endregion
 
     #region State

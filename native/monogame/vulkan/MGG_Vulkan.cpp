@@ -1443,11 +1443,38 @@ void MGVK_RecreateSwapChain(
 	create_info.imageColorSpace = VK_COLORSPACE_SRGB_NONLINEAR_KHR;
 	create_info.imageExtent = extent;
 	create_info.imageArrayLayers = 1;
-	create_info.imageUsage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT;
+	create_info.imageUsage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_TRANSFER_SRC_BIT;
 	create_info.imageSharingMode = VK_SHARING_MODE_EXCLUSIVE;
 	create_info.preTransform = VK_SURFACE_TRANSFORM_IDENTITY_BIT_KHR;
 	create_info.compositeAlpha = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR;
-	create_info.presentMode = VK_PRESENT_MODE_MAILBOX_KHR;
+	
+	// Query supported present modes and select the best one
+	uint32_t presentModeCount = 0;
+	res = vkGetPhysicalDeviceSurfacePresentModesKHR(device->physicalDevice, device->surface, &presentModeCount, nullptr);
+	VK_CHECK_RESULT(res);
+	
+	VkPresentModeKHR* presentModes = new VkPresentModeKHR[presentModeCount];
+	res = vkGetPhysicalDeviceSurfacePresentModesKHR(device->physicalDevice, device->surface, &presentModeCount, presentModes);
+	VK_CHECK_RESULT(res);
+	
+	// Prefer MAILBOX -> IMMEDIATE -> FIFO (FIFO is always supported)
+	VkPresentModeKHR selectedPresentMode = VK_PRESENT_MODE_FIFO_KHR;
+	for (uint32_t i = 0; i < presentModeCount; i++)
+	{
+		if (presentModes[i] == VK_PRESENT_MODE_MAILBOX_KHR)
+		{
+			selectedPresentMode = VK_PRESENT_MODE_MAILBOX_KHR;
+			break;
+		}
+		else if (presentModes[i] == VK_PRESENT_MODE_IMMEDIATE_KHR)
+		{
+			selectedPresentMode = VK_PRESENT_MODE_IMMEDIATE_KHR;
+		}
+	}
+	
+	delete[] presentModes;
+	
+	create_info.presentMode = selectedPresentMode;
 	create_info.clipped = true;
 	//create_info.pNext = &scalingCreateInfo;
 	res = vkCreateSwapchainKHR(device->device, &create_info, nullptr, &device->swapchain);
@@ -2141,7 +2168,7 @@ static void MGVK_UpdateRenderPass(MGG_GraphicsDevice* device, FrameCounter curre
 			attachment_descs[num_attachments].storeOp = VK_ATTACHMENT_STORE_OP_STORE;
 			attachment_descs[num_attachments].stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
 			attachment_descs[num_attachments].stencilStoreOp = VK_ATTACHMENT_STORE_OP_STORE;
-			attachment_descs[num_attachments].initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+			attachment_descs[num_attachments].initialLayout = target->isSwapchain ? VK_IMAGE_LAYOUT_UNDEFINED : VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
 			attachment_descs[num_attachments].finalLayout = target->isSwapchain ? VK_IMAGE_LAYOUT_PRESENT_SRC_KHR : VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
 			num_attachments++;
 			num_color_attachments++;
@@ -2174,11 +2201,22 @@ static void MGVK_UpdateRenderPass(MGG_GraphicsDevice* device, FrameCounter curre
 			if (depth)
 				subpass_desc.pDepthStencilAttachment = &depth_stencil_attachment;
 
+			// Add subpass dependencies for proper synchronization
+			VkSubpassDependency dependency = {};
+			dependency.srcSubpass = VK_SUBPASS_EXTERNAL;
+			dependency.dstSubpass = 0;
+			dependency.srcStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
+			dependency.srcAccessMask = 0;
+			dependency.dstStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
+			dependency.dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
+
 			VkRenderPassCreateInfo create_info = { VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO };
 			create_info.attachmentCount = num_attachments;
 			create_info.pAttachments = attachment_descs;
 			create_info.subpassCount = 1;
 			create_info.pSubpasses = &subpass_desc;
+			create_info.dependencyCount = 1;
+			create_info.pDependencies = &dependency;
 
 			VkResult res = vkCreateRenderPass(device->device, &create_info, nullptr, &cached->renderPass);
 			VK_CHECK_RESULT(res);
@@ -2736,6 +2774,126 @@ void MGG_GraphicsDevice_DrawIndexedInstanced(MGG_GraphicsDevice* device, MGPrimi
 		return;
 
 	MG_NOT_IMPLEMEMTED;
+}
+
+void MGG_GraphicsDevice_GetBackBufferData(MGG_GraphicsDevice* device, mgint x, mgint y, mgint width, mgint height, void* data, mgint count, mgint dataBytes)
+{
+	assert(device != nullptr);
+	assert(data != nullptr);
+	assert(count > 0);
+	assert(dataBytes > 0);
+
+	auto currentFrame = device->frame;
+	auto frameIndex = currentFrame % kConcurrentFrameCount;
+	auto& frame = device->frames[frameIndex];
+	auto& main_cmd_buffer = frame.commandBuffer;
+
+	if (device->inRenderPass)
+	{
+		vkCmdEndRenderPass(main_cmd_buffer.buffer);
+		device->inRenderPass = false;
+	}
+
+	VK_CHECK_RESULT(vkEndCommandBuffer(main_cmd_buffer.buffer));
+
+	VkSubmitInfo flushSubmitInfo = { VK_STRUCTURE_TYPE_SUBMIT_INFO };
+	flushSubmitInfo.commandBufferCount = 1;
+	flushSubmitInfo.pCommandBuffers = &main_cmd_buffer.buffer;
+
+	VkFence flushFence;
+	VkFenceCreateInfo fenceInfo = { VK_STRUCTURE_TYPE_FENCE_CREATE_INFO };
+	vkCreateFence(device->device, &fenceInfo, nullptr, &flushFence);
+
+	vkQueueSubmit(device->queue, 1, &flushSubmitInfo, flushFence);
+	vkWaitForFences(device->device, 1, &flushFence, VK_TRUE, UINT64_MAX);
+	vkDestroyFence(device->device, flushFence, nullptr);
+
+	auto srcImage = device->frames[device->swapchain_image_index].swapchainTexture->image;
+
+	uint32_t bytesPerPixelOnGpu = 4;
+	VkDeviceSize gpuBufferSize = (VkDeviceSize)width * height * bytesPerPixelOnGpu;
+
+	VkBuffer dstBuffer;
+	VmaAllocation dstBufferAllocation;
+	VmaAllocationInfo dstAllocInfo = {};
+
+	VkBufferCreateInfo bufferInfo = { VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO };
+	bufferInfo.size = gpuBufferSize;
+	bufferInfo.usage = VK_BUFFER_USAGE_TRANSFER_DST_BIT;
+
+	VmaAllocationCreateInfo allocCreateInfo = {};
+	allocCreateInfo.usage = VMA_MEMORY_USAGE_GPU_TO_CPU;
+	allocCreateInfo.flags = VMA_ALLOCATION_CREATE_MAPPED_BIT;
+
+	VK_CHECK_RESULT(vmaCreateBuffer(device->allocator, &bufferInfo, &allocCreateInfo, &dstBuffer, &dstBufferAllocation, &dstAllocInfo));
+
+	VkCommandBuffer copyCmdBuffer = MGVK_BeginNewCommandBuffer(device);
+
+	VkImageMemoryBarrier barrierToTransfer = { VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER };
+	barrierToTransfer.srcAccessMask = VK_ACCESS_MEMORY_READ_BIT;
+	barrierToTransfer.dstAccessMask = VK_ACCESS_TRANSFER_READ_BIT;
+	barrierToTransfer.oldLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
+	barrierToTransfer.newLayout = VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL;
+	barrierToTransfer.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+	barrierToTransfer.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+	barrierToTransfer.image = srcImage;
+	barrierToTransfer.subresourceRange = { VK_IMAGE_ASPECT_COLOR_BIT, 0, 1, 0, 1 };
+
+	vkCmdPipelineBarrier(copyCmdBuffer,
+		VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT, VK_PIPELINE_STAGE_TRANSFER_BIT, 0,
+		0, nullptr, 0, nullptr, 1, &barrierToTransfer);
+
+	VkBufferImageCopy copyRegion = {};
+	copyRegion.imageSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+	copyRegion.imageSubresource.layerCount = 1;
+	copyRegion.imageOffset = { x, y, 0 };
+	copyRegion.imageExtent = { (uint32_t)width, (uint32_t)height, 1 };
+
+	vkCmdCopyImageToBuffer(copyCmdBuffer, srcImage, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL, dstBuffer, 1, &copyRegion);
+
+	VkImageMemoryBarrier barrierToPresent = { VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER };
+	barrierToPresent.srcAccessMask = VK_ACCESS_TRANSFER_READ_BIT;
+	barrierToPresent.dstAccessMask = VK_ACCESS_MEMORY_READ_BIT;
+	barrierToPresent.oldLayout = VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL;
+	barrierToPresent.newLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
+	barrierToPresent.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+	barrierToPresent.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+	barrierToPresent.image = srcImage;
+	barrierToPresent.subresourceRange = { VK_IMAGE_ASPECT_COLOR_BIT, 0, 1, 0, 1 };
+
+	vkCmdPipelineBarrier(copyCmdBuffer,
+		VK_PIPELINE_STAGE_TRANSFER_BIT, VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT, 0,
+		0, nullptr, 0, nullptr, 1, &barrierToPresent);
+
+	MGVK_ExecuteAndFreeCommandBuffer(device, copyCmdBuffer);
+
+	vmaInvalidateAllocation(device->allocator, dstBufferAllocation, 0, VK_WHOLE_SIZE);
+	assert(dstAllocInfo.pMappedData != nullptr);
+
+	size_t bytesToCopy = (size_t)count * dataBytes;
+	if (bytesToCopy > gpuBufferSize)
+	{
+		bytesToCopy = gpuBufferSize;
+	}
+	memcpy(data, dstAllocInfo.pMappedData, bytesToCopy);
+
+	vmaDestroyBuffer(device->allocator, dstBuffer, dstBufferAllocation);
+
+	if (device->colorFormat == VK_FORMAT_B8G8R8A8_UNORM || device->colorFormat == VK_FORMAT_B8G8R8A8_SRGB)
+	{
+		uint8_t* pixels = (uint8_t*)data;
+		mgint pixelCountToSwizzle = bytesToCopy / dataBytes;
+
+		for (int i = 0; i < pixelCountToSwizzle; ++i)
+		{
+			uint8_t b = pixels[i * 4 + 0];
+			uint8_t r = pixels[i * 4 + 2];
+			pixels[i * 4 + 0] = r;
+			pixels[i * 4 + 2] = b;
+		}
+	}
+
+	MGVK_BeginFrame(main_cmd_buffer);
 }
 
 
