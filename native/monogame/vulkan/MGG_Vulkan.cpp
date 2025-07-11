@@ -3041,7 +3041,7 @@ MGG_RasterizerState* MGG_RasterizerState_Create(MGG_GraphicsDevice* device, MGG_
 	rasterizer.cullMode = ToVkCullModeFlags(info->cullMode);
 	rasterizer.frontFace = VK_FRONT_FACE_CLOCKWISE;
 	rasterizer.depthBiasEnable = info->depthBias != 0;
-	rasterizer.depthBiasConstantFactor = info->depthBias;
+	rasterizer.depthBiasConstantFactor = info->depthBias * ((1 << 24) - 1);
 	rasterizer.depthBiasClamp = 0.0f;
 	rasterizer.depthBiasSlopeFactor = info->slopeScaleDepthBias;
 	rasterizer.lineWidth = 1.0f;
