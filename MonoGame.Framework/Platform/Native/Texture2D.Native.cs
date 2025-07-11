@@ -126,8 +126,10 @@ public partial class Texture2D : Texture
             zeroTransparentPixels = true;
         }
 
-        // Simply read it all into memory as it will be fast
-        // for most cases and simplifies the native API.
+        if (stream.CanSeek)
+            stream.Seek(0, SeekOrigin.Begin);
+        else
+            throw new ArgumentException("Stream must support seeking.", nameof(stream));
 
         var dataLength = (int)stream.Length;
         var streamTemp = new byte[dataLength];

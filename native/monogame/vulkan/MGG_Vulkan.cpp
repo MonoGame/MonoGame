@@ -3388,7 +3388,7 @@ void MGG_Buffer_Destroy(MGG_GraphicsDevice* device, MGG_Buffer* buffer)
 	device->destroyBuffers.push(buffer);
 }
 
-void MGG_Buffer_SetData(MGG_GraphicsDevice* device, MGG_Buffer*& buffer, mgint offset, mgbyte* data, mgint length, mgbyte discard)
+void MGG_Buffer_SetData(MGG_GraphicsDevice* device, MGG_Buffer*& buffer, mgint offset, mgbyte* data, mgint length, mgbool discard)
 {
 	assert(device != nullptr);
 	assert(buffer != nullptr);

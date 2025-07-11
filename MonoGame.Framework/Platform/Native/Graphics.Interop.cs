@@ -315,7 +315,7 @@ internal static unsafe partial class MGG
         int offset,
         byte* data,
         int length,       
-        byte discard);
+        bool discard);
 
     [DllImport(MGP.MonoGameNativeDLL, EntryPoint = "MGG_Buffer_GetData", ExactSpelling = true)]
     public static extern void Buffer_GetData(
