@@ -59,7 +59,7 @@ function sdl2()
         libdirs { "external/sdl2/sdl/build" }
         linkoptions { "-Wl,-force_load,external/sdl2/sdl/build/libSDL2.a" }
 		links { "SDL2" }
-		links { "IOKit", "ForceFeedback", "CoreAudio", "AudioToolbox", "CoreGraphics", "CoreFoundation", "Metal" }
+		links { "Cocoa.framework", "IOKit.framework", "ForceFeedback.framework", "CoreAudio.framework", "AudioToolbox.framework", "CoreGraphics.framework", "CoreFoundation.framework", "Metal.framework" }
 
 	filter {"system:linux"}
         libdirs { "external/sdl2/sdl/build" }
