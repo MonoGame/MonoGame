@@ -3035,7 +3035,7 @@ MGG_RasterizerState* MGG_RasterizerState_Create(MGG_GraphicsDevice* device, MGG_
 	auto& rasterizer = state->info;
 	rasterizer.sType = VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO;
 	rasterizer.flags = 0; // Reserved for future use.
-	rasterizer.depthClampEnable = VK_FALSE; // info->depthClipEnable;
+	rasterizer.depthClampEnable = !info->depthClipEnable;
 	rasterizer.rasterizerDiscardEnable = VK_FALSE;
 	rasterizer.polygonMode = ToVkPolygonMode(info->fillMode);
 	rasterizer.cullMode = ToVkCullModeFlags(info->cullMode);
