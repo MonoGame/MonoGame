@@ -50,12 +50,6 @@ namespace Microsoft.Xna.Framework.Audio
         /// </summary>
         public const int ContentVersion = 39;
 
-        /// <param name="settingsFile">Path to a XACT settings file.</param>
-        public AudioEngine(string settingsFile)
-            : this(settingsFile, TimeSpan.Zero, "")
-        {            
-        }
-
         internal static Stream OpenStream(string filePath, bool useMemoryStream = false)
         {
             var stream = TitleContainer.OpenStream(filePath);
@@ -78,11 +72,13 @@ namespace Microsoft.Xna.Framework.Audio
             return stream;
         }
 
+        /// <summary>
+        /// Initializes a new instance of the AudioEngine class by reading out the specified XACT <paramref name="settingsFile"/>
+        /// </summary>
         /// <param name="settingsFile">Path to a XACT settings file.</param>
-        /// <param name="lookAheadTime">Determines how many milliseconds the engine will look ahead when determing when to transition to another sound.</param>
-        /// <param name="rendererId">A string that specifies the audio renderer to use.</param>
         /// <remarks>For the best results, use a lookAheadTime of 250 milliseconds or greater.</remarks>
-        public AudioEngine(string settingsFile, TimeSpan lookAheadTime, string rendererId)
+        /// <exception cref="ArgumentNullException">Invoked if <paramref name="settingsFile"/> is <see cref="String.IsNullOrEmpty"/></exception>
+        public AudioEngine(string settingsFile)
         {
             if (string.IsNullOrEmpty(settingsFile))
                 throw new ArgumentNullException("settingsFile");
