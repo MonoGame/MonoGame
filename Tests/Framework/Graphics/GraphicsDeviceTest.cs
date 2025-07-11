@@ -131,7 +131,7 @@ namespace MonoGame.Tests.Graphics
         {
             // https://blogs.msdn.microsoft.com/shawnhar/2007/12/12/virtualizing-the-graphicsdevice-in-xna-game-studio-2-0/
 
-            var rt = new RenderTarget2D(gdm.GraphicsDevice, 5, 5);
+            var rt = new RenderTarget2D(gdm._GraphicsDevice, 5, 5);
             var vb = new DynamicVertexBuffer(gd, VertexPositionColor.VertexDeclaration, 1, BufferUsage.None);
             var ib = new DynamicIndexBuffer(gd, IndexElementSize.SixteenBits, 1, BufferUsage.None);
             var rtc = new RenderTargetCube(gd, 1, false, SurfaceFormat.Color, DepthFormat.Depth16);
@@ -234,7 +234,7 @@ namespace MonoGame.Tests.Graphics
                 gd, VertexPositionColorTexture.VertexDeclaration,
                 3, BufferUsage.None);
             var indexBuffer = new IndexBuffer(
-                gd, IndexElementSize.SixteenBits, 
+                gd, IndexElementSize.SixteenBits,
                 3, BufferUsage.None);
 
             // No vertex shader or pixel shader.
@@ -295,7 +295,7 @@ namespace MonoGame.Tests.Graphics
                 gd, VertexPositionColorTexture.VertexDeclaration,
                 3, BufferUsage.None);
             var indexBuffer = new IndexBuffer(
-                gd, IndexElementSize.SixteenBits, 
+                gd, IndexElementSize.SixteenBits,
                 3, BufferUsage.None);
 
             // No vertex shader or pixel shader.
@@ -458,7 +458,7 @@ namespace MonoGame.Tests.Graphics
 
             gd.DrawInstancedPrimitives(PrimitiveType.TriangleList, 0, 0, 6, 0, 2, worldTransforms.Length);
 
-            // There is a minor difference in the rasterization between XNA and DirectX. 
+            // There is a minor difference in the rasterization between XNA and DirectX.
             Similarity = 0.98f;
 
             CheckFrames();
@@ -622,11 +622,11 @@ namespace MonoGame.Tests.Graphics
 #if XNA
             var supportedVertexTextureFormats = new[]
             {
-                SurfaceFormat.Single, 
-                SurfaceFormat.Vector2, 
+                SurfaceFormat.Single,
+                SurfaceFormat.Vector2,
                 SurfaceFormat.Vector4,
-                SurfaceFormat.HalfSingle, 
-                SurfaceFormat.HalfVector2, 
+                SurfaceFormat.HalfSingle,
+                SurfaceFormat.HalfVector2,
                 SurfaceFormat.HalfVector4,
                 SurfaceFormat.HdrBlendable
             };

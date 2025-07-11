@@ -1,0 +1,15 @@
+{
+  "profiles": {
+    "Example": {
+      "commandName": "Project",
+      "launchBrowser": true,
+      "nativeDebugging": true,
+
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      },
+      "applicationUrl": "https://localhost:7214;http://localhost:5223",
+      "inspectUri": "{wsProtocol}://{url.hostname}:{url.port}/_framework/debug/ws-proxy?browser={browserInspectUri}"
+    }
+  }
+}

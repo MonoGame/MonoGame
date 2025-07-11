@@ -7,6 +7,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MonoGame.Framework.DesktopG
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MonoGame.Tests.DesktopGL", "Tests\MonoGame.Tests.DesktopGL.csproj", "{3EA1BB98-6F7F-4CEC-9804-8553A599AA3B}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Example", "Example\Example.csproj", "{899CBE02-D331-41F1-80B6-A328AB77C6A9}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -41,6 +43,18 @@ Global
 		{3EA1BB98-6F7F-4CEC-9804-8553A599AA3B}.Release|x64.Build.0 = Release|Any CPU
 		{3EA1BB98-6F7F-4CEC-9804-8553A599AA3B}.Release|x86.ActiveCfg = Release|Any CPU
 		{3EA1BB98-6F7F-4CEC-9804-8553A599AA3B}.Release|x86.Build.0 = Release|Any CPU
+		{899CBE02-D331-41F1-80B6-A328AB77C6A9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{899CBE02-D331-41F1-80B6-A328AB77C6A9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{899CBE02-D331-41F1-80B6-A328AB77C6A9}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{899CBE02-D331-41F1-80B6-A328AB77C6A9}.Debug|x64.Build.0 = Debug|Any CPU
+		{899CBE02-D331-41F1-80B6-A328AB77C6A9}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{899CBE02-D331-41F1-80B6-A328AB77C6A9}.Debug|x86.Build.0 = Debug|Any CPU
+		{899CBE02-D331-41F1-80B6-A328AB77C6A9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{899CBE02-D331-41F1-80B6-A328AB77C6A9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{899CBE02-D331-41F1-80B6-A328AB77C6A9}.Release|x64.ActiveCfg = Release|Any CPU
+		{899CBE02-D331-41F1-80B6-A328AB77C6A9}.Release|x64.Build.0 = Release|Any CPU
+		{899CBE02-D331-41F1-80B6-A328AB77C6A9}.Release|x86.ActiveCfg = Release|Any CPU
+		{899CBE02-D331-41F1-80B6-A328AB77C6A9}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -538,7 +538,7 @@ namespace MonoGame.OpenGL
 
     internal partial class ColorFormat
     {
-        internal ColorFormat (int r, int g, int b, int a)
+        internal ColorFormat(int r, int g, int b, int a)
         {
             R = r;
             G = g;
@@ -669,7 +669,11 @@ namespace MonoGame.OpenGL
         [UnmanagedFunctionPointer(callingConvention)]
         [MonoNativeFunctionWrapper]
         internal delegate int DisableDelegate(EnableCap cap);
-        internal static DisableDelegate Disable;
+        internal static DisableDelegate disable;
+        internal static int Disable(EnableCap cap)
+        {
+            return disable(cap);
+        }
 
         [System.Security.SuppressUnmanagedCodeSecurity()]
         [UnmanagedFunctionPointer(callingConvention)]
@@ -764,7 +768,7 @@ namespace MonoGame.OpenGL
         [System.Security.SuppressUnmanagedCodeSecurity()]
         [UnmanagedFunctionPointer(callingConvention)]
         [MonoNativeFunctionWrapper]
-        internal delegate void DeleteRenderbuffersDelegate(int count, [In] [Out] ref int buffer);
+        internal delegate void DeleteRenderbuffersDelegate(int count, [In][Out] ref int buffer);
         internal static DeleteRenderbuffersDelegate DeleteRenderbuffers;
 
         [System.Security.SuppressUnmanagedCodeSecurity()]
@@ -909,7 +913,7 @@ namespace MonoGame.OpenGL
         [System.Security.SuppressUnmanagedCodeSecurity()]
         [UnmanagedFunctionPointer(callingConvention)]
         [MonoNativeFunctionWrapper]
-        internal delegate void DeleteQueriesDelegate(int count, [In] [Out] ref int queryId);
+        internal delegate void DeleteQueriesDelegate(int count, [In][Out] ref int queryId);
         internal static DeleteQueriesDelegate DeleteQueries;
 
         [System.Security.SuppressUnmanagedCodeSecurity()]
@@ -1205,7 +1209,7 @@ namespace MonoGame.OpenGL
         [System.Security.SuppressUnmanagedCodeSecurity()]
         [UnmanagedFunctionPointer(callingConvention)]
         [MonoNativeFunctionWrapper]
-        internal delegate void DeleteBuffersDelegate(int count, [In] [Out] ref int buffer);
+        internal delegate void DeleteBuffersDelegate(int count, [In][Out] ref int buffer);
         internal static DeleteBuffersDelegate DeleteBuffers;
 
         [System.Security.SuppressUnmanagedCodeSecurity()]
@@ -1236,176 +1240,769 @@ namespace MonoGame.OpenGL
         internal static VertexAttribDivisorDelegate VertexAttribDivisor;
 
 #if DEBUG
-        [UnmanagedFunctionPointer (CallingConvention.StdCall)]
-        delegate void DebugMessageCallbackProc (int source, int type, int id, int severity, int length, IntPtr message, IntPtr userParam);
+        [UnmanagedFunctionPointer(CallingConvention.StdCall)]
+        delegate void DebugMessageCallbackProc(int source, int type, int id, int severity, int length, IntPtr message, IntPtr userParam);
         static DebugMessageCallbackProc DebugProc;
-        [System.Security.SuppressUnmanagedCodeSecurity ()]
+        [System.Security.SuppressUnmanagedCodeSecurity()]
         [MonoNativeFunctionWrapper]
-        delegate void DebugMessageCallbackDelegate (DebugMessageCallbackProc callback, IntPtr userParam);
+        delegate void DebugMessageCallbackDelegate(DebugMessageCallbackProc callback, IntPtr userParam);
         static DebugMessageCallbackDelegate DebugMessageCallback;
 
-        internal delegate void ErrorDelegate (string message);
+        internal delegate void ErrorDelegate(string message);
         internal static event ErrorDelegate OnError;
 
         static void DebugMessageCallbackHandler(int source, int type, int id, int severity, int length, IntPtr message, IntPtr userParam)
         {
             var errorMessage = Marshal.PtrToStringAnsi(message);
             System.Diagnostics.Debug.WriteLine(errorMessage);
-            if (OnError != null)
-                OnError(errorMessage);
+            OnError?.Invoke(errorMessage);
         }
 #endif
 
         internal static int SwapInterval { get; set; }
 
-        internal static void LoadEntryPoints ()
+        unsafe internal static void LoadEntryPoints()
         {
-            LoadPlatformEntryPoints ();
+            LoadPlatformEntryPoints();
 
             if (Viewport == null)
-                Viewport = LoadFunction<ViewportDelegate> ("glViewport");
+            {
+                var funcViewportDelegate = LoadFunction<ViewportDelegate>("glViewport");
+                Viewport = (a, b, c, d) =>
+                {
+                    Console.WriteLine("OPENGL: Viewport" + " " + a + " " + b + " " + c + " " + d);
+                    funcViewportDelegate(a, b, c, d);
+                };
+            }
             if (Scissor == null)
-                Scissor = LoadFunction<ScissorDelegate> ("glScissor");
+            {
+                var funcScissorDelegate = LoadFunction<ScissorDelegate>("glScissor");
+                Scissor = (a, b, c, d) =>
+                {
+                    Console.WriteLine("OPENGL: Scissor" + " " + a + " " + b + " " + c + " " + d);
+                    funcScissorDelegate(a, b, c, d);
+                };
+            }
             if (MakeCurrent == null)
-                MakeCurrent = LoadFunction<MakeCurrentDelegate> ("glMakeCurrent");
+            {
+                var funcMakeCurrentDelegate = LoadFunction<MakeCurrentDelegate>("glMakeCurrent");
+                MakeCurrent = (a) =>
+                {
+                    Console.WriteLine("OPENGL: MakeCurrent" + " " + a);
+                    funcMakeCurrentDelegate(a);
+                };
+            }
 
-            GetError = LoadFunction<GetErrorDelegate> ("glGetError");
+            var funcGetErrorDelegate = LoadFunction<GetErrorDelegate>("glGetError");
+            GetError = () =>
+            {
+                Console.WriteLine("OPENGL: GetError");
+                return funcGetErrorDelegate();
+            };
 
-            TexParameterf = LoadFunction<TexParameterFloatDelegate> ("glTexParameterf");
-            TexParameterfv = LoadFunction<TexParameterFloatArrayDelegate> ("glTexParameterfv");
-            TexParameteri = LoadFunction<TexParameterIntDelegate> ("glTexParameteri");
+            var funcTexParameterFloatDelegate = LoadFunction<TexParameterFloatDelegate>("glTexParameterf");
+            TexParameterf = (a, b, c) =>
+            {
+                Console.WriteLine("OPENGL: TexParameterf" + " " + a + " " + b + " " + c);
+                funcTexParameterFloatDelegate(a, b, c);
+            };
+            var funcTexParameterFloatArrayDelegate = LoadFunction<TexParameterFloatArrayDelegate>("glTexParameterfv");
+            TexParameterfv = (a, b, c) =>
+            {
+                Console.WriteLine("OPENGL: TexParameterfv" + " " + a + " " + b);
+                funcTexParameterFloatArrayDelegate(a, b, c);
+            };
+            var funcTexParameterIntDelegate = LoadFunction<TexParameterIntDelegate>("glTexParameteri");
+            TexParameteri = (a, b, c) =>
+            {
+                Console.WriteLine("OPENGL: TexParameteri" + " " + a + " " + b + " " + c);
+                funcTexParameterIntDelegate(a, b, c);
+            };
 
-            EnableVertexAttribArray = LoadFunction<EnableVertexAttribArrayDelegate> ("glEnableVertexAttribArray");
-            DisableVertexAttribArray = LoadFunction<DisableVertexAttribArrayDelegate> ("glDisableVertexAttribArray");
-            GetIntegerv = LoadFunction<GetIntegerDelegate> ("glGetIntegerv");
-            GetStringInternal = LoadFunction<GetStringDelegate> ("glGetString");
-            ClearDepth = LoadFunction<ClearDepthDelegate> ("glClearDepth");
+            var funcEnableVertexAttribArrayDelegate = LoadFunction<EnableVertexAttribArrayDelegate>("glEnableVertexAttribArray");
+            EnableVertexAttribArray = (a) =>
+            {
+                Console.WriteLine("OPENGL: EnableVertexAttribArray" + " " + a);
+                funcEnableVertexAttribArrayDelegate(a);
+            };
+            var funcDisableVertexAttribArrayDelegate = LoadFunction<DisableVertexAttribArrayDelegate>("glDisableVertexAttribArray");
+            DisableVertexAttribArray = (a) =>
+            {
+                Console.WriteLine("OPENGL: DisableVertexAttribArray" + " " + a);
+                funcDisableVertexAttribArrayDelegate(a);
+            };
+            var funcGetIntegerDelegate = LoadFunction<GetIntegerDelegate>("glGetIntegerv");
+            GetIntegerv = (a, b) =>
+            {
+                Console.WriteLine("OPENGL: GetIntegerv" + " " + a);
+                funcGetIntegerDelegate(a, b);
+            };
+            var funcGetStringDelegate = LoadFunction<GetStringDelegate>("glGetString");
+            GetStringInternal = (a) =>
+            {
+                Console.WriteLine("OPENGL: GetStringInternal" + " " + a);
+                return funcGetStringDelegate(a);
+            };
+            var funcClearDepthDelegate = LoadFunction<ClearDepthDelegate>("glClearDepth");
+            ClearDepth = (a) =>
+            {
+                Console.WriteLine("OPENGL: ClearDepth" + " " + a);
+                funcClearDepthDelegate(a);
+            };
             if (ClearDepth == null)
-                ClearDepth = LoadFunction<ClearDepthDelegate> ("glClearDepthf");
-            DepthRanged = LoadFunction<DepthRangedDelegate> ("glDepthRange");
-            DepthRangef = LoadFunction<DepthRangefDelegate> ("glDepthRangef");
-            Clear = LoadFunction<ClearDelegate> ("glClear");
-            ClearColor = LoadFunction<ClearColorDelegate> ("glClearColor");
-            ClearStencil = LoadFunction<ClearStencilDelegate> ("glClearStencil");
-            Flush = LoadFunction<FlushDelegate> ("glFlush");
-            GenTextures = LoadFunction<GenTexturesDelegte> ("glGenTextures");
-            BindTexture = LoadFunction<BindTextureDelegate> ("glBindTexture");
+            {
+                var funcClearDepthDelegate2 = LoadFunction<ClearDepthDelegate>("glClearDepthf");
+                ClearDepth = (a) =>
+                {
+                    Console.WriteLine("OPENGL: ClearDepth" + " " + a);
+                    funcClearDepthDelegate2(a);
+                };
+            }
+            var funcDepthRangedDelegate = LoadFunction<DepthRangedDelegate>("glDepthRange");
+            DepthRanged = (a, b) =>
+            {
+                Console.WriteLine("OPENGL: DepthRanged" + " " + a + " " + b);
+                funcDepthRangedDelegate(a, b);
+            };
+            var funcDepthRangefDelegate = LoadFunction<DepthRangefDelegate>("glDepthRangef");
+            DepthRangef = (a, b) =>
+            {
+                Console.WriteLine("OPENGL: DepthRangef" + " " + a + " " + b);
+                funcDepthRangefDelegate(a, b);
+            };
+            var funcClearDelegate = LoadFunction<ClearDelegate>("glClear");
+            Clear = (a) =>
+            {
+                Console.WriteLine("OPENGL: Clear" + " " + a);
+                funcClearDelegate(a);
+            };
+            var funcClearColorDelegate = LoadFunction<ClearColorDelegate>("glClearColor");
+            ClearColor = (a, b, c, d) =>
+            {
+                Console.WriteLine("OPENGL: ClearColor" + " " + a + " " + b + " " + c + " " + d);
+                funcClearColorDelegate(a, b, c, d);
+            };
+            var funcClearStencilDelegate = LoadFunction<ClearStencilDelegate>("glClearStencil");
+            ClearStencil = (a) =>
+            {
+                Console.WriteLine("OPENGL: ClearStencil" + " " + a);
+                funcClearStencilDelegate(a);
+            };
+            var funcFlushDelegate = LoadFunction<FlushDelegate>("glFlush");
+            Flush = () =>
+            {
+                Console.WriteLine("OPENGL: Flush");
+                funcFlushDelegate();
+            };
+            var funcGenTexturesDelegte = LoadFunction<GenTexturesDelegte>("glGenTextures");
+            GenTextures = (int a, out int b) =>
+            {
+                Console.WriteLine("OPENGL: GenTextures" + " " + a);
+                funcGenTexturesDelegte(a, out b);
+            };
+            var funcBindTextureDelegate = LoadFunction<BindTextureDelegate>("glBindTexture");
+            BindTexture = (a, b) =>
+            {
+                Console.WriteLine("OPENGL: BindTexture" + " " + a + " " + b);
+                funcBindTextureDelegate(a, b);
+            };
 
-            Enable = LoadFunction<EnableDelegate> ("glEnable");
-            Disable = LoadFunction<DisableDelegate> ("glDisable");
-            CullFace = LoadFunction<CullFaceDelegate> ("glCullFace");
-            FrontFace = LoadFunction<FrontFaceDelegate> ("glFrontFace");
-            PolygonMode = LoadFunction<PolygonModeDelegate> ("glPolygonMode");
-            PolygonOffset = LoadFunction<PolygonOffsetDelegate> ("glPolygonOffset");
+            var funcEnableDelegate = LoadFunction<EnableDelegate>("glEnable");
+            Enable = (a) =>
+            {
+                Console.WriteLine("OPENGL: Enable" + " " + a);
+                return funcEnableDelegate(a);
+            };
+            var funcDisableDelegate = LoadFunction<DisableDelegate>("glDisable");
+            disable = (a) =>
+            {
+                Console.WriteLine("OPENGL: disable" + " " + a);
+                return funcDisableDelegate(a);
+            };
+            var funcCullFaceDelegate = LoadFunction<CullFaceDelegate>("glCullFace");
+            CullFace = (a) =>
+            {
+                Console.WriteLine("OPENGL: CullFace" + " " + a);
+                funcCullFaceDelegate(a);
+            };
+            var funcFrontFaceDelegate = LoadFunction<FrontFaceDelegate>("glFrontFace");
+            FrontFace = (a) =>
+            {
+                Console.WriteLine("OPENGL: FrontFace" + " " + a);
+                funcFrontFaceDelegate(a);
+            };
+            var funcPolygonModeDelegate = LoadFunction<PolygonModeDelegate>("glPolygonMode");
+            PolygonMode = (a, b) =>
+            {
+                Console.WriteLine("OPENGL: PolygonMode" + " " + a + " " + b);
+                funcPolygonModeDelegate(a, b);
+            };
+            var funcPolygonOffsetDelegate = LoadFunction<PolygonOffsetDelegate>("glPolygonOffset");
+            PolygonOffset = (a, b) =>
+            {
+                Console.WriteLine("OPENGL: PolygonOffset" + " " + a + " " + b);
+                funcPolygonOffsetDelegate(a, b);
+            };
 
-            BindBuffer = LoadFunction<BindBufferDelegate> ("glBindBuffer");
-            DrawBuffers = LoadFunction<DrawBuffersDelegate> ("glDrawBuffers");
-            DrawElements = LoadFunction<DrawElementsDelegate> ("glDrawElements");
-            DrawArrays = LoadFunction<DrawArraysDelegate> ("glDrawArrays");
-            Uniform1i = LoadFunction<Uniform1iDelegate> ("glUniform1i");
-            Uniform4fv = LoadFunction<Uniform4fvDelegate> ("glUniform4fv");
-            ReadPixelsInternal = LoadFunction<ReadPixelsDelegate>("glReadPixels");
+            var funcBindBufferDelegate = LoadFunction<BindBufferDelegate>("glBindBuffer");
+            BindBuffer = (a, b) =>
+            {
+                Console.WriteLine("OPENGL: BindBuffer" + " " + a + " " + b);
+                funcBindBufferDelegate(a, b);
+            };
+            var funcDrawBuffersDelegate = LoadFunction<DrawBuffersDelegate>("glDrawBuffers");
+            DrawBuffers = (a, b) =>
+            {
+                Console.WriteLine("OPENGL: DrawBuffers" + " " + a + " " + b);
+                funcDrawBuffersDelegate(a, b);
+            };
+            var funcDrawElementsDelegate = LoadFunction<DrawElementsDelegate>("glDrawElements");
+            DrawElements = (a, b, c, d) =>
+            {
+                Console.WriteLine("OPENGL: DrawElements" + " " + a + " " + b + " " + c + " " + d);
+                funcDrawElementsDelegate(a, b, c, d);
+            };
+            var funcDrawArraysDelegate = LoadFunction<DrawArraysDelegate>("glDrawArrays");
+            DrawArrays = (a, b, c) =>
+            {
+                Console.WriteLine("OPENGL: DrawArrays" + " " + a + " " + b + " " + c);
+                funcDrawArraysDelegate(a, b, c);
+            };
+            var funcUniform1iDelegate = LoadFunction<Uniform1iDelegate>("glUniform1i");
+            Uniform1i = (a, b) =>
+            {
+                Console.WriteLine("OPENGL: Uniform1i" + " " + a + " " + b);
+                funcUniform1iDelegate(a, b);
+            };
+            var funcUniform4fvDelegate = LoadFunction<Uniform4fvDelegate>("glUniform4fv");
+            Uniform4fv = (a, b, c) =>
+            {
+                Console.WriteLine("OPENGL: Uniform4fv" + " " + a + " " + b);
+                funcUniform4fvDelegate(a, b, c);
+            };
+            var funcReadPixelsDelegate = LoadFunction<ReadPixelsDelegate>("glReadPixels");
+            ReadPixelsInternal = (a, b, c, d, e, f, g) =>
+            {
+                Console.WriteLine("OPENGL: ReadPixelsInternal" + " " + a + " " + b + " " + c + " " + d + " " + e + " " + f + " " + g);
+                funcReadPixelsDelegate(a, b, c, d, e, f, g);
+            };
 
-            ReadBuffer = LoadFunction<ReadBufferDelegate> ("glReadBuffer");
-            DrawBuffer = LoadFunction<DrawBufferDelegate> ("glDrawBuffer");
+            var funcReadBufferDelegate = LoadFunction<ReadBufferDelegate>("glReadBuffer");
+            ReadBuffer = (a) =>
+            {
+                Console.WriteLine("OPENGL: ReadBuffer" + " " + a);
+                funcReadBufferDelegate(a);
+            };
+            var funcDrawBufferDelegate = LoadFunction<DrawBufferDelegate>("glDrawBuffer");
+            DrawBuffer = (a) =>
+            {
+                Console.WriteLine("OPENGL: DrawBuffer" + " " + a);
+                funcDrawBufferDelegate(a);
+            };
 
             // Render Target Support. These might be null if they are not supported
             // see GraphicsDevice.OpenGL.FramebufferHelper.cs for handling other extensions.
-            GenRenderbuffers = LoadFunction<GenRenderbuffersDelegate> ("glGenRenderbuffers");
-            BindRenderbuffer = LoadFunction<BindRenderbufferDelegate> ("glBindRenderbuffer");
-            DeleteRenderbuffers = LoadFunction<DeleteRenderbuffersDelegate> ("glDeleteRenderbuffers");
-            GenFramebuffers = LoadFunction<GenFramebuffersDelegate> ("glGenFramebuffers");
-            BindFramebuffer = LoadFunction<BindFramebufferDelegate> ("glBindFramebuffer");
-            DeleteFramebuffers = LoadFunction<DeleteFramebuffersDelegate> ("glDeleteFramebuffers");
-            FramebufferTexture2D = LoadFunction<FramebufferTexture2DDelegate> ("glFramebufferTexture2D");
-            FramebufferRenderbuffer = LoadFunction<FramebufferRenderbufferDelegate> ("glFramebufferRenderbuffer");
-            RenderbufferStorage = LoadFunction<RenderbufferStorageDelegate> ("glRenderbufferStorage");
-            RenderbufferStorageMultisample = LoadFunction<RenderbufferStorageMultisampleDelegate> ("glRenderbufferStorageMultisample");
-            GenerateMipmap = LoadFunction<GenerateMipmapDelegate> ("glGenerateMipmap");
-            BlitFramebuffer = LoadFunction<BlitFramebufferDelegate> ("glBlitFramebuffer");
-            CheckFramebufferStatus = LoadFunction<CheckFramebufferStatusDelegate> ("glCheckFramebufferStatus");
+            var funcGenRenderbuffersDelegate = LoadFunction<GenRenderbuffersDelegate>("glGenRenderbuffers");
+            GenRenderbuffers = (int a, out int b) =>
+            {
+                Console.WriteLine("OPENGL: GenRenderbuffers" + " " + a);
+                funcGenRenderbuffersDelegate(a, out b);
+            };
+            var funcBindRenderbufferDelegate = LoadFunction<BindRenderbufferDelegate>("glBindRenderbuffer");
+            BindRenderbuffer = (a, b) =>
+            {
+                Console.WriteLine("OPENGL: BindRenderbuffer" + " " + a + " " + b);
+                funcBindRenderbufferDelegate(a, b);
+            };
+            var funcDeleteRenderbuffersDelegate = LoadFunction<DeleteRenderbuffersDelegate>("glDeleteRenderbuffers");
+            DeleteRenderbuffers = (int a, [In][Out] ref int b) =>
+            {
+                Console.WriteLine("OPENGL: DeleteRenderbuffers" + " " + a + " " + b);
+                funcDeleteRenderbuffersDelegate(a, ref b);
+            };
+            var funcGenFramebuffersDelegate = LoadFunction<GenFramebuffersDelegate>("glGenFramebuffers");
+            GenFramebuffers = (int a, out int b) =>
+            {
+                Console.WriteLine("OPENGL: GenFramebuffers" + " " + a);
+                funcGenFramebuffersDelegate(a, out b);
+            };
+            var funcBindFramebufferDelegate = LoadFunction<BindFramebufferDelegate>("glBindFramebuffer");
+            BindFramebuffer = (a, b) =>
+            {
+                Console.WriteLine("OPENGL: BindFramebuffer" + " " + a + " " + b);
+                funcBindFramebufferDelegate(a, b);
+            };
+            var funcDeleteFramebuffersDelegate = LoadFunction<DeleteFramebuffersDelegate>("glDeleteFramebuffers");
+            DeleteFramebuffers = (int a, [In][Out] ref int b) =>
+            {
+                Console.WriteLine("OPENGL: DeleteFramebuffers" + " " + a + " " + b);
+                funcDeleteFramebuffersDelegate(a, ref b);
+            };
+            var funcFramebufferTexture2DDelegate = LoadFunction<FramebufferTexture2DDelegate>("glFramebufferTexture2D");
+            FramebufferTexture2D = (a, b, c, d, e) =>
+            {
+                Console.WriteLine("OPENGL: FramebufferTexture2D" + " " + a + " " + b + " " + c + " " + d + " " + e);
+                funcFramebufferTexture2DDelegate(a, b, c, d, e);
+            };
+            var funcFramebufferRenderbufferDelegate = LoadFunction<FramebufferRenderbufferDelegate>("glFramebufferRenderbuffer");
+            FramebufferRenderbuffer = (a, b, c, d) =>
+            {
+                Console.WriteLine("OPENGL: FramebufferRenderbuffer" + " " + a + " " + b + " " + c + " " + d);
+                funcFramebufferRenderbufferDelegate(a, b, c, d);
+            };
+            var funcRenderbufferStorageDelegate = LoadFunction<RenderbufferStorageDelegate>("glRenderbufferStorage");
+            RenderbufferStorage = (a, b, c, d) =>
+            {
+                Console.WriteLine("OPENGL: RenderbufferStorage" + " " + a + " " + b + " " + c + " " + d);
+                funcRenderbufferStorageDelegate(a, b, c, d);
+            };
+            var funcRenderbufferStorageMultisampleDelegate = LoadFunction<RenderbufferStorageMultisampleDelegate>("glRenderbufferStorageMultisample");
+            RenderbufferStorageMultisample = (a, b, c, d, e) =>
+            {
+                Console.WriteLine("OPENGL: RenderbufferStorageMultisample" + " " + a + " " + b + " " + c + " " + d + " " + e);
+                funcRenderbufferStorageMultisampleDelegate(a, b, c, d, e);
+            };
+            var funcGenerateMipmapDelegate = LoadFunction<GenerateMipmapDelegate>("glGenerateMipmap");
+            GenerateMipmap = (a) =>
+            {
+                Console.WriteLine("OPENGL: GenerateMipmap" + " " + a);
+                funcGenerateMipmapDelegate(a);
+            };
+            var funcBlitFramebufferDelegate = LoadFunction<BlitFramebufferDelegate>("glBlitFramebuffer");
+            BlitFramebuffer = (a, b, c, d, e, f, g, h, i, j) =>
+            {
+                Console.WriteLine("OPENGL: BlitFramebuffer" + " " + a + " " + b + " " + c + " " + d + " " + e + " " + f + " " + g + " " + h + " " + i + " " + j);
+                funcBlitFramebufferDelegate(a, b, c, d, e, f, g, h, i, j);
+            };
+            var funcCheckFramebufferStatusDelegate = LoadFunction<CheckFramebufferStatusDelegate>("glCheckFramebufferStatus");
+            CheckFramebufferStatus = (a) =>
+            {
+                Console.WriteLine("OPENGL: CheckFramebufferStatus" + " " + a);
+                return funcCheckFramebufferStatusDelegate(a);
+            };
 
-            GenQueries = LoadFunction<GenQueriesDelegate> ("glGenQueries");
-            BeginQuery = LoadFunction<BeginQueryDelegate> ("glBeginQuery");
-            EndQuery = LoadFunction<EndQueryDelegate> ("glEndQuery");
-            GetQueryObject = LoadFunction<GetQueryObjectDelegate>("glGetQueryObjectuiv");
+            var funcGenQueriesDelegate = LoadFunction<GenQueriesDelegate>("glGenQueries");
+            GenQueries = (int a, out int b) =>
+            {
+                Console.WriteLine("OPENGL: GenQueries" + " " + a);
+                funcGenQueriesDelegate(a, out b);
+            };
+            var funcBeginQueryDelegate = LoadFunction<BeginQueryDelegate>("glBeginQuery");
+            BeginQuery = (a, b) =>
+            {
+                Console.WriteLine("OPENGL: BeginQuery" + " " + a + " " + b);
+                funcBeginQueryDelegate(a, b);
+            };
+            var funcEndQueryDelegate = LoadFunction<EndQueryDelegate>("glEndQuery");
+            EndQuery = (a) =>
+            {
+                Console.WriteLine("OPENGL: EndQuery" + " " + a);
+                funcEndQueryDelegate(a);
+            };
+            var funcGetQueryObjectDelegate = LoadFunction<GetQueryObjectDelegate>("glGetQueryObjectuiv");
+            GetQueryObject = (int queryId, GetQueryObjectParam getparam, out int ready) =>
+            {
+                Console.WriteLine("OPENGL: GetQueryObject" + " " + queryId + " " + getparam);
+                funcGetQueryObjectDelegate(queryId, getparam, out ready);
+            };
             if (GetQueryObject == null)
-                GetQueryObject = LoadFunction<GetQueryObjectDelegate> ("glGetQueryObjectivARB");
+                funcGetQueryObjectDelegate = LoadFunction<GetQueryObjectDelegate>("glGetQueryObjectivARB");
+            GetQueryObject = (int queryId, MonoGame.OpenGL.GetQueryObjectParam getparam, out int ready) =>
+            {
+                Console.WriteLine("OPENGL: GetQueryObject" + " " + queryId + " " + getparam);
+                funcGetQueryObjectDelegate(queryId, getparam, out ready);
+            };
             if (GetQueryObject == null)
-                GetQueryObject = LoadFunction<GetQueryObjectDelegate> ("glGetQueryObjectiv");
-            DeleteQueries = LoadFunction<DeleteQueriesDelegate> ("glDeleteQueries");
+                funcGetQueryObjectDelegate = LoadFunction<GetQueryObjectDelegate>("glGetQueryObjectiv");
+            GetQueryObject = (int queryId, MonoGame.OpenGL.GetQueryObjectParam getparam, out int ready) =>
+            {
+                Console.WriteLine("OPENGL: GetQueryObject" + " " + queryId + " " + getparam);
+                funcGetQueryObjectDelegate(queryId, getparam, out ready);
+            };
+            var funcDeleteQueriesDelegate = LoadFunction<DeleteQueriesDelegate>("glDeleteQueries");
+            DeleteQueries = (int count, ref int queryId) =>
+            {
+                Console.WriteLine("OPENGL: DeleteQueries" + " " + count + " " + queryId);
+                funcDeleteQueriesDelegate(count, ref queryId);
+            };
 
-            ActiveTexture = LoadFunction<ActiveTextureDelegate> ("glActiveTexture");
-            CreateShader = LoadFunction<CreateShaderDelegate> ("glCreateShader");
-            ShaderSourceInternal = LoadFunction<ShaderSourceDelegate> ("glShaderSource");
-            CompileShader = LoadFunction<CompileShaderDelegate> ("glCompileShader");
-            GetShaderiv = LoadFunction<GetShaderDelegate> ("glGetShaderiv");
-            GetShaderInfoLogInternal = LoadFunction<GetShaderInfoLogDelegate> ("glGetShaderInfoLog");
-            IsShader = LoadFunction<IsShaderDelegate> ("glIsShader");
-            DeleteShader = LoadFunction<DeleteShaderDelegate> ("glDeleteShader");
-            GetAttribLocation = LoadFunction<GetAttribLocationDelegate> ("glGetAttribLocation");
-            GetUniformLocation = LoadFunction<GetUniformLocationDelegate> ("glGetUniformLocation");
+            var funcActiveTextureDelegate = LoadFunction<ActiveTextureDelegate>("glActiveTexture");
+            ActiveTexture = (a) =>
+            {
+                Console.WriteLine("OPENGL: ActiveTexture" + " " + a);
+                funcActiveTextureDelegate(a);
+            };
+            var funcCreateShaderDelegate = LoadFunction<CreateShaderDelegate>("glCreateShader");
+            CreateShader = (a) =>
+            {
+                Console.WriteLine("OPENGL: CreateShader" + " " + a);
+                return funcCreateShaderDelegate(a);
+            };
+            var funcShaderSourceDelegate = LoadFunction<ShaderSourceDelegate>("glShaderSource");
+            ShaderSourceInternal = (a, b, c, d) =>
+            {
+                Console.WriteLine("OPENGL: ShaderSourceInternal" + " " + a + " " + b + " " + c);
+                funcShaderSourceDelegate(a, b, c, d);
+            };
+            var funcCompileShaderDelegate = LoadFunction<CompileShaderDelegate>("glCompileShader");
+            CompileShader = (a) =>
+            {
+                Console.WriteLine("OPENGL: CompileShader" + " " + a);
+                funcCompileShaderDelegate(a);
+            };
+            var funcGetShaderDelegate = LoadFunction<GetShaderDelegate>("glGetShaderiv");
+            GetShaderiv = (a, b, c) =>
+            {
+                Console.WriteLine("OPENGL: GetShaderiv" + " " + a + " " + b);
+                funcGetShaderDelegate(a, b, c);
+            };
+            var funcGetShaderInfoLogDelegate = LoadFunction<GetShaderInfoLogDelegate>(
+                "glGetShaderInfoLog"
+            );
+            GetShaderInfoLogInternal = (a, b, c, d) =>
+            {
+                Console.WriteLine("OPENGL: GetShaderInfoLogInternal" + " " + a + " " + b + " " + c + " " + d);
+                funcGetShaderInfoLogDelegate(a, b, c, d);
+            };
+            var funcIsShaderDelegate = LoadFunction<IsShaderDelegate>("glIsShader");
+            IsShader = (a) =>
+            {
+                Console.WriteLine("OPENGL: IsShader" + " " + a);
+                return funcIsShaderDelegate(a);
+            };
+            var funcDeleteShaderDelegate = LoadFunction<DeleteShaderDelegate>("glDeleteShader");
+            DeleteShader = (a) =>
+            {
+                Console.WriteLine("OPENGL: DeleteShader" + " " + a);
+                funcDeleteShaderDelegate(a);
+            };
+            var funcGetAttribLocationDelegate = LoadFunction<GetAttribLocationDelegate>(
+                "glGetAttribLocation"
+            );
+            GetAttribLocation = (a, b) =>
+            {
+                Console.WriteLine("OPENGL: GetAttribLocation" + " " + a + " " + b);
+                return funcGetAttribLocationDelegate(a, b);
+            };
+            var funcGetUniformLocationDelegate = LoadFunction<GetUniformLocationDelegate>(
+                "glGetUniformLocation"
+            );
+            GetUniformLocation = (a, b) =>
+            {
+                Console.WriteLine("OPENGL: GetUniformLocation" + " " + a + " " + b);
+                return funcGetUniformLocationDelegate(a, b);
+            };
 
-            IsProgram = LoadFunction<IsProgramDelegate> ("glIsProgram");
-            DeleteProgram = LoadFunction<DeleteProgramDelegate> ("glDeleteProgram");
-            CreateProgram = LoadFunction<CreateProgramDelegate> ("glCreateProgram");
-            AttachShader = LoadFunction<AttachShaderDelegate> ("glAttachShader");
-            UseProgram = LoadFunction<UseProgramDelegate> ("glUseProgram");
-            LinkProgram = LoadFunction<LinkProgramDelegate> ("glLinkProgram");
-            GetProgramiv = LoadFunction<GetProgramDelegate> ("glGetProgramiv");
-            GetProgramInfoLogInternal = LoadFunction<GetProgramInfoLogDelegate> ("glGetProgramInfoLog");
-            DetachShader = LoadFunction<DetachShaderDelegate> ("glDetachShader");
+            var funcIsProgramDelegate = LoadFunction<IsProgramDelegate>("glIsProgram");
+            IsProgram = (a) =>
+            {
+                Console.WriteLine("OPENGL: IsProgram" + " " + a);
+                return funcIsProgramDelegate(a);
+            };
+            var funcDeleteProgramDelegate = LoadFunction<DeleteProgramDelegate>("glDeleteProgram");
+            DeleteProgram = (a) =>
+            {
+                Console.WriteLine("OPENGL: DeleteProgram" + " " + a);
+                funcDeleteProgramDelegate(a);
+            };
+            var funcCreateProgramDelegate = LoadFunction<CreateProgramDelegate>("glCreateProgram");
+            CreateProgram = () =>
+            {
+                Console.WriteLine("OPENGL: CreateProgram");
+                return funcCreateProgramDelegate();
+            };
+            var funcAttachShaderDelegate = LoadFunction<AttachShaderDelegate>("glAttachShader");
+            AttachShader = (a, b) =>
+            {
+                Console.WriteLine("OPENGL: AttachShader" + " " + a + " " + b);
+                funcAttachShaderDelegate(a, b);
+            };
+            var funcUseProgramDelegate = LoadFunction<UseProgramDelegate>("glUseProgram");
+            UseProgram = (a) =>
+            {
+                Console.WriteLine("OPENGL: UseProgram" + " " + a);
+                funcUseProgramDelegate(a);
+            };
+            var funcLinkProgramDelegate = LoadFunction<LinkProgramDelegate>("glLinkProgram");
+            LinkProgram = (a) =>
+            {
+                Console.WriteLine("OPENGL: LinkProgram" + " " + a);
+                funcLinkProgramDelegate(a);
+            };
+            var funcGetProgramDelegate = LoadFunction<GetProgramDelegate>("glGetProgramiv");
+            GetProgramiv = (a, b, c) =>
+            {
+                Console.WriteLine("OPENGL: GetProgramiv" + " " + a + " " + b);
+                funcGetProgramDelegate(a, b, c);
+            };
+            var funcGetProgramInfoLogDelegate = LoadFunction<GetProgramInfoLogDelegate>(
+                "glGetProgramInfoLog"
+            );
+            GetProgramInfoLogInternal = (a, b, c, d) =>
+            {
+                Console.WriteLine("OPENGL: GetProgramInfoLogInternal" + " " + a + " " + b + " " + c + " " + d);
+                funcGetProgramInfoLogDelegate(a, b, c, d);
+            };
+            var funcDetachShaderDelegate = LoadFunction<DetachShaderDelegate>("glDetachShader");
+            DetachShader = (a, b) =>
+            {
+                Console.WriteLine("OPENGL: DetachShader" + " " + a + " " + b);
+                funcDetachShaderDelegate(a, b);
+            };
 
-            BlendColor = LoadFunction<BlendColorDelegate> ("glBlendColor");
-            BlendEquationSeparate = LoadFunction<BlendEquationSeparateDelegate> ("glBlendEquationSeparate");
-            BlendEquationSeparatei = LoadFunction<BlendEquationSeparateiDelegate>("glBlendEquationSeparatei");
-            BlendFuncSeparate = LoadFunction<BlendFuncSeparateDelegate> ("glBlendFuncSeparate");
-            BlendFuncSeparatei = LoadFunction<BlendFuncSeparateiDelegate>("glBlendFuncSeparatei");
-            ColorMask = LoadFunction<ColorMaskDelegate> ("glColorMask");
-            DepthFunc = LoadFunction<DepthFuncDelegate> ("glDepthFunc");
-            DepthMask = LoadFunction<DepthMaskDelegate> ("glDepthMask");
-            StencilFuncSeparate = LoadFunction<StencilFuncSeparateDelegate> ("glStencilFuncSeparate");
-            StencilOpSeparate = LoadFunction<StencilOpSeparateDelegate> ("glStencilOpSeparate");
-            StencilFunc = LoadFunction<StencilFuncDelegate> ("glStencilFunc");
-            StencilOp = LoadFunction<StencilOpDelegate> ("glStencilOp");
-            StencilMask = LoadFunction<StencilMaskDelegate> ("glStencilMask");
+            var funcBlendColorDelegate = LoadFunction<BlendColorDelegate>("glBlendColor");
+            BlendColor = (a, b, c, d) =>
+            {
+                Console.WriteLine("OPENGL: BlendColor" + " " + a + " " + b + " " + c + " " + d);
+                funcBlendColorDelegate(a, b, c, d);
+            };
+            var funcBlendEquationSeparateDelegate = LoadFunction<BlendEquationSeparateDelegate>(
+                "glBlendEquationSeparate"
+            );
+            BlendEquationSeparate = (a, b) =>
+            {
+                Console.WriteLine("OPENGL: BlendEquationSeparate" + " " + a + " " + b);
+                funcBlendEquationSeparateDelegate(a, b);
+            };
+            var funcBlendEquationSeparateiDelegate = LoadFunction<BlendEquationSeparateiDelegate>(
+                "glBlendEquationSeparatei"
+            );
+            BlendEquationSeparatei = (a, b, c) =>
+            {
+                Console.WriteLine("OPENGL: BlendEquationSeparatei" + " " + a + " " + b + " " + c);
+                funcBlendEquationSeparateiDelegate(a, b, c);
+            };
+            var funcBlendFuncSeparateDelegate = LoadFunction<BlendFuncSeparateDelegate>(
+                "glBlendFuncSeparate"
+            );
+            BlendFuncSeparate = (a, b, c, d) =>
+            {
+                Console.WriteLine("OPENGL: BlendFuncSeparate" + " " + a + " " + b + " " + c + " " + d);
+                funcBlendFuncSeparateDelegate(a, b, c, d);
+            };
+            var funcBlendFuncSeparateiDelegate = LoadFunction<BlendFuncSeparateiDelegate>(
+                "glBlendFuncSeparatei"
+            );
+            BlendFuncSeparatei = (a, b, c, d, e) =>
+            {
+                Console.WriteLine("OPENGL: BlendFuncSeparatei" + " " + a + " " + b + " " + c + " " + d + " " + e);
+                funcBlendFuncSeparateiDelegate(a, b, c, d, e);
+            };
+            var funcColorMaskDelegate = LoadFunction<ColorMaskDelegate>("glColorMask");
+            ColorMask = (a, b, c, d) =>
+            {
+                Console.WriteLine("OPENGL: ColorMask" + " " + a + " " + b + " " + c + " " + d);
+                funcColorMaskDelegate(a, b, c, d);
+            };
+            var funcDepthFuncDelegate = LoadFunction<DepthFuncDelegate>("glDepthFunc");
+            DepthFunc = (a) =>
+            {
+                Console.WriteLine("OPENGL: DepthFunc" + " " + a);
+                funcDepthFuncDelegate(a);
+            };
+            var funcDepthMaskDelegate = LoadFunction<DepthMaskDelegate>("glDepthMask");
+            DepthMask = (a) =>
+            {
+                Console.WriteLine("OPENGL: DepthMask" + " " + a);
+                funcDepthMaskDelegate(a);
+            };
+            var funcStencilFuncSeparateDelegate = LoadFunction<StencilFuncSeparateDelegate>(
+                "glStencilFuncSeparate"
+            );
+            StencilFuncSeparate = (a, b, c, d) =>
+            {
+                Console.WriteLine("OPENGL: StencilFuncSeparate" + " " + a + " " + b + " " + c + " " + d);
+                funcStencilFuncSeparateDelegate(a, b, c, d);
+            };
+            var funcStencilOpSeparateDelegate = LoadFunction<StencilOpSeparateDelegate>(
+                "glStencilOpSeparate"
+            );
+            StencilOpSeparate = (a, b, c, d) =>
+            {
+                Console.WriteLine("OPENGL: StencilOpSeparate" + " " + a + " " + b + " " + c + " " + d);
+                funcStencilOpSeparateDelegate(a, b, c, d);
+            };
+            var funcStencilFuncDelegate = LoadFunction<StencilFuncDelegate>("glStencilFunc");
+            StencilFunc = (a, b, c) =>
+            {
+                Console.WriteLine("OPENGL: StencilFunc" + " " + a + " " + b + " " + c);
+                funcStencilFuncDelegate(a, b, c);
+            };
+            var funcStencilOpDelegate = LoadFunction<StencilOpDelegate>("glStencilOp");
+            StencilOp = (a, b, c) =>
+            {
+                Console.WriteLine("OPENGL: StencilOp" + " " + a + " " + b + " " + c);
+                funcStencilOpDelegate(a, b, c);
+            };
+            var funcStencilMaskDelegate = LoadFunction<StencilMaskDelegate>("glStencilMask");
+            StencilMask = (a) =>
+            {
+                Console.WriteLine("OPENGL: StencilMask" + " " + a);
+                funcStencilMaskDelegate(a);
+            };
 
-            CompressedTexImage2D = LoadFunction<CompressedTexImage2DDelegate> ("glCompressedTexImage2D");
-            TexImage2D = LoadFunction<TexImage2DDelegate> ("glTexImage2D");
-            CompressedTexSubImage2D = LoadFunction<CompressedTexSubImage2DDelegate> ("glCompressedTexSubImage2D");
-            TexSubImage2D = LoadFunction<TexSubImage2DDelegate> ("glTexSubImage2D");
-            PixelStore = LoadFunction<PixelStoreDelegate> ("glPixelStorei");
-            Finish = LoadFunction<FinishDelegate> ("glFinish");
-            GetTexImageInternal = LoadFunction<GetTexImageDelegate> ("glGetTexImage");
-            GetCompressedTexImageInternal = LoadFunction<GetCompressedTexImageDelegate> ("glGetCompressedTexImage");
-            TexImage3D = LoadFunction<TexImage3DDelegate> ("glTexImage3D");
-            TexSubImage3D = LoadFunction<TexSubImage3DDelegate> ("glTexSubImage3D");
-            DeleteTextures = LoadFunction<DeleteTexturesDelegate> ("glDeleteTextures");
+            var funcCompressedTexImage2DDelegate = LoadFunction<CompressedTexImage2DDelegate>(
+                "glCompressedTexImage2D"
+            );
+            CompressedTexImage2D = (a, b, c, d, e, f, g, h) =>
+            {
+                Console.WriteLine("OPENGL: CompressedTexImage2D" + " " + a + " " + b + " " + c + " " + d + " " + e + " " + f + " " + g + " " + h);
+                funcCompressedTexImage2DDelegate(a, b, c, d, e, f, g, h);
+            };
+            var funcTexImage2DDelegate = LoadFunction<TexImage2DDelegate>("glTexImage2D");
+            TexImage2D = (a, b, c, d, e, f, g, h, i) =>
+            {
+                Console.WriteLine("OPENGL: TexImage2D" + " " + a + " " + b + " " + c + " " + d + " " + e + " " + f + " " + g + " " + h + " " + i);
+                funcTexImage2DDelegate(a, b, c, d, e, f, g, h, i);
+            };
+            var funcCompressedTexSubImage2DDelegate =
+                LoadFunction<CompressedTexSubImage2DDelegate>("glCompressedTexSubImage2D");
+            CompressedTexSubImage2D = (a, b, c, d, e, f, g, h, i) =>
+            {
+                Console.WriteLine("OPENGL: CompressedTexSubImage2D" + " " + a + " " + b + " " + c + " " + d + " " + e + " " + f + " " + g + " " + h + " " + i);
+                funcCompressedTexSubImage2DDelegate(a, b, c, d, e, f, g, h, i);
+            };
+            var funcTexSubImage2DDelegate = LoadFunction<TexSubImage2DDelegate>("glTexSubImage2D");
+            TexSubImage2D = (a, b, c, d, e, f, g, h, i) =>
+            {
+                Console.WriteLine("OPENGL: TexSubImage2D" + " " + a + " " + b + " " + c + " " + d + " " + e + " " + f + " " + g + " " + h + " " + i);
+                funcTexSubImage2DDelegate(a, b, c, d, e, f, g, h, i);
+            };
+            var funcPixelStoreDelegate = LoadFunction<PixelStoreDelegate>("glPixelStorei");
+            PixelStore = (a, b) =>
+            {
+                Console.WriteLine("OPENGL: PixelStore" + " " + a + " " + b);
+                funcPixelStoreDelegate(a, b);
+            };
+            var funcFinishDelegate = LoadFunction<FinishDelegate>("glFinish");
+            Finish = () =>
+            {
+                Console.WriteLine("OPENGL: Finish");
+                funcFinishDelegate();
+            };
+            var funcGetTexImageDelegate = LoadFunction<GetTexImageDelegate>("glGetTexImage");
+            GetTexImageInternal = (a, b, c, d, e) =>
+            {
+                Console.WriteLine("OPENGL: GetTexImageInternal" + " " + a + " " + b + " " + c + " " + d + " " + e);
+                funcGetTexImageDelegate(a, b, c, d, e);
+            };
+            var funcGetCompressedTexImageDelegate = LoadFunction<GetCompressedTexImageDelegate>(
+                "glGetCompressedTexImage"
+            );
+            GetCompressedTexImageInternal = (a, b, c) =>
+            {
+                Console.WriteLine("OPENGL: GetCompressedTexImageInternal" + " " + a + " " + b + " " + c);
+                funcGetCompressedTexImageDelegate(a, b, c);
+            };
+            var funcTexImage3DDelegate = LoadFunction<TexImage3DDelegate>("glTexImage3D");
+            TexImage3D = (a, b, c, d, e, f, g, h, i, j) =>
+            {
+                Console.WriteLine("OPENGL: TexImage3D" + " " + a + " " + b + " " + c + " " + d + " " + e + " " + f + " " + g + " " + h + " " + i + " " + j);
+                funcTexImage3DDelegate(a, b, c, d, e, f, g, h, i, j);
+            };
+            var funcTexSubImage3DDelegate = LoadFunction<TexSubImage3DDelegate>("glTexSubImage3D");
+            TexSubImage3D = (a, b, c, d, e, f, g, h, i, j, k) =>
+            {
+                Console.WriteLine("OPENGL: TexSubImage3D" + " " + a + " " + b + " " + c + " " + d + " " + e + " " + f + " " + g + " " + h + " " + i + " " + j + " " + k);
+                funcTexSubImage3DDelegate(a, b, c, d, e, f, g, h, i, j, k);
+            };
+            var funcDeleteTexturesDelegate = LoadFunction<DeleteTexturesDelegate>("glDeleteTextures");
+            DeleteTextures = (int a, ref int b) =>
+            {
+                Console.WriteLine("OPENGL: DeleteTextures" + " " + a + " " + b);
+                funcDeleteTexturesDelegate(a, ref b);
+            };
 
-            GenBuffers = LoadFunction<GenBuffersDelegate> ("glGenBuffers");
-            BufferData = LoadFunction<BufferDataDelegate> ("glBufferData");
-            MapBuffer = LoadFunction<MapBufferDelegate> ("glMapBuffer");
-            UnmapBuffer = LoadFunction<UnmapBufferDelegate> ("glUnmapBuffer");
-            BufferSubData = LoadFunction<BufferSubDataDelegate> ("glBufferSubData");
-            DeleteBuffers = LoadFunction<DeleteBuffersDelegate> ("glDeleteBuffers");
+            var funcGenBuffersDelegate = LoadFunction<GenBuffersDelegate>("glGenBuffers");
+            GenBuffers = (int a, out int b) =>
+            {
+                Console.WriteLine("OPENGL: GenBuffers" + " " + a);
+                funcGenBuffersDelegate(a, out b);
+            };
+            var funcBufferDataDelegate = LoadFunction<BufferDataDelegate>("glBufferData");
+            BufferData = (a, b, c, d) =>
+            {
+                Console.WriteLine("OPENGL: BufferData" + " " + a + " " + b + " " + c + " " + d);
+                funcBufferDataDelegate(a, b, c, d);
+            };
+            var funcMapBufferDelegate = LoadFunction<MapBufferDelegate>("glMapBuffer");
+            MapBuffer = (a, b) =>
+            {
+                Console.WriteLine("OPENGL: MapBuffer" + " " + a + " " + b);
+                return funcMapBufferDelegate(a, b);
+            };
+            var funcUnmapBufferDelegate = LoadFunction<UnmapBufferDelegate>("glUnmapBuffer");
+            UnmapBuffer = (a) =>
+            {
+                Console.WriteLine("OPENGL: UnmapBuffer" + " " + a);
+                funcUnmapBufferDelegate(a);
+            };
+            var funcBufferSubDataDelegate = LoadFunction<BufferSubDataDelegate>("glBufferSubData");
+            BufferSubData = (a, b, c, d) =>
+            {
+                Console.WriteLine("OPENGL: BufferSubData" + " " + a + " " + b + " " + c + " " + d);
+                funcBufferSubDataDelegate(a, b, c, d);
+            };
+            var funcDeleteBuffersDelegate = LoadFunction<DeleteBuffersDelegate>("glDeleteBuffers");
+            DeleteBuffers = (int a, ref int b) =>
+            {
+                Console.WriteLine("OPENGL: DeleteBuffers" + " " + a + " " + b);
+                funcDeleteBuffersDelegate(a, ref b);
+            };
 
-            VertexAttribPointer = LoadFunction<VertexAttribPointerDelegate> ("glVertexAttribPointer");
+            var funcVertexAttribPointerDelegate = LoadFunction<VertexAttribPointerDelegate>("glVertexAttribPointer");
+            VertexAttribPointer = (a, b, c, d, e, f) =>
+            {
+                Console.WriteLine("OPENGL: VertexAttribPointer" + " " + a + " " + b + " " + c + " " + d + " " + e + " " + f);
+                funcVertexAttribPointerDelegate(a, b, c, d, e, f);
+            };
 
             // Instanced drawing requires GL 3.2 or up, if the either of the following entry points can not be loaded
             // this will get flagged by setting SupportsInstancing in GraphicsCapabilities to false.
-            try {
-                DrawElementsInstanced = LoadFunction<DrawElementsInstancedDelegate> ("glDrawElementsInstanced");
-                VertexAttribDivisor = LoadFunction<VertexAttribDivisorDelegate> ("glVertexAttribDivisor");
-                DrawElementsInstancedBaseInstance = LoadFunction<DrawElementsInstancedBaseInstanceDelegate>("glDrawElementsInstancedBaseInstance");
+            try
+            {
+                var funcDrawElementsInstancedDelegate = LoadFunction<
+                    DrawElementsInstancedDelegate
+                >("glDrawElementsInstanced");
+                DrawElementsInstanced = (a, b, c, d, e) =>
+                {
+                    Console.WriteLine("OPENGL: DrawElementsInstanced" + " " + a + " " + b + " " + c + " " + d + " " + e);
+                    funcDrawElementsInstancedDelegate(a, b, c, d, e);
+                };
+                var funcVertexAttribDivisorDelegate = LoadFunction<VertexAttribDivisorDelegate>(
+                    "glVertexAttribDivisor"
+                );
+                VertexAttribDivisor = (a, b) =>
+                {
+                    Console.WriteLine("OPENGL: VertexAttribDivisor" + " " + a + " " + b);
+                    funcVertexAttribDivisorDelegate(a, b);
+                };
+                var funcDrawElementsInstancedBaseInstanceDelegate = LoadFunction<
+                    DrawElementsInstancedBaseInstanceDelegate
+                >("glDrawElementsInstancedBaseInstance");
+                DrawElementsInstancedBaseInstance = (a, b, c, d, e, f) =>
+                {
+                    Console.WriteLine("OPENGL: DrawElementsInstancedBaseInstance" + " " + a + " " + b + " " + c + " " + d + " " + e + " " + f);
+                    funcDrawElementsInstancedBaseInstanceDelegate(a, b, c, d, e, f);
+                };
             }
-            catch (EntryPointNotFoundException) {
+            catch (EntryPointNotFoundException)
+            {
                 // this will be detected in the initialization of GraphicsCapabilities
             }
 
 #if DEBUG
             try
             {
-                DebugMessageCallback = LoadFunction<DebugMessageCallbackDelegate>("glDebugMessageCallback");
+                var funcDebugMessageCallbackDelegate = LoadFunction<DebugMessageCallbackDelegate>(
+                    "glDebugMessageCallback"
+                );
+                DebugMessageCallback = funcDebugMessageCallbackDelegate;
+                // (a, b) =>
+                // {
+                //     Console.WriteLine("OPENGL: DebugMessageCallback"+ " " +                  );
+                //     funcDebugMessageCallbackDelegate(a, b);
+                // };
                 if (DebugMessageCallback != null)
                 {
                     DebugProc = DebugMessageCallbackHandler;
@@ -1419,17 +2016,25 @@ namespace MonoGame.OpenGL
                 // Ignore the debug message callback if the entry point can not be found
             }
 #endif
-            if (BoundApi == RenderApi.ES) {
-                InvalidateFramebuffer = LoadFunction<InvalidateFramebufferDelegate> ("glDiscardFramebufferEXT");
+            if (BoundApi == RenderApi.ES)
+            {
+                var funcInvalidateFramebufferDelegate = LoadFunction<
+                    InvalidateFramebufferDelegate
+                >("glDiscardFramebufferEXT");
+                InvalidateFramebuffer = (a, b, c) =>
+                {
+                    Console.WriteLine("OPENGL: InvalidateFramebuffer" + " " + a + " " + b + " " + c);
+                    funcInvalidateFramebufferDelegate(a, b, c);
+                };
             }
 
-            LoadExtensions ();
+            LoadExtensions();
         }
 
-        internal static List<string> Extensions = new List<string> ();
+        internal static List<string> Extensions = new List<string>();
 
-        //[Conditional("DEBUG")]
-        //[DebuggerHidden]
+        [Conditional("DEBUG")]
+        [DebuggerHidden]
         static void LogExtensions()
         {
 #if __ANDROID__
@@ -1455,54 +2060,188 @@ namespace MonoGame.OpenGL
                 GL.LoadFrameBufferObjectEXTEntryPoints();
             }
             if (GL.RenderbufferStorageMultisample == null)
-            {                
+            {
                 if (Extensions.Contains("GL_APPLE_framebuffer_multisample"))
                 {
-                    GL.RenderbufferStorageMultisample = LoadFunction<GL.RenderbufferStorageMultisampleDelegate>("glRenderbufferStorageMultisampleAPPLE");
-                    GL.BlitFramebuffer = LoadFunction<GL.BlitFramebufferDelegate>("glResolveMultisampleFramebufferAPPLE");
+                    var funcGL = LoadFunction<GL.RenderbufferStorageMultisampleDelegate>(
+                        "glRenderbufferStorageMultisampleAPPLE"
+                    );
+                    GL.RenderbufferStorageMultisample = (a, b, c, d, e) =>
+                    {
+                        Console.WriteLine("OPENGL: GL" + " " + " " + b + " " + c + " " + d + " " + e);
+                        funcGL(a, b, c, d, e);
+                    };
+                    var funcGL2 = LoadFunction<GL.BlitFramebufferDelegate>(
+                        "glResolveMultisampleFramebufferAPPLE"
+                    );
+                    GL.BlitFramebuffer = (a, b, c, d, e, f, g, h, i, j) =>
+                    {
+                        Console.WriteLine("OPENGL: GL" + " " + a + " " + b + " " + c + " " + d + " " + e + " " + f + " " + g + " " + h + " " + i + " " + j);
+                        funcGL2(a, b, c, d, e, f, g, h, i, j);
+                    };
                 }
                 else if (Extensions.Contains("GL_EXT_multisampled_render_to_texture"))
                 {
-                    GL.RenderbufferStorageMultisample = LoadFunction<GL.RenderbufferStorageMultisampleDelegate>("glRenderbufferStorageMultisampleEXT");
-                    GL.FramebufferTexture2DMultiSample = LoadFunction<GL.FramebufferTexture2DMultiSampleDelegate>("glFramebufferTexture2DMultisampleEXT");
-
+                    var funcGL = LoadFunction<GL.RenderbufferStorageMultisampleDelegate>(
+                        "glRenderbufferStorageMultisampleEXT"
+                    );
+                    GL.RenderbufferStorageMultisample = (a, b, c, d, e) =>
+                    {
+                        Console.WriteLine("OPENGL: GL" + " " + a + " " + b + " " + c + " " + d + " " + e);
+                        funcGL(a, b, c, d, e);
+                    };
+                    var funcGL2 = LoadFunction<GL.FramebufferTexture2DMultiSampleDelegate>(
+                        "glFramebufferTexture2DMultisampleEXT"
+                    );
+                    GL.FramebufferTexture2DMultiSample = (a, b, c, d, e, f) =>
+                    {
+                        Console.WriteLine("OPENGL: GL" + " " + a + " " + b + " " + c + " " + d + " " + e + " " + f);
+                        funcGL2(a, b, c, d, e, f);
+                    };
                 }
                 else if (Extensions.Contains("GL_IMG_multisampled_render_to_texture"))
                 {
-                    GL.RenderbufferStorageMultisample = LoadFunction<GL.RenderbufferStorageMultisampleDelegate>("glRenderbufferStorageMultisampleIMG");
-                    GL.FramebufferTexture2DMultiSample = LoadFunction<GL.FramebufferTexture2DMultiSampleDelegate>("glFramebufferTexture2DMultisampleIMG");
+                    var funcGL = LoadFunction<GL.RenderbufferStorageMultisampleDelegate>(
+                        "glRenderbufferStorageMultisampleIMG"
+                    );
+                    GL.RenderbufferStorageMultisample = (a, b, c, d, e) =>
+                    {
+                        Console.WriteLine("OPENGL: GL" + " " + a + " " + b + " " + c + " " + d + " " + e);
+                        funcGL(a, b, c, d, e);
+                    };
+                    var funcGL2 = LoadFunction<GL.FramebufferTexture2DMultiSampleDelegate>(
+                        "glFramebufferTexture2DMultisampleIMG"
+                    );
+                    GL.FramebufferTexture2DMultiSample = (a, b, c, d, e, f) =>
+                    {
+                        Console.WriteLine("OPENGL: GL" + " " + a + " " + b + " " + c + " " + d + " " + e + " " + f);
+                        funcGL2(a, b, c, d, e, f);
+                    };
                 }
                 else if (Extensions.Contains("GL_NV_framebuffer_multisample"))
                 {
-                    GL.RenderbufferStorageMultisample = LoadFunction<GL.RenderbufferStorageMultisampleDelegate>("glRenderbufferStorageMultisampleNV");
-                    GL.BlitFramebuffer = LoadFunction<GL.BlitFramebufferDelegate>("glBlitFramebufferNV");
+                    var funcGL = LoadFunction<GL.RenderbufferStorageMultisampleDelegate>(
+                        "glRenderbufferStorageMultisampleNV"
+                    );
+                    GL.RenderbufferStorageMultisample = (a, b, c, d, e) =>
+                    {
+                        Console.WriteLine("OPENGL: GL" + " " + a + " " + b + " " + c + " " + d + " " + e);
+                        funcGL(a, b, c, d, e);
+                    };
+                    var funcGL2 = LoadFunction<GL.BlitFramebufferDelegate>("glBlitFramebufferNV");
+                    GL.BlitFramebuffer = (a, b, c, d, e, f, g, h, i, j) =>
+                    {
+                        Console.WriteLine("OPENGL: GL" + " " + a + " " + b + " " + c + " " + d + " " + e + " " + f + " " + g + " " + h + " " + i + " " + j);
+                        funcGL2(a, b, c, d, e, f, g, h, i, j);
+                    };
                 }
             }
             if (GL.BlendFuncSeparatei == null && Extensions.Contains("GL_ARB_draw_buffers_blend"))
             {
-                GL.BlendFuncSeparatei = LoadFunction<GL.BlendFuncSeparateiDelegate>("BlendFuncSeparateiARB");
+                var funcGL = LoadFunction<GL.BlendFuncSeparateiDelegate>(
+                    "BlendFuncSeparateiARB"
+                );
+                GL.BlendFuncSeparatei = (a, b, c, d, e) =>
+                {
+                    Console.WriteLine("OPENGL: GL" + " " + a + " " + b + " " + c + " " + d + " " + e);
+                    funcGL(a, b, c, d, e);
+                };
             }
-            if (GL.BlendEquationSeparatei == null && Extensions.Contains("GL_ARB_draw_buffers_blend"))
+            if (
+                GL.BlendEquationSeparatei == null
+                && Extensions.Contains("GL_ARB_draw_buffers_blend")
+            )
             {
-                GL.BlendEquationSeparatei = LoadFunction<GL.BlendEquationSeparateiDelegate>("BlendEquationSeparateiARB");
+                var funcGL = LoadFunction<GL.BlendEquationSeparateiDelegate>(
+                    "BlendEquationSeparateiARB"
+                );
+                GL.BlendEquationSeparatei = (a, b, c) =>
+                {
+                    Console.WriteLine("OPENGL: GL" + " " + a + " " + b + " " + c);
+                    funcGL(a, b, c);
+                };
             }
         }
-
         internal static void LoadFrameBufferObjectEXTEntryPoints()
         {
-            GenRenderbuffers = LoadFunction<GenRenderbuffersDelegate>("glGenRenderbuffersEXT");
-            BindRenderbuffer = LoadFunction<BindRenderbufferDelegate>("glBindRenderbufferEXT");
-            DeleteRenderbuffers = LoadFunction<DeleteRenderbuffersDelegate>("glDeleteRenderbuffersEXT");
-            GenFramebuffers = LoadFunction<GenFramebuffersDelegate>("glGenFramebuffersEXT");
-            BindFramebuffer = LoadFunction<BindFramebufferDelegate>("glBindFramebufferEXT");
-            DeleteFramebuffers = LoadFunction<DeleteFramebuffersDelegate>("glDeleteFramebuffersEXT");
-            FramebufferTexture2D = LoadFunction<FramebufferTexture2DDelegate>("glFramebufferTexture2DEXT");
-            FramebufferRenderbuffer = LoadFunction<FramebufferRenderbufferDelegate>("glFramebufferRenderbufferEXT");
-            RenderbufferStorage = LoadFunction<RenderbufferStorageDelegate>("glRenderbufferStorageEXT");
-            RenderbufferStorageMultisample = LoadFunction<RenderbufferStorageMultisampleDelegate>("glRenderbufferStorageMultisampleEXT");
-            GenerateMipmap = LoadFunction<GenerateMipmapDelegate>("glGenerateMipmapEXT");
-            BlitFramebuffer = LoadFunction<BlitFramebufferDelegate>("glBlitFramebufferEXT");
-            CheckFramebufferStatus = LoadFunction<CheckFramebufferStatusDelegate>("glCheckFramebufferStatusEXT");
+            var funcGenRenderbuffersDelegate = LoadFunction<GenRenderbuffersDelegate>("glGenRenderbuffersEXT");
+            GenRenderbuffers = (int count, out int buffer) =>
+            {
+                Console.WriteLine("OPENGL: GenRenderbuffers" + " " + count);
+                funcGenRenderbuffersDelegate(count, out buffer);
+            };
+            var funcBindRenderbufferDelegate = LoadFunction<BindRenderbufferDelegate>("glBindRenderbufferEXT");
+            BindRenderbuffer = (RenderbufferTarget target, int buffer) =>
+            {
+                Console.WriteLine("OPENGL: BindRenderbuffer" + " " + target + " " + buffer);
+                funcBindRenderbufferDelegate(target, buffer);
+            };
+            var funcDeleteRenderbuffersDelegate = LoadFunction<DeleteRenderbuffersDelegate>("glDeleteRenderbuffersEXT");
+            DeleteRenderbuffers = (int count, ref int buffer) =>
+            {
+                Console.WriteLine("OPENGL: DeleteRenderbuffers" + " " + count + " " + buffer);
+                funcDeleteRenderbuffersDelegate(count, ref buffer);
+            };
+            var funcGenFramebuffersDelegate = LoadFunction<GenFramebuffersDelegate>("glGenFramebuffersEXT");
+            GenFramebuffers = (int count, out int buffer) =>
+            {
+                Console.WriteLine("OPENGL: GenFramebuffers" + " " + count);
+                funcGenFramebuffersDelegate(count, out buffer);
+            };
+            var funcBindFramebufferDelegate = LoadFunction<BindFramebufferDelegate>("glBindFramebufferEXT");
+            BindFramebuffer = (FramebufferTarget target, int buffer) =>
+            {
+                Console.WriteLine("OPENGL: BindFramebuffer" + " " + target + " " + buffer);
+                funcBindFramebufferDelegate(target, buffer);
+            };
+            var funcDeleteFramebuffersDelegate = LoadFunction<DeleteFramebuffersDelegate>("glDeleteFramebuffersEXT");
+            DeleteFramebuffers = (int count, ref int buffer) =>
+            {
+                Console.WriteLine("OPENGL: DeleteFramebuffers" + " " + count + " " + buffer);
+                funcDeleteFramebuffersDelegate(count, ref buffer);
+            };
+            var funcFramebufferTexture2DDelegate = LoadFunction<FramebufferTexture2DDelegate>("glFramebufferTexture2DEXT");
+            FramebufferTexture2D = (FramebufferTarget target, FramebufferAttachment attachement, TextureTarget textureTarget, int texture, int level) =>
+            {
+                Console.WriteLine("OPENGL: FramebufferTexture2D" + " " + target + " " + attachement + " " + textureTarget + " " + texture + " " + level);
+                funcFramebufferTexture2DDelegate(target, attachement, textureTarget, texture, level);
+            };
+            var funcFramebufferRenderbufferDelegate = LoadFunction<FramebufferRenderbufferDelegate>("glFramebufferRenderbufferEXT");
+            FramebufferRenderbuffer = (FramebufferTarget target, FramebufferAttachment attachement, RenderbufferTarget renderBufferTarget, int buffer) =>
+            {
+                Console.WriteLine("OPENGL: FramebufferRenderbuffer" + " " + target + " " + attachement + " " + renderBufferTarget + " " + buffer);
+                funcFramebufferRenderbufferDelegate(target, attachement, renderBufferTarget, buffer);
+            };
+            var funcRenderbufferStorageDelegate = LoadFunction<RenderbufferStorageDelegate>("glRenderbufferStorageEXT");
+            RenderbufferStorage = (RenderbufferTarget target, RenderbufferStorage storage, int width, int hegiht) =>
+            {
+                Console.WriteLine("OPENGL: RenderbufferStorage" + " " + target + " " + storage + " " + width + " " + hegiht);
+                funcRenderbufferStorageDelegate(target, storage, width, hegiht);
+            };
+            var funcRenderbufferStorageMultisampleDelegate = LoadFunction<RenderbufferStorageMultisampleDelegate>("glRenderbufferStorageMultisampleEXT");
+            RenderbufferStorageMultisample = (RenderbufferTarget target, int sampleCount, RenderbufferStorage storage, int width, int height) =>
+            {
+                Console.WriteLine("OPENGL: RenderbufferStorageMultisample" + " " + target + " " + sampleCount + " " + storage + " " + width + " " + height);
+                funcRenderbufferStorageMultisampleDelegate(target, sampleCount, storage, width, height);
+            };
+            var funcGenerateMipmapDelegate = LoadFunction<GenerateMipmapDelegate>("glGenerateMipmapEXT");
+            GenerateMipmap = (GenerateMipmapTarget target) =>
+            {
+                Console.WriteLine("OPENGL: GenerateMipmap" + " " + target);
+                funcGenerateMipmapDelegate(target);
+            };
+            var funcBlitFramebufferDelegate = LoadFunction<BlitFramebufferDelegate>("glBlitFramebufferEXT");
+            BlitFramebuffer = (int srcX0, int srcY0, int srcX1, int srcY1, int dstX0, int dstY0, int dstX1, int dstY1, ClearBufferMask mask, BlitFramebufferFilter filter) =>
+            {
+                Console.WriteLine("OPENGL: BlitFramebuffer" + " " + srcX0 + " " + srcY0 + " " + srcX1 + " " + srcY1 + " " + dstX0 + " " + dstY0 + " " + dstX1 + " " + dstY1 + " " + mask + " " + filter);
+                funcBlitFramebufferDelegate(srcX0, srcY0, srcX1, srcY1, dstX0, dstY0, dstX1, dstY1, mask, filter);
+            };
+            var funcCheckFramebufferStatusDelegate = LoadFunction<CheckFramebufferStatusDelegate>("glCheckFramebufferStatusEXT");
+            CheckFramebufferStatus = (FramebufferTarget target) =>
+            {
+                Console.WriteLine("OPENGL: CheckFramebufferStatus" + " " + target);
+                return funcCheckFramebufferStatusDelegate(target);
+            };
         }
 
         static partial void LoadPlatformEntryPoints();
@@ -1522,96 +2261,109 @@ namespace MonoGame.OpenGL
                 DepthRanged(min, max);
         }
 
-        internal static void Uniform1 (int location, int value) {
+        internal static void Uniform1(int location, int value)
+        {
             Uniform1i(location, value);
         }
 
-        internal static unsafe void Uniform4 (int location, int size, float* value) {
+        internal static unsafe void Uniform4(int location, int size, float* value)
+        {
             Uniform4fv(location, size, value);
         }
 
-        internal unsafe static string GetString (StringName name)
+        internal unsafe static string GetString(StringName name)
         {
-            return Marshal.PtrToStringAnsi (GetStringInternal (name));
+            return Marshal.PtrToStringAnsi(GetStringInternal(name));
         }
 
-        protected static IntPtr MarshalStringArrayToPtr (string[] strings)
+        protected static IntPtr MarshalStringArrayToPtr(string[] strings)
         {
             IntPtr intPtr = IntPtr.Zero;
-            if (strings != null && strings.Length != 0) {
-                intPtr = Marshal.AllocHGlobal (strings.Length * IntPtr.Size);
-                if (intPtr == IntPtr.Zero) {
-                    throw new OutOfMemoryException ();
+            if (strings != null && strings.Length != 0)
+            {
+                intPtr = Marshal.AllocHGlobal(strings.Length * IntPtr.Size);
+                if (intPtr == IntPtr.Zero)
+                {
+                    throw new OutOfMemoryException();
                 }
                 int i = 0;
-                try {
-                    for (i = 0; i < strings.Length; i++) {
-                        IntPtr val = MarshalStringToPtr (strings [i]);
-                        Marshal.WriteIntPtr (intPtr, i * IntPtr.Size, val);
+                try
+                {
+                    for (i = 0; i < strings.Length; i++)
+                    {
+                        IntPtr val = MarshalStringToPtr(strings[i]);
+                        Marshal.WriteIntPtr(intPtr, i * IntPtr.Size, val);
                     }
                 }
-                catch (OutOfMemoryException) {
-                    for (i--; i >= 0; i--) {
-                        Marshal.FreeHGlobal (Marshal.ReadIntPtr (intPtr, i * IntPtr.Size));
+                catch (OutOfMemoryException)
+                {
+                    for (i--; i >= 0; i--)
+                    {
+                        Marshal.FreeHGlobal(Marshal.ReadIntPtr(intPtr, i * IntPtr.Size));
                     }
-                    Marshal.FreeHGlobal (intPtr);
+                    Marshal.FreeHGlobal(intPtr);
                     throw;
                 }
             }
             return intPtr;
         }
 
-        protected unsafe static IntPtr MarshalStringToPtr (string str)
+        protected unsafe static IntPtr MarshalStringToPtr(string str)
         {
-            if (string.IsNullOrEmpty (str)) {
+            if (string.IsNullOrEmpty(str))
+            {
                 return IntPtr.Zero;
             }
-            int num = Encoding.ASCII.GetMaxByteCount (str.Length) + 1;
-            IntPtr intPtr = Marshal.AllocHGlobal (num);
-            if (intPtr == IntPtr.Zero) {
-                throw new OutOfMemoryException ();
+            int num = Encoding.ASCII.GetMaxByteCount(str.Length) + 1;
+            IntPtr intPtr = Marshal.AllocHGlobal(num);
+            if (intPtr == IntPtr.Zero)
+            {
+                throw new OutOfMemoryException();
             }
-            fixed (char* chars = str + RuntimeHelpers.OffsetToStringData / 2) {
-                int bytes = Encoding.ASCII.GetBytes (chars, str.Length, (byte*)((void*)intPtr), num);
-                Marshal.WriteByte (intPtr, bytes, 0);
+            fixed (char* chars = str + RuntimeHelpers.OffsetToStringData / 2)
+            {
+                int bytes = Encoding.ASCII.GetBytes(chars, str.Length, (byte*)((void*)intPtr), num);
+                Marshal.WriteByte(intPtr, bytes, 0);
                 return intPtr;
             }
         }
 
-        protected static void FreeStringArrayPtr (IntPtr ptr, int length)
+        protected static void FreeStringArrayPtr(IntPtr ptr, int length)
         {
-            for (int i = 0; i < length; i++) {
-                Marshal.FreeHGlobal (Marshal.ReadIntPtr (ptr, i * IntPtr.Size));
+            for (int i = 0; i < length; i++)
+            {
+                Marshal.FreeHGlobal(Marshal.ReadIntPtr(ptr, i * IntPtr.Size));
             }
-            Marshal.FreeHGlobal (ptr);
+            Marshal.FreeHGlobal(ptr);
         }
 
-        internal static string GetProgramInfoLog (int programId)
+        internal static string GetProgramInfoLog(int programId)
         {
             int length = 0;
             GetProgram(programId, GetProgramParameterName.LogLength, out length);
             var sb = new StringBuilder(length, length);
-            GetProgramInfoLogInternal (programId, length, IntPtr.Zero, sb);
+            GetProgramInfoLogInternal(programId, length, IntPtr.Zero, sb);
             return sb.ToString();
         }
 
-        internal static string GetShaderInfoLog (int shaderId) {
+        internal static string GetShaderInfoLog(int shaderId)
+        {
             int length = 0;
             GetShader(shaderId, ShaderParameter.LogLength, out length);
             var sb = new StringBuilder(length, length);
-            GetShaderInfoLogInternal (shaderId, length, IntPtr.Zero, sb);
+            GetShaderInfoLogInternal(shaderId, length, IntPtr.Zero, sb);
             return sb.ToString();
         }
 
         internal unsafe static void ShaderSource(int shaderId, string code)
         {
             int length = code.Length;
-            IntPtr intPtr = MarshalStringArrayToPtr (new string[] { code });
+            IntPtr intPtr = MarshalStringArrayToPtr(new string[] { code });
             ShaderSourceInternal(shaderId, 1, intPtr, &length);
             FreeStringArrayPtr(intPtr, 1);
         }
 
-        internal unsafe static void GetShader (int shaderId, ShaderParameter name, out int result)
+        internal unsafe static void GetShader(int shaderId, ShaderParameter name, out int result)
         {
             fixed (int* ptr = &result)
             {
@@ -1627,18 +2379,19 @@ namespace MonoGame.OpenGL
             }
         }
 
-        internal unsafe static void GetInteger (GetPName name, out int value)
-        {
-            fixed (int* ptr = &value) {
-                GetIntegerv ((int)name, ptr);
-            }
-        }
-
-        internal unsafe static void GetInteger (int name, out int value)
+        internal unsafe static void GetInteger(GetPName name, out int value)
         {
             fixed (int* ptr = &value)
             {
-                GetIntegerv (name, ptr);
+                GetIntegerv((int)name, ptr);
+            }
+        }
+
+        internal unsafe static void GetInteger(int name, out int value)
+        {
+            fixed (int* ptr = &value)
+            {
+                GetIntegerv(name, ptr);
             }
         }
 
@@ -1700,4 +2453,3 @@ namespace MonoGame.OpenGL
         }
     }
 }
-
