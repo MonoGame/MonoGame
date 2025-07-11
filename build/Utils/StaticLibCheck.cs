@@ -87,7 +87,7 @@ public class StaticLibCheck
                 if (!libPath.EndsWith(".dll") || libPath.Contains(' '))
                     continue;
 
-                if (!ValidWindowsLibs.Contains(libPath))
+                if (ValidWindowsLibs.Contains(libPath))
                 {
                     context.Information($"VALID: {libPath}");
                 }

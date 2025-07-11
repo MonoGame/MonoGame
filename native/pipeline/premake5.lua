@@ -22,6 +22,9 @@ function pipeline_native()
             "STBIW_WINDOWS_UTF8",
         }
 
+    filter "system:linux"
+        pic "On"
+
     filter {}
     targetdir(platform_target_path)
     targetname "mgpipeline"
@@ -41,17 +44,18 @@ end
 workspace "pipeline"
     configurations { "Debug", "Release" }
 
-project "monogame_native_pipeline"
+project "mgpipeline"
     pipeline_native()
     filter "configurations:Debug"
         defines { "DEBUG" }
         symbols "On"
     filter "configurations:Release"
         defines { "NDEBUG" }
-        filter "system:windows"
-            buildoptions { "/MT" }
         optimize "On"
 
+    filter { "system:windows", "configurations:Release" }
+        buildoptions { "/MT" } 
+
     filter "system:macosx"
-      buildoptions { "-arch x86_64", "-arch arm64" }
-      linkoptions { "-arch x86_64", "-arch arm64" }
+        buildoptions { "-arch x86_64", "-arch arm64" }
+        linkoptions { "-arch x86_64", "-arch arm64" }
