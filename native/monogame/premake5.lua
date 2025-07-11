@@ -56,11 +56,11 @@ function sdl2()
             "shell32"
         }
     filter {"system:macosx"}
-		links { "external/sdl2/sdl/build/Release/libSDL2.a" }
+		links { "external/sdl2/sdl/build/libSDL2.a" }
 		links { "Cocoa", "IOKit", "ForceFeedback", "CoreAudio", "AudioToolbox", "CoreGraphics", "CoreFoundation", "Metal" }
 
 	filter {"system:linux"}
-		links { "external/sdl2/sdl/build/Release/libSDL2.a" }
+		links { "external/sdl2/sdl/build/libSDL2.a" }
 		links { "dl", "pthread", "m", "rt" }
     filter {}
 end
