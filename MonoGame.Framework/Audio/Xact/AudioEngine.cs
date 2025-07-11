@@ -76,7 +76,6 @@ namespace Microsoft.Xna.Framework.Audio
         /// Initializes a new instance of the AudioEngine class by reading out the specified XACT <paramref name="settingsFile"/>
         /// </summary>
         /// <param name="settingsFile">Path to a XACT settings file.</param>
-        /// <remarks>For the best results, use a lookAheadTime of 250 milliseconds or greater.</remarks>
         /// <exception cref="ArgumentNullException">Invoked if <paramref name="settingsFile"/> is <see cref="String.IsNullOrEmpty"/></exception>
         public AudioEngine(string settingsFile)
         {
