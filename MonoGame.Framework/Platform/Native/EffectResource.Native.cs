@@ -21,11 +21,7 @@ internal partial class EffectResource
     {
         byte* data;
         int size;
-
-        byte* _name = stackalloc byte[StringInterop.GetMaxSize(name)];
-        StringInterop.CopyString(_name, name);
-        MGG.EffectResource_GetBytecode(_name, out data, out size);
-
+        MGG.EffectResource_GetBytecode(name, out data, out size);
         var bytecode = new byte[size];
         Marshal.Copy((IntPtr)data, bytecode, 0, size);
         return bytecode;

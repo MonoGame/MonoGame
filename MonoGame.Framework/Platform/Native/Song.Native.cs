@@ -75,10 +75,7 @@ public sealed partial class Song : IEquatable<Song>, IDisposable
     private unsafe void PlatformInitialize(string fileName)
     {
         var absolutePath = MGP.Platform_MakePath(TitleContainer.Location, fileName);
-
-        byte* _absolutePath = stackalloc byte[StringInterop.GetMaxSize(absolutePath)];
-        StringInterop.CopyString(_absolutePath, absolutePath);
-        _decoder = MGM.AudioDecoder_Create(_absolutePath, out _info);
+        _decoder = MGM.AudioDecoder_Create(absolutePath, out _info);
 
         if (_decoder == null)
             return;

@@ -148,8 +148,8 @@ internal static unsafe partial class MGG
 {
     #region Effect Resources
 
-    [DllImport(MGP.MonoGameNativeDLL, EntryPoint = "MGG_EffectResource_GetBytecode", ExactSpelling = true)]
-    public static extern void EffectResource_GetBytecode(byte* name, out byte* bytecode, out int size);
+    [DllImport(MGP.MonoGameNativeDLL, EntryPoint = "MGG_EffectResource_GetBytecode", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void EffectResource_GetBytecode([MarshalAs(UnmanagedType.LPUTF8Str)] string name, out byte* bytecode, out int size);
 
     #endregion
 

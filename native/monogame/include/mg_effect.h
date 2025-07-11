@@ -16,13 +16,13 @@
 #define MG_BUILTIN_EFFECT_SIZE(name) (sizeof(MG_BUILTIN_EFFECT_BYTES(name)))
 
 #define MG_HANDLE_BUILTIN_EFFECT(effectName, bytecode, size) \
-    if (strcmp((const char*)name, #effectName) == 0) \
+    if (strcmp(name, #effectName) == 0) \
     { \
         (bytecode) = MG_BUILTIN_EFFECT_BYTES(effectName); \
         (size) = MG_BUILTIN_EFFECT_SIZE(effectName); \
     }
 
-void MGG_EffectResource_GetBytecode(mgbyte * name, mgbyte * &bytecode, mgint & size)
+void MGG_EffectResource_GetBytecode(const char* name, mgbyte * &bytecode, mgint & size)
 {
 	MG_HANDLE_BUILTIN_EFFECT(AlphaTestEffect, bytecode, size)
 	else MG_HANDLE_BUILTIN_EFFECT(BasicEffect, bytecode, size)

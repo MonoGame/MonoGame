@@ -25,7 +25,7 @@ struct MGG_Shader;
 struct MGG_InputLayout;
 struct MGG_OcclusionQuery;
 
-MG_EXPORT void MGG_EffectResource_GetBytecode(mgbyte* name, mgbyte*& bytecode, mgint& size);
+MG_EXPORT void MGG_EffectResource_GetBytecode(const char* name, mgbyte*& bytecode, mgint& size);
 MG_EXPORT MGG_GraphicsSystem* MGG_GraphicsSystem_Create();
 MG_EXPORT void MGG_GraphicsSystem_Destroy(MGG_GraphicsSystem* system);
 MG_EXPORT MGG_GraphicsAdapter* MGG_GraphicsAdapter_Get(MGG_GraphicsSystem* system, mgint index);

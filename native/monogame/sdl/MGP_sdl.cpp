@@ -241,11 +241,10 @@ void* MGP_Platform_MakePath(mgbyte* location, mgbyte* path)
 	return reinterpret_cast<void*>(fpath);
 }
 
-void* MGP_Platform_Free(void* ptr)
+void MGP_Platform_Free(void* ptr)
 {
     assert(ptr != nullptr);
     SDL_free(ptr);
-    return nullptr;
 }
 
 void MGP_Platform_BeforeInitialize(MGP_Platform* platform)
@@ -830,7 +829,7 @@ void MGP_Window_ExitFullScreen(MGP_Window* window)
     SDL_SetWindowFullscreen(window->window, 0);
 }
 
-mgint MGP_Window_ShowMessageBox(MGP_Window* window, const char* title, const char* description, const char** buttons, mgint count)
+mgint MGP_Window_ShowMessageBox(MGP_Window* window, const char* title, const char* description, const char* buttons, mgint count)
 {
     SDL_MessageBoxData data;
     data.window = window->window;
@@ -840,10 +839,14 @@ mgint MGP_Window_ShowMessageBox(MGP_Window* window, const char* title, const cha
     data.flags = SDL_MESSAGEBOX_BUTTONS_LEFT_TO_RIGHT;
 
     auto bdata = new SDL_MessageBoxButtonData[count];
+    const char* p = buttons;
     for (int i = 0; i < count; i++)
     {
         bdata[i].buttonid = i;
-        bdata[i].text = buttons[i];
+        bdata[i].text = p;
+        // Since we have double null-terminated strings,
+        // we can safely assume the next button text starts after the current one.
+        p += strlen(p) + 1;
         bdata[i].flags = 0;
     }
 
