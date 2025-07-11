@@ -218,13 +218,13 @@ void MGP_Platform_Destroy(MGP_Platform* platform)
 	delete platform;
 }
 
-void* MGP_Platform_MakePath(mgbyte* location, mgbyte* path)
+void* MGP_Platform_MakePath(const char* location, const char* path)
 {
     assert(location != nullptr);
     assert(path != nullptr);
 
-    size_t location_len = strlen(reinterpret_cast<const char*>(location));
-    size_t path_len = strlen(reinterpret_cast<const char*>(path));
+    size_t location_len = strlen(location);
+    size_t path_len = strlen(path);
     size_t separator_len = (location_len > 0) ? strlen(MG_PATH_SEPARATOR) : 0;
 
     size_t length = location_len + separator_len + path_len + 1;

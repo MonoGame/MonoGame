@@ -5,7 +5,6 @@
 #include "api_MGI.h"
 
 #define STBI_NO_PSD
-#define STBI_NO_BMP
 #define STBI_NO_TGA
 #define STBI_NO_HDR
 #define STBI_NO_PIC
@@ -22,7 +21,7 @@
 #include "stb_image_write.h"
 
 
-void MGI_ReadRGBA(mgbyte* data, mgint dataBytes, mgbyte zeroTransparentPixels, mgint& width, mgint& height, mgbyte*& rgba)
+void MGI_ReadRGBA(mgbyte* data, mgint dataBytes, mgbool zeroTransparentPixels, mgint& width, mgint& height, mgbyte*& rgba)
 {
 	width = 0;
 	height = 0;
@@ -41,7 +40,7 @@ void MGI_ReadRGBA(mgbyte* data, mgint dataBytes, mgbyte zeroTransparentPixels, m
 	if (zeroTransparentPixels && c == 4)
 	{
 		// XNA blacks out any pixels with an alpha of zero.
-		for (int i = 0; i < w * h; i += 4)
+		for (int i = 0; i < 4 * w * h; i += 4)
 		{
 			if (image[i + 3] == 0)
 			{
@@ -55,6 +54,12 @@ void MGI_ReadRGBA(mgbyte* data, mgint dataBytes, mgbyte zeroTransparentPixels, m
 	rgba = image;
 	width = w;
 	height = h;
+}
+
+void MGI_FreeRGBA(mgbyte* rgba)
+{
+	if (rgba)
+		STBI_FREE(rgba);
 }
 
 struct mem_image

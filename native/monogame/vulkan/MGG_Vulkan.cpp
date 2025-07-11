@@ -3828,6 +3828,7 @@ void MGG_Texture_GetData(MGG_GraphicsDevice* device, MGG_Texture* texture, mgint
 
 MGG_InputLayout* MGG_InputLayout_Create(
 	MGG_GraphicsDevice* device,
+	MGG_Shader* vertexShader,
 	mgint* strides,
 	mgint streamCount,
 	MGG_InputElement* elements,

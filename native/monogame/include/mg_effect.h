@@ -6,14 +6,15 @@
 #include <string.h>
 
 #if defined(MG_DIRECTX12)
-#define MG_BUILTIN_EFFECT_BYTES(name) ((mgbyte*)name##_dx12_mgfxo)
+#define MG_BUILTIN_EFFECT_SYMBOL(name) name##_dx12_mgfxo
 #elif defined(MG_VULKAN)
-#define MG_BUILTIN_EFFECT_BYTES(name) ((mgbyte*)name##_vk_mgfxo)
+#define MG_BUILTIN_EFFECT_SYMBOL(name) name##_vk_mgfxo
 #else
 #error "Unsupported graphics backend, this header is intended for native builtin effects embedding only."
 #endif
 
-#define MG_BUILTIN_EFFECT_SIZE(name) (sizeof(MG_BUILTIN_EFFECT_BYTES(name)))
+#define MG_BUILTIN_EFFECT_BYTES(name) ((mgbyte*)MG_BUILTIN_EFFECT_SYMBOL(name))
+#define MG_BUILTIN_EFFECT_SIZE(name) (sizeof(MG_BUILTIN_EFFECT_SYMBOL(name)))
 
 #define MG_HANDLE_BUILTIN_EFFECT(effectName, bytecode, size) \
     if (strcmp(name, #effectName) == 0) \

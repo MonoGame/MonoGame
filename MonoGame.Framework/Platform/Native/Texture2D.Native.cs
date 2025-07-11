@@ -119,9 +119,12 @@ public partial class Texture2D : Texture
 
     private static unsafe Texture2D PlatformFromStream(GraphicsDevice graphicsDevice, Stream stream, Action<byte[]> colorProcessor)
     {
-        // HACK: Clear the default zero action as we do this natively.
+        bool zeroTransparentPixels = false;
         if (colorProcessor == DefaultColorProcessors.ZeroTransparentPixels)
+        {
             colorProcessor = null;
+            zeroTransparentPixels = true;
+        }
 
         // Simply read it all into memory as it will be fast
         // for most cases and simplifies the native API.
@@ -140,7 +143,7 @@ public partial class Texture2D : Texture
             MGI.ReadRGBA(
                 (byte*)handle.AddrOfPinnedObject(),
                 dataLength,
-                (byte)(colorProcessor == null ? 1 : 0),
+                zeroTransparentPixels,
                 out width,
                 out height,
                 out rgba);
@@ -174,7 +177,7 @@ public partial class Texture2D : Texture
                 rgba,
                 rgbaBytes);
 
-            Marshal.FreeHGlobal((nint)rgba);
+            MGI.FreeRGBA(rgba);
 
             return texture;
         }
@@ -185,7 +188,7 @@ public partial class Texture2D : Texture
         // Ideally we change this to use Span which avoids this.
         var bytes = new byte[rgbaBytes];
         Marshal.Copy((nint)rgba, bytes, 0, rgbaBytes);
-        Marshal.FreeHGlobal((nint)rgba);
+        MGI.FreeRGBA(rgba);
 
         // Do the processing.
         colorProcessor(bytes);
@@ -240,7 +243,7 @@ public partial class Texture2D : Texture
             MGI.ReadRGBA(
                 (byte*)handle.AddrOfPinnedObject(),
                 dataLength,
-                1,
+                true,
                 out width,
                 out height,
                 out rgba);
@@ -267,6 +270,6 @@ public partial class Texture2D : Texture
             rgba,
             width * height);
 
-        Marshal.FreeHGlobal((nint)rgba);
+        MGI.FreeRGBA(rgba);
     }
 }

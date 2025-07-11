@@ -17,10 +17,14 @@ internal static unsafe partial class MGI
     public static extern void ReadRGBA(
         byte* data,
         int dataBytes,
-        byte zeroTransparentPixels,
+        bool zeroTransparentPixels,
         out int width,
         out int height,
         out byte* rgba);
+
+    [DllImport(MGP.MonoGameNativeDLL, EntryPoint = "MGI_FreeRGBA", ExactSpelling = true)]
+    public static extern void FreeRGBA(
+        byte* rgba);
 
     [DllImport(MGP.MonoGameNativeDLL, EntryPoint = "MGI_WriteJpg", ExactSpelling = true)]
     public static extern void WriteJpg(
