@@ -34,6 +34,9 @@
 #ifdef _WIN32
 #include <Windows.h>
 #include <vulkan/vulkan_win32.h>
+#elif defined(__APPLE__)
+#include <CoreGraphics/CoreGraphics.h>
+#include <vulkan/vulkan_macos.h>
 #endif
 
 #define VK_CHECK_RESULT(vkr)															\
@@ -705,7 +708,7 @@ void MGG_GraphicsAdapter_GetInfo(MGG_GraphicsAdapter* adapter, MGG_GraphicsAdapt
 	info.MonitorHandle = 0;
 
 #ifdef _WIN32
-
+	// Windows implementation
 	HMONITOR primaryMonitor = MonitorFromPoint(POINT{ 0, 0 }, MONITOR_DEFAULTTOPRIMARY);
 	info.MonitorHandle = primaryMonitor;
 
@@ -760,8 +763,138 @@ void MGG_GraphicsAdapter_GetInfo(MGG_GraphicsAdapter* adapter, MGG_GraphicsAdapt
 	info.CurrentDisplayMode.height = monitorInfo.rcMonitor.bottom - monitorInfo.rcMonitor.top;
 	info.CurrentDisplayMode.format = MGSurfaceFormat::Color;
 
+#elif defined(__linux__)
+	// Linux implementation using SDL2 (supports both X11 and Wayland)
+#if defined(MG_SDL2)
+	// Get the number of display modes for the primary display
+	int displayIndex = 0; // Primary display
+	int numModes = SDL_GetNumDisplayModes(displayIndex);
+	
+	if (adapter->modes.size() == 0 && numModes > 0)
+	{
+		// Enumerate available display modes
+		for (int i = 0; i < numModes; i++)
+		{
+			SDL_DisplayMode mode;
+			if (SDL_GetDisplayMode(displayIndex, i, &mode) == 0)
+			{
+				MGG_DisplayMode displayMode;
+				displayMode.width = mode.w;
+				displayMode.height = mode.h;
+				displayMode.format = MGSurfaceFormat::Color;
+				
+				bool found = false;
+				for (auto m : adapter->modes)
+				{
+					if (m.width == displayMode.width &&
+						m.height == displayMode.height)
+					{
+						found = true;
+						break;
+					}
+				}
+				
+				if (!found)
+					adapter->modes.push_back(displayMode);
+			}
+		}
+	}
+	
+	// Get current display mode
+	SDL_DisplayMode currentMode;
+	if (SDL_GetCurrentDisplayMode(displayIndex, &currentMode) == 0)
+	{
+		info.CurrentDisplayMode.width = currentMode.w;
+		info.CurrentDisplayMode.height = currentMode.h;
+		info.CurrentDisplayMode.format = MGSurfaceFormat::Color;
+	}
+	else
+	{
+		// Fallback to desktop display mode
+		SDL_DisplayMode desktopMode;
+		if (SDL_GetDesktopDisplayMode(displayIndex, &desktopMode) == 0)
+		{
+			info.CurrentDisplayMode.width = desktopMode.w;
+			info.CurrentDisplayMode.height = desktopMode.h;
+			info.CurrentDisplayMode.format = MGSurfaceFormat::Color;
+		}
+		else
+		{
+			// Final fallback
+			info.CurrentDisplayMode.width = 1920;
+			info.CurrentDisplayMode.height = 1080;
+			info.CurrentDisplayMode.format = MGSurfaceFormat::Color;
+		}
+	}
+	info.DisplayModeCount = adapter->modes.size();
+	info.DisplayModes = adapter->modes.data();
 #else
-#error NOT IMPLEMENTED!
+#error "Linux implementation requires SDL2 for display mode enumeration"
+#endif
+#elif defined(__APPLE__)
+	// macOS implementation using CoreGraphics
+	CGDirectDisplayID mainDisplay = CGMainDisplayID();
+	info.MonitorHandle = (void*)(uintptr_t)mainDisplay;
+	
+	if (adapter->modes.size() == 0)
+	{
+		// Get available display modes
+		CFArrayRef modes = CGDisplayCopyAllDisplayModes(mainDisplay, nullptr);
+		if (modes)
+		{
+			CFIndex modeCount = CFArrayGetCount(modes);
+			for (CFIndex i = 0; i < modeCount; i++)
+			{
+				CGDisplayModeRef mode = (CGDisplayModeRef)CFArrayGetValueAtIndex(modes, i);
+				if (mode)
+				{
+					MGG_DisplayMode displayMode;
+					displayMode.width = (mgint)CGDisplayModeGetWidth(mode);
+					displayMode.height = (mgint)CGDisplayModeGetHeight(mode);
+					displayMode.format = MGSurfaceFormat::Color;
+					
+					bool found = false;
+					for (auto m : adapter->modes)
+					{
+						if (m.width == displayMode.width &&
+							m.height == displayMode.height)
+						{
+							found = true;
+							break;
+						}
+					}
+					
+					if (!found)
+						adapter->modes.push_back(displayMode);
+				}
+			}
+			CFRelease(modes);
+		}
+	}
+	
+	// Get current display mode
+	CGDisplayModeRef currentMode = CGDisplayCopyDisplayMode(mainDisplay);
+	if (currentMode)
+	{
+		info.CurrentDisplayMode.width = (mgint)CGDisplayModeGetWidth(currentMode);
+		info.CurrentDisplayMode.height = (mgint)CGDisplayModeGetHeight(currentMode);
+		info.CurrentDisplayMode.format = MGSurfaceFormat::Color;
+		CGDisplayModeRelease(currentMode);
+	}
+	else
+	{
+		// Fallback to main display bounds
+		CGRect bounds = CGDisplayBounds(mainDisplay);
+		info.CurrentDisplayMode.width = (mgint)bounds.size.width;
+		info.CurrentDisplayMode.height = (mgint)bounds.size.height;
+		info.CurrentDisplayMode.format = MGSurfaceFormat::Color;
+	}
+	
+	info.DisplayModeCount = adapter->modes.size();
+	info.DisplayModes = adapter->modes.data();
+
+#else
+#error "Unsupported platform for MGG_GraphicsAdapter_GetInfo"
 #endif
 }
 

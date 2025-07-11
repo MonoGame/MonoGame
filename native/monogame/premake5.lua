@@ -146,12 +146,12 @@ project "desktopvk"
     vulkan()
     faudio()
     configs()
-
-project "windowsdx"
-    filter "system:windows"
+    
+filter "system:windows"
+    project "windowsdx"
         common("windowsdx")
         sdl2()
         directx12()
         xaudio()
         configs()
-    filter {}
+filter {}

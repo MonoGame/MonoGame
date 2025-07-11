@@ -8,6 +8,7 @@
 
 #include <stdio.h>
 #include <assert.h>
+#include <limits.h>
 
 #include <vector>
 #include <string>
