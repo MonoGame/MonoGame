@@ -56,11 +56,16 @@ function sdl2()
             "shell32"
         }
     filter {"system:macosx"}
-		links { "external/sdl2/sdl/build/libSDL2.a" }
+        libdirs { "external/sdl2/sdl/build" }
+        linkoptions { "-Wl,-force_load,external/sdl2/sdl/build/libSDL2.a" }
+		links { "SDL2" }
 		links { "Cocoa", "IOKit", "ForceFeedback", "CoreAudio", "AudioToolbox", "CoreGraphics", "CoreFoundation", "Metal" }
 
 	filter {"system:linux"}
-		links { "external/sdl2/sdl/build/libSDL2.a" }
+        libdirs { "external/sdl2/sdl/build" }
+        linkoptions { "-Wl,-Bstatic" }
+        links { "SDL2" }
+        linkoptions { "-Wl,-Bdynamic" }
 		links { "dl", "pthread", "m", "rt" }
     filter {}
 end
