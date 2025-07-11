@@ -3,6 +3,7 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 #pragma once
+#include <string.h>
 
 #if defined(MG_DIRECTX12)
 #define MG_BUILTIN_EFFECT_BYTES(name) ((mgbyte*)name##_dx12_mgfxo)

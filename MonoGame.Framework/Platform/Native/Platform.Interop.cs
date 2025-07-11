@@ -246,30 +246,28 @@ internal static unsafe partial class MGP
     [return: MarshalAs(UnmanagedType.U1)]
     public static extern byte Platform_BeforeDraw(MGP_Platform* platform);
 
-    [DllImport(MonoGameNativeDLL, EntryPoint = "MGP_Platform_MakePath", ExactSpelling = true)]
-    static extern byte* _Platform_MakePath(byte* location, byte* path);
+    [DllImport(MonoGameNativeDLL, EntryPoint = "MGP_Platform_MakePath", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    private static extern IntPtr _Platform_MakePath(
+        [MarshalAs(UnmanagedType.LPUTF8Str)] string location,
+        [MarshalAs(UnmanagedType.LPUTF8Str)] string path);
+
+    [DllImport(MonoGameNativeDLL, EntryPoint = "MGP_Platform_Free", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    private static extern void _Platform_Free(IntPtr ptr);
 
     public static string Platform_MakePath(string location, string path)
     {
-        byte* _result = null;
-
+        IntPtr resultPtr = IntPtr.Zero;
         try
         {
-            byte* _location = stackalloc byte[StringInterop.GetMaxSize(location)];
-            StringInterop.CopyString(_location, location);
-
-            byte* _path = stackalloc byte[StringInterop.GetMaxSize(path)];
-            StringInterop.CopyString(_path, path);
-
-            _result = _Platform_MakePath(_location, _path);
-
-            string result = StringInterop.ToString(_result);
-
-            return result;
+            resultPtr = _Platform_MakePath(location, path);
+            if (resultPtr == IntPtr.Zero)
+                return null;
+            return Marshal.PtrToStringUTF8(resultPtr);
         }
         finally
         {
-            StringInterop.Free(_result);
+            if (resultPtr != IntPtr.Zero)
+                _Platform_Free(resultPtr);
         }
     }
 

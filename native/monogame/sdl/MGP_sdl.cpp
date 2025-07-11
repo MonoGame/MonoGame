@@ -6,7 +6,7 @@
 
 #include "mg_common.h"
 
-#include <sdl.h>
+#include <SDL.h>
 
 #if _WIN32
 #include <combaseapi.h>
@@ -218,34 +218,34 @@ void MGP_Platform_Destroy(MGP_Platform* platform)
 	delete platform;
 }
 
-const char* MGP_Platform_MakePath(const char* location, const char* path)
+void* MGP_Platform_MakePath(mgbyte* location, mgbyte* path)
 {
     assert(location != nullptr);
     assert(path != nullptr);
 
-    size_t length = strlen(path) + 1;
-    if (location[0])
-        length += strlen(location) + 1;
+    size_t location_len = strlen(reinterpret_cast<const char*>(location));
+    size_t path_len = strlen(reinterpret_cast<const char*>(path));
+    size_t separator_len = (location_len > 0) ? strlen(MG_PATH_SEPARATOR) : 0;
 
-#if _WIN32
-    // Windows requires marshaled strings to be allocated like this.
-    char* fpath = (char*)CoTaskMemAlloc(length);    
-#else
-    char* fpath = (char*)malloc(length);
-#endif
+    size_t length = location_len + separator_len + path_len + 1;
 
-    if (location[0])
-    {
-        strcpy_s(fpath, length, location);
-        strcat_s(fpath, length, MG_PATH_SEPARATOR);
-        strcat_s(fpath, length, path);
-    }
-    else
-    {
-        strcpy_s(fpath, length, path);
+    char* fpath = (char*)SDL_malloc(length);
+    assert(fpath != nullptr);
+
+    if (location_len > 0) {
+        snprintf(fpath, length, "%s%s%s", location, MG_PATH_SEPARATOR, path);
+    } else {
+        snprintf(fpath, length, "%s", path);
     }
 
-    return fpath;
+	return reinterpret_cast<void*>(fpath);
+}
+
+void* MGP_Platform_Free(void* ptr)
+{
+    assert(ptr != nullptr);
+    SDL_free(ptr);
+    return nullptr;
 }
 
 void MGP_Platform_BeforeInitialize(MGP_Platform* platform)
@@ -627,8 +627,8 @@ mgbyte MGP_Platform_PollEvent(MGP_Platform* platform, MGP_Event& event_)
             event_.Type = MGEventType::DropFile;
             event_.Drop.Window = MGP_WindowFromId(platform, ev.drop.windowID);
 
-            static char TempPath[_MAX_PATH];
-            strcpy_s(TempPath, _MAX_PATH, ev.drop.file);
+            static char TempPath[MAX_PATH_SIZE];
+            snprintf(TempPath, MAX_PATH_SIZE, "%s", ev.drop.file);
             SDL_free(ev.drop.file);
 
             event_.Drop.File = TempPath;
@@ -982,7 +982,7 @@ mgbyte MGP_GamePad_SetVibration(MGP_Platform* platform, mgint identifer, mgfloat
     if (pair == platform->controllers.end())
         return false;
 
-    auto supported = SDL_GameControllerRumble(pair->second, (UINT16)(leftMotor * 0xFFFF), (UINT16)(rightMotor * 0xFFFF), INT_MAX);
+    auto supported = SDL_GameControllerRumble(pair->second, (mgushort)(leftMotor * 0xFFFF), (mgushort)(rightMotor * 0xFFFF), INT_MAX);
     return supported == 0;
 }
 
