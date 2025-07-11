@@ -19,6 +19,7 @@ public sealed class BuildNativeDependenciesTask : FrostingTask<BuildContext>
         var configureArgs = new ProcessArgumentBuilder();
         // Add the relative path to the source directory.
         configureArgs.Append("../");
+        configureArgs.Append("-DSDL_STATIC=ON");
 
         // Append platform-specific CMake arguments.
         switch (context.Environment.Platform.Family)
@@ -28,6 +29,7 @@ public sealed class BuildNativeDependenciesTask : FrostingTask<BuildContext>
                 configureArgs.Append("-D CMAKE_MSVC_RUNTIME_LIBRARY=MultiThreaded");
                 break;
             case PlatformFamily.Linux:
+                configureArgs.Append("-D CMAKE_POSITION_INDEPENDENT_CODE=ON");
                 break;
             case PlatformFamily.OSX:
                 configureArgs.Append("-D CMAKE_OSX_ARCHITECTURES=\"x86_64;arm64\"");
