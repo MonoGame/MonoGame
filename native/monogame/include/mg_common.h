@@ -62,6 +62,7 @@ inline void MG_Print_StdOut(const char* file, int line, const char* message)
 
 mguint MG_ComputeHash(const mgbyte* value, mgint length);
 mguint MG_ComputeHash(mguint value, mguint result = 0x811c9dc5);
+mguint MG_ComputeHash(const mgbyte* value, mgint length, mguint result);
 
 // Removes the element preserving order.
 template <class T>

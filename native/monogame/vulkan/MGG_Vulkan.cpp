@@ -280,6 +280,7 @@ struct MGG_GraphicsDevice
 	std::queue<MGG_BlendState*> destroyBlendStates;
 	std::queue<MGG_RasterizerState*> destroyRasterizerStates;
 	std::queue<MGG_DepthStencilState*> destroyDepthStencilStates;
+	std::queue<MGG_SamplerState*> destroySamplers;
 
 	MGG_Buffer* discarded = nullptr;
 	MGG_Buffer* pending = nullptr;
@@ -442,7 +443,17 @@ static void MGVK_BufferCopyAndFlush(MGG_GraphicsDevice* device, MGG_Buffer* buff
 static MGG_Buffer* MGVK_Buffer_Create(MGG_GraphicsDevice* device, MGBufferType type, mgint sizeInBytes, bool no_push);
 static void MGVK_DestroyFrameResources(MGG_GraphicsDevice* device, mgint currentFrame, mgbyte free_all);
 static void MGVK_UpdateRenderPass(MGG_GraphicsDevice* device, FrameCounter currentFrame, MGVK_CmdBuffer& cmd);
-static void MGVK_TransitionImageLayout(MGG_GraphicsDevice* device, MGG_Texture* texture, int32_t level, VkImageLayout newLayout);
+static VkCommandBuffer MGVK_BeginNewCommandBuffer(MGG_GraphicsDevice* device);
+static void MGVK_ExecuteAndFreeCommandBuffer(MGG_GraphicsDevice* device, VkCommandBuffer commandBuffer);
+static void MGVK_CmdTransitionImageLayout(
+	VkCommandBuffer cmd,
+	VkImage image,
+	VkImageLayout oldLayout,
+	VkImageLayout newLayout,
+	VkImageAspectFlags aspectMask,
+	uint32_t baseMipLevel = 0,
+	uint32_t levelCount = 1,
+	uint32_t layerCount = 1);
 
 
 static VkFormat ToVkFormat(MGSurfaceFormat format)
@@ -1037,10 +1048,23 @@ static MGG_Texture* CreateDepthTexture(MGG_GraphicsDevice* device, VkFormat form
 
 	texture->layout = VK_IMAGE_LAYOUT_UNDEFINED;
 	texture->optimal_layout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
+	VkImageLayout optimalLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
 
 	mggCreateImage(device, &create_info, texture);
+	
+	VkCommandBuffer cmd = MGVK_BeginNewCommandBuffer(device);
+	MGVK_CmdTransitionImageLayout(
+        cmd,
+        texture->image,
+        VK_IMAGE_LAYOUT_UNDEFINED,
+        optimalLayout,
+        VK_IMAGE_ASPECT_DEPTH_BIT | VK_IMAGE_ASPECT_STENCIL_BIT
+    );
 
-	MGVK_TransitionImageLayout(device, texture, 0, texture->optimal_layout);
+	MGVK_ExecuteAndFreeCommandBuffer(device, cmd);
+	
+	texture->layout = optimalLayout;
+    texture->optimal_layout = optimalLayout;
 
 	return texture;
 }
@@ -1150,50 +1174,6 @@ static void MGVK_ExecuteAndFreeCommandBuffer(MGG_GraphicsDevice* device, VkComma
 	vkDestroyFence(device->device, renderFence, nullptr);
 
 	vkFreeCommandBuffers(device->device, device->cmdPool, 1, &commandBuffer);
-}
-
-static void MGVK_CopyBufferToImage(MGG_GraphicsDevice* device, VkBuffer buffer, VkImage image, int32_t x, int32_t y, int32_t z, int32_t level, uint32_t width, uint32_t height, uint32_t depth)
-{
-	VkCommandBuffer cmds = MGVK_BeginNewCommandBuffer(device);
-
-	VkBufferImageCopy region = {};
-	region.bufferOffset = 0;
-	region.bufferRowLength = 0;
-	region.bufferImageHeight = 0;
-
-	region.imageSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
-	region.imageSubresource.mipLevel = level;
-	region.imageSubresource.baseArrayLayer = 0;
-	region.imageSubresource.layerCount = 1;
-
-	region.imageOffset = { x, y, z };
-	region.imageExtent = { width, height, depth };
-
-	vkCmdCopyBufferToImage(cmds, buffer, image, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &region);
-
-	MGVK_ExecuteAndFreeCommandBuffer(device, cmds);
-}
-
-static void MGVK_CopyImageToBuffer(MGG_GraphicsDevice* device, VkImage image, VkBuffer buffer, int32_t x, int32_t y, int32_t z, int32_t level, uint32_t width, uint32_t height, uint32_t depth)
-{
-	VkCommandBuffer cmds = MGVK_BeginNewCommandBuffer(device);
-
-	VkBufferImageCopy region = {};
-	region.bufferOffset = 0;
-	region.bufferRowLength = 0;
-	region.bufferImageHeight = 0;
-
-	region.imageSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
-	region.imageSubresource.mipLevel = level;
-	region.imageSubresource.baseArrayLayer = 0;
-	region.imageSubresource.layerCount = 1;
-
-	region.imageOffset = { x, y, z };
-	region.imageExtent = { width, height, depth };
-
-	vkCmdCopyImageToBuffer(cmds, image, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL, buffer, 1, &region);
-
-	MGVK_ExecuteAndFreeCommandBuffer(device, cmds);
 }
 
 MGG_GraphicsDevice* MGG_GraphicsDevice_Create(MGG_GraphicsSystem* system, MGG_GraphicsAdapter* adapter)
@@ -1970,6 +1950,14 @@ static void MGVK_DestroyFrameResources(MGG_GraphicsDevice* device, mgint current
 			MGVK_DestroyPipelines(device, [state](const MGVK_PipelineState& s) { return s.depthStencilState == state; });
 			delete state;
 		}
+
+		while (device->destroySamplers.size() > 0)
+		{
+			auto sampler = device->destroySamplers.front();
+			device->destroySamplers.pop();
+			vkDestroySampler(device->device, sampler->sampler, nullptr);
+			delete sampler;
+		}
 	}
 }
 
@@ -2246,6 +2234,158 @@ void MGG_GraphicsDevice_SetInputLayout(MGG_GraphicsDevice* device, MGG_InputLayo
 		device->pipelineStateDirty = true;
 		device->pipelineState.layout = layout;
 	}
+}
+
+static void MGVK_CmdTransitionImageLayout(
+	VkCommandBuffer cmd,
+	VkImage image,
+	VkImageLayout oldLayout,
+	VkImageLayout newLayout,
+	VkImageAspectFlags aspectMask,
+	uint32_t baseMipLevel,
+	uint32_t levelCount,
+	uint32_t layerCount)
+{
+	VkImageMemoryBarrier barrier = {};
+	barrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
+	barrier.oldLayout = oldLayout;
+	barrier.newLayout = newLayout;
+	barrier.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+	barrier.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+	barrier.image = image;
+	barrier.subresourceRange.aspectMask = aspectMask;
+	barrier.subresourceRange.baseMipLevel = baseMipLevel;
+	barrier.subresourceRange.levelCount = levelCount;
+	barrier.subresourceRange.baseArrayLayer = 0;
+	barrier.subresourceRange.layerCount = layerCount;
+
+	VkPipelineStageFlags sourceStage;
+	VkPipelineStageFlags destinationStage;
+
+	if (oldLayout == VK_IMAGE_LAYOUT_UNDEFINED && newLayout == VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL)
+	{
+		barrier.srcAccessMask = 0;
+		barrier.dstAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
+
+		sourceStage = VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT;
+		destinationStage = VK_PIPELINE_STAGE_TRANSFER_BIT;
+	}
+	else if (oldLayout == VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL && newLayout == VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL)
+	{
+		barrier.srcAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
+		barrier.dstAccessMask = VK_ACCESS_SHADER_READ_BIT;
+
+		sourceStage = VK_PIPELINE_STAGE_TRANSFER_BIT;
+		destinationStage = VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT;
+	}
+	else if (oldLayout == VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL)
+	{
+		barrier.srcAccessMask = VK_ACCESS_TRANSFER_READ_BIT;
+		barrier.dstAccessMask = VK_ACCESS_SHADER_READ_BIT;
+
+		sourceStage = VK_PIPELINE_STAGE_TRANSFER_BIT;
+		destinationStage = VK_PIPELINE_STAGE_VERTEX_SHADER_BIT | VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT;
+
+		if (newLayout == VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL)
+			barrier.dstAccessMask |= VK_ACCESS_SHADER_WRITE_BIT;
+	}
+	else if (newLayout == VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL)
+	{
+		barrier.srcAccessMask = 0;
+		barrier.dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
+
+		sourceStage = VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT;
+		destinationStage = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
+	}
+	else if (newLayout == VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL)
+	{
+		barrier.srcAccessMask = 0;
+		barrier.dstAccessMask = VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_READ_BIT | VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT;
+
+		sourceStage = VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT;
+		destinationStage = VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT;
+	}
+	else if (oldLayout == VK_IMAGE_LAYOUT_PRESENT_SRC_KHR && newLayout == VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL)
+	{
+		barrier.srcAccessMask = VK_ACCESS_MEMORY_READ_BIT;
+		barrier.dstAccessMask = VK_ACCESS_TRANSFER_READ_BIT;
+		sourceStage = VK_PIPELINE_STAGE_TRANSFER_BIT;
+		destinationStage = VK_PIPELINE_STAGE_TRANSFER_BIT;
+	}
+	else if (oldLayout == VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL && newLayout == VK_IMAGE_LAYOUT_PRESENT_SRC_KHR)
+	{
+		barrier.srcAccessMask = VK_ACCESS_TRANSFER_READ_BIT;
+		barrier.dstAccessMask = VK_ACCESS_MEMORY_READ_BIT;
+		sourceStage = VK_PIPELINE_STAGE_TRANSFER_BIT;
+		destinationStage = VK_PIPELINE_STAGE_TRANSFER_BIT;
+	}
+	else
+	{
+		fprintf(stderr, "Warning: Potentially unhandled layout transition from %d to %d in %s:%d\n", oldLayout, newLayout, __FILE__, __LINE__);
+		barrier.srcAccessMask = 0;
+		barrier.dstAccessMask = 0;
+		sourceStage = VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT;
+		destinationStage = VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT;
+	}
+
+
+	vkCmdPipelineBarrier(
+		cmd,
+		sourceStage, destinationStage,
+		0,
+		0, nullptr,
+		0, nullptr,
+		1, &barrier
+	);
+}
+
+static void MGVK_CmdCopyBufferToImage(
+	VkCommandBuffer cmds,
+	VkBuffer buffer,
+	VkImage image,
+	int32_t x, int32_t y, int32_t z,
+	int32_t level,
+	uint32_t width, uint32_t height, uint32_t depth)
+{
+	VkBufferImageCopy region = {};
+	region.bufferOffset = 0;
+	region.bufferRowLength = 0;
+	region.bufferImageHeight = 0;
+
+	region.imageSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+	region.imageSubresource.mipLevel = level;
+	region.imageSubresource.baseArrayLayer = 0;
+	region.imageSubresource.layerCount = 1;
+
+	region.imageOffset = { x, y, z };
+	region.imageExtent = { width, height, depth };
+
+	vkCmdCopyBufferToImage(cmds, buffer, image, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &region);
+}
+
+static void MGVK_CmdCopyImageToBuffer(
+	VkCommandBuffer cmds,
+	VkImage image,
+	VkBuffer buffer,
+	int32_t x, int32_t y, int32_t z,
+	int32_t level,
+	uint32_t width, uint32_t height, uint32_t depth,
+	VkImageAspectFlags aspectMask)
+{
+	VkBufferImageCopy region = {};
+	region.bufferOffset = 0;
+	region.bufferRowLength = 0;
+	region.bufferImageHeight = 0;
+
+	region.imageSubresource.aspectMask = aspectMask;
+	region.imageSubresource.mipLevel = level;
+	region.imageSubresource.baseArrayLayer = 0;
+	region.imageSubresource.layerCount = 1;
+
+	region.imageOffset = { x, y, z };
+	region.imageExtent = { width, height, depth };
+
+	vkCmdCopyImageToBuffer(cmds, image, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL, buffer, 1, &region);
 }
 
 static void MGVK_UpdateRenderPass(MGG_GraphicsDevice* device, FrameCounter currentFrame, MGVK_CmdBuffer& cmd)
@@ -2997,19 +3137,10 @@ void MGG_GraphicsDevice_GetBackBufferData(MGG_GraphicsDevice* device, mgint x, m
 
 	VkCommandBuffer copyCmdBuffer = MGVK_BeginNewCommandBuffer(device);
 
-	VkImageMemoryBarrier barrierToTransfer = { VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER };
-	barrierToTransfer.srcAccessMask = VK_ACCESS_MEMORY_READ_BIT;
-	barrierToTransfer.dstAccessMask = VK_ACCESS_TRANSFER_READ_BIT;
-	barrierToTransfer.oldLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
-	barrierToTransfer.newLayout = VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL;
-	barrierToTransfer.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
-	barrierToTransfer.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
-	barrierToTransfer.image = srcImage;
-	barrierToTransfer.subresourceRange = { VK_IMAGE_ASPECT_COLOR_BIT, 0, 1, 0, 1 };
-
-	vkCmdPipelineBarrier(copyCmdBuffer,
-		VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT, VK_PIPELINE_STAGE_TRANSFER_BIT, 0,
-		0, nullptr, 0, nullptr, 1, &barrierToTransfer);
+	MGVK_CmdTransitionImageLayout(copyCmdBuffer, srcImage,
+		VK_IMAGE_LAYOUT_PRESENT_SRC_KHR,
+		VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL,
+		VK_IMAGE_ASPECT_COLOR_BIT);
 
 	VkBufferImageCopy copyRegion = {};
 	copyRegion.imageSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
@@ -3019,19 +3150,10 @@ void MGG_GraphicsDevice_GetBackBufferData(MGG_GraphicsDevice* device, mgint x, m
 
 	vkCmdCopyImageToBuffer(copyCmdBuffer, srcImage, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL, dstBuffer, 1, &copyRegion);
 
-	VkImageMemoryBarrier barrierToPresent = { VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER };
-	barrierToPresent.srcAccessMask = VK_ACCESS_TRANSFER_READ_BIT;
-	barrierToPresent.dstAccessMask = VK_ACCESS_MEMORY_READ_BIT;
-	barrierToPresent.oldLayout = VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL;
-	barrierToPresent.newLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
-	barrierToPresent.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
-	barrierToPresent.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
-	barrierToPresent.image = srcImage;
-	barrierToPresent.subresourceRange = { VK_IMAGE_ASPECT_COLOR_BIT, 0, 1, 0, 1 };
-
-	vkCmdPipelineBarrier(copyCmdBuffer,
-		VK_PIPELINE_STAGE_TRANSFER_BIT, VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT, 0,
-		0, nullptr, 0, nullptr, 1, &barrierToPresent);
+	MGVK_CmdTransitionImageLayout(copyCmdBuffer, srcImage,
+		VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL,
+		VK_IMAGE_LAYOUT_PRESENT_SRC_KHR,
+		VK_IMAGE_ASPECT_COLOR_BIT);
 
 	MGVK_ExecuteAndFreeCommandBuffer(device, copyCmdBuffer);
 
@@ -3530,9 +3652,7 @@ void MGG_SamplerState_Destroy(MGG_GraphicsDevice* device, MGG_SamplerState* stat
 	if (!state)
 		return;
 
-	vkDestroySampler(device->device, state->sampler, nullptr);
-
-	delete state;
+	device->destroySamplers.push(state);
 }
 
 static MGG_Buffer* MGVK_BufferDiscard(MGG_GraphicsDevice* device, MGG_Buffer* buffer)
@@ -3901,6 +4021,7 @@ MGG_Texture* MGG_RenderTarget_Create(
 
 		texture->layout = VK_IMAGE_LAYOUT_UNDEFINED;
 		texture->optimal_layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
+		VkImageLayout optimalLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
 
 
 		mggCreateImage(device, &create_info, texture);
@@ -3911,7 +4032,18 @@ MGG_Texture* MGG_RenderTarget_Create(
 		texture->target_view = CreateImageView(device, texture, 1);
 		VK_SET_OBJECT_NAME(device->device, texture->target_view, VK_OBJECT_TYPE_IMAGE_VIEW, "MGG_Texture.target_view (RenderTarget id: %llu)", texture->id);
 
-		MGVK_TransitionImageLayout(device, texture, 0, texture->optimal_layout);
+		VkCommandBuffer cmd = MGVK_BeginNewCommandBuffer(device);
+        MGVK_CmdTransitionImageLayout(
+            cmd,
+            texture->image,
+            VK_IMAGE_LAYOUT_UNDEFINED,
+            optimalLayout,
+            DetermineAspectMask(create_info.format)
+        );
+
+        MGVK_ExecuteAndFreeCommandBuffer(device, cmd);
+		texture->layout = texture->optimal_layout;
+		texture->optimal_layout = optimalLayout;
 	}
 
 	if (depthFormat != MGDepthFormat::None)
@@ -3943,101 +4075,6 @@ void MGG_Texture_Destroy(MGG_GraphicsDevice* device, MGG_Texture* texture)
 
 	//remove_by_value(device->all_textures, texture);
 	//delete texture;
-}
-
-static void MGVK_TransitionImageLayout(MGG_GraphicsDevice* device, MGG_Texture* texture, int32_t level, VkImageLayout newLayout)
-{
-	VkCommandBuffer cmd = MGVK_BeginNewCommandBuffer(device);
-
-	VkImageLayout oldLayout = texture->layout;
-
-	VkImageMemoryBarrier barrier = {};
-	barrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
-	barrier.oldLayout = oldLayout;
-	barrier.newLayout = newLayout;
-	barrier.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
-	barrier.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
-	barrier.image = texture->image;
-	barrier.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT; // Fetch this from MGG_Texture!
-	barrier.subresourceRange.baseMipLevel = level;
-	barrier.subresourceRange.levelCount = 1;
-	barrier.subresourceRange.baseArrayLayer = 0;
-	barrier.subresourceRange.layerCount = 1;
-
-	VkPipelineStageFlags sourceStage;
-	VkPipelineStageFlags destinationStage;
-
-	if (newLayout == VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL)
-	{
-		barrier.srcAccessMask = 0;
-		barrier.dstAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
-
-		sourceStage = VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT;
-		destinationStage = VK_PIPELINE_STAGE_TRANSFER_BIT;
-	}
-	else if (oldLayout == VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL && newLayout == VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL)
-	{
-		barrier.srcAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
-		barrier.dstAccessMask = VK_ACCESS_SHADER_READ_BIT;
-
-		sourceStage = VK_PIPELINE_STAGE_TRANSFER_BIT;
-		destinationStage = VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT;
-	}
-	else if (newLayout == VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL)
-	{
-		barrier.srcAccessMask = 0;
-		barrier.dstAccessMask = VK_ACCESS_TRANSFER_READ_BIT;
-
-		sourceStage = VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT;
-		destinationStage = VK_PIPELINE_STAGE_TRANSFER_BIT;
-	}
-	else if (oldLayout == VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL)
-	{
-		barrier.srcAccessMask = VK_ACCESS_TRANSFER_READ_BIT;
-		barrier.dstAccessMask = VK_ACCESS_SHADER_READ_BIT;
-
-		sourceStage = VK_PIPELINE_STAGE_TRANSFER_BIT;
-		destinationStage = VK_PIPELINE_STAGE_VERTEX_SHADER_BIT | VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT;
-
-		if (newLayout == VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL)
-			barrier.dstAccessMask |= VK_ACCESS_SHADER_WRITE_BIT;
-	}
-	else if (newLayout == VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL)
-	{
-		barrier.srcAccessMask = 0;
-		barrier.dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
-
-		sourceStage = VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT;
-		destinationStage = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
-	}
-	else if (newLayout == VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL)
-	{
-		barrier.subresourceRange.aspectMask = VK_IMAGE_ASPECT_DEPTH_BIT | VK_IMAGE_ASPECT_STENCIL_BIT;
-
-		barrier.srcAccessMask = 0;
-		barrier.dstAccessMask = VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_READ_BIT | VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT;
-
-		sourceStage = VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT;
-		destinationStage = VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT;
-	}
-	else
-	{
-		// unsupported layout transition!
-		assert(0);
-	}
-
-	vkCmdPipelineBarrier(
-		cmd,
-		sourceStage, destinationStage,
-		0,
-		0, nullptr,
-		0, nullptr,
-		1, &barrier
-	);
-
-	MGVK_ExecuteAndFreeCommandBuffer(device, cmd);
-
-	texture->layout = barrier.newLayout;
 }
 
 void MGG_Texture_SetData(MGG_GraphicsDevice* device, MGG_Texture* texture, mgint level, mgint slice, mgint x, mgint y, mgint z, mgint width, mgint height, mgint depth, mgbyte* data, mgint dataBytes)
@@ -4074,11 +4111,13 @@ void MGG_Texture_SetData(MGG_GraphicsDevice* device, MGG_Texture* texture, mgint
 	memcpy(dest, data, dataBytes);
 	vmaUnmapMemory(device->allocator, buffer.allocation);
 
-	MGVK_TransitionImageLayout(device, texture, level, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
-
-	MGVK_CopyBufferToImage(device, buffer.buffer, texture->image, x, y, z, level, width, height, depth);
-
-	MGVK_TransitionImageLayout(device, texture, level, texture->optimal_layout);
+	VkCommandBuffer cmd = MGVK_BeginNewCommandBuffer(device);
+	MGVK_CmdTransitionImageLayout(cmd, texture->image, texture->layout, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_ASPECT_COLOR_BIT);
+	texture->layout = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL;
+	MGVK_CmdCopyBufferToImage(cmd, buffer.buffer, texture->image, x, y, z, level, width, height, depth);
+	MGVK_CmdTransitionImageLayout(cmd, texture->image, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, texture->optimal_layout, VK_IMAGE_ASPECT_COLOR_BIT);
+	texture->layout = texture->optimal_layout;
+	MGVK_ExecuteAndFreeCommandBuffer(device, cmd);
 
 	vmaDestroyBuffer(device->allocator, buffer.buffer, buffer.allocation);
 }
@@ -4147,11 +4186,14 @@ void MGG_Texture_GetData(MGG_GraphicsDevice* device, MGG_Texture* texture, mgint
 	MGG_Buffer buffer;
 	MGVK_BufferCreate(device, dataBytes, VK_BUFFER_USAGE_TRANSFER_DST_BIT, VMA_MEMORY_USAGE_CPU_ONLY, &buffer);
 	VK_SET_OBJECT_NAME(device->device, buffer.buffer, VK_OBJECT_TYPE_BUFFER, "MGG_Texture_GetData::stagingBuffer");
-	MGVK_TransitionImageLayout(device, texture, level, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL);
 
-	MGVK_CopyImageToBuffer(device, texture->image, buffer.buffer, x, y, z, level, width, height, depth);
-
-	MGVK_TransitionImageLayout(device, texture, level, texture->layout);
+	VkImageLayout originalLayout = texture->layout;
+	VkImageAspectFlags aspectMask = DetermineAspectMask(texture->info.format);
+	VkCommandBuffer copyCmd = MGVK_BeginNewCommandBuffer(device);
+	MGVK_CmdTransitionImageLayout(copyCmd, texture->image, originalLayout, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL, aspectMask, level);
+	MGVK_CmdCopyImageToBuffer(copyCmd, texture->image, buffer.buffer, x, y, z, level, width, height, depth, aspectMask);
+	MGVK_CmdTransitionImageLayout(copyCmd, texture->image, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL, originalLayout, aspectMask, level);
+	MGVK_ExecuteAndFreeCommandBuffer(device, copyCmd);
 
 	void* src;
 	vmaMapMemory(device->allocator, buffer.allocation, &src);
