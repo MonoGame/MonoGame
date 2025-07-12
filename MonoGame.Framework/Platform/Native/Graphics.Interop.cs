@@ -325,7 +325,9 @@ internal static unsafe partial class MGG
         ref MGG_Buffer* buffer,
         int offset,
         byte* data,
-        int length,       
+        int elementCount,
+        int vertexStride,
+        int elementSizeInBytes,
         bool discard);
 
     [DllImport(MGP.MonoGameNativeDLL, EntryPoint = "MGG_Buffer_GetData", ExactSpelling = true)]

@@ -455,6 +455,30 @@ static void MGVK_CmdTransitionImageLayout(
 	uint32_t levelCount = 1,
 	uint32_t layerCount = 1);
 
+static VkSampleCountFlagBits ToVkSampleCount(mgint multiSampleCount)
+{
+    switch (multiSampleCount)
+    {
+		case 0:
+        case 1:
+            return VK_SAMPLE_COUNT_1_BIT;
+        case 2:
+            return VK_SAMPLE_COUNT_2_BIT;
+        case 4:
+            return VK_SAMPLE_COUNT_4_BIT;
+        case 8:
+            return VK_SAMPLE_COUNT_8_BIT;
+        case 16:
+            return VK_SAMPLE_COUNT_16_BIT;
+        case 32:
+            return VK_SAMPLE_COUNT_32_BIT;
+        case 64:
+            return VK_SAMPLE_COUNT_64_BIT;
+        default:
+            assert(!"Unsupported sample count!");
+            return VK_SAMPLE_COUNT_1_BIT;
+    }
+}
 
 static VkFormat ToVkFormat(MGSurfaceFormat format)
 {
@@ -1186,6 +1210,9 @@ MGG_GraphicsDevice* MGG_GraphicsDevice_Create(MGG_GraphicsSystem* system, MGG_Gr
 	device->instance = system->instance;
 	device->physicalDevice = adapter->device;
 
+	vkGetPhysicalDeviceFeatures(device->physicalDevice, &device->deviceFeatures);
+	vkGetPhysicalDeviceProperties(device->physicalDevice, &device->deviceProperties);
+
 	// Capture some needed limits.
 	device->minUniformBufferOffsetAlignment = adapter->properties.limits.minUniformBufferOffsetAlignment;
 
@@ -1237,10 +1264,20 @@ MGG_GraphicsDevice* MGG_GraphicsDevice_Create(MGG_GraphicsSystem* system, MGG_Gr
 	customBorderColorFeatures.customBorderColors = VK_TRUE;
 	customBorderColorFeatures.customBorderColorWithoutFormat = VK_TRUE;
 
+	VkPhysicalDeviceFeatures enabledFeatures = {};
+	if (device->deviceFeatures.sampleRateShading)
+	{
+		enabledFeatures.sampleRateShading = VK_TRUE;
+	}
+	if (device->deviceFeatures.occlusionQueryPrecise)
+	{
+		enabledFeatures.occlusionQueryPrecise = VK_TRUE;
+	}
+
 	VkPhysicalDeviceFeatures2 deviceFeatures2 = {};
 	deviceFeatures2.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2;
 	deviceFeatures2.pNext = &customBorderColorFeatures;
-	deviceFeatures2.features = device->deviceFeatures;
+	deviceFeatures2.features = enabledFeatures;
 
 	VkDeviceCreateInfo deviceCreateInfo = { VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO };
 	deviceCreateInfo.queueCreateInfoCount = queueCreateInfoCount;
@@ -3809,6 +3846,33 @@ static void MGVK_BufferCopyAndFlush(MGG_GraphicsDevice* device, MGG_Buffer* buff
 	*/
 }
 
+static void MGVK_BufferCopyAndFlush(MGG_GraphicsDevice* device, MGG_Buffer* buffer, int destOffset, mgbyte* data, mgint dataCount, mgint dataBytes, mgint dataStride)
+{
+	assert(device);
+	assert(buffer);
+	assert(destOffset < buffer->dataSize);
+	assert(dataStride >= dataBytes);
+	assert(destOffset + dataCount * dataStride + dataBytes - dataStride <= buffer->dataSize);
+
+	mgbyte* dest_ptr = buffer->mapped + destOffset;
+
+	if (dataStride == dataBytes)
+	{
+		memcpy(dest_ptr, data, dataCount * dataBytes);
+	}
+	else
+	{
+		for (mgint i = 0; i < dataCount; ++i)
+		{
+			memcpy(dest_ptr + i * dataStride,
+				   data + i * dataBytes,
+				   dataBytes);
+		}
+	}
+
+	buffer->dirty = false;
+}
+
 void MGG_Buffer_Destroy(MGG_GraphicsDevice* device, MGG_Buffer* buffer)
 {
 	assert(device != nullptr);
@@ -3834,12 +3898,15 @@ void MGG_Buffer_Destroy(MGG_GraphicsDevice* device, MGG_Buffer* buffer)
 	// Queue the buffer for later destruction.
 	device->destroyBuffers.push(buffer);
 }
-
-void MGG_Buffer_SetData(MGG_GraphicsDevice* device, MGG_Buffer*& buffer, mgint offset, mgbyte* data, mgint length, mgbool discard)
+void MGG_Buffer_SetData(MGG_GraphicsDevice* device, MGG_Buffer*& buffer, mgint offset, mgbyte* data, mgint elementCount, mgint vertexStride, mgint elementSizeInBytes, mgbool discard)
 {
 	assert(device != nullptr);
 	assert(buffer != nullptr);
 	assert(data != nullptr);
+	assert(offset >= 0);
+	assert(elementCount > 0);
+	assert(vertexStride > 0);
+	assert(elementSizeInBytes > 0);
 
 	buffer->dirty = true;
 
@@ -3848,7 +3915,19 @@ void MGG_Buffer_SetData(MGG_GraphicsDevice* device, MGG_Buffer*& buffer, mgint o
 	// We can safely ignore the discard.
 	if (buffer->push)
 	{
-		memcpy(buffer->push + offset, data, length);
+		if (elementSizeInBytes == vertexStride)
+		{
+			memcpy(buffer->push + offset, data, elementCount * elementSizeInBytes);
+		}
+		else
+		{
+			for (mgint i = 0; i < elementCount; ++i)
+			{
+				memcpy(buffer->push + offset + i * vertexStride,
+					   data + i * elementSizeInBytes,
+					   elementSizeInBytes);
+			}
+		}
 		return;
 	}
 
@@ -3896,7 +3975,12 @@ void MGG_Buffer_SetData(MGG_GraphicsDevice* device, MGG_Buffer*& buffer, mgint o
 	}
 
 	// Do the copy and flush.
-	MGVK_BufferCopyAndFlush(device, buffer, offset, data, length);
+	auto size = elementCount * vertexStride;
+	if (elementSizeInBytes < vertexStride)
+	{
+		size -= vertexStride - elementSizeInBytes;
+	}
+	MGVK_BufferCopyAndFlush(device, buffer, offset, data, elementCount, elementSizeInBytes, vertexStride);
 }
 
 void MGG_Buffer_GetData(MGG_GraphicsDevice* device, MGG_Buffer* buffer, mgint offset, mgbyte* data, mgint dataCount, mgint dataBytes, mgint dataStride)
@@ -3911,10 +3995,20 @@ void MGG_Buffer_GetData(MGG_GraphicsDevice* device, MGG_Buffer* buffer, mgint of
 	assert(dataBytes > 0);
 	assert(dataStride > 0);
 
-	if (buffer->push)
-		memcpy(data, buffer->push + offset, dataCount * dataBytes);
-	else
-		memcpy(data, buffer->mapped + offset, dataCount * dataBytes);
+	mgbyte* src_ptr = buffer->push ? buffer->push : buffer->mapped;
+    src_ptr += offset;
+
+    if (dataStride == dataBytes)
+    {
+        memcpy(data, src_ptr, dataCount * dataBytes);
+    }
+    else
+    {
+        for (mgint i = 0; i < dataCount; ++i)
+        {
+            memcpy(data + i * dataBytes, src_ptr + i * dataStride, dataBytes);
+        }
+    }
 }
 
 MGG_Texture* MGG_Texture_Create(
@@ -4086,6 +4180,11 @@ void MGG_Texture_SetData(MGG_GraphicsDevice* device, MGG_Texture* texture, mgint
 	{
 		width = texture->info.extent.width;
 		height = texture->info.extent.height;
+	}
+
+	if (texture->info.imageType == VK_IMAGE_TYPE_2D && depth == 0)
+	{
+		depth = 1;
 	}
 
 	assert(level >= 0 && level < texture->info.mipLevels);

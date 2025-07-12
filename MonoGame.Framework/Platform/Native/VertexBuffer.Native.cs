@@ -45,7 +45,7 @@ public partial class VertexBuffer
         //
         var discard = _isDynamic && options != SetDataOptions.NoOverwrite;
 
-        MGG.Buffer_SetData(GraphicsDevice.Handle, ref Handle, offsetInBytes, (byte*)dataPtr, dataBytes, discard);
+        MGG.Buffer_SetData(GraphicsDevice.Handle, ref Handle, offsetInBytes, (byte*)dataPtr, elementCount, vertexStride, elementSizeInBytes, discard);
 
         dataHandle.Free();
     }
