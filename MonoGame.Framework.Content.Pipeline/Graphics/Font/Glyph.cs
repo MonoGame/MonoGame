@@ -12,11 +12,17 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
     [StructLayout(LayoutKind.Sequential)]
     public struct ABCFloat
     {
-        /// <summary/>
+        /// <summary>
+        /// Horizontal layout values for glyph bitmap
+        /// </summary>
         public float A;
-        /// <summary/>
+        /// <summary>
+        /// Width of glyph bitmap
+        /// </summary>
         public float B;
-        /// <summary/>
+        /// <summary>
+        /// Horizontal space after glyph bitmap
+        /// </summary>
         public float C;
     }
 

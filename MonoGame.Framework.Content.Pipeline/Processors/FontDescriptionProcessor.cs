@@ -82,12 +82,6 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
 
                 var glyphData = new HashSet<GlyphData>(glyphs.Select(x => x.Data));
 
-                // Optimize.
-                foreach (GlyphData glyph in glyphData)
-                {
-                    GlyphCropper.Crop(glyph);
-                }
-
                 // We need to know how to pack the glyphs.
                 bool requiresPot, requiresSquare;
                 texProfile.Requirements(context, TextureFormat, out requiresPot, out requiresSquare);
@@ -176,23 +170,29 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
             IFontImporter importer;
 
             var TrueTypeFileExtensions = new List<string> { ".ttf", ".ttc", ".otf" };
-            //var BitmapFileExtensions = new List<string> { ".bmp", ".png", ".gif" };
 
             string fileExtension = Path.GetExtension(fontName).ToLowerInvariant();
 
-            //			if (BitmapFileExtensions.Contains(fileExtension))
-            //			{
-            //				importer = new BitmapImporter();
-            //			}
-            //			else
-            //			{
             if (!TrueTypeFileExtensions.Contains(fileExtension))
+            {
                 throw new PipelineException("Unknown file extension " + fileExtension);
+            }
 
             importer = new SharpFontImporter();
 
             // Import the source font data.
             importer.Import(options, fontName);
+
+            context.Logger.Indent();
+            if (importer.Emboldened)
+            {
+                context.Logger.LogMessage("Bold effect simulated");
+            }
+            if (importer.Italicized)
+            {
+                context.Logger.LogMessage("Italic effect simulated");
+            }
+            context.Logger.Unindent();
 
             lineSpacing = importer.LineSpacing;
             yOffsetMin = importer.YOffsetMin;
@@ -296,8 +296,8 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
             return String.Empty;
         }
 
-         private static bool MatchFont(string fontPath, string fontName, string fontStyle)
-         {
+        private static bool MatchFont(string fontPath, string fontName, string fontStyle)
+        {
             // TODO: Implement this with FreeType lib
             /*try
             {
@@ -317,6 +317,6 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
             }*/
 
             return true;
-         }
+        }
     }
 }
