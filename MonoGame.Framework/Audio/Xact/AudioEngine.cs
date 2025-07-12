@@ -76,6 +76,17 @@ namespace Microsoft.Xna.Framework.Audio
         /// Initializes a new instance of the AudioEngine class by reading out the specified XACT <paramref name="settingsFile"/>
         /// </summary>
         /// <param name="settingsFile">Path to a XACT settings file.</param>
+        /// <param name="lookAheadTime"><c>Not in use:</c> use the <see cref="AudioEngine(string)"/> constructor instead!</param>
+        /// <param name="rendererId"><c>Not in use:</c> use the <see cref="AudioEngine(string)"/> constructor instead!</param>
+        [Obsolete("Use AudioEngine(string settingsFile) instead. The lookAheadTime and rendererId parameters are not used.")]
+        public AudioEngine(string settingsFile, TimeSpan lookAheadTime, string rendererId) : this(settingsFile)
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the AudioEngine class by reading out the specified XACT <paramref name="settingsFile"/>
+        /// </summary>
+        /// <param name="settingsFile">Path to a XACT settings file.</param>
         /// <exception cref="ArgumentException">Invoked if <paramref name="settingsFile"/> is <see cref="String.IsNullOrEmpty"/></exception>
         public AudioEngine(string settingsFile)
         {
