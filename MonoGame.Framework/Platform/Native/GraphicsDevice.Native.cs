@@ -413,6 +413,10 @@ public partial class GraphicsDevice
     private unsafe void PlatformDrawIndexedPrimitives(PrimitiveType primitiveType, int baseVertex, int startIndex, int primitiveCount)
     {
         ApplyState(true);
+        if (baseVertex < 0)
+            baseVertex = 0;
+        if (startIndex < 0)
+            startIndex = 0;
 
         MGG.GraphicsDevice_DrawIndexed(Handle, primitiveType, primitiveCount, startIndex, baseVertex);
     }
@@ -428,6 +432,8 @@ public partial class GraphicsDevice
     private unsafe void PlatformDrawPrimitives(PrimitiveType primitiveType, int vertexStart, int vertexCount)
     {
         ApplyState(true);
+        if (vertexStart < 0)
+            vertexStart = 0;
 
         MGG.GraphicsDevice_Draw(Handle, primitiveType, vertexStart, vertexCount);
     }

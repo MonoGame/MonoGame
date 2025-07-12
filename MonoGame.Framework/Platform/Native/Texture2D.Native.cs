@@ -151,7 +151,7 @@ public partial class Texture2D : Texture
                 out rgba);
 
             if (rgba == null)
-                return null;
+                throw new InvalidOperationException("Failed to read valid RGBA data from the stream, it may not be a valid image format or the data is corrupted.");
         }
         finally
         {

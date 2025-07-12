@@ -20,6 +20,10 @@
 #define VK_NO_PROTOTYPES
 #include <vulkan/vulkan.h>
 
+#ifdef DEBUG
+#define VK_EXT_debug_utils
+#endif
+
 #define VOLK_IMPLEMENTATION
 #include <volk.h>
 
@@ -32,6 +36,7 @@
 #endif
 
 #ifdef _WIN32
+#define NOMINMAX
 #include <Windows.h>
 #include <vulkan/vulkan_win32.h>
 #elif defined(__APPLE__)
@@ -48,6 +53,47 @@
 		assert(_vkr == VK_SUCCESS);														\
 	}																					\
 }
+
+#if defined(DEBUG)
+template <typename... FmtArgs>
+static void setObjectNameVariadic(
+    VkDevice device, uint64_t object, VkObjectType type,
+    const char* file, int line,
+    const char* nameOrFormat, FmtArgs&&... fmtArgs)
+{
+    if (!device || !object || !vkSetDebugUtilsObjectNameEXT) return;
+
+    const char* baseName = nullptr;
+    char formattedNameBuffer[256];
+
+    if constexpr (sizeof...(FmtArgs) > 0)
+    {
+        snprintf(formattedNameBuffer, sizeof(formattedNameBuffer), nameOrFormat, std::forward<FmtArgs>(fmtArgs)...);
+        baseName = formattedNameBuffer;
+    }
+    else
+    {
+        baseName = nameOrFormat;
+    }
+
+    char finalName[256];
+    snprintf(finalName, sizeof(finalName), "%s (%s:%d)", baseName, file, line);
+
+    VkDebugUtilsObjectNameInfoEXT info = {};
+    info.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_OBJECT_NAME_INFO_EXT;
+    info.pNext = VK_NULL_HANDLE;
+    info.objectType = type;
+    info.objectHandle = object;
+    info.pObjectName = finalName;
+    
+    vkSetDebugUtilsObjectNameEXT(device, &info);
+}
+
+#define VK_SET_OBJECT_NAME(device, object, type, ...) \
+    setObjectNameVariadic(device, (uint64_t)(object), type, __FILE__, __LINE__, __VA_ARGS__)
+#else
+#define VK_SET_OBJECT_NAME(...) ((void)0)
+#endif
 
 template<class T>
 T MG_AlignUp(T value, const T alignment)
@@ -378,7 +424,10 @@ struct MGG_SamplerState
 
 struct MGG_OcclusionQuery
 {
-	// TODO!
+	VkQueryPool queryPool = VK_NULL_HANDLE;
+	mgbool isComplete = false;
+	mgbool inBeginEndBlock = false;
+	mgint pixelCount = 0;
 };
 
 struct MGG_GraphicsSystem
@@ -527,6 +576,48 @@ static VkPrimitiveTopology ToVkPrimitiveTopology(MGPrimitiveType type)
 	}
 }
 
+static VkImageViewType ToVkImageViewType(MGTextureType type)
+{
+	switch (type)
+	{
+	case MGTextureType::_2D:
+		return VK_IMAGE_VIEW_TYPE_2D;
+	case MGTextureType::_3D:
+		return VK_IMAGE_VIEW_TYPE_3D;
+	case MGTextureType::Cube:
+		return VK_IMAGE_VIEW_TYPE_CUBE;
+	default:
+		assert(0);
+	}
+}
+
+static VkImageType ToVkImageType(MGTextureType type)
+{
+	switch (type)
+	{
+	case MGTextureType::_2D:
+		return VK_IMAGE_TYPE_2D;
+	case MGTextureType::_3D:
+		return VK_IMAGE_TYPE_3D;
+	case MGTextureType::Cube:
+		return VK_IMAGE_TYPE_2D; // Cube maps are treated as 2D images with cube view.
+	default:
+		assert(0);
+	}
+}
+
+static VkImageCreateFlags ToVkImageCreateFlags(MGTextureType type)
+{
+	VkImageCreateFlags flags = 0;
+	switch (type)
+	{
+	case MGTextureType::Cube:
+		flags |= VK_IMAGE_CREATE_CUBE_COMPATIBLE_BIT;
+		break;
+	}
+	return flags;
+}
+
 static VkImageAspectFlags DetermineAspectMask(VkFormat format)
 {
 	VkImageAspectFlags result = (VkImageAspectFlags)0;
@@ -617,9 +708,12 @@ MGG_GraphicsSystem* MGG_GraphicsSystem_Create()
 #endif
 	instanceExtensions.push_back(VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2_EXTENSION_NAME);
 
+#ifdef DEBUG
+	instanceExtensions.push_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
+#endif
+
 	std::vector<const char*> enabledLayers;
 	enabledLayers.push_back("VK_LAYER_KHRONOS_validation");
-	//enabledLayers.push_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
 	CheckValidationLayerSupport(enabledLayers);
 
 	VkInstanceCreateInfo instance_create_info = { VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO };
@@ -679,7 +773,20 @@ void MGG_GraphicsSystem_Destroy(MGG_GraphicsSystem* system)
 {
 	assert(system != nullptr);
 
-	MG_NOT_IMPLEMEMTED;
+    // Clean up all adapters
+    for (auto adapter : system->adapters)
+    {
+        delete adapter;
+    }
+    system->adapters.clear();
+
+    // Destroy the Vulkan instance
+	if (system->instance)
+	{
+		vkDestroyInstance(system->instance, nullptr);
+	}
+
+	delete system;
 }
 
 MGG_GraphicsAdapter* MGG_GraphicsAdapter_Get(MGG_GraphicsSystem* system, mgint index)
@@ -904,6 +1011,7 @@ static void mggCreateImage(MGG_GraphicsDevice* device, VkImageCreateInfo* info, 
 	allocInfo.usage = VMA_MEMORY_USAGE_GPU_ONLY;
 	VkResult res = vmaCreateImage(device->allocator, info, &allocInfo, &texture->image, &texture->allocation, nullptr);
 	VK_CHECK_RESULT(res);
+	VK_SET_OBJECT_NAME(device->device, texture->image, VK_OBJECT_TYPE_IMAGE, "MGG_Texture.image");
 }
 
 static MGG_Texture* CreateDepthTexture(MGG_GraphicsDevice* device, VkFormat format, uint32_t width, uint32_t height)
@@ -946,7 +1054,7 @@ static VkImageView CreateImageView(MGG_GraphicsDevice* device, MGG_Texture* text
 
 	VkImageViewCreateInfo image_view_create_info = { VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO };
 	image_view_create_info.image = texture->image;
-	image_view_create_info.viewType = VK_IMAGE_VIEW_TYPE_2D;
+	image_view_create_info.viewType = ToVkImageViewType(texture->type);
 	image_view_create_info.format = format;
 	image_view_create_info.subresourceRange.aspectMask = aspect_mask;
 	image_view_create_info.subresourceRange.baseMipLevel = 0;
@@ -973,6 +1081,7 @@ static void MGVK_BufferCreate(MGG_GraphicsDevice* device, int sizeInBytes, VkBuf
 
 	VkResult res = vmaCreateBuffer(device->allocator, &bufferInfo, &allocInfo, &buffer->buffer, &buffer->allocation, nullptr);
 	VK_CHECK_RESULT(res);
+	VK_SET_OBJECT_NAME(device->device, buffer->buffer, VK_OBJECT_TYPE_BUFFER, "MGG_Buffer.buffer");
 }
 
 static VkBufferUsageFlags ToUsage(MGBufferType type)
@@ -1004,6 +1113,7 @@ static VkCommandBuffer MGVK_BeginNewCommandBuffer(MGG_GraphicsDevice* device)
 
 	VkCommandBuffer commandBuffer;
 	vkAllocateCommandBuffers(device->device, &allocInfo, &commandBuffer);
+	VK_SET_OBJECT_NAME(device->device, commandBuffer, VK_OBJECT_TYPE_COMMAND_BUFFER, "MGVK_BeginNewCommandBuffer::commandBuffer");
 
 	VkCommandBufferBeginInfo beginInfo = {};
 	beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
@@ -1024,6 +1134,7 @@ static void MGVK_ExecuteAndFreeCommandBuffer(MGG_GraphicsDevice* device, VkComma
 		fenceCreateInfo.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
 		fenceCreateInfo.flags = 0;
 		vkCreateFence(device->device, &fenceCreateInfo, nullptr, &renderFence);
+		VK_SET_OBJECT_NAME(device->device, renderFence, VK_OBJECT_TYPE_FENCE, "MGVK_ExecuteAndFreeCommandBuffer::renderFence");
 	}
 
 	VkSubmitInfo submitInfo = {};
@@ -1041,7 +1152,7 @@ static void MGVK_ExecuteAndFreeCommandBuffer(MGG_GraphicsDevice* device, VkComma
 	vkFreeCommandBuffers(device->device, device->cmdPool, 1, &commandBuffer);
 }
 
-static void MGVK_CopyBufferToImage(MGG_GraphicsDevice* device, VkBuffer buffer, VkImage image, int32_t x, int32_t y, int32_t level, uint32_t width, uint32_t height)
+static void MGVK_CopyBufferToImage(MGG_GraphicsDevice* device, VkBuffer buffer, VkImage image, int32_t x, int32_t y, int32_t z, int32_t level, uint32_t width, uint32_t height, uint32_t depth)
 {
 	VkCommandBuffer cmds = MGVK_BeginNewCommandBuffer(device);
 
@@ -1055,15 +1166,15 @@ static void MGVK_CopyBufferToImage(MGG_GraphicsDevice* device, VkBuffer buffer, 
 	region.imageSubresource.baseArrayLayer = 0;
 	region.imageSubresource.layerCount = 1;
 
-	region.imageOffset = { x, y, 0 };
-	region.imageExtent = { width, height, 1 };
+	region.imageOffset = { x, y, z };
+	region.imageExtent = { width, height, depth };
 
 	vkCmdCopyBufferToImage(cmds, buffer, image, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &region);
 
 	MGVK_ExecuteAndFreeCommandBuffer(device, cmds);
 }
 
-static void MGVK_CopyImageToBuffer(MGG_GraphicsDevice* device, VkImage image, VkBuffer buffer, int32_t x, int32_t y, int32_t level, uint32_t width, uint32_t height)
+static void MGVK_CopyImageToBuffer(MGG_GraphicsDevice* device, VkImage image, VkBuffer buffer, int32_t x, int32_t y, int32_t z, int32_t level, uint32_t width, uint32_t height, uint32_t depth)
 {
 	VkCommandBuffer cmds = MGVK_BeginNewCommandBuffer(device);
 
@@ -1077,8 +1188,8 @@ static void MGVK_CopyImageToBuffer(MGG_GraphicsDevice* device, VkImage image, Vk
 	region.imageSubresource.baseArrayLayer = 0;
 	region.imageSubresource.layerCount = 1;
 
-	region.imageOffset = { x, y, level };
-	region.imageExtent = { width, height, 1 };
+	region.imageOffset = { x, y, z };
+	region.imageExtent = { width, height, depth };
 
 	vkCmdCopyImageToBuffer(cmds, image, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL, buffer, 1, &region);
 
@@ -1161,6 +1272,8 @@ MGG_GraphicsDevice* MGG_GraphicsDevice_Create(MGG_GraphicsSystem* system, MGG_Gr
 
 	auto res = vkCreateDevice(device->physicalDevice, &deviceCreateInfo, NULL, &device->device);
 	VK_CHECK_RESULT(res);
+	VK_SET_OBJECT_NAME(device->device, device->device, VK_OBJECT_TYPE_DEVICE, "MGG_GraphicsDevice.device");
+	VK_SET_OBJECT_NAME(device->device, device->physicalDevice, VK_OBJECT_TYPE_PHYSICAL_DEVICE, "MGG_GraphicsDevice.physicalDevice");
 
 	VmaAllocatorCreateInfo allocatorInfo = {};
 	allocatorInfo.instance = system->instance;
@@ -1175,6 +1288,7 @@ MGG_GraphicsDevice* MGG_GraphicsDevice_Create(MGG_GraphicsSystem* system, MGG_Gr
 	cmdPoolInfo.queueFamilyIndex = queueFamilyIndex;
 	res = vkCreateCommandPool(device->device, &cmdPoolInfo, nullptr, &device->cmdPool);
 	VK_CHECK_RESULT(res);
+	VK_SET_OBJECT_NAME(device->device, device->cmdPool, VK_OBJECT_TYPE_COMMAND_POOL, "MGG_GraphicsDevice.cmdPool");
 
 	VkCommandBufferAllocateInfo comBufferInfo =
 	{
@@ -1194,17 +1308,21 @@ MGG_GraphicsDevice* MGG_GraphicsDevice_Create(MGG_GraphicsSystem* system, MGG_Gr
 
 		res = vkAllocateCommandBuffers(device->device, &comBufferInfo, &cmd.buffer);
 		VK_CHECK_RESULT(res);
+		VK_SET_OBJECT_NAME(device->device, cmd.buffer, VK_OBJECT_TYPE_COMMAND_BUFFER, "MGVK_CmdBuffer.buffer[%d]", i);
 
 		VkSemaphoreCreateInfo semaphore_create_info = { VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO };
 		res = vkCreateSemaphore(device->device, &semaphore_create_info, NULL, &cmd.imageAcquiredSemaphore);
 		VK_CHECK_RESULT(res);
+		VK_SET_OBJECT_NAME(device->device, cmd.imageAcquiredSemaphore, VK_OBJECT_TYPE_SEMAPHORE, "MGVK_CmdBuffer.imageAcquiredSemaphore[%d]", i);
 		res = vkCreateSemaphore(device->device, &semaphore_create_info, NULL, &cmd.renderCompleteSemaphore);
 		VK_CHECK_RESULT(res);
+		VK_SET_OBJECT_NAME(device->device, cmd.renderCompleteSemaphore, VK_OBJECT_TYPE_SEMAPHORE, "MGVK_CmdBuffer.renderCompleteSemaphore[%d]", i);
 
 		VkFenceCreateInfo fence_create_info = { VK_STRUCTURE_TYPE_FENCE_CREATE_INFO };
 		fence_create_info.flags = VK_FENCE_CREATE_SIGNALED_BIT;
 		res = vkCreateFence(device->device, &fence_create_info, NULL, &cmd.completedFence);
 		VK_CHECK_RESULT(res);
+		VK_SET_OBJECT_NAME(device->device, cmd.completedFence, VK_OBJECT_TYPE_FENCE, "MGVK_CmdBuffer.completedFence[%d]", i);
 	}
 
 	// Create the pipeline cache which is used at runtime
@@ -1216,6 +1334,7 @@ MGG_GraphicsDevice* MGG_GraphicsDevice_Create(MGG_GraphicsSystem* system, MGG_Gr
 	pipelineCache.flags = 0;
 	res = vkCreatePipelineCache(device->device, &pipelineCache, nullptr, &device->pipelineCache);
 	VK_CHECK_RESULT(res);
+	VK_SET_OBJECT_NAME(device->device, device->pipelineCache, VK_OBJECT_TYPE_PIPELINE_CACHE, "MGG_GraphicsDevice.pipelineCache");
 
 	//res = vkDeviceWaitIdle(device->device);
 	//VK_CHECK_RESULT(res);
@@ -1374,6 +1493,7 @@ void MGVK_RecreateSwapChain(
 			vkDestroySurfaceKHR(device->instance, device->surface, nullptr);
 
 		SDL_Vulkan_CreateSurface(sdl_window, device->instance, &device->surface);
+		VK_SET_OBJECT_NAME(device->device, (uint64_t)device->surface, VK_OBJECT_TYPE_SURFACE_KHR, "MGG_GraphicsDevice.surface");
 
 		device->window = sdl_window;
 	}
@@ -1479,6 +1599,7 @@ void MGVK_RecreateSwapChain(
 	//create_info.pNext = &scalingCreateInfo;
 	res = vkCreateSwapchainKHR(device->device, &create_info, nullptr, &device->swapchain);
 	VK_CHECK_RESULT(res);
+	VK_SET_OBJECT_NAME(device->device, device->swapchain, VK_OBJECT_TYPE_SWAPCHAIN_KHR, "MGG_GraphicsDevice.swapchain");
 
 	uint32_t swapchainCount = 0;
 	res = vkGetSwapchainImagesKHR(device->device, device->swapchain, &swapchainCount, NULL);
@@ -1511,13 +1632,17 @@ void MGVK_RecreateSwapChain(
 		texture->info = image_create_info;
 		texture->image = swapchainImages[i];
 		texture->isSwapchain = texture->isTarget = true;
+		VK_SET_OBJECT_NAME(device->device, texture->image, VK_OBJECT_TYPE_IMAGE, "MGG_Texture.image (Swapchain %d)", i);
 
 		texture->target_view = CreateImageView(device, texture, 1);
+		VK_SET_OBJECT_NAME(device->device, texture->target_view, VK_OBJECT_TYPE_IMAGE_VIEW, "MGG_Texture.target_view (Swapchain %d)", i);
 
 		if (device->depthFormat != VK_FORMAT_UNDEFINED)
 		{
 			texture->depthTexture = CreateDepthTexture(device, device->depthFormat, texture->info.extent.width, texture->info.extent.height);
+			VK_SET_OBJECT_NAME(device->device, texture->depthTexture->image, VK_OBJECT_TYPE_IMAGE, "MGG_Texture.depthTexture.image (Swapchain %d)", i);
 			texture->depthTexture->target_view = CreateImageView(device, texture->depthTexture, 1);
+			VK_SET_OBJECT_NAME(device->device, texture->depthTexture->target_view, VK_OBJECT_TYPE_IMAGE_VIEW, "MGG_Texture.depthTexture.target_view (Swapchain %d)", i);
 		}
 
 		device->frames[i].swapchainTexture = texture;
@@ -1631,7 +1756,10 @@ mgint MGG_GraphicsDevice_BeginFrame(MGG_GraphicsDevice* device)
 
 	frame.uniformOffset = 0;
 	if (frame.uniforms == NULL)
+	{
 		frame.uniforms = MGVK_Buffer_Create(device, MGBufferType::Constant, 4 * 1024 * 1024, true);
+		VK_SET_OBJECT_NAME(device->device, frame.uniforms->buffer, VK_OBJECT_TYPE_BUFFER, "MGVK_FrameState.uniforms->buffer");
+	}
 
 	MGVK_BeginFrame(cmd);
 
@@ -2220,6 +2348,7 @@ static void MGVK_UpdateRenderPass(MGG_GraphicsDevice* device, FrameCounter curre
 
 			VkResult res = vkCreateRenderPass(device->device, &create_info, nullptr, &cached->renderPass);
 			VK_CHECK_RESULT(res);
+			VK_SET_OBJECT_NAME(device->device, cached->renderPass, VK_OBJECT_TYPE_RENDER_PASS, "MGVK_TargetSetCache.renderPass (hash: %u)", hash);
 		}
 
 		{
@@ -2233,6 +2362,7 @@ static void MGVK_UpdateRenderPass(MGG_GraphicsDevice* device, FrameCounter curre
 
 			VkResult res = vkCreateFramebuffer(device->device, &create_info, nullptr, &cached->framebuffer);
 			VK_CHECK_RESULT(res);
+			VK_SET_OBJECT_NAME(device->device, cached->framebuffer, VK_OBJECT_TYPE_FRAMEBUFFER, "MGVK_TargetSetCache.framebuffer (hash: %u)", hash);
 		}
 
 		device->targetCache[hash] = cached;
@@ -2421,6 +2551,7 @@ static MGVK_Program* MGVK_ProgramGetOrCreate(MGG_GraphicsDevice* device, MGG_Sha
 	pipelineLayoutInfo.pPushConstantRanges = nullptr;
 	res = vkCreatePipelineLayout(device->device, &pipelineLayoutInfo, nullptr, &program->layout);
 	VK_CHECK_RESULT(res);
+	VK_SET_OBJECT_NAME(device->device, program->layout, VK_OBJECT_TYPE_PIPELINE_LAYOUT, "MGVK_Program.layout (id: %llu)", programId);
 
 	device->shader_programs[programId] = program;
 
@@ -2528,6 +2659,7 @@ static VkPipeline MGVK_CreatePipeline(MGG_GraphicsDevice* device)
 
 	VkResult res = vkCreateGraphicsPipelines(device->device, device->pipelineCache, 1, &pipelineInfo, nullptr, &pipeline.cache);
 	VK_CHECK_RESULT(res);
+	VK_SET_OBJECT_NAME(device->device, pipeline.cache, VK_OBJECT_TYPE_PIPELINE, "MGVK_PipelineCache.cache (hash: %u)", hash);
 
 	device->pipelines[hash] = pipeline;
 
@@ -2760,20 +2892,54 @@ void MGG_GraphicsDevice_DrawIndexed(MGG_GraphicsDevice* device, MGPrimitiveType 
 	vkCmdDrawIndexed(frame.commandBuffer.buffer, indexCount, 1, indexStart, vertexStart, 0);
 }
 
-void MGG_GraphicsDevice_DrawIndexedInstanced(MGG_GraphicsDevice* device, MGPrimitiveType primitiveType, mgint primitiveCount, mgint indexStart, mgint vertexStart, mgint instanceCount)
+void MGG_GraphicsDevice_DrawIndexedInstanced(
+	MGG_GraphicsDevice* device,
+	MGPrimitiveType primitiveType,
+	mgint primitiveCount,
+	mgint indexStart,
+	mgint vertexStart,
+	mgint instanceCount)
 {
 	assert(device != nullptr);
 	assert(primitiveCount >= 0);
 	assert(indexStart >= 0);
 	assert(vertexStart >= 0);
-	assert(instanceCount >= 0);
+	assert(instanceCount > 0);
 
 	if (primitiveCount <= 0)
 		return;
-	if (instanceCount <= 0)
-		return;
 
-	MG_NOT_IMPLEMEMTED;
+	auto currentFrame = device->frame;
+	auto frameIndex = currentFrame % kConcurrentFrameCount;
+	auto& frame = device->frames[frameIndex];
+	assert(frame.is_recording);
+
+	auto& cmd = frame.commandBuffer;
+
+	MGVK_UpdateRenderPass(device, currentFrame, cmd);
+
+	auto topology = ToVkPrimitiveTopology(primitiveType);
+	if (device->pipelineState.topology != topology)
+	{
+		device->pipelineStateDirty = true;
+		device->pipelineState.topology = topology;
+	}
+
+	MGVK_UpdatePipeline(device, cmd, currentFrame);
+
+	auto indexBuffer = device->indexBuffer;
+	assert(indexBuffer != nullptr);
+	vkCmdBindIndexBuffer(cmd.buffer, indexBuffer->buffer, 0, device->indexBufferSize == MGIndexElementSize::SixteenBits ? VK_INDEX_TYPE_UINT16 : VK_INDEX_TYPE_UINT32);
+
+	auto indexCount = MGVK_GetIndexCount(primitiveType, primitiveCount);
+
+	vkCmdDrawIndexed(
+		cmd.buffer,
+		indexCount,       
+		instanceCount,    
+		indexStart,       
+		vertexStart,      
+		0);               
 }
 
 void MGG_GraphicsDevice_GetBackBufferData(MGG_GraphicsDevice* device, mgint x, mgint y, mgint width, mgint height, void* data, mgint count, mgint dataBytes)
@@ -2803,6 +2969,7 @@ void MGG_GraphicsDevice_GetBackBufferData(MGG_GraphicsDevice* device, mgint x, m
 	VkFence flushFence;
 	VkFenceCreateInfo fenceInfo = { VK_STRUCTURE_TYPE_FENCE_CREATE_INFO };
 	vkCreateFence(device->device, &fenceInfo, nullptr, &flushFence);
+	VK_SET_OBJECT_NAME(device->device, flushFence, VK_OBJECT_TYPE_FENCE, "MGG_GraphicsDevice_GetBackBufferData::flushFence");
 
 	vkQueueSubmit(device->queue, 1, &flushSubmitInfo, flushFence);
 	vkWaitForFences(device->device, 1, &flushFence, VK_TRUE, UINT64_MAX);
@@ -2826,6 +2993,7 @@ void MGG_GraphicsDevice_GetBackBufferData(MGG_GraphicsDevice* device, mgint x, m
 	allocCreateInfo.flags = VMA_ALLOCATION_CREATE_MAPPED_BIT;
 
 	VK_CHECK_RESULT(vmaCreateBuffer(device->allocator, &bufferInfo, &allocCreateInfo, &dstBuffer, &dstBufferAllocation, &dstAllocInfo));
+	VK_SET_OBJECT_NAME(device->device, dstBuffer, VK_OBJECT_TYPE_BUFFER, "MGG_GraphicsDevice_GetBackBufferData::dstBuffer");
 
 	VkCommandBuffer copyCmdBuffer = MGVK_BeginNewCommandBuffer(device);
 
@@ -3349,6 +3517,7 @@ MGG_SamplerState* MGG_SamplerState_Create(MGG_GraphicsDevice* device, MGG_Sample
 	VK_CHECK_RESULT(res);
 
 	state->id = ++device->currentSamplerId;
+	VK_SET_OBJECT_NAME(device->device, state->sampler, VK_OBJECT_TYPE_SAMPLER, "MGG_SamplerState.sampler (id: %llu)", state->id);
 
 	return state;
 }
@@ -3650,10 +3819,13 @@ MGG_Texture* MGG_Texture_Create(
 	auto texture = new MGG_Texture();
 	texture->type = type;
 	texture->format = format;
+	texture->id = ++device->currentTextureId;
 
 	VkImageCreateInfo& create_info = texture->info;
 	create_info.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
-	create_info.imageType = VK_IMAGE_TYPE_2D; // TODO: 3D textures
+	create_info.imageType = ToVkImageType(type);
+	create_info.flags = ToVkImageCreateFlags(type);
+
 	create_info.format = ToVkFormat(format);
 	create_info.extent.width = width;
 	create_info.extent.height = height;
@@ -3670,10 +3842,10 @@ MGG_Texture* MGG_Texture_Create(
 	texture->optimal_layout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
 	
 	mggCreateImage(device, &create_info, texture);
+	VK_SET_OBJECT_NAME(device->device, texture->image, VK_OBJECT_TYPE_IMAGE, "MGG_Texture.image (id: %llu)", texture->id);
 
 	texture->view = CreateImageView(device, texture, mipmaps);
-
-	texture->id = ++device->currentTextureId;
+	VK_SET_OBJECT_NAME(device->device, texture->view, VK_OBJECT_TYPE_IMAGE_VIEW, "MGG_Texture.view (id: %llu)", texture->id);
 
 	return texture;
 }
@@ -3704,6 +3876,7 @@ MGG_Texture* MGG_RenderTarget_Create(
 	texture->isTarget = true;
 	texture->type = type;
 	texture->format = format;
+	texture->id = ++device->currentTextureId;
 
 	texture->depthFormat = depthFormat;
 	texture->multiSampleCount = multiSampleCount;
@@ -3712,7 +3885,8 @@ MGG_Texture* MGG_RenderTarget_Create(
 	{
 		VkImageCreateInfo& create_info = texture->info;
 		create_info.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
-		create_info.imageType = VK_IMAGE_TYPE_2D; // TODO: Fix type!
+		create_info.imageType = ToVkImageType(type);
+		create_info.flags = ToVkImageCreateFlags(type);
 		create_info.format = ToVkFormat(format);
 		create_info.extent.width = width;
 		create_info.extent.height = height;
@@ -3730,9 +3904,12 @@ MGG_Texture* MGG_RenderTarget_Create(
 
 
 		mggCreateImage(device, &create_info, texture);
+		VK_SET_OBJECT_NAME(device->device, texture->image, VK_OBJECT_TYPE_IMAGE, "MGG_Texture.image (RenderTarget id: %llu)", texture->id);
 
 		texture->view = CreateImageView(device, texture, mipmaps);
+		VK_SET_OBJECT_NAME(device->device, texture->view, VK_OBJECT_TYPE_IMAGE_VIEW, "MGG_Texture.view (RenderTarget id: %llu)", texture->id);
 		texture->target_view = CreateImageView(device, texture, 1);
+		VK_SET_OBJECT_NAME(device->device, texture->target_view, VK_OBJECT_TYPE_IMAGE_VIEW, "MGG_Texture.target_view (RenderTarget id: %llu)", texture->id);
 
 		MGVK_TransitionImageLayout(device, texture, 0, texture->optimal_layout);
 	}
@@ -3740,10 +3917,10 @@ MGG_Texture* MGG_RenderTarget_Create(
 	if (depthFormat != MGDepthFormat::None)
 	{
 		texture->depthTexture = CreateDepthTexture(device, ToVkFormat(depthFormat), width, height);
+		VK_SET_OBJECT_NAME(device->device, texture->depthTexture->image, VK_OBJECT_TYPE_IMAGE, "MGG_Texture.depthTexture.image (for RT id: %llu)", texture->id);
 		texture->depthTexture->target_view = CreateImageView(device, texture->depthTexture, 1);
+		VK_SET_OBJECT_NAME(device->device, texture->depthTexture->target_view, VK_OBJECT_TYPE_IMAGE_VIEW, "MGG_Texture.depthTexture.target_view (for RT id: %llu)", texture->id);
 	}
-
-	texture->id = ++device->currentTextureId;
 
 	//device->all_textures.push_back(texture);
 
@@ -3890,6 +4067,7 @@ void MGG_Texture_SetData(MGG_GraphicsDevice* device, MGG_Texture* texture, mgint
 
 	MGG_Buffer buffer;
 	MGVK_BufferCreate(device, dataBytes, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VMA_MEMORY_USAGE_CPU_ONLY, &buffer);
+	VK_SET_OBJECT_NAME(device->device, buffer.buffer, VK_OBJECT_TYPE_BUFFER, "MGG_Texture_SetData::stagingBuffer");
 
 	void* dest;
 	vmaMapMemory(device->allocator, buffer.allocation, &dest);
@@ -3898,7 +4076,7 @@ void MGG_Texture_SetData(MGG_GraphicsDevice* device, MGG_Texture* texture, mgint
 
 	MGVK_TransitionImageLayout(device, texture, level, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
 
-	MGVK_CopyBufferToImage(device, buffer.buffer, texture->image, x, y, level, width, height);
+	MGVK_CopyBufferToImage(device, buffer.buffer, texture->image, x, y, z, level, width, height, depth);
 
 	MGVK_TransitionImageLayout(device, texture, level, texture->optimal_layout);
 
@@ -3948,6 +4126,7 @@ void MGG_Texture_GetData(MGG_GraphicsDevice* device, MGG_Texture* texture, mgint
 				fenceCreateInfo.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
 				fenceCreateInfo.flags = 0;
 				vkCreateFence(device->device, &fenceCreateInfo, nullptr, &renderFence);
+				VK_SET_OBJECT_NAME(device->device, renderFence, VK_OBJECT_TYPE_FENCE, "MGG_Texture_GetData::renderFence");
 			}
 
 			VkSubmitInfo submitInfo = {};
@@ -3967,9 +4146,10 @@ void MGG_Texture_GetData(MGG_GraphicsDevice* device, MGG_Texture* texture, mgint
 
 	MGG_Buffer buffer;
 	MGVK_BufferCreate(device, dataBytes, VK_BUFFER_USAGE_TRANSFER_DST_BIT, VMA_MEMORY_USAGE_CPU_ONLY, &buffer);
+	VK_SET_OBJECT_NAME(device->device, buffer.buffer, VK_OBJECT_TYPE_BUFFER, "MGG_Texture_GetData::stagingBuffer");
 	MGVK_TransitionImageLayout(device, texture, level, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL);
 
-	MGVK_CopyImageToBuffer(device, texture->image, buffer.buffer, x, y, level, width, height);
+	MGVK_CopyImageToBuffer(device, texture->image, buffer.buffer, x, y, z, level, width, height, depth);
 
 	MGVK_TransitionImageLayout(device, texture, level, texture->layout);
 
@@ -4074,6 +4254,7 @@ MGG_Shader* MGG_Shader_Create(MGG_GraphicsDevice* device, MGShaderStage stage, m
 	VK_CHECK_RESULT(res);
 
 	shader->id = ++device->currentShaderId;
+	VK_SET_OBJECT_NAME(device->device, shader->module, VK_OBJECT_TYPE_SHADER_MODULE, "MGG_Shader.module (id: %u)", shader->id);
 
 	device->all_shaders.push_back(shader);
 
@@ -4097,6 +4278,7 @@ MGG_Shader* MGG_Shader_Create(MGG_GraphicsDevice* device, MGShaderStage stage, m
 
 	res = vkCreateDescriptorSetLayout(device->device, &layoutInfo, nullptr, &shader->setLayout);
 	VK_CHECK_RESULT(res);
+	VK_SET_OBJECT_NAME(device->device, shader->setLayout, VK_OBJECT_TYPE_DESCRIPTOR_SET_LAYOUT, "MGG_Shader.setLayout (id: %u)", shader->id);
 
 	// Prepare the initial descriptor pool.
 	{
@@ -4118,6 +4300,7 @@ MGG_Shader* MGG_Shader_Create(MGG_GraphicsDevice* device, MGShaderStage stage, m
 
 		res = vkCreateDescriptorPool(device->device, shader->poolInfo, nullptr, &shader->pool);
 		VK_CHECK_RESULT(res);
+		VK_SET_OBJECT_NAME(device->device, shader->pool, VK_OBJECT_TYPE_DESCRIPTOR_POOL, "MGG_Shader.pool (id: %u)", shader->id);
 	}
 
 	// Pre-fill the free descriptor sets now.
@@ -4133,6 +4316,7 @@ MGG_Shader* MGG_Shader_Create(MGG_GraphicsDevice* device, MGShaderStage stage, m
 
 		res = vkAllocateDescriptorSets(device->device, &alloc_info, &info->set);
 		VK_CHECK_RESULT(res);
+		VK_SET_OBJECT_NAME(device->device, info->set, VK_OBJECT_TYPE_DESCRIPTOR_SET, "MGVK_DescriptorInfo.set (Shader id: %u, index: %d)", shader->id, i);
 	}
 
 	// Prepare the write descriptor set for updates at runtime.
@@ -4230,7 +4414,13 @@ MGG_OcclusionQuery* MGG_OcclusionQuery_Create(MGG_GraphicsDevice* device)
 
 	auto query = new MGG_OcclusionQuery();
 
-	// TODO: Implement!
+	VkQueryPoolCreateInfo createInfo = { VK_STRUCTURE_TYPE_QUERY_POOL_CREATE_INFO };
+	createInfo.queryType = VK_QUERY_TYPE_OCCLUSION;
+	createInfo.queryCount = 1;
+
+	VkResult res = vkCreateQueryPool(device->device, &createInfo, nullptr, &query->queryPool);
+	VK_CHECK_RESULT(res);
+	VK_SET_OBJECT_NAME(device->device, query->queryPool, VK_OBJECT_TYPE_QUERY_POOL, "MGG_OcclusionQuery.queryPool");
 
 	return query;
 }
@@ -4243,7 +4433,15 @@ void MGG_OcclusionQuery_Destroy(MGG_GraphicsDevice* device, MGG_OcclusionQuery* 
 	if (!query)
 		return;
 
-	// TODO: Implement!
+	// An active query should be also able to destroy
+	
+	if (query->queryPool != VK_NULL_HANDLE)
+	{
+		// Wait until the device is idle to ensure the query pool is no longer
+		// in use by any submitted command buffers before destroying it.
+		vkDeviceWaitIdle(device->device);
+		vkDestroyQueryPool(device->device, query->queryPool, nullptr);
+	}
 
 	delete query;
 }
@@ -4252,25 +4450,93 @@ void MGG_OcclusionQuery_Begin(MGG_GraphicsDevice* device, MGG_OcclusionQuery* qu
 {
 	assert(device != nullptr);
 	assert(query != nullptr);
+	assert(!query->inBeginEndBlock);
 
-	// TODO: Implement!
+	auto currentFrame = device->frame;
+	auto frameIndex = currentFrame % kConcurrentFrameCount;
+	auto& frame = device->frames[frameIndex];
+	assert(frame.is_recording);
+
+	auto cmd = frame.commandBuffer.buffer;
+
+	// Reset the query before beginning it.
+	vkCmdResetQueryPool(cmd, query->queryPool, 0, 1);
+
+	// Use precise queries if the hardware supports it for more accurate results.
+	VkQueryControlFlags flags = 0;
+	if (device->deviceFeatures.occlusionQueryPrecise)
+		flags = VK_QUERY_CONTROL_PRECISE_BIT;
+		
+	vkCmdBeginQuery(cmd, query->queryPool, 0, flags);
+
+	query->inBeginEndBlock = true;
+	query->isComplete = false;
+	query->pixelCount = 0;
 }
 
 void MGG_OcclusionQuery_End(MGG_GraphicsDevice* device, MGG_OcclusionQuery* query)
 {
 	assert(device != nullptr);
 	assert(query != nullptr);
+	assert(query->inBeginEndBlock);
 
-	// TODO: Implement!
+	auto currentFrame = device->frame;
+	auto frameIndex = currentFrame % kConcurrentFrameCount;
+	auto& frame = device->frames[frameIndex];
+	assert(frame.is_recording);
+
+	auto cmd = frame.commandBuffer.buffer;
+
+	vkCmdEndQuery(cmd, query->queryPool, 0);
+
+	query->inBeginEndBlock = false;
 }
 
 mgbyte MGG_OcclusionQuery_GetResult(MGG_GraphicsDevice* device, MGG_OcclusionQuery* query, mgint& pixelCount)
 {
 	assert(device != nullptr);
 	assert(query != nullptr);
+	assert(!query->inBeginEndBlock);
 
-	// TODO: Implement!
+	// If the result is already available from a previous check, return it immediately.
+	if (query->isComplete)
+	{
+		pixelCount = query->pixelCount;
+		return true;
+	}
 
-	pixelCount = 0;
-	return true;
+	uint64_t result = 0;
+	// Poll for the result without waiting. This prevents stalling the CPU.
+	// VK_QUERY_RESULT_64_BIT requests a 64-bit integer result.
+	VkResult res = vkGetQueryPoolResults(
+		device->device,
+		query->queryPool,
+		0, // firstQuery
+		1, // queryCount
+		sizeof(uint64_t), // dataSize
+		&result,          // pData
+		sizeof(uint64_t), // stride
+		VK_QUERY_RESULT_64_BIT
+	);
+
+	if (res == VK_SUCCESS)
+	{
+		query->pixelCount = (mgint)result;
+		pixelCount = query->pixelCount;
+		query->isComplete = true;
+		return true;
+	}
+	else if (res == VK_NOT_READY)
+	{
+		// The GPU has not finished processing the query yet.
+		pixelCount = 0;
+		return false;
+	}
+	else
+	{
+		// An error occurred.
+		VK_CHECK_RESULT(res);
+		pixelCount = 0;
+		return false; // Return false indicating the result is not available.
+	}
 }

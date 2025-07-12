@@ -17,6 +17,7 @@
 #include <queue>
 #include <map>
 #include <functional>
+#include <algorithm>
 
 
 #if defined(_WIN32)
