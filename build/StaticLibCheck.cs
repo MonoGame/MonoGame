@@ -30,7 +30,8 @@ public static class StaticLibCheck
         "VERSION.dll",
         "ADVAPI32.dll",
         "SETUPAPI.dll",
-        "SHELL32.dll"
+        "SHELL32.dll",
+        "KERNEL32.dll"
     };
 
     private static readonly string[] ValidLinuxLibs = {
