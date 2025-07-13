@@ -30,8 +30,7 @@ public static class StaticLibCheck
         "VERSION.dll",
         "ADVAPI32.dll",
         "SETUPAPI.dll",
-        "SHELL32.dll",
-        "KERNEL32.dll"
+        "SHELL32.dll"
     };
 
     private static readonly string[] ValidLinuxLibs = {
@@ -69,7 +68,7 @@ public static class StaticLibCheck
             if (!libPath.EndsWith(".dll") || libPath.Contains(' '))
                 continue;
 
-            if (!ValidWindowsLibs.Contains(libPath))
+            if (ValidWindowsLibs.Contains(libPath))
             {
                 context.Information($"VALID: {libPath}");
             }
