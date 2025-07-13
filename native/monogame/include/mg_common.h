@@ -18,6 +18,7 @@
 #include <map>
 #include <functional>
 #include <algorithm>
+#include <optional> 
 
 
 #if defined(_WIN32)

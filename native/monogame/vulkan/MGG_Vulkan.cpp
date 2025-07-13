@@ -117,10 +117,13 @@ struct MGVK_CmdBuffer
 	VkFence         completedFence;
 };
 
+constexpr size_t MGVK_NUM_TARGETS = 4;
+
 struct MGVK_TargetSet
 {
-	MGG_Texture* targets[4] = { 0 };
+    MGG_Texture* targets[MGVK_NUM_TARGETS] = { 0 };
 	int numTargets = 0;
+	std::optional<int> arraySlices[MGVK_NUM_TARGETS];
 };
 
 struct MGVK_TargetSetCache
@@ -131,6 +134,7 @@ struct MGVK_TargetSetCache
 	int height = 0;
 	VkFramebuffer framebuffer = VK_NULL_HANDLE;
 	VkRenderPass renderPass = VK_NULL_HANDLE;
+    std::optional<VkImageView> arraySlicesViews[MGVK_NUM_TARGETS];
 };
 
 struct MGVK_PipelineState
@@ -453,6 +457,7 @@ static void MGVK_CmdTransitionImageLayout(
 	VkImageAspectFlags aspectMask,
 	uint32_t baseMipLevel = 0,
 	uint32_t levelCount = 1,
+	uint32_t baseArrayLayer = 0,
 	uint32_t layerCount = 1);
 
 static VkSampleCountFlagBits ToVkSampleCount(mgint multiSampleCount)
@@ -1046,10 +1051,9 @@ static void mggCreateImage(MGG_GraphicsDevice* device, VkImageCreateInfo* info, 
 	allocInfo.usage = VMA_MEMORY_USAGE_GPU_ONLY;
 	VkResult res = vmaCreateImage(device->allocator, info, &allocInfo, &texture->image, &texture->allocation, nullptr);
 	VK_CHECK_RESULT(res);
-	VK_SET_OBJECT_NAME(device->device, texture->image, VK_OBJECT_TYPE_IMAGE, "MGG_Texture.image");
 }
 
-static MGG_Texture* CreateDepthTexture(MGG_GraphicsDevice* device, VkFormat format, uint32_t width, uint32_t height)
+static MGG_Texture* CreateDepthTexture(MGG_GraphicsDevice* device, VkFormat format, uint32_t width, uint32_t height, mgint multiSampleCount)
 {
 	// TODO: Could convert this into a
 	// general image creation method.
@@ -1064,7 +1068,7 @@ static MGG_Texture* CreateDepthTexture(MGG_GraphicsDevice* device, VkFormat form
 	create_info.extent = { width, height, 1 };
 	create_info.mipLevels = 1;
 	create_info.arrayLayers = 1;
-	create_info.samples = VK_SAMPLE_COUNT_1_BIT;
+    create_info.samples = ToVkSampleCount(multiSampleCount);
 	create_info.tiling = VK_IMAGE_TILING_OPTIMAL;
 	create_info.usage = VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT;
 	create_info.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
@@ -1073,8 +1077,10 @@ static MGG_Texture* CreateDepthTexture(MGG_GraphicsDevice* device, VkFormat form
 	texture->layout = VK_IMAGE_LAYOUT_UNDEFINED;
 	texture->optimal_layout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
 	VkImageLayout optimalLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
+    VkImageAspectFlags aspectMask = DetermineAspectMask(format);
 
 	mggCreateImage(device, &create_info, texture);
+    VK_SET_OBJECT_NAME(device->device, texture->image, VK_OBJECT_TYPE_IMAGE, "CreateDepthTexture::texture.image");
 	
 	VkCommandBuffer cmd = MGVK_BeginNewCommandBuffer(device);
 	MGVK_CmdTransitionImageLayout(
@@ -1082,7 +1088,7 @@ static MGG_Texture* CreateDepthTexture(MGG_GraphicsDevice* device, VkFormat form
         texture->image,
         VK_IMAGE_LAYOUT_UNDEFINED,
         optimalLayout,
-        VK_IMAGE_ASPECT_DEPTH_BIT | VK_IMAGE_ASPECT_STENCIL_BIT
+        aspectMask
     );
 
 	MGVK_ExecuteAndFreeCommandBuffer(device, cmd);
@@ -1389,6 +1395,13 @@ static void cleanupSwapChain(MGG_GraphicsDevice* device)
 	// Destroy all frame buffers.
 	for (auto pair : device->targetCache)
 	{
+        for (int i = 0; i < MGVK_NUM_TARGETS; ++i)
+        {
+            auto& view = pair.second->arraySlicesViews[i];
+            if (view.has_value()) {
+                vkDestroyImageView(device->device, view.value(), nullptr);
+            }
+        }
 		vkDestroyRenderPass(device->device, pair.second->renderPass, nullptr);
 		vkDestroyFramebuffer(device->device, pair.second->framebuffer, nullptr);
 		delete pair.second;
@@ -1656,7 +1669,7 @@ void MGVK_RecreateSwapChain(
 
 		if (device->depthFormat != VK_FORMAT_UNDEFINED)
 		{
-			texture->depthTexture = CreateDepthTexture(device, device->depthFormat, texture->info.extent.width, texture->info.extent.height);
+            texture->depthTexture = CreateDepthTexture(device, device->depthFormat, texture->info.extent.width, texture->info.extent.height, texture->multiSampleCount);
 			VK_SET_OBJECT_NAME(device->device, texture->depthTexture->image, VK_OBJECT_TYPE_IMAGE, "MGG_Texture.depthTexture.image (Swapchain %d)", i);
 			texture->depthTexture->target_view = CreateImageView(device, texture->depthTexture, 1);
 			VK_SET_OBJECT_NAME(device->device, texture->depthTexture->target_view, VK_OBJECT_TYPE_IMAGE_VIEW, "MGG_Texture.depthTexture.target_view (Swapchain %d)", i);
@@ -1680,7 +1693,7 @@ void MGVK_RecreateSwapChain(MGG_GraphicsDevice* device)
 		device->colorFormat,
 		device->depthFormat);
 
-	MGG_GraphicsDevice_SetRenderTargets(device, nullptr, 0);
+    MGG_GraphicsDevice_SetRenderTargets(device, nullptr, nullptr, 0);
 }
 
 void MGG_GraphicsDevice_ResizeSwapchain(
@@ -1817,7 +1830,7 @@ void MGG_GraphicsDevice_Clear(MGG_GraphicsDevice* device, MGClearOptions options
 		{
 			VkClearAttachment* attachment = &attachments[num_attachments];
 			attachment->aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
-			attachment->colorAttachment = num_attachments;
+			attachment->colorAttachment = i;
 			attachment->clearValue.color.float32[0] = color.X;
 			attachment->clearValue.color.float32[1] = color.Y;
 			attachment->clearValue.color.float32[2] = color.Z;
@@ -1830,15 +1843,27 @@ void MGG_GraphicsDevice_Clear(MGG_GraphicsDevice* device, MGClearOptions options
 	bool clearStencil = ((int)options & (int)MGClearOptions::Stencil) != 0;
 	if (clearDepth || clearStencil)
 	{
-		VkClearAttachment* attachment = &attachments[num_attachments++];
+		VkClearAttachment* attachment = &attachments[num_attachments];
 
 		if (clearDepth)
 			attachment->aspectMask |= VK_IMAGE_ASPECT_DEPTH_BIT;
 		if (clearStencil)
 			attachment->aspectMask |= VK_IMAGE_ASPECT_STENCIL_BIT;
 
-		attachment->clearValue.depthStencil.depth = depth;
-		attachment->clearValue.depthStencil.stencil = stencil;
+		auto depthTexture = targets->set.targets[0]->depthTexture;
+		if (depthTexture) {
+			attachment->aspectMask &= DetermineAspectMask(depthTexture->info.format);
+		}
+		else {
+			attachment->aspectMask = 0;
+		}
+
+		if (attachment->aspectMask != 0)
+		{
+			attachment->clearValue.depthStencil.depth = depth;
+			attachment->clearValue.depthStencil.stencil = stencil;
+			num_attachments++;
+		}
 	}
 
 	VkClearRect rect;
@@ -1865,6 +1890,12 @@ static void MGVK_DestroyTargetSets(MGG_GraphicsDevice* device, std::function<boo
 			itr++;
 		else
 		{
+            for (int i = 0; i < MGVK_NUM_TARGETS; ++i) {
+                auto& view = itr->second->arraySlicesViews[i];
+                if (view.has_value()) {
+                    vkDestroyImageView(device->device, view.value(), nullptr);
+                }
+            }
 			vkDestroyFramebuffer(device->device, itr->second->framebuffer, nullptr);
 			vkDestroyRenderPass(device->device, itr->second->renderPass, nullptr);
 			delete itr->second;
@@ -2162,7 +2193,7 @@ void MGG_GraphicsDevice_SetScissorRectangle(MGG_GraphicsDevice* device, mgint x,
 	device->scissorDirty = true;
 }
 
-void MGG_GraphicsDevice_SetRenderTargets(MGG_GraphicsDevice* device, MGG_Texture** targets, mgint count)
+void MGG_GraphicsDevice_SetRenderTargets(MGG_GraphicsDevice* device, MGG_Texture** targets, mgint* arraySlices, mgint count)
 {
 	assert(device != nullptr);
 
@@ -2173,14 +2204,40 @@ void MGG_GraphicsDevice_SetRenderTargets(MGG_GraphicsDevice* device, MGG_Texture
 		auto& frame = device->frames[frameIndex];
 
 		device->targets.targets[0] = frame.swapchainTexture;
-		memset(device->targets.targets + 1, 0, 3 * sizeof(MGG_Texture*));
+        memset(device->targets.targets + 1, 0, sizeof(MGG_Texture*) * (MGVK_NUM_TARGETS - 1));
 		device->targets.numTargets = 1;
+        for (int i = 0; i < MGVK_NUM_TARGETS; i++)
+        {
+            device->targets.arraySlices[i] = std::nullopt;
+        }
 	}
 	else
 	{
 		memcpy(device->targets.targets, targets, count * sizeof(MGG_Texture*));
-		memset(device->targets.targets + count, 0, (4 - count) * sizeof(MGG_Texture*));
+        memset(device->targets.targets + count, 0, (MGVK_NUM_TARGETS - count) * sizeof(MGG_Texture*));
 		device->targets.numTargets = count;
+
+        if (arraySlices)
+        {
+            for (int i = 0; i < MGVK_NUM_TARGETS; i++)
+            {
+                if (i < count && arraySlices[i] >= 0)
+                {
+                    device->targets.arraySlices[i] = arraySlices[i];
+                }
+                else
+                {
+                    device->targets.arraySlices[i] = std::nullopt;
+                }
+            }
+        }
+        else
+        {
+            for (int i = 0; i < MGVK_NUM_TARGETS; i++)
+            {
+                device->targets.arraySlices[i] = std::nullopt;
+            }
+        }
 	}
 
 	device->pipelineStateDirty = true;
@@ -2281,6 +2338,7 @@ static void MGVK_CmdTransitionImageLayout(
 	VkImageAspectFlags aspectMask,
 	uint32_t baseMipLevel,
 	uint32_t levelCount,
+	uint32_t baseArrayLayer,
 	uint32_t layerCount)
 {
 	VkImageMemoryBarrier barrier = {};
@@ -2293,7 +2351,7 @@ static void MGVK_CmdTransitionImageLayout(
 	barrier.subresourceRange.aspectMask = aspectMask;
 	barrier.subresourceRange.baseMipLevel = baseMipLevel;
 	barrier.subresourceRange.levelCount = levelCount;
-	barrier.subresourceRange.baseArrayLayer = 0;
+	barrier.subresourceRange.baseArrayLayer = baseArrayLayer;
 	barrier.subresourceRange.layerCount = layerCount;
 
 	VkPipelineStageFlags sourceStage;
@@ -2382,6 +2440,7 @@ static void MGVK_CmdCopyBufferToImage(
 	VkImage image,
 	int32_t x, int32_t y, int32_t z,
 	int32_t level,
+	int32_t slice,
 	uint32_t width, uint32_t height, uint32_t depth)
 {
 	VkBufferImageCopy region = {};
@@ -2391,7 +2450,7 @@ static void MGVK_CmdCopyBufferToImage(
 
 	region.imageSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
 	region.imageSubresource.mipLevel = level;
-	region.imageSubresource.baseArrayLayer = 0;
+	region.imageSubresource.baseArrayLayer = slice;
 	region.imageSubresource.layerCount = 1;
 
 	region.imageOffset = { x, y, z };
@@ -2406,6 +2465,7 @@ static void MGVK_CmdCopyImageToBuffer(
 	VkBuffer buffer,
 	int32_t x, int32_t y, int32_t z,
 	int32_t level,
+	int32_t slice,
 	uint32_t width, uint32_t height, uint32_t depth,
 	VkImageAspectFlags aspectMask)
 {
@@ -2416,7 +2476,7 @@ static void MGVK_CmdCopyImageToBuffer(
 
 	region.imageSubresource.aspectMask = aspectMask;
 	region.imageSubresource.mipLevel = level;
-	region.imageSubresource.baseArrayLayer = 0;
+	region.imageSubresource.baseArrayLayer = slice;
 	region.imageSubresource.layerCount = 1;
 
 	region.imageOffset = { x, y, z };
@@ -2427,6 +2487,8 @@ static void MGVK_CmdCopyImageToBuffer(
 
 static void MGVK_UpdateRenderPass(MGG_GraphicsDevice* device, FrameCounter currentFrame, MGVK_CmdBuffer& cmd)
 {
+    const int MAX_ATTACHMENTS = 6;
+
 	if (!device->renderTargetDirty)
 		return;
 
@@ -2439,6 +2501,8 @@ static void MGVK_UpdateRenderPass(MGG_GraphicsDevice* device, FrameCounter curre
 	// Lookup the texture set in the cache.
 	uint32_t hash = MG_ComputeHash((mgbyte*)&device->targets, sizeof(MGVK_TargetSet));
 	MGVK_TargetSetCache* cached = device->targetCache[hash];
+    bool isMsaa;
+
 	if (!cached)
 	{
 		cached = new MGVK_TargetSetCache();
@@ -2448,11 +2512,13 @@ static void MGVK_UpdateRenderPass(MGG_GraphicsDevice* device, FrameCounter curre
 		assert(first);
 		cached->width = first->info.extent.width;
 		cached->height = first->info.extent.height;
+        isMsaa = first->multiSampleCount > 1;
 
-		VkImageView attachments[5];
-		VkAttachmentReference color_attachments[5];
+        VkImageView attachments[MAX_ATTACHMENTS];
+        VkAttachmentReference color_attachments[MAX_ATTACHMENTS];
 		VkAttachmentReference depth_stencil_attachment;
-		VkAttachmentDescription attachment_descs[5];
+        VkAttachmentReference resolve_attachment_ref = {};
+        VkAttachmentDescription attachment_descs[MAX_ATTACHMENTS];
 		memset(attachment_descs, 0, sizeof(attachment_descs));
 		int num_attachments = 0;
 		int num_color_attachments = 0;
@@ -2460,24 +2526,82 @@ static void MGVK_UpdateRenderPass(MGG_GraphicsDevice* device, FrameCounter curre
 		for (int i = 0; i < cached->set.numTargets; i++)
 		{
 			auto target = cached->set.targets[i];
+            auto layer = cached->set.arraySlices[i];
 			assert(target);
 
-			attachments[num_attachments] = target->target_view;
+            VkImageView viewToUse;
+            if (target->isTarget && layer.has_value())
+            {
+                VkImageViewCreateInfo ivci = { VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO };
+                ivci.image = target->image;
+                ivci.viewType = VK_IMAGE_VIEW_TYPE_2D;
+                ivci.format = target->info.format;
+                ivci.subresourceRange.aspectMask = DetermineAspectMask(target->info.format);
+                ivci.subresourceRange.baseMipLevel = 0;
+                ivci.subresourceRange.levelCount = 1;
+                ivci.subresourceRange.baseArrayLayer = layer.value();
+                ivci.subresourceRange.layerCount = 1;
+
+                VkResult res = vkCreateImageView(device->device, &ivci, nullptr, &viewToUse);
+                VK_CHECK_RESULT(res);
+                VK_SET_OBJECT_NAME(device->device, viewToUse, VK_OBJECT_TYPE_IMAGE_VIEW, "MGVK_TargetSetCache.arrayLayerViews[%d] (hash: %u)", i, hash);
+
+                cached->arraySlicesViews[i] = viewToUse;
+            }
+            else
+            {
+                viewToUse = target->target_view;
+                cached->arraySlicesViews[i] = std::nullopt;
+            }
+            attachments[num_attachments] = viewToUse;
 
 			color_attachments[num_attachments].attachment = num_attachments;
 			color_attachments[num_attachments].layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
 
-			attachment_descs[num_attachments].format = target->info.format;
-			attachment_descs[num_attachments].samples = VK_SAMPLE_COUNT_1_BIT;
-			attachment_descs[num_attachments].loadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
-			attachment_descs[num_attachments].storeOp = VK_ATTACHMENT_STORE_OP_STORE;
-			attachment_descs[num_attachments].stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
-			attachment_descs[num_attachments].stencilStoreOp = VK_ATTACHMENT_STORE_OP_STORE;
-			attachment_descs[num_attachments].initialLayout = target->isSwapchain ? VK_IMAGE_LAYOUT_UNDEFINED : VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
-			attachment_descs[num_attachments].finalLayout = target->isSwapchain ? VK_IMAGE_LAYOUT_PRESENT_SRC_KHR : VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
+            auto& desc = attachment_descs[num_attachments];
+            desc.format = target->info.format;
+            desc.samples = ToVkSampleCount(target->multiSampleCount);
+            desc.loadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
+            desc.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
+            desc.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
+
+            if (isMsaa)
+            {
+                desc.storeOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
+                desc.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+                desc.finalLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
+            }
+            else
+            {
+                desc.storeOp = VK_ATTACHMENT_STORE_OP_STORE; //
+                desc.initialLayout = target->isSwapchain ? VK_IMAGE_LAYOUT_UNDEFINED : VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
+                desc.finalLayout = target->isSwapchain ? VK_IMAGE_LAYOUT_PRESENT_SRC_KHR : VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
+            }
+
 			num_attachments++;
 			num_color_attachments++;
 		}
+
+        if (isMsaa)
+        {
+            auto swapchainTexture = device->frames[device->swapchain_image_index].swapchainTexture;
+            attachments[num_attachments] = swapchainTexture->target_view;
+
+            resolve_attachment_ref.attachment = num_attachments;
+            resolve_attachment_ref.layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
+
+            auto& desc = attachment_descs[num_attachments];
+            desc.format = swapchainTexture->info.format;
+            desc.samples = VK_SAMPLE_COUNT_1_BIT;
+            desc.loadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
+            desc.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
+            desc.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
+            desc.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
+            desc.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+            desc.finalLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
+
+            num_attachments++;
+        }
 
 		auto depth = cached->set.targets[0]->depthTexture;
 		if (depth)
@@ -2487,14 +2611,15 @@ static void MGVK_UpdateRenderPass(MGG_GraphicsDevice* device, FrameCounter curre
 
 			attachments[num_attachments] = depth->target_view;
 
-			attachment_descs[num_attachments].format = depth->info.format;
-			attachment_descs[num_attachments].samples = VK_SAMPLE_COUNT_1_BIT;
-			attachment_descs[num_attachments].loadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
-			attachment_descs[num_attachments].storeOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
-			attachment_descs[num_attachments].stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
-			attachment_descs[num_attachments].stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
-			attachment_descs[num_attachments].initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
-			attachment_descs[num_attachments].finalLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
+            auto& desc = attachment_descs[num_attachments];
+            desc.format = depth->info.format;
+            desc.samples = ToVkSampleCount(depth->multiSampleCount);
+            desc.loadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
+            desc.storeOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
+            desc.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
+            desc.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
+            desc.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED; //
+            desc.finalLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
 			num_attachments++;
 		}
 
@@ -2503,6 +2628,10 @@ static void MGVK_UpdateRenderPass(MGG_GraphicsDevice* device, FrameCounter curre
 			subpass_desc.pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS;
 			subpass_desc.colorAttachmentCount = num_color_attachments;
 			subpass_desc.pColorAttachments = color_attachments;
+
+            if (isMsaa)
+                subpass_desc.pResolveAttachments = &resolve_attachment_ref;
+
 			if (depth)
 				subpass_desc.pDepthStencilAttachment = &depth_stencil_attachment;
 
@@ -2510,10 +2639,10 @@ static void MGVK_UpdateRenderPass(MGG_GraphicsDevice* device, FrameCounter curre
 			VkSubpassDependency dependency = {};
 			dependency.srcSubpass = VK_SUBPASS_EXTERNAL;
 			dependency.dstSubpass = 0;
-			dependency.srcStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
-			dependency.srcAccessMask = 0;
-			dependency.dstStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
-			dependency.dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
+            dependency.srcStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT | VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT;
+            dependency.dstStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT | VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT;
+            dependency.srcAccessMask = VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT;
+            dependency.dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT | VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT;
 
 			VkRenderPassCreateInfo create_info = { VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO };
 			create_info.attachmentCount = num_attachments;
@@ -2563,8 +2692,11 @@ static void MGVK_UpdateRenderPass(MGG_GraphicsDevice* device, FrameCounter curre
 	render_pass_begin_info.renderPass = cached->renderPass;
 	render_pass_begin_info.framebuffer = cached->framebuffer;
 	render_pass_begin_info.renderArea = render_area;
+
+    // TODO: Change the pipeline to use lazy clearing
 	render_pass_begin_info.clearValueCount = 0;
 	render_pass_begin_info.pClearValues = NULL;
+
 	vkCmdBeginRenderPass(cmd.buffer, &render_pass_begin_info, VK_SUBPASS_CONTENTS_INLINE);
 
 	device->inRenderPass = true;
@@ -2820,9 +2952,30 @@ static VkPipeline MGVK_CreatePipeline(MGG_GraphicsDevice* device)
 	VkPipelineMultisampleStateCreateInfo multisampling;
 	memset(&multisampling, 0, sizeof(multisampling));
 	multisampling.sType = VK_STRUCTURE_TYPE_PIPELINE_MULTISAMPLE_STATE_CREATE_INFO;
+
+    bool preferSampleShading = false;
+
+    if (pstate.rasterizerState->multiSampleAntiAlias && pstate.targets && pstate.targets->set.targets[0])
+    {
+        multisampling.rasterizationSamples = ToVkSampleCount(pstate.targets->set.targets[0]->multiSampleCount);
+        preferSampleShading = true;
+    }
+    else
+    {
+        multisampling.rasterizationSamples = VK_SAMPLE_COUNT_1_BIT;
+    }
+
+    if (preferSampleShading && device->deviceFeatures.sampleRateShading)
+    {
+        multisampling.sampleShadingEnable = VK_TRUE; 
+        multisampling.minSampleShading = 0.2f; 
+    }
+    else
+    {
 	multisampling.sampleShadingEnable = VK_FALSE;
-	multisampling.rasterizationSamples = pstate.rasterizerState->multiSampleAntiAlias ? VK_SAMPLE_COUNT_1_BIT : VK_SAMPLE_COUNT_1_BIT;
-	multisampling.minSampleShading = 1.0f; // Optional
+        multisampling.minSampleShading = 1.0f;
+    }
+    
 	multisampling.pSampleMask = nullptr; // Optional
 	multisampling.alphaToCoverageEnable = VK_FALSE; // Optional
 	multisampling.alphaToOneEnable = VK_FALSE; // Optional
@@ -3898,6 +4051,8 @@ void MGG_Buffer_Destroy(MGG_GraphicsDevice* device, MGG_Buffer* buffer)
 	// Queue the buffer for later destruction.
 	device->destroyBuffers.push(buffer);
 }
+
+
 void MGG_Buffer_SetData(MGG_GraphicsDevice* device, MGG_Buffer*& buffer, mgint offset, mgbyte* data, mgint elementCount, mgint vertexStride, mgint elementSizeInBytes, mgbool discard)
 {
 	assert(device != nullptr);
@@ -4107,7 +4262,7 @@ MGG_Texture* MGG_RenderTarget_Create(
 		create_info.extent.depth = depth;
 		create_info.mipLevels = mipmaps;
 		create_info.arrayLayers = slices;
-		create_info.samples = VK_SAMPLE_COUNT_1_BIT;
+        create_info.samples = ToVkSampleCount(multiSampleCount);
 		create_info.tiling = VK_IMAGE_TILING_OPTIMAL;
 		create_info.usage = VK_IMAGE_USAGE_SAMPLED_BIT | VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_TRANSFER_SRC_BIT;
 		create_info.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
@@ -4132,7 +4287,11 @@ MGG_Texture* MGG_RenderTarget_Create(
             texture->image,
             VK_IMAGE_LAYOUT_UNDEFINED,
             optimalLayout,
-            DetermineAspectMask(create_info.format)
+            DetermineAspectMask(create_info.format),
+			0,
+			mipmaps,
+			0,
+			slices
         );
 
         MGVK_ExecuteAndFreeCommandBuffer(device, cmd);
@@ -4142,7 +4301,7 @@ MGG_Texture* MGG_RenderTarget_Create(
 
 	if (depthFormat != MGDepthFormat::None)
 	{
-		texture->depthTexture = CreateDepthTexture(device, ToVkFormat(depthFormat), width, height);
+        texture->depthTexture = CreateDepthTexture(device, ToVkFormat(depthFormat), width, height, multiSampleCount);
 		VK_SET_OBJECT_NAME(device->device, texture->depthTexture->image, VK_OBJECT_TYPE_IMAGE, "MGG_Texture.depthTexture.image (for RT id: %llu)", texture->id);
 		texture->depthTexture->target_view = CreateImageView(device, texture->depthTexture, 1);
 		VK_SET_OBJECT_NAME(device->device, texture->depthTexture->target_view, VK_OBJECT_TYPE_IMAGE_VIEW, "MGG_Texture.depthTexture.target_view (for RT id: %llu)", texture->id);
@@ -4171,30 +4330,138 @@ void MGG_Texture_Destroy(MGG_GraphicsDevice* device, MGG_Texture* texture)
 	//delete texture;
 }
 
+uint32_t getVkFormatBlockAlignment(VkFormat format) {
+	switch (format) {
+		// BCn (DXT) Formats
+	case VK_FORMAT_BC1_RGB_UNORM_BLOCK:
+	case VK_FORMAT_BC1_RGB_SRGB_BLOCK:
+	case VK_FORMAT_BC1_RGBA_UNORM_BLOCK:
+	case VK_FORMAT_BC1_RGBA_SRGB_BLOCK:
+	case VK_FORMAT_BC2_UNORM_BLOCK:
+	case VK_FORMAT_BC2_SRGB_BLOCK:
+	case VK_FORMAT_BC3_UNORM_BLOCK:
+	case VK_FORMAT_BC3_SRGB_BLOCK:
+	case VK_FORMAT_BC4_UNORM_BLOCK:
+	case VK_FORMAT_BC4_SNORM_BLOCK:
+	case VK_FORMAT_BC5_UNORM_BLOCK:
+	case VK_FORMAT_BC5_SNORM_BLOCK:
+	case VK_FORMAT_BC6H_UFLOAT_BLOCK:
+	case VK_FORMAT_BC6H_SFLOAT_BLOCK:
+	case VK_FORMAT_BC7_UNORM_BLOCK:
+	case VK_FORMAT_BC7_SRGB_BLOCK:
+		// ETC2/EAC Format
+	case VK_FORMAT_ETC2_R8G8B8_UNORM_BLOCK:
+	case VK_FORMAT_ETC2_R8G8B8_SRGB_BLOCK:
+	case VK_FORMAT_ETC2_R8G8B8A1_UNORM_BLOCK:
+	case VK_FORMAT_ETC2_R8G8B8A1_SRGB_BLOCK:
+	case VK_FORMAT_ETC2_R8G8B8A8_UNORM_BLOCK:
+	case VK_FORMAT_ETC2_R8G8B8A8_SRGB_BLOCK:
+	case VK_FORMAT_EAC_R11_UNORM_BLOCK:
+	case VK_FORMAT_EAC_R11_SNORM_BLOCK:
+	case VK_FORMAT_EAC_R11G11_UNORM_BLOCK:
+	case VK_FORMAT_EAC_R11G11_SNORM_BLOCK:
+		// ASTC Format
+	case VK_FORMAT_ASTC_4x4_UNORM_BLOCK:
+	case VK_FORMAT_ASTC_4x4_SRGB_BLOCK:
+		return 4;
+	case VK_FORMAT_ASTC_5x5_UNORM_BLOCK:
+	case VK_FORMAT_ASTC_5x5_SRGB_BLOCK:
+		return 5;
+	case VK_FORMAT_ASTC_6x6_UNORM_BLOCK:
+	case VK_FORMAT_ASTC_6x6_SRGB_BLOCK:
+		return 6;
+	case VK_FORMAT_ASTC_8x8_UNORM_BLOCK:
+	case VK_FORMAT_ASTC_8x8_SRGB_BLOCK:
+		return 8;
+	case VK_FORMAT_ASTC_10x10_UNORM_BLOCK:
+	case VK_FORMAT_ASTC_10x10_SRGB_BLOCK:
+		return 10;
+	case VK_FORMAT_ASTC_12x12_UNORM_BLOCK:
+	case VK_FORMAT_ASTC_12x12_SRGB_BLOCK:
+		return 12;
+
+	default:
+		return 1;
+	}
+}
+
+inline mgint getMipScalar(mgint level, mgint value)
+{
+	value = value >> level;
+	return value < 1 ? 1 : value;
+}
+
+inline mgint getMipScalar(mgint level, mgint value, mgint alignment)
+{
+	alignment -= 1;
+	return ((value >> level) + alignment) & ~alignment;
+}
+
+static void MGVK_ClampAndValidateTextureRegion(
+	MGG_Texture* texture,
+	mgint level,
+	mgint slice,
+	mgint& x, mgint& y, mgint& z,
+	mgint& width, mgint& height, mgint& depth)
+{
+	assert(texture != nullptr);
+	mgint mipWidth, mipHeight, mipDepth;
+	auto alignment = getVkFormatBlockAlignment(texture->info.format);
+
+	// Calculate the dimensions of the specified mipmap level.
+	// Dimensions are halved at each level, with a minimum of 1.
+	if (alignment > 1)
+	{
+		mipWidth = getMipScalar(level, texture->info.extent.width, alignment);
+		mipHeight = getMipScalar(level, texture->info.extent.height, alignment);
+		mipDepth = getMipScalar(level, texture->info.extent.depth, alignment);
+	}
+	else
+	{
+		mipWidth = getMipScalar(level, texture->info.extent.width);
+		mipHeight = getMipScalar(level, texture->info.extent.height);
+		mipDepth = getMipScalar(level, texture->info.extent.depth);
+	}
+
+	// If width and height are 0, assume the user wants to operate on the whole mip level.
+	if (width == 0 && height == 0)
+	{
+		width = mipWidth;
+		height = mipHeight;
+	}
+
+	if (texture->info.imageType == VK_IMAGE_TYPE_2D)
+	{
+		depth = 1;
+		z = 0;
+		mipDepth = 1; // Correct mipDepth for assertions on 2D textures.
+	}
+	else
+	{
+		// If depth is 0 for a 3D texture, assume the whole mip depth.
+		if (depth == 0)
+		{
+			depth = mipDepth;
+		}
+	}
+
+	// Validate that the final region is within the bounds of the mip level.
+	assert(level >= 0 && level < texture->info.mipLevels);
+	assert(slice >= 0 && slice < texture->info.arrayLayers);
+	assert(x >= 0 && x < mipWidth);
+	assert(y >= 0 && y < mipHeight);
+	assert(z >= 0 && z < mipDepth);
+	assert(x + width <= mipWidth);
+	assert(y + height <= mipHeight);
+	assert(z + depth <= mipDepth);
+}
+
 void MGG_Texture_SetData(MGG_GraphicsDevice* device, MGG_Texture* texture, mgint level, mgint slice, mgint x, mgint y, mgint z, mgint width, mgint height, mgint depth, mgbyte* data, mgint dataBytes)
 {
 	assert(device != nullptr);
 	assert(texture != nullptr);
 
-	if (x == 0 && y == 0 && width == 0 && height == 0)
-	{
-		width = texture->info.extent.width;
-		height = texture->info.extent.height;
-	}
-
-	if (texture->info.imageType == VK_IMAGE_TYPE_2D && depth == 0)
-	{
-		depth = 1;
-	}
-
-	assert(level >= 0 && level < texture->info.mipLevels);
-	assert(slice >= 0 && slice < texture->info.arrayLayers);
-	assert(x >= 0 && x < texture->info.extent.width);
-	assert(y >= 0 && y < texture->info.extent.height);
-	assert(z >= 0 && z < texture->info.extent.depth);
-	assert(x + width <= texture->info.extent.width);
-	assert(y + height <= texture->info.extent.height);
-	assert(z + depth <= texture->info.extent.depth);
+	MGVK_ClampAndValidateTextureRegion(texture, level, slice, x, y, z, width, height, depth);
 
 	assert(data != nullptr);
 	assert(dataBytes > 0);
@@ -4211,10 +4478,10 @@ void MGG_Texture_SetData(MGG_GraphicsDevice* device, MGG_Texture* texture, mgint
 	vmaUnmapMemory(device->allocator, buffer.allocation);
 
 	VkCommandBuffer cmd = MGVK_BeginNewCommandBuffer(device);
-	MGVK_CmdTransitionImageLayout(cmd, texture->image, texture->layout, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_ASPECT_COLOR_BIT);
+	MGVK_CmdTransitionImageLayout(cmd, texture->image, texture->layout, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_ASPECT_COLOR_BIT, level, 1, slice, 1);
 	texture->layout = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL;
-	MGVK_CmdCopyBufferToImage(cmd, buffer.buffer, texture->image, x, y, z, level, width, height, depth);
-	MGVK_CmdTransitionImageLayout(cmd, texture->image, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, texture->optimal_layout, VK_IMAGE_ASPECT_COLOR_BIT);
+	MGVK_CmdCopyBufferToImage(cmd, buffer.buffer, texture->image, x, y, z, level, slice, width, height, depth);
+	MGVK_CmdTransitionImageLayout(cmd, texture->image, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, texture->optimal_layout, VK_IMAGE_ASPECT_COLOR_BIT, level, 1, slice, 1);
 	texture->layout = texture->optimal_layout;
 	MGVK_ExecuteAndFreeCommandBuffer(device, cmd);
 
@@ -4225,15 +4492,8 @@ void MGG_Texture_GetData(MGG_GraphicsDevice* device, MGG_Texture* texture, mgint
 {
 	assert(device != nullptr);
 	assert(texture != nullptr);
-
-	assert(level >= 0 && level < texture->info.mipLevels);
-	assert(slice >= 0 && slice < texture->info.arrayLayers);
-	assert(x >= 0 && x < texture->info.extent.width);
-	assert(y >= 0 && y < texture->info.extent.height);
-	assert(z >= 0 && z < texture->info.extent.depth);
-	assert(x + width <= texture->info.extent.width);
-	assert(y + height <= texture->info.extent.height);
-	assert(z + depth <= texture->info.extent.depth);
+    
+	MGVK_ClampAndValidateTextureRegion(texture, level, slice, x, y, z, width, height, depth);
 
 	assert(data != nullptr);
 	assert(dataBytes > 0);
@@ -4289,9 +4549,9 @@ void MGG_Texture_GetData(MGG_GraphicsDevice* device, MGG_Texture* texture, mgint
 	VkImageLayout originalLayout = texture->layout;
 	VkImageAspectFlags aspectMask = DetermineAspectMask(texture->info.format);
 	VkCommandBuffer copyCmd = MGVK_BeginNewCommandBuffer(device);
-	MGVK_CmdTransitionImageLayout(copyCmd, texture->image, originalLayout, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL, aspectMask, level);
-	MGVK_CmdCopyImageToBuffer(copyCmd, texture->image, buffer.buffer, x, y, z, level, width, height, depth, aspectMask);
-	MGVK_CmdTransitionImageLayout(copyCmd, texture->image, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL, originalLayout, aspectMask, level);
+	MGVK_CmdTransitionImageLayout(copyCmd, texture->image, originalLayout, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL, aspectMask, level, 1, slice, 1);
+	MGVK_CmdCopyImageToBuffer(copyCmd, texture->image, buffer.buffer, x, y, z, level, slice, width, height, depth, aspectMask);
+	MGVK_CmdTransitionImageLayout(copyCmd, texture->image, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL, originalLayout, aspectMask, level, 1, slice, 1);
 	MGVK_ExecuteAndFreeCommandBuffer(device, copyCmd);
 
 	void* src;
@@ -4563,6 +4823,10 @@ MGG_OcclusionQuery* MGG_OcclusionQuery_Create(MGG_GraphicsDevice* device)
 	VK_CHECK_RESULT(res);
 	VK_SET_OBJECT_NAME(device->device, query->queryPool, VK_OBJECT_TYPE_QUERY_POOL, "MGG_OcclusionQuery.queryPool");
 
+    VkCommandBuffer cmd = MGVK_BeginNewCommandBuffer(device);
+    vkCmdResetQueryPool(cmd, query->queryPool, 0, 1);
+    MGVK_ExecuteAndFreeCommandBuffer(device, cmd);
+
 	return query;
 }
 
@@ -4599,6 +4863,10 @@ void MGG_OcclusionQuery_Begin(MGG_GraphicsDevice* device, MGG_OcclusionQuery* qu
 	assert(frame.is_recording);
 
 	auto cmd = frame.commandBuffer.buffer;
+    if (!device->inRenderPass)
+    {
+        MGVK_UpdateRenderPass(device, currentFrame, frame.commandBuffer);
+    }
 
 	// Reset the query before beginning it.
 	vkCmdResetQueryPool(cmd, query->queryPool, 0, 1);
@@ -4627,6 +4895,10 @@ void MGG_OcclusionQuery_End(MGG_GraphicsDevice* device, MGG_OcclusionQuery* quer
 	assert(frame.is_recording);
 
 	auto cmd = frame.commandBuffer.buffer;
+    if (!device->inRenderPass)
+    {
+        MGVK_UpdateRenderPass(device, currentFrame, frame.commandBuffer);
+    }
 
 	vkCmdEndQuery(cmd, query->queryPool, 0);
 
@@ -4645,6 +4917,15 @@ mgbyte MGG_OcclusionQuery_GetResult(MGG_GraphicsDevice* device, MGG_OcclusionQue
 		pixelCount = query->pixelCount;
 		return true;
 	}
+
+    if (!query->inBeginEndBlock && !query->isComplete) {
+        vkEndCommandBuffer(device->frames[device->frame % kConcurrentFrameCount].commandBuffer.buffer);
+        VkSubmitInfo submitInfo = { VK_STRUCTURE_TYPE_SUBMIT_INFO };
+        submitInfo.commandBufferCount = 1;
+        submitInfo.pCommandBuffers = &device->frames[device->frame % kConcurrentFrameCount].commandBuffer.buffer;
+        vkQueueSubmit(device->queue, 1, &submitInfo, VK_NULL_HANDLE);
+        vkQueueWaitIdle(device->queue);
+    }
 
 	uint64_t result = 0;
 	// Poll for the result without waiting. This prevents stalling the CPU.

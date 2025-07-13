@@ -26,6 +26,7 @@ public partial class GraphicsDevice
     private DynamicIndexBuffer _userIndexBuffer32;
 
     private unsafe readonly MGG_Texture*[] _curRenderTargets = new MGG_Texture*[4];
+    private readonly int[] _currentRenderTargetArraySlices = new int[4];
 
     internal static int ShaderProfile
     {
@@ -65,6 +66,10 @@ public partial class GraphicsDevice
 
     private unsafe void OnPresentationChanged()
     {
+        // Clamp MultiSampleCount
+        PresentationParameters.MultiSampleCount =
+                GetClampedMultisampleCount(PresentationParameters.MultiSampleCount);
+
         // Finish any frame that is currently rendering.
         if (_currentFrame > -1)
         {
@@ -195,7 +200,7 @@ public partial class GraphicsDevice
             PresentationParameters.BackBufferWidth,
             PresentationParameters.BackBufferHeight);
 
-        MGG.GraphicsDevice_SetRenderTargets(Handle, null, 0);
+        MGG.GraphicsDevice_SetRenderTargets(Handle, null, null, 0);
     }
 
     private void PlatformResolveRenderTargets()
@@ -209,19 +214,21 @@ public partial class GraphicsDevice
 
         Array.Clear(_curRenderTargets, 0, 4);
 
-        RenderTarget2D first = null;
+        IRenderTarget first = null;
 
         for (var i = 0; i < _currentRenderTargetCount; i++)
         {
             var binding = _currentRenderTargetBindings[i];
-            var target = binding.RenderTarget as RenderTarget2D;
+            var target = binding.RenderTarget;
             _curRenderTargets[i] = target.Handle;
+            _currentRenderTargetArraySlices[i] = binding.ArraySlice;
             if (i == 0)
-                first = target;
+                first = target as IRenderTarget;
         }
 
         fixed (MGG_Texture** targets = _curRenderTargets)
-            MGG.GraphicsDevice_SetRenderTargets(Handle, targets, _currentRenderTargetCount);
+        fixed (int* arraySlices = _currentRenderTargetArraySlices)
+            MGG.GraphicsDevice_SetRenderTargets(Handle, targets, arraySlices, _currentRenderTargetCount);
         
         return first;
     }
