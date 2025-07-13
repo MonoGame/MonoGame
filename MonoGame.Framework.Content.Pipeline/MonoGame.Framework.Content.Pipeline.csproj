@@ -94,15 +94,15 @@
       <PackagePath>runtimes\win-x64\native</PackagePath>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="..\Artifacts\mgpipeline\windows\$(Configuration)\mgpipeline.dll" Condition="Exists('..\Artifacts\mgpipeline\windows\$(Configuration)\mgpipeline.dll')" Visible="false">
+    <Content Include="..\Artifacts\native\mgpipeline\windows\$(Configuration)\mgpipeline.dll" Condition="Exists('..\Artifacts\native\mgpipeline\windows\$(Configuration)\mgpipeline.dll')" Visible="false">
       <PackagePath>runtimes\win-x64\native</PackagePath>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="..\Artifacts\mgpipeline\linux\$(Configuration)\libmgpipeline.so" Condition="Exists('..\Artifacts\mgpipeline\linux\$(Configuration)\libmgpipeline.so')" Visible="false">
+    <Content Include="..\Artifacts\native\mgpipeline\linux\$(Configuration)\libmgpipeline.so" Condition="Exists('..\Artifacts\native\mgpipeline\linux\$(Configuration)\libmgpipeline.so')" Visible="false">
       <PackagePath>runtimes\linux-x64\native</PackagePath>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="..\Artifacts\mgpipeline\macosx\$(Configuration)\libmgpipeline.dylib" Condition="Exists('..\Artifacts\mgpipeline\macosx\$(Configuration)\libmgpipeline.dylib')" Visible="false">
+    <Content Include="..\Artifacts\native\mgpipeline\macosx\$(Configuration)\libmgpipeline.dylib" Condition="Exists('..\Artifacts\native\mgpipeline\macosx\$(Configuration)\libmgpipeline.dylib')" Visible="false">
       <PackagePath>runtimes\osx\native</PackagePath>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
