@@ -47,6 +47,11 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
         public abstract OpaqueDataDictionary Parameters { get; }
 
         /// <summary>
+        /// Gets the directory that contains the content project.
+        /// </summary>
+        public abstract string ProjectDirectory { get; }
+
+        /// <summary>
         /// Gets the current content build target platform.
         /// </summary>
         public abstract TargetPlatform TargetPlatform { get; }
@@ -103,7 +108,8 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
         /// <param name="importerName">Optional importer for this content.</param>
         /// <returns>Copy of the final converted content.</returns>
         /// <remarks>An example of usage would be a mesh processor calling BuildAndLoadAsset to build any associated textures and replace the original .tga file references with an embedded copy of the converted texture.</remarks>
-        public abstract TOutput BuildAndLoadAsset<TInput,TOutput>(
+        [Obsolete("Please pass importer and processor as instances instead of just their names.")]
+        public abstract TOutput BuildAndLoadAsset<TInput, TOutput>(
             ExternalReference<TInput> sourceAsset,
             string processorName,
             OpaqueDataDictionary processorParameters,
@@ -151,7 +157,8 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
         /// <param name="assetName">Optional name of the final compiled content.</param>
         /// <returns>Reference to the final compiled content. The build work is not required to complete before returning. Therefore, this file may not be up to date when BuildAsset returns but it will be available for loading by the game at runtime.</returns>
         /// <remarks>An example of usage for BuildAsset is being called by a mesh processor to request that any related textures used are also built, replacing the original TGA file references with new references to the converted texture files.</remarks>
-        public abstract ExternalReference<TOutput> BuildAsset<TInput,TOutput>(
+        [Obsolete("Please pass importer and processor as instances instead of just their names.")]
+        public abstract ExternalReference<TOutput> BuildAsset<TInput, TOutput>(
             ExternalReference<TInput> sourceAsset,
             string processorName,
             OpaqueDataDictionary processorParameters,
@@ -202,6 +209,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
         /// <param name="processorName">Optional processor for this content.</param>
         /// <param name="processorParameters">Optional parameters for the processor.</param>
         /// <returns>Reference of the final converted content.</returns>
+        [Obsolete("Please pass importer and processor as instances instead of just their names.")]
         public abstract TOutput Convert<TInput, TOutput>(TInput input, string processorName, OpaqueDataDictionary processorParameters);
 
         /// <summary>

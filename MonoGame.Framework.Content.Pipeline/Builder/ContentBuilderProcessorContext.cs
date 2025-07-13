@@ -29,6 +29,8 @@ class ContentBuilderProcessorContext(ContentBuilder builder, ContentFileCache co
 
     public override OpaqueDataDictionary Parameters { get; } = [];
 
+    public override string ProjectDirectory => _builder.Parameters.RootedSourceDirectory;
+
     public override TargetPlatform TargetPlatform => _builder.Parameters.Platform;
 
     public override GraphicsProfile TargetProfile => _builder.Parameters.GraphicsProfile;
