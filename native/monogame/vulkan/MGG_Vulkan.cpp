@@ -3307,45 +3307,64 @@ void MGG_GraphicsDevice_GetBackBufferData(MGG_GraphicsDevice* device, mgint x, m
 
 	auto srcImage = device->frames[device->swapchain_image_index].swapchainTexture->image;
 
+	MGG_Texture* tempRgbaTexture = MGG_Texture_Create(
+		device,
+		MGTextureType::_2D,
+		MGSurfaceFormat::Color,
+		width,
+		height,
+		1,
+		1,
+		1 
+	);
+	VK_SET_OBJECT_NAME(device->device, tempRgbaTexture->image, VK_OBJECT_TYPE_IMAGE, "GetBackBufferData::tempRgbaImage");
+
 	uint32_t bytesPerPixelOnGpu = 4;
 	VkDeviceSize gpuBufferSize = (VkDeviceSize)width * height * bytesPerPixelOnGpu;
-
 	VkBuffer dstBuffer;
 	VmaAllocation dstBufferAllocation;
 	VmaAllocationInfo dstAllocInfo = {};
+	{
+		VkBufferCreateInfo bufferInfo = { VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO };
+		bufferInfo.size = gpuBufferSize;
+		bufferInfo.usage = VK_BUFFER_USAGE_TRANSFER_DST_BIT;
 
-	VkBufferCreateInfo bufferInfo = { VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO };
-	bufferInfo.size = gpuBufferSize;
-	bufferInfo.usage = VK_BUFFER_USAGE_TRANSFER_DST_BIT;
+		VmaAllocationCreateInfo allocCreateInfo = {};
+		allocCreateInfo.usage = VMA_MEMORY_USAGE_GPU_TO_CPU;
+		allocCreateInfo.flags = VMA_ALLOCATION_CREATE_MAPPED_BIT;
 
-	VmaAllocationCreateInfo allocCreateInfo = {};
-	allocCreateInfo.usage = VMA_MEMORY_USAGE_GPU_TO_CPU;
-	allocCreateInfo.flags = VMA_ALLOCATION_CREATE_MAPPED_BIT;
-
-	VK_CHECK_RESULT(vmaCreateBuffer(device->allocator, &bufferInfo, &allocCreateInfo, &dstBuffer, &dstBufferAllocation, &dstAllocInfo));
-	VK_SET_OBJECT_NAME(device->device, dstBuffer, VK_OBJECT_TYPE_BUFFER, "MGG_GraphicsDevice_GetBackBufferData::dstBuffer");
+		VK_CHECK_RESULT(vmaCreateBuffer(device->allocator, &bufferInfo, &allocCreateInfo, &dstBuffer, &dstBufferAllocation, &dstAllocInfo));
+		VK_SET_OBJECT_NAME(device->device, dstBuffer, VK_OBJECT_TYPE_BUFFER, "MGG_GraphicsDevice_GetBackBufferData::dstBuffer");
+	}
 
 	VkCommandBuffer copyCmdBuffer = MGVK_BeginNewCommandBuffer(device);
+	{
+		MGVK_CmdTransitionImageLayout(copyCmdBuffer, srcImage, VK_IMAGE_LAYOUT_PRESENT_SRC_KHR, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL, VK_IMAGE_ASPECT_COLOR_BIT);
+		MGVK_CmdTransitionImageLayout(copyCmdBuffer, tempRgbaTexture->image, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_ASPECT_COLOR_BIT);
 
-	MGVK_CmdTransitionImageLayout(copyCmdBuffer, srcImage,
-		VK_IMAGE_LAYOUT_PRESENT_SRC_KHR,
-		VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL,
-		VK_IMAGE_ASPECT_COLOR_BIT);
+		VkImageBlit imageBlitRegion = {};
+		imageBlitRegion.srcSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+		imageBlitRegion.srcSubresource.layerCount = 1;
+		imageBlitRegion.srcOffsets[0] = { x, y, 0 };
+		imageBlitRegion.srcOffsets[1] = { x + (int32_t)width, y + (int32_t)height, 1 };
+		imageBlitRegion.dstSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+		imageBlitRegion.dstSubresource.layerCount = 1;
+		imageBlitRegion.dstOffsets[0] = { 0, 0, 0 };
+		imageBlitRegion.dstOffsets[1] = { (int32_t)width, (int32_t)height, 1 };
+		vkCmdBlitImage(copyCmdBuffer, srcImage, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL, tempRgbaTexture->image, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &imageBlitRegion, VK_FILTER_NEAREST);
 
-	VkBufferImageCopy copyRegion = {};
-	copyRegion.imageSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
-	copyRegion.imageSubresource.layerCount = 1;
-	copyRegion.imageOffset = { x, y, 0 };
-	copyRegion.imageExtent = { (uint32_t)width, (uint32_t)height, 1 };
+		MGVK_CmdTransitionImageLayout(copyCmdBuffer, tempRgbaTexture->image, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL, VK_IMAGE_ASPECT_COLOR_BIT);
+		MGVK_CmdTransitionImageLayout(copyCmdBuffer, srcImage, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL, VK_IMAGE_LAYOUT_PRESENT_SRC_KHR, VK_IMAGE_ASPECT_COLOR_BIT);
 
-	vkCmdCopyImageToBuffer(copyCmdBuffer, srcImage, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL, dstBuffer, 1, &copyRegion);
+		VkBufferImageCopy copyRegion = {};
+		copyRegion.imageSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+		copyRegion.imageSubresource.layerCount = 1;
+		copyRegion.imageOffset = { 0, 0, 0 };
+		copyRegion.imageExtent = { (uint32_t)width, (uint32_t)height, 1 };
+		vkCmdCopyImageToBuffer(copyCmdBuffer, tempRgbaTexture->image, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL, dstBuffer, 1, &copyRegion);
+	}
 
-	MGVK_CmdTransitionImageLayout(copyCmdBuffer, srcImage,
-		VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL,
-		VK_IMAGE_LAYOUT_PRESENT_SRC_KHR,
-		VK_IMAGE_ASPECT_COLOR_BIT);
-
-	MGVK_ExecuteAndFreeCommandBuffer(device, copyCmdBuffer);
+    MGVK_ExecuteAndFreeCommandBuffer(device, copyCmdBuffer);
 
 	vmaInvalidateAllocation(device->allocator, dstBufferAllocation, 0, VK_WHOLE_SIZE);
 	assert(dstAllocInfo.pMappedData != nullptr);
@@ -3355,27 +3374,16 @@ void MGG_GraphicsDevice_GetBackBufferData(MGG_GraphicsDevice* device, mgint x, m
 	{
 		bytesToCopy = gpuBufferSize;
 	}
+
 	memcpy(data, dstAllocInfo.pMappedData, bytesToCopy);
 
 	vmaDestroyBuffer(device->allocator, dstBuffer, dstBufferAllocation);
-
-	if (device->colorFormat == VK_FORMAT_B8G8R8A8_UNORM || device->colorFormat == VK_FORMAT_B8G8R8A8_SRGB)
-	{
-		uint8_t* pixels = (uint8_t*)data;
-		mgint pixelCountToSwizzle = bytesToCopy / dataBytes;
-
-		for (int i = 0; i < pixelCountToSwizzle; ++i)
-		{
-			uint8_t b = pixels[i * 4 + 0];
-			uint8_t r = pixels[i * 4 + 2];
-			pixels[i * 4 + 0] = r;
-			pixels[i * 4 + 2] = b;
-		}
-	}
+	vkDestroyImageView(device->device, tempRgbaTexture->view, nullptr);
+	vmaDestroyImage(device->allocator, tempRgbaTexture->image, tempRgbaTexture->allocation);
+	delete tempRgbaTexture;
 
 	MGVK_BeginFrame(main_cmd_buffer);
 }
-
 
 static VkBlendFactor ToVkBlendFactor(MGBlend mode)
 {
@@ -3750,9 +3758,9 @@ MGG_SamplerState* MGG_SamplerState_Create(MGG_GraphicsDevice* device, MGG_Sample
 	samplerInfo.unnormalizedCoordinates = VK_FALSE;
 	samplerInfo.compareEnable = VK_FALSE;
 	samplerInfo.compareOp = VK_COMPARE_OP_NEVER;
-	samplerInfo.mipLodBias = 0.0f; // ?? info->MipMapLevelOfDetailBias
-	samplerInfo.minLod = 0; // ??? info->MaxMipLevel
-	samplerInfo.maxLod = VK_LOD_CLAMP_NONE;
+	samplerInfo.mipLodBias = info->MipMapLevelOfDetailBias;
+	samplerInfo.minLod = 0.0f;
+	samplerInfo.maxLod = info->MaxMipLevel;
 
 	VkSamplerCustomBorderColorCreateInfoEXT bcolor = {};
 
