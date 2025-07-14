@@ -14,7 +14,7 @@ struct MGG_Texture;
 struct MGM_AudioDecoder
 {
 	virtual ~MGM_AudioDecoder() {}
-	virtual void Initialize(const char* filepath, MGM_AudioDecoderInfo& info) = 0;
+	virtual void Initialize(mgbyte* filepath, MGM_AudioDecoderInfo& info) = 0;
 	virtual void SetPosition(mgulong timeMs) = 0;
 	virtual bool Decode(mgbyte*& buffer, mguint& size) = 0;
 };
@@ -26,7 +26,7 @@ struct MGM_AudioDecoder
 struct MGM_VideoDecoder
 {
 	virtual ~MGM_VideoDecoder() {}
-	virtual void Initialize(const char* filepath, MGM_VideoDecoderInfo& info) = 0;
+	virtual void Initialize(mgbyte* filepath, MGM_VideoDecoderInfo& info) = 0;
 	virtual MGM_AudioDecoder* GetAudioDecoder(MGM_AudioDecoderInfo& info) = 0;
 	virtual mgulong GetPosition() = 0;
 	virtual void SetLooped(mgbool looped) = 0;
@@ -42,7 +42,7 @@ struct MGM_VideoDecoder
 /// <summary>
 ///  Helper to read first bytes of a file to get its signature.
 /// </summary>
-void MGM_ReadSignature(const char* filepath, MGM_SIGNATURE);
+void MGM_ReadSignature(mgbyte* filepath, MGM_SIGNATURE);
 
 
 // These are the common decoders supported on all platforms.
