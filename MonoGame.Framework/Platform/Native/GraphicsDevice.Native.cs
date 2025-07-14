@@ -203,9 +203,9 @@ public partial class GraphicsDevice
         MGG.GraphicsDevice_SetRenderTargets(Handle, null, null, 0);
     }
 
-    private void PlatformResolveRenderTargets()
+    private unsafe void PlatformResolveRenderTargets()
     {
-        // Resolving MSAA render targets should be done here.
+        MGG.GraphicsDevice_ResolveRenderTargets(Handle);
     }
 
     private unsafe IRenderTarget PlatformApplyRenderTargets()

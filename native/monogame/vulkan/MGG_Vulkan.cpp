@@ -449,6 +449,7 @@ static void MGVK_DestroyFrameResources(MGG_GraphicsDevice* device, mgint current
 static void MGVK_UpdateRenderPass(MGG_GraphicsDevice* device, FrameCounter currentFrame, MGVK_CmdBuffer& cmd);
 static VkCommandBuffer MGVK_BeginNewCommandBuffer(MGG_GraphicsDevice* device);
 static void MGVK_ExecuteAndFreeCommandBuffer(MGG_GraphicsDevice* device, VkCommandBuffer commandBuffer);
+static void MGVK_CmdGenerateMipmaps(MGG_GraphicsDevice* device, VkCommandBuffer commandBuffer, MGG_Texture* texture);
 static void MGVK_CmdTransitionImageLayout(
 	VkCommandBuffer cmd,
 	VkImage image,
@@ -1121,6 +1122,27 @@ static VkImageView CreateImageView(MGG_GraphicsDevice* device, MGG_Texture* text
 	VK_CHECK_RESULT(res);
 
 	return view;
+}
+
+static void MGVK_EndRenderPass(MGG_GraphicsDevice* device, VkCommandBuffer cmd_buffer)
+{
+    if (!device->inRenderPass)
+        return;
+
+    if (device->pipelineState.targets)
+    {
+        for (int i = 0; i < device->pipelineState.targets->set.numTargets; i++)
+        {
+            MGG_Texture* target = device->pipelineState.targets->set.targets[i];
+            if (target && target->isTarget && !target->isSwapchain)
+            {
+                target->layout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+            }
+        }
+    }
+
+    vkCmdEndRenderPass(cmd_buffer);
+    device->inRenderPass = false;
 }
 
 static void MGVK_BufferCreate(MGG_GraphicsDevice* device, int sizeInBytes, VkBufferUsageFlags usage, VmaMemoryUsage flags, MGG_Buffer* buffer)
@@ -2042,11 +2064,7 @@ void MGG_GraphicsDevice_Present(MGG_GraphicsDevice* device, mgint currentFrame, 
 
 	auto& cmd = frame.commandBuffer;
 
-	if (device->inRenderPass)
-	{
-		vkCmdEndRenderPass(cmd.buffer);
-		device->inRenderPass = false;
-	}
+	MGVK_EndRenderPass(device, cmd.buffer);
 
 	VkResult res = vkEndCommandBuffer(cmd.buffer);
 	VK_CHECK_RESULT(res);
@@ -2492,11 +2510,7 @@ static void MGVK_UpdateRenderPass(MGG_GraphicsDevice* device, FrameCounter curre
 	if (!device->renderTargetDirty)
 		return;
 
-	if (device->inRenderPass)
-	{
-		vkCmdEndRenderPass(cmd.buffer);
-		device->inRenderPass = false;
-	}
+	MGVK_EndRenderPass(device, cmd.buffer);
 
 	// Lookup the texture set in the cache.
 	uint32_t hash = MG_ComputeHash((mgbyte*)&device->targets, sizeof(MGVK_TargetSet));
@@ -2573,9 +2587,23 @@ static void MGVK_UpdateRenderPass(MGG_GraphicsDevice* device, FrameCounter curre
             }
             else
             {
-                desc.storeOp = VK_ATTACHMENT_STORE_OP_STORE; //
-                desc.initialLayout = target->isSwapchain ? VK_IMAGE_LAYOUT_UNDEFINED : VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
-                desc.finalLayout = target->isSwapchain ? VK_IMAGE_LAYOUT_PRESENT_SRC_KHR : VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
+                desc.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
+                desc.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
+
+                if (target->isSwapchain)
+                {
+                    desc.loadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
+                    desc.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
+                    desc.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+                    desc.finalLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
+                }
+                else
+                {
+                    desc.loadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
+                    desc.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
+                    desc.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+                    desc.finalLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+                }
             }
 
 			num_attachments++;
@@ -2636,21 +2664,31 @@ static void MGVK_UpdateRenderPass(MGG_GraphicsDevice* device, FrameCounter curre
 				subpass_desc.pDepthStencilAttachment = &depth_stencil_attachment;
 
 			// Add subpass dependencies for proper synchronization
-			VkSubpassDependency dependency = {};
-			dependency.srcSubpass = VK_SUBPASS_EXTERNAL;
-			dependency.dstSubpass = 0;
-            dependency.srcStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT | VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT;
-            dependency.dstStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT | VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT;
-            dependency.srcAccessMask = VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT;
-            dependency.dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT | VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT;
+			VkSubpassDependency dependencies[2];
 
-			VkRenderPassCreateInfo create_info = { VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO };
-			create_info.attachmentCount = num_attachments;
-			create_info.pAttachments = attachment_descs;
-			create_info.subpassCount = 1;
-			create_info.pSubpasses = &subpass_desc;
-			create_info.dependencyCount = 1;
-			create_info.pDependencies = &dependency;
+            dependencies[0].srcSubpass = VK_SUBPASS_EXTERNAL;
+            dependencies[0].dstSubpass = 0;
+            dependencies[0].srcStageMask = VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT;
+            dependencies[0].dstStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
+            dependencies[0].srcAccessMask = VK_ACCESS_SHADER_READ_BIT;
+            dependencies[0].dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
+            dependencies[0].dependencyFlags = VK_DEPENDENCY_BY_REGION_BIT;
+
+            dependencies[1].srcSubpass = 0;
+            dependencies[1].dstSubpass = VK_SUBPASS_EXTERNAL;
+            dependencies[1].srcStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
+            dependencies[1].dstStageMask = VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT;
+            dependencies[1].srcAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
+            dependencies[1].dstAccessMask = VK_ACCESS_SHADER_READ_BIT;
+            dependencies[1].dependencyFlags = VK_DEPENDENCY_BY_REGION_BIT;
+
+            VkRenderPassCreateInfo create_info = { VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO };
+            create_info.attachmentCount = num_attachments;
+            create_info.pAttachments = attachment_descs;
+            create_info.subpassCount = 1;
+            create_info.pSubpasses = &subpass_desc;
+            create_info.dependencyCount = 2;
+            create_info.pDependencies = dependencies;
 
 			VkResult res = vkCreateRenderPass(device->device, &create_info, nullptr, &cached->renderPass);
 			VK_CHECK_RESULT(res);
@@ -2693,7 +2731,6 @@ static void MGVK_UpdateRenderPass(MGG_GraphicsDevice* device, FrameCounter curre
 	render_pass_begin_info.framebuffer = cached->framebuffer;
 	render_pass_begin_info.renderArea = render_area;
 
-    // TODO: Change the pipeline to use lazy clearing
 	render_pass_begin_info.clearValueCount = 0;
 	render_pass_begin_info.pClearValues = NULL;
 
@@ -3272,6 +3309,199 @@ void MGG_GraphicsDevice_DrawIndexedInstanced(
 		0);               
 }
 
+inline mgint getMipScalar(mgint level, mgint value)
+{
+	value = value >> level;
+	return value < 1 ? 1 : value;
+}
+
+inline mgint getMipScalar(mgint level, mgint value, mgint alignment)
+{
+	alignment -= 1;
+	return ((value >> level) + alignment) & ~alignment;
+}
+
+uint32_t getVkFormatBlockAlignment(VkFormat format) {
+	switch (format) {
+		// BCn (DXT) Formats
+	case VK_FORMAT_BC1_RGB_UNORM_BLOCK:
+	case VK_FORMAT_BC1_RGB_SRGB_BLOCK:
+	case VK_FORMAT_BC1_RGBA_UNORM_BLOCK:
+	case VK_FORMAT_BC1_RGBA_SRGB_BLOCK:
+	case VK_FORMAT_BC2_UNORM_BLOCK:
+	case VK_FORMAT_BC2_SRGB_BLOCK:
+	case VK_FORMAT_BC3_UNORM_BLOCK:
+	case VK_FORMAT_BC3_SRGB_BLOCK:
+	case VK_FORMAT_BC4_UNORM_BLOCK:
+	case VK_FORMAT_BC4_SNORM_BLOCK:
+	case VK_FORMAT_BC5_UNORM_BLOCK:
+	case VK_FORMAT_BC5_SNORM_BLOCK:
+	case VK_FORMAT_BC6H_UFLOAT_BLOCK:
+	case VK_FORMAT_BC6H_SFLOAT_BLOCK:
+	case VK_FORMAT_BC7_UNORM_BLOCK:
+	case VK_FORMAT_BC7_SRGB_BLOCK:
+		// ETC2/EAC Format
+	case VK_FORMAT_ETC2_R8G8B8_UNORM_BLOCK:
+	case VK_FORMAT_ETC2_R8G8B8_SRGB_BLOCK:
+	case VK_FORMAT_ETC2_R8G8B8A1_UNORM_BLOCK:
+	case VK_FORMAT_ETC2_R8G8B8A1_SRGB_BLOCK:
+	case VK_FORMAT_ETC2_R8G8B8A8_UNORM_BLOCK:
+	case VK_FORMAT_ETC2_R8G8B8A8_SRGB_BLOCK:
+	case VK_FORMAT_EAC_R11_UNORM_BLOCK:
+	case VK_FORMAT_EAC_R11_SNORM_BLOCK:
+	case VK_FORMAT_EAC_R11G11_UNORM_BLOCK:
+	case VK_FORMAT_EAC_R11G11_SNORM_BLOCK:
+		// ASTC Format
+	case VK_FORMAT_ASTC_4x4_UNORM_BLOCK:
+	case VK_FORMAT_ASTC_4x4_SRGB_BLOCK:
+		return 4;
+	case VK_FORMAT_ASTC_5x5_UNORM_BLOCK:
+	case VK_FORMAT_ASTC_5x5_SRGB_BLOCK:
+		return 5;
+	case VK_FORMAT_ASTC_6x6_UNORM_BLOCK:
+	case VK_FORMAT_ASTC_6x6_SRGB_BLOCK:
+		return 6;
+	case VK_FORMAT_ASTC_8x8_UNORM_BLOCK:
+	case VK_FORMAT_ASTC_8x8_SRGB_BLOCK:
+		return 8;
+	case VK_FORMAT_ASTC_10x10_UNORM_BLOCK:
+	case VK_FORMAT_ASTC_10x10_SRGB_BLOCK:
+		return 10;
+	case VK_FORMAT_ASTC_12x12_UNORM_BLOCK:
+	case VK_FORMAT_ASTC_12x12_SRGB_BLOCK:
+		return 12;
+
+	default:
+		return 1;
+	}
+}
+
+void MGG_GraphicsDevice_ResolveRenderTargets(MGG_GraphicsDevice* device)
+{
+	assert(device != nullptr);
+	
+    auto psoTargets = device->pipelineState.targets;
+    if (!psoTargets)
+        return;
+
+    VkCommandBuffer cmd = MGVK_BeginNewCommandBuffer(device);
+
+    for (int i = 0; i < psoTargets->set.numTargets; ++i)
+    {
+        MGG_Texture* renderTarget = psoTargets->set.targets[i];
+
+        if (renderTarget == nullptr || renderTarget->isSwapchain)
+            continue;
+        
+        if (renderTarget->info.mipLevels > 1)
+        {
+            VkImageMemoryBarrier barrier = {};
+            barrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
+            barrier.image = renderTarget->image;
+            barrier.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+            barrier.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+            barrier.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+            barrier.subresourceRange.baseArrayLayer = 0;
+            barrier.subresourceRange.layerCount = renderTarget->info.arrayLayers;
+            barrier.subresourceRange.levelCount = 1;
+
+            int32_t mipWidth = renderTarget->info.extent.width;
+            int32_t mipHeight = renderTarget->info.extent.height;
+
+            for (uint32_t j = 1; j < renderTarget->info.mipLevels; j++)
+            {
+                barrier.subresourceRange.baseMipLevel = j - 1;
+
+                barrier.oldLayout = (j == 1) ? renderTarget->layout : VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL;
+                barrier.newLayout = VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL;
+
+                VkPipelineStageFlags srcStage;
+                if (j == 1)
+                {
+                    barrier.srcAccessMask = VK_ACCESS_SHADER_READ_BIT;
+                    srcStage = VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT;
+                }
+                else
+                {
+                    barrier.srcAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
+                    srcStage = VK_PIPELINE_STAGE_TRANSFER_BIT;
+                }
+                barrier.dstAccessMask = VK_ACCESS_TRANSFER_READ_BIT;
+
+                vkCmdPipelineBarrier(cmd,
+                    srcStage,
+                    VK_PIPELINE_STAGE_TRANSFER_BIT,
+                    0, 0, nullptr, 0, nullptr, 1, &barrier);
+
+                VkImageBlit blit = {};
+                blit.srcOffsets[0] = {0, 0, 0};
+                blit.srcOffsets[1] = {mipWidth, mipHeight, 1};
+                blit.srcSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+                blit.srcSubresource.mipLevel = j - 1;
+                blit.srcSubresource.baseArrayLayer = 0;
+                blit.srcSubresource.layerCount = renderTarget->info.arrayLayers;
+
+                int32_t nextMipWidth = mipWidth > 1 ? mipWidth / 2 : 1;
+                int32_t nextMipHeight = mipHeight > 1 ? mipHeight / 2 : 1;
+
+                blit.dstOffsets[0] = {0, 0, 0};
+                blit.dstOffsets[1] = {nextMipWidth, nextMipHeight, 1};
+                blit.dstSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+                blit.dstSubresource.mipLevel = j;
+                blit.dstSubresource.baseArrayLayer = 0;
+                blit.dstSubresource.layerCount = renderTarget->info.arrayLayers;
+                
+                barrier.subresourceRange.baseMipLevel = j;
+                barrier.oldLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+                barrier.newLayout = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL;
+                barrier.srcAccessMask = 0;
+                barrier.dstAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
+
+                vkCmdPipelineBarrier(cmd,
+                    VK_PIPELINE_STAGE_TRANSFER_BIT, 
+                    VK_PIPELINE_STAGE_TRANSFER_BIT,
+                    0, 0, nullptr, 0, nullptr, 1, &barrier);
+
+                vkCmdBlitImage(cmd,
+                    renderTarget->image, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL,
+                    renderTarget->image, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
+                    1, &blit,
+                    VK_FILTER_LINEAR);
+
+                barrier.subresourceRange.baseMipLevel = j - 1;
+                barrier.oldLayout = VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL;
+                barrier.newLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+                barrier.srcAccessMask = VK_ACCESS_TRANSFER_READ_BIT;
+                barrier.dstAccessMask = VK_ACCESS_SHADER_READ_BIT;
+
+                vkCmdPipelineBarrier(cmd,
+                    VK_PIPELINE_STAGE_TRANSFER_BIT,
+                    VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT,
+                    0, 0, nullptr, 0, nullptr, 1, &barrier);
+
+                mipWidth = nextMipWidth;
+                mipHeight = nextMipHeight;
+            }
+
+            barrier.subresourceRange.baseMipLevel = renderTarget->info.mipLevels - 1;
+            barrier.oldLayout = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL;
+            barrier.newLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+            barrier.srcAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
+            barrier.dstAccessMask = VK_ACCESS_SHADER_READ_BIT;
+
+            vkCmdPipelineBarrier(cmd,
+                VK_PIPELINE_STAGE_TRANSFER_BIT,
+                VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT,
+                0, 0, nullptr, 0, nullptr, 1, &barrier);
+            
+            renderTarget->layout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+        }
+    }
+
+	MGVK_ExecuteAndFreeCommandBuffer(device, cmd);
+}
+
+
 void MGG_GraphicsDevice_GetBackBufferData(MGG_GraphicsDevice* device, mgint x, mgint y, mgint width, mgint height, void* data, mgint count, mgint dataBytes)
 {
 	assert(device != nullptr);
@@ -3282,19 +3512,15 @@ void MGG_GraphicsDevice_GetBackBufferData(MGG_GraphicsDevice* device, mgint x, m
 	auto currentFrame = device->frame;
 	auto frameIndex = currentFrame % kConcurrentFrameCount;
 	auto& frame = device->frames[frameIndex];
-	auto& main_cmd_buffer = frame.commandBuffer;
+	auto& cmd = frame.commandBuffer;
 
-	if (device->inRenderPass)
-	{
-		vkCmdEndRenderPass(main_cmd_buffer.buffer);
-		device->inRenderPass = false;
-	}
+	MGVK_EndRenderPass(device, cmd.buffer);
 
-	VK_CHECK_RESULT(vkEndCommandBuffer(main_cmd_buffer.buffer));
+	VK_CHECK_RESULT(vkEndCommandBuffer(cmd.buffer));
 
 	VkSubmitInfo flushSubmitInfo = { VK_STRUCTURE_TYPE_SUBMIT_INFO };
 	flushSubmitInfo.commandBufferCount = 1;
-	flushSubmitInfo.pCommandBuffers = &main_cmd_buffer.buffer;
+	flushSubmitInfo.pCommandBuffers = &cmd.buffer;
 
 	VkFence flushFence;
 	VkFenceCreateInfo fenceInfo = { VK_STRUCTURE_TYPE_FENCE_CREATE_INFO };
@@ -3382,7 +3608,7 @@ void MGG_GraphicsDevice_GetBackBufferData(MGG_GraphicsDevice* device, mgint x, m
 	vmaDestroyImage(device->allocator, tempRgbaTexture->image, tempRgbaTexture->allocation);
 	delete tempRgbaTexture;
 
-	MGVK_BeginFrame(main_cmd_buffer);
+	MGVK_BeginFrame(cmd);
 }
 
 static VkBlendFactor ToVkBlendFactor(MGBlend mode)
@@ -3760,7 +3986,7 @@ MGG_SamplerState* MGG_SamplerState_Create(MGG_GraphicsDevice* device, MGG_Sample
 	samplerInfo.compareOp = VK_COMPARE_OP_NEVER;
 	samplerInfo.mipLodBias = info->MipMapLevelOfDetailBias;
 	samplerInfo.minLod = 0.0f;
-	samplerInfo.maxLod = info->MaxMipLevel;
+	samplerInfo.maxLod = VK_LOD_CLAMP_NONE;
 
 	VkSamplerCustomBorderColorCreateInfoEXT bcolor = {};
 
@@ -4272,7 +4498,10 @@ MGG_Texture* MGG_RenderTarget_Create(
 		create_info.arrayLayers = slices;
         create_info.samples = ToVkSampleCount(multiSampleCount);
 		create_info.tiling = VK_IMAGE_TILING_OPTIMAL;
-		create_info.usage = VK_IMAGE_USAGE_SAMPLED_BIT | VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_TRANSFER_SRC_BIT;
+		create_info.usage = VK_IMAGE_USAGE_SAMPLED_BIT | 
+                        VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | 
+                        VK_IMAGE_USAGE_TRANSFER_SRC_BIT | 
+                        VK_IMAGE_USAGE_TRANSFER_DST_BIT;
 		create_info.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
 		create_info.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
 
@@ -4336,73 +4565,6 @@ void MGG_Texture_Destroy(MGG_GraphicsDevice* device, MGG_Texture* texture)
 
 	//remove_by_value(device->all_textures, texture);
 	//delete texture;
-}
-
-uint32_t getVkFormatBlockAlignment(VkFormat format) {
-	switch (format) {
-		// BCn (DXT) Formats
-	case VK_FORMAT_BC1_RGB_UNORM_BLOCK:
-	case VK_FORMAT_BC1_RGB_SRGB_BLOCK:
-	case VK_FORMAT_BC1_RGBA_UNORM_BLOCK:
-	case VK_FORMAT_BC1_RGBA_SRGB_BLOCK:
-	case VK_FORMAT_BC2_UNORM_BLOCK:
-	case VK_FORMAT_BC2_SRGB_BLOCK:
-	case VK_FORMAT_BC3_UNORM_BLOCK:
-	case VK_FORMAT_BC3_SRGB_BLOCK:
-	case VK_FORMAT_BC4_UNORM_BLOCK:
-	case VK_FORMAT_BC4_SNORM_BLOCK:
-	case VK_FORMAT_BC5_UNORM_BLOCK:
-	case VK_FORMAT_BC5_SNORM_BLOCK:
-	case VK_FORMAT_BC6H_UFLOAT_BLOCK:
-	case VK_FORMAT_BC6H_SFLOAT_BLOCK:
-	case VK_FORMAT_BC7_UNORM_BLOCK:
-	case VK_FORMAT_BC7_SRGB_BLOCK:
-		// ETC2/EAC Format
-	case VK_FORMAT_ETC2_R8G8B8_UNORM_BLOCK:
-	case VK_FORMAT_ETC2_R8G8B8_SRGB_BLOCK:
-	case VK_FORMAT_ETC2_R8G8B8A1_UNORM_BLOCK:
-	case VK_FORMAT_ETC2_R8G8B8A1_SRGB_BLOCK:
-	case VK_FORMAT_ETC2_R8G8B8A8_UNORM_BLOCK:
-	case VK_FORMAT_ETC2_R8G8B8A8_SRGB_BLOCK:
-	case VK_FORMAT_EAC_R11_UNORM_BLOCK:
-	case VK_FORMAT_EAC_R11_SNORM_BLOCK:
-	case VK_FORMAT_EAC_R11G11_UNORM_BLOCK:
-	case VK_FORMAT_EAC_R11G11_SNORM_BLOCK:
-		// ASTC Format
-	case VK_FORMAT_ASTC_4x4_UNORM_BLOCK:
-	case VK_FORMAT_ASTC_4x4_SRGB_BLOCK:
-		return 4;
-	case VK_FORMAT_ASTC_5x5_UNORM_BLOCK:
-	case VK_FORMAT_ASTC_5x5_SRGB_BLOCK:
-		return 5;
-	case VK_FORMAT_ASTC_6x6_UNORM_BLOCK:
-	case VK_FORMAT_ASTC_6x6_SRGB_BLOCK:
-		return 6;
-	case VK_FORMAT_ASTC_8x8_UNORM_BLOCK:
-	case VK_FORMAT_ASTC_8x8_SRGB_BLOCK:
-		return 8;
-	case VK_FORMAT_ASTC_10x10_UNORM_BLOCK:
-	case VK_FORMAT_ASTC_10x10_SRGB_BLOCK:
-		return 10;
-	case VK_FORMAT_ASTC_12x12_UNORM_BLOCK:
-	case VK_FORMAT_ASTC_12x12_SRGB_BLOCK:
-		return 12;
-
-	default:
-		return 1;
-	}
-}
-
-inline mgint getMipScalar(mgint level, mgint value)
-{
-	value = value >> level;
-	return value < 1 ? 1 : value;
-}
-
-inline mgint getMipScalar(mgint level, mgint value, mgint alignment)
-{
-	alignment -= 1;
-	return ((value >> level) + alignment) & ~alignment;
 }
 
 static void MGVK_ClampAndValidateTextureRegion(
@@ -4517,11 +4679,7 @@ void MGG_Texture_GetData(MGG_GraphicsDevice* device, MGG_Texture* texture, mgint
 	{
 		if (texture->frame == device->frame)
 		{
-			if (device->inRenderPass)
-			{
-				vkCmdEndRenderPass(cmd.buffer);
-				device->inRenderPass = false;
-			}
+			MGVK_EndRenderPass(device, cmd.buffer);
 
 			VkResult res = vkEndCommandBuffer(cmd.buffer);
 			VK_CHECK_RESULT(res);
