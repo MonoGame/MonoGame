@@ -1965,7 +1965,7 @@ namespace Microsoft.Xna.Framework
         }
 
         /// <summary>
-        /// Calculates Hue & Saturation value from RGB, to avoid code duplication.
+        /// Calculates Hue and Saturation value from RGB, to avoid code duplication.
         /// </summary>
         /// <param name="h">Hue component value from 0.0f to 360.0f</param>
         /// <param name="s">Saturation component</param>

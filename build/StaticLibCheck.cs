@@ -15,7 +15,7 @@ namespace BuildScripts;
 /// Call <see cref="StaticLibCheck.Check"/> during your build pipeline, passing the build context and the folder to check.
 /// </para>
 /// </remarks>
-public class StaticLibCheck
+public static class StaticLibCheck
 {
     private static readonly string[] ValidWindowsLibs = {
         "WS2_32.dll",
@@ -44,7 +44,7 @@ public class StaticLibCheck
         "/lib64/ld-linux-"
     };
 
-    public void Check(BuildContext context, string folder)
+    public static void Check(BuildContext context, string folder)
     {
         switch (context.Environment.Platform.Family)
         {
@@ -62,7 +62,7 @@ public class StaticLibCheck
         }
     }
 
-    public void CheckWindows(BuildContext context, string folder)
+    public static void CheckWindows(BuildContext context, string folder)
     {
         var vswhere = new VSWhereLatest(context.FileSystem, context.Environment, context.ProcessRunner, context.Tools);
         var devcmdPath = vswhere.Latest(new VSWhereLatestSettings()).FullPath + @"\Common7\Tools\vsdevcmd.bat";
@@ -105,7 +105,7 @@ public class StaticLibCheck
         }
     }
 
-    public void CheckMacOS(BuildContext context, string folder)
+    public static void CheckMacOS(BuildContext context, string folder)
     {
         foreach (var filePath in Directory.GetFiles(folder, "*.dylib"))
         {
@@ -170,7 +170,7 @@ public class StaticLibCheck
         }
     }
 
-    public void CheckLinux(BuildContext context, string folder)
+    public static void CheckLinux(BuildContext context, string folder)
     {
         foreach (var filePath in Directory.GetFiles(folder, "*.so*"))
         {
