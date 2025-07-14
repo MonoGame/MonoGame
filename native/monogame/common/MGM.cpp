@@ -13,11 +13,11 @@ struct MGG_Texture;
 #include <stdio.h>
 
 
-void MGM_ReadSignature(const char* filepath, MGM_SIGNATURE)
+void MGM_ReadSignature(mgbyte* filepath, MGM_SIGNATURE)
 {
 	memset(signature, 0, 16);
 
-	FILE* handle = fopen(filepath, "rb");
+	FILE* handle = fopen((const char*)filepath, "rb");
 	if (handle == nullptr)
 		return;
 
@@ -48,7 +48,7 @@ MGM_AudioDecoder* MGM_AudioDecoder_TryCreate_Mp3(MGM_SIGNATURE)
 
 #if defined(_WIN32)
 
-MGM_AudioDecoder* MGM_AudioDecoder_Create(const char* filepath, MGM_AudioDecoderInfo& info)
+MGM_AudioDecoder* MGM_AudioDecoder_Create(mgbyte* filepath, MGM_AudioDecoderInfo& info)
 {
 	assert(filepath != nullptr);
 
@@ -120,7 +120,7 @@ MGM_VideoDecoder* MGM_VideoDecoder_TryCreate_OpenH264(MGM_SIGNATURE)
 
 #if defined(_WIN32)
 
-MGM_VideoDecoder* MGM_VideoDecoder_Create(MGG_GraphicsDevice* device, const char* filepath, MGM_VideoDecoderInfo& info)
+MGM_VideoDecoder* MGM_VideoDecoder_Create(MGG_GraphicsDevice* device, mgbyte* filepath, MGM_VideoDecoderInfo& info)
 {
 	assert(filepath != nullptr);
 
