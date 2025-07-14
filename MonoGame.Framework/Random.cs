@@ -71,7 +71,7 @@ public static partial class MathHelper
         }
 
         /// <summary>
-        /// Generate a uniformly distributed number, r, where 0 <= and r < <paramref name="bound"/>.
+        /// Generate a uniformly distributed number, r, where 0 &lt;= r &lt; <paramref name="bound"/>.
         /// </summary>
         /// <param name="bound">Exclusive upper bound of the number to generate.</param>
         /// <returns>A uniformly distributed 32bit unsigned integer strictly less than <paramref name="bound"/>.</returns>
