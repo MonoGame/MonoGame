@@ -94,15 +94,15 @@
       <PackagePath>runtimes\win-x64\native</PackagePath>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="..\Artifacts\mgpipeline\$(Configuration)\mgpipeline.dll" Condition="Exists('..\Artifacts\mgpipeline\$(Configuration)\mgpipeline.dll')" Visible="false">
+    <Content Include="..\Artifacts\native\mgpipeline\windows\$(Configuration)\mgpipeline.dll" Condition="Exists('..\Artifacts\native\mgpipeline\windows\$(Configuration)\mgpipeline.dll')" Visible="false">
       <PackagePath>runtimes\win-x64\native</PackagePath>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="..\Artifacts\mgpipeline\$(Configuration)\libmgpipeline.so" Condition="Exists('..\Artifacts\mgpipeline\$(Configuration)\libmgpipeline.so')" Visible="false">
+    <Content Include="..\Artifacts\native\mgpipeline\linux\$(Configuration)\libmgpipeline.so" Condition="Exists('..\Artifacts\native\mgpipeline\linux\$(Configuration)\libmgpipeline.so')" Visible="false">
       <PackagePath>runtimes\linux-x64\native</PackagePath>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="..\Artifacts\mgpipeline\$(Configuration)\libmgpipeline.dylib" Condition="Exists('..\Artifacts\mgpipeline\$(Configuration)\libmgpipeline.dylib')" Visible="false">
+    <Content Include="..\Artifacts\native\mgpipeline\macosx\$(Configuration)\libmgpipeline.dylib" Condition="Exists('..\Artifacts\native\mgpipeline\macosx\$(Configuration)\libmgpipeline.dylib')" Visible="false">
       <PackagePath>runtimes\osx\native</PackagePath>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -119,5 +119,15 @@
   <Import Project="..\PlayStation5\MonoGame.Framework.Content.Pipeline.targets" Condition="exists('..\PlayStation5\MonoGame.Framework.Content.Pipeline.targets')" />
   <Import Project="..\PSVita\MonoGame.Framework.Content.Pipeline.targets" Condition="exists('..\PSVita\MonoGame.Framework.Content.Pipeline.targets')" />
   <Import Project="..\GDKX\MonoGame.Framework.Content.Pipeline.targets" Condition="exists('..\GDKX\MonoGame.Framework.Content.Pipeline.targets')" />
+
+  <Target Name="BuildMGCPW" Condition="'$(DisableNativeBuild)' != 'True' and '$(OS)' == 'Windows_NT'" BeforeTargets="CollectPackageReferences">
+    <Exec Command="premake5 vs2022" WorkingDirectory="../native/pipeline/" />
+    <Exec Command="msbuild pipeline.sln /p:Configuration=$(Configuration) /p:Platform=x64" WorkingDirectory="../native/pipeline/" />
+  </Target>
+
+  <Target Name="BuildMGCPU" Condition="'$(DisableNativeBuild)' != 'True' and '$(OS)' != 'Windows_NT'" BeforeTargets="CollectPackageReferences">
+    <Exec Command="premake5 gmake" WorkingDirectory="../native/pipeline/" />
+    <Exec Command="make config=$(Configuration.ToLower())" WorkingDirectory="../native/pipeline/" />
+  </Target>
 
 </Project>
