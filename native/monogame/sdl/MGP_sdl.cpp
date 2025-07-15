@@ -223,27 +223,28 @@ void* MGP_Platform_MakePath(const char* location, const char* path)
     assert(location != nullptr);
     assert(path != nullptr);
 
-    size_t length = strlen(path) + 1;
-    if (location[0])
-        length += strlen(location) + 1;
+    size_t location_len = strlen(location);
+    size_t path_len = strlen(path);
+    size_t separator_len = (location_len > 0) ? strlen(MG_PATH_SEPARATOR) : 0;
 
     size_t length = location_len + separator_len + path_len + 1;
 
     char* fpath = (char*)SDL_malloc(length);
     assert(fpath != nullptr);
 
-    if (location[0])
-    {
-        strcpy_s(fpath, length, location);
-        strcat_s(fpath, length, MG_PATH_SEPARATOR);
-        strcat_s(fpath, length, path);
-    }
-    else
-    {
-        strcpy_s(fpath, length, path);
+    if (location_len > 0) {
+        snprintf(fpath, length, "%s%s%s", location, MG_PATH_SEPARATOR, path);
+    } else {
+        snprintf(fpath, length, "%s", path);
     }
 
-    return fpath;
+	return reinterpret_cast<void*>(fpath);
+}
+
+void MGP_Platform_Free(void* ptr)
+{
+    assert(ptr != nullptr);
+    SDL_free(ptr);
 }
 
 void MGP_Platform_BeforeInitialize(MGP_Platform* platform)
@@ -828,7 +829,7 @@ void MGP_Window_ExitFullScreen(MGP_Window* window)
     SDL_SetWindowFullscreen(window->window, 0);
 }
 
-mgint MGP_Window_ShowMessageBox(MGP_Window* window, const char* title, const char* description, const char** buttons, mgint count)
+mgint MGP_Window_ShowMessageBox(MGP_Window* window, const char* title, const char* description, const char* buttons, mgint count)
 {
     SDL_MessageBoxData data;
     data.window = window->window;
@@ -842,7 +843,10 @@ mgint MGP_Window_ShowMessageBox(MGP_Window* window, const char* title, const cha
     for (int i = 0; i < count; i++)
     {
         bdata[i].buttonid = i;
-        bdata[i].text = buttons[i];
+        bdata[i].text = p;
+        // Since we have double null-terminated strings,
+        // we can safely assume the next button text starts after the current one.
+        p += strlen(p) + 1;
         bdata[i].flags = 0;
     }
 
