@@ -292,6 +292,8 @@ struct MGG_GraphicsDevice
 
 	std::vector<MGG_Buffer*> all_buffers;
 	std::vector<MGG_Texture*> all_textures;
+
+	std::vector<MGG_OcclusionQuery*> deferredOcclusionQueries;
 };
 
 struct MGG_Buffer
@@ -433,6 +435,7 @@ struct MGG_OcclusionQuery
 	mgbool isComplete = false;
 	mgbool inBeginEndBlock = false;
 	mgint pixelCount = 0;
+	mgbool gpuHasBegun = false;
 };
 
 struct MGG_GraphicsSystem
@@ -1414,21 +1417,48 @@ static void cleanupSwapChain(MGG_GraphicsDevice* device)
 	// Destroy all the frame resources.
 
 
-	// Destroy all frame buffers.
-	for (auto pair : device->targetCache)
+	// Destroy framebuffers and render passes that are dependent on the swapchain.
+	// We iterate this way because we are removing elements from the map.
+	auto& cache = device->targetCache;
+	for (auto itr = cache.begin(); itr != cache.end();)
 	{
-        for (int i = 0; i < MGVK_NUM_TARGETS; ++i)
-        {
-            auto& view = pair.second->arraySlicesViews[i];
-            if (view.has_value()) {
-                vkDestroyImageView(device->device, view.value(), nullptr);
-            }
-        }
-		vkDestroyRenderPass(device->device, pair.second->renderPass, nullptr);
-		vkDestroyFramebuffer(device->device, pair.second->framebuffer, nullptr);
-		delete pair.second;
+		bool usesSwapchain = false;
+		auto targetSetCache = itr->second;
+
+		// Check if any of the targets in this cache entry are part of the swapchain.
+		for (int i = 0; i < targetSetCache->set.numTargets; ++i)
+		{
+			if (targetSetCache->set.targets[i] && targetSetCache->set.targets[i]->isSwapchain)
+			{
+				usesSwapchain = true;
+				break;
+			}
+		}
+
+		if (usesSwapchain)
+		{
+			// This cache entry uses the swapchain, so it's safe to destroy.
+			for (int i = 0; i < MGVK_NUM_TARGETS; ++i)
+			{
+				auto& view = targetSetCache->arraySlicesViews[i];
+				if (view.has_value()) {
+					vkDestroyImageView(device->device, view.value(), nullptr);
+				}
+			}
+			vkDestroyRenderPass(device->device, targetSetCache->renderPass, nullptr);
+			vkDestroyFramebuffer(device->device, targetSetCache->framebuffer, nullptr);
+			delete targetSetCache;
+			
+			// Erase the element and get an iterator to the next one.
+			itr = cache.erase(itr);
+		}
+		else
+		{
+			// This is an off-screen render target, so leave it alone and
+			// move to the next element.
+			++itr;
+		}
 	}
-	device->targetCache.clear();
 
 	// Cleanup the swap chain images.
 	for (size_t i = 0; i < kConcurrentFrameCount; i++)
@@ -2734,11 +2764,31 @@ static void MGVK_UpdateRenderPass(MGG_GraphicsDevice* device, FrameCounter curre
 	render_pass_begin_info.clearValueCount = 0;
 	render_pass_begin_info.pClearValues = NULL;
 
+	VkQueryControlFlags flags = 0;
+	if (device->deviceFeatures.occlusionQueryPrecise)
+		flags = VK_QUERY_CONTROL_PRECISE_BIT;
+
+	for (auto query : device->deferredOcclusionQueries)
+	{
+		if (!query->gpuHasBegun)
+		{
+			vkCmdResetQueryPool(cmd.buffer, query->queryPool, 0, 1);
+			query->gpuHasBegun = true;
+		}
+	}
+
 	vkCmdBeginRenderPass(cmd.buffer, &render_pass_begin_info, VK_SUBPASS_CONTENTS_INLINE);
 
 	device->inRenderPass = true;
 	device->renderTargetDirty = false;
 	device->pipelineStateDirty = true;
+
+	for (auto query : device->deferredOcclusionQueries)
+	{
+		vkCmdBeginQuery(cmd.buffer, query->queryPool, 0, flags);
+	}
+
+	device->deferredOcclusionQueries.clear();
 }
 
 static void MGVK_UpdateDescriptors(MGG_GraphicsDevice* device, FrameCounter currentFrame, MGG_Shader* shader, VkDescriptorSet* current, uint32_t* dynamicOffset)
@@ -2989,33 +3039,35 @@ static VkPipeline MGVK_CreatePipeline(MGG_GraphicsDevice* device)
 	VkPipelineMultisampleStateCreateInfo multisampling;
 	memset(&multisampling, 0, sizeof(multisampling));
 	multisampling.sType = VK_STRUCTURE_TYPE_PIPELINE_MULTISAMPLE_STATE_CREATE_INFO;
-
-    bool preferSampleShading = false;
-
-    if (pstate.rasterizerState->multiSampleAntiAlias && pstate.targets && pstate.targets->set.targets[0])
-    {
-        multisampling.rasterizationSamples = ToVkSampleCount(pstate.targets->set.targets[0]->multiSampleCount);
-        preferSampleShading = true;
-    }
-    else
-    {
-        multisampling.rasterizationSamples = VK_SAMPLE_COUNT_1_BIT;
-    }
-
-    if (preferSampleShading && device->deviceFeatures.sampleRateShading)
-    {
-        multisampling.sampleShadingEnable = VK_TRUE; 
-        multisampling.minSampleShading = 0.2f; 
-    }
-    else
-    {
-	multisampling.sampleShadingEnable = VK_FALSE;
-        multisampling.minSampleShading = 1.0f;
-    }
-    
-	multisampling.pSampleMask = nullptr; // Optional
 	multisampling.alphaToCoverageEnable = VK_FALSE; // Optional
 	multisampling.alphaToOneEnable = VK_FALSE; // Optional
+	multisampling.pSampleMask = nullptr; // Optional
+
+	// Configure multisampling based on rasterizer state and render target
+	if (pstate.rasterizerState->multiSampleAntiAlias && pstate.targets && pstate.targets->set.targets[0])
+	{
+		multisampling.rasterizationSamples = ToVkSampleCount(pstate.targets->set.targets[0]->multiSampleCount);
+		
+		// Enable sample shading for higher quality if supported by the device and MSAA is active
+		if (device->deviceFeatures.sampleRateShading)
+		{
+			multisampling.sampleShadingEnable = VK_TRUE; 
+			multisampling.minSampleShading = 0.2f; // Run fragment shader on at least 20% of samples
+		}
+		else
+		{
+			multisampling.sampleShadingEnable = VK_FALSE;
+			multisampling.minSampleShading = 1.0f;
+		}
+	}
+	else
+	{
+		// No MSAA
+		multisampling.rasterizationSamples = VK_SAMPLE_COUNT_1_BIT;
+		multisampling.sampleShadingEnable = VK_FALSE;
+		multisampling.minSampleShading = 1.0f;
+	}
+    
 	pipelineInfo.pMultisampleState = &multisampling;
 	pipelineInfo.renderPass = pstate.targets->renderPass;
 
@@ -3609,6 +3661,7 @@ void MGG_GraphicsDevice_GetBackBufferData(MGG_GraphicsDevice* device, mgint x, m
 	delete tempRgbaTexture;
 
 	MGVK_BeginFrame(cmd);
+	device->renderTargetDirty = true;
 }
 
 static VkBlendFactor ToVkBlendFactor(MGBlend mode)
@@ -4984,14 +5037,11 @@ MGG_OcclusionQuery* MGG_OcclusionQuery_Create(MGG_GraphicsDevice* device)
 	VkQueryPoolCreateInfo createInfo = { VK_STRUCTURE_TYPE_QUERY_POOL_CREATE_INFO };
 	createInfo.queryType = VK_QUERY_TYPE_OCCLUSION;
 	createInfo.queryCount = 1;
+	query->gpuHasBegun = false;
 
 	VkResult res = vkCreateQueryPool(device->device, &createInfo, nullptr, &query->queryPool);
 	VK_CHECK_RESULT(res);
 	VK_SET_OBJECT_NAME(device->device, query->queryPool, VK_OBJECT_TYPE_QUERY_POOL, "MGG_OcclusionQuery.queryPool");
-
-    VkCommandBuffer cmd = MGVK_BeginNewCommandBuffer(device);
-    vkCmdResetQueryPool(cmd, query->queryPool, 0, 1);
-    MGVK_ExecuteAndFreeCommandBuffer(device, cmd);
 
 	return query;
 }
@@ -5004,12 +5054,8 @@ void MGG_OcclusionQuery_Destroy(MGG_GraphicsDevice* device, MGG_OcclusionQuery* 
 	if (!query)
 		return;
 
-	// An active query should be also able to destroy
-	
 	if (query->queryPool != VK_NULL_HANDLE)
 	{
-		// Wait until the device is idle to ensure the query pool is no longer
-		// in use by any submitted command buffers before destroying it.
 		vkDeviceWaitIdle(device->device);
 		vkDestroyQueryPool(device->device, query->queryPool, nullptr);
 	}
@@ -5023,30 +5069,13 @@ void MGG_OcclusionQuery_Begin(MGG_GraphicsDevice* device, MGG_OcclusionQuery* qu
 	assert(query != nullptr);
 	assert(!query->inBeginEndBlock);
 
-	auto currentFrame = device->frame;
-	auto frameIndex = currentFrame % kConcurrentFrameCount;
-	auto& frame = device->frames[frameIndex];
-	assert(frame.is_recording);
-
-	auto cmd = frame.commandBuffer.buffer;
-    if (!device->inRenderPass)
-    {
-        MGVK_UpdateRenderPass(device, currentFrame, frame.commandBuffer);
-    }
-
-	// Reset the query before beginning it.
-	vkCmdResetQueryPool(cmd, query->queryPool, 0, 1);
-
-	// Use precise queries if the hardware supports it for more accurate results.
-	VkQueryControlFlags flags = 0;
-	if (device->deviceFeatures.occlusionQueryPrecise)
-		flags = VK_QUERY_CONTROL_PRECISE_BIT;
-		
-	vkCmdBeginQuery(cmd, query->queryPool, 0, flags);
+	device->deferredOcclusionQueries.push_back(query);
 
 	query->inBeginEndBlock = true;
 	query->isComplete = false;
 	query->pixelCount = 0;
+
+	device->renderTargetDirty = true;
 }
 
 void MGG_OcclusionQuery_End(MGG_GraphicsDevice* device, MGG_OcclusionQuery* query)
@@ -5059,16 +5088,31 @@ void MGG_OcclusionQuery_End(MGG_GraphicsDevice* device, MGG_OcclusionQuery* quer
 	auto frameIndex = currentFrame % kConcurrentFrameCount;
 	auto& frame = device->frames[frameIndex];
 	assert(frame.is_recording);
+    auto cmd = frame.commandBuffer.buffer;
 
-	auto cmd = frame.commandBuffer.buffer;
-    if (!device->inRenderPass)
+    if (query->gpuHasBegun)
     {
-        MGVK_UpdateRenderPass(device, currentFrame, frame.commandBuffer);
+        vkCmdEndQuery(cmd, query->queryPool, 0);
     }
+    query->inBeginEndBlock = false;
 
-	vkCmdEndQuery(cmd, query->queryPool, 0);
+    MGVK_EndRenderPass(device, cmd);
+    VK_CHECK_RESULT(vkEndCommandBuffer(cmd));
 
-	query->inBeginEndBlock = false;
+    VkFence fence;
+    VkFenceCreateInfo fenceInfo = { VK_STRUCTURE_TYPE_FENCE_CREATE_INFO };
+    VK_CHECK_RESULT(vkCreateFence(device->device, &fenceInfo, nullptr, &fence));
+    
+    VkSubmitInfo submitInfo = { VK_STRUCTURE_TYPE_SUBMIT_INFO };
+    submitInfo.commandBufferCount = 1;
+    submitInfo.pCommandBuffers = &cmd;
+    VK_CHECK_RESULT(vkQueueSubmit(device->queue, 1, &submitInfo, fence));
+
+    VK_CHECK_RESULT(vkWaitForFences(device->device, 1, &fence, VK_TRUE, UINT64_MAX));
+    vkDestroyFence(device->device, fence, nullptr);
+
+    MGVK_BeginFrame(frame.commandBuffer);
+    device->renderTargetDirty = true;
 }
 
 mgbyte MGG_OcclusionQuery_GetResult(MGG_GraphicsDevice* device, MGG_OcclusionQuery* query, mgint& pixelCount)
@@ -5083,15 +5127,6 @@ mgbyte MGG_OcclusionQuery_GetResult(MGG_GraphicsDevice* device, MGG_OcclusionQue
 		pixelCount = query->pixelCount;
 		return true;
 	}
-
-    if (!query->inBeginEndBlock && !query->isComplete) {
-        vkEndCommandBuffer(device->frames[device->frame % kConcurrentFrameCount].commandBuffer.buffer);
-        VkSubmitInfo submitInfo = { VK_STRUCTURE_TYPE_SUBMIT_INFO };
-        submitInfo.commandBufferCount = 1;
-        submitInfo.pCommandBuffers = &device->frames[device->frame % kConcurrentFrameCount].commandBuffer.buffer;
-        vkQueueSubmit(device->queue, 1, &submitInfo, VK_NULL_HANDLE);
-        vkQueueWaitIdle(device->queue);
-    }
 
 	uint64_t result = 0;
 	// Poll for the result without waiting. This prevents stalling the CPU.
