@@ -122,7 +122,7 @@
 
   <Target Name="BuildMGCPW" Condition="'$(DisableNativeBuild)' != 'True' and '$(OS)' == 'Windows_NT'" BeforeTargets="CollectPackageReferences">
     <Exec Command="premake5 vs2022" WorkingDirectory="../native/pipeline/" />
-    <MSBuild Projects="../native/pipeline/pipeline.sln" Targets="Build" Properties="Configuration=$(Configuration);Platform=x64" />
+    <MSBuild Projects="../native/pipeline/pipeline.sln" Properties="Configuration=$(Configuration);Platform=x64" />
   </Target>
 
   <Target Name="BuildMGCPU" Condition="'$(DisableNativeBuild)' != 'True' and '$(OS)' != 'Windows_NT'" BeforeTargets="CollectPackageReferences">
