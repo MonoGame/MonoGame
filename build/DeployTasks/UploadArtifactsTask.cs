@@ -45,11 +45,19 @@ public sealed class UploadArtifactsTask : AsyncFrostingTask<BuildContext>
         var version = BuildContext.CalculateVersion(context);
 
         // Upload mgpipeline native libraries
-        var buildConf = context.Argument("build-configuration", "Release");
-        var mgDir = System.IO.Path.Combine(context.BuildOutput, "mgpipeline", buildConf);
-        if (System.IO.Directory.Exists(mgDir))
+        switch (context.Environment.Platform.Family)
         {
-            await context.GitHubActions().Commands.UploadArtifact(new DirectoryPath(mgDir), $"mgpipeline-{os}.{version}");
+            case PlatformFamily.Windows:
+                await context.GitHubActions().Commands.UploadArtifact(new DirectoryPath("Artifacts/native/mgpipeline/windows/Release/"), $"mgpipeline-{os}.{version}");
+                break;
+            case PlatformFamily.Linux:
+                await context.GitHubActions().Commands.UploadArtifact(new DirectoryPath("Artifacts/native/mgpipeline/linux/Release/"), $"mgpipeline-{os}.{version}");
+                break;
+            case PlatformFamily.OSX:
+                await context.GitHubActions().Commands.UploadArtifact(new DirectoryPath("Artifacts/native/mgpipeline/macosx/Release/"), $"mgpipeline-{os}.{version}");
+                break;
+            default:
+                throw new NotSupportedException($"Platform {context.Environment.Platform.Family} is not supported for static library checks.");
         }
 
         // Upload NuGet packages

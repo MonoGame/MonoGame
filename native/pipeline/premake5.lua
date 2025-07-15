@@ -2,7 +2,7 @@
 -- This file is subject to the terms and conditions defined in
 -- file 'LICENSE.txt', which is part of this source code package.
 function pipeline_native()
-    platform_target_path = "../../Artifacts/mgpipeline/%{cfg.buildcfg}"
+    platform_target_path = "../../Artifacts/native/mgpipeline/%{cfg.system}/%{cfg.buildcfg}"
 
     kind "SharedLib"
     language "C++"

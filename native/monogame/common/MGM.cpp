@@ -14,11 +14,11 @@ struct MGG_Texture;
 #include <string.h>
 
 
-void MGM_ReadSignature(const char* filepath, MGM_SIGNATURE)
+void MGM_ReadSignature(mgbyte* filepath, MGM_SIGNATURE)
 {
 	memset(signature, 0, 16);
 
-	FILE* handle = fopen(filepath, "rb");
+	FILE* handle = fopen((const char*)filepath, "rb");
 	if (handle == nullptr)
 		return;
 

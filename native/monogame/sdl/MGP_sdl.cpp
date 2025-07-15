@@ -223,28 +223,27 @@ void* MGP_Platform_MakePath(const char* location, const char* path)
     assert(location != nullptr);
     assert(path != nullptr);
 
-    size_t location_len = strlen(location);
-    size_t path_len = strlen(path);
-    size_t separator_len = (location_len > 0) ? strlen(MG_PATH_SEPARATOR) : 0;
+    size_t length = strlen(path) + 1;
+    if (location[0])
+        length += strlen(location) + 1;
 
     size_t length = location_len + separator_len + path_len + 1;
 
     char* fpath = (char*)SDL_malloc(length);
     assert(fpath != nullptr);
 
-    if (location_len > 0) {
-        snprintf(fpath, length, "%s%s%s", location, MG_PATH_SEPARATOR, path);
-    } else {
-        snprintf(fpath, length, "%s", path);
+    if (location[0])
+    {
+        strcpy_s(fpath, length, location);
+        strcat_s(fpath, length, MG_PATH_SEPARATOR);
+        strcat_s(fpath, length, path);
+    }
+    else
+    {
+        strcpy_s(fpath, length, path);
     }
 
-	return reinterpret_cast<void*>(fpath);
-}
-
-void MGP_Platform_Free(void* ptr)
-{
-    assert(ptr != nullptr);
-    SDL_free(ptr);
+    return fpath;
 }
 
 void MGP_Platform_BeforeInitialize(MGP_Platform* platform)
@@ -667,7 +666,7 @@ MGP_Window* MGP_Window_Create(
     MGP_Platform* platform,
     mgint& width,
     mgint& height,
-    const char* title)
+    mgbyte* title)
 {
 	assert(platform != nullptr);
     assert(width > 0);
@@ -687,9 +686,9 @@ MGP_Window* MGP_Window_Create(
 	#error Not implemented
 #endif
 
-    title = title ? title : "";
+    title = title ? title : (mgbyte*)"";
 
-	window->window = SDL_CreateWindow(title, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, width, height, flags);
+	window->window = SDL_CreateWindow((const char*)title, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, width, height, flags);
     window->windowId = SDL_GetWindowID(window->window);
 
 	platform->windows.push_back(window);
@@ -747,7 +746,7 @@ void MGP_Window_SetAllowUserResizing(MGP_Window* window, mgbyte allow)
 	SDL_SetWindowResizable(window->window, allow ? SDL_TRUE : SDL_FALSE);
 }
 
-mgbyte MGP_Window_GetIsBoderless(MGP_Window* window)
+mgbyte MGP_Window_GetIsBorderless(MGP_Window* window)
 {
 	assert(window != nullptr);
 
@@ -759,19 +758,19 @@ mgbyte MGP_Window_GetIsBoderless(MGP_Window* window)
 	return false;
 }
 
-void MGP_Window_SetIsBoderless(MGP_Window* window, mgbyte borderless)
+void MGP_Window_SetIsBorderless(MGP_Window* window, mgbyte borderless)
 {
 	assert(window != nullptr);
 
 	SDL_SetWindowBordered(window->window, borderless ? SDL_FALSE : SDL_TRUE);
 }
 
-void MGP_Window_SetTitle(MGP_Window* window, const char* title)
+void MGP_Window_SetTitle(MGP_Window* window, mgbyte* title)
 {
     assert(window != nullptr);
 
-    title = title ? title : "";
-    SDL_SetWindowTitle(window->window, title);
+    title = title ? title : (mgbyte*)"";
+    SDL_SetWindowTitle(window->window, (const char*)title);
 }
 
 void MGP_Window_Show(MGP_Window* window, mgbyte show)
@@ -829,12 +828,12 @@ void MGP_Window_ExitFullScreen(MGP_Window* window)
     SDL_SetWindowFullscreen(window->window, 0);
 }
 
-mgint MGP_Window_ShowMessageBox(MGP_Window* window, const char* title, const char* description, const char* buttons, mgint count)
+mgint MGP_Window_ShowMessageBox(MGP_Window* window, const char* title, const char* description, const char** buttons, mgint count)
 {
     SDL_MessageBoxData data;
     data.window = window->window;
-    data.title = title;
-    data.message = description;
+    data.title = (const char*)title;
+    data.message = (const char*)description;
     data.colorScheme = nullptr;
     data.flags = SDL_MESSAGEBOX_BUTTONS_LEFT_TO_RIGHT;
 
@@ -843,10 +842,7 @@ mgint MGP_Window_ShowMessageBox(MGP_Window* window, const char* title, const cha
     for (int i = 0; i < count; i++)
     {
         bdata[i].buttonid = i;
-        bdata[i].text = p;
-        // Since we have double null-terminated strings,
-        // we can safely assume the next button text starts after the current one.
-        p += strlen(p) + 1;
+        bdata[i].text = buttons[i];
         bdata[i].flags = 0;
     }
 

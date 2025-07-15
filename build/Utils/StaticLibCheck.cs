@@ -1,4 +1,5 @@
 using Cake.Common.Tools.VSWhere.Latest;
+
 namespace BuildScripts;
 
 /// <summary>
@@ -15,7 +16,7 @@ namespace BuildScripts;
 /// Call <see cref="StaticLibCheck.Check"/> during your build pipeline, passing the build context and the folder to check.
 /// </para>
 /// </remarks>
-public class StaticLibCheck
+public static class StaticLibCheck
 {
     private static readonly string[] ValidWindowsLibs = {
         "WS2_32.dll",
@@ -44,48 +45,28 @@ public class StaticLibCheck
         "/lib64/ld-linux-"
     };
 
-    public void Check(BuildContext context, string folder)
-    {
-        switch (context.Environment.Platform.Family)
-        {
-            case PlatformFamily.Windows:
-                CheckWindows(context, folder);
-                break;
-            case PlatformFamily.Linux:
-                CheckLinux(context, folder);
-                break;
-            case PlatformFamily.OSX:
-                CheckMacOS(context, folder);
-                break;
-            default:
-                throw new NotSupportedException($"Platform {context.Environment.Platform.Family} is not supported for static library checks.");
-        }
-    }
-
-    public void CheckWindows(BuildContext context, string folder)
+    public static void CheckWindows(BuildContext context, string filePath)
     {
         var vswhere = new VSWhereLatest(context.FileSystem, context.Environment, context.ProcessRunner, context.Tools);
         var devcmdPath = vswhere.Latest(new VSWhereLatestSettings()).FullPath + @"\Common7\Tools\vsdevcmd.bat";
 
-        foreach (var filePath in Directory.GetFiles(folder, "*.dll"))
-        {
-            context.Information($"Checking: {filePath}");
-            context.StartProcess(
-                devcmdPath,
-                new ProcessSettings()
-                {
-                    Arguments = $"& dumpbin /dependents /nologo {filePath}",
-                    RedirectStandardOutput = true
-                },
-                out IEnumerable<string> processOutput
-            );
-
-            var passedTests = true;
-            foreach (string output in processOutput)
+        context.Information($"Checking: {filePath}");
+        context.StartProcess(
+            devcmdPath,
+            new ProcessSettings()
             {
-                var libPath = output.Trim();
-                if (!libPath.EndsWith(".dll") || libPath.Contains(' '))
-                    continue;
+                Arguments = $"& dumpbin /dependents /nologo {filePath}",
+                RedirectStandardOutput = true
+            },
+            out IEnumerable<string> processOutput
+        );
+
+        var passedTests = true;
+        foreach (string output in processOutput)
+        {
+            var libPath = output.Trim();
+            if (!libPath.EndsWith(".dll") || libPath.Contains(' '))
+                continue;
 
                 if (ValidWindowsLibs.Contains(libPath))
                 {
@@ -98,108 +79,55 @@ public class StaticLibCheck
                 }
             }
 
-            if (!passedTests)
-            {
-                throw new Exception("Invalid library linkage detected!");
-            }
+        if (!passedTests)
+        {
+            throw new Exception("Invalid library linkage detected!");
         }
     }
 
-    public void CheckMacOS(BuildContext context, string folder)
+    public static void CheckMacOS(BuildContext context, string filePath)
     {
-        foreach (var filePath in Directory.GetFiles(folder, "*.dylib"))
+        context.Information($"Checking Universal Binary: {filePath}");
+
+        context.StartProcess(
+            "lipo",
+            new ProcessSettings { Arguments = $"-archs {filePath}", RedirectStandardOutput = true },
+            out IEnumerable<string> lipoOutput);
+
+        var archs = (lipoOutput.FirstOrDefault() ?? "").Split(' ', StringSplitOptions.RemoveEmptyEntries);
+
+        if (archs.Length < 2)
         {
-            context.Information($"Checking Universal Binary: {filePath}");
-
-            context.StartProcess(
-                "lipo",
-                new ProcessSettings { Arguments = $"-archs {filePath}", RedirectStandardOutput = true },
-                out IEnumerable<string> lipoOutput);
-
-            var archs = (lipoOutput.FirstOrDefault() ?? "").Split(' ', StringSplitOptions.RemoveEmptyEntries);
-
-            if (archs.Length < 2)
-            {
-                context.Warning($"Warning: '{filePath}' is not a universal binary. Found archs: {string.Join(", ", archs)}");
-            }
-            else
-            {
-                context.Information($"Found architectures: {string.Join(", ", archs)}");
-            }
-
-            foreach (var arch in archs)
-            {
-                context.StartProcess(
-                    "dyld_info",
-                    new ProcessSettings
-                    {
-                        Arguments = $"-arch {arch} -dependents \"{filePath}\"",
-                        RedirectStandardOutput = true
-                    },
-                    out IEnumerable<string> processOutput);
-
-                var processOutputList = processOutput.ToList();
-                var passedTests = true;
-                for (int i = 3; i < processOutputList.Count; i++)
-                {
-                    var libPath = processOutputList[i].Trim().Split(' ')[^1];
-                    if (libPath.Contains('['))
-                    {
-                        i += 2;
-                        continue;
-                    }
-
-                    if (libPath.StartsWith("/usr/lib/") || libPath.StartsWith("/System/Library/Frameworks/"))
-                    {
-                        context.Information($"VALID: {libPath}");
-                    }
-                    else
-                    {
-                        context.Information($"INVALID: {libPath}");
-                        passedTests = false;
-                    }
-                }
-
-                if (!passedTests)
-                {
-                    throw new Exception($"Invalid library linkage detected in arch '{arch}' for {filePath}!");
-                }
-            }
-
-            context.Information("");
+            context.Warning($"Warning: '{filePath}' is not a universal binary. Found archs: {string.Join(", ", archs)}");
         }
-    }
-
-    public void CheckLinux(BuildContext context, string folder)
-    {
-        foreach (var filePath in Directory.GetFiles(folder, "*.so*"))
+        else
         {
-            context.Information($"Checking: {filePath}");
+            context.Information($"Found architectures: {string.Join(", ", archs)}");
+        }
+
+        foreach (var arch in archs)
+        {
             context.StartProcess(
-                "ldd",
+                "dyld_info",
                 new ProcessSettings
                 {
-                    Arguments = $"{filePath}",
+                    Arguments = $"-arch {arch} -dependents \"{filePath}\"",
                     RedirectStandardOutput = true
                 },
                 out IEnumerable<string> processOutput);
 
+            var processOutputList = processOutput.ToList();
             var passedTests = true;
-            foreach (var line in processOutput)
+            for (int i = 3; i < processOutputList.Count; i++)
             {
-                var libPath = line.Trim().Split(' ')[0];
-
-                var isValidLib = false;
-                foreach (var validLib in ValidLinuxLibs)
+                var libPath = processOutputList[i].Trim().Split(' ')[^1];
+                if (libPath.Contains('['))
                 {
-                    if (libPath.StartsWith(validLib))
-                    {
-                        isValidLib = true;
-                        break;
-                    }
+                    i += 2;
+                    continue;
                 }
 
-                if (isValidLib)
+                if (libPath.StartsWith("/usr/lib/") || libPath.StartsWith("/System/Library/Frameworks/"))
                 {
                     context.Information($"VALID: {libPath}");
                 }
@@ -212,10 +140,56 @@ public class StaticLibCheck
 
             if (!passedTests)
             {
-                throw new Exception("Invalid library linkage detected!");
+                throw new Exception($"Invalid library linkage detected in arch '{arch}' for {filePath}!");
+            }
+        }
+
+        context.Information("");
+    }
+
+    public static void CheckLinux(BuildContext context, string filePath)
+    {
+        context.Information($"Checking: {filePath}");
+        context.StartProcess(
+            "ldd",
+            new ProcessSettings
+            {
+                Arguments = $"{filePath}",
+                RedirectStandardOutput = true
+            },
+            out IEnumerable<string> processOutput);
+
+        var passedTests = true;
+        foreach (var line in processOutput)
+        {
+            var libPath = line.Trim().Split(' ')[0];
+
+            var isValidLib = false;
+            foreach (var validLib in ValidLinuxLibs)
+            {
+                if (libPath.StartsWith(validLib))
+                {
+                    isValidLib = true;
+                    break;
+                }
             }
 
-            context.Information("");
+            if (isValidLib)
+            {
+                context.Information($"VALID: {libPath}");
+            }
+            else
+            {
+                context.Information($"INVALID: {libPath}");
+                passedTests = false;
+            }
         }
+
+        if (!passedTests)
+        {
+            throw new Exception("Invalid library linkage detected!");
+        }
+
+        context.Information("");
     }
 }
