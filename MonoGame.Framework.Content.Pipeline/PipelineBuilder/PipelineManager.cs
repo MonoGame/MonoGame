@@ -959,6 +959,24 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
                 pipelineBuildEvents.Add(pipelineEvent);
         }
 
+        internal string ResolveSourceFilePath(string sourceFileName)
+        {
+            // If the source file is non-rooted we can assume it is relative
+            // to the project directory... if it is not then we should get a
+            // file not found error later in content processing.
+            if (!Path.IsPathRooted(sourceFileName))
+                sourceFileName = Path.Combine(ProjectDirectory, sourceFileName);
+
+            // Passing the path into GetFullPath resolves any relative pathing
+            // which can screw up the cache lookup below.
+            sourceFileName = Path.GetFullPath(sourceFileName);
+
+            // Get source file name, which is used for lookup in _pipelineBuildEvents.
+            sourceFileName = PathHelper.Normalize(sourceFileName);
+
+            return sourceFileName;
+        }
+
         /// <summary>
         /// Gets an automatic asset name, such as "AssetName_0".
         /// </summary>
@@ -969,14 +987,8 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
         /// <returns>The asset name.</returns>
         public string GetAssetName(string sourceFileName, string importerName, string processorName, OpaqueDataDictionary processorParameters)
         {
-            // If the source file is non-rooted we can assume it is relative
-            // to the project directory... if it is not then we should get a
-            // file not found error later in content processing.
-            if (!Path.IsPathRooted(sourceFileName))
-                sourceFileName = Path.Combine(ProjectDirectory, sourceFileName);
-
             // Get source file name, which is used for lookup in _pipelineBuildEvents.
-            sourceFileName = PathHelper.Normalize(sourceFileName);
+            sourceFileName = ResolveSourceFilePath(sourceFileName);
             string relativeSourceFileName = PathHelper.GetRelativePath(ProjectDirectory, sourceFileName);
 
             List<PipelineBuildEvent> pipelineBuildEvents;
