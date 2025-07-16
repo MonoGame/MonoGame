@@ -667,7 +667,7 @@ MGP_Window* MGP_Window_Create(
     MGP_Platform* platform,
     mgint& width,
     mgint& height,
-    mgbyte* title)
+    const char* title)
 {
 	assert(platform != nullptr);
     assert(width > 0);
@@ -687,7 +687,7 @@ MGP_Window* MGP_Window_Create(
 	#error Not implemented
 #endif
 
-    title = title ? title : (mgbyte*)"";
+    title = title ? title : "";
 
 	window->window = SDL_CreateWindow((const char*)title, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, width, height, flags);
     window->windowId = SDL_GetWindowID(window->window);

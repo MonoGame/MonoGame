@@ -119,11 +119,11 @@ public partial class Texture2D : Texture
 
     private static unsafe Texture2D PlatformFromStream(GraphicsDevice graphicsDevice, Stream stream, Action<byte[]> colorProcessor)
     {
-        bool zeroTransparentPixels = false;
+        ProcessorType processor = 0;
         if (colorProcessor == DefaultColorProcessors.ZeroTransparentPixels)
         {
             colorProcessor = null;
-            zeroTransparentPixels = true;
+            processor |= ProcessorType.ZeroTransparentPixels;
         }
 
         if (stream.CanSeek)
@@ -145,7 +145,7 @@ public partial class Texture2D : Texture
             MGI.ReadRGBA(
                 (byte*)handle.AddrOfPinnedObject(),
                 dataLength,
-                zeroTransparentPixels,
+                processor,
                 out width,
                 out height,
                 out rgba);
@@ -245,7 +245,7 @@ public partial class Texture2D : Texture
             MGI.ReadRGBA(
                 (byte*)handle.AddrOfPinnedObject(),
                 dataLength,
-                true,
+                ProcessorType.ZeroTransparentPixels,
                 out width,
                 out height,
                 out rgba);

@@ -4,6 +4,8 @@
 
 #include "api_MGI.h"
 
+#include <type_traits>
+
 #if defined(_WIN32)
 #define __STDC_LIB_EXT1__
 #endif
@@ -14,8 +16,14 @@
 #define STB_IMAGE_WRITE_IMPLEMENTATION
 #include "stb_image_write.h"
 
+inline constexpr bool operator&(MGProcessorType Lhs, MGProcessorType Rhs)
+{
+    return static_cast<bool>(static_cast<std::underlying_type_t<MGProcessorType>>(Lhs) &
+                                        static_cast<std::underlying_type_t<MGProcessorType>>(Rhs));
+}
 
-void MGI_ReadRGBA(mgbyte* data, mgint dataBytes, mgbool zeroTransparentPixels, mgint& width, mgint& height, mgbyte*& rgba)
+
+void MGI_ReadRGBA(mgbyte* data, mgint dataBytes, MGProcessorType processors, mgint& width, mgint& height, mgbyte*& rgba)
 {
 	width = 0;
 	height = 0;
@@ -31,7 +39,7 @@ void MGI_ReadRGBA(mgbyte* data, mgint dataBytes, mgbool zeroTransparentPixels, m
 	}
 
 	// If the original image before conversion had alpha...
-	if (zeroTransparentPixels && c == 4)
+    if ((processors & MGProcessorType::ZeroTransparentPixels) && c == 4)
 	{
 		// XNA blacks out any pixels with an alpha of zero.
 		for (int i = 0; i < 4 * w * h; i += 4)
