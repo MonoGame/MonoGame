@@ -261,6 +261,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
         internal GraphicsDevice()
 		{
+            Console.WriteLine("test");
             PresentationParameters = new PresentationParameters();
             PresentationParameters.DepthStencilFormat = DepthFormat.Depth24;
             Setup();
@@ -280,6 +281,8 @@ namespace Microsoft.Xna.Framework.Graphics
         /// </exception>
         public GraphicsDevice(GraphicsAdapter adapter, GraphicsProfile graphicsProfile, PresentationParameters presentationParameters)
         {
+            Console.WriteLine("GraphicsDevice ?");
+
             if (adapter == null)
                 throw new ArgumentNullException("adapter");
             if (!adapter.IsProfileSupported(graphicsProfile))
@@ -308,16 +311,18 @@ namespace Microsoft.Xna.Framework.Graphics
         /// </exception>
         public GraphicsDevice(GraphicsAdapter adapter, GraphicsProfile graphicsProfile, bool preferHalfPixelOffset, PresentationParameters presentationParameters)
         {
+            Console.WriteLine("GraphicsDevice B");
+
             if (adapter == null)
                 throw new ArgumentNullException("adapter");
             if (!adapter.IsProfileSupported(graphicsProfile))
                 throw new NoSuitableGraphicsDeviceException(String.Format("Adapter '{0}' does not support the {1} profile.", adapter.Description, graphicsProfile));
             if (presentationParameters == null)
                 throw new ArgumentNullException("presentationParameters");
-#if DIRECTX
-            // TODO we need to figure out how to inject the half pixel offset into DX shaders
-            preferHalfPixelOffset = false;
-#endif
+// #if DIRECTX
+//             // TODO we need to figure out how to inject the half pixel offset into DX shaders
+//             preferHalfPixelOffset = false;
+// #endif
             Adapter = adapter;
             _graphicsProfile = graphicsProfile;
             UseHalfPixelOffset = preferHalfPixelOffset;
@@ -327,6 +332,7 @@ namespace Microsoft.Xna.Framework.Graphics
             GraphicsCapabilities.Initialize(this);
 
             Initialize();
+            Console.WriteLine("end GraphicsDevice ctor");
         }
 
         private void Setup()
@@ -406,13 +412,16 @@ namespace Microsoft.Xna.Framework.Graphics
 
         internal void Initialize()
         {
+            Console.WriteLine("1");
             PlatformInitialize();
+            Console.WriteLine("2");
 
             // Force set the default render states.
             _blendStateDirty = _depthStencilStateDirty = _rasterizerStateDirty = true;
             BlendState = BlendState.Opaque;
             DepthStencilState = DepthStencilState.Default;
             RasterizerState = RasterizerState.CullCounterClockwise;
+            Console.WriteLine("3");
 
             // Clear the texture and sampler collections forcing
             // the state to be reapplied.
@@ -420,6 +429,8 @@ namespace Microsoft.Xna.Framework.Graphics
             VertexSamplerStates.Clear();
             Textures.Clear();
             SamplerStates.Clear();
+
+            Console.WriteLine("4");
 
             // Clear constant buffers
             _vertexConstantBuffers.Clear();
@@ -438,6 +449,8 @@ namespace Microsoft.Xna.Framework.Graphics
 
             // Set the default render target.
             ApplyRenderTargets(null);
+
+            Console.WriteLine("End Initialize");
         }
 
         /// <summary>
@@ -585,6 +598,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
         internal void ApplyState(bool applyShaders)
         {
+            Console.WriteLine("Apply State");
             PlatformBeginApplyState();
 
             PlatformApplyBlend();

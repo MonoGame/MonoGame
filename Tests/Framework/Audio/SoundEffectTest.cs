@@ -43,7 +43,7 @@ namespace MonoGame.Tests.Audio
             Assert.DoesNotThrow(() => SoundEffect.GetSampleDuration(1, 8000, AudioChannels.Mono));
             Assert.DoesNotThrow(() => SoundEffect.GetSampleDuration(2, 8000, AudioChannels.Mono));
             Assert.DoesNotThrow(() => SoundEffect.GetSampleDuration(3, 8000, AudioChannels.Mono));
-            
+
             // Test sampleRate range.
             Assert.Throws<ArgumentOutOfRangeException>(() => SoundEffect.GetSampleDuration(2, -1, AudioChannels.Mono));
             Assert.Throws<ArgumentOutOfRangeException>(() => SoundEffect.GetSampleDuration(2, 0, AudioChannels.Mono));
@@ -457,7 +457,7 @@ namespace MonoGame.Tests.Audio
         // Proxy for the content manager used in SoundEffectFromContent
         class GraphicsDeviceProxy : IGraphicsDeviceService
         {
-            public GraphicsDevice GraphicsDevice
+            public GraphicsDevice _GraphicsDevice
             {
                 get { return null; }
             }

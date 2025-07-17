@@ -25,7 +25,7 @@ public class BuildContext : FrostingContext
     public BuildContext(ICakeContext context) : base(context)
     {
         var repositoryUrl = context.Argument("build-repository", DefaultRepositoryUrl);
-        var buildConfiguration = context.Argument("build-configuration", "Release");
+        var buildConfiguration = context.Argument("build-configuration", "Debug");
         BuildOutput = context.Argument("build-output", "Artifacts");
         NuGetsDirectory = $"{BuildOutput}/NuGet/";
 

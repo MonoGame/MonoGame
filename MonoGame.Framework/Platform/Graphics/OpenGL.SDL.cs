@@ -11,26 +11,27 @@ namespace MonoGame.OpenGL
     {
         static partial void LoadPlatformEntryPoints()
         {
+#if GLES
+            BoundApi = RenderApi.ES;
+#else
             BoundApi = RenderApi.GL;
+#endif
         }
+
 
         private static T LoadFunction<T>(string function, bool throwIfNotFound = false)
         {
-            var ret = Sdl.GL.GetProcAddress(function);
+            nint ret = Sdl.GL.GetProcAddress(function);
 
             if (ret == IntPtr.Zero)
             {
                 if (throwIfNotFound)
                     throw new EntryPointNotFoundException(function);
 
-                return default(T);
+                return default;
             }
 
-#if NETSTANDARD
             return Marshal.GetDelegateForFunctionPointer<T>(ret);
-#else
-            return (T)(object)Marshal.GetDelegateForFunctionPointer(ret, typeof(T));
-#endif
         }
 
         private static IGraphicsContext PlatformCreateContext (IWindowInfo info)
@@ -39,4 +40,3 @@ namespace MonoGame.OpenGL
         }
     }
 }
-

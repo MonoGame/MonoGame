@@ -2,6 +2,7 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
+using System;
 using MonoGame.OpenGL;
 
 namespace Microsoft.Xna.Framework.Graphics
@@ -14,12 +15,14 @@ namespace Microsoft.Xna.Framework.Graphics
             {
                 if (!DepthBufferEnable)
                 {
+                    Console.WriteLine("GL.Disable");
                     GL.Disable(EnableCap.DepthTest);
                     GraphicsExtensions.CheckGLError();
                 }
                 else
                 {
                     // enable Depth Buffer
+                    Console.WriteLine("GL.Enable");
                     GL.Enable(EnableCap.DepthTest);
                     GraphicsExtensions.CheckGLError();
                 }
@@ -28,6 +31,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
             if (force || this.DepthBufferFunction != device._lastDepthStencilState.DepthBufferFunction)
             {
+                Console.WriteLine("GL.DepthFunc");
                 GL.DepthFunc(DepthBufferFunction.GetDepthFunction());
                 GraphicsExtensions.CheckGLError();
                 device._lastDepthStencilState.DepthBufferFunction = this.DepthBufferFunction;
@@ -35,6 +39,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
             if (force || this.DepthBufferWriteEnable != device._lastDepthStencilState.DepthBufferWriteEnable)
             {
+                Console.WriteLine("GL.DepthMask");
                 GL.DepthMask(DepthBufferWriteEnable);
                 GraphicsExtensions.CheckGLError();
                 device._lastDepthStencilState.DepthBufferWriteEnable = this.DepthBufferWriteEnable;
@@ -44,12 +49,14 @@ namespace Microsoft.Xna.Framework.Graphics
             {
                 if (!StencilEnable)
                 {
+                    Console.WriteLine("GL.Disable");
                     GL.Disable(EnableCap.StencilTest);
                     GraphicsExtensions.CheckGLError();
                 }
                 else
                 {
                     // enable Stencil
+                    Console.WriteLine("GL.Enable");
                     GL.Enable(EnableCap.StencilTest);
                     GraphicsExtensions.CheckGLError();
                 }
@@ -70,6 +77,7 @@ namespace Microsoft.Xna.Framework.Graphics
 					this.ReferenceStencil != device._lastDepthStencilState.ReferenceStencil ||
 					this.StencilMask != device._lastDepthStencilState.StencilMask)
 				{
+                    Console.WriteLine("GL.StencilFuncSeparate");
                     GL.StencilFuncSeparate(cullFaceModeFront, GetStencilFunc(this.StencilFunction),
                                            this.ReferenceStencil, this.StencilMask);
                     GraphicsExtensions.CheckGLError();
@@ -84,6 +92,7 @@ namespace Microsoft.Xna.Framework.Graphics
                     this.ReferenceStencil != device._lastDepthStencilState.ReferenceStencil ||
                     this.StencilMask != device._lastDepthStencilState.StencilMask)
 			    {
+                    Console.WriteLine("GL.StencilFuncSeparate");
                     GL.StencilFuncSeparate(cullFaceModeBack, GetStencilFunc(this.CounterClockwiseStencilFunction),
                                            this.ReferenceStencil, this.StencilMask);
                     GraphicsExtensions.CheckGLError();
@@ -92,13 +101,14 @@ namespace Microsoft.Xna.Framework.Graphics
                     device._lastDepthStencilState.StencilMask = this.StencilMask;
                 }
 
-                
+
                 if (force ||
 					this.TwoSidedStencilMode != device._lastDepthStencilState.TwoSidedStencilMode ||
 					this.StencilFail != device._lastDepthStencilState.StencilFail ||
 					this.StencilDepthBufferFail != device._lastDepthStencilState.StencilDepthBufferFail ||
 					this.StencilPass != device._lastDepthStencilState.StencilPass)
                 {
+                    Console.WriteLine("GL.StencilOpSeparate");
                     GL.StencilOpSeparate(stencilFaceFront, GetStencilOp(this.StencilFail),
                                          GetStencilOp(this.StencilDepthBufferFail),
                                          GetStencilOp(this.StencilPass));
@@ -114,6 +124,7 @@ namespace Microsoft.Xna.Framework.Graphics
                     this.CounterClockwiseStencilDepthBufferFail != device._lastDepthStencilState.CounterClockwiseStencilDepthBufferFail ||
                     this.CounterClockwiseStencilPass != device._lastDepthStencilState.CounterClockwiseStencilPass)
 			    {
+                    Console.WriteLine("GL.StencilOpSeparate");
                     GL.StencilOpSeparate(stencilFaceBack, GetStencilOp(this.CounterClockwiseStencilFail),
                                          GetStencilOp(this.CounterClockwiseStencilDepthBufferFail),
                                          GetStencilOp(this.CounterClockwiseStencilPass));
@@ -131,6 +142,7 @@ namespace Microsoft.Xna.Framework.Graphics
 					this.ReferenceStencil != device._lastDepthStencilState.ReferenceStencil ||
 					this.StencilMask != device._lastDepthStencilState.StencilMask)
 				{
+                    Console.WriteLine("GL.StencilFunc");
                     GL.StencilFunc(GetStencilFunc(this.StencilFunction), ReferenceStencil, StencilMask);
                     GraphicsExtensions.CheckGLError();
                     device._lastDepthStencilState.StencilFunction = this.StencilFunction;
@@ -144,6 +156,7 @@ namespace Microsoft.Xna.Framework.Graphics
                     this.StencilDepthBufferFail != device._lastDepthStencilState.StencilDepthBufferFail ||
                     this.StencilPass != device._lastDepthStencilState.StencilPass)
                 {
+                    Console.WriteLine("GL.StencilOp");
                     GL.StencilOp(GetStencilOp(StencilFail),
                                  GetStencilOp(StencilDepthBufferFail),
                                  GetStencilOp(StencilPass));
@@ -158,6 +171,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
             if (force || this.StencilWriteMask != device._lastDepthStencilState.StencilWriteMask)
             {
+                Console.WriteLine("GL.StencilMask");
                 GL.StencilMask(this.StencilWriteMask);
                 GraphicsExtensions.CheckGLError();
                 device._lastDepthStencilState.StencilWriteMask = this.StencilWriteMask;
@@ -168,7 +182,7 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             switch (function)
             {
-                case CompareFunction.Always: 
+                case CompareFunction.Always:
                     return GLStencilFunction.Always;
                 case CompareFunction.Equal:
                     return GLStencilFunction.Equal;
@@ -215,4 +229,3 @@ namespace Microsoft.Xna.Framework.Graphics
         }
     }
 }
-

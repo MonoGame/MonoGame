@@ -16,15 +16,15 @@ using Microsoft.Xna.Framework.Graphics;
 using NUnit.Framework;
 using NUnit.Framework.Constraints;
 
-namespace MonoGame.Tests 
+namespace MonoGame.Tests
 {
-	partial class GameTest 
+	partial class GameTest
     {
-		public static class Properties 
+		public static class Properties
         {
 			[TestFixture]
 			[Category("GameTest")]
-			public class Components : ReadOnlyPropertyFixtureBase<GameComponentCollection> 
+			public class Components : ReadOnlyPropertyFixtureBase<GameComponentCollection>
             {
 				public Components ()
 					: base (g => g.Components)
@@ -95,7 +95,7 @@ namespace MonoGame.Tests
 					var service = new MockGraphicsDeviceService ();
 					Game.Services.AddService (typeof (IGraphicsDeviceService), service);
 
-					Assert.That (Game, HasThisProperty.SameAs (service.GraphicsDevice));
+					Assert.That (Game, HasThisProperty.SameAs (service._GraphicsDevice));
 				}
 
 				[Test]
@@ -116,7 +116,7 @@ namespace MonoGame.Tests
 
 					// TODO: It might be nice to try to use a real, live
 					//       GraphicsDevice here rather than null.
-					public GraphicsDevice GraphicsDevice { get { return null; } }
+					public GraphicsDevice _GraphicsDevice { get { return null; } }
 				}
 			}
 
