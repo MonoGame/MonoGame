@@ -66,7 +66,7 @@ public class BuildContext : FrostingContext
         };
         MSPackSettings.WithProperty(nameof(Version), Version);
         MSPackSettings.WithProperty(nameof(repositoryUrl), repositoryUrl);
-        MSPackSettings.WithProperty("OutputDirectory", NuGetsDirectory.FullPath);
+        MSPackSettings.WithProperty("OutputDirectory", NuGetsDirectory);
         MSPackSettings.WithTarget("Pack");
 
         DotNetPublishSettings = new DotNetPublishSettings
@@ -101,7 +101,7 @@ public class BuildContext : FrostingContext
 
     public string BuildOutput { get; }
 
-    public DirectoryPath NuGetsDirectory { get; }
+    public string NuGetsDirectory { get; }
 
     public DotNetMSBuildSettings DotNetMSBuildSettings { get; }
 
@@ -133,6 +133,16 @@ public class BuildContext : FrostingContext
         _ => throw new ArgumentOutOfRangeException(nameof(type))
     };
 
+    public string GetOutputPath(string path)
+    {
+        if (System.IO.Path.IsPathRooted(path) || path.StartsWith(BuildOutput))
+        {
+            return path;
+        }
+
+        return System.IO.Path.Combine(BuildOutput, path);
+    }
+
     public void Shell(string command, string args)
     {
         if (this.StartProcess(command, new ProcessSettings { WorkingDirectory = ShellWorkingDir, Arguments = args }) != 0)
@@ -156,7 +166,7 @@ public class BuildContext : FrostingContext
         return processOutput.Any(match => match.StartsWith($"{workload} "));
     }
 
-    public static string CalculateVersion(ICakeContext context)
+    private static string CalculateVersion(ICakeContext context)
     {
         var tags = GitAliases.GitTags(context, ".");
         foreach (var tag in tags)
