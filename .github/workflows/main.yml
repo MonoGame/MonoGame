@@ -95,6 +95,8 @@ jobs:
       - name: Build
         run: |
           dotnet run --project build/Build.csproj -- --target=Default
+        env:
+          DOTNET_SYSTEM_NET_SECURITY_NOREVOCATIONCHECKBYDEFAULT: 1
 
       - name: Run Tools Tests
         run: |
