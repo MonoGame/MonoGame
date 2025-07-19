@@ -6,6 +6,14 @@
 
 #include "mg_common.h"
 
+#include "AlphaTestEffect.dx12.mgfxo.h"
+#include "BasicEffect.dx12.mgfxo.h"
+#include "DualTextureEffect.dx12.mgfxo.h"
+#include "EnvironmentMapEffect.dx12.mgfxo.h"
+#include "SkinnedEffect.dx12.mgfxo.h"
+#include "SpriteEffect.dx12.mgfxo.h"
+#include "mg_effect.h"
+
 #include "directx12.h"
 #include "CommandContext.h"
 #include "DeviceResources.h"
@@ -15,7 +23,6 @@
 
 #ifdef _WIN32
 #include <Windows.h>
-#include "directx12.resources.h"
 #endif
 
 #if defined(MG_SDL2)
@@ -172,47 +179,6 @@ struct MGG_GraphicsSystem
 
 	std::vector<MGG_GraphicsAdapter*> adapters;
 };
-
-void MGG_EffectResource_GetBytecode(mgbyte* name, mgbyte*& bytecode, mgint& size)
-{
-	bytecode = nullptr;
-	size = 0;
-
-	// TODO: Move this to use the new MGFXC header generation.
-	// 
-	// Get the handle of this DLL.
-	HMODULE module;
-	::GetModuleHandleExA(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS, (LPCSTR)&MGG_EffectResource_GetBytecode, &module);
-
-	LPCWSTR id = L"";
-
-	if (strcmp((const char*)name, "AlphaTestEffect") == 0)
-		id = MAKEINTRESOURCEW(C_AlphaTestEffect);
-	else if (strcmp((const char*)name, "BasicEffect") == 0)
-		id = MAKEINTRESOURCEW(C_BasicEffect);
-	else if (strcmp((const char*)name, "DualTextureEffect") == 0)
-		id = MAKEINTRESOURCEW(C_DualTextureEffect);
-	else if (strcmp((const char*)name, "EnvironmentMapEffect") == 0)
-		id = MAKEINTRESOURCEW(C_EnvironmentMapEffect);
-	else if (strcmp((const char*)name, "SkinnedEffect") == 0)
-		id = MAKEINTRESOURCEW(C_SkinnedEffect);
-	else if (strcmp((const char*)name, "SpriteEffect") == 0)
-		id = MAKEINTRESOURCEW(C_SpriteEffect);
-
-	auto handle = ::FindResourceW(module, id, L"BIN");
-	if (handle == nullptr)
-		return;
-
-	size = ::SizeofResource(module, handle);
-	if (size == 0)
-		return;
-
-	HGLOBAL global = ::LoadResource(module, handle);
-	if (global == nullptr)
-		return;
-
-	bytecode = (mgbyte*)LockResource(global);
-}
 
 MGG_GraphicsSystem* MGG_GraphicsSystem_Create()
 {
