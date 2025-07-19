@@ -168,7 +168,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
         /// <summary>
         /// Creates an <see cref="ImmutableVertexInputLayout"/> that can be used as a key in the
-        /// <see cref="InputLayoutCache"/>.
+        /// input layout cache.
         /// </summary>
         /// <returns>The <see cref="ImmutableVertexInputLayout"/>.</returns>
         internal ImmutableVertexInputLayout ToImmutable()
