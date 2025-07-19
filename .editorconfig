@@ -40,5 +40,5 @@ dotnet_diagnostic.CA1829.severity = warning
 #use StringBuilder.Append(char) for single character strings.
 dotnet_diagnostic.CA1834.severity = warning
 
-#specificy StringComparison for correctness and performance.
+#Specify StringComparison for correctness and performance.
 dotnet_diagnostic.CA1319.severity = warning
