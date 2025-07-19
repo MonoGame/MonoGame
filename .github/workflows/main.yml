@@ -95,16 +95,18 @@ jobs:
       - name: Build
         run: |
           dotnet run --project build/Build.csproj -- --target=Default
+        env:
+          DOTNET_SYSTEM_NET_SECURITY_NOREVOCATIONCHECKBYDEFAULT: 1 # android compilation is failing randomly due to downloads from microsofts website during it
 
       - name: Run Tools Tests
-        run:   |
-              if [ "$RUNNER_OS" == "Windows" ]; then
-                    dotnet test Tools/MonoGame.Tools.Tests/MonoGame.Tools.Tests.csproj --blame-hang-timeout 5m -c Release
-              elif [ "$RUNNER_OS" == "Linux" ]; then
-                    MGFXC_WINE_PATH=/home/runner/.winemonogame dotnet test Tools/MonoGame.Tools.Tests/MonoGame.Tools.Tests.csproj --blame-hang-timeout 5m -c Release --filter="TestCategory!=Audio"
-              else
-                    MGFXC_WINE_PATH=/Users/runner/.winemonogame dotnet test Tools/MonoGame.Tools.Tests/MonoGame.Tools.Tests.csproj --blame-hang-timeout 5m -c Release --filter="TestCategory!=Audio"
-              fi
+        run: |
+          if [ "$RUNNER_OS" == "Windows" ]; then
+                dotnet test Tools/MonoGame.Tools.Tests/MonoGame.Tools.Tests.csproj --blame-hang-timeout 5m -c Release
+          elif [ "$RUNNER_OS" == "Linux" ]; then
+                MGFXC_WINE_PATH=/home/runner/.winemonogame dotnet test Tools/MonoGame.Tools.Tests/MonoGame.Tools.Tests.csproj --blame-hang-timeout 5m -c Release --filter="TestCategory!=Audio"
+          else
+                MGFXC_WINE_PATH=/Users/runner/.winemonogame dotnet test Tools/MonoGame.Tools.Tests/MonoGame.Tools.Tests.csproj --blame-hang-timeout 5m -c Release --filter="TestCategory!=Audio"
+          fi
         env:
           CI: true
         shell: bash
@@ -157,17 +159,31 @@ jobs:
               artifacts: "nugets/*.nupkg;vsix/MonoGame.Templates.VSExtension.vsix"
               token: ${{ secrets.GITHUB_TOKEN }}
 
+  choose-runner:
+    runs-on: ubuntu-latest
+    outputs:
+      runner: ${{ steps.runner.outputs.runner }}
+
+    steps:
+    - id: runner
+      run: |
+        if [ "${{ github.repository }}" == "MonoGame/MonoGame" ]; then
+          echo "::set-output name=runner::-selfhosted-"    
+        else
+          echo "::set-output name=runner::-"
+        fi
+
   tests:
     name: tests-${{ matrix.os }}
-    needs: [ build ]
+    needs: [ build, choose-runner ]
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
         include:
-          - os: windows
+          - os: windows${{ needs.choose-runner.outputs.runner }}latest
             platform: windows
             shell: cmd
-          - os: macos
+          - os: macos${{ needs.choose-runner.outputs.runner }}15
             platform: macos
             shell: bash
           - os: ubuntu-24.04
@@ -193,7 +209,7 @@ jobs:
           dotnet-version: '8.0.x'
 
       - name: install wine64 on linux
-        if: runner.os == 'Linux' && runner.environment == 'github-hosted'
+        if: runner.environment == 'github-hosted' && runner.os == 'Linux'
         run: |
           sudo apt install p7zip-full curl
           sudo dpkg --add-architecture i386 
@@ -201,6 +217,16 @@ jobs:
           sudo wget -O /etc/apt/keyrings/winehq-archive.key https://dl.winehq.org/wine-builds/winehq.key
           sudo wget -NP /etc/apt/sources.list.d/ https://dl.winehq.org/wine-builds/ubuntu/dists/noble/winehq-noble.sources
           sudo apt update && sudo apt install --install-recommends winehq-stable
+          wget -qO- https://monogame.net/downloads/net9_mgfxc_wine_setup.sh | bash
+
+      - name: install wine64 on MacOS
+        if: runner.environment == 'github-hosted' && runner.os == 'macos'
+        run: |
+          brew install wine-stable p7zip
+          sudo mkdir -p /usr/local/lib
+          ls -n /Applications/ | grep Xcode*
+          sudo xcode-select -s /Applications/Xcode_16.2.app/Contents/Developer
+          wget -qO- https://monogame.net/downloads/net9_mgfxc_wine_setup.sh | bash
 
       - name: Install Arial Font
         if: runner.os == 'Linux' && runner.environment == 'github-hosted'
@@ -209,10 +235,6 @@ jobs:
           sudo apt install -y ttf-mscorefonts-installer
           sudo fc-cache
           fc-match Arial
-
-      - name: Setup Wine 
-        if: runner.os != 'Windows' && runner.environment == 'github-hosted'
-        run: wget -qO- https://monogame.net/downloads/net9_mgfxc_wine_setup.sh | bash
 
       - name: Download Nuget
         uses: actions/download-artifact@v4
@@ -226,7 +248,7 @@ jobs:
           path: tests-desktopgl
           
       - name: Download tests-windowsdx-${{ matrix.platform }}
-        if: runner.os == 'Windows'
+        if: runner.os == 'Windows' && runner.environment != 'github-hosted'
         uses: actions/download-artifact@v4
         with:
           name: tests-windowsdx-${{ matrix.platform }}
@@ -235,14 +257,14 @@ jobs:
       # Run the DirectX tests in two steps: first the audio, then the rest.
       # This is because the audio tests has some incompatibilities within the runner with ContentManagerTests.
       - name: Run DirectX Audio Tests
-        if: runner.os == 'Windows'
+        if: runner.os == 'Windows' && runner.environment != 'github-hosted'
         run: dotnet test --filter Category=Audio MonoGame.Tests.dll 
         env:
           CI: true
         working-directory: tests-windowsdx
         
       - name: Run DirectX All Tests Except Audio
-        if: runner.os == 'Windows'
+        if: runner.os == 'Windows' && runner.environment != 'github-hosted'
         run: dotnet test --filter Category!=Audio MonoGame.Tests.dll 
         env:
           CI: true
@@ -251,6 +273,7 @@ jobs:
       # Run the DesktopGL tests on all platforms using NUnitLite runner not dotnet test
       # We have to run this is bits because the tests crash if too many are run in one go?
       - name: Run Framework Tests
+        if: runner.environment != 'github-hosted' || runner.os != 'Windows' 
         run: dotnet MonoGame.Tests.dll --timeout=300000 --test MonoGame.Tests.Framework ${{matrix.filter}}
         env:
           CI: true
@@ -276,6 +299,7 @@ jobs:
         working-directory: tests-desktopgl
 
       - name: Run Game Tests
+        if: runner.environment != 'github-hosted' || runner.os == 'Linux' 
         run: dotnet MonoGame.Tests.dll --timeout=300000 --where="Category = GameTest"
         env:
           CI: true

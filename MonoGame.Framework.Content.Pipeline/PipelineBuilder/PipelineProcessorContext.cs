@@ -156,6 +156,10 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
                                                                                 string importerName,
                                                                                 string assetName)
         {
+            // Be sure we have a good absolute path to the source content
+            // or it may not cache correctly and create duplicates.
+            sourceAsset.Filename = _manager.ResolveSourceFilePath(sourceAsset.Filename);
+
             if (string.IsNullOrEmpty(assetName))
                 assetName = _manager.GetAssetName(sourceAsset.Filename, importerName, processorName, processorParameters);
 

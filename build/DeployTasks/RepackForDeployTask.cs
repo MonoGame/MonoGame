@@ -19,6 +19,5 @@ public sealed class RepackForDeployTask : FrostingTask<BuildContext>
         context.DotNetPack(context.GetProjectPath(ProjectType.Tools, "MonoGame.Content.Builder"), context.DotNetPackSettings);
 
         context.DotNetPackSettings.MSBuildSettings.Properties.Remove("DisableNativeBuild");
-        context.CopyDirectory(new DirectoryPath(context.NuGetsDirectory.FullPath), "nugets");
     }
 }

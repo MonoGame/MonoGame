@@ -22,7 +22,7 @@ public sealed class DeployNuGetsToNuGetOrgTask : FrostingTask<BuildContext>
 
     public override void Run(BuildContext context)
     {
-        context.DotNetNuGetPush($"nugets/*.nupkg", new()
+        context.DotNetNuGetPush($"{context.NuGetsDirectory}*.nupkg", new()
         {
             ApiKey = context.EnvironmentVariable("NUGET_API_KEY"),
             Source = $"https://api.nuget.org/v3/index.json"
