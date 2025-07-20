@@ -12,7 +12,7 @@ using Microsoft.Xna.Framework.Graphics;
 using System.Collections.Generic;
 
 // Disable lack of namespace warning for the types used for unit tests.
-#pragma warning disable CA0105
+#pragma warning disable CA1050
 
 #region The Basics
 
@@ -650,3 +650,5 @@ namespace MonoGame.Tests.SomethingElse.ContentPipeline
         public bool Value;
     }
 }
+
+#pragma warning restore CA1050
