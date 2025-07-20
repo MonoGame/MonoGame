@@ -7,12 +7,7 @@ using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 
-
-// Because of the way TypeConverters are used - sometimes simply by dynamically requesting the TypeConverter
-// of an object type, rather than instantiating the convert itself - we cannot use DynamicallyAccessedMembersAttribute here,
-// as the compiler would simply ignore it. The programmer must ensure that the type's interfaces and public parameterless constructor are preserved.
 #pragma warning disable IL2067
-
 
 namespace Microsoft.Xna.Framework.Design
 {
