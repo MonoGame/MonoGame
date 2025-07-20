@@ -5,6 +5,7 @@
 using Microsoft.Xna.Framework.Graphics.PackedVector;
 using System;
 using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 
  
@@ -21,6 +22,7 @@ namespace Microsoft.Xna.Framework.Design
     /// of an object type, rather than instantiating the convert itself - we cannot use DynamicallyAccessedMembersAttribute here,
     /// as the compiler would simply ignore it. The programmer must ensure that the type's interfaces and public parameterless constructor are preserved.
     /// </remarks>
+    [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.All)]
     public sealed class Byte4TypeConverter : TypeConverter
     {
         /// <inheritdoc />
