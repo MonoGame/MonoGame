@@ -5,6 +5,8 @@
 using System;
 using System.ComponentModel;
 using System.Globalization;
+ 
+#pragma warning disable IL2067
 
 namespace Microsoft.Xna.Framework.Design
 {
@@ -12,7 +14,12 @@ namespace Microsoft.Xna.Framework.Design
     /// Provides a unified way of converting <see cref="Vector4"/> values to other types, as well as for accessing
     /// standard values and subproperties.
     /// </summary>    
-    public class Vector4TypeConverter : TypeConverter
+    /// <remarks>
+    /// Because of the way TypeConverters are used - sometimes simply by dynamically requesting the TypeConverter
+    /// of an object type, rather than instantiating the convert itself - we cannot use DynamicallyAccessedMembersAttribute here,
+    /// as the compiler would simply ignore it. The programmer must ensure that the type's interfaces and public parameterless constructor are preserved.
+    /// </remarks>
+    public sealed class Vector4TypeConverter : TypeConverter
     {
         /// <inheritdoc /> 
         public override bool CanConvertTo(ITypeDescriptorContext context, Type destinationType)
@@ -81,3 +88,5 @@ namespace Microsoft.Xna.Framework.Design
         }
     }
 }
+
+#pragma warning restore IL2067

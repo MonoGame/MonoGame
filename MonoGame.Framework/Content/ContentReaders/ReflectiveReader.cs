@@ -17,7 +17,7 @@ namespace Microsoft.Xna.Framework.Content
     /// If ContentManager.Load() throws an NotSupportedExeception, the message should provide insights on how to fix it.
     /// </summary>
     [System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.All)]
-    public class ReflectiveReader<T> : ContentTypeReader
+    public class ReflectiveReader<[System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicParameterlessConstructor)] T> : ContentTypeReader
     {
         delegate void ReadElement(ContentReader input, object parent);
 
@@ -48,10 +48,14 @@ namespace Microsoft.Xna.Framework.Content
             if (baseType != null && baseType != typeof(object))
 				_baseTypeReader = manager.GetTypeReader(baseType);
 
+            // Reader types cannot be dynamically ensured to have their required items not be trimmed;
+            // The programmer must ensure that the type is preserved.
+            #pragma warning disable IL2072
             _constructor = TargetType.GetDefaultConstructor();
 
             var properties = TargetType.GetAllProperties();
             var fields = TargetType.GetAllFields();
+            #pragma warning restore IL2072
             _readers = new List<ReadElement>(fields.Length + properties.Length);
 
             // Gather the properties.

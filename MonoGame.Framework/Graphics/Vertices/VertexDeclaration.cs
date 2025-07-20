@@ -5,6 +5,7 @@
 using System;
 using System.Collections.Generic;
 using MonoGame.Framework.Utilities;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
@@ -201,7 +202,7 @@ namespace Microsoft.Xna.Framework.Graphics
         /// Prefer to use VertexDeclarationCache when the declaration lookup
         /// can be performed with a templated type.
         /// </remarks>
-		internal static VertexDeclaration FromType(Type vertexType)
+		internal static VertexDeclaration FromType([DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicParameterlessConstructor)] Type vertexType)
 		{
 			if (vertexType == null)
 				throw new ArgumentNullException("vertexType", "Cannot be null");
