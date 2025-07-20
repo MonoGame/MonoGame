@@ -15,13 +15,13 @@ public sealed class BuildContentPipelineTask : FrostingTask<BuildContext>
         switch (context.Environment.Platform.Family)
         {
             case PlatformFamily.Windows:
-                StaticLibCheck.CheckWindows(context, context.GetOutputPath("native/mgpipeline/windows/Release/mgpipeline.dll"));
+                context.CheckLib("native/mgpipeline/windows/Release/mgpipeline.dll");
                 break;
             case PlatformFamily.Linux:
-                StaticLibCheck.CheckLinux(context, context.GetOutputPath("native/mgpipeline/linux/Release/mgpipeline.so"));
+                context.CheckLib("native/mgpipeline/linux/Release/libmgpipeline.so");
                 break;
             case PlatformFamily.OSX:
-                StaticLibCheck.CheckMacOS(context, context.GetOutputPath("native/mgpipeline/macosx/Release/mgpipeline.dylib"));
+                context.CheckLib("native/mgpipeline/macosx/Release/libmgpipeline.dylib");
                 break;
             default:
                 throw new NotSupportedException($"Platform {context.Environment.Platform.Family} is not supported for static library checks.");

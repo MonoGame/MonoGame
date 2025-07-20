@@ -166,6 +166,34 @@ public class BuildContext : FrostingContext
         return processOutput.Any(match => match.StartsWith($"{workload} "));
     }
 
+    public void CheckLib(string relativePath)
+    {
+        var filePath = GetOutputPath(relativePath);
+        this.Information($"Checking library: {filePath}");
+
+        if (!File.Exists(filePath))
+        {
+            throw new FileNotFoundException(filePath);
+        }
+
+        switch (Environment.Platform.Family)
+        {
+            case PlatformFamily.Windows:
+                StaticLibCheck.CheckWindows(this, filePath);
+                break;
+            case PlatformFamily.Linux:
+                StaticLibCheck.CheckLinux(this, filePath);
+                break;
+            case PlatformFamily.OSX:
+                StaticLibCheck.CheckMacOS(this, filePath);
+                break;
+            default:
+                throw new NotSupportedException($"Platform {Environment.Platform.Family} is not supported for static library checks.");
+        }
+
+        this.Information("");
+    }
+
     private static string CalculateVersion(ICakeContext context)
     {
         var tags = GitAliases.GitTags(context, ".");
