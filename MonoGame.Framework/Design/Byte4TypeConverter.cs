@@ -17,11 +17,6 @@ namespace Microsoft.Xna.Framework.Design
     /// Provides a unified way of converting <see cref="Byte4"/> value to other types, as well as for accessing
     /// standard values and subproperties.
     /// </summary>
-    /// <remarks>
-    /// Because of the way TypeConverters are used - sometimes simply by dynamically requesting the TypeConverter
-    /// of an object type, rather than instantiating the convert itself - we cannot use DynamicallyAccessedMembersAttribute here,
-    /// as the compiler would simply ignore it. The programmer must ensure that the type's interfaces and public parameterless constructor are preserved.
-    /// </remarks>
     [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.All)]
     public sealed class Byte4TypeConverter : TypeConverter
     {
