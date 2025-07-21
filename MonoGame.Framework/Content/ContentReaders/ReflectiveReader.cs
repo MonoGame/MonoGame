@@ -57,8 +57,7 @@ namespace Microsoft.Xna.Framework.Content
             if (baseType != null && baseType != typeof(object))
 				_baseTypeReader = manager.GetTypeReader(baseType);
 
-            // Reader types cannot be dynamically ensured to have their required items not be trimmed;
-            // The programmer must ensure that the type is preserved.
+            // TargetType is the typeof(T) of the generic type parameter of this class.
             #pragma warning disable IL2072
             _constructor = TargetType.GetDefaultConstructor();
 
