@@ -8,16 +8,25 @@ using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using MonoGame.Framework.Utilities;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Microsoft.Xna.Framework.Content
 {
     /// <summary>
     /// This type is not meant to be used directly by MonoGame users.
-    /// Its purpose is to allow to work-around AOT issues when loading assets with the ContentManager fail due to the absence of runtime-reflection support in that context (i.e. missing types due to trimming and inability to statically discover them at compile-time).
-    /// If ContentManager.Load() throws an NotSupportedExeception, the message should provide insights on how to fix it.
+    /// Its purpose is to allow to work-around AOT issues when loading assets with the <see cref="ContentManager"/> fail due to the absence of runtime-reflection support in that context (i.e. missing types due to trimming and inability to statically discover them at compile-time).
+    /// If <see cref="ContentManager.Load{T}"/> throws an <see cref="NotSupportedException"/>, the message should provide insights on how to fix it.
     /// </summary>
-    [System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.All)]
-    public class ReflectiveReader<[System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicParameterlessConstructor)] T> : ContentTypeReader
+    [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.All)]
+    public class ReflectiveReader<
+        [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicParameterlessConstructor
+                                    | DynamicallyAccessedMemberTypes.NonPublicConstructors
+                                    | DynamicallyAccessedMemberTypes.PublicConstructors
+                                    | DynamicallyAccessedMemberTypes.NonPublicFields
+                                    | DynamicallyAccessedMemberTypes.PublicFields
+                                    | DynamicallyAccessedMemberTypes.NonPublicProperties
+                                    | DynamicallyAccessedMemberTypes.PublicProperties)] T
+    > : ContentTypeReader
     {
         delegate void ReadElement(ContentReader input, object parent);
 
