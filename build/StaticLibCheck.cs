@@ -50,7 +50,6 @@ public static class StaticLibCheck
         var vswhere = new VSWhereLatest(context.FileSystem, context.Environment, context.ProcessRunner, context.Tools);
         var devcmdPath = vswhere.Latest(new VSWhereLatestSettings()).FullPath + @"\Common7\Tools\vsdevcmd.bat";
 
-        context.Information($"Checking: {filePath}");
         context.StartProcess(
             devcmdPath,
             new ProcessSettings()
@@ -87,8 +86,6 @@ public static class StaticLibCheck
 
     public static void CheckMacOS(BuildContext context, string filePath)
     {
-        context.Information($"Checking Universal Binary: {filePath}");
-
         context.StartProcess(
             "lipo",
             new ProcessSettings { Arguments = $"-archs {filePath}", RedirectStandardOutput = true },
@@ -143,13 +140,10 @@ public static class StaticLibCheck
                 throw new Exception($"Invalid library linkage detected in arch '{arch}' for {filePath}!");
             }
         }
-
-        context.Information("");
     }
 
     public static void CheckLinux(BuildContext context, string filePath)
     {
-        context.Information($"Checking: {filePath}");
         context.StartProcess(
             "ldd",
             new ProcessSettings
@@ -189,7 +183,5 @@ public static class StaticLibCheck
         {
             throw new Exception("Invalid library linkage detected!");
         }
-
-        context.Information("");
     }
 }
