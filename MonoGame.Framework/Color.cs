@@ -1969,6 +1969,8 @@ namespace Microsoft.Xna.Framework
         /// </summary>
         /// <param name="h">Hue component value from 0.0f to 360.0f</param>
         /// <param name="s">Saturation component</param>
+        /// <param name="max">Returns the highest value of the <see cref="R"/>, <see cref="G"/> and <see cref="B"/> values</param>
+        /// <param name="min">Returns the lowest value of the <see cref="R"/>, <see cref="G"/> and <see cref="B"/> values</param>
         private void ToHS(out float h, out float s, out double max, out double min)
         {
             double r = R / 255f;
