@@ -4,6 +4,9 @@ using System.Diagnostics;
 
 namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 {
+    /// <summary>
+    /// Class to provide helper methods for processing mesh data.
+    /// </summary>
     public static class MeshHelper
     {
         static bool IsFinite(float v)
@@ -177,6 +180,15 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
                 channels.Add(binormalChannelName, bitangents);
         }
 
+        /// <summary>
+        /// Calculates the tangent and bitangent vectors for a mesh.
+        /// </summary>
+        /// <param name="positions">The list of vertex positions.</param>
+        /// <param name="indices">The list of indices that define the triangles in the mesh.</param>
+        /// <param name="normals">The list of vertex normals.</param>
+        /// <param name="textureCoords">The list of texture coordinates.</param>
+        /// <param name="tangents">The output list of tangent vectors.</param>
+        /// <param name="bitangents">The output list of bitangent vectors.</param>
         public static void CalculateTangentFrames(IList<Vector3> positions,
                                                   IList<int> indices,
                                                   IList<Vector3> normals,
@@ -509,6 +521,13 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
                 MergeDuplicateVertices(geom);
         }
 
+        /// <summary>
+        /// Optimizes the mesh for caching.
+        /// </summary>
+        /// <remarks>
+        /// This method is not currently implemented.
+        /// </remarks>
+        /// <param name="mesh">Mesh data to optimize.</param>
         public static void OptimizeForCache(MeshContent mesh)
         {
             // We don't throw here as non-optimized still works.

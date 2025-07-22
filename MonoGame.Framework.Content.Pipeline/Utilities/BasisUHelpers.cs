@@ -7,6 +7,7 @@ using System.IO;
 using Microsoft.Xna.Framework.Content.Pipeline.Graphics;
 using Microsoft.Xna.Framework.Graphics;
 using MonoGame.Framework.Content;
+using MonoGame.Tool;
 
 namespace Microsoft.Xna.Framework.Content.Pipeline.Utilities;
 
@@ -65,7 +66,7 @@ internal struct BasisUFormat
 
 
     /// <summary>
-    /// <see cref="SurfaceFormat.ASTC_4x4"/>
+    /// <see cref="SurfaceFormat.Astc4X4Rgba"/>
     /// // Opaque+alpha, ASTC 4x4, alpha channel will be opaque for opaque .basis files. Transcoder uses RGB/RGBA/L/LA modes, void extent, and up to two ([0,47] and [0,255]) endpoint precisions.
     /// </summary>
     public static readonly BasisUFormat Astc_4x4_Rgba = new BasisUFormat(
@@ -206,14 +207,14 @@ internal static class BasisU
     /// <returns>The exit code for the basisu process. </returns>
     public static int Run(string args, out string stdOut, out string stdErr, string stdIn=null, string workingDirectory=null)
     {
-        return ExternalTool.RunDotnetTool("mgcb-basisu", args, out stdOut, out stdErr, stdIn, workingDirectory);
+        return Basisu.Run(args, out stdOut, out stdErr, stdIn, workingDirectory);
     }
 
     /// <summary>
     /// <para>
     ///     Convert a <see cref="SurfaceFormat"/> into a <see cref="BasisUFormat"/>.
     ///     Not all surface formats are supported. If the given format is not supported,
-    ///     then this method returns false, and the <see cref="error"/> out param will
+    ///     then this method returns false, and the <paramref name="error"/> out param will
     ///     include an explanation of why the format isn't supported.
     /// </para>
     /// <para>
@@ -221,12 +222,12 @@ internal static class BasisU
     ///     https://github.com/BinomialLLC/basis_universal/blob/master/transcoder/basisu_transcoder.h#L49
     /// </para>
     /// </summary>
-    /// <param name="format"></param>
-    /// <param name="basisUFormat"></param>
-    /// <param name="error"></param>
+    /// <param name="format">The format to retrieve the basis u format for.</param>
+    /// <param name="basisUFormat">The retrieved basis u format</param>
+    /// <param name="error">Error message (only relevant if the method returns <see langword="true" />).</param>
     /// <returns>
     ///     True if the <see cref="BasisUFormat"/> out param has been set.
-    ///     False otherwise, and the <see cref="error"/> out param will include an error message.
+    ///     False otherwise, and the <paramref name="error"/> out param will include an error message.
     /// </returns>
     public static bool TryGetBasisUFormat(SurfaceFormat format, out BasisUFormat basisUFormat, out string error)
     {
@@ -430,7 +431,7 @@ internal static class BasisU
         //  basisu -unpack foo.ktx2 -ktx_only -linear -format_only 2
         var linearFlag = basisUFormat.isLinearColorSpace ? "-linear" : "";
         // var linearFlag = "";
-        var argStr = $"-unpack -file {basisFileName} -ktx_only -format_only {basisUFormat.code} {linearFlag}";
+        var argStr = $"-unpack -file \"{basisFileName}\" -ktx_only -format_only {basisUFormat.code} {linearFlag}";
         var exitCode = Run(
             args: argStr,
             stdOut: out var stdOut,
@@ -457,7 +458,7 @@ internal static class BasisU
 
         // move backwards through the lines because the output we are looking for
         //  should be at the end of the output
-        const string logPrefix = "Wrote KTX file \"";
+        const string logPrefix = "Wrote .KTX file \"";
         const string logSuffix = "\"";
         for (var i = lines.Length - 1; i >= 0; i--)
         {
@@ -489,7 +490,7 @@ internal static class BasisU
     {
         var absImageFileName = Path.GetFullPath(imageFileName);
         var uastcFlag = format.nonUastcCompatible ? "": "-uastc";
-        var argStr = $"-file {absImageFileName} {uastcFlag} -ktx2 -output_file {intermediateFileName}";
+        var argStr = $"-file \"{absImageFileName}\" {uastcFlag} -ktx2 -output_file \"{intermediateFileName}\"";
         var exitCode = Run(
             args: argStr,
             stdOut: out var stdOut,

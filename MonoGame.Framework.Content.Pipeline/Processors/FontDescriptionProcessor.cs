@@ -5,15 +5,11 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Globalization;
 using System.IO;
 using System.Linq;
 using Microsoft.Win32;
 using Microsoft.Xna.Framework.Content.Pipeline.Graphics;
 using MonoGame.Framework.Utilities;
-using RoyT.TrueType;
-using RoyT.TrueType.Helpers;
-using RoyT.TrueType.Tables.Name;
 using Glyph = Microsoft.Xna.Framework.Content.Pipeline.Graphics.Glyph;
 
 namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
@@ -68,7 +64,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
             }
 
             if (!File.Exists(fontFile))
-                throw new FileNotFoundException("Could not find \"" + input.FontName + "\" font file.");
+                throw new FileNotFoundException("Could not find \"" + input.FontName + "\" font file at \"" + fontFile + "\".");
 
             context.Logger.LogMessage("Building Font {0}", fontFile);
 
@@ -81,7 +77,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
                     throw new Exception(string.Format("Could not load {0}", fontFile));
                 }
                 var lineSpacing = 0f;
-                int yOffsetMin = 0;
+                long yOffsetMin = 0;
                 var glyphs = ImportFont(input, out lineSpacing, out yOffsetMin, context, fontFile);
 
                 var glyphData = new HashSet<GlyphData>(glyphs.Select(x => x.Data));
@@ -174,7 +170,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
             return output;
         }
 
-        private static Glyph[] ImportFont(FontDescription options, out float lineSpacing, out int yOffsetMin, ContentProcessorContext context, string fontName)
+        private static Glyph[] ImportFont(FontDescription options, out float lineSpacing, out long yOffsetMin, ContentProcessorContext context, string fontName)
         {
             // Which importer knows how to read this source font?
             IFontImporter importer;
@@ -264,7 +260,6 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
                         }
                     }
                 }
-#pragma warning restore CA1416 // Validate platform compatibility
             }
             else if (CurrentPlatform.OS == OS.Linux)
             {
@@ -301,9 +296,10 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
             return String.Empty;
         }
 
-        private static bool MatchFont(string fontPath, string fontName, string fontStyle)
-        {
-            try
+         private static bool MatchFont(string fontPath, string fontName, string fontStyle)
+         {
+            // TODO: Implement this with FreeType lib
+            /*try
             {
                 var font = fontPath.EndsWith(".ttc", StringComparison.OrdinalIgnoreCase)
                     ? TrueTypeFont.FromCollectionFile(fontPath)[0]
@@ -318,7 +314,9 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
             {
                 // Let's not crash when a font cannot be parsed
                 return false;
-            }
-        }
+            }*/
+
+            return true;
+         }
     }
 }

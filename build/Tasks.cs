@@ -9,11 +9,13 @@ namespace BuildScripts;
 [IsDependentOn(typeof(BuildAndroidTask))]
 [IsDependentOn(typeof(BuildiOSTask))]
 [IsDependentOn(typeof(BuildContentPipelineTask))]
+[IsDependentOn(typeof(BuildConsoleCheckTask))]
 public sealed class BuildFrameworksTask : FrostingTask<BuildContext> { }
 
 [TaskName("Build Tools")]
 [IsDependentOn(typeof(BuildMGFXCTask))]
 [IsDependentOn(typeof(BuildContentPipelineTask))]
+[IsDependentOn(typeof(BuildDevToolsTask))]
 [IsDependentOn(typeof(BuildMGCBTask))]
 [IsDependentOn(typeof(BuildMGCBEditorTask))]
 public sealed class BuildToolsTask : FrostingTask<BuildContext> { }

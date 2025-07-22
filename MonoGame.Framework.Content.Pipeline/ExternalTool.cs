@@ -5,6 +5,8 @@
 using System;
 using System.Diagnostics;
 using System.IO;
+using System.Net;
+using System.Reflection;
 using System.Threading;
 using MonoGame.Framework.Utilities;
 
@@ -27,13 +29,31 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
             return result;
         }
 
+        static void RestoreDotnetTool(string command, string toolName, string toolVersion, string path)
+        {
+            Directory.CreateDirectory(path);
+            var exe = CurrentPlatform.OS == OS.Windows ? "dotnet.exe" : "dotnet";
+            var dotnetRoot = Environment.GetEnvironmentVariable("DOTNET_ROOT");
+            if (!string.IsNullOrEmpty(dotnetRoot))
+            {
+                exe = Path.Combine(dotnetRoot, exe);
+            }
+            if (Run(exe, $"tool {command} {toolName} --version {toolVersion} --tool-path .", out string stdout, out string stderr,  workingDirectory: path) != 0)
+            {
+                // install the latest
+                Debug.WriteLine ($"{command} returned {stdout} {stderr}. Trying backup path.");
+                Run(exe, $"tool {command} {toolName} --tool-path .", out stdout, out stderr,  workingDirectory: path);
+            }
+        }
+
         /// <summary>
         /// Run a dotnet tool. The tool should be installed in a .config/dotnet-tools.json file somewhere in the project lineage.
         /// </summary>
         public static int RunDotnetTool(string toolName, string args, out string stdOut, out string stdErr, string stdIn=null, string workingDirectory=null)
         {
-            var finalizedArgs = toolName + " " + args;
-            return ExternalTool.Run("dotnet", finalizedArgs, out stdOut, out stdErr, stdIn, workingDirectory);
+            var exe = FindCommand(toolName);
+            var finalizedArgs =  args;
+            return ExternalTool.Run(exe, finalizedArgs, out stdOut, out stdErr, stdIn, workingDirectory);
         }
 
         public static int Run(string command, string arguments, out string stdout, out string stderr, string stdin = null, string workingDirectory=null)
@@ -67,6 +87,12 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
 
             if (!string.IsNullOrEmpty(workingDirectory))
                 processInfo.WorkingDirectory = workingDirectory;
+
+            var dotnetRoot = Environment.GetEnvironmentVariable("DOTNET_ROOT");
+            if (!string.IsNullOrEmpty(dotnetRoot))
+            {
+                processInfo.EnvironmentVariables["DOTNET_ROOT"] = dotnetRoot;
+            }
 
             EnsureExecutable(fullPath);
 

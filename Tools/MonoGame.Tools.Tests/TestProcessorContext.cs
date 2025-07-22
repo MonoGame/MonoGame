@@ -49,6 +49,11 @@ namespace MonoGame.Tests.ContentPipeline
             get { throw new NotImplementedException(); }
         }
 
+        public override string ProjectDirectory
+        {
+            get { throw new NotImplementedException(); }
+        }
+
 #if !XNA
         public override ContentIdentity SourceIdentity
         {
@@ -79,7 +84,17 @@ namespace MonoGame.Tests.ContentPipeline
             return default(TOutput);
         }
 
+        public override TOutput BuildAndLoadAsset<TInput, TOutput>(ExternalReference<TInput> sourceAsset, IContentImporter importer, IContentProcessor processor)
+        {
+            return default(TOutput);
+        }
+
         public override ExternalReference<TOutput> BuildAsset<TInput, TOutput>(ExternalReference<TInput> sourceAsset, string processorName, OpaqueDataDictionary processorParameters, string importerName, string assetName)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override ExternalReference<TOutput> BuildAsset<TInput, TOutput>(ExternalReference<TInput> sourceAsset, IContentImporter importer, IContentProcessor processor, string assetName = null)
         {
             throw new NotImplementedException();
         }
@@ -103,6 +118,22 @@ namespace MonoGame.Tests.ContentPipeline
                     property.SetValue(processor, kvp.Value);
                 }
                 return processor.Process(input, this);
+            }
+
+            throw new NotImplementedException();
+        }
+
+        public override TOutput Convert<TInput, TOutput>(TInput input, IContentProcessor processor)
+        {
+            // MaterialProcessor essentially transforms its
+            // input and returns it... not a copy.  So this
+            // seems like a reasonable shortcut for testing.
+            if (typeof(TOutput) == typeof(MaterialContent) && typeof(TInput).IsAssignableFrom(typeof(MaterialContent)))
+                return (TOutput)((object)input);
+
+            if (processor != null)
+            {
+                return (TOutput)processor.Process(input, this);
             }
 
             throw new NotImplementedException();

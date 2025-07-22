@@ -5,6 +5,7 @@
 using System;
 using Microsoft.Xna.Framework.Content.Pipeline.Graphics;
 using MonoGame.Framework.Content;
+using MonoGame.Tool;
 
 namespace Microsoft.Xna.Framework.Content.Pipeline.Utilities
 {
@@ -125,23 +126,10 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Utilities
     /// This is marked as internal because it is not part of the original XNA api.
     /// </para>
     /// </summary>
-    internal static class Crunch
+    internal static class CrunchHelpers
     {
         /// <summary>
-        /// A lightweight wrapper to invoke the Crunch tool (called 'crunch').
-        /// https://github.com/MonoGame/MonoGame.Tool.Crunch
-        /// </summary>
-        /// <param name="args">The args to pass to crunch. These args are passed directly to the tool with no processing. </param>
-        /// <param name="stdOut">The standard output buffer from the crunch process</param>
-        /// <param name="stdErr">The standard error buffer from the crunch process</param>
-        /// <returns>The exit code for the basisu process. </returns>
-        private static int Run(string args, out string stdOut, out string stdErr)
-        {
-            return ExternalTool.RunDotnetTool("mgcb-crunch", args, out stdOut, out stdErr);
-        }
-
-        /// <summary>
-        /// This method will use Crunch to compress the <see cref="sourceBitmap"/> into the
+        /// This method will use Crunch to compress the <paramref name="sourceBitmap"/> into the
         /// desired <see cref="CrunchFormat"/>.
         ///
         /// <para>
@@ -233,11 +221,11 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Utilities
         )
         {
             errorMessage = null;
-            var argStr = $"-file {pngFileName} -{format.formatString} -out {intermediateFileName} -fileformat ktx -forceprimaryencoding -noNormalDetection";
-            var exitCode = Run(
-                args: argStr,
-                stdOut: out var stdOut,
-                stdErr: out var stdErr
+            var argStr = $"-file \"{pngFileName}\" -{format.formatString} -out \"{intermediateFileName}\" -fileformat ktx -forceprimaryencoding -noNormalDetection";
+            var exitCode = Crunch.Run(
+                argStr,
+                out var stdOut,
+                out var stdErr
             );
 
             var wasSuccess = exitCode == 0;

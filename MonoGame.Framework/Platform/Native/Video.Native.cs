@@ -94,7 +94,9 @@ public sealed partial class Video : IDisposable
                 var count = MGA.Voice_GetBufferCount(_voice);
                 if (count < 3)
                 {
-                    MGM.AudioDecoder_Decode(_decoderA, out var buffer, out var size);
+                    byte* buffer;
+                    uint size;
+                    MGM.AudioDecoder_Decode(_decoderA, out buffer, out size);
 
                     if (size > 0)
                         MGA.Voice_AppendBuffer(_voice, buffer, size);
@@ -104,7 +106,7 @@ public sealed partial class Video : IDisposable
 
                 if (play_voice)
                 {
-                    MGA.Voice_Play(_voice, false);
+                    MGA.Voice_Play(_voice, 0);
                     play_voice = false;
                 }
             }
@@ -167,7 +169,10 @@ public sealed partial class Video : IDisposable
         // that doesn't assume Game exists.
         var device = Game.Instance.GraphicsDevice;
 
-        _decoderV = MGM.VideoDecoder_Create(device.Handle, absolutePath, out _infoV);
+        byte* _absolutePath = stackalloc byte[StringInterop.GetMaxSize(absolutePath)];
+        StringInterop.CopyString(_absolutePath, absolutePath);
+        _decoderV = MGM.VideoDecoder_Create(device.Handle, _absolutePath, out _infoV);
+
         if (_decoderV == null)
             return;
 
@@ -244,7 +249,7 @@ public sealed partial class Video : IDisposable
         {
             _looped = value;
             if (_decoderV != null)
-                MGM.VideoDecoder_SetLooped(_decoderV, value);
+                MGM.VideoDecoder_SetLooped(_decoderV, (byte)(value ? 1 : 0));
         }
 
         get

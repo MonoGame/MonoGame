@@ -4,8 +4,9 @@
 
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using System.Numerics;
+using System;
 using System.Runtime.InteropServices;
+
 
 namespace MonoGame.Interop;
 
@@ -120,6 +121,8 @@ internal struct MGG_SamplerState_Info
 [StructLayout(LayoutKind.Sequential)]
 internal struct MGG_InputElement
 {
+    public VertexElementUsage SemanticUsage;
+    public uint SemanticIndex;
     public uint VertexBufferSlot;
     public VertexElementFormat Format;
     public uint AlignedByteOffset;
@@ -145,45 +148,45 @@ internal static unsafe partial class MGG
 {
     #region Effect Resources
 
-    [LibraryImport(MGP.MonoGameNativeDLL, EntryPoint = "MGG_EffectResource_GetBytecode", StringMarshalling = StringMarshalling.Utf8)]
-    public static partial void EffectResource_GetBytecode(string name, out byte* bytecode, out int size);
+    [DllImport(MGP.MonoGameNativeDLL, EntryPoint = "MGG_EffectResource_GetBytecode", ExactSpelling = true)]
+    public static extern void EffectResource_GetBytecode(byte* name, out byte* bytecode, out int size);
 
     #endregion
 
     #region Graphics System
 
     
-    [LibraryImport(MGP.MonoGameNativeDLL, EntryPoint = "MGG_GraphicsSystem_Create", StringMarshalling = StringMarshalling.Utf8)]
-    public static partial MGG_GraphicsSystem* GraphicsSystem_Create();
+    [DllImport(MGP.MonoGameNativeDLL, EntryPoint = "MGG_GraphicsSystem_Create", ExactSpelling = true)]
+    public static extern MGG_GraphicsSystem* GraphicsSystem_Create();
 
-    [LibraryImport(MGP.MonoGameNativeDLL, EntryPoint = "MGG_GraphicsSystem_Destroy", StringMarshalling = StringMarshalling.Utf8)]
-    public static partial void GraphicsSystem_Destroy(MGG_GraphicsSystem* system);
+    [DllImport(MGP.MonoGameNativeDLL, EntryPoint = "MGG_GraphicsSystem_Destroy", ExactSpelling = true)]
+    public static extern void GraphicsSystem_Destroy(MGG_GraphicsSystem* system);
 
     #endregion
 
     #region Graphics Adapter
 
-    [LibraryImport(MGP.MonoGameNativeDLL, EntryPoint = "MGG_GraphicsAdapter_Get", StringMarshalling = StringMarshalling.Utf8)]
-    public static partial MGG_GraphicsAdapter* GraphicsAdapter_Get(MGG_GraphicsSystem* system, int index);
+    [DllImport(MGP.MonoGameNativeDLL, EntryPoint = "MGG_GraphicsAdapter_Get", ExactSpelling = true)]
+    public static extern MGG_GraphicsAdapter* GraphicsAdapter_Get(MGG_GraphicsSystem* system, int index);
 
-    [LibraryImport(MGP.MonoGameNativeDLL, EntryPoint = "MGG_GraphicsAdapter_GetInfo", StringMarshalling = StringMarshalling.Utf8)]
-    public static partial void GraphicsAdapter_GetInfo(MGG_GraphicsAdapter* adapter, out MGG_GraphicsAdaptor_Info info);
+    [DllImport(MGP.MonoGameNativeDLL, EntryPoint = "MGG_GraphicsAdapter_GetInfo", ExactSpelling = true)]
+    public static extern void GraphicsAdapter_GetInfo(MGG_GraphicsAdapter* adapter, out MGG_GraphicsAdaptor_Info info);
 
     #endregion
 
     #region Graphics Device
 
-    [LibraryImport(MGP.MonoGameNativeDLL, EntryPoint = "MGG_GraphicsDevice_Create", StringMarshalling = StringMarshalling.Utf8)]
-    public static partial MGG_GraphicsDevice* GraphicsDevice_Create(MGG_GraphicsSystem* system, MGG_GraphicsAdapter* adapter);
+    [DllImport(MGP.MonoGameNativeDLL, EntryPoint = "MGG_GraphicsDevice_Create", ExactSpelling = true)]
+    public static extern MGG_GraphicsDevice* GraphicsDevice_Create(MGG_GraphicsSystem* system, MGG_GraphicsAdapter* adapter);
 
-    [LibraryImport(MGP.MonoGameNativeDLL, EntryPoint = "MGG_GraphicsDevice_Destroy", StringMarshalling = StringMarshalling.Utf8)]
-    public static partial void GraphicsDevice_Destroy(MGG_GraphicsDevice* device);
+    [DllImport(MGP.MonoGameNativeDLL, EntryPoint = "MGG_GraphicsDevice_Destroy", ExactSpelling = true)]
+    public static extern void GraphicsDevice_Destroy(MGG_GraphicsDevice* device);
 
-    [LibraryImport(MGP.MonoGameNativeDLL, EntryPoint = "MGG_GraphicsDevice_GetCaps", StringMarshalling = StringMarshalling.Utf8)]
-    public static partial void GraphicsDevice_GetCaps(MGG_GraphicsDevice* device, out MGG_GraphicsDevice_Caps caps);
+    [DllImport(MGP.MonoGameNativeDLL, EntryPoint = "MGG_GraphicsDevice_GetCaps", ExactSpelling = true)]
+    public static extern void GraphicsDevice_GetCaps(MGG_GraphicsDevice* device, out MGG_GraphicsDevice_Caps caps);
 
-    [LibraryImport(MGP.MonoGameNativeDLL, EntryPoint = "MGG_GraphicsDevice_ResizeSwapchain", StringMarshalling = StringMarshalling.Utf8)]
-    public static partial void GraphicsDevice_ResizeSwapchain(
+    [DllImport(MGP.MonoGameNativeDLL, EntryPoint = "MGG_GraphicsDevice_ResizeSwapchain", ExactSpelling = true)]
+    public static extern void GraphicsDevice_ResizeSwapchain(
         MGG_GraphicsDevice* device,
         nint nativeWindowHandle,
         int width,
@@ -191,33 +194,33 @@ internal static unsafe partial class MGG
         SurfaceFormat color,
         DepthFormat depth);
 
-    [LibraryImport(MGP.MonoGameNativeDLL, EntryPoint = "MGG_GraphicsDevice_BeginFrame", StringMarshalling = StringMarshalling.Utf8)]
-    public static partial int GraphicsDevice_BeginFrame(MGG_GraphicsDevice* device);
+    [DllImport(MGP.MonoGameNativeDLL, EntryPoint = "MGG_GraphicsDevice_BeginFrame", ExactSpelling = true)]
+    public static extern int GraphicsDevice_BeginFrame(MGG_GraphicsDevice* device);
 
-    [LibraryImport(MGP.MonoGameNativeDLL, EntryPoint = "MGG_GraphicsDevice_Clear", StringMarshalling = StringMarshalling.Utf8)]
-    public static partial void GraphicsDevice_Clear(MGG_GraphicsDevice* device, ClearOptions options, ref Microsoft.Xna.Framework.Vector4 color, float depth, int stencil);
+    [DllImport(MGP.MonoGameNativeDLL, EntryPoint = "MGG_GraphicsDevice_Clear", ExactSpelling = true)]
+    public static extern void GraphicsDevice_Clear(MGG_GraphicsDevice* device, ClearOptions options, ref Microsoft.Xna.Framework.Vector4 color, float depth, int stencil);
 
-    [LibraryImport(MGP.MonoGameNativeDLL, EntryPoint = "MGG_GraphicsDevice_Present", StringMarshalling = StringMarshalling.Utf8)]
-    public static partial void GraphicsDevice_Present(MGG_GraphicsDevice* device, int currentFrame, int syncInterval);
+    [DllImport(MGP.MonoGameNativeDLL, EntryPoint = "MGG_GraphicsDevice_Present", ExactSpelling = true)]
+    public static extern void GraphicsDevice_Present(MGG_GraphicsDevice* device, int currentFrame, int syncInterval);
 
-    [LibraryImport(MGP.MonoGameNativeDLL, EntryPoint = "MGG_GraphicsDevice_SetBlendState", StringMarshalling = StringMarshalling.Utf8)]
-    public static partial void GraphicsDevice_SetBlendState(MGG_GraphicsDevice* device, MGG_BlendState* state, float factorR, float factorG, float factorB, float factorA);
+    [DllImport(MGP.MonoGameNativeDLL, EntryPoint = "MGG_GraphicsDevice_SetBlendState", ExactSpelling = true)]
+    public static extern void GraphicsDevice_SetBlendState(MGG_GraphicsDevice* device, MGG_BlendState* state, float factorR, float factorG, float factorB, float factorA);
 
-    [LibraryImport(MGP.MonoGameNativeDLL, EntryPoint = "MGG_GraphicsDevice_SetDepthStencilState", StringMarshalling = StringMarshalling.Utf8)]
-    public static partial void GraphicsDevice_SetDepthStencilState(MGG_GraphicsDevice* device, MGG_DepthStencilState* state);
+    [DllImport(MGP.MonoGameNativeDLL, EntryPoint = "MGG_GraphicsDevice_SetDepthStencilState", ExactSpelling = true)]
+    public static extern void GraphicsDevice_SetDepthStencilState(MGG_GraphicsDevice* device, MGG_DepthStencilState* state);
 
-    [LibraryImport(MGP.MonoGameNativeDLL, EntryPoint = "MGG_GraphicsDevice_SetRasterizerState", StringMarshalling = StringMarshalling.Utf8)]
-    public static partial void GraphicsDevice_SetRasterizerState(MGG_GraphicsDevice* device, MGG_RasterizerState* state);
+    [DllImport(MGP.MonoGameNativeDLL, EntryPoint = "MGG_GraphicsDevice_SetRasterizerState", ExactSpelling = true)]
+    public static extern void GraphicsDevice_SetRasterizerState(MGG_GraphicsDevice* device, MGG_RasterizerState* state);
 
-    [LibraryImport(MGP.MonoGameNativeDLL, EntryPoint = "MGG_GraphicsDevice_GetTitleSafeArea", StringMarshalling = StringMarshalling.Utf8)]
-    public static partial void GraphicsDevice_GetTitleSafeArea(
+    [DllImport(MGP.MonoGameNativeDLL, EntryPoint = "MGG_GraphicsDevice_GetTitleSafeArea", ExactSpelling = true)]
+    public static extern void GraphicsDevice_GetTitleSafeArea(
         ref int x,
         ref int y,
         ref int width,
         ref int height);
     
-    [LibraryImport(MGP.MonoGameNativeDLL, EntryPoint = "MGG_GraphicsDevice_SetViewport", StringMarshalling = StringMarshalling.Utf8)]
-    public static partial void GraphicsDevice_SetViewport(
+    [DllImport(MGP.MonoGameNativeDLL, EntryPoint = "MGG_GraphicsDevice_SetViewport", ExactSpelling = true)]
+    public static extern void GraphicsDevice_SetViewport(
         MGG_GraphicsDevice* device,
         int x,
         int y,
@@ -226,97 +229,96 @@ internal static unsafe partial class MGG
         float minDepth,
         float maxDepth);
 
-    [LibraryImport(MGP.MonoGameNativeDLL, EntryPoint = "MGG_GraphicsDevice_SetScissorRectangle", StringMarshalling = StringMarshalling.Utf8)]
-    public static partial void GraphicsDevice_SetScissorRectangle(
+    [DllImport(MGP.MonoGameNativeDLL, EntryPoint = "MGG_GraphicsDevice_SetScissorRectangle", ExactSpelling = true)]
+    public static extern void GraphicsDevice_SetScissorRectangle(
         MGG_GraphicsDevice* device,
         int x,
         int y,
         int width,
         int height);
 
-    [LibraryImport(MGP.MonoGameNativeDLL, EntryPoint = "MGG_GraphicsDevice_SetRenderTargets", StringMarshalling = StringMarshalling.Utf8)]
-    public static partial void GraphicsDevice_SetRenderTargets(MGG_GraphicsDevice* device, MGG_Texture** targets, int count);
+    [DllImport(MGP.MonoGameNativeDLL, EntryPoint = "MGG_GraphicsDevice_SetRenderTargets", ExactSpelling = true)]
+    public static extern void GraphicsDevice_SetRenderTargets(MGG_GraphicsDevice* device, MGG_Texture** targets, int count);
 
-    [LibraryImport(MGP.MonoGameNativeDLL, EntryPoint = "MGG_GraphicsDevice_SetConstantBuffer", StringMarshalling = StringMarshalling.Utf8)]
-    public static partial void GraphicsDevice_SetConstantBuffer(MGG_GraphicsDevice* device, ShaderStage stage, int slot, MGG_Buffer* buffer);
+    [DllImport(MGP.MonoGameNativeDLL, EntryPoint = "MGG_GraphicsDevice_SetConstantBuffer", ExactSpelling = true)]
+    public static extern void GraphicsDevice_SetConstantBuffer(MGG_GraphicsDevice* device, ShaderStage stage, int slot, MGG_Buffer* buffer);
 
-    [LibraryImport(MGP.MonoGameNativeDLL, EntryPoint = "MGG_GraphicsDevice_SetTexture", StringMarshalling = StringMarshalling.Utf8)]
-    public static partial void GraphicsDevice_SetTexture(MGG_GraphicsDevice* device, ShaderStage stage, int slot, MGG_Texture* texture);
+    [DllImport(MGP.MonoGameNativeDLL, EntryPoint = "MGG_GraphicsDevice_SetTexture", ExactSpelling = true)]
+    public static extern void GraphicsDevice_SetTexture(MGG_GraphicsDevice* device, ShaderStage stage, int slot, MGG_Texture* texture);
 
-    [LibraryImport(MGP.MonoGameNativeDLL, EntryPoint = "MGG_GraphicsDevice_SetSamplerState", StringMarshalling = StringMarshalling.Utf8)]
-    public static partial void GraphicsDevice_SetSamplerState(MGG_GraphicsDevice* device, ShaderStage stage, int slot, MGG_SamplerState* state);
+    [DllImport(MGP.MonoGameNativeDLL, EntryPoint = "MGG_GraphicsDevice_SetSamplerState", ExactSpelling = true)]
+    public static extern void GraphicsDevice_SetSamplerState(MGG_GraphicsDevice* device, ShaderStage stage, int slot, MGG_SamplerState* state);
 
-    [LibraryImport(MGP.MonoGameNativeDLL, EntryPoint = "MGG_GraphicsDevice_SetIndexBuffer", StringMarshalling = StringMarshalling.Utf8)]
-    public static partial void GraphicsDevice_SetIndexBuffer(MGG_GraphicsDevice* device, IndexElementSize size, MGG_Buffer* buffer);
+    [DllImport(MGP.MonoGameNativeDLL, EntryPoint = "MGG_GraphicsDevice_SetIndexBuffer", ExactSpelling = true)]
+    public static extern void GraphicsDevice_SetIndexBuffer(MGG_GraphicsDevice* device, IndexElementSize size, MGG_Buffer* buffer);
 
-    [LibraryImport(MGP.MonoGameNativeDLL, EntryPoint = "MGG_GraphicsDevice_SetVertexBuffer", StringMarshalling = StringMarshalling.Utf8)]
-    public static partial void GraphicsDevice_SetVertexBuffer(MGG_GraphicsDevice* device, int slot, MGG_Buffer* buffer, int vertexOffset);
+    [DllImport(MGP.MonoGameNativeDLL, EntryPoint = "MGG_GraphicsDevice_SetVertexBuffer", ExactSpelling = true)]
+    public static extern void GraphicsDevice_SetVertexBuffer(MGG_GraphicsDevice* device, int slot, MGG_Buffer* buffer, int vertexOffset);
 
-    [LibraryImport(MGP.MonoGameNativeDLL, EntryPoint = "MGG_GraphicsDevice_SetShader", StringMarshalling = StringMarshalling.Utf8)]
-    public static partial void GraphicsDevice_SetShader(MGG_GraphicsDevice* device, ShaderStage stage, MGG_Shader* shader);
+    [DllImport(MGP.MonoGameNativeDLL, EntryPoint = "MGG_GraphicsDevice_SetShader", ExactSpelling = true)]
+    public static extern void GraphicsDevice_SetShader(MGG_GraphicsDevice* device, ShaderStage stage, MGG_Shader* shader);
 
-    [LibraryImport(MGP.MonoGameNativeDLL, EntryPoint = "MGG_GraphicsDevice_SetInputLayout", StringMarshalling = StringMarshalling.Utf8)]
-    public static partial void GraphicsDevice_SetInputLayout(MGG_GraphicsDevice* device, MGG_InputLayout* layout);
+    [DllImport(MGP.MonoGameNativeDLL, EntryPoint = "MGG_GraphicsDevice_SetInputLayout", ExactSpelling = true)]
+    public static extern void GraphicsDevice_SetInputLayout(MGG_GraphicsDevice* device, MGG_InputLayout* layout);
 
-    [LibraryImport(MGP.MonoGameNativeDLL, EntryPoint = "MGG_GraphicsDevice_Draw", StringMarshalling = StringMarshalling.Utf8)]
-    public static partial void GraphicsDevice_Draw(MGG_GraphicsDevice* device, PrimitiveType primitiveType, int vertexStart, int vertexCount);
+    [DllImport(MGP.MonoGameNativeDLL, EntryPoint = "MGG_GraphicsDevice_Draw", ExactSpelling = true)]
+    public static extern void GraphicsDevice_Draw(MGG_GraphicsDevice* device, PrimitiveType primitiveType, int vertexStart, int vertexCount);
 
-    [LibraryImport(MGP.MonoGameNativeDLL, EntryPoint = "MGG_GraphicsDevice_DrawIndexed", StringMarshalling = StringMarshalling.Utf8)]
-    public static partial void GraphicsDevice_DrawIndexed(MGG_GraphicsDevice* device, PrimitiveType primitiveType, int primitiveCount, int indexStart, int vertexStart);
+    [DllImport(MGP.MonoGameNativeDLL, EntryPoint = "MGG_GraphicsDevice_DrawIndexed", ExactSpelling = true)]
+    public static extern void GraphicsDevice_DrawIndexed(MGG_GraphicsDevice* device, PrimitiveType primitiveType, int primitiveCount, int indexStart, int vertexStart);
 
-    [LibraryImport(MGP.MonoGameNativeDLL, EntryPoint = "MGG_GraphicsDevice_DrawIndexedInstanced", StringMarshalling = StringMarshalling.Utf8)]
-    public static partial void GraphicsDevice_DrawIndexedInstanced(MGG_GraphicsDevice* device, PrimitiveType primitiveType, int primitiveCount, int indexStart, int vertexStart, int instanceCount);
+    [DllImport(MGP.MonoGameNativeDLL, EntryPoint = "MGG_GraphicsDevice_DrawIndexedInstanced", ExactSpelling = true)]
+    public static extern void GraphicsDevice_DrawIndexedInstanced(MGG_GraphicsDevice* device, PrimitiveType primitiveType, int primitiveCount, int indexStart, int vertexStart, int instanceCount);
 
     #endregion
 
     #region State
 
-    [LibraryImport(MGP.MonoGameNativeDLL, EntryPoint = "MGG_BlendState_Create", StringMarshalling = StringMarshalling.Utf8)]
-    public static partial MGG_BlendState* BlendState_Create(MGG_GraphicsDevice* device, MGG_BlendState_Info* infos);
+    [DllImport(MGP.MonoGameNativeDLL, EntryPoint = "MGG_BlendState_Create", ExactSpelling = true)]
+    public static extern MGG_BlendState* BlendState_Create(MGG_GraphicsDevice* device, MGG_BlendState_Info* infos);
 
-    [LibraryImport(MGP.MonoGameNativeDLL, EntryPoint = "MGG_BlendState_Destroy", StringMarshalling = StringMarshalling.Utf8)]
-    public static partial void BlendState_Destroy(MGG_GraphicsDevice* device, MGG_BlendState* state);
+    [DllImport(MGP.MonoGameNativeDLL, EntryPoint = "MGG_BlendState_Destroy", ExactSpelling = true)]
+    public static extern void BlendState_Destroy(MGG_GraphicsDevice* device, MGG_BlendState* state);
 
-    [LibraryImport(MGP.MonoGameNativeDLL, EntryPoint = "MGG_DepthStencilState_Create", StringMarshalling = StringMarshalling.Utf8)]
-    public static partial MGG_DepthStencilState* DepthStencilState_Create(MGG_GraphicsDevice* device, MGG_DepthStencilState_Info* info);
+    [DllImport(MGP.MonoGameNativeDLL, EntryPoint = "MGG_DepthStencilState_Create", ExactSpelling = true)]
+    public static extern MGG_DepthStencilState* DepthStencilState_Create(MGG_GraphicsDevice* device, MGG_DepthStencilState_Info* info);
 
-    [LibraryImport(MGP.MonoGameNativeDLL, EntryPoint = "MGG_DepthStencilState_Destroy", StringMarshalling = StringMarshalling.Utf8)]
-    public static partial void DepthStencilState_Destroy(MGG_GraphicsDevice* device, MGG_DepthStencilState* state);
+    [DllImport(MGP.MonoGameNativeDLL, EntryPoint = "MGG_DepthStencilState_Destroy", ExactSpelling = true)]
+    public static extern void DepthStencilState_Destroy(MGG_GraphicsDevice* device, MGG_DepthStencilState* state);
 
-    [LibraryImport(MGP.MonoGameNativeDLL, EntryPoint = "MGG_RasterizerState_Create", StringMarshalling = StringMarshalling.Utf8)]
-    public static partial MGG_RasterizerState* RasterizerState_Create(MGG_GraphicsDevice* device, MGG_RasterizerState_Info* info);
+    [DllImport(MGP.MonoGameNativeDLL, EntryPoint = "MGG_RasterizerState_Create", ExactSpelling = true)]
+    public static extern MGG_RasterizerState* RasterizerState_Create(MGG_GraphicsDevice* device, MGG_RasterizerState_Info* info);
 
-    [LibraryImport(MGP.MonoGameNativeDLL, EntryPoint = "MGG_RasterizerState_Destroy", StringMarshalling = StringMarshalling.Utf8)]
-    public static partial void RasterizerState_Destroy(MGG_GraphicsDevice* device, MGG_RasterizerState* state);
+    [DllImport(MGP.MonoGameNativeDLL, EntryPoint = "MGG_RasterizerState_Destroy", ExactSpelling = true)]
+    public static extern void RasterizerState_Destroy(MGG_GraphicsDevice* device, MGG_RasterizerState* state);
 
-    [LibraryImport(MGP.MonoGameNativeDLL, EntryPoint = "MGG_SamplerState_Create", StringMarshalling = StringMarshalling.Utf8)]
-    public static partial MGG_SamplerState* SamplerState_Create(MGG_GraphicsDevice* device, MGG_SamplerState_Info* info);
+    [DllImport(MGP.MonoGameNativeDLL, EntryPoint = "MGG_SamplerState_Create", ExactSpelling = true)]
+    public static extern MGG_SamplerState* SamplerState_Create(MGG_GraphicsDevice* device, MGG_SamplerState_Info* info);
 
-    [LibraryImport(MGP.MonoGameNativeDLL, EntryPoint = "MGG_SamplerState_Destroy", StringMarshalling = StringMarshalling.Utf8)]
-    public static partial void SamplerState_Destroy(MGG_GraphicsDevice* device, MGG_SamplerState* state);
+    [DllImport(MGP.MonoGameNativeDLL, EntryPoint = "MGG_SamplerState_Destroy", ExactSpelling = true)]
+    public static extern void SamplerState_Destroy(MGG_GraphicsDevice* device, MGG_SamplerState* state);
 
     #endregion
 
     #region Buffer
 
-    [LibraryImport(MGP.MonoGameNativeDLL, EntryPoint = "MGG_Buffer_Create", StringMarshalling = StringMarshalling.Utf8)]
-    public static partial MGG_Buffer* Buffer_Create(MGG_GraphicsDevice* device, BufferType type, int sizeInBytes);
+    [DllImport(MGP.MonoGameNativeDLL, EntryPoint = "MGG_Buffer_Create", ExactSpelling = true)]
+    public static extern MGG_Buffer* Buffer_Create(MGG_GraphicsDevice* device, BufferType type, int sizeInBytes);
 
-    [LibraryImport(MGP.MonoGameNativeDLL, EntryPoint = "MGG_Buffer_Destroy", StringMarshalling = StringMarshalling.Utf8)]
-    public static partial void Buffer_Destroy(MGG_GraphicsDevice* device, MGG_Buffer* buffer);
+    [DllImport(MGP.MonoGameNativeDLL, EntryPoint = "MGG_Buffer_Destroy", ExactSpelling = true)]
+    public static extern void Buffer_Destroy(MGG_GraphicsDevice* device, MGG_Buffer* buffer);
 
-    [LibraryImport(MGP.MonoGameNativeDLL, EntryPoint = "MGG_Buffer_SetData", StringMarshalling = StringMarshalling.Utf8)]
-    public static partial void Buffer_SetData(
+    [DllImport(MGP.MonoGameNativeDLL, EntryPoint = "MGG_Buffer_SetData", ExactSpelling = true)]
+    public static extern void Buffer_SetData(
         MGG_GraphicsDevice* device,
         ref MGG_Buffer* buffer,
         int offset,
         byte* data,
-        int length,
-        [MarshalAs(UnmanagedType.U1)]
-        bool discard);
+        int length,       
+        byte discard);
 
-    [LibraryImport(MGP.MonoGameNativeDLL, EntryPoint = "MGG_Buffer_GetData", StringMarshalling = StringMarshalling.Utf8)]
-    public static partial void Buffer_GetData(
+    [DllImport(MGP.MonoGameNativeDLL, EntryPoint = "MGG_Buffer_GetData", ExactSpelling = true)]
+    public static extern void Buffer_GetData(
         MGG_GraphicsDevice* device,
         MGG_Buffer* buffer,
         int offset,
@@ -329,11 +331,11 @@ internal static unsafe partial class MGG
 
     #region Texture
 
-    [LibraryImport(MGP.MonoGameNativeDLL, EntryPoint = "MGG_Texture_Create", StringMarshalling = StringMarshalling.Utf8)]
-    public static partial MGG_Texture* Texture_Create(MGG_GraphicsDevice* device, TextureType type, SurfaceFormat format, int width, int height, int depth, int mipmaps, int slices);
+    [DllImport(MGP.MonoGameNativeDLL, EntryPoint = "MGG_Texture_Create", ExactSpelling = true)]
+    public static extern MGG_Texture* Texture_Create(MGG_GraphicsDevice* device, TextureType type, SurfaceFormat format, int width, int height, int depth, int mipmaps, int slices);
 
-    [LibraryImport(MGP.MonoGameNativeDLL, EntryPoint = "MGG_RenderTarget_Create", StringMarshalling = StringMarshalling.Utf8)]
-    public static partial MGG_Texture* RenderTarget_Create(
+    [DllImport(MGP.MonoGameNativeDLL, EntryPoint = "MGG_RenderTarget_Create", ExactSpelling = true)]
+    public static extern MGG_Texture* RenderTarget_Create(
         MGG_GraphicsDevice* device,
         TextureType type,
         SurfaceFormat format,
@@ -346,11 +348,11 @@ internal static unsafe partial class MGG
         int multiSampleCount,
         RenderTargetUsage usage);
 
-    [LibraryImport(MGP.MonoGameNativeDLL, EntryPoint = "MGG_Texture_Destroy", StringMarshalling = StringMarshalling.Utf8)]
-    public static partial void Texture_Destroy(MGG_GraphicsDevice* device, MGG_Texture* texture);
+    [DllImport(MGP.MonoGameNativeDLL, EntryPoint = "MGG_Texture_Destroy", ExactSpelling = true)]
+    public static extern void Texture_Destroy(MGG_GraphicsDevice* device, MGG_Texture* texture);
 
-    [LibraryImport(MGP.MonoGameNativeDLL, EntryPoint = "MGG_Texture_SetData", StringMarshalling = StringMarshalling.Utf8)]
-    public static partial void Texture_SetData(
+    [DllImport(MGP.MonoGameNativeDLL, EntryPoint = "MGG_Texture_SetData", ExactSpelling = true)]
+    public static extern void Texture_SetData(
         MGG_GraphicsDevice* device,
         MGG_Texture* texture,
         int level,
@@ -364,8 +366,8 @@ internal static unsafe partial class MGG
         byte* data,
         int dataBytes);
 
-    [LibraryImport(MGP.MonoGameNativeDLL, EntryPoint = "MGG_Texture_GetData", StringMarshalling = StringMarshalling.Utf8)]
-    public static partial void Texture_GetData(
+    [DllImport(MGP.MonoGameNativeDLL, EntryPoint = "MGG_Texture_GetData", ExactSpelling = true)]
+    public static extern void Texture_GetData(
         MGG_GraphicsDevice* device,
         MGG_Texture* texture,
         int level,
@@ -383,47 +385,47 @@ internal static unsafe partial class MGG
 
     #region Input Layout
 
-    [LibraryImport(MGP.MonoGameNativeDLL, EntryPoint = "MGG_InputLayout_Create", StringMarshalling = StringMarshalling.Utf8)]
-    public static partial MGG_InputLayout* InputLayout_Create(
+    [DllImport(MGP.MonoGameNativeDLL, EntryPoint = "MGG_InputLayout_Create", ExactSpelling = true)]
+    public static extern MGG_InputLayout* InputLayout_Create(
         MGG_GraphicsDevice* device,
-        int[] strides,
+        MGG_Shader* vertexShader,
+        int* strides,
         int streamCount,
-        MGG_InputElement[] elements,
+        MGG_InputElement* elements,
         int elementCount
         );
 
-    [LibraryImport(MGP.MonoGameNativeDLL, EntryPoint = "MGG_InputLayout_Destroy", StringMarshalling = StringMarshalling.Utf8)]
-    public static partial void InputLayout_Destroy(MGG_GraphicsDevice* device, MGG_InputLayout* layout);
+    [DllImport(MGP.MonoGameNativeDLL, EntryPoint = "MGG_InputLayout_Destroy", ExactSpelling = true)]
+    public static extern void InputLayout_Destroy(MGG_GraphicsDevice* device, MGG_InputLayout* layout);
 
     #endregion
 
     #region Shader
 
-    [LibraryImport(MGP.MonoGameNativeDLL, EntryPoint = "MGG_Shader_Create", StringMarshalling = StringMarshalling.Utf8)]
-    public static partial MGG_Shader* Shader_Create(MGG_GraphicsDevice* device, ShaderStage stage, byte* bytecode, int sizeInBytes);
+    [DllImport(MGP.MonoGameNativeDLL, EntryPoint = "MGG_Shader_Create", ExactSpelling = true)]
+    public static extern MGG_Shader* Shader_Create(MGG_GraphicsDevice* device, ShaderStage stage, byte* bytecode, int sizeInBytes);
 
-    [LibraryImport(MGP.MonoGameNativeDLL, EntryPoint = "MGG_Shader_Destroy", StringMarshalling = StringMarshalling.Utf8)]
-    public static partial void Shader_Destroy(MGG_GraphicsDevice* device, MGG_Shader* shader);
+    [DllImport(MGP.MonoGameNativeDLL, EntryPoint = "MGG_Shader_Destroy", ExactSpelling = true)]
+    public static extern void Shader_Destroy(MGG_GraphicsDevice* device, MGG_Shader* shader);
 
     #endregion
 
     #region Occlusion Query
 
-    [LibraryImport(MGP.MonoGameNativeDLL, EntryPoint = "MGG_OcclusionQuery_Create", StringMarshalling = StringMarshalling.Utf8)]
-    public static partial MGG_OcclusionQuery* OcclusionQuery_Create(MGG_GraphicsDevice* device);
+    [DllImport(MGP.MonoGameNativeDLL, EntryPoint = "MGG_OcclusionQuery_Create", ExactSpelling = true)]
+    public static extern MGG_OcclusionQuery* OcclusionQuery_Create(MGG_GraphicsDevice* device);
 
-    [LibraryImport(MGP.MonoGameNativeDLL, EntryPoint = "MGG_OcclusionQuery_Destroy", StringMarshalling = StringMarshalling.Utf8)]
-    public static partial void OcclusionQuery_Destroy(MGG_GraphicsDevice* device, MGG_OcclusionQuery* query);
+    [DllImport(MGP.MonoGameNativeDLL, EntryPoint = "MGG_OcclusionQuery_Destroy", ExactSpelling = true)]
+    public static extern void OcclusionQuery_Destroy(MGG_GraphicsDevice* device, MGG_OcclusionQuery* query);
 
-    [LibraryImport(MGP.MonoGameNativeDLL, EntryPoint = "MGG_OcclusionQuery_Begin", StringMarshalling = StringMarshalling.Utf8)]
-    public static partial void OcclusionQuery_Begin(MGG_GraphicsDevice* device, MGG_OcclusionQuery* query);
+    [DllImport(MGP.MonoGameNativeDLL, EntryPoint = "MGG_OcclusionQuery_Begin", ExactSpelling = true)]
+    public static extern void OcclusionQuery_Begin(MGG_GraphicsDevice* device, MGG_OcclusionQuery* query);
 
-    [LibraryImport(MGP.MonoGameNativeDLL, EntryPoint = "MGG_OcclusionQuery_End", StringMarshalling = StringMarshalling.Utf8)]
-    public static partial void OcclusionQuery_End(MGG_GraphicsDevice* device, MGG_OcclusionQuery* query);
+    [DllImport(MGP.MonoGameNativeDLL, EntryPoint = "MGG_OcclusionQuery_End", ExactSpelling = true)]
+    public static extern void OcclusionQuery_End(MGG_GraphicsDevice* device, MGG_OcclusionQuery* query);
 
-    [LibraryImport(MGP.MonoGameNativeDLL, EntryPoint = "MGG_OcclusionQuery_GetResult", StringMarshalling = StringMarshalling.Utf8)]
-    [return: MarshalAs(UnmanagedType.U1)]
-    public static partial bool OcclusionQuery_GetResult(MGG_GraphicsDevice* device, MGG_OcclusionQuery* query, out int pixelCount);
+    [DllImport(MGP.MonoGameNativeDLL, EntryPoint = "MGG_OcclusionQuery_GetResult", ExactSpelling = true)]
+    public static extern byte OcclusionQuery_GetResult(MGG_GraphicsDevice* device, MGG_OcclusionQuery* query, out int pixelCount);
 
     #endregion
 }

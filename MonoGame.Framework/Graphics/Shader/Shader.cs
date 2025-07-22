@@ -46,31 +46,31 @@ namespace Microsoft.Xna.Framework.Graphics
             switch (usage)
             {
                 case VertexElementUsage.Position:
-                    return $"POSITION{index}";
+                    return "POSITION" + index;
                 case VertexElementUsage.Color:
-                    return $"COLOR{index}";
+                    return "COLOR" + index;
                 case VertexElementUsage.Normal:
-                    return $"NORMAL{index}";
+                    return "NORMAL" + index;
                 case VertexElementUsage.TextureCoordinate:
-                    return $"TEXCOORD{index}";
+                    return "TEXCOORD" + index;
                 case VertexElementUsage.BlendIndices:
-                    return $"BLENDINDICES{index}";
+                    return "BLENDINDICES" + index;
                 case VertexElementUsage.BlendWeight:
-                    return $"BLENDWEIGHT{index}";
+                    return "BLENDWEIGHT" + index;
                 case VertexElementUsage.Binormal:
-                    return $"BINORMAL{index}";
+                    return "BINORMAL" + index;
                 case VertexElementUsage.Tangent:
-                    return $"TANGENT{index}";
+                    return "TANGENT" + index;
                 case VertexElementUsage.PointSize:
-                    return $"PSIZE{index}";
+                    return "PSIZE" + index;
                 case VertexElementUsage.Depth:
-                    return $"DEPTH{index}";
+                    return "DEPTH" + index;
                 case VertexElementUsage.Fog:
-                    return $"FOG{index}";
+                    return "FOG" + index;
                 case VertexElementUsage.Sample: // Huh?  What is this?
-                    return $"SAMPLE{index}";
+                    return "SAMPLE" + index;
                 case VertexElementUsage.TessellateFactor:
-                    return $"TESSELLATEFACTOR{index}";
+                    return "TESSELLATEFACTOR" + index;
                 default:
                     throw new NotSupportedException("Unknown vertex element usage!");
             }
@@ -97,12 +97,29 @@ namespace Microsoft.Xna.Framework.Graphics
 
         public VertexAttribute[] Attributes { get; private set; }
 
-        internal Shader(GraphicsDevice device, BinaryReader reader)
+        public string Entrypoint { get; private set; }
+
+        public string SourceFile { get; private set; }
+
+        internal Shader(GraphicsDevice device, int version, BinaryReader reader)
         {
             GraphicsDevice = device;
 
             var isVertexShader = reader.ReadBoolean();
             Stage = isVertexShader ? ShaderStage.Vertex : ShaderStage.Pixel;
+
+            if (version > 10)
+            {
+                // We don't really need these at runtime unless there is an
+                // error with the shader and this information is very useful.
+                SourceFile = reader.ReadString();
+                Entrypoint = reader.ReadString();
+            }
+            else
+            {
+                SourceFile = "<unknown>";
+                Entrypoint = "<unknown>";
+            }
 
             var shaderLength = reader.ReadInt32();
             var shaderBytecode = reader.ReadBytes(shaderLength);

@@ -10,54 +10,54 @@
 
 struct VSInput
 {
-    float4 Position : POSITION;
+    float4 Position : POSITION0;
 };
 
 struct VSInputVc
 {
-    float4 Position : POSITION;
-    float4 Color    : COLOR;
+    float4 Position : POSITION0;
+    float4 Color    : COLOR0;
 };
 
 struct VSInputTx
 {
-    float4 Position : POSITION;
-    float2 TexCoord : TEXCOORD;
+    float4 Position : POSITION0;
+    float2 TexCoord : TEXCOORD0;
 };
 
 struct VSInputTxVc
 {
-    float4 Position : POSITION;
-    float4 Color    : COLOR;
-    float2 TexCoord : TEXCOORD;
+    float4 Position : POSITION0;
+    float4 Color    : COLOR0;
+    float2 TexCoord : TEXCOORD0;
 };
 
 struct VSInputNm
 {
-    float4 Position : POSITION;
-    float3 Normal   : NORMAL;
+    float4 Position : POSITION0;
+    float3 Normal   : NORMAL0;
 };
 
 struct VSInputNmVc
 {
-    float4 Position : POSITION;
-    float3 Normal   : NORMAL;
-    float4 Color    : COLOR;
+    float4 Position : POSITION0;
+    float3 Normal   : NORMAL0;
+    float4 Color    : COLOR0;
 };
 
 struct VSInputNmTx
 {
-    float4 Position : POSITION;
-    float3 Normal   : NORMAL;
-    float2 TexCoord : TEXCOORD;
+    float4 Position : POSITION0;
+    float3 Normal   : NORMAL0;
+    float2 TexCoord : TEXCOORD0;
 };
 
 struct VSInputNmTxVc
 {
-    float4 Position : POSITION;
-    float3 Normal   : NORMAL;
-    float2 TexCoord : TEXCOORD;
-    float4 Color    : COLOR;
+    float4 Position : POSITION0;
+    float3 Normal   : NORMAL0;
+    float2 TexCoord : TEXCOORD0;
+    float4 Color    : COLOR0;
 };
 
 struct VSInputTx2
@@ -72,7 +72,7 @@ struct VSInputTx2Vc
     float4 Position  : POSITION0;
     float2 TexCoord  : TEXCOORD0;
     float2 TexCoord2 : TEXCOORD1;
-    float4 Color     : COLOR;
+    float4 Color     : COLOR0;
 };
 
 struct VSInputNmTxWeights
