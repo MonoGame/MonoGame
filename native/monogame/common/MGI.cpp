@@ -37,11 +37,12 @@ void MGI_ReadRGBA(mgbyte* data, mgint dataBytes, mgbool zeroTransparentPixels, m
 		return;
 	}
 
-	// If the original image before conversion had alpha...
+	// If the original image before conversion had alpha,
+	// black out pixels with an alpha of zero (XNA behavior).
 	if (zeroTransparentPixels && c == 4)
 	{
-		// XNA blacks out any pixels with an alpha of zero.
-		for (int i = 0; i < w * h; i += 4)
+		auto byteCount = w * h * 4;
+		for (int i = 0; i < byteCount; i += 4)
 		{
 			if (image[i + 3] == 0)
 			{
