@@ -3,12 +3,16 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Microsoft.Xna.Framework.Graphics.PackedVector
 {
     /// <summary>
     /// Packed vector type containing unsigned normalized values ranging from 0 to 1. The x and z components use 5 bits, and the y component uses 6 bits.
     /// </summary>
+#if XNADESIGNPROVIDED
+    [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.Interfaces | DynamicallyAccessedMemberTypes.PublicParameterlessConstructor)]
+#endif
     public struct Bgr565 : IPackedVector<UInt16>, IEquatable<Bgr565>, IPackedVector
     {
         UInt16 _packedValue;

@@ -3,6 +3,7 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using System.Runtime.InteropServices;
 
@@ -75,7 +76,7 @@ namespace MonoGame.Framework.Utilities
             return false;
         }
 
-        public static MethodInfo GetMethodInfo(Type type, string methodName)
+        public static MethodInfo GetMethodInfo([DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.NonPublicMethods)] Type type, string methodName)
         {
 #if NET45            
             return type.GetTypeInfo().GetDeclaredMethod(methodName);
@@ -189,7 +190,9 @@ namespace MonoGame.Framework.Utilities
         internal static int ManagedSizeOf(Type type)
         {
             // to make this AOT-compliant, we should be using Marshal.SizeOf<T>() but it isn't possible here without using reflection (which we can't if we want AOT compatibility)
+            #pragma warning disable IL3050
             return Marshal.SizeOf(type);
+            #pragma warning restore IL3050
         }
 
     }

@@ -3,12 +3,16 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Microsoft.Xna.Framework.Graphics.PackedVector
 {
     /// <summary>
     /// Packed vector type containing a single 8 bit normalized W values that is ranging from 0 to 1.
     /// </summary>
+#if XNADESIGNPROVIDED
+    [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.Interfaces | DynamicallyAccessedMemberTypes.PublicParameterlessConstructor)]
+#endif
     public struct Alpha8 : IPackedVector<byte>, IEquatable<Alpha8>, IPackedVector
     {
         private byte packedValue;
