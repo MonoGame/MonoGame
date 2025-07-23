@@ -121,8 +121,11 @@
   <Import Project="..\GDKX\MonoGame.Framework.Content.Pipeline.targets" Condition="exists('..\GDKX\MonoGame.Framework.Content.Pipeline.targets')" />
 
   <Target Name="BuildMGCPW" Condition="'$(DisableNativeBuild)' != 'True' and '$(OS)' == 'Windows_NT'" BeforeTargets="CollectPackageReferences">
+    <Exec Command="&quot;$(MSBuildProgramFiles32)\Microsoft Visual Studio\Installer\vswhere.exe&quot; -latest -requires Microsoft.Component.MSBuild -find MSBuild\**\Bin\MSBuild.exe" ConsoleToMSBuild="true">
+      <Output TaskParameter="ConsoleOutput" PropertyName="MGMSBuild" />
+    </Exec>
     <Exec Command="premake5 vs2022" WorkingDirectory="../native/pipeline/" />
-    <Exec Command="msbuild pipeline.sln /p:Configuration=$(Configuration) /p:Platform=x64" WorkingDirectory="../native/pipeline/" />
+    <Exec Command="&quot;$(MGMSBuild)&quot; pipeline.sln /p:Configuration=$(Configuration) /p:Platform=x64" WorkingDirectory="../native/pipeline/" />
   </Target>
 
   <Target Name="BuildMGCPU" Condition="'$(DisableNativeBuild)' != 'True' and '$(OS)' != 'Windows_NT'" BeforeTargets="CollectPackageReferences">
