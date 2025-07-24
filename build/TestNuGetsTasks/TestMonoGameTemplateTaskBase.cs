@@ -1,11 +1,14 @@
 using System.Text.RegularExpressions;
+using System.IO;
+using IOPath = System.IO.Path;
 
 namespace BuildScripts;
 
 public abstract class TestMonoGameTemplateTaskBase : FrostingTask<BuildContext>
 {
-    // Regex to match both self-closing and open tag formats for PackageReference
+    // Pre-compiled regex patterns for better performance
     private static readonly Regex PackageReferenceRegex = new(@"<PackageReference\s+Include=""(MonoGame\.[^""]*)""\s+Version=""([^""]*)""\s*/?(?:\s*/>|>)", RegexOptions.Compiled);
+    private static readonly Regex RegexEscapeCache = new(@"[\[\](){}*+?|^$\\.#\s]", RegexOptions.Compiled);
     
     // Static collection to track test results across all tasks
     private static readonly List<TestResult> TestResults = new();
@@ -56,9 +59,9 @@ public abstract class TestMonoGameTemplateTaskBase : FrostingTask<BuildContext>
     public override void Run(BuildContext context)
     {
         var currentPlatform = context.Environment.Platform.Family;
-        var nugetSourcePath = System.IO.Path.GetFullPath(context.NuGetsDirectory);
+        var nugetSourcePath = IOPath.GetFullPath(context.NuGetsDirectory);
         var testsPath = context.GetOutputPath("TemplateTests");
-        var projectPath = System.IO.Path.Combine(testsPath, ProjectFolderName);
+        var projectPath = IOPath.Combine(testsPath, ProjectFolderName);
         var nugetSourceName = "MonoGameTestSource";
 
         try
@@ -87,7 +90,7 @@ public abstract class TestMonoGameTemplateTaskBase : FrostingTask<BuildContext>
             CreateTestProject(context, projectPath);
 
             // Step 6.5: Replace dotnet-tools.json with platform-specific version
-            var projectDir = System.IO.Path.Combine(projectPath, "TestProject");
+            var projectDir = IOPath.Combine(projectPath, "TestProject");
             ReplaceDotnetToolsConfig(context, projectDir, templateVersion);
 
             // Step 7: Update the project references to use the version being tested
@@ -224,19 +227,19 @@ public abstract class TestMonoGameTemplateTaskBase : FrostingTask<BuildContext>
 
     private void ReplaceDotnetToolsConfig(BuildContext context, string projectDir, string version)
     {
-        var configDir = System.IO.Path.Combine(projectDir, ".config");
-        var dotnetToolsPath = System.IO.Path.Combine(configDir, "dotnet-tools.json");
+        var configDir = IOPath.Combine(projectDir, ".config");
+        var dotnetToolsPath = IOPath.Combine(configDir, "dotnet-tools.json");
         
         context.Information($"Replacing dotnet-tools.json with platform-specific version for: {context.Environment.Platform.Family}");
         
-        if (!System.IO.Directory.Exists(configDir))
+        if (!Directory.Exists(configDir))
         {
             context.CreateDirectory(configDir);
         }
 
         // Always replace with platform-specific version to avoid cross-platform tool issues
         var toolsJson = GetPlatformSpecificToolsJson(context, version);
-        System.IO.File.WriteAllText(dotnetToolsPath, toolsJson);
+        File.WriteAllText(dotnetToolsPath, toolsJson);
         
         context.Information("Platform-specific dotnet-tools.json created successfully.");
     }
@@ -363,7 +366,7 @@ public abstract class TestMonoGameTemplateTaskBase : FrostingTask<BuildContext>
     private string GetTemplateVersionFromNuGet(BuildContext context, string nugetPath)
     {
         // Ensure proper path separators and remove any double separators
-        var normalizedPath = nugetPath.TrimEnd(System.IO.Path.DirectorySeparatorChar, System.IO.Path.AltDirectorySeparatorChar);
+        var normalizedPath = nugetPath.TrimEnd(IOPath.DirectorySeparatorChar, IOPath.AltDirectorySeparatorChar);
         var searchPattern = System.IO.Path.Combine(normalizedPath, "MonoGame.Templates.CSharp.*.nupkg");
         var templateFiles = context.GetFiles(searchPattern);
         
@@ -384,13 +387,13 @@ public abstract class TestMonoGameTemplateTaskBase : FrostingTask<BuildContext>
     {
         context.Information($"Updating project references to version {version} in: {projectDir}");
         
-        if (!System.IO.Directory.Exists(projectDir))
+        if (!Directory.Exists(projectDir))
         {
             throw new DirectoryNotFoundException($"Project directory not found: {projectDir}");
         }
 
         // Find all .csproj files recursively in the project directory
-        var csprojFiles = System.IO.Directory.GetFiles(projectDir, "*.csproj", System.IO.SearchOption.AllDirectories);
+        var csprojFiles = Directory.GetFiles(projectDir, "*.csproj", SearchOption.AllDirectories);
         
         if (csprojFiles.Length == 0)
         {
@@ -404,7 +407,7 @@ public abstract class TestMonoGameTemplateTaskBase : FrostingTask<BuildContext>
 
         foreach (var csprojPath in csprojFiles)
         {
-            var relativePath = System.IO.Path.GetRelativePath(projectDir, csprojPath);
+            var relativePath = IOPath.GetRelativePath(projectDir, csprojPath);
             context.Information($"📁 Processing: {relativePath}");
             
             var updatesInThisFile = UpdateProjectFile(context, csprojPath, version);
@@ -424,13 +427,13 @@ public abstract class TestMonoGameTemplateTaskBase : FrostingTask<BuildContext>
     private int UpdateProjectFile(BuildContext context, string csprojPath, string version)
     {
         // Read and analyze the csproj file directly using regex
-        var csprojContent = System.IO.File.ReadAllText(csprojPath);
+        var csprojContent = File.ReadAllText(csprojPath);
         var monoGamePackages = new List<string>();
         
         // Find all MonoGame PackageReference elements using cached regex
         var matches = PackageReferenceRegex.Matches(csprojContent);
         
-        foreach (System.Text.RegularExpressions.Match match in matches)
+        foreach (Match match in matches)
         {
             var packageName = match.Groups[1].Value;
             var currentVersion = match.Groups[2].Value;
@@ -452,19 +455,22 @@ public abstract class TestMonoGameTemplateTaskBase : FrostingTask<BuildContext>
         
         foreach (var packageName in monoGamePackages)
         {
+            // Pre-escape the package name once for reuse
+            var escapedPackageName = Regex.Escape(packageName);
+            
             // Handle both self-closing and open tag formats properly
-            var selfClosingPattern = $@"<PackageReference\s+Include=""{System.Text.RegularExpressions.Regex.Escape(packageName)}""\s+Version=""[^""]*""\s*/>";
-            var openTagPattern = $@"(<PackageReference\s+Include=""{System.Text.RegularExpressions.Regex.Escape(packageName)}""\s+Version="")[^""]*("">)";
+            var selfClosingPattern = $@"<PackageReference\s+Include=""{escapedPackageName}""\s+Version=""[^""]*""\s*/>";
+            var openTagPattern = $@"(<PackageReference\s+Include=""{escapedPackageName}""\s+Version="")[^""]*("">)";
             
             // First try self-closing format
             var selfClosingReplacement = $@"<PackageReference Include=""{packageName}"" Version=""{version}"" />";
-            var newContent = System.Text.RegularExpressions.Regex.Replace(updatedContent, selfClosingPattern, selfClosingReplacement);
+            var newContent = Regex.Replace(updatedContent, selfClosingPattern, selfClosingReplacement);
             
             // If no change, try open tag format (just update the version, preserve the rest)
             if (newContent == updatedContent)
             {
                 var openTagReplacement = $@"${{1}}{version}${{2}}";
-                newContent = System.Text.RegularExpressions.Regex.Replace(updatedContent, openTagPattern, openTagReplacement);
+                newContent = Regex.Replace(updatedContent, openTagPattern, openTagReplacement);
             }
             
             if (newContent != updatedContent)
@@ -482,7 +488,7 @@ public abstract class TestMonoGameTemplateTaskBase : FrostingTask<BuildContext>
         if (successfulUpdates > 0)
         {
             // Write the updated content back to the file
-            System.IO.File.WriteAllText(csprojPath, updatedContent);
+            File.WriteAllText(csprojPath, updatedContent);
             context.Information($"   ✅ Updated {successfulUpdates} package reference(s) in this file");
         }
         
@@ -546,22 +552,22 @@ public abstract class TestMonoGameTemplateTaskBase : FrostingTask<BuildContext>
         context.Information("🔍 Inspecting file contents before build...");
         
         // Log dotnet-tools.json content
-        var toolsJsonPath = System.IO.Path.Combine(projectDir, ".config", "dotnet-tools.json");
-        if (System.IO.File.Exists(toolsJsonPath))
+        var toolsJsonPath = IOPath.Combine(projectDir, ".config", "dotnet-tools.json");
+        if (File.Exists(toolsJsonPath))
         {
             context.Information($"📄 Contents of {toolsJsonPath}:");
-            var toolsContent = System.IO.File.ReadAllText(toolsJsonPath);
+            var toolsContent = File.ReadAllText(toolsJsonPath);
             context.Information(toolsContent);
             context.Information(""); // Empty line for readability
         }
 
         // Log all .csproj files content
-        var csprojFiles = System.IO.Directory.GetFiles(projectDir, "*.csproj", System.IO.SearchOption.AllDirectories);
+        var csprojFiles = Directory.GetFiles(projectDir, "*.csproj", SearchOption.AllDirectories);
         foreach (var csprojFile in csprojFiles)
         {
-            var relativePath = System.IO.Path.GetRelativePath(projectDir, csprojFile);
+            var relativePath = IOPath.GetRelativePath(projectDir, csprojFile);
             context.Information($"📄 Contents of {relativePath}:");
-            var csprojContent = System.IO.File.ReadAllText(csprojFile);
+            var csprojContent = File.ReadAllText(csprojFile);
             context.Information(csprojContent);
             context.Information(""); // Empty line for readability
         }
