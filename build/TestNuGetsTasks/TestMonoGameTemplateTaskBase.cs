@@ -173,17 +173,172 @@ public abstract class TestMonoGameTemplateTaskBase : FrostingTask<BuildContext>
         
         context.Information($"Replacing dotnet-tools.json with platform-specific version for: {context.Environment.Platform.Family}");
         
+        // Debug: Output entire project directory contents
+        context.Information($"🔍 Project directory contents for: {projectDir}");
+        try
+        {
+            var allFiles = System.IO.Directory.GetFiles(projectDir, "*.*", System.IO.SearchOption.AllDirectories);
+            foreach (var file in allFiles.OrderBy(f => f))
+            {
+                var relativePath = System.IO.Path.GetRelativePath(projectDir, file);
+                var fileInfo = new System.IO.FileInfo(file);
+                context.Information($"   📄 {relativePath} ({fileInfo.Length} bytes, {fileInfo.LastWriteTime:yyyy-MM-dd HH:mm:ss})");
+            }
+            
+            var allDirs = System.IO.Directory.GetDirectories(projectDir, "*", System.IO.SearchOption.AllDirectories);
+            foreach (var dir in allDirs.OrderBy(d => d))
+            {
+                var relativePath = System.IO.Path.GetRelativePath(projectDir, dir);
+                context.Information($"   📁 {relativePath}/");
+            }
+            
+            context.Information($"🔍 Total files: {allFiles.Length}, Total directories: {allDirs.Length}");
+        }
+        catch (Exception ex)
+        {
+            context.Warning($"Failed to enumerate project directory: {ex.Message}");
+        }
+        
+        // Debug: Show existing dotnet-tools.json content before replacement
+        if (System.IO.File.Exists(dotnetToolsPath))
+        {
+            try
+            {
+                var existingContent = System.IO.File.ReadAllText(dotnetToolsPath);
+                context.Information($"🔍 Existing dotnet-tools.json content before replacement:");
+                context.Information($"{existingContent}");
+            }
+            catch (Exception ex)
+            {
+                context.Warning($"Failed to read existing dotnet-tools.json: {ex.Message}");
+            }
+        }
+        else
+        {
+            context.Information($"🔍 No existing dotnet-tools.json found at: {dotnetToolsPath}");
+        }
+        
         if (!System.IO.Directory.Exists(configDir))
         {
             context.CreateDirectory(configDir);
         }
 
-        string toolsJson = GetPlatformSpecificToolsJson(context, version);
+        string toolsJson;
+        
+        // Always replace with platform-specific version to avoid cross-platform tool issues
+        if (System.IO.File.Exists(dotnetToolsPath))
+        {
+            var existingContent = System.IO.File.ReadAllText(dotnetToolsPath);
+            context.Information($"🔄 Replacing existing dotnet-tools.json with platform-specific version for {context.Environment.Platform.Family}");
+            context.Information($"   (Template includes all platform tools, but we need only {context.Environment.Platform.Family}-compatible tools)");
+        }
+        else
+        {
+            context.Information($"📝 Creating new platform-specific dotnet-tools.json for {context.Environment.Platform.Family}");
+        }
+        
+        toolsJson = GetPlatformSpecificToolsJson(context, version);
 
         context.Information($"Writing platform-specific dotnet-tools.json to: {dotnetToolsPath}\n{toolsJson}");
         
         System.IO.File.WriteAllText(dotnetToolsPath, toolsJson);
         context.Information("Platform-specific dotnet-tools.json created successfully.");
+        
+        // Verify the file was written correctly
+        VerifyDotnetToolsConfig(context, projectDir, version);
+    }
+
+    private void VerifyDotnetToolsConfig(BuildContext context, string projectDir, string expectedVersion)
+    {
+        var dotnetToolsPath = $"{projectDir}/.config/dotnet-tools.json";
+        
+        context.Information($"🔍 Verifying dotnet-tools.json configuration...");
+        
+        // Step 1: Verify the file contents
+        if (System.IO.File.Exists(dotnetToolsPath))
+        {
+            var actualContent = System.IO.File.ReadAllText(dotnetToolsPath);
+            context.Information($"📋 Final dotnet-tools.json content:");
+            context.Information($"{actualContent}");
+            
+            // Check if the expected version is present
+            if (actualContent.Contains($"\"version\": \"{expectedVersion}\""))
+            {
+                context.Information($"✅ File contains expected version: {expectedVersion}");
+            }
+            else
+            {
+                context.Warning($"❌ File does NOT contain expected version: {expectedVersion}");
+            }
+        }
+        else
+        {
+            context.Error($"❌ dotnet-tools.json not found at: {dotnetToolsPath}");
+            return;
+        }
+        
+        // Step 2: Test tool restore to see what versions are actually installed
+        context.Information($"🔧 Testing tool restore to verify actual tool versions...");
+        try
+        {
+            var restoreResult = context.StartProcess("dotnet", new ProcessSettings
+            {
+                Arguments = "tool restore",
+                WorkingDirectory = projectDir,
+                RedirectStandardOutput = true
+            }, out var restoreOutput);
+            
+            context.Information($"Tool restore exit code: {restoreResult}");
+            foreach (var line in restoreOutput)
+            {
+                context.Information($"   {line}");
+            }
+            
+            if (restoreResult == 0)
+            {
+                context.Information($"✅ Tool restore completed successfully");
+            }
+            else
+            {
+                context.Warning($"❌ Tool restore failed with exit code: {restoreResult}");
+            }
+        }
+        catch (Exception ex)
+        {
+            context.Warning($"❌ Tool restore failed: {ex.Message}");
+        }
+        
+        // Step 3: List the actually installed tools to verify versions
+        context.Information($"📋 Listing actually installed tools...");
+        try
+        {
+            var listResult = context.StartProcess("dotnet", new ProcessSettings
+            {
+                Arguments = "tool list",
+                WorkingDirectory = projectDir,
+                RedirectStandardOutput = true
+            }, out var listOutput);
+            
+            context.Information($"Tool list exit code: {listResult}");
+            foreach (var line in listOutput)
+            {
+                context.Information($"   {line}");
+                
+                // Check if this line contains a MonoGame tool with version info
+                if (line.Contains("dotnet-mgcb") && line.Contains(expectedVersion))
+                {
+                    context.Information($"✅ Found expected tool version: {line.Trim()}");
+                }
+                else if (line.Contains("dotnet-mgcb") && !line.Contains(expectedVersion))
+                {
+                    context.Warning($"❌ Found UNEXPECTED tool version: {line.Trim()}");
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            context.Warning($"❌ Tool list failed: {ex.Message}");
+        }
     }
 
     private string GetPlatformSpecificToolsJson(BuildContext context, string version)
