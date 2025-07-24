@@ -316,16 +316,31 @@ public abstract class TestMonoGameTemplateTaskBase : FrostingTask<BuildContext>
     private void BuildProject(BuildContext context, string projectDir)
     {
         context.Information("Building the test project...");
-        var buildResult = context.StartProcess("dotnet", new ProcessSettings
+        
+        // Capture build output to only show it on failure
+        var buildSettings = new ProcessSettings
         {
             Arguments = "build --verbosity normal --no-restore",
-            WorkingDirectory = projectDir
-        });
+            WorkingDirectory = projectDir,
+            RedirectStandardOutput = true,
+            RedirectStandardError = true
+        };
+
+        var buildResult = context.StartProcess("dotnet", buildSettings, out var output);
 
         if (buildResult != 0)
         {
+            // Build failed - show the output for debugging
+            context.Error("Build failed! Output:");
+            foreach (var line in output)
+            {
+                context.Error(line);
+            }
             throw new Exception($"Test project failed to build!");
         }
+        
+        // Build succeeded - just show a success message without the verbose output
+        context.Information("✅ Build completed successfully");
     }
 
     private void CleanupPreviousTestRun(BuildContext context, string testsPath, string projectPath, string nugetSourceName)
