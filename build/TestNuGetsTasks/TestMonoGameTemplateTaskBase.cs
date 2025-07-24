@@ -4,10 +4,30 @@ namespace BuildScripts;
 
 public abstract class TestMonoGameTemplateTaskBase : FrostingTask<BuildContext>
 {
+    private static readonly Regex PackageReferenceRegex = new(@"<PackageReference\s+Include=""(MonoGame\.[^""]*)""\s+Version=""([^""]*)""\s*/>", RegexOptions.Compiled);
+    
+    // Static collection to track test results across all tasks
+    private static readonly List<TestResult> TestResults = new();
+    
     protected abstract string TemplateName { get; }
     protected abstract string ProjectFolderName { get; }
     protected abstract string TemplateShortName { get; }
     protected abstract PlatformFamily[] SupportedPlatforms { get; }
+
+    private class TestResult
+    {
+        public required string TemplateName { get; set; }
+        public TestStatus Status { get; set; }
+        public required string Message { get; set; }
+        public PlatformFamily Platform { get; set; }
+    }
+
+    private enum TestStatus
+    {
+        Success,
+        Skipped,
+        Failed
+    }
 
     public override bool ShouldRun(BuildContext context)
     {
@@ -18,6 +38,15 @@ public abstract class TestMonoGameTemplateTaskBase : FrostingTask<BuildContext>
         {
             context.Information($"⏭️ Skipping {TemplateName} test - not supported on {currentPlatform}");
             context.Information($"   Supported platforms: {string.Join(", ", SupportedPlatforms)}");
+            
+            // Record the skip result
+            TestResults.Add(new TestResult
+            {
+                TemplateName = TemplateName,
+                Status = TestStatus.Skipped,
+                Message = $"Not supported on {currentPlatform}",
+                Platform = currentPlatform
+            });
         }
         
         return isSupported;
@@ -25,9 +54,10 @@ public abstract class TestMonoGameTemplateTaskBase : FrostingTask<BuildContext>
 
     public override void Run(BuildContext context)
     {
+        var currentPlatform = context.Environment.Platform.Family;
         var nugetSourcePath = System.IO.Path.GetFullPath(context.NuGetsDirectory);
         var testsPath = context.GetOutputPath("TemplateTests");
-        var projectPath = $"{testsPath}/{ProjectFolderName}";
+        var projectPath = System.IO.Path.Combine(testsPath, ProjectFolderName);
         var nugetSourceName = "MonoGameTestSource";
 
         try
@@ -56,7 +86,7 @@ public abstract class TestMonoGameTemplateTaskBase : FrostingTask<BuildContext>
             CreateTestProject(context, projectPath);
 
             // Step 6.5: Replace dotnet-tools.json with platform-specific version
-            var projectDir = $"{projectPath}/TestProject";
+            var projectDir = System.IO.Path.Combine(projectPath, "TestProject");
             ReplaceDotnetToolsConfig(context, projectDir, templateVersion);
 
             // Step 7: Update the project references to use the version being tested
@@ -70,6 +100,28 @@ public abstract class TestMonoGameTemplateTaskBase : FrostingTask<BuildContext>
 
             context.Information($"✅ Test completed successfully! MonoGame {TemplateName} project built without errors.");
             context.Information($"📁 Test project preserved at: {projectDir}");
+            
+            // Record the success result
+            TestResults.Add(new TestResult
+            {
+                TemplateName = TemplateName,
+                Status = TestStatus.Success,
+                Message = "Built successfully",
+                Platform = currentPlatform
+            });
+        }
+        catch (Exception ex)
+        {
+            // Record the failure result
+            TestResults.Add(new TestResult
+            {
+                TemplateName = TemplateName,
+                Status = TestStatus.Failed,
+                Message = ex.Message,
+                Platform = currentPlatform
+            });
+            
+            throw; // Re-throw to maintain existing error handling behavior
         }
         finally
         {
@@ -168,8 +220,8 @@ public abstract class TestMonoGameTemplateTaskBase : FrostingTask<BuildContext>
 
     private void ReplaceDotnetToolsConfig(BuildContext context, string projectDir, string version)
     {
-        var configDir = $"{projectDir}/.config";
-        var dotnetToolsPath = $"{configDir}/dotnet-tools.json";
+        var configDir = System.IO.Path.Combine(projectDir, ".config");
+        var dotnetToolsPath = System.IO.Path.Combine(configDir, "dotnet-tools.json");
         
         context.Information($"Replacing dotnet-tools.json with platform-specific version for: {context.Environment.Platform.Family}");
         
@@ -307,8 +359,9 @@ public abstract class TestMonoGameTemplateTaskBase : FrostingTask<BuildContext>
     private string GetTemplateVersionFromNuGet(BuildContext context, string nugetPath)
     {
         // Ensure proper path separators and remove any double separators
-        var normalizedPath = nugetPath.TrimEnd('/', '\\');
-        var templateFiles = context.GetFiles($"{normalizedPath}/MonoGame.Templates.CSharp.*.nupkg");
+        var normalizedPath = nugetPath.TrimEnd(System.IO.Path.DirectorySeparatorChar, System.IO.Path.AltDirectorySeparatorChar);
+        var searchPattern = System.IO.Path.Combine(normalizedPath, "MonoGame.Templates.CSharp.*.nupkg");
+        var templateFiles = context.GetFiles(searchPattern);
         
         if (!templateFiles.Any())
         {
@@ -319,9 +372,8 @@ public abstract class TestMonoGameTemplateTaskBase : FrostingTask<BuildContext>
         var fileName = latestTemplateFile.GetFilenameWithoutExtension().ToString();
         
         // Remove "MonoGame.Templates.CSharp." prefix to get the version
-        var version = fileName.Substring("MonoGame.Templates.CSharp.".Length);
-        
-        return version;
+        const string prefix = "MonoGame.Templates.CSharp.";
+        return fileName.Substring(prefix.Length);
     }
 
     private void UpdateProjectReferences(BuildContext context, string projectDir, string version, string nugetSourceName)
@@ -371,9 +423,8 @@ public abstract class TestMonoGameTemplateTaskBase : FrostingTask<BuildContext>
         var csprojContent = System.IO.File.ReadAllText(csprojPath);
         var monoGamePackages = new List<string>();
         
-        // Find all MonoGame PackageReference elements using regex
-        var packageReferencePattern = @"<PackageReference\s+Include=""(MonoGame\.[^""]*)""\s+Version=""([^""]*)""\s*/>";
-        var matches = System.Text.RegularExpressions.Regex.Matches(csprojContent, packageReferencePattern);
+        // Find all MonoGame PackageReference elements using cached regex
+        var matches = PackageReferenceRegex.Matches(csprojContent);
         
         foreach (System.Text.RegularExpressions.Match match in matches)
         {
@@ -423,5 +474,65 @@ public abstract class TestMonoGameTemplateTaskBase : FrostingTask<BuildContext>
         }
         
         return successfulUpdates;
+    }
+
+    /// <summary>
+    /// Display a summary report of all test results with status icons
+    /// </summary>
+    public static void DisplayTestSummary(BuildContext context)
+    {
+        if (TestResults.Count == 0)
+        {
+            context.Information("No test results to display.");
+            return;
+        }
+
+        context.Information("");
+        context.Information("🎯 MonoGame NuGet Template Test Summary");
+        context.Information("==========================================");
+
+        var successCount = 0;
+        var skippedCount = 0;
+        var failedCount = 0;
+
+        foreach (var result in TestResults.OrderBy(r => r.TemplateName))
+        {
+            var icon = result.Status switch
+            {
+                TestStatus.Success => "✅",
+                TestStatus.Skipped => "⚠️",
+                TestStatus.Failed => "❌",
+                _ => "❓"
+            };
+
+            context.Information($"{icon} {result.TemplateName} - {result.Message}");
+
+            switch (result.Status)
+            {
+                case TestStatus.Success: successCount++; break;
+                case TestStatus.Skipped: skippedCount++; break;
+                case TestStatus.Failed: failedCount++; break;
+            }
+        }
+
+        context.Information("");
+        context.Information($"📊 Results: {successCount} successful, {skippedCount} skipped, {failedCount} failed");
+        
+        if (failedCount > 0)
+        {
+            context.Information($"❌ {failedCount} test(s) failed - check logs above for details");
+        }
+        else if (successCount > 0)
+        {
+            context.Information($"🎉 All {successCount} eligible test(s) completed successfully!");
+        }
+    }
+
+    /// <summary>
+    /// Clear test results (useful for multiple test runs)
+    /// </summary>
+    public static void ClearTestResults()
+    {
+        TestResults.Clear();
     }
 }
