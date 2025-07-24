@@ -4,7 +4,8 @@ namespace BuildScripts;
 
 public abstract class TestMonoGameTemplateTaskBase : FrostingTask<BuildContext>
 {
-    private static readonly Regex PackageReferenceRegex = new(@"<PackageReference\s+Include=""(MonoGame\.[^""]*)""\s+Version=""([^""]*)""\s*/>", RegexOptions.Compiled);
+    // Regex to match both self-closing and open tag formats for PackageReference
+    private static readonly Regex PackageReferenceRegex = new(@"<PackageReference\s+Include=""(MonoGame\.[^""]*)""\s+Version=""([^""]*)""\s*/?(?:\s*/>|>)", RegexOptions.Compiled);
     
     // Static collection to track test results across all tasks
     private static readonly List<TestResult> TestResults = new();
@@ -94,6 +95,9 @@ public abstract class TestMonoGameTemplateTaskBase : FrostingTask<BuildContext>
 
             // Step 8: Restore packages for the project
             RestoreProject(context, projectDir);
+
+            // Step 8.5: Log file contents before build for debugging
+            LogCurrentFileContents(context, projectDir);
 
             // Step 9: Run dotnet build to verify the project builds
             BuildProject(context, projectDir);
@@ -448,11 +452,20 @@ public abstract class TestMonoGameTemplateTaskBase : FrostingTask<BuildContext>
         
         foreach (var packageName in monoGamePackages)
         {
-            // Replace the version for this specific package
-            var pattern = $@"<PackageReference\s+Include=""{System.Text.RegularExpressions.Regex.Escape(packageName)}""\s+Version=""[^""]*""\s*/>";
-            var replacement = $@"<PackageReference Include=""{packageName}"" Version=""{version}"" />";
+            // Handle both self-closing and open tag formats properly
+            var selfClosingPattern = $@"<PackageReference\s+Include=""{System.Text.RegularExpressions.Regex.Escape(packageName)}""\s+Version=""[^""]*""\s*/>";
+            var openTagPattern = $@"(<PackageReference\s+Include=""{System.Text.RegularExpressions.Regex.Escape(packageName)}""\s+Version="")[^""]*("">)";
             
-            var newContent = System.Text.RegularExpressions.Regex.Replace(updatedContent, pattern, replacement);
+            // First try self-closing format
+            var selfClosingReplacement = $@"<PackageReference Include=""{packageName}"" Version=""{version}"" />";
+            var newContent = System.Text.RegularExpressions.Regex.Replace(updatedContent, selfClosingPattern, selfClosingReplacement);
+            
+            // If no change, try open tag format (just update the version, preserve the rest)
+            if (newContent == updatedContent)
+            {
+                var openTagReplacement = $@"${{1}}{version}${{2}}";
+                newContent = System.Text.RegularExpressions.Regex.Replace(updatedContent, openTagPattern, openTagReplacement);
+            }
             
             if (newContent != updatedContent)
             {
@@ -525,6 +538,32 @@ public abstract class TestMonoGameTemplateTaskBase : FrostingTask<BuildContext>
         else if (successCount > 0)
         {
             context.Information($"🎉 All {successCount} eligible test(s) completed successfully!");
+        }
+    }
+
+    private void LogCurrentFileContents(BuildContext context, string projectDir)
+    {
+        context.Information("🔍 Inspecting file contents before build...");
+        
+        // Log dotnet-tools.json content
+        var toolsJsonPath = System.IO.Path.Combine(projectDir, ".config", "dotnet-tools.json");
+        if (System.IO.File.Exists(toolsJsonPath))
+        {
+            context.Information($"📄 Contents of {toolsJsonPath}:");
+            var toolsContent = System.IO.File.ReadAllText(toolsJsonPath);
+            context.Information(toolsContent);
+            context.Information(""); // Empty line for readability
+        }
+
+        // Log all .csproj files content
+        var csprojFiles = System.IO.Directory.GetFiles(projectDir, "*.csproj", System.IO.SearchOption.AllDirectories);
+        foreach (var csprojFile in csprojFiles)
+        {
+            var relativePath = System.IO.Path.GetRelativePath(projectDir, csprojFile);
+            context.Information($"📄 Contents of {relativePath}:");
+            var csprojContent = System.IO.File.ReadAllText(csprojFile);
+            context.Information(csprojContent);
+            context.Information(""); // Empty line for readability
         }
     }
 
