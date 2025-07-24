@@ -8,7 +8,6 @@ public abstract class TestMonoGameTemplateTaskBase : FrostingTask<BuildContext>
 {
     // Pre-compiled regex patterns for better performance
     private static readonly Regex PackageReferenceRegex = new(@"<PackageReference\s+Include=""(MonoGame\.[^""]*)""\s+Version=""([^""]*)""\s*/?(?:\s*/>|>)", RegexOptions.Compiled);
-    private static readonly Regex RegexEscapeCache = new(@"[\[\](){}*+?|^$\\.#\s]", RegexOptions.Compiled);
     
     // Static collection to track test results across all tasks
     private static readonly List<TestResult> TestResults = new();
@@ -94,7 +93,7 @@ public abstract class TestMonoGameTemplateTaskBase : FrostingTask<BuildContext>
             ReplaceDotnetToolsConfig(context, projectDir, templateVersion);
 
             // Step 7: Update the project references to use the version being tested
-            UpdateProjectReferences(context, projectDir, templateVersion, nugetSourceName);
+            UpdateProjectReferences(context, projectDir, templateVersion);
 
             // Step 8: Restore packages for the project
             RestoreProject(context, projectDir);
@@ -383,7 +382,7 @@ public abstract class TestMonoGameTemplateTaskBase : FrostingTask<BuildContext>
         return fileName.Substring(prefix.Length);
     }
 
-    private void UpdateProjectReferences(BuildContext context, string projectDir, string version, string nugetSourceName)
+    private void UpdateProjectReferences(BuildContext context, string projectDir, string version)
     {
         context.Information($"Updating project references to version {version} in: {projectDir}");
         
