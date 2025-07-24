@@ -63,7 +63,7 @@ public abstract class TestMonoGameTemplateTaskBase : FrostingTask<BuildContext>
             UpdateProjectReferences(context, projectDir, templateVersion, nugetSourceName);
 
             // Step 8: Restore packages for the project
-            //RestoreProject(context, projectDir);
+            RestoreProject(context, projectDir);
 
             // Step 9: Run dotnet build to verify the project builds
             BuildProject(context, projectDir);
@@ -333,16 +333,40 @@ public abstract class TestMonoGameTemplateTaskBase : FrostingTask<BuildContext>
             throw new DirectoryNotFoundException($"Project directory not found: {projectDir}");
         }
 
-        var csprojPath = System.IO.Path.Combine(projectDir, "TestProject.csproj");
+        // Find all .csproj files recursively in the project directory
+        var csprojFiles = System.IO.Directory.GetFiles(projectDir, "*.csproj", System.IO.SearchOption.AllDirectories);
         
-        if (!System.IO.File.Exists(csprojPath))
+        if (csprojFiles.Length == 0)
         {
-            context.Warning($"Project file not found: {csprojPath}");
+            context.Warning($"No .csproj files found in directory: {projectDir}");
             return;
         }
 
-        context.Information("Detecting existing MonoGame package references...");
+        context.Information($"Found {csprojFiles.Length} .csproj file(s) to process");
         
+        var totalSuccessfulUpdates = 0;
+
+        foreach (var csprojPath in csprojFiles)
+        {
+            var relativePath = System.IO.Path.GetRelativePath(projectDir, csprojPath);
+            context.Information($"📁 Processing: {relativePath}");
+            
+            var updatesInThisFile = UpdateProjectFile(context, csprojPath, version);
+            totalSuccessfulUpdates += updatesInThisFile;
+        }
+
+        if (totalSuccessfulUpdates > 0)
+        {
+            context.Information($"✅ Updated {totalSuccessfulUpdates} package reference(s) across {csprojFiles.Length} project file(s)");
+        }
+        else
+        {
+            context.Warning("❌ No package references were successfully updated");
+        }
+    }
+
+    private int UpdateProjectFile(BuildContext context, string csprojPath, string version)
+    {
         // Read and analyze the csproj file directly using regex
         var csprojContent = System.IO.File.ReadAllText(csprojPath);
         var monoGamePackages = new List<string>();
@@ -361,14 +385,14 @@ public abstract class TestMonoGameTemplateTaskBase : FrostingTask<BuildContext>
 
         if (monoGamePackages.Count == 0)
         {
-            context.Warning("No MonoGame packages found to update. This might indicate an issue with package detection.");
-            return;
+            context.Information("   No MonoGame packages found in this file");
+            return 0;
         }
         
         // Update packages directly via csproj editing (more reliable than dotnet add package for prerelease versions)
-        context.Information($"📝 Updating {monoGamePackages.Count} package(s) to version {version}...");
+        context.Information($"   📝 Updating {monoGamePackages.Count} package(s) to version {version}...");
         
-        var updatedContent = System.IO.File.ReadAllText(csprojPath);
+        var updatedContent = csprojContent;
         var successfulUpdates = 0;
         
         foreach (var packageName in monoGamePackages)
@@ -383,11 +407,11 @@ public abstract class TestMonoGameTemplateTaskBase : FrostingTask<BuildContext>
             {
                 updatedContent = newContent;
                 successfulUpdates++;
-                context.Information($"✅ Successfully updated {packageName} to version {version}");
+                context.Information($"   ✅ Successfully updated {packageName} to version {version}");
             }
             else
             {
-                context.Warning($"❌ Failed to update {packageName} version in csproj");
+                context.Warning($"   ❌ Failed to update {packageName} version in csproj");
             }
         }
         
@@ -395,11 +419,9 @@ public abstract class TestMonoGameTemplateTaskBase : FrostingTask<BuildContext>
         {
             // Write the updated content back to the file
             System.IO.File.WriteAllText(csprojPath, updatedContent);
-            context.Information($"✅ Updated {successfulUpdates} of {monoGamePackages.Count} package reference(s) in csproj file");
+            context.Information($"   ✅ Updated {successfulUpdates} package reference(s) in this file");
         }
-        else
-        {
-            context.Warning("❌ No package references were successfully updated");
-        }
+        
+        return successfulUpdates;
     }
 }
