@@ -316,11 +316,11 @@ public abstract class TestMonoGameTemplateTaskBase : FrostingTask<BuildContext>
     private void BuildProject(BuildContext context, string projectDir)
     {
         context.Information("Building the test project...");
-        
+
         // Capture build output to only show it on failure
         var buildSettings = new ProcessSettings
         {
-            Arguments = "build --verbosity normal --no-restore",
+            Arguments = "build --verbosity normal --no-restore -m:1",
             WorkingDirectory = projectDir,
             RedirectStandardOutput = true,
             RedirectStandardError = true
