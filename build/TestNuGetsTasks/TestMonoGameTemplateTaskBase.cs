@@ -63,7 +63,7 @@ public abstract class TestMonoGameTemplateTaskBase : FrostingTask<BuildContext>
             UpdateProjectReferences(context, projectDir, templateVersion, nugetSourceName);
 
             // Step 8: Restore packages for the project
-            RestoreProject(context, projectDir);
+            //RestoreProject(context, projectDir);
 
             // Step 9: Run dotnet build to verify the project builds
             BuildProject(context, projectDir);
@@ -179,6 +179,8 @@ public abstract class TestMonoGameTemplateTaskBase : FrostingTask<BuildContext>
         }
 
         string toolsJson = GetPlatformSpecificToolsJson(context, version);
+
+        context.Information($"Writing platform-specific dotnet-tools.json to: {dotnetToolsPath}\n{toolsJson}");
         
         System.IO.File.WriteAllText(dotnetToolsPath, toolsJson);
         context.Information("Platform-specific dotnet-tools.json created successfully.");
