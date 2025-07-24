@@ -53,6 +53,8 @@ public sealed class TestTask : FrostingTask<BuildContext> { }
 [IsDependentOn(typeof(TestWindowsDXTask))]
 [IsDependentOn(typeof(TestAndroidTask))]
 [IsDependentOn(typeof(TestiOSTask))]
+// [IsDependentOn(typeof(TestBlank2DStarterKitTask))]
+// [IsDependentOn(typeof(TestFull2DStarterKitTask))]
 public sealed class TestNuGetTask : FrostingTask<BuildContext> { }
 
 [TaskName("Default")]
