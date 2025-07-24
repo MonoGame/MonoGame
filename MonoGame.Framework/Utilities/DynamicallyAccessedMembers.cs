@@ -4,7 +4,7 @@
 namespace System.Diagnostics.CodeAnalysis
 {
     [Flags]
-    public enum DynamicallyAccessedMemberTypes
+    internal enum DynamicallyAccessedMemberTypes
     {
         All = -1,
         None = 0,
@@ -25,7 +25,7 @@ namespace System.Diagnostics.CodeAnalysis
     }
 
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Struct | AttributeTargets.Method | AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Interface | AttributeTargets.Parameter | AttributeTargets.ReturnValue | AttributeTargets.GenericParameter, Inherited = false)]
-    public sealed class DynamicallyAccessedMembersAttribute : Attribute
+    internal sealed class DynamicallyAccessedMembersAttribute : Attribute
     {
         private DynamicallyAccessedMemberTypes _memberTypes;
 
