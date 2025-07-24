@@ -26,7 +26,7 @@ public abstract class TestMonoGameTemplateTaskBase : FrostingTask<BuildContext>
     public override void Run(BuildContext context)
     {
         var nugetSourcePath = System.IO.Path.GetFullPath(context.NuGetsDirectory);
-        var testsPath = context.GetOutputPath("tests");
+        var testsPath = context.GetOutputPath("TemplateTests");
         var projectPath = $"{testsPath}/{ProjectFolderName}";
         var nugetSourceName = "MonoGameTestSource";
 
@@ -48,8 +48,8 @@ public abstract class TestMonoGameTemplateTaskBase : FrostingTask<BuildContext>
             // Step 4: Install the templates using the detected version
             InstallTemplates(context, templateVersion, nugetSourcePath);
 
-            // Step 5: Create the tests folder
-            context.Information($"Creating tests folder: {testsPath}");
+            // Step 5: Create the template tests folder
+            context.Information($"Creating template tests folder: {testsPath}");
             context.CreateDirectory(testsPath);
 
             // Step 6: Create a new MonoGame project
