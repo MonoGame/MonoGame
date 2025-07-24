@@ -46,7 +46,16 @@ public sealed class DeployTask : FrostingTask<BuildContext> { }
 
 [TaskName("Test")]
 [IsDependentOn(typeof(DownloadTestArtifactsTask))]
-public sealed class TestTask : FrostingTask<BuildContext> {}
+// [IsDependentOn(typeof(TestWindowsDXTask))]  // Uncomment to test WindowsDX
+// [IsDependentOn(typeof(TestAndroidTask))]    // Uncomment to test Android
+public sealed class TestTask : FrostingTask<BuildContext> { }
+
+[TaskName("TestNuGet")]
+[IsDependentOn(typeof(TestDesktopGLTask))]
+[IsDependentOn(typeof(TestWindowsDXTask))]
+[IsDependentOn(typeof(TestAndroidTask))]
+[IsDependentOn(typeof(TestiOSTask))]
+public sealed class TestNuGetTask : FrostingTask<BuildContext> { }
 
 [TaskName("Default")]
 [IsDependentOn(typeof(BuildAllTask))]
