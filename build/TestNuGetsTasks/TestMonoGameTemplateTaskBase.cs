@@ -7,6 +7,21 @@ public abstract class TestMonoGameTemplateTaskBase : FrostingTask<BuildContext>
     protected abstract string TemplateName { get; }
     protected abstract string ProjectFolderName { get; }
     protected abstract string TemplateShortName { get; }
+    protected abstract PlatformFamily[] SupportedPlatforms { get; }
+
+    public override bool ShouldRun(BuildContext context)
+    {
+        var currentPlatform = context.Environment.Platform.Family;
+        var isSupported = SupportedPlatforms.Contains(currentPlatform);
+        
+        if (!isSupported)
+        {
+            context.Information($"⏭️ Skipping {TemplateName} test - not supported on {currentPlatform}");
+            context.Information($"   Supported platforms: {string.Join(", ", SupportedPlatforms)}");
+        }
+        
+        return isSupported;
+    }
 
     public override void Run(BuildContext context)
     {
@@ -80,15 +95,37 @@ public abstract class TestMonoGameTemplateTaskBase : FrostingTask<BuildContext>
             // Source might not exist, continue
         }
 
-        // Use PowerShell directly to avoid CAKE argument parsing issues
-        var result = context.StartProcess("powershell", new ProcessSettings
+        // Try using CAKE's cross-platform process execution with proper argument handling
+        try
         {
-            Arguments = $"-Command \"dotnet nuget add source '{nugetSourcePath}' --name {nugetSourceName}\""
-        });
-        
-        if (result != 0)
+            var addSourceSettings = new ProcessSettings
+            {
+                Arguments = new ProcessArgumentBuilder()
+                    .Append("nuget")
+                    .Append("add")
+                    .Append("source")
+                    .Append(nugetSourcePath)
+                    .Append("--name")
+                    .Append(nugetSourceName),
+                RedirectStandardOutput = true
+            };
+            
+            var result = context.StartProcess("dotnet", addSourceSettings, out var output);
+            
+            if (result != 0)
+            {
+                var errorMessage = string.Join("\n", output);
+                context.Warning($"dotnet nuget add source failed with exit code {result}");
+                context.Warning($"Output: {errorMessage}");
+                throw new Exception($"Failed to add NuGet source {nugetSourceName}");
+            }
+            
+            context.Information($"Successfully added NuGet source: {nugetSourceName}");
+        }
+        catch (Exception ex)
         {
-            throw new Exception($"Failed to add NuGet source {nugetSourceName}");
+            context.Error($"Failed to add NuGet source: {ex.Message}");
+            throw;
         }
     }
 
