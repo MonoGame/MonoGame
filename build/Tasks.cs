@@ -46,8 +46,6 @@ public sealed class DeployTask : FrostingTask<BuildContext> { }
 
 [TaskName("Test")]
 [IsDependentOn(typeof(DownloadTestArtifactsTask))]
-// [IsDependentOn(typeof(TestWindowsDXTask))]  // Uncomment to test WindowsDX
-// [IsDependentOn(typeof(TestAndroidTask))]    // Uncomment to test Android
 public sealed class TestTask : FrostingTask<BuildContext> { }
 
 [TaskName("TestNuGet")]
