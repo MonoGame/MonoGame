@@ -39,7 +39,7 @@ We support a growing list of platforms across the desktop, mobile, and console s
 * [Consoles (for registered developers)](https://docs.monogame.net/articles/console_access.html)
   * PlayStation 4
   * PlayStation 5
-  * Xbox (GDK & XDK)
+  * Xbox (GDKX & XDK)
   * Nintendo Switch
 
 [^1]An experimental Vulkan implementation is available to source code users.
