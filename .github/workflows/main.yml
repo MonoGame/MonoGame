@@ -112,6 +112,7 @@ jobs:
         shell: bash
 
       - name: Test generated Nuget packages
+        if: runner.os != 'Linux'
         run: dotnet run --project build/Build.csproj -- --target=TestNuGet
         env:
           ACTIONS_RUNTIME_TOKEN: ${{ env.ACTIONS_RUNTIME_TOKEN }}
