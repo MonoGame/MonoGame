@@ -3,7 +3,7 @@ namespace BuildScripts;
 [TaskName("TestBlank2DStarterKit")]
 public sealed class TestBlank2DStarterKitTask : TestMonoGameTemplateTaskBase
 {
-    private static readonly PlatformFamily[] _supportedPlatforms = { PlatformFamily.Windows, PlatformFamily.Linux, PlatformFamily.OSX };
+    private static readonly PlatformFamily[] _supportedPlatforms = { PlatformFamily.Windows, PlatformFamily.Linux};
     
     protected override string TemplateName => "Blank 2D Starter Kit";
     protected override string ProjectFolderName => "blank2dstartkit";
