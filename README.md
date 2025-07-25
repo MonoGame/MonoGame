@@ -30,17 +30,21 @@ It is an open-source re-implementation of the discontinued [Microsoft's XNA Fram
 We support a growing list of platforms across the desktop, mobile, and console space. If there is a platform we do not support, please [make a request](https://github.com/MonoGame/MonoGame/issues) or [come help us](CONTRIBUTING.md) add it.
 
 * Desktop PCs
-  * Windows 8.1 and up (OpenGL & DirectX)
-  * Linux (OpenGL)
-  * macOS 10.15 and up (OpenGL)
+  * Windows 10 (22H2+) and up (OpenGL[^1] & DirectX 10[^2])
+  * Linux[^3] and up (OpenGL[^1])
+  * macOS 13 "Ventura" and up (OpenGL[^1])
 * Mobile/Tablet Devices
-  * Android 6.0 and up (OpenGL)
-  * iPhone/iPad 10.0 and up (OpenGL)
+  * Android 6 (API 23) and up (OpenGL)
+  * iOS/iPadOS 12.2 and up (OpenGL)
 * [Consoles (for registered developers)](https://docs.monogame.net/articles/console_access.html)
   * PlayStation 4
   * PlayStation 5
-  * Xbox One (XDK only) (GDK coming soon)
+  * Xbox (GDK & XDK)
   * Nintendo Switch
+
+[^1]An experimental Vulkan implementation is available to source code users.
+[^2]An experimental DirectX 12 implementation is available to source code users.
+[^3]Requires a distribution with glibc 2.27 or up. This includes SteamOS 3.0 and up, Ubuntu 18.04 and up, Debian 11 and up, CentOS 9 and up among other unlisted distributions.
 
 ## Resources
 
