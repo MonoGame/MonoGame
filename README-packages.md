@@ -39,9 +39,11 @@ We support a growing list of platforms across the desktop, mobile, and console s
   * Xbox (GDKX & XDK)
   * Nintendo Switch
 
-[^1]An experimental Vulkan implementation is available to source code users.
-[^2]An experimental DirectX 12 implementation is available to source code users.
-[^3]Requires a distribution with glibc 2.27 or up. This includes SteamOS 3.0 and up, Ubuntu 22.04 and up, Debian 12 and up, CentOS 9 and up among other unlisted distributions.
+[^1]: An experimental Vulkan implementation is available to source code users.
+
+[^2]: An experimental DirectX 12 implementation is available to source code users.
+
+[^3]: Requires a distribution with glibc 2.27 or up. This includes SteamOS 3.0 and up, Ubuntu 22.04 and up, Debian 12 and up, CentOS 9 and up among other unlisted distributions.
 
 ## Resources
 
