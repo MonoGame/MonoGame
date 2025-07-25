@@ -36,7 +36,7 @@ namespace MonoGame.Effect.Compiler
 
             // We don't support running MGFXC on Unix platforms
             // however Wine can be used to make it work so lets try that.
-            if (Environment.OSVersion.Platform == PlatformID.Unix)
+            if (Environment.OSVersion.Platform == PlatformID.Unix && options.Profile != ShaderProfile.Vulkan)
             {
                 Environment.SetEnvironmentVariable("MGFXC_USE_WINE", "1");
                 return WineHelper.Run(options);

@@ -33,7 +33,7 @@ jobs:
       - name: Setup DotNet on MacOS
         if: runner.environment == 'github-hosted' && runner.os == 'macos'
         run: |
-          dotnet workload install android macos ios
+          dotnet workload install macos ios
 
       - name: Add msbuild to PATH
         if: runner.os == 'Windows'

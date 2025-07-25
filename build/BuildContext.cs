@@ -1,4 +1,7 @@
+using Cake.Common.Tools.DotNet.Run;
 using Cake.Git;
+using MonoGame.Tool;
+using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
 
 namespace BuildScripts;
@@ -84,11 +87,25 @@ public class BuildContext : FrostingContext
             Configuration = buildConfiguration
         };
 
+        DotNetRunSettings = new DotNetRunSettings
+        {
+            NoBuild = true,
+            NoRestore = true,
+            Configuration = "Release"
+        };
+
         Console.WriteLine($"Version: {Version}");
         Console.WriteLine($"RepositoryUrl: {repositoryUrl}");
         Console.WriteLine($"BuildConfiguration: {buildConfiguration}");
 
-        if (!context.IsRunningOnWindows())
+        if (context.IsRunningOnWindows())
+        {
+            // SET PATH SO PROCESSESS CAN FIND DXC.EXE
+            var pathEnv = System.Environment.GetEnvironmentVariable("PATH");
+            pathEnv += ";" + AppDomain.CurrentDomain.BaseDirectory;
+            System.Environment.SetEnvironmentVariable("PATH", pathEnv);
+        }
+        else
         {
             // SET MGFXC_WINE_PATH for building shaders on macOS and Linux
             System.Environment.SetEnvironmentVariable("MGFXC_WINE_PATH", context.EnvironmentVariable("HOME") + "/.winemonogame");
@@ -112,6 +129,8 @@ public class BuildContext : FrostingContext
     public DotNetPublishSettings DotNetPublishSettings { get; }
 
     public DotNetPublishSettings DotNetPublishSettingsForMac { get; }
+
+    public DotNetRunSettings DotNetRunSettings { get; }
 
     public MSBuildSettings MSBuildSettings { get; }
 
@@ -150,6 +169,16 @@ public class BuildContext : FrostingContext
             throw new Exception($"Execution failed for: {command} {args}");
         }
     }
+
+    public void DotNetRun(string project, string args, DirectoryPath? workingDir = null)
+    {
+        var mgfxc = System.IO.Path.Combine(Directory.GetCurrentDirectory(), project);
+        DotNetRunSettings.WorkingDirectory = workingDir ?? "";
+        this.DotNetRun(mgfxc, args, DotNetRunSettings);
+        DotNetRunSettings.WorkingDirectory = "";
+    }
+
+    public int DxcRun(string args) => RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? this.StartProcess("dxc.exe", args) : Dxc.Run(args, out _, out _);
 
     public bool IsWorkloadInstalled(string workload)
     {
