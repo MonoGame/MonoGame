@@ -603,9 +603,16 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
                 {
                     foreach (var animation in _scene.Animations)
                     {
-                        var animationContent = ImportAnimation(animation, node.Name);
+                        var animationContent = ImportAnimation(animation, node.Name, _scene.RootNode);
                         if (animationContent.Channels.Count > 0)
                             node.Animations.Add(animationContent.Name, animationContent);
+                    }
+                }
+                if (_scene.HasTextures)
+                {
+                    foreach (var texture in _scene.Textures)
+                    {
+                       
                     }
                 }
             }
@@ -698,11 +705,13 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
 
             // First, identify all deformation bones.
             _deformationBones = FindDeformationBones(_scene);
-            if (_deformationBones.Count == 0)
-                return;
-
-            // Walk the tree upwards to find the root bones.
             var rootBones = new HashSet<Node>();
+            if (_deformationBones.Count == 0)
+            {
+                return;
+            }
+            // Walk the tree upwards to find the root bones.
+            
             foreach (var boneName in _deformationBones.Keys)
                 rootBones.Add(FindRootBone(_scene, boneName));
 
@@ -783,7 +792,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
             // Convert animations and add to root bone.
             foreach (var animation in _scene.Animations)
             {
-                var animationContent = ImportAnimation(animation);
+                var animationContent = ImportAnimation(animation, node: _scene.RootNode);
                 rootBoneContent.Animations.Add(animationContent.Name, animationContent);
             }
         }
@@ -907,11 +916,11 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
         /// <param name="aiAnimation">The animation.</param>
         /// <param name="nodeName">An optional filter.</param>
         /// <returns>The animation converted to XNA.</returns>
-        private AnimationContent ImportAnimation(Animation aiAnimation, string nodeName = null)
+        private AnimationContent ImportAnimation(Animation aiAnimation, string nodeName = null, Node node = null)
         {
             var animation = new AnimationContent
             {
-                Name = GetAnimationName(aiAnimation.Name),
+                Name = GetAnimationName(aiAnimation.Name, node),
                 Identity = _identity,
                 Duration = TimeSpan.FromSeconds(aiAnimation.DurationInTicks / aiAnimation.TicksPerSecond)
             };
@@ -1154,9 +1163,28 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
         /// Gets the animation name without the "AnimStack::" part.
         /// </summary>
         /// <param name="name">The mangled animation name.</param>
+        /// <param name="node">The node this animation is attached to.</param>
         /// <returns>The original animation name.</returns>
-        private static string GetAnimationName(string name)
+        private static string GetAnimationName(string name, Node node)
         {
+            if (name.Contains ('|'))
+            {
+                // fix up mangled blender animation names
+                var parts = name.Split('|');
+                if (parts.Length == 2)
+                {
+                    
+                    var nodeName = parts[0]; // nodename
+                    if (node != null)
+                    {
+                        if (ValidNode (node, nodeName))
+                        {
+                            return parts[1]; // animationname;
+                        }
+                    }
+
+                }
+            }
             return name.Replace("AnimStack::", string.Empty);
         }
 
@@ -1169,6 +1197,19 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
         {
             int index = name.IndexOf("_$AssimpFbx$", StringComparison.Ordinal);
             return (index >= 0) ? name.Remove(index) : name;
+        }
+
+        private static bool ValidNode(Node node, string name)
+        {
+            if (node.Name == name)
+                return true;
+
+            foreach (var child in node.Children)
+            {
+                if (ValidNode(child, name))
+                    return true;
+            }
+            return false;
         }
     }
 }
