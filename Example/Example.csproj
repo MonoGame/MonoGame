@@ -6,10 +6,6 @@
     <EmccFlags>-sMIN_WEBGL_VERSION=2</EmccFlags>
 
   </PropertyGroup>
-  <PropertyGroup>
-    <WasmBuildNative>true</WasmBuildNative>
-    <WasmNativeStrip>false</WasmNativeStrip>
-  </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\MonoGame.Framework/MonoGame.Framework.DesktopGL.csproj" />
 

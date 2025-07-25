@@ -43,7 +43,7 @@ namespace MonoGame.OpenGL
             SetWindowHandle(info);
 #if DEBUG
             // create debug context, so we get better error messages (glDebugMessageCallback)
-            Sdl.GL.SetAttribute(Sdl.GL.Attribute.ContextFlags, 1); // 1 = SDL_GL_CONTEXT_DEBUG_FLAG
+            // Sdl.GL.SetAttribute(Sdl.GL.Attribute.ContextFlags, 1); // 1 = SDL_GL_CONTEXT_DEBUG_FLAG
 #endif
             _context = Sdl.GL.CreateContext(_winHandle);
             Console.WriteLine("OPENGL Context "+_context);

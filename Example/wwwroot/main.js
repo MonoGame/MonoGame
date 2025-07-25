@@ -38,6 +38,4 @@ Module.setMainLoop(cSharpMainLoop);
 var canvas = document.getElementById("canvas");
 Module.canvas = canvas;
 
-// globalThis.gl = canvas.getContext("webgl2");// changing to webgl2 causes alot more issues
-
 await dotnet.run();
