@@ -11,6 +11,7 @@
     <CopyContentFiles>True</CopyContentFiles>
     <IsAotCompatible>true</IsAotCompatible>
     <PackageReadmeFile>README-packages.md</PackageReadmeFile>
+    <DefineConstants>$(DefineConstants);GLES</DefineConstants>
   </PropertyGroup>
 
   <ItemGroup>

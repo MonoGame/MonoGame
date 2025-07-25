@@ -11,19 +11,25 @@ namespace MonoGame.OpenGL
     {
         static partial void LoadPlatformEntryPoints()
         {
+#if GLES
+            BoundApi = RenderApi.ES;
+#else
             BoundApi = RenderApi.GL;
+#endif
         }
+
 
         private static T LoadFunction<T>(string function, bool throwIfNotFound = false)
         {
-            var ret = Sdl.GL.GetProcAddress(function);
+            nint ret = Sdl.GL.GL_GetProcAddress_Import(function);
+            Console.WriteLine(function+" "+ret);
 
             if (ret == IntPtr.Zero)
             {
                 if (throwIfNotFound)
                     throw new EntryPointNotFoundException(function);
 
-                return default(T);
+                return default;
             }
 
 #if NETSTANDARD
@@ -39,4 +45,3 @@ namespace MonoGame.OpenGL
         }
     }
 }
-

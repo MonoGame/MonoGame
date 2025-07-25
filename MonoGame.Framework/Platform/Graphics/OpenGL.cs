@@ -1291,8 +1291,19 @@ namespace MonoGame.OpenGL
             GenTextures = LoadFunction<GenTexturesDelegte> ("glGenTextures");
             BindTexture = LoadFunction<BindTextureDelegate> ("glBindTexture");
 
-            Enable = LoadFunction<EnableDelegate> ("glEnable");
-            Disable = LoadFunction<DisableDelegate> ("glDisable");
+                var enable=LoadFunction<EnableDelegate> ("glEnable");
+            Enable = (EnableCap cap)=>{
+                Console.WriteLine("Enable: "+cap);
+                return enable(cap);
+            };
+         var   disable = LoadFunction<DisableDelegate> ("glDisable");
+         Console.WriteLine(disable);
+                     Disable = (EnableCap cap)=>{
+                Console.WriteLine("disable: "+cap);
+                var res= disable(cap);
+                Console.WriteLine("res "+res);
+                return res;
+            };
             CullFace = LoadFunction<CullFaceDelegate> ("glCullFace");
             FrontFace = LoadFunction<FrontFaceDelegate> ("glFrontFace");
             PolygonMode = LoadFunction<PolygonModeDelegate> ("glPolygonMode");
@@ -1455,7 +1466,7 @@ namespace MonoGame.OpenGL
                 GL.LoadFrameBufferObjectEXTEntryPoints();
             }
             if (GL.RenderbufferStorageMultisample == null)
-            {                
+            {
                 if (Extensions.Contains("GL_APPLE_framebuffer_multisample"))
                 {
                     GL.RenderbufferStorageMultisample = LoadFunction<GL.RenderbufferStorageMultisampleDelegate>("glRenderbufferStorageMultisampleAPPLE");
@@ -1700,4 +1711,3 @@ namespace MonoGame.OpenGL
         }
     }
 }
-

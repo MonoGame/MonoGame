@@ -2,6 +2,12 @@
     "version": "2.0.0",
     "tasks": [
         {
+            "label": "stop-server",
+            "type": "shell",
+            "command": "sleep 5 && killall dotnet",
+            "problemMatcher": []
+        },
+        {
             "label": "Build: mgcb",
             "command": "dotnet",
             "type": "process",

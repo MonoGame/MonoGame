@@ -2,13 +2,21 @@
     // Use IntelliSense to learn about possible attributes.
     // Hover to view descriptions of existing attributes.
     // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
-    "version": "0.2.0",
-    "configurations": [
-        {
-            "name": "Generator: CTypes",
-            "type": "coreclr",
-            "request": "launch",
-            "preLaunchTask": "generator-ctypes",
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Debug Standalone Blazor WebAssembly App",
+      "type": "blazorwasm",
+      "request": "launch",
+      "trace": "verbose",
+      "cwd": "${workspaceFolder}/Example",
+      "url": "https://localhost:7214"
+    },
+    {
+      "name": "Generator: CTypes",
+      "type": "coreclr",
+      "request": "launch",
+      "preLaunchTask": "generator-ctypes",
             "program": "${workspaceFolder}/Tools/MonoGame.Generator.CTypes/bin/Debug/net8.0/MonoGame.Generator.CTypes",
             "args": [],
             "cwd": "${workspaceFolder}/Tools/MonoGame.Generator.CTypes/bin/Debug/net8.0",
@@ -26,8 +34,8 @@
             "console": "internalConsole",
             "stopAtEntry": false
         },
-        {
-            "name": "MGCB",
+{
+        "name": "MGCB",
             "type": "coreclr",
             "request": "launch",
             "preLaunchTask": "Build: mgcb",
@@ -75,6 +83,6 @@
             "type": "promptString",
             "default": "0",
             "description": "Enter Process Id of process to attach to."
-        }
-    ]
+    }
+  ]
 }

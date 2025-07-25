@@ -39,14 +39,14 @@ namespace MonoGame.OpenGL
         {
             if (_disposed)
                 return;
-            
+
             SetWindowHandle(info);
 #if DEBUG
             // create debug context, so we get better error messages (glDebugMessageCallback)
             Sdl.GL.SetAttribute(Sdl.GL.Attribute.ContextFlags, 1); // 1 = SDL_GL_CONTEXT_DEBUG_FLAG
 #endif
             _context = Sdl.GL.CreateContext(_winHandle);
-
+            Console.WriteLine("OPENGL Context "+_context);
             // GL entry points must be loaded after the GL context creation, otherwise some Windows drivers will return only GL 1.3 compatible functions
             try
             {
@@ -64,7 +64,7 @@ namespace MonoGame.OpenGL
         {
             if (_disposed)
                 return;
-            
+
             SetWindowHandle(info);
             Sdl.GL.MakeCurrent(_winHandle, _context);
         }
@@ -73,7 +73,7 @@ namespace MonoGame.OpenGL
         {
             if (_disposed)
                 return;
-            
+
             Sdl.GL.SwapWindow(_winHandle);
         }
 

@@ -12,6 +12,7 @@ namespace MonoGame.Framework.Utilities
         Windows,
         Linux,
         MacOSX,
+        Browser,
         Unknown
     }
 
@@ -45,7 +46,7 @@ namespace MonoGame.Framework.Utilities
                     _os = OS.MacOSX;
 
                     var buf = IntPtr.Zero;
-                    
+
                     try
                     {
                         buf = Marshal.AllocHGlobal(8192);
@@ -64,7 +65,7 @@ namespace MonoGame.Framework.Utilities
 
                     break;
                 default:
-                    _os = OS.Unknown;
+                    _os = OS.Browser;
                     break;
             }
 
@@ -92,6 +93,8 @@ namespace MonoGame.Framework.Utilities
                     return "linux-x64";
                 else if (CurrentPlatform.OS == OS.MacOSX)
                     return "osx";
+                else if (CurrentPlatform.OS == OS.Browser)
+                    return "browser-wasm";
                 else
                     return "unknown";
             }

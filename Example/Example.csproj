@@ -1,0 +1,38 @@
+<Project Sdk="Microsoft.NET.Sdk.WebAssembly">
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+
+    <EmccFlags>-sMIN_WEBGL_VERSION=2</EmccFlags>
+
+  </PropertyGroup>
+  <PropertyGroup>
+    <WasmBuildNative>true</WasmBuildNative>
+    <WasmNativeStrip>false</WasmNativeStrip>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\MonoGame.Framework/MonoGame.Framework.DesktopGL.csproj" />
+
+    <!-- <Reference Include="MonoGame.Framework.DesktopGL">
+        <HintPath>../Artifacts/MonoGame.Framework/DesktopGL/Debug/MonoGame.Framework.dll</HintPath>
+    </Reference> -->
+
+
+    <NativeFileReference Include="libSDL2.a">
+        <Visible>false</Visible>
+    </NativeFileReference>
+
+    <EmccExportedRuntimeMethod Include="SDL">
+        <Visible>false</Visible>
+    </EmccExportedRuntimeMethod>
+
+    <EmccExportedRuntimeMethod Include="GL">
+        <Visible>false</Visible>
+    </EmccExportedRuntimeMethod>
+
+    <EmccExportedRuntimeMethod Include="setMainLoop">
+        <Visible>false</Visible>
+    </EmccExportedRuntimeMethod>
+
+  </ItemGroup>
+</Project>

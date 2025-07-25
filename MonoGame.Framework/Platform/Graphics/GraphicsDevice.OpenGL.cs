@@ -214,7 +214,7 @@ namespace Microsoft.Xna.Framework.Graphics
                         (IntPtr)(offset.ToInt64() + element.Offset));
 
                     // only set the divisor if instancing is supported
-                    if (GraphicsCapabilities.SupportsInstancing) 
+                    if (GraphicsCapabilities.SupportsInstancing)
                         GL.VertexAttribDivisor(element.AttributeLocation, vertexBufferBinding.InstanceFrequency);
 
                     GraphicsExtensions.CheckGLError();
@@ -243,6 +243,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
         private void PlatformSetup()
         {
+            Console.WriteLine("PlatformSetup");
             _programCache = new ShaderProgramCache(this);
 #if DESKTOPGL || ANGLE
             var windowInfo = new WindowInfo(SdlGameWindow.Instance.Handle);
@@ -320,6 +321,7 @@ namespace Microsoft.Xna.Framework.Graphics
             }
 #endif
 
+
 #if !GLES
 			// Initialize draw buffer attachment array
 			int maxDrawBuffers;
@@ -338,22 +340,27 @@ namespace Microsoft.Xna.Framework.Graphics
             // Ensure the vertex attributes are reset
             _enabledVertexAttributes.Clear();
 
-            // Free all the cached shader programs. 
+            // Free all the cached shader programs.
             _programCache.Clear();
             _shaderProgram = null;
 
+Console.WriteLine("A");
             framebufferHelper = FramebufferHelper.Create(this);
+Console.WriteLine("B");
 
             // Force resetting states
             this.PlatformApplyBlend(true);
+Console.WriteLine("C");
             this.DepthStencilState.PlatformApplyState(this, true);
+Console.WriteLine("D");
             this.RasterizerState.PlatformApplyState(this, true);
+Console.WriteLine("E");
 
             _bufferBindingInfos = new BufferBindingInfo[_maxVertexBufferSlots];
             for (int i = 0; i < _bufferBindingInfos.Length; i++)
                 _bufferBindingInfos[i] = new BufferBindingInfo(null, IntPtr.Zero, 0, -1);
         }
-        
+
         private DepthStencilState clearDepthStencilState = new DepthStencilState { StencilEnable = true };
 
         private void PlatformClear(ClearOptions options, Vector4 color, float depth, int stencil)
@@ -376,7 +383,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		    var prevDepthStencilState = DepthStencilState;
             var prevBlendState = BlendState;
             ScissorRectangle = _viewport.Bounds;
-            // DepthStencilState.Default has the Stencil Test disabled; 
+            // DepthStencilState.Default has the Stencil Test disabled;
             // make sure stencil test is enabled before we clear since
             // some drivers won't clear with stencil test disabled
             DepthStencilState = this.clearDepthStencilState;
@@ -405,7 +412,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 bufferMask = bufferMask | ClearBufferMask.StencilBufferBit;
 			}
 
-			if ((options & ClearOptions.DepthBuffer) == ClearOptions.DepthBuffer) 
+			if ((options & ClearOptions.DepthBuffer) == ClearOptions.DepthBuffer)
             {
                 if (depth != _lastClearDepth)
                 {
@@ -425,7 +432,7 @@ namespace Microsoft.Xna.Framework.Graphics
 #if MONOMAC || IOS
             }
 #endif
-           		
+
             // Restore the previous render state.
 		    ScissorRectangle = prevScissorRect;
 		    DepthStencilState = prevDepthStencilState;
@@ -562,7 +569,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
             GL.DepthRange(value.MinDepth, value.MaxDepth);
             GraphicsExtensions.LogGLError("GraphicsDevice.Viewport_set() GL.DepthRange");
-                
+
             // In OpenGL we have to re-apply the special "posFixup"
             // vertex shader uniform if the viewport changes.
             _vertexShaderDirty = true;
@@ -635,7 +642,7 @@ namespace Microsoft.Xna.Framework.Graphics
             var color = 0;
             var depth = 0;
             var stencil = 0;
-            
+
             if (preferredMultiSampleCount > 0 && this.framebufferHelper.SupportsBlitFramebuffer)
             {
                 this.framebufferHelper.GenRenderbuffer(out color);
@@ -649,7 +656,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 var stencilInternalFormat = (RenderbufferStorage)0;
                 switch (preferredDepthFormat)
                 {
-                    case DepthFormat.Depth16: 
+                    case DepthFormat.Depth16:
                         depthInternalFormat = RenderbufferStorage.DepthComponent16;
                         break;
 #if GLES
@@ -888,7 +895,7 @@ namespace Microsoft.Xna.Framework.Graphics
         }
 
         /// <summary>
-        /// Activates the Current Vertex/Pixel shader pair into a program.         
+        /// Activates the Current Vertex/Pixel shader pair into a program.
         /// </summary>
         private unsafe void ActivateShaderProgram()
         {
@@ -970,6 +977,7 @@ namespace Microsoft.Xna.Framework.Graphics
         private void PlatformApplyBlend(bool force = false)
         {
             _actualBlendState.PlatformApplyState(this, force);
+            Console.WriteLine("----");
             ApplyBlendFactor(force);
         }
 
@@ -1105,7 +1113,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
         private void PlatformDrawPrimitives(PrimitiveType primitiveType, int vertexStart, int vertexCount)
         {
-            ApplyState(true);   
+            ApplyState(true);
 
             ApplyAttribs(_vertexShader, 0);
 
@@ -1264,7 +1272,7 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             return new Rectangle(x, y, width, height);
         }
-        
+
         internal void PlatformSetMultiSamplingToMaximum(PresentationParameters presentationParameters, out int quality)
         {
             presentationParameters.MultiSampleCount = 4;
