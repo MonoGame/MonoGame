@@ -19,12 +19,12 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Utilities;
 internal static class BcnUtil
 {
     /// <summary>
-    /// Compress the given <see cref="sourceBitmap"/> to the desired block format <see cref="destinationFormat"/>.
+    /// Compress the given <paramref name="sourceBitmap"/> to the desired block format <paramref name="destinationFormat"/>.
     /// No files will be written to disk, and no external tools are invoked.
     /// </summary>
-    /// <param name="sourceBitmap"></param>
-    /// <param name="destinationFormat"></param>
-    /// <param name="compressedBytes"></param>
+    /// <param name="sourceBitmap">Source bitmap to encode</param>
+    /// <param name="destinationFormat">The format to encode the bitmap with</param>
+    /// <param name="compressedBytes">The resulting encoded bitmap, in the form of a byte array.</param>
     public static void Encode(
         BitmapContent sourceBitmap,
         CompressionFormat destinationFormat,

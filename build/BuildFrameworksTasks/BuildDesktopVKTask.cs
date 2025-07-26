@@ -2,6 +2,7 @@
 namespace BuildScripts;
 
 [TaskName("Build DesktopVK")]
+[IsDependentOn(typeof(BuildShadersVulkanTask))]
 [IsDependentOn(typeof(BuildNativeDependenciesTask))]
 public sealed class BuildDesktopVKTask : FrostingTask<BuildContext>
 {

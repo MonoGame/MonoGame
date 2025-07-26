@@ -33,8 +33,18 @@
     <PackageReference Include="Cake.FileHelpers" Version="7.0.0" />
     <PackageReference Include="Cake.Frosting" Version="5.0.0" />
     <PackageReference Include="Cake.Git" Version="4.0.0" />
+    <PackageReference Include="Microsoft.Direct3D.DXC" Version="1.8.2505.32" />
+    <PackageReference Include="MonoGame.Tool.Dxc" Version="1.8.2505.7" />
     <PackageReference Include="NuGet.Packaging" Version="6.11.1" />
     <PackageReference Include="System.Formats.Asn1" Version="9.0.0" />
   </ItemGroup>
+
+  <Target Name="CopyNuGetToolFiles" AfterTargets="Build">
+    <ItemGroup>
+      <ToolFiles Include="$(NuGetPackageRoot)Microsoft.Direct3D.DXC\1.8.2505.32\build\native\bin\x64\*.dll" />
+	    <ToolFiles Include="$(NuGetPackageRoot)Microsoft.Direct3D.DXC\1.8.2505.32\build\native\bin\x64\*.exe" />
+    </ItemGroup>
+    <Copy SourceFiles="@(ToolFiles)" DestinationFolder="$(OutputPath)" />
+  </Target>
 
 </Project>

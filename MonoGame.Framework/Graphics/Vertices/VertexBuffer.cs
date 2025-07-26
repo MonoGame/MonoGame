@@ -4,6 +4,7 @@
 
 using System;
 using MonoGame.Framework.Utilities;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
@@ -80,7 +81,7 @@ namespace Microsoft.Xna.Framework.Graphics
         /// <param name="vertexCount">The number of vertices.</param>
         /// <param name="bufferUsage">Behavior options.</param>
         /// <exception cref="ArgumentNullException"><paramref name="graphicsDevice"/> is <see langword="null"/></exception>
-        public VertexBuffer(GraphicsDevice graphicsDevice, Type type, int vertexCount, BufferUsage bufferUsage) :
+        public VertexBuffer(GraphicsDevice graphicsDevice, [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicParameterlessConstructor)] Type type, int vertexCount, BufferUsage bufferUsage) :
 			this(graphicsDevice, VertexDeclaration.FromType(type), vertexCount, bufferUsage, false)
 		{
         }
@@ -117,7 +118,9 @@ namespace Microsoft.Xna.Framework.Graphics
         /// For vertexStride we pass the size of a <see cref="VertexPositionTexture"/>.
         /// </p>
         /// </remarks>
-        public void GetData<T> (int offsetInBytes, T[] data, int startIndex, int elementCount, int vertexStride = 0) where T : struct
+        public void GetData<
+            [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors | DynamicallyAccessedMemberTypes.NonPublicConstructors)] T
+        > (int offsetInBytes, T[] data, int startIndex, int elementCount, int vertexStride = 0) where T : struct
         {
             var elementSizeInBytes = ReflectionHelpers.FastSizeOf<T>();
             if (vertexStride == 0)
@@ -140,13 +143,17 @@ namespace Microsoft.Xna.Framework.Graphics
         }
 
         /// <inheritdoc cref="GetData{T}(int, T[], int, int, int)"/>
-        public void GetData<T>(T[] data, int startIndex, int elementCount) where T : struct
+        public void GetData<
+            [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors | DynamicallyAccessedMemberTypes.NonPublicConstructors)] T
+        >(T[] data, int startIndex, int elementCount) where T : struct
         {
             this.GetData<T>(0, data, startIndex, elementCount, 0);
         }
 
         /// <inheritdoc cref="GetData{T}(int, T[], int, int, int)"/>
-        public void GetData<T>(T[] data) where T : struct
+        public void GetData<
+            [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors | DynamicallyAccessedMemberTypes.NonPublicConstructors)] T
+        >(T[] data) where T : struct
         {
             var elementSizeInByte = ReflectionHelpers.FastSizeOf<T>();
             this.GetData<T>(0, data, 0, data.Length, elementSizeInByte);

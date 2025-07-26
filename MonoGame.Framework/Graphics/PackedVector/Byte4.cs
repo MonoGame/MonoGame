@@ -3,16 +3,29 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Microsoft.Xna.Framework.Graphics.PackedVector
 {
     /// <summary>
     /// Packed vector type containing four 8-bit unsigned integer values, ranging from 0 to 255.
     /// </summary>
+#if XNADESIGNPROVIDED
+    [System.ComponentModel.TypeConverter(typeof(Microsoft.Xna.Framework.Design.Byte4TypeConverter))]
+    [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.Interfaces | DynamicallyAccessedMemberTypes.PublicParameterlessConstructor)]
+#endif
     public struct Byte4 : IPackedVector<uint>, IEquatable<Byte4>, IPackedVector
     {
         uint packedValue;
 
+        /// <summary>
+        /// Initializes a new instance of this structure.
+        /// </summary>
+        public Byte4()
+        {
+            
+        }
+        
         /// <summary>
         /// Initializes a new instance of this structure.
         /// </summary>

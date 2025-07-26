@@ -1,4 +1,7 @@
+using Cake.Common.Tools.DotNet.Run;
 using Cake.Git;
+using MonoGame.Tool;
+using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
 
 namespace BuildScripts;
@@ -84,11 +87,25 @@ public class BuildContext : FrostingContext
             Configuration = buildConfiguration
         };
 
+        DotNetRunSettings = new DotNetRunSettings
+        {
+            NoBuild = true,
+            NoRestore = true,
+            Configuration = "Release"
+        };
+
         Console.WriteLine($"Version: {Version}");
         Console.WriteLine($"RepositoryUrl: {repositoryUrl}");
         Console.WriteLine($"BuildConfiguration: {buildConfiguration}");
 
-        if (!context.IsRunningOnWindows())
+        if (context.IsRunningOnWindows())
+        {
+            // SET PATH SO PROCESSESS CAN FIND DXC.EXE
+            var pathEnv = System.Environment.GetEnvironmentVariable("PATH");
+            pathEnv += ";" + AppDomain.CurrentDomain.BaseDirectory;
+            System.Environment.SetEnvironmentVariable("PATH", pathEnv);
+        }
+        else
         {
             // SET MGFXC_WINE_PATH for building shaders on macOS and Linux
             System.Environment.SetEnvironmentVariable("MGFXC_WINE_PATH", context.EnvironmentVariable("HOME") + "/.winemonogame");
@@ -112,6 +129,8 @@ public class BuildContext : FrostingContext
     public DotNetPublishSettings DotNetPublishSettings { get; }
 
     public DotNetPublishSettings DotNetPublishSettingsForMac { get; }
+
+    public DotNetRunSettings DotNetRunSettings { get; }
 
     public MSBuildSettings MSBuildSettings { get; }
 
@@ -151,6 +170,16 @@ public class BuildContext : FrostingContext
         }
     }
 
+    public void DotNetRun(string project, string args, DirectoryPath? workingDir = null)
+    {
+        var mgfxc = System.IO.Path.Combine(Directory.GetCurrentDirectory(), project);
+        DotNetRunSettings.WorkingDirectory = workingDir ?? "";
+        this.DotNetRun(mgfxc, args, DotNetRunSettings);
+        DotNetRunSettings.WorkingDirectory = "";
+    }
+
+    public int DxcRun(string args) => RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? this.StartProcess("dxc.exe", args) : Dxc.Run(args, out _, out _);
+
     public bool IsWorkloadInstalled(string workload)
     {
         this.StartProcess(
@@ -164,6 +193,34 @@ public class BuildContext : FrostingContext
         );
 
         return processOutput.Any(match => match.StartsWith($"{workload} "));
+    }
+
+    public void CheckLib(string relativePath)
+    {
+        var filePath = GetOutputPath(relativePath);
+        this.Information($"Checking library: {filePath}");
+
+        if (!File.Exists(filePath))
+        {
+            throw new FileNotFoundException(filePath);
+        }
+
+        switch (Environment.Platform.Family)
+        {
+            case PlatformFamily.Windows:
+                StaticLibCheck.CheckWindows(this, filePath);
+                break;
+            case PlatformFamily.Linux:
+                StaticLibCheck.CheckLinux(this, filePath);
+                break;
+            case PlatformFamily.OSX:
+                StaticLibCheck.CheckMacOS(this, filePath);
+                break;
+            default:
+                throw new NotSupportedException($"Platform {Environment.Platform.Family} is not supported for static library checks.");
+        }
+
+        this.Information("");
     }
 
     private static string CalculateVersion(ICakeContext context)
