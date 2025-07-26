@@ -261,6 +261,11 @@ enum class MGVertexElementFormat : mgint
     HalfVector4 = 11,
 };
 
+enum class MGProcessorType : mguint
+{
+    ZeroTransparentPixels = 1,
+};
+
 enum class MGGameRunBehavior : mgint
 {
     Asynchronous = 0,

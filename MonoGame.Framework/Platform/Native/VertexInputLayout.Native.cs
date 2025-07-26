@@ -65,11 +65,10 @@ partial class VertexInputLayout
         {
             // TODO: This should reference the documentation for more information on this issue.
 
-            var message =   "An error occurred while preparing to draw.\n\n" +
-                            "The set VertexDeclaration does not provide all the elements " +
-                            "required by the current vertex shader:\n\n\t" +
-                            string.Join(",  ", inputs.Select((x) => x.ToShaderSemantic())) + "\n\n" +
-                            "To fix the error change your VertexDeclaration or your Effect.";
+            var message = "An error occurred while preparing to draw. "
+                        + "This is probably because the current vertex declaration does not include all the elements "
+                        + "required by the current vertex shader. The current vertex declaration includes these elements: "
+                        + string.Join(", ", inputs.Select((x) => x.ToShaderSemantic())) + ".";
 
             throw new InvalidOperationException(message);
         }

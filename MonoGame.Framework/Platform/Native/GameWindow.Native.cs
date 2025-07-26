@@ -106,9 +106,7 @@ internal class NativeGameWindow : GameWindow
         var title = Title == null ? AssemblyHelper.GetDefaultWindowTitle() : Title;
 
         // Create the window which size may be changed by the platform.
-        byte* _title = stackalloc byte[StringInterop.GetMaxSize(title)];
-        StringInterop.CopyString(_title, title);
-        _handle = MGP.Window_Create(platform.Handle, ref _width, ref _height, _title);
+        _handle = MGP.Window_Create(platform.Handle, ref _width, ref _height, title);
 
         _windows[(nint)_handle] = this;
 
@@ -208,9 +206,7 @@ internal class NativeGameWindow : GameWindow
 
     protected override unsafe void SetTitle(string title)
     {
-        byte* _title = stackalloc byte[StringInterop.GetMaxSize(title)];
-        StringInterop.CopyString(_title, title);
-        MGP.Window_SetTitle(_handle, _title);
+        MGP.Window_SetTitle(_handle, title);
     }
 
     internal unsafe void Show(bool show)

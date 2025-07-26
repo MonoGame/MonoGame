@@ -68,8 +68,8 @@ internal static unsafe partial class MGM
     /// <param name="filepath">The absolute file path to the audio file.</param>
     /// <param name="info">Returns information about the opened audio file.</param>
     /// <returns>Returns the audio decoder ready to read data or null if the format is unsupported.</returns>
-    [DllImport(MGP.MonoGameNativeDLL, EntryPoint = "MGM_AudioDecoder_Create", ExactSpelling = true)]
-    public static extern MGM_AudioDecoder* AudioDecoder_Create(byte* filepath, out MGM_AudioDecoderInfo info);
+    [DllImport(MGP.MonoGameNativeDLL, EntryPoint = "MGM_AudioDecoder_Create", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern MGM_AudioDecoder* AudioDecoder_Create([MarshalAs(UnmanagedType.LPUTF8Str)] string filepath, out MGM_AudioDecoderInfo info);
 
     /// <summary>
     /// This releases all internal resources, closes the file, and destroys the audio decoder.
@@ -100,8 +100,8 @@ internal static unsafe partial class MGM
 
     #region Video
 
-    [DllImport(MGP.MonoGameNativeDLL, EntryPoint = "MGM_VideoDecoder_Create", ExactSpelling = true)]
-    public static extern MGM_VideoDecoder* VideoDecoder_Create(MGG_GraphicsDevice* device, byte* filepath, out MGM_VideoDecoderInfo info);
+    [DllImport(MGP.MonoGameNativeDLL, EntryPoint = "MGM_VideoDecoder_Create", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern MGM_VideoDecoder* VideoDecoder_Create(MGG_GraphicsDevice* device, [MarshalAs(UnmanagedType.LPUTF8Str)] string filepath, out MGM_VideoDecoderInfo info);
 
     [DllImport(MGP.MonoGameNativeDLL, EntryPoint = "MGM_VideoDecoder_Destroy", ExactSpelling = true)]
     public static extern void VideoDecoder_Destroy(MGM_VideoDecoder* decoder);

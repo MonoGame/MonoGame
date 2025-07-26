@@ -5,6 +5,7 @@
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;
+using System.Drawing;
 using System.Runtime.InteropServices;
 
 
@@ -148,8 +149,8 @@ internal static unsafe partial class MGG
 {
     #region Effect Resources
 
-    [DllImport(MGP.MonoGameNativeDLL, EntryPoint = "MGG_EffectResource_GetBytecode", ExactSpelling = true)]
-    public static extern void EffectResource_GetBytecode(byte* name, out byte* bytecode, out int size);
+    [DllImport(MGP.MonoGameNativeDLL, EntryPoint = "MGG_EffectResource_GetBytecode", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void EffectResource_GetBytecode([MarshalAs(UnmanagedType.LPUTF8Str)] string name, out byte* bytecode, out int size);
 
     #endregion
 
@@ -238,7 +239,7 @@ internal static unsafe partial class MGG
         int height);
 
     [DllImport(MGP.MonoGameNativeDLL, EntryPoint = "MGG_GraphicsDevice_SetRenderTargets", ExactSpelling = true)]
-    public static extern void GraphicsDevice_SetRenderTargets(MGG_GraphicsDevice* device, MGG_Texture** targets, int count);
+    public static extern void GraphicsDevice_SetRenderTargets(MGG_GraphicsDevice* device, MGG_Texture** targets, int* arraySlices, int count);
 
     [DllImport(MGP.MonoGameNativeDLL, EntryPoint = "MGG_GraphicsDevice_SetConstantBuffer", ExactSpelling = true)]
     public static extern void GraphicsDevice_SetConstantBuffer(MGG_GraphicsDevice* device, ShaderStage stage, int slot, MGG_Buffer* buffer);
@@ -269,6 +270,20 @@ internal static unsafe partial class MGG
 
     [DllImport(MGP.MonoGameNativeDLL, EntryPoint = "MGG_GraphicsDevice_DrawIndexedInstanced", ExactSpelling = true)]
     public static extern void GraphicsDevice_DrawIndexedInstanced(MGG_GraphicsDevice* device, PrimitiveType primitiveType, int primitiveCount, int indexStart, int vertexStart, int instanceCount);
+
+    [DllImport(MGP.MonoGameNativeDLL, EntryPoint = "MGG_GraphicsDevice_ResolveRenderTargets", ExactSpelling = true)]
+    public static extern void GraphicsDevice_ResolveRenderTargets(MGG_GraphicsDevice* device);
+
+    [DllImport(MGP.MonoGameNativeDLL, EntryPoint = "MGG_GraphicsDevice_GetBackBufferData", ExactSpelling = true)]
+    public static extern void GraphicsDevice_GetBackBufferData(
+        MGG_GraphicsDevice* device,
+        int x,
+        int y,
+        int width,
+        int height,
+        IntPtr data,
+        int count,
+        int dataBytes);
 
     #endregion
 
@@ -314,8 +329,10 @@ internal static unsafe partial class MGG
         ref MGG_Buffer* buffer,
         int offset,
         byte* data,
-        int length,       
-        byte discard);
+        int elementCount,
+        int vertexStride,
+        int elementSizeInBytes,
+        bool discard);
 
     [DllImport(MGP.MonoGameNativeDLL, EntryPoint = "MGG_Buffer_GetData", ExactSpelling = true)]
     public static extern void Buffer_GetData(
