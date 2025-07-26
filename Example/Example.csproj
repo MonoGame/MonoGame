@@ -1,9 +1,9 @@
 <Project Sdk="Microsoft.NET.Sdk.WebAssembly">
   <PropertyGroup>
-    <TargetFramework>net8.0</TargetFramework>
+    <TargetFramework>net9.0</TargetFramework>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 
-    <EmccFlags>-sMIN_WEBGL_VERSION=2</EmccFlags>
+    <EmccFlags>-sMIN_WEBGL_VERSION=2 -lGL</EmccFlags>
 
   </PropertyGroup>
   <ItemGroup>
@@ -21,10 +21,10 @@
     <EmccExportedRuntimeMethod Include="SDL">
         <Visible>false</Visible>
     </EmccExportedRuntimeMethod>
-
+<!--
     <EmccExportedRuntimeMethod Include="GL">
         <Visible>false</Visible>
-    </EmccExportedRuntimeMethod>
+    </EmccExportedRuntimeMethod> -->
 
     <EmccExportedRuntimeMethod Include="setMainLoop">
         <Visible>false</Visible>

@@ -22,7 +22,6 @@ namespace MonoGame.OpenGL
         private static T LoadFunction<T>(string function, bool throwIfNotFound = false)
         {
             nint ret = Sdl.GL.GL_GetProcAddress_Import(function);
-            Console.WriteLine(function+" "+ret);
 
             if (ret == IntPtr.Zero)
             {

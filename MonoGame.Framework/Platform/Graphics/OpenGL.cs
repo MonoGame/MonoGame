@@ -1258,7 +1258,7 @@ namespace MonoGame.OpenGL
 
         internal static int SwapInterval { get; set; }
 
-        internal static void LoadEntryPoints ()
+        unsafe internal static void LoadEntryPoints ()
         {
             LoadPlatformEntryPoints ();
 
@@ -1269,149 +1269,597 @@ namespace MonoGame.OpenGL
             if (MakeCurrent == null)
                 MakeCurrent = LoadFunction<MakeCurrentDelegate> ("glMakeCurrent");
 
-            GetError = LoadFunction<GetErrorDelegate> ("glGetError");
-
-            TexParameterf = LoadFunction<TexParameterFloatDelegate> ("glTexParameterf");
-            TexParameterfv = LoadFunction<TexParameterFloatArrayDelegate> ("glTexParameterfv");
-            TexParameteri = LoadFunction<TexParameterIntDelegate> ("glTexParameteri");
-
-            EnableVertexAttribArray = LoadFunction<EnableVertexAttribArrayDelegate> ("glEnableVertexAttribArray");
-            DisableVertexAttribArray = LoadFunction<DisableVertexAttribArrayDelegate> ("glDisableVertexAttribArray");
-            GetIntegerv = LoadFunction<GetIntegerDelegate> ("glGetIntegerv");
-            GetStringInternal = LoadFunction<GetStringDelegate> ("glGetString");
-            ClearDepth = LoadFunction<ClearDepthDelegate> ("glClearDepth");
-            if (ClearDepth == null)
-                ClearDepth = LoadFunction<ClearDepthDelegate> ("glClearDepthf");
-            DepthRanged = LoadFunction<DepthRangedDelegate> ("glDepthRange");
-            DepthRangef = LoadFunction<DepthRangefDelegate> ("glDepthRangef");
-            Clear = LoadFunction<ClearDelegate> ("glClear");
-            ClearColor = LoadFunction<ClearColorDelegate> ("glClearColor");
-            ClearStencil = LoadFunction<ClearStencilDelegate> ("glClearStencil");
-            Flush = LoadFunction<FlushDelegate> ("glFlush");
-            GenTextures = LoadFunction<GenTexturesDelegte> ("glGenTextures");
-            BindTexture = LoadFunction<BindTextureDelegate> ("glBindTexture");
-
-                var enable=LoadFunction<EnableDelegate> ("glEnable");
-            Enable = (EnableCap cap)=>{
-                Console.WriteLine("Enable: "+cap);
+            // GetError
+            var getError = LoadFunction<GetErrorDelegate>("glGetError");
+            GetError = () => {
+                Console.WriteLine("glGetError()");
+                return getError();
+            };
+            // TexParameterf
+            var texParameterf = LoadFunction<TexParameterFloatDelegate>("glTexParameterf");
+            TexParameterf = (target, name, value) => {
+                Console.WriteLine($"glTexParameterf({target}, {name}, {value})");
+                texParameterf(target, name, value);
+            };
+            // TexParameterfv
+            var texParameterfv = LoadFunction<TexParameterFloatArrayDelegate>("glTexParameterfv");
+            TexParameterfv = (target, name, values) => {
+                Console.WriteLine($"glTexParameterfv({target}, {name})");
+                texParameterfv(target, name, values);
+            };
+            // TexParameteri
+            var texParameteri = LoadFunction<TexParameterIntDelegate>("glTexParameteri");
+            TexParameteri = (target, name, value) => {
+                Console.WriteLine($"glTexParameteri({target}, {name}, {value})");
+                texParameteri(target, name, value);
+            };
+            // EnableVertexAttribArray
+            var enableVertexAttribArray = LoadFunction<EnableVertexAttribArrayDelegate>("glEnableVertexAttribArray");
+            EnableVertexAttribArray = (attrib) => {
+                Console.WriteLine($"glEnableVertexAttribArray({attrib})");
+                enableVertexAttribArray(attrib);
+            };
+            // DisableVertexAttribArray
+            var disableVertexAttribArray = LoadFunction<DisableVertexAttribArrayDelegate>("glDisableVertexAttribArray");
+            DisableVertexAttribArray = (attrib) => {
+                Console.WriteLine($"glDisableVertexAttribArray({attrib})");
+                disableVertexAttribArray(attrib);
+            };
+            // GetIntegerv
+            var getIntegerv = LoadFunction<GetIntegerDelegate>("glGetIntegerv");
+            GetIntegerv = (param, data) => {
+                Console.WriteLine($"glGetIntegerv({param}, {new IntPtr(data)})");
+                getIntegerv(param, data);
+            };
+            // GetStringInternal
+            var getStringInternal = LoadFunction<GetStringDelegate>("glGetString");
+            GetStringInternal = (param) => {
+                Console.WriteLine($"glGetString({param})");
+                return getStringInternal(param);
+            };
+            // ClearDepth
+            var clearDepth = LoadFunction<ClearDepthDelegate>("glClearDepth");
+            ClearDepth = (depth) => {
+                Console.WriteLine($"glClearDepth({depth})");
+                clearDepth(depth);
+            };
+            // DepthRanged
+            var depthRanged = LoadFunction<DepthRangedDelegate>("glDepthRange");
+            DepthRanged = (min, max) => {
+                Console.WriteLine($"glDepthRange({min}, {max})");
+                depthRanged(min, max);
+            };
+            // DepthRangef
+            var depthRangef = LoadFunction<DepthRangefDelegate>("glDepthRangef");
+            DepthRangef = (min, max) => {
+                Console.WriteLine($"glDepthRangef({min}, {max})");
+                depthRangef(min, max);
+            };
+            // Clear
+            var clear = LoadFunction<ClearDelegate>("glClear");
+            Clear = (mask) => {
+                Console.WriteLine($"glClear({mask})");
+                clear(mask);
+            };
+            // ClearColor
+            var clearColor = LoadFunction<ClearColorDelegate>("glClearColor");
+            ClearColor = (r, g, b, a) => {
+                Console.WriteLine($"glClearColor({r}, {g}, {b}, {a})");
+                clearColor(r, g, b, a);
+            };
+            // ClearStencil
+            var clearStencil = LoadFunction<ClearStencilDelegate>("glClearStencil");
+            ClearStencil = (stencil) => {
+                Console.WriteLine($"glClearStencil({stencil})");
+                clearStencil(stencil);
+            };
+            // Flush
+            var flush = LoadFunction<FlushDelegate>("glFlush");
+            Flush = () => {
+                Console.WriteLine("glFlush()");
+                flush();
+            };
+            // GenTextures
+            var genTextures = LoadFunction<GenTexturesDelegte>("glGenTextures");
+            GenTextures = (int count, out int id) => {
+                Console.WriteLine($"glGenTextures({count})");
+                genTextures(count, out id);
+            };
+            // BindTexture
+            var bindTexture = LoadFunction<BindTextureDelegate>("glBindTexture");
+            BindTexture = (target, id) => {
+                Console.WriteLine($"glBindTexture({target}, {id})");
+                bindTexture(target, id);
+            };
+            // Enable
+            var enable = LoadFunction<EnableDelegate>("glEnable");
+            Enable = (EnableCap cap) => {
+                Console.WriteLine($"glEnable({cap})");
                 return enable(cap);
             };
-         var   disable = LoadFunction<DisableDelegate> ("glDisable");
-         Console.WriteLine(disable);
-                     Disable = (EnableCap cap)=>{
-                Console.WriteLine("disable: "+cap);
-                var res= disable(cap);
-                Console.WriteLine("res "+res);
+            // Disable
+            var disable = LoadFunction<DisableDelegate>("glDisable");
+            Disable = (EnableCap cap) => {
+                Console.WriteLine($"glDisable({cap})");
+                var res = disable(cap);
+                Console.WriteLine($"res {res}");
                 return res;
             };
-            CullFace = LoadFunction<CullFaceDelegate> ("glCullFace");
-            FrontFace = LoadFunction<FrontFaceDelegate> ("glFrontFace");
-            PolygonMode = LoadFunction<PolygonModeDelegate> ("glPolygonMode");
-            PolygonOffset = LoadFunction<PolygonOffsetDelegate> ("glPolygonOffset");
+            // Uniform1i
+            var uniform1i = LoadFunction<Uniform1iDelegate>("glUniform1i");
+            Uniform1i = (location, value) => {
+                Console.WriteLine($"glUniform1i({location}, {value})");
+                uniform1i(location, value);
+            };
+            // Viewport
+            var viewport = LoadFunction<ViewportDelegate>("glViewport");
+            Viewport = (x, y, w, h) => {
+                Console.WriteLine($"glViewport({x}, {y}, {w}, {h})");
+                viewport(x, y, w, h);
+            };
+            // Scissor
+            var scissor = LoadFunction<ScissorDelegate>("glScissor");
+            Scissor = (x, y, w, h) => {
+                Console.WriteLine($"glScissor({x}, {y}, {w}, {h})");
+                scissor(x, y, w, h);
+            };
+            // DrawBuffers
+            var drawBuffers = LoadFunction<DrawBuffersDelegate> ("glDrawBuffers");
+            DrawBuffers = (count, buffers) => {
+                Console.WriteLine($"glDrawBuffers({count}, {string.Join(", ", buffers)})");
+                drawBuffers(count, buffers);
+            };
+            // DrawElements
+            var drawElements = LoadFunction<DrawElementsDelegate> ("glDrawElements");
+            DrawElements = (primitiveType, count, elementType, offset) => {
+                Console.WriteLine($"glDrawElements({primitiveType}, {count}, {elementType}, {offset})");
+                drawElements(primitiveType, count, elementType, offset);
+            };
+            // DrawArrays
+            var drawArrays = LoadFunction<DrawArraysDelegate> ("glDrawArrays");
+            DrawArrays = (primitiveType, offset, count) => {
+                Console.WriteLine($"glDrawArrays({primitiveType}, {offset}, {count})");
+                drawArrays(primitiveType, offset, count);
+            };
+            // Uniform4fv
+            var uniform4fv = LoadFunction<Uniform4fvDelegate> ("glUniform4fv");
+            Uniform4fv = (location, size, values) => {
+                Console.WriteLine($"glUniform4fv({location}, {size})");
+                uniform4fv(location, size, values);
+            };
+            // ReadPixels
+            var readPixels = LoadFunction<ReadPixelsDelegate>("glReadPixels");
+            ReadPixelsInternal = (x, y, width, height, format, type, data) => {
+                Console.WriteLine($"glReadPixels({x}, {y}, {width}, {height}, {format}, {type}, {data})");
+                readPixels(x, y, width, height, format, type, data);
+            };
+            // BindBuffer
+            var bindBuffer = LoadFunction<BindBufferDelegate> ("glBindBuffer");
+            BindBuffer = (target, buffer) => {
+                Console.WriteLine($"glBindBuffer({target}, {buffer})");
+                bindBuffer(target, buffer);
+            };
+            // GenRenderbuffers
+            var genRenderbuffers = LoadFunction<GenRenderbuffersDelegate> ("glGenRenderbuffers");
+            GenRenderbuffers = (int count,     out int buffer) => {
+                Console.WriteLine($"glGenRenderbuffers({count})");
+                genRenderbuffers(count,  out buffer);
+            };
+            // BindRenderbuffer
+            var bindRenderbuffer = LoadFunction<BindRenderbufferDelegate> ("glBindRenderbuffer");
+            BindRenderbuffer = (target, buffer) => {
+                Console.WriteLine($"glBindRenderbuffer({target}, {buffer})");
+                bindRenderbuffer(target, buffer);
+            };
+            // DeleteRenderbuffers
+            var deleteRenderbuffers = LoadFunction<DeleteRenderbuffersDelegate> ("glDeleteRenderbuffers");
+            DeleteRenderbuffers = (int count, ref int buffer) => {
+                Console.WriteLine($"glDeleteRenderbuffers({count})");
+                deleteRenderbuffers(count, ref buffer);
+            };
+            // GenFramebuffers
+            var genFramebuffers = LoadFunction<GenFramebuffersDelegate> ("glGenFramebuffers");
+            GenFramebuffers = (int count, out int buffer) => {
+                Console.WriteLine($"glGenFramebuffers({count})");
+                genFramebuffers(count,out buffer);
+            };
+            // BindFramebuffer
+            var bindFramebuffer = LoadFunction<BindFramebufferDelegate> ("glBindFramebuffer");
+            BindFramebuffer = (target, buffer) => {
+                Console.WriteLine($"glBindFramebuffer({target}, {buffer})");
+                bindFramebuffer(target, buffer);
+            };
+            // DeleteFramebuffers
+            var deleteFramebuffers = LoadFunction<DeleteFramebuffersDelegate> ("glDeleteFramebuffers");
+            DeleteFramebuffers = (int count, ref int buffer) => {
+                Console.WriteLine($"glDeleteFramebuffers({count})");
+                deleteFramebuffers(count,ref buffer);
+            };
+            // FramebufferTexture2D
+            var framebufferTexture2D = LoadFunction<FramebufferTexture2DDelegate> ("glFramebufferTexture2D");
+            FramebufferTexture2D = (target, attachement, textureTarget, texture, level) => {
+                Console.WriteLine($"glFramebufferTexture2D({target}, {attachement}, {textureTarget}, {texture}, {level})");
+                framebufferTexture2D(target, attachement, textureTarget, texture, level);
+            };
+            // FramebufferRenderbuffer
+            var framebufferRenderbuffer = LoadFunction<FramebufferRenderbufferDelegate> ("glFramebufferRenderbuffer");
+            FramebufferRenderbuffer = (target, attachement, renderBufferTarget, buffer) => {
+                Console.WriteLine($"glFramebufferRenderbuffer({target}, {attachement}, {renderBufferTarget}, {buffer})");
+                framebufferRenderbuffer(target, attachement, renderBufferTarget, buffer);
+            };
+            // RenderbufferStorage
+            var renderbufferStorage = LoadFunction<RenderbufferStorageDelegate> ("glRenderbufferStorage");
+            RenderbufferStorage = (target, storage, width, hegiht) => {
+                Console.WriteLine($"glRenderbufferStorage({target}, {storage}, {width}, {hegiht})");
+                renderbufferStorage(target, storage, width, hegiht);
+            };
+            // RenderbufferStorageMultisample
+            var renderbufferStorageMultisample = LoadFunction<RenderbufferStorageMultisampleDelegate> ("glRenderbufferStorageMultisample");
+            RenderbufferStorageMultisample = (target, sampleCount, storage, width, height) => {
+                Console.WriteLine($"glRenderbufferStorageMultisample({target}, {sampleCount}, {storage}, {width}, {height})");
+                renderbufferStorageMultisample(target, sampleCount, storage, width, height);
+            };
+            // GenerateMipmap
+            var generateMipmap = LoadFunction<GenerateMipmapDelegate> ("glGenerateMipmap");
+            GenerateMipmap = (target) => {
+                Console.WriteLine($"glGenerateMipmap({target})");
+                generateMipmap(target);
+            };
+            // BlitFramebuffer
+            var blitFramebuffer = LoadFunction<BlitFramebufferDelegate> ("glBlitFramebuffer");
+            BlitFramebuffer = (srcX0, srcY0, srcX1, srcY1, dstX0, dstY0, dstX1, dstY1, mask, filter) => {
+                Console.WriteLine($"glBlitFramebuffer({srcX0}, {srcY0}, {srcX1}, {srcY1}, {dstX0}, {dstY0}, {dstX1}, {dstY1}, {mask}, {filter})");
+                blitFramebuffer(srcX0, srcY0, srcX1, srcY1, dstX0, dstY0, dstX1, dstY1, mask, filter);
+            };
+            // CheckFramebufferStatus
+            var checkFramebufferStatus = LoadFunction<CheckFramebufferStatusDelegate> ("glCheckFramebufferStatus");
+            CheckFramebufferStatus = (target) => {
+                Console.WriteLine($"glCheckFramebufferStatus({target})");
+              return  checkFramebufferStatus(target);
+            };
+            // GenQueries
+            var genQueries = LoadFunction<GenQueriesDelegate> ("glGenQueries");
+            GenQueries = (int count, out int queryId) => {
+                Console.WriteLine($"glGenQueries({count})");
+                genQueries(count,out queryId);
+            };
+            // BeginQuery
+            var beginQuery = LoadFunction<BeginQueryDelegate> ("glBeginQuery");
+            BeginQuery = (target, queryId) => {
+                Console.WriteLine($"glBeginQuery({target}, {queryId})");
+                beginQuery(target, queryId);
+            };
+            // EndQuery
+            var endQuery = LoadFunction<EndQueryDelegate> ("glEndQuery");
+            EndQuery = (target) => {
+                Console.WriteLine($"glEndQuery({target})");
+                endQuery(target);
+            };
+            // GetQueryObject
+            var getQueryObject = LoadFunction<GetQueryObjectDelegate>("glGetQueryObjectuiv");
+            GetQueryObject = (int queryId, GetQueryObjectParam getparam, [Out] out int ready) => {
+                Console.WriteLine($"glGetQueryObject({queryId}, {getparam})");
+                getQueryObject(queryId, getparam, out ready);
+            };
+            // DeleteQueries
+            var deleteQueries = LoadFunction<DeleteQueriesDelegate> ("glDeleteQueries");
+            DeleteQueries = (int count, ref int queryId) => {
+                Console.WriteLine($"glDeleteQueries({count})");
+                deleteQueries(count,ref queryId);
+            };
+            // ActiveTexture
+            var activeTexture = LoadFunction<ActiveTextureDelegate> ("glActiveTexture");
+            ActiveTexture = (textureUnit) => {
+                Console.WriteLine($"glActiveTexture({textureUnit})");
+                activeTexture(textureUnit);
+            };
+            // CreateShader
+            var createShader = LoadFunction<CreateShaderDelegate> ("glCreateShader");
+            CreateShader = (type) => {
+                Console.WriteLine($"glCreateShader({type})");
+                return createShader(type);
+            };
+            // ShaderSource
+            var shaderSource = LoadFunction<ShaderSourceDelegate> ("glShaderSource");
+            ShaderSourceInternal = (shaderId, count, code, length) => {
+                Console.WriteLine($"glShaderSource({shaderId}, {count}, {code})");
+                shaderSource(shaderId, count, code, length);
+            };
+            // CompileShader
+            var compileShader = LoadFunction<CompileShaderDelegate> ("glCompileShader");
+            CompileShader = (shaderId) => {
+                Console.WriteLine($"glCompileShader({shaderId})");
+                compileShader(shaderId);
+            };
+            // GetShaderiv
+            var getShaderiv = LoadFunction<GetShaderDelegate> ("glGetShaderiv");
+            GetShaderiv = (shaderId, name, value) => {
+                Console.WriteLine($"glGetShaderiv({shaderId}, {name})");
+                getShaderiv(shaderId, name, value);
+            };
+            // GetShaderInfoLog
+            var getShaderInfoLog = LoadFunction<GetShaderInfoLogDelegate> ("glGetShaderInfoLog");
+            GetShaderInfoLogInternal = (shader, bufSize, length, infoLog) => {
+                Console.WriteLine($"glGetShaderInfoLog({shader}, {bufSize}, {length}, {infoLog})");
+                getShaderInfoLog(shader, bufSize, length, infoLog);
+            };
+            // IsShader
+            var isShader = LoadFunction<IsShaderDelegate> ("glIsShader");
+            IsShader = (shaderId) => {
+                Console.WriteLine($"glIsShader({shaderId})");
+                return isShader(shaderId);
+            };
+            // DeleteShader
+            var deleteShader = LoadFunction<DeleteShaderDelegate> ("glDeleteShader");
+            DeleteShader = (shaderId) => {
+                Console.WriteLine($"glDeleteShader({shaderId})");
+                deleteShader(shaderId);
+            };
+            // GetAttribLocation
+            var getAttribLocation = LoadFunction<GetAttribLocationDelegate> ("glGetAttribLocation");
+            GetAttribLocation = (programId, name) => {
+                Console.WriteLine($"glGetAttribLocation({programId}, {name})");
+                return getAttribLocation(programId, name);
+            };
+            // GetUniformLocation
+            var getUniformLocation = LoadFunction<GetUniformLocationDelegate> ("glGetUniformLocation");
+            GetUniformLocation = (programId, name) => {
+                Console.WriteLine($"glGetUniformLocation({programId}, {name})");
+                return getUniformLocation(programId, name);
+            };
+            // IsProgram
+            var isProgram = LoadFunction<IsProgramDelegate> ("glIsProgram");
+            IsProgram = (programId) => {
+                Console.WriteLine($"glIsProgram({programId})");
+                return isProgram(programId);
+            };
+            // DeleteProgram
+            var deleteProgram = LoadFunction<DeleteProgramDelegate> ("glDeleteProgram");
+            DeleteProgram = (programId) => {
+                Console.WriteLine($"glDeleteProgram({programId})");
+                deleteProgram(programId);
+            };
+            // CreateProgram
+            var createProgram = LoadFunction<CreateProgramDelegate> ("glCreateProgram");
+            CreateProgram = () => {
+                Console.WriteLine($"glCreateProgram()");
+                return createProgram();
+            };
+            // AttachShader
+            var attachShader = LoadFunction<AttachShaderDelegate> ("glAttachShader");
+            AttachShader = (programId, shaderId) => {
+                Console.WriteLine($"glAttachShader({programId}, {shaderId})");
+                attachShader(programId, shaderId);
+            };
+            // LinkProgram
+            var linkProgram = LoadFunction<LinkProgramDelegate> ("glLinkProgram");
+            LinkProgram = (programId) => {
+                Console.WriteLine($"glLinkProgram({programId})");
+                linkProgram(programId);
+            };
+            // GetProgramiv
+            var getProgramiv = LoadFunction<GetProgramDelegate> ("glGetProgramiv");
+            GetProgramiv = (programId, name, linked) => {
+                Console.WriteLine($"glGetProgramiv({programId}, {name})");
+                getProgramiv(programId, name, linked);
+            };
+            // GetProgramInfoLog
+            var getProgramInfoLog = LoadFunction<GetProgramInfoLogDelegate> ("glGetProgramInfoLog");
+            GetProgramInfoLogInternal = (program, bufSize, length, infoLog) => {
+                Console.WriteLine($"glGetProgramInfoLog({program}, {bufSize}, {length}, {infoLog})");
+                getProgramInfoLog(program, bufSize, length, infoLog);
+            };
+            // DetachShader
+            var detachShader = LoadFunction<DetachShaderDelegate> ("glDetachShader");
+            DetachShader = (programId, shaderId) => {
+                Console.WriteLine($"glDetachShader({programId}, {shaderId})");
+                detachShader(programId, shaderId);
+            };
+            // BlendColor
+            var blendColor = LoadFunction<BlendColorDelegate> ("glBlendColor");
+            BlendColor = (r, g, b, a) => {
+                Console.WriteLine($"glBlendColor({r}, {g}, {b}, {a})");
+                blendColor(r, g, b, a);
+            };
+            // BlendEquationSeparate
+            var blendEquationSeparate = LoadFunction<BlendEquationSeparateDelegate> ("glBlendEquationSeparate");
+            BlendEquationSeparate = (colorMode, alphaMode) => {
+                Console.WriteLine($"glBlendEquationSeparate({colorMode}, {alphaMode})");
+                blendEquationSeparate(colorMode, alphaMode);
+            };
+            // BlendEquationSeparatei
+            var blendEquationSeparatei = LoadFunction<BlendEquationSeparateiDelegate>("glBlendEquationSeparatei");
+            BlendEquationSeparatei = (buffer, colorMode, alphaMode) => {
+                Console.WriteLine($"glBlendEquationSeparatei({buffer}, {colorMode}, {alphaMode})");
+                blendEquationSeparatei(buffer, colorMode, alphaMode);
+            };
+            // BlendFuncSeparate
+            var blendFuncSeparate = LoadFunction<BlendFuncSeparateDelegate> ("glBlendFuncSeparate");
+            BlendFuncSeparate = (colorSrc, colorDst, alphaSrc, alphaDst) => {
+                Console.WriteLine($"glBlendFuncSeparate({colorSrc}, {colorDst}, {alphaSrc}, {alphaDst})");
+                blendFuncSeparate(colorSrc, colorDst, alphaSrc, alphaDst);
+            };
+            // BlendFuncSeparatei
+            var blendFuncSeparatei = LoadFunction<BlendFuncSeparateiDelegate>("glBlendFuncSeparatei");
+            BlendFuncSeparatei = (buffer, colorSrc, colorDst, alphaSrc, alphaDst) => {
+                Console.WriteLine($"glBlendFuncSeparatei({buffer}, {colorSrc}, {colorDst}, {alphaSrc}, {alphaDst})");
+                blendFuncSeparatei(buffer, colorSrc, colorDst, alphaSrc, alphaDst);
+            };
+            // ColorMask
+            var colorMask = LoadFunction<ColorMaskDelegate> ("glColorMask");
+            ColorMask = (r, g, b, a) => {
+                Console.WriteLine($"glColorMask({r}, {g}, {b}, {a})");
+                colorMask(r, g, b, a);
+            };
+            // DepthFunc
+            var depthFunc = LoadFunction<DepthFuncDelegate> ("glDepthFunc");
+            DepthFunc = (function) => {
+                Console.WriteLine($"glDepthFunc({function})");
+                depthFunc(function);
+            };
+            // DepthMask
+            var depthMask = LoadFunction<DepthMaskDelegate> ("glDepthMask");
+            DepthMask = (enabled) => {
+                Console.WriteLine($"glDepthMask({enabled})");
+                depthMask(enabled);
+            };
+            // StencilFuncSeparate
+            var stencilFuncSeparate = LoadFunction<StencilFuncSeparateDelegate> ("glStencilFuncSeparate");
+            StencilFuncSeparate = (face, function, referenceStencil, mask) => {
+                Console.WriteLine($"glStencilFuncSeparate({face}, {function}, {referenceStencil}, {mask})");
+                stencilFuncSeparate(face, function, referenceStencil, mask);
+            };
+            // StencilOpSeparate
+            var stencilOpSeparate = LoadFunction<StencilOpSeparateDelegate> ("glStencilOpSeparate");
+            StencilOpSeparate = (face, stencilfail, depthFail, pass) => {
+                Console.WriteLine($"glStencilOpSeparate({face}, {stencilfail}, {depthFail}, {pass})");
+                stencilOpSeparate(face, stencilfail, depthFail, pass);
+            };
+            // StencilFunc
+            var stencilFunc = LoadFunction<StencilFuncDelegate> ("glStencilFunc");
+            StencilFunc = (function, referenceStencil, mask) => {
+                Console.WriteLine($"glStencilFunc({function}, {referenceStencil}, {mask})");
+                stencilFunc(function, referenceStencil, mask);
+            };
+            // StencilOp
+            var stencilOp = LoadFunction<StencilOpDelegate> ("glStencilOp");
+            StencilOp = (stencilfail, depthFail, pass) => {
+                Console.WriteLine($"glStencilOp({stencilfail}, {depthFail}, {pass})");
+                stencilOp(stencilfail, depthFail, pass);
+            };
+            // StencilMask
+            var stencilMask = LoadFunction<StencilMaskDelegate> ("glStencilMask");
+            StencilMask = (mask) => {
+                Console.WriteLine($"glStencilMask({mask})");
+                stencilMask(mask);
+            };
+            // CompressedTexImage2D
+            var compressedTexImage2D = LoadFunction<CompressedTexImage2DDelegate> ("glCompressedTexImage2D");
+            CompressedTexImage2D = (target, level, internalFormat, width, height, border, size, data) => {
+                Console.WriteLine($"glCompressedTexImage2D({target}, {level}, {internalFormat}, {width}, {height}, {border}, {size}, {data})");
+                compressedTexImage2D(target, level, internalFormat, width, height, border, size, data);
+            };
+            // TexImage2D
+            var texImage2D = LoadFunction<TexImage2DDelegate> ("glTexImage2D");
+            TexImage2D = (target, level, internalFormat, width, height, border, format, pixelType, data) => {
+                Console.WriteLine($"glTexImage2D({target}, {level}, {internalFormat}, {width}, {height}, {border}, {format}, {pixelType}, {data})");
+                texImage2D(target, level, internalFormat, width, height, border, format, pixelType, data);
+            };
+            // CompressedTexSubImage2D
+            var compressedTexSubImage2D = LoadFunction<CompressedTexSubImage2DDelegate> ("glCompressedTexSubImage2D");
+            CompressedTexSubImage2D = (target, level, x, y, width, height, format, size, data) => {
+                Console.WriteLine($"glCompressedTexSubImage2D({target}, {level}, {x}, {y}, {width}, {height}, {format}, {size}, {data})");
+                compressedTexSubImage2D(target, level, x, y, width, height, format, size, data);
+            };
+            // TexSubImage2D
+            var texSubImage2D = LoadFunction<TexSubImage2DDelegate> ("glTexSubImage2D");
+            TexSubImage2D = (target, level, x, y, width, height, format, pixelType, data) => {
+                Console.WriteLine($"glTexSubImage2D({target}, {level}, {x}, {y}, {width}, {height}, {format}, {pixelType}, {data})");
+                texSubImage2D(target, level, x, y, width, height, format, pixelType, data);
+            };
+            // PixelStore
+            var pixelStore = LoadFunction<PixelStoreDelegate> ("glPixelStorei");
+            PixelStore = (parameter, size) => {
+                Console.WriteLine($"glPixelStorei({parameter}, {size})");
+                pixelStore(parameter, size);
+            };
+            // Finish
+            var finish = LoadFunction<FinishDelegate> ("glFinish");
+            Finish = () => {
+                Console.WriteLine($"glFinish()");
+                finish();
+            };
+            // GetTexImage
+            var getTexImage = LoadFunction<GetTexImageDelegate> ("glGetTexImage");
+            GetTexImageInternal = (target, level, format, type, pixels) => {
+                Console.WriteLine($"glGetTexImage({target}, {level}, {format}, {type}, {pixels})");
+                getTexImage(target, level, format, type, pixels);
+            };
+            // GetCompressedTexImage
+            var getCompressedTexImage = LoadFunction<GetCompressedTexImageDelegate> ("glGetCompressedTexImage");
+            GetCompressedTexImageInternal = (target, level, pixels) => {
+                Console.WriteLine($"glGetCompressedTexImage({target}, {level}, {pixels})");
+                getCompressedTexImage(target, level, pixels);
+            };
 
-            BindBuffer = LoadFunction<BindBufferDelegate> ("glBindBuffer");
-            DrawBuffers = LoadFunction<DrawBuffersDelegate> ("glDrawBuffers");
-            DrawElements = LoadFunction<DrawElementsDelegate> ("glDrawElements");
-            DrawArrays = LoadFunction<DrawArraysDelegate> ("glDrawArrays");
-            Uniform1i = LoadFunction<Uniform1iDelegate> ("glUniform1i");
-            Uniform4fv = LoadFunction<Uniform4fvDelegate> ("glUniform4fv");
-            ReadPixelsInternal = LoadFunction<ReadPixelsDelegate>("glReadPixels");
-
-            ReadBuffer = LoadFunction<ReadBufferDelegate> ("glReadBuffer");
-            DrawBuffer = LoadFunction<DrawBufferDelegate> ("glDrawBuffer");
-
-            // Render Target Support. These might be null if they are not supported
-            // see GraphicsDevice.OpenGL.FramebufferHelper.cs for handling other extensions.
-            GenRenderbuffers = LoadFunction<GenRenderbuffersDelegate> ("glGenRenderbuffers");
-            BindRenderbuffer = LoadFunction<BindRenderbufferDelegate> ("glBindRenderbuffer");
-            DeleteRenderbuffers = LoadFunction<DeleteRenderbuffersDelegate> ("glDeleteRenderbuffers");
-            GenFramebuffers = LoadFunction<GenFramebuffersDelegate> ("glGenFramebuffers");
-            BindFramebuffer = LoadFunction<BindFramebufferDelegate> ("glBindFramebuffer");
-            DeleteFramebuffers = LoadFunction<DeleteFramebuffersDelegate> ("glDeleteFramebuffers");
-            FramebufferTexture2D = LoadFunction<FramebufferTexture2DDelegate> ("glFramebufferTexture2D");
-            FramebufferRenderbuffer = LoadFunction<FramebufferRenderbufferDelegate> ("glFramebufferRenderbuffer");
-            RenderbufferStorage = LoadFunction<RenderbufferStorageDelegate> ("glRenderbufferStorage");
-            RenderbufferStorageMultisample = LoadFunction<RenderbufferStorageMultisampleDelegate> ("glRenderbufferStorageMultisample");
-            GenerateMipmap = LoadFunction<GenerateMipmapDelegate> ("glGenerateMipmap");
-            BlitFramebuffer = LoadFunction<BlitFramebufferDelegate> ("glBlitFramebuffer");
-            CheckFramebufferStatus = LoadFunction<CheckFramebufferStatusDelegate> ("glCheckFramebufferStatus");
-
-            GenQueries = LoadFunction<GenQueriesDelegate> ("glGenQueries");
-            BeginQuery = LoadFunction<BeginQueryDelegate> ("glBeginQuery");
-            EndQuery = LoadFunction<EndQueryDelegate> ("glEndQuery");
-            GetQueryObject = LoadFunction<GetQueryObjectDelegate>("glGetQueryObjectuiv");
-            if (GetQueryObject == null)
-                GetQueryObject = LoadFunction<GetQueryObjectDelegate> ("glGetQueryObjectivARB");
-            if (GetQueryObject == null)
-                GetQueryObject = LoadFunction<GetQueryObjectDelegate> ("glGetQueryObjectiv");
-            DeleteQueries = LoadFunction<DeleteQueriesDelegate> ("glDeleteQueries");
-
-            ActiveTexture = LoadFunction<ActiveTextureDelegate> ("glActiveTexture");
-            CreateShader = LoadFunction<CreateShaderDelegate> ("glCreateShader");
-            ShaderSourceInternal = LoadFunction<ShaderSourceDelegate> ("glShaderSource");
-            CompileShader = LoadFunction<CompileShaderDelegate> ("glCompileShader");
-            GetShaderiv = LoadFunction<GetShaderDelegate> ("glGetShaderiv");
-            GetShaderInfoLogInternal = LoadFunction<GetShaderInfoLogDelegate> ("glGetShaderInfoLog");
-            IsShader = LoadFunction<IsShaderDelegate> ("glIsShader");
-            DeleteShader = LoadFunction<DeleteShaderDelegate> ("glDeleteShader");
-            GetAttribLocation = LoadFunction<GetAttribLocationDelegate> ("glGetAttribLocation");
-            GetUniformLocation = LoadFunction<GetUniformLocationDelegate> ("glGetUniformLocation");
-
-            IsProgram = LoadFunction<IsProgramDelegate> ("glIsProgram");
-            DeleteProgram = LoadFunction<DeleteProgramDelegate> ("glDeleteProgram");
-            CreateProgram = LoadFunction<CreateProgramDelegate> ("glCreateProgram");
-            AttachShader = LoadFunction<AttachShaderDelegate> ("glAttachShader");
-            UseProgram = LoadFunction<UseProgramDelegate> ("glUseProgram");
-            LinkProgram = LoadFunction<LinkProgramDelegate> ("glLinkProgram");
-            GetProgramiv = LoadFunction<GetProgramDelegate> ("glGetProgramiv");
-            GetProgramInfoLogInternal = LoadFunction<GetProgramInfoLogDelegate> ("glGetProgramInfoLog");
-            DetachShader = LoadFunction<DetachShaderDelegate> ("glDetachShader");
-
-            BlendColor = LoadFunction<BlendColorDelegate> ("glBlendColor");
-            BlendEquationSeparate = LoadFunction<BlendEquationSeparateDelegate> ("glBlendEquationSeparate");
-            BlendEquationSeparatei = LoadFunction<BlendEquationSeparateiDelegate>("glBlendEquationSeparatei");
-            BlendFuncSeparate = LoadFunction<BlendFuncSeparateDelegate> ("glBlendFuncSeparate");
-            BlendFuncSeparatei = LoadFunction<BlendFuncSeparateiDelegate>("glBlendFuncSeparatei");
-            ColorMask = LoadFunction<ColorMaskDelegate> ("glColorMask");
-            DepthFunc = LoadFunction<DepthFuncDelegate> ("glDepthFunc");
-            DepthMask = LoadFunction<DepthMaskDelegate> ("glDepthMask");
-            StencilFuncSeparate = LoadFunction<StencilFuncSeparateDelegate> ("glStencilFuncSeparate");
-            StencilOpSeparate = LoadFunction<StencilOpSeparateDelegate> ("glStencilOpSeparate");
-            StencilFunc = LoadFunction<StencilFuncDelegate> ("glStencilFunc");
-            StencilOp = LoadFunction<StencilOpDelegate> ("glStencilOp");
-            StencilMask = LoadFunction<StencilMaskDelegate> ("glStencilMask");
-
-            CompressedTexImage2D = LoadFunction<CompressedTexImage2DDelegate> ("glCompressedTexImage2D");
-            TexImage2D = LoadFunction<TexImage2DDelegate> ("glTexImage2D");
-            CompressedTexSubImage2D = LoadFunction<CompressedTexSubImage2DDelegate> ("glCompressedTexSubImage2D");
-            TexSubImage2D = LoadFunction<TexSubImage2DDelegate> ("glTexSubImage2D");
-            PixelStore = LoadFunction<PixelStoreDelegate> ("glPixelStorei");
-            Finish = LoadFunction<FinishDelegate> ("glFinish");
-            GetTexImageInternal = LoadFunction<GetTexImageDelegate> ("glGetTexImage");
-            GetCompressedTexImageInternal = LoadFunction<GetCompressedTexImageDelegate> ("glGetCompressedTexImage");
-            TexImage3D = LoadFunction<TexImage3DDelegate> ("glTexImage3D");
-            TexSubImage3D = LoadFunction<TexSubImage3DDelegate> ("glTexSubImage3D");
-            DeleteTextures = LoadFunction<DeleteTexturesDelegate> ("glDeleteTextures");
-
-            GenBuffers = LoadFunction<GenBuffersDelegate> ("glGenBuffers");
-            BufferData = LoadFunction<BufferDataDelegate> ("glBufferData");
-            MapBuffer = LoadFunction<MapBufferDelegate> ("glMapBuffer");
-            UnmapBuffer = LoadFunction<UnmapBufferDelegate> ("glUnmapBuffer");
-            BufferSubData = LoadFunction<BufferSubDataDelegate> ("glBufferSubData");
-            DeleteBuffers = LoadFunction<DeleteBuffersDelegate> ("glDeleteBuffers");
-
-            VertexAttribPointer = LoadFunction<VertexAttribPointerDelegate> ("glVertexAttribPointer");
-
-            // Instanced drawing requires GL 3.2 or up, if the either of the following entry points can not be loaded
-            // this will get flagged by setting SupportsInstancing in GraphicsCapabilities to false.
-            try {
-                DrawElementsInstanced = LoadFunction<DrawElementsInstancedDelegate> ("glDrawElementsInstanced");
-                VertexAttribDivisor = LoadFunction<VertexAttribDivisorDelegate> ("glVertexAttribDivisor");
-                DrawElementsInstancedBaseInstance = LoadFunction<DrawElementsInstancedBaseInstanceDelegate>("glDrawElementsInstancedBaseInstance");
-            }
-            catch (EntryPointNotFoundException) {
-                // this will be detected in the initialization of GraphicsCapabilities
-            }
+            // TexImage3D
+            var texImage3D = LoadFunction<TexImage3DDelegate> ("glTexImage3D");
+            TexImage3D = (target, level, internalFormat, width, height, depth, border, format, pixelType, data) => {
+                Console.WriteLine($"glTexImage3D({target}, {level}, {internalFormat}, {width}, {height}, {depth}, {border}, {format}, {pixelType}, {data})");
+                texImage3D(target, level, internalFormat, width, height, depth, border, format, pixelType, data);
+            };
+            // TexSubImage3D
+            var texSubImage3D = LoadFunction<TexSubImage3DDelegate> ("glTexSubImage3D");
+            TexSubImage3D = (target, level, x, y, z, width, height, depth, format, pixelType, data) => {
+                Console.WriteLine($"glTexSubImage3D({target}, {level}, {x}, {y}, {z}, {width}, {height}, {depth}, {format}, {pixelType}, {data})");
+                texSubImage3D(target, level, x, y, z, width, height, depth, format, pixelType, data);
+            };
+            // DeleteTextures
+            var deleteTextures = LoadFunction<DeleteTexturesDelegate> ("glDeleteTextures");
+            DeleteTextures = (int count, ref int id) => {
+                Console.WriteLine($"glDeleteTextures({count})");
+                deleteTextures(count,ref id);
+            };
+            // GenBuffers
+            var genBuffers = LoadFunction<GenBuffersDelegate> ("glGenBuffers");
+            GenBuffers = (int count, out int buffer) => {
+                Console.WriteLine($"glGenBuffers({count})");
+                genBuffers(count,out buffer);
+            };
+            // BufferData
+            var bufferData = LoadFunction<BufferDataDelegate> ("glBufferData");
+            BufferData = (target, size, n, usage) => {
+                Console.WriteLine($"glBufferData({target}, {size}, {n}, {usage})");
+                bufferData(target, size, n, usage);
+            };
+            // MapBuffer
+            var mapBuffer = LoadFunction<MapBufferDelegate> ("glMapBuffer");
+            MapBuffer = (target, access) => {
+                Console.WriteLine($"glMapBuffer({target}, {access})");
+                return mapBuffer(target, access);
+            };
+            // UnmapBuffer
+            var unmapBuffer = LoadFunction<UnmapBufferDelegate> ("glUnmapBuffer");
+            UnmapBuffer = (target) => {
+                Console.WriteLine($"glUnmapBuffer({target})");
+                unmapBuffer(target);
+            };
+            // BufferSubData
+            var bufferSubData = LoadFunction<BufferSubDataDelegate> ("glBufferSubData");
+            BufferSubData = (target, offset, size, data) => {
+                Console.WriteLine($"glBufferSubData({target}, {offset}, {size}, {data})");
+                bufferSubData(target, offset, size, data);
+            };
+            // DeleteBuffers
+            var deleteBuffers = LoadFunction<DeleteBuffersDelegate> ("glDeleteBuffers");
+            DeleteBuffers = (int count, ref int buffer) => {
+                Console.WriteLine($"glDeleteBuffers({count})");
+                deleteBuffers(count, ref buffer);
+            };
+            // VertexAttribPointer
+            var vertexAttribPointer = LoadFunction<VertexAttribPointerDelegate> ("glVertexAttribPointer");
+            VertexAttribPointer = (location, elementCount, type, normalize, stride, data) => {
+                Console.WriteLine($"glVertexAttribPointer({location}, {elementCount}, {type}, {normalize}, {stride}, {data})");
+                vertexAttribPointer(location, elementCount, type, normalize, stride, data);
+            };
+            // DrawElementsInstanced
+            var drawElementsInstanced = LoadFunction<DrawElementsInstancedDelegate> ("glDrawElementsInstanced");
+            DrawElementsInstanced = (primitiveType, count, elementType, offset, instanceCount) => {
+                Console.WriteLine($"glDrawElementsInstanced({primitiveType}, {count}, {elementType}, {offset}, {instanceCount})");
+                drawElementsInstanced(primitiveType, count, elementType, offset, instanceCount);
+            };
+            // DrawElementsInstancedBaseInstance
+            var drawElementsInstancedBaseInstance = LoadFunction<DrawElementsInstancedBaseInstanceDelegate> ("glDrawElementsInstancedBaseInstance");
+            DrawElementsInstancedBaseInstance = (primitiveType, count, elementType, offset, instanceCount, baseInstance) => {
+                Console.WriteLine($"glDrawElementsInstancedBaseInstance({primitiveType}, {count}, {elementType}, {offset}, {instanceCount}, {baseInstance})");
+                drawElementsInstancedBaseInstance(primitiveType, count, elementType, offset, instanceCount, baseInstance);
+            };
+            // VertexAttribDivisor
+            var vertexAttribDivisor = LoadFunction<VertexAttribDivisorDelegate> ("glVertexAttribDivisor");
+            VertexAttribDivisor = (location, frequency) => {
+                Console.WriteLine($"glVertexAttribDivisor({location}, {frequency})");
+                vertexAttribDivisor(location, frequency);
+            };
 
 #if DEBUG
             try
