@@ -14,7 +14,7 @@ public sealed class BuildShadersVulkanTask : FrostingTask<BuildContext>
         foreach (var filePath in context.GetFiles($"{shadersDir}/*.fx"))
             {
                 context.Information($"Building {filePath.GetFilename()}");
-                context.DotNetRun(mgfxc, $"{filePath} {filePath.GetFilenameWithoutExtension()}.vk.mgfxo.h /Profile:Vulkan /RelativeRoot:{workingDir}", workingDir);
+                context.DotNetRun(mgfxc, $"{filePath} {filePath.GetFilenameWithoutExtension()}.vk.mgfxo.h /Profile:Vulkan", workingDir);
                 context.Information("");
             }
     }

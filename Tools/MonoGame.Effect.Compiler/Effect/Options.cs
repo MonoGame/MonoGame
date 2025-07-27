@@ -21,8 +21,5 @@ namespace MonoGame.Effect
 
         [CommandLineParser.Name("Defines", "\t - Semicolon-delimited define assignments")]
         public string Defines;
-
-        [CommandLineParser.Name("RelativeRoot", "\t - The root path to which the source file path will be made relative in the generated header.")]
-        public string RelativeRoot = string.Empty;
     }
 }

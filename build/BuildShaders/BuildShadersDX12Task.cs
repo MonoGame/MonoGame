@@ -17,7 +17,7 @@ public sealed class BuildShadersDX12Task : FrostingTask<BuildContext>
         foreach (var filePath in context.GetFiles($"{shadersDir}/*.fx"))
         {
             context.Information($"Building {filePath.GetFilename()}");
-            context.DotNetRun(mgfxc, $"{filePath} {filePath.GetFilenameWithoutExtension()}.dx12.mgfxo.h /Profile:DirectX_12 /RelativeRoot:{workingDir}", workingDir);
+            context.DotNetRun(mgfxc, $"{filePath} {filePath.GetFilenameWithoutExtension()}.dx12.mgfxo.h /Profile:DirectX_12", workingDir);
             context.Information("");
         }
 
