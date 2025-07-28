@@ -126,6 +126,19 @@ namespace Microsoft.Xna.Framework
         }
 
         /// <summary>
+        /// Multiplies the components of a <see cref="Point"/> by a scalar.
+        /// </summary>
+        /// <param name="value">Source <see cref="Point"/> on the left of the mul sign.</param>
+        /// <param name="scaleFactor">Scalar value on the right of the mul sign.</param>
+        /// <returns>Result of multiplying point with a scalar.</returns>
+        public static Point operator *(Point value, int scaleFactor)
+        {
+            value.X *= scaleFactor;
+            value.Y *= scaleFactor;
+            return value;
+        }
+
+        /// <summary>
         /// Divides the components of a <see cref="Point"/> by the components of another <see cref="Point"/>.
         /// </summary>
         /// <param name="source">Source <see cref="Point"/> on the left of the div sign.</param>
@@ -134,6 +147,19 @@ namespace Microsoft.Xna.Framework
         public static Point operator /(Point source, Point divisor)
         {
             return new Point(source.X / divisor.X, source.Y / divisor.Y);
+        }
+
+        /// <summary>
+        /// Divides the components of a <see cref="Point"/> by a scalar.
+        /// </summary>
+        /// <param name="value">Source <see cref="Point"/> on the left of the div sign.</param>
+        /// <param name="scaleFactor">Scalar value on the right of the div sign.</param>
+        /// <returns>Result of dividing point by a scalar.</returns>
+        public static Point operator /(Point value, int scaleFactor)
+        {
+            value.X /= scaleFactor;
+            value.Y /= scaleFactor;
+            return value;
         }
 
         /// <summary>
@@ -152,7 +178,7 @@ namespace Microsoft.Xna.Framework
         /// </summary>
         /// <param name="a"><see cref="Point"/> instance on the left of the not equal sign.</param>
         /// <param name="b"><see cref="Point"/> instance on the right of the not equal sign.</param>
-        /// <returns><c>true</c> if the instances are not equal; <c>false</c> otherwise.</returns>	
+        /// <returns><c>true</c> if the instances are not equal; <c>false</c> otherwise.</returns>
         public static bool operator !=(Point a, Point b)
         {
             return !a.Equals(b);
