@@ -137,7 +137,7 @@ namespace Microsoft.Xna.Framework.Storage
         /// <summary>
         /// Deletes specified directory for the storage-container.
         /// </summary>
-        /// <param name="directory">The relative path of the directory to be deleted.</param>
+        /// <param name="directoryName">The relative path of the directory to be deleted.</param>
         public void DeleteDirectory(string directoryName)
         {
             if (string.IsNullOrEmpty(directoryName))
