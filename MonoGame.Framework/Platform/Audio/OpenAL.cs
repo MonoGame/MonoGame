@@ -218,10 +218,10 @@ namespace MonoGame.OpenAL
             }
 
             return ret;
-#else
+#else // iOS
             var ret =  FuncLoader.LoadLibrary("libopenal.dylib");
             if (ret ==IntPtr.Zero)
-                ret = FuncLoader.LoadLibrary(Path.Combine (Path.GetDirectoryName (typeof (AL).Assembly.Location), "libopenal.dylib"));
+                ret = FuncLoader.LoadLibrary(Path.Combine (Path.GetDirectoryName (AppContext.BaseDirectory), "libopenal.dylib"));
             return ret;
 #endif
         }
