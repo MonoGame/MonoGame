@@ -53,7 +53,7 @@
             "name": "Attach to Process",
             "type": "coreclr",
             "request": "attach",
-            "processId": "${input.processid}",
+            "processId": "${command:pickProcess}",
         },
         {
             "name": "MonoGame.Tests",
@@ -69,12 +69,4 @@
             "stopAtEntry": false
         }
     ],
-    "inputs": [
-        {
-            "id": "processid",
-            "type": "promptString",
-            "default": "0",
-            "description": "Enter Process Id of process to attach to."
-        }
-    ]
 }
