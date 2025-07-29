@@ -1,6 +1,13 @@
 -- MonoGame - Copyright (C) MonoGame Foundation, Inc
 -- This file is subject to the terms and conditions defined in
 -- file 'LICENSE.txt', which is part of this source code package.
+
+local vulkan_sdk = os.getenv("VULKAN_SDK")
+
+if vulkan_sdk == nil and os.target() == "macosx" then
+    error("Error: VULKAN_SDK environment variable is not set. Please set it to your Vulkan SDK installation path.")
+end
+
 function common(project_name)
     platform_target_path = "../../Artifacts/monogame.native/%{cfg.system}/" .. project_name .. "/%{cfg.buildcfg}"
 
@@ -36,8 +43,8 @@ function sdl2()
     linkoptions {"-Wl,-force_load,external/sdl2/sdl/build/libSDL2.a"}
     links {"SDL2"}
     links {"Cocoa.framework", "IOKit.framework", "ForceFeedback.framework", "CoreAudio.framework",
-           "AudioToolbox.framework", "CoreGraphics.framework", "CoreFoundation.framework", "Metal.framework",
-           "CoreVideo.framework", "GameController.framework", "CoreHaptics.framework", "Carbon.framework", "iconv"}
+        "AudioToolbox.framework", "CoreGraphics.framework", "CoreFoundation.framework", "Metal.framework",
+        "CoreVideo.framework", "GameController.framework", "CoreHaptics.framework", "Carbon.framework", "iconv"}
 
     filter {"system:linux"}
     libdirs {"external/sdl2/sdl/build"}
@@ -54,7 +61,13 @@ function vulkan()
 
     files {"vulkan/**.h", "vulkan/**.cpp"}
 
-    includedirs {"external/vulkan-headers/include", "external/volk", "external/vma/include"}
+    includedirs {"external/vulkan-headers/include", "external/volk", "external/vma/include",
+        path.join(vulkan_sdk, "include")}
+
+    filter {"system:macosx"}
+    libdirs {path.join(vulkan_sdk, "lib/MoltenVK.xcframework/macos-arm64_x86_64")}
+    links {"MoltenVK", "IOSurface.framework", "Foundation.framework", "QuartzCore.framework", "AppKit.framework"}
+    filter {}
 end
 
 -- DirectX12 is supported on Xbox and Windows.

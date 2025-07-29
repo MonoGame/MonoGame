@@ -18,13 +18,23 @@
 #define VULKAN_HPP_NO_EXCEPTIONS
 #define VULKAN_HPP_TYPESAFE_CONVERSION 1
 #define VK_NO_PROTOTYPES
+
+#if defined(__APPLE__)
+#include <MoltenVK/mvk_vulkan.h>
+#else
 #include <vulkan/vulkan.h>
+#endif
 
 #ifdef DEBUG
 #define VK_EXT_debug_utils
+#ifdef __APPLE__
+#define MVK_CONFIG_DEBUG
+#endif
 #endif
 
+#ifndef __APPLE__
 #define VOLK_IMPLEMENTATION
+#endif
 #include <volk.h>
 
 #define VMA_IMPLEMENTATION
@@ -721,12 +731,16 @@ uint64_t CheckValidationLayerSupport(const std::vector<const char*>& validationL
 }
 MGG_GraphicsSystem* MGG_GraphicsSystem_Create()
 {
+#ifndef __APPLE__
 	auto err = volkInitialize();
 	if (err != VK_SUCCESS)
 	{
 		printf("Failed to initialize volk!");
 		return nullptr;
 	}
+#else
+	auto err = VK_SUCCESS;
+#endif
 
 	VkApplicationInfo app_info = { VK_STRUCTURE_TYPE_APPLICATION_INFO };
 	app_info.pNext = nullptr;
@@ -752,13 +766,16 @@ MGG_GraphicsSystem* MGG_GraphicsSystem_Create()
 #endif
 	instanceExtensions.push_back(VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2_EXTENSION_NAME);
 
+	std::vector<const char*> enabledLayers;
+
 #ifdef DEBUG
 	instanceExtensions.push_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
-#endif
 
-	std::vector<const char*> enabledLayers;
+#ifndef __APPLE__
 	enabledLayers.push_back("VK_LAYER_KHRONOS_validation");
 	CheckValidationLayerSupport(enabledLayers);
+#endif
+#endif
 
 	VkInstanceCreateInfo instance_create_info = { VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO };
 	instance_create_info.pApplicationInfo = &app_info;
@@ -777,7 +794,9 @@ MGG_GraphicsSystem* MGG_GraphicsSystem_Create()
 		return nullptr;
 	}
 
+#ifndef __APPLE__
 	volkLoadInstance(instance);
+#endif
 
 	auto system = new MGG_GraphicsSystem();
 	system->instance = instance;
