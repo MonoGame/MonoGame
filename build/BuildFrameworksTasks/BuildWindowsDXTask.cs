@@ -2,6 +2,7 @@
 namespace BuildScripts;
 
 [TaskName("Build WindowsDX")]
+[IsDependentOn(typeof(BuildShadersDX11Task))]
 public sealed class BuildWindowsDXTask : FrostingTask<BuildContext>
 {
     public override bool ShouldRun(BuildContext context) => context.IsRunningOnWindows();

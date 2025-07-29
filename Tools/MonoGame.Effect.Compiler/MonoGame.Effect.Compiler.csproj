@@ -16,7 +16,6 @@
 
   <ItemGroup>
     <Compile Include="..\..\MonoGame.Framework.Content.Pipeline\ExternalTool.cs" />
-    <Compile Include="..\..\MonoGame.Framework\Platform\Utilities\CurrentPlatform.cs" />
   </ItemGroup>
 
   <ItemGroup>
@@ -32,6 +31,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="MonoGame.Tool.Dxc" Version="1.8.2505.7" />
     <PackageReference Include="SharpDX" Version="4.0.1" />
     <PackageReference Include="SharpDX.D3DCompiler" Version="4.0.1" />
   </ItemGroup>
