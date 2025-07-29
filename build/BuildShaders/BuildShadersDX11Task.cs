@@ -5,6 +5,8 @@ namespace BuildScripts;
 [IsDependentOn(typeof(BuildMGFXCTask))]
 public sealed class BuildShadersDX11Task : FrostingTask<BuildContext>
 {
+    public override bool ShouldRun(BuildContext context) => context.IsRunningOnWindows();
+    
     public override void Run(BuildContext context)
     {
         var mgfxc = context.GetProjectPath(ProjectType.Tools, "MonoGame.Effect.Compiler");
