@@ -50,7 +50,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\MonoGame.Framework\MonoGame.Framework.Native.csproj" />
-    <ProjectReference Include="..\native\monogame\desktopvk.vcxproj" />
 
 	  <Content Include="..\Artifacts\monogame.native\windows\desktopvk\$(Configuration)\monogame.native.dll" Condition="Exists('..\Artifacts\monogame.native\windows\desktopvk\$(Configuration)\monogame.native.dll')" Visible="false">
       <PackagePath>runtimes\win-x64\native</PackagePath>
