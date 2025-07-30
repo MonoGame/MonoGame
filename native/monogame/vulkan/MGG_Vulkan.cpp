@@ -1180,12 +1180,6 @@ MGG_GraphicsDevice* MGG_GraphicsDevice_Create(MGG_GraphicsSystem* system, MGG_Gr
 
 	std::vector<const char*> extensions;
 	extensions.push_back(VK_KHR_SWAPCHAIN_EXTENSION_NAME);
-	extensions.push_back(VK_EXT_CUSTOM_BORDER_COLOR_EXTENSION_NAME);
-
-	VkPhysicalDeviceCustomBorderColorFeaturesEXT customBorderColorFeatures = {};
-	customBorderColorFeatures.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_CUSTOM_BORDER_COLOR_FEATURES_EXT;
-	customBorderColorFeatures.customBorderColors = VK_TRUE;
-	customBorderColorFeatures.customBorderColorWithoutFormat = VK_TRUE;
 
 	VkPhysicalDeviceFeatures enabledFeatures = {};
 	if (device->deviceFeatures.sampleRateShading)
@@ -1199,8 +1193,18 @@ MGG_GraphicsDevice* MGG_GraphicsDevice_Create(MGG_GraphicsSystem* system, MGG_Gr
 
 	VkPhysicalDeviceFeatures2 deviceFeatures2 = {};
 	deviceFeatures2.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2;
-	deviceFeatures2.pNext = &customBorderColorFeatures;
 	deviceFeatures2.features = enabledFeatures;
+
+#if defined(__APPLE__)
+	deviceFeatures2.pNext = nullptr;
+#else
+	extensions.push_back(VK_EXT_CUSTOM_BORDER_COLOR_EXTENSION_NAME);
+	VkPhysicalDeviceCustomBorderColorFeaturesEXT customBorderColorFeatures = {};
+	customBorderColorFeatures.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_CUSTOM_BORDER_COLOR_FEATURES_EXT;
+	customBorderColorFeatures.customBorderColors = VK_TRUE;
+	customBorderColorFeatures.customBorderColorWithoutFormat = VK_TRUE;
+	deviceFeatures2.pNext = &customBorderColorFeatures;
+#endif
 
 	VkDeviceCreateInfo deviceCreateInfo = { VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO };
 	deviceCreateInfo.queueCreateInfoCount = queueCreateInfoCount;
@@ -3944,6 +3948,9 @@ MGG_SamplerState* MGG_SamplerState_Create(MGG_GraphicsDevice* device, MGG_Sample
 		samplerInfo.borderColor = VK_BORDER_COLOR_FLOAT_OPAQUE_WHITE;
 	else
 	{
+#if defined(__APPLE__)
+		samplerInfo.borderColor = VK_BORDER_COLOR_INT_TRANSPARENT_BLACK;
+#else
 		samplerInfo.borderColor = VK_BORDER_COLOR_FLOAT_CUSTOM_EXT;
 		bcolor.sType = VK_STRUCTURE_TYPE_SAMPLER_CUSTOM_BORDER_COLOR_CREATE_INFO_EXT;
 
@@ -3955,6 +3962,7 @@ MGG_SamplerState* MGG_SamplerState_Create(MGG_GraphicsDevice* device, MGG_Sample
 		bcolor.customBorderColor.float32[3] = ((info->BorderColor >> 24) & 0xFF) / 255.0f;
 
 		samplerInfo.pNext = &bcolor;
+#endif
 	}
 
 	switch (info->Filter)
