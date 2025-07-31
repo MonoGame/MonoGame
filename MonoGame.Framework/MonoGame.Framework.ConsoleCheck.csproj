@@ -50,6 +50,8 @@
     <Compile Include="Platform\Windows\WinFormsGameWindow.cs" />
     <Compile Include="Platform\Desktop\Devices\Sensors\Accelerometer.cs" />
     <Compile Include="Platform\Desktop\Devices\Sensors\Compass.cs" />
+    <Compile Include="Platform\Storage\StorageDevice.Desktop.cs" />
+    <Compile Include="Platform\Storage\StorageContainer.Android.Desktop.iOS.cs" />
   </ItemGroup> 
 
   <ItemGroup>
