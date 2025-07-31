@@ -5,7 +5,7 @@
 
   <!-- iOS has its own Song and Video implementation -->
   <ItemGroup Condition="$(DefineConstants.Contains('NO_AUDIO')) != 'true' And $(DefineConstants.Contains('IOS'))">
-    <PackageReference Include="MonoGame.Library.OpenAL" Version="1.24.3.1" />
+    <PackageReference Include="MonoGame.Library.OpenAL" Version="1.24.3.2" />
     <Compile Include="Platform\Media\Song.iOS.cs" />
 	
 	<Compile Include="Platform\Media\MediaLibrary.iOS.cs" />
@@ -21,7 +21,7 @@
   
   <!-- Android has its own Song and Video implementation, and need OpenAL binaries -->
   <ItemGroup Condition="$(DefineConstants.Contains('NO_AUDIO')) != 'true' And $(DefineConstants.Contains('ANDROID'))">
-    <PackageReference Include="MonoGame.Library.OpenAL" Version="1.24.3.1" />
+    <PackageReference Include="MonoGame.Library.OpenAL" Version="1.24.3.2" />
     <Compile Include="Platform\Media\Song.Android.cs" />
 	
 	<Compile Include="Platform\Media\MediaLibrary.Android.cs" />
@@ -37,7 +37,7 @@
   
   <!-- DesktopGL has its own Song implementation, and need OpenAL binaries -->
   <ItemGroup Condition="$(DefineConstants.Contains('NO_AUDIO')) != 'true' And $(DefineConstants.Contains('DESKTOPGL'))">
-    <PackageReference Include="MonoGame.Library.OpenAL" Version="1.24.3.1" />
+    <PackageReference Include="MonoGame.Library.OpenAL" Version="1.24.3.2" />
 	<PackageReference Include="NVorbis" Version="0.10.4" />
 
     <Compile Include="Platform\Media\OggStream.NVorbis.cs" />
