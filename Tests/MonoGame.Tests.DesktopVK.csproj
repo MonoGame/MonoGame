@@ -50,11 +50,19 @@
 
   <ItemGroup>
     <ProjectReference Include="..\MonoGame.Framework\MonoGame.Framework.Native.csproj" />
-    <ProjectReference Include="..\native\monogame\desktopvk.vcxproj" />
 
-	  <Content Include="..\Artifacts\monogame.native\windows\desktopvk\$(Configuration)\monogame.native.dll">
-		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-	  </Content>
+	  <Content Include="..\Artifacts\monogame.native\windows\desktopvk\$(Configuration)\monogame.native.dll" Condition="Exists('..\Artifacts\monogame.native\windows\desktopvk\$(Configuration)\monogame.native.dll')" Visible="false">
+      <PackagePath>runtimes\win-x64\native</PackagePath>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Artifacts\monogame.native\linux\desktopvk\$(Configuration)\libmonogame.native.so" Condition="Exists('..\Artifacts\monogame.native\linux\desktopvk\$(Configuration)\libmonogame.native.so')" Visible="false">
+      <PackagePath>runtimes\linux-x64\native</PackagePath>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Artifacts\monogame.native\macosx\desktopvk\$(Configuration)\libmonogame.native.dylib" Condition="Exists('..\Artifacts\monogame.native\macosx\desktopvk\$(Configuration)\libmonogame.native.dylib')" Visible="false">
+      <PackagePath>runtimes\osx\native</PackagePath>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
 	  
   </ItemGroup>
 

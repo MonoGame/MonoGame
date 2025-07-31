@@ -779,6 +779,9 @@ namespace Microsoft.Xna.Framework.Graphics
             if (presentationParameters == null)
                 throw new ArgumentNullException("presentationParameters");
 
+            if (presentationParameters.DeviceWindowHandle == IntPtr.Zero)
+                throw new ArgumentException("The DeviceWindowHandle property of the PresentationParameters must be set before calling Reset.", "presentationParameters");
+
             PresentationParameters = presentationParameters;
             Reset();
         }
