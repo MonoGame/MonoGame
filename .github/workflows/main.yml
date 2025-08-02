@@ -12,7 +12,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [windows-latest, macos-latest, ubuntu-24.04]
+        os: [windows-latest, macos-15, ubuntu-24.04]
       fail-fast: false
     steps:
       - name: Clone repository
@@ -24,6 +24,9 @@ jobs:
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '8.0.x'
+          
+      - name: Setup Android Dependencies
+        uses: monogame/monogame-actions/install-android-dependencies@v1
 
       - name: Setup DotNet on linux/Windows
         if: runner.environment == 'github-hosted' && (runner.os == 'Linux' || runner.os == 'windows')
@@ -33,7 +36,7 @@ jobs:
       - name: Setup DotNet on MacOS
         if: runner.environment == 'github-hosted' && runner.os == 'macos'
         run: |
-          dotnet workload install macos ios
+          dotnet workload install android macos ios
 
       - name: Add msbuild to PATH
         if: runner.os == 'Windows'
@@ -59,33 +62,11 @@ jobs:
       - name: Disable Annotations
         run: echo "::remove-matcher owner=csc::"
 
-      - name: install wine64 on linux
-        if: runner.environment == 'github-hosted' && runner.os == 'Linux'
-        run: |
-          sudo apt install p7zip-full curl
-          sudo dpkg --add-architecture i386 
-          sudo mkdir -pm755 /etc/apt/keyrings
-          sudo wget -O /etc/apt/keyrings/winehq-archive.key https://dl.winehq.org/wine-builds/winehq.key
-          sudo wget -NP /etc/apt/sources.list.d/ https://dl.winehq.org/wine-builds/ubuntu/dists/noble/winehq-noble.sources
-          sudo apt update && sudo apt install --install-recommends winehq-stable
-          wget -qO- https://monogame.net/downloads/net9_mgfxc_wine_setup.sh | bash
+      - name: Setup Wine
+        uses: monogame/monogame-actions/install-wine@v1
 
-      - name: install wine64 on MacOS
-        if: runner.environment == 'github-hosted' && runner.os == 'macos'
-        run: |
-          brew install wine-stable p7zip
-          sudo mkdir -p /usr/local/lib
-          ls -n /Applications/ | grep Xcode*
-          sudo xcode-select -s /Applications/Xcode_16.2.app/Contents/Developer
-          wget -qO- https://monogame.net/downloads/net9_mgfxc_wine_setup.sh | bash
-
-      - name: Install Arial Font
-        if: runner.environment == 'github-hosted' && runner.os == 'Linux'
-        run: |
-          echo "ttf-mscorefonts-installer msttcorefonts/accepted-mscorefonts-eula select true" | sudo debconf-set-selections
-          sudo apt install -y ttf-mscorefonts-installer
-          sudo fc-cache
-          fc-match Arial
+      - name: Install Fonts
+        uses: monogame/monogame-actions/install-fonts@v1
 
       - name: Dotnet Restore Templates
         if: runner.environment == 'github-hosted' && runner.os == 'Windows'
@@ -111,6 +92,13 @@ jobs:
           CI: true
         shell: bash
 
+      - name: Test generated Nuget packages
+        if: runner.os != 'Linux'
+        run: dotnet run --project build/Build.csproj -- --target=TestNuGet
+        env:
+          ACTIONS_RUNTIME_TOKEN: ${{ env.ACTIONS_RUNTIME_TOKEN }}
+          ACTIONS_RUNTIME_URL: "${{ env.ACTIONS_RUNTIME_URL }}"           
+
       - name: Expose GitHub Runtime
         uses: crazy-max/ghaction-github-runtime@v3
 
@@ -119,6 +107,7 @@ jobs:
         env:
           ACTIONS_RUNTIME_TOKEN: ${{ env.ACTIONS_RUNTIME_TOKEN }}
           ACTIONS_RUNTIME_URL: "${{ env.ACTIONS_RUNTIME_URL }}"
+       
   deploy:
       name: Deploy
       needs: [ build, tests ]
