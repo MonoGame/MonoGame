@@ -12,5 +12,9 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 		float LineSpacing { get; }
 
 		long YOffsetMin { get; }
+
+		bool Italicized { get; }
+
+		bool Emboldened { get; }
 	}
 }
