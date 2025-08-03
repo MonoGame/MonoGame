@@ -99,15 +99,33 @@ namespace MonoGame.Tests.ContentPipeline
         }
 
         [Test]
-        [TestCase("Assets/Effects/Stock/AlphaTestEffect.fx")]
-        [TestCase("Assets/Effects/Stock/BasicEffect.fx")]
-        [TestCase("Assets/Effects/Stock/DualTextureEffect.fx")]
-        [TestCase("Assets/Effects/Stock/EnvironmentMapEffect.fx")]
-        [TestCase("Assets/Effects/Stock/SkinnedEffect.fx")]
-        [TestCase("Assets/Effects/Stock/SpriteEffect.fx")]
-        public void BuildStockEffect(string effectFile)
+        [TestCase("Assets/Effects/Stock/AlphaTestEffect.fx", TargetPlatform.Windows)]
+        [TestCase("Assets/Effects/Stock/BasicEffect.fx", TargetPlatform.Windows)]
+        [TestCase("Assets/Effects/Stock/DualTextureEffect.fx", TargetPlatform.Windows)]
+        [TestCase("Assets/Effects/Stock/EnvironmentMapEffect.fx", TargetPlatform.Windows)]
+        [TestCase("Assets/Effects/Stock/SkinnedEffect.fx", TargetPlatform.Windows)]
+        [TestCase("Assets/Effects/Stock/SpriteEffect.fx", TargetPlatform.Windows)]
+        [TestCase("Assets/Effects/Stock/AlphaTestEffect.fx", TargetPlatform.DesktopGL)]
+        [TestCase("Assets/Effects/Stock/BasicEffect.fx", TargetPlatform.DesktopGL)]
+        [TestCase("Assets/Effects/Stock/DualTextureEffect.fx", TargetPlatform.DesktopGL)]
+        [TestCase("Assets/Effects/Stock/EnvironmentMapEffect.fx", TargetPlatform.DesktopGL)]
+        [TestCase("Assets/Effects/Stock/SkinnedEffect.fx", TargetPlatform.DesktopGL)]
+        [TestCase("Assets/Effects/Stock/SpriteEffect.fx", TargetPlatform.DesktopGL)]
+        [TestCase("Assets/Effects/Stock/AlphaTestEffect.fx", TargetPlatform.WindowsGDK)]
+        [TestCase("Assets/Effects/Stock/BasicEffect.fx", TargetPlatform.WindowsGDK)]
+        [TestCase("Assets/Effects/Stock/DualTextureEffect.fx", TargetPlatform.WindowsGDK)]
+        [TestCase("Assets/Effects/Stock/EnvironmentMapEffect.fx", TargetPlatform.WindowsGDK)]
+        [TestCase("Assets/Effects/Stock/SkinnedEffect.fx", TargetPlatform.WindowsGDK)]
+        [TestCase("Assets/Effects/Stock/SpriteEffect.fx", TargetPlatform.WindowsGDK)]
+        [TestCase("Assets/Effects/Stock/AlphaTestEffect.fx", TargetPlatform.DesktopVK)]
+        [TestCase("Assets/Effects/Stock/BasicEffect.fx", TargetPlatform.DesktopVK)]
+        [TestCase("Assets/Effects/Stock/DualTextureEffect.fx", TargetPlatform.DesktopVK)]
+        [TestCase("Assets/Effects/Stock/EnvironmentMapEffect.fx", TargetPlatform.DesktopVK)]
+        [TestCase("Assets/Effects/Stock/SkinnedEffect.fx", TargetPlatform.DesktopVK)]
+        [TestCase("Assets/Effects/Stock/SpriteEffect.fx", TargetPlatform.DesktopVK)]
+        public void BuildStockEffect(string effectFile, TargetPlatform platform)
         {
-            BuildEffect(effectFile, TargetPlatform.Windows);
+            BuildEffect(effectFile, platform);
         }
 
         private void BuildEffect(string effectFile, TargetPlatform targetPlatform, string defines = null)
