@@ -8,7 +8,7 @@ public abstract class TestMonoGameTemplateTaskBase : FrostingTask<BuildContext>
 {
     // Pre-compiled regex pattern with named groups for better performance
     private static readonly Regex PackageReferenceRegex = new(
-        @"<PackageReference\s+?Include=""(?<packageName>MonoGame\.[^""]+?)""\s+?Version=""(?<version>[^""]+?)"".+?>",
+        @"<PackageReference\s+?Include=""(?<packageName>MonoGame\.[^""]+?)""\s+?Version=""(?<version>[^""]+?)"".*?>",
         RegexOptions.Compiled
     );
     // Static collection to track test results across all tasks
@@ -425,8 +425,8 @@ public abstract class TestMonoGameTemplateTaskBase : FrostingTask<BuildContext>
         
         foreach (Match match in matches)
         {
-            var packageName = match.Groups[1].Value;
-            var currentVersion = match.Groups[2].Value;
+            var packageName = match.Groups["packageName"].Value;
+            var currentVersion = match.Groups["version"].Value;
             monoGamePackages.Add(packageName);
             context.Information($"📦 Found MonoGame package: {packageName} (current version: {currentVersion})");
         }
@@ -447,18 +447,9 @@ public abstract class TestMonoGameTemplateTaskBase : FrostingTask<BuildContext>
             // Pre-escape the package name once for reuse
             var escapedPackageName = Regex.Escape(packageName);
             
-            // Handle both self-closing and open tag formats properly
-            var selfClosingPattern = $@"<PackageReference\s+Include=""{escapedPackageName}""\s+Version=""[^""]*""\s*/>";
-            var openTagPattern = $@"(<PackageReference\s+Include=""{escapedPackageName}""\s+Version="")[^""]*("">)";
-            
-            var selfClosingReplacement = $@"<PackageReference Include=""{packageName}"" Version=""{version}"" />";
-            var newContent = Regex.Replace(updatedContent, selfClosingPattern, selfClosingReplacement);
-            
-            if (newContent == updatedContent)
-            {
-                var openTagReplacement = $@"${{1}}{version}${{2}}";
-                newContent = Regex.Replace(updatedContent, openTagPattern, openTagReplacement);
-            }
+            // Handle both self-closing and open tag formats properly, targeting specific package
+            var replacementPattern = $@"(?<partA><PackageReference\s+?Include=""{escapedPackageName}""\s+?Version="")(?<version>[^""]+?)(?<partB>"".*?>)";
+            var newContent = Regex.Replace(updatedContent, replacementPattern, $"${{partA}}{version}${{partB}}", RegexOptions.IgnoreCase);
             
             if (newContent != updatedContent)
             {
