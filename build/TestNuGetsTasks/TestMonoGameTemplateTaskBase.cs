@@ -6,9 +6,11 @@ namespace BuildScripts;
 
 public abstract class TestMonoGameTemplateTaskBase : FrostingTask<BuildContext>
 {
-    // Pre-compiled regex patterns for better performance
-    private static readonly Regex PackageReferenceRegex = new(@"<PackageReference\s+Include=""(MonoGame\.[^""]*)""\s+Version=""([^""]*)""\s*/?(?:\s*/>|>)", RegexOptions.Compiled);
-    
+    // Pre-compiled regex pattern with named groups for better performance
+    private static readonly Regex PackageReferenceRegex = new(
+        @"<PackageReference\s+?Include=""(?<packageName>MonoGame\.[^""]+?)""\s+?Version=""(?<version>[^""]+?)"".+?>",
+        RegexOptions.Compiled
+    );
     // Static collection to track test results across all tasks
     private static readonly List<TestResult> TestResults = new();
     
@@ -65,49 +67,36 @@ public abstract class TestMonoGameTemplateTaskBase : FrostingTask<BuildContext>
 
         try
         {
-            // Step 0: Clean up any previous test artifacts
             CleanupPreviousTestRun(context, testsPath, projectPath, nugetSourceName);
 
-            // Step 1: Setup NuGet source pointing to Artifacts/NuGet folder
             SetupNuGetSource(context, nugetSourcePath, nugetSourceName);
 
-            // Step 2: Remove any existing MonoGame dotnet templates
             UninstallExistingTemplates(context);
 
-            // Step 3: Work out the version from the Templates NuGet package
             var templateVersion = GetTemplateVersionFromNuGet(context, nugetSourcePath);
             context.Information($"Detected MonoGame template version: {templateVersion}");
 
-            // Step 4: Install the templates using the detected version
             InstallTemplates(context, templateVersion, nugetSourcePath);
 
-            // Step 5: Create the template tests folder
             context.Information($"Creating template tests folder: {testsPath}");
             context.CreateDirectory(testsPath);
 
-            // Step 6: Create a new MonoGame project
             CreateTestProject(context, projectPath);
 
-            // Step 6.5: Replace dotnet-tools.json with platform-specific version
             var projectDir = IOPath.Combine(projectPath, "TestProject");
             ReplaceDotnetToolsConfig(context, projectDir, templateVersion);
 
-            // Step 7: Update the project references to use the version being tested
             UpdateProjectReferences(context, projectDir, templateVersion);
 
-            // Step 8: Restore packages for the project
             RestoreProject(context, projectDir);
 
-            // Step 8.5: Log file contents before build for debugging
             LogCurrentFileContents(context, projectDir);
 
-            // Step 9: Run dotnet build to verify the project builds
             BuildProject(context, projectDir);
 
             context.Information($"✅ Test completed successfully! MonoGame {TemplateName} project built without errors.");
             context.Information($"📁 Test project preserved at: {projectDir}");
             
-            // Record the success result
             TestResults.Add(new TestResult
             {
                 TemplateName = TemplateName,
@@ -118,7 +107,6 @@ public abstract class TestMonoGameTemplateTaskBase : FrostingTask<BuildContext>
         }
         catch (Exception ex)
         {
-            // Record the failure result
             TestResults.Add(new TestResult
             {
                 TemplateName = TemplateName,
@@ -127,11 +115,10 @@ public abstract class TestMonoGameTemplateTaskBase : FrostingTask<BuildContext>
                 Platform = currentPlatform
             });
             
-            throw; // Re-throw to maintain existing error handling behavior
+            throw;
         }
         finally
         {
-            // Cleanup: Remove the local NuGet source
             CleanupNuGetSource(context, nugetSourceName);
         }
     }
@@ -140,7 +127,6 @@ public abstract class TestMonoGameTemplateTaskBase : FrostingTask<BuildContext>
     {
         context.Information($"Setting up NuGet source from: {nugetSourcePath}");
         
-        // Remove source if it exists (ignore errors)
         try
         {
             context.StartProcess("dotnet", new ProcessSettings
@@ -153,7 +139,6 @@ public abstract class TestMonoGameTemplateTaskBase : FrostingTask<BuildContext>
             // Source might not exist, continue
         }
 
-        // Try using CAKE's cross-platform process execution with proper argument handling
         try
         {
             var addSourceSettings = new ProcessSettings
@@ -199,7 +184,6 @@ public abstract class TestMonoGameTemplateTaskBase : FrostingTask<BuildContext>
         }
         catch
         {
-            // Template might not be installed, continue
             context.Information("No existing MonoGame templates found to uninstall.");
         }
     }
@@ -236,7 +220,6 @@ public abstract class TestMonoGameTemplateTaskBase : FrostingTask<BuildContext>
             context.CreateDirectory(configDir);
         }
 
-        // Always replace with platform-specific version to avoid cross-platform tool issues
         var toolsJson = GetPlatformSpecificToolsJson(context, version);
         File.WriteAllText(dotnetToolsPath, toolsJson);
         
@@ -249,56 +232,56 @@ public abstract class TestMonoGameTemplateTaskBase : FrostingTask<BuildContext>
         
         // Base tools that are available on all platforms
         var baseTools = $$"""
-        {
-          "version": 1,
-          "isRoot": true,
-          "tools": {
-            "dotnet-mgcb": {
-              "version": "{{version}}",
-              "commands": [
-                "mgcb"
-              ]
-            },
-            "dotnet-mgcb-editor": {
-              "version": "{{version}}",
-              "commands": [
-                "mgcb-editor"
-              ]
-            }
-        """;
+            {
+            "version": 1,
+            "isRoot": true,
+            "tools": {
+                "dotnet-mgcb": {
+                "version": "{{version}}",
+                "commands": [
+                    "mgcb"
+                ]
+                },
+                "dotnet-mgcb-editor": {
+                "version": "{{version}}",
+                "commands": [
+                    "mgcb-editor"
+                ]
+                }
+            """;
 
-        // Add platform-specific editor tool
-        string platformSpecificTool = platform switch
-        {
-            PlatformFamily.Windows => $$"""
-            ,
-            "dotnet-mgcb-editor-windows": {
-              "version": "{{version}}",
-              "commands": [
-                "mgcb-editor-windows"
-              ]
-            }
-        """,
-            PlatformFamily.Linux => $$"""
-            ,
-            "dotnet-mgcb-editor-linux": {
-              "version": "{{version}}",
-              "commands": [
-                "mgcb-editor-linux"
-              ]
-            }
-        """,
-            PlatformFamily.OSX => $$"""
-            ,
-            "dotnet-mgcb-editor-mac": {
-              "version": "{{version}}",
-              "commands": [
-                "mgcb-editor-mac"
-              ]
-            }
-        """,
-            _ => "" // No platform-specific tool for unknown platforms
-        };
+            // Add platform-specific editor tool
+            string platformSpecificTool = platform switch
+            {
+                PlatformFamily.Windows => $$"""
+                ,
+                "dotnet-mgcb-editor-windows": {
+                "version": "{{version}}",
+                "commands": [
+                    "mgcb-editor-windows"
+                ]
+                }
+            """,
+                PlatformFamily.Linux => $$"""
+                ,
+                "dotnet-mgcb-editor-linux": {
+                "version": "{{version}}",
+                "commands": [
+                    "mgcb-editor-linux"
+                ]
+                }
+            """,
+                PlatformFamily.OSX => $$"""
+                ,
+                "dotnet-mgcb-editor-mac": {
+                "version": "{{version}}",
+                "commands": [
+                    "mgcb-editor-mac"
+                ]
+                }
+            """,
+                _ => "" // No platform-specific tool for unknown platforms
+            };
 
         return baseTools + platformSpecificTool + "\n  }\n}";
     }
@@ -317,7 +300,6 @@ public abstract class TestMonoGameTemplateTaskBase : FrostingTask<BuildContext>
     {
         context.Information("Building the test project...");
 
-        // Capture build output to only show it on failure
         var buildSettings = new ProcessSettings
         {
             Arguments = "build --verbosity normal --no-restore -m:1",
@@ -330,7 +312,6 @@ public abstract class TestMonoGameTemplateTaskBase : FrostingTask<BuildContext>
 
         if (buildResult != 0)
         {
-            // Build failed - show the output for debugging
             context.Error("Build failed! Output:");
             foreach (var line in output)
             {
@@ -339,7 +320,6 @@ public abstract class TestMonoGameTemplateTaskBase : FrostingTask<BuildContext>
             throw new Exception($"Test project failed to build!");
         }
         
-        // Build succeeded - just show a success message without the verbose output
         context.Information("✅ Build completed successfully");
     }
 
@@ -347,7 +327,6 @@ public abstract class TestMonoGameTemplateTaskBase : FrostingTask<BuildContext>
     {
         context.Information($"🧹 Cleaning up previous {TemplateName} test run...");
         
-        // Remove any existing test project directory for this specific target
         if (context.DirectoryExists(projectPath))
         {
             context.Information($"Removing existing test project: {projectPath}");
@@ -392,7 +371,6 @@ public abstract class TestMonoGameTemplateTaskBase : FrostingTask<BuildContext>
         var latestTemplateFile = templateFiles.OrderByDescending(f => f.GetFilename().ToString()).First();
         var fileName = latestTemplateFile.GetFilenameWithoutExtension().ToString();
         
-        // Remove "MonoGame.Templates.CSharp." prefix to get the version
         const string prefix = "MonoGame.Templates.CSharp.";
         return fileName.Substring(prefix.Length);
     }
@@ -440,11 +418,9 @@ public abstract class TestMonoGameTemplateTaskBase : FrostingTask<BuildContext>
 
     private int UpdateProjectFile(BuildContext context, string csprojPath, string version)
     {
-        // Read and analyze the csproj file directly using regex
         var csprojContent = File.ReadAllText(csprojPath);
         var monoGamePackages = new List<string>();
         
-        // Find all MonoGame PackageReference elements using cached regex
         var matches = PackageReferenceRegex.Matches(csprojContent);
         
         foreach (Match match in matches)
@@ -461,7 +437,6 @@ public abstract class TestMonoGameTemplateTaskBase : FrostingTask<BuildContext>
             return 0;
         }
         
-        // Update packages directly via csproj editing (more reliable than dotnet add package for prerelease versions)
         context.Information($"   📝 Updating {monoGamePackages.Count} package(s) to version {version}...");
         
         var updatedContent = csprojContent;
@@ -476,11 +451,9 @@ public abstract class TestMonoGameTemplateTaskBase : FrostingTask<BuildContext>
             var selfClosingPattern = $@"<PackageReference\s+Include=""{escapedPackageName}""\s+Version=""[^""]*""\s*/>";
             var openTagPattern = $@"(<PackageReference\s+Include=""{escapedPackageName}""\s+Version="")[^""]*("">)";
             
-            // First try self-closing format
             var selfClosingReplacement = $@"<PackageReference Include=""{packageName}"" Version=""{version}"" />";
             var newContent = Regex.Replace(updatedContent, selfClosingPattern, selfClosingReplacement);
             
-            // If no change, try open tag format (just update the version, preserve the rest)
             if (newContent == updatedContent)
             {
                 var openTagReplacement = $@"${{1}}{version}${{2}}";
@@ -501,7 +474,6 @@ public abstract class TestMonoGameTemplateTaskBase : FrostingTask<BuildContext>
         
         if (successfulUpdates > 0)
         {
-            // Write the updated content back to the file
             File.WriteAllText(csprojPath, updatedContent);
             context.Information($"   ✅ Updated {successfulUpdates} package reference(s) in this file");
         }
@@ -565,7 +537,6 @@ public abstract class TestMonoGameTemplateTaskBase : FrostingTask<BuildContext>
     {
         context.Information("🔍 Inspecting file contents before build...");
         
-        // Log dotnet-tools.json content
         var toolsJsonPath = IOPath.Combine(projectDir, ".config", "dotnet-tools.json");
         if (File.Exists(toolsJsonPath))
         {
@@ -575,7 +546,6 @@ public abstract class TestMonoGameTemplateTaskBase : FrostingTask<BuildContext>
             context.Information(""); // Empty line for readability
         }
 
-        // Log all .csproj files content
         var csprojFiles = Directory.GetFiles(projectDir, "*.csproj", SearchOption.AllDirectories);
         foreach (var csprojFile in csprojFiles)
         {
