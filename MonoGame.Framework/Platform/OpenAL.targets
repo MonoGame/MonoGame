@@ -3,11 +3,6 @@
     <DefineConstants>$(DefineConstants);OPENAL</DefineConstants>
   </PropertyGroup>
 
-  <!-- iOS needs to link CoreAudio.framework for OpenAL -->
-  <PropertyGroup Condition="$(DefineConstants.Contains('NO_AUDIO')) != 'true' And $(DefineConstants.Contains('IOS'))">
-     <AppBundleExtraOptions>$(AppBundleExtraOptions) -gcc_flags '-framework CoreAudio -framework AudioToolbox'</AppBundleExtraOptions>
-  </PropertyGroup>
-
   <!-- iOS has its own Song and Video implementation -->
   <ItemGroup Condition="$(DefineConstants.Contains('NO_AUDIO')) != 'true' And $(DefineConstants.Contains('IOS'))">
     <PackageReference Include="MonoGame.Library.OpenAL" Version="1.24.3.2" />
