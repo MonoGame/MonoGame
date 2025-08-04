@@ -5,7 +5,7 @@
 
   <!-- iOS needs to link CoreAudio.framework for OpenAL -->
   <PropertyGroup Condition="$(DefineConstants.Contains('NO_AUDIO')) != 'true' And $(DefineConstants.Contains('IOS'))">
-     <AppBundleExtraOptions>$(AppBundleExtraOptions) -framework CoreAudio</AppBundleExtraOptions>
+     <AppBundleExtraOptions>$(AppBundleExtraOptions) -framework CoreAudio -framework AudioToolbox</AppBundleExtraOptions>
   </PropertyGroup>
 
   <!-- iOS has its own Song and Video implementation -->
