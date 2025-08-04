@@ -192,47 +192,18 @@ namespace MonoGame.OpenAL
 
     internal class AL
     {
-        public static IntPtr NativeLibrary = GetNativeLibrary();
-
-        private static IntPtr GetNativeLibrary()
-        {
-#if DESKTOPGL
-            if (CurrentPlatform.OS == OS.Windows)
-                return FuncLoader.LoadLibraryExt("openal.dll");
-            else if (CurrentPlatform.OS == OS.Linux)
-                return FuncLoader.LoadLibraryExt("libopenal.so");
-            else if (CurrentPlatform.OS == OS.MacOSX)
-                return FuncLoader.LoadLibraryExt("libopenal.dylib");
-            else
-                return FuncLoader.LoadLibraryExt("openal");
-#elif ANDROID
-            var ret = FuncLoader.LoadLibrary("libopenal.so");
-
-            if (ret == IntPtr.Zero)
-            {
-                var appFilesDir = Environment.GetFolderPath(Environment.SpecialFolder.Personal);
-                var appDir = Path.GetDirectoryName(appFilesDir);
-                var lib = Path.Combine(appDir, "lib", "libopenal.so");
-
-                ret = FuncLoader.LoadLibrary(lib);
-            }
-
-            return ret;
-#else // iOS
-            var ret =  FuncLoader.LoadLibrary("libopenal.dylib");
-            if (ret ==IntPtr.Zero)
-                ret = FuncLoader.LoadLibrary(Path.Combine (Path.GetDirectoryName (AppContext.BaseDirectory), "libopenal.dylib"));
-            return ret;
+#if !IOS
+        internal const string LibraryName = "openal";
+#else
+        internal const string LibraryName = "__Internal";
 #endif
-        }
 
-        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-        internal delegate void d_alenable(int cap);
-        internal static d_alenable Enable = FuncLoader.LoadFunction<d_alenable>(NativeLibrary, "alEnable");
+        [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
+        internal static extern void alEnable(int cap);
+        internal static void Enable(int cap) => alEnable(cap);
 
-        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-        internal delegate void d_albufferdata(uint bid, int format, IntPtr data, int size, int freq);
-        internal static d_albufferdata alBufferData = FuncLoader.LoadFunction<d_albufferdata>(NativeLibrary, "alBufferData");
+        [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
+        internal static extern void alBufferData(uint bid, int format, IntPtr data, int size, int freq);
 
         internal static void BufferData(int bid, ALFormat format, byte[] data, int size, int freq)
         {
@@ -260,9 +231,8 @@ namespace MonoGame.OpenAL
             }
         }
 
-        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-        internal unsafe delegate void d_aldeletebuffers(int n, int* buffers);
-        internal static d_aldeletebuffers alDeleteBuffers = FuncLoader.LoadFunction<d_aldeletebuffers>(NativeLibrary, "alDeleteBuffers");
+        [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
+        internal unsafe static extern void alDeleteBuffers(int n, int* buffers);
 
         internal static void DeleteBuffers(int[] buffers)
         {
@@ -277,26 +247,25 @@ namespace MonoGame.OpenAL
             }
         }
 
-        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-        internal delegate void d_albufferi(int buffer, ALBufferi param, int value);
-        internal static d_albufferi Bufferi = FuncLoader.LoadFunction<d_albufferi>(NativeLibrary, "alBufferi");
+        [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
+        internal static extern void alBufferi(int buffer, ALBufferi param, int value);
+        internal static void Bufferi(int buffer, ALBufferi param, int value) => alBufferi(buffer, param, value);
 
-        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-        internal delegate void d_algetbufferi(int bid, ALGetBufferi param, out int value);
-        internal static d_algetbufferi GetBufferi = FuncLoader.LoadFunction<d_algetbufferi>(NativeLibrary, "alGetBufferi");
+        [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
+        internal static extern void alGetBufferi(int bid, ALGetBufferi param, out int value);
+        internal static void GetBufferi(int bid, ALGetBufferi param, out int value) => alGetBufferi(bid, param, out value);
 
-        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-        internal delegate void d_albufferiv(int bid, ALBufferi param, int[] values);
-        internal static d_albufferiv Bufferiv = FuncLoader.LoadFunction<d_albufferiv>(NativeLibrary, "alBufferiv");
+        [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
+        internal static extern void alBufferiv(int bid, ALBufferi param, int[] values);
+        internal static void Bufferiv(int bid, ALBufferi param, int[] values) => alBufferiv(bid, param, values);
 
         internal static void GetBuffer(int bid, ALGetBufferi param, out int value)
         {
             GetBufferi(bid, param, out value);
         }
 
-        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-        internal unsafe delegate void d_algenbuffers(int count, int* buffers);
-        internal static d_algenbuffers alGenBuffers = FuncLoader.LoadFunction<d_algenbuffers>(NativeLibrary, "alGenBuffers");
+        [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
+        internal unsafe static extern void alGenBuffers(int count, int* buffers);
 
         internal unsafe static void GenBuffers(int count, out int[] buffers)
         {
@@ -322,9 +291,8 @@ namespace MonoGame.OpenAL
             return ret;
         }
 
-        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-        internal delegate void d_algensources(int n, uint[] sources);
-        internal static d_algensources alGenSources = FuncLoader.LoadFunction<d_algensources>(NativeLibrary, "alGenSources");
+        [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
+        internal static extern void alGenSources(int n, uint[] sources);
 
 
         internal static void GenSources(int[] sources)
@@ -337,31 +305,28 @@ namespace MonoGame.OpenAL
             }
         }
 
-        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-        internal delegate ALError d_algeterror();
-        internal static d_algeterror GetError = FuncLoader.LoadFunction<d_algeterror>(NativeLibrary, "alGetError");
+        [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
+        internal static extern ALError alGetError();
+        internal static ALError GetError() => alGetError();
 
-        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-        internal delegate bool d_alisbuffer(uint buffer);
-        internal static d_alisbuffer alIsBuffer = FuncLoader.LoadFunction<d_alisbuffer>(NativeLibrary, "alIsBuffer");
+        [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
+        internal static extern bool alIsBuffer(uint buffer);
 
         internal static bool IsBuffer(int buffer)
         {
             return alIsBuffer((uint)buffer);
         }
 
-        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-        internal delegate void d_alsourcepause(uint source);
-        internal static d_alsourcepause alSourcePause = FuncLoader.LoadFunction<d_alsourcepause>(NativeLibrary, "alSourcePause");
+        [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
+        internal static extern void alSourcePause(uint source);
 
         internal static void SourcePause(int source)
         {
             alSourcePause((uint)source);
         }
 
-        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-        internal delegate void d_alsourceplay(uint source);
-        internal static d_alsourceplay alSourcePlay = FuncLoader.LoadFunction<d_alsourceplay>(NativeLibrary, "alSourcePlay");
+        [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
+        internal static extern void alSourcePlay(uint source);
 
         internal static void SourcePlay(int source)
         {
@@ -373,30 +338,27 @@ namespace MonoGame.OpenAL
             return errorCode.ToString();
         }
 
-        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-        internal delegate bool d_alissource(int source);
-        internal static d_alissource IsSource = FuncLoader.LoadFunction<d_alissource>(NativeLibrary, "alIsSource");
+        [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
+        internal static extern bool alIsSource(int source);
+        internal static bool IsSource(int source) => alIsSource(source);
 
-        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-        internal delegate void d_aldeletesources(int n, ref int sources);
-        internal static d_aldeletesources alDeleteSources = FuncLoader.LoadFunction<d_aldeletesources>(NativeLibrary, "alDeleteSources");
+        [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
+        internal static extern void alDeleteSources(int n, ref int sources);
 
         internal static void DeleteSource(int source)
         {
             alDeleteSources(1, ref source);
         }
 
-        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-        internal delegate void d_alsourcestop(int sourceId);
-        internal static d_alsourcestop SourceStop = FuncLoader.LoadFunction<d_alsourcestop>(NativeLibrary, "alSourceStop");
+        [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
+        internal static extern void alSourceStop(int sourceId);
+        internal static void SourceStop(int sourceId) => alSourceStop(sourceId);
 
-        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-        internal delegate void d_alsourcei(int sourceId, int i, int a);
-        internal static d_alsourcei alSourcei = FuncLoader.LoadFunction<d_alsourcei>(NativeLibrary, "alSourcei");
+        [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
+        internal static extern void alSourcei(int sourceId, int i, int a);
 
-        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-        internal delegate void d_alsource3i(int sourceId, ALSourcei i, int a, int b, int c);
-        internal static d_alsource3i alSource3i = FuncLoader.LoadFunction<d_alsource3i>(NativeLibrary, "alSource3i");
+        [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
+        internal static extern void alSource3i(int sourceId, ALSourcei i, int a, int b, int c);
 
         internal static void Source(int sourceId, ALSourcei i, int a)
         {
@@ -418,21 +380,18 @@ namespace MonoGame.OpenAL
             alSourcef(sourceId, i, dist);
         }
 
-        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-        internal delegate void d_alsourcef(int sourceId, ALSourcef i, float a);
-        internal static d_alsourcef alSourcef = FuncLoader.LoadFunction<d_alsourcef>(NativeLibrary, "alSourcef");
+        [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
+        internal static extern void alSourcef(int sourceId, ALSourcef i, float a);
 
-        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-        internal delegate void d_alsource3f(int sourceId, ALSource3f i, float x, float y, float z);
-        internal static d_alsource3f alSource3f = FuncLoader.LoadFunction<d_alsource3f>(NativeLibrary, "alSource3f");
+        [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
+        internal static extern void alSource3f(int sourceId, ALSource3f i, float x, float y, float z);
 
-        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-        internal delegate void d_alsourcefv(int sourceId, ALSourcef i, float[] values);
-        internal static d_alsourcefv alSourcefv = FuncLoader.LoadFunction<d_alsourcefv>(NativeLibrary, "alSourcefv");
+        [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
+        internal static extern void alSourcefv(int sourceId, ALSourcef i, float[] values);
 
-        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-        internal delegate void d_algetsourcei(int sourceId, ALGetSourcei i, out int state);
-        internal static d_algetsourcei GetSource = FuncLoader.LoadFunction<d_algetsourcei>(NativeLibrary, "alGetSourcei");
+        [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
+        internal static extern void alGetSourcei(int sourceId, ALGetSourcei i, out int state);
+        internal static void GetSource(int sourceId, ALGetSourcei i, out int state) => alGetSourcei(sourceId, i, out state);
 
         internal static ALSourceState GetSourceState(int sourceId)
         {
@@ -441,25 +400,31 @@ namespace MonoGame.OpenAL
             return (ALSourceState)state;
         }
 
-        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-        internal delegate void d_algetlistener3f(ALListener3f param, out float value1, out float value2, out float value3);
-        internal static d_algetlistener3f GetListener = FuncLoader.LoadFunction<d_algetlistener3f>(NativeLibrary, "alGetListener3f");
+        [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
+        internal static extern void alGetListener3f(ALListener3f param, out float value1, out float value2, out float value3);
+        internal static void GetListener(ALListener3f param, out float value1, out float value2, out float value3) => alGetListener3f(param, out value1, out value2, out value3);
 
-        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-        internal delegate void d_aldistancemodel(ALDistanceModel model);
-        internal static d_aldistancemodel DistanceModel = FuncLoader.LoadFunction<d_aldistancemodel>(NativeLibrary, "alDistanceModel");
+        [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
+        internal static extern void alDistanceModel(ALDistanceModel model);
+        internal static void DistanceModel(ALDistanceModel model) => alDistanceModel(model);
 
-        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-        internal delegate void d_aldopplerfactor(float value);
-        internal static d_aldopplerfactor DopplerFactor = FuncLoader.LoadFunction<d_aldopplerfactor>(NativeLibrary, "alDopplerFactor");
+        [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
+        internal static extern void alDopplerFactor(float value);
+        internal static void DopplerFactor(float value) => alDopplerFactor(value);
 
-        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-        internal unsafe delegate void d_alsourcequeuebuffers(int sourceId, int numEntries, int* buffers);
-        internal static d_alsourcequeuebuffers alSourceQueueBuffers = FuncLoader.LoadFunction<d_alsourcequeuebuffers>(NativeLibrary, "alSourceQueueBuffers");
+        [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
+        internal unsafe static extern void alSourceQueueBuffers(int sourceId, int numEntries, int* buffers);
 
-        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-        internal unsafe delegate void d_alsourceunqueuebuffers(int sourceId, int numEntries, int* salvaged);
-        internal static d_alsourceunqueuebuffers alSourceUnqueueBuffers = FuncLoader.LoadFunction<d_alsourceunqueuebuffers>(NativeLibrary, "alSourceUnqueueBuffers");
+        [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
+        internal unsafe static extern void alSourceUnqueueBuffers(int sourceId, int numEntries, int* salvaged);
+
+        [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
+        internal unsafe static extern void alSourceUnqueueBuffers(int sid, int numEntries, out int[] bids);
+
+        internal static void SourceUnqueueBuffers(int sid, int numEntries, out int[] bids)
+        {
+            alSourceUnqueueBuffers(sid, numEntries, out bids);
+        }
 
         internal static unsafe void SourceQueueBuffers(int sourceId, int numEntries, int[] buffers)
         {
@@ -473,10 +438,6 @@ namespace MonoGame.OpenAL
         {
             AL.alSourceQueueBuffers(sourceId, 1, &buffer);
         }
-
-        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-        internal delegate void d_alsourceunqueuebuffers2(int sid, int numEntries, out int[] bids);
-        internal static d_alsourceunqueuebuffers2 alSourceUnqueueBuffers2 = FuncLoader.LoadFunction<d_alsourceunqueuebuffers2>(NativeLibrary, "alSourceUnqueueBuffers");
 
         internal static unsafe int[] SourceUnqueueBuffers(int sourceId, int numEntries)
         {
@@ -492,26 +453,18 @@ namespace MonoGame.OpenAL
             return array;
         }
 
-        internal static void SourceUnqueueBuffers(int sid, int numENtries, out int[] bids)
-        {
-            alSourceUnqueueBuffers2(sid, numENtries, out bids);
-        }
+        [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
+        internal static extern int alGetEnumValue(string enumName);
 
-        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-        internal delegate int d_algetenumvalue(string enumName);
-        internal static d_algetenumvalue alGetEnumValue = FuncLoader.LoadFunction<d_algetenumvalue>(NativeLibrary, "alGetEnumValue");
+        [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
+        internal static extern bool alIsExtensionPresent(string extensionName);
+        internal static bool IsExtensionPresent(string extensionName) => alIsExtensionPresent(extensionName);
 
-        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-        internal delegate bool d_alisextensionpresent(string extensionName);
-        internal static d_alisextensionpresent IsExtensionPresent = FuncLoader.LoadFunction<d_alisextensionpresent>(NativeLibrary, "alIsExtensionPresent");
+        [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
+        internal static extern IntPtr alGetProcAddress(string functionName);
 
-        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-        internal delegate IntPtr d_algetprocaddress(string functionName);
-        internal static d_algetprocaddress alGetProcAddress = FuncLoader.LoadFunction<d_algetprocaddress>(NativeLibrary, "alGetProcAddress");
-
-        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-        private delegate IntPtr d_algetstring(int p);
-        private static d_algetstring alGetString = FuncLoader.LoadFunction<d_algetstring>(NativeLibrary, "alGetString");
+        [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
+        private static extern IntPtr alGetString(int p);
 
         internal static string GetString(int p)
         {
@@ -526,80 +479,77 @@ namespace MonoGame.OpenAL
 
     internal partial class Alc
     {
-        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-        internal delegate IntPtr d_alccreatecontext(IntPtr device, int[] attributes);
-        internal static d_alccreatecontext CreateContext = FuncLoader.LoadFunction<d_alccreatecontext>(AL.NativeLibrary, "alcCreateContext");
+        [DllImport(AL.LibraryName, CallingConvention = CallingConvention.Cdecl)]
+        internal static extern IntPtr alcCreateContext(IntPtr device, int[] attributes);
+        internal static IntPtr CreateContext(IntPtr device, int[] attributes) => alcCreateContext(device, attributes);
 
         internal static AlcError GetError()
         {
             return GetErrorForDevice(IntPtr.Zero);
         }
 
-        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-        internal delegate AlcError d_alcgeterror(IntPtr device);
-        internal static d_alcgeterror GetErrorForDevice = FuncLoader.LoadFunction<d_alcgeterror>(AL.NativeLibrary, "alcGetError");
+        [DllImport(AL.LibraryName, CallingConvention = CallingConvention.Cdecl)]
+        internal static extern AlcError alcGetError(IntPtr device);
+        internal static AlcError GetErrorForDevice(IntPtr device) => alcGetError(device);
 
-        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-        internal delegate void d_alcgetintegerv(IntPtr device, int param, int size, int[] values);
-        internal static d_alcgetintegerv alcGetIntegerv = FuncLoader.LoadFunction<d_alcgetintegerv>(AL.NativeLibrary, "alcGetIntegerv");
+        [DllImport(AL.LibraryName, CallingConvention = CallingConvention.Cdecl)]
+        internal static extern void alcGetIntegerv(IntPtr device, int param, int size, int[] values);
 
         internal static void GetInteger(IntPtr device, AlcGetInteger param, int size, int[] values)
         {
             alcGetIntegerv(device, (int)param, size, values);
         }
 
-        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-        internal delegate IntPtr d_alcgetcurrentcontext();
-        internal static d_alcgetcurrentcontext GetCurrentContext = FuncLoader.LoadFunction<d_alcgetcurrentcontext>(AL.NativeLibrary, "alcGetCurrentContext");
+        [DllImport(AL.LibraryName, CallingConvention = CallingConvention.Cdecl)]
+        internal static extern IntPtr alcGetCurrentContext();
+        internal static IntPtr GetCurrentContext() => alcGetCurrentContext();
 
-        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-        internal delegate void d_alcmakecontextcurrent(IntPtr context);
-        internal static d_alcmakecontextcurrent MakeContextCurrent = FuncLoader.LoadFunction<d_alcmakecontextcurrent>(AL.NativeLibrary, "alcMakeContextCurrent");
+        [DllImport(AL.LibraryName, CallingConvention = CallingConvention.Cdecl)]
+        internal static extern void alcMakeContextCurrent(IntPtr context);
+        internal static void MakeContextCurrent(IntPtr context) => alcMakeContextCurrent(context);
 
-        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-        internal delegate void d_alcdestroycontext(IntPtr context);
-        internal static d_alcdestroycontext DestroyContext = FuncLoader.LoadFunction<d_alcdestroycontext>(AL.NativeLibrary, "alcDestroyContext");
+        [DllImport(AL.LibraryName, CallingConvention = CallingConvention.Cdecl)]
+        internal static extern void alcDestroyContext(IntPtr context);
+        internal static void DestroyContext(IntPtr context) => alcDestroyContext(context);
 
-        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-        internal delegate void d_alcclosedevice(IntPtr device);
-        internal static d_alcclosedevice CloseDevice = FuncLoader.LoadFunction<d_alcclosedevice>(AL.NativeLibrary, "alcCloseDevice");
+        [DllImport(AL.LibraryName, CallingConvention = CallingConvention.Cdecl)]
+        internal static extern void alcCloseDevice(IntPtr device);
+        internal static void CloseDevice(IntPtr device) => alcCloseDevice(device);
 
-        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-        internal delegate IntPtr d_alcopendevice(string device);
-        internal static d_alcopendevice OpenDevice = FuncLoader.LoadFunction<d_alcopendevice>(AL.NativeLibrary, "alcOpenDevice");
+        [DllImport(AL.LibraryName, CallingConvention = CallingConvention.Cdecl)]
+        internal static extern IntPtr alcOpenDevice(string device);
+        internal static IntPtr OpenDevice(string device) => alcOpenDevice(device);
 
-        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-        internal delegate IntPtr d_alccaptureopendevice(string device, uint sampleRate, int format, int sampleSize);
-        internal static d_alccaptureopendevice alcCaptureOpenDevice = FuncLoader.LoadFunction<d_alccaptureopendevice>(AL.NativeLibrary, "alcCaptureOpenDevice");
+        [DllImport(AL.LibraryName, CallingConvention = CallingConvention.Cdecl)]
+        internal static extern IntPtr alcCaptureOpenDevice(string device, uint sampleRate, int format, int sampleSize);
 
         internal static IntPtr CaptureOpenDevice(string device, uint sampleRate, ALFormat format, int sampleSize)
         {
             return alcCaptureOpenDevice(device, sampleRate, (int)format, sampleSize);
         }
 
-        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-        internal delegate IntPtr d_alccapturestart(IntPtr device);
-        internal static d_alccapturestart CaptureStart = FuncLoader.LoadFunction<d_alccapturestart>(AL.NativeLibrary, "alcCaptureStart");
+        [DllImport(AL.LibraryName, CallingConvention = CallingConvention.Cdecl)]
+        internal static extern IntPtr alcCaptureStart(IntPtr device);
+        internal static IntPtr CaptureStart(IntPtr device) => alcCaptureStart(device);
 
-        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-        internal delegate void d_alccapturesamples(IntPtr device, IntPtr buffer, int samples);
-        internal static d_alccapturesamples CaptureSamples = FuncLoader.LoadFunction<d_alccapturesamples>(AL.NativeLibrary, "alcCaptureSamples");
+        [DllImport(AL.LibraryName, CallingConvention = CallingConvention.Cdecl)]
+        internal static extern void alcCaptureSamples(IntPtr device, IntPtr buffer, int samples);
+        internal static void CaptureSamples(IntPtr device, IntPtr buffer, int samples) => alcCaptureSamples(device, buffer, samples);
 
-        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-        internal delegate IntPtr d_alccapturestop(IntPtr device);
-        internal static d_alccapturestop CaptureStop = FuncLoader.LoadFunction<d_alccapturestop>(AL.NativeLibrary, "alcCaptureStop");
+        [DllImport(AL.LibraryName, CallingConvention = CallingConvention.Cdecl)]
+        internal static extern IntPtr alcCaptureStop(IntPtr device);
+        internal static IntPtr CaptureStop(IntPtr device) => alcCaptureStop(device);
 
-        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-        internal delegate IntPtr d_alccaptureclosedevice(IntPtr device);
-        internal static d_alccaptureclosedevice CaptureCloseDevice = FuncLoader.LoadFunction<d_alccaptureclosedevice>(AL.NativeLibrary, "alcCaptureCloseDevice");
+        [DllImport(AL.LibraryName, CallingConvention = CallingConvention.Cdecl)]
+        internal static extern IntPtr alcCaptureCloseDevice(IntPtr device);
+        internal static IntPtr CaptureCloseDevice(IntPtr device) => alcCaptureCloseDevice(device);
 
-        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-        internal delegate bool d_alcisextensionpresent(IntPtr device, string extensionName);
-        internal static d_alcisextensionpresent IsExtensionPresent = FuncLoader.LoadFunction<d_alcisextensionpresent>(AL.NativeLibrary, "alcIsExtensionPresent");
+        [DllImport(AL.LibraryName, CallingConvention = CallingConvention.Cdecl)]
+        internal static extern bool alcIsExtensionPresent(IntPtr device, string extensionName);
+        internal static bool IsExtensionPresent(IntPtr device, string extensionName) => alcIsExtensionPresent(device, extensionName);
 
-        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-        internal delegate IntPtr d_alcgetstring(IntPtr device, int p);
-        internal static d_alcgetstring alcGetString = FuncLoader.LoadFunction<d_alcgetstring>(AL.NativeLibrary, "alcGetString");
+        [DllImport(AL.LibraryName, CallingConvention = CallingConvention.Cdecl)]
+        internal static extern IntPtr alcGetString(IntPtr device, int p);
 
         internal static string GetString(IntPtr device, int p)
         {
@@ -612,23 +562,23 @@ namespace MonoGame.OpenAL
         }
 
 #if IOS
-        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-        internal delegate void d_alcsuspendcontext(IntPtr context);
-        internal static d_alcsuspendcontext SuspendContext = FuncLoader.LoadFunction<d_alcsuspendcontext>(AL.NativeLibrary, "alcSuspendContext");
+        [DllImport("_Internal", CallingConvention = CallingConvention.Cdecl)]
+        internal static extern void alcSuspendContext(IntPtr context);
+        internal static void SuspendContext(IntPtr context) => alcSuspendContext(context);
 
-        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-        internal delegate void d_alcprocesscontext(IntPtr context);
-        internal static d_alcprocesscontext ProcessContext = FuncLoader.LoadFunction<d_alcprocesscontext>(AL.NativeLibrary, "alcProcessContext");
+        [DllImport("_Internal", CallingConvention = CallingConvention.Cdecl)]
+        internal static extern void alcProcessContext(IntPtr context);
+        internal static void ProcessContext(IntPtr context) => alcProcessContext(context);
 #endif
 
 #if ANDROID
-        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-        internal delegate void d_alcdevicepausesoft(IntPtr device);
-        internal static d_alcdevicepausesoft DevicePause = FuncLoader.LoadFunction<d_alcdevicepausesoft>(AL.NativeLibrary, "alcDevicePauseSOFT");
+        [DllImport("openal", CallingConvention = CallingConvention.Cdecl)]
+        internal static extern void alcDevicePauseSOFT(IntPtr device);
+        internal static void DevicePause(IntPtr device) => alcDevicePauseSOFT(device);
 
-        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-        internal delegate void d_alcdeviceresumesoft(IntPtr device);
-        internal static d_alcdeviceresumesoft DeviceResume = FuncLoader.LoadFunction<d_alcdeviceresumesoft>(AL.NativeLibrary, "alcDeviceResumeSOFT");
+        [DllImport("openal", CallingConvention = CallingConvention.Cdecl)]
+        internal static extern void alcDeviceResumeSOFT(IntPtr device);
+        internal static void DeviceResume(IntPtr device) => alcDeviceResumeSOFT(device);
 #endif
     }
 
