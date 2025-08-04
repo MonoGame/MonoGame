@@ -766,12 +766,12 @@ void MGP_Window_SetIsBorderless(MGP_Window* window, mgbyte borderless)
 	SDL_SetWindowBordered(window->window, borderless ? SDL_FALSE : SDL_TRUE);
 }
 
-void MGP_Window_SetTitle(MGP_Window* window, mgbyte* title)
+void MGP_Window_SetTitle(MGP_Window* window, const char* title)
 {
     assert(window != nullptr);
 
-    title = title ? title : (mgbyte*)"";
-    SDL_SetWindowTitle(window->window, (const char*)title);
+    title = title ? title : "";
+    SDL_SetWindowTitle(window->window, title);
 }
 
 void MGP_Window_Show(MGP_Window* window, mgbyte show)
