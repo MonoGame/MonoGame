@@ -317,7 +317,6 @@ public abstract class TestMonoGameTemplateTaskBase : FrostingTask<BuildContext>
             {
                 context.Error(line);
             }
-            InspectNuGetPackagePaths(context, output);
             throw new Exception($"Test project failed to build!");
         }
 
