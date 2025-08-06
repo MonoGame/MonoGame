@@ -13,15 +13,13 @@ namespace MonoGame.Effect.Compiler
 {
     public static class Program
     {
-        private static bool usingWine;
-
         private static readonly List<(string, string)> sourceFiles = new();
 
         private static readonly Regex lineColumnRegex = new(@"\((\d*)(,)?(\d*)?(-)?(\d*)?\)", RegexOptions.Compiled);
 
         public static int Main(string[] args)
         {
-            if (!Environment.Is64BitProcess && Environment.OSVersion.Platform != PlatformID.Unix)
+            if (!Environment.Is64BitProcess)
             {
                 Console.Error.WriteLine("The MonoGame content tools only work on a 64bit OS.");
                 return -1;
@@ -33,16 +31,6 @@ namespace MonoGame.Effect.Compiler
 
             if (!parser.ParseCommandLine(args))
                 return 1;
-
-            // We don't support running MGFXC on Unix platforms
-            // however Wine can be used to make it work so lets try that.
-            if (Environment.OSVersion.Platform == PlatformID.Unix && options.Profile != ShaderProfile.Vulkan)
-            {
-                Environment.SetEnvironmentVariable("MGFXC_USE_WINE", "1");
-                return WineHelper.Run(options);
-            }
-
-            usingWine = Environment.GetEnvironmentVariable("MGFXC_USE_WINE") == "1";
 
             var sourceFilepath = Path.GetFullPath(options.SourceFile);
 
@@ -206,17 +194,7 @@ namespace MonoGame.Effect.Compiler
 
         private static string ConvertToNative(string path)
         {
-            if (!usingWine)
-                return path.Replace('\\', '/');
-
-            var proc = new Process();
-            proc.StartInfo.FileName = "winepath.exe";
-            proc.StartInfo.Arguments = "-u \"" + path + "\"";
-            proc.StartInfo.UseShellExecute = false;
-            proc.StartInfo.RedirectStandardOutput = true;
-            proc.Start();
-
-            return proc.StandardOutput.ReadToEnd().Trim('\n');
+            return path.Replace('\\', '/');
         }
 
         private static string ConvertMessage(string sourceString)

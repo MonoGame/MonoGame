@@ -225,19 +225,7 @@ namespace MonoGame.Effect
                     toolArgs += "-Fd \"" + dbgFile + "\" ";
                 }
                 toolArgs += "\"" + hlslFile + "\"";
-
-                if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-                {
-                    toolResult = ExternalTool.Run("dxc", toolArgs, out stdout, out stderr);
-                }
-                else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
-                {
-                    toolResult = ExternalTool.Run(Path.Combine(AppContext.BaseDirectory, "osx/bin/dxc"), toolArgs, out stdout, out stderr);
-                }
-                else
-                {
-                    toolResult = Dxc.Run(toolArgs, out stdout, out stderr);
-                }
+                toolResult = Dxc.Run(toolArgs, out stdout, out stderr);
 
                 errorsAndWarnings += stderr;
 

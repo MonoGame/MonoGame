@@ -26,7 +26,12 @@
   <ItemGroup>
     <Compile Remove="bin\**\*" />
     <Compile Remove="obj\**\*" />
-    <Compile Remove="Properties\**\*" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Include="..\Tools\MonoGame.Effect.Compiler\Effect\**\*.cs">
+      <Link>Processors\Effect\%(RecursiveDir)%(Filename)%(Extension)</Link>
+    </Compile>
   </ItemGroup>
 
   <ItemGroup>
@@ -54,19 +59,12 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Reference Include="CppNet">
-      <HintPath>..\ThirdParty\Dependencies\CppNet\CppNet.dll</HintPath>
-    </Reference>
+    <Reference Include="..\ThirdParty\Dependencies\CppNet\CppNet.dll" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\MonoGame.Framework\MonoGame.Framework.DesktopGL.csproj">
       <PrivateAssets>All</PrivateAssets>
-    </ProjectReference>
-    <ProjectReference Include="..\Tools\MonoGame.Effect.Compiler\MonoGame.Effect.Compiler.csproj">
-      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
-      <OutputItemType>Content</OutputItemType>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </ProjectReference>
   </ItemGroup>
 
@@ -75,8 +73,10 @@
     <PackageReference Include="BCnEncoder.Net" Version="2.1.0" />
     <PackageReference Include="Microsoft.VisualBasic" Version="10.3.0" />
     <PackageReference Include="MonoGame.Library.FreeType" Version="2.13.2.2" />
+    <PackageReference Include="MonoGame.Library.MojoShader" Version="1.0.0.3" />
     <PackageReference Include="MonoGame.Tool.Basisu" Version="1.60.0.2" />
     <PackageReference Include="MonoGame.Tool.Crunch" Version="1.0.4.4" />
+    <PackageReference Include="MonoGame.Tool.Dxc" Version="1.8.2505.10" />
     <PackageReference Include="MonoGame.Tool.FFmpeg" Version="7.0.0.8" />
     <PackageReference Include="MonoGame.Tool.FFprobe" Version="7.0.0.8" />
     <PackageReference Include="SharpDX" Version="4.0.1" />
@@ -87,13 +87,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Content Include="..\ThirdParty\Dependencies\CppNet\CppNet.dll" PackagePath="lib\net8.0" Visible="false">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\ThirdParty\Dependencies\MojoShader\Windows\libmojoshader_64.dll" Visible="false">
-      <PackagePath>runtimes\win-x64\native</PackagePath>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
     <Content Include="..\Artifacts\native\mgpipeline\windows\$(Configuration)\mgpipeline.dll" Condition="Exists('..\Artifacts\native\mgpipeline\windows\$(Configuration)\mgpipeline.dll')" Visible="false">
       <PackagePath>runtimes\win-x64\native</PackagePath>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>

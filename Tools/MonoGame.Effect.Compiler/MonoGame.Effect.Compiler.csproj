@@ -16,12 +16,12 @@
 
   <ItemGroup>
     <Compile Include="..\..\MonoGame.Framework.Content.Pipeline\ExternalTool.cs" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Include="..\..\ThirdParty\Dependencies\MojoShader\Windows\libmojoshader_64.dll">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
+    <Compile Include="..\..\MonoGame.Framework.Content.Pipeline\LoadedTypeCollection.cs">
+      <Link>LoadedTypeCollection.cs</Link>
+    </Compile>
+    <Compile Include="..\..\MonoGame.Framework.Content.Pipeline\TargetPlatform.cs">
+      <Link>TargetPlatform.cs</Link>
+    </Compile>
   </ItemGroup>
 
   <ItemGroup>
@@ -31,7 +31,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="MonoGame.Tool.Dxc" Version="1.8.2505.7" />
+    <PackageReference Include="MonoGame.Library.MojoShader" Version="1.0.0.3" />
+    <PackageReference Include="MonoGame.Tool.Dxc" Version="1.8.2505.10" />
     <PackageReference Include="SharpDX" Version="4.0.1" />
     <PackageReference Include="SharpDX.D3DCompiler" Version="4.0.1" />
   </ItemGroup>

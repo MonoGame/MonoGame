@@ -83,19 +83,19 @@ namespace MonoGame.Tests.ContentPipeline
         [TestCase("Assets/Effects/ParserTest.fx")]
         public void TestParser(string effectFile)
         {
-            BuildEffect(effectFile, TargetPlatform.Windows);
+            BuildEffect(effectFile, TargetPlatform.DesktopGL);
         }
 
         [Test]
         public void TestDefines()
         {
-            Assert.DoesNotThrow(() => BuildEffect("Assets/Effects/DefinesTest.fx", TargetPlatform.Windows, "MACRO_DEFINE_TEST=3"));
+            Assert.DoesNotThrow(() => BuildEffect("Assets/Effects/DefinesTest.fx", TargetPlatform.DesktopGL, "MACRO_DEFINE_TEST=3"));
             Assert.Throws<InvalidContentException>(() =>
-                BuildEffect("Assets/Effects/DefinesTest.fx", TargetPlatform.Windows, "MACRO_DEFINE_TEST=4"));
+                BuildEffect("Assets/Effects/DefinesTest.fx", TargetPlatform.DesktopGL, "MACRO_DEFINE_TEST=4"));
             Assert.Throws<InvalidContentException>(() =>
-                BuildEffect("Assets/Effects/DefinesTest.fx", TargetPlatform.Windows));
+                BuildEffect("Assets/Effects/DefinesTest.fx", TargetPlatform.DesktopGL));
             Assert.Throws<InvalidContentException>(() =>
-                BuildEffect("Assets/Effects/DefinesTest.fx", TargetPlatform.Windows, "INVALID_SYNTAX;ANOTHER_MACRO;MACRO_DEFINE_TEST=3"));
+                BuildEffect("Assets/Effects/DefinesTest.fx", TargetPlatform.DesktopGL, "INVALID_SYNTAX;ANOTHER_MACRO;MACRO_DEFINE_TEST=3"));
         }
 
         [Test]
@@ -107,7 +107,12 @@ namespace MonoGame.Tests.ContentPipeline
         [TestCase("Assets/Effects/Stock/SpriteEffect.fx")]
         public void BuildStockEffect(string effectFile)
         {
+#if DIRECTX
             BuildEffect(effectFile, TargetPlatform.Windows);
+            BuildEffect(effectFile, TargetPlatform.WindowsGDK);
+#endif
+            BuildEffect(effectFile, TargetPlatform.DesktopGL);
+            BuildEffect(effectFile, TargetPlatform.DesktopVK);
         }
 
         private void BuildEffect(string effectFile, TargetPlatform targetPlatform, string defines = null)

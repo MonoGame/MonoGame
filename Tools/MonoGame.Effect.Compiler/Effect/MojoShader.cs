@@ -5,11 +5,7 @@ namespace MonoGame.Effect
 {
 	internal class MojoShader
     {
-#if OLD_CONTENT_PROCESSORS
-        const string mojoshader_dll = "libmojoshader_32.dll";
-#else
-        const string mojoshader_dll = "libmojoshader_64.dll";
-#endif
+        const string mojoshader_dll = "mojoshader";
 
 		public partial class NativeConstants {
 		    
@@ -437,7 +433,7 @@ namespace MonoGame.Effect
 		    public int minor_ver;
 		    
 		    /// int
-		    public int uniform_count;
+			public int uniform_count;
 		    
 		    /// MOJOSHADER_uniform*
 		    public IntPtr uniforms;
