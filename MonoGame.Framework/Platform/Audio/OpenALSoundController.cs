@@ -1,11 +1,12 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.IO;
-using System.Runtime.InteropServices;
 using MonoGame.Framework.Utilities;
 using MonoGame.OpenAL;
 using MonoGame.OpenGL;
+using System;
+using System.Collections.Generic;
+using System.Globalization;
+using System.IO;
+using System.Linq;
+using System.Runtime.InteropServices;
 
 #if ANDROID
 using System.Globalization;
@@ -31,7 +32,7 @@ namespace Microsoft.Xna.Framework.Audio
             if ((error = AL.GetError()) != ALError.NoError)
             {
                 if (args != null && args.Length > 0)
-                    message = String.Format(message, args);
+                    message = String.Format(CultureInfo.InvariantCulture, message, args);
                 
                 throw new InvalidOperationException(message + " (Reason: " + AL.GetErrorString(error) + ")");
             }
@@ -57,7 +58,7 @@ namespace Microsoft.Xna.Framework.Audio
             if ((error = Alc.GetError()) != AlcError.NoError)
             {
                 if (args != null && args.Length > 0)
-                    message = String.Format(message, args);
+                    message = String.Format(CultureInfo.InvariantCulture, message, args);
 
                 throw new InvalidOperationException(message + " (Reason: " + error.ToString() + ")");
             }

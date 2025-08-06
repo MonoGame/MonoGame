@@ -5,6 +5,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Globalization;
 using System.Runtime.Serialization;
 
 namespace Microsoft.Xna.Framework
@@ -40,7 +41,7 @@ namespace Microsoft.Xna.Framework
             {
                 return string.Concat(
                     "Center( ", this.Center.DebugDisplayString, " )  \r\n",
-                    "Radius( ", this.Radius.ToString(), " )"
+                    "Radius( ", this.Radius.ToString(CultureInfo.InvariantCulture), " )"
                     );
             }
         }

@@ -283,7 +283,7 @@ namespace Microsoft.Xna.Framework.Graphics
             if (adapter == null)
                 throw new ArgumentNullException("adapter");
             if (!adapter.IsProfileSupported(graphicsProfile))
-                throw new NoSuitableGraphicsDeviceException(String.Format("Adapter '{0}' does not support the {1} profile.", adapter.Description, graphicsProfile));
+                throw new NoSuitableGraphicsDeviceException(String.Format(CultureInfo.InvariantCulture, "Adapter '{0}' does not support the {1} profile.", adapter.Description, graphicsProfile));
             if (presentationParameters == null)
                 throw new ArgumentNullException("presentationParameters");
             Adapter = adapter;
@@ -311,7 +311,7 @@ namespace Microsoft.Xna.Framework.Graphics
             if (adapter == null)
                 throw new ArgumentNullException("adapter");
             if (!adapter.IsProfileSupported(graphicsProfile))
-                throw new NoSuitableGraphicsDeviceException(String.Format("Adapter '{0}' does not support the {1} profile.", adapter.Description, graphicsProfile));
+                throw new NoSuitableGraphicsDeviceException(String.Format(CultureInfo.InvariantCulture, "Adapter '{0}' does not support the {1} profile.", adapter.Description, graphicsProfile));
             if (presentationParameters == null)
                 throw new ArgumentNullException("presentationParameters");
 #if DIRECTX
@@ -1621,7 +1621,7 @@ namespace Microsoft.Xna.Framework.Graphics
             var dataByteSize = width * height * fSize;
 
             if (elementCount * tSize != dataByteSize)
-                throw new ArgumentException(string.Format("elementCount is not the right size, " +
+                throw new ArgumentException(string.Format(CultureInfo.InvariantCulture, "elementCount is not the right size, " +
                                             "elementCount * sizeof(T) is {0}, but data size is {1} bytes.",
                                             elementCount * tSize, dataByteSize), "elementCount");
 

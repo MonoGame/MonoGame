@@ -5,6 +5,7 @@
 
 using System;
 using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
 
 namespace Microsoft.Xna.Framework.Graphics.PackedVector
 {
@@ -96,7 +97,17 @@ namespace Microsoft.Xna.Framework.Graphics.PackedVector
         /// <inheritdoc />
         public override string ToString()
         {
-            return _packed.ToString("X");
+            return _packed.ToString("X", CultureInfo.CurrentCulture);
+        }
+
+        /// <summary>
+        /// Returns a string representation of the <see cref="NormalizedByte2"/> using the specified format provider.
+        /// </summary>
+        /// <param name="provider">Format provider to utilize</param>
+        /// <returns>String representation of <see langword="this" />.</returns>
+        public string ToString(IFormatProvider provider)
+        {
+            return _packed.ToString("X", provider);
         }
 
         private static ushort Pack(float x, float y)

@@ -2,12 +2,12 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
+using MonoGame.Framework.Utilities;
+using MonoGame.OpenAL;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Runtime.InteropServices;
-using MonoGame.Framework.Utilities;
-
-using MonoGame.OpenAL;
 #if IOS || MONOMAC
 using AudioToolbox;
 using AudioUnit;
@@ -32,9 +32,9 @@ namespace Microsoft.Xna.Framework.Audio
 
             string errorFmt = "OpenAL Error: {0}";
 
-            throw new NoMicrophoneConnectedException(String.Format("{0} - {1}",
+            throw new NoMicrophoneConnectedException(String.Format(CultureInfo.InvariantCulture, "{0} - {1}",
                             operation,
-                            string.Format(errorFmt, error)));
+                            String.Format(CultureInfo.InvariantCulture, errorFmt, error)));
         }
 
         internal static void PopulateCaptureDevices()

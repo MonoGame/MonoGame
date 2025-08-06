@@ -4,8 +4,9 @@
 
 using System;
 using System.Diagnostics;
-using System.Text;
+using System.Globalization;
 using System.Runtime.Serialization;
+using System.Text;
 
 namespace Microsoft.Xna.Framework
 {
@@ -156,9 +157,9 @@ namespace Microsoft.Xna.Framework
             get
             {
                 return string.Concat(
-                    this.X.ToString(), "  ",
-                    this.Y.ToString(), "  ",
-                    this.Z.ToString()
+                    this.X.ToString(CultureInfo.InvariantCulture), "  ",
+                    this.Y.ToString(CultureInfo.InvariantCulture), "  ",
+                    this.Z.ToString(CultureInfo.InvariantCulture)
                 );
             }
         }
@@ -1028,7 +1029,7 @@ namespace Microsoft.Xna.Framework
             sb.Append(this.Y);
             sb.Append(" Z:");
             sb.Append(this.Z);
-            sb.Append("}");
+            sb.Append('}');
             return sb.ToString();
         }
 

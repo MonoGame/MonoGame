@@ -4,6 +4,7 @@
 
 using System;
 using System.Diagnostics;
+using System.Globalization;
 
 #if OPENGL
 #if DESKTOPGL || GLES
@@ -761,7 +762,7 @@ namespace Microsoft.Xna.Framework.Graphics
 				break;
             case InvalidFormat: 
             default:
-                    throw new NotSupportedException(string.Format("The requested SurfaceFormat `{0}` is not supported.", format));
+                    throw new NotSupportedException(string.Format(CultureInfo.InvariantCulture, "The requested SurfaceFormat `{0}` is not supported.", format));
 			}
 		}
 

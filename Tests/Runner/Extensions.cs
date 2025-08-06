@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -11,7 +9,7 @@ using System.Text.RegularExpressions;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using NUnit.Framework;
-using NUnit.Framework.Internal;
+using System.Globalization;
 
 namespace MonoGame.Tests {
 	static class Extensions {
@@ -25,7 +23,7 @@ namespace MonoGame.Tests {
 
 		public static Color ToColor (this string self)
 		{
-			return (Color)typeof (Color).InvokeMember (self, BindingFlags.GetProperty, null, null, null);
+			return (Color)typeof (Color).InvokeMember (self, BindingFlags.GetProperty, null, null, null, CultureInfo.InvariantCulture);
 		}
 
 	    public static FramePixelData ToPixelData(this Texture2D texture)
@@ -146,7 +144,7 @@ namespace MonoGame.Tests {
 
 	class ServiceNotFoundException : Exception {
 		public ServiceNotFoundException (Type serviceType)
-			: base(string.Format("Required service of type '{0}' was not found.", serviceType))
+			: base(string.Format(CultureInfo.InvariantCulture, "Required service of type '{0}' was not found.", serviceType))
 		{
 			if (serviceType == null)
 				throw new ArgumentNullException ("serviceType");

@@ -3,6 +3,7 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System;
+using System.Globalization;
 using System.IO;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -77,8 +78,8 @@ namespace MonoGame.Framework.Utilities
 
                     foreach (var num in bytes)
                     {
-                        safeline.Append("%");
-                        safeline.Append(num.ToString("X"));
+                        safeline.Append('%');
+                        safeline.Append(num.ToString("X", CultureInfo.InvariantCulture));
                     }
                 }
             }

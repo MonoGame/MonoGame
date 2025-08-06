@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using System.Diagnostics;
+using System.Globalization;
 
 #if ANGLE
 using OpenTK.Graphics;
@@ -309,8 +310,8 @@ namespace Microsoft.Xna.Framework.Graphics
                 if (string.IsNullOrEmpty(version))
                     throw new NoSuitableGraphicsDeviceException("Unable to retrieve OpenGL version");
 
-                glMajorVersion = Convert.ToInt32(version.Substring(0, 1));
-                glMinorVersion = Convert.ToInt32(version.Substring(2, 1));
+                glMajorVersion = Convert.ToInt32(version.Substring(0, 1), CultureInfo.InvariantCulture);
+                glMinorVersion = Convert.ToInt32(version.Substring(2, 1), CultureInfo.InvariantCulture);
             }
             catch (FormatException)
             {

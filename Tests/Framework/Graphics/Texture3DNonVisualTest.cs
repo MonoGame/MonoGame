@@ -2,10 +2,11 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
-using System;
-using NUnit.Framework;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using NUnit.Framework;
+using System;
+using System.Globalization;
 
 namespace MonoGame.Tests.Graphics
 {
@@ -95,11 +96,11 @@ namespace MonoGame.Tests.Graphics
             for (int i = 0; i < a; i++)
             {
                 if (i < startIndex)
-                    Assert.AreNotEqual(reference[i], written[i], string.Format("Color written from before startIndex"));
+                    Assert.AreNotEqual(reference[i], written[i], "Color written from before startIndex");
                 else if (i < elementCount + startIndex)
-                    Assert.AreEqual(write[i + startIndex], written[i], string.Format("bad color in position {0}", i));
+                    Assert.AreEqual(write[i + startIndex], written[i], string.Format(CultureInfo.InvariantCulture, "bad color in position {0}", i));
                 else
-                    Assert.AreEqual(reference[i], written[i], string.Format("Color written after elementCount"));
+                    Assert.AreEqual(reference[i], written[i], "Color written after elementCount");
             }
 
         }
@@ -144,9 +145,9 @@ namespace MonoGame.Tests.Graphics
                 cy = (i / Texture3DNonVisualTest.w) % Texture3DNonVisualTest.h;
                 cz = ((i / Texture3DNonVisualTest.w) / Texture3DNonVisualTest.h) % Texture3DNonVisualTest.d;
                 if (cx >= x && cx < w + x && cy >= y && cy < h + y && cz >= z && cz < d + z)
-                    Assert.AreEqual(write[startIndex + j++], written[i], string.Format("bad color in position x:{0};y:{1};z:{2};i:{3}", cx, cy, cz, i));
+                    Assert.AreEqual(write[startIndex + j++], written[i], string.Format(CultureInfo.InvariantCulture, "bad color in position x:{0};y:{1};z:{2};i:{3}", cx, cy, cz, i));
                 else
-                    Assert.AreEqual(reference[i], written[i], string.Format("bad color in position x:{0};y:{1};z:{2};i:{3}, outside requested area", cx, cy, cz, i));
+                    Assert.AreEqual(reference[i], written[i], string.Format(CultureInfo.InvariantCulture, "bad color in position x:{0};y:{1};z:{2};i:{3}, outside requested area", cx, cy, cz, i));
             }
         }
 

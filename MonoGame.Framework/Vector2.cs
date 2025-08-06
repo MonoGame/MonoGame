@@ -4,6 +4,7 @@
 
 using System;
 using System.Diagnostics;
+using System.Globalization;
 using System.Runtime.CompilerServices;
 using System.Runtime.Serialization;
 
@@ -87,8 +88,8 @@ namespace Microsoft.Xna.Framework
             get
             {
                 return string.Concat(
-                    this.X.ToString(), "  ",
-                    this.Y.ToString()
+                    this.X.ToString(CultureInfo.InvariantCulture), "  ",
+                    this.Y.ToString(CultureInfo.InvariantCulture)
                 );
             }
         }
