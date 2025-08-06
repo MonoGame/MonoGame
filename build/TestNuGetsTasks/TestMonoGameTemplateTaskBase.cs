@@ -8,8 +8,8 @@ public abstract class TestMonoGameTemplateTaskBase : FrostingTask<BuildContext>
 {
     // Pre-compiled regex pattern with named groups for better performance
     private static readonly Regex PackageReferenceRegex = new(
-        @"<PackageReference\s+?Include=""(?<packageName>MonoGame\.[^""]+?)""\s+?Version=""(?<version>[^""]+?)"".*?>",
-        RegexOptions.Compiled
+        @"(?<partA><PackageReference\s+?Include=""(?<packageName>MonoGame\.[^""]+?)""\s+?Version="")(?<version>[^""]+?)(?<partB>"".*?>)",
+        RegexOptions.Compiled | RegexOptions.IgnoreCase
     );
     // Static collection to track test results across all tasks
     private static readonly List<TestResult> TestResults = new();
@@ -457,57 +457,31 @@ public abstract class TestMonoGameTemplateTaskBase : FrostingTask<BuildContext>
     private int UpdateProjectFile(BuildContext context, string csprojPath, string version)
     {
         var csprojContent = File.ReadAllText(csprojPath);
-        var monoGamePackages = new List<string>();
-
-        var matches = PackageReferenceRegex.Matches(csprojContent);
-
-        foreach (Match match in matches)
-        {
-            var packageName = match.Groups["packageName"].Value;
-            var currentVersion = match.Groups["version"].Value;
-            monoGamePackages.Add(packageName);
-            context.Information($"📦 Found MonoGame package: {packageName} (current version: {currentVersion})");
-        }
-
-        if (monoGamePackages.Count == 0)
-        {
-            context.Information("   No MonoGame packages found in this file");
-            return 0;
-        }
-
-        context.Information($"   📝 Updating {monoGamePackages.Count} package(s) to version {version}...");
+        context.Information($"   📝 Updating MonoGame package(s) to version {version}...");
 
         var updatedContent = csprojContent;
-        var successfulUpdates = 0;
+        bool successfulUpdate = false;
 
-        foreach (var packageName in monoGamePackages)
+        var newContent = PackageReferenceRegex.Replace(updatedContent, $"${{partA}}{version}${{partB}}");
+
+        if (newContent != updatedContent)
         {
-            // Pre-escape the package name once for reuse
-            var escapedPackageName = Regex.Escape(packageName);
-
-            // Handle both self-closing and open tag formats properly, targeting specific package
-            var replacementPattern = $@"(?<partA><PackageReference\s+?Include=""{escapedPackageName}""\s+?Version="")(?<version>[^""]+?)(?<partB>"".*?>)";
-            var newContent = Regex.Replace(updatedContent, replacementPattern, $"${{partA}}{version}${{partB}}", RegexOptions.IgnoreCase);
-
-            if (newContent != updatedContent)
-            {
-                updatedContent = newContent;
-                successfulUpdates++;
-                context.Information($"   ✅ Successfully updated {packageName} to version {version}");
-            }
-            else
-            {
-                context.Warning($"   ❌ Failed to update {packageName} version in csproj");
-            }
+            updatedContent = newContent;
+            successfulUpdate = true;
+            context.Information($"   ✅ Successfully updated {csprojPath} to version {version}");
+        }
+        else
+        {
+            context.Warning($"   ❌ Failed to update {csprojPath} version in csproj");
         }
 
-        if (successfulUpdates > 0)
+        if (successfulUpdate)
         {
             File.WriteAllText(csprojPath, updatedContent);
-            context.Information($"   ✅ Updated {successfulUpdates} package reference(s) in this file");
+            context.Information($"   ✅ Updated MonoGame package reference(s) in this file");
         }
 
-        return successfulUpdates;
+        return successfulUpdate ? 1 : 0;
     }
 
     /// <summary>
