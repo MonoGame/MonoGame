@@ -13,7 +13,7 @@ public abstract class TestMonoGameTemplateTaskBase : FrostingTask<BuildContext>
     );
     // Static collection to track test results across all tasks
     private static readonly List<TestResult> TestResults = new();
-    
+
     protected abstract string TemplateName { get; }
     protected abstract string ProjectFolderName { get; }
     protected abstract string TemplateShortName { get; }
@@ -38,12 +38,12 @@ public abstract class TestMonoGameTemplateTaskBase : FrostingTask<BuildContext>
     {
         var currentPlatform = context.Environment.Platform.Family;
         var isSupported = SupportedPlatforms.Contains(currentPlatform);
-        
+
         if (!isSupported)
         {
             context.Information($"⏭️ Skipping {TemplateName} test - not supported on {currentPlatform}");
             context.Information($"   Supported platforms: {string.Join(", ", SupportedPlatforms)}");
-            
+
             // Record the skip result
             TestResults.Add(new TestResult
             {
@@ -53,7 +53,7 @@ public abstract class TestMonoGameTemplateTaskBase : FrostingTask<BuildContext>
                 Platform = currentPlatform
             });
         }
-        
+
         return isSupported;
     }
 
@@ -96,7 +96,7 @@ public abstract class TestMonoGameTemplateTaskBase : FrostingTask<BuildContext>
 
             context.Information($"✅ Test completed successfully! MonoGame {TemplateName} project built without errors.");
             context.Information($"📁 Test project preserved at: {projectDir}");
-            
+
             TestResults.Add(new TestResult
             {
                 TemplateName = TemplateName,
@@ -114,7 +114,7 @@ public abstract class TestMonoGameTemplateTaskBase : FrostingTask<BuildContext>
                 Message = ex.Message,
                 Platform = currentPlatform
             });
-            
+
             throw;
         }
         finally
@@ -126,7 +126,7 @@ public abstract class TestMonoGameTemplateTaskBase : FrostingTask<BuildContext>
     private void SetupNuGetSource(BuildContext context, string nugetSourcePath, string nugetSourceName)
     {
         context.Information($"Setting up NuGet source from: {nugetSourcePath}");
-        
+
         try
         {
             context.StartProcess("dotnet", new ProcessSettings
@@ -152,9 +152,9 @@ public abstract class TestMonoGameTemplateTaskBase : FrostingTask<BuildContext>
                     .Append(nugetSourceName),
                 RedirectStandardOutput = true
             };
-            
+
             var result = context.StartProcess("dotnet", addSourceSettings, out var output);
-            
+
             if (result != 0)
             {
                 var errorMessage = string.Join("\n", output);
@@ -162,7 +162,7 @@ public abstract class TestMonoGameTemplateTaskBase : FrostingTask<BuildContext>
                 context.Warning($"Output: {errorMessage}");
                 throw new Exception($"Failed to add NuGet source {nugetSourceName}");
             }
-            
+
             context.Information($"Successfully added NuGet source: {nugetSourceName}");
         }
         catch (Exception ex)
@@ -212,9 +212,9 @@ public abstract class TestMonoGameTemplateTaskBase : FrostingTask<BuildContext>
     {
         var configDir = IOPath.Combine(projectDir, ".config");
         var dotnetToolsPath = IOPath.Combine(configDir, "dotnet-tools.json");
-        
+
         context.Information($"Replacing dotnet-tools.json with platform-specific version for: {context.Environment.Platform.Family}");
-        
+
         if (!Directory.Exists(configDir))
         {
             context.CreateDirectory(configDir);
@@ -222,14 +222,14 @@ public abstract class TestMonoGameTemplateTaskBase : FrostingTask<BuildContext>
 
         var toolsJson = GetPlatformSpecificToolsJson(context, version);
         File.WriteAllText(dotnetToolsPath, toolsJson);
-        
+
         context.Information("Platform-specific dotnet-tools.json created successfully.");
     }
 
     private string GetPlatformSpecificToolsJson(BuildContext context, string version)
     {
         var platform = context.Environment.Platform.Family;
-        
+
         // Base tools that are available on all platforms
         var baseTools = $$"""
             {
@@ -250,10 +250,10 @@ public abstract class TestMonoGameTemplateTaskBase : FrostingTask<BuildContext>
                 }
             """;
 
-            // Add platform-specific editor tool
-            string platformSpecificTool = platform switch
-            {
-                PlatformFamily.Windows => $$"""
+        // Add platform-specific editor tool
+        string platformSpecificTool = platform switch
+        {
+            PlatformFamily.Windows => $$"""
                 ,
                 "dotnet-mgcb-editor-windows": {
                 "version": "{{version}}",
@@ -262,7 +262,7 @@ public abstract class TestMonoGameTemplateTaskBase : FrostingTask<BuildContext>
                 ]
                 }
             """,
-                PlatformFamily.Linux => $$"""
+            PlatformFamily.Linux => $$"""
                 ,
                 "dotnet-mgcb-editor-linux": {
                 "version": "{{version}}",
@@ -271,7 +271,7 @@ public abstract class TestMonoGameTemplateTaskBase : FrostingTask<BuildContext>
                 ]
                 }
             """,
-                PlatformFamily.OSX => $$"""
+            PlatformFamily.OSX => $$"""
                 ,
                 "dotnet-mgcb-editor-mac": {
                 "version": "{{version}}",
@@ -280,8 +280,8 @@ public abstract class TestMonoGameTemplateTaskBase : FrostingTask<BuildContext>
                 ]
                 }
             """,
-                _ => "" // No platform-specific tool for unknown platforms
-            };
+            _ => "" // No platform-specific tool for unknown platforms
+        };
 
         return baseTools + platformSpecificTool + "\n  }\n}";
     }
@@ -317,26 +317,65 @@ public abstract class TestMonoGameTemplateTaskBase : FrostingTask<BuildContext>
             {
                 context.Error(line);
             }
+            InspectNuGetPackagePaths(context, output);
             throw new Exception($"Test project failed to build!");
         }
-        
+
+        InspectNuGetPackagePaths(context, output);
+
         context.Information("✅ Build completed successfully");
+    }
+
+    // Regex to match any path ending with MonoGame.Framework.dll
+    private static readonly Regex MonoGameFrameworkPathRegex = new(
+        @"([^\s]+MonoGame\.Framework\.dll)",
+        RegexOptions.Compiled | RegexOptions.IgnoreCase
+    );
+
+    private void InspectNuGetPackagePaths(BuildContext context, IEnumerable<string> buildOutput)
+    {
+        context.Information("🔍 Inspecting NuGet package paths for MonoGame.Framework.dll from build output...");
+
+        var monoGameFrameworkPaths = new List<string>();
+
+        foreach (var line in buildOutput)
+        {
+            var matches = MonoGameFrameworkPathRegex.Matches(line);
+            foreach (Match match in matches)
+            {
+                var path = match.Groups[1].Value.Trim('"', ' ');
+                monoGameFrameworkPaths.Add($"Path: {path}");
+            }
+        }
+
+        if (monoGameFrameworkPaths.Count > 0)
+        {
+            context.Information($"📦 Found {monoGameFrameworkPaths.Count} MonoGame.Framework.dll references in build output:");
+            foreach (var path in monoGameFrameworkPaths.Distinct())
+            {
+                context.Information($"  🔗 {path}");
+            }
+        }
+        else
+        {
+            context.Warning("⚠️ No MonoGame.Framework.dll paths found in build output");
+        }
     }
 
     private void CleanupPreviousTestRun(BuildContext context, string testsPath, string projectPath, string nugetSourceName)
     {
         context.Information($"🧹 Cleaning up previous {TemplateName} test run...");
-        
+
         if (context.DirectoryExists(projectPath))
         {
             context.Information($"Removing existing test project: {projectPath}");
-            context.DeleteDirectory(projectPath, new DeleteDirectorySettings 
-            { 
-                Recursive = true, 
-                Force = true 
+            context.DeleteDirectory(projectPath, new DeleteDirectorySettings
+            {
+                Recursive = true,
+                Force = true
             });
         }
-        
+
         context.Information($"✅ Cleanup completed for {TemplateName} target");
     }
 
@@ -362,7 +401,7 @@ public abstract class TestMonoGameTemplateTaskBase : FrostingTask<BuildContext>
         var normalizedPath = nugetPath.TrimEnd(IOPath.DirectorySeparatorChar, IOPath.AltDirectorySeparatorChar);
         var searchPattern = System.IO.Path.Combine(normalizedPath, "MonoGame.Templates.CSharp.*.nupkg");
         var templateFiles = context.GetFiles(searchPattern);
-        
+
         if (!templateFiles.Any())
         {
             throw new FileNotFoundException($"No MonoGame.Templates.CSharp NuGet package found in {nugetPath}");
@@ -370,7 +409,7 @@ public abstract class TestMonoGameTemplateTaskBase : FrostingTask<BuildContext>
 
         var latestTemplateFile = templateFiles.OrderByDescending(f => f.GetFilename().ToString()).First();
         var fileName = latestTemplateFile.GetFilenameWithoutExtension().ToString();
-        
+
         const string prefix = "MonoGame.Templates.CSharp.";
         return fileName.Substring(prefix.Length);
     }
@@ -378,7 +417,7 @@ public abstract class TestMonoGameTemplateTaskBase : FrostingTask<BuildContext>
     private void UpdateProjectReferences(BuildContext context, string projectDir, string version)
     {
         context.Information($"Updating project references to version {version} in: {projectDir}");
-        
+
         if (!Directory.Exists(projectDir))
         {
             throw new DirectoryNotFoundException($"Project directory not found: {projectDir}");
@@ -386,7 +425,7 @@ public abstract class TestMonoGameTemplateTaskBase : FrostingTask<BuildContext>
 
         // Find all .csproj files recursively in the project directory
         var csprojFiles = Directory.GetFiles(projectDir, "*.csproj", SearchOption.AllDirectories);
-        
+
         if (csprojFiles.Length == 0)
         {
             context.Warning($"No .csproj files found in directory: {projectDir}");
@@ -394,14 +433,14 @@ public abstract class TestMonoGameTemplateTaskBase : FrostingTask<BuildContext>
         }
 
         context.Information($"Found {csprojFiles.Length} .csproj file(s) to process");
-        
+
         var totalSuccessfulUpdates = 0;
 
         foreach (var csprojPath in csprojFiles)
         {
             var relativePath = IOPath.GetRelativePath(projectDir, csprojPath);
             context.Information($"📁 Processing: {relativePath}");
-            
+
             var updatesInThisFile = UpdateProjectFile(context, csprojPath, version);
             totalSuccessfulUpdates += updatesInThisFile;
         }
@@ -420,9 +459,9 @@ public abstract class TestMonoGameTemplateTaskBase : FrostingTask<BuildContext>
     {
         var csprojContent = File.ReadAllText(csprojPath);
         var monoGamePackages = new List<string>();
-        
+
         var matches = PackageReferenceRegex.Matches(csprojContent);
-        
+
         foreach (Match match in matches)
         {
             var packageName = match.Groups["packageName"].Value;
@@ -436,21 +475,21 @@ public abstract class TestMonoGameTemplateTaskBase : FrostingTask<BuildContext>
             context.Information("   No MonoGame packages found in this file");
             return 0;
         }
-        
+
         context.Information($"   📝 Updating {monoGamePackages.Count} package(s) to version {version}...");
-        
+
         var updatedContent = csprojContent;
         var successfulUpdates = 0;
-        
+
         foreach (var packageName in monoGamePackages)
         {
             // Pre-escape the package name once for reuse
             var escapedPackageName = Regex.Escape(packageName);
-            
+
             // Handle both self-closing and open tag formats properly, targeting specific package
             var replacementPattern = $@"(?<partA><PackageReference\s+?Include=""{escapedPackageName}""\s+?Version="")(?<version>[^""]+?)(?<partB>"".*?>)";
             var newContent = Regex.Replace(updatedContent, replacementPattern, $"${{partA}}{version}${{partB}}", RegexOptions.IgnoreCase);
-            
+
             if (newContent != updatedContent)
             {
                 updatedContent = newContent;
@@ -462,13 +501,13 @@ public abstract class TestMonoGameTemplateTaskBase : FrostingTask<BuildContext>
                 context.Warning($"   ❌ Failed to update {packageName} version in csproj");
             }
         }
-        
+
         if (successfulUpdates > 0)
         {
             File.WriteAllText(csprojPath, updatedContent);
             context.Information($"   ✅ Updated {successfulUpdates} package reference(s) in this file");
         }
-        
+
         return successfulUpdates;
     }
 
@@ -513,7 +552,7 @@ public abstract class TestMonoGameTemplateTaskBase : FrostingTask<BuildContext>
 
         context.Information("");
         context.Information($"📊 Results: {successCount} successful, {skippedCount} skipped, {failedCount} failed");
-        
+
         if (failedCount > 0)
         {
             context.Information($"❌ {failedCount} test(s) failed - check logs above for details");
@@ -527,7 +566,7 @@ public abstract class TestMonoGameTemplateTaskBase : FrostingTask<BuildContext>
     private void LogCurrentFileContents(BuildContext context, string projectDir)
     {
         context.Information("🔍 Inspecting file contents before build...");
-        
+
         var toolsJsonPath = IOPath.Combine(projectDir, ".config", "dotnet-tools.json");
         if (File.Exists(toolsJsonPath))
         {
