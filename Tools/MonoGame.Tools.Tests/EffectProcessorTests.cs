@@ -111,12 +111,16 @@ namespace MonoGame.Tests.ContentPipeline
         [TestCase("Assets/Effects/Stock/EnvironmentMapEffect.fx", TargetPlatform.DesktopGL)]
         [TestCase("Assets/Effects/Stock/SkinnedEffect.fx", TargetPlatform.DesktopGL)]
         [TestCase("Assets/Effects/Stock/SpriteEffect.fx", TargetPlatform.DesktopGL)]
+#if WINDOWS
+        // DirectX 12 shaders will only build on Windows due to DXC having the signing bits only in the Microsoft-built dxc.exe
+        // but DXC is used to compile the VK shaders, so at least we have DXC validating them in some way
         [TestCase("Assets/Effects/Stock/AlphaTestEffect.fx", TargetPlatform.WindowsGDK)]
         [TestCase("Assets/Effects/Stock/BasicEffect.fx", TargetPlatform.WindowsGDK)]
         [TestCase("Assets/Effects/Stock/DualTextureEffect.fx", TargetPlatform.WindowsGDK)]
         [TestCase("Assets/Effects/Stock/EnvironmentMapEffect.fx", TargetPlatform.WindowsGDK)]
         [TestCase("Assets/Effects/Stock/SkinnedEffect.fx", TargetPlatform.WindowsGDK)]
         [TestCase("Assets/Effects/Stock/SpriteEffect.fx", TargetPlatform.WindowsGDK)]
+#endif
         [TestCase("Assets/Effects/Stock/AlphaTestEffect.fx", TargetPlatform.DesktopVK)]
         [TestCase("Assets/Effects/Stock/BasicEffect.fx", TargetPlatform.DesktopVK)]
         [TestCase("Assets/Effects/Stock/DualTextureEffect.fx", TargetPlatform.DesktopVK)]
