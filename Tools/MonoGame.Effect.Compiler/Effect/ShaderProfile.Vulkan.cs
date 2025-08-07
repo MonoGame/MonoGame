@@ -394,32 +394,30 @@ namespace MonoGame.Effect
 
                 // TODO: Support multiple constant buffers one day!
 
-                // Count how many constant buffers there are
                 int cbCount = 0;
-                string cbName = string.Empty;
+                VkStruct globals;
                 foreach (var descriptor in descriptors)
                 {
+                    // Find uniform buffers.
                     if (descriptor.Value.type == VkDescriptorType.UNIFORM_BUFFER)
                     {
-                        cbCount++;
-                        // consider the first hit only
-                        if (cbCount <= 1)
-                            cbName = descriptor.Key.Replace("%", "%type_"); // convert into equivalent struct name
+                        // Check if there is a corresponding struct.
+                        if (names.TryGetValue(descriptor.Key, out string name))
+                        {
+                            if (structs.TryGetValue("%type_" + name, out globals))
+                            {
+                                if (++cbCount > 1)
+                                {
+                                    errorsAndWarnings += "Building effects for Vulkan currently doesn't support more than one constant buffer (cbuffer) structures. Please consider refactoring your HLSL code.";
+                                    throw new ShaderCompilerException();
+                                }
+
+                                // Gather uniforms.
+                                foreach (var member in globals.members.Values)
+                                    cbuffer.AddParameter(member.name, member.type, 0, member.offset);
+                            }
+                        }
                     }
-                }
-
-                if (cbCount > 1)
-                {
-                    errorsAndWarnings += "Building effects for Vulkan currently doesn't support more than one constant buffer (cbuffer) structures. Please consider refactoring your HLSL code.";
-                    throw new ShaderCompilerException();
-                }
-
-                // First gather the uniforms.
-                VkStruct globals;
-                if (structs.TryGetValue(cbName, out globals))
-                {
-                    foreach (var member in globals.members.Values)
-                        cbuffer.AddParameter(member.name, member.type, 0, member.offset);
                 }
 
                 // Gather the input attributes.
