@@ -394,9 +394,29 @@ namespace MonoGame.Effect
 
                 // TODO: Support multiple constant buffers one day!
 
+                // Count how many constant buffers there are
+                int cbCount = 0;
+                string cbName = string.Empty;
+                foreach (var descriptor in descriptors)
+                {
+                    if (descriptor.Value.type == VkDescriptorType.UNIFORM_BUFFER)
+                    {
+                        cbCount++;
+                        // consider the first hit only
+                        if (cbCount <= 1)
+                            cbName = descriptor.Key.Replace("%", "%type_"); // convert into equivalent struct name
+                    }
+                }
+
+                if (cbCount > 1)
+                {
+                    errorsAndWarnings += "Building effects for Vulkan currently doesn't support more than one constant buffer (cbuffer) structures. Please consider refactoring your HLSL code.";
+                    throw new ShaderCompilerException();
+                }
+
                 // First gather the uniforms.
                 VkStruct globals;
-                if (structs.TryGetValue("%type__MG_Globals", out globals))
+                if (structs.TryGetValue(cbName, out globals))
                 {
                     foreach (var member in globals.members.Values)
                         cbuffer.AddParameter(member.name, member.type, 0, member.offset);
