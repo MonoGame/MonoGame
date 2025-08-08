@@ -35,42 +35,42 @@ public record ContentBuilderParams
 
             var srcDirectoryOptions = new Option<string>(
                 name: "--src",
-                description: "The source directory of content relative to the workingDir.",
+                description: "The source asset directory.",
                 getDefaultValue: () => defaultValues.SourceDirectory);
             srcDirectoryOptions.AddAlias("-s");
             rootCommand.AddGlobalOption(srcDirectoryOptions);
 
             var outputDirectoryOption = new Option<string>(
                 name: "--output",
-                description: "The output directory relative to the workingDir.",
+                description: "The output content directory.",
                 getDefaultValue: () => defaultValues.OutputDirectory);
             outputDirectoryOption.AddAlias("-o");
             rootCommand.AddGlobalOption(outputDirectoryOption);
 
             var intermediateDirectoryOption = new Option<string>(
                 name: "--intermediate",
-                description: "The intermediate directory relative to the workingDir.",
+                description: "The intermediate content directory.",
                 getDefaultValue: () => defaultValues.IntermediateDirectory);
             intermediateDirectoryOption.AddAlias("-i");
             rootCommand.AddGlobalOption(intermediateDirectoryOption);
 
             var platformOption = new Option<TargetPlatform>(
                 name: "--platform",
-                description: "The target platform to build the content for.",
+                description: "The content target platform.",
                 getDefaultValue: () => defaultValues.Platform);
             platformOption.AddAlias("-p");
             rootCommand.AddGlobalOption(platformOption);
 
             var graphicsProfileOption = new Option<GraphicsProfile>(
                 name: "--graphics-profile",
-                description: "The graphics profile to build the content for.",
+                description: "The content graphics profile.",
                 getDefaultValue: () => defaultValues.GraphicsProfile);
             graphicsProfileOption.AddAlias("-g");
             rootCommand.AddGlobalOption(graphicsProfileOption);
 
             var compressContentOption = new Option<bool>(
                 name: "--compress",
-                description: "Tells the builder that the content should be compressed.",
+                description: "Compress the build content files.",
                 getDefaultValue: () => defaultValues.CompressContent);
             rootCommand.AddGlobalOption(compressContentOption);
 
@@ -81,16 +81,20 @@ public record ContentBuilderParams
             logLevelOption.AddAlias("-l");
             rootCommand.AddGlobalOption(logLevelOption);
 
-            _contentBuilderArgsFunc = (bindingContext) => new ContentBuilderParams
+            _contentBuilderArgsFunc = (bindingContext) =>
             {
-                WorkingDirectory = bindingContext.ParseResult.GetValueForOption(workingDirectoryOption) ?? defaultValues.WorkingDirectory,
-                SourceDirectory = bindingContext.ParseResult.GetValueForOption(srcDirectoryOptions) ?? defaultValues.SourceDirectory,
-                OutputDirectory = bindingContext.ParseResult.GetValueForOption(outputDirectoryOption) ?? defaultValues.OutputDirectory,
-                IntermediateDirectory = bindingContext.ParseResult.GetValueForOption(intermediateDirectoryOption) ?? defaultValues.IntermediateDirectory,
-                Platform = bindingContext.ParseResult.GetValueForOption(platformOption),
-                GraphicsProfile = bindingContext.ParseResult.GetValueForOption(graphicsProfileOption),
-                CompressContent = bindingContext.ParseResult.GetValueForOption(compressContentOption),
-                LogLevel = bindingContext.ParseResult.GetValueForOption(logLevelOption)
+                var workingDir = bindingContext.ParseResult.GetValueForOption(workingDirectoryOption) ?? defaultValues.WorkingDirectory;
+                return new ContentBuilderParams
+                {
+                    WorkingDirectory = workingDir,
+                    SourceDirectory = MakeRelative(workingDir, bindingContext.ParseResult.GetValueForOption(srcDirectoryOptions) ?? defaultValues.SourceDirectory),
+                    OutputDirectory = MakeRelative(workingDir, bindingContext.ParseResult.GetValueForOption(outputDirectoryOption) ?? defaultValues.OutputDirectory),
+                    IntermediateDirectory = MakeRelative(workingDir, bindingContext.ParseResult.GetValueForOption(intermediateDirectoryOption) ?? defaultValues.IntermediateDirectory),
+                    Platform = bindingContext.ParseResult.GetValueForOption(platformOption),
+                    GraphicsProfile = bindingContext.ParseResult.GetValueForOption(graphicsProfileOption),
+                    CompressContent = bindingContext.ParseResult.GetValueForOption(compressContentOption),
+                    LogLevel = bindingContext.ParseResult.GetValueForOption(logLevelOption)
+                };
             };
         }
 
@@ -192,6 +196,48 @@ public record ContentBuilderParams
         return ret;
     }
 
+    private string MakeRooted(string path)
+    {
+        var result = path;
+        if (!Path.IsPathFullyQualified(result))
+        {
+            // Combine fails for paths wtih leading slashes.
+            while ( result.StartsWith(Path.DirectorySeparatorChar) ||
+                    result.StartsWith(Path.AltDirectorySeparatorChar))
+                result = result.Substring(1);
+
+            result = Path.Combine(WorkingDirectory, result);
+        }
+
+        result = Path.GetFullPath(result);
+        return result;
+    }
+
+    private static string MakeRelative(string root, string source)
+    {
+        var result = source;
+
+        // First be sure we have an absolute unambigous path first.
+        if (!Path.IsPathFullyQualified(result))
+        {
+            // Combine fails for paths wtih leading slashes.
+            while ( result.StartsWith(Path.DirectorySeparatorChar) ||
+                    result.StartsWith(Path.AltDirectorySeparatorChar))
+                result = result.Substring(1);
+
+            result = Path.Combine(Directory.GetCurrentDirectory(), result);
+        }
+
+        // Now make it relative to the incoming root.
+        //
+        // Note this may still return an absolute path in the case
+        // that these directories are on different drives.
+        //
+        result = Path.GetRelativePath(root, result);
+
+        return result;
+    }
+
     /// <summary>
     /// Set the mode in which the content builder is run in. See <see cref="ContentBuilderMode"/> for available modes.
     /// </summary>
@@ -213,7 +259,7 @@ public record ContentBuilderParams
     /// <summary>
     /// Gets the rooted location of <see cref="SourceDirectory"/>.
     /// </summary>
-    public string RootedSourceDirectory => Path.Combine(WorkingDirectory, SourceDirectory);
+    public string RootedSourceDirectory => MakeRooted(SourceDirectory);
 
     /// <summary>
     /// Gets or sets the location for the content output relative to the <see cref="WorkingDirectory"/>.
@@ -224,7 +270,7 @@ public record ContentBuilderParams
     /// <summary>
     /// Gets the rooted location of <see cref="OutputDirectory"/>.
     /// </summary>
-    public string RootedOutputDirectory => Path.Combine(WorkingDirectory, OutputDirectory, Platform.ToString());
+    public string RootedOutputDirectory => MakeRooted(OutputDirectory);
 
     /// <summary>
     /// Gets or sets the location for the intermediate files for content build relative to the <see cref="WorkingDirectory"/>.
@@ -235,7 +281,7 @@ public record ContentBuilderParams
     /// <summary>
     /// Gets the rooted location of <see cref="IntermediateDirectory"/>.
     /// </summary>
-    public string RootedIntermediateDirectory => Path.Combine(WorkingDirectory, IntermediateDirectory, Platform.ToString());
+    public string RootedIntermediateDirectory => MakeRooted(IntermediateDirectory);
 
     /// <summary>
     /// Gets or sets the desired platform for <see cref="ContentBuilder"/> to build the content for.
