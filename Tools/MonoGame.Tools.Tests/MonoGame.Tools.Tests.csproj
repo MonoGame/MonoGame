@@ -24,7 +24,16 @@
     <PackageReference Include="NUnit3TestAdapter" Version="4.5.0" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.7.2" />
     <PackageReference Include="MonoGame.Tool.Dxc" Version="1.8.2505.7" />
+    <PackageReference Include="Microsoft.Direct3D.DXC" Version="1.8.2505.32" />
   </ItemGroup>
+
+  <Target Name="CopyNuGetToolFiles" AfterTargets="Build">
+    <ItemGroup>
+      <ToolFiles Include="$(NuGetPackageRoot)Microsoft.Direct3D.DXC\1.8.2505.32\build\native\bin\x64\*.dll" />
+      <ToolFiles Include="$(NuGetPackageRoot)Microsoft.Direct3D.DXC\1.8.2505.32\build\native\bin\x64\*.exe" />
+    </ItemGroup>
+    <Copy SourceFiles="@(ToolFiles)" DestinationFolder="$(OutputPath)" />
+  </Target>
 
   <ItemGroup>
     <ProjectReference Include="..\..\MonoGame.Framework\MonoGame.Framework.DesktopGL.csproj" />
