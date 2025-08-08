@@ -58,6 +58,16 @@ public abstract class ContentBuilder
     public abstract IContentCollection GetContentCollection();
 
     /// <summary>
+    /// Returns the number of content items that failed to build.
+    /// </summary>
+    public uint FailedToBuild => _failedToBuild;
+
+    /// <summary>
+    /// Returns the number of content items that built successfully.
+    /// </summary>
+    public uint SucceededToBuild => _succeededToBuild;
+
+    /// <summary>
     /// Initiates a build of the specified asset and then writes down the result to disk..
     /// </summary>
     /// <param name="relativePath">A relative path to the source asset.</param>
@@ -221,13 +231,13 @@ public abstract class ContentBuilder
     /// Runs the <see cref="ContentBuilder"/> with the specified parameters.
     /// </summary>
     /// <param name="parameters">A <see cref="ContentBuilderParams"/> describing both the platform paramteres for the content compilation as well as the configuration of the <see cref="ContentBuilder"/> itself.</param>
-    public void Run(ContentBuilderParams parameters)
+    public bool Run(ContentBuilderParams parameters)
     {
         Parameters = parameters;
         if (parameters.Mode == ContentBuilderMode.None)
         {
             // This means we are just showing the help menu.
-            return;
+            return false;
         }
 
         Directory.SetCurrentDirectory(Parameters.WorkingDirectory);
@@ -261,12 +271,13 @@ public abstract class ContentBuilder
         switch (Parameters.Mode)
         {
             case ContentBuilderMode.Builder:
-                RunBuild();
-                break;
+                return RunBuild();
             case ContentBuilderMode.Server:
                 RunServer();
                 break;
         }
+
+        return true;
     }
 
     /// <summary>
@@ -294,7 +305,7 @@ public abstract class ContentBuilder
         }
     }
 
-    private void RunBuild()
+    private bool RunBuild()
     {
         foreach (var pair in _content)
         {
@@ -313,6 +324,8 @@ public abstract class ContentBuilder
         Logger.PushFile("Content Builder Finished");
         Logger.Log($"{_succeededToBuild} succeeded, {_failedToBuild} failed");
         Logger.PopFile();
+
+        return _failedToBuild == 0;
     }
 
     private void RunServer()
