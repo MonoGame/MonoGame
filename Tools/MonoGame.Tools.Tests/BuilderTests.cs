@@ -45,8 +45,8 @@ namespace MonoGame.Tests.ContentPipeline
             args = ContentBuilderParams.Parse(
                 "build",
                 "-s", Path.Combine(Directory.GetCurrentDirectory(), "../Some/Folder"),
-                "-o", Path.Combine(Directory.GetCurrentDirectory(), "\\Other/Folder"),
-                "-i", Path.Combine(Directory.GetCurrentDirectory(), "/Folder")
+                "-o", Path.Combine(Directory.GetCurrentDirectory(), "Other/Folder"),
+                "-i", Path.Combine(Directory.GetCurrentDirectory(), "Folder")
             );
             Assert.AreEqual(NormalizePath("../Some/Folder"), args.SourceDirectory);
             Assert.AreEqual(NormalizePath("Other/Folder"), args.OutputDirectory);

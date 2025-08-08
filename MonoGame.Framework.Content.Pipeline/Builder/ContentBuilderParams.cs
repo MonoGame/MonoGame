@@ -200,12 +200,8 @@ public record ContentBuilderParams
     {
         var result = path;
         if (!Path.IsPathFullyQualified(result))
-        {
-            // Combine fails for paths wtih leading slashes.
-            result = result.TrimStart(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
             result = Path.Combine(WorkingDirectory, result);
-        }
-
+ 
         result = Path.GetFullPath(result);
         return result;
     }
@@ -216,11 +212,7 @@ public record ContentBuilderParams
 
         // First be sure we have an absolute unambigous path first.
         if (!Path.IsPathFullyQualified(result))
-        {
-            // Combine fails for paths wtih leading slashes.
-            result = result.TrimStart(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
             result = Path.Combine(Directory.GetCurrentDirectory(), result);
-        }
 
         // Now make it relative to the incoming root.
         //
