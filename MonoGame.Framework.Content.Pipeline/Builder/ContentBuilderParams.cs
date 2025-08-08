@@ -202,10 +202,7 @@ public record ContentBuilderParams
         if (!Path.IsPathFullyQualified(result))
         {
             // Combine fails for paths wtih leading slashes.
-            while ( result.StartsWith(Path.DirectorySeparatorChar) ||
-                    result.StartsWith(Path.AltDirectorySeparatorChar))
-                result = result.Substring(1);
-
+            result = result.TrimStart(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
             result = Path.Combine(WorkingDirectory, result);
         }
 
@@ -221,10 +218,7 @@ public record ContentBuilderParams
         if (!Path.IsPathFullyQualified(result))
         {
             // Combine fails for paths wtih leading slashes.
-            while ( result.StartsWith(Path.DirectorySeparatorChar) ||
-                    result.StartsWith(Path.AltDirectorySeparatorChar))
-                result = result.Substring(1);
-
+            result = result.TrimStart(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
             result = Path.Combine(Directory.GetCurrentDirectory(), result);
         }
 
