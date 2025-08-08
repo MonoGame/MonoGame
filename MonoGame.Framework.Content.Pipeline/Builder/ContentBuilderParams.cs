@@ -148,83 +148,6 @@ public record ContentBuilderParams
     }
 
     /// <summary>
-    /// Parses out the main entry point args into a <see cref="ContentBuilderParams"/> to be used by <see cref="ContentBuilder"/>.
-    /// </summary>
-    /// <param name="args">Arguments passed to the main entry point of the app.</param>
-    /// <returns>
-    /// <see cref="ContentBuilderParams"/> containing the parsed arguments, or an empty <see cref="ContentBuilderParams"/> if no arguments were passed.
-    /// </returns>
-    public static ContentBuilderParams Parse(params string[] args)
-    {
-        var ret = new ContentBuilderParams();
-        var defaultValues = new ContentBuilderParams();
-        var rootCommand = new RootCommand("Content builder and conntent server for MonoGame.");
-        var rootOptions = new RootOptions(rootCommand);
-
-        var buildCommand = new Command("build", "Build all the content.");
-        var skipCleanOption = new Option<bool>(
-                name: "--skip-clean",
-                description: "Should the builder skip cleaning up old content cache data after the build is finished.",
-                getDefaultValue: () => defaultValues.SkipClean);
-        buildCommand.AddOption(skipCleanOption);
-        buildCommand.SetHandler(
-            (contentBuilder, skipCleanOption) => ret = contentBuilder with { Mode = ContentBuilderMode.Builder, SkipClean = skipCleanOption },
-            rootOptions,
-            skipCleanOption);
-        rootCommand.AddCommand(buildCommand);
-
-        var serverCommand = new Command("server", "Start a content server.");
-        var sererOptions = new ServerOptions(serverCommand);
-        serverCommand.SetHandler(
-            (contentBuilder, sererOptions) => ret = contentBuilder with { Mode = ContentBuilderMode.Server, Servers = sererOptions },
-            rootOptions,
-            sererOptions);
-        rootCommand.AddCommand(serverCommand);
-
-        bool helpShown = false;
-        var parser = new CommandLineBuilder(rootCommand)
-            .UseDefaults()
-            .UseHelp(ctx => helpShown = true)
-            .Build();
-        parser.Invoke(args);
-
-        if (helpShown)
-        {
-            ret = ret with { Mode = ContentBuilderMode.None };
-        }
-
-        return ret;
-    }
-
-    private string MakeRooted(string path)
-    {
-        var result = path;
-        if (!Path.IsPathFullyQualified(result))
-            result = Path.Combine(WorkingDirectory, result);
- 
-        result = Path.GetFullPath(result);
-        return result;
-    }
-
-    private static string MakeRelative(string root, string source)
-    {
-        var result = source;
-
-        // First be sure we have an absolute unambigous path first.
-        if (!Path.IsPathFullyQualified(result))
-            result = Path.Combine(Directory.GetCurrentDirectory(), result);
-
-        // Now make it relative to the incoming root.
-        //
-        // Note this may still return an absolute path in the case
-        // that these directories are on different drives.
-        //
-        result = Path.GetRelativePath(root, result);
-
-        return result;
-    }
-
-    /// <summary>
     /// Set the mode in which the content builder is run in. See <see cref="ContentBuilderMode"/> for available modes.
     /// </summary>
     /// <value><see cref="ContentBuilderMode.None"/> by default.</value>
@@ -304,4 +227,71 @@ public record ContentBuilderParams
     /// </summary>
     /// <value>A collection of <see cref="ContentServer"/> classes found by scaning all referenced assemblies.</value>
     public List<ContentServer> Servers { get; init; } = []; // TODO: Fix command line display
+
+    /// <summary>
+    /// Parses out the main entry point args into a <see cref="ContentBuilderParams"/> to be used by <see cref="ContentBuilder"/>.
+    /// </summary>
+    /// <param name="args">Arguments passed to the main entry point of the app.</param>
+    /// <returns>
+    /// <see cref="ContentBuilderParams"/> containing the parsed arguments, or an empty <see cref="ContentBuilderParams"/> if no arguments were passed.
+    /// </returns>
+    public static ContentBuilderParams Parse(params string[] args)
+    {
+        var ret = new ContentBuilderParams();
+        var defaultValues = new ContentBuilderParams();
+        var rootCommand = new RootCommand("Content builder and conntent server for MonoGame.");
+        var rootOptions = new RootOptions(rootCommand);
+
+        var buildCommand = new Command("build", "Build all the content.");
+        var skipCleanOption = new Option<bool>(
+                name: "--skip-clean",
+                description: "Should the builder skip cleaning up old content cache data after the build is finished.",
+                getDefaultValue: () => defaultValues.SkipClean);
+        buildCommand.AddOption(skipCleanOption);
+        buildCommand.SetHandler(
+            (contentBuilder, skipCleanOption) => ret = contentBuilder with { Mode = ContentBuilderMode.Builder, SkipClean = skipCleanOption },
+            rootOptions,
+            skipCleanOption);
+        rootCommand.AddCommand(buildCommand);
+
+        var serverCommand = new Command("server", "Start a content server.");
+        var sererOptions = new ServerOptions(serverCommand);
+        serverCommand.SetHandler(
+            (contentBuilder, sererOptions) => ret = contentBuilder with { Mode = ContentBuilderMode.Server, Servers = sererOptions },
+            rootOptions,
+            sererOptions);
+        rootCommand.AddCommand(serverCommand);
+
+        bool helpShown = false;
+        var parser = new CommandLineBuilder(rootCommand)
+            .UseDefaults()
+            .UseHelp(ctx => helpShown = true)
+            .Build();
+        parser.Invoke(args);
+
+        if (helpShown)
+        {
+            ret = ret with { Mode = ContentBuilderMode.None };
+        }
+
+        return ret;
+    }
+
+    private string MakeRooted(string path)
+    {
+        if (!Path.IsPathRooted(path))
+            path = Path.Combine(WorkingDirectory, path);
+
+        return Path.GetFullPath(path);
+    }
+
+    private static string MakeRelative(string workingDir, string path)
+    {
+        if (!Path.IsPathRooted(path))
+            return path.Replace(Path.AltDirectorySeparatorChar, Path.DirectorySeparatorChar);
+
+        // Note this may still return an absolute path in the case
+        // that these directories are on different drives.
+        return Path.GetRelativePath(workingDir, path);
+    }
 }
