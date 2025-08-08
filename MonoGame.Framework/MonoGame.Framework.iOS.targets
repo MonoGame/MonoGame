@@ -2,6 +2,7 @@
 
   <PropertyGroup>
     <MonoGamePlatform>iOS</MonoGamePlatform>
+    <AppBundleExtraOptions>$(AppBundleExtraOptions) -gcc_flags '-framework CoreAudio -framework AudioToolbox'</AppBundleExtraOptions>
   </PropertyGroup>
 
 </Project>
