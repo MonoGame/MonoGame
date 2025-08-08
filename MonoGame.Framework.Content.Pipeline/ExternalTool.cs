@@ -9,6 +9,7 @@ using System.Net;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Threading;
+using Microsoft.Win32;
 
 namespace Microsoft.Xna.Framework.Content.Pipeline
 {
@@ -158,6 +159,10 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
             // Expand any environment variables.
             command = Environment.ExpandEnvironmentVariables(command);
 
+            // Add .exe if needed
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows) && !command.ToLowerInvariant().EndsWith(".exe"))
+                command += ".exe";
+
             // If we have a full path just pass it through.
             if (File.Exists(command))
                 return command;
@@ -189,6 +194,37 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
                     var fullExeName = string.Concat(fullName, ".exe");
                     if (File.Exists(fullExeName))
                         return fullExeName;
+                }
+            }
+
+            // Ultimately, we may search if it is a Windows SDK tool
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            {
+                // We expect the Windows SDK 10 or 11 (which both are "v10.0") and only for x64
+                string winSDKRegistry = @"SOFTWARE\WOW6432Node\Microsoft\Microsoft SDKs\Windows\v10.0";
+                // Workaround so that the registry lookup works no matter if the process is 32 or 64bit
+                using (RegistryKey baseKey = RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, Environment.Is64BitOperatingSystem ? RegistryView.Registry64 : RegistryView.Registry32))
+                {
+                    if (baseKey != null)
+                    {
+                        using (RegistryKey key = baseKey.OpenSubKey(winSDKRegistry))
+                        {
+                            if (key != null)
+                            {
+                                string winSDKFolder = key.GetValue("InstallationFolder") as string;
+                                string version = key.GetValue("ProductVersion") as string;
+                                if (!string.IsNullOrEmpty(winSDKFolder) & !string.IsNullOrEmpty(version))
+                                {
+                                    // Build the full path.
+                                    command = Path.Combine(winSDKFolder, "bin", version + ".0", "x64", command);
+
+                                    // Is this it?
+                                    if (File.Exists(command))
+                                        return command;
+                                }
+                            }
+                        }
+                    }
                 }
             }
 
