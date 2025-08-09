@@ -6,8 +6,39 @@ using System.IO;
 
 namespace MonoGame.Framework.Content.Pipeline.Builder
 {
+    /// <summary>
+    /// Common file and path helpers.
+    /// </summary>
     public static class FileHelper
     {
+        /// <summary>
+        /// A forward slash.
+        /// </summary>
+        public static readonly char ForwardSlash = '/';
+
+        /// <summary>
+        /// A backward slash.
+        /// </summary>
+        public static readonly char BackwardSlash = '\\';
+
+        /// <summary>
+        /// The directory seperator that is not common for the current platform.
+        /// </summary>
+        public static readonly char NotSeparator = Path.DirectorySeparatorChar == BackwardSlash ? ForwardSlash : BackwardSlash;
+
+        /// <summary>
+        /// The required or default directory seperator for this platform.
+        /// </summary>
+        public static readonly char Separator = Path.DirectorySeparatorChar;
+
+        /// <summary>
+        /// Fixes the incoming path to have the default directory seperators for the current platform.
+        /// </summary>
+        public static string NormalizeDirectorySeparators(string path)
+        {
+            return path.Replace(NotSeparator, Separator);
+        }
+
         /// <summary>
         /// Checks  deletes a file from disk without throwing exceptions.
         /// </summary>

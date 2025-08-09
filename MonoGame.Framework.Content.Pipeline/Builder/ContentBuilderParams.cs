@@ -288,7 +288,7 @@ public record ContentBuilderParams
     private static string MakeRelative(string workingDir, string path)
     {
         if (!Path.IsPathRooted(path))
-            return path.Replace(Path.AltDirectorySeparatorChar, Path.DirectorySeparatorChar);
+            return FileHelper.NormalizeDirectorySeparators(path);
 
         // Note this may still return an absolute path in the case
         // that these directories are on different drives.

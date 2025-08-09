@@ -13,11 +13,12 @@ namespace MonoGame.Tests.ContentPipeline
     [TestFixture]
     public class BuilderTest
     {
-        string NormalizePath(string path, string append = null)
+        string MakePath(string path, string append = null)
         {
             if (append != null)
                 path = Path.Combine(path, append);
-            return path.Replace(Path.AltDirectorySeparatorChar, Path.DirectorySeparatorChar);
+
+            return FileHelper.NormalizeDirectorySeparators(path);
         }
 
         [Test]
@@ -37,23 +38,23 @@ namespace MonoGame.Tests.ContentPipeline
             Assert.IsTrue(Path.IsPathRooted(args.WorkingDirectory));
             Assert.AreEqual(Directory.GetCurrentDirectory(), args.WorkingDirectory);
             Assert.AreEqual("Content", args.SourceDirectory);
-            Assert.AreEqual(NormalizePath(Directory.GetCurrentDirectory(), "Content"), args.RootedSourceDirectory);
-            Assert.AreEqual(NormalizePath("bin/Content"), args.OutputDirectory);
-            Assert.AreEqual(NormalizePath(Directory.GetCurrentDirectory(), "bin\\Content"), args.RootedOutputDirectory);
-            Assert.AreEqual(NormalizePath("obj/Content"), args.IntermediateDirectory);
-            Assert.AreEqual(NormalizePath(Directory.GetCurrentDirectory(), "obj\\Content"), args.RootedIntermediateDirectory);
+            Assert.AreEqual(MakePath(Directory.GetCurrentDirectory(), "Content"), args.RootedSourceDirectory);
+            Assert.AreEqual(MakePath("bin/Content"), args.OutputDirectory);
+            Assert.AreEqual(MakePath(Directory.GetCurrentDirectory(), "bin\\Content"), args.RootedOutputDirectory);
+            Assert.AreEqual(MakePath("obj/Content"), args.IntermediateDirectory);
+            Assert.AreEqual(MakePath(Directory.GetCurrentDirectory(), "obj\\Content"), args.RootedIntermediateDirectory);
 
             args = ContentBuilderParams.Parse("build", "-s", "C:/This/Does/Not/Exist");
-            Assert.AreEqual(NormalizePath("C:/This/Does/Not/Exist"), args.SourceDirectory);
+            Assert.AreEqual(MakePath("C:/This/Does/Not/Exist"), args.SourceDirectory);
 
             args = ContentBuilderParams.Parse(
                 "build",
-                "-s", NormalizePath(Directory.GetCurrentDirectory(), "../Some/Folder"),
-                "-o", NormalizePath(Directory.GetCurrentDirectory(), "Other/Folder"),
-                "-i", NormalizePath(Directory.GetCurrentDirectory(), "Folder")
+                "-s", MakePath(Directory.GetCurrentDirectory(), "../Some/Folder"),
+                "-o", MakePath(Directory.GetCurrentDirectory(), "Other/Folder"),
+                "-i", MakePath(Directory.GetCurrentDirectory(), "Folder")
             );
-            Assert.AreEqual(NormalizePath("../Some/Folder"), args.SourceDirectory);
-            Assert.AreEqual(NormalizePath("Other/Folder"), args.OutputDirectory);
+            Assert.AreEqual(MakePath("../Some/Folder"), args.SourceDirectory);
+            Assert.AreEqual(MakePath("Other/Folder"), args.OutputDirectory);
             Assert.AreEqual("Folder", args.IntermediateDirectory);
 
             args = ContentBuilderParams.Parse("server");
