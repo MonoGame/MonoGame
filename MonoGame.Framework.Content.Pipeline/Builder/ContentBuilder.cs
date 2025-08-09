@@ -30,8 +30,6 @@ public abstract class ContentBuilder
     private readonly object _contentRequestLock = new();
     private readonly Dictionary<string, ContentInfo> _content = [];
     private readonly Dictionary<string, string> _outputContent = [];
-    private uint _succeededToBuild = 0;
-    private uint _failedToBuild = 0;
 
     /// <summary>
     /// Parameters to be used by the <see cref="ContentBuilder"/> or any of its subsystems.
@@ -58,6 +56,16 @@ public abstract class ContentBuilder
     public abstract IContentCollection GetContentCollection();
 
     /// <summary>
+    /// Returns the number of content items that failed to build.
+    /// </summary>
+    public uint FailedToBuild { get; private set; }
+
+    /// <summary>
+    /// Returns the number of content items that built successfully.
+    /// </summary>
+    public uint SucceededToBuild { get; private set; }
+
+    /// <summary>
     /// Initiates a build of the specified asset and then writes down the result to disk..
     /// </summary>
     /// <param name="relativePath">A relative path to the source asset.</param>
@@ -70,12 +78,12 @@ public abstract class ContentBuilder
         try
         {
             contentFileCache = ProcessContent(relativePath, contentInfo, true).contentFileCache;
-            _succeededToBuild++;
+            SucceededToBuild++;
         }
         catch (Exception ex)
         {
             Logger.Log(LogLevel.Error, $"Countent failed to build:\n{ex}");
-            _failedToBuild++;
+            FailedToBuild++;
         }
         Logger.PopFile();
         return contentFileCache;
@@ -93,13 +101,13 @@ public abstract class ContentBuilder
         try
         {
             var content = ProcessContent(relativePath, contentInfo, false);
-            _succeededToBuild++;
+            SucceededToBuild++;
             return content;
         }
         catch (Exception ex)
         {
             Logger.Log(LogLevel.Error, $"Countent failed to build:\n{ex}");
-            _failedToBuild++;
+            FailedToBuild++;
         }
         Logger.PopFile();
         return (null, null);
@@ -221,13 +229,13 @@ public abstract class ContentBuilder
     /// Runs the <see cref="ContentBuilder"/> with the specified parameters.
     /// </summary>
     /// <param name="parameters">A <see cref="ContentBuilderParams"/> describing both the platform paramteres for the content compilation as well as the configuration of the <see cref="ContentBuilder"/> itself.</param>
-    public void Run(ContentBuilderParams parameters)
+    public bool Run(ContentBuilderParams parameters)
     {
         Parameters = parameters;
         if (parameters.Mode == ContentBuilderMode.None)
         {
             // This means we are just showing the help menu.
-            return;
+            return false;
         }
 
         Directory.SetCurrentDirectory(Parameters.WorkingDirectory);
@@ -261,12 +269,13 @@ public abstract class ContentBuilder
         switch (Parameters.Mode)
         {
             case ContentBuilderMode.Builder:
-                RunBuild();
-                break;
+                return RunBuild();
             case ContentBuilderMode.Server:
                 RunServer();
                 break;
         }
+
+        return true;
     }
 
     /// <summary>
@@ -294,7 +303,7 @@ public abstract class ContentBuilder
         }
     }
 
-    private void RunBuild()
+    private bool RunBuild()
     {
         foreach (var pair in _content)
         {
@@ -311,8 +320,10 @@ public abstract class ContentBuilder
         ContentCache.FlushCache(this);
 
         Logger.PushFile("Content Builder Finished");
-        Logger.Log($"{_succeededToBuild} succeeded, {_failedToBuild} failed");
+        Logger.Log($"{SucceededToBuild} succeeded, {FailedToBuild} failed");
         Logger.PopFile();
+
+        return FailedToBuild == 0;
     }
 
     private void RunServer()
