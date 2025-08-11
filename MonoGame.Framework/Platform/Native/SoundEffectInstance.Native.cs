@@ -33,7 +33,7 @@ public partial class SoundEffectInstance : IDisposable
         };
 
         if (Voice != null)
-            MGA.Voice_Apply3D(Voice, &listener_, &emitter_, SoundEffect.DistanceScale);
+            MGA.Voice_Apply3D(Voice, in listener_, in emitter_, SoundEffect.DistanceScale);
     }
 
     private unsafe void PlatformPause()

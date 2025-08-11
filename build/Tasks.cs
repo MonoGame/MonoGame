@@ -1,6 +1,13 @@
 ﻿
 namespace BuildScripts;
 
+[TaskName("Build Shaders")]
+[IsDependentOn(typeof(BuildShadersDX11Task))]
+[IsDependentOn(typeof(BuildShadersDX12Task))]
+[IsDependentOn(typeof(BuildShadersOGLTask))]
+[IsDependentOn(typeof(BuildShadersVulkanTask))]
+public sealed class BuildShadersTask : FrostingTask<BuildContext> { }
+
 [TaskName("Build Frameworks")]
 [IsDependentOn(typeof(BuildNativeTask))]
 [IsDependentOn(typeof(BuildDesktopVKTask))]
@@ -15,6 +22,7 @@ public sealed class BuildFrameworksTask : FrostingTask<BuildContext> { }
 [TaskName("Build Tools")]
 [IsDependentOn(typeof(BuildMGFXCTask))]
 [IsDependentOn(typeof(BuildContentPipelineTask))]
+[IsDependentOn(typeof(BuildDevToolsTask))]
 [IsDependentOn(typeof(BuildMGCBTask))]
 [IsDependentOn(typeof(BuildMGCBEditorTask))]
 public sealed class BuildToolsTask : FrostingTask<BuildContext> { }
@@ -31,6 +39,7 @@ public sealed class BuildAllTestsTask : FrostingTask<BuildContext> { }
 
 
 [TaskName("Build All")]
+[IsDependentOn(typeof(BuildShadersTask))]
 [IsDependentOn(typeof(BuildFrameworksTask))]
 [IsDependentOn(typeof(BuildToolsTask))]
 [IsDependentOn(typeof(BuildTemplatesTask))]

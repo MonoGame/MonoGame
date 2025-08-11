@@ -74,7 +74,7 @@ internal static unsafe partial class MGA
     #region System
 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    public delegate void NativeFinishedCallback(IntPtr callbackData);
+    public delegate void NativeFinishedCallback(nint callbackData);
 
     [DllImport(MGP.MonoGameNativeDLL, EntryPoint = "MGA_System_Create", ExactSpelling = true)]
     public static extern MGA_System* System_Create();
@@ -86,7 +86,7 @@ internal static unsafe partial class MGA
     public static extern int System_GetMaxInstances();
 
     [DllImport(MGP.MonoGameNativeDLL, EntryPoint = "MGA_System_SetReverbSettings", ExactSpelling = true)]
-    public static extern void System_SetReverbSettings(MGA_System* system, ReverbSettings* settings);
+    public static extern void System_SetReverbSettings(MGA_System* system, in ReverbSettings settings);
 
     #endregion
 
@@ -190,7 +190,7 @@ internal static unsafe partial class MGA
     public static extern void Voice_ClearFilterMode(MGA_Voice* voice);
 
     [DllImport(MGP.MonoGameNativeDLL, EntryPoint = "MGA_Voice_Apply3D", ExactSpelling = true)]
-    public static extern void Voice_Apply3D(MGA_Voice* voice, Listener* listener, Emitter* emitter, float distanceScale);
+    public static extern void Voice_Apply3D(MGA_Voice* voice, in Listener listener, in Emitter emitter, float distanceScale);
 
     #endregion
 }

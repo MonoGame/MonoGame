@@ -2,6 +2,7 @@
 namespace BuildScripts;
 
 [TaskName("Build Android")]
+[IsDependentOn(typeof(BuildShadersOGLTask))]
 public sealed class BuildAndroidTask : FrostingTask<BuildContext>
 {
     public override bool ShouldRun(BuildContext context) => context.IsWorkloadInstalled("android");

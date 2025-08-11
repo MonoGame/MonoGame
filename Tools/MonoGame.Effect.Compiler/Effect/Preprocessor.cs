@@ -1,3 +1,7 @@
+// MonoGame - Copyright (C) MonoGame Foundation, Inc
+// This file is subject to the terms and conditions defined in
+// file 'LICENSE.txt', which is part of this source code package.
+
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
@@ -7,6 +11,15 @@ namespace MonoGame.Effect
 {
     public static class Preprocessor
     {
+        static readonly private Dictionary<string, string> Workarounds = new Dictionary<string, string>
+        {
+            // Sometimes input FX files can contain #line directives, pass these thru.
+            { "#line", "//--WORKAROUND#line" },
+
+            // Some platforms use #pragma for special compiler features, pass these thru. 
+            { "#pragma", "//--WORKAROUND#pragma" },
+        };
+
         public static string Preprocess(
             string effectCode, string filePath, IDictionary<string, string> defines, List<string> dependencies,
             IEffectCompilerOutput output)
@@ -24,7 +37,8 @@ namespace MonoGame.Effect
             foreach (var define in defines)
                 pp.addMacro(define.Key, define.Value);
 
-            effectCode = effectCode.Replace("#line", "//--WORKAROUND#line");
+            foreach (var kv in Workarounds)
+                effectCode = effectCode.Replace(kv.Key, kv.Value);
 
             pp.addInput(new MGStringLexerSource(effectCode, true, fullPath));
 
@@ -40,9 +54,13 @@ namespace MonoGame.Effect
                         endOfStream = true;
                         break;
                     case CppNet.Token.CPPCOMMENT:
-                        if (token.getText().StartsWith("//--WORKAROUND#line"))
+                        foreach (var kv in Workarounds)
                         {
-                            result.Append(token.getText().Replace("//--WORKAROUND#line", "#line"));
+                            if (token.getText().StartsWith(kv.Value))
+                            {
+                                result.Append(token.getText().Replace(kv.Value, kv.Key));
+                                break;
+                            }
                         }
                         break;
                     case CppNet.Token.CCOMMENT:

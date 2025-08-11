@@ -2,18 +2,13 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
+using System;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 using MonoGame.Framework.Utilities;
-using System;
 using System.Runtime.InteropServices;
-using System.Text;
 
 namespace MonoGame.Interop;
-
-internal class MGHandleAttribute : System.Attribute
-{
-}
 
 internal enum EventType : uint
 {
@@ -227,7 +222,7 @@ internal static unsafe partial class MGP
     #region Platform
 
     [DllImport(MonoGameNativeDLL, EntryPoint = "MGP_Platform_Create", ExactSpelling = true)]
-    public static extern MGP_Platform* Platform_Create(GameRunBehavior* behavior);
+    public static extern MGP_Platform* Platform_Create(out GameRunBehavior behavior);
 
     [DllImport(MonoGameNativeDLL, EntryPoint = "MGP_Platform_Destroy", ExactSpelling = true)]
     public static extern void Platform_Destroy(MGP_Platform* platform);
@@ -236,7 +231,7 @@ internal static unsafe partial class MGP
     public static extern void Platform_BeforeInitialize(MGP_Platform* platform);
 
     [DllImport(MonoGameNativeDLL, EntryPoint = "MGP_Platform_PollEvent", ExactSpelling = true)]
-    public static extern byte Platform_PollEvent(MGP_Platform* platform, MGP_Event* event_);
+    public static extern byte Platform_PollEvent(MGP_Platform* platform, out MGP_Event event_);
 
     [DllImport(MonoGameNativeDLL, EntryPoint = "MGP_Platform_StartRunLoop", ExactSpelling = true)]
     public static extern void Platform_StartRunLoop(MGP_Platform* platform);
@@ -251,7 +246,7 @@ internal static unsafe partial class MGP
     [return: MarshalAs(UnmanagedType.U1)]
     public static extern byte Platform_BeforeDraw(MGP_Platform* platform);
 
-    [System.Runtime.InteropServices.DllImportAttribute("monogame.native", EntryPoint = "MGP_Platform_MakePath", ExactSpelling = true)]
+    [DllImport(MonoGameNativeDLL, EntryPoint = "MGP_Platform_MakePath", ExactSpelling = true)]
     static extern byte* _Platform_MakePath(byte* location, byte* path);
 
     public static string Platform_MakePath(string location, string path)
@@ -260,29 +255,21 @@ internal static unsafe partial class MGP
 
         try
         {
-            byte* _location = stackalloc byte[(location.Length * 4) + 1];
-            fixed (char* s = location)
-            {
-                int count = Encoding.UTF8.GetBytes(s, location.Length, _location, location.Length * 4);
-                _location[count] = 0;
-            }
+            byte* _location = stackalloc byte[StringInterop.GetMaxSize(location)];
+            StringInterop.CopyString(_location, location);
 
-            byte* _path = stackalloc byte[(path.Length * 4) + 1];
-            fixed (char* s = path)
-            {
-                int count = Encoding.UTF8.GetBytes(s, path.Length, _path, path.Length * 4);
-                _path[count] = 0;
-            }
+            byte* _path = stackalloc byte[StringInterop.GetMaxSize(path)];
+            StringInterop.CopyString(_path, path);
 
             _result = _Platform_MakePath(_location, _path);
 
-            string result = Marshal.PtrToStringUTF8((IntPtr)_result);
+            string result = StringInterop.ToString(_result);
 
             return result;
         }
         finally
         {
-            Marshal.FreeHGlobal((IntPtr)_result);
+            StringInterop.Free(_result);
         }
     }
 
@@ -297,7 +284,7 @@ internal static unsafe partial class MGP
     #region Window
 
     [DllImport(MonoGameNativeDLL, EntryPoint = "MGP_Window_Create", ExactSpelling = true)]
-    public static extern MGP_Window* Window_Create(MGP_Platform* platform, int* width, int* height, byte* title);
+    public static extern MGP_Window* Window_Create(MGP_Platform* platform, ref int width, ref int height, byte* title);
 
     [DllImport(MonoGameNativeDLL, EntryPoint = "MGP_Window_Destroy", ExactSpelling = true)]
     public static extern void Window_Destroy(MGP_Window* window);
@@ -327,7 +314,7 @@ internal static unsafe partial class MGP
     public static extern void Window_Show(MGP_Window* window, byte show);
 
     [DllImport(MonoGameNativeDLL, EntryPoint = "MGP_Window_GetPosition", ExactSpelling = true)]
-    public static extern void Window_GetPosition(MGP_Window* window, int* x, int* y);
+    public static extern void Window_GetPosition(MGP_Window* window, out int x, out int y);
 
     [DllImport(MonoGameNativeDLL, EntryPoint = "MGP_Window_SetPosition", ExactSpelling = true)]
     public static extern void Window_SetPosition(MGP_Window* window, int x, int y);
@@ -341,9 +328,9 @@ internal static unsafe partial class MGP
     [DllImport(MonoGameNativeDLL, EntryPoint = "MGP_Window_ShowMessageBox", ExactSpelling = true)]
     public static extern int Window_ShowMessageBox(
          MGP_Window* window,
-         string title,
-         string description,
-         string[] buttons,
+         byte* title,
+         byte* description,
+         byte* buttons,
          int count);
 
     [DllImport(MonoGameNativeDLL, EntryPoint = "MGP_Window_EnterFullScreen", ExactSpelling = true)]

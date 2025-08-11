@@ -242,5 +242,55 @@ namespace MonoGame.Tests.Framework
             Assert.AreEqual(a2, color2.A / 255f);
         }
 #endif
+        [Test]
+        public void ToHSL()
+        {
+            Color color = new Color(0, 255, 0);
+
+            float h, s, l;
+            color.ToHSL(out h, out s, out l);
+            Assert.AreEqual(120.0f, h);
+            Assert.AreEqual(100f, s);
+            Assert.AreEqual(50f, l);
+        }
+
+        [Test]
+        public void ToHSV()
+        {
+            Color color = new Color(0, 255, 0);
+
+            float h, s, v;
+            color.ToHSV(out h, out s, out v);
+            Assert.AreEqual(120.0f, h);
+            Assert.AreEqual(100f, s);
+            Assert.AreEqual(100f, v);
+        }
+
+        [Test]
+        public void FromHSL()
+        {
+            Color color1 = new(0, 255, 0);
+            float h = 120;
+            float s = 100;
+            float l = 50;
+
+            Color color2 = color1.FromHSL(h, s, l);
+
+            Assert.AreEqual(color1, color2);
+        }
+
+        [Test]
+        public void FromHSV()
+        {
+            Color color1 = new(0, 255, 0);
+            float h = 120;
+            float s = 100;
+            float v = 100;
+
+            Color color2 = color1.FromHSV(h, s, v);
+
+            Assert.AreEqual(color1, color2);
+            
+        }
     }
 }

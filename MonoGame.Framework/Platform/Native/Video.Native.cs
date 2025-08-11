@@ -96,7 +96,7 @@ public sealed partial class Video : IDisposable
                 {
                     byte* buffer;
                     uint size;
-                    MGM.AudioDecoder_Decode(_decoderA, &buffer, &size);
+                    MGM.AudioDecoder_Decode(_decoderA, out buffer, out size);
 
                     if (size > 0)
                         MGA.Voice_AppendBuffer(_voice, buffer, size);
@@ -169,9 +169,9 @@ public sealed partial class Video : IDisposable
         // that doesn't assume Game exists.
         var device = Game.Instance.GraphicsDevice;
 
-        fixed (byte* p = System.Text.Encoding.UTF8.GetBytes(absolutePath + '\0'))
-        fixed (MGM_VideoDecoderInfo* i = &_infoV)
-            _decoderV = MGM.VideoDecoder_Create(device.Handle, p, i);
+        byte* _absolutePath = stackalloc byte[StringInterop.GetMaxSize(absolutePath)];
+        StringInterop.CopyString(_absolutePath, absolutePath);
+        _decoderV = MGM.VideoDecoder_Create(device.Handle, _absolutePath, out _infoV);
 
         if (_decoderV == null)
             return;
@@ -184,8 +184,7 @@ public sealed partial class Video : IDisposable
         _state = (int)MediaState.Stopped;
 
         // Get the audio decoder if we have one.
-        fixed (MGM_AudioDecoderInfo* i = &_infoA)
-            _decoderA = MGM.VideoDecoder_GetAudioDecoder(_decoderV, i);
+        _decoderA = MGM.VideoDecoder_GetAudioDecoder(_decoderV, out _infoA);
 
         // Unsupported
         VideoSoundtrackType = VideoSoundtrackType.MusicAndDialog;

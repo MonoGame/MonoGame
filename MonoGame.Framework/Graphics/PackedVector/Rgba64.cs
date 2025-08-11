@@ -3,13 +3,17 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Microsoft.Xna.Framework.Graphics.PackedVector
 {
-	/// <summary>
+    /// <summary>
     /// Packed vector type containing four 16-bit unsigned normalized values ranging from 0 to 1.
-	/// </summary>
-	public struct Rgba64 : IPackedVector<ulong>, IEquatable<Rgba64>, IPackedVector
+    /// </summary>
+#if XNADESIGNPROVIDED
+    [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.Interfaces | DynamicallyAccessedMemberTypes.PublicParameterlessConstructor)]
+#endif
+    public struct Rgba64 : IPackedVector<ulong>, IEquatable<Rgba64>, IPackedVector
 	{
         /// <inheritdoc />
 		public ulong PackedValue

@@ -4,9 +4,10 @@
 
 using System;
 using System.IO;
+using System.Runtime.InteropServices;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Graphics.PackedVector;
-using FreeImageAPI;
+using MonoGame.Framework.Content.Pipeline.Interop;
 
 namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 {
@@ -17,29 +18,81 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
             BitmapContent src = bitmap;
             SurfaceFormat format;
             src.TryGetFormat(out format);
-            if (format != SurfaceFormat.Vector4)
+            var intermediateFormat = SurfaceFormat.Vector4;
+
+            switch (format)
             {
-                var v4 = new PixelBitmapContent<Vector4>(src.Width, src.Height);
-                BitmapContent.Copy(src, v4);
-                src = v4;
+                case SurfaceFormat.Color or SurfaceFormat.Rgba64 or SurfaceFormat.Vector4:
+                    intermediateFormat = format;
+                    break;
+                default:
+                    var v4 = new PixelBitmapContent<Vector4>(src.Width, src.Height);
+                    BitmapContent.Copy(src, v4);
+                    src = v4;
+                    break;
             }
 
-            // Convert to FreeImage bitmap
-            var bytes = src.GetPixelData();
-            var fi = FreeImage.ConvertFromRawBits(bytes, FREE_IMAGE_TYPE.FIT_RGBAF, src.Width, src.Height, SurfaceFormat.Vector4.GetSize() * src.Width, 128, 0, 0, 0, true);
+            var newBytes = new byte[intermediateFormat.GetSize() * newWidth * newHeight];
 
-            // Resize
-            var newfi = FreeImage.Rescale(fi, newWidth, newHeight, FREE_IMAGE_FILTER.FILTER_BICUBIC);
-            FreeImage.Unload(fi);
+            GCHandle srcHandle = default;
+            GCHandle dstHandle = default;
+            try
+            {
+                byte[] srcPixelData = src.GetPixelData();
+                srcHandle = GCHandle.Alloc(srcPixelData, GCHandleType.Pinned);
+                IntPtr srcPtr = srcHandle.AddrOfPinnedObject();
+                dstHandle = GCHandle.Alloc(newBytes, GCHandleType.Pinned);
+                IntPtr dstPtr = dstHandle.AddrOfPinnedObject();
 
-            // Convert back to PixelBitmapContent<Vector4>
-            src = new PixelBitmapContent<Vector4>(newWidth, newHeight);
-            bytes = new byte[SurfaceFormat.Vector4.GetSize() * newWidth * newHeight];
-            FreeImage.ConvertToRawBits(bytes, newfi, SurfaceFormat.Vector4.GetSize() * newWidth, 128, 0, 0, 0, true);
-            src.SetPixelData(bytes);
-            FreeImage.Unload(newfi);
+                var srcBitmap = new MGCP_Bitmap
+                {
+                    width = src.Width,
+                    height = src.Height,
+                    type = TextureType.RgbaF,
+                    data = srcPtr,
+                };
+
+                var dstBitmap = new MGCP_Bitmap
+                {
+                    width = newWidth,
+                    height = newHeight,
+                    data = dstPtr,
+                };
+
+                IntPtr err = MGCP.MP_ResizeBitmap(ref srcBitmap, ref dstBitmap);
+                if (err != IntPtr.Zero)
+                {
+                    string errorMsg = System.Runtime.InteropServices.Marshal.PtrToStringUTF8(err);
+                    throw new InvalidContentException($"Bitmap resize failed: {errorMsg}");
+                }
+            }
+            finally
+            {
+                if (srcHandle.IsAllocated)
+                    srcHandle.Free();
+                if (dstHandle.IsAllocated)
+                    dstHandle.Free();
+            }
+
+            switch (intermediateFormat)
+            {
+                case SurfaceFormat.Color:
+                    src = new PixelBitmapContent<Color>(newWidth, newHeight);
+                    break;
+                case SurfaceFormat.Rgba64:
+                    src = new PixelBitmapContent<Rgba64>(newWidth, newHeight);
+                    break;
+                case SurfaceFormat.Vector4:
+                    src = new PixelBitmapContent<Vector4>(newWidth, newHeight);
+                    break;
+                default:
+                    throw new InvalidOperationException($"Unexpected intermediate format: {intermediateFormat}");
+            }
+
+            src.SetPixelData(newBytes);
+
             // Convert back to source type if required
-            if (format != SurfaceFormat.Vector4)
+            if (format != intermediateFormat)
             {
                 var s = (BitmapContent)Activator.CreateInstance(bitmap.GetType(), new object[] { newWidth, newHeight });
                 BitmapContent.Copy(src, s);
@@ -47,16 +100,6 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
             }
 
             return src;
-        }
-
-        public static void BGRAtoRGBA(byte[] data)
-        {
-            for (var x = 0; x < data.Length; x += 4)
-            {
-                data[x] ^= data[x + 2];
-                data[x + 2] ^= data[x];
-                data[x] ^= data[x + 2];
-            }
         }
 
         public static bool IsPowerOfTwo(int x)

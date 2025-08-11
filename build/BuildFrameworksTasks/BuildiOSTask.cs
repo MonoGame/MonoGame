@@ -2,6 +2,7 @@
 namespace BuildScripts;
 
 [TaskName("Build iOS")]
+[IsDependentOn(typeof(BuildShadersOGLTask))]
 public sealed class BuildiOSTask : FrostingTask<BuildContext>
 {
     public override bool ShouldRun(BuildContext context) => context.IsWorkloadInstalled("ios");

@@ -44,7 +44,7 @@ public partial class Texture2D : Texture
         var dataHandle = GCHandle.Alloc(data, GCHandleType.Pinned);
         var elementSizeInByte = ReflectionHelpers.FastSizeOf<T>();
         var startBytes = startIndex * elementSizeInByte;
-        var dataPtr = (IntPtr)(dataHandle.AddrOfPinnedObject().ToInt64() + startBytes);
+        var dataPtr = (nint)(dataHandle.AddrOfPinnedObject().ToInt64() + startBytes);
 
         unsafe
         {
@@ -71,7 +71,7 @@ public partial class Texture2D : Texture
         var dataHandle = GCHandle.Alloc(data, GCHandleType.Pinned);
         var elementSizeInByte = ReflectionHelpers.FastSizeOf<T>();
         var startBytes = startIndex * elementSizeInByte;
-        var dataPtr = (IntPtr)(dataHandle.AddrOfPinnedObject().ToInt64() + startBytes);
+        var dataPtr = (nint)(dataHandle.AddrOfPinnedObject().ToInt64() + startBytes);
 
         unsafe
         {
@@ -98,7 +98,7 @@ public partial class Texture2D : Texture
         var dataHandle = GCHandle.Alloc(data, GCHandleType.Pinned);
         var elementSizeInByte = ReflectionHelpers.FastSizeOf<T>();
         var startBytes = startIndex * elementSizeInByte;
-        var dataPtr = (IntPtr)(dataHandle.AddrOfPinnedObject().ToInt64() + startBytes);
+        var dataPtr = (nint)(dataHandle.AddrOfPinnedObject().ToInt64() + startBytes);
 
         MGG.Texture_GetData(
             GraphicsDevice.Handle,

@@ -5,6 +5,7 @@
 using System;
 using System.Runtime.InteropServices;
 using MonoGame.OpenGL;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
@@ -43,7 +44,9 @@ namespace Microsoft.Xna.Framework.Graphics
             }
         }
 
-        private void PlatformGetData<T>(int offsetInBytes, T[] data, int startIndex, int elementCount, int vertexStride)
+        private void PlatformGetData<
+           [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors | DynamicallyAccessedMemberTypes.NonPublicConstructors)] T
+        >(int offsetInBytes, T[] data, int startIndex, int elementCount, int vertexStride)
             where T : struct
         {
 #if GLES
@@ -57,7 +60,9 @@ namespace Microsoft.Xna.Framework.Graphics
 
 #if !GLES
 
-        private void GetBufferData<T>(int offsetInBytes, T[] data, int startIndex, int elementCount, int vertexStride)
+        private void GetBufferData<
+            [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors | DynamicallyAccessedMemberTypes.NonPublicConstructors)] T
+        >(int offsetInBytes, T[] data, int startIndex, int elementCount, int vertexStride)
             where T : struct
         {
             GL.BindBuffer(BufferTarget.ArrayBuffer, vbo);

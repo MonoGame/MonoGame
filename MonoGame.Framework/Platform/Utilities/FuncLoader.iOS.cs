@@ -23,11 +23,7 @@ namespace MonoGame.Framework.Utilities
                 return default(T);
             }
 
-            // TODO: Use the function bellow once Protobuild gets axed
-            // requires .NET Framework 4.5.1 and its useful for corert
-            // return Marshal.GetDelegateForFunctionPointer<T>(ret);
-
-            return (T)(object)Marshal.GetDelegateForFunctionPointer(ret, typeof(T));
+            return Marshal.GetDelegateForFunctionPointer<T>(ret);
         }
     }
 }

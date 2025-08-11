@@ -2,6 +2,7 @@
 namespace BuildScripts;
 
 [TaskName("Build DesktopVK")]
+[IsDependentOn(typeof(BuildShadersVulkanTask))]
 public sealed class BuildDesktopVKTask : FrostingTask<BuildContext>
 {
     // TEMP: Until OSX and Linux is setup to work.

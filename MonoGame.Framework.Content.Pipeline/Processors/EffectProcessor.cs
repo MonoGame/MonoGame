@@ -103,7 +103,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
                 case TargetPlatform.WindowsGDK:
                 case TargetPlatform.XboxOne:
                 case TargetPlatform.XboxSeries:
-                    return "GDK";
+                    return "DirectX_12";
             }
 
             return platform.ToString();

@@ -37,7 +37,7 @@ public partial class GraphicsDevice
 
         // Get the device caps.
         MGG_GraphicsDevice_Caps caps;
-        MGG.GraphicsDevice_GetCaps(Handle, &caps);
+        MGG.GraphicsDevice_GetCaps(Handle, out caps);
 
         MaxTextureSlots = caps.MaxTextureSlots;
         MaxVertexTextureSlots = caps.MaxVertexTextureSlots;
@@ -139,7 +139,7 @@ public partial class GraphicsDevice
         BeginFrame();
 
         PlatformBeginApplyState();
-        MGG.GraphicsDevice_Clear(Handle, options, &color, depth, stencil);
+        MGG.GraphicsDevice_Clear(Handle, options, ref color, depth, stencil);
     }
 
     private unsafe void PlatformDispose()
@@ -464,7 +464,7 @@ public partial class GraphicsDevice
 
     private static unsafe Rectangle PlatformGetTitleSafeArea(int x, int y, int width, int height)
     {
-        MGG.GraphicsDevice_GetTitleSafeArea(&x, &y, &width, &height);
+        MGG.GraphicsDevice_GetTitleSafeArea(ref x, ref y, ref width, ref height);
 
         return new Rectangle(x, y, width, height);
     }
