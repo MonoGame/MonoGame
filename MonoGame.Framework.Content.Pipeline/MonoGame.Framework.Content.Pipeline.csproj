@@ -113,6 +113,12 @@
   <Import Project="..\PSVita\MonoGame.Framework.Content.Pipeline.targets" Condition="exists('..\PSVita\MonoGame.Framework.Content.Pipeline.targets')" />
   <Import Project="..\GDKX\MonoGame.Framework.Content.Pipeline.targets" Condition="exists('..\GDKX\MonoGame.Framework.Content.Pipeline.targets')" />
 
+  <Import Project="..\Switch\MonoGame.Effect.Compiler.targets" Condition="exists('..\Switch\MonoGame.Effect.Compiler.targets')" />
+  <Import Project="..\XBoxOne\MonoGame.Effect.Compiler.targets" Condition="exists('..\XBoxOne\MonoGame.Effect.Compiler.targets')" />
+  <Import Project="..\PlayStation4\MonoGame.Effect.Compiler.targets" Condition="exists('..\PlayStation4\MonoGame.Effect.Compiler.targets')" />
+  <Import Project="..\PlayStation5\MonoGame.Effect.Compiler.targets" Condition="exists('..\PlayStation5\MonoGame.Effect.Compiler.targets')" />
+  <Import Project="..\GDKX\MonoGame.Effect.Compiler.targets" Condition="exists('..\GDKX\MonoGame.Effect.Compiler.targets')" />
+
   <Target Name="BuildMGCPW" Condition="'$(DisableNativeBuild)' != 'True' and '$(OS)' == 'Windows_NT'" BeforeTargets="CollectPackageReferences">
     <Exec Command="&quot;$(MSBuildProgramFiles32)\Microsoft Visual Studio\Installer\vswhere.exe&quot; -latest -requires Microsoft.Component.MSBuild -find MSBuild\**\Bin\MSBuild.exe" ConsoleToMSBuild="true">
       <Output TaskParameter="ConsoleOutput" PropertyName="MGMSBuild" />
