@@ -79,20 +79,25 @@ namespace MonoGame.Tests.ContentPipeline
 
             for (var i = 0; i < 4; ++i)
             {
-                // (2, 2, 4, 5) is the top,left and width,height of the first glyph. All test glyphs are 4x5
-                var inRect = new Rectangle(i * 8 + 2, 2, 4, 5);
+                // (1, 1, 6, 7) is the top,left and width,height of the first glyph. All test glyphs are 6x7 (no longer cropped)
+                var inRect = new Rectangle(i * 8 + 1, 1, 6, 7);
                 var outRect = output.Glyphs[i];
                 Assert.AreEqual(inRect.Width, outRect.Width);
                 Assert.AreEqual(inRect.Height, outRect.Height);
+
                 for (var y = 0; y < inRect.Height; ++y)
                     for (var x = 0; x < inRect.Width; ++x)
-                        Assert.AreEqual(pixelData[(x + inRect.Left) + (y + inRect.Top) * face.Width], outFace.GetPixel(x + outRect.Left, y + outRect.Top).PackedValue);
+                    {
+                        var left = pixelData[(x + inRect.Left) + (y + inRect.Top) * face.Width];
+                        var right = outFace.GetPixel(x + outRect.Left, y + outRect.Top).PackedValue;
+                        Assert.AreEqual(left, right);
+                    }
             }
             
-            Assert.AreEqual(new Rectangle(1, 1, 6, 7), output.Cropping[0]);
-            Assert.AreEqual(new Rectangle(1, 1, 6, 7), output.Cropping[1]);
-            Assert.AreEqual(new Rectangle(1, 1, 6, 7), output.Cropping[2]);
-            Assert.AreEqual(new Rectangle(1, 1, 6, 7), output.Cropping[3]);
+            Assert.AreEqual(new Rectangle(0, 0, 6, 7), output.Cropping[0]);
+            Assert.AreEqual(new Rectangle(0, 0, 6, 7), output.Cropping[1]);
+            Assert.AreEqual(new Rectangle(0, 0, 6, 7), output.Cropping[2]);
+            Assert.AreEqual(new Rectangle(0, 0, 6, 7), output.Cropping[3]);
         }
     }
 }
