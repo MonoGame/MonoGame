@@ -26,7 +26,12 @@
   <ItemGroup>
     <Compile Remove="bin\**\*" />
     <Compile Remove="obj\**\*" />
-    <Compile Remove="Properties\**\*" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Include="..\Tools\MonoGame.Effect.Compiler\Effect\**\*.cs">
+      <Link>Processors\Effect\%(RecursiveDir)%(Filename)%(Extension)</Link>
+    </Compile>
   </ItemGroup>
 
   <ItemGroup>
@@ -54,19 +59,80 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Reference Include="CppNet">
-      <HintPath>..\ThirdParty\Dependencies\CppNet\CppNet.dll</HintPath>
-    </Reference>
+    <Compile Include="..\external\CppNet\Argument.cs">
+      <Link>Utilities\CppNet\Argument.cs</Link>
+    </Compile>
+    <Compile Include="..\external\CppNet\DefaultPreprocessorListener.cs">
+      <Link>Utilities\CppNet\DefaultPreprocessorListener.cs</Link>
+    </Compile>
+    <Compile Include="..\external\CppNet\Feature.cs">
+      <Link>Utilities\CppNet\Feature.cs</Link>
+    </Compile>
+    <Compile Include="..\external\CppNet\FileLexerSource.cs">
+      <Link>Utilities\CppNet\FileLexerSource.cs</Link>
+    </Compile>
+    <Compile Include="..\external\CppNet\FixedTokenSource.cs">
+      <Link>Utilities\CppNet\FixedTokenSource.cs</Link>
+    </Compile>
+    <Compile Include="..\external\CppNet\JavaCompat\JavaCompat.cs">
+      <Link>Utilities\CppNet\JavaCompat.cs</Link>
+    </Compile>
+    <Compile Include="..\external\CppNet\JavaFile.cs">
+      <Link>Utilities\CppNet\JavaFile.cs</Link>
+    </Compile>
+    <Compile Include="..\external\CppNet\JavaFileSystem.cs">
+      <Link>Utilities\CppNet\JavaFileSystem.cs</Link>
+    </Compile>
+    <Compile Include="..\external\CppNet\JoinReader.cs">
+      <Link>Utilities\CppNet\JoinReader.cs</Link>
+    </Compile>
+    <Compile Include="..\external\CppNet\LexerException.cs">
+      <Link>Utilities\CppNet\LexerException.cs</Link>
+    </Compile>
+    <Compile Include="..\external\CppNet\LexerSource.cs">
+      <Link>Utilities\CppNet\LexerSource.cs</Link>
+    </Compile>
+    <Compile Include="..\external\CppNet\Macro.cs">
+      <Link>Utilities\CppNet\Macro.cs</Link>
+    </Compile>
+    <Compile Include="..\external\CppNet\MacroTokenSource.cs">
+      <Link>Utilities\CppNet\MacroTokenSource.cs</Link>
+    </Compile>
+    <Compile Include="..\external\CppNet\Preprocessor.cs">
+      <Link>Utilities\CppNet\Preprocessor.cs</Link>
+    </Compile>
+    <Compile Include="..\external\CppNet\PreprocessorListener.cs">
+      <Link>Utilities\CppNet\PreprocessorListener.cs</Link>
+    </Compile>
+    <Compile Include="..\external\CppNet\Source.cs">
+      <Link>Utilities\CppNet\Source.cs</Link>
+    </Compile>
+    <Compile Include="..\external\CppNet\SourceIterator.cs">
+      <Link>Utilities\CppNet\SourceIterator.cs</Link>
+    </Compile>
+    <Compile Include="..\external\CppNet\State.cs">
+      <Link>Utilities\CppNet\State.cs</Link>
+    </Compile>
+    <Compile Include="..\external\CppNet\StringLexerSource.cs">
+      <Link>Utilities\CppNet\StringLexerSource.cs</Link>
+    </Compile>
+    <Compile Include="..\external\CppNet\Token.cs">
+      <Link>Utilities\CppNet\Token.cs</Link>
+    </Compile>
+    <Compile Include="..\external\CppNet\VirtualFile.cs">
+      <Link>Utilities\CppNet\VirtualFile.cs</Link>
+    </Compile>
+    <Compile Include="..\external\CppNet\VirtualFileSystem.cs">
+      <Link>Utilities\CppNet\VirtualFileSystem.cs</Link>
+    </Compile>
+    <Compile Include="..\external\CppNet\Warning.cs">
+      <Link>Utilities\CppNet\Warning.cs</Link>
+    </Compile>
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\MonoGame.Framework\MonoGame.Framework.DesktopGL.csproj">
       <PrivateAssets>All</PrivateAssets>
-    </ProjectReference>
-    <ProjectReference Include="..\Tools\MonoGame.Effect.Compiler\MonoGame.Effect.Compiler.csproj">
-      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
-      <OutputItemType>Content</OutputItemType>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </ProjectReference>
   </ItemGroup>
 
@@ -75,8 +141,10 @@
     <PackageReference Include="BCnEncoder.Net" Version="2.1.0" />
     <PackageReference Include="Microsoft.VisualBasic" Version="10.3.0" />
     <PackageReference Include="MonoGame.Library.FreeType" Version="2.13.2.2" />
+    <PackageReference Include="MonoGame.Library.MojoShader" Version="1.0.0.3" />
     <PackageReference Include="MonoGame.Tool.Basisu" Version="1.60.0.2" />
     <PackageReference Include="MonoGame.Tool.Crunch" Version="1.0.4.4" />
+    <PackageReference Include="MonoGame.Tool.Dxc" Version="1.8.2505.10" />
     <PackageReference Include="MonoGame.Tool.FFmpeg" Version="7.0.0.8" />
     <PackageReference Include="MonoGame.Tool.FFprobe" Version="7.0.0.8" />
     <PackageReference Include="SharpDX" Version="4.0.1" />
@@ -87,13 +155,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Content Include="..\ThirdParty\Dependencies\CppNet\CppNet.dll" PackagePath="lib\net8.0" Visible="false">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\ThirdParty\Dependencies\MojoShader\Windows\libmojoshader_64.dll" Visible="false">
-      <PackagePath>runtimes\win-x64\native</PackagePath>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
     <Content Include="..\Artifacts\native\mgpipeline\windows\$(Configuration)\mgpipeline.dll" Condition="Exists('..\Artifacts\native\mgpipeline\windows\$(Configuration)\mgpipeline.dll')" Visible="false">
       <PackagePath>runtimes\win-x64\native</PackagePath>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
@@ -119,6 +180,12 @@
   <Import Project="..\PlayStation5\MonoGame.Framework.Content.Pipeline.targets" Condition="exists('..\PlayStation5\MonoGame.Framework.Content.Pipeline.targets')" />
   <Import Project="..\PSVita\MonoGame.Framework.Content.Pipeline.targets" Condition="exists('..\PSVita\MonoGame.Framework.Content.Pipeline.targets')" />
   <Import Project="..\GDKX\MonoGame.Framework.Content.Pipeline.targets" Condition="exists('..\GDKX\MonoGame.Framework.Content.Pipeline.targets')" />
+
+  <Import Project="..\Switch\MonoGame.Effect.Compiler.targets" Condition="exists('..\Switch\MonoGame.Effect.Compiler.targets')" />
+  <Import Project="..\XBoxOne\MonoGame.Effect.Compiler.targets" Condition="exists('..\XBoxOne\MonoGame.Effect.Compiler.targets')" />
+  <Import Project="..\PlayStation4\MonoGame.Effect.Compiler.targets" Condition="exists('..\PlayStation4\MonoGame.Effect.Compiler.targets')" />
+  <Import Project="..\PlayStation5\MonoGame.Effect.Compiler.targets" Condition="exists('..\PlayStation5\MonoGame.Effect.Compiler.targets')" />
+  <Import Project="..\GDKX\MonoGame.Effect.Compiler.targets" Condition="exists('..\GDKX\MonoGame.Effect.Compiler.targets')" />
 
   <Target Name="BuildMGCPW" Condition="'$(DisableNativeBuild)' != 'True' and '$(OS)' == 'Windows_NT'" BeforeTargets="CollectPackageReferences">
     <Exec Command="&quot;$(MSBuildProgramFiles32)\Microsoft Visual Studio\Installer\vswhere.exe&quot; -latest -requires Microsoft.Component.MSBuild -find MSBuild\**\Bin\MSBuild.exe" ConsoleToMSBuild="true">

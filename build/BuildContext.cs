@@ -178,8 +178,6 @@ public class BuildContext : FrostingContext
         DotNetRunSettings.WorkingDirectory = "";
     }
 
-    public int DxcRun(string args) => RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? this.StartProcess("dxc.exe", args) : Dxc.Run(args, out _, out _);
-
     public bool IsWorkloadInstalled(string workload)
     {
         this.StartProcess(
@@ -228,9 +226,10 @@ public class BuildContext : FrostingContext
         var tags = GitAliases.GitTags(context, ".");
         foreach (var tag in tags)
         {
-            if (VersionRegex.IsMatch(tag.FriendlyName))
+            var match = VersionRegex.Match(tag.FriendlyName);
+            if (match.Success)
             {
-                VersionBase = tag.FriendlyName[1..];
+                VersionBase = match.Captures[0].ToString()[1..];
             }
         }
 
