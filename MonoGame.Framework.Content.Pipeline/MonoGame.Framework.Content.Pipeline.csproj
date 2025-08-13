@@ -59,7 +59,75 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Reference Include="..\ThirdParty\Dependencies\CppNet\CppNet.dll" />
+    <Compile Include="..\external\CppNet\Argument.cs">
+      <Link>Utilities\CppNet\Argument.cs</Link>
+    </Compile>
+    <Compile Include="..\external\CppNet\DefaultPreprocessorListener.cs">
+      <Link>Utilities\CppNet\DefaultPreprocessorListener.cs</Link>
+    </Compile>
+    <Compile Include="..\external\CppNet\Feature.cs">
+      <Link>Utilities\CppNet\Feature.cs</Link>
+    </Compile>
+    <Compile Include="..\external\CppNet\FileLexerSource.cs">
+      <Link>Utilities\CppNet\FileLexerSource.cs</Link>
+    </Compile>
+    <Compile Include="..\external\CppNet\FixedTokenSource.cs">
+      <Link>Utilities\CppNet\FixedTokenSource.cs</Link>
+    </Compile>
+    <Compile Include="..\external\CppNet\JavaCompat\JavaCompat.cs">
+      <Link>Utilities\CppNet\JavaCompat.cs</Link>
+    </Compile>
+    <Compile Include="..\external\CppNet\JavaFile.cs">
+      <Link>Utilities\CppNet\JavaFile.cs</Link>
+    </Compile>
+    <Compile Include="..\external\CppNet\JavaFileSystem.cs">
+      <Link>Utilities\CppNet\JavaFileSystem.cs</Link>
+    </Compile>
+    <Compile Include="..\external\CppNet\JoinReader.cs">
+      <Link>Utilities\CppNet\JoinReader.cs</Link>
+    </Compile>
+    <Compile Include="..\external\CppNet\LexerException.cs">
+      <Link>Utilities\CppNet\LexerException.cs</Link>
+    </Compile>
+    <Compile Include="..\external\CppNet\LexerSource.cs">
+      <Link>Utilities\CppNet\LexerSource.cs</Link>
+    </Compile>
+    <Compile Include="..\external\CppNet\Macro.cs">
+      <Link>Utilities\CppNet\Macro.cs</Link>
+    </Compile>
+    <Compile Include="..\external\CppNet\MacroTokenSource.cs">
+      <Link>Utilities\CppNet\MacroTokenSource.cs</Link>
+    </Compile>
+    <Compile Include="..\external\CppNet\Preprocessor.cs">
+      <Link>Utilities\CppNet\Preprocessor.cs</Link>
+    </Compile>
+    <Compile Include="..\external\CppNet\PreprocessorListener.cs">
+      <Link>Utilities\CppNet\PreprocessorListener.cs</Link>
+    </Compile>
+    <Compile Include="..\external\CppNet\Source.cs">
+      <Link>Utilities\CppNet\Source.cs</Link>
+    </Compile>
+    <Compile Include="..\external\CppNet\SourceIterator.cs">
+      <Link>Utilities\CppNet\SourceIterator.cs</Link>
+    </Compile>
+    <Compile Include="..\external\CppNet\State.cs">
+      <Link>Utilities\CppNet\State.cs</Link>
+    </Compile>
+    <Compile Include="..\external\CppNet\StringLexerSource.cs">
+      <Link>Utilities\CppNet\StringLexerSource.cs</Link>
+    </Compile>
+    <Compile Include="..\external\CppNet\Token.cs">
+      <Link>Utilities\CppNet\Token.cs</Link>
+    </Compile>
+    <Compile Include="..\external\CppNet\VirtualFile.cs">
+      <Link>Utilities\CppNet\VirtualFile.cs</Link>
+    </Compile>
+    <Compile Include="..\external\CppNet\VirtualFileSystem.cs">
+      <Link>Utilities\CppNet\VirtualFileSystem.cs</Link>
+    </Compile>
+    <Compile Include="..\external\CppNet\Warning.cs">
+      <Link>Utilities\CppNet\Warning.cs</Link>
+    </Compile>
   </ItemGroup>
 
   <ItemGroup>
