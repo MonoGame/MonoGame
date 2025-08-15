@@ -142,11 +142,11 @@
     <PackageReference Include="Microsoft.VisualBasic" Version="10.3.0" />
     <PackageReference Include="MonoGame.Library.FreeType" Version="2.13.2.2" />
     <PackageReference Include="MonoGame.Library.MojoShader" Version="1.0.0.3" />
-    <PackageReference Include="MonoGame.Tool.Basisu" Version="1.60.0.2" />
-    <PackageReference Include="MonoGame.Tool.Crunch" Version="1.0.4.4" />
+    <PackageReference Include="MonoGame.Tool.Basisu" Version="1.60.0.3" />
+    <PackageReference Include="MonoGame.Tool.Crunch" Version="1.0.4.5" />
     <PackageReference Include="MonoGame.Tool.Dxc" Version="1.8.2505.10" />
-    <PackageReference Include="MonoGame.Tool.FFmpeg" Version="7.0.0.8" />
-    <PackageReference Include="MonoGame.Tool.FFprobe" Version="7.0.0.8" />
+    <PackageReference Include="MonoGame.Tool.FFmpeg" Version="7.0.0.9" />
+    <PackageReference Include="MonoGame.Tool.FFprobe" Version="7.0.0.9" />
     <PackageReference Include="SharpDX" Version="4.0.1" />
     <PackageReference Include="SharpDX.D3DCompiler" Version="4.0.1" />
     <PackageReference Include="LibKTX" Version="0.9.2" />
