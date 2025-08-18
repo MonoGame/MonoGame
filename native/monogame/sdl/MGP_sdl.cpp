@@ -461,6 +461,16 @@ mgbyte MGP_Platform_PollEvent(MGP_Platform* platform, MGP_Event& event_)
             event_.Controller.Id = ev.caxis.which;
             event_.Controller.Input = FromSDLAxis(ev.caxis.axis);
             event_.Controller.Value = ev.caxis.value;
+            if (event_.Controller.Input == MGControllerInput::LeftStickY || event_.Controller.Input == MGControllerInput::RightStickY)
+            {
+                // MonoGame has an inverted Y value convention compared to SDL, and we
+                // need to take care of the special case of -32768 because it would otherwise
+                // overflow into -32768 when inverted.
+                // (This maps the range of values to -32767:32767 instead of SDL's -32768:32767)
+                event_.Controller.Value = (event_.Controller.Value == -32768 ? 32767 : ~event_.Controller.Value + 1);
+            }
+            else
+
             return true;
             break;
 
