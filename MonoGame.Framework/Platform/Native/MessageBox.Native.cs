@@ -13,8 +13,12 @@ public static partial class MessageBox
 {
     internal static unsafe MGP_Window* _window;
 
+    private static TaskCompletionSource<int?> _taskCompletionSource;
+
     private static unsafe Task<int?> PlatformShow(string title, string description, List<string> buttons)
     {
+        _taskCompletionSource = new TaskCompletionSource<int?>();
+
         var button_bytes = new List<nint>();
 
         byte* _title = stackalloc byte[StringInterop.GetMaxSize(title)];
@@ -26,11 +30,14 @@ public static partial class MessageBox
 
         int result = MGP.Window_ShowMessageBox(_window, _title, _description, _buttons, buttons.Count);
 
-        return Task.FromResult<int?>(result);
+        _taskCompletionSource.SetResult(result);
+
+        return _taskCompletionSource.Task;
     }
 
     private static void PlatformCancel(int? result)
     {
-        // TODO: How should we do this?
+        if (_taskCompletionSource != null)
+            _taskCompletionSource.SetResult(result);
     }
 }

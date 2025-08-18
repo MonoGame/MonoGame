@@ -851,11 +851,15 @@ void MGP_Window_ExitFullScreen(MGP_Window* window)
 mgint MGP_Window_ShowMessageBox(MGP_Window* window, mgbyte* title, mgbyte* description, mgbyte* buttons, mgint count)
 {
     SDL_MessageBoxData data;
-    data.window = window->window;
+    data.window = (window != nullptr ? window->window : nullptr);
     data.title = (const char*)title;
     data.message = (const char*)description;
     data.colorScheme = nullptr;
     data.flags = SDL_MESSAGEBOX_BUTTONS_LEFT_TO_RIGHT;
+#ifndef _WIN32
+    // Convention is to reverse buttons display order on non-Windows systems.
+    data.flags = SDL_MESSAGEBOX_BUTTONS_RIGHT_TO_LEFT;
+#endif
 
     auto bdata = new SDL_MessageBoxButtonData[count];
     for (int i = 0; i < count; i++)
