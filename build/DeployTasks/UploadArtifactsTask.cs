@@ -47,16 +47,26 @@ public sealed class UploadArtifactsTask : AsyncFrostingTask<BuildContext>
         {
             case PlatformFamily.Windows:
                 await context.GitHubActions().Commands.UploadArtifact(new DirectoryPath("Artifacts/native/mgpipeline/windows/Release/"), $"mgpipeline-{os}.{context.Version}");
+                await context.GitHubActions().Commands.UploadArtifact(new DirectoryPath("Artifacts/monogame.native/windows/Release/"), $"mgnative-{os}.{context.Version}");
                 break;
             case PlatformFamily.Linux:
                 await context.GitHubActions().Commands.UploadArtifact(new DirectoryPath("Artifacts/native/mgpipeline/linux/Release/"), $"mgpipeline-{os}.{context.Version}");
+                await context.GitHubActions().Commands.UploadArtifact(new DirectoryPath("Artifacts/monogame.native/linux/Release/"), $"mgnative-{os}.{context.Version}");
                 break;
             case PlatformFamily.OSX:
                 await context.GitHubActions().Commands.UploadArtifact(new DirectoryPath("Artifacts/native/mgpipeline/macosx/Release/"), $"mgpipeline-{os}.{context.Version}");
+                await context.GitHubActions().Commands.UploadArtifact(new DirectoryPath("Artifacts/monogame.native/macosx/Release/"), $"mgnative-{os}.{context.Version}");
                 break;
             default:
                 throw new NotSupportedException($"Platform {context.Environment.Platform.Family} is not supported for static library checks.");
         }
+
+        // Upload Binaries
+        await context.GitHubActions().Commands.UploadArtifact(new DirectoryPath("Artifacts/MonoGame.Content.Builder/Release/"), $"mgcontentbuilder-{os}.{context.Version}");
+        await context.GitHubActions().Commands.UploadArtifact(new DirectoryPath("Artifacts/MonoGame.Effect.Compiler/Release/"), $"mgeffectcompiler-{os}.{context.Version}");
+        await context.GitHubActions().Commands.UploadArtifact(new DirectoryPath("Artifacts/MonoGame.Framework/"), $"mgframework-{os}.{context.Version}");
+        await context.GitHubActions().Commands.UploadArtifact(new DirectoryPath("Artifacts/MonoGame.Framework.Content.Pipeline/"), $"mgcontentpipeline-{os}.{context.Version}");
+
 
         // Upload NuGet packages
         await context.GitHubActions().Commands.UploadArtifact(new DirectoryPath(context.NuGetsDirectory), $"nuget-{os}.{context.Version}");
@@ -90,7 +100,7 @@ public sealed class UploadArtifactsTask : AsyncFrostingTask<BuildContext>
                     context.Log.Information($"Deleting: {file}");
                     System.IO.File.Delete(file);
                 }
-                
+
             }
         }
     }
