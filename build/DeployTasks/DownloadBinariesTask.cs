@@ -16,6 +16,13 @@ public sealed class DownloadBinariesTask : AsyncFrostingTask<BuildContext>
 
     public override async Task RunAsync(BuildContext context)
     {
+        var os = context.Environment.Platform.Family switch
+        {
+            PlatformFamily.Windows => "windows",
+            PlatformFamily.OSX => "macos",
+            _ => "linux"
+        };
+
         await DownloadArtifactAsync(context, $"mgcontentbuilder-{os}.{context.Version}", "binaries/MonoGame.Content.Builder/");
         await DownloadArtifactAsync(context, $"mgeffectcompiler-{os}.{context.Version}", "binaries/MonoGame.Effect.Compiler/");
         await DownloadArtifactAsync(context, $"mgframework-{os}.{context.Version}", "binaries/MonoGame.Framework/");
