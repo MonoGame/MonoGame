@@ -3,7 +3,7 @@ namespace BuildScripts;
 
 [TaskName("DeployBinaries")]
 [IsDependentOn(typeof(DownloadBinariesTask))]
-public sealed class DeployBinariesTask : FrostingTask<BuildContext>
+public sealed class DeployBinariesTask : AsyncFrostingTask<BuildContext>
 {
     public override bool ShouldRun(BuildContext context) => context.BuildSystem().IsRunningOnGitHubActions;
 
