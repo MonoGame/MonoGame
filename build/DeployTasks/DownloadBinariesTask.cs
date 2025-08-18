@@ -16,17 +16,19 @@ public sealed class DownloadBinariesTask : AsyncFrostingTask<BuildContext>
 
     public override async Task RunAsync(BuildContext context)
     {
-        var os = context.Environment.Platform.Family switch
+        foreach (PlatformFamily platform in Enum.GetValues(typeof(PlatformFamily)))
         {
-            PlatformFamily.Windows => "windows",
-            PlatformFamily.OSX => "macos",
-            _ => "linux"
-        };
-
-        await DownloadArtifactAsync(context, $"mgcontentbuilder-{os}.{context.Version}", "binaries/MonoGame.Content.Builder/");
-        await DownloadArtifactAsync(context, $"mgeffectcompiler-{os}.{context.Version}", "binaries/MonoGame.Effect.Compiler/");
-        await DownloadArtifactAsync(context, $"mgframework-{os}.{context.Version}", "binaries/MonoGame.Framework/");
-        await DownloadArtifactAsync(context, $"mgcontentpipeline-{os}.{context.Version}", "binaries/MonoGame.Framework.Content.Pipeline/");
+            string platformStr = platform switch
+            {
+                PlatformFamily.Windows => "windows",
+                PlatformFamily.OSX => "macos",
+                _ => "linux"
+            };
+            await DownloadArtifactAsync(context, $"mgcontentbuilder-{platformStr}.{context.Version}", "binaries/MonoGame.Content.Builder/");
+            await DownloadArtifactAsync(context, $"mgeffectcompiler-{platformStr}.{context.Version}", "binaries/MonoGame.Effect.Compiler/");
+            await DownloadArtifactAsync(context, $"mgframework-{platformStr}.{context.Version}", "binaries/MonoGame.Framework/");
+            await DownloadArtifactAsync(context, $"mgcontentpipeline-{platformStr}.{context.Version}", "binaries/MonoGame.Framework.Content.Pipeline/");
+        }
 
         await DownloadArtifactAsync(context, $"mgpipeline-windows.{context.Version}", "binaries/mgpipeline/windows/Release/");
         await DownloadArtifactAsync(context, $"mgpipeline-macos.{context.Version}", "binaries/mgpipeline/macosx/Release/");
