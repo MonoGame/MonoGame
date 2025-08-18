@@ -421,25 +421,33 @@ mgbyte MGP_Platform_PollEvent(MGP_Platform* platform, MGP_Event& event_)
         case SDL_EventType::SDL_CONTROLLERDEVICEADDED:
         {
             auto controller = SDL_GameControllerOpen(ev.cdevice.which);
-            platform->controllers.emplace(ev.cdevice.which, controller);
-            event_.Type = MGEventType::ControllerAdded;
-            event_.Timestamp = ev.cdevice.timestamp;
-            event_.Controller.Id = ev.cdevice.which;
-            event_.Controller.Input = MGControllerInput::INVALID;
-            event_.Controller.Value = 0;
-            return true;
+            if (controller != nullptr)
+            {
+                platform->controllers.emplace(ev.cdevice.which, controller);
+                event_.Type = MGEventType::ControllerAdded;
+                event_.Timestamp = ev.cdevice.timestamp;
+                event_.Controller.Id = ev.cdevice.which;
+                event_.Controller.Input = MGControllerInput::INVALID;
+                event_.Controller.Value = 0;
+                return true;
+            }
+            break;
         }
         case SDL_EventType::SDL_CONTROLLERDEVICEREMOVED:
         {
             auto controller = platform->controllers[ev.cdevice.which];
-            platform->controllers.erase(ev.cdevice.which);
-            SDL_GameControllerClose(controller);
-            event_.Type = MGEventType::ControllerRemoved;
-            event_.Timestamp = ev.cdevice.timestamp;
-            event_.Controller.Id = ev.cdevice.which;
-            event_.Controller.Input = MGControllerInput::INVALID;
-            event_.Controller.Value = 0;
-            return true;
+            if (controller != nullptr)
+            {
+                platform->controllers.erase(ev.cdevice.which);
+                SDL_GameControllerClose(controller);
+                event_.Type = MGEventType::ControllerRemoved;
+                event_.Timestamp = ev.cdevice.timestamp;
+                event_.Controller.Id = ev.cdevice.which;
+                event_.Controller.Input = MGControllerInput::INVALID;
+                event_.Controller.Value = 0;
+                return true;
+            }
+            break;
         }
         case SDL_EventType::SDL_CONTROLLERBUTTONUP:
             event_.Type = MGEventType::ControllerStateChange;
