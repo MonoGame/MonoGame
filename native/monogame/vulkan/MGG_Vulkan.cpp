@@ -40,6 +40,47 @@
 	}																					\
 }
 
+#if defined(DEBUG)
+template <typename... FmtArgs>
+static void setObjectNameVariadic(
+    VkDevice device, uint64_t object, VkObjectType type,
+    const char* file, int line,
+    const char* nameOrFormat, FmtArgs&&... fmtArgs)
+{
+    if (!device || !object || !vkSetDebugUtilsObjectNameEXT) return;
+
+    const char* baseName = nullptr;
+    char formattedNameBuffer[256];
+
+    if constexpr (sizeof...(FmtArgs) > 0)
+    {
+        snprintf(formattedNameBuffer, sizeof(formattedNameBuffer), nameOrFormat, std::forward<FmtArgs>(fmtArgs)...);
+        baseName = formattedNameBuffer;
+    }
+    else
+    {
+        baseName = nameOrFormat;
+    }
+
+    char finalName[256];
+    snprintf(finalName, sizeof(finalName), "%s (%s:%d)", baseName, file, line);
+
+    VkDebugUtilsObjectNameInfoEXT info = {};
+    info.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_OBJECT_NAME_INFO_EXT;
+    info.pNext = VK_NULL_HANDLE;
+    info.objectType = type;
+    info.objectHandle = object;
+    info.pObjectName = finalName;
+
+    vkSetDebugUtilsObjectNameEXT(device, &info);
+}
+
+#define VK_SET_OBJECT_NAME(device, object, type, ...) \
+    setObjectNameVariadic(device, (uint64_t)(object), type, __FILE__, __LINE__, __VA_ARGS__)
+#else
+#define VK_SET_OBJECT_NAME(...) ((void)0)
+#endif
+
 template<class T>
 T MG_AlignUp(T value, const T alignment)
 {
