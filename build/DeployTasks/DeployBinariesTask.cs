@@ -9,6 +9,6 @@ public sealed class DeployBinariesTask : AsyncFrostingTask<BuildContext>
 
     public override async Task RunAsync(BuildContext context)
     {
-        await context.GitHubActions().Commands.UploadArtifact(new DirectoryPath("binaries"), $"MonoGame.{context.Version}");
+        await context.GitHubActions().Commands.UploadArtifact(new DirectoryPath("Artifacts/binaries"), $"MonoGame.{context.Version}");
     }
 }
