@@ -35,7 +35,7 @@ public sealed class DownloadBinariesTask : AsyncFrostingTask<BuildContext>
         await DownloadArtifactAsync(context, $"mgpipeline-linux.{context.Version}", "binaries/mgpipeline/linux/Release/");
 
         await DownloadArtifactAsync(context, $"mgnative-windows.{context.Version}", "binaries/mgnative/windows/Release/");
-        await DownloadArtifactAsync(context, $"mgnative-macos.{context.Version}", "binaries/mgnative/macosx/Release/");
-        await DownloadArtifactAsync(context, $"mgnative-linux.{context.Version}", "binaries/mgnative/linux/Release/");
+        //await DownloadArtifactAsync(context, $"mgnative-macos.{context.Version}", "binaries/mgnative/macosx/Release/");
+        //await DownloadArtifactAsync(context, $"mgnative-linux.{context.Version}", "binaries/mgnative/linux/Release/");
     }
 }
