@@ -17,11 +17,12 @@
 #define VULKAN_HPP_DISPATCH_LOADER_DYNAMIC 1
 #define VULKAN_HPP_NO_EXCEPTIONS
 #define VULKAN_HPP_TYPESAFE_CONVERSION 1
-#define VK_NO_PROTOTYPES
+
 
 #if defined(__APPLE__)
 #include <MoltenVK/mvk_vulkan.h>
 #else
+#define VK_NO_PROTOTYPES
 #include <vulkan/vulkan.h>
 #endif
 
@@ -34,8 +35,8 @@
 
 #ifndef __APPLE__
 #define VOLK_IMPLEMENTATION
-#endif
 #include <volk.h>
+#endif
 
 #define VMA_IMPLEMENTATION
 #define VMA_STATIC_VULKAN_FUNCTIONS 1
