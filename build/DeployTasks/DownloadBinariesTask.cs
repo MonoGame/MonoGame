@@ -37,20 +37,20 @@ public sealed class DownloadBinariesTask : AsyncFrostingTask<BuildContext>
         // Clean up duplicate "publish" folder from NuGet packaging
         DeleteDirectory(context, context.GetOutputPath("binaries/MonoGame.Framework.Content.Pipeline/publish"));
         var mgfPath = context.GetOutputPath("binaries/MonoGame.Framework/");
-        // loop through the mgf path and locate folders named "release" and move their contents to their parent folder using only Cake Frosting Context methods
-        // Find all "release" folders under the mgfPath using Cake's globbing and move their contents up one folder
         foreach (var releaseDir in context.GetDirectories($"{mgfPath}/**/release"))
         {
-            var parentFullPath = System.IO.Path.GetDirectoryName(releaseDir.FullPath);
-            if (string.IsNullOrEmpty(parentFullPath))
+            var parentDir = releaseDir.GetParent();
+            if (parentDir == null)
                 continue;
 
-            context.MoveFiles($"{releaseDir.FullPath}/*.*", parentFullPath);
-            DeleteDirectory(context, releaseDir.FullPath);
+            context.Information($"Moving contents of '{releaseDir.FullPath}' to '{parentDir.FullPath}'");
+
+            context.MoveFiles($"{releaseDir}/*.*", parentDir);
+            DeleteDirectory(context, releaseDir);
         }
     }
 
-    private void DeleteDirectory(BuildContext context, string fullPath)
+    private void DeleteDirectory(BuildContext context, DirectoryPath fullPath)
     {
         context.DeleteDirectory(fullPath, new DeleteDirectorySettings { Recursive = true, Force = true });
     }
