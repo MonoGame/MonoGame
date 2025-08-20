@@ -36,18 +36,6 @@ public sealed class DownloadBinariesTask : AsyncFrostingTask<BuildContext>
 
         // Clean up duplicate "publish" folder from NuGet packaging
         DeleteDirectory(context, context.GetOutputPath("binaries/MonoGame.Framework.Content.Pipeline/publish"));
-        var mgfPath = context.GetOutputPath("binaries/MonoGame.Framework/");
-        foreach (var releaseDir in context.GetDirectories($"{mgfPath}/**/release"))
-        {
-            var parentDir = releaseDir.GetParent();
-            if (parentDir == null)
-                continue;
-
-            context.Information($"Moving contents of '{releaseDir.FullPath}' to '{parentDir.FullPath}'");
-
-            context.MoveFiles($"{releaseDir}/*.*", parentDir);
-            DeleteDirectory(context, releaseDir);
-        }
     }
 
     private void DeleteDirectory(BuildContext context, DirectoryPath fullPath)
