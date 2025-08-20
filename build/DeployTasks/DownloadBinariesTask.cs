@@ -31,8 +31,25 @@ public sealed class DownloadBinariesTask : AsyncFrostingTask<BuildContext>
             await DownloadArtifactAsync(context, $"mgframework-{platformStr}.{context.Version}", "binaries/MonoGame.Framework/");
         }
 
+        // Manually download native Windows binaries, once Linux/Mac are available, they will move the the loop above.
         await DownloadArtifactAsync(context, $"mgnative-windows.{context.Version}", "binaries/MonoGame.Framework/");
-        //await DownloadArtifactAsync(context, $"mgnative-macos.{context.Version}", "binaries/MonoGame.Framework/");
-        //await DownloadArtifactAsync(context, $"mgnative-linux.{context.Version}", "binaries/MonoGame.Framework/");
+
+        // Clean up duplicate "publish" folder from NuGet packaging
+        context.DeleteDirectory(context.GetOutputPath("binaries/MonoGame.Framework.Content.Pipeline/publish"));
+        var mgfPath = context.GetOutputPath("binaries/MonoGame.Framework/");
+        // loop through the mgf path and locate folders named "release" and move their contents to their parent folder
+        foreach (var releaseDir in Directory.GetDirectories(mgfPath, "release", SearchOption.AllDirectories))
+        {
+            var parentDir = Directory.GetParent(releaseDir);
+            if (parentDir != null)
+            {
+                foreach (var file in Directory.GetFiles(releaseDir))
+                {
+                    var destFile = Path.Combine(parentDir.FullName, Path.GetFileName(file));
+                    File.Move(file, destFile);
+                }
+                Directory.Delete(releaseDir, true);
+            }
+        }
     }
 }
