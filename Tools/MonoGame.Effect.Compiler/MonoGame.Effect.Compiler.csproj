@@ -15,78 +15,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Include="..\..\external\CppNet\Argument.cs">
-      <Link>CppNet\Argument.cs</Link>
-    </Compile>
-    <Compile Include="..\..\external\CppNet\DefaultPreprocessorListener.cs">
-      <Link>CppNet\DefaultPreprocessorListener.cs</Link>
-    </Compile>
-    <Compile Include="..\..\external\CppNet\Feature.cs">
-      <Link>CppNet\Feature.cs</Link>
-    </Compile>
-    <Compile Include="..\..\external\CppNet\FileLexerSource.cs">
-      <Link>CppNet\FileLexerSource.cs</Link>
-    </Compile>
-    <Compile Include="..\..\external\CppNet\FixedTokenSource.cs">
-      <Link>CppNet\FixedTokenSource.cs</Link>
-    </Compile>
-    <Compile Include="..\..\external\CppNet\JavaCompat\JavaCompat.cs">
-      <Link>CppNet\JavaCompat.cs</Link>
-    </Compile>
-    <Compile Include="..\..\external\CppNet\JavaFile.cs">
-      <Link>CppNet\JavaFile.cs</Link>
-    </Compile>
-    <Compile Include="..\..\external\CppNet\JavaFileSystem.cs">
-      <Link>CppNet\JavaFileSystem.cs</Link>
-    </Compile>
-    <Compile Include="..\..\external\CppNet\JoinReader.cs">
-      <Link>CppNet\JoinReader.cs</Link>
-    </Compile>
-    <Compile Include="..\..\external\CppNet\LexerException.cs">
-      <Link>CppNet\LexerException.cs</Link>
-    </Compile>
-    <Compile Include="..\..\external\CppNet\LexerSource.cs">
-      <Link>CppNet\LexerSource.cs</Link>
-    </Compile>
-    <Compile Include="..\..\external\CppNet\Macro.cs">
-      <Link>CppNet\Macro.cs</Link>
-    </Compile>
-    <Compile Include="..\..\external\CppNet\MacroTokenSource.cs">
-      <Link>CppNet\MacroTokenSource.cs</Link>
-    </Compile>
-    <Compile Include="..\..\external\CppNet\Preprocessor.cs">
-      <Link>CppNet\Preprocessor.cs</Link>
-    </Compile>
-    <Compile Include="..\..\external\CppNet\PreprocessorListener.cs">
-      <Link>CppNet\PreprocessorListener.cs</Link>
-    </Compile>
-    <Compile Include="..\..\external\CppNet\Source.cs">
-      <Link>CppNet\Source.cs</Link>
-    </Compile>
-    <Compile Include="..\..\external\CppNet\SourceIterator.cs">
-      <Link>CppNet\SourceIterator.cs</Link>
-    </Compile>
-    <Compile Include="..\..\external\CppNet\State.cs">
-      <Link>CppNet\State.cs</Link>
-    </Compile>
-    <Compile Include="..\..\external\CppNet\StringLexerSource.cs">
-      <Link>CppNet\StringLexerSource.cs</Link>
-    </Compile>
-    <Compile Include="..\..\external\CppNet\Token.cs">
-      <Link>CppNet\Token.cs</Link>
-    </Compile>
-    <Compile Include="..\..\external\CppNet\VirtualFile.cs">
-      <Link>CppNet\VirtualFile.cs</Link>
-    </Compile>
-    <Compile Include="..\..\external\CppNet\VirtualFileSystem.cs">
-      <Link>CppNet\VirtualFileSystem.cs</Link>
-    </Compile>
-    <Compile Include="..\..\external\CppNet\Warning.cs">
-      <Link>CppNet\Warning.cs</Link>
-    </Compile>
-  </ItemGroup>
-
-  <ItemGroup>
     <Compile Include="..\..\MonoGame.Framework.Content.Pipeline\ExternalTool.cs" />
     <Compile Include="..\..\MonoGame.Framework.Content.Pipeline\LoadedTypeCollection.cs">
       <Link>LoadedTypeCollection.cs</Link>
@@ -108,6 +36,8 @@
     <PackageReference Include="SharpDX" Version="4.0.1" />
     <PackageReference Include="SharpDX.D3DCompiler" Version="4.0.1" />
   </ItemGroup>
+  
+  <Import Project="..\..\external\CppNet\CppNet.targets" />
 
   <Import Project="..\..\Switch\MonoGame.Effect.Compiler.targets" Condition="exists('..\..\Switch\MonoGame.Effect.Compiler.targets')" />
   <Import Project="..\..\XBoxOne\MonoGame.Effect.Compiler.targets" Condition="exists('..\..\XBoxOne\MonoGame.Effect.Compiler.targets')" />
