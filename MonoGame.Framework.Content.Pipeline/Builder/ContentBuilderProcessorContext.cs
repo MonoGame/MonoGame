@@ -43,7 +43,7 @@ class ContentBuilderProcessorContext(ContentBuilder builder, ContentFileCache co
         string processorName, OpaqueDataDictionary processorParameters, string importerName)
     {
         throw new NotSupportedException(
-            @"Converting from imposterName and processorName is not supported with the ContentBuilder.
+            @"Converting from importerName and processorName is not supported with the ContentBuilder.
             Please pass an importer and processor instance to the Convert method instead.");
     }
 
