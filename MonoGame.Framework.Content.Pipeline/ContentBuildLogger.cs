@@ -91,9 +91,19 @@ public class ContentBuildLogger
     public string GetCurrentFilename(ContentIdentity? contentIdentity = null)
     {
         if ((contentIdentity != null) && !string.IsNullOrEmpty(contentIdentity.SourceFilename))
+        {
+            if (string.IsNullOrEmpty(LoggerRootDirectory))
+                return contentIdentity.SourceFilename;
+
             return Path.GetRelativePath(LoggerRootDirectory, contentIdentity.SourceFilename);
+        }
         if (_filenames.Count > 0)
+        {
+            if (string.IsNullOrEmpty(LoggerRootDirectory))
+                return _filenames.Peek();
+
             return Path.GetRelativePath(LoggerRootDirectory, _filenames.Peek());
+        }
         return string.Empty;
     }
 
