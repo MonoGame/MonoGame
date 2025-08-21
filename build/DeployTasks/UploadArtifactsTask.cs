@@ -64,9 +64,9 @@ public sealed class UploadArtifactsTask : AsyncFrostingTask<BuildContext>
         // Upload Binaries
         await context.GitHubActions().Commands.UploadArtifact(new DirectoryPath("Artifacts/MonoGame.Content.Builder/Release/"), $"mgcontentbuilder-{os}.{context.Version}");
         await context.GitHubActions().Commands.UploadArtifact(new DirectoryPath("Artifacts/MonoGame.Effect.Compiler/Release/"), $"mgeffectcompiler-{os}.{context.Version}");
-        await context.GitHubActions().Commands.UploadArtifact(new DirectoryPath("Artifacts/MonoGame.Framework/"), $"mgframework-{os}.{context.Version}");
         await context.GitHubActions().Commands.UploadArtifact(new DirectoryPath("Artifacts/MonoGame.Framework.Content.Pipeline/Release"), $"mgcontentpipeline-{os}.{context.Version}");
-
+        await context.GitHubActions().Commands.UploadArtifact(new DirectoryPath("Artifacts/MonoGame.Framework/"), $"mgframework-{os}.{context.Version}");
+        await context.GitHubActions().Commands.UploadArtifact(new DirectoryPath("Artifacts/Binaries/"), $"mgbinaries-{os}.{context.Version}");
 
         // Upload NuGet packages
         await context.GitHubActions().Commands.UploadArtifact(new DirectoryPath(context.NuGetsDirectory), $"nuget-{os}.{context.Version}");

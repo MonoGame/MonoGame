@@ -4,6 +4,7 @@ namespace BuildScripts;
 [TaskName("DownloadBinaries")]
 public sealed class DownloadBinariesTask : AsyncFrostingTask<BuildContext>
 {
+    private string binariesPackagingFolder = "binPackaging/";
     public override bool ShouldRun(BuildContext context) => context.BuildSystem().IsRunningOnGitHubActions;
 
     private static async Task DownloadArtifactAsync(BuildContext context, string artifactName, string path)
@@ -24,18 +25,18 @@ public sealed class DownloadBinariesTask : AsyncFrostingTask<BuildContext>
                 PlatformFamily.OSX => "macos",
                 _ => "linux"
             };
-            await DownloadArtifactAsync(context, $"mgcontentbuilder-{platformStr}.{context.Version}", "binaries/MonoGame.Framework.Content.Pipeline/");
-            await DownloadArtifactAsync(context, $"mgeffectcompiler-{platformStr}.{context.Version}", "binaries/MonoGame.Framework.Content.Pipeline/");
-            await DownloadArtifactAsync(context, $"mgcontentpipeline-{platformStr}.{context.Version}", "binaries/MonoGame.Framework.Content.Pipeline/");
-            await DownloadArtifactAsync(context, $"mgpipeline-{platformStr}.{context.Version}", "binaries/MonoGame.Framework.Content.Pipeline/");
-            await DownloadArtifactAsync(context, $"mgframework-{platformStr}.{context.Version}", "binaries/MonoGame.Framework/");
+            await DownloadArtifactAsync(context, $"mgcontentbuilder-{platformStr}.{context.Version}", $"{binariesPackagingFolder}MonoGame.Framework.Content.Pipeline/");
+            await DownloadArtifactAsync(context, $"mgeffectcompiler-{platformStr}.{context.Version}", $"{binariesPackagingFolder}MonoGame.Framework.Content.Pipeline/");
+            await DownloadArtifactAsync(context, $"mgcontentpipeline-{platformStr}.{context.Version}", $"{binariesPackagingFolder}MonoGame.Framework.Content.Pipeline/");
+            await DownloadArtifactAsync(context, $"mgpipeline-{platformStr}.{context.Version}", $"{binariesPackagingFolder}MonoGame.Framework.Content.Pipeline/");
+            await DownloadArtifactAsync(context, $"mgbinaries-{platformStr}.{context.Version}", $"{binariesPackagingFolder}MonoGame.Framework/");
         }
 
         // Manually download native Windows binaries, once Linux/Mac are available, they will move the the loop above.
-        await DownloadArtifactAsync(context, $"mgnative-windows.{context.Version}", "binaries/MonoGame.Framework/");
+        await DownloadArtifactAsync(context, $"mgnative-windows.{context.Version}", $"{binariesPackagingFolder}MonoGame.Framework/");
 
-        // Clean up duplicate "publish" folder from NuGet packaging
-        DeleteDirectory(context, context.GetOutputPath("binaries/MonoGame.Framework.Content.Pipeline/publish"));
+        // Clean up duplicate "publish" folder from NuGet cp packaging
+        DeleteDirectory(context, context.GetOutputPath($"{binariesPackagingFolder}MonoGame.Framework.Content.Pipeline/publish"));
     }
 
     private void DeleteDirectory(BuildContext context, DirectoryPath fullPath)
