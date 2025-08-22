@@ -40,19 +40,20 @@ public sealed class DownloadBinariesTask : AsyncFrostingTask<BuildContext>
 
 
         // Post tasks due to issues with Android / iOS "publish" steps
+        var inputPath = context.GetOutputPath($"Artifacts/MonoGame.Framework/");
+        var outputPath = context.GetOutputPath($"{binariesPackagingFolder}MonoGame.Framework/");
         // Copy MonoGame.Framework/Android to Binaries/MonoGame.Framework
-        context.CreateDirectory($"{binariesPackagingFolder}MonoGame.Framework/Android");
-        context.CopyDirectory($"Artifacts/MonoGame.Framework/Android", $"{binariesPackagingFolder}MonoGame.Framework/");
-        context.CreateDirectory($"{binariesPackagingFolder}MonoGame.Framework/Android/runtimes");
-        context.CopyDirectory($"{binariesPackagingFolder}MonoGame.Framework/runtimes", $"{binariesPackagingFolder}MonoGame.Framework/Android");
+        context.CreateDirectory($"{outputPath}Android");
+        context.CopyDirectory($"{inputPath}Android", $"{outputPath}Android");
+        context.CreateDirectory($"{outputPath}Android/runtimes");
+        context.CopyDirectory($"{binariesPackagingFolder}MonoGame.Framework/runtimes", $"{outputPath}Android/runtimes");
 
 
         // Copy MonoGame.Framework/IOS to Binaries/MonoGame.Framework
-        context.CreateDirectory($"{binariesPackagingFolder}MonoGame.Framework/iOS");
-        context.CopyDirectory($"Artifacts/MonoGame.Framework/iOS", $"{binariesPackagingFolder}MonoGame.Framework/");
-        context.CreateDirectory($"{binariesPackagingFolder}MonoGame.Framework/iOS/runtimes");
-        context.CopyDirectory($"{binariesPackagingFolder}MonoGame.Framework/runtimes", $"{binariesPackagingFolder}MonoGame.Framework/iOS");
-
+        context.CreateDirectory($"{outputPath}iOS");
+        context.CopyDirectory($"{inputPath}iOS", $"{outputPath}iOS");
+        context.CreateDirectory($"{outputPath}iOS/runtimes");
+        context.CopyDirectory($"{binariesPackagingFolder}MonoGame.Framework/runtimes", $"{outputPath}iOS/runtimes");
     }
 
     private void DeleteDirectory(BuildContext context, DirectoryPath fullPath)
