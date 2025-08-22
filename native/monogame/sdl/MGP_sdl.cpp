@@ -190,11 +190,14 @@ struct MGP_Cursor
 
 MGP_Platform* MGP_Platform_Create(MGGameRunBehavior& behavior)
 {
-	SDL_Init(
-		SDL_INIT_VIDEO |
-		SDL_INIT_JOYSTICK |
-		SDL_INIT_GAMECONTROLLER |
-		SDL_INIT_HAPTIC);
+	// Check if SDL is already initialized to avoid reference count overflow
+	if (SDL_WasInit(0) == 0) {
+		SDL_Init(
+			SDL_INIT_VIDEO |
+			SDL_INIT_JOYSTICK |
+			SDL_INIT_GAMECONTROLLER |
+			SDL_INIT_HAPTIC);
+	}
 
 	SDL_DisableScreenSaver();
 
