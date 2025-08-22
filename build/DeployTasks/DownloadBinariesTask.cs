@@ -37,6 +37,20 @@ public sealed class DownloadBinariesTask : AsyncFrostingTask<BuildContext>
 
         // Clean up duplicate "publish" folder from NuGet cp packaging
         DeleteDirectory(context, context.GetOutputPath($"{binariesPackagingFolder}MonoGame.Framework.Content.Pipeline/publish"));
+
+
+        // Post tasks due to issues with Android / iOS "publish" steps
+        // Copy MonoGame.Framework/Android to Binaries/MonoGame.Framework
+        //context.CreateDirectory($"{binariesPackagingFolder}MonoGame.Framework/Android");
+        context.CopyDirectory($"/Artifacts/MonoGame.Framework/Android", $"{binariesPackagingFolder}MonoGame.Framework/");
+        context.CopyDirectory($"{binariesPackagingFolder}MonoGame.Framework/runtimes", $"{binariesPackagingFolder}MonoGame.Framework/Android");
+
+
+        // Copy MonoGame.Framework/IOS to Binaries/MonoGame.Framework
+        //context.CreateDirectory($"{binariesPackagingFolder}MonoGame.Framework/iOS");
+        context.CopyDirectory($"/Artifacts/MonoGame.Framework/iOS", $"{binariesPackagingFolder}MonoGame.Framework/");
+        context.CopyDirectory($"{binariesPackagingFolder}MonoGame.Framework/runtimes", $"{binariesPackagingFolder}MonoGame.Framework/iOS");
+
     }
 
     private void DeleteDirectory(BuildContext context, DirectoryPath fullPath)
