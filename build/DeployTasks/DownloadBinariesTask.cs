@@ -36,7 +36,7 @@ public sealed class DownloadBinariesTask : AsyncFrostingTask<BuildContext>
         await DownloadArtifactAsync(context, $"mgnative-windows.{context.Version}", $"{binariesPackagingFolder}MonoGame.Framework/");
 
         // Clean up duplicate "publish" folder from NuGet cp packaging
-        DeleteDirectory(context, context.GetOutputPath($"{binariesPackagingFolder}MonoGame.Framework.Content.Pipeline/publish"));
+        context.DeleteDirectory(context.GetOutputPath($"{binariesPackagingFolder}MonoGame.Framework.Content.Pipeline/publish"));
 
         // Post tasks due to issues with Android / iOS "publish" steps
         var processingPath = context.GetOutputPath($"{binariesPackagingFolder}MonoGame.Framework/");
