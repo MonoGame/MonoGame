@@ -46,6 +46,7 @@ public sealed class DownloadBinariesTask : AsyncFrostingTask<BuildContext>
         foreach (var platform in targets)
         {
             context.Information($"Post Processing platform: {platform}");
+            context.CreateDirectory($"{processingPath}{platform}");
             context.CopyFiles($"{sourcePath}{platform}/Release/*.*", $"{processingPath}{platform}");
             context.CreateDirectory($"{processingPath}{platform}/runtimes");
             context.CopyDirectory($"{processingPath}DesktopGL/runtimes", $"{processingPath}{platform}/runtimes");
