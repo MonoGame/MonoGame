@@ -287,4 +287,9 @@ public static class BuildContextExtensions
         context.DotNetBinariesPublishSettings.OutputDirectory = $"{context.BinariesDirectory}/{platformName}/";
         context.DotNetPublish(context.GetProjectPath(ProjectType.Framework, platformName), context.DotNetBinariesPublishSettings);
     }
+
+    public static void DeleteDirectory(this BuildContext context, DirectoryPath fullPath)
+    {
+        context.DeleteDirectory(fullPath, new DeleteDirectorySettings { Recursive = true, Force = true });
+    }
 }

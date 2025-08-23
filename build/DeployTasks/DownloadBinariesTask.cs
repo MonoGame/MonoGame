@@ -38,26 +38,17 @@ public sealed class DownloadBinariesTask : AsyncFrostingTask<BuildContext>
         // Clean up duplicate "publish" folder from NuGet cp packaging
         DeleteDirectory(context, context.GetOutputPath($"{binariesPackagingFolder}MonoGame.Framework.Content.Pipeline/publish"));
 
-
         // Post tasks due to issues with Android / iOS "publish" steps
-        var inputPath = context.GetOutputPath($"Artifacts/MonoGame.Framework/");
-        var outputPath = context.GetOutputPath($"{binariesPackagingFolder}MonoGame.Framework/");
-        // Copy MonoGame.Framework/Android to Binaries/MonoGame.Framework
-        context.CreateDirectory($"{outputPath}Android");
-        context.CopyDirectory($"{inputPath}Android", $"{outputPath}Android");
-        context.CreateDirectory($"{outputPath}Android/runtimes");
-        context.CopyDirectory($"{binariesPackagingFolder}MonoGame.Framework/runtimes", $"{outputPath}Android/runtimes");
-
-
-        // Copy MonoGame.Framework/IOS to Binaries/MonoGame.Framework
-        context.CreateDirectory($"{outputPath}iOS");
-        context.CopyDirectory($"{inputPath}iOS", $"{outputPath}iOS");
-        context.CreateDirectory($"{outputPath}iOS/runtimes");
-        context.CopyDirectory($"{binariesPackagingFolder}MonoGame.Framework/runtimes", $"{outputPath}iOS/runtimes");
-    }
-
-    private void DeleteDirectory(BuildContext context, DirectoryPath fullPath)
-    {
-        context.DeleteDirectory(fullPath, new DeleteDirectorySettings { Recursive = true, Force = true });
+        var processingPath = context.GetOutputPath($"{binariesPackagingFolder}MonoGame.Framework/");
+        string[] targets = ["Android", "iOS"];
+        foreach (var platform in targets)
+        {
+            await DownloadArtifactAsync(context, $"mgframework-{platform}.{context.Version}", $"{binariesPackagingFolder}MonoGame.Framework/");
+            context.Information($"Post Processing platform: {platform}");
+            context.CopyDirectory($"{processingPath}{platform}/Release", $"{processingPath}{platform}");
+            context.DeleteDirectory(context.GetOutputPath($"{processingPath}{platform}/Release"));
+            context.CreateDirectory($"{processingPath}{platform}/runtimes");
+            context.CopyDirectory($"{processingPath}MonoGame.Framework/DesktopGL/runtimes", $"{processingPath}{platform}/runtimes");
+        }
     }
 }
