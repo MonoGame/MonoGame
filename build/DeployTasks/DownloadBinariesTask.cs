@@ -48,7 +48,7 @@ public sealed class DownloadBinariesTask : AsyncFrostingTask<BuildContext>
             context.Information($"Post Processing platform: {platform}");
             context.CopyFiles($"{sourcePath}{platform}/Release/*.*", $"{processingPath}{platform}");
             context.CreateDirectory($"{processingPath}{platform}/runtimes");
-            context.CopyDirectory($"{processingPath}MonoGame.Framework/DesktopGL/runtimes", $"{processingPath}{platform}/runtimes");
+            context.CopyDirectory($"{processingPath}DesktopGL/runtimes", $"{processingPath}{platform}/runtimes");
         }
     }
 }
