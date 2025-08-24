@@ -43,7 +43,7 @@ namespace MonoGame.Tests.Visual {
 			RunSingleFrameTest ();
 		}
 
-		[Test, Ignore("Fix me!")]
+		[Test]
 		[RunOnUI]
 		public void SpaceshipModel ()
 		{
