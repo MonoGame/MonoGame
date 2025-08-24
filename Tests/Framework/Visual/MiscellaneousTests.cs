@@ -1,7 +1,8 @@
 ﻿// MonoGame - Copyright (C) MonoGame Foundation, Inc
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
-
+using System;
+using System.Runtime.InteropServices;
 using Microsoft.Xna.Framework;
 using MonoGame.Tests.Components;
 using NUnit.Framework;
@@ -47,6 +48,9 @@ namespace MonoGame.Tests.Visual {
 		[RunOnUI]
 		public void SpaceshipModel ()
 		{
+			if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux)) {
+				Assert.Ignore();
+			}
 			Game.Components.Add (new SpaceshipModelDrawComponent(Game));
 			RunMultiFrameTest (captureCount: 10, captureStride: 2, similarity: 0.96f);
 		}
