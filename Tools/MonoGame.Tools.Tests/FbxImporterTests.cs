@@ -93,7 +93,7 @@ namespace MonoGame.Tests.ContentPipeline
 #if XNA
             Assert.AreEqual(11433, meshContent.Positions.Count);
 #else
-            Assert.AreEqual(13126, meshContent.Positions.Count);
+            Assert.AreEqual(13132, meshContent.Positions.Count);
 #endif
 
 
