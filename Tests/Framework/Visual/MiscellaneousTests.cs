@@ -52,7 +52,7 @@ namespace MonoGame.Tests.Visual {
 				Assert.Ignore();
 			}
 			Game.Components.Add (new SpaceshipModelDrawComponent(Game));
-			RunMultiFrameTest (captureCount: 10, captureStride: 2, similarity: 0.96f);
+			RunMultiFrameTest (captureCount: 10, captureStride: 2, similarity: 0.99f);
 		}
 	}
 }
