@@ -23,7 +23,5 @@ public sealed class BuildAndroidTask : FrostingTask<BuildContext>
 
         context.DotNetBuild(context.GetProjectPath(ProjectType.Framework, platformName), installSettings);
         context.DotNetPack(context.GetProjectPath(ProjectType.Framework, platformName), context.DotNetPackSettings);
-
-        context.PublishBinaries(platformName);
     }
 }
