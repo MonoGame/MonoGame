@@ -288,6 +288,13 @@ public static class BuildContextExtensions
         context.DotNetPublish(context.GetProjectPath(ProjectType.Framework, platformName), context.DotNetBinariesPublishSettings);
     }
 
+    public static void PublishToolsBinaries(this BuildContext context, string inputPath)
+    {
+        context.Information($"Packaging Tools Binaries {inputPath}...");
+        context.DotNetBinariesPublishSettings.OutputDirectory = $"{context.BinariesDirectory}/MonoGame.Framework.Content.Pipeline/";
+        context.DotNetPublish(inputPath, context.DotNetBinariesPublishSettings);
+    }
+
     public static void DeleteDirectory(this BuildContext context, DirectoryPath fullPath)
     {
         context.DeleteDirectory(fullPath, new DeleteDirectorySettings { Recursive = true, Force = true });

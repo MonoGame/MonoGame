@@ -25,19 +25,13 @@ public sealed class DownloadBinariesTask : AsyncFrostingTask<BuildContext>
                 PlatformFamily.OSX => "macos",
                 _ => "linux"
             };
-            await DownloadArtifactAsync(context, $"mgcontentbuilder-{platformStr}.{context.Version}", $"{binariesPackagingFolder}MonoGame.Framework.Content.Pipeline/");
-            await DownloadArtifactAsync(context, $"mgeffectcompiler-{platformStr}.{context.Version}", $"{binariesPackagingFolder}MonoGame.Framework.Content.Pipeline/");
-            await DownloadArtifactAsync(context, $"mgcontentpipeline-{platformStr}.{context.Version}", $"{binariesPackagingFolder}MonoGame.Framework.Content.Pipeline/");
-            await DownloadArtifactAsync(context, $"mgpipeline-{platformStr}.{context.Version}", $"{binariesPackagingFolder}MonoGame.Framework.Content.Pipeline/");
-            await DownloadArtifactAsync(context, $"mgbinaries-{platformStr}.{context.Version}", $"{binariesPackagingFolder}MonoGame.Framework/");
             await DownloadArtifactAsync(context, $"mgframework-{platformStr}.{context.Version}", $"Artifacts/MonoGame.Framework/");
+            await DownloadArtifactAsync(context, $"mgbinaries-{platformStr}.{context.Version}", $"{binariesPackagingFolder}MonoGame.Framework/");
+            await DownloadArtifactAsync(context, $"mgpipeline-{platformStr}.{context.Version}", $"{binariesPackagingFolder}MonoGame.Framework.Content.Pipeline/");
         }
 
         // Manually download native Windows binaries, once Linux/Mac are available, they will move the the loop above.
         await DownloadArtifactAsync(context, $"mgnative-windows.{context.Version}", $"{binariesPackagingFolder}MonoGame.Framework/");
-
-        // Clean up duplicate "publish" folder from NuGet cp packaging
-        context.DeleteDirectory(context.GetOutputPath($"{binariesPackagingFolder}MonoGame.Framework.Content.Pipeline/publish"));
 
         // Post tasks due to issues with Android / iOS "publish" steps
         var sourcePath = context.GetOutputPath("Artifacts/MonoGame.Framework/");
