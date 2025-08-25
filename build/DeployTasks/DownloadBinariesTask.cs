@@ -33,6 +33,8 @@ public sealed class DownloadBinariesTask : AsyncFrostingTask<BuildContext>
         // Manually download native Windows binaries, once Linux/Mac are available, they will move the the loop above.
         await DownloadArtifactAsync(context, $"mgnative-windows.{context.Version}", $"{binariesPackagingFolder}MonoGame.Framework/");
 
+        context.MoveDirectory(context.GetOutputPath($"{binariesPackagingFolder}/MonoGame.Framework/MonoGame.Framework.Content.Pipeline/"), context.GetOutputPath($"{binariesPackagingFolder}MonoGame.Framework.Content.Pipeline/"));
+
         // Post tasks due to issues with Android / iOS "publish" steps
         var sourcePath = context.GetOutputPath("Artifacts/MonoGame.Framework/");
         var processingPath = context.GetOutputPath($"{binariesPackagingFolder}MonoGame.Framework/");
