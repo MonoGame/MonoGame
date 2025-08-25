@@ -35,10 +35,6 @@ namespace MonoGame.Tests {
             GraphicsAdapter.UseReferenceDevice = true;
             GraphicsAdapter.UseDriverType = GraphicsAdapter.DriverType.FastSoftware;
 
-            /// Enable fixed time step
-            IsFixedTimeStep = true;
-            TargetElapsedTime = TimeSpan.FromSeconds(1.0 / 30.0); // 30 FPS
-
             Services.AddService<IFrameInfoSource>(this);
 			SuppressExtraUpdatesAndDraws = true;
 		}
