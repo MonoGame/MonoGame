@@ -15,7 +15,7 @@ public sealed class BuildShadersDX11Task : FrostingTask<BuildContext>
         foreach (var filePath in context.GetFiles($"{shadersDir}/*.fx"))
         {
             context.Information($"Building {filePath.GetFilename()}");
-            context.DotNetRun(mgfxc, $"{filePath} {filePath.GetFilenameWithoutExtension()}.dx11.mgfxo /Profile:DirectX_11", shadersDir);
+            context.DotNetRun(mgfxc, $"\"{filePath}\" {filePath.GetFilenameWithoutExtension()}.dx11.mgfxo /Profile:DirectX_11", shadersDir);
             context.Information("");
         }
     }

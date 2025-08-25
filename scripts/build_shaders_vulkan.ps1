@@ -1,2 +1,2 @@
-dotnet run --project "$PSScriptRoot/../build/Build.csproj" -- --target="Build Vulklan Shaders"
+dotnet run --project "$PSScriptRoot/../build/Build.csproj" -- --target="Build Vulkan Shaders"
 exit $LASTEXITCODE;
