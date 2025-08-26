@@ -111,7 +111,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
         /// <remarks>If the input to process is of type EffectMaterialContent, this function will be called to request that the EffectContent be built. The EffectProcessor is used to process the EffectContent. Subclasses of MaterialProcessor can override this function to modify the parameters used to build EffectContent. For example, a different version of this function could request a different processor for the EffectContent.</remarks>
         protected virtual ExternalReference<CompiledEffectContent> BuildEffect(ExternalReference<EffectContent> effect, ContentProcessorContext context)
         {
-            return context.BuildAsset<EffectContent, CompiledEffectContent>(effect, "EffectProcessor");
+            return context.BuildAsset<EffectContent, CompiledEffectContent>(effect, new EffectImporter(), new EffectProcessor());
         }
 
         /// <summary>

@@ -98,8 +98,9 @@
   </ItemGroup>
 
   <PropertyGroup>
-    <!-- NuGet warns if we copy assemblies but don't reference them; we suppress those warnings. -->
-    <NoWarn>NU5100</NoWarn>
+    <!-- NU5100 - NuGet warns if we copy assemblies but don't reference them; we suppress those warnings. -->
+    <!-- CS1591 - Disable XML documentation warnings. -->
+    <NoWarn>NU5100;CS1591</NoWarn>
   </PropertyGroup>
   
   <Import Project="..\external\CppNet\CppNet.targets" />
