@@ -13,7 +13,7 @@ public sealed class BuildShadersOGLTask : FrostingTask<BuildContext>
         foreach (var filePath in context.GetFiles($"{shadersDir}/*.fx"))
         {
             context.Information($"Building {filePath.GetFilename()}");
-            context.DotNetRun(mgfxc, $"{filePath} {filePath.GetFilenameWithoutExtension()}.ogl.mgfxo", shadersDir);
+            context.DotNetRun(mgfxc, $"\"{filePath}\" {filePath.GetFilenameWithoutExtension()}.ogl.mgfxo", shadersDir);
             context.Information("");
         }
     }
