@@ -27,7 +27,7 @@ public sealed class DownloadBinariesTask : AsyncFrostingTask<BuildContext>
             };
             await DownloadArtifactAsync(context, $"mgframework-{platformStr}.{context.Version}", $"Artifacts/MonoGame.Framework/");
             await DownloadArtifactAsync(context, $"mgbinaries-{platformStr}.{context.Version}", $"{binariesPackagingFolder}MonoGame.Framework/");
-            await DownloadArtifactAsync(context, $"mgpipeline-{platformStr}.{context.Version}", $"{binariesPackagingFolder}MonoGame.Framework.Content.Pipeline/");
+            await DownloadArtifactAsync(context, $"mgpipeline-{platformStr}.{context.Version}", $"{binariesPackagingFolder}MonoGame.Framework/MonoGame.Framework.Content.Pipeline/");
         }
 
         // Manually download native Windows binaries, once Linux/Mac are available, they will move the the loop above.
