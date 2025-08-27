@@ -10,6 +10,7 @@ public sealed class BuildContentPipelineTask : FrostingTask<BuildContext>
         var builderPath = context.GetProjectPath(ProjectType.ContentPipeline);
         context.DotNetPackSettings.MSBuildSettings.WithProperty("DisableMonoGameToolAssets", "True");
         context.DotNetPack(builderPath, context.DotNetPackSettings);
+        context.PublishToolsBinaries(builderPath);
         context.DotNetPackSettings.MSBuildSettings.Properties.Remove("DisableMonoGameToolAssets");
 
         switch (context.Environment.Platform.Family)

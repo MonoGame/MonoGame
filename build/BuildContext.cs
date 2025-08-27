@@ -31,6 +31,7 @@ public class BuildContext : FrostingContext
         var buildConfiguration = context.Argument("build-configuration", "Release");
         BuildOutput = context.Argument("build-output", "Artifacts");
         NuGetsDirectory = $"{BuildOutput}/NuGet/";
+        BinariesDirectory = $"{BuildOutput}/Binaries/";
 
         Version = CalculateVersion(context);
 
@@ -94,6 +95,14 @@ public class BuildContext : FrostingContext
             Configuration = "Release"
         };
 
+        DotNetBinariesPublishSettings = new DotNetPublishSettings
+        {
+            MSBuildSettings = DotNetMSBuildSettings,
+            Verbosity = DotNetVerbosity.Diagnostic,
+            Configuration = buildConfiguration,
+            OutputDirectory = BinariesDirectory
+        };
+
         Console.WriteLine($"Version: {Version}");
         Console.WriteLine($"RepositoryUrl: {repositoryUrl}");
         Console.WriteLine($"BuildConfiguration: {buildConfiguration}");
@@ -120,6 +129,8 @@ public class BuildContext : FrostingContext
 
     public string NuGetsDirectory { get; }
 
+    public string BinariesDirectory { get; }
+
     public DotNetMSBuildSettings DotNetMSBuildSettings { get; }
 
     public DotNetBuildSettings DotNetBuildSettings { get; }
@@ -129,6 +140,8 @@ public class BuildContext : FrostingContext
     public DotNetPublishSettings DotNetPublishSettings { get; }
 
     public DotNetPublishSettings DotNetPublishSettingsForMac { get; }
+
+    public DotNetPublishSettings DotNetBinariesPublishSettings { get; }
 
     public DotNetRunSettings DotNetRunSettings { get; }
 
@@ -263,5 +276,27 @@ public class BuildContext : FrostingContext
         {
             return context.Argument("build-version", VersionBase + ".1-develop");
         }
+    }
+}
+
+public static class BuildContextExtensions
+{
+    public static void PublishBinaries(this BuildContext context, string platformName)
+    {
+        context.Information($"Packaging Binaries {platformName}...");
+        context.DotNetBinariesPublishSettings.OutputDirectory = $"{context.BinariesDirectory}/{platformName}/";
+        context.DotNetPublish(context.GetProjectPath(ProjectType.Framework, platformName), context.DotNetBinariesPublishSettings);
+    }
+
+    public static void PublishToolsBinaries(this BuildContext context, string inputPath)
+    {
+        context.Information($"Packaging Tools Binaries {inputPath}...");
+        context.DotNetBinariesPublishSettings.OutputDirectory = $"{context.BinariesDirectory}/MonoGame.Framework.Content.Pipeline/";
+        context.DotNetPublish(inputPath, context.DotNetBinariesPublishSettings);
+    }
+
+    public static void DeleteDirectory(this BuildContext context, DirectoryPath fullPath)
+    {
+        context.DeleteDirectory(fullPath, new DeleteDirectorySettings { Recursive = true, Force = true });
     }
 }
