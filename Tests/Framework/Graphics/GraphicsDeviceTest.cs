@@ -338,7 +338,6 @@ namespace MonoGame.Tests.Graphics
         }
 #endif
 
-#if XNA
         [Test]
         [RunOnUI]
         public void DrawInstancedPrimitivesParameterValidation()
@@ -468,7 +467,6 @@ namespace MonoGame.Tests.Graphics
             instanceVertexBuffer.Dispose();
             indexBuffer.Dispose();
         }
-#endif
 
         [Test]
         [RunOnUI]
