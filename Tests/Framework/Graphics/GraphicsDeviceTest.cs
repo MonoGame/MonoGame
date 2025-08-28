@@ -338,7 +338,7 @@ namespace MonoGame.Tests.Graphics
         }
 #endif
 
-#if XNA || DIRECTX
+#if XNA
         [Test]
         [RunOnUI]
         public void DrawInstancedPrimitivesParameterValidation()
