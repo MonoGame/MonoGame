@@ -26,6 +26,29 @@ public class SpriteFontContentWriter : ContentTypeWriter<SpriteFontContent>
         {
             output.Write(true);
             output.Write((char)value.DefaultCharacter);
+
+            output.WriteObject(value.Texture);
+            output.WriteObject(value.Glyphs);
+            output.WriteObject(value.Cropping);
+            output.WriteObject(value.CharacterMap);
+            output.Write(value.VerticalLineSpacing);
+            output.Write(value.HorizontalSpacing);
+            output.WriteObject(value.Kerning);
+            var hasDefChar = value.DefaultCharacter.HasValue;
+            output.Write(hasDefChar);
+            if (hasDefChar)
+                output.Write(value.DefaultCharacter.Value);
+
+            // Distance field extension block.
+            // Write a flag so reader can detect presence.
+            bool hasDF = value.DistanceFieldType != 0;
+            output.Write(hasDF);
+            if (hasDF)
+            {
+                output.Write((byte)1);
+                output.Write(value.DistanceFieldSpread);
+                output.Write(value.DistanceFieldEmSize);
+            }
         }
         else
         {
