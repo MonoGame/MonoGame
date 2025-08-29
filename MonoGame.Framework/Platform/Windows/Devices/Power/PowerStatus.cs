@@ -1,38 +1,31 @@
 using System.Windows.Forms;
+using MonoGame.Framework.Devices.Power;
 
 public partial class PowerStatus
 {
-    private string PlatformBatteryChargeStatus()
+    private BatteryChargeStatus PlatformBatteryChargeStatus()
     {
-        switch (SystemInformation.PowerStatus.BatteryChargeStatus)
+        return SystemInformation.PowerStatus.BatteryChargeStatus switch
         {
-            case BatteryChargeStatus.Charging:
-                return "Charging";
-            case BatteryChargeStatus.NoSystemBattery:
-                return "NoSystemBattery";
-            case BatteryChargeStatus.NotCharging:
-                return "NotCharging";
-            case BatteryChargeStatus.Unknown:
-                return "Unknown";
-            case BatteryChargeStatus.High:
-            case BatteryChargeStatus.Low:
-            case BatteryChargeStatus.Critical:
-            default:
-                return "Discharging";
-        }
+            BatteryChargeStatus.Charging => BatteryChargeStatus.Charging,
+            BatteryChargeStatus.NoSystemBattery => BatteryChargeStatus.NoBattery,
+            BatteryChargeStatus.NotCharging => BatteryChargeStatus.OnBattery,
+            BatteryChargeStatus.Unknown => BatteryChargeStatus.Unknown,
+            BatteryChargeStatus.High => BatteryChargeStatus.OnBattery,
+            BatteryChargeStatus.Low => BatteryChargeStatus.OnBattery,
+            BatteryChargeStatus.Critical => BatteryChargeStatus.OnBattery,
+            _ => BatteryChargeStatus.Unknown
+        };
     }
 
-    private string PlatformPowerLineStatus()
+    private PowerLineStatus PlatformPowerLineStatus()
     {
-        switch (SystemInformation.PowerStatus.PowerLineStatus)
+        return SystemInformation.PowerStatus.PowerLineStatus switch
         {
-            case PowerLineStatus.Offline:
-                return "Unplugged";
-            case PowerLineStatus.Online:
-                return "Plugged";
-            default:
-                return "Unknown";
-        }
+            PowerLineStatus.Offline => PowerLineStatus.Offline,
+            PowerLineStatus.Online => PowerLineStatus.Online,
+            _ => PowerLineStatus.Unknown
+        };
     }
 
     private int PlatformBatteryLifePercent()
