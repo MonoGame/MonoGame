@@ -1,4 +1,5 @@
 using UIKit;
+using MonoGame.Framework.Devices.Power;
 
 public partial class PowerStatus
 {
@@ -7,33 +8,29 @@ public partial class PowerStatus
         UIDevice.CurrentDevice.BatteryMonitoringEnabled = true;
     }
 
-    private string PlatformBatteryChargeStatus()
+    private BatteryChargeStatus PlatformBatteryChargeStatus()
     {
-        switch (UIDevice.CurrentDevice.BatteryState)
+        return UIDevice.CurrentDevice.BatteryState switch
         {
-            case UIDeviceBatteryState.Charging:
-                return "Charging";
-            case UIDeviceBatteryState.Full:
-                return "Full";
-            case UIDeviceBatteryState.Unplugged:
-                return "Unplugged";
-            case UIDeviceBatteryState.Unknown:
-            default:
-                return "Unknown";
-        }
+            UIDeviceBatteryState.Charging => BatteryChargeStatus.Charging,
+            UIDeviceBatteryState.Full => BatteryChargeStatus.Full,
+            UIDeviceBatteryState.Unplugged => BatteryChargeStatus.OnBattery,
+            UIDeviceBatteryState.Unknown => BatteryChargeStatus.Unknown,
+            _ => BatteryChargeStatus.Unknown
+        };
     }
 
-    private string PlatformPowerLineStatus()
+    private PowerLineStatus PlatformPowerLineStatus()
     {
         var state = UIDevice.CurrentDevice.BatteryState;
 
-        if (state == UIDeviceBatteryState.Charging || state == UIDeviceBatteryState.Full)
-            return "Plugged";
-
-        if (state == UIDeviceBatteryState.Unplugged)
-            return "Unplugged";
-
-        return "Unknown";
+        return state switch
+        {
+            UIDeviceBatteryState.Charging => PowerLineStatus.Online,
+            UIDeviceBatteryState.Full => PowerLineStatus.Online,
+            UIDeviceBatteryState.Unplugged => PowerLineStatus.Offline,
+            _ => PowerLineStatus.Unknown
+        };
     }
 
     private int PlatformBatteryLifePercent()
