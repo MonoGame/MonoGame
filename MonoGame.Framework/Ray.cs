@@ -4,6 +4,7 @@
 
 using System;
 using System.Diagnostics;
+using System.Globalization;
 using System.Runtime.Serialization;
 
 namespace Microsoft.Xna.Framework
@@ -346,7 +347,17 @@ namespace Microsoft.Xna.Framework
         /// <returns>A <see cref="String"/> representation of this <see cref="Ray"/>.</returns>
         public override string ToString()
         {
-            return "{{Position:" + Position.ToString() + " Direction:" + Direction.ToString() + "}}";
+            return "{{Position:" + Position.ToString(CultureInfo.CurrentCulture) + " Direction:" + Direction.ToString(CultureInfo.CurrentCulture) + "}}";
+        }
+
+        /// <summary>
+        /// Serializes the <see cref="Ray"/> to a string using the specified format provider.
+        /// </summary>
+        /// <param name="formatProvider">Format provider to utilise</param>
+        /// <returns>String representation of this <see cref="Ray"/></returns>
+        public string ToString(IFormatProvider formatProvider)
+        {
+            return "{{Position:" + Position.ToString(formatProvider) + " Direction:" + Direction.ToString(formatProvider) + "}}";
         }
 
         /// <summary>

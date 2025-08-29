@@ -989,6 +989,17 @@ namespace Microsoft.Xna.Framework
         }
 
         /// <summary>
+        /// Returns a <see cref="String"/> representation of this <see cref="Vector2"/> in the format:
+        /// {X:[<see cref="X"/>] Y:[<see cref="Y"/>]}
+        /// </summary>
+        /// <param name="formatProvider">Format provider for <see cref="X"/> and <see cref="Y"/></param>
+        /// <returns>A <see cref="String"/> representation of this <see cref="Vector2"/>.</returns>
+        public string ToString(IFormatProvider formatProvider)
+        {
+            return "{X:" + X.ToString(formatProvider) + " Y:" + Y.ToString(formatProvider) + "}";
+        }
+
+        /// <summary>
         /// Gets a <see cref="Point"/> representation for this object.
         /// </summary>
         /// <returns>A <see cref="Point"/> representation for this object.</returns>

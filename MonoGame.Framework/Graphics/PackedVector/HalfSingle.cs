@@ -91,7 +91,7 @@ namespace Microsoft.Xna.Framework.Graphics.PackedVector
         /// <returns>String representation of <see langword="this" />.</returns>
         public string ToString(IFormatProvider provider)
         {
-            return packedValue.ToString(provider);
+            return this.ToSingle().ToString(provider);
         }
 
         /// <inheritdoc />

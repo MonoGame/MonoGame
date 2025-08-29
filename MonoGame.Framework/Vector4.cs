@@ -1248,6 +1248,17 @@ namespace Microsoft.Xna.Framework
         }
 
         /// <summary>
+        /// Returns a <see cref="String"/> representation of this <see cref="Vector4"/> in the format:
+        /// {X:[<see cref="X"/>] Y:[<see cref="Y"/>] Z:[<see cref="Z"/>] W:[<see cref="W"/>]}
+        /// </summary>
+        /// <param name="formatProvider">Format provider for <see cref="X"/>, <see cref="Y"/>, <see cref="Z"/> and <see cref="W"/>.</param>
+        /// <returns>A <see cref="String"/> representation of this <see cref="Vector4"/>.</returns>
+        public string ToString(IFormatProvider formatProvider)
+        {
+            return "{X:" + X.ToString(formatProvider) + " Y:" + Y.ToString(formatProvider) + " Z:" + Z.ToString(formatProvider) + " W:" + W.ToString(formatProvider) + "}";
+        }
+
+        /// <summary>
         /// Deconstruction method for <see cref="Vector4"/>.
         /// </summary>
         /// <param name="x"></param>

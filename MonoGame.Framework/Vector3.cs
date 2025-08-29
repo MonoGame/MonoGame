@@ -1033,6 +1033,25 @@ namespace Microsoft.Xna.Framework
             return sb.ToString();
         }
 
+        /// <summary>
+        /// Returns a <see cref="String"/> representation of this <see cref="Vector3"/> in the format:
+        /// {X:[<see cref="X"/>] Y:[<see cref="Y"/>] Z:[<see cref="Z"/>]}
+        /// </summary>
+        /// <param name="formatProvider">Provider to format the string with</param>
+        /// <returns>A <see cref="String"/> representation of this <see cref="Vector3"/>.</returns>
+        public string ToString(IFormatProvider formatProvider)
+        {
+            StringBuilder sb = new StringBuilder(32);
+            sb.Append("{X:");
+            sb.Append(this.X.ToString(formatProvider));
+            sb.Append(" Y:");
+            sb.Append(this.Y.ToString(formatProvider));
+            sb.Append(" Z:");
+            sb.Append(this.Z.ToString(formatProvider));
+            sb.Append('}');
+            return sb.ToString();
+        }
+
         #region Transform
 
         /// <summary>

@@ -4,6 +4,7 @@
 
 using System;
 using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
 
 namespace Microsoft.Xna.Framework.Graphics.PackedVector
 {
@@ -85,8 +86,19 @@ namespace Microsoft.Xna.Framework.Graphics.PackedVector
         /// <inheritdoc />
 		public override string ToString()
 		{
-			return ToVector4().ToString();
+			return ToVector4().ToString(CultureInfo.CurrentCulture);
 		}
+
+
+        /// <summary>
+        /// Returns a string representation of the packed vector using the specified format provider.
+        /// </summary>
+        /// <param name="formatProvider">Format provider to utilise</param>
+        /// <returns>String representation of this <see cref="HalfVector2"/></returns>
+        public string ToString(IFormatProvider formatProvider)
+        {
+            return ToVector4().ToString(formatProvider);
+        }
 
         /// <inheritdoc />
 		public override int GetHashCode()
