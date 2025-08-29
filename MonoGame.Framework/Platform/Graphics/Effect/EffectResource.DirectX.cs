@@ -12,5 +12,6 @@ namespace Microsoft.Xna.Framework.Graphics
         const string EnvironmentMapEffectName = "Microsoft.Xna.Framework.Platform.Graphics.Effect.Resources.EnvironmentMapEffect.dx11.mgfxo";
         const string SkinnedEffectName = "Microsoft.Xna.Framework.Platform.Graphics.Effect.Resources.SkinnedEffect.dx11.mgfxo";
         const string SpriteEffectName = "Microsoft.Xna.Framework.Platform.Graphics.Effect.Resources.SpriteEffect.dx11.mgfxo";
+        const string DistanceFieldSpriteEffectName = "Microsoft.Xna.Framework.Platform.Graphics.Effect.Resources.DistanceFieldSpriteEffect.dx11.mgfxo";
     }
 }
