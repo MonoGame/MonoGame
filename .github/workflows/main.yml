@@ -359,12 +359,12 @@ jobs:
         working-directory: tests-desktopgl
 
       # This test hangs on MacOS?
-      # - name: Run Graphics.GraphicsDeviceTest Tests
-      #   if: runner.environment != 'github-hosted'
-      #   run: dotnet MonoGame.Tests.dll --timeout=300000 --test MonoGame.Tests.Graphics.GraphicsDeviceTest
-      #   env:
-      #     CI: true
-      #   working-directory: tests-desktopgl
+      - name: Run Graphics.GraphicsDeviceTest Tests
+        if: runner.environment != 'github-hosted'
+        run: dotnet MonoGame.Tests.dll --timeout=300000 --test MonoGame.Tests.Graphics.GraphicsDeviceTest
+        env:
+          CI: true
+        working-directory: tests-desktopgl
 
       - name: Run Graphics.IndexBufferTest Tests
         if: runner.environment != 'github-hosted'
