@@ -101,6 +101,7 @@ namespace MonoGame.Tests.ContentPipeline
         [Test]
         [TestCase("Assets/Effects/Stock/AlphaTestEffect.fx")]
         [TestCase("Assets/Effects/Stock/BasicEffect.fx")]
+        [TestCase("Assets/Effects/Stock/DistanceFieldSpriteEffect.fx")]
         [TestCase("Assets/Effects/Stock/DualTextureEffect.fx")]
         [TestCase("Assets/Effects/Stock/EnvironmentMapEffect.fx")]
         [TestCase("Assets/Effects/Stock/SkinnedEffect.fx")]

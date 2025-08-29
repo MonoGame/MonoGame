@@ -148,10 +148,12 @@ namespace Microsoft.Xna.Framework.Graphics
         /// overflow the 16 bit array indices for vertices.
         /// </summary>
         /// <param name="sortMode">The type of depth sorting desired for the rendering.</param>
-        /// <param name="effect">The custom effect to apply to the drawn geometry</param>
-        public unsafe void DrawBatch(SpriteSortMode sortMode, Effect effect)
+        /// <param name="customEffect">Optional custom effect passed by user via SpriteBatch.Begin. If non-null it overrides variant selection.</param>
+        /// <param name="defaultSpriteEffect">The standard SpriteEffect used for non-distance-field glyphs.</param>
+        /// <param name="distanceFieldEffect">The distance field sprite effect used when a SpriteFont has distance field metadata.</param>
+		public unsafe void DrawBatch(SpriteSortMode sortMode, Effect customEffect, Effect defaultSpriteEffect, Effect distanceFieldEffect)
 		{
-            if (effect != null && effect.IsDisposed)
+            if (customEffect != null && customEffect.IsDisposed)
                 throw new ObjectDisposedException("effect");
 
 			// nothing to do
@@ -179,53 +181,78 @@ namespace Microsoft.Xna.Framework.Graphics
             }
 
             // Iterate through the batches, doing short.MaxValue sets of vertices only.
-            while(batchCount > 0)
+            while (batchCount > 0)
             {
-                // setup the vertexArray array
                 var startIndex = 0;
                 var index = 0;
                 Texture2D tex = null;
+                int currentVariant = -1;
+                float currentVariantDFSpread = 0f;
+                float currentVariantDFOutlineThickness = 0f;
+                Vector4 currentVariantDFOutlineColor = Vector4.Zero;
 
                 int numBatchesToProcess = batchCount;
                 if (numBatchesToProcess > MaxBatchSize)
-                {
                     numBatchesToProcess = MaxBatchSize;
+
+                Effect GetEffectForVariant(int variant)
+                {
+                    if (customEffect != null)
+                        return customEffect;
+                    return variant == 1 ? distanceFieldEffect : defaultSpriteEffect;
                 }
-                // Avoid the array checking overhead by using pointer indexing!
+
                 fixed (VertexPositionColorTexture* vertexArrayFixedPtr = _vertexArray)
                 {
                     var vertexArrayPtr = vertexArrayFixedPtr;
-
-                    // Draw the batches
                     for (int i = 0; i < numBatchesToProcess; i++, batchIndex++, index += 4, vertexArrayPtr += 4)
                     {
-                        SpriteBatchItem item = _batchItemList[batchIndex];
-                        // if the texture changed, we need to flush and bind the new texture
-                        var shouldFlush = !ReferenceEquals(item.Texture, tex);
-                        if (shouldFlush)
+                        var item = _batchItemList[batchIndex];
+                        bool groupMismatch = false;
+                        if (currentVariant == -1)
                         {
-                            FlushVertexArray(startIndex, index, effect, tex);
-
                             tex = item.Texture;
+                            currentVariant = item.ShaderVariant;
+                            currentVariantDFSpread = item.DFSpread;
+                            currentVariantDFOutlineThickness = item.DFOutlineThickness;
+                            currentVariantDFOutlineColor = item.DFOutlineColor;
+                            _device.Textures[0] = tex;
+                        }
+                        else
+                        {
+                            groupMismatch = !ReferenceEquals(item.Texture, tex) || item.ShaderVariant != currentVariant ||
+                                (item.ShaderVariant == 1 && (item.DFSpread != currentVariantDFSpread ||
+                                    item.DFOutlineThickness != currentVariantDFOutlineThickness || item.DFOutlineColor != currentVariantDFOutlineColor));
+                        }
+
+                        if (groupMismatch)
+                        {
+                            var effectToUse = GetEffectForVariant(currentVariant);
+                            FlushVertexArray(startIndex, index, effectToUse, tex, currentVariant, currentVariantDFSpread, currentVariantDFOutlineThickness, currentVariantDFOutlineColor);
                             startIndex = index = 0;
                             vertexArrayPtr = vertexArrayFixedPtr;
+                            tex = item.Texture;
+                            currentVariant = item.ShaderVariant;
+                            currentVariantDFSpread = item.DFSpread;
+                            currentVariantDFOutlineThickness = item.DFOutlineThickness;
+                            currentVariantDFOutlineColor = item.DFOutlineColor;
                             _device.Textures[0] = tex;
                         }
 
-                        // store the SpriteBatchItem data in our vertexArray
-                        *(vertexArrayPtr+0) = item.vertexTL;
-                        *(vertexArrayPtr+1) = item.vertexTR;
-                        *(vertexArrayPtr+2) = item.vertexBL;
-                        *(vertexArrayPtr+3) = item.vertexBR;
-
-                        // Release the texture.
+                        *(vertexArrayPtr + 0) = item.vertexTL;
+                        *(vertexArrayPtr + 1) = item.vertexTR;
+                        *(vertexArrayPtr + 2) = item.vertexBL;
+                        *(vertexArrayPtr + 3) = item.vertexBR;
                         item.Texture = null;
                     }
+
+                    if (currentVariant != -1)
+                    {
+                        var finalEffect = GetEffectForVariant(currentVariant);
+                        FlushVertexArray(startIndex, index, finalEffect, tex, currentVariant, currentVariantDFSpread, currentVariantDFOutlineThickness, currentVariantDFOutlineColor);
+                    }
                 }
-                // flush the remaining vertexArray data
-                FlushVertexArray(startIndex, index, effect, tex);
-                // Update our batch count to continue the process of culling down
-                // large batches
+
                 batchCount -= numBatchesToProcess;
             }
             // return items to the pool.  
@@ -239,7 +266,11 @@ namespace Microsoft.Xna.Framework.Graphics
         /// <param name="end">End index of vertices to draw. Not used except to compute the count of vertices to draw.</param>
         /// <param name="effect">The custom effect to apply to the geometry</param>
         /// <param name="texture">The texture to draw.</param>
-        private void FlushVertexArray(int start, int end, Effect effect, Texture texture)
+    /// <param name="shaderVariant">0 for normal sprites/glyphs, 1 for distance field glyphs.</param>
+    /// <param name="dfSpread">Distance field spread (in texels) used to normalize smoothing width.</param>
+    /// <param name="dfOutlineThickness">Outline thickness in normalised distance units (0 = no outline).</param>
+    /// <param name="dfOutlineColor">Outline colour as a Vector4 (RGBA).</param>
+        private void FlushVertexArray(int start, int end, Effect effect, Texture texture, int shaderVariant, float dfSpread, float dfOutlineThickness, Vector4 dfOutlineColor)
         {
             if (start == end)
                 return;
@@ -249,15 +280,19 @@ namespace Microsoft.Xna.Framework.Graphics
             // If the effect is not null, then apply each pass and render the geometry
             if (effect != null)
             {
+                if (effect is DistanceFieldSpriteEffect dfs && shaderVariant == 1)
+                {
+                    dfs.ApplyDistanceFieldSettings(dfSpread);
+                    if (dfOutlineThickness > 0f)
+                        dfs.SetOutline(dfOutlineThickness, dfOutlineColor);
+                    else
+                        dfs.ClearOutline();
+                }
                 var passes = effect.CurrentTechnique.Passes;
                 foreach (var pass in passes)
                 {
                     pass.Apply();
-
-                    // Whatever happens in pass.Apply, make sure the texture being drawn
-                    // ends up in Textures[0].
                     _device.Textures[0] = texture;
-
                     _device.DrawUserIndexedPrimitives(
                         PrimitiveType.TriangleList,
                         _vertexArray,
@@ -271,7 +306,6 @@ namespace Microsoft.Xna.Framework.Graphics
             }
             else
             {
-                // If no custom effect is defined, then simply render.
                 _device.DrawUserIndexedPrimitives(
                     PrimitiveType.TriangleList,
                     _vertexArray,

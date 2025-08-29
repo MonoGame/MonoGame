@@ -10,6 +10,12 @@ namespace Microsoft.Xna.Framework.Graphics
 	{
 		public Texture2D Texture;
         public float SortKey;
+    // Internal shader variant index (0 = default sprite, 1 = distance field)
+    public int ShaderVariant;
+        // Distance field parameters (valid when ShaderVariant==1)
+        public float DFSpread;
+        public float DFOutlineThickness;
+        public Vector4 DFOutlineColor;
 
         public VertexPositionColorTexture vertexTL;
 		public VertexPositionColorTexture vertexTR;
@@ -28,6 +34,7 @@ namespace Microsoft.Xna.Framework.Graphics
             // TODO, Should we be just assigning the Depth Value to Z?
             // According to http://blogs.msdn.com/b/shawnhar/archive/2011/01/12/spritebatch-billboards-in-a-3d-world.aspx
             // We do.
+            // NOTE: ShaderVariant is assigned outside before calling Set.
 			vertexTL.Position.X = x+dx*cos-dy*sin;
             vertexTL.Position.Y = y+dx*sin+dy*cos;
             vertexTL.Position.Z = depth;

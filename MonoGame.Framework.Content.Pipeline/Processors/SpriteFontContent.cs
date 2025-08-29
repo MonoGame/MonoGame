@@ -47,5 +47,10 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 
         public Nullable<char> DefaultCharacter;
 
+    // Distance field metadata (internal use). Defaults keep classic bitmap behavior.
+    public byte DistanceFieldType = 0; // 0=None,1=SDF
+    public float DistanceFieldSpread = 0f; // in texels
+    public float DistanceFieldEmSize = 0f; // design size baseline
+
     }
 }

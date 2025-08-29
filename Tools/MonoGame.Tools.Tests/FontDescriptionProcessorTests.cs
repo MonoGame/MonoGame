@@ -163,6 +163,44 @@ namespace MonoGame.Tests.ContentPipeline
             }
         }
 
+        [Test]
+        public void BuildFontWithDistanceField()
+        {
+            FontDescription fontDescription = null;
+            using (var input = XmlReader.Create(new StringReader(ArialFont)))
+                fontDescription = IntermediateSerializer.Deserialize<FontDescription>(input, "");
+            fontDescription.Identity = new ContentIdentity("Arial.spritefont");
+
+            var processor = new FontDescriptionProcessor
+            {
+                GenerateDistanceField = true,
+                DistanceFieldSpread = 8f
+            };
+            var context = new TestProcessorContext(TargetPlatform.DesktopGL, "Arial.xnb");
+            var result = processor.Process(fontDescription, context);
+
+            Assert.AreEqual(1, result.DistanceFieldType,
+                "DistanceFieldType should be 1 (SDF)");
+            Assert.AreEqual(8f, result.DistanceFieldSpread,
+                "DistanceFieldSpread should match requested spread");
+            Assert.AreEqual(20f, result.DistanceFieldEmSize,
+                "DistanceFieldEmSize should match font size");
+
+            Assert.IsInstanceOf<PixelBitmapContent<Color>>(result.Texture.Faces[0][0],
+                "Atlas should be PixelBitmapContent<Color>");
+
+            var bitmap = (PixelBitmapContent<Color>)result.Texture.Faces[0][0];
+            bool hasGradient = false;
+            for (int y = 0; y < bitmap.Height && !hasGradient; y++)
+                for (int x = 0; x < bitmap.Width && !hasGradient; x++)
+                {
+                    var r = bitmap.GetPixel(x, y).R;
+                    if (r > 0 && r < 255)
+                        hasGradient = true;
+                }
+            Assert.IsTrue(hasGradient, "Atlas should contain gradient distance values");
+        }
+
         static string ArialFont = @"<?xml version=""1.0"" encoding=""utf-8""?>
 <XnaContent xmlns:Graphics=""Microsoft.Xna.Framework.Content.Pipeline.Graphics"">
   <Asset Type=""Graphics:FontDescription"">

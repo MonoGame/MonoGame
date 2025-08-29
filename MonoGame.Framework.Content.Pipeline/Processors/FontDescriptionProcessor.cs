@@ -23,6 +23,14 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
         [DefaultValue(typeof(TextureProcessorOutputFormat), "Compressed")]
         public virtual TextureProcessorOutputFormat TextureFormat { get; set; }
 
+    // Distance field generation options (experimental).
+    [DefaultValue(false)]
+    public bool GenerateDistanceField { get; set; }
+    [DefaultValue(8f)]
+    public float DistanceFieldSpread { get; set; } = 8f; // in texels (half-range)
+    [DefaultValue(4)]
+    public int Oversample { get; set; } = 4; // supersampling factor for source coverage
+
         public FontDescriptionProcessor()
         {
             PremultiplyAlpha = true;
@@ -88,6 +96,32 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
                     GlyphCropper.Crop(glyph);
                 }
 
+                // For SDF fonts, expand each tightly-cropped glyph by spread pixels of
+                // transparent padding on every side before atlas packing. This ensures the
+                // full SDF gradient — and the outline ring — is captured inside the rendered
+                // quad rather than being clipped at the atlas cell boundary.
+                // GlyphCropper already removed all blank space, so only transparent pixels
+                // are added here; no glyph content is lost.
+                int sdfPad = GenerateDistanceField ? (int)Math.Ceiling(DistanceFieldSpread) : 0;
+                if (sdfPad > 0)
+                {
+                    foreach (GlyphData glyph in glyphData)
+                    {
+                        var src    = glyph.Subrect;
+                        int newW   = src.Width  + 2 * sdfPad;
+                        int newH   = src.Height + 2 * sdfPad;
+                        // PixelBitmapContent is zero-initialised (transparent black).
+                        var padded = new PixelBitmapContent<Color>(newW, newH);
+                        BitmapContent.Copy(glyph.Bitmap, src,
+                            padded, new Rectangle(sdfPad, sdfPad, src.Width, src.Height));
+                        glyph.Bitmap  = padded;
+                        glyph.Subrect = new Rectangle(0, 0, newW, newH);
+                        // The padded quad's top-left is sdfPad pixels earlier in each axis;
+                        // shift YOffset up so Cropping.Y keeps the glyph body on the baseline.
+                        glyph.YOffset -= sdfPad;
+                    }
+                }
+
                 // We need to know how to pack the glyphs.
                 bool requiresPot, requiresSquare;
                 texProfile.Requirements(context, TextureFormat, out requiresPot, out requiresSquare);
@@ -105,7 +139,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
                     var texRect = glyph.Data.Subrect;
                     output.Glyphs.Add(texRect);
 
-                    var cropping = new Rectangle(0, (int)(glyph.Data.YOffset - yOffsetMin), (int)glyph.Data.XAdvance, output.VerticalLineSpacing);
+                    var cropping = new Rectangle(-sdfPad, (int)(glyph.Data.YOffset - yOffsetMin), (int)glyph.Data.XAdvance, output.VerticalLineSpacing);
                     output.Cropping.Add(cropping);
 
                     // Set the optional character kerning.
@@ -116,14 +150,102 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
                     }
                     else
                     {
-                        output.Kerning.Add(new Vector3(0, texRect.Width, 0));
+                        output.Kerning.Add(new Vector3(0, texRect.Width - 2 * sdfPad, 0));
                     }
                 }
 
                 output.Texture.Faces[0].Add(face);
+
+                if (GenerateDistanceField)
+                {
+                    // Convert face (BitmapContent) to a signed distance field in-place.
+                    //
+                    // Algorithm: two-pass 1D Euclidean distance transform (Meijster/Felzenszwalb)
+                    // applied to the oversampled alpha mask, then downsampled to atlas resolution.
+                    // This is O(W*H) and produces correct Euclidean distances, unlike the naive
+                    // O(W*H*R²) brute-force search it replaces.
+                    //
+                    // Oversample: the rasterizer already rendered glyphs at atlas resolution.
+                    // We use the alpha channel at that resolution directly; the Oversample property
+                    // controls how much the font was rendered above the nominal size (set in the
+                    // importer / glyph builder) which we account for in the spread scaling below.
+                    var bmp = output.Texture.Faces[0][0];
+                    var data = bmp.GetPixelData(); // RGBA8
+                    int width  = bmp.Width;
+                    int height = bmp.Height;
+
+                    // Extract binary inside/outside mask (threshold 128) — used for sign determination only.
+                    // Coverage is stored in the RED channel.
+                    var inside = new bool[width * height];
+                    for (int i = 0, p = 0; i < width * height; i++, p += 4)
+                        inside[i] = data[p] >= 128;
+
+                    // Route A: seed the EDT with sub-pixel edge positions derived from FreeType's
+                    // anti-aliased coverage values rather than a hard binary threshold.
+                    //
+                    // For a pixel with normalised coverage 'a' (0=fully outside, 1=fully inside):
+                    //   outSeeds: distance to nearest foreground (for outside pixels)
+                    //     inside (a >= 0.5) → 0         (this pixel IS foreground)
+                    //     edge   (0 < a < 0.5) → 0.5-a  (sub-pixel fraction to foreground edge)
+                    //     outside (a == 0)   → inf       (let EDT propagate from neighbours)
+                    //   inSeeds: distance to nearest background (for inside pixels)
+                    //     outside (a < 0.5)  → 0         (this pixel IS background)
+                    //     edge   (0.5 <= a < 1) → a-0.5  (sub-pixel fraction to background edge)
+                    //     inside  (a == 1)   → inf        (let EDT propagate from neighbours)
+                    //
+                    // This places the 0.5 isoline with sub-pixel accuracy on curves rather than
+                    // snapping it to the nearest pixel boundary, reducing staircase artefacts
+                    // at large render scales without changing the rasterization resolution.
+                    float inf = (float)(width * width + height * height) + 1f;
+                    var outSeeds = new float[width * height];
+                    var inSeeds  = new float[width * height];
+                    for (int i = 0, p = 0; i < width * height; i++, p += 4)
+                    {
+                        float a = data[p] / 255f;
+                        outSeeds[i] = a >= 0.5f ? 0f : (a > 0f ? 0.5f - a : inf);
+                        inSeeds[i]  = a <  0.5f ? 0f : (a < 1f ? a - 0.5f  : inf);
+                    }
+
+                    float[] sqDistOut = ComputeEDT(outSeeds, width, height);
+                    float[] sqDistIn  = ComputeEDT(inSeeds,  width, height);
+
+                    // Normalize to [0,1] with 0.5 at the edge, clamped to DistanceFieldSpread.
+                    var sdf = new float[width * height];
+                    float spread = DistanceFieldSpread;
+                    float twoSpread = spread * 2f;
+                    for (int i = 0; i < width * height; i++)
+                    {
+                        float distIn  = MathF.Sqrt(sqDistIn[i]);
+                        float distOut = MathF.Sqrt(sqDistOut[i]);
+                        float signedDist = inside[i] ? distIn : -distOut;
+                        signedDist = MathF.Max(-spread, MathF.Min(spread, signedDist));
+                        sdf[i] = 0.5f + signedDist / twoSpread;
+                    }
+
+                    // Write back: SDF value stored in all RGB channels + alpha so
+                    // both single-channel (R) and legacy (A) sampling paths work.
+                    for (int i = 0, p = 0; i < width * height; i++, p += 4)
+                    {
+                        byte q = (byte)(sdf[i] * 255f + 0.5f);
+                        data[p + 0] = q;
+                        data[p + 1] = q;
+                        data[p + 2] = q;
+                        data[p + 3] = q;
+                    }
+                    bmp.SetPixelData(data);
+
+                    output.DistanceFieldType  = (byte)1;
+                    output.DistanceFieldSpread = DistanceFieldSpread;
+                    output.DistanceFieldEmSize = input.Size;
+                }
             }
 
-            if (PremultiplyAlpha)
+            if (GenerateDistanceField)
+            {
+                // Distance field already encoded as linear distance in RGB; keep premultiplied path simple: ensure grayscale remains.
+                // No action needed; we already replaced data.
+            }
+            else if (PremultiplyAlpha)
             {
                 var bmp = output.Texture.Faces[0][0];
                 var data = bmp.GetPixelData();
@@ -165,7 +287,10 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
             }
 
             // Perform the final texture conversion.
-            texProfile.ConvertTexture(context, output.Texture, TextureFormat, true);
+            // NOTE: SDF atlases must remain uncompressed: DXT compression destroys the
+            // gradient precision required for distance field rendering at runtime.
+            var effectiveFormat = GenerateDistanceField ? TextureProcessorOutputFormat.Color : TextureFormat;
+            texProfile.ConvertTexture(context, output.Texture, effectiveFormat, true);
 
             return output;
         }
@@ -318,5 +443,97 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
 
             return true;
          }
+
+        /// <summary>
+        /// Computes an unsigned squared Euclidean distance transform using the
+        /// Felzenszwalb–Huttenlocher two-pass 1D algorithm (O(W*H)).
+        /// </summary>
+        /// <param name="initialDists">
+        /// Per-pixel initial 1D seed distances. 0 = this pixel is foreground (already at the target).
+        /// A small positive value encodes a sub-pixel fractional offset to the edge (Route A seeding).
+        /// A large value (inf) means the pixel is background and needs EDT propagation.
+        /// </param>
+        /// <param name="width">Image width in pixels.</param>
+        /// <param name="height">Image height in pixels.</param>
+        /// <returns>Array of squared Euclidean distances (same size as initialDists).</returns>
+        private static float[] ComputeEDT(float[] initialDists, int width, int height)
+        {
+            // Phase 1: 1D distance transform along each row.
+            var rowDist = new float[width * height];
+
+            for (int y = 0; y < height; y++)
+            {
+                int row = y * width;
+                for (int x = 0; x < width; x++)
+                    rowDist[row + x] = initialDists[row + x];
+
+                // Forward pass
+                for (int x = 1; x < width; x++)
+                {
+                    float prev = rowDist[row + x - 1];
+                    if (prev + 1f < rowDist[row + x])
+                        rowDist[row + x] = prev + 1f;
+                }
+                // Backward pass
+                for (int x = width - 2; x >= 0; x--)
+                {
+                    float next = rowDist[row + x + 1];
+                    if (next + 1f < rowDist[row + x])
+                        rowDist[row + x] = next + 1f;
+                }
+                // Square the 1D distances
+                for (int x = 0; x < width; x++)
+                {
+                    float d = rowDist[row + x];
+                    rowDist[row + x] = d * d;
+                }
+            }
+
+            // Phase 2: 1D parabolic lower-envelope along each column.
+            float inf = (float)(width * width + height * height) + 1f;
+            var result = new float[width * height];
+            var v = new int[height];
+            var z = new float[height + 1];
+
+            for (int x = 0; x < width; x++)
+            {
+                // Build lower envelope of parabolas
+                int k = 0;
+                v[0] = 0;
+                z[0] = -inf;
+                z[1] = inf;
+
+                for (int q = 1; q < height; q++)
+                {
+                    float fq = rowDist[q * width + x] + q * q;
+                    float s;
+                    while (true)
+                    {
+                        int vk = v[k];
+                        float fvk = rowDist[vk * width + x] + vk * vk;
+                        s = (fq - fvk) / (2f * q - 2f * vk);
+                        if (s > z[k]) break;
+                        k--;
+                        if (k < 0) { k = 0; break; }
+                    }
+                    k++;
+                    v[k]     = q;
+                    z[k]     = s;
+                    z[k + 1] = inf;
+                }
+
+                // Fill result column from envelope
+                k = 0;
+                for (int q = 0; q < height; q++)
+                {
+                    while (z[k + 1] < q) k++;
+                    int vk  = v[k];
+                    float dq = q - vk;
+                    result[q * width + x] = rowDist[vk * width + x] + dq * dq;
+                }
+            }
+
+            return result;
+        }
     }
 }

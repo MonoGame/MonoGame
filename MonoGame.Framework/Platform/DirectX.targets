@@ -42,6 +42,7 @@
     <EmbeddedResource Include="Platform\Graphics\Effect\Resources\EnvironmentMapEffect.dx11.mgfxo" />
     <EmbeddedResource Include="Platform\Graphics\Effect\Resources\SkinnedEffect.dx11.mgfxo" />
     <EmbeddedResource Include="Platform\Graphics\Effect\Resources\SpriteEffect.dx11.mgfxo" />
+    <EmbeddedResource Include="Platform\Graphics\Effect\Resources\DistanceFieldSpriteEffect.dx11.mgfxo" />
   </ItemGroup>
 
 </Project>

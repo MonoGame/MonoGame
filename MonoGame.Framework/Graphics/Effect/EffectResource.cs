@@ -18,6 +18,7 @@ namespace Microsoft.Xna.Framework.Graphics
         public static readonly EffectResource EnvironmentMapEffect = new EffectResource(EnvironmentMapEffectName);
         public static readonly EffectResource SkinnedEffect = new EffectResource(SkinnedEffectName);
         public static readonly EffectResource SpriteEffect = new EffectResource(SpriteEffectName);
+        public static readonly EffectResource DistanceFieldSpriteEffect = new EffectResource(DistanceFieldSpriteEffectName);
 
         private readonly object _locker = new object();
         private readonly string _name;

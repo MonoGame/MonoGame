@@ -1062,6 +1062,9 @@
     <Content Update="..\..\MonoGame.Framework\Platform\Graphics\Effect\Resources\SpriteEffect.fx">
       <Link>Assets\Effects\Stock\SpriteEffect.fx</Link>
     </Content>
+    <Content Update="..\..\MonoGame.Framework\Platform\Graphics\Effect\Resources\DistanceFieldSpriteEffect.fx">
+      <Link>Assets\Effects\Stock\DistanceFieldSpriteEffect.fx</Link>
+    </Content>
     <Content Update="..\..\MonoGame.Framework\Platform\Graphics\Effect\Resources\BasicEffect.fx">
       <Link>Assets\Effects\Stock\BasicEffect.fx</Link>
     </Content>
