@@ -16,6 +16,49 @@ namespace Microsoft.Xna.Framework.Graphics
     /// </summary>
 	public sealed class SpriteFont 
     {
+        // Internal distance field support (Option B foundation)
+        // This keeps public API unchanged while allowing SpriteBatch to pick
+        // an alternate shader path for distance field encoded fonts.
+        internal enum DistanceFieldType : byte
+        {
+            None = 0,
+            SDF = 1
+        }
+
+        // Type of distance field data stored in the texture (if any).
+        internal DistanceFieldType _distanceFieldType = DistanceFieldType.None;
+        // Spread in texels used when generating the distance field (half-range maps to 0.5).
+        internal float _distanceFieldSpread;
+        // Nominal EM size (design size) used when generating the atlas; used for scale compensation.
+        internal float _emSize;
+
+        // Helper to allow SpriteBatch to quickly branch to variant shader.
+        internal bool IsDistanceField => _distanceFieldType != DistanceFieldType.None;
+
+        // Outline settings — only used when IsDistanceField is true.
+        internal float _outlineThickness;
+        internal Vector4 _outlineColor;
+
+        /// <summary>
+        /// Outline thickness for SDF fonts, in normalised distance units.
+        /// 0 = no outline (default). Typical values are 0.1 to 0.3.
+        /// Has no effect on standard (non-SDF) SpriteFonts.
+        /// </summary>
+        public float OutlineThickness
+        {
+            get => _outlineThickness;
+            set => _outlineThickness = value;
+        }
+
+        /// <summary>
+        /// Outline colour for SDF fonts. Has no effect when <see cref="OutlineThickness"/> is 0
+        /// or when the font is not an SDF font.
+        /// </summary>
+        public Color OutlineColor
+        {
+            get => new Color(_outlineColor);
+            set => _outlineColor = value.ToVector4();
+        }
 		internal static class Errors 
         {
 			public const string TextContainsUnresolvableCharacters =
@@ -165,11 +208,21 @@ namespace Microsoft.Xna.Framework.Graphics
 		/// </summary>
 		public int LineSpacing { get; set; }
 
-		/// <summary>
-		/// Gets or sets the spacing (tracking) between characters in
-		/// the font.
-		/// </summary>
-		public float Spacing { get; set; }
+        private float _spacingBase;
+
+        /// <summary>Gets or sets the spacing (tracking) between characters in the font.</summary>
+        /// <value>The additional spacing between glyphs.</value>
+        public float Spacing
+        {
+            get
+            {
+                if (_distanceFieldType != DistanceFieldType.None && _outlineThickness > 0f)
+                    return _spacingBase + _outlineThickness * _distanceFieldSpread * 2f;
+
+                return _spacingBase;
+            }
+            set => _spacingBase = value;
+        }
 
 		/// <summary>
 		/// Returns the size of a string when rendered in this font.

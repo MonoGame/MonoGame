@@ -24,6 +24,7 @@ namespace Microsoft.Xna.Framework.Graphics
         bool _beginCalled;
 
 		SpriteEffect _spriteEffect;
+        readonly DistanceFieldSpriteEffect _distanceFieldEffect;
         readonly EffectPass _spritePass;
 
 		Rectangle _tempRect = new Rectangle (0,0,0,0);
@@ -56,6 +57,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			this.GraphicsDevice = graphicsDevice;
 
             _spriteEffect = new SpriteEffect(graphicsDevice);
+            _distanceFieldEffect = DistanceFieldSpriteEffect.Instance(graphicsDevice);
             _spritePass = _spriteEffect.CurrentTechnique.Passes[0];
 
             _batcher = new SpriteBatcher(graphicsDevice, capacity);
@@ -122,7 +124,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			if (_sortMode != SpriteSortMode.Immediate)
 				Setup();
             
-            _batcher.DrawBatch(_sortMode, _effect);
+            _batcher.DrawBatch(_sortMode, _effect, _spriteEffect, _distanceFieldEffect);
         }
 		
 		void Setup() 
@@ -414,9 +416,20 @@ namespace Microsoft.Xna.Framework.Graphics
 		{
 			if (_sortMode == SpriteSortMode.Immediate)
 			{
-				_batcher.DrawBatch(_sortMode, _effect);
+                _batcher.DrawBatch(_sortMode, _effect, _spriteEffect, _distanceFieldEffect);
 			}
 		}
+
+        private static void ConfigureDistanceFieldItem(SpriteBatchItem item, SpriteFont spriteFont)
+        {
+            item.ShaderVariant = spriteFont.IsDistanceField ? 1 : 0;
+            if (item.ShaderVariant == 1)
+            {
+                item.DFSpread = spriteFont._distanceFieldSpread;
+                item.DFOutlineThickness = spriteFont._outlineThickness;
+                item.DFOutlineColor = spriteFont._outlineColor;
+            }
+        }
 
         /// <summary>
         /// Submit a sprite for drawing in the current batch.
@@ -429,8 +442,9 @@ namespace Microsoft.Xna.Framework.Graphics
 		{
 			CheckValid(texture);
             
-			var item = _batcher.CreateBatchItem();
-			item.Texture = texture;
+            var item = _batcher.CreateBatchItem();
+            item.Texture = texture;
+            item.ShaderVariant = 0; // default sprite
             
             // set SortKey based on SpriteSortMode.
             item.SortKey = _sortMode == SpriteSortMode.Texture ? texture.SortingKey : 0;
@@ -617,8 +631,9 @@ namespace Microsoft.Xna.Framework.Graphics
                 p.Y += pCurrentGlyph->Cropping.Y;
                 p += position;
 
-                var item = _batcher.CreateBatchItem();
+                var item = _batcher.CreateBatchItem();               
                 item.Texture = spriteFont.Texture;
+                ConfigureDistanceFieldItem(item, spriteFont);
                 item.SortKey = sortKey;
             
                 _texCoordTL.X = pCurrentGlyph->BoundsInTexture.X * spriteFont.Texture.TexelWidth;
@@ -793,6 +808,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
                 var item = _batcher.CreateBatchItem();               
                 item.Texture = spriteFont.Texture;
+                ConfigureDistanceFieldItem(item, spriteFont);
                 item.SortKey = sortKey;
                 
                 _texCoordTL.X = pCurrentGlyph->BoundsInTexture.X * spriteFont.Texture.TexelWidth;
@@ -978,6 +994,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
                     var item = _batcher.CreateBatchItem();
                     item.Texture = spriteFont.Texture;
+                    ConfigureDistanceFieldItem(item, spriteFont);
                     item.SortKey = sortKey;
 
                     _texCoordTL.X = pCurrentGlyph->BoundsInTexture.X * spriteFont.Texture.TexelWidth;
@@ -1087,6 +1104,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 
                 var item = _batcher.CreateBatchItem();
                 item.Texture = spriteFont.Texture;
+                ConfigureDistanceFieldItem(item, spriteFont);
                 item.SortKey = sortKey;
             
                 _texCoordTL.X = pCurrentGlyph->BoundsInTexture.X * spriteFont.Texture.TexelWidth;
@@ -1258,8 +1276,9 @@ namespace Microsoft.Xna.Framework.Graphics
 
                 Vector2.Transform(ref p, ref transformation, out p);
                 
-                var item = _batcher.CreateBatchItem();               
+                var item = _batcher.CreateBatchItem();
                 item.Texture = spriteFont.Texture;
+                ConfigureDistanceFieldItem(item, spriteFont);
                 item.SortKey = sortKey;
                 
                 _texCoordTL.X = pCurrentGlyph->BoundsInTexture.X * (float)spriteFont.Texture.TexelWidth;

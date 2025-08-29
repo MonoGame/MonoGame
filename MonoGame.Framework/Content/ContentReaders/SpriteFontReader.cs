@@ -2,7 +2,9 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
+using System;
 using System.Collections.Generic;
+using System.IO;
 using Microsoft.Xna.Framework.Graphics;
 
 namespace Microsoft.Xna.Framework.Content
@@ -10,8 +12,59 @@ namespace Microsoft.Xna.Framework.Content
     [System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.All)]
     internal class SpriteFontReader : ContentTypeReader<SpriteFont>
     {
+        private const int DistanceFieldMetadataSize = 1 + 4 + 4;
+
         public SpriteFontReader()
         {
+        }
+
+        private static bool HasRemainingBytes(ContentReader input, int bytes)
+        {
+            var stream = input.BaseStream;
+            if (!stream.CanSeek)
+                return true;
+
+            return stream.Length - stream.Position >= bytes;
+        }
+
+        private static bool TryReadHasDistanceFieldBlock(ContentReader input, out bool hasDistanceField)
+        {
+            hasDistanceField = false;
+            if (!HasRemainingBytes(input, 1))
+                return false;
+
+            try
+            {
+                hasDistanceField = input.ReadBoolean();
+                return true;
+            }
+            catch (EndOfStreamException)
+            {
+                return false;
+            }
+        }
+
+        private static void ReadOptionalDistanceFieldMetadata(ContentReader input, SpriteFont font)
+        {
+            if (!TryReadHasDistanceFieldBlock(input, out var hasDistanceField) || !hasDistanceField)
+                return;
+
+            if (!HasRemainingBytes(input, DistanceFieldMetadataSize))
+                throw new ContentLoadException("Invalid SpriteFont distance field metadata block.");
+
+            var dfType = input.ReadByte();
+            if (dfType != (byte)SpriteFont.DistanceFieldType.SDF)
+                throw new ContentLoadException($"Unsupported SpriteFont distance field type '{dfType}'. Rebuild the asset with SDF-only distance field output.");
+
+            var spread = input.ReadSingle();
+            var emSize = input.ReadSingle();
+
+            if (font != null)
+            {
+                font._distanceFieldType = SpriteFont.DistanceFieldType.SDF;
+                font._distanceFieldSpread = spread;
+                font._emSize = emSize;
+            }
         }
 
         protected internal override SpriteFont Read(ContentReader input, SpriteFont existingInstance)
@@ -33,6 +86,8 @@ namespace Microsoft.Xna.Framework.Content
                     input.ReadChar();
                 }
 
+                ReadOptionalDistanceFieldMetadata(input, null);
+
                 return existingInstance;
             }
             else
@@ -50,7 +105,11 @@ namespace Microsoft.Xna.Framework.Content
                 {
                     defaultCharacter = new char?(input.ReadChar());
                 }
-                return new SpriteFont(texture, glyphs, cropping, charMap, lineSpacing, spacing, kerning, defaultCharacter);
+                var font = new SpriteFont(texture, glyphs, cropping, charMap, lineSpacing, spacing, kerning, defaultCharacter);
+
+                ReadOptionalDistanceFieldMetadata(input, font);
+
+                return font;
             }
         }
     }

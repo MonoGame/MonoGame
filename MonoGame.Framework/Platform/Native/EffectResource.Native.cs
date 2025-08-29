@@ -12,6 +12,7 @@ internal partial class EffectResource
 {
     const string AlphaTestEffectName = "AlphaTestEffect";
     const string BasicEffectName = "BasicEffect";
+    const string DistanceFieldSpriteEffectName = "DistanceFieldSpriteEffect";
     const string DualTextureEffectName = "DualTextureEffect";
     const string EnvironmentMapEffectName = "EnvironmentMapEffect";
     const string SkinnedEffectName = "SkinnedEffect";
