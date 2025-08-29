@@ -1,11 +1,13 @@
-
-
 namespace MonoGame.Framework.Devices.Power
 {
+    /// <summary>
+    /// Represents the current power status of the device, including battery charge status,
+    /// power line status, and battery life percentage.
+    /// </summary>
     public sealed partial class PowerStatus
     {
-        public string BatteryChargeStatus => PlatformBatteryChargeStatus;
-        public string PowerLineStatus => PlatformPowerLineStatus;
-        public int BatteryLifePercent => PlatformBatteryLifePercent;
+        public BatteryChargeStatus BatteryChargeStatus => PlatformBatteryChargeStatus();
+        public PowerLineStatus PowerLineStatus => PlatformPowerLineStatus();
+        public int BatteryLifePercent => PlatformBatteryLifePercent();
     }
 }

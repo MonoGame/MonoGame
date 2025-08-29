@@ -1,10 +1,11 @@
 using Android.App;
 using Android.Content;
 using Android.OS;
+using MonoGame.Framework.Devices.Power;
 
 public partial class PowerStatus
 {
-    private string PlatformBatteryChargeStatus()
+    private BatteryChargeStatus PlatformBatteryChargeStatus()
     {
         var filter = new IntentFilter(Intent.ActionBatteryChanged);
         var battery = Application.Context.RegisterReceiver(null, filter);
@@ -12,40 +13,36 @@ public partial class PowerStatus
         {
             int status = battery.GetIntExtra(BatteryManager.ExtraStatus, -1);
 
-            switch ((global::Android.OS.BatteryStatus)status)
+            return status switch
             {
-                case global::Android.OS.BatteryStatus.Charging:
-                    return "Charging";
-                case global::Android.OS.BatteryStatus.Full:
-                    return "Full";
-                case global::Android.OS.BatteryStatus.Discharging:
-                    return "Discharging";
-                case global::Android.OS.BatteryStatus.NotCharging:
-                    return "Not Charging";
-                case global::Android.OS.BatteryStatus.Unknown:
-                default:
-                    return "Unknown";
-            }
+                (int)global::Android.OS.BatteryStatus.Charging => BatteryChargeStatus.Charging,
+                (int)global::Android.OS.BatteryStatus.Full => BatteryChargeStatus.Full,
+                (int)global::Android.OS.BatteryStatus.Discharging => BatteryChargeStatus.OnBattery,
+                (int)global::Android.OS.BatteryStatus.NotCharging => BatteryChargeStatus.OnBattery,
+                (int)global::Android.OS.BatteryStatus.Unknown => BatteryChargeStatus.Unknown,
+                _ => BatteryChargeStatus.Unknown
+            };
         }
 
-        return "Unknown";
+        return BatteryChargeStatus.Unknown;
     }
 
-    private string PlatformPowerLineStatus()
+    private PowerLineStatus PlatformPowerLineStatus()
     {
         var filter = new IntentFilter(Intent.ActionBatteryChanged);
         var battery = Application.Context.RegisterReceiver(null, filter);
         if (battery != null)
         {
             int plugged = battery.GetIntExtra(global::Android.OS.BatteryManager.ExtraPlugged, -1);
-            if (plugged == (int)global::Android.OS.BatteryPlugged.Ac)
-                return "AC";
-            if (plugged == (int)global::Android.OS.BatteryPlugged.Usb)
-                return "USB";
-            if (plugged == (int)global::Android.OS.BatteryPlugged.Wireless)
-                return "Wireless";
+            return plugged switch
+            {
+                (int)global::Android.OS.BatteryPlugged.Ac => PowerLineStatus.Online,
+                (int)global::Android.OS.BatteryPlugged.Usb => PowerLineStatus.Online,
+                (int)global::Android.OS.BatteryPlugged.Wireless => PowerLineStatus.Online,
+                _ => PowerLineStatus.Offline
+            };
         }
-        return "Unplugged";
+        return PowerLineStatus.Unknown;
     }
 
     private int PlatformBatteryLifePercent()
