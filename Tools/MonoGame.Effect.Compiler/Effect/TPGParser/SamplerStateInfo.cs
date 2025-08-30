@@ -6,9 +6,9 @@ using System;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
-namespace MonoGame.Effect.TPGParser
+namespace MonoGame.Effect
 {
-    class SamplerStateInfo
+    public class SamplerStateInfo
     {
         private SamplerState _state;
         

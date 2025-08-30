@@ -4,9 +4,9 @@
 
 using System.Collections.Generic;
 
-namespace MonoGame.Effect.TPGParser
+namespace MonoGame.Effect
 {
-    class TechniqueInfo
+    public class TechniqueInfo
     {
         public int startPos;
         public int length;

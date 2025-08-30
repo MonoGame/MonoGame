@@ -7,9 +7,9 @@ using System.Text.RegularExpressions;
 using Microsoft.Xna.Framework.Graphics;
 using System.Globalization;
 
-namespace MonoGame.Effect.TPGParser
+namespace MonoGame.Effect
 {
-    class PassInfo
+    public class PassInfo
     {
         public string name;
 

@@ -6,9 +6,9 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 
-namespace MonoGame.Effect.TPGParser
+namespace MonoGame.Effect
 {
-    class ShaderInfo
+    public class ShaderInfo
 	{
 		public List<TechniqueInfo> Techniques = new List<TechniqueInfo>();
 

@@ -27,7 +27,7 @@ namespace MonoGame.Effect
             macros.Add("SM6", "1");
         }
 
-        internal override void ValidateShaderModels(MonoGame.Effect.TPGParser.PassInfo pass)
+        internal override void ValidateShaderModels(PassInfo pass)
         {
             if (!string.IsNullOrEmpty(pass.vsFunction))
             {
