@@ -28,3 +28,6 @@
 [submodule "external/CppNet"]
 	path = external/CppNet
 	url = https://github.com/MonoGame/CppNet.git
+[submodule "native/monogame/external/vma"]
+	path = native/monogame/external/vma
+	url = https://github.com/GPUOpen-LibrariesAndSDKs/VulkanMemoryAllocator.git
