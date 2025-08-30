@@ -1,11 +1,15 @@
-﻿using System;
+﻿// MonoGame - Copyright (C) MonoGame Foundation, Inc
+// This file is subject to the terms and conditions defined in
+// file 'LICENSE.txt', which is part of this source code package.
+
+using System;
 using System.Text.RegularExpressions;
 using Microsoft.Xna.Framework.Graphics;
 using System.Globalization;
 
 namespace MonoGame.Effect.TPGParser
 {
-    public class PassInfo
+    class PassInfo
     {
         public string name;
 
