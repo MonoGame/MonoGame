@@ -11,13 +11,11 @@ class ContentCache : IContentCache
     private const string CacheFileName = "cache.yaml";
 
     private Dictionary<string, ContentFileCache> _cache = [];
-    private readonly HashSet<string> _unusedDependencies = [];
     private readonly HashSet<string> _unusedOutputs = [];
 
     public void LoadCache(ContentBuilder builder)
     {
         _cache.Clear();
-        _unusedDependencies.Clear();
         _unusedOutputs.Clear();
 
         var cacheFilePath = Path.Combine(builder.Parameters.RootedIntermediateDirectory, CacheFileName);
@@ -39,64 +37,11 @@ class ContentCache : IContentCache
 
         foreach (var (_, fileCache) in _cache)
         {
-            foreach (var (depFile, _) in fileCache.Dependencies)
+            foreach (var (outputPath, _) in fileCache.Outputs)
             {
-                _unusedDependencies.Add(depFile);
-            }
-
-            foreach (var output in fileCache.Outputs)
-            {
-                _unusedOutputs.Add(output);
+                _unusedOutputs.Add(outputPath);
             }
         }
-    }
-
-    public ContentFileCache? ReadContentFileCache(ContentBuilder builder, string relativePath, string contentRoot, bool shouldBuild = false, IContentImporter? importer = null, IContentProcessor? processor = null)
-    {
-        if (!_cache.TryGetValue(relativePath, out ContentFileCache? fileCache))
-        {
-            return null;
-        }
-
-        if (builder.Parameters.GraphicsProfile != fileCache.GraphicsProfile ||
-            builder.Parameters.CompressContent != fileCache.CompressContent ||
-            contentRoot != fileCache.ContentRoot ||
-            shouldBuild != fileCache.ShouldBuild ||
-            !ContentBuilderHelper.ArePropsEqual(fileCache.Importer, importer) ||
-            !ContentBuilderHelper.ArePropsEqual(fileCache.Processor, processor))
-        {
-            return null;
-        }
-
-        foreach (var (dependencyFile, cachedModifiedTime) in fileCache.Dependencies)
-        {
-            var dependencyFullPath = Path.Combine(builder.Parameters.RootedSourceDirectory, dependencyFile);
-            var modifiedTime = File.GetLastWriteTimeUtc(dependencyFullPath);
-
-            if (modifiedTime != cachedModifiedTime)
-            {
-                return null;
-            }
-        }
-
-        foreach (var outputPath in fileCache.Outputs)
-        {
-            var fullOutputPath = Path.Combine(builder.Parameters.RootedOutputDirectory, outputPath);
-
-            if (!File.Exists(fullOutputPath))
-            {
-                return null;
-            }
-        }
-
-        MarkUsed(fileCache);
-        return fileCache;
-    }
-
-    public void WriteContentFileCache(ContentBuilder builder, string relativePath, ContentFileCache fileCache)
-    {
-        _cache[relativePath] = fileCache;
-        MarkUsed(fileCache);
     }
 
     public void FlushCache(ContentBuilder builder)
@@ -117,37 +62,84 @@ class ContentCache : IContentCache
         File.WriteAllText(cacheFilePath, text);
     }
 
-    private void MarkUsed(ContentFileCache fileCache)
+    public IContentFileCache CreateContentFileCache(ContentBuilder builder, ContentInfo info) => new ContentFileCache
     {
-        foreach (var (depFile, _) in fileCache.Dependencies)
+        ContentRoot = info.ContentRoot,
+        CompressContent = builder.Parameters.CompressContent,
+        GraphicsProfile = builder.Parameters.GraphicsProfile,
+        ShouldBuild = info.ShouldBuild,
+        Importer = info.Importer,
+        Processor = info.Processor
+    };
+
+    public IContentFileCache? ReadContentFileCache(ContentBuilder builder, string relativeOutputPath)
+    {
+        if (!_cache.TryGetValue(relativeOutputPath.Sanitize(), out ContentFileCache? fileCache))
         {
-            _unusedDependencies.Remove(depFile);
+            return null;
+        }
+        return fileCache;
+    }
+
+    public void WriteContentFileCache(ContentBuilder builder, string relativeOutputPath, IContentFileCache? fileCache)
+    {
+        if (fileCache is ContentFileCache builderFileCache)
+        {
+            _cache[relativeOutputPath.Sanitize()] = builderFileCache;
+        }
+    }
+
+    public void MarkUsed(IContentFileCache fileCache)
+    {
+        if (fileCache is not ContentFileCache builderFileCache)
+        {
+            return;
         }
 
-        foreach (var output in fileCache.Outputs)
+        foreach (var (outputPath, _) in builderFileCache.Outputs)
         {
-            _unusedOutputs.Remove(output);
+            _unusedOutputs.Remove(outputPath);
         }
     }
 
     public void CleanCache(ContentBuilder builder)
     {
-        foreach (var depFile in _unusedDependencies)
+        foreach (var outputPath in _unusedOutputs)
         {
-            _cache.Remove(depFile);
+            _cache.Remove(outputPath);
         }
 
-        foreach (var outputFile in _unusedOutputs)
+        foreach (var outputPath in _unusedOutputs)
         {
-            var outputFilePath = Path.Combine(builder.Parameters.RootedOutputDirectory, outputFile);
-            if (File.Exists(outputFilePath))
+            var outputFilePath = Path.Combine(builder.Parameters.RootedOutputDirectory, outputPath);
+            if (!IsOutputUsed(outputPath) && File.Exists(outputFilePath))
             {
-                builder.Logger.Log("Deleting: " + outputFile);
+                builder.Logger.Log("Deleting: " + outputPath);
                 File.Delete(outputFilePath);
             }
         }
 
-        _unusedDependencies.Clear();
         _unusedOutputs.Clear();
+    }
+
+    private bool IsOutputUsed(string outputPathToCheck)
+    {
+        foreach (var (mainOutput, fileCache) in _cache)
+        {
+            if (mainOutput == outputPathToCheck)
+            {
+                return true;
+            }
+
+            foreach (var (outputPath, _) in fileCache.Outputs)
+            {
+                if (outputPath == outputPathToCheck)
+                {
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
 }
