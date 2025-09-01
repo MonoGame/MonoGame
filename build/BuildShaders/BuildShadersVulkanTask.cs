@@ -1,7 +1,7 @@
 
 namespace BuildScripts;
 
-[TaskName("Build Vulklan Shaders")]
+[TaskName("Build Vulkan Shaders")]
 [IsDependentOn(typeof(BuildMGFXCTask))]
 public sealed class BuildShadersVulkanTask : FrostingTask<BuildContext>
 {
@@ -14,7 +14,7 @@ public sealed class BuildShadersVulkanTask : FrostingTask<BuildContext>
         foreach (var filePath in context.GetFiles($"{shadersDir}/*.fx"))
             {
                 context.Information($"Building {filePath.GetFilename()}");
-                context.DotNetRun(mgfxc, $"{filePath} {filePath.GetFilenameWithoutExtension()}.vk.mgfxo /Profile:Vulkan", workingDir);
+                context.DotNetRun(mgfxc, $"\"{filePath}\" {filePath.GetFilenameWithoutExtension()}.vk.mgfxo /Profile:Vulkan", workingDir);
                 context.Information("");
             }
     }

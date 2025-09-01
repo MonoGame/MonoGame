@@ -26,5 +26,6 @@ public sealed class BuildContentPipelineTask : FrostingTask<BuildContext>
             default:
                 throw new NotSupportedException($"Platform {context.Environment.Platform.Family} is not supported for static library checks.");
         }
+        context.PublishToolsBinaries(builderPath);
     }
 }

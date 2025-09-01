@@ -23,7 +23,7 @@
 
 #define PS_PROFILE ps_4_0_level_9_1
 #define VS_PROFILE vs_4_0_level_9_1
-#define SV_TARGET0 COLOR0
+#define SV_TARGET0 SV_Target0
 
 #define DECLARE_TEXTURE(Name, index) \
     Texture2D<float4> Name : register(t##index); \

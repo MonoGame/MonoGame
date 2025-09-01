@@ -17,11 +17,11 @@ public sealed class BuildShadersDX12Task : FrostingTask<BuildContext>
         foreach (var filePath in context.GetFiles($"{shadersDir}/*.fx"))
         {
             context.Information($"Building {filePath.GetFilename()}");
-            context.DotNetRun(mgfxc, $"{filePath} {filePath.GetFilenameWithoutExtension()}.dx12.mgfxo /Profile:DirectX_12", workingDir);
+            context.DotNetRun(mgfxc, $"\"{filePath}\" {filePath.GetFilenameWithoutExtension()}.dx12.mgfxo /Profile:DirectX_12", workingDir);
             context.Information("");
         }
 
-        if (context.DxcRun("-T cs_6_0 -O3 -Vn GenerateMips_main -Fh native/monogame/directx12/GenerateMips_Desktop.h native/monogame/directx12/GenerateMips.hlsl") != 0)
+        if (Dxc.Run("-T cs_6_0 -O3 -Vn GenerateMips_main -Fh native/monogame/directx12/GenerateMips_Desktop.h native/monogame/directx12/GenerateMips.hlsl", out _, out _) != 0)
         {
             throw new Exception("An error occured while running dxc");
         }

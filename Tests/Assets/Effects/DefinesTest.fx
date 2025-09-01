@@ -2,7 +2,7 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
-#include "include.fxh"
+#include "Include.fxh"
 
 float4 VS_Main(float4 position : POSITION0) : SV_Position0
 {

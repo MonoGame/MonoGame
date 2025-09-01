@@ -47,16 +47,23 @@ public sealed class UploadArtifactsTask : AsyncFrostingTask<BuildContext>
         {
             case PlatformFamily.Windows:
                 await context.GitHubActions().Commands.UploadArtifact(new DirectoryPath("Artifacts/native/mgpipeline/windows/Release/"), $"mgpipeline-{os}.{context.Version}");
+                await context.GitHubActions().Commands.UploadArtifact(new DirectoryPath("Artifacts/monogame.native/windows/"), $"mgnative-{os}.{context.Version}");
                 break;
             case PlatformFamily.Linux:
                 await context.GitHubActions().Commands.UploadArtifact(new DirectoryPath("Artifacts/native/mgpipeline/linux/Release/"), $"mgpipeline-{os}.{context.Version}");
+                //await context.GitHubActions().Commands.UploadArtifact(new DirectoryPath("Artifacts/monogame.native/linux/"), $"mgnative-{os}.{context.Version}");
                 break;
             case PlatformFamily.OSX:
                 await context.GitHubActions().Commands.UploadArtifact(new DirectoryPath("Artifacts/native/mgpipeline/macosx/Release/"), $"mgpipeline-{os}.{context.Version}");
+                //await context.GitHubActions().Commands.UploadArtifact(new DirectoryPath("Artifacts/monogame.native/macosx/"), $"mgnative-{os}.{context.Version}");
                 break;
             default:
                 throw new NotSupportedException($"Platform {context.Environment.Platform.Family} is not supported for static library checks.");
         }
+
+        // Upload Binaries
+        await context.GitHubActions().Commands.UploadArtifact(new DirectoryPath("Artifacts/MonoGame.Framework/"), $"mgframework-{os}.{context.Version}");
+        await context.GitHubActions().Commands.UploadArtifact(new DirectoryPath("Artifacts/Binaries/"), $"mgbinaries-{os}.{context.Version}");
 
         // Upload NuGet packages
         await context.GitHubActions().Commands.UploadArtifact(new DirectoryPath(context.NuGetsDirectory), $"nuget-{os}.{context.Version}");
@@ -90,7 +97,7 @@ public sealed class UploadArtifactsTask : AsyncFrostingTask<BuildContext>
                     context.Log.Information($"Deleting: {file}");
                     System.IO.File.Delete(file);
                 }
-                
+
             }
         }
     }

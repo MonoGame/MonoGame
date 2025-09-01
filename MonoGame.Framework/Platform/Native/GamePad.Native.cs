@@ -142,8 +142,8 @@ static partial class GamePad
 
     private static float FromAxisValue(short axis)
     {
-        if (axis < 0)
-            return axis / 32768f;
+        // The native implementation returns -32767 to 32767 range
+        // (-32768 is excluded to avoid overflows from max 16bit range conversions)
         return axis / 32767f;
     }
 

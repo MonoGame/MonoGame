@@ -13,6 +13,7 @@ public sealed class RepackForDeployTask : FrostingTask<BuildContext>
         //  MonoGame.Framework.Content.Pipeline
         context.DotNetPackSettings.MSBuildSettings.WithProperty("DisableMonoGameToolAssets", "True");
         context.DotNetPack(context.GetProjectPath(ProjectType.ContentPipeline), context.DotNetPackSettings);
+        context.PublishToolsBinaries(context.GetProjectPath(ProjectType.ContentPipeline));
         context.DotNetPackSettings.MSBuildSettings.Properties.Remove("DisableMonoGameToolAssets");
 
         // mgcb

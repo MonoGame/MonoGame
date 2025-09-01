@@ -421,25 +421,33 @@ mgbyte MGP_Platform_PollEvent(MGP_Platform* platform, MGP_Event& event_)
         case SDL_EventType::SDL_CONTROLLERDEVICEADDED:
         {
             auto controller = SDL_GameControllerOpen(ev.cdevice.which);
-            platform->controllers.emplace(ev.cdevice.which, controller);
-            event_.Type = MGEventType::ControllerAdded;
-            event_.Timestamp = ev.cdevice.timestamp;
-            event_.Controller.Id = ev.cdevice.which;
-            event_.Controller.Input = MGControllerInput::INVALID;
-            event_.Controller.Value = 0;
-            return true;
+            if (controller != nullptr)
+            {
+                platform->controllers.emplace(ev.cdevice.which, controller);
+                event_.Type = MGEventType::ControllerAdded;
+                event_.Timestamp = ev.cdevice.timestamp;
+                event_.Controller.Id = ev.cdevice.which;
+                event_.Controller.Input = MGControllerInput::INVALID;
+                event_.Controller.Value = 0;
+                return true;
+            }
+            break;
         }
         case SDL_EventType::SDL_CONTROLLERDEVICEREMOVED:
         {
             auto controller = platform->controllers[ev.cdevice.which];
-            platform->controllers.erase(ev.cdevice.which);
-            SDL_GameControllerClose(controller);
-            event_.Type = MGEventType::ControllerRemoved;
-            event_.Timestamp = ev.cdevice.timestamp;
-            event_.Controller.Id = ev.cdevice.which;
-            event_.Controller.Input = MGControllerInput::INVALID;
-            event_.Controller.Value = 0;
-            return true;
+            if (controller != nullptr)
+            {
+                platform->controllers.erase(ev.cdevice.which);
+                SDL_GameControllerClose(controller);
+                event_.Type = MGEventType::ControllerRemoved;
+                event_.Timestamp = ev.cdevice.timestamp;
+                event_.Controller.Id = ev.cdevice.which;
+                event_.Controller.Input = MGControllerInput::INVALID;
+                event_.Controller.Value = 0;
+                return true;
+            }
+            break;
         }
         case SDL_EventType::SDL_CONTROLLERBUTTONUP:
             event_.Type = MGEventType::ControllerStateChange;
@@ -461,6 +469,16 @@ mgbyte MGP_Platform_PollEvent(MGP_Platform* platform, MGP_Event& event_)
             event_.Controller.Id = ev.caxis.which;
             event_.Controller.Input = FromSDLAxis(ev.caxis.axis);
             event_.Controller.Value = ev.caxis.value;
+            if (event_.Controller.Input == MGControllerInput::LeftStickY || event_.Controller.Input == MGControllerInput::RightStickY)
+            {
+                // MonoGame has an inverted Y value convention compared to SDL, and we
+                // need to take care of the special case of -32768 because it would otherwise
+                // overflow into -32768 when inverted.
+                // (This maps the range of values to -32767:32767 instead of SDL's -32768:32767)
+                event_.Controller.Value = (event_.Controller.Value == -32768 ? 32767 : ~event_.Controller.Value + 1);
+            }
+            else
+
             return true;
             break;
 
@@ -833,11 +851,15 @@ void MGP_Window_ExitFullScreen(MGP_Window* window)
 mgint MGP_Window_ShowMessageBox(MGP_Window* window, mgbyte* title, mgbyte* description, mgbyte* buttons, mgint count)
 {
     SDL_MessageBoxData data;
-    data.window = window->window;
+    data.window = (window != nullptr ? window->window : nullptr);
     data.title = (const char*)title;
     data.message = (const char*)description;
     data.colorScheme = nullptr;
     data.flags = SDL_MESSAGEBOX_BUTTONS_LEFT_TO_RIGHT;
+#ifndef _WIN32
+    // Convention is to reverse buttons display order on non-Windows systems.
+    data.flags = SDL_MESSAGEBOX_BUTTONS_RIGHT_TO_LEFT;
+#endif
 
     auto bdata = new SDL_MessageBoxButtonData[count];
     for (int i = 0; i < count; i++)
