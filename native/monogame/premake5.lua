@@ -47,10 +47,7 @@ function sdl2()
         "CoreVideo.framework", "GameController.framework", "CoreHaptics.framework", "Carbon.framework", "iconv"}
 
     filter {"system:linux"}
-    libdirs {"external/sdl2/sdl/build"}
-    linkoptions {"-Wl,-Bstatic"}
-    links {"SDL2"}
-    linkoptions {"-Wl,-Bdynamic"}
+    linkoptions {"external/sdl2/sdl/build/libSDL2.a"}
     links {"dl", "pthread", "m", "rt"}
     filter {}
 end

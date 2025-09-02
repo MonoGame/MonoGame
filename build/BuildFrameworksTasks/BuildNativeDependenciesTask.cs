@@ -19,7 +19,7 @@ public sealed class BuildNativeDependenciesTask : FrostingTask<BuildContext>
         var configureArgs = new ProcessArgumentBuilder();
         // Add the relative path to the source directory.
         configureArgs.Append("../");
-        configureArgs.Append("-DSDL_STATIC=ON");
+        configureArgs.Append("-DSDL_STATIC=ON -DSDL_TEST=OFF");
 
         // Append platform-specific CMake arguments.
         switch (context.Environment.Platform.Family)

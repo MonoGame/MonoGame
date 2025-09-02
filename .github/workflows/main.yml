@@ -96,6 +96,14 @@ jobs:
           sudo fc-cache
           fc-match Arial
 
+      - name: Install X11 and Wayland Dependencies on Linux
+        if: runner.environment == 'github-hosted' && runner.os == 'Linux'
+        run: |
+          sudo apt install -y libx11-dev libxext-dev libxrandr-dev libxcursor-dev \
+          libxinerama-dev libxi-dev libxss-dev libxxf86vm-dev \
+          libwayland-dev libwayland-egl1-mesa libwayland-cursor0 \
+          libxkbcommon-dev libegl1-mesa-dev
+
       - name: Dotnet Restore Templates
         if: runner.environment == 'github-hosted' && runner.os == 'Windows'
         run: |
