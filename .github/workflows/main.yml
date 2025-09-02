@@ -95,14 +95,16 @@ jobs:
           sudo apt install -y ttf-mscorefonts-installer
           sudo fc-cache
           fc-match Arial
-
-      - name: Install X11 and Wayland Dependencies on Linux
-        if: runner.environment == 'github-hosted' && runner.os == 'Linux'
+      
+      - name: Install Linux dependencies for SDL2
+        if: runner.os == 'Linux'
         run: |
-          sudo apt install -y libx11-dev libxext-dev libxrandr-dev libxcursor-dev \
-          libxinerama-dev libxi-dev libxss-dev libxxf86vm-dev \
-          libwayland-dev libwayland-egl1-mesa libwayland-cursor0 \
-          libxkbcommon-dev libegl1-mesa-dev
+          sudo apt install -y libasound2-dev libpulse-dev \
+            libaudio-dev libjack-dev libsndio-dev libsamplerate0-dev libx11-dev libxext-dev \
+            libxrandr-dev libxcursor-dev libxfixes-dev libxi-dev libxss-dev libwayland-dev \
+            libxkbcommon-dev libdrm-dev libgbm-dev libgl1-mesa-dev libgles2-mesa-dev \
+            libegl1-mesa-dev libdbus-1-dev libibus-1.0-dev libudev-dev fcitx-libs-dev \
+            libpipewire-0.3-dev libdecor-0-dev
 
       - name: Dotnet Restore Templates
         if: runner.environment == 'github-hosted' && runner.os == 'Windows'
