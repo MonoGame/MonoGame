@@ -7,57 +7,24 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace MonoGame.Framework.Content.Pipeline.Builder;
 
-/// <summary>
-/// Contains cached information about a single source content file.
-/// </summary>
-public record ContentFileCache
+record ContentFileCache : IContentFileCache
 {
-    /// <summary>
-    /// The ContentRoot that was used for the building of the content file,
-    /// </summary>
     public string ContentRoot { get; init; } = "";
 
-    /// <summary>
-    /// <c>true</c> if the content was built, <c>false</c> if the content was copied.
-    /// </summary>
     public bool ShouldBuild { get; init; } = false;
 
-    /// <summary>
-    /// An <see cref="IContentImporter"/> that was used for the building of the content file,
-    /// </summary>
     public IContentImporter? Importer { get; init; } = null;
 
-    /// <summary>
-    /// An <see cref="IContentProcessor"/> that was used for the building of the content file,
-    /// </summary>
     public IContentProcessor? Processor { get; init; } = null;
 
-    /// <summary>
-    /// Indicates if the content was compressed.
-    /// </summary>
     public bool CompressContent { get; init; } = false;
 
-    /// <summary>
-    /// Indicates the <see cref="GraphicsProfile"/> that was used when the content was built.
-    /// </summary>
     public GraphicsProfile GraphicsProfile { get; init; } = GraphicsProfile.HiDef;
 
-    /// <summary>
-    /// A dictionary of keys of dependency files that either the <see cref="IContentImporter"/> or <see cref="IContentProcessor"/> included
-    /// and values of the last modified times for those files.
-    /// </summary>
     public Dictionary<string, DateTime> Dependencies { get; init; } = [];
 
-    /// <summary>
-    /// A hashset of output files that the <see cref="IContentProcessor"/> included.
-    /// </summary>
-    public HashSet<string> Outputs { get; init; } = [];
+    public Dictionary<string, DateTime> Outputs { get; init; } = [];
 
-    /// <summary>
-    /// Adds the specified file as a dependency related to the current content file.
-    /// </summary>
-    /// <param name="builder">A <see cref="ContentBuilder"/> the added depedency is related to.</param>
-    /// <param name="dependencyPath">A relative or absolute path to the dependency file.</param>
     public void AddDependency(ContentBuilder builder, string dependencyPath)
     {
         string fullDependencyPath;
@@ -80,14 +47,9 @@ public record ContentFileCache
         }
 
         var lastModifiedTime = File.GetLastWriteTimeUtc(fullDependencyPath);
-        Dependencies[relativeDependencyPath] = lastModifiedTime;
+        Dependencies[relativeDependencyPath.Sanitize()] = lastModifiedTime;
     }
 
-    /// <summary>
-    /// Removes the specified file as a dependency related to the current content file.
-    /// </summary>
-    /// <param name="builder">A <see cref="ContentBuilder"/> the added depedency is related to.</param>
-    /// <param name="dependencyPath">A relative or absolute path to the dependency file.</param>
     public void RemoveDependency(ContentBuilder builder, string dependencyPath)
     {
         string relativeDependencyPath = Path.IsPathRooted(dependencyPath) ?
@@ -96,29 +58,76 @@ public record ContentFileCache
         Dependencies.Remove(relativeDependencyPath);
     }
 
-    /// <summary>
-    /// Adds the specified file as an output file related to the current content file.
-    /// </summary>
-    /// <param name="builder">A <see cref="ContentBuilder"/> the output file is related to.</param>
-    /// <param name="outputPath">A relative or absolute path to the output file.</param>
     public void AddOutputFile(ContentBuilder builder, string outputPath)
     {
-        var relativeOutputFile = Path.IsPathRooted(outputPath) ?
-            Path.GetRelativePath(builder.Parameters.RootedOutputDirectory, outputPath) :
-            outputPath;
-        Outputs.Add(relativeOutputFile);
+        string fullOutputPath;
+        string relativeOutputPath;
+
+        if (Path.IsPathRooted(outputPath))
+        {
+            fullOutputPath = outputPath;
+            relativeOutputPath = Path.GetRelativePath(builder.Parameters.RootedOutputDirectory, outputPath);
+        }
+        else
+        {
+            fullOutputPath = Path.Combine(builder.Parameters.RootedOutputDirectory, outputPath);
+            relativeOutputPath = outputPath;
+        }
+
+        if (!File.Exists(fullOutputPath))
+        {
+            return;
+        }
+
+        var lastModifiedTime = File.GetLastWriteTimeUtc(fullOutputPath);
+        Outputs[relativeOutputPath.Sanitize()] = lastModifiedTime;
     }
 
-    /// <summary>
-    /// Removes the specified file as an output related to the current content file.
-    /// </summary>
-    /// <param name="builder">A <see cref="ContentBuilder"/> the output file is related to.</param>
-    /// <param name="outputPath">A relative or absolute path to the output file.</param>
     public void RemoveOutputFile(ContentBuilder builder, string outputPath)
     {
         var relativeOutputFile = Path.IsPathRooted(outputPath) ?
             Path.GetRelativePath(builder.Parameters.RootedOutputDirectory, outputPath) :
             outputPath;
         Outputs.Remove(relativeOutputFile);
+    }
+
+    public bool IsValid(ContentBuilder builder, ContentInfo info)
+    {
+        if (info.ShouldBuild || ShouldBuild)
+        {
+            if (builder.Parameters.GraphicsProfile != GraphicsProfile ||
+                builder.Parameters.CompressContent != CompressContent ||
+                info.ContentRoot != ContentRoot ||
+                info.ShouldBuild != ShouldBuild ||
+                !ContentBuilderHelper.ArePropsEqual(Importer, info.Importer) ||
+                !ContentBuilderHelper.ArePropsEqual(Processor, info.Processor))
+            {
+                return false;
+            }
+        }
+
+        foreach (var (dependencyFile, cachedModifiedTime) in Dependencies)
+        {
+            var dependencyFilePath = Path.Combine(builder.Parameters.RootedSourceDirectory, dependencyFile);
+            var modifiedTime = File.GetLastWriteTimeUtc(dependencyFilePath);
+
+            if (modifiedTime != cachedModifiedTime)
+            {
+                return false;
+            }
+        }
+
+        foreach (var (outputPath, cachedModifiedTime) in Outputs)
+        {
+            var outputFilePath = Path.Combine(builder.Parameters.RootedOutputDirectory, outputPath);
+            var modifiedTime = File.GetLastWriteTimeUtc(outputFilePath);
+
+            if (modifiedTime != cachedModifiedTime)
+            {
+                return false;
+            }
+        }
+
+        return true;
     }
 }

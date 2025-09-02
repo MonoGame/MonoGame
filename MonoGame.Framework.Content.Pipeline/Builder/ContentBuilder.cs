@@ -28,7 +28,7 @@ public abstract class ContentBuilder
 
     private readonly Queue<ContentRequest> _contentRequestQueue = [];
     private readonly object _contentRequestLock = new();
-    private readonly Dictionary<string, ContentInfo> _content = [];
+    private readonly Dictionary<string, List<ContentInfo>> _content = [];
     private readonly Dictionary<string, string> _outputContent = [];
 
     /// <summary>
@@ -68,16 +68,15 @@ public abstract class ContentBuilder
     /// <summary>
     /// Initiates a build of the specified asset and then writes down the result to disk..
     /// </summary>
-    /// <param name="relativePath">A relative path to the source asset.</param>
+    /// <param name="relativeSrcPath">A relative path to the source asset.</param>
     /// <param name="contentInfo">The desired <see cref="ContentInfo"/> to be used for the content building.</param>
-    /// <returns></returns>
-    public ContentFileCache? BuildAndWriteContent(string relativePath, ContentInfo contentInfo)
+    /// <param name="relativeDstPath">The desired relative output path.</param>
+    public void BuildAndWriteContent(string relativeSrcPath, ContentInfo contentInfo, string? relativeDstPath = null)
     {
-        ContentFileCache? contentFileCache = null;
-        Logger.PushFile(relativePath);
+        Logger.PushFile(relativeSrcPath);
         try
         {
-            contentFileCache = ProcessContent(relativePath, contentInfo, true).contentFileCache;
+            ProcessContent(relativeSrcPath, contentInfo, true, relativeDstPath);
             SucceededToBuild++;
         }
         catch (Exception ex)
@@ -86,21 +85,21 @@ public abstract class ContentBuilder
             FailedToBuild++;
         }
         Logger.PopFile();
-        return contentFileCache;
     }
 
     /// <summary>
     /// Initiates a build of the specified asset and then loads the result into memory.
     /// </summary>
-    /// <param name="relativePath">A relative path to the source asset.</param>
+    /// <param name="relativeSrcPath">A relative path to the source asset.</param>
     /// <param name="contentInfo">The desired <see cref="ContentInfo"/> to be used for the content building.</param>
-    /// <returns></returns>
-    public (ContentFileCache? contentFileCache, object? processedObject) BuildAndLoadContent(string relativePath, ContentInfo contentInfo)
+    /// <param name="relativeDstPath">The desired relative output path.</param>
+    /// <returns>The built object that the <see cref="IContentProcessor.Process(object, ContentProcessorContext)"/> returned.</returns>
+    public object? BuildAndLoadContent(string relativeSrcPath, ContentInfo contentInfo, string? relativeDstPath = null)
     {
-        Logger.PushFile(relativePath);
+        Logger.PushFile(relativeSrcPath);
         try
         {
-            var content = ProcessContent(relativePath, contentInfo, false);
+            var content = ProcessContent(relativeSrcPath, contentInfo, false, relativeDstPath);
             SucceededToBuild++;
             return content;
         }
@@ -110,20 +109,19 @@ public abstract class ContentBuilder
             FailedToBuild++;
         }
         Logger.PopFile();
-        return (null, null);
+        return null;
     }
 
-    private (ContentFileCache? contentFileCache, object? processedObject) ProcessContent(string relativePath, ContentInfo contentInfo, bool writeToDisk)
+    private object? ProcessContent(string relativePath, ContentInfo contentInfo, bool writeToDisk, string? relativeOutputPath)
     {
-        ContentFileCache? contentFileCache = null;
         var filePath = Path.Combine(Parameters.RootedSourceDirectory, relativePath);
-        var relativeDestPath = Path.Combine(contentInfo.ContentRoot, contentInfo.GetOutputPath(relativePath));
+        var relativeDestPath = Path.Combine(contentInfo.ContentRoot, string.IsNullOrEmpty(relativeOutputPath) ? relativePath.GetDestinationPath(contentInfo.ShouldBuild, contentInfo.GetOutputPath) : relativeOutputPath);
         var outputPath = Path.Combine(Parameters.RootedOutputDirectory, relativeDestPath);
         var outputDir = Path.GetDirectoryName(outputPath);
 
         if (string.IsNullOrWhiteSpace(outputDir))
         {
-            return (contentFileCache, null);
+            return null;
         }
 
         if (!Directory.Exists(outputDir))
@@ -131,15 +129,20 @@ public abstract class ContentBuilder
             Directory.CreateDirectory(outputDir);
         }
 
-        if (!contentInfo.ShouldBuild)
+        Logger.Log($"Output: {relativeDestPath}");
+        if (!Parameters.Rebuild)
         {
-            Logger.Log($"Output: {relativeDestPath}");
-            contentFileCache = ContentCache.ReadContentFileCache(this, relativePath, contentInfo.ContentRoot);
-            if (contentFileCache != null)
+            var fileCache = ContentCache.ReadContentFileCache(this, relativeDestPath);
+            if (fileCache != null && fileCache.IsValid(this, contentInfo))
             {
                 Logger.Log($"Cache: Found");
-                return (contentFileCache, null);
+                ContentCache.MarkUsed(fileCache);
+                return null;
             }
+        }
+
+        if (!contentInfo.ShouldBuild)
+        {
             Logger.Log($"Cache: Not Found");
 
             if (File.Exists(outputPath))
@@ -148,54 +151,35 @@ public abstract class ContentBuilder
             }
             File.Copy(filePath, outputPath);
 
-            contentFileCache = new ContentFileCache
-            {
-                ContentRoot = contentInfo.ContentRoot
-            };
-            contentFileCache.AddDependency(this, relativePath);
-            contentFileCache.AddOutputFile(this, outputPath);
-            ContentCache.WriteContentFileCache(this, relativePath, contentFileCache);
-            return (contentFileCache, null);
+            var fileCache = ContentCache.CreateContentFileCache(this, contentInfo);
+            fileCache.AddDependency(this, relativePath);
+            fileCache.AddOutputFile(this, outputPath);
+            ContentCache.WriteContentFileCache(this, relativeDestPath, fileCache);
+            ContentCache.MarkUsed(fileCache);
+            return null;
         }
 
         if (!ContentBuilderHelper.GetImporter(relativePath, contentInfo.Importer, out IContentImporter importer))
         {
             Logger.Log(LogLevel.Warning, "Importer: Not found :(");
-            return (contentFileCache, null);
+            return null;
         }
         Logger.Log($"Imposter: {importer.GetType().Name}");
         if (!ContentBuilderHelper.GetProcessor(importer, contentInfo.Processor, out IContentProcessor processor))
         {
             Logger.Log(LogLevel.Warning, "Processor: Not found :(");
-            return (contentFileCache, null);
+            return null;
         }
         Logger.Log($"Processor: {processor.GetType().Name}");
-        Logger.Log($"Output: {relativeDestPath}");
-
-        contentFileCache = ContentCache.ReadContentFileCache(this, relativePath, contentInfo.ContentRoot, true, importer, processor);
-        if (contentFileCache != null)
-        {
-            Logger.Log($"Cache: Found");
-            return (contentFileCache, null);
-        }
         Logger.Log($"Cache: Not Found");
 
-        contentFileCache = new ContentFileCache
-        {
-            ContentRoot = contentInfo.ContentRoot,
-            CompressContent = Parameters.CompressContent,
-            GraphicsProfile = Parameters.GraphicsProfile,
-            ShouldBuild = true,
-            Importer = importer,
-            Processor = processor
-        };
+        var contentFileCache = ContentCache.CreateContentFileCache(this, contentInfo);
         contentFileCache.AddDependency(this, relativePath);
-        contentFileCache.AddOutputFile(this, outputPath);
 
         var importContext = new ContentBuilderImporterContext(this, contentFileCache);
         var importedObject = importer.Import(filePath, importContext);
 
-        var processorContext = new ContentBuilderProcessorContext(this, contentFileCache, contentInfo.ContentRoot, outputPath);
+        var processorContext = new ContentBuilderProcessorContext(this, relativePath, contentInfo, contentFileCache, outputPath);
         var processedObject = processor.Process(importedObject, processorContext);
 
         if (writeToDisk)
@@ -203,26 +187,12 @@ public abstract class ContentBuilder
             var compiler = new ContentCompiler();
             using var stream = new FileStream(outputPath, FileMode.Create, FileAccess.Write, FileShare.None);
             compiler.Compile(stream, processedObject, Parameters.Platform, Parameters.GraphicsProfile, Parameters.CompressContent, Parameters.RootedOutputDirectory, outputDir);
-            ContentCache.WriteContentFileCache(this, relativePath, contentFileCache);
+            contentFileCache.AddOutputFile(this, outputPath);
+            ContentCache.WriteContentFileCache(this, relativeDestPath, contentFileCache);
+            ContentCache.MarkUsed(contentFileCache);
         }
 
-        return (contentFileCache, processedObject);
-    }
-
-    private ContentFileCache? CheckContentCache(string relativePath, ContentInfo contentInfo)
-    {
-        if (!contentInfo.ShouldBuild)
-        {
-            return ContentCache.ReadContentFileCache(this, relativePath, contentInfo.ContentRoot);
-        }
-
-        if (!ContentBuilderHelper.GetImporter(relativePath, contentInfo.Importer, out IContentImporter importer) ||
-            !ContentBuilderHelper.GetProcessor(importer, contentInfo.Processor, out IContentProcessor processor))
-        {
-            return null;
-        }
-
-        return ContentCache.ReadContentFileCache(this, relativePath, contentInfo.ContentRoot, true, importer, processor);
+        return processedObject;
     }
 
     /// <summary>
@@ -293,12 +263,15 @@ public abstract class ContentBuilder
 
         foreach (var filePath in Directory.GetFiles(directory))
         {
-            ContentInfo? contentInfo = null;
             var relativePath = Path.GetRelativePath(Parameters.RootedSourceDirectory, filePath);
-            if (contentCollection.GetContentInfo(relativePath, ref contentInfo) && contentInfo != null)
+            relativePath = relativePath.Sanitize();
+            if (contentCollection.GetContentInfo(relativePath, out List<ContentInfo> contentInfos) && contentInfos.Count > 0)
             {
-                _content[relativePath] = contentInfo;
-                _outputContent[Path.Combine(contentInfo.ContentRoot, contentInfo.GetOutputPath(relativePath))] = relativePath;
+                _content[relativePath] = contentInfos;
+                foreach (var contentInfo in contentInfos)
+                {
+                    _outputContent[Path.Combine(contentInfo.ContentRoot, contentInfo.GetOutputPath(relativePath))] = relativePath;
+                }
             }
         }
     }
@@ -307,7 +280,7 @@ public abstract class ContentBuilder
     {
         foreach (var pair in _content)
         {
-            if (_content.TryGetValue(pair.Key, out ContentInfo? contentInfo))
+            foreach(var contentInfo in pair.Value)
             {
                 BuildAndWriteContent(pair.Key, contentInfo);
             }
@@ -383,28 +356,36 @@ public abstract class ContentBuilder
 
         if (_outputContent.TryGetValue(args.ContentPath, out var inputPath))
         {
-            if (_content.TryGetValue(inputPath, out ContentInfo? contentInfo))
+            if (_content.TryGetValue(inputPath, out List<ContentInfo>? contentInfos))
             {
-                if (CheckContentCache(inputPath, contentInfo) is not null)
+                foreach (var contentInfo in contentInfos)
                 {
-                    // we've already found a valid cached version of content, so no need for any compilation here
-                    args.FilePath = Path.Combine(Parameters.RootedOutputDirectory, Path.Combine(contentInfo.ContentRoot, contentInfo.GetOutputPath(inputPath)));
-                    return;
-                }
+                    if (contentInfo.GetOutputPath(inputPath) != args.ContentPath)
+                    {
+                        continue;
+                    }
 
-                args.CompilationStarted = true;
-                lock (_contentRequestQueue)
-                {
-                    _contentRequestQueue.Enqueue(new ContentRequest
+                    if (ContentCache.ReadContentFileCache(this, args.ContentPath) is not null)
                     {
-                        InputPath = inputPath,
-                        ContentInfo = contentInfo,
-                        Server = contentServer,
-                        Args = args
-                    });
-                    lock (_contentRequestLock)
+                        // we've already found a valid cached version of content, so no need for any compilation here
+                        args.FilePath = Path.Combine(Parameters.RootedOutputDirectory, args.ContentPath);
+                        return;
+                    }
+
+                    args.CompilationStarted = true;
+                    lock (_contentRequestQueue)
                     {
-                        Monitor.Pulse(_contentRequestLock);
+                        _contentRequestQueue.Enqueue(new ContentRequest
+                        {
+                            InputPath = inputPath,
+                            ContentInfo = contentInfo,
+                            Server = contentServer,
+                            Args = args
+                        });
+                        lock (_contentRequestLock)
+                        {
+                            Monitor.Pulse(_contentRequestLock);
+                        }
                     }
                 }
             }

@@ -13,7 +13,7 @@ public interface IContentCollection
     /// Gets information about how the ocntent should be handled for the passed relative filepath.
     /// </summary>
     /// <param name="filePath">Relative path to the content file.</param>
-    /// <param name="contentInfo"><see cref="ContentInfo"/> describing the desired content handling.</param>
+    /// <param name="contentInfos">A list of <see cref="ContentInfo"/> describing the desired content handling.</param>
     /// <returns><c>true</c> if the content should be handled, <c>false</c> otherwise.</returns>
-    bool GetContentInfo(string filePath, ref ContentInfo? contentInfo);
+    bool GetContentInfo(string filePath, out List<ContentInfo> contentInfos);
 }
