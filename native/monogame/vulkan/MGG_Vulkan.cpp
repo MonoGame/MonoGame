@@ -1559,8 +1559,8 @@ void MGVK_RecreateSwapChain(
 	device->colorFormat = vkColor;
 	device->depthFormat = vkDepth;
 
+	VkSurfaceCapabilitiesKHR surface_capabilities;
 	{
-		VkSurfaceCapabilitiesKHR surface_capabilities;
 		res = vkGetPhysicalDeviceSurfaceCapabilitiesKHR(device->physicalDevice, device->surface, &surface_capabilities);
 		VK_CHECK_RESULT(res);
 
@@ -1602,7 +1602,12 @@ void MGVK_RecreateSwapChain(
 
 	VkSwapchainCreateInfoKHR create_info = { VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR };
 	create_info.surface = device->surface;
-	create_info.minImageCount = kConcurrentFrameCount;
+	// Use the maximum of our desired count and the surface's minimum requirement
+	create_info.minImageCount = (surface_capabilities.minImageCount > kConcurrentFrameCount) ? 
+								surface_capabilities.minImageCount : kConcurrentFrameCount;
+	// Cap at maxImageCount if it's not zero (zero means no limit)
+	if (surface_capabilities.maxImageCount > 0 && create_info.minImageCount > surface_capabilities.maxImageCount)
+		create_info.minImageCount = surface_capabilities.maxImageCount;
 	create_info.imageFormat = device->colorFormat;
 	create_info.imageColorSpace = VK_COLORSPACE_SRGB_NONLINEAR_KHR;
 	create_info.imageExtent = extent;
@@ -1653,7 +1658,10 @@ void MGVK_RecreateSwapChain(
 	res = vkGetSwapchainImagesKHR(device->device, device->swapchain, &swapchainCount, swapchainImages);
 	VK_CHECK_RESULT(res);
 
-	for (uint32_t i = 0; i < swapchainCount; ++i)
+	// Store swapchain images, but only create frame textures for the ones we'll use
+	uint32_t framesToCreate = (swapchainCount < kConcurrentFrameCount) ? swapchainCount : kConcurrentFrameCount;
+
+	for (uint32_t i = 0; i < framesToCreate; ++i)
 	{
 		VkImageCreateInfo image_create_info = { VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO };
 		image_create_info.imageType = VK_IMAGE_TYPE_2D;
