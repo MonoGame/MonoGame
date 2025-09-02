@@ -15,11 +15,9 @@ class ContentBuilderProcessorContext(ContentBuilder builder, string relativePath
 
     private readonly ContentInfo _contentInfo = contentInfo;
 
-    private readonly IContentFileCache _contentFileCache = contentFileCache;
-
     private int _contentIndex = 0;
 
-    private readonly ContentBuilderProcessorContext? _parentContext = ContextScopeFactory.HasActiveContext ? ContextScopeFactory.ActiveContext as ContentBuilderProcessorContext : null;
+    public IContentFileCache ContentFileCache { get; } = contentFileCache;
 
     public override string BuildConfiguration { get; } = "";
 
@@ -41,35 +39,12 @@ class ContentBuilderProcessorContext(ContentBuilder builder, string relativePath
 
     public override GraphicsProfile TargetProfile => _builder.Parameters.GraphicsProfile;
 
-    public override void AddDependency(string filename)
-    {
-        if (_parentContext != null)
-        {
-            _parentContext.AddDependency(filename);
-            return;
-        }
+    public override void AddDependency(string filename) => ContentFileCache.AddDependency(_builder, filename);
 
-        _contentFileCache.AddDependency(_builder, filename);
-    }
-
-    public override void AddOutputFile(string filename)
-    {
-        if (_parentContext != null)
-        {
-            _parentContext.AddOutputFile(filename);
-            return;
-        }
-
-        _contentFileCache.AddOutputFile(_builder, filename);
-    }
+    public override void AddOutputFile(string filename) => ContentFileCache.AddOutputFile(_builder, filename);
 
     public string GetNextOutputPath()
     {
-        if (_parentContext != null)
-        {
-            return _parentContext.GetNextOutputPath();
-        }
-
         _contentIndex++;
         return $"{_relativeContentPath.GetDestinationPath(true, _contentInfo.GetOutputPath)[0..^4]}_{_contentIndex}.xnb";
     }
@@ -85,7 +60,7 @@ class ContentBuilderProcessorContext(ContentBuilder builder, string relativePath
 
     public override TOutput BuildAndLoadAsset<TInput, TOutput>(ExternalReference<TInput> sourceAsset, IContentImporter importer, IContentProcessor processor)
     {
-        var processedObject = _builder.BuildAndLoadContent(sourceAsset.Filename, new ContentInfo(_contentInfo.ContentRoot, true, importer, processor), GetNextOutputPath());
+        var processedObject = _builder.BuildAndLoadContent(sourceAsset.Filename, new ContentInfo(_contentInfo.ContentRoot, true, importer, processor), GetNextOutputPath(), this);
         return (TOutput)processedObject!;
     }
 
@@ -102,7 +77,7 @@ class ContentBuilderProcessorContext(ContentBuilder builder, string relativePath
         IContentImporter importer, IContentProcessor processor, string? assetName)
     {
         var outputRelativePath = string.IsNullOrWhiteSpace(assetName) ? GetNextOutputPath() : assetName;
-        _builder.BuildAndWriteContent(sourceAsset.Filename, new ContentInfo(_contentInfo.ContentRoot, true, importer, processor), outputRelativePath);
+        _builder.BuildAndWriteContent(sourceAsset.Filename, new ContentInfo(_contentInfo.ContentRoot, true, importer, processor), outputRelativePath, this);
 
         return new ExternalReference<TOutput>(Path.Combine(_builder.Parameters.RootedOutputDirectory, outputRelativePath));
     }
@@ -116,7 +91,7 @@ class ContentBuilderProcessorContext(ContentBuilder builder, string relativePath
 
     public override TOutput Convert<TInput, TOutput>(TInput input, IContentProcessor processor)
     {
-        var processContext = new ContentBuilderProcessorContext(_builder, _relativeContentPath, _contentInfo, _contentFileCache);
+        var processContext = new ContentBuilderProcessorContext(_builder, _relativeContentPath, _contentInfo, ContentFileCache);
         using var _ = ContextScopeFactory.BeginContext(processContext);
         var processedObject = processor.Process(input!, processContext);
 

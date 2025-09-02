@@ -58,6 +58,24 @@ record ContentFileCache : IContentFileCache
         Dependencies.Remove(relativeDependencyPath);
     }
 
+    public void AddDependency(ContentBuilder builder, IContentFileCache fileCache)
+    {
+        if (fileCache is not ContentFileCache cache)
+        {
+            return;
+        }
+
+        foreach (var dependency in cache.Dependencies)
+        {
+            Dependencies[dependency.Key] = dependency.Value;
+        }
+
+        foreach (var output in cache.Outputs)
+        {
+            Outputs[output.Key] = output.Value;
+        }
+    }
+
     public void AddOutputFile(ContentBuilder builder, string outputPath)
     {
         string fullOutputPath;
