@@ -10,6 +10,7 @@ using System.Text.RegularExpressions;
 using Microsoft.Win32;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Content.Pipeline;
+using MonoGame.Tool;
 
 namespace MonoGame.Effect
 {
@@ -26,7 +27,7 @@ namespace MonoGame.Effect
             macros.Add("SM6", "1");
         }
 
-        internal override void ValidateShaderModels(MonoGame.Effect.TPGParser.PassInfo pass)
+        internal override void ValidateShaderModels(PassInfo pass)
         {
             if (!string.IsNullOrEmpty(pass.vsFunction))
             {
@@ -80,7 +81,7 @@ namespace MonoGame.Effect
 
                 // Compile the shader once just to get reflection info.
                 string stdout, stderr;
-                var result = ExternalTool.Run("dxc", toolArgs + "\"" + inputFile + "\"", out reflectionData, out stderr);
+                var result = Dxc.Run(toolArgs + "\"" + inputFile + "\"", out reflectionData, out stderr);
                 errorsAndWarnings += stderr;
                 if (result > 0)
                     throw new ShaderCompilerException();
@@ -103,7 +104,7 @@ namespace MonoGame.Effect
                 }
 
                 toolArgs += "/Fo " + "\"" + outputFile + "\"" + " ";
-                result = ExternalTool.Run("dxc", toolArgs + "\"" + inputFile + "\"", out stdout, out stderr);
+                result = Dxc.Run(toolArgs + "\"" + inputFile + "\"", out stdout, out stderr);
                 errorsAndWarnings += stderr;
                 if (result > 0)
                     throw new ShaderCompilerException();

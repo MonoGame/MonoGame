@@ -169,9 +169,7 @@ public sealed partial class Video : IDisposable
         // that doesn't assume Game exists.
         var device = Game.Instance.GraphicsDevice;
 
-        byte* _absolutePath = stackalloc byte[StringInterop.GetMaxSize(absolutePath)];
-        StringInterop.CopyString(_absolutePath, absolutePath);
-        _decoderV = MGM.VideoDecoder_Create(device.Handle, _absolutePath, out _infoV);
+        _decoderV = MGM.VideoDecoder_Create(device.Handle, absolutePath, out _infoV);
 
         if (_decoderV == null)
             return;

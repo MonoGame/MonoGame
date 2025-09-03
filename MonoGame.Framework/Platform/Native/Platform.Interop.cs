@@ -246,30 +246,28 @@ internal static unsafe partial class MGP
     [return: MarshalAs(UnmanagedType.U1)]
     public static extern byte Platform_BeforeDraw(MGP_Platform* platform);
 
-    [DllImport(MonoGameNativeDLL, EntryPoint = "MGP_Platform_MakePath", ExactSpelling = true)]
-    static extern byte* _Platform_MakePath(byte* location, byte* path);
+    [DllImport(MonoGameNativeDLL, EntryPoint = "MGP_Platform_MakePath", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    private static extern IntPtr _Platform_MakePath(
+        [MarshalAs(UnmanagedType.LPUTF8Str)] string location,
+        [MarshalAs(UnmanagedType.LPUTF8Str)] string path);
+
+    [DllImport(MonoGameNativeDLL, EntryPoint = "MGP_Platform_Free", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    private static extern void _Platform_Free(IntPtr ptr);
 
     public static string Platform_MakePath(string location, string path)
     {
-        byte* _result = null;
-
+        IntPtr resultPtr = IntPtr.Zero;
         try
         {
-            byte* _location = stackalloc byte[StringInterop.GetMaxSize(location)];
-            StringInterop.CopyString(_location, location);
-
-            byte* _path = stackalloc byte[StringInterop.GetMaxSize(path)];
-            StringInterop.CopyString(_path, path);
-
-            _result = _Platform_MakePath(_location, _path);
-
-            string result = StringInterop.ToString(_result);
-
-            return result;
+            resultPtr = _Platform_MakePath(location, path);
+            if (resultPtr == IntPtr.Zero)
+                return null;
+            return Marshal.PtrToStringUTF8(resultPtr);
         }
         finally
         {
-            StringInterop.Free(_result);
+            if (resultPtr != IntPtr.Zero)
+                _Platform_Free(resultPtr);
         }
     }
 
@@ -283,8 +281,8 @@ internal static unsafe partial class MGP
 
     #region Window
 
-    [DllImport(MonoGameNativeDLL, EntryPoint = "MGP_Window_Create", ExactSpelling = true)]
-    public static extern MGP_Window* Window_Create(MGP_Platform* platform, ref int width, ref int height, byte* title);
+    [DllImport(MonoGameNativeDLL, EntryPoint = "MGP_Window_Create", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern MGP_Window* Window_Create(MGP_Platform* platform, ref int width, ref int height, [MarshalAs(UnmanagedType.LPUTF8Str)] string title);
 
     [DllImport(MonoGameNativeDLL, EntryPoint = "MGP_Window_Destroy", ExactSpelling = true)]
     public static extern void Window_Destroy(MGP_Window* window);
@@ -307,8 +305,8 @@ internal static unsafe partial class MGP
     [DllImport(MonoGameNativeDLL, EntryPoint = "MGP_Window_SetIsBorderless", ExactSpelling = true)]
     public static extern void Window_SetIsBorderless(MGP_Window* window, byte borderless);
 
-    [DllImport(MonoGameNativeDLL, EntryPoint = "MGP_Window_SetTitle", ExactSpelling = true)]
-    public static extern void Window_SetTitle(MGP_Window* window, byte* title);
+    [DllImport(MonoGameNativeDLL, EntryPoint = "MGP_Window_SetTitle", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void Window_SetTitle(MGP_Window* window, [MarshalAs(UnmanagedType.LPUTF8Str)] string title);
 
     [DllImport(MonoGameNativeDLL, EntryPoint = "MGP_Window_Show", ExactSpelling = true)]
     public static extern void Window_Show(MGP_Window* window, byte show);
@@ -325,12 +323,12 @@ internal static unsafe partial class MGP
     [DllImport(MonoGameNativeDLL, EntryPoint = "MGP_Window_SetCursor", ExactSpelling = true)]
     public static extern void Window_SetCursor(MGP_Window* window, MGP_Cursor* cursor);        
 
-    [DllImport(MonoGameNativeDLL, EntryPoint = "MGP_Window_ShowMessageBox", ExactSpelling = true)]
+    [DllImport(MonoGameNativeDLL, EntryPoint = "MGP_Window_ShowMessageBox", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
     public static extern int Window_ShowMessageBox(
          MGP_Window* window,
-         byte* title,
-         byte* description,
-         byte* buttons,
+         [MarshalAs(UnmanagedType.LPUTF8Str)] string title,
+         [MarshalAs(UnmanagedType.LPUTF8Str)] string description,
+         [MarshalAs(UnmanagedType.LPUTF8Str)] string buttons,
          int count);
 
     [DllImport(MonoGameNativeDLL, EntryPoint = "MGP_Window_EnterFullScreen", ExactSpelling = true)]

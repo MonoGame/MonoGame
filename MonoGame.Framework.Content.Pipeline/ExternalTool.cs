@@ -7,8 +7,8 @@ using System.Diagnostics;
 using System.IO;
 using System.Net;
 using System.Reflection;
+using System.Runtime.InteropServices;
 using System.Threading;
-using MonoGame.Framework.Utilities;
 
 namespace Microsoft.Xna.Framework.Content.Pipeline
 {
@@ -32,31 +32,31 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
         static void RestoreDotnetTool(string command, string toolName, string toolVersion, string path)
         {
             Directory.CreateDirectory(path);
-            var exe = CurrentPlatform.OS == OS.Windows ? "dotnet.exe" : "dotnet";
+            var exe = RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "dotnet.exe" : "dotnet";
             var dotnetRoot = Environment.GetEnvironmentVariable("DOTNET_ROOT");
             if (!string.IsNullOrEmpty(dotnetRoot))
             {
                 exe = Path.Combine(dotnetRoot, exe);
             }
-            if (Run(exe, $"tool {command} {toolName} --version {toolVersion} --tool-path .", out string stdout, out string stderr,  workingDirectory: path) != 0)
+            if (Run(exe, $"tool {command} {toolName} --version {toolVersion} --tool-path .", out string stdout, out string stderr, workingDirectory: path) != 0)
             {
                 // install the latest
-                Debug.WriteLine ($"{command} returned {stdout} {stderr}. Trying backup path.");
-                Run(exe, $"tool {command} {toolName} --tool-path .", out stdout, out stderr,  workingDirectory: path);
+                Debug.WriteLine($"{command} returned {stdout} {stderr}. Trying backup path.");
+                Run(exe, $"tool {command} {toolName} --tool-path .", out stdout, out stderr, workingDirectory: path);
             }
         }
 
         /// <summary>
         /// Run a dotnet tool. The tool should be installed in a .config/dotnet-tools.json file somewhere in the project lineage.
         /// </summary>
-        public static int RunDotnetTool(string toolName, string args, out string stdOut, out string stdErr, string stdIn=null, string workingDirectory=null)
+        public static int RunDotnetTool(string toolName, string args, out string stdOut, out string stdErr, string stdIn = null, string workingDirectory = null)
         {
             var exe = FindCommand(toolName);
-            var finalizedArgs =  args;
+            var finalizedArgs = args;
             return ExternalTool.Run(exe, finalizedArgs, out stdOut, out stdErr, stdIn, workingDirectory);
         }
 
-        public static int Run(string command, string arguments, out string stdout, out string stderr, string stdin = null, string workingDirectory=null)
+        public static int Run(string command, string arguments, out string stdout, out string stderr, string stdin = null, string workingDirectory = null)
         {
             // This particular case is likely to be the most common and thus
             // warrants its own specific error message rather than falling
@@ -164,12 +164,12 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
 
             // For Linux check specific subfolder
             var lincom = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "linux", command);
-            if (CurrentPlatform.OS == OS.Linux && File.Exists(lincom))
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux) && File.Exists(lincom))
                 return lincom;
 
             // For Mac check specific subfolder
             var maccom = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "osx", command);
-            if (CurrentPlatform.OS == OS.MacOSX && File.Exists(maccom))
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX) && File.Exists(maccom))
                 return maccom;
 
             // We don't have a full path, so try running through the system path to find it.
@@ -184,7 +184,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
                 if (File.Exists(fullName))
                     return fullName;
 
-                if (CurrentPlatform.OS == OS.Windows)
+                if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
                 {
                     var fullExeName = string.Concat(fullName, ".exe");
                     if (File.Exists(fullExeName))

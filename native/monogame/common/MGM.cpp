@@ -11,6 +11,7 @@ struct MGG_Texture;
 #include "api_MGG.h"
 
 #include <stdio.h>
+#include <string.h>
 
 
 void MGM_ReadSignature(const char* filepath, MGM_SIGNATURE)
@@ -46,8 +47,6 @@ MGM_AudioDecoder* MGM_AudioDecoder_TryCreate_Mp3(MGM_SIGNATURE)
 	return nullptr;
 }
 
-#if defined(_WIN32)
-
 MGM_AudioDecoder* MGM_AudioDecoder_Create(const char* filepath, MGM_AudioDecoderInfo& info)
 {
 	assert(filepath != nullptr);
@@ -72,8 +71,6 @@ MGM_AudioDecoder* MGM_AudioDecoder_Create(const char* filepath, MGM_AudioDecoder
 	return decoder;
 }
 
-#endif
-
 void MGM_AudioDecoder_Destroy(MGM_AudioDecoder* decoder)
 {
 	assert(decoder != nullptr);
@@ -91,8 +88,6 @@ mgbyte MGM_AudioDecoder_Decode(MGM_AudioDecoder* decoder, mgbyte*& buffer, mguin
 	assert(decoder != nullptr);
 	return decoder->Decode(buffer, size);
 }
-
-
 
 MGM_VideoDecoder* MGM_VideoDecoder_TryCreate_Theora(MGM_SIGNATURE)
 {
@@ -118,8 +113,6 @@ MGM_VideoDecoder* MGM_VideoDecoder_TryCreate_OpenH264(MGM_SIGNATURE)
 	return nullptr;
 }
 
-#if defined(_WIN32)
-
 MGM_VideoDecoder* MGM_VideoDecoder_Create(MGG_GraphicsDevice* device, const char* filepath, MGM_VideoDecoderInfo& info)
 {
 	assert(filepath != nullptr);
@@ -144,8 +137,6 @@ MGM_VideoDecoder* MGM_VideoDecoder_Create(MGG_GraphicsDevice* device, const char
 	decoder->Initialize(filepath, info);
 	return decoder;
 }
-
-#endif
 
 void MGM_VideoDecoder_Destroy(MGM_VideoDecoder* decoder)
 {

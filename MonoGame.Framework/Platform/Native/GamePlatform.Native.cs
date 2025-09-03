@@ -178,8 +178,8 @@ class NativeGamePlatform : GamePlatform
                     var window = NativeGameWindow.FromHandle(event_.MouseWheel.Window);
                     if (window != null)
                     {
-                        window.MouseState.ScrollWheelValue = event_.MouseWheel.Scroll;
-                        window.MouseState.HorizontalScrollWheelValue = event_.MouseWheel.ScrollH;
+                        window.MouseState.ScrollWheelValue += event_.MouseWheel.Scroll;
+                        window.MouseState.HorizontalScrollWheelValue += event_.MouseWheel.ScrollH;
                     }
                     break;
                 }

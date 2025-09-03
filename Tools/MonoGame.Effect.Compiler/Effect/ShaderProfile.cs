@@ -11,6 +11,7 @@ using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading;
+using Microsoft.Xna.Framework.Content.Pipeline;
 using MonoGame.Effect.TPGParser;
 
 namespace MonoGame.Effect
@@ -77,6 +78,15 @@ namespace MonoGame.Effect
             major = int.Parse(match.Groups["major"].Value, NumberStyles.Integer, CultureInfo.InvariantCulture);
             minor = int.Parse(match.Groups["minor"].Value, NumberStyles.Integer, CultureInfo.InvariantCulture);
         }
+
+        public static ShaderProfile GetProfileForPlatform(TargetPlatform platform) => platform switch
+        {
+            TargetPlatform.Windows => ShaderProfile.DirectX_11,
+            TargetPlatform.iOS or TargetPlatform.Android or TargetPlatform.DesktopGL or TargetPlatform.MacOSX or TargetPlatform.RaspberryPi or TargetPlatform.Web => ShaderProfile.OpenGL,
+            TargetPlatform.DesktopVK => ShaderProfile.Vulkan,
+            TargetPlatform.WindowsGDK or TargetPlatform.XboxOne or TargetPlatform.XboxSeries => new DirectX12ShaderProfile(),
+            _ => ShaderProfile.FromName(platform.ToString())
+        };
 
         private class StringConverter : TypeConverter
         {

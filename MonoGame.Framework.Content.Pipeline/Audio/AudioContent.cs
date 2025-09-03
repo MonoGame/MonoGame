@@ -4,6 +4,7 @@
 
 using System;
 using System.Collections.ObjectModel;
+using System.Globalization;
 using System.IO;
 
 namespace Microsoft.Xna.Framework.Content.Pipeline.Audio
@@ -122,7 +123,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Audio
                 // the type is WAV... else it is ok.
                 if (    (audioFileType == AudioFileType.Wav || _fileType == AudioFileType.Wav) &&
                         audioFileType != _fileType)
-                    throw new ArgumentException("Incorrect file type!", "audioFileType");
+                    throw new ArgumentException(string.Format(CultureInfo.InvariantCulture, "Incorrect file type! Expected '.wav' but found '.{0}'. Did you mean to use the Mp3Importer?", _fileType), "audioFileType");
 
                 // Only provide the data for WAV files.
                 if (audioFileType == AudioFileType.Wav)
@@ -157,7 +158,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Audio
             }
             catch (Exception ex)
             {
-                var message = string.Format("Failed to open file {0}. Ensure the file is a valid audio file and is not DRM protected.", Path.GetFileNameWithoutExtension(audioFileName));
+                var message = string.Format(CultureInfo.InvariantCulture, "There was an error processing '{0}'\n {1}", Path.GetFileNameWithoutExtension(audioFileName), ex.Message);
                 throw new InvalidContentException(message, ex);
             }
         }

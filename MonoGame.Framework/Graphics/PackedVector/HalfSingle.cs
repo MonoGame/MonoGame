@@ -3,12 +3,16 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Microsoft.Xna.Framework.Graphics.PackedVector
 {
     /// <summary>
     /// Packed vector type containing a single 16-bit floating point
     /// </summary>
+#if XNADESIGNPROVIDED
+    [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.Interfaces | DynamicallyAccessedMemberTypes.PublicParameterlessConstructor)]
+#endif
     public struct HalfSingle : IPackedVector<UInt16>, IEquatable<HalfSingle>, IPackedVector
     {
         UInt16 packedValue;

@@ -8,7 +8,7 @@ namespace Microsoft.Xna.Framework.Graphics
 {
     /// <summary>
     /// Immutable version of <see cref="VertexInputLayout"/>. Can be used as a key in the
-    /// <see cref="InputLayoutCache"/>.
+    /// input layout cache.
     /// </summary>
     internal sealed class ImmutableVertexInputLayout : VertexInputLayout
     {

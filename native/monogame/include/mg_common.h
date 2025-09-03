@@ -8,12 +8,17 @@
 
 #include <stdio.h>
 #include <assert.h>
+#include <limits.h>
+#include <stdlib.h>
+#include <string.h>
 
 #include <vector>
 #include <string>
 #include <queue>
 #include <map>
 #include <functional>
+#include <algorithm>
+#include <optional> 
 
 
 #if defined(_WIN32)
@@ -26,6 +31,12 @@
 #define MG_PATH_SEPARATOR "\\"
 #else
 #define MG_PATH_SEPARATOR "/"
+#endif
+
+#ifdef _WIN32
+    #define MAX_PATH_SIZE _MAX_PATH
+#else
+    #define MAX_PATH_SIZE PATH_MAX
 #endif
 
 inline void MG_Print_StdError(const char* file, int line, const char* message)
@@ -52,6 +63,7 @@ inline void MG_Print_StdOut(const char* file, int line, const char* message)
 
 mguint MG_ComputeHash(const mgbyte* value, mgint length);
 mguint MG_ComputeHash(mguint value, mguint result = 0x811c9dc5);
+mguint MG_ComputeHash(const mgbyte* value, mgint length, mguint result);
 
 // Removes the element preserving order.
 template <class T>

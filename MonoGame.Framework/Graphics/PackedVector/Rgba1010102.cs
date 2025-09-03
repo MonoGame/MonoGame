@@ -3,6 +3,7 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Microsoft.Xna.Framework.Graphics.PackedVector
 {
@@ -10,6 +11,9 @@ namespace Microsoft.Xna.Framework.Graphics.PackedVector
     /// Packed vector type containing unsigned normalized values ranging from 0 to 1.
     /// The x, y and z components use 10 bits, and the w component uses 2 bits.
     /// </summary>
+#if XNADESIGNPROVIDED
+    [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.Interfaces | DynamicallyAccessedMemberTypes.PublicParameterlessConstructor)]
+#endif
     public struct Rgba1010102 : IPackedVector<uint>, IEquatable<Rgba1010102>, IPackedVector
     {
         /// <inheritdoc />

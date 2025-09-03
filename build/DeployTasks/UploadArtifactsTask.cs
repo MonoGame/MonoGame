@@ -42,26 +42,40 @@ public sealed class UploadArtifactsTask : AsyncFrostingTask<BuildContext>
             DeleteToolStore(context, path);
         }
 
-        var version = BuildContext.CalculateVersion(context);
-
         // Upload mgpipeline native libraries
-        var buildConf = context.Argument("build-configuration", "Release");
-        var mgDir = System.IO.Path.Combine(context.BuildOutput, "mgpipeline", buildConf);
-        if (System.IO.Directory.Exists(mgDir))
+        switch (context.Environment.Platform.Family)
         {
-            await context.GitHubActions().Commands.UploadArtifact(new DirectoryPath(mgDir), $"mgpipeline-{os}.{version}");
+            case PlatformFamily.Windows:
+                await context.GitHubActions().Commands.UploadArtifact(new DirectoryPath("Artifacts/native/mgpipeline/windows/Release/"), $"mgpipeline-{os}.{context.Version}");
+                await context.GitHubActions().Commands.UploadArtifact(new DirectoryPath("Artifacts/monogame.native/windows/"), $"mgnative-{os}.{context.Version}");
+                break;
+            case PlatformFamily.Linux:
+                await context.GitHubActions().Commands.UploadArtifact(new DirectoryPath("Artifacts/native/mgpipeline/linux/Release/"), $"mgpipeline-{os}.{context.Version}");
+                //await context.GitHubActions().Commands.UploadArtifact(new DirectoryPath("Artifacts/monogame.native/linux/"), $"mgnative-{os}.{context.Version}");
+                break;
+            case PlatformFamily.OSX:
+                await context.GitHubActions().Commands.UploadArtifact(new DirectoryPath("Artifacts/native/mgpipeline/macosx/Release/"), $"mgpipeline-{os}.{context.Version}");
+                //await context.GitHubActions().Commands.UploadArtifact(new DirectoryPath("Artifacts/monogame.native/macosx/"), $"mgnative-{os}.{context.Version}");
+                break;
+            default:
+                throw new NotSupportedException($"Platform {context.Environment.Platform.Family} is not supported for static library checks.");
         }
 
+        // Upload Binaries
+        await context.GitHubActions().Commands.UploadArtifact(new DirectoryPath("Artifacts/MonoGame.Framework/"), $"mgframework-{os}.{context.Version}");
+        await context.GitHubActions().Commands.UploadArtifact(new DirectoryPath("Artifacts/Binaries/"), $"mgbinaries-{os}.{context.Version}");
+
         // Upload NuGet packages
-        await context.GitHubActions().Commands.UploadArtifact(new DirectoryPath(context.NuGetsDirectory.FullPath), $"nuget-{os}.{version}");
+        await context.GitHubActions().Commands.UploadArtifact(new DirectoryPath(context.NuGetsDirectory), $"nuget-{os}.{context.Version}");
         await context.GitHubActions().Commands.UploadArtifact(new DirectoryPath(System.IO.Path.Combine(context.BuildOutput, "Tests", "DesktopGL", "Release")), $"tests-desktopgl-{os}");
+        await context.GitHubActions().Commands.UploadArtifact(new DirectoryPath(System.IO.Path.Combine(context.BuildOutput, "Tests", "DesktopVK", "Release")), $"tests-desktopvk-{os}");
         if (context.IsRunningOnWindows())
         {
             await context.GitHubActions().Commands.UploadArtifact(new DirectoryPath(System.IO.Path.Combine(context.BuildOutput, "Tests", "WindowsDX", "Release")), $"tests-windowsdx-{os}");
 
             // Assuming that the .vsix file has already been created and is located at this exact path.
             var vsixFilePath = System.IO.Path.Combine(context.BuildOutput, "MonoGame.Templates.VSExtension", "net472", "MonoGame.Templates.VSExtension.vsix");
-            await context.GitHubActions().Commands.UploadArtifact(new FilePath(vsixFilePath), $"MonoGame.Templates.VSExtension.{version}.vsix");
+            await context.GitHubActions().Commands.UploadArtifact(new FilePath(vsixFilePath), $"MonoGame.Templates.VSExtension.{context.Version}.vsix");
         }
     }
 
@@ -84,7 +98,7 @@ public sealed class UploadArtifactsTask : AsyncFrostingTask<BuildContext>
                     context.Log.Information($"Deleting: {file}");
                     System.IO.File.Delete(file);
                 }
-                
+
             }
         }
     }

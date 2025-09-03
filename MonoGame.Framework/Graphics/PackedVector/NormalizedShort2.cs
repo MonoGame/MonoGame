@@ -4,13 +4,17 @@
 
 
 using System;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Microsoft.Xna.Framework.Graphics.PackedVector
 {
     /// <summary>
     /// Packed vector type containing two 16-bit signed normalized values, ranging from −1 to 1.
     /// </summary>
-	public struct NormalizedShort2 : IPackedVector<uint>, IEquatable<NormalizedShort2>
+#if XNADESIGNPROVIDED
+    [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.Interfaces | DynamicallyAccessedMemberTypes.PublicParameterlessConstructor)]
+#endif
+    public struct NormalizedShort2 : IPackedVector<uint>, IEquatable<NormalizedShort2>
 	{
 		private uint short2Packed;
 

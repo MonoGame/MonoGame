@@ -9,7 +9,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tools", "Tools", "{65B3DC17
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MonoGame.Generator.CTypes", "Tools\MonoGame.Generator.CTypes\MonoGame.Generator.CTypes.csproj", "{74F12E34-D96B-4EC1-A218-BAFC83DC6220}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MonoGame.Tests.WindowsVK", "Tests\MonoGame.Tests.WindowsVK.csproj", "{C670BF60-56F7-493F-B5DD-50F97DB80A04}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MonoGame.Tests.DesktopVK", "Tests\MonoGame.Tests.DesktopVK.csproj", "{C670BF60-56F7-493F-B5DD-50F97DB80A04}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "desktopvk", "native\monogame\desktopvk.vcxproj", "{60D6243F-CC40-D9B5-157F-8A5B8128B70A}"
 EndProject
