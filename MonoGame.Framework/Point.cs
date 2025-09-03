@@ -139,6 +139,19 @@ namespace Microsoft.Xna.Framework
         }
 
         /// <summary>
+        /// Multiplies the components of a <see cref="Point"/> by a scalar.
+        /// </summary>
+        /// <param name="scaleFactor">Scalar value on the left of the mul sign.</param>
+        /// <param name="value">Source <see cref="Point"/> on the right of the mul sign.</param>
+        /// <returns>Result of multiplying point with a scalar.</returns>
+        public static Point operator *(int scaleFactor, Point value)
+        {
+            value.X *= scaleFactor;
+            value.Y *= scaleFactor;
+            return value;
+        }
+
+        /// <summary>
         /// Divides the components of a <see cref="Point"/> by the components of another <see cref="Point"/>.
         /// </summary>
         /// <param name="source">Source <see cref="Point"/> on the left of the div sign.</param>
