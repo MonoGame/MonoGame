@@ -71,12 +71,13 @@ public abstract class ContentBuilder
     /// <param name="relativeSrcPath">A relative path to the source asset.</param>
     /// <param name="contentInfo">The desired <see cref="ContentInfo"/> to be used for the content building.</param>
     /// <param name="relativeDstPath">The desired relative output path.</param>
-    public void BuildAndWriteContent(string relativeSrcPath, ContentInfo contentInfo, string? relativeDstPath = null)
+    /// <param name="parentContext">Only set when the method is being called by the ContentProcessorContext to build one of its children.</param>
+    public void BuildAndWriteContent(string relativeSrcPath, ContentInfo contentInfo, string? relativeDstPath = null, ContentProcessorContext? parentContext = null)
     {
         Logger.PushFile(relativeSrcPath);
         try
         {
-            ProcessContent(relativeSrcPath, contentInfo, true, relativeDstPath);
+            ProcessContent(relativeSrcPath, contentInfo, true, relativeDstPath, parentContext);
             SucceededToBuild++;
         }
         catch (Exception ex)
@@ -93,13 +94,14 @@ public abstract class ContentBuilder
     /// <param name="relativeSrcPath">A relative path to the source asset.</param>
     /// <param name="contentInfo">The desired <see cref="ContentInfo"/> to be used for the content building.</param>
     /// <param name="relativeDstPath">The desired relative output path.</param>
+    /// <param name="parentContext">Only set when the method is being called by the ContentProcessorContext to build one of its children.</param>
     /// <returns>The built object that the <see cref="IContentProcessor.Process(object, ContentProcessorContext)"/> returned.</returns>
-    public object? BuildAndLoadContent(string relativeSrcPath, ContentInfo contentInfo, string? relativeDstPath = null)
+    public object? BuildAndLoadContent(string relativeSrcPath, ContentInfo contentInfo, string? relativeDstPath = null, ContentProcessorContext? parentContext = null)
     {
         Logger.PushFile(relativeSrcPath);
         try
         {
-            var content = ProcessContent(relativeSrcPath, contentInfo, false, relativeDstPath);
+            var content = ProcessContent(relativeSrcPath, contentInfo, false, relativeDstPath, parentContext);
             SucceededToBuild++;
             return content;
         }
@@ -112,7 +114,7 @@ public abstract class ContentBuilder
         return null;
     }
 
-    private object? ProcessContent(string relativePath, ContentInfo contentInfo, bool writeToDisk, string? relativeOutputPath)
+    private object? ProcessContent(string relativePath, ContentInfo contentInfo, bool writeToDisk, string? relativeOutputPath, ContentProcessorContext? parentContext)
     {
         var filePath = Path.Combine(Parameters.RootedSourceDirectory, relativePath);
         var relativeDestPath = Path.Combine(contentInfo.ContentRoot, string.IsNullOrEmpty(relativeOutputPath) ? relativePath.GetDestinationPath(contentInfo.ShouldBuild, contentInfo.GetOutputPath) : relativeOutputPath);
@@ -156,6 +158,7 @@ public abstract class ContentBuilder
             fileCache.AddOutputFile(this, outputPath);
             ContentCache.WriteContentFileCache(this, relativeDestPath, fileCache);
             ContentCache.MarkUsed(fileCache);
+            (parentContext as ContentBuilderProcessorContext)?.ContentFileCache.AddDependency(this, fileCache);
             return null;
         }
 
@@ -190,6 +193,7 @@ public abstract class ContentBuilder
             contentFileCache.AddOutputFile(this, outputPath);
             ContentCache.WriteContentFileCache(this, relativeDestPath, contentFileCache);
             ContentCache.MarkUsed(contentFileCache);
+            (parentContext as ContentBuilderProcessorContext)?.ContentFileCache.AddDependency(this, contentFileCache);
         }
 
         return processedObject;
@@ -354,21 +358,22 @@ public abstract class ContentBuilder
             return;
         }
 
-        if (_outputContent.TryGetValue(args.ContentPath, out var inputPath))
+        var outputPath = args.ContentPath.Sanitize();
+        if (_outputContent.TryGetValue(outputPath, out var inputPath))
         {
             if (_content.TryGetValue(inputPath, out List<ContentInfo>? contentInfos))
             {
                 foreach (var contentInfo in contentInfos)
                 {
-                    if (contentInfo.GetOutputPath(inputPath) != args.ContentPath)
+                    if (contentInfo.GetOutputPath(inputPath) != outputPath)
                     {
                         continue;
                     }
 
-                    if (ContentCache.ReadContentFileCache(this, args.ContentPath) is not null)
+                    if (ContentCache.ReadContentFileCache(this, outputPath) is not null)
                     {
                         // we've already found a valid cached version of content, so no need for any compilation here
-                        args.FilePath = Path.Combine(Parameters.RootedOutputDirectory, args.ContentPath);
+                        args.FilePath = Path.Combine(Parameters.RootedOutputDirectory, outputPath);
                         return;
                     }
 

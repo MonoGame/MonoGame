@@ -17,6 +17,13 @@ public interface IContentFileCache
     void AddDependency(ContentBuilder builder, string dependencyPath);
 
     /// <summary>
+    /// Adds the specified file cache as a dependency related to the current content file.
+    /// </summary>
+    /// <param name="builder">A <see cref="ContentBuilder"/> the added depedency is related to.</param>
+    /// <param name="fileCache">A dependent file cache.</param>
+    void AddDependency(ContentBuilder builder, IContentFileCache fileCache);
+
+    /// <summary>
     /// Adds the specified file as an output file related to the current content file.
     /// </summary>
     /// <param name="builder">A <see cref="ContentBuilder"/> the output file is related to.</param>
