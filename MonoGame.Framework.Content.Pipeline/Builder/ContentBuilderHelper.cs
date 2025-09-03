@@ -14,7 +14,7 @@ using MonoGame.Framework.Content.Pipeline.Builder.Server;
 
 namespace MonoGame.Framework.Content.Pipeline.Builder;
 
-class ContentBuilderHelper
+static class ContentBuilderHelper
 {
     sealed class ColorConverter : IYamlTypeConverter
     {
@@ -286,4 +286,56 @@ class ContentBuilderHelper
             }
         }
     }
+
+    public static string GetDestinationPath(this string filePath, bool build, Func<string, string>? outputFunc = null)
+    {
+        if (string.IsNullOrEmpty(filePath))
+        {
+            return filePath;
+        }
+
+        if (build)
+        {
+            int extensionEnd = filePath.Length - 1;
+            for (int i = extensionEnd; i >= 0; i--)
+            {
+                if (filePath[i] == '.')
+                {
+                    extensionEnd = i;
+                }
+
+                if (filePath[i] == '/' || filePath[i] == '\\')
+                {
+                    break;
+                }
+            }
+
+            filePath = filePath[..extensionEnd];
+        }
+
+        filePath = filePath.Sanitize();
+
+        if (outputFunc != null)
+        {
+            filePath = outputFunc(filePath);
+        }
+
+        if (build)
+        {
+            filePath += ".xnb";
+        }
+
+        return filePath;
+    }
+
+    public static string Sanitize(this string filePath)
+    {
+        if (string.IsNullOrEmpty(filePath))
+        {
+            return filePath;
+        }
+
+        return filePath.Replace('\\', '/');
+    }
 }
+
