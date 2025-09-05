@@ -164,13 +164,13 @@ public abstract class ContentBuilder
 
         if (!ContentBuilderHelper.GetImporter(relativePath, contentInfo.Importer, out IContentImporter importer))
         {
-            Logger.Log(LogLevel.Warning, "Importer: Not found :(");
+            Logger.Log(LogLevel.Warning, "Importer: Not found");
             return null;
         }
         Logger.Log($"Imposter: {importer.GetType().Name}");
         if (!ContentBuilderHelper.GetProcessor(importer, contentInfo.Processor, out IContentProcessor processor))
         {
-            Logger.Log(LogLevel.Warning, "Processor: Not found :(");
+            Logger.Log(LogLevel.Warning, "Processor: Not found");
             return null;
         }
         Logger.Log($"Processor: {processor.GetType().Name}");
