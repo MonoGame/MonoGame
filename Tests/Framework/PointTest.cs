@@ -59,8 +59,8 @@ namespace MonoGame.Tests.Framework
             Point pointTwo = new Point(1, 2);
 
             // Test two-point division.
-            Assert.AreEqual(new Point(pointOne.X / pointTwo.X), pointOne / pointTwo);
-            Assert.AreEqual(new Point(pointTwo.X / pointOne.X), pointTwo / pointOne);
+            Assert.AreEqual(new Point(point.X / pointTwo.X), point / pointTwo);
+            Assert.AreEqual(new Point(pointTwo.X / point.X), pointTwo / point);
         }
     }
 }
