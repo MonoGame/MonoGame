@@ -26,6 +26,8 @@ public abstract class ContentBuilder
         public required ContentRequestedArgs Args { get; set; }
     }
 
+    private class SkipLogException() : Exception;
+
     private readonly Queue<ContentRequest> _contentRequestQueue = [];
     private readonly object _contentRequestLock = new();
     private readonly Dictionary<string, List<ContentInfo>> _content = [];
@@ -82,10 +84,20 @@ public abstract class ContentBuilder
         }
         catch (Exception ex)
         {
-            Logger.Log(LogLevel.Error, $"Countent failed to build:\n{ex}");
             FailedToBuild++;
+            if (ex is not SkipLogException)
+            {
+                Logger.Log(LogLevel.Error, $"Countent failed to build: {ex}");
+            }
+            if (parentContext != null)
+            {
+                throw new SkipLogException();
+            }
         }
-        Logger.PopFile();
+        finally
+        {
+            Logger.PopFile();
+        }
     }
 
     /// <summary>
@@ -107,10 +119,20 @@ public abstract class ContentBuilder
         }
         catch (Exception ex)
         {
-            Logger.Log(LogLevel.Error, $"Countent failed to build:\n{ex}");
             FailedToBuild++;
+            if (ex is not SkipLogException)
+            {
+                Logger.Log(LogLevel.Error, $"Countent failed to build: {ex}");
+            }
+            if (parentContext != null)
+            {
+                throw new SkipLogException();
+            }
         }
-        Logger.PopFile();
+        finally
+        {
+            Logger.PopFile();
+        }
         return null;
     }
 
