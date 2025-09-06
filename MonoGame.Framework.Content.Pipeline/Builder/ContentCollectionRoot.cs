@@ -13,15 +13,15 @@ class ContentCollectionRoot(string contentRoot)
     private readonly List<(ContentRule rule, ContentInfo? info)> _rules = [];
 
     public void IncludeCopy(string inputPath, string? outputPath)
-        => _imputFiles[inputPath] = new(_contentRoot, false, null, null, string.IsNullOrWhiteSpace(outputPath) ? (s => s) : (_ => outputPath));
+        => _imputFiles[inputPath.Sanitize()] = new(_contentRoot, false, null, null, string.IsNullOrWhiteSpace(outputPath) ? (s => s) : (_ => outputPath));
 
     public void Include(string inputPath, IContentImporter? contentImporter, IContentProcessor? contentProcessor)
-        => _imputFiles[inputPath] = new(_contentRoot, true, contentImporter, contentProcessor);
+        => _imputFiles[inputPath.Sanitize()] = new(_contentRoot, true, contentImporter, contentProcessor);
 
     public void Include(string inputPath, string outputPath, IContentImporter? contentImporter, IContentProcessor? contentProcessor )
-        => _imputFiles[inputPath] = new(_contentRoot, true, contentImporter, contentProcessor, _ => outputPath);
+        => _imputFiles[inputPath.Sanitize()] = new(_contentRoot, true, contentImporter, contentProcessor, _ => outputPath);
 
-    public void Exclude(string excludePath) => _imputFiles[excludePath] = null;
+    public void Exclude(string excludePath) => _imputFiles[excludePath.Sanitize()] = null;
 
     public void IncludeCopy<T>(string includePattern, Func<string, string>? outputPath)
         where T : ContentRule, new()
@@ -60,7 +60,7 @@ class ContentCollectionRoot(string contentRoot)
         HashSet<string> usedOutputs = [];
         contentInfos = [];
 
-        bool inputFiles = _imputFiles.TryGetValue(filePath, out ContentInfo? inputFilesInfo);
+        bool inputFiles = _imputFiles.TryGetValue(filePath.Sanitize(), out ContentInfo? inputFilesInfo);
         bool? shouldBuild = null;
 
         if (inputFilesInfo != null)
