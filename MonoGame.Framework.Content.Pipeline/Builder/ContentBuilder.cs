@@ -82,7 +82,7 @@ public abstract class ContentBuilder
         }
         catch (Exception ex)
         {
-            Logger.Log(LogLevel.Error, $"Countent failed to build:\n{ex}");
+            Logger.Log(LogLevel.Error, $"Content failed to build:\n{ex}");
             FailedToBuild++;
         }
         Logger.PopFile();
@@ -107,7 +107,7 @@ public abstract class ContentBuilder
         }
         catch (Exception ex)
         {
-            Logger.Log(LogLevel.Error, $"Countent failed to build:\n{ex}");
+            Logger.Log(LogLevel.Error, $"Content failed to build:\n{ex}");
             FailedToBuild++;
         }
         Logger.PopFile();
