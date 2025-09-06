@@ -183,7 +183,7 @@ public abstract class ContentBuilder
         }
 
         Logger.Log($"Cache: Not Found");
-        Logger.Log($"Imposter: {contentInfo.Importer!.GetType().Name}");
+        Logger.Log($"Importer: {contentInfo.Importer!.GetType().Name}");
         Logger.Log($"Processor: {contentInfo.Processor!.GetType().Name}");
 
         var contentFileCache = ContentCache.CreateContentFileCache(this, contentInfo);
