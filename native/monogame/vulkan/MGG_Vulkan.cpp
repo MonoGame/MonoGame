@@ -1555,6 +1555,7 @@ void MGVK_RecreateSwapChain(
 		height == device->swapchainHeight &&
 		vkColor == device->colorFormat &&
 		vkDepth == device->depthFormat &&
+		syncInterval == device->syncInterval &&
 		device->swapchain != VK_NULL_HANDLE)
 		return;
 
@@ -1737,6 +1738,15 @@ void MGG_GraphicsDevice_ResizeSwapchain(
 	MGDepthFormat depth,
 	mgint syncInterval)
 {
+	assert(device);
+
+	// Swapchain resize should not happen manually in Vulkan, we should leave this work to
+	// vkQueuePresentKHR() and vkAcquireNextImageKHR() which will react to surface changes.
+	// We should only let this through if the swapchain needs to be created or if syncInterval has changed.
+	if (device->swapchain != VK_NULL_HANDLE &&
+		device->syncInterval == syncInterval)
+		return;
+
 	auto vkColor = ToVkFormat(color);
 	auto vkDepth = ToVkFormat(depth);
 
@@ -1800,7 +1810,10 @@ mgint MGG_GraphicsDevice_BeginFrame(MGG_GraphicsDevice* device)
 
 	// If the swapchain is null, it probably means that the window is minimized and we must attempt to check if it has been restored.
 	if (device->swapchain == VK_NULL_HANDLE)
+	{
+		printf("Swapchain was null before acquiring a frame. This shouldn't happen.\n");
 		MGVK_RecreateSwapChain(device);
+	}
 
 	VkResult res;
 
@@ -2108,8 +2121,15 @@ void MGG_GraphicsDevice_Present(MGG_GraphicsDevice* device, mgint currentFrame, 
 	presentInfo.pImageIndices = &device->swapchain_image_index;
 
 	res = vkQueuePresentKHR(device->queue, &presentInfo);
-	if (res == VK_ERROR_OUT_OF_DATE_KHR) // This will happen if the window is minimized.
+	if (res == VK_ERROR_OUT_OF_DATE_KHR || // This will happen if the window is minimized.
+		res == VK_SUBOPTIMAL_KHR)
+	{
+		if (res == VK_SUBOPTIMAL_KHR)
+			printf("Swapchain suboptimal. Recreating swapchain...\n");
+		else
+			printf("Swapchain out of date. Recreating swapchain...\n");
 		MGVK_RecreateSwapChain(device);
+	}
 	else
 	{
 		VK_CHECK_RESULT(res);

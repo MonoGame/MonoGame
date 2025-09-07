@@ -831,7 +831,30 @@ void MGP_Window_SetPosition(MGP_Window* window, mgint x, mgint y)
 void MGP_Window_SetClientSize(MGP_Window* window, mgint width, mgint height)
 {
     assert(window != nullptr);
-    SDL_SetWindowSize(window->window, width, height);
+
+    // Resizing with SDL depends on the fullscreen mode.
+    // If we're in exclusive-fullscreen, SDL_SetWindowDisplayMode()
+    // is needed to be called with the closest requested size.
+    // If windowed-fullscreen or just windowed, only
+    // SDL_SetWindowSize() is needed.
+
+    auto flags = SDL_GetWindowFlags(window->window);
+
+    if ((flags & SDL_WINDOW_FULLSCREEN) != 0)
+    {
+        SDL_DisplayMode closest{ 0, 0, 0, 0, nullptr };
+        const SDL_DisplayMode desired{ 0, width, height, 60, nullptr };
+        if (SDL_GetClosestDisplayMode(0, &desired, &closest))
+        {
+            SDL_SetWindowDisplayMode(window->window, &closest);
+            // We need to call SDL_SetWindowSize() as well otherwise
+            // SDL won't send resize proper resize events to our
+            // event queue for the Viewport to update properly.
+            SDL_SetWindowSize(window->window, closest.w, closest.h);
+        }
+    }
+    else
+        SDL_SetWindowSize(window->window, width, height);
 }
 
 void MGP_Window_SetCursor(MGP_Window* window, MGP_Cursor* cursor)
