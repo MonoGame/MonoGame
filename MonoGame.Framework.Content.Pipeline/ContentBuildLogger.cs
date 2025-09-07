@@ -175,7 +175,7 @@ public class ContentBuildLogger
     public virtual void PushFile(string filename)
     {
         filename = filename.Sanitize();
-        Log(filename.Sanitize());
+        Log(filename);
         _filenames.Push(filename);
     }
 
