@@ -429,7 +429,8 @@ void MGG_GraphicsDevice_ResizeSwapchain(
 	mgint width,
 	mgint height,
 	MGSurfaceFormat color,
-	MGDepthFormat depth)
+	MGDepthFormat depth,
+	mgint syncInterval)
 {
 #if !defined(_GAMING_XBOX)
 

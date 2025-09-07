@@ -56,7 +56,8 @@ public partial class GraphicsDevice
                 PresentationParameters.BackBufferWidth,
                 PresentationParameters.BackBufferHeight,
                 PresentationParameters.BackBufferFormat,
-                PresentationParameters.DepthStencilFormat);
+                PresentationParameters.DepthStencilFormat,
+                PresentationParameters.PresentationInterval.GetSyncInterval());
 
         // Setup the default texture.
         DefaultTexture = new Texture2D(this, 2, 2);
@@ -83,7 +84,8 @@ public partial class GraphicsDevice
             PresentationParameters.BackBufferWidth,
             PresentationParameters.BackBufferHeight,
             PresentationParameters.BackBufferFormat,
-            PresentationParameters.DepthStencilFormat);
+            PresentationParameters.DepthStencilFormat,
+            PresentationParameters.PresentationInterval.GetSyncInterval());
 
         _viewport = new Viewport(
             0,

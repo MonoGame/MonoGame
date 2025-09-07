@@ -243,6 +243,7 @@ struct MGG_GraphicsDevice
 	VkSurfaceKHR surface = VK_NULL_HANDLE;
 	VkSwapchainKHR swapchain = VK_NULL_HANDLE;
 	uint32_t swapchain_image_index = 0;
+	int syncInterval = 0;
 
 	uint64_t vertexBuffersDirty = 0xFFFFFFFF;
 	MGG_Buffer* vertexBuffers[8] = { 0 };
@@ -1451,7 +1452,8 @@ void MGVK_RecreateSwapChain(
 	mguint width,
 	mguint height,
 	VkFormat vkColor,
-	VkFormat vkDepth)
+	VkFormat vkDepth,
+	mgint syncInterval)
 {
 	assert(device != nullptr);
 	assert(nativeWindowHandle != nullptr);
@@ -1558,20 +1560,30 @@ void MGVK_RecreateSwapChain(
 	VK_CHECK_RESULT(res);
 	
 	// Prefer MAILBOX -> IMMEDIATE -> FIFO (FIFO is always supported)
-	VkPresentModeKHR selectedPresentMode = VK_PRESENT_MODE_FIFO_KHR;
+	device->syncInterval = syncInterval; // 0 is IMMEDIATE, 1 is either MAILBOX or FIFO, 2 is half-Vsync and we currently don't support that on Vulkan.
+	VkPresentModeKHR selectedPresentMode = VK_PRESENT_MODE_FIFO_KHR; // Default, guaranteed to be supported by Vulkan specs.
 	for (uint32_t i = 0; i < presentModeCount; i++)
 	{
-		if (presentModes[i] == VK_PRESENT_MODE_MAILBOX_KHR)
+		// We used to upgrade FIFO to MAILBOX when supported because should be preferred,
+		// but driver support seems to be broken sometimes. Some drivers report MAILBOX
+		// as supported but will actually behave like IMMEDIATE instead.
+		/*
+		if (device->syncInterval > 0 &&
+			presentModes[i] == VK_PRESENT_MODE_MAILBOX_KHR)
 		{
 			selectedPresentMode = VK_PRESENT_MODE_MAILBOX_KHR;
+			fprintf(stderr, "Vsync is upgraded.\n");
 			break;
 		}
-		else if (presentModes[i] == VK_PRESENT_MODE_IMMEDIATE_KHR)
+		*/
+		// Vsync is disabled, set IMMEDIATE if supported
+		if (device->syncInterval == 0 &&
+			presentModes[i] == VK_PRESENT_MODE_IMMEDIATE_KHR)
 		{
 			selectedPresentMode = VK_PRESENT_MODE_IMMEDIATE_KHR;
+			break;
 		}
 	}
-	
 	delete[] presentModes;
 	
 	create_info.presentMode = selectedPresentMode;
@@ -1641,7 +1653,8 @@ void MGVK_RecreateSwapChain(MGG_GraphicsDevice* device)
 		device->swapchainWidth,
 		device->swapchainHeight,
 		device->colorFormat,
-		device->depthFormat);
+		device->depthFormat,
+		device->syncInterval);
 
     MGG_GraphicsDevice_SetRenderTargets(device, nullptr, nullptr, 0);
 }
@@ -1652,12 +1665,13 @@ void MGG_GraphicsDevice_ResizeSwapchain(
 	mgint width,
 	mgint height,
 	MGSurfaceFormat color,
-	MGDepthFormat depth)
+	MGDepthFormat depth,
+	mgint syncInterval)
 {
 	auto vkColor = ToVkFormat(color);
 	auto vkDepth = ToVkFormat(depth);
 
-	MGVK_RecreateSwapChain(device, nativeWindowHandle, width, height, vkColor, vkDepth);
+	MGVK_RecreateSwapChain(device, nativeWindowHandle, width, height, vkColor, vkDepth, syncInterval);
 }
 
 
