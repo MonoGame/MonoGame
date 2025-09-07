@@ -479,8 +479,6 @@ mgbyte MGP_Platform_PollEvent(MGP_Platform* platform, MGP_Event& event_)
                 // (This maps the range of values to -32767:32767 instead of SDL's -32768:32767)
                 event_.Controller.Value = (event_.Controller.Value == -32768 ? 32767 : ~event_.Controller.Value + 1);
             }
-            else
-
             return true;
             break;
 
