@@ -213,6 +213,7 @@ struct MGG_GraphicsDevice
 	VkPhysicalDeviceProperties deviceProperties;
 	VkPhysicalDeviceFeatures deviceFeatures;
 	VkPhysicalDeviceMemoryProperties deviceMemoryProperties;
+	bool customBorderColorSupported = false;
 
 	VkDevice device = VK_NULL_HANDLE;
 	VkQueue queue = VK_NULL_HANDLE;
@@ -705,7 +706,7 @@ static VkImageAspectFlags DetermineAspectMask(VkFormat format)
 	return result;
 }
 
-uint64_t CheckValidationLayerSupport(const std::vector<const char*>& validationLayers)
+bool AreValidationLayersSupported()
 {
 	uint32_t layerCount;
 	vkEnumerateInstanceLayerProperties(&layerCount, nullptr);
@@ -713,24 +714,26 @@ uint64_t CheckValidationLayerSupport(const std::vector<const char*>& validationL
 	std::vector<VkLayerProperties> availableLayers(layerCount);
 	vkEnumerateInstanceLayerProperties(&layerCount, availableLayers.data());
 
-	uint64_t found = 0;
-
-	for (int i = 0; i < validationLayers.size(); i++)
+	for (const auto& layerProperties : availableLayers)
 	{
-		const char* layerName = validationLayers[i];
-
-		for (const auto& layerProperties : availableLayers)
-		{
-			if (strcmp(layerName, layerProperties.layerName) == 0)
-			{
-				found |= ((uint64_t)1) << i;
-				break;
-			}
-		}
+		if (strcmp("VK_LAYER_KHRONOS_validation", layerProperties.layerName) == 0)
+			return true;
 	}
 
-	return found;
+	return false;
 }
+
+static bool HasExtension(const std::vector<const char*>& extensions, const char* extension)
+{
+	for (const auto& ext : extensions)
+	{
+		if (strcmp(ext, extension) == 0)
+			return true;
+	}
+
+	return false;
+}
+
 MGG_GraphicsSystem* MGG_GraphicsSystem_Create()
 {
 #ifndef __APPLE__
@@ -764,19 +767,52 @@ MGG_GraphicsSystem* MGG_GraphicsSystem_Create()
 		SDL_Vulkan_GetInstanceExtensions(nullptr, &count, instanceExtensions.data());
 	}
 #else
-#error Not Implemented!
+	{
+		uint32_t count;
+		vkEnumerateInstanceExtensionProperties(nullptr, &count, nullptr);
+		instanceExtensions.resize(count);
+
+		vkEnumerateInstanceExtensionProperties(nullptr, &count, instanceExtensions.data());
+	}
 #endif
-	instanceExtensions.push_back(VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2_EXTENSION_NAME);
+
+	// Check instance-level extensions support or if they are core in this instance
+	uint32_t version;
+	err = vkEnumerateInstanceVersion(&version);
+	if (err != VK_SUCCESS)
+	{
+		printf("Failed to retrieve Vulkan instance version!");
+		return nullptr;
+	}
+
+	printf("Vulkan instance version: %d.%d.%d\n", VK_API_VERSION_MAJOR(version), VK_API_VERSION_MINOR(version), VK_API_VERSION_PATCH(version));
+
+	// This extension should be widely supported (~89% of systems according to https://vulkan.gpuinfo.org/listinstanceextensions.php?platform=all)
+	// This extension is used to initialize the VK_EXT_custom_border_color (which therefore won't be supported)
+	if (!(VK_API_VERSION_MAJOR(version) > 1 || VK_API_VERSION_MINOR(version) >= 1) && // This extension is core in 1.1 SDK.
+		!HasExtension(instanceExtensions, VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2_EXTENSION_NAME))
+	{
+		printf("%s is not supported by this SDK!\n", VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2_EXTENSION_NAME);
+		// This is a critical failure.
+		return nullptr;
+	}
 
 	std::vector<const char*> enabledLayers;
 
 #ifdef DEBUG
-	instanceExtensions.push_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
 
-#ifndef __APPLE__
-	enabledLayers.push_back("VK_LAYER_KHRONOS_validation");
-	CheckValidationLayerSupport(enabledLayers);
-#endif
+	// This extension has a very poor support on Android (less than 25%). Chances are that DEBUG builds won't work on Android.
+	if (!HasExtension(instanceExtensions, VK_EXT_DEBUG_UTILS_EXTENSION_NAME)) // This exention is not core in any SDK and might be unsupported.
+		printf("%s is not supported by this SDK. Labeling Vulkan object will not be possible.\n", VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
+
+	if (AreValidationLayersSupported())
+	{
+		enabledLayers.push_back("VK_LAYER_KHRONOS_validation");
+		printf("Validation layers are enabled (performances will be drastically impacted). To run without validation layers, please use a RELEASE build or uninstall the Vulkan SDK.\n");
+	}
+	else
+		printf("Validation layers aren't supported (you might want to install the Vulkan SDK to support them).\n");
+
 #endif
 
 	VkInstanceCreateInfo instance_create_info = { VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO };
@@ -809,15 +845,16 @@ MGG_GraphicsSystem* MGG_GraphicsSystem_Create()
 		VkResult res = vkEnumeratePhysicalDevices(system->instance, &count, NULL);
 		if (res == VK_SUCCESS)
 		{
-			VkPhysicalDevice* gpus = (VkPhysicalDevice*)calloc(count, sizeof(*gpus));
+			std::vector<VkPhysicalDevice> gpus;
+			gpus.resize(count);
 
-			res = vkEnumeratePhysicalDevices(system->instance, &count, gpus);
+			res = vkEnumeratePhysicalDevices(system->instance, &count, gpus.data());
 			if (res == VK_SUCCESS)
 			{
-				for (uint32_t i = 0; i < count; ++i)
+				for (const auto& gpu : gpus)
 				{
 					auto adapter = new MGG_GraphicsAdapter();
-					adapter->device = gpus[i];
+					adapter->device = gpu;
 
 					vkGetPhysicalDeviceProperties(adapter->device, &adapter->properties);
 					vkGetPhysicalDeviceFeatures(adapter->device, &adapter->features);
@@ -826,8 +863,6 @@ MGG_GraphicsSystem* MGG_GraphicsSystem_Create()
 					system->adapters.push_back(adapter);
 				}
 			}
-
-			free((void*)gpus);
 		}
 	}
 
@@ -1138,6 +1173,9 @@ MGG_GraphicsDevice* MGG_GraphicsDevice_Create(MGG_GraphicsSystem* system, MGG_Gr
 	vkGetPhysicalDeviceFeatures(device->physicalDevice, &device->deviceFeatures);
 	vkGetPhysicalDeviceProperties(device->physicalDevice, &device->deviceProperties);
 
+	printf("Selected GPU: %s\n", device->deviceProperties.deviceName);
+	printf("Supported Vulkan API version: %d.%d.%d\n", VK_API_VERSION_MAJOR(device->deviceProperties.apiVersion), VK_API_VERSION_MINOR(device->deviceProperties.apiVersion), VK_API_VERSION_PATCH(device->deviceProperties.apiVersion));
+
 	// Capture some needed limits.
 	device->minUniformBufferOffsetAlignment = adapter->properties.limits.minUniformBufferOffsetAlignment;
 
@@ -1180,6 +1218,34 @@ MGG_GraphicsDevice* MGG_GraphicsDevice_Create(MGG_GraphicsSystem* system, MGG_Gr
 	}
 	assert(queueFamilyCount == queueCreateInfoCount);
 
+	// Check if VK_KHR_swapchain and VK_EXT_custom_border_color are supported
+	std::vector<VkExtensionProperties> deviceExtensions;
+	{
+		uint32_t count;
+		vkEnumerateDeviceExtensionProperties(device->physicalDevice, nullptr, &count, nullptr);
+		deviceExtensions.resize(count);
+
+		vkEnumerateDeviceExtensionProperties(device->physicalDevice, nullptr, &count, deviceExtensions.data());
+	}
+
+	bool swapChainSupported = false;
+	for (const auto& extension : deviceExtensions)
+	{
+		if (strcmp(extension.extensionName, VK_KHR_SWAPCHAIN_EXTENSION_NAME) == 0)
+			swapChainSupported = true;
+		if (strcmp(extension.extensionName, VK_EXT_CUSTOM_BORDER_COLOR_EXTENSION_NAME) == 0)
+			device->customBorderColorSupported = true;
+	}
+
+	if (!swapChainSupported)
+	{
+		printf("%s is not supported by this driver!\n", VK_KHR_SWAPCHAIN_EXTENSION_NAME);
+		// This is a critical failure.
+		return nullptr;
+	}
+	if (!device->customBorderColorSupported) // We can live without this extention.
+		printf("%s is not supported by this driver!\n", VK_EXT_CUSTOM_BORDER_COLOR_EXTENSION_NAME);
+
 	std::vector<const char*> extensions;
 	extensions.push_back(VK_KHR_SWAPCHAIN_EXTENSION_NAME);
 
@@ -1197,16 +1263,19 @@ MGG_GraphicsDevice* MGG_GraphicsDevice_Create(MGG_GraphicsSystem* system, MGG_Gr
 	deviceFeatures2.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2;
 	deviceFeatures2.features = enabledFeatures;
 
-#if defined(__APPLE__)
-	deviceFeatures2.pNext = nullptr;
-#else
-	extensions.push_back(VK_EXT_CUSTOM_BORDER_COLOR_EXTENSION_NAME);
-	VkPhysicalDeviceCustomBorderColorFeaturesEXT customBorderColorFeatures = {};
-	customBorderColorFeatures.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_CUSTOM_BORDER_COLOR_FEATURES_EXT;
-	customBorderColorFeatures.customBorderColors = VK_TRUE;
-	customBorderColorFeatures.customBorderColorWithoutFormat = VK_TRUE;
-	deviceFeatures2.pNext = &customBorderColorFeatures;
-#endif
+	if (!device->customBorderColorSupported)
+	{
+		deviceFeatures2.pNext = nullptr;
+	}
+	else
+	{
+		extensions.push_back(VK_EXT_CUSTOM_BORDER_COLOR_EXTENSION_NAME);
+		VkPhysicalDeviceCustomBorderColorFeaturesEXT customBorderColorFeatures = {};
+		customBorderColorFeatures.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_CUSTOM_BORDER_COLOR_FEATURES_EXT;
+		customBorderColorFeatures.customBorderColors = VK_TRUE;
+		customBorderColorFeatures.customBorderColorWithoutFormat = VK_TRUE;
+		deviceFeatures2.pNext = &customBorderColorFeatures;
+	}
 
 	VkDeviceCreateInfo deviceCreateInfo = { VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO };
 	deviceCreateInfo.queueCreateInfoCount = queueCreateInfoCount;
@@ -4000,21 +4069,24 @@ MGG_SamplerState* MGG_SamplerState_Create(MGG_GraphicsDevice* device, MGG_Sample
 		samplerInfo.borderColor = VK_BORDER_COLOR_FLOAT_OPAQUE_WHITE;
 	else
 	{
-#if defined(__APPLE__)
-		samplerInfo.borderColor = VK_BORDER_COLOR_INT_TRANSPARENT_BLACK;
-#else
-		samplerInfo.borderColor = VK_BORDER_COLOR_FLOAT_CUSTOM_EXT;
-		bcolor.sType = VK_STRUCTURE_TYPE_SAMPLER_CUSTOM_BORDER_COLOR_CREATE_INFO_EXT;
+		if (!device->customBorderColorSupported)
+		{
+			samplerInfo.borderColor = VK_BORDER_COLOR_INT_TRANSPARENT_BLACK;
+		}
+		else
+		{
+			samplerInfo.borderColor = VK_BORDER_COLOR_FLOAT_CUSTOM_EXT;
+			bcolor.sType = VK_STRUCTURE_TYPE_SAMPLER_CUSTOM_BORDER_COLOR_CREATE_INFO_EXT;
 
-		// RGBA
-		bcolor.format = VK_FORMAT_UNDEFINED;
-		bcolor.customBorderColor.float32[0] = ((info->BorderColor >> 0) & 0xFF) / 255.0f;
-		bcolor.customBorderColor.float32[1] = ((info->BorderColor >> 8) & 0xFF) / 255.0f;
-		bcolor.customBorderColor.float32[2] = ((info->BorderColor >> 16) & 0xFF) / 255.0f;
-		bcolor.customBorderColor.float32[3] = ((info->BorderColor >> 24) & 0xFF) / 255.0f;
+			// RGBA
+			bcolor.format = VK_FORMAT_UNDEFINED;
+			bcolor.customBorderColor.float32[0] = ((info->BorderColor >> 0) & 0xFF) / 255.0f;
+			bcolor.customBorderColor.float32[1] = ((info->BorderColor >> 8) & 0xFF) / 255.0f;
+			bcolor.customBorderColor.float32[2] = ((info->BorderColor >> 16) & 0xFF) / 255.0f;
+			bcolor.customBorderColor.float32[3] = ((info->BorderColor >> 24) & 0xFF) / 255.0f;
 
-		samplerInfo.pNext = &bcolor;
-#endif
+			samplerInfo.pNext = &bcolor;
+		}
 	}
 
 	switch (info->Filter)
