@@ -276,8 +276,6 @@ struct MGG_GraphicsDevice
 	MGVK_TargetSet targets;
 	std::map<uint32_t, MGVK_TargetSetCache*> targetCache;
 
-	// Extension support flags
-	bool customBorderColorSupported = false;
 
 	//
 	bool pipelineStateDirty = false;
@@ -1126,26 +1124,6 @@ static void MGVK_ExecuteAndFreeCommandBuffer(MGG_GraphicsDevice* device, VkComma
 	vkFreeCommandBuffers(device->device, device->cmdPool, 1, &commandBuffer);
 }
 
-static bool MGVK_CheckExtensionSupport(VkPhysicalDevice physicalDevice, const char* extensionName)
-{
-	uint32_t extensionCount;
-	vkEnumerateDeviceExtensionProperties(physicalDevice, nullptr, &extensionCount, nullptr);
-
-	if (extensionCount == 0)
-		return false;
-
-	std::vector<VkExtensionProperties> availableExtensions(extensionCount);
-	vkEnumerateDeviceExtensionProperties(physicalDevice, nullptr, &extensionCount, availableExtensions.data());
-
-	for (const auto& extensionProperties : availableExtensions) {
-		if (strcmp(extensionName, extensionProperties.extensionName) == 0) {
-			return true;
-		}
-	}
-
-	return false;
-}
-
 MGG_GraphicsDevice* MGG_GraphicsDevice_Create(MGG_GraphicsSystem* system, MGG_GraphicsAdapter* adapter)
 {
 	assert(system != nullptr);
@@ -1218,58 +1196,15 @@ MGG_GraphicsDevice* MGG_GraphicsDevice_Create(MGG_GraphicsSystem* system, MGG_Gr
 	deviceFeatures2.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2;
 	deviceFeatures2.features = enabledFeatures;
 
-	// Check for custom border color extension support
-	device->customBorderColorSupported = false;
-	VkPhysicalDeviceCustomBorderColorFeaturesEXT customBorderColorFeatures = {};
-	
 #if defined(__APPLE__)
-	// Apple/MoltenVK doesn't support custom border colors
 	deviceFeatures2.pNext = nullptr;
 #else
-	// Check if the device supports the custom border color extension
-	if (MGVK_CheckExtensionSupport(device->physicalDevice, VK_EXT_CUSTOM_BORDER_COLOR_EXTENSION_NAME))
-	{
-		// Check if the physical device supports the required features
-		VkPhysicalDeviceCustomBorderColorFeaturesEXT availableFeatures = {};
-		availableFeatures.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_CUSTOM_BORDER_COLOR_FEATURES_EXT;
-		
-		VkPhysicalDeviceFeatures2 queryFeatures = {};
-		queryFeatures.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2;
-		queryFeatures.pNext = &availableFeatures;
-		
-		vkGetPhysicalDeviceFeatures2(device->physicalDevice, &queryFeatures);
-		
-		// Only enable if both customBorderColors and customBorderColorWithoutFormat are supported
-		if (availableFeatures.customBorderColors && availableFeatures.customBorderColorWithoutFormat)
-		{
-			extensions.push_back(VK_EXT_CUSTOM_BORDER_COLOR_EXTENSION_NAME);
-			customBorderColorFeatures.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_CUSTOM_BORDER_COLOR_FEATURES_EXT;
-			customBorderColorFeatures.customBorderColors = VK_TRUE;
-			customBorderColorFeatures.customBorderColorWithoutFormat = VK_TRUE;
-			deviceFeatures2.pNext = &customBorderColorFeatures;
-			device->customBorderColorSupported = true;
-			
-#if defined(DEBUG)
-			printf("VK_EXT_custom_border_color extension enabled\n");
-#endif
-		}
-		else
-		{
-			deviceFeatures2.pNext = nullptr;
-			
-#if defined(DEBUG)
-			printf("VK_EXT_custom_border_color extension available but features not supported\n");
-#endif
-		}
-	}
-	else
-	{
-		deviceFeatures2.pNext = nullptr;
-		
-#if defined(DEBUG)
-		printf("VK_EXT_custom_border_color extension not available, using fallback border colors\n");
-#endif
-	}
+	extensions.push_back(VK_EXT_CUSTOM_BORDER_COLOR_EXTENSION_NAME);
+	VkPhysicalDeviceCustomBorderColorFeaturesEXT customBorderColorFeatures = {};
+	customBorderColorFeatures.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_CUSTOM_BORDER_COLOR_FEATURES_EXT;
+	customBorderColorFeatures.customBorderColors = VK_TRUE;
+	customBorderColorFeatures.customBorderColorWithoutFormat = VK_TRUE;
+	deviceFeatures2.pNext = &customBorderColorFeatures;
 #endif
 
 	VkDeviceCreateInfo deviceCreateInfo = { VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO };
@@ -4014,26 +3949,21 @@ MGG_SamplerState* MGG_SamplerState_Create(MGG_GraphicsDevice* device, MGG_Sample
 		samplerInfo.borderColor = VK_BORDER_COLOR_FLOAT_OPAQUE_WHITE;
 	else
 	{
-		// Check if custom border color extension is supported
-		if (device->customBorderColorSupported)
-		{
-			samplerInfo.borderColor = VK_BORDER_COLOR_FLOAT_CUSTOM_EXT;
-			bcolor.sType = VK_STRUCTURE_TYPE_SAMPLER_CUSTOM_BORDER_COLOR_CREATE_INFO_EXT;
+#if defined(__APPLE__)
+		samplerInfo.borderColor = VK_BORDER_COLOR_INT_TRANSPARENT_BLACK;
+#else
+		samplerInfo.borderColor = VK_BORDER_COLOR_FLOAT_CUSTOM_EXT;
+		bcolor.sType = VK_STRUCTURE_TYPE_SAMPLER_CUSTOM_BORDER_COLOR_CREATE_INFO_EXT;
 
-			// RGBA
-			bcolor.format = VK_FORMAT_UNDEFINED;
-			bcolor.customBorderColor.float32[0] = ((info->BorderColor >> 0) & 0xFF) / 255.0f;
-			bcolor.customBorderColor.float32[1] = ((info->BorderColor >> 8) & 0xFF) / 255.0f;
-			bcolor.customBorderColor.float32[2] = ((info->BorderColor >> 16) & 0xFF) / 255.0f;
-			bcolor.customBorderColor.float32[3] = ((info->BorderColor >> 24) & 0xFF) / 255.0f;
+		// RGBA
+		bcolor.format = VK_FORMAT_UNDEFINED;
+		bcolor.customBorderColor.float32[0] = ((info->BorderColor >> 0) & 0xFF) / 255.0f;
+		bcolor.customBorderColor.float32[1] = ((info->BorderColor >> 8) & 0xFF) / 255.0f;
+		bcolor.customBorderColor.float32[2] = ((info->BorderColor >> 16) & 0xFF) / 255.0f;
+		bcolor.customBorderColor.float32[3] = ((info->BorderColor >> 24) & 0xFF) / 255.0f;
 
-			samplerInfo.pNext = &bcolor;
-		}
-		else
-		{
-			// Fallback to closest standard border color when custom border colors are not supported
-			samplerInfo.borderColor = VK_BORDER_COLOR_FLOAT_TRANSPARENT_BLACK;
-		}
+		samplerInfo.pNext = &bcolor;
+#endif
 	}
 
 	switch (info->Filter)
