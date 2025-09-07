@@ -679,6 +679,19 @@ mgbyte MGP_Platform_BeforeUpdate(MGP_Platform* platform)
 mgbyte MGP_Platform_BeforeDraw(MGP_Platform* platform)
 {
 	assert(platform != nullptr);
+
+    // TO DO: Vulkan wants that we stop rendering if the window is minimized on Windows (because surface extent is 0x0 when this happens, which will crash Vulkan).
+    // This code assume that we only have one primary window. If we ever implement multi-window support, this will need to be changed.
+    for (auto window : platform->windows)
+    {
+        if (window != nullptr)
+        {
+            auto flags = SDL_GetWindowFlags(window->window);
+            if ((flags & SDL_WINDOW_MINIMIZED) != 0)
+                return false;
+        }
+    }
+
 	return true;
 }
 

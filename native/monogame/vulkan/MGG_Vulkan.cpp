@@ -1448,8 +1448,8 @@ void MGG_GraphicsDevice_GetCaps(MGG_GraphicsDevice* device, MGG_GraphicsDevice_C
 void MGVK_RecreateSwapChain(
 	MGG_GraphicsDevice* device,
 	void* nativeWindowHandle,
-	mgint width,
-	mgint height,
+	mguint width,
+	mguint height,
 	VkFormat vkColor,
 	VkFormat vkDepth)
 {
@@ -1489,16 +1489,21 @@ void MGVK_RecreateSwapChain(
 
 	cleanupSwapChain(device);
 
-	device->swapchainWidth = width;
-	device->swapchainHeight = height;
+	VkSurfaceCapabilitiesKHR surface_capabilities;
+	res = vkGetPhysicalDeviceSurfaceCapabilitiesKHR(device->physicalDevice, device->surface, &surface_capabilities);
+	VK_CHECK_RESULT(res);
+
+	// If max extent is zero'd, it means the window is minimized, and we should leave the swapchain to VK_NULL_HANDLE and stop rendering (this is done in MGP_Platform_BeforeDraw()).
+	if (surface_capabilities.maxImageExtent.width == 0 || surface_capabilities.maxImageExtent.height == 0)
+		return;
+
+	// We apply the extent range to the entire swapchain size to avoid surface scaling and errors.
+	device->swapchainWidth = std::clamp(width, surface_capabilities.minImageExtent.width, surface_capabilities.maxImageExtent.width);
+	device->swapchainHeight = std::clamp(height, surface_capabilities.minImageExtent.height, surface_capabilities.maxImageExtent.height);
 	device->colorFormat = vkColor;
 	device->depthFormat = vkDepth;
 
 	{
-		VkSurfaceCapabilitiesKHR surface_capabilities;
-		res = vkGetPhysicalDeviceSurfaceCapabilitiesKHR(device->physicalDevice, device->surface, &surface_capabilities);
-		VK_CHECK_RESULT(res);
-
 		VkFormat surface_format = VK_FORMAT_UNDEFINED;
 		uint32_t format_count = 0;
 		res = vkGetPhysicalDeviceSurfaceFormatsKHR(device->physicalDevice, device->surface, &format_count, nullptr);
@@ -1511,10 +1516,6 @@ void MGVK_RecreateSwapChain(
 		surface_format = surfFormats[0].format;
 		if ((1 == format_count) && (VK_FORMAT_UNDEFINED == surfFormats[0].format))
 			surface_format = VK_FORMAT_B8G8R8A8_UNORM;
-
-		VkSurfaceCapabilitiesKHR surface_caps;
-		res = vkGetPhysicalDeviceSurfaceCapabilitiesKHR(device->physicalDevice, device->surface, &surface_caps);
-		VK_CHECK_RESULT(res);
 
 		device->colorFormat = surface_format;
 
@@ -1714,6 +1715,10 @@ mgint MGG_GraphicsDevice_BeginFrame(MGG_GraphicsDevice* device)
 {
 	assert(device != nullptr);
 
+	// If the swapchain is null, it probably means that the window is minimized and we must attempt to check if it has been restored.
+	if (device->swapchain == VK_NULL_HANDLE)
+		MGVK_RecreateSwapChain(device);
+
 	VkResult res;
 
 	const FrameCounter currentFrame = device->frame;
@@ -1728,10 +1733,13 @@ mgint MGG_GraphicsDevice_BeginFrame(MGG_GraphicsDevice* device)
 	res = vkResetFences(device->device, 1, &cmd.completedFence);
 	VK_CHECK_RESULT(res);
 
-	device->swapchain_image_index = 0;
-	res = vkAcquireNextImageKHR(device->device, device->swapchain, UINT64_MAX,
-		cmd.imageAcquiredSemaphore, VK_NULL_HANDLE, &device->swapchain_image_index);
-	VK_CHECK_RESULT(res);
+	if (device->swapchain != VK_NULL_HANDLE)
+	{
+		device->swapchain_image_index = 0;
+		res = vkAcquireNextImageKHR(device->device, device->swapchain, UINT64_MAX,
+			cmd.imageAcquiredSemaphore, VK_NULL_HANDLE, &device->swapchain_image_index);
+		VK_CHECK_RESULT(res);
+	}
 
 	frame.uniformOffset = 0;
 	if (frame.uniforms == NULL)
@@ -2017,7 +2025,7 @@ void MGG_GraphicsDevice_Present(MGG_GraphicsDevice* device, mgint currentFrame, 
 	presentInfo.pImageIndices = &device->swapchain_image_index;
 
 	res = vkQueuePresentKHR(device->queue, &presentInfo);
-	if (res == VK_ERROR_OUT_OF_DATE_KHR)
+	if (res == VK_ERROR_OUT_OF_DATE_KHR) // This will happen if the window is minimized.
 		MGVK_RecreateSwapChain(device);
 	else
 	{
