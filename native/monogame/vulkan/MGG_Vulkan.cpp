@@ -454,6 +454,7 @@ struct MGG_OcclusionQuery
 struct MGG_GraphicsSystem
 {
 	VkInstance instance;
+	mgbool supportsPhysicalDeviceProperties2EXT;
 
 	std::vector<MGG_GraphicsAdapter*> adapters;
 };
@@ -723,11 +724,11 @@ bool AreValidationLayersSupported()
 	return false;
 }
 
-static bool HasExtension(const std::vector<const char*>& extensions, const char* extension)
+static bool SupportsExtension(const std::vector<VkExtensionProperties>& supportedExtensions, const char* extensionName)
 {
-	for (const auto& ext : extensions)
+	for (const auto& extension : supportedExtensions)
 	{
-		if (strcmp(ext, extension) == 0)
+		if (strcmp(extension.extensionName, extensionName) == 0)
 			return true;
 	}
 
@@ -740,7 +741,7 @@ MGG_GraphicsSystem* MGG_GraphicsSystem_Create()
 	auto err = volkInitialize();
 	if (err != VK_SUCCESS)
 	{
-		printf("Failed to initialize volk!");
+		printf("Failed to initialize volk!\n");
 		return nullptr;
 	}
 #else
@@ -757,6 +758,15 @@ MGG_GraphicsSystem* MGG_GraphicsSystem_Create()
 	app_info.pApplicationName = "Unknown";
 	app_info.pEngineName = "MonoGame";
 
+	std::vector<VkExtensionProperties> supportedInstanceExtensions;
+	{
+		uint32_t count;
+		vkEnumerateInstanceExtensionProperties(nullptr, &count, nullptr);
+		supportedInstanceExtensions.resize(count);
+
+		vkEnumerateInstanceExtensionProperties(nullptr, &count, supportedInstanceExtensions.data());
+	}
+
 	std::vector<const char*> instanceExtensions;
 #if defined(MG_SDL2)
 	{
@@ -764,15 +774,8 @@ MGG_GraphicsSystem* MGG_GraphicsSystem_Create()
 		SDL_Vulkan_GetInstanceExtensions(nullptr, &count, nullptr);
 		instanceExtensions.resize(count);
 
+		// This call returns the extensions that SDL needs for the created instance.
 		SDL_Vulkan_GetInstanceExtensions(nullptr, &count, instanceExtensions.data());
-	}
-#else
-	{
-		uint32_t count;
-		vkEnumerateInstanceExtensionProperties(nullptr, &count, nullptr);
-		instanceExtensions.resize(count);
-
-		vkEnumerateInstanceExtensionProperties(nullptr, &count, instanceExtensions.data());
 	}
 #endif
 
@@ -781,20 +784,23 @@ MGG_GraphicsSystem* MGG_GraphicsSystem_Create()
 	err = vkEnumerateInstanceVersion(&version);
 	if (err != VK_SUCCESS)
 	{
-		printf("Failed to retrieve Vulkan instance version!");
+		printf("Failed to retrieve Vulkan instance version!\n");
 		return nullptr;
 	}
 
 	printf("Vulkan instance version: %d.%d.%d\n", VK_API_VERSION_MAJOR(version), VK_API_VERSION_MINOR(version), VK_API_VERSION_PATCH(version));
 
 	// This extension should be widely supported (~89% of systems according to https://vulkan.gpuinfo.org/listinstanceextensions.php?platform=all)
-	// This extension is used to initialize the VK_EXT_custom_border_color (which therefore won't be supported)
-	if (!(VK_API_VERSION_MAJOR(version) > 1 || VK_API_VERSION_MINOR(version) >= 1) && // This extension is core in 1.1 SDK.
-		!HasExtension(instanceExtensions, VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2_EXTENSION_NAME))
+	// This extension is used to initialize the VK_EXT_custom_border_color (which therefore won't be supported if absent)
+	bool supportsProperties2EXT = false;
+	if (SupportsExtension(supportedInstanceExtensions, VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2_EXTENSION_NAME))
 	{
-		printf("%s is not supported by this SDK!\n", VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2_EXTENSION_NAME);
-		// This is a critical failure.
-		return nullptr;
+		supportsProperties2EXT = true;
+		instanceExtensions.push_back(VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2_EXTENSION_NAME);
+	}
+	else
+	{
+		printf("%s is not supported by this instance! VK_EXT_custom_border_color will not be supported either.\n", VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2_EXTENSION_NAME);
 	}
 
 	std::vector<const char*> enabledLayers;
@@ -802,8 +808,14 @@ MGG_GraphicsSystem* MGG_GraphicsSystem_Create()
 #ifdef DEBUG
 
 	// This extension has a very poor support on Android (less than 25%). Chances are that DEBUG builds won't work on Android.
-	if (!HasExtension(instanceExtensions, VK_EXT_DEBUG_UTILS_EXTENSION_NAME)) // This exention is not core in any SDK and might be unsupported.
-		printf("%s is not supported by this SDK. Labeling Vulkan object will not be possible.\n", VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
+	if (SupportsExtension(supportedInstanceExtensions, VK_EXT_DEBUG_UTILS_EXTENSION_NAME))
+	{
+		instanceExtensions.push_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
+	}
+	else
+	{
+		printf("%s is not supported by this instance. Labeling Vulkan object will not be possible.\n", VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
+	}
 
 	if (AreValidationLayersSupported())
 	{
@@ -828,7 +840,7 @@ MGG_GraphicsSystem* MGG_GraphicsSystem_Create()
 	err = vkCreateInstance(&instance_create_info, nullptr, &instance);
 	if (err != VK_SUCCESS)
 	{
-		printf("Failed to create Vulkan instance!");
+		printf("Failed to create Vulkan instance!\n");
 		return nullptr;
 	}
 
@@ -838,6 +850,7 @@ MGG_GraphicsSystem* MGG_GraphicsSystem_Create()
 
 	auto system = new MGG_GraphicsSystem();
 	system->instance = instance;
+	system->supportsPhysicalDeviceProperties2EXT = supportsProperties2EXT;
 
 	// Gather the physical devices.
 	{
@@ -1234,7 +1247,7 @@ MGG_GraphicsDevice* MGG_GraphicsDevice_Create(MGG_GraphicsSystem* system, MGG_Gr
 		if (strcmp(extension.extensionName, VK_KHR_SWAPCHAIN_EXTENSION_NAME) == 0)
 			swapChainSupported = true;
 		if (strcmp(extension.extensionName, VK_EXT_CUSTOM_BORDER_COLOR_EXTENSION_NAME) == 0)
-			device->customBorderColorSupported = true;
+			device->customBorderColorSupported = system->supportsPhysicalDeviceProperties2EXT;
 	}
 
 	if (!swapChainSupported)
@@ -1259,13 +1272,14 @@ MGG_GraphicsDevice* MGG_GraphicsDevice_Create(MGG_GraphicsSystem* system, MGG_Gr
 		enabledFeatures.occlusionQueryPrecise = VK_TRUE;
 	}
 
-	VkPhysicalDeviceFeatures2 deviceFeatures2 = {};
-	deviceFeatures2.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2;
-	deviceFeatures2.features = enabledFeatures;
-
+	VkDeviceCreateInfo deviceCreateInfo = { VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO };
+	deviceCreateInfo.queueCreateInfoCount = queueCreateInfoCount;
+	deviceCreateInfo.pQueueCreateInfos = queueCreateInfos;
+	
 	if (!device->customBorderColorSupported)
 	{
-		deviceFeatures2.pNext = nullptr;
+		deviceCreateInfo.pEnabledFeatures = &enabledFeatures;
+		deviceCreateInfo.pNext = nullptr;
 	}
 	else
 	{
@@ -1274,16 +1288,18 @@ MGG_GraphicsDevice* MGG_GraphicsDevice_Create(MGG_GraphicsSystem* system, MGG_Gr
 		customBorderColorFeatures.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_CUSTOM_BORDER_COLOR_FEATURES_EXT;
 		customBorderColorFeatures.customBorderColors = VK_TRUE;
 		customBorderColorFeatures.customBorderColorWithoutFormat = VK_TRUE;
+
+		VkPhysicalDeviceFeatures2 deviceFeatures2 = {};
+		deviceFeatures2.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2;
+		deviceFeatures2.features = enabledFeatures;
 		deviceFeatures2.pNext = &customBorderColorFeatures;
+
+		deviceCreateInfo.pEnabledFeatures = nullptr;
+		deviceCreateInfo.pNext = &deviceFeatures2;
 	}
 
-	VkDeviceCreateInfo deviceCreateInfo = { VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO };
-	deviceCreateInfo.queueCreateInfoCount = queueCreateInfoCount;
-	deviceCreateInfo.pQueueCreateInfos = queueCreateInfos;
 	deviceCreateInfo.enabledExtensionCount = extensions.size();
 	deviceCreateInfo.ppEnabledExtensionNames = extensions.data();
-	deviceCreateInfo.pEnabledFeatures = nullptr;
-	deviceCreateInfo.pNext = &deviceFeatures2;
 
 	auto res = vkCreateDevice(device->physicalDevice, &deviceCreateInfo, NULL, &device->device);
 	VK_CHECK_RESULT(res);
@@ -1576,22 +1592,32 @@ void MGVK_RecreateSwapChain(
 	device->depthFormat = vkDepth;
 
 	{
+		// Check if the requested color format is supported, and fallback to another one otherwise.
 		VkFormat surface_format = VK_FORMAT_UNDEFINED;
 		uint32_t format_count = 0;
 		res = vkGetPhysicalDeviceSurfaceFormatsKHR(device->physicalDevice, device->surface, &format_count, nullptr);
 		VK_CHECK_RESULT(res);
 
-		VkSurfaceFormatKHR* surfFormats = new VkSurfaceFormatKHR[format_count];
-		res = vkGetPhysicalDeviceSurfaceFormatsKHR(device->physicalDevice, device->surface, &format_count, surfFormats);
+		std::vector<VkSurfaceFormatKHR> surfFormats(format_count);
+		res = vkGetPhysicalDeviceSurfaceFormatsKHR(device->physicalDevice, device->surface, &format_count, surfFormats.data());
 		VK_CHECK_RESULT(res);
 
-		surface_format = surfFormats[0].format;
-		if ((1 == format_count) && (VK_FORMAT_UNDEFINED == surfFormats[0].format))
-			surface_format = VK_FORMAT_B8G8R8A8_UNORM;
+		for (const auto& surfFormat : surfFormats)
+		{
+			if (surfFormat.format == vkColor &&
+				surfFormat.colorSpace == VK_COLOR_SPACE_SRGB_NONLINEAR_KHR)
+			{
+				// The expected format is supported
+				surface_format = surfFormat.format;
+				break;
+			}
+		}
 
-		device->colorFormat = surface_format;
-
-		delete[] surfFormats;
+		if (surface_format == VK_FORMAT_UNDEFINED)
+		{
+			// Format is unsupported, what should we do?
+			return;
+		}
 	}
 
 	// Requested swapchain extent will be clamped based on the surface's min/max extent.
@@ -1612,7 +1638,7 @@ void MGVK_RecreateSwapChain(
 	create_info.surface = device->surface;
 	create_info.minImageCount = kConcurrentFrameCount;
 	create_info.imageFormat = device->colorFormat;
-	create_info.imageColorSpace = VK_COLORSPACE_SRGB_NONLINEAR_KHR;
+	create_info.imageColorSpace = VK_COLOR_SPACE_SRGB_NONLINEAR_KHR;
 	create_info.imageExtent = extent;
 	create_info.imageArrayLayers = 1;
 	create_info.imageUsage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_TRANSFER_SRC_BIT;
@@ -1625,16 +1651,16 @@ void MGVK_RecreateSwapChain(
 	res = vkGetPhysicalDeviceSurfacePresentModesKHR(device->physicalDevice, device->surface, &presentModeCount, nullptr);
 	VK_CHECK_RESULT(res);
 	
-	VkPresentModeKHR* presentModes = new VkPresentModeKHR[presentModeCount];
-	res = vkGetPhysicalDeviceSurfacePresentModesKHR(device->physicalDevice, device->surface, &presentModeCount, presentModes);
+	std::vector<VkPresentModeKHR> presentModes(presentModeCount);
+	res = vkGetPhysicalDeviceSurfacePresentModesKHR(device->physicalDevice, device->surface, &presentModeCount, presentModes.data());
 	VK_CHECK_RESULT(res);
 	
 	// Prefer MAILBOX -> IMMEDIATE -> FIFO (FIFO is always supported)
 	device->syncInterval = syncInterval; // 0 is IMMEDIATE, 1 is either MAILBOX or FIFO, 2 is half-Vsync and we currently don't support that on Vulkan.
 	VkPresentModeKHR selectedPresentMode = VK_PRESENT_MODE_FIFO_KHR; // Default, guaranteed to be supported by Vulkan specs.
-	for (uint32_t i = 0; i < presentModeCount; i++)
+	for (const auto& presentMode : presentModes)
 	{
-		// We used to upgrade FIFO to MAILBOX when supported because should be preferred,
+		// We used to upgrade FIFO to MAILBOX when supported because it should be preferred,
 		// but driver support seems to be broken sometimes. Some drivers report MAILBOX
 		// as supported but will actually behave like IMMEDIATE instead.
 		/*
@@ -1648,16 +1674,15 @@ void MGVK_RecreateSwapChain(
 		*/
 		// Vsync is disabled, set IMMEDIATE if supported
 		if (device->syncInterval == 0 &&
-			presentModes[i] == VK_PRESENT_MODE_IMMEDIATE_KHR)
+			presentMode == VK_PRESENT_MODE_IMMEDIATE_KHR)
 		{
 			selectedPresentMode = VK_PRESENT_MODE_IMMEDIATE_KHR;
 			break;
 		}
 	}
-	delete[] presentModes;
 	
 	create_info.presentMode = selectedPresentMode;
-	create_info.clipped = true;
+	create_info.clipped = VK_TRUE;
 	//create_info.pNext = &scalingCreateInfo;
 	res = vkCreateSwapchainKHR(device->device, &create_info, nullptr, &device->swapchain);
 	VK_CHECK_RESULT(res);
