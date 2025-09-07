@@ -116,7 +116,7 @@ struct MGVK_Program;
 
 typedef uint32_t FrameCounter;
 
-const FrameCounter kFreeFrames = 2;
+const FrameCounter kFreeFrames = 3;
 const FrameCounter kConcurrentFrameCount = 2;
 
 
@@ -2688,6 +2688,27 @@ static void MGVK_UpdateRenderPass(MGG_GraphicsDevice* device, FrameCounter curre
 	device->deferredOcclusionQueries.clear();
 }
 
+static const int DefaultPoolSize = 1024;
+
+static void MGVK_FillDescriptorSetCache(MGG_GraphicsDevice* device, MGG_Shader* shader)
+{
+	// Pre-fill the free descriptor sets now.
+	VkDescriptorSetAllocateInfo alloc_info = { VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO };
+	alloc_info.descriptorPool = shader->pool;
+	alloc_info.descriptorSetCount = 1;
+	alloc_info.pSetLayouts = &shader->setLayout;
+	for (int i = 0; i < DefaultPoolSize; i++)
+	{
+		MGVK_DescriptorInfo* info = new MGVK_DescriptorInfo;
+		info->frame = 0;
+		shader->freeSets.push(info);
+
+		VkResult res = vkAllocateDescriptorSets(device->device, &alloc_info, &info->set);
+		VK_CHECK_RESULT(res);
+		VK_SET_OBJECT_NAME(device->device, info->set, VK_OBJECT_TYPE_DESCRIPTOR_SET, "MGVK_DescriptorInfo.set (Shader id: %u, index: %d)", shader->id, i);
+	}
+}
+
 static void MGVK_UpdateDescriptors(MGG_GraphicsDevice* device, FrameCounter currentFrame, MGG_Shader* shader, VkDescriptorSet* current, uint32_t* dynamicOffset)
 {
 	// If nothing is dirty then skip the update.
@@ -2729,7 +2750,15 @@ static void MGVK_UpdateDescriptors(MGG_GraphicsDevice* device, FrameCounter curr
 		if (!dirty)
 			break;
 	}
-	//hash = MG_ComputeHash(frame_index);
+	// We hash the frameIndex because each frame in the swap chain has its
+	// own uniforms buffer (device->frames[frameIndex].uniforms) that gets
+	// bound to the descriptor set. If we don't, some frame will use the
+	// wrong buffer if the descriptor is retrieved from the cache (and will
+	// result in flickers/broken rendering).
+	// 
+	// TO DO: refactor the descriptor cache and uniforms buffer handling so
+	// that we don't create twice as much descriptor due to this.
+	hash = MG_ComputeHash(frameIndex, hash);
 
 	// Do we have this same descriptor cached?
 	info = shader->usedSets[hash];
@@ -2737,16 +2766,16 @@ static void MGVK_UpdateDescriptors(MGG_GraphicsDevice* device, FrameCounter curr
 	{
 		// The descriptor wasn't cached... so we need to
 		// create a new one from the free sets.
-		if (shader->freeSets.size() > 0)
+		if (shader->freeSets.size() == 0)
 		{
-			info = shader->freeSets.front();
-			shader->freeSets.pop();
+			// Allocate more cache if empty.
+			MGVK_FillDescriptorSetCache(device, shader);
 		}
-		else
-		{
-			// TODO: We're out of free sets... allocate more?
-			assert(0);
-		}
+
+		assert(shader->freeSets.size() > 0);
+		
+		info = shader->freeSets.front();
+		shader->freeSets.pop();
 
 		// Cache the new or recycled set for later use.
 		shader->usedSets[hash] = info;
@@ -4739,8 +4768,6 @@ void MGG_InputLayout_Destroy(MGG_GraphicsDevice* device, MGG_InputLayout* layout
 	delete layout;
 }
 
-static const int DefaultPoolSize = 1024;
-
 MGG_Shader* MGG_Shader_Create(MGG_GraphicsDevice* device, MGShaderStage stage, mgbyte* bytecode, mgint sizeInBytes)
 {
 	assert(device != nullptr);
@@ -4825,20 +4852,7 @@ MGG_Shader* MGG_Shader_Create(MGG_GraphicsDevice* device, MGShaderStage stage, m
 	}
 
 	// Pre-fill the free descriptor sets now.
-	VkDescriptorSetAllocateInfo alloc_info = { VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO };
-	alloc_info.descriptorPool = shader->pool;
-	alloc_info.descriptorSetCount = 1;
-	alloc_info.pSetLayouts = &shader->setLayout;
-	for (int i = 0; i < DefaultPoolSize; i++)
-	{
-		MGVK_DescriptorInfo* info = new MGVK_DescriptorInfo;
-		info->frame = 0;
-		shader->freeSets.push(info);
-
-		res = vkAllocateDescriptorSets(device->device, &alloc_info, &info->set);
-		VK_CHECK_RESULT(res);
-		VK_SET_OBJECT_NAME(device->device, info->set, VK_OBJECT_TYPE_DESCRIPTOR_SET, "MGVK_DescriptorInfo.set (Shader id: %u, index: %d)", shader->id, i);
-	}
+	MGVK_FillDescriptorSetCache(device, shader);
 
 	// Prepare the write descriptor set for updates at runtime.
 	VkWriteDescriptorSet* write = shader->writes = new VkWriteDescriptorSet[layoutBindings.size()];
