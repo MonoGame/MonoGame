@@ -1211,25 +1211,12 @@ MGG_GraphicsDevice* MGG_GraphicsDevice_Create(MGG_GraphicsSystem* system, MGG_Gr
 		}
 	}
 
-	int queueCreateInfoCount = 0;
-	VkDeviceQueueCreateInfo* queueCreateInfos = new VkDeviceQueueCreateInfo[queueFamilyCount];
-	memset(queueCreateInfos, 0, sizeof(VkDeviceQueueCreateInfo) * queueFamilyCount);
-
-	for (int i = 0; i < queueFamilyCount; i++)
-	{
-		const VkQueueFamilyProperties* properties = queueFamilyProps + i;
-		float* queuePriorities = new float[properties->queueCount];
-
-		for (int j = 0; j < properties->queueCount; ++j)
-			queuePriorities[j] = 1.0f;
-
-		queueCreateInfos[i].sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
-		queueCreateInfos[i].queueFamilyIndex = i;
-		queueCreateInfos[i].queueCount = 1;
-		queueCreateInfos[i].pQueuePriorities = queuePriorities;
-		++queueCreateInfoCount;
-	}
-	assert(queueFamilyCount == queueCreateInfoCount);
+	VkDeviceQueueCreateInfo queueCreateInfo {};
+	queueCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
+	queueCreateInfo.queueFamilyIndex = queueFamilyIndex;
+	queueCreateInfo.queueCount = 1;
+	float priority = 1.0f;
+	queueCreateInfo.pQueuePriorities = &priority;
 
 	// Check if VK_KHR_swapchain and VK_EXT_custom_border_color are supported
 	std::vector<VkExtensionProperties> deviceExtensions;
@@ -1273,8 +1260,8 @@ MGG_GraphicsDevice* MGG_GraphicsDevice_Create(MGG_GraphicsSystem* system, MGG_Gr
 	}
 
 	VkDeviceCreateInfo deviceCreateInfo = { VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO };
-	deviceCreateInfo.queueCreateInfoCount = queueCreateInfoCount;
-	deviceCreateInfo.pQueueCreateInfos = queueCreateInfos;
+	deviceCreateInfo.queueCreateInfoCount = 1;
+	deviceCreateInfo.pQueueCreateInfos = &queueCreateInfo;
 	
 	if (!device->customBorderColorSupported)
 	{
