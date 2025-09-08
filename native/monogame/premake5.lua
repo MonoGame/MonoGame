@@ -92,7 +92,10 @@ function faudio()
     
     filter {"system:macosx"}
     libdirs {"external/faudio/build"}
-    linkoptions {"-Wl,-force_load,external/faudio/build/libFAudio.a"}
+    linkoptions {
+        "-Wl,-force_load,external/faudio/build/libFAudio.a",
+        "-Wl,-ld_classic"
+    }
     
     filter {"system:linux"}
     linkoptions {"external/faudio/build/libFAudio.a"}
