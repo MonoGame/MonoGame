@@ -6,7 +6,7 @@
 
 #include "mg_common.h"
 
-
+#include <cmath>
 #include "FAudio.h"
 #include "FAPO.h"
 #include "FAudioFX.h"

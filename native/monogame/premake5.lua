@@ -115,8 +115,12 @@ function configs()
     defines {"NDEBUG"}
     optimize "On"
 
+    filter {"system:windows"}
+    staticruntime "On"
+    filter {"system:windows", "configurations:Debug"}
+    runtime "Debug"
     filter {"system:windows", "configurations:Release"}
-    buildoptions {"/MT"}
+    runtime "Release"
 
     filter "system:macosx"
     buildoptions {"-arch x86_64", "-arch arm64"}
