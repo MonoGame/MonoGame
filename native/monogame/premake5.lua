@@ -83,6 +83,20 @@ function faudio()
     defines {"MG_FAUDIO"}
 
     files {"faudio/**.h", "faudio/**.cpp"}
+
+    includedirs {"external/faudio/include"}
+    
+    filter {"system:windows"}
+    libdirs {"external/faudio/build/Release"}
+    links {"FAudio.lib"}
+    
+    filter {"system:macosx"}
+    libdirs {"external/faudio/build"}
+    linkoptions {"-Wl,-force_load,external/faudio/build/libFAudio.a"}
+    
+    filter {"system:linux"}
+    linkoptions {"external/faudio/build/libFAudio.a"}
+    filter {}
 end
 
 -- Xaudio is supported on Windows and Xbox.
