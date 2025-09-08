@@ -8,6 +8,7 @@
 
 
 #include "FAudio.h"
+#include "FAPO.h"
 #include "FAudioFX.h"
 #include "F3DAudio.h"
 
@@ -16,6 +17,9 @@ struct MGA_System
 	FAudio* faudio = nullptr;
 	FAudioMasteringVoice* masteringVoice = nullptr;
 	FAudioSubmixVoice* reverbVoice = nullptr;
+	FAPO* reverbEffect = nullptr;
+	FAudioEffectDescriptor reverbEffectDesc;
+	FAudioEffectChain reverbEffectChain;
 	F3DAUDIO_HANDLE f3daudio;
 };
 
@@ -67,7 +71,47 @@ MGA_System* MGA_System_Create()
 		return nullptr;
 	}
 
-	// !TODO : Create reverb effect and submix voice
+	// Create reverb effect
+	uint32_t result2 = FAudioCreateReverb(&system->reverbEffect, 0);
+	if (result != 0)
+	{
+		FAudioVoice_DestroyVoice(system->masteringVoice);
+		FAudio_Release(system->faudio);
+		delete system;
+		return nullptr;
+	}
+
+	// Get mastering voice details
+	FAudioVoiceDetails details;
+	FAudioVoice_GetVoiceDetails(system->masteringVoice, &details);
+
+	// Create effect descriptor
+	system->reverbEffectDesc.InitialState = true;
+	system->reverbEffectDesc.OutputChannels = details.InputChannels;
+	system->reverbEffectDesc.pEffect = system->reverbEffect;
+
+	// Create effect chain
+	system->reverbEffectChain.EffectCount = 1;
+	system->reverbEffectChain.pEffectDescriptors = &system->reverbEffectDesc;
+
+	// Create submix voice with reverb effect
+	result = FAudio_CreateSubmixVoice(
+		system->faudio,
+		&system->reverbVoice,
+		details.InputChannels,
+		details.InputSampleRate,
+		0,
+		0,
+		nullptr,
+		&system->reverbEffectChain
+	);
+	if (result != 0)
+	{
+		FAudioVoice_DestroyVoice(system->masteringVoice);
+		FAudio_Release(system->faudio);
+		delete system;
+		return nullptr;
+	}
 
 	// Initialize F3DAudio
 	F3DAudioInitialize(SPEAKER_STEREO, 343.0f, system->f3daudio);
@@ -79,7 +123,15 @@ void MGA_System_Destroy(MGA_System* system)
 {
 	assert(system != nullptr);
 
-	// !TODO : Destroy reverb effect and submix voice
+	// Destroy reverb effect and submix voice
+	if (system->reverbVoice)
+	{
+		FAudioVoice_DestroyVoice(system->reverbVoice);
+	}
+	if (system->reverbEffect)
+	{
+		system->reverbEffect->Release(system->reverbEffect);
+	}
 
 	if (system->masteringVoice)
 	{
@@ -101,6 +153,41 @@ mgint MGA_System_GetMaxInstances()
 void MGA_System_SetReverbSettings(MGA_System* system, ReverbSettings& settings)
 {
 	assert(system != nullptr);
+
+	// Get reverb voice details
+	FAudioVoiceDetails details;
+	FAudioVoice_GetVoiceDetails(system->reverbVoice, &details);
+
+	// All parameters related to sampling rate or time are relative to a 48kHz
+	// voice and must be scaled for use with other sampling rates.
+	float timeScale = 48000.0f / details.InputSampleRate;
+
+	FAudioFXReverbParameters params;
+	params.WetDryMix = settings.WetDryMixPct;
+	params.ReflectionsDelay = (uint32_t)(settings.ReflectionsDelayMs * timeScale);
+	params.ReverbDelay = (uint8_t)(settings.ReverbDelayMs * timeScale);
+	params.RearDelay = (uint8_t)(settings.RearDelayMs * timeScale);
+	params.PositionLeft = (uint8_t)settings.PositionLeft;
+	params.PositionRight = (uint8_t)settings.PositionRight;
+	params.PositionMatrixLeft = (uint8_t)settings.PositionLeftMatrix;
+	params.PositionMatrixRight = (uint8_t)settings.PositionRightMatrix;
+	params.EarlyDiffusion = (uint8_t)settings.EarlyDiffusion;
+	params.LateDiffusion = (uint8_t)settings.LateDiffusion;
+	params.LowEQGain = (uint8_t)settings.LowEqGain;
+	params.LowEQCutoff = (uint8_t)settings.LowEqCutoff;
+	params.HighEQGain = (uint8_t)settings.HighEqGain;
+	params.HighEQCutoff = (uint8_t)settings.HighEqCutoff;
+	params.RoomFilterFreq = settings.RoomFilterFrequencyHz * timeScale;
+	params.RoomFilterMain = settings.RoomFilterMainDb;
+	params.RoomFilterHF = settings.RoomFilterHighFrequencyDb;
+	params.ReflectionsGain = settings.ReflectionsGainDb;
+	params.ReverbGain = settings.ReverbGainDb;
+	params.DecayTime = settings.DecayTimeSec;
+	params.Density = settings.DensityPct;
+	params.RoomSize = settings.RoomSizeFeet;
+
+	uint32_t result = FAudioVoice_SetEffectParameters(system->reverbVoice, 0, &params, sizeof(params), FAUDIO_COMMIT_NOW);
+	assert(result == 0);
 }
 
 MGA_Buffer* MGA_Buffer_Create(MGA_System* system)
@@ -343,10 +430,36 @@ mgulong MGA_Voice_GetPosition(MGA_Voice* voice)
 	return state.SamplesPlayed;
 }
 
+static void MGA_Voice_UpdateOutputMatrix(MGA_Voice* voice)
+{
+	FAudioVoiceDetails details;
+	FAudioVoice_GetVoiceDetails(voice->sourceVoice, &details);
+	int srcChannelCount = details.InputChannels;
+	FAudioVoice_GetVoiceDetails(voice->system->masteringVoice, &details);
+	int dstChannelCount = details.InputChannels;
+
+	// Default to zero volume on all channels.
+	float panMatrix[16];
+	memset(panMatrix, 0, sizeof(panMatrix));
+
+	// Set the pan on the correct channels based on the reverb mix.
+	if (!(voice->reverbMix > 0.0f))
+		FAudioVoice_SetOutputMatrix(voice->sourceVoice, nullptr, srcChannelCount, dstChannelCount,
+			MGA_Voice_CalculatePanMatrix(voice->pan, 1.0f, panMatrix, srcChannelCount), FAUDIO_COMMIT_NOW);
+	else
+	{
+		FAudioVoice_SetOutputMatrix(voice->sourceVoice, voice->system->reverbVoice, srcChannelCount, dstChannelCount,
+			MGA_Voice_CalculatePanMatrix(voice->pan, voice->reverbMix, panMatrix, srcChannelCount), FAUDIO_COMMIT_NOW);
+		FAudioVoice_SetOutputMatrix(voice->sourceVoice, voice->system->masteringVoice, srcChannelCount, dstChannelCount,
+			MGA_Voice_CalculatePanMatrix(voice->pan, 1.0f - (voice->reverbMix > 1.0f ? 1.0f : voice->reverbMix), panMatrix, srcChannelCount), FAUDIO_COMMIT_NOW);
+	}
+}
+
 void MGA_Voice_SetPan(MGA_Voice* voice, mgfloat pan)
 {
 	assert(voice != nullptr);
-	// !TODO: Implement output matrix update
+	voice->pan = pan;
+	MGA_Voice_UpdateOutputMatrix(voice);
 }
 
 void MGA_Voice_SetPitch(MGA_Voice* voice, mgfloat pitch)
@@ -375,6 +488,7 @@ void MGA_Voice_SetReverbMix(MGA_Voice* voice, mgfloat mix)
 		voice->reverbMix = 2.0f;
 	else
 		voice->reverbMix = mix;
+
 	if (voice->reverbMix > 0.0f)
 	{
 		FAudioSendDescriptor desc[2];
@@ -386,42 +500,6 @@ void MGA_Voice_SetReverbMix(MGA_Voice* voice, mgfloat mix)
 		sends.SendCount = 2;
 		sends.pSends = desc;
 		FAudioVoice_SetOutputVoices(voice->sourceVoice, &sends);
-		// Update output matrix for both sends
-		FAudioVoiceDetails details;
-		FAudioVoice_GetVoiceDetails(voice->sourceVoice, &details);
-		int srcChannels = details.InputChannels;
-		FAudioVoice_GetVoiceDetails(voice->system->reverbVoice, &details);
-		int reverbChannels = details.InputChannels;
-		FAudioVoice_GetVoiceDetails(voice->system->masteringVoice, &details);
-		int masterChannels = details.InputChannels;
-		// Set reverb send matrix
-		float reverbMatrix[16] = { 0 };
-		for (int i = 0; i < srcChannels * reverbChannels; i++)
-		{
-			reverbMatrix[i] = voice->reverbMix;
-		}
-		FAudioVoice_SetOutputMatrix(
-			voice->sourceVoice,
-			voice->system->reverbVoice,
-			srcChannels,
-			reverbChannels,
-			reverbMatrix,
-			FAUDIO_COMMIT_NOW
-		);
-		// Set master send matrix
-		float masterMatrix[16] = { 0 };
-		for (int i = 0; i < srcChannels* masterChannels; i++)
-		{
-			masterMatrix[i] = 1.0f - (voice->reverbMix > 1.0f ? 1.0f : voice->reverbMix);
-		}
-		FAudioVoice_SetOutputMatrix(
-			voice->sourceVoice,
-			voice->system->masteringVoice,
-			srcChannels,
-			masterChannels,
-			masterMatrix,
-			FAUDIO_COMMIT_NOW
-		);
 	}
 	else
 	{
@@ -432,26 +510,9 @@ void MGA_Voice_SetReverbMix(MGA_Voice* voice, mgfloat mix)
 		sends.SendCount = 1;
 		sends.pSends = desc;
 		FAudioVoice_SetOutputVoices(voice->sourceVoice, &sends);
-		// Reset output matrix
-		FAudioVoiceDetails details;
-		FAudioVoice_GetVoiceDetails(voice->sourceVoice, &details);
-		int srcChannels = details.InputChannels;
-		FAudioVoice_GetVoiceDetails(voice->system->masteringVoice, &details);
-		int masterChannels = details.InputChannels;
-		float masterMatrix[16] = { 0 };
-		for (int i = 0; i < srcChannels * masterChannels; i++)
-		{
-			masterMatrix[i] = 1.0f;
-		}
-		FAudioVoice_SetOutputMatrix(
-			voice->sourceVoice,
-			voice->system->masteringVoice,
-			srcChannels,
-			masterChannels,
-			masterMatrix,
-			FAUDIO_COMMIT_NOW
-		);
 	}
+
+	MGA_Voice_UpdateOutputMatrix(voice);
 }
 
 void MGA_Voice_SetFilterMode(MGA_Voice* voice, MGFilterMode mode, mgfloat filterQ, mgfloat frequency)
