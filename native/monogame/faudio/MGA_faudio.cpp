@@ -72,7 +72,7 @@ MGA_System* MGA_System_Create()
 	}
 
 	// Create reverb effect
-	uint32_t result2 = FAudioCreateReverb(&system->reverbEffect, 0);
+	result = FAudioCreateReverb(&system->reverbEffect, 0);
 	if (result != 0)
 	{
 		FAudioVoice_DestroyVoice(system->masteringVoice);
@@ -214,11 +214,18 @@ void MGA_Buffer_InitializeFormat(MGA_Buffer* buffer, mgbyte* waveHeader, mgbyte*
 	assert(waveData != nullptr);
 	assert(length > 0);
 
-	// !TODO: Parse wave header and initialize format
-	// For now, copy the data
+	auto wformat = (FAudioWaveFormatEx*)waveHeader;
+
+	// Copy format
+	buffer->format = *wformat;
+
+	// Copy audio data
 	buffer->data = new mgbyte[length];
 	memcpy(buffer->data, waveData, length);
 	buffer->size = length;
+
+	// Calculate duration
+	buffer->duration = (mgulong)((length * 1000) / buffer->format.nAvgBytesPerSec);
 }
 
 void MGA_Buffer_InitializePCM(MGA_Buffer* buffer, mgbyte* waveData, mgint offset, mgint length, mgint sampleBits, mgint sampleRate, mgint channels, mgint loopStart, mgint loopLength)
