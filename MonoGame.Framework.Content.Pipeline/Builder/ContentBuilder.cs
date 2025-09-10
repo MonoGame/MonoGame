@@ -87,7 +87,7 @@ public abstract class ContentBuilder
             FailedToBuild++;
             if (ex is not SkipLogException)
             {
-                Logger.Log(LogLevel.Error, $"Countent failed to build: {ex}");
+                Logger.Log(LogLevel.Error, $"Content failed to build: {ex}");
             }
             if (parentContext != null)
             {
@@ -122,7 +122,7 @@ public abstract class ContentBuilder
             FailedToBuild++;
             if (ex is not SkipLogException)
             {
-                Logger.Log(LogLevel.Error, $"Countent failed to build: {ex}");
+                Logger.Log(LogLevel.Error, $"Content failed to build: {ex}");
             }
             if (parentContext != null)
             {
