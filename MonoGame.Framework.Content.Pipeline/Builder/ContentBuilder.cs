@@ -26,6 +26,8 @@ public abstract class ContentBuilder
         public required ContentRequestedArgs Args { get; set; }
     }
 
+    private class SkipLogException() : Exception;
+
     private readonly Queue<ContentRequest> _contentRequestQueue = [];
     private readonly object _contentRequestLock = new();
     private readonly Dictionary<string, List<ContentInfo>> _content = [];
@@ -82,10 +84,20 @@ public abstract class ContentBuilder
         }
         catch (Exception ex)
         {
-            Logger.Log(LogLevel.Error, $"Content failed to build:\n{ex}");
             FailedToBuild++;
+            if (ex is not SkipLogException)
+            {
+                Logger.Log(LogLevel.Error, $"Countent failed to build: {ex}");
+            }
+            if (parentContext != null)
+            {
+                throw new SkipLogException();
+            }
         }
-        Logger.PopFile();
+        finally
+        {
+            Logger.PopFile();
+        }
     }
 
     /// <summary>
@@ -107,10 +119,20 @@ public abstract class ContentBuilder
         }
         catch (Exception ex)
         {
-            Logger.Log(LogLevel.Error, $"Content failed to build:\n{ex}");
             FailedToBuild++;
+            if (ex is not SkipLogException)
+            {
+                Logger.Log(LogLevel.Error, $"Countent failed to build: {ex}");
+            }
+            if (parentContext != null)
+            {
+                throw new SkipLogException();
+            }
         }
-        Logger.PopFile();
+        finally
+        {
+            Logger.PopFile();
+        }
         return null;
     }
 
@@ -132,6 +154,25 @@ public abstract class ContentBuilder
         }
 
         Logger.Log($"Output: {relativeDestPath}");
+
+        if (contentInfo.ShouldBuild) // ensure importer and processor are set
+        {
+            if (!ContentBuilderHelper.GetImporter(relativePath, contentInfo.Importer, out IContentImporter importer))
+            {
+                Logger.Log(LogLevel.Warning, "Importer: Not found");
+                return null;
+            }
+            if (!ContentBuilderHelper.GetProcessor(importer, contentInfo.Processor, out IContentProcessor processor))
+            {
+                Logger.Log(LogLevel.Warning, "Processor: Not found");
+                return null;
+            }
+            if (contentInfo.Importer != importer || contentInfo.Processor != processor)
+            {
+                contentInfo = new ContentInfo(contentInfo.ContentRoot, contentInfo.ShouldBuild, importer, processor, contentInfo.GetOutputPath);
+            }
+        }
+
         if (!Parameters.Rebuild)
         {
             var fileCache = ContentCache.ReadContentFileCache(this, relativeDestPath);
@@ -139,6 +180,7 @@ public abstract class ContentBuilder
             {
                 Logger.Log($"Cache: Found");
                 ContentCache.MarkUsed(fileCache);
+                (parentContext as ContentBuilderProcessorContext)?.ContentFileCache.AddDependency(this, fileCache);
                 return null;
             }
         }
@@ -162,28 +204,18 @@ public abstract class ContentBuilder
             return null;
         }
 
-        if (!ContentBuilderHelper.GetImporter(relativePath, contentInfo.Importer, out IContentImporter importer))
-        {
-            Logger.Log(LogLevel.Warning, "Importer: Not found");
-            return null;
-        }
-        Logger.Log($"Imposter: {importer.GetType().Name}");
-        if (!ContentBuilderHelper.GetProcessor(importer, contentInfo.Processor, out IContentProcessor processor))
-        {
-            Logger.Log(LogLevel.Warning, "Processor: Not found");
-            return null;
-        }
-        Logger.Log($"Processor: {processor.GetType().Name}");
         Logger.Log($"Cache: Not Found");
+        Logger.Log($"Importer: {contentInfo.Importer!.GetType().Name}");
+        Logger.Log($"Processor: {contentInfo.Processor!.GetType().Name}");
 
         var contentFileCache = ContentCache.CreateContentFileCache(this, contentInfo);
         contentFileCache.AddDependency(this, relativePath);
 
         var importContext = new ContentBuilderImporterContext(this, contentFileCache);
-        var importedObject = importer.Import(filePath, importContext);
+        var importedObject = contentInfo.Importer!.Import(filePath, importContext);
 
         var processorContext = new ContentBuilderProcessorContext(this, relativePath, contentInfo, contentFileCache, outputPath);
-        var processedObject = processor.Process(importedObject, processorContext);
+        var processedObject = contentInfo.Processor!.Process(importedObject, processorContext);
 
         if (writeToDisk)
         {

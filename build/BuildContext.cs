@@ -98,7 +98,7 @@ public class BuildContext : FrostingContext
         DotNetBinariesPublishSettings = new DotNetPublishSettings
         {
             MSBuildSettings = DotNetMSBuildSettings,
-            Verbosity = DotNetVerbosity.Diagnostic,
+            Verbosity = DotNetVerbosity.Minimal,
             Configuration = buildConfiguration,
             OutputDirectory = BinariesDirectory
         };
