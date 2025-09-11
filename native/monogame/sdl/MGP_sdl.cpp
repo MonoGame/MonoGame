@@ -479,8 +479,6 @@ mgbyte MGP_Platform_PollEvent(MGP_Platform* platform, MGP_Event& event_)
                 // (This maps the range of values to -32767:32767 instead of SDL's -32768:32767)
                 event_.Controller.Value = (event_.Controller.Value == -32768 ? 32767 : ~event_.Controller.Value + 1);
             }
-            else
-
             return true;
             break;
 
@@ -681,6 +679,19 @@ mgbyte MGP_Platform_BeforeUpdate(MGP_Platform* platform)
 mgbyte MGP_Platform_BeforeDraw(MGP_Platform* platform)
 {
 	assert(platform != nullptr);
+
+    // TO DO: Vulkan wants that we stop rendering if the window is minimized on Windows (because surface extent is 0x0 when this happens, which will crash Vulkan).
+    // This code assume that we only have one primary window. If we ever implement multi-window support, this will need to be changed.
+    for (auto window : platform->windows)
+    {
+        if (window != nullptr)
+        {
+            auto flags = SDL_GetWindowFlags(window->window);
+            if ((flags & SDL_WINDOW_MINIMIZED) != 0)
+                return false;
+        }
+    }
+
 	return true;
 }
 
@@ -820,7 +831,30 @@ void MGP_Window_SetPosition(MGP_Window* window, mgint x, mgint y)
 void MGP_Window_SetClientSize(MGP_Window* window, mgint width, mgint height)
 {
     assert(window != nullptr);
-    SDL_SetWindowSize(window->window, width, height);
+
+    // Resizing with SDL depends on the fullscreen mode.
+    // If we're in exclusive-fullscreen, SDL_SetWindowDisplayMode()
+    // is needed to be called with the closest requested size.
+    // If windowed-fullscreen or just windowed, only
+    // SDL_SetWindowSize() is needed.
+
+    auto flags = SDL_GetWindowFlags(window->window);
+
+    if ((flags & SDL_WINDOW_FULLSCREEN) != 0)
+    {
+        SDL_DisplayMode closest{ 0, 0, 0, 0, nullptr };
+        const SDL_DisplayMode desired{ 0, width, height, 60, nullptr };
+        if (SDL_GetClosestDisplayMode(0, &desired, &closest))
+        {
+            SDL_SetWindowDisplayMode(window->window, &closest);
+            // We need to call SDL_SetWindowSize() as well otherwise
+            // SDL won't send resize proper resize events to our
+            // event queue for the Viewport to update properly.
+            SDL_SetWindowSize(window->window, closest.w, closest.h);
+        }
+    }
+    else
+        SDL_SetWindowSize(window->window, width, height);
 }
 
 void MGP_Window_SetCursor(MGP_Window* window, MGP_Cursor* cursor)

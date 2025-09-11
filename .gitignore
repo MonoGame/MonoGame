@@ -103,3 +103,4 @@ _*
 /native/**/*.vcxproj.filters
 /native/**/*.make
 /native/**/Makefile
+/native/**/*.mgfxo.h

@@ -116,7 +116,7 @@ struct MGVK_Program;
 
 typedef uint32_t FrameCounter;
 
-const FrameCounter kFreeFrames = 2;
+const FrameCounter kFreeFrames = 3;
 const FrameCounter kConcurrentFrameCount = 2;
 
 
@@ -213,6 +213,7 @@ struct MGG_GraphicsDevice
 	VkPhysicalDeviceProperties deviceProperties;
 	VkPhysicalDeviceFeatures deviceFeatures;
 	VkPhysicalDeviceMemoryProperties deviceMemoryProperties;
+	bool customBorderColorSupported = false;
 
 	VkDevice device = VK_NULL_HANDLE;
 	VkQueue queue = VK_NULL_HANDLE;
@@ -243,6 +244,7 @@ struct MGG_GraphicsDevice
 	VkSurfaceKHR surface = VK_NULL_HANDLE;
 	VkSwapchainKHR swapchain = VK_NULL_HANDLE;
 	uint32_t swapchain_image_index = 0;
+	int syncInterval = 0;
 
 	uint64_t vertexBuffersDirty = 0xFFFFFFFF;
 	MGG_Buffer* vertexBuffers[8] = { 0 };
@@ -276,8 +278,6 @@ struct MGG_GraphicsDevice
 	MGVK_TargetSet targets;
 	std::map<uint32_t, MGVK_TargetSetCache*> targetCache;
 
-	// Extension support flags
-	bool customBorderColorSupported = false;
 
 	//
 	bool pipelineStateDirty = false;
@@ -454,6 +454,7 @@ struct MGG_OcclusionQuery
 struct MGG_GraphicsSystem
 {
 	VkInstance instance;
+	mgbool supportsPhysicalDeviceProperties2EXT;
 
 	std::vector<MGG_GraphicsAdapter*> adapters;
 };
@@ -706,7 +707,7 @@ static VkImageAspectFlags DetermineAspectMask(VkFormat format)
 	return result;
 }
 
-uint64_t CheckValidationLayerSupport(const std::vector<const char*>& validationLayers)
+bool AreValidationLayersSupported()
 {
 	uint32_t layerCount;
 	vkEnumerateInstanceLayerProperties(&layerCount, nullptr);
@@ -714,31 +715,33 @@ uint64_t CheckValidationLayerSupport(const std::vector<const char*>& validationL
 	std::vector<VkLayerProperties> availableLayers(layerCount);
 	vkEnumerateInstanceLayerProperties(&layerCount, availableLayers.data());
 
-	uint64_t found = 0;
-
-	for (int i = 0; i < validationLayers.size(); i++)
+	for (const auto& layerProperties : availableLayers)
 	{
-		const char* layerName = validationLayers[i];
-
-		for (const auto& layerProperties : availableLayers)
-		{
-			if (strcmp(layerName, layerProperties.layerName) == 0)
-			{
-				found |= ((uint64_t)1) << i;
-				break;
-			}
-		}
+		if (strcmp("VK_LAYER_KHRONOS_validation", layerProperties.layerName) == 0)
+			return true;
 	}
 
-	return found;
+	return false;
 }
+
+static bool SupportsExtension(const std::vector<VkExtensionProperties>& supportedExtensions, const char* extensionName)
+{
+	for (const auto& extension : supportedExtensions)
+	{
+		if (strcmp(extension.extensionName, extensionName) == 0)
+			return true;
+	}
+
+	return false;
+}
+
 MGG_GraphicsSystem* MGG_GraphicsSystem_Create()
 {
 #ifndef __APPLE__
 	auto err = volkInitialize();
 	if (err != VK_SUCCESS)
 	{
-		printf("Failed to initialize volk!");
+		printf("Failed to initialize volk!\n");
 		return nullptr;
 	}
 #else
@@ -755,6 +758,15 @@ MGG_GraphicsSystem* MGG_GraphicsSystem_Create()
 	app_info.pApplicationName = "Unknown";
 	app_info.pEngineName = "MonoGame";
 
+	std::vector<VkExtensionProperties> supportedInstanceExtensions;
+	{
+		uint32_t count;
+		vkEnumerateInstanceExtensionProperties(nullptr, &count, nullptr);
+		supportedInstanceExtensions.resize(count);
+
+		vkEnumerateInstanceExtensionProperties(nullptr, &count, supportedInstanceExtensions.data());
+	}
+
 	std::vector<const char*> instanceExtensions;
 #if defined(MG_SDL2)
 	{
@@ -762,22 +774,57 @@ MGG_GraphicsSystem* MGG_GraphicsSystem_Create()
 		SDL_Vulkan_GetInstanceExtensions(nullptr, &count, nullptr);
 		instanceExtensions.resize(count);
 
+		// This call returns the extensions that SDL needs for the created instance.
 		SDL_Vulkan_GetInstanceExtensions(nullptr, &count, instanceExtensions.data());
 	}
-#else
-#error Not Implemented!
 #endif
-	instanceExtensions.push_back(VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2_EXTENSION_NAME);
+
+	// Check instance-level extensions support or if they are core in this instance
+	uint32_t version;
+	err = vkEnumerateInstanceVersion(&version);
+	if (err != VK_SUCCESS)
+	{
+		printf("Failed to retrieve Vulkan instance version!\n");
+		return nullptr;
+	}
+
+	printf("Vulkan instance version: %d.%d.%d\n", VK_API_VERSION_MAJOR(version), VK_API_VERSION_MINOR(version), VK_API_VERSION_PATCH(version));
+
+	// This extension should be widely supported (~89% of systems according to https://vulkan.gpuinfo.org/listinstanceextensions.php?platform=all)
+	// This extension is used to initialize the VK_EXT_custom_border_color (which therefore won't be supported if absent)
+	bool supportsProperties2EXT = false;
+	if (SupportsExtension(supportedInstanceExtensions, VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2_EXTENSION_NAME))
+	{
+		supportsProperties2EXT = true;
+		instanceExtensions.push_back(VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2_EXTENSION_NAME);
+	}
+	else
+	{
+		printf("%s is not supported by this instance! VK_EXT_custom_border_color will not be supported either.\n", VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2_EXTENSION_NAME);
+	}
 
 	std::vector<const char*> enabledLayers;
 
 #ifdef DEBUG
-	instanceExtensions.push_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
 
-#ifndef __APPLE__
-	enabledLayers.push_back("VK_LAYER_KHRONOS_validation");
-	CheckValidationLayerSupport(enabledLayers);
-#endif
+	// This extension has a very poor support on Android (less than 25%). Chances are that DEBUG builds won't work on Android.
+	if (SupportsExtension(supportedInstanceExtensions, VK_EXT_DEBUG_UTILS_EXTENSION_NAME))
+	{
+		instanceExtensions.push_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
+	}
+	else
+	{
+		printf("%s is not supported by this instance. Labeling Vulkan object will not be possible.\n", VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
+	}
+
+	if (AreValidationLayersSupported())
+	{
+		enabledLayers.push_back("VK_LAYER_KHRONOS_validation");
+		printf("Validation layers are enabled (performances will be drastically impacted). To run without validation layers, please use a RELEASE build or uninstall the Vulkan SDK.\n");
+	}
+	else
+		printf("Validation layers aren't supported (you might want to install the Vulkan SDK to support them).\n");
+
 #endif
 
 	VkInstanceCreateInfo instance_create_info = { VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO };
@@ -793,7 +840,7 @@ MGG_GraphicsSystem* MGG_GraphicsSystem_Create()
 	err = vkCreateInstance(&instance_create_info, nullptr, &instance);
 	if (err != VK_SUCCESS)
 	{
-		printf("Failed to create Vulkan instance!");
+		printf("Failed to create Vulkan instance!\n");
 		return nullptr;
 	}
 
@@ -803,6 +850,7 @@ MGG_GraphicsSystem* MGG_GraphicsSystem_Create()
 
 	auto system = new MGG_GraphicsSystem();
 	system->instance = instance;
+	system->supportsPhysicalDeviceProperties2EXT = supportsProperties2EXT;
 
 	// Gather the physical devices.
 	{
@@ -810,15 +858,16 @@ MGG_GraphicsSystem* MGG_GraphicsSystem_Create()
 		VkResult res = vkEnumeratePhysicalDevices(system->instance, &count, NULL);
 		if (res == VK_SUCCESS)
 		{
-			VkPhysicalDevice* gpus = (VkPhysicalDevice*)calloc(count, sizeof(*gpus));
+			std::vector<VkPhysicalDevice> gpus;
+			gpus.resize(count);
 
-			res = vkEnumeratePhysicalDevices(system->instance, &count, gpus);
+			res = vkEnumeratePhysicalDevices(system->instance, &count, gpus.data());
 			if (res == VK_SUCCESS)
 			{
-				for (uint32_t i = 0; i < count; ++i)
+				for (const auto& gpu : gpus)
 				{
 					auto adapter = new MGG_GraphicsAdapter();
-					adapter->device = gpus[i];
+					adapter->device = gpu;
 
 					vkGetPhysicalDeviceProperties(adapter->device, &adapter->properties);
 					vkGetPhysicalDeviceFeatures(adapter->device, &adapter->features);
@@ -827,8 +876,6 @@ MGG_GraphicsSystem* MGG_GraphicsSystem_Create()
 					system->adapters.push_back(adapter);
 				}
 			}
-
-			free((void*)gpus);
 		}
 	}
 
@@ -1126,26 +1173,6 @@ static void MGVK_ExecuteAndFreeCommandBuffer(MGG_GraphicsDevice* device, VkComma
 	vkFreeCommandBuffers(device->device, device->cmdPool, 1, &commandBuffer);
 }
 
-static bool MGVK_CheckExtensionSupport(VkPhysicalDevice physicalDevice, const char* extensionName)
-{
-	uint32_t extensionCount;
-	vkEnumerateDeviceExtensionProperties(physicalDevice, nullptr, &extensionCount, nullptr);
-
-	if (extensionCount == 0)
-		return false;
-
-	std::vector<VkExtensionProperties> availableExtensions(extensionCount);
-	vkEnumerateDeviceExtensionProperties(physicalDevice, nullptr, &extensionCount, availableExtensions.data());
-
-	for (const auto& extensionProperties : availableExtensions) {
-		if (strcmp(extensionName, extensionProperties.extensionName) == 0) {
-			return true;
-		}
-	}
-
-	return false;
-}
-
 MGG_GraphicsDevice* MGG_GraphicsDevice_Create(MGG_GraphicsSystem* system, MGG_GraphicsAdapter* adapter)
 {
 	assert(system != nullptr);
@@ -1158,6 +1185,9 @@ MGG_GraphicsDevice* MGG_GraphicsDevice_Create(MGG_GraphicsSystem* system, MGG_Gr
 
 	vkGetPhysicalDeviceFeatures(device->physicalDevice, &device->deviceFeatures);
 	vkGetPhysicalDeviceProperties(device->physicalDevice, &device->deviceProperties);
+
+	printf("Selected GPU: %s\n", device->deviceProperties.deviceName);
+	printf("Supported Vulkan API version: %d.%d.%d\n", VK_API_VERSION_MAJOR(device->deviceProperties.apiVersion), VK_API_VERSION_MINOR(device->deviceProperties.apiVersion), VK_API_VERSION_PATCH(device->deviceProperties.apiVersion));
 
 	// Capture some needed limits.
 	device->minUniformBufferOffsetAlignment = adapter->properties.limits.minUniformBufferOffsetAlignment;
@@ -1181,25 +1211,40 @@ MGG_GraphicsDevice* MGG_GraphicsDevice_Create(MGG_GraphicsSystem* system, MGG_Gr
 		}
 	}
 
-	int queueCreateInfoCount = 0;
-	VkDeviceQueueCreateInfo* queueCreateInfos = new VkDeviceQueueCreateInfo[queueFamilyCount];
-	memset(queueCreateInfos, 0, sizeof(VkDeviceQueueCreateInfo) * queueFamilyCount);
+	VkDeviceQueueCreateInfo queueCreateInfo {};
+	queueCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
+	queueCreateInfo.queueFamilyIndex = queueFamilyIndex;
+	queueCreateInfo.queueCount = 1;
+	float priority = 1.0f;
+	queueCreateInfo.pQueuePriorities = &priority;
 
-	for (int i = 0; i < queueFamilyCount; i++)
+	// Check if VK_KHR_swapchain and VK_EXT_custom_border_color are supported
+	std::vector<VkExtensionProperties> deviceExtensions;
 	{
-		const VkQueueFamilyProperties* properties = queueFamilyProps + i;
-		float* queuePriorities = new float[properties->queueCount];
+		uint32_t count;
+		vkEnumerateDeviceExtensionProperties(device->physicalDevice, nullptr, &count, nullptr);
+		deviceExtensions.resize(count);
 
-		for (int j = 0; j < properties->queueCount; ++j)
-			queuePriorities[j] = 1.0f;
-
-		queueCreateInfos[i].sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
-		queueCreateInfos[i].queueFamilyIndex = i;
-		queueCreateInfos[i].queueCount = 1;
-		queueCreateInfos[i].pQueuePriorities = queuePriorities;
-		++queueCreateInfoCount;
+		vkEnumerateDeviceExtensionProperties(device->physicalDevice, nullptr, &count, deviceExtensions.data());
 	}
-	assert(queueFamilyCount == queueCreateInfoCount);
+
+	bool swapChainSupported = false;
+	for (const auto& extension : deviceExtensions)
+	{
+		if (strcmp(extension.extensionName, VK_KHR_SWAPCHAIN_EXTENSION_NAME) == 0)
+			swapChainSupported = true;
+		if (strcmp(extension.extensionName, VK_EXT_CUSTOM_BORDER_COLOR_EXTENSION_NAME) == 0)
+			device->customBorderColorSupported = system->supportsPhysicalDeviceProperties2EXT;
+	}
+
+	if (!swapChainSupported)
+	{
+		printf("%s is not supported by this driver!\n", VK_KHR_SWAPCHAIN_EXTENSION_NAME);
+		// This is a critical failure.
+		return nullptr;
+	}
+	if (!device->customBorderColorSupported) // We can live without this extention.
+		printf("%s is not supported by this driver!\n", VK_EXT_CUSTOM_BORDER_COLOR_EXTENSION_NAME);
 
 	std::vector<const char*> extensions;
 	extensions.push_back(VK_KHR_SWAPCHAIN_EXTENSION_NAME);
@@ -1214,71 +1259,34 @@ MGG_GraphicsDevice* MGG_GraphicsDevice_Create(MGG_GraphicsSystem* system, MGG_Gr
 		enabledFeatures.occlusionQueryPrecise = VK_TRUE;
 	}
 
-	VkPhysicalDeviceFeatures2 deviceFeatures2 = {};
-	deviceFeatures2.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2;
-	deviceFeatures2.features = enabledFeatures;
-
-	// Check for custom border color extension support
-	device->customBorderColorSupported = false;
-	VkPhysicalDeviceCustomBorderColorFeaturesEXT customBorderColorFeatures = {};
+	VkDeviceCreateInfo deviceCreateInfo = { VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO };
+	deviceCreateInfo.queueCreateInfoCount = 1;
+	deviceCreateInfo.pQueueCreateInfos = &queueCreateInfo;
 	
-#if defined(__APPLE__)
-	// Apple/MoltenVK doesn't support custom border colors
-	deviceFeatures2.pNext = nullptr;
-#else
-	// Check if the device supports the custom border color extension
-	if (MGVK_CheckExtensionSupport(device->physicalDevice, VK_EXT_CUSTOM_BORDER_COLOR_EXTENSION_NAME))
+	if (!device->customBorderColorSupported)
 	{
-		// Check if the physical device supports the required features
-		VkPhysicalDeviceCustomBorderColorFeaturesEXT availableFeatures = {};
-		availableFeatures.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_CUSTOM_BORDER_COLOR_FEATURES_EXT;
-		
-		VkPhysicalDeviceFeatures2 queryFeatures = {};
-		queryFeatures.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2;
-		queryFeatures.pNext = &availableFeatures;
-		
-		vkGetPhysicalDeviceFeatures2(device->physicalDevice, &queryFeatures);
-		
-		// Only enable if both customBorderColors and customBorderColorWithoutFormat are supported
-		if (availableFeatures.customBorderColors && availableFeatures.customBorderColorWithoutFormat)
-		{
-			extensions.push_back(VK_EXT_CUSTOM_BORDER_COLOR_EXTENSION_NAME);
-			customBorderColorFeatures.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_CUSTOM_BORDER_COLOR_FEATURES_EXT;
-			customBorderColorFeatures.customBorderColors = VK_TRUE;
-			customBorderColorFeatures.customBorderColorWithoutFormat = VK_TRUE;
-			deviceFeatures2.pNext = &customBorderColorFeatures;
-			device->customBorderColorSupported = true;
-			
-#if defined(DEBUG)
-			printf("VK_EXT_custom_border_color extension enabled\n");
-#endif
-		}
-		else
-		{
-			deviceFeatures2.pNext = nullptr;
-			
-#if defined(DEBUG)
-			printf("VK_EXT_custom_border_color extension available but features not supported\n");
-#endif
-		}
+		deviceCreateInfo.pEnabledFeatures = &enabledFeatures;
+		deviceCreateInfo.pNext = nullptr;
 	}
 	else
 	{
-		deviceFeatures2.pNext = nullptr;
-		
-#if defined(DEBUG)
-		printf("VK_EXT_custom_border_color extension not available, using fallback border colors\n");
-#endif
-	}
-#endif
+		extensions.push_back(VK_EXT_CUSTOM_BORDER_COLOR_EXTENSION_NAME);
+		VkPhysicalDeviceCustomBorderColorFeaturesEXT customBorderColorFeatures = {};
+		customBorderColorFeatures.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_CUSTOM_BORDER_COLOR_FEATURES_EXT;
+		customBorderColorFeatures.customBorderColors = VK_TRUE;
+		customBorderColorFeatures.customBorderColorWithoutFormat = VK_TRUE;
 
-	VkDeviceCreateInfo deviceCreateInfo = { VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO };
-	deviceCreateInfo.queueCreateInfoCount = queueCreateInfoCount;
-	deviceCreateInfo.pQueueCreateInfos = queueCreateInfos;
+		VkPhysicalDeviceFeatures2 deviceFeatures2 = {};
+		deviceFeatures2.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2;
+		deviceFeatures2.features = enabledFeatures;
+		deviceFeatures2.pNext = &customBorderColorFeatures;
+
+		deviceCreateInfo.pEnabledFeatures = nullptr;
+		deviceCreateInfo.pNext = &deviceFeatures2;
+	}
+
 	deviceCreateInfo.enabledExtensionCount = extensions.size();
 	deviceCreateInfo.ppEnabledExtensionNames = extensions.data();
-	deviceCreateInfo.pEnabledFeatures = nullptr;
-	deviceCreateInfo.pNext = &deviceFeatures2;
 
 	auto res = vkCreateDevice(device->physicalDevice, &deviceCreateInfo, NULL, &device->device);
 	VK_CHECK_RESULT(res);
@@ -1513,10 +1521,11 @@ void MGG_GraphicsDevice_GetCaps(MGG_GraphicsDevice* device, MGG_GraphicsDevice_C
 void MGVK_RecreateSwapChain(
 	MGG_GraphicsDevice* device,
 	void* nativeWindowHandle,
-	mgint width,
-	mgint height,
+	mguint width,
+	mguint height,
 	VkFormat vkColor,
-	VkFormat vkDepth)
+	VkFormat vkDepth,
+	mgint syncInterval)
 {
 	assert(device != nullptr);
 	assert(nativeWindowHandle != nullptr);
@@ -1549,41 +1558,53 @@ void MGVK_RecreateSwapChain(
 		height == device->swapchainHeight &&
 		vkColor == device->colorFormat &&
 		vkDepth == device->depthFormat &&
+		syncInterval == device->syncInterval &&
 		device->swapchain != VK_NULL_HANDLE)
 		return;
 
 	cleanupSwapChain(device);
 
-	device->swapchainWidth = width;
-	device->swapchainHeight = height;
+	VkSurfaceCapabilitiesKHR surface_capabilities;
+	res = vkGetPhysicalDeviceSurfaceCapabilitiesKHR(device->physicalDevice, device->surface, &surface_capabilities);
+	VK_CHECK_RESULT(res);
+
+	// If max extent is zero'd, it means the window is minimized, and we should leave the swapchain to VK_NULL_HANDLE and stop rendering (this is done in MGP_Platform_BeforeDraw()).
+	if (surface_capabilities.maxImageExtent.width == 0 || surface_capabilities.maxImageExtent.height == 0)
+		return;
+
+	// We apply the extent range to the entire swapchain size to avoid surface scaling and errors.
+	device->swapchainWidth = std::clamp(width, surface_capabilities.minImageExtent.width, surface_capabilities.maxImageExtent.width);
+	device->swapchainHeight = std::clamp(height, surface_capabilities.minImageExtent.height, surface_capabilities.maxImageExtent.height);
 	device->colorFormat = vkColor;
 	device->depthFormat = vkDepth;
 
-	VkSurfaceCapabilitiesKHR surface_capabilities;
 	{
-		res = vkGetPhysicalDeviceSurfaceCapabilitiesKHR(device->physicalDevice, device->surface, &surface_capabilities);
-		VK_CHECK_RESULT(res);
-
+		// Check if the requested color format is supported, and fallback to another one otherwise.
 		VkFormat surface_format = VK_FORMAT_UNDEFINED;
 		uint32_t format_count = 0;
 		res = vkGetPhysicalDeviceSurfaceFormatsKHR(device->physicalDevice, device->surface, &format_count, nullptr);
 		VK_CHECK_RESULT(res);
 
-		VkSurfaceFormatKHR* surfFormats = new VkSurfaceFormatKHR[format_count];
-		res = vkGetPhysicalDeviceSurfaceFormatsKHR(device->physicalDevice, device->surface, &format_count, surfFormats);
+		std::vector<VkSurfaceFormatKHR> surfFormats(format_count);
+		res = vkGetPhysicalDeviceSurfaceFormatsKHR(device->physicalDevice, device->surface, &format_count, surfFormats.data());
 		VK_CHECK_RESULT(res);
 
-		surface_format = surfFormats[0].format;
-		if ((1 == format_count) && (VK_FORMAT_UNDEFINED == surfFormats[0].format))
-			surface_format = VK_FORMAT_B8G8R8A8_UNORM;
+		for (const auto& surfFormat : surfFormats)
+		{
+			if (surfFormat.format == vkColor &&
+				surfFormat.colorSpace == VK_COLOR_SPACE_SRGB_NONLINEAR_KHR)
+			{
+				// The expected format is supported
+				surface_format = surfFormat.format;
+				break;
+			}
+		}
 
-		VkSurfaceCapabilitiesKHR surface_caps;
-		res = vkGetPhysicalDeviceSurfaceCapabilitiesKHR(device->physicalDevice, device->surface, &surface_caps);
-		VK_CHECK_RESULT(res);
-
-		device->colorFormat = surface_format;
-
-		delete[] surfFormats;
+		if (surface_format == VK_FORMAT_UNDEFINED)
+		{
+			// Format is unsupported, what should we do?
+			return;
+		}
 	}
 
 	// Requested swapchain extent will be clamped based on the surface's min/max extent.
@@ -1602,14 +1623,9 @@ void MGVK_RecreateSwapChain(
 
 	VkSwapchainCreateInfoKHR create_info = { VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR };
 	create_info.surface = device->surface;
-	// Use the maximum of our desired count and the surface's minimum requirement
-	create_info.minImageCount = (surface_capabilities.minImageCount > kConcurrentFrameCount) ? 
-								surface_capabilities.minImageCount : kConcurrentFrameCount;
-	// Cap at maxImageCount if it's not zero (zero means no limit)
-	if (surface_capabilities.maxImageCount > 0 && create_info.minImageCount > surface_capabilities.maxImageCount)
-		create_info.minImageCount = surface_capabilities.maxImageCount;
+	create_info.minImageCount = kConcurrentFrameCount;
 	create_info.imageFormat = device->colorFormat;
-	create_info.imageColorSpace = VK_COLORSPACE_SRGB_NONLINEAR_KHR;
+	create_info.imageColorSpace = VK_COLOR_SPACE_SRGB_NONLINEAR_KHR;
 	create_info.imageExtent = extent;
 	create_info.imageArrayLayers = 1;
 	create_info.imageUsage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_TRANSFER_SRC_BIT;
@@ -1622,29 +1638,38 @@ void MGVK_RecreateSwapChain(
 	res = vkGetPhysicalDeviceSurfacePresentModesKHR(device->physicalDevice, device->surface, &presentModeCount, nullptr);
 	VK_CHECK_RESULT(res);
 	
-	VkPresentModeKHR* presentModes = new VkPresentModeKHR[presentModeCount];
-	res = vkGetPhysicalDeviceSurfacePresentModesKHR(device->physicalDevice, device->surface, &presentModeCount, presentModes);
+	std::vector<VkPresentModeKHR> presentModes(presentModeCount);
+	res = vkGetPhysicalDeviceSurfacePresentModesKHR(device->physicalDevice, device->surface, &presentModeCount, presentModes.data());
 	VK_CHECK_RESULT(res);
 	
 	// Prefer MAILBOX -> IMMEDIATE -> FIFO (FIFO is always supported)
-	VkPresentModeKHR selectedPresentMode = VK_PRESENT_MODE_FIFO_KHR;
-	for (uint32_t i = 0; i < presentModeCount; i++)
+	device->syncInterval = syncInterval; // 0 is IMMEDIATE, 1 is either MAILBOX or FIFO, 2 is half-Vsync and we currently don't support that on Vulkan.
+	VkPresentModeKHR selectedPresentMode = VK_PRESENT_MODE_FIFO_KHR; // Default, guaranteed to be supported by Vulkan specs.
+	for (const auto& presentMode : presentModes)
 	{
-		if (presentModes[i] == VK_PRESENT_MODE_MAILBOX_KHR)
+		// We used to upgrade FIFO to MAILBOX when supported because it should be preferred,
+		// but driver support seems to be broken sometimes. Some drivers report MAILBOX
+		// as supported but will actually behave like IMMEDIATE instead.
+		/*
+		if (device->syncInterval > 0 &&
+			presentModes[i] == VK_PRESENT_MODE_MAILBOX_KHR)
 		{
 			selectedPresentMode = VK_PRESENT_MODE_MAILBOX_KHR;
+			fprintf(stderr, "Vsync is upgraded.\n");
 			break;
 		}
-		else if (presentModes[i] == VK_PRESENT_MODE_IMMEDIATE_KHR)
+		*/
+		// Vsync is disabled, set IMMEDIATE if supported
+		if (device->syncInterval == 0 &&
+			presentMode == VK_PRESENT_MODE_IMMEDIATE_KHR)
 		{
 			selectedPresentMode = VK_PRESENT_MODE_IMMEDIATE_KHR;
+			break;
 		}
 	}
 	
-	delete[] presentModes;
-	
 	create_info.presentMode = selectedPresentMode;
-	create_info.clipped = true;
+	create_info.clipped = VK_TRUE;
 	//create_info.pNext = &scalingCreateInfo;
 	res = vkCreateSwapchainKHR(device->device, &create_info, nullptr, &device->swapchain);
 	VK_CHECK_RESULT(res);
@@ -1658,10 +1683,7 @@ void MGVK_RecreateSwapChain(
 	res = vkGetSwapchainImagesKHR(device->device, device->swapchain, &swapchainCount, swapchainImages);
 	VK_CHECK_RESULT(res);
 
-	// Store swapchain images, but only create frame textures for the ones we'll use
-	uint32_t framesToCreate = (swapchainCount < kConcurrentFrameCount) ? swapchainCount : kConcurrentFrameCount;
-
-	for (uint32_t i = 0; i < framesToCreate; ++i)
+	for (uint32_t i = 0; i < swapchainCount; ++i)
 	{
 		VkImageCreateInfo image_create_info = { VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO };
 		image_create_info.imageType = VK_IMAGE_TYPE_2D;
@@ -1713,7 +1735,8 @@ void MGVK_RecreateSwapChain(MGG_GraphicsDevice* device)
 		device->swapchainWidth,
 		device->swapchainHeight,
 		device->colorFormat,
-		device->depthFormat);
+		device->depthFormat,
+		device->syncInterval);
 
     MGG_GraphicsDevice_SetRenderTargets(device, nullptr, nullptr, 0);
 }
@@ -1724,12 +1747,22 @@ void MGG_GraphicsDevice_ResizeSwapchain(
 	mgint width,
 	mgint height,
 	MGSurfaceFormat color,
-	MGDepthFormat depth)
+	MGDepthFormat depth,
+	mgint syncInterval)
 {
+	assert(device);
+
+	// Swapchain resize should not happen manually in Vulkan, we should leave this work to
+	// vkQueuePresentKHR() and vkAcquireNextImageKHR() which will react to surface changes.
+	// We should only let this through if the swapchain needs to be created or if syncInterval has changed.
+	if (device->swapchain != VK_NULL_HANDLE &&
+		device->syncInterval == syncInterval)
+		return;
+
 	auto vkColor = ToVkFormat(color);
 	auto vkDepth = ToVkFormat(depth);
 
-	MGVK_RecreateSwapChain(device, nativeWindowHandle, width, height, vkColor, vkDepth);
+	MGVK_RecreateSwapChain(device, nativeWindowHandle, width, height, vkColor, vkDepth, syncInterval);
 }
 
 
@@ -1787,6 +1820,13 @@ mgint MGG_GraphicsDevice_BeginFrame(MGG_GraphicsDevice* device)
 {
 	assert(device != nullptr);
 
+	// If the swapchain is null, it probably means that the window is minimized and we must attempt to check if it has been restored.
+	if (device->swapchain == VK_NULL_HANDLE)
+	{
+		printf("Swapchain was null before acquiring a frame. This shouldn't happen.\n");
+		MGVK_RecreateSwapChain(device);
+	}
+
 	VkResult res;
 
 	const FrameCounter currentFrame = device->frame;
@@ -1801,10 +1841,13 @@ mgint MGG_GraphicsDevice_BeginFrame(MGG_GraphicsDevice* device)
 	res = vkResetFences(device->device, 1, &cmd.completedFence);
 	VK_CHECK_RESULT(res);
 
-	device->swapchain_image_index = 0;
-	res = vkAcquireNextImageKHR(device->device, device->swapchain, UINT64_MAX,
-		cmd.imageAcquiredSemaphore, VK_NULL_HANDLE, &device->swapchain_image_index);
-	VK_CHECK_RESULT(res);
+	if (device->swapchain != VK_NULL_HANDLE)
+	{
+		device->swapchain_image_index = 0;
+		res = vkAcquireNextImageKHR(device->device, device->swapchain, UINT64_MAX,
+			cmd.imageAcquiredSemaphore, VK_NULL_HANDLE, &device->swapchain_image_index);
+		VK_CHECK_RESULT(res);
+	}
 
 	frame.uniformOffset = 0;
 	if (frame.uniforms == NULL)
@@ -2090,8 +2133,15 @@ void MGG_GraphicsDevice_Present(MGG_GraphicsDevice* device, mgint currentFrame, 
 	presentInfo.pImageIndices = &device->swapchain_image_index;
 
 	res = vkQueuePresentKHR(device->queue, &presentInfo);
-	if (res == VK_ERROR_OUT_OF_DATE_KHR)
+	if (res == VK_ERROR_OUT_OF_DATE_KHR || // This will happen if the window is minimized.
+		res == VK_SUBOPTIMAL_KHR)
+	{
+		if (res == VK_SUBOPTIMAL_KHR)
+			printf("Swapchain suboptimal. Recreating swapchain...\n");
+		else
+			printf("Swapchain out of date. Recreating swapchain...\n");
 		MGVK_RecreateSwapChain(device);
+	}
 	else
 	{
 		VK_CHECK_RESULT(res);
@@ -2761,6 +2811,27 @@ static void MGVK_UpdateRenderPass(MGG_GraphicsDevice* device, FrameCounter curre
 	device->deferredOcclusionQueries.clear();
 }
 
+static const int DefaultPoolSize = 1024;
+
+static void MGVK_FillDescriptorSetCache(MGG_GraphicsDevice* device, MGG_Shader* shader)
+{
+	// Pre-fill the free descriptor sets now.
+	VkDescriptorSetAllocateInfo alloc_info = { VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO };
+	alloc_info.descriptorPool = shader->pool;
+	alloc_info.descriptorSetCount = 1;
+	alloc_info.pSetLayouts = &shader->setLayout;
+	for (int i = 0; i < DefaultPoolSize; i++)
+	{
+		MGVK_DescriptorInfo* info = new MGVK_DescriptorInfo;
+		info->frame = 0;
+		shader->freeSets.push(info);
+
+		VkResult res = vkAllocateDescriptorSets(device->device, &alloc_info, &info->set);
+		VK_CHECK_RESULT(res);
+		VK_SET_OBJECT_NAME(device->device, info->set, VK_OBJECT_TYPE_DESCRIPTOR_SET, "MGVK_DescriptorInfo.set (Shader id: %u, index: %d)", shader->id, i);
+	}
+}
+
 static void MGVK_UpdateDescriptors(MGG_GraphicsDevice* device, FrameCounter currentFrame, MGG_Shader* shader, VkDescriptorSet* current, uint32_t* dynamicOffset)
 {
 	// If nothing is dirty then skip the update.
@@ -2802,7 +2873,15 @@ static void MGVK_UpdateDescriptors(MGG_GraphicsDevice* device, FrameCounter curr
 		if (!dirty)
 			break;
 	}
-	//hash = MG_ComputeHash(frame_index);
+	// We hash the frameIndex because each frame in the swap chain has its
+	// own uniforms buffer (device->frames[frameIndex].uniforms) that gets
+	// bound to the descriptor set. If we don't, some frame will use the
+	// wrong buffer if the descriptor is retrieved from the cache (and will
+	// result in flickers/broken rendering).
+	// 
+	// TO DO: refactor the descriptor cache and uniforms buffer handling so
+	// that we don't create twice as much descriptor due to this.
+	hash = MG_ComputeHash(frameIndex, hash);
 
 	// Do we have this same descriptor cached?
 	info = shader->usedSets[hash];
@@ -2810,16 +2889,16 @@ static void MGVK_UpdateDescriptors(MGG_GraphicsDevice* device, FrameCounter curr
 	{
 		// The descriptor wasn't cached... so we need to
 		// create a new one from the free sets.
-		if (shader->freeSets.size() > 0)
+		if (shader->freeSets.size() == 0)
 		{
-			info = shader->freeSets.front();
-			shader->freeSets.pop();
+			// Allocate more cache if empty.
+			MGVK_FillDescriptorSetCache(device, shader);
 		}
-		else
-		{
-			// TODO: We're out of free sets... allocate more?
-			assert(0);
-		}
+
+		assert(shader->freeSets.size() > 0);
+		
+		info = shader->freeSets.front();
+		shader->freeSets.pop();
 
 		// Cache the new or recycled set for later use.
 		shader->usedSets[hash] = info;
@@ -4022,8 +4101,11 @@ MGG_SamplerState* MGG_SamplerState_Create(MGG_GraphicsDevice* device, MGG_Sample
 		samplerInfo.borderColor = VK_BORDER_COLOR_FLOAT_OPAQUE_WHITE;
 	else
 	{
-		// Check if custom border color extension is supported
-		if (device->customBorderColorSupported)
+		if (!device->customBorderColorSupported)
+		{
+			samplerInfo.borderColor = VK_BORDER_COLOR_INT_TRANSPARENT_BLACK;
+		}
+		else
 		{
 			samplerInfo.borderColor = VK_BORDER_COLOR_FLOAT_CUSTOM_EXT;
 			bcolor.sType = VK_STRUCTURE_TYPE_SAMPLER_CUSTOM_BORDER_COLOR_CREATE_INFO_EXT;
@@ -4036,11 +4118,6 @@ MGG_SamplerState* MGG_SamplerState_Create(MGG_GraphicsDevice* device, MGG_Sample
 			bcolor.customBorderColor.float32[3] = ((info->BorderColor >> 24) & 0xFF) / 255.0f;
 
 			samplerInfo.pNext = &bcolor;
-		}
-		else
-		{
-			// Fallback to closest standard border color when custom border colors are not supported
-			samplerInfo.borderColor = VK_BORDER_COLOR_FLOAT_TRANSPARENT_BLACK;
 		}
 	}
 
@@ -4817,8 +4894,6 @@ void MGG_InputLayout_Destroy(MGG_GraphicsDevice* device, MGG_InputLayout* layout
 	delete layout;
 }
 
-static const int DefaultPoolSize = 1024;
-
 MGG_Shader* MGG_Shader_Create(MGG_GraphicsDevice* device, MGShaderStage stage, mgbyte* bytecode, mgint sizeInBytes)
 {
 	assert(device != nullptr);
@@ -4903,20 +4978,7 @@ MGG_Shader* MGG_Shader_Create(MGG_GraphicsDevice* device, MGShaderStage stage, m
 	}
 
 	// Pre-fill the free descriptor sets now.
-	VkDescriptorSetAllocateInfo alloc_info = { VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO };
-	alloc_info.descriptorPool = shader->pool;
-	alloc_info.descriptorSetCount = 1;
-	alloc_info.pSetLayouts = &shader->setLayout;
-	for (int i = 0; i < DefaultPoolSize; i++)
-	{
-		MGVK_DescriptorInfo* info = new MGVK_DescriptorInfo;
-		info->frame = 0;
-		shader->freeSets.push(info);
-
-		res = vkAllocateDescriptorSets(device->device, &alloc_info, &info->set);
-		VK_CHECK_RESULT(res);
-		VK_SET_OBJECT_NAME(device->device, info->set, VK_OBJECT_TYPE_DESCRIPTOR_SET, "MGVK_DescriptorInfo.set (Shader id: %u, index: %d)", shader->id, i);
-	}
+	MGVK_FillDescriptorSetCache(device, shader);
 
 	// Prepare the write descriptor set for updates at runtime.
 	VkWriteDescriptorSet* write = shader->writes = new VkWriteDescriptorSet[layoutBindings.size()];
