@@ -562,21 +562,21 @@ namespace MonoGame.OpenAL
         }
 
 #if IOS
-        [DllImport("_Internal", CallingConvention = CallingConvention.Cdecl)]
+        [DllImport(AL.LibraryName, CallingConvention = CallingConvention.Cdecl)]
         internal static extern void alcSuspendContext(IntPtr context);
         internal static void SuspendContext(IntPtr context) => alcSuspendContext(context);
 
-        [DllImport("_Internal", CallingConvention = CallingConvention.Cdecl)]
+        [DllImport(AL.LibraryName, CallingConvention = CallingConvention.Cdecl)]
         internal static extern void alcProcessContext(IntPtr context);
         internal static void ProcessContext(IntPtr context) => alcProcessContext(context);
 #endif
 
 #if ANDROID
-        [DllImport("openal", CallingConvention = CallingConvention.Cdecl)]
+        [DllImport(AL.LibraryName, CallingConvention = CallingConvention.Cdecl)]
         internal static extern void alcDevicePauseSOFT(IntPtr device);
         internal static void DevicePause(IntPtr device) => alcDevicePauseSOFT(device);
 
-        [DllImport("openal", CallingConvention = CallingConvention.Cdecl)]
+        [DllImport(AL.LibraryName, CallingConvention = CallingConvention.Cdecl)]
         internal static extern void alcDeviceResumeSOFT(IntPtr device);
         internal static void DeviceResume(IntPtr device) => alcDeviceResumeSOFT(device);
 #endif
