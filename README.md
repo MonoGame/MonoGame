@@ -97,7 +97,7 @@ There are several options on our [Donation Page](https://monogame.net/donate/).
 
 The full source code is available here from GitHub:
 
-* Clone the source: `git clone https://github.com/MonoGame/MonoGame.git` recursively.
+* Clone the source: `git clone --recurse-submodules https://github.com/MonoGame/MonoGame.git` (including resursive submodules).
 * Set up the submodules: `git submodule update --init`
 * Open the solution for your target platform to build the game framework.
 * Open the Tools solution for your development platform to build the pipeline and content tools.

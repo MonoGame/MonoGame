@@ -37,7 +37,7 @@ For Modern platforms (Vulkan / DX12)
 
 With the addition of the new development platforms, there are additional dependencies required to support these targets, namely:
 
-* The [Vulkan SDK](https://www.lunarg.com/vulkan-sdk/) required for using Vulkan targets.
+* The [Vulkan SDK](https://vulkan.lunarg.com/) required for using Vulkan targets. (Make sure to run the setup script `setup_env.sh` on Mac/Linux)
 * The [Java SDK](https://www.oracle.com/java/technologies/downloads/), min version 17.
 * DirectX 12 (Windows Only) should be installed by default, [you can check here](https://support.microsoft.com/en-us/topic/how-to-install-the-latest-version-of-directx-d1f5ffa5-dae2-246c-91b1-ee1e973ed8c2).
 
@@ -46,5 +46,9 @@ Building from Source
 
 If you are intending to build MonoGame from source, there are a few extra build dependencies required:
 
-* The [Premake](https://premake.github.io/download/) executable, downloaded and added to your machines "Path".
+* The [Premake5](https://premake.github.io/download/) executable, downloaded and added to your machines "Path".
+
+> [!IMPORTANT]
+> Make sure to download the "Latest" Premake 5 (`5.0.0-beta7` at time of writing) as earlier versions of Premake will not work.
+
 * (Macos / Linux) Wine (for shader compilation) which can be downloaded from [WineHQ](https://www.winehq.org/) - [See here for more details](https://docs.monogame.net/articles/getting_started/1_setting_up_your_os_for_development_macos.html?tabs=android#setup-wine-for-effect-compilation)
