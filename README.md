@@ -40,7 +40,7 @@ We support a growing list of platforms across the desktop, mobile, and console s
   * PlayStation 4
   * PlayStation 5
   * Xbox (GDKX & XDK)
-  * Nintendo Switch
+  * Nintendo Switch 1 & 2
 
 [^1]: An experimental Vulkan implementation is available to source code users.
 
@@ -92,14 +92,15 @@ There are several options on our [Donation Page](https://monogame.net/donate/).
 
 ## Source Code
 
+> [!NOTE]
+> For the prerequisites to build from source, please refer to the [Requirements](REQUIREMENTS.md) file.
+
 The full source code is available here from GitHub:
 
-* Clone the source: `git clone https://github.com/MonoGame/MonoGame.git`
+* Clone the source: `git clone --recurse-submodules https://github.com/MonoGame/MonoGame.git` (including resursive submodules).
 * Set up the submodules: `git submodule update --init`
 * Open the solution for your target platform to build the game framework.
 * Open the Tools solution for your development platform to build the pipeline and content tools.
-
-For the prerequisites for building from source, please look at the [Requirements](REQUIREMENTS.md) file.
 
 A high level breakdown of the components of the framework:
 
@@ -119,8 +120,9 @@ A high level breakdown of the components of the framework:
 * You can [join the Discord server](https://discord.gg/monogame) and chat live with the core developers and other users.
 * The [official documentation](https://docs.monogame.net/articles/index.html) is on our website.
 * Download [release](https://github.com/MonoGame/MonoGame/releases) and [development](https://github.com/orgs/MonoGame/packages) packages.
-* Follow [@MonoGameTeam](https://twitter.com/monogameteam) on Twitter.
-* Get premium content on [Patreon](https://www.patreon.com/bePatron?u=3142012) (coming soon)
+* Release and Preview releases are also available on [NuGet.Org](https://www.nuget.org/packages?q=monogame.framework&includeComputedFrameworks=true&prerel=true&sortby=relevance).
+* Follow [@MonoGameTeam](https://twitter.com/monogameteam) on Twitter/X, [BlueSky](https://bsky.app/profile/monogame.net) and [Mastodon](https://mastodon.cloud/@MonoGame).
+* Get premium content on [Patreon](https://www.patreon.com/bePatron?u=3142012).
 
 ## License
 

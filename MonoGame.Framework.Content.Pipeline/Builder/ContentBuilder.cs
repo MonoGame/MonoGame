@@ -322,7 +322,7 @@ public abstract class ContentBuilder
             }
         }
 
-        if (!Parameters.SkipClean)
+        if (!Parameters.SkipClean && FailedToBuild == 0)
         {
             ContentCache.CleanCache(this);
         }
