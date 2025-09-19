@@ -423,6 +423,12 @@ void MGG_GraphicsDevice_GetCaps(MGG_GraphicsDevice* device, MGG_GraphicsDevice_C
 #endif
 }
 
+void MGG_GraphicsDevice_ResolveRenderTargets(MGG_GraphicsDevice* device)
+{
+	assert(device != nullptr);
+	// This is a no-op for Direct3D 12.
+}
+
 void MGG_GraphicsDevice_ResizeSwapchain(
 	MGG_GraphicsDevice* device,
 	void* nativeWindowHandle,
@@ -633,7 +639,7 @@ void MGG_GraphicsDevice_SetScissorRectangle(MGG_GraphicsDevice* device, mgint x,
 	device->scissorDirty = true;
 }
 
-void MGG_GraphicsDevice_SetRenderTargets(MGG_GraphicsDevice* device, MGG_Texture** targets, mgint count)
+void MGG_GraphicsDevice_SetRenderTargets(MGG_GraphicsDevice* device, MGG_Texture** targets, mgint* arraySlices, mgint count)
 {
 	assert(device != nullptr);
 
@@ -650,6 +656,16 @@ void MGG_GraphicsDevice_SetRenderTargets(MGG_GraphicsDevice* device, MGG_Texture
 		var renderTarget = (IRenderTarget)_currentRenderTargetBindings[0].RenderTarget;
 		*/
 	}
+}
+
+void MGG_GraphicsDevice_GetBackBufferData(MGG_GraphicsDevice* device, mgint x, mgint y, mgint width, mgint height, void* data, mgint count, mgint dataBytes)
+{
+	assert(device != nullptr);
+	assert(data != nullptr);
+	assert(count > 0);
+	assert(dataBytes > 0);
+
+	// !TODO, need to implement
 }
 
 void MGG_GraphicsDevice_SetConstantBuffer(MGG_GraphicsDevice* device, MGShaderStage stage, mgint slot, MGG_Buffer* buffer)

@@ -25,7 +25,6 @@ public sealed class BuildNativeDependenciesTask : FrostingTask<BuildContext>
         switch (context.Environment.Platform.Family)
         {
             case PlatformFamily.Windows:
-                configureArgs.Append("-A x64");
                 configureArgs.Append("-D CMAKE_MSVC_RUNTIME_LIBRARY=MultiThreaded");
                 break;
             case PlatformFamily.Linux:
