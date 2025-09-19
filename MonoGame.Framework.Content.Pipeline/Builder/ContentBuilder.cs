@@ -87,7 +87,7 @@ public abstract class ContentBuilder
             FailedToBuild++;
             if (ex is not SkipLogException)
             {
-                Logger.Log(LogLevel.Error, $"Countent failed to build: {ex}");
+                Logger.Log(LogLevel.Error, $"Content failed to build: {ex}");
             }
             if (parentContext != null)
             {
@@ -122,7 +122,7 @@ public abstract class ContentBuilder
             FailedToBuild++;
             if (ex is not SkipLogException)
             {
-                Logger.Log(LogLevel.Error, $"Countent failed to build: {ex}");
+                Logger.Log(LogLevel.Error, $"Content failed to build: {ex}");
             }
             if (parentContext != null)
             {
@@ -139,8 +139,8 @@ public abstract class ContentBuilder
     private object? ProcessContent(string relativePath, ContentInfo contentInfo, bool writeToDisk, string? relativeOutputPath, ContentProcessorContext? parentContext)
     {
         var filePath = Path.Combine(Parameters.RootedSourceDirectory, relativePath);
-        var relativeDestPath = Path.Combine(contentInfo.ContentRoot, string.IsNullOrEmpty(relativeOutputPath) ? relativePath.GetDestinationPath(contentInfo.ShouldBuild, contentInfo.GetOutputPath) : relativeOutputPath);
-        var outputPath = Path.Combine(Parameters.RootedOutputDirectory, relativeDestPath);
+        var relativeDestPath = Path.Combine(contentInfo.ContentRoot, string.IsNullOrEmpty(relativeOutputPath) ? relativePath.GetDestinationPath(contentInfo.ShouldBuild, contentInfo.GetOutputPath) : relativeOutputPath).Sanitize();
+        var outputPath = Path.Combine(Parameters.RootedOutputDirectory, relativeDestPath).Sanitize();
         var outputDir = Path.GetDirectoryName(outputPath);
 
         if (string.IsNullOrWhiteSpace(outputDir))
