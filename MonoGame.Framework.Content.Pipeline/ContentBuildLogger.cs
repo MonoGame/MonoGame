@@ -3,6 +3,7 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System.Diagnostics;
+using MonoGame.Framework.Content.Pipeline.Builder;
 
 namespace Microsoft.Xna.Framework.Content.Pipeline;
 
@@ -173,6 +174,7 @@ public class ContentBuildLogger
     /// <param name="filename">Name of the file containing future messages.</param>
     public virtual void PushFile(string filename)
     {
+        filename = filename.Sanitize();
         Log(filename);
         _filenames.Push(filename);
     }

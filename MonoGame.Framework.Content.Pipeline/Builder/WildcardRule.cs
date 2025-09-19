@@ -17,5 +17,5 @@ public class WildcardRule : ContentRule
     /// </summary>
     /// <param name="filePath">Relative path to the content file.</param>
     /// <returns>Returns true if filePath matches the Wildcard <see cref="ContentRule.Pattern"/>.</returns>
-    public override bool IsMatch(string filePath) => LikeOperator.LikeString(filePath, Pattern, CompareMethod.Binary);
+    public override bool IsMatch(string filePath) => LikeOperator.LikeString(filePath, Pattern.Sanitize(), CompareMethod.Binary);
 }
