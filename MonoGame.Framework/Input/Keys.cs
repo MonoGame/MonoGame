@@ -5,7 +5,7 @@
 namespace Microsoft.Xna.Framework.Input
 {
     /// <summary>
-    /// Defines the keys on a keyboard.
+    /// Defines the keys on a keyboard and the mouse according to <a href="https://learn.microsoft.com/en-us/windows/win32/inputdev/virtual-key-codes">Microsoft doc on key codes</a>.
     /// </summary>	
 	public enum Keys
 	{
@@ -13,6 +13,30 @@ namespace Microsoft.Xna.Framework.Input
         /// Reserved.
         /// </summary>
 		None = 0,
+        /// <summary>
+        /// Left mouse button
+        /// </summary>
+        LMB = 1,
+        /// <summary>
+        /// Right mouse button
+        /// </summary>
+        RMB = 2,
+        /// <summary>
+        /// Control-break processing
+        /// </summary>
+        Cancel = 3,
+        /// <summary>
+        /// Middle mouse button
+        /// </summary>
+        MMB = 4,
+        /// <summary>
+        /// X1 mouse button
+        /// </summary>
+        X1 = 5,
+        /// <summary>
+        /// X2 mouse button
+        /// </summary>
+        X2 = 6,
         /// <summary>
         /// BACKSPACE key.
         /// </summary>
