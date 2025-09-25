@@ -8,6 +8,7 @@ using System.Diagnostics;
 using System.Globalization;
 using MonoGame.Framework.Utilities;
 using System.Runtime.InteropServices;
+using System.Linq;
 
 
 namespace Microsoft.Xna.Framework.Graphics
@@ -672,9 +673,7 @@ namespace Microsoft.Xna.Framework.Graphics
                     // Dispose of all remaining graphics resources before disposing of the graphics device
                     lock (_resourcesLock)
                     {
-                        var allResources = new WeakReference[_resources.Count];
-                        _resources.CopyTo(allResources);
-                        foreach (var resource in allResources)
+                        foreach (var resource in _resources.ToArray())
                         {
                             var target = resource.Target as IDisposable;
                             if (target != null)
