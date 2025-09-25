@@ -62,7 +62,6 @@ namespace Microsoft.Xna.Framework.Storage
         {
             lock (_processingLock)
             {
-                // Return all file names (relative, not full path)
                 return _containers.Keys.Select(f => Path.GetFileName(f)).Distinct().ToArray();
             }
         }
@@ -110,12 +109,10 @@ namespace Microsoft.Xna.Framework.Storage
 
                 if (fileAccess == FileAccess.Read)
                 {
-                    // Read-only: use buffer constructor
                     return new CallbackStream(new MemoryStream(data ?? new byte[0]), _ => { });
                 }
                 else
                 {
-                    // Write or ReadWrite: use expandable stream
                     var ms = new MemoryStream();
                     if (fileMode == FileMode.Append && data != null && data.Length > 0)
                     {
@@ -149,8 +146,7 @@ namespace Microsoft.Xna.Framework.Storage
                 }
             }
             catch (Exception ex)
-            {
-                // Log or handle unexpected errors
+            {              
                 Console.WriteLine("Error reading {0}. Error: {1}", Path.Combine(_storagePath, SAVE_DATA_FILENAME), ex.Message);
                 return null;
             }
@@ -161,11 +157,9 @@ namespace Microsoft.Xna.Framework.Storage
             if (data == null || data.Length == 0)
                 return;
 
-            // Ensure the physical directory exists
             if (!Directory.Exists(_storagePath))
                 Directory.CreateDirectory(_storagePath);
 
-            // Write the data directly to the physical file (overwrite if exists)
             var savePath = Path.Combine(_storagePath, SAVE_DATA_FILENAME);
             File.WriteAllBytes(savePath, data);
         }

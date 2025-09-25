@@ -37,7 +37,6 @@ namespace Microsoft.Xna.Framework.Storage
         /// </description>
         /// </item>
         /// </list>
-        /// This approach ensures that application data is stored in a location consistent with each operating system's guidelines.
         /// </remarks>
         /// <returns>
         /// A string representing the root directory path for application data storage.

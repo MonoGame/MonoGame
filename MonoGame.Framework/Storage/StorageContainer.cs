@@ -342,9 +342,9 @@ namespace Microsoft.Xna.Framework.Storage
                 // Make a copy to prevent the input data from being freed elsewhere.
                 byte[] copiedData = null;
                 if (_containers.ContainsKey(_containerName) && _containers[_containerName] != null && _containers[_containerName].Length == data.Length)
-                    copiedData = _containers[_containerName]; // Reuse buffer if possible.
+                    copiedData = _containers[_containerName];
                 else
-                    copiedData = new byte[data.Length]; // Possible garbage generation by replacing the previous buffer.
+                    copiedData = new byte[data.Length];
 
                 Array.Copy(data, copiedData, data.Length);
 
