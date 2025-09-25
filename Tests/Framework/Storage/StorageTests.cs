@@ -13,7 +13,7 @@ namespace MonoGame.Tests.Framework
         const string MY_GAME = "MyGame";
         const string ALL_PLAYERS = "AllPlayers";
 
-        [Test]
+        [Test, Platform(Exclude = "Linux", Reason = "Virtualised Display not supported on Linux")]
         public void OpenContainer_WhenPlayerIndexIsNotNull_ShouldReturnContainer_OnSuccess()
         {
             var device = new StorageDevice(PlayerIndex.One);
