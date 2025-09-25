@@ -852,5 +852,32 @@ namespace MonoGame.Tests.Graphics
 
             CheckFrames();
         }
+
+        [Test]
+        [RunOnUI]
+        public void DisposeReferencedResources()
+        {
+            var rt = new RenderTarget2D(gdm.GraphicsDevice, 5, 5);
+            var vb = new DynamicVertexBuffer(gd, VertexPositionColor.VertexDeclaration, 1, BufferUsage.None);
+
+            var middleIb = new DynamicIndexBuffer(gd, IndexElementSize.SixteenBits, 1, BufferUsage.None);
+
+            var ib = new DynamicIndexBuffer(gd, IndexElementSize.SixteenBits, 1, BufferUsage.None);
+            var rtc = new RenderTargetCube(gd, 1, false, SurfaceFormat.Color, DepthFormat.Depth16);
+
+            middleIb.Dispose();
+            Assert.IsTrue(middleIb.IsDisposed);
+
+            // Remaining referenced resources should be disposed.
+            gd.Dispose();
+
+            Assert.IsTrue(rt.IsDisposed);
+
+            Assert.IsTrue(vb.IsDisposed);
+
+            Assert.IsTrue(ib.IsDisposed);
+
+            Assert.IsTrue(rtc.IsDisposed);
+        }
     }
 }
