@@ -7,7 +7,9 @@ namespace Microsoft.Xna.Framework.Storage
 {
     public partial class StorageContainer
     {
-        internal string _storagePath;
+        private string _storagePath;
+        internal string StoragePath { get => _storagePath; }
+
         internal const string SAVE_DATA_FILENAME = "save.data";
 
         private void PlatformCreateDirectory(string directoryName)
