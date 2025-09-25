@@ -250,6 +250,9 @@ jobs:
           sudo wget -NP /etc/apt/sources.list.d/ https://dl.winehq.org/wine-builds/ubuntu/dists/noble/winehq-noble.sources
           sudo apt update && sudo apt install --install-recommends winehq-stable
           wget -qO- https://monogame.net/downloads/net9_mgfxc_wine_setup.sh | bash
+          sudo apt-get install -y xvfb
+          export DISPLAY=:99.0
+          nohup Xvfb :99 -screen 0 1024x768x24 &
 
       - name: install wine64 on MacOS
         if: runner.environment == 'github-hosted' && runner.os == 'macos'
