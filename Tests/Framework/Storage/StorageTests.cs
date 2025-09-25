@@ -38,9 +38,9 @@ namespace MonoGame.Tests.Framework
         {
             var device = new StorageDevice(null);
             var container = device.OpenContainer(MY_GAME);
-            Assert.IsNotNull(container._storagePath);
-            Assert.IsNotEmpty(container._storagePath);
-            Assert.AreEqual(true, container._storagePath.EndsWith(ALL_PLAYERS));
+            Assert.IsNotNull(container.StoragePath);
+            Assert.IsNotEmpty(container.StoragePath);
+            Assert.AreEqual(true, container.StoragePath.EndsWith(ALL_PLAYERS));
         }
 
         [Test]
