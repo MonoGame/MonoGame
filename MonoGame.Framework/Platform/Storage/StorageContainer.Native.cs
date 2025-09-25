@@ -6,6 +6,9 @@ namespace Microsoft.Xna.Framework.Storage
 {
     partial class StorageContainer
     {
+        private string _storagePath;
+        internal string StoragePath { get => _storagePath; }
+
         private string PlatformInitialize()
         {
             throw new NotImplementedException();
