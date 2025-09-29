@@ -123,6 +123,8 @@ struct MGG_Texture
 
 	MGSurfaceFormat format;
 	Texture* texture = nullptr;
+
+	Texture* depthTexture = nullptr;
 };
 
 struct MGG_InputLayout
@@ -537,7 +539,14 @@ static void MGDX_DestroyFrameResources(MGG_GraphicsDevice* device, mgint current
 
 			device->destroyTextures.pop();
 
-			delete texture->texture;
+			if (texture->texture) {
+				texture->texture->FreeDescriptors(device->resources);
+				delete texture->texture;
+			}
+			if (texture->depthTexture) {
+				texture->depthTexture->FreeDescriptors(device->resources);
+				delete texture->depthTexture;
+			}
 			delete texture;
 		}
 	}
@@ -649,12 +658,13 @@ void MGG_GraphicsDevice_SetRenderTargets(MGG_GraphicsDevice* device, MGG_Texture
 	}
 	else
 	{
-		/*
-		device->context->SetRenderTarget(
-		DxCommandContext.SetRenderTarget(rtHandle.AddrOfPinnedObject(), (uint)_currentRenderTargetCount, (_currentRenderTargetBindings[0].RenderTarget as RenderTarget2D).DxDepthTexture);
-		rtHandle.Free();
-		var renderTarget = (IRenderTarget)_currentRenderTargetBindings[0].RenderTarget;
-		*/
+		std::vector<Texture*> colorTargets;
+		colorTargets.reserve(count);
+		for (size_t i = 0; i < count; i++) {
+			colorTargets.push_back(targets[i]->texture);
+		}
+
+		device->context->SetRenderTarget(static_cast<void*>(colorTargets.data()), count, targets[0]->depthTexture);
 	}
 }
 
@@ -1237,11 +1247,17 @@ void MGG_Buffer_Destroy(MGG_GraphicsDevice* device, MGG_Buffer* buffer)
 	device->destroyBuffers.push(buffer);
 }
 
-void MGG_Buffer_SetData(MGG_GraphicsDevice* device, MGG_Buffer*& buffer, mgint offset, mgbyte* data, mgint length, mgbyte discard)
+void MGG_Buffer_SetData(MGG_GraphicsDevice* device, MGG_Buffer*& buffer, mgint offset, mgbyte* data, mgint elementCount, mgint vertexStride, mgint elementSizeInBytes, mgbool discard)
 {
+//void MGG_Buffer_SetData(MGG_GraphicsDevice* device, MGG_Buffer*& buffer, mgint offset, mgbyte* data, mgint length, mgbyte discard)
+//{
 	assert(device != nullptr);
 	assert(buffer != nullptr);
 	assert(data != nullptr);
+	assert(offset >= 0);
+	assert(elementCount > 0);
+	assert(vertexStride > 0);
+	assert(elementSizeInBytes > 0);
 
 	// TODO: Force discard here if we find we're
 	// copying over data still in use.  See NX.
@@ -1288,6 +1304,9 @@ void MGG_Buffer_SetData(MGG_GraphicsDevice* device, MGG_Buffer*& buffer, mgint o
 			break;
 		}
 	}
+
+	// Temp fix for now
+	auto length = elementCount * elementSizeInBytes;
 
 	// Copy the data.
 	UINT8* pVertexDataBegin;
@@ -1398,7 +1417,18 @@ MGG_Texture* MGG_RenderTarget_Create(
 	assert(type != MGTextureType::Cube || (slices % 6) == 0);
 
 	auto texture = new MGG_Texture();
+
 	texture->format = format;
+	texture->texture = new Texture(SurfaceType::RenderTarget, TextureDimension::Texture2D, width, height, mipmaps, format);
+	texture->texture->Create(device->resources);
+
+	if (depthFormat != MGDepthFormat::None)
+	{
+		texture->depthTexture = new Texture(width, height, depthFormat);
+		//if (multiSampleCount > 1)
+			//DepthTexture.SetMSAA(sampleCount);
+		texture->depthTexture->Create(device->resources);
+	}
 
 	return texture;
 }

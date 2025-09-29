@@ -94,6 +94,10 @@ Texture::Texture(DeviceResources* device, IDXGISwapChain3* swapchain, int buffer
 #endif
 
 Texture::~Texture() {
+    assert(impl->m_srvHandle.ptr == 0);
+    assert(impl->m_uavHandles.empty());
+    assert(impl->m_rtvHandle.ptr == 0);
+    assert(impl->m_dsvHandle.ptr == 0);
     delete impl;
 }
 
