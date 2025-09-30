@@ -1249,8 +1249,6 @@ void MGG_Buffer_Destroy(MGG_GraphicsDevice* device, MGG_Buffer* buffer)
 
 void MGG_Buffer_SetData(MGG_GraphicsDevice* device, MGG_Buffer*& buffer, mgint offset, mgbyte* data, mgint elementCount, mgint vertexStride, mgint elementSizeInBytes, mgbool discard)
 {
-//void MGG_Buffer_SetData(MGG_GraphicsDevice* device, MGG_Buffer*& buffer, mgint offset, mgbyte* data, mgint length, mgbyte discard)
-//{
 	assert(device != nullptr);
 	assert(buffer != nullptr);
 	assert(data != nullptr);
@@ -1425,8 +1423,6 @@ MGG_Texture* MGG_RenderTarget_Create(
 	if (depthFormat != MGDepthFormat::None)
 	{
 		texture->depthTexture = new Texture(width, height, depthFormat);
-		//if (multiSampleCount > 1)
-			//DepthTexture.SetMSAA(sampleCount);
 		texture->depthTexture->Create(device->resources);
 	}
 
