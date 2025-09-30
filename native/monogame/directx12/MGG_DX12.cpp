@@ -1155,7 +1155,8 @@ static MGG_Buffer* MGDX_BufferDiscard(MGG_GraphicsDevice* device, MGG_Buffer* bu
 
 	// Search for the best fit from the free list.		
 	MGG_Buffer* best = nullptr;
-	for (int i=0; i < device->free.size(); i++)
+	auto bestIndex = -1;
+	for (int i = 0; i < device->free.size(); i++)
 	{
 		auto curr = device->free[i];
 
@@ -1169,19 +1170,22 @@ static MGG_Buffer* MGDX_BufferDiscard(MGG_GraphicsDevice* device, MGG_Buffer* bu
 		if (best == nullptr || best->actualSize > currSize)
 		{
 			best = curr;
+			bestIndex = i;
 
 			if (currSize == dataSize)
-			{
-				device->free[i] = device->free.back();
-				device->free.pop_back();
 				break;
-			}
 		}
 	}
 
 	// We didn't find a match, so allocate a new one.
 	if (best == nullptr)
 		best = MGG_Buffer_Create(device, type, dataSize);
+
+	else
+	{
+		device->free[bestIndex] = device->free.back();
+		device->free.pop_back();
+	}
 
 	best->dataSize = dataSize;
 
