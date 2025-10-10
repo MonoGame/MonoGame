@@ -2112,6 +2112,8 @@ void MGG_GraphicsDevice_Present(MGG_GraphicsDevice* device, mgint currentFrame, 
 	VkResult res = vkEndCommandBuffer(cmd.buffer);
 	VK_CHECK_RESULT(res);
 
+	frame.is_recording = false;
+
 	VkPipelineStageFlags wait_dst_stage_mask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
 	VkSubmitInfo submitInfo = { VK_STRUCTURE_TYPE_SUBMIT_INFO };
 	submitInfo.waitSemaphoreCount = 1;
