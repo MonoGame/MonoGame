@@ -25,6 +25,7 @@ public sealed class BuildNativeDependenciesTask : FrostingTask<BuildContext>
         switch (context.Environment.Platform.Family)
         {
             case PlatformFamily.Windows:
+                configureArgs.Append("-A x64");
                 configureArgs.Append("-D CMAKE_MSVC_RUNTIME_LIBRARY=MultiThreaded");
                 break;
             case PlatformFamily.Linux:
@@ -37,7 +38,7 @@ public sealed class BuildNativeDependenciesTask : FrostingTask<BuildContext>
         }
 
         configureSettings.Arguments = configureArgs;
-        
+
         if (context.StartProcess("cmake", configureSettings) != 0)
         {
             throw new Exception("SDL2 CMake configuration failed!");
@@ -50,7 +51,7 @@ public sealed class BuildNativeDependenciesTask : FrostingTask<BuildContext>
         buildArgs.Append("--parallel");
 
         buildSettings.Arguments = buildArgs;
-        
+
         if (context.StartProcess("cmake", buildSettings) != 0)
         {
             throw new Exception("SDL2 build failed!");
