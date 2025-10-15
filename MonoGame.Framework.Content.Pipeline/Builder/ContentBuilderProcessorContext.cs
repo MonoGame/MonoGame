@@ -25,7 +25,7 @@ class ContentBuilderProcessorContext(ContentBuilder builder, string relativePath
 
     public override ContentBuildLogger Logger => _builder.Logger;
 
-    public override ContentIdentity SourceIdentity => new ContentIdentity(sourceFilename: _relativeContentPath);
+    public override ContentIdentity SourceIdentity => new(sourceFilename: _relativeContentPath);
 
     public override string OutputDirectory => _builder.Parameters.OutputDirectory;
 
@@ -51,7 +51,7 @@ class ContentBuilderProcessorContext(ContentBuilder builder, string relativePath
 
     [Obsolete]
     public override TOutput BuildAndLoadAsset<TInput, TOutput>(ExternalReference<TInput> sourceAsset,
-        string processorName, OpaqueDataDictionary processorParameters, string importerName)
+        string processorName, OpaqueDataDictionary? processorParameters, string? importerName)
     {
         throw new NotSupportedException(
             @"Converting from importerName and processorName is not supported with the ContentBuilder.
@@ -66,7 +66,7 @@ class ContentBuilderProcessorContext(ContentBuilder builder, string relativePath
 
     [Obsolete]
     public override ExternalReference<TOutput> BuildAsset<TInput, TOutput>(ExternalReference<TInput> sourceAsset,
-        string processorName, OpaqueDataDictionary processorParameters, string importerName, string assetName)
+        string processorName, OpaqueDataDictionary? processorParameters, string? importerName, string? assetName)
     {
         throw new NotSupportedException(
             @"Converting from imposterName and processorName is not supported with the ContentBuilder.
@@ -93,7 +93,6 @@ class ContentBuilderProcessorContext(ContentBuilder builder, string relativePath
         var processContext = new ContentBuilderProcessorContext(_builder, _relativeContentPath, _contentInfo, ContentFileCache);
         using var _ = ContextScopeFactory.BeginContext(processContext);
         var processedObject = processor.Process(input!, processContext);
-
-        return (TOutput)processedObject;
+        return (TOutput)processedObject!;
     }
 }

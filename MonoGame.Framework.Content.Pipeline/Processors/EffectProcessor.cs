@@ -12,7 +12,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors;
 /// Processes a string representation to a platform-specific compiled effect.
 /// </summary>
 [ContentProcessor(DisplayName = "Effect - MonoGame")]
-public class EffectProcessor() : ContentProcessor<EffectContent, CompiledEffectContent>
+public class EffectProcessor : ContentProcessor<EffectContent, CompiledEffectContent>
 {
     private static readonly Regex errorOrWarning = new(@"(.*)\((\d*,\d*(?>,\d*,\d*)?)\):\s*(.*)", RegexOptions.Compiled);
 
@@ -69,7 +69,7 @@ public class EffectProcessor() : ContentProcessor<EffectContent, CompiledEffectC
         }
 
         // Create the effect object.
-        EffectObject? effect = null;
+        EffectObject? effect;
         var shaderErrorsAndWarnings = string.Empty;
         try
         {
@@ -84,6 +84,7 @@ public class EffectProcessor() : ContentProcessor<EffectContent, CompiledEffectC
         {
             // This will log any warnings and errors and throw.
             ProcessErrorsAndWarnings(true, shaderErrorsAndWarnings, input, context);
+            throw;
         }
 
         // Process any warning messages that the shader compiler might have produced.
@@ -111,7 +112,7 @@ public class EffectProcessor() : ContentProcessor<EffectContent, CompiledEffectC
     {
         // Split the errors and warnings into individual lines.
         var errorsAndWarningArray = shaderErrorsAndWarnings.Split(["\n", "\r", Environment.NewLine], StringSplitOptions.RemoveEmptyEntries);
-        ContentIdentity identity = null;
+        ContentIdentity? identity = null;
         var allErrorsAndWarnings = new System.Text.StringBuilder();
 
         // Process all the lines.
@@ -124,7 +125,7 @@ public class EffectProcessor() : ContentProcessor<EffectContent, CompiledEffectC
                 if (buildFailed)
                     allErrorsAndWarnings.AppendLine(errorOrWarningLine);
                 else
-                    context.Logger.LogWarning(string.Empty, input.Identity, errorOrWarningLine);
+                    context.Logger.Log(LogLevel.Warning, $"{errorOrWarningLine}: {context.Logger.GetCurrentFilename(input.Identity)}");
 
                 continue;
             }
@@ -146,7 +147,7 @@ public class EffectProcessor() : ContentProcessor<EffectContent, CompiledEffectC
 
             var newIdentity = new ContentIdentity(fileName, input.Identity.SourceTool, lineAndColumn);
 
-            // If we got an exception then we'll be throwing an exception 
+            // If we got an exception then we'll be throwing an exception
             // below, so just gather the lines to throw later.
             if (buildFailed)
             {
@@ -159,7 +160,7 @@ public class EffectProcessor() : ContentProcessor<EffectContent, CompiledEffectC
                     allErrorsAndWarnings.AppendLine(errorOrWarningLine);
             }
             else
-                context.Logger.LogWarning(string.Empty, newIdentity, message);
+                context.Logger.Log(LogLevel.Warning, $"{message}: {context.Logger.GetCurrentFilename(newIdentity)}");
         }
 
         if (buildFailed)
@@ -168,28 +169,14 @@ public class EffectProcessor() : ContentProcessor<EffectContent, CompiledEffectC
         }
     }
 
-    private class ContentPipelineEffectCompilerOutput : IEffectCompilerOutput
+    private class ContentPipelineEffectCompilerOutput(ContentProcessorContext context) : IEffectCompilerOutput
     {
-        private readonly ContentProcessorContext _context;
-
-        public ContentPipelineEffectCompilerOutput(ContentProcessorContext context)
-        {
-            _context = context;
-        }
-
         public void WriteWarning(string file, int line, int column, string message)
-        {
-            _context.Logger.LogWarning(null, CreateContentIdentity(file, line, column), message);
-        }
+            => context.Logger.Log(LogLevel.Warning, $"{message}: {context.Logger.GetCurrentFilename(CreateContentIdentity(file, line, column))}");
 
         public void WriteError(string file, int line, int column, string message)
-        {
-            throw new InvalidContentException(message, CreateContentIdentity(file, line, column));
-        }
+            => throw new InvalidContentException(message, CreateContentIdentity(file, line, column));
 
-        private static ContentIdentity CreateContentIdentity(string file, int line, int column)
-        {
-            return new ContentIdentity(file, null, line + "," + column);
-        }
+        private static ContentIdentity CreateContentIdentity(string file, int line, int column) => new(file, null, line + "," + column);
     }
 }

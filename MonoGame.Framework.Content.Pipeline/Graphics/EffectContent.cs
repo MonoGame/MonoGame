@@ -10,16 +10,13 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
     public class EffectContent : ContentItem
     {
         /// <summary>
-        /// Initializes a new instance of EffectContent.
+        /// Gets or sets the identity of the content item.
         /// </summary>
-        public EffectContent()
-        {
-
-        }
+        public new required ContentIdentity Identity { get; set; }
 
         /// <summary>
         /// Gets or sets the effect program source code.
         /// </summary>
-        public string EffectCode { get; set; }
+        public string EffectCode { get; set; } = "";
     }
 }
