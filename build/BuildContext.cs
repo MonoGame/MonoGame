@@ -198,7 +198,8 @@ public class BuildContext : FrostingContext
             new ProcessSettings()
             {
                 Arguments = $"workload list",
-                RedirectStandardOutput = true
+                RedirectStandardOutput = true,
+                WorkingDirectory = this.ShellWorkingDir,
             },
             out IEnumerable<string> processOutput
         );
