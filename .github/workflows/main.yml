@@ -31,18 +31,12 @@ jobs:
       - name: Setup DotNet on linux/Windows
         if: runner.environment == 'github-hosted' && (runner.os == 'Linux' || runner.os == 'windows')
         run: |
-          dotnet workload restore MonoGame.Framework.Android.sln
+          dotnet workload install android
 
       - name: Setup DotNet on MacOS
         if: runner.environment == 'github-hosted' && runner.os == 'macos'
         run: |
-          dotnet workload restore MonoGame.Framework.Android.sln
-          dotnet workload restore MonoGame.Framework.iOS.sln
-          dotnet workload restore MonoGame.Tools.Mac.sln
-
-      - name: List Workloads
-        run: |
-          dotnet workload list
+          dotnet workload install android macos ios
 
       - name: Add msbuild to PATH
         if: runner.os == 'Windows'
