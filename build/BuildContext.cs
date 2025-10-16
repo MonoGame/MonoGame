@@ -44,7 +44,7 @@ public class BuildContext : FrostingContext
             MSBuildSettings = DotNetMSBuildSettings,
             Verbosity = DotNetVerbosity.Minimal,
             Configuration = buildConfiguration,
-            WorkingDirectory = Directory.GetCurrentDirectory()
+            WorkingDirectory = this.ShellWorkingDir
         };
 
         DotNetPackSettings = new DotNetPackSettings
@@ -53,7 +53,7 @@ public class BuildContext : FrostingContext
             Verbosity = DotNetVerbosity.Minimal,
             OutputDirectory = NuGetsDirectory,
             Configuration = buildConfiguration,
-            WorkingDirectory = Directory.GetCurrentDirectory()
+            WorkingDirectory = this.ShellWorkingDir
         };
 
         MSBuildSettings = new MSBuildSettings
@@ -81,7 +81,7 @@ public class BuildContext : FrostingContext
             Verbosity = DotNetVerbosity.Minimal,
             Configuration = buildConfiguration,
             SelfContained = false,
-            WorkingDirectory = Directory.GetCurrentDirectory()
+            WorkingDirectory = this.ShellWorkingDir
         };
         // SelfContained needs to be default for MacOS
         DotNetPublishSettingsForMac = new DotNetPublishSettings
@@ -89,7 +89,7 @@ public class BuildContext : FrostingContext
             MSBuildSettings = DotNetMSBuildSettings,
             Verbosity = DotNetVerbosity.Minimal,
             Configuration = buildConfiguration,
-            WorkingDirectory = Directory.GetCurrentDirectory()
+            WorkingDirectory = this.ShellWorkingDir
         };
 
         DotNetRunSettings = new DotNetRunSettings
@@ -105,7 +105,7 @@ public class BuildContext : FrostingContext
             Verbosity = DotNetVerbosity.Minimal,
             Configuration = buildConfiguration,
             OutputDirectory = BinariesDirectory,
-            WorkingDirectory = Directory.GetCurrentDirectory()
+            WorkingDirectory = this.ShellWorkingDir
         };
 
         Console.WriteLine($"Version: {Version}");
