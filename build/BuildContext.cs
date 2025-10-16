@@ -78,7 +78,7 @@ public class BuildContext : FrostingContext
         DotNetPublishSettings = new DotNetPublishSettings
         {
             MSBuildSettings = DotNetMSBuildSettings,
-            Verbosity = DotNetVerbosity.Minimal,
+            Verbosity = DotNetVerbosity.Diagnostic,
             Configuration = buildConfiguration,
             SelfContained = false,
             WorkingDirectory = this.ShellWorkingDir
