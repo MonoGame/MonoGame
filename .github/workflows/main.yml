@@ -40,6 +40,10 @@ jobs:
           dotnet workload restore MonoGame.Framework.iOS.sln
           dotnet workload restore MonoGame.Tools.Mac.sln
 
+      - name: List Workloads
+        run: |
+          dotnet workload list
+
       - name: Add msbuild to PATH
         if: runner.os == 'Windows'
         uses: microsoft/setup-msbuild@v1.0.2
