@@ -11,23 +11,18 @@ namespace MonoGame.Tests.Graphics
 {
     [TestFixture]
     [NonParallelizable]
-    public class Texture3DNonVisualTest
+    internal class Texture3DNonVisualTest : GraphicsDeviceTestFixtureBase
     {
         Texture3D t;
         Color[] reference;
         const int w=50, h=50, d=50, a = w * d * h;
-        private Game _game;
 
         [OneTimeSetUp]
         public void TestFixtureSetUp()
         {
             reference = new Color[a];
-            _game = new Game();
-            var graphicsDeviceManager = new GraphicsDeviceManager(_game);
-            graphicsDeviceManager.GraphicsProfile = GraphicsProfile.HiDef;
-            graphicsDeviceManager.ApplyChanges();
 
-            t = new Texture3D(_game.GraphicsDevice, w, h, d, false, SurfaceFormat.Color);
+            t = new Texture3D(game.GraphicsDevice, w, h, d, false, SurfaceFormat.Color);
             for (int layer = 0; layer < d; layer++)
             {
                 for (int i = 0; i < w * h; i++)
@@ -40,7 +35,6 @@ namespace MonoGame.Tests.Graphics
         [OneTimeTearDown]
         public void TestFixtureTearDown()
         {
-            _game.Dispose();
             t.Dispose();
         }
 
@@ -55,7 +49,7 @@ namespace MonoGame.Tests.Graphics
         public void ZeroSizeShouldFailTest()
         {
             Texture3D texture;
-            var gd = _game.GraphicsDevice;
+            var gd = game.GraphicsDevice;
             Assert.Throws<ArgumentOutOfRangeException>(() => texture = new Texture3D(gd, 0, 1, 1, false, SurfaceFormat.Color));
             Assert.Throws<ArgumentOutOfRangeException>(() => texture = new Texture3D(gd, 1, 0, 1, false, SurfaceFormat.Color));
             Assert.Throws<ArgumentOutOfRangeException>(() => texture = new Texture3D(gd, 1, 1, 0, false, SurfaceFormat.Color));
