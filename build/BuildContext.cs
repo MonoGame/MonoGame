@@ -51,7 +51,8 @@ public class BuildContext : FrostingContext
             MSBuildSettings = DotNetMSBuildSettings,
             Verbosity = DotNetVerbosity.Minimal,
             OutputDirectory = NuGetsDirectory,
-            Configuration = buildConfiguration
+            Configuration = buildConfiguration,
+            WorkingDirectory = Directory.GetCurrentDirectory()
         };
 
         MSBuildSettings = new MSBuildSettings
