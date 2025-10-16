@@ -28,8 +28,13 @@ jobs:
       - name: Setup Android Dependencies
         uses: monogame/monogame-actions/install-android-dependencies@v1
 
-      - name: Setup DotNet on linux/Windows
-        if: runner.environment == 'github-hosted' && (runner.os == 'Linux' || runner.os == 'windows')
+      - name: Setup DotNet on Windows
+        if: runner.environment == 'github-hosted' && runner.os == 'windows'
+        run: |
+          dotnet workload install android ios
+
+      - name: Setup DotNet on linux
+        if: runner.environment == 'github-hosted' && runner.os == 'Linux'
         run: |
           dotnet workload install android
 
