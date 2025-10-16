@@ -18,6 +18,7 @@ using NUnit.Framework.Internal;
 
 namespace MonoGame.Tests.Graphics
 {
+    [RunOnUI] 
     internal class GraphicsDeviceTestFixtureBase
     {
         protected TestGameBase game;
@@ -51,6 +52,7 @@ namespace MonoGame.Tests.Graphics
         #region SetUp and TearDown
 
         [SetUp]
+        [RunOnUI]
         public virtual void SetUp()
         {
             game = new TestGameBase();
@@ -79,6 +81,7 @@ namespace MonoGame.Tests.Graphics
         }
 
         [TearDown]
+        [RunOnUI]
         public virtual void TearDown()
         {
             game.Dispose();

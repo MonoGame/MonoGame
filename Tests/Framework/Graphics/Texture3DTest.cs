@@ -9,6 +9,7 @@ namespace MonoGame.Tests.Graphics
 {
     [TestFixture]
     [NonParallelizable]
+    [RunOnUI]
     class Texture3DTest : GraphicsDeviceTestFixtureBase
     {
         [Test]

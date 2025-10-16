@@ -11,15 +11,25 @@ namespace MonoGame.Tests.Graphics
 {
     [TestFixture]
     [NonParallelizable]
+    [RunOnUI]
     internal class Texture3DNonVisualTest : GraphicsDeviceTestFixtureBase
     {
         Texture3D t;
         Color[] reference;
         const int w=50, h=50, d=50, a = w * d * h;
 
-        [OneTimeSetUp]
-        public void TestFixtureSetUp()
+        [TearDown]
+        public override void TearDown()
         {
+            t.Dispose();
+            base.TearDown();
+        }
+
+        [SetUp]
+        public override void SetUp()
+        {
+            base.SetUp();
+
             reference = new Color[a];
 
             t = new Texture3D(game.GraphicsDevice, w, h, d, false, SurfaceFormat.Color);
@@ -30,17 +40,6 @@ namespace MonoGame.Tests.Graphics
                     reference[layer * w * h + i] = new Color(layer * 5, layer * 5, layer * 5, layer * 5);
                 }
             }
-        }
-
-        [OneTimeTearDown]
-        public void TestFixtureTearDown()
-        {
-            t.Dispose();
-        }
-
-        [SetUp]
-        public void TestSetUp()
-        {
             t.SetData(reference);
         }
 
