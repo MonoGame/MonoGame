@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net9.0</TargetFramework>
+    <TargetFramework>net8.0-ios</TargetFramework>
     <DefineConstants>IOS;GLES;STBSHARP_INTERNAL</DefineConstants>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <MGOpenGL>GLES</MGOpenGL>
@@ -10,7 +10,7 @@
     <PackageId>MonoGame.Framework.iOS</PackageId>
     <AppendTargetFrameworkToOutputPath>False</AppendTargetFrameworkToOutputPath>
     <SupportedOSPlatformVersion>11.2</SupportedOSPlatformVersion>
-    <TargetPlatformVersion>18.0</TargetPlatformVersion>
+    <TargetPlatformVersion>17.4</TargetPlatformVersion>
     <IsAotCompatible>true</IsAotCompatible>
     <PackageReadmeFile>README-packages.md</PackageReadmeFile>
     <CheckEolWorkloads>false</CheckEolWorkloads>
