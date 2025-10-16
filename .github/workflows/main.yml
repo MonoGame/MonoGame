@@ -5,6 +5,9 @@ on: [push, pull_request]
 concurrency:
   group: ${{ github.ref }}
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+env:
+  DotnetVersion: 8.0.404
   
 jobs:
   build:
@@ -20,10 +23,14 @@ jobs:
         with:
           submodules: recursive
 
+      - name: Generate global.json
+        run: |
+          echo '{ "sdk": { "version": "${{ env.DotnetVersion }}" } }' > global.json
+
       - name: Setup .NET Core SDK
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: '8.0.404'
+          dotnet-version: '${{ env.DotnetVersion }}'
           
       - name: Setup Android Dependencies
         uses: monogame/monogame-actions/install-android-dependencies@v1
