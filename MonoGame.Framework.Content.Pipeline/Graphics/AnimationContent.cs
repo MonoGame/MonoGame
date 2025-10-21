@@ -10,12 +10,6 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
     public class AnimationContent : ContentItem
     {
         /// <summary>
-        /// Gets or sets the name of the content item.
-        /// </summary>
-        [ContentSerializer(Optional = true)]
-        public required new string Name { get; set; }
-
-        /// <summary>
         /// Gets the collection of animation data channels. Each channel describes the movement of a single bone or rigid object.
         /// </summary>
         public AnimationChannelDictionary Channels { get; } = [];

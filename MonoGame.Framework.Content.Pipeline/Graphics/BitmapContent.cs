@@ -20,7 +20,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
         public int Height
         {
             get => _height;
-            internal set
+            protected set
             {
                 ArgumentOutOfRangeException.ThrowIfNegativeOrZero(value);
                 _height = value;
@@ -33,7 +33,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
         public int Width
         {
             get => _width;
-            internal set
+            protected set
             {
                 ArgumentOutOfRangeException.ThrowIfNegativeOrZero(value);
                 _width = value;
@@ -140,7 +140,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
         /// Returns a string description of the bitmap resource.
         /// </summary>
         /// <returns>Description of the bitmap.</returns>
-        public override string ToString() => "{GetType().Name}, {Width}x{Height}";
+        public override string ToString() => $"{GetType().Name}, {Width}x{Height}";
 
         /// <summary>
         /// Attempts to copy a region from a specified bitmap.

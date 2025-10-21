@@ -11,13 +11,13 @@ namespace Microsoft.Xna.Framework.Content
 		protected internal override VertexDeclaration Read(ContentReader reader, VertexDeclaration existingInstance)
         {
 			var vertexStride = reader.ReadInt32();
+			var elementCount = reader.ReadInt32();
 			if (vertexStride == 0)
             {
 				return VertexDeclaration.GetOrCreate(0, []);
             }
 
-			var elementCount = reader.ReadInt32();
-			VertexElement[] elements = new VertexElement[elementCount];
+			var elements = new VertexElement[elementCount];
 			for (int i = 0; i < elementCount; ++i)
 			{
 				var offset = reader.ReadInt32();

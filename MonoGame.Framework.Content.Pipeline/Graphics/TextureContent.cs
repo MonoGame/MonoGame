@@ -43,7 +43,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
                 throw new ArgumentException($"Type '{newBitmapType}' contains generic parameters and cannot be allocated.", nameof(newBitmapType));
 
             if (newBitmapType.GetConstructor([typeof (int), typeof (int)]) == null)
-                throw new ArgumentException("Type '{newBitmapType} does not have a constructor with signature (int, int) and cannot be allocated.", nameof(newBitmapType));
+                throw new ArgumentException($"Type '{newBitmapType} does not have a constructor with signature (int, int) and cannot be allocated.", nameof(newBitmapType));
 
             foreach (var mipChain in Faces)
             {

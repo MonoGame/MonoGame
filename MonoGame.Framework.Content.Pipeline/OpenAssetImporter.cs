@@ -653,11 +653,12 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
 
                 if (_scene.HasAnimations)
                 {
-                    foreach (var animation in _scene.Animations)
+                    for (int i = 0; i < _scene.Animations.Count; i++)
                     {
+                        var animation = _scene.Animations[i];
                         var animationContent = ImportAnimation(animation, node.Name);
                         if (animationContent.Channels.Count > 0)
-                            node.Animations.Add(animationContent.Name, animationContent);
+                            node.Animations.Add(animationContent.Name ?? $"anim{i}", animationContent);
                     }
                 }
             }
@@ -833,10 +834,11 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
                 return;
 
             // Convert animations and add to root bone.
-            foreach (var animation in _scene.Animations)
+            for (int i = 0; i < _scene.Animations.Count; i++)
             {
+                var animation = _scene.Animations[i];
                 var animationContent = ImportAnimation(animation);
-                rootBoneContent.Animations.Add(animationContent.Name, animationContent);
+                rootBoneContent.Animations.Add(animationContent.Name ?? $"anim{i}", animationContent);
             }
         }
 
