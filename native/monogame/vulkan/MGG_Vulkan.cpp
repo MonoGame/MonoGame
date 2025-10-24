@@ -467,6 +467,7 @@ static void MGVK_UpdateRenderPass(MGG_GraphicsDevice* device, FrameCounter curre
 static VkCommandBuffer MGVK_BeginNewCommandBuffer(MGG_GraphicsDevice* device);
 static void MGVK_ExecuteAndFreeCommandBuffer(MGG_GraphicsDevice* device, VkCommandBuffer commandBuffer);
 static void MGVK_CmdGenerateMipmaps(MGG_GraphicsDevice* device, VkCommandBuffer commandBuffer, MGG_Texture* texture);
+static void MGVK_ProcessDescriptorCaches(MGG_GraphicsDevice* device, FrameCounter currentFrame);
 static void MGVK_CmdTransitionImageLayout(
 	VkCommandBuffer cmd,
 	VkImage image,
@@ -1670,6 +1671,12 @@ void MGVK_RecreateSwapChain(
 
 			delete[] device->frames;
 		}
+
+		// Since we know that all rendering has stopped it is
+		// safe to free all the descriptors and let them recreate
+		// on the next draw.  This removes all flicker caused by
+		// bad descriptor caches.
+		MGVK_ProcessDescriptorCaches(device, 0);
 
 		device->swapchainCount = swapchainCount;
 		device->freeFrames = device->swapchainCount + 1;
@@ -2906,6 +2913,7 @@ static void MGVK_UpdateDescriptors(MGG_GraphicsDevice* device, FrameCounter curr
 		if (!dirty)
 			break;
 	}
+
 	// We hash the frameIndex because each frame in the swap chain has its
 	// own uniforms buffer (device->frames[frameIndex].uniforms) that gets
 	// bound to the descriptor set. If we don't, some frame will use the
