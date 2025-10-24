@@ -1667,7 +1667,9 @@ void MGVK_RecreateSwapChain(
 				vkDestroySemaphore(device->device, cmd.renderCompleteSemaphore, nullptr);
 				vkDestroyFence(device->device, cmd.completedFence, nullptr);
 
-				MGG_Buffer_Destroy(device, device->frames[i].uniforms);
+				if (device->frames[i].uniforms)
+					MGG_Buffer_Destroy(device, device->frames[i].uniforms);
+
 				MGVK_DestroyFrameResources(device, i, true);
 			}
 
