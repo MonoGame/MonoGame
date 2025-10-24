@@ -1637,8 +1637,10 @@ void MGVK_RecreateSwapChain(
 	//create_info.pNext = &scalingCreateInfo;
 
 	// This seems to just be a suggestion to vkCreateSwapchainKHR and
-	// vkGetSwapchainImagesKHR will really define the number of images.
+	// vkGetSwapchainImagesKHR will really define the final number.
 	create_info.minImageCount = std::max(2u, surface_capabilities.minImageCount);
+	if (surface_capabilities.maxImageCount > 0)
+		create_info.minImageCount = std::min(create_info.minImageCount, surface_capabilities.maxImageCount);
 
 	res = vkCreateSwapchainKHR(device->device, &create_info, nullptr, &device->swapchain);
 	VK_CHECK_RESULT(res);
