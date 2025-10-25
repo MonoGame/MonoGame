@@ -98,25 +98,43 @@ namespace MonoGame.Effect
             // TODO: Default value?
 
             param.data = data;
-                        
+
             // Add the new parameter and resort by the
             // offset for some consistent results.
             Parameters.Add(param);
             Parameters = Parameters.OrderBy(e => e.bufferOffset).ToList();
 
             // Recreate the parameter offsets and calculate the size.
-            Size = 0;
             ParameterOffset.Clear();
+            int maxEnd = 0;
+
             foreach (var p in Parameters)
             {
                 ParameterOffset.Add(p.bufferOffset);
 
-                var esize = p.rows * p.columns * 4;
-                if (p.element_count > 0)
-                    esize = (esize + (16 - (esize % 16))) * p.element_count;
+                int paramSize;
+                if (p.class_ == EffectObject.D3DXPARAMETER_CLASS.MATRIX_COLUMNS)
+                {                    
+                    paramSize = (int)p.rows * 16;
+                }
+                else
+                {
+                    paramSize = (int)(p.rows * p.columns * 4);
 
-                Size = p.bufferOffset + (int)esize;
+                    if (p.element_count > 0)
+                    {
+                        int elementSize = ((paramSize + 15) / 16) * 16;
+                        paramSize = elementSize * (int)p.element_count;
+                    }
+                }
+                
+                int paramEnd = p.bufferOffset + paramSize;
+                if (paramEnd > maxEnd)
+                    maxEnd = paramEnd;
             }
+
+            // Set size to the max end aligned to 16 bytes
+            Size = ((maxEnd + 15) / 16) * 16;
         }
     }
 }
