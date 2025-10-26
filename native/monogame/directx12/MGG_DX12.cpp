@@ -123,6 +123,8 @@ struct MGG_Texture
 
 	MGSurfaceFormat format;
 	Texture* texture = nullptr;
+
+	Texture* depthTexture = nullptr;
 };
 
 struct MGG_InputLayout
@@ -423,6 +425,12 @@ void MGG_GraphicsDevice_GetCaps(MGG_GraphicsDevice* device, MGG_GraphicsDevice_C
 #endif
 }
 
+void MGG_GraphicsDevice_ResolveRenderTargets(MGG_GraphicsDevice* device)
+{
+	assert(device != nullptr);
+	// This is a no-op for Direct3D 12.
+}
+
 void MGG_GraphicsDevice_ResizeSwapchain(
 	MGG_GraphicsDevice* device,
 	void* nativeWindowHandle,
@@ -531,7 +539,14 @@ static void MGDX_DestroyFrameResources(MGG_GraphicsDevice* device, mgint current
 
 			device->destroyTextures.pop();
 
-			delete texture->texture;
+			if (texture->texture) {
+				texture->texture->FreeDescriptors(device->resources);
+				delete texture->texture;
+			}
+			if (texture->depthTexture) {
+				texture->depthTexture->FreeDescriptors(device->resources);
+				delete texture->depthTexture;
+			}
 			delete texture;
 		}
 	}
@@ -633,7 +648,7 @@ void MGG_GraphicsDevice_SetScissorRectangle(MGG_GraphicsDevice* device, mgint x,
 	device->scissorDirty = true;
 }
 
-void MGG_GraphicsDevice_SetRenderTargets(MGG_GraphicsDevice* device, MGG_Texture** targets, mgint count)
+void MGG_GraphicsDevice_SetRenderTargets(MGG_GraphicsDevice* device, MGG_Texture** targets, mgint* arraySlices, mgint count)
 {
 	assert(device != nullptr);
 
@@ -643,13 +658,24 @@ void MGG_GraphicsDevice_SetRenderTargets(MGG_GraphicsDevice* device, MGG_Texture
 	}
 	else
 	{
-		/*
-		device->context->SetRenderTarget(
-		DxCommandContext.SetRenderTarget(rtHandle.AddrOfPinnedObject(), (uint)_currentRenderTargetCount, (_currentRenderTargetBindings[0].RenderTarget as RenderTarget2D).DxDepthTexture);
-		rtHandle.Free();
-		var renderTarget = (IRenderTarget)_currentRenderTargetBindings[0].RenderTarget;
-		*/
+		std::vector<Texture*> colorTargets;
+		colorTargets.reserve(count);
+		for (size_t i = 0; i < count; i++) {
+			colorTargets.push_back(targets[i]->texture);
+		}
+
+		device->context->SetRenderTarget(static_cast<void*>(colorTargets.data()), count, targets[0]->depthTexture);
 	}
+}
+
+void MGG_GraphicsDevice_GetBackBufferData(MGG_GraphicsDevice* device, mgint x, mgint y, mgint width, mgint height, void* data, mgint count, mgint dataBytes)
+{
+	assert(device != nullptr);
+	assert(data != nullptr);
+	assert(count > 0);
+	assert(dataBytes > 0);
+
+	// !TODO, need to implement
 }
 
 void MGG_GraphicsDevice_SetConstantBuffer(MGG_GraphicsDevice* device, MGShaderStage stage, mgint slot, MGG_Buffer* buffer)
@@ -1129,7 +1155,8 @@ static MGG_Buffer* MGDX_BufferDiscard(MGG_GraphicsDevice* device, MGG_Buffer* bu
 
 	// Search for the best fit from the free list.		
 	MGG_Buffer* best = nullptr;
-	for (int i=0; i < device->free.size(); i++)
+	auto bestIndex = -1;
+	for (int i = 0; i < device->free.size(); i++)
 	{
 		auto curr = device->free[i];
 
@@ -1143,19 +1170,22 @@ static MGG_Buffer* MGDX_BufferDiscard(MGG_GraphicsDevice* device, MGG_Buffer* bu
 		if (best == nullptr || best->actualSize > currSize)
 		{
 			best = curr;
+			bestIndex = i;
 
 			if (currSize == dataSize)
-			{
-				device->free[i] = device->free.back();
-				device->free.pop_back();
 				break;
-			}
 		}
 	}
 
 	// We didn't find a match, so allocate a new one.
 	if (best == nullptr)
 		best = MGG_Buffer_Create(device, type, dataSize);
+
+	else
+	{
+		device->free[bestIndex] = device->free.back();
+		device->free.pop_back();
+	}
 
 	best->dataSize = dataSize;
 
@@ -1221,11 +1251,15 @@ void MGG_Buffer_Destroy(MGG_GraphicsDevice* device, MGG_Buffer* buffer)
 	device->destroyBuffers.push(buffer);
 }
 
-void MGG_Buffer_SetData(MGG_GraphicsDevice* device, MGG_Buffer*& buffer, mgint offset, mgbyte* data, mgint length, mgbyte discard)
+void MGG_Buffer_SetData(MGG_GraphicsDevice* device, MGG_Buffer*& buffer, mgint offset, mgbyte* data, mgint elementCount, mgint vertexStride, mgint elementSizeInBytes, mgbool discard)
 {
 	assert(device != nullptr);
 	assert(buffer != nullptr);
 	assert(data != nullptr);
+	assert(offset >= 0);
+	assert(elementCount > 0);
+	assert(vertexStride > 0);
+	assert(elementSizeInBytes > 0);
 
 	// TODO: Force discard here if we find we're
 	// copying over data still in use.  See NX.
@@ -1272,6 +1306,9 @@ void MGG_Buffer_SetData(MGG_GraphicsDevice* device, MGG_Buffer*& buffer, mgint o
 			break;
 		}
 	}
+
+	// Temp fix for now
+	auto length = elementCount * elementSizeInBytes;
 
 	// Copy the data.
 	UINT8* pVertexDataBegin;
@@ -1382,7 +1419,16 @@ MGG_Texture* MGG_RenderTarget_Create(
 	assert(type != MGTextureType::Cube || (slices % 6) == 0);
 
 	auto texture = new MGG_Texture();
+
 	texture->format = format;
+	texture->texture = new Texture(SurfaceType::RenderTarget, TextureDimension::Texture2D, width, height, mipmaps, format);
+	texture->texture->Create(device->resources);
+
+	if (depthFormat != MGDepthFormat::None)
+	{
+		texture->depthTexture = new Texture(width, height, depthFormat);
+		texture->depthTexture->Create(device->resources);
+	}
 
 	return texture;
 }

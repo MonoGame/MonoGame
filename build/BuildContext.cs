@@ -43,7 +43,8 @@ public class BuildContext : FrostingContext
         {
             MSBuildSettings = DotNetMSBuildSettings,
             Verbosity = DotNetVerbosity.Minimal,
-            Configuration = buildConfiguration
+            Configuration = buildConfiguration,
+            WorkingDirectory = this.ShellWorkingDir
         };
 
         DotNetPackSettings = new DotNetPackSettings
@@ -51,7 +52,8 @@ public class BuildContext : FrostingContext
             MSBuildSettings = DotNetMSBuildSettings,
             Verbosity = DotNetVerbosity.Minimal,
             OutputDirectory = NuGetsDirectory,
-            Configuration = buildConfiguration
+            Configuration = buildConfiguration,
+            WorkingDirectory = this.ShellWorkingDir
         };
 
         MSBuildSettings = new MSBuildSettings
@@ -78,14 +80,16 @@ public class BuildContext : FrostingContext
             MSBuildSettings = DotNetMSBuildSettings,
             Verbosity = DotNetVerbosity.Minimal,
             Configuration = buildConfiguration,
-            SelfContained = false
+            SelfContained = false,
+            WorkingDirectory = this.ShellWorkingDir
         };
         // SelfContained needs to be default for MacOS
         DotNetPublishSettingsForMac = new DotNetPublishSettings
         {
             MSBuildSettings = DotNetMSBuildSettings,
             Verbosity = DotNetVerbosity.Minimal,
-            Configuration = buildConfiguration
+            Configuration = buildConfiguration,
+            WorkingDirectory = this.ShellWorkingDir
         };
 
         DotNetRunSettings = new DotNetRunSettings
@@ -100,7 +104,8 @@ public class BuildContext : FrostingContext
             MSBuildSettings = DotNetMSBuildSettings,
             Verbosity = DotNetVerbosity.Minimal,
             Configuration = buildConfiguration,
-            OutputDirectory = BinariesDirectory
+            OutputDirectory = BinariesDirectory,
+            WorkingDirectory = this.ShellWorkingDir
         };
 
         Console.WriteLine($"Version: {Version}");
@@ -198,7 +203,8 @@ public class BuildContext : FrostingContext
             new ProcessSettings()
             {
                 Arguments = $"workload list",
-                RedirectStandardOutput = true
+                RedirectStandardOutput = true,
+                WorkingDirectory = this.ShellWorkingDir,
             },
             out IEnumerable<string> processOutput
         );
