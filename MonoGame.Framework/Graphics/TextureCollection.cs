@@ -23,7 +23,7 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             get
             {
-                return _textures.Length;
+                return Math.Min(_textures.Length, 16);
             }
         }
 
