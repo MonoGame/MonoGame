@@ -19,7 +19,13 @@ namespace Microsoft.Xna.Framework.Graphics
         /// <summary>
         /// Amount of textures
         /// </summary>
-        public int Count => _textures.Length;
+        public int Count
+        {
+            get
+            {
+                return _textures.Length;
+            }
+        }
 
         internal TextureCollection(GraphicsDevice graphicsDevice, int maxTextures, ShaderStage stage)
         {
