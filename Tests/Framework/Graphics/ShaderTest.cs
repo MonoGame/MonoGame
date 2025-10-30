@@ -21,6 +21,7 @@ namespace MonoGame.Tests.Graphics
 		[TestCase("ColorFlip")]
 		[TestCase("Invert")]
 		[TestCase("BlackOut")]
+        [TestCase("Float3by3")]
 #if !DESKTOPGL
         // TODO this does not render for some reason, we need to fix this
         [TestCase("RainbowH")]
@@ -36,10 +37,24 @@ namespace MonoGame.Tests.Graphics
 			// mess up other textures
             var background = content.Load<Texture2D>(Paths.Texture ("fun-background"));
 			// The texture to apply the effect to
-            var surge = content.Load<Texture2D>(Paths.Texture("Surge"));
+            var surge = content.Load<Texture2D>(Paths.Texture("Surge"));           
 
             spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend);
             spriteBatch.Draw(background, Vector2.Zero, Color.White);
+
+            if (effectName == "Float3by3") // This test requires setting a parameter
+            {
+                var layer1ColorsParam = effect.Parameters["Layer1Colors"];
+                if (layer1ColorsParam != null)
+                {
+                    layer1ColorsParam.SetValue(new Matrix(
+                        0.5f, 0, 0, 0,
+                        0, 0.5f, 0, 0,
+                        0, 0, 0.5f, 0,
+                        0, 0, 0, 0    
+                    ));
+                }               
+            }
 
             effect.CurrentTechnique.Passes[0].Apply();
             spriteBatch.Draw(

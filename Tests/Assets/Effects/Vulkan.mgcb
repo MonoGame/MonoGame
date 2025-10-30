@@ -92,3 +92,9 @@
 /processorParam:DebugMode=Auto
 /build:TextureArrayEffect.fx
 
+#begin Float3by3.fx
+/importer:EffectImporter
+/processor:EffectProcessor
+/processorParam:DebugMode=Auto
+/build:Float3by3.fx
+
