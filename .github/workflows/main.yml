@@ -124,15 +124,17 @@ jobs:
         shell: bash
 
       - name: Setup .NET Core SDK
-        uses: actions/setup-dotnet@v4
+        uses: actions/setup-dotnet@v5
         with:
-          dotnet-version: '9.0.x'
+          dotnet-version: |
+            9.0.x
+            8.0.x
         env:
           DotnetVersion: 9.0.305
 
       - name: Test generated Nuget packages
         if: runner.os != 'Linux'
-        run: dotnet run --project build/Build.csproj -- --target=TestNuGet
+        run: dotnet run --project build/Build.csproj -- --target=TestNuGet --framework net9.0
         env:
           DotnetVersion: 9.0.305
           ACTIONS_RUNTIME_TOKEN: ${{ env.ACTIONS_RUNTIME_TOKEN }}
