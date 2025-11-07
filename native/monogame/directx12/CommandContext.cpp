@@ -273,6 +273,8 @@ void CommandContext::SetPSODeviceParameters(D3D12_GRAPHICS_PIPELINE_STATE_DESC& 
     psoDesc.NumRenderTargets = m_currentRT.size();
     for (int i = 0; i < m_currentRT.size(); i++)
         psoDesc.RTVFormats[i] = m_currentRT[i]->GetFormat();
+    for (int i = m_currentRT.size(); i < D3D12_SIMULTANEOUS_RENDER_TARGET_COUNT; i++)
+        psoDesc.RTVFormats[i] = DXGI_FORMAT_UNKNOWN;
     psoDesc.DSVFormat = m_currentDepthStencil ? m_currentDepthStencil->GetFormat() : DXGI_FORMAT_UNKNOWN;
 }
 
