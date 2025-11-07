@@ -258,6 +258,7 @@ struct MGG_GraphicsDevice
 	MGG_Texture* textures[MAX_TEXTURE_SLOTS] = { 0 };
 	MGG_SamplerState* samplers[MAX_TEXTURE_SLOTS] = { 0 };
 	uint32_t textureSamplerDirty = 0;
+	MGG_Texture* nullTexture = nullptr;
 
 	bool blendFactorDirty = false;
 	float blendFactor[4] = { 0 };
@@ -1347,6 +1348,10 @@ MGG_GraphicsDevice* MGG_GraphicsDevice_Create(MGG_GraphicsSystem* system, MGG_Gr
 	memset(device->textures, 0, sizeof(device->textures));
 	memset(device->samplers, 0, sizeof(device->samplers));
 
+	device->nullTexture = MGG_Texture_Create(device, MGTextureType::_2D, MGSurfaceFormat::Color, 2, 2, 1, 1, 1);
+	uint32_t black[] = {0,0,0,0};
+	MGG_Texture_SetData(device, device->nullTexture, 0, 0, 0, 0, 0, 0, 0, 0, (mgbyte*)black, sizeof(black));
+
 	return device;
 }
 
@@ -1463,6 +1468,8 @@ void MGG_GraphicsDevice_Destroy(MGG_GraphicsDevice* device)
 	}
 
 	vkDestroyCommandPool(device->device, device->cmdPool, nullptr);
+
+	MGG_Texture_Destroy(device, device->nullTexture);
 
 	for (size_t i = 0; i < device->swapchainCount; i++)
 		MGVK_DestroyFrameResources(device, i, true);
@@ -2387,7 +2394,7 @@ void MGG_GraphicsDevice_SetTexture(MGG_GraphicsDevice* device, MGShaderStage sta
 	assert(slot >= 0);
 	assert(slot < MAX_TEXTURE_SLOTS);
 
-	device->textures[slot] = texture;
+	device->textures[slot] = texture ? texture : device->nullTexture;
 	device->textureSamplerDirty |= 1 << slot;
 }
 
