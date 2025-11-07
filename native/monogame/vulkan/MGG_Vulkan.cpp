@@ -3025,17 +3025,14 @@ static MGVK_Program* MGVK_ProgramGetOrCreate(MGG_GraphicsDevice* device, MGG_Sha
 
 	VkResult res;
 
-	int count = 0;
 	VkDescriptorSetLayout layouts[2];
-	if (program->vertex->setLayout)
-		layouts[count++] = program->vertex->setLayout;
-	if (program->pixel->setLayout)
-		layouts[count++] = program->pixel->setLayout;
+	layouts[0] = program->vertex->setLayout;
+	layouts[1] = program->pixel->setLayout;
 
 	VkPipelineLayoutCreateInfo pipelineLayoutInfo;
 	memset(&pipelineLayoutInfo, 0, sizeof(pipelineLayoutInfo));
 	pipelineLayoutInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
-	pipelineLayoutInfo.setLayoutCount = count;
+	pipelineLayoutInfo.setLayoutCount = 2;
 	pipelineLayoutInfo.pSetLayouts = layouts;
 	pipelineLayoutInfo.pushConstantRangeCount = 0;
 	pipelineLayoutInfo.pPushConstantRanges = nullptr;
@@ -3114,7 +3111,6 @@ static VkPipeline MGVK_CreatePipeline(MGG_GraphicsDevice* device)
 	vertexInputInfo.vertexAttributeDescriptionCount = pstate.layout->attributeCount;
 	vertexInputInfo.pVertexAttributeDescriptions = pstate.layout->attributes;
 	pipelineInfo.pVertexInputState = &vertexInputInfo;
-
 
 	VkPipelineInputAssemblyStateCreateInfo inputAssembly;
 	memset(&inputAssembly, 0, sizeof(inputAssembly));
@@ -3266,30 +3262,32 @@ static void MGVK_UpdatePipeline(MGG_GraphicsDevice* device, MGVK_CmdBuffer& cmd,
 		auto program = device->pipelineState.program;
 
 		// Update the shader bindings.
-		int setsCount = 0;
+		int setCount = 0;
+		int setOffset = 0;
 		int offsetCount = 0;
-		if (program->vertex->setLayout)
+		if (program->vertex->bindings.size() == 0)
+			setOffset++;
+		else
 		{
 			uint32_t* dynamicOffset = nullptr;
 			if (program->vertex->uniformSlots)
 				dynamicOffset = &device->dynamicOffsets[offsetCount++];
 
-			MGVK_UpdateDescriptors(device, currentFrame, program->vertex, &device->descriptorSets[setsCount++], dynamicOffset);
+			MGVK_UpdateDescriptors(device, currentFrame, program->vertex, &device->descriptorSets[setCount++], dynamicOffset);
 		}
-		if (program->pixel->setLayout)
+
+		if (program->pixel->bindings.size() > 0)
 		{
 			uint32_t* dynamicOffset = nullptr;
 			if (program->pixel->uniformSlots)
 				dynamicOffset = &device->dynamicOffsets[offsetCount++];
 
-			MGVK_UpdateDescriptors(device, currentFrame, program->pixel, &device->descriptorSets[setsCount++], dynamicOffset);
+			MGVK_UpdateDescriptors(device, currentFrame, program->pixel, &device->descriptorSets[setCount++], dynamicOffset);
 		}
 
 		// Bind the new descriptor sets.		
 		vkCmdBindDescriptorSets(cmd.buffer, VK_PIPELINE_BIND_POINT_GRAPHICS,
-			program->layout, 0,
-			setsCount, device->descriptorSets,
-			offsetCount, device->dynamicOffsets);
+			program->layout, setOffset, setCount, device->descriptorSets, offsetCount, device->dynamicOffsets);
 
 		// Clear all the dirty flags.
 		device->uniformsDirty = 0;
@@ -4977,11 +4975,19 @@ MGG_Shader* MGG_Shader_Create(MGG_GraphicsDevice* device, MGShaderStage stage, m
 
 	device->all_shaders.push_back(shader);
 
-	// If the shader has no bindings... then skip all the layout
-	// and descriptor setup.
+	// If the shader has no bindings we still need an empty layout
+	// to ensure that the descriptor sets are in the right slots.
 	if (layoutBindings.empty())
 	{
-		shader->setLayout = nullptr;
+		VkDescriptorSetLayoutCreateInfo layoutInfo;
+		memset(&layoutInfo, 0, sizeof(layoutInfo));
+		layoutInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
+		layoutInfo.bindingCount = 0;
+		layoutInfo.pBindings = nullptr;
+		layoutInfo.flags = 0;
+		res = vkCreateDescriptorSetLayout(device->device, &layoutInfo, nullptr, &shader->setLayout);
+		VK_CHECK_RESULT(res);
+
 		shader->poolInfo = nullptr;
 		shader->pool = nullptr;
 		shader->writes = nullptr;
