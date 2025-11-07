@@ -1259,6 +1259,10 @@ MGG_GraphicsDevice* MGG_GraphicsDevice_Create(MGG_GraphicsSystem* system, MGG_Gr
 	{
 		enabledFeatures.occlusionQueryPrecise = VK_TRUE;
 	}
+	if (device->deviceFeatures.samplerAnisotropy)
+	{
+		enabledFeatures.samplerAnisotropy = VK_TRUE;
+	}
 
 	VkDeviceCreateInfo deviceCreateInfo = { VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO };
 	deviceCreateInfo.queueCreateInfoCount = 1;
@@ -4124,7 +4128,8 @@ MGG_SamplerState* MGG_SamplerState_Create(MGG_GraphicsDevice* device, MGG_Sample
 	samplerInfo.addressModeU = ToVkSamplerAddressMode(info->AddressU);
 	samplerInfo.addressModeV = ToVkSamplerAddressMode(info->AddressV);
 	samplerInfo.addressModeW = ToVkSamplerAddressMode(info->AddressW);
-	samplerInfo.anisotropyEnable = info->Filter == MGTextureFilter::Anisotropic;
+	samplerInfo.anisotropyEnable =	info->Filter == MGTextureFilter::Anisotropic &&
+									device->deviceFeatures.samplerAnisotropy == VK_TRUE;
 	samplerInfo.maxAnisotropy = info->MaximumAnisotropy;
 	samplerInfo.unnormalizedCoordinates = VK_FALSE;
 	samplerInfo.compareEnable = VK_FALSE;
