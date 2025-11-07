@@ -15,7 +15,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [windows-latest, macos-15, ubuntu-24.04]
+        os: [windows-latest, macos-26, ubuntu-24.04]
       fail-fast: false
     steps:
       - name: Clone repository
@@ -28,7 +28,7 @@ jobs:
           echo '{ "sdk": { "version": "${{ env.DotnetVersion }}" } }' > global.json
 
       - name: Setup .NET Core SDK
-        uses: actions/setup-dotnet@v4
+        uses: actions/setup-dotnet@v5
         with:
           dotnet-version: '${{ env.DotnetVersion }}'
           
@@ -123,9 +123,24 @@ jobs:
           CI: true
         shell: bash
 
+      - name: Generate global.json
+        run: |
+          echo '{ "sdk": { "version": "9.0.x" } }' > global.json
+
+      - name: Setup .NET Core SDK
+        uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: |
+            9.0.x
+
+      - name: Setup DotNet on MacOS for DotNet 9
+        if: runner.environment == 'github-hosted' && runner.os == 'macos'
+        run: |
+          dotnet workload install android macos ios
+
       - name: Test generated Nuget packages
         if: runner.os != 'Linux'
-        run: dotnet run --project build/Build.csproj -- --target=TestNuGet
+        run: dotnet run --project build/Build.csproj -- --target=TestNuGet --framework net9.0
         env:
           ACTIONS_RUNTIME_TOKEN: ${{ env.ACTIONS_RUNTIME_TOKEN }}
           ACTIONS_RUNTIME_URL: "${{ env.ACTIONS_RUNTIME_URL }}"           

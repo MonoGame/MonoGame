@@ -7,11 +7,9 @@ using NUnit.Framework;
 
 namespace MonoGame.Tests.Graphics
 {
-#if DESKTOPGL
-    [Ignore("Texture3D is not implemented for the OpenGL backend.")]
-#endif
     [TestFixture]
     [NonParallelizable]
+    [RunOnUI]
     class Texture3DTest : GraphicsDeviceTestFixtureBase
     {
         [Test]
