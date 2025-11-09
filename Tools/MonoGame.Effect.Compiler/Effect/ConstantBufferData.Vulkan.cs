@@ -2,6 +2,7 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
+using MonoGame.Effect.Compiler.Effect.Spirv;
 using System;
 using System.Linq;
 
@@ -9,89 +10,78 @@ namespace MonoGame.Effect
 {
     internal partial class ConstantBufferData
     {
-        static EffectObject.D3DXPARAMETER_TYPE ToParamType(string dataType)
+        static EffectObject.D3DXPARAMETER_TYPE ToParamType(SpirvTypeBase spirvType)
         {
-            switch(dataType)
+            if (spirvType is SpirvTypeVector vector)
             {
-                case "float":
+                return ToParamType(vector.ElementType);
+            }
+            else if (spirvType is SpirvTypeMatrix matrix)
+            {
+                return ToParamType(matrix.ColumnType.ElementType);
+            }
+            else if (spirvType is SpirvTypeArray array)
+            {
+                return ToParamType(array.ElementType);
+            }
+
+            switch (spirvType.Type)
+            {
+                case SpirvType.Float:
                     return EffectObject.D3DXPARAMETER_TYPE.FLOAT;
-                case "uint":
-                case "int":
+                case SpirvType.Int:
                     return EffectObject.D3DXPARAMETER_TYPE.INT;
-                case "bool":
+                case SpirvType.Bool:
                     return EffectObject.D3DXPARAMETER_TYPE.BOOL;
                 default:
-                    throw new Exception("Unknown data type: " + dataType);
+                    throw new Exception("Unknown data type: " + spirvType);
             };
         }
 
-        public void AddParameter(string name, string dataType, int sizeOfArray, int byteOffset)
+        public void AddParameter(SpirvTypeStructMember member)
         {
             // Has this parameter already been added?
-            var found = Parameters.FirstOrDefault(p => p.name == name);
+            var found = Parameters.FirstOrDefault(p => p.name == member.Name);
             if (found != null)
                 return;
 
             // Create the new parameter.
             var param = new EffectObject.d3dx_parameter();
-            param.name = name;
+            param.name = member.Name;
             param.semantic = string.Empty;
-            param.bufferOffset = byteOffset;
+            param.bufferOffset = member.Offset.Value;
 
-            if (dataType.StartsWith("%mat"))
+            if (member.Type is SpirvTypeMatrix matrix)
             {
-                param.columns = (uint)char.GetNumericValue(dataType[4]);
-                param.rows = (uint)char.GetNumericValue(dataType[6]);
-                param.type = ToParamType(dataType.Substring(7));
+                param.columns = matrix.Columns;
+                param.rows = matrix.ColumnType.Dimensions;
+                param.type = ToParamType(matrix.ColumnType.ElementType);
+                param.class_ = EffectObject.D3DXPARAMETER_CLASS.MATRIX_COLUMNS;
             }
-            else if (dataType.StartsWith("%v"))
+            else if (member.Type is SpirvTypeVector vector)
             {
                 param.rows = 1;
-                param.columns = (uint)char.GetNumericValue(dataType[2]);
-                param.type = ToParamType(dataType.Substring(3));
+                param.columns = vector.Dimensions;
+                param.type = ToParamType(vector.ElementType);
+                param.class_ = EffectObject.D3DXPARAMETER_CLASS.VECTOR;
             }
-            else if (dataType.StartsWith("%_arr_"))
+            else if (member.Type is SpirvTypeArray array)
             {
-                // TODO: Support arrays.... %_arr_mat4v3float_uint_72
+                // TODO: Add array support here.
                 param.rows = 1;
                 param.columns = 1;
                 param.type = EffectObject.D3DXPARAMETER_TYPE.FLOAT;
+                param.class_ = EffectObject.D3DXPARAMETER_CLASS.SCALAR;
             }
             else
             {
                 param.rows = 1;
                 param.columns = 1;
-                param.type = ToParamType(dataType.Substring(1));
-            }
-
-            if (param.rows > 1)
-                param.class_ = EffectObject.D3DXPARAMETER_CLASS.MATRIX_COLUMNS;
-            else if (param.columns > 1)
-                param.class_ = EffectObject.D3DXPARAMETER_CLASS.VECTOR;
-            else
+                param.type = ToParamType(member.Type);
                 param.class_ = EffectObject.D3DXPARAMETER_CLASS.SCALAR;
+            }
 
             var byteSize = param.rows * param.columns * 4;
-
-            if (sizeOfArray > 0)
-            {
-                param.element_count = (uint)sizeOfArray;
-                param.member_handles = new EffectObject.d3dx_parameter[param.element_count];
-                for (var i = 0; i < param.element_count; i++)
-                {
-                    var mparam = new EffectObject.d3dx_parameter();
-
-                    mparam.name = string.Empty;
-                    mparam.semantic = string.Empty;
-                    mparam.type = param.type;
-                    mparam.class_ = param.class_;
-                    mparam.rows = param.rows;
-                    mparam.columns = param.columns;
-                    mparam.data = new byte[byteSize];
-
-                    param.member_handles[i] = mparam;
-                }
-            }
 
             var data = new byte[byteSize];
 
