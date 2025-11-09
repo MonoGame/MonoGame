@@ -1,4 +1,4 @@
-﻿// MonoGame - Copyright (C) The MonoGame Team
+﻿// MonoGame - Copyright (C) MonoGame Foundation, Inc
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
@@ -7,7 +7,7 @@ using System.Diagnostics;
 
 namespace MonoGame.Effect.Compiler.Effect.Spirv
 {
-    public class SpirvSampledImage
+    internal class SpirvSampledImage
     {
         public string Id { get; private set; }
         public SpirvLoad LoadedSampler { get; private set; }

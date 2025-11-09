@@ -1,4 +1,4 @@
-﻿// MonoGame - Copyright (C) The MonoGame Team
+﻿// MonoGame - Copyright (C) MonoGame Foundation, Inc
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
@@ -7,7 +7,7 @@ using System.Diagnostics;
 namespace MonoGame.Effect.Compiler.Effect.Spirv
 {
     // https://registry.khronos.org/SPIR-V/specs/unified1/SPIRV.html#OpTypeMatrix
-    public class SpirvTypeMatrix : SpirvTypeBase
+    internal class SpirvTypeMatrix : SpirvTypeBase
     {
         public override SpirvType Type => SpirvType.Matrix;
         public SpirvTypeVector ColumnType { get; private set; }

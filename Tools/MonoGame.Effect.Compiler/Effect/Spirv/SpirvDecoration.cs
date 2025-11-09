@@ -1,4 +1,4 @@
-﻿// MonoGame - Copyright (C) The MonoGame Team
+﻿// MonoGame - Copyright (C) MonoGame Foundation, Inc
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
@@ -7,8 +7,7 @@ using System;
 namespace MonoGame.Effect.Compiler.Effect.Spirv
 {
     // https://registry.khronos.org/SPIR-V/specs/unified1/SPIRV.html#Decoration
-    // I decided to add all of the included ones just to cover all bases, even though only a small subset would be used.
-    public enum SpirvDecorationType
+    internal enum SpirvDecorationType
     {
         RelaxedPrecision = 0,
         SpecId = 1,
@@ -59,7 +58,7 @@ namespace MonoGame.Effect.Compiler.Effect.Spirv
         MaxByteOffsetId = 47
     }
 
-    public class SpirvDecoration
+    internal class SpirvDecoration
     {
         public SpirvDecorationType Type { get; private set; }
         public string[] Args { get; private set; }

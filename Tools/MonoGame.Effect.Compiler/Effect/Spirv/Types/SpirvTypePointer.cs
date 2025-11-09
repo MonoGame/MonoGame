@@ -1,4 +1,4 @@
-﻿// MonoGame - Copyright (C) The MonoGame Team
+﻿// MonoGame - Copyright (C) MonoGame Foundation, Inc
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
@@ -7,7 +7,8 @@ using System.Diagnostics;
 
 namespace MonoGame.Effect.Compiler.Effect.Spirv
 {
-    public enum StorageClass
+    // https://registry.khronos.org/SPIR-V/specs/unified1/SPIRV.html#Storage_Class
+    internal enum StorageClass
     {
         UniformConstant = 0,
         Input = 1,
@@ -15,7 +16,8 @@ namespace MonoGame.Effect.Compiler.Effect.Spirv
         Output = 3
     }
 
-    public class SpirvTypePointer : SpirvTypeBase
+    // https://registry.khronos.org/SPIR-V/specs/unified1/SPIRV.html#OpTypePointer
+    internal class SpirvTypePointer : SpirvTypeBase
     {
         public override SpirvType Type => SpirvType.Pointer;
         public StorageClass StorageClass { get; private set; }

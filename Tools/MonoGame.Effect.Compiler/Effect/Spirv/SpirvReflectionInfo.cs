@@ -1,4 +1,4 @@
-﻿// MonoGame - Copyright (C) The MonoGame Team
+﻿// MonoGame - Copyright (C) MonoGame Foundation, Inc
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
@@ -9,7 +9,7 @@ using System.Linq;
 
 namespace MonoGame.Effect.Compiler.Effect.Spirv
 {
-    public class SpirvReflectionInfo
+    internal class SpirvReflectionInfo
     {
         public ReadOnlyCollection<SpirvVariable> Variables { get; init; }
         public string EntryPoint { get; init; }
@@ -31,7 +31,7 @@ namespace MonoGame.Effect.Compiler.Effect.Spirv
             internal string[] EntryPoint = null;
         }
 
-        public static SpirvReflectionInfo Parse(string[] spirvFileLines)
+        internal static SpirvReflectionInfo Parse(string[] spirvFileLines)
         {
             SpirvParseContext context = new();
 

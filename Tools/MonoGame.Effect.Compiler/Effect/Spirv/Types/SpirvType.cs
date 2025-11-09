@@ -1,4 +1,4 @@
-﻿// MonoGame - Copyright (C) The MonoGame Team
+﻿// MonoGame - Copyright (C) MonoGame Foundation, Inc
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
@@ -8,7 +8,7 @@ using System.Collections.Generic;
 namespace MonoGame.Effect.Compiler.Effect.Spirv
 {
     // https://registry.khronos.org/SPIR-V/specs/unified1/SPIRV.html#_type_declaration_instructions
-    public enum SpirvType
+    internal enum SpirvType
     {
         Void,
         Bool,
@@ -27,7 +27,7 @@ namespace MonoGame.Effect.Compiler.Effect.Spirv
     }
 
     // https://registry.khronos.org/SPIR-V/specs/unified1/SPIRV.html#_type_declaration_instructions
-    public abstract class SpirvTypeBase
+    internal abstract class SpirvTypeBase
     {
         public abstract SpirvType Type { get; }
         public string Id { get; private set; }

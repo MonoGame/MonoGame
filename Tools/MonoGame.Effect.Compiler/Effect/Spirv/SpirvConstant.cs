@@ -5,7 +5,7 @@
 namespace MonoGame.Effect.Compiler.Effect.Spirv
 {
     // https://registry.khronos.org/SPIR-V/specs/unified1/SPIRV.html#OpConstant
-    public class SpirvConstant
+    internal class SpirvConstant
     {
         public string Id { get; private set; }
         public SpirvTypeScalar Type { get; private set; }

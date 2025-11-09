@@ -1,4 +1,4 @@
-﻿// MonoGame - Copyright (C) The MonoGame Team
+﻿// MonoGame - Copyright (C) MonoGame Foundation, Inc
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
@@ -7,7 +7,7 @@ using System.Diagnostics;
 namespace MonoGame.Effect.Compiler.Effect.Spirv
 {
     // https://registry.khronos.org/SPIR-V/specs/unified1/SPIRV.html#Dim
-    public enum ImageDimensionality
+    internal enum ImageDimensionality
     {
         OneD,
         TwoD,
@@ -17,7 +17,7 @@ namespace MonoGame.Effect.Compiler.Effect.Spirv
     }
 
     // https://registry.khronos.org/SPIR-V/specs/unified1/SPIRV.html#OpTypeImage
-    public class SpirvTypeImage : SpirvTypeBase
+    internal class SpirvTypeImage : SpirvTypeBase
     {
         public override SpirvType Type => SpirvType.Image;
         public ImageDimensionality Dimensionality { get; private set; }
