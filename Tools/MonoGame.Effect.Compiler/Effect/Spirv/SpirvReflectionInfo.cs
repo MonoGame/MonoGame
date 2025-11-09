@@ -2,6 +2,7 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
+using Microsoft.VisualBasic;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
@@ -22,6 +23,7 @@ namespace MonoGame.Effect.Compiler.Effect.Spirv
             internal Dictionary<string, Dictionary<int, string>> MemberNames = [];
             internal Dictionary<string, SpirvTypeBase> Types = [];
             internal Dictionary<string, SpirvVariable> Variables = [];
+            internal Dictionary<string, SpirvConstant> Constants = [];
             internal Dictionary<string, SpirvLoad> Loads = [];
             internal List<SpirvSampledImage> SampledImages = [];
             internal List<(string id, SpirvDecoration decoration)> Decorations = [];
@@ -49,6 +51,11 @@ namespace MonoGame.Effect.Compiler.Effect.Spirv
                     {
                         SpirvVariable newVar = SpirvVariable.ParseVariable(parts, context);
                         context.Variables.Add(newVar.Id, newVar);
+                    }
+                    else if (parts[2] == "OpConstant")
+                    {
+                        SpirvConstant newConst = SpirvConstant.ParseConstant(parts, context);
+                        context.Constants.Add(newConst.Id, newConst);
                     }
                     else if (parts[2] == "OpLoad")
                     {

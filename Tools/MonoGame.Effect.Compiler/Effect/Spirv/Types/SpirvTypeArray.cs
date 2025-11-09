@@ -20,8 +20,14 @@ namespace MonoGame.Effect.Compiler.Effect.Spirv
                 return;
             }
 
+            if (!context.Constants.TryGetValue(args[1], out SpirvConstant constant))
+            {
+                Debug.WriteLine($"OpTypeArray {Name ?? Id} specified unparsed constant for length {args[1]}");
+                return;
+            }
+
             ElementType = type;
-            Length = uint.Parse(args[1]);
+            Length = (uint)constant.Value;
         }
     }
 }
