@@ -9,19 +9,19 @@ namespace MonoGame.Framework.Content.Pipeline.Builder;
 class ContentCollectionRoot(string contentRoot)
 {
     private readonly string _contentRoot = contentRoot;
-    private readonly Dictionary<string, ContentInfo?> _imputFiles = [];
+    private readonly Dictionary<string, ContentInfo?> _inputFiles = [];
     private readonly List<(ContentRule rule, ContentInfo? info)> _rules = [];
 
     public void IncludeCopy(string inputPath, string? outputPath)
-        => _imputFiles[inputPath.Sanitize()] = new(_contentRoot, false, null, null, string.IsNullOrWhiteSpace(outputPath) ? (s => s) : (_ => outputPath));
+        => _inputFiles[inputPath.Sanitize()] = new(_contentRoot, false, null, null, string.IsNullOrWhiteSpace(outputPath) ? (s => s) : (_ => outputPath));
 
     public void Include(string inputPath, IContentImporter? contentImporter, IContentProcessor? contentProcessor)
-        => _imputFiles[inputPath.Sanitize()] = new(_contentRoot, true, contentImporter, contentProcessor);
+        => _inputFiles[inputPath.Sanitize()] = new(_contentRoot, true, contentImporter, contentProcessor);
 
     public void Include(string inputPath, string outputPath, IContentImporter? contentImporter, IContentProcessor? contentProcessor )
-        => _imputFiles[inputPath.Sanitize()] = new(_contentRoot, true, contentImporter, contentProcessor, _ => outputPath);
+        => _inputFiles[inputPath.Sanitize()] = new(_contentRoot, true, contentImporter, contentProcessor, _ => outputPath);
 
-    public void Exclude(string excludePath) => _imputFiles[excludePath.Sanitize()] = null;
+    public void Exclude(string excludePath) => _inputFiles[excludePath.Sanitize()] = null;
 
     public void IncludeCopy<T>(string includePattern, Func<string, string>? outputPath)
         where T : ContentRule, new()
@@ -60,7 +60,7 @@ class ContentCollectionRoot(string contentRoot)
         HashSet<string> usedOutputs = [];
         contentInfos = [];
 
-        bool inputFiles = _imputFiles.TryGetValue(filePath.Sanitize(), out ContentInfo? inputFilesInfo);
+        bool inputFiles = _inputFiles.TryGetValue(filePath.Sanitize(), out ContentInfo? inputFilesInfo);
         bool? shouldBuild = null;
 
         if (inputFilesInfo != null)
@@ -115,7 +115,7 @@ class ContentCollectionRoot(string contentRoot)
     {
         List<string> elementsToRemove = [];
 
-        foreach (var pair in _imputFiles)
+        foreach (var pair in _inputFiles)
         {
             if (!rule.IsMatch(pair.Key))
             {
@@ -139,7 +139,7 @@ class ContentCollectionRoot(string contentRoot)
 
         foreach (var element in elementsToRemove)
         {
-            _imputFiles.Remove(element);
+            _inputFiles.Remove(element);
         }
     }
 }
