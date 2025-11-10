@@ -18,8 +18,6 @@ class ContentBuilderProcessorContext(ContentBuilder builder, string relativePath
 
     private readonly ContentIdentity _sourceIdentity = new ContentIdentity(sourceFilename: Path.Combine(builder.Parameters.RootedSourceDirectory, relativePath).Sanitize());
 
-    private readonly ContentIdentity _sourceIdentity = new ContentIdentity(sourceFilename: Path.Combine(_builder.Parameters.RootedSourceDirectory, relativePath));
-
     private readonly ContentInfo _contentInfo = contentInfo;
 
     private int _contentIndex = 0;
