@@ -4,12 +4,76 @@
 
 using System;
 using System.IO;
-using Microsoft.Xna.Framework.Content.Pipeline;
-using MonoGame.Framework.Content.Pipeline.Builder;
 using NUnit.Framework;
+using Microsoft.Xna.Framework.Content.Pipeline;
+using Microsoft.Xna.Framework.Content.Pipeline.Processors;
+using MonoGame.Framework.Content.Pipeline.Builder;
+
 
 namespace MonoGame.Tests.ContentPipeline
 {
+    class TestAsset
+    {
+    }
+
+    class TestContent
+    {
+    }
+
+    class TestImporter : ContentImporter<TestAsset>
+    {
+        public override TestAsset Import(string filename, ContentImporterContext context)
+        {
+            var asset = new TestAsset();
+            return asset;
+        }
+    }
+
+    class TestProcessor : ContentProcessor<TestAsset, TestContent>
+    {
+        public override TestContent Process(TestAsset input, ContentProcessorContext context)
+        {
+            var content = new TestContent();
+
+            return content;
+        }
+    }
+
+    class Builder : ContentBuilder
+    {
+        public override IContentCollection GetContentCollection()
+        {
+            var content = new ContentCollection();
+
+            content.Include<RegexRule>(".");
+
+            // This is not content.
+            content.Exclude<WildcardRule>("ReferenceImages/**/*.*");
+
+            // These all normally fail per design.
+            content.Exclude<WildcardRule>("**/04_ExcludingPublicMembers.xml");
+            content.Exclude<WildcardRule>("**/08_AllowNull.xml");
+            content.Exclude<WildcardRule>("**/17_ExternalReferences.xml");
+            content.Exclude<WildcardRule>("**/23_GetterOnlyPolymorphicArrayProperties.xml");            
+            content.Exclude<WildcardRule>("**/bark_mono_44hz_32bit.wav");
+            content.Exclude<WildcardRule>("**/bark_mono_88hz_16bit.wav");
+            content.Exclude<WildcardRule>("**/rock_loop_stereo.mp3");
+            content.Exclude<WildcardRule>("**/rock_loop_stereo.wma");
+            content.Exclude("Textures/rgbf.tif");
+            content.Exclude("Models/Dude/dude.fbx");
+            content.Exclude("Models/level1.fbx");
+
+            // Required for this to build.
+            content.Include("Effects/DefinesTest.fx",
+                new EffectImporter(),
+                new EffectProcessor() { Defines = "MACRO_DEFINE_TEST=3" } ); 
+
+            //content.Include(@"Assets/*.*", new TestImporter(), new TestProcessor());
+
+            return content;
+        }
+    }
+
     [TestFixture]
     public class BuilderTest
     {
@@ -60,5 +124,27 @@ namespace MonoGame.Tests.ContentPipeline
             args = ContentBuilderParams.Parse("server");
             Assert.AreEqual(ContentBuilderMode.Server, args.Mode);
         }
-    } 
+
+        [Test]
+        public void BuildTest()
+        {
+            var builder = new Builder();
+            builder.Run(new ContentBuilderParams
+            {
+                CompressContent = false,
+                GraphicsProfile = Microsoft.Xna.Framework.Graphics.GraphicsProfile.HiDef,
+                LogLevel = LogLevel.Debug,
+                Mode = ContentBuilderMode.Builder,
+                Platform = TargetPlatform.Windows,
+                Rebuild = true,
+                WorkingDirectory = Directory.GetCurrentDirectory(),
+                SourceDirectory = "Assets",
+                IntermediateDirectory = "BuilderIntermediateDir",
+                OutputDirectory = "BuilderOutputDir"
+            });
+
+            var failures = builder.FailedToBuild;
+            Assert.AreEqual(0, failures);
+        }
+    }
 }
