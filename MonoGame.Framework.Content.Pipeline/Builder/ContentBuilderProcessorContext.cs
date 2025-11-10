@@ -13,6 +13,8 @@ class ContentBuilderProcessorContext(ContentBuilder builder, string relativePath
 
     private readonly string _relativeContentPath = relativePath;
 
+    private readonly ContentIdentity _sourceIdentity = new ContentIdentity(sourceFilename: Path.Combine(_builder.Parameters.RootedSourceDirectory, relativePath));
+
     private readonly ContentInfo _contentInfo = contentInfo;
 
     private int _contentIndex = 0;
@@ -25,7 +27,7 @@ class ContentBuilderProcessorContext(ContentBuilder builder, string relativePath
 
     public override ContentBuildLogger Logger => _builder.Logger;
 
-    public override ContentIdentity SourceIdentity => throw new NotImplementedException();
+    public override ContentIdentity SourceIdentity => _sourceIdentity;
 
     public override string OutputDirectory => _builder.Parameters.OutputDirectory;
 
