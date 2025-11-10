@@ -83,11 +83,11 @@ namespace MonoGame.Effect.Compiler.Effect.Spirv
 
                     members.Add(int.Parse(parts[2]), parts[3].Trim('\"'));
                 }
-                else if (parts[0] == "OpDecorate")
+                else if (parts[0] == "OpDecorate" || parts[0] == "OpDecorateString")
                 {
                     string target = parts[1];
                     SpirvDecoration decoration = SpirvDecoration.ParseDecorator(parts[2..]);
-                    context.Decorations.Add((target, decoration));
+                    if (decoration != null) context.Decorations.Add((target, decoration));
                 }
                 else if (parts[0] == "OpMemberDecorate")
                 {

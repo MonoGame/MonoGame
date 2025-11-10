@@ -153,6 +153,11 @@ namespace MonoGame.Effect
                 toolArgs += "-nologo ";
                 toolArgs += "-spirv ";
                 toolArgs += "-fvk-use-dx-layout ";
+
+                // Adds HLSL specific reflection information to the SPIR-V
+                // https://github.com/Microsoft/DirectXShaderCompiler/blob/main/docs/SPIR-V.rst#reflection
+                toolArgs += "-fspv-reflect ";
+
                 if (isVertexShader)
                 {
                     toolArgs += "-fvk-invert-y ";
@@ -346,11 +351,7 @@ namespace MonoGame.Effect
                     foreach (SpirvVariable input in sorted)
                     {
                         var a = new ShaderData.Attribute();
-
-                        // TODO: This is a potentially brittle mapping from input variable to Vertex element, reling on the non-guaranteed SPIR-V ID which may change.
-                        // unfortunately, from my brief research it doesn't appear there's a better way other than analysing the HLSL file,
-                        // and assuming that the vulkan locations are defined in the same order. Some more research required here.
-                        var semanticId = input.Id.Replace("%in_var_", "");
+                        var semanticId = input.HlslSemantic ?? input.Id.Replace("%in_var_", "");
 
                         var m = Regex.Match(semanticId, @"(\D+)(\d+)?");
                         if (m.Groups[2].Success)

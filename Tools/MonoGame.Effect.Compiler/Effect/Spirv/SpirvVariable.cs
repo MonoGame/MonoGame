@@ -19,6 +19,7 @@ namespace MonoGame.Effect.Compiler.Effect.Spirv
         public int? BindingSlot { get; private set; }
         public uint? DescriptorSet { get; private set; }
         public uint? Location { get; private set; }
+        public string HlslSemantic { get; private set; }
 
         internal static SpirvVariable ParseVariable(string[] parts, SpirvReflectionInfo.SpirvParseContext context)
         {
@@ -67,6 +68,9 @@ namespace MonoGame.Effect.Compiler.Effect.Spirv
                     break;
                 case SpirvDecorationType.Location:
                     Location = uint.Parse(spirvDecoration.Args[0]);
+                    break;
+                case SpirvDecorationType.UserSemantic:
+                    HlslSemantic = spirvDecoration.Args[0].Trim('\"');
                     break;
             }
         }

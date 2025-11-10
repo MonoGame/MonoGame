@@ -55,7 +55,8 @@ namespace MonoGame.Effect.Compiler.Effect.Spirv
         Alignment = 44,
         MaxByteOffset = 45,
         AlignmentId = 46,
-        MaxByteOffsetId = 47
+        MaxByteOffsetId = 47,
+        UserSemantic = 5635
     }
 
     internal class SpirvDecoration
