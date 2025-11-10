@@ -35,7 +35,27 @@ namespace MonoGame.Effect
                     return EffectObject.D3DXPARAMETER_TYPE.BOOL;
                 default:
                     throw new Exception("Unknown data type: " + spirvType);
-            };
+            }
+        }
+
+        static (uint rows, uint columns, EffectObject.D3DXPARAMETER_CLASS paramClass) DimensionsForType(SpirvTypeBase spirvType)
+        {
+            if (spirvType is SpirvTypeArray array)
+            {
+                return DimensionsForType(array.ElementType);
+            }
+            else if (spirvType is SpirvTypeVector vector)
+            {
+                return (1, vector.Dimensions, EffectObject.D3DXPARAMETER_CLASS.VECTOR);
+            }
+            else if (spirvType is SpirvTypeMatrix matrix)
+            {
+                return (matrix.ColumnType.Dimensions, matrix.Columns, EffectObject.D3DXPARAMETER_CLASS.MATRIX_COLUMNS);
+            }
+            else
+            {
+                return (1, 1, EffectObject.D3DXPARAMETER_CLASS.SCALAR);
+            }
         }
 
         public void AddParameter(SpirvTypeStructMember member)
@@ -51,44 +71,40 @@ namespace MonoGame.Effect
             param.semantic = string.Empty;
             param.bufferOffset = member.Offset.Value;
 
-            if (member.Type is SpirvTypeMatrix matrix)
+            (uint rows, uint cols, var paramClass) = DimensionsForType(member.Type);
+            param.rows = rows;
+            param.columns = cols;
+            param.class_ = paramClass;
+            param.type = ToParamType(member.Type);
+
+            if (member.Type is SpirvTypeArray array)
             {
-                param.columns = matrix.Columns;
-                param.rows = matrix.ColumnType.Dimensions;
-                param.type = ToParamType(matrix.ColumnType.ElementType);
-                param.class_ = EffectObject.D3DXPARAMETER_CLASS.MATRIX_COLUMNS;
-            }
-            else if (member.Type is SpirvTypeVector vector)
-            {
-                param.rows = 1;
-                param.columns = vector.Dimensions;
-                param.type = ToParamType(vector.ElementType);
-                param.class_ = EffectObject.D3DXPARAMETER_CLASS.VECTOR;
-            }
-            else if (member.Type is SpirvTypeArray array)
-            {
-                // TODO: Add array support here.
-                param.rows = 1;
-                param.columns = 1;
-                param.type = EffectObject.D3DXPARAMETER_TYPE.FLOAT;
-                param.class_ = EffectObject.D3DXPARAMETER_CLASS.SCALAR;
-            }
-            else
-            {
-                param.rows = 1;
-                param.columns = 1;
-                param.type = ToParamType(member.Type);
-                param.class_ = EffectObject.D3DXPARAMETER_CLASS.SCALAR;
+                param.element_count = array.Length;
+                param.member_handles = new EffectObject.d3dx_parameter[param.element_count];
+
+                for (uint i = 0; i < array.Length; i++)
+                {
+                    var mparam = new EffectObject.d3dx_parameter();
+
+                    mparam.name = string.Empty;
+                    mparam.semantic = string.Empty;
+                    mparam.type = param.type;
+                    mparam.class_ = param.class_;
+                    mparam.rows = param.rows;
+                    mparam.columns = param.columns;
+                    mparam.data = new byte[param.columns * param.rows * 4];
+
+                    param.member_handles[i] = mparam;
+                }
             }
 
             var byteSize = param.rows * param.columns * 4;
-
             var data = new byte[byteSize];
 
             // TODO: Default value?
 
             param.data = data;
-                        
+
             // Add the new parameter and resort by the
             // offset for some consistent results.
             Parameters.Add(param);
