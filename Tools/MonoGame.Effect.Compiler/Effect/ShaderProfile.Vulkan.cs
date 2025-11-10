@@ -330,8 +330,7 @@ namespace MonoGame.Effect
 
                             if (!shaderResult.ShaderInfo.SamplerStates.TryGetValue(samplerVariable.Name, out SamplerStateInfo samplerStateInfo))
                             {
-                                // TODO: should we just default the sampler state here?
-                                // would an exception be more appropriate?
+                                errorsAndWarnings += $"Could not find sampler state info for sampler '{samplerVariable.Name}'; using defaults\n";
                                 samplerStateInfo = new SamplerStateInfo();
                             }
 
