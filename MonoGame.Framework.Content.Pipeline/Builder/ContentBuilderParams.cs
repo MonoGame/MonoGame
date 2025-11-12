@@ -157,7 +157,7 @@ public class ContentBuilderParams
     /// Gets or sets the working directory of the <see cref="ContentBuilder"/>.
     /// </summary>
     /// <value><see cref="Directory.GetCurrentDirectory"/> by default.</value>
-    public string WorkingDirectory { get; set; } = Directory.GetCurrentDirectory();
+    public string WorkingDirectory { get; set; } = Directory.GetCurrentDirectory().SanitizeDirectory();
 
     /// <summary>
     /// Gets or sets the location of the content relative to the <see cref="WorkingDirectory"/>.
@@ -168,7 +168,7 @@ public class ContentBuilderParams
     /// <summary>
     /// Gets the rooted location of <see cref="SourceDirectory"/>.
     /// </summary>
-    public string RootedSourceDirectory => MakeRooted(SourceDirectory);
+    public string RootedSourceDirectory => MakeRooted(SourceDirectory).SanitizeDirectory();
 
     /// <summary>
     /// Gets or sets the location for the content output relative to the <see cref="WorkingDirectory"/>.
@@ -179,7 +179,7 @@ public class ContentBuilderParams
     /// <summary>
     /// Gets the rooted location of <see cref="OutputDirectory"/>.
     /// </summary>
-    public string RootedOutputDirectory => MakeRooted(OutputDirectory);
+    public string RootedOutputDirectory => MakeRooted(OutputDirectory).SanitizeDirectory();
 
     /// <summary>
     /// Gets or sets the location for the intermediate files for content build relative to the <see cref="WorkingDirectory"/>.
@@ -190,7 +190,7 @@ public class ContentBuilderParams
     /// <summary>
     /// Gets the rooted location of <see cref="IntermediateDirectory"/>.
     /// </summary>
-    public string RootedIntermediateDirectory => MakeRooted(IntermediateDirectory);
+    public string RootedIntermediateDirectory => MakeRooted(IntermediateDirectory).SanitizeDirectory();
 
     /// <summary>
     /// Gets or sets the desired platform for <see cref="ContentBuilder"/> to build the content for.

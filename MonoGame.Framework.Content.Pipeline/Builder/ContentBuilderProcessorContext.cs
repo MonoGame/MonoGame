@@ -13,8 +13,8 @@ class ContentBuilderProcessorContext(ContentBuilder builder, string relativePath
 
     private readonly string _relativeContentPath = relativePath.Sanitize();
 
-    private readonly string _outputDirectory = builder.Parameters.RootedOutputDirectory.SanitizeDirectory();
-    private readonly string _intermediateDirectory = builder.Parameters.RootedIntermediateDirectory.SanitizeDirectory();
+    private readonly string _outputDirectory = builder.Parameters.RootedOutputDirectory;
+    private readonly string _intermediateDirectory = builder.Parameters.RootedIntermediateDirectory;
 
     private readonly ContentIdentity _sourceIdentity = new ContentIdentity(sourceFilename: Path.Combine(builder.Parameters.RootedSourceDirectory, relativePath).Sanitize());
 
