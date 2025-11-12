@@ -264,7 +264,7 @@ jobs:
           echo '{ "sdk": { "version": "${{ env.DotnetVersion }}" } }' > global.json
 
       - name: Setup .NET Core SDK
-        uses: actions/setup-dotnet@v5
+        uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '${{ env.DotnetVersion }}'
 
