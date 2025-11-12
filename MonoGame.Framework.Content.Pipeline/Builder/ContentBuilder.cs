@@ -153,6 +153,11 @@ public abstract class ContentBuilder
             Directory.CreateDirectory(outputDir);
         }
 
+        if (!Directory.Exists(Parameters.IntermediateDirectory))
+        {
+            Directory.CreateDirectory(Parameters.IntermediateDirectory);
+        }
+
         Logger.Log($"Output: {relativeDestPath}");
 
         if (contentInfo.ShouldBuild) // ensure importer and processor are set

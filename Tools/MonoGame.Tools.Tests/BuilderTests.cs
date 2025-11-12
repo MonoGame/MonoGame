@@ -101,12 +101,15 @@ namespace MonoGame.Tests.ContentPipeline
             content.Exclude("Fonts/SegoeKeycaps.spritefont");
             content.Exclude("Fonts/Motorwerk.spritefont");
             content.Exclude("Fonts/QuartzMS.spritefont");
+            content.Exclude("Fonts/JingJing.spritefont");
+            content.Exclude("Fonts/Lindsey.spritefont");
 
             // These are not supported on DesktopGL.
             content.Exclude("Effects/CustomSpriteBatchEffectComparisonSampler.fx");
             content.Exclude("Effects/TextureArrayEffect.fx");
             content.Exclude("Effects/VertexTextureEffect.fx");
-
+            content.Exclude("Effects/ParameterTypes.fx");
+            
             // Required for this to build.
             content.Include("Effects/DefinesTest.fx",
                 new EffectImporter(),
@@ -172,8 +175,7 @@ namespace MonoGame.Tests.ContentPipeline
         [Test]
         public void BuildTest()
         {
-            var builder = new Builder();
-            builder.Run(new ContentBuilderParams
+            var args = new ContentBuilderParams
             {
                 CompressContent = false,
                 GraphicsProfile = Microsoft.Xna.Framework.Graphics.GraphicsProfile.HiDef,
@@ -185,7 +187,16 @@ namespace MonoGame.Tests.ContentPipeline
                 SourceDirectory = "Assets",
                 IntermediateDirectory = "BuilderIntermediateDir",
                 OutputDirectory = "BuilderOutputDir"
-            });
+            };
+
+            // Cleanup old stuff first.
+            if (Directory.Exists(args.RootedIntermediateDirectory))
+                Directory.Delete(args.RootedIntermediateDirectory, true);
+            if (Directory.Exists(args.RootedOutputDirectory))
+                Directory.Delete(args.RootedOutputDirectory, true);
+
+            var builder = new Builder();
+            builder.Run(args);
 
             var failures = builder.FailedToBuild;
             Assert.AreEqual(0, failures);
