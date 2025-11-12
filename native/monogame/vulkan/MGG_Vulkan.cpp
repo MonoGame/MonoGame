@@ -1229,12 +1229,22 @@ MGG_GraphicsDevice* MGG_GraphicsDevice_Create(MGG_GraphicsSystem* system, MGG_Gr
 	}
 
 	bool swapChainSupported = false;
+	bool scalarBlockLayoutSupported = false;
+	bool hlslFunctionalitySupported = false;
+	bool userTypeSupported = false;
+
 	for (const auto& extension : deviceExtensions)
 	{
 		if (strcmp(extension.extensionName, VK_KHR_SWAPCHAIN_EXTENSION_NAME) == 0)
 			swapChainSupported = true;
+		if (strcmp(extension.extensionName, VK_EXT_SCALAR_BLOCK_LAYOUT_EXTENSION_NAME) == 0)
+			scalarBlockLayoutSupported = true;
 		if (strcmp(extension.extensionName, VK_EXT_CUSTOM_BORDER_COLOR_EXTENSION_NAME) == 0)
 			device->customBorderColorSupported = system->supportsPhysicalDeviceProperties2EXT;
+		if (strcmp(extension.extensionName, VK_GOOGLE_HLSL_FUNCTIONALITY1_EXTENSION_NAME) == 0)
+			hlslFunctionalitySupported = true;
+		if (strcmp(extension.extensionName, VK_GOOGLE_USER_TYPE_EXTENSION_NAME) == 0)
+			userTypeSupported = true;
 	}
 
 	if (!swapChainSupported)
@@ -1243,8 +1253,19 @@ MGG_GraphicsDevice* MGG_GraphicsDevice_Create(MGG_GraphicsSystem* system, MGG_Gr
 		// This is a critical failure.
 		return nullptr;
 	}
+
+	// This is technically required by -fvk-use-dx-layout, but the driver may still accept it and it'll just work. It might also cause shader compilation failures, or insane rendering.
+	// This has pretty good coverage.
+	if (!scalarBlockLayoutSupported) 
+		printf("%s is not supported by this driver!\n", VK_EXT_SCALAR_BLOCK_LAYOUT_EXTENSION_NAME);
 	if (!device->customBorderColorSupported) // We can live without this extention.
 		printf("%s is not supported by this driver!\n", VK_EXT_CUSTOM_BORDER_COLOR_EXTENSION_NAME);
+	// This is only required for reflection information when compiling shaders, so worst case it's just a validation failure. TODO: Potentially look at stripping this from the SPIR-V?
+	if (!hlslFunctionalitySupported) 
+		printf("%s is not supported by this driver!\n", VK_GOOGLE_HLSL_FUNCTIONALITY1_EXTENSION_NAME);
+	// This is the same as above - fine if it's not there.
+	if (!userTypeSupported) 
+		printf("%s is not supported by this driver!\n", VK_GOOGLE_USER_TYPE_EXTENSION_NAME);
 
 	std::vector<const char*> extensions;
 	extensions.push_back(VK_KHR_SWAPCHAIN_EXTENSION_NAME);
@@ -1262,24 +1283,37 @@ MGG_GraphicsDevice* MGG_GraphicsDevice_Create(MGG_GraphicsSystem* system, MGG_Gr
 	VkDeviceCreateInfo deviceCreateInfo = { VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO };
 	deviceCreateInfo.queueCreateInfoCount = 1;
 	deviceCreateInfo.pQueueCreateInfos = &queueCreateInfo;
-	
-	if (!device->customBorderColorSupported)
-	{
-		deviceCreateInfo.pEnabledFeatures = &enabledFeatures;
-		deviceCreateInfo.pNext = nullptr;
-	}
-	else
+	deviceCreateInfo.pEnabledFeatures = &enabledFeatures;
+
+	void* lastFeature = nullptr;
+
+	if (device->customBorderColorSupported)
 	{
 		extensions.push_back(VK_EXT_CUSTOM_BORDER_COLOR_EXTENSION_NAME);
-		VkPhysicalDeviceCustomBorderColorFeaturesEXT customBorderColorFeatures = {};
-		customBorderColorFeatures.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_CUSTOM_BORDER_COLOR_FEATURES_EXT;
+		VkPhysicalDeviceCustomBorderColorFeaturesEXT customBorderColorFeatures = { VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_CUSTOM_BORDER_COLOR_FEATURES_EXT };
 		customBorderColorFeatures.customBorderColors = VK_TRUE;
 		customBorderColorFeatures.customBorderColorWithoutFormat = VK_TRUE;
+		customBorderColorFeatures.pNext = lastFeature;
+		lastFeature = &customBorderColorFeatures;
+	}
+	if (scalarBlockLayoutSupported)
+	{
+		extensions.push_back(VK_EXT_SCALAR_BLOCK_LAYOUT_EXTENSION_NAME);
+		VkPhysicalDeviceScalarBlockLayoutFeatures scalarFeatures = { VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SCALAR_BLOCK_LAYOUT_FEATURES };
+		scalarFeatures.scalarBlockLayout = VK_TRUE;
+		scalarFeatures.pNext = lastFeature;
+		lastFeature = &scalarFeatures;
+	}
+	if (hlslFunctionalitySupported)
+		extensions.push_back(VK_GOOGLE_HLSL_FUNCTIONALITY1_EXTENSION_NAME);
+	if (userTypeSupported)
+		extensions.push_back(VK_GOOGLE_USER_TYPE_EXTENSION_NAME);
 
-		VkPhysicalDeviceFeatures2 deviceFeatures2 = {};
-		deviceFeatures2.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2;
+	if (lastFeature != nullptr)
+	{
+		VkPhysicalDeviceFeatures2 deviceFeatures2 = { VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2 };
 		deviceFeatures2.features = enabledFeatures;
-		deviceFeatures2.pNext = &customBorderColorFeatures;
+		deviceFeatures2.pNext = lastFeature;
 
 		deviceCreateInfo.pEnabledFeatures = nullptr;
 		deviceCreateInfo.pNext = &deviceFeatures2;
