@@ -63,6 +63,17 @@ namespace MonoGame.Tests.ContentPipeline
             content.Exclude("Models/Dude/dude.fbx");
             content.Exclude("Models/level1.fbx");
 
+            // These fail on some platforms without these
+            // fonts installed... so skip them.
+            content.Exclude("Fonts/SegoeKeycaps.spritefont");
+            content.Exclude("Fonts/Motorwerk.spritefont");
+            content.Exclude("Fonts/QuartzMS.spritefont");
+
+            // These are not supported on DesktopGL.
+            content.Exclude("Effects/CustomSpriteBatchEffectComparisonSampler.fx");
+            content.Exclude("Effects/TextureArrayEffect.fx");
+            content.Exclude("Effects/VertexTextureEffect.fx");
+
             // Required for this to build.
             content.Include("Effects/DefinesTest.fx",
                 new EffectImporter(),
@@ -135,7 +146,7 @@ namespace MonoGame.Tests.ContentPipeline
                 GraphicsProfile = Microsoft.Xna.Framework.Graphics.GraphicsProfile.HiDef,
                 LogLevel = LogLevel.Debug,
                 Mode = ContentBuilderMode.Builder,
-                Platform = TargetPlatform.Windows,
+                Platform = TargetPlatform.DesktopGL,
                 Rebuild = true,
                 WorkingDirectory = Directory.GetCurrentDirectory(),
                 SourceDirectory = "Assets",
