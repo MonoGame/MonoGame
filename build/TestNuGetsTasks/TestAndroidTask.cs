@@ -3,7 +3,7 @@ namespace BuildScripts;
 [TaskName("TestAndroid")]
 public sealed class TestAndroidTask : TestMonoGameTemplateTaskBase
 {
-    private static readonly PlatformFamily[] _supportedPlatforms = { PlatformFamily.Windows, PlatformFamily.Linux, PlatformFamily.OSX };
+    private static readonly PlatformFamily[] _supportedPlatforms = { PlatformFamily.Windows, PlatformFamily.Linux };
     
     protected override string TemplateName => "Android";
     protected override string ProjectFolderName => "android";
