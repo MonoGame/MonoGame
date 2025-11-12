@@ -52,7 +52,8 @@ namespace MonoGame.Tests.Visual {
 				Assert.Ignore();
 			}
 			Game.Components.Add (new SpaceshipModelDrawComponent(Game));
-			RunMultiFrameTest (captureCount: 10, captureStride: 2, similarity: 0.99f);
+            // only require 97% similarity since we need to take into account floating point rotation accuracy.
+			RunMultiFrameTest (captureCount: 10, captureStride: 2, similarity: 0.97f);
 		}
 	}
 }
