@@ -7,7 +7,7 @@ concurrency:
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 env:
-  DotnetVersion: 8.0.404
+  DotnetVersion: 10.0.0
   
 jobs:
   build:
@@ -123,17 +123,7 @@ jobs:
           CI: true
         shell: bash
 
-      - name: Generate global.json
-        run: |
-          echo '{ "sdk": { "version": "9.0.x" } }' > global.json
-
-      - name: Setup .NET Core SDK
-        uses: actions/setup-dotnet@v5
-        with:
-          dotnet-version: |
-            9.0.x
-
-      - name: Setup DotNet on MacOS for DotNet 9
+      - name: Setup DotNet on MacOS
         if: runner.environment == 'github-hosted' && runner.os == 'macos'
         run: |
           dotnet workload install android macos ios
