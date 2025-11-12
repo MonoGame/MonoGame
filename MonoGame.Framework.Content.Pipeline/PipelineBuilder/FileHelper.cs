@@ -34,9 +34,12 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
         /// <summary>
         /// Fixes the incoming path to have the default directory seperators for the current platform.
         /// </summary>
-        public static string NormalizeDirectorySeparators(string path)
+        public static string NormalizeSeparators(string path, bool isDirectory = false)
         {
-            return path.Replace(NotSeparator, Separator);
+            path = path.Replace(NotSeparator, Separator);
+            if (isDirectory && !path.EndsWith(Separator))
+                path += Separator;
+            return path;
         }
 
         /// <summary>

@@ -16,7 +16,7 @@ class ContentBuilderProcessorContext(ContentBuilder builder, string relativePath
     private readonly string _outputDirectory = builder.Parameters.RootedOutputDirectory;
     private readonly string _intermediateDirectory = builder.Parameters.RootedIntermediateDirectory;
 
-    private readonly ContentIdentity _sourceIdentity = new ContentIdentity(sourceFilename: Path.Combine(builder.Parameters.RootedSourceDirectory, relativePath).Sanitize());
+    private readonly ContentIdentity _sourceIdentity = new ContentIdentity(sourceFilename: FileHelper.NormalizeSeparators(Path.Combine(builder.Parameters.RootedSourceDirectory, relativePath)));
 
     private readonly ContentInfo _contentInfo = contentInfo;
 
@@ -34,7 +34,7 @@ class ContentBuilderProcessorContext(ContentBuilder builder, string relativePath
 
     public override string OutputDirectory => _outputDirectory;
 
-    public override string OutputFilename { get; } = outputFilename;
+    public override string OutputFilename { get; } = FileHelper.NormalizeSeparators(outputFilename);
 
     public override OpaqueDataDictionary Parameters { get; } = [];
 

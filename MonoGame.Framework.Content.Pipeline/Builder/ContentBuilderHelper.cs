@@ -337,22 +337,5 @@ static class ContentBuilderHelper
 
         return filePath.Replace('\\', '/');
     }
-
-    public static string SanitizeDirectory(this string filePath)
-    {
-        if (string.IsNullOrEmpty(filePath))
-        {
-            return filePath;
-        }
-
-        // Convert to forward slashes.
-        filePath = filePath.Replace('\\', '/');
-
-        // Make sure the path ends in a forward slash.
-        if (!filePath.EndsWith('/'))
-            filePath += "/";
-
-        return filePath;
-    }
 }
 

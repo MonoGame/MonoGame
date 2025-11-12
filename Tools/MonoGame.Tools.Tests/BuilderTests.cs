@@ -24,6 +24,18 @@ namespace MonoGame.Tests.ContentPipeline
     {
         public override TestAsset Import(string filename, ContentImporterContext context)
         {
+            Assert.NotNull(filename);
+            Assert.IsTrue(File.Exists(filename));
+            Assert.IsFalse(filename.Contains(FileHelper.NotSeparator));
+
+            Assert.NotNull(context);
+            Assert.IsTrue(Directory.Exists(context.IntermediateDirectory));
+            Assert.IsTrue(context.IntermediateDirectory.EndsWith(FileHelper.Separator));
+            Assert.IsFalse(context.IntermediateDirectory.Contains(FileHelper.NotSeparator));
+            Assert.IsTrue(Directory.Exists(context.OutputDirectory));
+            Assert.IsTrue(context.OutputDirectory.EndsWith(FileHelper.Separator));
+            Assert.IsFalse(context.OutputDirectory.Contains(FileHelper.NotSeparator));
+
             var asset = new TestAsset();
             return asset;
         }
@@ -33,8 +45,29 @@ namespace MonoGame.Tests.ContentPipeline
     {
         public override TestContent Process(TestAsset input, ContentProcessorContext context)
         {
-            var content = new TestContent();
+            Assert.NotNull(context);
 
+            Assert.IsTrue(Directory.Exists(context.IntermediateDirectory));
+            Assert.IsTrue(context.IntermediateDirectory.EndsWith(FileHelper.Separator));
+            Assert.IsFalse(context.IntermediateDirectory.Contains(FileHelper.NotSeparator));
+            Assert.IsTrue(Directory.Exists(context.OutputDirectory));
+            Assert.IsTrue(context.OutputDirectory.EndsWith(FileHelper.Separator));
+            Assert.IsFalse(context.OutputDirectory.Contains(FileHelper.NotSeparator));
+
+            Assert.NotNull(context.OutputFilename);
+            Assert.IsFalse(context.OutputFilename.Contains(FileHelper.NotSeparator));
+
+            Assert.NotNull(context.SourceIdentity);
+            Assert.NotNull(context.SourceIdentity.SourceFilename);
+            Assert.IsTrue(File.Exists(context.SourceIdentity.SourceFilename));
+            Assert.IsFalse(context.SourceIdentity.SourceFilename.Contains(FileHelper.NotSeparator));
+
+            Assert.NotNull(context.ProjectDirectory);
+            Assert.IsTrue(Directory.Exists(context.ProjectDirectory));
+            Assert.IsTrue(context.ProjectDirectory.EndsWith(FileHelper.Separator));
+            Assert.IsFalse(context.ProjectDirectory.Contains(FileHelper.NotSeparator));
+
+            var content = new TestContent();
             return content;
         }
     }
@@ -79,7 +112,7 @@ namespace MonoGame.Tests.ContentPipeline
                 new EffectImporter(),
                 new EffectProcessor() { Defines = "MACRO_DEFINE_TEST=3" } ); 
 
-            //content.Include(@"Assets/*.*", new TestImporter(), new TestProcessor());
+            content.Include(@"Effects/VertexTextureEffect.fx", new TestImporter(), new TestProcessor());
 
             return content;
         }
@@ -93,7 +126,7 @@ namespace MonoGame.Tests.ContentPipeline
             if (append != null)
                 path = Path.Combine(path, append);
 
-            return FileHelper.NormalizeDirectorySeparators(path);
+            return FileHelper.NormalizeSeparators(path, true);
         }
 
         [Test]
@@ -112,7 +145,7 @@ namespace MonoGame.Tests.ContentPipeline
             Assert.AreEqual(false, args.SkipClean);
             Assert.IsTrue(Path.IsPathRooted(args.WorkingDirectory));
             Assert.AreEqual(Directory.GetCurrentDirectory(), args.WorkingDirectory);
-            Assert.AreEqual("Content", args.SourceDirectory);
+            Assert.AreEqual(MakePath("Content"), args.SourceDirectory);
             Assert.AreEqual(MakePath(Directory.GetCurrentDirectory(), "Content"), args.RootedSourceDirectory);
             Assert.AreEqual(MakePath("bin/Content"), args.OutputDirectory);
             Assert.AreEqual(MakePath(Directory.GetCurrentDirectory(), "bin\\Content"), args.RootedOutputDirectory);
@@ -130,7 +163,7 @@ namespace MonoGame.Tests.ContentPipeline
             );
             Assert.AreEqual(MakePath("../Some/Folder"), args.SourceDirectory);
             Assert.AreEqual(MakePath("Other/Folder"), args.OutputDirectory);
-            Assert.AreEqual("Folder", args.IntermediateDirectory);
+            Assert.AreEqual(MakePath("Folder"), args.IntermediateDirectory);
 
             args = ContentBuilderParams.Parse("server");
             Assert.AreEqual(ContentBuilderMode.Server, args.Mode);

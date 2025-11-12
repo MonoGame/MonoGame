@@ -157,7 +157,7 @@ public class ContentBuilderParams
     /// Gets or sets the working directory of the <see cref="ContentBuilder"/>.
     /// </summary>
     /// <value><see cref="Directory.GetCurrentDirectory"/> by default.</value>
-    public string WorkingDirectory { get; set; } = Directory.GetCurrentDirectory().SanitizeDirectory();
+    public string WorkingDirectory { get; set; } = Directory.GetCurrentDirectory();
 
     /// <summary>
     /// Gets or sets the location of the content relative to the <see cref="WorkingDirectory"/>.
@@ -168,7 +168,7 @@ public class ContentBuilderParams
     /// <summary>
     /// Gets the rooted location of <see cref="SourceDirectory"/>.
     /// </summary>
-    public string RootedSourceDirectory => MakeRooted(SourceDirectory).SanitizeDirectory();
+    public string RootedSourceDirectory => MakeRooted(SourceDirectory);
 
     /// <summary>
     /// Gets or sets the location for the content output relative to the <see cref="WorkingDirectory"/>.
@@ -179,7 +179,7 @@ public class ContentBuilderParams
     /// <summary>
     /// Gets the rooted location of <see cref="OutputDirectory"/>.
     /// </summary>
-    public string RootedOutputDirectory => MakeRooted(OutputDirectory).SanitizeDirectory();
+    public string RootedOutputDirectory => MakeRooted(OutputDirectory);
 
     /// <summary>
     /// Gets or sets the location for the intermediate files for content build relative to the <see cref="WorkingDirectory"/>.
@@ -190,7 +190,7 @@ public class ContentBuilderParams
     /// <summary>
     /// Gets the rooted location of <see cref="IntermediateDirectory"/>.
     /// </summary>
-    public string RootedIntermediateDirectory => MakeRooted(IntermediateDirectory).SanitizeDirectory();
+    public string RootedIntermediateDirectory => MakeRooted(IntermediateDirectory);
 
     /// <summary>
     /// Gets or sets the desired platform for <see cref="ContentBuilder"/> to build the content for.
@@ -305,16 +305,18 @@ public class ContentBuilderParams
         if (!Path.IsPathRooted(path))
             path = Path.Combine(WorkingDirectory, path);
 
-        return Path.GetFullPath(path);
+        path = Path.GetFullPath(path);
+
+        return FileHelper.NormalizeSeparators(path, true);
     }
 
     private static string MakeRelative(string workingDir, string path)
     {
         if (!Path.IsPathRooted(path))
-            return FileHelper.NormalizeDirectorySeparators(path);
+            return FileHelper.NormalizeSeparators(path, true);
 
         // Note this may still return an absolute path in the case
         // that these directories are on different drives.
-        return Path.GetRelativePath(workingDir, path);
+        return FileHelper.NormalizeSeparators(Path.GetRelativePath(workingDir, path), true);
     }
 }
