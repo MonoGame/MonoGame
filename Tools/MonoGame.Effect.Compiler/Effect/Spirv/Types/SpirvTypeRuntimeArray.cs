@@ -12,7 +12,7 @@ namespace MonoGame.Effect.Compiler.Effect.Spirv
         public override SpirvType Type => SpirvType.RuntimeArray;
         public SpirvTypeBase ElementType { get; private set; }
 
-        internal override void ParseArgs(string[] args, SpirvReflectionInfo.SpirvParseContext context)
+        protected override void ParseArgs(string[] args, SpirvReflectionInfo.SpirvParseContext context)
         {
             if (!context.Types.TryGetValue(args[0], out SpirvTypeBase type))
             {

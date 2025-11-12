@@ -12,9 +12,8 @@ namespace MonoGame.Effect.Compiler.Effect.Spirv
         public override SpirvType Type => SpirvType.Matrix;
         public SpirvTypeVector ColumnType { get; private set; }
         public uint Columns { get; private set; }
-        public uint Width => ColumnType.Width * Columns;
 
-        internal override void ParseArgs(string[] args, SpirvReflectionInfo.SpirvParseContext context)
+        protected override void ParseArgs(string[] args, SpirvReflectionInfo.SpirvParseContext context)
         {
             if (!context.Types.TryGetValue(args[0], out SpirvTypeBase opTypeBase))
             {

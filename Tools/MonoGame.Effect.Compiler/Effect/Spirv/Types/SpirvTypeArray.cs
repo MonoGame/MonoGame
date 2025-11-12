@@ -12,8 +12,9 @@ namespace MonoGame.Effect.Compiler.Effect.Spirv
         public override SpirvType Type => SpirvType.Array;
         public SpirvTypeBase ElementType { get; private set; }
         public uint Length { get; private set; }
+        public uint? ArrayStride { get; private set; }
 
-        internal override void ParseArgs(string[] args, SpirvReflectionInfo.SpirvParseContext context)
+        protected override void ParseArgs(string[] args, SpirvReflectionInfo.SpirvParseContext context)
         {
             if (!context.Types.TryGetValue(args[0], out SpirvTypeBase type))
             {     
@@ -29,6 +30,14 @@ namespace MonoGame.Effect.Compiler.Effect.Spirv
 
             ElementType = type;
             Length = (uint)constant.Value;
+        }
+
+        public override void ApplyDecoration(SpirvDecoration spirvDecoration)
+        {
+            if (spirvDecoration.Type == SpirvDecorationType.ArrayStride)
+            {
+                ArrayStride = uint.Parse(spirvDecoration.Args[0]);
+            }
         }
     }
 }
