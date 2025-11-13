@@ -590,8 +590,15 @@ namespace Microsoft.Xna.Framework.Graphics
         /// </exception>
 		public void SetValue (bool value)
 		{
+#if NATIVE
+            // DXC encodes bool parameters as uints, so to enable people to use the same type semantics as is declared in the shader,
+            // we should allow parameters of that type here.
+            if (ParameterClass != EffectParameterClass.Scalar || (ParameterType != EffectParameterType.Bool && ParameterType != EffectParameterType.Int32))
+                throw new InvalidCastException();
+#else
             if (ParameterClass != EffectParameterClass.Scalar || ParameterType != EffectParameterType.Bool)
                 throw new InvalidCastException();
+#endif
 
 #if OPENGL
             // MojoShader encodes even booleans into a float.

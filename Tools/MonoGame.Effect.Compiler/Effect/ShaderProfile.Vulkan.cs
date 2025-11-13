@@ -1,4 +1,4 @@
-﻿// MonoGame - Copyright (C) The MonoGame Team
+﻿// MonoGame - Copyright (C) MonoGame Foundation, Inc
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
@@ -7,13 +7,9 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
-using MonoGame.Effect.TPGParser;
 using Microsoft.Xna.Framework.Graphics;
-using System.Diagnostics;
-using System.Threading;
-using Microsoft.Xna.Framework.Content.Pipeline;
 using MonoGame.Tool;
-using System.Runtime.InteropServices;
+using MonoGame.Effect.Compiler.Effect.Spirv;
 
 namespace MonoGame.Effect
 {
@@ -44,19 +40,6 @@ namespace MonoGame.Effect
                     throw new Exception(String.Format("Invalid Vulkan pixel profile '{0}'! Requires ps_6_0.", pass.psModel));
             }
         }
-
-        class VkStructMember
-        {
-            public string name;
-            public int offset;
-            public string type;
-        };
-
-        class VkStruct
-        {
-            public string name;
-            public readonly Dictionary<int, VkStructMember> members = new Dictionary<int, VkStructMember>();
-        };
 
         enum VkDescriptorType : uint
         {
@@ -114,21 +97,6 @@ namespace MonoGame.Effect
             FLAG_BITS_MAX_ENUM = 0x7FFFFFFF
         };
 
-        class VkDescriptor
-        {
-            public string name;
-            public VkDescriptorType type;
-            public int set;
-            public int binding;
-        };
-
-        class VkInput
-        {
-            public string name;
-            public string type;
-            public int location;
-        };
-
         struct VkDescriptorSetLayoutBinding
         {
             public uint binding;
@@ -137,7 +105,7 @@ namespace MonoGame.Effect
             public VkShaderStageFlags stageFlags;
             public nint pImmutableSamplers;
         };
-        
+
         internal override ShaderData CreateShader(ShaderResult shaderResult, string shaderFunction, string shaderProfile, bool isVertexShader, EffectObject effect, ref string errorsAndWarnings)
         {
             const int SlotOffset = 32;
@@ -163,7 +131,7 @@ namespace MonoGame.Effect
             cleanup.Add(binFile);
             cleanup.Add(dbgFile);
             cleanup.Add(reflectFile);
-            
+
             try
             {
                 if (!Directory.Exists(intermediateDir))
@@ -185,6 +153,11 @@ namespace MonoGame.Effect
                 toolArgs += "-nologo ";
                 toolArgs += "-spirv ";
                 toolArgs += "-fvk-use-dx-layout ";
+
+                // Adds HLSL specific reflection information to the SPIR-V
+                // https://github.com/Microsoft/DirectXShaderCompiler/blob/main/docs/SPIR-V.rst#reflection
+                toolArgs += "-fspv-reflect ";
+
                 if (isVertexShader)
                 {
                     toolArgs += "-fvk-invert-y ";
@@ -211,18 +184,19 @@ namespace MonoGame.Effect
                     toolArgs += $"-fvk-t-shift {SlotOffset} 1 ";
                     toolArgs += $"-fvk-s-shift {SlotOffset} 1 ";
                 }
-                
+
                 //toolArgs += "-Qstrip_reflect ";
                 //toolArgs += "-fspv-reflect ";
                 toolArgs += "-T " + (isVertexShader ? "vs_" : "ps_") + "6_0 ";
                 toolArgs += "-E main ";
-                toolArgs += "-Fc \"" + reflectFile + "\" ";                
+                toolArgs += "-Fc \"" + reflectFile + "\" ";
                 toolArgs += "-Fo \"" + binFile + "\" ";
 
                 if (shaderResult.Debug)
                 {
                     toolArgs += "-Zi ";
-                    toolArgs += "-Fd \"" + dbgFile + "\" ";
+                    // Error: '-Fd cannot be used with -spirv' - investigate
+                    //toolArgs += "-Fd \"" + dbgFile + "\" ";
                 }
                 toolArgs += "\"" + hlslFile + "\"";
                 toolResult = Dxc.Run(toolArgs, out stdout, out stderr);
@@ -248,7 +222,8 @@ namespace MonoGame.Effect
                         return shader;
                 }
 
-                string reflectionData = File.ReadAllText(reflectFile);
+                string[] reflectionDataArray = File.ReadAllLines(reflectFile);
+                SpirvReflectionInfo reflectionInfo = SpirvReflectionInfo.Parse(reflectionDataArray);
 
                 // Keep the debug file if we are creating a new shader
                 // and debug shaders are enabled.
@@ -262,148 +237,105 @@ namespace MonoGame.Effect
 
                 // Create a new shader.
                 var shaderData = new ShaderData(isVertexShader, effect.Shaders.Count, bytecode);
-
-                // Gather all the vulkan reflection info.
-                var reader = new StringReader(reflectionData);
-                var names = new Dictionary<string, string>();
-                var structs = new Dictionary<string, VkStruct>();
-                var descriptors = new Dictionary<string, VkDescriptor>();
-                var inputs = new Dictionary<string, VkInput>();
-
-                while (true)
-                {
-                    var line = reader.ReadLine();
-                    if (line == null)
-                        break;
-
-                    var data = line.Trim().Split(' ');
-
-                    if (data[0] == "OpName")
-                    {
-                        var name = data[2].Trim(new[] { '\"' });
-                        var id = data[1];
-                        if (id.StartsWith("%in_var_"))
-                            inputs.Add(id, new VkInput { name = id.Substring(8) });
-                        else
-                            names.Add(id, name);
-                    }
-                    else if (data[0] == "OpMemberName")
-                    {
-                        var name = data[3].Trim(new[] { '\"' });
-                        var id = data[1];
-                        var index = int.Parse(data[2]);
-
-                        VkStruct s;
-                        if (!structs.TryGetValue(id, out s))
-                        {
-                            s = new VkStruct();
-                            s.name = names[id];
-                            structs.Add(id, s);
-                        }
-
-                        var member = new VkStructMember();
-                        member.name = name;
-                        s.members.Add(index, member);
-                    }
-                    else if (data[0] == "OpDecorate")
-                    {
-                        if (data[2] == "DescriptorSet")
-                        {
-                            VkDescriptor d;
-                            if (!descriptors.TryGetValue(data[1], out d))
-                            {
-                                d = new VkDescriptor();
-                                d.name = data[1];
-                                d.type = VkDescriptorType.UNIFORM_BUFFER;
-                                descriptors.Add(d.name, d);
-                            }
-
-                            d.set = int.Parse(data[3]);
-                        }
-                        else if (data[2] == "Binding")
-                        {
-                            VkDescriptor d;
-                            if (!descriptors.TryGetValue(data[1], out d))
-                            {
-                                d = new VkDescriptor();
-                                d.name = data[1];
-                                d.type = VkDescriptorType.UNIFORM_BUFFER;
-                                descriptors.Add(d.name, d);
-                            }
-
-                            d.binding = int.Parse(data[3]);
-                        }
-                        else if (data[1].StartsWith("%in_var_"))
-                        {
-                            inputs[data[1]].location = int.Parse(data[3]);
-                        }
-                    }
-                    else if (data[0] == "OpMemberDecorate")
-                    {
-                        var id = data[1];
-                        var index = int.Parse(data[2]);
-                        var s = structs[id];
-
-                        if (data[3] == "Offset")
-                        {
-                            var offset = int.Parse(data[4]);
-                            s.members[index].offset = offset;
-                        }
-                    }
-                    else if (data[0].StartsWith("%in_var_"))
-                    {
-                        inputs[data[0]].type = data[3].Substring(12);
-                    }
-                    else if (data[0].StartsWith("%"))
-                    {
-                        if (data[2] == "OpTypeStruct")
-                        {
-                            var id = data[0];
-                            var s = structs[id];
-
-                            for (int i=3; i < data.Length; i++)
-                                s.members[i - 3].type = data[i];
-                        }
-                        else if (data[2] == "OpVariable")
-                        {
-                            VkDescriptor d;
-                            if (descriptors.TryGetValue(data[0], out d))
-                            {
-                                if (data[3].EndsWith("_type_2d_image"))
-                                    d.type = VkDescriptorType.SAMPLED_IMAGE;
-                                else if (data[3].EndsWith("_type_sampler"))
-                                    d.type = VkDescriptorType.SAMPLER;
-                            }
-                        }
-                    }
-                }
-
-                var cbuffer = new ConstantBufferData("global");
-
-                // TODO: Support multiple constant buffers one day!
+                var samplers = new List<ShaderData.Sampler>();
 
                 int cbCount = 0;
-                VkStruct globals;
-                foreach (var descriptor in descriptors)
-                {
-                    // Find uniform buffers.
-                    if (descriptor.Value.type == VkDescriptorType.UNIFORM_BUFFER)
-                    {
-                        // Check if there is a corresponding struct.
-                        if (names.TryGetValue(descriptor.Key, out string name))
-                        {
-                            if (structs.TryGetValue("%type_" + name, out globals))
-                            {
-                                if (++cbCount > 1)
-                                {
-                                    errorsAndWarnings += "Building effects for Vulkan currently doesn't support more than one constant buffer (cbuffer) structures. Please consider refactoring your HLSL code.";
-                                    throw new ShaderCompilerException();
-                                }
+                var cbufferIndex = new List<int>();
 
-                                // Gather uniforms.
-                                foreach (var member in globals.members.Values)
-                                    cbuffer.AddParameter(member.name, member.type, 0, member.offset);
+                // we could have multiple descriptor sets in here, but we don't currently handle that
+                var withDescriptorSet = reflectionInfo.Variables.Where(v => v.DescriptorSet.HasValue);
+
+                foreach (SpirvVariable variable in withDescriptorSet)
+                {
+                    if (variable.Pointer.PointerType.Type == SpirvType.Struct)
+                    {
+                        // TODO: Look into multiple cbuffer support.
+                        if (cbCount > 0)
+                        {
+                            errorsAndWarnings += "Building effects for Vulkan currently doesn't support more than one constant buffer (cbuffer) structures. Please consider refactoring your HLSL code.";
+                            throw new ShaderCompilerException();
+                        }
+
+                        ConstantBufferData cbuffer = new ConstantBufferData("global");
+
+                        SpirvTypeStruct constantBuffer = variable.Pointer.PointerType as SpirvTypeStruct;
+
+                        foreach (SpirvTypeStructMember member in constantBuffer.Members)
+                            cbuffer.AddParameter(member);
+
+                        if (cbuffer.Size > 0)
+                        {
+                            var match = effect.ConstantBuffers.FindIndex(e => e.SameAs(cbuffer));
+
+                            if (match == -1)
+                            {
+                                cbufferIndex.Add(effect.ConstantBuffers.Count);
+                                effect.ConstantBuffers.Add(cbuffer);
                             }
+                            else
+                                cbufferIndex.Add(match);
+                        }
+
+                        cbCount++;
+                    }
+                    else if (variable.Pointer.PointerType.Type == SpirvType.Image)
+                    {
+                        // find all the times this image was sampled by distinct samplers.
+                        var sampledImages = reflectionInfo.SampledImages.Where(si => si.LoadedImage.Variable == variable)
+                            .DistinctBy(si => si.LoadedSampler.Variable);
+
+                        // and create a sampler parameter for each.
+                        foreach (var sampledImage in sampledImages)
+                        {
+                            // pull out what we need from the sampled image object
+                            var samplerVariable = sampledImage.LoadedSampler.Variable;
+                            var imageVariable = sampledImage.LoadedImage.Variable;
+
+                            var samplerType = samplerVariable.Pointer.PointerType as SpirvTypeSampler;
+                            var imageType = imageVariable.Pointer.PointerType as SpirvTypeImage;
+
+                            var sampler = new ShaderData.Sampler
+                            {
+                                samplerSlot = samplerVariable.BindingSlot.Value - SlotOffset,
+                                samplerName = samplerVariable.Name,
+                                textureSlot = imageVariable.BindingSlot.Value - SlotOffset,
+                            };
+
+                            // This image is only sampled by one sampler, we can safely use the texture name for the parameter.
+                            if (sampledImages.Count() == 1)
+                            {
+                                sampler.parameterName = imageVariable.Name;
+                            }
+                            // otherwise make a composite name for this image/sampler combo.
+                            else
+                            {
+                                sampler.parameterName = $"{samplerVariable.Name}+{imageVariable.Name}";
+                            }
+
+                            switch (imageType.Dimensionality)
+                            {
+                                case ImageDimensionality.OneD:
+                                    sampler.type = MojoShader.MOJOSHADER_samplerType.MOJOSHADER_SAMPLER_1D;
+                                    break;
+                                case ImageDimensionality.TwoD:
+                                    sampler.type = MojoShader.MOJOSHADER_samplerType.MOJOSHADER_SAMPLER_2D;
+                                    break;
+                                case ImageDimensionality.ThreeD:
+                                    sampler.type = MojoShader.MOJOSHADER_samplerType.MOJOSHADER_SAMPLER_VOLUME;
+                                    break;
+                                case ImageDimensionality.Cube:
+                                    sampler.type = MojoShader.MOJOSHADER_samplerType.MOJOSHADER_SAMPLER_CUBE;
+                                    break;
+                            }
+
+                            if (!shaderResult.ShaderInfo.SamplerStates.TryGetValue(samplerVariable.Name, out SamplerStateInfo samplerStateInfo))
+                            {
+                                errorsAndWarnings += $"Could not find sampler state info for sampler '{samplerVariable.Name}'; using defaults\n";
+                                samplerStateInfo = new SamplerStateInfo();
+                            }
+
+                            sampler.state = samplerStateInfo.State;
+                            samplers.Add(sampler);
                         }
                     }
                 }
@@ -413,13 +345,14 @@ namespace MonoGame.Effect
                 if (isVertexShader)
                 {
                     // Sort by the location.
-                    var sorted = inputs.Values.OrderBy(f=>f.location);
+                    var sorted = reflectionInfo.Input.OrderBy(i => i.Location);
 
-                    foreach (var input in sorted)
+                    foreach (SpirvVariable input in sorted)
                     {
                         var a = new ShaderData.Attribute();
+                        var semanticId = input.HlslSemantic ?? input.Id.Replace("%in_var_", "");
 
-                        var m = Regex.Match(input.name, @"(\D+)(\d+)?");
+                        var m = Regex.Match(semanticId, @"(\D+)(\d+)?");
                         if (m.Groups[2].Success)
                             a.index = int.Parse(m.Groups[2].Value);
                         else
@@ -465,7 +398,7 @@ namespace MonoGame.Effect
                                 case "TESSELLATEFACTOR":
                                     a.usage = VertexElementUsage.TessellateFactor;
                                     break;
-                            }                        
+                            }
                         }
 
                         // TODO: These are unused at runtime under the
@@ -477,150 +410,86 @@ namespace MonoGame.Effect
                     }
                 }
 
-                // Now gather the samplers.
-                var samplers = new List<ShaderData.Sampler>();
-                foreach (var d in descriptors.Values)
-                {
-                    // TODO: This seems like it is maybe backwards
-                    // and i should be looking for samplers for textures?
-
-                    if (d.type != VkDescriptorType.SAMPLER)
-                        continue;
-
-                    var s = new ShaderData.Sampler();
-                    s.samplerSlot = d.binding;
-                    s.samplerName = names[d.name];
-
-                    s.type = MojoShader.MOJOSHADER_samplerType.MOJOSHADER_SAMPLER_2D;
-                    //if (data[0] == "SAMPLER3D")
-                        //s.type = MojoShader.MOJOSHADER_samplerType.MOJOSHADER_SAMPLER_VOLUME;
-                    //else if (data[0] == "SAMPLERCUBE")
-                        //s.type = MojoShader.MOJOSHADER_samplerType.MOJOSHADER_SAMPLER_CUBE;
-
-                    foreach (var td in descriptors.Values)
-                    {
-                        if (td.binding == s.samplerSlot)
-                        {
-                            s.textureSlot = td.binding - SlotOffset;
-                            s.parameterName = names[td.name];
-                            break;
-                        }
-                    }
-
-                    s.samplerSlot -= SlotOffset;
-
-                    // Associate sampler state to the sampler.
-                    SamplerStateInfo state;
-                    if (shaderResult.ShaderInfo.SamplerStates.TryGetValue(s.samplerName, out state))
-                    {
-                        s.parameterName = s.parameterName ?? state.TextureName;
-                        s.state = state.State;
-                        samplers.Add(s);
-                        continue;
-                    }
-
-                    s.parameterName = s.parameterName ?? s.samplerName;
-                    s.state = state.State;
-                    samplers.Add(s);
-                }
-
                 shaderData._samplers = samplers.ToArray();
-
-                // Look for existing matching constant buffers.
-                var cbufferIndex = new List<int>();
-                if (cbuffer.Size > 0)
-                {
-                    var match = effect.ConstantBuffers.FindIndex(e => e.SameAs(cbuffer));
-                    if (match == -1)
-                    {
-                        cbufferIndex.Add(effect.ConstantBuffers.Count);
-                        effect.ConstantBuffers.Add(cbuffer);
-                    }
-                    else
-                        cbufferIndex.Add(match);
-                }
                 shaderData._cbuffers = cbufferIndex.ToArray();
-
                 shaderData._attributes = attributes.ToArray();
 
                 // Generate the layout bindings from our cbuffers, samplers, and textures.
+                using (var stream = new MemoryStream())
+                using (var writer = new BinaryWriter(stream))
                 {
-                    using (var stream = new MemoryStream())
-                    using (var writer = new BinaryWriter(stream))
+                    var bindings = new List<VkDescriptorSetLayoutBinding>();
+
+                    VkDescriptorSetLayoutBinding binding;
+                    binding.stageFlags = isVertexShader ? VkShaderStageFlags.VERTEX_BIT : VkShaderStageFlags.FRAGMENT_BIT;
+                    binding.pImmutableSamplers = 0;
+                    binding.descriptorCount = 1;
+
+                    // Write the number of uniform buffers
+                    writer.Write(cbufferIndex.Count);
+
+                    uint uniformSlots = 0;
+                    uint textureSlots = 0;
+                    uint samplerSlots = 0;
+
+                    // We just have one cbuffer at 0 right now.
+                    if (cbufferIndex.Count > 0)
                     {
-                        var bindings = new List<VkDescriptorSetLayoutBinding>();
-
-                        VkDescriptorSetLayoutBinding binding;
-                        binding.stageFlags = isVertexShader ? VkShaderStageFlags.VERTEX_BIT : VkShaderStageFlags.FRAGMENT_BIT;
-                        binding.pImmutableSamplers = 0;
-                        binding.descriptorCount = 1;
-
-                        // Write the number of uniform buffers
-                        writer.Write(cbufferIndex.Count);
-
-                        uint uniformSlots = 0;
-                        uint textureSlots = 0;
-                        uint samplerSlots = 0;
-
-                        // We just have one cbuffer at 0 right now.
-                        if (cbufferIndex.Count > 0)
-                        {
-                            uniformSlots |= 1 << 0;
-                            binding.binding = 0;
-                            binding.descriptorType = VkDescriptorType.UNIFORM_BUFFER_DYNAMIC;
-                            bindings.Add(binding);
-                        }
-
-                        foreach (var s in samplers)
-                        {
-                            if (s.textureSlot == s.samplerSlot)
-                            {
-                                textureSlots |= (uint)(1 << s.textureSlot);
-                                samplerSlots |= (uint)(1 << s.textureSlot);
-                                binding.binding = (uint)(s.textureSlot + SlotOffset);
-                                binding.descriptorType = VkDescriptorType.COMBINED_IMAGE_SAMPLER;
-                                bindings.Add(binding);
-
-                                continue;
-                            }
-
-                            samplerSlots |= (uint)(1 << s.samplerSlot);
-                            binding.binding = (uint)(s.samplerSlot + SlotOffset);
-                            binding.descriptorType = VkDescriptorType.SAMPLER;
-                            bindings.Add(binding);
-
-                            textureSlots |= (uint)(1 << s.textureSlot);
-                            binding.binding = (uint)(s.textureSlot + SlotOffset);
-                            binding.descriptorType = VkDescriptorType.SAMPLED_IMAGE;
-                            bindings.Add(binding);
-                        }
-
-                        // Write the slot bits.
-                        writer.Write(uniformSlots);
-                        writer.Write(textureSlots);
-                        writer.Write(samplerSlots);
-
-                        // Write the bindings.
-                        writer.Write((uint)bindings.Count);
-                        foreach (var b in bindings)
-                        {
-                            writer.Write(b.binding);
-                            writer.Write((uint)b.descriptorType);
-                            writer.Write(b.descriptorCount);
-                            writer.Write((uint)b.stageFlags);
-                            writer.Write((UInt64)b.pImmutableSamplers);
-                        }
-
-                        // Finally write the shader bytecode.
-                        writer.Write(shaderData.Bytecode);
-
-                        // Store the combined binding layout info and shader code.
-                        shaderData.ShaderCode = stream.ToArray();
+                        uniformSlots |= 1 << 0;
+                        binding.binding = 0;
+                        binding.descriptorType = VkDescriptorType.UNIFORM_BUFFER_DYNAMIC;
+                        bindings.Add(binding);
                     }
+
+                    foreach (var s in samplers)
+                    {
+                        if (s.textureSlot == s.samplerSlot)
+                        {
+                            textureSlots |= (uint)(1 << s.textureSlot);
+                            samplerSlots |= (uint)(1 << s.textureSlot);
+                            binding.binding = (uint)(s.textureSlot + SlotOffset);
+                            binding.descriptorType = VkDescriptorType.COMBINED_IMAGE_SAMPLER;
+                            bindings.Add(binding);
+
+                            continue;
+                        }
+
+                        samplerSlots |= (uint)(1 << s.samplerSlot);
+                        binding.binding = (uint)(s.samplerSlot + SlotOffset);
+                        binding.descriptorType = VkDescriptorType.SAMPLER;
+                        bindings.Add(binding);
+
+                        textureSlots |= (uint)(1 << s.textureSlot);
+                        binding.binding = (uint)(s.textureSlot + SlotOffset);
+                        binding.descriptorType = VkDescriptorType.SAMPLED_IMAGE;
+                        bindings.Add(binding);
+                    }
+
+                    // Write the slot bits.
+                    writer.Write(uniformSlots);
+                    writer.Write(textureSlots);
+                    writer.Write(samplerSlots);
+
+                    // Write the bindings.
+                    writer.Write((uint)bindings.Count);
+                    foreach (var b in bindings)
+                    {
+                        writer.Write(b.binding);
+                        writer.Write((uint)b.descriptorType);
+                        writer.Write(b.descriptorCount);
+                        writer.Write((uint)b.stageFlags);
+                        writer.Write((UInt64)b.pImmutableSamplers);
+                    }
+
+                    // Finally write the shader bytecode.
+                    writer.Write(shaderData.Bytecode);
+
+                    // Store the combined binding layout info and shader code.
+                    shaderData.ShaderCode = stream.ToArray();
                 }
 
                 effect.Shaders.Add(shaderData);
-                                
+
                 return shaderData;
             }
             finally
