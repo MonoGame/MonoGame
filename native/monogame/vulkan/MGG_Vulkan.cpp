@@ -1589,9 +1589,9 @@ void MGVK_RecreateSwapChain(
 	device->colorFormat = vkColor;
 	device->depthFormat = vkDepth;
 
+	// Check if the requested color format is supported, and fallback to another one otherwise.
+	VkFormat surface_format = VK_FORMAT_UNDEFINED;
 	{
-		// Check if the requested color format is supported, and fallback to another one otherwise.
-		VkFormat surface_format = VK_FORMAT_UNDEFINED;
 		uint32_t format_count = 0;
 		res = vkGetPhysicalDeviceSurfaceFormatsKHR(device->physicalDevice, device->surface, &format_count, nullptr);
 		VK_CHECK_RESULT(res);
@@ -1600,20 +1600,34 @@ void MGVK_RecreateSwapChain(
 		res = vkGetPhysicalDeviceSurfaceFormatsKHR(device->physicalDevice, device->surface, &format_count, surfFormats.data());
 		VK_CHECK_RESULT(res);
 
+	RETRY_SURFACE_FORMAT_SEARCH:
+
 		for (const auto& surfFormat : surfFormats)
 		{
-			if (surfFormat.format == vkColor &&
-				surfFormat.colorSpace == VK_COLOR_SPACE_SRGB_NONLINEAR_KHR)
-			{
-				// The expected format is supported
-				surface_format = surfFormat.format;
-				break;
-			}
+			if (surfFormat.colorSpace != VK_COLOR_SPACE_SRGB_NONLINEAR_KHR)
+				continue;
+			if (surfFormat.format != vkColor)
+				continue;
+
+			// The expected format is supported.
+			surface_format = surfFormat.format;
+			break;
+		}
+
+		// Some hardware only supports BGRA.
+		// For the swapchain allow BGRA to match to RGBA.
+		if (surface_format == VK_FORMAT_UNDEFINED && vkColor == VK_FORMAT_R8G8B8A8_UNORM)
+		{
+			vkColor = VK_FORMAT_B8G8R8A8_UNORM;
+			goto RETRY_SURFACE_FORMAT_SEARCH;
 		}
 
 		if (surface_format == VK_FORMAT_UNDEFINED)
 		{
-			// Format is unsupported, what should we do?
+			// TODO: We need a better "log" method that isn't just printfs.
+			// TODO: Would be nice to log the unsupported surface format.
+
+			printf("Requested swapchain format was unsupported!\n");
 			return;
 		}
 	}
@@ -1669,7 +1683,7 @@ void MGVK_RecreateSwapChain(
 
 	VkSwapchainCreateInfoKHR create_info = { VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR };
 	create_info.surface = device->surface;
-	create_info.imageFormat = device->colorFormat;
+	create_info.imageFormat = surface_format;
 	create_info.imageColorSpace = VK_COLOR_SPACE_SRGB_NONLINEAR_KHR;
 	create_info.imageExtent = extent;
 	create_info.imageArrayLayers = 1;
@@ -1774,7 +1788,7 @@ void MGVK_RecreateSwapChain(
 	{
 		VkImageCreateInfo image_create_info = { VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO };
 		image_create_info.imageType = VK_IMAGE_TYPE_2D;
-		image_create_info.format = device->colorFormat;
+		image_create_info.format = surface_format;
 		image_create_info.extent = { device->swapchainWidth, device->swapchainHeight, 1 };
 		image_create_info.mipLevels = 1;
 		image_create_info.arrayLayers = 1;
