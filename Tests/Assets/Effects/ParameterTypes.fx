@@ -22,6 +22,8 @@ float3 Vec3Array[3];
 float4 Vec4;
 float4 Vec4Array[3];
 
+float3x3 Mat3x3;
+
 struct VInput
 {
     float4 pos : POSITION;
@@ -71,17 +73,24 @@ float4 PShaderIntArray(PInput input) : SV_TARGET0
 
 float4 PShaderMat(PInput input) : SV_TARGET0
 {
-    int col = int(input.tx.x * 4.0f);
+    int row = int(input.tx.x * 4.0f);
     
-    return Mat[col];
+    return Mat[row];
+}
+
+float4 PShaderMat3x3(PInput input) : SV_TARGET0
+{
+    int row = int(input.tx.x * 3.0f);
+    
+    return float4(Mat3x3[row], 1.0f);
 }
 
 float4 PShaderMatArray(PInput input) : SV_TARGET0
 {
     int idx = int(input.tx.y * 3.0f);
-    int col = int(input.tx.x * 4.0f);
+    int row = int(input.tx.x * 4.0f);
         
-    return MatArray[idx][col];
+    return MatArray[idx][row];
 }
 
 float4 PShaderQuat(PInput input) : SV_TARGET0
@@ -177,6 +186,7 @@ TECHNIQUE(TestBoolean, VShader, PShaderBoolean);
 TECHNIQUE(TestInt, VShader, PShaderInt);
 TECHNIQUE(TestIntArray, VShader, PShaderIntArray);
 TECHNIQUE(TestMat, VShader, PShaderMat);
+TECHNIQUE(TestMat3x3, VShader, PShaderMat3x3);
 TECHNIQUE(TestMatArray, VShader, PShaderMatArray);
 TECHNIQUE(TestQuat, VShader, PShaderQuat);
 TECHNIQUE(TestFloat, VShader, PShaderFloat);

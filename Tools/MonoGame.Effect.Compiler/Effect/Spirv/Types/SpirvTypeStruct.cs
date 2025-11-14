@@ -4,6 +4,7 @@
 
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 
 namespace MonoGame.Effect.Compiler.Effect.Spirv
 {
@@ -12,14 +13,18 @@ namespace MonoGame.Effect.Compiler.Effect.Spirv
         public int Index { get; init; }
         public SpirvTypeBase Type { get; init; }
         public string Name { get; init; }
-        public int? Offset { get; private set; }
+        public uint? Offset { get; private set; }
+        public uint? MatrixStride { get; private set; }
 
         internal void ApplyDecoration(SpirvDecoration decoration)
         {
             switch (decoration.Type)
             {
                 case SpirvDecorationType.Offset:
-                    Offset = int.Parse(decoration.Args[0]);
+                    Offset = uint.Parse(decoration.Args[0]);
+                    break;
+                case SpirvDecorationType.MatrixStride:
+                    MatrixStride = uint.Parse(decoration.Args[0]);
                     break;
             }
         }
@@ -31,7 +36,7 @@ namespace MonoGame.Effect.Compiler.Effect.Spirv
         public override SpirvType Type => SpirvType.Struct;
         public List<SpirvTypeStructMember> Members { get; private set; }
 
-        internal override void ParseArgs(string[] args, SpirvReflectionInfo.SpirvParseContext context)
+        protected override void ParseArgs(string[] args, SpirvReflectionInfo.SpirvParseContext context)
         {
             Members = [];
 

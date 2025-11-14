@@ -32,7 +32,15 @@ namespace MonoGame.Effect.Compiler.Effect.Spirv
         public abstract SpirvType Type { get; }
         public string Id { get; private set; }
         public string Name { get; private set; }
-        public List<SpirvDecoration> Decorations { get; } = [];
+
+        public override string ToString()
+        {
+            return $"{Type} {Name ?? Id}";
+        }
+
+        public virtual void ApplyDecoration(SpirvDecoration spirvDecoration)
+        {
+        }
 
         private void Parse(string[] parts, SpirvReflectionInfo.SpirvParseContext context)
         {
@@ -46,13 +54,8 @@ namespace MonoGame.Effect.Compiler.Effect.Spirv
             ParseArgs(parts[3..], context);
         }
 
-        internal virtual void ParseArgs(string[] args, SpirvReflectionInfo.SpirvParseContext context)
+        protected virtual void ParseArgs(string[] args, SpirvReflectionInfo.SpirvParseContext context)
         {
-        }
-
-        public override string ToString()
-        {
-            return $"{Type} {Name ?? Id}";
         }
 
         internal static SpirvTypeBase ParseType(string[] parts, SpirvReflectionInfo.SpirvParseContext context)

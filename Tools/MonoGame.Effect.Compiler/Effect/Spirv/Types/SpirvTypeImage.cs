@@ -34,7 +34,7 @@ namespace MonoGame.Effect.Compiler.Effect.Spirv
         // https://registry.khronos.org/SPIR-V/specs/unified1/SPIRV.html#Image_Format
         public string ImageFormat { get; private set; }
 
-        internal override void ParseArgs(string[] args, SpirvReflectionInfo.SpirvParseContext context)
+        protected override void ParseArgs(string[] args, SpirvReflectionInfo.SpirvParseContext context)
         {
             if (!context.Types.TryGetValue(args[0], out SpirvTypeBase sampleType))
             {

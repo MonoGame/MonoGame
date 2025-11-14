@@ -16,7 +16,7 @@ namespace MonoGame.Effect.Compiler.Effect.Spirv
         public SpirvTypePointer Pointer { get; set; }
         public StorageClass StorageClass { get; set; }
         public List<SpirvDecoration> Decorations { get; private set; } = [];
-        public int? BindingSlot { get; private set; }
+        public uint? BindingSlot { get; private set; }
         public uint? DescriptorSet { get; private set; }
         public uint? Location { get; private set; }
         public string HlslSemantic { get; private set; }
@@ -61,7 +61,7 @@ namespace MonoGame.Effect.Compiler.Effect.Spirv
             switch (spirvDecoration.Type)
             {
                 case SpirvDecorationType.Binding:
-                    BindingSlot = int.Parse(spirvDecoration.Args[0]);
+                    BindingSlot = uint.Parse(spirvDecoration.Args[0]);
                     break;
                 case SpirvDecorationType.DescriptorSet:
                     DescriptorSet = uint.Parse(spirvDecoration.Args[0]);

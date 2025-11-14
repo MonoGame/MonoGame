@@ -214,6 +214,28 @@ namespace MonoGame.Tests.Graphics
 
         [Test]
         [RunOnUI]
+        public void Matrix3x3Parameter()
+        {
+            _effect.CurrentTechnique = _effect.Techniques["TestMat3x3"];
+            _effect.Parameters["Mat3x3"].SetValue(new Matrix(
+                new Vector4(1.0f, 0.5f, 0.5f, 0.3f),
+                new Vector4(0.5f, 1.0f, 0.5f, 0.3f),
+                new Vector4(1.0f, 0.5f, 1.0f, 0.3f),
+                new Vector4(0.3f, 0.3f, 0.3f, 0.3f)
+            ));
+
+            var grid = new ColorGridShaderTestHarness(3, 1, gd);
+            grid.CaptureShaderOutput(_effect);
+
+            Assert.That(new Vector4(1.0f, 0.5f, 0.5f, 1.0f), Is.EqualTo(grid.SampleAt(0, 0)).Using(Vector4Comparer.Epsilon));
+            Assert.That(new Vector4(0.5f, 1.0f, 0.5f, 1.0f), Is.EqualTo(grid.SampleAt(1, 0)).Using(Vector4Comparer.Epsilon));
+            Assert.That(new Vector4(1.0f, 0.5f, 1.0f, 1.0f), Is.EqualTo(grid.SampleAt(2, 0)).Using(Vector4Comparer.Epsilon));
+
+            grid.Dispose();
+        }
+
+        [Test]
+        [RunOnUI]
         public void QuaternionParameter()
         {
             _effect.CurrentTechnique = _effect.Techniques["TestQuat"];

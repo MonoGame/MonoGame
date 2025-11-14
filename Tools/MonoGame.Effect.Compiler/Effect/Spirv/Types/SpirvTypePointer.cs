@@ -23,7 +23,7 @@ namespace MonoGame.Effect.Compiler.Effect.Spirv
         public StorageClass StorageClass { get; private set; }
         public SpirvTypeBase PointerType { get; private set; }
 
-        internal override void ParseArgs(string[] args, SpirvReflectionInfo.SpirvParseContext context)
+        protected override void ParseArgs(string[] args, SpirvReflectionInfo.SpirvParseContext context)
         {
             if (!Enum.TryParse(args[0], false, out StorageClass storageClass))
             {

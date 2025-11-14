@@ -110,6 +110,10 @@ namespace MonoGame.Effect.Compiler.Effect.Spirv
                 {
                     variable.ApplyDecoration(decoration);
                 }
+                else if (context.Types.TryGetValue(id, out SpirvTypeBase type))
+                {
+                    type.ApplyDecoration(decoration);
+                }
             }
 
             foreach ((string id, int index, SpirvDecoration decoration) in context.MemberDecorations)

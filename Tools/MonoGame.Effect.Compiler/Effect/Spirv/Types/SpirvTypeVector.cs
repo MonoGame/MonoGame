@@ -12,9 +12,8 @@ namespace MonoGame.Effect.Compiler.Effect.Spirv
         public override SpirvType Type => SpirvType.Vector;
         public SpirvTypeScalar ElementType { get; private set; }
         public uint Dimensions { get; private set; }
-        public uint Width => ElementType.Width * Dimensions;
 
-        internal override void ParseArgs(string[] args, SpirvReflectionInfo.SpirvParseContext context)
+        protected override void ParseArgs(string[] args, SpirvReflectionInfo.SpirvParseContext context)
         {
             if (!context.Types.TryGetValue(args[0], out SpirvTypeBase type))
             {

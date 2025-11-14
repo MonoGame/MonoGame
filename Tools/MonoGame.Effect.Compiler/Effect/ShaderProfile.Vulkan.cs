@@ -256,12 +256,8 @@ namespace MonoGame.Effect
                             throw new ShaderCompilerException();
                         }
 
-                        ConstantBufferData cbuffer = new ConstantBufferData("global");
-
                         SpirvTypeStruct constantBuffer = variable.Pointer.PointerType as SpirvTypeStruct;
-
-                        foreach (SpirvTypeStructMember member in constantBuffer.Members)
-                            cbuffer.AddParameter(member);
+                        ConstantBufferData cbuffer = ConstantBufferData.BuildFromSpirvStruct(constantBuffer);
 
                         if (cbuffer.Size > 0)
                         {
@@ -296,9 +292,9 @@ namespace MonoGame.Effect
 
                             var sampler = new ShaderData.Sampler
                             {
-                                samplerSlot = samplerVariable.BindingSlot.Value - SlotOffset,
+                                samplerSlot = (int)samplerVariable.BindingSlot.Value - SlotOffset,
                                 samplerName = samplerVariable.Name,
-                                textureSlot = imageVariable.BindingSlot.Value - SlotOffset,
+                                textureSlot = (int)imageVariable.BindingSlot.Value - SlotOffset,
                             };
 
                             // This image is only sampled by one sampler, we can safely use the texture name for the parameter.
