@@ -7,7 +7,7 @@ concurrency:
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 env:
-  DotnetVersion: 8.0.404
+  DotnetVersion: 9.0.x
   
 jobs:
   build:
@@ -19,7 +19,7 @@ jobs:
       fail-fast: false
     steps:
       - name: Clone repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           submodules: recursive
 
@@ -123,16 +123,6 @@ jobs:
           CI: true
         shell: bash
 
-      - name: Generate global.json
-        run: |
-          echo '{ "sdk": { "version": "9.0.x" } }' > global.json
-
-      - name: Setup .NET Core SDK
-        uses: actions/setup-dotnet@v5
-        with:
-          dotnet-version: |
-            9.0.x
-
       - name: Setup DotNet on MacOS for DotNet 9
         if: runner.environment == 'github-hosted' && runner.os == 'macos'
         run: |
@@ -160,14 +150,18 @@ jobs:
     runs-on: ubuntu-latest
     steps:
         - name: Clone Repository
-          uses: actions/checkout@v4
+          uses: actions/checkout@v5
           with:
             submodules: recursive
 
-        - name: Setup .NET
-          uses: actions/setup-dotnet@v4
+        - name: Generate global.json
+          run: |
+            echo '{ "sdk": { "version": "${{ env.DotnetVersion }}" } }' > global.json
+
+        - name: Setup .NET Core SDK
+          uses: actions/setup-dotnet@v5
           with:
-            dotnet-version: '8.0.x'
+            dotnet-version: '${{ env.DotnetVersion }}'
 
         - name: Expose GitHub Runtime
           uses: crazy-max/ghaction-github-runtime@v3
@@ -192,10 +186,14 @@ jobs:
           with:
             submodules: recursive
 
-        - name: Setup .NET
-          uses: actions/setup-dotnet@v4
+        - name: Generate global.json
+          run: |
+            echo '{ "sdk": { "version": "${{ env.DotnetVersion }}" } }' > global.json
+
+        - name: Setup .NET Core SDK
+          uses: actions/setup-dotnet@v5
           with:
-            dotnet-version: '8.0.x'
+            dotnet-version: '${{ env.DotnetVersion }}'
 
         - name: Expose GitHub Runtime
           uses: crazy-max/ghaction-github-runtime@v3
@@ -257,15 +255,18 @@ jobs:
         shell: ${{ matrix.shell }}
     steps:
       - name: Clone repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           submodules: recursive
 
+      - name: Generate global.json
+        run: |
+          echo '{ "sdk": { "version": "${{ env.DotnetVersion }}" } }' > global.json
+
       - name: Setup .NET Core SDK
-        if: runner.environment == 'github-hosted'
-        uses: actions/setup-dotnet@v4
+        uses: actions/setup-dotnet@v5
         with:
-          dotnet-version: '8.0.x'
+          dotnet-version: '${{ env.DotnetVersion }}'
 
       - name: install wine64 on linux
         if: runner.environment == 'github-hosted' && runner.os == 'Linux'

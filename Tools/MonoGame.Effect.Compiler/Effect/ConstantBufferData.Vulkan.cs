@@ -1,7 +1,8 @@
-// MonoGame - Copyright (C) The MonoGame Team
+// MonoGame - Copyright (C) MonoGame Foundation, Inc
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
+using MonoGame.Effect.Compiler.Effect.Spirv;
 using System;
 using System.Linq;
 
@@ -9,75 +10,79 @@ namespace MonoGame.Effect
 {
     internal partial class ConstantBufferData
     {
-        static EffectObject.D3DXPARAMETER_TYPE ToParamType(string dataType)
+        static EffectObject.D3DXPARAMETER_TYPE ToParamType(SpirvTypeBase spirvType)
         {
-            switch(dataType)
+            if (spirvType is SpirvTypeVector vector)
             {
-                case "float":
+                return ToParamType(vector.ElementType);
+            }
+            else if (spirvType is SpirvTypeMatrix matrix)
+            {
+                return ToParamType(matrix.ColumnType.ElementType);
+            }
+            else if (spirvType is SpirvTypeArray array)
+            {
+                return ToParamType(array.ElementType);
+            }
+
+            switch (spirvType.Type)
+            {
+                case SpirvType.Float:
                     return EffectObject.D3DXPARAMETER_TYPE.FLOAT;
-                case "uint":
-                case "int":
+                case SpirvType.Int:
                     return EffectObject.D3DXPARAMETER_TYPE.INT;
-                case "bool":
+                case SpirvType.Bool:
                     return EffectObject.D3DXPARAMETER_TYPE.BOOL;
                 default:
-                    throw new Exception("Unknown data type: " + dataType);
-            };
+                    throw new Exception("Unknown data type: " + spirvType);
+            }
         }
 
-        public void AddParameter(string name, string dataType, int sizeOfArray, int byteOffset)
+        static (uint rows, uint columns, EffectObject.D3DXPARAMETER_CLASS paramClass) DimensionsForType(SpirvTypeBase spirvType)
+        {
+            if (spirvType is SpirvTypeArray array)
+            {
+                return DimensionsForType(array.ElementType);
+            }
+            else if (spirvType is SpirvTypeVector vector)
+            {
+                return (1, vector.Dimensions, EffectObject.D3DXPARAMETER_CLASS.VECTOR);
+            }
+            else if (spirvType is SpirvTypeMatrix matrix)
+            {
+                return (matrix.ColumnType.Dimensions, matrix.Columns, EffectObject.D3DXPARAMETER_CLASS.MATRIX_COLUMNS);
+            }
+            else
+            {
+                return (1, 1, EffectObject.D3DXPARAMETER_CLASS.SCALAR);
+            }
+        }
+
+        public void AddParameter(SpirvTypeStructMember member)
         {
             // Has this parameter already been added?
-            var found = Parameters.FirstOrDefault(p => p.name == name);
+            var found = Parameters.FirstOrDefault(p => p.name == member.Name);
             if (found != null)
                 return;
 
             // Create the new parameter.
             var param = new EffectObject.d3dx_parameter();
-            param.name = name;
+            param.name = member.Name;
             param.semantic = string.Empty;
-            param.bufferOffset = byteOffset;
+            param.bufferOffset = member.Offset.Value;
 
-            if (dataType.StartsWith("%mat"))
-            {
-                param.columns = (uint)char.GetNumericValue(dataType[4]);
-                param.rows = (uint)char.GetNumericValue(dataType[6]);
-                param.type = ToParamType(dataType.Substring(7));
-            }
-            else if (dataType.StartsWith("%v"))
-            {
-                param.rows = 1;
-                param.columns = (uint)char.GetNumericValue(dataType[2]);
-                param.type = ToParamType(dataType.Substring(3));
-            }
-            else if (dataType.StartsWith("%_arr_"))
-            {
-                // TODO: Support arrays.... %_arr_mat4v3float_uint_72
-                param.rows = 1;
-                param.columns = 1;
-                param.type = EffectObject.D3DXPARAMETER_TYPE.FLOAT;
-            }
-            else
-            {
-                param.rows = 1;
-                param.columns = 1;
-                param.type = ToParamType(dataType.Substring(1));
-            }
+            (uint rows, uint cols, var paramClass) = DimensionsForType(member.Type);
+            param.rows = rows;
+            param.columns = cols;
+            param.class_ = paramClass;
+            param.type = ToParamType(member.Type);
 
-            if (param.rows > 1)
-                param.class_ = EffectObject.D3DXPARAMETER_CLASS.MATRIX_COLUMNS;
-            else if (param.columns > 1)
-                param.class_ = EffectObject.D3DXPARAMETER_CLASS.VECTOR;
-            else
-                param.class_ = EffectObject.D3DXPARAMETER_CLASS.SCALAR;
-
-            var byteSize = param.rows * param.columns * 4;
-
-            if (sizeOfArray > 0)
+            if (member.Type is SpirvTypeArray array)
             {
-                param.element_count = (uint)sizeOfArray;
+                param.element_count = array.Length;
                 param.member_handles = new EffectObject.d3dx_parameter[param.element_count];
-                for (var i = 0; i < param.element_count; i++)
+
+                for (uint i = 0; i < array.Length; i++)
                 {
                     var mparam = new EffectObject.d3dx_parameter();
 
@@ -87,18 +92,19 @@ namespace MonoGame.Effect
                     mparam.class_ = param.class_;
                     mparam.rows = param.rows;
                     mparam.columns = param.columns;
-                    mparam.data = new byte[byteSize];
+                    mparam.data = new byte[param.columns * param.rows * 4];
 
                     param.member_handles[i] = mparam;
                 }
             }
 
+            var byteSize = param.rows * param.columns * 4;
             var data = new byte[byteSize];
 
             // TODO: Default value?
 
             param.data = data;
-                        
+
             // Add the new parameter and resort by the
             // offset for some consistent results.
             Parameters.Add(param);
