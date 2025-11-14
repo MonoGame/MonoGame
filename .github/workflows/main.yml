@@ -40,11 +40,6 @@ jobs:
         run: |
           dotnet workload install android ios
 
-      - name: Setup DotNet on linux
-        if: runner.environment == 'github-hosted' && runner.os == 'Linux'
-        run: |
-          dotnet workload install android
-
       - name: Setup DotNet on MacOS
         if: runner.environment == 'github-hosted' && runner.os == 'macos'
         run: |
