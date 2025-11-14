@@ -10,7 +10,7 @@ namespace MonoGame.Effect.Compiler.Effect.Spirv
         public override SpirvType Type => SpirvType.Int;
         public override uint Width { get; protected set; }
         public bool Signed { get; private set; }
-        internal override void ParseArgs(string[] args, SpirvReflectionInfo.SpirvParseContext context)
+        protected override void ParseArgs(string[] args, SpirvReflectionInfo.SpirvParseContext context)
         {
             Width = uint.Parse(args[0]);
             Signed = args[1] == "1";

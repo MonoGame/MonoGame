@@ -8,12 +8,6 @@ namespace MonoGame.Effect.Compiler.Effect.Spirv
     internal class SpirvTypeBool : SpirvTypeScalar
     {
         public override SpirvType Type => SpirvType.Bool;
-        public override uint Width { get; protected set; }
-
-        internal override void ParseArgs(string[] args, SpirvReflectionInfo.SpirvParseContext context)
-        {
-            // TODO: Validate what this should be
-            Width = 8;
-        }
+        public override uint Width { get; protected set; } = 32;
     }
 }
