@@ -13,9 +13,6 @@ class ContentBuilderProcessorContext(ContentBuilder builder, string relativePath
 
     private readonly string _relativeContentPath = relativePath.Sanitize();
 
-    private readonly string _outputDirectory = builder.Parameters.RootedOutputDirectory;
-    private readonly string _intermediateDirectory = builder.Parameters.RootedIntermediateDirectory;
-
     private readonly ContentIdentity _sourceIdentity = new ContentIdentity(sourceFilename: FileHelper.NormalizeSeparators(Path.Combine(builder.Parameters.RootedSourceDirectory, relativePath)));
 
     private readonly ContentInfo _contentInfo = contentInfo;
@@ -26,13 +23,13 @@ class ContentBuilderProcessorContext(ContentBuilder builder, string relativePath
 
     public override string BuildConfiguration { get; } = "";
 
-    public override string IntermediateDirectory => _intermediateDirectory;
+    public override string IntermediateDirectory => _builder.Parameters.RootedIntermediateDirectory;
 
     public override ContentBuildLogger Logger => _builder.Logger;
 
     public override ContentIdentity SourceIdentity => _sourceIdentity;
 
-    public override string OutputDirectory => _outputDirectory;
+    public override string OutputDirectory => _builder.Parameters.RootedOutputDirectory;
 
     public override string OutputFilename { get; } = FileHelper.NormalizeSeparators(outputFilename);
 
