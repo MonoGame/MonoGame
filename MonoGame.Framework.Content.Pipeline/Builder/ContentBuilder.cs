@@ -153,9 +153,9 @@ public abstract class ContentBuilder
             Directory.CreateDirectory(outputDir);
         }
 
-        if (!Directory.Exists(Parameters.IntermediateDirectory))
+        if (!Directory.Exists(Parameters.RootedIntermediateDirectory))
         {
-            Directory.CreateDirectory(Parameters.IntermediateDirectory);
+            Directory.CreateDirectory(Parameters.RootedIntermediateDirectory);
         }
 
         Logger.Log($"Output: {relativeDestPath}");
