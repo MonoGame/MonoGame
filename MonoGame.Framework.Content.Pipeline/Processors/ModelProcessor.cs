@@ -342,7 +342,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
                         throw new InvalidContentException(
                             string.Format("The mesh \"{0}\", using {1}, contains geometry that is missing texture coordinates for channel {2}.",
                             geometry.Parent.Name,
-                            MaterialProcessor.GetDefaultEffect(material),
+                            material.GetType().Name,
                             i),
                             _identity);
                 }
