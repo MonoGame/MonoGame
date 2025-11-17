@@ -4111,6 +4111,8 @@ MGG_SamplerState* MGG_SamplerState_Create(MGG_GraphicsDevice* device, MGG_Sample
 	auto state = new MGG_SamplerState();
 	state->info = *info; // For debugging
 
+	bool isComparison = info->FilterMode == MGTextureFilterMode::Comparison;
+
 	VkSamplerCreateInfo samplerInfo = { VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO };
 	samplerInfo.addressModeU = ToVkSamplerAddressMode(info->AddressU);
 	samplerInfo.addressModeV = ToVkSamplerAddressMode(info->AddressV);
@@ -4118,8 +4120,8 @@ MGG_SamplerState* MGG_SamplerState_Create(MGG_GraphicsDevice* device, MGG_Sample
 	samplerInfo.anisotropyEnable = info->Filter == MGTextureFilter::Anisotropic;
 	samplerInfo.maxAnisotropy = info->MaximumAnisotropy;
 	samplerInfo.unnormalizedCoordinates = VK_FALSE;
-	samplerInfo.compareEnable = VK_FALSE;
-	samplerInfo.compareOp = VK_COMPARE_OP_NEVER;
+	samplerInfo.compareEnable = isComparison ? VK_TRUE : VK_FALSE;
+	samplerInfo.compareOp = isComparison ? ToVkCompareOp(info->ComparisonFunction) : VK_COMPARE_OP_NEVER;
 	samplerInfo.mipLodBias = info->MipMapLevelOfDetailBias;
 	samplerInfo.minLod = 0.0f;
 	samplerInfo.maxLod = VK_LOD_CLAMP_NONE;
