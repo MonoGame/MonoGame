@@ -3,6 +3,7 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using MonoGame.Interop;
+using System.Runtime.CompilerServices;
 namespace Microsoft.Xna.Framework.Graphics;
 
 public partial class BlendState
@@ -11,27 +12,30 @@ public partial class BlendState
 
     internal unsafe void PlatformApplyState(GraphicsDevice device)
     {
+        // Check if uninitialized
         if (Handle == null)
         {
+            // Convert state data to interop variant
             var info = new MGG_BlendState_Info[4];
-            for (int i = 0; i < 4; i++)
-            {
-                var state = _targetBlendState[i];
 
-                info[i] = new MGG_BlendState_Info()
-                {
-                    colorSourceBlend = state.ColorSourceBlend,
-                    colorDestBlend = state.ColorDestinationBlend,
-                    colorBlendFunc = state.ColorBlendFunction,
-                    alphaSourceBlend = state.AlphaSourceBlend,
-                    alphaDestBlend = state.AlphaDestinationBlend,
-                    alphaBlendFunc = state.AlphaBlendFunction,
-                    colorWriteChannels = state.ColorWriteChannels
-                };
+            if (_independentBlendEnable)
+            {
+                info[0] = CreateInfo(_targetBlendState[0]);
+                info[1] = CreateInfo(_targetBlendState[1]);
+                info[2] = CreateInfo(_targetBlendState[2]);
+                info[3] = CreateInfo(_targetBlendState[3]);
+            }
+            else
+            {
+                // All share the same
+                info[0] = info[1] = info[2] = info[3] = CreateInfo(_targetBlendState[0]);
             }
 
+            // Create native blend state
             fixed (MGG_BlendState_Info* ptr = info)
+            {
                 Handle = MGG.BlendState_Create(device.Handle, ptr);
+            }
         }
 
         MGG.GraphicsDevice_SetBlendState(device.Handle, Handle, _blendFactor.R / 255.0f, _blendFactor.G / 255.0f, _blendFactor.B / 255.0f, _blendFactor.A / 255.0f);
@@ -48,4 +52,16 @@ public partial class BlendState
             }
         }
     }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private static MGG_BlendState_Info CreateInfo(TargetBlendState state) => new()
+    {
+        colorSourceBlend = state.ColorSourceBlend,
+        colorDestBlend = state.ColorDestinationBlend,
+        colorBlendFunc = state.ColorBlendFunction,
+        alphaSourceBlend = state.AlphaSourceBlend,
+        alphaDestBlend = state.AlphaDestinationBlend,
+        alphaBlendFunc = state.AlphaBlendFunction,
+        colorWriteChannels = state.ColorWriteChannels
+    };
 }
