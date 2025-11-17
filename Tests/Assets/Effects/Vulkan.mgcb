@@ -92,3 +92,8 @@
 /processorParam:DebugMode=Auto
 /build:TextureArrayEffect.fx
 
+#begin ParameterTypes.fx
+/importer:EffectImporter
+/processor:EffectProcessor
+/processorParam:DebugMode=Auto
+/build:ParameterTypes.fx
