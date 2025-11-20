@@ -31,6 +31,7 @@ jobs:
         uses: actions/setup-dotnet@v5
         with:
           dotnet-version: '${{ env.DotnetVersion }}'
+          global-json-file: "./global.json"
           
       - name: Setup Android Dependencies
         uses: monogame/monogame-actions/install-android-dependencies@v1
@@ -194,6 +195,7 @@ jobs:
           uses: actions/setup-dotnet@v5
           with:
             dotnet-version: '${{ env.DotnetVersion }}'
+            global-json-file: "./global.json"
 
         - name: Expose GitHub Runtime
           uses: crazy-max/ghaction-github-runtime@v3
@@ -267,6 +269,7 @@ jobs:
         uses: actions/setup-dotnet@v5
         with:
           dotnet-version: '${{ env.DotnetVersion }}'
+          global-json-file: "./global.json"
 
       - name: install wine64 on linux
         if: runner.environment == 'github-hosted' && runner.os == 'Linux'
