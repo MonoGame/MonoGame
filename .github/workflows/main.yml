@@ -309,13 +309,23 @@ jobs:
         with:
           name: tests-desktopgl-${{ matrix.platform }}
           path: tests-desktopgl
-          
+
+      - name: Set global.json for tests-desktopgl
+        run: |
+          set DOTNET_CLI_TELEMETRY_OPTOUT=1
+          echo '{ "sdk": { "version": "${{ env.DotnetVersion }}" } }' > tests-desktopgl/global.json
+
       - name: Download tests-windowsdx-${{ matrix.platform }}
         if: runner.os == 'Windows' && runner.environment != 'github-hosted'
         uses: actions/download-artifact@v4
         with:
           name: tests-windowsdx-${{ matrix.platform }}
           path: tests-windowsdx
+
+      - name: Set global.json for tests-windowsdx
+        run: |
+          set DOTNET_CLI_TELEMETRY_OPTOUT=1
+          echo '{ "sdk": { "version": "${{ env.DotnetVersion }}" } }' > tests-windowsdx/global.json
 
       # Run the DirectX tests in two steps: first the audio, then the rest.
       # This is because the audio tests has some incompatibilities within the runner with ContentManagerTests.
