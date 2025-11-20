@@ -236,6 +236,8 @@ jobs:
     name: tests-${{ matrix.os }}
     needs: [ build, choose-runner ]
     runs-on: ${{ matrix.os }}
+    env:
+      DOTNET_CLI_TELEMETRY_OPTOUT: 1 
     strategy:
       matrix:
         include:
@@ -312,7 +314,6 @@ jobs:
 
       - name: Set global.json for tests-desktopgl
         run: |
-          set DOTNET_CLI_TELEMETRY_OPTOUT=1
           echo '{ "sdk": { "version": "${{ env.DotnetVersion }}" } }' > tests-desktopgl/global.json
 
       - name: Download tests-windowsdx-${{ matrix.platform }}
@@ -324,7 +325,6 @@ jobs:
 
       - name: Set global.json for tests-windowsdx
         run: |
-          set DOTNET_CLI_TELEMETRY_OPTOUT=1
           echo '{ "sdk": { "version": "${{ env.DotnetVersion }}" } }' > tests-windowsdx/global.json
 
       # Run the DirectX tests in two steps: first the audio, then the rest.
