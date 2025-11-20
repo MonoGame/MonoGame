@@ -70,7 +70,7 @@ jobs:
       - name: Setup Premake5
         uses: abel0b/setup-premake@v2.4
         with:
-          version: "5.0.0-beta2"
+          version: "5.0.0-beta6"
 
       - name: Setup Java
         uses: actions/setup-java@v4
@@ -101,7 +101,16 @@ jobs:
 
       - name: Install Fonts
         uses: monogame/monogame-actions/install-fonts@v1
-        
+
+      - name: Setup Emsdk
+        uses: mymindstorm/setup-emsdk@v14
+        with:
+          version: '3.1.56'
+      
+      - name: List Emscripten Version
+        run: |
+          emcc --version
+
       - name: Install SDL2 deps on Linux
         if: runner.os == 'Linux'
         run: |
@@ -111,6 +120,20 @@ jobs:
             libwayland-dev libxkbcommon-dev libdrm-dev libgbm-dev libgl1-mesa-dev libgles2-mesa-dev \
             libegl1-mesa-dev libdbus-1-dev libibus-1.0-dev libudev-dev fcitx-libs-dev \
             libpipewire-0.3-dev libdecor-0-dev
+
+      - name: Clean Up Disk Space
+        if: runner.os == 'Linux'
+        run: |
+          # Space usage before cleanup
+          df -h /
+      
+          # Remove unused tool caches (comment any required ones with #)
+          sudo rm -rf /usr/local/.ghcup
+          sudo rm -rf /usr/share/swift
+          sudo rm -rf "$AGENT_TOOLSDIRECTORY"
+      
+          # Verify gains
+          df -h /
 
       - name: Dotnet Restore Templates
         if: runner.environment == 'github-hosted' && runner.os == 'Windows'

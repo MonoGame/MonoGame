@@ -537,7 +537,7 @@ namespace Microsoft.Xna.Framework
                 // We only have a precision timer on Windows, so other platforms may still overshoot
 #if WINDOWS && !DESKTOPGL
                 MonoGame.Framework.Utilities.TimerHelper.SleepForNoMoreThan(sleepTime);
-#elif DESKTOPGL || ANDROID || IOS
+#elif DESKTOPGL || ANDROID || IOS || NATIVE
                 if (sleepTime >= 2.0)
                     System.Threading.Thread.Sleep(1);
 #endif

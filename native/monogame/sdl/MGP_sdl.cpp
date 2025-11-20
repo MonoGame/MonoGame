@@ -12,6 +12,10 @@
 #include <combaseapi.h>
 #endif
 
+#if MG_EMSCRIPTEN
+#include <emscripten.h>
+#endif
+
 
 struct MGP_Platform
 {
@@ -199,12 +203,18 @@ MGP_Platform* MGP_Platform_Create(MGGameRunBehavior& behavior)
 			SDL_INIT_HAPTIC);
 	}
 
+#ifndef MG_EMSCRIPTEN
 	SDL_DisableScreenSaver();
+#endif
 
 	SDL_SetHint("SDL_VIDEO_MINIMIZE_ON_FOCUS_LOSS", "0");
 	SDL_SetHint("SDL_JOYSTICK_ALLOW_BACKGROUND_EVENTS", "1");
 
-	behavior = MGGameRunBehavior::Synchronous;
+#if MG_EMSCRIPTEN
+    behavior = MGGameRunBehavior::Asynchronous;
+#else
+    behavior = MGGameRunBehavior::Synchronous;
+#endif
 
 	auto platform = new MGP_Platform();
 	return platform;
@@ -261,6 +271,10 @@ MGMonoGamePlatform MGP_Platform_GetPlatform()
     return MGMonoGamePlatform::DesktopVK;
 #elif MG_DIRECTX12
     return MGMonoGamePlatform::WindowsDX12;
+#elif MG_EMSCRIPTEN
+    return MGMonoGamePlatform::WebGL;
+#elif MG_OPENGL
+    return MGMonoGamePlatform::DesktopGL;
 #else
     assert(false);
     return (MGMonoGamePlatform)-1;
@@ -273,6 +287,8 @@ MGGraphicsBackend MGP_Platform_GetGraphicsBackend()
     return MGGraphicsBackend::Vulkan;
 #elif MG_DIRECTX12
     return MGGraphicsBackend::DirectX12;
+#elif MG_EMSCRIPTEN || MG_OPENGL
+    return MGGraphicsBackend::OpenGL;
 #else
     assert(false);
     return (MGGraphicsBackend)-1;
@@ -664,6 +680,11 @@ mgbyte MGP_Platform_PollEvent(MGP_Platform* platform, MGP_Event& event_)
     return false;
 }
 
+void MGP_Platform_StartRunLoop(MGP_Platform* platform)
+{
+    assert(platform != nullptr);
+}
+
 mgbyte MGP_Platform_BeforeRun(MGP_Platform* platform)
 {
 	assert(platform != nullptr);
@@ -715,6 +736,8 @@ MGP_Window* MGP_Window_Create(
 
 #if defined(MG_VULKAN) || defined(MG_DIRECTX12)
 	flags |= SDL_WINDOW_VULKAN;
+#elif defined(MG_OPENGL) || defined(MG_EMSCRIPTEN)
+    flags |= SDL_WINDOW_OPENGL;
 #else
 	#error Not implemented
 #endif

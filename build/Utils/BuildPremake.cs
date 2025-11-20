@@ -3,7 +3,7 @@ namespace BuildScripts;
 
 public sealed class BuildPremake
 {
-    public void Run(BuildContext context, string name, string workingDirectory, string solutionFile)
+    public void Run(BuildContext context, string name, string workingDirectory, string solutionFile, string os = "")
     {
         int exit;
         exit = context.StartProcess("premake5", new ProcessSettings { WorkingDirectory = workingDirectory, Arguments = "clean" });
@@ -22,6 +22,9 @@ public sealed class BuildPremake
             default:
                 throw new NotSupportedException($"Platform {context.Environment.Platform.Family} is not supported for building the {name}.");
         }
+
+        if (!string.IsNullOrEmpty(os))
+            premakeArguments += $" --os={os}";
 
         exit = context.StartProcess("premake5", new ProcessSettings { WorkingDirectory = workingDirectory, Arguments = premakeArguments });
         if (exit != 0)

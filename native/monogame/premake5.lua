@@ -18,6 +18,10 @@ function common(project_name)
     filter "system:linux"
     pic "On"
     filter {}
+    if os.target() == "emscripten" then
+        kind "StaticLib"
+        targetprefix "" -- remove lib prefix
+    end
     defines {"DLL_EXPORT"}
     targetdir(platform_target_path)
     targetname "mgruntime"
@@ -35,21 +39,27 @@ function sdl2()
 
     includedirs {"external/sdl2/sdl/include"}
 
-    filter {"system:windows"}
-    links {"external/sdl2/sdl/build/Release/SDL2-static.lib", "winmm", "imm32", "user32", "gdi32", "advapi32",
-           "setupapi", "ole32", "oleaut32", "version", "shell32"}
-    filter {"system:macosx"}
-    libdirs {"external/sdl2/sdl/build"}
-    linkoptions {"-Wl,-force_load,external/sdl2/sdl/build/libSDL2.a"}
-    links {"SDL2"}
-    links {"Cocoa.framework", "IOKit.framework", "ForceFeedback.framework", "CoreAudio.framework",
-        "AudioToolbox.framework", "CoreGraphics.framework", "CoreFoundation.framework", "Metal.framework",
-        "CoreVideo.framework", "GameController.framework", "CoreHaptics.framework", "Carbon.framework", "iconv"}
+    if os.target() ~= "emscripten" then
+        filter {"system:windows"}
+        links {"external/sdl2/sdl/build/Release/SDL2-static.lib", "winmm", "imm32", "user32", "gdi32", "advapi32",
+            "setupapi", "ole32", "oleaut32", "version", "shell32"}
+        filter {"system:macosx"}
+        libdirs {"external/sdl2/sdl/build"}
+        linkoptions {"-Wl,-force_load,external/sdl2/sdl/build/libSDL2.a"}
+        links {"SDL2"}
+        links {"Cocoa.framework", "IOKit.framework", "ForceFeedback.framework", "CoreAudio.framework",
+            "AudioToolbox.framework", "CoreGraphics.framework", "CoreFoundation.framework", "Metal.framework",
+            "CoreVideo.framework", "GameController.framework", "CoreHaptics.framework", "Carbon.framework", "iconv"}
 
-    filter {"system:linux"}
-    linkoptions {"external/sdl2/sdl/build/libSDL2.a"}
-    links {"dl", "pthread", "m", "rt"}
-    filter {}
+        filter {"system:linux"}
+        linkoptions {"external/sdl2/sdl/build/libSDL2.a"}
+        links {"dl", "pthread", "m", "rt"}
+        filter {}
+    end
+
+    if os.target() == "emscripten" then
+        linkoptions {"external/sdl2/sdl/build_emscripten/libSDL2.a"}
+    end
 end
 
 -- Vulkan is supported for all desktop platforms.
@@ -78,28 +88,56 @@ function directx12()
     filter {}
 end
 
--- FAudio is supported for all desktop platforms.
+-- Add Emscripten/WASM support
+function opengl()
+    defines {"MG_OPENGL"}
+    if os.target() == "emscripten" then
+        defines {"MG_EMSCRIPTEN"}
+        defines {"MG_WEBGL"}
+    end
+
+    -- Add your Emscripten-specific files
+    files {"opengl/**.h", "opengl/**.cpp"}
+
+    if os.target() ~= "emscripten" then
+        filter {"system:macosx"}
+        links {"OpenGL.framework"}
+        filter {"system:windows"}
+        links {"opengl32"}
+        filter {}
+    end
+end
+
+-- FAudio is supported for all desktop/web platforms.
 function faudio()
     defines {"MG_FAUDIO"}
 
     files {"faudio/**.h", "faudio/**.cpp"}
 
     includedirs {"external/faudio/include"}
+
+    if os.target() ~= "emscripten" then
     
-    filter {"system:windows"}
-    libdirs {"external/faudio/build/Release"}
-    links {"FAudio.lib"}
-    
-    filter {"system:macosx"}
-    libdirs {"external/faudio/build"}
-    linkoptions {
-        "-Wl,-force_load,external/faudio/build/libFAudio.a",
-        "-Wl,-ld_classic"
-    }
-    
-    filter {"system:linux"}
-    linkoptions {"external/faudio/build/libFAudio.a"}
-    filter {}
+        filter {"system:windows"}
+        libdirs {"external/faudio/build/Release"}
+        links {"FAudio.lib"}
+        
+        filter {"system:macosx"}
+        libdirs {"external/faudio/build"}
+        linkoptions {
+            "-Wl,-force_load,external/faudio/build/libFAudio.a",
+            "-Wl,-ld_classic"
+        }
+        
+        filter {"system:linux"}
+        linkoptions {"external/faudio/build/libFAudio.a"}
+        filter {}
+
+    end
+
+    if os.target() == "emscripten" then
+        linkoptions {"external/faudio/build_emscripten/libFAudio.a"}
+    end
 end
 
 -- Xaudio is supported on Windows and Xbox.
@@ -128,18 +166,37 @@ function configs()
     filter "system:macosx"
     buildoptions {"-arch x86_64", "-arch arm64"}
     linkoptions {"-arch x86_64", "-arch arm64"}
+
+    filter {"system:macosx", "configurations:Debug"}
+    buildoptions {"-g", "-O0", "-fno-omit-frame-pointer"}
+    linkoptions {"-g"}
+
+    if os.target() == "emscripten" then
+        -- Change to StaticLib for Emscripten builds to output .a files
+        kind "StaticLib"
+    end
+    
     filter {}
 end
 
 workspace "monogame"
 configurations {"Debug", "Release"}
 
-project "desktopvk"
-common("desktopvk")
-sdl2()
-vulkan()
-faudio()
-configs()
+if os.target() ~= "emscripten" then
+    project "desktopvk"
+    common("desktopvk")
+    sdl2()
+    vulkan()
+    faudio()
+    configs()
+
+    project "desktopgl"
+    common("desktopgl")
+    sdl2()
+    opengl()
+    faudio()
+    configs()
+end
 
 if os.target() == "windows" then
     project "windowsdx"
@@ -147,5 +204,15 @@ if os.target() == "windows" then
     sdl2()
     directx12()
     xaudio()
+    configs()
+end
+
+-- Add this to your project section
+if os.target() == "emscripten" then
+    project "wasm"
+    common("wasm")
+    sdl2()
+    opengl()
+    faudio()
     configs()
 end

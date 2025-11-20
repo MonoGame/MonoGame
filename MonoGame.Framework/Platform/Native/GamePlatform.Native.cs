@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using MonoGame.Interop;
 using System.Threading;
+using MonoGame.Framework.Utilities;
 
 namespace Microsoft.Xna.Framework;
 
@@ -28,6 +29,22 @@ class NativeGamePlatform : GamePlatform
     private readonly List<string> _dropList = new List<string>(64);
 
     private int _isExiting;
+
+    private static Game _emscriptenGame;
+    private delegate void em_callback_func();
+
+    [DllImport("*", CallingConvention = CallingConvention.Cdecl)]
+    private static extern void emscripten_set_main_loop(em_callback_func func, int fps, bool simulateInfiniteLoop);
+
+    [DllImport("*", CallingConvention = CallingConvention.Cdecl)]
+    private static extern void emscripten_cancel_main_loop();
+
+    [ObjCRuntime.MonoPInvokeCallback(typeof(em_callback_func))]
+    private static unsafe void RunEmscriptenMainLoop()
+    {
+        _emscriptenGame.Tick();
+    }
+
 
     public unsafe NativeGamePlatform(Game game) : base(game)
     {
@@ -271,7 +288,15 @@ class NativeGamePlatform : GamePlatform
 
     public override unsafe void StartRunLoop()
     {
-        MGP.Platform_StartRunLoop(Handle);
+        if (PlatformInfo.MonoGamePlatform == MonoGamePlatform.WebGL)
+        {
+            _emscriptenGame = this.Game;
+            emscripten_set_main_loop(RunEmscriptenMainLoop, fps: 0, simulateInfiniteLoop: false);
+        }
+        else
+        {
+            MGP.Platform_StartRunLoop(Handle);
+        }
     }
 
     public override unsafe void BeforeInitialize()

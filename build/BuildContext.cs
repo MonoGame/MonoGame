@@ -28,7 +28,7 @@ public class BuildContext : FrostingContext
     public BuildContext(ICakeContext context) : base(context)
     {
         var repositoryUrl = context.Argument("build-repository", DefaultRepositoryUrl);
-        var buildConfiguration = context.Argument("build-configuration", "Release");
+        BuildConfiguration = context.Argument("build-configuration", "Release");
         BuildOutput = context.Argument("build-output", "Artifacts");
         NuGetsDirectory = $"{BuildOutput}/NuGet/";
         BinariesDirectory = $"{BuildOutput}/Binaries/";
@@ -43,7 +43,7 @@ public class BuildContext : FrostingContext
         {
             MSBuildSettings = DotNetMSBuildSettings,
             Verbosity = DotNetVerbosity.Minimal,
-            Configuration = buildConfiguration,
+            Configuration = BuildConfiguration,
             WorkingDirectory = this.ShellWorkingDir
         };
 
@@ -52,14 +52,14 @@ public class BuildContext : FrostingContext
             MSBuildSettings = DotNetMSBuildSettings,
             Verbosity = DotNetVerbosity.Minimal,
             OutputDirectory = NuGetsDirectory,
-            Configuration = buildConfiguration,
+            Configuration = BuildConfiguration,
             WorkingDirectory = this.ShellWorkingDir
         };
 
         MSBuildSettings = new MSBuildSettings
         {
             Verbosity = Verbosity.Minimal,
-            Configuration = buildConfiguration
+            Configuration = BuildConfiguration
         };
         MSBuildSettings.WithProperty(nameof(Version), Version);
         MSBuildSettings.WithProperty(nameof(repositoryUrl), repositoryUrl);
@@ -67,7 +67,7 @@ public class BuildContext : FrostingContext
         MSPackSettings = new MSBuildSettings
         {
             Verbosity = Verbosity.Minimal,
-            Configuration = buildConfiguration,
+            Configuration = BuildConfiguration,
             Restore = true
         };
         MSPackSettings.WithProperty(nameof(Version), Version);
@@ -79,7 +79,7 @@ public class BuildContext : FrostingContext
         {
             MSBuildSettings = DotNetMSBuildSettings,
             Verbosity = DotNetVerbosity.Minimal,
-            Configuration = buildConfiguration,
+            Configuration = BuildConfiguration,
             SelfContained = false,
             WorkingDirectory = this.ShellWorkingDir
         };
@@ -88,7 +88,7 @@ public class BuildContext : FrostingContext
         {
             MSBuildSettings = DotNetMSBuildSettings,
             Verbosity = DotNetVerbosity.Minimal,
-            Configuration = buildConfiguration,
+            Configuration = BuildConfiguration,
             WorkingDirectory = this.ShellWorkingDir
         };
 
@@ -103,14 +103,14 @@ public class BuildContext : FrostingContext
         {
             MSBuildSettings = DotNetMSBuildSettings,
             Verbosity = DotNetVerbosity.Minimal,
-            Configuration = buildConfiguration,
+            Configuration = BuildConfiguration,
             OutputDirectory = BinariesDirectory,
             WorkingDirectory = this.ShellWorkingDir
         };
 
         Console.WriteLine($"Version: {Version}");
         Console.WriteLine($"RepositoryUrl: {repositoryUrl}");
-        Console.WriteLine($"BuildConfiguration: {buildConfiguration}");
+        Console.WriteLine($"BuildConfiguration: {BuildConfiguration}");
 
         if (context.IsRunningOnWindows())
         {
@@ -155,6 +155,8 @@ public class BuildContext : FrostingContext
     public MSBuildSettings MSPackSettings { get; }
 
     public string ShellWorkingDir { get; set; } = Directory.GetCurrentDirectory();
+
+    public string BuildConfiguration { get;}
 
     public string GetProjectPath(ProjectType type, string id = "") => type switch
     {
