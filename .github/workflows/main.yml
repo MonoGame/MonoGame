@@ -324,6 +324,7 @@ jobs:
           path: tests-windowsdx
 
       - name: Set global.json for tests-windowsdx
+        if: runner.os == 'Windows' && runner.environment != 'github-hosted'
         run: |
           echo '{ "sdk": { "version": "${{ env.DotnetVersion }}" } }' > tests-windowsdx/global.json
 
