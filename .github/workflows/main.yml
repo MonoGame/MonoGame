@@ -332,14 +332,14 @@ jobs:
       # This is because the audio tests has some incompatibilities within the runner with ContentManagerTests.
       - name: Run DirectX Audio Tests
         if: runner.os == 'Windows' && runner.environment != 'github-hosted'
-        run: dotnet test --filter Category=Audio MonoGame.Tests.dll 
+        run: dotnet vstest MonoGame.Tests.dll --TestCaseFilter:Category=Audio
         env:
           CI: true
         working-directory: tests-windowsdx
         
       - name: Run DirectX All Tests Except Audio
         if: runner.os == 'Windows' && runner.environment != 'github-hosted'
-        run: dotnet test --filter Category!=Audio MonoGame.Tests.dll 
+        run: dotnet vstest MonoGame.Tests.dll --TestCaseFilter:"Category!=Audio" 
         env:
           CI: true
         working-directory: tests-windowsdx
