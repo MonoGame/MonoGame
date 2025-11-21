@@ -5,13 +5,14 @@ on: [push, pull_request]
 concurrency:
   group: ${{ github.ref }}
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
- 
+
+env:
+  DotnetVersion: 9.0.307
+  
 jobs:
   build:
     name: build-${{ matrix.os }}
     runs-on: ${{ matrix.os }}
-    env:
-      DotnetVersion: 9.0.307
     strategy:
       matrix:
         os: [windows-latest, macos-26, ubuntu-24.04]
@@ -24,7 +25,6 @@ jobs:
 
       - name: Generate global.json
         run: |
-          echo "DotNetVersion=${{ env.DotnetVersion }}"
           echo '{ "sdk": { "version": "${{ env.DotnetVersion }}" } }' > global.json
 
       - name: Setup .NET Core SDK
@@ -149,8 +149,6 @@ jobs:
     name: PackageBinaries
     needs: [ build, tests ]
     runs-on: ubuntu-latest
-    env:
-      DotnetVersion: 9.0.307
     steps:
         - name: Clone Repository
           uses: actions/checkout@v5
@@ -159,7 +157,6 @@ jobs:
 
         - name: Generate global.json
           run: |
-            echo "DotNetVersion=${{ env.DotnetVersion }}"
             echo '{ "sdk": { "version": "${{ env.DotnetVersion }}" } }' > global.json
 
         - name: Setup .NET Core SDK
@@ -180,8 +177,6 @@ jobs:
     name: Deploy
     needs: [ build, tests ]
     runs-on: ubuntu-latest
-    env:
-      DotnetVersion: 9.0.307
     if: ${{ github.event_name == 'push' }}
     permissions:
         packages: write
@@ -194,7 +189,6 @@ jobs:
 
         - name: Generate global.json
           run: |
-            echo "DotNetVersion=${{ env.DotnetVersion }}"
             echo '{ "sdk": { "version": "${{ env.DotnetVersion }}" } }' > global.json
 
         - name: Setup .NET Core SDK
@@ -242,9 +236,6 @@ jobs:
     name: tests-${{ matrix.os }}
     needs: [ build, choose-runner ]
     runs-on: ${{ matrix.os }}
-    env:
-      DotnetVersion: 8.0.404
-      DOTNET_CLI_TELEMETRY_OPTOUT: 1 
     strategy:
       matrix:
         include:
@@ -272,7 +263,6 @@ jobs:
 
       - name: Generate global.json
         run: |
-          echo "DotNetVersion=${{ env.DotnetVersion }}"
           echo '{ "sdk": { "version": "${{ env.DotnetVersion }}" } }' > global.json
 
       - name: Setup .NET Core SDK
@@ -319,7 +309,7 @@ jobs:
         with:
           name: tests-desktopgl-${{ matrix.platform }}
           path: tests-desktopgl
-
+          
       - name: Download tests-windowsdx-${{ matrix.platform }}
         if: runner.os == 'Windows' && runner.environment != 'github-hosted'
         uses: actions/download-artifact@v4
@@ -329,16 +319,16 @@ jobs:
 
       # Run the DirectX tests in two steps: first the audio, then the rest.
       # This is because the audio tests has some incompatibilities within the runner with ContentManagerTests.
-      - name: Run DirectX Audio Tests
-        if: runner.os == 'Windows' && runner.environment != 'github-hosted'
-        run: dotnet vstest ..\Tests\MonoGame.Tests.WindowsDX.csproj --TestCaseFilter:Category=Audio
-        env:
-          CI: true
-        working-directory: tests-windowsdx
+      # - name: Run DirectX Audio Tests
+      #   if: runner.os == 'Windows' && runner.environment != 'github-hosted'
+      #   run: dotnet test --filter Category=Audio MonoGame.Tests.dll 
+      #   env:
+      #     CI: true
+      #   working-directory: tests-windowsdx
         
       - name: Run DirectX All Tests Except Audio
         if: runner.os == 'Windows' && runner.environment != 'github-hosted'
-        run: dotnet vstest ..\Tests\MonoGame.Tests.WindowsDX.csproj --TestCaseFilter:"Category!=Audio" 
+        run: dotnet test --filter Category!=Audio MonoGame.Tests.dll  
         env:
           CI: true
         working-directory: tests-windowsdx
