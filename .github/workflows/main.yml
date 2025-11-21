@@ -24,6 +24,7 @@ jobs:
 
       - name: Generate global.json
         run: |
+          echo "DotNetVersion=${{ env.DotnetVersion }}"
           echo '{ "sdk": { "version": "${{ env.DotnetVersion }}" } }' > global.json
 
       - name: Setup .NET Core SDK
@@ -158,6 +159,7 @@ jobs:
 
         - name: Generate global.json
           run: |
+            echo "DotNetVersion=${{ env.DotnetVersion }}"
             echo '{ "sdk": { "version": "${{ env.DotnetVersion }}" } }' > global.json
 
         - name: Setup .NET Core SDK
@@ -192,6 +194,7 @@ jobs:
 
         - name: Generate global.json
           run: |
+            echo "DotNetVersion=${{ env.DotnetVersion }}"
             echo '{ "sdk": { "version": "${{ env.DotnetVersion }}" } }' > global.json
 
         - name: Setup .NET Core SDK
@@ -269,6 +272,7 @@ jobs:
 
       - name: Generate global.json
         run: |
+          echo "DotNetVersion=${{ env.DotnetVersion }}"
           echo '{ "sdk": { "version": "${{ env.DotnetVersion }}" } }' > global.json
 
       - name: Setup .NET Core SDK
@@ -327,14 +331,14 @@ jobs:
       # This is because the audio tests has some incompatibilities within the runner with ContentManagerTests.
       - name: Run DirectX Audio Tests
         if: runner.os == 'Windows' && runner.environment != 'github-hosted'
-        run: dotnet vstest MonoGame.Tests.dll --TestCaseFilter:Category=Audio
+        run: dotnet vstest ..\Tests\MonoGame.Tests.WindowsDX.csproj --TestCaseFilter:Category=Audio
         env:
           CI: true
         working-directory: tests-windowsdx
         
       - name: Run DirectX All Tests Except Audio
         if: runner.os == 'Windows' && runner.environment != 'github-hosted'
-        run: dotnet vstest MonoGame.Tests.dll --TestCaseFilter:"Category!=Audio" 
+        run: dotnet vstest ..\Tests\MonoGame.Tests.WindowsDX.csproj --TestCaseFilter:"Category!=Audio" 
         env:
           CI: true
         working-directory: tests-windowsdx
