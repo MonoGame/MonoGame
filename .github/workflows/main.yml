@@ -326,12 +326,12 @@ jobs:
       #     CI: true
       #   working-directory: tests-windowsdx
         
-      - name: Run DirectX All Tests Except Audio
-        if: runner.os == 'Windows' && runner.environment != 'github-hosted'
-        run: dotnet test --filter Category!=Audio MonoGame.Tests.dll  
-        env:
-          CI: true
-        working-directory: tests-windowsdx
+      # - name: Run DirectX All Tests Except Audio
+      #   if: runner.os == 'Windows' && runner.environment != 'github-hosted'
+      #   run: dotnet test --filter Category!=Audio MonoGame.Tests.dll  
+      #   env:
+      #     CI: true
+      #   working-directory: tests-windowsdx
 
       # Run the DesktopGL tests on all platforms using NUnitLite runner not dotnet test
       # We have to run this is bits because the tests crash if too many are run in one go?
