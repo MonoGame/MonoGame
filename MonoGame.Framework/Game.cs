@@ -1184,10 +1184,12 @@ namespace Microsoft.Xna.Framework
 
             public override bool Equals(object obj)
             {
-                if (!(obj is AddJournalEntry<T>))
-                    return false;
+                if (obj is AddJournalEntry<T> addJournalEntry)
+                {
+                    return object.Equals(Item, addJournalEntry.Item);
+                }
 
-                return object.Equals(Item, ((AddJournalEntry<T>)obj).Item);
+                return false;
             }
         }
     }
