@@ -218,7 +218,7 @@ namespace Microsoft.Xna.Framework
                 if (value < TimeSpan.Zero)
                     throw new ArgumentOutOfRangeException(
                         "The time must be positive.");
-                
+
                 if (value < _targetElapsedTime)
                     throw new ArgumentOutOfRangeException(
                         "The time must be at least TargetElapsedTime");
@@ -276,7 +276,7 @@ namespace Microsoft.Xna.Framework
 
         /// <summary>
         /// Indicates if this game is running with a fixed time between frames.
-        /// 
+        ///
         /// When set to <code>true</code> the target time between frames is
         /// given by <see cref="TargetElapsedTime"/>.
         /// </summary>
@@ -411,13 +411,13 @@ namespace Microsoft.Xna.Framework
         }
 
         /// <summary>
-        /// Supress calling <see cref="Draw"/> in the game loop.
+        /// Suppress calling <see cref="Draw"/> in the game loop.
         /// </summary>
         public void SuppressDraw()
         {
             _suppressDraw = true;
         }
-        
+
         /// <summary>
         /// Run the game for one frame, then exit.
         /// </summary>
@@ -436,7 +436,7 @@ namespace Microsoft.Xna.Framework
                 _initialized = true;
             }
 
-            BeginRun();            
+            BeginRun();
 
             //Not quite right..
             Tick ();
@@ -509,8 +509,8 @@ namespace Microsoft.Xna.Framework
         public void Tick()
         {
             // NOTE: This code is very sensitive and can break very badly
-            // with even what looks like a safe change.  Be sure to test 
-            // any change fully in both the fixed and variable timestep 
+            // with even what looks like a safe change.  Be sure to test
+            // any change fully in both the fixed and variable timestep
             // modes across multiple devices and platforms.
 
         RetryTick:
@@ -733,7 +733,7 @@ namespace Microsoft.Xna.Framework
         {
             EventHelpers.Raise(sender, Exiting, args);
         }
-		
+
         /// <summary>
         /// Called when the game gains focus. Raises the <see cref="Activated"/> event.
         /// </summary>
@@ -744,7 +744,7 @@ namespace Microsoft.Xna.Framework
 			AssertNotDisposed();
             EventHelpers.Raise(sender, Activated, args);
 		}
-		
+
         /// <summary>
         /// Called when the game loses focus. Raises the <see cref="Deactivated"/> event.
         /// </summary>
@@ -815,7 +815,7 @@ namespace Microsoft.Xna.Framework
             if (Platform.BeforeUpdate(gameTime))
             {
                 FrameworkDispatcher.Update();
-				
+
                 Update(gameTime);
 
                 //The TouchPanel needs to know the time for when touches arrive
@@ -849,7 +849,7 @@ namespace Microsoft.Xna.Framework
             // 1. Categorize components into IUpdateable and IDrawable lists.
             // 2. Subscribe to Added/Removed events to keep the categorized
             //    lists synced and to Initialize future components as they are
-            //    added.            
+            //    added.
             CategorizeComponents();
             _components.ComponentAdded += Components_ComponentAdded;
             _components.ComponentRemoved += Components_ComponentRemoved;
