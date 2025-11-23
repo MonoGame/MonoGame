@@ -15,8 +15,20 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [windows-latest, macos-26, ubuntu-24.04]
+        include:
+          - os: windows-latest
+            platform: windows
+            shell: pwsh
+          - os: macos-26
+            platform: macos
+            shell: bash
+          - os: ubuntu-24.04
+            platform: linux
+            shell: bash      
       fail-fast: false
+    defaults:
+      run:
+        shell: ${{ matrix.shell }}
     steps:
       - name: Clone repository
         uses: actions/checkout@v5
@@ -241,7 +253,7 @@ jobs:
         include:
           - os: windows${{ needs.choose-runner.outputs.runner }}latest
             platform: windows
-            shell: cmd
+            shell: pwsh
           - os: macos${{ needs.choose-runner.outputs.runner }}15
             platform: macos
             shell: bash
@@ -249,8 +261,6 @@ jobs:
             platform: linux
             shell: bash
             filter: --where="Category != Audio"
-          # - os: linux
-          #   platform: linux
       fail-fast: false
     defaults:
       run:
@@ -328,7 +338,7 @@ jobs:
         
       - name: Run DirectX All Tests Except Audio
         if: runner.os == 'Windows' && runner.environment != 'github-hosted'
-        run: dotnet test --filter Category!=Audio MonoGame.Tests.dll 
+        run: dotnet test --filter Category!=Audio MonoGame.Tests.dll  
         env:
           CI: true
         working-directory: tests-windowsdx
