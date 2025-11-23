@@ -179,7 +179,7 @@ namespace Microsoft.Xna.Framework
         internal static Game Instance { get { return Game._instance; } }
 
         /// <summary>
-        /// The start up parameters for this <see cref="Game"/>.
+        /// The start-up parameters for this <see cref="Game"/>.
         /// </summary>
         public LaunchParameters LaunchParameters { get; private set; }
 
