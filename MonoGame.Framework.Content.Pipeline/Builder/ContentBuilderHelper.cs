@@ -65,7 +65,7 @@ static class ContentBuilderHelper
 
     static ContentBuilderHelper()
     {
-        var serilizer = new SerializerBuilder()
+        var serializer = new SerializerBuilder()
             .WithNamingConvention(CamelCaseNamingConvention.Instance)
             .WithTypeConverter(new ColorConverter())
             .EnablePrivateConstructors()
@@ -87,7 +87,7 @@ static class ContentBuilderHelper
 
                 if (t.GetInterface(nameof(IContentImporter)) != null)
                 {
-                    serilizer.WithTagMapping("!" + t.ToString(), t);
+                    serializer.WithTagMapping("!" + t.ToString(), t);
                     deserializer.WithTagMapping("!" + t.ToString(), t);
 
                     _importers.Add(new ImporterInfo
@@ -98,7 +98,7 @@ static class ContentBuilderHelper
                 }
                 else if (t.GetInterface(nameof(IContentProcessor)) != null)
                 {
-                    serilizer.WithTagMapping("!" + t.ToString(), t);
+                    serializer.WithTagMapping("!" + t.ToString(), t);
                     deserializer.WithTagMapping("!" + t.ToString(), t);
 
                     _processors.Add(new ProcessorInfo
@@ -134,7 +134,7 @@ static class ContentBuilderHelper
             }
         }
 
-        Serializer = serilizer.Build();
+        Serializer = serializer.Build();
         Deserializer = deserializer.Build();
     }
 
