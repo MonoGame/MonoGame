@@ -302,10 +302,6 @@ static class ContentBuilderHelper
                 if (filePath[i] == '.')
                 {
                     extensionEnd = i;
-                }
-
-                if (filePath[i] == '/' || filePath[i] == '\\')
-                {
                     break;
                 }
             }
