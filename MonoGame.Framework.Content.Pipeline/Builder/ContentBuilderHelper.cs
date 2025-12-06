@@ -59,12 +59,25 @@ static class ContentBuilderHelper
         public required PropertyInfo PropertyInfo { get; init; }
     }
 
+    private static readonly HashSet<AssemblyName> _loadedAssemblies = [];
     private static readonly List<ImporterInfo> _importers = [];
     private static readonly List<ProcessorInfo> _processors = [];
     private static readonly Dictionary<Type, List<ServerPropertyInfo>> _serverOptions = [];
 
-    static ContentBuilderHelper()
+    public static ISerializer Serializer { get; set; } = null!;
+
+    public static IDeserializer Deserializer { get; set; } = null!;
+
+    public static void LoadAssemblies()
     {
+        var assemblies = AppDomain.CurrentDomain.GetAssemblies();
+
+        foreach (var a in assemblies)
+            _loadedAssemblies.Add(a.GetName());
+
+        foreach (var a in assemblies)
+            LoadAssemblyRefs(a);
+
         var serializer = new SerializerBuilder()
             .WithNamingConvention(CamelCaseNamingConvention.Instance)
             .WithTypeConverter(new ColorConverter())
@@ -78,7 +91,8 @@ static class ContentBuilderHelper
             .IgnoreFields()
             .IgnoreUnmatchedProperties();
 
-        foreach (var a in AppDomain.CurrentDomain.GetAssemblies())
+        assemblies = AppDomain.CurrentDomain.GetAssemblies();
+        foreach (var a in assemblies)
         {
             foreach (var t in a.GetTypes())
             {
@@ -137,10 +151,6 @@ static class ContentBuilderHelper
         Serializer = serializer.Build();
         Deserializer = deserializer.Build();
     }
-
-    public static readonly ISerializer Serializer;
-
-    public static readonly IDeserializer Deserializer;
 
     public static bool ArePropsEqual(object? obj1, object? obj2)
     {
@@ -332,6 +342,24 @@ static class ContentBuilderHelper
         }
 
         return filePath.Replace('\\', '/');
+    }
+
+    private static void LoadAssemblyRefs(Assembly assembly)
+    {
+        _loadedAssemblies.Add(assembly.GetName());
+
+        foreach (var refAssembly in assembly.GetReferencedAssemblies())
+        {
+            if (_loadedAssemblies.Contains(refAssembly) ||
+                refAssembly.FullName.StartsWith("System."))
+                continue;
+
+            try
+            {
+                LoadAssemblyRefs(Assembly.Load(refAssembly));
+            }
+            catch { }
+        }
     }
 }
 
