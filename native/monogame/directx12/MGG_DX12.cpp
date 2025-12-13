@@ -778,6 +778,9 @@ void MGDX_ApplyState(MGG_GraphicsDevice* device)
 	{
 		cl->RSSetViewports(1, &device->viewport);
 		device->viewportDirty = false;
+
+		if (!device->scissorTestEnable)
+			device->scissorDirty = true;
 	}
 
 	if (device->scissorDirty)
