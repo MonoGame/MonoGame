@@ -1,7 +1,9 @@
-// MonoGame - Copyright (C) The MonoGame Team
+// MonoGame - Copyright (C) MonoGame Foundation, Inc
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
+using Microsoft.Xna.Framework;
+using MonoGame.Effect.Compiler.Effect.Spirv;
 using System;
 using System.Linq;
 
@@ -9,114 +11,124 @@ namespace MonoGame.Effect
 {
     internal partial class ConstantBufferData
     {
-        static EffectObject.D3DXPARAMETER_TYPE ToParamType(string dataType)
+        static EffectObject.D3DXPARAMETER_TYPE ToParamType(SpirvTypeBase spirvType)
         {
-            switch(dataType)
+            if (spirvType is SpirvTypeVector vector)
+                return ToParamType(vector.ElementType);
+            else if (spirvType is SpirvTypeMatrix matrix)
+                return ToParamType(matrix.ColumnType.ElementType);
+            else if (spirvType is SpirvTypeArray array)
+                return ToParamType(array.ElementType);
+
+            switch (spirvType.Type)
             {
-                case "float":
+                case SpirvType.Float:
                     return EffectObject.D3DXPARAMETER_TYPE.FLOAT;
-                case "uint":
-                case "int":
+                case SpirvType.Int:
                     return EffectObject.D3DXPARAMETER_TYPE.INT;
-                case "bool":
+                case SpirvType.Bool:
                     return EffectObject.D3DXPARAMETER_TYPE.BOOL;
                 default:
-                    throw new Exception("Unknown data type: " + dataType);
-            };
+                    throw new Exception("Unknown data type: " + spirvType);
+            }
         }
 
-        public void AddParameter(string name, string dataType, int sizeOfArray, int byteOffset)
+        static (uint rows, uint columns, EffectObject.D3DXPARAMETER_CLASS paramClass) DimensionsForType(SpirvTypeBase spirvType)
         {
-            // Has this parameter already been added?
-            var found = Parameters.FirstOrDefault(p => p.name == name);
-            if (found != null)
-                return;
-
-            // Create the new parameter.
-            var param = new EffectObject.d3dx_parameter();
-            param.name = name;
-            param.semantic = string.Empty;
-            param.bufferOffset = byteOffset;
-
-            if (dataType.StartsWith("%mat"))
-            {
-                param.columns = (uint)char.GetNumericValue(dataType[4]);
-                param.rows = (uint)char.GetNumericValue(dataType[6]);
-                param.type = ToParamType(dataType.Substring(7));
-            }
-            else if (dataType.StartsWith("%v"))
-            {
-                param.rows = 1;
-                param.columns = (uint)char.GetNumericValue(dataType[2]);
-                param.type = ToParamType(dataType.Substring(3));
-            }
-            else if (dataType.StartsWith("%_arr_"))
-            {
-                // TODO: Support arrays.... %_arr_mat4v3float_uint_72
-                param.rows = 1;
-                param.columns = 1;
-                param.type = EffectObject.D3DXPARAMETER_TYPE.FLOAT;
-            }
+            if (spirvType is SpirvTypeArray array)
+                return DimensionsForType(array.ElementType);
+            else if (spirvType is SpirvTypeVector vector)
+                return (1, vector.Dimensions, EffectObject.D3DXPARAMETER_CLASS.VECTOR);
+            else if (spirvType is SpirvTypeMatrix matrix)
+                return (matrix.ColumnType.Dimensions, matrix.Columns, EffectObject.D3DXPARAMETER_CLASS.MATRIX_COLUMNS);
             else
-            {
-                param.rows = 1;
-                param.columns = 1;
-                param.type = ToParamType(dataType.Substring(1));
-            }
+                return (1, 1, EffectObject.D3DXPARAMETER_CLASS.SCALAR);
+        }
 
-            if (param.rows > 1)
-                param.class_ = EffectObject.D3DXPARAMETER_CLASS.MATRIX_COLUMNS;
-            else if (param.columns > 1)
-                param.class_ = EffectObject.D3DXPARAMETER_CLASS.VECTOR;
+        // This one calculates how large we need to make the bit array of data for this specific parameter
+        static uint DataSizeForMember(SpirvTypeBase type)
+        {
+            if (type is SpirvTypeScalar svScalar)
+                // SPIR-V scalar widths are bit-sized.
+                return svScalar.Width / 8;
+            else if (type is SpirvTypeVector svVector)
+                return DataSizeForMember(svVector.ElementType) * svVector.Dimensions;
+            else if (type is SpirvTypeMatrix svMatrix)
+                return DataSizeForMember(svMatrix.ColumnType) * svMatrix.Columns;
+            else if (type is SpirvTypeArray svArray)
+                return DataSizeForMember(svArray.ElementType);
             else
-                param.class_ = EffectObject.D3DXPARAMETER_CLASS.SCALAR;
+                return 4;
+        }
 
-            var byteSize = param.rows * param.columns * 4;
+        // And this one calculates the size of the parameter with padding
+        static uint PaddingSizeForMember(SpirvTypeStructMember member)
+        {
+            if (member.Type is SpirvTypeScalar svScalar)
+                // SPIR-V scalar widths are bit-sized.
+                return svScalar.Width / 8;
+            else if (member.Type is SpirvTypeVector svVector)
+                return svVector.Dimensions * svVector.ElementType.Width / 8;
+            else if (member.Type is SpirvTypeMatrix svMatrix)
+                return member.MatrixStride.Value * svMatrix.Columns;
+            else if (member.Type is SpirvTypeArray svArray)
+                return svArray.ArrayStride.Value * svArray.Length;
+            else
+                return 4;
+        }
 
-            if (sizeOfArray > 0)
+        public static ConstantBufferData BuildFromSpirvStruct(SpirvTypeStruct svStruct)
+        {
+            var cbuffer = new ConstantBufferData(svStruct.Name);
+            var byOffset = svStruct.Members.OrderBy(m => m.Offset.Value);
+
+            foreach (var member in byOffset)
             {
-                param.element_count = (uint)sizeOfArray;
-                param.member_handles = new EffectObject.d3dx_parameter[param.element_count];
-                for (var i = 0; i < param.element_count; i++)
+                var param = new EffectObject.d3dx_parameter();
+                param.name = member.Name;
+                param.semantic = string.Empty;
+                param.bufferOffset = (int)member.Offset.Value;
+
+                (param.rows, param.columns, param.class_) = DimensionsForType(member.Type);
+                param.type = ToParamType(member.Type);
+                var dataSize = DataSizeForMember(member.Type);
+
+                if (member.Type is SpirvTypeArray array)
                 {
-                    var mparam = new EffectObject.d3dx_parameter();
+                    param.element_count = array.Length;
+                    param.member_handles = new EffectObject.d3dx_parameter[param.element_count];
 
-                    mparam.name = string.Empty;
-                    mparam.semantic = string.Empty;
-                    mparam.type = param.type;
-                    mparam.class_ = param.class_;
-                    mparam.rows = param.rows;
-                    mparam.columns = param.columns;
-                    mparam.data = new byte[byteSize];
+                    for (uint i = 0; i < array.Length; i++)
+                    {
+                        var mparam = new EffectObject.d3dx_parameter();
 
-                    param.member_handles[i] = mparam;
+                        mparam.name = string.Empty;
+                        mparam.semantic = string.Empty;
+                        mparam.type = param.type;
+                        mparam.class_ = param.class_;
+                        mparam.rows = param.rows;
+                        mparam.columns = param.columns;
+                        mparam.data = new byte[dataSize];
+
+                        param.member_handles[i] = mparam;
+                    }
                 }
+                else
+                {
+                    // TODO: Default value?
+                    var data = new byte[dataSize];
+                    param.data = data;
+                }
+
+                cbuffer.Parameters.Add(param);
+                cbuffer.ParameterOffset.Add(param.bufferOffset);
             }
 
-            var data = new byte[byteSize];
+            var lastItem = svStruct.Members.MaxBy(mem => mem.Offset.Value);
+            cbuffer.Size = (int)(lastItem.Offset.Value + PaddingSizeForMember(lastItem));
+            cbuffer.Size = ((cbuffer.Size + 15) / 16) * 16;
 
-            // TODO: Default value?
-
-            param.data = data;
-                        
-            // Add the new parameter and resort by the
-            // offset for some consistent results.
-            Parameters.Add(param);
-            Parameters = Parameters.OrderBy(e => e.bufferOffset).ToList();
-
-            // Recreate the parameter offsets and calculate the size.
-            Size = 0;
-            ParameterOffset.Clear();
-            foreach (var p in Parameters)
-            {
-                ParameterOffset.Add(p.bufferOffset);
-
-                var esize = p.rows * p.columns * 4;
-                if (p.element_count > 0)
-                    esize = (esize + (16 - (esize % 16))) * p.element_count;
-
-                Size = p.bufferOffset + (int)esize;
-            }
+            return cbuffer;
         }
     }
 }
