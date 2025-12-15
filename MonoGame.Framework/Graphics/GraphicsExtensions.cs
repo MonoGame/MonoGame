@@ -804,7 +804,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
 #endif // OPENGL
 
-                    public static int GetSyncInterval(this PresentInterval interval)
+        public static int GetSyncInterval(this PresentInterval interval)
         {
             switch (interval)
             {
@@ -1060,7 +1060,7 @@ namespace Microsoft.Xna.Framework.Graphics
             }
         }
 #endif
-            }
+    }
 
     internal class MonoGameGLException : Exception
     {
