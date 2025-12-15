@@ -547,7 +547,7 @@ namespace MonoGame.OpenGL
 
     internal partial class ColorFormat
     {
-        internal ColorFormat (int r, int g, int b, int a)
+        internal ColorFormat(int r, int g, int b, int a)
         {
             R = r;
             G = g;
@@ -773,7 +773,7 @@ namespace MonoGame.OpenGL
         [System.Security.SuppressUnmanagedCodeSecurity()]
         [UnmanagedFunctionPointer(callingConvention)]
         [MonoNativeFunctionWrapper]
-        internal delegate void DeleteRenderbuffersDelegate(int count, [In] [Out] ref int buffer);
+        internal delegate void DeleteRenderbuffersDelegate(int count, [In][Out] ref int buffer);
         internal static DeleteRenderbuffersDelegate DeleteRenderbuffers;
 
         [System.Security.SuppressUnmanagedCodeSecurity()]
@@ -918,7 +918,7 @@ namespace MonoGame.OpenGL
         [System.Security.SuppressUnmanagedCodeSecurity()]
         [UnmanagedFunctionPointer(callingConvention)]
         [MonoNativeFunctionWrapper]
-        internal delegate void DeleteQueriesDelegate(int count, [In] [Out] ref int queryId);
+        internal delegate void DeleteQueriesDelegate(int count, [In][Out] ref int queryId);
         internal static DeleteQueriesDelegate DeleteQueries;
 
         [System.Security.SuppressUnmanagedCodeSecurity()]
@@ -1205,6 +1205,43 @@ namespace MonoGame.OpenGL
         internal delegate void UnmapBufferDelegate(BufferTarget target);
         internal static UnmapBufferDelegate UnmapBuffer;
 
+        /// <summary>
+        /// Access mask flags for glMapBufferRange (OpenGL ES 3.0+ / OpenGL 3.0+).
+        /// </summary>
+        internal enum MapBufferAccessMask
+        {
+            /// <summary>
+            /// The mapped buffer range will be read by the client.
+            /// </summary>
+            MapReadBit = 0x0001,
+            /// <summary>
+            /// The mapped buffer range will be written by the client.
+            /// </summary>
+            MapWriteBit = 0x0002,
+            /// <summary>
+            /// The previous contents of the specified range may be discarded.
+            /// </summary>
+            MapInvalidateRangeBit = 0x0004,
+            /// <summary>
+            /// The previous contents of the entire buffer may be discarded.
+            /// </summary>
+            MapInvalidateBufferBit = 0x0008,
+            /// <summary>
+            /// Explicit flushing of modified buffer range will be performed.
+            /// </summary>
+            MapFlushExplicitBit = 0x0010,
+            /// <summary>
+            /// No GL error will be generated if the buffer is accessed while mapped.
+            /// </summary>
+            MapUnsynchronizedBit = 0x0020,
+        }
+
+        [System.Security.SuppressUnmanagedCodeSecurity()]
+        [UnmanagedFunctionPointer(callingConvention)]
+        [MonoNativeFunctionWrapper]
+        internal delegate IntPtr MapBufferRangeDelegate(BufferTarget target, IntPtr offset, IntPtr length, int access);
+        internal static MapBufferRangeDelegate MapBufferRange;
+
         [System.Security.SuppressUnmanagedCodeSecurity()]
         [UnmanagedFunctionPointer(callingConvention)]
         [MonoNativeFunctionWrapper]
@@ -1214,7 +1251,7 @@ namespace MonoGame.OpenGL
         [System.Security.SuppressUnmanagedCodeSecurity()]
         [UnmanagedFunctionPointer(callingConvention)]
         [MonoNativeFunctionWrapper]
-        internal delegate void DeleteBuffersDelegate(int count, [In] [Out] ref int buffer);
+        internal delegate void DeleteBuffersDelegate(int count, [In][Out] ref int buffer);
         internal static DeleteBuffersDelegate DeleteBuffers;
 
         [System.Security.SuppressUnmanagedCodeSecurity()]
@@ -1245,15 +1282,15 @@ namespace MonoGame.OpenGL
         internal static VertexAttribDivisorDelegate VertexAttribDivisor;
 
 #if DEBUG
-        [UnmanagedFunctionPointer (CallingConvention.StdCall)]
-        delegate void DebugMessageCallbackProc (int source, int type, int id, int severity, int length, IntPtr message, IntPtr userParam);
+        [UnmanagedFunctionPointer(CallingConvention.StdCall)]
+        delegate void DebugMessageCallbackProc(int source, int type, int id, int severity, int length, IntPtr message, IntPtr userParam);
         static DebugMessageCallbackProc DebugProc;
-        [System.Security.SuppressUnmanagedCodeSecurity ()]
+        [System.Security.SuppressUnmanagedCodeSecurity()]
         [MonoNativeFunctionWrapper]
-        delegate void DebugMessageCallbackDelegate (DebugMessageCallbackProc callback, IntPtr userParam);
+        delegate void DebugMessageCallbackDelegate(DebugMessageCallbackProc callback, IntPtr userParam);
         static DebugMessageCallbackDelegate DebugMessageCallback;
 
-        internal delegate void ErrorDelegate (string message);
+        internal delegate void ErrorDelegate(string message);
         internal static event ErrorDelegate OnError;
 
         static void DebugMessageCallbackHandler(int source, int type, int id, int severity, int length, IntPtr message, IntPtr userParam)
@@ -1267,147 +1304,150 @@ namespace MonoGame.OpenGL
 
         internal static int SwapInterval { get; set; }
 
-        internal static void LoadEntryPoints ()
+        internal static void LoadEntryPoints()
         {
-            LoadPlatformEntryPoints ();
+            LoadPlatformEntryPoints();
 
             if (Viewport == null)
-                Viewport = LoadFunction<ViewportDelegate> ("glViewport");
+                Viewport = LoadFunction<ViewportDelegate>("glViewport");
             if (Scissor == null)
-                Scissor = LoadFunction<ScissorDelegate> ("glScissor");
+                Scissor = LoadFunction<ScissorDelegate>("glScissor");
             if (MakeCurrent == null)
-                MakeCurrent = LoadFunction<MakeCurrentDelegate> ("glMakeCurrent");
+                MakeCurrent = LoadFunction<MakeCurrentDelegate>("glMakeCurrent");
 
-            GetError = LoadFunction<GetErrorDelegate> ("glGetError");
+            GetError = LoadFunction<GetErrorDelegate>("glGetError");
 
-            TexParameterf = LoadFunction<TexParameterFloatDelegate> ("glTexParameterf");
-            TexParameterfv = LoadFunction<TexParameterFloatArrayDelegate> ("glTexParameterfv");
-            TexParameteri = LoadFunction<TexParameterIntDelegate> ("glTexParameteri");
+            TexParameterf = LoadFunction<TexParameterFloatDelegate>("glTexParameterf");
+            TexParameterfv = LoadFunction<TexParameterFloatArrayDelegate>("glTexParameterfv");
+            TexParameteri = LoadFunction<TexParameterIntDelegate>("glTexParameteri");
 
-            EnableVertexAttribArray = LoadFunction<EnableVertexAttribArrayDelegate> ("glEnableVertexAttribArray");
-            DisableVertexAttribArray = LoadFunction<DisableVertexAttribArrayDelegate> ("glDisableVertexAttribArray");
-            GetIntegerv = LoadFunction<GetIntegerDelegate> ("glGetIntegerv");
-            GetStringInternal = LoadFunction<GetStringDelegate> ("glGetString");
-            ClearDepth = LoadFunction<ClearDepthDelegate> ("glClearDepth");
+            EnableVertexAttribArray = LoadFunction<EnableVertexAttribArrayDelegate>("glEnableVertexAttribArray");
+            DisableVertexAttribArray = LoadFunction<DisableVertexAttribArrayDelegate>("glDisableVertexAttribArray");
+            GetIntegerv = LoadFunction<GetIntegerDelegate>("glGetIntegerv");
+            GetStringInternal = LoadFunction<GetStringDelegate>("glGetString");
+            ClearDepth = LoadFunction<ClearDepthDelegate>("glClearDepth");
             if (ClearDepth == null)
-                ClearDepth = LoadFunction<ClearDepthDelegate> ("glClearDepthf");
-            DepthRanged = LoadFunction<DepthRangedDelegate> ("glDepthRange");
-            DepthRangef = LoadFunction<DepthRangefDelegate> ("glDepthRangef");
-            Clear = LoadFunction<ClearDelegate> ("glClear");
-            ClearColor = LoadFunction<ClearColorDelegate> ("glClearColor");
-            ClearStencil = LoadFunction<ClearStencilDelegate> ("glClearStencil");
-            Flush = LoadFunction<FlushDelegate> ("glFlush");
-            GenTextures = LoadFunction<GenTexturesDelegte> ("glGenTextures");
-            BindTexture = LoadFunction<BindTextureDelegate> ("glBindTexture");
+                ClearDepth = LoadFunction<ClearDepthDelegate>("glClearDepthf");
+            DepthRanged = LoadFunction<DepthRangedDelegate>("glDepthRange");
+            DepthRangef = LoadFunction<DepthRangefDelegate>("glDepthRangef");
+            Clear = LoadFunction<ClearDelegate>("glClear");
+            ClearColor = LoadFunction<ClearColorDelegate>("glClearColor");
+            ClearStencil = LoadFunction<ClearStencilDelegate>("glClearStencil");
+            Flush = LoadFunction<FlushDelegate>("glFlush");
+            GenTextures = LoadFunction<GenTexturesDelegte>("glGenTextures");
+            BindTexture = LoadFunction<BindTextureDelegate>("glBindTexture");
 
-            Enable = LoadFunction<EnableDelegate> ("glEnable");
-            Disable = LoadFunction<DisableDelegate> ("glDisable");
-            CullFace = LoadFunction<CullFaceDelegate> ("glCullFace");
-            FrontFace = LoadFunction<FrontFaceDelegate> ("glFrontFace");
-            PolygonMode = LoadFunction<PolygonModeDelegate> ("glPolygonMode");
-            PolygonOffset = LoadFunction<PolygonOffsetDelegate> ("glPolygonOffset");
+            Enable = LoadFunction<EnableDelegate>("glEnable");
+            Disable = LoadFunction<DisableDelegate>("glDisable");
+            CullFace = LoadFunction<CullFaceDelegate>("glCullFace");
+            FrontFace = LoadFunction<FrontFaceDelegate>("glFrontFace");
+            PolygonMode = LoadFunction<PolygonModeDelegate>("glPolygonMode");
+            PolygonOffset = LoadFunction<PolygonOffsetDelegate>("glPolygonOffset");
 
-            BindBuffer = LoadFunction<BindBufferDelegate> ("glBindBuffer");
-            DrawBuffers = LoadFunction<DrawBuffersDelegate> ("glDrawBuffers");
-            DrawElements = LoadFunction<DrawElementsDelegate> ("glDrawElements");
-            DrawArrays = LoadFunction<DrawArraysDelegate> ("glDrawArrays");
-            Uniform1i = LoadFunction<Uniform1iDelegate> ("glUniform1i");
-            Uniform4fv = LoadFunction<Uniform4fvDelegate> ("glUniform4fv");
+            BindBuffer = LoadFunction<BindBufferDelegate>("glBindBuffer");
+            DrawBuffers = LoadFunction<DrawBuffersDelegate>("glDrawBuffers");
+            DrawElements = LoadFunction<DrawElementsDelegate>("glDrawElements");
+            DrawArrays = LoadFunction<DrawArraysDelegate>("glDrawArrays");
+            Uniform1i = LoadFunction<Uniform1iDelegate>("glUniform1i");
+            Uniform4fv = LoadFunction<Uniform4fvDelegate>("glUniform4fv");
             ReadPixelsInternal = LoadFunction<ReadPixelsDelegate>("glReadPixels");
 
-            ReadBuffer = LoadFunction<ReadBufferDelegate> ("glReadBuffer");
-            DrawBuffer = LoadFunction<DrawBufferDelegate> ("glDrawBuffer");
+            ReadBuffer = LoadFunction<ReadBufferDelegate>("glReadBuffer");
+            DrawBuffer = LoadFunction<DrawBufferDelegate>("glDrawBuffer");
 
             // Render Target Support. These might be null if they are not supported
             // see GraphicsDevice.OpenGL.FramebufferHelper.cs for handling other extensions.
-            GenRenderbuffers = LoadFunction<GenRenderbuffersDelegate> ("glGenRenderbuffers");
-            BindRenderbuffer = LoadFunction<BindRenderbufferDelegate> ("glBindRenderbuffer");
-            DeleteRenderbuffers = LoadFunction<DeleteRenderbuffersDelegate> ("glDeleteRenderbuffers");
-            GenFramebuffers = LoadFunction<GenFramebuffersDelegate> ("glGenFramebuffers");
-            BindFramebuffer = LoadFunction<BindFramebufferDelegate> ("glBindFramebuffer");
-            DeleteFramebuffers = LoadFunction<DeleteFramebuffersDelegate> ("glDeleteFramebuffers");
-            FramebufferTexture2D = LoadFunction<FramebufferTexture2DDelegate> ("glFramebufferTexture2D");
-            FramebufferRenderbuffer = LoadFunction<FramebufferRenderbufferDelegate> ("glFramebufferRenderbuffer");
-            RenderbufferStorage = LoadFunction<RenderbufferStorageDelegate> ("glRenderbufferStorage");
-            RenderbufferStorageMultisample = LoadFunction<RenderbufferStorageMultisampleDelegate> ("glRenderbufferStorageMultisample");
-            GenerateMipmap = LoadFunction<GenerateMipmapDelegate> ("glGenerateMipmap");
-            BlitFramebuffer = LoadFunction<BlitFramebufferDelegate> ("glBlitFramebuffer");
-            CheckFramebufferStatus = LoadFunction<CheckFramebufferStatusDelegate> ("glCheckFramebufferStatus");
+            GenRenderbuffers = LoadFunction<GenRenderbuffersDelegate>("glGenRenderbuffers");
+            BindRenderbuffer = LoadFunction<BindRenderbufferDelegate>("glBindRenderbuffer");
+            DeleteRenderbuffers = LoadFunction<DeleteRenderbuffersDelegate>("glDeleteRenderbuffers");
+            GenFramebuffers = LoadFunction<GenFramebuffersDelegate>("glGenFramebuffers");
+            BindFramebuffer = LoadFunction<BindFramebufferDelegate>("glBindFramebuffer");
+            DeleteFramebuffers = LoadFunction<DeleteFramebuffersDelegate>("glDeleteFramebuffers");
+            FramebufferTexture2D = LoadFunction<FramebufferTexture2DDelegate>("glFramebufferTexture2D");
+            FramebufferRenderbuffer = LoadFunction<FramebufferRenderbufferDelegate>("glFramebufferRenderbuffer");
+            RenderbufferStorage = LoadFunction<RenderbufferStorageDelegate>("glRenderbufferStorage");
+            RenderbufferStorageMultisample = LoadFunction<RenderbufferStorageMultisampleDelegate>("glRenderbufferStorageMultisample");
+            GenerateMipmap = LoadFunction<GenerateMipmapDelegate>("glGenerateMipmap");
+            BlitFramebuffer = LoadFunction<BlitFramebufferDelegate>("glBlitFramebuffer");
+            CheckFramebufferStatus = LoadFunction<CheckFramebufferStatusDelegate>("glCheckFramebufferStatus");
 
-            GenQueries = LoadFunction<GenQueriesDelegate> ("glGenQueries");
-            BeginQuery = LoadFunction<BeginQueryDelegate> ("glBeginQuery");
-            EndQuery = LoadFunction<EndQueryDelegate> ("glEndQuery");
+            GenQueries = LoadFunction<GenQueriesDelegate>("glGenQueries");
+            BeginQuery = LoadFunction<BeginQueryDelegate>("glBeginQuery");
+            EndQuery = LoadFunction<EndQueryDelegate>("glEndQuery");
             GetQueryObject = LoadFunction<GetQueryObjectDelegate>("glGetQueryObjectuiv");
             if (GetQueryObject == null)
-                GetQueryObject = LoadFunction<GetQueryObjectDelegate> ("glGetQueryObjectivARB");
+                GetQueryObject = LoadFunction<GetQueryObjectDelegate>("glGetQueryObjectivARB");
             if (GetQueryObject == null)
-                GetQueryObject = LoadFunction<GetQueryObjectDelegate> ("glGetQueryObjectiv");
-            DeleteQueries = LoadFunction<DeleteQueriesDelegate> ("glDeleteQueries");
+                GetQueryObject = LoadFunction<GetQueryObjectDelegate>("glGetQueryObjectiv");
+            DeleteQueries = LoadFunction<DeleteQueriesDelegate>("glDeleteQueries");
 
-            ActiveTexture = LoadFunction<ActiveTextureDelegate> ("glActiveTexture");
-            CreateShader = LoadFunction<CreateShaderDelegate> ("glCreateShader");
-            ShaderSourceInternal = LoadFunction<ShaderSourceDelegate> ("glShaderSource");
-            CompileShader = LoadFunction<CompileShaderDelegate> ("glCompileShader");
-            GetShaderiv = LoadFunction<GetShaderDelegate> ("glGetShaderiv");
-            GetShaderInfoLogInternal = LoadFunction<GetShaderInfoLogDelegate> ("glGetShaderInfoLog");
-            IsShader = LoadFunction<IsShaderDelegate> ("glIsShader");
-            DeleteShader = LoadFunction<DeleteShaderDelegate> ("glDeleteShader");
-            GetAttribLocation = LoadFunction<GetAttribLocationDelegate> ("glGetAttribLocation");
-            GetUniformLocation = LoadFunction<GetUniformLocationDelegate> ("glGetUniformLocation");
+            ActiveTexture = LoadFunction<ActiveTextureDelegate>("glActiveTexture");
+            CreateShader = LoadFunction<CreateShaderDelegate>("glCreateShader");
+            ShaderSourceInternal = LoadFunction<ShaderSourceDelegate>("glShaderSource");
+            CompileShader = LoadFunction<CompileShaderDelegate>("glCompileShader");
+            GetShaderiv = LoadFunction<GetShaderDelegate>("glGetShaderiv");
+            GetShaderInfoLogInternal = LoadFunction<GetShaderInfoLogDelegate>("glGetShaderInfoLog");
+            IsShader = LoadFunction<IsShaderDelegate>("glIsShader");
+            DeleteShader = LoadFunction<DeleteShaderDelegate>("glDeleteShader");
+            GetAttribLocation = LoadFunction<GetAttribLocationDelegate>("glGetAttribLocation");
+            GetUniformLocation = LoadFunction<GetUniformLocationDelegate>("glGetUniformLocation");
 
-            IsProgram = LoadFunction<IsProgramDelegate> ("glIsProgram");
-            DeleteProgram = LoadFunction<DeleteProgramDelegate> ("glDeleteProgram");
-            CreateProgram = LoadFunction<CreateProgramDelegate> ("glCreateProgram");
-            AttachShader = LoadFunction<AttachShaderDelegate> ("glAttachShader");
-            UseProgram = LoadFunction<UseProgramDelegate> ("glUseProgram");
-            LinkProgram = LoadFunction<LinkProgramDelegate> ("glLinkProgram");
-            GetProgramiv = LoadFunction<GetProgramDelegate> ("glGetProgramiv");
-            GetProgramInfoLogInternal = LoadFunction<GetProgramInfoLogDelegate> ("glGetProgramInfoLog");
-            DetachShader = LoadFunction<DetachShaderDelegate> ("glDetachShader");
+            IsProgram = LoadFunction<IsProgramDelegate>("glIsProgram");
+            DeleteProgram = LoadFunction<DeleteProgramDelegate>("glDeleteProgram");
+            CreateProgram = LoadFunction<CreateProgramDelegate>("glCreateProgram");
+            AttachShader = LoadFunction<AttachShaderDelegate>("glAttachShader");
+            UseProgram = LoadFunction<UseProgramDelegate>("glUseProgram");
+            LinkProgram = LoadFunction<LinkProgramDelegate>("glLinkProgram");
+            GetProgramiv = LoadFunction<GetProgramDelegate>("glGetProgramiv");
+            GetProgramInfoLogInternal = LoadFunction<GetProgramInfoLogDelegate>("glGetProgramInfoLog");
+            DetachShader = LoadFunction<DetachShaderDelegate>("glDetachShader");
 
-            BlendColor = LoadFunction<BlendColorDelegate> ("glBlendColor");
-            BlendEquationSeparate = LoadFunction<BlendEquationSeparateDelegate> ("glBlendEquationSeparate");
+            BlendColor = LoadFunction<BlendColorDelegate>("glBlendColor");
+            BlendEquationSeparate = LoadFunction<BlendEquationSeparateDelegate>("glBlendEquationSeparate");
             BlendEquationSeparatei = LoadFunction<BlendEquationSeparateiDelegate>("glBlendEquationSeparatei");
-            BlendFuncSeparate = LoadFunction<BlendFuncSeparateDelegate> ("glBlendFuncSeparate");
+            BlendFuncSeparate = LoadFunction<BlendFuncSeparateDelegate>("glBlendFuncSeparate");
             BlendFuncSeparatei = LoadFunction<BlendFuncSeparateiDelegate>("glBlendFuncSeparatei");
-            ColorMask = LoadFunction<ColorMaskDelegate> ("glColorMask");
-            DepthFunc = LoadFunction<DepthFuncDelegate> ("glDepthFunc");
-            DepthMask = LoadFunction<DepthMaskDelegate> ("glDepthMask");
-            StencilFuncSeparate = LoadFunction<StencilFuncSeparateDelegate> ("glStencilFuncSeparate");
-            StencilOpSeparate = LoadFunction<StencilOpSeparateDelegate> ("glStencilOpSeparate");
-            StencilFunc = LoadFunction<StencilFuncDelegate> ("glStencilFunc");
-            StencilOp = LoadFunction<StencilOpDelegate> ("glStencilOp");
-            StencilMask = LoadFunction<StencilMaskDelegate> ("glStencilMask");
+            ColorMask = LoadFunction<ColorMaskDelegate>("glColorMask");
+            DepthFunc = LoadFunction<DepthFuncDelegate>("glDepthFunc");
+            DepthMask = LoadFunction<DepthMaskDelegate>("glDepthMask");
+            StencilFuncSeparate = LoadFunction<StencilFuncSeparateDelegate>("glStencilFuncSeparate");
+            StencilOpSeparate = LoadFunction<StencilOpSeparateDelegate>("glStencilOpSeparate");
+            StencilFunc = LoadFunction<StencilFuncDelegate>("glStencilFunc");
+            StencilOp = LoadFunction<StencilOpDelegate>("glStencilOp");
+            StencilMask = LoadFunction<StencilMaskDelegate>("glStencilMask");
 
-            CompressedTexImage2D = LoadFunction<CompressedTexImage2DDelegate> ("glCompressedTexImage2D");
-            TexImage2D = LoadFunction<TexImage2DDelegate> ("glTexImage2D");
-            CompressedTexSubImage2D = LoadFunction<CompressedTexSubImage2DDelegate> ("glCompressedTexSubImage2D");
-            TexSubImage2D = LoadFunction<TexSubImage2DDelegate> ("glTexSubImage2D");
-            PixelStore = LoadFunction<PixelStoreDelegate> ("glPixelStorei");
-            Finish = LoadFunction<FinishDelegate> ("glFinish");
-            GetTexImageInternal = LoadFunction<GetTexImageDelegate> ("glGetTexImage");
-            GetCompressedTexImageInternal = LoadFunction<GetCompressedTexImageDelegate> ("glGetCompressedTexImage");
-            TexImage3D = LoadFunction<TexImage3DDelegate> ("glTexImage3D");
-            TexSubImage3D = LoadFunction<TexSubImage3DDelegate> ("glTexSubImage3D");
-            DeleteTextures = LoadFunction<DeleteTexturesDelegate> ("glDeleteTextures");
+            CompressedTexImage2D = LoadFunction<CompressedTexImage2DDelegate>("glCompressedTexImage2D");
+            TexImage2D = LoadFunction<TexImage2DDelegate>("glTexImage2D");
+            CompressedTexSubImage2D = LoadFunction<CompressedTexSubImage2DDelegate>("glCompressedTexSubImage2D");
+            TexSubImage2D = LoadFunction<TexSubImage2DDelegate>("glTexSubImage2D");
+            PixelStore = LoadFunction<PixelStoreDelegate>("glPixelStorei");
+            Finish = LoadFunction<FinishDelegate>("glFinish");
+            GetTexImageInternal = LoadFunction<GetTexImageDelegate>("glGetTexImage");
+            GetCompressedTexImageInternal = LoadFunction<GetCompressedTexImageDelegate>("glGetCompressedTexImage");
+            TexImage3D = LoadFunction<TexImage3DDelegate>("glTexImage3D");
+            TexSubImage3D = LoadFunction<TexSubImage3DDelegate>("glTexSubImage3D");
+            DeleteTextures = LoadFunction<DeleteTexturesDelegate>("glDeleteTextures");
 
-            GenBuffers = LoadFunction<GenBuffersDelegate> ("glGenBuffers");
-            BufferData = LoadFunction<BufferDataDelegate> ("glBufferData");
-            MapBuffer = LoadFunction<MapBufferDelegate> ("glMapBuffer");
-            UnmapBuffer = LoadFunction<UnmapBufferDelegate> ("glUnmapBuffer");
-            BufferSubData = LoadFunction<BufferSubDataDelegate> ("glBufferSubData");
-            DeleteBuffers = LoadFunction<DeleteBuffersDelegate> ("glDeleteBuffers");
+            GenBuffers = LoadFunction<GenBuffersDelegate>("glGenBuffers");
+            BufferData = LoadFunction<BufferDataDelegate>("glBufferData");
+            MapBuffer = LoadFunction<MapBufferDelegate>("glMapBuffer");
+            UnmapBuffer = LoadFunction<UnmapBufferDelegate>("glUnmapBuffer");
+            MapBufferRange = LoadFunction<MapBufferRangeDelegate>("glMapBufferRange");
+            BufferSubData = LoadFunction<BufferSubDataDelegate>("glBufferSubData");
+            DeleteBuffers = LoadFunction<DeleteBuffersDelegate>("glDeleteBuffers");
 
-            VertexAttribPointer = LoadFunction<VertexAttribPointerDelegate> ("glVertexAttribPointer");
+            VertexAttribPointer = LoadFunction<VertexAttribPointerDelegate>("glVertexAttribPointer");
 
             // Instanced drawing requires GL 3.2 or up, if the either of the following entry points can not be loaded
             // this will get flagged by setting SupportsInstancing in GraphicsCapabilities to false.
-            try {
-                DrawElementsInstanced = LoadFunction<DrawElementsInstancedDelegate> ("glDrawElementsInstanced");
-                VertexAttribDivisor = LoadFunction<VertexAttribDivisorDelegate> ("glVertexAttribDivisor");
+            try
+            {
+                DrawElementsInstanced = LoadFunction<DrawElementsInstancedDelegate>("glDrawElementsInstanced");
+                VertexAttribDivisor = LoadFunction<VertexAttribDivisorDelegate>("glVertexAttribDivisor");
                 DrawElementsInstancedBaseInstance = LoadFunction<DrawElementsInstancedBaseInstanceDelegate>("glDrawElementsInstancedBaseInstance");
             }
-            catch (EntryPointNotFoundException) {
+            catch (EntryPointNotFoundException)
+            {
                 // this will be detected in the initialization of GraphicsCapabilities
             }
 
@@ -1428,11 +1468,12 @@ namespace MonoGame.OpenGL
                 // Ignore the debug message callback if the entry point can not be found
             }
 #endif
-            if (BoundApi == RenderApi.ES) {
-                InvalidateFramebuffer = LoadFunction<InvalidateFramebufferDelegate> ("glDiscardFramebufferEXT");
+            if (BoundApi == RenderApi.ES)
+            {
+                InvalidateFramebuffer = LoadFunction<InvalidateFramebufferDelegate>("glDiscardFramebufferEXT");
             }
 
-            LoadExtensions ();
+            LoadExtensions();
         }
 
         internal static List<string> Extensions;
@@ -1475,7 +1516,7 @@ namespace MonoGame.OpenGL
                 GL.LoadFrameBufferObjectEXTEntryPoints();
             }
             if (GL.RenderbufferStorageMultisample == null)
-            {                
+            {
                 if (HasExtension("GL_APPLE_framebuffer_multisample"))
                 {
                     GL.RenderbufferStorageMultisample = LoadFunction<GL.RenderbufferStorageMultisampleDelegate>("glRenderbufferStorageMultisampleAPPLE");
@@ -1542,100 +1583,109 @@ namespace MonoGame.OpenGL
                 DepthRanged(min, max);
         }
 
-        internal static void Uniform1 (int location, int value) {
+        internal static void Uniform1(int location, int value)
+        {
             Uniform1i(location, value);
         }
 
-        internal static unsafe void Uniform4 (int location, int size, float* value) {
+        internal static unsafe void Uniform4(int location, int size, float* value)
+        {
             Uniform4fv(location, size, value);
         }
 
-        internal unsafe static string GetString (StringName name)
+        internal unsafe static string GetString(StringName name)
         {
-            return Marshal.PtrToStringAnsi (GetStringInternal (name));
+            return Marshal.PtrToStringAnsi(GetStringInternal(name));
         }
 
-        protected static IntPtr MarshalStringArrayToPtr (string[] strings)
+        protected static IntPtr MarshalStringArrayToPtr(string[] strings)
         {
             IntPtr intPtr = IntPtr.Zero;
-            if (strings != null && strings.Length != 0) {
-                intPtr = Marshal.AllocHGlobal (strings.Length * IntPtr.Size);
-                if (intPtr == IntPtr.Zero) {
-                    throw new OutOfMemoryException ();
+            if (strings != null && strings.Length != 0)
+            {
+                intPtr = Marshal.AllocHGlobal(strings.Length * IntPtr.Size);
+                if (intPtr == IntPtr.Zero)
+                {
+                    throw new OutOfMemoryException();
                 }
                 int i = 0;
-                try {
-                    for (i = 0; i < strings.Length; i++) {
-                        IntPtr val = MarshalStringToPtr (strings [i]);
-                        Marshal.WriteIntPtr (intPtr, i * IntPtr.Size, val);
+                try
+                {
+                    for (i = 0; i < strings.Length; i++)
+                    {
+                        IntPtr val = MarshalStringToPtr(strings[i]);
+                        Marshal.WriteIntPtr(intPtr, i * IntPtr.Size, val);
                     }
                 }
-                catch (OutOfMemoryException) {
-                    for (i--; i >= 0; i--) {
-                        Marshal.FreeHGlobal (Marshal.ReadIntPtr (intPtr, i * IntPtr.Size));
+                catch (OutOfMemoryException)
+                {
+                    for (i--; i >= 0; i--)
+                    {
+                        Marshal.FreeHGlobal(Marshal.ReadIntPtr(intPtr, i * IntPtr.Size));
                     }
-                    Marshal.FreeHGlobal (intPtr);
+                    Marshal.FreeHGlobal(intPtr);
                     throw;
                 }
             }
             return intPtr;
         }
 
-        protected unsafe static IntPtr MarshalStringToPtr (string str)
+        protected unsafe static IntPtr MarshalStringToPtr(string str)
         {
-            if (string.IsNullOrEmpty (str))
+            if (string.IsNullOrEmpty(str))
             {
                 return IntPtr.Zero;
             }
-            int num = Encoding.ASCII.GetMaxByteCount (str.Length) + 1;
-            IntPtr intPtr = Marshal.AllocHGlobal (num);
+            int num = Encoding.ASCII.GetMaxByteCount(str.Length) + 1;
+            IntPtr intPtr = Marshal.AllocHGlobal(num);
             if (intPtr == IntPtr.Zero)
             {
-                throw new OutOfMemoryException ();
+                throw new OutOfMemoryException();
             }
-            
-            fixed (char* chars = str)
+            fixed (char* chars = str + RuntimeHelpers.OffsetToStringData / 2)
             {
-                int bytes = Encoding.ASCII.GetBytes (chars, str.Length, (byte*)((void*)intPtr), num);
-                Marshal.WriteByte (intPtr, bytes, 0);
+                int bytes = Encoding.ASCII.GetBytes(chars, str.Length, (byte*)((void*)intPtr), num);
+                Marshal.WriteByte(intPtr, bytes, 0);
                 return intPtr;
             }
         }
 
-        protected static void FreeStringArrayPtr (IntPtr ptr, int length)
+        protected static void FreeStringArrayPtr(IntPtr ptr, int length)
         {
-            for (int i = 0; i < length; i++) {
-                Marshal.FreeHGlobal (Marshal.ReadIntPtr (ptr, i * IntPtr.Size));
+            for (int i = 0; i < length; i++)
+            {
+                Marshal.FreeHGlobal(Marshal.ReadIntPtr(ptr, i * IntPtr.Size));
             }
-            Marshal.FreeHGlobal (ptr);
+            Marshal.FreeHGlobal(ptr);
         }
 
-        internal static string GetProgramInfoLog (int programId)
+        internal static string GetProgramInfoLog(int programId)
         {
             int length = 0;
             GetProgram(programId, GetProgramParameterName.LogLength, out length);
             var sb = new StringBuilder(length, length);
-            GetProgramInfoLogInternal (programId, length, IntPtr.Zero, sb);
+            GetProgramInfoLogInternal(programId, length, IntPtr.Zero, sb);
             return sb.ToString();
         }
 
-        internal static string GetShaderInfoLog (int shaderId) {
+        internal static string GetShaderInfoLog(int shaderId)
+        {
             int length = 0;
             GetShader(shaderId, ShaderParameter.LogLength, out length);
             var sb = new StringBuilder(length, length);
-            GetShaderInfoLogInternal (shaderId, length, IntPtr.Zero, sb);
+            GetShaderInfoLogInternal(shaderId, length, IntPtr.Zero, sb);
             return sb.ToString();
         }
 
         internal unsafe static void ShaderSource(int shaderId, string code)
         {
             int length = code.Length;
-            IntPtr intPtr = MarshalStringArrayToPtr (new string[] { code });
+            IntPtr intPtr = MarshalStringArrayToPtr(new string[] { code });
             ShaderSourceInternal(shaderId, 1, intPtr, &length);
             FreeStringArrayPtr(intPtr, 1);
         }
 
-        internal unsafe static void GetShader (int shaderId, ShaderParameter name, out int result)
+        internal unsafe static void GetShader(int shaderId, ShaderParameter name, out int result)
         {
             fixed (int* ptr = &result)
             {
@@ -1651,18 +1701,19 @@ namespace MonoGame.OpenGL
             }
         }
 
-        internal unsafe static void GetInteger (GetPName name, out int value)
-        {
-            fixed (int* ptr = &value) {
-                GetIntegerv ((int)name, ptr);
-            }
-        }
-
-        internal unsafe static void GetInteger (int name, out int value)
+        internal unsafe static void GetInteger(GetPName name, out int value)
         {
             fixed (int* ptr = &value)
             {
-                GetIntegerv (name, ptr);
+                GetIntegerv((int)name, ptr);
+            }
+        }
+
+        internal unsafe static void GetInteger(int name, out int value)
+        {
+            fixed (int* ptr = &value)
+            {
+                GetIntegerv(name, ptr);
             }
         }
 
@@ -1724,4 +1775,3 @@ namespace MonoGame.OpenGL
         }
     }
 }
-
