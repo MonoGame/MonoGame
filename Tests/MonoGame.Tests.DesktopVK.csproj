@@ -42,13 +42,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Remove="Framework\Audio\DynamicSoundEffectInstanceTest.cs" />
-    <Compile Remove="Framework\Audio\SoundEffectInstanceTest.cs" />
-    <Compile Remove="Framework\Audio\SoundEffectTest.cs" />
-    <Compile Remove="Framework\Audio\XactTest.cs" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\MonoGame.Framework\MonoGame.Framework.Native.csproj" />
 
 	  <Content Include="..\Artifacts\monogame.native\windows\desktopvk\$(Configuration)\monogame.native.dll" Condition="Exists('..\Artifacts\monogame.native\windows\desktopvk\$(Configuration)\monogame.native.dll')" Visible="false">
@@ -64,10 +57,6 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
 	  
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Framework\Audio\" />
   </ItemGroup>
 
 </Project>

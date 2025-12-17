@@ -40,14 +40,31 @@ mgbool MG_Asset_Open(const char* path, MG_Asset*& handle, mglong& length)
     return true;
 }
 
-mgint MG_Asset_Read(MG_Asset* handle,  mgbyte* buffer, mglong count)
+mgint MG_Asset_Read(MG_Asset* handle, mgbyte* buffer, mglong count)
 {
     return fread(buffer, 1, count, handle->file);
 }
 
 mglong MG_Asset_Seek(MG_Asset* handle, mglong offset, mgint whence)
 {
-    return fseek(handle->file, offset, whence);
+    int origin;
+    switch (whence)
+    {
+        default:
+        case 0: // Begin
+            origin = SEEK_SET;
+            break;
+        case 1: // Current
+            origin = SEEK_CUR;
+            break;
+        case 2: // End
+            origin = SEEK_END;
+            break;
+    }
+
+    fseek(handle->file, offset, origin);
+
+    return ftell(handle->file);
 }
 
 void MG_Asset_Close(MG_Asset* handle)

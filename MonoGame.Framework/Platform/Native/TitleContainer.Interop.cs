@@ -25,7 +25,7 @@ internal unsafe class ReadOnlyAssetStream : Stream
             if (value < 0 || value > _length)
                 throw new ArgumentOutOfRangeException();
 
-            _position = value;
+            _position = MG.AssetSeek(_asset, value, (int)SeekOrigin.Begin);
         }
     }
 

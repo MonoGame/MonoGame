@@ -65,6 +65,8 @@ mguint MG_ComputeHash(const mgbyte* value, mgint length);
 mguint MG_ComputeHash(mguint value, mguint result = 0x811c9dc5);
 mguint MG_ComputeHash(const mgbyte* value, mgint length, mguint result);
 
+float* MGA_Voice_CalculatePanMatrix(float pan, float scale, float* matrix, int srcChannels);
+
 // Removes the element preserving order.
 template <class T>
 void mg_remove(std::vector<T>& vector, const T& element)

@@ -237,6 +237,8 @@ public abstract class ContentBuilder
     /// <param name="parameters">A <see cref="ContentBuilderParams"/> describing both the platform paramteres for the content compilation as well as the configuration of the <see cref="ContentBuilder"/> itself.</param>
     public bool Run(ContentBuilderParams parameters)
     {
+        ContentBuilderHelper.LoadAssemblies();
+
         Parameters = parameters;
         if (parameters.Mode == ContentBuilderMode.None)
         {
