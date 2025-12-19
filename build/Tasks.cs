@@ -16,7 +16,6 @@ public sealed class BuildShadersTask : FrostingTask<BuildContext> { }
 [IsDependentOn(typeof(BuildAndroidTask))]
 [IsDependentOn(typeof(BuildiOSTask))]
 [IsDependentOn(typeof(BuildContentPipelineTask))]
-[IsDependentOn(typeof(BuildConsoleCheckTask))]
 public sealed class BuildFrameworksTask : FrostingTask<BuildContext> { }
 
 [TaskName("Build Tools")]

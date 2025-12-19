@@ -9,28 +9,30 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace MonoGame.Tests.Graphics
 {
-#if DESKTOPGL
-    [Ignore("Texture3D is not implemented for the OpenGL backend.")]
-#endif
     [TestFixture]
     [NonParallelizable]
-    public class Texture3DNonVisualTest
+    [RunOnUI]
+    internal class Texture3DNonVisualTest : GraphicsDeviceTestFixtureBase
     {
         Texture3D t;
         Color[] reference;
         const int w=50, h=50, d=50, a = w * d * h;
-        private Game _game;
 
-        [OneTimeSetUp]
-        public void TestFixtureSetUp()
+        [TearDown]
+        public override void TearDown()
         {
-            reference = new Color[a];
-            _game = new Game();
-            var graphicsDeviceManager = new GraphicsDeviceManager(_game);
-            graphicsDeviceManager.GraphicsProfile = GraphicsProfile.HiDef;
-            graphicsDeviceManager.ApplyChanges();
+            t.Dispose();
+            base.TearDown();
+        }
 
-            t = new Texture3D(_game.GraphicsDevice, w, h, d, false, SurfaceFormat.Color);
+        [SetUp]
+        public override void SetUp()
+        {
+            base.SetUp();
+
+            reference = new Color[a];
+
+            t = new Texture3D(game.GraphicsDevice, w, h, d, false, SurfaceFormat.Color);
             for (int layer = 0; layer < d; layer++)
             {
                 for (int i = 0; i < w * h; i++)
@@ -38,18 +40,6 @@ namespace MonoGame.Tests.Graphics
                     reference[layer * w * h + i] = new Color(layer * 5, layer * 5, layer * 5, layer * 5);
                 }
             }
-        }
-
-        [OneTimeTearDown]
-        public void TestFixtureTearDown()
-        {
-            _game.Dispose();
-            t.Dispose();
-        }
-
-        [SetUp]
-        public void TestSetUp()
-        {
             t.SetData(reference);
         }
 
@@ -58,7 +48,7 @@ namespace MonoGame.Tests.Graphics
         public void ZeroSizeShouldFailTest()
         {
             Texture3D texture;
-            var gd = _game.GraphicsDevice;
+            var gd = game.GraphicsDevice;
             Assert.Throws<ArgumentOutOfRangeException>(() => texture = new Texture3D(gd, 0, 1, 1, false, SurfaceFormat.Color));
             Assert.Throws<ArgumentOutOfRangeException>(() => texture = new Texture3D(gd, 1, 0, 1, false, SurfaceFormat.Color));
             Assert.Throws<ArgumentOutOfRangeException>(() => texture = new Texture3D(gd, 1, 1, 0, false, SurfaceFormat.Color));
