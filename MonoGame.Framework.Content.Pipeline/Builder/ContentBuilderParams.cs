@@ -305,16 +305,18 @@ public class ContentBuilderParams
         if (!Path.IsPathRooted(path))
             path = Path.Combine(WorkingDirectory, path);
 
-        return Path.GetFullPath(path);
+        path = Path.GetFullPath(path);
+
+        return FileHelper.NormalizeSeparators(path, true);
     }
 
     private static string MakeRelative(string workingDir, string path)
     {
         if (!Path.IsPathRooted(path))
-            return FileHelper.NormalizeDirectorySeparators(path);
+            return FileHelper.NormalizeSeparators(path, true);
 
         // Note this may still return an absolute path in the case
         // that these directories are on different drives.
-        return Path.GetRelativePath(workingDir, path);
+        return FileHelper.NormalizeSeparators(Path.GetRelativePath(workingDir, path), true);
     }
 }

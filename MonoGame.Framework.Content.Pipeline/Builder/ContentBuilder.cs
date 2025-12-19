@@ -138,7 +138,7 @@ public abstract class ContentBuilder
 
     private object? ProcessContent(string relativePath, ContentInfo contentInfo, bool writeToDisk, string? relativeOutputPath, ContentProcessorContext? parentContext)
     {
-        var filePath = Path.Combine(Parameters.RootedSourceDirectory, relativePath);
+        var filePath = FileHelper.NormalizeSeparators(Path.Combine(Parameters.RootedSourceDirectory, relativePath));
         var relativeDestPath = Path.Combine(contentInfo.ContentRoot, string.IsNullOrEmpty(relativeOutputPath) ? relativePath.GetDestinationPath(contentInfo.ShouldBuild, contentInfo.GetOutputPath) : relativeOutputPath).Sanitize();
         var outputPath = Path.Combine(Parameters.RootedOutputDirectory, relativeDestPath).Sanitize();
         var outputDir = Path.GetDirectoryName(outputPath);
@@ -151,6 +151,11 @@ public abstract class ContentBuilder
         if (!Directory.Exists(outputDir))
         {
             Directory.CreateDirectory(outputDir);
+        }
+
+        if (!Directory.Exists(Parameters.RootedIntermediateDirectory))
+        {
+            Directory.CreateDirectory(Parameters.RootedIntermediateDirectory);
         }
 
         Logger.Log($"Output: {relativeDestPath}");

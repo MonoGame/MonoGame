@@ -11,7 +11,9 @@ class ContentBuilderProcessorContext(ContentBuilder builder, string relativePath
 {
     private readonly ContentBuilder _builder = builder;
 
-    private readonly string _relativeContentPath = relativePath;
+    private readonly string _relativeContentPath = relativePath.Sanitize();
+
+    private readonly ContentIdentity _sourceIdentity = new ContentIdentity(sourceFilename: FileHelper.NormalizeSeparators(Path.Combine(builder.Parameters.RootedSourceDirectory, relativePath)));
 
     private readonly ContentInfo _contentInfo = contentInfo;
 
@@ -25,11 +27,11 @@ class ContentBuilderProcessorContext(ContentBuilder builder, string relativePath
 
     public override ContentBuildLogger Logger => _builder.Logger;
 
-    public override ContentIdentity SourceIdentity => throw new NotImplementedException();
+    public override ContentIdentity SourceIdentity => _sourceIdentity;
 
-    public override string OutputDirectory => _builder.Parameters.OutputDirectory;
+    public override string OutputDirectory => _builder.Parameters.RootedOutputDirectory;
 
-    public override string OutputFilename { get; } = outputFilename;
+    public override string OutputFilename { get; } = FileHelper.NormalizeSeparators(outputFilename);
 
     public override OpaqueDataDictionary Parameters { get; } = [];
 

@@ -4,12 +4,123 @@
 
 using System;
 using System.IO;
-using Microsoft.Xna.Framework.Content.Pipeline;
-using MonoGame.Framework.Content.Pipeline.Builder;
 using NUnit.Framework;
+using Microsoft.Xna.Framework.Content.Pipeline;
+using Microsoft.Xna.Framework.Content.Pipeline.Processors;
+using MonoGame.Framework.Content.Pipeline.Builder;
+
 
 namespace MonoGame.Tests.ContentPipeline
 {
+    class TestAsset
+    {
+    }
+
+    class TestContent
+    {
+    }
+
+    class TestImporter : ContentImporter<TestAsset>
+    {
+        public override TestAsset Import(string filename, ContentImporterContext context)
+        {
+            Assert.NotNull(filename);
+            Assert.IsTrue(File.Exists(filename));
+            Assert.IsFalse(filename.Contains(FileHelper.NotSeparator));
+
+            Assert.NotNull(context);
+            Assert.IsTrue(Directory.Exists(context.IntermediateDirectory));
+            Assert.IsTrue(context.IntermediateDirectory.EndsWith(FileHelper.Separator));
+            Assert.IsFalse(context.IntermediateDirectory.Contains(FileHelper.NotSeparator));
+            Assert.IsTrue(Directory.Exists(context.OutputDirectory));
+            Assert.IsTrue(context.OutputDirectory.EndsWith(FileHelper.Separator));
+            Assert.IsFalse(context.OutputDirectory.Contains(FileHelper.NotSeparator));
+
+            var asset = new TestAsset();
+            return asset;
+        }
+    }
+
+    class TestProcessor : ContentProcessor<TestAsset, TestContent>
+    {
+        public override TestContent Process(TestAsset input, ContentProcessorContext context)
+        {
+            Assert.NotNull(context);
+
+            Assert.IsTrue(Directory.Exists(context.IntermediateDirectory));
+            Assert.IsTrue(context.IntermediateDirectory.EndsWith(FileHelper.Separator));
+            Assert.IsFalse(context.IntermediateDirectory.Contains(FileHelper.NotSeparator));
+            Assert.IsTrue(Directory.Exists(context.OutputDirectory));
+            Assert.IsTrue(context.OutputDirectory.EndsWith(FileHelper.Separator));
+            Assert.IsFalse(context.OutputDirectory.Contains(FileHelper.NotSeparator));
+
+            Assert.NotNull(context.OutputFilename);
+            Assert.IsFalse(context.OutputFilename.Contains(FileHelper.NotSeparator));
+
+            Assert.NotNull(context.SourceIdentity);
+            Assert.NotNull(context.SourceIdentity.SourceFilename);
+            Assert.IsTrue(File.Exists(context.SourceIdentity.SourceFilename));
+            Assert.IsFalse(context.SourceIdentity.SourceFilename.Contains(FileHelper.NotSeparator));
+
+            Assert.NotNull(context.ProjectDirectory);
+            Assert.IsTrue(Directory.Exists(context.ProjectDirectory));
+            Assert.IsTrue(context.ProjectDirectory.EndsWith(FileHelper.Separator));
+            Assert.IsFalse(context.ProjectDirectory.Contains(FileHelper.NotSeparator));
+
+            var content = new TestContent();
+            return content;
+        }
+    }
+
+    class Builder : ContentBuilder
+    {
+        public override IContentCollection GetContentCollection()
+        {
+            var content = new ContentCollection();
+
+            content.Include<RegexRule>(".");
+
+            // This is not content.
+            content.Exclude<WildcardRule>("ReferenceImages/**/*.*");
+
+            // These all normally fail per design.
+            content.Exclude<WildcardRule>("**/04_ExcludingPublicMembers.xml");
+            content.Exclude<WildcardRule>("**/08_AllowNull.xml");
+            content.Exclude<WildcardRule>("**/17_ExternalReferences.xml");
+            content.Exclude<WildcardRule>("**/23_GetterOnlyPolymorphicArrayProperties.xml");            
+            content.Exclude<WildcardRule>("**/bark_mono_44hz_32bit.wav");
+            content.Exclude<WildcardRule>("**/bark_mono_88hz_16bit.wav");
+            content.Exclude<WildcardRule>("**/rock_loop_stereo.mp3");
+            content.Exclude<WildcardRule>("**/rock_loop_stereo.wma");
+            content.Exclude("Textures/rgbf.tif");
+            content.Exclude("Models/Dude/dude.fbx");
+            content.Exclude("Models/level1.fbx");
+
+            // These fail on some platforms without these
+            // fonts installed... so skip them.
+            content.Exclude("Fonts/SegoeKeycaps.spritefont");
+            content.Exclude("Fonts/Motorwerk.spritefont");
+            content.Exclude("Fonts/QuartzMS.spritefont");
+            content.Exclude("Fonts/JingJing.spritefont");
+            content.Exclude("Fonts/Lindsey.spritefont");
+
+            // These are not supported on DesktopGL.
+            content.Exclude("Effects/CustomSpriteBatchEffectComparisonSampler.fx");
+            content.Exclude("Effects/TextureArrayEffect.fx");
+            content.Exclude("Effects/VertexTextureEffect.fx");
+            content.Exclude("Effects/ParameterTypes.fx");
+            
+            // Required for this to build.
+            content.Include("Effects/DefinesTest.fx",
+                new EffectImporter(),
+                new EffectProcessor() { Defines = "MACRO_DEFINE_TEST=3" } ); 
+
+            content.Include(@"Effects/VertexTextureEffect.fx", new TestImporter(), new TestProcessor());
+
+            return content;
+        }
+    }
+
     [TestFixture]
     public class BuilderTest
     {
@@ -18,7 +129,7 @@ namespace MonoGame.Tests.ContentPipeline
             if (append != null)
                 path = Path.Combine(path, append);
 
-            return FileHelper.NormalizeDirectorySeparators(path);
+            return FileHelper.NormalizeSeparators(path, true);
         }
 
         [Test]
@@ -37,7 +148,7 @@ namespace MonoGame.Tests.ContentPipeline
             Assert.AreEqual(false, args.SkipClean);
             Assert.IsTrue(Path.IsPathRooted(args.WorkingDirectory));
             Assert.AreEqual(Directory.GetCurrentDirectory(), args.WorkingDirectory);
-            Assert.AreEqual("Content", args.SourceDirectory);
+            Assert.AreEqual(MakePath("Content"), args.SourceDirectory);
             Assert.AreEqual(MakePath(Directory.GetCurrentDirectory(), "Content"), args.RootedSourceDirectory);
             Assert.AreEqual(MakePath("bin/Content"), args.OutputDirectory);
             Assert.AreEqual(MakePath(Directory.GetCurrentDirectory(), "bin\\Content"), args.RootedOutputDirectory);
@@ -55,10 +166,40 @@ namespace MonoGame.Tests.ContentPipeline
             );
             Assert.AreEqual(MakePath("../Some/Folder"), args.SourceDirectory);
             Assert.AreEqual(MakePath("Other/Folder"), args.OutputDirectory);
-            Assert.AreEqual("Folder", args.IntermediateDirectory);
+            Assert.AreEqual(MakePath("Folder"), args.IntermediateDirectory);
 
             args = ContentBuilderParams.Parse("server");
             Assert.AreEqual(ContentBuilderMode.Server, args.Mode);
         }
-    } 
+
+        [Test]
+        public void BuildTest()
+        {
+            var args = new ContentBuilderParams
+            {
+                CompressContent = false,
+                GraphicsProfile = Microsoft.Xna.Framework.Graphics.GraphicsProfile.HiDef,
+                LogLevel = LogLevel.Debug,
+                Mode = ContentBuilderMode.Builder,
+                Platform = TargetPlatform.DesktopGL,
+                Rebuild = true,
+                WorkingDirectory = Directory.GetCurrentDirectory(),
+                SourceDirectory = "Assets",
+                IntermediateDirectory = "BuilderIntermediateDir",
+                OutputDirectory = "BuilderOutputDir"
+            };
+
+            // Cleanup old stuff first.
+            if (Directory.Exists(args.RootedIntermediateDirectory))
+                Directory.Delete(args.RootedIntermediateDirectory, true);
+            if (Directory.Exists(args.RootedOutputDirectory))
+                Directory.Delete(args.RootedOutputDirectory, true);
+
+            var builder = new Builder();
+            builder.Run(args);
+
+            var failures = builder.FailedToBuild;
+            Assert.AreEqual(0, failures);
+        }
+    }
 }
