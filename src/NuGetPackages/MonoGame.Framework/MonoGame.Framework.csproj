@@ -1,0 +1,10 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\MonoGame.Framework\MonoGame.Framework.Native.csproj" />
+    <ProjectReference Include="..\MonoGame.Runtime.Linux.Vulkan\MonoGame.Runtime.Linux.Vulkan.csproj" />
+    <ProjectReference Include="..\MonoGame.Runtime.Mac.Vulkan\MonoGame.Runtime.Mac.Vulkan.csproj" />
+    <ProjectReference Include="..\MonoGame.Runtime.Windows.DX12\MonoGame.Runtime.Windows.DX12.csproj" />
+  </ItemGroup>
+
+</Project>
