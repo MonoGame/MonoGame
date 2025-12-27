@@ -217,7 +217,7 @@ internal readonly struct MGP_Window { }
 
 internal static unsafe partial class MGP
 {
-    public const string MonoGameNativeDLL = "monogame.native";
+    public const string MonoGameNativeDLL = "mgruntime";
 
     #region Platform
 

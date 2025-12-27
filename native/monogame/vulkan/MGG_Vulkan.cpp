@@ -116,9 +116,6 @@ struct MGVK_Program;
 
 typedef uint32_t FrameCounter;
 
-const FrameCounter kFreeFrames = 3;
-const FrameCounter kConcurrentFrameCount = 2;
-
 
 struct MGVK_CmdBuffer
 {
@@ -224,6 +221,9 @@ struct MGG_GraphicsDevice
 	MGVK_FrameState* frames = nullptr;
 	FrameCounter frame = 0;
 
+	FrameCounter freeFrames = 0;
+	FrameCounter swapchainCount = 0;
+
 	uint32_t swapchainWidth = 0;
 	uint32_t swapchainHeight = 0;
 	VkFormat colorFormat = VK_FORMAT_UNDEFINED;
@@ -258,6 +258,7 @@ struct MGG_GraphicsDevice
 	MGG_Texture* textures[MAX_TEXTURE_SLOTS] = { 0 };
 	MGG_SamplerState* samplers[MAX_TEXTURE_SLOTS] = { 0 };
 	uint32_t textureSamplerDirty = 0;
+	MGG_Texture* nullTexture = nullptr;
 
 	bool blendFactorDirty = false;
 	float blendFactor[4] = { 0 };
@@ -467,6 +468,7 @@ static void MGVK_UpdateRenderPass(MGG_GraphicsDevice* device, FrameCounter curre
 static VkCommandBuffer MGVK_BeginNewCommandBuffer(MGG_GraphicsDevice* device);
 static void MGVK_ExecuteAndFreeCommandBuffer(MGG_GraphicsDevice* device, VkCommandBuffer commandBuffer);
 static void MGVK_CmdGenerateMipmaps(MGG_GraphicsDevice* device, VkCommandBuffer commandBuffer, MGG_Texture* texture);
+static void MGVK_ProcessDescriptorCaches(MGG_GraphicsDevice* device, FrameCounter currentFrame);
 static void MGVK_CmdTransitionImageLayout(
 	VkCommandBuffer cmd,
 	VkImage image,
@@ -1279,6 +1281,10 @@ MGG_GraphicsDevice* MGG_GraphicsDevice_Create(MGG_GraphicsSystem* system, MGG_Gr
 	{
 		enabledFeatures.occlusionQueryPrecise = VK_TRUE;
 	}
+	if (device->deviceFeatures.samplerAnisotropy)
+	{
+		enabledFeatures.samplerAnisotropy = VK_TRUE;
+	}
 
 	VkDeviceCreateInfo deviceCreateInfo = { VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO };
 	deviceCreateInfo.queueCreateInfoCount = 1;
@@ -1342,41 +1348,6 @@ MGG_GraphicsDevice* MGG_GraphicsDevice_Create(MGG_GraphicsSystem* system, MGG_Gr
 	VK_CHECK_RESULT(res);
 	VK_SET_OBJECT_NAME(device->device, device->cmdPool, VK_OBJECT_TYPE_COMMAND_POOL, "MGG_GraphicsDevice.cmdPool");
 
-	VkCommandBufferAllocateInfo comBufferInfo =
-	{
-		VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO,
-		NULL,
-		device->cmdPool,
-		VK_COMMAND_BUFFER_LEVEL_PRIMARY,
-		1
-	};
-
-	device->frames = new MGVK_FrameState[kConcurrentFrameCount];
-	memset(device->frames, 0, sizeof(MGVK_FrameState) * kConcurrentFrameCount);
-
-	for (int i = 0; i < kConcurrentFrameCount; i++)
-	{
-		MGVK_CmdBuffer& cmd = device->frames[i].commandBuffer;
-
-		res = vkAllocateCommandBuffers(device->device, &comBufferInfo, &cmd.buffer);
-		VK_CHECK_RESULT(res);
-		VK_SET_OBJECT_NAME(device->device, cmd.buffer, VK_OBJECT_TYPE_COMMAND_BUFFER, "MGVK_CmdBuffer.buffer[%d]", i);
-
-		VkSemaphoreCreateInfo semaphore_create_info = { VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO };
-		res = vkCreateSemaphore(device->device, &semaphore_create_info, NULL, &cmd.imageAcquiredSemaphore);
-		VK_CHECK_RESULT(res);
-		VK_SET_OBJECT_NAME(device->device, cmd.imageAcquiredSemaphore, VK_OBJECT_TYPE_SEMAPHORE, "MGVK_CmdBuffer.imageAcquiredSemaphore[%d]", i);
-		res = vkCreateSemaphore(device->device, &semaphore_create_info, NULL, &cmd.renderCompleteSemaphore);
-		VK_CHECK_RESULT(res);
-		VK_SET_OBJECT_NAME(device->device, cmd.renderCompleteSemaphore, VK_OBJECT_TYPE_SEMAPHORE, "MGVK_CmdBuffer.renderCompleteSemaphore[%d]", i);
-
-		VkFenceCreateInfo fence_create_info = { VK_STRUCTURE_TYPE_FENCE_CREATE_INFO };
-		fence_create_info.flags = VK_FENCE_CREATE_SIGNALED_BIT;
-		res = vkCreateFence(device->device, &fence_create_info, NULL, &cmd.completedFence);
-		VK_CHECK_RESULT(res);
-		VK_SET_OBJECT_NAME(device->device, cmd.completedFence, VK_OBJECT_TYPE_FENCE, "MGVK_CmdBuffer.completedFence[%d]", i);
-	}
-
 	// Create the pipeline cache which is used at runtime
 	// to speed up pipeline creation.
 	VkPipelineCacheCreateInfo pipelineCache{ VK_STRUCTURE_TYPE_PIPELINE_CACHE_CREATE_INFO };
@@ -1410,6 +1381,10 @@ MGG_GraphicsDevice* MGG_GraphicsDevice_Create(MGG_GraphicsSystem* system, MGG_Gr
 	memset(device->uniforms, 0, sizeof(device->uniforms));
 	memset(device->textures, 0, sizeof(device->textures));
 	memset(device->samplers, 0, sizeof(device->samplers));
+
+	device->nullTexture = MGG_Texture_Create(device, MGTextureType::_2D, MGSurfaceFormat::Color, 2, 2, 1, 1, 1);
+	uint32_t black[] = {0,0,0,0};
+	MGG_Texture_SetData(device, device->nullTexture, 0, 0, 0, 0, 0, 0, 0, 0, (mgbyte*)black, sizeof(black));
 
 	return device;
 }
@@ -1465,7 +1440,7 @@ static void cleanupSwapChain(MGG_GraphicsDevice* device)
 	}
 
 	// Cleanup the swap chain images.
-	for (size_t i = 0; i < kConcurrentFrameCount; i++)
+	for (size_t i = 0; i < device->swapchainCount; i++)
 	{
 		auto chain = device->frames[i].swapchainTexture;
 		if (chain == nullptr)
@@ -1517,7 +1492,7 @@ void MGG_GraphicsDevice_Destroy(MGG_GraphicsDevice* device)
 	while (device->all_buffers.size() > 0)
 		MGG_Buffer_Destroy(device, device->all_buffers[0]);
 
-	for (size_t i = 0; i < kConcurrentFrameCount; i++)
+	for (size_t i = 0; i < device->swapchainCount; i++)
 	{
 		auto cmd = device->frames[i].commandBuffer;
 
@@ -1528,7 +1503,9 @@ void MGG_GraphicsDevice_Destroy(MGG_GraphicsDevice* device)
 
 	vkDestroyCommandPool(device->device, device->cmdPool, nullptr);
 
-	for (size_t i = 0; i < kConcurrentFrameCount; i++)
+	MGG_Texture_Destroy(device, device->nullTexture);
+
+	for (size_t i = 0; i < device->swapchainCount; i++)
 		MGVK_DestroyFrameResources(device, i, true);
 
 	vmaDestroyAllocator(device->allocator);
@@ -1612,9 +1589,9 @@ void MGVK_RecreateSwapChain(
 	device->colorFormat = vkColor;
 	device->depthFormat = vkDepth;
 
+	// Check if the requested color format is supported, and fallback to another one otherwise.
+	VkFormat surface_format = VK_FORMAT_UNDEFINED;
 	{
-		// Check if the requested color format is supported, and fallback to another one otherwise.
-		VkFormat surface_format = VK_FORMAT_UNDEFINED;
 		uint32_t format_count = 0;
 		res = vkGetPhysicalDeviceSurfaceFormatsKHR(device->physicalDevice, device->surface, &format_count, nullptr);
 		VK_CHECK_RESULT(res);
@@ -1623,20 +1600,34 @@ void MGVK_RecreateSwapChain(
 		res = vkGetPhysicalDeviceSurfaceFormatsKHR(device->physicalDevice, device->surface, &format_count, surfFormats.data());
 		VK_CHECK_RESULT(res);
 
+	RETRY_SURFACE_FORMAT_SEARCH:
+
 		for (const auto& surfFormat : surfFormats)
 		{
-			if (surfFormat.format == vkColor &&
-				surfFormat.colorSpace == VK_COLOR_SPACE_SRGB_NONLINEAR_KHR)
-			{
-				// The expected format is supported
-				surface_format = surfFormat.format;
-				break;
-			}
+			if (surfFormat.colorSpace != VK_COLOR_SPACE_SRGB_NONLINEAR_KHR)
+				continue;
+			if (surfFormat.format != vkColor)
+				continue;
+
+			// The expected format is supported.
+			surface_format = surfFormat.format;
+			break;
+		}
+
+		// Some hardware only supports BGRA.
+		// For the swapchain allow BGRA to match to RGBA.
+		if (surface_format == VK_FORMAT_UNDEFINED && vkColor == VK_FORMAT_R8G8B8A8_UNORM)
+		{
+			vkColor = VK_FORMAT_B8G8R8A8_UNORM;
+			goto RETRY_SURFACE_FORMAT_SEARCH;
 		}
 
 		if (surface_format == VK_FORMAT_UNDEFINED)
 		{
-			// Format is unsupported, what should we do?
+			// TODO: We need a better "log" method that isn't just printfs.
+			// TODO: Would be nice to log the unsupported surface format.
+
+			printf("Requested swapchain format was unsupported!\n");
 			return;
 		}
 	}
@@ -1655,18 +1646,6 @@ void MGVK_RecreateSwapChain(
 	scalingCreateInfo.presentGravityY = VK_PRESENT_GRAVITY_CENTERED_BIT_EXT;
 	*/
 
-	VkSwapchainCreateInfoKHR create_info = { VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR };
-	create_info.surface = device->surface;
-	create_info.minImageCount = kConcurrentFrameCount;
-	create_info.imageFormat = device->colorFormat;
-	create_info.imageColorSpace = VK_COLOR_SPACE_SRGB_NONLINEAR_KHR;
-	create_info.imageExtent = extent;
-	create_info.imageArrayLayers = 1;
-	create_info.imageUsage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_TRANSFER_SRC_BIT;
-	create_info.imageSharingMode = VK_SHARING_MODE_EXCLUSIVE;
-	create_info.preTransform = VK_SURFACE_TRANSFORM_IDENTITY_BIT_KHR;
-	create_info.compositeAlpha = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR;
-	
 	// Query supported present modes and select the best one
 	uint32_t presentModeCount = 0;
 	res = vkGetPhysicalDeviceSurfacePresentModesKHR(device->physicalDevice, device->surface, &presentModeCount, nullptr);
@@ -1701,10 +1680,27 @@ void MGVK_RecreateSwapChain(
 			break;
 		}
 	}
-	
+
+	VkSwapchainCreateInfoKHR create_info = { VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR };
+	create_info.surface = device->surface;
+	create_info.imageFormat = surface_format;
+	create_info.imageColorSpace = VK_COLOR_SPACE_SRGB_NONLINEAR_KHR;
+	create_info.imageExtent = extent;
+	create_info.imageArrayLayers = 1;
+	create_info.imageUsage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_TRANSFER_SRC_BIT;
+	create_info.imageSharingMode = VK_SHARING_MODE_EXCLUSIVE;
+	create_info.preTransform = VK_SURFACE_TRANSFORM_IDENTITY_BIT_KHR;
+	create_info.compositeAlpha = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR;
 	create_info.presentMode = selectedPresentMode;
 	create_info.clipped = VK_TRUE;
 	//create_info.pNext = &scalingCreateInfo;
+
+	// This seems to just be a suggestion to vkCreateSwapchainKHR and
+	// vkGetSwapchainImagesKHR will really define the final number.
+	create_info.minImageCount = std::max(2u, surface_capabilities.minImageCount);
+	if (surface_capabilities.maxImageCount > 0)
+		create_info.minImageCount = std::min(create_info.minImageCount, surface_capabilities.maxImageCount);
+
 	res = vkCreateSwapchainKHR(device->device, &create_info, nullptr, &device->swapchain);
 	VK_CHECK_RESULT(res);
 	VK_SET_OBJECT_NAME(device->device, device->swapchain, VK_OBJECT_TYPE_SWAPCHAIN_KHR, "MGG_GraphicsDevice.swapchain");
@@ -1712,6 +1708,77 @@ void MGVK_RecreateSwapChain(
 	uint32_t swapchainCount = 0;
 	res = vkGetSwapchainImagesKHR(device->device, device->swapchain, &swapchainCount, NULL);
 	VK_CHECK_RESULT(res);
+
+	// Do we need to change the number of swapchain images?  This can happen for various reasons
+	// including display changes and refresh rates.
+	if (swapchainCount != device->swapchainCount)
+	{
+		// Free any existing swapchain frame info and recreate it.
+		if (device->frames != nullptr)
+		{
+			for (size_t i = 0; i < device->swapchainCount; i++)
+			{
+				auto cmd = device->frames[i].commandBuffer;
+
+				// TODO: Should we wait for fences here or is vkDeviceWaitIdle enough?
+
+				vkDestroySemaphore(device->device, cmd.imageAcquiredSemaphore, nullptr);
+				vkDestroySemaphore(device->device, cmd.renderCompleteSemaphore, nullptr);
+				vkDestroyFence(device->device, cmd.completedFence, nullptr);
+
+				if (device->frames[i].uniforms)
+					MGG_Buffer_Destroy(device, device->frames[i].uniforms);
+
+				MGVK_DestroyFrameResources(device, i, true);
+			}
+
+			delete[] device->frames;
+		}
+
+		// Since we know that all rendering has stopped it is
+		// safe to free all the descriptors and let them recreate
+		// on the next draw.  This removes all flicker caused by
+		// bad descriptor caches.
+		MGVK_ProcessDescriptorCaches(device, 0);
+
+		device->swapchainCount = swapchainCount;
+		device->freeFrames = device->swapchainCount + 1;
+
+		device->frames = new MGVK_FrameState[device->swapchainCount];
+		memset(device->frames, 0, sizeof(MGVK_FrameState) * device->swapchainCount);
+
+		VkCommandBufferAllocateInfo comBufferInfo =
+		{
+			VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO,
+			NULL,
+			device->cmdPool,
+			VK_COMMAND_BUFFER_LEVEL_PRIMARY,
+			1
+		};
+
+		for (int i = 0; i < device->swapchainCount; i++)
+		{
+			MGVK_CmdBuffer& cmd = device->frames[i].commandBuffer;
+
+			res = vkAllocateCommandBuffers(device->device, &comBufferInfo, &cmd.buffer);
+			VK_CHECK_RESULT(res);
+			VK_SET_OBJECT_NAME(device->device, cmd.buffer, VK_OBJECT_TYPE_COMMAND_BUFFER, "MGVK_CmdBuffer.buffer[%d]", i);
+
+			VkSemaphoreCreateInfo semaphore_create_info = { VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO };
+			res = vkCreateSemaphore(device->device, &semaphore_create_info, NULL, &cmd.imageAcquiredSemaphore);
+			VK_CHECK_RESULT(res);
+			VK_SET_OBJECT_NAME(device->device, cmd.imageAcquiredSemaphore, VK_OBJECT_TYPE_SEMAPHORE, "MGVK_CmdBuffer.imageAcquiredSemaphore[%d]", i);
+			res = vkCreateSemaphore(device->device, &semaphore_create_info, NULL, &cmd.renderCompleteSemaphore);
+			VK_CHECK_RESULT(res);
+			VK_SET_OBJECT_NAME(device->device, cmd.renderCompleteSemaphore, VK_OBJECT_TYPE_SEMAPHORE, "MGVK_CmdBuffer.renderCompleteSemaphore[%d]", i);
+
+			VkFenceCreateInfo fence_create_info = { VK_STRUCTURE_TYPE_FENCE_CREATE_INFO };
+			fence_create_info.flags = VK_FENCE_CREATE_SIGNALED_BIT;
+			res = vkCreateFence(device->device, &fence_create_info, NULL, &cmd.completedFence);
+			VK_CHECK_RESULT(res);
+			VK_SET_OBJECT_NAME(device->device, cmd.completedFence, VK_OBJECT_TYPE_FENCE, "MGVK_CmdBuffer.completedFence[%d]", i);
+		}
+	}
 
 	VkImage* swapchainImages = new VkImage[swapchainCount];
 	res = vkGetSwapchainImagesKHR(device->device, device->swapchain, &swapchainCount, swapchainImages);
@@ -1721,7 +1788,7 @@ void MGVK_RecreateSwapChain(
 	{
 		VkImageCreateInfo image_create_info = { VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO };
 		image_create_info.imageType = VK_IMAGE_TYPE_2D;
-		image_create_info.format = device->colorFormat;
+		image_create_info.format = surface_format;
 		image_create_info.extent = { device->swapchainWidth, device->swapchainHeight, 1 };
 		image_create_info.mipLevels = 1;
 		image_create_info.arrayLayers = 1;
@@ -1820,7 +1887,7 @@ static void MGVK_ProcessDescriptorCaches(MGG_GraphicsDevice* device, FrameCounte
 		for (; pair != usedSets.end();)
 		{
 			auto diff = currentFrame - pair->second->frame;
-			if (diff < kFreeFrames || (0xFFFF - diff) < kFreeFrames)
+			if (diff < device->freeFrames || (0xFFFF - diff) < device->freeFrames)
 			{
 				pair++;
 				continue;
@@ -1864,7 +1931,7 @@ mgint MGG_GraphicsDevice_BeginFrame(MGG_GraphicsDevice* device)
 	VkResult res;
 
 	const FrameCounter currentFrame = device->frame;
-	const FrameCounter frameIndex = currentFrame % kConcurrentFrameCount;
+	const FrameCounter frameIndex = currentFrame % device->swapchainCount;
 	MGVK_FrameState& frame = device->frames[frameIndex];
 	MGVK_CmdBuffer& cmd = frame.commandBuffer;
 
@@ -1909,7 +1976,7 @@ void MGG_GraphicsDevice_Clear(MGG_GraphicsDevice* device, MGClearOptions options
 		return;
 
 	auto currentFrame = device->frame;
-	auto frameIndex = currentFrame % kConcurrentFrameCount;
+	auto frameIndex = currentFrame % device->swapchainCount;
 	auto& frame = device->frames[frameIndex];
 	auto& cmd = frame.commandBuffer;
 	assert(frame.is_recording);
@@ -2025,7 +2092,7 @@ static void MGVK_DestroyFrameResources(MGG_GraphicsDevice* device, mgint current
 	assert(device != nullptr);
 	assert(currentFrame >= 0);
 
-	auto frameIndex = currentFrame % kConcurrentFrameCount;
+	auto frameIndex = currentFrame % device->swapchainCount;
 	auto& frame = device->frames[frameIndex];
 
 	// Delete resources that haven't been used in a few frames 
@@ -2034,7 +2101,7 @@ static void MGVK_DestroyFrameResources(MGG_GraphicsDevice* device, mgint current
 		{
 			auto buffer = device->destroyBuffers.front();
 			auto diff = currentFrame - buffer->frame;
-			if (!free_all && diff < kFreeFrames || (0xFFFF - diff) < kFreeFrames)
+			if (!free_all && diff < device->freeFrames || (0xFFFF - diff) < device->freeFrames)
 				break;
 
 			device->destroyBuffers.pop();
@@ -2046,7 +2113,7 @@ static void MGVK_DestroyFrameResources(MGG_GraphicsDevice* device, mgint current
 		{
 			auto texture = device->destroyTextures.front();
 			auto diff = currentFrame - texture->frame;
-			if (!free_all && diff < kFreeFrames || (0xFFFF - diff) < kFreeFrames)
+			if (!free_all && diff < device->freeFrames || (0xFFFF - diff) < device->freeFrames)
 				break;
 
 			device->destroyTextures.pop();
@@ -2083,7 +2150,7 @@ static void MGVK_DestroyFrameResources(MGG_GraphicsDevice* device, mgint current
 		{
 			auto state = device->destroyBlendStates.front();
 			auto diff = currentFrame - state->frame;
-			if (!free_all && diff < kFreeFrames || (0xFFFF - diff) < kFreeFrames)
+			if (!free_all && diff < device->freeFrames || (0xFFFF - diff) < device->freeFrames)
 				break;
 
 			device->destroyBlendStates.pop();
@@ -2096,7 +2163,7 @@ static void MGVK_DestroyFrameResources(MGG_GraphicsDevice* device, mgint current
 		{
 			auto state = device->destroyRasterizerStates.front();
 			auto diff = currentFrame - state->frame;
-			if (!free_all && diff < kFreeFrames || (0xFFFF - diff) < kFreeFrames)
+			if (!free_all && diff < device->freeFrames || (0xFFFF - diff) < device->freeFrames)
 				break;
 
 			device->destroyRasterizerStates.pop();
@@ -2109,7 +2176,7 @@ static void MGVK_DestroyFrameResources(MGG_GraphicsDevice* device, mgint current
 		{
 			auto state = device->destroyDepthStencilStates.front();
 			auto diff = currentFrame - state->frame;
-			if (!free_all && diff < kFreeFrames || (0xFFFF - diff) < kFreeFrames)
+			if (!free_all && diff < device->freeFrames || (0xFFFF - diff) < device->freeFrames)
 				break;
 
 			device->destroyDepthStencilStates.pop();
@@ -2133,9 +2200,9 @@ void MGG_GraphicsDevice_Present(MGG_GraphicsDevice* device, mgint currentFrame, 
 	assert(device != nullptr);
 	assert(syncInterval >= 0);
 	assert(currentFrame >= 0);
-	assert((device->frame % kConcurrentFrameCount) == currentFrame);
+	assert((device->frame % device->swapchainCount) == currentFrame);
 
-	auto frameIndex = currentFrame % kConcurrentFrameCount;
+	auto frameIndex = currentFrame % device->swapchainCount;
 	auto& frame = device->frames[frameIndex];
 	assert(frame.is_recording);
 
@@ -2145,6 +2212,8 @@ void MGG_GraphicsDevice_Present(MGG_GraphicsDevice* device, mgint currentFrame, 
 
 	VkResult res = vkEndCommandBuffer(cmd.buffer);
 	VK_CHECK_RESULT(res);
+
+	frame.is_recording = false;
 
 	VkPipelineStageFlags wait_dst_stage_mask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
 	VkSubmitInfo submitInfo = { VK_STRUCTURE_TYPE_SUBMIT_INFO };
@@ -2276,7 +2345,7 @@ void MGG_GraphicsDevice_SetViewport(MGG_GraphicsDevice* device, mgint x, mgint y
 	viewport.minDepth = minDepth;
 	viewport.maxDepth = maxDepth;
 
-	auto frameIndex = device->frame % kConcurrentFrameCount;
+	auto frameIndex = device->frame % device->swapchainCount;
 	auto& frame = device->frames[frameIndex];
 	assert(frame.is_recording);
 
@@ -2302,7 +2371,7 @@ void MGG_GraphicsDevice_SetRenderTargets(MGG_GraphicsDevice* device, MGG_Texture
 	if (targets == nullptr || count == 0)
 	{
 		auto currentFrame = device->frame;
-		auto frameIndex = currentFrame % kConcurrentFrameCount;
+		auto frameIndex = currentFrame % device->swapchainCount;
 		auto& frame = device->frames[frameIndex];
 
 		device->targets.targets[0] = frame.swapchainTexture;
@@ -2373,7 +2442,7 @@ void MGG_GraphicsDevice_SetTexture(MGG_GraphicsDevice* device, MGShaderStage sta
 	assert(slot >= 0);
 	assert(slot < MAX_TEXTURE_SLOTS);
 
-	device->textures[slot] = texture;
+	device->textures[slot] = texture ? texture : device->nullTexture;
 	device->textureSamplerDirty |= 1 << slot;
 }
 
@@ -2878,7 +2947,7 @@ static void MGVK_UpdateDescriptors(MGG_GraphicsDevice* device, FrameCounter curr
 	assert(!shader->bindings.empty());
 
 	// Apply the bindings to the new descriptor set.
-	const FrameCounter frameIndex = currentFrame % kConcurrentFrameCount;
+	const FrameCounter frameIndex = currentFrame % device->swapchainCount;
 	auto& offset = device->frames[frameIndex].uniformOffset;
 	auto buffer = device->frames[frameIndex].uniforms;
 
@@ -2907,6 +2976,7 @@ static void MGVK_UpdateDescriptors(MGG_GraphicsDevice* device, FrameCounter curr
 		if (!dirty)
 			break;
 	}
+
 	// We hash the frameIndex because each frame in the swap chain has its
 	// own uniforms buffer (device->frames[frameIndex].uniforms) that gets
 	// bound to the descriptor set. If we don't, some frame will use the
@@ -3014,17 +3084,14 @@ static MGVK_Program* MGVK_ProgramGetOrCreate(MGG_GraphicsDevice* device, MGG_Sha
 
 	VkResult res;
 
-	int count = 0;
 	VkDescriptorSetLayout layouts[2];
-	if (program->vertex->setLayout)
-		layouts[count++] = program->vertex->setLayout;
-	if (program->pixel->setLayout)
-		layouts[count++] = program->pixel->setLayout;
+	layouts[0] = program->vertex->setLayout;
+	layouts[1] = program->pixel->setLayout;
 
 	VkPipelineLayoutCreateInfo pipelineLayoutInfo;
 	memset(&pipelineLayoutInfo, 0, sizeof(pipelineLayoutInfo));
 	pipelineLayoutInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
-	pipelineLayoutInfo.setLayoutCount = count;
+	pipelineLayoutInfo.setLayoutCount = 2;
 	pipelineLayoutInfo.pSetLayouts = layouts;
 	pipelineLayoutInfo.pushConstantRangeCount = 0;
 	pipelineLayoutInfo.pPushConstantRanges = nullptr;
@@ -3103,7 +3170,6 @@ static VkPipeline MGVK_CreatePipeline(MGG_GraphicsDevice* device)
 	vertexInputInfo.vertexAttributeDescriptionCount = pstate.layout->attributeCount;
 	vertexInputInfo.pVertexAttributeDescriptions = pstate.layout->attributes;
 	pipelineInfo.pVertexInputState = &vertexInputInfo;
-
 
 	VkPipelineInputAssemblyStateCreateInfo inputAssembly;
 	memset(&inputAssembly, 0, sizeof(inputAssembly));
@@ -3255,30 +3321,32 @@ static void MGVK_UpdatePipeline(MGG_GraphicsDevice* device, MGVK_CmdBuffer& cmd,
 		auto program = device->pipelineState.program;
 
 		// Update the shader bindings.
-		int setsCount = 0;
+		int setCount = 0;
+		int setOffset = 0;
 		int offsetCount = 0;
-		if (program->vertex->setLayout)
+		if (program->vertex->bindings.size() == 0)
+			setOffset++;
+		else
 		{
 			uint32_t* dynamicOffset = nullptr;
 			if (program->vertex->uniformSlots)
 				dynamicOffset = &device->dynamicOffsets[offsetCount++];
 
-			MGVK_UpdateDescriptors(device, currentFrame, program->vertex, &device->descriptorSets[setsCount++], dynamicOffset);
+			MGVK_UpdateDescriptors(device, currentFrame, program->vertex, &device->descriptorSets[setCount++], dynamicOffset);
 		}
-		if (program->pixel->setLayout)
+
+		if (program->pixel->bindings.size() > 0)
 		{
 			uint32_t* dynamicOffset = nullptr;
 			if (program->pixel->uniformSlots)
 				dynamicOffset = &device->dynamicOffsets[offsetCount++];
 
-			MGVK_UpdateDescriptors(device, currentFrame, program->pixel, &device->descriptorSets[setsCount++], dynamicOffset);
+			MGVK_UpdateDescriptors(device, currentFrame, program->pixel, &device->descriptorSets[setCount++], dynamicOffset);
 		}
 
 		// Bind the new descriptor sets.		
 		vkCmdBindDescriptorSets(cmd.buffer, VK_PIPELINE_BIND_POINT_GRAPHICS,
-			program->layout, 0,
-			setsCount, device->descriptorSets,
-			offsetCount, device->dynamicOffsets);
+			program->layout, setOffset, setCount, device->descriptorSets, offsetCount, device->dynamicOffsets);
 
 		// Clear all the dirty flags.
 		device->uniformsDirty = 0;
@@ -3339,7 +3407,7 @@ void MGG_GraphicsDevice_Draw(MGG_GraphicsDevice* device, MGPrimitiveType primiti
 		return;
 
 	auto currentFrame = device->frame;
-	auto frameIndex = currentFrame % kConcurrentFrameCount;
+	auto frameIndex = currentFrame % device->swapchainCount;
 	auto& frame = device->frames[frameIndex];
 	assert(frame.is_recording);
 
@@ -3368,7 +3436,7 @@ void MGG_GraphicsDevice_DrawIndexed(MGG_GraphicsDevice* device, MGPrimitiveType 
 		return;
 
 	auto currentFrame = device->frame;
-	auto frameIndex = currentFrame % kConcurrentFrameCount;
+	auto frameIndex = currentFrame % device->swapchainCount;
 	auto& frame = device->frames[frameIndex];
 	assert(frame.is_recording);
 
@@ -3412,7 +3480,7 @@ void MGG_GraphicsDevice_DrawIndexedInstanced(
 		return;
 
 	auto currentFrame = device->frame;
-	auto frameIndex = currentFrame % kConcurrentFrameCount;
+	auto frameIndex = currentFrame % device->swapchainCount;
 	auto& frame = device->frames[frameIndex];
 	assert(frame.is_recording);
 
@@ -3645,7 +3713,7 @@ void MGG_GraphicsDevice_GetBackBufferData(MGG_GraphicsDevice* device, mgint x, m
 	assert(dataBytes > 0);
 
 	auto currentFrame = device->frame;
-	auto frameIndex = currentFrame % kConcurrentFrameCount;
+	auto frameIndex = currentFrame % device->swapchainCount;
 	auto& frame = device->frames[frameIndex];
 	auto& cmd = frame.commandBuffer;
 
@@ -4117,7 +4185,8 @@ MGG_SamplerState* MGG_SamplerState_Create(MGG_GraphicsDevice* device, MGG_Sample
 	samplerInfo.addressModeU = ToVkSamplerAddressMode(info->AddressU);
 	samplerInfo.addressModeV = ToVkSamplerAddressMode(info->AddressV);
 	samplerInfo.addressModeW = ToVkSamplerAddressMode(info->AddressW);
-	samplerInfo.anisotropyEnable = info->Filter == MGTextureFilter::Anisotropic;
+	samplerInfo.anisotropyEnable =	info->Filter == MGTextureFilter::Anisotropic &&
+									device->deviceFeatures.samplerAnisotropy == VK_TRUE;
 	samplerInfo.maxAnisotropy = info->MaximumAnisotropy;
 	samplerInfo.unnormalizedCoordinates = VK_FALSE;
 	samplerInfo.compareEnable = isComparison ? VK_TRUE : VK_FALSE;
@@ -4816,7 +4885,7 @@ void MGG_Texture_GetData(MGG_GraphicsDevice* device, MGG_Texture* texture, mgint
 	bool restart_frame = false;
 
 	const FrameCounter currentFrame = device->frame;
-	const FrameCounter frameIndex = currentFrame % kConcurrentFrameCount;
+	const FrameCounter frameIndex = currentFrame % device->swapchainCount;
 	MGVK_FrameState& frame = device->frames[frameIndex];
 	MGVK_CmdBuffer& cmd = frame.commandBuffer;
 
@@ -4968,11 +5037,19 @@ MGG_Shader* MGG_Shader_Create(MGG_GraphicsDevice* device, MGShaderStage stage, m
 
 	device->all_shaders.push_back(shader);
 
-	// If the shader has no bindings... then skip all the layout
-	// and descriptor setup.
+	// If the shader has no bindings we still need an empty layout
+	// to ensure that the descriptor sets are in the right slots.
 	if (layoutBindings.empty())
 	{
-		shader->setLayout = nullptr;
+		VkDescriptorSetLayoutCreateInfo layoutInfo;
+		memset(&layoutInfo, 0, sizeof(layoutInfo));
+		layoutInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
+		layoutInfo.bindingCount = 0;
+		layoutInfo.pBindings = nullptr;
+		layoutInfo.flags = 0;
+		res = vkCreateDescriptorSetLayout(device->device, &layoutInfo, nullptr, &shader->setLayout);
+		VK_CHECK_RESULT(res);
+
 		shader->poolInfo = nullptr;
 		shader->pool = nullptr;
 		shader->writes = nullptr;
@@ -5162,7 +5239,7 @@ void MGG_OcclusionQuery_End(MGG_GraphicsDevice* device, MGG_OcclusionQuery* quer
 	assert(query->inBeginEndBlock);
 
 	auto currentFrame = device->frame;
-	auto frameIndex = currentFrame % kConcurrentFrameCount;
+	auto frameIndex = currentFrame % device->swapchainCount;
 	auto& frame = device->frames[frameIndex];
 	assert(frame.is_recording);
     auto cmd = frame.commandBuffer.buffer;
