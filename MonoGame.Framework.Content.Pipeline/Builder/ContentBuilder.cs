@@ -295,11 +295,17 @@ public abstract class ContentBuilder
     {
         foreach (var dir in Directory.GetDirectories(directory))
         {
+            if (Path.GetFileName(dir).StartsWith('.'))
+                continue;
+
             ScanFiles(contentCollection, dir);
         }
 
         foreach (var filePath in Directory.GetFiles(directory))
         {
+            if (Path.GetFileName(filePath).StartsWith('.'))
+                continue;
+
             var relativePath = Path.GetRelativePath(Parameters.RootedSourceDirectory, filePath);
             relativePath = relativePath.Sanitize();
             if (contentCollection.GetContentInfo(relativePath, out List<ContentInfo> contentInfos) && contentInfos.Count > 0)
