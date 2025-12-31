@@ -45,7 +45,7 @@
     <ProjectReference Include="..\MonoGame.Framework\MonoGame.Framework.Native.csproj" />
     <ProjectReference Include="..\native\monogame\windowsdx.vcxproj" />
 
-	  <Content Include="..\Artifacts\monogame.native\windows\windowsdx\$(Configuration)\monogame.native.dll">
+	  <Content Include="..\Artifacts\native\mgruntime\windowsdx\windows\$(Configuration)\mgruntime.dll">
 		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 	  </Content>
 	  

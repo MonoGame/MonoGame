@@ -95,7 +95,7 @@ internal readonly struct MG_Asset
 
 internal static unsafe partial class MG
 {
-    public const string MonoGameNativeDLL = "monogame.native";
+    public const string MonoGameNativeDLL = "mgruntime";
 
     [DllImport(MonoGameNativeDLL, EntryPoint = "MG_Asset_Open", ExactSpelling = true)]
     public static extern byte AssetOpen(string assetname, out MG_Asset* file, out long length);

@@ -9,7 +9,7 @@ if vulkan_sdk == nil and os.target() == "macosx" then
 end
 
 function common(project_name)
-    platform_target_path = "../../Artifacts/monogame.native/%{cfg.system}/" .. project_name .. "/%{cfg.buildcfg}"
+    platform_target_path = "../../Artifacts/native/mgruntime/" .. project_name .. "/%{cfg.system}/%{cfg.buildcfg}"
 
     kind "SharedLib"
     language "C++"
@@ -20,7 +20,7 @@ function common(project_name)
     filter {}
     defines {"DLL_EXPORT"}
     targetdir(platform_target_path)
-    targetname "monogame.native"
+    targetname "mgruntime"
     cppdialect "C++17"
 
     files {"include/**.h", "common/**.h", "common/**.cpp"}
