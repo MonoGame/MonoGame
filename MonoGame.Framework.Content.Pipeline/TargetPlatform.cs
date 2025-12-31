@@ -93,12 +93,12 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
         DesktopVK,
 
         /// <summary>
-        /// Windows GDK
+        /// Windows using DirectX 12
         /// </summary>
-        WindowsGDK,
+        WindowsDX12,
 
         /// <summary>
-        /// Xbox Series
+        /// Xbox Series S|X
         /// </summary>
         XboxSeries
     }
