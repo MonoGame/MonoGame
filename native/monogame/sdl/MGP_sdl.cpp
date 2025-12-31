@@ -260,7 +260,7 @@ MGMonoGamePlatform MGP_Platform_GetPlatform()
 #if MG_VULKAN
     return MGMonoGamePlatform::DesktopVK;
 #elif MG_DIRECTX12
-    return MGMonoGamePlatform::Windows;
+    return MGMonoGamePlatform::WindowsDX12;
 #else
     assert(false);
     return (MGMonoGamePlatform)-1;

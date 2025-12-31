@@ -510,7 +510,7 @@ enum class MGMonoGamePlatform : mgint
     Windows = 4,
     WebGL = 5,
     XboxOne = 6,
-    WindowsGDK = 7,
+    WindowsDX12 = 7,
     XboxSeries = 8,
     PlayStation4 = 9,
     PlayStation5 = 10,
