@@ -556,7 +556,7 @@ void MGA_Voice_AppendBuffer(MGA_Voice* voice, mgbyte* buffer, mguint size)
 		raw->length = size;
 	}
 
-	assert(raw->length <= size);
+	assert(raw->length >= size);
 	memcpy(raw->data, buffer, size);
 
 	// Copy the buffer structure and fix the looping state.

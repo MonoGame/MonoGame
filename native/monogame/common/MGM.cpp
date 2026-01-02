@@ -13,6 +13,9 @@ struct MGG_Texture;
 #include <stdio.h>
 #include <string.h>
 
+#define OGG_IMPL
+#define VORBIS_IMPL
+#include "minivorbis.h"
 
 void MGM_ReadSignature(const char* filepath, MGM_SIGNATURE)
 {
@@ -26,15 +29,110 @@ void MGM_ReadSignature(const char* filepath, MGM_SIGNATURE)
 	fclose(handle);
 }
 
+struct MGM_AudioDecoder_Ogg : MGM_AudioDecoder
+{
+	OggVorbis_File* _vreader = nullptr;
+	int16_t* _buffer = nullptr;
+	int _sizeInBytes = 0;
+
+	bool _finished = false;
+
+	virtual ~MGM_AudioDecoder_Ogg();
+	virtual void Initialize(const char* filepath, MGM_AudioDecoderInfo& info);
+	virtual void SetPosition(mgulong timeMs);
+	virtual bool Decode(mgbyte*& buffer, mguint& size);
+};
+
+
+MGM_AudioDecoder_Ogg::~MGM_AudioDecoder_Ogg()
+{
+	if (_vreader)
+	{
+		ov_clear(_vreader);
+		delete _vreader;
+	}
+
+	if (_buffer)
+		delete [] _buffer;
+}
+
+void MGM_AudioDecoder_Ogg::Initialize(const char* filepath, MGM_AudioDecoderInfo& info)
+{
+	_vreader = new OggVorbis_File();
+
+	int err = ov_fopen(filepath, _vreader);
+
+	vorbis_info* vinfo = ov_info(_vreader, -1);
+
+	info.samplerate = vinfo->rate;
+	info.channels = vinfo->channels;
+	info.duration = 3.0f; // TODO!
+
+	// Decode 0.25 seconds of audio per decode step.
+	_sizeInBytes = ((vinfo->rate / 4) * vinfo->channels) * 2;
+	_buffer = new int16_t[_sizeInBytes / 2];
+
+	_finished = false;
+}
+
+void MGM_AudioDecoder_Ogg::SetPosition(mgulong timeMs)
+{
+	if (_vreader)
+		ov_pcm_seek(_vreader, timeMs);
+}
+
+bool MGM_AudioDecoder_Ogg::Decode(mgbyte*& buffer, mguint& size)
+{
+	buffer = nullptr;
+	size = 0;
+
+	if (!_vreader || _finished)
+		return true;
+
+	int bitstream = 0;
+	int readBytes = 0;
+	char* dest = (char*)_buffer;
+
+	while (readBytes < _sizeInBytes)
+	{
+		int decoded = ov_read(_vreader, dest, _sizeInBytes - readBytes, 0, 2, 1, &bitstream);
+
+		// If we got an error call it finished.
+		if (decoded < 0)
+		{
+			_finished = true;
+			break;
+		}
+
+		// We have no more data so we're finished.
+		if (decoded == 0)
+		{
+			_finished = true;
+			break;
+		}
+
+		readBytes += decoded;
+		dest += decoded;
+	}
+
+	size = readBytes;
+	buffer = (mgbyte*)_buffer;
+
+	return _finished;
+}
+
+
 MGM_AudioDecoder* MGM_AudioDecoder_TryCreate_Ogg(MGM_SIGNATURE)
 {
-	// TODO: Implement me!
-	//
-	// - This should be moved into its own CPP.
-	// - We need to add Ogg support to native build.
-	// - How do we compile Ogg for consoles?
-	// 
-	return nullptr;
+	// Simple header detection.
+	if (signature[0] != 'O' ||
+		signature[1] != 'g' ||
+		signature[2] != 'g' ||
+		signature[3] != 'S' ||
+		signature[4] != 0)
+		return nullptr;
+
+	return new MGM_AudioDecoder_Ogg();
 }
 
 MGM_AudioDecoder* MGM_AudioDecoder_TryCreate_Mp3(MGM_SIGNATURE)
