@@ -36,7 +36,7 @@ struct MGM_VideoDecoder
 
 
 // This seems like enough to detect most file formats.
-#define MGM_SIGNATURE char signature[16]
+#define MGM_SIGNATURE uint8_t signature[16]
 
 
 /// <summary>

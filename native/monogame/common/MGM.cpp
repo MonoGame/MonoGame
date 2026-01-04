@@ -17,6 +17,12 @@ struct MGG_Texture;
 #define VORBIS_IMPL
 #include "minivorbis.h"
 
+#define MINIMP3_ONLY_MP3
+#define MINIMP3_ONLY_SIMD
+#define MINIMP3_IMPLEMENTATION
+#include "minimp3_ex.h"
+
+
 void MGM_ReadSignature(const char* filepath, MGM_SIGNATURE)
 {
 	memset(signature, 0, 16);
@@ -69,7 +75,7 @@ void MGM_AudioDecoder_Ogg::Initialize(const char* filepath, MGM_AudioDecoderInfo
 	info.duration = 3.0f; // TODO!
 
 	// Decode 0.25 seconds of audio per decode step.
-	_sizeInBytes = ((vinfo->rate / 4) * vinfo->channels) * 2;
+	_sizeInBytes = ((info.samplerate / 4) * info.channels) * 2;
 	_buffer = new int16_t[_sizeInBytes / 2];
 
 	_finished = false;
@@ -135,14 +141,99 @@ MGM_AudioDecoder* MGM_AudioDecoder_TryCreate_Ogg(MGM_SIGNATURE)
 	return new MGM_AudioDecoder_Ogg();
 }
 
+
+struct MGM_AudioDecoder_Mp3 : MGM_AudioDecoder
+{
+	mp3dec_ex_t _mp3d;
+	int16_t* _buffer = nullptr;
+	int _sizeInSamples = 0;
+
+	bool _finished = false;
+
+	virtual ~MGM_AudioDecoder_Mp3();
+	virtual void Initialize(const char* filepath, MGM_AudioDecoderInfo& info);
+	virtual void SetPosition(mgulong timeMs);
+	virtual bool Decode(mgbyte*& buffer, mguint& size);
+};
+
+
+MGM_AudioDecoder_Mp3::~MGM_AudioDecoder_Mp3()
+{
+	if (_buffer)
+		delete[] _buffer;
+}
+
+void MGM_AudioDecoder_Mp3::Initialize(const char* filepath, MGM_AudioDecoderInfo& info)
+{
+	if (mp3dec_ex_open(&_mp3d, filepath, MP3D_SEEK_TO_SAMPLE))
+	{
+		_finished = true;
+		return;
+	}
+
+	info.samplerate = _mp3d.info.hz;
+	info.channels = _mp3d.info.channels;
+	info.duration = 3.0f; // TODO!
+
+	// Decode 0.25 seconds of audio per decode step.
+	_sizeInSamples = ((info.samplerate / 4) * info.channels);
+	_buffer = new int16_t[_sizeInSamples];
+
+	_finished = false;
+}
+
+void MGM_AudioDecoder_Mp3::SetPosition(mgulong timeMs)
+{
+	mp3dec_ex_seek(&_mp3d, timeMs);
+}
+
+bool MGM_AudioDecoder_Mp3::Decode(mgbyte*& buffer, mguint& size)
+{
+	buffer = nullptr;
+	size = 0;
+
+	if (_finished)
+		return true;
+
+	int bitstream = 0;
+	int readSamples = 0;
+	char* dest = (char*)_buffer;
+
+	while (readSamples < _sizeInSamples)
+	{
+		size_t readed = mp3dec_ex_read(&_mp3d, (mp3d_sample_t*)dest, _sizeInSamples - readSamples);
+
+		// If we got an error call it finished.
+		if (readed < 0)
+		{
+			_finished = true;
+			break;
+		}
+
+		// We have no more data so we're finished.
+		if (readed == 0)
+		{
+			_finished = true;
+			break;
+		}
+
+		readSamples += readed;
+		dest += readed * 2;
+	}
+
+	size = readSamples * 2;
+	buffer = (mgbyte*)_buffer;
+
+	return _finished;
+}
+
 MGM_AudioDecoder* MGM_AudioDecoder_TryCreate_Mp3(MGM_SIGNATURE)
 {
-	// TODO: Implement me!
-	//
-	// - This should be moved into its own CPP.
-	// - Should we use a single header mp3 decoder?
-	//
-	return nullptr;
+	if ((signature[0] != 'I' || signature[1] != 'D' || signature[2] != '3') &&	// ID3 tag		
+		(signature[0] != 0xFF || (signature[1] & 0xE0) != 0xE0)) // MPEG frame sync
+		return nullptr;
+
+	return new MGM_AudioDecoder_Mp3();
 }
 
 MGM_AudioDecoder* MGM_AudioDecoder_Create(const char* filepath, MGM_AudioDecoderInfo& info)

@@ -13,6 +13,9 @@
 
 #---------------------------------- Content ---------------------------------#
 
+#begin rock_loop_stereo.mp3
+/copy:rock_loop_stereo.mp3;rock_loop_stereo2.mp3
+
 #begin rock_loop_stereo.wav
 /importer:WavImporter
 /processor:SongProcessor
