@@ -665,7 +665,9 @@ mgulong MGA_Voice_GetPosition(MGA_Voice* voice)
 				
 	FAudioVoiceState state;
 	FAudioSourceVoice_GetState(voice->voice, &state, 0);
-	return state.SamplesPlayed;
+
+	float msec = (state.SamplesPlayed / (float)voice->format.nSamplesPerSec) * 1000.0f;
+	return (mgulong)msec;
 }
 
 static void MGA_Voice_UpdateOutputMatrix(MGA_Voice* voice)

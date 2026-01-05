@@ -83,8 +83,11 @@ void MGM_AudioDecoder_Ogg::Initialize(const char* filepath, MGM_AudioDecoderInfo
 
 void MGM_AudioDecoder_Ogg::SetPosition(mgulong timeMs)
 {
-	if (_vreader)
-		ov_pcm_seek(_vreader, timeMs);
+	if (!_vreader)
+		return;
+
+	ogg_int64_t pos = (timeMs / 1000.0f) * _vreader->vi->rate;
+	ov_pcm_seek(_vreader, pos);
 }
 
 bool MGM_AudioDecoder_Ogg::Decode(mgbyte*& buffer, mguint& size)
@@ -144,7 +147,7 @@ MGM_AudioDecoder* MGM_AudioDecoder_TryCreate_Ogg(MGM_SIGNATURE)
 
 struct MGM_AudioDecoder_Mp3 : MGM_AudioDecoder
 {
-	mp3dec_ex_t _mp3d;
+	mp3dec_ex_t* _mp3d;
 	int16_t* _buffer = nullptr;
 	int _sizeInSamples = 0;
 
@@ -159,20 +162,25 @@ struct MGM_AudioDecoder_Mp3 : MGM_AudioDecoder
 
 MGM_AudioDecoder_Mp3::~MGM_AudioDecoder_Mp3()
 {
+	if (_mp3d)
+		delete _mp3d;
+
 	if (_buffer)
 		delete[] _buffer;
 }
 
 void MGM_AudioDecoder_Mp3::Initialize(const char* filepath, MGM_AudioDecoderInfo& info)
 {
-	if (mp3dec_ex_open(&_mp3d, filepath, MP3D_SEEK_TO_SAMPLE))
+	_mp3d = new mp3dec_ex_t();
+
+	if (mp3dec_ex_open(_mp3d, filepath, MP3D_SEEK_TO_SAMPLE))
 	{
 		_finished = true;
 		return;
 	}
 
-	info.samplerate = _mp3d.info.hz;
-	info.channels = _mp3d.info.channels;
+	info.samplerate = _mp3d->info.hz;
+	info.channels = _mp3d->info.channels;
 	info.duration = 3.0f; // TODO!
 
 	// Decode 0.25 seconds of audio per decode step.
@@ -184,7 +192,11 @@ void MGM_AudioDecoder_Mp3::Initialize(const char* filepath, MGM_AudioDecoderInfo
 
 void MGM_AudioDecoder_Mp3::SetPosition(mgulong timeMs)
 {
-	mp3dec_ex_seek(&_mp3d, timeMs);
+	if (!_mp3d)
+		return;
+
+	uint64_t pos = (timeMs / 1000.0f) * _mp3d->info.hz;
+	mp3dec_ex_seek(_mp3d, pos);
 }
 
 bool MGM_AudioDecoder_Mp3::Decode(mgbyte*& buffer, mguint& size)
@@ -192,7 +204,7 @@ bool MGM_AudioDecoder_Mp3::Decode(mgbyte*& buffer, mguint& size)
 	buffer = nullptr;
 	size = 0;
 
-	if (_finished)
+	if (!_mp3d || _finished)
 		return true;
 
 	int bitstream = 0;
@@ -201,7 +213,7 @@ bool MGM_AudioDecoder_Mp3::Decode(mgbyte*& buffer, mguint& size)
 
 	while (readSamples < _sizeInSamples)
 	{
-		size_t readed = mp3dec_ex_read(&_mp3d, (mp3d_sample_t*)dest, _sizeInSamples - readSamples);
+		size_t readed = mp3dec_ex_read(_mp3d, (mp3d_sample_t*)dest, _sizeInSamples - readSamples);
 
 		// If we got an error call it finished.
 		if (readed < 0)

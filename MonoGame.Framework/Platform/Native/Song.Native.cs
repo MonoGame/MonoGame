@@ -27,8 +27,6 @@ public sealed partial class Song : IEquatable<Song>, IDisposable
         bool start_voice = true;
         bool finished = false;
 
-        Console.WriteLine("DecoderStream");
-
         while (true)
         {
             // Do we need to stop?
