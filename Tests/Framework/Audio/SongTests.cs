@@ -17,6 +17,8 @@ namespace MonoGame.Tests.Audio
     {
         private void RunTests(Song song)
         {
+            Assert.AreEqual(7.94f, song.Duration.TotalSeconds, 0.01f);
+
             // Play the song.
             MediaPlayer.Play(song);
             SleepWhileDispatching(1500);

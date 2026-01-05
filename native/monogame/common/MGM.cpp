@@ -69,12 +69,13 @@ void MGM_AudioDecoder_Ogg::Initialize(const char* filepath, MGM_AudioDecoderInfo
 	int err = ov_fopen(filepath, _vreader);
 
 	vorbis_info* vinfo = ov_info(_vreader, -1);
+	ogg_int64_t samples = ov_pcm_total(_vreader, -1);
 
 	info.samplerate = vinfo->rate;
 	info.channels = vinfo->channels;
-	info.duration = 3.0f; // TODO!
+	info.duration = (samples / (float)info.samplerate) * 1000ull;
 
-	// Decode 0.25 seconds of audio per decode step.
+	// Decode 250ms of audio per decode step.
 	_sizeInBytes = ((info.samplerate / 4) * info.channels) * 2;
 	_buffer = new int16_t[_sizeInBytes / 2];
 
@@ -181,9 +182,9 @@ void MGM_AudioDecoder_Mp3::Initialize(const char* filepath, MGM_AudioDecoderInfo
 
 	info.samplerate = _mp3d->info.hz;
 	info.channels = _mp3d->info.channels;
-	info.duration = 3.0f; // TODO!
+	info.duration = ((_mp3d->samples / info.channels) / (float)info.samplerate) * 1000ull;
 
-	// Decode 0.25 seconds of audio per decode step.
+	// Decode 250ms of audio per decode step.
 	_sizeInSamples = ((info.samplerate / 4) * info.channels);
 	_buffer = new int16_t[_sizeInSamples];
 

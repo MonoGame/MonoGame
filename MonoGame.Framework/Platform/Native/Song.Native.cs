@@ -131,6 +131,8 @@ public sealed partial class Song : IEquatable<Song>, IDisposable
                 return TimeSpan.Zero;
 
             var milliseconds = MGA.Voice_GetPosition(_voice);
+            milliseconds %= (ulong)_duration.TotalMilliseconds;
+
             return TimeSpan.FromMilliseconds(milliseconds);
         }
     }
@@ -150,13 +152,15 @@ public sealed partial class Song : IEquatable<Song>, IDisposable
 
         // Stop the current playback which cleans stuff up.
         Stop();
-        
+
         // Move the decoder to the new position.
         MGM.AudioDecoder_SetPosition(_decoder, milliseconds);
 
         // The thread does the rest of the work.
         _stop.Reset();
         _thread = new Thread(DecoderStream);
+        _thread.Name = "MGSongDecoder";
+        _thread.Priority = ThreadPriority.BelowNormal;
         _thread.Start();
 
         _playCount++;
