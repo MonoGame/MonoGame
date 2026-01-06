@@ -534,6 +534,54 @@ namespace Microsoft.Xna.Framework
         }
 
         /// <summary>
+        /// Computes the 2D pseudo cross product (perp-dot product) of two vectors.
+        /// </summary>
+        /// <param name="value1">The first vector.</param>
+        /// <param name="value2">The second vector.</param>
+        /// <returns>
+        /// A scalar value representing twice the signed area of the parallelogram formed by the vectors.
+        /// Positive if <paramref name="value2"/> is clockwise from <paramref name="value1"/>,
+        /// negative if clockwise, zero if parallel.
+        /// </returns>
+        /// <remarks>
+        /// <b>Compatibility Note:</b>
+        /// This member is a MonoGame extension and does not exist in the original XNA framework.
+        /// Code using this member may require changes when porting to other XNA-like frameworks
+        /// such as FNA or KNI.
+        /// </remarks>
+        public static float PerpDot(Vector2 value1, Vector2 value2)
+        {
+            // C. Ericson, Real-Time Collision Detection, Morgan Kaufmann, 2005
+            // Section 3.3.5 The Cross Product
+
+            return (value1.X * value2.Y) - (value1.Y * value2.X);
+        }
+
+        /// <summary>
+        /// Computes the 2D pseudo cross products (perp-dot product) of two vectors.
+        /// </summary>
+        /// <param name="value1">The first vector.</param>
+        /// <param name="value2">The second vector.</param>
+        /// <param name="result">
+        /// A scalar value representing twice the signed area of the parallelogram formed by the vectors.
+        /// Positive if <paramref name="value2"/> is clockwise from <paramref name="value1"/>,
+        /// negative if clockwise, zero if parallel.
+        /// </param>
+        /// <remarks>
+        /// <b>Compatibility Note:</b>
+        /// This member is a MonoGame extension and does not exist in the original XNA framework.
+        /// Code using this member may require changes when porting to other XNA-like frameworks
+        /// such as FNA or KNI.
+        /// </remarks>
+        public static void PerpDot(ref Vector2 value1, ref Vector2 value2, out float result)
+        {
+            // C. Ericson, Real-Time Collision Detection, Morgan Kaufmann, 2005
+            // Section 3.3.5 The Cross Product
+
+            result = (value1.X * value2.Y) - (value1.Y * value2.X);
+        }
+
+        /// <summary>
         /// Compares whether current instance is equal to specified <see cref="Object"/>.
         /// </summary>
         /// <param name="obj">The <see cref="Object"/> to compare.</param>
