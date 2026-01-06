@@ -466,7 +466,7 @@ namespace Microsoft.Xna.Framework
 
             Vector2 d1 = Direction;
             Vector2 d2 = other.Direction;
-            Vector2 r = Start - other.Start;
+            Vector2 r = other.Start - Start;
 
             float d1CrossD2 = d1.X * d2.Y - d1.Y * d2.X;
 
