@@ -431,6 +431,39 @@ namespace Microsoft.Xna.Framework
         }
 
         /// <summary>
+        /// Tests if this line intersects with an axis-aligned bounding box.
+        /// </summary>
+        /// <param name="box">The bounding box to test against.</param>
+        /// <returns>
+        /// <see langword="true"/> if the line passes through or touches the bounding box;
+        /// otherwise, <see langword="false"/>.
+        /// </returns>
+        public readonly bool Intersects(BoundingBox2D box)
+        {
+            // C. Ericson, Real-Time Collision Detection, Morgan Kaufmann, 2005
+            // Intersection of an implicit line with an axis-aligned box using corner distances
+            // Derived from Section 5.2.3 "Testing Box Against Plane"
+
+            // Get the four corners of the box
+            Vector2 min = box.Min;
+            Vector2 max = box.Max;
+
+            // Compute signed distance for all four corners
+            float d1 = DistanceToPoint(min);
+            float d2 = DistanceToPoint(new Vector2(max.X, min.Y));
+            float d3 = DistanceToPoint(max);
+            float d4 = DistanceToPoint(new Vector2(min.X, max.Y));
+
+            // Find min and max signed distances
+            float minDist = MathF.Min(MathF.Min(d1, d2), MathF.Min(d3, d4));
+            float maxDist = MathF.Max(MathF.Max(d1, d2), MathF.Max(d3, d4));
+
+            // Line intersects if corners straddle the line (opposite signs)
+            // or if any corner lies on the line (one distance is zero)
+            return minDist <= 0.0f && maxDist >= 0.0f;
+        }
+
+        /// <summary>
         /// Deconstructs this line into its component values.
         /// </summary>
         /// <param name="normal">

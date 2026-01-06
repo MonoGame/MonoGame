@@ -119,6 +119,22 @@ namespace Microsoft.Xna.Framework
         #region Public Methods
 
         /// <summary>
+        /// Computes the smallest axis-aligned bounding box that contains this line segment.
+        /// </summary>
+        /// <returns>
+        /// A <see cref="BoundingBox2D"/> that tightly encloses both endpoints of this segment.
+        /// </returns>
+        /// <remarks>
+        /// The bounding box is computed using the component-wise minimum and maximum of the start and end points.
+        /// </remarks>
+        public readonly BoundingBox2D GetBounds()
+        {
+            Vector2 min = Vector2.Min(Start, End);
+            Vector2 max = Vector2.Max(Start, End);
+            return new BoundingBox2D(min, max);
+        }
+
+        /// <summary>
         /// Computes a point along this line segment at the specified parametric distance.
         /// </summary>
         /// <param name="distanceAlongSegment">
@@ -515,6 +531,91 @@ namespace Microsoft.Xna.Framework
         public readonly bool Intersects(LineSegment2D other)
         {
             return Intersects(other, out _, out _, out _);
+        }
+
+        /// <summary>
+        /// Tests if this line segment intersects with an axis-aligned bounding box and computes the parametric distances to the intersection points.
+        /// </summary>
+        /// <param name="box">The bounding box to test against.</param>
+        /// <param name="tMin">
+        /// When this method returns <see langword="true"/>, contains the parametric distance along this segment
+        /// to the entry intersection point, in the range [0, 1] where 0 represents the start and 1 represents the end.
+        /// When this method returns <see langword="false"/>, contains <see langword="null"/>.
+        /// </param>
+        /// <param name="tMax">
+        /// When this method returns <see langword="true"/>, contains the parametric distance along this segment
+        /// to the exit intersection point, in the range [0, 1] where 0 represents the start and 1 represents the end.
+        /// When this method returns <see langword="false"/>, contains <see langword="null"/>.
+        /// </param>
+        /// <returns>
+        /// <see langword="true"/> if the segment intersects the bounding box; otherwise, <see langword="false"/>.
+        /// </returns>
+        /// <remarks>
+        /// For degenerate segments (zero length), returns <see langword="true"/> with tMin = tMax = 0
+        /// if the start point is inside the bounding box.
+        /// </remarks>
+        public readonly bool Intersects(BoundingBox2D box, out float? tMin, out float? tMax)
+        {
+            // C. Ericson, Real-Time Collision Detection, Morgan Kaufmann, 2005
+            // Parametric intersection of a segment with an axis-aligned box
+            // Derived from Section 5.3.3 "Intersecting Ray or Segment Against Box"
+
+            const float Epsilon = 1e-6f;
+
+            Vector2 direction = Direction;
+            float segmentLengthSq = direction.LengthSquared();
+
+            // Handle degenerate segment (zero length)
+            if (segmentLengthSq < Epsilon * Epsilon)
+            {
+                bool inside = Start.X >= box.Min.X && Start.X <= box.Max.X &&
+                              Start.Y >= box.Min.Y && Start.Y <= box.Max.Y;
+
+                if (inside)
+                {
+                    tMin = tMax = 0.0f;
+                    return true;
+                }
+
+                tMin = tMax = null;
+                return false;
+            }
+
+            float segmentLength = MathF.Sqrt(segmentLengthSq);
+            Ray2D ray = new Ray2D(Start, direction / segmentLength);
+
+            float? rayTMin;
+            float? rayTMax;
+            if (ray.Intersects(box, out rayTMin, out rayTMax))
+            {
+                float segmentTMin = rayTMin.Value / segmentLength;
+                float segmentTMax = rayTMax.Value / segmentLength;
+
+                if (segmentTMax < 0.0f || segmentTMin > 1.0f)
+                {
+                    tMin = tMax = null;
+                    return false;
+                }
+
+                tMin = MathF.Max(0.0f, segmentTMin);
+                tMax = MathF.Min(1.0f, segmentTMax);
+                return true;
+            }
+
+            tMin = tMax = null;
+            return false;
+        }
+
+        /// <summary>
+        /// Tests if this line segment intersects with an axis-aligned bounding box.
+        /// </summary>
+        /// <param name="box">The bounding box to test against.</param>
+        /// <returns>
+        /// <see langword="true"/> if the segment intersects the bounding box; otherwise, <see langword="false"/>.
+        /// </returns>
+        public readonly bool Intersects(BoundingBox2D box)
+        {
+            return Intersects(box, out _, out _);
         }
 
         /// <summary>

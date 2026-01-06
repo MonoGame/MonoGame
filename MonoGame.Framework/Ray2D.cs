@@ -424,6 +424,142 @@ namespace Microsoft.Xna.Framework
         }
 
         /// <summary>
+        /// Tests if this ray intersects with an axis-aligned bounding box and computes the parametric distances to the intersection points.
+        /// </summary>
+        /// <param name="box">The bounding box to test against.</param>
+        /// <param name="tRayMin">
+        /// When this method returns <see langword="true"/>, contains the parametric distance along this ray
+        /// to the entry intersection point, where the intersection point equals <c>Origin + tRayMin * Direction</c>.
+        /// If the ray origin is inside the bounding box, this will be <c>0</c>.
+        /// When this method returns <see langword="false"/>, contains <see langword="null"/>.
+        /// </param>
+        /// <param name="tRayMax">
+        /// When this method returns <see langword="true"/>, contains the parametric distance along this ray
+        /// to the exit intersection point, where the intersection point equals <c>Origin + tRayMax * Direction</c>.
+        /// This is always greater than or equal to <paramref name="tRayMin"/>.
+        /// When this method returns <see langword="false"/>, contains <see langword="null"/>.
+        /// </param>
+        /// <returns>
+        /// <see langword="true"/> if the ray intersects the bounding box in its forward direction;
+        /// otherwise, <see langword="false"/>.
+        /// </returns>
+        public readonly bool Intersects(BoundingBox2D box, out float? tRayMin, out float? tRayMax)
+        {
+            // C. Ericson, Real-Time Collision Detection, Morgan Kaufmann, 2005
+            // Parametric intersection of a ray with an axis-aligned box (2D reduction)
+            // Derived from Section 5.3.3 "Intersecting Ray or Segment Against Box"
+
+            const float Epsilon = 1e-6f;
+
+            float tMin = float.MinValue;
+            float tMax = float.MaxValue;
+
+            // X-axis slab
+            if (MathF.Abs(Direction.X) < Epsilon)
+            {
+                // Ray is parallel to the x slab planes
+                if (Origin.X < box.Min.X || Origin.X > box.Max.X)
+                {
+                    tRayMin = tRayMax = null;
+                    return false;
+                }
+            }
+            else
+            {
+                // Compute intersection t values with the near and far X planes
+                float ood = 1.0f / Direction.X;
+                float t1 = (box.Min.X - Origin.X) * ood;
+                float t2 = (box.Max.X - Origin.X) * ood;
+
+                // Make t1 be intersection with near plane and t2 with far plane
+                if (t1 > t2)
+                {
+                    float temp = t1;
+                    t1 = t2;
+                    t2 = temp;
+                }
+
+                tMin = MathF.Max(tMin, t1);
+                tMax = MathF.Min(tMax, t2);
+
+                // Is slab intersection empty?
+                if (tMin > tMax)
+                {
+                    tRayMin = tRayMax = null;
+                    return false;
+                }
+            }
+
+            // Y-axis slab
+            if (MathF.Abs(Direction.Y) < Epsilon)
+            {
+                // Ray is parallel to the x slab planes
+                if (Origin.Y < box.Min.Y || Origin.Y > box.Max.Y)
+                {
+                    tRayMin = tRayMax = null;
+                    return false;
+                }
+            }
+            else
+            {
+                // Compute intersection t values with the near and far X planes
+                float ood = 1.0f / Direction.Y;
+                float t1 = (box.Min.Y - Origin.Y) * ood;
+                float t2 = (box.Max.Y - Origin.Y) * ood;
+
+                // Make t1 be intersection with near plane and t2 with far plane
+                if (t1 > t2)
+                {
+                    float temp = t1;
+                    t1 = t2;
+                    t2 = temp;
+                }
+
+                tMin = MathF.Max(tMin, t1);
+                tMax = MathF.Min(tMax, t2);
+
+                // Is slab intersection empty?
+                if (tMin > tMax)
+                {
+                    tRayMin = tRayMax = null;
+                    return false;
+                }
+            }
+
+            // If ray origin is inside box (tMin < 0), return 0
+            if (tMin < 0.0f && tMax > 0.0f)
+            {
+                tRayMin = 0.0f;
+                tRayMax = tMax;
+                return true;
+            }
+
+            // Ensure intersection is in forward direction
+            if (tMax < 0.0f)
+            {
+                tRayMin = tRayMax = null;
+                return false;
+            }
+
+            tRayMin = MathF.Max(0.0f, tMin);
+            tRayMax = tMax;
+            return true;
+        }
+
+        /// <summary>
+        /// Tests if this ray intersects with an axis-aligned bounding box.
+        /// </summary>
+        /// <param name="box">The bounding box to test against.</param>
+        /// <returns>
+        /// <see langword="true"/> if the ray intersects the bounding box in its forward direction;
+        /// otherwise, <see langword="false"/>.
+        /// </returns>
+        public readonly bool Intersects(BoundingBox2D box)
+        {
+            return Intersects(box, out _, out _);
+        }
+
+        /// <summary>
         /// Deconstructs this ray into its component values.
         /// </summary>
         /// <param name="origin">
