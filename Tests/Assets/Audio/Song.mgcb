@@ -13,12 +13,12 @@
 
 #---------------------------------- Content ---------------------------------#
 
-#begin rock_loop_stereo.mp3
-/copy:rock_loop_stereo.mp3;rock_loop_stereo2.mp3
+#begin one_two_three.mp3
+/copy:one_two_three.mp3
 
-#begin rock_loop_stereo.wav
+#begin one_two_three.wav
 /importer:WavImporter
 /processor:SongProcessor
 /processorParam:Quality=Best
-/build:rock_loop_stereo.wav
+/build:one_two_three.wav
 

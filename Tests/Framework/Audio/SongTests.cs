@@ -4,10 +4,10 @@
 
 #if VULKAN || DIRECTX12
 
-using Microsoft.Xna.Framework.Media;
-using NUnit.Framework;
 using System;
 using System.IO;
+using NUnit.Framework;
+using Microsoft.Xna.Framework.Media;
 
 namespace MonoGame.Tests.Audio
 {
@@ -17,11 +17,11 @@ namespace MonoGame.Tests.Audio
     {
         private void RunTests(Song song)
         {
-            Assert.AreEqual(7.94f, song.Duration.TotalSeconds, 0.01f);
+            Assert.AreEqual(3.0f, song.Duration.TotalSeconds, 0.01f);
 
-            // Play the song.
+            // Play the "One".
             MediaPlayer.Play(song);
-            SleepWhileDispatching(1500);
+            SleepWhileDispatching(1000);
             Assert.AreEqual(MediaState.Playing, MediaPlayer.State);
 
             // Pause it now.
@@ -31,41 +31,51 @@ namespace MonoGame.Tests.Audio
 
             // Test the play position.
             var pos = MediaPlayer.PlayPosition;
-            Assert.AreEqual(1.5f, pos.TotalSeconds, 0.1f);
+            Assert.AreEqual(1.0f, pos.TotalSeconds, 0.1f);
 
-            // Resume from where it was paused.
+            // Resume from where it was paused to play "Two" and "Three".
             MediaPlayer.Resume();
-            SleepWhileDispatching(1500);
+            SleepWhileDispatching(1000);
             Assert.AreEqual(MediaState.Playing, MediaPlayer.State);
 
             // Stop it.
             MediaPlayer.Stop();
             SleepWhileDispatching(100);
             Assert.AreEqual(MediaState.Stopped, MediaPlayer.State);
-            
-            // Start it with offset.
-            MediaPlayer.Play(song, TimeSpan.FromSeconds(3));
-            SleepWhileDispatching(1000);
+
+            // Start it with offset to play the "Three".
+            MediaPlayer.Play(song, TimeSpan.FromSeconds(2));
+            SleepWhileDispatching(100);
             Assert.AreEqual(MediaState.Playing, MediaPlayer.State);
 
-            // Ok stop!
+            // Wait for it to end.
+            SleepWhileDispatching(1000);
+            Assert.AreEqual(MediaState.Stopped, MediaPlayer.State);
+
+            // Go back and play "Two" then "One" testing seek.
+            MediaPlayer.Play(song, TimeSpan.FromSeconds(1));
+            SleepWhileDispatching(1000);
+            MediaPlayer.Play(song, TimeSpan.FromSeconds(0));
+            SleepWhileDispatching(1000);
             MediaPlayer.Stop();
+            SleepWhileDispatching(100);
+            Assert.AreEqual(MediaState.Stopped, MediaPlayer.State);
         }
 
         [Test]
         public void SongTestOgg()
         {
-            var song = _content.Load<Song>("Assets/Audio/Song/rock_loop_stereo");
+            var song = _content.Load<Song>("Assets/Audio/Song/one_two_three");
             RunTests(song);
         }
 
         [Test]
         public void SongTestMP3()
         {
-            string relativePath = "Assets/Audio/Song/rock_loop_stereo2.mp3";
+            string relativePath = "Assets/Audio/Song/one_two_three.mp3";
             string fullPath = Path.GetFullPath(relativePath);
             var path = new System.Uri(fullPath);
-            var song = Song.FromUri("rock_loop_stereo", path);
+            var song = Song.FromUri("one_two_three", path);
 
             RunTests(song);
 

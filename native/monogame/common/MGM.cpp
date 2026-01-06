@@ -87,8 +87,8 @@ void MGM_AudioDecoder_Ogg::SetPosition(mgulong timeMs)
 	if (!_vreader)
 		return;
 
-	ogg_int64_t pos = (timeMs / 1000.0f) * _vreader->vi->rate;
-	ov_pcm_seek(_vreader, pos);
+	if (ov_time_seek(_vreader, timeMs * 0.001) == 0)
+		_finished = false;
 }
 
 bool MGM_AudioDecoder_Ogg::Decode(mgbyte*& buffer, mguint& size)
@@ -197,7 +197,8 @@ void MGM_AudioDecoder_Mp3::SetPosition(mgulong timeMs)
 		return;
 
 	uint64_t pos = (timeMs / 1000.0f) * _mp3d->info.hz;
-	mp3dec_ex_seek(_mp3d, pos);
+	if (mp3dec_ex_seek(_mp3d, pos) == 0)
+		_finished = false;
 }
 
 bool MGM_AudioDecoder_Mp3::Decode(mgbyte*& buffer, mguint& size)

@@ -71,6 +71,7 @@ namespace MonoGame.Tests.Audio
             for (int i = 0; i < cycles; i++)
             {
                 FrameworkDispatcher.Update();
+                Threading.Run();
                 Thread.Sleep(10);
 
                 if (stopwatch.Elapsed.TotalMilliseconds > ms)
