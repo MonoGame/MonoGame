@@ -553,5 +553,133 @@ namespace MonoGame.Tests.Framework
 
             Assert.IsFalse(intersects);
         }
+
+        [Test]
+        public void IntersectsBoundingCapsule_PassesCompletelyThrough()
+        {
+            var segment = new LineSegment2D(new Vector2(5, -10), new Vector2(5, 20));
+            var capsule = new BoundingCapsule2D(new Vector2(0, 0), new Vector2(10, 0), 5);
+
+            bool intersects = segment.Intersects(capsule, out float? tMin, out float? tMax);
+
+            Assert.IsTrue(intersects);
+            Assert.IsNotNull(tMin);
+            Assert.IsNotNull(tMax);
+            Assert.LessOrEqual(tMin.Value, tMax.Value);
+        }
+
+        [Test]
+        public void IntersectsBoundingCapsule_StartsInside()
+        {
+            var segment = new LineSegment2D(new Vector2(5, 0), new Vector2(15, 0));
+            var capsule = new BoundingCapsule2D(new Vector2(0, 0), new Vector2(10, 0), 3);
+
+            bool intersects = segment.Intersects(capsule, out float? tMin, out float? tMax);
+
+            Assert.IsTrue(intersects);
+            Assert.AreEqual(0.0f, tMin);
+            Assert.IsNotNull(tMax);
+        }
+
+        [Test]
+        public void IntersectsBoundingCapsule_EndsInside()
+        {
+            var segment = new LineSegment2D(new Vector2(-5, 0), new Vector2(5, 0));
+            var capsule = new BoundingCapsule2D(new Vector2(0, 0), new Vector2(10, 0), 3);
+
+            bool intersects = segment.Intersects(capsule, out float? tMin, out float? tMax);
+
+            Assert.IsTrue(intersects);
+            Assert.IsNotNull(tMin);
+            Assert.AreEqual(1.0f, tMax);
+        }
+
+        [Test]
+        public void IntersectsBoundingCapsule_BothEndpointsInside()
+        {
+            var segment = new LineSegment2D(new Vector2(3, 0), new Vector2(7, 0));
+            var capsule = new BoundingCapsule2D(new Vector2(0, 0), new Vector2(10, 0), 5);
+
+            bool intersects = segment.Intersects(capsule, out float? tMin, out float? tMax);
+
+            Assert.IsTrue(intersects);
+            Assert.AreEqual(0.0f, tMin);
+            Assert.AreEqual(1.0f, tMax);
+        }
+
+        [Test]
+        public void IntersectsBoundingCapsule_CompletelyOutside()
+        {
+            var segment = new LineSegment2D(new Vector2(-10, 0), new Vector2(-5, 0));
+            var capsule = new BoundingCapsule2D(new Vector2(5, 0), new Vector2(15, 0), 3);
+
+            bool intersects = segment.Intersects(capsule);
+
+            Assert.IsFalse(intersects);
+        }
+
+        [Test]
+        public void IntersectsBoundingCapsule_PerpendicularIntersection()
+        {
+            var segment = new LineSegment2D(new Vector2(5, -10), new Vector2(5, 10));
+            var capsule = new BoundingCapsule2D(new Vector2(0, 0), new Vector2(10, 0), 3);
+
+            bool intersects = segment.Intersects(capsule, out float? tMin, out float? tMax);
+
+            Assert.IsTrue(intersects);
+            Assert.IsNotNull(tMin);
+            Assert.IsNotNull(tMax);
+        }
+
+        [Test]
+        public void IntersectsBoundingCapsule_HitsEndCap()
+        {
+            var segment = new LineSegment2D(new Vector2(-8, 0), new Vector2(5, 0));
+            var capsule = new BoundingCapsule2D(new Vector2(-10, 0), new Vector2(-10, 10), 3);
+
+            bool intersects = segment.Intersects(capsule, out float? tMin, out float? tMax);
+
+            Assert.IsTrue(intersects);
+            Assert.IsNotNull(tMin);
+            Assert.IsNotNull(tMax);
+        }
+
+        [Test]
+        public void IntersectsBoundingCapsule_DegenerateSegmentInside()
+        {
+            var segment = new LineSegment2D(new Vector2(5, 0), new Vector2(5, 0));
+            var capsule = new BoundingCapsule2D(new Vector2(0, 0), new Vector2(10, 0), 5);
+
+            bool intersects = segment.Intersects(capsule, out float? tMin, out float? tMax);
+
+            Assert.IsTrue(intersects);
+            Assert.AreEqual(0.0f, tMin);
+            Assert.AreEqual(0.0f, tMax);
+        }
+
+        [Test]
+        public void IntersectsBoundingCapsule_DegenerateSegmentOutside()
+        {
+            var segment = new LineSegment2D(new Vector2(20, 0), new Vector2(20, 0));
+            var capsule = new BoundingCapsule2D(new Vector2(0, 0), new Vector2(10, 0), 3);
+
+            bool intersects = segment.Intersects(capsule);
+
+            Assert.IsFalse(intersects);
+        }
+
+        [Test]
+        public void IntersectsBoundingCapsule_DegenerateCapsule()
+        {
+            var segment = new LineSegment2D(new Vector2(0, 5), new Vector2(20, 5));
+            var capsule = new BoundingCapsule2D(new Vector2(10, 5), new Vector2(10, 5), 3);
+
+            bool intersects = segment.Intersects(capsule, out float? tMin, out float? tMax);
+
+            Assert.IsTrue(intersects);
+            Assert.IsNotNull(tMin);
+            Assert.IsNotNull(tMax);
+        }
+
     }
 }

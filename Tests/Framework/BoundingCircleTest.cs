@@ -2,9 +2,9 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
+using System;
 using Microsoft.Xna.Framework;
 using NUnit.Framework;
-using System;
 
 namespace MonoGame.Tests.Framework
 {
@@ -123,6 +123,57 @@ namespace MonoGame.Tests.Framework
 
             // Radius should be half the diagonal: sqrt(5^2 + 5^2) = sqrt(50)
             Assert.AreEqual(MathF.Sqrt(50), circle.Radius, 1e-5f);
+        }
+
+[Test]
+        public void CreateFromBoundingCapsule2D_HorizontalCapsule()
+        {
+            var capsule = new BoundingCapsule2D(new Vector2(0, 0), new Vector2(10, 0), 3);
+
+            var circle = BoundingCircle.CreateFromBoundingCapsule2D(capsule);
+
+            Assert.AreEqual(new Vector2(5, 0), circle.Center);
+            // Radius = (length / 2) + radius = 5 + 3 = 8
+            Assert.AreEqual(8.0f, circle.Radius, 1e-5f);
+        }
+
+        [Test]
+        public void CreateFromBoundingCapsule2D_VerticalCapsule()
+        {
+            var capsule = new BoundingCapsule2D(new Vector2(5, 0), new Vector2(5, 20), 4);
+
+            var circle = BoundingCircle.CreateFromBoundingCapsule2D(capsule);
+
+            Assert.AreEqual(new Vector2(5, 10), circle.Center);
+            // Radius = (length / 2) + radius = 10 + 4 = 14
+            Assert.AreEqual(14.0f, circle.Radius, 1e-5f);
+        }
+
+        [Test]
+        public void CreateFromBoundingCapsule2D_DegenerateCapsule()
+        {
+            var capsule = new BoundingCapsule2D(new Vector2(5, 5), new Vector2(5, 5), 7);
+
+            var circle = BoundingCircle.CreateFromBoundingCapsule2D(capsule);
+
+            Assert.AreEqual(new Vector2(5, 5), circle.Center);
+            // Radius = (length / 2) + radius = 0 + 7 = 7
+            Assert.AreEqual(7.0f, circle.Radius, 1e-5f);
+        }
+
+        [Test]
+        public void CreateFromBoundingCapsule2D_ContainsOriginal()
+        {
+            var capsule = new BoundingCapsule2D(new Vector2(0, 0), new Vector2(10, 10), 5);
+
+            var circle = BoundingCircle.CreateFromBoundingCapsule2D(capsule);
+
+            // Verify that all points on the capsule are within the bounding circle
+            // Test endpoints + radius
+            float distToA = Vector2.Distance(circle.Center, capsule.PointA);
+            float distToB = Vector2.Distance(circle.Center, capsule.PointB);
+            Assert.LessOrEqual(distToA + capsule.Radius, circle.Radius + 1e-5f);
+            Assert.LessOrEqual(distToB + capsule.Radius, circle.Radius + 1e-5f);
         }
 
         [Test]
@@ -448,6 +499,50 @@ namespace MonoGame.Tests.Framework
 
             Assert.AreEqual(circle.Center, center);
             Assert.AreEqual(circle.Radius, radius);
+        }
+
+        [Test]
+        public void IntersectsBoundingCapsule_Overlapping()
+        {
+            var circle = new BoundingCircle(new Vector2(5, 5), 5);
+            var capsule = new BoundingCapsule2D(new Vector2(0, 0), new Vector2(10, 0), 3);
+
+            bool intersects = circle.Intersects(capsule);
+
+            Assert.IsTrue(intersects);
+        }
+
+        [Test]
+        public void IntersectsBoundingCapsule_Separated()
+        {
+            var circle = new BoundingCircle(new Vector2(5, 15), 3);
+            var capsule = new BoundingCapsule2D(new Vector2(0, 0), new Vector2(10, 0), 3);
+
+            bool intersects = circle.Intersects(capsule);
+
+            Assert.IsFalse(intersects);
+        }
+
+        [Test]
+        public void IntersectsBoundingCapsule_CircleAtEndCap()
+        {
+            var circle = new BoundingCircle(new Vector2(-5, 0), 3);
+            var capsule = new BoundingCapsule2D(new Vector2(0, 0), new Vector2(10, 0), 5);
+
+            bool intersects = circle.Intersects(capsule);
+
+            Assert.IsTrue(intersects);
+        }
+
+        [Test]
+        public void IntersectsBoundingCapsule_CircleInsideCapsule()
+        {
+            var circle = new BoundingCircle(new Vector2(5, 0), 2);
+            var capsule = new BoundingCapsule2D(new Vector2(0, 0), new Vector2(10, 0), 5);
+
+            bool intersects = circle.Intersects(capsule);
+
+            Assert.IsTrue(intersects);
         }
     }
 }

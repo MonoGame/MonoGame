@@ -369,5 +369,93 @@ namespace MonoGame.Tests.Framework
             Assert.AreEqual(5.0f, tMin, 1e-5f);
             Assert.AreEqual(15.0f, tMax, 1e-5f);
         }
+
+         [Test]
+        public void IntersectsBoundingCapsule_HitsCapsule()
+        {
+            var ray = new Ray2D(new Vector2(0, 5), new Vector2(1, 0));
+            var capsule = new BoundingCapsule2D(new Vector2(10, 0), new Vector2(10, 10), 3);
+
+            bool intersects = ray.Intersects(capsule, out float? tMin, out float? tMax);
+
+            Assert.IsTrue(intersects);
+            Assert.AreEqual(7.0f, tMin, 1e-5f);
+            Assert.AreEqual(13.0f, tMax, 1e-5f);
+        }
+
+        [Test]
+        public void IntersectsBoundingCapsule_MissesCapsule()
+        {
+            var ray = new Ray2D(new Vector2(0, 0), new Vector2(1, 0));
+            var capsule = new BoundingCapsule2D(new Vector2(10, 10), new Vector2(10, 20), 3);
+
+            bool intersects = ray.Intersects(capsule);
+
+            Assert.IsFalse(intersects);
+        }
+
+        [Test]
+        public void IntersectsBoundingCapsule_OriginInsideCapsule()
+        {
+            var ray = new Ray2D(new Vector2(5, 5), new Vector2(1, 0));
+            var capsule = new BoundingCapsule2D(new Vector2(0, 0), new Vector2(0, 10), 8);
+
+            bool intersects = ray.Intersects(capsule, out float? tMin, out float? tMax);
+
+            Assert.IsTrue(intersects);
+            Assert.AreEqual(0.0f, tMin);
+            Assert.IsNotNull(tMax);
+        }
+
+        [Test]
+        public void IntersectsBoundingCapsule_PointsAwayFromCapsule()
+        {
+            var ray = new Ray2D(new Vector2(0, 5), new Vector2(-1, 0));
+            var capsule = new BoundingCapsule2D(new Vector2(10, 0), new Vector2(10, 10), 3);
+
+            bool intersects = ray.Intersects(capsule);
+
+            Assert.IsFalse(intersects);
+        }
+
+        [Test]
+        public void IntersectsBoundingCapsule_ParallelToAxis()
+        {
+            var ray = new Ray2D(new Vector2(0, 5), new Vector2(1, 0));
+            var capsule = new BoundingCapsule2D(new Vector2(10, 5), new Vector2(20, 5), 3);
+
+            bool intersects = ray.Intersects(capsule, out float? tMin, out float? tMax);
+
+            Assert.IsTrue(intersects);
+            Assert.AreEqual(7.0f, tMin, 1e-5f);
+            Assert.AreEqual(23.0f, tMax, 1e-5f);
+        }
+
+        [Test]
+        public void IntersectsBoundingCapsule_HitsEndCap()
+        {
+            var ray = new Ray2D(new Vector2(0, 0), new Vector2(1, 0));
+            var capsule = new BoundingCapsule2D(new Vector2(10, 3), new Vector2(10, 10), 3);
+
+            bool intersects = ray.Intersects(capsule, out float? tMin, out float? tMax);
+
+            Assert.IsTrue(intersects);
+            Assert.IsNotNull(tMin);
+            Assert.IsNotNull(tMax);
+        }
+
+        [Test]
+        public void IntersectsBoundingCapsule_DegenerateCapsule()
+        {
+            var ray = new Ray2D(new Vector2(0, 5), new Vector2(1, 0));
+            var capsule = new BoundingCapsule2D(new Vector2(10, 5), new Vector2(10, 5), 5);
+
+            bool intersects = ray.Intersects(capsule, out float? tMin, out float? tMax);
+
+            Assert.IsTrue(intersects);
+            Assert.AreEqual(5.0f, tMin, 1e-5f);
+            Assert.AreEqual(15.0f, tMax, 1e-5f);
+        }
+
     }
 }

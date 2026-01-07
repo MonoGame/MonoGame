@@ -382,5 +382,60 @@ namespace MonoGame.Tests.Framework
 
             Assert.IsTrue(intersects);
         }
+
+        [Test]
+        public void IntersectsBoundingCapsule_PassesThrough()
+        {
+            var line = new Line2D(new Vector2(0, 1), 2);
+            var capsule = new BoundingCapsule2D(new Vector2(0, 0), new Vector2(10, 0), 3);
+
+            bool intersects = line.Intersects(capsule);
+
+            Assert.IsTrue(intersects);
+        }
+
+        [Test]
+        public void IntersectsBoundingCapsule_MissesCompletely()
+        {
+            var line = new Line2D(new Vector2(0, 1), 5);
+            var capsule = new BoundingCapsule2D(new Vector2(0, 10), new Vector2(10, 10), 2);
+
+            bool intersects = line.Intersects(capsule);
+
+            Assert.IsFalse(intersects);
+        }
+
+        [Test]
+        public void IntersectsBoundingCapsule_TangentToBody()
+        {
+            var line = new Line2D(new Vector2(0, 1), 5);
+            var capsule = new BoundingCapsule2D(new Vector2(0, 2), new Vector2(10, 2), 3);
+
+            bool intersects = line.Intersects(capsule);
+
+            Assert.IsTrue(intersects);
+        }
+
+        [Test]
+        public void IntersectsBoundingCapsule_IntersectsEndCap()
+        {
+            var line = Line2D.CreateFromTwoPoints(new Vector2(0, 0), new Vector2(10, 0));
+            var capsule = new BoundingCapsule2D(new Vector2(-5, -3), new Vector2(-5, 3), 3);
+
+            bool intersects = line.Intersects(capsule);
+
+            Assert.IsTrue(intersects);
+        }
+
+        [Test]
+        public void IntersectsBoundingCapsule_ParallelToAxis()
+        {
+            var line = Line2D.CreateFromTwoPoints(new Vector2(0, 0), new Vector2(10, 0));
+            var capsule = new BoundingCapsule2D(new Vector2(5, 2), new Vector2(15, 2), 1);
+
+            bool intersects = line.Intersects(capsule);
+
+            Assert.IsFalse(intersects);
+        }
     }
 }
