@@ -485,6 +485,50 @@ namespace Microsoft.Xna.Framework
         }
 
         /// <summary>
+        /// Tests if this line intersects with a capsule.
+        /// </summary>
+        /// <param name="capsule">The capsule to test against.</param>
+        /// <returns>
+        /// <see langword="true"/> if the line passes through or is tangent to the capsule;
+        /// otherwise, <see langword="false"/>.
+        /// </returns>
+        public readonly bool Intersects(BoundingCapsule2D capsule)
+        {
+            // C. Ericson, Real-Time Collision Detection, Morgan Kaufmann, 2005
+            // Intersection of an implicit line with a 2D capsule (line segment swept by a circle)
+            // Derived from Section 4.5.1 "Sphere-swept Volume Intersection" and Section 5.2.2 "Testing Sphere Against Plane"
+
+            const float Epsilon = 1e-6f;
+
+            // Compute signed distance to capsule endpoints
+            float signedDistA = DistanceToPoint(capsule.PointA);
+            float signedDistB = DistanceToPoint(capsule.PointB);
+
+            // Get absolute distances for comparison
+            float distToA = MathF.Abs(signedDistA);
+            float distToB = MathF.Abs(signedDistB);
+
+            // minimum distance starts as the closer of the two end points
+            float minDistSq = MathF.Min(distToA * distToA, distToB * distToB);
+
+            // Check if capsule's medial segment is not degenerate
+            Vector2 segmentDir = capsule.PointB - capsule.PointA;
+            float segmentLenSq = segmentDir.LengthSquared();
+
+            if (segmentLenSq > Epsilon * Epsilon)
+            {
+                // If endpoints are on opposite sides of the line, the segment crosses it
+                if (signedDistA * signedDistB <= 0.0f)
+                {
+                    minDistSq = 0.0f;
+                }
+            }
+
+            // Line intersects capsule if minimum distance is within radius
+            return minDistSq <= capsule.Radius * capsule.Radius;
+        }
+
+        /// <summary>
         /// Deconstructs this line into its component values.
         /// </summary>
         /// <param name="normal">

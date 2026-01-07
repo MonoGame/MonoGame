@@ -645,6 +645,178 @@ namespace Microsoft.Xna.Framework
         }
 
         /// <summary>
+        /// Tests if this ray intersects with a capsule and computes the parametric distances to the intersection points.
+        /// </summary>
+        /// <param name="capsule">The capsule to test against.</param>
+        /// <param name="tRayMin">
+        /// When this method returns <see langword="true"/>, contains the parametric distance along this ray
+        /// to the entry intersection point, where the intersection point equals Origin + tRayMin * Direction.
+        /// If the ray origin is inside the capsule, this will be 0.
+        /// When this method returns <see langword="false"/>, contains <see langword="null"/>.
+        /// </param>
+        /// <param name="tRayMax">
+        /// When this method returns <see langword="true"/>, contains the parametric distance along this ray
+        /// to the exit intersection point, where the intersection point equals Origin + tRayMax * Direction.
+        /// This is always greater than or equal to <paramref name="tRayMin"/>.
+        /// When this method returns <see langword="false"/>, contains <see langword="null"/>.
+        /// </param>
+        /// <returns>
+        /// <see langword="true"/> if the ray intersects the capsule in its forward direction;
+        /// otherwise, <see langword="false"/>.
+        /// </returns>
+        public readonly bool Intersects(BoundingCapsule2D capsule, out float? tRayMin, out float? tRayMax)
+        {
+            // C. Ericson, Real-Time Collision Detection, Morgan Kaufmann, 2005
+            // Parametric intersection of a ray with a capsule (2D reduction)
+            // Derived from Section 5.1.9 "Closest Points of Two Line Segments" and Section 5.3.7 "Intersecting Ray or Segment Against Cylinder"
+
+            const float Epsilon = 1e-6f;
+
+            Vector2 d1 = Direction;
+            Vector2 d2 = capsule.PointB - capsule.PointA;
+            Vector2 r = Origin - capsule.PointA;
+
+            float a = Vector2.Dot(d1, d1);
+            float e = Vector2.Dot(d2, d2);
+            float f = Vector2.Dot(d2, r);
+
+            // Handle degenerate capsule (segment is a point, just a circe).
+            if (e <= Epsilon * Epsilon)
+            {
+                // capsule degenerates to a circle at Point A
+                BoundingCircle circle = new BoundingCircle(capsule.PointA, capsule.Radius);
+                return Intersects(circle, out tRayMin, out tRayMax);
+            }
+
+            float c = Vector2.Dot(d1, r);
+            float b = Vector2.Dot(d1, d2);
+            float denom = a * e - b * b;
+
+            float radiusSq = capsule.Radius * capsule.Radius;
+
+            // Check if ray and segment are parallel
+            if (MathF.Abs(denom) < Epsilon)
+            {
+                // ray and segment are parallel
+                // Compute perpendicular distance between the parallel lines
+                Vector2 toSegment = capsule.PointA - Origin;
+                float projectionOnRay = Vector2.Dot(toSegment, d1);
+                Vector2 perpComponent = toSegment - projectionOnRay * d1;
+                float perpDistanceSq = perpComponent.LengthSquared();
+
+                if (perpDistanceSq > radiusSq)
+                {
+                    // Too far apart perpendicularly
+                    tRayMin = tRayMax = null;
+                    return false;
+                }
+
+                // Parallel and close enough, project capsule endpoints onto ray.
+                Vector2 toA = capsule.PointA - Origin;
+                Vector2 toB = capsule.PointB - Origin;
+                float projA = Vector2.Dot(toA, d1);
+                float projB = Vector2.Dot(toB, d1);
+
+                // Find the interval on the ray where it's within radius of the capsule.
+                float minProj = MathF.Min(projA, projB);
+                float maxProj = MathF.Max(projA, projB);
+
+                float parallelOffset = MathF.Sqrt(radiusSq - perpDistanceSq);
+
+                tRayMin = minProj - parallelOffset;
+                tRayMax = maxProj + parallelOffset;
+                return true;
+            }
+
+            // General case: ray and segment are not parallel
+            float s;
+            float t;
+
+            // Compute closest point on infinite lines
+            s = (b * f - c * e) / denom;
+
+            // Since this is a ray, clamp s to [0, positiveInfinity]
+            if (s < 0.0f)
+            {
+                s = 0.0f;
+                t = MathHelper.Clamp(f / e, 0.0f, 1.0f);
+            }
+            else
+            {
+                // Compute t corresponding to s
+                t = (b * s + f) / e;
+
+                // Clamp to to segment range
+                if (t < 0.0f)
+                {
+                    t = 0.0f;
+                    s = MathF.Max(-c / a, 0.0f);
+                }
+                else if (t > 1.0f)
+                {
+                    t = 1.0f;
+                    s = MathF.Max((b - c) / a, 0.0f);
+                }
+            }
+
+            // Compute closest points
+            Vector2 closestOnRay = Origin + s * d1;
+            Vector2 closestOnSegment = capsule.PointA + t * d2;
+
+            // Check if closest points are within capsule radius
+            Vector2 separation = closestOnRay - closestOnSegment;
+            float distanceSq = separation.LengthSquared();
+
+            if (distanceSq > radiusSq)
+            {
+                // Ray doesn't intersect capsule
+                tRayMin = tRayMax = null;
+                return false;
+            }
+
+            // Compute intersection parameters using Pythagorean theorem
+            // The ray intersects a sphere of radius R at distance s from origin
+            // We need to find how far along the ray from point s the entry and exit are
+            float offset = MathF.Sqrt(radiusSq - distanceSq);
+
+            float tMin = s - offset;
+            float tMax = s + offset;
+
+            // If ray origin is inside capsule (tMin < 0), return 0
+            if (tMin < 0.0f && tMax > 0.0f)
+            {
+                tRayMin = 0.0f;
+                tRayMax = tMax;
+                return true;
+            }
+
+            // If both intersections are behind ray origin, no valid intersection
+            if (tMax < 0.0f)
+            {
+                tRayMin = tRayMax = null;
+                return false;
+            }
+
+            tRayMin = MathF.Max(0.0f, tMin);
+            tRayMax = tMax;
+            return true;
+        }
+
+
+        /// <summary>
+        /// Tests if this ray intersects with a capsule.
+        /// </summary>
+        /// <param name="capsule">The capsule to test against.</param>
+        /// <returns>
+        /// <see langword="true"/> if the ray intersects the capsule in its forward direction;
+        /// otherwise, <see langword="false"/>.
+        /// </returns>
+        public readonly bool Intersects(BoundingCapsule2D capsule)
+        {
+            return Intersects(capsule, out _, out _);
+        }
+
+        /// <summary>
         /// Deconstructs this ray into its component values.
         /// </summary>
         /// <param name="origin">

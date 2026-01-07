@@ -193,6 +193,29 @@ namespace Microsoft.Xna.Framework
         }
 
         /// <summary>
+        /// Creates a <see cref="BoundingCircle"/> that completely encloses the specified capsule.
+        /// </summary>
+        /// <param name="capsule">The capsule to enclose within a circle.</param>
+        /// <returns>
+        /// A <see cref="BoundingCircle"/> centered at the capsule's center with radius sufficient to contain both endpoint caps.
+        /// </returns>
+        /// <remarks>
+        /// The radius is computed as half the capsule's length plus the capsule's radius, ensuring that
+        /// the circle reaches the farthest points on both circular caps.
+        /// </remarks>
+        public static BoundingCircle CreateFromBoundingCapsule2D(BoundingCapsule2D capsule)
+        {
+            // The bounding circle center is at the capsule's midpoint
+            Vector2 center = capsule.Center;
+
+            // The radius needs to reach from the center to the farthest point on either cap
+            // This is half the capsule length plus the cap radius
+            float radius = (capsule.Length * 0.5f) + capsule.Radius;
+
+            return new BoundingCircle(center, radius);
+        }
+
+        /// <summary>
         /// Creates a <see cref="BoundingCircle"/> that encloses two bounding circles.
         /// </summary>
         /// <param name="original">The first bounding circle to enclose.</param>
@@ -386,6 +409,20 @@ namespace Microsoft.Xna.Framework
 
             // Circle intersects if distance to closest point is less than radius
             return distSquared <= Radius * Radius;
+        }
+
+        /// <summary>
+        /// Tests whether this circle intersects with a capsule.
+        /// </summary>
+        /// <param name="capsule">The capsule to test against.</param>
+        /// <returns>
+        /// <see langword="true"/> if the circle and capsule overlap or touch; otherwise, <see langword="false"/>.
+        /// </returns>
+        public readonly bool Intersects(BoundingCapsule2D capsule)
+        {
+            LineSegment2D segment = new LineSegment2D(capsule.PointA, capsule.PointB);
+            float distance = segment.DistanceToPoint(Center);
+            return distance <= capsule.Radius + Radius;
         }
 
         /// <summary>

@@ -388,6 +388,60 @@ namespace Microsoft.Xna.Framework
         }
 
         /// <summary>
+        /// Tests whether this bounding box intersects with a capsule.
+        /// </summary>
+        /// <param name="capsule">The capsule to test against.</param>
+        /// <returns>
+        /// <see langword="true"/> if the bounding box and capsule overlap or touch; otherwise, <see langword="false"/>.
+        /// </returns>
+        public readonly bool Intersects(BoundingCapsule2D capsule)
+        {
+            // C. Ericson, Real-Time Collision Detection, Morgan Kaufmann, 2005
+            // Section 5.3.7 "Capsules" and Section 5.1.3 "Closest Point on AABB to Point"
+
+            // If the medial segment intersects the rectangle, we can early exit here
+            LineSegment2D segment = new LineSegment2D(capsule.PointA, capsule.PointB);
+
+            if (segment.Intersects(this, out _, out _))
+            {
+                return true;
+            }
+
+            // Since the medial segment does not intersect the rectangle, we need
+            // to perform the sphere-swept volume test
+            //     1. Compute the minimum distance between the medial segment and rectangle
+            //     2. Check if that distance is within the capsule's radius.
+            float minDistSquared = float.MaxValue;
+
+            // Check distance from each rectangle corner to segment
+            Vector2[] corners = GetCorners();
+            for (int i = 0; i < 4; i++)
+            {
+                float distSq = segment.DistanceSquaredToPoint(corners[i]);
+                minDistSquared = MathF.Min(minDistSquared, distSq);
+            }
+
+            // Check distance from each segment endpoint to the rectangle
+            // (Find closest point on rectangle to each endpoint)
+            Vector2 closestToA = new Vector2(
+                MathHelper.Clamp(capsule.PointA.X, Min.X, Max.X),
+                MathHelper.Clamp(capsule.PointA.Y, Min.Y, Max.Y)
+            );
+            float distASq = Vector2.DistanceSquared(capsule.PointA, closestToA);
+            minDistSquared = MathF.Min(minDistSquared, distASq);
+
+            Vector2 closestToB = new Vector2(
+                MathHelper.Clamp(capsule.PointB.X, Min.X, Max.X),
+                MathHelper.Clamp(capsule.PointB.Y, Min.Y, Max.Y)
+            );
+            float distBSq = Vector2.DistanceSquared(capsule.PointB, closestToB);
+            minDistSquared = MathF.Min(minDistSquared, distBSq);
+
+            // Intersection if distance is within the capsule's radius.
+            return minDistSquared <= capsule.Radius * capsule.Radius;
+        }
+
+        /// <summary>
         /// Deconstructs this bounding box into its component values.
         /// </summary>
         /// <param name="min">

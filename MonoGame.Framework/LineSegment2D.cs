@@ -717,6 +717,143 @@ namespace Microsoft.Xna.Framework
             end = End;
         }
 
+        /// <summary>
+        /// Tests if this line segment intersects with a capsule and computes the parametric distances to the intersection points.
+        /// </summary>
+        /// <param name="capsule">The capsule to test against.</param>
+        /// <param name="tMin">
+        /// When this method returns <see langword="true"/>, contains the parametric distance along this segment
+        /// to the entry intersection point, in the range [0, 1] where 0 represents the start and 1 represents the end.
+        /// When this method returns <see langword="false"/>, contains <see langword="null"/>.
+        /// </param>
+        /// <param name="tMax">
+        /// When this method returns <see langword="true"/>, contains the parametric distance along this segment
+        /// to the exit intersection point, in the range [0, 1] where 0 represents the start and 1 represents the end.
+        /// When this method returns <see langword="false"/>, contains <see langword="null"/>.
+        /// </param>
+        /// <returns>
+        /// <see langword="true"/> if the segment intersects the capsule; otherwise, <see langword="false"/>.
+        /// </returns>
+        /// <remarks>
+        /// For degenerate segments (zero length), returns <see langword="true"/> with tMin = tMax = 0
+        /// if the start point is inside the capsule.
+        /// </remarks>
+        public readonly bool Intersects(BoundingCapsule2D capsule, out float? tMin, out float? tMax)
+        {
+            // C. Ericson, Real-Time Collision Detection, Morgan Kaufmann, 2005
+            // Parametric intersection of a segment with a capsule
+            // Derived from Section 5.1.9 "Closest Points of Two Line Segments"
+            // and Section 5.3.7 "Intersecting Ray or Segment Against Cylinder"
+
+            const float Epsilon = 1e-6f;
+
+            Vector2 segmentDir = Direction;
+            float segmentLengthSq = segmentDir.LengthSquared();
+
+            // Handle degenerate segment (zero length)
+            if (segmentLengthSq < Epsilon * Epsilon)
+            {
+                LineSegment2D capsuleSegment = new LineSegment2D(capsule.PointA, capsule.PointB);
+                float distSq = capsuleSegment.DistanceSquaredToPoint(Start);
+
+                if (distSq <= capsule.Radius * capsule.Radius)
+                {
+                    tMin = tMax = 0.0f;
+                    return true;
+                }
+
+                tMin = tMax = null;
+                return false;
+            }
+
+            // Handle degenerate capsule segment (circle)
+            float capsuleLengthSq = capsule.Length * capsule.Length;
+            if (capsuleLengthSq < Epsilon * Epsilon)
+            {
+                // Capsule is just a circle at PointA
+                BoundingCircle circle = new BoundingCircle(capsule.PointA, capsule.Radius);
+                float segmentLength = MathF.Sqrt(segmentLengthSq);
+                Ray2D ray = new Ray2D(Start, segmentDir / segmentLength);
+
+                float? rayTMin;
+                float? rayTMax;
+                if (!ray.Intersects(circle, out rayTMin, out rayTMax))
+                {
+                    tMin = tMax = null;
+                    return false;
+                }
+
+                // Convert ray t values to segment t values
+                float segmentTMin = rayTMin.Value / segmentLength;
+                float segmentTMax = rayTMax.Value / segmentLength;
+
+                // Check if intersection overlaps with segment bounds [0, 1]
+                if (segmentTMax < 0.0f || segmentTMin > 1.0f)
+                {
+                    tMin = tMax = null;
+                    return false;
+                }
+
+                tMin = MathF.Max(0.0f, segmentTMin);
+                tMax = MathF.Min(1.0f, segmentTMax);
+                return true;
+            }
+
+            // General case: use segment-segment distance
+            LineSegment2D capsuleSegment2 = new LineSegment2D(capsule.PointA, capsule.PointB);
+            float distSqBetweenSegments = DistanceSquaredToSegment(capsuleSegment2, out _, out _, out _, out _);
+
+            float radiusSq = capsule.Radius * capsule.Radius;
+
+            // Quick rejection if segments are too far apart
+            if (distSqBetweenSegments > radiusSq)
+            {
+                tMin = tMax = null;
+                return false;
+            }
+
+            // Segments are close enough, solve for intersection points.
+            // Cast the segment as a ray and use ray-capsule intersection
+            float segmentLength2 = MathF.Sqrt(segmentLengthSq);
+            Ray2D ray2 = new Ray2D(Start, segmentDir / segmentLength2);
+
+            float? rayTMin2;
+            float? rayTMax2;
+            if (!ray2.Intersects(capsule, out rayTMin2, out rayTMax2))
+            {
+                tMin = tMax = null;
+                return false;
+            }
+
+            // Convert ray t values to segment t values
+            float segmentTMin2 = rayTMin2.Value / segmentLength2;
+            float segmentTMax2 = rayTMax2.Value / segmentLength2;
+
+            // Check if intersection overlaps with segment bounds [0, 1]
+            if (segmentTMax2 < 0.0f || segmentTMin2 > 1.0f)
+            {
+                tMin = tMax = null;
+                return false;
+            }
+
+            // Clamp to segment bounds
+            tMin = MathF.Max(0.0f, segmentTMin2);
+            tMax = MathF.Min(1.0f, segmentTMax2);
+            return true;
+        }
+
+        /// <summary>
+        /// Tests if this line segment intersects with a capsule.
+        /// </summary>
+        /// <param name="capsule">The capsule to test against.</param>
+        /// <returns>
+        /// <see langword="true"/> if the segment intersects the capsule; otherwise, <see langword="false"/>.
+        /// </returns>
+        public readonly bool Intersects(BoundingCapsule2D capsule)
+        {
+            return Intersects(capsule, out _, out _);
+        }
+
         /// <inheritdoc/>
         public override readonly bool Equals([NotNullWhen(true)] object obj)
         {
