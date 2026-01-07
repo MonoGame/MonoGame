@@ -201,5 +201,99 @@ namespace MonoGame.Tests.Framework
             Assert.AreEqual(ray.Origin, origin);
             Assert.AreEqual(ray.Direction, direction);
         }
+
+        [Test]
+        public void IntersectsBoundingBox_HitsBox()
+        {
+            var ray = new Ray2D(new Vector2(0, 5), new Vector2(1, 0));
+            var box = new BoundingBox2D(new Vector2(10, 0), new Vector2(20, 10));
+
+            bool intersects = ray.Intersects(box, out float? tMin, out float? tMax);
+
+            Assert.IsTrue(intersects);
+            Assert.AreEqual(10.0f, tMin, 1e-5f);
+            Assert.AreEqual(20.0f, tMax, 1e-5f);
+        }
+
+        [Test]
+        public void IntersectsBoundingBox_MissesBox()
+        {
+            var ray = new Ray2D(new Vector2(0, 0), new Vector2(1, 0));
+            var box = new BoundingBox2D(new Vector2(10, 10), new Vector2(20, 20));
+
+            bool intersects = ray.Intersects(box);
+
+            Assert.IsFalse(intersects);
+        }
+
+        [Test]
+        public void IntersectsBoundingBox_OriginInsideBox()
+        {
+            var ray = new Ray2D(new Vector2(5, 5), new Vector2(1, 0));
+            var box = new BoundingBox2D(new Vector2(0, 0), new Vector2(10, 10));
+
+            bool intersects = ray.Intersects(box, out float? tMin, out float? tMax);
+
+            Assert.IsTrue(intersects);
+            Assert.AreEqual(0.0f, tMin);
+            Assert.AreEqual(5.0f, tMax, 1e-5f);
+        }
+
+        [Test]
+        public void IntersectsBoundingBox_PointsAwayFromBox()
+        {
+            var ray = new Ray2D(new Vector2(0, 5), new Vector2(-1, 0));
+            var box = new BoundingBox2D(new Vector2(10, 0), new Vector2(20, 10));
+
+            bool intersects = ray.Intersects(box);
+
+            Assert.IsFalse(intersects);
+        }
+
+        [Test]
+        public void IntersectsBoundingBox_ParallelToEdgeInside()
+        {
+            var ray = new Ray2D(new Vector2(5, 5), new Vector2(1, 0));
+            var box = new BoundingBox2D(new Vector2(0, 0), new Vector2(20, 10));
+
+            bool intersects = ray.Intersects(box, out float? tMin, out float? tMax);
+
+            Assert.IsTrue(intersects);
+            Assert.AreEqual(0.0f, tMin);
+            Assert.AreEqual(15.0f, tMax, 1e-5f);
+        }
+
+        [Test]
+        public void IntersectsBoundingBox_ParallelToEdgeOutside()
+        {
+            var ray = new Ray2D(new Vector2(5, 15), new Vector2(1, 0));
+            var box = new BoundingBox2D(new Vector2(0, 0), new Vector2(20, 10));
+
+            bool intersects = ray.Intersects(box);
+
+            Assert.IsFalse(intersects);
+        }
+
+        [Test]
+        public void IntersectsBoundingBox_HitsCorner()
+        {
+            var ray = new Ray2D(new Vector2(0, 0), Vector2.Normalize(new Vector2(1, 1)));
+            var box = new BoundingBox2D(new Vector2(10, 10), new Vector2(20, 20));
+
+            bool intersects = ray.Intersects(box);
+
+            Assert.IsTrue(intersects);
+        }
+
+        [Test]
+        public void IntersectsBoundingBox_TouchesEdge()
+        {
+            var ray = new Ray2D(new Vector2(0, 10), new Vector2(1, 0));
+            var box = new BoundingBox2D(new Vector2(10, 0), new Vector2(20, 10));
+
+            bool intersects = ray.Intersects(box);
+
+            Assert.IsTrue(intersects);
+        }
     }
 }
