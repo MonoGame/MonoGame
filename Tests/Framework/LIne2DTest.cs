@@ -271,5 +271,72 @@ namespace MonoGame.Tests.Framework
             Assert.AreEqual(line.Normal, normal);
             Assert.AreEqual(line.Distance, distance);
         }
+
+        [Test]
+        public void IntersectsBoundingBox2D_PassesThrough()
+        {
+            var line = new Line2D(new Vector2(0, 1), 5);
+            var box = new BoundingBox2D(new Vector2(0, 0), new Vector2(10, 10));
+
+            bool intersects = line.Intersects(box);
+
+            Assert.IsTrue(intersects);
+        }
+
+        [Test]
+        public void IntersectsBoundingBox2D_MissesCompletely()
+        {
+            var line = new Line2D(new Vector2(0, 1), 5);
+            var box = new BoundingBox2D(new Vector2(0, 10), new Vector2(10, 20));
+
+            bool intersects = line.Intersects(box);
+
+            Assert.IsFalse(intersects);
+        }
+
+        [Test]
+        public void IntersectsBoundingBox2D_TouchesEdge()
+        {
+            var line = new Line2D(new Vector2(0, 1), 10);
+            var box = new BoundingBox2D(new Vector2(0, 0), new Vector2(10, 10));
+
+            bool intersects = line.Intersects(box);
+
+            Assert.IsTrue(intersects);
+        }
+
+        [Test]
+        public void IntersectsBoundingBox2D_TouchesCorner()
+        {
+            var line = Line2D.CreateFromTwoPoints(new Vector2(0, 0), new Vector2(10, 10));
+            var box = new BoundingBox2D(new Vector2(5, 5), new Vector2(15, 15));
+
+            bool intersects = line.Intersects(box);
+
+            Assert.IsTrue(intersects);
+        }
+
+
+        [Test]
+        public void IntersectsBoundingBox2D_HorizontalLine()
+        {
+            var line = new Line2D(new Vector2(0, 1), 5);
+            var box = new BoundingBox2D(new Vector2(-5, 0), new Vector2(5, 10));
+
+            bool intersects = line.Intersects(box);
+
+            Assert.IsTrue(intersects);
+        }
+
+        [Test]
+        public void IntersectsBoundingBox2D_VerticalLine()
+        {
+            var line = new Line2D(new Vector2(1, 0), 5);
+            var box = new BoundingBox2D(new Vector2(0, -5), new Vector2(10, 5));
+
+            bool intersects = line.Intersects(box);
+
+            Assert.IsTrue(intersects);
+        }
     }
 }
