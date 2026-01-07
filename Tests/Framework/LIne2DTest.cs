@@ -338,5 +338,49 @@ namespace MonoGame.Tests.Framework
 
             Assert.IsTrue(intersects);
         }
+
+        [Test]
+        public void IntersectsBoundingCircle_PassesThrough()
+        {
+            var line = new Line2D(new Vector2(0, 1), 5);
+            var circle = new BoundingCircle(new Vector2(0, 5), 3);
+
+            bool intersects = line.Intersects(circle);
+
+            Assert.IsTrue(intersects);
+        }
+
+        [Test]
+        public void IntersectsBoundingCircle_Tangent()
+        {
+            var line = new Line2D(new Vector2(0, 1), 5);
+            var circle = new BoundingCircle(new Vector2(0, 0), 5);
+
+            bool intersects = line.Intersects(circle);
+
+            Assert.IsTrue(intersects);
+        }
+
+        [Test]
+        public void IntersectsBoundingCircle_MissesCompletely()
+        {
+            var line = new Line2D(new Vector2(0, 1), 5);
+            var circle = new BoundingCircle(new Vector2(0, 0), 3);
+
+            bool intersects = line.Intersects(circle);
+
+            Assert.IsFalse(intersects);
+        }
+
+        [Test]
+        public void IntersectsBoundingCircle_LineThroughCenter()
+        {
+            var line = Line2D.CreateFromTwoPoints(new Vector2(0, 0), new Vector2(10, 0));
+            var circle = new BoundingCircle(new Vector2(5, 0), 5);
+
+            bool intersects = line.Intersects(circle);
+
+            Assert.IsTrue(intersects);
+        }
     }
 }

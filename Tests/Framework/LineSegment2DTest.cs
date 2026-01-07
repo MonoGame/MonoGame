@@ -440,5 +440,118 @@ namespace MonoGame.Tests.Framework
             Assert.AreEqual(new Vector2(10, 15), bounds.Min);
             Assert.AreEqual(new Vector2(10, 15), bounds.Max);
         }
+
+        [Test]
+        public void IntersectsBoundingCircle_PassesCompletelyThrough()
+        {
+            var segment = new LineSegment2D(new Vector2(5, 0), new Vector2(5, 20));
+            var circle = new BoundingCircle(new Vector2(5, 10), 5);
+
+            bool intersects = segment.Intersects(circle, out float? tMin, out float? tMax);
+
+            Assert.IsTrue(intersects);
+            Assert.AreEqual(0.25f, tMin, 1e-5f);
+            Assert.AreEqual(0.75f, tMax, 1e-5f);
+        }
+
+        [Test]
+        public void IntersectsBoundingCircle_StartsInside()
+        {
+            var segment = new LineSegment2D(new Vector2(5, 5), new Vector2(15, 5));
+            var circle = new BoundingCircle(new Vector2(5, 5), 5);
+
+            bool intersects = segment.Intersects(circle, out float? tMin, out float? tMax);
+
+            Assert.IsTrue(intersects);
+            Assert.AreEqual(0.0f, tMin);
+            Assert.AreEqual(0.5f, tMax, 1e-5f);
+        }
+
+        [Test]
+        public void IntersectsBoundingCircle_EndsInside()
+        {
+            var segment = new LineSegment2D(new Vector2(-5, 5), new Vector2(5, 5));
+            var circle = new BoundingCircle(new Vector2(5, 5), 5);
+
+            bool intersects = segment.Intersects(circle, out float? tMin, out float? tMax);
+
+            Assert.IsTrue(intersects);
+            Assert.AreEqual(0.5f, tMin, 1e-5f);
+            Assert.AreEqual(1.0f, tMax);
+        }
+
+        [Test]
+        public void IntersectsBoundingCircle_BothEndpointsInside()
+        {
+            var segment = new LineSegment2D(new Vector2(3, 5), new Vector2(7, 5));
+            var circle = new BoundingCircle(new Vector2(5, 5), 5);
+
+            bool intersects = segment.Intersects(circle, out float? tMin, out float? tMax);
+
+            Assert.IsTrue(intersects);
+            Assert.AreEqual(0.0f, tMin);
+            Assert.AreEqual(1.0f, tMax);
+        }
+
+        [Test]
+        public void IntersectsBoundingCircle_CompletelyOutside()
+        {
+            var segment = new LineSegment2D(new Vector2(-5, 5), new Vector2(-2, 5));
+            var circle = new BoundingCircle(new Vector2(5, 5), 5);
+
+            bool intersects = segment.Intersects(circle);
+
+            Assert.IsFalse(intersects);
+        }
+
+        [Test]
+        public void IntersectsBoundingCircle_TangentToCircle()
+        {
+            var segment = new LineSegment2D(new Vector2(0, 10), new Vector2(10, 10));
+            var circle = new BoundingCircle(new Vector2(5, 5), 5);
+
+            bool intersects = segment.Intersects(circle, out float? tMin, out float? tMax);
+
+            Assert.IsTrue(intersects);
+            Assert.AreEqual(0.5f, tMin, 1e-5f);
+            Assert.AreEqual(0.5f, tMax, 1e-5f);
+        }
+
+        [Test]
+        public void IntersectsBoundingCircle_SegmentThroughCenter()
+        {
+            var segment = new LineSegment2D(new Vector2(0, 5), new Vector2(10, 5));
+            var circle = new BoundingCircle(new Vector2(5, 5), 3);
+
+            bool intersects = segment.Intersects(circle, out float? tMin, out float? tMax);
+
+            Assert.IsTrue(intersects);
+            Assert.AreEqual(0.2f, tMin, 1e-5f);
+            Assert.AreEqual(0.8f, tMax, 1e-5f);
+        }
+
+        [Test]
+        public void IntersectsBoundingCircle_DegenerateSegmentInside()
+        {
+            var segment = new LineSegment2D(new Vector2(5, 5), new Vector2(5, 5));
+            var circle = new BoundingCircle(new Vector2(5, 5), 5);
+
+            bool intersects = segment.Intersects(circle, out float? tMin, out float? tMax);
+
+            Assert.IsTrue(intersects);
+            Assert.AreEqual(0.0f, tMin);
+            Assert.AreEqual(0.0f, tMax);
+        }
+
+        [Test]
+        public void IntersectsBoundingCircle_DegenerateSegmentOutside()
+        {
+            var segment = new LineSegment2D(new Vector2(15, 15), new Vector2(15, 15));
+            var circle = new BoundingCircle(new Vector2(5, 5), 5);
+
+            bool intersects = segment.Intersects(circle);
+
+            Assert.IsFalse(intersects);
+        }
     }
 }

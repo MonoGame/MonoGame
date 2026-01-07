@@ -295,5 +295,79 @@ namespace MonoGame.Tests.Framework
 
             Assert.IsTrue(intersects);
         }
+
+        [Test]
+        public void IntersectsBoundingCircle_HitsCircle()
+        {
+            var ray = new Ray2D(new Vector2(0, 5), new Vector2(1, 0));
+            var circle = new BoundingCircle(new Vector2(10, 5), 3);
+
+            bool intersects = ray.Intersects(circle, out float? tMin, out float? tMax);
+
+            Assert.IsTrue(intersects);
+            Assert.AreEqual(7.0f, tMin, 1e-5f);
+            Assert.AreEqual(13.0f, tMax, 1e-5f);
+        }
+
+        [Test]
+        public void IntersectsBoundingCircle_MissesCircle()
+        {
+            var ray = new Ray2D(new Vector2(0, 0), new Vector2(1, 0));
+            var circle = new BoundingCircle(new Vector2(10, 10), 3);
+
+            bool intersects = ray.Intersects(circle);
+
+            Assert.IsFalse(intersects);
+        }
+
+        [Test]
+        public void IntersectsBoundingCircle_OriginInsideCircle()
+        {
+            var ray = new Ray2D(new Vector2(5, 5), new Vector2(1, 0));
+            var circle = new BoundingCircle(new Vector2(5, 5), 10);
+
+            bool intersects = ray.Intersects(circle, out float? tMin, out float? tMax);
+
+            Assert.IsTrue(intersects);
+            Assert.AreEqual(0.0f, tMin);
+            Assert.AreEqual(10.0f, tMax, 1e-5f);
+        }
+
+        [Test]
+        public void IntersectsBoundingCircle_PointsAwayFromCircle()
+        {
+            var ray = new Ray2D(new Vector2(0, 5), new Vector2(-1, 0));
+            var circle = new BoundingCircle(new Vector2(10, 5), 3);
+
+            bool intersects = ray.Intersects(circle);
+
+            Assert.IsFalse(intersects);
+        }
+
+        [Test]
+        public void IntersectsBoundingCircle_TangentRay()
+        {
+            var ray = new Ray2D(new Vector2(0, 5), new Vector2(1, 0));
+            var circle = new BoundingCircle(new Vector2(10, 10), 5);
+
+            bool intersects = ray.Intersects(circle, out float? tMin, out float? tMax);
+
+            Assert.IsTrue(intersects);
+            Assert.AreEqual(10.0f, tMin, 1e-5f);
+            Assert.AreEqual(10.0f, tMax, 1e-5f);
+        }
+
+        [Test]
+        public void IntersectsBoundingCircle_RayThroughCenter()
+        {
+            var ray = new Ray2D(new Vector2(0, 5), new Vector2(1, 0));
+            var circle = new BoundingCircle(new Vector2(10, 5), 5);
+
+            bool intersects = ray.Intersects(circle, out float? tMin, out float? tMax);
+
+            Assert.IsTrue(intersects);
+            Assert.AreEqual(5.0f, tMin, 1e-5f);
+            Assert.AreEqual(15.0f, tMax, 1e-5f);
+        }
     }
 }

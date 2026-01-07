@@ -358,6 +358,72 @@ namespace MonoGame.Tests.Framework
         }
 
         [Test]
+        public void ContainsBoundingCircle_Contains()
+        {
+            var box = new BoundingBox2D(new Vector2(0, 0), new Vector2(20, 20));
+            var circle = new BoundingCircle(new Vector2(10, 10), 5);
+
+            var result = box.Contains(circle);
+
+            Assert.AreEqual(ContainmentType.Contains, result);
+        }
+
+        [Test]
+        public void ContainsBoundingCircle_Intersects()
+        {
+            var box = new BoundingBox2D(new Vector2(0, 0), new Vector2(10, 10));
+            var circle = new BoundingCircle(new Vector2(8, 5), 5);
+
+            var result = box.Contains(circle);
+
+            Assert.AreEqual(ContainmentType.Intersects, result);
+        }
+
+        [Test]
+        public void ContainsBoundingCircle_Disjoint()
+        {
+            var box = new BoundingBox2D(new Vector2(0, 0), new Vector2(10, 10));
+            var circle = new BoundingCircle(new Vector2(20, 20), 5);
+
+            var result = box.Contains(circle);
+
+            Assert.AreEqual(ContainmentType.Disjoint, result);
+        }
+
+        [Test]
+        public void ContainsBoundingCircle_CircleTouchesEdge()
+        {
+            var box = new BoundingBox2D(new Vector2(0, 0), new Vector2(10, 10));
+            var circle = new BoundingCircle(new Vector2(15, 5), 5);
+
+            var result = box.Contains(circle);
+
+            Assert.AreEqual(ContainmentType.Intersects, result);
+        }
+
+        [Test]
+        public void ContainsBoundingCircle_CircleTouchesCorner()
+        {
+            var box = new BoundingBox2D(new Vector2(0, 0), new Vector2(10, 10));
+            var circle = new BoundingCircle(new Vector2(10 + MathF.Sqrt(12.5f), 10 + MathF.Sqrt(12.5f)), 5);
+
+            var result = box.Contains(circle);
+
+            Assert.AreEqual(ContainmentType.Intersects, result);
+        }
+
+        [Test]
+        public void ContainsBoundingCircle_CircleCenterInsideBox()
+        {
+            var box = new BoundingBox2D(new Vector2(0, 0), new Vector2(10, 10));
+            var circle = new BoundingCircle(new Vector2(5, 5), 8);
+
+            var result = box.Contains(circle);
+
+            Assert.AreEqual(ContainmentType.Intersects, result);
+        }
+
+        [Test]
         public void Intersects_Overlapping()
         {
             var box1 = new BoundingBox2D(new Vector2(0, 0), new Vector2(10, 10));
