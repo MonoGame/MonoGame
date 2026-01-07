@@ -560,6 +560,91 @@ namespace Microsoft.Xna.Framework
         }
 
         /// <summary>
+        /// Tests if this ray intersects with a circle and computes the parametric distances to the intersection points.
+        /// </summary>
+        /// <param name="circle">The circle to test against.</param>
+        /// <param name="tRayMin">
+        /// When this method returns <see langword="true"/>, contains the parametric distance along this ray
+        /// to the first intersection point, where the intersection point equals <c>Origin + tRayMin * Direction</c>.
+        /// If the ray origin is inside the circle, this will be <c>0</c>.
+        /// When this method returns <see langword="false"/>, contains <see langword="null"/>.
+        /// </param>
+        /// <param name="tRayMax">
+        /// When this method returns <see langword="true"/>, contains the parametric distance along this ray
+        /// to the second intersection point, where the intersection point equals <c>Origin + tRayMax * Direction</c>.
+        /// This is always greater than or equal to <paramref name="tRayMin"/>.
+        /// When this method returns <see langword="false"/>, contains <see langword="null"/>.
+        /// </param>
+        /// <returns>
+        /// <see langword="true"/> if the ray intersects the circle in its forward direction;
+        /// otherwise, <see langword="false"/>.
+        /// </returns>
+        public readonly bool Intersects(BoundingCircle circle, out float? tRayMin, out float? tRayMax)
+        {
+            // C. Ericson, Real-Time Collision Detection, Morgan Kaufmann, 2005
+            // Parametric intersection of a ray with a circle (2D reduction)
+            // Derived from Section 5.3.2 "Intersecting Ray or Segment Against Sphere"
+
+            Vector2 m = Origin - circle.Center;
+
+            float b = Vector2.Dot(m, Direction);
+            float c = Vector2.Dot(m, m) - circle.Radius * circle.Radius;
+
+            // Ray origin outside circle (c > 0)
+            // and ray pointing away from circle (b > 0)
+            if (c > 0.0f && b > 0.0f)
+            {
+                tRayMin = tRayMax = null;
+                return false;
+            }
+
+            float discriminant = b * b - c;
+
+            // Negative discriminant means ray misses circle
+            if (discriminant < 0.0f)
+            {
+                tRayMin = tRayMax = null;
+                return false;
+            }
+
+            float sqrtDiscriminant = MathF.Sqrt(discriminant);
+            float tMin = -b - sqrtDiscriminant;
+            float tMax = -b + sqrtDiscriminant;
+
+            // If ray origin is inside circle (tMin < 0), return 0
+            if (tMin < 0.0f && tMax > 0.0f)
+            {
+                tRayMin = 0.0f;
+                tRayMax = tMax;
+                return true;
+            }
+
+            // If both intersections are behind ray origin, no valid intersection
+            if (tMax < 0.0f)
+            {
+                tRayMin = tRayMax = null;
+                return false;
+            }
+
+            tRayMin = MathF.Max(0.0f, tMin);
+            tRayMax = tMax;
+            return true;
+        }
+
+        /// <summary>
+        /// Tests if this ray intersects with a circle.
+        /// </summary>
+        /// <param name="circle">The circle to test against.</param>
+        /// <returns>
+        /// <see langword="true"/> if the ray intersects the circle in its forward direction;
+        /// otherwise, <see langword="false"/>.
+        /// </returns>
+        public readonly bool Intersects(BoundingCircle circle)
+        {
+            return Intersects(circle, out _, out _);
+        }
+
+        /// <summary>
         /// Deconstructs this ray into its component values.
         /// </summary>
         /// <param name="origin">

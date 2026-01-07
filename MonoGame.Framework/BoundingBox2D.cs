@@ -134,7 +134,7 @@ namespace Microsoft.Xna.Framework
         /// Creates a new <see cref="BoundingBox2D"/> from a minimum corner position and size.
         /// </summary>
         /// <param name="position">The minimum corner position in 2D space.</param>
-        /// <param name="size">The size as width and height in world units.</param>
+        /// <param name="size">The size as width and height.</param>
         /// <returns>
         /// A new <see cref="BoundingBox2D"/> with the specified position and size.
         /// </returns>
@@ -332,6 +332,34 @@ namespace Microsoft.Xna.Framework
         }
 
         /// <summary>
+        /// Tests whether this bounding box contains, intersects, or is separate from a circle.
+        /// </summary>
+        /// <param name="circle">The circle to test against.</param>
+        /// <returns>
+        /// <see cref="ContainmentType.Contains"/> if the circle is completely inside this bounding box;
+        /// <see cref="ContainmentType.Intersects"/> if they partially overlap;
+        /// or <see cref="ContainmentType.Disjoint"/> if they do not touch.
+        /// </returns>
+        public readonly ContainmentType Contains(BoundingCircle circle)
+        {
+            // Check if circle center is outside the rectangle by more than the radius
+            if (circle.Center.X - circle.Radius > Max.X
+               || circle.Center.X + circle.Radius < Min.X
+               || circle.Center.Y - circle.Radius > Max.Y
+               || circle.Center.Y + circle.Radius < Min.Y)
+                return ContainmentType.Disjoint;
+
+            // Check if circle is fully contained
+            if (circle.Center.X - circle.Radius >= Min.X
+               && circle.Center.X + circle.Radius <= Max.X
+               && circle.Center.Y - circle.Radius >= Min.Y
+               && circle.Center.Y + circle.Radius <= Max.Y)
+                return ContainmentType.Contains;
+
+            return ContainmentType.Intersects;
+        }
+
+        /// <summary>
         /// Tests whether this bounding box intersects with another bounding box.
         /// </summary>
         /// <param name="other">The other bounding box to test against.</param>
@@ -345,6 +373,18 @@ namespace Microsoft.Xna.Framework
             if (Max.Y < other.Min.Y || Min.Y > other.Max.Y) return false;
 
             return true;
+        }
+
+        /// <summary>
+        /// Tests whether this bounding box intersects with a circle.
+        /// </summary>
+        /// <param name="circle">The circle to test against.</param>
+        /// <returns>
+        /// <see langword="true"/> if the bounding box and circle overlap or touch; otherwise, <see langword="false"/>.
+        /// </returns>
+        public readonly bool Intersects(BoundingCircle circle)
+        {
+            return circle.Intersects(this);
         }
 
         /// <summary>

@@ -464,6 +464,27 @@ namespace Microsoft.Xna.Framework
         }
 
         /// <summary>
+        /// Tests if this line intersects with a circle.
+        /// </summary>
+        /// <param name="circle">The circle to test against.</param>
+        /// <returns>
+        /// <see langword="true"/> if the line passes through or is tangent to the circle;
+        /// otherwise, <see langword="false"/>.
+        /// </returns>
+        public readonly bool Intersects(BoundingCircle circle)
+        {
+            // C. Ericson, Real-Time Collision Detection, Morgan Kaufmann, 2005
+            // Distance‑based intersection of implicit line with circle
+            // Derived from Section 5.2.2 "Testing Sphere Against Plane" (2D reduction)
+
+            // Compute signed distance from circle center to line
+            float signedDist = DistanceToPoint(circle.Center);
+
+            // Line intersects circle if perpendicular distance is within radius
+            return MathF.Abs(signedDist) <= circle.Radius;
+        }
+
+        /// <summary>
         /// Deconstructs this line into its component values.
         /// </summary>
         /// <param name="normal">

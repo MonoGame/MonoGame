@@ -619,6 +619,90 @@ namespace Microsoft.Xna.Framework
         }
 
         /// <summary>
+        /// Tests if this line segment intersects with a circle and computes the parametric distances to the intersection points.
+        /// </summary>
+        /// <param name="circle">The circle to test against.</param>
+        /// <param name="tSegmentMin">
+        /// When this method returns <see langword="true"/>, contains the parametric distance along this segment
+        /// to the entry intersection point, in the range [0, 1] where 0 represents the start and 1 represents the end.
+        /// When this method returns <see langword="false"/>, contains <see langword="null"/>.
+        /// </param>
+        /// <param name="tSegmentMax">
+        /// When this method returns <see langword="true"/>, contains the parametric distance along this segment
+        /// to the exit intersection point, in the range [0, 1] where 0 represents the start and 1 represents the end.
+        /// When this method returns <see langword="false"/>, contains <see langword="null"/>.
+        /// </param>
+        /// <returns>
+        /// <see langword="true"/> if the segment intersects the circle; otherwise, <see langword="false"/>.
+        /// </returns>
+        /// <remarks>
+        /// For degenerate segments (zero length), returns <see langword="true"/> with tSegmentMin = tSegmentMax = 0
+        /// if the start point is inside the circle.
+        /// </remarks>
+        public readonly bool Intersects(BoundingCircle circle, out float? tSegmentMin, out float? tSegmentMax)
+        {
+            // C. Ericson, Real-Time Collision Detection, Morgan Kaufmann, 2005
+            // Parametric intersection of a segment with a circle (2D reduction)
+            // Derived from Section 5.3.2 "Intersecting Ray or Segment Against Sphere"
+
+            const float Epsilon = 1e-6f;
+
+            Vector2 direction = Direction;
+            float segmentLenSq = direction.LengthSquared();
+
+            // Handle degenerate segment (zero length)
+            if (segmentLenSq < Epsilon * Epsilon)
+            {
+                float distSq = Vector2.DistanceSquared(Start, circle.Center);
+                if (distSq < circle.Radius * circle.Radius)
+                {
+                    tSegmentMin = tSegmentMax = 0.0f;
+                    return true;
+                }
+
+                tSegmentMin = tSegmentMax = null;
+                return false;
+            }
+
+            float segmentLength = MathF.Sqrt(segmentLenSq);
+            Ray2D ray = new Ray2D(Start, direction / segmentLength);
+
+            float? tRayMin;
+            float? tRayMax;
+            if (ray.Intersects(circle, out tRayMin, out tRayMax))
+            {
+                float tMin = tRayMin.Value / segmentLength;
+                float tMax = tRayMax.Value / segmentLength;
+
+                if (tMax < 0.0f || tMin > 1.0f)
+                {
+                    tSegmentMin = tSegmentMax = null;
+                    return false;
+                }
+
+                tSegmentMin = MathF.Max(0.0f, tMin);
+                tSegmentMax = MathF.Min(1.0f, tMax);
+                return true;
+            }
+
+            tSegmentMin = null;
+            tSegmentMax = null;
+            return false;
+        }
+
+        /// <summary>
+        /// Tests if this line segment intersects with a circle.
+        /// </summary>
+        /// <param name="circle">The circle to test against.</param>
+        /// <returns>
+        /// <see langword="true"/> if the segment intersects the circle; otherwise, <see langword="false"/>.
+        /// </returns>
+        public readonly bool Intersects(BoundingCircle circle)
+        {
+            return Intersects(circle, out _, out _);
+        }
+
+        /// <summary>
         /// Deconstructs this line segment into its component values.
         /// </summary>
         /// <param name="start">
