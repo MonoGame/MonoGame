@@ -398,6 +398,18 @@ namespace Microsoft.Xna.Framework
         }
 
         /// <summary>
+        /// Tests whether this capsule intersects with an oriented bounding box.
+        /// </summary>
+        /// <param name="obb">The oriented bounding box to test against.</param>
+        /// <returns>
+        /// <see langword="true"/> if the capsule and box overlap or touch; otherwise, <see langword="false"/>.
+        /// </returns>
+        public readonly bool Intersects(OrientedBoundingBox2D obb)
+        {
+            return obb.Intersects(this);
+        }
+
+        /// <summary>
         /// Applies a matrix transformation to this capsule and creates a new transformed capsule.
         /// </summary>
         /// <param name="matrix">The transformation matrix to apply.</param>

@@ -854,6 +854,99 @@ namespace Microsoft.Xna.Framework
             return Intersects(capsule, out _, out _);
         }
 
+        /// <summary>
+        /// Tests if this line segment intersects with an oriented bounding box and computes the parametric distances to the intersection points.
+        /// </summary>
+        /// <param name="obb">The oriented bounding box to test against.</param>
+        /// <param name="tMin">
+        /// When this method returns <see langword="true"/>, contains the parametric distance along this segment
+        /// to the entry intersection point, in the range [0, 1] where 0 represents the start and 1 represents the end.
+        /// When this method returns <see langword="false"/>, contains <see langword="null"/>.
+        /// </param>
+        /// <param name="tMax">
+        /// When this method returns <see langword="true"/>, contains the parametric distance along this segment
+        /// to the exit intersection point, in the range [0, 1] where 0 represents the start and 1 represents the end.
+        /// When this method returns <see langword="false"/>, contains <see langword="null"/>.
+        /// </param>
+        /// <returns>
+        /// <see langword="true"/> if the segment intersects the box; otherwise, <see langword="false"/>.
+        /// </returns>
+        /// <remarks>
+        /// For degenerate segments (zero length), returns <see langword="true"/> with tMin = tMax = 0
+        /// if the start point is inside the box.
+        /// </remarks>
+        public readonly bool Intersects(OrientedBoundingBox2D obb, out float? tMin, out float? tMax)
+        {
+            // C. Ericson, Real-Time Collision Detection, Morgan Kaufmann, 2005
+            // Parametric intersection of a segment with an oriented box
+            // Derived from Section 5.3.3 "Intersecting Ray or Segment Against Box"
+
+            const float Epsilon = 1e-6f;
+
+            Vector2 direction = Direction;
+            float segmentLengthSq = direction.LengthSquared();
+
+            // Handle degenerate segment (zero length)
+            if (segmentLengthSq < Epsilon * Epsilon)
+            {
+                // Transform point to OBB local space
+                Vector2 diff = Start - obb.Center;
+                Vector2 localPoint = new Vector2(
+                    Vector2.Dot(diff, obb.AxisX),
+                    Vector2.Dot(diff, obb.AxisY)
+                );
+
+                // Check if point is inside the local aabb
+                bool inside = MathF.Abs(localPoint.X) <= obb.HalfExtents.X &&
+                              MathF.Abs(localPoint.Y) <= obb.HalfExtents.Y;
+
+                if (inside)
+                {
+                    tMin = tMax = 0.0f;
+                    return true;
+                }
+
+                tMin = tMax = null;
+                return false;
+            }
+
+            float segmentLength = MathF.Sqrt(segmentLengthSq);
+            Ray2D ray = new Ray2D(Start, direction / segmentLength);
+
+            float? rayTMin;
+            float? rayTMax;
+            if (ray.Intersects(obb, out rayTMin, out rayTMax))
+            {
+                float segmentTMin = rayTMin.Value / segmentLength;
+                float segmentTMax = rayTMax.Value / segmentLength;
+
+                if (segmentTMax < 0.0f || segmentTMin > 1.0f)
+                {
+                    tMin = tMax = null;
+                    return false;
+                }
+
+                tMin = MathF.Max(0.0f, segmentTMin);
+                tMax = MathF.Min(1.0f, segmentTMax);
+                return true;
+            }
+
+            tMin = tMax = null;
+            return false;
+        }
+
+        /// <summary>
+        /// Tests if this line segment intersects with an oriented bounding box.
+        /// </summary>
+        /// <param name="obb">The oriented bounding box to test against.</param>
+        /// <returns>
+        /// <see langword="true"/> if the segment intersects the box; otherwise, <see langword="false"/>.
+        /// </returns>
+        public readonly bool Intersects(OrientedBoundingBox2D obb)
+        {
+            return Intersects(obb, out _, out _);
+        }
+
         /// <inheritdoc/>
         public override readonly bool Equals([NotNullWhen(true)] object obj)
         {

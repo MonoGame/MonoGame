@@ -370,7 +370,7 @@ namespace MonoGame.Tests.Framework
             Assert.AreEqual(15.0f, tMax, 1e-5f);
         }
 
-         [Test]
+        [Test]
         public void IntersectsBoundingCapsule_HitsCapsule()
         {
             var ray = new Ray2D(new Vector2(0, 5), new Vector2(1, 0));
@@ -457,5 +457,43 @@ namespace MonoGame.Tests.Framework
             Assert.AreEqual(15.0f, tMax, 1e-5f);
         }
 
+        [Test]
+        public void IntersectsOrientedBoundingBox2D_PassesCompletelyThrough()
+        {
+            var ray = new Ray2D(new Vector2(0, 10), Vector2.UnitX);
+            var obb = new OrientedBoundingBox2D(new Vector2(10, 10), Vector2.UnitX, Vector2.UnitY, new Vector2(5, 5));
+
+            bool intersects = ray.Intersects(obb, out float? tMin, out float? tMax);
+
+            Assert.IsTrue(intersects);
+            Assert.AreEqual(5.0f, tMin, 1e-5f);
+            Assert.AreEqual(15.0f, tMax, 1e-5f);
+        }
+
+        [Test]
+        public void IntersectsOrientedBoundingBox2D_StartsInside()
+        {
+            var ray = new Ray2D(new Vector2(10, 10), Vector2.UnitX);
+            var obb = new OrientedBoundingBox2D(new Vector2(10, 10), Vector2.UnitX, Vector2.UnitY, new Vector2(5, 5));
+
+            bool intersects = ray.Intersects(obb, out float? tMin, out float? tMax);
+
+            Assert.IsTrue(intersects);
+            Assert.AreEqual(0.0f, tMin);
+            Assert.AreEqual(5.0f, tMax, 1e-5f);
+        }
+
+        [Test]
+        public void IntersectsOrientedBoundingBox2D_MissesCompletely()
+        {
+            var ray = new Ray2D(new Vector2(0, 0), Vector2.UnitX);
+            var obb = new OrientedBoundingBox2D(new Vector2(10, 10), Vector2.UnitX, Vector2.UnitY, new Vector2(5, 5));
+
+            bool intersects = ray.Intersects(obb, out float? tMin, out float? tMax);
+
+            Assert.IsFalse(intersects);
+            Assert.IsNull(tMin);
+            Assert.IsNull(tMax);
+        }
     }
 }

@@ -681,5 +681,46 @@ namespace MonoGame.Tests.Framework
             Assert.IsNotNull(tMax);
         }
 
+        [Test]
+        public void IntersectsOrientedBoundingBox2D_PassesCompletelyThrough()
+        {
+            var segment = new LineSegment2D(new Vector2(0, 10), new Vector2(20, 10));
+
+            // Axis-aligned OBB: equivalent to AABB min(5,5) max(15,15)
+            var obb = new OrientedBoundingBox2D(new Vector2(10, 10), Vector2.UnitX, Vector2.UnitY, new Vector2(5, 5));
+
+            bool intersects = segment.Intersects(obb, out float? tMin, out float? tMax);
+
+            Assert.IsTrue(intersects);
+            Assert.AreEqual(0.25f, tMin, 1e-5f);
+            Assert.AreEqual(0.75f, tMax, 1e-5f);
+        }
+
+        [Test]
+        public void IntersectsOrientedBoundingBox2D_StartsInside()
+        {
+            var segment = new LineSegment2D(new Vector2(10, 10), new Vector2(20, 10));
+            var obb = new OrientedBoundingBox2D(new Vector2(10, 10), Vector2.UnitX, Vector2.UnitY, new Vector2(5, 5));
+
+            bool intersects = segment.Intersects(obb, out float? tMin, out float? tMax);
+
+            Assert.IsTrue(intersects);
+            Assert.AreEqual(0.0f, tMin);
+            Assert.AreEqual(0.5f, tMax, 1e-5f);
+        }
+
+        [Test]
+        public void IntersectsOrientedBoundingBox2D_MissesCompletely()
+        {
+            var segment = new LineSegment2D(new Vector2(0, 0), new Vector2(20, 0));
+            var obb = new OrientedBoundingBox2D(new Vector2(10, 10), Vector2.UnitX, Vector2.UnitY, new Vector2(5, 5));
+
+            bool intersects = segment.Intersects(obb, out float? tMin, out float? tMax);
+
+            Assert.IsFalse(intersects);
+            Assert.IsNull(tMin);
+            Assert.IsNull(tMax);
+        }
+
     }
 }

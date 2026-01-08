@@ -437,5 +437,39 @@ namespace MonoGame.Tests.Framework
 
             Assert.IsFalse(intersects);
         }
+
+        [Test]
+        public void IntersectsOrientedBoundingBox2D_PassesThrough()
+        {
+            var line = new Line2D(new Vector2(0, 1), 10);
+            var obb = new OrientedBoundingBox2D(new Vector2(10, 10), Vector2.UnitX, Vector2.UnitY, new Vector2(5, 5));
+
+            bool intersects = line.Intersects(obb);
+
+            Assert.IsTrue(intersects);
+        }
+
+        [Test]
+        public void IntersectsOrientedBoundingBox2D_MissesCompletely()
+        {
+            var line = new Line2D(new Vector2(0, 1), 30);
+            var obb = new OrientedBoundingBox2D(new Vector2(10, 10), Vector2.UnitX, Vector2.UnitY, new Vector2(5, 5));
+
+            bool intersects = line.Intersects(obb);
+
+            Assert.IsFalse(intersects);
+        }
+
+        [Test]
+        public void IntersectsOrientedBoundingBox2D_TouchesEdge()
+        {
+            var line = new Line2D(new Vector2(0, 1), 5);
+            var obb = new OrientedBoundingBox2D(new Vector2(10, 10), Vector2.UnitX, Vector2.UnitY, new Vector2(5, 5));
+
+            bool intersects = line.Intersects(obb);
+
+            Assert.IsTrue(intersects);
+        }
+
     }
 }

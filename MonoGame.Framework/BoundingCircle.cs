@@ -426,6 +426,36 @@ namespace Microsoft.Xna.Framework
         }
 
         /// <summary>
+        /// Tests whether this circle intersects with an oriented bounding box.
+        /// </summary>
+        /// <param name="obb">The oriented bounding box to test against.</param>
+        /// <returns>
+        /// <see langword="true"/> if the circle and box overlap or touch; otherwise, <see langword="false"/>.
+        /// </returns>
+        public readonly bool Intersects(OrientedBoundingBox2D obb)
+        {
+            // C. Ericson, Real-Time Collision Detection, Morgan Kaufmann, 2005
+            // Section 5.1.4 "Closest Point on OBB to Point"
+
+            // Transform the circle center to OBB local space
+            Vector2 diff = Center - obb.Center;
+            float projX = Vector2.Dot(diff, obb.AxisX);
+            float projY = Vector2.Dot(diff, obb.AxisY);
+            Vector2 localCenter = new Vector2(projX, projY);
+
+            // Find closest point on rectangle (in local space) to circle center
+            float closestX = Math.Clamp(localCenter.X, -obb.HalfExtents.X, obb.HalfExtents.X);
+            float closestY = Math.Clamp(localCenter.Y, -obb.HalfExtents.Y, obb.HalfExtents.Y);
+
+            // Calculate squared distances
+            float dx = localCenter.X - closestX;
+            float dy = localCenter.Y - closestY;
+            float distSq = dx * dx + dy * dy;
+
+            return distSq <= Radius * Radius;
+        }
+
+        /// <summary>
         /// Applies a matrix transformation to this circle and creates a new transformed circle.
         /// </summary>
         /// <param name="matrix">The transformation matrix to apply.</param>

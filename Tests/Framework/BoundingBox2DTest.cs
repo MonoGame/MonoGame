@@ -160,7 +160,7 @@ namespace MonoGame.Tests.Framework
         }
 
         [Test]
-        public void CreateMerged_EnclosesBoths()
+        public void CreateMerged_EnclosesBoth()
         {
             var box1 = new BoundingBox2D(new Vector2(0, 0), new Vector2(10, 10));
             var box2 = new BoundingBox2D(new Vector2(5, 5), new Vector2(15, 20));
@@ -466,6 +466,41 @@ namespace MonoGame.Tests.Framework
 
             Assert.IsTrue(intersects);
         }
+
+        [Test]
+        public void IntersectsOrientedBoundingBox2D_Overlapping()
+        {
+            var box = new BoundingBox2D(new Vector2(8, 8), new Vector2(12, 12));
+            var obb = new OrientedBoundingBox2D(new Vector2(10, 10), Vector2.UnitX, Vector2.UnitY, new Vector2(5, 5));
+
+            bool intersects = box.Intersects(obb);
+
+            Assert.IsTrue(intersects);
+        }
+
+        [Test]
+        public void IntersectsOrientedBoundingBox2D_Separated()
+        {
+            var box = new BoundingBox2D(new Vector2(30, 30), new Vector2(40, 40));
+            var obb = new OrientedBoundingBox2D(new Vector2(10, 10), Vector2.UnitX, Vector2.UnitY, new Vector2(5, 5));
+
+            bool intersects = box.Intersects(obb);
+
+            Assert.IsFalse(intersects);
+        }
+
+        [Test]
+        public void IntersectsOrientedBoundingBox2D_TouchesEdge()
+        {
+            // Touches at x = 15 for aligned OBB (center 10 halfX=5 => right edge x=15)
+            var box = new BoundingBox2D(new Vector2(15, 9), new Vector2(20, 11));
+            var obb = new OrientedBoundingBox2D(new Vector2(10, 10), Vector2.UnitX, Vector2.UnitY, new Vector2(5, 5));
+
+            bool intersects = box.Intersects(obb);
+
+            Assert.IsTrue(intersects);
+        }
+
 
         [Test]
         public void Deconstruct()

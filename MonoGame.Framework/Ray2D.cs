@@ -817,6 +817,68 @@ namespace Microsoft.Xna.Framework
         }
 
         /// <summary>
+        /// Tests if this ray intersects with an oriented bounding box and computes the parametric distances to the intersection points.
+        /// </summary>
+        /// <param name="obb">The oriented bounding box to test against.</param>
+        /// <param name="tRayMin">
+        /// When this method returns <see langword="true"/>, contains the parametric distance along this ray
+        /// to the entry intersection point, where the intersection point equals Origin + tRayMin * Direction.
+        /// If the ray origin is inside the box, this will be 0.
+        /// When this method returns <see langword="false"/>, contains <see langword="null"/>.
+        /// </param>
+        /// <param name="tRayMax">
+        /// When this method returns <see langword="true"/>, contains the parametric distance along this ray
+        /// to the exit intersection point, where the intersection point equals Origin + tRayMax * Direction.
+        /// This is always greater than or equal to <paramref name="tRayMin"/>.
+        /// When this method returns <see langword="false"/>, contains <see langword="null"/>.
+        /// </param>
+        /// <returns>
+        /// <see langword="true"/> if the ray intersects the box in its forward direction;
+        /// otherwise, <see langword="false"/>.
+        /// </returns>
+        public readonly bool Intersects(OrientedBoundingBox2D obb, out float? tRayMin, out float? tRayMax)
+        {
+            // C. Ericson, Real-Time Collision Detection, Morgan Kaufmann, 2005
+            // Parametric intersection of a ray with an oriented bounding rectangle (2D reduction)
+            // Derived from Section 5.3.3 "Intersecting Ray or Segment Against Box"
+
+            // Project the ray origin and direction onto the OBBs local axes
+            // to transform the ray from world space to OBB local space.
+            Vector2 diff = Origin - obb.Center;
+
+            Vector2 localOrigin = new Vector2(
+                Vector2.Dot(diff, obb.AxisX),
+                Vector2.Dot(diff, obb.AxisY)
+            );
+
+            Vector2 localDirection = new Vector2(
+                Vector2.Dot(Direction, obb.AxisX),
+                Vector2.Dot(Direction, obb.AxisY)
+            );
+
+            // Create an axis-aligned box in local space centered at origin
+            BoundingBox2D localAABB = new BoundingBox2D(-obb.HalfExtents, obb.HalfExtents);
+
+            // Create ray in local space
+            Ray2D localRay = new Ray2D(localOrigin, localDirection);
+
+            return localRay.Intersects(localAABB, out tRayMin, out tRayMax);
+        }
+
+        /// <summary>
+        /// Tests if this ray intersects with an oriented bounding box.
+        /// </summary>
+        /// <param name="obb">The oriented bounding box to test against.</param>
+        /// <returns>
+        /// <see langword="true"/> if the ray intersects the box in its forward direction;
+        /// otherwise, <see langword="false"/>.
+        /// </returns>
+        public readonly bool Intersects(OrientedBoundingBox2D obb)
+        {
+            return Intersects(obb, out _, out _);
+        }
+
+        /// <summary>
         /// Deconstructs this ray into its component values.
         /// </summary>
         /// <param name="origin">

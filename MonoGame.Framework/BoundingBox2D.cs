@@ -442,6 +442,20 @@ namespace Microsoft.Xna.Framework
         }
 
         /// <summary>
+        /// Tests whether this bounding box intersects with an oriented bounding box.
+        /// </summary>
+        /// <param name="obb">The oriented bounding box to test against.</param>
+        /// <returns>
+        /// <see langword="true"/> if the boxes overlap or touch; otherwise, <see langword="false"/>.
+        /// </returns>
+        public readonly bool Intersects(OrientedBoundingBox2D obb)
+        {
+            // Convert this aabb to obb and perform obb intersection test.
+            OrientedBoundingBox2D aabbAsObb = OrientedBoundingBox2D.CreateFromBoundingBox2D(this);
+            return aabbAsObb.Intersects(obb);
+        }
+
+        /// <summary>
         /// Deconstructs this bounding box into its component values.
         /// </summary>
         /// <param name="min">

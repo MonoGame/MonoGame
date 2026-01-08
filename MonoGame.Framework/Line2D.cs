@@ -529,6 +529,45 @@ namespace Microsoft.Xna.Framework
         }
 
         /// <summary>
+        /// Tests if this line intersects with an oriented bounding box.
+        /// </summary>
+        /// <param name="obb">The oriented bounding box to test against.</param>
+        /// <returns>
+        /// <see langword="true"/> if the line passes through or touches the box;
+        /// otherwise, <see langword="false"/>.
+        /// </returns>
+        public readonly bool Intersects(OrientedBoundingBox2D obb)
+        {
+            // C. Ericson, Real-Time Collision Detection, Morgan Kaufmann, 2005
+            // Intersection of an implicit line with a 2D oriented bounding rectangle (OBB)
+            // Derived from Section 5.2.3 "Testing Box Against Plane"
+
+            // Compute the four corners of the OBB
+            Vector2 halfX = obb.AxisX * obb.HalfExtents.X;
+            Vector2 halfY = obb.AxisY * obb.HalfExtents.Y;
+
+            // Manually calculate corners instead of calling obb.GetCorners
+            // to avoid array heap allocations
+            Vector2 corner1 = obb.Center - halfX - halfY;
+            Vector2 corner2 = obb.Center + halfX - halfY;
+            Vector2 corner3 = obb.Center + halfX + halfY;
+            Vector2 corner4 = obb.Center - halfX + halfY;
+
+            // Compute signed distances from all four corners
+            float d1 = DistanceToPoint(corner1);
+            float d2 = DistanceToPoint(corner2);
+            float d3 = DistanceToPoint(corner3);
+            float d4 = DistanceToPoint(corner4);
+
+            // Find min and max signed distances
+            float minDist = MathF.Min(MathF.Min(d1, d2), MathF.Min(d3, d4));
+            float maxDist = MathF.Max(MathF.Max(d1, d2), MathF.Max(d3, d4));
+
+            // Line intersects if corners straddle the line (opposite signs)
+            return minDist <= 0.0f && maxDist >= 0.0f;
+        }
+
+        /// <summary>
         /// Deconstructs this line into its component values.
         /// </summary>
         /// <param name="normal">

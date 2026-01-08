@@ -125,7 +125,7 @@ namespace MonoGame.Tests.Framework
             Assert.AreEqual(MathF.Sqrt(50), circle.Radius, 1e-5f);
         }
 
-[Test]
+        [Test]
         public void CreateFromBoundingCapsule2D_HorizontalCapsule()
         {
             var capsule = new BoundingCapsule2D(new Vector2(0, 0), new Vector2(10, 0), 3);
@@ -425,6 +425,41 @@ namespace MonoGame.Tests.Framework
 
             Assert.IsTrue(intersects);
         }
+
+        [Test]
+        public void IntersectsOrientedBoundingBox2D_Overlapping()
+        {
+            var circle = new BoundingCircle(new Vector2(8, 10), 5);
+            var obb = new OrientedBoundingBox2D(new Vector2(10, 10), Vector2.UnitX, Vector2.UnitY, new Vector2(5, 5));
+
+            bool intersects = circle.Intersects(obb);
+
+            Assert.IsTrue(intersects);
+        }
+
+        [Test]
+        public void IntersectsOrientedBoundingBox2D_Separated()
+        {
+            var circle = new BoundingCircle(new Vector2(30, 10), 5);
+            var obb = new OrientedBoundingBox2D(new Vector2(10, 10), Vector2.UnitX, Vector2.UnitY, new Vector2(5, 5));
+
+            bool intersects = circle.Intersects(obb);
+
+            Assert.IsFalse(intersects);
+        }
+
+        [Test]
+        public void IntersectsOrientedBoundingBox2D_Tangent()
+        {
+            // Aligned OBB left edge at x=5. Circle centered at (0,10) radius 5 => tangent at x=5.
+            var circle = new BoundingCircle(new Vector2(0, 10), 5);
+            var obb = new OrientedBoundingBox2D(new Vector2(10, 10), Vector2.UnitX, Vector2.UnitY, new Vector2(5, 5));
+
+            bool intersects = circle.Intersects(obb);
+
+            Assert.IsTrue(intersects);
+        }
+
 
         [Test]
         public void Transform_Translation()

@@ -169,7 +169,7 @@ namespace MonoGame.Tests.Framework
         }
 
         [Test]
-        public void ContainsBoundingCapsule2D__Contains()
+        public void ContainsBoundingCapsule2D_Contains()
         {
             var capsule1 = new BoundingCapsule2D(new Vector2(0, 0), new Vector2(20, 0), 10);
             var capsule2 = new BoundingCapsule2D(new Vector2(8, 0), new Vector2(12, 0), 3);
@@ -180,7 +180,7 @@ namespace MonoGame.Tests.Framework
         }
 
         [Test]
-        public void ContainsBoundingCapsule2D__Intersects()
+        public void ContainsBoundingCapsule2D_Intersects()
         {
             var capsule1 = new BoundingCapsule2D(new Vector2(0, 0), new Vector2(10, 0), 5);
             var capsule2 = new BoundingCapsule2D(new Vector2(8, 0), new Vector2(18, 0), 5);
@@ -191,7 +191,7 @@ namespace MonoGame.Tests.Framework
         }
 
         [Test]
-        public void ContainsBoundingCapsule2D__Disjoint()
+        public void ContainsBoundingCapsule2D_Disjoint()
         {
             var capsule1 = new BoundingCapsule2D(new Vector2(0, 0), new Vector2(10, 0), 3);
             var capsule2 = new BoundingCapsule2D(new Vector2(20, 0), new Vector2(30, 0), 3);
@@ -356,7 +356,7 @@ namespace MonoGame.Tests.Framework
         }
 
         [Test]
-        public void IntersectsBoundingBox2D__Overlapping()
+        public void IntersectsBoundingBox2D_Overlapping()
         {
             var capsule = new BoundingCapsule2D(new Vector2(0, 0), new Vector2(10, 0), 5);
             var box = new BoundingBox2D(new Vector2(3, 3), new Vector2(7, 7));
@@ -367,7 +367,7 @@ namespace MonoGame.Tests.Framework
         }
 
         [Test]
-        public void IntersectsBoundingBox2D__Separated()
+        public void IntersectsBoundingBox2D_Separated()
         {
             var capsule = new BoundingCapsule2D(new Vector2(0, 0), new Vector2(10, 0), 3);
             var box = new BoundingBox2D(new Vector2(5, 10), new Vector2(15, 20));
@@ -378,7 +378,7 @@ namespace MonoGame.Tests.Framework
         }
 
         [Test]
-        public void IntersectsBoundingBox2D__CapsuleThroughBox()
+        public void IntersectsBoundingBox2D_CapsuleThroughBox()
         {
             var capsule = new BoundingCapsule2D(new Vector2(5, -10), new Vector2(5, 20), 2);
             var box = new BoundingBox2D(new Vector2(0, 0), new Vector2(10, 10));
@@ -387,6 +387,40 @@ namespace MonoGame.Tests.Framework
 
             Assert.IsTrue(intersects);
         }
+
+        [Test]
+        public void IntersectsOrientedBoundingBox2D_Overlapping()
+        {
+            var capsule = new BoundingCapsule2D(new Vector2(8, 8), new Vector2(12, 12), 2);
+            var obb = new OrientedBoundingBox2D(new Vector2(10, 10), Vector2.UnitX, Vector2.UnitY, new Vector2(5, 5));
+
+            bool intersects = capsule.Intersects(obb);
+
+            Assert.IsTrue(intersects);
+        }
+
+        [Test]
+        public void IntersectsOrientedBoundingBox2D_Separated()
+        {
+            var capsule = new BoundingCapsule2D(new Vector2(30, 30), new Vector2(40, 40), 2);
+            var obb = new OrientedBoundingBox2D(new Vector2(10, 10), Vector2.UnitX, Vector2.UnitY, new Vector2(5, 5));
+
+            bool intersects = capsule.Intersects(obb);
+
+            Assert.IsFalse(intersects);
+        }
+
+        [Test]
+        public void IntersectsOrientedBoundingBox2D_CapsuleThroughBox()
+        {
+            var capsule = new BoundingCapsule2D(new Vector2(0, 10), new Vector2(20, 10), 1);
+            var obb = new OrientedBoundingBox2D(new Vector2(10, 10), Vector2.UnitX, Vector2.UnitY, new Vector2(5, 5));
+
+            bool intersects = capsule.Intersects(obb);
+
+            Assert.IsTrue(intersects);
+        }
+
 
         [Test]
         public void Transform_Translation()
