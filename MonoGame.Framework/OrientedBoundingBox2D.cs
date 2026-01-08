@@ -571,6 +571,18 @@ namespace Microsoft.Xna.Framework
         }
 
         /// <summary>
+        /// Tests whether this oriented bounding box intersects with a polygon.
+        /// </summary>
+        /// <param name="polygon">The polygon to test against.</param>
+        /// <returns>
+        /// <see langword="true"/> if the box and polygon overlap or touch; otherwise, <see langword="false"/>.
+        /// </returns>
+        public readonly bool Intersects(BoundingPolygon2D polygon)
+        {
+            return polygon.Intersects(this);
+        }
+
+        /// <summary>
         /// Applies a matrix transformation to this oriented bounding box and creates a new transformed box.
         /// </summary>
         /// <param name="matrix">The transformation matrix to apply.</param>

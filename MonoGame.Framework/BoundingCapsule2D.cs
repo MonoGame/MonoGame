@@ -410,6 +410,57 @@ namespace Microsoft.Xna.Framework
         }
 
         /// <summary>
+        /// Tests whether this capsule intersects with a polygon.
+        /// </summary>
+        /// <param name="polygon">The polygon to test against.</param>
+        /// <returns>
+        /// <see langword="true"/> if the capsule and polygon overlap or touch; otherwise, <see langword="false"/>.
+        /// </returns>
+        public readonly bool Intersects(BoundingPolygon2D polygon)
+        {
+            // C. Ericson, Real-Time Collision Detection, Morgan Kaufmann, 2005
+            // Capsule–polygon overlap test via minimum distance
+
+            if (polygon.Vertices == null || polygon.VertexCount < 3)
+                return false;
+
+            LineSegment2D capsuleSegment = new LineSegment2D(PointA, PointB);
+
+            // 1. Segment intersects polygon
+            if (capsuleSegment.Intersects(polygon))
+                return true;
+
+            // 2. Polygon contains any capsule endpoint
+            if (polygon.Contains(PointA) == ContainmentType.Contains ||
+                polygon.Contains(PointB) == ContainmentType.Contains)
+                return true;
+
+            // 3. Minimum distance from capsule segment to polygon
+            float minDistSq = float.MaxValue;
+
+            // a) Distance to polygon edges
+            for (int i = 0; i < polygon.VertexCount; i++)
+            {
+                int j = (i + 1) % polygon.VertexCount;
+                LineSegment2D edge = new LineSegment2D(
+                    polygon.Vertices[i],
+                    polygon.Vertices[j]);
+
+                float distSq = capsuleSegment.DistanceSquaredToSegment(edge, out _, out _, out _, out _);
+                minDistSq = MathF.Min(minDistSq, distSq);
+            }
+
+            // b) Distance from segment to polygon interior (critical fix)
+            // Test closest point on segment to polygon centroid
+            Vector2 closest = capsuleSegment.ClosestPoint(polygon.Centroid, out _);
+
+            if (polygon.Contains(closest) == ContainmentType.Contains)
+                minDistSq = 0.0f;
+
+            return minDistSq <= Radius * Radius;
+        }
+
+        /// <summary>
         /// Applies a matrix transformation to this capsule and creates a new transformed capsule.
         /// </summary>
         /// <param name="matrix">The transformation matrix to apply.</param>

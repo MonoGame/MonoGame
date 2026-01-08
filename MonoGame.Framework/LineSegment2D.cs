@@ -947,6 +947,158 @@ namespace Microsoft.Xna.Framework
             return Intersects(obb, out _, out _);
         }
 
+        /// <summary>
+        /// Tests if this line segment intersects with a polygon and computes the parametric distances to the intersection points.
+        /// </summary>
+        /// <param name="polygon">The polygon to test against.</param>
+        /// <param name="tMin">
+        /// When this method returns <see langword="true"/>, contains the parametric distance along this segment
+        /// to the entry intersection point, in the range [0, 1] where 0 represents the start and 1 represents the end.
+        /// When this method returns <see langword="false"/>, contains <see langword="null"/>.
+        /// </param>
+        /// <param name="tMax">
+        /// When this method returns <see langword="true"/>, contains the parametric distance along this segment
+        /// to the exit intersection point, in the range [0, 1] where 0 represents the start and 1 represents the end.
+        /// When this method returns <see langword="false"/>, contains <see langword="null"/>.
+        /// </param>
+        /// <param name="point">
+        /// When this method returns <see langword="true"/>, contains the intersection point corresponding to <paramref name="tMin"/>.
+        /// When this method returns <see langword="false"/>, contains <see langword="null"/>.
+        /// </param>
+        /// <returns>
+        /// <see langword="true"/> if the segment intersects the polygon; otherwise, <see langword="false"/>.
+        /// </returns>
+        /// <remarks>
+        /// For degenerate segments (zero length), returns <see langword="true"/> with tMin = tMax = 0
+        /// if the start point is inside the polygon.
+        /// </remarks>
+        public readonly bool Intersects(BoundingPolygon2D polygon, out float? tMin, out float? tMax, out Vector2? point)
+        {
+            // C. Ericson, Real-Time Collision Detection, Morgan Kaufmann, 2005
+            // Section 5.3.8 "Intersecting Ray or Segment Against Convex Polyhedron"
+
+            const float Epsilon = 1e-6f;
+
+            // Handle degenerate polygon
+            if (polygon.Vertices == null || polygon.Vertices.Length == 0)
+            {
+                tMin = tMax = null;
+                point = null;
+                return false;
+            }
+
+            Vector2 segmentDir = Direction;
+            float segmentLengthSq = segmentDir.LengthSquared();
+
+            // Handle degenerate segment (point)
+            if (segmentLengthSq < Epsilon * Epsilon)
+            {
+                // Check if point (segment start) is inside the polygon
+                if (polygon.Contains(Start) == ContainmentType.Contains)
+                {
+                    tMin = tMax = 0.0f;
+                    point = Start;
+                    return true;
+                }
+
+                tMin = tMax = null;
+                point = null;
+                return false;
+            }
+
+            // Initialize interval to entire segment [0, 1]
+            float currentTMin = 0.0f;
+            float currentTMax = 1.0f;
+
+            int n = polygon.Vertices.Length;
+
+            // Clip segment against each edge (half-space) of the polygon
+            for (int i = 0; i < n; i++)
+            {
+                Vector2 edgeStart = polygon.Vertices[i];
+                Vector2 edgeNormal = polygon.Normals[i];
+
+                // Compute distance from segment origin to the edge plane
+                float planeD = Vector2.Dot(edgeNormal, edgeStart);
+                float dist = planeD - Vector2.Dot(edgeNormal, Start);
+
+                // Compute denominator (how aligned segment direction is with edge normal)
+                float denom = Vector2.Dot(edgeNormal, segmentDir);
+
+                // Handle segment parallel to edge
+                if (MathF.Abs(denom) < Epsilon)
+                {
+                    // Segment is parallel to edge
+                    // If segment start is outside the half-space, no intersection
+                    if (dist > Epsilon)
+                    {
+                        tMin = tMax = null;
+                        point = null;
+                        return false;
+                    }
+
+                    // Segment is inside this half-space, continue to next edge
+                    continue;
+                }
+
+                // Compute intersection parameter t with the edge plane
+                float t = dist / denom;
+
+                if (denom < 0.0f)
+                {
+                    // Segment is exiting the half-space
+                    if (t < currentTMax)
+                    {
+                        currentTMax = t;
+                    }
+                }
+                else
+                {
+                    // Segment is entering the half-space
+                    if (t > currentTMin)
+                    {
+                        currentTMin = t;
+                    }
+                }
+
+                // Early exit if interval becomes invalid
+                if (currentTMin > currentTMax)
+                {
+                    tMin = tMax = null;
+                    point = null;
+                    return false;
+                }
+            }
+
+            // Check if intersection overlaps with segment bounds [0, 1]
+            if (currentTMax < 0.0f || currentTMin > 1.0f)
+            {
+                tMin = tMax = null;
+                point = null;
+                return false;
+            }
+
+            // Clamp to segment bounds
+            tMin = MathF.Max(currentTMin, 0.0f);
+            tMax = MathF.Min(currentTMax, 1.0f);
+
+            // Compute intersection point
+            point = Start + segmentDir * tMin.Value;
+            return true;
+        }
+
+        /// <summary>
+        /// Tests if this line segment intersects with a polygon.
+        /// </summary>
+        /// <param name="polygon">The polygon to test against.</param>
+        /// <returns>
+        /// <see langword="true"/> if the segment intersects the polygon; otherwise, <see langword="false"/>.
+        /// </returns>
+        public readonly bool Intersects(BoundingPolygon2D polygon)
+        {
+            return Intersects(polygon, out _, out _, out _);
+        }
+
         /// <inheritdoc/>
         public override readonly bool Equals([NotNullWhen(true)] object obj)
         {

@@ -879,6 +879,151 @@ namespace Microsoft.Xna.Framework
         }
 
         /// <summary>
+        /// Tests if this ray intersects with a polygon and computes the parametric distances to the intersection points.
+        /// </summary>
+        /// <param name="polygon">The polygon to test against.</param>
+        /// <param name="tRayMin">
+        /// When this method returns <see langword="true"/>, contains the parametric distance along this ray
+        /// to the entry intersection point, where the intersection point equals Origin + tRayMin * Direction.
+        /// If the ray origin is inside the polygon, this will be 0.
+        /// When this method returns <see langword="false"/>, contains <see langword="null"/>.
+        /// </param>
+        /// <param name="tRayMax">
+        /// When this method returns <see langword="true"/>, contains the parametric distance along this ray
+        /// to the exit intersection point, where the intersection point equals Origin + tRayMax * Direction.
+        /// This is always greater than or equal to <paramref name="tRayMin"/>.
+        /// When this method returns <see langword="false"/>, contains <see langword="null"/>.
+        /// </param>
+        /// <param name="point">
+        /// When this method returns <see langword="true"/>, contains the position of the entry intersection point
+        /// corresponding to <paramref name="tRayMin"/>.
+        /// When this method returns <see langword="false"/>, contains <see langword="null"/>.
+        /// </param>
+        /// <returns>
+        /// <see langword="true"/> if the ray intersects the polygon in its forward direction;
+        /// otherwise, <see langword="false"/>.
+        /// </returns>
+        public readonly bool Intersects(BoundingPolygon2D polygon, out float? tRayMin, out float? tRayMax, out Vector2? point)
+        {
+            // C. Ericson, Real-Time Collision Detection, Morgan Kaufmann, 2005
+            // Parametric intersection of a ray with a convex polygon (2D reduction)
+            // Derived from Section 5.3.8 "Intersecting Ray or Segment Against Convex Polyhedron"
+
+            const float Epsilon = 1e-6f;
+
+            // Handle degenerate polygon
+            if (polygon.Vertices == null || polygon.Vertices.Length < 3)
+            {
+                tRayMin = tRayMax = null;
+                point = null;
+                return false;
+            }
+
+            // Initialize interval to entire ray (semi-infinite)
+            float tMin = float.MinValue;
+            float tMax = float.MaxValue;
+
+            int n = polygon.Vertices.Length;
+
+            // Clip ray against each edge (half-space) of the polygon.
+            for (int i = 0; i < n; i++)
+            {
+                Vector2 edgeStart = polygon.Vertices[i];
+                Vector2 edgeNormal = polygon.Normals[i];
+
+                // Compute distance from ray origin to the edge plane
+                float planeD = Vector2.Dot(edgeNormal, edgeStart);
+                float dist = planeD - Vector2.Dot(edgeNormal, Origin);
+
+                // Compute denominator (how aligned ray is with edge normal)
+                float denom = Vector2.Dot(edgeNormal, Direction);
+
+                // Handle ray parallel to edge
+                if (MathF.Abs(denom) < Epsilon)
+                {
+                    // Ray is parallel to edge
+                    // If ray origin is outside the half-space, no intersection
+                    if (dist > Epsilon)
+                    {
+                        tRayMin = tRayMax = null;
+                        point = null;
+                        return false;
+                    }
+
+                    // Ray is inside the half-space, continue to next edge
+                    continue;
+                }
+
+                // Compute intersection parameter t with the edge plane
+                float t = dist / denom;
+
+                if (denom < 0.0f)
+                {
+                    // Ray is exiting the half-space (moving against inward normal)
+                    // Update exit point if this is the earliest exit
+                    if (t < tMax)
+                    {
+                        tMax = t;
+                    }
+                }
+                else
+                {
+                    // Ray is entering the half-space (moving with inward normal)
+                    // Update entry point if this is the latest entry
+                    if (t > tMin)
+                    {
+                        tMin = t;
+                    }
+                }
+
+                // Early exit if interval becomes invalid
+                if (tMin > tMax)
+                {
+                    tRayMin = tRayMax = null;
+                    point = null;
+                    return false;
+                }
+            }
+
+            // If ray origin is inside polygon (tMin < 0), return 0
+            if (tMin < 0.0f && tMax > 0.0f)
+            {
+                tRayMin = 0.0f;
+                tRayMax = tMax;
+                point = Origin;
+                return true;
+            }
+
+            // If both intersections are behind ray origin, no valid intersection
+            if (tMax < 0.0f)
+            {
+                tRayMin = tRayMax = null;
+                point = null;
+                return false;
+            }
+
+            // Ray intersects polygon
+            tRayMin = MathF.Max(0.0f, tMin);
+            tRayMax = tMax;
+            point = Origin + Direction * tRayMin.Value;
+            return true;
+        }
+
+        /// <summary>
+        /// Tests if this ray intersects with a polygon.
+        /// </summary>
+        /// <param name="polygon">The polygon to test against.</param>
+        /// <returns>
+        /// <see langword="true"/> if the ray intersects the polygon in its forward direction;
+        /// otherwise, <see langword="false"/>.
+        /// </returns>
+        public readonly bool Intersects(BoundingPolygon2D polygon)
+        {
+            return Intersects(polygon, out _, out _, out _);
+        }
+
+
+        /// <summary>
         /// Deconstructs this ray into its component values.
         /// </summary>
         /// <param name="origin">

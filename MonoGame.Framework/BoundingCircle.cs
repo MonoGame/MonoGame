@@ -456,6 +456,40 @@ namespace Microsoft.Xna.Framework
         }
 
         /// <summary>
+        /// Tests whether this circle intersects with a polygon.
+        /// </summary>
+        /// <param name="polygon">The polygon to test against.</param>
+        /// <returns>
+        /// <see langword="true"/> if the circle and polygon overlap or touch; otherwise, <see langword="false"/>.
+        /// </returns>
+        public readonly bool Intersects(BoundingPolygon2D polygon)
+        {
+            if (polygon.Vertices == null || polygon.Vertices.Length < 3)
+            {
+                return false;
+            }
+
+            // Check if circle center is inside polygon
+            if (polygon.Contains(Center) == ContainmentType.Contains)
+            {
+                return true;
+            }
+
+            // Find closest point on polygon to the center of the circle
+            float minDistSq = float.MaxValue;
+            int n = polygon.Vertices.Length;
+            for (int i = 0; i < n; i++)
+            {
+                int j = (i + 1) % n;
+                LineSegment2D edge = new LineSegment2D(polygon.Vertices[i], polygon.Vertices[j]);
+                float distSq = edge.DistanceSquaredToPoint(Center);
+                minDistSq = MathF.Min(minDistSq, distSq);
+            }
+
+            return minDistSq <= Radius * Radius;
+        }
+
+        /// <summary>
         /// Applies a matrix transformation to this circle and creates a new transformed circle.
         /// </summary>
         /// <param name="matrix">The transformation matrix to apply.</param>

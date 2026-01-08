@@ -568,6 +568,43 @@ namespace Microsoft.Xna.Framework
         }
 
         /// <summary>
+        /// Tests if this line intersects with a polygon.
+        /// </summary>
+        /// <param name="polygon">The polygon to test against.</param>
+        /// <returns>
+        /// <see langword="true"/> if the line passes through or is tangent to the polygon;
+        /// otherwise, <see langword="false"/>.
+        /// </returns>
+        public readonly bool Intersects(BoundingPolygon2D polygon)
+        {
+            // C. Ericson, Real-Time Collision Detection, Morgan Kaufmann, 2005
+            // Intersection of an implicit line with a 2D convex polygon
+            // Derived from Section 5.4.3 "Testing Point in Polyhedron" (half-space test principle)
+
+            if (polygon.Vertices == null || polygon.Vertices.Length == 0)
+                return false;
+
+            // Compute signed distance to first vertex to establish initial min/max
+            float minDist = DistanceToPoint(polygon.Vertices[0]);
+            float maxDist = minDist;
+
+            // Check remaining vertices
+            for (int i = 0; i < polygon.Vertices.Length; i++)
+            {
+                float dist = DistanceToPoint(polygon.Vertices[i]);
+                minDist = MathF.Min(minDist, dist);
+                maxDist = MathF.Max(maxDist, dist);
+
+                // Early exit if we've found vertices on both sides of the line
+                if (minDist <= 0.0f && maxDist >= 0.0f)
+                    return true;
+            }
+
+            // line intersects if vertices straddle the line (opposite signs)
+            return minDist <= 0.0f && maxDist >= 0.0f;
+        }
+
+        /// <summary>
         /// Deconstructs this line into its component values.
         /// </summary>
         /// <param name="normal">

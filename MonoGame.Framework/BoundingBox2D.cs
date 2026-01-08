@@ -456,6 +456,20 @@ namespace Microsoft.Xna.Framework
         }
 
         /// <summary>
+        /// Tests whether this bounding box intersects with a polygon.
+        /// </summary>
+        /// <param name="polygon">The polygon to test against.</param>
+        /// <returns>
+        /// <see langword="true"/> if the box and polygon overlap or touch; otherwise, <see langword="false"/>.
+        /// </returns>
+        public readonly bool Intersects(BoundingPolygon2D polygon)
+        {
+            // Convert this rectangle to a polygon and use polygon intersection test
+            BoundingPolygon2D aabbAsPoly = BoundingPolygon2D.CreateFromBoundingBox2D(this);
+            return aabbAsPoly.Intersects(polygon);
+        }
+
+        /// <summary>
         /// Deconstructs this bounding box into its component values.
         /// </summary>
         /// <param name="min">
