@@ -3,6 +3,7 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
@@ -148,6 +149,10 @@ namespace Microsoft.Xna.Framework
             {
                 throw new ArgumentException("Polygon must have at least 3 vertices", nameof(vertices));
             }
+
+            Debug.Assert(ComputeSignedArea(vertices) > 1e-6f,
+                "Vertices must be in counter-clockwise order. Ensure vertices follow the documented winding order.");
+
 
             Vertices = vertices;
             Normals = ComputeNormals(vertices);
@@ -315,7 +320,12 @@ namespace Microsoft.Xna.Framework
             Array.Copy(additional.Vertices, 0, allVertices, original.Vertices.Length, additional.Vertices.Length);
 
             // Compute convex hull using Graham scan
-            return new BoundingPolygon2D(ComputeConvexHull(allVertices));
+            Vector2[] hullVertices = ComputeConvexHull(allVertices);
+
+            // Ensure output is ccw order
+            EnsureCounterClockwise(hullVertices);
+
+            return new BoundingPolygon2D(hullVertices);
         }
 
         /// <summary>
@@ -696,6 +706,34 @@ namespace Microsoft.Xna.Framework
         #endregion
 
         #region Private Helper Methods
+
+        private static float ComputeSignedArea(Vector2[] vertices)
+        {
+            if (vertices == null || vertices.Length < 3)
+                return 0.0f;
+
+            float area = 0.0f;
+            int n = vertices.Length;
+
+            for (int i = 0; i < n; i++)
+            {
+                int j = (i + 1) % n;
+                area += Vector2.PerpDot(vertices[i], vertices[j]);
+            }
+
+            return area * 0.5f;
+        }
+
+        private static void EnsureCounterClockwise(Vector2[] vertices)
+        {
+            if(vertices == null || vertices.Length < 3)
+                return;
+
+            float signedArea = ComputeSignedArea(vertices);
+
+            if(signedArea < 0.0f)
+                Array.Reverse(vertices);
+        }
 
         private static Vector2[] ComputeConvexHull(Vector2[] points)
         {
