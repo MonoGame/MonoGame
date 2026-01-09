@@ -214,6 +214,7 @@ public abstract class ContentBuilder
         var importedObject = contentInfo.Importer!.Import(filePath, importContext);
 
         var processorContext = new ContentBuilderProcessorContext(this, relativePath, contentInfo, contentFileCache, outputPath);
+        using var _ = ContextScopeFactory.BeginContext(processorContext);
         var processedObject = contentInfo.Processor!.Process(importedObject, processorContext);
 
         if (writeToDisk)
