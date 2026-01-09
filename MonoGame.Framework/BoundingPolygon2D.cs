@@ -777,7 +777,7 @@ namespace Microsoft.Xna.Framework
                     // Same angle, closer point comes first
                     float distA = Vector2.DistanceSquared(pivot, a);
                     float distB = Vector2.DistanceSquared(pivot, b);
-                    return distA.CompareTo(distB);
+                    return distB.CompareTo(distA);
                 }
 
                 return angleA.CompareTo(angleB);
