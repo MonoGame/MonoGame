@@ -29,6 +29,7 @@ MG_EXPORT mgulong MGA_Buffer_GetDuration(MGA_Buffer* buffer);
 MG_EXPORT MGA_Voice* MGA_Voice_Create(MGA_System* system, mgint sampleRate, mgint channels);
 MG_EXPORT void MGA_Voice_Destroy(MGA_Voice* voice);
 MG_EXPORT mgint MGA_Voice_GetBufferCount(MGA_Voice* voice);
+MG_EXPORT mgint MGA_Voice_GetFinishedBufferCount(MGA_Voice* voice);
 MG_EXPORT void MGA_Voice_SetBuffer(MGA_Voice* voice, MGA_Buffer* buffer);
 MG_EXPORT void MGA_Voice_AppendBuffer(MGA_Voice* voice, mgbyte* buffer, mguint size);
 MG_EXPORT void MGA_Voice_Play(MGA_Voice* voice, mgbyte looped);

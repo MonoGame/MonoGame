@@ -73,9 +73,6 @@ internal static unsafe partial class MGA
 {
     #region System
 
-    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    public delegate void NativeFinishedCallback(nint callbackData);
-
     [DllImport(MGP.MonoGameNativeDLL, EntryPoint = "MGA_System_Create", ExactSpelling = true)]
     public static extern MGA_System* System_Create();
 
@@ -146,6 +143,9 @@ internal static unsafe partial class MGA
 
     [DllImport(MGP.MonoGameNativeDLL, EntryPoint = "MGA_Voice_GetBufferCount", ExactSpelling = true)]
     public static extern int Voice_GetBufferCount(MGA_Voice* voice);
+
+    [DllImport(MGP.MonoGameNativeDLL, EntryPoint = "MGA_Voice_GetFinishedBufferCount", ExactSpelling = true)]
+    public static extern int Voice_GetFinishedBufferCount(MGA_Voice* voice);
 
     [DllImport(MGP.MonoGameNativeDLL, EntryPoint = "MGA_Voice_SetBuffer", ExactSpelling = true)]
     public static extern void Voice_SetBuffer(MGA_Voice* voice, MGA_Buffer* buffer);
