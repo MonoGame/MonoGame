@@ -6,6 +6,7 @@
 
 #include "api_common.h"
 
+#include <stdint.h>
 #include <stdio.h>
 #include <assert.h>
 #include <limits.h>
