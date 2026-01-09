@@ -151,7 +151,7 @@ public sealed partial class Song : IEquatable<Song>, IDisposable
             DonePlaying += handler;
 
         // Stop the current playback which cleans stuff up.
-        Stop();
+        Stop(true);
 
         // Move the decoder to the new position.
         MGM.AudioDecoder_SetPosition(_decoder, milliseconds);
@@ -183,17 +183,17 @@ public sealed partial class Song : IEquatable<Song>, IDisposable
         MGA.Voice_Resume(_voice);
     }
 
-    internal unsafe void Stop()
+    internal unsafe void Stop(bool immediate = false)
     {
-        if (_thread == null)
-            return;
+        if (_thread != null)
+        {
+            // Halt the thread.
+            _stop.Set();
+            _thread.Join();
+            _thread = null;
+        }
 
-        MGA.Voice_Stop(_voice, 0);
-
-        // Halt the thread.
-        _stop.Set();
-        _thread.Join();
-        _thread = null;        
+        MGA.Voice_Stop(_voice, (byte)(immediate ? 1 : 0));
     }
 
 

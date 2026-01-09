@@ -64,21 +64,19 @@ namespace MonoGame.Tests.Audio
 
         protected static void SleepWhileDispatching(int ms)
         {
-            Stopwatch stopwatch = new Stopwatch();
-            stopwatch.Start();
+            const int sleep = (int)(1000.0 / 60.0);
 
-            int cycles = ms / 10;
-            for (int i = 0; i < cycles; i++)
+            var stopwatch = Stopwatch.StartNew();
+
+            while (true)
             {
                 FrameworkDispatcher.Update();
                 Threading.Run();
-                Thread.Sleep(10);
 
                 if (stopwatch.Elapsed.TotalMilliseconds > ms)
-                {
-                    stopwatch.Stop();
                     break;
-                }
+
+                Thread.Sleep(sleep);
             }
         }
     }

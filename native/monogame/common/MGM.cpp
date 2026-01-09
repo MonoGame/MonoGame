@@ -117,7 +117,7 @@ bool MGM_AudioDecoder_Ogg::Decode(mgbyte*& buffer, mguint& size)
 		// We have no more data so we're finished.
 		if (decoded == 0)
 		{
-			_finished = true;
+			_finished = readBytes == 0;
 			break;
 		}
 
@@ -227,7 +227,7 @@ bool MGM_AudioDecoder_Mp3::Decode(mgbyte*& buffer, mguint& size)
 		// We have no more data so we're finished.
 		if (readed == 0)
 		{
-			_finished = true;
+			_finished = readSamples == 0;
 			break;
 		}
 
