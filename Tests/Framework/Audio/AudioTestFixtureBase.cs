@@ -71,8 +71,10 @@ namespace MonoGame.Tests.Audio
             while (true)
             {
                 FrameworkDispatcher.Update();
-                Threading.Run();
 
+#if !(WINDOWS && DIRECTX) // WindowsDX
+                Threading.Run();
+#endif
                 if (stopwatch.Elapsed.TotalMilliseconds > ms)
                     break;
 
