@@ -427,7 +427,6 @@ namespace MonoGame.Tests.Framework
         }
 
         [Test]
-        [Ignore("floating-point precision is causing SAT tests to fail for exactly touching cases")]
         public void IntersectsPolygon_Touching()
         {
             var poly1 = BoundingPolygon2D.CreateRegular(new Vector2(0, 0), 5, 4);

@@ -838,6 +838,8 @@ namespace Microsoft.Xna.Framework
 
         private static bool OverlapOnAxis(BoundingPolygon2D polygon, Vector2[] otherVerts, Vector2 axis)
         {
+            const float Epsilon = 1e-6f;
+
             float min1 = float.MaxValue;
             float max1 = float.MinValue;
             float min2 = float.MaxValue;
@@ -857,7 +859,12 @@ namespace Microsoft.Xna.Framework
                 max2 = MathF.Max(max2, p);
             }
 
-            return !(max1 < min2 || max2 < min1);
+            // use epsilon comparison for instances where axes are touching
+            // but floating point errors would cause them to return a
+            // false negative
+            if(max1 < min2 - Epsilon) return false;
+            if(max2 < min1 - Epsilon) return false;
+            return true;
         }
 
         #endregion
