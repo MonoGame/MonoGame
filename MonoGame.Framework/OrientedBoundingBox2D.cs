@@ -553,9 +553,9 @@ namespace Microsoft.Xna.Framework
             // Check distance from capsule segment to each OBB edge
             Vector2[][] edges = new Vector2[][]
             {
-                new Vector2[] { corners[0], corners[1] }, // Bottom edge
+                new Vector2[] { corners[0], corners[1] }, // Top edge
                 new Vector2[] { corners[1], corners[2] }, // Right edge
-                new Vector2[] { corners[2], corners[3] }, // Top edge
+                new Vector2[] { corners[2], corners[3] }, // Bottom edge
                 new Vector2[] { corners[3], corners[0] }  // Left edge
             };
 

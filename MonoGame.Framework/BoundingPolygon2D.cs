@@ -272,10 +272,10 @@ namespace Microsoft.Xna.Framework
         {
             Vector2[] vertices = new Vector2[]
             {
-                new Vector2(box.Min.X, box.Min.Y),  // Bottom-left
-                new Vector2(box.Max.X, box.Min.Y),  // Bottom-right
-                new Vector2(box.Max.X, box.Max.Y),  // Top-right
-                new Vector2(box.Min.X, box.Max.Y)   // top-left
+                new Vector2(box.Min.X, box.Min.Y),  // Top-left
+                new Vector2(box.Max.X, box.Min.Y),  // Top-right
+                new Vector2(box.Max.X, box.Max.Y),  // Bottom-right
+                new Vector2(box.Min.X, box.Max.Y)   // Bottom-left
             };
 
             return new BoundingPolygon2D(vertices);
@@ -782,7 +782,7 @@ namespace Microsoft.Xna.Framework
                 int j = (i + 1) % n;
                 Vector2 edge = vertices[j] - vertices[i];
 
-                // Perpendicular to edge (rotated 90 degrees counter-clockwise for outward normal)
+                // Perpendicular to edge (rotated 90 degrees clockwise for outward normal)
                 normals[i] = new Vector2(edge.Y, -edge.X);
 
                 // Normalize
