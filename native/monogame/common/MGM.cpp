@@ -23,7 +23,7 @@ struct MGG_Texture;
 #include "minimp3_ex.h"
 
 
-void MGM_ReadSignature(const char* filepath, MGM_SIGNATURE)
+void MGM_ReadSignature(const char* filepath, uint8_t* signature)
 {
 	memset(signature, 0, 16);
 
@@ -132,7 +132,7 @@ bool MGM_AudioDecoder_Ogg::Decode(mgbyte*& buffer, mguint& size)
 }
 
 
-MGM_AudioDecoder* MGM_AudioDecoder_TryCreate_Ogg(MGM_SIGNATURE)
+MGM_AudioDecoder* MGM_AudioDecoder_TryCreate_Ogg(const uint8_t* signature)
 {
 	// Simple header detection.
 	if (signature[0] != 'O' ||
@@ -241,7 +241,7 @@ bool MGM_AudioDecoder_Mp3::Decode(mgbyte*& buffer, mguint& size)
 	return _finished;
 }
 
-MGM_AudioDecoder* MGM_AudioDecoder_TryCreate_Mp3(MGM_SIGNATURE)
+MGM_AudioDecoder* MGM_AudioDecoder_TryCreate_Mp3(const uint8_t* signature)
 {
 	if ((signature[0] != 'I' || signature[1] != 'D' || signature[2] != '3') &&	// ID3 tag		
 		(signature[0] != 0xFF || (signature[1] & 0xE0) != 0xE0)) // MPEG frame sync
@@ -254,7 +254,7 @@ MGM_AudioDecoder* MGM_AudioDecoder_Create(const char* filepath, MGM_AudioDecoder
 {
 	assert(filepath != nullptr);
 
-	MGM_SIGNATURE;
+	uint8_t signature[16];
 	MGM_ReadSignature(filepath, signature);
 
 	// Try the common decoders.
@@ -292,7 +292,7 @@ mgbyte MGM_AudioDecoder_Decode(MGM_AudioDecoder* decoder, mgbyte*& buffer, mguin
 	return decoder->Decode(buffer, size);
 }
 
-MGM_VideoDecoder* MGM_VideoDecoder_TryCreate_Theora(MGM_SIGNATURE)
+MGM_VideoDecoder* MGM_VideoDecoder_TryCreate_Theora(const uint8_t* signature)
 {
 	// TODO: Implement me!
 	//
@@ -303,7 +303,7 @@ MGM_VideoDecoder* MGM_VideoDecoder_TryCreate_Theora(MGM_SIGNATURE)
 	return nullptr;
 }
 
-MGM_VideoDecoder* MGM_VideoDecoder_TryCreate_OpenH264(MGM_SIGNATURE)
+MGM_VideoDecoder* MGM_VideoDecoder_TryCreate_OpenH264(const uint8_t* signature)
 {
 	// TODO: Implement me!
 	//
@@ -320,7 +320,7 @@ MGM_VideoDecoder* MGM_VideoDecoder_Create(MGG_GraphicsDevice* device, const char
 {
 	assert(filepath != nullptr);
 
-	MGM_SIGNATURE;
+	uint8_t signature[16];
 	MGM_ReadSignature(filepath, signature);
 
 	// Try the common decoders.
