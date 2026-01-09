@@ -273,7 +273,6 @@ namespace MonoGame.Tests.Framework
         }
 
         [Test]
-        [Ignore("Should return ContainmentType.Contains, but returning Intersects.")]
         public void CreateMerged_NonOverlapping()
         {
             var poly1 = BoundingPolygon2D.CreateRegular(new Vector2(0, 0), 5, 4);
@@ -282,12 +281,11 @@ namespace MonoGame.Tests.Framework
             var merged = BoundingPolygon2D.CreateMerged(poly1, poly2);
 
             // Should contain both polygons
-            Assert.AreNotEqual(ContainmentType.Disjoint, merged.Contains(poly1));
-            Assert.AreNotEqual(ContainmentType.Disjoint, merged.Contains(poly2));
+            Assert.AreEqual(ContainmentType.Contains, merged.Contains(poly1));
+            Assert.AreEqual(ContainmentType.Contains, merged.Contains(poly2));
         }
 
         [Test]
-        [Ignore("Should return ContainmentType.Contains, but returning Intersects.")]
         public void CreateMerged_Overlapping()
         {
             var poly1 = BoundingPolygon2D.CreateRegular(new Vector2(0, 0), 5, 4);
@@ -296,8 +294,8 @@ namespace MonoGame.Tests.Framework
             var merged = BoundingPolygon2D.CreateMerged(poly1, poly2);
 
             // Should contain both polygons
-            Assert.AreNotEqual(ContainmentType.Disjoint, merged.Contains(poly1));
-            Assert.AreNotEqual(ContainmentType.Disjoint, merged.Contains(poly2));
+            Assert.AreEqual(ContainmentType.Contains, merged.Contains(poly1));
+            Assert.AreEqual(ContainmentType.Contains, merged.Contains(poly2));
         }
 
         [Test]

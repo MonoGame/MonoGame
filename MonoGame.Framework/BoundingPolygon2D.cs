@@ -422,6 +422,8 @@ namespace Microsoft.Xna.Framework
         /// </returns>
         public readonly ContainmentType Contains(Vector2 point)
         {
+            const float Epsilon = 1e-6f;
+
             if (Vertices == null || Vertices.Length < 3)
             {
                 return ContainmentType.Disjoint;
@@ -434,7 +436,7 @@ namespace Microsoft.Xna.Framework
                 Vector2 toPoint = point - Vertices[i];
                 float projection = Vector2.Dot(toPoint, Normals[i]);
 
-                if (projection > 0.0f)
+                if (projection > Epsilon)
                 {
                     return ContainmentType.Disjoint;
                 }
