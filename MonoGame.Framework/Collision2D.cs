@@ -178,7 +178,6 @@ namespace Microsoft.Xna.Framework
         /// <see cref="ContainmentType.Contains"/> if the point lies inside the bounding box or on its
         /// boundary; otherwise, <see cref="ContainmentType.Disjoint"/>.
         /// </returns>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static ContainmentType ContainsAabbPoint(Vector2 point, Vector2 min, Vector2 max)
         {
             if (point.X < min.X - Epsilon) return ContainmentType.Disjoint;
@@ -202,7 +201,6 @@ namespace Microsoft.Xna.Framework
         /// <remarks>
         /// Boundary contact is treated as overlap rather than disjoint.
         /// </remarks>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static ContainmentType ContainsAabbAabb(Vector2 aMin, Vector2 aMax, Vector2 bMin, Vector2 bMax)
         {
             // Disjoint (touch counts as NOT disjoint)
@@ -238,7 +236,6 @@ namespace Microsoft.Xna.Framework
         /// <remarks>
         /// Boundary contact is treated as intersection rather than disjoint.
         /// </remarks>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static ContainmentType ContainsAabbCircle(Vector2 boxMin, Vector2 boxMax, Vector2 circleCenter, float circleRadius)
         {
             if (circleRadius < 0.0f)
@@ -279,7 +276,6 @@ namespace Microsoft.Xna.Framework
         /// The overlap test is performed first. If the volumes overlap, containment is determined by testing whether all four OBB
         /// corners lie inside the AABB (inclusive).
         /// </remarks>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static ContainmentType ContainsAabbObb(Vector2 aabbMin, Vector2 aabbMax, Vector2 obbCenter, Vector2 obbAxisX, Vector2 obbAxisY, Vector2 obbHalfExtents)
         {
             Vector2 aabbCenter = (aabbMin + aabbMax) * 0.5f;
@@ -326,7 +322,6 @@ namespace Microsoft.Xna.Framework
         /// endpoints lie inside the contracted box (inclusive). This corresponds to the condition that the capsule's
         /// swept disk about its segment is contained within the original AABB.
         /// </remarks>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static ContainmentType ContainsAabbCapsule(Vector2 boxMin, Vector2 boxMax, Vector2 capsuleA, Vector2 capsuleB, float capsuleRadius)
         {
             if (capsuleRadius < 0.0f)
@@ -375,7 +370,6 @@ namespace Microsoft.Xna.Framework
         /// that every polygon vertex lies inside the AABB (inclusive). For a convex polygon, all vertices contained
         /// within a convex set implies the entire polygon is contained.
         /// </remarks>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static ContainmentType ContainsAabbConvexPolygon(Vector2 boxMin, Vector2 boxMax, Vector2[] vertices, Vector2[] normals)
         {
             if (!IsValidPolygon(vertices, normals))
@@ -410,7 +404,6 @@ namespace Microsoft.Xna.Framework
         /// <see cref="ContainmentType.Contains"/> if the point lies inside the circle or on its boundary;
         /// otherwise, <see cref="ContainmentType.Disjoint"/>.
         /// </returns>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static ContainmentType ContainsCirclePoint(Vector2 point, Vector2 center, float radius)
         {
             if (radius < 0.0f)
@@ -437,7 +430,6 @@ namespace Microsoft.Xna.Framework
         /// This method first performs an intersection test. If the shapes overlap, containment is determined by testing
         /// whether all four AABB corners lie inside the circle (inclusive).
         /// </remarks>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static ContainmentType ContainsCircleAabb(Vector2 circleCenter, float circleRadius, Vector2 aabbMin, Vector2 aabbMax)
         {
             if (circleRadius < 0f)
@@ -477,7 +469,6 @@ namespace Microsoft.Xna.Framework
         /// The test is performed using squared distances to avoid a square root. Boundary contact is treated as intersection,
         /// and containment tests are inclusive.
         /// </remarks>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static ContainmentType ContainsCircleCircle(Vector2 aCenter, float aRadius, Vector2 bCenter, float bRadius)
         {
             if (aRadius < 0.0f || bRadius < 0.0f)
@@ -517,7 +508,6 @@ namespace Microsoft.Xna.Framework
         /// This method first performs an intersection test. If the shapes overlap, containment is determined by testing
         /// whether all four OBB corners lie inside the circle (inclusive).
         /// </remarks>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static ContainmentType ContainsCircleObb(Vector2 circleCenter, float circleRadius, Vector2 obbCenter, Vector2 obbAxisX, Vector2 obbAxisY, Vector2 obbHalfExtents)
         {
             if (circleRadius < 0f)
@@ -565,7 +555,6 @@ namespace Microsoft.Xna.Framework
         /// the maximum distance from <paramref name="circleCenter"/> to the segment to be less than or equal to
         /// <c>circleRadius - capsuleRadius</c>.
         /// </remarks>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static ContainmentType ContainsCircleCapsule(Vector2 circleCenter, float circleRadius, Vector2 capsuleA, Vector2 capsuleB, float capsuleRadius)
         {
             if (circleRadius < 0f || capsuleRadius < 0f)
@@ -609,7 +598,6 @@ namespace Microsoft.Xna.Framework
         /// that every polygon vertex lies inside the circle (inclusive). For a convex polygon, all vertices contained
         /// within a convex set implies the entire polygon is contained.
         /// </remarks>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static ContainmentType ContainsCircleConvexPolygon(Vector2 circleCenter, float circleRadius, Vector2[] vertices, Vector2[] normals)
         {
             if (circleRadius < 0f)
@@ -651,7 +639,6 @@ namespace Microsoft.Xna.Framework
         /// The test projects <c>(point - center)</c> onto the OBB axes and compares the absolute projected distances against
         /// the corresponding half extents. The axes are expected to be orthonormal for the extents to represent distances.
         /// </remarks>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static ContainmentType ContainsObbPoint(Vector2 point, Vector2 center, Vector2 axisX, Vector2 axisY, Vector2 halfExtents)
         {
             //  Transform point into OBB local space by projecting it onto axes
@@ -685,7 +672,6 @@ namespace Microsoft.Xna.Framework
         /// The overlap test is performed first. If the volumes overlap, containment is determined by testing whether all four
         /// AABB corners lie inside the OBB (inclusive).
         /// </remarks>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static ContainmentType ContainsObbAabb(Vector2 obbCenter, Vector2 obbAxisX, Vector2 obbAxisY, Vector2 obbHalfExtents, Vector2 aabbMin, Vector2 aabbMax)
         {
             Vector2 aabbCenter = (aabbMin + aabbMax) * 0.5f;
@@ -729,7 +715,6 @@ namespace Microsoft.Xna.Framework
         /// axis fits within the corresponding half extent, i.e. <c>|dot(d, axisX)| + r &lt;= halfExtents.X</c> and
         /// <c>|dot(d, axisY)| + r &lt;= halfExtents.Y</c>.
         /// </remarks>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static ContainmentType ContainsObbCircle(Vector2 boxCenter, Vector2 axisX, Vector2 axisY, Vector2 halfExtents, Vector2 circleCenter, float circleRadius)
         {
             if (circleRadius < 0.0f)
@@ -772,7 +757,6 @@ namespace Microsoft.Xna.Framework
         /// This method first performs an overlap test. If the boxes overlap, containment is determined by testing whether all
         /// four corners of the second OBB lie inside the first OBB.
         /// </remarks>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static ContainmentType ContainsObbObb(Vector2 aCenter, Vector2 aAxisX, Vector2 aAxisY, Vector2 aHalf, Vector2 bCenter, Vector2 bAxisX, Vector2 bAxisY, Vector2 bHalf)
         {
             if (!IntersectsObbObb(aCenter, aAxisX, aAxisY, aHalf, bCenter, bAxisX, bAxisY, bHalf))
@@ -816,7 +800,6 @@ namespace Microsoft.Xna.Framework
         /// the OBB half extents by <paramref name="capsuleRadius"/> and testing whether both capsule endpoints lie inside the
         /// contracted OBB.
         /// </remarks>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static ContainmentType ContainsObbCapsule(Vector2 boxCenter, Vector2 axisX, Vector2 axisY, Vector2 halfExtents, Vector2 capsuleA, Vector2 capsuleB, float capsuleRadius)
         {
             if (capsuleRadius < 0.0f)
@@ -859,7 +842,6 @@ namespace Microsoft.Xna.Framework
         /// This method first performs an intersection test. If the shapes overlap, containment is determined by verifying
         /// that every polygon vertex lies inside the OBB.
         /// </remarks>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static ContainmentType ContainsObbConvexPolygon(Vector2 boxCenter, Vector2 axisX, Vector2 axisY, Vector2 halfExtents, Vector2[] vertices, Vector2[] normals)
         {
             if (!IsValidPolygon(vertices, normals))
@@ -897,7 +879,6 @@ namespace Microsoft.Xna.Framework
         /// <paramref name="radius"/>. This method compares the squared distance from the point to the segment against
         /// <c>radius^2</c> to avoid a square root.
         /// </remarks>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static ContainmentType ContainsCapsulePoint(Vector2 point, Vector2 a, Vector2 b, float radius)
         {
             if (radius < 0.0f)
@@ -927,7 +908,6 @@ namespace Microsoft.Xna.Framework
         /// This method first performs an intersection test. If the shapes overlap, containment is determined by testing
         /// whether all four AABB corners lie inside the capsule.
         /// </remarks>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static ContainmentType ContainsCapsuleAabb(Vector2 capsuleA, Vector2 capsuleB, float capsuleRadius, Vector2 aabbMin, Vector2 aabbMax)
         {
             if (capsuleRadius < 0f)
@@ -968,7 +948,6 @@ namespace Microsoft.Xna.Framework
         /// within a distance of <c>capsuleRadius - circleRadius</c> from the capsule segment <c>[capsuleA, capsuleB]</c>.
         /// The test is performed using squared distance to avoid a square root.
         /// </remarks>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static ContainmentType ContainsCapsuleCircle(Vector2 capsuleA, Vector2 capsuleB, float capsuleRadius, Vector2 circleCenter, float circleRadius)
         {
             if (capsuleRadius < 0f || circleRadius < 0f)
@@ -1008,7 +987,6 @@ namespace Microsoft.Xna.Framework
         /// This method first performs an intersection test. If the shapes overlap, containment is determined by testing
         /// whether all four OBB corners lie inside the capsule.
         /// </remarks>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static ContainmentType ContainsCapsuleObb(Vector2 capsuleA, Vector2 capsuleB, float capsuleRadius, Vector2 obbCenter, Vector2 obbAxisX, Vector2 obbAxisY, Vector2 obbHalf)
         {
             if (capsuleRadius < 0f)
@@ -1053,7 +1031,6 @@ namespace Microsoft.Xna.Framework
         /// endpoints of the second capsule to lie within a distance of <c>aRadius - bRadius</c> from the reference capsule
         /// segment <c>[a0, a1]</c>. The test is performed using squared distances to avoid a square root.
         /// </remarks>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static ContainmentType ContainsCapsuleCapsule(Vector2 a0, Vector2 a1, float aRadius, Vector2 b0, Vector2 b1, float bRadius)
         {
             if (aRadius < 0f || bRadius < 0f)
@@ -1100,7 +1077,6 @@ namespace Microsoft.Xna.Framework
         /// This method first performs an intersection test. If the shapes overlap, containment is determined by verifying
         /// that every polygon vertex lies inside the capsule.
         /// </remarks>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static ContainmentType ContainsCapsuleConvexPolygon(Vector2 capsuleA, Vector2 capsuleB, float capsuleRadius, Vector2[] pVertices, Vector2[] pNormals)
         {
             if (capsuleRadius < 0f)
@@ -1142,7 +1118,6 @@ namespace Microsoft.Xna.Framework
         /// The polygon is treated as the intersection of half-spaces defined by its edges. For each edge normal <c>n</c>,
         /// the point is inside the polygon when <c>dot(n, point) &lt;= dot(n, vertices[i])</c>.
         /// </remarks>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static ContainmentType ContainsConvexPolygonPoint(Vector2 point, Vector2[] vertices, Vector2[] normals)
         {
             // C. Ericson, Real-Time Collision Detection, Morgan Kaufmann, 2005
@@ -1183,7 +1158,6 @@ namespace Microsoft.Xna.Framework
         /// This method first performs an intersection test. If the shapes overlap, containment is determined by testing
         /// whether all four AABB corners lie inside the polygon.
         /// </remarks>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static ContainmentType ContainsConvexPolygonAabb(Vector2[] pVertices, Vector2[] pNormals, Vector2 aabbMin, Vector2 aabbMax)
         {
             if (!IsValidPolygon(pVertices, pNormals))
@@ -1230,7 +1204,6 @@ namespace Microsoft.Xna.Framework
         /// when, for every edge normal <c>n</c>, <c>dot(n, circleCenter) + circleRadius &lt;= dot(n, pVertices[i])</c>.
         /// This requires <paramref name="pNormals"/> to be outward-facing unit normals.
         /// </remarks>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static ContainmentType ContainsConvexPolygonCircle(Vector2[] pVertices, Vector2[] pNormals, Vector2 circleCenter, float circleRadius)
         {
             // C. Ericson, Real-Time Collision Detection, Morgan Kaufmann, 2005
@@ -1287,7 +1260,6 @@ namespace Microsoft.Xna.Framework
         /// is less than or equal to <c>dot(n, pVertices[i])</c>. This requires <paramref name="pNormals"/> to be
         /// outward-facing unit normals.
         /// </remarks>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static ContainmentType ContainsConvexPolygonCapsule(Vector2[] pVertices, Vector2[] pNormals, Vector2 capsuleA, Vector2 capsuleB, float capsuleRadius)
         {
             // C. Ericson, Real-Time Collision Detection, Morgan Kaufmann, 2005
@@ -1341,7 +1313,6 @@ namespace Microsoft.Xna.Framework
         /// This method first performs an intersection test. If the shapes overlap, containment is determined by testing
         /// whether all four OBB corners lie inside the polygon.
         /// </remarks>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static ContainmentType ContainsConvexPolygonObb(Vector2[] pVertices, Vector2[] pNormals, Vector2 obbCenter, Vector2 obbAxisX, Vector2 obbAxisY, Vector2 obbHalf)
         {
             if (!IsValidPolygon(pVertices, pNormals))
@@ -1389,7 +1360,6 @@ namespace Microsoft.Xna.Framework
         /// This method first performs an intersection test. If the polygons overlap, containment is determined by verifying
         /// that every vertex of the second polygon lies inside the first polygon.
         /// </remarks>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static ContainmentType ContainsConvexPolygonConvexPolygon(Vector2[] aVertices, Vector2[] aNormals, Vector2[] bVertices, Vector2[] bNormals)
         {
             if (!IsValidPolygon(aVertices, aNormals) || !IsValidPolygon(bVertices, bNormals))
@@ -1425,7 +1395,6 @@ namespace Microsoft.Xna.Framework
         /// <remarks>
         /// The projection of a point <c>v</c> onto <paramref name="axis"/> is computed as <c>dot(v, axis)</c>.
         /// </remarks>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void ProjectOntoAxis(Vector2[] vertices, Vector2 axis, out float min, out float max)
         {
             // C. Ericson, Real-Time Collision Detection, Morgan Kaufmann, 2005
@@ -1505,7 +1474,6 @@ namespace Microsoft.Xna.Framework
         /// <param name="bVerts">The vertices of the second shape.</param>
         /// <param name="axis">The axis onto which both point sets are projected.</param>
         /// <returns><see langword="true"/> if the projection intervals overlap; otherwise, <see langword="false"/>.</returns>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool OverlapOnAxis(Vector2[] aVerts, Vector2[] bVerts, Vector2 axis)
         {
             // C. Ericson, Real-Time Collision Detection, Morgan Kaufmann, 2005
@@ -1524,7 +1492,6 @@ namespace Microsoft.Xna.Framework
         /// <param name="polygonVertices">The vertices of the shape being tested.</param>
         /// <param name="axis">The axis onto which both shapes are projected.</param>
         /// <returns><see langword="true"/> if the projection intervals overlap; otherwise, <see langword="false"/>.</returns>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool OverlapOnAxis(Vector2 aabbCenter, Vector2 aabbHalfExtents, Vector2[] polygonVertices, Vector2 axis)
         {
             // C. Ericson, Real-Time Collision Detection, Morgan Kaufmann, 2005
@@ -1557,7 +1524,6 @@ namespace Microsoft.Xna.Framework
         /// parameterized as <c>segA + t * (segB - segA)</c> with <c>0 &lt;= t &lt;= 1</c>.
         /// </param>
         /// <param name="distanceSquared">When this method returns, contains the squared distance between the closest points.</param>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void ClosestPointRaySegment(Vector2 rayOrigin, Vector2 rayDirection, Vector2 segA, Vector2 segB, out float sRay, out float tSeg, out float distanceSquared)
         {
             // C. Ericson, Real-Time Collision Detection, Morgan Kaufmann, 2005
@@ -2159,7 +2125,6 @@ namespace Microsoft.Xna.Framework
         /// <item><description>Segment: [0, 1]</description></item>
         /// </list>
         /// </remarks>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool ClipLineToAabb(Vector2 origin, Vector2 direction, Vector2 min, Vector2 max, float tLower, float tUpper, out float tEnter, out float tExit)
         {
             // C. Ericson, Real-Time Collision Detection, Morgan Kaufmann, 2005
@@ -2245,7 +2210,6 @@ namespace Microsoft.Xna.Framework
         /// each polygon edge half-space <c>dot(n, X) &lt;= dot(n, v)</c>. For a segment or ray, pass an appropriate parameter
         /// range (for example, <c>[0, 1]</c> for a segment and <c>[0, +inf)</c> for a ray).
         /// </remarks>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool ClipLineToConvexPolygon(Vector2 origin, Vector2 direction, Vector2[] vertices, Vector2[] normals, float tLower, float tUpper, out float tEnter, out float tExit)
         {
             // C. Ericson, Real-Time Collision Detection, Morgan Kaufmann, 2005
@@ -2408,7 +2372,6 @@ namespace Microsoft.Xna.Framework
         /// expanding along the ray by the available radial slack. Degenerate inputs are handled by reducing to point/segment or
         /// ray/circle cases.
         /// </remarks>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool RayCapsuleIntersectionInterval(Vector2 rayOrigin, Vector2 rayDirection, Vector2 segA, Vector2 segB, float radius, out float tMin, out float tMax)
         {
             // C. Ericson, Real-Time Collision Detection, Morgan Kaufmann, 2005
