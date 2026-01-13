@@ -22,7 +22,7 @@ namespace Microsoft.Xna.Framework
         {
             services = new Dictionary<Type, object>();
         }
-
+#nullable enable
         /// <summary>
         /// Add a service provider to this container.
         /// </summary>
@@ -55,11 +55,11 @@ namespace Microsoft.Xna.Framework
         /// no suitable service provider is registered in this container.
         /// </returns>
         /// <exception cref="ArgumentNullException">If the specified type is <code>null</code>.</exception>
-        public object GetService(Type type)
+        public object? GetService(Type type)
         {
             if (type == null)
                 throw new ArgumentNullException("type");
-						
+
             object service;
             if (services.TryGetValue(type, out service))
                 return service;
@@ -72,12 +72,13 @@ namespace Microsoft.Xna.Framework
         /// </summary>
         /// <param name="type">The type of the service to remove.</param>
         /// <exception cref="ArgumentNullException">If the specified type is <code>null</code>.</exception>
-        public void RemoveService(Type type)
+        /// <returns><c>true</c> if a service of the indicated type was found and removed, otherwise <c>false</c>.</returns>
+        public bool RemoveService(Type type)
         {
             if (type == null)
                 throw new ArgumentNullException("type");
 
-            services.Remove(type);
+            return services.Remove(type);
         }
         
         /// <summary>
@@ -90,6 +91,9 @@ namespace Microsoft.Xna.Framework
         /// </exception>
         public void AddService<T>(T provider)
         {
+            if (provider == null)
+                throw new ArgumentNullException("provider");
+
             AddService(typeof(T), provider);
         }
 
@@ -101,7 +105,7 @@ namespace Microsoft.Xna.Framework
         /// A service provider of the specified type or <code>null</code> if
         /// no suitable service provider is registered in this container.
         /// </returns>
- 	public T GetService<T>() where T : class
+ 	public T? GetService<T>() where T : class
         {
             var service = GetService(typeof(T));
 
@@ -111,4 +115,5 @@ namespace Microsoft.Xna.Framework
             return (T)service;
         }
     }
+#nullable restore
 }
