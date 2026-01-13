@@ -1293,19 +1293,19 @@ MGG_GraphicsDevice* MGG_GraphicsDevice_Create(MGG_GraphicsSystem* system, MGG_Gr
 
 	void* lastFeature = nullptr;
 
+	VkPhysicalDeviceCustomBorderColorFeaturesEXT customBorderColorFeatures = { VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_CUSTOM_BORDER_COLOR_FEATURES_EXT };
 	if (device->customBorderColorSupported)
 	{
 		extensions.push_back(VK_EXT_CUSTOM_BORDER_COLOR_EXTENSION_NAME);
-		VkPhysicalDeviceCustomBorderColorFeaturesEXT customBorderColorFeatures = { VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_CUSTOM_BORDER_COLOR_FEATURES_EXT };
 		customBorderColorFeatures.customBorderColors = VK_TRUE;
 		customBorderColorFeatures.customBorderColorWithoutFormat = VK_TRUE;
 		customBorderColorFeatures.pNext = lastFeature;
 		lastFeature = &customBorderColorFeatures;
 	}
+	VkPhysicalDeviceScalarBlockLayoutFeatures scalarFeatures = { VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SCALAR_BLOCK_LAYOUT_FEATURES };
 	if (scalarBlockLayoutSupported)
 	{
 		extensions.push_back(VK_EXT_SCALAR_BLOCK_LAYOUT_EXTENSION_NAME);
-		VkPhysicalDeviceScalarBlockLayoutFeatures scalarFeatures = { VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SCALAR_BLOCK_LAYOUT_FEATURES };
 		scalarFeatures.scalarBlockLayout = VK_TRUE;
 		scalarFeatures.pNext = lastFeature;
 		lastFeature = &scalarFeatures;
@@ -1315,9 +1315,9 @@ MGG_GraphicsDevice* MGG_GraphicsDevice_Create(MGG_GraphicsSystem* system, MGG_Gr
 	if (userTypeSupported)
 		extensions.push_back(VK_GOOGLE_USER_TYPE_EXTENSION_NAME);
 
+	VkPhysicalDeviceFeatures2 deviceFeatures2 = { VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2 };
 	if (lastFeature != nullptr)
 	{
-		VkPhysicalDeviceFeatures2 deviceFeatures2 = { VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2 };
 		deviceFeatures2.features = enabledFeatures;
 		deviceFeatures2.pNext = lastFeature;
 
