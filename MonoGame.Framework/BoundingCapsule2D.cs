@@ -79,12 +79,10 @@ namespace Microsoft.Xna.Framework
         {
             get
             {
-                const float Epsilon = 1e-6f;
-
                 Vector2 dir = PointB - PointA;
                 float lengthSquared = dir.X * dir.X + dir.Y * dir.Y;
 
-                if (lengthSquared < Epsilon * Epsilon)
+                if (lengthSquared < Collision2D.Epsilon * Collision2D.Epsilon)
                 {
                     return Vector2.Zero;
                 }
@@ -160,12 +158,10 @@ namespace Microsoft.Xna.Framework
         /// </returns>
         public static BoundingCapsule2D CreateFromCenterAndDirection(Vector2 center, Vector2 direction, float length, float radius)
         {
-            const float Epsilon = 1e-6f;
-
             // Check if the direction needs to be normalized and normalize it.
             float lengthSq = direction.LengthSquared();
             Vector2 normalizedDir = Vector2.Zero;
-            if (lengthSq >= Epsilon * Epsilon)
+            if (lengthSq >= Collision2D.Epsilon * Collision2D.Epsilon)
             {
                 normalizedDir = direction / MathF.Sqrt(lengthSq);
             }
@@ -266,44 +262,38 @@ namespace Microsoft.Xna.Framework
         }
 
         /// <summary>
-        /// Tests whether this capsule contains, intersects, or is separate from another capsule.
+        /// Tests whether a point lies inside this capsule or on its boundary.
         /// </summary>
-        /// <param name="capsule">The other capsule to test against.</param>
+        /// <param name="point">The point to test in 2D space.</param>
         /// <returns>
-        /// <see cref="ContainmentType.Contains"/> if the other capsule is completely inside this one;
-        /// <see cref="ContainmentType.Intersects"/> if they partially overlap;
-        /// or <see cref="ContainmentType.Disjoint"/> if they do not touch.
+        /// <see cref="ContainmentType.Contains"/> if the point is inside or on the boundary;
+        /// otherwise, <see cref="ContainmentType.Disjoint"/> if the point is outside.
         /// </returns>
-        public readonly ContainmentType Contains(BoundingCapsule2D capsule)
+        public readonly ContainmentType Contains(Vector2 point)
         {
-            // A capsule contains another if both endpoints and radius fit within it
-            // This is a conservative test; checks if both endpoints are inside this capsule
-            // and the radius difference allows containment
+            float rr = Radius * Radius;
+            float d2 = Collision2D.DistanceSquaredPointSegment(point, PointA, PointB, out _, out _);
 
-            float radiusDiff = Radius - capsule.Radius;
-            if (radiusDiff < 0)
-            {
-                // Other capsule is larger, can't contain it
-                return ContainmentType.Disjoint;
-            }
-
-            // Check if both endpoints of the other capsule are within this capsule
-            LineSegment2D thisSegment = new LineSegment2D(PointA, PointB);
-            float distA = thisSegment.DistanceToPoint(capsule.PointA);
-            float distB = thisSegment.DistanceToPoint(capsule.PointB);
-
-            if (distA <= radiusDiff && distB <= radiusDiff)
+            if (d2 <= rr)
             {
                 return ContainmentType.Contains;
             }
 
-            // Check for intersection
-            if (Intersects(capsule))
-            {
-                return ContainmentType.Intersects;
-            }
-
             return ContainmentType.Disjoint;
+        }
+
+        /// <summary>
+        /// Tests whether this capsule contains, intersects, or is separate from an axis-aligned bounding box.
+        /// </summary>
+        /// <param name="aabb">The circle to test against.</param>
+        /// <returns>
+        /// <see cref="ContainmentType.Contains"/> if the axis-aligned bounding box is completely inside this capsule;
+        /// <see cref="ContainmentType.Intersects"/> if they partially overlap;
+        /// or <see cref="ContainmentType.Disjoint"/> if they do not touch.
+        /// </returns>
+        public readonly ContainmentType Contains(BoundingBox2D aabb)
+        {
+            return Collision2D.ContainsCapsuleAabb(PointA, PointB, Radius, aabb.Min, aabb.Max);
         }
 
         /// <summary>
@@ -317,60 +307,61 @@ namespace Microsoft.Xna.Framework
         /// </returns>
         public readonly ContainmentType Contains(BoundingCircle circle)
         {
-            LineSegment2D segment = new LineSegment2D(PointA, PointB);
-            float distToCenter = segment.DistanceToPoint(circle.Center);
-            float radiusDiff = Radius - circle.Radius;
-
-            if (distToCenter <= radiusDiff)
-            {
-                return ContainmentType.Contains;
-            }
-
-            if (distToCenter < Radius + circle.Radius)
-            {
-                return ContainmentType.Intersects;
-            }
-
-            return ContainmentType.Disjoint;
+            return Collision2D.ContainsCapsuleCircle(PointA, PointB, Radius, circle.Center, circle.Radius);
         }
 
         /// <summary>
-        /// Tests whether a point lies inside this capsule or on its boundary.
+        /// Tests whether this capsule contains, intersects, or is separate from an oriented bounding box.
         /// </summary>
-        /// <param name="point">The point to test in 2D space.</param>
+        /// <param name="obb">The oriented bounding box to test against.</param>
         /// <returns>
-        /// <see cref="ContainmentType.Contains"/> if the point is inside or on the boundary;
-        /// otherwise, <see cref="ContainmentType.Disjoint"/> if the point is outside.
+        /// <see cref="ContainmentType.Contains"/> if the oriented bounding box is completely inside this capsule;
+        /// <see cref="ContainmentType.Intersects"/> if they partially overlap;
+        /// or <see cref="ContainmentType.Disjoint"/> if they do not touch.
         /// </returns>
-        public readonly ContainmentType Contains(Vector2 point)
+        public readonly ContainmentType Contains(OrientedBoundingBox2D obb)
         {
-            LineSegment2D segment = new LineSegment2D(PointA, PointB);
-            float distance = segment.DistanceToPoint(point);
+            return Collision2D.ContainsCapsuleObb(PointA, PointB, Radius, obb.Center, obb.AxisX, obb.AxisY, obb.HalfExtents);
+        }
 
-            if (distance <= Radius)
-            {
-                return ContainmentType.Contains;
-            }
+        /// <summary>
+        /// Tests whether this capsule contains, intersects, or is separate from another capsule.
+        /// </summary>
+        /// <param name="other">The other capsule to test against.</param>
+        /// <returns>
+        /// <see cref="ContainmentType.Contains"/> if the other capsule is completely inside this one;
+        /// <see cref="ContainmentType.Intersects"/> if they partially overlap;
+        /// or <see cref="ContainmentType.Disjoint"/> if they do not touch.
+        /// </returns>
+        public readonly ContainmentType Contains(BoundingCapsule2D other)
+        {
+            return Collision2D.ContainsCapsuleCapsule(PointA, PointB, Radius, other.PointA, other.PointB, other.Radius);
+        }
 
-            return ContainmentType.Disjoint;
+        /// <summary>
+        /// Tests whether this capsule contains, intersects, or is separate from a polygon.
+        /// </summary>
+        /// <param name="polygon">The circle to test against.</param>
+        /// <returns>
+        /// <see cref="ContainmentType.Contains"/> if the polygon is completely inside this capsule;
+        /// <see cref="ContainmentType.Intersects"/> if they partially overlap;
+        /// or <see cref="ContainmentType.Disjoint"/> if they do not touch.
+        /// </returns>
+        public readonly ContainmentType Contains(BoundingPolygon2D polygon)
+        {
+            return Collision2D.ContainsCapsuleConvexPolygon(PointA, PointB, Radius, polygon.Vertices, polygon.Normals);
         }
 
         /// <summary>
         /// Tests whether this capsule intersects with another capsule.
         /// </summary>
-        /// <param name="capsule">The other capsule to test against.</param>
+        /// <param name="other">The other capsule to test against.</param>
         /// <returns>
         /// <see langword="true"/> if the capsules overlap or touch; otherwise, <see langword="false"/>.
         /// </returns>
-        public readonly bool Intersects(BoundingCapsule2D capsule)
+        public readonly bool Intersects(BoundingCapsule2D other)
         {
-            // Two capsules intersect if the distance between their medial segments
-            // is less than the sum of their radii
-            LineSegment2D segmentA = new LineSegment2D(PointA, PointB);
-            LineSegment2D segmentB = new LineSegment2D(capsule.PointA, capsule.PointB);
-
-            float distance = segmentA.DistanceToSegment(segmentB);
-            return distance <= Radius + capsule.Radius;
+            return Collision2D.IntersectsCapsuleCapsule(PointA, PointB, Radius, other.PointA, other.PointB, other.Radius);
         }
 
         /// <summary>
@@ -382,7 +373,7 @@ namespace Microsoft.Xna.Framework
         /// </returns>
         public readonly bool Intersects(BoundingCircle circle)
         {
-            return circle.Intersects(this);
+            return Collision2D.IntersectsCircleCapsule(circle.Center, circle.Radius, PointA, PointB, Radius);
         }
 
         /// <summary>
@@ -394,7 +385,7 @@ namespace Microsoft.Xna.Framework
         /// </returns>
         public readonly bool Intersects(BoundingBox2D box)
         {
-            return box.Intersects(this);
+            return Collision2D.IntersectsAabbCapsule(box.Min, box.Max, PointA, PointB, Radius);
         }
 
         /// <summary>
@@ -406,7 +397,7 @@ namespace Microsoft.Xna.Framework
         /// </returns>
         public readonly bool Intersects(OrientedBoundingBox2D obb)
         {
-            return obb.Intersects(this);
+            return Collision2D.IntersectsObbCapsule(obb.Center, obb.AxisX, obb.AxisY, obb.HalfExtents, PointA, PointB, Radius);
         }
 
         /// <summary>
@@ -418,46 +409,7 @@ namespace Microsoft.Xna.Framework
         /// </returns>
         public readonly bool Intersects(BoundingPolygon2D polygon)
         {
-            // C. Ericson, Real-Time Collision Detection, Morgan Kaufmann, 2005
-            // Capsule–polygon overlap test via minimum distance
-
-            if (polygon.Vertices == null || polygon.VertexCount < 3)
-                return false;
-
-            LineSegment2D capsuleSegment = new LineSegment2D(PointA, PointB);
-
-            // 1. Segment intersects polygon
-            if (capsuleSegment.Intersects(polygon))
-                return true;
-
-            // 2. Polygon contains any capsule endpoint
-            if (polygon.Contains(PointA) == ContainmentType.Contains ||
-                polygon.Contains(PointB) == ContainmentType.Contains)
-                return true;
-
-            // 3. Minimum distance from capsule segment to polygon
-            float minDistSq = float.MaxValue;
-
-            // a) Distance to polygon edges
-            for (int i = 0; i < polygon.VertexCount; i++)
-            {
-                int j = (i + 1) % polygon.VertexCount;
-                LineSegment2D edge = new LineSegment2D(
-                    polygon.Vertices[i],
-                    polygon.Vertices[j]);
-
-                float distSq = capsuleSegment.DistanceSquaredToSegment(edge, out _, out _, out _, out _);
-                minDistSq = MathF.Min(minDistSq, distSq);
-            }
-
-            // b) Distance from segment to polygon interior (critical fix)
-            // Test closest point on segment to polygon centroid
-            Vector2 closest = capsuleSegment.ClosestPoint(polygon.Centroid, out _);
-
-            if (polygon.Contains(closest) == ContainmentType.Contains)
-                minDistSq = 0.0f;
-
-            return minDistSq <= Radius * Radius;
+            return Collision2D.IntersectsCapsuleConvexPolygon(PointA, PointB, Radius, polygon.Vertices, polygon.Normals);
         }
 
         /// <summary>

@@ -3,6 +3,7 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Diagnostics;
 using System.Runtime.Serialization;
 
@@ -96,12 +97,10 @@ namespace Microsoft.Xna.Framework
         /// </exception>
         public static Line2D CreateFromTwoPoints(Vector2 p1, Vector2 p2)
         {
-            const float Epsilon = 1e-6f;
-
             Vector2 direction = p2 - p1;
             float lengthSquared = direction.LengthSquared();
 
-            if (lengthSquared < Epsilon * Epsilon)
+            if (lengthSquared < Collision2D.Epsilon * Collision2D.Epsilon)
             {
                 throw new ArgumentException("Points must be distinct to define a line.");
             }
@@ -166,15 +165,13 @@ namespace Microsoft.Xna.Framework
             // Section 5.1.2 "Closest Point on Line Segment to Point"
             // Applied to an infinite line (no clamping of t), as described by Ericson.
 
-            const float Epsilon = 1e-6f;
-
             // This line is represented in implicit form:
             //      Dot(Normal, X) = Distance
             // We need to calculate X, as any point X that satisfies this
             // equation lies on the line.
             Vector2 n = Normal;
             float nn = Vector2.Dot(n, n);
-            if (nn <= Epsilon)
+            if (nn <= Collision2D.Epsilon)
             {
                 // Degenerate line, normal has no meaningful direction
                 // Treat line as a single point
@@ -222,10 +219,8 @@ namespace Microsoft.Xna.Framework
         /// </param>
         public static void Normalize(ref Line2D value, out Line2D result)
         {
-            const float Epsilon = 1e-6f;
-
             float length = value.Normal.Length();
-            if (length < Epsilon)
+            if (length < Collision2D.Epsilon)
             {
                 result = value;
                 return;
@@ -243,10 +238,8 @@ namespace Microsoft.Xna.Framework
         /// </remarks>
         public void Normalize()
         {
-            const float Epsilon = 1e-6f;
-
             float length = Normal.Length();
-            if (length > Epsilon)
+            if (length > Collision2D.Epsilon)
             {
                 Normal /= length;
                 Distance /= length;
@@ -270,11 +263,10 @@ namespace Microsoft.Xna.Framework
         {
             // Use implicit line representation and Cramer's rule
             // to solve a 2D line-line intersection
-            const float Epsilon = 1e-6f;
 
             // Check if lines are parallel
             float cross = Normal.X * other.Normal.Y - Normal.Y * other.Normal.X;
-            if (MathF.Abs(cross) < Epsilon)
+            if (MathF.Abs(cross) < Collision2D.Epsilon)
             {
                 // Lines are parallel or coincident
                 point = null;
@@ -319,15 +311,7 @@ namespace Microsoft.Xna.Framework
         /// </returns>
         public readonly bool Intersects(Ray2D ray, out float? distanceAlongRay, out Vector2? point)
         {
-            // C. Ericson, Real-Time Collision Detection, Morgan Kaufmann, 2005
-            // Parametric intersection of a ray with an implicit line
-            // Derived from Section 5.3.1 "Intersecting Segment Against Plane" (2D reduction)
-
-            const float Epsilon = 1e-6f;
-
-            // Check if ray is parallel to the line
-            float denom = Vector2.Dot(Normal, ray.Direction);
-            if (MathF.Abs(denom) < Epsilon)
+            if (!Collision2D.SolveParametricIntersectionWithImplicitLine(Normal, Distance, ray.Origin, ray.Direction, out float t))
             {
                 // Parallel or coincident
                 distanceAlongRay = null;
@@ -335,19 +319,16 @@ namespace Microsoft.Xna.Framework
                 return false;
             }
 
-            // Compute parametric distance along ray
-            float distance = Distance - Vector2.Dot(Normal, ray.Origin);
-            distanceAlongRay = distance / denom;
-
             // Ray only intersects in forward direction
-            if (distanceAlongRay < 0.0f)
+            if (t < 0.0f)
             {
                 distanceAlongRay = null;
                 point = null;
                 return false;
             }
 
-            point = ray.Origin + distanceAlongRay * ray.Direction;
+            distanceAlongRay = t;
+            point = ray.Origin + t * ray.Direction;
             return true;
         }
 
@@ -383,39 +364,27 @@ namespace Microsoft.Xna.Framework
         /// </returns>
         public readonly bool Intersects(LineSegment2D segment, out float? distanceAlongSegment, out Vector2? point)
         {
-            // C. Ericson, Real-Time Collision Detection, Morgan Kaufmann, 2005
-            // Parametric intersection of a line segment with an implicit line
-            // Derived from Section 5.3.1 "Intersecting Segment Against Plane" (2D reduction)
-
-            const float Epsilon = 1e-6f;
-
             Vector2 ab = segment.End - segment.Start;
-            float denom = Vector2.Dot(Normal, ab);
 
-            // Check if segment is parallel to the line
-            if (MathF.Abs(denom) < Epsilon)
+            if (!Collision2D.SolveParametricIntersectionWithImplicitLine(Normal, Distance, segment.Start, ab, out float t))
             {
                 distanceAlongSegment = null;
                 point = null;
                 return false;
             }
-
-            // Compute parametric distance along segment
-            float signedDistance = Distance - Vector2.Dot(Normal, segment.Start);
-            distanceAlongSegment = signedDistance / denom;
 
             // Check if the intersection is within the segment bounds
-            if (distanceAlongSegment < 0.0f || distanceAlongSegment > 1.0f)
+            if (t < 0.0f || t > 1.0f)
             {
                 distanceAlongSegment = null;
                 point = null;
                 return false;
             }
 
-            point = segment.Start + distanceAlongSegment * ab;
+            distanceAlongSegment = t;
+            point = segment.Start + t * ab;
             return true;
         }
-
 
         /// <summary>
         /// Tests if this line intersects with a line segment.
@@ -440,27 +409,20 @@ namespace Microsoft.Xna.Framework
         /// </returns>
         public readonly bool Intersects(BoundingBox2D box)
         {
-            // C. Ericson, Real-Time Collision Detection, Morgan Kaufmann, 2005
-            // Intersection of an implicit line with an axis-aligned box using corner distances
-            // Derived from Section 5.2.3 "Testing Box Against Plane"
+            Vector2 n = Normal;
+            float nn = Vector2.Dot(n, n);
 
-            // Get the four corners of the box
-            Vector2 min = box.Min;
-            Vector2 max = box.Max;
+            // Check for degenerate line
+            if(nn <= Collision2D.Epsilon * Collision2D.Epsilon)
+                return false;
 
-            // Compute signed distance for all four corners
-            float d1 = DistanceToPoint(min);
-            float d2 = DistanceToPoint(new Vector2(max.X, min.Y));
-            float d3 = DistanceToPoint(max);
-            float d4 = DistanceToPoint(new Vector2(min.X, max.Y));
+            // Point on the line: a = n * (d / Dot(n,n))
+            Vector2 origin = n * (Distance / nn);
 
-            // Find min and max signed distances
-            float minDist = MathF.Min(MathF.Min(d1, d2), MathF.Min(d3, d4));
-            float maxDist = MathF.Max(MathF.Max(d1, d2), MathF.Max(d3, d4));
+            // Direction along the line (perpendicular to normal)
+            Vector2 dir = new Vector2(-n.Y, n.X);
 
-            // Line intersects if corners straddle the line (opposite signs)
-            // or if any corner lies on the line (one distance is zero)
-            return minDist <= 0.0f && maxDist >= 0.0f;
+            return Collision2D.ClipLineToAabb(origin, dir, box.Min, box.Max, float.MinValue, float.MaxValue, out _, out _);
         }
 
         /// <summary>
@@ -498,8 +460,6 @@ namespace Microsoft.Xna.Framework
             // Intersection of an implicit line with a 2D capsule (line segment swept by a circle)
             // Derived from Section 4.5.1 "Sphere-swept Volume Intersection" and Section 5.2.2 "Testing Sphere Against Plane"
 
-            const float Epsilon = 1e-6f;
-
             // Compute signed distance to capsule endpoints
             float signedDistA = DistanceToPoint(capsule.PointA);
             float signedDistB = DistanceToPoint(capsule.PointB);
@@ -515,7 +475,7 @@ namespace Microsoft.Xna.Framework
             Vector2 segmentDir = capsule.PointB - capsule.PointA;
             float segmentLenSq = segmentDir.LengthSquared();
 
-            if (segmentLenSq > Epsilon * Epsilon)
+            if (segmentLenSq > Collision2D.Epsilon * Collision2D.Epsilon)
             {
                 // If endpoints are on opposite sides of the line, the segment crosses it
                 if (signedDistA * signedDistB <= 0.0f)
@@ -538,33 +498,24 @@ namespace Microsoft.Xna.Framework
         /// </returns>
         public readonly bool Intersects(OrientedBoundingBox2D obb)
         {
-            // C. Ericson, Real-Time Collision Detection, Morgan Kaufmann, 2005
-            // Intersection of an implicit line with a 2D oriented bounding rectangle (OBB)
-            // Derived from Section 5.2.3 "Testing Box Against Plane"
+            Vector2 n = Normal;
+            float nn = Vector2.Dot(n, n);
 
-            // Compute the four corners of the OBB
-            Vector2 halfX = obb.AxisX * obb.HalfExtents.X;
-            Vector2 halfY = obb.AxisY * obb.HalfExtents.Y;
+            // Handle degenerate line
+            if(nn <= Collision2D.Epsilon * Collision2D.Epsilon)
+                return false;
 
-            // Manually calculate corners instead of calling obb.GetCorners
-            // to avoid array heap allocations
-            Vector2 corner1 = obb.Center - halfX - halfY;
-            Vector2 corner2 = obb.Center + halfX - halfY;
-            Vector2 corner3 = obb.Center + halfX + halfY;
-            Vector2 corner4 = obb.Center - halfX + halfY;
+            // Get a world space point and direction for the line
+            Vector2 a = n * (Distance / nn);
+            Vector2 dir = new Vector2(-n.Y, n.X);
 
-            // Compute signed distances from all four corners
-            float d1 = DistanceToPoint(corner1);
-            float d2 = DistanceToPoint(corner2);
-            float d3 = DistanceToPoint(corner3);
-            float d4 = DistanceToPoint(corner4);
+            // Transform line into OBB local space
+            Vector2 diff = a - obb.Center;
+            Vector2 localOrigin = new Vector2(Vector2.Dot(diff, obb.AxisX), Vector2.Dot(diff, obb.AxisY));
+            Vector2 localDirection = new Vector2(Vector2.Dot(dir, obb.AxisX), Vector2.Dot(dir, obb.AxisY));
 
-            // Find min and max signed distances
-            float minDist = MathF.Min(MathF.Min(d1, d2), MathF.Min(d3, d4));
-            float maxDist = MathF.Max(MathF.Max(d1, d2), MathF.Max(d3, d4));
-
-            // Line intersects if corners straddle the line (opposite signs)
-            return minDist <= 0.0f && maxDist >= 0.0f;
+            // Local OBB is just ABB [-halfExtents, +halfExtents]
+            return Collision2D.ClipLineToAabb(localOrigin, localDirection, -obb.HalfExtents, obb.HalfExtents, float.MinValue, float.MaxValue, out _, out _);
         }
 
         /// <summary>
@@ -577,31 +528,21 @@ namespace Microsoft.Xna.Framework
         /// </returns>
         public readonly bool Intersects(BoundingPolygon2D polygon)
         {
-            // C. Ericson, Real-Time Collision Detection, Morgan Kaufmann, 2005
-            // Intersection of an implicit line with a 2D convex polygon
-            // Derived from Section 5.4.3 "Testing Point in Polyhedron" (half-space test principle)
+            Vector2 n = Normal;
+            float nn = Vector2.Dot(n, n);
 
-            if (polygon.Vertices == null || polygon.Vertices.Length == 0)
+            // Check for degenerate line
+            if(nn <= Collision2D.Epsilon * Collision2D.Epsilon)
                 return false;
 
-            // Compute signed distance to first vertex to establish initial min/max
-            float minDist = DistanceToPoint(polygon.Vertices[0]);
-            float maxDist = minDist;
+            // A point on the line: a = n * (d / Dot(n,n))
+            Vector2 a = n * (Distance / nn);
 
-            // Check remaining vertices
-            for (int i = 0; i < polygon.Vertices.Length; i++)
-            {
-                float dist = DistanceToPoint(polygon.Vertices[i]);
-                minDist = MathF.Min(minDist, dist);
-                maxDist = MathF.Max(maxDist, dist);
+            // A direction along the line (perpendicular to n)
+            Vector2 dir = new Vector2(-n.Y, n.X);
 
-                // Early exit if we've found vertices on both sides of the line
-                if (minDist <= 0.0f && maxDist >= 0.0f)
-                    return true;
-            }
-
-            // line intersects if vertices straddle the line (opposite signs)
-            return minDist <= 0.0f && maxDist >= 0.0f;
+            // Clip infinite line against polygon half-spaces
+            return Collision2D.ClipLineToConvexPolygon(a, dir, polygon.Vertices, polygon.Normals, float.MinValue, float.MaxValue, out _, out _);
         }
 
         /// <summary>
@@ -623,10 +564,8 @@ namespace Microsoft.Xna.Framework
         /// <inheritdoc/>
         public readonly bool Equals(Line2D other)
         {
-            const float Epsilon = 1e-6f;
-
             return Normal.Equals(other.Normal)
-                   && Math.Abs(Distance - other.Distance) < Epsilon;
+                   && Math.Abs(Distance - other.Distance) < Collision2D.Epsilon;
         }
 
         /// <inheritdoc/>

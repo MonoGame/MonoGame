@@ -3,7 +3,6 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System;
-using System.ComponentModel.DataAnnotations.Schema;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
@@ -329,44 +328,30 @@ namespace Microsoft.Xna.Framework
         }
 
         /// <summary>
-        /// Tests whether this polygon contains, intersects, or is separate from another polygon.
+        /// Tests whether a point lies inside this polygon or on its boundary.
         /// </summary>
-        /// <param name="polygon">The other polygon to test against.</param>
+        /// <param name="point">The point to test in 2D space.</param>
         /// <returns>
-        /// <see cref="ContainmentType.Contains"/> if the other polygon is completely inside this one;
+        /// <see cref="ContainmentType.Contains"/> if the point is inside or on the boundary;
+        /// otherwise, <see cref="ContainmentType.Disjoint"/> if the point is outside.
+        /// </returns>
+        public readonly ContainmentType Contains(Vector2 point)
+        {
+            return Collision2D.ContainsConvexPolygonPoint(point, Vertices, Normals);
+        }
+
+        /// <summary>
+        /// Tests whether this polygon contains, intersects, or is separate from a bounding box.
+        /// </summary>
+        /// <param name="aabb">The bounding box. to test against.</param>
+        /// <returns>
+        /// <see cref="ContainmentType.Contains"/> if the bounding box. is completely inside this polygon;
         /// <see cref="ContainmentType.Intersects"/> if they partially overlap;
         /// or <see cref="ContainmentType.Disjoint"/> if they do not touch.
         /// </returns>
-        public readonly ContainmentType Contains(BoundingPolygon2D polygon)
+        public readonly ContainmentType Contains(BoundingBox2D aabb)
         {
-            if (polygon.Vertices == null || polygon.Vertices.Length == 0)
-            {
-                return ContainmentType.Disjoint;
-            }
-
-            // Check if all vertices of the other polygon are inside this polygon
-            bool allInside = true;
-            for (int i = 0; i < polygon.Vertices.Length; i++)
-            {
-                if (Contains(polygon.Vertices[i]) != ContainmentType.Contains)
-                {
-                    allInside = false;
-                    break;
-                }
-            }
-
-            if (allInside)
-            {
-                return ContainmentType.Contains;
-            }
-
-            // Check for intersection
-            if (Intersects(polygon))
-            {
-                return ContainmentType.Intersects;
-            }
-
-            return ContainmentType.Disjoint;
+            return Collision2D.ContainsConvexPolygonAabb(Vertices, Normals, aabb.Min, aabb.Max);
         }
 
         /// <summary>
@@ -380,79 +365,49 @@ namespace Microsoft.Xna.Framework
         /// </returns>
         public readonly ContainmentType Contains(BoundingCircle circle)
         {
-            // Check if circle center is inside and all points on circle boundary are inside
-            if (Contains(circle.Center) != ContainmentType.Contains)
-            {
-                if (Intersects(circle))
-                {
-                    return ContainmentType.Intersects;
-                }
-
-                return ContainmentType.Disjoint;
-            }
-
-            // Center is inside, check if circle extends beyond any edge
-            float minDistance = float.MaxValue;
-
-            for (int i = 0; i < Vertices.Length; i++)
-            {
-                int j = (i + 1) % Vertices.Length;
-                Vector2 edge = Vertices[j] - Vertices[i];
-                Vector2 toCenter = circle.Center - Vertices[i];
-
-                // Project center onto edge
-                float edgeLengthSq = edge.LengthSquared();
-                float t = Math.Clamp(Vector2.Dot(toCenter, edge) / edgeLengthSq, 0.0f, 1.0f);
-                Vector2 closestPoint = Vertices[i] + t * edge;
-
-                float distance = Vector2.Distance(circle.Center, closestPoint);
-                minDistance = MathF.Min(minDistance, distance);
-            }
-
-            if (minDistance >= circle.Radius)
-            {
-                return ContainmentType.Contains;
-            }
-
-            if (Intersects(circle))
-            {
-                return ContainmentType.Intersects;
-            }
-
-            return ContainmentType.Disjoint;
+            return Collision2D.ContainsConvexPolygonCircle(Vertices, Normals, circle.Center, circle.Radius);
         }
 
         /// <summary>
-        /// Tests whether a point lies inside this polygon or on its boundary.
+        /// Tests whether this polygon contains, intersects, or is separate from an oriented bounding box.
         /// </summary>
-        /// <param name="point">The point to test in 2D space.</param>
+        /// <param name="obb">The oriented bounding box to test against.</param>
         /// <returns>
-        /// <see cref="ContainmentType.Contains"/> if the point is inside or on the boundary;
-        /// otherwise, <see cref="ContainmentType.Disjoint"/> if the point is outside.
+        /// <see cref="ContainmentType.Contains"/> if the oriented bounding box is completely inside this polygon;
+        /// <see cref="ContainmentType.Intersects"/> if they partially overlap;
+        /// or <see cref="ContainmentType.Disjoint"/> if they do not touch.
         /// </returns>
-        public readonly ContainmentType Contains(Vector2 point)
+        public readonly ContainmentType Contains(OrientedBoundingBox2D obb)
         {
-            const float Epsilon = 1e-6f;
+            return Collision2D.ContainsConvexPolygonObb(Vertices, Normals, obb.Center, obb.AxisX, obb.AxisY, obb.HalfExtents);
+        }
 
-            if (Vertices == null || Vertices.Length < 3)
-            {
-                return ContainmentType.Disjoint;
-            }
+        /// <summary>
+        /// Tests whether this polygon contains, intersects, or is separate from a capsule.
+        /// </summary>
+        /// <param name="capsule">The vs to test against.</param>
+        /// <returns>
+        /// <see cref="ContainmentType.Contains"/> if the capsule is completely inside this polygon;
+        /// <see cref="ContainmentType.Intersects"/> if they partially overlap;
+        /// or <see cref="ContainmentType.Disjoint"/> if they do not touch.
+        /// </returns>
+        public readonly ContainmentType Contains(BoundingCapsule2D capsule)
+        {
+            return Collision2D.ContainsConvexPolygonCapsule(Vertices, Normals, capsule.PointA, capsule.PointB, capsule.Radius);
+        }
 
-            // Use edge normal test
-            // Point is inside if it is on the correct side of all edges
-            for (int i = 0; i < Vertices.Length; i++)
-            {
-                Vector2 toPoint = point - Vertices[i];
-                float projection = Vector2.Dot(toPoint, Normals[i]);
-
-                if (projection > Epsilon)
-                {
-                    return ContainmentType.Disjoint;
-                }
-            }
-
-            return ContainmentType.Contains;
+        /// <summary>
+        /// Tests whether this polygon contains, intersects, or is separate from another polygon.
+        /// </summary>
+        /// <param name="other">The other polygon to test against.</param>
+        /// <returns>
+        /// <see cref="ContainmentType.Contains"/> if the other polygon is completely inside this one;
+        /// <see cref="ContainmentType.Intersects"/> if they partially overlap;
+        /// or <see cref="ContainmentType.Disjoint"/> if they do not touch.
+        /// </returns>
+        public readonly ContainmentType Contains(BoundingPolygon2D other)
+        {
+            return Collision2D.ContainsConvexPolygonConvexPolygon(Vertices, Normals, other.Vertices, other.Normals);
         }
 
         /// <summary>
@@ -464,7 +419,7 @@ namespace Microsoft.Xna.Framework
         /// </returns>
         public readonly bool Intersects(BoundingCircle circle)
         {
-            return circle.Intersects(this);
+            return Collision2D.IntersectsCircleConvexPolygon(circle.Center, circle.Radius, Vertices, Normals);
         }
 
         /// <summary>
@@ -476,7 +431,7 @@ namespace Microsoft.Xna.Framework
         /// </returns>
         public readonly bool Intersects(BoundingBox2D box)
         {
-            return box.Intersects(this);
+            return Collision2D.IntersectsAabbConvexPolygon(box.Center, box.HalfExtents, Vertices, Normals);
         }
 
         /// <summary>
@@ -488,30 +443,7 @@ namespace Microsoft.Xna.Framework
         /// </returns>
         public readonly bool Intersects(OrientedBoundingBox2D obb)
         {
-            // C. Ericson, Real-Time Collision Detection, Morgan Kaufmann, 2005
-            // Section 5.2.1 "Separating-axis Test"
-
-            if (Vertices == null || VertexCount < 3)
-                return false;
-
-            // Treat OBB as a convex polygon
-            Vector2[] obbCorners = obb.GetCorners();
-
-            // Test polygon edge normals
-            for (int i = 0; i < VertexCount; i++)
-            {
-                if (!OverlapOnAxis(this, obbCorners, Normals[i]))
-                    return false;
-            }
-
-            // Test OBB local axes
-            if (!OverlapOnAxis(this, obbCorners, obb.AxisX))
-                return false;
-
-            if (!OverlapOnAxis(this, obbCorners, obb.AxisY))
-                return false;
-
-            return true;
+            return Collision2D.IntersectsObbConvexPolygon(obb.Center, obb.AxisX, obb.AxisY, obb.HalfExtents, Vertices, Normals);
         }
 
         /// <summary>
@@ -523,49 +455,19 @@ namespace Microsoft.Xna.Framework
         /// </returns>
         public readonly bool Intersects(BoundingCapsule2D capsule)
         {
-            return capsule.Intersects(this);
+            return Collision2D.IntersectsCapsuleConvexPolygon(capsule.PointA, capsule.PointB, capsule.Radius, Vertices, Normals);
         }
 
         /// <summary>
         /// Tests whether this polygon intersects with another polygon.
         /// </summary>
-        /// <param name="polygon">The other polygon to test against.</param>
+        /// <param name="other">The other polygon to test against.</param>
         /// <returns>
         /// <see langword="true"/> if the polygons overlap or touch; otherwise, <see langword="false"/>.
         /// </returns>
-        public readonly bool Intersects(BoundingPolygon2D polygon)
+        public readonly bool Intersects(BoundingPolygon2D other)
         {
-            // C. Ericson, Real-Time Collision Detection, Morgan Kaufmann, 2005
-            // Section 5.2.1 "Separating-axis Test"
-            // Adapted for 2D convex polygon intersection using SAT
-
-            if (Vertices == null || polygon.Vertices == null)
-            {
-                return false;
-            }
-
-            // Separating Axis Theorem
-            // Test all edge normals from both polygons
-
-            // Test this polygon's normals
-            for (int i = 0; i < Vertices.Length; i++)
-            {
-                if (!OverlapOnAxis(this, polygon.Vertices, Normals[i]))
-                {
-                    return false;
-                }
-            }
-
-            // Test other polygon's normals
-            for (int i = 0; i < polygon.Vertices.Length; i++)
-            {
-                if (!OverlapOnAxis(this, polygon.Vertices, polygon.Normals[i]))
-                {
-                    return false;
-                }
-            }
-
-            return true;
+            return Collision2D.IntersectsConvexPolygonConvexPolygon(Vertices, Normals, other.Vertices, other.Normals);
         }
 
         /// <summary>
@@ -726,12 +628,12 @@ namespace Microsoft.Xna.Framework
 
         private static void EnsureCounterClockwise(Vector2[] vertices)
         {
-            if(vertices == null || vertices.Length < 3)
+            if (vertices == null || vertices.Length < 3)
                 return;
 
             float signedArea = ComputeSignedArea(vertices);
 
-            if(signedArea < 0.0f)
+            if (signedArea < 0.0f)
                 Array.Reverse(vertices);
         }
 
@@ -740,8 +642,6 @@ namespace Microsoft.Xna.Framework
             // C. Ericson, Real-Time Collision Detection, Morgan Kaufmann, 2005
             // Section 4.2.3 "Computing the Convex Hull"
             // Graham scan algorithm adapted for 2D Vector2 input
-
-            const float Epsilon = 1e-6f;
 
             if (points.Length < 3)
                 return points;
@@ -772,7 +672,7 @@ namespace Microsoft.Xna.Framework
                 float angleA = MathF.Atan2(a.Y - pivot.Y, a.X - pivot.X);
                 float angleB = MathF.Atan2(b.Y - pivot.Y, b.X - pivot.X);
 
-                if (MathF.Abs(angleA - angleB) < Epsilon)
+                if (MathF.Abs(angleA - angleB) < Collision2D.Epsilon)
                 {
                     // Same angle, closer point comes first
                     float distA = Vector2.DistanceSquared(pivot, a);
@@ -812,8 +712,6 @@ namespace Microsoft.Xna.Framework
 
         private static Vector2[] ComputeNormals(Vector2[] vertices)
         {
-            const float Epsilon = 1e-6f;
-
             int n = vertices.Length;
             Vector2[] normals = new Vector2[n];
 
@@ -827,44 +725,13 @@ namespace Microsoft.Xna.Framework
 
                 // Normalize
                 float length = normals[i].Length();
-                if (length > Epsilon)
+                if (length > Collision2D.Epsilon)
                 {
                     normals[i] /= length;
                 }
             }
 
             return normals;
-        }
-
-        private static bool OverlapOnAxis(BoundingPolygon2D polygon, Vector2[] otherVerts, Vector2 axis)
-        {
-            const float Epsilon = 1e-6f;
-
-            float min1 = float.MaxValue;
-            float max1 = float.MinValue;
-            float min2 = float.MaxValue;
-            float max2 = float.MinValue;
-
-            for (int i = 0; i < polygon.VertexCount; i++)
-            {
-                float p = Vector2.Dot(polygon.Vertices[i], axis);
-                min1 = MathF.Min(min1, p);
-                max1 = MathF.Max(max1, p);
-            }
-
-            for (int i = 0; i < otherVerts.Length; i++)
-            {
-                float p = Vector2.Dot(otherVerts[i], axis);
-                min2 = MathF.Min(min2, p);
-                max2 = MathF.Max(max2, p);
-            }
-
-            // use epsilon comparison for instances where axes are touching
-            // but floating point errors would cause them to return a
-            // false negative
-            if(max1 < min2 - Epsilon) return false;
-            if(max2 < min1 - Epsilon) return false;
-            return true;
         }
 
         #endregion

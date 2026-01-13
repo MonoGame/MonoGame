@@ -286,6 +286,19 @@ namespace Microsoft.Xna.Framework
         }
 
         /// <summary>
+        /// Tests whether a point lies inside this bounding box or on its boundary.
+        /// </summary>
+        /// <param name="point">The point to test in 2D space.</param>
+        /// <returns>
+        /// <see cref="ContainmentType.Contains"/> if the point is inside or on the boundary;
+        /// otherwise, <see cref="ContainmentType.Disjoint"/> if the point is outside.
+        /// </returns>
+        public readonly ContainmentType Contains(Vector2 point)
+        {
+            return Collision2D.ContainsAabbPoint(point, Min, Max);
+        }
+
+        /// <summary>
         /// Tests whether this bounding box contains, intersects, or is separate from another bounding box.
         /// </summary>
         /// <param name="other">The other bounding box to test against.</param>
@@ -296,39 +309,7 @@ namespace Microsoft.Xna.Framework
         /// </returns>
         public readonly ContainmentType Contains(BoundingBox2D other)
         {
-            // Test if all corners are in the same side of a face by checking min and max
-            if (other.Max.X < Min.X
-               || other.Min.X > Max.X
-               || other.Max.Y < Min.Y
-               || other.Min.Y > Max.Y)
-                return ContainmentType.Disjoint;
-
-            if (other.Min.X >= Min.X
-               && other.Max.X <= Max.X
-               && other.Min.Y >= Min.Y
-               && other.Max.Y <= Max.Y)
-                return ContainmentType.Contains;
-
-            return ContainmentType.Intersects;
-        }
-
-        /// <summary>
-        /// Tests whether a point lies inside this bounding box or on its boundary.
-        /// </summary>
-        /// <param name="point">The point to test in 2D space.</param>
-        /// <returns>
-        /// <see cref="ContainmentType.Contains"/> if the point is inside or on the boundary;
-        /// otherwise, <see cref="ContainmentType.Disjoint"/> if the point is outside.
-        /// </returns>
-        public readonly ContainmentType Contains(Vector2 point)
-        {
-            if (point.X < Min.X
-               || point.X > Max.X
-               || point.Y < Min.Y
-               || point.Y > Max.Y)
-                return ContainmentType.Disjoint;
-
-            return ContainmentType.Contains;
+            return Collision2D.ContainsAabbAabb(Min, Max, other.Min, other.Max);
         }
 
         /// <summary>
@@ -342,21 +323,49 @@ namespace Microsoft.Xna.Framework
         /// </returns>
         public readonly ContainmentType Contains(BoundingCircle circle)
         {
-            // Check if circle center is outside the rectangle by more than the radius
-            if (circle.Center.X - circle.Radius > Max.X
-               || circle.Center.X + circle.Radius < Min.X
-               || circle.Center.Y - circle.Radius > Max.Y
-               || circle.Center.Y + circle.Radius < Min.Y)
-                return ContainmentType.Disjoint;
+            return Collision2D.ContainsAabbCircle(Min, Max, circle.Center, circle.Radius);
+        }
 
-            // Check if circle is fully contained
-            if (circle.Center.X - circle.Radius >= Min.X
-               && circle.Center.X + circle.Radius <= Max.X
-               && circle.Center.Y - circle.Radius >= Min.Y
-               && circle.Center.Y + circle.Radius <= Max.Y)
-                return ContainmentType.Contains;
+        /// <summary>
+        /// Tests whether this bounding box contains, intersects, or is separate from an oriented bounding box.
+        /// </summary>
+        /// <param name="obb">The oriented bounding box to test against.</param>
+        /// <returns>
+        /// <see cref="ContainmentType.Contains"/> if the oriented bounding box is completely inside this bounding box;
+        /// <see cref="ContainmentType.Intersects"/> if they partially overlap;
+        /// or <see cref="ContainmentType.Disjoint"/> if they do not touch.
+        /// </returns>
+        public readonly ContainmentType Contains(OrientedBoundingBox2D obb)
+        {
+            return Collision2D.ContainsAabbObb(Min, Max, obb.Center, obb.AxisX, obb.AxisY, obb.HalfExtents);
+        }
 
-            return ContainmentType.Intersects;
+        /// <summary>
+        /// Tests whether this bounding box contains, intersects, or is separate from a capsule.
+        /// </summary>
+        /// <param name="capsule">The capsule to test against.</param>
+        /// <returns>
+        /// <see cref="ContainmentType.Contains"/> if the capsule is completely inside this bounding box;
+        /// <see cref="ContainmentType.Intersects"/> if they partially overlap;
+        /// or <see cref="ContainmentType.Disjoint"/> if they do not touch.
+        /// </returns>
+        public readonly ContainmentType Contains(BoundingCapsule2D capsule)
+        {
+            return Collision2D.ContainsAabbCapsule(Min, Max, capsule.PointA, capsule.PointB, capsule.Radius);
+        }
+
+        /// <summary>
+        /// Tests whether this bounding box contains, intersects, or is separate from a polygon.
+        /// </summary>
+        /// <param name="polygon">The polygon to test against.</param>
+        /// <returns>
+        /// <see cref="ContainmentType.Contains"/> if the polygon is completely inside this bounding box;
+        /// <see cref="ContainmentType.Intersects"/> if they partially overlap;
+        /// or <see cref="ContainmentType.Disjoint"/> if they do not touch.
+        /// </returns>
+        public readonly ContainmentType Contains(BoundingPolygon2D polygon)
+        {
+            return Collision2D.ContainsAabbConvexPolygon(Min, Max, polygon.Vertices, polygon.Normals);
         }
 
         /// <summary>
@@ -368,11 +377,7 @@ namespace Microsoft.Xna.Framework
         /// </returns>
         public readonly bool Intersects(BoundingBox2D other)
         {
-            // Exit with no intersection if separated along any axis
-            if (Max.X < other.Min.X || Min.X > other.Max.X) return false;
-            if (Max.Y < other.Min.Y || Min.Y > other.Max.Y) return false;
-
-            return true;
+            return Collision2D.IntersectsAabbAabb(Min, Max, other.Min, other.Max);
         }
 
         /// <summary>
@@ -384,7 +389,7 @@ namespace Microsoft.Xna.Framework
         /// </returns>
         public readonly bool Intersects(BoundingCircle circle)
         {
-            return circle.Intersects(this);
+            return Collision2D.IntersectsCircleAabb(circle.Center, circle.Radius, Min, Max);
         }
 
         /// <summary>
@@ -396,49 +401,7 @@ namespace Microsoft.Xna.Framework
         /// </returns>
         public readonly bool Intersects(BoundingCapsule2D capsule)
         {
-            // C. Ericson, Real-Time Collision Detection, Morgan Kaufmann, 2005
-            // Section 5.3.7 "Capsules" and Section 5.1.3 "Closest Point on AABB to Point"
-
-            // If the medial segment intersects the rectangle, we can early exit here
-            LineSegment2D segment = new LineSegment2D(capsule.PointA, capsule.PointB);
-
-            if (segment.Intersects(this, out _, out _))
-            {
-                return true;
-            }
-
-            // Since the medial segment does not intersect the rectangle, we need
-            // to perform the sphere-swept volume test
-            //     1. Compute the minimum distance between the medial segment and rectangle
-            //     2. Check if that distance is within the capsule's radius.
-            float minDistSquared = float.MaxValue;
-
-            // Check distance from each rectangle corner to segment
-            Vector2[] corners = GetCorners();
-            for (int i = 0; i < 4; i++)
-            {
-                float distSq = segment.DistanceSquaredToPoint(corners[i]);
-                minDistSquared = MathF.Min(minDistSquared, distSq);
-            }
-
-            // Check distance from each segment endpoint to the rectangle
-            // (Find closest point on rectangle to each endpoint)
-            Vector2 closestToA = new Vector2(
-                MathHelper.Clamp(capsule.PointA.X, Min.X, Max.X),
-                MathHelper.Clamp(capsule.PointA.Y, Min.Y, Max.Y)
-            );
-            float distASq = Vector2.DistanceSquared(capsule.PointA, closestToA);
-            minDistSquared = MathF.Min(minDistSquared, distASq);
-
-            Vector2 closestToB = new Vector2(
-                MathHelper.Clamp(capsule.PointB.X, Min.X, Max.X),
-                MathHelper.Clamp(capsule.PointB.Y, Min.Y, Max.Y)
-            );
-            float distBSq = Vector2.DistanceSquared(capsule.PointB, closestToB);
-            minDistSquared = MathF.Min(minDistSquared, distBSq);
-
-            // Intersection if distance is within the capsule's radius.
-            return minDistSquared <= capsule.Radius * capsule.Radius;
+            return Collision2D.IntersectsAabbCapsule(Min, Max, capsule.PointA, capsule.PointB, capsule.Radius);
         }
 
         /// <summary>
@@ -450,9 +413,7 @@ namespace Microsoft.Xna.Framework
         /// </returns>
         public readonly bool Intersects(OrientedBoundingBox2D obb)
         {
-            // Convert this aabb to obb and perform obb intersection test.
-            OrientedBoundingBox2D aabbAsObb = OrientedBoundingBox2D.CreateFromBoundingBox2D(this);
-            return aabbAsObb.Intersects(obb);
+            return Collision2D.IntersectsAabbObb(Center, HalfExtents, obb.Center, obb.AxisX, obb.AxisY, obb.HalfExtents);
         }
 
         /// <summary>
@@ -464,9 +425,7 @@ namespace Microsoft.Xna.Framework
         /// </returns>
         public readonly bool Intersects(BoundingPolygon2D polygon)
         {
-            // Convert this rectangle to a polygon and use polygon intersection test
-            BoundingPolygon2D aabbAsPoly = BoundingPolygon2D.CreateFromBoundingBox2D(this);
-            return aabbAsPoly.Intersects(polygon);
+            return Collision2D.IntersectsAabbConvexPolygon(Center, HalfExtents, polygon.Vertices, polygon.Normals);
         }
 
         /// <summary>

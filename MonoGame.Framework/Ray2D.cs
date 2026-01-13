@@ -82,12 +82,10 @@ namespace Microsoft.Xna.Framework
         /// </exception>
         public static Ray2D CreateFromPoints(Vector2 start, Vector2 through)
         {
-            const float Epsilon = 1e-6f;
-
             Vector2 direction = through - start;
             float lengthSq = direction.LengthSquared();
 
-            if (lengthSq < Epsilon * Epsilon)
+            if (lengthSq < Collision2D.Epsilon * Collision2D.Epsilon)
             {
                 throw new ArgumentException("Points must be distinct to define a ray direction");
             }
@@ -123,12 +121,10 @@ namespace Microsoft.Xna.Framework
         /// </returns>
         public readonly Vector2 ClosestPoint(Vector2 point, out float distanceAlongRay)
         {
-            const float Epsilon = 1e-6f;
-
             Vector2 ab = Direction;
 
             float denom = Vector2.Dot(ab, ab);
-            if (denom <= Epsilon)
+            if (denom <= Collision2D.Epsilon)
             {
                 // Direction of ray is effectively zero, so it's just a point.
                 distanceAlongRay = 0.0f;
@@ -288,44 +284,25 @@ namespace Microsoft.Xna.Framework
             // Parametric intersection of two rays using 2D cross products
             // Derived from Section 5.1.9.1 "2D Segment Intersection" (line–line formulation)
 
-            const float Epsilon = 1e-6f;
-
-            // Check if rays are parallel
-            float cross = Vector2.PerpDot(Direction, other.Direction);
-            if (MathF.Abs(cross) < Epsilon)
+            if (!Collision2D.SolveParametricIntersection2D(Origin, Direction, other.Origin, other.Direction, out float t1, out float t2))
             {
                 distanceAlongRay1 = distanceAlongRay2 = null;
                 point = null;
                 return false;
             }
-
-            Vector2 diff = other.Origin - Origin;
-
-            // Solve for t1 (parameter on this ray)
-            distanceAlongRay1 = Vector2.PerpDot(diff, other.Direction) / cross;
 
             // Only intersections in forward direction.  Negative direction indicates
-            // intersection would have happened behind origin
-            if (distanceAlongRay1 < 0.0f)
+            // intersection would have happened behind origin.
+            if (t1 < 0.0f || t2 < 0.0f)
             {
                 distanceAlongRay1 = distanceAlongRay2 = null;
                 point = null;
                 return false;
             }
 
-            // Solve for t2 (parameter on other ray)
-            distanceAlongRay2 = Vector2.PerpDot(diff, Direction) / cross;
-
-            // Only intersections in forward direction.  Negative direction indicates
-            // intersection would have happened behind the origin
-            if (distanceAlongRay2 < 0.0f)
-            {
-                distanceAlongRay1 = distanceAlongRay2 = null;
-                point = null;
-                return false;
-            }
-
-            point = Origin + distanceAlongRay1 * Direction;
+            distanceAlongRay1 = t1;
+            distanceAlongRay2 = t2;
+            point = Origin + t1 * Direction;
             return true;
         }
 
@@ -370,46 +347,28 @@ namespace Microsoft.Xna.Framework
             // Parametric intersection of a ray with a line segment using 2D cross products
             // Derived from Section 5.1.9.1 "2D Segment Intersection" (line–line formulation)
 
-            const float Epsilon = 1e-6f;
-
             Vector2 segmentDir = segment.End - segment.Start;
 
-            // Check if ray and segment are parallel
-            float cross = Vector2.PerpDot(Direction, segmentDir);
-            if (MathF.Abs(cross) < Epsilon)
-            {
-                // Parallel or colinear
-                distanceAlongRay = distanceAlongSegment = null;
-                point = null;
-                return false;
-            }
-
-            Vector2 diff = segment.Start - Origin;
-
-            // Solve for segment parameter s
-            distanceAlongSegment = Vector2.PerpDot(diff, Direction) / cross;
-
-            // Intersection only if within segment bounds [0,1]
-            if (distanceAlongSegment < 0.0f || distanceAlongSegment > 1.0f)
+            if (!Collision2D.SolveParametricIntersection2D(Origin, Direction, segment.Start, segmentDir, out float tRay, out float tSeg))
             {
                 distanceAlongRay = distanceAlongSegment = null;
                 point = null;
                 return false;
             }
 
-            // Solve for ray parameter t
-            distanceAlongRay = Vector2.PerpDot(diff, segmentDir) / cross;
-
-            // Intersection only if in forward direction. Negative direction indicates
+            // Intersection only if within segments bounds [0,1] and
+            // only in forward direction of ray. Negative direction of ray indicates
             // intersection would have happened behind ray origin
-            if (distanceAlongRay < 0.0f)
+            if (tSeg < 0.0f || tSeg > 1.0f || tRay < 0.0f)
             {
-                distanceAlongSegment = distanceAlongRay = null;
+                distanceAlongRay = distanceAlongSegment = null;
                 point = null;
                 return false;
             }
 
-            point = Origin + distanceAlongRay * Direction;
+            distanceAlongRay = tRay;
+            distanceAlongSegment = tSeg;
+            point = Origin + tRay * Direction;
             return true;
         }
 
@@ -445,104 +404,15 @@ namespace Microsoft.Xna.Framework
         /// </returns>
         public readonly bool Intersects(BoundingBox2D box, out float? tRayMin, out float? tRayMax)
         {
-            // C. Ericson, Real-Time Collision Detection, Morgan Kaufmann, 2005
-            // Parametric intersection of a ray with an axis-aligned box (2D reduction)
-            // Derived from Section 5.3.3 "Intersecting Ray or Segment Against Box"
 
-            const float Epsilon = 1e-6f;
-
-            float tMin = float.MinValue;
-            float tMax = float.MaxValue;
-
-            // X-axis slab
-            if (MathF.Abs(Direction.X) < Epsilon)
-            {
-                // Ray is parallel to the x slab planes
-                if (Origin.X < box.Min.X || Origin.X > box.Max.X)
-                {
-                    tRayMin = tRayMax = null;
-                    return false;
-                }
-            }
-            else
-            {
-                // Compute intersection t values with the near and far X planes
-                float ood = 1.0f / Direction.X;
-                float t1 = (box.Min.X - Origin.X) * ood;
-                float t2 = (box.Max.X - Origin.X) * ood;
-
-                // Make t1 be intersection with near plane and t2 with far plane
-                if (t1 > t2)
-                {
-                    float temp = t1;
-                    t1 = t2;
-                    t2 = temp;
-                }
-
-                tMin = MathF.Max(tMin, t1);
-                tMax = MathF.Min(tMax, t2);
-
-                // Is slab intersection empty?
-                if (tMin > tMax)
-                {
-                    tRayMin = tRayMax = null;
-                    return false;
-                }
-            }
-
-            // Y-axis slab
-            if (MathF.Abs(Direction.Y) < Epsilon)
-            {
-                // Ray is parallel to the x slab planes
-                if (Origin.Y < box.Min.Y || Origin.Y > box.Max.Y)
-                {
-                    tRayMin = tRayMax = null;
-                    return false;
-                }
-            }
-            else
-            {
-                // Compute intersection t values with the near and far X planes
-                float ood = 1.0f / Direction.Y;
-                float t1 = (box.Min.Y - Origin.Y) * ood;
-                float t2 = (box.Max.Y - Origin.Y) * ood;
-
-                // Make t1 be intersection with near plane and t2 with far plane
-                if (t1 > t2)
-                {
-                    float temp = t1;
-                    t1 = t2;
-                    t2 = temp;
-                }
-
-                tMin = MathF.Max(tMin, t1);
-                tMax = MathF.Min(tMax, t2);
-
-                // Is slab intersection empty?
-                if (tMin > tMax)
-                {
-                    tRayMin = tRayMax = null;
-                    return false;
-                }
-            }
-
-            // If ray origin is inside box (tMin < 0), return 0
-            if (tMin < 0.0f && tMax > 0.0f)
-            {
-                tRayMin = 0.0f;
-                tRayMax = tMax;
-                return true;
-            }
-
-            // Ensure intersection is in forward direction
-            if (tMax < 0.0f)
+            if (!Collision2D.ClipLineToAabb(Origin, Direction, box.Min, box.Max, 0.0f, float.MaxValue, out float tEnter, out float tExit))
             {
                 tRayMin = tRayMax = null;
                 return false;
             }
 
-            tRayMin = MathF.Max(0.0f, tMin);
-            tRayMax = tMax;
+            tRayMin = tEnter;
+            tRayMax = tExit;
             return true;
         }
 
@@ -581,53 +451,21 @@ namespace Microsoft.Xna.Framework
         /// </returns>
         public readonly bool Intersects(BoundingCircle circle, out float? tRayMin, out float? tRayMax)
         {
-            // C. Ericson, Real-Time Collision Detection, Morgan Kaufmann, 2005
-            // Parametric intersection of a ray with a circle (2D reduction)
-            // Derived from Section 5.3.2 "Intersecting Ray or Segment Against Sphere"
 
-            Vector2 m = Origin - circle.Center;
-
-            float b = Vector2.Dot(m, Direction);
-            float c = Vector2.Dot(m, m) - circle.Radius * circle.Radius;
-
-            // Ray origin outside circle (c > 0)
-            // and ray pointing away from circle (b > 0)
-            if (c > 0.0f && b > 0.0f)
+            if (!Collision2D.RayCircleIntersectionInterval(Origin, Direction, circle.Center, circle.Radius, out float tMin, out float tMax))
             {
                 tRayMin = tRayMax = null;
                 return false;
             }
 
-            float discriminant = b * b - c;
-
-            // Negative discriminant means ray misses circle
-            if (discriminant < 0.0f)
+            if (!Collision2D.ClipInterval(tMin, tMax, 0.0f, float.MaxValue, out float entry, out float exit))
             {
                 tRayMin = tRayMax = null;
                 return false;
             }
 
-            float sqrtDiscriminant = MathF.Sqrt(discriminant);
-            float tMin = -b - sqrtDiscriminant;
-            float tMax = -b + sqrtDiscriminant;
-
-            // If ray origin is inside circle (tMin < 0), return 0
-            if (tMin < 0.0f && tMax > 0.0f)
-            {
-                tRayMin = 0.0f;
-                tRayMax = tMax;
-                return true;
-            }
-
-            // If both intersections are behind ray origin, no valid intersection
-            if (tMax < 0.0f)
-            {
-                tRayMin = tRayMax = null;
-                return false;
-            }
-
-            tRayMin = MathF.Max(0.0f, tMin);
-            tRayMax = tMax;
+            tRayMin = entry;
+            tRayMax = exit;
             return true;
         }
 
@@ -666,142 +504,23 @@ namespace Microsoft.Xna.Framework
         /// </returns>
         public readonly bool Intersects(BoundingCapsule2D capsule, out float? tRayMin, out float? tRayMax)
         {
-            // C. Ericson, Real-Time Collision Detection, Morgan Kaufmann, 2005
-            // Parametric intersection of a ray with a capsule (2D reduction)
-            // Derived from Section 5.1.9 "Closest Points of Two Line Segments" and Section 5.3.7 "Intersecting Ray or Segment Against Cylinder"
 
-            const float Epsilon = 1e-6f;
-
-            Vector2 d1 = Direction;
-            Vector2 d2 = capsule.PointB - capsule.PointA;
-            Vector2 r = Origin - capsule.PointA;
-
-            float a = Vector2.Dot(d1, d1);
-            float e = Vector2.Dot(d2, d2);
-            float f = Vector2.Dot(d2, r);
-
-            // Handle degenerate capsule (segment is a point, just a circe).
-            if (e <= Epsilon * Epsilon)
-            {
-                // capsule degenerates to a circle at Point A
-                BoundingCircle circle = new BoundingCircle(capsule.PointA, capsule.Radius);
-                return Intersects(circle, out tRayMin, out tRayMax);
-            }
-
-            float c = Vector2.Dot(d1, r);
-            float b = Vector2.Dot(d1, d2);
-            float denom = a * e - b * b;
-
-            float radiusSq = capsule.Radius * capsule.Radius;
-
-            // Check if ray and segment are parallel
-            if (MathF.Abs(denom) < Epsilon)
-            {
-                // ray and segment are parallel
-                // Compute perpendicular distance between the parallel lines
-                Vector2 toSegment = capsule.PointA - Origin;
-                float projectionOnRay = Vector2.Dot(toSegment, d1);
-                Vector2 perpComponent = toSegment - projectionOnRay * d1;
-                float perpDistanceSq = perpComponent.LengthSquared();
-
-                if (perpDistanceSq > radiusSq)
-                {
-                    // Too far apart perpendicularly
-                    tRayMin = tRayMax = null;
-                    return false;
-                }
-
-                // Parallel and close enough, project capsule endpoints onto ray.
-                Vector2 toA = capsule.PointA - Origin;
-                Vector2 toB = capsule.PointB - Origin;
-                float projA = Vector2.Dot(toA, d1);
-                float projB = Vector2.Dot(toB, d1);
-
-                // Find the interval on the ray where it's within radius of the capsule.
-                float minProj = MathF.Min(projA, projB);
-                float maxProj = MathF.Max(projA, projB);
-
-                float parallelOffset = MathF.Sqrt(radiusSq - perpDistanceSq);
-
-                tRayMin = minProj - parallelOffset;
-                tRayMax = maxProj + parallelOffset;
-                return true;
-            }
-
-            // General case: ray and segment are not parallel
-            float s;
-            float t;
-
-            // Compute closest point on infinite lines
-            s = (b * f - c * e) / denom;
-
-            // Since this is a ray, clamp s to [0, positiveInfinity]
-            if (s < 0.0f)
-            {
-                s = 0.0f;
-                t = MathHelper.Clamp(f / e, 0.0f, 1.0f);
-            }
-            else
-            {
-                // Compute t corresponding to s
-                t = (b * s + f) / e;
-
-                // Clamp to to segment range
-                if (t < 0.0f)
-                {
-                    t = 0.0f;
-                    s = MathF.Max(-c / a, 0.0f);
-                }
-                else if (t > 1.0f)
-                {
-                    t = 1.0f;
-                    s = MathF.Max((b - c) / a, 0.0f);
-                }
-            }
-
-            // Compute closest points
-            Vector2 closestOnRay = Origin + s * d1;
-            Vector2 closestOnSegment = capsule.PointA + t * d2;
-
-            // Check if closest points are within capsule radius
-            Vector2 separation = closestOnRay - closestOnSegment;
-            float distanceSq = separation.LengthSquared();
-
-            if (distanceSq > radiusSq)
-            {
-                // Ray doesn't intersect capsule
-                tRayMin = tRayMax = null;
-                return false;
-            }
-
-            // Compute intersection parameters using Pythagorean theorem
-            // The ray intersects a sphere of radius R at distance s from origin
-            // We need to find how far along the ray from point s the entry and exit are
-            float offset = MathF.Sqrt(radiusSq - distanceSq);
-
-            float tMin = s - offset;
-            float tMax = s + offset;
-
-            // If ray origin is inside capsule (tMin < 0), return 0
-            if (tMin < 0.0f && tMax > 0.0f)
-            {
-                tRayMin = 0.0f;
-                tRayMax = tMax;
-                return true;
-            }
-
-            // If both intersections are behind ray origin, no valid intersection
-            if (tMax < 0.0f)
+            if (!Collision2D.RayCapsuleIntersectionInterval(Origin, Direction, capsule.PointA, capsule.PointB, capsule.Radius, out float tMin, out float tMax))
             {
                 tRayMin = tRayMax = null;
                 return false;
             }
 
-            tRayMin = MathF.Max(0.0f, tMin);
-            tRayMax = tMax;
+            if (!Collision2D.ClipInterval(tMin, tMax, 0.0f, float.MaxValue, out float entry, out float exit))
+            {
+                tRayMin = tRayMax = null;
+                return false;
+            }
+
+            tRayMin = entry;
+            tRayMax = exit;
             return true;
         }
-
 
         /// <summary>
         /// Tests if this ray intersects with a capsule.
@@ -856,13 +575,15 @@ namespace Microsoft.Xna.Framework
                 Vector2.Dot(Direction, obb.AxisY)
             );
 
-            // Create an axis-aligned box in local space centered at origin
-            BoundingBox2D localAABB = new BoundingBox2D(-obb.HalfExtents, obb.HalfExtents);
+            if (!Collision2D.ClipLineToAabb(localOrigin, localDirection, -obb.HalfExtents, obb.HalfExtents, 0.0f, float.MaxValue, out float tEnter, out float tExit))
+            {
+                tRayMin = tRayMax = null;
+                return false;
+            }
 
-            // Create ray in local space
-            Ray2D localRay = new Ray2D(localOrigin, localDirection);
-
-            return localRay.Intersects(localAABB, out tRayMin, out tRayMax);
+            tRayMin = tEnter;
+            tRayMax = tExit;
+            return true;
         }
 
         /// <summary>
@@ -905,107 +626,24 @@ namespace Microsoft.Xna.Framework
         /// </returns>
         public readonly bool Intersects(BoundingPolygon2D polygon, out float? tRayMin, out float? tRayMax, out Vector2? point)
         {
-            // C. Ericson, Real-Time Collision Detection, Morgan Kaufmann, 2005
-            // Parametric intersection of a ray with a convex polygon (2D reduction)
-            // Derived from Section 5.3.8 "Intersecting Ray or Segment Against Convex Polyhedron"
-
-            const float Epsilon = 1e-6f;
-
-            // Handle degenerate polygon
-            if (polygon.Vertices == null || polygon.Vertices.Length < 3)
+            // Clip ray's parametric line against the polygon
+            if (!Collision2D.ClipLineToConvexPolygon(Origin, Direction, polygon.Vertices, polygon.Normals, 0.0f, float.MaxValue, out float t0, out float t1))
             {
                 tRayMin = tRayMax = null;
                 point = null;
                 return false;
             }
 
-            // Initialize interval to entire ray (semi-infinite)
-            float tMin = float.MinValue;
-            float tMax = float.MaxValue;
-
-            int n = polygon.Vertices.Length;
-
-            // Clip ray against each edge (half-space) of the polygon.
-            for (int i = 0; i < n; i++)
-            {
-                Vector2 edgeStart = polygon.Vertices[i];
-                Vector2 edgeNormal = polygon.Normals[i];
-
-                // Compute distance from ray origin to the edge plane
-                float planeD = Vector2.Dot(edgeNormal, edgeStart);
-                float dist = planeD - Vector2.Dot(edgeNormal, Origin);
-
-                // Compute denominator (how aligned ray is with edge normal)
-                float denom = Vector2.Dot(edgeNormal, Direction);
-
-                // Handle ray parallel to edge
-                if (MathF.Abs(denom) < Epsilon)
-                {
-                    // Ray is parallel to edge
-                    // If ray origin is outside the half-space, no intersection
-                    if (dist > Epsilon)
-                    {
-                        tRayMin = tRayMax = null;
-                        point = null;
-                        return false;
-                    }
-
-                    // Ray is inside the half-space, continue to next edge
-                    continue;
-                }
-
-                // Compute intersection parameter t with the edge plane
-                float t = dist / denom;
-
-                if (denom < 0.0f)
-                {
-                    // Ray is exiting the half-space (moving against inward normal)
-                    // Update exit point if this is the earliest exit
-                    if (t < tMax)
-                    {
-                        tMax = t;
-                    }
-                }
-                else
-                {
-                    // Ray is entering the half-space (moving with inward normal)
-                    // Update entry point if this is the latest entry
-                    if (t > tMin)
-                    {
-                        tMin = t;
-                    }
-                }
-
-                // Early exit if interval becomes invalid
-                if (tMin > tMax)
-                {
-                    tRayMin = tRayMax = null;
-                    point = null;
-                    return false;
-                }
-            }
-
-            // If ray origin is inside polygon (tMin < 0), return 0
-            if (tMin < 0.0f && tMax > 0.0f)
-            {
-                tRayMin = 0.0f;
-                tRayMax = tMax;
-                point = Origin;
-                return true;
-            }
-
-            // If both intersections are behind ray origin, no valid intersection
-            if (tMax < 0.0f)
+            if (!Collision2D.ClipInterval(t0, t1, 0.0f, float.MaxValue, out float entry, out float exit))
             {
                 tRayMin = tRayMax = null;
                 point = null;
                 return false;
             }
 
-            // Ray intersects polygon
-            tRayMin = MathF.Max(0.0f, tMin);
-            tRayMax = tMax;
-            point = Origin + Direction * tRayMin.Value;
+            tRayMin = entry;
+            tRayMax = exit;
+            point = Origin + Direction * entry;
             return true;
         }
 

@@ -207,26 +207,7 @@ namespace Microsoft.Xna.Framework
         /// </remarks>
         public readonly float DistanceSquaredToPoint(Vector2 point)
         {
-            Vector2 ab = End - Start;
-            Vector2 ac = point - Start;
-            Vector2 bc = point - End;
-
-            float e = Vector2.Dot(ac, ab);
-
-            // Handle cases where point projects outside ab
-            if (e <= 0.0f)
-            {
-                return Vector2.Dot(ac, ac);
-            }
-
-            float f = Vector2.Dot(ab, ab);
-
-            if (e >= f)
-            {
-                return Vector2.Dot(bc, bc);
-            }
-
-            return Vector2.Dot(ac, ac) - e * e / f;
+            return Collision2D.DistanceSquaredPointSegment(point, Start, End, out _, out _);
         }
 
         /// <summary>
@@ -274,85 +255,9 @@ namespace Microsoft.Xna.Framework
         /// </remarks>
         public readonly float DistanceSquaredToSegment(LineSegment2D other, out float distanceAlongSegment1, out float distanceAlongSegment2, out Vector2 closestPoint1, out Vector2 closestPoint2)
         {
-            // C. Ericson, Real-Time Collision Detection, Morgan Kaufmann, 2005
-            // Section 5.1.9 "Closest Points of Two Line Segments"
-
-            const float Epsilon = 1e-6f;
-
-            Vector2 d1 = End - Start;               // Direction vector of segment s!
-            Vector2 d2 = other.End - other.Start;   // Direction vector of segment S2
-            Vector2 r = Start - other.Start;
-
-            float a = Vector2.Dot(d1, d1);  // Squared length of segment s!, always nonnegative
-            float e = Vector2.Dot(d2, d2);  // Squared length of segment S2, always nonnegative
-            float f = Vector2.Dot(d2, r);
-
-            // Check if either or both segments degenerate into points
-            if (a <= Epsilon && e <= Epsilon)
-            {
-                distanceAlongSegment1 = distanceAlongSegment2 = 0.0f;
-                closestPoint1 = Start;
-                closestPoint2 = other.Start;
-                return Vector2.Dot(closestPoint1 - closestPoint2, closestPoint1 - closestPoint2);
-            }
-
-            if (a <= Epsilon)
-            {
-                // First segment degenerates into a point
-                distanceAlongSegment1 = 0.0f;
-                distanceAlongSegment2 = f / e; // s = 0 => t = (b*s + f) / e = f / e
-                distanceAlongSegment2 = MathHelper.Clamp(distanceAlongSegment2, 0.0f, 1.0f);
-            }
-            else
-            {
-                float c = Vector2.Dot(d1, r);
-
-                if (e <= Epsilon)
-                {
-                    // Second segment degenerates into a point
-                    distanceAlongSegment2 = 0.0f;
-                    distanceAlongSegment1 = MathHelper.Clamp(-c / a, 0.0f, 1.0f); // t = 0 => s = (b*t - c) / a = - c / a
-                }
-                else
-                {
-                    // The general nondegenerate case stats here
-                    float b = Vector2.Dot(d1, d2);
-                    float denom = a * e - b * b; // Always nonnegative
-
-                    // If segments not parallel, compute closest point on L1 to L2 and
-                    // clamp to segment s!.  Else pick arbitrary s (here 0)
-                    if (denom != 0.0f)
-                    {
-                        distanceAlongSegment1 = MathHelper.Clamp((b * f - c * e) / denom, 0.0f, 1.0f);
-                    }
-                    else
-                    {
-                        distanceAlongSegment1 = 0.0f;
-                    }
-
-                    // Compute point on L2 closest to S1(s) using
-                    // t = Dot((P1 + D1*s) - P2,D2) / Dot(D2,D2) = (b*s + f) / e
-                    distanceAlongSegment2 = (b * distanceAlongSegment1 + f) / e;
-
-                    // If t in [0,1] don't. Else clamp t, recompute s for the new value
-                    // of t using s = Dot((P2 + D2*t) - P1,D1) / Dot(D1,D1) = (t*b - c) / a
-                    // and clamp s to [0, 1]
-                    if (distanceAlongSegment2 < 0.0f)
-                    {
-                        distanceAlongSegment2 = 0.0f;
-                        distanceAlongSegment1 = MathHelper.Clamp(-c / a, 0.0f, 1.0f);
-                    }
-                    else if (distanceAlongSegment2 > 1.0f)
-                    {
-                        distanceAlongSegment2 = 1.0f;
-                        distanceAlongSegment1 = MathHelper.Clamp((b - c) / a, 0.0f, 1.0f);
-                    }
-                }
-            }
-
-            closestPoint1 = Start + d1 * distanceAlongSegment1;
-            closestPoint2 = other.Start + d2 * distanceAlongSegment2;
-            return Vector2.Dot(closestPoint1 - closestPoint2, closestPoint1 - closestPoint2);
+            return Collision2D.DistanceSquaredSegmentSegment(Start, End, other.Start, other.End,
+                                                             out distanceAlongSegment1, out distanceAlongSegment2,
+                                                             out closestPoint1, out closestPoint2);
         }
 
 
@@ -406,7 +311,6 @@ namespace Microsoft.Xna.Framework
         {
             return line.Intersects(this);
         }
-
 
         /// <summary>
         /// Tests if this line segment intersects with a ray.
@@ -474,49 +378,24 @@ namespace Microsoft.Xna.Framework
         /// </returns>
         public readonly bool Intersects(LineSegment2D other, out float? distanceAlongSegment1, out float? distanceAlongSegment2, out Vector2? point)
         {
-            // C. Ericson, Real-Time Collision Detection, Morgan Kaufmann, 2005
-            // Parametric 2D segment–segment intersection using cross products
-            // See section 5.1.9.1 "2D Segment Intersection" (line intersection formulation)
-
-            const float Epsilon = 1e-6f;
-
-            Vector2 d1 = Direction;
-            Vector2 d2 = other.Direction;
-            Vector2 r = other.Start - Start;
-
-            float d1CrossD2 = d1.X * d2.Y - d1.Y * d2.X;
-
-            // Check if segments are parallel
-            if (MathF.Abs(d1CrossD2) < Epsilon)
+            if (!Collision2D.SolveParametricIntersection2D(Start, Direction, other.Start, other.Direction, out float t1, out float t2))
             {
                 distanceAlongSegment1 = distanceAlongSegment2 = null;
                 point = null;
                 return false;
             }
 
-            float rCrossD2 = r.X * d2.Y - r.Y * d2.X;
-            distanceAlongSegment1 = rCrossD2 / d1CrossD2;
-
-            // Validate that intersection is in range [0, 1] of this segment
-            if (distanceAlongSegment1 < 0.0f || distanceAlongSegment1 > 1.0f)
+            // Clamp to segment bounds [0,1]
+            if (t1 < 0.0f || t1 > 1.0f || t2 < 0.0f || t2 > 1.0f)
             {
                 distanceAlongSegment1 = distanceAlongSegment2 = null;
                 point = null;
                 return false;
             }
 
-            float rCrossD1 = r.X * d1.Y - r.Y * d1.X;
-            distanceAlongSegment2 = rCrossD1 / d1CrossD2;
-
-            // Validate that intersection is in range [0, 1] of other segment
-            if (distanceAlongSegment2 < 0.0f || distanceAlongSegment2 > 1.0f)
-            {
-                distanceAlongSegment1 = distanceAlongSegment2 = null;
-                point = null;
-                return false;
-            }
-
-            point = Start + distanceAlongSegment1 * d1;
+            distanceAlongSegment1 = t1;
+            distanceAlongSegment2 = t2;
+            point = Start + t1 * Direction;
             return true;
         }
 
@@ -556,17 +435,11 @@ namespace Microsoft.Xna.Framework
         /// </remarks>
         public readonly bool Intersects(BoundingBox2D box, out float? tMin, out float? tMax)
         {
-            // C. Ericson, Real-Time Collision Detection, Morgan Kaufmann, 2005
-            // Parametric intersection of a segment with an axis-aligned box
-            // Derived from Section 5.3.3 "Intersecting Ray or Segment Against Box"
-
-            const float Epsilon = 1e-6f;
-
-            Vector2 direction = Direction;
-            float segmentLengthSq = direction.LengthSquared();
+            Vector2 d = Direction;
+            float dd = Vector2.Dot(d, d);
 
             // Handle degenerate segment (zero length)
-            if (segmentLengthSq < Epsilon * Epsilon)
+            if (dd < Collision2D.Epsilon * Collision2D.Epsilon)
             {
                 bool inside = Start.X >= box.Min.X && Start.X <= box.Max.X &&
                               Start.Y >= box.Min.Y && Start.Y <= box.Max.Y;
@@ -581,29 +454,15 @@ namespace Microsoft.Xna.Framework
                 return false;
             }
 
-            float segmentLength = MathF.Sqrt(segmentLengthSq);
-            Ray2D ray = new Ray2D(Start, direction / segmentLength);
-
-            float? rayTMin;
-            float? rayTMax;
-            if (ray.Intersects(box, out rayTMin, out rayTMax))
+            if (!Collision2D.ClipLineToAabb(Start, d, box.Min, box.Max, 0.0f, 1.0f, out float tEnter, out float tExit))
             {
-                float segmentTMin = rayTMin.Value / segmentLength;
-                float segmentTMax = rayTMax.Value / segmentLength;
-
-                if (segmentTMax < 0.0f || segmentTMin > 1.0f)
-                {
-                    tMin = tMax = null;
-                    return false;
-                }
-
-                tMin = MathF.Max(0.0f, segmentTMin);
-                tMax = MathF.Min(1.0f, segmentTMax);
-                return true;
+                tMin = tMax = null;
+                return false;
             }
 
-            tMin = tMax = null;
-            return false;
+            tMin = tEnter;
+            tMax = tExit;
+            return true;
         }
 
         /// <summary>
@@ -645,16 +504,14 @@ namespace Microsoft.Xna.Framework
             // Parametric intersection of a segment with a circle (2D reduction)
             // Derived from Section 5.3.2 "Intersecting Ray or Segment Against Sphere"
 
-            const float Epsilon = 1e-6f;
-
-            Vector2 direction = Direction;
-            float segmentLenSq = direction.LengthSquared();
+            Vector2 d = Direction;
+            float dd = Vector2.Dot(d, d);
 
             // Handle degenerate segment (zero length)
-            if (segmentLenSq < Epsilon * Epsilon)
+            if (dd <= Collision2D.Epsilon * Collision2D.Epsilon)
             {
                 float distSq = Vector2.DistanceSquared(Start, circle.Center);
-                if (distSq < circle.Radius * circle.Radius)
+                if (distSq <= circle.Radius * circle.Radius)
                 {
                     tSegmentMin = tSegmentMax = 0.0f;
                     return true;
@@ -664,30 +521,22 @@ namespace Microsoft.Xna.Framework
                 return false;
             }
 
-            float segmentLength = MathF.Sqrt(segmentLenSq);
-            Ray2D ray = new Ray2D(Start, direction / segmentLength);
-
-            float? tRayMin;
-            float? tRayMax;
-            if (ray.Intersects(circle, out tRayMin, out tRayMax))
+            if (!Collision2D.RayCircleIntersectionInterval(Start, d, circle.Center, circle.Radius, out float tMin, out float tMax))
             {
-                float tMin = tRayMin.Value / segmentLength;
-                float tMax = tRayMax.Value / segmentLength;
-
-                if (tMax < 0.0f || tMin > 1.0f)
-                {
-                    tSegmentMin = tSegmentMax = null;
-                    return false;
-                }
-
-                tSegmentMin = MathF.Max(0.0f, tMin);
-                tSegmentMax = MathF.Min(1.0f, tMax);
-                return true;
+                tSegmentMin = tSegmentMax = null;
+                return false;
             }
 
-            tSegmentMin = null;
-            tSegmentMax = null;
-            return false;
+            // Clip ray interval to segment interval [0,1]
+            if (!Collision2D.ClipInterval(tMin, tMax, 0.0f, 1.0f, out float enter, out float exit))
+            {
+                tSegmentMin = tSegmentMax = null;
+                return false;
+            }
+
+            tSegmentMin = enter;
+            tSegmentMax = exit;
+            return true;
         }
 
         /// <summary>
@@ -745,18 +594,16 @@ namespace Microsoft.Xna.Framework
             // Derived from Section 5.1.9 "Closest Points of Two Line Segments"
             // and Section 5.3.7 "Intersecting Ray or Segment Against Cylinder"
 
-            const float Epsilon = 1e-6f;
+            Vector2 d = Direction;
+            float dd = Vector2.Dot(d, d);
+            float radiusSq = capsule.Radius * capsule.Radius;
 
-            Vector2 segmentDir = Direction;
-            float segmentLengthSq = segmentDir.LengthSquared();
-
-            // Handle degenerate segment (zero length)
-            if (segmentLengthSq < Epsilon * Epsilon)
+            // Check for degenerate segment
+            if (dd <= Collision2D.Epsilon * Collision2D.Epsilon)
             {
-                LineSegment2D capsuleSegment = new LineSegment2D(capsule.PointA, capsule.PointB);
-                float distSq = capsuleSegment.DistanceSquaredToPoint(Start);
-
-                if (distSq <= capsule.Radius * capsule.Radius)
+                // Segment is degenerate, treat as point
+                float distSq = Collision2D.DistanceSquaredPointSegment(Start, capsule.PointA, capsule.PointB, out _, out _);
+                if (distSq <= radiusSq)
                 {
                     tMin = tMax = 0.0f;
                     return true;
@@ -766,79 +613,21 @@ namespace Microsoft.Xna.Framework
                 return false;
             }
 
-            // Handle degenerate capsule segment (circle)
-            float capsuleLengthSq = capsule.Length * capsule.Length;
-            if (capsuleLengthSq < Epsilon * Epsilon)
-            {
-                // Capsule is just a circle at PointA
-                BoundingCircle circle = new BoundingCircle(capsule.PointA, capsule.Radius);
-                float segmentLength = MathF.Sqrt(segmentLengthSq);
-                Ray2D ray = new Ray2D(Start, segmentDir / segmentLength);
-
-                float? rayTMin;
-                float? rayTMax;
-                if (!ray.Intersects(circle, out rayTMin, out rayTMax))
-                {
-                    tMin = tMax = null;
-                    return false;
-                }
-
-                // Convert ray t values to segment t values
-                float segmentTMin = rayTMin.Value / segmentLength;
-                float segmentTMax = rayTMax.Value / segmentLength;
-
-                // Check if intersection overlaps with segment bounds [0, 1]
-                if (segmentTMax < 0.0f || segmentTMin > 1.0f)
-                {
-                    tMin = tMax = null;
-                    return false;
-                }
-
-                tMin = MathF.Max(0.0f, segmentTMin);
-                tMax = MathF.Min(1.0f, segmentTMax);
-                return true;
-            }
-
-            // General case: use segment-segment distance
-            LineSegment2D capsuleSegment2 = new LineSegment2D(capsule.PointA, capsule.PointB);
-            float distSqBetweenSegments = DistanceSquaredToSegment(capsuleSegment2, out _, out _, out _, out _);
-
-            float radiusSq = capsule.Radius * capsule.Radius;
-
-            // Quick rejection if segments are too far apart
-            if (distSqBetweenSegments > radiusSq)
+            // Get intersection interval against the infinite parametric line P(t)=Start + t * d
+            if (!Collision2D.RayCapsuleIntersectionInterval(Start, d, capsule.PointA, capsule.PointB, capsule.Radius, out float t0, out float t1))
             {
                 tMin = tMax = null;
                 return false;
             }
 
-            // Segments are close enough, solve for intersection points.
-            // Cast the segment as a ray and use ray-capsule intersection
-            float segmentLength2 = MathF.Sqrt(segmentLengthSq);
-            Ray2D ray2 = new Ray2D(Start, segmentDir / segmentLength2);
-
-            float? rayTMin2;
-            float? rayTMax2;
-            if (!ray2.Intersects(capsule, out rayTMin2, out rayTMax2))
+            if (!Collision2D.ClipInterval(t0, t1, 0.0f, 1.0f, out float enter, out float exit))
             {
                 tMin = tMax = null;
                 return false;
             }
 
-            // Convert ray t values to segment t values
-            float segmentTMin2 = rayTMin2.Value / segmentLength2;
-            float segmentTMax2 = rayTMax2.Value / segmentLength2;
-
-            // Check if intersection overlaps with segment bounds [0, 1]
-            if (segmentTMax2 < 0.0f || segmentTMin2 > 1.0f)
-            {
-                tMin = tMax = null;
-                return false;
-            }
-
-            // Clamp to segment bounds
-            tMin = MathF.Max(0.0f, segmentTMin2);
-            tMax = MathF.Min(1.0f, segmentTMax2);
+            tMin = enter;
+            tMax = exit;
             return true;
         }
 
@@ -881,24 +670,19 @@ namespace Microsoft.Xna.Framework
             // Parametric intersection of a segment with an oriented box
             // Derived from Section 5.3.3 "Intersecting Ray or Segment Against Box"
 
-            const float Epsilon = 1e-6f;
+            Vector2 d = Direction;
+            float dd = Vector2.Dot(d, d);
+            Vector2 diff = Start - obb.Center;
 
-            Vector2 direction = Direction;
-            float segmentLengthSq = direction.LengthSquared();
-
-            // Handle degenerate segment (zero length)
-            if (segmentLengthSq < Epsilon * Epsilon)
+            // Check for degenerate segment (zero length)
+            if (dd <= Collision2D.Epsilon * Collision2D.Epsilon)
             {
-                // Transform point to OBB local space
-                Vector2 diff = Start - obb.Center;
-                Vector2 localPoint = new Vector2(
-                    Vector2.Dot(diff, obb.AxisX),
-                    Vector2.Dot(diff, obb.AxisY)
-                );
+                // Segment is degenerate, treat it as a point
+                float x = Vector2.Dot(diff, obb.AxisX);
+                float y = Vector2.Dot(diff, obb.AxisY);
 
-                // Check if point is inside the local aabb
-                bool inside = MathF.Abs(localPoint.X) <= obb.HalfExtents.X &&
-                              MathF.Abs(localPoint.Y) <= obb.HalfExtents.Y;
+                bool inside = MathF.Abs(x) <= obb.HalfExtents.X &&
+                              MathF.Abs(y) <= obb.HalfExtents.Y;
 
                 if (inside)
                 {
@@ -910,29 +694,30 @@ namespace Microsoft.Xna.Framework
                 return false;
             }
 
-            float segmentLength = MathF.Sqrt(segmentLengthSq);
-            Ray2D ray = new Ray2D(Start, direction / segmentLength);
+            // Transform segment start and direction into OBB local space
+            Vector2 localOrigin = new Vector2(
+                Vector2.Dot(diff, obb.AxisX),
+                Vector2.Dot(diff, obb.AxisY)
+            );
 
-            float? rayTMin;
-            float? rayTMax;
-            if (ray.Intersects(obb, out rayTMin, out rayTMax))
+            Vector2 localDirection = new Vector2(
+                Vector2.Dot(d, obb.AxisX),
+                Vector2.Dot(d, obb.AxisY)
+            );
+
+            // Intersect the parametric line:
+            // P(T) = localOrigin + t * localDirection
+            // with local AABB [-halfExtent, +halfExtent]
+            if (!Collision2D.ClipLineToAabb(localOrigin, localDirection, -obb.HalfExtents, obb.HalfExtents, 0.0f, 1.0f, out float enter, out float exit))
             {
-                float segmentTMin = rayTMin.Value / segmentLength;
-                float segmentTMax = rayTMax.Value / segmentLength;
-
-                if (segmentTMax < 0.0f || segmentTMin > 1.0f)
-                {
-                    tMin = tMax = null;
-                    return false;
-                }
-
-                tMin = MathF.Max(0.0f, segmentTMin);
-                tMax = MathF.Min(1.0f, segmentTMax);
-                return true;
+                tMin = tMax = null;
+                return false;
             }
 
-            tMin = tMax = null;
-            return false;
+
+            tMin = enter;
+            tMax = exit;
+            return true;
         }
 
         /// <summary>
@@ -974,26 +759,13 @@ namespace Microsoft.Xna.Framework
         /// </remarks>
         public readonly bool Intersects(BoundingPolygon2D polygon, out float? tMin, out float? tMax, out Vector2? point)
         {
-            // C. Ericson, Real-Time Collision Detection, Morgan Kaufmann, 2005
-            // Section 5.3.8 "Intersecting Ray or Segment Against Convex Polyhedron"
+            Vector2 d = Direction;
+            float dd = Vector2.Dot(d, d);
 
-            const float Epsilon = 1e-6f;
-
-            // Handle degenerate polygon
-            if (polygon.Vertices == null || polygon.Vertices.Length == 0)
+            // Check for degenerate segment
+            if (dd <= Collision2D.Epsilon * Collision2D.Epsilon)
             {
-                tMin = tMax = null;
-                point = null;
-                return false;
-            }
-
-            Vector2 segmentDir = Direction;
-            float segmentLengthSq = segmentDir.LengthSquared();
-
-            // Handle degenerate segment (point)
-            if (segmentLengthSq < Epsilon * Epsilon)
-            {
-                // Check if point (segment start) is inside the polygon
+                // Segment is degenerate, treat as point
                 if (polygon.Contains(Start) == ContainmentType.Contains)
                 {
                     tMin = tMax = 0.0f;
@@ -1006,84 +778,17 @@ namespace Microsoft.Xna.Framework
                 return false;
             }
 
-            // Initialize interval to entire segment [0, 1]
-            float currentTMin = 0.0f;
-            float currentTMax = 1.0f;
-
-            int n = polygon.Vertices.Length;
-
-            // Clip segment against each edge (half-space) of the polygon
-            for (int i = 0; i < n; i++)
-            {
-                Vector2 edgeStart = polygon.Vertices[i];
-                Vector2 edgeNormal = polygon.Normals[i];
-
-                // Compute distance from segment origin to the edge plane
-                float planeD = Vector2.Dot(edgeNormal, edgeStart);
-                float dist = planeD - Vector2.Dot(edgeNormal, Start);
-
-                // Compute denominator (how aligned segment direction is with edge normal)
-                float denom = Vector2.Dot(edgeNormal, segmentDir);
-
-                // Handle segment parallel to edge
-                if (MathF.Abs(denom) < Epsilon)
-                {
-                    // Segment is parallel to edge
-                    // If segment start is outside the half-space, no intersection
-                    if (dist > Epsilon)
-                    {
-                        tMin = tMax = null;
-                        point = null;
-                        return false;
-                    }
-
-                    // Segment is inside this half-space, continue to next edge
-                    continue;
-                }
-
-                // Compute intersection parameter t with the edge plane
-                float t = dist / denom;
-
-                if (denom < 0.0f)
-                {
-                    // Segment is exiting the half-space
-                    if (t < currentTMax)
-                    {
-                        currentTMax = t;
-                    }
-                }
-                else
-                {
-                    // Segment is entering the half-space
-                    if (t > currentTMin)
-                    {
-                        currentTMin = t;
-                    }
-                }
-
-                // Early exit if interval becomes invalid
-                if (currentTMin > currentTMax)
-                {
-                    tMin = tMax = null;
-                    point = null;
-                    return false;
-                }
-            }
-
-            // Check if intersection overlaps with segment bounds [0, 1]
-            if (currentTMax < 0.0f || currentTMin > 1.0f)
+            // Clip the segment's parametric line against the polygon
+            if (!Collision2D.ClipLineToConvexPolygon(Start, d, polygon.Vertices, polygon.Normals, 0.0f, 1.0f, out float t0, out float t1))
             {
                 tMin = tMax = null;
                 point = null;
                 return false;
             }
 
-            // Clamp to segment bounds
-            tMin = MathF.Max(currentTMin, 0.0f);
-            tMax = MathF.Min(currentTMax, 1.0f);
-
-            // Compute intersection point
-            point = Start + segmentDir * tMin.Value;
+            tMin = t0;
+            tMax = t1;
+            point = Start + d * t0;
             return true;
         }
 

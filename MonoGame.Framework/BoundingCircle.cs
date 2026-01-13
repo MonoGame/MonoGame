@@ -232,8 +232,6 @@ namespace Microsoft.Xna.Framework
             // C. Ericson, Real-Time Collision Detection, Morgan Kaufmann, 2005
             // Section 6.5.2 "Merging Two Spheres" (2D circle adaptation)
 
-            const float Epsilon = 1e-6f;
-
             // Calculate distance between centers
             Vector2 centerDiff = additional.Center - original.Center;
             float distSq = centerDiff.X * centerDiff.X + centerDiff.Y * centerDiff.Y;
@@ -259,7 +257,7 @@ namespace Microsoft.Xna.Framework
 
             // Calculate the center by adjusting original center toward additional center
             Vector2 center = original.Center;
-            if (dist > Epsilon)
+            if (dist > Collision2D.Epsilon)
             {
                 center += ((radius - original.Radius) / dist) * centerDiff;
             }
@@ -268,30 +266,16 @@ namespace Microsoft.Xna.Framework
         }
 
         /// <summary>
-        /// Tests whether this circle contains, intersects, or is separate from another circle.
+        /// Tests whether a point lies inside this circle or on its boundary.
         /// </summary>
-        /// <param name="circle">The other circle to test against.</param>
+        /// <param name="point">The point to test in 2D space.</param>
         /// <returns>
-        /// <see cref="ContainmentType.Contains"/> if the other circle is completely inside this one;
-        /// <see cref="ContainmentType.Intersects"/> if they partially overlap;
-        /// or <see cref="ContainmentType.Disjoint"/> if they do not touch.
+        /// <see cref="ContainmentType.Contains"/> if the point is inside or on the boundary;
+        /// otherwise, <see cref="ContainmentType.Disjoint"/> if the point is outside.
         /// </returns>
-        public readonly ContainmentType Contains(BoundingCircle circle)
+        public readonly ContainmentType Contains(Vector2 point)
         {
-            float sqDistance = Vector2.DistanceSquared(circle.Center, Center);
-
-            if (sqDistance > (circle.Radius + Radius) * (circle.Radius + Radius))
-            {
-                return ContainmentType.Disjoint;
-            }
-            else if (sqDistance <= (Radius - circle.Radius) * (Radius - circle.Radius))
-            {
-                return ContainmentType.Contains;
-            }
-            else
-            {
-                return ContainmentType.Intersects;
-            }
+            return Collision2D.ContainsCirclePoint(point, Center, Radius);
         }
 
         /// <summary>
@@ -305,85 +289,75 @@ namespace Microsoft.Xna.Framework
         /// </returns>
         public readonly ContainmentType Contains(BoundingBox2D box)
         {
-            // Check if all corners of the box are inside the circle
-            bool inside = true;
-            Vector2[] corners = box.GetCorners();
-
-            foreach (Vector2 corner in corners)
-            {
-                if (Contains(corner) == ContainmentType.Disjoint)
-                {
-                    inside = false;
-                    break;
-                }
-            }
-
-            if (inside)
-            {
-                return ContainmentType.Contains;
-            }
-
-            // Check if the distance from circle center to box is less than radius
-            float dMin = 0;
-
-            if (Center.X < box.Min.X)
-            {
-                dMin += (Center.X - box.Min.X) * (Center.X - box.Min.X);
-            }
-            else if (Center.X > box.Max.X)
-            {
-                dMin += (Center.X - box.Max.X) * (Center.X - box.Max.X);
-            }
-
-            if (Center.Y < box.Min.Y)
-            {
-                dMin += (Center.Y - box.Min.Y) * (Center.Y - box.Min.Y);
-            }
-            else if (Center.Y > box.Max.Y)
-            {
-                dMin += (Center.Y - box.Max.Y) * (Center.Y - box.Max.Y);
-            }
-
-            if (dMin <= Radius * Radius)
-            {
-                return ContainmentType.Intersects;
-            }
-
-            // Otherwise disjoint
-            return ContainmentType.Disjoint;
+            return Collision2D.ContainsCircleAabb(Center, Radius, box.Min, box.Max);
         }
 
         /// <summary>
-        /// Tests whether a point lies inside this circle or on its boundary.
+        /// Tests whether this circle contains, intersects, or is separate from another circle.
         /// </summary>
-        /// <param name="point">The point to test in 2D space.</param>
+        /// <param name="other">The other circle to test against.</param>
         /// <returns>
-        /// <see cref="ContainmentType.Contains"/> if the point is inside or on the boundary;
-        /// otherwise, <see cref="ContainmentType.Disjoint"/> if the point is outside.
+        /// <see cref="ContainmentType.Contains"/> if the other circle is completely inside this one;
+        /// <see cref="ContainmentType.Intersects"/> if they partially overlap;
+        /// or <see cref="ContainmentType.Disjoint"/> if they do not touch.
         /// </returns>
-        public readonly ContainmentType Contains(Vector2 point)
+        public readonly ContainmentType Contains(BoundingCircle other)
         {
-            float sqDistance = Vector2.DistanceSquared(point, Center);
+            return Collision2D.ContainsCircleCircle(Center, Radius, other.Center, other.Radius);
+        }
 
-            if (sqDistance > Radius * Radius)
-            {
-                return ContainmentType.Disjoint;
-            }
+        /// <summary>
+        /// Tests whether this circle contains, intersects, or is separate from an oriented bounding box
+        /// </summary>
+        /// <param name="obb">The oriented bounding box to test against.</param>
+        /// <returns>
+        /// <see cref="ContainmentType.Contains"/> if the oriented bounding box is completely inside this circle;
+        /// <see cref="ContainmentType.Intersects"/> if they partially overlap;
+        /// or <see cref="ContainmentType.Disjoint"/> if they do not touch.
+        /// </returns>
+        public readonly ContainmentType Contains(OrientedBoundingBox2D obb)
+        {
+            return Collision2D.ContainsCircleObb(Center, Radius, obb.Center, obb.AxisX, obb.AxisY, obb.HalfExtents);
+        }
 
-            return ContainmentType.Contains;
+        /// <summary>
+        /// Tests whether this circle contains, intersects, or is separate from a capsule.
+        /// </summary>
+        /// <param name="capsule">The capsule to test against.</param>
+        /// <returns>
+        /// <see cref="ContainmentType.Contains"/> if the capsule is completely inside this circle;
+        /// <see cref="ContainmentType.Intersects"/> if they partially overlap;
+        /// or <see cref="ContainmentType.Disjoint"/> if they do not touch.
+        /// </returns>
+        public readonly ContainmentType Contains(BoundingCapsule2D capsule)
+        {
+            return Collision2D.ContainsCircleCapsule(Center, Radius, capsule.PointA, capsule.PointB, capsule.Radius);
+        }
+
+        /// <summary>
+        /// Tests whether this circle contains, intersects, or is separate from a polygon.
+        /// </summary>
+        /// <param name="polygon">The capsule to test against.</param>
+        /// <returns>
+        /// <see cref="ContainmentType.Contains"/> if the polygon is completely inside this circle;
+        /// <see cref="ContainmentType.Intersects"/> if they partially overlap;
+        /// or <see cref="ContainmentType.Disjoint"/> if they do not touch.
+        /// </returns>
+        public readonly ContainmentType Contains(BoundingPolygon2D polygon)
+        {
+            return Collision2D.ContainsCircleConvexPolygon(Center, Radius, polygon.Vertices, polygon.Normals);
         }
 
         /// <summary>
         /// Tests whether this circle intersects with another circle.
         /// </summary>
-        /// <param name="circle">The other circle to test against.</param>
+        /// <param name="other">The other circle to test against.</param>
         /// <returns>
         /// <see langword="true"/> if the circles overlap or touch; otherwise, <see langword="false"/>.
         /// </returns>
-        public readonly bool Intersects(BoundingCircle circle)
+        public readonly bool Intersects(BoundingCircle other)
         {
-            float sqDist = Vector2.DistanceSquared(circle.Center, Center);
-            return sqDist <= (circle.Radius + Radius) * (circle.Radius + Radius);
+            return Collision2D.IntersectsCircleCircle(Center, Radius, other.Center, other.Radius);
         }
 
         /// <summary>
@@ -395,20 +369,7 @@ namespace Microsoft.Xna.Framework
         /// </returns>
         public readonly bool Intersects(BoundingBox2D box)
         {
-            // C. Ericson, Real-Time Collision Detection, Morgan Kaufmann, 2005
-            // Section 5.1.3 "Closest Point on AABB to Point"
-
-            // Find the closest point on the box to the circle center
-            float closestX = MathHelper.Clamp(Center.X, box.Min.X, box.Max.X);
-            float closestY = MathHelper.Clamp(Center.Y, box.Min.Y, box.Max.Y);
-
-            // Calculate squared distance from circle center to closest point.
-            float dx = Center.X - closestX;
-            float dy = Center.Y - closestY;
-            float distSquared = dx * dx + dy * dy;
-
-            // Circle intersects if distance to closest point is less than radius
-            return distSquared <= Radius * Radius;
+            return Collision2D.IntersectsCircleAabb(Center, Radius, box.Min, box.Max);
         }
 
         /// <summary>
@@ -420,9 +381,7 @@ namespace Microsoft.Xna.Framework
         /// </returns>
         public readonly bool Intersects(BoundingCapsule2D capsule)
         {
-            LineSegment2D segment = new LineSegment2D(capsule.PointA, capsule.PointB);
-            float distance = segment.DistanceToPoint(Center);
-            return distance <= capsule.Radius + Radius;
+            return Collision2D.IntersectsCircleCapsule(Center, Radius, capsule.PointA, capsule.PointB, capsule.Radius);
         }
 
         /// <summary>
@@ -434,25 +393,7 @@ namespace Microsoft.Xna.Framework
         /// </returns>
         public readonly bool Intersects(OrientedBoundingBox2D obb)
         {
-            // C. Ericson, Real-Time Collision Detection, Morgan Kaufmann, 2005
-            // Section 5.1.4 "Closest Point on OBB to Point"
-
-            // Transform the circle center to OBB local space
-            Vector2 diff = Center - obb.Center;
-            float projX = Vector2.Dot(diff, obb.AxisX);
-            float projY = Vector2.Dot(diff, obb.AxisY);
-            Vector2 localCenter = new Vector2(projX, projY);
-
-            // Find closest point on rectangle (in local space) to circle center
-            float closestX = Math.Clamp(localCenter.X, -obb.HalfExtents.X, obb.HalfExtents.X);
-            float closestY = Math.Clamp(localCenter.Y, -obb.HalfExtents.Y, obb.HalfExtents.Y);
-
-            // Calculate squared distances
-            float dx = localCenter.X - closestX;
-            float dy = localCenter.Y - closestY;
-            float distSq = dx * dx + dy * dy;
-
-            return distSq <= Radius * Radius;
+            return Collision2D.IntersectsCircleObb(Center, Radius, obb.Center, obb.AxisX, obb.AxisY, obb.HalfExtents);
         }
 
         /// <summary>
@@ -464,29 +405,7 @@ namespace Microsoft.Xna.Framework
         /// </returns>
         public readonly bool Intersects(BoundingPolygon2D polygon)
         {
-            if (polygon.Vertices == null || polygon.Vertices.Length < 3)
-            {
-                return false;
-            }
-
-            // Check if circle center is inside polygon
-            if (polygon.Contains(Center) == ContainmentType.Contains)
-            {
-                return true;
-            }
-
-            // Find closest point on polygon to the center of the circle
-            float minDistSq = float.MaxValue;
-            int n = polygon.Vertices.Length;
-            for (int i = 0; i < n; i++)
-            {
-                int j = (i + 1) % n;
-                LineSegment2D edge = new LineSegment2D(polygon.Vertices[i], polygon.Vertices[j]);
-                float distSq = edge.DistanceSquaredToPoint(Center);
-                minDistSq = MathF.Min(minDistSq, distSq);
-            }
-
-            return minDistSq <= Radius * Radius;
+            return Collision2D.IntersectsCircleConvexPolygon(Center, Radius, polygon.Vertices, polygon.Normals);
         }
 
         /// <summary>

@@ -181,7 +181,6 @@ namespace Microsoft.Xna.Framework
             // Derived PCA-based OBB merge using power iteration in place of the
             // Jacobi eigenvalue method described in the book.
 
-            const float Epsilon = 1e-6f;
             const int Iterations = 4;
 
             // Get all corners from both rectangles
@@ -234,7 +233,7 @@ namespace Microsoft.Xna.Framework
 
                 // Only sqrt if necessary
                 float lenSq = axisX.LengthSquared();
-                if (lenSq > Epsilon * Epsilon)
+                if (lenSq > Collision2D.Epsilon * Collision2D.Epsilon)
                 {
                     axisX /= MathF.Sqrt(lenSq);
                 }
@@ -339,42 +338,30 @@ namespace Microsoft.Xna.Framework
         }
 
         /// <summary>
-        /// Tests whether this oriented bounding box contains, intersects, or is separate from another oriented bounding box.
+        /// Tests whether a point lies inside this oriented bounding box or on its boundary.
         /// </summary>
-        /// <param name="other">The other oriented bounding box to test against.</param>
+        /// <param name="point">The point to test in 2D space.</param>
         /// <returns>
-        /// <see cref="ContainmentType.Contains"/> if the other box is completely inside this one;
+        /// <see cref="ContainmentType.Contains"/> if the point is inside or on the boundary;
+        /// otherwise, <see cref="ContainmentType.Disjoint"/> if the point is outside.
+        /// </returns>
+        public readonly ContainmentType Contains(Vector2 point)
+        {
+            return Collision2D.ContainsObbPoint(point, Center, AxisX, AxisY, HalfExtents);
+        }
+
+        /// <summary>
+        /// Tests whether this oriented bounding box contains, intersects, or is separate from a bounding box.
+        /// </summary>
+        /// <param name="aabb">The bounding box to test against.</param>
+        /// <returns>
+        /// <see cref="ContainmentType.Contains"/> if the bounding box is completely inside this box;
         /// <see cref="ContainmentType.Intersects"/> if they partially overlap;
         /// or <see cref="ContainmentType.Disjoint"/> if they do not touch.
         /// </returns>
-        public readonly ContainmentType Contains(OrientedBoundingBox2D other)
+        public readonly ContainmentType Contains(BoundingBox2D aabb)
         {
-            // Use Separating Axis Theorem to test containment
-            // If all corners of the other OBB are inside this OBB, it's contained
-            Vector2[] corners = other.GetCorners();
-            bool allInside = true;
-
-            for (int i = 0; i < corners.Length; i++)
-            {
-                if (Contains(corners[i]) != ContainmentType.Contains)
-                {
-                    allInside = false;
-                    break;
-                }
-            }
-
-            if (allInside)
-            {
-                return ContainmentType.Contains;
-            }
-
-            // Check for intersection
-            if (Intersects(other))
-            {
-                return ContainmentType.Intersects;
-            }
-
-            return ContainmentType.Disjoint;
+            return Collision2D.ContainsObbAabb(Center, AxisX, AxisY, HalfExtents, aabb.Min, aabb.Max);
         }
 
         /// <summary>
@@ -388,51 +375,49 @@ namespace Microsoft.Xna.Framework
         /// </returns>
         public readonly ContainmentType Contains(BoundingCircle circle)
         {
-            //Transform circle center to OBB local space
-            Vector2 diff = circle.Center - Center;
-            Vector2 localCenter = new Vector2(
-                Vector2.Dot(diff, AxisX),
-                Vector2.Dot(diff, AxisY)
-            );
-
-            // Check if circle (as an AABB in local space) is fully inside
-            if (MathF.Abs(localCenter.X) + circle.Radius <= HalfExtents.X &&
-               MathF.Abs(localCenter.Y) + circle.Radius <= HalfExtents.Y)
-            {
-                return ContainmentType.Contains;
-            }
-
-            // Check for intersection
-            if (Intersects(circle))
-            {
-                return ContainmentType.Intersects;
-            }
-
-            return ContainmentType.Disjoint;
+            return Collision2D.ContainsObbCircle(Center, AxisX, AxisY, HalfExtents, circle.Center, circle.Radius);
         }
 
         /// <summary>
-        /// Tests whether a point lies inside this oriented bounding box or on its boundary.
+        /// Tests whether this oriented bounding box contains, intersects, or is separate from another oriented bounding box.
         /// </summary>
-        /// <param name="point">The point to test in 2D space.</param>
+        /// <param name="other">The other oriented bounding box to test against.</param>
         /// <returns>
-        /// <see cref="ContainmentType.Contains"/> if the point is inside or on the boundary;
-        /// otherwise, <see cref="ContainmentType.Disjoint"/> if the point is outside.
+        /// <see cref="ContainmentType.Contains"/> if the other box is completely inside this one;
+        /// <see cref="ContainmentType.Intersects"/> if they partially overlap;
+        /// or <see cref="ContainmentType.Disjoint"/> if they do not touch.
         /// </returns>
-        public readonly ContainmentType Contains(Vector2 point)
+        public readonly ContainmentType Contains(OrientedBoundingBox2D other)
         {
-            // Transform point to OBB local space
-            Vector2 diff = point - Center;
-            float projX = Vector2.Dot(diff, AxisX);
-            float projY = Vector2.Dot(diff, AxisY);
+            return Collision2D.ContainsObbObb(Center, AxisX, AxisY, HalfExtents, other.Center, other.AxisX, other.AxisY, other.HalfExtents);
+        }
 
-            // Check if within extents
-            if (MathF.Abs(projX) <= HalfExtents.X && MathF.Abs(projY) <= HalfExtents.Y)
-            {
-                return ContainmentType.Contains;
-            }
+        /// <summary>
+        /// Tests whether this oriented bounding box contains, intersects, or is separate from a capsule.
+        /// </summary>
+        /// <param name="capsule">The capsule to test against.</param>
+        /// <returns>
+        /// <see cref="ContainmentType.Contains"/> if the capsule is completely inside this box;
+        /// <see cref="ContainmentType.Intersects"/> if they partially overlap;
+        /// or <see cref="ContainmentType.Disjoint"/> if they do not touch.
+        /// </returns>
+        public readonly ContainmentType Contains(BoundingCapsule2D capsule)
+        {
+            return Collision2D.ContainsObbCapsule(Center, AxisX, AxisY, HalfExtents, capsule.PointA, capsule.PointB, capsule.Radius);
+        }
 
-            return ContainmentType.Disjoint;
+        /// <summary>
+        /// Tests whether this oriented bounding box contains, intersects, or is separate from a polygon.
+        /// </summary>
+        /// <param name="polygon">The polygon to test against.</param>
+        /// <returns>
+        /// <see cref="ContainmentType.Contains"/> if the polygon is completely inside this box;
+        /// <see cref="ContainmentType.Intersects"/> if they partially overlap;
+        /// or <see cref="ContainmentType.Disjoint"/> if they do not touch.
+        /// </returns>
+        public readonly ContainmentType Contains(BoundingPolygon2D polygon)
+        {
+            return Collision2D.ContainsObbConvexPolygon(Center, AxisX, AxisY, HalfExtents, polygon.Vertices, polygon.Normals);
         }
 
         /// <summary>
@@ -444,7 +429,7 @@ namespace Microsoft.Xna.Framework
         /// </returns>
         public readonly bool Intersects(BoundingCircle circle)
         {
-            return circle.Intersects(this);
+            return Collision2D.IntersectsCircleObb(circle.Center, circle.Radius, Center, AxisX, AxisY, HalfExtents);
         }
 
         /// <summary>
@@ -456,30 +441,7 @@ namespace Microsoft.Xna.Framework
         /// </returns>
         public readonly bool Intersects(OrientedBoundingBox2D other)
         {
-            // C. Ericson, Real-Time Collision Detection, Morgan Kaufmann, 2005
-            // Section 5.2.1 "Separating-axis Test", Section 4.4 "Oriented Bounding Boxes"
-
-            if (!OverlapOnAxis(this, other, AxisX))
-            {
-                return false;
-            }
-
-            if (!OverlapOnAxis(this, other, AxisY))
-            {
-                return false;
-            }
-
-            if (!OverlapOnAxis(this, other, other.AxisX))
-            {
-                return false;
-            }
-
-            if (!OverlapOnAxis(this, other, other.AxisY))
-            {
-                return false;
-            }
-
-            return true;
+            return Collision2D.IntersectsObbObb(Center, AxisX, AxisY, HalfExtents, other.Center, other.AxisX, other.AxisY, other.HalfExtents);
         }
 
         /// <summary>
@@ -491,7 +453,7 @@ namespace Microsoft.Xna.Framework
         /// </returns>
         public readonly bool Intersects(BoundingBox2D box)
         {
-            return box.Intersects(this);
+            return Collision2D.IntersectsAabbObb(box.Center, box.HalfExtents, Center, AxisX, AxisY, HalfExtents);
         }
 
         /// <summary>
@@ -503,71 +465,7 @@ namespace Microsoft.Xna.Framework
         /// </returns>
         public readonly bool Intersects(BoundingCapsule2D capsule)
         {
-            // C. Ericson, Real-Time Collision Detection, Morgan Kaufmann, 2005
-            // OBB-Capsule test: Find minimum distance between OBB and capsule segment
-            // If distance <= capsule radius, they intersect
-
-            float radiusSq = capsule.Radius * capsule.Radius;
-
-            // Transform capsule segment into OBB local space
-            Vector2 a = capsule.PointA - Center;
-            Vector2 b = capsule.PointB - Center;
-
-            Vector2 localA = new Vector2(
-                Vector2.Dot(a, AxisX),
-                Vector2.Dot(a, AxisY));
-
-            Vector2 localB = new Vector2(
-                Vector2.Dot(b, AxisX),
-                Vector2.Dot(b, AxisY));
-
-            // Check if either capsule endpoint is inside the OBB
-            bool aInside = localA.X >= -HalfExtents.X && localA.X <= HalfExtents.X &&
-                           localA.Y >= -HalfExtents.Y && localA.Y <= HalfExtents.Y;
-
-            bool bInside = localB.X >= -HalfExtents.X && localB.X <= HalfExtents.X &&
-                           localB.Y >= -HalfExtents.Y && localB.Y <= HalfExtents.Y;
-
-            if (aInside || bInside)
-                return true;
-
-            // Create a LineSegment2D for the capsule in local space
-            LineSegment2D capsuleSegment = new LineSegment2D(localA, localB);
-
-            // Check if any OBB corner is within capsule radius of the segment
-            Vector2[] corners = new Vector2[]
-            {
-                new Vector2(-HalfExtents.X, -HalfExtents.Y),
-                new Vector2(HalfExtents.X, -HalfExtents.Y),
-                new Vector2(HalfExtents.X, HalfExtents.Y),
-                new Vector2(-HalfExtents.X, HalfExtents.Y)
-            };
-
-            for (int i = 0; i < 4; i++)
-            {
-                float distSq = capsuleSegment.DistanceSquaredToPoint(corners[i]);
-                if (distSq <= radiusSq)
-                    return true;
-            }
-
-            // Check distance from capsule segment to each OBB edge
-            Vector2[][] edges = new Vector2[][]
-            {
-                new Vector2[] { corners[0], corners[1] }, // Top edge
-                new Vector2[] { corners[1], corners[2] }, // Right edge
-                new Vector2[] { corners[2], corners[3] }, // Bottom edge
-                new Vector2[] { corners[3], corners[0] }  // Left edge
-            };
-
-            for (int i = 0; i < 4; i++)
-            {
-                LineSegment2D edge = new LineSegment2D(edges[i][0], edges[i][1]);
-                float distSq = capsuleSegment.DistanceSquaredToSegment(edge, out _, out _, out _, out _);
-                if (distSq <= radiusSq)
-                    return true;
-            }
-
-            return false;
+            return Collision2D.IntersectsObbCapsule(Center, AxisX, AxisY, HalfExtents, capsule.PointA, capsule.PointB, capsule.Radius);
         }
 
         /// <summary>
@@ -579,7 +477,7 @@ namespace Microsoft.Xna.Framework
         /// </returns>
         public readonly bool Intersects(BoundingPolygon2D polygon)
         {
-            return polygon.Intersects(this);
+            return Collision2D.IntersectsObbConvexPolygon(Center, AxisX, AxisY, HalfExtents, polygon.Vertices, polygon.Normals);
         }
 
         /// <summary>
@@ -597,8 +495,6 @@ namespace Microsoft.Xna.Framework
         /// </remarks>
         public readonly OrientedBoundingBox2D Transform(Matrix matrix)
         {
-            const float Epsilon = 1e-6f;
-
             Vector2 transformedCenter = Vector2.Transform(Center, matrix);
 
             // Transform the axes (rotation and scale)
@@ -610,8 +506,8 @@ namespace Microsoft.Xna.Framework
             float scaleY = transformedAxisY.Length();
 
             // Normalize axes
-            transformedAxisX = scaleX > Epsilon ? transformedAxisX / scaleX : Vector2.UnitX;
-            transformedAxisY = scaleY > Epsilon ? transformedAxisY / scaleY : Vector2.UnitY;
+            transformedAxisX = scaleX > Collision2D.Epsilon ? transformedAxisX / scaleX : Vector2.UnitX;
+            transformedAxisY = scaleY > Collision2D.Epsilon ? transformedAxisY / scaleY : Vector2.UnitY;
 
             // Scale the extents
             Vector2 transformedExtents = new Vector2(
@@ -698,35 +594,6 @@ namespace Microsoft.Xna.Framework
         public static bool operator !=(OrientedBoundingBox2D left, OrientedBoundingBox2D right)
         {
             return !left.Equals(right);
-        }
-
-        #endregion
-
-        #region Separating Axis Theorem Helper Methods
-
-        private static bool OverlapOnAxis(OrientedBoundingBox2D obb1, OrientedBoundingBox2D obb2, Vector2 axis)
-        {
-            // Project both OBBs onto the axis and check for overlap
-            float min1, max1, min2, max2;
-
-            ProjectOntoAxis(obb1, axis, out min1, out max1);
-            ProjectOntoAxis(obb2, axis, out min2, out max2);
-
-            // Check if intervals overlap
-            return !(max1 < min2 || max2 < min1);
-        }
-
-        private static void ProjectOntoAxis(OrientedBoundingBox2D obb, Vector2 axis, out float min, out float max)
-        {
-            // Project center
-            float centerProj = Vector2.Dot(obb.Center, axis);
-
-            // Project extents
-            float extentProj = MathF.Abs(Vector2.Dot(obb.AxisX * obb.HalfExtents.X, axis)) +
-                               MathF.Abs(Vector2.Dot(obb.AxisY * obb.HalfExtents.Y, axis));
-
-            min = centerProj - extentProj;
-            max = centerProj + extentProj;
         }
 
         #endregion
