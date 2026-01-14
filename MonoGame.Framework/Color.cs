@@ -2095,7 +2095,7 @@ namespace Microsoft.Xna.Framework
         /// <param name="s">Saturation component value, ranging from 0.0f to 1.0f</param>
         /// <param name="v">Value component value, ranging from 0.0f to 1.0f</param>
         /// <returns><see cref="Color"/> with the HSV values</returns>
-        public Color FromHSV(float h, float s, float v)
+        public static Color FromHSV(float h, float s, float v)
         {
             //defining values for easier colour conversion at end
             float r = 0f;
