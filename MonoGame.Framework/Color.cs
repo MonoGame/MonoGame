@@ -2103,8 +2103,8 @@ namespace Microsoft.Xna.Framework
             float b = 0f;
 
             h %= 360.0f;
-            s /= 100;
-            v /= 100;
+            s = MathHelper.Clamp(s, 0.0f, 1.0f);
+            v = MathHelper.Clamp(v, 0.0f, 1.0f);
 
             if (s == 0)
                 r = g = b = v;
