@@ -274,7 +274,7 @@ namespace MonoGame.Tests.Framework
             float s = 100;
             float l = 50;
 
-            Color color2 = color1.FromHSL(h, s, l);
+            Color color2 = Color.FromHSL(h, s, l);
 
             Assert.AreEqual(color1, color2);
         }

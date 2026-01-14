@@ -2037,7 +2037,7 @@ namespace Microsoft.Xna.Framework
         /// <param name="x"></param>
         /// <param name="rh"></param>
         /// <returns>the hue for R, G or B</returns>
-        private float HtoRGB(float c, float x, float rh)
+        private static float HtoRGB(float c, float x, float rh)
         {
             if ((6 * rh) < 1)
                 return (c + (x - c) * 6 * rh);
@@ -2056,7 +2056,7 @@ namespace Microsoft.Xna.Framework
         /// <param name="s">Saturation component value, from 0.0f to 100.0f</param>
         /// <param name="l">Luminosity (brightness) component value, from 0.0f to 100.0f</param>
         /// <returns><see cref="Color"/> with the HSL values</returns>
-        public Color FromHSL(float h, float s, float l)
+        public static Color FromHSL(float h, float s, float l)
         {
             s /= 100;
             l /= 100;
