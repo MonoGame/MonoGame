@@ -7,6 +7,7 @@
 #include "mg_common.h"
 
 #include <vector>
+#include <atomic>
 #include <mutex>
 
 #define XAUDIO2_HELPER_FUNCTIONS
@@ -21,6 +22,7 @@ struct MGA_VoiceCallbacks;
 
 struct MGA_RawBuffer
 {
+	MGA_Voice* voice = nullptr;
 	uint8_t* data = nullptr;
 	uint32_t length = 0;
 };
@@ -56,6 +58,8 @@ struct MGA_Voice
 	MGA_Buffer* buffer = nullptr;
 	WAVEFORMATEX format;
 
+	std::atomic<int> finishedBuffers = 0;
+
 	float pan = 0.0f;
 	float reverbMix = 0.0f;
 	bool looped = false;
@@ -86,10 +90,13 @@ public:
 		if (raw == nullptr)
 			return;
 
+		++raw->voice->finishedBuffers;
+
 		std::lock_guard guard(_system->lock);
 		_system->freeRawBuffers.push_back(raw);
 	}
 };
+
 
 MGA_System* MGA_System_Create()
 {
@@ -141,6 +148,9 @@ void MGA_System_Destroy(MGA_System* system)
 {
 	assert(system != nullptr);
 
+	// TODO: Should we be stopping any playing sounds here first?
+
+
 	// Destroy system resources.
 	for (auto raw : system->freeRawBuffers)
 	{
@@ -148,9 +158,14 @@ void MGA_System_Destroy(MGA_System* system)
 		delete raw;
 	}
 
-	// TODO: We're assuming here the C# side is cleaning up
-	// buffers/voices, but if we want this to be a good C++
-	// API as well, we likely should cleanup ourselves too.
+	if (system->reverbVoice)
+		system->reverbVoice->DestroyVoice();		
+	if (system->masterVoice)
+		system->masterVoice->DestroyVoice();
+	if (system->audio)
+		system->audio->Release();
+
+	delete system->callbacks;
 
 	delete system;
 }
@@ -215,9 +230,11 @@ void MGA_Buffer_Destroy(MGA_Buffer* buffer)
 {
 	assert(buffer != nullptr);
 
-	free(buffer->data);
-	free(buffer->format);
-
+	if (buffer->data)
+		free(buffer->data);
+	if (buffer->format)
+		free(buffer->format);
+		
 	if (buffer->wmaBuffer != nullptr)
 	{
 		free((void*)buffer->wmaBuffer->pDecodedPacketCumulativeBytes);
@@ -293,7 +310,6 @@ void MGA_Buffer_InitializeFormat(MGA_Buffer* buffer, mgbyte* waveHeader, mgbyte*
 void MGA_Buffer_InitializePCM(MGA_Buffer* buffer, mgbyte* waveData, mgint offset, mgint length, mgint sampleBits, mgint sampleRate, mgint channels, mgint loopStart, mgint loopLength)
 {
 	assert(buffer != nullptr);
-	assert(waveData != nullptr);
 	assert(offset >=0);
 	assert(length > 0);
 
@@ -483,6 +499,12 @@ mgint MGA_Voice_GetBufferCount(MGA_Voice* voice)
 	return state.BuffersQueued;
 }
 
+mgint MGA_Voice_GetFinishedBufferCount(MGA_Voice* voice)
+{
+	assert(voice != nullptr);
+	return voice->finishedBuffers.exchange(0);
+}
+
 void MGA_Voice_SetBuffer(MGA_Voice* voice, MGA_Buffer* buffer)
 {
 	assert(voice != nullptr);
@@ -538,7 +560,9 @@ void MGA_Voice_AppendBuffer(MGA_Voice* voice, mgbyte* buffer, mguint size)
 		raw->length = size;
 	}
 
-	assert(raw->length <= size);
+	raw->voice = voice;
+
+	assert(raw->length >= size);
 	memcpy(raw->data, buffer, size);
 
 	// Copy the buffer structure and fix the looping state.
@@ -571,8 +595,9 @@ void MGA_Voice_Play(MGA_Voice* voice, mgbyte looped)
 		voice->voice->SubmitSourceBuffer(&buffer, voice->buffer->wmaBuffer);
 	}
 
-	voice->voice->Start();
+	voice->finishedBuffers = 0;
 	voice->state = MGSoundState::Playing;
+	voice->voice->Start();
 }
 
 void MGA_Voice_Pause(MGA_Voice* voice)
@@ -618,6 +643,7 @@ void MGA_Voice_Stop(MGA_Voice* voice, mgbyte immediate)
 	voice->voice->Stop(immediate ? XAUDIO2_PLAY_TAILS : 0, XAUDIO2_COMMIT_NOW);
 	voice->voice->FlushSourceBuffers();
 	voice->state = MGSoundState::Stopped;
+	voice->finishedBuffers = 0;
 }
 
 MGSoundState MGA_Voice_GetState(MGA_Voice* voice)
@@ -647,7 +673,9 @@ mgulong MGA_Voice_GetPosition(MGA_Voice* voice)
 				
 	XAUDIO2_VOICE_STATE state;
 	voice->voice->GetState(&state, 0);
-	return state.SamplesPlayed;
+
+	float msec = (state.SamplesPlayed / (float)voice->format.nSamplesPerSec) * 1000.0f;
+	return (mgulong)msec;
 }
 
 static void MGA_Voice_UpdateOutputMatrix(MGA_Voice* voice)

@@ -7,6 +7,7 @@
 #include "mg_common.h"
 
 #include <vector>
+#include <atomic>
 #include <mutex>
 
 #define _USE_MATH_DEFINES
@@ -22,6 +23,7 @@ struct MGA_VoiceCallbacks;
 
 struct MGA_RawBuffer
 {
+	MGA_Voice* voice = nullptr;
 	uint8_t* data = nullptr;
 	uint32_t length = 0;
 };
@@ -60,6 +62,8 @@ struct MGA_Voice
 	MGA_Buffer* buffer = nullptr;
 	FAudioWaveFormatEx format;
 
+	std::atomic<int> finishedBuffers = 0;
+
 	float pan = 0.0f;
 	float reverbMix = 0.0f;
 	bool looped = false;
@@ -91,6 +95,8 @@ public:
 			return;
 
 		auto callbacks = (MGA_VoiceCallbacks*)callback;
+
+		++raw->voice->finishedBuffers;
 
 		std::lock_guard guard(callbacks->_system->lock);
 		callbacks->_system->freeRawBuffers.push_back(raw);
@@ -496,6 +502,12 @@ mgint MGA_Voice_GetBufferCount(MGA_Voice* voice)
 	return state.BuffersQueued;
 }
 
+mgint MGA_Voice_GetFinishedBufferCount(MGA_Voice* voice)
+{
+	assert(voice != nullptr);
+	return voice->finishedBuffers.exchange(0);
+}
+
 void MGA_Voice_SetBuffer(MGA_Voice* voice, MGA_Buffer* buffer)
 {
 	assert(voice != nullptr);
@@ -556,7 +568,9 @@ void MGA_Voice_AppendBuffer(MGA_Voice* voice, mgbyte* buffer, mguint size)
 		raw->length = size;
 	}
 
-	assert(raw->length <= size);
+	raw->voice = voice;
+
+	assert(raw->length >= size);
 	memcpy(raw->data, buffer, size);
 
 	// Copy the buffer structure and fix the looping state.
@@ -589,8 +603,9 @@ void MGA_Voice_Play(MGA_Voice* voice, mgbyte looped)
 		FAudioSourceVoice_SubmitSourceBuffer(voice->voice, &buffer, nullptr);
 	}
 
-	FAudioSourceVoice_Start(voice->voice, 0, FAUDIO_COMMIT_NOW);
+	voice->finishedBuffers = 0;
 	voice->state = MGSoundState::Playing;
+	FAudioSourceVoice_Start(voice->voice, 0, FAUDIO_COMMIT_NOW);
 }
 
 void MGA_Voice_Pause(MGA_Voice* voice)
@@ -636,6 +651,7 @@ void MGA_Voice_Stop(MGA_Voice* voice, mgbyte immediate)
 	FAudioSourceVoice_Stop(voice->voice, immediate ? FAUDIO_PLAY_TAILS : 0, FAUDIO_COMMIT_NOW);
 	FAudioSourceVoice_FlushSourceBuffers(voice->voice);
 	voice->state = MGSoundState::Stopped;
+	voice->finishedBuffers = 0;
 }
 
 MGSoundState MGA_Voice_GetState(MGA_Voice* voice)
@@ -665,7 +681,9 @@ mgulong MGA_Voice_GetPosition(MGA_Voice* voice)
 				
 	FAudioVoiceState state;
 	FAudioSourceVoice_GetState(voice->voice, &state, 0);
-	return state.SamplesPlayed;
+
+	float msec = (state.SamplesPlayed / (float)voice->format.nSamplesPerSec) * 1000.0f;
+	return (mgulong)msec;
 }
 
 static void MGA_Voice_UpdateOutputMatrix(MGA_Voice* voice)

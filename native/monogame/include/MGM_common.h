@@ -35,21 +35,17 @@ struct MGM_VideoDecoder
 
 
 
-// This seems like enough to detect most file formats.
-#define MGM_SIGNATURE char signature[16]
-
-
 /// <summary>
 ///  Helper to read first bytes of a file to get its signature.
 /// </summary>
-void MGM_ReadSignature(const char* filepath, MGM_SIGNATURE);
+void MGM_ReadSignature(const char* filepath, const uint8_t* signature);
 
 
 // These are the common decoders supported on all platforms.
 // They all work via optimized software decoding.
 
-MGM_AudioDecoder* MGM_AudioDecoder_TryCreate_Ogg(MGM_SIGNATURE);
-MGM_AudioDecoder* MGM_AudioDecoder_TryCreate_Mp3(MGM_SIGNATURE);
+MGM_AudioDecoder* MGM_AudioDecoder_TryCreate_Ogg(const uint8_t* signature);
+MGM_AudioDecoder* MGM_AudioDecoder_TryCreate_Mp3(const uint8_t* signature);
 
-MGM_VideoDecoder* MGM_VideoDecoder_TryCreate_Theora(MGM_SIGNATURE);
-MGM_VideoDecoder* MGM_VideoDecoder_TryCreate_OpenH264(MGM_SIGNATURE);
+MGM_VideoDecoder* MGM_VideoDecoder_TryCreate_Theora(const uint8_t* signature);
+MGM_VideoDecoder* MGM_VideoDecoder_TryCreate_OpenH264(const uint8_t* signature);

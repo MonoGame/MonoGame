@@ -67,10 +67,12 @@ public sealed partial class DynamicSoundEffectInstance : SoundEffectInstance
         }
     }
 
-    private void PlatformUpdateQueue()
+    private unsafe void PlatformUpdateQueue()
     {
         // TODO: This really shouldn't be per-instance
         // instead this should be handled internally by
         // the native sound system.
+
+        _buffersNeeded += MGA.Voice_GetFinishedBufferCount(Voice);
     }
 }
