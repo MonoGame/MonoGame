@@ -132,6 +132,7 @@ jobs:
           dotnet run --project build/Build.csproj -- --target=Default
         env:
           DOTNET_SYSTEM_NET_SECURITY_NOREVOCATIONCHECKBYDEFAULT: 1 # android compilation is failing randomly due to downloads from microsofts website during it
+          MGFXC_WINE_PATH: $HOME/.winemonogame
 
       - name: Run Tools Tests
         run: |
