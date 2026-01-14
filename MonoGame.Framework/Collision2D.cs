@@ -568,9 +568,10 @@ namespace Microsoft.Xna.Framework
                 return ContainmentType.Intersects;
 
             float inner2 = inner * inner;
-            float d2 = DistanceSquaredPointSegment(circleCenter, capsuleA, capsuleB, out _, out _);
 
-            if (d2 <= inner2)
+            // For the capsule to be fully contained, both endpoints must be within the inner circle
+            if (Vector2.DistanceSquared(circleCenter, capsuleA) <= inner2 &&
+                Vector2.DistanceSquared(circleCenter, capsuleB) <= inner2)
                 return ContainmentType.Contains;
 
             return ContainmentType.Intersects;
@@ -1740,7 +1741,7 @@ namespace Microsoft.Xna.Framework
 
                     // If segments not parallel, compute closest point on L1, to L2 and
                     // clamp to segment s!  Else pick arbitrary s (here 0)
-                    if (MathF.Abs(denom) > Epsilon )
+                    if (MathF.Abs(denom) > Epsilon)
                     {
                         s = MathHelper.Clamp((b * f - c * e) / denom, 0.0f, 1.0f);
                     }
@@ -2348,6 +2349,10 @@ namespace Microsoft.Xna.Framework
             if (tMin > tMax)
                 (tMin, tMax) = (tMax, tMin);
 
+            // Clamp tMin to 0 for ray semantics
+            if (tMin < 0.0f)
+                tMin = 0.0f;
+
             return true;
         }
 
@@ -2433,6 +2438,10 @@ namespace Microsoft.Xna.Framework
 
                 tMin = minProj - delta;
                 tMax = maxProj + delta;
+
+                // Clamp tMin to 0 for ray semantics
+                if (tMin < 0.0f)
+                    tMin = 0.0f;
                 return true;
             }
 
@@ -2455,6 +2464,10 @@ namespace Microsoft.Xna.Framework
             {
                 (tMin, tMax) = (tMax, tMin);
             }
+
+            // Clamp tMin to 0 for ray semantics
+            if (tMin < 0.0f)
+                tMin = 0.0f;
 
             return true;
         }

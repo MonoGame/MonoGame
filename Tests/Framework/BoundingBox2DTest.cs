@@ -2,19 +2,21 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
+using System;
 using Microsoft.Xna.Framework;
 using NUnit.Framework;
-using System;
 
 namespace MonoGame.Tests.Framework
 {
     class BoundingBox2DTest
     {
+        #region Constructor Tests
+
         [Test]
         public void Constructor()
         {
-            var min = new Vector2(10, 20);
-            var max = new Vector2(30, 40);
+            var min = new Vector2(1, 2);
+            var max = new Vector2(10, 20);
 
             var box = new BoundingBox2D(min, max);
 
@@ -22,71 +24,79 @@ namespace MonoGame.Tests.Framework
             Assert.AreEqual(max, box.Max);
         }
 
+        #endregion
+
+        #region Computed Property Tests
+
         [Test]
         public void Center_ReturnsMiddlePoint()
         {
-            var box = new BoundingBox2D(new Vector2(0, 0), new Vector2(20, 10));
+            var box = new BoundingBox2D(new Vector2(0, 0), new Vector2(10, 20));
 
             var center = box.Center;
 
-            Assert.AreEqual(new Vector2(10, 5), center);
+            Assert.AreEqual(new Vector2(5, 10), center);
         }
 
         [Test]
         public void Size_ReturnsWidthAndHeight()
         {
-            var box = new BoundingBox2D(new Vector2(10, 20), new Vector2(30, 50));
+            var box = new BoundingBox2D(new Vector2(0, 0), new Vector2(10, 20));
 
             var size = box.Size;
 
-            Assert.AreEqual(new Vector2(20, 30), size);
+            Assert.AreEqual(new Vector2(10, 20), size);
         }
 
         [Test]
         public void HalfExtents_ReturnsHalfSize()
         {
-            var box = new BoundingBox2D(new Vector2(0, 0), new Vector2(20, 10));
+            var box = new BoundingBox2D(new Vector2(0, 0), new Vector2(10, 20));
 
             var halfExtents = box.HalfExtents;
 
-            Assert.AreEqual(new Vector2(10, 5), halfExtents);
+            Assert.AreEqual(new Vector2(5, 10), halfExtents);
         }
 
         [Test]
         public void Width_ReturnsHorizontalExtent()
         {
-            var box = new BoundingBox2D(new Vector2(10, 20), new Vector2(30, 50));
+            var box = new BoundingBox2D(new Vector2(0, 0), new Vector2(10, 20));
 
             float width = box.Width;
 
-            Assert.AreEqual(20.0f, width);
+            Assert.AreEqual(10.0f, width, Collision2D.Epsilon);
         }
 
         [Test]
         public void Height_ReturnsVerticalExtent()
         {
-            var box = new BoundingBox2D(new Vector2(10, 20), new Vector2(30, 50));
+            var box = new BoundingBox2D(new Vector2(0, 0), new Vector2(10, 20));
 
             float height = box.Height;
 
-            Assert.AreEqual(30.0f, height);
+            Assert.AreEqual(20.0f, height, Collision2D.Epsilon);
         }
 
         [Test]
         public void Area_ReturnsWidthTimesHeight()
         {
-            var box = new BoundingBox2D(new Vector2(0, 0), new Vector2(10, 5));
+            var box = new BoundingBox2D(new Vector2(0, 0), new Vector2(10, 20));
 
             float area = box.Area;
 
-            Assert.AreEqual(50.0f, area);
+            Assert.AreEqual(200.0f, area, Collision2D.Epsilon);
         }
+
+        #endregion
+
+        #region Factory Method Tests
 
         [Test]
         public void CreateFromMinMax()
         {
-            var min = new Vector2(5, 10);
-            var max = new Vector2(15, 20);
+            var min = new Vector2(1, 2);
+            var max = new Vector2(10, 20);
 
             var box = BoundingBox2D.CreateFromMinMax(min, max);
 
@@ -97,37 +107,36 @@ namespace MonoGame.Tests.Framework
         [Test]
         public void CreateFromCenterAndExtents()
         {
-            var center = new Vector2(10, 10);
-            var halfExtents = new Vector2(5, 5);
+            var center = new Vector2(5, 10);
+            var halfExtents = new Vector2(5, 10);
 
             var box = BoundingBox2D.CreateFromCenterAndExtents(center, halfExtents);
 
-            Assert.AreEqual(new Vector2(5, 5), box.Min);
-            Assert.AreEqual(new Vector2(15, 15), box.Max);
-            Assert.AreEqual(center, box.Center);
+            Assert.AreEqual(new Vector2(0, 0), box.Min);
+            Assert.AreEqual(new Vector2(10, 20), box.Max);
         }
 
         [Test]
         public void CreateFromPositionAndSize()
         {
-            var position = new Vector2(10, 20);
-            var size = new Vector2(30, 40);
+            var position = new Vector2(1, 2);
+            var size = new Vector2(9, 18);
 
             var box = BoundingBox2D.CreateFromPositionAndSize(position, size);
 
-            Assert.AreEqual(position, box.Min);
-            Assert.AreEqual(new Vector2(40, 60), box.Max);
+            Assert.AreEqual(new Vector2(1, 2), box.Min);
+            Assert.AreEqual(new Vector2(10, 20), box.Max);
         }
 
         [Test]
         public void CreateFromPoints_SinglePoint()
         {
-            var points = new[] { new Vector2(5, 10) };
+            var points = new[] { new Vector2(5, 5) };
 
             var box = BoundingBox2D.CreateFromPoints(points);
 
-            Assert.AreEqual(new Vector2(5, 10), box.Min);
-            Assert.AreEqual(new Vector2(5, 10), box.Max);
+            Assert.AreEqual(new Vector2(5, 5), box.Min);
+            Assert.AreEqual(new Vector2(5, 5), box.Max);
         }
 
         [Test]
@@ -137,14 +146,14 @@ namespace MonoGame.Tests.Framework
             {
                 new Vector2(0, 0),
                 new Vector2(10, 5),
-                new Vector2(-5, 15),
-                new Vector2(20, -10)
+                new Vector2(5, 15),
+                new Vector2(-5, 3)
             };
 
             var box = BoundingBox2D.CreateFromPoints(points);
 
-            Assert.AreEqual(new Vector2(-5, -10), box.Min);
-            Assert.AreEqual(new Vector2(20, 15), box.Max);
+            Assert.AreEqual(new Vector2(-5, 0), box.Min);
+            Assert.AreEqual(new Vector2(10, 15), box.Max);
         }
 
         [Test]
@@ -163,25 +172,29 @@ namespace MonoGame.Tests.Framework
         public void CreateMerged_EnclosesBoth()
         {
             var box1 = new BoundingBox2D(new Vector2(0, 0), new Vector2(10, 10));
-            var box2 = new BoundingBox2D(new Vector2(5, 5), new Vector2(15, 20));
+            var box2 = new BoundingBox2D(new Vector2(5, 5), new Vector2(15, 15));
 
             var merged = BoundingBox2D.CreateMerged(box1, box2);
 
             Assert.AreEqual(new Vector2(0, 0), merged.Min);
-            Assert.AreEqual(new Vector2(15, 20), merged.Max);
+            Assert.AreEqual(new Vector2(15, 15), merged.Max);
         }
 
         [Test]
         public void CreateMerged_OneBoxContainsOther()
         {
             var box1 = new BoundingBox2D(new Vector2(0, 0), new Vector2(20, 20));
-            var box2 = new BoundingBox2D(new Vector2(5, 5), new Vector2(10, 10));
+            var box2 = new BoundingBox2D(new Vector2(5, 5), new Vector2(15, 15));
 
             var merged = BoundingBox2D.CreateMerged(box1, box2);
 
             Assert.AreEqual(box1.Min, merged.Min);
             Assert.AreEqual(box1.Max, merged.Max);
         }
+
+        #endregion
+
+        #region GetCorners Tests (Type-Specific Method)
 
         [Test]
         public void GetCorners_ReturnsArray()
@@ -191,30 +204,30 @@ namespace MonoGame.Tests.Framework
             var corners = box.GetCorners();
 
             Assert.AreEqual(4, corners.Length);
-            Assert.AreEqual(new Vector2(0, 0), corners[0]);
-            Assert.AreEqual(new Vector2(10, 0), corners[1]);
-            Assert.AreEqual(new Vector2(10, 20), corners[2]);
-            Assert.AreEqual(new Vector2(0, 20), corners[3]);
+            Assert.Contains(new Vector2(0, 0), corners);
+            Assert.Contains(new Vector2(10, 0), corners);
+            Assert.Contains(new Vector2(10, 20), corners);
+            Assert.Contains(new Vector2(0, 20), corners);
         }
 
         [Test]
         public void GetCorners_FillsExistingArray()
         {
-            var box = new BoundingBox2D(new Vector2(5, 10), new Vector2(15, 30));
+            var box = new BoundingBox2D(new Vector2(0, 0), new Vector2(10, 20));
             var corners = new Vector2[4];
 
             box.GetCorners(corners);
 
-            Assert.AreEqual(new Vector2(5, 10), corners[0]);
-            Assert.AreEqual(new Vector2(15, 10), corners[1]);
-            Assert.AreEqual(new Vector2(15, 30), corners[2]);
-            Assert.AreEqual(new Vector2(5, 30), corners[3]);
+            Assert.Contains(new Vector2(0, 0), corners);
+            Assert.Contains(new Vector2(10, 0), corners);
+            Assert.Contains(new Vector2(10, 20), corners);
+            Assert.Contains(new Vector2(0, 20), corners);
         }
 
         [Test]
         public void GetCorners_ThrowsWhenArrayNull()
         {
-            var box = new BoundingBox2D(new Vector2(0, 0), new Vector2(10, 10));
+            var box = new BoundingBox2D(new Vector2(0, 0), new Vector2(10, 20));
 
             Assert.Throws<ArgumentNullException>(() => box.GetCorners(null));
         }
@@ -222,11 +235,15 @@ namespace MonoGame.Tests.Framework
         [Test]
         public void GetCorners_ThrowsWhenArrayTooSmall()
         {
-            var box = new BoundingBox2D(new Vector2(0, 0), new Vector2(10, 10));
+            var box = new BoundingBox2D(new Vector2(0, 0), new Vector2(10, 20));
             var corners = new Vector2[3];
 
             Assert.Throws<ArgumentException>(() => box.GetCorners(corners));
         }
+
+        #endregion
+
+        #region Transform Tests
 
         [Test]
         public void Transform_Translation()
@@ -236,93 +253,51 @@ namespace MonoGame.Tests.Framework
 
             var transformed = box.Transform(matrix);
 
-            Assert.AreEqual(new Vector2(10, 15), transformed.Center);
-            Assert.AreEqual(new Vector2(5, 5), transformed.HalfExtents);
+            Assert.AreEqual(new Vector2(5, 10), transformed.Min);
+            Assert.AreEqual(new Vector2(15, 20), transformed.Max);
         }
 
         [Test]
         public void Transform_Scale()
         {
             var box = new BoundingBox2D(new Vector2(0, 0), new Vector2(10, 10));
-            var matrix = Matrix.CreateScale(2, 3, 1);
+            var matrix = Matrix.CreateScale(2.0f);
 
             var transformed = box.Transform(matrix);
 
-            Assert.AreEqual(new Vector2(10, 15), transformed.Center);
-            Assert.AreEqual(new Vector2(10, 15), transformed.HalfExtents);
+            Assert.AreEqual(new Vector2(0, 0), transformed.Min);
+            Assert.AreEqual(new Vector2(20, 20), transformed.Max);
         }
 
         [Test]
         public void Transform_Rotation()
         {
-            var box = new BoundingBox2D(new Vector2(-5, -5), new Vector2(5, 5));
-            var matrix = Matrix.CreateRotationZ(MathHelper.PiOver4);
+            var box = new BoundingBox2D(new Vector2(0, 0), new Vector2(10, 0));
+            var matrix = Matrix.CreateRotationZ(MathHelper.PiOver2);
 
             var transformed = box.Transform(matrix);
 
-            // Rotated box should be larger to contain all corners
-            Assert.AreEqual(Vector2.Zero, transformed.Center);
-            float expectedHalfExtent = 5.0f * MathF.Sqrt(2);
-            Assert.AreEqual(expectedHalfExtent, transformed.HalfExtents.X, 1e-5f);
-            Assert.AreEqual(expectedHalfExtent, transformed.HalfExtents.Y, 1e-5f);
+            Assert.AreEqual(0, transformed.Min.X, Collision2D.Epsilon);
+            Assert.AreEqual(0, transformed.Min.Y, Collision2D.Epsilon);
+            Assert.AreEqual(0, transformed.Max.X, Collision2D.Epsilon);
+            Assert.AreEqual(10, transformed.Max.Y, Collision2D.Epsilon);
         }
 
         [Test]
         public void Translate_OffsetsPosition()
         {
             var box = new BoundingBox2D(new Vector2(0, 0), new Vector2(10, 10));
-            var translation = new Vector2(5, -3);
+            var offset = new Vector2(5, 10);
 
-            var translated = box.Translate(translation);
+            var translated = box.Translate(offset);
 
-            Assert.AreEqual(new Vector2(5, -3), translated.Min);
-            Assert.AreEqual(new Vector2(15, 7), translated.Max);
-            Assert.AreEqual(box.Size, translated.Size);
+            Assert.AreEqual(new Vector2(5, 10), translated.Min);
+            Assert.AreEqual(new Vector2(15, 20), translated.Max);
         }
 
-        [Test]
-        public void ContainsBox_Disjoint()
-        {
-            var box1 = new BoundingBox2D(new Vector2(0, 0), new Vector2(10, 10));
-            var box2 = new BoundingBox2D(new Vector2(20, 20), new Vector2(30, 30));
+        #endregion
 
-            var result = box1.Contains(box2);
-
-            Assert.AreEqual(ContainmentType.Disjoint, result);
-        }
-
-        [Test]
-        public void ContainsBox_Intersects()
-        {
-            var box1 = new BoundingBox2D(new Vector2(0, 0), new Vector2(10, 10));
-            var box2 = new BoundingBox2D(new Vector2(5, 5), new Vector2(15, 15));
-
-            var result = box1.Contains(box2);
-
-            Assert.AreEqual(ContainmentType.Intersects, result);
-        }
-
-        [Test]
-        public void ContainsBox_Contains()
-        {
-            var box1 = new BoundingBox2D(new Vector2(0, 0), new Vector2(20, 20));
-            var box2 = new BoundingBox2D(new Vector2(5, 5), new Vector2(15, 15));
-
-            var result = box1.Contains(box2);
-
-            Assert.AreEqual(ContainmentType.Contains, result);
-        }
-
-        [Test]
-        public void ContainsBox_TouchingEdge()
-        {
-            var box1 = new BoundingBox2D(new Vector2(0, 0), new Vector2(10, 10));
-            var box2 = new BoundingBox2D(new Vector2(10, 0), new Vector2(20, 10));
-
-            var result = box1.Contains(box2);
-
-            Assert.AreEqual(ContainmentType.Intersects, result);
-        }
+        #region ContainsPoint Tests (Delegation Spot Check)
 
         [Test]
         public void ContainsPoint_Inside()
@@ -357,160 +332,21 @@ namespace MonoGame.Tests.Framework
             Assert.AreEqual(ContainmentType.Disjoint, result);
         }
 
-        [Test]
-        public void ContainsBoundingCircle_Contains()
-        {
-            var box = new BoundingBox2D(new Vector2(0, 0), new Vector2(20, 20));
-            var circle = new BoundingCircle(new Vector2(10, 10), 5);
+        #endregion
 
-            var result = box.Contains(circle);
-
-            Assert.AreEqual(ContainmentType.Contains, result);
-        }
-
-        [Test]
-        public void ContainsBoundingCircle_Intersects()
-        {
-            var box = new BoundingBox2D(new Vector2(0, 0), new Vector2(10, 10));
-            var circle = new BoundingCircle(new Vector2(8, 5), 5);
-
-            var result = box.Contains(circle);
-
-            Assert.AreEqual(ContainmentType.Intersects, result);
-        }
-
-        [Test]
-        public void ContainsBoundingCircle_Disjoint()
-        {
-            var box = new BoundingBox2D(new Vector2(0, 0), new Vector2(10, 10));
-            var circle = new BoundingCircle(new Vector2(20, 20), 5);
-
-            var result = box.Contains(circle);
-
-            Assert.AreEqual(ContainmentType.Disjoint, result);
-        }
-
-        [Test]
-        public void ContainsBoundingCircle_CircleTouchesEdge()
-        {
-            var box = new BoundingBox2D(new Vector2(0, 0), new Vector2(10, 10));
-            var circle = new BoundingCircle(new Vector2(15, 5), 5);
-
-            var result = box.Contains(circle);
-
-            Assert.AreEqual(ContainmentType.Intersects, result);
-        }
-
-        [Test]
-        public void ContainsBoundingCircle_CircleTouchesCorner()
-        {
-            var box = new BoundingBox2D(new Vector2(0, 0), new Vector2(10, 10));
-            var circle = new BoundingCircle(new Vector2(10 + MathF.Sqrt(12.5f), 10 + MathF.Sqrt(12.5f)), 5);
-
-            var result = box.Contains(circle);
-
-            Assert.AreEqual(ContainmentType.Intersects, result);
-        }
-
-        [Test]
-        public void ContainsBoundingCircle_CircleCenterInsideBox()
-        {
-            var box = new BoundingBox2D(new Vector2(0, 0), new Vector2(10, 10));
-            var circle = new BoundingCircle(new Vector2(5, 5), 8);
-
-            var result = box.Contains(circle);
-
-            Assert.AreEqual(ContainmentType.Intersects, result);
-        }
-
-        [Test]
-        public void Intersects_Overlapping()
-        {
-            var box1 = new BoundingBox2D(new Vector2(0, 0), new Vector2(10, 10));
-            var box2 = new BoundingBox2D(new Vector2(5, 5), new Vector2(15, 15));
-
-            bool intersects = box1.Intersects(box2);
-
-            Assert.IsTrue(intersects);
-        }
-
-        [Test]
-        public void Intersects_Separated()
-        {
-            var box1 = new BoundingBox2D(new Vector2(0, 0), new Vector2(10, 10));
-            var box2 = new BoundingBox2D(new Vector2(20, 20), new Vector2(30, 30));
-
-            bool intersects = box1.Intersects(box2);
-
-            Assert.IsFalse(intersects);
-        }
-
-        [Test]
-        public void Intersects_TouchingEdge()
-        {
-            var box1 = new BoundingBox2D(new Vector2(0, 0), new Vector2(10, 10));
-            var box2 = new BoundingBox2D(new Vector2(10, 0), new Vector2(20, 10));
-
-            bool intersects = box1.Intersects(box2);
-
-            Assert.IsTrue(intersects);
-        }
-
-        [Test]
-        public void Intersects_OneContainsOther()
-        {
-            var box1 = new BoundingBox2D(new Vector2(0, 0), new Vector2(20, 20));
-            var box2 = new BoundingBox2D(new Vector2(5, 5), new Vector2(15, 15));
-
-            bool intersects = box1.Intersects(box2);
-
-            Assert.IsTrue(intersects);
-        }
-
-        [Test]
-        public void IntersectsOrientedBoundingBox2D_Overlapping()
-        {
-            var box = new BoundingBox2D(new Vector2(8, 8), new Vector2(12, 12));
-            var obb = new OrientedBoundingBox2D(new Vector2(10, 10), Vector2.UnitX, Vector2.UnitY, new Vector2(5, 5));
-
-            bool intersects = box.Intersects(obb);
-
-            Assert.IsTrue(intersects);
-        }
-
-        [Test]
-        public void IntersectsOrientedBoundingBox2D_Separated()
-        {
-            var box = new BoundingBox2D(new Vector2(30, 30), new Vector2(40, 40));
-            var obb = new OrientedBoundingBox2D(new Vector2(10, 10), Vector2.UnitX, Vector2.UnitY, new Vector2(5, 5));
-
-            bool intersects = box.Intersects(obb);
-
-            Assert.IsFalse(intersects);
-        }
-
-        [Test]
-        public void IntersectsOrientedBoundingBox2D_TouchesEdge()
-        {
-            // Touches at x = 15 for aligned OBB (center 10 halfX=5 => right edge x=15)
-            var box = new BoundingBox2D(new Vector2(15, 9), new Vector2(20, 11));
-            var obb = new OrientedBoundingBox2D(new Vector2(10, 10), Vector2.UnitX, Vector2.UnitY, new Vector2(5, 5));
-
-            bool intersects = box.Intersects(obb);
-
-            Assert.IsTrue(intersects);
-        }
-
+        #region Deconstruct Test
 
         [Test]
         public void Deconstruct()
         {
-            var box = new BoundingBox2D(new Vector2(1, 2), new Vector2(3, 4));
+            var box = new BoundingBox2D(new Vector2(1, 2), new Vector2(10, 20));
 
-            box.Deconstruct(out Vector2 min, out Vector2 max);
+            var (min, max) = box;
 
-            Assert.AreEqual(box.Min, min);
-            Assert.AreEqual(box.Max, max);
+            Assert.AreEqual(new Vector2(1, 2), min);
+            Assert.AreEqual(new Vector2(10, 20), max);
         }
+
+        #endregion
     }
 }

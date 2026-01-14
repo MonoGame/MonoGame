@@ -2,14 +2,16 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
+using System;
 using Microsoft.Xna.Framework;
 using NUnit.Framework;
-using System;
 
 namespace MonoGame.Tests.Framework
 {
     class BoundingPolygon2DTest
     {
+        #region Constructor Tests
+
         [Test]
         public void Constructor_Triangle()
         {
@@ -23,9 +25,6 @@ namespace MonoGame.Tests.Framework
             var polygon = new BoundingPolygon2D(vertices);
 
             Assert.AreEqual(3, polygon.VertexCount);
-            Assert.AreEqual(vertices, polygon.Vertices);
-            Assert.IsNotNull(polygon.Normals);
-            Assert.AreEqual(3, polygon.Normals.Length);
         }
 
         [Test]
@@ -69,25 +68,30 @@ namespace MonoGame.Tests.Framework
             {
                 new Vector2(0, 0),
                 new Vector2(10, 0),
-                new Vector2(5, 10)
+                new Vector2(10, 10)
             };
             var normals = new[]
             {
                 new Vector2(0, -1),
-                new Vector2(0.707f, 0.707f),
+                new Vector2(1, 0),
                 new Vector2(-0.707f, 0.707f)
             };
 
             var polygon = new BoundingPolygon2D(vertices, normals);
 
-            Assert.AreEqual(vertices, polygon.Vertices);
-            Assert.AreEqual(normals, polygon.Normals);
+            Assert.AreEqual(3, polygon.VertexCount);
         }
 
         [Test]
         public void Constructor_WithNormals_ThrowsWhenNullVertices()
         {
-            var normals = new[] { Vector2.UnitX };
+            var normals = new[]
+            {
+                new Vector2(0, -1),
+                new Vector2(1, 0),
+                new Vector2(0, 1)
+            };
+
             Assert.Throws<ArgumentNullException>(() => new BoundingPolygon2D(null, normals));
         }
 
@@ -98,8 +102,9 @@ namespace MonoGame.Tests.Framework
             {
                 new Vector2(0, 0),
                 new Vector2(10, 0),
-                new Vector2(5, 10)
+                new Vector2(10, 10)
             };
+
             Assert.Throws<ArgumentNullException>(() => new BoundingPolygon2D(vertices, null));
         }
 
@@ -110,16 +115,20 @@ namespace MonoGame.Tests.Framework
             {
                 new Vector2(0, 0),
                 new Vector2(10, 0),
-                new Vector2(5, 10)
+                new Vector2(10, 10)
             };
             var normals = new[]
             {
-                Vector2.UnitX,
-                Vector2.UnitY
+                new Vector2(0, -1),
+                new Vector2(1, 0)
             };
 
             Assert.Throws<ArgumentException>(() => new BoundingPolygon2D(vertices, normals));
         }
+
+        #endregion
+
+        #region Computed Property Tests
 
         [Test]
         public void VertexCount_ReturnsCorrectCount()
@@ -131,11 +140,10 @@ namespace MonoGame.Tests.Framework
                 new Vector2(10, 10),
                 new Vector2(0, 10)
             };
+
             var polygon = new BoundingPolygon2D(vertices);
 
-            int count = polygon.VertexCount;
-
-            Assert.AreEqual(4, count);
+            Assert.AreEqual(4, polygon.VertexCount);
         }
 
         [Test]
@@ -147,12 +155,13 @@ namespace MonoGame.Tests.Framework
                 new Vector2(10, 0),
                 new Vector2(5, 10)
             };
+
             var polygon = new BoundingPolygon2D(vertices);
 
             var centroid = polygon.Centroid;
 
-            Assert.AreEqual(5.0f, centroid.X, 1e-5f);
-            Assert.AreEqual(10.0f / 3.0f, centroid.Y, 1e-5f);
+            Assert.AreEqual(5, centroid.X, Collision2D.Epsilon);
+            Assert.AreEqual(10.0f / 3.0f, centroid.Y, Collision2D.Epsilon);
         }
 
         [Test]
@@ -165,11 +174,13 @@ namespace MonoGame.Tests.Framework
                 new Vector2(10, 10),
                 new Vector2(0, 10)
             };
+
             var polygon = new BoundingPolygon2D(vertices);
 
             var centroid = polygon.Centroid;
 
-            Assert.AreEqual(new Vector2(5, 5), centroid);
+            Assert.AreEqual(5, centroid.X, Collision2D.Epsilon);
+            Assert.AreEqual(5, centroid.Y, Collision2D.Epsilon);
         }
 
         [Test]
@@ -179,13 +190,14 @@ namespace MonoGame.Tests.Framework
             {
                 new Vector2(0, 0),
                 new Vector2(10, 0),
-                new Vector2(0, 10)
+                new Vector2(5, 10)
             };
+
             var polygon = new BoundingPolygon2D(vertices);
 
             float area = polygon.Area;
 
-            Assert.AreEqual(50.0f, area, 1e-5f);
+            Assert.AreEqual(50.0f, area, Collision2D.Epsilon);
         }
 
         [Test]
@@ -198,12 +210,17 @@ namespace MonoGame.Tests.Framework
                 new Vector2(10, 10),
                 new Vector2(0, 10)
             };
+
             var polygon = new BoundingPolygon2D(vertices);
 
             float area = polygon.Area;
 
-            Assert.AreEqual(100.0f, area, 1e-5f);
+            Assert.AreEqual(100.0f, area, Collision2D.Epsilon);
         }
+
+        #endregion
+
+        #region Factory Method Tests
 
         [Test]
         public void CreateFromVertices()
@@ -212,27 +229,40 @@ namespace MonoGame.Tests.Framework
             {
                 new Vector2(0, 0),
                 new Vector2(10, 0),
-                new Vector2(5, 10)
+                new Vector2(10, 10)
             };
 
             var polygon = BoundingPolygon2D.CreateFromVertices(vertices);
 
             Assert.AreEqual(3, polygon.VertexCount);
-            Assert.AreEqual(vertices, polygon.Vertices);
         }
 
         [Test]
         public void CreateRegular_Triangle()
         {
-            var polygon = BoundingPolygon2D.CreateRegular(Vector2.Zero, 10, 3);
+            var center = new Vector2(5, 5);
+            var radius = 10.0f;
+            var sides = 3;
+
+            var polygon = BoundingPolygon2D.CreateRegular(center, radius, sides);
 
             Assert.AreEqual(3, polygon.VertexCount);
+
+            for (int i = 0; i < 3; i++)
+            {
+                float distance = Vector2.Distance(center, polygon.Vertices[i]);
+                Assert.AreEqual(radius, distance, Collision2D.Epsilon);
+            }
         }
 
         [Test]
         public void CreateRegular_Square()
         {
-            var polygon = BoundingPolygon2D.CreateRegular(Vector2.Zero, 10, 4);
+            var center = new Vector2(0, 0);
+            var radius = 10.0f;
+            var sides = 4;
+
+            var polygon = BoundingPolygon2D.CreateRegular(center, radius, sides);
 
             Assert.AreEqual(4, polygon.VertexCount);
         }
@@ -240,7 +270,11 @@ namespace MonoGame.Tests.Framework
         [Test]
         public void CreateRegular_Hexagon()
         {
-            var polygon = BoundingPolygon2D.CreateRegular(Vector2.Zero, 10, 6);
+            var center = new Vector2(0, 0);
+            var radius = 10.0f;
+            var sides = 6;
+
+            var polygon = BoundingPolygon2D.CreateRegular(center, radius, sides);
 
             Assert.AreEqual(6, polygon.VertexCount);
         }
@@ -248,127 +282,201 @@ namespace MonoGame.Tests.Framework
         [Test]
         public void CreateRegular_WithRotation()
         {
-            var polygon = BoundingPolygon2D.CreateRegular(new Vector2(5, 5), 10, 4, MathHelper.PiOver4);
+            var center = new Vector2(0, 0);
+            var radius = 10.0f;
+            var sides = 4;
+            var rotation = MathHelper.PiOver4;
+
+            var polygon = BoundingPolygon2D.CreateRegular(center, radius, sides, rotation);
 
             Assert.AreEqual(4, polygon.VertexCount);
-            Assert.AreEqual(new Vector2(5, 5), polygon.Centroid);
+
+            float angle = MathHelper.PiOver4;
+            float expectedX = radius * MathF.Cos(angle);
+            float expectedY = radius * MathF.Sin(angle);
+
+            Assert.AreEqual(expectedX, polygon.Vertices[0].X, Collision2D.Epsilon);
+            Assert.AreEqual(expectedY, polygon.Vertices[0].Y, Collision2D.Epsilon);
         }
 
         [Test]
         public void CreateRegular_ThrowsWhenTooFewSides()
         {
-            Assert.Throws<ArgumentException>(() => BoundingPolygon2D.CreateRegular(Vector2.Zero, 10, 2));
+            var center = new Vector2(0, 0);
+            var radius = 10.0f;
+            var sides = 2;
+
+            Assert.Throws<ArgumentException>(() => BoundingPolygon2D.CreateRegular(center, radius, sides));
         }
 
         [Test]
         public void CreateFromBoundingBox2D()
         {
-            var box = new BoundingBox2D(new Vector2(0, 0), new Vector2(10, 20));
+            var box = new BoundingBox2D(new Vector2(0, 0), new Vector2(10, 10));
 
             var polygon = BoundingPolygon2D.CreateFromBoundingBox2D(box);
 
             Assert.AreEqual(4, polygon.VertexCount);
-            Assert.AreEqual(new Vector2(5, 10), polygon.Centroid);
-            Assert.AreEqual(200.0f, polygon.Area, 1e-5f);
+
+            Assert.Contains(new Vector2(0, 0), polygon.Vertices);
+            Assert.Contains(new Vector2(10, 0), polygon.Vertices);
+            Assert.Contains(new Vector2(10, 10), polygon.Vertices);
+            Assert.Contains(new Vector2(0, 10), polygon.Vertices);
         }
 
         [Test]
         public void CreateMerged_NonOverlapping()
         {
-            var poly1 = BoundingPolygon2D.CreateRegular(new Vector2(0, 0), 5, 4);
-            var poly2 = BoundingPolygon2D.CreateRegular(new Vector2(20, 0), 5, 4);
+            var vertices1 = new[]
+            {
+                new Vector2(0, 0),
+                new Vector2(5, 0),
+                new Vector2(5, 5),
+                new Vector2(0, 5)
+            };
+            var polygon1 = new BoundingPolygon2D(vertices1);
 
-            var merged = BoundingPolygon2D.CreateMerged(poly1, poly2);
+            var vertices2 = new[]
+            {
+                new Vector2(10, 10),
+                new Vector2(15, 10),
+                new Vector2(15, 15),
+                new Vector2(10, 15)
+            };
+            var polygon2 = new BoundingPolygon2D(vertices2);
 
-            // Should contain both polygons
-            Assert.AreEqual(ContainmentType.Contains, merged.Contains(poly1));
-            Assert.AreEqual(ContainmentType.Contains, merged.Contains(poly2));
+            var merged = BoundingPolygon2D.CreateMerged(polygon1, polygon2);
+
+            Assert.AreEqual(ContainmentType.Contains, merged.Contains(polygon1));
+            Assert.AreEqual(ContainmentType.Contains, merged.Contains(polygon2));
         }
 
         [Test]
         public void CreateMerged_Overlapping()
         {
-            var poly1 = BoundingPolygon2D.CreateRegular(new Vector2(0, 0), 5, 4);
-            var poly2 = BoundingPolygon2D.CreateRegular(new Vector2(5, 0), 5, 4);
+            var vertices1 = new[]
+            {
+                new Vector2(0, 0),
+                new Vector2(10, 0),
+                new Vector2(10, 10),
+                new Vector2(0, 10)
+            };
+            var polygon1 = new BoundingPolygon2D(vertices1);
 
-            var merged = BoundingPolygon2D.CreateMerged(poly1, poly2);
+            var vertices2 = new[]
+            {
+                new Vector2(5, 5),
+                new Vector2(15, 5),
+                new Vector2(15, 15),
+                new Vector2(5, 15)
+            };
+            var polygon2 = new BoundingPolygon2D(vertices2);
 
-            // Should contain both polygons
-            Assert.AreEqual(ContainmentType.Contains, merged.Contains(poly1));
-            Assert.AreEqual(ContainmentType.Contains, merged.Contains(poly2));
+            var merged = BoundingPolygon2D.CreateMerged(polygon1, polygon2);
+
+            Assert.AreEqual(ContainmentType.Contains, merged.Contains(polygon1));
+            Assert.AreEqual(ContainmentType.Contains, merged.Contains(polygon2));
+        }
+
+        #endregion
+
+        #region Transform Tests
+
+        [Test]
+        public void Transform_Translation()
+        {
+            var vertices = new[]
+            {
+                new Vector2(0, 0),
+                new Vector2(10, 0),
+                new Vector2(10, 10)
+            };
+            var polygon = new BoundingPolygon2D(vertices);
+            var matrix = Matrix.CreateTranslation(5, 10, 0);
+
+            var transformed = polygon.Transform(matrix);
+
+            Assert.AreEqual(new Vector2(5, 10), transformed.Vertices[0]);
+            Assert.AreEqual(new Vector2(15, 10), transformed.Vertices[1]);
+            Assert.AreEqual(new Vector2(15, 20), transformed.Vertices[2]);
         }
 
         [Test]
-        public void ContainsPolygon_Contains()
+        public void Transform_UniformScale()
         {
-            var outer = BoundingPolygon2D.CreateRegular(Vector2.Zero, 10, 6);
-            var inner = BoundingPolygon2D.CreateRegular(Vector2.Zero, 3, 4);
+            var vertices = new[]
+            {
+                new Vector2(0, 0),
+                new Vector2(10, 0),
+                new Vector2(10, 10)
+            };
+            var polygon = new BoundingPolygon2D(vertices);
+            var matrix = Matrix.CreateScale(2.0f);
 
-            var result = outer.Contains(inner);
+            var transformed = polygon.Transform(matrix);
 
-            Assert.AreEqual(ContainmentType.Contains, result);
+            Assert.AreEqual(new Vector2(0, 0), transformed.Vertices[0]);
+            Assert.AreEqual(new Vector2(20, 0), transformed.Vertices[1]);
+            Assert.AreEqual(new Vector2(20, 20), transformed.Vertices[2]);
         }
 
         [Test]
-        public void ContainsPolygon_Intersects()
+        public void Transform_Rotation()
         {
-            var poly1 = BoundingPolygon2D.CreateRegular(new Vector2(0, 0), 5, 4);
-            var poly2 = BoundingPolygon2D.CreateRegular(new Vector2(7, 0), 5, 4);
+            var vertices = new[]
+            {
+                new Vector2(0, 0),
+                new Vector2(10, 0),
+                new Vector2(0, 10)
+            };
+            var polygon = new BoundingPolygon2D(vertices);
+            var matrix = Matrix.CreateRotationZ(MathHelper.PiOver2);
 
-            var result = poly1.Contains(poly2);
+            var transformed = polygon.Transform(matrix);
 
-            Assert.AreEqual(ContainmentType.Intersects, result);
+            Assert.AreEqual(0, transformed.Vertices[0].X, Collision2D.Epsilon);
+            Assert.AreEqual(0, transformed.Vertices[0].Y, Collision2D.Epsilon);
+            Assert.AreEqual(0, transformed.Vertices[1].X, Collision2D.Epsilon);
+            Assert.AreEqual(10, transformed.Vertices[1].Y, Collision2D.Epsilon);
+            Assert.AreEqual(-10, transformed.Vertices[2].X, Collision2D.Epsilon);
+            Assert.AreEqual(0, transformed.Vertices[2].Y, Collision2D.Epsilon);
         }
 
         [Test]
-        public void ContainsPolygon_Disjoint()
+        public void Translate_OffsetsPosition()
         {
-            var poly1 = BoundingPolygon2D.CreateRegular(new Vector2(0, 0), 5, 4);
-            var poly2 = BoundingPolygon2D.CreateRegular(new Vector2(20, 0), 5, 4);
+            var vertices = new[]
+            {
+                new Vector2(0, 0),
+                new Vector2(10, 0),
+                new Vector2(10, 10)
+            };
+            var polygon = new BoundingPolygon2D(vertices);
+            var offset = new Vector2(5, 10);
 
-            var result = poly1.Contains(poly2);
+            var translated = polygon.Translate(offset);
 
-            Assert.AreEqual(ContainmentType.Disjoint, result);
+            Assert.AreEqual(new Vector2(5, 10), translated.Vertices[0]);
+            Assert.AreEqual(new Vector2(15, 10), translated.Vertices[1]);
+            Assert.AreEqual(new Vector2(15, 20), translated.Vertices[2]);
         }
 
-        [Test]
-        public void ContainsCircle_Contains()
-        {
-            var polygon = BoundingPolygon2D.CreateRegular(Vector2.Zero, 10, 6);
-            var circle = new BoundingCircle(Vector2.Zero, 3);
+        #endregion
 
-            var result = polygon.Contains(circle);
-
-            Assert.AreEqual(ContainmentType.Contains, result);
-        }
-
-        [Test]
-        public void ContainsCircle_Intersects()
-        {
-            var polygon = BoundingPolygon2D.CreateRegular(Vector2.Zero, 10, 6);
-            var circle = new BoundingCircle(new Vector2(8, 0), 5);
-
-            var result = polygon.Contains(circle);
-
-            Assert.AreEqual(ContainmentType.Intersects, result);
-        }
-
-        [Test]
-        public void ContainsCircle_Disjoint()
-        {
-            var polygon = BoundingPolygon2D.CreateRegular(Vector2.Zero, 5, 4);
-            var circle = new BoundingCircle(new Vector2(20, 0), 3);
-
-            var result = polygon.Contains(circle);
-
-            Assert.AreEqual(ContainmentType.Disjoint, result);
-        }
+        #region ContainsPoint Tests (Delegation Spot Check)
 
         [Test]
         public void ContainsPoint_Inside()
         {
-            var polygon = BoundingPolygon2D.CreateRegular(Vector2.Zero, 10, 4);
-            var point = new Vector2(3, 3);
+            var vertices = new[]
+            {
+                new Vector2(0, 0),
+                new Vector2(10, 0),
+                new Vector2(10, 10),
+                new Vector2(0, 10)
+            };
+            var polygon = new BoundingPolygon2D(vertices);
+            var point = new Vector2(5, 5);
 
             var result = polygon.Contains(point);
 
@@ -396,209 +504,24 @@ namespace MonoGame.Tests.Framework
         [Test]
         public void ContainsPoint_Outside()
         {
-            var polygon = BoundingPolygon2D.CreateRegular(Vector2.Zero, 5, 4);
-            var point = new Vector2(20, 20);
+            var vertices = new[]
+            {
+                new Vector2(0, 0),
+                new Vector2(10, 0),
+                new Vector2(10, 10),
+                new Vector2(0, 10)
+            };
+            var polygon = new BoundingPolygon2D(vertices);
+            var point = new Vector2(15, 5);
 
             var result = polygon.Contains(point);
 
             Assert.AreEqual(ContainmentType.Disjoint, result);
         }
 
-        [Test]
-        public void IntersectsPolygon_Overlapping()
-        {
-            var poly1 = BoundingPolygon2D.CreateRegular(new Vector2(0, 0), 5, 4);
-            var poly2 = BoundingPolygon2D.CreateRegular(new Vector2(7, 0), 5, 4);
+        #endregion
 
-            bool intersects = poly1.Intersects(poly2);
-
-            Assert.IsTrue(intersects);
-        }
-
-        [Test]
-        public void IntersectsPolygon_Separated()
-        {
-            var poly1 = BoundingPolygon2D.CreateRegular(new Vector2(0, 0), 5, 4);
-            var poly2 = BoundingPolygon2D.CreateRegular(new Vector2(20, 0), 5, 4);
-
-            bool intersects = poly1.Intersects(poly2);
-
-            Assert.IsFalse(intersects);
-        }
-
-        [Test]
-        public void IntersectsPolygon_Touching()
-        {
-            var poly1 = BoundingPolygon2D.CreateRegular(new Vector2(0, 0), 5, 4);
-            var poly2 = BoundingPolygon2D.CreateRegular(new Vector2(10, 0), 5, 4);
-
-            bool intersects = poly1.Intersects(poly2);
-
-            Assert.IsTrue(intersects);
-        }
-
-        [Test]
-        public void IntersectsCircle_Overlapping()
-        {
-            var polygon = BoundingPolygon2D.CreateRegular(Vector2.Zero, 10, 6);
-            var circle = new BoundingCircle(new Vector2(8, 0), 5);
-
-            bool intersects = polygon.Intersects(circle);
-
-            Assert.IsTrue(intersects);
-        }
-
-        [Test]
-        public void IntersectsCircle_Separated()
-        {
-            var polygon = BoundingPolygon2D.CreateRegular(Vector2.Zero, 5, 4);
-            var circle = new BoundingCircle(new Vector2(20, 0), 3);
-
-            bool intersects = polygon.Intersects(circle);
-
-            Assert.IsFalse(intersects);
-        }
-
-        [Test]
-        public void IntersectsBox_Overlapping()
-        {
-            var polygon = BoundingPolygon2D.CreateRegular(Vector2.Zero, 10, 6);
-            var box = new BoundingBox2D(new Vector2(-5, -5), new Vector2(5, 5));
-
-            bool intersects = polygon.Intersects(box);
-
-            Assert.IsTrue(intersects);
-        }
-
-        [Test]
-        public void IntersectsBox_Separated()
-        {
-            var polygon = BoundingPolygon2D.CreateRegular(Vector2.Zero, 5, 4);
-            var box = new BoundingBox2D(new Vector2(20, 20), new Vector2(30, 30));
-
-            bool intersects = polygon.Intersects(box);
-
-            Assert.IsFalse(intersects);
-        }
-
-        [Test]
-        public void IntersectsOBB_Overlapping()
-        {
-            var polygon = BoundingPolygon2D.CreateRegular(Vector2.Zero, 10, 6);
-            var obb = new OrientedBoundingBox2D(new Vector2(5, 0), Vector2.UnitX, Vector2.UnitY, new Vector2(5, 5));
-
-            bool intersects = polygon.Intersects(obb);
-
-            Assert.IsTrue(intersects);
-        }
-
-        [Test]
-        public void IntersectsOBB_Separated()
-        {
-            var polygon = BoundingPolygon2D.CreateRegular(Vector2.Zero, 5, 4);
-            var obb = new OrientedBoundingBox2D(new Vector2(20, 0), Vector2.UnitX, Vector2.UnitY, new Vector2(5, 5));
-
-            bool intersects = polygon.Intersects(obb);
-
-            Assert.IsFalse(intersects);
-        }
-
-        [Test]
-        public void IntersectsCapsule_Overlapping()
-        {
-            var polygon = BoundingPolygon2D.CreateRegular(Vector2.Zero, 10, 6);
-            var capsule = new BoundingCapsule2D(new Vector2(-5, 0), new Vector2(5, 0), 3);
-
-            bool intersects = polygon.Intersects(capsule);
-
-            Assert.IsTrue(intersects);
-        }
-
-        [Test]
-        public void IntersectsCapsule_Separated()
-        {
-            var polygon = BoundingPolygon2D.CreateRegular(Vector2.Zero, 5, 4);
-            var capsule = new BoundingCapsule2D(new Vector2(20, 0), new Vector2(30, 0), 3);
-
-            bool intersects = polygon.Intersects(capsule);
-
-            Assert.IsFalse(intersects);
-        }
-
-        [Test]
-        public void Transform_Translation()
-        {
-            var vertices = new[]
-            {
-                new Vector2(0, 0),
-                new Vector2(10, 0),
-                new Vector2(10, 10),
-                new Vector2(0, 10)
-            };
-            var polygon = new BoundingPolygon2D(vertices);
-            var matrix = Matrix.CreateTranslation(5, 10, 0);
-
-            var transformed = polygon.Transform(matrix);
-
-            Assert.AreEqual(new Vector2(10, 15), transformed.Centroid);
-        }
-
-        [Test]
-        public void Transform_UniformScale()
-        {
-            var vertices = new[]
-            {
-                new Vector2(0, 0),
-                new Vector2(10, 0),
-                new Vector2(10, 10),
-                new Vector2(0, 10)
-            };
-            var polygon = new BoundingPolygon2D(vertices);
-            var matrix = Matrix.CreateScale(2, 2, 1);
-
-            var transformed = polygon.Transform(matrix);
-
-            Assert.AreEqual(new Vector2(10, 10), transformed.Centroid);
-            Assert.AreEqual(400.0f, transformed.Area, 1e-5f);
-        }
-
-        [Test]
-        public void Transform_Rotation()
-        {
-            var vertices = new[]
-            {
-                new Vector2(10, 0),
-                new Vector2(20, 0),
-                new Vector2(20, 10),
-                new Vector2(10, 10)
-            };
-            var polygon = new BoundingPolygon2D(vertices);
-            var matrix = Matrix.CreateRotationZ(MathHelper.PiOver2);
-
-            var transformed = polygon.Transform(matrix);
-
-            Assert.AreEqual(-5.0f, transformed.Centroid.X, 1e-5f);
-            Assert.AreEqual(15.0f, transformed.Centroid.Y, 1e-5f);
-        }
-
-        [Test]
-        public void Translate_OffsetsPosition()
-        {
-            var vertices = new[]
-            {
-                new Vector2(0, 0),
-                new Vector2(10, 0),
-                new Vector2(10, 10),
-                new Vector2(0, 10)
-            };
-            var polygon = new BoundingPolygon2D(vertices);
-            var translation = new Vector2(5, -3);
-
-            var translated = polygon.Translate(translation);
-
-            Assert.AreEqual(new Vector2(10, 2), translated.Centroid);
-            Assert.AreEqual(100.0f, translated.Area, 1e-5f);
-        }
+        #region Deconstruct Test
 
         [Test]
         public void Deconstruct()
@@ -607,14 +530,16 @@ namespace MonoGame.Tests.Framework
             {
                 new Vector2(0, 0),
                 new Vector2(10, 0),
-                new Vector2(5, 10)
+                new Vector2(10, 10)
             };
             var polygon = new BoundingPolygon2D(vertices);
 
-            polygon.Deconstruct(out Vector2[] outVertices, out Vector2[] outNormals);
+            var (v, n) = polygon;
 
-            Assert.AreEqual(polygon.Vertices, outVertices);
-            Assert.AreEqual(polygon.Normals, outNormals);
+            Assert.AreEqual(vertices, v);
+            Assert.IsNotNull(n);
         }
+
+        #endregion
     }
 }

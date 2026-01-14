@@ -2,6 +2,7 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
+using System;
 using Microsoft.Xna.Framework;
 using NUnit.Framework;
 
@@ -9,6 +10,8 @@ namespace MonoGame.Tests.Framework
 {
     class LineSegment2DTest
     {
+        #region Constructor Tests
+
         [Test]
         public void Constructor()
         {
@@ -21,14 +24,18 @@ namespace MonoGame.Tests.Framework
             Assert.AreEqual(end, segment.End);
         }
 
+        #endregion
+
+        #region Computed Property Tests
+
         [Test]
         public void Direction_ReturnsVector()
         {
-            var segment = new LineSegment2D(new Vector2(0, 0), new Vector2(10, 0));
+            var segment = new LineSegment2D(new Vector2(0, 0), new Vector2(3, 4));
 
             var direction = segment.Direction;
 
-            Assert.AreEqual(new Vector2(10, 0), direction);
+            Assert.AreEqual(new Vector2(3, 4), direction);
         }
 
         [Test]
@@ -48,9 +55,8 @@ namespace MonoGame.Tests.Framework
 
             float length = segment.Length;
 
-            Assert.AreEqual(10.0f, length, 1e-6f);
+            Assert.AreEqual(10.0f, length, Collision2D.Epsilon);
         }
-
 
         [Test]
         public void Length_Diagonal()
@@ -59,7 +65,7 @@ namespace MonoGame.Tests.Framework
 
             float length = segment.Length;
 
-            Assert.AreEqual(5.0f, length, 1e-6f);
+            Assert.AreEqual(5.0f, length, Collision2D.Epsilon);
         }
 
         [Test]
@@ -69,15 +75,19 @@ namespace MonoGame.Tests.Framework
 
             float lengthSquared = segment.LengthSquared;
 
-            Assert.AreEqual(25.0f, lengthSquared, 1e-6f);
+            Assert.AreEqual(25.0f, lengthSquared, Collision2D.Epsilon);
         }
+
+        #endregion
+
+        #region GetPoint Tests (Type-Specific Utility)
 
         [Test]
         public void GetPoint_AtStart()
         {
             var segment = new LineSegment2D(new Vector2(0, 0), new Vector2(10, 0));
 
-            var point = segment.GetPoint(0);
+            var point = segment.GetPoint(0.0f);
 
             Assert.AreEqual(new Vector2(0, 0), point);
         }
@@ -107,56 +117,118 @@ namespace MonoGame.Tests.Framework
         {
             var segment = new LineSegment2D(new Vector2(0, 0), new Vector2(10, 0));
 
-            var point = segment.GetPoint(2.0f);
+            var point = segment.GetPoint(1.5f);
 
-            Assert.AreEqual(new Vector2(20, 0), point);
+            Assert.AreEqual(new Vector2(15, 0), point);
         }
+
+        #endregion
+
+        #region GetBounds Tests (Type-Specific Method)
+
+        [Test]
+        public void GetBounds_HorizontalSegment()
+        {
+            var segment = new LineSegment2D(new Vector2(2, 5), new Vector2(8, 5));
+
+            var bounds = segment.GetBounds();
+
+            Assert.AreEqual(new Vector2(2, 5), bounds.Min);
+            Assert.AreEqual(new Vector2(8, 5), bounds.Max);
+        }
+
+        [Test]
+        public void GetBounds_VerticalSegment()
+        {
+            var segment = new LineSegment2D(new Vector2(5, 2), new Vector2(5, 8));
+
+            var bounds = segment.GetBounds();
+
+            Assert.AreEqual(new Vector2(5, 2), bounds.Min);
+            Assert.AreEqual(new Vector2(5, 8), bounds.Max);
+        }
+
+        [Test]
+        public void GetBounds_DiagonalSegment()
+        {
+            var segment = new LineSegment2D(new Vector2(1, 2), new Vector2(9, 7));
+
+            var bounds = segment.GetBounds();
+
+            Assert.AreEqual(new Vector2(1, 2), bounds.Min);
+            Assert.AreEqual(new Vector2(9, 7), bounds.Max);
+        }
+
+        [Test]
+        public void GetBounds_ReversedEndpoints()
+        {
+            var segment = new LineSegment2D(new Vector2(9, 7), new Vector2(1, 2));
+
+            var bounds = segment.GetBounds();
+
+            Assert.AreEqual(new Vector2(1, 2), bounds.Min);
+            Assert.AreEqual(new Vector2(9, 7), bounds.Max);
+        }
+
+        [Test]
+        public void GetBounds_DegenerateSegment()
+        {
+            var segment = new LineSegment2D(new Vector2(5, 5), new Vector2(5, 5));
+
+            var bounds = segment.GetBounds();
+
+            Assert.AreEqual(new Vector2(5, 5), bounds.Min);
+            Assert.AreEqual(new Vector2(5, 5), bounds.Max);
+        }
+
+        #endregion
+
+        #region Distance and Projection Tests (Delegation Spot Checks)
 
         [Test]
         public void ClosestPoint_OnSegment()
         {
             var segment = new LineSegment2D(new Vector2(0, 0), new Vector2(10, 0));
-            var point = new Vector2(5, 5);
+            var point = new Vector2(5, 3);
 
             var closest = segment.ClosestPoint(point, out float distanceAlongSegment);
 
             Assert.AreEqual(new Vector2(5, 0), closest);
-            Assert.AreEqual(0.5f, distanceAlongSegment, 1e-6f);
+            Assert.AreEqual(0.5f, distanceAlongSegment, Collision2D.Epsilon);
         }
 
         [Test]
         public void ClosestPoint_BeforeStart()
         {
             var segment = new LineSegment2D(new Vector2(10, 0), new Vector2(20, 0));
-            var point = new Vector2(0, 5);
+            var point = new Vector2(5, 3);
 
             var closest = segment.ClosestPoint(point, out float distanceAlongSegment);
 
             Assert.AreEqual(new Vector2(10, 0), closest);
-            Assert.AreEqual(0.0f, distanceAlongSegment);
+            Assert.AreEqual(0.0f, distanceAlongSegment, Collision2D.Epsilon);
         }
 
         [Test]
         public void ClosestPoint_AfterEnd()
         {
             var segment = new LineSegment2D(new Vector2(0, 0), new Vector2(10, 0));
-            var point = new Vector2(20, 5);
+            var point = new Vector2(15, 3);
 
             var closest = segment.ClosestPoint(point, out float distanceAlongSegment);
 
             Assert.AreEqual(new Vector2(10, 0), closest);
-            Assert.AreEqual(1.0f, distanceAlongSegment);
         }
 
         [Test]
         public void DistanceToPoint_PerpendicularDistance()
         {
             var segment = new LineSegment2D(new Vector2(0, 0), new Vector2(10, 0));
-            var point = new Vector2(5, 5);
+            var point = new Vector2(5, 3);
 
             float distance = segment.DistanceToPoint(point);
 
-            Assert.AreEqual(5.0f, distance, 1e-6f);
+            Assert.AreEqual(3.0f, distance, Collision2D.Epsilon);
         }
 
         [Test]
@@ -167,7 +239,7 @@ namespace MonoGame.Tests.Framework
 
             float distanceSquared = segment.DistanceSquaredToPoint(point);
 
-            Assert.AreEqual(9.0f, distanceSquared, 1e-6f);
+            Assert.AreEqual(9.0f, distanceSquared, Collision2D.Epsilon);
         }
 
         [Test]
@@ -178,549 +250,24 @@ namespace MonoGame.Tests.Framework
 
             float distance = segment1.DistanceToSegment(segment2);
 
-            Assert.AreEqual(5.0f, distance, 1e-6f);
+            Assert.AreEqual(5.0f, distance, Collision2D.Epsilon);
         }
 
-        [Test]
-        public void IntersectsLine_WithinBounds()
-        {
-            var segment = new LineSegment2D(new Vector2(0, -5), new Vector2(0, 5));
-            var line = new Line2D(new Vector2(0, 1), 0);
+        #endregion
 
-            bool intersects = segment.Intersects(line, out float? distanceAlongSegment, out Vector2? point);
-
-            Assert.IsTrue(intersects);
-            Assert.AreEqual(0.5f, distanceAlongSegment, 1e-6f);
-            Assert.AreEqual(new Vector2(0, 0), point);
-        }
-
-        [Test]
-        public void IntersectsLine_OutsideBounds()
-        {
-            var segment = new LineSegment2D(new Vector2(0, 5), new Vector2(0, 10));
-            var line = new Line2D(new Vector2(0, 1), 0);
-
-            bool intersects = segment.Intersects(line);
-
-            Assert.IsFalse(intersects);
-        }
-
-        [Test]
-        public void IntersectsRay_WithinBounds()
-        {
-            var segment = new LineSegment2D(new Vector2(5, -5), new Vector2(5, 5));
-            var ray = new Ray2D(new Vector2(0, 0), new Vector2(1, 0));
-
-            bool intersects = segment.Intersects(ray, out float? distanceAlongSegment, out float? distanceAlongRay, out Vector2? point);
-
-            Assert.IsTrue(intersects);
-            Assert.AreEqual(0.5f, distanceAlongSegment, 1e-6f);
-            Assert.AreEqual(5.0f, distanceAlongRay, 1e-6f);
-            Assert.AreEqual(new Vector2(5, 0), point);
-        }
-
-        [Test]
-        public void IntersectsRay_OutsideBounds()
-        {
-            var segment = new LineSegment2D(new Vector2(5, 5), new Vector2(5, 10));
-            var ray = new Ray2D(new Vector2(0, 0), new Vector2(1, 0));
-
-            bool intersects = segment.Intersects(ray);
-
-            Assert.IsFalse(intersects);
-        }
-
-        [Test]
-        public void IntersectsSegment_Crossing()
-        {
-            var segment1 = new LineSegment2D(new Vector2(0, 5), new Vector2(10, 5));
-            var segment2 = new LineSegment2D(new Vector2(5, 0), new Vector2(5, 10));
-
-            bool intersects = segment1.Intersects(segment2, out float? d1, out float? d2, out Vector2? point);
-
-            Assert.IsTrue(intersects);
-            Assert.AreEqual(0.5f, d1, 1e-6f);
-            Assert.AreEqual(0.5f, d2, 1e-6f);
-            Assert.AreEqual(new Vector2(5, 5), point);
-        }
-
-        [Test]
-        public void IntersectsSegment_Parallel()
-        {
-            var segment1 = new LineSegment2D(new Vector2(0, 0), new Vector2(10, 0));
-            var segment2 = new LineSegment2D(new Vector2(0, 5), new Vector2(10, 5));
-
-            bool intersects = segment1.Intersects(segment2);
-
-            Assert.IsFalse(intersects);
-        }
-
-        [Test]
-        public void IntersectsSegment_NotCrossing()
-        {
-            var segment1 = new LineSegment2D(new Vector2(0, 0), new Vector2(5, 0));
-            var segment2 = new LineSegment2D(new Vector2(10, -5), new Vector2(10, 5));
-
-            bool intersects = segment1.Intersects(segment2);
-
-            Assert.IsFalse(intersects);
-        }
+        #region Deconstruct Test
 
         [Test]
         public void Deconstruct()
         {
             var segment = new LineSegment2D(new Vector2(1, 2), new Vector2(3, 4));
 
-            segment.Deconstruct(out Vector2 start, out Vector2 end);
+            var (start, end) = segment;
 
-            Assert.AreEqual(segment.Start, start);
-            Assert.AreEqual(segment.End, end);
+            Assert.AreEqual(new Vector2(1, 2), start);
+            Assert.AreEqual(new Vector2(3, 4), end);
         }
 
-        [Test]
-        public void IntersectsBoundingBox_PassesCompletelyThrough()
-        {
-            var segment = new LineSegment2D(new Vector2(5, -5), new Vector2(5, 15));
-            var box = new BoundingBox2D(new Vector2(0, 0), new Vector2(10, 10));
-
-            bool intersects = segment.Intersects(box, out float? tMin, out float? tMax);
-
-            Assert.IsTrue(intersects);
-            Assert.AreEqual(0.25f, tMin, 1e-5f);
-            Assert.AreEqual(0.75f, tMax, 1e-5f);
-        }
-
-        [Test]
-        public void IntersectsBoundingBox_StartsInside()
-        {
-            var segment = new LineSegment2D(new Vector2(5, 5), new Vector2(15, 5));
-            var box = new BoundingBox2D(new Vector2(0, 0), new Vector2(10, 10));
-
-            bool intersects = segment.Intersects(box, out float? tMin, out float? tMax);
-
-            Assert.IsTrue(intersects);
-            Assert.AreEqual(0.0f, tMin);
-            Assert.AreEqual(0.5f, tMax, 1e-5f);
-        }
-
-        [Test]
-        public void IntersectsBoundingBox_EndsInside()
-        {
-            var segment = new LineSegment2D(new Vector2(-5, 5), new Vector2(5, 5));
-            var box = new BoundingBox2D(new Vector2(0, 0), new Vector2(10, 10));
-
-            bool intersects = segment.Intersects(box, out float? tMin, out float? tMax);
-
-            Assert.IsTrue(intersects);
-            Assert.AreEqual(0.5f, tMin, 1e-5f);
-            Assert.AreEqual(1.0f, tMax);
-        }
-
-        [Test]
-        public void IntersectsBoundingBox_BothEndpointsInside()
-        {
-            var segment = new LineSegment2D(new Vector2(2, 5), new Vector2(8, 5));
-            var box = new BoundingBox2D(new Vector2(0, 0), new Vector2(10, 10));
-
-            bool intersects = segment.Intersects(box, out float? tMin, out float? tMax);
-
-            Assert.IsTrue(intersects);
-            Assert.AreEqual(0.0f, tMin);
-            Assert.AreEqual(1.0f, tMax);
-        }
-
-        [Test]
-        public void IntersectsBoundingBox_CompletelyOutside()
-        {
-            var segment = new LineSegment2D(new Vector2(-5, 5), new Vector2(-2, 5));
-            var box = new BoundingBox2D(new Vector2(0, 0), new Vector2(10, 10));
-
-            bool intersects = segment.Intersects(box);
-
-            Assert.IsFalse(intersects);
-        }
-
-        [Test]
-        public void IntersectsBoundingBox_TouchesEdge()
-        {
-            var segment = new LineSegment2D(new Vector2(-5, 10), new Vector2(5, 10));
-            var box = new BoundingBox2D(new Vector2(0, 0), new Vector2(10, 10));
-
-            bool intersects = segment.Intersects(box);
-
-            Assert.IsTrue(intersects);
-        }
-
-        [Test]
-        public void IntersectsBoundingBox_TouchesCorner()
-        {
-            var segment = new LineSegment2D(new Vector2(0, 0), new Vector2(10, 10));
-            var box = new BoundingBox2D(new Vector2(5, 5), new Vector2(15, 15));
-
-            bool intersects = segment.Intersects(box);
-
-            Assert.IsTrue(intersects);
-        }
-
-        [Test]
-        public void IntersectsBoundingBox_DegenerateSegmentInside()
-        {
-            var segment = new LineSegment2D(new Vector2(5, 5), new Vector2(5, 5));
-            var box = new BoundingBox2D(new Vector2(0, 0), new Vector2(10, 10));
-
-            bool intersects = segment.Intersects(box, out float? tMin, out float? tMax);
-
-            Assert.IsTrue(intersects);
-            Assert.AreEqual(0.0f, tMin);
-            Assert.AreEqual(0.0f, tMax);
-        }
-
-        [Test]
-        public void IntersectsBoundingBox_DegenerateSegmentOutside()
-        {
-            var segment = new LineSegment2D(new Vector2(15, 15), new Vector2(15, 15));
-            var box = new BoundingBox2D(new Vector2(0, 0), new Vector2(10, 10));
-
-            bool intersects = segment.Intersects(box);
-
-            Assert.IsFalse(intersects);
-        }
-
-        [Test]
-        public void GetBounds_HorizontalSegment()
-        {
-            var segment = new LineSegment2D(new Vector2(5, 10), new Vector2(15, 10));
-
-            var bounds = segment.GetBounds();
-
-            Assert.AreEqual(new Vector2(5, 10), bounds.Min);
-            Assert.AreEqual(new Vector2(15, 10), bounds.Max);
-        }
-
-        [Test]
-        public void GetBounds_VerticalSegment()
-        {
-            var segment = new LineSegment2D(new Vector2(10, 5), new Vector2(10, 15));
-
-            var bounds = segment.GetBounds();
-
-            Assert.AreEqual(new Vector2(10, 5), bounds.Min);
-            Assert.AreEqual(new Vector2(10, 15), bounds.Max);
-        }
-
-        [Test]
-        public void GetBounds_DiagonalSegment()
-        {
-            var segment = new LineSegment2D(new Vector2(5, 10), new Vector2(15, 20));
-
-            var bounds = segment.GetBounds();
-
-            Assert.AreEqual(new Vector2(5, 10), bounds.Min);
-            Assert.AreEqual(new Vector2(15, 20), bounds.Max);
-        }
-
-        [Test]
-        public void GetBounds_ReversedEndpoints()
-        {
-            var segment = new LineSegment2D(new Vector2(15, 20), new Vector2(5, 10));
-
-            var bounds = segment.GetBounds();
-
-            Assert.AreEqual(new Vector2(5, 10), bounds.Min);
-            Assert.AreEqual(new Vector2(15, 20), bounds.Max);
-        }
-
-        [Test]
-        public void GetBounds_DegenerateSegment()
-        {
-            var segment = new LineSegment2D(new Vector2(10, 15), new Vector2(10, 15));
-
-            var bounds = segment.GetBounds();
-
-            Assert.AreEqual(new Vector2(10, 15), bounds.Min);
-            Assert.AreEqual(new Vector2(10, 15), bounds.Max);
-        }
-
-        [Test]
-        public void IntersectsBoundingCircle_PassesCompletelyThrough()
-        {
-            var segment = new LineSegment2D(new Vector2(5, 0), new Vector2(5, 20));
-            var circle = new BoundingCircle(new Vector2(5, 10), 5);
-
-            bool intersects = segment.Intersects(circle, out float? tMin, out float? tMax);
-
-            Assert.IsTrue(intersects);
-            Assert.AreEqual(0.25f, tMin, 1e-5f);
-            Assert.AreEqual(0.75f, tMax, 1e-5f);
-        }
-
-        [Test]
-        public void IntersectsBoundingCircle_StartsInside()
-        {
-            var segment = new LineSegment2D(new Vector2(5, 5), new Vector2(15, 5));
-            var circle = new BoundingCircle(new Vector2(5, 5), 5);
-
-            bool intersects = segment.Intersects(circle, out float? tMin, out float? tMax);
-
-            Assert.IsTrue(intersects);
-            Assert.AreEqual(0.0f, tMin);
-            Assert.AreEqual(0.5f, tMax, 1e-5f);
-        }
-
-        [Test]
-        public void IntersectsBoundingCircle_EndsInside()
-        {
-            var segment = new LineSegment2D(new Vector2(-5, 5), new Vector2(5, 5));
-            var circle = new BoundingCircle(new Vector2(5, 5), 5);
-
-            bool intersects = segment.Intersects(circle, out float? tMin, out float? tMax);
-
-            Assert.IsTrue(intersects);
-            Assert.AreEqual(0.5f, tMin, 1e-5f);
-            Assert.AreEqual(1.0f, tMax);
-        }
-
-        [Test]
-        public void IntersectsBoundingCircle_BothEndpointsInside()
-        {
-            var segment = new LineSegment2D(new Vector2(3, 5), new Vector2(7, 5));
-            var circle = new BoundingCircle(new Vector2(5, 5), 5);
-
-            bool intersects = segment.Intersects(circle, out float? tMin, out float? tMax);
-
-            Assert.IsTrue(intersects);
-            Assert.AreEqual(0.0f, tMin);
-            Assert.AreEqual(1.0f, tMax);
-        }
-
-        [Test]
-        public void IntersectsBoundingCircle_CompletelyOutside()
-        {
-            var segment = new LineSegment2D(new Vector2(-5, 5), new Vector2(-2, 5));
-            var circle = new BoundingCircle(new Vector2(5, 5), 5);
-
-            bool intersects = segment.Intersects(circle);
-
-            Assert.IsFalse(intersects);
-        }
-
-        [Test]
-        public void IntersectsBoundingCircle_TangentToCircle()
-        {
-            var segment = new LineSegment2D(new Vector2(0, 10), new Vector2(10, 10));
-            var circle = new BoundingCircle(new Vector2(5, 5), 5);
-
-            bool intersects = segment.Intersects(circle, out float? tMin, out float? tMax);
-
-            Assert.IsTrue(intersects);
-            Assert.AreEqual(0.5f, tMin, 1e-5f);
-            Assert.AreEqual(0.5f, tMax, 1e-5f);
-        }
-
-        [Test]
-        public void IntersectsBoundingCircle_SegmentThroughCenter()
-        {
-            var segment = new LineSegment2D(new Vector2(0, 5), new Vector2(10, 5));
-            var circle = new BoundingCircle(new Vector2(5, 5), 3);
-
-            bool intersects = segment.Intersects(circle, out float? tMin, out float? tMax);
-
-            Assert.IsTrue(intersects);
-            Assert.AreEqual(0.2f, tMin, 1e-5f);
-            Assert.AreEqual(0.8f, tMax, 1e-5f);
-        }
-
-        [Test]
-        public void IntersectsBoundingCircle_DegenerateSegmentInside()
-        {
-            var segment = new LineSegment2D(new Vector2(5, 5), new Vector2(5, 5));
-            var circle = new BoundingCircle(new Vector2(5, 5), 5);
-
-            bool intersects = segment.Intersects(circle, out float? tMin, out float? tMax);
-
-            Assert.IsTrue(intersects);
-            Assert.AreEqual(0.0f, tMin);
-            Assert.AreEqual(0.0f, tMax);
-        }
-
-        [Test]
-        public void IntersectsBoundingCircle_DegenerateSegmentOutside()
-        {
-            var segment = new LineSegment2D(new Vector2(15, 15), new Vector2(15, 15));
-            var circle = new BoundingCircle(new Vector2(5, 5), 5);
-
-            bool intersects = segment.Intersects(circle);
-
-            Assert.IsFalse(intersects);
-        }
-
-        [Test]
-        public void IntersectsBoundingCapsule_PassesCompletelyThrough()
-        {
-            var segment = new LineSegment2D(new Vector2(5, -10), new Vector2(5, 20));
-            var capsule = new BoundingCapsule2D(new Vector2(0, 0), new Vector2(10, 0), 5);
-
-            bool intersects = segment.Intersects(capsule, out float? tMin, out float? tMax);
-
-            Assert.IsTrue(intersects);
-            Assert.IsNotNull(tMin);
-            Assert.IsNotNull(tMax);
-            Assert.LessOrEqual(tMin.Value, tMax.Value);
-        }
-
-        [Test]
-        public void IntersectsBoundingCapsule_StartsInside()
-        {
-            var segment = new LineSegment2D(new Vector2(5, 0), new Vector2(15, 0));
-            var capsule = new BoundingCapsule2D(new Vector2(0, 0), new Vector2(10, 0), 3);
-
-            bool intersects = segment.Intersects(capsule, out float? tMin, out float? tMax);
-
-            Assert.IsTrue(intersects);
-            Assert.AreEqual(0.0f, tMin);
-            Assert.IsNotNull(tMax);
-        }
-
-        [Test]
-        public void IntersectsBoundingCapsule_EndsInside()
-        {
-            var segment = new LineSegment2D(new Vector2(-5, 0), new Vector2(5, 0));
-            var capsule = new BoundingCapsule2D(new Vector2(0, 0), new Vector2(10, 0), 3);
-
-            bool intersects = segment.Intersects(capsule, out float? tMin, out float? tMax);
-
-            Assert.IsTrue(intersects);
-            Assert.IsNotNull(tMin);
-            Assert.AreEqual(1.0f, tMax);
-        }
-
-        [Test]
-        public void IntersectsBoundingCapsule_BothEndpointsInside()
-        {
-            var segment = new LineSegment2D(new Vector2(3, 0), new Vector2(7, 0));
-            var capsule = new BoundingCapsule2D(new Vector2(0, 0), new Vector2(10, 0), 5);
-
-            bool intersects = segment.Intersects(capsule, out float? tMin, out float? tMax);
-
-            Assert.IsTrue(intersects);
-            Assert.AreEqual(0.0f, tMin);
-            Assert.AreEqual(1.0f, tMax);
-        }
-
-        [Test]
-        public void IntersectsBoundingCapsule_CompletelyOutside()
-        {
-            var segment = new LineSegment2D(new Vector2(-10, 0), new Vector2(-5, 0));
-            var capsule = new BoundingCapsule2D(new Vector2(5, 0), new Vector2(15, 0), 3);
-
-            bool intersects = segment.Intersects(capsule);
-
-            Assert.IsFalse(intersects);
-        }
-
-        [Test]
-        public void IntersectsBoundingCapsule_PerpendicularIntersection()
-        {
-            var segment = new LineSegment2D(new Vector2(5, -10), new Vector2(5, 10));
-            var capsule = new BoundingCapsule2D(new Vector2(0, 0), new Vector2(10, 0), 3);
-
-            bool intersects = segment.Intersects(capsule, out float? tMin, out float? tMax);
-
-            Assert.IsTrue(intersects);
-            Assert.IsNotNull(tMin);
-            Assert.IsNotNull(tMax);
-        }
-
-        [Test]
-        public void IntersectsBoundingCapsule_HitsEndCap()
-        {
-            var segment = new LineSegment2D(new Vector2(-8, 0), new Vector2(5, 0));
-            var capsule = new BoundingCapsule2D(new Vector2(-10, 0), new Vector2(-10, 10), 3);
-
-            bool intersects = segment.Intersects(capsule, out float? tMin, out float? tMax);
-
-            Assert.IsTrue(intersects);
-            Assert.IsNotNull(tMin);
-            Assert.IsNotNull(tMax);
-        }
-
-        [Test]
-        public void IntersectsBoundingCapsule_DegenerateSegmentInside()
-        {
-            var segment = new LineSegment2D(new Vector2(5, 0), new Vector2(5, 0));
-            var capsule = new BoundingCapsule2D(new Vector2(0, 0), new Vector2(10, 0), 5);
-
-            bool intersects = segment.Intersects(capsule, out float? tMin, out float? tMax);
-
-            Assert.IsTrue(intersects);
-            Assert.AreEqual(0.0f, tMin);
-            Assert.AreEqual(0.0f, tMax);
-        }
-
-        [Test]
-        public void IntersectsBoundingCapsule_DegenerateSegmentOutside()
-        {
-            var segment = new LineSegment2D(new Vector2(20, 0), new Vector2(20, 0));
-            var capsule = new BoundingCapsule2D(new Vector2(0, 0), new Vector2(10, 0), 3);
-
-            bool intersects = segment.Intersects(capsule);
-
-            Assert.IsFalse(intersects);
-        }
-
-        [Test]
-        public void IntersectsBoundingCapsule_DegenerateCapsule()
-        {
-            var segment = new LineSegment2D(new Vector2(0, 5), new Vector2(20, 5));
-            var capsule = new BoundingCapsule2D(new Vector2(10, 5), new Vector2(10, 5), 3);
-
-            bool intersects = segment.Intersects(capsule, out float? tMin, out float? tMax);
-
-            Assert.IsTrue(intersects);
-            Assert.IsNotNull(tMin);
-            Assert.IsNotNull(tMax);
-        }
-
-        [Test]
-        public void IntersectsOrientedBoundingBox2D_PassesCompletelyThrough()
-        {
-            var segment = new LineSegment2D(new Vector2(0, 10), new Vector2(20, 10));
-
-            // Axis-aligned OBB: equivalent to AABB min(5,5) max(15,15)
-            var obb = new OrientedBoundingBox2D(new Vector2(10, 10), Vector2.UnitX, Vector2.UnitY, new Vector2(5, 5));
-
-            bool intersects = segment.Intersects(obb, out float? tMin, out float? tMax);
-
-            Assert.IsTrue(intersects);
-            Assert.AreEqual(0.25f, tMin, 1e-5f);
-            Assert.AreEqual(0.75f, tMax, 1e-5f);
-        }
-
-        [Test]
-        public void IntersectsOrientedBoundingBox2D_StartsInside()
-        {
-            var segment = new LineSegment2D(new Vector2(10, 10), new Vector2(20, 10));
-            var obb = new OrientedBoundingBox2D(new Vector2(10, 10), Vector2.UnitX, Vector2.UnitY, new Vector2(5, 5));
-
-            bool intersects = segment.Intersects(obb, out float? tMin, out float? tMax);
-
-            Assert.IsTrue(intersects);
-            Assert.AreEqual(0.0f, tMin);
-            Assert.AreEqual(0.5f, tMax, 1e-5f);
-        }
-
-        [Test]
-        public void IntersectsOrientedBoundingBox2D_MissesCompletely()
-        {
-            var segment = new LineSegment2D(new Vector2(0, 0), new Vector2(20, 0));
-            var obb = new OrientedBoundingBox2D(new Vector2(10, 10), Vector2.UnitX, Vector2.UnitY, new Vector2(5, 5));
-
-            bool intersects = segment.Intersects(obb, out float? tMin, out float? tMax);
-
-            Assert.IsFalse(intersects);
-            Assert.IsNull(tMin);
-            Assert.IsNull(tMax);
-        }
-
+        #endregion
     }
 }

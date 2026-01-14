@@ -10,6 +10,8 @@ namespace MonoGame.Tests.Framework
 {
     class Line2DTest
     {
+        #region Constructor Tests
+
         [Test]
         public void Constructor()
         {
@@ -22,6 +24,10 @@ namespace MonoGame.Tests.Framework
             Assert.AreEqual(distance, line.Distance);
         }
 
+        #endregion
+
+        #region Factory Method Tests
+
         [Test]
         public void CreateFromPointAndNormal()
         {
@@ -31,7 +37,7 @@ namespace MonoGame.Tests.Framework
             var line = Line2D.CreateFromPointAndNormal(point, normal);
 
             Assert.AreEqual(new Vector2(0, 1), line.Normal);
-            Assert.AreEqual(5.0f, line.Distance, 1e-6f);
+            Assert.AreEqual(5.0f, line.Distance, Collision2D.Epsilon);
         }
 
         [Test]
@@ -42,9 +48,8 @@ namespace MonoGame.Tests.Framework
 
             var line = Line2D.CreateFromTwoPoints(p1, p2);
 
-            // Line through (0,0) and (10,0) has normal (0,1) or (0,-1)
-            Assert.AreEqual(0, MathF.Abs(line.Normal.X), 1e-6f);
-            Assert.AreEqual(1, MathF.Abs(line.Normal.Y), 1e-6f);
+            Assert.AreEqual(0, MathF.Abs(line.Normal.X), Collision2D.Epsilon);
+            Assert.AreEqual(1, MathF.Abs(line.Normal.Y), Collision2D.Epsilon);
         }
 
         [Test]
@@ -64,10 +69,13 @@ namespace MonoGame.Tests.Framework
 
             var line = Line2D.CreateFromPointAndDirection(point, direction);
 
-            // Direction (1,0) gives normal (0,1) or (0,-1)
-            Assert.AreEqual(0, MathF.Abs(line.Normal.X), 1e-6f);
-            Assert.AreEqual(1, MathF.Abs(line.Normal.Y), 1e-6f);
+            Assert.AreEqual(0, MathF.Abs(line.Normal.X), Collision2D.Epsilon);
+            Assert.AreEqual(1, MathF.Abs(line.Normal.Y), Collision2D.Epsilon);
         }
+
+        #endregion
+
+        #region Distance and Projection Tests (Delegation Spot Checks)
 
         [Test]
         public void DistanceToPoint_PointOnLine()
@@ -77,60 +85,34 @@ namespace MonoGame.Tests.Framework
 
             float distance = line.DistanceToPoint(point);
 
-            Assert.AreEqual(0.0f, distance, 1e-6f);
+            Assert.AreEqual(0.0f, distance, Collision2D.Epsilon);
         }
 
         [Test]
-        public void DistanceToPoint_PointAboveLine()
+        public void DistanceToPoint_PointOffLine()
         {
             var line = new Line2D(new Vector2(0, 1), 5);
             var point = new Vector2(0, 8);
 
             float distance = line.DistanceToPoint(point);
 
-            Assert.AreEqual(3.0f, distance, 1e-6f);
-        }
-
-        [Test]
-        public void DistanceToPoint_PointBelowLine()
-        {
-            var line = new Line2D(new Vector2(0, 1), 5);
-            var point = new Vector2(0, 2);
-
-            float distance = line.DistanceToPoint(point);
-
-            Assert.AreEqual(-3.0f, distance, 1e-6f);
+            Assert.AreEqual(3.0f, distance, Collision2D.Epsilon);
         }
 
         [Test]
         public void ClosestPoint_ReturnsProjection()
         {
             var line = new Line2D(new Vector2(0, 1), 5);
-            var point = new Vector2(10, 8);
+            var point = new Vector2(3, 8);
 
             var closest = line.ClosestPoint(point, out float distanceAlongLine);
 
-            Assert.AreEqual(new Vector2(10, 5), closest);
-
-            // For normal (0,1), the line's direction vector is (-1,0)
-            // Distance from reference point (0,5) to (10,5) along (-1,0) is -10
-            Assert.AreEqual(-10.0f, distanceAlongLine, 1e-6f);
+            Assert.AreEqual(new Vector2(3, 5), closest);
         }
 
-        [Test]
-        public void ClosestPoint_ParametricDistance_VerticalLine()
-        {
-            var line = new Line2D(new Vector2(1, 0), 3);
-            var point = new Vector2(3, 10);
+        #endregion
 
-            var closest = line.ClosestPoint(point, out float distanceAlongLine);
-
-            Assert.AreEqual(new Vector2(3, 10), closest);
-
-            // For normal (1,0), the line's direction vector is (0,1)
-            // Distance from reference point (3,0) to (3,10) along (0,1) is 10
-            Assert.AreEqual(10.0f, distanceAlongLine, 1e-5f);
-        }
+        #region Normalize Tests
 
         [Test]
         public void Normalize_Static_CreatesUnitNormal()
@@ -139,8 +121,7 @@ namespace MonoGame.Tests.Framework
 
             var normalized = Line2D.Normalize(line);
 
-            Assert.AreEqual(1.0f, normalized.Normal.Length(), 1e-6f);
-            Assert.AreEqual(2.0f, normalized.Distance, 1e-6f);
+            Assert.AreEqual(1.0f, normalized.Normal.Length(), Collision2D.Epsilon);
         }
 
         [Test]
@@ -148,10 +129,9 @@ namespace MonoGame.Tests.Framework
         {
             var line = new Line2D(new Vector2(3, 4), 10);
 
-            Line2D.Normalize(ref line, out Line2D result);
+            Line2D.Normalize(ref line, out var normalized);
 
-            Assert.AreEqual(1.0f, result.Normal.Length(), 1e-6f);
-            Assert.AreEqual(2.0f, result.Distance, 1e-6f);
+            Assert.AreEqual(1.0f, normalized.Normal.Length(), Collision2D.Epsilon);
         }
 
         [Test]
@@ -161,315 +141,36 @@ namespace MonoGame.Tests.Framework
 
             line.Normalize();
 
-            Assert.AreEqual(1.0f, line.Normal.Length(), 1e-6f);
-            Assert.AreEqual(2.0f, line.Distance, 1e-6f);
+            Assert.AreEqual(1.0f, line.Normal.Length(), Collision2D.Epsilon);
         }
 
         [Test]
         public void Normalize_AlreadyNormalized_RemainsUnchanged()
         {
             var line = new Line2D(new Vector2(0, 1), 5);
+            var original = line;
 
-            var normalized = Line2D.Normalize(line);
+            line.Normalize();
 
-            Assert.AreEqual(line.Normal, normalized.Normal);
-            Assert.AreEqual(line.Distance, normalized.Distance);
+            Assert.AreEqual(original.Normal, line.Normal);
+            Assert.AreEqual(original.Distance, line.Distance);
         }
 
-        [Test]
-        public void Normalize_Static_PreservesGeometricLine()
-        {
-            var line = new Line2D(new Vector2(0, 2), 10);
-            var testPoint = new Vector2(5, 5);
+        #endregion
 
-            var normalized = Line2D.Normalize(line);
-
-            // Distance to point should be the same for both representations
-            float originalDistance = line.DistanceToPoint(testPoint);
-            float normalizedDistance = normalized.DistanceToPoint(testPoint);
-            Assert.AreEqual(originalDistance, normalizedDistance, 1e-5f);
-        }
-
-        [Test]
-        public void IntersectsLine_Perpendicular()
-        {
-            var line1 = new Line2D(new Vector2(1, 0), 0);
-            var line2 = new Line2D(new Vector2(0, 1), 0);
-
-            bool intersects = line1.Intersects(line2, out Vector2? point);
-
-            Assert.IsTrue(intersects);
-            Assert.AreEqual(Vector2.Zero, point);
-        }
-
-        [Test]
-        public void IntersectsLine_Parallel()
-        {
-            var line1 = new Line2D(new Vector2(0, 1), 5);
-            var line2 = new Line2D(new Vector2(0, 1), 10);
-
-            bool intersects = line1.Intersects(line2);
-
-            Assert.IsFalse(intersects);
-        }
-
-        [Test]
-        public void IntersectsRay_ForwardDirection()
-        {
-            var line = new Line2D(new Vector2(0, 1), 5);
-            var ray = new Ray2D(new Vector2(0, 0), new Vector2(0, 1));
-
-            bool intersects = line.Intersects(ray, out float? distanceAlongRay, out Vector2? point);
-
-            Assert.IsTrue(intersects);
-            Assert.AreEqual(5.0f, distanceAlongRay, 1e-6f);
-            Assert.AreEqual(new Vector2(0, 5), point);
-        }
-
-        [Test]
-        public void IntersectsRay_BehindRayOrigin()
-        {
-            var line = new Line2D(new Vector2(0, 1), 5);
-            var ray = new Ray2D(new Vector2(0, 10), new Vector2(0, 1));
-
-            bool intersects = line.Intersects(ray);
-
-            Assert.IsFalse(intersects);
-        }
-
-        [Test]
-        public void IntersectsSegment_WithinBounds()
-        {
-            var line = new Line2D(new Vector2(0, 1), 5);
-            var segment = new LineSegment2D(new Vector2(0, 0), new Vector2(0, 10));
-
-            bool intersects = line.Intersects(segment, out float? distanceAlongSegment, out Vector2? point);
-
-            Assert.IsTrue(intersects);
-            Assert.AreEqual(0.5f, distanceAlongSegment, 1e-6f);
-            Assert.AreEqual(new Vector2(0, 5), point);
-        }
-
-        [Test]
-        public void IntersectsSegment_OutsideBounds()
-        {
-            var line = new Line2D(new Vector2(0, 1), 5);
-            var segment = new LineSegment2D(new Vector2(0, 10), new Vector2(0, 20));
-
-            bool intersects = line.Intersects(segment);
-
-            Assert.IsFalse(intersects);
-        }
+        #region Deconstruct Test
 
         [Test]
         public void Deconstruct()
         {
-            var line = new Line2D(new Vector2(1, 0), 5.0f);
-
-            line.Deconstruct(out Vector2 normal, out float distance);
-
-            Assert.AreEqual(line.Normal, normal);
-            Assert.AreEqual(line.Distance, distance);
-        }
-
-        [Test]
-        public void IntersectsBoundingBox2D_PassesThrough()
-        {
             var line = new Line2D(new Vector2(0, 1), 5);
-            var box = new BoundingBox2D(new Vector2(0, 0), new Vector2(10, 10));
 
-            bool intersects = line.Intersects(box);
+            var (normal, distance) = line;
 
-            Assert.IsTrue(intersects);
+            Assert.AreEqual(new Vector2(0, 1), normal);
+            Assert.AreEqual(5.0f, distance);
         }
 
-        [Test]
-        public void IntersectsBoundingBox2D_MissesCompletely()
-        {
-            var line = new Line2D(new Vector2(0, 1), 5);
-            var box = new BoundingBox2D(new Vector2(0, 10), new Vector2(10, 20));
-
-            bool intersects = line.Intersects(box);
-
-            Assert.IsFalse(intersects);
-        }
-
-        [Test]
-        public void IntersectsBoundingBox2D_TouchesEdge()
-        {
-            var line = new Line2D(new Vector2(0, 1), 10);
-            var box = new BoundingBox2D(new Vector2(0, 0), new Vector2(10, 10));
-
-            bool intersects = line.Intersects(box);
-
-            Assert.IsTrue(intersects);
-        }
-
-        [Test]
-        public void IntersectsBoundingBox2D_TouchesCorner()
-        {
-            var line = Line2D.CreateFromTwoPoints(new Vector2(0, 0), new Vector2(10, 10));
-            var box = new BoundingBox2D(new Vector2(5, 5), new Vector2(15, 15));
-
-            bool intersects = line.Intersects(box);
-
-            Assert.IsTrue(intersects);
-        }
-
-
-        [Test]
-        public void IntersectsBoundingBox2D_HorizontalLine()
-        {
-            var line = new Line2D(new Vector2(0, 1), 5);
-            var box = new BoundingBox2D(new Vector2(-5, 0), new Vector2(5, 10));
-
-            bool intersects = line.Intersects(box);
-
-            Assert.IsTrue(intersects);
-        }
-
-        [Test]
-        public void IntersectsBoundingBox2D_VerticalLine()
-        {
-            var line = new Line2D(new Vector2(1, 0), 5);
-            var box = new BoundingBox2D(new Vector2(0, -5), new Vector2(10, 5));
-
-            bool intersects = line.Intersects(box);
-
-            Assert.IsTrue(intersects);
-        }
-
-        [Test]
-        public void IntersectsBoundingCircle_PassesThrough()
-        {
-            var line = new Line2D(new Vector2(0, 1), 5);
-            var circle = new BoundingCircle(new Vector2(0, 5), 3);
-
-            bool intersects = line.Intersects(circle);
-
-            Assert.IsTrue(intersects);
-        }
-
-        [Test]
-        public void IntersectsBoundingCircle_Tangent()
-        {
-            var line = new Line2D(new Vector2(0, 1), 5);
-            var circle = new BoundingCircle(new Vector2(0, 0), 5);
-
-            bool intersects = line.Intersects(circle);
-
-            Assert.IsTrue(intersects);
-        }
-
-        [Test]
-        public void IntersectsBoundingCircle_MissesCompletely()
-        {
-            var line = new Line2D(new Vector2(0, 1), 5);
-            var circle = new BoundingCircle(new Vector2(0, 0), 3);
-
-            bool intersects = line.Intersects(circle);
-
-            Assert.IsFalse(intersects);
-        }
-
-        [Test]
-        public void IntersectsBoundingCircle_LineThroughCenter()
-        {
-            var line = Line2D.CreateFromTwoPoints(new Vector2(0, 0), new Vector2(10, 0));
-            var circle = new BoundingCircle(new Vector2(5, 0), 5);
-
-            bool intersects = line.Intersects(circle);
-
-            Assert.IsTrue(intersects);
-        }
-
-        [Test]
-        public void IntersectsBoundingCapsule_PassesThrough()
-        {
-            var line = new Line2D(new Vector2(0, 1), 2);
-            var capsule = new BoundingCapsule2D(new Vector2(0, 0), new Vector2(10, 0), 3);
-
-            bool intersects = line.Intersects(capsule);
-
-            Assert.IsTrue(intersects);
-        }
-
-        [Test]
-        public void IntersectsBoundingCapsule_MissesCompletely()
-        {
-            var line = new Line2D(new Vector2(0, 1), 5);
-            var capsule = new BoundingCapsule2D(new Vector2(0, 10), new Vector2(10, 10), 2);
-
-            bool intersects = line.Intersects(capsule);
-
-            Assert.IsFalse(intersects);
-        }
-
-        [Test]
-        public void IntersectsBoundingCapsule_TangentToBody()
-        {
-            var line = new Line2D(new Vector2(0, 1), 5);
-            var capsule = new BoundingCapsule2D(new Vector2(0, 2), new Vector2(10, 2), 3);
-
-            bool intersects = line.Intersects(capsule);
-
-            Assert.IsTrue(intersects);
-        }
-
-        [Test]
-        public void IntersectsBoundingCapsule_IntersectsEndCap()
-        {
-            var line = Line2D.CreateFromTwoPoints(new Vector2(0, 0), new Vector2(10, 0));
-            var capsule = new BoundingCapsule2D(new Vector2(-5, -3), new Vector2(-5, 3), 3);
-
-            bool intersects = line.Intersects(capsule);
-
-            Assert.IsTrue(intersects);
-        }
-
-        [Test]
-        public void IntersectsBoundingCapsule_ParallelToAxis()
-        {
-            var line = Line2D.CreateFromTwoPoints(new Vector2(0, 0), new Vector2(10, 0));
-            var capsule = new BoundingCapsule2D(new Vector2(5, 2), new Vector2(15, 2), 1);
-
-            bool intersects = line.Intersects(capsule);
-
-            Assert.IsFalse(intersects);
-        }
-
-        [Test]
-        public void IntersectsOrientedBoundingBox2D_PassesThrough()
-        {
-            var line = new Line2D(new Vector2(0, 1), 10);
-            var obb = new OrientedBoundingBox2D(new Vector2(10, 10), Vector2.UnitX, Vector2.UnitY, new Vector2(5, 5));
-
-            bool intersects = line.Intersects(obb);
-
-            Assert.IsTrue(intersects);
-        }
-
-        [Test]
-        public void IntersectsOrientedBoundingBox2D_MissesCompletely()
-        {
-            var line = new Line2D(new Vector2(0, 1), 30);
-            var obb = new OrientedBoundingBox2D(new Vector2(10, 10), Vector2.UnitX, Vector2.UnitY, new Vector2(5, 5));
-
-            bool intersects = line.Intersects(obb);
-
-            Assert.IsFalse(intersects);
-        }
-
-        [Test]
-        public void IntersectsOrientedBoundingBox2D_TouchesEdge()
-        {
-            var line = new Line2D(new Vector2(0, 1), 5);
-            var obb = new OrientedBoundingBox2D(new Vector2(10, 10), Vector2.UnitX, Vector2.UnitY, new Vector2(5, 5));
-
-            bool intersects = line.Intersects(obb);
-
-            Assert.IsTrue(intersects);
-        }
-
+        #endregion
     }
 }

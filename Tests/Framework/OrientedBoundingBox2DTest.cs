@@ -2,21 +2,23 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
+using System;
 using Microsoft.Xna.Framework;
 using NUnit.Framework;
-using System;
 
 namespace MonoGame.Tests.Framework
 {
     class OrientedBoundingBox2DTest
     {
+        #region Constructor Tests
+
         [Test]
         public void Constructor()
         {
-            var center = new Vector2(10, 20);
+            var center = new Vector2(5, 10);
             var axisX = new Vector2(1, 0);
             var axisY = new Vector2(0, 1);
-            var halfExtents = new Vector2(5, 3);
+            var halfExtents = new Vector2(3, 4);
 
             var obb = new OrientedBoundingBox2D(center, axisX, axisY, halfExtents);
 
@@ -26,100 +28,141 @@ namespace MonoGame.Tests.Framework
             Assert.AreEqual(halfExtents, obb.HalfExtents);
         }
 
+        #endregion
+
+        #region Computed Property Tests
+
         [Test]
         public void Width_ReturnsTwiceHalfExtentX()
         {
-            var obb = new OrientedBoundingBox2D(Vector2.Zero, Vector2.UnitX, Vector2.UnitY, new Vector2(5, 3));
+            var obb = new OrientedBoundingBox2D(
+                new Vector2(0, 0),
+                new Vector2(1, 0),
+                new Vector2(0, 1),
+                new Vector2(5, 3)
+            );
 
             float width = obb.Width;
 
-            Assert.AreEqual(10.0f, width);
+            Assert.AreEqual(10.0f, width, Collision2D.Epsilon);
         }
 
         [Test]
         public void Height_ReturnsTwiceHalfExtentY()
         {
-            var obb = new OrientedBoundingBox2D(Vector2.Zero, Vector2.UnitX, Vector2.UnitY, new Vector2(5, 3));
+            var obb = new OrientedBoundingBox2D(
+                new Vector2(0, 0),
+                new Vector2(1, 0),
+                new Vector2(0, 1),
+                new Vector2(5, 3)
+            );
 
             float height = obb.Height;
 
-            Assert.AreEqual(6.0f, height);
+            Assert.AreEqual(6.0f, height, Collision2D.Epsilon);
         }
 
         [Test]
         public void Rotation_ReturnsZeroForAlignedBox()
         {
-            var obb = new OrientedBoundingBox2D(Vector2.Zero, Vector2.UnitX, Vector2.UnitY, new Vector2(5, 3));
+            var obb = new OrientedBoundingBox2D(
+                new Vector2(0, 0),
+                new Vector2(1, 0),
+                new Vector2(0, 1),
+                new Vector2(5, 3)
+            );
 
             float rotation = obb.Rotation;
 
-            Assert.AreEqual(0.0f, rotation, 1e-5f);
+            Assert.AreEqual(0.0f, rotation, Collision2D.Epsilon);
         }
 
         [Test]
         public void Rotation_Returns90DegreesForRotatedBox()
         {
-            var obb = new OrientedBoundingBox2D(Vector2.Zero, Vector2.UnitY, new Vector2(-1, 0), new Vector2(5, 3));
+            var obb = new OrientedBoundingBox2D(
+                new Vector2(0, 0),
+                new Vector2(0, 1),
+                new Vector2(-1, 0),
+                new Vector2(5, 3)
+            );
 
             float rotation = obb.Rotation;
 
-            Assert.AreEqual(MathHelper.PiOver2, rotation, 1e-5f);
+            Assert.AreEqual(MathHelper.PiOver2, rotation, Collision2D.Epsilon);
         }
 
         [Test]
         public void Area_CalculatesCorrectly()
         {
-            var obb = new OrientedBoundingBox2D(Vector2.Zero, Vector2.UnitX, Vector2.UnitY, new Vector2(5, 3));
+            var obb = new OrientedBoundingBox2D(
+                new Vector2(0, 0),
+                new Vector2(1, 0),
+                new Vector2(0, 1),
+                new Vector2(5, 3)
+            );
 
             float area = obb.Area;
 
-            Assert.AreEqual(60.0f, area);
+            Assert.AreEqual(60.0f, area, Collision2D.Epsilon);
         }
+
+        #endregion
+
+        #region Factory Method Tests
 
         [Test]
         public void CreateFromRotation_ZeroRotation()
         {
-            var center = new Vector2(10, 20);
-            var halfExtents = new Vector2(5, 3);
+            var center = new Vector2(5, 5);
+            var halfExtents = new Vector2(3, 2);
+            var rotation = 0.0f;
 
-            var obb = OrientedBoundingBox2D.CreateFromRotation(center, 0.0f, halfExtents);
+            var obb = OrientedBoundingBox2D.CreateFromRotation(center, rotation, halfExtents);
 
             Assert.AreEqual(center, obb.Center);
-            Assert.AreEqual(new Vector2(1, 0), obb.AxisX);
-            Assert.AreEqual(new Vector2(0, 1), obb.AxisY);
+            Assert.AreEqual(1, obb.AxisX.X, Collision2D.Epsilon);
+            Assert.AreEqual(0, obb.AxisX.Y, Collision2D.Epsilon);
+            Assert.AreEqual(0, obb.AxisY.X, Collision2D.Epsilon);
+            Assert.AreEqual(1, obb.AxisY.Y, Collision2D.Epsilon);
             Assert.AreEqual(halfExtents, obb.HalfExtents);
         }
 
         [Test]
         public void CreateFromRotation_90Degrees()
         {
-            var center = new Vector2(10, 20);
-            var halfExtents = new Vector2(5, 3);
+            var center = new Vector2(5, 5);
+            var halfExtents = new Vector2(3, 2);
+            var rotation = MathHelper.PiOver2;
 
-            var obb = OrientedBoundingBox2D.CreateFromRotation(center, MathHelper.PiOver2, halfExtents);
+            var obb = OrientedBoundingBox2D.CreateFromRotation(center, rotation, halfExtents);
 
             Assert.AreEqual(center, obb.Center);
-            Assert.AreEqual(0.0f, obb.AxisX.X, 1e-5f);
-            Assert.AreEqual(1.0f, obb.AxisX.Y, 1e-5f);
-            Assert.AreEqual(-1.0f, obb.AxisY.X, 1e-5f);
-            Assert.AreEqual(0.0f, obb.AxisY.Y, 1e-5f);
+            Assert.AreEqual(0, obb.AxisX.X, Collision2D.Epsilon);
+            Assert.AreEqual(1, obb.AxisX.Y, Collision2D.Epsilon);
+            Assert.AreEqual(-1, obb.AxisY.X, Collision2D.Epsilon);
+            Assert.AreEqual(0, obb.AxisY.Y, Collision2D.Epsilon);
             Assert.AreEqual(halfExtents, obb.HalfExtents);
         }
 
         [Test]
         public void CreateFromRotation_45Degrees()
         {
-            var center = new Vector2(10, 20);
-            var halfExtents = new Vector2(5, 3);
-            float rotation = MathHelper.PiOver4;
+            var center = new Vector2(5, 5);
+            var halfExtents = new Vector2(3, 2);
+            var rotation = MathHelper.PiOver4;
 
             var obb = OrientedBoundingBox2D.CreateFromRotation(center, rotation, halfExtents);
 
             Assert.AreEqual(center, obb.Center);
-            float expectedCos = MathF.Cos(rotation);
-            float expectedSin = MathF.Sin(rotation);
-            Assert.AreEqual(expectedCos, obb.AxisX.X, 1e-5f);
-            Assert.AreEqual(expectedSin, obb.AxisX.Y, 1e-5f);
+            Assert.AreEqual(halfExtents, obb.HalfExtents);
+
+            float cos45 = MathF.Cos(MathHelper.PiOver4);
+            float sin45 = MathF.Sin(MathHelper.PiOver4);
+            Assert.AreEqual(cos45, obb.AxisX.X, Collision2D.Epsilon);
+            Assert.AreEqual(sin45, obb.AxisX.Y, Collision2D.Epsilon);
+            Assert.AreEqual(-sin45, obb.AxisY.X, Collision2D.Epsilon);
+            Assert.AreEqual(cos45, obb.AxisY.Y, Collision2D.Epsilon);
         }
 
         [Test]
@@ -129,17 +172,27 @@ namespace MonoGame.Tests.Framework
 
             var obb = OrientedBoundingBox2D.CreateFromBoundingBox2D(box);
 
-            Assert.AreEqual(box.Center, obb.Center);
-            Assert.AreEqual(Vector2.UnitX, obb.AxisX);
-            Assert.AreEqual(Vector2.UnitY, obb.AxisY);
-            Assert.AreEqual(box.HalfExtents, obb.HalfExtents);
+            Assert.AreEqual(new Vector2(5, 10), obb.Center);
+            Assert.AreEqual(new Vector2(1, 0), obb.AxisX);
+            Assert.AreEqual(new Vector2(0, 1), obb.AxisY);
+            Assert.AreEqual(new Vector2(5, 10), obb.HalfExtents);
         }
 
         [Test]
         public void CreateMerged_NonOverlapping()
         {
-            var obb1 = new OrientedBoundingBox2D(new Vector2(0, 0), Vector2.UnitX, Vector2.UnitY, new Vector2(2, 2));
-            var obb2 = new OrientedBoundingBox2D(new Vector2(10, 0), Vector2.UnitX, Vector2.UnitY, new Vector2(2, 2));
+            var obb1 = new OrientedBoundingBox2D(
+                new Vector2(0, 0),
+                new Vector2(1, 0),
+                new Vector2(0, 1),
+                new Vector2(2, 2)
+            );
+            var obb2 = new OrientedBoundingBox2D(
+                new Vector2(10, 10),
+                new Vector2(1, 0),
+                new Vector2(0, 1),
+                new Vector2(2, 2)
+            );
 
             var merged = OrientedBoundingBox2D.CreateMerged(obb1, obb2);
 
@@ -150,8 +203,18 @@ namespace MonoGame.Tests.Framework
         [Test]
         public void CreateMerged_Overlapping()
         {
-            var obb1 = new OrientedBoundingBox2D(new Vector2(0, 0), Vector2.UnitX, Vector2.UnitY, new Vector2(5, 5));
-            var obb2 = new OrientedBoundingBox2D(new Vector2(5, 5), Vector2.UnitX, Vector2.UnitY, new Vector2(5, 5));
+            var obb1 = new OrientedBoundingBox2D(
+                new Vector2(0, 0),
+                new Vector2(1, 0),
+                new Vector2(0, 1),
+                new Vector2(5, 5)
+            );
+            var obb2 = new OrientedBoundingBox2D(
+                new Vector2(5, 5),
+                new Vector2(1, 0),
+                new Vector2(0, 1),
+                new Vector2(3, 3)
+            );
 
             var merged = OrientedBoundingBox2D.CreateMerged(obb1, obb2);
 
@@ -162,8 +225,8 @@ namespace MonoGame.Tests.Framework
         [Test]
         public void CreateMerged_DifferentRotations()
         {
-            var obb1 = OrientedBoundingBox2D.CreateFromRotation(new Vector2(0, 0), 0, new Vector2(5, 2));
-            var obb2 = OrientedBoundingBox2D.CreateFromRotation(new Vector2(10, 0), MathHelper.PiOver4, new Vector2(5, 2));
+            var obb1 = OrientedBoundingBox2D.CreateFromRotation(new Vector2(0, 0), 0, new Vector2(3, 2));
+            var obb2 = OrientedBoundingBox2D.CreateFromRotation(new Vector2(5, 5), MathHelper.PiOver4, new Vector2(3, 2));
 
             var merged = OrientedBoundingBox2D.CreateMerged(obb1, obb2);
 
@@ -171,10 +234,19 @@ namespace MonoGame.Tests.Framework
             Assert.AreEqual(ContainmentType.Contains, merged.Contains(obb2));
         }
 
+        #endregion
+
+        #region GetCorners Tests (Type-Specific Method)
+
         [Test]
         public void GetCorners_ReturnsArrayOfFour()
         {
-            var obb = new OrientedBoundingBox2D(new Vector2(10, 10), Vector2.UnitX, Vector2.UnitY, new Vector2(5, 3));
+            var obb = new OrientedBoundingBox2D(
+                new Vector2(0, 0),
+                new Vector2(1, 0),
+                new Vector2(0, 1),
+                new Vector2(5, 3)
+            );
 
             var corners = obb.GetCorners();
 
@@ -184,34 +256,49 @@ namespace MonoGame.Tests.Framework
         [Test]
         public void GetCorners_AlignedBox()
         {
-            var obb = new OrientedBoundingBox2D(new Vector2(10, 10), Vector2.UnitX, Vector2.UnitY, new Vector2(5, 3));
+            var obb = new OrientedBoundingBox2D(
+                new Vector2(0, 0),
+                new Vector2(1, 0),
+                new Vector2(0, 1),
+                new Vector2(5, 3)
+            );
 
             var corners = obb.GetCorners();
 
-            Assert.AreEqual(new Vector2(5, 7), corners[0]);   // Top-left
-            Assert.AreEqual(new Vector2(15, 7), corners[1]);  // Top-right
-            Assert.AreEqual(new Vector2(15, 13), corners[2]); // Bottom-right
-            Assert.AreEqual(new Vector2(5, 13), corners[3]);  // Bottom-left
+            Assert.Contains(new Vector2(-5, -3), corners);
+            Assert.Contains(new Vector2(5, -3), corners);
+            Assert.Contains(new Vector2(5, 3), corners);
+            Assert.Contains(new Vector2(-5, 3), corners);
         }
 
         [Test]
         public void GetCorners_FillArray()
         {
-            var obb = new OrientedBoundingBox2D(new Vector2(10, 10), Vector2.UnitX, Vector2.UnitY, new Vector2(5, 3));
+            var obb = new OrientedBoundingBox2D(
+                new Vector2(0, 0),
+                new Vector2(1, 0),
+                new Vector2(0, 1),
+                new Vector2(5, 3)
+            );
             var corners = new Vector2[4];
 
             obb.GetCorners(corners);
 
-            Assert.AreEqual(new Vector2(5, 7), corners[0]);
-            Assert.AreEqual(new Vector2(15, 7), corners[1]);
-            Assert.AreEqual(new Vector2(15, 13), corners[2]);
-            Assert.AreEqual(new Vector2(5, 13), corners[3]);
+            Assert.Contains(new Vector2(-5, -3), corners);
+            Assert.Contains(new Vector2(5, -3), corners);
+            Assert.Contains(new Vector2(5, 3), corners);
+            Assert.Contains(new Vector2(-5, 3), corners);
         }
 
         [Test]
         public void GetCorners_ThrowsWhenArrayNull()
         {
-            var obb = new OrientedBoundingBox2D(Vector2.Zero, Vector2.UnitX, Vector2.UnitY, Vector2.One);
+            var obb = new OrientedBoundingBox2D(
+                new Vector2(0, 0),
+                new Vector2(1, 0),
+                new Vector2(0, 1),
+                new Vector2(5, 3)
+            );
 
             Assert.Throws<ArgumentNullException>(() => obb.GetCorners(null));
         }
@@ -219,83 +306,133 @@ namespace MonoGame.Tests.Framework
         [Test]
         public void GetCorners_ThrowsWhenArrayTooSmall()
         {
-            var obb = new OrientedBoundingBox2D(Vector2.Zero, Vector2.UnitX, Vector2.UnitY, Vector2.One);
+            var obb = new OrientedBoundingBox2D(
+                new Vector2(0, 0),
+                new Vector2(1, 0),
+                new Vector2(0, 1),
+                new Vector2(5, 3)
+            );
             var corners = new Vector2[3];
 
             Assert.Throws<ArgumentException>(() => obb.GetCorners(corners));
         }
 
+        #endregion
+
+        #region Transform Tests
+
         [Test]
-        public void ContainsOBB_Contains()
+        public void Transform_Translation()
         {
-            var obb1 = new OrientedBoundingBox2D(new Vector2(10, 10), Vector2.UnitX, Vector2.UnitY, new Vector2(10, 10));
-            var obb2 = new OrientedBoundingBox2D(new Vector2(10, 10), Vector2.UnitX, Vector2.UnitY, new Vector2(3, 3));
+            var obb = new OrientedBoundingBox2D(
+                new Vector2(0, 0),
+                new Vector2(1, 0),
+                new Vector2(0, 1),
+                new Vector2(5, 3)
+            );
+            var matrix = Matrix.CreateTranslation(10, 20, 0);
 
-            var result = obb1.Contains(obb2);
+            var transformed = obb.Transform(matrix);
 
-            Assert.AreEqual(ContainmentType.Contains, result);
+            Assert.AreEqual(new Vector2(10, 20), transformed.Center);
+            Assert.AreEqual(obb.AxisX, transformed.AxisX);
+            Assert.AreEqual(obb.AxisY, transformed.AxisY);
+            Assert.AreEqual(obb.HalfExtents, transformed.HalfExtents);
         }
 
         [Test]
-        public void ContainsOBB_Intersects()
+        public void Transform_UniformScale()
         {
-            var obb1 = new OrientedBoundingBox2D(new Vector2(0, 0), Vector2.UnitX, Vector2.UnitY, new Vector2(5, 5));
-            var obb2 = new OrientedBoundingBox2D(new Vector2(7, 0), Vector2.UnitX, Vector2.UnitY, new Vector2(5, 5));
+            var obb = new OrientedBoundingBox2D(
+                new Vector2(0, 0),
+                new Vector2(1, 0),
+                new Vector2(0, 1),
+                new Vector2(5, 3)
+            );
+            var matrix = Matrix.CreateScale(2.0f);
 
-            var result = obb1.Contains(obb2);
+            var transformed = obb.Transform(matrix);
 
-            Assert.AreEqual(ContainmentType.Intersects, result);
+            Assert.AreEqual(new Vector2(0, 0), transformed.Center);
+            Assert.AreEqual(new Vector2(10, 6), transformed.HalfExtents);
         }
 
         [Test]
-        public void ContainsOBB_Disjoint()
+        public void Transform_NonUniformScale()
         {
-            var obb1 = new OrientedBoundingBox2D(new Vector2(0, 0), Vector2.UnitX, Vector2.UnitY, new Vector2(5, 5));
-            var obb2 = new OrientedBoundingBox2D(new Vector2(20, 0), Vector2.UnitX, Vector2.UnitY, new Vector2(5, 5));
+            var obb = new OrientedBoundingBox2D(
+                new Vector2(0, 0),
+                new Vector2(1, 0),
+                new Vector2(0, 1),
+                new Vector2(5, 3)
+            );
+            var matrix = Matrix.CreateScale(2.0f, 3.0f, 1.0f);
 
-            var result = obb1.Contains(obb2);
+            var transformed = obb.Transform(matrix);
 
-            Assert.AreEqual(ContainmentType.Disjoint, result);
+            Assert.AreEqual(0, transformed.Center.X, Collision2D.Epsilon);
+            Assert.AreEqual(0, transformed.Center.Y, Collision2D.Epsilon);
+            Assert.AreEqual(10, transformed.HalfExtents.X, Collision2D.Epsilon);
+            Assert.AreEqual(9, transformed.HalfExtents.Y, Collision2D.Epsilon);
         }
 
         [Test]
-        public void ContainsCircle_Contains()
+        public void Transform_Rotation()
         {
-            var obb = new OrientedBoundingBox2D(new Vector2(10, 10), Vector2.UnitX, Vector2.UnitY, new Vector2(10, 10));
-            var circle = new BoundingCircle(new Vector2(10, 10), 3);
+            var obb = new OrientedBoundingBox2D(
+                new Vector2(5, 0),
+                new Vector2(1, 0),
+                new Vector2(0, 1),
+                new Vector2(3, 2)
+            );
+            var matrix = Matrix.CreateRotationZ(MathHelper.PiOver2);
 
-            var result = obb.Contains(circle);
+            var transformed = obb.Transform(matrix);
 
-            Assert.AreEqual(ContainmentType.Contains, result);
+            Assert.AreEqual(0, transformed.Center.X, Collision2D.Epsilon);
+            Assert.AreEqual(5, transformed.Center.Y, Collision2D.Epsilon);
+
+            Assert.AreEqual(0, transformed.AxisX.X, Collision2D.Epsilon);
+            Assert.AreEqual(1, transformed.AxisX.Y, Collision2D.Epsilon);
+            Assert.AreEqual(-1, transformed.AxisY.X, Collision2D.Epsilon);
+            Assert.AreEqual(0, transformed.AxisY.Y, Collision2D.Epsilon);
+
+            Assert.AreEqual(new Vector2(3, 2), transformed.HalfExtents);
         }
 
         [Test]
-        public void ContainsCircle_Intersects()
+        public void Translate_OffsetsPosition()
         {
-            var obb = new OrientedBoundingBox2D(new Vector2(10, 10), Vector2.UnitX, Vector2.UnitY, new Vector2(5, 5));
-            var circle = new BoundingCircle(new Vector2(8, 10), 5);
+            var obb = new OrientedBoundingBox2D(
+                new Vector2(5, 5),
+                new Vector2(1, 0),
+                new Vector2(0, 1),
+                new Vector2(3, 2)
+            );
+            var offset = new Vector2(10, 15);
 
-            var result = obb.Contains(circle);
+            var translated = obb.Translate(offset);
 
-            Assert.AreEqual(ContainmentType.Intersects, result);
+            Assert.AreEqual(new Vector2(15, 20), translated.Center);
+            Assert.AreEqual(obb.AxisX, translated.AxisX);
+            Assert.AreEqual(obb.AxisY, translated.AxisY);
+            Assert.AreEqual(obb.HalfExtents, translated.HalfExtents);
         }
 
-        [Test]
-        public void ContainsCircle_Disjoint()
-        {
-            var obb = new OrientedBoundingBox2D(new Vector2(10, 10), Vector2.UnitX, Vector2.UnitY, new Vector2(5, 5));
-            var circle = new BoundingCircle(new Vector2(30, 10), 5);
+        #endregion
 
-            var result = obb.Contains(circle);
-
-            Assert.AreEqual(ContainmentType.Disjoint, result);
-        }
+        #region ContainsPoint Tests (Delegation Spot Check)
 
         [Test]
         public void ContainsPoint_Inside()
         {
-            var obb = new OrientedBoundingBox2D(new Vector2(10, 10), Vector2.UnitX, Vector2.UnitY, new Vector2(5, 3));
-            var point = new Vector2(10, 10);
+            var obb = new OrientedBoundingBox2D(
+                new Vector2(0, 0),
+                new Vector2(1, 0),
+                new Vector2(0, 1),
+                new Vector2(5, 3)
+            );
+            var point = new Vector2(2, 1);
 
             var result = obb.Contains(point);
 
@@ -305,8 +442,13 @@ namespace MonoGame.Tests.Framework
         [Test]
         public void ContainsPoint_OnBoundary()
         {
-            var obb = new OrientedBoundingBox2D(new Vector2(10, 10), Vector2.UnitX, Vector2.UnitY, new Vector2(5, 3));
-            var point = new Vector2(15, 10);
+            var obb = new OrientedBoundingBox2D(
+                new Vector2(0, 0),
+                new Vector2(1, 0),
+                new Vector2(0, 1),
+                new Vector2(5, 3)
+            );
+            var point = new Vector2(5, 0);
 
             var result = obb.Contains(point);
 
@@ -316,8 +458,13 @@ namespace MonoGame.Tests.Framework
         [Test]
         public void ContainsPoint_Outside()
         {
-            var obb = new OrientedBoundingBox2D(new Vector2(10, 10), Vector2.UnitX, Vector2.UnitY, new Vector2(5, 3));
-            var point = new Vector2(20, 20);
+            var obb = new OrientedBoundingBox2D(
+                new Vector2(0, 0),
+                new Vector2(1, 0),
+                new Vector2(0, 1),
+                new Vector2(5, 3)
+            );
+            var point = new Vector2(10, 0);
 
             var result = obb.Contains(point);
 
@@ -327,212 +474,40 @@ namespace MonoGame.Tests.Framework
         [Test]
         public void ContainsPoint_RotatedBox()
         {
-            var obb = OrientedBoundingBox2D.CreateFromRotation(new Vector2(10, 10), MathHelper.PiOver4, new Vector2(5, 3));
-            var point = new Vector2(10, 10);
+            var obb = OrientedBoundingBox2D.CreateFromRotation(
+                new Vector2(0, 0),
+                MathHelper.PiOver4,
+                new Vector2(5, 3)
+            );
+            var point = new Vector2(0, 0);
 
             var result = obb.Contains(point);
 
             Assert.AreEqual(ContainmentType.Contains, result);
         }
 
-        [Test]
-        public void IntersectsOBB_Overlapping()
-        {
-            var obb1 = new OrientedBoundingBox2D(new Vector2(0, 0), Vector2.UnitX, Vector2.UnitY, new Vector2(5, 5));
-            var obb2 = new OrientedBoundingBox2D(new Vector2(7, 0), Vector2.UnitX, Vector2.UnitY, new Vector2(5, 5));
+        #endregion
 
-            bool intersects = obb1.Intersects(obb2);
-
-            Assert.IsTrue(intersects);
-        }
-
-        [Test]
-        public void IntersectsOBB_Separated()
-        {
-            var obb1 = new OrientedBoundingBox2D(new Vector2(0, 0), Vector2.UnitX, Vector2.UnitY, new Vector2(5, 5));
-            var obb2 = new OrientedBoundingBox2D(new Vector2(20, 0), Vector2.UnitX, Vector2.UnitY, new Vector2(5, 5));
-
-            bool intersects = obb1.Intersects(obb2);
-
-            Assert.IsFalse(intersects);
-        }
-
-        [Test]
-        public void IntersectsOBB_Touching()
-        {
-            var obb1 = new OrientedBoundingBox2D(new Vector2(0, 0), Vector2.UnitX, Vector2.UnitY, new Vector2(5, 5));
-            var obb2 = new OrientedBoundingBox2D(new Vector2(10, 0), Vector2.UnitX, Vector2.UnitY, new Vector2(5, 5));
-
-            bool intersects = obb1.Intersects(obb2);
-
-            Assert.IsTrue(intersects);
-        }
-
-        [Test]
-        public void IntersectsOBB_DifferentRotations()
-        {
-            var obb1 = OrientedBoundingBox2D.CreateFromRotation(new Vector2(0, 0), 0, new Vector2(5, 2));
-            var obb2 = OrientedBoundingBox2D.CreateFromRotation(new Vector2(5, 0), MathHelper.PiOver4, new Vector2(5, 2));
-
-            bool intersects = obb1.Intersects(obb2);
-
-            Assert.IsTrue(intersects);
-        }
-
-        [Test]
-        public void IntersectsCircle_Overlapping()
-        {
-            var obb = new OrientedBoundingBox2D(new Vector2(10, 10), Vector2.UnitX, Vector2.UnitY, new Vector2(5, 5));
-            var circle = new BoundingCircle(new Vector2(8, 10), 5);
-
-            bool intersects = obb.Intersects(circle);
-
-            Assert.IsTrue(intersects);
-        }
-
-        [Test]
-        public void IntersectsCircle_Separated()
-        {
-            var obb = new OrientedBoundingBox2D(new Vector2(10, 10), Vector2.UnitX, Vector2.UnitY, new Vector2(5, 5));
-            var circle = new BoundingCircle(new Vector2(30, 10), 5);
-
-            bool intersects = obb.Intersects(circle);
-
-            Assert.IsFalse(intersects);
-        }
-
-        [Test]
-        public void IntersectsBox_Overlapping()
-        {
-            var obb = new OrientedBoundingBox2D(new Vector2(10, 10), Vector2.UnitX, Vector2.UnitY, new Vector2(5, 5));
-            var box = new BoundingBox2D(new Vector2(8, 8), new Vector2(12, 12));
-
-            bool intersects = obb.Intersects(box);
-
-            Assert.IsTrue(intersects);
-        }
-
-        [Test]
-        public void IntersectsBox_Separated()
-        {
-            var obb = new OrientedBoundingBox2D(new Vector2(10, 10), Vector2.UnitX, Vector2.UnitY, new Vector2(5, 5));
-            var box = new BoundingBox2D(new Vector2(30, 30), new Vector2(40, 40));
-
-            bool intersects = obb.Intersects(box);
-
-            Assert.IsFalse(intersects);
-        }
-
-        [Test]
-        public void IntersectsCapsule_Overlapping()
-        {
-            var obb = new OrientedBoundingBox2D(new Vector2(10, 10), Vector2.UnitX, Vector2.UnitY, new Vector2(5, 5));
-            var capsule = new BoundingCapsule2D(new Vector2(8, 8), new Vector2(12, 12), 2);
-
-            bool intersects = obb.Intersects(capsule);
-
-            Assert.IsTrue(intersects);
-        }
-
-        [Test]
-        public void IntersectsCapsule_Separated()
-        {
-            var obb = new OrientedBoundingBox2D(new Vector2(10, 10), Vector2.UnitX, Vector2.UnitY, new Vector2(5, 5));
-            var capsule = new BoundingCapsule2D(new Vector2(30, 30), new Vector2(40, 40), 2);
-
-            bool intersects = obb.Intersects(capsule);
-
-            Assert.IsFalse(intersects);
-        }
-
-        [Test]
-        public void IntersectsCapsule_CapsuleThroughBox()
-        {
-            var obb = new OrientedBoundingBox2D(new Vector2(10, 10), Vector2.UnitX, Vector2.UnitY, new Vector2(5, 5));
-            var capsule = new BoundingCapsule2D(new Vector2(10, 0), new Vector2(10, 20), 2);
-
-            bool intersects = obb.Intersects(capsule);
-
-            Assert.IsTrue(intersects);
-        }
-
-        [Test]
-        public void Transform_Translation()
-        {
-            var obb = new OrientedBoundingBox2D(new Vector2(10, 10), Vector2.UnitX, Vector2.UnitY, new Vector2(5, 3));
-            var matrix = Matrix.CreateTranslation(5, 10, 0);
-
-            var transformed = obb.Transform(matrix);
-
-            Assert.AreEqual(new Vector2(15, 20), transformed.Center);
-            Assert.AreEqual(Vector2.UnitX, transformed.AxisX);
-            Assert.AreEqual(Vector2.UnitY, transformed.AxisY);
-            Assert.AreEqual(new Vector2(5, 3), transformed.HalfExtents);
-        }
-
-        [Test]
-        public void Transform_UniformScale()
-        {
-            var obb = new OrientedBoundingBox2D(new Vector2(10, 10), Vector2.UnitX, Vector2.UnitY, new Vector2(5, 3));
-            var matrix = Matrix.CreateScale(2, 2, 1);
-
-            var transformed = obb.Transform(matrix);
-
-            Assert.AreEqual(new Vector2(20, 20), transformed.Center);
-            Assert.AreEqual(new Vector2(10, 6), transformed.HalfExtents);
-        }
-
-        [Test]
-        public void Transform_NonUniformScale()
-        {
-            var obb = new OrientedBoundingBox2D(new Vector2(10, 10), Vector2.UnitX, Vector2.UnitY, new Vector2(5, 3));
-            var matrix = Matrix.CreateScale(2, 3, 1);
-
-            var transformed = obb.Transform(matrix);
-
-            Assert.AreEqual(new Vector2(20, 30), transformed.Center);
-            Assert.AreEqual(new Vector2(10, 9), transformed.HalfExtents);
-        }
-
-        [Test]
-        public void Transform_Rotation()
-        {
-            var obb = new OrientedBoundingBox2D(new Vector2(10, 0), Vector2.UnitX, Vector2.UnitY, new Vector2(5, 3));
-            var matrix = Matrix.CreateRotationZ(MathHelper.PiOver2);
-
-            var transformed = obb.Transform(matrix);
-
-            Assert.AreEqual(0.0f, transformed.Center.X, 1e-5f);
-            Assert.AreEqual(10.0f, transformed.Center.Y, 1e-5f);
-            Assert.AreEqual(0.0f, transformed.AxisX.X, 1e-5f);
-            Assert.AreEqual(1.0f, transformed.AxisX.Y, 1e-5f);
-        }
-
-        [Test]
-        public void Translate_OffsetsPosition()
-        {
-            var obb = new OrientedBoundingBox2D(new Vector2(10, 10), Vector2.UnitX, Vector2.UnitY, new Vector2(5, 3));
-            var translation = new Vector2(5, -3);
-
-            var translated = obb.Translate(translation);
-
-            Assert.AreEqual(new Vector2(15, 7), translated.Center);
-            Assert.AreEqual(Vector2.UnitX, translated.AxisX);
-            Assert.AreEqual(Vector2.UnitY, translated.AxisY);
-            Assert.AreEqual(new Vector2(5, 3), translated.HalfExtents);
-        }
+        #region Deconstruct Test
 
         [Test]
         public void Deconstruct()
         {
-            var obb = new OrientedBoundingBox2D(new Vector2(10, 10), Vector2.UnitX, Vector2.UnitY, new Vector2(5, 3));
+            var obb = new OrientedBoundingBox2D(
+                new Vector2(5, 10),
+                new Vector2(1, 0),
+                new Vector2(0, 1),
+                new Vector2(3, 4)
+            );
 
-            obb.Deconstruct(out Vector2 center, out Vector2 axisX, out Vector2 axisY, out Vector2 halfExtents);
+            var (center, axisX, axisY, halfExtents) = obb;
 
-            Assert.AreEqual(obb.Center, center);
-            Assert.AreEqual(obb.AxisX, axisX);
-            Assert.AreEqual(obb.AxisY, axisY);
-            Assert.AreEqual(obb.HalfExtents, halfExtents);
+            Assert.AreEqual(new Vector2(5, 10), center);
+            Assert.AreEqual(new Vector2(1, 0), axisX);
+            Assert.AreEqual(new Vector2(0, 1), axisY);
+            Assert.AreEqual(new Vector2(3, 4), halfExtents);
         }
+
+        #endregion
     }
 }

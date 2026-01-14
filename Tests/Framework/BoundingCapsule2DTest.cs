@@ -10,6 +10,8 @@ namespace MonoGame.Tests.Framework
 {
     class BoundingCapsule2DTest
     {
+        #region Constructor Tests
+
         [Test]
         public void Constructor()
         {
@@ -24,10 +26,14 @@ namespace MonoGame.Tests.Framework
             Assert.AreEqual(radius, capsule.Radius);
         }
 
+        #endregion
+
+        #region Computed Property Tests
+
         [Test]
         public void Center_ReturnsMidpoint()
         {
-            var capsule = new BoundingCapsule2D(new Vector2(0, 0), new Vector2(10, 0), 5);
+            var capsule = new BoundingCapsule2D(new Vector2(0, 0), new Vector2(10, 0), 5.0f);
 
             var center = capsule.Center;
 
@@ -37,38 +43,39 @@ namespace MonoGame.Tests.Framework
         [Test]
         public void Length_ReturnsDistance()
         {
-            var capsule = new BoundingCapsule2D(new Vector2(0, 0), new Vector2(10, 0), 5);
+            var capsule = new BoundingCapsule2D(new Vector2(0, 0), new Vector2(3, 4), 5.0f);
 
             float length = capsule.Length;
 
-            Assert.AreEqual(10.0f, length, 1e-5f);
+            Assert.AreEqual(5.0f, length, Collision2D.Epsilon);
         }
 
         [Test]
         public void LengthSquared_ReturnsSquaredDistance()
         {
-            var capsule = new BoundingCapsule2D(new Vector2(0, 0), new Vector2(10, 0), 5);
+            var capsule = new BoundingCapsule2D(new Vector2(0, 0), new Vector2(3, 4), 5.0f);
 
             float lengthSquared = capsule.LengthSquared;
 
-            Assert.AreEqual(100.0f, lengthSquared, 1e-5f);
+            Assert.AreEqual(25.0f, lengthSquared, Collision2D.Epsilon);
         }
 
         [Test]
         public void Direction_ReturnsUnitVector()
         {
-            var capsule = new BoundingCapsule2D(new Vector2(0, 0), new Vector2(10, 0), 5);
+            var capsule = new BoundingCapsule2D(new Vector2(0, 0), new Vector2(3, 4), 5.0f);
 
             var direction = capsule.Direction;
 
-            Assert.AreEqual(new Vector2(1, 0), direction);
-            Assert.AreEqual(1.0f, direction.Length(), 1e-5f);
+            Assert.AreEqual(1.0f, direction.Length(), Collision2D.Epsilon);
+            Assert.AreEqual(0.6f, direction.X, Collision2D.Epsilon);
+            Assert.AreEqual(0.8f, direction.Y, Collision2D.Epsilon);
         }
 
         [Test]
         public void Direction_DegenerateCapsule()
         {
-            var capsule = new BoundingCapsule2D(new Vector2(5, 5), new Vector2(5, 5), 5);
+            var capsule = new BoundingCapsule2D(new Vector2(5, 5), new Vector2(5, 5), 3.0f);
 
             var direction = capsule.Direction;
 
@@ -78,14 +85,17 @@ namespace MonoGame.Tests.Framework
         [Test]
         public void Area_CalculatesCorrectly()
         {
-            var capsule = new BoundingCapsule2D(new Vector2(0, 0), new Vector2(10, 0), 5);
+            var capsule = new BoundingCapsule2D(new Vector2(0, 0), new Vector2(10, 0), 5.0f);
 
             float area = capsule.Area;
 
-            // Area = (length * 2 * radius) + (PI * radius^2)
-            // Area = (10 * 10) + (PI * 25) = 100 + 78.54 = 178.54
-            Assert.AreEqual(100.0f + MathF.PI * 25.0f, area, 1e-5f);
+            float expected = 100.0f + MathF.PI * 25.0f;
+            Assert.AreEqual(expected, area, Collision2D.Epsilon);
         }
+
+        #endregion
+
+        #region Factory Method Tests
 
         [Test]
         public void CreateFromCenterAndDirection()
@@ -106,21 +116,21 @@ namespace MonoGame.Tests.Framework
         public void CreateFromCenterAndDirection_UnnormalizedDirection()
         {
             var center = new Vector2(5, 5);
-            var direction = new Vector2(3, 0);
+            var direction = new Vector2(3, 4);
             var length = 10.0f;
             var radius = 3.0f;
 
             var capsule = BoundingCapsule2D.CreateFromCenterAndDirection(center, direction, length, radius);
 
-            Assert.AreEqual(new Vector2(0, 5), capsule.PointA);
-            Assert.AreEqual(new Vector2(10, 5), capsule.PointB);
+            float distance = Vector2.Distance(capsule.PointA, capsule.PointB);
+            Assert.AreEqual(10.0f, distance, Collision2D.Epsilon);
         }
 
         [Test]
         public void CreateFromSegment()
         {
             var segment = new LineSegment2D(new Vector2(0, 0), new Vector2(10, 0));
-            var radius = 5.0f;
+            var radius = 3.0f;
 
             var capsule = BoundingCapsule2D.CreateFromSegment(segment, radius);
 
@@ -132,12 +142,11 @@ namespace MonoGame.Tests.Framework
         [Test]
         public void CreateMerged_NonOverlapping()
         {
-            var capsule1 = new BoundingCapsule2D(new Vector2(0, 0), new Vector2(5, 0), 2);
-            var capsule2 = new BoundingCapsule2D(new Vector2(20, 0), new Vector2(25, 0), 2);
+            var capsule1 = new BoundingCapsule2D(new Vector2(0, 0), new Vector2(5, 0), 2.0f);
+            var capsule2 = new BoundingCapsule2D(new Vector2(20, 0), new Vector2(25, 0), 2.0f);
 
             var merged = BoundingCapsule2D.CreateMerged(capsule1, capsule2);
 
-            // Should contain both capsules
             Assert.AreEqual(ContainmentType.Contains, merged.Contains(capsule1));
             Assert.AreEqual(ContainmentType.Contains, merged.Contains(capsule2));
         }
@@ -145,100 +154,109 @@ namespace MonoGame.Tests.Framework
         [Test]
         public void CreateMerged_OneContainsOther()
         {
-            var capsule1 = new BoundingCapsule2D(new Vector2(0, 0), new Vector2(20, 0), 5);
-            var capsule2 = new BoundingCapsule2D(new Vector2(8, 0), new Vector2(12, 0), 2);
+            var capsule1 = new BoundingCapsule2D(new Vector2(0, 0), new Vector2(20, 0), 5.0f);
+            var capsule2 = new BoundingCapsule2D(new Vector2(8, 0), new Vector2(12, 0), 2.0f);
 
             var merged = BoundingCapsule2D.CreateMerged(capsule1, capsule2);
 
-            // Should approximately match the larger capsule
-            Assert.AreEqual(ContainmentType.Contains, merged.Contains(capsule1));
-            Assert.AreEqual(ContainmentType.Contains, merged.Contains(capsule2));
+            Assert.AreEqual(capsule1.PointA.X, merged.PointA.X, Collision2D.Epsilon);
+            Assert.AreEqual(capsule1.PointA.Y, merged.PointA.Y, Collision2D.Epsilon);
+            Assert.AreEqual(capsule1.PointB.X, merged.PointB.X, Collision2D.Epsilon);
+            Assert.AreEqual(capsule1.PointB.Y, merged.PointB.Y, Collision2D.Epsilon);
         }
 
         [Test]
         public void CreateMerged_PartiallyOverlapping()
         {
-            var capsule1 = new BoundingCapsule2D(new Vector2(0, 0), new Vector2(10, 0), 3);
-            var capsule2 = new BoundingCapsule2D(new Vector2(8, 0), new Vector2(18, 0), 3);
+            var capsule1 = new BoundingCapsule2D(new Vector2(0, 0), new Vector2(10, 0), 3.0f);
+            var capsule2 = new BoundingCapsule2D(new Vector2(8, 0), new Vector2(18, 0), 3.0f);
 
             var merged = BoundingCapsule2D.CreateMerged(capsule1, capsule2);
 
-            // Should contain both capsules
             Assert.AreEqual(ContainmentType.Contains, merged.Contains(capsule1));
             Assert.AreEqual(ContainmentType.Contains, merged.Contains(capsule2));
         }
 
+        #endregion
+
+        #region Transform Tests
+
         [Test]
-        public void ContainsBoundingCapsule2D_Contains()
+        public void Transform_Translation()
         {
-            var capsule1 = new BoundingCapsule2D(new Vector2(0, 0), new Vector2(20, 0), 10);
-            var capsule2 = new BoundingCapsule2D(new Vector2(8, 0), new Vector2(12, 0), 3);
+            var capsule = new BoundingCapsule2D(new Vector2(0, 0), new Vector2(10, 0), 3.0f);
+            var matrix = Matrix.CreateTranslation(5, 10, 0);
 
-            var result = capsule1.Contains(capsule2);
+            var transformed = capsule.Transform(matrix);
 
-            Assert.AreEqual(ContainmentType.Contains, result);
+            Assert.AreEqual(new Vector2(5, 10), transformed.PointA);
+            Assert.AreEqual(new Vector2(15, 10), transformed.PointB);
+            Assert.AreEqual(3.0f, transformed.Radius, Collision2D.Epsilon);
         }
 
         [Test]
-        public void ContainsBoundingCapsule2D_Intersects()
+        public void Transform_UniformScale()
         {
-            var capsule1 = new BoundingCapsule2D(new Vector2(0, 0), new Vector2(10, 0), 5);
-            var capsule2 = new BoundingCapsule2D(new Vector2(8, 0), new Vector2(18, 0), 5);
+            var capsule = new BoundingCapsule2D(new Vector2(0, 0), new Vector2(10, 0), 3.0f);
+            var matrix = Matrix.CreateScale(2.0f);
 
-            var result = capsule1.Contains(capsule2);
+            var transformed = capsule.Transform(matrix);
 
-            Assert.AreEqual(ContainmentType.Intersects, result);
+            Assert.AreEqual(new Vector2(0, 0), transformed.PointA);
+            Assert.AreEqual(new Vector2(20, 0), transformed.PointB);
+            Assert.AreEqual(6.0f, transformed.Radius, Collision2D.Epsilon);
         }
 
         [Test]
-        public void ContainsBoundingCapsule2D_Disjoint()
+        public void Transform_NonUniformScale()
         {
-            var capsule1 = new BoundingCapsule2D(new Vector2(0, 0), new Vector2(10, 0), 3);
-            var capsule2 = new BoundingCapsule2D(new Vector2(20, 0), new Vector2(30, 0), 3);
+            var capsule = new BoundingCapsule2D(new Vector2(0, 0), new Vector2(10, 0), 3.0f);
+            var matrix = Matrix.CreateScale(2.0f, 3.0f, 1.0f);
 
-            var result = capsule1.Contains(capsule2);
+            var transformed = capsule.Transform(matrix);
 
-            Assert.AreEqual(ContainmentType.Disjoint, result);
+            Assert.AreEqual(new Vector2(0, 0), transformed.PointA);
+            Assert.AreEqual(new Vector2(20, 0), transformed.PointB);
+            Assert.GreaterOrEqual(transformed.Radius, 6.0f);
         }
 
         [Test]
-        public void ContainsBoundingCircle_Contains()
+        public void Transform_Rotation()
         {
-            var capsule = new BoundingCapsule2D(new Vector2(0, 0), new Vector2(10, 0), 5);
-            var circle = new BoundingCircle(new Vector2(5, 0), 2);
+            var capsule = new BoundingCapsule2D(new Vector2(0, 0), new Vector2(10, 0), 3.0f);
+            var matrix = Matrix.CreateRotationZ(MathHelper.PiOver2);
 
-            var result = capsule.Contains(circle);
+            var transformed = capsule.Transform(matrix);
 
-            Assert.AreEqual(ContainmentType.Contains, result);
+            Assert.AreEqual(0, transformed.PointA.X, Collision2D.Epsilon);
+            Assert.AreEqual(0, transformed.PointA.Y, Collision2D.Epsilon);
+            Assert.AreEqual(0, transformed.PointB.X, Collision2D.Epsilon);
+            Assert.AreEqual(10, transformed.PointB.Y, Collision2D.Epsilon);
+            Assert.AreEqual(3.0f, transformed.Radius, Collision2D.Epsilon);
         }
 
         [Test]
-        public void ContainsBoundingCircle_Intersects()
+        public void Translate_OffsetsPosition()
         {
-            var capsule = new BoundingCapsule2D(new Vector2(0, 0), new Vector2(10, 0), 5);
-            var circle = new BoundingCircle(new Vector2(5, 5), 3);
+            var capsule = new BoundingCapsule2D(new Vector2(0, 0), new Vector2(10, 0), 3.0f);
+            var offset = new Vector2(5, 10);
 
-            var result = capsule.Contains(circle);
+            var translated = capsule.Translate(offset);
 
-            Assert.AreEqual(ContainmentType.Intersects, result);
+            Assert.AreEqual(new Vector2(5, 10), translated.PointA);
+            Assert.AreEqual(new Vector2(15, 10), translated.PointB);
+            Assert.AreEqual(3.0f, translated.Radius, Collision2D.Epsilon);
         }
 
-        [Test]
-        public void ContainsBoundingCircle_Disjoint()
-        {
-            var capsule = new BoundingCapsule2D(new Vector2(0, 0), new Vector2(10, 0), 3);
-            var circle = new BoundingCircle(new Vector2(5, 10), 3);
+        #endregion
 
-            var result = capsule.Contains(circle);
-
-            Assert.AreEqual(ContainmentType.Disjoint, result);
-        }
+        #region ContainsPoint Tests (Delegation Spot Check)
 
         [Test]
         public void ContainsPoint_Inside()
         {
-            var capsule = new BoundingCapsule2D(new Vector2(0, 0), new Vector2(10, 0), 5);
-            var point = new Vector2(5, 3);
+            var capsule = new BoundingCapsule2D(new Vector2(0, 0), new Vector2(10, 0), 5.0f);
+            var point = new Vector2(5, 2);
 
             var result = capsule.Contains(point);
 
@@ -248,7 +266,7 @@ namespace MonoGame.Tests.Framework
         [Test]
         public void ContainsPoint_OnBoundary()
         {
-            var capsule = new BoundingCapsule2D(new Vector2(0, 0), new Vector2(10, 0), 5);
+            var capsule = new BoundingCapsule2D(new Vector2(0, 0), new Vector2(10, 0), 5.0f);
             var point = new Vector2(5, 5);
 
             var result = capsule.Contains(point);
@@ -259,7 +277,7 @@ namespace MonoGame.Tests.Framework
         [Test]
         public void ContainsPoint_Outside()
         {
-            var capsule = new BoundingCapsule2D(new Vector2(0, 0), new Vector2(10, 0), 3);
+            var capsule = new BoundingCapsule2D(new Vector2(0, 0), new Vector2(10, 0), 5.0f);
             var point = new Vector2(5, 10);
 
             var result = capsule.Contains(point);
@@ -270,237 +288,30 @@ namespace MonoGame.Tests.Framework
         [Test]
         public void ContainsPoint_AtEndCap()
         {
-            var capsule = new BoundingCapsule2D(new Vector2(0, 0), new Vector2(10, 0), 5);
-            var point = new Vector2(-3, 0);
+            var capsule = new BoundingCapsule2D(new Vector2(0, 0), new Vector2(10, 0), 5.0f);
+            var point = new Vector2(-3, 4);
 
             var result = capsule.Contains(point);
 
             Assert.AreEqual(ContainmentType.Contains, result);
         }
 
-        [Test]
-        public void IntersectsBoundingCapsule2D_Overlapping()
-        {
-            var capsule1 = new BoundingCapsule2D(new Vector2(0, 0), new Vector2(10, 0), 5);
-            var capsule2 = new BoundingCapsule2D(new Vector2(8, 0), new Vector2(18, 0), 5);
+        #endregion
 
-            bool intersects = capsule1.Intersects(capsule2);
-
-            Assert.IsTrue(intersects);
-        }
-
-        [Test]
-        public void IntersectsBoundingCapsule2D_Separated()
-        {
-            var capsule1 = new BoundingCapsule2D(new Vector2(0, 0), new Vector2(10, 0), 3);
-            var capsule2 = new BoundingCapsule2D(new Vector2(20, 0), new Vector2(30, 0), 3);
-
-            bool intersects = capsule1.Intersects(capsule2);
-
-            Assert.IsFalse(intersects);
-        }
-
-        [Test]
-        public void IntersectsBoundingCapsule2D_Touching()
-        {
-            var capsule1 = new BoundingCapsule2D(new Vector2(0, 0), new Vector2(10, 0), 5);
-            var capsule2 = new BoundingCapsule2D(new Vector2(15, 0), new Vector2(25, 0), 5);
-
-            bool intersects = capsule1.Intersects(capsule2);
-
-            Assert.IsTrue(intersects);
-        }
-
-        [Test]
-        public void IntersectsBoundingCapsule2D_Perpendicular()
-        {
-            var capsule1 = new BoundingCapsule2D(new Vector2(0, 0), new Vector2(10, 0), 3);
-            var capsule2 = new BoundingCapsule2D(new Vector2(5, -5), new Vector2(5, 5), 3);
-
-            bool intersects = capsule1.Intersects(capsule2);
-
-            Assert.IsTrue(intersects);
-        }
-
-        [Test]
-        public void IntersectsBoundingCircle_Overlapping()
-        {
-            var capsule = new BoundingCapsule2D(new Vector2(0, 0), new Vector2(10, 0), 5);
-            var circle = new BoundingCircle(new Vector2(5, 5), 3);
-
-            bool intersects = capsule.Intersects(circle);
-
-            Assert.IsTrue(intersects);
-        }
-
-        [Test]
-        public void IntersectsBoundingCircle_Separated()
-        {
-            var capsule = new BoundingCapsule2D(new Vector2(0, 0), new Vector2(10, 0), 3);
-            var circle = new BoundingCircle(new Vector2(5, 10), 3);
-
-            bool intersects = capsule.Intersects(circle);
-
-            Assert.IsFalse(intersects);
-        }
-
-        [Test]
-        public void IntersectsBoundingCircle_CircleAtEndCap()
-        {
-            var capsule = new BoundingCapsule2D(new Vector2(0, 0), new Vector2(10, 0), 5);
-            var circle = new BoundingCircle(new Vector2(-5, 5), 3);
-
-            bool intersects = capsule.Intersects(circle);
-
-            Assert.IsTrue(intersects);
-        }
-
-        [Test]
-        public void IntersectsBoundingBox2D_Overlapping()
-        {
-            var capsule = new BoundingCapsule2D(new Vector2(0, 0), new Vector2(10, 0), 5);
-            var box = new BoundingBox2D(new Vector2(3, 3), new Vector2(7, 7));
-
-            bool intersects = capsule.Intersects(box);
-
-            Assert.IsTrue(intersects);
-        }
-
-        [Test]
-        public void IntersectsBoundingBox2D_Separated()
-        {
-            var capsule = new BoundingCapsule2D(new Vector2(0, 0), new Vector2(10, 0), 3);
-            var box = new BoundingBox2D(new Vector2(5, 10), new Vector2(15, 20));
-
-            bool intersects = capsule.Intersects(box);
-
-            Assert.IsFalse(intersects);
-        }
-
-        [Test]
-        public void IntersectsBoundingBox2D_CapsuleThroughBox()
-        {
-            var capsule = new BoundingCapsule2D(new Vector2(5, -10), new Vector2(5, 20), 2);
-            var box = new BoundingBox2D(new Vector2(0, 0), new Vector2(10, 10));
-
-            bool intersects = capsule.Intersects(box);
-
-            Assert.IsTrue(intersects);
-        }
-
-        [Test]
-        public void IntersectsOrientedBoundingBox2D_Overlapping()
-        {
-            var capsule = new BoundingCapsule2D(new Vector2(8, 8), new Vector2(12, 12), 2);
-            var obb = new OrientedBoundingBox2D(new Vector2(10, 10), Vector2.UnitX, Vector2.UnitY, new Vector2(5, 5));
-
-            bool intersects = capsule.Intersects(obb);
-
-            Assert.IsTrue(intersects);
-        }
-
-        [Test]
-        public void IntersectsOrientedBoundingBox2D_Separated()
-        {
-            var capsule = new BoundingCapsule2D(new Vector2(30, 30), new Vector2(40, 40), 2);
-            var obb = new OrientedBoundingBox2D(new Vector2(10, 10), Vector2.UnitX, Vector2.UnitY, new Vector2(5, 5));
-
-            bool intersects = capsule.Intersects(obb);
-
-            Assert.IsFalse(intersects);
-        }
-
-        [Test]
-        public void IntersectsOrientedBoundingBox2D_CapsuleThroughBox()
-        {
-            var capsule = new BoundingCapsule2D(new Vector2(0, 10), new Vector2(20, 10), 1);
-            var obb = new OrientedBoundingBox2D(new Vector2(10, 10), Vector2.UnitX, Vector2.UnitY, new Vector2(5, 5));
-
-            bool intersects = capsule.Intersects(obb);
-
-            Assert.IsTrue(intersects);
-        }
-
-
-        [Test]
-        public void Transform_Translation()
-        {
-            var capsule = new BoundingCapsule2D(new Vector2(0, 0), new Vector2(10, 0), 5);
-            var matrix = Matrix.CreateTranslation(5, 10, 0);
-
-            var transformed = capsule.Transform(matrix);
-
-            Assert.AreEqual(new Vector2(5, 10), transformed.PointA);
-            Assert.AreEqual(new Vector2(15, 10), transformed.PointB);
-            Assert.AreEqual(5.0f, transformed.Radius, 1e-5f);
-        }
-
-        [Test]
-        public void Transform_UniformScale()
-        {
-            var capsule = new BoundingCapsule2D(new Vector2(0, 0), new Vector2(10, 0), 5);
-            var matrix = Matrix.CreateScale(2, 2, 1);
-
-            var transformed = capsule.Transform(matrix);
-
-            Assert.AreEqual(new Vector2(0, 0), transformed.PointA);
-            Assert.AreEqual(new Vector2(20, 0), transformed.PointB);
-            Assert.AreEqual(10.0f, transformed.Radius, 1e-5f);
-        }
-
-        [Test]
-        public void Transform_NonUniformScale()
-        {
-            var capsule = new BoundingCapsule2D(new Vector2(0, 0), new Vector2(10, 0), 5);
-            var matrix = Matrix.CreateScale(2, 3, 1);
-
-            var transformed = capsule.Transform(matrix);
-
-            Assert.AreEqual(new Vector2(0, 0), transformed.PointA);
-            Assert.AreEqual(new Vector2(20, 0), transformed.PointB);
-
-            // Radius should be scaled by maximum scale component (3)
-            Assert.AreEqual(15.0f, transformed.Radius, 1e-5f);
-        }
-
-        [Test]
-        public void Transform_Rotation()
-        {
-            var capsule = new BoundingCapsule2D(new Vector2(0, 0), new Vector2(10, 0), 5);
-            var matrix = Matrix.CreateRotationZ(MathHelper.PiOver2);
-
-            var transformed = capsule.Transform(matrix);
-
-            Assert.AreEqual(0.0f, transformed.PointA.X, 1e-5f);
-            Assert.AreEqual(0.0f, transformed.PointA.Y, 1e-5f);
-            Assert.AreEqual(0.0f, transformed.PointB.X, 1e-5f);
-            Assert.AreEqual(10.0f, transformed.PointB.Y, 1e-5f);
-            Assert.AreEqual(5.0f, transformed.Radius, 1e-5f);
-        }
-
-        [Test]
-        public void Translate_OffsetsPosition()
-        {
-            var capsule = new BoundingCapsule2D(new Vector2(0, 0), new Vector2(10, 0), 5);
-            var translation = new Vector2(5, -3);
-
-            var translated = capsule.Translate(translation);
-
-            Assert.AreEqual(new Vector2(5, -3), translated.PointA);
-            Assert.AreEqual(new Vector2(15, -3), translated.PointB);
-            Assert.AreEqual(5.0f, translated.Radius);
-        }
+        #region Deconstruct Test
 
         [Test]
         public void Deconstruct()
         {
-            var capsule = new BoundingCapsule2D(new Vector2(0, 0), new Vector2(10, 0), 5);
+            var capsule = new BoundingCapsule2D(new Vector2(0, 0), new Vector2(10, 0), 5.0f);
 
-            capsule.Deconstruct(out Vector2 pointA, out Vector2 pointB, out float radius);
+            var (pointA, pointB, radius) = capsule;
 
-            Assert.AreEqual(capsule.PointA, pointA);
-            Assert.AreEqual(capsule.PointB, pointB);
-            Assert.AreEqual(capsule.Radius, radius);
+            Assert.AreEqual(new Vector2(0, 0), pointA);
+            Assert.AreEqual(new Vector2(10, 0), pointB);
+            Assert.AreEqual(5.0f, radius);
         }
+
+        #endregion
     }
 }

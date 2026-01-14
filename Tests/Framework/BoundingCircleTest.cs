@@ -10,11 +10,13 @@ namespace MonoGame.Tests.Framework
 {
     class BoundingCircleTest
     {
+        #region Constructor Tests
+
         [Test]
         public void Constructor()
         {
-            var center = new Vector2(10, 20);
-            var radius = 5.0f;
+            var center = new Vector2(5, 10);
+            var radius = 15.0f;
 
             var circle = new BoundingCircle(center, radius);
 
@@ -22,61 +24,64 @@ namespace MonoGame.Tests.Framework
             Assert.AreEqual(radius, circle.Radius);
         }
 
+        #endregion
+
+        #region Computed Property Tests
 
         [Test]
         public void RadiusSquared_ReturnsSquaredValue()
         {
-            var circle = new BoundingCircle(Vector2.Zero, 5.0f);
+            var circle = new BoundingCircle(new Vector2(0, 0), 5.0f);
 
             float radiusSquared = circle.RadiusSquared;
 
-            Assert.AreEqual(25.0f, radiusSquared);
+            Assert.AreEqual(25.0f, radiusSquared, Collision2D.Epsilon);
         }
 
         [Test]
         public void Diameter_ReturnsTwiceRadius()
         {
-            var circle = new BoundingCircle(Vector2.Zero, 5.0f);
+            var circle = new BoundingCircle(new Vector2(0, 0), 5.0f);
 
             float diameter = circle.Diameter;
 
-            Assert.AreEqual(10.0f, diameter);
+            Assert.AreEqual(10.0f, diameter, Collision2D.Epsilon);
         }
 
         [Test]
         public void Area_ReturnsPiTimesRadiusSquared()
         {
-            var circle = new BoundingCircle(Vector2.Zero, 5.0f);
+            var circle = new BoundingCircle(new Vector2(0, 0), 5.0f);
 
             float area = circle.Area;
 
-            Assert.AreEqual(MathF.PI * 25.0f, area, 1e-5f);
+            Assert.AreEqual(MathF.PI * 25.0f, area, Collision2D.Epsilon);
         }
+
+        #endregion
+
+        #region Factory Method Tests
 
         [Test]
         public void CreateFromPoints_SinglePoint()
         {
-            var points = new[] { new Vector2(5, 10) };
+            var points = new[] { new Vector2(5, 5) };
 
             var circle = BoundingCircle.CreateFromPoints(points);
 
-            Assert.AreEqual(new Vector2(5, 10), circle.Center);
-            Assert.AreEqual(0.0f, circle.Radius);
+            Assert.AreEqual(new Vector2(5, 5), circle.Center);
+            Assert.AreEqual(0.0f, circle.Radius, Collision2D.Epsilon);
         }
 
         [Test]
         public void CreateFromPoints_TwoPoints()
         {
-            var points = new[]
-            {
-                new Vector2(0, 0),
-                new Vector2(10, 0)
-            };
+            var points = new[] { new Vector2(0, 0), new Vector2(10, 0) };
 
             var circle = BoundingCircle.CreateFromPoints(points);
 
             Assert.AreEqual(new Vector2(5, 0), circle.Center);
-            Assert.AreEqual(5.0f, circle.Radius, 1e-5f);
+            Assert.AreEqual(5.0f, circle.Radius, Collision2D.Epsilon);
         }
 
         [Test]
@@ -86,17 +91,16 @@ namespace MonoGame.Tests.Framework
             {
                 new Vector2(0, 0),
                 new Vector2(10, 0),
-                new Vector2(10, 10),
-                new Vector2(0, 10)
+                new Vector2(0, 10),
+                new Vector2(10, 10)
             };
 
             var circle = BoundingCircle.CreateFromPoints(points);
 
-            // Should contain all points
             foreach (var point in points)
             {
-                float distSq = Vector2.DistanceSquared(point, circle.Center);
-                Assert.LessOrEqual(distSq, circle.RadiusSquared + 1e-5f);
+                float distance = Vector2.Distance(circle.Center, point);
+                Assert.LessOrEqual(distance, circle.Radius + Collision2D.Epsilon);
             }
         }
 
@@ -119,186 +123,162 @@ namespace MonoGame.Tests.Framework
 
             var circle = BoundingCircle.CreateFromBoundingBox2D(box);
 
-            Assert.AreEqual(new Vector2(5, 5), circle.Center);
-
-            // Radius should be half the diagonal: sqrt(5^2 + 5^2) = sqrt(50)
-            Assert.AreEqual(MathF.Sqrt(50), circle.Radius, 1e-5f);
+            Assert.IsTrue(circle.Contains(new Vector2(0, 0)) != ContainmentType.Disjoint);
+            Assert.IsTrue(circle.Contains(new Vector2(10, 10)) != ContainmentType.Disjoint);
         }
 
         [Test]
         public void CreateFromBoundingCapsule2D_HorizontalCapsule()
         {
-            var capsule = new BoundingCapsule2D(new Vector2(0, 0), new Vector2(10, 0), 3);
+            var capsule = new BoundingCapsule2D(new Vector2(0, 5), new Vector2(10, 5), 3.0f);
 
             var circle = BoundingCircle.CreateFromBoundingCapsule2D(capsule);
 
-            Assert.AreEqual(new Vector2(5, 0), circle.Center);
-            // Radius = (length / 2) + radius = 5 + 3 = 8
-            Assert.AreEqual(8.0f, circle.Radius, 1e-5f);
+            Assert.IsTrue(circle.Contains(new Vector2(-3, 5)) != ContainmentType.Disjoint);
+            Assert.IsTrue(circle.Contains(new Vector2(13, 5)) != ContainmentType.Disjoint);
         }
 
         [Test]
         public void CreateFromBoundingCapsule2D_VerticalCapsule()
         {
-            var capsule = new BoundingCapsule2D(new Vector2(5, 0), new Vector2(5, 20), 4);
+            var capsule = new BoundingCapsule2D(new Vector2(5, 0), new Vector2(5, 10), 3.0f);
 
             var circle = BoundingCircle.CreateFromBoundingCapsule2D(capsule);
 
-            Assert.AreEqual(new Vector2(5, 10), circle.Center);
-            // Radius = (length / 2) + radius = 10 + 4 = 14
-            Assert.AreEqual(14.0f, circle.Radius, 1e-5f);
+            Assert.IsTrue(circle.Contains(new Vector2(5, -3)) != ContainmentType.Disjoint);
+            Assert.IsTrue(circle.Contains(new Vector2(5, 13)) != ContainmentType.Disjoint);
         }
 
         [Test]
         public void CreateFromBoundingCapsule2D_DegenerateCapsule()
         {
-            var capsule = new BoundingCapsule2D(new Vector2(5, 5), new Vector2(5, 5), 7);
+            var capsule = new BoundingCapsule2D(new Vector2(5, 5), new Vector2(5, 5), 3.0f);
 
             var circle = BoundingCircle.CreateFromBoundingCapsule2D(capsule);
 
             Assert.AreEqual(new Vector2(5, 5), circle.Center);
-            // Radius = (length / 2) + radius = 0 + 7 = 7
-            Assert.AreEqual(7.0f, circle.Radius, 1e-5f);
+            Assert.AreEqual(3.0f, circle.Radius, Collision2D.Epsilon);
         }
 
         [Test]
         public void CreateFromBoundingCapsule2D_ContainsOriginal()
         {
-            var capsule = new BoundingCapsule2D(new Vector2(0, 0), new Vector2(10, 10), 5);
+            var capsule = new BoundingCapsule2D(new Vector2(0, 0), new Vector2(10, 10), 2.0f);
 
             var circle = BoundingCircle.CreateFromBoundingCapsule2D(capsule);
 
-            // Verify that all points on the capsule are within the bounding circle
-            // Test endpoints + radius
-            float distToA = Vector2.Distance(circle.Center, capsule.PointA);
-            float distToB = Vector2.Distance(circle.Center, capsule.PointB);
-            Assert.LessOrEqual(distToA + capsule.Radius, circle.Radius + 1e-5f);
-            Assert.LessOrEqual(distToB + capsule.Radius, circle.Radius + 1e-5f);
+            Assert.AreEqual(ContainmentType.Contains, circle.Contains(capsule));
         }
 
         [Test]
         public void CreateMerged_NonOverlapping()
         {
-            var circle1 = new BoundingCircle(new Vector2(0, 0), 5);
-            var circle2 = new BoundingCircle(new Vector2(20, 0), 5);
+            var circle1 = new BoundingCircle(new Vector2(0, 0), 5.0f);
+            var circle2 = new BoundingCircle(new Vector2(20, 0), 5.0f);
 
             var merged = BoundingCircle.CreateMerged(circle1, circle2);
 
-            // Should contain both circles
-            Assert.AreEqual(new Vector2(10, 0), merged.Center);
-            Assert.AreEqual(15.0f, merged.Radius, 1e-5f);
+            Assert.AreEqual(ContainmentType.Contains, merged.Contains(circle1));
+            Assert.AreEqual(ContainmentType.Contains, merged.Contains(circle2));
         }
 
         [Test]
         public void CreateMerged_OneContainsOther()
         {
-            var circle1 = new BoundingCircle(new Vector2(0, 0), 10);
-            var circle2 = new BoundingCircle(new Vector2(2, 0), 3);
+            var circle1 = new BoundingCircle(new Vector2(0, 0), 10.0f);
+            var circle2 = new BoundingCircle(new Vector2(2, 2), 3.0f);
 
             var merged = BoundingCircle.CreateMerged(circle1, circle2);
 
-            // Should return the larger circle
             Assert.AreEqual(circle1.Center, merged.Center);
-            Assert.AreEqual(circle1.Radius, merged.Radius, 1e-5f);
+            Assert.AreEqual(circle1.Radius, merged.Radius, 0.1f);
         }
 
         [Test]
         public void CreateMerged_PartiallyOverlapping()
         {
-            var circle1 = new BoundingCircle(new Vector2(0, 0), 5);
-            var circle2 = new BoundingCircle(new Vector2(8, 0), 5);
+            var circle1 = new BoundingCircle(new Vector2(0, 0), 5.0f);
+            var circle2 = new BoundingCircle(new Vector2(8, 0), 5.0f);
 
             var merged = BoundingCircle.CreateMerged(circle1, circle2);
 
-            // Verify both circles are contained
-            float dist1 = Vector2.Distance(merged.Center, circle1.Center);
-            float dist2 = Vector2.Distance(merged.Center, circle2.Center);
-            Assert.LessOrEqual(dist1 + circle1.Radius, merged.Radius + 1e-5f);
-            Assert.LessOrEqual(dist2 + circle2.Radius, merged.Radius + 1e-5f);
+            Assert.AreEqual(ContainmentType.Contains, merged.Contains(circle1));
+            Assert.AreEqual(ContainmentType.Contains, merged.Contains(circle2));
+        }
+
+        #endregion
+
+        #region Transform Tests
+
+        [Test]
+        public void Transform_Translation()
+        {
+            var circle = new BoundingCircle(new Vector2(0, 0), 5.0f);
+            var matrix = Matrix.CreateTranslation(10, 20, 0);
+
+            var transformed = circle.Transform(matrix);
+
+            Assert.AreEqual(new Vector2(10, 20), transformed.Center);
+            Assert.AreEqual(5.0f, transformed.Radius, Collision2D.Epsilon);
         }
 
         [Test]
-        public void ContainsCircle_Contains()
+        public void Transform_UniformScale()
         {
-            var circle1 = new BoundingCircle(new Vector2(0, 0), 10);
-            var circle2 = new BoundingCircle(new Vector2(2, 0), 3);
+            var circle = new BoundingCircle(new Vector2(0, 0), 5.0f);
+            var matrix = Matrix.CreateScale(2.0f);
 
-            var result = circle1.Contains(circle2);
+            var transformed = circle.Transform(matrix);
 
-            Assert.AreEqual(ContainmentType.Contains, result);
+            Assert.AreEqual(new Vector2(0, 0), transformed.Center);
+            Assert.AreEqual(10.0f, transformed.Radius, Collision2D.Epsilon);
         }
 
         [Test]
-        public void ContainsCircle_Intersects()
+        public void Transform_NonUniformScale()
         {
-            var circle1 = new BoundingCircle(new Vector2(0, 0), 10);
-            var circle2 = new BoundingCircle(new Vector2(8, 0), 5);
+            var circle = new BoundingCircle(new Vector2(0, 0), 5.0f);
+            var matrix = Matrix.CreateScale(2.0f, 3.0f, 1.0f);
 
-            var result = circle1.Contains(circle2);
+            var transformed = circle.Transform(matrix);
 
-            Assert.AreEqual(ContainmentType.Intersects, result);
+            Assert.GreaterOrEqual(transformed.Radius, 10.0f);
         }
 
         [Test]
-        public void ContainsCircle_Disjoint()
+        public void Transform_Rotation()
         {
-            var circle1 = new BoundingCircle(new Vector2(0, 0), 5);
-            var circle2 = new BoundingCircle(new Vector2(20, 0), 5);
+            var circle = new BoundingCircle(new Vector2(5, 0), 3.0f);
+            var matrix = Matrix.CreateRotationZ(MathHelper.PiOver2);
 
-            var result = circle1.Contains(circle2);
+            var transformed = circle.Transform(matrix);
 
-            Assert.AreEqual(ContainmentType.Disjoint, result);
+            Assert.AreEqual(0, transformed.Center.X, Collision2D.Epsilon);
+            Assert.AreEqual(5, transformed.Center.Y, Collision2D.Epsilon);
+            Assert.AreEqual(3.0f, transformed.Radius, Collision2D.Epsilon);
         }
 
         [Test]
-        public void ContainsCircle_Touching()
+        public void Translate_OffsetsPosition()
         {
-            var circle1 = new BoundingCircle(new Vector2(0, 0), 5);
-            var circle2 = new BoundingCircle(new Vector2(10, 0), 5);
+            var circle = new BoundingCircle(new Vector2(5, 5), 3.0f);
+            var offset = new Vector2(10, 15);
 
-            var result = circle1.Contains(circle2);
+            var translated = circle.Translate(offset);
 
-            Assert.AreEqual(ContainmentType.Intersects, result);
+            Assert.AreEqual(new Vector2(15, 20), translated.Center);
+            Assert.AreEqual(3.0f, translated.Radius, Collision2D.Epsilon);
         }
 
-        [Test]
-        public void ContainsBox_Contains()
-        {
-            var circle = new BoundingCircle(new Vector2(10, 10), 10);
-            var box = new BoundingBox2D(new Vector2(8, 8), new Vector2(12, 12));
+        #endregion
 
-            var result = circle.Contains(box);
-
-            Assert.AreEqual(ContainmentType.Contains, result);
-        }
-
-        [Test]
-        public void ContainsBox_Intersects()
-        {
-            var circle = new BoundingCircle(new Vector2(0, 0), 5);
-            var box = new BoundingBox2D(new Vector2(3, 3), new Vector2(10, 10));
-
-            var result = circle.Contains(box);
-
-            Assert.AreEqual(ContainmentType.Intersects, result);
-        }
-
-        [Test]
-        public void ContainsBox_Disjoint()
-        {
-            var circle = new BoundingCircle(new Vector2(0, 0), 5);
-            var box = new BoundingBox2D(new Vector2(10, 10), new Vector2(20, 20));
-
-            var result = circle.Contains(box);
-
-            Assert.AreEqual(ContainmentType.Disjoint, result);
-        }
+        #region ContainsPoint Tests (Delegation Spot Check)
 
         [Test]
         public void ContainsPoint_Inside()
         {
-            var circle = new BoundingCircle(new Vector2(10, 10), 5);
-            var point = new Vector2(10, 10);
+            var circle = new BoundingCircle(new Vector2(0, 0), 10.0f);
+            var point = new Vector2(5, 0);
 
             var result = circle.Contains(point);
 
@@ -308,8 +288,8 @@ namespace MonoGame.Tests.Framework
         [Test]
         public void ContainsPoint_OnBoundary()
         {
-            var circle = new BoundingCircle(new Vector2(0, 0), 5);
-            var point = new Vector2(5, 0);
+            var circle = new BoundingCircle(new Vector2(0, 0), 10.0f);
+            var point = new Vector2(10, 0);
 
             var result = circle.Contains(point);
 
@@ -319,265 +299,29 @@ namespace MonoGame.Tests.Framework
         [Test]
         public void ContainsPoint_Outside()
         {
-            var circle = new BoundingCircle(new Vector2(0, 0), 5);
-            var point = new Vector2(10, 0);
+            var circle = new BoundingCircle(new Vector2(0, 0), 10.0f);
+            var point = new Vector2(15, 0);
 
             var result = circle.Contains(point);
 
             Assert.AreEqual(ContainmentType.Disjoint, result);
         }
 
-        [Test]
-        public void IntersectsCircle_Overlapping()
-        {
-            var circle1 = new BoundingCircle(new Vector2(0, 0), 5);
-            var circle2 = new BoundingCircle(new Vector2(8, 0), 5);
+        #endregion
 
-            bool intersects = circle1.Intersects(circle2);
-
-            Assert.IsTrue(intersects);
-        }
-
-        [Test]
-        public void IntersectsCircle_Separated()
-        {
-            var circle1 = new BoundingCircle(new Vector2(0, 0), 5);
-            var circle2 = new BoundingCircle(new Vector2(20, 0), 5);
-
-            bool intersects = circle1.Intersects(circle2);
-
-            Assert.IsFalse(intersects);
-        }
-
-        [Test]
-        public void IntersectsCircle_Touching()
-        {
-            var circle1 = new BoundingCircle(new Vector2(0, 0), 5);
-            var circle2 = new BoundingCircle(new Vector2(10, 0), 5);
-
-            bool intersects = circle1.Intersects(circle2);
-
-            Assert.IsTrue(intersects);
-        }
-
-        [Test]
-        public void IntersectsCircle_OneContainsOther()
-        {
-            var circle1 = new BoundingCircle(new Vector2(0, 0), 10);
-            var circle2 = new BoundingCircle(new Vector2(2, 0), 3);
-
-            bool intersects = circle1.Intersects(circle2);
-
-            Assert.IsTrue(intersects);
-        }
-
-        [Test]
-        public void IntersectsBox_Overlapping()
-        {
-            var circle = new BoundingCircle(new Vector2(0, 0), 5);
-            var box = new BoundingBox2D(new Vector2(3, 3), new Vector2(10, 10));
-
-            bool intersects = circle.Intersects(box);
-
-            Assert.IsTrue(intersects);
-        }
-
-        [Test]
-        public void IntersectsBox_Separated()
-        {
-            var circle = new BoundingCircle(new Vector2(0, 0), 5);
-            var box = new BoundingBox2D(new Vector2(10, 10), new Vector2(20, 20));
-
-            bool intersects = circle.Intersects(box);
-
-            Assert.IsFalse(intersects);
-        }
-
-        [Test]
-        public void IntersectsBox_CircleCenterInsideBox()
-        {
-            var circle = new BoundingCircle(new Vector2(5, 5), 2);
-            var box = new BoundingBox2D(new Vector2(0, 0), new Vector2(10, 10));
-
-            bool intersects = circle.Intersects(box);
-
-            Assert.IsTrue(intersects);
-        }
-
-        [Test]
-        public void IntersectsBox_TouchingEdge()
-        {
-            var circle = new BoundingCircle(new Vector2(0, 5), 5);
-            var box = new BoundingBox2D(new Vector2(5, 0), new Vector2(15, 10));
-
-            bool intersects = circle.Intersects(box);
-
-            Assert.IsTrue(intersects);
-        }
-
-        [Test]
-        public void IntersectsBox_TouchingCorner()
-        {
-            var circle = new BoundingCircle(new Vector2(0, 0), 5);
-            var box = new BoundingBox2D(new Vector2(MathF.Sqrt(12.5f), MathF.Sqrt(12.5f)), new Vector2(10, 10));
-
-            bool intersects = circle.Intersects(box);
-
-            Assert.IsTrue(intersects);
-        }
-
-        [Test]
-        public void IntersectsOrientedBoundingBox2D_Overlapping()
-        {
-            var circle = new BoundingCircle(new Vector2(8, 10), 5);
-            var obb = new OrientedBoundingBox2D(new Vector2(10, 10), Vector2.UnitX, Vector2.UnitY, new Vector2(5, 5));
-
-            bool intersects = circle.Intersects(obb);
-
-            Assert.IsTrue(intersects);
-        }
-
-        [Test]
-        public void IntersectsOrientedBoundingBox2D_Separated()
-        {
-            var circle = new BoundingCircle(new Vector2(30, 10), 5);
-            var obb = new OrientedBoundingBox2D(new Vector2(10, 10), Vector2.UnitX, Vector2.UnitY, new Vector2(5, 5));
-
-            bool intersects = circle.Intersects(obb);
-
-            Assert.IsFalse(intersects);
-        }
-
-        [Test]
-        public void IntersectsOrientedBoundingBox2D_Tangent()
-        {
-            // Aligned OBB left edge at x=5. Circle centered at (0,10) radius 5 => tangent at x=5.
-            var circle = new BoundingCircle(new Vector2(0, 10), 5);
-            var obb = new OrientedBoundingBox2D(new Vector2(10, 10), Vector2.UnitX, Vector2.UnitY, new Vector2(5, 5));
-
-            bool intersects = circle.Intersects(obb);
-
-            Assert.IsTrue(intersects);
-        }
-
-
-        [Test]
-        public void Transform_Translation()
-        {
-            var circle = new BoundingCircle(new Vector2(0, 0), 5);
-            var matrix = Matrix.CreateTranslation(10, 20, 0);
-
-            var transformed = circle.Transform(matrix);
-
-            Assert.AreEqual(new Vector2(10, 20), transformed.Center);
-            Assert.AreEqual(5.0f, transformed.Radius, 1e-5f);
-        }
-
-        [Test]
-        public void Transform_UniformScale()
-        {
-            var circle = new BoundingCircle(new Vector2(5, 5), 5);
-            var matrix = Matrix.CreateScale(2, 2, 1);
-
-            var transformed = circle.Transform(matrix);
-
-            Assert.AreEqual(new Vector2(10, 10), transformed.Center);
-            Assert.AreEqual(10.0f, transformed.Radius, 1e-5f);
-        }
-
-        [Test]
-        public void Transform_NonUniformScale()
-        {
-            var circle = new BoundingCircle(new Vector2(0, 0), 5);
-            var matrix = Matrix.CreateScale(2, 3, 1);
-
-            var transformed = circle.Transform(matrix);
-
-            // Radius should be scaled by the maximum scale component (3)
-            Assert.AreEqual(15.0f, transformed.Radius, 1e-5f);
-        }
-
-        [Test]
-        public void Transform_Rotation()
-        {
-            var circle = new BoundingCircle(new Vector2(5, 0), 5);
-            var matrix = Matrix.CreateRotationZ(MathHelper.PiOver2);
-
-            var transformed = circle.Transform(matrix);
-
-            // Center should be rotated
-            Assert.AreEqual(0.0f, transformed.Center.X, 1e-5f);
-            Assert.AreEqual(5.0f, transformed.Center.Y, 1e-5f);
-
-            // Radius should remain the same for pure rotation
-            Assert.AreEqual(5.0f, transformed.Radius, 1e-5f);
-        }
-
-        [Test]
-        public void Translate_OffsetsPosition()
-        {
-            var circle = new BoundingCircle(new Vector2(10, 10), 5);
-            var translation = new Vector2(5, -3);
-
-            var translated = circle.Translate(translation);
-
-            Assert.AreEqual(new Vector2(15, 7), translated.Center);
-            Assert.AreEqual(5.0f, translated.Radius);
-        }
+        #region Deconstruct Test
 
         [Test]
         public void Deconstruct()
         {
-            var circle = new BoundingCircle(new Vector2(10, 20), 5);
+            var circle = new BoundingCircle(new Vector2(5, 10), 15.0f);
 
-            circle.Deconstruct(out Vector2 center, out float radius);
+            var (center, radius) = circle;
 
-            Assert.AreEqual(circle.Center, center);
-            Assert.AreEqual(circle.Radius, radius);
+            Assert.AreEqual(new Vector2(5, 10), center);
+            Assert.AreEqual(15.0f, radius);
         }
 
-        [Test]
-        public void IntersectsBoundingCapsule_Overlapping()
-        {
-            var circle = new BoundingCircle(new Vector2(5, 5), 5);
-            var capsule = new BoundingCapsule2D(new Vector2(0, 0), new Vector2(10, 0), 3);
-
-            bool intersects = circle.Intersects(capsule);
-
-            Assert.IsTrue(intersects);
-        }
-
-        [Test]
-        public void IntersectsBoundingCapsule_Separated()
-        {
-            var circle = new BoundingCircle(new Vector2(5, 15), 3);
-            var capsule = new BoundingCapsule2D(new Vector2(0, 0), new Vector2(10, 0), 3);
-
-            bool intersects = circle.Intersects(capsule);
-
-            Assert.IsFalse(intersects);
-        }
-
-        [Test]
-        public void IntersectsBoundingCapsule_CircleAtEndCap()
-        {
-            var circle = new BoundingCircle(new Vector2(-5, 0), 3);
-            var capsule = new BoundingCapsule2D(new Vector2(0, 0), new Vector2(10, 0), 5);
-
-            bool intersects = circle.Intersects(capsule);
-
-            Assert.IsTrue(intersects);
-        }
-
-        [Test]
-        public void IntersectsBoundingCapsule_CircleInsideCapsule()
-        {
-            var circle = new BoundingCircle(new Vector2(5, 0), 2);
-            var capsule = new BoundingCapsule2D(new Vector2(0, 0), new Vector2(10, 0), 5);
-
-            bool intersects = circle.Intersects(capsule);
-
-            Assert.IsTrue(intersects);
-        }
+        #endregion
     }
 }

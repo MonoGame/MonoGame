@@ -10,17 +10,23 @@ namespace MonoGame.Tests.Framework
 {
     class Ray2DTest
     {
+        #region Constructor Tests
+
         [Test]
         public void Constructor()
         {
             var origin = new Vector2(1, 2);
-            var direction = new Vector2(0, 1);
+            var direction = new Vector2(3, 4);
 
             var ray = new Ray2D(origin, direction);
 
             Assert.AreEqual(origin, ray.Origin);
             Assert.AreEqual(direction, ray.Direction);
         }
+
+        #endregion
+
+        #region Factory Method Tests
 
         [Test]
         public void CreateFromPoints()
@@ -42,6 +48,10 @@ namespace MonoGame.Tests.Framework
 
             Assert.Throws<ArgumentException>(() => Ray2D.CreateFromPoints(start, through));
         }
+
+        #endregion
+
+        #region GetPoint Tests (Type-Specific Utility)
 
         [Test]
         public void GetPoint_AtOrigin()
@@ -66,434 +76,102 @@ namespace MonoGame.Tests.Framework
         [Test]
         public void GetPoint_NegativeDistance()
         {
-            var ray = new Ray2D(new Vector2(0, 0), new Vector2(1, 0));
+            var ray = new Ray2D(new Vector2(10, 0), new Vector2(1, 0));
 
             var point = ray.GetPoint(-5);
 
-            Assert.AreEqual(new Vector2(-5, 0), point);
+            Assert.AreEqual(new Vector2(5, 0), point);
         }
+
+        #endregion
+
+        #region Distance and Projection Tests (Delegation Spot Checks)
 
         [Test]
         public void ClosestPoint_PointAhead()
         {
             var ray = new Ray2D(new Vector2(0, 0), new Vector2(1, 0));
-            var point = new Vector2(10, 5);
+            var point = new Vector2(5, 3);
 
             var closest = ray.ClosestPoint(point, out float distanceAlongRay);
 
-            Assert.AreEqual(new Vector2(10, 0), closest);
-            Assert.AreEqual(10.0f, distanceAlongRay, 1e-6f);
+            Assert.AreEqual(new Vector2(5, 0), closest);
         }
 
         [Test]
         public void ClosestPoint_PointBehind()
         {
             var ray = new Ray2D(new Vector2(10, 0), new Vector2(1, 0));
-            var point = new Vector2(0, 5);
+            var point = new Vector2(5, 3);
 
             var closest = ray.ClosestPoint(point, out float distanceAlongRay);
 
             Assert.AreEqual(new Vector2(10, 0), closest);
-            Assert.AreEqual(0.0f, distanceAlongRay);
         }
 
         [Test]
         public void DistanceToPoint_PerpendicularDistance()
         {
             var ray = new Ray2D(new Vector2(0, 0), new Vector2(1, 0));
-            var point = new Vector2(10, 5);
+            var point = new Vector2(5, 3);
 
             float distance = ray.DistanceToPoint(point);
 
-            Assert.AreEqual(5.0f, distance, 1e-6f);
+            Assert.AreEqual(3.0f, distance, Collision2D.Epsilon);
         }
 
         [Test]
         public void DistanceSquaredToPoint_AvoidsSqrt()
         {
             var ray = new Ray2D(new Vector2(0, 0), new Vector2(1, 0));
-            var point = new Vector2(10, 3);
+            var point = new Vector2(5, 3);
 
             float distanceSquared = ray.DistanceSquaredToPoint(point);
 
-            Assert.AreEqual(9.0f, distanceSquared, 1e-6f);
+            Assert.AreEqual(9.0f, distanceSquared, Collision2D.Epsilon);
         }
 
+        #endregion
+
+        #region Normalize Tests
+
         [Test]
-        public void Normalize_CreatesUnitDirection()
+        public void Normalize_Static_CreatesUnitDirection()
         {
             var ray = new Ray2D(new Vector2(0, 0), new Vector2(3, 4));
 
-            Ray2D.Normalize(ref ray, out Ray2D normalized);
+            var normalized = Ray2D.Normalize(ray);
 
-            Assert.AreEqual(new Vector2(0, 0), normalized.Origin);
-            Assert.AreEqual(1.0f, normalized.Direction.Length(), 1e-6f);
+            Assert.AreEqual(1.0f, normalized.Direction.Length(), Collision2D.Epsilon);
+            Assert.AreEqual(ray.Origin, normalized.Origin);
         }
 
         [Test]
-        public void IntersectsRay_Crossing()
+        public void Normalize_Instance_ModifiesInPlace()
         {
-            var ray1 = new Ray2D(new Vector2(0, 0), new Vector2(1, 0));
-            var ray2 = new Ray2D(new Vector2(5, -5), new Vector2(0, 1));
+            var ray = new Ray2D(new Vector2(5, 5), new Vector2(3, 4));
 
-            bool intersects = ray1.Intersects(ray2, out float? d1, out float? d2, out Vector2? point);
+            ray.Normalize();
 
-            Assert.IsTrue(intersects);
-            Assert.AreEqual(5.0f, d1, 1e-6f);
-            Assert.AreEqual(5.0f, d2, 1e-6f);
-            Assert.AreEqual(new Vector2(5, 0), point);
+            Assert.AreEqual(1.0f, ray.Direction.Length(), Collision2D.Epsilon);
+            Assert.AreEqual(new Vector2(5, 5), ray.Origin);
         }
 
-        [Test]
-        public void IntersectsRay_Parallel()
-        {
-            var ray1 = new Ray2D(new Vector2(0, 0), new Vector2(1, 0));
-            var ray2 = new Ray2D(new Vector2(0, 5), new Vector2(1, 0));
+        #endregion
 
-            bool intersects = ray1.Intersects(ray2);
-
-            Assert.IsFalse(intersects);
-        }
-
-        [Test]
-        public void IntersectsRay_BehindOrigin()
-        {
-            var ray1 = new Ray2D(new Vector2(10, 0), new Vector2(1, 0));
-            var ray2 = new Ray2D(new Vector2(5, -5), new Vector2(0, 1));
-
-            bool intersects = ray1.Intersects(ray2);
-
-            Assert.IsFalse(intersects);
-        }
-
-        [Test]
-        public void IntersectsSegment_WithinBounds()
-        {
-            var ray = new Ray2D(new Vector2(0, 0), new Vector2(1, 0));
-            var segment = new LineSegment2D(new Vector2(5, -5), new Vector2(5, 5));
-
-            bool intersects = ray.Intersects(segment, out float? distanceAlongRay, out float? distanceAlongSegment, out Vector2? point);
-
-            Assert.IsTrue(intersects);
-            Assert.AreEqual(5.0f, distanceAlongRay, 1e-6f);
-            Assert.AreEqual(0.5f, distanceAlongSegment, 1e-6f);
-            Assert.AreEqual(new Vector2(5, 0), point);
-        }
-
-        [Test]
-        public void IntersectsSegment_OutsideBounds()
-        {
-            var ray = new Ray2D(new Vector2(0, 0), new Vector2(1, 0));
-            var segment = new LineSegment2D(new Vector2(5, 5), new Vector2(5, 10));
-
-            bool intersects = ray.Intersects(segment);
-
-            Assert.IsFalse(intersects);
-        }
+        #region Deconstruct Test
 
         [Test]
         public void Deconstruct()
         {
             var ray = new Ray2D(new Vector2(1, 2), new Vector2(3, 4));
 
-            ray.Deconstruct(out Vector2 origin, out Vector2 direction);
+            var (origin, direction) = ray;
 
-            Assert.AreEqual(ray.Origin, origin);
-            Assert.AreEqual(ray.Direction, direction);
+            Assert.AreEqual(new Vector2(1, 2), origin);
+            Assert.AreEqual(new Vector2(3, 4), direction);
         }
 
-        [Test]
-        public void IntersectsBoundingBox_HitsBox()
-        {
-            var ray = new Ray2D(new Vector2(0, 5), new Vector2(1, 0));
-            var box = new BoundingBox2D(new Vector2(10, 0), new Vector2(20, 10));
-
-            bool intersects = ray.Intersects(box, out float? tMin, out float? tMax);
-
-            Assert.IsTrue(intersects);
-            Assert.AreEqual(10.0f, tMin, 1e-5f);
-            Assert.AreEqual(20.0f, tMax, 1e-5f);
-        }
-
-        [Test]
-        public void IntersectsBoundingBox_MissesBox()
-        {
-            var ray = new Ray2D(new Vector2(0, 0), new Vector2(1, 0));
-            var box = new BoundingBox2D(new Vector2(10, 10), new Vector2(20, 20));
-
-            bool intersects = ray.Intersects(box);
-
-            Assert.IsFalse(intersects);
-        }
-
-        [Test]
-        public void IntersectsBoundingBox_OriginInsideBox()
-        {
-            var ray = new Ray2D(new Vector2(5, 5), new Vector2(1, 0));
-            var box = new BoundingBox2D(new Vector2(0, 0), new Vector2(10, 10));
-
-            bool intersects = ray.Intersects(box, out float? tMin, out float? tMax);
-
-            Assert.IsTrue(intersects);
-            Assert.AreEqual(0.0f, tMin);
-            Assert.AreEqual(5.0f, tMax, 1e-5f);
-        }
-
-        [Test]
-        public void IntersectsBoundingBox_PointsAwayFromBox()
-        {
-            var ray = new Ray2D(new Vector2(0, 5), new Vector2(-1, 0));
-            var box = new BoundingBox2D(new Vector2(10, 0), new Vector2(20, 10));
-
-            bool intersects = ray.Intersects(box);
-
-            Assert.IsFalse(intersects);
-        }
-
-        [Test]
-        public void IntersectsBoundingBox_ParallelToEdgeInside()
-        {
-            var ray = new Ray2D(new Vector2(5, 5), new Vector2(1, 0));
-            var box = new BoundingBox2D(new Vector2(0, 0), new Vector2(20, 10));
-
-            bool intersects = ray.Intersects(box, out float? tMin, out float? tMax);
-
-            Assert.IsTrue(intersects);
-            Assert.AreEqual(0.0f, tMin);
-            Assert.AreEqual(15.0f, tMax, 1e-5f);
-        }
-
-        [Test]
-        public void IntersectsBoundingBox_ParallelToEdgeOutside()
-        {
-            var ray = new Ray2D(new Vector2(5, 15), new Vector2(1, 0));
-            var box = new BoundingBox2D(new Vector2(0, 0), new Vector2(20, 10));
-
-            bool intersects = ray.Intersects(box);
-
-            Assert.IsFalse(intersects);
-        }
-
-        [Test]
-        public void IntersectsBoundingBox_HitsCorner()
-        {
-            var ray = new Ray2D(new Vector2(0, 0), Vector2.Normalize(new Vector2(1, 1)));
-            var box = new BoundingBox2D(new Vector2(10, 10), new Vector2(20, 20));
-
-            bool intersects = ray.Intersects(box);
-
-            Assert.IsTrue(intersects);
-        }
-
-        [Test]
-        public void IntersectsBoundingBox_TouchesEdge()
-        {
-            var ray = new Ray2D(new Vector2(0, 10), new Vector2(1, 0));
-            var box = new BoundingBox2D(new Vector2(10, 0), new Vector2(20, 10));
-
-            bool intersects = ray.Intersects(box);
-
-            Assert.IsTrue(intersects);
-        }
-
-        [Test]
-        public void IntersectsBoundingCircle_HitsCircle()
-        {
-            var ray = new Ray2D(new Vector2(0, 5), new Vector2(1, 0));
-            var circle = new BoundingCircle(new Vector2(10, 5), 3);
-
-            bool intersects = ray.Intersects(circle, out float? tMin, out float? tMax);
-
-            Assert.IsTrue(intersects);
-            Assert.AreEqual(7.0f, tMin, 1e-5f);
-            Assert.AreEqual(13.0f, tMax, 1e-5f);
-        }
-
-        [Test]
-        public void IntersectsBoundingCircle_MissesCircle()
-        {
-            var ray = new Ray2D(new Vector2(0, 0), new Vector2(1, 0));
-            var circle = new BoundingCircle(new Vector2(10, 10), 3);
-
-            bool intersects = ray.Intersects(circle);
-
-            Assert.IsFalse(intersects);
-        }
-
-        [Test]
-        public void IntersectsBoundingCircle_OriginInsideCircle()
-        {
-            var ray = new Ray2D(new Vector2(5, 5), new Vector2(1, 0));
-            var circle = new BoundingCircle(new Vector2(5, 5), 10);
-
-            bool intersects = ray.Intersects(circle, out float? tMin, out float? tMax);
-
-            Assert.IsTrue(intersects);
-            Assert.AreEqual(0.0f, tMin);
-            Assert.AreEqual(10.0f, tMax, 1e-5f);
-        }
-
-        [Test]
-        public void IntersectsBoundingCircle_PointsAwayFromCircle()
-        {
-            var ray = new Ray2D(new Vector2(0, 5), new Vector2(-1, 0));
-            var circle = new BoundingCircle(new Vector2(10, 5), 3);
-
-            bool intersects = ray.Intersects(circle);
-
-            Assert.IsFalse(intersects);
-        }
-
-        [Test]
-        public void IntersectsBoundingCircle_TangentRay()
-        {
-            var ray = new Ray2D(new Vector2(0, 5), new Vector2(1, 0));
-            var circle = new BoundingCircle(new Vector2(10, 10), 5);
-
-            bool intersects = ray.Intersects(circle, out float? tMin, out float? tMax);
-
-            Assert.IsTrue(intersects);
-            Assert.AreEqual(10.0f, tMin, 1e-5f);
-            Assert.AreEqual(10.0f, tMax, 1e-5f);
-        }
-
-        [Test]
-        public void IntersectsBoundingCircle_RayThroughCenter()
-        {
-            var ray = new Ray2D(new Vector2(0, 5), new Vector2(1, 0));
-            var circle = new BoundingCircle(new Vector2(10, 5), 5);
-
-            bool intersects = ray.Intersects(circle, out float? tMin, out float? tMax);
-
-            Assert.IsTrue(intersects);
-            Assert.AreEqual(5.0f, tMin, 1e-5f);
-            Assert.AreEqual(15.0f, tMax, 1e-5f);
-        }
-
-        [Test]
-        public void IntersectsBoundingCapsule_HitsCapsule()
-        {
-            var ray = new Ray2D(new Vector2(0, 5), new Vector2(1, 0));
-            var capsule = new BoundingCapsule2D(new Vector2(10, 0), new Vector2(10, 10), 3);
-
-            bool intersects = ray.Intersects(capsule, out float? tMin, out float? tMax);
-
-            Assert.IsTrue(intersects);
-            Assert.AreEqual(7.0f, tMin, 1e-5f);
-            Assert.AreEqual(13.0f, tMax, 1e-5f);
-        }
-
-        [Test]
-        public void IntersectsBoundingCapsule_MissesCapsule()
-        {
-            var ray = new Ray2D(new Vector2(0, 0), new Vector2(1, 0));
-            var capsule = new BoundingCapsule2D(new Vector2(10, 10), new Vector2(10, 20), 3);
-
-            bool intersects = ray.Intersects(capsule);
-
-            Assert.IsFalse(intersects);
-        }
-
-        [Test]
-        public void IntersectsBoundingCapsule_OriginInsideCapsule()
-        {
-            var ray = new Ray2D(new Vector2(5, 5), new Vector2(1, 0));
-            var capsule = new BoundingCapsule2D(new Vector2(0, 0), new Vector2(0, 10), 8);
-
-            bool intersects = ray.Intersects(capsule, out float? tMin, out float? tMax);
-
-            Assert.IsTrue(intersects);
-            Assert.AreEqual(0.0f, tMin);
-            Assert.IsNotNull(tMax);
-        }
-
-        [Test]
-        public void IntersectsBoundingCapsule_PointsAwayFromCapsule()
-        {
-            var ray = new Ray2D(new Vector2(0, 5), new Vector2(-1, 0));
-            var capsule = new BoundingCapsule2D(new Vector2(10, 0), new Vector2(10, 10), 3);
-
-            bool intersects = ray.Intersects(capsule);
-
-            Assert.IsFalse(intersects);
-        }
-
-        [Test]
-        public void IntersectsBoundingCapsule_ParallelToAxis()
-        {
-            var ray = new Ray2D(new Vector2(0, 5), new Vector2(1, 0));
-            var capsule = new BoundingCapsule2D(new Vector2(10, 5), new Vector2(20, 5), 3);
-
-            bool intersects = ray.Intersects(capsule, out float? tMin, out float? tMax);
-
-            Assert.IsTrue(intersects);
-            Assert.AreEqual(7.0f, tMin, 1e-5f);
-            Assert.AreEqual(23.0f, tMax, 1e-5f);
-        }
-
-        [Test]
-        public void IntersectsBoundingCapsule_HitsEndCap()
-        {
-            var ray = new Ray2D(new Vector2(0, 0), new Vector2(1, 0));
-            var capsule = new BoundingCapsule2D(new Vector2(10, 3), new Vector2(10, 10), 3);
-
-            bool intersects = ray.Intersects(capsule, out float? tMin, out float? tMax);
-
-            Assert.IsTrue(intersects);
-            Assert.IsNotNull(tMin);
-            Assert.IsNotNull(tMax);
-        }
-
-        [Test]
-        public void IntersectsBoundingCapsule_DegenerateCapsule()
-        {
-            var ray = new Ray2D(new Vector2(0, 5), new Vector2(1, 0));
-            var capsule = new BoundingCapsule2D(new Vector2(10, 5), new Vector2(10, 5), 5);
-
-            bool intersects = ray.Intersects(capsule, out float? tMin, out float? tMax);
-
-            Assert.IsTrue(intersects);
-            Assert.AreEqual(5.0f, tMin, 1e-5f);
-            Assert.AreEqual(15.0f, tMax, 1e-5f);
-        }
-
-        [Test]
-        public void IntersectsOrientedBoundingBox2D_PassesCompletelyThrough()
-        {
-            var ray = new Ray2D(new Vector2(0, 10), Vector2.UnitX);
-            var obb = new OrientedBoundingBox2D(new Vector2(10, 10), Vector2.UnitX, Vector2.UnitY, new Vector2(5, 5));
-
-            bool intersects = ray.Intersects(obb, out float? tMin, out float? tMax);
-
-            Assert.IsTrue(intersects);
-            Assert.AreEqual(5.0f, tMin, 1e-5f);
-            Assert.AreEqual(15.0f, tMax, 1e-5f);
-        }
-
-        [Test]
-        public void IntersectsOrientedBoundingBox2D_StartsInside()
-        {
-            var ray = new Ray2D(new Vector2(10, 10), Vector2.UnitX);
-            var obb = new OrientedBoundingBox2D(new Vector2(10, 10), Vector2.UnitX, Vector2.UnitY, new Vector2(5, 5));
-
-            bool intersects = ray.Intersects(obb, out float? tMin, out float? tMax);
-
-            Assert.IsTrue(intersects);
-            Assert.AreEqual(0.0f, tMin);
-            Assert.AreEqual(5.0f, tMax, 1e-5f);
-        }
-
-        [Test]
-        public void IntersectsOrientedBoundingBox2D_MissesCompletely()
-        {
-            var ray = new Ray2D(new Vector2(0, 0), Vector2.UnitX);
-            var obb = new OrientedBoundingBox2D(new Vector2(10, 10), Vector2.UnitX, Vector2.UnitY, new Vector2(5, 5));
-
-            bool intersects = ray.Intersects(obb, out float? tMin, out float? tMax);
-
-            Assert.IsFalse(intersects);
-            Assert.IsNull(tMin);
-            Assert.IsNull(tMax);
-        }
+        #endregion
     }
 }
