@@ -2110,7 +2110,7 @@ namespace Microsoft.Xna.Framework
                 r = g = b = v;
             //working out which segment of colour wheel the hue is.
             int i = (int)(h / 60.0f);
-            int f = (int)(h / 60.0f) - i;
+            float f = (h % 60.0f) / 60.0f;
             float p = v * (1.0f - s);
             float q = v * (1.0f - s * f);
             float t = v * (1.0f - s * (1.0f - f));
