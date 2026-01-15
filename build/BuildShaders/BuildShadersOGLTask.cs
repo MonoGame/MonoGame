@@ -13,7 +13,7 @@ public sealed class BuildShadersOGLTask : FrostingTask<BuildContext>
         var envVars = System.Environment.GetEnvironmentVariables();
         context.Information($"Environment");
 
-        foreach (var entry in envVars)
+        foreach (System.Collections.DictionaryEntry entry in envVars)
         {
             context.Information($"{entry.Key}={entry.Value}");
         }
