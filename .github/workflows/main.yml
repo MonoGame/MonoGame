@@ -22,7 +22,7 @@ jobs:
           - os: macos-26
             platform: macos
             shell: bash
-          - os: ubuntu-24.04
+          - os: ubuntu-latest
             platform: linux
             shell: bash      
       fail-fast: false
