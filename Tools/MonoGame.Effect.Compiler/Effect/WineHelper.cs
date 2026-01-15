@@ -53,7 +53,7 @@ namespace MonoGame.Effect.Compiler
                 Console.Out.WriteLine(output);
                 if (proc.ExitCode == 0)
                 {
-                    _wineExecutable = wine;
+                    _wineExecutable = output.Trim();
                     Console.Out.WriteLine($"Found {_wineExecutable}");
                     return true;
                 }
