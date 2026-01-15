@@ -83,6 +83,8 @@ namespace MonoGame.Effect.Compiler
         static int RunInWine(string cmd)
         {
             Console.Out.WriteLine($"Trying to run {_wineExecutable}");
+            var path = Environment.GetEnvironmentVariable("PATH");
+            Console.WriteLine($"Current PATH: {path}");
             var proc = new Process();
             proc.StartInfo.FileName = _wineExecutable;
             proc.StartInfo.Arguments = cmd;
