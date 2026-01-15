@@ -37,7 +37,6 @@ namespace MonoGame.Effect.Compiler
                 ["wine64", "wine"] :
                 ["wine", "wine64"];
             var proc = new Process();
-            proc.StartInfo.Arguments = "--version";
             proc.StartInfo.UseShellExecute = false;
             proc.StartInfo.CreateNoWindow = true;
             proc.StartInfo.RedirectStandardOutput = true;
@@ -55,6 +54,12 @@ namespace MonoGame.Effect.Compiler
                 {
                     _wineExecutable = output.Trim();
                     Console.Out.WriteLine($"Found {_wineExecutable}");
+                    proc.StartInfo.FileName = _wineExecutable;
+                    proc.StartInfo.Arguments = "--version";
+                    proc.Start();
+                    proc.WaitForExit();
+                    output = proc.StandardOutput.ReadToEnd();
+                    Console.Out.WriteLine(output);
                     return true;
                 }
             }
