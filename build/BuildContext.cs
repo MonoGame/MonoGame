@@ -192,6 +192,7 @@ public class BuildContext : FrostingContext
     {
         var mgfxc = System.IO.Path.Combine(Directory.GetCurrentDirectory(), project);
         DotNetRunSettings.WorkingDirectory = workingDir ?? "";
+        DotNetRunSettings.EnvironmentVariables["PATH"] = System.Environment.GetEnvironmentVariable("PATH");
         this.DotNetRun(mgfxc, args, DotNetRunSettings);
         DotNetRunSettings.WorkingDirectory = "";
     }
