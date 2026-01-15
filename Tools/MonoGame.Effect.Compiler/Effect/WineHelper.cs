@@ -44,6 +44,7 @@ namespace MonoGame.Effect.Compiler
 
             foreach (var wine in wineCommands)
             {
+                Console.Out.WriteLine($"Checking for {wine}");
                 proc.StartInfo.FileName = "which";
                 proc.StartInfo.Arguments = wine;
                 proc.Start();
@@ -51,10 +52,11 @@ namespace MonoGame.Effect.Compiler
                 if (proc.ExitCode == 0)
                 {
                     _wineExecutable = wine;
+                    Console.Out.WriteLine($"Found {_wineExecutable}");
                     return true;
                 }
             }
-
+            Console.Out.WriteLine("wine not found.");
             return false;
         }
 
@@ -63,9 +65,11 @@ namespace MonoGame.Effect.Compiler
             var mgfxcwine = Environment.GetEnvironmentVariable("MGFXC_WINE_PATH");
             if (string.IsNullOrEmpty(mgfxcwine))
             {
+                Console.Out.WriteLine("MGFXC_WINE_PATH envvar not set.");
                 return false;
             }
 
+            Console.Out.WriteLine("MGFXC_WINE_PATH={mgfxcwine}");
             Environment.SetEnvironmentVariable("WINEARCH", "win64");
             Environment.SetEnvironmentVariable("WINEDLLOVERRIDES", "d3dcompiler_47=n,explorer.exe=e,services.exe=f");
             Environment.SetEnvironmentVariable("WINEPREFIX", mgfxcwine);
@@ -76,6 +80,7 @@ namespace MonoGame.Effect.Compiler
 
         static int RunInWine(string cmd)
         {
+            Console.Out.WriteLine("Trying to run {_wineExecutable}");
             var proc = new Process();
             proc.StartInfo.FileName = _wineExecutable;
             proc.StartInfo.Arguments = cmd;
