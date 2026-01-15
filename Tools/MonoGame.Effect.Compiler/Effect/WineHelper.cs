@@ -29,6 +29,7 @@ namespace MonoGame.Effect.Compiler
                 Console.Error.WriteLine(errMessage);
                 throw new Exception(errMessage);
             }
+            RunInWine("--version");
         }
 
         static bool DetectWine()
@@ -54,12 +55,6 @@ namespace MonoGame.Effect.Compiler
                 {
                     _wineExecutable = output.Trim();
                     Console.Out.WriteLine($"Found {_wineExecutable}");
-                    proc.StartInfo.FileName = _wineExecutable;
-                    proc.StartInfo.Arguments = "--version";
-                    proc.Start();
-                    proc.WaitForExit();
-                    output = proc.StandardOutput.ReadToEnd();
-                    Console.Out.WriteLine(output);
                     return true;
                 }
             }
@@ -94,10 +89,14 @@ namespace MonoGame.Effect.Compiler
             proc.StartInfo.FileName = _wineExecutable;
             proc.StartInfo.Arguments = cmd;
             proc.StartInfo.CreateNoWindow = true;
-            proc.StartInfo.UseShellExecute = true;
+            proc.StartInfo.UseShellExecute = false;
+            proc.StartInfo.RedirectStandardOutput = true;
 
             proc.Start();
             proc.WaitForExit();
+
+            var output = proc.StandardOutput.ReadToEnd();
+            Console.Out.WriteLine(output);
 
             return proc.ExitCode;
         }
