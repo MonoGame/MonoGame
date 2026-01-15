@@ -109,6 +109,14 @@ jobs:
       - name: Setup Wine
         uses: monogame/monogame-actions/install-wine@v1
 
+      - name: DEBUG WINE
+        if: runner.os == 'Linux'
+        run: |
+          ls -la $HOME/.winemonogame
+          wine64 netstat
+          which bash
+          bash --version
+
       - name: Install Fonts
         uses: monogame/monogame-actions/install-fonts@v1
         
