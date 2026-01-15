@@ -69,7 +69,7 @@ namespace MonoGame.Effect.Compiler
                 return false;
             }
 
-            Console.Out.WriteLine("MGFXC_WINE_PATH={mgfxcwine}");
+            Console.Out.WriteLine($"MGFXC_WINE_PATH={mgfxcwine}");
             Environment.SetEnvironmentVariable("WINEARCH", "win64");
             Environment.SetEnvironmentVariable("WINEDLLOVERRIDES", "d3dcompiler_47=n,explorer.exe=e,services.exe=f");
             Environment.SetEnvironmentVariable("WINEPREFIX", mgfxcwine);
@@ -80,7 +80,7 @@ namespace MonoGame.Effect.Compiler
 
         static int RunInWine(string cmd)
         {
-            Console.Out.WriteLine("Trying to run {_wineExecutable}");
+            Console.Out.WriteLine($"Trying to run {_wineExecutable}");
             var proc = new Process();
             proc.StartInfo.FileName = _wineExecutable;
             proc.StartInfo.Arguments = cmd;
@@ -95,6 +95,7 @@ namespace MonoGame.Effect.Compiler
 
         static string GetWinePath(string path)
         {
+            Console.Out.WriteLine($"Trying to run winepath for {path}");
             var proc = new Process();
             proc.StartInfo.FileName = "winepath";
             proc.StartInfo.Arguments = $"-w \"{path}\"";
@@ -104,7 +105,10 @@ namespace MonoGame.Effect.Compiler
             proc.Start();
             proc.WaitForExit();
 
-            return '"' + proc.StandardOutput.ReadToEnd().Replace(@"\", @"\\").Trim('\n') + '"';
+            var output = proc.StandardOutput.ReadToEnd();
+            Console.Out.WriteLine(output);
+
+            return '"' + output.Replace(@"\", @"\\").Trim('\n') + '"';
         }
 
         public static CompilationResult RunFxc2(string fileContents, string shaderFunction, string shaderProfile, ShaderFlags shaderFlags, string displayPath)
