@@ -49,6 +49,8 @@ namespace MonoGame.Effect.Compiler
                 proc.StartInfo.Arguments = wine;
                 proc.Start();
                 proc.WaitForExit();
+                var output = proc.StandardOutput.ReadToEnd();
+                Console.Out.WriteLine(output);
                 if (proc.ExitCode == 0)
                 {
                     _wineExecutable = wine;
