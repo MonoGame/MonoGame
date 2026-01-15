@@ -11,11 +11,11 @@ public sealed class BuildShadersOGLTask : FrostingTask<BuildContext>
         var shadersDir = "MonoGame.Framework/Platform/Graphics/Effect/Resources";
 
         var envVars = System.Environment.GetEnvironmentVariables();
-        context.Information($"Environment"");
+        context.Information($"Environment");
 
         foreach (var entry in envVars)
         {
-            context.Information($"\t{entry.Key}={entry.Value}");
+            context.Information($"{entry.Key}={entry.Value}");
         }
 
         foreach (var filePath in context.GetFiles($"{shadersDir}/*.fx"))
