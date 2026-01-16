@@ -2,11 +2,12 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
-using System;
-using SharpDX.XAudio2;
-using SharpDX.X3DAudio;
-using SharpDX.Multimedia;
+using Microsoft.VisualBasic;
 using SharpDX.Mathematics.Interop;
+using SharpDX.Multimedia;
+using SharpDX.X3DAudio;
+using SharpDX.XAudio2;
+using System;
 
 namespace Microsoft.Xna.Framework.Audio
 {
@@ -47,7 +48,7 @@ namespace Microsoft.Xna.Framework.Audio
             {
                 e.ChannelRadius = 0;
                 e.ChannelAzimuths = _defaultChannelAzimuths;
-             }
+            }
 
             // Convert from XNA Listener to a SharpDX Listener
             var l = ToDXListener(listener);
@@ -307,11 +308,47 @@ namespace Microsoft.Xna.Framework.Audio
                 return SoundState.Stopped;
 
             // Because XAudio2 does not actually provide if a SourceVoice is Started / Stopped
-            // we have to save the "paused" state ourself.
+            // we have to save the "paused" state ourselves.
             if (_paused)
                 return SoundState.Paused;
 
             return SoundState.Playing;
+        }
+
+        private TimeSpan PlatformGetOffset()
+        {
+            if (_voice != null && SoundEffect.MasterVoice != null && _voice.State.BuffersQueued > 0)
+            {
+                return TimeSpan.FromMilliseconds((_voice.State.SamplesPlayed * 1000) / _format.SampleRate);
+            }
+
+            return TimeSpan.Zero;
+        }
+
+        private void PlatformSetOffset(TimeSpan offset)
+        {
+            if (_voice != null && SoundEffect.MasterVoice != null)
+            {
+                if (_voice.State.BuffersQueued > 0)
+                {
+                    _voice.Stop();
+                    _voice.FlushSourceBuffers();
+                }
+
+                if (_isLooped)
+                {
+                    _effect._loopedBuffer.PlayBegin = (int)(offset.TotalSeconds * _effect._format.SampleRate) * _effect._format.BlockAlign;
+                    _voice.SubmitSourceBuffer(_effect._loopedBuffer, null);
+                }
+                else
+                {
+                    _effect._buffer.PlayBegin = (int)(offset.TotalSeconds * _effect._format.SampleRate) * _effect._format.BlockAlign;
+                    _voice.SubmitSourceBuffer(_effect._buffer, null); 
+                } 
+                 
+                // Restart playback
+                _voice.Start();
+            }
         }
 
         private void PlatformSetVolume(float value)

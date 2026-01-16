@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.IO;
@@ -439,13 +439,19 @@ namespace Microsoft.Xna.Framework.Audio
             inst.SoundState = SoundState.Stopped;
 		}
 
-        public double SourceCurrentPosition (int sourceId)
+        public float SourceCurrentOffset (int sourceId)
 		{
-            int pos;
-			AL.GetSource (sourceId, ALGetSourcei.SampleOffset, out pos);
+            float pos;
+			AL.alGetSourcef(sourceId, ALSourcef.Offset, out pos);
             ALHelper.CheckError("Failed to set source offset.");
 			return pos;
 		}
+
+        public void SetSourceCurrentPosition(int sourceId, TimeSpan position)
+        {
+            int pos;
+            AL.Source(sourceId, ALSourcef.Offset, (float)position.TotalSeconds);
+        }
 
 #if ANDROID
         void Activity_Paused(object sender, EventArgs e)

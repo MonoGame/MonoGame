@@ -1,4 +1,4 @@
-// MonoGame - Copyright (C) MonoGame Foundation, Inc
+﻿// MonoGame - Copyright (C) MonoGame Foundation, Inc
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
@@ -684,6 +684,29 @@ mgulong MGA_Voice_GetPosition(MGA_Voice* voice)
 
 	float msec = (state.SamplesPlayed / (float)voice->format.nSamplesPerSec) * 1000.0f;
 	return (mgulong)msec;
+}
+
+void MGA_Voice_SetPosition(MGA_Voice* voice, mgulong position)
+{
+	assert(voice != nullptr);
+	if (voice->voice == nullptr)
+		return;
+	 
+	FAudioSourceVoice_Stop(voice->voice, 0, FAUDIO_COMMIT_NOW);
+	FAudioSourceVoice_FlushSourceBuffers(voice->voice); 
+	// Calculate the sample to seek to.
+	uint32_t sample = ((position / 1000.0f) * voice->format.nSamplesPerSec);
+	auto buffer = voice->buffer->buffer;
+	if (voice->looped)
+		buffer.LoopCount = FAUDIO_LOOP_INFINITE;
+	else
+		buffer.LoopBegin = buffer.LoopLength = buffer.LoopCount = 0;
+
+	buffer.PlayBegin = (uint32_t)sample;
+	FAudioSourceVoice_SubmitSourceBuffer(voice->voice, &buffer, nullptr);  
+	voice->finishedBuffers = 0;
+	voice->state = MGSoundState::Playing;
+	FAudioSourceVoice_Start(voice->voice, 0, FAUDIO_COMMIT_NOW);
 }
 
 static void MGA_Voice_UpdateOutputMatrix(MGA_Voice* voice)

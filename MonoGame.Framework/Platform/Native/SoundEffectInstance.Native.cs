@@ -1,4 +1,4 @@
-// MonoGame - Copyright (C) MonoGame Foundation, Inc
+﻿// MonoGame - Copyright (C) MonoGame Foundation, Inc
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
@@ -78,6 +78,21 @@ public partial class SoundEffectInstance : IDisposable
             return MGA.Voice_GetState(Voice);
 
         return SoundState.Stopped;
+    }
+
+    private unsafe TimeSpan PlatformGetOffset()
+    {
+        if (Voice != null)
+            return TimeSpan.FromMilliseconds(MGA.Voice_GetPosition(Voice));
+
+        return TimeSpan.Zero;
+    }
+
+
+    private unsafe void PlatformSetOffset(TimeSpan offset)
+    {
+        if (Voice != null)
+            MGA.Voice_SetPosition(Voice, (ulong)offset.TotalMilliseconds);
     }
 
     private unsafe void PlatformSetVolume(float volume)

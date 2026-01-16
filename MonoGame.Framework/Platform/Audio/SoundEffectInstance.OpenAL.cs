@@ -1,4 +1,4 @@
-// MonoGame - Copyright (C) MonoGame Foundation, Inc
+﻿// MonoGame - Copyright (C) MonoGame Foundation, Inc
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
@@ -300,6 +300,27 @@ namespace Microsoft.Xna.Framework.Audio
 
             return SoundState;
         }
+
+        private TimeSpan PlatformGetOffset()
+        { 
+            if (HasSourceId)
+            {
+                var result = OpenALSoundController.Instance.SourceCurrentOffset(SourceId);
+                AlcHelper.CheckError("Failed to set position.");
+                return TimeSpan.FromSeconds(result);
+            }
+
+            return TimeSpan.Zero;
+        }
+
+        private void PlatformSetOffset(TimeSpan position)
+        {
+            if (HasSourceId)
+            {
+                AL.Source(SourceId, ALSourcef.Offset, (float)position.TotalSeconds);
+            }
+        }
+        
 
         private void PlatformSetVolume(float value)
         {

@@ -1,4 +1,4 @@
-// MonoGame - Copyright (C) MonoGame Foundation, Inc
+﻿// MonoGame - Copyright (C) MonoGame Foundation, Inc
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
@@ -176,6 +176,9 @@ internal static unsafe partial class MGA
 
     [DllImport(MGP.MonoGameNativeDLL, EntryPoint = "MGA_Voice_SetPitch", ExactSpelling = true)]
     public static extern void Voice_SetPitch(MGA_Voice* voice, float pitch);
+     
+    [DllImport(MGP.MonoGameNativeDLL, EntryPoint = "MGA_Voice_SetPosition", ExactSpelling = true)]
+    public static extern void Voice_SetPosition(MGA_Voice* voice, ulong position);
 
     [DllImport(MGP.MonoGameNativeDLL, EntryPoint = "MGA_Voice_SetVolume", ExactSpelling = true)]
     public static extern void Voice_SetVolume(MGA_Voice* voice, float volume);
