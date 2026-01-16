@@ -15,15 +15,8 @@ using System.Diagnostics;
 namespace MonoGame.Tests.Audio
 {
     [Category("Audio")]
-    class SoundEffectInstanceTest
+    class SoundEffectInstanceTest : AudioTestFixtureBase
     {
-        [SetUp]
-        public void SetUp()
-        {
-            // Necessary to get audio initialised
-            FrameworkDispatcher.Update();
-        }
-
         /// <summary>
         /// Unit test for issue #7372 where the Sound effects instance does not play after Play()
         /// is called after calling Pause(), Stop().
@@ -31,7 +24,6 @@ namespace MonoGame.Tests.Audio
         [Test]
         public void SoundEffectPauseStopPlay()
         {
-
             var se = new SoundEffect(new byte[16000], 8000, AudioChannels.Mono);
             
             using (var instance = se.CreateInstance())
@@ -55,26 +47,5 @@ namespace MonoGame.Tests.Audio
                 Assert.AreEqual(SoundState.Paused, instance.State);
             }
         }
-
-
-        private static void SleepWhileDispatching(int ms)
-        {
-            Stopwatch stopwatch = new Stopwatch();
-            stopwatch.Start();
-
-            int cycles = ms / 10;
-            for (int i = 0; i < cycles; i++)
-            {
-                FrameworkDispatcher.Update();
-                Thread.Sleep(10);
-
-                if (stopwatch.Elapsed.TotalMilliseconds > ms)
-                {
-                    stopwatch.Stop();
-                    break;
-                }
-            }
-        }
-
     }
 }
