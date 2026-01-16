@@ -47,7 +47,7 @@ public sealed class UploadArtifactsTask : AsyncFrostingTask<BuildContext>
         {
             case PlatformFamily.Windows:
                 await context.GitHubActions().Commands.UploadArtifact(new DirectoryPath("Artifacts/native/mgpipeline/windows/Release/"), $"mgpipeline-{os}.{context.Version}");
-                await context.GitHubActions().Commands.UploadArtifact(new DirectoryPath("Artifacts/monogame.native/windows/"), $"mgnative-{os}.{context.Version}");
+                await context.GitHubActions().Commands.UploadArtifact(new DirectoryPath("Artifacts/native/mgruntime/windowsdx/windows/"), $"mgnative-{os}.{context.Version}");
                 break;
             case PlatformFamily.Linux:
                 await context.GitHubActions().Commands.UploadArtifact(new DirectoryPath("Artifacts/native/mgpipeline/linux/Release/"), $"mgpipeline-{os}.{context.Version}");

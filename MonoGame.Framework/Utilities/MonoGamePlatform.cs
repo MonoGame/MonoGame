@@ -10,67 +10,67 @@ namespace MonoGame.Framework.Utilities
     public enum MonoGamePlatform
     {
         /// <summary>
-        /// MonoGame Android platform.
+        /// Android platform.
         /// </summary>
         Android,
 
         /// <summary>
-        /// MonoGame iOS platform.
+        /// iOS platform.
         /// </summary>
         iOS,
 
         /// <summary>
-        /// MonoGame tvOS platform.
+        /// tvOS platform.
         /// </summary>
         tvOS,
 
         /// <summary>
-        /// MonoGame cross platform desktop OpenGL platform.
+        /// Cross platform desktop using OpenGL.
         /// </summary>
         DesktopGL,
 
         /// <summary>
-        /// MonoGame Win32 Windows platform.
+        /// Windows platform using DirectX 11.
         /// </summary>
         Windows,
 
         /// <summary>
-        /// MonoGame WebGL platform.
+        /// WebGL platform.
         /// </summary>
         WebGL,
 
         /// <summary>
-        /// MonoGame Xbox One platform.
+        /// Xbox One platform.
         /// </summary>
         XboxOne,
         
         /// <summary>
-        /// MonoGame Windows GDK platform.
+        /// Windows platform using DirectX 12.
         /// </summary>
-        WindowsGDK,
+        WindowsDX12,
 
         /// <summary>
-        /// MonoGame Xbox Series platform.
+        /// Xbox Series X|S platform.
         /// </summary>
         XboxSeries,
 
         /// <summary>
-        /// MonoGame PlayStation 4 platform.
+        /// PlayStation 4 platform.
         /// </summary>
         PlayStation4,
 
         /// <summary>
-        /// MonoGame PlayStation 5 platform.
+        /// PlayStation 5 platform.
         /// </summary>
         PlayStation5,
 
         /// <summary>
-        /// MonoGame Nintendo Switch platform.
+        /// Nintendo Switch platform.
         /// </summary>
         NintendoSwitch,
 
         /// <summary>
-        /// All desktop versions using Vulkan.
+        /// Cross platform desktop using Vulkan.
         /// </summary>
         DesktopVK,
     }

@@ -1,4 +1,4 @@
-// MonoGame - Copyright (C) The MonoGame Team
+// MonoGame - Copyright (C) MonoGame Foundation, Inc
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
@@ -510,7 +510,7 @@ enum class MGMonoGamePlatform : mgint
     Windows = 4,
     WebGL = 5,
     XboxOne = 6,
-    WindowsGDK = 7,
+    WindowsDX12 = 7,
     XboxSeries = 8,
     PlayStation4 = 9,
     PlayStation5 = 10,

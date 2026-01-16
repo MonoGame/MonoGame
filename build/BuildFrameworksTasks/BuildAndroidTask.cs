@@ -5,7 +5,6 @@ namespace BuildScripts;
 [IsDependentOn(typeof(BuildShadersOGLTask))]
 public sealed class BuildAndroidTask : FrostingTask<BuildContext>
 {
-    private string platformName = "Android";
     public override bool ShouldRun(BuildContext context) => context.IsWorkloadInstalled("android");
 
     public override void Run(BuildContext context)
@@ -21,7 +20,7 @@ public sealed class BuildAndroidTask : FrostingTask<BuildContext>
             Configuration = context.DotNetPackSettings.Configuration,
         };
 
-        context.DotNetBuild(context.GetProjectPath(ProjectType.Framework, platformName), installSettings);
-        context.DotNetPack(context.GetProjectPath(ProjectType.Framework, platformName), context.DotNetPackSettings);
+        context.DotNetBuild(context.GetProjectPath(ProjectType.Framework, "Android"), installSettings);
+        context.DotNetPack(context.GetProjectPath(ProjectType.Framework, "Android"), context.DotNetPackSettings);
     }
 }

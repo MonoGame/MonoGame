@@ -19,5 +19,7 @@ For inspiration review the commit/PR history in the MonoGame repository.
 -->
 
 
+### Contributor Declaration
 
+- [ ] I certify that no LLM's were used to generate any code or documentation in this contribution.
 

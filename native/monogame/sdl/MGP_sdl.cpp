@@ -1,4 +1,4 @@
-// MonoGame - Copyright (C) The MonoGame Team
+// MonoGame - Copyright (C) MonoGame Foundation, Inc
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
@@ -260,7 +260,7 @@ MGMonoGamePlatform MGP_Platform_GetPlatform()
 #if MG_VULKAN
     return MGMonoGamePlatform::DesktopVK;
 #elif MG_DIRECTX12
-    return MGMonoGamePlatform::Windows;
+    return MGMonoGamePlatform::WindowsDX12;
 #else
     assert(false);
     return (MGMonoGamePlatform)-1;
