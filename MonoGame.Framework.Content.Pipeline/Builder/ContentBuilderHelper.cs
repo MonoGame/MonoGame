@@ -243,8 +243,7 @@ static class ContentBuilderHelper
 
         foreach (var info in _importers)
         {
-            string fileExtension = Path.GetExtension(relativePath);
-            if (info.Attribute?.FileExtensions.Any(e => e.Equals(fileExtension, StringComparison.InvariantCultureIgnoreCase)) ?? false)
+            if (info.Attribute?.FileExtensions.Any(e => relativePath.EndsWith(e, StringComparison.InvariantCultureIgnoreCase)) ?? false)
             {
                 outImporter = (IContentImporter)Activator.CreateInstance(info.Type)!;
                 return true;

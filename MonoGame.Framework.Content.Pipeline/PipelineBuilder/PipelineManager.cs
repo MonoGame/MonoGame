@@ -229,7 +229,7 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
                     if (t.IsAbstract)
                         continue;
 
-                    if (t.GetInterface(@"IContentImporter") != null)
+                    if (t.GetInterface(nameof(IContentImporter)) != null)
                     {
                         var attributes = t.GetCustomAttributes(typeof (ContentImporterAttribute), false);
                         if (attributes.Length != 0)
@@ -256,7 +256,7 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
                             });
                         }
                     }
-                    else if (t.GetInterface(@"IContentProcessor") != null)
+                    else if (t.GetInterface(nameof(IContentProcessor)) != null)
                     {
                         var attributes = t.GetCustomAttributes(typeof (ContentProcessorAttribute), false);
                         if (attributes.Length != 0)
@@ -270,15 +270,21 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
                             });
                         }
                     }
-                    else if (t.GetInterface(@"ContentTypeWriter") != null)
+                    else if (t.GetInterface(nameof(ContentTypeWriter)) != null)
                     {
 						// TODO: This doesn't work... how do i find these?
                         _writers.Add(t);
                     }
                 }
             }
-        }
 
+            // Sort importers by priority descending.
+            // This makes sure that in methods where they are looped through, the one with
+            // the highest priority is found first.
+            // This is important for file extensions that are supported by multiple importers.
+            _importers.Sort((a, b) => b.attribute.Priority.CompareTo(a.attribute.Priority));
+        }
+        
         /// <summary>
         /// Gets the importer types.
         /// </summary>
@@ -358,6 +364,26 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
         }
 
         /// <summary>
+        /// Returns the importer type name based on the file name (including extension).
+        /// </summary>
+        /// <param name="fileNameWithExt">Then name of the file including the extension.</param>
+        /// <returns>Importer type name or <see langword="null"/> if not found.</returns>
+        public string FindImporterByFileName(string fileNameWithExt)
+        {
+            if (_importers == null)
+                ResolveAssemblies();
+
+            // Search for the importer.
+            foreach (var info in _importers)
+            {
+                if (info.attribute.FileExtensions.Any(e => fileNameWithExt.EndsWith(e, StringComparison.InvariantCultureIgnoreCase)))
+                    return info.type.Name;
+            }
+
+            return null;
+        }
+
+        /// <summary>
         /// Gets the importer assembly timestamp.
         /// </summary>
         /// <param name="name">Assembly name.</param>
@@ -428,7 +454,7 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
         {
             // Resolve the importer name.
             if (string.IsNullOrEmpty(importerName))
-                importerName = FindImporterByExtension(Path.GetExtension(sourceFilepath));
+                importerName = FindImporterByFileName(Path.GetExtension(sourceFilepath));
             if (string.IsNullOrEmpty(importerName))
                 throw new Exception(string.Format("Couldn't find a default importer for '{0}'!", sourceFilepath));
 
