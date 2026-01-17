@@ -31,12 +31,6 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
         public virtual string DisplayName { get; set; }
 
         /// <summary>
-        /// Gets or sets the priority of this importer: when multiple importers support the same file extension or ending, the importer with the higher priority value is chosen.
-        /// When importers have the same priority the selection is undefined.
-        /// </summary>
-        public virtual int Priority { get; set; }
-
-        /// <summary>
         /// Gets the supported file name extensions of the importer.
         /// </summary>
         public IEnumerable<string> FileExtensions { get { return extensions; } }

@@ -1,4 +1,4 @@
-﻿// MonoGame - Copyright (C) MonoGame Foundation, Inc
+// MonoGame - Copyright (C) MonoGame Foundation, Inc
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
@@ -31,6 +31,7 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
         };
 
         private List<ImporterInfo> _importers;
+        private List<(string fileNameEnding, ImporterInfo importerInfo)> _importersByFileEnding;
 
         [DebuggerDisplay("ProcessorInfo: {type.Name}")]
         private struct ProcessorInfo
@@ -183,6 +184,7 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
                 //TODO need better way to update caches
                 _processors = null;
                 _importers = null;
+                _importersByFileEnding = null;
                 _writers = null;
             }
         }
@@ -190,6 +192,7 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
         private void ResolveAssemblies()
         {
             _importers = new List<ImporterInfo>();
+            _importersByFileEnding = new List<(string fileNameEnding, ImporterInfo importerInfo)>();
             _processors = new List<ProcessorInfo>();
             _writers = new List<Type>();
 
@@ -235,12 +238,19 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
                         if (attributes.Length != 0)
                         {
                             var importerAttribute = attributes[0] as ContentImporterAttribute;
-                            _importers.Add(new ImporterInfo
+                            var importerInfo = new ImporterInfo
                             {
                                 attribute = importerAttribute,
                                 type = t,
                                 assemblyTimestamp = assemblyTimestamp
-                            });
+                            };
+
+                            _importers.Add(importerInfo);
+
+                            foreach (var ext in importerAttribute.FileExtensions)
+                            {
+                                _importersByFileEnding.Add((ext, importerInfo));
+                            }
                         }
                         else
                         {
@@ -278,13 +288,13 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
                 }
             }
 
-            // Sort importers by priority descending.
+            // Sort importer-extension pairs by extension length descending.
             // This makes sure that in methods where they are looped through, the one with
             // the highest priority is found first.
-            // This is important for file extensions that are supported by multiple importers.
-            _importers.Sort((a, b) => b.attribute.Priority.CompareTo(a.attribute.Priority));
+            // This is important for file endings that are matched by multiple importers.
+            _importersByFileEnding.Sort((a, b) => b.fileNameEnding.Length.CompareTo(a.fileNameEnding.Length));
         }
-        
+
         /// <summary>
         /// Gets the importer types.
         /// </summary>
@@ -374,10 +384,10 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
                 ResolveAssemblies();
 
             // Search for the importer.
-            foreach (var info in _importers)
+            foreach (var pair in _importersByFileEnding)
             {
-                if (info.attribute.FileExtensions.Any(e => fileNameWithExt.EndsWith(e, StringComparison.InvariantCultureIgnoreCase)))
-                    return info.type.Name;
+                if (fileNameWithExt.EndsWith(pair.fileNameEnding, StringComparison.InvariantCultureIgnoreCase))
+                    return pair.importerInfo.type.Name;
             }
 
             return null;
