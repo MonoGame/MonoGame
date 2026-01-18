@@ -354,26 +354,6 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
         }
 
         /// <summary>
-        /// Returns the importer type name based on the file extension.
-        /// </summary>
-        /// <param name="ext">File extension to search for.</param>
-        /// <returns>Importer type name or <see langword="null"/> if not found.</returns>
-        public string FindImporterByExtension(string ext)
-        {
-            if (_importers == null)
-                ResolveAssemblies();
-
-            // Search for the importer.
-            foreach (var info in _importers)
-            {
-                if (info.attribute.FileExtensions.Any(e => e.Equals(ext, StringComparison.InvariantCultureIgnoreCase)))
-                    return info.type.Name;
-            }
-
-            return null;
-        }
-
-        /// <summary>
         /// Returns the importer type name based on the file name (including extension).
         /// </summary>
         /// <param name="fileNameWithExt">Then name of the file including the extension.</param>
