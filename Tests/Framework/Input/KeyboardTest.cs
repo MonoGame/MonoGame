@@ -72,5 +72,30 @@ namespace MonoGame.Tests.Input
 
             CollectionAssert.AreEquivalent(keys, newKeysArray);
         }
+
+        [Test]
+        public void TestBitwiseOperations()
+        {
+            var azState = new KeyboardState(Keys.A, Keys.B, Keys.C, Keys.D, Keys.E, Keys.F, Keys.G, Keys.H, Keys.I, Keys.J, Keys.K, Keys.L, Keys.M, Keys.N, Keys.O, Keys.P, Keys.Q, Keys.R, Keys.S, Keys.T, Keys.U, Keys.V, Keys.W, Keys.X, Keys.Y, Keys.Z);
+
+            var numState = new KeyboardState(Keys.D0, Keys.D1, Keys.D2, Keys.D3, Keys.D4, Keys.D5, Keys.D6, Keys.D7, Keys.D8, Keys.D9);
+
+            var randState = new KeyboardState(Keys.A, Keys.D0, Keys.F1);
+
+            var orState = azState | numState;
+            Assert.AreEqual(true, orState.IsKeyDown(Keys.A));
+            Assert.AreEqual(true, orState.IsKeyDown(Keys.D0));
+            Assert.AreEqual(false, orState.IsKeyDown(Keys.F1));
+
+            var invState = ~orState;
+            Assert.AreEqual(false, invState.IsKeyDown(Keys.A));
+            Assert.AreEqual(false, invState.IsKeyDown(Keys.D0));
+            Assert.AreEqual(true, invState.IsKeyDown(Keys.F1));
+
+            var andState = invState & randState;
+            Assert.AreEqual(false, andState.IsKeyDown(Keys.A));
+            Assert.AreEqual(false, andState.IsKeyDown(Keys.D0));
+            Assert.AreEqual(true, andState.IsKeyDown(Keys.F1));
+        }
     }
 }
