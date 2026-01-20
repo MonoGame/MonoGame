@@ -15,6 +15,11 @@ namespace Microsoft.Xna.Framework.Input
         private const byte CapsLockModifier = 1;
         private const byte NumLockModifier = 2;
 
+        /// <summary>
+        /// Returns a <see cref="KeyboardState"/> with no keys or modifiers set.
+        /// </summary>
+        public static KeyboardState Empty => default;
+
         // Used for the common situation where GetPressedKeys will return an empty array
         private static Keys[] empty = new Keys[0];
 
@@ -333,6 +338,25 @@ namespace Microsoft.Xna.Framework.Input
         public override bool Equals(object obj)
         {
             return obj is KeyboardState && this == (KeyboardState)obj;
+        }
+
+        /// <summary>
+        /// Compares whether current instance shares any keys or modifiers in the specified object.
+        /// </summary>
+        /// <param name="obj">The <see cref="KeyboardState"/> to compare.</param>
+        /// <returns>true if the provided <see cref="KeyboardState"/> instance shares any keys or modifiers as the current; false otherwise.</returns>
+        public bool Any(KeyboardState obj)
+        {
+            return
+                (_keys0 & obj._keys0) != 0
+                || (_keys1 & obj._keys1) != 0
+                || (_keys2 & obj._keys2) != 0
+                || (_keys3 & obj._keys3) != 0
+                || (_keys4 & obj._keys4) != 0
+                || (_keys5 & obj._keys5) != 0
+                || (_keys6 & obj._keys6) != 0
+                || (_keys7 & obj._keys7) != 0
+                || (_modifiers & obj._modifiers) != 0;
         }
 
         /// <summary>

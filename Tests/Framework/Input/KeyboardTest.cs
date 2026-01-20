@@ -84,18 +84,25 @@ namespace MonoGame.Tests.Input
 
             var orState = azState | numState;
             Assert.AreEqual(true, orState.IsKeyDown(Keys.A));
+            Assert.AreEqual(true, orState.IsKeyDown(Keys.Z));
             Assert.AreEqual(true, orState.IsKeyDown(Keys.D0));
+            Assert.AreEqual(true, orState.IsKeyDown(Keys.D9));
             Assert.AreEqual(false, orState.IsKeyDown(Keys.F1));
 
             var invState = ~orState;
             Assert.AreEqual(false, invState.IsKeyDown(Keys.A));
+            Assert.AreEqual(false, invState.IsKeyDown(Keys.Z));
             Assert.AreEqual(false, invState.IsKeyDown(Keys.D0));
+            Assert.AreEqual(false, invState.IsKeyDown(Keys.D9));
             Assert.AreEqual(true, invState.IsKeyDown(Keys.F1));
 
             var andState = invState & randState;
-            Assert.AreEqual(false, andState.IsKeyDown(Keys.A));
-            Assert.AreEqual(false, andState.IsKeyDown(Keys.D0));
-            Assert.AreEqual(true, andState.IsKeyDown(Keys.F1));
+            Assert.AreEqual(false, andState.Any(azState));
+            Assert.AreEqual(false, andState.Any(numState));
+            Assert.AreEqual(true, andState.Any(randState));
+
+            var emptyState = andState & ~andState;
+            Assert.AreEqual(emptyState, KeyboardState.Empty);
         }
     }
 }
