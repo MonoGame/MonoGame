@@ -36,7 +36,7 @@ public class FontImporter : ContentImporter<FontDescription>
     /// <summary>
     /// Indicates if kerning information is used when drawing characters.
     /// </summary>
-    public bool UseKrning { get; set; }
+    public bool UseKerning { get; set; }
 
     /// <summary>
     /// Retrieves the set of characters to include in the processor output.
@@ -101,7 +101,7 @@ public class FontImporter : ContentImporter<FontDescription>
             Size = Size,
             Spacing = Spacing,
             Style = Style,
-            UseKerning = UseKrning,
+            UseKerning = UseKerning,
             Characters = characters,
             Identity = new ContentIdentity(new FileInfo(filename).FullName, "FontImporter")
         };
