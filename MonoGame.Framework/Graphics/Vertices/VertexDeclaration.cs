@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using MonoGame.Framework.Utilities;
 using System.Diagnostics.CodeAnalysis;
+using System.Reflection;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
@@ -193,6 +194,9 @@ namespace Microsoft.Xna.Framework.Graphics
 			return max;
 		}
 
+#nullable enable
+        private static readonly Type vertexTypeInterface = typeof(IVertexType);
+        private static readonly MethodInfo vertexDeclarationGetter = vertexTypeInterface.GetProperty(nameof(IVertexType.VertexDeclaration), BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Static)!.GetGetMethod()!;
         /// <summary>
         /// Returns the VertexDeclaration for Type.
         /// </summary>
@@ -202,30 +206,28 @@ namespace Microsoft.Xna.Framework.Graphics
         /// Prefer to use VertexDeclarationCache when the declaration lookup
         /// can be performed with a templated type.
         /// </remarks>
-		internal static VertexDeclaration FromType([DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicParameterlessConstructor)] Type vertexType)
-		{
-			if (vertexType == null)
-				throw new ArgumentNullException("vertexType", "Cannot be null");
+        internal static VertexDeclaration FromType([DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicParameterlessConstructor)] Type vertexType)
+        {
+            if (vertexType == null)
+                throw new ArgumentNullException(nameof(vertexType), "Cannot be null");
 
             if (!ReflectionHelpers.IsValueType(vertexType))
-            {
-				throw new ArgumentException("Must be value type", "vertexType");
-			}
+                throw new ArgumentException("Must be a value type", nameof(vertexType));
 
-            var type = Activator.CreateInstance(vertexType) as IVertexType;
-			if (type == null)
-			{
-				throw new ArgumentException("vertexData does not inherit IVertexType");
-			}
+            if (!typeof(IVertexType).IsAssignableFrom(vertexType))
+                throw new ArgumentException($"{nameof(vertexType)} does not implement {nameof(IVertexType)}.");
 
-            var vertexDeclaration = type.VertexDeclaration;
-			if (vertexDeclaration == null)
-			{
-				throw new Exception("VertexDeclaration cannot be null");
-			}
+            var map = vertexType.GetInterfaceMap(vertexTypeInterface);
+            int index = Array.IndexOf(map.InterfaceMethods, vertexDeclarationGetter);
+            MethodInfo implementationGetter = map.TargetMethods[index];
+            VertexDeclaration? vertexDeclaration = implementationGetter.Invoke(null, null) as VertexDeclaration;
 
-			return vertexDeclaration;
-		}
+            if (vertexDeclaration == null)
+                throw new Exception($"{nameof(IVertexType.VertexDeclaration)} on {nameof(vertexType)} cannot be null");
+
+            return vertexDeclaration;
+        }
+#nullable restore
 
         /// <summary>
         /// Gets a copy of the vertex elements.

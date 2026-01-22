@@ -18,7 +18,7 @@ namespace Microsoft.Xna.Framework.Graphics
         /// <inheritdoc cref="VertexPositionTexture.TextureCoordinate"/>
         public Vector2 TextureCoordinate;
         /// <inheritdoc cref="IVertexType.VertexDeclaration"/>
-        public static readonly VertexDeclaration VertexDeclaration;
+        public static VertexDeclaration VertexDeclaration { get; }
 
         /// <summary>
         /// Creates an instance of <see cref="VertexPositionColorTexture"/>.
@@ -33,14 +33,6 @@ namespace Microsoft.Xna.Framework.Graphics
             Color = color;
             Normal = normal;
             TextureCoordinate = textureCoordinate;
-        }
-
-        VertexDeclaration IVertexType.VertexDeclaration
-        {
-            get
-            {
-                return VertexDeclaration;
-            }
         }
 
         /// <inheritdoc/>
