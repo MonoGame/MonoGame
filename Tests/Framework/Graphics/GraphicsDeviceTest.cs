@@ -879,5 +879,55 @@ namespace MonoGame.Tests.Graphics
 
             Assert.IsTrue(rtc.IsDisposed);
         }
+
+        #region Nullable context tests
+
+#nullable enable
+
+        [Test]
+        public void NullableBackingFieldsShouldNotCauseExceptions()
+        {
+            // Properties that are backed by nullable fields and return them with non-null assertions should not throw exceptions.
+            // These properties are necessary because the GraphicsDevice constructors all call Setup and Initialize rather than
+            // initializing the backing fields inside the constructor, resulting in CS8618.
+            // See https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/compiler-messages/nullable-warnings?f1url=%3FappId%3Droslyn%26k%3Dk(CS8618)#nonnullable-reference-not-initialized
+
+            var gd = new GraphicsDevice();
+            object unused;
+            Assert.DoesNotThrow(() => unused = gd.Adapter);
+            Assert.DoesNotThrow(() => unused = gd.VertexTextures);
+            Assert.DoesNotThrow(() => unused = gd.VertexSamplerStates);
+            Assert.DoesNotThrow(() => unused = gd.Textures);
+            Assert.DoesNotThrow(() => unused = gd.SamplerStates);
+        }
+
+        [Test]
+        public void NullableBackingFieldsWithDefaultsAreCorrect()
+        {
+            // Properties that are backed by nullable fields and have a default value indicated in their documentation
+            // should return the indicated default value.
+            var gd = new GraphicsDevice();
+            Assert.AreEqual(gd.RasterizerState, RasterizerState.CullCounterClockwise);
+            Assert.AreEqual(gd.BlendState, BlendState.Opaque);
+            Assert.AreEqual(gd.DepthStencilState, DepthStencilState.Default);
+        }
+
+        [Test]
+        public void CanSetNullRenderTargets()
+        {
+            // Passing null values to the SetRenderTarget* methods should not throw exceptions
+            var gd = new GraphicsDevice();
+            RenderTarget2D? renderTarget = null;
+            RenderTargetCube? renderTargetCube = null;
+            RenderTargetBinding[]? array = null;
+
+            Assert.DoesNotThrow(() => gd.SetRenderTarget(renderTarget));
+            Assert.DoesNotThrow(() => gd.SetRenderTarget(renderTargetCube, default));
+            Assert.DoesNotThrow(() => gd.SetRenderTargets(array));
+        }
+
+#nullable restore
+
+        #endregion
     }
 }
