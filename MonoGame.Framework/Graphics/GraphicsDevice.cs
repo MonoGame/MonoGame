@@ -1005,7 +1005,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
             int renderTargetWidth;
             int renderTargetHeight;
-            if (renderTargets == null)
+            if (renderTargets == null || renderTargets.Length == 0)
             {
                 _currentRenderTargetCount = 0;
 
@@ -1021,7 +1021,9 @@ namespace Microsoft.Xna.Framework.Graphics
                 Array.Copy(renderTargets, _currentRenderTargetBindings, renderTargets.Length);
                 _currentRenderTargetCount = renderTargets.Length;
 
-                var renderTarget = PlatformApplyRenderTargets();
+                // This null forgiveness assumes that there will be at least 1 render target
+                // returned from PlatformApplyRenderTargets, because of the condition of this if block
+                var renderTarget = PlatformApplyRenderTargets()!;
 
                 // We clear the render target if asked.
                 clearTarget = renderTarget.RenderTargetUsage == RenderTargetUsage.DiscardContents;

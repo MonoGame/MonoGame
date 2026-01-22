@@ -2,6 +2,8 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
+#nullable enable
+
 using MonoGame.Framework.Utilities;
 using MonoGame.Interop;
 using System;
@@ -16,13 +18,13 @@ public partial class GraphicsDevice
 {
     internal unsafe MGG_GraphicsDevice* Handle;
 
-    internal Texture2D DefaultTexture;
+    internal Texture2D? DefaultTexture;
 
     private int _currentFrame = -1;
 
     private readonly Dictionary<int, DynamicVertexBuffer> _userVertexBuffers = new Dictionary<int, DynamicVertexBuffer>();
-    private DynamicIndexBuffer _userIndexBuffer16;
-    private DynamicIndexBuffer _userIndexBuffer32;
+    private DynamicIndexBuffer? _userIndexBuffer16;
+    private DynamicIndexBuffer? _userIndexBuffer32;
 
     private unsafe readonly MGG_Texture*[] _curRenderTargets = new MGG_Texture*[4];
     private readonly int[] _currentRenderTargetArraySlices = new int[4];
@@ -209,13 +211,13 @@ public partial class GraphicsDevice
         MGG.GraphicsDevice_ResolveRenderTargets(Handle);
     }
 
-    private unsafe IRenderTarget PlatformApplyRenderTargets()
+    private unsafe IRenderTarget? PlatformApplyRenderTargets()
     {
         BeginFrame();
 
         Array.Clear(_curRenderTargets, 0, 4);
 
-        IRenderTarget first = null;
+        IRenderTarget? first = null;
 
         for (var i = 0; i < _currentRenderTargetCount; i++)
         {
@@ -230,7 +232,7 @@ public partial class GraphicsDevice
         fixed (MGG_Texture** targets = _curRenderTargets)
         fixed (int* arraySlices = _currentRenderTargetArraySlices)
             MGG.GraphicsDevice_SetRenderTargets(Handle, targets, arraySlices, _currentRenderTargetCount);
-        
+
         return first;
     }
 
@@ -390,8 +392,7 @@ public partial class GraphicsDevice
         {
             if (_userIndexBuffer32 == null || _userIndexBuffer32.IndexCount < requiredIndexCount)
             {
-                if (_userIndexBuffer32 != null)
-                    _userIndexBuffer32.Dispose();
+                _userIndexBuffer32?.Dispose();
 
                 _userIndexBuffer32 = new DynamicIndexBuffer(this, indexElementSize, requiredIndexCount, BufferUsage.WriteOnly);
             }
