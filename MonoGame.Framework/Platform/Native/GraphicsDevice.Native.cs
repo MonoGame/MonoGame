@@ -243,7 +243,7 @@ public partial class GraphicsDevice
     {
         if (_blendStateDirty)
         {
-            _actualBlendState.PlatformApplyState(this);
+            _actualBlendState!.PlatformApplyState(this);
             _blendStateDirty = false;
         }
 
@@ -307,8 +307,8 @@ public partial class GraphicsDevice
         }
 
         if (_vertexBuffersDirty)
-       {
-            for (var slot = 0; slot < _vertexBuffers.Count; slot++)
+        {
+            for (var slot = 0; slot < _vertexBuffers?.Count; slot++)
             {
                 var vertexBufferBinding = _vertexBuffers.Get(slot);
                 var buffer = vertexBufferBinding.VertexBuffer;
