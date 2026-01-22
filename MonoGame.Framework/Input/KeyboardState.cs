@@ -120,8 +120,8 @@ namespace Microsoft.Xna.Framework.Input
             _modifiers = (byte)(0 | (capsLock ? CapsLockModifier : 0) | (numLock ? NumLockModifier : 0));
 
             if (keys != null)
-                foreach (Keys k in keys)
-                    InternalSetKey(k);
+                for (var i = 0; i < keys.Count; i++)
+                    InternalSetKey(keys[i]);
         }
 
         /// <summary>
@@ -135,8 +135,8 @@ namespace Microsoft.Xna.Framework.Input
             _modifiers = (byte)(0 | (capsLock ? CapsLockModifier : 0) | (numLock ? NumLockModifier : 0));
 
             if (keys != null)
-                foreach (Keys k in keys)
-                    InternalSetKey(k);
+                for (var i = 0; i < keys.Length; i++)
+                    InternalSetKey(keys[i]);
         }
 
         /// <summary>
@@ -146,8 +146,8 @@ namespace Microsoft.Xna.Framework.Input
         public KeyboardState(params Keys[] keys) : this()
         {
             if (keys != null)
-                foreach (Keys k in keys)
-                    InternalSetKey(k);
+                for (var i = 0; i < keys.Length; i++)
+                    InternalSetKey(keys[i]);
         }
 
         /// <summary>
