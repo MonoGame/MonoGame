@@ -31,6 +31,8 @@ namespace MonoGame.Effect
 
         public static readonly ShaderProfile DirectX_11 = FromName("DirectX_11");
 
+        public static readonly ShaderProfile DirectX_12 = FromName("DirectX_12");
+
         public static readonly ShaderProfile Vulkan = FromName("Vulkan");
 
         /// <summary>
@@ -84,7 +86,7 @@ namespace MonoGame.Effect
             TargetPlatform.Windows => ShaderProfile.DirectX_11,
             TargetPlatform.iOS or TargetPlatform.Android or TargetPlatform.DesktopGL or TargetPlatform.MacOSX or TargetPlatform.RaspberryPi or TargetPlatform.Web => ShaderProfile.OpenGL,
             TargetPlatform.DesktopVK => ShaderProfile.Vulkan,
-            TargetPlatform.WindowsGDK or TargetPlatform.XboxOne or TargetPlatform.XboxSeries => new DirectX12ShaderProfile(),
+            TargetPlatform.WindowsDX12 or TargetPlatform.XboxOne or TargetPlatform.XboxSeries => ShaderProfile.DirectX_12,
             _ => ShaderProfile.FromName(platform.ToString())
         };
 

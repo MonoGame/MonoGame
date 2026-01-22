@@ -1,4 +1,4 @@
-// MonoGame - Copyright (C) The MonoGame Team
+// MonoGame - Copyright (C) MonoGame Foundation, Inc
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
@@ -217,7 +217,7 @@ internal readonly struct MGP_Window { }
 
 internal static unsafe partial class MGP
 {
-    public const string MonoGameNativeDLL = "monogame.native";
+    public const string MonoGameNativeDLL = "mgruntime";
 
     #region Platform
 

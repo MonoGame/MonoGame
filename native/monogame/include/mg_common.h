@@ -1,4 +1,4 @@
-// MonoGame - Copyright (C) The MonoGame Team
+// MonoGame - Copyright (C) MonoGame Foundation, Inc
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
@@ -6,6 +6,7 @@
 
 #include "api_common.h"
 
+#include <stdint.h>
 #include <stdio.h>
 #include <assert.h>
 #include <limits.h>
@@ -64,6 +65,8 @@ inline void MG_Print_StdOut(const char* file, int line, const char* message)
 mguint MG_ComputeHash(const mgbyte* value, mgint length);
 mguint MG_ComputeHash(mguint value, mguint result = 0x811c9dc5);
 mguint MG_ComputeHash(const mgbyte* value, mgint length, mguint result);
+
+float* MGA_Voice_CalculatePanMatrix(float pan, float scale, float* matrix, int srcChannels);
 
 // Removes the element preserving order.
 template <class T>

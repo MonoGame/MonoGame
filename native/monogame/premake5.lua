@@ -9,7 +9,7 @@ if vulkan_sdk == nil and os.target() == "macosx" then
 end
 
 function common(project_name)
-    platform_target_path = "../../Artifacts/monogame.native/%{cfg.system}/" .. project_name .. "/%{cfg.buildcfg}"
+    platform_target_path = "../../Artifacts/native/mgruntime/" .. project_name .. "/%{cfg.system}/%{cfg.buildcfg}"
 
     kind "SharedLib"
     language "C++"
@@ -20,7 +20,7 @@ function common(project_name)
     filter {}
     defines {"DLL_EXPORT"}
     targetdir(platform_target_path)
-    targetname "monogame.native"
+    targetname "mgruntime"
     cppdialect "C++17"
 
     files {"include/**.h", "common/**.h", "common/**.cpp"}
@@ -83,6 +83,23 @@ function faudio()
     defines {"MG_FAUDIO"}
 
     files {"faudio/**.h", "faudio/**.cpp"}
+
+    includedirs {"external/faudio/include"}
+    
+    filter {"system:windows"}
+    libdirs {"external/faudio/build/Release"}
+    links {"FAudio.lib"}
+    
+    filter {"system:macosx"}
+    libdirs {"external/faudio/build"}
+    linkoptions {
+        "-Wl,-force_load,external/faudio/build/libFAudio.a",
+        "-Wl,-ld_classic"
+    }
+    
+    filter {"system:linux"}
+    linkoptions {"external/faudio/build/libFAudio.a"}
+    filter {}
 end
 
 -- Xaudio is supported on Windows and Xbox.
@@ -101,8 +118,12 @@ function configs()
     defines {"NDEBUG"}
     optimize "On"
 
+    filter {"system:windows"}
+    staticruntime "On"
+    filter {"system:windows", "configurations:Debug"}
+    runtime "Debug"
     filter {"system:windows", "configurations:Release"}
-    buildoptions {"/MT"}
+    runtime "Release"
 
     filter "system:macosx"
     buildoptions {"-arch x86_64", "-arch arm64"}

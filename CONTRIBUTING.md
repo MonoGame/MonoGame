@@ -27,6 +27,7 @@ Here are a few simple rules and suggestions to remember when contributing to Mon
 * :bangbang: **NEVER** commit code that you did not personally write.
 * :bangbang: **NEVER** use decompiler tools to steal code and submit it as your own work.
 * :bangbang: **NEVER** decompile XNA assemblies and steal Microsoft's copyrighted code.
+* :bangbang: **NEVER** commit code generated or copied from LLM's or other forms of Generative AI.
 * **PLEASE** try to keep your PRs focused on a single topic and of a reasonable size or we may ask you to break it up.
 * **PLEASE** be sure to write simple and descriptive commit messages.
 * **DO NOT** surprise us with new APIs or big new features. Open an issue to discuss your ideas first.
@@ -71,6 +72,13 @@ Due to limitations on private target platforms, MonoGame enforces the use of C# 
 It is however allowed to use the latest class library, but if contributions make use of classes that are not present in .NET 4.5, it will be required from the contribution to implement backward-compatible switches.
 
 > These limitations will be lifted at some point in the near future.
+
+## Large Language Models / Generative AI
+
+We prohibit all content created with generative AI and/or LLMs from being contributed to MonoGame.﻿
+It CANNOT be used for any reason for new code features, documentation, bug fixes, or art content.﻿
+If you did not write the code yourself, you should not be contributing it to MonoGame.﻿
+If we find a contribution to be made with LLMs or other generative AI tools, it will be immediately removed.
 
 ## Licensing
 

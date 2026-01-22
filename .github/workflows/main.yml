@@ -30,6 +30,16 @@ jobs:
       run:
         shell: ${{ matrix.shell }}
     steps:
+      - name: Free disk space
+        if: runner.environment == 'github-hosted' && runner.os == 'Linux'
+        uses: jlumbroso/free-disk-space@main
+        with:
+          android: false
+          dotnet: false 
+          docker-images: true
+          large-packages: true
+          swap-storage: true
+
       - name: Clone repository
         uses: actions/checkout@v5
         with:
