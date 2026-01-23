@@ -81,6 +81,7 @@ namespace Microsoft.Xna.Framework.Graphics
         private Rectangle _scissorRectangle;
         private bool _scissorRectangleDirty;
 
+        // This is set to a non-null value in Initialize, so null forgiveness is safe after that
         private VertexBufferBindings? _vertexBuffers;
         private bool _vertexBuffersDirty;
 
@@ -246,7 +247,7 @@ namespace Microsoft.Xna.Framework.Graphics
         /// <summary>
         /// Gets the graphics adapter.
         /// </summary>
-        public GraphicsAdapter Adapter => _adapter!;
+        public GraphicsAdapter Adapter { get => _adapter!; set => _adapter = value ?? throw new ArgumentNullException(nameof(value)); }
 
         internal GraphicsMetrics _graphicsMetrics;
 
@@ -256,6 +257,8 @@ namespace Microsoft.Xna.Framework.Graphics
         /// </summary>
         public GraphicsMetrics Metrics { get { return _graphicsMetrics; } set { _graphicsMetrics = value; } }
 
+        // This is set to a non-null value in CreateDeviceResources of the different platform implementations,
+        // so null forgiveness is safe after that
         private GraphicsDebug? _graphicsDebug;
 
         /// <summary>
@@ -290,7 +293,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 throw new NoSuitableGraphicsDeviceException(String.Format("Adapter '{0}' does not support the {1} profile.", adapter.Description, graphicsProfile));
             if (presentationParameters == null)
                 throw new ArgumentNullException("presentationParameters");
-            _adapter = adapter;
+            Adapter = adapter;
             PresentationParameters = presentationParameters;
             _graphicsProfile = graphicsProfile;
             Setup();
@@ -322,7 +325,7 @@ namespace Microsoft.Xna.Framework.Graphics
             // TODO we need to figure out how to inject the half pixel offset into DX shaders
             preferHalfPixelOffset = false;
 #endif
-            _adapter = adapter;
+            Adapter = adapter;
             _graphicsProfile = graphicsProfile;
             UseHalfPixelOffset = preferHalfPixelOffset;
             PresentationParameters = presentationParameters;
@@ -509,7 +512,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
                 // Static state properties never actually get bound;
                 // instead we use our GraphicsDevice-specific version of them.
-                var newBlendState = _blendState!;
+                BlendState newBlendState = _blendState!;
                 if (ReferenceEquals(_blendState, BlendState.Additive))
                     newBlendState = _blendStateAdditive;
                 else if (ReferenceEquals(_blendState, BlendState.AlphaBlend))

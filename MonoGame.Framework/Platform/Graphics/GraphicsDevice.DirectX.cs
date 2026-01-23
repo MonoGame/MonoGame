@@ -2,6 +2,8 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
+#nullable enable
+
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -18,37 +20,32 @@ namespace Microsoft.Xna.Framework.Graphics
     public partial class GraphicsDevice
     {
         // Core Direct3D Objects
-        internal SharpDX.Direct3D11.Device _d3dDevice;
-        internal SharpDX.Direct3D11.DeviceContext _d3dContext;
-        internal SharpDX.Direct3D11.RenderTargetView _renderTargetView;
-        internal SharpDX.Direct3D11.DepthStencilView _depthStencilView;
+        // Null forgiveness is safe for these from initialization to disposal
+        internal SharpDX.Direct3D11.Device? _d3dDevice;
+        internal SharpDX.Direct3D11.DeviceContext? _d3dContext;
+        internal SharpDX.Direct3D11.RenderTargetView? _renderTargetView;
+        internal SharpDX.Direct3D11.DepthStencilView? _depthStencilView;
         private int _vertexBufferSlotsUsed;
 
 #if WINDOWS
-        SwapChain _swapChain;
+        SwapChain? _swapChain;
 #endif
 
         // The active render targets.
         readonly SharpDX.Direct3D11.RenderTargetView[] _currentRenderTargets = new SharpDX.Direct3D11.RenderTargetView[8];
 
         // The active depth view.
-        SharpDX.Direct3D11.DepthStencilView _currentDepthStencilView;
+        SharpDX.Direct3D11.DepthStencilView? _currentDepthStencilView;
 
         private readonly Dictionary<VertexDeclaration, DynamicVertexBuffer> _userVertexBuffers = new Dictionary<VertexDeclaration, DynamicVertexBuffer>();
-        private DynamicIndexBuffer _userIndexBuffer16;
-        private DynamicIndexBuffer _userIndexBuffer32;
+        private DynamicIndexBuffer? _userIndexBuffer16;
+        private DynamicIndexBuffer? _userIndexBuffer32;
 
         /// <summary>
         /// Returns a handle to internal device object. Valid only on DirectX platforms.
         /// For usage, convert this to SharpDX.Direct3D11.Device.
         /// </summary>
-        public object Handle
-        {
-            get
-            {
-                return _d3dDevice;
-            }
-        }
+        public object Handle => _d3dDevice!;
 
         private void PlatformSetup()
         {
@@ -59,7 +56,7 @@ namespace Microsoft.Xna.Framework.Graphics
             CreateDeviceResources();
 #endif
 
-            _maxVertexBufferSlots = _d3dDevice.FeatureLevel >= FeatureLevel.Level_11_0 ? SharpDX.Direct3D11.InputAssemblerStage.VertexInputResourceSlotCount : 16;
+            _maxVertexBufferSlots = _d3dDevice!.FeatureLevel >= FeatureLevel.Level_11_0 ? SharpDX.Direct3D11.InputAssemblerStage.VertexInputResourceSlotCount : 16;
         }
 
         private void PlatformInitialize()
@@ -107,10 +104,8 @@ namespace Microsoft.Xna.Framework.Graphics
         protected virtual void CreateDeviceResources()
         {
             // Dispose previous references.
-            if (_d3dDevice != null)
-                _d3dDevice.Dispose();
-            if (_d3dContext != null)
-                _d3dContext.Dispose();
+            _d3dDevice?.Dispose();
+            _d3dContext?.Dispose();
 
             // Windows requires BGRA support out of DX.
             var creationFlags = SharpDX.Direct3D11.DeviceCreationFlags.BgraSupport;
@@ -184,12 +179,12 @@ namespace Microsoft.Xna.Framework.Graphics
 
         internal void SetHardwareFullscreen()
         {
-            _swapChain.SetFullscreenState(PresentationParameters.IsFullScreen && PresentationParameters.HardwareModeSwitch, null);
+            _swapChain!.SetFullscreenState(PresentationParameters.IsFullScreen && PresentationParameters.HardwareModeSwitch, null);
         }
 
         internal void ClearHardwareFullscreen()
         {
-            _swapChain.SetFullscreenState(false, null);
+            _swapChain!.SetFullscreenState(false, null);
         }
 
         internal void ResizeTargets()
@@ -203,12 +198,12 @@ namespace Microsoft.Xna.Framework.Graphics
                 Height = PresentationParameters.BackBufferHeight,
             };
 
-            _swapChain.ResizeTarget(ref descr);
+            _swapChain!.ResizeTarget(ref descr);
         }
 
         internal void GetModeSwitchedSize(out int width, out int height)
         {
-            Output output = null;
+            Output? output = null;
             if (_swapChain == null)
             {
                 // get the primary output
@@ -261,19 +256,13 @@ namespace Microsoft.Xna.Framework.Graphics
             PresentationParameters.MultiSampleCount =
                 GetClampedMultisampleCount(PresentationParameters.MultiSampleCount);
 
-            _d3dContext.OutputMerger.SetTargets((SharpDX.Direct3D11.DepthStencilView)null,
-                                                (SharpDX.Direct3D11.RenderTargetView)null);
+            _d3dContext!.OutputMerger.SetTargets((SharpDX.Direct3D11.DepthStencilView?)null,
+                                                (SharpDX.Direct3D11.RenderTargetView?)null);
+            _renderTargetView?.Dispose();
+            _renderTargetView = null;
 
-            if (_renderTargetView != null)
-            {
-                _renderTargetView.Dispose();
-                _renderTargetView = null;
-            }
-            if (_depthStencilView != null)
-            {
-                _depthStencilView.Dispose();
-                _depthStencilView = null;
-            }
+            _depthStencilView?.Dispose();
+            _depthStencilView = null;
 
             // Clear the current render targets.
             _currentDepthStencilView = null;
@@ -287,11 +276,8 @@ namespace Microsoft.Xna.Framework.Graphics
             // We need presentation parameters to continue here.
             if (PresentationParameters == null || PresentationParameters.DeviceWindowHandle == IntPtr.Zero)
             {
-                if (_swapChain != null)
-                {
-                    _swapChain.Dispose();
-                    _swapChain = null;
-                }
+                _swapChain?.Dispose();
+                _swapChain = null;
 
                 return;
             }
@@ -351,7 +337,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
                 // First, retrieve the underlying DXGI Device from the D3D Device.
                 // Creates the swap chain 
-                using (var dxgiDevice = _d3dDevice.QueryInterface<SharpDX.DXGI.Device1>())
+                using (var dxgiDevice = _d3dDevice!.QueryInterface<SharpDX.DXGI.Device1>())
                 using (var dxgiAdapter = dxgiDevice.Adapter)
                 using (var dxgiFactory = dxgiAdapter.GetParent<SharpDX.DXGI.Factory1>())
                 {
@@ -419,7 +405,7 @@ namespace Microsoft.Xna.Framework.Graphics
             if (_swapChain == null)
                 return;
 
-            Output output = null;
+            Output? output = null;
             try
             {
                 output = _swapChain.ContainingOutput;
@@ -464,7 +450,7 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             // The valid range is between zero and one less than the level returned by CheckMultisampleQualityLevels
             // https://msdn.microsoft.com/en-us/library/windows/desktop/bb173072(v=vs.85).aspx
-            var quality = _d3dDevice.CheckMultisampleQualityLevels(format, multiSampleCount) - 1;
+            var quality = _d3dDevice!.CheckMultisampleQualityLevels(format, multiSampleCount) - 1;
             // NOTE: should we always return highest quality?
             return Math.Max(quality, 0); // clamp minimum to 0 
         }
@@ -498,7 +484,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 options &= ~ClearOptions.Stencil;
             }
 
-            lock (_d3dContext)
+            lock (_d3dContext!)
             {
                 // Clear the diffuse render buffer.
                 if ((options & ClearOptions.Target) == ClearOptions.Target)
@@ -531,10 +517,8 @@ namespace Microsoft.Xna.Framework.Graphics
             SharpDX.Utilities.Dispose(ref _renderTargetView);
             SharpDX.Utilities.Dispose(ref _depthStencilView);
 
-            if (_userIndexBuffer16 != null)
-                _userIndexBuffer16.Dispose();
-            if (_userIndexBuffer32 != null)
-                _userIndexBuffer32.Dispose();
+            _userIndexBuffer16?.Dispose();
+            _userIndexBuffer32?.Dispose();
 
             foreach (var vb in _userVertexBuffers.Values)
                 vb.Dispose();
@@ -553,8 +537,8 @@ namespace Microsoft.Xna.Framework.Graphics
                 var syncInterval = PresentationParameters.PresentationInterval.GetSyncInterval();
 
                 // The first argument instructs DXGI to block n VSyncs before presenting.
-                lock (_d3dContext)
-                    _swapChain.Present(syncInterval, PresentFlags.None);
+                lock (_d3dContext!)
+                    _swapChain!.Present(syncInterval, PresentFlags.None);
             }
             catch (SharpDX.SharpDXException)
             {
@@ -582,7 +566,7 @@ namespace Microsoft.Xna.Framework.Graphics
         }
 
         // Only implemented for DirectX right now, so not in GraphicsDevice.cs
-        public void SetRenderTarget(RenderTarget2D renderTarget, int arraySlice)
+        public void SetRenderTarget(RenderTarget2D? renderTarget, int arraySlice)
         {
             if (!GraphicsCapabilities.SupportsTextureArrays)
                 throw new InvalidOperationException("Texture arrays are not supported on this graphics device");
@@ -597,7 +581,7 @@ namespace Microsoft.Xna.Framework.Graphics
         }
 
         // Only implemented for DirectX right now, so not in GraphicsDevice.cs
-        public void SetRenderTarget(RenderTarget3D renderTarget, int arraySlice)
+        public void SetRenderTarget(RenderTarget3D? renderTarget, int arraySlice)
         {
             if (renderTarget == null)
                 SetRenderTarget(null);
@@ -612,10 +596,10 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             // Set the default swap chain.
             Array.Clear(_currentRenderTargets, 0, _currentRenderTargets.Length);
-            _currentRenderTargets[0] = _renderTargetView;
+            _currentRenderTargets[0] = _renderTargetView!;
             _currentDepthStencilView = _depthStencilView;
 
-            lock (_d3dContext)
+            lock (_d3dContext!)
                 _d3dContext.OutputMerger.SetTargets(_currentDepthStencilView, _currentRenderTargets);
         }
 
@@ -633,7 +617,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 // Generate mipmaps.
                 if (renderTargetBinding.RenderTarget.LevelCount > 1)
                 {
-                    lock (_d3dContext)
+                    lock (_d3dContext!)
                         _d3dContext.GenerateMips(renderTargetBinding.RenderTarget.GetShaderResourceView());
                 }
             }
@@ -647,7 +631,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
             // Make sure none of the new targets are bound
             // to the device as a texture resource.
-            lock (_d3dContext)
+            lock (_d3dContext!)
             {
                 VertexTextures.ClearTargets(this, _currentRenderTargetBindings);
                 Textures.ClearTargets(this, _currentRenderTargetBindings);
@@ -699,9 +683,11 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             if (_blendFactorDirty || _blendStateDirty)
             {
-                var state = _actualBlendState.GetDxState(this);
+                // This null forgiveness should work because _actualBlendState is assigned in the BlendState property,
+                // where an exception is thrown if the assigned value is null, and in Dispose after which this method should not be called
+                var state = _actualBlendState!.GetDxState(this);
                 var factor = GetBlendFactor();
-                _d3dContext.OutputMerger.SetBlendState(state, factor);
+                _d3dContext!.OutputMerger.SetBlendState(state, factor);
 
                 _blendFactorDirty = false;
                 _blendStateDirty = false;
@@ -723,7 +709,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
             if (_scissorRectangleDirty)
             {
-                _d3dContext.Rasterizer.SetScissorRectangle(
+                _d3dContext!.Rasterizer.SetScissorRectangle(
                     _scissorRectangle.X,
                     _scissorRectangle.Y,
                     _scissorRectangle.Right,
@@ -739,7 +725,7 @@ namespace Microsoft.Xna.Framework.Graphics
             {
                 if (_indexBuffer != null)
                 {
-                    _d3dContext.InputAssembler.SetIndexBuffer(
+                    _d3dContext!.InputAssembler.SetIndexBuffer(
                         _indexBuffer.Buffer,
                         _indexBuffer.IndexElementSize == IndexElementSize.SixteenBits ?
                             SharpDX.DXGI.Format.R16_UInt : SharpDX.DXGI.Format.R32_UInt,
@@ -750,7 +736,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
             if (_vertexBuffersDirty)
             {
-                if (_vertexBuffers.Count > 0)
+                if (_vertexBuffers!.Count > 0) // Dirtiness implies a non-null value
                 {
                     for (int slot = 0; slot < _vertexBuffers.Count; slot++)
                     {
@@ -759,7 +745,7 @@ namespace Microsoft.Xna.Framework.Graphics
                         var vertexDeclaration = vertexBuffer.VertexDeclaration;
                         int vertexStride = vertexDeclaration.VertexStride;
                         int vertexOffsetInBytes = vertexBufferBinding.VertexOffset * vertexStride;
-                        _d3dContext.InputAssembler.SetVertexBuffers(
+                        _d3dContext!.InputAssembler.SetVertexBuffers(
                             slot, new SharpDX.Direct3D11.VertexBufferBinding(vertexBuffer.Buffer, vertexStride, vertexOffsetInBytes));
                     }
                     _vertexBufferSlotsUsed = _vertexBuffers.Count;
@@ -767,7 +753,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 else
                 {
                     for (int slot = 0; slot < _vertexBufferSlotsUsed; slot++)
-                        _d3dContext.InputAssembler.SetVertexBuffers(slot, new SharpDX.Direct3D11.VertexBufferBinding());
+                        _d3dContext!.InputAssembler.SetVertexBuffers(slot, new SharpDX.Direct3D11.VertexBufferBinding());
 
                     _vertexBufferSlotsUsed = 0;
                 }
@@ -780,7 +766,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
             if (_vertexShaderDirty)
             {
-                _d3dContext.VertexShader.Set(_vertexShader.VertexShader);
+                _d3dContext!.VertexShader.Set(_vertexShader.VertexShader);
 
                 unchecked
                 {
@@ -789,13 +775,13 @@ namespace Microsoft.Xna.Framework.Graphics
             }
             if (_vertexShaderDirty || _vertexBuffersDirty)
             {
-                _d3dContext.InputAssembler.InputLayout = _vertexShader.InputLayouts.GetOrCreate(_vertexBuffers);
+                _d3dContext!.InputAssembler.InputLayout = _vertexShader.InputLayouts.GetOrCreate(_vertexBuffers);
                 _vertexShaderDirty = _vertexBuffersDirty = false;
             }
 
             if (_pixelShaderDirty)
             {
-                _d3dContext.PixelShader.Set(_pixelShader.PixelShader);
+                _d3dContext!.PixelShader.Set(_pixelShader.PixelShader);
                 _pixelShaderDirty = false;
 
                 unchecked
@@ -816,13 +802,10 @@ namespace Microsoft.Xna.Framework.Graphics
         private int SetUserVertexBuffer<T>(T[] vertexData, int vertexOffset, int vertexCount, VertexDeclaration vertexDecl)
             where T : struct
         {
-            DynamicVertexBuffer buffer;
-
-            if (!_userVertexBuffers.TryGetValue(vertexDecl, out buffer) || buffer.VertexCount < vertexCount)
+            if (!_userVertexBuffers.TryGetValue(vertexDecl, out DynamicVertexBuffer? buffer) || buffer.VertexCount < vertexCount)
             {
                 // Dispose the previous buffer if we have one.
-                if (buffer != null)
-                    buffer.Dispose();
+                buffer?.Dispose();
 
                 buffer = new DynamicVertexBuffer(this, vertexDecl, Math.Max(vertexCount, 2000), BufferUsage.WriteOnly);
                 _userVertexBuffers[vertexDecl] = buffer;
@@ -861,8 +844,7 @@ namespace Microsoft.Xna.Framework.Graphics
             {
                 if (_userIndexBuffer16 == null || _userIndexBuffer16.IndexCount < requiredIndexCount)
                 {
-                    if (_userIndexBuffer16 != null)
-                        _userIndexBuffer16.Dispose();
+                    _userIndexBuffer16?.Dispose();
 
                     _userIndexBuffer16 = new DynamicIndexBuffer(this, indexElementSize, requiredIndexCount, BufferUsage.WriteOnly);
                 }
@@ -873,8 +855,7 @@ namespace Microsoft.Xna.Framework.Graphics
             {
                 if (_userIndexBuffer32 == null || _userIndexBuffer32.IndexCount < requiredIndexCount)
                 {
-                    if (_userIndexBuffer32 != null)
-                        _userIndexBuffer32.Dispose();
+                    _userIndexBuffer32?.Dispose();
 
                     _userIndexBuffer32 = new DynamicIndexBuffer(this, indexElementSize, requiredIndexCount, BufferUsage.WriteOnly);
                 }
@@ -903,7 +884,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
         private void PlatformDrawIndexedPrimitives(PrimitiveType primitiveType, int baseVertex, int startIndex, int primitiveCount)
         {
-            lock (_d3dContext)
+            lock (_d3dContext!)
             {
                 ApplyState(true);
 
@@ -918,7 +899,7 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             var startVertex = SetUserVertexBuffer(vertexData, vertexOffset, vertexCount, vertexDeclaration);
 
-            lock (_d3dContext)
+            lock (_d3dContext!)
             {
                 ApplyState(true);
 
@@ -929,7 +910,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
         private void PlatformDrawPrimitives(PrimitiveType primitiveType, int vertexStart, int vertexCount)
         {
-            lock (_d3dContext)
+            lock (_d3dContext!)
             {
                 ApplyState(true);
 
@@ -944,7 +925,7 @@ namespace Microsoft.Xna.Framework.Graphics
             var startVertex = SetUserVertexBuffer(vertexData, vertexOffset, numVertices, vertexDeclaration);
             var startIndex = SetUserIndexBuffer(indexData, indexOffset, indexCount);
 
-            lock (_d3dContext)
+            lock (_d3dContext!)
             {
                 ApplyState(true);
 
@@ -959,7 +940,7 @@ namespace Microsoft.Xna.Framework.Graphics
             var startVertex = SetUserVertexBuffer(vertexData, vertexOffset, numVertices, vertexDeclaration);
             var startIndex = SetUserIndexBuffer(indexData, indexOffset, indexCount);
 
-            lock (_d3dContext)
+            lock (_d3dContext!)
             {
                 ApplyState(true);
 
@@ -971,7 +952,7 @@ namespace Microsoft.Xna.Framework.Graphics
         private void PlatformDrawInstancedPrimitives(PrimitiveType primitiveType, int baseVertex, int startIndex,
             int primitiveCount, int baseInstance, int instanceCount)
         {
-            lock (_d3dContext)
+            lock (_d3dContext!)
             {
                 ApplyState(true);
 
@@ -998,7 +979,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
                 using (var stagingTex = new SharpDX.Direct3D11.Texture2D(_d3dDevice, desc))
                 {
-                    lock (_d3dContext)
+                    lock (_d3dContext!)
                     {
                         // Copy the data from the GPU to the staging texture.
                         // if MSAA is enabled we need to first copy to a resource without MSAA
@@ -1033,7 +1014,7 @@ namespace Microsoft.Xna.Framework.Graphics
                         }
 
                         // Copy the data to the array.
-                        DataStream stream = null;
+                        DataStream? stream = null;
                         try
                         {
                             var databox = _d3dContext.MapSubresource(stagingTex, 0, MapMode.Read, SharpDX.Direct3D11.MapFlags.None, out stream);
@@ -1087,7 +1068,7 @@ namespace Microsoft.Xna.Framework.Graphics
         /// </summary>
         public void Flush()
         {
-            _d3dContext.Flush();
+            _d3dContext!.Flush();
         }
 
         private static Rectangle PlatformGetTitleSafeArea(int x, int y, int width, int height)
