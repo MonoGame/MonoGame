@@ -2,6 +2,8 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
+#nullable enable
+
 using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
@@ -18,11 +20,12 @@ namespace Microsoft.Xna.Framework.Graphics
     public partial class GraphicsDevice
     {
 #if DESKTOPGL || ANGLE
-        internal IGraphicsContext Context { get; private set; }
+        // Null forgiveness is safe from after PlatformSetup is called until disposal
+        internal IGraphicsContext? Context { get; private set; }
 #endif
 
 #if !GLES
-        private DrawBuffersEnum[] _drawBuffers;
+        private DrawBuffersEnum[]? _drawBuffers;
 #endif
 
         enum ResourceType
@@ -110,18 +113,20 @@ namespace Microsoft.Xna.Framework.Graphics
         static List<IntPtr> _disposeContexts = new List<IntPtr>();
         static object _disposeContextsLock = new object();
 
-        private ShaderProgramCache _programCache;
-        private ShaderProgram _shaderProgram = null;
+        private ShaderProgramCache? _programCache;
+        private ShaderProgram? _shaderProgram = null;
 
         static readonly float[] _posFixup = new float[4];
 
-        private static BufferBindingInfo[] _bufferBindingInfos;
+        // Null forgiveness is safe after PlatformInitialize
+        private static BufferBindingInfo[]? _bufferBindingInfos;
         private static int _activeBufferBindingInfosCount;
-        private static bool[] _newEnabledVertexAttributes;
+        // Null forgiveness is safe after PlatformSetup
+        private static bool[]? _newEnabledVertexAttributes;
         internal static readonly List<int> _enabledVertexAttributes = new List<int>();
         internal static bool _attribsDirty;
 
-        internal FramebufferHelper framebufferHelper;
+        internal FramebufferHelper? framebufferHelper;
 
         internal int glMajorVersion = 0;
         internal int glMinorVersion = 0;
@@ -144,13 +149,12 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             get
             {
-                if (_vertexShader == null && _pixelShader == null)
-                    throw new InvalidOperationException("There is no shader bound!");
                 if (_vertexShader == null)
-                    return _pixelShader.HashKey;
-                if (_pixelShader == null)
+                    return _pixelShader?.HashKey ?? throw new InvalidOperationException("There is no shader bound!");
+                else if (_pixelShader == null)
                     return _vertexShader.HashKey;
-                return _vertexShader.HashKey ^ _pixelShader.HashKey;
+                else
+                    return _vertexShader.HashKey ^ _pixelShader.HashKey;
             }
         }
 
@@ -178,7 +182,7 @@ namespace Microsoft.Xna.Framework.Graphics
             var programHash = ShaderProgramHash;
             var bindingsChanged = false;
 
-            for (var slot = 0; slot < _vertexBuffers.Count; slot++)
+            for (var slot = 0; slot < _vertexBuffers!.Count; slot++)
             {
                 var vertexBufferBinding = _vertexBuffers.Get(slot);
                 var vertexDeclaration = vertexBufferBinding.VertexBuffer.VertexDeclaration;
@@ -189,7 +193,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
                 if (!_attribsDirty &&
                     slot < _activeBufferBindingInfosCount &&
-                    _bufferBindingInfos[slot].VertexOffset == offset &&
+                    _bufferBindingInfos![slot].VertexOffset == offset &&
                     ReferenceEquals(_bufferBindingInfos[slot].AttributeInfo, attrInfo) &&
                     _bufferBindingInfos[slot].InstanceFrequency == vertexBufferBinding.InstanceFrequency &&
                     _bufferBindingInfos[slot].Vbo == vertexBufferBinding.VertexBuffer.vbo)
@@ -220,7 +224,7 @@ namespace Microsoft.Xna.Framework.Graphics
                     GraphicsExtensions.CheckGLError();
                 }
 
-                _bufferBindingInfos[slot].VertexOffset = offset;
+                _bufferBindingInfos![slot].VertexOffset = offset;
                 _bufferBindingInfos[slot].AttributeInfo = attrInfo;
                 _bufferBindingInfos[slot].InstanceFrequency = vertexBufferBinding.InstanceFrequency;
                 _bufferBindingInfos[slot].Vbo = vertexBufferBinding.VertexBuffer.vbo;
@@ -230,15 +234,15 @@ namespace Microsoft.Xna.Framework.Graphics
 
             if (bindingsChanged)
             {
-                Array.Clear(_newEnabledVertexAttributes, 0, _newEnabledVertexAttributes.Length);
+                Array.Clear(_newEnabledVertexAttributes!, 0, _newEnabledVertexAttributes!.Length);
                 for (var slot = 0; slot < _vertexBuffers.Count; slot++)
                 {
-                    foreach (var element in _bufferBindingInfos[slot].AttributeInfo.Elements)
+                    foreach (var element in _bufferBindingInfos![slot].AttributeInfo!.Elements)
                         _newEnabledVertexAttributes[element.AttributeLocation] = true;
                 }
                 _activeBufferBindingInfosCount = _vertexBuffers.Count;
             }
-            SetVertexAttributeArray(_newEnabledVertexAttributes);
+            SetVertexAttributeArray(_newEnabledVertexAttributes!);
         }
 
         private void PlatformSetup()
@@ -339,7 +343,7 @@ namespace Microsoft.Xna.Framework.Graphics
             _enabledVertexAttributes.Clear();
 
             // Free all the cached shader programs. 
-            _programCache.Clear();
+            _programCache!.Clear();
             _shaderProgram = null;
 
             framebufferHelper = FramebufferHelper.Create(this);
@@ -435,10 +439,10 @@ namespace Microsoft.Xna.Framework.Graphics
         private void PlatformDispose()
         {
             // Free all the cached shader programs.
-            _programCache.Dispose();
+            _programCache?.Dispose();
 
 #if DESKTOPGL || ANGLE
-            Context.Dispose();
+            Context?.Dispose();
             Context = null;
 #endif
         }
@@ -533,7 +537,7 @@ namespace Microsoft.Xna.Framework.Graphics
         private void PlatformPresent()
         {
 #if DESKTOPGL || ANGLE
-            Context.SwapBuffers();
+            Context!.SwapBuffers();
 #endif
             GraphicsExtensions.CheckGLError();
 
@@ -571,7 +575,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
         private void PlatformApplyDefaultRenderTarget()
         {
-            this.framebufferHelper.BindFramebuffer(this.glFramebuffer);
+            this.framebufferHelper!.BindFramebuffer(this.glFramebuffer);
 
             // Reset the raster state because we flip vertices
             // when rendering offscreen and hence the cull direction.
@@ -583,7 +587,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
         private class RenderTargetBindingArrayComparer : IEqualityComparer<RenderTargetBinding[]>
         {
-            public bool Equals(RenderTargetBinding[] first, RenderTargetBinding[] second)
+            public bool Equals(RenderTargetBinding[]? first, RenderTargetBinding[]? second)
             {
                 if (object.ReferenceEquals(first, second))
                     return true;
@@ -636,7 +640,7 @@ namespace Microsoft.Xna.Framework.Graphics
             var depth = 0;
             var stencil = 0;
             
-            if (preferredMultiSampleCount > 0 && this.framebufferHelper.SupportsBlitFramebuffer)
+            if (preferredMultiSampleCount > 0 && this.framebufferHelper!.SupportsBlitFramebuffer)
             {
                 this.framebufferHelper.GenRenderbuffer(out color);
                 this.framebufferHelper.BindRenderbuffer(color);
@@ -688,7 +692,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
                 if (depthInternalFormat != 0)
                 {
-                    this.framebufferHelper.GenRenderbuffer(out depth);
+                    this.framebufferHelper!.GenRenderbuffer(out depth);
                     this.framebufferHelper.BindRenderbuffer(depth);
                     this.framebufferHelper.RenderbufferStorageMultisample(preferredMultiSampleCount, (int)depthInternalFormat, width, height);
                     if (preferredDepthFormat == DepthFormat.Depth24Stencil8)
@@ -727,11 +731,11 @@ namespace Microsoft.Xna.Framework.Graphics
             if (color != 0)
             {
                 if (colorIsRenderbuffer)
-                    this.framebufferHelper.DeleteRenderbuffer(color);
+                    this.framebufferHelper!.DeleteRenderbuffer(color);
                 if (stencil != 0 && stencil != depth)
-                    this.framebufferHelper.DeleteRenderbuffer(stencil);
+                    this.framebufferHelper!.DeleteRenderbuffer(stencil);
                 if (depth != 0)
-                    this.framebufferHelper.DeleteRenderbuffer(depth);
+                    this.framebufferHelper!.DeleteRenderbuffer(depth);
 
                 var bindingsToDelete = new List<RenderTargetBinding[]>();
                 foreach (var bindings in this.glFramebuffers.Keys)
@@ -751,12 +755,12 @@ namespace Microsoft.Xna.Framework.Graphics
                     var fbo = 0;
                     if (this.glFramebuffers.TryGetValue(bindings, out fbo))
                     {
-                        this.framebufferHelper.DeleteFramebuffer(fbo);
+                        this.framebufferHelper!.DeleteFramebuffer(fbo);
                         this.glFramebuffers.Remove(bindings);
                     }
                     if (this.glResolveFramebuffers.TryGetValue(bindings, out fbo))
                     {
-                        this.framebufferHelper.DeleteFramebuffer(fbo);
+                        this.framebufferHelper!.DeleteFramebuffer(fbo);
                         this.glResolveFramebuffers.Remove(bindings);
                     }
                 }
@@ -769,8 +773,8 @@ namespace Microsoft.Xna.Framework.Graphics
                 return;
 
             var renderTargetBinding = this._currentRenderTargetBindings[0];
-            var renderTarget = renderTargetBinding.RenderTarget as IRenderTarget;
-            if (renderTarget.MultiSampleCount > 0 && this.framebufferHelper.SupportsBlitFramebuffer)
+            IRenderTarget renderTarget = (renderTargetBinding.RenderTarget as IRenderTarget)!;
+            if (renderTarget.MultiSampleCount > 0 && this.framebufferHelper!.SupportsBlitFramebuffer)
             {
                 var glResolveFramebuffer = 0;
                 if (!this.glResolveFramebuffers.TryGetValue(this._currentRenderTargetBindings, out glResolveFramebuffer))
@@ -779,7 +783,7 @@ namespace Microsoft.Xna.Framework.Graphics
                     this.framebufferHelper.BindFramebuffer(glResolveFramebuffer);
                     for (var i = 0; i < this._currentRenderTargetCount; ++i)
                     {
-                        var rt = this._currentRenderTargetBindings[i].RenderTarget as IRenderTarget;
+                        IRenderTarget rt = (this._currentRenderTargetBindings[i].RenderTarget as IRenderTarget)!;
                         this.framebufferHelper.FramebufferTexture2D((int)(FramebufferAttachment.ColorAttachment0 + i), (int) rt.GetFramebufferTarget(renderTargetBinding), rt.GLTexture);
                     }
                     this.glResolveFramebuffers.Add((RenderTargetBinding[])this._currentRenderTargetBindings.Clone(), glResolveFramebuffer);
@@ -799,7 +803,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 for (var i = 0; i < this._currentRenderTargetCount; ++i)
                 {
                     renderTargetBinding = this._currentRenderTargetBindings[i];
-                    renderTarget = renderTargetBinding.RenderTarget as IRenderTarget;
+                    renderTarget = (renderTargetBinding.RenderTarget as IRenderTarget)!;
                     this.framebufferHelper.BlitFramebuffer(i, renderTarget.Width, renderTarget.Height);
                 }
                 if (renderTarget.RenderTargetUsage == RenderTargetUsage.DiscardContents && this.framebufferHelper.SupportsInvalidateFramebuffer)
@@ -813,12 +817,12 @@ namespace Microsoft.Xna.Framework.Graphics
             for (var i = 0; i < this._currentRenderTargetCount; ++i)
             {
                 renderTargetBinding = this._currentRenderTargetBindings[i];
-                renderTarget = renderTargetBinding.RenderTarget as IRenderTarget;
+                renderTarget = (renderTargetBinding.RenderTarget as IRenderTarget)!;
                 if (renderTarget.LevelCount > 1)
                 {
                     GL.BindTexture((TextureTarget)renderTarget.GLTarget, renderTarget.GLTexture);
                     GraphicsExtensions.CheckGLError();
-                    this.framebufferHelper.GenerateMipmap((int)renderTarget.GLTarget);
+                    this.framebufferHelper!.GenerateMipmap((int)renderTarget.GLTarget);
                 }
             }
         }
@@ -828,16 +832,16 @@ namespace Microsoft.Xna.Framework.Graphics
             var glFramebuffer = 0;
             if (!this.glFramebuffers.TryGetValue(this._currentRenderTargetBindings, out glFramebuffer))
             {
-                this.framebufferHelper.GenFramebuffer(out glFramebuffer);
+                this.framebufferHelper!.GenFramebuffer(out glFramebuffer);
                 this.framebufferHelper.BindFramebuffer(glFramebuffer);
                 var renderTargetBinding = this._currentRenderTargetBindings[0];
-                var renderTarget = renderTargetBinding.RenderTarget as IRenderTarget;
+                IRenderTarget renderTarget = (renderTargetBinding.RenderTarget as IRenderTarget)!;
                 this.framebufferHelper.FramebufferRenderbuffer((int)FramebufferAttachment.DepthAttachment, renderTarget.GLDepthBuffer, 0);
                 this.framebufferHelper.FramebufferRenderbuffer((int)FramebufferAttachment.StencilAttachment, renderTarget.GLStencilBuffer, 0);
                 for (var i = 0; i < this._currentRenderTargetCount; ++i)
                 {
                     renderTargetBinding = this._currentRenderTargetBindings[i];
-                    renderTarget = renderTargetBinding.RenderTarget as IRenderTarget;
+                    renderTarget = (renderTargetBinding.RenderTarget as IRenderTarget)!;
                     var attachement = (int)(FramebufferAttachment.ColorAttachment0 + i);
                     if (renderTarget.GLColorBuffer != renderTarget.GLTexture)
                         this.framebufferHelper.FramebufferRenderbuffer(attachement, renderTarget.GLColorBuffer, 0);
@@ -852,7 +856,7 @@ namespace Microsoft.Xna.Framework.Graphics
             }
             else
             {
-                this.framebufferHelper.BindFramebuffer(glFramebuffer);
+                this.framebufferHelper!.BindFramebuffer(glFramebuffer);
             }
 #if !GLES
             GL.DrawBuffers(this._currentRenderTargetCount, this._drawBuffers);
@@ -865,7 +869,7 @@ namespace Microsoft.Xna.Framework.Graphics
             // Textures will need to be rebound to render correctly in the new render target.
             Textures.Dirty();
 
-            return _currentRenderTargetBindings[0].RenderTarget as IRenderTarget;
+            return (_currentRenderTargetBindings[0].RenderTarget as IRenderTarget)!;
         }
 
         private static GLPrimitiveType PrimitiveTypeGL(PrimitiveType primitiveType)
@@ -893,7 +897,7 @@ namespace Microsoft.Xna.Framework.Graphics
         private unsafe void ActivateShaderProgram()
         {
             // Lookup the shader program.
-            var shaderProgram = _programCache.GetProgram(VertexShader, PixelShader);
+            var shaderProgram = _programCache!.GetProgram(VertexShader, PixelShader);
             if (shaderProgram.Program == -1)
                 return;
             // Set the new program if it has changed.
@@ -969,7 +973,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
         private void PlatformApplyBlend(bool force = false)
         {
-            _actualBlendState.PlatformApplyState(this, force);
+            _actualBlendState!.PlatformApplyState(this, force);
             ApplyBlendFactor(force);
         }
 
@@ -1052,7 +1056,8 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             ApplyState(true);
 
-            var shortIndices = _indexBuffer.IndexElementSize == IndexElementSize.SixteenBits;
+            // The caller should have ensured that _indexBuffer is not null
+            var shortIndices = _indexBuffer!.IndexElementSize == IndexElementSize.SixteenBits;
 
 			var indexElementType = shortIndices ? DrawElementsType.UnsignedShort : DrawElementsType.UnsignedInt;
             var indexElementSize = shortIndices ? 2 : 4;
@@ -1060,7 +1065,8 @@ namespace Microsoft.Xna.Framework.Graphics
 			var indexElementCount = GetElementCountArray(primitiveType, primitiveCount);
 			var target = PrimitiveTypeGL(primitiveType);
 
-            ApplyAttribs(_vertexShader, baseVertex);
+            // The caller should have ensured that _vertexShader is not null
+            ApplyAttribs(_vertexShader!, baseVertex);
 
             GL.DrawElements(target,
                                      indexElementCount,
@@ -1105,9 +1111,10 @@ namespace Microsoft.Xna.Framework.Graphics
 
         private void PlatformDrawPrimitives(PrimitiveType primitiveType, int vertexStart, int vertexCount)
         {
-            ApplyState(true);   
+            ApplyState(true);
 
-            ApplyAttribs(_vertexShader, 0);
+            // The caller should have ensured that _vertexShader is not null
+            ApplyAttribs(_vertexShader!, 0);
 
             if (vertexStart < 0)
                 vertexStart = 0;
@@ -1204,7 +1211,8 @@ namespace Microsoft.Xna.Framework.Graphics
                 throw new PlatformNotSupportedException("Instanced geometry drawing requires at least OpenGL 3.2 or GLES 3.2. Try upgrading your graphics card drivers.");
             ApplyState(true);
 
-            var shortIndices = _indexBuffer.IndexElementSize == IndexElementSize.SixteenBits;
+            // The caller should have ensured that _indexBuffer is not null
+            var shortIndices = _indexBuffer!.IndexElementSize == IndexElementSize.SixteenBits;
 
             var indexElementType = shortIndices ? DrawElementsType.UnsignedShort : DrawElementsType.UnsignedInt;
             var indexElementSize = shortIndices ? 2 : 4;
@@ -1212,7 +1220,8 @@ namespace Microsoft.Xna.Framework.Graphics
             var indexElementCount = GetElementCountArray(primitiveType, primitiveCount);
             var target = PrimitiveTypeGL(primitiveType);
 
-            ApplyAttribs(_vertexShader, baseVertex);
+            // The caller should have ensured that _vertexShader is not null
+            ApplyAttribs(_vertexShader!, baseVertex);
 
             if (baseInstance > 0)
             {
@@ -1274,7 +1283,7 @@ namespace Microsoft.Xna.Framework.Graphics
         internal void OnPresentationChanged()
         {
 #if DESKTOPGL || ANGLE
-            Context.MakeCurrent(new WindowInfo(SdlGameWindow.Instance.Handle));
+            Context!.MakeCurrent(new WindowInfo(SdlGameWindow.Instance.Handle));
             Context.SwapInterval = PresentationParameters.PresentationInterval.GetSwapInterval();
 #endif
 
@@ -1284,12 +1293,12 @@ namespace Microsoft.Xna.Framework.Graphics
         // Holds information for caching
         private class BufferBindingInfo
         {
-            public VertexDeclaration.VertexDeclarationAttributeInfo AttributeInfo;
+            public VertexDeclaration.VertexDeclarationAttributeInfo? AttributeInfo;
             public IntPtr VertexOffset;
             public int InstanceFrequency;
             public int Vbo;
 
-            public BufferBindingInfo(VertexDeclaration.VertexDeclarationAttributeInfo attributeInfo, IntPtr vertexOffset, int instanceFrequency, int vbo)
+            public BufferBindingInfo(VertexDeclaration.VertexDeclarationAttributeInfo? attributeInfo, IntPtr vertexOffset, int instanceFrequency, int vbo)
             {
                 AttributeInfo = attributeInfo;
                 VertexOffset = vertexOffset;

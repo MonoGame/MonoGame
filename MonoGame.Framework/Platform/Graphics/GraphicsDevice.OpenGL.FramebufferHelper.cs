@@ -2,6 +2,8 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
+#nullable enable
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -19,7 +21,7 @@ namespace Microsoft.Xna.Framework.Graphics
     {
         internal class FramebufferHelper
         {
-            private static FramebufferHelper _instance;
+            private static FramebufferHelper? _instance;
 
             public static FramebufferHelper Create(GraphicsDevice gd)
             {
@@ -37,12 +39,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 return _instance;
             }
 
-            public static FramebufferHelper Get()
-            {
-                if (_instance == null)
-                    throw new InvalidOperationException("The FramebufferHelper has not been created yet!");
-                return _instance;
-            }
+            public static FramebufferHelper Get() => _instance ?? throw new InvalidOperationException("The FramebufferHelper has not been created yet!");
 
             public bool SupportsInvalidateFramebuffer { get; private set; }
 
