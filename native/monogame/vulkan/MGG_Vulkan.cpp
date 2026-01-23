@@ -516,7 +516,7 @@ static VkFormat ToVkFormat(MGSurfaceFormat format)
 	case MGSurfaceFormat::Bgra5551:
 		return VK_FORMAT_B5G5R5A1_UNORM_PACK16;
 	case MGSurfaceFormat::Bgra4444:
-		return VK_FORMAT_B4G4R4A4_UNORM_PACK16;
+		return VK_FORMAT_A4R4G4B4_UNORM_PACK16;
 	case MGSurfaceFormat::Dxt1:
 		return VK_FORMAT_BC1_RGB_UNORM_BLOCK;
 	case MGSurfaceFormat::Dxt3:
