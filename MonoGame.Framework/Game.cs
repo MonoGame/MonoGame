@@ -717,7 +717,7 @@ namespace Microsoft.Xna.Framework
         /// </summary>
         /// <param name="sender">This <see cref="Game"/>.</param>
         /// <param name="args">The arguments to the <see cref="Activated"/> event.</param>
-		protected virtual void OnActivated (object sender, EventArgs args)
+		protected virtual void OnActivated (object? sender, EventArgs args)
 		{
 			AssertNotDisposed();
             EventHelpers.Raise(sender, Activated, args);
@@ -728,7 +728,7 @@ namespace Microsoft.Xna.Framework
         /// </summary>
         /// <param name="sender">This <see cref="Game"/>.</param>
         /// <param name="args">The arguments to the <see cref="Deactivated"/> event.</param>
-		protected virtual void OnDeactivated (object sender, EventArgs args)
+		protected virtual void OnDeactivated (object? sender, EventArgs args)
 		{
 			AssertNotDisposed();
             EventHelpers.Raise(sender, Deactivated, args);
@@ -738,8 +738,7 @@ namespace Microsoft.Xna.Framework
 
         #region Event Handlers
 
-        private void Components_ComponentAdded(
-            object sender, GameComponentCollectionEventArgs e)
+        private void Components_ComponentAdded(object? sender, GameComponentCollectionEventArgs e)
         {
             // Since we only subscribe to ComponentAdded after the graphics
             // devices are set up, it is safe to just blindly call Initialize.
@@ -747,17 +746,16 @@ namespace Microsoft.Xna.Framework
             CategorizeComponent(e.GameComponent);
         }
 
-        private void Components_ComponentRemoved(
-            object sender, GameComponentCollectionEventArgs e)
+        private void Components_ComponentRemoved(object? sender, GameComponentCollectionEventArgs e)
         {
             DecategorizeComponent(e.GameComponent);
         }
 
-        private void Platform_AsyncRunLoopEnded(object sender, EventArgs e)
+        private void Platform_AsyncRunLoopEnded(object? sender, EventArgs e)
         {
             AssertNotDisposed();
 
-            var platform = (GamePlatform)sender;
+            GamePlatform platform = (GamePlatform)sender!;
             platform.AsyncRunLoopEnded -= Platform_AsyncRunLoopEnded;
         }
 
@@ -772,7 +770,7 @@ namespace Microsoft.Xna.Framework
 #if !(WINDOWS && DIRECTX) && !NATIVE
         internal void applyChanges(GraphicsDeviceManager manager)
         {
-			Platform.BeginScreenDeviceChange(GraphicsDevice.PresentationParameters.IsFullScreen);
+			Platform!.BeginScreenDeviceChange(GraphicsDevice.PresentationParameters.IsFullScreen);
 
             if (GraphicsDevice.PresentationParameters.IsFullScreen)
                 Platform.EnterFullScreen();
@@ -1120,14 +1118,14 @@ namespace Microsoft.Xna.Framework
                 _shouldRebuildCache = true;
             }
 
-            private void Item_FilterPropertyChanged(object sender, EventArgs e)
+            private void Item_FilterPropertyChanged(object? sender, EventArgs e)
             {
                 InvalidateCache();
             }
 
-            private void Item_SortPropertyChanged(object sender, EventArgs e)
+            private void Item_SortPropertyChanged(object? sender, EventArgs e)
             {
-                var item = (T)sender;
+                T item = (T)sender!;
                 var index = _items.IndexOf(item);
 
                 _addJournal.Add(new AddJournalEntry<T>(_addJournal.Count, item));
@@ -1162,13 +1160,7 @@ namespace Microsoft.Xna.Framework
                 return Item.GetHashCode();
             }
 
-            public override bool Equals(object obj)
-            {
-                if (!(obj is AddJournalEntry<T>))
-                    return false;
-
-                return object.Equals(Item, ((AddJournalEntry<T>)obj).Item);
-            }
+            public readonly override bool Equals(object? obj) => obj is AddJournalEntry<T> entry && object.Equals(Item, entry.Item);
         }
     }
 }
