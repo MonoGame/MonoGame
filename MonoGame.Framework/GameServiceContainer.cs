@@ -54,7 +54,7 @@ namespace Microsoft.Xna.Framework
             if (type == null)
                 throw new ArgumentNullException("type");
 
-            services.TryGetValue(type, out object service);
+            services.TryGetValue(type, out object? service);
             return service;
         }
 
