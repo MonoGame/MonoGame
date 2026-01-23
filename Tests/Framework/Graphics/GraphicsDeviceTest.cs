@@ -892,7 +892,6 @@ namespace MonoGame.Tests.Graphics
             // initializing the backing fields inside the constructor, resulting in CS8618.
             // See https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/compiler-messages/nullable-warnings?f1url=%3FappId%3Droslyn%26k%3Dk(CS8618)#nonnullable-reference-not-initialized
 
-            var gd = new GraphicsDevice();
             object unused;
             Assert.DoesNotThrow(() => unused = gd.Adapter);
             Assert.DoesNotThrow(() => unused = gd.VertexTextures);
@@ -907,7 +906,6 @@ namespace MonoGame.Tests.Graphics
         {
             // Nullable fields that are null-forgiven all over the place with the assumption they should have values after initialization,
             // should have values after initialization.
-            var gd = new GraphicsDevice();
             object unused;
             Assert.DoesNotThrow(() => unused = gd.Context!.GetHashCode());
             Assert.DoesNotThrow(() => unused = gd.framebufferHelper!.GetHashCode());
@@ -919,7 +917,6 @@ namespace MonoGame.Tests.Graphics
         {
             // Properties that are backed by nullable fields and have a default value indicated in their documentation
             // should return the indicated default value.
-            var gd = new GraphicsDevice();
             Assert.AreEqual(gd.RasterizerState, RasterizerState.CullCounterClockwise);
             Assert.AreEqual(gd.BlendState, BlendState.Opaque);
             Assert.AreEqual(gd.DepthStencilState, DepthStencilState.Default);
@@ -929,7 +926,6 @@ namespace MonoGame.Tests.Graphics
         public void CanSetNullRenderTargets()
         {
             // Passing null values to the SetRenderTarget* methods should not throw exceptions
-            var gd = new GraphicsDevice();
             RenderTarget2D? renderTarget = null;
             RenderTargetCube? renderTargetCube = null;
             RenderTargetBinding[]? array = null;
