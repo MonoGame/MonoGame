@@ -901,6 +901,19 @@ namespace MonoGame.Tests.Graphics
             Assert.DoesNotThrow(() => unused = gd.SamplerStates);
         }
 
+#if DESKTOPGL
+        [Test]
+        public void NullableInternalFieldsShouldHaveValuesAfterInitialization()
+        {
+            // Nullable fields that are null-forgiven all over the place with the assumption they should have values after initialization,
+            // should have values after initialization.
+            var gd = new GraphicsDevice();
+            object unused;
+            Assert.DoesNotThrow(() => unused = gd.Context!.GetHashCode());
+            Assert.DoesNotThrow(() => unused = gd.framebufferHelper!.GetHashCode());
+        }
+#endif
+
         [Test]
         public void NullableBackingFieldsWithDefaultsAreCorrect()
         {
