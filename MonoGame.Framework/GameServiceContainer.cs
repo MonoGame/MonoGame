@@ -2,6 +2,8 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
+#nullable enable
+
 using System;
 using System.Collections.Generic;
 using MonoGame.Framework.Utilities;
@@ -13,15 +15,7 @@ namespace Microsoft.Xna.Framework
     /// </summary>
     public class GameServiceContainer : IServiceProvider
     {
-        Dictionary<Type, object> services;
-
-        /// <summary>
-        /// Create an empty <see cref="GameServiceContainer"/>.
-        /// </summary>
-        public GameServiceContainer()
-        {
-            services = new Dictionary<Type, object>();
-        }
+        readonly Dictionary<Type, object> services = [];
 
         /// <summary>
         /// Add a service provider to this container.
@@ -29,7 +23,7 @@ namespace Microsoft.Xna.Framework
         /// <param name="type">The type of the service.</param>
         /// <param name="provider">The provider of the service.</param>
         /// <exception cref="ArgumentNullException">
-        /// If <paramref name="type"/> or <paramref name="provider"/> is <code>null</code>.
+        /// If <paramref name="type"/> or <paramref name="provider"/> is <see langword="null"/>.
         /// </exception>
         /// <exception cref="ArgumentException">
         /// If <paramref name="provider"/> cannot be assigned to <paramref name="type"/>.
@@ -55,16 +49,13 @@ namespace Microsoft.Xna.Framework
         /// no suitable service provider is registered in this container.
         /// </returns>
         /// <exception cref="ArgumentNullException">If the specified type is <code>null</code>.</exception>
-        public object GetService(Type type)
+        public object? GetService(Type type)
         {
             if (type == null)
                 throw new ArgumentNullException("type");
-						
-            object service;
-            if (services.TryGetValue(type, out service))
-                return service;
 
-            return null;
+            services.TryGetValue(type, out object service);
+            return service;
         }
 
         /// <summary>
@@ -88,10 +79,10 @@ namespace Microsoft.Xna.Framework
         /// <exception cref="ArgumentNullException">
         /// If <paramref name="provider"/> is <code>null</code>.
         /// </exception>
-        public void AddService<T>(T provider)
-        {
-            AddService(typeof(T), provider);
-        }
+#nullable disable // Null checking is done in the overload
+        public void AddService<T>(T provider) => AddService(typeof(T), provider);
+#nullable enable
+
 
         /// <summary>
         /// Get a service provider of the specified type.
@@ -101,14 +92,10 @@ namespace Microsoft.Xna.Framework
         /// A service provider of the specified type or <code>null</code> if
         /// no suitable service provider is registered in this container.
         /// </returns>
- 	public T GetService<T>() where T : class
+        public T? GetService<T>() where T : class
         {
             var service = GetService(typeof(T));
-
-            if (service == null)
-                return null;
-
-            return (T)service;
+            return service as T;
         }
     }
 }
