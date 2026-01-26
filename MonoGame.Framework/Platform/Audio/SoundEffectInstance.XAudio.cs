@@ -327,11 +327,7 @@ namespace Microsoft.Xna.Framework.Audio
         private void PlatformSetOffset(TimeSpan offset)
         {
             if (_voice != null && SoundEffect.MasterVoice != null)
-            {
-                if (_voice.State.BuffersQueued > 0)
-                {
-                    _voice.Stop(); 
-                }
+            { 
                 _voice.FlushSourceBuffers();
 
                 if (_isLooped)
@@ -346,9 +342,6 @@ namespace Microsoft.Xna.Framework.Audio
                      _effect._buffer.PlayLength = 0;
                      _voice.SubmitSourceBuffer(_effect._buffer, null); 
                 } 
-                 
-                // Restart playback
-                _voice.Start();
             }
         }
 

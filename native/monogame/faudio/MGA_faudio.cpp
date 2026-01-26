@@ -717,10 +717,7 @@ void MGA_Voice_SetPosition(MGA_Voice* voice, mgdouble position)
 		buffer.LoopCount = 0;
 	}
 
-	FAudioSourceVoice_SubmitSourceBuffer(voice->voice, &buffer, nullptr);
-	FAudioSourceVoice_Start(voice->voice, 0, FAUDIO_COMMIT_NOW);
-
-	voice->state = MGSoundState::Playing;
+	FAudioSourceVoice_SubmitSourceBuffer(voice->voice, &buffer, nullptr); 
 }
 
 static void MGA_Voice_UpdateOutputMatrix(MGA_Voice* voice)
