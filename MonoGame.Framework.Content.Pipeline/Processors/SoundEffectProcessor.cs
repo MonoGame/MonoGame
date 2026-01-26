@@ -21,12 +21,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
         /// Gets or sets the target format quality of the audio content.
         /// </summary>
         /// <value>The ConversionQuality of this audio data.</value>
-        public ConversionQuality Quality { get { return quality; } set { quality = value; } }
-
-        /// <summary>
-        /// Currently assigned audio profile.
-        /// </summary>
-        private AudioProfile? _profile;
+        public ConversionQuality Quality { get { return quality; } set { quality = value; } } 
 
         /// <summary>
         /// Initializes a new instance of SoundEffectProcessor.
@@ -34,12 +29,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
         public SoundEffectProcessor()
         { 
         }
-
-        public SoundEffectProcessor(AudioProfile profile)
-        { 
-            _profile = profile;
-        }
-
+         
         /// <summary>
         /// Builds the content for the source audio.
         /// </summary>
@@ -53,7 +43,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
             if (context == null)
                 throw new ArgumentNullException("context");
             
-            var profile = _profile ?? AudioProfile.ForPlatform(context.TargetPlatform);
+            var profile = AudioProfile.ForPlatform(context.TargetPlatform);
             var finalQuality = profile.ConvertAudio(context.TargetPlatform, quality, input);
             if (quality != finalQuality)
                 context.Logger.LogMessage("Failed to convert using \"{0}\" quality, used \"{1}\" quality", quality, finalQuality);

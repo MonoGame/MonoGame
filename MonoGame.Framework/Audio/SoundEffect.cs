@@ -19,10 +19,8 @@ namespace Microsoft.Xna.Framework.Audio
 
         private string _name = string.Empty;
         
-        private bool _isDisposed;
-        private readonly TimeSpan _duration;
-
-        internal readonly uint _bitsPerSample;
+        private bool _isDisposed = false;
+        private readonly TimeSpan _duration; 
 
         #endregion
 
