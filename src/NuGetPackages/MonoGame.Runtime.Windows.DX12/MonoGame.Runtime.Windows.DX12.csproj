@@ -1,0 +1,11 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <ItemGroup>
+    <Content Include="..\..\..\Artifacts\native\mgruntime\windowsdx\windows\Release\mgruntime.dll"
+      Condition="Exists('..\..\..\Artifacts\native\mgruntime\windowsdx\windows\Release\mgruntime.dll')">
+      <PackagePath>runtimes\win-x64\native</PackagePath>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+</Project>

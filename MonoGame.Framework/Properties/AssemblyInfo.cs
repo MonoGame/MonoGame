@@ -10,7 +10,7 @@ using System.Resources;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("MonoGame Team")]
 [assembly: AssemblyProduct("MonoGame.Framework")]
-[assembly: AssemblyCopyright("Copyright © 2009-2016 MonoGame Team")]
+[assembly: AssemblyCopyright("Copyright © 2009-2026 MonoGame Team")]
 [assembly: AssemblyTrademark("MonoGame® is a registered trademark of the MonoGame Team")]
 [assembly: AssemblyCulture("")]
 

@@ -6,6 +6,7 @@ using System.Collections;
 using System.Reflection;
 using Microsoft.Xna.Framework.Content.Pipeline;
 using Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler;
+using MonoGame.Framework.Content.Pipeline.Builder.Logger;
 using MonoGame.Framework.Content.Pipeline.Builder.Server;
 
 namespace MonoGame.Framework.Content.Pipeline.Builder;
@@ -26,6 +27,8 @@ public abstract class ContentBuilder
         public required ContentRequestedArgs Args { get; set; }
     }
 
+    private class SkipLogException() : Exception;
+
     private readonly Queue<ContentRequest> _contentRequestQueue = [];
     private readonly object _contentRequestLock = new();
     private readonly Dictionary<string, List<ContentInfo>> _content = [];
@@ -42,7 +45,7 @@ public abstract class ContentBuilder
     /// Gets or sets the logger to be used by the <see cref="ContentBuilder"/>.
     /// </summary>
     /// <value><see cref="ContentBuildLogger"/> by default.</value>
-    public ContentBuildLogger Logger { get; set; } = new ContentBuildLogger();
+    public ContentBuildLogger Logger { get; set; } = new ContentBuilderLogger();
 
     /// <summary>
     /// Gets or sets the content cahcing system to be used by the <see cref="ContentBuilder"/>.
@@ -74,7 +77,7 @@ public abstract class ContentBuilder
     /// <param name="parentContext">Only set when the method is being called by the ContentProcessorContext to build one of its children.</param>
     public void BuildAndWriteContent(string relativeSrcPath, ContentInfo contentInfo, string? relativeDstPath = null, ContentProcessorContext? parentContext = null)
     {
-        Logger.PushFile(relativeSrcPath);
+        Logger.PushFile(Path.Combine(Parameters.RootedSourceDirectory, relativeSrcPath));
         try
         {
             ProcessContent(relativeSrcPath, contentInfo, true, relativeDstPath, parentContext);
@@ -82,10 +85,20 @@ public abstract class ContentBuilder
         }
         catch (Exception ex)
         {
-            Logger.Log(LogLevel.Error, $"Countent failed to build:\n{ex}");
             FailedToBuild++;
+            if (ex is not SkipLogException)
+            {
+                Logger.Log(LogLevel.Error, $"Content failed to build: {ex}");
+            }
+            if (parentContext != null)
+            {
+                throw new SkipLogException();
+            }
         }
-        Logger.PopFile();
+        finally
+        {
+            Logger.PopFile();
+        }
     }
 
     /// <summary>
@@ -98,7 +111,7 @@ public abstract class ContentBuilder
     /// <returns>The built object that the <see cref="IContentProcessor.Process(object, ContentProcessorContext)"/> returned.</returns>
     public object? BuildAndLoadContent(string relativeSrcPath, ContentInfo contentInfo, string? relativeDstPath = null, ContentProcessorContext? parentContext = null)
     {
-        Logger.PushFile(relativeSrcPath);
+        Logger.PushFile(Path.Combine(Parameters.RootedSourceDirectory, relativeSrcPath));
         try
         {
             var content = ProcessContent(relativeSrcPath, contentInfo, false, relativeDstPath, parentContext);
@@ -107,18 +120,28 @@ public abstract class ContentBuilder
         }
         catch (Exception ex)
         {
-            Logger.Log(LogLevel.Error, $"Countent failed to build:\n{ex}");
             FailedToBuild++;
+            if (ex is not SkipLogException)
+            {
+                Logger.Log(LogLevel.Error, $"Content failed to build: {ex}");
+            }
+            if (parentContext != null)
+            {
+                throw new SkipLogException();
+            }
         }
-        Logger.PopFile();
+        finally
+        {
+            Logger.PopFile();
+        }
         return null;
     }
 
     private object? ProcessContent(string relativePath, ContentInfo contentInfo, bool writeToDisk, string? relativeOutputPath, ContentProcessorContext? parentContext)
     {
         var filePath = Path.Combine(Parameters.RootedSourceDirectory, relativePath);
-        var relativeDestPath = Path.Combine(contentInfo.ContentRoot, string.IsNullOrEmpty(relativeOutputPath) ? relativePath.GetDestinationPath(contentInfo.ShouldBuild, contentInfo.GetOutputPath) : relativeOutputPath);
-        var outputPath = Path.Combine(Parameters.RootedOutputDirectory, relativeDestPath);
+        var relativeDestPath = Path.Combine(contentInfo.ContentRoot, string.IsNullOrEmpty(relativeOutputPath) ? relativePath.GetDestinationPath(contentInfo.ShouldBuild, contentInfo.GetOutputPath) : relativeOutputPath).Sanitize();
+        var outputPath = Path.Combine(Parameters.RootedOutputDirectory, relativeDestPath).Sanitize();
         var outputDir = Path.GetDirectoryName(outputPath);
 
         if (string.IsNullOrWhiteSpace(outputDir))
@@ -131,22 +154,39 @@ public abstract class ContentBuilder
             Directory.CreateDirectory(outputDir);
         }
 
-        Logger.Log($"Output: {relativeDestPath}");
+        if (contentInfo.ShouldBuild) // ensure importer and processor are set
+        {
+            if (!ContentBuilderHelper.GetImporter(relativePath, contentInfo.Importer, out IContentImporter importer))
+            {
+                Logger.Log(LogLevel.Warning, "Importer: Not found");
+                return null;
+            }
+            if (!ContentBuilderHelper.GetProcessor(importer, contentInfo.Processor, out IContentProcessor processor))
+            {
+                Logger.Log(LogLevel.Warning, "Processor: Not found");
+                return null;
+            }
+            if (contentInfo.Importer != importer || contentInfo.Processor != processor)
+            {
+                contentInfo = new ContentInfo(contentInfo.ContentRoot, contentInfo.ShouldBuild, importer, processor, contentInfo.GetOutputPath);
+            }
+        }
+
         if (!Parameters.Rebuild)
         {
             var fileCache = ContentCache.ReadContentFileCache(this, relativeDestPath);
             if (fileCache != null && fileCache.IsValid(this, contentInfo))
             {
-                Logger.Log($"Cache: Found");
+                Logger.Log(LogLevel.Debug, $"Cache: Found");
                 ContentCache.MarkUsed(fileCache);
+                (parentContext as ContentBuilderProcessorContext)?.ContentFileCache.AddDependency(this, fileCache);
                 return null;
             }
         }
 
         if (!contentInfo.ShouldBuild)
         {
-            Logger.Log($"Cache: Not Found");
-
+            Logger.Log(Path.GetRelativePath(Logger.LoggerRootDirectory, outputPath).Sanitize());
             if (File.Exists(outputPath))
             {
                 File.Delete(outputPath);
@@ -162,28 +202,20 @@ public abstract class ContentBuilder
             return null;
         }
 
-        if (!ContentBuilderHelper.GetImporter(relativePath, contentInfo.Importer, out IContentImporter importer))
-        {
-            Logger.Log(LogLevel.Warning, "Importer: Not found :(");
-            return null;
-        }
-        Logger.Log($"Imposter: {importer.GetType().Name}");
-        if (!ContentBuilderHelper.GetProcessor(importer, contentInfo.Processor, out IContentProcessor processor))
-        {
-            Logger.Log(LogLevel.Warning, "Processor: Not found :(");
-            return null;
-        }
-        Logger.Log($"Processor: {processor.GetType().Name}");
-        Logger.Log($"Cache: Not Found");
+        Logger.Log(LogLevel.Debug, $"Cache: Not Found");
+        Logger.Log(LogLevel.Debug, $"Importer: {contentInfo.Importer!.GetType().Name}");
+        Logger.Log(LogLevel.Debug, $"Processor: {contentInfo.Processor!.GetType().Name}");
+        Logger.Log(Path.GetRelativePath(Logger.LoggerRootDirectory, outputPath).Sanitize());
 
         var contentFileCache = ContentCache.CreateContentFileCache(this, contentInfo);
         contentFileCache.AddDependency(this, relativePath);
 
         var importContext = new ContentBuilderImporterContext(this, contentFileCache);
-        var importedObject = importer.Import(filePath, importContext);
+        var importedObject = contentInfo.Importer!.Import(filePath, importContext);
 
         var processorContext = new ContentBuilderProcessorContext(this, relativePath, contentInfo, contentFileCache, outputPath);
-        var processedObject = processor.Process(importedObject, processorContext);
+        using var _ = ContextScopeFactory.BeginContext(processorContext);
+        var processedObject = contentInfo.Processor!.Process(importedObject, processorContext);
 
         if (writeToDisk)
         {
@@ -205,7 +237,12 @@ public abstract class ContentBuilder
     /// <param name="parameters">A <see cref="ContentBuilderParams"/> describing both the platform paramteres for the content compilation as well as the configuration of the <see cref="ContentBuilder"/> itself.</param>
     public bool Run(ContentBuilderParams parameters)
     {
+        ContentBuilderHelper.LoadAssemblies();
+
         Parameters = parameters;
+        Logger.LoggerLogLevel = Parameters.LogLevel;
+        Logger.LoggerRootDirectory = Parameters.WorkingDirectory;
+
         if (parameters.Mode == ContentBuilderMode.None)
         {
             // This means we are just showing the help menu.
@@ -214,27 +251,24 @@ public abstract class ContentBuilder
 
         Directory.SetCurrentDirectory(Parameters.WorkingDirectory);
 
-        Logger.IndentCharacter = ' ';
-        Logger.IndentCharacterSize = 2;
-        Logger.ShowRealTime = Parameters.Mode == ContentBuilderMode.Server;
-
-        Logger.PushFile("Starting Content Builder");
+        Logger.Log("Starting Content Builder");
+        Logger.Indent();
         foreach (var prop in Parameters.GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance))
         {
             if (prop.GetValue(Parameters) is IList list)
             {
-                Logger.Log($"{prop.Name}:");
+                Logger.Log(LogLevel.Debug, $"{prop.Name}:");
                 foreach (var item in list)
                 {
-                    Logger.Log($"- {item}");
+                    Logger.Log(LogLevel.Debug, $"- {item}");
                 }
             }
             else
             {
-                Logger.Log($"{prop.Name}: {prop.GetValue(Parameters)}");
+                Logger.Log(LogLevel.Debug, $"{prop.Name}: {prop.GetValue(Parameters)}");
             }
         }
-        Logger.PopFile();
+        Logger.Unindent();
 
         ContentCache.LoadCache(this);
         var contentCollection = GetContentCollection();
@@ -262,11 +296,17 @@ public abstract class ContentBuilder
     {
         foreach (var dir in Directory.GetDirectories(directory))
         {
+            if (Path.GetFileName(dir).StartsWith('.'))
+                continue;
+
             ScanFiles(contentCollection, dir);
         }
 
         foreach (var filePath in Directory.GetFiles(directory))
         {
+            if (Path.GetFileName(filePath).StartsWith('.'))
+                continue;
+
             var relativePath = Path.GetRelativePath(Parameters.RootedSourceDirectory, filePath);
             relativePath = relativePath.Sanitize();
             if (contentCollection.GetContentInfo(relativePath, out List<ContentInfo> contentInfos) && contentInfos.Count > 0)
@@ -290,15 +330,16 @@ public abstract class ContentBuilder
             }
         }
 
-        if (!Parameters.SkipClean)
+        if (!Parameters.SkipClean && FailedToBuild == 0)
         {
             ContentCache.CleanCache(this);
         }
         ContentCache.FlushCache(this);
 
-        Logger.PushFile("Content Builder Finished");
+        Logger.Log("Content Builder Finished");
+        Logger.Indent();
         Logger.Log($"{SucceededToBuild} succeeded, {FailedToBuild} failed");
-        Logger.PopFile();
+        Logger.Unindent();
 
         return FailedToBuild == 0;
     }

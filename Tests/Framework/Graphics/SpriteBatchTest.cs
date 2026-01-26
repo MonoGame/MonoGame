@@ -11,6 +11,7 @@ using NUnit.Framework;
 namespace MonoGame.Tests.Graphics {
     [TestFixture]
     [NonParallelizable]
+    [RunOnUI]
 	class SpriteBatchTest : GraphicsDeviceTestFixtureBase {
 		private SpriteBatch _spriteBatch;
 		private Texture2D _texture;

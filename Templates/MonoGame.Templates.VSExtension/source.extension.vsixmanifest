@@ -7,22 +7,22 @@
     <Tags>.NET,C#,Game development,Templates,Games,Gamedev,Project,Mono,MonoGame</Tags>
   </Metadata>
   <Installation>
-    <InstallationTarget Version="[17.0, 18.0)" Id="Microsoft.VisualStudio.Community">
+    <InstallationTarget Version="[17.0, 19.0)" Id="Microsoft.VisualStudio.Community">
       <ProductArchitecture>amd64</ProductArchitecture>
     </InstallationTarget>
-    <InstallationTarget Version="[17.0, 18.0)" Id="Microsoft.VisualStudio.Pro">
+    <InstallationTarget Version="[17.0, 19.0)" Id="Microsoft.VisualStudio.Pro">
       <ProductArchitecture>amd64</ProductArchitecture>
     </InstallationTarget>
-    <InstallationTarget Version="[17.0, 18.0)" Id="Microsoft.VisualStudio.Enterprise">
+    <InstallationTarget Version="[17.0, 19.0)" Id="Microsoft.VisualStudio.Enterprise">
       <ProductArchitecture>amd64</ProductArchitecture>
     </InstallationTarget>
-    <InstallationTarget Version="[17.0, 18.0)" Id="Microsoft.VisualStudio.Community">
+    <InstallationTarget Version="[17.0, 19.0)" Id="Microsoft.VisualStudio.Community">
       <ProductArchitecture>arm64</ProductArchitecture>
     </InstallationTarget>
-    <InstallationTarget Version="[17.0, 18.0)" Id="Microsoft.VisualStudio.Pro">
+    <InstallationTarget Version="[17.0, 19.0)" Id="Microsoft.VisualStudio.Pro">
       <ProductArchitecture>arm64</ProductArchitecture>
     </InstallationTarget>
-    <InstallationTarget Version="[17.0, 18.0)" Id="Microsoft.VisualStudio.Enterprise">
+    <InstallationTarget Version="[17.0, 19.0)" Id="Microsoft.VisualStudio.Enterprise">
       <ProductArchitecture>arm64</ProductArchitecture>
     </InstallationTarget>
   </Installation>
@@ -30,7 +30,7 @@
     <Dependency Id="Microsoft.Framework.NDP" DisplayName="Microsoft .NET Framework" d:Source="Manual" Version="[4.7.2,)" />
   </Dependencies>
   <Prerequisites>
-    <Prerequisite Id="Microsoft.VisualStudio.Component.CoreEditor" Version="[17.0,18.0)" DisplayName="Visual Studio core editor" />
+    <Prerequisite Id="Microsoft.VisualStudio.Component.CoreEditor" Version="[17.0,19.0)" DisplayName="Visual Studio core editor" />
   </Prerequisites>
   <Assets>
     <Asset Type="Microsoft.VisualStudio.VsPackage" d:Source="Project" d:ProjectName="%CurrentProject%" Path="|%CurrentProject%;PkgdefProjectOutputGroup|" />

@@ -1,4 +1,4 @@
-// MonoGame - Copyright (C) The MonoGame Team
+// MonoGame - Copyright (C) MonoGame Foundation, Inc
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
@@ -193,7 +193,8 @@ internal static unsafe partial class MGG
         int width,
         int height,
         SurfaceFormat color,
-        DepthFormat depth);
+        DepthFormat depth,
+        int syncInterval);
 
     [DllImport(MGP.MonoGameNativeDLL, EntryPoint = "MGG_GraphicsDevice_BeginFrame", ExactSpelling = true)]
     public static extern int GraphicsDevice_BeginFrame(MGG_GraphicsDevice* device);

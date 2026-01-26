@@ -28,3 +28,6 @@
 [submodule "external/CppNet"]
 	path = external/CppNet
 	url = https://github.com/MonoGame/CppNet.git
+[submodule "native/monogame/external/faudio"]
+	path = native/monogame/external/faudio
+	url = https://github.com/FNA-XNA/FAudio.git

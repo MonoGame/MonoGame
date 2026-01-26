@@ -1,4 +1,4 @@
-// MonoGame - Copyright (C) The MonoGame Team
+// MonoGame - Copyright (C) MonoGame Foundation, Inc
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
@@ -56,7 +56,8 @@ public partial class GraphicsDevice
                 PresentationParameters.BackBufferWidth,
                 PresentationParameters.BackBufferHeight,
                 PresentationParameters.BackBufferFormat,
-                PresentationParameters.DepthStencilFormat);
+                PresentationParameters.DepthStencilFormat,
+                PresentationParameters.PresentationInterval.GetSyncInterval());
 
         // Setup the default texture.
         DefaultTexture = new Texture2D(this, 2, 2);
@@ -83,7 +84,8 @@ public partial class GraphicsDevice
             PresentationParameters.BackBufferWidth,
             PresentationParameters.BackBufferHeight,
             PresentationParameters.BackBufferFormat,
-            PresentationParameters.DepthStencilFormat);
+            PresentationParameters.DepthStencilFormat,
+            PresentationParameters.PresentationInterval.GetSyncInterval());
 
         _viewport = new Viewport(
             0,

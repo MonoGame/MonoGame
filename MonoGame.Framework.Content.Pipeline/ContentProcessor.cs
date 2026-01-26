@@ -2,8 +2,6 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
-using System;
-
 namespace Microsoft.Xna.Framework.Content.Pipeline
 {
     /// <summary>
@@ -16,7 +14,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
         /// </summary>
         protected ContentProcessor()
         {
-
+            Version = (GetType().Assembly.GetName().Version ?? new Version()).ToString();
         }
 
         /// <summary>
@@ -26,6 +24,11 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
         /// <param name="context">Contains any required custom process parameters.</param>
         /// <returns>A typed object representing the processed input.</returns>
         public abstract TOutput Process(TInput input, ContentProcessorContext context);
+
+        /// <summary>
+        /// Gets or sets the version of the current content processor that will be used to determien if the content needs to be rebuilt.
+        /// </summary>
+        public virtual string Version { get; set; }
 
         /// <summary>
         /// Gets the expected object type of the input parameter to IContentProcessor.Process.

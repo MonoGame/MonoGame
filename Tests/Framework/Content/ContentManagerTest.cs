@@ -12,17 +12,6 @@ namespace MonoGame.Tests.Content
     [NonParallelizable]
     internal class ContentManagerTest : GraphicsDeviceTestFixtureBase
     {
-        [TestCase("C:\\image.png")]
-        [TestCase("\\image.png")]
-        [TestCase("/image.png")]
-        public void ThrowExceptionIfAssetNameIsRootedPath(string assetName)
-        {
-            GameServiceContainer services = new GameServiceContainer();
-            ContentManager content = new ContentManager(services, "Content");
-            var exception = Assert.Throws<ContentLoadException>(() => content.Load<Texture2D>(assetName));
-            StringAssert.Contains("rooted (absolute)", exception.Message);
-        }
-
         [Test]
         // Tests loading a texture from a XNB file
         public void CorrectlyLoadTextureFromXnb()

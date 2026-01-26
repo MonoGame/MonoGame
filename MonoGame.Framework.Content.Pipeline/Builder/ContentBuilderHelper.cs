@@ -3,14 +3,15 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System.Collections;
+using System.Diagnostics.Contracts;
 using System.Reflection;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content.Pipeline;
+using MonoGame.Framework.Content.Pipeline.Builder.Server;
 using YamlDotNet.Core;
 using YamlDotNet.Core.Events;
 using YamlDotNet.Serialization;
 using YamlDotNet.Serialization.NamingConventions;
-using MonoGame.Framework.Content.Pipeline.Builder.Server;
 
 namespace MonoGame.Framework.Content.Pipeline.Builder;
 
@@ -47,6 +48,19 @@ static class ContentBuilderHelper
         public required Type Type { get; init; }
     }
 
+    readonly record struct FileEndingImporterPair : IComparable<FileEndingImporterPair>
+    {
+        public required string FileNameEnding { get; init; }
+        public required ImporterInfo ImporterInfo { get; init; }
+
+        [Pure]
+        public int CompareTo(FileEndingImporterPair other)
+        {
+            // Sort by length of file ending, longest first.
+            return other.FileNameEnding.Length.CompareTo(FileNameEnding.Length);
+        }
+    }
+
     record ProcessorInfo
     {
         public required ContentProcessorAttribute? Attribute { get; init; }
@@ -59,13 +73,26 @@ static class ContentBuilderHelper
         public required PropertyInfo PropertyInfo { get; init; }
     }
 
-    private static readonly List<ImporterInfo> _importers = [];
+    private static readonly HashSet<AssemblyName> _loadedAssemblies = [];
+    private static readonly List<FileEndingImporterPair> _importers = [];
     private static readonly List<ProcessorInfo> _processors = [];
     private static readonly Dictionary<Type, List<ServerPropertyInfo>> _serverOptions = [];
 
-    static ContentBuilderHelper()
+    public static ISerializer Serializer { get; set; } = null!;
+
+    public static IDeserializer Deserializer { get; set; } = null!;
+
+    public static void LoadAssemblies()
     {
-        var serilizer = new SerializerBuilder()
+        var assemblies = AppDomain.CurrentDomain.GetAssemblies();
+
+        foreach (var a in assemblies)
+            _loadedAssemblies.Add(a.GetName());
+
+        foreach (var a in assemblies)
+            LoadAssemblyRefs(a);
+
+        var serializer = new SerializerBuilder()
             .WithNamingConvention(CamelCaseNamingConvention.Instance)
             .WithTypeConverter(new ColorConverter())
             .EnablePrivateConstructors()
@@ -78,7 +105,8 @@ static class ContentBuilderHelper
             .IgnoreFields()
             .IgnoreUnmatchedProperties();
 
-        foreach (var a in AppDomain.CurrentDomain.GetAssemblies())
+        assemblies = AppDomain.CurrentDomain.GetAssemblies();
+        foreach (var a in assemblies)
         {
             foreach (var t in a.GetTypes())
             {
@@ -87,18 +115,30 @@ static class ContentBuilderHelper
 
                 if (t.GetInterface(nameof(IContentImporter)) != null)
                 {
-                    serilizer.WithTagMapping("!" + t.ToString(), t);
+                    serializer.WithTagMapping("!" + t.ToString(), t);
                     deserializer.WithTagMapping("!" + t.ToString(), t);
 
-                    _importers.Add(new ImporterInfo
+                    var importerInfo = new ImporterInfo
                     {
                         Attribute = GetImporterAttribute(t),
                         Type = t
-                    });
+                    };
+
+                    // The importer gets added once per file extension it supports,
+                    // and the list is sorted by file extension length later to ensure
+                    // that longer extensions are matched first.
+                    foreach (string ext in importerInfo.Attribute.FileExtensions)
+                    {
+                        _importers.Add(new FileEndingImporterPair
+                        {
+                            FileNameEnding = ext,
+                            ImporterInfo = importerInfo
+                        });
+                    }
                 }
                 else if (t.GetInterface(nameof(IContentProcessor)) != null)
                 {
-                    serilizer.WithTagMapping("!" + t.ToString(), t);
+                    serializer.WithTagMapping("!" + t.ToString(), t);
                     deserializer.WithTagMapping("!" + t.ToString(), t);
 
                     _processors.Add(new ProcessorInfo
@@ -134,13 +174,10 @@ static class ContentBuilderHelper
             }
         }
 
-        Serializer = serilizer.Build();
+        _importers.Sort();
+        Serializer = serializer.Build();
         Deserializer = deserializer.Build();
     }
-
-    public static readonly ISerializer Serializer;
-
-    public static readonly IDeserializer Deserializer;
 
     public static bool ArePropsEqual(object? obj1, object? obj2)
     {
@@ -233,10 +270,9 @@ static class ContentBuilderHelper
 
         foreach (var info in _importers)
         {
-            string fileExtension = Path.GetExtension(relativePath);
-            if (info.Attribute?.FileExtensions.Any(e => e.Equals(fileExtension, StringComparison.InvariantCultureIgnoreCase)) ?? false)
+            if (relativePath.EndsWith(info.FileNameEnding, StringComparison.InvariantCultureIgnoreCase))
             {
-                outImporter = (IContentImporter)Activator.CreateInstance(info.Type)!;
+                outImporter = (IContentImporter)Activator.CreateInstance(info.ImporterInfo.Type)!;
                 return true;
             }
         }
@@ -302,10 +338,6 @@ static class ContentBuilderHelper
                 if (filePath[i] == '.')
                 {
                     extensionEnd = i;
-                }
-
-                if (filePath[i] == '/' || filePath[i] == '\\')
-                {
                     break;
                 }
             }
@@ -336,6 +368,24 @@ static class ContentBuilderHelper
         }
 
         return filePath.Replace('\\', '/');
+    }
+
+    private static void LoadAssemblyRefs(Assembly assembly)
+    {
+        _loadedAssemblies.Add(assembly.GetName());
+
+        foreach (var refAssembly in assembly.GetReferencedAssemblies())
+        {
+            if (_loadedAssemblies.Contains(refAssembly) ||
+                refAssembly.FullName.StartsWith("System."))
+                continue;
+
+            try
+            {
+                LoadAssemblyRefs(Assembly.Load(refAssembly));
+            }
+            catch { }
+        }
     }
 }
 

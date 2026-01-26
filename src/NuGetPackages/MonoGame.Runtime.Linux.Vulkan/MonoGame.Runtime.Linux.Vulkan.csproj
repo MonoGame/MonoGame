@@ -1,0 +1,11 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <ItemGroup>
+    <Content Include="..\..\..\Artifacts\native\mgruntime\desktopvk\linux\Release\libmgruntime.so"
+      Condition="Exists('..\..\..\Artifacts\native\mgruntime\desktopvk\linux\Release\libmgruntime.so')">
+      <PackagePath>runtimes\linux-x64\native</PackagePath>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+</Project>

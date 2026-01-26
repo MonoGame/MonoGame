@@ -30,7 +30,7 @@ namespace MonoGame.Framework.Utilities
         Metal,
 
         /// <summary>
-        /// Represents the Microsoft DirectX 12 graphics backend. (GDKX only for now)
+        /// Represents the Microsoft DirectX 12 graphics backend.
         /// </summary>
         DirectX12
     }
