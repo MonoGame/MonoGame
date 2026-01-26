@@ -92,7 +92,7 @@ public partial class SoundEffectInstance : IDisposable
     private unsafe void PlatformSetOffset(TimeSpan offset)
     {
         if (Voice != null)
-            MGA.Voice_SetPosition(Voice, (ulong)offset.TotalMilliseconds);
+            MGA.Voice_SetPosition(Voice, offset.TotalSeconds);
     }
 
     private unsafe void PlatformSetVolume(float volume)

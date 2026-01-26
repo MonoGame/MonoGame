@@ -686,27 +686,41 @@ mgulong MGA_Voice_GetPosition(MGA_Voice* voice)
 	return (mgulong)msec;
 }
 
-void MGA_Voice_SetPosition(MGA_Voice* voice, mgulong position)
+void MGA_Voice_SetPosition(MGA_Voice* voice, mgdouble position)
 {
 	assert(voice != nullptr);
-	if (voice->voice == nullptr)
+	if (!voice->voice)
 		return;
 	 
-	FAudioSourceVoice_Stop(voice->voice, 0, FAUDIO_COMMIT_NOW);
-	FAudioSourceVoice_FlushSourceBuffers(voice->voice); 
-	// Calculate the sample to seek to.
-	uint32_t sample = ((position / 1000.0f) * voice->format.nSamplesPerSec);
-	auto buffer = voice->buffer->buffer;
-	if (voice->looped)
-		buffer.LoopCount = FAUDIO_LOOP_INFINITE;
-	else
-		buffer.LoopBegin = buffer.LoopLength = buffer.LoopCount = 0;
+	FAudioSourceVoice_FlushSourceBuffers(voice->voice);
 
-	buffer.PlayBegin = (uint32_t)sample;
-	FAudioSourceVoice_SubmitSourceBuffer(voice->voice, &buffer, nullptr);  
-	voice->finishedBuffers = 0;
-	voice->state = MGSoundState::Playing;
+	// Note: currenly, SoundEffectInstances don't have their format initialized,
+	// causing their values to always be 0, making this method unusable (it will restart the audio instead)
+	assert(voice->format.nBlockAlign > 0);
+	assert(voice->format.nChannels > 0);
+	assert(voice->format.nSamplesPerSec > 0);
+	assert(voice->format.wBitsPerSample > 0);
+
+	uint32_t sample = (uint32_t)(position * voice->format.nSamplesPerSec); 
+
+	auto buffer = voice->buffer->buffer;
+	buffer.PlayBegin = sample;
+	buffer.PlayLength = 0;
+
+	if (voice->looped)
+	{
+		buffer.LoopCount = FAUDIO_LOOP_INFINITE;
+		buffer.LoopBegin = sample;
+	}
+	else
+	{
+		buffer.LoopCount = 0;
+	}
+
+	FAudioSourceVoice_SubmitSourceBuffer(voice->voice, &buffer, nullptr);
 	FAudioSourceVoice_Start(voice->voice, 0, FAUDIO_COMMIT_NOW);
+
+	voice->state = MGSoundState::Playing;
 }
 
 static void MGA_Voice_UpdateOutputMatrix(MGA_Voice* voice)

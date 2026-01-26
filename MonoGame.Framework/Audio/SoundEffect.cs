@@ -1,4 +1,4 @@
-// MonoGame - Copyright (C) MonoGame Foundation, Inc
+﻿// MonoGame - Copyright (C) MonoGame Foundation, Inc
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 ﻿
@@ -19,8 +19,10 @@ namespace Microsoft.Xna.Framework.Audio
 
         private string _name = string.Empty;
         
-        private bool _isDisposed = false;
+        private bool _isDisposed;
         private readonly TimeSpan _duration;
+
+        internal readonly uint _bitsPerSample;
 
         #endregion
 

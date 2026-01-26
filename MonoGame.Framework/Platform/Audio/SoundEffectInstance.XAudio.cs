@@ -331,19 +331,21 @@ namespace Microsoft.Xna.Framework.Audio
             {
                 if (_voice.State.BuffersQueued > 0)
                 {
-                    _voice.Stop();
-                    _voice.FlushSourceBuffers();
+                    _voice.Stop(); 
                 }
+                _voice.FlushSourceBuffers();
 
                 if (_isLooped)
                 {
-                    _effect._loopedBuffer.PlayBegin = (int)(offset.TotalSeconds * _effect._format.SampleRate) * _effect._format.BlockAlign;
+                    _effect._loopedBuffer.PlayBegin = (int)(offset.TotalSeconds * _effect._format.SampleRate);
+                    _effect._loopedBuffer.PlayLength = 0;
                     _voice.SubmitSourceBuffer(_effect._loopedBuffer, null);
                 }
                 else
                 {
-                    _effect._buffer.PlayBegin = (int)(offset.TotalSeconds * _effect._format.SampleRate) * _effect._format.BlockAlign;
-                    _voice.SubmitSourceBuffer(_effect._buffer, null); 
+                     _effect._buffer.PlayBegin = (int)(offset.TotalSeconds * _effect._format.SampleRate);
+                     _effect._buffer.PlayLength = 0;
+                     _voice.SubmitSourceBuffer(_effect._buffer, null); 
                 } 
                  
                 // Restart playback

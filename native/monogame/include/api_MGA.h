@@ -38,7 +38,7 @@ MG_EXPORT void MGA_Voice_Resume(MGA_Voice* voice);
 MG_EXPORT void MGA_Voice_Stop(MGA_Voice* voice, mgbyte immediate);
 MG_EXPORT MGSoundState MGA_Voice_GetState(MGA_Voice* voice);
 MG_EXPORT mgulong MGA_Voice_GetPosition(MGA_Voice* voice);
-MG_EXPORT void MGA_Voice_SetPosition(MGA_Voice* voice, mgulong position);
+MG_EXPORT void MGA_Voice_SetPosition(MGA_Voice* voice, mgdouble position);
 MG_EXPORT void MGA_Voice_SetPan(MGA_Voice* voice, mgfloat pan);
 MG_EXPORT void MGA_Voice_SetPitch(MGA_Voice* voice, mgfloat pitch);
 MG_EXPORT void MGA_Voice_SetVolume(MGA_Voice* voice, mgfloat volume);

@@ -178,7 +178,7 @@ internal static unsafe partial class MGA
     public static extern void Voice_SetPitch(MGA_Voice* voice, float pitch);
      
     [DllImport(MGP.MonoGameNativeDLL, EntryPoint = "MGA_Voice_SetPosition", ExactSpelling = true)]
-    public static extern void Voice_SetPosition(MGA_Voice* voice, ulong position);
+    public static extern void Voice_SetPosition(MGA_Voice* voice, double position);
 
     [DllImport(MGP.MonoGameNativeDLL, EntryPoint = "MGA_Voice_SetVolume", ExactSpelling = true)]
     public static extern void Voice_SetVolume(MGA_Voice* voice, float volume);
