@@ -492,7 +492,9 @@ namespace MonoGame.Tests.Audio
                 instance.Pause();
                 instance.Offset = TimeSpan.FromSeconds(secondPosition);
                 instance.Resume();
-                Task.Delay(TimeSpan.FromSeconds(5)).Wait();
+                Task.Delay(TimeSpan.FromSeconds(2)).Wait();
+
+                instance.Stop();
             }
         }
     }
