@@ -2,6 +2,8 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
+#nullable enable
+
 using System;
 
 namespace Microsoft.Xna.Framework.Graphics
@@ -58,7 +60,7 @@ namespace Microsoft.Xna.Framework.Graphics
         /// This event is never called.  It is included for XNA compatibility.
         /// </remarks>
         [Obsolete("This is provided for XNA compatibility is never called by MonoGame")]
-		public event EventHandler<EventArgs> ContentLost;
+		public event EventHandler<EventArgs> ContentLost = delegate { };
 
         /// <summary>
         /// Initializes a new instance of the <see cref="RenderTargetCube"/> class.

@@ -3,6 +3,9 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 // Original code from SilverSprite Project
+
+#nullable enable
+
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -331,10 +334,10 @@ namespace Microsoft.Xna.Framework.Graphics
                 return glyphIdx;
         }
         
-        internal struct CharacterSource 
+        internal readonly struct CharacterSource
         {
-			private readonly string _string;
-			private readonly StringBuilder _builder;
+			private readonly string? _string;
+			private readonly StringBuilder? _builder;
 
 			public CharacterSource(string s)
 			{
@@ -351,13 +354,14 @@ namespace Microsoft.Xna.Framework.Graphics
 			}
 
 			public readonly int Length;
-			public char this [int index] 
+			public readonly char this [int index]
             {
 				get 
                 {
 					if (_string != null)
 						return _string[index];
-					return _builder[index];
+                    // The constructors are designed so _builder is not null when _string is null
+                    return _builder![index];
 				}
 			}
 		}

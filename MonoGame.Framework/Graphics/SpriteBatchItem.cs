@@ -2,13 +2,15 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
+#nullable enable
+
 using System;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
     internal class SpriteBatchItem : IComparable<SpriteBatchItem>
 	{
-		public Texture2D Texture;
+		public Texture2D? Texture;
         public float SortKey;
 
         public VertexPositionColorTexture vertexTL;

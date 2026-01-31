@@ -2,6 +2,8 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
+#nullable enable
+
 using System;
 
 namespace Microsoft.Xna.Framework.Graphics
@@ -12,7 +14,7 @@ namespace Microsoft.Xna.Framework.Graphics
     public sealed partial class TextureCollection
     {
         private readonly GraphicsDevice _graphicsDevice;
-        private readonly Texture[] _textures;
+        private readonly Texture?[] _textures;
         private ShaderStage _stage;
         private int _dirty;
 
@@ -28,7 +30,7 @@ namespace Microsoft.Xna.Framework.Graphics
         /// <summary>
         /// Gets or sets the <see cref="Texture"/> at the specified sampler number.
         /// </summary>
-        public Texture this[int index]
+        public Texture? this[int index]
         {
             get
             {

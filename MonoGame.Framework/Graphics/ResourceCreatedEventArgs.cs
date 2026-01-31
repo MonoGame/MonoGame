@@ -1,4 +1,10 @@
-﻿using System;
+﻿// MonoGame - Copyright (C) MonoGame Foundation, Inc
+// This file is subject to the terms and conditions defined in
+// file 'LICENSE.txt', which is part of this source code package.
+
+#nullable enable
+
+using System;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
@@ -10,6 +16,6 @@ namespace Microsoft.Xna.Framework.Graphics
         /// <summary>
         /// The newly created resource object.
         /// </summary>
-        public Object Resource { get; internal set; }
+        public Object? Resource { get; internal set; }
     }
 }

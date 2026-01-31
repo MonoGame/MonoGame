@@ -2,6 +2,8 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
+#nullable enable
+
 using System;
 using System.Text;
 
@@ -16,11 +18,11 @@ namespace Microsoft.Xna.Framework.Graphics
         readonly SpriteBatcher _batcher;
 
 		SpriteSortMode _sortMode;
-		BlendState _blendState;
-		SamplerState _samplerState;
-		DepthStencilState _depthStencilState; 
-		RasterizerState _rasterizerState;		
-		Effect _effect;
+		BlendState? _blendState;
+		SamplerState? _samplerState;
+		DepthStencilState? _depthStencilState;
+		RasterizerState? _rasterizerState;		
+		Effect? _effect;
         bool _beginCalled;
 
 		SpriteEffect _spriteEffect;
@@ -79,11 +81,11 @@ namespace Microsoft.Xna.Framework.Graphics
         public void Begin
         (
              SpriteSortMode sortMode = SpriteSortMode.Deferred,
-             BlendState blendState = null,
-             SamplerState samplerState = null,
-             DepthStencilState depthStencilState = null,
-             RasterizerState rasterizerState = null,
-             Effect effect = null,
+             BlendState? blendState = null,
+             SamplerState? samplerState = null,
+             DepthStencilState? depthStencilState = null,
+             RasterizerState? rasterizerState = null,
+             Effect? effect = null,
              Matrix? transformMatrix = null
         )
         {
@@ -131,7 +133,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			gd.BlendState = _blendState;
 			gd.DepthStencilState = _depthStencilState;
 			gd.RasterizerState = _rasterizerState;
-			gd.SamplerStates[0] = _samplerState;
+			gd.SamplerStates[0] = _samplerState!; // This should not be null when Setup is called
 
             _spritePass.Apply();
 		}
@@ -1512,7 +1514,9 @@ namespace Microsoft.Xna.Framework.Graphics
                     if (_spriteEffect != null)
                     {
                         _spriteEffect.Dispose();
+#nullable disable // Disable nullability checks to free the reference, which is safely assumed non-null everywhere else
                         _spriteEffect = null;
+#nullable enable
                     }
                 }
             }

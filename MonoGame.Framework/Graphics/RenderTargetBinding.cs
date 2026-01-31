@@ -4,6 +4,8 @@
 //
 // Author: Kenneth James Pouncey
 
+#nullable enable
+
 using System;
 
 namespace Microsoft.Xna.Framework.Graphics

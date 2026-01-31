@@ -2,6 +2,8 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
+#nullable enable
+
 using MonoGame.Interop;
 
 namespace Microsoft.Xna.Framework.Graphics;
@@ -30,7 +32,7 @@ public sealed partial class TextureCollection
 
             var tex = _textures[i];
 
-            if (_textures[i] == null || _textures[i].IsDisposed)
+            if (tex?.IsDisposed ?? true)
                 MGG.GraphicsDevice_SetTexture(device.Handle, _stage, i, null);
             else
             {

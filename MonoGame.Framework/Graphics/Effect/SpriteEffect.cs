@@ -5,6 +5,8 @@
 // Microsoft XNA Community Game Platform
 // Copyright (C) Microsoft Corporation. All rights reserved.
 
+#nullable enable
+
 namespace Microsoft.Xna.Framework.Graphics
 {
     /// <summary>
@@ -22,7 +24,7 @@ namespace Microsoft.Xna.Framework.Graphics
         public SpriteEffect(GraphicsDevice device)
             : base(device, EffectResource.SpriteEffect.Bytecode)
         {
-            CacheEffectParameters();
+            _matrixParam = Parameters["MatrixTransform"];
         }
 
         /// <summary>
@@ -36,7 +38,7 @@ namespace Microsoft.Xna.Framework.Graphics
         protected SpriteEffect(SpriteEffect cloneSource)
             : base(cloneSource)
         {
-            CacheEffectParameters();
+            _matrixParam = Parameters["MatrixTransform"];
         }
 
 
@@ -46,15 +48,6 @@ namespace Microsoft.Xna.Framework.Graphics
         public override Effect Clone()
         {
             return new SpriteEffect(this);
-        }
-
-
-        /// <summary>
-        /// Looks up shortcut references to our effect parameters.
-        /// </summary>
-        void CacheEffectParameters()
-        {
-            _matrixParam = Parameters["MatrixTransform"];
         }
 
         /// <summary>

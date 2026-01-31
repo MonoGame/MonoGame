@@ -2,6 +2,8 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
+#nullable enable
+
 using System;
 using System.Collections.Generic;
 
@@ -50,9 +52,9 @@ namespace Microsoft.Xna.Framework.Graphics
         /// <summary>
         /// Vertex index array. The values in this array never change.
         /// </summary>
-        private short[] _index;
+        private short[]? _index;
 
-        private VertexPositionColorTexture[] _vertexArray;
+        private VertexPositionColorTexture[]? _vertexArray;
 
         public SpriteBatcher(GraphicsDevice device, int capacity = 0)
 		{
@@ -149,7 +151,7 @@ namespace Microsoft.Xna.Framework.Graphics
         /// </summary>
         /// <param name="sortMode">The type of depth sorting desired for the rendering.</param>
         /// <param name="effect">The custom effect to apply to the drawn geometry</param>
-        public unsafe void DrawBatch(SpriteSortMode sortMode, Effect effect)
+        public unsafe void DrawBatch(SpriteSortMode sortMode, Effect? effect)
 		{
             if (effect != null && effect.IsDisposed)
                 throw new ObjectDisposedException("effect");
@@ -184,7 +186,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 // setup the vertexArray array
                 var startIndex = 0;
                 var index = 0;
-                Texture2D tex = null;
+                Texture2D? tex = null;
 
                 int numBatchesToProcess = batchCount;
                 if (numBatchesToProcess > MaxBatchSize)
@@ -239,7 +241,7 @@ namespace Microsoft.Xna.Framework.Graphics
         /// <param name="end">End index of vertices to draw. Not used except to compute the count of vertices to draw.</param>
         /// <param name="effect">The custom effect to apply to the geometry</param>
         /// <param name="texture">The texture to draw.</param>
-        private void FlushVertexArray(int start, int end, Effect effect, Texture texture)
+        private void FlushVertexArray(int start, int end, Effect? effect, Texture? texture)
         {
             if (start == end)
                 return;
@@ -260,7 +262,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
                     _device.DrawUserIndexedPrimitives(
                         PrimitiveType.TriangleList,
-                        _vertexArray,
+                        _vertexArray!,
                         0,
                         vertexCount,
                         _index,
@@ -274,7 +276,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 // If no custom effect is defined, then simply render.
                 _device.DrawUserIndexedPrimitives(
                     PrimitiveType.TriangleList,
-                    _vertexArray,
+                    _vertexArray!,
                     0,
                     vertexCount,
                     _index,

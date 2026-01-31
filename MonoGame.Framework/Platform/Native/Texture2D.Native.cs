@@ -2,6 +2,8 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
+#nullable enable
+
 using System;
 using System.IO;
 using System.Runtime.InteropServices;
@@ -122,7 +124,6 @@ public partial class Texture2D : Texture
         ProcessorType processor = 0;
         if (colorProcessor == DefaultColorProcessors.ZeroTransparentPixels)
         {
-            colorProcessor = null;
             processor |= ProcessorType.ZeroTransparentPixels;
         }
 
@@ -161,7 +162,7 @@ public partial class Texture2D : Texture
         var texture = new Texture2D(graphicsDevice, width, height);
         var rgbaBytes = (width * height) * 4;
 
-        if (colorProcessor == null)
+        if ((processor & ProcessorType.ZeroTransparentPixels) != 0)
         {
             // Without a color processor take the fast path.
 

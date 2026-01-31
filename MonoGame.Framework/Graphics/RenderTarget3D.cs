@@ -2,6 +2,8 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
+#nullable enable
+
 using System;
 
 namespace Microsoft.Xna.Framework.Graphics
@@ -16,7 +18,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		
 		public bool IsContentLost { get { return false; } }
 		
-		public event EventHandler<EventArgs> ContentLost;
+		public event EventHandler<EventArgs> ContentLost = delegate { };
 
         private bool SuppressEventHandlerWarningsUntilEventsAreProperlyImplemented()
         {
