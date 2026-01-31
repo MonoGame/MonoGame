@@ -102,11 +102,8 @@ namespace Microsoft.Xna.Framework.Graphics
 			DepthFormat selectedDepthFormat;
 			int selectedMultiSampleCount;
 
-            if (graphicsDevice != null)
-            {
-                graphicsDevice.Adapter.QueryRenderTargetFormat(graphicsDevice.GraphicsProfile, preferredFormat, DepthFormat.None, 0,
+            graphicsDevice?.Adapter.QueryRenderTargetFormat(graphicsDevice.GraphicsProfile, preferredFormat, DepthFormat.None, 0,
                     out selectedFormat, out selectedDepthFormat, out selectedMultiSampleCount);
-            }
 
             return selectedFormat;
         }

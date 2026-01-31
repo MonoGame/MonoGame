@@ -4,6 +4,8 @@
 //
 // Author: Kenneth James Pouncey
 
+#nullable enable
+
 using MonoGame.OpenGL;
 
 namespace Microsoft.Xna.Framework.Graphics

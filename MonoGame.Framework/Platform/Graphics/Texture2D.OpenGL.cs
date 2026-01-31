@@ -2,6 +2,8 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
+#nullable enable
+
 using System;
 using System.IO;
 using System.Runtime.InteropServices;
@@ -346,14 +348,14 @@ namespace Microsoft.Xna.Framework.Graphics
             bitmapContext.Dispose();
             colorSpace.Dispose();
 
-            Texture2D texture = null;
+            Texture2D? texture = null;
             Threading.BlockOnUIThread(() =>
             {
                 texture = new Texture2D(graphicsDevice, (int)width, (int)height, false, SurfaceFormat.Color);
                 texture.SetData(data);
             });
 
-            return texture;
+            return texture!;
         }
 #elif ANDROID
         private static Texture2D PlatformFromStream(GraphicsDevice graphicsDevice, Bitmap image)
@@ -382,14 +384,14 @@ namespace Microsoft.Xna.Framework.Graphics
             // Convert from ARGB to ABGR
             ConvertToABGR(height, width, pixels);
 
-            Texture2D texture = null;
+            Texture2D? texture = null;
             Threading.BlockOnUIThread(() =>
             {
                 texture = new Texture2D(graphicsDevice, width, height, false, SurfaceFormat.Color);
                 texture.SetData<int>(pixels);
             });
 
-            return texture;
+            return texture!;
         }
 #endif
 

@@ -58,12 +58,10 @@ namespace Microsoft.Xna.Framework.Graphics
 
         internal TextureCube(GraphicsDevice graphicsDevice, int size, bool mipMap, SurfaceFormat format, bool renderTarget)
         {
-            if (graphicsDevice == null)
-                throw new ArgumentNullException("graphicsDevice", FrameworkResources.ResourceCreationWhenDeviceIsNull);
             if (size <= 0)
                 throw new ArgumentOutOfRangeException("size","Cube size must be greater than zero");
 
-            this.GraphicsDevice = graphicsDevice;
+            this.GraphicsDevice = graphicsDevice ?? throw new ArgumentNullException(nameof(graphicsDevice), FrameworkResources.ResourceCreationWhenDeviceIsNull);
 			this.size = size;
             this._format = format;
             this._levelCount = mipMap ? CalculateMipLevels(size) : 1;
@@ -95,8 +93,7 @@ namespace Microsoft.Xna.Framework.Graphics
         /// <exception cref="ArgumentNullException">The <paramref name="data"/> parameter is null.</exception>
         public void GetData<T>(CubeMapFace cubeMapFace, T[] data) where T : struct
         {
-            if (data == null)
-                throw new ArgumentNullException("data");
+            ArgumentNullException.ThrowIfNull(data);
             GetData(cubeMapFace, 0, null, data, 0, data.Length);
         }
 
@@ -211,8 +208,7 @@ namespace Microsoft.Xna.Framework.Graphics
         /// <exception cref="ArgumentNullException">The <paramref name="data"/> parameter is null.</exception>
 		public void SetData<T> (CubeMapFace face, T[] data) where T : struct
 		{
-            if (data == null)
-                throw new ArgumentNullException("data");
+            ArgumentNullException.ThrowIfNull(data);
             SetData(face, 0, null, data, 0, data.Length);
 		}
 
@@ -312,8 +308,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 throw new ArgumentException("level must be smaller than the number of levels in this texture.");
             if (!textureBounds.Contains(checkedRect) || checkedRect.Width <= 0 || checkedRect.Height <= 0)
                 throw new ArgumentException("Rectangle must be inside the texture bounds", "rect");
-            if (data == null)
-                throw new ArgumentNullException("data");
+            ArgumentNullException.ThrowIfNull(data);
             var tSize = ReflectionHelpers.FastSizeOf<T>();
             var fSize = Format.GetSize();
             if (tSize > fSize || fSize % tSize != 0)
