@@ -2,6 +2,8 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
+#nullable enable
+
 using System;
 using System.IO;
 using System.Runtime.InteropServices;
@@ -27,7 +29,7 @@ namespace Microsoft.Xna.Framework.Graphics
         private bool _mipmap;
         private SampleDescription _sampleDescription;
 
-        private SharpDX.Direct3D11.Texture2D _cachedStagingTexture;
+        private SharpDX.Direct3D11.Texture2D? _cachedStagingTexture;
 
         private void PlatformConstruct(int width, int height, bool mipmap, SurfaceFormat format, SurfaceType type, bool shared)
         {
@@ -148,7 +150,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 d3dContext.CopySubresourceRegion(GetTexture(), subresourceIndex, region, _cachedStagingTexture, 0);
 
                 // Copy the data to the array.
-                DataStream stream = null;
+                DataStream? stream = null;
                 try
                 {
                     var databox = d3dContext.MapSubresource(_cachedStagingTexture, 0, MapMode.Read, MapFlags.None, out stream);

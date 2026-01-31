@@ -2,6 +2,8 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
+#nullable enable
+
 using System;
 using System.IO;
 using System.Runtime.InteropServices;
@@ -90,7 +92,7 @@ namespace Microsoft.Xna.Framework.Graphics
                     d3dContext.CopySubresourceRegion(GetTexture(), subresourceIndex, region, stagingTex, 0);
 
                     // Copy the data to the array.
-                    DataStream stream = null;
+                    DataStream? stream = null;
                     try
                     {
                         var databox = d3dContext.MapSubresource(stagingTex, 0, MapMode.Read, MapFlags.None, out stream);

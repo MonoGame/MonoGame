@@ -2,6 +2,8 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
+#nullable enable
+
 using SharpDX.Direct3D11;
 using SharpDX.DXGI;
 
@@ -9,9 +11,9 @@ namespace Microsoft.Xna.Framework.Graphics
 {
     public partial class RenderTarget2D
     {
-        internal RenderTargetView[] _renderTargetViews;
-        internal DepthStencilView _depthStencilView;
-        private SharpDX.Direct3D11.Texture2D _msTexture;
+        internal RenderTargetView[]? _renderTargetViews;
+        internal DepthStencilView? _depthStencilView;
+        private SharpDX.Direct3D11.Texture2D? _msTexture;
 
         private SampleDescription _msSampleDescription;
 
@@ -125,13 +127,13 @@ namespace Microsoft.Xna.Framework.Graphics
         RenderTargetView IRenderTarget.GetRenderTargetView(int arraySlice)
         {
             GenerateIfRequired();
-            return _renderTargetViews[arraySlice];
+            return _renderTargetViews![arraySlice];
         }
 
         DepthStencilView IRenderTarget.GetDepthStencilView()
         {
             GenerateIfRequired();
-            return _depthStencilView;
+            return _depthStencilView!;
         }
 
         internal virtual void ResolveSubresource()

@@ -2,6 +2,8 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
+#nullable enable
+
 using System;
 using SharpDX.DXGI;
 using SharpDX.Direct3D11;
@@ -10,7 +12,7 @@ namespace Microsoft.Xna.Framework.Graphics
 {
     public partial class RenderTargetCube
     {
-        private RenderTargetView[] _renderTargetViews;
+        private RenderTargetView[]? _renderTargetViews;
         private DepthStencilView _depthStencilView;
 
         private void PlatformConstruct(GraphicsDevice graphicsDevice, bool mipMap, DepthFormat preferredDepthFormat, int preferredMultiSampleCount, RenderTargetUsage usage)
@@ -87,7 +89,7 @@ namespace Microsoft.Xna.Framework.Graphics
         /// <inheritdoc/>
         public RenderTargetView GetRenderTargetView(int arraySlice)
         {
-            return _renderTargetViews[arraySlice];
+            return _renderTargetViews![arraySlice];
         }
 
         /// <inheritdoc/>

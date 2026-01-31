@@ -2,6 +2,8 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
+#nullable enable
+
 using System;
 using SharpDX.Direct3D11;
 
@@ -10,7 +12,7 @@ namespace Microsoft.Xna.Framework.Graphics
     public partial class RenderTarget3D
     {
         private int _currentSlice;
-        private RenderTargetView _renderTargetView;
+        private RenderTargetView? _renderTargetView;
         private DepthStencilView _depthStencilView;
 
         private void PlatformConstruct(GraphicsDevice graphicsDevice, int width, int height, bool mipMap,

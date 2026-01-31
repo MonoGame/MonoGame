@@ -2,6 +2,8 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
+#nullable enable
+
 using StbImageSharp;
 using StbImageWriteSharp;
 using System;
@@ -41,8 +43,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 colorProcessor(result.Data);
             }
 
-            Texture2D texture = null;
-            texture = new Texture2D(graphicsDevice, result.Width, result.Height);
+            Texture2D texture = new Texture2D(graphicsDevice, result.Width, result.Height);
             texture.SetData(result.Data);
 
             return texture;
@@ -78,7 +79,7 @@ namespace Microsoft.Xna.Framework.Graphics
             {
                 throw new ArgumentOutOfRangeException("height", height, "'height' cannot be less than or equal to zero");
             }
-            Color[] data = null;
+            Color[]? data = null;
             try
             {
                 data = GetColorData();

@@ -4,6 +4,8 @@
 //
 // Author: Kenneth James Pouncey
 
+#nullable enable
+
 namespace Microsoft.Xna.Framework.Graphics
 {
     public sealed partial class SamplerStateCollection
@@ -49,7 +51,7 @@ namespace Microsoft.Xna.Framework.Graphics
                     continue;
 
                 var sampler = _actualSamplers[i];
-                SharpDX.Direct3D11.SamplerState state = null;
+                SharpDX.Direct3D11.SamplerState? state = null;
                 if (sampler != null)
                     state = sampler.GetState(device);
 

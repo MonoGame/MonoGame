@@ -2,6 +2,8 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
+#nullable enable
+
 namespace Microsoft.Xna.Framework.Graphics
 {
     public sealed partial class TextureCollection
@@ -72,11 +74,11 @@ namespace Microsoft.Xna.Framework.Graphics
 
                 var tex = _textures[i];
 
-                if (_textures[i] == null || _textures[i].IsDisposed)
+                if (tex?.IsDisposed ?? true)
                     shaderStage.SetShaderResource(i, null);
                 else
                 {
-                    shaderStage.SetShaderResource(i, _textures[i].GetShaderResourceView());
+                    shaderStage.SetShaderResource(i, tex.GetShaderResourceView());
                     unchecked
                     {
                         _graphicsDevice._graphicsMetrics._textureCount++;
