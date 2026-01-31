@@ -21,7 +21,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		BlendState? _blendState;
 		SamplerState? _samplerState;
 		DepthStencilState? _depthStencilState;
-		RasterizerState? _rasterizerState;		
+		RasterizerState? _rasterizerState;
 		Effect? _effect;
         bool _beginCalled;
 
