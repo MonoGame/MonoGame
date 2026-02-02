@@ -5,5 +5,8 @@
     <AppBundleExtraOptions>$(AppBundleExtraOptions) -gcc_flags '-framework CoreAudio -framework AudioToolbox'</AppBundleExtraOptions>
   </PropertyGroup>
 
-</Project>
+  <ItemGroup>
+    <CompilerVisibleProperty Include="MonoGamePlatform" />
+  </ItemGroup>
 
+</Project>

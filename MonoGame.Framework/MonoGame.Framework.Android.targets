@@ -4,5 +4,8 @@
     <MonoGamePlatform>Android</MonoGamePlatform>
   </PropertyGroup>
 
-</Project>
+  <ItemGroup>
+    <CompilerVisibleProperty Include="MonoGamePlatform" />
+  </ItemGroup>
 
+</Project>
