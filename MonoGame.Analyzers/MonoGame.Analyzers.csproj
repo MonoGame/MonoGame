@@ -1,0 +1,50 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <Import Project="..\MonoGame.props" />
+
+    <PropertyGroup>
+        <!-- Build Settings -->
+        <TargetFramework>netstandard2.0</TargetFramework>
+        <LangVersion>latest</LangVersion>
+        <IncludeBuildOutput>false</IncludeBuildOutput>
+        <BaseOutputPath>..\Artifacts\MonoGame.Analyzers</BaseOutputPath>
+        <AssemblyName>MonoGame.Analyzers</AssemblyName>
+        <RootNamespace>MonoGame.Analyzers</RootNamespace>
+        <EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
+
+        <!-- Pack Settings -->
+        <IsPackable>True</IsPackable>
+        <Description>Roslyn analyzers for MonoGame project.</Description>
+        <PackageTags>monogame;roslyn;analyzers</PackageTags>
+        <PackageReadmeFile>README-packages.md</PackageReadmeFile>
+
+        <!-- Put the analyzer dll in the NuGet analyzer folder -->
+        <NoPackageAnalysis>true</NoPackageAnalysis>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <!-- Pack the analyzer DLL into analyzers/dotnet/cs/ -->
+        <None Include="$(TargetPath)"
+              Pack="true"
+              PackagePath="analyzers/dotnet/cs/" />
+
+        <!--
+              Additional files to include for analyzer releases
+              Read more at: https://github.com/dotnet/roslyn-analyzers/blob/main/src/Microsoft.CodeAnalysis.Analyzers/ReleaseTrackingAnalyzers.Help.md
+        -->
+        <AdditionalFiles Include="AnalyzerReleases.Shipped.md" />
+        <AdditionalFiles Include="AnalyzerReleases.Unshipped.md" />
+
+        <None Include="..\README-packages.md" Pack="true" PackagePath="\" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Microsoft.CodeAnalysis.CSharp"
+                          Version="4.8.0"
+                          PrivateAssets="all" />
+        <PackageReference Include="Microsoft.CodeAnalysis.Analyzers"
+                          Version="3.3.4"
+                          PrivateAssets="all" />
+    </ItemGroup>
+
+</Project>
