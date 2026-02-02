@@ -4,4 +4,4 @@
 
 Rule ID | Category | Severity | Notes
 --------|----------|----------|--------------------
-MG0001 | MonoGame.Compatibility | Error | API Unsupported on platform
+MG0001 | MonoGame.Compatibility | Warning | API Unsupported on platform

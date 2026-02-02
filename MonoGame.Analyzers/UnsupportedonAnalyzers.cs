@@ -17,7 +17,7 @@ public sealed class UnsupportedOnAnalyzer : DiagnosticAnalyzer
         "API is not supported on this MonoGame platform",
         "{0}",
         "MonoGame.Compatibility",
-        DiagnosticSeverity.Error,
+        DiagnosticSeverity.Warning,
         isEnabledByDefault: true);
 
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => ImmutableArray.Create(Rule);
