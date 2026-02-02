@@ -35,13 +35,13 @@ public sealed class BuildTemplatesTask : FrostingTask<BuildContext> { }
 [IsDependentOn(typeof(BuildToolTestsTask))]
 public sealed class BuildAllTestsTask : FrostingTask<BuildContext> { }
 
-
 [TaskName("Build All")]
 [IsDependentOn(typeof(BuildShadersTask))]
 [IsDependentOn(typeof(BuildFrameworksTask))]
 [IsDependentOn(typeof(BuildToolsTask))]
 [IsDependentOn(typeof(BuildTemplatesTask))]
 [IsDependentOn(typeof(BuildAllTestsTask))]
+[IsDependentOn(typeof(BuildAnalyzerTask))]
 public sealed class BuildAllTask : FrostingTask<BuildContext> { }
 
 [TaskName("Deploy")]

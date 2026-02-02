@@ -16,7 +16,8 @@ public enum ProjectType
     ContentPipeline,
     DevTools,
     MGCBEditor,
-    MGCBEditorLauncher
+    MGCBEditorLauncher,
+    Analyzer
 }
 
 public class BuildContext : FrostingContext
@@ -167,6 +168,7 @@ public class BuildContext : FrostingContext
         ProjectType.DevTools => "src/MonoGame.Framework.DevTools/MonoGame.Framework.DevTools.csproj",
         ProjectType.MGCBEditor => $"Tools/MonoGame.Content.Builder.Editor/MonoGame.Content.Builder.Editor.{id}.csproj",
         ProjectType.MGCBEditorLauncher => $"Tools/MonoGame.Content.Builder.Editor.Launcher/MonoGame.Content.Builder.Editor.Launcher.{id}.csproj",
+        ProjectType.Analyzer => "MonoGame.Analyzers/MonoGame.Analyzers.csproj",
         _ => throw new ArgumentOutOfRangeException(nameof(type))
     };
 
@@ -298,6 +300,13 @@ public static class BuildContextExtensions
     {
         context.Information($"Packaging Tools Binaries {inputPath}...");
         context.DotNetBinariesPublishSettings.OutputDirectory = $"{context.BinariesDirectory}/MonoGame.Framework.Content.Pipeline/";
+        context.DotNetPublish(inputPath, context.DotNetBinariesPublishSettings);
+    }
+
+    public static void PublishAnalyzerBinaries(this BuildContext context, string inputPath)
+    {
+        context.Information($"Packaging Analyzers Binaries {inputPath}...");
+        context.DotNetBinariesPublishSettings.OutputDirectory = $"{context.BinariesDirectory}/MonoGame.Analyzers/";
         context.DotNetPublish(inputPath, context.DotNetBinariesPublishSettings);
     }
 
