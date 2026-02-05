@@ -19,7 +19,7 @@ jobs:
           - os: windows-latest
             platform: windows
             shell: pwsh
-          - os: macos-26
+          - os: macos-latest
             platform: macos
             shell: bash
           - os: ubuntu-24.04
