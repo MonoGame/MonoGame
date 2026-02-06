@@ -10,7 +10,7 @@ namespace Microsoft.Xna.Framework.Input
 	public enum Keys
 	{
         /// <summary>
-        /// Reserved.
+        /// No key set.
         /// </summary>
 		None = 0,
         /// <summary>
