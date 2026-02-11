@@ -492,35 +492,31 @@ namespace Microsoft.Xna.Framework
         public static void CreateBillboard(ref Vector3 objectPosition, ref Vector3 cameraPosition,
             ref Vector3 cameraUpVector, Vector3? cameraForwardVector, out Matrix result)
         {
-            Vector3 vector;
-            Vector3 vector2;
-            Vector3 vector3;
-            vector.X = objectPosition.X - cameraPosition.X;
-            vector.Y = objectPosition.Y - cameraPosition.Y;
-            vector.Z = objectPosition.Z - cameraPosition.Z;
-            float num = vector.LengthSquared();
+            Vector3 cameraDir = objectPosition - cameraPosition;
+
+            // Normalize cameraDir
+            float num = cameraDir.LengthSquared();
             if (num < 0.0001f)
             {
-                vector = cameraForwardVector.HasValue ? -cameraForwardVector.Value : Vector3.Forward;
+                cameraDir = cameraForwardVector.HasValue ? -cameraForwardVector.Value : Vector3.Forward;
             }
             else
             {
-                Vector3.Multiply(ref vector, 1f / MathF.Sqrt(num), out vector);
+                Vector3.Multiply(ref cameraDir, 1f / MathF.Sqrt(num), out cameraDir);
             }
-            Vector3.Cross(ref cameraUpVector, ref vector, out vector3);
-            vector3.Normalize();
-            Vector3.Cross(ref vector, ref vector3, out vector2);
-            result.M11 = vector3.X;
-            result.M12 = vector3.Y;
-            result.M13 = vector3.Z;
+            Vector3 right = Vector3.Normalize(Vector3.Cross(cameraUpVector, cameraDir));
+            Vector3 up = Vector3.Cross(cameraDir, right);
+            result.M11 = right.X;
+            result.M12 = right.Y;
+            result.M13 = right.Z;
             result.M14 = 0;
-            result.M21 = vector2.X;
-            result.M22 = vector2.Y;
-            result.M23 = vector2.Z;
+            result.M21 = up.X;
+            result.M22 = up.Y;
+            result.M23 = up.Z;
             result.M24 = 0;
-            result.M31 = vector.X;
-            result.M32 = vector.Y;
-            result.M33 = vector.Z;
+            result.M31 = cameraDir.X;
+            result.M32 = cameraDir.Y;
+            result.M33 = cameraDir.Z;
             result.M34 = 0;
             result.M41 = objectPosition.X;
             result.M42 = objectPosition.Y;
