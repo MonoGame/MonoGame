@@ -89,6 +89,13 @@ namespace MonoGame.Tests.Input
             Assert.AreEqual(true, orState.IsKeyDown(Keys.D9));
             Assert.AreEqual(false, orState.IsKeyDown(Keys.F1));
 
+            var xorState = orState ^ randState;
+            Assert.AreEqual(false, xorState.IsKeyDown(Keys.A));
+            Assert.AreEqual(true, xorState.IsKeyDown(Keys.B));
+            Assert.AreEqual(false, xorState.IsKeyDown(Keys.D0));
+            Assert.AreEqual(true, xorState.IsKeyDown(Keys.D1));
+            Assert.AreEqual(true, xorState.IsKeyDown(Keys.F1));
+
             var invState = ~orState;
             Assert.AreEqual(false, invState.IsKeyDown(Keys.A));
             Assert.AreEqual(false, invState.IsKeyDown(Keys.Z));
@@ -111,13 +118,13 @@ namespace MonoGame.Tests.Input
             var shiftState = new KeyboardState(Keys.LeftShift);
             var ctrlCState = new KeyboardState(Keys.LeftControl, Keys.C);
 
-            Assert.AreEqual(true, aState.AnyKeyDown());
-            Assert.AreEqual(false, shiftState.AnyKeyDown());
-            Assert.AreEqual(true, shfitAState.AnyKeyDown());
+            Assert.AreEqual(true, aState.AnyKeyDown(includeModifiers: false));
+            Assert.AreEqual(false, shiftState.AnyKeyDown(includeModifiers: false));
+            Assert.AreEqual(true, shfitAState.AnyKeyDown(includeModifiers: false));
 
-            Assert.AreEqual(true, aState.AnyKeyOrModifierDown());
-            Assert.AreEqual(true, shiftState.AnyKeyOrModifierDown());
-            Assert.AreEqual(true, shfitAState.AnyKeyOrModifierDown());
+            Assert.AreEqual(true, aState.AnyKeyDown());
+            Assert.AreEqual(true, shiftState.AnyKeyDown());
+            Assert.AreEqual(true, shfitAState.AnyKeyDown());
 
             // when keys == [A]
             //   A =         true
@@ -127,13 +134,13 @@ namespace MonoGame.Tests.Input
             //   Shift + B = false
             // when keys == [Shift]
             //   Shift     = false
-            Assert.AreEqual(true, aState.AnyKeyDown(aState));
-            Assert.AreEqual(true, shfitAState.AnyKeyDown(aState));
-            Assert.AreEqual(false, shiftState.AnyKeyDown(aState));
-            Assert.AreEqual(false, bState.AnyKeyDown(aState));
-            Assert.AreEqual(false, shiftBState.AnyKeyDown(aState));
-            Assert.AreEqual(false, ctrlCState.AnyKeyDown(aState));
-            Assert.AreEqual(false, shiftState.AnyKeyDown(shiftState));
+            Assert.AreEqual(true, aState.AnyKeyDown(aState, includeModifiers: false));
+            Assert.AreEqual(true, shfitAState.AnyKeyDown(aState, includeModifiers: false));
+            Assert.AreEqual(false, shiftState.AnyKeyDown(aState, includeModifiers: false));
+            Assert.AreEqual(false, bState.AnyKeyDown(aState, includeModifiers: false));
+            Assert.AreEqual(false, shiftBState.AnyKeyDown(aState, includeModifiers: false));
+            Assert.AreEqual(false, ctrlCState.AnyKeyDown(aState, includeModifiers: false));
+            Assert.AreEqual(false, shiftState.AnyKeyDown(shiftState, includeModifiers: false));
 
             // when keys == [A]
             //   A =         true
@@ -143,13 +150,13 @@ namespace MonoGame.Tests.Input
             //   Shift + B = false
             // when keys == [Shift]
             //   Shift     = true
-            Assert.AreEqual(true, aState.AnyKeyOrModifierDown(aState));
-            Assert.AreEqual(true, shfitAState.AnyKeyOrModifierDown(aState));
-            Assert.AreEqual(false, shiftState.AnyKeyOrModifierDown(aState));
-            Assert.AreEqual(false, bState.AnyKeyOrModifierDown(aState));
-            Assert.AreEqual(false, shiftBState.AnyKeyOrModifierDown(aState));
-            Assert.AreEqual(false, ctrlCState.AnyKeyOrModifierDown(aState));
-            Assert.AreEqual(true, shiftState.AnyKeyOrModifierDown(shiftState));
+            Assert.AreEqual(true, aState.AnyKeyDown(aState));
+            Assert.AreEqual(true, shfitAState.AnyKeyDown(aState));
+            Assert.AreEqual(false, shiftState.AnyKeyDown(aState));
+            Assert.AreEqual(false, bState.AnyKeyDown(aState));
+            Assert.AreEqual(false, shiftBState.AnyKeyDown(aState));
+            Assert.AreEqual(false, ctrlCState.AnyKeyDown(aState));
+            Assert.AreEqual(true, shiftState.AnyKeyDown(shiftState));
 
             // when keys == [A]
             //   A =         false
@@ -157,12 +164,12 @@ namespace MonoGame.Tests.Input
             //   Shift =     false
             //   B =         true
             //   Shift + B = true
-            Assert.AreEqual(false, aState.AnyKeyDownExcept(aState));
-            Assert.AreEqual(false, shfitAState.AnyKeyDownExcept(aState));
-            Assert.AreEqual(false, shiftState.AnyKeyDownExcept(aState));
-            Assert.AreEqual(true, bState.AnyKeyDownExcept(aState));
-            Assert.AreEqual(true, shiftBState.AnyKeyDownExcept(aState));
-            Assert.AreEqual(true, ctrlCState.AnyKeyDownExcept(aState));
+            Assert.AreEqual(false, aState.AnyKeyDownExcept(aState, includeModifiers: false));
+            Assert.AreEqual(false, shfitAState.AnyKeyDownExcept(aState, includeModifiers: false));
+            Assert.AreEqual(false, shiftState.AnyKeyDownExcept(aState, includeModifiers: false));
+            Assert.AreEqual(true, bState.AnyKeyDownExcept(aState, includeModifiers: false));
+            Assert.AreEqual(true, shiftBState.AnyKeyDownExcept(aState, includeModifiers: false));
+            Assert.AreEqual(true, ctrlCState.AnyKeyDownExcept(aState, includeModifiers: false));
 
             // when keys == [A]
             //   A =         false
@@ -170,12 +177,12 @@ namespace MonoGame.Tests.Input
             //   Shift =     true
             //   B =         true
             //   Shift + B = true
-            Assert.AreEqual(false, aState.AnyKeyOrModifierDownExcept(aState));
-            Assert.AreEqual(true, shfitAState.AnyKeyOrModifierDownExcept(aState));
-            Assert.AreEqual(true, shiftState.AnyKeyOrModifierDownExcept(aState));
-            Assert.AreEqual(true, bState.AnyKeyOrModifierDownExcept(aState));
-            Assert.AreEqual(true, shiftBState.AnyKeyOrModifierDownExcept(aState));
-            Assert.AreEqual(true, ctrlCState.AnyKeyOrModifierDownExcept(aState));
+            Assert.AreEqual(false, aState.AnyKeyDownExcept(aState));
+            Assert.AreEqual(true, shfitAState.AnyKeyDownExcept(aState));
+            Assert.AreEqual(true, shiftState.AnyKeyDownExcept(aState));
+            Assert.AreEqual(true, bState.AnyKeyDownExcept(aState));
+            Assert.AreEqual(true, shiftBState.AnyKeyDownExcept(aState));
+            Assert.AreEqual(true, ctrlCState.AnyKeyDownExcept(aState));
         }
     }
 }
