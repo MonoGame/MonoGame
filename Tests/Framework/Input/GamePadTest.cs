@@ -306,7 +306,7 @@ namespace MonoGame.Tests.Input
 
 #if !XNA
             var gamePadButtons = state.Buttons;
-            Assert.AreEqual(joinedButtons, gamePadButtons._buttons);
+            Assert.AreEqual(joinedButtons, gamePadButtons.Buttons);
 #endif
 
             // all buttons except for thumbstick position buttons and triggers (they're not controlled via buttons here)
