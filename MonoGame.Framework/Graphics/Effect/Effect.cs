@@ -104,6 +104,11 @@ namespace Microsoft.Xna.Framework.Graphics
         /// <param name="count">Number of bytes to read from the <paramref name="effectCode"/> array.</param>
         /// <exception cref="Exception">Invoked when the <paramref name="effectCode"/> is not a valid MGFX effect file or is for an incompatible version of MonoGame.</exception>
         /// <exception cref="ArgumentException">This <paramref name="effectCode"/> is invalid.</exception>
+        /// <remarks>
+        /// The <paramref name="index"/> and <paramref name="count"/> parameters do not need to take the header of the file into account; this will be calculated first,
+        /// and the <paramref name="index"/> and <paramref name="count"/> will be adjusted to point to the effect content after the header. <br/>
+        /// Therefore,do <strong>not</strong> enter the size of the header into those parameters! This is done for you!
+        /// </remarks>
         public Effect (GraphicsDevice graphicsDevice, byte[] effectCode, int index, int count)
             : this(graphicsDevice)
 		{
