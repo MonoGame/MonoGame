@@ -318,11 +318,8 @@ namespace Microsoft.Xna.Framework
             {
                 if (_graphicsDeviceService is null)
                 {
-                    _graphicsDeviceService = (IGraphicsDeviceService)
-                        Services.GetService(typeof(IGraphicsDeviceService));
-
-                    if (_graphicsDeviceService is null)
-                        throw new InvalidOperationException("No Graphics Device Service");
+                    _graphicsDeviceService = Services.GetService<IGraphicsDeviceService>()
+                        ?? throw new InvalidOperationException("No Graphics Device Service");
                 }
                 return _graphicsDeviceService.GraphicsDevice;
             }
@@ -679,8 +676,8 @@ namespace Microsoft.Xna.Framework
             // Initialize all existing components
             InitializeExistingComponents();
 
-            _graphicsDeviceService = (IGraphicsDeviceService)
-                Services.GetService(typeof(IGraphicsDeviceService));
+            _graphicsDeviceService = Services.GetService<IGraphicsDeviceService>()
+                ?? throw new InvalidOperationException("No Graphics Device Service");
 
             if (_graphicsDeviceService is not null &&
                 _graphicsDeviceService.GraphicsDevice is not null)
