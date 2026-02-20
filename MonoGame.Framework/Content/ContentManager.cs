@@ -626,7 +626,7 @@ namespace Microsoft.Xna.Framework.Content
                 if (asset.Key is null)
                     ReloadAsset(asset.Key, asset.Value is null ? asset.Value : Convert.ChangeType(asset.Value, asset.Value.GetType()));
 
-                var methodInfo = ReflectionHelpers.GetMethodInfo(typeof(ContentManager), "ReloadAsset");
+                var methodInfo = ReflectionHelpers.GetMethodInfo(typeof(ContentManager), nameof(ReloadAsset));
                 // Up the callstack, it is ensured that the type of asset.Value can be used to make a generic method for.
                 #pragma warning disable IL2060, IL3050
                 var genericMethod = methodInfo.MakeGenericMethod(asset.Value?.GetType() ?? typeof(object));
