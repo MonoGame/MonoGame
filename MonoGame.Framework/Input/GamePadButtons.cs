@@ -9,7 +9,10 @@ namespace Microsoft.Xna.Framework.Input
     /// </summary>
     public struct GamePadButtons
     {
-        internal readonly Buttons _buttons;
+        /// <summary>
+        /// A value representing all currently pressed buttons
+        /// </summary>
+        public readonly Buttons Buttons;
 
         /// <summary>
         /// Gets a value indicating if the button A is pressed.
@@ -19,7 +22,7 @@ namespace Microsoft.Xna.Framework.Input
         {
             get
             {
-                return ((_buttons & Buttons.A) == Buttons.A) ? ButtonState.Pressed : ButtonState.Released;
+                return ((Buttons & Buttons.A) == Buttons.A) ? ButtonState.Pressed : ButtonState.Released;
             }
         }
 
@@ -31,7 +34,7 @@ namespace Microsoft.Xna.Framework.Input
         {
             get
             {
-                return ((_buttons & Buttons.B) == Buttons.B) ? ButtonState.Pressed : ButtonState.Released;
+                return ((Buttons & Buttons.B) == Buttons.B) ? ButtonState.Pressed : ButtonState.Released;
             }
         }
 
@@ -43,7 +46,7 @@ namespace Microsoft.Xna.Framework.Input
         {
             get
             {
-                return ((_buttons & Buttons.Back) == Buttons.Back) ? ButtonState.Pressed : ButtonState.Released;
+                return ((Buttons & Buttons.Back) == Buttons.Back) ? ButtonState.Pressed : ButtonState.Released;
             }
         }
 
@@ -55,7 +58,7 @@ namespace Microsoft.Xna.Framework.Input
         {
             get
             {
-                return ((_buttons & Buttons.X) == Buttons.X) ? ButtonState.Pressed : ButtonState.Released;
+                return ((Buttons & Buttons.X) == Buttons.X) ? ButtonState.Pressed : ButtonState.Released;
             }
         }
 
@@ -67,7 +70,7 @@ namespace Microsoft.Xna.Framework.Input
         {
             get
             {
-                return ((_buttons & Buttons.Y) == Buttons.Y) ? ButtonState.Pressed : ButtonState.Released;
+                return ((Buttons & Buttons.Y) == Buttons.Y) ? ButtonState.Pressed : ButtonState.Released;
             }
         }
 
@@ -79,7 +82,7 @@ namespace Microsoft.Xna.Framework.Input
         {
             get
             {
-                return ((_buttons & Buttons.Start) == Buttons.Start) ? ButtonState.Pressed : ButtonState.Released;
+                return ((Buttons & Buttons.Start) == Buttons.Start) ? ButtonState.Pressed : ButtonState.Released;
             }
         }
 
@@ -91,7 +94,7 @@ namespace Microsoft.Xna.Framework.Input
         {
             get
             {
-                return ((_buttons & Buttons.LeftShoulder) == Buttons.LeftShoulder) ? ButtonState.Pressed : ButtonState.Released;
+                return ((Buttons & Buttons.LeftShoulder) == Buttons.LeftShoulder) ? ButtonState.Pressed : ButtonState.Released;
             }
         }
 
@@ -103,7 +106,7 @@ namespace Microsoft.Xna.Framework.Input
         {
             get
             {
-                return ((_buttons & Buttons.LeftStick) == Buttons.LeftStick) ? ButtonState.Pressed : ButtonState.Released;
+                return ((Buttons & Buttons.LeftStick) == Buttons.LeftStick) ? ButtonState.Pressed : ButtonState.Released;
             }
         }
 
@@ -115,7 +118,7 @@ namespace Microsoft.Xna.Framework.Input
         {
             get
             {
-                return ((_buttons & Buttons.RightShoulder) == Buttons.RightShoulder) ? ButtonState.Pressed : ButtonState.Released;
+                return ((Buttons & Buttons.RightShoulder) == Buttons.RightShoulder) ? ButtonState.Pressed : ButtonState.Released;
             }
         }
 
@@ -127,7 +130,7 @@ namespace Microsoft.Xna.Framework.Input
         {
             get
             {
-                return ((_buttons & Buttons.RightStick) == Buttons.RightStick) ? ButtonState.Pressed : ButtonState.Released;
+                return ((Buttons & Buttons.RightStick) == Buttons.RightStick) ? ButtonState.Pressed : ButtonState.Released;
             }
         }
 
@@ -139,7 +142,7 @@ namespace Microsoft.Xna.Framework.Input
         {
             get
             {
-                return ((_buttons & Buttons.BigButton) == Buttons.BigButton) ? ButtonState.Pressed : ButtonState.Released;
+                return ((Buttons & Buttons.BigButton) == Buttons.BigButton) ? ButtonState.Pressed : ButtonState.Released;
             }
         }
 
@@ -150,13 +153,13 @@ namespace Microsoft.Xna.Framework.Input
         /// <param name="buttons">Buttons to be set as pressed in.</param>
         public GamePadButtons(Buttons buttons)
         {
-            _buttons = buttons;
+            Buttons = buttons;
         }
 
         internal GamePadButtons(params Buttons[] buttons) : this()
         {
             foreach (Buttons b in buttons)
-                _buttons |= b;
+                Buttons |= b;
         }
 
         /// <summary>
@@ -167,7 +170,7 @@ namespace Microsoft.Xna.Framework.Input
         /// <returns>true if <paramref name="left"/> and <paramref name="right"/> are equal; otherwise, false.</returns>
         public static bool operator ==(GamePadButtons left, GamePadButtons right)
         {
-            return left._buttons == right._buttons;
+            return left.Buttons == right.Buttons;
         }
 
         /// <summary>
@@ -198,7 +201,7 @@ namespace Microsoft.Xna.Framework.Input
         /// hash table.</returns>
         public override int GetHashCode ()
         {
-            return (int)_buttons;
+            return (int)Buttons;
         }
 
         /// <summary>

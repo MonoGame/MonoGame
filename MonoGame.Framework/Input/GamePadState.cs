@@ -112,7 +112,7 @@ namespace Microsoft.Xna.Framework.Input
         /// </summary>
         private Buttons GetVirtualButtons ()
         {
-            var result = Buttons._buttons;
+            var result = Buttons.Buttons;
 
             result |= ThumbSticks._virtualButtons;
 
