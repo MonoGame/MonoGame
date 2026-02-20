@@ -636,12 +636,12 @@ static VkPrimitiveTopology ToVkPrimitiveTopology(MGPrimitiveType type)
 	}
 }
 
-static VkImageViewType ToVkImageViewType(MGTextureType type)
+static VkImageViewType ToVkImageViewType(MGTextureType type, int layerCount = 1)
 {
 	switch (type)
 	{
 	case MGTextureType::_2D:
-		return VK_IMAGE_VIEW_TYPE_2D;
+		return layerCount > 1 ? VK_IMAGE_VIEW_TYPE_2D_ARRAY : VK_IMAGE_VIEW_TYPE_2D;
 	case MGTextureType::_3D:
 		return VK_IMAGE_VIEW_TYPE_3D;
 	case MGTextureType::Cube:
@@ -1056,7 +1056,7 @@ static VkImageView CreateImageView(MGG_GraphicsDevice* device, MGG_Texture* text
 
 	VkImageViewCreateInfo image_view_create_info = { VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO };
 	image_view_create_info.image = texture->image;
-	image_view_create_info.viewType = ToVkImageViewType(texture->type);
+	image_view_create_info.viewType = ToVkImageViewType(texture->type, layer_count);
 	image_view_create_info.format = format;
 	image_view_create_info.subresourceRange.aspectMask = aspect_mask;
 	image_view_create_info.subresourceRange.baseMipLevel = 0;

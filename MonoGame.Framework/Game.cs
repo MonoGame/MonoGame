@@ -42,8 +42,8 @@ namespace Microsoft.Xna.Framework
                 (u, handler) => u.UpdateOrderChanged += handler,
                 (u, handler) => u.UpdateOrderChanged -= handler);
 
-        private IGraphicsDeviceManager _graphicsDeviceManager;
-        private IGraphicsDeviceService _graphicsDeviceService;
+        private IGraphicsDeviceManager? _graphicsDeviceManager;
+        private IGraphicsDeviceService? _graphicsDeviceService;
 
         private bool _initialized = false;
         private bool _isFixedTimeStep = true;
@@ -63,7 +63,7 @@ namespace Microsoft.Xna.Framework
         /// </summary>
         public Game()
         {
-            _instance = this;
+            Instance = this;
 
             LaunchParameters = new LaunchParameters();
             _services = new GameServiceContainer();
@@ -92,7 +92,7 @@ namespace Microsoft.Xna.Framework
 		[System.Diagnostics.Conditional("DEBUG")]
 		internal void Log(string Message)
 		{
-			if (Platform != null) Platform.Log(Message);
+			Platform?.Log(Message);
 		}
 
         #region IDisposable Implementation
@@ -117,31 +117,28 @@ namespace Microsoft.Xna.Framework
                     for (int i = 0; i < _components.Count; i++)
                     {
                         var disposable = _components[i] as IDisposable;
-                        if (disposable != null)
-                            disposable.Dispose();
+                        disposable?.Dispose();
                     }
-                    _components = null;
+                    _components = null!;
 
-                    if (_content != null)
-                    {
-                        _content.Dispose();
-                        _content = null;
-                    }
 
-                    if (_graphicsDeviceManager != null)
+                    _content?.Dispose();
+                    _content = null!;
+
+                    if (_graphicsDeviceManager is not null)
                     {
-                        (_graphicsDeviceManager as GraphicsDeviceManager).Dispose();
+                        (_graphicsDeviceManager as IDisposable)?.Dispose();
                         _graphicsDeviceManager = null;
                     }
 
-                    if (Platform != null)
+                    if (Platform is not null)
                     {
                         Platform.Activated -= OnActivated;
                         Platform.Deactivated -= OnDeactivated;
                         _services.RemoveService(typeof(GamePlatform));
 
                         Platform.Dispose();
-                        Platform = null;
+                        Platform = null!;
                     }
 
                     ContentTypeReaderManager.ClearTypeCreators();
@@ -153,7 +150,7 @@ namespace Microsoft.Xna.Framework
                 Activity = null;
 #endif
                 _isDisposed = true;
-                _instance = null;
+                Instance = null;
             }
         }
 
@@ -175,8 +172,7 @@ namespace Microsoft.Xna.Framework
 #if ANDROID
         public static AndroidGameActivity Activity { get; internal set; }
 #endif
-        private static Game _instance = null;
-        internal static Game Instance { get { return Game._instance; } }
+        internal static Game? Instance { get; private set; }
 
         /// <summary>
         /// The start up parameters for this <see cref="Game"/>.
@@ -303,8 +299,8 @@ namespace Microsoft.Xna.Framework
             get { return _content; }
             set
             {
-                if (value == null)
-                    throw new ArgumentNullException();
+                if (value is null)
+                    throw new ArgumentNullException(nameof(value));
 
                 _content = value;
             }
@@ -320,12 +316,12 @@ namespace Microsoft.Xna.Framework
         {
             get
             {
-                if (_graphicsDeviceService == null)
+                if (_graphicsDeviceService is null)
                 {
                     _graphicsDeviceService = (IGraphicsDeviceService)
                         Services.GetService(typeof(IGraphicsDeviceService));
 
-                    if (_graphicsDeviceService == null)
+                    if (_graphicsDeviceService is null)
                         throw new InvalidOperationException("No Graphics Device Service");
                 }
                 return _graphicsDeviceService.GraphicsDevice;
@@ -360,22 +356,22 @@ namespace Microsoft.Xna.Framework
         /// <summary>
         /// Raised when the game gains focus.
         /// </summary>
-        public event EventHandler<EventArgs> Activated;
+        public event EventHandler<EventArgs> Activated = delegate { };
 
         /// <summary>
         /// Raised when the game loses focus.
         /// </summary>
-        public event EventHandler<EventArgs> Deactivated;
+        public event EventHandler<EventArgs> Deactivated = delegate { };
 
         /// <summary>
         /// Raised when this game is being disposed.
         /// </summary>
-        public event EventHandler<EventArgs> Disposed;
+        public event EventHandler<EventArgs> Disposed = delegate { };
 
         /// <summary>
         /// Raised when this game is exiting.
         /// </summary>
-        public event EventHandler<ExitingEventArgs> Exiting;
+        public event EventHandler<ExitingEventArgs> Exiting = delegate { };
 
         #endregion
 
@@ -399,7 +395,7 @@ namespace Microsoft.Xna.Framework
         public void ResetElapsedTime()
         {
             Platform.ResetElapsedTime();
-            if (_gameTimer != null)
+            if (_gameTimer is not null)
             {
                 _gameTimer.Reset();
                 _gameTimer.Start();
@@ -423,7 +419,7 @@ namespace Microsoft.Xna.Framework
         /// </summary>
         public void RunOneFrame()
         {
-            if (Platform == null)
+            if (Platform is null)
                 return;
 
             if (!Platform.BeforeRun())
@@ -436,7 +432,7 @@ namespace Microsoft.Xna.Framework
                 _initialized = true;
             }
 
-            BeginRun();            
+            BeginRun();
 
             //Not quite right..
             Tick ();
@@ -494,7 +490,7 @@ namespace Microsoft.Xna.Framework
 
         private TimeSpan _accumulatedElapsedTime;
         private readonly GameTime _gameTime = new GameTime();
-        private Stopwatch _gameTimer;
+        private Stopwatch? _gameTimer;
         private long _previousTicks = 0;
         private int _updateFrameLag;
 
@@ -521,7 +517,7 @@ namespace Microsoft.Xna.Framework
             }
 
             // Advance the accumulated elapsed time.
-            if (_gameTimer == null)
+            if (_gameTimer is null)
             {
                 _gameTimer = new Stopwatch();
                 _gameTimer.Start();
@@ -686,8 +682,8 @@ namespace Microsoft.Xna.Framework
             _graphicsDeviceService = (IGraphicsDeviceService)
                 Services.GetService(typeof(IGraphicsDeviceService));
 
-            if (_graphicsDeviceService != null &&
-                _graphicsDeviceService.GraphicsDevice != null)
+            if (_graphicsDeviceService is not null &&
+                _graphicsDeviceService.GraphicsDevice is not null)
             {
                 LoadContent();
             }
@@ -839,8 +835,8 @@ namespace Microsoft.Xna.Framework
         internal void DoInitialize()
         {
             AssertNotDisposed();
-            if (GraphicsDevice == null && graphicsDeviceManager != null)
-                _graphicsDeviceManager.CreateDevice();
+            if (GraphicsDevice is null && graphicsDeviceManager is not null)
+                ((IGraphicsDeviceManager)graphicsDeviceManager).CreateDevice();
 
             Platform.BeforeInitialize();
             Initialize();
@@ -861,16 +857,13 @@ namespace Microsoft.Xna.Framework
         {
             get
             {
-                if (_graphicsDeviceManager == null)
-                {
-                    _graphicsDeviceManager = (IGraphicsDeviceManager)
-                        Services.GetService(typeof(IGraphicsDeviceManager));
-                }
+                _graphicsDeviceManager ??= Services.GetService<IGraphicsDeviceManager>()
+                        ?? throw new InvalidOperationException("No Graphics Device Manager");
                 return (GraphicsDeviceManager)_graphicsDeviceManager;
             }
             set
             {
-                if (_graphicsDeviceManager != null)
+                if (_graphicsDeviceManager is not null)
                     throw new InvalidOperationException("GraphicsDeviceManager already registered for this Game object");
                 _graphicsDeviceManager = value;
             }
@@ -904,20 +897,20 @@ namespace Microsoft.Xna.Framework
 
         private void CategorizeComponent(IGameComponent component)
         {
-            if (component is IUpdateable)
-                _updateables.Add((IUpdateable)component);
-            if (component is IDrawable)
-                _drawables.Add((IDrawable)component);
+            if (component is IUpdateable updateable)
+                _updateables.Add(updateable);
+            if (component is IDrawable drawable)
+                _drawables.Add(drawable);
         }
 
         // FIXME: I am open to a better name for this method.  It does the
         //        opposite of CategorizeComponent.
         private void DecategorizeComponent(IGameComponent component)
         {
-            if (component is IUpdateable)
-                _updateables.Remove((IUpdateable)component);
-            if (component is IDrawable)
-                _drawables.Remove((IDrawable)component);
+            if (component is IUpdateable updateable)
+                _updateables.Remove(updateable);
+            if (component is IDrawable drawable)
+                _drawables.Remove(drawable);
         }
 
         /// <summary>
@@ -1179,16 +1172,10 @@ namespace Microsoft.Xna.Framework
 
             public override int GetHashCode()
             {
-                return Item.GetHashCode();
+                return Item?.GetHashCode() ?? 0;
             }
 
-            public override bool Equals(object obj)
-            {
-                if (!(obj is AddJournalEntry<T>))
-                    return false;
-
-                return object.Equals(Item, ((AddJournalEntry<T>)obj).Item);
-            }
+            public override bool Equals(object obj) => obj is AddJournalEntry<T> je && object.Equals(Item, je.Item);
         }
     }
 }
