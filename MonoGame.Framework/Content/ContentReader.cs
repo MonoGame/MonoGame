@@ -121,7 +121,7 @@ namespace Microsoft.Xna.Framework.Content
         /// the underlying stream.  If the relative link read was null or an empty string, then the default
         /// implementation of type <typeparamref name="T"/> is returned.
         /// </returns>
-        /// <exception cref="ArgumentNullException">The relative link to the external file read is null or an empty string.</exception>
+        /// <exception cref="ArgumentNullException">The relative link to the external file read is <see langword="null"/> or an empty string.</exception>
         /// <exception cref="ObjectDisposedException">
         /// This was called after the <see cref="ContentManager">ContentReader.ContentManager</see> was disposed.
         ///
