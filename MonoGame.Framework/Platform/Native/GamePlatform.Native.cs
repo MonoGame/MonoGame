@@ -90,7 +90,7 @@ class NativeGamePlatform : GamePlatform
             switch (event_.Type)
             {
                 case EventType.Quit:
-                    _isExiting++;
+                    Game.Exit();
                     break;
 
                 case EventType.WindowGainedFocus:
@@ -113,7 +113,7 @@ class NativeGamePlatform : GamePlatform
                 { 
                     var window = NativeGameWindow.FromHandle(event_.Window.Window);
                     if (Window == window)
-                        _isExiting++;
+                            Game.Exit();
                     break;
                 }
 
