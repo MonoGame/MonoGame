@@ -113,7 +113,7 @@ class NativeGamePlatform : GamePlatform
                 { 
                     var window = NativeGameWindow.FromHandle(event_.Window.Window);
                     if (Window == window)
-                            Game.Exit();
+                        Game.Exit();
                     break;
                 }
 
