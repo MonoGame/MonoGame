@@ -441,7 +441,6 @@ mgbyte MGP_Platform_PollEvent(MGP_Platform* platform, MGP_Event& event_)
                     break;
 
                 auto instanceId = SDL_JoystickInstanceID(SDL_GameControllerGetJoystick(controller));
-
                 platform->controller_slots[slot] = controller;
                 platform->controller_instance_map.emplace(instanceId, slot);
                 event_.Type = MGEventType::ControllerAdded;
@@ -455,13 +454,9 @@ mgbyte MGP_Platform_PollEvent(MGP_Platform* platform, MGP_Event& event_)
         }
         case SDL_EventType::SDL_CONTROLLERDEVICEREMOVED:
         {
-            auto controller = SDL_GameControllerFromInstanceID(ev.cdevice.which);
-            if (controller == nullptr)
-                break;
-
             auto slot = platform->controller_instance_map.find(ev.cdevice.which);
             if (slot != platform->controller_instance_map.end()) {
-
+                auto controller = platform->controller_slots[slot->second];
                 SDL_GameControllerClose(controller);
                 event_.Type = MGEventType::ControllerRemoved;
                 event_.Timestamp = ev.cdevice.timestamp;
