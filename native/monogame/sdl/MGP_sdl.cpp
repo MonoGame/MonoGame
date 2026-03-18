@@ -12,14 +12,12 @@
 #include <combaseapi.h>
 #endif
 
-const int MAX_SUPPORTED_CONTROLLERS = 16;
 
 struct MGP_Platform
 {
     std::vector<MGP_Window*> windows;
     std::queue<MGP_Event> queued_events;
-    SDL_GameController* controller_slots[MAX_SUPPORTED_CONTROLLERS] = {};
-    std::map<SDL_JoystickID, mgint> controller_instance_map;
+    std::map<mgint, SDL_GameController*> controllers;
 };
 
 static std::map<int, MGKeys> s_keymap
@@ -424,29 +422,13 @@ mgbyte MGP_Platform_PollEvent(MGP_Platform* platform, MGP_Event& event_)
 
         case SDL_EventType::SDL_CONTROLLERDEVICEADDED:
         {
-            auto slot = -1;
-            for (int i = 0; i < MAX_SUPPORTED_CONTROLLERS; i++)
+            auto controller = SDL_GameControllerOpen(ev.cdevice.which);
+            if (controller != nullptr)
             {
-                if (platform->controller_slots[i] == nullptr)
-                {
-                    slot = i;
-                    break;
-                }
-            }
-
-            if (slot >= 0)
-            {
-                auto controller = SDL_GameControllerOpen(ev.cdevice.which);
-                if (controller == nullptr)
-                    break;
-
-                auto instanceId = SDL_JoystickInstanceID(SDL_GameControllerGetJoystick(controller));
-
-                platform->controller_slots[slot] = controller;
-                platform->controller_instance_map.emplace(instanceId, slot);
+                platform->controllers.emplace(ev.cdevice.which, controller);
                 event_.Type = MGEventType::ControllerAdded;
                 event_.Timestamp = ev.cdevice.timestamp;
-                event_.Controller.Id = slot;
+                event_.Controller.Id = ev.cdevice.which;
                 event_.Controller.Input = MGControllerInput::INVALID;
                 event_.Controller.Value = 0;
                 return true;
@@ -455,75 +437,50 @@ mgbyte MGP_Platform_PollEvent(MGP_Platform* platform, MGP_Event& event_)
         }
         case SDL_EventType::SDL_CONTROLLERDEVICEREMOVED:
         {
-            auto controller = SDL_GameControllerFromInstanceID(ev.cdevice.which);
-            if (controller == nullptr)
-                break;
-
-            auto slot = platform->controller_instance_map.find(ev.cdevice.which);
-            if (slot != platform->controller_instance_map.end()) {
-
+            auto controller = platform->controllers[ev.cdevice.which];
+            if (controller != nullptr)
+            {
+                platform->controllers.erase(ev.cdevice.which);
                 SDL_GameControllerClose(controller);
                 event_.Type = MGEventType::ControllerRemoved;
                 event_.Timestamp = ev.cdevice.timestamp;
-                event_.Controller.Id = slot->second;
+                event_.Controller.Id = ev.cdevice.which;
                 event_.Controller.Input = MGControllerInput::INVALID;
                 event_.Controller.Value = 0;
-                platform->controller_slots[slot->second] = nullptr;
-                platform->controller_instance_map.erase(slot);
                 return true;
             }
             break;
         }
         case SDL_EventType::SDL_CONTROLLERBUTTONUP:
-        {
-            auto slot = platform->controller_instance_map.find(ev.cbutton.which);
-            if (slot != platform->controller_instance_map.end()) {
-
-                event_.Type = MGEventType::ControllerStateChange;
-                event_.Timestamp = ev.cbutton.timestamp;
-                event_.Controller.Id = slot->second;
-                event_.Controller.Input = FromSDLButton(ev.cbutton.button);
-                event_.Controller.Value = 0;
-                return true;
-            }
-            break;
-        }
+            event_.Type = MGEventType::ControllerStateChange;
+            event_.Timestamp = ev.cbutton.timestamp;
+            event_.Controller.Id = ev.cbutton.which;
+            event_.Controller.Input = FromSDLButton(ev.cbutton.button);
+            event_.Controller.Value = 0;
+            return true;
         case SDL_EventType::SDL_CONTROLLERBUTTONDOWN:
-        {
-            auto slot = platform->controller_instance_map.find(ev.cbutton.which);
-            if (slot != platform->controller_instance_map.end()) {
-
-                event_.Type = MGEventType::ControllerStateChange;
-                event_.Timestamp = ev.cbutton.timestamp;
-                event_.Controller.Id = slot->second;
-                event_.Controller.Input = FromSDLButton(ev.cbutton.button);
-                event_.Controller.Value = 1;
-                return true;
-            }
-            break;
-        }
+            event_.Type = MGEventType::ControllerStateChange;
+            event_.Timestamp = ev.cbutton.timestamp;
+            event_.Controller.Id = ev.cbutton.which;
+            event_.Controller.Input = FromSDLButton(ev.cbutton.button);
+            event_.Controller.Value = 1;
+            return true;
         case SDL_EventType::SDL_CONTROLLERAXISMOTION:
-        {
-            auto slot = platform->controller_instance_map.find(ev.caxis.which);
-            if (slot != platform->controller_instance_map.end()) {
-
-                event_.Type = MGEventType::ControllerStateChange;
-                event_.Timestamp = ev.caxis.timestamp;
-                event_.Controller.Id = slot->second;
-                event_.Controller.Input = FromSDLAxis(ev.caxis.axis);
-                event_.Controller.Value = ev.caxis.value;
-                if (event_.Controller.Input == MGControllerInput::LeftStickY || event_.Controller.Input == MGControllerInput::RightStickY)
-                {
-                    // MonoGame has an inverted Y value convention compared to SDL, and we
-                    // need to take care of the special case of -32768 because it would otherwise
-                    // overflow into -32768 when inverted.
-                    // (This maps the range of values to -32767:32767 instead of SDL's -32768:32767)
-                    event_.Controller.Value = (event_.Controller.Value == -32768 ? 32767 : ~event_.Controller.Value + 1);
-                }
-                return true;
+            event_.Type = MGEventType::ControllerStateChange;
+            event_.Timestamp = ev.caxis.timestamp;
+            event_.Controller.Id = ev.caxis.which;
+            event_.Controller.Input = FromSDLAxis(ev.caxis.axis);
+            event_.Controller.Value = ev.caxis.value;
+            if (event_.Controller.Input == MGControllerInput::LeftStickY || event_.Controller.Input == MGControllerInput::RightStickY)
+            {
+                // MonoGame has an inverted Y value convention compared to SDL, and we
+                // need to take care of the special case of -32768 because it would otherwise
+                // overflow into -32768 when inverted.
+                // (This maps the range of values to -32767:32767 instead of SDL's -32768:32767)
+                event_.Controller.Value = (event_.Controller.Value == -32768 ? 32767 : ~event_.Controller.Value + 1);
             }
+            return true;
             break;
-        }
 
         case SDL_EventType::SDL_MOUSEMOTION:
             event_.Type = MGEventType::MouseMove;
@@ -1006,7 +963,7 @@ void MGP_Cursor_Destroy(MGP_Cursor* cursor)
 
 mgint MGP_GamePad_GetMaxSupported()
 {
-    return MAX_SUPPORTED_CONTROLLERS;
+    return 16;
 }
 
 inline uint32_t HasSDLButton(SDL_GameController* controller, SDL_GameControllerButton button)
@@ -1023,8 +980,8 @@ void MGP_GamePad_GetCaps(MGP_Platform* platform, mgint identifer, MGP_Controller
 {
     assert(platform);
 
-    auto controller = platform->controller_slots[identifer];
-    if (controller == nullptr)
+    auto pair = platform->controllers.find(identifer);
+    if (pair == platform->controllers.end())
     {
         // Not connected or unknown... so nothing to set.
         caps->Identifier = nullptr;
@@ -1036,6 +993,8 @@ void MGP_GamePad_GetCaps(MGP_Platform* platform, mgint identifer, MGP_Controller
         caps->HasVoiceSupport = false;
         return;
     }
+
+    auto controller = pair->second;
 
     // This doesn't need to be thread safe, but be valid
     // long enough for the caller to copy it.
@@ -1081,10 +1040,11 @@ mgbyte MGP_GamePad_SetVibration(MGP_Platform* platform, mgint identifer, mgfloat
 {
     assert(platform);
 
-    auto controller = platform->controller_slots[identifer];
-    if (controller == nullptr)
+    auto pair = platform->controllers.find(identifer);
+    if (pair == platform->controllers.end())
         return false;
 
-    auto supported = SDL_GameControllerRumble(controller, (mgushort)(leftMotor * 0xFFFF), (mgushort)(rightMotor * 0xFFFF), INT_MAX);
+    auto supported = SDL_GameControllerRumble(pair->second, (mgushort)(leftMotor * 0xFFFF), (mgushort)(rightMotor * 0xFFFF), INT_MAX);
     return supported == 0;
 }
+
