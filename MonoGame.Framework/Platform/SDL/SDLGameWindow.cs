@@ -224,15 +224,16 @@ namespace Microsoft.Xna.Framework
             Sdl.Display.GetBounds(displayIndex, out displayRect);
 
             // fullcreen mode needs to change
-            var setFullscreen = _willBeFullScreen != IsFullScreen || _hardwareSwitch != _game.graphicsDeviceManager.HardwareModeSwitch;
+            var fullScreenChanged = _willBeFullScreen != IsFullScreen;
+            var hardwareSwitchChanged = _hardwareSwitch != _game.graphicsDeviceManager.HardwareModeSwitch;
             _hardwareSwitch = _game.graphicsDeviceManager.HardwareModeSwitch;
 
             // set fullscreen to windowed mode
-            if (setFullscreen && !_willBeFullScreen)
+            if (!_willBeFullScreen && fullScreenChanged)
                 Sdl.Window.SetFullscreen(Handle, 0);
 
             // set fullscreen to desktop fullscreen
-            if (setFullscreen && _willBeFullScreen && !_hardwareSwitch)
+            if (_willBeFullScreen && !_hardwareSwitch && (fullScreenChanged || hardwareSwitchChanged))
                 Sdl.Window.SetFullscreen(Handle, Sdl.Window.State.FullscreenDesktop);
 
             // If going to exclusive full-screen mode, force the window to minimize on focus loss (Windows only)
@@ -254,7 +255,7 @@ namespace Microsoft.Xna.Framework
             }
 
             // set fullscreen to hardware fullscreen
-            if (setFullscreen && _willBeFullScreen && _hardwareSwitch)
+            if (_willBeFullScreen && _hardwareSwitch  && (fullScreenChanged || hardwareSwitchChanged))
                 Sdl.Window.SetFullscreen(Handle, Sdl.Window.State.Fullscreen);
 
             int ignore, minx = 0, miny = 0;
