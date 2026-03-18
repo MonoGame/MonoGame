@@ -73,11 +73,11 @@ jobs:
         run: |
           dotnet workload install macos ios
 
-      - name: Pin xcode to 26.0.1
+      - name: Pin xcode to 26.2
         uses: maxim-lobanov/setup-xcode@v1
         if: runner.environment == 'github-hosted' && runner.os == 'macos'
         with:
-          xcode-version: '26.0.1'
+          xcode-version: '26.2'
 
       - name: Add msbuild to PATH
         if: runner.os == 'Windows'
