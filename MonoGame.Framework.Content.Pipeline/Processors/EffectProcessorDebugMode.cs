@@ -10,7 +10,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
     public enum EffectProcessorDebugMode
     {
         /// <summary>
-        /// Enables effect debugging when built with Debug profile.
+        /// Will use the Optimize behaviour, disabling debugging and producing optimized shaders.
         /// </summary>
         Auto = 0,
 
