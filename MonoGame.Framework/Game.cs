@@ -147,7 +147,9 @@ namespace Microsoft.Xna.Framework
                     ContentTypeReaderManager.ClearTypeCreators();
 
                     if (SoundEffect._systemState == SoundEffect.SoundSystemState.Initialized)
-                        SoundEffect.PlatformShutdown();
+                    {
+                        SoundEffect.Shutdown();
+                    }
                 }
 #if ANDROID
                 Activity = null;
