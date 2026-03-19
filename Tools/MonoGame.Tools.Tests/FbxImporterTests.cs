@@ -93,8 +93,7 @@ namespace MonoGame.Tests.ContentPipeline
 #if XNA
             Assert.AreEqual(11433, meshContent.Positions.Count);
 #else
-            // this used to be 13126  but with the latest assimp its now 13132. We might need to change this back if we upgrade assimp
-            Assert.AreEqual(13132, meshContent.Positions.Count);
+            Assert.AreEqual(13126, meshContent.Positions.Count);
 #endif
 
 
