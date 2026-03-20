@@ -2281,8 +2281,8 @@ namespace Microsoft.Xna.Framework
         /// <summary>
         /// Multiplies the elements of matrix by a scalar.
         /// </summary>
-        /// <param name="scaleFactor">Scalar value on the right of the mul sign.</param>
-        /// <param name="matrix">Source <see cref="Matrix"/> on the left of the mul sign.</param>
+        /// <param name="scaleFactor">Scalar value on the left of the mul sign.</param>
+        /// <param name="matrix">Source <see cref="Matrix"/> on the right of the mul sign.</param>
         /// <returns>Result of the matrix multiplication with a scalar.</returns>
         public static Matrix operator *(float scaleFactor, Matrix matrix)
         {
