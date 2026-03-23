@@ -121,6 +121,12 @@ namespace Microsoft.Xna.Framework.Audio
                 throw;
             }
         }
+        
+        internal static void Shutdown()
+        {
+            PlatformShutdown();
+            _systemState = SoundSystemState.NotInitialized;
+        }
 
         #endregion
 
@@ -536,11 +542,5 @@ namespace Microsoft.Xna.Framework.Audio
         }
 
         #endregion
-
-        internal static void Shutdown()
-        {
-            PlatformShutdown();
-            _systemState = SoundSystemState.NotInitialized;
-        }
     }
 }
