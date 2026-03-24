@@ -33,6 +33,8 @@ body:
       - MonoGame Cross-Platform Desktop Application (mgdesktopgl)
       - MonoGame Windows Desktop Application (mgwindowsdx)
       - MonoGame iOS Application (mgios)
+      - MonoGame Windows Desktop DirectX 12 Application
+      - MonoGame Cross-Platform Desktop Vulkan Application
       - N/A
 - type: input
   id: operating-system
