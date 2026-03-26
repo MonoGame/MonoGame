@@ -248,7 +248,7 @@ public:
 
         // If the swap chain already exists, resize it, otherwise create one.
         if (m_swapChain) {
-            bool lost = HandleLost(m_swapChain->ResizeBuffers(m_backBufferCount, width, height, backBufferFormat, DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH));
+            bool lost = HandleLost(m_swapChain->ResizeBuffers(m_backBufferCount, width, height, backBufferFormat, DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH | DXGI_SWAP_CHAIN_FLAG_ALLOW_TEARING));
             if (lost) return;
         } else {
             // Create a descriptor for the swap chain.
@@ -263,7 +263,7 @@ public:
             swapChainDesc.Scaling = DXGI_SCALING_STRETCH;
             swapChainDesc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;
             swapChainDesc.AlphaMode = DXGI_ALPHA_MODE_IGNORE;
-            swapChainDesc.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;
+            swapChainDesc.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH | DXGI_SWAP_CHAIN_FLAG_ALLOW_TEARING;
 
             DXGI_SWAP_CHAIN_FULLSCREEN_DESC fsSwapChainDesc = {};
             fsSwapChainDesc.Scaling = DXGI_MODE_SCALING_UNSPECIFIED;
@@ -563,6 +563,8 @@ void DeviceResources::WaitForOrigin() {
 }
 #else
 void DeviceResources::Present(int sync, int flags) {
+    if(sync == 0)
+        flags |= DXGI_PRESENT_ALLOW_TEARING;
     pImpl->Present(sync, flags);
 }
 
