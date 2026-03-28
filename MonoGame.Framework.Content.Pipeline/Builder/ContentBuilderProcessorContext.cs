@@ -25,7 +25,7 @@ class ContentBuilderProcessorContext(ContentBuilder builder, string relativePath
 
     public override ContentBuildLogger Logger => _builder.Logger;
 
-    public override ContentIdentity SourceIdentity => throw new NotImplementedException();
+    public override ContentIdentity SourceIdentity => new ContentIdentity(sourceFilename: _relativeContentPath);
 
     public override string OutputDirectory => _builder.Parameters.OutputDirectory;
 
