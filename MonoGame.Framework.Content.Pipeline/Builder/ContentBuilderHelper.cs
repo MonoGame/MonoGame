@@ -2,12 +2,12 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
-using System.Collections;
-using System.Diagnostics.Contracts;
-using System.Reflection;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content.Pipeline;
 using MonoGame.Framework.Content.Pipeline.Builder.Server;
+using System.Collections;
+using System.Diagnostics.Contracts;
+using System.Reflection;
 using YamlDotNet.Core;
 using YamlDotNet.Core.Events;
 using YamlDotNet.Serialization;
@@ -223,6 +223,22 @@ static class ContentBuilderHelper
         }
 
         return true;
+    }
+
+    public static void GetHash(object importerOrProcessor, ref HashCode hash)
+    {
+        var type = importerOrProcessor.GetType();
+        hash.Add(type.FullName);
+
+        var props = type.GetProperties(BindingFlags.Public | BindingFlags.Instance);
+        foreach (var prop in props)
+        {
+            if (prop.CanRead)
+            {
+                var value = prop.GetValue(importerOrProcessor);
+                hash.Add(value);
+            }
+        }
     }
 
     public static ContentImporterAttribute GetImporterAttribute(Type t)
