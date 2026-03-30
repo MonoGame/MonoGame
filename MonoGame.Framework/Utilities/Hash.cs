@@ -3,11 +3,95 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System.IO;
+using System.Reflection;
 
 namespace MonoGame.Framework.Utilities
 {
-    internal static class Hash
+    internal struct Hash
     {
+        private const int Prime = 16777619;
+        private const int Default = unchecked((int)(2166136261));
+
+        public bool _initialize;
+        private int _hash;
+
+        public readonly int Value => _hash;
+
+        private void Init()
+        {
+            if (!_initialize)
+            {
+                _initialize = true;
+                _hash = Default;
+            }
+        }
+
+        public void Add(int value)
+        {
+            Init();
+
+            unchecked
+            {
+                _hash = (_hash ^ value) * Prime;
+                _hash += _hash << 13;
+                _hash ^= _hash >> 7;
+                _hash += _hash << 3;
+                _hash ^= _hash >> 17;
+                _hash += _hash << 5;
+            }
+        }
+
+        public void Add(string value)
+        {
+            Init();
+
+            unchecked
+            {
+                for (var i = 0; i < value.Length; i++)
+                    _hash = (_hash ^ value[i]) * Prime;
+
+                _hash += _hash << 13;
+                _hash ^= _hash >> 7;
+                _hash += _hash << 3;
+                _hash ^= _hash >> 17;
+                _hash += _hash << 5;
+            }
+        }
+
+        public void Add(object value)
+        {
+            if (value is string string_)
+            {
+                // In recent .NET releases string.GetHashCode()
+                // will use a random seed when creating the string
+                // hash code... so we need to avoid it.
+                Add(string_);
+                return;
+            }
+
+            // This is safe for primitive numerical
+            // types as well as custom types that return
+            // consistent hash values.
+            Add(value == null ? 0 : value.GetHashCode());
+        }
+
+        public static void FromTypeAndProperties(object importerOrProcessor, ref Hash hash)
+        {
+            var type = importerOrProcessor.GetType();
+            hash.Add(type.FullName);
+
+            var props = type.GetProperties(BindingFlags.Public | BindingFlags.Instance);
+            foreach (var prop in props)
+            {
+                if (prop.CanRead)
+                {
+                    var value = prop.GetValue(importerOrProcessor);
+                    hash.Add(value);
+                }
+            }
+        }
+
+
         /// <summary>
         /// Compute a hash from a byte array.
         /// </summary>
@@ -19,11 +103,10 @@ namespace MonoGame.Framework.Utilities
         {
             unchecked
             {
-                const int p = 16777619;
-                var hash = (int)2166136261;
+                var hash = Default;
 
                 for (var i = 0; i < data.Length; i++)
-                    hash = (hash ^ data[i]) * p;
+                    hash = (hash ^ data[i]) * Prime;
 
                 hash += hash << 13;
                 hash ^= hash >> 7;
@@ -47,8 +130,7 @@ namespace MonoGame.Framework.Utilities
 
             unchecked
             {
-                const int p = 16777619;
-                var hash = (int)2166136261;
+                var hash = Default;
 
                 var prevPosition = stream.Position;
                 stream.Position = 0;
@@ -58,7 +140,7 @@ namespace MonoGame.Framework.Utilities
                 while((length = stream.Read(data, 0, data.Length)) != 0)
                 {
                     for (var i = 0; i < length; i++)
-                        hash = (hash ^ data[i]) * p;
+                        hash = (hash ^ data[i]) * Prime;
                 }
 
                 // Restore stream position.
