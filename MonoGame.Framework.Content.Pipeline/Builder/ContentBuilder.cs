@@ -73,20 +73,18 @@ public abstract class ContentBuilder
     /// </summary>
     /// <param name="relativeSrcPath">A relative path to the source asset.</param>
     /// <param name="contentInfo">The desired <see cref="ContentInfo"/> to be used for the content building.</param>
-    /// <param name="assetName">Optional name of the final compiled content.</param>
+    /// <param name="relativeDstPath">Optional name of the final compiled content.</param>
     /// <param name="parentContext">Set when building content dependencies by the ContentProcessorContext.</param>
-    public string BuildAndWriteContent(string relativeSrcPath, ContentInfo contentInfo, string? assetName = null, ContentProcessorContext? parentContext = null)
+    /// <returns>The complete name of the final compiled content including the content root.</returns>
+    public string BuildAndWriteContent(string relativeSrcPath, ContentInfo contentInfo, string? relativeDstPath = null, ContentProcessorContext? parentContext = null)
     {
-        // If we get a absolute path to a source asset fix it.
-        // TODO: Should we be doing this or erroring out? or warning?
+        // If we get a absolute path to a source asset try
+        // to make it relative as ProcessContent expects that. 
         if (Path.IsPathRooted(relativeSrcPath))
         {
             if (parentContext != null)
             {
-                var assetRoot = parentContext.ProjectDirectory;
-                if (!assetRoot.EndsWith("\\") || !assetRoot.EndsWith("/"))
-                    assetRoot += "\\";
-
+                var assetRoot = PathHelper.NormalizeDirectory(parentContext.ProjectDirectory);
                 relativeSrcPath = PathHelper.GetRelativePath(assetRoot, relativeSrcPath);
             }
         }
@@ -94,9 +92,9 @@ public abstract class ContentBuilder
         Logger.PushFile(Path.Combine(Parameters.RootedSourceDirectory, relativeSrcPath));
         try
         {
-            ProcessContent(relativeSrcPath, contentInfo, true, ref assetName, parentContext);
+            ProcessContent(relativeSrcPath, contentInfo, true, ref relativeDstPath, parentContext);
             SucceededToBuild++;
-            return assetName;
+            return relativeDstPath;
         }
         catch (Exception ex)
         {
@@ -153,12 +151,12 @@ public abstract class ContentBuilder
         return null;
     }
 
-    private object? ProcessContent(string relativePath, ContentInfo contentInfo, bool writeToDisk, ref string? assetName, ContentProcessorContext? parentContext)
+    private object? ProcessContent(string relativePath, ContentInfo contentInfo, bool writeToDisk, ref string? relativeDstPath, ContentProcessorContext? parentContext)
     {
         var filePath = Path.Combine(Parameters.RootedSourceDirectory, relativePath);
 
-        if (string.IsNullOrEmpty(assetName))
-            assetName = relativePath.GetDestinationPath(contentInfo.ShouldBuild, contentInfo.GetOutputPath);
+        if (string.IsNullOrEmpty(relativeDstPath))
+            relativeDstPath = relativePath.GetDestinationPath(contentInfo.ShouldBuild, contentInfo.GetOutputPath);
 
         if (contentInfo.ShouldBuild) // ensure importer and processor are set
         {
@@ -178,19 +176,17 @@ public abstract class ContentBuilder
             }
         }
 
-        var relativeDestPath = Path.Combine(contentInfo.ContentRoot, assetName).Sanitize();
+        var relativeDestPath = Path.Combine(contentInfo.ContentRoot, relativeDstPath).Sanitize();
 
         // Dependency content gets a hash to avoid conflicts.
         if (parentContext != null)
-        {
-            var hash = new HashCode();
-            ContentBuilderHelper.GetHash(contentInfo.Importer, ref hash);
-            ContentBuilderHelper.GetHash(contentInfo.Processor, ref hash);
-            assetName = relativeDestPath = relativeDestPath.Replace(".xnb", $".{hash.ToHashCode():x}.xnb");
-        }
+            relativeDestPath = relativeDestPath.Replace(".xnb", $".{contentInfo.MakeHash():x}.xnb");
 
         var outputPath = Path.Combine(Parameters.RootedOutputDirectory, relativeDestPath).Sanitize();
         var outputDir = Path.GetDirectoryName(outputPath);
+
+        // Return the caller the final completed content path.
+        relativeDstPath = relativeDestPath;
 
         if (string.IsNullOrWhiteSpace(outputDir))
             return null;

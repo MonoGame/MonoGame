@@ -225,22 +225,6 @@ static class ContentBuilderHelper
         return true;
     }
 
-    public static void GetHash(object importerOrProcessor, ref HashCode hash)
-    {
-        var type = importerOrProcessor.GetType();
-        hash.Add(type.FullName);
-
-        var props = type.GetProperties(BindingFlags.Public | BindingFlags.Instance);
-        foreach (var prop in props)
-        {
-            if (prop.CanRead)
-            {
-                var value = prop.GetValue(importerOrProcessor);
-                hash.Add(value);
-            }
-        }
-    }
-
     public static ContentImporterAttribute GetImporterAttribute(Type t)
     {
         var attributes = t.GetCustomAttributes(typeof(ContentImporterAttribute), false);
