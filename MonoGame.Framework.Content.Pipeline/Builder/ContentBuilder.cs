@@ -178,9 +178,10 @@ public abstract class ContentBuilder
 
         var relativeDestPath = Path.Combine(contentInfo.ContentRoot, relativeDstPath).Sanitize();
 
-        // Dependency content gets a hash to avoid conflicts.
-        if (parentContext != null)
-            relativeDestPath = relativeDestPath.Replace(".xnb", $".{contentInfo.MakeHash():x}.xnb");
+        // Dependency content that is imported/processed gets a
+        // hash code appended to the file name to avoid conflicts.
+        if (parentContext != null && contentInfo.ShouldBuild)
+            relativeDestPath = relativeDestPath.Replace(".xnb", $".{contentInfo.MakeBuildHash():x}.xnb");
 
         var outputPath = Path.Combine(Parameters.RootedOutputDirectory, relativeDestPath).Sanitize();
         var outputDir = Path.GetDirectoryName(outputPath);

@@ -49,9 +49,10 @@ public class ContentInfo(string contentRoot = "", bool shouldBuild = true, ICont
     public string GetOutputPath(string filePath) => _outputPath(filePath);
 
     /// <summary>
-    /// Returns a hash code that is unique to the importer and processor used.
+    /// Returns a hash code that is unique to the importer and processor
+    /// settings used to build the content.
     /// </summary>
-    public int MakeHash()
+    public int MakeBuildHash()
     {
         var hash = new Hash();
         ContentBuilderHelper.HashTypeAndProperties(Importer, ref hash);
