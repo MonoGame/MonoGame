@@ -7,14 +7,20 @@ using System.Reflection;
 
 namespace MonoGame.Framework.Utilities
 {
+    /// This works similar to .NET System.HashCode
+    /// for building hash values incrementally.
+    /// <remarks>
+    /// Uses a modified FNV Hash in C#: http://stackoverflow.com/a/468084
+    /// </remarks>
     internal struct Hash
     {
         private const int Prime = 16777619;
         private const int Default = unchecked((int)(2166136261));
 
-        public bool _initialize;
+        private bool _initialize;
         private int _hash;
 
+        // The currently calculated hash.
         public readonly int Value => _hash;
 
         private void Init()
@@ -26,6 +32,9 @@ namespace MonoGame.Framework.Utilities
             }
         }
 
+        /// <summary>
+        /// Adds an integer to the hash.
+        /// </summary>
         public void Add(int value)
         {
             Init();
@@ -41,6 +50,9 @@ namespace MonoGame.Framework.Utilities
             }
         }
 
+        /// <summary>
+        /// Adds a string to the hash.
+        /// </summary>
         public void Add(string value)
         {
             Init();
@@ -61,11 +73,7 @@ namespace MonoGame.Framework.Utilities
         /// <summary>
         /// Compute a hash from a byte array.
         /// </summary>
-        /// <remarks>
-        /// Modified FNV Hash in C#
-        /// http://stackoverflow.com/a/468084
-        /// </remarks>
-        internal static int ComputeHash(params byte[] data)
+        public static int ComputeHash(params byte[] data)
         {
             unchecked
             {
@@ -86,11 +94,7 @@ namespace MonoGame.Framework.Utilities
         /// <summary>
         /// Compute a hash from the content of a stream and restore the position.
         /// </summary>
-        /// <remarks>
-        /// Modified FNV Hash in C#
-        /// http://stackoverflow.com/a/468084
-        /// </remarks>
-        internal static int ComputeHash(Stream stream)
+        public static int ComputeHash(Stream stream)
         {
             System.Diagnostics.Debug.Assert(stream.CanSeek);
 
