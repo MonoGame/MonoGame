@@ -54,8 +54,8 @@ public class ContentInfo(string contentRoot = "", bool shouldBuild = true, ICont
     public int MakeHash()
     {
         var hash = new Hash();
-        Hash.FromTypeAndProperties(Importer, ref hash);
-        Hash.FromTypeAndProperties(Processor, ref hash);
+        ContentBuilderHelper.HashTypeAndProperties(Importer, ref hash);
+        ContentBuilderHelper.HashTypeAndProperties(Processor, ref hash);
         return hash.Value;
     }
 }

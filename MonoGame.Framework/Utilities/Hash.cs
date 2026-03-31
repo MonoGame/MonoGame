@@ -58,40 +58,6 @@ namespace MonoGame.Framework.Utilities
             }
         }
 
-        public void Add(object value)
-        {
-            if (value is string string_)
-            {
-                // In recent .NET releases string.GetHashCode()
-                // will use a random seed when creating the string
-                // hash code... so we need to avoid it.
-                Add(string_);
-                return;
-            }
-
-            // This is safe for primitive numerical
-            // types as well as custom types that return
-            // consistent hash values.
-            Add(value == null ? 0 : value.GetHashCode());
-        }
-
-        public static void FromTypeAndProperties(object importerOrProcessor, ref Hash hash)
-        {
-            var type = importerOrProcessor.GetType();
-            hash.Add(type.FullName);
-
-            var props = type.GetProperties(BindingFlags.Public | BindingFlags.Instance);
-            foreach (var prop in props)
-            {
-                if (prop.CanRead)
-                {
-                    var value = prop.GetValue(importerOrProcessor);
-                    hash.Add(value);
-                }
-            }
-        }
-
-
         /// <summary>
         /// Compute a hash from a byte array.
         /// </summary>
