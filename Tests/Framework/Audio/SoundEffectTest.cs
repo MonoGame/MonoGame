@@ -9,6 +9,7 @@ using Microsoft.Xna.Framework.Audio;
 using NUnit.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
+using System.Threading.Tasks;
 
 namespace MonoGame.Tests.Audio
 {
@@ -467,6 +468,34 @@ namespace MonoGame.Tests.Audio
         {
             var soundEffect = _content.Load<SoundEffect>(Paths.Audio(filename));
             Assert.AreEqual(durationTicks, soundEffect.Duration.Ticks);
+        }
+
+
+        [TestCase(@"Assets/Audio/rock_loop_stereo.wav", 3.0d, 1.0d)]
+        public void SoundEffectChangePosition(string filename, double firstPosition, double secondPosition)
+        {
+            using (var stream = File.OpenRead(filename))
+            {
+                var sound = SoundEffect.FromStream(stream); 
+                var instance = sound.CreateInstance();
+                instance.Play();
+                instance.Pause();
+                instance.Offset = TimeSpan.FromSeconds(firstPosition);
+                instance.Resume();
+
+                // Set position exceeds length of sound.
+                Assert.Throws<InvalidOperationException>(() => instance.Offset = TimeSpan.FromMinutes(10));
+                // Fails because the file hasn't been paused.
+                Assert.Throws<InvalidOperationException>(() => instance.Offset = TimeSpan.FromSeconds(1));
+                 
+                Task.Delay(TimeSpan.FromSeconds(3)).Wait();
+                instance.Pause();
+                instance.Offset = TimeSpan.FromSeconds(secondPosition);
+                instance.Resume();
+                Task.Delay(TimeSpan.FromSeconds(2)).Wait();
+
+                instance.Stop();
+            }
         }
     }
 }

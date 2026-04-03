@@ -1,4 +1,4 @@
-// MonoGame - Copyright (C) MonoGame Foundation, Inc
+﻿// MonoGame - Copyright (C) MonoGame Foundation, Inc
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
@@ -684,6 +684,40 @@ mgulong MGA_Voice_GetPosition(MGA_Voice* voice)
 
 	float msec = (state.SamplesPlayed / (float)voice->format.nSamplesPerSec) * 1000.0f;
 	return (mgulong)msec;
+}
+
+void MGA_Voice_SetPosition(MGA_Voice* voice, mgdouble position)
+{
+	assert(voice != nullptr);
+	if (!voice->voice)
+		return;
+	 
+	FAudioSourceVoice_FlushSourceBuffers(voice->voice);
+
+	// Note: currenly, SoundEffectInstances don't have their format initialized,
+	// causing their values to always be 0, making this method unusable (it will restart the audio instead)
+	assert(voice->format.nBlockAlign > 0);
+	assert(voice->format.nChannels > 0);
+	assert(voice->format.nSamplesPerSec > 0);
+	assert(voice->format.wBitsPerSample > 0);
+
+	uint32_t sample = (uint32_t)(position * voice->format.nSamplesPerSec); 
+
+	auto buffer = voice->buffer->buffer;
+	buffer.PlayBegin = sample;
+	buffer.PlayLength = 0;
+
+	if (voice->looped)
+	{
+		buffer.LoopCount = FAUDIO_LOOP_INFINITE;
+		buffer.LoopBegin = sample;
+	}
+	else
+	{
+		buffer.LoopCount = 0;
+	}
+
+	FAudioSourceVoice_SubmitSourceBuffer(voice->voice, &buffer, nullptr); 
 }
 
 static void MGA_Voice_UpdateOutputMatrix(MGA_Voice* voice)
