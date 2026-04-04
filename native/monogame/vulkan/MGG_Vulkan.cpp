@@ -636,12 +636,12 @@ static VkPrimitiveTopology ToVkPrimitiveTopology(MGPrimitiveType type)
 	}
 }
 
-static VkImageViewType ToVkImageViewType(MGTextureType type)
+static VkImageViewType ToVkImageViewType(MGTextureType type, int layerCount = 1)
 {
 	switch (type)
 	{
 	case MGTextureType::_2D:
-		return VK_IMAGE_VIEW_TYPE_2D;
+		return layerCount > 1 ? VK_IMAGE_VIEW_TYPE_2D_ARRAY : VK_IMAGE_VIEW_TYPE_2D;
 	case MGTextureType::_3D:
 		return VK_IMAGE_VIEW_TYPE_3D;
 	case MGTextureType::Cube:
@@ -1056,7 +1056,7 @@ static VkImageView CreateImageView(MGG_GraphicsDevice* device, MGG_Texture* text
 
 	VkImageViewCreateInfo image_view_create_info = { VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO };
 	image_view_create_info.image = texture->image;
-	image_view_create_info.viewType = ToVkImageViewType(texture->type);
+	image_view_create_info.viewType = ToVkImageViewType(texture->type, layer_count);
 	image_view_create_info.format = format;
 	image_view_create_info.subresourceRange.aspectMask = aspect_mask;
 	image_view_create_info.subresourceRange.baseMipLevel = 0;
@@ -1953,7 +1953,7 @@ mgint MGG_GraphicsDevice_BeginFrame(MGG_GraphicsDevice* device)
 	frame.uniformOffset = 0;
 	if (frame.uniforms == NULL)
 	{
-		frame.uniforms = MGVK_Buffer_Create(device, MGBufferType::Constant, 4 * 1024 * 1024, true);
+		frame.uniforms = MGVK_Buffer_Create(device, MGBufferType::Constant, 32 * 1024 * 1024, true);
 		VK_SET_OBJECT_NAME(device->device, frame.uniforms->buffer, VK_OBJECT_TYPE_BUFFER, "MGVK_FrameState.uniforms->buffer");
 	}
 
@@ -2914,7 +2914,7 @@ static void MGVK_UpdateRenderPass(MGG_GraphicsDevice* device, FrameCounter curre
 	device->deferredOcclusionQueries.clear();
 }
 
-static const int DefaultPoolSize = 1024;
+static const int DefaultPoolSize = 16384;
 
 static void MGVK_FillDescriptorSetCache(MGG_GraphicsDevice* device, MGG_Shader* shader)
 {
