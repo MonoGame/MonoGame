@@ -73,15 +73,28 @@ public abstract class ContentBuilder
     /// </summary>
     /// <param name="relativeSrcPath">A relative path to the source asset.</param>
     /// <param name="contentInfo">The desired <see cref="ContentInfo"/> to be used for the content building.</param>
-    /// <param name="relativeDstPath">The desired relative output path.</param>
-    /// <param name="parentContext">Only set when the method is being called by the ContentProcessorContext to build one of its children.</param>
-    public void BuildAndWriteContent(string relativeSrcPath, ContentInfo contentInfo, string? relativeDstPath = null, ContentProcessorContext? parentContext = null)
+    /// <param name="relativeDstPath">Optional name of the final compiled content.</param>
+    /// <param name="parentContext">Set when building content dependencies by the ContentProcessorContext.</param>
+    /// <returns>The complete name of the final compiled content including the content root.</returns>
+    public string BuildAndWriteContent(string relativeSrcPath, ContentInfo contentInfo, string? relativeDstPath = null, ContentProcessorContext? parentContext = null)
     {
+        // If we get a absolute path to a source asset try
+        // to make it relative as ProcessContent expects that. 
+        if (Path.IsPathRooted(relativeSrcPath))
+        {
+            if (parentContext != null)
+            {
+                var assetRoot = PathHelper.NormalizeDirectory(parentContext.ProjectDirectory);
+                relativeSrcPath = PathHelper.GetRelativePath(assetRoot, relativeSrcPath);
+            }
+        }
+
         Logger.PushFile(Path.Combine(Parameters.RootedSourceDirectory, relativeSrcPath));
         try
         {
-            ProcessContent(relativeSrcPath, contentInfo, true, relativeDstPath, parentContext);
+            ProcessContent(relativeSrcPath, contentInfo, true, ref relativeDstPath, parentContext);
             SucceededToBuild++;
+            return relativeDstPath;
         }
         catch (Exception ex)
         {
@@ -94,6 +107,7 @@ public abstract class ContentBuilder
             {
                 throw new SkipLogException();
             }
+            return null;
         }
         finally
         {
@@ -114,7 +128,7 @@ public abstract class ContentBuilder
         Logger.PushFile(Path.Combine(Parameters.RootedSourceDirectory, relativeSrcPath));
         try
         {
-            var content = ProcessContent(relativeSrcPath, contentInfo, false, relativeDstPath, parentContext);
+            var content = ProcessContent(relativeSrcPath, contentInfo, false, ref relativeDstPath, parentContext);
             SucceededToBuild++;
             return content;
         }
@@ -137,22 +151,12 @@ public abstract class ContentBuilder
         return null;
     }
 
-    private object? ProcessContent(string relativePath, ContentInfo contentInfo, bool writeToDisk, string? relativeOutputPath, ContentProcessorContext? parentContext)
+    private object? ProcessContent(string relativePath, ContentInfo contentInfo, bool writeToDisk, ref string? relativeDstPath, ContentProcessorContext? parentContext)
     {
         var filePath = Path.Combine(Parameters.RootedSourceDirectory, relativePath);
-        var relativeDestPath = Path.Combine(contentInfo.ContentRoot, string.IsNullOrEmpty(relativeOutputPath) ? relativePath.GetDestinationPath(contentInfo.ShouldBuild, contentInfo.GetOutputPath) : relativeOutputPath).Sanitize();
-        var outputPath = Path.Combine(Parameters.RootedOutputDirectory, relativeDestPath).Sanitize();
-        var outputDir = Path.GetDirectoryName(outputPath);
 
-        if (string.IsNullOrWhiteSpace(outputDir))
-        {
-            return null;
-        }
-
-        if (!Directory.Exists(outputDir))
-        {
-            Directory.CreateDirectory(outputDir);
-        }
+        if (string.IsNullOrEmpty(relativeDstPath))
+            relativeDstPath = relativePath.GetDestinationPath(contentInfo.ShouldBuild, contentInfo.GetOutputPath);
 
         if (contentInfo.ShouldBuild) // ensure importer and processor are set
         {
@@ -172,16 +176,32 @@ public abstract class ContentBuilder
             }
         }
 
-        if (!Parameters.Rebuild)
+        var relativeDestPath = Path.Combine(contentInfo.ContentRoot, relativeDstPath).Sanitize();
+
+        // Dependency content that is imported/processed gets a
+        // hash code appended to the file name to avoid conflicts.
+        if (parentContext != null && contentInfo.ShouldBuild)
+            relativeDestPath = relativeDestPath.Replace(".xnb", $".{contentInfo.MakeBuildHash():x}.xnb");
+
+        var outputPath = Path.Combine(Parameters.RootedOutputDirectory, relativeDestPath).Sanitize();
+        var outputDir = Path.GetDirectoryName(outputPath);
+
+        // Return the caller the final completed content path.
+        relativeDstPath = relativeDestPath;
+
+        if (string.IsNullOrWhiteSpace(outputDir))
+            return null;
+
+        if (!Directory.Exists(outputDir))
+            Directory.CreateDirectory(outputDir);
+
+        var fileCache = ContentCache.ReadContentFileCache(this, relativeDestPath);
+        if (fileCache != null && fileCache.IsValid(this, contentInfo))
         {
-            var fileCache = ContentCache.ReadContentFileCache(this, relativeDestPath);
-            if (fileCache != null && fileCache.IsValid(this, contentInfo))
-            {
-                Logger.Log(LogLevel.Debug, $"Cache: Found");
-                ContentCache.MarkUsed(fileCache);
-                (parentContext as ContentBuilderProcessorContext)?.ContentFileCache.AddDependency(this, fileCache);
-                return null;
-            }
+            Logger.Log(LogLevel.Debug, $"Cache: Found");
+            ContentCache.MarkUsed(fileCache);
+            (parentContext as ContentBuilderProcessorContext)?.ContentFileCache.AddDependency(this, fileCache);
+            return null;
         }
 
         if (!contentInfo.ShouldBuild)
@@ -193,11 +213,11 @@ public abstract class ContentBuilder
             }
             File.Copy(filePath, outputPath);
 
-            var fileCache = ContentCache.CreateContentFileCache(this, contentInfo);
-            fileCache.AddDependency(this, relativePath);
-            fileCache.AddOutputFile(this, outputPath);
-            ContentCache.WriteContentFileCache(this, relativeDestPath, fileCache);
-            ContentCache.MarkUsed(fileCache);
+            var fileCopyCache = ContentCache.CreateContentFileCache(this, contentInfo);
+            fileCopyCache.AddDependency(this, relativePath);
+            fileCopyCache.AddOutputFile(this, outputPath);
+            ContentCache.WriteContentFileCache(this, relativeDestPath, fileCopyCache);
+            ContentCache.MarkUsed(fileCopyCache);
             (parentContext as ContentBuilderProcessorContext)?.ContentFileCache.AddDependency(this, fileCache);
             return null;
         }
@@ -271,6 +291,12 @@ public abstract class ContentBuilder
         Logger.Unindent();
 
         ContentCache.LoadCache(this);
+
+        // If we're rebuilding then clear all previously
+        // built content which will force a rebuild.
+        if (Parameters.Rebuild)
+            ContentCache.CleanCache(this);
+
         var contentCollection = GetContentCollection();
         ScanFiles(contentCollection, Parameters.RootedSourceDirectory);
 

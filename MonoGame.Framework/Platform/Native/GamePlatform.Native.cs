@@ -43,6 +43,7 @@ class NativeGamePlatform : GamePlatform
         Mouse.WindowHandle = _window.Handle;
         MessageBox._window = _window._handle;
         GamePad.Handle = Handle;
+        OnIsMouseVisibleChanged();
     }
 
     internal static unsafe MGG_GraphicsSystem* GraphicsSystem
@@ -328,7 +329,7 @@ class NativeGamePlatform : GamePlatform
 
     protected override unsafe void OnIsMouseVisibleChanged()
     {
-        MGP.Mouse_SetVisible(Handle, (byte)(Game.IsMouseVisible ? 1 : 0));
+        MGP.Mouse_SetVisible(Handle, (byte)(IsMouseVisible ? 1 : 0));
     }
 
     protected unsafe override void Dispose(bool disposing)
