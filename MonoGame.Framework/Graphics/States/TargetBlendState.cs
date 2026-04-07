@@ -32,7 +32,7 @@ namespace Microsoft.Xna.Framework.Graphics
             ColorWriteChannels = ColorWriteChannels.All;
         }
 
-	    internal TargetBlendState Clone(BlendState parent)
+	    public TargetBlendState Clone(BlendState parent)
 	    {
 	        return new TargetBlendState(parent)
 	        {
@@ -302,4 +302,3 @@ namespace Microsoft.Xna.Framework.Graphics
 
 	}
 }
-

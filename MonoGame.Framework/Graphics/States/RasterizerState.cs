@@ -236,7 +236,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		    CullNone = new RasterizerState("RasterizerState.CullNone", CullMode.None);
 		}
 
-	    internal RasterizerState Clone()
+	    public RasterizerState Clone()
 	    {
 	        return new RasterizerState(this);
 	    }
