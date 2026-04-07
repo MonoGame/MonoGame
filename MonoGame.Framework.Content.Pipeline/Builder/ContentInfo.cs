@@ -3,6 +3,7 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using Microsoft.Xna.Framework.Content.Pipeline;
+using MonoGame.Framework.Utilities;
 
 namespace MonoGame.Framework.Content.Pipeline.Builder;
 
@@ -46,4 +47,16 @@ public class ContentInfo(string contentRoot = "", bool shouldBuild = true, ICont
     /// <param name="filePath">A relative path to the content file (without extension in case of build action).</param>
     /// <returns>Desired relative path for the output content.</returns>
     public string GetOutputPath(string filePath) => _outputPath(filePath);
+
+    /// <summary>
+    /// Returns a hash code that is unique to the importer and processor
+    /// settings used to build the content.
+    /// </summary>
+    public int MakeBuildHash()
+    {
+        var hash = new Hash();
+        ContentBuilderHelper.HashTypeAndProperties(Importer, ref hash);
+        ContentBuilderHelper.HashTypeAndProperties(Processor, ref hash);
+        return hash.Value;
+    }
 }

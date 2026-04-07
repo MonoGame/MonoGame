@@ -1953,7 +1953,7 @@ mgint MGG_GraphicsDevice_BeginFrame(MGG_GraphicsDevice* device)
 	frame.uniformOffset = 0;
 	if (frame.uniforms == NULL)
 	{
-		frame.uniforms = MGVK_Buffer_Create(device, MGBufferType::Constant, 4 * 1024 * 1024, true);
+		frame.uniforms = MGVK_Buffer_Create(device, MGBufferType::Constant, 32 * 1024 * 1024, true);
 		VK_SET_OBJECT_NAME(device->device, frame.uniforms->buffer, VK_OBJECT_TYPE_BUFFER, "MGVK_FrameState.uniforms->buffer");
 	}
 
@@ -2914,7 +2914,7 @@ static void MGVK_UpdateRenderPass(MGG_GraphicsDevice* device, FrameCounter curre
 	device->deferredOcclusionQueries.clear();
 }
 
-static const int DefaultPoolSize = 1024;
+static const int DefaultPoolSize = 16384;
 
 static void MGVK_FillDescriptorSetCache(MGG_GraphicsDevice* device, MGG_Shader* shader)
 {
