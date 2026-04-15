@@ -250,7 +250,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
                 content.ConvertBitmapType(typeof(AtcInterpolatedBitmapContent));
         }
 
-        static public void CompressAstc(ContentProcessorContext context, TextureContent content, bool isSpriteFont)
+        static public void CompressAstc(ContentProcessorContext context, TextureContent content, bool isSpriteFont, TextureProcessorOutputFormat format)
         {
             // If sharp alpha is required (for a font texture page), use 16-bit color instead of PVR
             if (isSpriteFont)
@@ -259,8 +259,13 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
                 return;
             }
 
-            // astc supports rgba
-            content.ConvertBitmapType(typeof(AstcBitmapContent));
+            switch (format)
+            {
+                default:
+                    // astc supports rgba
+                    content.ConvertBitmapType(typeof(AstcBitmapContent));
+                    break;
+            }
         }
 
         static public void CompressEtc(ContentProcessorContext context, TextureContent content, bool isSpriteFont)
