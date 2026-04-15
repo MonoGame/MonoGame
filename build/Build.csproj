@@ -31,11 +31,11 @@
 
   <ItemGroup>
     <PackageReference Include="Cake.FileHelpers" Version="7.0.0" />
-    <PackageReference Include="Cake.Frosting" Version="5.0.0" />
-    <PackageReference Include="Cake.Git" Version="4.0.0" />
-    <PackageReference Include="MonoGame.Tool.Dxc" Version="1.8.2505.10" />
-    <PackageReference Include="NuGet.Packaging" Version="6.11.1" />
-    <PackageReference Include="System.Formats.Asn1" Version="9.0.0" />
+    <PackageReference Include="Cake.Frosting" Version="6.1.0" />
+    <PackageReference Include="Cake.Git" Version="5.0.1" />
+    <PackageReference Include="MonoGame.Tool.Dxc" Version="1.8.2505.11" />
+    <PackageReference Include="NuGet.Packaging" Version="7.3.1" />
+    <PackageReference Include="System.Formats.Asn1" Version="10.0.6" />
   </ItemGroup>
 
 </Project>
