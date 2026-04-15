@@ -76,6 +76,16 @@ internal struct BasisUFormat
     );
 
     /// <summary>
+    /// <see cref="SurfaceFormat.Astc4X4Rgba"/>
+    /// // Opaque+alpha, ASTC 4x4, alpha channel will be opaque for opaque .basis files. Transcoder uses RGB/RGBA/L/LA modes, void extent, and up to two ([0,47] and [0,255]) endpoint precisions.
+    /// </summary>
+    public static readonly BasisUFormat Astc_6x6_Rgba = new BasisUFormat(
+        code: 31,
+        name: "cTFASTC_6x6_RGBA",
+        isLinearColorSpace: true
+    );
+
+    /// <summary>
     /// <see cref="SurfaceFormat.RgbEtc1"/>
     /// Opaque only, returns RGB or alpha data if cDecodeFlagsTranscodeAlphaDataToOpaqueFormats flag is specified
     /// </summary>
@@ -235,9 +245,14 @@ internal static class BasisU
         error = "";
         switch (format)
         {
-            // ASTC format
+            // ASTC 4x4 format
             case SurfaceFormat.Astc4X4Rgba:
                 basisUFormat = BasisUFormat.Astc_4x4_Rgba;
+                return true;
+
+            // ASTC 6x6 format
+            case SurfaceFormat.Astc6X6Rgba:
+                basisUFormat = BasisUFormat.Astc_6x6_Rgba;
                 return true;
 
             // ATC formats
