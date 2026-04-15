@@ -68,6 +68,7 @@ enum class MGSurfaceFormat : mgint
     Rgba8Etc2 = 94,
     SRgb8A8Etc2 = 95,
     Astc4X4Rgba = 96,
+    Astc6X6Rgba = 97,
 };
 
 enum class MGDepthFormat : mgint
