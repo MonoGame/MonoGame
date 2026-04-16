@@ -8,7 +8,6 @@ using Microsoft.Xna.Framework.Content.Pipeline.Utilities;
 
 namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 {
-
     public class AstcBitmapContent : BitmapContent
     {
         private SurfaceFormat FORMAT => SurfaceFormat.Astc4X4Rgba;
@@ -113,6 +112,51 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
         public override bool TryGetFormat(out SurfaceFormat format)
         {
             format = FORMAT;
+            return true;
+        }
+    }
+
+    public class Astc5x5BitmapContent : AstcBitmapContent
+    {
+        public override bool TryGetFormat(out SurfaceFormat format)
+        {
+            format = SurfaceFormat.Astc5X5Rgba;
+            return true;
+        }
+    }
+
+    public class Astc6x6BitmapContent : AstcBitmapContent
+    {
+        public override bool TryGetFormat(out SurfaceFormat format)
+        {
+            format = SurfaceFormat.Astc6X6Rgba;
+            return true;
+        }
+    }
+
+    public class Astc8x8BitmapContent : AstcBitmapContent
+    {
+        public override bool TryGetFormat(out SurfaceFormat format)
+        {
+            format = SurfaceFormat.Astc8X8Rgba;
+            return true;
+        }
+    }
+
+    public class Astc10x10BitmapContent : AstcBitmapContent
+    {
+        public override bool TryGetFormat(out SurfaceFormat format)
+        {
+            format = SurfaceFormat.Astc10X10Rgba;
+            return true;
+        }
+    }
+
+    public class Astc12x12BitmapContent : AstcBitmapContent
+    {
+        public override bool TryGetFormat(out SurfaceFormat format)
+        {
+            format = SurfaceFormat.Astc12X12Rgba;
             return true;
         }
     }
