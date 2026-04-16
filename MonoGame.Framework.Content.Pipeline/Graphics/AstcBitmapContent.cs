@@ -118,6 +118,24 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 
     public class Astc5x5BitmapContent : AstcBitmapContent
     {
+        /// <summary>
+        /// Initializes a new instance of Astc5x5BitmapContent.
+        /// </summary>
+        protected Astc5x5BitmapContent()
+            : base()
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of Astc5x5BitmapContent with the specified width or height.
+        /// </summary>
+        /// <param name="width">Width in pixels of the bitmap resource.</param>
+        /// <param name="height">Height in pixels of the bitmap resource.</param>
+        public Astc5x5BitmapContent(int width, int height)
+            : base(width, height)
+        {
+        }
+
         public override bool TryGetFormat(out SurfaceFormat format)
         {
             format = SurfaceFormat.Astc5X5Rgba;
@@ -127,6 +145,24 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 
     public class Astc6x6BitmapContent : AstcBitmapContent
     {
+        /// <summary>
+        /// Initializes a new instance of Astc6x6BitmapContent.
+        /// </summary>
+        protected Astc6x6BitmapContent()
+            : base()
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of Astc6x6BitmapContent with the specified width or height.
+        /// </summary>
+        /// <param name="width">Width in pixels of the bitmap resource.</param>
+        /// <param name="height">Height in pixels of the bitmap resource.</param>
+        public Astc6x6BitmapContent(int width, int height)
+            : base(width, height)
+        {
+        }
+
         public override bool TryGetFormat(out SurfaceFormat format)
         {
             format = SurfaceFormat.Astc6X6Rgba;
@@ -136,6 +172,24 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 
     public class Astc8x8BitmapContent : AstcBitmapContent
     {
+        /// <summary>
+        /// Initializes a new instance of Astc8x8BitmapContent.
+        /// </summary>
+        protected Astc8x8BitmapContent()
+            : base()
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of Astc8x8BitmapContent with the specified width or height.
+        /// </summary>
+        /// <param name="width">Width in pixels of the bitmap resource.</param>
+        /// <param name="height">Height in pixels of the bitmap resource.</param>
+        public Astc8x8BitmapContent(int width, int height)
+            : base(width, height)
+        {
+        }
+
         public override bool TryGetFormat(out SurfaceFormat format)
         {
             format = SurfaceFormat.Astc8X8Rgba;
@@ -145,6 +199,24 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 
     public class Astc10x10BitmapContent : AstcBitmapContent
     {
+        /// <summary>
+        /// Initializes a new instance of Astc10x10BitmapContent.
+        /// </summary>
+        protected Astc10x10BitmapContent()
+            : base()
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of Astc10x10BitmapContent with the specified width or height.
+        /// </summary>
+        /// <param name="width">Width in pixels of the bitmap resource.</param>
+        /// <param name="height">Height in pixels of the bitmap resource.</param>
+        public Astc10x10BitmapContent(int width, int height)
+            : base(width, height)
+        {
+        }
+
         public override bool TryGetFormat(out SurfaceFormat format)
         {
             format = SurfaceFormat.Astc10X10Rgba;
@@ -154,6 +226,24 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 
     public class Astc12x12BitmapContent : AstcBitmapContent
     {
+        /// <summary>
+        /// Initializes a new instance of Astc12x12BitmapContent.
+        /// </summary>
+        protected Astc12x12BitmapContent()
+            : base()
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of Astc12x12BitmapContent with the specified width or height.
+        /// </summary>
+        /// <param name="width">Width in pixels of the bitmap resource.</param>
+        /// <param name="height">Height in pixels of the bitmap resource.</param>
+        public Astc12x12BitmapContent(int width, int height)
+            : base(width, height)
+        {
+        }
+
         public override bool TryGetFormat(out SurfaceFormat format)
         {
             format = SurfaceFormat.Astc12X12Rgba;
