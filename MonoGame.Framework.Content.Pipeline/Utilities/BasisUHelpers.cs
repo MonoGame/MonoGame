@@ -50,13 +50,19 @@ internal struct BasisUFormat
     /// </summary>
     public bool nonUastcCompatible;
 
+    /// <summary>
+    /// When building certain codecs we need to specify a flag other than -uastc.
+    /// </summary>
+    public string encoderFlag;
+
     // Instead of constructing one of these yourself, please use one of the many predefined static class members.
-    private BasisUFormat(int code, string name, bool isLinearColorSpace=false, bool nonUastcCompatible=false)
+    private BasisUFormat(int code, string name, bool isLinearColorSpace=false, bool nonUastcCompatible=false, string encoderFlag="")
     {
         this.code = code;
         this.name = name;
         this.isLinearColorSpace = isLinearColorSpace;
         this.nonUastcCompatible = nonUastcCompatible;
+        this.encoderFlag = encoderFlag;
     }
 
     public override string ToString()
@@ -82,7 +88,8 @@ internal struct BasisUFormat
     public static readonly BasisUFormat Astc_5x5_Rgba = new BasisUFormat(
         code: 29,
         name: "cTFASTC_5x5_RGBA",
-        isLinearColorSpace: true
+        isLinearColorSpace: true,
+        encoderFlag: "-xuastc_ldr_5x5"
     );
 
     /// <summary>
@@ -92,7 +99,8 @@ internal struct BasisUFormat
     public static readonly BasisUFormat Astc_6x6_Rgba = new BasisUFormat(
         code: 31,
         name: "cTFASTC_6x6_RGBA",
-        isLinearColorSpace: true
+        isLinearColorSpace: true,
+         encoderFlag: "-xuastc_ldr_6x6"
     );
 
     /// <summary>
@@ -102,7 +110,8 @@ internal struct BasisUFormat
     public static readonly BasisUFormat Astc_8x8_Rgba = new BasisUFormat(
         code: 36,
         name: "cTFASTC_8x8_RGBA",
-        isLinearColorSpace: true
+        isLinearColorSpace: true,
+         encoderFlag: "-xuastc_ldr_8x8"
     );
 
     /// <summary>
@@ -112,7 +121,8 @@ internal struct BasisUFormat
     public static readonly BasisUFormat Astc_10x10_Rgba = new BasisUFormat(
         code: 38,
         name: "cTFASTC_10x10_RGBA",
-        isLinearColorSpace: true
+        isLinearColorSpace: true,
+         encoderFlag: "-xuastc_ldr_10x10"
     );
 
     /// <summary>
@@ -122,7 +132,8 @@ internal struct BasisUFormat
     public static readonly BasisUFormat Astc_12x12_Rgba = new BasisUFormat(
         code: 40,
         name: "cTFASTC_12x12_RGBA",
-        isLinearColorSpace: true
+        isLinearColorSpace: true,
+         encoderFlag: "-xuastc_ldr_12x12"
     );
 
     /// <summary>
@@ -564,7 +575,7 @@ internal static class BasisU
         out string stdErr)
     {
         var absImageFileName = Path.GetFullPath(imageFileName);
-        var uastcFlag = format.nonUastcCompatible ? "": "-uastc";
+        var uastcFlag = format.encoderFlag ?? (format.nonUastcCompatible ? "": "-uastc");
         var argStr = $"-file \"{absImageFileName}\" {uastcFlag} -ktx2 -output_file \"{intermediateFileName}\"";
         var exitCode = Run(
             args: argStr,
