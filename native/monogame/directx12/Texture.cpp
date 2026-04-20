@@ -297,6 +297,10 @@ void Graphics::Texture::SetData(DeviceResources* device, uint32_t subResId, uint
 #endif
 
 void Graphics::Texture::GetData(DeviceResources* device, uint32_t subResId, uint32_t x, uint32_t y, uint32_t w, uint32_t h, uint8_t* data, size_t srcStride, size_t destStride) {
+    // If this is a render target block until the last frame is finished rendering.
+    if (impl->m_type == SurfaceType::RenderTarget)
+        device->WaitForGpu();
+
     D3D12_RESOURCE_DESC copyDesc = CD3DX12_RESOURCE_DESC::Tex2D(impl->m_desc.Format, w, h);
     UINT64 readbackBufferSize = 0;
     UINT64 fpRowPitch = 0;
