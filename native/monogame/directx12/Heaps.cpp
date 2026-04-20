@@ -43,12 +43,11 @@ D3D12_CPU_DESCRIPTOR_HANDLE NonShaderVisibleDescHeap::AllocCpuHandle()
     std::lock_guard<std::mutex> lock(m_mutex);
 
     if(m_freeHandle.empty())
-        return GetCpuHandle(m_firstFreeAlloc++);
-    else {
-        auto handle = GetCpuHandle(m_freeHandle.front());
-        m_freeHandle.pop();
-        return handle;
-    }
+        return GetCpuHandle_Locked(m_firstFreeAlloc++);
+
+    auto handle = GetCpuHandle_Locked(m_freeHandle.front());
+    m_freeHandle.pop();
+    return handle;
 }
 
 void NonShaderVisibleDescHeap::FreeCpuHandle(D3D12_CPU_DESCRIPTOR_HANDLE handle)
