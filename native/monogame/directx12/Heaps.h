@@ -6,6 +6,7 @@
 
 #include "GraphicsEnums.h"
 #include <queue>
+#include <mutex>
 
 namespace Graphics {
     class NonShaderVisibleDescHeap {
@@ -20,6 +21,10 @@ namespace Graphics {
 
         uint64_t m_firstFreeAlloc = 0;
         std::queue<uint64_t> m_freeHandle;
+
+        mutable std::mutex m_mutex;
+
+        D3D12_CPU_DESCRIPTOR_HANDLE GetCpuHandle_Locked(size_t index) const;
 
         NonShaderVisibleDescHeap(ID3D12Device* device, D3D12_DESCRIPTOR_HEAP_TYPE type, D3D12_DESCRIPTOR_HEAP_FLAGS flags, uint32_t size);
     public:

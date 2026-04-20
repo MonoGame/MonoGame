@@ -22,7 +22,14 @@ NonShaderVisibleDescHeap::NonShaderVisibleDescHeap(ID3D12Device* device, D3D12_D
     m_heapStartCPU = m_heap->GetCPUDescriptorHandleForHeapStart();
 }
 
-D3D12_CPU_DESCRIPTOR_HANDLE NonShaderVisibleDescHeap::GetCpuHandle(size_t index) const {
+D3D12_CPU_DESCRIPTOR_HANDLE NonShaderVisibleDescHeap::GetCpuHandle(size_t index) const
+{
+    std::lock_guard<std::mutex> lock(m_mutex);
+    return GetCpuHandle_Locked(index);
+}
+
+D3D12_CPU_DESCRIPTOR_HANDLE NonShaderVisibleDescHeap::GetCpuHandle_Locked(size_t index) const
+{
     if (index >= m_size)
         throw std::out_of_range("No more room in the NonShaderVisibleDescHeap");
 
@@ -31,7 +38,10 @@ D3D12_CPU_DESCRIPTOR_HANDLE NonShaderVisibleDescHeap::GetCpuHandle(size_t index)
     return handle;
 }
 
-D3D12_CPU_DESCRIPTOR_HANDLE NonShaderVisibleDescHeap::AllocCpuHandle() {
+D3D12_CPU_DESCRIPTOR_HANDLE NonShaderVisibleDescHeap::AllocCpuHandle()
+{
+    std::lock_guard<std::mutex> lock(m_mutex);
+
     if(m_freeHandle.empty())
         return GetCpuHandle(m_firstFreeAlloc++);
     else {
@@ -41,7 +51,10 @@ D3D12_CPU_DESCRIPTOR_HANDLE NonShaderVisibleDescHeap::AllocCpuHandle() {
     }
 }
 
-void NonShaderVisibleDescHeap::FreeCpuHandle(D3D12_CPU_DESCRIPTOR_HANDLE handle) {
+void NonShaderVisibleDescHeap::FreeCpuHandle(D3D12_CPU_DESCRIPTOR_HANDLE handle)
+{
+    std::lock_guard<std::mutex> lock(m_mutex);
+
     SIZE_T index = (handle.ptr - m_heapStartCPU.ptr) / SIZE_T(m_increment);
     m_freeHandle.push(index);
 }
@@ -52,6 +65,10 @@ Graphics::ShaderVisibleDescHeap::ShaderVisibleDescHeap(ID3D12Device* device, D3D
 }
 
 void ShaderVisibleDescHeap::WriteDescriptor(ID3D12Device* device, uint32_t offset, const D3D12_CPU_DESCRIPTOR_HANDLE desc) {
+    // This should be safe as only the render thread accesses
+    // this with the single render thread design of MG.
+    //std::lock_guard<std::mutex> lock(m_mutex);
+
     if (offset >= m_size)
         throw std::out_of_range("Offset outside of the ShaderVisibleDescHeap");
 
@@ -59,6 +76,10 @@ void ShaderVisibleDescHeap::WriteDescriptor(ID3D12Device* device, uint32_t offse
 }
 
 D3D12_GPU_DESCRIPTOR_HANDLE ShaderVisibleDescHeap::GetGpuHandle(size_t index) const {
+    // This should be safe as only the render thread accesses
+    // this with the single render thread design of MG.
+    //std::lock_guard<std::mutex> lock(m_mutex);
+
     if (index >= m_size)
         throw std::out_of_range("No more room in the ShaderVisibleDescHeap");
 
