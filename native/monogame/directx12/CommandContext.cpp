@@ -318,6 +318,12 @@ void CommandContext::CreateDefaultRootSignature() {
     m_deviceRes->GetD3DDevice()->CreateRootSignature(
         0, pSerializedRootSig->GetBufferPointer(), pSerializedRootSig->GetBufferSize(),
         IID_GRAPHICS_PPV_ARGS(m_rootSig.ReleaseAndGetAddressOf()));
+
+    // Release the blobs.
+    if (pSerializedRootSig)
+        pSerializedRootSig->Release();
+    if (pErrorBlob)
+        pErrorBlob->Release();
 }
 
 void CommandContext::CreateGenerateMipPipelineResources() {
