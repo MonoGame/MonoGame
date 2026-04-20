@@ -107,42 +107,49 @@ void CommandContext::SetRenderTarget(void* colorTargets, size_t numColorTargets,
     // Only allow SetRenderTarget between Prepare and Present
     // This check should be replaced by an assert but Monogame's GraphicsDevice::Initialize() call ApplyRenderTargets(null)
     // This is here to avoid adding a platform specific define in the managed code and avoid crashing
-    if (!cmdList) return;
+    if (!cmdList)
+        return;
+
+    std::vector<D3D12_RESOURCE_BARRIER> batch;
 
     for (auto t : m_currentRT)
-        t->TransitionBatched(D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
+        t->TransitionBatched(batch, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
     m_currentRT.clear();
 
     if (m_currentDepthStencil != depthTarget) {
         if (m_currentDepthStencil)
-            m_currentDepthStencil->TransitionBatched(D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
+            m_currentDepthStencil->TransitionBatched(batch, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
         if (depthTarget)
-            depthTarget->TransitionBatched(D3D12_RESOURCE_STATE_DEPTH_WRITE);
+            depthTarget->TransitionBatched(batch, D3D12_RESOURCE_STATE_DEPTH_WRITE);
     }
 
-    if (colorTargets != nullptr) {
-        D3D12_CPU_DESCRIPTOR_HANDLE* rtvs = new D3D12_CPU_DESCRIPTOR_HANDLE[numColorTargets];
+    if (colorTargets != nullptr)
+    {
+        D3D12_CPU_DESCRIPTOR_HANDLE rtvs[8] = {};
 
         for (auto i = 0; i < numColorTargets; i++) {
             Texture* rt = ((Texture**)colorTargets)[i];
             rtvs[i] = rt->GetRTV();
             m_currentRT.push_back(rt);
 
-            rt->TransitionBatched(D3D12_RESOURCE_STATE_RENDER_TARGET);
+            rt->TransitionBatched(batch, D3D12_RESOURCE_STATE_RENDER_TARGET);
         }
-        Texture::SendTransitionBatch(cmdList);
+
+        Texture::SendTransitionBatch(batch, cmdList);
 
         if (depthTarget)
             SetRenderTargets(numColorTargets, rtvs, depthTarget->GetDSV());
         else
             SetRenderTargets(numColorTargets, rtvs);
-
-        delete[] rtvs;
     }
-    else {
-        Texture::SendTransitionBatch(cmdList);
+    else
+    {
         Texture* displayTarget = m_deviceRes->GetMainTarget();
+        displayTarget->TransitionBatched(batch, D3D12_RESOURCE_STATE_RENDER_TARGET);
         m_currentRT.push_back(displayTarget);
+
+        Texture::SendTransitionBatch(batch, cmdList);
+
         if (depthTarget)
             SetRenderTarget(displayTarget->GetRTV(), depthTarget->GetDSV());
         else
@@ -155,9 +162,11 @@ void CommandContext::ResolveResource(Texture* source, Texture* dest) {
     CommandList* cmdResolve = cmd;
     if (!cmd) cmdResolve = m_deviceRes->BeginCommandList(); // we might want to Resolve outside of Draw (to read the back buffer for example), so we create a blocking command list for that purpose
 
-    source->TransitionBatched(D3D12_RESOURCE_STATE_RESOLVE_SOURCE);
-    dest->TransitionBatched(D3D12_RESOURCE_STATE_RESOLVE_DEST);
-    Texture::SendTransitionBatch(cmdResolve->Get());
+    std::vector<D3D12_RESOURCE_BARRIER> batch;
+
+    source->TransitionBatched(batch, D3D12_RESOURCE_STATE_RESOLVE_SOURCE);
+    dest->TransitionBatched(batch, D3D12_RESOURCE_STATE_RESOLVE_DEST);
+    Texture::SendTransitionBatch(batch, cmdResolve->Get());
 
     DXGI_FORMAT resolveFormat = dest->GetFormat();
     if (resolveFormat == DXGI_FORMAT_D24_UNORM_S8_UINT) resolveFormat = DXGI_FORMAT_R24_UNORM_X8_TYPELESS;
@@ -179,16 +188,18 @@ void CommandContext::GenerateMipmap(Texture* source) {
     staging->AllowUAV();
     staging->Create(m_deviceRes);
 
+    std::vector<D3D12_RESOURCE_BARRIER> batch;
+
     // Copy the texture to the staging resource
-    source->Transition(cmdList, D3D12_RESOURCE_STATE_COPY_SOURCE);
+    source->Transition(batch, cmdList, D3D12_RESOURCE_STATE_COPY_SOURCE);
     const CD3DX12_TEXTURE_COPY_LOCATION src(source->Get(), 0);
     const CD3DX12_TEXTURE_COPY_LOCATION dst(staging->Get(), 0);
     cmdList->CopyTextureRegion(&dst, 0, 0, 0, &src, nullptr);
 
-    staging->TransitionBatched(D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE);
+    staging->TransitionBatched(batch, D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE);
     for (uint32_t mip = 1; mip < mipLevels; ++mip)
-        staging->TransitionBatched(D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE, D3D12_RESOURCE_STATE_UNORDERED_ACCESS, mip);
-    Texture::SendTransitionBatch(cmdList);
+        staging->TransitionBatched(batch, D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE, D3D12_RESOURCE_STATE_UNORDERED_ACCESS, mip);
+    Texture::SendTransitionBatch(batch, cmdList);
 
     m_deviceRes->GetGraphicsHeaps()->CopySRVUAVToShader(staging->GetSRV(), 0);
     for (uint16_t mip = 1; mip < mipLevels; ++mip)
@@ -216,20 +227,20 @@ void CommandContext::GenerateMipmap(Texture* source) {
 
         cmdList->Dispatch((mipWidth + 8 - 1) / 8, (mipHeight + 8 - 1) / 8, 1);
 
-        staging->TransitionBatched(D3D12_RESOURCE_STATE_UNORDERED_ACCESS, D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE, mip);
-        Texture::s_batchedBarriers.push_back(CD3DX12_RESOURCE_BARRIER::UAV(staging->Get()));
-        Texture::SendTransitionBatch(cmdList);
+        staging->TransitionBatched(batch, D3D12_RESOURCE_STATE_UNORDERED_ACCESS, D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE, mip);
+        batch.push_back(CD3DX12_RESOURCE_BARRIER::UAV(staging->Get()));
+        Texture::SendTransitionBatch(batch, cmdList);
     }
     m_deviceRes->GetGraphicsHeaps()->ApplySRVsToShader();
 
     // Copy back the content of the staging resource to the texture
-    staging->TransitionBatched(D3D12_RESOURCE_STATE_COPY_SOURCE);
-    source->TransitionBatched(D3D12_RESOURCE_STATE_COPY_DEST);
-    Texture::SendTransitionBatch(cmdList);
+    staging->TransitionBatched(batch, D3D12_RESOURCE_STATE_COPY_SOURCE);
+    source->TransitionBatched(batch, D3D12_RESOURCE_STATE_COPY_DEST);
+    Texture::SendTransitionBatch(batch, cmdList);
     cmdList->CopyResource(source->Get(), staging->Get());
 
     // We leave the resource in the pixel shader resource state as it is the most likely to be used
-    source->TransitionBatched(D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
+    source->Transition(batch, cmdList, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
 
     if (cmd) {
         // If we are in the main context we reset the descriptor heaps for normal rendering

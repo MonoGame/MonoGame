@@ -306,7 +306,8 @@ public:
         m_heaps->Prepare(m_backBufferIndex);
         m_commandContext->Reset(m_backBufferIndex);
 
-        GetMainTarget()->Transition(m_commandContext->GetCommandList(), D3D12_RESOURCE_STATE_RENDER_TARGET);
+        std::vector<D3D12_RESOURCE_BARRIER> batch;
+        GetMainTarget()->Transition(batch, m_commandContext->GetCommandList(), D3D12_RESOURCE_STATE_RENDER_TARGET);
 
         return m_backBufferIndex;
     }
@@ -320,7 +321,9 @@ public:
     void BeforePresent() {
         if (m_msaaEnabled)
             m_commandContext->ResolveResource(GetMainTarget(), GetDisplayTarget());
-        GetDisplayTarget()->Transition(m_commandContext->GetCommandList(), D3D12_RESOURCE_STATE_PRESENT);
+
+        std::vector<D3D12_RESOURCE_BARRIER> batch;
+        GetDisplayTarget()->Transition(batch, m_commandContext->GetCommandList(), D3D12_RESOURCE_STATE_PRESENT);
 
         // Send the command list and store the fence value for us to wait on it later
         m_fenceValues[m_backBufferIndex] = m_commandContext->Close();
