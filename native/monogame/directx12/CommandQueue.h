@@ -57,6 +57,8 @@ struct CommandList;
 class CommandListPool {
     ID3D12Device* m_device = nullptr;
 
+    std::mutex m_queueMutex;
+
     D3D12_COMMAND_LIST_TYPE  m_type;
     std::wstring m_name;
     

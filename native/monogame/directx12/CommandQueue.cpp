@@ -97,6 +97,8 @@ void CommandQueue::ResumeX() {
 CommandList* CommandListPool::Begin() {
     CommandList* ctx = nullptr;
 
+    std::lock_guard<std::mutex> lock(m_queueMutex);
+
     if (m_contextsRepo.empty()) {
         ctx = new CommandList(this);
         m_contexts.emplace_back(ctx);
@@ -114,14 +116,23 @@ CommandList* CommandListPool::Begin() {
 }
 
 uint64_t CommandListPool::CloseList(CommandList* ctx, bool blocking) {
-    uint64_t fenceValue = m_queue.ExecuteCommandList(ctx->m_list.Get());
-    FreeAllocator(fenceValue, ctx->m_allocator);
-    ctx->m_allocator = nullptr;
+
+    uint64_t fenceValue;
+    {
+        std::lock_guard<std::mutex> lock(m_queueMutex);
+
+        fenceValue = m_queue.ExecuteCommandList(ctx->m_list.Get());
+        FreeAllocator(fenceValue, ctx->m_allocator);
+        ctx->m_allocator = nullptr;
+    }
 
     if (blocking)
         m_queue.WaitForFenceCPUBlocking(fenceValue);
 
-    m_contextsRepo.push(ctx);
+    {
+        std::lock_guard<std::mutex> lock(m_queueMutex);
+        m_contextsRepo.push(ctx);
+    }
 
     return fenceValue;
 }
