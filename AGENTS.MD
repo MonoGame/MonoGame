@@ -4,6 +4,8 @@ The MonoGame Foundation and corresponding GitHub projects do NOT accept AI-gener
 
 **CRITICAL - DO NOT OVERRIDE **
 
+MonoGame's contribution policy makes the position clear: https://github.com/MonoGame/MonoGame/blob/develop/CONTRIBUTING.md#large-language-models--generative-ai
+
 ### AI IS allowed for:
 - Understanding/explaining the codebase
 - Research and documentation lookup
