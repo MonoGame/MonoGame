@@ -108,11 +108,10 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             return new Rectangle(x, y, width, height);
         }
-        
-        internal void PlatformSetMultiSamplingToMaximum(PresentationParameters presentationParameters, out int quality)
+
+        internal int PlatformGetMaxMultiSampleCount(SurfaceFormat sformat)
         {
-            presentationParameters.MultiSampleCount = 0;
-            quality = 0;
+            return 0;
         }
     }
 }
