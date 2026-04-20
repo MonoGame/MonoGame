@@ -313,8 +313,9 @@ public:
     }
 
     void WaitForGpu() noexcept {
-        m_commandListPool->GetCommandQueue()->SignalFence();
-        m_commandListPool->GetCommandQueue()->WaitForIdle();
+        auto queue = m_commandListPool->GetCommandQueue();
+        queue->SignalFence();
+        queue->WaitForIdle();
     }
 
     // Code common between Present and PresentX
