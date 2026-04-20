@@ -26,6 +26,9 @@ using namespace DirectX;
 using namespace DX;
 using namespace Graphics;
 
+// 33MB should be more than enough for CB.
+const size_t CB_RingCapacity = 512 * D3D12_DEFAULT_RESOURCE_PLACEMENT_ALIGNMENT;
+
 #pragma pack(push, 4)
 struct MipGenerationConstantData {
     XMFLOAT2 InvOutTexelSize;
@@ -40,7 +43,7 @@ CommandContext::CommandContext(DeviceResources* deviceResources) : m_deviceRes(d
     CreateGenerateMipPipelineResources();
 
     D3D12MA::ALLOCATION_DESC cbUploadAllocDesc = { D3D12MA::ALLOCATION_FLAG_NONE, D3D12_HEAP_TYPE_UPLOAD };
-    D3D12_RESOURCE_DESC cbUploadResourceDesc = CD3DX12_RESOURCE_DESC::Buffer(512 * D3D12_DEFAULT_RESOURCE_PLACEMENT_ALIGNMENT); // should be more than enough for CB
+    D3D12_RESOURCE_DESC cbUploadResourceDesc = CD3DX12_RESOURCE_DESC::Buffer(CB_RingCapacity);
     for (size_t i = 0; i < MAX_BACK_BUFFER_COUNT; ++i) {
         deviceResources->GetAllocator()->CreateResource(
             &cbUploadAllocDesc,
