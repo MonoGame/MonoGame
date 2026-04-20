@@ -2279,6 +2279,33 @@ namespace Microsoft.Xna.Framework
         }
 
         /// <summary>
+        /// Multiplies the elements of matrix by a scalar.
+        /// </summary>
+        /// <param name="scaleFactor">Scalar value on the left of the mul sign.</param>
+        /// <param name="matrix">Source <see cref="Matrix"/> on the right of the mul sign.</param>
+        /// <returns>Result of the matrix multiplication with a scalar.</returns>
+        public static Matrix operator *(float scaleFactor, Matrix matrix)
+        {
+		    matrix.M11 = matrix.M11 * scaleFactor;
+		    matrix.M12 = matrix.M12 * scaleFactor;
+		    matrix.M13 = matrix.M13 * scaleFactor;
+		    matrix.M14 = matrix.M14 * scaleFactor;
+		    matrix.M21 = matrix.M21 * scaleFactor;
+		    matrix.M22 = matrix.M22 * scaleFactor;
+		    matrix.M23 = matrix.M23 * scaleFactor;
+		    matrix.M24 = matrix.M24 * scaleFactor;
+		    matrix.M31 = matrix.M31 * scaleFactor;
+		    matrix.M32 = matrix.M32 * scaleFactor;
+		    matrix.M33 = matrix.M33 * scaleFactor;
+		    matrix.M34 = matrix.M34 * scaleFactor;
+		    matrix.M41 = matrix.M41 * scaleFactor;
+		    matrix.M42 = matrix.M42 * scaleFactor;
+		    matrix.M43 = matrix.M43 * scaleFactor;
+		    matrix.M44 = matrix.M44 * scaleFactor;
+		    return matrix;
+        }
+
+        /// <summary>
         /// Subtracts the values of one <see cref="Matrix"/> from another <see cref="Matrix"/>.
         /// </summary>
         /// <param name="matrix1">Source <see cref="Matrix"/> on the left of the sub sign.</param>

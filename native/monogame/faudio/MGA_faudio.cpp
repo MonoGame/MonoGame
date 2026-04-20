@@ -714,6 +714,10 @@ static void MGA_Voice_UpdateOutputMatrix(MGA_Voice* voice)
 void MGA_Voice_SetPan(MGA_Voice* voice, mgfloat pan)
 {
 	assert(voice != nullptr);
+
+	if (voice->voice == nullptr)
+		return;
+
 	voice->pan = pan;
 	MGA_Voice_UpdateOutputMatrix(voice);
 }
@@ -722,6 +726,9 @@ void MGA_Voice_SetPitch(MGA_Voice* voice, mgfloat pitch)
 {
 	assert(voice != nullptr);
 
+	if (voice->voice == nullptr)
+		return;
+
 	float ratio = powf(2.0f, pitch);
 	FAudioSourceVoice_SetFrequencyRatio(voice->voice, ratio, FAUDIO_COMMIT_NOW);
 }
@@ -729,6 +736,9 @@ void MGA_Voice_SetPitch(MGA_Voice* voice, mgfloat pitch)
 void MGA_Voice_SetVolume(MGA_Voice* voice, mgfloat volume)
 {
 	assert(voice != nullptr);
+
+	if (voice->voice == nullptr)
+		return;
 
 	FAudioVoice_SetVolume(voice->voice, volume, FAUDIO_COMMIT_NOW);
 }
@@ -785,6 +795,9 @@ void MGA_Voice_SetFilterMode(MGA_Voice* voice, MGFilterMode mode, mgfloat filter
 {
 	assert(voice != nullptr);
 
+	if (voice->voice == nullptr)
+		return;
+
 	FAudioVoiceDetails details;
 	memset(&details, 0, sizeof(details));
 	FAudioVoice_GetVoiceDetails(voice->voice, &details);
@@ -809,6 +822,9 @@ void MGA_Voice_ClearFilterMode(MGA_Voice* voice)
 {
 	assert(voice != nullptr);
 
+	if (voice->voice == nullptr)
+		return;
+
 	FAudioFilterParameters params;
 	params.Type = FAudioLowPassFilter;
 	params.Frequency = FAUDIO_MAX_FILTER_FREQUENCY;
@@ -819,6 +835,9 @@ void MGA_Voice_ClearFilterMode(MGA_Voice* voice)
 void MGA_Voice_Apply3D(MGA_Voice* voice, Listener& listener, Emitter& emitter, mgfloat distanceScale)
 {
 	assert(voice != nullptr);
+
+	if (voice->voice == nullptr)
+		return;
 
 	F3DAUDIO_LISTENER f3dListener;
 	f3dListener.OrientFront.x = listener.Forward.X;

@@ -101,7 +101,7 @@ internal static unsafe partial class MG
     public static extern byte AssetOpen(string assetname, out MG_Asset* file, out long length);
 
     [DllImport(MonoGameNativeDLL, EntryPoint = "MG_Asset_Read", ExactSpelling = true)]
-    public static extern int AssetRead(MG_Asset* file, byte* buffer, int count);
+    public static extern int AssetRead(MG_Asset* file, byte* buffer, long count);
 
     [DllImport(MonoGameNativeDLL, EntryPoint = "MG_Asset_Seek", ExactSpelling = true)]
     public static extern long AssetSeek(MG_Asset* file, long offset, int origin);
