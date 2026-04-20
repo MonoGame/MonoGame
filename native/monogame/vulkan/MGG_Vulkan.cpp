@@ -640,6 +640,8 @@ static VkPrimitiveTopology ToVkPrimitiveTopology(MGPrimitiveType type)
 		return VK_PRIMITIVE_TOPOLOGY_LINE_LIST;
 	case MGPrimitiveType::LineStrip:
 		return VK_PRIMITIVE_TOPOLOGY_LINE_STRIP;
+	case MGPrimitiveType::PointList:
+		return VK_PRIMITIVE_TOPOLOGY_POINT_LIST;
 	default:
 		assert(0);
 	}
