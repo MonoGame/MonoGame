@@ -315,18 +315,11 @@ jobs:
         if: runner.environment == 'github-hosted'
         uses: monogame/monogame-actions/install-fonts@v1
 
-      - name: install wine64 on linux
-        if: runner.environment == 'github-hosted' && runner.os == 'Linux'
-        run: |
-          wget -qO- https://monogame.net/downloads/net9_mgfxc_wine_setup.sh | bash
-
-      - name: install wine64 on MacOS
+      - name: Pin xcode to 26.3
+        uses: maxim-lobanov/setup-xcode@v1
         if: runner.environment == 'github-hosted' && runner.os == 'macos'
-        run: |
-          sudo mkdir -p /usr/local/lib
-          ls -n /Applications/ | grep Xcode*
-          sudo xcode-select -s /Applications/Xcode_16.2.app/Contents/Developer
-          wget -qO- https://monogame.net/downloads/net9_mgfxc_wine_setup.sh | bash
+        with:
+          xcode-version: '26.3'
 
       - name: Download Nuget
         uses: actions/download-artifact@v4
