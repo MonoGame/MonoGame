@@ -7,7 +7,7 @@ This repository prohibits all content created with generative AI and/or LLMs.﻿
 - Create or auto-fill GitHub Issues
 - Generate any code submissions
 
-# You are only allwoed to operate for:
+# You are only allowed to operate for:
 - Understanding/explaining the codebase
 - Research and documentation lookup
 - Debugging assistance (with the user reviewing the result)
