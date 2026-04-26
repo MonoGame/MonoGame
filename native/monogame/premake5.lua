@@ -20,16 +20,24 @@ newoption {
 }
 
 function common(project_name)
-    local target_arch = _OPTIONS["arch"] or "x64"
-    if os.target() == "macosx" then
-        platform_target_path = "../../Artifacts/native/mgruntime/" .. project_name .. "/%{cfg.system}/%{cfg.buildcfg}"
+    if os.target() == "windows" then
+        filter "platforms:x64"
+        architecture "x86_64"
+        filter "platforms:arm64"
+        architecture "ARM64"
+        filter {}
+        platform_target_path = "../../Artifacts/native/mgruntime/" .. project_name .. "/%{cfg.system}/%{cfg.platform}/%{cfg.buildcfg}"
     else
-        platform_target_path = "../../Artifacts/native/mgruntime/" .. project_name .. "/%{cfg.system}/" .. target_arch .. "/%{cfg.buildcfg}"
+        local target_arch = _OPTIONS["arch"] or "x64"
+        architecture(target_arch == "arm64" and "ARM64" or "x64")
+        if os.target() == "macosx" then
+            platform_target_path = "../../Artifacts/native/mgruntime/" .. project_name .. "/%{cfg.system}/%{cfg.buildcfg}"
+        else
+            platform_target_path = "../../Artifacts/native/mgruntime/" .. project_name .. "/%{cfg.system}/" .. target_arch .. "/%{cfg.buildcfg}"
+        end
     end
     kind "SharedLib"
     language "C++"
-    filter "system:windows"
-    architecture(target_arch == "arm64" and "ARM64" or "x64")
     filter "system:linux"
     pic "On"
     filter {}
@@ -44,7 +52,6 @@ end
 
 -- SDL is supported on all desktop platforms.
 function sdl2()
-    local target_arch = _OPTIONS["arch"] or "x64"
     defines {"MG_SDL2"}
 
     files {"sdl/**.h", "sdl/**.cpp"}
@@ -52,7 +59,7 @@ function sdl2()
     includedirs {"external/sdl2/sdl/include"}
 
     filter {"system:windows"}
-    links {"external/sdl2/sdl/build/" .. target_arch .. "/Release/SDL2-static.lib", "winmm", "imm32", "user32", "gdi32", "advapi32",
+    links {"external/sdl2/sdl/build/%{cfg.platform}/Release/SDL2-static.lib", "winmm", "imm32", "user32", "gdi32", "advapi32",
            "setupapi", "ole32", "oleaut32", "version", "shell32"}
     filter {"system:macosx"}
     libdirs {"external/sdl2/sdl/build"}
@@ -96,7 +103,6 @@ end
 
 -- FAudio is supported for all desktop platforms.
 function faudio()
-    local target_arch = _OPTIONS["arch"] or "x64"
     defines {"MG_FAUDIO"}
 
     files {"faudio/**.h", "faudio/**.cpp"}
@@ -104,7 +110,7 @@ function faudio()
     includedirs {"external/faudio/include"}
     
     filter {"system:windows"}
-    libdirs {"external/faudio/build/" .. target_arch .. "/Release"}
+    libdirs {"external/faudio/build/%{cfg.platform}/Release"}
     links {"FAudio.lib"}
     
     filter {"system:macosx"}
@@ -150,6 +156,9 @@ end
 
 workspace "monogame"
 configurations {"Debug", "Release"}
+if os.target() == "windows" then
+    platforms { "x64", "arm64" }
+end
 
 project "desktopvk"
 common("desktopvk")

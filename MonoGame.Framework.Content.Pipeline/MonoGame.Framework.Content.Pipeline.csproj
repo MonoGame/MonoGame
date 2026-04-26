@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <Import Project="..\MonoGame.props" />
 
@@ -139,12 +139,11 @@
     <Exec Command="&quot;$(MSBuildProgramFiles32)\Microsoft Visual Studio\Installer\vswhere.exe&quot; -latest -requires Microsoft.Component.MSBuild -find MSBuild\**\Bin\MSBuild.exe" ConsoleToMSBuild="true">
       <Output TaskParameter="ConsoleOutput" PropertyName="MGMSBuild" />
     </Exec>
+    <!-- Generate Multi-Arch Solution -->
+    <Exec Command="premake5 vs2022" WorkingDirectory="../native/pipeline/" />
     <!-- Build x64 -->
-    <Exec Command="premake5 --arch=x64 vs2022" WorkingDirectory="../native/pipeline/" />
     <Exec Command="&quot;$(MGMSBuild)&quot; pipeline.sln /p:Configuration=$(Configuration) /p:Platform=x64" WorkingDirectory="../native/pipeline/" />
     <!-- Build arm64 (cross-compile on same host) -->
-    <Exec Command="premake5 clean" WorkingDirectory="../native/pipeline/" />
-    <Exec Command="premake5 --arch=arm64 vs2022" WorkingDirectory="../native/pipeline/" />
     <Exec Command="&quot;$(MGMSBuild)&quot; pipeline.sln /p:Configuration=$(Configuration) /p:Platform=ARM64" WorkingDirectory="../native/pipeline/" />
   </Target>
 
