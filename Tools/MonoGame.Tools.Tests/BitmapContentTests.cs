@@ -280,11 +280,17 @@ namespace MonoGame.Tests.ContentPipeline
             // validate that we can compress an astc interpolated texture
             using var _ = ContextScopeFactory.BeginContext(new TestBitmapProcessorContext());
             BitmapConvert(typeof(AstcBitmapContent), Color.Red, 64, 64);
+            BitmapConvert(typeof(AstcBitmapContent), Color.Red, 63, 64);
             BitmapConvert(typeof(Astc5x5BitmapContent), Color.Red, 64, 64);
+            BitmapConvert(typeof(Astc5x5BitmapContent), Color.Red, 63, 64);
             BitmapConvert(typeof(Astc6x6BitmapContent), Color.Red, 64, 64);
+            BitmapConvert(typeof(Astc6x6BitmapContent), Color.Red, 64, 63);
             BitmapConvert(typeof(Astc8x8BitmapContent), Color.Red, 64, 64);
+            BitmapConvert(typeof(Astc8x8BitmapContent), Color.Red, 63, 64);
             BitmapConvert(typeof(Astc10x10BitmapContent), Color.Red, 64, 64);
+            BitmapConvert(typeof(Astc10x10BitmapContent), Color.Red, 64, 63);
             BitmapConvert(typeof(Astc12x12BitmapContent), Color.Red, 64, 64);
+            BitmapConvert(typeof(Astc12x12BitmapContent), Color.Red, 63, 64);
         }
 
         [Test]
