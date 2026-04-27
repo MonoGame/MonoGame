@@ -206,6 +206,9 @@ jobs:
     name: PackNativeRuntime
     needs: [ build ]
     runs-on: ubuntu-latest
+    permissions:
+        packages: write
+        contents: write
     steps:
         - name: Clone Repository
           uses: actions/checkout@v5
