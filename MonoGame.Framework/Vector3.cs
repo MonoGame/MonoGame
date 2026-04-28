@@ -936,7 +936,7 @@ namespace Microsoft.Xna.Framework
         /// <summary>
         /// Round the members of this <see cref="Vector3"/> towards the specified number of fractional digits.
         /// </summary>
-        /// <param name="digits">The number of fractional digits in the return value's components.</param>
+        /// <param name="digits">The number of fractional digits the components will be rounded to.</param>
         public void Round(int digits)
         {
             X = MathF.Round(X, digits);
@@ -947,7 +947,7 @@ namespace Microsoft.Xna.Framework
         /// <summary>
         /// Round the members of this <see cref="Vector3"/> towards the specified number of fractional digits, using the specified rounding convention for midpoint values.
         /// </summary>
-        /// <param name="digits">The number of fractional digits in the return value's components.</param>
+        /// <param name="digits">The number of fractional digits the components will be rounded to.</param>
         /// <param name="mode">Specification for how to round a component value if it is midway between two other numbers.</param>
         public void Round(int digits, MidpointRounding mode)
         {
