@@ -119,6 +119,8 @@ namespace Microsoft.Xna.Framework
                         var disposable = _components[i] as IDisposable;
                         disposable?.Dispose();
                     }
+                    _components.ComponentAdded -= Components_ComponentAdded;
+                    _components.ComponentRemoved -= Components_ComponentRemoved;
                     _components = null!;
 
 
@@ -144,7 +146,9 @@ namespace Microsoft.Xna.Framework
                     ContentTypeReaderManager.ClearTypeCreators();
 
                     if (SoundEffect._systemState == SoundEffect.SoundSystemState.Initialized)
-                        SoundEffect.PlatformShutdown();
+                    {
+                        SoundEffect.Shutdown();
+                    }
                 }
 #if ANDROID
                 Activity = null;

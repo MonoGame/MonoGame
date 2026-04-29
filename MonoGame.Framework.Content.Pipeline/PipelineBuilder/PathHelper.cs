@@ -27,7 +27,7 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
 
         /// <summary>
         /// Returns a directory path string normalized to the/universal/standard
-        /// with a trailing seperator.
+        /// with a trailing separator.
         /// </summary>
         public static string NormalizeDirectory(string path)
         {
