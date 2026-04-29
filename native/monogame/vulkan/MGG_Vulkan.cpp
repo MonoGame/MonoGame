@@ -463,6 +463,7 @@ struct MGG_GraphicsSystem
 
 static void MGVK_BufferCopyAndFlush(MGG_GraphicsDevice* device, MGG_Buffer* buffer, int destOffset, mgbyte* data, int dataBytes);
 static MGG_Buffer* MGVK_Buffer_Create(MGG_GraphicsDevice* device, MGBufferType type, mgint sizeInBytes, bool no_push);
+static void MGVK_DestroyPipelines(MGG_GraphicsDevice* device, std::function<bool(const MGVK_PipelineState&)> compare);
 static void MGVK_DestroyFrameResources(MGG_GraphicsDevice* device, mgint currentFrame, mgbyte free_all);
 static void MGVK_UpdateRenderPass(MGG_GraphicsDevice* device, FrameCounter currentFrame, MGVK_CmdBuffer& cmd);
 static VkCommandBuffer MGVK_BeginNewCommandBuffer(MGG_GraphicsDevice* device);
@@ -636,12 +637,12 @@ static VkPrimitiveTopology ToVkPrimitiveTopology(MGPrimitiveType type)
 	}
 }
 
-static VkImageViewType ToVkImageViewType(MGTextureType type)
+static VkImageViewType ToVkImageViewType(MGTextureType type, int layerCount = 1)
 {
 	switch (type)
 	{
 	case MGTextureType::_2D:
-		return VK_IMAGE_VIEW_TYPE_2D;
+		return layerCount > 1 ? VK_IMAGE_VIEW_TYPE_2D_ARRAY : VK_IMAGE_VIEW_TYPE_2D;
 	case MGTextureType::_3D:
 		return VK_IMAGE_VIEW_TYPE_3D;
 	case MGTextureType::Cube:
@@ -1056,7 +1057,7 @@ static VkImageView CreateImageView(MGG_GraphicsDevice* device, MGG_Texture* text
 
 	VkImageViewCreateInfo image_view_create_info = { VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO };
 	image_view_create_info.image = texture->image;
-	image_view_create_info.viewType = ToVkImageViewType(texture->type);
+	image_view_create_info.viewType = ToVkImageViewType(texture->type, layer_count);
 	image_view_create_info.format = format;
 	image_view_create_info.subresourceRange.aspectMask = aspect_mask;
 	image_view_create_info.subresourceRange.baseMipLevel = 0;
@@ -1416,6 +1417,12 @@ static void cleanupSwapChain(MGG_GraphicsDevice* device)
 
 		if (usesSwapchain)
 		{
+			// Clean up any pipelines that point at this target set cache.
+			MGVK_DestroyPipelines(device, [targetSetCache](const MGVK_PipelineState& s)
+				{
+					return s.targets == targetSetCache;
+				});
+
 			// This cache entry uses the swapchain, so it's safe to destroy.
 			for (int i = 0; i < MGVK_NUM_TARGETS; ++i)
 			{
@@ -1477,6 +1484,10 @@ static void cleanupSwapChain(MGG_GraphicsDevice* device)
 void MGG_GraphicsDevice_Destroy(MGG_GraphicsDevice* device)
 {
 	assert(device != nullptr);
+
+	// Be sure we're done drawing.
+	// Prevents some exceptions while shutting down.
+	vkDeviceWaitIdle(device->device);
 
 	cleanupSwapChain(device);
 
@@ -1953,7 +1964,7 @@ mgint MGG_GraphicsDevice_BeginFrame(MGG_GraphicsDevice* device)
 	frame.uniformOffset = 0;
 	if (frame.uniforms == NULL)
 	{
-		frame.uniforms = MGVK_Buffer_Create(device, MGBufferType::Constant, 4 * 1024 * 1024, true);
+		frame.uniforms = MGVK_Buffer_Create(device, MGBufferType::Constant, 32 * 1024 * 1024, true);
 		VK_SET_OBJECT_NAME(device->device, frame.uniforms->buffer, VK_OBJECT_TYPE_BUFFER, "MGVK_FrameState.uniforms->buffer");
 	}
 
@@ -2585,6 +2596,34 @@ static void MGVK_CmdTransitionImageLayout(
 		sourceStage = VK_PIPELINE_STAGE_TRANSFER_BIT;
 		destinationStage = VK_PIPELINE_STAGE_TRANSFER_BIT;
 	}
+	else if (oldLayout == VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL && newLayout == VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL)
+	{
+		barrier.srcAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
+		barrier.dstAccessMask = VK_ACCESS_TRANSFER_READ_BIT;
+		sourceStage = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
+		destinationStage = VK_PIPELINE_STAGE_TRANSFER_BIT;
+	}
+	else if (oldLayout == VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL && newLayout == VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL)
+	{
+		barrier.srcAccessMask = VK_ACCESS_SHADER_READ_BIT;
+		barrier.dstAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
+		sourceStage = VK_PIPELINE_STAGE_VERTEX_SHADER_BIT | VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT;
+		destinationStage = VK_PIPELINE_STAGE_TRANSFER_BIT;
+	}
+	else if (oldLayout == VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL && newLayout == VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL)
+	{
+		barrier.srcAccessMask = VK_ACCESS_SHADER_READ_BIT;
+		barrier.dstAccessMask = VK_ACCESS_TRANSFER_READ_BIT;
+		sourceStage = VK_PIPELINE_STAGE_VERTEX_SHADER_BIT | VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT;
+		destinationStage = VK_PIPELINE_STAGE_TRANSFER_BIT;
+	}
+	else if (oldLayout == VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL && newLayout == VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL)
+	{
+		barrier.srcAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
+		barrier.dstAccessMask = VK_ACCESS_TRANSFER_READ_BIT;
+		sourceStage = VK_PIPELINE_STAGE_TRANSFER_BIT;
+		destinationStage = VK_PIPELINE_STAGE_TRANSFER_BIT;
+	}
 	else
 	{
 		fprintf(stderr, "Warning: Potentially unhandled layout transition from %d to %d in %s:%d\n", oldLayout, newLayout, __FILE__, __LINE__);
@@ -2914,7 +2953,7 @@ static void MGVK_UpdateRenderPass(MGG_GraphicsDevice* device, FrameCounter curre
 	device->deferredOcclusionQueries.clear();
 }
 
-static const int DefaultPoolSize = 1024;
+static const int DefaultPoolSize = 16384;
 
 static void MGVK_FillDescriptorSetCache(MGG_GraphicsDevice* device, MGG_Shader* shader)
 {
@@ -4607,9 +4646,10 @@ void MGG_Buffer_GetData(MGG_GraphicsDevice* device, MGG_Buffer* buffer, mgint of
     }
     else
     {
+		auto bytesToCopy = dataBytes < dataStride ? dataBytes : dataStride;
         for (mgint i = 0; i < dataCount; ++i)
         {
-            memcpy(data + i * dataBytes, src_ptr + i * dataStride, dataBytes);
+            memcpy(data + i * dataBytes, src_ptr + i * dataStride, bytesToCopy);
         }
     }
 }
