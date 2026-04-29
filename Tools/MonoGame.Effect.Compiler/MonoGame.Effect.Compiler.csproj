@@ -31,8 +31,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="MonoGame.Library.MojoShader" Version="1.0.0.3" />
-    <PackageReference Include="MonoGame.Tool.Dxc" Version="1.8.2505.10" />
+    <PackageReference Include="MonoGame.Library.MojoShader" Version="1.0.0.4" />
+    <PackageReference Include="MonoGame.Tool.Dxc" Version="1.8.2505.11" />
     <PackageReference Include="SharpDX" Version="4.0.1" />
     <PackageReference Include="SharpDX.D3DCompiler" Version="4.0.1" />
   </ItemGroup>

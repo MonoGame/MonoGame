@@ -193,7 +193,8 @@ public sealed partial class Song : IEquatable<Song>, IDisposable
             _thread = null;
         }
 
-        MGA.Voice_Stop(_voice, (byte)(immediate ? 1 : 0));
+        if (_voice != null)
+            MGA.Voice_Stop(_voice, (byte)(immediate ? 1 : 0));
     }
 
 
