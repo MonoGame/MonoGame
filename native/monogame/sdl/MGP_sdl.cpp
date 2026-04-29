@@ -425,10 +425,11 @@ mgbyte MGP_Platform_PollEvent(MGP_Platform* platform, MGP_Event& event_)
             auto controller = SDL_GameControllerOpen(ev.cdevice.which);
             if (controller != nullptr)
             {
-                platform->controllers.emplace(ev.cdevice.which, controller);
+                auto instanceId = SDL_JoystickInstanceID(SDL_GameControllerGetJoystick(controller));
+                platform->controllers.emplace(instanceId, controller);
                 event_.Type = MGEventType::ControllerAdded;
                 event_.Timestamp = ev.cdevice.timestamp;
-                event_.Controller.Id = ev.cdevice.which;
+                event_.Controller.Id = instanceId;
                 event_.Controller.Input = MGControllerInput::INVALID;
                 event_.Controller.Value = 0;
                 return true;

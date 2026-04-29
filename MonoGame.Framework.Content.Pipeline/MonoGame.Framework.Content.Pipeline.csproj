@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <Import Project="..\MonoGame.props" />
 
@@ -65,16 +65,16 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="AssimpNetter" Version="5.4.3.3" />
+    <PackageReference Include="AssimpNetter" Version="5.4.3.4" />
     <PackageReference Include="BCnEncoder.Net" Version="2.1.0" />
     <PackageReference Include="Microsoft.VisualBasic" Version="10.3.0" />
-    <PackageReference Include="MonoGame.Library.FreeType" Version="2.13.2.2" />
-    <PackageReference Include="MonoGame.Library.MojoShader" Version="1.0.0.3" />
-    <PackageReference Include="MonoGame.Tool.Basisu" Version="1.60.0.3" />
-    <PackageReference Include="MonoGame.Tool.Crunch" Version="1.0.4.5" />
-    <PackageReference Include="MonoGame.Tool.Dxc" Version="1.8.2505.10" />
-    <PackageReference Include="MonoGame.Tool.FFmpeg" Version="7.0.0.9" />
-    <PackageReference Include="MonoGame.Tool.FFprobe" Version="7.0.0.9" />
+    <PackageReference Include="MonoGame.Library.FreeType" Version="2.13.2.3" />
+    <PackageReference Include="MonoGame.Library.MojoShader" Version="1.0.0.4" />
+    <PackageReference Include="MonoGame.Tool.Basisu" Version="2.0.2.1" />
+    <PackageReference Include="MonoGame.Tool.Crunch" Version="1.0.4.7" />
+    <PackageReference Include="MonoGame.Tool.Dxc" Version="1.8.2505.11" />
+    <PackageReference Include="MonoGame.Tool.FFmpeg" Version="7.0.0.10" />
+    <PackageReference Include="MonoGame.Tool.FFprobe" Version="7.0.0.10" />
     <PackageReference Include="SharpDX" Version="4.0.1" />
     <PackageReference Include="SharpDX.D3DCompiler" Version="4.0.1" />
     <PackageReference Include="LibKTX" Version="0.9.2" />
@@ -83,14 +83,31 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Content Include="..\Artifacts\native\mgpipeline\windows\$(Configuration)\mgpipeline.dll" Condition="Exists('..\Artifacts\native\mgpipeline\windows\$(Configuration)\mgpipeline.dll')" Visible="false">
+    <!-- Windows x64 -->
+    <Content Include="..\Artifacts\native\mgpipeline\windows\x64\$(Configuration)\mgpipeline.dll" Condition="Exists('..\Artifacts\native\mgpipeline\windows\x64\$(Configuration)\mgpipeline.dll')" Visible="false">
+      <Link>runtimes\win-x64\native\mgpipeline.dll</Link>
       <PackagePath>runtimes\win-x64\native</PackagePath>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="..\Artifacts\native\mgpipeline\linux\$(Configuration)\libmgpipeline.so" Condition="Exists('..\Artifacts\native\mgpipeline\linux\$(Configuration)\libmgpipeline.so')" Visible="false">
+    <!-- Windows arm64 -->
+    <Content Include="..\Artifacts\native\mgpipeline\windows\arm64\$(Configuration)\mgpipeline.dll" Condition="Exists('..\Artifacts\native\mgpipeline\windows\arm64\$(Configuration)\mgpipeline.dll')" Visible="false">
+      <Link>runtimes\win-arm64\native\mgpipeline.dll</Link>
+      <PackagePath>runtimes\win-arm64\native</PackagePath>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <!-- Linux x64 -->
+    <Content Include="..\Artifacts\native\mgpipeline\linux\x64\$(Configuration)\libmgpipeline.so" Condition="Exists('..\Artifacts\native\mgpipeline\linux\x64\$(Configuration)\libmgpipeline.so')" Visible="false">
+       <Link>runtimes\linux-x64\native\libmgpipeline.so</Link>
       <PackagePath>runtimes\linux-x64\native</PackagePath>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <!-- Linux arm64 -->
+    <Content Include="..\Artifacts\native\mgpipeline\linux\arm64\$(Configuration)\libmgpipeline.so" Condition="Exists('..\Artifacts\native\mgpipeline\linux\arm64\$(Configuration)\libmgpipeline.so')" Visible="false">
+      <Link>runtimes\linux-arm64\native\libmgpipeline.so</Link>
+      <PackagePath>runtimes\linux-arm64\native</PackagePath>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <!-- macOS (universal binary) -->
     <Content Include="..\Artifacts\native\mgpipeline\macosx\$(Configuration)\libmgpipeline.dylib" Condition="Exists('..\Artifacts\native\mgpipeline\macosx\$(Configuration)\libmgpipeline.dylib')" Visible="false">
       <PackagePath>runtimes\osx\native</PackagePath>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
@@ -122,12 +139,21 @@
     <Exec Command="&quot;$(MSBuildProgramFiles32)\Microsoft Visual Studio\Installer\vswhere.exe&quot; -latest -requires Microsoft.Component.MSBuild -find MSBuild\**\Bin\MSBuild.exe" ConsoleToMSBuild="true">
       <Output TaskParameter="ConsoleOutput" PropertyName="MGMSBuild" />
     </Exec>
+    <!-- Generate Multi-Arch Solution -->
     <Exec Command="premake5 vs2022" WorkingDirectory="../native/pipeline/" />
+    <!-- Build x64 -->
     <Exec Command="&quot;$(MGMSBuild)&quot; pipeline.sln /p:Configuration=$(Configuration) /p:Platform=x64" WorkingDirectory="../native/pipeline/" />
+    <!-- Build arm64 (cross-compile on same host) -->
+    <Exec Command="&quot;$(MGMSBuild)&quot; pipeline.sln /p:Configuration=$(Configuration) /p:Platform=ARM64" WorkingDirectory="../native/pipeline/" />
   </Target>
 
   <Target Name="BuildMGCPU" Condition="'$(DisableNativeBuild)' != 'True' and '$(OS)' != 'Windows_NT'" BeforeTargets="CollectPackageReferences">
-    <Exec Command="premake5 gmake" WorkingDirectory="../native/pipeline/" />
+    <PropertyGroup>
+      <!-- Linux/macOS: build for the host architecture (no cross-compilation) -->
+      <NativeArch Condition="'$([System.Runtime.InteropServices.RuntimeInformation]::OSArchitecture)' == 'Arm64'">arm64</NativeArch>
+      <NativeArch Condition="'$(NativeArch)' == ''">x64</NativeArch>
+    </PropertyGroup>
+    <Exec Command="premake5 --arch=$(NativeArch) gmake" WorkingDirectory="../native/pipeline/" />
     <Exec Command="make config=$(Configuration.ToLower())" WorkingDirectory="../native/pipeline/" />
   </Target>
 
