@@ -148,6 +148,7 @@ struct MGG_BlendState
 struct MGG_DepthStencilState
 {
 	D3D12_DEPTH_STENCIL_DESC desc;
+	mgint referenceStencil;
 };
 
 struct MGG_RasterizerState
@@ -604,6 +605,10 @@ void MGG_GraphicsDevice_SetDepthStencilState(MGG_GraphicsDevice* device, MGG_Dep
 
 	auto& depthStencilState = device->pipelineManager->impl->m_currentPSODesc.DepthStencilState;
 	depthStencilState = state->desc;
+	
+	// Set stencil reference on every frame.
+	auto commandList = device->context->GetCommandList();
+	commandList->OMSetStencilRef(state->referenceStencil);
 }
 
 void MGG_GraphicsDevice_SetRasterizerState(MGG_GraphicsDevice* device, MGG_RasterizerState* state)
@@ -827,6 +832,15 @@ void MGDX_ApplyState(MGG_GraphicsDevice* device)
 			if (!buffer)
 				continue;
 
+
+			if (i >= device->layout->streamStrides.size())
+			{
+				// Vertex buffer is out of sync with current layout.
+				// Clean up leftover vertex buffer slot.
+				device->vertexBuffers[i] = nullptr;
+				continue;
+			}
+
 			vbv.BufferLocation = buffer->GpuAddress() + device->vertexOffsets[i];
 			vbv.StrideInBytes = device->layout->streamStrides[i];
 			vbv.SizeInBytes = buffer->dataSize;
@@ -974,8 +988,6 @@ void MGG_GraphicsDevice_DrawIndexedInstanced(MGG_GraphicsDevice* device, MGPrimi
 	auto indexCount = MGDX_GetIndexCount(primitiveType, primitiveCount);
 
 	cl->DrawIndexedInstanced(indexCount, instanceCount, indexStart, vertexStart, 0);
-
-	MG_NOT_IMPLEMEMTED;
 }
 
 
@@ -1051,6 +1063,7 @@ MGG_DepthStencilState* MGG_DepthStencilState_Create(MGG_GraphicsDevice* device, 
 	state->desc.BackFace.StencilPassOp = StencilOperationToD3D12_D3D12_STENCIL_OP[(int)info->stencilPass];
 	state->desc.BackFace.StencilFailOp = StencilOperationToD3D12_D3D12_STENCIL_OP[(int)info->stencilFail];
 	state->desc.BackFace.StencilDepthFailOp = StencilOperationToD3D12_D3D12_STENCIL_OP[(int)info->stencilDepthBufferFail];
+	state->referenceStencil = info->referenceStencil;
 
 	return state;
 }
@@ -1332,11 +1345,13 @@ void MGG_Buffer_GetData(MGG_GraphicsDevice* device, MGG_Buffer* buffer, mgint of
 	ComPtr<D3D12MA::Allocation> intermediateAlloc;
 	CD3DX12_RESOURCE_DESC resourceDesc = CD3DX12_RESOURCE_DESC::Buffer(dataStride * dataCount);
 	D3D12MA::ALLOCATION_DESC allocDesc = { D3D12MA::ALLOCATION_FLAG_NONE, D3D12_HEAP_TYPE_READBACK };
-	device->resources->GetAllocator()->CreateResource(
-		&allocDesc, &resourceDesc,
-		D3D12_RESOURCE_STATE_COPY_DEST, nullptr,
+	DX::ThrowIfFailed(device->resources->GetAllocator()->CreateResource(
+		&allocDesc,
+		&resourceDesc,
+		D3D12_RESOURCE_STATE_COPY_DEST,
+		nullptr,
 		intermediateAlloc.ReleaseAndGetAddressOf(),
-		IID_GRAPHICS_PPV_ARGS(intermediateBuffer.ReleaseAndGetAddressOf()));
+		IID_GRAPHICS_PPV_ARGS(intermediateBuffer.ReleaseAndGetAddressOf())));
 
 	auto cmd = device->resources->BeginCommandList();
 	auto cmdList = cmd->Get();
@@ -1361,13 +1376,19 @@ void MGG_Buffer_GetData(MGG_GraphicsDevice* device, MGG_Buffer* buffer, mgint of
 
 	UINT8* pSourceDataBegin;
 	DX::ThrowIfFailed(intermediateBuffer->Map(0, nullptr, reinterpret_cast<void**>(&pSourceDataBegin)));
-	if (dataStride == dataStride)
+	if (dataStride == dataBytes)
+	{
 		memcpy(data, pSourceDataBegin, dataStride * dataCount);
-	else {
-		for (auto i = 0; i < dataCount; i++)
-			memcpy(data + (i * dataStride), (void*)(pSourceDataBegin + (i * dataStride)), dataStride);
 	}
-	CD3DX12_RANGE writeRange(0, 0); // We haven't write to the buffer
+	else
+	{
+		auto bytesToCopy = dataBytes < dataStride ? dataBytes : dataStride;
+		for (auto i = 0; i < dataCount; i++)
+		{
+			memcpy(data + (i * dataBytes), (void*)(pSourceDataBegin + (i * dataStride)), bytesToCopy);
+		}
+	}
+	CD3DX12_RANGE writeRange(0, 0); // We haven't written to the buffer
 	intermediateBuffer->Unmap(0, &writeRange);
 }
 
@@ -1389,6 +1410,8 @@ MGG_Texture* MGG_Texture_Create(
 	assert(mipmaps > 0);
 	assert(slices > 0);
 	assert(type != MGTextureType::Cube || (slices % 6) == 0);
+	// TODO: Pass slices down into texture ctor and implement handling.
+	// We already use it in Vulkan to define array layers.
 
 	auto texture = new MGG_Texture();
 
@@ -1655,7 +1678,14 @@ MGG_InputLayout* MGG_InputLayout_Create(
 		elem.SemanticIndex = elements[i].SemanticIndex;
 		elem.AlignedByteOffset = elements[i].AlignedByteOffset;
 		elem.InputSlot = elements[i].VertexBufferSlot;
-		elem.InputSlotClass = D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA; // TODO: instancing!
+
+		// instanceFrequency is set on InstanceDataStepRate at:
+		// AsInputElement() in VertexInputLayout.GenerateInputElements()
+		// We can use MGG_InputElement.InstanceDataStepRate to identify GPU instancing.
+		elem.InputSlotClass = elements[i].InstanceDataStepRate > 0
+			? D3D12_INPUT_CLASSIFICATION_PER_INSTANCE_DATA
+			: D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA;
+
 		elem.InstanceDataStepRate = elements[i].InstanceDataStepRate;
 		elem.Format = MGVertexElementFormatToDXGI_FORMAT[(int)elements[i].Format];
 		layout->elements.push_back(elem);

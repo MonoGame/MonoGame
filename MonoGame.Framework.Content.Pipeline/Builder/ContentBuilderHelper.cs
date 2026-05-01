@@ -2,12 +2,13 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
-using System.Collections;
-using System.Diagnostics.Contracts;
-using System.Reflection;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content.Pipeline;
 using MonoGame.Framework.Content.Pipeline.Builder.Server;
+using MonoGame.Framework.Utilities;
+using System.Collections;
+using System.Diagnostics.Contracts;
+using System.Reflection;
 using YamlDotNet.Core;
 using YamlDotNet.Core.Events;
 using YamlDotNet.Serialization;
@@ -223,6 +224,20 @@ static class ContentBuilderHelper
         }
 
         return true;
+    }
+
+    public static void HashTypeAndProperties(object importerOrProcessor, ref Hash hash)
+    {
+        // Use the YAML serializer to generate a string with the
+        // type and properties of this importer/processor.
+        var text = Serializer.Serialize(importerOrProcessor);
+
+        // Normalize Windows line endings so we get
+        // consistent strings across all systems.
+        text = text.Replace("\r\n", "\n");
+
+        // Add the string to the hasher.
+        hash.Add(text);
     }
 
     public static ContentImporterAttribute GetImporterAttribute(Type t)

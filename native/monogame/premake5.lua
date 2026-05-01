@@ -8,13 +8,36 @@ if vulkan_sdk == nil and os.target() == "macosx" then
     error("Error: VULKAN_SDK environment variable is not set. Please set it to your Vulkan SDK installation path.")
 end
 
-function common(project_name)
-    platform_target_path = "../../Artifacts/native/mgruntime/" .. project_name .. "/%{cfg.system}/%{cfg.buildcfg}"
+newoption {
+    trigger = "arch",
+    value = "ARCH",
+    description = "Target architecture (x64 or arm64)",
+    default = "x64",
+    allowed = {
+        { "x64", "64-bit x86" },
+        { "arm64", "64-bit ARM" }
+    }
+}
 
+function common(project_name)
+    if os.target() == "windows" then
+        filter "platforms:x64"
+        architecture "x86_64"
+        filter "platforms:arm64"
+        architecture "ARM64"
+        filter {}
+        platform_target_path = "../../Artifacts/native/mgruntime/" .. project_name .. "/%{cfg.system}/%{cfg.platform}/%{cfg.buildcfg}"
+    else
+        local target_arch = _OPTIONS["arch"] or "x64"
+        architecture(target_arch == "arm64" and "ARM64" or "x64")
+        if os.target() == "macosx" then
+            platform_target_path = "../../Artifacts/native/mgruntime/" .. project_name .. "/%{cfg.system}/%{cfg.buildcfg}"
+        else
+            platform_target_path = "../../Artifacts/native/mgruntime/" .. project_name .. "/%{cfg.system}/" .. target_arch .. "/%{cfg.buildcfg}"
+        end
+    end
     kind "SharedLib"
     language "C++"
-    filter "system:windows"
-    architecture "x64"
     filter "system:linux"
     pic "On"
     filter {}
@@ -36,7 +59,7 @@ function sdl2()
     includedirs {"external/sdl2/sdl/include"}
 
     filter {"system:windows"}
-    links {"external/sdl2/sdl/build/Release/SDL2-static.lib", "winmm", "imm32", "user32", "gdi32", "advapi32",
+    links {"external/sdl2/sdl/build/%{cfg.platform}/Release/SDL2-static.lib", "winmm", "imm32", "user32", "gdi32", "advapi32",
            "setupapi", "ole32", "oleaut32", "version", "shell32"}
     filter {"system:macosx"}
     libdirs {"external/sdl2/sdl/build"}
@@ -87,7 +110,7 @@ function faudio()
     includedirs {"external/faudio/include"}
     
     filter {"system:windows"}
-    libdirs {"external/faudio/build/Release"}
+    libdirs {"external/faudio/build/%{cfg.platform}/Release"}
     links {"FAudio.lib"}
     
     filter {"system:macosx"}
@@ -133,6 +156,9 @@ end
 
 workspace "monogame"
 configurations {"Debug", "Release"}
+if os.target() == "windows" then
+    platforms { "x64", "arm64" }
+end
 
 project "desktopvk"
 common("desktopvk")

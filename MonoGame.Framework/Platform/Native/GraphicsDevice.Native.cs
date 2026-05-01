@@ -307,7 +307,7 @@ public partial class GraphicsDevice
         }
 
         if (_vertexBuffersDirty)
-       {
+        {
             for (var slot = 0; slot < _vertexBuffers.Count; slot++)
             {
                 var vertexBufferBinding = _vertexBuffers.Get(slot);

@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
@@ -8,6 +8,7 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <GenerateProgramFile>false</GenerateProgramFile>
     <DefineConstants>WINDOWS;DIRECTX12</DefineConstants>
+    <Platforms>AnyCPU;ARM64;x64</Platforms>
   </PropertyGroup>
 
   <ItemGroup>
@@ -41,11 +42,17 @@
     <None Remove="Framework\WindowsDX\**" />
   </ItemGroup>
 
+  <PropertyGroup>
+    <NativePlatform Condition="'$(Platform)' == 'ARM64' or '$(Platform)' == 'x64'">$(Platform)</NativePlatform>
+    <NativePlatform Condition="'$(NativePlatform)' == '' And '$(PROCESSOR_ARCHITECTURE)' == 'ARM64'">ARM64</NativePlatform>
+    <NativePlatform Condition="'$(NativePlatform)' == ''">x64</NativePlatform>
+  </PropertyGroup>
+
   <ItemGroup>
     <ProjectReference Include="..\MonoGame.Framework\MonoGame.Framework.Native.csproj" />
     <ProjectReference Include="..\native\monogame\windowsdx.vcxproj" />
 
-	  <Content Include="..\Artifacts\native\mgruntime\windowsdx\windows\$(Configuration)\mgruntime.dll">
+	  <Content Include="..\Artifacts\native\mgruntime\windowsdx\windows\$(NativePlatform)\$(Configuration)\mgruntime.dll">
 		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 	  </Content>
 	  
