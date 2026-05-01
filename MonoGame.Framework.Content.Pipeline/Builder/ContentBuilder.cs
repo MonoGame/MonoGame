@@ -340,7 +340,7 @@ public abstract class ContentBuilder
                 _content[relativePath] = contentInfos;
                 foreach (var contentInfo in contentInfos)
                 {
-                    _outputContent[Path.Combine(contentInfo.ContentRoot, contentInfo.GetOutputPath(relativePath))] = relativePath;
+                    _outputContent[Path.Combine(contentInfo.ContentRoot, relativePath.GetDestinationPath(contentInfo.ShouldBuild, contentInfo.GetOutputPath))] = relativePath;
                 }
             }
         }
@@ -405,7 +405,7 @@ public abstract class ContentBuilder
             if (request != null)
             {
                 BuildAndWriteContent(request.InputPath, request.ContentInfo);
-                request.Args.FilePath = Path.Combine(Parameters.RootedOutputDirectory, Path.Combine(request.ContentInfo.ContentRoot, request.ContentInfo.GetOutputPath(request.InputPath)));
+                request.Args.FilePath = Path.Combine(Parameters.RootedOutputDirectory, Path.Combine(request.ContentInfo.ContentRoot, request.InputPath.GetDestinationPath(request.ContentInfo.ShouldBuild, request.ContentInfo.GetOutputPath))).Sanitize();
                 request.Server.NotifyContentRequestCompiled();
             }
             else
@@ -432,12 +432,13 @@ public abstract class ContentBuilder
             {
                 foreach (var contentInfo in contentInfos)
                 {
-                    if (contentInfo.GetOutputPath(inputPath) != outputPath)
+                    var finalOutputPath = Path.Combine(contentInfo.ContentRoot, inputPath.GetDestinationPath(contentInfo.ShouldBuild, contentInfo.GetOutputPath));
+                    if (finalOutputPath != outputPath)
                     {
                         continue;
                     }
 
-                    if (ContentCache.ReadContentFileCache(this, outputPath) is not null)
+                    if (ContentCache.ReadContentFileCache(this, outputPath) is ContentFileCache fileCache && fileCache.IsValid(this, contentInfo))
                     {
                         // we've already found a valid cached version of content, so no need for any compilation here
                         args.FilePath = Path.Combine(Parameters.RootedOutputDirectory, outputPath);

@@ -59,7 +59,7 @@ inline void MG_Print_StdOut(const char* file, int line, const char* message)
 #define MG_ERROR_PRINT(msg) \
     MG_Print_StdError(__FILE__, __LINE__, msg)
 
-#define MG_NOT_IMPLEMEMTED	MG_ERROR_PRINT("NOT IMPLEMENTED!"); MG_GENERATE_TRAP()
+#define MG_NOT_IMPLEMENTED	MG_ERROR_PRINT("NOT IMPLEMENTED!"); MG_GENERATE_TRAP()
 
 
 mguint MG_ComputeHash(const mgbyte* value, mgint length);

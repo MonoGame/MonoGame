@@ -463,6 +463,7 @@ struct MGG_GraphicsSystem
 
 static void MGVK_BufferCopyAndFlush(MGG_GraphicsDevice* device, MGG_Buffer* buffer, int destOffset, mgbyte* data, int dataBytes);
 static MGG_Buffer* MGVK_Buffer_Create(MGG_GraphicsDevice* device, MGBufferType type, mgint sizeInBytes, bool no_push);
+static void MGVK_DestroyPipelines(MGG_GraphicsDevice* device, std::function<bool(const MGVK_PipelineState&)> compare);
 static void MGVK_DestroyFrameResources(MGG_GraphicsDevice* device, mgint currentFrame, mgbyte free_all);
 static void MGVK_UpdateRenderPass(MGG_GraphicsDevice* device, FrameCounter currentFrame, MGVK_CmdBuffer& cmd);
 static VkCommandBuffer MGVK_BeginNewCommandBuffer(MGG_GraphicsDevice* device);
@@ -1416,6 +1417,12 @@ static void cleanupSwapChain(MGG_GraphicsDevice* device)
 
 		if (usesSwapchain)
 		{
+			// Clean up any pipelines that point at this target set cache.
+			MGVK_DestroyPipelines(device, [targetSetCache](const MGVK_PipelineState& s)
+				{
+					return s.targets == targetSetCache;
+				});
+
 			// This cache entry uses the swapchain, so it's safe to destroy.
 			for (int i = 0; i < MGVK_NUM_TARGETS; ++i)
 			{
