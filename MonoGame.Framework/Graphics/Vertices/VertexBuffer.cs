@@ -81,7 +81,7 @@ namespace Microsoft.Xna.Framework.Graphics
         /// <param name="vertexCount">The number of vertices.</param>
         /// <param name="bufferUsage">Behavior options.</param>
         /// <exception cref="ArgumentNullException"><paramref name="graphicsDevice"/> is <see langword="null"/></exception>
-        public VertexBuffer(GraphicsDevice graphicsDevice, [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicParameterlessConstructor)] Type type, int vertexCount, BufferUsage bufferUsage) :
+        public VertexBuffer(GraphicsDevice graphicsDevice, [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicProperties | DynamicallyAccessedMemberTypes.NonPublicProperties | DynamicallyAccessedMemberTypes.Interfaces)] Type type, int vertexCount, BufferUsage bufferUsage) :
 			this(graphicsDevice, VertexDeclaration.FromType(type), vertexCount, bufferUsage, false)
 		{
         }

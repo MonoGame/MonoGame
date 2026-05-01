@@ -194,9 +194,19 @@ namespace Microsoft.Xna.Framework.Graphics
 			return max;
 		}
 
-#nullable enable
-        private static readonly Type vertexTypeInterface = typeof(IVertexType);
-        private static readonly MethodInfo vertexDeclarationGetter = vertexTypeInterface.GetProperty(nameof(IVertexType.VertexDeclaration), BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Static)!.GetGetMethod()!;
+
+        const BindingFlags allStatics = BindingFlags.Static
+                | BindingFlags.NonPublic // In case vertexType implements IVertexType.VertexDeclaration explicitly
+                | BindingFlags.Public;
+        // This static typeof should not need any DynamicallyAccessedMembers annotation for AOT because
+        // the trimmer can anticipate typeof "constants" like this
+        private static readonly MethodInfo interfaceGetter = typeof(IVertexType)
+                                                .GetProperty(nameof(IVertexType.VertexDeclaration), allStatics)!
+                                                .GetMethod!;
+        // The index of the VertexDeclaration getter method in the interface map for IVertexType will be the same
+        // for every implementing type, so just look it up once with a known type and save some reflection calls.
+        private static readonly int getterMethodIndex = Array.IndexOf(typeof(VertexPosition).GetInterfaceMap(typeof(IVertexType)).InterfaceMethods, interfaceGetter);
+
         /// <summary>
         /// Returns the VertexDeclaration for Type.
         /// </summary>
@@ -206,7 +216,7 @@ namespace Microsoft.Xna.Framework.Graphics
         /// Prefer to use VertexDeclarationCache when the declaration lookup
         /// can be performed with a templated type.
         /// </remarks>
-        internal static VertexDeclaration FromType([DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicParameterlessConstructor)] Type vertexType)
+        internal static VertexDeclaration FromType([DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicProperties | DynamicallyAccessedMemberTypes.NonPublicProperties | DynamicallyAccessedMemberTypes.Interfaces)] Type vertexType)
         {
             if (vertexType == null)
                 throw new ArgumentNullException(nameof(vertexType), "Cannot be null");
@@ -217,17 +227,35 @@ namespace Microsoft.Xna.Framework.Graphics
             if (!typeof(IVertexType).IsAssignableFrom(vertexType))
                 throw new ArgumentException($"{nameof(vertexType)} does not implement {nameof(IVertexType)}.");
 
-            var map = vertexType.GetInterfaceMap(vertexTypeInterface);
-            int index = Array.IndexOf(map.InterfaceMethods, vertexDeclarationGetter);
-            MethodInfo implementationGetter = map.TargetMethods[index];
-            VertexDeclaration? vertexDeclaration = implementationGetter.Invoke(null, null) as VertexDeclaration;
+            var declarationProperty = vertexType.GetProperty(
+                nameof(IVertexType.VertexDeclaration),
+                allStatics);
 
-            if (vertexDeclaration == null)
-                throw new Exception($"{nameof(IVertexType.VertexDeclaration)} on {nameof(vertexType)} cannot be null");
+            object declarationValue;
 
-            return vertexDeclaration;
+            if (declarationProperty is null || !typeof(VertexDeclaration).IsAssignableFrom(declarationProperty.PropertyType))
+            {
+                // Try to get the explicit implementation through the interface map.
+                // This may throw for structs under NativeAOT, so catch that and give a specific message.
+                InterfaceMapping interfaceMap;
+                try
+                {
+                    interfaceMap = vertexType.GetInterfaceMap(typeof(IVertexType));
+                }
+                catch (PlatformNotSupportedException pex)
+                {
+                    throw new ArgumentException($"The type {vertexType.Name} does not implement {nameof(IVertexType)} implicitly. Explicit interface implementations are incompatible with NativeAOT reflection and cannot be used.", nameof(vertexType), pex);
+                }
+
+                var mappedGetter = interfaceMap.TargetMethods[getterMethodIndex];
+                declarationValue = mappedGetter.Invoke(null, null);
+            }
+            else
+                declarationValue = declarationProperty.GetValue(null);
+
+            return (declarationValue as VertexDeclaration)
+                ?? throw new ArgumentException($"{nameof(IVertexType.VertexDeclaration)} on {vertexType.Name} is null.", nameof(vertexType));
         }
-#nullable restore
 
         /// <summary>
         /// Gets a copy of the vertex elements.
