@@ -66,6 +66,11 @@ namespace Microsoft.Xna.Framework.Graphics
         /// </summary>
         internal bool SupportsAtitc { get; private set; }
 
+        /// <summary>
+        /// Gets the support for ASTC
+        /// </summary>
+        internal bool SupportsAstc { get; private set; }
+
         internal bool SupportsTextureMaxLevel { get; private set; }
 
         /// <summary>

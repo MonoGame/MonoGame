@@ -1,3 +1,5 @@
+using System.Runtime.InteropServices;
+
 namespace BuildScripts;
 
 [TaskName("Build Native Dependencies")]
@@ -5,14 +7,32 @@ public sealed class BuildNativeDependenciesTask : FrostingTask<BuildContext>
 {
     public override void Run(BuildContext context)
     {
-        BuildSDL2(context);
-        BuildFAudio(context);
+        if (context.Environment.Platform.Family == PlatformFamily.Windows)
+        {
+            // Cross-compile both architectures on the same x64 runner
+            BuildDependenciesForArch(context, "x64");
+            BuildDependenciesForArch(context, "arm64");
+        }
+        else
+        {
+            // Linux/macOS: build for the host architecture only
+            var arch = RuntimeInformation.OSArchitecture == Architecture.Arm64 ? "arm64" : "x64";
+            BuildDependenciesForArch(context, arch);
+        }
     }
 
-    private void BuildSDL2(BuildContext context)
+    private void BuildDependenciesForArch(BuildContext context, string targetArch)
+    {
+        BuildSDL2(context, targetArch);
+        BuildFAudio(context, targetArch);
+    }
+
+    private void BuildSDL2(BuildContext context, string targetArch)
     {
         var sdlSourceDir = "native/monogame/external/sdl2/sdl";
-        var sdlBuildDir = System.IO.Path.Combine(sdlSourceDir, "build");
+        var sdlBuildDir = System.IO.Path.Combine(sdlSourceDir, "build", targetArch);
+        if (context.Environment.Platform.Family != PlatformFamily.Windows)
+            sdlBuildDir = System.IO.Path.Combine(sdlSourceDir, "build");
 
         RecreateDirectory(context, sdlBuildDir);
 
@@ -22,17 +42,19 @@ public sealed class BuildNativeDependenciesTask : FrostingTask<BuildContext>
             .Append("-DSDL_STATIC=ON")
             .Append("-DSDL_TEST=OFF");
 
-        AppendPlatformCMakeArgs(configureArgs, context, isSDL: true);
+        AppendPlatformCMakeArgs(configureArgs, context, isSDL: true, targetArch);
 
         RunCMake(context, configureArgs, "SDL2 CMake configuration failed!");
 
         RunCMakeBuild(context, sdlBuildDir, "Release", "SDL2 build failed!");
     }
 
-    private void BuildFAudio(BuildContext context)
+    private void BuildFAudio(BuildContext context, string targetArch)
     {
         var faudioSourceDir = "native/monogame/external/faudio";
-        var faudioBuildDir = System.IO.Path.Combine(faudioSourceDir, "build");
+        var faudioBuildDir = System.IO.Path.Combine(faudioSourceDir, "build", targetArch);
+        if (context.Environment.Platform.Family != PlatformFamily.Windows)
+            faudioBuildDir = System.IO.Path.Combine(faudioSourceDir, "build");
 
         RecreateDirectory(context, faudioBuildDir);
 
@@ -46,19 +68,19 @@ public sealed class BuildNativeDependenciesTask : FrostingTask<BuildContext>
             .Append($"-DCMAKE_CXX_STANDARD_INCLUDE_DIRECTORIES={context.MakeAbsolute(new DirectoryPath(sdlIncludeDir))}")
             .Append("-DBUILD_SDL3=OFF");
 
-        AppendPlatformCMakeArgs(configureArgs, context, isSDL: false);
+        AppendPlatformCMakeArgs(configureArgs, context, isSDL: false, targetArch);
 
         RunCMake(context, configureArgs, "FAudio CMake configuration failed!");
 
         RunCMakeBuild(context, faudioBuildDir, "Release", "FAudio build failed!");
     }
 
-    private void AppendPlatformCMakeArgs(ProcessArgumentBuilder args, BuildContext context, bool isSDL)
+    private void AppendPlatformCMakeArgs(ProcessArgumentBuilder args, BuildContext context, bool isSDL, string targetArch)
     {
         switch (context.Environment.Platform.Family)
         {
             case PlatformFamily.Windows:
-                args.Append("-A").Append("x64");
+                args.Append("-A").Append(targetArch == "arm64" ? "ARM64" : "x64");
                 if (isSDL)
                 {
                     args.Append("-DSDL_FORCE_STATIC_VCRT=ON");
