@@ -180,7 +180,6 @@ struct MGVK_FrameState
 {
 	bool is_recording = false;
 
-	MGG_Texture* swapchainTexture = nullptr;
 	MGVK_CmdBuffer commandBuffer;
 
 	uint32_t uniformOffset = 0;
@@ -225,6 +224,7 @@ struct MGG_GraphicsDevice
 	FrameCounter freeFrames = 0;
 	FrameCounter swapchainCount = 0;
 
+	MGG_Texture** swapchains = nullptr;
 	uint32_t swapchainWidth = 0;
 	uint32_t swapchainHeight = 0;
 	VkFormat colorFormat = VK_FORMAT_UNDEFINED;
@@ -1476,8 +1476,8 @@ static void cleanupSwapChain(MGG_GraphicsDevice* device)
 	// Cleanup the swap chain images.
 	for (size_t i = 0; i < device->swapchainCount; i++)
 	{
-		auto chain = device->frames[i].swapchainTexture;
-		device->frames[i].swapchainTexture = nullptr;
+		auto chain = device->swapchains[i];
+		device->swapchains[i] = nullptr;
 
 		if (chain == nullptr)
 			continue;
@@ -1806,6 +1806,9 @@ void MGVK_RecreateSwapChain(
 			delete[] device->frames;
 		}
 
+		if (device->swapchains != nullptr)
+			delete [] device->swapchains;
+
 		// Since we know that all rendering has stopped it is
 		// safe to free all the descriptors and let them recreate
 		// on the next draw.  This removes all flicker caused by
@@ -1854,6 +1857,8 @@ void MGVK_RecreateSwapChain(
 	VkImage* swapchainImages = new VkImage[swapchainCount];
 	res = vkGetSwapchainImagesKHR(device->device, device->swapchain, &swapchainCount, swapchainImages);
 	VK_CHECK_RESULT(res);
+
+	device->swapchains = new MGG_Texture*[swapchainCount];
 
 	for (uint32_t i = 0; i < swapchainCount; ++i)
 	{
@@ -1921,7 +1926,7 @@ void MGVK_RecreateSwapChain(
 			VK_SET_OBJECT_NAME(device->device, texture->depthTexture->target_view, VK_OBJECT_TYPE_IMAGE_VIEW, "MGG_Texture.depthTexture.target_view (Swapchain %d)", i);
 		}
 
-		device->frames[i].swapchainTexture = texture;
+		device->swapchains[i] = texture;
 	}
 
 	delete[] swapchainImages;
@@ -2477,10 +2482,7 @@ void MGG_GraphicsDevice_SetRenderTargets(MGG_GraphicsDevice* device, MGG_Texture
 
 	if (targets == nullptr || count == 0)
 	{
-		auto frameIndex = currentFrame % device->swapchainCount;
-		auto& frame = device->frames[frameIndex];
-
-		device->targets.targets[0] = frame.swapchainTexture;
+		device->targets.targets[0] = device->swapchains[device->swapchain_image_index];
 
 		memset(device->targets.targets + 1, 0, sizeof(MGG_Texture*) * (MGVK_NUM_TARGETS - 1));
 		device->targets.numTargets = 1;
@@ -2680,9 +2682,9 @@ static void MGVK_CmdTransitionImageLayout(
 	}
 	else if (oldLayout == VK_IMAGE_LAYOUT_PRESENT_SRC_KHR && newLayout == VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL)
 	{
-		barrier.srcAccessMask = VK_ACCESS_MEMORY_READ_BIT;
+		barrier.srcAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
 		barrier.dstAccessMask = VK_ACCESS_TRANSFER_READ_BIT;
-		sourceStage = VK_PIPELINE_STAGE_TRANSFER_BIT;
+		sourceStage = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
 		destinationStage = VK_PIPELINE_STAGE_TRANSFER_BIT;
 	}
 	else if (oldLayout == VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL && newLayout == VK_IMAGE_LAYOUT_PRESENT_SRC_KHR)
@@ -3870,6 +3872,8 @@ void MGG_GraphicsDevice_GetBackBufferData(MGG_GraphicsDevice* device, mgint x, m
 	auto currentFrame = device->frame;
 	auto frameIndex = currentFrame % device->swapchainCount;
 	auto& frame = device->frames[frameIndex];
+	assert(frame.is_recording);
+
 	auto& cmd = frame.commandBuffer;
 
 	MGVK_EndRenderPass(device, cmd.buffer);
@@ -3896,7 +3900,7 @@ void MGG_GraphicsDevice_GetBackBufferData(MGG_GraphicsDevice* device, mgint x, m
 	vkWaitForFences(device->device, 1, &flushFence, VK_TRUE, UINT64_MAX);
 	vkDestroyFence(device->device, flushFence, nullptr);
 
-	auto srcImage = device->frames[device->swapchain_image_index].swapchainTexture->image;
+	auto srcImage = device->swapchains[device->swapchain_image_index]->image;
 
 	MGG_Texture* tempRgbaTexture = MGG_Texture_Create(
 		device,
