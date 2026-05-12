@@ -28,14 +28,18 @@ namespace Microsoft.Xna.Framework.Graphics
             FastSoftware
         }
 
-        private static readonly ReadOnlyCollection<GraphicsAdapter> _adapters;
+        // This is nulled from GamePlatform on destruction.
+        internal static ReadOnlyCollection<GraphicsAdapter> _adapters;
 
         private DisplayModeCollection _supportedDisplayModes;
 
         private DisplayMode _currentDisplayMode;
 
-        static GraphicsAdapter()
+        private static void Initialize()
         {
+            if (_adapters != null)
+                return;
+
             // NOTE: An adapter is a monitor+device combination, so we expect
             // at lease one adapter per connected monitor.
             PlatformInitializeAdapters(out _adapters);
@@ -46,12 +50,20 @@ namespace Microsoft.Xna.Framework.Graphics
 
         public static GraphicsAdapter DefaultAdapter
         {
-            get { return _adapters[0]; }
+            get
+            {
+                Initialize();
+                return _adapters[0];
+            }
         }
         
         public static ReadOnlyCollection<GraphicsAdapter> Adapters 
         {
-            get  { return _adapters; }
+            get
+            {
+                Initialize();
+                return _adapters;
+            }
         }
 
         /// <summary>
