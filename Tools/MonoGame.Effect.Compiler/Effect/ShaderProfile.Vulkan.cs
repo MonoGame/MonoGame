@@ -171,19 +171,10 @@ namespace MonoGame.Effect
                     toolArgs += "-auto-binding-space 1 ";
                 }
 
-                // In SPIR-V the uniform and texture bindings cannot
-                // overlap.  To solve this we shift them all forward by
-                // a fixed amount here and in the shader layout creation.
-                if (isVertexShader)
-                {
-                    toolArgs += $"-fvk-t-shift {SlotOffset} 0 ";
-                    toolArgs += $"-fvk-s-shift {SlotOffset} 0 ";
-                }
-                else
-                {
-                    toolArgs += $"-fvk-t-shift {SlotOffset} 1 ";
-                    toolArgs += $"-fvk-s-shift {SlotOffset} 1 ";
-                }
+                // Offset the texture/sampler slots?
+                toolArgs += $"-fvk-t-shift {SlotOffset} all ";
+                toolArgs += $"-fvk-s-shift {SlotOffset} all ";
+
 
                 //toolArgs += "-Qstrip_reflect ";
                 //toolArgs += "-fspv-reflect ";

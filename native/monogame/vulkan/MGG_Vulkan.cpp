@@ -257,8 +257,8 @@ struct MGG_GraphicsDevice
 
 	uint64_t currentTextureId = 1;
 	uint64_t currentSamplerId = 1;
-	MGG_Texture* textures[MAX_TEXTURE_SLOTS] = { 0 };
-	MGG_SamplerState* samplers[MAX_TEXTURE_SLOTS] = { 0 };
+	MGG_Texture* textures[(mgint)MGShaderStage::Count][MAX_TEXTURE_SLOTS] = { 0 };
+	MGG_SamplerState* samplers[(mgint)MGShaderStage::Count][MAX_TEXTURE_SLOTS] = { 0 };
 	uint32_t textureSamplerDirty = 0;
 	MGG_Texture* nullTexture = nullptr;
 
@@ -2557,7 +2557,7 @@ void MGG_GraphicsDevice_SetTexture(MGG_GraphicsDevice* device, MGShaderStage sta
 	assert(slot >= 0);
 	assert(slot < MAX_TEXTURE_SLOTS);
 
-	device->textures[slot] = texture ? texture : device->nullTexture;
+	device->textures[(mgint)stage][slot] = texture ? texture : device->nullTexture;
 	device->textureSamplerDirty |= 1 << slot;
 }
 
@@ -2567,7 +2567,7 @@ void MGG_GraphicsDevice_SetSamplerState(MGG_GraphicsDevice* device, MGShaderStag
 	assert(slot >= 0);
 	assert(slot < MAX_TEXTURE_SLOTS);
 
-	device->samplers[slot] = state;
+	device->samplers[(mgint)stage][slot] = state;
 	device->textureSamplerDirty |= 1 << slot;
 }
 
@@ -3126,10 +3126,10 @@ static void MGVK_UpdateDescriptors(MGG_GraphicsDevice* device, FrameCounter curr
 		if ((dirty & mask) == 0)
 			continue;
 
-		device->textures[i]->frame = currentFrame;
+		device->textures[(mgint)shader->stage][i]->frame = currentFrame;
 
-		hash = MG_ComputeHash(device->textures[i]->id, hash);
-		hash = MG_ComputeHash(device->samplers[i]->id, hash);
+		hash = MG_ComputeHash(device->textures[(mgint)shader->stage][i]->id, hash);
+		hash = MG_ComputeHash(device->samplers[(mgint)shader->stage][i]->id, hash);
 
 		// Early out if there are no more used slots.
 		dirty &= ~mask;
@@ -3181,8 +3181,8 @@ static void MGVK_UpdateDescriptors(MGG_GraphicsDevice* device, FrameCounter curr
 			else if (w.descriptorType == VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER)
 			{
 				int slot = w.dstBinding - 32;
-				((VkDescriptorImageInfo*)w.pImageInfo)->imageView = device->textures[slot]->view;
-				((VkDescriptorImageInfo*)w.pImageInfo)->sampler = device->samplers[slot]->sampler;
+				((VkDescriptorImageInfo*)w.pImageInfo)->imageView = device->textures[(mgint)shader->stage][slot]->view;
+				((VkDescriptorImageInfo*)w.pImageInfo)->sampler = device->samplers[(mgint)shader->stage][slot]->sampler;
 			}
 			else
 			{

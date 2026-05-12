@@ -25,9 +25,9 @@ float HeightMapSize;
 
 #if SM6
 
-Texture2D<float4> HeightMapTexture;
+Texture2D<float4> HeightMapTexture : register(t0);
 
-sampler HeightMapSampler = sampler_state
+sampler HeightMapSampler : register(s0) = sampler_state
 {
     Texture = (HeightMapTexture);
     MinFilter = POINT;
@@ -37,9 +37,9 @@ sampler HeightMapSampler = sampler_state
 
 #else
 
-Texture2D HeightMapTexture;
+Texture2D HeightMapTexture : register(t0);
 
-sampler2D HeightMapSampler = sampler_state
+sampler2D HeightMapSampler : register(s0) = sampler_state 
 {
     Texture = (HeightMapTexture);
     MinFilter = POINT;
