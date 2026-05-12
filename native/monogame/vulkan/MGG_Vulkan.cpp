@@ -5345,8 +5345,11 @@ void MGG_Shader_Destroy(MGG_GraphicsDevice* device, MGG_Shader* shader)
 	vkDestroyDescriptorSetLayout(device->device, shader->setLayout, nullptr);
 
 	vkDestroyDescriptorPool(device->device, shader->pool, nullptr);
-	delete [] shader->poolInfo->pPoolSizes;
-	delete shader->poolInfo;
+	if (shader->poolInfo)
+	{
+		delete [] shader->poolInfo->pPoolSizes;
+		delete shader->poolInfo;
+	}
 
 	vkDestroyShaderModule(device->device, shader->module, nullptr);
 
