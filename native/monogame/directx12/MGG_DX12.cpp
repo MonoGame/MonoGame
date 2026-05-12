@@ -832,6 +832,15 @@ void MGDX_ApplyState(MGG_GraphicsDevice* device)
 			if (!buffer)
 				continue;
 
+
+			if (i >= device->layout->streamStrides.size())
+			{
+				// Vertex buffer is out of sync with current layout.
+				// Clean up leftover vertex buffer slot.
+				device->vertexBuffers[i] = nullptr;
+				continue;
+			}
+
 			vbv.BufferLocation = buffer->GpuAddress() + device->vertexOffsets[i];
 			vbv.StrideInBytes = device->layout->streamStrides[i];
 			vbv.SizeInBytes = buffer->dataSize;
@@ -979,8 +988,6 @@ void MGG_GraphicsDevice_DrawIndexedInstanced(MGG_GraphicsDevice* device, MGPrimi
 	auto indexCount = MGDX_GetIndexCount(primitiveType, primitiveCount);
 
 	cl->DrawIndexedInstanced(indexCount, instanceCount, indexStart, vertexStart, 0);
-
-	MG_NOT_IMPLEMEMTED;
 }
 
 
@@ -1403,6 +1410,8 @@ MGG_Texture* MGG_Texture_Create(
 	assert(mipmaps > 0);
 	assert(slices > 0);
 	assert(type != MGTextureType::Cube || (slices % 6) == 0);
+	// TODO: Pass slices down into texture ctor and implement handling.
+	// We already use it in Vulkan to define array layers.
 
 	auto texture = new MGG_Texture();
 
@@ -1669,7 +1678,14 @@ MGG_InputLayout* MGG_InputLayout_Create(
 		elem.SemanticIndex = elements[i].SemanticIndex;
 		elem.AlignedByteOffset = elements[i].AlignedByteOffset;
 		elem.InputSlot = elements[i].VertexBufferSlot;
-		elem.InputSlotClass = D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA; // TODO: instancing!
+
+		// instanceFrequency is set on InstanceDataStepRate at:
+		// AsInputElement() in VertexInputLayout.GenerateInputElements()
+		// We can use MGG_InputElement.InstanceDataStepRate to identify GPU instancing.
+		elem.InputSlotClass = elements[i].InstanceDataStepRate > 0
+			? D3D12_INPUT_CLASSIFICATION_PER_INSTANCE_DATA
+			: D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA;
+
 		elem.InstanceDataStepRate = elements[i].InstanceDataStepRate;
 		elem.Format = MGVertexElementFormatToDXGI_FORMAT[(int)elements[i].Format];
 		layout->elements.push_back(elem);

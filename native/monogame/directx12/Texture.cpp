@@ -230,10 +230,13 @@ void Texture::SetData(DeviceResources* device, uint32_t subResId, uint8_t* data,
     const UINT64 uploadSize = GetRequiredIntermediateSize(impl->m_res.Get(), subResId, 1);
     CD3DX12_RESOURCE_DESC resourceDesc = CD3DX12_RESOURCE_DESC::Buffer(uploadSize);
     D3D12MA::ALLOCATION_DESC allocDesc = { D3D12MA::ALLOCATION_FLAG_COMMITTED, D3D12_HEAP_TYPE_UPLOAD };
-    device->GetAllocator()->CreateResource(
-        &allocDesc, &resourceDesc,
-        D3D12_RESOURCE_STATE_GENERIC_READ, nullptr,
-        uploadAlloc.ReleaseAndGetAddressOf(), IID_GRAPHICS_PPV_ARGS(uploadBuffer.ReleaseAndGetAddressOf()));
+    ThrowIfFailed(device->GetAllocator()->CreateResource(
+        &allocDesc,
+        &resourceDesc,
+        D3D12_RESOURCE_STATE_GENERIC_READ,
+        nullptr,
+        uploadAlloc.ReleaseAndGetAddressOf(),
+        IID_GRAPHICS_PPV_ARGS(uploadBuffer.ReleaseAndGetAddressOf())));
 
     auto cmd = device->BeginCommandList();
     auto cmdList = cmd->Get();
