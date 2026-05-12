@@ -2041,12 +2041,10 @@ mgint MGG_GraphicsDevice_BeginFrame(MGG_GraphicsDevice* device)
 
 	MGVK_ProcessDescriptorCaches(device, currentFrame);
 
-	/*
 	res = vkWaitForFences(device->device, 1, &cmd.completedFence, VK_TRUE, UINT64_MAX);
 	VK_CHECK_RESULT(res);
 	res = vkResetFences(device->device, 1, &cmd.completedFence);
 	VK_CHECK_RESULT(res);
-	*/
 
 	if (device->swapchain != VK_NULL_HANDLE)
 	{
@@ -2055,12 +2053,6 @@ mgint MGG_GraphicsDevice_BeginFrame(MGG_GraphicsDevice* device)
 			cmd.imageAcquiredSemaphore, VK_NULL_HANDLE, &device->swapchain_image_index);
 		VK_CHECK_RESULT(res);
 	}
-
-	auto fence = device->frames[device->swapchain_image_index].commandBuffer.completedFence;
-	res = vkWaitForFences(device->device, 1, &fence, VK_TRUE, UINT64_MAX);
-	VK_CHECK_RESULT(res);
-	res = vkResetFences(device->device, 1, &fence);
-	VK_CHECK_RESULT(res);
 
 	frame.uniformOffset = 0;
 	if (frame.uniforms == NULL)
