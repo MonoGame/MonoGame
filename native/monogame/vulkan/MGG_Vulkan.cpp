@@ -1205,9 +1205,8 @@ MGG_GraphicsDevice* MGG_GraphicsDevice_Create(MGG_GraphicsSystem* system, MGG_Gr
 
 	device->instance = system->instance;
 	device->physicalDevice = adapter->device;
-
-	vkGetPhysicalDeviceFeatures(device->physicalDevice, &device->deviceFeatures);
-	vkGetPhysicalDeviceProperties(device->physicalDevice, &device->deviceProperties);
+	device->deviceFeatures = adapter->features;
+	device->deviceProperties = adapter->properties;
 
 	printf("Selected GPU: %s\n", device->deviceProperties.deviceName);
 	printf("Supported Vulkan API version: %d.%d.%d\n", VK_API_VERSION_MAJOR(device->deviceProperties.apiVersion), VK_API_VERSION_MINOR(device->deviceProperties.apiVersion), VK_API_VERSION_PATCH(device->deviceProperties.apiVersion));
