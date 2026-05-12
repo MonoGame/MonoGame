@@ -190,6 +190,18 @@ struct MGP_Cursor
 
 MGP_Platform* MGP_Platform_Create(MGGameRunBehavior& behavior)
 {
+    // NOTE: Use this on Windows when you see:
+    //
+    // Detected memory leaks!
+    // Dumping objects ->
+    // {327} normal block at 0x000001AFF5CB3F10, 120 bytes long.
+    //
+    // The number in the {} is the allocation number.  Put it below
+    // to have the debugger stop on that allocation so you can
+    // identify the source of the memory leak.
+    //
+    //_CrtSetBreakAlloc(327);
+
 	// Check if SDL is already initialized to avoid reference count overflow
 	if (SDL_WasInit(0) == 0) {
 		SDL_Init(

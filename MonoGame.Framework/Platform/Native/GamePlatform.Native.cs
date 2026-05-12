@@ -341,6 +341,12 @@ class NativeGamePlatform : GamePlatform
             Window = null;
         }
 
+        if (_system != null)
+        {
+            MGG.GraphicsSystem_Destroy(_system);
+            _system = null;
+        }
+
         if (Handle != null)
         {
             MGP.Platform_Destroy(Handle);

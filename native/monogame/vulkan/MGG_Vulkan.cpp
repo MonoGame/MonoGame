@@ -397,6 +397,8 @@ struct MGG_Shader
 	std::vector<VkDescriptorSetLayoutBinding> bindings;
 
 	VkWriteDescriptorSet* writes;
+	VkDescriptorBufferInfo* bufferInfo;
+	VkDescriptorImageInfo* imageInfo;
 
 	mguint uniformSlots;
 	mguint textureSlots;
@@ -1230,6 +1232,8 @@ MGG_GraphicsDevice* MGG_GraphicsDevice_Create(MGG_GraphicsSystem* system, MGG_Gr
 				break;
 			}
 		}
+
+		delete [] queueFamilyProps;
 	}
 
 	VkDeviceQueueCreateInfo queueCreateInfo {};
@@ -1539,6 +1543,8 @@ void MGG_GraphicsDevice_Destroy(MGG_GraphicsDevice* device)
 		vkDestroyFence(device->device, cmd.completedFence, nullptr);
 		vkFreeCommandBuffers(device->device, device->cmdPool, 1, &cmd.buffer);
 	}
+
+	delete [] device->frames;
 
 	vkDestroyCommandPool(device->device, device->cmdPool, nullptr);
 
@@ -5254,8 +5260,8 @@ MGG_Shader* MGG_Shader_Create(MGG_GraphicsDevice* device, MGShaderStage stage, m
 
 	// Prepare the write descriptor set for updates at runtime.
 	VkWriteDescriptorSet* write = shader->writes = new VkWriteDescriptorSet[layoutBindings.size()];
-	VkDescriptorBufferInfo* bufferInfo = new VkDescriptorBufferInfo[uniformCount];
-	VkDescriptorImageInfo* imageInfo = new VkDescriptorImageInfo[layoutBindings.size() - uniformCount];
+	VkDescriptorBufferInfo* bufferInfo = shader->bufferInfo = new VkDescriptorBufferInfo[uniformCount];
+	VkDescriptorImageInfo* imageInfo = shader->imageInfo =  new VkDescriptorImageInfo[layoutBindings.size() - uniformCount];
 	for (int i = 0; i < layoutBindings.size(); i++)
 	{
 		auto& b = layoutBindings[i];
@@ -5315,6 +5321,10 @@ void MGG_Shader_Destroy(MGG_GraphicsDevice* device, MGG_Shader* shader)
 	if (!shader)
 		return;
 
+	delete [] shader->bufferInfo;
+	delete [] shader->imageInfo;
+	delete [] shader->writes;
+
 	for (auto pair : shader->usedSets)
 	{
 		//vkFreeDescriptorSets(device->device, shader->pool, 1, &pair.second->set);
@@ -5333,6 +5343,7 @@ void MGG_Shader_Destroy(MGG_GraphicsDevice* device, MGG_Shader* shader)
 	vkDestroyDescriptorSetLayout(device->device, shader->setLayout, nullptr);
 
 	vkDestroyDescriptorPool(device->device, shader->pool, nullptr);
+	delete [] shader->poolInfo->pPoolSizes;
 	delete shader->poolInfo;
 
 	vkDestroyShaderModule(device->device, shader->module, nullptr);
