@@ -3745,7 +3745,6 @@ void MGG_GraphicsDevice_ResolveRenderTargets(MGG_GraphicsDevice* device)
 	auto currentFrame = device->frame;
 	auto frameIndex = currentFrame % device->swapchainCount;
 	auto& frame = device->frames[frameIndex];
-	assert(frame.is_recording);
 	auto cmd = frame.commandBuffer.buffer;
 
     for (int i = 0; i < psoTargets->set.numTargets; ++i)
@@ -3754,7 +3753,10 @@ void MGG_GraphicsDevice_ResolveRenderTargets(MGG_GraphicsDevice* device)
 
         if (renderTarget == nullptr || renderTarget->isSwapchain)
             continue;
-        
+
+		// We should be recording if we're going to resolve mips here.
+		assert(frame.is_recording);
+
         if (renderTarget->info.mipLevels > 1)
         {
             VkImageMemoryBarrier barrier = {};
