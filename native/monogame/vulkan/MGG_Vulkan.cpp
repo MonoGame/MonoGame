@@ -3739,7 +3739,12 @@ void MGG_GraphicsDevice_ResolveRenderTargets(MGG_GraphicsDevice* device)
     if (!psoTargets)
         return;
 
-    VkCommandBuffer cmd = MGVK_BeginNewCommandBuffer(device);
+	// We resolve MSAA and mips to the active command buffer.
+	auto currentFrame = device->frame;
+	auto frameIndex = currentFrame % device->swapchainCount;
+	auto& frame = device->frames[frameIndex];
+	assert(frame.is_recording);
+	auto cmd = frame.commandBuffer.buffer;
 
     for (int i = 0; i < psoTargets->set.numTargets; ++i)
     {
@@ -3773,8 +3778,8 @@ void MGG_GraphicsDevice_ResolveRenderTargets(MGG_GraphicsDevice* device)
                 VkPipelineStageFlags srcStage;
                 if (j == 1)
                 {
-                    barrier.srcAccessMask = VK_ACCESS_SHADER_READ_BIT;
-                    srcStage = VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT;
+                    barrier.srcAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
+                    srcStage = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
                 }
                 else
                 {
@@ -3852,8 +3857,6 @@ void MGG_GraphicsDevice_ResolveRenderTargets(MGG_GraphicsDevice* device)
             renderTarget->layout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
         }
     }
-
-	MGVK_ExecuteAndFreeCommandBuffer(device, cmd);
 }
 
 
