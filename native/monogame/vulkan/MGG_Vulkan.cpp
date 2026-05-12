@@ -4351,7 +4351,7 @@ MGG_SamplerState* MGG_SamplerState_Create(MGG_GraphicsDevice* device, MGG_Sample
 	samplerInfo.compareEnable = isComparison ? VK_TRUE : VK_FALSE;
 	samplerInfo.compareOp = isComparison ? ToVkCompareOp(info->ComparisonFunction) : VK_COMPARE_OP_NEVER;
 	samplerInfo.mipLodBias = info->MipMapLevelOfDetailBias;
-	samplerInfo.minLod = 0.0f;
+	samplerInfo.minLod = info->MaxMipLevel;
 	samplerInfo.maxLod = VK_LOD_CLAMP_NONE;
 
 	VkSamplerCustomBorderColorCreateInfoEXT bcolor = {};
