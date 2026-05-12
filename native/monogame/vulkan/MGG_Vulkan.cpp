@@ -1554,6 +1554,9 @@ void MGG_GraphicsDevice_Destroy(MGG_GraphicsDevice* device)
 	for (size_t i = 0; i < device->swapchainCount; i++)
 		MGVK_DestroyFrameResources(device, i, true);
 
+	if (device->surface != nullptr)
+		vkDestroySurfaceKHR(device->instance, device->surface, nullptr);
+
 	vmaDestroyAllocator(device->allocator);
 
 	vkDestroyDevice(device->device, nullptr);
