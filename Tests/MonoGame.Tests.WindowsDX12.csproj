@@ -20,7 +20,7 @@
   <ItemGroup>
     <Compile Remove="bin\**\*" />
     <Compile Remove="Framework\WindowsDX\**" />
-    <Compile Remove="obj\**\*" />
+    <Compile Remove="obj\**" />
     <Compile Remove="Properties/**/*" />
     <Compile Remove="Interactive/**/*" />
     <Compile Remove="Runner/iOS/**/*" />
@@ -39,7 +39,9 @@
 
   <ItemGroup>
     <EmbeddedResource Remove="Framework\WindowsDX\**" />
+    <EmbeddedResource Remove="obj\**" />
     <None Remove="Framework\WindowsDX\**" />
+    <None Remove="obj\**" />
   </ItemGroup>
 
   <PropertyGroup>
@@ -48,18 +50,18 @@
     <NativePlatform Condition="'$(NativePlatform)' == ''">x64</NativePlatform>
   </PropertyGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\MonoGame.Framework\MonoGame.Framework.Native.csproj" />
-    <ProjectReference Include="..\native\monogame\windowsdx.vcxproj" />
-
-	  <Content Include="..\Artifacts\native\mgruntime\windowsdx\windows\$(NativePlatform)\$(Configuration)\mgruntime.dll">
-		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-	  </Content>
-	  
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Framework\Audio\" />
-  </ItemGroup>
-
+    <ItemGroup>
+		<ProjectReference Include="..\MonoGame.Framework\MonoGame.Framework.Native.csproj" />
+	
+		<NativeLib Include="..\Artifacts\native\mgruntime\windowsdx\windows\$(Configuration)\mgruntime.dll" Condition="Exists('..\Artifacts\native\mgruntime\windowsdx\windows\$(Configuration)\mgruntime.dll')" PackagePath="runtimes\win-$(NativePlatform)\native" />
+    </ItemGroup>
+	
+	<ItemGroup>
+		<Content Include="@(NativeLib)" Visible="false">
+			<PackagePath>%(PackagePath)</PackagePath>
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</Content>
+		<UpToDateCheckBuilt Include="@(NativeLib->'$(OutputPath)%(Filename)%(Extension)')"><Original>%(Identity)</Original></UpToDateCheckBuilt>
+	</ItemGroup>
+	
 </Project>

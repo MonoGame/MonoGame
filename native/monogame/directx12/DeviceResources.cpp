@@ -573,7 +573,7 @@ void DeviceResources::Reset() {
 void DeviceResources::GetBackBufferData(uint32_t x, uint32_t y, uint32_t w, uint32_t h, uint8_t* data, size_t stride) {
     if (pImpl->m_msaaEnabled)
         pImpl->m_commandContext->ResolveResource(pImpl->GetMainTarget(), pImpl->GetDisplayTarget());
-    pImpl->GetDisplayTarget()->GetData(this, 0, x, y, w, h, data, stride, stride);
+    pImpl->GetDisplayTarget()->GetData(this, 0, x, y, 0, w, h, 1, data, stride);
 }
 
 uint64_t DeviceResources::CreateQueryHandle() {

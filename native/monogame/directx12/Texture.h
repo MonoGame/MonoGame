@@ -30,7 +30,7 @@ public:
 
     void SetData(DeviceResources* device, uint32_t subResId, uint8_t* data, size_t size, size_t rowPitch);
     void SetData(DeviceResources* device, uint32_t subResId, uint32_t x, uint32_t y, uint32_t w, uint32_t h, uint8_t* data, size_t size, size_t rowPitch);
-    void GetData(DeviceResources* device, uint32_t subResId, uint32_t x, uint32_t y, uint32_t w, uint32_t h, uint8_t* data, size_t srcStride, size_t destStride);
+    void GetData(DeviceResources* device, uint32_t subResId, uint32_t x, uint32_t y, uint32_t z, uint32_t w, uint32_t h, uint32_t d, uint8_t* data, size_t dataSize);
 
     static std::vector<D3D12_RESOURCE_BARRIER> s_batchedBarriers;
 
@@ -53,6 +53,7 @@ public:
     const UINT GetHeight() const { return impl->m_desc.Height; }
     const DXGI_SAMPLE_DESC& GetSampleDesc() const { return impl->m_desc.SampleDesc; }
     const DXGI_FORMAT& GetFormat() const { return impl->m_desc.Format; }
+    const bool IsRenderTarget() const { return impl->m_type == SurfaceType::RenderTarget; }
 
     const D3D12_CPU_DESCRIPTOR_HANDLE& GetSRV() const { return impl->m_srvHandle; }
     const D3D12_CPU_DESCRIPTOR_HANDLE& GetUAV(uint32_t mip) const { return impl->m_uavHandles[mip]; }
