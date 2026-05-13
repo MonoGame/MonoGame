@@ -52,8 +52,7 @@
 
     <ItemGroup>
 		<ProjectReference Include="..\MonoGame.Framework\MonoGame.Framework.Native.csproj" />
-		<ProjectReference Include="..\native\monogame\desktopvk.vcxproj" />
-		
+	
 		<NativeLib Include="..\Artifacts\native\mgruntime\desktopvk\windows\$(Configuration)\mgruntime.dll" Condition="Exists('..\Artifacts\native\mgruntime\desktopvk\windows\$(Configuration)\mgruntime.dll')" PackagePath="runtimes\win-$(NativePlatform)\native" />
 	    <NativeLib Include="..\Artifacts\native\mgruntime\desktopvk\linux\$(Configuration)\libmgruntime.so" Condition="Exists('..\Artifacts\native\mgruntime\desktopvk\linux\$(Configuration)\libmgruntime.so')" PackagePath="runtimes\linux-x64\native" />
 	    <NativeLib Include="..\Artifacts\native\mgruntime\desktopvk\macos\$(Configuration)\libmgruntime.dylib" Condition="Exists('..\Artifacts\native\mgruntime\desktopvk\macos\$(Configuration)\libmgruntime.dylib')" PackagePath="runtimes\osx\native" />
