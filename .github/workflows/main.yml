@@ -8,7 +8,7 @@ concurrency:
 
 env:
   DotnetVersion: 9.0.314
-  XCodeVersion: 26.3
+  XCodeVersion: 26.4
   
 jobs:
   build:
@@ -408,6 +408,11 @@ jobs:
         if: runner.environment == 'github-hosted' && runner.os == 'macos'
         with:
           xcode-version: '${{ env.XCodeVersion }}'
+
+      - name: Download Nuget
+        uses: actions/download-artifact@v4
+        with:
+          path: Artifacts/NuGet
 
       - name: Download tests-desktopgl-${{ matrix.platform }}
         uses: actions/download-artifact@v4
