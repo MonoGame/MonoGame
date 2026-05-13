@@ -5,6 +5,7 @@
 #include "directx12.h"
 
 #include "DeviceResources.h"
+#include "CommandContext.h"
 #include "GraphicsEnums.h"
 #include "Texture.h"
 
@@ -297,7 +298,8 @@ void Graphics::Texture::SetData(DeviceResources* device, uint32_t subResId, uint
 #define TEXTURE_DATA_PITCH_ALIGNMENT D3D12_TEXTURE_DATA_PITCH_ALIGNMENT
 #endif
 
-void Graphics::Texture::GetData(DeviceResources* device, uint32_t subResId, uint32_t x, uint32_t y, uint32_t w, uint32_t h, uint8_t* data, size_t srcStride, size_t destStride) {
+void Graphics::Texture::GetData(DeviceResources* device, uint32_t subResId, uint32_t x, uint32_t y, uint32_t z, uint32_t w, uint32_t h, uint32_t d, uint8_t* data, size_t dataSize)
+{
     D3D12_RESOURCE_DESC copyDesc = CD3DX12_RESOURCE_DESC::Tex2D(impl->m_desc.Format, w, h);
     UINT64 readbackBufferSize = 0;
     UINT64 fpRowPitch = 0;
@@ -334,7 +336,7 @@ void Graphics::Texture::GetData(DeviceResources* device, uint32_t subResId, uint
     const CD3DX12_TEXTURE_COPY_LOCATION copyDest(readbackBuffer.Get(), bufferFootprint);
     const CD3DX12_TEXTURE_COPY_LOCATION copySrc(impl->m_res.Get(), subResId);
 
-    D3D12_BOX sourceRegion { x, y, 0, x + w, y + h, 1 };
+    D3D12_BOX sourceRegion { x, y, z, x + w, y + h, z + d };
     cmdList->CopyTextureRegion(&copyDest, 0, 0, 0, &copySrc, &sourceRegion);
 
     const D3D12_RESOURCE_BARRIER revertBarrier = CD3DX12_RESOURCE_BARRIER::Transition(
@@ -352,16 +354,11 @@ void Graphics::Texture::GetData(DeviceResources* device, uint32_t subResId, uint
 
     uint8_t* current = data;
     uint8_t* currentRead = reinterpret_cast<uint8_t*>(pReadbackBufferData);
-    for (size_t line = 0; line < copyDesc.Height; line++) {
-        if (srcStride == destStride)
-            memcpy(current, currentRead, destStride * w);
-        else {
-            for (auto i = 0; i < w; i++)
-                memcpy(current + (i * destStride), (void*)(currentRead + (i * srcStride)), destStride);
-        }
-
+    for (size_t line = 0; line < copyDesc.Height; line++)
+    {
+        memcpy(current, currentRead, fpRowPitch);
         currentRead += dstRowPitch;
-        current += destStride * w;
+        current += fpRowPitch;
     }
 
     CD3DX12_RANGE writeRange(0, 0); // we didnt write anything

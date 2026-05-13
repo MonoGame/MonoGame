@@ -57,6 +57,7 @@ const int MAX_TEXTURE_SLOTS = 16;
 struct MGG_GraphicsDevice
 {
 	FrameCounter frame = 0;
+	bool is_recording = false;
 
 	DeviceResources* resources = nullptr;
 	CommandContext* context = nullptr;
@@ -106,7 +107,7 @@ struct MGG_Buffer
 
 	MGBufferType type;
 
-	// heapType = BufferType::Static;
+	D3D12_HEAP_TYPE heapType;
 	size_t dataSize = 0;
 	size_t actualSize = 0;
 	D3D12_RESOURCE_STATES m_currentState; // for static buffers
@@ -482,6 +483,7 @@ void MGG_GraphicsDevice_ResizeSwapchain(
 mgint MGG_GraphicsDevice_BeginFrame(MGG_GraphicsDevice* device)
 {
 	assert(device != nullptr);
+	assert(!device->is_recording);
 
 #if defined(_GAMING_XBOX)
 	device->resources->WaitForOrigin();
@@ -498,6 +500,8 @@ mgint MGG_GraphicsDevice_BeginFrame(MGG_GraphicsDevice* device)
 	device->samplersDirty = true;
 	device->viewportDirty = true;
 	device->scissorDirty = true;
+
+	device->is_recording = true;
 
 	return frameIndex;
 }
@@ -559,6 +563,7 @@ void MGG_GraphicsDevice_Present(MGG_GraphicsDevice* device, mgint currentFrame, 
 	assert(device != nullptr);
 	assert(syncInterval >= 0);
 	assert(currentFrame >= 0);
+	assert(device->is_recording);
 
 #if !defined(_GAMING_XBOX)
 	device->resources->Present(syncInterval, 0);
@@ -567,6 +572,7 @@ void MGG_GraphicsDevice_Present(MGG_GraphicsDevice* device, mgint currentFrame, 
 #endif
 
 	++device->frame;
+	device->is_recording = false;
 
 	// Move the pending buffers to the free list 
 	// for reuse on the next frame.
@@ -809,13 +815,19 @@ void MGDX_ApplyState(MGG_GraphicsDevice* device)
 
 	if (device->indexBufferDirty)
 	{
-		D3D12_INDEX_BUFFER_VIEW ibv;
-		ibv.BufferLocation = device->indexBuffer->GpuAddress();
-		ibv.Format = device->indexBufferSize == MGIndexElementSize::ThirtyTwoBits ? DXGI_FORMAT_R32_UINT : DXGI_FORMAT_R16_UINT;
-		ibv.SizeInBytes = device->indexBuffer->dataSize;
+		// NOTE: Is this just wasted cycles clearing the index buffer?
+		if (device->indexBuffer == nullptr)
+			cl->IASetIndexBuffer(nullptr);
+		else
+		{
+			D3D12_INDEX_BUFFER_VIEW ibv;
+			ibv.BufferLocation = device->indexBuffer->GpuAddress();
+			ibv.Format = device->indexBufferSize == MGIndexElementSize::ThirtyTwoBits ? DXGI_FORMAT_R32_UINT : DXGI_FORMAT_R16_UINT;
+			ibv.SizeInBytes = device->indexBuffer->dataSize;
 
-		cl->IASetIndexBuffer(&ibv);
-		device->indexBuffer->frame = currentFrame;
+			cl->IASetIndexBuffer(&ibv);
+			device->indexBuffer->frame = currentFrame;
+		}
 
 		device->indexBufferDirty = false;
 	}
@@ -1137,14 +1149,7 @@ MGG_SamplerState* MGG_SamplerState_Create(MGG_GraphicsDevice* device, MGG_Sample
 	assert(info != nullptr);
 
 	auto state = new MGG_SamplerState();
-
-	state->sampler = new Graphics::Sampler(
-		device->resources,
-		info->Filter,
-		info->AddressU,
-		info->AddressV,
-		info->AddressW);
-
+	state->sampler = new Graphics::Sampler(device->resources, info);
 	return state;
 }
 
@@ -1225,7 +1230,7 @@ MGG_Buffer* MGG_Buffer_Create(MGG_GraphicsDevice* device, MGBufferType type, mgi
 	// TODO: All heaps are dynamic at the moment
 	// can we fix that later?
 	buffer->m_currentState = D3D12_RESOURCE_STATE_GENERIC_READ;
-	allocDesc.HeapType = D3D12_HEAP_TYPE_UPLOAD;
+	buffer->heapType = allocDesc.HeapType = D3D12_HEAP_TYPE_UPLOAD;
 	/*
 	switch (buffer->heapType)
 	{
@@ -1331,7 +1336,16 @@ void MGG_Buffer_SetData(MGG_GraphicsDevice* device, MGG_Buffer*& buffer, mgint o
 	UINT8* pVertexDataBegin;
 	CD3DX12_RANGE readRange(0, 0);
 	DX::ThrowIfFailed(buffer->m_res->Map(0, &readRange, reinterpret_cast<void**>(&pVertexDataBegin)));
-	memcpy(pVertexDataBegin + offset, data, length);
+	pVertexDataBegin += offset;
+	if (vertexStride == elementSizeInBytes)
+		memcpy(pVertexDataBegin, data, length);
+	else
+	{
+		auto bytesToCopy = elementSizeInBytes < vertexStride ? elementSizeInBytes : vertexStride;
+		for (auto i = 0; i < elementCount; i++)
+			memcpy((void*)(pVertexDataBegin + (i * vertexStride)), data + (i * elementSizeInBytes), bytesToCopy);
+		length = vertexStride * (elementCount - 1) + elementSizeInBytes;
+	}
 	CD3DX12_RANGE writeRange(offset, offset + length);
 	buffer->m_res->Unmap(0, &writeRange);
 }
@@ -1343,40 +1357,46 @@ void MGG_Buffer_GetData(MGG_GraphicsDevice* device, MGG_Buffer* buffer, mgint of
 	assert(data != nullptr);
 
 	ComPtr<ID3D12Resource> intermediateBuffer;
-	ComPtr<D3D12MA::Allocation> intermediateAlloc;
-	CD3DX12_RESOURCE_DESC resourceDesc = CD3DX12_RESOURCE_DESC::Buffer(dataStride * dataCount);
-	D3D12MA::ALLOCATION_DESC allocDesc = { D3D12MA::ALLOCATION_FLAG_NONE, D3D12_HEAP_TYPE_READBACK };
-	DX::ThrowIfFailed(device->resources->GetAllocator()->CreateResource(
-		&allocDesc,
-		&resourceDesc,
-		D3D12_RESOURCE_STATE_COPY_DEST,
-		nullptr,
-		intermediateAlloc.ReleaseAndGetAddressOf(),
-		IID_GRAPHICS_PPV_ARGS(intermediateBuffer.ReleaseAndGetAddressOf())));
+	if (buffer->heapType == D3D12_HEAP_TYPE_UPLOAD)
+		intermediateBuffer = buffer->m_res;
+	else
+	{
+		ComPtr<D3D12MA::Allocation> intermediateAlloc;
+		CD3DX12_RESOURCE_DESC resourceDesc = CD3DX12_RESOURCE_DESC::Buffer(dataStride * dataCount);
+		D3D12MA::ALLOCATION_DESC allocDesc = { D3D12MA::ALLOCATION_FLAG_NONE, D3D12_HEAP_TYPE_READBACK };
+		DX::ThrowIfFailed(device->resources->GetAllocator()->CreateResource(
+			&allocDesc,
+			&resourceDesc,
+			D3D12_RESOURCE_STATE_COPY_DEST,
+			nullptr,
+			intermediateAlloc.ReleaseAndGetAddressOf(),
+			IID_GRAPHICS_PPV_ARGS(intermediateBuffer.ReleaseAndGetAddressOf())));
 
-	auto cmd = device->resources->BeginCommandList();
-	auto cmdList = cmd->Get();
+		auto cmd = device->resources->BeginCommandList();
+		auto cmdList = cmd->Get();
 
-	if (buffer->m_currentState != D3D12_RESOURCE_STATE_COPY_SOURCE) {
-		const D3D12_RESOURCE_BARRIER toCopySourceBarrier = CD3DX12_RESOURCE_BARRIER::Transition(
-			buffer->m_res.Get(), buffer->m_currentState, D3D12_RESOURCE_STATE_COPY_SOURCE
-		);
-		cmdList->ResourceBarrier(1, &toCopySourceBarrier);
+		if (buffer->m_currentState != D3D12_RESOURCE_STATE_COMMON) {
+			const D3D12_RESOURCE_BARRIER toCopySourceBarrier = CD3DX12_RESOURCE_BARRIER::Transition(
+				buffer->m_res.Get(), D3D12_RESOURCE_STATE_COMMON, D3D12_RESOURCE_STATE_COPY_SOURCE
+			);
+			cmdList->ResourceBarrier(1, &toCopySourceBarrier);
+		}
+
+		cmdList->CopyBufferRegion(intermediateBuffer.Get(), 0, buffer->m_res.Get(), offset, dataStride * dataCount);
+
+		if (buffer->m_currentState != D3D12_RESOURCE_STATE_COMMON) {
+			const D3D12_RESOURCE_BARRIER revertBarrier = CD3DX12_RESOURCE_BARRIER::Transition(
+				buffer->m_res.Get(), D3D12_RESOURCE_STATE_COMMON, buffer->m_currentState
+			);
+			cmdList->ResourceBarrier(1, &revertBarrier);
+		}
+
+		cmd->Close(true);
 	}
-
-	cmdList->CopyBufferRegion(intermediateBuffer.Get(), 0, buffer->m_res.Get(), offset, dataStride * dataCount);
-
-	if (buffer->m_currentState != D3D12_RESOURCE_STATE_COPY_SOURCE) {
-		const D3D12_RESOURCE_BARRIER revertBarrier = CD3DX12_RESOURCE_BARRIER::Transition(
-			buffer->m_res.Get(), D3D12_RESOURCE_STATE_COPY_SOURCE, buffer->m_currentState
-		);
-		cmdList->ResourceBarrier(1, &revertBarrier);
-	}
-
-	cmd->Close(true);
 
 	UINT8* pSourceDataBegin;
 	DX::ThrowIfFailed(intermediateBuffer->Map(0, nullptr, reinterpret_cast<void**>(&pSourceDataBegin)));
+	pSourceDataBegin += offset;
 	if (dataStride == dataBytes)
 	{
 		memcpy(data, pSourceDataBegin, dataStride * dataCount);
@@ -1616,6 +1636,52 @@ void MGG_Texture_GetData(MGG_GraphicsDevice* device, MGG_Texture* texture, mgint
 	assert(data != nullptr);
 	assert(dataBytes > 0);
 
+	if (x == 0 && y == 0 && width == 0 && height == 0)
+	{
+		width = texture->texture->GetWidth();
+		height = texture->texture->GetHeight();
+	}
+
+	// If this is a render target and we're currently rendering
+	// to it we need to flush the command buffer until it is ready.
+	bool restart_cmdlist = false;
+	if (	device->is_recording &&
+			texture->texture->IsRenderTarget() &&
+			texture->frame == device->frame)
+	{
+		auto context = device->resources->GetCommandContext();
+		context->cmd->Close(true);
+
+		//auto queue = device->resources->GetCommandQueue();
+		//auto clist = device->resources->GetCommandContext()->cmdList;
+		//queue->ExecuteCommandList(clist);
+		//queue->WaitForIdle();
+		restart_cmdlist = true;
+	}
+
+	assert(data != nullptr);
+	assert(dataBytes > 0);
+
+	uint32_t subres = (slice * texture->texture->GetMipLevels()) + level;
+	size_t rowPitch = GetTexturePitch(texture->format, width);
+
+	texture->texture->GetData(device->resources, subres, x, y, z, width, height, depth, data, dataBytes);
+
+	if (restart_cmdlist)
+	{
+		auto context = device->resources->GetCommandContext();
+		context->Reset(context->m_backBufferIndex);
+
+		device->pipelineManager->Prepare();
+		device->indexBufferDirty = true;
+		device->vertexBuffersDirty = 0xFFFFFFFF;
+		memset(device->textures, 0, sizeof(device->textures));
+		device->texturesDirty = true;
+		memset(device->samplers, 0, sizeof(device->samplers));
+		device->samplersDirty = true;
+		device->viewportDirty = true;
+		device->scissorDirty = true;
+	}
 }
 
 static const LPCSTR MGVertexElementUsageToLPCSTR[] =
