@@ -70,7 +70,17 @@ public:
             if (m_msaaEnabled)
                 delete m_msaaTargets[n];
         }
+
         m_commandContext.reset();
+        m_transientBufferPool.Reset();
+        m_heaps.reset();
+        m_commandListPool.reset();
+        m_swapChain.Reset();
+        m_d3dDevice.Reset();
+        m_dxgiFactory.Reset();
+
+        // Must be last as it will dump memory leaks.
+        m_allocator.Reset();
     }
 
 #if defined(_GAMING_XBOX)

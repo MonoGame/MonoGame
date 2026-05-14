@@ -16,9 +16,15 @@ using namespace Graphics;
 Sampler::Sampler(DeviceResources* device, MGG_SamplerState_Info* info)
 {
     impl = new InternalData();
-    
+
+    D3D12_FILTER filter;
+    if (info->FilterMode == MGTextureFilterMode::Comparison)
+        filter = TextureFilterToComparisonD3D12_FILTER[(int)info->Filter];
+    else
+        filter = TextureFilterToD3D12_FILTER[(int)info->Filter];
+
     D3D12_SAMPLER_DESC descSampler = {
-        TextureFilterToD3D12_FILTER[(int)info->Filter],
+        filter,
         TextureAddressModeToD3D12_TEXTURE_ADDRESS_MODE[(int)info->AddressU],
         TextureAddressModeToD3D12_TEXTURE_ADDRESS_MODE[(int)info->AddressV],
         TextureAddressModeToD3D12_TEXTURE_ADDRESS_MODE[(int)info->AddressW],
