@@ -378,6 +378,10 @@ namespace MonoGame.Effect
                                 sampler.type = MojoShader.MOJOSHADER_samplerType.MOJOSHADER_SAMPLER_CUBE;
                                 break;
 
+                            case "2darray":
+                                sampler.type = MojoShader.MOJOSHADER_samplerType.MOJOSHADER_SAMPLER_VOLUME;
+                                break;
+
                             default:
                                 throw new Exception("Unexpected sampler class type: " + textureDim);
                         }

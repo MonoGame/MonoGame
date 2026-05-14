@@ -403,8 +403,13 @@ void MGG_GraphicsDevice_Destroy(MGG_GraphicsDevice* device)
 {
 	assert(device != nullptr);
 
-
 	MGDX_DestroyFrameResources(device, 0, true);
+
+	if (device->depthTexture)
+		delete device->depthTexture;
+
+	delete device->pipelineManager;
+	delete device->resources;
 
 	delete device;
 }
@@ -687,7 +692,40 @@ void MGG_GraphicsDevice_GetBackBufferData(MGG_GraphicsDevice* device, mgint x, m
 	assert(count > 0);
 	assert(dataBytes > 0);
 
-	// !TODO, need to implement
+	// If we're currently recording we need to flush the
+	// /command buffer to finishing rendering.
+	bool restart_cmdlist = false;
+	if (device->is_recording)
+	{
+		auto context = device->resources->GetCommandContext();
+		context->cmd->Close(true);
+
+		//auto queue = device->resources->GetCommandQueue();
+		//auto clist = device->resources->GetCommandContext()->cmdList;
+		//queue->ExecuteCommandList(clist);
+		//queue->WaitForIdle();
+		restart_cmdlist = true;
+	}
+
+	assert(data != nullptr);
+	assert(dataBytes > 0);
+
+	auto texture = device->resources->GetMainTarget();
+	texture->GetData(device->resources, 0, x, y, 0, width, height, 1, (uint8_t*)data, dataBytes);
+
+	if (restart_cmdlist)
+	{
+		auto context = device->resources->GetCommandContext();
+		context->Reset(context->m_backBufferIndex);
+
+		device->pipelineManager->Prepare();
+		device->indexBufferDirty = true;
+		device->vertexBuffersDirty = 0xFFFFFFFF;
+		device->texturesDirty = true;
+		device->samplersDirty = true;
+		device->viewportDirty = true;
+		device->scissorDirty = true;
+	}
 }
 
 void MGG_GraphicsDevice_SetConstantBuffer(MGG_GraphicsDevice* device, MGShaderStage stage, mgint slot, MGG_Buffer* buffer)
@@ -1035,8 +1073,8 @@ MGG_BlendState* MGG_BlendState_Create(MGG_GraphicsDevice* device, MGG_BlendState
 		bstate.SrcBlend = BlendToD3D12_BLEND[(int)infos[i].colorSourceBlend];
 		bstate.DestBlend = BlendToD3D12_BLEND[(int)infos[i].colorDestBlend];
 		bstate.BlendOp = BlendFunctionToD3D12_BLEND_OP[(int)infos[i].colorBlendFunc];
-		bstate.SrcBlendAlpha = BlendToD3D12_BLEND[(int)infos[i].alphaSourceBlend];
-		bstate.DestBlendAlpha = BlendToD3D12_BLEND[(int)infos[i].alphaDestBlend];
+		bstate.SrcBlendAlpha = BlendToAlphaD3D12_BLEND[(int)infos[i].alphaSourceBlend];
+		bstate.DestBlendAlpha = BlendToAlphaD3D12_BLEND[(int)infos[i].alphaDestBlend];
 		bstate.BlendOpAlpha = BlendFunctionToD3D12_BLEND_OP[(int)infos[i].alphaBlendFunc];
 		bstate.RenderTargetWriteMask = (uint8_t)infos[i].colorWriteChannels;
 	}
@@ -1675,9 +1713,7 @@ void MGG_Texture_GetData(MGG_GraphicsDevice* device, MGG_Texture* texture, mgint
 		device->pipelineManager->Prepare();
 		device->indexBufferDirty = true;
 		device->vertexBuffersDirty = 0xFFFFFFFF;
-		memset(device->textures, 0, sizeof(device->textures));
 		device->texturesDirty = true;
-		memset(device->samplers, 0, sizeof(device->samplers));
 		device->samplersDirty = true;
 		device->viewportDirty = true;
 		device->scissorDirty = true;

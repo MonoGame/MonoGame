@@ -7,7 +7,10 @@
 DECLARE_TEXTURE(SourceTexture, 0);
 DECLARE_TEXTURE(OtherTexture, 1);
 
-float4 PS_Main(float2 uv : TEXCOORD0) : SV_TARGET0
+float4 PS_Main(
+    float4 position : SV_Position,
+    float4 color : COLOR0,
+    float2 uv : TEXCOORD0) : SV_TARGET0
 {
     return SAMPLE_TEXTURE(SourceTexture, uv) + SAMPLE_TEXTURE(OtherTexture, uv);
 }
