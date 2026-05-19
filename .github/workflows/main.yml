@@ -8,6 +8,7 @@ concurrency:
 
 env:
   DotnetVersion: 9.0.307
+  XCodeVersion: 26.0
   
 jobs:
   build:
@@ -87,7 +88,7 @@ jobs:
         uses: maxim-lobanov/setup-xcode@v1
         if: runner.environment == 'github-hosted' && runner.os == 'macos'
         with:
-          xcode-version: '26.4'
+          xcode-version: '${{ env.XCodeVersion }}'
 
       - name: Add msbuild to PATH
         if: runner.os == 'Windows'
@@ -382,7 +383,7 @@ jobs:
         uses: maxim-lobanov/setup-xcode@v1
         if: runner.environment == 'github-hosted' && runner.os == 'macos'
         with:
-          xcode-version: '26.4'
+          xcode-version: '${{ env.XCodeVersion }}'
 
       - name: Download Nuget
         uses: actions/download-artifact@v4
