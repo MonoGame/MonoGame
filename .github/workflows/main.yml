@@ -7,7 +7,8 @@ concurrency:
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 env:
-  DotnetVersion: 9.0.307
+  DotnetVersion: 9.0.314
+  XCodeVersion: 26.3
   
 jobs:
   build:
@@ -66,12 +67,12 @@ jobs:
       - name: Setup DotNet on Windows
         if: runner.environment == 'github-hosted' && runner.os == 'windows'
         run: |
-          dotnet workload install android ios
+          dotnet workload install android ios --version ${{ env.DotnetVersion }}
 
       - name: Setup DotNet on linux
         if: runner.environment == 'github-hosted' && runner.os == 'Linux' && runner.arch == 'x64'
         run: |
-          dotnet workload install android
+          dotnet workload install android --version ${{ env.DotnetVersion }}
 
       - name: Update Homebrew
         if: runner.environment == 'github-hosted' && runner.os == 'macos'
@@ -81,13 +82,13 @@ jobs:
       - name: Setup DotNet on MacOS
         if: runner.environment == 'github-hosted' && runner.os == 'macos'
         run: |
-          dotnet workload install macos ios
+          dotnet workload install macos ios --version ${{ env.DotnetVersion }}
 
       - name: Pin xcode version
         uses: maxim-lobanov/setup-xcode@v1
         if: runner.environment == 'github-hosted' && runner.os == 'macos'
         with:
-          xcode-version: '26.4'
+          xcode-version: '${{ env.XCodeVersion }}'
 
       - name: Add msbuild to PATH
         if: runner.os == 'Windows'
@@ -184,7 +185,7 @@ jobs:
       - name: Setup DotNet on MacOS for DotNet 9
         if: runner.environment == 'github-hosted' && runner.os == 'macos'
         run: |
-          dotnet workload install macos ios
+          dotnet workload install macos ios --version ${{ env.DotnetVersion }}
 
       - name: Test generated Nuget packages
         if: runner.os != 'Linux'
@@ -357,7 +358,7 @@ jobs:
 
       - name: Generate global.json
         run: |
-          echo '{ "sdk": { "version": "${{ env.DotnetVersion }}" } }' > global.json
+          echo '{ "sdk": { "version": "${{ env.DotnetVersion }}", "workloadVersion": "${{ env.DotnetVersion }}" } }' > global.json
 
       - name: Setup .NET Core SDK
         uses: actions/setup-dotnet@v5
@@ -382,7 +383,7 @@ jobs:
         uses: maxim-lobanov/setup-xcode@v1
         if: runner.environment == 'github-hosted' && runner.os == 'macos'
         with:
-          xcode-version: '26.4'
+          xcode-version: '${{ env.XCodeVersion }}'
 
       - name: Download Nuget
         uses: actions/download-artifact@v4
