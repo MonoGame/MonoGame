@@ -294,7 +294,7 @@ public:
         if (msaaCount > 1) {
             m_msaaEnabled = true;
             for (UINT n = 0; n < m_backBufferCount; n++) {
-                m_msaaTargets[n] = new Texture(SurfaceType::RenderTarget, TextureDimension::Texture2D, width, height, 1, m_backBufferFormat);
+                m_msaaTargets[n] = new Texture(SurfaceType::RenderTarget, TextureDimension::Texture2D, width, height, 1, 1, m_backBufferFormat);
                 m_msaaTargets[n]->SetClearColor(r, g, b, a);
                 m_msaaTargets[n]->SetMSAA(msaaCount);
                 if (!m_msaaTargets[n]->CheckMSAA(m_d3dDevice.Get())) {
@@ -584,10 +584,6 @@ void DeviceResources::GetBackBufferData(uint32_t x, uint32_t y, uint32_t w, uint
     if (pImpl->m_msaaEnabled)
         pImpl->m_commandContext->ResolveResource(pImpl->GetMainTarget(), pImpl->GetDisplayTarget());
     pImpl->GetDisplayTarget()->GetData(this, 0, x, y, 0, w, h, 1, data, stride);
-}
-
-uint64_t DeviceResources::CreateQueryHandle() {
-    return pImpl->m_heaps->CreateQueryHandle();
 }
 
 CommandContext* Graphics::DeviceResources::GetCommandContext() const {

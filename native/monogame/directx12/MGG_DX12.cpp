@@ -95,6 +95,7 @@ struct MGG_GraphicsDevice
 
 	std::queue<MGG_Buffer*> destroyBuffers;
 	std::queue<MGG_Texture*> destroyTextures;
+	std::queue<MGG_OcclusionQuery*> destroyQuery;
 
 	std::vector<MGG_Buffer*> discarded;
 	std::vector<MGG_Buffer*> pending;
@@ -103,7 +104,7 @@ struct MGG_GraphicsDevice
 
 struct MGG_Buffer
 {
-	mgint frame;
+	FrameCounter frame = 0;
 
 	MGBufferType type;
 
@@ -120,7 +121,7 @@ struct MGG_Buffer
 
 struct MGG_Texture
 {
-	mgint frame;
+	FrameCounter frame = 0;
 
 	MGSurfaceFormat format;
 	Texture* texture = nullptr;
@@ -165,12 +166,14 @@ struct MGG_SamplerState
 
 struct MGG_OcclusionQuery
 {
-	uint64_t handle;
+	FrameCounter frame = 0;
+
+	int32_t index = -1;
 
 	Microsoft::WRL::ComPtr<ID3D12Resource> buffer;
 	Microsoft::WRL::ComPtr<D3D12MA::Allocation> alloc;
 
-	uint64_t fence;
+	uint64_t fence = 0;
 };
 
 struct MGG_GraphicsSystem
@@ -435,7 +438,21 @@ void MGG_GraphicsDevice_GetCaps(MGG_GraphicsDevice* device, MGG_GraphicsDevice_C
 void MGG_GraphicsDevice_ResolveRenderTargets(MGG_GraphicsDevice* device)
 {
 	assert(device != nullptr);
-	// This is a no-op for Direct3D 12.
+
+	auto& currentRT = device->context->m_currentRT;
+	if (currentRT.size() == 0)
+		return;
+
+	// We resolve MSAA and mips to the active command buffer.
+
+	for (int i = 0; i < currentRT.size(); ++i)
+	{
+		auto renderTarget = currentRT[i];
+		if (renderTarget->GetMipLevels() <= 1)
+			continue;
+
+		device->context->GenerateMipmap(renderTarget);
+	}
 }
 
 void MGG_GraphicsDevice_ResizeSwapchain(
@@ -462,13 +479,9 @@ void MGG_GraphicsDevice_ResizeSwapchain(
 #error Not Implemented
 #endif
 
-	//resetCallback = OnDeviceLost;
-	//DxDevice.SetDeviceResetCallback(resetCallback);
 #endif
 
-	int sampleCount = 1; // PresentationParameters.MultiSampleCount;
-	//Vector4 clear = DiscardColor.ToVector4();
-	device->resources->CreateWindowSizeDependentResources(width, height, 0, 0, 0, 0, sampleCount);
+	device->resources->CreateWindowSizeDependentResources(width, height, 0, 0, 0, 0, multiSampleCount);
 
 	if (device->depthTexture)
 	{
@@ -478,9 +491,9 @@ void MGG_GraphicsDevice_ResizeSwapchain(
 
 	if (depth != MGDepthFormat::None)
 	{
-		device->depthTexture = new  Texture(width, height, depth);
-		//if (sampleCount > 1)
-			//DepthTexture.SetMSAA(sampleCount);
+		device->depthTexture = new Texture(width, height, depth);
+		if (multiSampleCount > 1)
+			device->depthTexture->SetMSAA(multiSampleCount);
 		device->depthTexture->Create(device->resources);
 	}
 }
@@ -532,7 +545,7 @@ static void MGDX_DestroyFrameResources(MGG_GraphicsDevice* device, mgint current
 		while (device->destroyBuffers.size() > 0)
 		{
 			auto buffer = device->destroyBuffers.front();
-			auto diff = currentFrame - buffer->frame;
+			mgint diff = currentFrame - buffer->frame;
 			if (!free_all && diff < kFreeFrames || (0xFFFF - diff) < kFreeFrames)
 				break;
 
@@ -544,7 +557,7 @@ static void MGDX_DestroyFrameResources(MGG_GraphicsDevice* device, mgint current
 		while (device->destroyTextures.size() > 0)
 		{
 			auto texture = device->destroyTextures.front();
-			auto diff = currentFrame - texture->frame;
+			mgint diff = currentFrame - texture->frame;
 			if (!free_all && diff < kFreeFrames || (0xFFFF - diff) < kFreeFrames)
 				break;
 
@@ -559,6 +572,21 @@ static void MGDX_DestroyFrameResources(MGG_GraphicsDevice* device, mgint current
 				delete texture->depthTexture;
 			}
 			delete texture;
+		}
+
+		while (device->destroyQuery.size() > 0)
+		{
+			auto query = device->destroyQuery.front();
+			mgint diff = currentFrame - query->frame;
+			if (!free_all && diff < kFreeFrames || (0xFFFF - diff) < kFreeFrames)
+				break;
+
+			device->destroyQuery.pop();
+
+			device->resources->GetGraphicsHeaps()->FreeQueryIndex(query->index);
+			query->buffer.Reset();
+			query->alloc.Reset();
+			delete query;
 		}
 	}
 }
@@ -671,7 +699,7 @@ void MGG_GraphicsDevice_SetRenderTargets(MGG_GraphicsDevice* device, MGG_Texture
 
 	if (targets == nullptr || count == 0)
 	{
-		device->context->SetRenderTarget(nullptr, 0, device->depthTexture);
+		device->context->SetRenderTarget(nullptr, nullptr, 0, device->depthTexture);
 	}
 	else
 	{
@@ -681,7 +709,7 @@ void MGG_GraphicsDevice_SetRenderTargets(MGG_GraphicsDevice* device, MGG_Texture
 			colorTargets.push_back(targets[i]->texture);
 		}
 
-		device->context->SetRenderTarget(static_cast<void*>(colorTargets.data()), count, targets[0]->depthTexture);
+		device->context->SetRenderTarget(colorTargets.data(), arraySlices, count, targets[0]->depthTexture);
 	}
 }
 
@@ -699,19 +727,13 @@ void MGG_GraphicsDevice_GetBackBufferData(MGG_GraphicsDevice* device, mgint x, m
 	{
 		auto context = device->resources->GetCommandContext();
 		context->cmd->Close(true);
-
-		//auto queue = device->resources->GetCommandQueue();
-		//auto clist = device->resources->GetCommandContext()->cmdList;
-		//queue->ExecuteCommandList(clist);
-		//queue->WaitForIdle();
+		context->cmd = nullptr;
 		restart_cmdlist = true;
 	}
 
 	assert(data != nullptr);
 	assert(dataBytes > 0);
-
-	auto texture = device->resources->GetMainTarget();
-	texture->GetData(device->resources, 0, x, y, 0, width, height, 1, (uint8_t*)data, dataBytes);
+	device->resources->GetBackBufferData(x,y, width, height, (uint8_t*)data, dataBytes);
 
 	if (restart_cmdlist)
 	{
@@ -1161,7 +1183,8 @@ MGG_RasterizerState* MGG_RasterizerState_Create(MGG_GraphicsDevice* device, MGG_
 		break;
 	}
 
-	state->desc.DepthBias = info->depthBias;
+	state->desc.DepthBias = info->depthBias * ((1 << 24) - 1);
+	state->desc.DepthBiasClamp = 0.0f;
 	state->desc.DepthClipEnable = info->depthClipEnable;
 	state->desc.SlopeScaledDepthBias = info->slopeScaleDepthBias;
 	state->desc.MultisampleEnable = info->multiSampleAntiAlias;
@@ -1474,8 +1497,25 @@ MGG_Texture* MGG_Texture_Create(
 
 	auto texture = new MGG_Texture();
 
+	mgint depthOrArray;
+	switch (type)
+	{
+	default:
+	case MGTextureType::_2D:
+		assert(depth == 1);
+		depthOrArray = slices;
+		break;
+	case MGTextureType::_3D:
+		depthOrArray = depth * slices;
+		break;
+	case MGTextureType::Cube:
+		assert(depth == 1);
+		depthOrArray = slices;
+		break;
+	}
+
 	texture->format = format;
-	texture->texture = new Texture(SurfaceType::Texture, TextureDimension::Texture2D, width, height, mipmaps, format);
+	texture->texture = new Texture(SurfaceType::Texture, (TextureDimension)type, width, height, depthOrArray, mipmaps, format);
 	texture->texture->Create(device->resources);
 
 	return texture;
@@ -1505,8 +1545,25 @@ MGG_Texture* MGG_RenderTarget_Create(
 
 	auto texture = new MGG_Texture();
 
+	mgint depthOrArray;
+	switch (type)
+	{
+	default:
+	case MGTextureType::_2D:
+		assert(depth == 1);
+		depthOrArray = slices;
+		break;
+	case MGTextureType::_3D:
+		depthOrArray = depth * slices;
+		break;
+	case MGTextureType::Cube:
+		assert(depth == 1);
+		depthOrArray = slices;
+		break;
+	}
+
 	texture->format = format;
-	texture->texture = new Texture(SurfaceType::RenderTarget, TextureDimension::Texture2D, width, height, mipmaps, format);
+	texture->texture = new Texture(SurfaceType::RenderTarget, (TextureDimension)type, width, height, depthOrArray, mipmaps, format);
 	texture->texture->Create(device->resources);
 
 	if (depthFormat != MGDepthFormat::None)
@@ -1630,20 +1687,26 @@ void MGG_Texture_SetData(MGG_GraphicsDevice* device, MGG_Texture* texture, mgint
 	assert(device != nullptr);
 	assert(texture != nullptr);
 
-	if (x == 0 && y == 0 && width == 0 && height == 0)
+	uint32_t tmips = texture->texture->GetMipLevels();
+	uint32_t twidth = texture->texture->GetWidth(level);
+	uint32_t theight = texture->texture->GetHeight(level);
+	uint32_t tdepth = texture->texture->GetDepthOrArraySize(level);
+
+	// If no arguments passed thru then use the defaults.
+	if (x == 0 && y == 0 && z == 0 && width == 0 && height == 0 && depth == 0)
 	{
-		width = texture->texture->GetWidth();
-		height = texture->texture->GetHeight();
+		width = twidth;
+		height = theight;
+		depth = tdepth;
 	}
 
-	//assert(level >= 0 && level < texture->info.mipLevels);
-	//assert(slice >= 0 && slice < texture->info.arrayLayers);
-	//assert(x >= 0 && x < texture->info.extent.width);
-	//assert(y >= 0 && y < texture->info.extent.height);
-	//assert(z >= 0 && z < texture->info.extent.depth);
-	//assert(x + width <= texture->info.extent.width);
-	//assert(y + height <= texture->info.extent.height);
-	//assert(z + depth <= texture->info.extent.depth);
+	assert(level >= 0 && level < tmips);
+	assert(x >= 0 && x < twidth);
+	assert(y >= 0 && y < theight);
+	assert(z >= 0 && z < tdepth);
+	assert(x + width <= twidth);
+	assert(y + height <= theight);
+	assert(z + depth <= tdepth);
 
 	assert(data != nullptr);
 	assert(dataBytes > 0);
@@ -1651,10 +1714,10 @@ void MGG_Texture_SetData(MGG_GraphicsDevice* device, MGG_Texture* texture, mgint
 	uint32_t subres = (slice * texture->texture->GetMipLevels()) + level;
 	size_t rowPitch = GetTexturePitch(texture->format, width);
 
-	if (x == 0 && y == 0 && width == texture->texture->GetWidth() && height == texture->texture->GetHeight())
+	if (x == 0 && y == 0 && z == 0 && width == twidth && height == theight && depth == tdepth)
 		texture->texture->SetData(device->resources, subres, data, dataBytes, rowPitch);
 	else
-		texture->texture->SetData(device->resources, subres, x, y, width, height, data, dataBytes, rowPitch);
+		texture->texture->SetData(device->resources, subres, x, y, z, width, height, depth, data, dataBytes, rowPitch);
 }
 
 void MGG_Texture_GetData(MGG_GraphicsDevice* device, MGG_Texture* texture, mgint level, mgint slice, mgint x, mgint y, mgint z, mgint width, mgint height, mgint depth, mgbyte* data, mgint dataBytes)
@@ -1662,23 +1725,29 @@ void MGG_Texture_GetData(MGG_GraphicsDevice* device, MGG_Texture* texture, mgint
 	assert(device != nullptr);
 	assert(texture != nullptr);
 
-	//assert(level >= 0 && level < texture->info.mipLevels);
-	//assert(slice >= 0 && slice < texture->info.arrayLayers);
-	//assert(x >= 0 && x < texture->info.extent.width);
-	//assert(y >= 0 && y < texture->info.extent.height);
-	//assert(z >= 0 && z < texture->info.extent.depth);
-	//assert(x + width <= texture->info.extent.width);
-	//assert(y + height <= texture->info.extent.height);
-	//assert(z + depth <= texture->info.extent.depth);
+	uint32_t tmips = texture->texture->GetMipLevels();
+	uint32_t twidth = texture->texture->GetWidth(level);
+	uint32_t theight = texture->texture->GetHeight(level);
+	uint32_t tdepth = texture->texture->GetDepthOrArraySize(level);
+
+	// If no arguments passed thru then use the defaults.
+	if (x == 0 && y == 0 && z == 0 && width == 0 && height == 0 && depth == 0)
+	{
+		width = twidth;
+		height = theight;
+		depth = tdepth;
+	}
+
+	assert(level >= 0 && level < tmips);
+	assert(x >= 0 && x < twidth);
+	assert(y >= 0 && y < theight);
+	assert(z >= 0 && z < tdepth);
+	assert(x + width <= twidth);
+	assert(y + height <= theight);
+	assert(z + depth <= tdepth);
 
 	assert(data != nullptr);
 	assert(dataBytes > 0);
-
-	if (x == 0 && y == 0 && width == 0 && height == 0)
-	{
-		width = texture->texture->GetWidth();
-		height = texture->texture->GetHeight();
-	}
 
 	// If this is a render target and we're currently rendering
 	// to it we need to flush the command buffer until it is ready.
@@ -1690,10 +1759,7 @@ void MGG_Texture_GetData(MGG_GraphicsDevice* device, MGG_Texture* texture, mgint
 		auto context = device->resources->GetCommandContext();
 		context->cmd->Close(true);
 
-		//auto queue = device->resources->GetCommandQueue();
-		//auto clist = device->resources->GetCommandContext()->cmdList;
-		//queue->ExecuteCommandList(clist);
-		//queue->WaitForIdle();
+		context->cmd = nullptr;
 		restart_cmdlist = true;
 	}
 
@@ -1844,7 +1910,7 @@ MGG_OcclusionQuery* MGG_OcclusionQuery_Create(MGG_GraphicsDevice* device)
 
 	auto query = new MGG_OcclusionQuery();
 
-	query->handle = device->resources->GetGraphicsHeaps()->CreateQueryHandle();
+	query->index = device->resources->GetGraphicsHeaps()->GetQueryIndex();
 
 	CD3DX12_RESOURCE_DESC resourceDesc = CD3DX12_RESOURCE_DESC::Buffer(8);
 	D3D12MA::ALLOCATION_DESC allocDesc = { D3D12MA::ALLOCATION_FLAG_COMMITTED, D3D12_HEAP_TYPE_READBACK };
@@ -1865,7 +1931,8 @@ void MGG_OcclusionQuery_Destroy(MGG_GraphicsDevice* device, MGG_OcclusionQuery* 
 	if (!query)
 		return;
 
-	delete query;
+	// Queue the occulusion query for later destruction.
+	device->destroyQuery.push(query);
 }
 
 void MGG_OcclusionQuery_Begin(MGG_GraphicsDevice* device, MGG_OcclusionQuery* query)
@@ -1875,10 +1942,12 @@ void MGG_OcclusionQuery_Begin(MGG_GraphicsDevice* device, MGG_OcclusionQuery* qu
 
 	auto cl = device->context->GetCommandList();
 
+	query->frame = device->frame;
+
 	cl->BeginQuery(
 		device->resources->GetGraphicsHeaps()->GetQueryHeap(),
 		D3D12_QUERY_TYPE_OCCLUSION,
-		query->handle);
+		query->index);
 }
 
 void MGG_OcclusionQuery_End(MGG_GraphicsDevice* device, MGG_OcclusionQuery* query)
@@ -1892,13 +1961,14 @@ void MGG_OcclusionQuery_End(MGG_GraphicsDevice* device, MGG_OcclusionQuery* quer
 	cl->EndQuery(
 		heap,
 		D3D12_QUERY_TYPE_OCCLUSION,
-		query->handle);
+		query->index);
 
 	cl->ResolveQueryData(
 		heap,
 		D3D12_QUERY_TYPE_OCCLUSION,
-		query->handle, 1, query->buffer.Get(), 0);
+		query->index, 1, query->buffer.Get(), 0);
 
+	query->frame = device->frame;
 	query->fence = device->resources->GetCommandQueue()->SignalFence();
 }
 
@@ -1911,16 +1981,11 @@ mgbyte MGG_OcclusionQuery_GetResult(MGG_GraphicsDevice* device, MGG_OcclusionQue
 	if (!cq->IsFenceComplete(query->fence))
 		return false;
 
-	D3D12_RANGE readbackBufferRange{ 0, 8 };
-	void* pReadbackBufferData{};
-	query->buffer->Map(0, &readbackBufferRange, &pReadbackBufferData);
+	D3D12_RANGE range { 0, 8 };
+	uint64_t* pValue;
+	query->buffer->Map(0, &range, (void**)&pValue);
+	pixelCount = *pValue;
+	query->buffer->Unmap(0, nullptr);
 
-	uint64_t value;
-	memcpy(&value, pReadbackBufferData, 8);
-
-	CD3DX12_RANGE writeRange(0, 0);
-	query->buffer->Unmap(0, &writeRange);
-
-	pixelCount = value;
 	return true;
 }
