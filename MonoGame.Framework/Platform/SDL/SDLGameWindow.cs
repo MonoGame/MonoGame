@@ -132,9 +132,16 @@ namespace Microsoft.Xna.Framework
                 }
             }
 
-            _handle = Sdl.Window.Create("", 0, 0,
-                GraphicsDeviceManager.DefaultBackBufferWidth, GraphicsDeviceManager.DefaultBackBufferHeight,
-                Sdl.Window.State.Hidden | Sdl.Window.State.FullscreenDesktop);
+            _handle = Sdl.Window.Create(
+                "",
+                0,
+                0,
+                GraphicsDeviceManager.DefaultBackBufferWidth,
+                GraphicsDeviceManager.DefaultBackBufferHeight,
+                Sdl.Window.State.Hidden |
+                Sdl.Window.State.OpenGL |
+                Sdl.Window.State.FullscreenDesktop
+            );
 
             if (_handle == default)
             {

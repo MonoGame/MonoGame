@@ -47,24 +47,54 @@ namespace Microsoft.Xna.Framework
 
             if (presentationParameters.MultiSampleCount > 0)
             {
-                var temporaryWindow = Sdl.Window.Create(
-                    "glContextInfoWindow",
-                    0,
-                    0,
-                    0,
-                    0,
-                    Sdl.Window.State.OpenGL |
-                    Sdl.Window.State.Hidden |
-                    Sdl.Window.State.InputFocus |
-                    Sdl.Window.State.MouseFocus
-                );
-                var temporaryGLContext = Sdl.GL.CreateContext(temporaryWindow);
-                var maxSamples = GL.GetMaxSamples();
-                Sdl.GL.DeleteContext(temporaryGLContext);
-                Sdl.Window.Destroy(temporaryWindow);
+                // Store the "default" multisample count, which will be lowered if necessary to meet GL_MAX_SAMPLES.
+                var multiSampleCount = presentationParameters.MultiSampleCount;
 
-                Sdl.GL.SetAttribute(Sdl.GL.Attribute.MultiSampleBuffers, 1);
-                Sdl.GL.SetAttribute(Sdl.GL.Attribute.MultiSampleSamples, Math.Min(maxSamples, presentationParameters.MultiSampleCount));
+                // There should be an available SDL window handle created in SdlGameWindow on PlatformCreate().
+                var sdlWindowHandle = SdlGameWindow.Instance.Handle;
+
+                // If for some reason that code gets removed or the handle is cleared before this code is executed,
+                // we should create a new temporary window to make a best-effort on grabbing GL_MAX_SAMPLES.
+                var temporaryWindowHandle = IntPtr.Zero;
+                if (sdlWindowHandle == IntPtr.Zero)
+                {
+                    temporaryWindowHandle = Sdl.Window.Create(
+                        "glContextInfoWindow",
+                        0,
+                        0,
+                        0,
+                        0,
+                        Sdl.Window.State.OpenGL |
+                        Sdl.Window.State.Hidden
+                    );
+                    sdlWindowHandle = temporaryWindowHandle;
+                }
+
+                // If we do have an SDL window handle now, we can create a temporary GL context to grab GL_MAX_SAMPLES.
+                // Otherwise, just use the previous value (which by default would be 32 if PreferMultiSampling is true).
+                if (sdlWindowHandle != IntPtr.Zero)
+                {
+                    var temporaryGLContext = Sdl.GL.CreateContext(sdlWindowHandle);
+
+                    var glMaxSamples = GL.GetMaxSamples();
+                    multiSampleCount = Math.Min(glMaxSamples, multiSampleCount);
+
+                    Sdl.GL.DeleteContext(temporaryGLContext);
+
+                    if (temporaryWindowHandle != IntPtr.Zero)
+                    {
+                        // If for some reason the expected previously-created window was not available, and we
+                        // created a new one in this method, then destroy the locally-created temporary window.
+                        Sdl.Window.Destroy(temporaryWindowHandle);
+                    }
+                }
+
+                // Only set the multisampling attributes if GL_MAX_SAMPLES was above 0.
+                if (multiSampleCount > 0)
+                {
+                    Sdl.GL.SetAttribute(Sdl.GL.Attribute.MultiSampleBuffers, 1);
+                    Sdl.GL.SetAttribute(Sdl.GL.Attribute.MultiSampleSamples, multiSampleCount);
+                }
             }
 
             ((SdlGameWindow)SdlGameWindow.Instance).CreateWindow();
