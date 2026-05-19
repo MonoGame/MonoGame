@@ -50,7 +50,7 @@ jobs:
 
       - name: Generate global.json
         run: |
-          echo '{ "sdk": { "version": "${{ env.DotnetVersion }}" } }' > global.json
+          echo '{ "sdk": { "version": "${{ env.DotnetVersion }}", "workloadVersion": "${{ env.DotnetVersion }}" } }' > global.json
           echo "runner.arch=${{ runner.arch }}"
 
       - name: Setup .NET Core SDK
@@ -217,7 +217,7 @@ jobs:
 
         - name: Generate global.json
           run: |
-            echo '{ "sdk": { "version": "${{ env.DotnetVersion }}" } }' > global.json
+            echo '{ "sdk": { "version": "${{ env.DotnetVersion }}", "workloadVersion": "${{ env.DotnetVersion }}" } }' > global.json
 
         - name: Setup .NET Core SDK
           uses: actions/setup-dotnet@v5
@@ -249,7 +249,7 @@ jobs:
 
         - name: Generate global.json
           run: |
-            echo '{ "sdk": { "version": "${{ env.DotnetVersion }}" } }' > global.json
+            echo '{ "sdk": { "version": "${{ env.DotnetVersion }}", "workloadVersion": "${{ env.DotnetVersion }}"  } }' > global.json
 
         - name: Setup .NET Core SDK
           uses: actions/setup-dotnet@v5
@@ -281,7 +281,7 @@ jobs:
 
         - name: Generate global.json
           run: |
-            echo '{ "sdk": { "version": "${{ env.DotnetVersion }}" } }' > global.json
+            echo '{ "sdk": { "version": "${{ env.DotnetVersion }}", "workloadVersion": "${{ env.DotnetVersion }}" } }' > global.json
 
         - name: Setup .NET Core SDK
           uses: actions/setup-dotnet@v5
@@ -357,7 +357,7 @@ jobs:
 
       - name: Generate global.json
         run: |
-          echo '{ "sdk": { "version": "${{ env.DotnetVersion }}" } }' > global.json
+          echo '{ "sdk": { "version": "${{ env.DotnetVersion }}", "workloadVersion": "${{ env.DotnetVersion }}" } }' > global.json
 
       - name: Setup .NET Core SDK
         uses: actions/setup-dotnet@v5
