@@ -50,7 +50,7 @@ jobs:
 
       - name: Generate global.json
         run: |
-          echo '{ "sdk": { "version": "${{ env.DotnetVersion }}" }' > global.json
+          echo '{ "sdk": { "version": "${{ env.DotnetVersion }}" } }' > global.json
           echo "runner.arch=${{ runner.arch }}"
 
       - name: Setup .NET Core SDK
