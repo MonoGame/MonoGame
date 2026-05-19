@@ -50,7 +50,7 @@ jobs:
 
       - name: Generate global.json
         run: |
-          echo '{ "sdk": { "version": "${{ env.DotnetVersion }}", "workloadVersion": "${{ env.DotnetVersion }}" } }' > global.json
+          echo '{ "sdk": { "version": "${{ env.DotnetVersion }}" }' > global.json
           echo "runner.arch=${{ runner.arch }}"
 
       - name: Setup .NET Core SDK
@@ -66,12 +66,12 @@ jobs:
       - name: Setup DotNet on Windows
         if: runner.environment == 'github-hosted' && runner.os == 'windows'
         run: |
-          dotnet workload install android ios
+          dotnet workload install android ios --version ${{ env.DotnetVersion }}
 
       - name: Setup DotNet on linux
         if: runner.environment == 'github-hosted' && runner.os == 'Linux' && runner.arch == 'x64'
         run: |
-          dotnet workload install android
+          dotnet workload install android --version ${{ env.DotnetVersion }}
 
       - name: Update Homebrew
         if: runner.environment == 'github-hosted' && runner.os == 'macos'
@@ -217,7 +217,7 @@ jobs:
 
         - name: Generate global.json
           run: |
-            echo '{ "sdk": { "version": "${{ env.DotnetVersion }}", "workloadVersion": "${{ env.DotnetVersion }}" } }' > global.json
+            echo '{ "sdk": { "version": "${{ env.DotnetVersion }}" } }' > global.json
 
         - name: Setup .NET Core SDK
           uses: actions/setup-dotnet@v5
@@ -249,7 +249,7 @@ jobs:
 
         - name: Generate global.json
           run: |
-            echo '{ "sdk": { "version": "${{ env.DotnetVersion }}", "workloadVersion": "${{ env.DotnetVersion }}"  } }' > global.json
+            echo '{ "sdk": { "version": "${{ env.DotnetVersion }}" } }' > global.json
 
         - name: Setup .NET Core SDK
           uses: actions/setup-dotnet@v5
@@ -281,7 +281,7 @@ jobs:
 
         - name: Generate global.json
           run: |
-            echo '{ "sdk": { "version": "${{ env.DotnetVersion }}", "workloadVersion": "${{ env.DotnetVersion }}" } }' > global.json
+            echo '{ "sdk": { "version": "${{ env.DotnetVersion }}" } }' > global.json
 
         - name: Setup .NET Core SDK
           uses: actions/setup-dotnet@v5
