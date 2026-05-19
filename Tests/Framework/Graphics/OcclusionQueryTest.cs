@@ -122,6 +122,9 @@ namespace MonoGame.Tests.Graphics
                         }
                         break;
                 }
+
+                // We have to present or the rendering never begins.
+                gd.Present();
             };
 
             Predicate<int> exitCondition = frame => state == 4 || frame > 15;
