@@ -190,17 +190,34 @@ namespace MonoGame.Effect
                     //toolArgs += "-Fd \"" + dbgFile + "\" ";
                 }
                 toolArgs += "\"" + hlslFile + "\"";
-                toolResult = Dxc.Run(toolArgs, out stdout, out stderr);
 
+                // Ok first build gathers reflection info.
+                toolResult = Dxc.Run(toolArgs, out stdout, out stderr);
                 errorsAndWarnings += stderr;
 
-                // jcf: this tool doesn't seem to use stderr for output
-                //      but if the return code was not success=0 then treat stdout as stderr
                 if (toolResult != 0)
                 {
-                    errorsAndWarnings += string.Format("DXC.exe returned error code '{0}'.\n", toolResult);
+                    errorsAndWarnings += $"DXC.exe returned error code '{toolResult}'.\n";
                     errorsAndWarnings += stdout;
                     throw new ShaderCompilerException();
+                }
+
+                string[] reflectionDataArray = File.ReadAllLines(reflectFile);
+                SpirvReflectionInfo reflectionInfo = SpirvReflectionInfo.Parse(reflectionDataArray);
+
+                // This second build is for generating the shader binary without
+                // reflection info that forces Google VK extensions into the binary.
+                {
+                    toolArgs = toolArgs.Replace("-fspv-reflect ", "");
+                    toolResult = Dxc.Run(toolArgs, out stdout, out stderr);
+                    errorsAndWarnings += stderr;
+
+                    if (toolResult != 0)
+                    {
+                        errorsAndWarnings += $"DXC.exe returned error code '{toolResult}'.\n";
+                        errorsAndWarnings += stdout;
+                        throw new ShaderCompilerException();
+                    }
                 }
 
                 // Load up the compiled shader.
@@ -212,9 +229,6 @@ namespace MonoGame.Effect
                     if (bytecode.SequenceEqual(shader.Bytecode))
                         return shader;
                 }
-
-                string[] reflectionDataArray = File.ReadAllLines(reflectFile);
-                SpirvReflectionInfo reflectionInfo = SpirvReflectionInfo.Parse(reflectionDataArray);
 
                 // Keep the debug file if we are creating a new shader
                 // and debug shaders are enabled.
@@ -324,6 +338,59 @@ namespace MonoGame.Effect
                             sampler.state = samplerStateInfo.State;
                             samplers.Add(sampler);
                         }
+
+                        if (!sampledImages.Any())
+                        {
+                            // This is for handling textures that are read via .Load and not a sampler.
+                            var imageLoads = reflectionInfo.ImageLoads.Where(si => si.Variable == variable).DistinctBy(si => si.Variable);
+                            foreach (var image in imageLoads)
+                            {
+                                bool found = false;
+
+                                foreach (var ss in shaderResult.ShaderInfo.SamplerStates)
+                                {
+                                    if (ss.Value.TextureName == variable.Name)
+                                    {
+                                        found = true;
+                                        break;
+                                    }
+                                }
+
+                                if (found)
+                                    continue;
+
+                                var imageVariable = image.Variable;
+                                var imageType = imageVariable.Pointer.PointerType as SpirvTypeImage;
+
+                                var sampler = new ShaderData.Sampler
+                                {
+                                    samplerSlot = -1,
+                                    samplerName = string.Empty,
+                                    textureSlot = (int)imageVariable.BindingSlot.Value - SlotOffset,
+                                };
+
+                                sampler.parameterName = imageVariable.Name;
+
+                                switch (imageType.Dimensionality)
+                                {
+                                    case ImageDimensionality.OneD:
+                                        sampler.type = MojoShader.MOJOSHADER_samplerType.MOJOSHADER_SAMPLER_1D;
+                                        break;
+                                    case ImageDimensionality.TwoD:
+                                        sampler.type = MojoShader.MOJOSHADER_samplerType.MOJOSHADER_SAMPLER_2D;
+                                        break;
+                                    case ImageDimensionality.ThreeD:
+                                        sampler.type = MojoShader.MOJOSHADER_samplerType.MOJOSHADER_SAMPLER_VOLUME;
+                                        break;
+                                    case ImageDimensionality.Cube:
+                                        sampler.type = MojoShader.MOJOSHADER_samplerType.MOJOSHADER_SAMPLER_CUBE;
+                                        break;
+                                }
+
+                                sampler.state = null;
+                                samplers.Add(sampler);
+                            }
+                        }
                     }
                 }
 
@@ -350,8 +417,17 @@ namespace MonoGame.Effect
                             switch (m.Groups[1].Value.ToUpper())
                             {
                                 default:
+                                    // Give a warning which hopefully someone notices.
+                                    errorsAndWarnings += $"Unknown vertex shader input semantic `{m.Groups[1].Value}`; defaulting to texture coord.\n";
                                     a.usage = VertexElementUsage.TextureCoordinate;
                                     break;
+                                case "TEXCOORD":
+                                    a.usage = VertexElementUsage.TextureCoordinate;
+                                    break;
+                                // NOTE: Some shaders incorrectly pass in SV_POSITION to
+                                // the vertex shader which is allowed in DX11, so we allow
+                                // it here as well.
+                                case "SV_POSITION":
                                 case "POSITION":
                                     a.usage = VertexElementUsage.Position;
                                     break;
@@ -418,6 +494,7 @@ namespace MonoGame.Effect
                     uint uniformSlots = 0;
                     uint textureSlots = 0;
                     uint samplerSlots = 0;
+                    var textureTypes = new uint[16];
 
                     // We just have one cbuffer at 0 right now.
                     if (cbufferIndex.Count > 0)
@@ -432,30 +509,43 @@ namespace MonoGame.Effect
                     {
                         if (s.textureSlot == s.samplerSlot)
                         {
+                            textureTypes[s.textureSlot] = ToTextureType(s.type);
+
                             textureSlots |= (uint)(1 << s.textureSlot);
                             samplerSlots |= (uint)(1 << s.textureSlot);
                             binding.binding = (uint)(s.textureSlot + SlotOffset);
                             binding.descriptorType = VkDescriptorType.COMBINED_IMAGE_SAMPLER;
                             bindings.Add(binding);
-
                             continue;
                         }
 
-                        samplerSlots |= (uint)(1 << s.samplerSlot);
-                        binding.binding = (uint)(s.samplerSlot + SlotOffset);
-                        binding.descriptorType = VkDescriptorType.SAMPLER;
-                        bindings.Add(binding);
+                        if (s.samplerSlot > 0)
+                        {
+                            samplerSlots |= (uint)(1 << s.samplerSlot);
+                            binding.binding = (uint)(s.samplerSlot + SlotOffset);
+                            binding.descriptorType = VkDescriptorType.SAMPLER;
+                            bindings.Add(binding);
+                        }
 
-                        textureSlots |= (uint)(1 << s.textureSlot);
-                        binding.binding = (uint)(s.textureSlot + SlotOffset);
-                        binding.descriptorType = VkDescriptorType.SAMPLED_IMAGE;
-                        bindings.Add(binding);
+                        if (s.textureSlot > 0)
+                        {
+                            textureTypes[s.textureSlot] = ToTextureType(s.type);
+
+                            textureSlots |= (uint)(1 << s.textureSlot);
+                            binding.binding = (uint)(s.textureSlot + SlotOffset);
+                            binding.descriptorType = VkDescriptorType.SAMPLED_IMAGE;
+                            bindings.Add(binding);
+                        }
                     }
 
                     // Write the slot bits.
                     writer.Write(uniformSlots);
                     writer.Write(textureSlots);
                     writer.Write(samplerSlots);
+
+                    // Write the texture types.
+                    for (int i = 0; i < textureTypes.Length; i++)
+                        writer.Write(textureTypes[i]);
 
                     // Write the bindings.
                     writer.Write((uint)bindings.Count);
@@ -489,6 +579,22 @@ namespace MonoGame.Effect
                     }
                     catch { }
                 }
+            }
+        }
+
+        private static uint ToTextureType(MojoShader.MOJOSHADER_samplerType type)
+        {
+            // NOTE:  This matches MGTextureType in the native bindings.
+            // Ideally we would move to this in the shader API too.
+            switch (type)
+            {
+                default:
+                case MojoShader.MOJOSHADER_samplerType.MOJOSHADER_SAMPLER_2D:
+                    return 0;
+                case MojoShader.MOJOSHADER_samplerType.MOJOSHADER_SAMPLER_VOLUME:
+                    return 1;
+                case MojoShader.MOJOSHADER_samplerType.MOJOSHADER_SAMPLER_CUBE:
+                    return 2;
             }
         }
     }
