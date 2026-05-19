@@ -1,4 +1,4 @@
-﻿// MonoGame - Copyright (C) The MonoGame Team
+﻿// MonoGame - Copyright (C) MonoGame Foundation, Inc
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
@@ -569,7 +569,7 @@ namespace MonoGame.Tools.Pipeline
 
         private void CmdHelp_Executed(object sender, EventArgs e)
         {
-            Process.Start(new ProcessStartInfo() { FileName = "https://docs.monogame.net/articles/tools/mgcb_editor.html", UseShellExecute = true, Verb = "open" });
+            Process.Start(new ProcessStartInfo() { FileName = "https://docs.monogame.net/articles/getting_started/tools/mgcb_editor.html", UseShellExecute = true, Verb = "open" });
         }
 
         private void CmdAbout_Executed(object sender, EventArgs e)

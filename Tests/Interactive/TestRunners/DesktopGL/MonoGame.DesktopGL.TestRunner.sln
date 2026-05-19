@@ -1,0 +1,47 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.8.34330.188
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MonoGame.DesktopGL.TestRunner", "MonoGame.DesktopGL.TestRunner.csproj", "{CBCBA692-DFCA-4B99-90FA-F504EAEE041A}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MonoGame.Framework.DesktopGL", "..\..\..\..\MonoGame.Framework\MonoGame.Framework.DesktopGL.csproj", "{DA984962-95FE-4090-A4FD-3CCDA8383ABB}"
+EndProject
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "MonoGame.Interactive.Common", "..\..\Common\MonoGame.Interactive.Common.shproj", "{085B407C-726C-43FE-BB55-64E2B6D143FE}"
+EndProject
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "MonoGame.Interactive.Tests", "..\..\Tests\MonoGame.Interactive.Tests.shproj", "{F55DCCE7-54DF-446F-9580-304855A8011C}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MonoGame.Framework.Content.Pipeline", "..\..\..\..\MonoGame.Framework.Content.Pipeline\MonoGame.Framework.Content.Pipeline.csproj", "{DB06D309-9994-455E-BC79-2D2294819AE9}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{CBCBA692-DFCA-4B99-90FA-F504EAEE041A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CBCBA692-DFCA-4B99-90FA-F504EAEE041A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CBCBA692-DFCA-4B99-90FA-F504EAEE041A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CBCBA692-DFCA-4B99-90FA-F504EAEE041A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DA984962-95FE-4090-A4FD-3CCDA8383ABB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DA984962-95FE-4090-A4FD-3CCDA8383ABB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DA984962-95FE-4090-A4FD-3CCDA8383ABB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DA984962-95FE-4090-A4FD-3CCDA8383ABB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DB06D309-9994-455E-BC79-2D2294819AE9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DB06D309-9994-455E-BC79-2D2294819AE9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DB06D309-9994-455E-BC79-2D2294819AE9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DB06D309-9994-455E-BC79-2D2294819AE9}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {324CDEC7-46A7-4C50-ABD2-44AA62BB9C7A}
+	EndGlobalSection
+	GlobalSection(SharedMSBuildProjectFiles) = preSolution
+		..\..\Common\MonoGame.Interactive.Common.projitems*{085b407c-726c-43fe-bb55-64e2b6d143fe}*SharedItemsImports = 13
+		..\..\Common\MonoGame.Interactive.Common.projitems*{cbcba692-dfca-4b99-90fa-f504eaee041a}*SharedItemsImports = 5
+		..\..\Tests\MonoGame.Interactive.Tests.projitems*{cbcba692-dfca-4b99-90fa-f504eaee041a}*SharedItemsImports = 5
+		..\..\Tests\MonoGame.Interactive.Tests.projitems*{f55dcce7-54df-446f-9580-304855a8011c}*SharedItemsImports = 13
+	EndGlobalSection
+EndGlobal

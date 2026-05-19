@@ -9,7 +9,7 @@ namespace Microsoft.Xna.Framework
     {
         /// <summary>
         /// Return true if your game has handled the back button event
-        /// retrn false if you want the operating system to handle it.
+        /// return false if you want the operating system to handle it.
         /// </summary>
         bool Handled();
     }

@@ -1,4 +1,4 @@
-﻿// MonoGame - Copyright (C) The MonoGame Team
+﻿// MonoGame - Copyright (C) MonoGame Foundation, Inc
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
@@ -10,7 +10,7 @@ namespace Microsoft.Xna.Framework.Graphics.PackedVector
     internal class HalfTypeHelper
     {
         [StructLayout(LayoutKind.Explicit)]
-        private struct uif
+        private struct UIF
         {
             [FieldOffset(0)]
             public float f;
@@ -22,7 +22,7 @@ namespace Microsoft.Xna.Framework.Graphics.PackedVector
 
         internal static UInt16 Convert(float f)
         {
-            uif uif = new uif();
+            UIF uif = new UIF();
             uif.f = f;
             return Convert(uif.i);
         }
@@ -109,7 +109,7 @@ namespace Microsoft.Xna.Framework.Graphics.PackedVector
                 rst = (uint)(((((uint)value & 0x8000) << 16) | ((((((uint)value >> 10) & 0x1f) - 15) + 127) << 23)) | (mantissa << 13));
             }
 
-            var uif = new uif();
+            var uif = new UIF();
             uif.u = rst;
             return uif.f;
         }

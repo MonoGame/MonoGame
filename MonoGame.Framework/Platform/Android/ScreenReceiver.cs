@@ -24,8 +24,13 @@ namespace Microsoft.Xna.Framework
                 // and if not re-enable the game related functions.
                 // http://stackoverflow.com/questions/4260794/how-to-tell-if-device-is-sleeping
                 KeyguardManager keyguard = (KeyguardManager)context.GetSystemService(Context.KeyguardService);
-                if (!keyguard.InKeyguardRestrictedInputMode())
-                    OnUnlocked();
+                if (!OperatingSystem.IsAndroidVersionAtLeast (28)) {
+                    if (!keyguard.InKeyguardRestrictedInputMode())
+                        OnUnlocked();
+                } else {
+                    if (!keyguard.IsDeviceLocked)
+                        OnUnlocked();
+                }
 			}
 			else if(intent.Action == Intent.ActionUserPresent)
 			{

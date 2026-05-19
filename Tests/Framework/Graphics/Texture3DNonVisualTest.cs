@@ -1,4 +1,4 @@
-﻿// MonoGame - Copyright (C) The MonoGame Team
+﻿// MonoGame - Copyright (C) MonoGame Foundation, Inc
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
@@ -9,27 +9,30 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace MonoGame.Tests.Graphics
 {
-#if !WINDOWS
-    [Ignore("Texture3D is not implemented for the OpenGL backend.")]
-#endif
     [TestFixture]
-    public class Texture3DNonVisualTest
+    [NonParallelizable]
+    [RunOnUI]
+    internal class Texture3DNonVisualTest : GraphicsDeviceTestFixtureBase
     {
         Texture3D t;
         Color[] reference;
         const int w=50, h=50, d=50, a = w * d * h;
-        private Game _game;
 
-        [OneTimeSetUp]
-        public void TestFixtureSetUp()
+        [TearDown]
+        public override void TearDown()
         {
-            reference = new Color[a];
-            _game = new Game();
-            var graphicsDeviceManager = new GraphicsDeviceManager(_game);
-            graphicsDeviceManager.GraphicsProfile = GraphicsProfile.HiDef;
-            graphicsDeviceManager.ApplyChanges();
+            t.Dispose();
+            base.TearDown();
+        }
 
-            t = new Texture3D(_game.GraphicsDevice, w, h, d, false, SurfaceFormat.Color);
+        [SetUp]
+        public override void SetUp()
+        {
+            base.SetUp();
+
+            reference = new Color[a];
+
+            t = new Texture3D(game.GraphicsDevice, w, h, d, false, SurfaceFormat.Color);
             for (int layer = 0; layer < d; layer++)
             {
                 for (int i = 0; i < w * h; i++)
@@ -37,26 +40,15 @@ namespace MonoGame.Tests.Graphics
                     reference[layer * w * h + i] = new Color(layer * 5, layer * 5, layer * 5, layer * 5);
                 }
             }
-        }
-
-        [OneTimeTearDown]
-        public void TestFixtureTearDown()
-        {
-            _game.Dispose();
-            t.Dispose();
-        }
-
-        [SetUp]
-        public void TestSetUp()
-        {
             t.SetData(reference);
         }
 
         [Test]
+        [RunOnUI]
         public void ZeroSizeShouldFailTest()
         {
             Texture3D texture;
-            var gd = _game.GraphicsDevice;
+            var gd = game.GraphicsDevice;
             Assert.Throws<ArgumentOutOfRangeException>(() => texture = new Texture3D(gd, 0, 1, 1, false, SurfaceFormat.Color));
             Assert.Throws<ArgumentOutOfRangeException>(() => texture = new Texture3D(gd, 1, 0, 1, false, SurfaceFormat.Color));
             Assert.Throws<ArgumentOutOfRangeException>(() => texture = new Texture3D(gd, 1, 1, 0, false, SurfaceFormat.Color));
@@ -67,6 +59,7 @@ namespace MonoGame.Tests.Graphics
         }
 
         [Test]
+        [RunOnUI]
         public void SetData1ParameterTest()
         {
             Color[] written = new Color[a];
@@ -74,9 +67,11 @@ namespace MonoGame.Tests.Graphics
             Assert.AreEqual(reference, written);
         }
 
+        [Test]
         [TestCase(a, 0, a)]
         [TestCase(a + 1, 0, a)]
         [TestCase(a + 1, 1, a)]
+        [RunOnUI]
         public void SetData3ParametersSuccessTest(int arrayLength, int startIndex, int elementCount)
         {
             Color[] write = new Color[arrayLength];
@@ -99,11 +94,13 @@ namespace MonoGame.Tests.Graphics
 
         }
 
+        [Test]
         [TestCase(a, 0, a - 1)]
         [TestCase(a - 1, 0, a)]
         [TestCase(a, 1, a)]
         [TestCase(a, 0, a + 1)]
         [TestCase(a + 1, 1, a + 1)]
+        [RunOnUI]
         public void SetData3ParametersExceptionTest(int arrayLength, int startIndex, int elementCount)
         {
             Color[] write = new Color[arrayLength];
@@ -115,9 +112,11 @@ namespace MonoGame.Tests.Graphics
             Assert.Throws(Is.InstanceOf<Exception>(), () =>t.SetData(write, startIndex, elementCount));
         }
 
+        [Test]
         [TestCase((w - 2) * (h - 2) * (d - 2), 0, (w - 2) * (h - 2) * (d - 2), 1, 1, 1, w - 2, h - 2, d - 2)]
         [TestCase(a, 0, a, 0, 0, 0, w, h, d)]
         [TestCase(a + 1, 1, a, 0, 0, 0, w, h, d)]
+        [RunOnUI]
         public void SetData9ParametersSuccessTest(int arrayLength, int startIndex, int elementCount, int x, int y, int z, int w, int h, int d)
         {
             Color[] write = new Color[arrayLength];
@@ -141,8 +140,10 @@ namespace MonoGame.Tests.Graphics
             }
         }
 
+        [Test]
         [TestCase(a, 0, a, -1, -1, -1, w + 1, h + 1, d + 1)]
         [TestCase(a, 1, a, 0, 0, 0, w, h, d)]
+        [RunOnUI]
         public void SetData9ParametersExceptionTest(int arrayLength, int startIndex, int elementCount, int x, int y, int z, int w, int h, int d)
         {
             Color[] write = new Color[arrayLength];
@@ -154,6 +155,7 @@ namespace MonoGame.Tests.Graphics
         }
 
         [Test]
+        [RunOnUI]
         public void NullDeviceShouldThrowArgumentNullException()
         {
             Assert.Throws<ArgumentNullException>(() => 

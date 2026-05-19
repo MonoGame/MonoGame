@@ -1,11 +1,13 @@
-﻿// MonoGame - Copyright (C) The MonoGame Team
+﻿// MonoGame - Copyright (C) MonoGame Foundation, Inc
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
+using System;
 using Microsoft.Xna.Framework.Graphics;
 
 namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 {
+    [Obsolete("PVRTC 2BPP formats are no longer supported, and this will be removed in a future version.")]
     public class PvrtcRgba2BitmapContent : PvrtcBitmapContent
     {
         /// <summary>

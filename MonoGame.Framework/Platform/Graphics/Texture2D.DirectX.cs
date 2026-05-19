@@ -1,4 +1,4 @@
-// MonoGame - Copyright (C) The MonoGame Team
+// MonoGame - Copyright (C) MonoGame Foundation, Inc
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
@@ -12,18 +12,15 @@ using SharpDX.DXGI;
 using MapFlags = SharpDX.Direct3D11.MapFlags;
 using Resource = SharpDX.Direct3D11.Resource;
 
-#if WINDOWS_UAP
-using Windows.Graphics.Imaging;
-using Windows.Storage.Streams;
-using System.Threading.Tasks;
-#endif
-
 namespace Microsoft.Xna.Framework.Graphics
 {
     public partial class Texture2D : Texture
     {
+        /// <summary />
         protected bool Shared { get { return _shared; } }
+        /// <summary />
         protected bool Mipmap { get { return _mipmap; } }
+        /// <summary />
         protected SampleDescription SampleDescription { get { return _sampleDescription; } }
 
         private bool _shared;
@@ -197,6 +194,7 @@ namespace Microsoft.Xna.Framework.Graphics
             }
         }
 
+        /// <summary />
         protected override void Dispose(bool disposing)
         {
             if (disposing)
@@ -212,6 +210,7 @@ namespace Microsoft.Xna.Framework.Graphics
             return arraySlice * _levelCount + level;
         }
 
+        /// <summary />
         protected internal virtual Texture2DDescription GetTexture2DDescription()
         {
             var desc = new Texture2DDescription();
@@ -236,6 +235,20 @@ namespace Microsoft.Xna.Framework.Graphics
             // TODO: Move this to SetData() if we want to make Immutable textures!
             var desc = GetTexture2DDescription();
             return new SharpDX.Direct3D11.Texture2D(GraphicsDevice._d3dDevice, desc);
+        }
+
+        public static Texture2D FromSharedHandle(
+            GraphicsDevice graphicsDevice,
+            IntPtr sharedHandle,
+            int width,
+            int height,
+            SurfaceFormat format)
+        {
+            var d3dTexture = graphicsDevice._d3dDevice
+                .OpenSharedResource<SharpDX.Direct3D11.Texture2D>(sharedHandle);
+            var texture = new Texture2D(graphicsDevice, width, height, false, format);
+            texture.SetNativeTexture(d3dTexture);
+            return texture;
         }
 
         private void PlatformReload(Stream textureStream)

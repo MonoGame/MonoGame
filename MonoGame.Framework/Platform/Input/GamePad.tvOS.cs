@@ -1,4 +1,4 @@
-﻿// MonoGame - Copyright (C) The MonoGame Team
+﻿// MonoGame - Copyright (C) MonoGame Foundation, Inc
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 using GameController;
@@ -83,6 +83,10 @@ namespace Microsoft.Xna.Framework.Input
                     continue;
 
                 if (controller.PlayerIndex != (int)ind)
+                    continue;
+
+                // validate controller has a valid input profile before reporting as connected
+                if (controller.ExtendedGamepad == null && controller.Gamepad == null && controller.MicroGamepad == null)
                     continue;
 
                 connected = true;
@@ -174,6 +178,7 @@ namespace Microsoft.Xna.Framework.Input
                 };
             if (controller.ExtendedGamepad != null)
             {
+                capabilities.IsConnected = true;
                 capabilities.HasAButton = true;
                 capabilities.HasBButton = true;
                 capabilities.HasXButton = true;
@@ -194,6 +199,7 @@ namespace Microsoft.Xna.Framework.Input
             }
             else if (controller.Gamepad != null)
             {
+                capabilities.IsConnected = true;
                 capabilities.HasAButton = true;
                 capabilities.HasBButton = true;
                 capabilities.HasXButton = true;
@@ -208,6 +214,7 @@ namespace Microsoft.Xna.Framework.Input
             }
             else if (controller.MicroGamepad != null)
             {
+                capabilities.IsConnected = true;
                 capabilities.HasAButton = true;
                 capabilities.HasXButton = true;
                 capabilities.HasBackButton = true;

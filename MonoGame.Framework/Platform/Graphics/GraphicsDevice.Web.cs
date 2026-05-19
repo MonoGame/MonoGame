@@ -1,4 +1,4 @@
-// MonoGame - Copyright (C) The MonoGame Team
+// MonoGame - Copyright (C) MonoGame Foundation, Inc
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
@@ -108,11 +108,10 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             return new Rectangle(x, y, width, height);
         }
-        
-        internal void PlatformSetMultiSamplingToMaximum(PresentationParameters presentationParameters, out int quality)
+
+        internal int PlatformGetMaxMultiSampleCount(SurfaceFormat sformat)
         {
-            presentationParameters.MultiSampleCount = 0;
-            quality = 0;
+            return 0;
         }
     }
 }

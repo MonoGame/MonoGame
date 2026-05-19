@@ -1,4 +1,4 @@
-﻿// MonoGame - Copyright (C) The MonoGame Team
+﻿// MonoGame - Copyright (C) MonoGame Foundation, Inc
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
@@ -11,9 +11,13 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
 {
+    /// <summary>
+    /// Provides methods and properties to write a <see cref="SpriteFontContent"/> to binary format.
+    /// </summary>
     [ContentTypeWriter]
     public class SpriteFontContentWriter : ContentTypeWriter<SpriteFontContent>
     {
+        /// <inheritdoc/>
         protected internal override void Write(ContentWriter output, SpriteFontContent value)
         {
             output.WriteObject(value.Texture);

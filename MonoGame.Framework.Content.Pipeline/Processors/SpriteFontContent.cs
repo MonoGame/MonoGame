@@ -1,4 +1,4 @@
-﻿// MonoGame - Copyright (C) The MonoGame Team
+﻿// MonoGame - Copyright (C) MonoGame Foundation, Inc
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
@@ -9,7 +9,7 @@ using Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler;
 
 namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 {
-	public class SpriteFontContent
+    public class SpriteFontContent
     {
         public SpriteFontContent() { }
 
@@ -37,7 +37,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 
         public List<Rectangle> Cropping = new List<Rectangle>();
 
-        public List<Char> CharacterMap = new List<Char>();
+        public List<char> CharacterMap = new List<char>();
 
         public int VerticalLineSpacing;
 
@@ -45,7 +45,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 
         public List<Vector3> Kerning = new List<Vector3>();
 
-        public Nullable<Char> DefaultCharacter;	 
+        public Nullable<char> DefaultCharacter;
 
     }
 }

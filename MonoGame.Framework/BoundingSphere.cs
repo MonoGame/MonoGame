@@ -406,7 +406,6 @@ namespace Microsoft.Xna.Framework
             float Rightradius = Math.Max(original.Radius + distance, additional.Radius);
             ocenterToaCenter = ocenterToaCenter + (((leftRadius - Rightradius) / (2 * ocenterToaCenter.Length())) * ocenterToaCenter);//oCenterToResultCenter
 
-            result = new BoundingSphere();
             result.Center = original.Center + ocenterToaCenter;
             result.Radius = (leftRadius + Rightradius) / 2;
         }

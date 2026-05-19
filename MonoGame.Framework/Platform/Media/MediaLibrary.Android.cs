@@ -34,15 +34,15 @@ namespace Microsoft.Xna.Framework.Media
                     // See: https://code.google.com/p/android/issues/detail?id=1630
                     // Workaround: http://stackoverflow.com/questions/1954434/cover-art-on-android
 
-                    int albumNameColumn = musicCursor.GetColumnIndex(MediaStore.Audio.AlbumColumns.Album);
-                    int albumArtistColumn = musicCursor.GetColumnIndex(MediaStore.Audio.AlbumColumns.Artist);
-                    int albumIdColumn = musicCursor.GetColumnIndex(MediaStore.Audio.AlbumColumns.AlbumId);
-                    int genreColumn = musicCursor.GetColumnIndex(MediaStore.Audio.GenresColumns.Name); // Also broken :(
+                    int albumNameColumn = musicCursor.GetColumnIndex(MediaStore.Audio.IAlbumColumns.Album);
+                    int albumArtistColumn = musicCursor.GetColumnIndex(MediaStore.Audio.IAlbumColumns.Artist);
+                    int albumIdColumn = musicCursor.GetColumnIndex(MediaStore.Audio.IAlbumColumns.AlbumId);
+                    int genreColumn = musicCursor.GetColumnIndex(MediaStore.Audio.IGenresColumns.Name); // Also broken :(
 
-                    int artistColumn = musicCursor.GetColumnIndex(MediaStore.Audio.AudioColumns.Artist);
-                    int titleColumn = musicCursor.GetColumnIndex(MediaStore.Audio.AudioColumns.Title);
-                    int durationColumn = musicCursor.GetColumnIndex(MediaStore.Audio.AudioColumns.Duration);
-                    int assetIdColumn = musicCursor.GetColumnIndex(MediaStore.Audio.AudioColumns.Id);
+                    int artistColumn = musicCursor.GetColumnIndex(MediaStore.Audio.IAudioColumns.Artist);
+                    int titleColumn = musicCursor.GetColumnIndex(MediaStore.IMediaColumns.Title);
+                    int durationColumn = musicCursor.GetColumnIndex(MediaStore.Audio.IAudioColumns.Duration);
+                    int assetIdColumn = musicCursor.GetColumnIndex(IBaseColumns.Id);
 
                     if (titleColumn == -1 || durationColumn == -1 || assetIdColumn == -1)
                     {

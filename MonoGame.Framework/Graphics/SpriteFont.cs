@@ -1,4 +1,4 @@
-// MonoGame - Copyright (C) The MonoGame Team
+// MonoGame - Copyright (C) MonoGame Foundation, Inc
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
@@ -11,7 +11,9 @@ using System.Text;
 
 namespace Microsoft.Xna.Framework.Graphics 
 {
-
+    /// <summary>
+    /// Represents a font texture.
+    /// </summary>
 	public sealed class SpriteFont 
     {
 		internal static class Errors 
@@ -264,27 +266,10 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             fixed (CharacterRegion* pRegions = _regions)
             {
-                // Get region Index 
-                int regionIdx = -1;
-                var l = 0;
-                var r = _regions.Length - 1;
-                while (l <= r)
+                if(!TryGetRegionIdx(c, pRegions, out int regionIdx))
                 {
-                    var m = (l + r) >> 1;                    
-                    Debug.Assert(m >= 0 && m < _regions.Length, "Index was outside the bounds of the array.");
-                    if (pRegions[m].End < c)
-                    {
-                        l = m + 1;
-                    }
-                    else if (pRegions[m].Start > c)
-                    {
-                        r = m - 1;
-                    }
-                    else
-                    {
-                        regionIdx = m;
-                        break;
-                    }
+                    c = char.IsUpper(c) ? char.ToLower(c) : char.ToUpper(c);
+                    TryGetRegionIdx(c, pRegions, out regionIdx);
                 }
 
                 if (regionIdx == -1)
@@ -294,6 +279,39 @@ namespace Microsoft.Xna.Framework.Graphics
                 }
 
                 index = pRegions[regionIdx].StartIndex + (c - pRegions[regionIdx].Start);
+            }
+
+            return true;
+        }
+
+        private unsafe bool TryGetRegionIdx(char c, CharacterRegion* pRegions, out int regionIdx)
+        {
+            // Get region Index 
+            regionIdx = -1;
+            var l = 0;
+            var r = _regions.Length - 1;
+            while (l <= r)
+            {
+                var m = (l + r) >> 1;
+                Debug.Assert(m >= 0 && m < _regions.Length, "Index was outside the bounds of the array.");
+                if (pRegions[m].End < c)
+                {
+                    l = m + 1;
+                }
+                else if (pRegions[m].Start > c)
+                {
+                    r = m - 1;
+                }
+                else
+                {
+                    regionIdx = m;
+                    break;
+                }
+            }
+
+            if (regionIdx == -1)
+            {
+                return false;
             }
 
             return true;
@@ -379,8 +397,14 @@ namespace Microsoft.Xna.Framework.Graphics
             /// </summary>
             public float WidthIncludingBearings;
 
-			public static readonly Glyph Empty = new Glyph();
+            /// <summary>
+            /// Returns an empty glyph.
+            /// </summary>
+            public static readonly Glyph Empty = new Glyph();
 
+            /// <summary>
+            /// Returns a string representation of this <see cref="Glyph"/>.
+            /// </summary>
 			public override string ToString ()
 			{
                 return "CharacterIndex=" + Character + ", Glyph=" + BoundsInTexture + ", Cropping=" + Cropping + ", Kerning=" + LeftSideBearing + "," + Width + "," + RightSideBearing;

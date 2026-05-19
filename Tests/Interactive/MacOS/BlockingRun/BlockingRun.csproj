@@ -51,10 +51,6 @@
       <Project>{36C538E6-C32A-4A8D-A39C-566173D7118E}</Project>
       <Name>MonoGame.Framework.MacOS</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\..\ThirdParty\Lidgren.Network\Lidgren.Network.MacOS.csproj">
-      <Project>{5C3DC4FF-FE5A-4B94-B4A6-6F79E63F3130}</Project>
-      <Name>Lidgren.Network.MacOS</Name>
-    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Content\" />

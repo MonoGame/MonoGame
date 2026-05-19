@@ -1,4 +1,4 @@
-﻿// MonoGame - Copyright (C) The MonoGame Team
+﻿// MonoGame - Copyright (C) MonoGame Foundation, Inc
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
@@ -86,6 +86,9 @@ namespace Microsoft.Xna.Framework.Input
             return PlatformFromTexture2D(texture, originx, originy);
         }
 
+        /// <summary>
+        /// Gets a handle for this cursor.
+        /// </summary>
         public IntPtr Handle { get; private set; }
 
         private bool _disposed;
@@ -100,6 +103,7 @@ namespace Microsoft.Xna.Framework.Input
             Handle = handle;
         }
 
+        /// <inheritdoc cref="IDisposable.Dispose()"/>
         public void Dispose()
         {
             if (_disposed)

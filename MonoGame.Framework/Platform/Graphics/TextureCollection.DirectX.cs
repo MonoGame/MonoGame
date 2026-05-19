@@ -1,4 +1,4 @@
-﻿// MonoGame - Copyright (C) The MonoGame Team
+﻿// MonoGame - Copyright (C) MonoGame Foundation, Inc
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
@@ -12,10 +12,10 @@ namespace Microsoft.Xna.Framework.Graphics
 
         internal void ClearTargets(GraphicsDevice device, RenderTargetBinding[] targets)
         {
-            if (_applyToVertexStage && !device.GraphicsCapabilities.SupportsVertexTextures)
+            if (_stage == ShaderStage.Vertex && !device.GraphicsCapabilities.SupportsVertexTextures)
                 return;
 
-            if (_applyToVertexStage)
+            if (_stage == ShaderStage.Vertex)
                 ClearTargets(targets, device._d3dContext.VertexShader);
             else
                 ClearTargets(targets, device._d3dContext.PixelShader);
@@ -59,7 +59,7 @@ namespace Microsoft.Xna.Framework.Graphics
             // NOTE: We make the assumption here that the caller has
             // locked the d3dContext for us to use.
             SharpDX.Direct3D11.CommonShaderStage shaderStage;
-            if (_applyToVertexStage)
+            if (_stage == ShaderStage.Vertex)
                 shaderStage = device._d3dContext.VertexShader;
             else
                 shaderStage = device._d3dContext.PixelShader;

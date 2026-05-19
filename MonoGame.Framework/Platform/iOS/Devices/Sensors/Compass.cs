@@ -5,9 +5,12 @@ using Microsoft.Xna.Framework;
 using CoreMotion;
 using Foundation;
 
-namespace Microsoft.Devices.Sensors
+namespace MonoGame.Framework.Devices.Sensors
 {
-    public sealed class Compass : SensorBase<CompassReading>
+    /// <summary>
+    /// Class to provide methods and properties to read device compass data.
+    /// </summary>
+    public sealed partial class Compass : SensorBase<CompassReading>
     {
         static readonly int MaxSensorCount = 10;
         static int instanceCount;
@@ -15,20 +18,29 @@ namespace Microsoft.Devices.Sensors
         private static SensorState state = IsSupported ? SensorState.Initializing : SensorState.NotSupported;
         private bool calibrate = false;
 
+        /// <summary>
+        /// Event that is triggered when the user calibrates the compass
+        /// </summary>
         public event EventHandler<CalibrationEventArgs> Calibrate;
+        static readonly CMMotionManager motionManager = new CMMotionManager();
 
-        public static bool IsSupported
+        internal static bool PlatformIsSupported()
         {
-            get { return motionManager.DeviceMotionAvailable; }
+            return motionManager.DeviceMotionAvailable;
         }
-        public SensorState State
+
+        internal SensorState PlatformSensorState()
         {
-            get { return state; }
+            return state;
         }
 
         private static event CMDeviceMotionHandler readingChanged;
 
-        public Compass()
+        /// <summary>
+        /// Creates a new instance of the Compass class.
+        /// </summary>
+        /// <exception cref="SensorFailedException">Thrown if the compass is not supported or limit of instances has been exceeded (10).</exception>
+        internal void PlatformCompass()
         {
             if (!IsSupported)
                 throw new SensorFailedException("Failed to start compass data acquisition. No default sensor found.");
@@ -41,7 +53,8 @@ namespace Microsoft.Devices.Sensors
             readingChanged += ReadingChangedHandler;
         }
 
-        protected override void Dispose (bool disposing)
+        /// <inheritdoc cref="IDisposable.Dispose"/>
+        internal void PlatformDispose(bool disposing)
         {
             if (!IsDisposed)
             {
@@ -52,10 +65,13 @@ namespace Microsoft.Devices.Sensors
                     --instanceCount;
                 }
             }
-            base.Dispose(disposing);
         }
 
-        public override void Start()
+        /// <summary>
+        /// Begins data acquisition from the compass sensor.
+        /// </summary>
+        /// <exception cref="SensorFailedException">Thrown if the sensor is already started.</exception>
+        internal void PlatformStart()
         {
             if (started == false)
             {
@@ -68,7 +84,10 @@ namespace Microsoft.Devices.Sensors
                 throw new SensorFailedException("Failed to start compass data acquisition. Data acquisition already started.");
         }
 
-        public override void Stop()
+        /// <summary>
+        /// Ends the data acquisition from the compass sensor.
+        /// </summary>
+        internal void PlatformStop()
         {
             motionManager.StopDeviceMotionUpdates();
             started = false;
@@ -121,6 +140,9 @@ namespace Microsoft.Devices.Sensors
         {
             motionManager.MagnetometerUpdateInterval = this.TimeBetweenUpdates.TotalSeconds;
         }
+
+        internal static void PlatformInitialize()
+        {
+        }
     }
 }
-

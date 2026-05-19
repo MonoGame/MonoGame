@@ -1,4 +1,4 @@
-// MonoGame - Copyright (C) The MonoGame Team
+// MonoGame - Copyright (C) MonoGame Foundation, Inc
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
@@ -44,12 +44,20 @@ namespace Microsoft.Xna.Framework.Graphics
             return _resourceView;
         }
 
+        internal void SetNativeTexture(Resource texture)
+        {
+            SharpDX.Utilities.Dispose(ref _resourceView);
+            SharpDX.Utilities.Dispose(ref _texture);
+            _texture = texture;
+        }
+
         private void PlatformGraphicsDeviceResetting()
         {
             SharpDX.Utilities.Dispose(ref _resourceView);
             SharpDX.Utilities.Dispose(ref _texture);
         }
 
+        /// <summary />
         protected override void Dispose(bool disposing)
         {
             if (disposing)

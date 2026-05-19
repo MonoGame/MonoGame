@@ -1,4 +1,4 @@
-﻿// MonoGame - Copyright (C) The MonoGame Team
+﻿// MonoGame - Copyright (C) MonoGame Foundation, Inc
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
@@ -11,15 +11,18 @@ using NUnit.Framework;
 namespace MonoGame.Tests.Graphics
 {
     [TestFixture]
+    [NonParallelizable]
     internal class DepthStencilStateTest : GraphicsDeviceTestFixtureBase
     {
         [Test]
+        [RunOnUI]
         public void ShouldNotBeAbleToSetNullDepthStencilState()
         {
             Assert.Throws<ArgumentNullException>(() => gd.DepthStencilState = null);
         }
 
         [Test]
+        [RunOnUI]
         public void ShouldNotBeAbleToMutateStateObjectAfterBindingToGraphicsDevice()
         {
             var depthStencilState = new DepthStencilState();
@@ -39,6 +42,7 @@ namespace MonoGame.Tests.Graphics
         }
 
         [Test]
+        [RunOnUI]
         public void ShouldNotBeAbleToMutateDefaultStateObjects()
         {
             DoAsserts(DepthStencilState.Default, d => Assert.Throws<InvalidOperationException>(d));
@@ -68,6 +72,7 @@ namespace MonoGame.Tests.Graphics
 
         [TestCase(false)]
         [TestCase(true)]
+        [RunOnUI]
         public void VisualTestDepthBufferEnable(bool depthBufferEnable)
         {
             PrepareFrameCapture();
@@ -95,6 +100,7 @@ namespace MonoGame.Tests.Graphics
         }
 
         [Test]
+        [RunOnUI]
         public void VisualTestStencilBuffer()
         {
             PrepareFrameCapture();

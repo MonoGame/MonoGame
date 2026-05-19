@@ -2,6 +2,9 @@
 
 namespace Microsoft.Xna.Framework.Graphics
 {
+    /// <summary>
+    /// Provides data for the <see cref="GraphicsDevice.ResourceDestroyed"/> event. This class cannot be inherited.
+    /// </summary>
     public sealed class ResourceDestroyedEventArgs : EventArgs
     {
         /// <summary>

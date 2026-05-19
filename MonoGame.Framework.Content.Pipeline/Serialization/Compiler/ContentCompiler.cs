@@ -1,4 +1,4 @@
-﻿// MonoGame - Copyright (C) The MonoGame Team
+﻿// MonoGame - Copyright (C) MonoGame Foundation, Inc
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
@@ -162,6 +162,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
             using (var writer = new ContentWriter(this, stream, targetPlatform, targetProfile, compressContent, rootDirectory, referenceRelocationPath))
             {
                 writer.WriteObject(content);
+                writer.FinalizeContent();
                 writer.Flush();
             }
         }

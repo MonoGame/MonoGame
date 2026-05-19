@@ -1,4 +1,4 @@
-// MonoGame - Copyright (C) The MonoGame Team
+// MonoGame - Copyright (C) MonoGame Foundation, Inc
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
@@ -6,6 +6,9 @@ using System;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
+    /// <summary>
+    /// Defines the blend state for a single render target.
+    /// </summary>
 	public class TargetBlendState
 	{
 	    private readonly BlendState _parent;
@@ -43,6 +46,17 @@ namespace Microsoft.Xna.Framework.Graphics
 	        };
 	    }
 
+        /// <summary>
+        /// Gets or Sets the blend function for the alpha component.
+        /// </summary>
+        /// <remarks>
+        /// This property specifies the blending operation that will be used to combine the alpha components
+        /// of the source and destination pixels. The blend function affects how the final alpha value is calculated.
+        /// </remarks>
+        /// <exception cref="InvalidOperationException">
+        /// The exception is thrown if you attempt to change the property after the <see cref="BlendState"/> has been
+        /// bound to the graphics device.
+        /// </exception>
 	    public BlendFunction AlphaBlendFunction
 	    {
 	        get { return _alphaBlendFunction; }
@@ -53,6 +67,18 @@ namespace Microsoft.Xna.Framework.Graphics
 	        }
 	    }
 
+        /// <summary>
+        /// Gets or Sets the blend factor for the alpha component of the destination pixel.
+        /// </summary>
+        /// <remarks>
+        /// This property specifies the blend factor that will be used for the destination alpha component
+        /// when combining the source and destination pixels. The blend factor affects how the final alpha value is
+        /// calculated.
+        /// </remarks>
+        /// <exception cref="InvalidOperationException">
+        /// The exception is thrown if you attempt to change the property after the <see cref="BlendState"/> has been
+        /// bound to the graphics device.
+        /// </exception>
 	    public Blend AlphaDestinationBlend
 	    {
 	        get { return _alphaDestinationBlend; }
@@ -63,6 +89,18 @@ namespace Microsoft.Xna.Framework.Graphics
 	        }
 	    }
 
+        /// <summary>
+        /// Gets or Sets the blend factor for the alpha component of the source pixel.
+        /// </summary>
+        /// <remarks>
+        /// This property specifies the blend factor that will be used for the source alpha component
+        /// when combining the source and destination pixels. The blend factor affects how the final alpha value is
+        /// calculated.
+        /// </remarks>
+        /// <exception cref="InvalidOperationException">
+        /// The exception is thrown if you attempt to change the property after the <see cref="BlendState"/> has been
+        /// bound to the graphics device.
+        /// </exception>
 	    public Blend AlphaSourceBlend
 	    {
 	        get { return _alphaSourceBlend; }
@@ -73,6 +111,18 @@ namespace Microsoft.Xna.Framework.Graphics
 	        }
 	    }
 
+        /// <summary>
+        /// Gets or Sets the blend function for the color components (red, green, and blue).
+        /// </summary>
+        /// <remarks>
+        /// This property specifies the blending operation that will be used to combine the color components
+        /// (red, green, and blue) of the source and destination pixels. The blend function affects how the final color
+        /// values are calculated.
+        /// </remarks>
+        /// <exception cref="InvalidOperationException">
+        /// The exception is thrown if you attempt to change the property after the <see cref="BlendState"/> has been
+        /// bound to the graphics device.
+        /// </exception>
 	    public BlendFunction ColorBlendFunction
 	    {
 	        get { return _colorBlendFunction; }
@@ -83,6 +133,18 @@ namespace Microsoft.Xna.Framework.Graphics
 	        }
 	    }
 
+        /// <summary>
+        /// Gets or Sets the blend factor for the color components (red, green, and blue) of the destination pixel.
+        /// </summary>
+        /// <remarks>
+        /// This property specifies the blend factor that will be used for the destination color components
+        /// when combining the source and destination pixels. The blend factor affects how the final color values are
+        /// calculated.
+        /// </remarks>
+        /// <exception cref="InvalidOperationException">
+        /// The exception is thrown if you attempt to change the property after the <see cref="BlendState"/> has been
+        /// bound to the graphics device.
+        /// </exception>
 	    public Blend ColorDestinationBlend
 	    {
 	        get { return _colorDestinationBlend; }
@@ -93,6 +155,18 @@ namespace Microsoft.Xna.Framework.Graphics
 	        }
 	    }
 
+        /// <summary>
+        /// Gets or Sets the blend factor for the color components (red, green, and blue) of the source pixel.
+        /// </summary>
+        /// <remarks>
+        /// This property specifies the blend factor that will be used for the source color components
+        /// when combining the source and destination pixels. The blend factor affects how the final color values are
+        /// calculated.
+        /// </remarks>
+        /// <exception cref="InvalidOperationException">
+        /// The exception is thrown if you attempt to change the property after the <see cref="BlendState"/> has been
+        /// bound to the graphics device.
+        /// </exception>
 	    public Blend ColorSourceBlend
 	    {
 	        get { return _colorSourceBlend; }
@@ -103,6 +177,17 @@ namespace Microsoft.Xna.Framework.Graphics
 	        }
 	    }
 
+        /// <summary>
+        /// Gets or Sets a value that determines which color channels to enable for writing to the render target.
+        /// </summary>
+        /// <remarks>
+        /// This property controls which color channels (red, green, blue, and alpha) are enabled for writing
+        /// to the render target during the blending operation. By default, all color channels are enabled for writing.
+        /// </remarks>
+        /// <exception cref="InvalidOperationException">
+        /// The exception is thrown if you attempt to change the property after the <see cref="BlendState"/> has been
+        /// bound to the graphics device.
+        /// </exception>
 	    public ColorWriteChannels ColorWriteChannels
 	    {
 	        get { return _colorWriteChannels; }

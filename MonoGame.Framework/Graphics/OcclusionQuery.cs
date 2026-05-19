@@ -1,4 +1,4 @@
-// MonoGame - Copyright (C) The MonoGame Team
+// MonoGame - Copyright (C) MonoGame Foundation, Inc
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
@@ -6,6 +6,9 @@ using System;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
+    /// <summary>
+    /// Used to perform an occlusion query against the latest drawn objects.
+    /// </summary>
     public partial class OcclusionQuery : GraphicsResource
     {
         private bool _inBeginEndPair;  // true if Begin was called and End was not yet called.

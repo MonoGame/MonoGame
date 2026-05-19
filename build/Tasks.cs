@@ -1,0 +1,70 @@
+﻿
+namespace BuildScripts;
+
+[TaskName("Build Shaders")]
+[IsDependentOn(typeof(BuildShadersDX11Task))]
+[IsDependentOn(typeof(BuildShadersDX12Task))]
+[IsDependentOn(typeof(BuildShadersOGLTask))]
+[IsDependentOn(typeof(BuildShadersVulkanTask))]
+public sealed class BuildShadersTask : FrostingTask<BuildContext> { }
+
+[TaskName("Build Frameworks")]
+[IsDependentOn(typeof(BuildNativeTask))]
+[IsDependentOn(typeof(BuildDesktopGLTask))]
+[IsDependentOn(typeof(BuildWindowsDXTask))]
+[IsDependentOn(typeof(BuildAndroidTask))]
+[IsDependentOn(typeof(BuildiOSTask))]
+[IsDependentOn(typeof(BuildContentPipelineTask))]
+public sealed class BuildFrameworksTask : FrostingTask<BuildContext> { }
+
+[TaskName("Build Tools")]
+[IsDependentOn(typeof(BuildMGFXCTask))]
+[IsDependentOn(typeof(BuildContentPipelineTask))]
+[IsDependentOn(typeof(BuildDevToolsTask))]
+[IsDependentOn(typeof(BuildMGCBTask))]
+[IsDependentOn(typeof(BuildMGCBEditorTask))]
+public sealed class BuildToolsTask : FrostingTask<BuildContext> { }
+
+[TaskName("Build Templates")]
+[IsDependentOn(typeof(BuildDotNetTemplatesTask))]
+[IsDependentOn(typeof(BuildVSTemplatesTask))]
+public sealed class BuildTemplatesTask : FrostingTask<BuildContext> { }
+
+[TaskName("Build All Tests")]
+[IsDependentOn(typeof(BuildTestsTask))]
+[IsDependentOn(typeof(BuildToolTestsTask))]
+public sealed class BuildAllTestsTask : FrostingTask<BuildContext> { }
+
+
+[TaskName("Build All")]
+[IsDependentOn(typeof(BuildShadersTask))]
+[IsDependentOn(typeof(BuildFrameworksTask))]
+[IsDependentOn(typeof(BuildToolsTask))]
+[IsDependentOn(typeof(BuildTemplatesTask))]
+[IsDependentOn(typeof(BuildAllTestsTask))]
+public sealed class BuildAllTask : FrostingTask<BuildContext> { }
+
+[TaskName("Deploy")]
+[IsDependentOn(typeof(DeployNuGetsToGitHubTask))]
+[IsDependentOn(typeof(DeployNuGetsToNuGetOrgTask))]
+[IsDependentOn(typeof(DeployVsixToMarketplaceTask))]
+public sealed class DeployTask : FrostingTask<BuildContext> { }
+
+[TaskName("Test")]
+[IsDependentOn(typeof(DownloadTestArtifactsTask))]
+public sealed class TestTask : FrostingTask<BuildContext> { }
+
+[TaskName("TestNuGet")]
+[IsDependentOn(typeof(TestNuGetSetupTask))]
+[IsDependentOn(typeof(TestDesktopGLTask))]
+[IsDependentOn(typeof(TestWindowsDXTask))]
+[IsDependentOn(typeof(TestAndroidTask))]
+[IsDependentOn(typeof(TestiOSTask))]
+[IsDependentOn(typeof(TestBlank2DStarterKitTask))]
+[IsDependentOn(typeof(TestFull2DStarterKitTask))]
+[IsDependentOn(typeof(TestNuGetSummaryTask))]
+public sealed class TestNuGetTask : FrostingTask<BuildContext> { }
+
+[TaskName("Default")]
+[IsDependentOn(typeof(BuildAllTask))]
+public sealed class DefaultTask : FrostingTask<BuildContext> { }

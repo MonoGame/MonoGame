@@ -1,4 +1,4 @@
-// MonoGame - Copyright (C) The MonoGame Team
+// MonoGame - Copyright (C) MonoGame Foundation, Inc
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
@@ -29,7 +29,7 @@ namespace Microsoft.Xna.Framework.Graphics
         /// <summary>
         /// Raised when the <see cref="GraphicsDevice"/> has reset.
         /// </summary>
-        /// <seealso cref="Microsoft.Xna.Framework.Graphics.GraphicsDevice.Reset"/>
+        /// <seealso cref="Microsoft.Xna.Framework.Graphics.GraphicsDevice.Reset()"/>
         event EventHandler<EventArgs> DeviceReset;
 
         /// <summary>

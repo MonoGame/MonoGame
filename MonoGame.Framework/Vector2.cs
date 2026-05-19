@@ -1187,7 +1187,7 @@ namespace Microsoft.Xna.Framework
             result.X = x;
             result.Y = y;
         }
-
+        
         /// <summary>
         /// Apply transformation on normals within array of <see cref="Vector2"/> by the specified <see cref="Matrix"/> and places the results in an another array.
         /// </summary>
@@ -1252,6 +1252,79 @@ namespace Microsoft.Xna.Framework
                 destinationArray[i] = new Vector2((normal.X * matrix.M11) + (normal.Y * matrix.M21),
                                                   (normal.X * matrix.M12) + (normal.Y * matrix.M22));
             }
+        }
+
+        /// <summary>
+        /// Rotates a vector by the specified number of radians
+        /// </summary>
+        /// <param name="value">The vector to be rotated.</param>
+        /// <param name="radians">The amount to rotate the vector.</param>
+        /// <returns>A rotated copy of value.</returns>
+        /// <remarks>
+        /// A positive angle and negative angle
+        /// would rotate counterclockwise and clockwise,
+        /// respectively
+        /// </remarks>
+        public static Vector2 Rotate(Vector2 value, float radians)
+        {
+            float cos = MathF.Cos(radians);
+            float sin = MathF.Sin(radians);
+
+            return new Vector2(value.X * cos - value.Y * sin, value.X * sin + value.Y * cos);
+        }
+
+        /// <summary>
+        /// Rotates a <see cref="Vector2"/> by the specified number of radians
+        /// </summary>
+        /// <param name="radians">The amount to rotate this <see cref="Vector2"/>.</param>
+        /// <remarks>
+        /// A positive angle and negative angle
+        /// would rotate counterclockwise and clockwise,
+        /// respectively
+        /// </remarks>
+        public void Rotate(float radians)
+        {
+            float cos = MathF.Cos(radians);
+            float sin = MathF.Sin(radians);
+
+            float oldx = X;
+
+            X = X * cos - Y * sin;
+            Y = oldx * sin + Y * cos;
+        }
+
+        /// <summary>
+        /// Rotates a <see cref="Vector2"/> around another <see cref="Vector2"/> representing a location
+        /// </summary>
+        /// <param name="value">The <see cref="Vector2"/> to be rotated</param>
+        /// <param name="origin">The origin location to be rotated around</param>
+        /// <param name="radians">The amount to rotate by in radians</param>
+        /// <returns>The rotated <see cref="Vector2"/></returns>
+        /// <remarks>
+        /// A positive angle and negative angle
+        /// would rotate counterclockwise and clockwise,
+        /// respectively
+        /// </remarks>
+        public static Vector2 RotateAround(Vector2 value, Vector2 origin, float radians)
+        {
+            return Rotate(value - origin, radians) + origin;
+        }
+
+        /// <summary>
+        /// Rotates a <see cref="Vector2"/> around another <see cref="Vector2"/> representing a location
+        /// </summary>
+        /// <param name="origin">The origin location to be rotated around</param>
+        /// <param name="radians">The amount to rotate by in radians</param>
+        /// <remarks>
+        /// A positive angle and negative angle
+        /// would rotate counterclockwise and clockwise,
+        /// respectively
+        /// </remarks>
+        public void RotateAround(Vector2 origin, float radians)
+        {
+            this -= origin;
+            Rotate(radians);
+            this += origin;
         }
 
         /// <summary>

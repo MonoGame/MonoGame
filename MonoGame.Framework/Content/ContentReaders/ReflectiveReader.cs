@@ -1,4 +1,4 @@
-// MonoGame - Copyright (C) The MonoGame Team
+// MonoGame - Copyright (C) MonoGame Foundation, Inc
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
@@ -8,10 +8,25 @@ using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using MonoGame.Framework.Utilities;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Microsoft.Xna.Framework.Content
 {
-    internal class ReflectiveReader<T> : ContentTypeReader
+    /// <summary>
+    /// This type is not meant to be used directly by MonoGame users.
+    /// Its purpose is to allow to work-around AOT issues when loading assets with the <see cref="ContentManager"/> fail due to the absence of runtime-reflection support in that context (i.e. missing types due to trimming and inability to statically discover them at compile-time).
+    /// If <see cref="ContentManager.Load{T}"/> throws an <see cref="NotSupportedException"/>, the message should provide insights on how to fix it.
+    /// </summary>
+    [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.All)]
+    public class ReflectiveReader<
+        [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicParameterlessConstructor
+                                    | DynamicallyAccessedMemberTypes.NonPublicConstructors
+                                    | DynamicallyAccessedMemberTypes.PublicConstructors
+                                    | DynamicallyAccessedMemberTypes.NonPublicFields
+                                    | DynamicallyAccessedMemberTypes.PublicFields
+                                    | DynamicallyAccessedMemberTypes.NonPublicProperties
+                                    | DynamicallyAccessedMemberTypes.PublicProperties)] T
+    > : ContentTypeReader
     {
         delegate void ReadElement(ContentReader input, object parent);
 
@@ -21,17 +36,19 @@ namespace Microsoft.Xna.Framework.Content
 
         private ContentTypeReader _baseTypeReader;
 
-
+        /// <summary/>
         public ReflectiveReader() 
             : base(typeof(T))
         {
         }
 
+        /// <summary/>
         public override bool CanDeserializeIntoExistingObject
         {
             get { return TargetType.IsClass(); }
         }
 
+        /// <summary/>
         protected internal override void Initialize(ContentTypeReaderManager manager)
         {
             base.Initialize(manager);
@@ -40,10 +57,13 @@ namespace Microsoft.Xna.Framework.Content
             if (baseType != null && baseType != typeof(object))
 				_baseTypeReader = manager.GetTypeReader(baseType);
 
+            // TargetType is the typeof(T) of the generic type parameter of this class.
+            #pragma warning disable IL2072
             _constructor = TargetType.GetDefaultConstructor();
 
             var properties = TargetType.GetAllProperties();
             var fields = TargetType.GetAllFields();
+            #pragma warning restore IL2072
             _readers = new List<ReadElement>(fields.Length + properties.Length);
 
             // Gather the properties.
@@ -164,7 +184,8 @@ namespace Microsoft.Xna.Framework.Content
                 setter(parent, obj2);
             };
         }
-      
+
+        /// <summary/>
         protected internal override object Read(ContentReader input, object existingInstance)
         {
             T obj;

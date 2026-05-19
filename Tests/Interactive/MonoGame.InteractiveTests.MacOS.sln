@@ -5,8 +5,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MouseGetStateAndIsMouseVisi
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MonoGame.Framework.MacOS", "..\..\MonoGame.Framework\MonoGame.Framework.MacOS.csproj", "{36C538E6-C32A-4A8D-A39C-566173D7118E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lidgren.Network.MacOS", "..\..\ThirdParty\Lidgren.Network\Lidgren.Network.MacOS.csproj", "{5C3DC4FF-FE5A-4B94-B4A6-6F79E63F3130}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GamePadTest", "MacOS\GamePadTest\GamePadTest.csproj", "{E251B0C1-ED74-4210-A0D5-9E4710FEA61F}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PrimitivesTest", "MacOS\PrimitivesTest\PrimitivesTest.csproj", "{9704681E-C6DB-4946-9F31-0EF9BE63090A}"
@@ -20,6 +18,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SoundTest2_MacOs", "MacOS\SoundTest2\SoundTest2_MacOs\SoundTest2_MacOs.csproj", "{79A32C2C-0F38-4ADE-88D1-F8502C520570}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlockingRun", "MacOS\BlockingRun\BlockingRun.csproj", "{75D4D875-093F-4C00-8EE5-C7B39D2F4C18}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MonoGame.InteractiveTests.iOS", "iOS\MonoGame.InteractiveTests.iOS.csproj", "{8C337B04-A86D-4E5D-8556-668709749F0C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -130,6 +130,12 @@ Global
 		{ECD1D53E-F50A-4299-9B0F-2F64D6063513}.Distribution|Any CPU.Build.0 = Debug|Any CPU
 		{ECD1D53E-F50A-4299-9B0F-2F64D6063513}.Release|x86.ActiveCfg = Release|Any CPU
 		{ECD1D53E-F50A-4299-9B0F-2F64D6063513}.Release|x86.Build.0 = Release|Any CPU
+		{8C337B04-A86D-4E5D-8556-668709749F0C}.Debug|x86.ActiveCfg = Debug|iPhoneSimulator
+		{8C337B04-A86D-4E5D-8556-668709749F0C}.Debug|x86.Build.0 = Debug|iPhoneSimulator
+		{8C337B04-A86D-4E5D-8556-668709749F0C}.Release|x86.ActiveCfg = Release|iPhoneSimulator
+		{8C337B04-A86D-4E5D-8556-668709749F0C}.Release|x86.Build.0 = Release|iPhoneSimulator
+		{8C337B04-A86D-4E5D-8556-668709749F0C}.Distribution|Any CPU.ActiveCfg = Debug|Any CPU
+		{8C337B04-A86D-4E5D-8556-668709749F0C}.Distribution|Any CPU.Build.0 = Debug|Any CPU
 	EndGlobalSection
 	GlobalSection(MonoDevelopProperties) = preSolution
 		StartupItem = MacOS\TextureScaleColorTest\TextureScaleColorTest.csproj

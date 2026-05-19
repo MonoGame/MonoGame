@@ -1,4 +1,4 @@
-﻿// MonoGame - Copyright (C) The MonoGame Team
+﻿// MonoGame - Copyright (C) MonoGame Foundation, Inc
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
@@ -41,9 +41,25 @@ namespace Microsoft.Xna.Framework.Graphics
             get { return size; }
         }
 
+        /// <summary>
+        /// Gets a value that indicates whether the contents of this <b>RenderTargetCube</b> has been lost due to a lost
+        /// device event.
+        /// </summary>
+        /// <remarks>
+        /// This property will always return <b>false</b>.  It is included for XNA compatibility.
+        /// </remarks>
+        [Obsolete("This is provided for XNA compatibility only and will always return false")]
 		public bool IsContentLost { get { return false; } }
+
+        /// <summary>
+        /// Occurs when a graphics device lost event is triggered.
+        /// </summary>
+        /// <remarks>
+        /// This event is never called.  It is included for XNA compatibility.
+        /// </remarks>
+        [Obsolete("This is provided for XNA compatibility is never called by MonoGame")]
 		public event EventHandler<EventArgs> ContentLost;
-		
+
         /// <summary>
         /// Initializes a new instance of the <see cref="RenderTargetCube"/> class.
         /// </summary>
@@ -54,7 +70,7 @@ namespace Microsoft.Xna.Framework.Graphics
         /// <param name="preferredDepthFormat">The preferred format of the depth-stencil buffer.</param>
         public RenderTargetCube(GraphicsDevice graphicsDevice, int size, bool mipMap, SurfaceFormat preferredFormat, DepthFormat preferredDepthFormat)
             : this(graphicsDevice, size, mipMap, preferredFormat, preferredDepthFormat, 0, RenderTargetUsage.DiscardContents)
-        {            
+        {
         }
 
         /// <summary>
@@ -76,7 +92,8 @@ namespace Microsoft.Xna.Framework.Graphics
 
             PlatformConstruct(graphicsDevice, mipMap, preferredDepthFormat, preferredMultiSampleCount, usage);
         }
-        
+
+        /// <summary />
         protected static SurfaceFormat QuerySelectedFormat(GraphicsDevice graphicsDevice, SurfaceFormat preferredFormat)
         {
 			SurfaceFormat selectedFormat = preferredFormat;
@@ -85,10 +102,10 @@ namespace Microsoft.Xna.Framework.Graphics
 
             if (graphicsDevice != null)
             {
-                graphicsDevice.Adapter.QueryRenderTargetFormat(graphicsDevice.GraphicsProfile, preferredFormat, DepthFormat.None, 0, 
+                graphicsDevice.Adapter.QueryRenderTargetFormat(graphicsDevice.GraphicsProfile, preferredFormat, DepthFormat.None, 0,
                     out selectedFormat, out selectedDepthFormat, out selectedMultiSampleCount);
             }
-            
+
             return selectedFormat;
         }
     }

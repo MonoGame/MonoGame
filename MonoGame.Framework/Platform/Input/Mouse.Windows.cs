@@ -1,4 +1,4 @@
-// MonoGame - Copyright (C) The MonoGame Team
+// MonoGame - Copyright (C) MonoGame Foundation, Inc
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
@@ -35,11 +35,12 @@ namespace Microsoft.Xna.Framework.Input
         {
             PrimaryWindow.MouseState.X = x;
             PrimaryWindow.MouseState.Y = y;
-            
+
             var pt = _window.PointToScreen(new System.Drawing.Point(x, y));
             SetCursorPos(pt.X, pt.Y);
         }
 
+        /// <inheritdoc cref="Mouse.SetCursor"/>
         public static void PlatformSetCursor(MouseCursor cursor)
         {
             _window.Cursor = cursor.Cursor;

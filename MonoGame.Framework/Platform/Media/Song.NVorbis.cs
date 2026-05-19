@@ -1,4 +1,4 @@
-// MonoGame - Copyright (C) The MonoGame Team
+// MonoGame - Copyright (C) MonoGame Foundation, Inc
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
@@ -98,6 +98,9 @@ namespace Microsoft.Xna.Framework.Media
             }
         }
 
+        /// <summary>
+        /// Gets the position of the Song.
+        /// </summary>
         public TimeSpan Position
         {
             get
@@ -123,11 +126,6 @@ namespace Microsoft.Xna.Framework.Media
             return null;
         }
 
-        private TimeSpan PlatformGetDuration()
-        {
-            return _duration;
-        }
-
         private bool PlatformIsProtected()
         {
             return false;
@@ -136,11 +134,6 @@ namespace Microsoft.Xna.Framework.Media
         private bool PlatformIsRated()
         {
             return false;
-        }
-
-        private string PlatformGetName()
-        {
-            return Path.GetFileNameWithoutExtension(_name);
         }
 
         private int PlatformGetPlayCount()

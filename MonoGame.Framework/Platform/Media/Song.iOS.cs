@@ -1,4 +1,4 @@
-// MonoGame - Copyright (C) The MonoGame Team
+// MonoGame - Copyright (C) MonoGame Foundation, Inc
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
@@ -16,8 +16,6 @@ namespace Microsoft.Xna.Framework.Media
         private Album album;
         private Artist artist;
         private Genre genre;
-        private string title;
-        private TimeSpan duration;
         #if !TVOS
         private MPMediaItem mediaItem;
         #endif
@@ -26,7 +24,6 @@ namespace Microsoft.Xna.Framework.Media
         private NSUrl assetUrl;
         private NSObject playToEndObserver;
 
-        [CLSCompliant(false)]
         public NSUrl AssetUrl
         {
             get { return this.assetUrl; }
@@ -41,12 +38,13 @@ namespace Microsoft.Xna.Framework.Media
             this.album = album;
             this.artist = artist;
             this.genre = genre;
-            this.title = title;
-            this.duration = duration;
             #if !TVOS
             this.mediaItem = mediaItem;
             #endif
             this.assetUrl = assetUrl;
+            _duration = duration;
+            if (!string.IsNullOrEmpty(title))
+                _name = title;
         }
 
         private void PlatformInitialize(string fileName)
@@ -194,15 +192,6 @@ namespace Microsoft.Xna.Framework.Media
             return this.genre;
         }
 
-        private TimeSpan PlatformGetDuration()
-        {
-            #if !TVOS
-            if (this.mediaItem != null)
-                return this.duration;
-            #endif
-            return _duration;
-        }
-
         private bool PlatformIsProtected()
         {
             return false;
@@ -211,11 +200,6 @@ namespace Microsoft.Xna.Framework.Media
         private bool PlatformIsRated()
         {
             return false;
-        }
-
-        private string PlatformGetName()
-        {
-            return this.title ?? Path.GetFileNameWithoutExtension(_name);
         }
 
         private int PlatformGetPlayCount()

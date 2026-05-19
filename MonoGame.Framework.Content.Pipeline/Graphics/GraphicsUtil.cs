@@ -1,12 +1,14 @@
-﻿// MonoGame - Copyright (C) The MonoGame Team
+﻿// MonoGame - Copyright (C) MonoGame Foundation, Inc
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System;
 using System.IO;
+using System.Runtime.InteropServices;
+using Microsoft.Xna.Framework.Content.Pipeline.Processors;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Graphics.PackedVector;
-using FreeImageAPI;
+using MonoGame.Framework.Content.Pipeline.Interop;
 
 namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 {
@@ -17,29 +19,81 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
             BitmapContent src = bitmap;
             SurfaceFormat format;
             src.TryGetFormat(out format);
-            if (format != SurfaceFormat.Vector4)
+            var intermediateFormat = SurfaceFormat.Vector4;
+
+            switch (format)
             {
-                var v4 = new PixelBitmapContent<Vector4>(src.Width, src.Height);
-                BitmapContent.Copy(src, v4);
-                src = v4;
+                case SurfaceFormat.Color or SurfaceFormat.Rgba64 or SurfaceFormat.Vector4:
+                    intermediateFormat = format;
+                    break;
+                default:
+                    var v4 = new PixelBitmapContent<Vector4>(src.Width, src.Height);
+                    BitmapContent.Copy(src, v4);
+                    src = v4;
+                    break;
             }
 
-            // Convert to FreeImage bitmap
-            var bytes = src.GetPixelData();
-            var fi = FreeImage.ConvertFromRawBits(bytes, FREE_IMAGE_TYPE.FIT_RGBAF, src.Width, src.Height, SurfaceFormat.Vector4.GetSize() * src.Width, 128, 0, 0, 0, true);
+            var newBytes = new byte[intermediateFormat.GetSize() * newWidth * newHeight];
 
-            // Resize
-            var newfi = FreeImage.Rescale(fi, newWidth, newHeight, FREE_IMAGE_FILTER.FILTER_BICUBIC);
-            FreeImage.Unload(fi);
+            GCHandle srcHandle = default;
+            GCHandle dstHandle = default;
+            try
+            {
+                byte[] srcPixelData = src.GetPixelData();
+                srcHandle = GCHandle.Alloc(srcPixelData, GCHandleType.Pinned);
+                IntPtr srcPtr = srcHandle.AddrOfPinnedObject();
+                dstHandle = GCHandle.Alloc(newBytes, GCHandleType.Pinned);
+                IntPtr dstPtr = dstHandle.AddrOfPinnedObject();
 
-            // Convert back to PixelBitmapContent<Vector4>
-            src = new PixelBitmapContent<Vector4>(newWidth, newHeight);
-            bytes = new byte[SurfaceFormat.Vector4.GetSize() * newWidth * newHeight];
-            FreeImage.ConvertToRawBits(bytes, newfi, SurfaceFormat.Vector4.GetSize() * newWidth, 128, 0, 0, 0, true);
-            src.SetPixelData(bytes);
-            FreeImage.Unload(newfi);
+                var srcBitmap = new MGCP_Bitmap
+                {
+                    width = src.Width,
+                    height = src.Height,
+                    type = TextureType.RgbaF,
+                    data = srcPtr,
+                };
+
+                var dstBitmap = new MGCP_Bitmap
+                {
+                    width = newWidth,
+                    height = newHeight,
+                    data = dstPtr,
+                };
+
+                IntPtr err = MGCP.MP_ResizeBitmap(ref srcBitmap, ref dstBitmap);
+                if (err != IntPtr.Zero)
+                {
+                    string errorMsg = System.Runtime.InteropServices.Marshal.PtrToStringUTF8(err);
+                    throw new InvalidContentException($"Bitmap resize failed: {errorMsg}");
+                }
+            }
+            finally
+            {
+                if (srcHandle.IsAllocated)
+                    srcHandle.Free();
+                if (dstHandle.IsAllocated)
+                    dstHandle.Free();
+            }
+
+            switch (intermediateFormat)
+            {
+                case SurfaceFormat.Color:
+                    src = new PixelBitmapContent<Color>(newWidth, newHeight);
+                    break;
+                case SurfaceFormat.Rgba64:
+                    src = new PixelBitmapContent<Rgba64>(newWidth, newHeight);
+                    break;
+                case SurfaceFormat.Vector4:
+                    src = new PixelBitmapContent<Vector4>(newWidth, newHeight);
+                    break;
+                default:
+                    throw new InvalidOperationException($"Unexpected intermediate format: {intermediateFormat}");
+            }
+
+            src.SetPixelData(newBytes);
+
             // Convert back to source type if required
-            if (format != SurfaceFormat.Vector4)
+            if (format != intermediateFormat)
             {
                 var s = (BitmapContent)Activator.CreateInstance(bitmap.GetType(), new object[] { newWidth, newHeight });
                 BitmapContent.Copy(src, s);
@@ -47,16 +101,6 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
             }
 
             return src;
-        }
-
-        public static void BGRAtoRGBA(byte[] data)
-        {
-            for (var x = 0; x < data.Length; x += 4)
-            {
-                data[x] ^= data[x + 2];
-                data[x + 2] ^= data[x];
-                data[x] ^= data[x + 2];
-            }
         }
 
         public static bool IsPowerOfTwo(int x)
@@ -160,7 +204,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
             if (context.TargetProfile == GraphicsProfile.Reach)
             {
                 if (!IsPowerOfTwo(face.Width) || !IsPowerOfTwo(face.Height))
-                    throw new PipelineException("DXT compression requires width and height must be powers of two in Reach graphics profile.");                
+                    throw new PipelineException("DXT compression requires width and height must be powers of two in Reach graphics profile.");
             }
 
             // Test the alpha channel to figure out if we have alpha.
@@ -175,8 +219,8 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
             // between DXT1 for cutouts and DXT5 for fractional alpha.
             //
             // DXT3 however can produce better results for high frequency
-            // alpha like a chain link fence where is DXT5 is better for 
-            // low frequency alpha like clouds.  I don't know how we can 
+            // alpha like a chain link fence where is DXT5 is better for
+            // low frequency alpha like clouds.  I don't know how we can
             // pick the right thing in this case without a hint.
             //
             if (isSpriteFont)
@@ -199,12 +243,89 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
             }
 
             var face = content.Faces[0][0];
-			var alphaRange = CalculateAlphaRange(face);
+            var alphaRange = CalculateAlphaRange(face);
 
             if (alphaRange == AlphaRange.Full)
                 content.ConvertBitmapType(typeof(AtcExplicitBitmapContent));
             else
                 content.ConvertBitmapType(typeof(AtcInterpolatedBitmapContent));
+        }
+
+        static public void CompressAstc(ContentProcessorContext context, TextureContent content, bool isSpriteFont, TextureProcessorOutputFormat format)
+        {
+            // If sharp alpha is required (for a font texture page), use 16-bit color instead of PVR
+            if (isSpriteFont)
+            {
+                CompressColor16Bit(context, content);
+                return;
+            }
+
+            switch (format)
+            {
+                case TextureProcessorOutputFormat.AstcCompressed5x5:
+                    content.ConvertBitmapType(typeof(Astc5x5BitmapContent));
+                    break;
+                case TextureProcessorOutputFormat.AstcCompressed6x6:
+                    content.ConvertBitmapType(typeof(Astc6x6BitmapContent));
+                    break;
+                case TextureProcessorOutputFormat.AstcCompressed8x8:
+                    content.ConvertBitmapType(typeof(Astc8x8BitmapContent));
+                    break;
+                case TextureProcessorOutputFormat.AstcCompressed10x10:
+                    content.ConvertBitmapType(typeof(Astc10x10BitmapContent));
+                    break;
+                case TextureProcessorOutputFormat.AstcCompressed12x12:
+                    content.ConvertBitmapType(typeof(Astc12x12BitmapContent));
+                    break;
+                case TextureProcessorOutputFormat.AstcCompressed4x4:
+                case TextureProcessorOutputFormat.AstcCompressed:
+                default:
+                    // astc supports rgba
+                    content.ConvertBitmapType(typeof(AstcBitmapContent));
+                    break;
+            }
+        }
+
+        static public void CompressEtc(ContentProcessorContext context, TextureContent content, bool isSpriteFont)
+        {
+            // If sharp alpha is required (for a font texture page), use 16-bit color instead of PVR
+            if (isSpriteFont)
+            {
+                CompressColor16Bit(context, content);
+                return;
+            }
+
+            var face = content.Faces[0][0];
+            var alphaRange = CalculateAlphaRange(face);
+
+
+            // confirm texture meets ETC requirements
+            if (!IsPowerOfTwo(face.Width) || !IsPowerOfTwo(face.Height))
+            {
+                // pick a fallback format based on the alpha range.
+                if (alphaRange != AlphaRange.Opaque)
+                {
+                    context.Logger.LogWarning(null, content.Identity, "ETC compression requires width and height to be powers of two due to hardware restrictions on some devices. Falling back to BGR565.");
+                    content.ConvertBitmapType(typeof(PixelBitmapContent<Bgra4444>));
+                }
+                else
+                {
+                    context.Logger.LogWarning(null, content.Identity, "ETC compression requires width and height to be powers of two due to hardware restrictions on some devices. Falling back to BGR565.");
+                    content.ConvertBitmapType(typeof(PixelBitmapContent<Bgr565>));
+                }
+
+                return;
+            }
+
+            if (alphaRange == AlphaRange.Opaque)
+            {
+                // ETC1 does not support alpha, which is fine since the data is all opaque
+                content.ConvertBitmapType(typeof(Etc1BitmapContent));
+                return;
+            }
+
+            // Use ETC2
+            content.ConvertBitmapType(typeof(Etc2BitmapContent));
         }
 
         static public void CompressEtc1(ContentProcessorContext context, TextureContent content, bool isSpriteFont)
@@ -233,7 +354,9 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
                     content.ConvertBitmapType(typeof(PixelBitmapContent<Bgr565>));
                 }
                 else
+                    // use ETC1 when there is no alpha
                     content.ConvertBitmapType(typeof(Etc1BitmapContent));
+
             }
         }
 
@@ -249,6 +372,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
             else
                 content.ConvertBitmapType(typeof(PixelBitmapContent<Bgra4444>));
         }
+
 
         // Compress the greyscale font texture page using a specially-formulated DXT3 mode
         static public unsafe void CompressFontDXT3(TextureContent content)

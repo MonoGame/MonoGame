@@ -1,4 +1,4 @@
-﻿// MonoGame - Copyright (C) The MonoGame Team
+﻿// MonoGame - Copyright (C) MonoGame Foundation, Inc
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
@@ -14,6 +14,10 @@ namespace Microsoft.Xna.Framework.Graphics
         private readonly Queue<GraphicsDebugMessage> _cachedMessages;
         private bool _hasPushedFilters = false;
 
+        /// <summary>
+        /// Creates a new instance of the <see cref="GraphicsDebug"/> class.
+        /// </summary>
+        /// <param name="device">The <see cref="GraphicsDevice"/> that the <see cref="GraphicsDebug"/> class is attached to.</param>
         public GraphicsDebug(GraphicsDevice device)
         {
             _device = device;

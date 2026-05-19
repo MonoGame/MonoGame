@@ -1,4 +1,4 @@
-﻿// MonoGame - Copyright (C) The MonoGame Team
+﻿// MonoGame - Copyright (C) MonoGame Foundation, Inc
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
@@ -33,6 +33,7 @@ namespace Microsoft.Xna.Framework.Audio
             }
         }
 
+        /// <inheritdoc />
         public override SoundState State
         {
             get
@@ -275,6 +276,7 @@ namespace Microsoft.Xna.Framework.Audio
                 throw new ObjectDisposedException(null);
         }
 
+        /// <summary />
         protected override void Dispose(bool disposing)
         {
             PlatformDispose(disposing);
@@ -294,13 +296,29 @@ namespace Microsoft.Xna.Framework.Audio
 
             // Raise the event
             var bufferNeededHandler = BufferNeeded;
-
             if (bufferNeededHandler != null)
             {
-                var eventCount = (_buffersNeeded < 3) ? _buffersNeeded : 3;
-                for (var i = 0; i < eventCount; i++)
+                if (_buffersNeeded >= 1)
                 {
-                    bufferNeededHandler(this, EventArgs.Empty);
+                    // At least one event is needed after the initial play call and per processed buffer
+                    int minimumNoOfBufferNeededEvents = (_buffersNeeded < 3) ? _buffersNeeded : 3;
+
+                    // Multiple events may be raised to reach the target buffer count so long as
+                    // a SubmitBuffer occurs for each event
+                    int noOfBuffersNeededEventsToReachTarget = TargetPendingBufferCount - PendingBufferCount;
+
+                    for (int i = 0; i < noOfBuffersNeededEventsToReachTarget; i++)
+                    {
+                        // Raise the BufferNeeded event and check if SubmitBuffer occurred
+                        int lastPendingBufferCount = PendingBufferCount;
+                        bufferNeededHandler(this, EventArgs.Empty);
+                        bool submitBufferOccurred = PendingBufferCount > lastPendingBufferCount;
+
+                        // Stop raising events if no SubmitBuffer occurred during BufferNeeded and
+                        // the minimum number of events has already been raised
+                        if (!submitBufferOccurred && ((i + 1) >= minimumNoOfBufferNeededEvents))
+                            break;
+                    }
                 }
             }
 

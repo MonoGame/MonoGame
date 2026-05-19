@@ -1,4 +1,4 @@
-// MonoGame - Copyright (C) The MonoGame Team
+// MonoGame - Copyright (C) MonoGame Foundation, Inc
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
@@ -10,63 +10,68 @@ namespace MonoGame.Framework.Utilities
     public enum MonoGamePlatform
     {
         /// <summary>
-        /// MonoGame Android platform.
+        /// Android platform.
         /// </summary>
         Android,
 
         /// <summary>
-        /// MonoGame iOS platform.
+        /// iOS platform.
         /// </summary>
         iOS,
 
         /// <summary>
-        /// MonoGame tvOS platform.
+        /// tvOS platform.
         /// </summary>
         tvOS,
 
         /// <summary>
-        /// MonoGame cross platform desktop OpenGL platform.
+        /// Cross platform desktop using OpenGL.
         /// </summary>
         DesktopGL,
 
         /// <summary>
-        /// MonoGame Win32 Windows platform.
+        /// Windows platform using DirectX 11.
         /// </summary>
         Windows,
 
         /// <summary>
-        /// MonoGame Windows universal platform.
-        /// </summary>
-        WindowsUniversal,
-
-        /// <summary>
-        /// MonoGame WebGL platform.
+        /// WebGL platform.
         /// </summary>
         WebGL,
 
         /// <summary>
-        /// MonoGame Xbox One platform.
+        /// Xbox One platform.
         /// </summary>
         XboxOne,
+        
+        /// <summary>
+        /// Windows platform using DirectX 12.
+        /// </summary>
+        WindowsDX12,
 
         /// <summary>
-        /// MonoGame PlayStation 4 platform.
+        /// Xbox Series X|S platform.
+        /// </summary>
+        XboxSeries,
+
+        /// <summary>
+        /// PlayStation 4 platform.
         /// </summary>
         PlayStation4,
 
         /// <summary>
-        /// MonoGame PlayStation 5 platform.
+        /// PlayStation 5 platform.
         /// </summary>
         PlayStation5,
 
         /// <summary>
-        /// MonoGame Nintendo Switch platform.
+        /// Nintendo Switch platform.
         /// </summary>
         NintendoSwitch,
 
         /// <summary>
-        /// MonoGame Google Stadia platform.
+        /// Cross platform desktop using Vulkan.
         /// </summary>
-        Stadia
+        DesktopVK,
     }
 }

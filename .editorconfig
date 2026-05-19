@@ -10,3 +10,35 @@ trim_trailing_whitespace = true
 [*.cs]
 indent_style = space
 indent_size = 4
+
+#XML Summary Errors (prevent malformed summaries)
+dotnet_diagnostic.CS1570.severity = error
+dotnet_diagnostic.CS1571.severity = error
+dotnet_diagnostic.CS1572.severity = error
+dotnet_diagnostic.CS1573.severity = error
+dotnet_diagnostic.CS1574.severity = error
+dotnet_diagnostic.CS1580.severity = error
+
+#Obsolete attributes should have a message
+dotnet_diagnostic.CA1041.severity = error
+
+#Do not declare protected items in a sealed class
+dotnet_diagnostic.CA1047.severity = error
+
+#Declare types in namespaces
+dotnet_diagnostic.CA1050.severity = error
+
+#Specify IFormatProvider in .ToString() methods.
+dotnet_diagnostic.CA1304.severity = warning
+dotnet_diagnostic.CA1305.severity = warning
+
+#Use properties of collections over Linq Enumerable methods
+dotnet_diagnostic.CA1826.severity = warning
+dotnet_diagnostic.CA1827.severity = warning
+dotnet_diagnostic.CA1829.severity = warning
+
+#use StringBuilder.Append(char) for single character strings.
+dotnet_diagnostic.CA1834.severity = warning
+
+#Specify StringComparison for correctness and performance.
+dotnet_diagnostic.CA1319.severity = warning

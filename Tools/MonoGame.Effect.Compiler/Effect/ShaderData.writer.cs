@@ -8,6 +8,9 @@ namespace MonoGame.Effect
         {
             writer.Write(IsVertexShader);
 
+            writer.Write(SourceFile ?? "<unknown>");
+            writer.Write(Entrypoint ?? "<unknown>");
+
             writer.Write(ShaderCode.Length);
             writer.Write(ShaderCode);
 

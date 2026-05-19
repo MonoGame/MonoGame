@@ -11,6 +11,6 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 
 		float LineSpacing { get; }
 
-		int YOffsetMin { get; }
+		long YOffsetMin { get; }
 	}
 }

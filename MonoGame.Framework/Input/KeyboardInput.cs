@@ -3,8 +3,14 @@ using System.Threading.Tasks;
 
 namespace Microsoft.Xna.Framework.Input
 {
+    /// <summary>
+    /// Provides access to the keyboard input user interface.
+    /// </summary>
     public static partial class KeyboardInput
     {
+        /// <summary>
+        /// Determines if a keyboard user interface screen is active.
+        /// </summary>
         public static bool IsVisible { get; private set; }
 
         /// <summary>

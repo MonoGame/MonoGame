@@ -1,4 +1,4 @@
-// MonoGame - Copyright (C) The MonoGame Team
+// MonoGame - Copyright (C) MonoGame Foundation, Inc
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
@@ -7,6 +7,7 @@ namespace Microsoft.Xna.Framework.Content
     /// <summary>
     /// External reference reader, provided for compatibility with XNA Framework built content
     /// </summary>
+    [System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.All)]
     internal class ExternalReferenceReader : ContentTypeReader
     {
         public ExternalReferenceReader()

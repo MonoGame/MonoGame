@@ -1,4 +1,4 @@
-﻿// MonoGame - Copyright (C) The MonoGame Team
+﻿// MonoGame - Copyright (C) MonoGame Foundation, Inc
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
@@ -16,14 +16,8 @@ namespace MonoGame.Framework.Utilities
         public static readonly char ForwardSlash = '/';
         public static readonly string ForwardSlashString = new string(ForwardSlash, 1);
         public static readonly char BackwardSlash = '\\';
-
-#if WINDOWS_UAP
-        public static readonly char NotSeparator = ForwardSlash;
-        public static readonly char Separator = BackwardSlash;
-#else
         public static readonly char NotSeparator = Path.DirectorySeparatorChar == BackwardSlash ? ForwardSlash : BackwardSlash;
         public static readonly char Separator = Path.DirectorySeparatorChar;
-#endif
 
         public static string NormalizeFilePathSeparators(string name)
         {

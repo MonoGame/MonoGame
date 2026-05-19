@@ -3,6 +3,10 @@
   <PropertyGroup>
     <DotnetCommand Condition="'$(DotnetCommand)' == ''">dotnet</DotnetCommand>
     <EnableMGCBItems Condition="'$(EnableMGCBItems)' == ''">true</EnableMGCBItems>
+    <!-- Allow users the ability to disble tool restoration if needed -->
+    <!-- If the user is using a custom $(MGCBCommand) , disable auto restore. -->
+    <AutoRestoreMGCBTool Condition="'$(AutoRestoreMGCBTool)' == '' And '$(MGCBCommand)' != ''">false</AutoRestoreMGCBTool>
+    <AutoRestoreMGCBTool Condition="'$(AutoRestoreMGCBTool)' == ''">true</AutoRestoreMGCBTool>
     <MGCBCommand Condition="'$(MGCBCommand)' == ''">mgcb</MGCBCommand>
   </PropertyGroup>
 

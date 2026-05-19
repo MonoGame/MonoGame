@@ -1,4 +1,4 @@
-// MonoGame - Copyright (C) The MonoGame Team
+// MonoGame - Copyright (C) MonoGame Foundation, Inc
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
@@ -6,11 +6,17 @@ using System.Runtime.InteropServices;
 
 namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 {
+    /// <summary>
+    /// Structure used to store float values sequentially
+    /// </summary>
     [StructLayout(LayoutKind.Sequential)]
     public struct ABCFloat
     {
+        /// <summary/>
         public float A;
+        /// <summary/>
         public float B;
+        /// <summary/>
         public float C;
     }
 
