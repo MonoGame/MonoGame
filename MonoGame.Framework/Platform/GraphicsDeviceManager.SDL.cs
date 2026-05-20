@@ -106,6 +106,9 @@ namespace Microsoft.Xna.Framework
                     Sdl.GL.SetAttribute(Sdl.GL.Attribute.MultiSampleBuffers, 1);
                     Sdl.GL.SetAttribute(Sdl.GL.Attribute.MultiSampleSamples, multiSampleCount);
                 }
+
+                // Make sure that the accessible value reflects any reduction in sample count.
+                presentationParameters.MultiSampleCount = multiSampleCount;
             }
             else
             {
