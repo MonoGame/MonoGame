@@ -16,6 +16,7 @@ namespace MonoGame.Effect.Compiler.Effect.Spirv
         public ReadOnlyCollection<SpirvVariable> Input { get; init; }
         public ReadOnlyCollection<SpirvVariable> Output { get; init; }
         public ReadOnlyCollection<SpirvSampledImage> SampledImages { get; init; }
+        public ReadOnlyCollection<SpirvLoad> ImageLoads { get; init; }
 
         internal class SpirvParseContext
         {
@@ -60,12 +61,14 @@ namespace MonoGame.Effect.Compiler.Effect.Spirv
                     else if (parts[2] == "OpLoad")
                     {
                         SpirvLoad load = SpirvLoad.ParseLoad(parts, context);
-                        if (load != null) context.Loads.Add(load.Id, load);
+                        if (load != null)
+                            context.Loads.Add(load.Id, load);
                     }
                     else if (parts[2] == "OpSampledImage")
                     {
                         SpirvSampledImage sampledImage = SpirvSampledImage.ParseSampledImage(parts, context);
-                        if (sampledImage != null) context.SampledImages.Add(sampledImage);
+                        if (sampledImage != null)
+                            context.SampledImages.Add(sampledImage);
                     }
                 }
                 else if (parts[0] == "OpName")
@@ -141,6 +144,13 @@ namespace MonoGame.Effect.Compiler.Effect.Spirv
                 }
             }
 
+            List<SpirvLoad> imageLoads = [];
+            foreach ((string id, SpirvLoad load) in context.Loads)
+            {
+                if (load.ResultType.Type == SpirvType.Image)
+                    imageLoads.Add(load);
+            }
+
             return new SpirvReflectionInfo
             {
                 EntryPoint = context.EntryPoint[3].Trim('\"'),
@@ -148,6 +158,7 @@ namespace MonoGame.Effect.Compiler.Effect.Spirv
                 Input = inputs.AsReadOnly(),
                 Output = outputs.AsReadOnly(),
                 SampledImages = context.SampledImages.AsReadOnly(),
+                ImageLoads = imageLoads.AsReadOnly()
             };
         }
     }

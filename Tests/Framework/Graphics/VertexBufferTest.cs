@@ -451,7 +451,7 @@ namespace MonoGame.Tests.Graphics
             Assert.That(ex.Message, Is.EqualTo("An error occurred while preparing to draw. "
                 + "This is probably because the current vertex declaration does not include all the elements "
                 + "required by the current vertex shader. The current vertex declaration includes these elements: "
-#if VULKAN
+#if VULKAN || DIRECTX12
                 + "POSITION0."));
 #else
                 + "NORMAL0, TEXCOORD0."));

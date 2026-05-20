@@ -5,6 +5,7 @@
 #include "directx12.h"
 
 #include "DeviceResources.h"
+#include "CommandContext.h"
 #include "GraphicsEnums.h"
 #include "Texture.h"
 
@@ -16,7 +17,7 @@ using namespace DX;
 using namespace Graphics;
 using namespace Microsoft::WRL;
 
-Texture::Texture(SurfaceType type, TextureDimension dimension, int width, int height, int mipLevels, MGSurfaceFormat format) {
+Texture::Texture(SurfaceType type, TextureDimension dimension, int width, int height, int depth, int mipLevels, MGSurfaceFormat format) {
     mipLevels = std::max(mipLevels, 1);
 
     impl = new InternalData();
@@ -42,10 +43,10 @@ Texture::Texture(SurfaceType type, TextureDimension dimension, int width, int he
 
     switch (dimension) {
     case TextureDimension::Texture2D:
-        impl->m_desc = CD3DX12_RESOURCE_DESC::Tex2D(TextureFormatToDXGI_FORMAT(format), width, height, 1, mipLevels, 1, 0, flags);
+        impl->m_desc = CD3DX12_RESOURCE_DESC::Tex2D(TextureFormatToDXGI_FORMAT(format), width, height, depth, mipLevels, 1, 0, flags);
         break;
     case TextureDimension::Texture3D:
-        // todo
+        impl->m_desc = CD3DX12_RESOURCE_DESC::Tex3D(TextureFormatToDXGI_FORMAT(format), width, height, depth, mipLevels, flags);
         break;
     case TextureDimension::TextureCube:
         impl->m_desc = CD3DX12_RESOURCE_DESC::Tex2D(TextureFormatToDXGI_FORMAT(format), width, height, 6, mipLevels, 1, 0, flags);
@@ -89,7 +90,7 @@ Texture::Texture(DeviceResources* device, IDXGISwapChain3* swapchain, int buffer
     rtvDesc.Format = impl->m_desc.Format;
     rtvDesc.ViewDimension = D3D12_RTV_DIMENSION_TEXTURE2D;
 
-    impl->m_rtvHandle = device->GetGraphicsHeaps()->CreateRTVHandle(impl->m_res.Get(), rtvDesc);
+    impl->m_rtvHandles.push_back(device->GetGraphicsHeaps()->CreateRTVHandle(impl->m_res.Get(), rtvDesc));
 }
 #endif
 
@@ -113,13 +114,15 @@ void Texture::Create(DeviceResources* device, bool createViews) {
         pClearValue = &optimizedClearValue;
 
     D3D12_HEAP_FLAGS heapFlags = D3D12_HEAP_FLAG_NONE;
+
     // In this context SurfaceType::SwapChainRenderTarget mean the displayable RT used on Gaming.Xbox rendering
     // Not a resource managed by IDXGISwapChain3 (Desktop only, cf Texture(DeviceResources*, IDXGISwapChain3*, int))
     if (impl->m_type == SurfaceType::SwapChainRenderTarget)
         heapFlags |= D3D12_HEAP_FLAG_ALLOW_DISPLAY;
 
     bool isMSAA = CheckMSAA(device->GetD3DDevice());
-    if (!isMSAA) impl->m_desc.SampleDesc.Count = 1;
+    if (!isMSAA)
+        impl->m_desc.SampleDesc.Count = 1;
 
     D3D12_RESOURCE_DESC resDesc = impl->m_desc;
     if (impl->m_allowUAV)
@@ -146,9 +149,12 @@ void Texture::Create(DeviceResources* device, bool createViews) {
         break;
     }
 
-    if (!createViews) return;
+    if (!createViews)
+        return;
 
-    if (impl->m_type != SurfaceType::SwapChainRenderTarget) { // We shouldn't bind a SRV for the display RT
+    if (impl->m_type != SurfaceType::SwapChainRenderTarget)
+    {
+        // We shouldn't bind a SRV for the display RT
         D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
         if (impl->m_depthFormat != MGDepthFormat::None)
             srvDesc.Format = DepthFormatToSRV[(int)impl->m_depthFormat];
@@ -164,6 +170,8 @@ void Texture::Create(DeviceResources* device, bool createViews) {
             break;
         case TextureDimension::Texture3D:
             srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE3D;
+            srvDesc.Texture3D.MostDetailedMip = 0;
+            srvDesc.Texture3D.MipLevels = impl->m_levels;
             break;
         case TextureDimension::TextureCube:
             srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURECUBE;
@@ -174,8 +182,10 @@ void Texture::Create(DeviceResources* device, bool createViews) {
         impl->m_srvHandle = device->GetGraphicsHeaps()->CreateSRVHandle(impl->m_res.Get(), srvDesc);
     }
 
-    if (impl->m_allowUAV) {
-        for (uint16_t mip = 0; mip < impl->m_levels; ++mip) {
+    if (impl->m_allowUAV)
+    {
+        for (uint16_t mip = 0; mip < impl->m_levels; ++mip)
+        {
             D3D12_UNORDERED_ACCESS_VIEW_DESC uavDesc = {};
             uavDesc.Format = GetFormat();
             uavDesc.ViewDimension = D3D12_UAV_DIMENSION_TEXTURE2D;
@@ -184,36 +194,102 @@ void Texture::Create(DeviceResources* device, bool createViews) {
         }
     }
 
-    if (impl->m_type != SurfaceType::Texture) { // This is a RT so we need a RTV or a DSV as well
-        if (impl->m_depthFormat != MGDepthFormat::None) {
-            D3D12_DEPTH_STENCIL_VIEW_DESC dsvDesc = {};
-            dsvDesc.Format = impl->m_desc.Format;
-            dsvDesc.ViewDimension = isMSAA ? D3D12_DSV_DIMENSION_TEXTURE2DMS: D3D12_DSV_DIMENSION_TEXTURE2D;
-            impl->m_dsvHandle = device->GetGraphicsHeaps()->CreateDSVHandle(impl->m_res.Get(), dsvDesc);
-        } else {
-            D3D12_RENDER_TARGET_VIEW_DESC rtvDesc = {};
-            rtvDesc.Format = impl->m_desc.Format;
-            rtvDesc.ViewDimension = isMSAA ? D3D12_RTV_DIMENSION_TEXTURE2DMS : D3D12_RTV_DIMENSION_TEXTURE2D;
-            impl->m_rtvHandle = device->GetGraphicsHeaps()->CreateRTVHandle(impl->m_res.Get(), rtvDesc);
+    // Nothing more to do for textures.
+    if (impl->m_type == SurfaceType::Texture)
+        return;
+
+    // If this has a depth format we're creating a depth buffer
+    // so setup the DSV handle only.
+    if (impl->m_depthFormat != MGDepthFormat::None)
+    {
+        D3D12_DEPTH_STENCIL_VIEW_DESC dsvDesc = {};
+        dsvDesc.Format = impl->m_desc.Format;
+        dsvDesc.ViewDimension = isMSAA ? D3D12_DSV_DIMENSION_TEXTURE2DMS: D3D12_DSV_DIMENSION_TEXTURE2D;
+        impl->m_dsvHandle = device->GetGraphicsHeaps()->CreateDSVHandle(impl->m_res.Get(), dsvDesc);
+        return;
+    }
+
+    // This is a render target, so make RTVs for each face of the target.
+    for (int i = 0; i < impl->m_desc.DepthOrArraySize; i++)
+    {
+        D3D12_RENDER_TARGET_VIEW_DESC rtvDesc = {};
+        rtvDesc.Format = impl->m_desc.Format;
+
+        switch (impl->m_dimension)
+        {
+        case TextureDimension::Texture2D:
+            if (isMSAA)
+            {
+                if (impl->m_desc.DepthOrArraySize == 1)
+                    rtvDesc.ViewDimension = D3D12_RTV_DIMENSION_TEXTURE2DMS;
+                else
+                {
+                    rtvDesc.ViewDimension = D3D12_RTV_DIMENSION_TEXTURE2DMSARRAY;
+                    rtvDesc.Texture2DMSArray.FirstArraySlice = i;
+                    rtvDesc.Texture2DMSArray.ArraySize = 1;
+                }
+            }
+            else
+            {
+                if (impl->m_desc.DepthOrArraySize == 1)
+                    rtvDesc.ViewDimension = D3D12_RTV_DIMENSION_TEXTURE2D;
+                else
+                {
+                    rtvDesc.ViewDimension = D3D12_RTV_DIMENSION_TEXTURE2DARRAY;
+                    rtvDesc.Texture2DArray.FirstArraySlice = i;
+                    rtvDesc.Texture2DArray.ArraySize = 1;
+                }
+            }
+            break;
+
+        case TextureDimension::Texture3D:
+            rtvDesc.ViewDimension = D3D12_RTV_DIMENSION_TEXTURE3D;
+            rtvDesc.Texture3D.FirstWSlice = i;
+            rtvDesc.Texture3D.WSize = 1;
+            break;
+
+        case TextureDimension::TextureCube:
+            if (isMSAA)
+            {
+                rtvDesc.ViewDimension = D3D12_RTV_DIMENSION_TEXTURE2DMSARRAY;
+                rtvDesc.Texture2DMSArray.ArraySize = 1;
+                rtvDesc.Texture2DMSArray.FirstArraySlice = i;
+            }
+            else
+            {
+                rtvDesc.ViewDimension = D3D12_RTV_DIMENSION_TEXTURE2DARRAY;
+                rtvDesc.Texture2DArray.ArraySize = 1;
+                rtvDesc.Texture2DArray.FirstArraySlice = i;
+            }
+            break;
         }
+        
+        D3D12_CPU_DESCRIPTOR_HANDLE handle = device->GetGraphicsHeaps()->CreateRTVHandle(impl->m_res.Get(), rtvDesc);
+        impl->m_rtvHandles.push_back(handle);
     }
 }
 
-void Texture::FreeDescriptors(DeviceResources* device) {
-    if (impl->m_srvHandle.ptr) device->GetGraphicsHeaps()->FreeSRVUAVHandle(impl->m_srvHandle);
+void Texture::FreeDescriptors(DeviceResources* device)
+{
+    if (impl->m_srvHandle.ptr)
+        device->GetGraphicsHeaps()->FreeSRVUAVHandle(impl->m_srvHandle);
     impl->m_srvHandle = {};
 
-    for (auto hdl : impl->m_uavHandles) device->GetGraphicsHeaps()->FreeSRVUAVHandle(hdl);
+    for (auto hdl : impl->m_uavHandles)
+        device->GetGraphicsHeaps()->FreeSRVUAVHandle(hdl);
     impl->m_uavHandles.clear();
 
-    if (impl->m_rtvHandle.ptr) device->GetGraphicsHeaps()->FreeRTVHandle(impl->m_rtvHandle);
-    impl->m_rtvHandle = {};
+    for (auto hdl : impl->m_rtvHandles)
+        device->GetGraphicsHeaps()->FreeRTVHandle(hdl);
+    impl->m_rtvHandles.clear();
 
-    if (impl->m_dsvHandle.ptr) device->GetGraphicsHeaps()->FreeDSVHandle(impl->m_dsvHandle);
+    if (impl->m_dsvHandle.ptr)
+        device->GetGraphicsHeaps()->FreeDSVHandle(impl->m_dsvHandle);
     impl->m_dsvHandle = {};
 }
 
-void Texture::SetClearColor(float r, float g, float b, float a) {
+void Texture::SetClearColor(float r, float g, float b, float a)
+{
     impl->m_clearColor[0] = r;
     impl->m_clearColor[1] = g;
     impl->m_clearColor[2] = b;
@@ -224,7 +300,8 @@ void Texture::SetMSAA(int sampleCount) {
     impl->m_desc.SampleDesc.Count = sampleCount;
 }
 
-void Texture::SetData(DeviceResources* device, uint32_t subResId, uint8_t* data, size_t size, size_t rowPitch) {
+void Texture::SetData(DeviceResources* device, uint32_t subResId, uint8_t* data, size_t size, size_t rowPitch)
+{
     ComPtr<ID3D12Resource> uploadBuffer;
     ComPtr<D3D12MA::Allocation> uploadAlloc;
     const UINT64 uploadSize = GetRequiredIntermediateSize(impl->m_res.Get(), subResId, 1);
@@ -248,7 +325,20 @@ void Texture::SetData(DeviceResources* device, uint32_t subResId, uint8_t* data,
         cmdList->ResourceBarrier(1, &copyDestBarrier);
     }
 
-    D3D12_SUBRESOURCE_DATA initData = { data, rowPitch, 0 };
+    size_t slicePitch = 0;
+    switch (impl->m_dimension)
+    {
+    case TextureDimension::Texture2D:
+        if (impl->m_desc.DepthOrArraySize > 1)
+            slicePitch = impl->m_desc.Height * rowPitch;
+        break;
+    case TextureDimension::Texture3D:
+        slicePitch = (impl->m_desc.Height / GetBlockSize()) * rowPitch;
+        break;
+    }
+
+    GetDepthOrArraySize();
+    D3D12_SUBRESOURCE_DATA initData = { data, rowPitch, slicePitch };
     UpdateSubresources(cmdList, impl->m_res.Get(), uploadBuffer.Get(), 0, subResId, 1, &initData);
 
     impl->m_currentState = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE | D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE;
@@ -260,25 +350,86 @@ void Texture::SetData(DeviceResources* device, uint32_t subResId, uint8_t* data,
     cmd->Close(true);
 }
 
-// Two intermediate textures are used in this version, this could probably be improved
-void Graphics::Texture::SetData(DeviceResources* device, uint32_t subResId, uint32_t x, uint32_t y, uint32_t w, uint32_t h, uint8_t* data, size_t size, size_t rowPitch) {
-    Texture* intermediateTexture = new Texture(SurfaceType::Texture, TextureDimension::Texture2D, w, h, 1, MGSurfaceFormat::Color);
-    intermediateTexture->Create(device, false);
-    intermediateTexture->SetData(device, 0, data, size, rowPitch);
+#ifdef _GAMING_XBOX
+#define TEXTURE_DATA_PITCH_ALIGNMENT D3D12XBOX_TEXTURE_DATA_PITCH_ALIGNMENT
+#else
+#define TEXTURE_DATA_PITCH_ALIGNMENT D3D12_TEXTURE_DATA_PITCH_ALIGNMENT
+#endif
+
+void Graphics::Texture::SetData(DeviceResources* device, uint32_t subResId, uint32_t x, uint32_t y, uint32_t z, uint32_t w, uint32_t h, uint32_t d, uint8_t* data, size_t size, size_t rowPitch)
+{
+    D3D12_RESOURCE_DESC copyDesc;
+    switch (impl->m_dimension)
+    {
+    default:
+    case TextureDimension::Texture2D:
+    case TextureDimension::TextureCube:
+        copyDesc = CD3DX12_RESOURCE_DESC::Tex2D(impl->m_desc.Format, w, h, d);
+        break;
+    case TextureDimension::Texture3D:
+        copyDesc = CD3DX12_RESOURCE_DESC::Tex3D(impl->m_desc.Format, w, h, d);
+        break;
+    }
+
+    UINT64 uploadBufferSize = 0;
+    UINT64 fpRowPitch = 0;
+    device->GetD3DDevice()->GetCopyableFootprints(
+        &copyDesc, 0, 1, 0, nullptr, nullptr, &fpRowPitch, &uploadBufferSize);
+    const UINT64 dstRowPitch = (fpRowPitch + (TEXTURE_DATA_PITCH_ALIGNMENT - 1)) & ~(UINT64)(TEXTURE_DATA_PITCH_ALIGNMENT - 1);
+
+    // Create the upload buffer.
+    Microsoft::WRL::ComPtr<ID3D12Resource> uploadBuffer;
+    Microsoft::WRL::ComPtr<D3D12MA::Allocation> uploadAlloc;
+    D3D12MA::ALLOCATION_DESC allocDesc = {
+        D3D12MA::ALLOCATION_FLAG_COMMITTED, D3D12_HEAP_TYPE_UPLOAD };
+    auto uploadBufferDesc = CD3DX12_RESOURCE_DESC::Buffer(uploadBufferSize);
+    device->GetAllocator()->CreateResource(
+        &allocDesc, &uploadBufferDesc,
+        D3D12_RESOURCE_STATE_GENERIC_READ, nullptr,
+        uploadAlloc.ReleaseAndGetAddressOf(),
+        IID_GRAPHICS_PPV_ARGS(uploadBuffer.ReleaseAndGetAddressOf()));
+
+    // Copy the data to the upload buffer.
+    {
+        void* pMapped = nullptr;
+        ThrowIfFailed(uploadBuffer->Map(0, nullptr, &pMapped));
+
+        size_t height = copyDesc.Height / GetBlockSize();
+        uint8_t* dst = reinterpret_cast<uint8_t*>(pMapped);
+        uint8_t* src = data;
+        for (size_t z = 0; z < copyDesc.DepthOrArraySize; z++)
+        {
+            for (size_t y = 0; y < height; y++)
+            {
+                memcpy(dst, src, fpRowPitch);
+                dst += dstRowPitch;
+                src += fpRowPitch;
+            }
+        }
+
+        uploadBuffer->Unmap(0, nullptr);
+    }
 
     auto cmd = device->BeginCommandList();
     auto cmdList = cmd->Get();
 
-    intermediateTexture->TransitionBatched(D3D12_RESOURCE_STATE_COPY_SOURCE);
     if (impl->m_currentState != D3D12_RESOURCE_STATE_COPY_DEST)
-        s_batchedBarriers.push_back(CD3DX12_RESOURCE_BARRIER::Transition(
-            impl->m_res.Get(), impl->m_currentState, D3D12_RESOURCE_STATE_COPY_DEST
-        ));
-    Texture::SendTransitionBatch(cmdList);
+    {
+        const auto barrier = CD3DX12_RESOURCE_BARRIER::Transition(
+            impl->m_res.Get(), impl->m_currentState, D3D12_RESOURCE_STATE_COPY_DEST);
+        cmdList->ResourceBarrier(1, &barrier);
+    }
 
-    const CD3DX12_TEXTURE_COPY_LOCATION src(intermediateTexture->impl->m_res.Get(), 0);
+    D3D12_PLACED_SUBRESOURCE_FOOTPRINT footprint = {};
+    footprint.Footprint.Width = static_cast<UINT>(copyDesc.Width);
+    footprint.Footprint.Height = copyDesc.Height;
+    footprint.Footprint.Depth = copyDesc.DepthOrArraySize;
+    footprint.Footprint.RowPitch = static_cast<UINT>(dstRowPitch);
+    footprint.Footprint.Format = copyDesc.Format;
+
+    const CD3DX12_TEXTURE_COPY_LOCATION src(uploadBuffer.Get(), footprint);
     const CD3DX12_TEXTURE_COPY_LOCATION dst(impl->m_res.Get(), subResId);
-    cmdList->CopyTextureRegion(&dst, x, y, 0, &src, nullptr);
+    cmdList->CopyTextureRegion(&dst, x, y, z, &src, nullptr);
 
     impl->m_currentState = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE | D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE;
     const D3D12_RESOURCE_BARRIER toShaderResBarrier = CD3DX12_RESOURCE_BARRIER::Transition(
@@ -287,8 +438,6 @@ void Graphics::Texture::SetData(DeviceResources* device, uint32_t subResId, uint
     cmdList->ResourceBarrier(1, &toShaderResBarrier);
 
     cmd->Close(true);
-
-    delete intermediateTexture;
 }
 
 #ifdef _GAMING_XBOX
@@ -297,8 +446,21 @@ void Graphics::Texture::SetData(DeviceResources* device, uint32_t subResId, uint
 #define TEXTURE_DATA_PITCH_ALIGNMENT D3D12_TEXTURE_DATA_PITCH_ALIGNMENT
 #endif
 
-void Graphics::Texture::GetData(DeviceResources* device, uint32_t subResId, uint32_t x, uint32_t y, uint32_t w, uint32_t h, uint8_t* data, size_t srcStride, size_t destStride) {
-    D3D12_RESOURCE_DESC copyDesc = CD3DX12_RESOURCE_DESC::Tex2D(impl->m_desc.Format, w, h);
+void Graphics::Texture::GetData(DeviceResources* device, uint32_t subResId, uint32_t x, uint32_t y, uint32_t z, uint32_t w, uint32_t h, uint32_t d, uint8_t* data, size_t dataSize)
+{
+    D3D12_RESOURCE_DESC copyDesc;
+    switch (impl->m_dimension)
+    {
+    default:
+    case TextureDimension::Texture2D:
+    case TextureDimension::TextureCube:
+        copyDesc = CD3DX12_RESOURCE_DESC::Tex2D(impl->m_desc.Format, w, h, d);
+        break;
+    case TextureDimension::Texture3D:
+        copyDesc = CD3DX12_RESOURCE_DESC::Tex3D(impl->m_desc.Format, w, h, d);
+        break;
+    }
+
     UINT64 readbackBufferSize = 0;
     UINT64 fpRowPitch = 0;
     device->GetD3DDevice()->GetCopyableFootprints(&copyDesc, 0, 1, 0, nullptr, nullptr, &fpRowPitch, &readbackBufferSize);
@@ -325,16 +487,16 @@ void Graphics::Texture::GetData(DeviceResources* device, uint32_t subResId, uint
     }
 
     D3D12_PLACED_SUBRESOURCE_FOOTPRINT bufferFootprint = {};
-    bufferFootprint.Footprint.Width = static_cast<UINT>(copyDesc.Width);
+    bufferFootprint.Footprint.Width = copyDesc.Width;
     bufferFootprint.Footprint.Height = copyDesc.Height;
-    bufferFootprint.Footprint.Depth = 1;
+    bufferFootprint.Footprint.Depth = copyDesc.DepthOrArraySize;
     bufferFootprint.Footprint.RowPitch = static_cast<UINT>(dstRowPitch);
     bufferFootprint.Footprint.Format = copyDesc.Format;
 
     const CD3DX12_TEXTURE_COPY_LOCATION copyDest(readbackBuffer.Get(), bufferFootprint);
     const CD3DX12_TEXTURE_COPY_LOCATION copySrc(impl->m_res.Get(), subResId);
 
-    D3D12_BOX sourceRegion { x, y, 0, x + w, y + h, 1 };
+    D3D12_BOX sourceRegion { x, y, z, x + w, y + h, z + d };
     cmdList->CopyTextureRegion(&copyDest, 0, 0, 0, &copySrc, &sourceRegion);
 
     const D3D12_RESOURCE_BARRIER revertBarrier = CD3DX12_RESOURCE_BARRIER::Transition(
@@ -350,18 +512,42 @@ void Graphics::Texture::GetData(DeviceResources* device, uint32_t subResId, uint
     void* pReadbackBufferData{};
     ThrowIfFailed(readbackBuffer->Map(0, &readbackBufferRange, &pReadbackBufferData));
 
-    uint8_t* current = data;
-    uint8_t* currentRead = reinterpret_cast<uint8_t*>(pReadbackBufferData);
-    for (size_t line = 0; line < copyDesc.Height; line++) {
-        if (srcStride == destStride)
-            memcpy(current, currentRead, destStride * w);
-        else {
-            for (auto i = 0; i < w; i++)
-                memcpy(current + (i * destStride), (void*)(currentRead + (i * srcStride)), destStride);
-        }
+    size_t height = copyDesc.Height;
+    switch (impl->m_desc.Format)
+    {
+    case DXGI_FORMAT_BC1_TYPELESS:
+    case DXGI_FORMAT_BC1_UNORM:
+    case DXGI_FORMAT_BC1_UNORM_SRGB:
+    case DXGI_FORMAT_BC2_TYPELESS:
+    case DXGI_FORMAT_BC2_UNORM:
+    case DXGI_FORMAT_BC2_UNORM_SRGB:
+    case DXGI_FORMAT_BC3_TYPELESS:
+    case DXGI_FORMAT_BC3_UNORM:
+    case DXGI_FORMAT_BC3_UNORM_SRGB:
+    case DXGI_FORMAT_BC4_TYPELESS:
+    case DXGI_FORMAT_BC4_UNORM:
+    case DXGI_FORMAT_BC4_SNORM:
+    case DXGI_FORMAT_BC5_TYPELESS:
+    case DXGI_FORMAT_BC5_UNORM:
+    case DXGI_FORMAT_BC5_SNORM:
+        height /= 4;
+        break;
+    }
 
-        currentRead += dstRowPitch;
-        current += destStride * w;
+    UINT cpuSlicePitch = h * fpRowPitch;
+    UINT gpuSlicePitch = h * dstRowPitch;
+
+    for (UINT z = 0; z < d; ++z)
+    {
+        auto srcData = (uint8_t*)(pReadbackBufferData) + (gpuSlicePitch * z);
+        auto dstData = data + (cpuSlicePitch * z);
+
+        for (UINT y = 0; y < height; ++y)
+        {
+            memcpy(dstData, srcData, fpRowPitch);
+            dstData += fpRowPitch;
+            srcData += dstRowPitch;
+        }
     }
 
     CD3DX12_RANGE writeRange(0, 0); // we didnt write anything

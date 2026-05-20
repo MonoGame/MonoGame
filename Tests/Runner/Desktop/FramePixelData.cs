@@ -31,8 +31,13 @@ namespace MonoGame.Tests
 				fixed (Color* ptr = &Data[0])
 				{
 					var writer = new ImageWriter();
-					writer.WriteBmp(ptr, Width, Height, StbImageWriteSharp.ColorComponents.RedGreenBlueAlpha, stream);
-				}
+                    if (filename.EndsWith(".png", StringComparison.OrdinalIgnoreCase))
+					    writer.WritePng(ptr, Width, Height, StbImageWriteSharp.ColorComponents.RedGreenBlueAlpha, stream);
+                    else if (filename.EndsWith(".bmp", StringComparison.OrdinalIgnoreCase))
+                        writer.WriteBmp(ptr, Width, Height, StbImageWriteSharp.ColorComponents.RedGreenBlueAlpha, stream);
+                    else
+                        throw new NotImplementedException();
+                }
 			}
 
             if (attachmentDescription != null)

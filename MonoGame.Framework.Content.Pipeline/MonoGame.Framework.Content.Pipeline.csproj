@@ -69,7 +69,7 @@
     <PackageReference Include="BCnEncoder.Net" Version="2.1.0" />
     <PackageReference Include="Microsoft.VisualBasic" Version="10.3.0" />
     <PackageReference Include="MonoGame.Library.FreeType" Version="2.13.2.3" />
-    <PackageReference Include="MonoGame.Library.MojoShader" Version="1.0.0.4" />
+    <PackageReference Include="MonoGame.Library.MojoShader" Version="1.0.0.5" />
     <PackageReference Include="MonoGame.Tool.Basisu" Version="2.0.2.1" />
     <PackageReference Include="MonoGame.Tool.Crunch" Version="1.0.4.7" />
     <PackageReference Include="MonoGame.Tool.Dxc" Version="1.8.2505.11" />
