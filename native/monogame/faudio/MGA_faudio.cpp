@@ -298,29 +298,29 @@ void MGA_Buffer_InitializeFormat(MGA_Buffer* buffer, mgbyte* waveHeader, mgbyte*
 			waveData,
 			0,
 			length,
-			wformat->wBitsPerSample,
-			wformat->nSamplesPerSec,
-			wformat->nChannels,
+			wformat.wBitsPerSample,
+			wformat.nSamplesPerSec,
+			wformat.nChannels,
 			loopStart,
 			loopLength);
 
 		return;
 	}
 
-	if (wformat->wFormatTag == FAUDIO_FORMAT_IEEE_FLOAT)
+	if (wformat.wFormatTag == FAUDIO_FORMAT_IEEE_FLOAT)
 	{
 		buffer->format = (FAudioWaveFormatEx*)malloc(sizeof(FAudioWaveFormatEx));
 		memset(buffer->format, 0, sizeof(FAudioWaveFormatEx));
 		buffer->format->wFormatTag = FAUDIO_FORMAT_IEEE_FLOAT;
-		buffer->format->nSamplesPerSec = wformat->nSamplesPerSec;
-		buffer->format->nChannels = wformat->nChannels;
-		buffer->format->nBlockAlign = wformat->nBlockAlign;
-		buffer->format->wBitsPerSample = wformat->wBitsPerSample;
+		buffer->format->nSamplesPerSec = wformat.nSamplesPerSec;
+		buffer->format->nChannels = wformat.nChannels;
+		buffer->format->nBlockAlign = wformat.nBlockAlign;
+		buffer->format->wBitsPerSample = wformat.wBitsPerSample;
 		buffer->format->nAvgBytesPerSec = buffer->format->nSamplesPerSec * buffer->format->nBlockAlign;
 		buffer->format->cbSize = 0;
 
 		// Buffer should be block aligned.
-		assert((length % wformat->nBlockAlign) == 0);
+		assert((length % wformat.nBlockAlign) == 0);
 
 		// Calculate duration
 		buffer->duration = (mgulong)((length * 1000) / buffer->format->nAvgBytesPerSec);
@@ -363,9 +363,9 @@ void MGA_Buffer_InitializeFormat(MGA_Buffer* buffer, mgbyte* waveHeader, mgbyte*
 		format->aCoef[5] = { 460, -208 };
 		format->aCoef[6] = { 392, -232 };
 
-		mgulong totalBlocks = length / wformat->nBlockAlign;
+		mgulong totalBlocks = length / wformat.nBlockAlign;
 		mgulong totalSamples = totalBlocks * format->wSamplesPerBlock;
-		buffer->duration = (mgulong)((totalSamples * 1000) / wformat->nSamplesPerSec);
+		buffer->duration = (mgulong)((totalSamples * 1000) / wformat.nSamplesPerSec);
 
 		// NOTE: XAudio only supports up to 512 as the samples per block.
 		// Larger values are not supported and the sound will be wrong.
@@ -394,7 +394,7 @@ void MGA_Buffer_InitializeFormat(MGA_Buffer* buffer, mgbyte* waveHeader, mgbyte*
 	}
 
 
-	if (wformat->wFormatTag == FAUDIO_FORMAT_WMAUDIO2)
+	if (wformat.wFormatTag == FAUDIO_FORMAT_WMAUDIO2)
 	{
 		// TODO: The API here needs to change to pass
 		// additional data for this format to work.
