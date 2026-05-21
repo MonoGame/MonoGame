@@ -5,7 +5,9 @@
 using System;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+#if DESKTOPGL
 using MonoGame.OpenGL;
+#endif
 using NUnit.Framework;
 
 namespace MonoGame.Tests.Graphics
@@ -359,7 +361,7 @@ namespace MonoGame.Tests.Graphics
             Assert.AreEqual(1, resetCount);
             Assert.AreEqual(1, resettingCount);
         }
-        
+
         [Test]
         [RunOnUI]
         public void NewDeviceDoesNotTriggerReset()
@@ -641,7 +643,7 @@ namespace MonoGame.Tests.Graphics
             gdm.GraphicsDevice.Reset(pp3);
             Assert.AreEqual
                 (maxMultiSampleCount, gdm.GraphicsDevice.PresentationParameters.MultiSampleCount);
-            
+
         }
 #endif
     }
