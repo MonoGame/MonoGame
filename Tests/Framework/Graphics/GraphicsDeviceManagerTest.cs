@@ -5,7 +5,9 @@
 using System;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+#if DESKTOPGL
 using MonoGame.OpenGL;
+#endif
 using NUnit.Framework;
 
 namespace MonoGame.Tests.Graphics
