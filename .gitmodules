@@ -31,3 +31,9 @@
 [submodule "native/monogame/external/faudio"]
 	path = native/monogame/external/faudio
 	url = https://github.com/FNA-XNA/FAudio.git
+[submodule "ThirdParty/StbTrueTypeSharp"]
+	path = ThirdParty/StbTrueTypeSharp
+	url = https://github.com/StbSharp/StbTrueTypeSharp.git
+[submodule "ThirdParty/StbRectPackSharp"]
+	path = ThirdParty/StbRectPackSharp
+	url = https://github.com/StbSharp/StbRectPackSharp.git
