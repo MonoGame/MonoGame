@@ -36,7 +36,9 @@
         backend doesn't use it to load or save textures.
   -->
   <ItemGroup>
-    <Compile Include="..\ThirdParty\StbImageSharp\src\**\*.cs" LinkBase="Utilities\StbImageSharp" />
+    <Compile Include="..\ThirdParty\StbImageSharp\src\**\*.cs" 
+             Exclude="..\ThirdParty\StbImageSharp\src\Hebron.Runtime\CRuntime.cs;..\ThirdParty\StbImageSharp\src\Hebron.Runtime\MemoryStats.cs"
+             LinkBase="Utilities\StbImageSharp" />
 	<Compile Include="..\ThirdParty\StbImageWriteSharp\src\**\*.cs" LinkBase="Utilities\StbImageWriteSharp" />
     <Compile Include="..\ThirdParty\StbTrueTypeSharp\src\**\*.cs" LinkBase="Utilities\StbTrueTypeSharp" />
     <Compile Include="..\ThirdParty\StbRectPackSharp\src\**\*.cs" LinkBase="Utilities\StbRectPackSharp" />
