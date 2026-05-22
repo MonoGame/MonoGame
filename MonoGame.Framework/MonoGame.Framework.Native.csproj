@@ -38,6 +38,8 @@
   <ItemGroup>
     <Compile Include="..\ThirdParty\StbImageSharp\src\**\*.cs" LinkBase="Utilities\StbImageSharp" />
 	<Compile Include="..\ThirdParty\StbImageWriteSharp\src\**\*.cs" LinkBase="Utilities\StbImageWriteSharp" />
+    <Compile Include="..\ThirdParty\StbTrueTypeSharp\src\**\*.cs" LinkBase="Utilities\StbTrueTypeSharp" />
+    <Compile Include="..\ThirdParty\StbRectPackSharp\src\**\*.cs" LinkBase="Utilities\StbRectPackSharp" />
   </ItemGroup>
 
   <ItemGroup>
