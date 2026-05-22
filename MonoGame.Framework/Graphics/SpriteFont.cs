@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
+using System.IO;
 using System.Text;
 
 namespace Microsoft.Xna.Framework.Graphics 
@@ -30,6 +31,8 @@ namespace Microsoft.Xna.Framework.Graphics
         private int _defaultGlyphIndex = -1;
 		
 		private readonly Texture2D _texture;
+        
+        // internal SpriteFontState State { get; }
 
 		/// <summary>
 		/// All the glyphs in this SpriteFont.
@@ -65,7 +68,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		public SpriteFont (
 			Texture2D texture, List<Rectangle> glyphBounds, List<Rectangle> cropping, List<char> characters,
 			int lineSpacing, float spacing, List<Vector3> kerning, char? defaultCharacter)
-		{
+        {
 			Characters = new ReadOnlyCollection<char>(characters.ToArray());
 			_texture = texture;
 			LineSpacing = lineSpacing;
@@ -170,6 +173,93 @@ namespace Microsoft.Xna.Framework.Graphics
 		/// the font.
 		/// </summary>
 		public float Spacing { get; set; }
+
+        /// <summary>
+        /// Creates a <see cref="SpriteFont"/> from a font file
+        /// </summary>
+        /// <param name="graphicsDevice">The graphics device used to create the font texture.</param>
+        /// <param name="path">The path to a TrueType or OpenType font file.</param>
+        /// <param name="size">The font size, in pixels, used when rasterizing glyphs.</param>
+        /// <param name="characterRegions">The character ranges to include in the created font.</param>
+        /// <returns>A <see cref="SpriteFont"/> created from the supplied font file.</returns>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown when <paramref name="graphicsDevice"/>, <paramref name="path"/>, or 
+        /// <paramref name="characterRegions"/> is <see langword="null"/>.
+        /// </exception>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// Thrown when <paramref name="size"/> is zero or negative.
+        /// </exception>
+        /// <exception cref="ArgumentException">
+        /// Thrown when <paramref name="characterRegions"/> does not contain any characters.
+        /// </exception>
+        /// <exception cref="InvalidOperationException">
+        /// Thrown when the font data cannot be parsed or no glyphs can be created.
+        /// </exception>
+        public static SpriteFont FromFile(GraphicsDevice graphicsDevice, string path, int size, IEnumerable<CharacterRegion> characterRegions)
+        {
+            if (path == null)
+            {
+                throw new ArgumentNullException(nameof(path), $"{nameof(path)} must not be null.");
+            }
+
+            using(Stream stream = File.OpenRead(path))
+            {
+                return FromStream(graphicsDevice, stream, size, characterRegions);
+            }
+        }
+
+        /// <summary>
+        /// Creates a <see cref="SpriteFont"/> from a font stream.
+        /// </summary>
+        /// <param name="graphicsDevice">The graphics device used to create the font texture.</param>
+        /// <param name="stream">The stream containing TrueType or OpenType font data.</param>
+        /// <param name="size">The font size, in pixels, used when rasterizing glyphs.</param>
+        /// <param name="characterRegions">The character ranges to include in the created font.</param>
+        /// <returns>A <see cref="SpriteFont"/> created from the supplied font file.</returns>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown when <paramref name="graphicsDevice"/>, <paramref name="stream"/>, or 
+        /// <paramref name="characterRegions"/> is <see langword="null"/>.
+        /// </exception>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// Thrown when <paramref name="size"/> is zero or negative.
+        /// </exception>
+        /// <exception cref="ArgumentException">
+        /// Thrown when <paramref name="characterRegions"/> does not contain any characters.
+        /// </exception>
+        /// <exception cref="InvalidOperationException">
+        /// Thrown when the font data cannot be parsed or no glyphs can be created.
+        /// </exception>
+        public static SpriteFont FromStream(GraphicsDevice graphicsDevice, Stream stream, int size, IEnumerable<CharacterRegion> characterRegions)
+        {
+            if (graphicsDevice == null)
+            {
+                throw new ArgumentNullException(nameof(graphicsDevice), $"{nameof(graphicsDevice)} must not be null.");
+            }
+
+            if (stream == null)
+            {
+                throw new ArgumentNullException(nameof(stream), $"{nameof(stream)} must not be null.");
+            }
+
+            if (size <= 0)
+            {
+                throw new ArgumentOutOfRangeException(nameof(size), $"{nameof(size)} must be greater than zero.");
+            }
+
+            if(characterRegions == null)
+            {
+                throw new ArgumentNullException(nameof(characterRegions), $"{nameof(characterRegions)} must not be null.");
+            }
+
+            byte[] fontData;
+            using(MemoryStream memoryStream = new MemoryStream())
+            {
+                stream.CopyTo(memoryStream);
+                fontData =memoryStream.ToArray();
+            }
+
+            return SpriteFontBaker.Bake(graphicsDevice, fontData, size,characterRegions);
+        }
 
 		/// <summary>
 		/// Returns the size of a string when rendered in this font.
