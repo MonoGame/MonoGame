@@ -25,7 +25,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		}
 
         private readonly Glyph[] _glyphs;
-        private readonly CharacterRegion[] _regions;
+        private readonly CharacterMapRegion[] _regions;
         private char? _defaultCharacter;
         private int _defaultGlyphIndex = -1;
 		
@@ -72,7 +72,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			Spacing = spacing;
 
             _glyphs = new Glyph[characters.Count];
-            var regions = new Stack<CharacterRegion>();
+            var regions = new Stack<CharacterMapRegion>();
 
 			for (var i = 0; i < characters.Count; i++) 
             {
@@ -92,7 +92,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 if(regions.Count == 0 || characters[i] > (regions.Peek().End+1))
                 {
                     // Start a new region
-                    regions.Push(new CharacterRegion(characters[i], i));
+                    regions.Push(new CharacterMapRegion(characters[i], i));
                 } 
                 else if(characters[i] == (regions.Peek().End+1))
                 {
@@ -264,7 +264,7 @@ namespace Microsoft.Xna.Framework.Graphics
         
         internal unsafe bool TryGetGlyphIndex(char c, out int index)
         {
-            fixed (CharacterRegion* pRegions = _regions)
+            fixed (CharacterMapRegion* pRegions = _regions)
             {
                 if(!TryGetRegionIdx(c, pRegions, out int regionIdx))
                 {
@@ -284,7 +284,7 @@ namespace Microsoft.Xna.Framework.Graphics
             return true;
         }
 
-        private unsafe bool TryGetRegionIdx(char c, CharacterRegion* pRegions, out int regionIdx)
+        private unsafe bool TryGetRegionIdx(char c, CharacterMapRegion* pRegions, out int regionIdx)
         {
             // Get region Index 
             regionIdx = -1;
@@ -411,13 +411,13 @@ namespace Microsoft.Xna.Framework.Graphics
 			}
 		}
 
-        private struct CharacterRegion
+        private struct CharacterMapRegion
         {
             public char Start;
             public char End;
             public int StartIndex;
 
-            public CharacterRegion(char start, int startIndex)
+            public CharacterMapRegion(char start, int startIndex)
             {
                 this.Start = start;                
                 this.End = start;
