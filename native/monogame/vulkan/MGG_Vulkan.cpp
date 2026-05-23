@@ -1342,7 +1342,7 @@ MGG_GraphicsDevice* MGG_GraphicsDevice_Create(MGG_GraphicsSystem* system, MGG_Gr
 		vkGetPhysicalDeviceFeatures2(device->physicalDevice, &supportedFeatures2);
 		
 		extensions.push_back(VK_EXT_CUSTOM_BORDER_COLOR_EXTENSION_NAME);
-		customBorderColorFeatures.customBorderColors             = supportedCbc.customBorderColors;
+		customBorderColorFeatures.customBorderColors = supportedCbc.customBorderColors;
 		customBorderColorFeatures.customBorderColorWithoutFormat = supportedCbc.customBorderColorWithoutFormat;
 		customBorderColorFeatures.pNext = lastFeature;
 		lastFeature = &customBorderColorFeatures;
