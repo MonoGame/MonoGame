@@ -19,6 +19,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="MonoGame.Library.FreeType" Version="2.13.2.3" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Compile Remove="bin\**\*" />
     <Compile Remove="obj\**\*" />
     <Compile Remove="Platform\**\*" />
@@ -72,11 +76,11 @@
     <Compile Include="Platform\Utilities\FuncLoader.Android.cs" />
     <Compile Include="Platform\Utilities\InteropHelpers.cs" />
     <Compile Include="Platform\Utilities\ReflectionHelpers.Default.cs" />
+    <Compile Include="Platform\FreeType\FreeType.cs" />
+    <Compile Include="Platform\FreeType\FreeTypeHelper.cs" />    
 
     <Compile Include="..\ThirdParty\StbImageSharp\src\**\*.cs" LinkBase="Utilities\StbImageSharp" />
     <Compile Include="..\ThirdParty\StbImageWriteSharp\src\**\*.cs" LinkBase="Utilities\StbImageWriteSharp" />
-    <Compile Include="..\ThirdParty\StbTrueTypeSharp\src\**\*.cs" LinkBase="Utilities\StbTrueTypeSharp" />
-    <Compile Include="..\ThirdParty\StbRectPackSharp\src\**\*.cs" LinkBase="Utilities\StbRectPackSharp" />
   </ItemGroup>
 
   <ItemGroup>

@@ -20,6 +20,10 @@
     <None Include="..\README-packages.md" Pack="true" PackagePath="\"/>
   </ItemGroup>
 
+  <ItemGroup>
+    <PackageReference Include="MonoGame.Library.FreeType" Version="2.13.2.3" />
+  </ItemGroup>  
+
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <CreatePackage>false</CreatePackage>
   </PropertyGroup>
@@ -76,11 +80,11 @@
     <Compile Include="Platform\Utilities\FuncLoader.iOS.cs" />
     <Compile Include="Platform\Utilities\InteropHelpers.cs" />
     <Compile Include="Platform\Utilities\ReflectionHelpers.Default.cs" />
+    <Compile Include="Platform\FreeType\FreeType.cs" />
+    <Compile Include="Platform\FreeType\FreeTypeHelper.cs" />    
 
     <Compile Include="..\ThirdParty\StbImageSharp\src\**\*.cs" LinkBase="Utilities\StbImageSharp" />
     <Compile Include="..\ThirdParty\StbImageWriteSharp\src\**\*.cs" LinkBase="Utilities\StbImageWriteSharp" />
-    <Compile Include="..\ThirdParty\StbTrueTypeSharp\src\**\*.cs" LinkBase="Utilities\StbTrueTypeSharp" />
-    <Compile Include="..\ThirdParty\StbRectPackSharp\src\**\*.cs" LinkBase="Utilities\StbRectPackSharp" />
   </ItemGroup>
 
   <ItemGroup>

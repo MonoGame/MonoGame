@@ -16,6 +16,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="MonoGame.Library.FreeType" Version="2.13.2.3" />
+  </ItemGroup>    
+
+  <ItemGroup>
     <Compile Remove="bin\**\*" />
     <Compile Remove="obj\**\*" />
     <Compile Remove="Platform\**\*" />
@@ -38,8 +42,6 @@
   <ItemGroup>
     <Compile Include="..\ThirdParty\StbImageSharp\src\**\*.cs" LinkBase="Utilities\StbImageSharp" />
 	<Compile Include="..\ThirdParty\StbImageWriteSharp\src\**\*.cs" LinkBase="Utilities\StbImageWriteSharp" />
-    <Compile Include="..\ThirdParty\StbTrueTypeSharp\src\**\*.cs" LinkBase="Utilities\StbTrueTypeSharp" />
-    <Compile Include="..\ThirdParty\StbRectPackSharp\src\**\*.cs" LinkBase="Utilities\StbRectPackSharp" />
   </ItemGroup>
 
   <ItemGroup>
@@ -48,6 +50,8 @@
     <Compile Include="Platform\Threading.cs" />
     <Compile Include="Platform\Desktop\Devices\Sensors\Accelerometer.cs" />
     <Compile Include="Platform\Desktop\Devices\Sensors\Compass.cs" />
+    <Compile Include="Platform\FreeType\FreeType.cs" />
+    <Compile Include="Platform\FreeType\FreeTypeHelper.cs" />    
   </ItemGroup>
 
   <ItemGroup>

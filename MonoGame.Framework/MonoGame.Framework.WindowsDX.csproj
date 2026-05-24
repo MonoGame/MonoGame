@@ -58,12 +58,12 @@
     <Compile Include="Platform\Windows\WinFormsGameWindow.cs" />
     <Compile Include="Platform\Desktop\Devices\Sensors\Accelerometer.cs" />
     <Compile Include="Platform\Desktop\Devices\Sensors\Compass.cs" />
+    <Compile Include="Platform\FreeType\FreeType.cs" />
+    <Compile Include="Platform\FreeType\FreeTypeHelper.cs" />    
   </ItemGroup>
 
   <ItemGroup>
     <Compile Include="..\ThirdParty\StbImageSharp\src\**\*.cs" LinkBase="Utilities\StbImageSharp" />
-    <Compile Include="..\ThirdParty\StbTrueTypeSharp\src\**\*.cs" LinkBase="Utilities\StbTrueTypeSharp" />
-    <Compile Include="..\ThirdParty\StbRectPackSharp\src\**\*.cs" LinkBase="Utilities\StbRectPackSharp" />
   </ItemGroup>
 
   <ItemGroup>
@@ -80,6 +80,7 @@
     <PackageReference Version="4.0.1" Include="SharpDX.XInput" />
     <PackageReference Include="System.Net.Http" Version="4.3.4" />
     <PackageReference Include="System.Security.Cryptography.X509Certificates" Version="4.3.2" />
+    <PackageReference Include="MonoGame.Library.FreeType" Version="2.13.2.3" />
   </ItemGroup>
 
   <Import Project="Platform\DirectX.targets" />
