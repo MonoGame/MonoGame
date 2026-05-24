@@ -18,6 +18,15 @@ namespace Microsoft.Xna.Framework
             Sdl.GL.SetAttribute(Sdl.GL.Attribute.GreenSize, surfaceFormat.G);
             Sdl.GL.SetAttribute(Sdl.GL.Attribute.BlueSize, surfaceFormat.B);
             Sdl.GL.SetAttribute(Sdl.GL.Attribute.AlphaSize, surfaceFormat.A);
+            
+            SurfaceFormat backBufferFormat = _game.graphicsDeviceManager.PreferredBackBufferFormat;
+
+            if (backBufferFormat == SurfaceFormat.ColorSRgb
+                || backBufferFormat == SurfaceFormat.Bgr32SRgb
+                || backBufferFormat == SurfaceFormat.Bgra32SRgb)
+            {
+                Sdl.GL.SetAttribute(Sdl.GL.Attribute.FramebufferSRGBCapable, 1);
+            }
 
             switch (depthStencilFormat)
             {

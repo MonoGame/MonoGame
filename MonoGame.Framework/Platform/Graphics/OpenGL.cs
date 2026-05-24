@@ -184,6 +184,7 @@ namespace MonoGame.OpenGL
         SampleCoverage = 0x80A0,
         DebugOutputSynchronous = 0x8242,
         DebugOutput = 0x92E0,
+        FramebufferSrgb = 0x8DB9,
     }
 
     internal enum VertexPointerType
