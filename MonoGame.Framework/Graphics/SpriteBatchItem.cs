@@ -3,6 +3,7 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System;
+using System.Numerics;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
@@ -10,12 +11,12 @@ namespace Microsoft.Xna.Framework.Graphics
 	{
 		public Texture2D Texture;
         public float SortKey;
-    // Internal shader variant index (0 = default sprite, 1 = distance field)
-    public int ShaderVariant;
+        // Internal shader variant index (0 = default sprite, 1 = distance field)
+        public int ShaderVariant = 0;
         // Distance field parameters (valid when ShaderVariant==1)
-        public float DFSpread;
-        public float DFOutlineThickness;
-        public Vector4 DFOutlineColor;
+        public float DFSpread = 0;
+        public float DFOutlineThickness = 0;
+        public Vector4 DFOutlineColor = Vector4.Zero;
 
         public VertexPositionColorTexture vertexTL;
 		public VertexPositionColorTexture vertexTR;
