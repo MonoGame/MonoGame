@@ -148,13 +148,16 @@ namespace Microsoft.Xna.Framework.Graphics
         /// overflow the 16 bit array indices for vertices.
         /// </summary>
         /// <param name="sortMode">The type of depth sorting desired for the rendering.</param>
-        /// <param name="customEffect">Optional custom effect passed by user via SpriteBatch.Begin. If non-null it overrides variant selection.</param>
+        /// <param name="customEffect">Optional custom effect passed by user via SpriteBatch.Begin.</param>
         /// <param name="defaultSpriteEffect">The standard SpriteEffect used for non-distance-field glyphs.</param>
         /// <param name="distanceFieldEffect">The distance field sprite effect used when a SpriteFont has distance field metadata.</param>
 		public unsafe void DrawBatch(SpriteSortMode sortMode, Effect customEffect, Effect defaultSpriteEffect, Effect distanceFieldEffect)
 		{
             if (customEffect != null && customEffect.IsDisposed)
                 throw new ObjectDisposedException("effect");
+
+            if (distanceFieldEffect != null && distanceFieldEffect.IsDisposed)
+                throw new ObjectDisposedException("distanceFieldEffect");
 
 			// nothing to do
             if (_batchItemCount == 0)
@@ -195,11 +198,28 @@ namespace Microsoft.Xna.Framework.Graphics
                 if (numBatchesToProcess > MaxBatchSize)
                     numBatchesToProcess = MaxBatchSize;
 
-                Effect GetEffectForVariant(int variant)
+                Effect GetEffectForVariant(int shaderVariant)
                 {
-                    if (customEffect != null)
-                        return customEffect;
-                    return variant == 1 ? distanceFieldEffect : defaultSpriteEffect;
+                    if (shaderVariant == 0 || shaderVariant == 1)
+                    {
+                        if (shaderVariant == 1)
+                        {
+                            if (distanceFieldEffect != null)
+                            {
+                                return distanceFieldEffect;
+                            }
+                            else
+                            {
+                                throw new NotSupportedException($"shaderVariant == 1 but distanceFieldEffect is null, is not supported");
+                            }
+                        }
+
+                        return (customEffect != null) ? customEffect : defaultSpriteEffect;
+                    }
+                    else
+                    {
+                        throw new NotSupportedException($"Unknown shaderVariant");
+                    }
                 }
 
                 fixed (VertexPositionColorTexture* vertexArrayFixedPtr = _vertexArray)
@@ -266,10 +286,10 @@ namespace Microsoft.Xna.Framework.Graphics
         /// <param name="end">End index of vertices to draw. Not used except to compute the count of vertices to draw.</param>
         /// <param name="effect">The custom effect to apply to the geometry</param>
         /// <param name="texture">The texture to draw.</param>
-    /// <param name="shaderVariant">0 for normal sprites/glyphs, 1 for distance field glyphs.</param>
-    /// <param name="dfSpread">Distance field spread (in texels) used to normalize smoothing width.</param>
-    /// <param name="dfOutlineThickness">Outline thickness in normalised distance units (0 = no outline).</param>
-    /// <param name="dfOutlineColor">Outline colour as a Vector4 (RGBA).</param>
+        /// <param name="shaderVariant">0 for normal sprites/glyphs, 1 for distance field glyphs.</param>
+        /// <param name="dfSpread">Distance field spread (in texels) used to normalize smoothing width.</param>
+        /// <param name="dfOutlineThickness">Outline thickness in normalised distance units (0 = no outline).</param>
+        /// <param name="dfOutlineColor">Outline colour as a Vector4 (RGBA).</param>
         private void FlushVertexArray(int start, int end, Effect effect, Texture texture, int shaderVariant, float dfSpread, float dfOutlineThickness, Vector4 dfOutlineColor)
         {
             if (start == end)
@@ -280,14 +300,22 @@ namespace Microsoft.Xna.Framework.Graphics
             // If the effect is not null, then apply each pass and render the geometry
             if (effect != null)
             {
-                if (effect is DistanceFieldSpriteEffect dfs && shaderVariant == 1)
+                if (shaderVariant == 1)
                 {
-                    dfs.ApplyDistanceFieldSettings(dfSpread);
-                    if (dfOutlineThickness > 0f)
-                        dfs.SetOutline(dfOutlineThickness, dfOutlineColor);
-                    else
-                        dfs.ClearOutline();
+                    if (effect is DistanceFieldSpriteEffect dfs)
+                    {
+                        dfs.ApplyDistanceFieldSettings(dfSpread);
+                        if (dfOutlineThickness > 0f)
+                            dfs.SetOutline(dfOutlineThickness, dfOutlineColor);
+                        else
+                            dfs.ClearOutline();
+                    }
+                    if (effect is not DistanceFieldSpriteEffect)
+                    {
+                        throw new NotSupportedException($"shaderVariant == 1 is not compatible with non distance field effects.");
+                    }
                 }
+
                 var passes = effect.CurrentTechnique.Passes;
                 foreach (var pass in passes)
                 {
@@ -306,6 +334,10 @@ namespace Microsoft.Xna.Framework.Graphics
             }
             else
             {
+                if (shaderVariant == 1)
+                {
+                    throw new NotSupportedException($"shaderVariant == 1 and no effect set.");
+                }
                 _device.DrawUserIndexedPrimitives(
                     PrimitiveType.TriangleList,
                     _vertexArray,
