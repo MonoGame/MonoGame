@@ -1336,9 +1336,14 @@ MGG_GraphicsDevice* MGG_GraphicsDevice_Create(MGG_GraphicsSystem* system, MGG_Gr
 	VkPhysicalDeviceCustomBorderColorFeaturesEXT customBorderColorFeatures = { VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_CUSTOM_BORDER_COLOR_FEATURES_EXT };
 	if (device->customBorderColorSupported)
 	{
+		VkPhysicalDeviceCustomBorderColorFeaturesEXT supportedCbc = { VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_CUSTOM_BORDER_COLOR_FEATURES_EXT };
+		VkPhysicalDeviceFeatures2 supportedFeatures2 = { VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2 };
+		supportedFeatures2.pNext = &supportedCbc;
+		vkGetPhysicalDeviceFeatures2(device->physicalDevice, &supportedFeatures2);
+		
 		extensions.push_back(VK_EXT_CUSTOM_BORDER_COLOR_EXTENSION_NAME);
-		customBorderColorFeatures.customBorderColors = VK_TRUE;
-		customBorderColorFeatures.customBorderColorWithoutFormat = VK_TRUE;
+		customBorderColorFeatures.customBorderColors = supportedCbc.customBorderColors;
+		customBorderColorFeatures.customBorderColorWithoutFormat = supportedCbc.customBorderColorWithoutFormat;
 		customBorderColorFeatures.pNext = lastFeature;
 		lastFeature = &customBorderColorFeatures;
 	}
@@ -2657,6 +2662,13 @@ void MGVK_GetTransition(	VkImageLayout oldLayout,
 		dstAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
 		sourceStage |= VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT;
 		destinationStage |= VK_PIPELINE_STAGE_TRANSFER_BIT;
+	}
+	else if (oldLayout == VK_IMAGE_LAYOUT_UNDEFINED && newLayout == VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL)
+	{
+		srcAccessMask = 0;
+		dstAccessMask = VK_ACCESS_SHADER_READ_BIT;
+		sourceStage |= VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT;
+		destinationStage |= VK_PIPELINE_STAGE_VERTEX_SHADER_BIT | VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT;
 	}
 	else if (oldLayout == VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL && newLayout == VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL)
 	{
