@@ -162,16 +162,16 @@ namespace Microsoft.Xna.Framework.Graphics
 			// nothing to do
             if (_batchItemCount == 0)
 				return;
-			
-			// sort the batch items
-			switch ( sortMode )
-			{
-			case SpriteSortMode.Texture :                
-			case SpriteSortMode.FrontToBack :
-			case SpriteSortMode.BackToFront :
-                Array.Sort(_batchItemList, 0, _batchItemCount);
-				break;
-			}
+
+            // sort the batch items
+            switch (sortMode)
+            {
+                case SpriteSortMode.Texture:
+                case SpriteSortMode.FrontToBack:
+                case SpriteSortMode.BackToFront:
+                    Array.Sort(_batchItemList, 0, _batchItemCount);
+                    break;
+            }
 
             // Determine how many iterations through the drawing code we need to make
             int batchIndex = 0;
