@@ -410,6 +410,27 @@ namespace Microsoft.Xna.Framework.Graphics
             return true;
         }
 
+        // The TryGetGlyphIndex() above works by using a case-flip fallback for the existing SpriteFont that is loaded
+        // through the content pipeline as an xnb.
+        // For Runtime lazy glyph resolution, we need an exact lookup so it can tell if a glyph is actually missing
+        // or not.
+        // - Chris (AristurtleDev)
+        internal unsafe bool TryGetGlyphIndexExact(char c, out int index)
+        {
+            fixed(CharacterMapRegion* pRegions = _regions)
+            {
+                int regionIndex;
+                if (!TryGetRegionIdx(c, pRegions, out regionIndex))
+                {
+                    index = -1;
+                    return false;
+                }
+
+                index = pRegions[regionIndex].StartIndex + (c - pRegions[regionIndex].Start);
+                return true;
+            }
+        }
+
         private unsafe bool TryGetRegionIdx(char c, CharacterMapRegion* pRegions, out int regionIdx)
         {
             // Get region Index 

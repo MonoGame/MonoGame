@@ -170,7 +170,7 @@ public sealed partial class SpriteFont
             }
 
             int glyphIndex;
-            if(!TryGetGlyphIndex(character, out glyphIndex))
+            if(!TryGetGlyphIndexExact(character, out _))
             {
                 missingCharacters.Add(character);
             }            
