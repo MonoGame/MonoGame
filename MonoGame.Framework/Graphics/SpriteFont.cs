@@ -15,7 +15,7 @@ namespace Microsoft.Xna.Framework.Graphics
     /// <summary>
     /// Represents a font texture.
     /// </summary>
-	public sealed class SpriteFont 
+	public sealed partial class SpriteFont 
     {
 		internal static class Errors 
         {
@@ -249,14 +249,11 @@ namespace Microsoft.Xna.Framework.Graphics
                 throw new ArgumentNullException(nameof(characterRegions), $"{nameof(characterRegions)} must not be null.");
             }
 
-            byte[] fontData;
-            using (MemoryStream memoryStream = new MemoryStream())
-            {
-                stream.CopyTo(memoryStream);
-                fontData = memoryStream.ToArray();
-            }
-
-            return SpriteFontBaker.Bake(graphicsDevice, fontData, size, characterRegions);
+#if NATIVE
+            return PlatformFromStream(graphicsDevice, stream, size, characterRegions);
+#else
+            throw new PlatformNotSupportedException("Runtime SpriteFont baking is currently implemented only for MonoGame.Framework.Native.");
+#endif
         }
 
 		/// <summary>
