@@ -139,7 +139,6 @@ namespace Microsoft.Xna.Framework
                 GraphicsDeviceManager.DefaultBackBufferWidth,
                 GraphicsDeviceManager.DefaultBackBufferHeight,
                 Sdl.Window.State.Hidden |
-                Sdl.Window.State.OpenGL |
                 Sdl.Window.State.FullscreenDesktop
             );
 
