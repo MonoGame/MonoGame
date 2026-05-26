@@ -21,6 +21,8 @@ namespace MonoGame.Tests {
 			}
 
 			[SetUp]
+			[RunOnUI]
+			[NonParallelizable]
 			public virtual void SetUp ()
 			{
 				Paths.SetStandardWorkingDirectory();
@@ -28,6 +30,8 @@ namespace MonoGame.Tests {
 			}
 
 			[TearDown]
+			[RunOnUI]
+			[NonParallelizable]
 			public virtual void TearDown ()
 			{
 				_game.Dispose ();
