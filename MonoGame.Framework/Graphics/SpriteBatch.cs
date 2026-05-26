@@ -100,6 +100,7 @@ namespace Microsoft.Xna.Framework.Graphics
             _rasterizerState = rasterizerState ?? RasterizerState.CullCounterClockwise;
             _effect = effect;
             _spriteEffect.TransformMatrix = transformMatrix;
+            _distanceFieldEffect.TransformMatrix = transformMatrix;
 
             // Setup things now so a user can change them.
             if (sortMode == SpriteSortMode.Immediate)
@@ -192,6 +193,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
             var item = _batcher.CreateBatchItem();
             item.Texture = texture;
+            item.ShaderVariant = 0;
 
             // set SortKey based on SpriteSortMode.
             switch ( _sortMode )
@@ -324,6 +326,7 @@ namespace Microsoft.Xna.Framework.Graphics
             
             var item = _batcher.CreateBatchItem();
             item.Texture = texture;
+            item.ShaderVariant = 0;
 
             // set SortKey based on SpriteSortMode.
             switch ( _sortMode )
@@ -429,6 +432,12 @@ namespace Microsoft.Xna.Framework.Graphics
                 item.DFOutlineThickness = spriteFont._outlineThickness;
                 item.DFOutlineColor = spriteFont._outlineColor;
             }
+            else
+            {
+                item.DFSpread = 0;
+                item.DFOutlineThickness = 0;
+                item.DFOutlineColor = Vector4.Zero;
+            }
         }
 
         /// <summary>
@@ -462,7 +471,7 @@ namespace Microsoft.Xna.Framework.Graphics
             }
             else
             {
-                size = new Vector2(texture.width, texture.height);
+                size = new Vector2(texture.Width, texture.Height);
                 _texCoordTL = Vector2.Zero;
                 _texCoordBR = Vector2.One;
             }
@@ -491,7 +500,8 @@ namespace Microsoft.Xna.Framework.Graphics
             CheckValid(texture);
             
 			var item = _batcher.CreateBatchItem();
-			item.Texture = texture;
+            item.Texture = texture;
+            item.ShaderVariant = 0;
             
             // set SortKey based on SpriteSortMode.
             item.SortKey = _sortMode == SpriteSortMode.Texture ? texture.SortingKey : 0;
@@ -533,7 +543,8 @@ namespace Microsoft.Xna.Framework.Graphics
 			CheckValid(texture);
             
 			var item = _batcher.CreateBatchItem();
-			item.Texture = texture;
+            item.Texture = texture;
+            item.ShaderVariant = 0;
             
             // set SortKey based on SpriteSortMode.
             item.SortKey = _sortMode == SpriteSortMode.Texture ? texture.SortingKey : 0;
@@ -562,6 +573,7 @@ namespace Microsoft.Xna.Framework.Graphics
             
             var item = _batcher.CreateBatchItem();
             item.Texture = texture;
+            item.ShaderVariant = 0;
             
             // set SortKey based on SpriteSortMode.
             item.SortKey = _sortMode == SpriteSortMode.Texture ? texture.SortingKey : 0;
@@ -1464,6 +1476,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
                     var item = _batcher.CreateBatchItem();
                     item.Texture = spriteFont.Texture;
+                    ConfigureDistanceFieldItem(item, spriteFont);
                     item.SortKey = sortKey;
 
                     _texCoordTL.X = pCurrentGlyph->BoundsInTexture.X * spriteFont.Texture.TexelWidth;
