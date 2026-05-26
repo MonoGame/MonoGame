@@ -25,12 +25,13 @@ namespace Microsoft.Xna.Framework.Graphics
 				"Character cannot be resolved by this SpriteFont.";
 		}
 
-        private readonly Glyph[] _glyphs;
-        private readonly CharacterMapRegion[] _regions;
+        private Glyph[] _glyphs;
+        private CharacterMapRegion[] _regions;
+        private readonly SpriteFontRuntimeState _runtimeState;
         private char? _defaultCharacter;
         private int _defaultGlyphIndex = -1;
 		
-		private readonly Texture2D _texture;
+		private Texture2D _texture;
 
 		/// <summary>
 		/// All the glyphs in this SpriteFont.
@@ -113,6 +114,20 @@ namespace Microsoft.Xna.Framework.Graphics
 
 			DefaultCharacter = defaultCharacter;
 		}
+
+        internal SpriteFont(Texture2D texture,
+                            List<Rectangle> glyphBounds,
+                            List<Rectangle> cropping,
+                            List<char> characters,
+                            int lineSpacing,
+                            float spacing,
+                            List<Vector3> kerning,
+                            char? defaultCharacter,
+                            SpriteFontRuntimeState runtimeState)
+                            :this(texture, glyphBounds, cropping, characters, lineSpacing, spacing, kerning, defaultCharacter)
+        {
+            _runtimeState = runtimeState;
+        }
 
         /// <summary>
         /// Gets the texture that this SpriteFont draws from.
@@ -256,6 +271,30 @@ namespace Microsoft.Xna.Framework.Graphics
 #endif
         }
 
+        internal void EnsureGlyphs(string text)
+        {
+            CharacterSource source = new CharacterSource(text);
+            EnsureGlyphs(ref source);
+        }
+
+        internal void EnsureGlyphs(StringBuilder text)
+        {
+            CharacterSource source = new CharacterSource(text);
+            EnsureGlyphs(ref source);
+        }
+
+        internal void EnsureGlyphs(ref CharacterSource text)
+        {
+            if(_runtimeState == null || text.Length == 0)
+            {
+                return;
+            }
+
+#if NATIVE
+            PlatformEnsureGlyphs(ref text);
+#endif
+        }
+
 		/// <summary>
 		/// Returns the size of a string when rendered in this font.
 		/// </summary>
@@ -287,6 +326,8 @@ namespace Microsoft.Xna.Framework.Graphics
 
 		internal unsafe void MeasureString(ref CharacterSource text, out Vector2 size)
 		{
+            EnsureGlyphs(ref text);
+
 			if (text.Length == 0)
             {
 				size = Vector2.Zero;
@@ -415,6 +456,23 @@ namespace Microsoft.Xna.Framework.Graphics
             else
                 return glyphIdx;
         }
+
+        private void SetRuntimeGlyphData(SpriteFont spriteFont)
+        {
+            Texture2D oldTexture = _texture;
+
+            _glyphs = spriteFont._glyphs;
+            _regions = spriteFont._regions;
+            _texture = spriteFont._texture;
+            Characters = spriteFont.Characters;
+            LineSpacing = spriteFont.LineSpacing;
+            DefaultCharacter = _defaultCharacter;
+
+            if(oldTexture != null && oldTexture != _texture)
+            {
+                oldTexture.Dispose();
+            }
+        }
         
         internal struct CharacterSource 
         {
@@ -507,6 +565,30 @@ namespace Microsoft.Xna.Framework.Graphics
                 this.Start = start;                
                 this.End = start;
                 this.StartIndex = startIndex;
+            }
+        }
+
+        internal sealed class SpriteFontRuntimeState
+        {
+            public readonly byte[] FontData;
+            public readonly int Size;
+            public CharacterRegion[] CharacterRegions;
+
+            public SpriteFontRuntimeState(byte[] fontData, int size, CharacterRegion[] characterRegions)
+            {
+                if(fontData == null)
+                {
+                    throw new ArgumentNullException(nameof(fontData), $"{nameof(fontData)} must not be null.");
+                }
+
+                if(characterRegions == null)
+                {
+                    throw new ArgumentNullException(nameof(characterRegions), $"{nameof(characterRegions)} must not be null.");
+                }
+
+                FontData = fontData;
+                Size = size;
+                CharacterRegions = characterRegions;
             }
         }
 	}
