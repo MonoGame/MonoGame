@@ -34,7 +34,7 @@ END_CONSTANTS
 // Distance-field uniforms live outside the constant buffer so they resolve
 // to ps constants in GLSL (no cbuffer support in the OGL/SM3 path).
 float  Spread           = 8.0;   // half-range in texels
-float  OutlineThickness = 0.0;   // outline depth in normalised dist units
+float  OutlineThickness = 0.0;   // outline depth in SDF texel units
 float4 OutlineColor     = float4(0, 0, 0, 1);
 
 
@@ -69,22 +69,19 @@ float4 SpritePixelShader(VSOutput input) : SV_Target0
     // ------------------------------------------------------------------
     float dist = t.r;
 
-    // Convert to a signed value centred on 0 (positive = inside glyph).
-    float d = dist - 0.5;
+    // Convert to signed distance in SDF texel units (positive = inside glyph).
+    float d = (dist - 0.5) * max(Spread, 0.0001);
 
-    // Derivative-based AA: smoothstep spans ~1 screen pixel at any scale.
-    float w = clamp(fwidth(dist) * 0.5, 0.0001, 0.45);
+    // Derivative-based AA in the same distance domain as d.
+    float w = clamp(fwidth(d), 0.0001, 1.5);
 
     // Fill alpha: 1 inside glyph, feathered over ~1px at the edge.
     float fillAlpha = smoothstep(-w, w, d);
 
-    // Optional outline ring: band of OutlineThickness just outside the fill.
-    float outlineAlpha = 0.0;
-    if (OutlineThickness > 0.0)
-    {
-        float outD = d + OutlineThickness;
-        outlineAlpha = smoothstep(-w, w, outD) * (1.0 - fillAlpha);
-    }
+    // Branchless optional outline ring: band of OutlineThickness outside fill.
+    float outlineMask  = step(0.0001, OutlineThickness);
+    float outD         = d + max(OutlineThickness, 0.0);
+    float outlineAlpha = smoothstep(-w, w, outD) * (1.0 - fillAlpha) * outlineMask;
 
     // Composite fill (input.color) over outline (OutlineColor).
     float totalAlpha = fillAlpha + outlineAlpha * OutlineColor.a;
@@ -92,7 +89,7 @@ float4 SpritePixelShader(VSOutput input) : SV_Target0
     float3 rgb       = lerp(OutlineColor.rgb, input.color.rgb, blend);
     float  a         = saturate(totalAlpha) * input.color.a;
 
-    // Premultiplied alpha output to match SpriteBatch NonPremultiplied=false.
+    // Premultiplied alpha output to match SpriteBatch.
     return float4(rgb * a, a);
 }
 
