@@ -193,6 +193,9 @@ namespace Microsoft.Xna.Framework.Graphics
                 float currentVariantDFSpread = 0f;
                 float currentVariantDFOutlineThickness = 0f;
                 Vector4 currentVariantDFOutlineColor = Vector4.Zero;
+                int currentVariantDFSpreadKey = 0;
+                int currentVariantDFOutlineThicknessKey = 0;
+                uint currentVariantDFOutlineColorKey = 0;
 
                 int numBatchesToProcess = batchCount;
                 if (numBatchesToProcess > MaxBatchSize)
@@ -236,13 +239,16 @@ namespace Microsoft.Xna.Framework.Graphics
                             currentVariantDFSpread = item.DFSpread;
                             currentVariantDFOutlineThickness = item.DFOutlineThickness;
                             currentVariantDFOutlineColor = item.DFOutlineColor;
+                            currentVariantDFSpreadKey = item.DFSpreadKey;
+                            currentVariantDFOutlineThicknessKey = item.DFOutlineThicknessKey;
+                            currentVariantDFOutlineColorKey = item.DFOutlineColorKey;
                             _device.Textures[0] = tex;
                         }
                         else
                         {
                             groupMismatch = !ReferenceEquals(item.Texture, tex) || item.ShaderVariant != currentVariant ||
-                                (item.ShaderVariant == 1 && (item.DFSpread != currentVariantDFSpread ||
-                                    item.DFOutlineThickness != currentVariantDFOutlineThickness || item.DFOutlineColor != currentVariantDFOutlineColor));
+                                (item.ShaderVariant == 1 && (item.DFSpreadKey != currentVariantDFSpreadKey ||
+                                    item.DFOutlineThicknessKey != currentVariantDFOutlineThicknessKey || item.DFOutlineColorKey != currentVariantDFOutlineColorKey));
                         }
 
                         if (groupMismatch)
@@ -256,6 +262,9 @@ namespace Microsoft.Xna.Framework.Graphics
                             currentVariantDFSpread = item.DFSpread;
                             currentVariantDFOutlineThickness = item.DFOutlineThickness;
                             currentVariantDFOutlineColor = item.DFOutlineColor;
+                            currentVariantDFSpreadKey = item.DFSpreadKey;
+                            currentVariantDFOutlineThicknessKey = item.DFOutlineThicknessKey;
+                            currentVariantDFOutlineColorKey = item.DFOutlineColorKey;
                             _device.Textures[0] = tex;
                         }
 
