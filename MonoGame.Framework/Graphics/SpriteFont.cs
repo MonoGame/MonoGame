@@ -214,13 +214,8 @@ namespace Microsoft.Xna.Framework.Graphics
         /// <value>The additional spacing between glyphs.</value>
         public float Spacing
         {
-            get
-            {
-                if (_distanceFieldType != DistanceFieldType.None && _outlineThickness > 0f)
-                    return _spacingBase + _outlineThickness * _distanceFieldSpread * 2f;
-
-                return _spacingBase;
-            }
+            // Spacing is part of font layout metrics and must not vary with SDF visual effects.
+            get => _spacingBase;
             set => _spacingBase = value;
         }
 
