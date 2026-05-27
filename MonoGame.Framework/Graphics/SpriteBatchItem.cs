@@ -17,6 +17,10 @@ namespace Microsoft.Xna.Framework.Graphics
         public float DFSpread = 0;
         public float DFOutlineThickness = 0;
         public Vector4 DFOutlineColor = Vector4.Zero;
+        // Quantized grouping keys for deterministic distance-field batching.
+        public int DFSpreadKey = 0;
+        public int DFOutlineThicknessKey = 0;
+        public uint DFOutlineColorKey = 0;
 
         public VertexPositionColorTexture vertexTL;
 		public VertexPositionColorTexture vertexTR;
