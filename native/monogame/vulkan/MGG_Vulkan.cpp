@@ -2663,6 +2663,13 @@ void MGVK_GetTransition(	VkImageLayout oldLayout,
 		sourceStage |= VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT;
 		destinationStage |= VK_PIPELINE_STAGE_TRANSFER_BIT;
 	}
+	else if (oldLayout == VK_IMAGE_LAYOUT_UNDEFINED && newLayout == VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL)
+	{
+		srcAccessMask = 0;
+		dstAccessMask = VK_ACCESS_SHADER_READ_BIT;
+		sourceStage |= VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT;
+		destinationStage |= VK_PIPELINE_STAGE_VERTEX_SHADER_BIT | VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT;
+	}
 	else if (oldLayout == VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL && newLayout == VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL)
 	{
 		srcAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
@@ -5149,17 +5156,25 @@ MGG_InputLayout* MGG_InputLayout_Create(
 	{
 		bindings[i].binding = i;
 		bindings[i].stride = strides[i];
-		bindings[i].inputRate = VK_VERTEX_INPUT_RATE_VERTEX; // Support instance rates.
+		bindings[i].inputRate = VK_VERTEX_INPUT_RATE_VERTEX;
 	}
 
 	layout->attributeCount = elementCount;
 	auto attrs = layout->attributes = new VkVertexInputAttributeDescription[elementCount];
 	for (int i = 0; i < elementCount; i++)
 	{
+		const auto element = elements[i];
+
 		attrs[i].location = i;
-		attrs[i].binding = elements[i].VertexBufferSlot;
-		attrs[i].format = ToVkFormat(elements[i].Format);
-		attrs[i].offset = elements[i].AlignedByteOffset;
+		attrs[i].binding = element.VertexBufferSlot;
+		attrs[i].format = ToVkFormat(element.Format);
+		attrs[i].offset = element.AlignedByteOffset;
+
+		if (element.InstanceDataStepRate > 0)
+		{
+			// Override input rate for instanced elements.
+			bindings[element.VertexBufferSlot].inputRate = VK_VERTEX_INPUT_RATE_INSTANCE;
+		}
 	}
 
 	return layout;
