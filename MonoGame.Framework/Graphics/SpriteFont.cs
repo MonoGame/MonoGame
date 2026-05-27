@@ -591,6 +591,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
         internal sealed unsafe class SpriteFontRuntimeState
         {
+#if NATIVE
             public readonly MonoGame.Interop.MGF_RuntimeFont* Handle;
 
             public SpriteFontRuntimeState(MonoGame.Interop.MGF_RuntimeFont* handle)
@@ -610,6 +611,7 @@ namespace Microsoft.Xna.Framework.Graphics
                     MonoGame.Interop.MGF.RuntimeFont_Destroy(Handle);
                 }
             }
+#endif
         }
 	}
 }
