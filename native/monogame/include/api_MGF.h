@@ -6,6 +6,8 @@
 
 #include "api_common.h"
 
+struct MGF_RuntimeFont;
+
 struct MGF_CharacterRegion
 {
     mgchar Start;
@@ -37,6 +39,29 @@ MG_EXPORT mgbool MGF_BakeSpriteFont(
     mgbyte*& atlasRgba,
     mgint& atlasWidth,
     mgint& atlasHeight,
+    MGF_Glyph*& glyphs,
+    mgint& glyphCount,
+    mgint& lineSpacing
+);
+
+MG_EXPORT MGF_RuntimeFont* MGF_RuntimeFont_Create(
+    mgbyte* data,
+    mgint dataBytes,
+    mgint size
+);
+
+MG_EXPORT void MGF_RuntimeFont_Destroy(
+    MGF_RuntimeFont* runtimeFont
+);
+
+MG_EXPORT mgbool MGF_RuntimeFont_EnsureGlyphs(
+    MGF_RuntimeFont* runtimeFont,
+    MGF_CharacterRegion* characterRegions,
+    mgint characterRegionCount,
+    mgbyte*& atlasRgba,
+    mgint& atlasWidth,
+    mgint& atlasHeight,
+    mgbool& atlasRebuilt,
     MGF_Glyph*& glyphs,
     mgint& glyphCount,
     mgint& lineSpacing

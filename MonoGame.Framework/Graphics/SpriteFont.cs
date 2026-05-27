@@ -589,27 +589,26 @@ namespace Microsoft.Xna.Framework.Graphics
             }
         }
 
-        internal sealed class SpriteFontRuntimeState
+        internal sealed unsafe class SpriteFontRuntimeState
         {
-            public readonly byte[] FontData;
-            public readonly int Size;
-            public CharacterRegion[] CharacterRegions;
+            public readonly MonoGame.Interop.MGF_RuntimeFont* Handle;
 
-            public SpriteFontRuntimeState(byte[] fontData, int size, CharacterRegion[] characterRegions)
+            public SpriteFontRuntimeState(MonoGame.Interop.MGF_RuntimeFont* handle)
             {
-                if(fontData == null)
+                if(handle == null)
                 {
-                    throw new ArgumentNullException(nameof(fontData), $"{nameof(fontData)} must not be null.");
+                    throw new ArgumentNullException(nameof(handle), $"{nameof(handle)} must not be null.");
                 }
 
-                if(characterRegions == null)
-                {
-                    throw new ArgumentNullException(nameof(characterRegions), $"{nameof(characterRegions)} must not be null.");
-                }
+                Handle = handle;
+            }
 
-                FontData = fontData;
-                Size = size;
-                CharacterRegions = characterRegions;
+            ~SpriteFontRuntimeState()
+            {
+                if (Handle != null)
+                {
+                    MonoGame.Interop.MGF.RuntimeFont_Destroy(Handle);
+                }
             }
         }
 	}

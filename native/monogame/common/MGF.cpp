@@ -4,10 +4,50 @@
 
 #include "api_MGF.h"
 #include "mg_common.h"
+
+#include <algorithm>
 #include <cmath>
+#include <cstring>
+#include <unordered_map>
+#include <utility>
+#include <vector>
+
+#define STB_RECT_PACK_IMPLEMENTATION
+#include "stb_rect_pack.h"
 
 #define STB_TRUETYPE_IMPLEMENTATION
 #include "stb_truetype.h"
+
+struct GlyphBuildInfo
+{
+    mgchar Character;
+    mgint Width;
+    mgint Height;
+    mgint BitmapTop;
+    mgint AtlasX;
+    mgint AtlasY;
+    mgfloat LeftSideBearing;
+    mgfloat WidthValue;
+    mgfloat RightSideBearing;
+    std::vector<mgbyte> Pixels;
+};
+
+struct MGF_RuntimeFont
+{
+    std::vector<mgbyte> FontData;
+    stbtt_fontinfo Font;
+    float Scale;
+    mgint AscentPixels;
+    mgint LineSpacing;
+    mgint AtlasWidth;
+    mgint AtlasHeight;
+    stbrp_context PackContext;
+    std::vector<stbrp_node> PackNodes;
+    std::vector<GlyphBuildInfo> Glyphs;
+    std::vector<MGF_Glyph> GlyphResults;
+    std::unordered_map<mgchar, size_t> GlyphLookup;
+    std::vector<mgbyte> Atlas;
+};
 
 namespace
 {
@@ -15,25 +55,12 @@ namespace
     constexpr mgint MinimumAtlasSize = 256;
     constexpr mgint MaximumAtlasSize = 4096;
 
-    struct GlyphBuildInfo
-    {
-        mgchar Character;
-        mgint Width;
-        mgint Height;
-        mgint BitmapTop;
-        mgint AtlasX;
-        mgint AtlasY;
-        mgfloat LeftSideBearing;
-        mgfloat WidthValue;
-        mgfloat RightSideBearing;
-        std::vector<mgbyte> Pixels;
-    };
-
     mgint next_power_of_two(mgint value)
     {
         mgint result = 1;
         while (result < value)
             result <<= 1;
+
         return result;
     }
 
@@ -55,59 +82,70 @@ namespace
         return characters;
     }
 
+    mgbool build_glyph(const stbtt_fontinfo& font, float scale, mgchar character, GlyphBuildInfo& glyph)
+    {
+        if (stbtt_FindGlyphIndex(&font, character) == 0)
+            return false;
+
+        int advanceWidth;
+        int leftSideBearing;
+        int x0;
+        int y0;
+        int x1;
+        int y1;
+
+        stbtt_GetCodepointHMetrics(&font, character, &advanceWidth, &leftSideBearing);
+        stbtt_GetCodepointBitmapBox(&font, character, scale, scale, &x0, &y0, &x1, &y1);
+
+        const mgint width = x1 - x0;
+        const mgint height = y1 - y0;
+        const mgint bitmapTop = -y0;
+        const mgfloat advancePixels = advanceWidth * scale;
+
+        glyph = {};
+        glyph.Character = character;
+        glyph.Width = width;
+        glyph.Height = height;
+        glyph.BitmapTop = bitmapTop;
+
+        if (width > 0 && height > 0)
+        {
+            glyph.Pixels.resize(static_cast<size_t>(width) * static_cast<size_t>(height));
+            stbtt_MakeCodepointBitmap(&font, glyph.Pixels.data(), width, height, width, scale, scale, character);
+        }
+
+        if (width > 0)
+        {
+            glyph.LeftSideBearing = static_cast<mgfloat>(x0);
+            glyph.WidthValue = static_cast<mgfloat>(width);
+            glyph.RightSideBearing = advancePixels - (static_cast<mgfloat>(x0) + static_cast<mgfloat>(width));
+        }
+        else
+        {
+            glyph.LeftSideBearing = 0.0f;
+            glyph.WidthValue = 0.0f;
+            glyph.RightSideBearing = advancePixels;
+        }
+
+        return true;
+    }
+
     std::vector<GlyphBuildInfo> build_glyphs(const stbtt_fontinfo& font,
                                              float scale,
-                                             const std::vector<mgchar>& characters)
+                                             const std::vector<mgchar>& characters,
+                                             const std::unordered_map<mgchar, size_t>& glyphLookup)
     {
         std::vector<GlyphBuildInfo> glyphs;
         glyphs.reserve(characters.size());
 
         for (mgchar character : characters)
         {
-            if (stbtt_FindGlyphIndex(&font, character) == 0)
+            if (glyphLookup.find(character) != glyphLookup.end())
                 continue;
 
-            int advanceWidth;
-            int leftSideBearing;
-            int x0;
-            int y0;
-            int x1;
-            int y1;
-
-            stbtt_GetCodepointHMetrics(&font, character, &advanceWidth, &leftSideBearing);
-            stbtt_GetCodepointBitmapBox(&font, character, scale, scale, &x0, &y0, &x1, &y1);
-
-            const mgint width = x1 - x0;
-            const mgint height = y1 - y0;
-            const mgint bitmapTop = -y0;
-            const mgfloat advancePixels = advanceWidth * scale;
-
             GlyphBuildInfo glyph = {};
-            glyph.Character = character;
-            glyph.Width = width;
-            glyph.Height = height;
-            glyph.BitmapTop = bitmapTop;
-
-            if (width > 0 && height > 0)
-            {
-                glyph.Pixels.resize(static_cast<size_t>(width) * static_cast<size_t>(height));
-                stbtt_MakeCodepointBitmap(&font, glyph.Pixels.data(), width, height, width, scale, scale, character);
-            }
-
-            if (width > 0)
-            {
-                glyph.LeftSideBearing = static_cast<mgfloat>(x0);
-                glyph.WidthValue = static_cast<mgfloat>(width);
-                glyph.RightSideBearing = advancePixels - (static_cast<mgfloat>(x0) + static_cast<mgfloat>(width));
-            }
-            else
-            {
-                glyph.LeftSideBearing = 0.0f;
-                glyph.WidthValue = 0.0f;
-                glyph.RightSideBearing = advancePixels;
-            }
-
-            glyphs.push_back(std::move(glyph));
+            if (build_glyph(font, scale, character, glyph))
+                glyphs.push_back(std::move(glyph));
         }
 
         return glyphs;
@@ -134,91 +172,306 @@ namespace
         return next_power_of_two(estimated);
     }
 
-    mgbool try_pack_glyphs(std::vector<GlyphBuildInfo>& glyphs,
-                           mgint atlasWidth,
-                           mgint atlasHeight)
+    void initialize_pakcer(MGF_RuntimeFont& runtimeFont)
     {
-        std::vector<size_t> packOrder;
-        packOrder.reserve(glyphs.size());
+        runtimeFont.PackNodes.resize(static_cast<size_t>(runtimeFont.AtlasWidth));
+        stbrp_init_target(&runtimeFont.PackContext,
+                          runtimeFont.AtlasWidth,
+                          runtimeFont.AtlasHeight,
+                          runtimeFont.PackNodes.data(),
+                          runtimeFont.AtlasWidth);
+    }
+
+    mgbool pack_glyphs(stbrp_context* packContext, std::vector<GlyphBuildInfo>& glyphs)
+    {
+        std::vector<stbrp_rect> rects;
+        std::vector<size_t> glyphIndices;
+        rects.reserve(glyphs.size());
+        glyphIndices.reserve(glyphs.size());
 
         for (size_t i = 0; i < glyphs.size(); ++i)
         {
-            if (glyphs[i].Width > 0 && glyphs[i].Height > 0)
-                packOrder.push_back(i);
-        }
-
-        std::sort(packOrder.begin(), packOrder.end(), [&glyphs](size_t left, size_t right)
-        {
-                      const auto& leftGlyph = glyphs[left];
-                      const auto& rightGlyph = glyphs[right];
-
-                      if (leftGlyph.Height != rightGlyph.Height)
-                          return rightGlyph.Height < leftGlyph.Height;
-
-                      return rightGlyph.Width < leftGlyph.Width; 
-        });
-
-        mgint x = 0;
-        mgint y = 0;
-        mgint rowHeight = 0;
-
-        for (size_t glyphIndex : packOrder)
-        {
-            auto& glyph = glyphs[glyphIndex];
-            const mgint packedWidth = glyph.Width + Padding;
-            const mgint packedHeight = glyph.Height + Padding;
-
-            if (packedWidth > atlasWidth || packedHeight > atlasHeight)
-                return false;
-
-            if (x + packedWidth > atlasWidth)
+            auto& glyph = glyphs[i];
+            if (glyph.Width <= 0 || glyph.Height <= 0)
             {
-                x = 0;
-                y += rowHeight;
-                rowHeight = 0;
+                glyph.AtlasX = 0;
+                glyph.AtlasY = 0;
+                continue;
             }
 
-            if (y + packedHeight > atlasHeight)
+            stbrp_rect rect = {};
+            rect.id = static_cast<int>(i);
+            rect.w = static_cast<stbrp_coord>(glyph.Width + Padding);
+            rect.h = static_cast<stbrp_coord>(glyph.Height + Padding);
+            rects.push_back(rect);
+            glyphIndices.push_back(i);
+        }
+
+        if (rects.empty())
+            return true;
+
+        stbrp_pack_rects(packContext, rects.data(), static_cast<int>(rects.size()));
+
+        for (size_t rectIndex = 0; rectIndex < rects.size(); ++rectIndex)
+        {
+            const auto& rect = rects[rectIndex];
+            if(rect.was_packed == 0)
                 return false;
 
-            glyph.AtlasX = x;
-            glyph.AtlasY = y;
-
-            x += packedWidth;
-            rowHeight = std::max(rowHeight, packedHeight);
+            auto& glyph = glyphs[glyphIndices[rectIndex]];
+            glyph.AtlasX = rect.x;
+            glyph.AtlasY = rect.y;
         }
 
         return true;
     }
 
-    std::vector<mgbyte> rasterize_glyphs_to_rgba(const std::vector<GlyphBuildInfo>& glyphs,
-                                                 mgint atlasWidth,
-                                                 mgint atlasHeight)
+    void rasterize_glyph(std::vector<mgbyte>& atlas,
+                         mgint atlasWidth,
+                         const GlyphBuildInfo& glyph)
     {
-        std::vector<mgbyte> atlas(static_cast<size_t>(atlasWidth) * static_cast<size_t>(atlasHeight) * 4, 0);
+        if (glyph.Width == 0 || glyph.Height == 0 || glyph.Pixels.empty())
+            return;
 
-        for (const auto& glyph : glyphs)
+        for (mgint row = 0; row < glyph.Height; ++row)
         {
-            if (glyph.Width == 0 || glyph.Height == 0 || glyph.Pixels.empty())
-                continue;
-
-            for (mgint row = 0; row < glyph.Height; ++row)
+            for (mgint column = 0; column < glyph.Width; ++column)
             {
-                for (mgint column = 0; column < glyph.Width; ++column)
-                {
-                    const auto alpha = glyph.Pixels[static_cast<size_t>(row) * glyph.Width + column];
-                    const auto atlasIndex = static_cast<size_t>(((glyph.AtlasY + row) * atlasWidth) + glyph.AtlasX + column) * 4;
+                const auto alpha = glyph.Pixels[static_cast<size_t>(row) * glyph.Width + column];
+                const auto atlasIndex = static_cast<size_t>(((glyph.AtlasY + row) * atlasWidth) + glyph.AtlasX + column) * 4;
 
-                    atlas[atlasIndex + 0] = alpha;
-                    atlas[atlasIndex + 1] = alpha;
-                    atlas[atlasIndex + 2] = alpha;
-                    atlas[atlasIndex + 3] = alpha;
-                }
+                atlas[atlasIndex + 0] = alpha;
+                atlas[atlasIndex + 1] = alpha;
+                atlas[atlasIndex + 2] = alpha;
+                atlas[atlasIndex + 3] = alpha;
+            }
+        }
+    }
+
+    void rebuild_lookup(MGF_RuntimeFont& runtimeFont)
+    {
+        runtimeFont.GlyphLookup.clear();
+
+        for (size_t i = 0; i < runtimeFont.Glyphs.size(); ++i)
+            runtimeFont.GlyphLookup[runtimeFont.Glyphs[i].Character] = i;
+    }
+
+    void update_glyph_results(MGF_RuntimeFont& runtimeFont)
+    {
+        std::sort(runtimeFont.Glyphs.begin(), runtimeFont.Glyphs.end(), [](const GlyphBuildInfo& left, const GlyphBuildInfo& right)
+        {
+            return left.Character < right.Character;
+        });
+
+        rebuild_lookup(runtimeFont);
+
+        runtimeFont.GlyphResults.resize(runtimeFont.Glyphs.size());
+        for (size_t i = 0; i < runtimeFont.Glyphs.size(); ++i)
+        {
+            const auto& glyph = runtimeFont.Glyphs[i];
+            auto& result = runtimeFont.GlyphResults[i];
+
+            result.Character = glyph.Character;
+            result.BoundsX = glyph.AtlasX;
+            result.BoundsY = glyph.AtlasY;
+            result.BoundsWidth = glyph.Width;
+            result.BoundsHeight = glyph.Height;
+            result.CroppingX = 0;
+            result.CroppingY = runtimeFont.AscentPixels - glyph.BitmapTop;
+            result.CroppingWidth = glyph.Width;
+            result.CroppingHeight = runtimeFont.LineSpacing;
+            result.LeftSideBearing = glyph.LeftSideBearing;
+            result.Width = glyph.WidthValue;
+            result.RightSideBearing = glyph.RightSideBearing;
+        }
+    }
+
+    mgbool rebuild_full_atlas(MGF_RuntimeFont& runtimeFont)
+    {
+        initialize_pakcer(runtimeFont);
+        if (!pack_glyphs(&runtimeFont.PackContext, runtimeFont.Glyphs))
+            return false;
+
+        runtimeFont.Atlas.assign(static_cast<size_t>(runtimeFont.AtlasWidth) * static_cast<size_t>(runtimeFont.AtlasHeight) * 4, 0);
+
+        for (const auto& glyph : runtimeFont.Glyphs)
+            rasterize_glyph(runtimeFont.Atlas, runtimeFont.AtlasWidth, glyph);
+
+        update_glyph_results(runtimeFont);
+        return true;
+    }
+
+    mgbool rebuild_runtime_font(MGF_RuntimeFont& runtimeFont,
+                                const std::vector<GlyphBuildInfo> glyphs,
+                                mgint startingAtlasSize)
+    {
+        mgint atlasSize = startingAtlasSize > 0 ? startingAtlasSize : estimate_initial_atlas_size(glyphs);
+        while (atlasSize <= MaximumAtlasSize)
+        {
+            runtimeFont.AtlasWidth = atlasSize;
+            runtimeFont.AtlasHeight = atlasSize;
+            runtimeFont.Glyphs = glyphs;
+
+            if (rebuild_full_atlas(runtimeFont))
+                return true;
+
+            atlasSize *= 2;
+        }
+
+        return false;
+    }
+
+    mgbool ensure_glyphs(MGF_RuntimeFont& runtimeFont,
+                         MGF_CharacterRegion* characterRegions,
+                         mgint characterRegionCount,
+                         mgbyte*& atlasRgba,
+                         mgint& atlasWidth,
+                         mgint& atlasHeight,
+                         mgbool& atlasRebuilt,
+                         MGF_Glyph*& glyphs,
+                         mgint& glyphCount,
+                         mgint& lineSpacing)
+    {
+        atlasRgba = nullptr;
+        atlasWidth = runtimeFont.AtlasWidth;
+        atlasHeight = runtimeFont.AtlasHeight;
+        atlasRebuilt = false;
+        glyphs = nullptr;
+        glyphCount = static_cast<mgint>(runtimeFont.GlyphResults.size());
+        lineSpacing = runtimeFont.LineSpacing;
+
+        if (characterRegions == nullptr || characterRegionCount <= 0)
+            return false;
+
+        const auto characters = collect_characters(characterRegions, characterRegionCount);
+        if (characters.empty())
+            return false;
+
+        auto newGlyphs = build_glyphs(runtimeFont.Font, runtimeFont.Scale, characters, runtimeFont.GlyphLookup);
+
+        if (newGlyphs.empty())
+        {
+            atlasRgba = runtimeFont.Atlas.empty() ? nullptr : runtimeFont.Atlas.data();
+            glyphs = runtimeFont.GlyphResults.empty() ? nullptr : runtimeFont.GlyphResults.data();
+            return glyphs != nullptr;
+        }
+
+        if (runtimeFont.AtlasWidth == 0 || runtimeFont.AtlasHeight == 0)
+        {
+            atlasRebuilt = true;
+
+            auto glyphsToAppend = newGlyphs;
+            if (!rebuild_runtime_font(runtimeFont, newGlyphs, estimate_initial_atlas_size(newGlyphs)))
+                return false;
+        }
+        else
+        {
+            auto glyphsToAppend = newGlyphs;
+
+            // Keep the packer alive across calls so we can keep filling the same atlas
+            // instead of starting over very time a new glyph shows up
+            if (!pack_glyphs(&runtimeFont.PackContext, glyphsToAppend))
+            {
+                auto allGlyphs = runtimeFont.Glyphs;
+                allGlyphs.insert(allGlyphs.end(), newGlyphs.begin(), newGlyphs.end());
+
+                // If the live packer paints itself into a corner, fall back to a full
+                // repack/grow pass instead of giving up on the atlas entirely
+                atlasRebuilt = true;
+                if (!rebuild_runtime_font(runtimeFont,
+                                          allGlyphs,
+                                          runtimeFont.AtlasWidth > 0 ? runtimeFont.AtlasWidth : estimate_initial_atlas_size(allGlyphs)))
+                    return false;
+
+            }
+            else
+            {
+                for (const auto& glyph : glyphsToAppend)
+                    rasterize_glyph(runtimeFont.Atlas, runtimeFont.AtlasWidth, glyph);
+
+                runtimeFont.Glyphs.insert(runtimeFont.Glyphs.end(), glyphsToAppend.begin(), glyphsToAppend.end());
+                update_glyph_results(runtimeFont);
             }
         }
 
-        return atlas;
+        atlasRgba = runtimeFont.Atlas.empty() ? nullptr : runtimeFont.Atlas.data();
+        atlasWidth = runtimeFont.AtlasWidth;
+        atlasHeight = runtimeFont.AtlasHeight;
+        glyphs = runtimeFont.GlyphResults.empty() ? nullptr : runtimeFont.GlyphResults.data();
+        glyphCount = static_cast<mgint>(runtimeFont.GlyphResults.size());
+        lineSpacing = runtimeFont.LineSpacing;
+        return atlasRgba != nullptr && glyphs != nullptr && glyphCount > 0;
     }
+}
+
+MGF_RuntimeFont* MGF_RuntimeFont_Create(mgbyte* data, mgint dataBytes, mgint size)
+{
+    if (data == nullptr || dataBytes <= 0 || size <= 0)
+        return nullptr;
+
+    auto runtimeFont = new MGF_RuntimeFont();
+    runtimeFont->FontData.assign(data, data + dataBytes);
+
+    const auto fontOffset = stbtt_GetFontOffsetForIndex(runtimeFont->FontData.data(), 0);
+    if (fontOffset < 0)
+    {
+        delete runtimeFont;
+        return nullptr;
+    }
+
+    runtimeFont->Font = {};
+    if (!stbtt_InitFont(&runtimeFont->Font, runtimeFont->FontData.data(), fontOffset))
+    {
+        delete runtimeFont;
+        return nullptr;
+    }
+
+    runtimeFont->Scale = stbtt_ScaleForPixelHeight(&runtimeFont->Font, static_cast<float>(size));
+
+    int ascent;
+    int descent;
+    int lineGap;
+    stbtt_GetFontVMetrics(&runtimeFont->Font, &ascent, &descent, &lineGap);
+
+    runtimeFont->AscentPixels = static_cast<mgint>(std::ceil(ascent * runtimeFont->Scale));
+    runtimeFont->LineSpacing = static_cast<mgint>(std::ceil((ascent - descent + lineGap) * runtimeFont->Scale));
+    if (runtimeFont->LineSpacing <= 0)
+        runtimeFont->LineSpacing = size;
+
+    runtimeFont->AtlasWidth = 0;
+    runtimeFont->AtlasHeight = 0;
+    return runtimeFont;
+}
+
+void MGF_RuntimeFont_Destroy(MGF_RuntimeFont* runtimeFont)
+{
+    delete runtimeFont;
+}
+
+mgbool MGF_RuntimeFont_EnsureGlyphs(MGF_RuntimeFont* runtimeFont,
+                                   MGF_CharacterRegion* characterRegions,
+                                   mgint characterRegionCount,
+                                   mgbyte*& atlasRgba,
+                                   mgint& atlasWidth,
+                                   mgint& atlasHeight,
+                                   mgbool& atlasRebuilt,
+                                   MGF_Glyph*& glyphs,
+                                   mgint& glyphCount,
+                                   mgint& lineSpacing)
+{
+    if (runtimeFont == nullptr)
+        return false;
+
+    return ensure_glyphs(*runtimeFont,
+                         characterRegions,
+                         characterRegionCount,
+                         atlasRgba,
+                         atlasWidth,
+                         atlasHeight,
+                         atlasRebuilt,
+                         glyphs,
+                         glyphCount,
+                         lineSpacing);
 }
 
 mgbool MGF_BakeSpriteFont(mgbyte* data,
@@ -240,83 +493,57 @@ mgbool MGF_BakeSpriteFont(mgbyte* data,
     glyphCount = 0;
     lineSpacing = 0;
 
-    if (data == nullptr || dataBytes <= 0 || size <= 0 || characterRegions == nullptr || characterRegionCount <= 0)
+    auto runtimeFont = MGF_RuntimeFont_Create(data, dataBytes, size);
+    if (runtimeFont == nullptr)
         return false;
 
-    const auto fontOffset = stbtt_GetFontOffsetForIndex(data, 0);
-    if (fontOffset < 0)
-        return false;
+    mgbool atlasRebuilt = false;
+    mgbyte* runtimeAtlas = nullptr;
+    MGF_Glyph* runtimeGlyphs = nullptr;
+    mgint runtimeAtlasWidth = 0;
+    mgint runtimeAtlasHeight = 0;
+    mgint runtimeGlyphCount = 0;
+    mgint runtimeLineSpacing = 0;
 
-    stbtt_fontinfo font = {};
-    if (!stbtt_InitFont(&font, data, fontOffset))
-        return false;
+    const auto result = MGF_RuntimeFont_EnsureGlyphs(runtimeFont,
+                                                     characterRegions,
+                                                     characterRegionCount,
+                                                     runtimeAtlas,
+                                                     runtimeAtlasWidth,
+                                                     runtimeAtlasHeight,
+                                                     atlasRebuilt,
+                                                     runtimeGlyphs,
+                                                     runtimeGlyphCount,
+                                                     runtimeLineSpacing);
 
-    const auto characters = collect_characters(characterRegions, characterRegionCount);
-    if (characters.empty())
-        return false;
-
-    const auto scale = stbtt_ScaleForPixelHeight(&font, static_cast<float>(size));
-
-    int ascent;
-    int descent;
-    int lineGap;
-    stbtt_GetFontVMetrics(&font, &ascent, &descent, &lineGap);
-
-    const auto ascentPixels = static_cast<mgint>(std::ceil(ascent * scale));
-    lineSpacing = static_cast<mgint>(std::ceil((ascent - descent + lineGap) * scale));
-    if (lineSpacing <= 0)
-        lineSpacing = size;
-
-    auto glyphBuilds = build_glyphs(font, scale, characters);
-    if (glyphBuilds.empty())
-        return false;
-
-    auto atlasSize = estimate_initial_atlas_size(glyphBuilds);
-    while (!try_pack_glyphs(glyphBuilds, atlasSize, atlasSize))
+    if (!result || runtimeAtlas == nullptr || runtimeGlyphs == nullptr || runtimeGlyphCount <= 0)
     {
-        if (atlasSize >= MaximumAtlasSize)
-            return false;
-
-        atlasSize *= 2;
+        MGF_RuntimeFont_Destroy(runtimeFont);
+        return false;
     }
 
-    auto atlas = rasterize_glyphs_to_rgba(glyphBuilds, atlasSize, atlasSize);
-
-    auto glyphBuffer = static_cast<MGF_Glyph*>(malloc(sizeof(MGF_Glyph) * glyphBuilds.size()));
-    auto atlasBuffer = static_cast<mgbyte*>(malloc(atlas.size()));
-    if (glyphBuffer == nullptr || atlasBuffer == nullptr)
+    const auto atlasBytes = static_cast<size_t>(runtimeAtlasWidth) * static_cast<size_t>(runtimeAtlasHeight) * 4;
+    auto atlasBuffer = static_cast<mgbyte*>(malloc(atlasBytes));
+    auto glyphBuffer = static_cast<MGF_Glyph*>(malloc(sizeof(MGF_Glyph) * runtimeGlyphCount));
+    if (atlasBuffer == nullptr || glyphBuffer == nullptr)
     {
-        free(glyphBuffer);
         free(atlasBuffer);
+        free(glyphBuffer);
+        MGF_RuntimeFont_Destroy(runtimeFont);
         return false;
     }
 
-    memcpy(atlasBuffer, atlas.data(), atlas.size());
-
-    for (size_t i = 0; i < glyphBuilds.size(); ++i)
-    {
-        const auto& glyph = glyphBuilds[i];
-        auto& result = glyphBuffer[i];
-
-        result.Character = glyph.Character;
-        result.BoundsX = glyph.AtlasX;
-        result.BoundsY = glyph.AtlasY;
-        result.BoundsWidth = glyph.Width;
-        result.BoundsHeight = glyph.Height;
-        result.CroppingX = 0;
-        result.CroppingY = ascentPixels - glyph.BitmapTop;
-        result.CroppingWidth = glyph.Width;
-        result.CroppingHeight = lineSpacing;
-        result.LeftSideBearing = glyph.LeftSideBearing;
-        result.Width = glyph.WidthValue;
-        result.RightSideBearing = glyph.RightSideBearing;
-    }
+    memcpy(atlasBuffer, runtimeAtlas, atlasBytes);
+    memcpy(glyphBuffer, runtimeGlyphs, sizeof(MGF_Glyph) * runtimeGlyphCount);
 
     atlasRgba = atlasBuffer;
-    atlasWidth = atlasSize;
-    atlasHeight = atlasSize;
+    atlasWidth = runtimeAtlasWidth;
+    atlasHeight = runtimeAtlasHeight;
     glyphs = glyphBuffer;
-    glyphCount = static_cast<mgint>(glyphBuilds.size());
+    glyphCount = runtimeGlyphCount;
+    lineSpacing = runtimeLineSpacing;
+
+    MGF_RuntimeFont_Destroy(runtimeFont);
     return true;
 }
 

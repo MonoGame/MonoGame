@@ -6,6 +6,11 @@ using System.Runtime.InteropServices;
 
 namespace MonoGame.Interop;
 
+[MGHandle]
+internal readonly struct MGF_RuntimeFont
+{
+}
+
 [StructLayout(LayoutKind.Sequential)]
 internal struct MGF_CharacterRegion
 {
@@ -32,6 +37,25 @@ internal struct MGF_Glyph
 
 internal static unsafe class MGF
 {
+    [DllImport(MGP.MonoGameNativeDLL, EntryPoint = "MGF_RuntimeFont_Create", ExactSpelling = true)]
+    public static extern MGF_RuntimeFont* RuntimeFont_Create(byte* data, int dataBytes, int size);
+
+    [DllImport(MGP.MonoGameNativeDLL, EntryPoint = "MGF_RuntimeFont_Destroy", ExactSpelling = true)]
+    public static extern void RuntimeFont_Destroy(MGF_RuntimeFont* runtimeFont);
+
+    [DllImport(MGP.MonoGameNativeDLL, EntryPoint = "MGF_RuntimeFont_EnsureGlyphs", ExactSpelling = true)]
+    [return: MarshalAs(UnmanagedType.U1)]
+    public static extern bool RuntimeFont_EnsureGlyphs(MGF_RuntimeFont* runtimeFont,
+                                                       MGF_CharacterRegion* characterRegions,
+                                                       int characterRegionCount,
+                                                       out byte* atlasRgba,
+                                                       out int atlasWidth,
+                                                       out int atlasHeight,
+                                                       [MarshalAs(UnmanagedType.U1)] out bool atlasRebuilt,
+                                                       out MGF_Glyph* glyphs,
+                                                       out int glyphCount,
+                                                       out int lineSpacing);
+
     [DllImport(MGP.MonoGameNativeDLL, EntryPoint = "MGF_BakeSpriteFont", ExactSpelling = true)]
     [return: MarshalAs(UnmanagedType.U1)]
     public static extern bool BakeSpriteFont(byte* data,
