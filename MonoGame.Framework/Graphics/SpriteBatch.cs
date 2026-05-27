@@ -30,6 +30,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		Rectangle _tempRect = new Rectangle (0,0,0,0);
 		Vector2 _texCoordTL = new Vector2 (0,0);
 		Vector2 _texCoordBR = new Vector2 (0,0);
+        private const float DistanceFieldQuantizationScale = 1024f;
         #endregion
 
         /// <summary>
@@ -423,20 +424,61 @@ namespace Microsoft.Xna.Framework.Graphics
 			}
 		}
 
+        private static float SanitizeDistanceFieldValue(float value)
+        {
+            if (float.IsNaN(value) || float.IsInfinity(value) || value < 0f)
+                return 0f;
+
+            return value;
+        }
+
+        private static int QuantizeDistanceFieldValue(float value)
+        {
+            return (int)MathF.Round(value * DistanceFieldQuantizationScale);
+        }
+
+        private static float Clamp01Finite(float value)
+        {
+            if (float.IsNaN(value) || float.IsInfinity(value))
+                return 0f;
+            if (value < 0f)
+                return 0f;
+            if (value > 1f)
+                return 1f;
+
+            return value;
+        }
+
+        private static Vector4 SanitizeOutlineColor(Vector4 color)
+        {
+            return new Vector4(
+                Clamp01Finite(color.X),
+                Clamp01Finite(color.Y),
+                Clamp01Finite(color.Z),
+                Clamp01Finite(color.W));
+        }
+
         private static void ConfigureDistanceFieldItem(SpriteBatchItem item, SpriteFont spriteFont)
         {
             item.ShaderVariant = spriteFont.IsDistanceField ? 1 : 0;
             if (item.ShaderVariant == 1)
             {
-                item.DFSpread = spriteFont._distanceFieldSpread;
-                item.DFOutlineThickness = spriteFont._outlineThickness;
-                item.DFOutlineColor = spriteFont._outlineColor;
+                item.DFSpread = SanitizeDistanceFieldValue(spriteFont._distanceFieldSpread);
+                item.DFOutlineThickness = SanitizeDistanceFieldValue(spriteFont._outlineThickness);
+                item.DFOutlineColor = SanitizeOutlineColor(spriteFont._outlineColor);
+
+                item.DFSpreadKey = QuantizeDistanceFieldValue(item.DFSpread);
+                item.DFOutlineThicknessKey = QuantizeDistanceFieldValue(item.DFOutlineThickness);
+                item.DFOutlineColorKey = new Color(item.DFOutlineColor).PackedValue;
             }
             else
             {
                 item.DFSpread = 0;
                 item.DFOutlineThickness = 0;
                 item.DFOutlineColor = Vector4.Zero;
+                item.DFSpreadKey = 0;
+                item.DFOutlineThicknessKey = 0;
+                item.DFOutlineColorKey = 0;
             }
         }
 
