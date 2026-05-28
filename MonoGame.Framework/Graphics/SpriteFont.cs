@@ -7,7 +7,6 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
-using System.IO;
 using System.Text;
 
 namespace Microsoft.Xna.Framework.Graphics 
@@ -15,7 +14,7 @@ namespace Microsoft.Xna.Framework.Graphics
     /// <summary>
     /// Represents a font texture.
     /// </summary>
-	public sealed partial class SpriteFont 
+	public sealed class SpriteFont 
     {
 		internal static class Errors 
         {
@@ -25,13 +24,12 @@ namespace Microsoft.Xna.Framework.Graphics
 				"Character cannot be resolved by this SpriteFont.";
 		}
 
-        private Glyph[] _glyphs;
-        private CharacterMapRegion[] _regions;
-        private readonly SpriteFontRuntimeState _runtimeState;
+        private readonly Glyph[] _glyphs;
+        private readonly CharacterRegion[] _regions;
         private char? _defaultCharacter;
         private int _defaultGlyphIndex = -1;
 		
-		private Texture2D _texture;
+		private readonly Texture2D _texture;
 
 		/// <summary>
 		/// All the glyphs in this SpriteFont.
@@ -74,7 +72,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			Spacing = spacing;
 
             _glyphs = new Glyph[characters.Count];
-            var regions = new Stack<CharacterMapRegion>();
+            var regions = new Stack<CharacterRegion>();
 
 			for (var i = 0; i < characters.Count; i++) 
             {
@@ -94,7 +92,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 if(regions.Count == 0 || characters[i] > (regions.Peek().End+1))
                 {
                     // Start a new region
-                    regions.Push(new CharacterMapRegion(characters[i], i));
+                    regions.Push(new CharacterRegion(characters[i], i));
                 } 
                 else if(characters[i] == (regions.Peek().End+1))
                 {
@@ -114,20 +112,6 @@ namespace Microsoft.Xna.Framework.Graphics
 
 			DefaultCharacter = defaultCharacter;
 		}
-
-        internal SpriteFont(Texture2D texture,
-                            List<Rectangle> glyphBounds,
-                            List<Rectangle> cropping,
-                            List<char> characters,
-                            int lineSpacing,
-                            float spacing,
-                            List<Vector3> kerning,
-                            char? defaultCharacter,
-                            SpriteFontRuntimeState runtimeState)
-                            :this(texture, glyphBounds, cropping, characters, lineSpacing, spacing, kerning, defaultCharacter)
-        {
-            _runtimeState = runtimeState;
-        }
 
         /// <summary>
         /// Gets the texture that this SpriteFont draws from.
@@ -187,114 +171,6 @@ namespace Microsoft.Xna.Framework.Graphics
 		/// </summary>
 		public float Spacing { get; set; }
 
-        /// <summary>
-        /// Creates a <see cref="SpriteFont"/> from a font file.
-        /// </summary>
-        /// <param name="graphicsDevice">The graphics device used to create the font texture.</param>
-        /// <param name="path">The path to a TrueType or OpenType font file.</param>
-        /// <param name="size">The font size, in pixels, used when rasterizing glyphs.</param>
-        /// <param name="characterRegions">The character ranges to include in the created font.</param>
-        /// <returns>A <see cref="SpriteFont"/> created from the supplied font file.</returns>
-        /// <exception cref="ArgumentNullException">
-        /// Thrown when <paramref name="graphicsDevice"/>, <paramref name="path"/>, or
-        /// <paramref name="characterRegions"/> is <see langword="null"/>.
-        /// </exception>
-        /// <exception cref="ArgumentOutOfRangeException">
-        /// Thrown when <paramref name="size"/> is zero or negative.
-        /// </exception>
-        /// <exception cref="ArgumentException">
-        /// Thrown when <paramref name="characterRegions"/> does not contain any characters.
-        /// </exception>
-        /// <exception cref="InvalidOperationException">
-        /// Thrown when the font data cannot be parsed or no glyphs can be created.
-        /// </exception>
-        public static SpriteFont FromFile(GraphicsDevice graphicsDevice, string path, int size, IEnumerable<CharacterRegion> characterRegions)
-        {
-            if (path == null)
-            {
-                throw new ArgumentNullException(nameof(path), $"{nameof(path)} must not be null.");
-            }
-
-            using (Stream stream = File.OpenRead(path))
-            {
-                return FromStream(graphicsDevice, stream, size, characterRegions);
-            }
-        }
-
-        /// <summary>
-        /// Creates a new <see cref="SpriteFont"/> from a font stream.
-        /// </summary>
-        /// <param name="graphicsDevice">The graphics device used to create the font texture.</param>
-        /// <param name="stream">The stream containing TrueType or OpenType font data.</param>
-        /// <param name="size">The font size, in pixels, used when rasterizing glyphs.</param>
-        /// <param name="characterRegions">The character ranges to include in the created font.</param>
-        /// <returns>A <see cref="SpriteFont"/> created from the supplied font stream.</returns>
-        /// <exception cref="ArgumentNullException">
-        /// Thrown when <paramref name="graphicsDevice"/>, <paramref name="stream"/>, or
-        /// <paramref name="characterRegions"/> is <see langword="null"/>.
-        /// </exception>
-        /// <exception cref="ArgumentOutOfRangeException">
-        /// Thrown when <paramref name="size"/> is zero or negative.
-        /// </exception>
-        /// <exception cref="ArgumentException">
-        /// Thrown when <paramref name="characterRegions"/> does not contain any characters.
-        /// </exception>
-        /// <exception cref="InvalidOperationException">
-        /// Thrown when the font data cannot be parsed or no glyphs can be created.
-        /// </exception>
-        public static SpriteFont FromStream(GraphicsDevice graphicsDevice, Stream stream, int size, IEnumerable<CharacterRegion> characterRegions)
-        {
-            if (graphicsDevice == null)
-            {
-                throw new ArgumentNullException(nameof(graphicsDevice), $"{nameof(graphicsDevice)} must not be null.");
-            }
-
-            if (stream == null)
-            {
-                throw new ArgumentNullException(nameof(stream), $"{nameof(stream)} must not be null.");
-            }
-
-            if (size <= 0)
-            {
-                throw new ArgumentOutOfRangeException(nameof(size), $"{nameof(size)} must be greater than zero.");
-            }
-
-            if (characterRegions == null)
-            {
-                throw new ArgumentNullException(nameof(characterRegions), $"{nameof(characterRegions)} must not be null.");
-            }
-
-#if NATIVE
-            return PlatformFromStream(graphicsDevice, stream, size, characterRegions);
-#else
-            throw new PlatformNotSupportedException("Runtime SpriteFont baking is currently implemented only for MonoGame.Framework.Native.");
-#endif
-        }
-
-        internal void EnsureGlyphs(string text)
-        {
-            CharacterSource source = new CharacterSource(text);
-            EnsureGlyphs(ref source);
-        }
-
-        internal void EnsureGlyphs(StringBuilder text)
-        {
-            CharacterSource source = new CharacterSource(text);
-            EnsureGlyphs(ref source);
-        }
-
-        internal void EnsureGlyphs(ref CharacterSource text)
-        {
-            if(_runtimeState == null || text.Length == 0)
-            {
-                return;
-            }
-
-#if NATIVE
-            PlatformEnsureGlyphs(ref text);
-#endif
-        }
-
 		/// <summary>
 		/// Returns the size of a string when rendered in this font.
 		/// </summary>
@@ -326,8 +202,6 @@ namespace Microsoft.Xna.Framework.Graphics
 
 		internal unsafe void MeasureString(ref CharacterSource text, out Vector2 size)
 		{
-            EnsureGlyphs(ref text);
-
 			if (text.Length == 0)
             {
 				size = Vector2.Zero;
@@ -390,7 +264,7 @@ namespace Microsoft.Xna.Framework.Graphics
         
         internal unsafe bool TryGetGlyphIndex(char c, out int index)
         {
-            fixed (CharacterMapRegion* pRegions = _regions)
+            fixed (CharacterRegion* pRegions = _regions)
             {
                 if(!TryGetRegionIdx(c, pRegions, out int regionIdx))
                 {
@@ -410,28 +284,7 @@ namespace Microsoft.Xna.Framework.Graphics
             return true;
         }
 
-        // The TryGetGlyphIndex() above works by using a case-flip fallback for the existing SpriteFont that is loaded
-        // through the content pipeline as an xnb.
-        // For Runtime lazy glyph resolution, we need an exact lookup so it can tell if a glyph is actually missing
-        // or not.
-        // - Chris (AristurtleDev)
-        internal unsafe bool TryGetGlyphIndexExact(char c, out int index)
-        {
-            fixed(CharacterMapRegion* pRegions = _regions)
-            {
-                int regionIndex;
-                if (!TryGetRegionIdx(c, pRegions, out regionIndex))
-                {
-                    index = -1;
-                    return false;
-                }
-
-                index = pRegions[regionIndex].StartIndex + (c - pRegions[regionIndex].Start);
-                return true;
-            }
-        }
-
-        private unsafe bool TryGetRegionIdx(char c, CharacterMapRegion* pRegions, out int regionIdx)
+        private unsafe bool TryGetRegionIdx(char c, CharacterRegion* pRegions, out int regionIdx)
         {
             // Get region Index 
             regionIdx = -1;
@@ -476,23 +329,6 @@ namespace Microsoft.Xna.Framework.Graphics
             }
             else
                 return glyphIdx;
-        }
-
-        private void SetRuntimeGlyphData(SpriteFont spriteFont)
-        {
-            Texture2D oldTexture = _texture;
-
-            _glyphs = spriteFont._glyphs;
-            _regions = spriteFont._regions;
-            _texture = spriteFont._texture;
-            Characters = spriteFont.Characters;
-            LineSpacing = spriteFont.LineSpacing;
-            DefaultCharacter = _defaultCharacter;
-
-            if(oldTexture != null && oldTexture != _texture)
-            {
-                oldTexture.Dispose();
-            }
         }
         
         internal struct CharacterSource 
@@ -575,43 +411,18 @@ namespace Microsoft.Xna.Framework.Graphics
 			}
 		}
 
-        private struct CharacterMapRegion
+        private struct CharacterRegion
         {
             public char Start;
             public char End;
             public int StartIndex;
 
-            public CharacterMapRegion(char start, int startIndex)
+            public CharacterRegion(char start, int startIndex)
             {
                 this.Start = start;                
                 this.End = start;
                 this.StartIndex = startIndex;
             }
-        }
-
-        internal sealed unsafe class SpriteFontRuntimeState
-        {
-#if NATIVE
-            public readonly MonoGame.Interop.MGF_RuntimeFont* Handle;
-
-            public SpriteFontRuntimeState(MonoGame.Interop.MGF_RuntimeFont* handle)
-            {
-                if(handle == null)
-                {
-                    throw new ArgumentNullException(nameof(handle), $"{nameof(handle)} must not be null.");
-                }
-
-                Handle = handle;
-            }
-
-            ~SpriteFontRuntimeState()
-            {
-                if (Handle != null)
-                {
-                    MonoGame.Interop.MGF.RuntimeFont_Destroy(Handle);
-                }
-            }
-#endif
         }
 	}
 }
