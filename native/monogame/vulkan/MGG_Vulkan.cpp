@@ -5156,17 +5156,25 @@ MGG_InputLayout* MGG_InputLayout_Create(
 	{
 		bindings[i].binding = i;
 		bindings[i].stride = strides[i];
-		bindings[i].inputRate = VK_VERTEX_INPUT_RATE_VERTEX; // Support instance rates.
+		bindings[i].inputRate = VK_VERTEX_INPUT_RATE_VERTEX;
 	}
 
 	layout->attributeCount = elementCount;
 	auto attrs = layout->attributes = new VkVertexInputAttributeDescription[elementCount];
 	for (int i = 0; i < elementCount; i++)
 	{
+		const auto element = elements[i];
+
 		attrs[i].location = i;
-		attrs[i].binding = elements[i].VertexBufferSlot;
-		attrs[i].format = ToVkFormat(elements[i].Format);
-		attrs[i].offset = elements[i].AlignedByteOffset;
+		attrs[i].binding = element.VertexBufferSlot;
+		attrs[i].format = ToVkFormat(element.Format);
+		attrs[i].offset = element.AlignedByteOffset;
+
+		if (element.InstanceDataStepRate > 0)
+		{
+			// Override input rate for instanced elements.
+			bindings[element.VertexBufferSlot].inputRate = VK_VERTEX_INPUT_RATE_INSTANCE;
+		}
 	}
 
 	return layout;
