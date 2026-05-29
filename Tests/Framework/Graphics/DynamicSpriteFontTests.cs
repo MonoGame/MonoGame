@@ -457,9 +457,24 @@ internal sealed class DynamicSpriteFontTest : GraphicsDeviceTestFixtureBase
         }
     }
 
+    [Test]
+    public void MeasureString_StringAndStringBuilder_ReturnSameValue()
+    {
+        using (Stream stream = OpenRuntimeFontStream())
+        {
+            DynamicSpriteFont font = DynamicSpriteFont.FromStream(gd, stream, 32.0f, Array.Empty<CharacterRegion>());
+            string text = "abc\nxyz";
+
+            Vector2 stringSize = font.MeasureString(text);
+            Vector2 builderSize = font.MeasureString(new StringBuilder(text));
+
+            Assert.That(builderSize, Is.EqualTo(stringSize).Using(Vector2Comparer.Epsilon));
+        }
+    }
+
     private static Stream OpenRuntimeFontStream()
     {
         return File.OpenRead(Paths.Font("IBMPlexSans-Regular.ttf"));
     }
- #endif
+#endif
 }

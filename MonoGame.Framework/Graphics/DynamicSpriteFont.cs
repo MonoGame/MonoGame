@@ -4,7 +4,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Text;
 using MonoGame.Interop;
@@ -19,8 +18,8 @@ public sealed partial class DynamicSpriteFont
     private readonly CharacterRegion[] _characterRegions;
     private readonly byte[] _fontData;
     private readonly GraphicsDevice _graphicsDevice;
+    private readonly Dictionary<int, PreparedTextFontData> _preparedTextFontDataBySize;
     private readonly DynamicSpriteFontRuntimeState _runtimeState;
-    private readonly Dictionary<int, DynamicSpriteFontSizeData> _sizeDataBySize;
     private Texture2D _texture;
     private float _size;
 
@@ -61,7 +60,7 @@ public sealed partial class DynamicSpriteFont
         _fontData = fontData;
         _runtimeState = runtimeState;
         _characterRegions = characterRegions;
-        _sizeDataBySize = new Dictionary<int, DynamicSpriteFontSizeData>();
+        _preparedTextFontDataBySize = new Dictionary<int, PreparedTextFontData>();
         _texture = CreateInitialTexture(graphicsDevice);
         _size = size;
     }
@@ -178,7 +177,7 @@ public sealed partial class DynamicSpriteFont
             return Vector2.Zero;
         }
 
-        DynamicSpriteFontCharacterSource source = new DynamicSpriteFontCharacterSource(text);
+        FontCharacterSource source = new FontCharacterSource(text);
         return MeasureString(ref source);
     }
 
@@ -202,23 +201,23 @@ public sealed partial class DynamicSpriteFont
             return Vector2.Zero;
         }
 
-        DynamicSpriteFontCharacterSource source = new DynamicSpriteFontCharacterSource(text);
+        FontCharacterSource source = new FontCharacterSource(text);
         return MeasureString(ref source);
     }
 
     internal void EnsureGlyphs(string text)
     {
-        DynamicSpriteFontCharacterSource source = new DynamicSpriteFontCharacterSource(text);
+        FontCharacterSource source = new FontCharacterSource(text);
         EnsureGlyphs(ref source);
     }
 
     internal void EnsureGlyphs(StringBuilder text)
     {
-        DynamicSpriteFontCharacterSource source = new DynamicSpriteFontCharacterSource(text);
+        FontCharacterSource source = new FontCharacterSource(text);
         EnsureGlyphs(ref source);
     }
 
-    internal void EnsureGlyphs(ref DynamicSpriteFontCharacterSource text)
+    internal void EnsureGlyphs(ref FontCharacterSource text)
     {
         if (text.Length == 0)
         {
@@ -226,31 +225,37 @@ public sealed partial class DynamicSpriteFont
         }
 
         int rasterizedSize = GetRasterizedSize();
-        DynamicSpriteFontSizeData sizeData = GetCurrentSizeData();
+        PreparedTextFontData preparedTextFontData = GetCurrentPreparedTextFontData();
 
 #if NATIVE
-        PlatformEnsureGlyphs(rasterizedSize, sizeData, ref text);
+        PlatformEnsureGlyphs(rasterizedSize, preparedTextFontData, ref text);
 #endif
     }
 
-    internal DynamicSpriteFontSizeData GetCurrentSizeData()
+    internal PreparedTextFontData GetCurrentPreparedTextFontData()
     {
         int rasterizedSize = GetRasterizedSize();
-        DynamicSpriteFontSizeData sizeData;
-        if (_sizeDataBySize.TryGetValue(rasterizedSize, out sizeData))
+        PreparedTextFontData preparedTextFontData;
+        if (_preparedTextFontDataBySize.TryGetValue(rasterizedSize, out preparedTextFontData))
         {
-            return sizeData;
+            return preparedTextFontData;
         }
 
-        sizeData = new DynamicSpriteFontSizeData(_texture, Array.Empty<DynamicSpriteFontGlyph>(), 0, 0.0f);
-        _sizeDataBySize[rasterizedSize] = sizeData;
-        return sizeData;
+        preparedTextFontData = new PreparedTextFontData(_texture, Array.Empty<FontGlyph>(), 0, 0.0f);
+        _preparedTextFontDataBySize[rasterizedSize] = preparedTextFontData;
+        return preparedTextFontData;
     }
 
-    internal Vector2 MeasureString(ref DynamicSpriteFontCharacterSource text)
+    internal Vector2 MeasureString(ref FontCharacterSource text)
     {
         EnsureGlyphs(ref text);
-        return GetCurrentSizeData().MeasureString(ref text);
+        return GetCurrentPreparedTextFontData().MeasureString(ref text);
+    }
+
+    internal PreparedTextFont GetPreparedTextFont(ref FontCharacterSource text)
+    {
+        EnsureGlyphs(ref text);
+        return GetCurrentPreparedTextFontData().GetPreparedTextFont();
     }
 
     private static byte[] ReadFontData(Stream stream)
@@ -282,56 +287,6 @@ public sealed partial class DynamicSpriteFont
         }
     }
 
-    internal struct DynamicSpriteFontGlyph
-    {
-        public static readonly DynamicSpriteFontGlyph Empty = new DynamicSpriteFontGlyph();
-
-        public Rectangle BoundsInTexture;
-        public char Character;
-        public int Size;
-        public Rectangle Cropping;
-        public float LeftSideBearing;
-        public float RightSideBearing;
-        public float Width;
-        public float WidthIncludingBearings;
-    }
-
-    internal struct DynamicSpriteFontCharacterSource
-    {
-        private readonly StringBuilder _builder;
-        private readonly string _string;
-
-        public readonly int Length;
-
-        public char this[int index]
-        {
-            get
-            {
-                if (_string != null)
-                {
-                    return _string[index];
-                }
-
-                return _builder[index];
-            }
-        }
-
-        public DynamicSpriteFontCharacterSource(string text)
-        {
-            _string = text;
-            _builder = null;
-            Length = text.Length;
-        }
-
-        public DynamicSpriteFontCharacterSource(StringBuilder text)
-        {
-            _builder = text;
-            _string = null;
-            Length = text.Length;
-        }
-
-    }
-
     internal sealed unsafe class DynamicSpriteFontRuntimeState
     {
         public readonly MGF_RuntimeFont* Handle;
@@ -355,134 +310,50 @@ public sealed partial class DynamicSpriteFont
         }
     }
 
-    internal sealed class DynamicSpriteFontSizeData
+    internal sealed class PreparedTextFontData
     {
         private const string TextContainsUnresolvableCharacters = 
             "Text contains characters that cannot be resolved by this DynamicSpriteFont.";
 
-        private readonly Dictionary<char, int> _glyphIndices;
+        private readonly PreparedTextFont _preparedTextFont;
 
-        public DynamicSpriteFontGlyph[] Glyphs { get; private set; }
-        public int LineSpacing { get; private set; }
+        public FontGlyph[] Glyphs => _preparedTextFont.Glyphs;
+        public int LineSpacing => _preparedTextFont.LineSpacing;
         public float Spacing { get; }
-        public Texture2D Texture { get; private set; }
+        public Texture2D Texture => _preparedTextFont.Texture;
 
-        public DynamicSpriteFontSizeData(Texture2D texture,
-                                         DynamicSpriteFontGlyph[] glyphs,
-                                         int lineSpacing,
-                                         float spacing)
+        public PreparedTextFontData(Texture2D texture,
+                                    FontGlyph[] glyphs,
+                                    int lineSpacing,
+                                    float spacing)
         {
-            Texture = texture;
             Spacing = spacing;
-            _glyphIndices = new Dictionary<char, int>(glyphs.Length);
-
-            Update(texture, glyphs, lineSpacing);
+            _preparedTextFont = new PreparedTextFont(texture, glyphs, lineSpacing, spacing, -1, TextContainsUnresolvableCharacters);
         }
 
-        public unsafe int GetGlyphIndexOrDefault(char c)
+        public int GetGlyphIndexOrDefault(char c)
         {
-            if (!TryGetGlyphIndex(c, out int glyphIndex))
-            {
-                throw new ArgumentException(TextContainsUnresolvableCharacters, nameof(c));
-            }
-
-            return glyphIndex;
+            return _preparedTextFont.GetGlyphIndexOrDefault(c);
         }
 
-        public unsafe Vector2 MeasureString(ref DynamicSpriteFontCharacterSource text)
+        public Vector2 MeasureString(ref FontCharacterSource text)
         {
-            if (text.Length == 0)
-            {
-                return Vector2.Zero;
-            }
-
-            float width = 0.0f;
-            float finalLineHeight = LineSpacing;
-            Vector2 offset = Vector2.Zero;
-            bool firstGlyphOfLine = true;
-
-            fixed (DynamicSpriteFontGlyph* pGlyphs = Glyphs)
-            {
-                for (int i = 0; i < text.Length; i++)
-                {
-                    char c = text[i];
-
-                    if (c == '\r')
-                    {
-                        continue;
-                    }
-
-                    if (c == '\n')
-                    {
-                        finalLineHeight = LineSpacing;
-                        offset.X = 0;
-                        offset.Y += LineSpacing;
-                        firstGlyphOfLine = true;
-                        continue;
-                    }
-
-                    int currentGlyphIndex = GetGlyphIndexOrDefault(c);
-                    Debug.Assert(currentGlyphIndex >= 0 && currentGlyphIndex < Glyphs.Length, "currentGlyphIndex was outside the bounds of the array.");
-                    DynamicSpriteFontGlyph* pCurrentGlyph = pGlyphs + currentGlyphIndex;
-
-                    if (firstGlyphOfLine)
-                    {
-                        offset.X = Math.Max(pCurrentGlyph->LeftSideBearing, 0);
-                        firstGlyphOfLine = false;
-                    }
-                    else
-                    {
-                        offset.X += Spacing + pCurrentGlyph->LeftSideBearing;
-                    }
-
-                    offset.X += pCurrentGlyph->Width;
-
-                    float proposedWidth = offset.X + Math.Max(pCurrentGlyph->RightSideBearing, 0);
-                    if (proposedWidth > width)
-                    {
-                        width = proposedWidth;
-                    }
-
-                    offset.X += pCurrentGlyph->RightSideBearing;
-
-                    if (pCurrentGlyph->Cropping.Height > finalLineHeight)
-                    {
-                        finalLineHeight = pCurrentGlyph->Cropping.Height;
-                    }
-                }
-            }
-
-            return new Vector2(width, offset.Y + finalLineHeight);
-        }
-
-        private bool TryGetGlyphIndex(char c, out int index)
-        {
-            if (_glyphIndices.TryGetValue(c, out index))
-            {
-                return true;
-            }
-
-            char alternate = char.IsUpper(c) ? char.ToLower(c) : char.ToUpper(c);
-            return _glyphIndices.TryGetValue(alternate, out index);
+            return _preparedTextFont.MeasureString(ref text);
         }
 
         public bool TryGetGlyphIndexExact(char c, out int index)
         {
-            return _glyphIndices.TryGetValue(c, out index);
+            return _preparedTextFont.TryGetGlyphIndexExact(c, out index);
         }
 
-        public void Update(Texture2D texture, DynamicSpriteFontGlyph[] glyphs, int lineSpacing)
+        public void Update(Texture2D texture, FontGlyph[] glyphs, int lineSpacing)
         {
-            Texture = texture;
-            Glyphs = glyphs;
-            LineSpacing = lineSpacing;
+            _preparedTextFont.Update(texture, glyphs, lineSpacing);
+        }
 
-            _glyphIndices.Clear();
-
-            for (int i = 0; i < glyphs.Length; i++)
-            {
-                _glyphIndices[glyphs[i].Character] = i;
-            }
+        public PreparedTextFont GetPreparedTextFont()
+        {
+            return _preparedTextFont;
         }
     }
 }
