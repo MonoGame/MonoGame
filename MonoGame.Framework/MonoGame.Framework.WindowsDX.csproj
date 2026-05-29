@@ -33,6 +33,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Remove="Graphics\DynamicSpriteFont.cs" />
+  </ItemGroup>  
+
+  <ItemGroup>
     <Compile Include="Platform\Audio\Xact\WaveBank.Default.cs" />
     <Compile Include="Platform\GamePlatform.Desktop.cs" />
     <Compile Include="Platform\Graphics\SwapChainRenderTarget.cs" />

@@ -40,6 +40,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Remove="Graphics\DynamicSpriteFont.cs" />
+  </ItemGroup>  
+
+  <ItemGroup>
     <Compile Include="Platform\TitleContainer.Desktop.cs" />
     <Compile Include="Platform\Audio\Xact\WaveBank.Default.cs" />
     <Compile Include="Platform\Graphics\OpenGL.Common.cs" />

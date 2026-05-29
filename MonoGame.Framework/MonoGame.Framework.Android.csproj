@@ -40,6 +40,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Remove="Graphics\DynamicSpriteFont.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Compile Include="Platform\Android\AndroidCompatibility.cs" />
     <Compile Include="Platform\Android\AndroidGameActivity.cs" />
     <Compile Include="Platform\Android\AndroidGamePlatform.cs" />
