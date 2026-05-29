@@ -10,7 +10,7 @@ namespace Microsoft.Xna.Framework.Graphics
     /// <summary>
     /// Helper class for drawing text strings and sprites in one or more optimized batches.
     /// </summary>
-	public class SpriteBatch : GraphicsResource
+	public partial class SpriteBatch : GraphicsResource
 	{
         #region Private Fields
         readonly SpriteBatcher _batcher;
