@@ -16,7 +16,7 @@ namespace MonoGame.Tests.Graphics;
 [RunOnUI]
 internal sealed class DynamicSpriteFontTest : GraphicsDeviceTestFixtureBase
 {
-    // #if DIRECTX12 || VULKAN
+#if DIRECTX12 || VULKAN
     [Test]
     public void FromFile_GraphicsDeviceIsNull_ThrowsArgumentNullException()
     {
@@ -461,5 +461,5 @@ internal sealed class DynamicSpriteFontTest : GraphicsDeviceTestFixtureBase
     {
         return File.OpenRead(Paths.Font("IBMPlexSans-Regular.ttf"));
     }
-    // #endif
+ #endif
 }
