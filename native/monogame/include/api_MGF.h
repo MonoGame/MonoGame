@@ -17,6 +17,7 @@ struct MGF_CharacterRegion
 struct MGF_Glyph
 {
     mgchar Character;
+    mgint Size;
     mgint BoundsX;
     mgint BoundsY;
     mgint BoundsWidth;
@@ -46,8 +47,7 @@ MG_EXPORT mgbool MGF_BakeSpriteFont(
 
 MG_EXPORT MGF_RuntimeFont* MGF_RuntimeFont_Create(
     mgbyte* data,
-    mgint dataBytes,
-    mgint size
+    mgint dataBytes
 );
 
 MG_EXPORT void MGF_RuntimeFont_Destroy(
@@ -56,6 +56,7 @@ MG_EXPORT void MGF_RuntimeFont_Destroy(
 
 MG_EXPORT mgbool MGF_RuntimeFont_EnsureGlyphs(
     MGF_RuntimeFont* runtimeFont,
+    mgint size,
     MGF_CharacterRegion* characterRegions,
     mgint characterRegionCount,
     mgbyte*& atlasRgba,

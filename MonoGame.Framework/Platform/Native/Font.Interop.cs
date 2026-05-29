@@ -22,6 +22,7 @@ internal struct MGF_CharacterRegion
 internal struct MGF_Glyph
 {
     public char Character;
+    public int Size;
     public int BoundsX;
     public int BoundsY;
     public int BoundsWidth;
@@ -38,7 +39,7 @@ internal struct MGF_Glyph
 internal static unsafe class MGF
 {
     [DllImport(MGP.MonoGameNativeDLL, EntryPoint = "MGF_RuntimeFont_Create", ExactSpelling = true)]
-    public static extern MGF_RuntimeFont* RuntimeFont_Create(byte* data, int dataBytes, int size);
+    public static extern MGF_RuntimeFont* RuntimeFont_Create(byte* data, int dataBytes);
 
     [DllImport(MGP.MonoGameNativeDLL, EntryPoint = "MGF_RuntimeFont_Destroy", ExactSpelling = true)]
     public static extern void RuntimeFont_Destroy(MGF_RuntimeFont* runtimeFont);
@@ -46,6 +47,7 @@ internal static unsafe class MGF
     [DllImport(MGP.MonoGameNativeDLL, EntryPoint = "MGF_RuntimeFont_EnsureGlyphs", ExactSpelling = true)]
     [return: MarshalAs(UnmanagedType.U1)]
     public static extern bool RuntimeFont_EnsureGlyphs(MGF_RuntimeFont* runtimeFont,
+                                                       int size,
                                                        MGF_CharacterRegion* characterRegions,
                                                        int characterRegionCount,
                                                        out byte* atlasRgba,

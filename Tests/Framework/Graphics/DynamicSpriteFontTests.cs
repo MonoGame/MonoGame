@@ -299,7 +299,29 @@ internal sealed class DynamicSpriteFontTest : GraphicsDeviceTestFixtureBase
 
             Assert.That(restoredSize, Is.EqualTo(smallSize).Using(Vector2Comparer.Epsilon));
         }
-    }    
+    }
+
+    [Test]
+    public void MeasureString_SizeChangesBackToPreviousSize_KeepsSharedAtlasTexture()
+    {
+        using (Stream stream = OpenRuntimeFontStream())
+        {
+            DynamicSpriteFont font = DynamicSpriteFont.FromStream(gd, stream, 16.0f, Array.Empty<CharacterRegion>());
+
+            font.MeasureString("a");
+            Texture2D initialTexture = font.Texture;
+
+            font.Size = 32.0f;
+            font.MeasureString("W");
+            Texture2D grownTexture = font.Texture;
+
+            font.Size = 16.0f;
+            font.MeasureString("a");
+
+            Assert.That(initialTexture, Is.Not.Null);
+            Assert.That(grownTexture, Is.SameAs(font.Texture));
+        }
+    }
 
     [Test]
     public void MeasureStringStringBuilder_SizeChanges_ChangesMeasuredWidth()
@@ -433,7 +455,7 @@ internal sealed class DynamicSpriteFontTest : GraphicsDeviceTestFixtureBase
                 spriteBatch.DrawString(font, new StringBuilder("abc"), Vector2.Zero, Color.White, 0.0f, Vector2.Zero, Vector2.One, SpriteEffects.None, 0.0f, true));
             spriteBatch.End();
         }
-    }    
+    }
 
     private static Stream OpenRuntimeFontStream()
     {

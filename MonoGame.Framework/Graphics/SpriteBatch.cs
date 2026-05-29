@@ -218,7 +218,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 {
                     char c = text[i];
 
-                    if (c == 'r')
+                    if (c == '\r')
                     {
                         continue;
                     }

@@ -21,6 +21,7 @@
 struct GlyphBuildInfo
 {
     mgchar Character;
+    mgint Size;
     mgint Width;
     mgint Height;
     mgint BitmapTop;
@@ -32,20 +33,47 @@ struct GlyphBuildInfo
     std::vector<mgbyte> Pixels;
 };
 
+struct RuntimeSizeInfo
+{
+    mgint Size;
+    float Scale;
+    mgint AscentPixels;
+    mgint LineSpacing;
+};
+
+struct GlyphKey
+{
+    mgchar Character;
+    mgint Size;
+
+    bool operator==(const GlyphKey& other) const
+    {
+        return Character == other.Character && Size == other.Size;
+    }
+};
+
+struct GlyphKeyHash
+{
+    size_t operator()(const GlyphKey& key) const
+    {
+        const auto character = static_cast<size_t>(key.Character);
+        const auto size = static_cast<size_t>(key.Size);
+        return (character << 16) ^ size;
+    }
+};
+
 struct MGF_RuntimeFont
 {
     std::vector<mgbyte> FontData;
     stbtt_fontinfo Font;
-    float Scale;
-    mgint AscentPixels;
-    mgint LineSpacing;
     mgint AtlasWidth;
     mgint AtlasHeight;
     stbrp_context PackContext;
     std::vector<stbrp_node> PackNodes;
     std::vector<GlyphBuildInfo> Glyphs;
     std::vector<MGF_Glyph> GlyphResults;
-    std::unordered_map<mgchar, size_t> GlyphLookup;
+    std::unordered_map<GlyphKey, size_t, GlyphKeyHash> GlyphLookup;
+    std::unordered_map<mgint, RuntimeSizeInfo> SizeLookup;
     std::vector<mgbyte> Atlas;
 };
 
@@ -82,7 +110,31 @@ namespace
         return characters;
     }
 
-    mgbool build_glyph(const stbtt_fontinfo& font, float scale, mgchar character, GlyphBuildInfo& glyph)
+    RuntimeSizeInfo& ensure_size_info(MGF_RuntimeFont& runtimeFont, mgint size)
+    {
+        auto sizeIterator = runtimeFont.SizeLookup.find(size);
+        if (sizeIterator != runtimeFont.SizeLookup.end())
+            return sizeIterator->second;
+
+        RuntimeSizeInfo sizeInfo = {};
+        sizeInfo.Size = size;
+        sizeInfo.Scale = stbtt_ScaleForPixelHeight(&runtimeFont.Font, static_cast<float>(size));
+
+        int ascent;
+        int descent;
+        int lineGap;
+        stbtt_GetFontVMetrics(&runtimeFont.Font, &ascent, &descent, &lineGap);
+
+        sizeInfo.AscentPixels = static_cast<mgint>(std::ceil(ascent * sizeInfo.Scale));
+        sizeInfo.LineSpacing = static_cast<mgint>(std::ceil((ascent - descent + lineGap) * sizeInfo.Scale));
+        if (sizeInfo.LineSpacing <= 0)
+            sizeInfo.LineSpacing = size;
+
+        const auto result = runtimeFont.SizeLookup.emplace(size, sizeInfo);
+        return result.first->second;
+    }
+
+    mgbool build_glyph(const stbtt_fontinfo& font, const RuntimeSizeInfo& sizeInfo, mgchar character, GlyphBuildInfo& glyph)
     {
         if (stbtt_FindGlyphIndex(&font, character) == 0)
             return false;
@@ -95,15 +147,16 @@ namespace
         int y1;
 
         stbtt_GetCodepointHMetrics(&font, character, &advanceWidth, &leftSideBearing);
-        stbtt_GetCodepointBitmapBox(&font, character, scale, scale, &x0, &y0, &x1, &y1);
+        stbtt_GetCodepointBitmapBox(&font, character, sizeInfo.Scale, sizeInfo.Scale, &x0, &y0, &x1, &y1);
 
         const mgint width = x1 - x0;
         const mgint height = y1 - y0;
         const mgint bitmapTop = -y0;
-        const mgfloat advancePixels = advanceWidth * scale;
+        const mgfloat advancePixels = advanceWidth * sizeInfo.Scale;
 
         glyph = {};
         glyph.Character = character;
+        glyph.Size = sizeInfo.Size;
         glyph.Width = width;
         glyph.Height = height;
         glyph.BitmapTop = bitmapTop;
@@ -111,7 +164,14 @@ namespace
         if (width > 0 && height > 0)
         {
             glyph.Pixels.resize(static_cast<size_t>(width) * static_cast<size_t>(height));
-            stbtt_MakeCodepointBitmap(&font, glyph.Pixels.data(), width, height, width, scale, scale, character);
+            stbtt_MakeCodepointBitmap(&font,
+                                      glyph.Pixels.data(),
+                                      width,
+                                      height,
+                                      width,
+                                      sizeInfo.Scale,
+                                      sizeInfo.Scale,
+                                      character);
         }
 
         if (width > 0)
@@ -131,20 +191,20 @@ namespace
     }
 
     std::vector<GlyphBuildInfo> build_glyphs(const stbtt_fontinfo& font,
-                                             float scale,
+                                             const RuntimeSizeInfo& sizeInfo,
                                              const std::vector<mgchar>& characters,
-                                             const std::unordered_map<mgchar, size_t>& glyphLookup)
+                                             const std::unordered_map<GlyphKey, size_t, GlyphKeyHash>& glyphLookup)
     {
         std::vector<GlyphBuildInfo> glyphs;
         glyphs.reserve(characters.size());
 
         for (mgchar character : characters)
         {
-            if (glyphLookup.find(character) != glyphLookup.end())
+            if (glyphLookup.find({ character, sizeInfo.Size }) != glyphLookup.end())
                 continue;
 
             GlyphBuildInfo glyph = {};
-            if (build_glyph(font, scale, character, glyph))
+            if (build_glyph(font, sizeInfo, character, glyph))
                 glyphs.push_back(std::move(glyph));
         }
 
@@ -215,7 +275,7 @@ namespace
         for (size_t rectIndex = 0; rectIndex < rects.size(); ++rectIndex)
         {
             const auto& rect = rects[rectIndex];
-            if(rect.was_packed == 0)
+            if (rect.was_packed == 0)
                 return false;
 
             auto& glyph = glyphs[glyphIndices[rectIndex]];
@@ -253,13 +313,16 @@ namespace
         runtimeFont.GlyphLookup.clear();
 
         for (size_t i = 0; i < runtimeFont.Glyphs.size(); ++i)
-            runtimeFont.GlyphLookup[runtimeFont.Glyphs[i].Character] = i;
+            runtimeFont.GlyphLookup[{ runtimeFont.Glyphs[i].Character, runtimeFont.Glyphs[i].Size }] = i;
     }
 
     void update_glyph_results(MGF_RuntimeFont& runtimeFont)
     {
         std::sort(runtimeFont.Glyphs.begin(), runtimeFont.Glyphs.end(), [](const GlyphBuildInfo& left, const GlyphBuildInfo& right)
         {
+            if (left.Size != right.Size)
+                return left.Size < right.Size;
+
             return left.Character < right.Character;
         });
 
@@ -270,16 +333,18 @@ namespace
         {
             const auto& glyph = runtimeFont.Glyphs[i];
             auto& result = runtimeFont.GlyphResults[i];
+            const auto& sizeInfo = runtimeFont.SizeLookup[glyph.Size];
 
             result.Character = glyph.Character;
+            result.Size = glyph.Size;
             result.BoundsX = glyph.AtlasX;
             result.BoundsY = glyph.AtlasY;
             result.BoundsWidth = glyph.Width;
             result.BoundsHeight = glyph.Height;
             result.CroppingX = 0;
-            result.CroppingY = runtimeFont.AscentPixels - glyph.BitmapTop;
+            result.CroppingY = sizeInfo.AscentPixels - glyph.BitmapTop;
             result.CroppingWidth = glyph.Width;
-            result.CroppingHeight = runtimeFont.LineSpacing;
+            result.CroppingHeight = sizeInfo.LineSpacing;
             result.LeftSideBearing = glyph.LeftSideBearing;
             result.Width = glyph.WidthValue;
             result.RightSideBearing = glyph.RightSideBearing;
@@ -322,6 +387,7 @@ namespace
     }
 
     mgbool ensure_glyphs(MGF_RuntimeFont& runtimeFont,
+                         mgint size,
                          MGF_CharacterRegion* characterRegions,
                          mgint characterRegionCount,
                          mgbyte*& atlasRgba,
@@ -338,16 +404,19 @@ namespace
         atlasRebuilt = false;
         glyphs = nullptr;
         glyphCount = static_cast<mgint>(runtimeFont.GlyphResults.size());
-        lineSpacing = runtimeFont.LineSpacing;
+        lineSpacing = 0;
 
-        if (characterRegions == nullptr || characterRegionCount <= 0)
+        if (size <= 0 || characterRegions == nullptr || characterRegionCount <= 0)
             return false;
+
+        const auto& sizeInfo = ensure_size_info(runtimeFont, size);
+        lineSpacing = sizeInfo.LineSpacing;
 
         const auto characters = collect_characters(characterRegions, characterRegionCount);
         if (characters.empty())
             return false;
 
-        auto newGlyphs = build_glyphs(runtimeFont.Font, runtimeFont.Scale, characters, runtimeFont.GlyphLookup);
+        auto newGlyphs = build_glyphs(runtimeFont.Font, sizeInfo, characters, runtimeFont.GlyphLookup);
 
         if (newGlyphs.empty())
         {
@@ -360,7 +429,6 @@ namespace
         {
             atlasRebuilt = true;
 
-            auto glyphsToAppend = newGlyphs;
             if (!rebuild_runtime_font(runtimeFont, newGlyphs, estimate_initial_atlas_size(newGlyphs)))
                 return false;
         }
@@ -399,14 +467,14 @@ namespace
         atlasHeight = runtimeFont.AtlasHeight;
         glyphs = runtimeFont.GlyphResults.empty() ? nullptr : runtimeFont.GlyphResults.data();
         glyphCount = static_cast<mgint>(runtimeFont.GlyphResults.size());
-        lineSpacing = runtimeFont.LineSpacing;
+        lineSpacing = sizeInfo.LineSpacing;
         return atlasRgba != nullptr && glyphs != nullptr && glyphCount > 0;
     }
 }
 
-MGF_RuntimeFont* MGF_RuntimeFont_Create(mgbyte* data, mgint dataBytes, mgint size)
+MGF_RuntimeFont* MGF_RuntimeFont_Create(mgbyte* data, mgint dataBytes)
 {
-    if (data == nullptr || dataBytes <= 0 || size <= 0)
+    if (data == nullptr || dataBytes <= 0)
         return nullptr;
 
     auto runtimeFont = new MGF_RuntimeFont();
@@ -426,18 +494,6 @@ MGF_RuntimeFont* MGF_RuntimeFont_Create(mgbyte* data, mgint dataBytes, mgint siz
         return nullptr;
     }
 
-    runtimeFont->Scale = stbtt_ScaleForPixelHeight(&runtimeFont->Font, static_cast<float>(size));
-
-    int ascent;
-    int descent;
-    int lineGap;
-    stbtt_GetFontVMetrics(&runtimeFont->Font, &ascent, &descent, &lineGap);
-
-    runtimeFont->AscentPixels = static_cast<mgint>(std::ceil(ascent * runtimeFont->Scale));
-    runtimeFont->LineSpacing = static_cast<mgint>(std::ceil((ascent - descent + lineGap) * runtimeFont->Scale));
-    if (runtimeFont->LineSpacing <= 0)
-        runtimeFont->LineSpacing = size;
-
     runtimeFont->AtlasWidth = 0;
     runtimeFont->AtlasHeight = 0;
     return runtimeFont;
@@ -449,20 +505,22 @@ void MGF_RuntimeFont_Destroy(MGF_RuntimeFont* runtimeFont)
 }
 
 mgbool MGF_RuntimeFont_EnsureGlyphs(MGF_RuntimeFont* runtimeFont,
-                                   MGF_CharacterRegion* characterRegions,
-                                   mgint characterRegionCount,
-                                   mgbyte*& atlasRgba,
-                                   mgint& atlasWidth,
-                                   mgint& atlasHeight,
-                                   mgbool& atlasRebuilt,
-                                   MGF_Glyph*& glyphs,
-                                   mgint& glyphCount,
-                                   mgint& lineSpacing)
+                                    mgint size,
+                                    MGF_CharacterRegion* characterRegions,
+                                    mgint characterRegionCount,
+                                    mgbyte*& atlasRgba,
+                                    mgint& atlasWidth,
+                                    mgint& atlasHeight,
+                                    mgbool& atlasRebuilt,
+                                    MGF_Glyph*& glyphs,
+                                    mgint& glyphCount,
+                                    mgint& lineSpacing)
 {
     if (runtimeFont == nullptr)
         return false;
 
     return ensure_glyphs(*runtimeFont,
+                         size,
                          characterRegions,
                          characterRegionCount,
                          atlasRgba,
@@ -493,7 +551,7 @@ mgbool MGF_BakeSpriteFont(mgbyte* data,
     glyphCount = 0;
     lineSpacing = 0;
 
-    auto runtimeFont = MGF_RuntimeFont_Create(data, dataBytes, size);
+    auto runtimeFont = MGF_RuntimeFont_Create(data, dataBytes);
     if (runtimeFont == nullptr)
         return false;
 
@@ -506,6 +564,7 @@ mgbool MGF_BakeSpriteFont(mgbyte* data,
     mgint runtimeLineSpacing = 0;
 
     const auto result = MGF_RuntimeFont_EnsureGlyphs(runtimeFont,
+                                                     size,
                                                      characterRegions,
                                                      characterRegionCount,
                                                      runtimeAtlas,

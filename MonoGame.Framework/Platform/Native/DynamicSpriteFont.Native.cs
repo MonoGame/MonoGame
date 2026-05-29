@@ -4,8 +4,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Drawing;
-using System.Net;
 using System.Runtime.InteropServices;
 using MonoGame.Interop;
 
@@ -14,18 +12,9 @@ namespace Microsoft.Xna.Framework.Graphics;
 public sealed partial class DynamicSpriteFont
 {
 #if NATIVE
-    private unsafe DynamicSpriteFontSizeData CreateSizeData(int rasterizedSize)
-    {
-        DynamicSpriteFontRuntimeState runtimeState = CreateRuntimeState(_fontData, rasterizedSize);
-        if (_characterRegions.Length == 0)
-        {
-            return CreateEmptyRuntimeSizeData(_graphicsDevice, runtimeState, rasterizedSize);
-        }
-
-        return CreateRuntimeSizeData(_graphicsDevice, runtimeState, _characterRegions);
-    }
-
-    private unsafe void PlatformEnsureGlyphs(DynamicSpriteFontSizeData sizeData, ref DynamicSpriteFontCharacterSource text)
+    private unsafe void PlatformEnsureGlyphs(int rasterizedSize,
+                                             DynamicSpriteFontSizeData sizeData,
+                                             ref DynamicSpriteFontCharacterSource text)
     {
         List<char> missingCharacters = GetMissingCharacters(sizeData, ref text);
         if (missingCharacters.Count == 0)
@@ -34,7 +23,8 @@ public sealed partial class DynamicSpriteFont
         }
 
         CharacterRegion[] characterRegions = BuildCharacterRegions(missingCharacters);
-        EnsureRuntimeGlyphs(sizeData.RuntimeState,
+        EnsureRuntimeGlyphs(_runtimeState,
+                            rasterizedSize,
                             characterRegions,
                             out byte* atlasRgba,
                             out int atlasWidth,
@@ -44,9 +34,9 @@ public sealed partial class DynamicSpriteFont
                             out int glyphCount,
                             out int lineSpacing);
 
-        Texture2D currentTexture = sizeData.Texture;
+        Texture2D currentTexture = _texture;
         Texture2D nextTexture = currentTexture;
-        if (currentTexture.width != atlasWidth || currentTexture.height != atlasHeight)
+        if (currentTexture.Width != atlasWidth || currentTexture.Height != atlasHeight)
         {
             nextTexture = new Texture2D(currentTexture.GraphicsDevice, atlasWidth, atlasHeight, false, SurfaceFormat.Color);
         }
@@ -72,7 +62,9 @@ public sealed partial class DynamicSpriteFont
         }
 
         DynamicSpriteFontGlyph[] updatedGlyphs = CreateGlyphs(glyphs, glyphCount);
-        sizeData.Update(nextTexture, updatedGlyphs, lineSpacing);
+        UpdateSizeDataCaches(nextTexture, updatedGlyphs, rasterizedSize, lineSpacing);
+
+        _texture = nextTexture;
 
         if (nextTexture != currentTexture)
         {
@@ -80,7 +72,7 @@ public sealed partial class DynamicSpriteFont
         }
     }
 
-    private static unsafe CharacterRegion[] BuildCharacterRegions(List<char> missingCharacters)
+    private static CharacterRegion[] BuildCharacterRegions(List<char> missingCharacters)
     {
         if (missingCharacters.Count == 0)
         {
@@ -90,11 +82,10 @@ public sealed partial class DynamicSpriteFont
         missingCharacters.Sort();
 
         List<CharacterRegion> regions = new List<CharacterRegion>();
-
         char regionStart = missingCharacters[0];
         char regionEnd = missingCharacters[0];
 
-        for (int i = 0; i < missingCharacters.Count; i++)
+        for (int i = 1; i < missingCharacters.Count; i++)
         {
             char character = missingCharacters[i];
             if (character == regionEnd + 1)
@@ -114,14 +105,15 @@ public sealed partial class DynamicSpriteFont
 
     private static unsafe DynamicSpriteFontGlyph[] CreateGlyphs(MGF_Glyph* glyphs, int glyphCount)
     {
-        DynamicSpriteFontGlyph[] spriteFontGlyphs = new DynamicSpriteFontGlyph[glyphCount];
+        DynamicSpriteFontGlyph[] dynamicGlyphs = new DynamicSpriteFontGlyph[glyphCount];
 
         for (int i = 0; i < glyphCount; i++)
         {
             MGF_Glyph glyph = glyphs[i];
-            spriteFontGlyphs[i] = new DynamicSpriteFontGlyph
+            dynamicGlyphs[i] = new DynamicSpriteFontGlyph
             {
                 Character = glyph.Character,
+                Size = glyph.Size,
                 BoundsInTexture = new Rectangle(glyph.BoundsX, glyph.BoundsY, glyph.BoundsWidth, glyph.BoundsHeight),
                 Cropping = new Rectangle(glyph.CroppingX, glyph.CroppingY, glyph.CroppingWidth, glyph.CroppingHeight),
                 LeftSideBearing = glyph.LeftSideBearing,
@@ -131,30 +123,20 @@ public sealed partial class DynamicSpriteFont
             };
         }
 
-        return spriteFontGlyphs;
+        return dynamicGlyphs;
     }
 
-    private static unsafe DynamicSpriteFontSizeData CreateEmptyRuntimeSizeData(GraphicsDevice graphicsDevice,
-                                                                               DynamicSpriteFontRuntimeState runtimeState,
-                                                                               int size)
-    {
-        Texture2D texture = new Texture2D(graphicsDevice, 1, 1, false, SurfaceFormat.Color);
-        texture.SetData(new Color[] { Color.Transparent });
-
-        return new DynamicSpriteFontSizeData(texture, Array.Empty<DynamicSpriteFontGlyph>(), size, 0.0f, runtimeState);
-    }
-
-    private static unsafe DynamicSpriteFontRuntimeState CreateRuntimeState(byte[] fontData, int size)
+    private static unsafe DynamicSpriteFontRuntimeState CreateRuntimeState(byte[] fontData)
     {
         GCHandle fontDataHandle = default;
 
         try
         {
             fontDataHandle = GCHandle.Alloc(fontData, GCHandleType.Pinned);
-            MGF_RuntimeFont* runtimeFont = MGF.RuntimeFont_Create((byte*)fontDataHandle.AddrOfPinnedObject(), fontData.Length, size);
+            MGF_RuntimeFont* runtimeFont = MGF.RuntimeFont_Create((byte*)fontDataHandle.AddrOfPinnedObject(), fontData.Length);
             if (runtimeFont == null)
             {
-                throw new InvalidOperationException("Failed to create a runtime DynamicSpriteFont from the supplied font data");
+                throw new InvalidOperationException("Failed to create a runtime DynamicSpriteFont from the supplied font data.");
             }
 
             return new DynamicSpriteFontRuntimeState(runtimeFont);
@@ -168,39 +150,8 @@ public sealed partial class DynamicSpriteFont
         }
     }
 
-    private static unsafe DynamicSpriteFontSizeData CreateRuntimeSizeData(GraphicsDevice graphicsDevice,
-                                                                          DynamicSpriteFontRuntimeState runtimeState,
-                                                                          CharacterRegion[] runtimeRegions)
-    {
-        EnsureRuntimeGlyphs(runtimeState,
-                            runtimeRegions,
-                            out byte* atlasRgba,
-                            out int atlasWidth,
-                            out int atlasHeight,
-                            out _,
-                            out MGF_Glyph* glyphs,
-                            out int glyphCount,
-                            out int lineSpacing);
-
-        Texture2D texture = new Texture2D(graphicsDevice, atlasWidth, atlasHeight, false, SurfaceFormat.Color);
-        MGG.Texture_SetData(graphicsDevice.Handle,
-                            texture.Handle,
-                            0,
-                            0,
-                            0,
-                            0,
-                            0,
-                            atlasWidth,
-                            atlasHeight,
-                            1,
-                            atlasRgba,
-                            atlasWidth * atlasHeight * 4);
-
-        DynamicSpriteFontGlyph[] spriteFontGlyphs = CreateGlyphs(glyphs, glyphCount);
-        return new DynamicSpriteFontSizeData(texture, spriteFontGlyphs, lineSpacing, 0.0f, runtimeState);
-    }
-
     private static unsafe void EnsureRuntimeGlyphs(DynamicSpriteFontRuntimeState runtimeState,
+                                                   int size,
                                                    CharacterRegion[] runtimeRegions,
                                                    out byte* atlasRgba,
                                                    out int atlasWidth,
@@ -224,6 +175,7 @@ public sealed partial class DynamicSpriteFont
             regionHandle = GCHandle.Alloc(nativeRegions, GCHandleType.Pinned);
 
             if (!MGF.RuntimeFont_EnsureGlyphs(runtimeState.Handle,
+                                             size,
                                              (MGF_CharacterRegion*)regionHandle.AddrOfPinnedObject(),
                                              nativeRegions.Length,
                                              out atlasRgba,
@@ -254,6 +206,7 @@ public sealed partial class DynamicSpriteFont
     private static List<char> GetMissingCharacters(DynamicSpriteFontSizeData sizeData, ref DynamicSpriteFontCharacterSource text)
     {
         HashSet<char> missingCharacters = new HashSet<char>();
+
         for (int i = 0; i < text.Length; i++)
         {
             char character = text[i];
@@ -269,6 +222,11 @@ public sealed partial class DynamicSpriteFont
         }
 
         return new List<char>(missingCharacters);
+    }
+
+    private static long GetGlyphLookupKey(char character, int size)
+    {
+        return ((long)size << 16) | character;
     }
 
     private static Rectangle MergeGlyphBounds(List<Rectangle> bounds)
@@ -288,9 +246,9 @@ public sealed partial class DynamicSpriteFont
         return mergedBounds;
     }
 
-    private static bool ShouldUploadGlyph(Dictionary<char, Rectangle> currentGlyphBounds, char character, Rectangle nextBounds)
+    private static bool ShouldUploadGlyph(Dictionary<long, Rectangle> currentGlyphBounds, long glyphKey, Rectangle nextBounds)
     {
-        if (!currentGlyphBounds.TryGetValue(character, out Rectangle currentBounds))
+        if (!currentGlyphBounds.TryGetValue(glyphKey, out Rectangle currentBounds))
         {
             return true;
         }
@@ -299,24 +257,25 @@ public sealed partial class DynamicSpriteFont
     }
 
     private static unsafe void UploadChangedGlyphBounds(DynamicSpriteFontSizeData sizeData,
-                                                       MGF_Glyph* glyphs,
-                                                       int glyphCount,
-                                                       byte* atlasRgba,
-                                                       int atlasWidth)
+                                                        MGF_Glyph* glyphs,
+                                                        int glyphCount,
+                                                        byte* atlasRgba,
+                                                        int atlasWidth)
     {
-        Dictionary<char, Rectangle> currentGlyphBounds = new Dictionary<char, Rectangle>(sizeData.Glyphs.Length);
+        Dictionary<long, Rectangle> currentGlyphBounds = new Dictionary<long, Rectangle>(sizeData.Glyphs.Length);
         List<Rectangle> changedBounds = new List<Rectangle>();
 
         for (int i = 0; i < sizeData.Glyphs.Length; i++)
         {
-            currentGlyphBounds[sizeData.Glyphs[i].Character] = sizeData.Glyphs[i].BoundsInTexture;
+            DynamicSpriteFontGlyph glyph = sizeData.Glyphs[i];
+            currentGlyphBounds[GetGlyphLookupKey(glyph.Character, glyph.Size)] =glyph.BoundsInTexture;
         }
 
         for (int i = 0; i < glyphCount; i++)
         {
             MGF_Glyph glyph = glyphs[i];
             Rectangle nextBounds = new Rectangle(glyph.BoundsX, glyph.BoundsY, glyph.BoundsWidth, glyph.BoundsHeight);
-            if (!ShouldUploadGlyph(currentGlyphBounds, glyph.Character, nextBounds))
+            if (!ShouldUploadGlyph(currentGlyphBounds, GetGlyphLookupKey(glyph.Character, glyph.Size), nextBounds))
             {
                 continue;
             }
@@ -336,6 +295,45 @@ public sealed partial class DynamicSpriteFont
 
         Rectangle dirtyBounds = MergeGlyphBounds(changedBounds);
         UploadDirtyBounds(sizeData.Texture, atlasRgba, atlasWidth, dirtyBounds);
+    }
+
+    private void UpdateSizeDataCaches(Texture2D texture, DynamicSpriteFontGlyph[] glyphs, int currentSize, int currentLineSpacing)
+    {
+        Dictionary<int, List<DynamicSpriteFontGlyph>> glyphsBySize = new Dictionary<int, List<DynamicSpriteFontGlyph>>();
+
+        for(int i = 0; i < glyphs.Length; i++)
+        {
+            DynamicSpriteFontGlyph glyph = glyphs[i];
+            List<DynamicSpriteFontGlyph> glyphList;
+            if (!glyphsBySize.TryGetValue(glyph.Size, out glyphList))
+            {
+                glyphList = new List<DynamicSpriteFontGlyph>();
+                glyphsBySize.Add(glyph.Size, glyphList);
+            }
+
+            glyphList.Add(glyph);
+        }
+
+        foreach(KeyValuePair<int, DynamicSpriteFontSizeData> pair in _sizeDataBySize)
+        {
+            int lineSpacing = pair.Key == currentSize ? currentLineSpacing : pair.Value.LineSpacing;
+
+            if (glyphsBySize.TryGetValue(pair.Key, out List<DynamicSpriteFontGlyph> existingGlyphs))
+            {
+                pair.Value.Update(texture, existingGlyphs.ToArray(), lineSpacing);
+                glyphsBySize.Remove(pair.Key);
+            }
+            else
+            {
+                pair.Value.Update(texture, Array.Empty<DynamicSpriteFontGlyph>(), lineSpacing);
+            }
+        }
+
+        foreach (KeyValuePair<int, List<DynamicSpriteFontGlyph>> pair in glyphsBySize)
+        {
+            int lineSpacing = pair.Key == currentSize ? currentLineSpacing : 0;
+            _sizeDataBySize[pair.Key] = new DynamicSpriteFontSizeData(texture, pair.Value.ToArray(), lineSpacing, 0.0f);
+        }
     }
 
     private static unsafe void UploadDirtyBounds(Texture2D texture,
@@ -374,12 +372,14 @@ public sealed partial class DynamicSpriteFont
         }
     }
 #else
-    private DynamicSpriteFontSizeData CreateSizeData(int rasterizedSize)
+    private void PlatformEnsureGlyphs(int rasterizedSize,
+                                      DynamicSpriteFontSizeData sizeData,
+                                      ref DynamicSpriteFontCharacterSource text)
     {
         throw new PlatformNotSupportedException("Runtime SpriteFont baking is currently implemented only for MonoGame.Framework.Native.");
     }
 
-    private void PlatformEnsureGlyphs(DynamicSpriteFontSizeData sizeData, ref DynamicSpriteFontCharacterSource text)
+    private static DynamicSpriteFontRuntimeState CreateRuntimeState(byte[] fontData)
     {
         throw new PlatformNotSupportedException("Runtime SpriteFont baking is currently implemented only for MonoGame.Framework.Native.");
     }

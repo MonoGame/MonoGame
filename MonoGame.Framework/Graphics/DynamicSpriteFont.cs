@@ -19,7 +19,9 @@ public sealed partial class DynamicSpriteFont
     private readonly CharacterRegion[] _characterRegions;
     private readonly byte[] _fontData;
     private readonly GraphicsDevice _graphicsDevice;
+    private readonly DynamicSpriteFontRuntimeState _runtimeState;
     private readonly Dictionary<int, DynamicSpriteFontSizeData> _sizeDataBySize;
+    private Texture2D _texture;
     private float _size;
 
     /// <summary>
@@ -39,22 +41,28 @@ public sealed partial class DynamicSpriteFont
     }
 
     /// <summary>
-    /// Gets the current atlas texture for the active size.
+    /// Gets the current atlas texture for this font face.
     /// </summary>
     public Texture2D Texture
     {
         get
         {
-            return GetCurrentSizeData().Texture;
+            return _texture;
         }
     }
 
-    private DynamicSpriteFont(GraphicsDevice graphicsDevice, byte[] fontDta, float size, CharacterRegion[] characterRegions)
+    private DynamicSpriteFont(GraphicsDevice graphicsDevice,
+                              byte[] fontData,
+                              DynamicSpriteFontRuntimeState runtimeState,
+                              float size,
+                              CharacterRegion[] characterRegions)
     {
         _graphicsDevice = graphicsDevice;
-        _fontData = fontDta;
+        _fontData = fontData;
+        _runtimeState = runtimeState;
         _characterRegions = characterRegions;
         _sizeDataBySize = new Dictionary<int, DynamicSpriteFontSizeData>();
+        _texture = CreateInitialTexture(graphicsDevice);
         _size = size;
     }
 
@@ -145,7 +153,8 @@ public sealed partial class DynamicSpriteFont
 #else
         List<CharacterRegion> regions = new List<CharacterRegion>(characterRegions);
         byte[] fontData = ReadFontData(stream);
-        return new DynamicSpriteFont(graphicsDevice, fontData, size, regions.ToArray());
+        DynamicSpriteFontRuntimeState runtimeState = CreateRuntimeState(fontData);
+        return new DynamicSpriteFont(graphicsDevice, fontData, runtimeState, size, regions.ToArray());
 #endif
     }
 
@@ -216,10 +225,11 @@ public sealed partial class DynamicSpriteFont
             return;
         }
 
+        int rasterizedSize = GetRasterizedSize();
         DynamicSpriteFontSizeData sizeData = GetCurrentSizeData();
 
 #if NATIVE
-        PlatformEnsureGlyphs(sizeData, ref text);
+        PlatformEnsureGlyphs(rasterizedSize, sizeData, ref text);
 #endif
     }
 
@@ -232,7 +242,7 @@ public sealed partial class DynamicSpriteFont
             return sizeData;
         }
 
-        sizeData = CreateSizeData(rasterizedSize);
+        sizeData = new DynamicSpriteFontSizeData(_texture, Array.Empty<DynamicSpriteFontGlyph>(), 0, 0.0f);
         _sizeDataBySize[rasterizedSize] = sizeData;
         return sizeData;
     }
@@ -257,6 +267,13 @@ public sealed partial class DynamicSpriteFont
         return (int)MathF.Ceiling(_size);
     }
 
+    private static Texture2D CreateInitialTexture(GraphicsDevice graphicsDevice)
+    {
+        Texture2D texture = new Texture2D(graphicsDevice, 1, 1, false, SurfaceFormat.Color);
+        texture.SetData(new Color[] { Color.Transparent });
+        return texture;
+    }
+
     private static void ValidateSize(float size, string paramName)
     {
         if (float.IsNaN(size) || float.IsInfinity(size) || size <= 0.0f)
@@ -271,6 +288,7 @@ public sealed partial class DynamicSpriteFont
 
         public Rectangle BoundsInTexture;
         public char Character;
+        public int Size;
         public Rectangle Cropping;
         public float LeftSideBearing;
         public float RightSideBearing;
@@ -346,18 +364,15 @@ public sealed partial class DynamicSpriteFont
 
         public DynamicSpriteFontGlyph[] Glyphs { get; private set; }
         public int LineSpacing { get; private set; }
-        public DynamicSpriteFontRuntimeState RuntimeState { get; }
         public float Spacing { get; }
         public Texture2D Texture { get; private set; }
 
         public DynamicSpriteFontSizeData(Texture2D texture,
                                          DynamicSpriteFontGlyph[] glyphs,
                                          int lineSpacing,
-                                         float spacing,
-                                         DynamicSpriteFontRuntimeState runtimeState)
+                                         float spacing)
         {
             Texture = texture;
-            RuntimeState = runtimeState;
             Spacing = spacing;
             _glyphIndices = new Dictionary<char, int>(glyphs.Length);
 
