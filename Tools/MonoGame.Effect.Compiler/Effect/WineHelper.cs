@@ -37,7 +37,6 @@ namespace MonoGame.Effect.Compiler
                 ["wine64", "wine"] :
                 ["wine", "wine64"];
             var proc = new Process();
-            proc.StartInfo.Arguments = "--version";
             proc.StartInfo.UseShellExecute = false;
             proc.StartInfo.CreateNoWindow = true;
             proc.StartInfo.RedirectStandardOutput = true;
@@ -74,16 +73,23 @@ namespace MonoGame.Effect.Compiler
             return true;
         }
 
-        static int RunInWine(string cmd)
+        static int RunInWine(string cmd, out string errors)
         {
+            errors = string.Empty;
             var proc = new Process();
             proc.StartInfo.FileName = _wineExecutable;
             proc.StartInfo.Arguments = cmd;
             proc.StartInfo.CreateNoWindow = true;
-            proc.StartInfo.UseShellExecute = true;
+            proc.StartInfo.UseShellExecute = false;
+            proc.StartInfo.RedirectStandardError = true;
 
             proc.Start();
             proc.WaitForExit();
+
+            if (proc.ExitCode != 0)
+            {
+                errors = proc.StandardError.ReadToEnd();
+            }
 
             return proc.ExitCode;
         }
@@ -113,20 +119,23 @@ namespace MonoGame.Effect.Compiler
                 File.WriteAllText(srcPath, fileContents);
 
                 var cmd = $"dotnet c:\\fxccs.dll {GetWinePath(srcPath)} {shaderFunction} {shaderProfile} {(int)shaderFlags} {displayPath} {GetWinePath(dstPath)}";
-                var result = RunInWine(cmd);
+                var result = RunInWine(cmd, out string errors);
                 if (result == 0)
                 {
                     ret = new CompilationResult(new ShaderBytecode(File.ReadAllBytes(dstPath)), Result.Ok, "");
                 }
+                else
+                {
+                    throw new Exception($"{_wineExecutable} {cmd} failed.\n{errors}");
+                }
             }
-            catch { }
-
-            File.Delete(srcPath);
-            File.Delete(dstPath);
-
-            if (ret == null)
-            {
-                throw new Exception("Failed to compile shader!");
+            catch (Exception ex) {
+                Console.Error.WriteLine($"{ex}");
+                throw;
+            }
+            finally {
+                File.Delete(srcPath);
+                File.Delete(dstPath);
             }
 
             return ret;
