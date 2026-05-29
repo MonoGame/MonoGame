@@ -426,6 +426,7 @@ namespace MonoGame.OpenGL
         // ETC1
         Etc1 = 0x8D64,
         Srgb = 0x8C40,
+        Srgb8Alpha8 = 0x8C43,
 
         // ETC2 RGB8A1
         Etc2Rgb8 = 0x9274,
