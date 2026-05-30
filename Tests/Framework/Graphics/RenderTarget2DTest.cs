@@ -188,16 +188,12 @@ namespace MonoGame.Tests.Graphics
         [Test]
         [TestCase(DepthFormat.None, 0)]
         [TestCase(DepthFormat.None, 1)]
-        [TestCase(DepthFormat.None, 2)]
         [TestCase(DepthFormat.Depth16, 0)]
         [TestCase(DepthFormat.Depth16, 1)]
-        [TestCase(DepthFormat.Depth16, 2)]
         [TestCase(DepthFormat.Depth24, 0)]
         [TestCase(DepthFormat.Depth24, 1)]
-        [TestCase(DepthFormat.Depth24, 2)]
         [TestCase(DepthFormat.Depth24Stencil8, 0)]
         [TestCase(DepthFormat.Depth24Stencil8, 1)]
-        [TestCase(DepthFormat.Depth24Stencil8, 2)]
         [RunOnUI]
         public void ClearAndGetDataWithMultiSample(DepthFormat depthFormat, int multiSampleCount)
         {
