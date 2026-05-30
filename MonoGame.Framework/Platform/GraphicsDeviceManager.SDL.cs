@@ -20,11 +20,7 @@ namespace Microsoft.Xna.Framework
             Sdl.GL.SetAttribute(Sdl.GL.Attribute.BlueSize, surfaceFormat.B);
             Sdl.GL.SetAttribute(Sdl.GL.Attribute.AlphaSize, surfaceFormat.A);
 
-            if (
-                backBufferFormat == SurfaceFormat.ColorSRgb
-                || backBufferFormat == SurfaceFormat.Bgr32SRgb
-                || backBufferFormat == SurfaceFormat.Bgra32SRgb
-            )
+            if (backBufferFormat == SurfaceFormat.ColorSRgb || backBufferFormat == SurfaceFormat.Bgr32SRgb || backBufferFormat == SurfaceFormat.Bgra32SRgb)
             {
                 Sdl.GL.SetAttribute(Sdl.GL.Attribute.FramebufferSRGBCapable, 1);
             }
@@ -56,10 +52,7 @@ namespace Microsoft.Xna.Framework
             if (presentationParameters.MultiSampleCount > 0)
             {
                 Sdl.GL.SetAttribute(Sdl.GL.Attribute.MultiSampleBuffers, 1);
-                Sdl.GL.SetAttribute(
-                    Sdl.GL.Attribute.MultiSampleSamples,
-                    presentationParameters.MultiSampleCount
-                );
+                Sdl.GL.SetAttribute(Sdl.GL.Attribute.MultiSampleSamples, presentationParameters.MultiSampleCount);
             }
 
             ((SdlGameWindow)SdlGameWindow.Instance).CreateWindow();
