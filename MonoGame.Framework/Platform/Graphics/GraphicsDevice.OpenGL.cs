@@ -644,11 +644,13 @@ namespace Microsoft.Xna.Framework.Graphics
             var depth = 0;
             var stencil = 0;
             
-            if (preferredMultiSampleCount > 0 && this.framebufferHelper.SupportsBlitFramebuffer)
+            var sampleCount = GetClampedMultisampleCount(preferredFormat, preferredMultiSampleCount);
+            
+            if (sampleCount > 0 && this.framebufferHelper.SupportsBlitFramebuffer)
             {
                 this.framebufferHelper.GenRenderbuffer(out color);
                 this.framebufferHelper.BindRenderbuffer(color);
-                this.framebufferHelper.RenderbufferStorageMultisample(preferredMultiSampleCount, (int)RenderbufferStorage.Rgba8, width, height);
+                this.framebufferHelper.RenderbufferStorageMultisample(sampleCount, (int)RenderbufferStorage.Rgba8, width, height);
             }
 
             if (preferredDepthFormat != DepthFormat.None)
@@ -698,7 +700,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 {
                     this.framebufferHelper.GenRenderbuffer(out depth);
                     this.framebufferHelper.BindRenderbuffer(depth);
-                    this.framebufferHelper.RenderbufferStorageMultisample(preferredMultiSampleCount, (int)depthInternalFormat, width, height);
+                    this.framebufferHelper.RenderbufferStorageMultisample(sampleCount, (int)depthInternalFormat, width, height);
                     if (preferredDepthFormat == DepthFormat.Depth24Stencil8)
                     {
                         stencil = depth;
@@ -706,7 +708,7 @@ namespace Microsoft.Xna.Framework.Graphics
                         {
                             this.framebufferHelper.GenRenderbuffer(out stencil);
                             this.framebufferHelper.BindRenderbuffer(stencil);
-                            this.framebufferHelper.RenderbufferStorageMultisample(preferredMultiSampleCount, (int)stencilInternalFormat, width, height);
+                            this.framebufferHelper.RenderbufferStorageMultisample(sampleCount, (int)stencilInternalFormat, width, height);
                         }
                     }
                 }
