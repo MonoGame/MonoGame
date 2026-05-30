@@ -53,7 +53,7 @@
     <ItemGroup>
 		<ProjectReference Include="..\MonoGame.Framework\MonoGame.Framework.Native.csproj" />
 	
-		<NativeLib Include="..\Artifacts\native\mgruntime\windowsdx\windows\$(Configuration)\mgruntime.dll" Condition="Exists('..\Artifacts\native\mgruntime\windowsdx\windows\$(Configuration)\mgruntime.dll')" PackagePath="runtimes\win-$(NativePlatform)\native" />
+		<NativeLib Include="..\Artifacts\native\mgruntime\windowsdx\windows\$(NativePlatform)\$(Configuration)\mgruntime.dll" Condition="Exists('..\Artifacts\native\mgruntime\windowsdx\windows\$(NativePlatform)\$(Configuration)\mgruntime.dll')" PackagePath="runtimes\win-$(NativePlatform)\native" />
     </ItemGroup>
 	
 	<ItemGroup>
