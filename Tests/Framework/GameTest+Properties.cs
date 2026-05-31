@@ -16,19 +16,15 @@ using Microsoft.Xna.Framework.Graphics;
 using NUnit.Framework;
 using NUnit.Framework.Constraints;
 
-namespace MonoGame.Tests
+namespace MonoGame.Tests 
 {
-	partial class GameTest
+	partial class GameTest 
     {
-		public static class Properties
+		public static class Properties 
         {
 			[TestFixture]
 			[Category("GameTest")]
-#if DESKTOPGL
-			[RunOnUI]
-			[NonParallelizable]
-#endif
-			public class Components : ReadOnlyPropertyFixtureBase<GameComponentCollection>
+			public class Components : ReadOnlyPropertyFixtureBase<GameComponentCollection> 
             {
 				public Components ()
 					: base (g => g.Components)
@@ -45,10 +41,6 @@ namespace MonoGame.Tests
 
 			[TestFixture]
 			[Category("GameTest")]
-#if DESKTOPGL
-			[RunOnUI]
-			[NonParallelizable]
-#endif
 			public class Content : ReadWritePropertyFixtureBase<ContentManager> {
 				public Content ()
 					: base (g => g.Content)
@@ -81,10 +73,6 @@ namespace MonoGame.Tests
 
 			[TestFixture]
 			[Category("GameTest")]
-#if DESKTOPGL
-			[RunOnUI]
-			[NonParallelizable]
-#endif
 			public class GraphicsDevice_ : ReadOnlyPropertyFixtureBase<GraphicsDevice> {
 				public GraphicsDevice_ ()
 					: base (g => g.GraphicsDevice)
@@ -134,10 +122,6 @@ namespace MonoGame.Tests
 
 			[TestFixture]
 			[Category("GameTest")]
-#if DESKTOPGL
-			[RunOnUI]
-			[NonParallelizable]
-#endif
 			public class InactiveSleepTime : ReadWritePropertyFixtureBase<TimeSpan> {
 				public InactiveSleepTime ()
 					: base (g => g.InactiveSleepTime)
@@ -156,10 +140,6 @@ namespace MonoGame.Tests
 
 			[TestFixture]
 			[Category("GameTest")]
-#if DESKTOPGL
-			[RunOnUI]
-			[NonParallelizable]
-#endif
 			public class IsActive : ReadOnlyPropertyFixtureBase<bool> {
 				public IsActive ()
 					: base (g => g.IsActive)
@@ -170,10 +150,6 @@ namespace MonoGame.Tests
 
 			[TestFixture]
 			[Category("GameTest")]
-#if DESKTOPGL
-			[RunOnUI]
-			[NonParallelizable]
-#endif
 			public class IsFixedTimeStep : ReadWritePropertyFixtureBase<bool> {
 				public IsFixedTimeStep ()
 					: base (g => g.IsFixedTimeStep)
@@ -189,10 +165,6 @@ namespace MonoGame.Tests
 
 			[TestFixture]
 			[Category("GameTest")]
-#if DESKTOPGL
-			[RunOnUI]
-			[NonParallelizable]
-#endif
 			public class IsMouseVisible : ReadWritePropertyFixtureBase<bool> {
 				public IsMouseVisible ()
 					: base (g => g.IsMouseVisible)
@@ -208,10 +180,6 @@ namespace MonoGame.Tests
 
 			[TestFixture]
 			[Category("GameTest")]
-#if DESKTOPGL
-			[RunOnUI]
-			[NonParallelizable]
-#endif
 			public class LaunchParameters_ : ReadOnlyPropertyFixtureBase<LaunchParameters> {
 				public LaunchParameters_ ()
 					: base (g => g.LaunchParameters)
@@ -228,10 +196,6 @@ namespace MonoGame.Tests
 
 			[TestFixture]
 			[Category("GameTest")]
-#if DESKTOPGL
-			[RunOnUI]
-			[NonParallelizable]
-#endif
 			public class Services : ReadOnlyPropertyFixtureBase<GameServiceContainer> {
 				public Services ()
 					: base (g => g.Services)
@@ -248,10 +212,6 @@ namespace MonoGame.Tests
 
 			[TestFixture]
 			[Category("GameTest")]
-#if DESKTOPGL
-			[RunOnUI]
-			[NonParallelizable]
-#endif
 			public class TargetElapsedTime : ReadWritePropertyFixtureBase<TimeSpan> {
 				public TargetElapsedTime ()
 					: base (g => g.TargetElapsedTime)
@@ -269,10 +229,6 @@ namespace MonoGame.Tests
 
 			[TestFixture]
 			[Category("GameTest")]
-#if DESKTOPGL
-			[RunOnUI]
-			[NonParallelizable]
-#endif
 			public class Window : ReadOnlyPropertyFixtureBase<GameWindow> {
 				public Window ()
 					: base (g => g.Window)
