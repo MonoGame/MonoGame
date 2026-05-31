@@ -13,7 +13,10 @@ using NUnit.Framework;
 
 namespace MonoGame.Tests {
 	static partial class GameTest {
-        [RunOnUI]
+#if DESKTOPGL
+		[RunOnUI]
+		[NonParallelizable]
+#endif
 		public abstract class FixtureBase {
 			private MockGame _game;
 
@@ -40,7 +43,10 @@ namespace MonoGame.Tests {
 
 		[TestFixture]
 		[Category("GameTest")]
-        [RunOnUI]
+#if DESKTOPGL
+		[RunOnUI]
+		[NonParallelizable]
+#endif
 		public class Disposal : FixtureBase {
 			[TestCase ("Components")]
 			[TestCase ("Content")]
@@ -136,7 +142,10 @@ namespace MonoGame.Tests {
 
 		[TestFixture]
 		[Category("GameTest")]
-        [RunOnUI]
+#if DESKTOPGL
+		[RunOnUI]
+		[NonParallelizable]
+#endif
 		public class Behaviors : FixtureBase {
 			[Test, Ignore("Fix me!")]
 			public void Nongraphical_run_succeeds ()
