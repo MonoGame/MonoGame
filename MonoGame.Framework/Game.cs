@@ -1161,7 +1161,7 @@ namespace Microsoft.Xna.Framework
             }
         }
 
-        private struct AddJournalEntry<T>
+        private struct AddJournalEntry<T> : IEquatable<AddJournalEntry<T>>
         {
             public readonly int Order;
             public readonly T Item;
@@ -1188,6 +1188,11 @@ namespace Microsoft.Xna.Framework
                     return false;
 
                 return object.Equals(Item, ((AddJournalEntry<T>)obj).Item);
+            }
+
+            public bool Equals(AddJournalEntry<T> other)
+            {
+                return object.Equals(Item, other.Item);
             }
         }
     }
