@@ -344,6 +344,12 @@ namespace Microsoft.Xna.Framework.Graphics
 
             framebufferHelper = FramebufferHelper.Create(this);
 
+            if (GraphicsCapabilities.SupportsSRgb)
+            {
+                GL.Enable(EnableCap.FramebufferSrgb);
+                GraphicsExtensions.CheckGLError();
+            }
+
             // Force resetting states
             this.PlatformApplyBlend(true);
             this.DepthStencilState.PlatformApplyState(this, true);
