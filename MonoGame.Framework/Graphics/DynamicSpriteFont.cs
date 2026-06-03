@@ -5,7 +5,6 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Runtime.InteropServices;
 using System.Text;
 using MonoGame.Interop;
 
@@ -17,7 +16,7 @@ namespace Microsoft.Xna.Framework.Graphics;
 public sealed partial class DynamicSpriteFont : GraphicsResource
 {
     private const string TextContainsUnresolvableCharacters = $"Text contains characters that cannot be resolved by this {nameof(DynamicSpriteFont)}.";
-    private const string UnresolvableCharacter = $"Character cannot be resolved by this ${nameof(DynamicSpriteFont)}.";
+    private const string UnresolvableCharacter = $"Character cannot be resolved by this {nameof(DynamicSpriteFont)}.";
 
     private static readonly Dictionary<long, Rectangle> EmptyGlyphBounds = new Dictionary<long, Rectangle>();
 
@@ -36,7 +35,7 @@ public sealed partial class DynamicSpriteFont : GraphicsResource
     /// Gets or sets the active font size used for measuring and drawing.
     /// </summary>
     /// <exception cref="ArgumentOutOfRangeException">
-    /// THrown when the assigned value is zero, negative, <see cref="float.NaN"/> or infinite.
+    /// Thrown when the assigned value is zero, negative, <see cref="float.NaN"/> or infinite.
     /// </exception>
     public float Size
     {
@@ -92,7 +91,7 @@ public sealed partial class DynamicSpriteFont : GraphicsResource
     }
 
     /// <summary>
-    /// Gets the index fo the atlas page currently receiving new glyphs.
+    /// Gets the index of the atlas page currently receiving new glyphs.
     /// </summary>
     public int CurrentAtlasPageIndex
     {
@@ -124,7 +123,7 @@ public sealed partial class DynamicSpriteFont : GraphicsResource
     /// </summary>
     /// <param name="graphicsDevice">The graphics device that will own the runtime font resources.</param>
     /// <param name="path">The path to a TrueType or OpenType font file.</param>
-    /// <param name="size">The initial active size for the dynamic font</param>
+    /// <param name="size">The initial active size for the dynamic font.</param>
     /// <returns>A new <see cref="DynamicSpriteFont"/> for the supplied font face.</returns>
     /// <exception cref="ArgumentNullException">
     /// Thrown when <paramref name="graphicsDevice"/> or <paramref name="path"/> is <see langword="null"/>.
@@ -133,7 +132,7 @@ public sealed partial class DynamicSpriteFont : GraphicsResource
     /// Thrown when <paramref name="path"/> is empty or whitespace.
     /// </exception>
     /// <exception cref="ArgumentOutOfRangeException">
-    /// Throw when <paramref name="size"/> is zero, negative <see cref="float.NaN"/>, or infinite.
+    /// Throw when <paramref name="size"/> is zero, negative, <see cref="float.NaN"/>, or infinite.
     /// </exception>
     public static DynamicSpriteFont FromFile(GraphicsDevice graphicsDevice, string path, float size)
     {
@@ -156,7 +155,7 @@ public sealed partial class DynamicSpriteFont : GraphicsResource
     /// Thrown when <paramref name="path"/> is empty or whitespace.
     /// </exception>
     /// <exception cref="ArgumentOutOfRangeException">
-    /// Throw when <paramref name="size"/> is zero, negative <see cref="float.NaN"/>, or infinite.
+    /// Throw when <paramref name="size"/> is zero, negative, <see cref="float.NaN"/>, or infinite.
     /// </exception>
     public static DynamicSpriteFont FromFile(GraphicsDevice graphicsDevice, string path, float size, IEnumerable<CharacterRegion> characterRegions)
     {
@@ -199,7 +198,7 @@ public sealed partial class DynamicSpriteFont : GraphicsResource
     /// Thrown when <paramref name="graphicsDevice"/> or <paramref name="stream"/> is <see langword="null"/>.
     /// </exception>
     /// <exception cref="ArgumentOutOfRangeException">
-    /// Throw when <paramref name="size"/> is zero, negative <see cref="float.NaN"/>, or infinite.
+    /// Throw when <paramref name="size"/> is zero, negative, <see cref="float.NaN"/>, or infinite.
     /// </exception>
     public static DynamicSpriteFont FromStream(GraphicsDevice graphicsDevice, Stream stream, float size)
     {
@@ -219,7 +218,7 @@ public sealed partial class DynamicSpriteFont : GraphicsResource
     /// <paramref name="characterRegions"/> is <see langword="null"/>.
     /// </exception>
     /// <exception cref="ArgumentOutOfRangeException">
-    /// Throw when <paramref name="size"/> is zero, negative <see cref="float.NaN"/>, or infinite.
+    /// Throw when <paramref name="size"/> is zero, negative, <see cref="float.NaN"/>, or infinite.
     /// </exception>
     public static DynamicSpriteFont FromStream(GraphicsDevice graphicsDevice, Stream stream, float size, IEnumerable<CharacterRegion> characterRegions)
     {
@@ -253,7 +252,7 @@ public sealed partial class DynamicSpriteFont : GraphicsResource
         }
 
         FontHandle fontHandle = CreateFontHandle(fontData);
-        DynamicSpriteFont dynamicSpriteFont =  new DynamicSpriteFont(graphicsDevice, fontHandle, size);
+        DynamicSpriteFont dynamicSpriteFont = new DynamicSpriteFont(graphicsDevice, fontHandle, size);
 
         try
         {
@@ -314,7 +313,7 @@ public sealed partial class DynamicSpriteFont : GraphicsResource
     }
 
     /// <summary>
-    /// Returns the size of the contents of a <see cref="StringBuilder"/>when rendered using the current font state.
+    /// Returns the size of the contents of a <see cref="StringBuilder"/> when rendered using the current font state.
     /// </summary>
     /// <param name="text">The text to measure.</param>
     /// <returns>The size, in pixels, of <paramref name="text"/> when rendered in this font.</returns>
@@ -453,7 +452,7 @@ public sealed partial class DynamicSpriteFont : GraphicsResource
         for (int i = 0; i < glyphs.Length; i++)
         {
             FontGlyph glyph = glyphs[i];
-            
+
             if (!_glyphBoundsByPage.TryGetValue(glyph.PageIndex, out Dictionary<long, Rectangle> glyphBounds))
             {
                 glyphBounds = new Dictionary<long, Rectangle>();
@@ -500,7 +499,7 @@ public sealed partial class DynamicSpriteFont : GraphicsResource
         foreach (PreparedTextFont preparedTextFont in _preparedTextFontsBySize.Values)
         {
             int defaultGlyphIndex = -1;
-            
+
             if (_defaultCharacter.HasValue)
             {
                 preparedTextFont.TryGetGlyphIndex(_defaultCharacter.Value, out defaultGlyphIndex);
@@ -541,34 +540,6 @@ public sealed partial class DynamicSpriteFont : GraphicsResource
         }
 
         return alternateIndex;
-    }
-
-    private static bool TryGetDefaultGlyphIndex(FontGlyph[] glyphs, char defaultCharacter, out int defaultGlyphIndex)
-    {
-        char alternate = char.IsUpper(defaultCharacter) ?
-                         char.ToLower(defaultCharacter) :
-                         char.ToUpper(defaultCharacter);
-
-        bool checkAlternate = alternate != defaultCharacter;
-        int alternateIndex = -1;
-
-        for (int i = 0; i < glyphs.Length; i++)
-        {
-            char character = glyphs[i].Character;
-            if (character == defaultCharacter)
-            {
-                defaultGlyphIndex = i;
-                return true;
-            }
-
-            if (checkAlternate && alternateIndex == -1 && character == alternate)
-            {
-                alternateIndex = i;
-            }
-        }
-
-        defaultGlyphIndex = alternateIndex;
-        return alternateIndex != -1;
     }
 
     private static void ValidateSize(float size, string paramName)
