@@ -23,7 +23,7 @@ public partial class SpriteBatch : GraphicsResource
 
         if (!_beginCalled)
         {
-            throw new InvalidOperationException("DrawString was called, But Begin has not yet been called. Begin must be called successfully before you can call DrawString.");
+            throw new InvalidOperationException("DrawString was called, but Begin has not yet been called. Begin must be called successfully before you can call DrawString.");
         }
 
         dynamicSpriteFont.EnsureGlyphs(text);
@@ -43,7 +43,7 @@ public partial class SpriteBatch : GraphicsResource
 
         if (!_beginCalled)
         {
-            throw new InvalidOperationException("DrawString was called, But Begin has not yet been called. Begin must be called successfully before you can call DrawString.");
+            throw new InvalidOperationException("DrawString was called, but Begin has not yet been called. Begin must be called successfully before you can call DrawString.");
         }
 
         dynamicSpriteFont.EnsureGlyphs(text);
@@ -51,7 +51,7 @@ public partial class SpriteBatch : GraphicsResource
 
     private void DrawString(DynamicSpriteFont dynamicSpriteFont, ref FontCharacterSource text, Vector2 position, Color color)
     {
-        PreparedTextFont preparedTextFont = dynamicSpriteFont.GetPreparedTextFont(ref text);
+        PreparedTextFont preparedTextFont = dynamicSpriteFont.GetCurrentPreparedTextFont();
         DrawPreparedText(preparedTextFont, ref text, position, color);
     }
 
@@ -66,7 +66,7 @@ public partial class SpriteBatch : GraphicsResource
                            float layerDepth,
                            bool rtl)
     {
-        PreparedTextFont preparedTextFont = dynamicSpriteFont.GetPreparedTextFont(ref text);
+        PreparedTextFont preparedTextFont = dynamicSpriteFont.GetCurrentPreparedTextFont();
         DrawPreparedText(preparedTextFont, ref text, position, color, rotation, origin, scale, effects, layerDepth, rtl);
     }
 

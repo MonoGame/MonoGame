@@ -9,67 +9,83 @@ using MonoGame.Interop;
 
 namespace Microsoft.Xna.Framework.Graphics;
 
-public sealed partial class DynamicSpriteFont
+public sealed partial class DynamicSpriteFont : GraphicsResource
 {
 #if NATIVE
     private unsafe void PlatformEnsureGlyphs(int rasterizedSize,
-                                             PreparedTextFontData preparedTextFontData,
+                                             PreparedTextFont preparedTextFont,
                                              ref FontCharacterSource text)
     {
-        List<char> missingCharacters = GetMissingCharacters(preparedTextFontData, ref text);
+        List<char> missingCharacters = GetMissingCharacters(preparedTextFont, ref text);
+        if (_defaultCharacter.HasValue && !preparedTextFont.TryGetGlyphIndex(_defaultCharacter.Value, out _))
+        {
+            missingCharacters.Add(_defaultCharacter.Value);
+        }
+
         if (missingCharacters.Count == 0)
         {
             return;
         }
 
         CharacterRegion[] characterRegions = BuildCharacterRegions(missingCharacters);
-        EnsureRuntimeGlyphs(_runtimeState,
+        EnsureRuntimeGlyphs(_fontHandle,
                             rasterizedSize,
                             characterRegions,
-                            out byte* atlasRgba,
-                            out int atlasWidth,
-                            out int atlasHeight,
-                            out bool atlasRebuilt,
+                            out MGF_PageUpdate* pageUpdates,
+                            out int pageUpdateCount,
                             out MGF_Glyph* glyphs,
                             out int glyphCount,
                             out int lineSpacing);
 
-        Texture2D currentTexture = _texture;
-        Texture2D nextTexture = currentTexture;
-        if (currentTexture.Width != atlasWidth || currentTexture.Height != atlasHeight)
+        ApplyRuntimeGlyphUpdateResults(rasterizedSize,
+                                       pageUpdates,
+                                       pageUpdateCount,
+                                       glyphs,
+                                       glyphCount,
+                                       lineSpacing);
+    }
+
+    private unsafe void PlatformWarmGlyphs(int rasterizedSize, CharacterRegion[] characterRegions)
+    {
+        EnsureRuntimeGlyphs(_fontHandle,
+                            rasterizedSize,
+                            characterRegions,
+                            out MGF_PageUpdate* pageUpdates,
+                            out int pageUpdateCount,
+                            out MGF_Glyph* glyphs,
+                            out int glyphCount,
+                            out int lineSpacing);
+
+        ApplyRuntimeGlyphUpdateResults(rasterizedSize,
+                                       pageUpdates,
+                                       pageUpdateCount,
+                                       glyphs,
+                                       glyphCount,
+                                       lineSpacing);
+    }
+
+    private unsafe void ApplyRuntimeGlyphUpdateResults(int rasterizedSize,
+                                                       MGF_PageUpdate* pageUpdates,
+                                                       int pageUpdateCount,
+                                                       MGF_Glyph* glyphs,
+                                                       int glyphCount,
+                                                       int lineSpacing)
+    {
+
+        int currentPageIndex = _currentPageIndex;
+        for (int i = 0; i < pageUpdateCount; i++)
         {
-            nextTexture = new Texture2D(currentTexture.GraphicsDevice, atlasWidth, atlasHeight, false, SurfaceFormat.Color);
+            MGF_PageUpdate pageUpdate = pageUpdates[i];
+            currentPageIndex = pageUpdate.PageIndex;
+            ApplyPageUpdate(glyphs, glyphCount, pageUpdate);
         }
 
-        if (atlasRebuilt || nextTexture != currentTexture)
-        {
-            MGG.Texture_SetData(currentTexture.GraphicsDevice.Handle,
-                                nextTexture.Handle,
-                                0,
-                                0,
-                                0,
-                                0,
-                                0,
-                                atlasWidth,
-                                atlasHeight,
-                                1,
-                                atlasRgba,
-                                atlasWidth * atlasHeight * 4);
-        }
-        else
-        {
-            UploadChangedGlyphBounds(preparedTextFontData, glyphs, glyphCount, atlasRgba, atlasWidth);
-        }
-
+        // Native returns the full glyph list because atlas rebuilds can repack previously baked glyphs onto
+        // different bounds or pages, so the managed caches must refresh from the complete glyph state.
         FontGlyph[] updatedGlyphs = CreateGlyphs(glyphs, glyphCount);
-        UpdatePreparedTextFontDataCaches(nextTexture, updatedGlyphs, rasterizedSize, lineSpacing);
-
-        _texture = nextTexture;
-
-        if (nextTexture != currentTexture)
-        {
-            currentTexture.Dispose();
-        }
+        _currentPageIndex = currentPageIndex;
+        UpdateGlyphBoundsByPage(updatedGlyphs);
+        UpdatePreparedTextFontCaches(updatedGlyphs, rasterizedSize, lineSpacing);
     }
 
     private static CharacterRegion[] BuildCharacterRegions(List<char> missingCharacters)
@@ -114,6 +130,7 @@ public sealed partial class DynamicSpriteFont
             {
                 Character = glyph.Character,
                 Size = glyph.Size,
+                PageIndex = glyph.PageIndex,
                 BoundsInTexture = new Rectangle(glyph.BoundsX, glyph.BoundsY, glyph.BoundsWidth, glyph.BoundsHeight),
                 Cropping = new Rectangle(glyph.CroppingX, glyph.CroppingY, glyph.CroppingWidth, glyph.CroppingHeight),
                 LeftSideBearing = glyph.LeftSideBearing,
@@ -126,7 +143,7 @@ public sealed partial class DynamicSpriteFont
         return dynamicGlyphs;
     }
 
-    private static unsafe DynamicSpriteFontRuntimeState CreateRuntimeState(byte[] fontData)
+    private static unsafe FontHandle CreateFontHandle(byte[] fontData)
     {
         GCHandle fontDataHandle = default;
 
@@ -139,7 +156,7 @@ public sealed partial class DynamicSpriteFont
                 throw new InvalidOperationException("Failed to create a runtime DynamicSpriteFont from the supplied font data.");
             }
 
-            return new DynamicSpriteFontRuntimeState(runtimeFont);
+            return new FontHandle(runtimeFont);
         }
         finally
         {
@@ -150,13 +167,11 @@ public sealed partial class DynamicSpriteFont
         }
     }
 
-    private static unsafe void EnsureRuntimeGlyphs(DynamicSpriteFontRuntimeState runtimeState,
+    private static unsafe void EnsureRuntimeGlyphs(FontHandle fontHandle,
                                                    int size,
                                                    CharacterRegion[] runtimeRegions,
-                                                   out byte* atlasRgba,
-                                                   out int atlasWidth,
-                                                   out int atlasHeight,
-                                                   out bool atlasRebuilt,
+                                                   out MGF_PageUpdate* pageUpdates,
+                                                   out int pageUpdateCount,
                                                    out MGF_Glyph* glyphs,
                                                    out int glyphCount,
                                                    out int lineSpacing)
@@ -174,22 +189,20 @@ public sealed partial class DynamicSpriteFont
 
             regionHandle = GCHandle.Alloc(nativeRegions, GCHandleType.Pinned);
 
-            if (!MGF.RuntimeFont_EnsureGlyphs(runtimeState.Handle,
+            if (!MGF.RuntimeFont_EnsureGlyphs(fontHandle.Handle,
                                              size,
                                              (MGF_CharacterRegion*)regionHandle.AddrOfPinnedObject(),
                                              nativeRegions.Length,
-                                             out atlasRgba,
-                                             out atlasWidth,
-                                             out atlasHeight,
-                                             out atlasRebuilt,
+                                             out pageUpdates,
+                                             out pageUpdateCount,
                                              out glyphs,
                                              out glyphCount,
                                              out lineSpacing))
             {
-                throw new InvalidOperationException("Failed to update a runtime DynamicSpriteFont from the supplied font data.");
+                ThrowRuntimeGlyphUpdateException(fontHandle);
             }
 
-            if (atlasRgba == null || glyphs == null || glyphCount <= 0)
+            if (pageUpdateCount < 0 || glyphCount <= 0)
             {
                 throw new InvalidOperationException("Runtime DynamicSpriteFont update did not return any glyph data.");
             }
@@ -203,7 +216,7 @@ public sealed partial class DynamicSpriteFont
         }
     }
 
-    private static List<char> GetMissingCharacters(PreparedTextFontData preparedTextFontData, ref FontCharacterSource text)
+    private static List<char> GetMissingCharacters(PreparedTextFont preparedTextFont, ref FontCharacterSource text)
     {
         HashSet<char> missingCharacters = new HashSet<char>();
 
@@ -215,18 +228,13 @@ public sealed partial class DynamicSpriteFont
                 continue;
             }
 
-            if (!preparedTextFontData.TryGetGlyphIndexExact(character, out _))
+            if (!preparedTextFont.TryGetGlyphIndexExact(character, out _))
             {
                 missingCharacters.Add(character);
             }
         }
 
         return new List<char>(missingCharacters);
-    }
-
-    private static long GetGlyphLookupKey(char character, int size)
-    {
-        return ((long)size << 16) | character;
     }
 
     private static Rectangle MergeGlyphBounds(List<Rectangle> bounds)
@@ -256,24 +264,24 @@ public sealed partial class DynamicSpriteFont
         return currentBounds != nextBounds;
     }
 
-    private static unsafe void UploadChangedGlyphBounds(PreparedTextFontData preparedFontTextData,
+    private static unsafe void UploadChangedGlyphBounds(Dictionary<long, Rectangle> currentGlyphBounds,
+                                                        Texture2D texture,
                                                         MGF_Glyph* glyphs,
                                                         int glyphCount,
+                                                        int pageIndex,
                                                         byte* atlasRgba,
                                                         int atlasWidth)
     {
-        Dictionary<long, Rectangle> currentGlyphBounds = new Dictionary<long, Rectangle>(preparedFontTextData.Glyphs.Length);
         List<Rectangle> changedBounds = new List<Rectangle>();
-
-        for (int i = 0; i < preparedFontTextData.Glyphs.Length; i++)
-        {
-            FontGlyph glyph = preparedFontTextData.Glyphs[i];
-            currentGlyphBounds[GetGlyphLookupKey(glyph.Character, glyph.Size)] =glyph.BoundsInTexture;
-        }
 
         for (int i = 0; i < glyphCount; i++)
         {
             MGF_Glyph glyph = glyphs[i];
+            if (glyph.PageIndex != pageIndex)
+            {
+                continue;
+            }
+
             Rectangle nextBounds = new Rectangle(glyph.BoundsX, glyph.BoundsY, glyph.BoundsWidth, glyph.BoundsHeight);
             if (!ShouldUploadGlyph(currentGlyphBounds, GetGlyphLookupKey(glyph.Character, glyph.Size), nextBounds))
             {
@@ -294,18 +302,66 @@ public sealed partial class DynamicSpriteFont
         }
 
         Rectangle dirtyBounds = MergeGlyphBounds(changedBounds);
-        UploadDirtyBounds(preparedFontTextData.Texture, atlasRgba, atlasWidth, dirtyBounds);
+        UploadDirtyBounds(texture, atlasRgba, atlasWidth, dirtyBounds);
     }
 
-    private void UpdatePreparedTextFontDataCaches(Texture2D texture, FontGlyph[] glyphs, int currentSize, int currentLineSpacing)
+    private unsafe void ApplyPageUpdate(MGF_Glyph* glyphs,
+                                        int glyphCount,
+                                        MGF_PageUpdate pageUpdate)
+    {
+        _texturesByPage.TryGetValue(pageUpdate.PageIndex, out Texture2D currentTexture);
+
+        Texture2D nextTexture = currentTexture;
+        if (currentTexture == null ||
+            currentTexture.Width != pageUpdate.AtlasWidth ||
+            currentTexture.Height != pageUpdate.AtlasHeight)
+        {
+            nextTexture = new Texture2D(GraphicsDevice, pageUpdate.AtlasWidth, pageUpdate.AtlasHeight, false, SurfaceFormat.Color);
+        }
+
+        if (pageUpdate.AtlasRebuilt || nextTexture != currentTexture)
+        {
+            MGG.Texture_SetData(GraphicsDevice.Handle,
+                                nextTexture.Handle,
+                                0,
+                                0,
+                                0,
+                                0,
+                                0,
+                                pageUpdate.AtlasWidth,
+                                pageUpdate.AtlasHeight,
+                                1,
+                                pageUpdate.AtlasRgba,
+                                pageUpdate.AtlasWidth * pageUpdate.AtlasHeight * 4);
+        }
+        else
+        {
+            UploadChangedGlyphBounds(GetGlyphBoundsForPage(pageUpdate.PageIndex),
+                                     nextTexture,
+                                     glyphs,
+                                     glyphCount,
+                                     pageUpdate.PageIndex,
+                                     pageUpdate.AtlasRgba,
+                                     pageUpdate.AtlasWidth);
+        }
+
+        _texturesByPage[pageUpdate.PageIndex] = nextTexture;
+
+        if (currentTexture != null && nextTexture != currentTexture)
+        {
+            currentTexture.Dispose();
+        }
+    }
+
+    private void UpdatePreparedTextFontCaches(FontGlyph[] glyphs, int currentSize, int currentLineSpacing)
     {
         Dictionary<int, List<FontGlyph>> glyphsBySize = new Dictionary<int, List<FontGlyph>>();
 
-        for(int i = 0; i < glyphs.Length; i++)
+        for (int i = 0; i < glyphs.Length; i++)
         {
             FontGlyph glyph = glyphs[i];
-            List<FontGlyph> glyphList;
-            if (!glyphsBySize.TryGetValue(glyph.Size, out glyphList))
+
+            if (!glyphsBySize.TryGetValue(glyph.Size, out List<FontGlyph> glyphList))
             {
                 glyphList = new List<FontGlyph>();
                 glyphsBySize.Add(glyph.Size, glyphList);
@@ -314,25 +370,34 @@ public sealed partial class DynamicSpriteFont
             glyphList.Add(glyph);
         }
 
-        foreach(KeyValuePair<int, PreparedTextFontData> pair in _preparedTextFontDataBySize)
+        foreach (KeyValuePair<int, PreparedTextFont> pair in _preparedTextFontsBySize)
         {
             int lineSpacing = pair.Key == currentSize ? currentLineSpacing : pair.Value.LineSpacing;
 
             if (glyphsBySize.TryGetValue(pair.Key, out List<FontGlyph> existingGlyphs))
             {
-                pair.Value.Update(texture, existingGlyphs.ToArray(), lineSpacing);
+                pair.Value.Update(_texturesByPage, _currentPageIndex, existingGlyphs.ToArray(), lineSpacing);
                 glyphsBySize.Remove(pair.Key);
             }
             else
             {
-                pair.Value.Update(texture, Array.Empty<FontGlyph>(), lineSpacing);
+                pair.Value.Update(_texturesByPage, _currentPageIndex, Array.Empty<FontGlyph>(), lineSpacing);
             }
+
+            int defaultGlyphIndex = -1;
+
+            if (_defaultCharacter.HasValue)
+            {
+                pair.Value.TryGetGlyphIndex(_defaultCharacter.Value, out defaultGlyphIndex);
+            }
+
+            pair.Value.UpdateDefaultGlyphIndex(defaultGlyphIndex);
         }
 
         foreach (KeyValuePair<int, List<FontGlyph>> pair in glyphsBySize)
         {
             int lineSpacing = pair.Key == currentSize ? currentLineSpacing : 0;
-            _preparedTextFontDataBySize[pair.Key] = new PreparedTextFontData(texture, pair.Value.ToArray(), lineSpacing, 0.0f);
+            _preparedTextFontsBySize[pair.Key] = CreatePreparedTextFont(_currentPageIndex, pair.Value.ToArray(), lineSpacing, 0.0f);
         }
     }
 
@@ -371,15 +436,35 @@ public sealed partial class DynamicSpriteFont
                                 uploadBufferBytes);
         }
     }
+
+    private static unsafe void ThrowRuntimeGlyphUpdateException(FontHandle fontHandle)
+    {
+        MGF_RuntimeFontErrorCode errorCode = (MGF_RuntimeFontErrorCode)MGF.RuntimeFont_GetLastErrorCode(fontHandle.Handle);
+        string message = Marshal.PtrToStringAnsi(MGF.RuntimeFont_GetLastErrorMessage(fontHandle.Handle))
+            ?? "Failed to update a runtime DynamicSpriteFont from the supplied font data.";
+
+        if (errorCode == MGF_RuntimeFontErrorCode.OutOfMemory)
+        {
+            throw new OutOfMemoryException(message);
+        }
+
+        throw new InvalidOperationException(message);
+    }
+
 #else
     private void PlatformEnsureGlyphs(int rasterizedSize,
-                                      PreparedTextFontData preparedTextFontData,
+                                      PreparedTextFont preparedTextFont,
                                       ref FontCharacterSource text)
     {
         throw new PlatformNotSupportedException("Runtime SpriteFont baking is currently implemented only for MonoGame.Framework.Native.");
     }
 
-    private static DynamicSpriteFontRuntimeState CreateRuntimeState(byte[] fontData)
+    private void PlatformWarmGlyphs(int rasterizedSize, CharacterRegion[] characterRegions)
+    {
+        throw new PlatformNotSupportedException("Runtime SpriteFont baking is currently implemented only for MonoGame.Framework.Native.");
+    }
+
+    private static FontHandle CreateFontHandle(byte[] fontData)
     {
         throw new PlatformNotSupportedException("Runtime SpriteFont baking is currently implemented only for MonoGame.Framework.Native.");
     }

@@ -726,7 +726,9 @@ namespace Microsoft.Xna.Framework.Graphics
 
         private unsafe void DrawPreparedText(PreparedTextFont preparedTextFont, ref FontCharacterSource text, Vector2 position, Color color)
         {
-            float sortKey = GetTextSortKey(preparedTextFont.Texture);
+            Texture2D defaultTexture = preparedTextFont.Texture;
+            bool usesMultipleTextures = preparedTextFont.UsesMultipleTextures;
+            float defaultSortKey = GetTextSortKey(defaultTexture);
 
             Vector2 offset = Vector2.Zero;
             bool firstGlyphOfLine = true;
@@ -771,14 +773,18 @@ namespace Microsoft.Xna.Framework.Graphics
                     p.Y += pCurrentGlyph->Cropping.Y;
                     p += position;
 
-                    SpriteBatchItem item = _batcher.CreateBatchItem();
-                    item.Texture = preparedTextFont.Texture;
-                    item.SortKey = sortKey;
+                    Texture2D glyphTexture = usesMultipleTextures ?
+                                             preparedTextFont.GetTexture(pCurrentGlyph->PageIndex) :
+                                             defaultTexture;
 
-                    _texCoordTL.X = pCurrentGlyph->BoundsInTexture.X * preparedTextFont.Texture.TexelWidth;
-                    _texCoordTL.Y = pCurrentGlyph->BoundsInTexture.Y * preparedTextFont.Texture.TexelHeight;
-                    _texCoordBR.X = (pCurrentGlyph->BoundsInTexture.X + pCurrentGlyph->BoundsInTexture.Width) * preparedTextFont.Texture.TexelWidth;
-                    _texCoordBR.Y = (pCurrentGlyph->BoundsInTexture.Y + pCurrentGlyph->BoundsInTexture.Height) * preparedTextFont.Texture.TexelHeight;
+                    SpriteBatchItem item = _batcher.CreateBatchItem();
+                    item.Texture = glyphTexture;
+                    item.SortKey = usesMultipleTextures ? GetTextSortKey(glyphTexture) : defaultSortKey;
+
+                    _texCoordTL.X = pCurrentGlyph->BoundsInTexture.X * glyphTexture.TexelWidth;
+                    _texCoordTL.Y = pCurrentGlyph->BoundsInTexture.Y * glyphTexture.TexelHeight;
+                    _texCoordBR.X = (pCurrentGlyph->BoundsInTexture.X + pCurrentGlyph->BoundsInTexture.Width) * glyphTexture.TexelWidth;
+                    _texCoordBR.Y = (pCurrentGlyph->BoundsInTexture.Y + pCurrentGlyph->BoundsInTexture.Height) * glyphTexture.TexelHeight;
 
                     item.Set(p.X,
                              p.Y,
@@ -807,7 +813,9 @@ namespace Microsoft.Xna.Framework.Graphics
                                              float layerDepth,
                                              bool rtl)
         {
-            float sortKey = GetTextSortKey(preparedTextFont.Texture, layerDepth);
+            Texture2D defaultTexture = preparedTextFont.Texture;
+            bool usesMultipleTextures = preparedTextFont.UsesMultipleTextures;
+            float defaultSortKey = GetTextSortKey(defaultTexture, layerDepth);
 
             Vector2 flipAdjustment = Vector2.Zero;
             bool flippedVert = (effects & SpriteEffects.FlipVertically) == SpriteEffects.FlipVertically;
@@ -908,14 +916,18 @@ namespace Microsoft.Xna.Framework.Graphics
 
                     Vector2.Transform(ref p, ref transformation, out p);
 
-                    SpriteBatchItem item = _batcher.CreateBatchItem();
-                    item.Texture = preparedTextFont.Texture;
-                    item.SortKey = sortKey;
+                    Texture2D glyphTexture = usesMultipleTextures ?
+                                             preparedTextFont.GetTexture(pCurrentGlyph->PageIndex) :
+                                             defaultTexture;
 
-                    _texCoordTL.X = pCurrentGlyph->BoundsInTexture.X * preparedTextFont.Texture.TexelWidth;
-                    _texCoordTL.Y = pCurrentGlyph->BoundsInTexture.Y * preparedTextFont.Texture.TexelHeight;
-                    _texCoordBR.X = (pCurrentGlyph->BoundsInTexture.X + pCurrentGlyph->BoundsInTexture.Width) * preparedTextFont.Texture.TexelWidth;
-                    _texCoordBR.Y = (pCurrentGlyph->BoundsInTexture.Y + pCurrentGlyph->BoundsInTexture.Height) * preparedTextFont.Texture.TexelHeight;
+                    SpriteBatchItem item = _batcher.CreateBatchItem();
+                    item.Texture = glyphTexture;
+                    item.SortKey = usesMultipleTextures ? GetTextSortKey(glyphTexture, layerDepth) : defaultSortKey;
+
+                    _texCoordTL.X = pCurrentGlyph->BoundsInTexture.X * glyphTexture.TexelWidth;
+                    _texCoordTL.Y = pCurrentGlyph->BoundsInTexture.Y * glyphTexture.TexelHeight;
+                    _texCoordBR.X = (pCurrentGlyph->BoundsInTexture.X + pCurrentGlyph->BoundsInTexture.Width) * glyphTexture.TexelWidth;
+                    _texCoordBR.Y = (pCurrentGlyph->BoundsInTexture.Y + pCurrentGlyph->BoundsInTexture.Height) * glyphTexture.TexelHeight;
 
                     if ((effects & SpriteEffects.FlipVertically) != 0)
                     {

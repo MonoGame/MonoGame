@@ -11,6 +11,16 @@ internal readonly struct MGF_RuntimeFont
 {
 }
 
+internal enum MGF_RuntimeFontErrorCode
+{
+    None = 0,
+    InvalidArgument = 1,
+    OutOfMemory = 2,
+    AtlasCapacityExceeded = 3,
+    NoGlyphData = 4,
+    Unknown = 5
+}
+
 [StructLayout(LayoutKind.Sequential)]
 internal struct MGF_CharacterRegion
 {
@@ -23,6 +33,7 @@ internal struct MGF_Glyph
 {
     public char Character;
     public int Size;
+    public int PageIndex;
     public int BoundsX;
     public int BoundsY;
     public int BoundsWidth;
@@ -34,6 +45,17 @@ internal struct MGF_Glyph
     public float LeftSideBearing;
     public float Width;
     public float RightSideBearing;
+}
+
+[StructLayout(LayoutKind.Sequential)]
+internal unsafe struct MGF_PageUpdate
+{
+    public int PageIndex;
+    public byte* AtlasRgba;
+    public int AtlasWidth;
+    public int AtlasHeight;
+    [MarshalAs(UnmanagedType.U1)]
+    public bool AtlasRebuilt;
 }
 
 internal static unsafe class MGF
@@ -50,13 +72,17 @@ internal static unsafe class MGF
                                                        int size,
                                                        MGF_CharacterRegion* characterRegions,
                                                        int characterRegionCount,
-                                                       out byte* atlasRgba,
-                                                       out int atlasWidth,
-                                                       out int atlasHeight,
-                                                       [MarshalAs(UnmanagedType.U1)] out bool atlasRebuilt,
+                                                       out MGF_PageUpdate* pageUpdates,
+                                                       out int pageUpdateCount,
                                                        out MGF_Glyph* glyphs,
                                                        out int glyphCount,
                                                        out int lineSpacing);
+
+    [DllImport(MGP.MonoGameNativeDLL, EntryPoint = "MGF_RuntimeFont_GetLastErrorCode", ExactSpelling = true)]
+    public static extern int RuntimeFont_GetLastErrorCode(MGF_RuntimeFont* runtimeFont);
+
+    [DllImport(MGP.MonoGameNativeDLL, EntryPoint = "MGF_RuntimeFont_GetLastErrorMessage", ExactSpelling = true)]
+    public static extern nint RuntimeFont_GetLastErrorMessage(MGF_RuntimeFont* runtimeFont);    
 
     [DllImport(MGP.MonoGameNativeDLL, EntryPoint = "MGF_BakeSpriteFont", ExactSpelling = true)]
     [return: MarshalAs(UnmanagedType.U1)]

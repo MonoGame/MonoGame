@@ -30,6 +30,11 @@ internal struct FontGlyph
     public int Size;
 
     /// <summary>
+    /// The atlas page that owns this glyph.
+    /// </summary>
+    public int PageIndex;
+
+    /// <summary>
     /// The cropping rectangle applied when positioning this glyph for drawing.
     /// </summary>
     public Rectangle Cropping;

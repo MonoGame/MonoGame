@@ -4,7 +4,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 
 namespace Microsoft.Xna.Framework.Graphics;
 
@@ -13,9 +12,10 @@ namespace Microsoft.Xna.Framework.Graphics;
 /// </summary>
 internal sealed class PreparedTextFont
 {
-    private int _defaultGlyphIndex;
     private readonly Dictionary<char, int> _glyphIndices;
     private readonly string _textContainsUnresolvableCharacters;
+    private readonly Dictionary<int, Texture2D> _textureByPage;
+    private int _defaultGlyphIndex;
 
     /// <summary>
     /// Gets the texture that contains the prepared glyph images.
@@ -36,6 +36,8 @@ internal sealed class PreparedTextFont
     /// Gets the additional spacing applied between glyphs, in pixels.
     /// </summary>
     public float Spacing { get; }
+
+    internal bool UsesMultipleTextures => _textureByPage.Count > 1;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="PreparedTextFont"/> class.
@@ -60,15 +62,37 @@ internal sealed class PreparedTextFont
         _defaultGlyphIndex = defaultGlyphIndex;
         _glyphIndices = new Dictionary<char, int>(glyphs.Length);
         _textContainsUnresolvableCharacters = textContainsUnresolvableCharacters;
+        _textureByPage = new Dictionary<int, Texture2D>();
         Spacing = spacing;
 
         Update(texture, glyphs, lineSpacing);
     }
 
+    internal PreparedTextFont(Dictionary<int, Texture2D> texturesByPage,
+                              int currentPageIndex,
+                              FontGlyph[] glyphs,
+                              int lineSpacing,
+                              float spacing,
+                              int defaultGlyphIndex,
+                              string textContainsUnresolvableCharacters)
+    {
+        if (texturesByPage == null)
+        {
+            throw new ArgumentNullException(nameof(texturesByPage));
+        }
+
+        _defaultGlyphIndex = defaultGlyphIndex;
+        _glyphIndices = new Dictionary<char, int>(glyphs.Length);
+        _textContainsUnresolvableCharacters = textContainsUnresolvableCharacters;
+        _textureByPage = new Dictionary<int, Texture2D>();
+        Spacing = spacing;
+
+        Update(texturesByPage, currentPageIndex, glyphs, lineSpacing);
+    }
+
     public int GetGlyphIndexOrDefault(char c)
     {
-        int glyphIndex;
-        if (!TryGetGlyphIndex(c, out glyphIndex))
+        if (!TryGetGlyphIndex(c, out int glyphIndex))
         {
             if (_defaultGlyphIndex == -1)
             {
@@ -112,8 +136,9 @@ internal sealed class PreparedTextFont
                     firstGlyphOfLine = true;
                     continue;
                 }
+
                 int currentGlyphIndex = GetGlyphIndexOrDefault(c);
-                Debug.Assert(currentGlyphIndex >= 0 && currentGlyphIndex < Glyphs.Length, $"{nameof(currentGlyphIndex)} was outside the bounds of the array");
+
                 FontGlyph* pCurrentGlyph = pGlyphs + currentGlyphIndex;
 
                 // The first character on a line might have a negative left side bearing.
@@ -155,6 +180,7 @@ internal sealed class PreparedTextFont
         Glyphs = glyphs;
         LineSpacing = lineSpacing;
 
+        _textureByPage.Clear();
         _glyphIndices.Clear();
 
         for (int i = 0; i < glyphs.Length; i++)
@@ -163,12 +189,62 @@ internal sealed class PreparedTextFont
         }
     }
 
+    internal Texture2D GetTexture(int pageIndex)
+    {
+        if(_textureByPage.Count == 0)
+        {
+            return Texture;
+        }
+
+        if (_textureByPage.TryGetValue(pageIndex, out Texture2D texture))
+        {
+            return texture;
+        }
+
+        throw new InvalidOperationException($"PreparedTextFont does not have a texture for page {pageIndex}.");
+    }
+
+    internal void Update(Dictionary<int, Texture2D> texturesByPage,
+                         int currentPageIndex,
+                         FontGlyph[] glyphs,
+                         int lineSpacing)
+    {
+        if (texturesByPage == null)
+        {
+            throw new ArgumentNullException(nameof(texturesByPage));
+        }
+
+        Update(GetPrimaryTexture(texturesByPage, currentPageIndex, glyphs), glyphs, lineSpacing);
+
+        if (glyphs.Length == 0)
+        {
+            _textureByPage[currentPageIndex] = Texture;
+            return;
+        }
+
+        for (int i = 0; i < glyphs.Length; i++)
+        {
+            int pageIndex = glyphs[i].PageIndex;
+            if (_textureByPage.ContainsKey(pageIndex))
+            {
+                continue;
+            }
+
+            if (!texturesByPage.TryGetValue(pageIndex, out Texture2D texture))
+            {
+                throw new InvalidOperationException($"PreparedTextFont does not have a texture for page {pageIndex}.");
+            }
+
+            _textureByPage.Add(pageIndex, texture);
+        }
+    }
+
     public void UpdateDefaultGlyphIndex(int defaultGlyphIndex)
     {
         _defaultGlyphIndex = defaultGlyphIndex;
     }
 
-    private bool TryGetGlyphIndex(char c, out int index)
+    internal bool TryGetGlyphIndex(char c, out int index)
     {
         if (_glyphIndices.TryGetValue(c, out index))
         {
@@ -179,8 +255,36 @@ internal sealed class PreparedTextFont
         return _glyphIndices.TryGetValue(alternate, out index);
     }
 
+    // Runtime glyph baking needs to know whether this exact codepoint is already preset,
+    // not whether SpriteFont-style alternate-case fallback could resolve it for drawing
+    // like TryGetGlyphIndex does above
     public bool TryGetGlyphIndexExact(char c, out int index)
     {
         return _glyphIndices.TryGetValue(c, out index);
+    }
+
+    private static Texture2D GetPrimaryTexture(Dictionary<int, Texture2D> texturesByPage,
+                                               int currentPageIndex,
+                                               FontGlyph[] glyphs)
+    {
+        if (glyphs.Length > 0)
+        {
+            if (texturesByPage.TryGetValue(glyphs[0].PageIndex, out Texture2D glyphTexture))
+            {
+                return glyphTexture;
+            }
+        }
+
+        if (texturesByPage.TryGetValue(currentPageIndex, out Texture2D currentTexture))
+        {
+            return currentTexture;
+        }
+
+        foreach (KeyValuePair<int, Texture2D> pair in texturesByPage)
+        {
+            return pair.Value;
+        }
+
+        throw new InvalidOperationException("PreparedTextFont requires at least one texture.");
     }
 }

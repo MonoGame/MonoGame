@@ -5,6 +5,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Runtime.InteropServices;
 using System.Text;
 using MonoGame.Interop;
 
@@ -13,14 +14,22 @@ namespace Microsoft.Xna.Framework.Graphics;
 /// <summary>
 /// Represents a runtime loaded font face that can bake glyphs on demand.
 /// </summary>
-public sealed partial class DynamicSpriteFont
+public sealed partial class DynamicSpriteFont : GraphicsResource
 {
-    private readonly CharacterRegion[] _characterRegions;
-    private readonly byte[] _fontData;
-    private readonly GraphicsDevice _graphicsDevice;
-    private readonly Dictionary<int, PreparedTextFontData> _preparedTextFontDataBySize;
-    private readonly DynamicSpriteFontRuntimeState _runtimeState;
-    private Texture2D _texture;
+    private const string TextContainsUnresolvableCharacters = $"Text contains characters that cannot be resolved by this {nameof(DynamicSpriteFont)}.";
+    private const string UnresolvableCharacter = $"Character cannot be resolved by this ${nameof(DynamicSpriteFont)}.";
+
+    private static readonly Dictionary<long, Rectangle> EmptyGlyphBounds = new Dictionary<long, Rectangle>();
+
+    // Incremental atlas uploads need the last known glyph bounds across every baked size,
+    // not just the current prepared size
+    private readonly Dictionary<int, Dictionary<long, Rectangle>> _glyphBoundsByPage;
+
+    private readonly Dictionary<int, PreparedTextFont> _preparedTextFontsBySize;
+    private readonly Dictionary<int, Texture2D> _texturesByPage;
+    private readonly FontHandle _fontHandle;
+    private char? _defaultCharacter;
+    private int _currentPageIndex;
     private float _size;
 
     /// <summary>
@@ -40,29 +49,95 @@ public sealed partial class DynamicSpriteFont
     }
 
     /// <summary>
-    /// Gets the current atlas texture for this font face.
+    /// Gets or sets the character that will be substituted when a given character
+    /// cannot be resolved by this font.
     /// </summary>
-    public Texture2D Texture
+    /// <exception cref="ArgumentException">
+    /// Thrown when the assigned character cannot be resolved by this font.
+    /// </exception>
+    public char? DefaultCharacter
     {
-        get
+        get => _defaultCharacter;
+        set
         {
-            return _texture;
+            if (IsDisposed)
+            {
+                throw new ObjectDisposedException(nameof(DynamicSpriteFont));
+            }
+
+            if (value.HasValue)
+            {
+                EnsureDefaultCharacterAvailable(value.Value);
+            }
+
+            _defaultCharacter = value;
+            UpdateDefaultGlyphIndices();
         }
     }
 
-    private DynamicSpriteFont(GraphicsDevice graphicsDevice,
-                              byte[] fontData,
-                              DynamicSpriteFontRuntimeState runtimeState,
-                              float size,
-                              CharacterRegion[] characterRegions)
+    /// <summary>
+    /// Gets the total number of atlas pages currently allocated for this font face.
+    /// </summary>
+    public int TotalPages
     {
-        _graphicsDevice = graphicsDevice;
-        _fontData = fontData;
-        _runtimeState = runtimeState;
-        _characterRegions = characterRegions;
-        _preparedTextFontDataBySize = new Dictionary<int, PreparedTextFontData>();
-        _texture = CreateInitialTexture(graphicsDevice);
+        get
+        {
+            if (IsDisposed)
+            {
+                throw new ObjectDisposedException(nameof(DynamicSpriteFont));
+            }
+
+            return _texturesByPage.Count;
+        }
+    }
+
+    /// <summary>
+    /// Gets the index fo the atlas page currently receiving new glyphs.
+    /// </summary>
+    public int CurrentAtlasPageIndex
+    {
+        get
+        {
+            return _currentPageIndex;
+        }
+    }
+
+    private DynamicSpriteFont(GraphicsDevice graphicsDevice, FontHandle fontHandle, float size)
+    {
+        if (fontHandle == null)
+        {
+            throw new ArgumentNullException(nameof(fontHandle));
+        }
+
+        GraphicsDevice = graphicsDevice;
+        _glyphBoundsByPage = new Dictionary<int, Dictionary<long, Rectangle>>();
+        _fontHandle = fontHandle;
+        _preparedTextFontsBySize = new Dictionary<int, PreparedTextFont>();
+        _texturesByPage = new Dictionary<int, Texture2D>();
+        _texturesByPage[0] = CreateInitialTexture(graphicsDevice);
+        _currentPageIndex = 0;
         _size = size;
+    }
+
+    /// <summary>
+    /// Creates a <see cref="DynamicSpriteFont"/> from a font file.
+    /// </summary>
+    /// <param name="graphicsDevice">The graphics device that will own the runtime font resources.</param>
+    /// <param name="path">The path to a TrueType or OpenType font file.</param>
+    /// <param name="size">The initial active size for the dynamic font</param>
+    /// <returns>A new <see cref="DynamicSpriteFont"/> for the supplied font face.</returns>
+    /// <exception cref="ArgumentNullException">
+    /// Thrown when <paramref name="graphicsDevice"/> or <paramref name="path"/> is <see langword="null"/>.
+    /// </exception>
+    /// <exception cref="ArgumentException">
+    /// Thrown when <paramref name="path"/> is empty or whitespace.
+    /// </exception>
+    /// <exception cref="ArgumentOutOfRangeException">
+    /// Throw when <paramref name="size"/> is zero, negative <see cref="float.NaN"/>, or infinite.
+    /// </exception>
+    public static DynamicSpriteFont FromFile(GraphicsDevice graphicsDevice, string path, float size)
+    {
+        return FromFile(graphicsDevice, path, size, Array.Empty<CharacterRegion>());
     }
 
     /// <summary>
@@ -74,7 +149,7 @@ public sealed partial class DynamicSpriteFont
     /// <param name="characterRegions">Optional character regions to warm at creation time.</param>
     /// <returns>A new <see cref="DynamicSpriteFont"/> for the supplied font face.</returns>
     /// <exception cref="ArgumentNullException">
-    /// Thrown when <paramref name="graphicsDevice"/>, <paramref name="path"/>, or 
+    /// Thrown when <paramref name="graphicsDevice"/>, <paramref name="path"/>, or
     /// <paramref name="characterRegions"/> is <see langword="null"/>.
     /// </exception>
     /// <exception cref="ArgumentException">
@@ -119,10 +194,28 @@ public sealed partial class DynamicSpriteFont
     /// <param name="graphicsDevice">The graphics device that will own runtime font resources.</param>
     /// <param name="stream">The stream containing TrueType or OpenType font data.</param>
     /// <param name="size">The initial active size for the dynamic font.</param>
+    /// <returns>A new <see cref="DynamicSpriteFont"/> for the supplied font face.</returns>
+    /// <exception cref="ArgumentNullException">
+    /// Thrown when <paramref name="graphicsDevice"/> or <paramref name="stream"/> is <see langword="null"/>.
+    /// </exception>
+    /// <exception cref="ArgumentOutOfRangeException">
+    /// Throw when <paramref name="size"/> is zero, negative <see cref="float.NaN"/>, or infinite.
+    /// </exception>
+    public static DynamicSpriteFont FromStream(GraphicsDevice graphicsDevice, Stream stream, float size)
+    {
+        return FromStream(graphicsDevice, stream, size, Array.Empty<CharacterRegion>());
+    }
+
+    /// <summary>
+    /// Creates a new <see cref="DynamicSpriteFont"/> from a font stream.
+    /// </summary>
+    /// <param name="graphicsDevice">The graphics device that will own runtime font resources.</param>
+    /// <param name="stream">The stream containing TrueType or OpenType font data.</param>
+    /// <param name="size">The initial active size for the dynamic font.</param>
     /// <param name="characterRegions">Optional character regions to warm at creation time.</param>
     /// <returns>A new <see cref="DynamicSpriteFont"/> for the supplied font face.</returns>
     /// <exception cref="ArgumentNullException">
-    /// Thrown when <paramref name="graphicsDevice"/>, <paramref name="stream"/>, or 
+    /// Thrown when <paramref name="graphicsDevice"/>, <paramref name="stream"/>, or
     /// <paramref name="characterRegions"/> is <see langword="null"/>.
     /// </exception>
     /// <exception cref="ArgumentOutOfRangeException">
@@ -151,10 +244,49 @@ public sealed partial class DynamicSpriteFont
         throw new PlatformNotSupportedException("Runtime SpriteFont baking is currently implemented only for MonoGame.Framework.Native.");
 #else
         List<CharacterRegion> regions = new List<CharacterRegion>(characterRegions);
-        byte[] fontData = ReadFontData(stream);
-        DynamicSpriteFontRuntimeState runtimeState = CreateRuntimeState(fontData);
-        return new DynamicSpriteFont(graphicsDevice, fontData, runtimeState, size, regions.ToArray());
+
+        byte[] fontData;
+        using(MemoryStream memoryStream = new MemoryStream())
+        {
+            stream.CopyTo(memoryStream);
+            fontData = memoryStream.ToArray();
+        }
+
+        FontHandle fontHandle = CreateFontHandle(fontData);
+        DynamicSpriteFont dynamicSpriteFont =  new DynamicSpriteFont(graphicsDevice, fontHandle, size);
+
+        try
+        {
+            CharacterRegion[] initialCharacterRegions = regions.ToArray();
+            dynamicSpriteFont.WarmCharacterRegions(initialCharacterRegions);
+            return dynamicSpriteFont;
+        }
+        catch
+        {
+            dynamicSpriteFont.Dispose();
+            throw;
+        }
 #endif
+    }
+
+    /// <summary>
+    /// Gets the atlas texture for a specific page index.
+    /// </summary>
+    /// <param name="pageIndex">The atlas page index to retrieve.</param>
+    /// <returns>The texture backing the requested atlas page.</returns>
+    public Texture2D GetTexture(int pageIndex)
+    {
+        if (IsDisposed)
+        {
+            throw new ObjectDisposedException(nameof(DynamicSpriteFont));
+        }
+
+        if (pageIndex < 0 || pageIndex >= _texturesByPage.Count)
+        {
+            throw new ArgumentOutOfRangeException(nameof(pageIndex), $"{nameof(pageIndex)} must be greater than or equal to zero and less than {TotalPages}.");
+        }
+
+        return _texturesByPage[pageIndex];
     }
 
     /// <summary>
@@ -225,45 +357,136 @@ public sealed partial class DynamicSpriteFont
         }
 
         int rasterizedSize = GetRasterizedSize();
-        PreparedTextFontData preparedTextFontData = GetCurrentPreparedTextFontData();
+        PreparedTextFont preparedTextFont = GetCurrentPreparedTextFont();
 
 #if NATIVE
-        PlatformEnsureGlyphs(rasterizedSize, preparedTextFontData, ref text);
+        PlatformEnsureGlyphs(rasterizedSize, preparedTextFont, ref text);
 #endif
     }
 
-    internal PreparedTextFontData GetCurrentPreparedTextFontData()
+    internal PreparedTextFont GetCurrentPreparedTextFont()
     {
         int rasterizedSize = GetRasterizedSize();
-        PreparedTextFontData preparedTextFontData;
-        if (_preparedTextFontDataBySize.TryGetValue(rasterizedSize, out preparedTextFontData))
+
+        if (_preparedTextFontsBySize.TryGetValue(rasterizedSize, out PreparedTextFont preparedTextFont))
         {
-            return preparedTextFontData;
+            return preparedTextFont;
         }
 
-        preparedTextFontData = new PreparedTextFontData(_texture, Array.Empty<FontGlyph>(), 0, 0.0f);
-        _preparedTextFontDataBySize[rasterizedSize] = preparedTextFontData;
-        return preparedTextFontData;
+        preparedTextFont = CreatePreparedTextFont(_currentPageIndex, Array.Empty<FontGlyph>(), 0, 0.0f);
+        _preparedTextFontsBySize[rasterizedSize] = preparedTextFont;
+        return preparedTextFont;
     }
 
     internal Vector2 MeasureString(ref FontCharacterSource text)
     {
         EnsureGlyphs(ref text);
-        return GetCurrentPreparedTextFontData().MeasureString(ref text);
+        return GetCurrentPreparedTextFont().MeasureString(ref text);
     }
 
-    internal PreparedTextFont GetPreparedTextFont(ref FontCharacterSource text)
+    private void WarmCharacterRegions(CharacterRegion[] characterRegions)
     {
-        EnsureGlyphs(ref text);
-        return GetCurrentPreparedTextFontData().GetPreparedTextFont();
-    }
-
-    private static byte[] ReadFontData(Stream stream)
-    {
-        using (MemoryStream memoryStream = new MemoryStream())
+        if (characterRegions.Length == 0)
         {
-            stream.CopyTo(memoryStream);
-            return memoryStream.ToArray();
+            return;
+        }
+
+#if NATIVE
+        PlatformWarmGlyphs(GetRasterizedSize(), characterRegions);
+#endif
+    }
+
+    private PreparedTextFont CreatePreparedTextFont(int currentPageIndex,
+                                                    FontGlyph[] glyphs,
+                                                    int lineSpacing,
+                                                    float spacing)
+    {
+        return new PreparedTextFont(_texturesByPage,
+                                    currentPageIndex,
+                                    glyphs,
+                                    lineSpacing,
+                                    spacing,
+                                    ResolveDefaultGlyphIndex(glyphs),
+                                    TextContainsUnresolvableCharacters);
+    }
+
+    /// <inheritdoc/>
+    protected override void Dispose(bool disposing)
+    {
+        if (disposing)
+        {
+            foreach (Texture2D texture in _texturesByPage.Values)
+            {
+                texture.Dispose();
+            }
+
+            _texturesByPage.Clear();
+            _preparedTextFontsBySize.Clear();
+            _glyphBoundsByPage.Clear();
+            _fontHandle.Dispose();
+        }
+
+        base.Dispose(disposing);
+    }
+
+    private static long GetGlyphLookupKey(char character, int size)
+    {
+        return ((long)size << 16) | character;
+    }
+
+    private Dictionary<long, Rectangle> GetGlyphBoundsForPage(int pageIndex)
+    {
+        if (_glyphBoundsByPage.TryGetValue(pageIndex, out Dictionary<long, Rectangle> glyphBounds))
+        {
+            return glyphBounds;
+        }
+
+        return EmptyGlyphBounds;
+    }
+
+    private void UpdateGlyphBoundsByPage(FontGlyph[] glyphs)
+    {
+        // Atlas rebuilds can move already baked glyphs between pages or replace old bounds entirely,
+        // so rebuilding from the full glyph snapshot avoids leaving stale per-page entries behind
+        _glyphBoundsByPage.Clear();
+
+        for (int i = 0; i < glyphs.Length; i++)
+        {
+            FontGlyph glyph = glyphs[i];
+            
+            if (!_glyphBoundsByPage.TryGetValue(glyph.PageIndex, out Dictionary<long, Rectangle> glyphBounds))
+            {
+                glyphBounds = new Dictionary<long, Rectangle>();
+                _glyphBoundsByPage.Add(glyph.PageIndex, glyphBounds);
+            }
+
+            glyphBounds[GetGlyphLookupKey(glyph.Character, glyph.Size)] = glyph.BoundsInTexture;
+        }
+    }
+
+    private static Texture2D CreateInitialTexture(GraphicsDevice graphicsDevice)
+    {
+        Texture2D texture = new Texture2D(graphicsDevice, 1, 1, false, SurfaceFormat.Color);
+        texture.SetData(new Color[] { Color.Transparent });
+        return texture;
+    }
+
+    private void EnsureDefaultCharacterAvailable(char defaultCharacter)
+    {
+        FontCharacterSource source = new FontCharacterSource(defaultCharacter.ToString());
+
+        try
+        {
+            EnsureGlyphs(ref source);
+        }
+        catch (InvalidOperationException)
+        {
+            throw new ArgumentException(UnresolvableCharacter);
+        }
+
+        if (!GetCurrentPreparedTextFont().TryGetGlyphIndex(defaultCharacter, out _))
+        {
+            throw new ArgumentException(UnresolvableCharacter);
         }
     }
 
@@ -272,11 +495,80 @@ public sealed partial class DynamicSpriteFont
         return (int)MathF.Ceiling(_size);
     }
 
-    private static Texture2D CreateInitialTexture(GraphicsDevice graphicsDevice)
+    private void UpdateDefaultGlyphIndices()
     {
-        Texture2D texture = new Texture2D(graphicsDevice, 1, 1, false, SurfaceFormat.Color);
-        texture.SetData(new Color[] { Color.Transparent });
-        return texture;
+        foreach (PreparedTextFont preparedTextFont in _preparedTextFontsBySize.Values)
+        {
+            int defaultGlyphIndex = -1;
+            
+            if (_defaultCharacter.HasValue)
+            {
+                preparedTextFont.TryGetGlyphIndex(_defaultCharacter.Value, out defaultGlyphIndex);
+            }
+
+            preparedTextFont.UpdateDefaultGlyphIndex(defaultGlyphIndex);
+        }
+    }
+
+    private int ResolveDefaultGlyphIndex(FontGlyph[] glyphs)
+    {
+        if (!_defaultCharacter.HasValue)
+        {
+            return -1;
+        }
+
+        char defaultCharacter = _defaultCharacter.Value;
+        char alternate = char.IsUpper(defaultCharacter) ?
+                         char.ToLower(defaultCharacter) :
+                         char.ToUpper(defaultCharacter);
+
+        bool checkAlternate = alternate != defaultCharacter;
+        int alternateIndex = -1;
+
+        for (int i = 0; i < glyphs.Length; i++)
+        {
+            char character = glyphs[i].Character;
+
+            if (character == defaultCharacter)
+            {
+                return i;
+            }
+
+            if (checkAlternate && alternateIndex == -1 && character == alternate)
+            {
+                alternateIndex = i;
+            }
+        }
+
+        return alternateIndex;
+    }
+
+    private static bool TryGetDefaultGlyphIndex(FontGlyph[] glyphs, char defaultCharacter, out int defaultGlyphIndex)
+    {
+        char alternate = char.IsUpper(defaultCharacter) ?
+                         char.ToLower(defaultCharacter) :
+                         char.ToUpper(defaultCharacter);
+
+        bool checkAlternate = alternate != defaultCharacter;
+        int alternateIndex = -1;
+
+        for (int i = 0; i < glyphs.Length; i++)
+        {
+            char character = glyphs[i].Character;
+            if (character == defaultCharacter)
+            {
+                defaultGlyphIndex = i;
+                return true;
+            }
+
+            if (checkAlternate && alternateIndex == -1 && character == alternate)
+            {
+                alternateIndex = i;
+            }
+        }
+
+        defaultGlyphIndex = alternateIndex;
+        return alternateIndex != -1;
     }
 
     private static void ValidateSize(float size, string paramName)
@@ -287,11 +579,12 @@ public sealed partial class DynamicSpriteFont
         }
     }
 
-    internal sealed unsafe class DynamicSpriteFontRuntimeState
+    private sealed unsafe class FontHandle : IDisposable
     {
         public readonly MGF_RuntimeFont* Handle;
+        private bool _isDisposed;
 
-        public DynamicSpriteFontRuntimeState(MGF_RuntimeFont* handle)
+        public FontHandle(MGF_RuntimeFont* handle)
         {
             if (handle == null)
             {
@@ -301,59 +594,27 @@ public sealed partial class DynamicSpriteFont
             Handle = handle;
         }
 
-        ~DynamicSpriteFontRuntimeState()
+        ~FontHandle() => Dispose(false);
+
+        public void Dispose()
         {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        private void Dispose(bool disposing)
+        {
+            if (_isDisposed)
+            {
+                return;
+            }
+
             if (Handle != null)
             {
                 MGF.RuntimeFont_Destroy(Handle);
             }
-        }
-    }
 
-    internal sealed class PreparedTextFontData
-    {
-        private const string TextContainsUnresolvableCharacters = 
-            "Text contains characters that cannot be resolved by this DynamicSpriteFont.";
-
-        private readonly PreparedTextFont _preparedTextFont;
-
-        public FontGlyph[] Glyphs => _preparedTextFont.Glyphs;
-        public int LineSpacing => _preparedTextFont.LineSpacing;
-        public float Spacing { get; }
-        public Texture2D Texture => _preparedTextFont.Texture;
-
-        public PreparedTextFontData(Texture2D texture,
-                                    FontGlyph[] glyphs,
-                                    int lineSpacing,
-                                    float spacing)
-        {
-            Spacing = spacing;
-            _preparedTextFont = new PreparedTextFont(texture, glyphs, lineSpacing, spacing, -1, TextContainsUnresolvableCharacters);
-        }
-
-        public int GetGlyphIndexOrDefault(char c)
-        {
-            return _preparedTextFont.GetGlyphIndexOrDefault(c);
-        }
-
-        public Vector2 MeasureString(ref FontCharacterSource text)
-        {
-            return _preparedTextFont.MeasureString(ref text);
-        }
-
-        public bool TryGetGlyphIndexExact(char c, out int index)
-        {
-            return _preparedTextFont.TryGetGlyphIndexExact(c, out index);
-        }
-
-        public void Update(Texture2D texture, FontGlyph[] glyphs, int lineSpacing)
-        {
-            _preparedTextFont.Update(texture, glyphs, lineSpacing);
-        }
-
-        public PreparedTextFont GetPreparedTextFont()
-        {
-            return _preparedTextFont;
+            _isDisposed = true;
         }
     }
 }
