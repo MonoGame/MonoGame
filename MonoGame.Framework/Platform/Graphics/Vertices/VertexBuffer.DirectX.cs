@@ -211,6 +211,18 @@ namespace Microsoft.Xna.Framework.Graphics
             }
         }
 
+        private void PlatformSetData<T>(
+            int offsetInBytes,
+            Span<T> data,
+            int elementCount,
+            int vertexStride,
+            SetDataOptions options,
+            int bufferSize,
+            int elementSizeInBytes)
+        {
+            throw new NotImplementedException();
+        }
+
         /// <summary />
         protected override void Dispose(bool disposing)
         {

@@ -208,6 +208,40 @@ namespace Microsoft.Xna.Framework.Graphics
         }
 
         /// <summary>
+        /// Sets the vertex buffer data, uses a Span including only relevant data to be copied rather than the full source array,
+        /// and the first index in the buffer to start copying to. Assumes the full Span will be copied with no padding between elements.
+        /// </summary>
+        /// <typeparam name="T">Type of elements in the data Span.</typeparam>
+        /// <param name="destinationStartIndex">The first index in the destination buffer you want to copy data to</param>
+        /// <param name="data">Data array to be passed to the shader as a Span.</param>
+        /// elementCount will be inferred to be the number of elements in <paramref name="data"/>
+        /// since the Span should only contain the relevant data to be copied.
+        /// <remarks>
+        /// If <c>T</c> is <see cref="VertexPositionTexture"/>, and you want to only update the first 10 elements of your array of
+        /// <see cref="VertexPositionTexture"/>s, you would generate a Span containing those elements and pass it in
+        /// <code>
+        /// Span&lt;VertexPositionTexture&gt; vptSpan = new Span&lt;VertexPositionTexture&gt;(vptArray, 0, 10);
+        /// vertexBuffer.SetData(0, vptSpan);
+        /// </code>
+        /// 
+        /// If you wanted to update the next 10 elements (indicies 10-19) in the source array, you would simply update the start index
+        /// <code>
+        /// Span&lt;VertexPositionTexture&gt; vptSpan = new Span&lt;VertexPositionTexture&gt;(vptArray, 10, 10);
+        /// vertexBuffer.SetData(10, vptSpan);
+        /// </code>
+        /// </remarks>
+        /// <remarks>
+        /// Since a Span is a wrapper around a contiguous region of arbitrary memory, this is intended for cases with a 
+        /// vertexStride of <c>sizeof(T)</c>, as you need to generate a contiguous array of only relevant elements to populate
+        /// the Span, and the extra allocation and pre-processing to generate the Span partial objects will likely outweigh 
+        /// any benefits of passing a Span instead of a copy of the source data array.
+        /// </remarks>
+        public void SetData<T>(int destinationStartIndex, Span<T> data) where T : struct
+        {
+            SetDataInternal<T>(destinationStartIndex, data, data.Length, SetDataOptions.None);
+        }
+
+        /// <summary>
         /// Sets the vertex buffer data, specifying the index at which to start copying from the source data array,
         /// and the number of elements to copy from the source data array. This is the same as calling
         /// <see cref="SetData{T}(int, T[], int, int, int)"/>  with <c>offsetInBytes</c> equal to <c>0</c>,
@@ -239,6 +273,18 @@ namespace Microsoft.Xna.Framework.Graphics
             SetDataInternal<T>(0, data, 0, data.Length, elementSizeInBytes, SetDataOptions.None);
         }
 
+        /// <summary>
+        /// Sets the vertex buffer data. This is the same as calling <see cref="SetData{T}(int, Span{T})"/>
+        /// with <c>destinationStartIndex</c> equal to <c>0</c>
+        /// </summary>
+        /// <typeparam name="T">Type of elements in the data array.</typeparam>
+        /// <param name="data">Data Span to be passed to the shader.</param>
+        public void SetData<T>(Span<T> data) where T : struct
+        {
+            var elementSizeInBytes = ReflectionHelpers.FastSizeOf<T>();
+            SetDataInternal<T>(0, data, data.Length, SetDataOptions.None);
+        }
+
         /// <summary/>
         protected void SetDataInternal<T>(int offsetInBytes, T[] data, int startIndex, int elementCount, int vertexStride, SetDataOptions options) where T : struct
         {
@@ -263,6 +309,24 @@ namespace Microsoft.Xna.Framework.Graphics
                 throw new ArgumentOutOfRangeException("The vertex stride must be greater than or equal to the size of the specified data (" + elementSizeInBytes + ").");
 
             PlatformSetData<T>(offsetInBytes, data, startIndex, elementCount, vertexStride, options, bufferSize, elementSizeInBytes);
+        }
+
+        /// <summary/>
+        protected void SetDataInternal<T>(int destinationStartIndex, Span<T> data, int elementCount, SetDataOptions options) where T : struct
+        {
+            if (data == null)
+                throw new ArgumentNullException("data");
+
+            var elementSizeInBytes = ReflectionHelpers.FastSizeOf<T>();
+            var offsetInBytes = destinationStartIndex * elementSizeInBytes;
+            var bufferSize = VertexCount * VertexDeclaration.VertexStride;
+
+            if (elementCount > data.Length || elementCount <= 0)
+                throw new ArgumentOutOfRangeException("data", "The array specified in the data parameter is not the correct size for the amount of data requested.");
+            if (offsetInBytes + elementCount * VertexDeclaration.VertexStride > bufferSize)
+                throw new ArgumentOutOfRangeException("The provided offset and data Span must total to a larger number of bytes than the vertex buffer");
+
+            PlatformSetData<T>(offsetInBytes, data, elementCount, VertexDeclaration.VertexStride, options, bufferSize, elementSizeInBytes);
         }
     }
 }
