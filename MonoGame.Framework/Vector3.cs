@@ -1037,6 +1037,10 @@ namespace Microsoft.Xna.Framework
         /// <summary>
         /// Creates a new <see cref="Vector3"/> that contains a transformation of 3d-vector by the specified <see cref="Matrix"/>.
         /// </summary>
+        /// <remarks>
+        /// The input vector is treated as (X, Y, Z, 1) for the transform, so translation is applied. The resulting W
+        /// component is not returned and is not used to divide the resulting X, Y, or Z components.
+        /// </remarks>
         /// <param name="position">Source <see cref="Vector3"/>.</param>
         /// <param name="matrix">The transformation <see cref="Matrix"/>.</param>
         /// <returns>Transformed <see cref="Vector3"/>.</returns>
@@ -1049,6 +1053,10 @@ namespace Microsoft.Xna.Framework
         /// <summary>
         /// Creates a new <see cref="Vector3"/> that contains a transformation of 3d-vector by the specified <see cref="Matrix"/>.
         /// </summary>
+        /// <remarks>
+        /// The input vector is treated as (X, Y, Z, 1) for the transform, so translation is applied. The resulting W
+        /// component is not returned and is not used to divide the resulting X, Y, or Z components.
+        /// </remarks>
         /// <param name="position">Source <see cref="Vector3"/>.</param>
         /// <param name="matrix">The transformation <see cref="Matrix"/>.</param>
         /// <param name="result">Transformed <see cref="Vector3"/> as an output parameter.</param>
@@ -1095,6 +1103,10 @@ namespace Microsoft.Xna.Framework
         /// <summary>
         /// Apply transformation on vectors within array of <see cref="Vector3"/> by the specified <see cref="Matrix"/> and places the results in an another array.
         /// </summary>
+        /// <remarks>
+        /// Each input vector is treated as (X, Y, Z, 1) for the transform, so translation is applied. The resulting W
+        /// component is not returned and is not used to divide the resulting X, Y, or Z components.
+        /// </remarks>
         /// <param name="sourceArray">Source array.</param>
         /// <param name="sourceIndex">The starting index of transformation in the source array.</param>
         /// <param name="matrix">The transformation <see cref="Matrix"/>.</param>
@@ -1166,6 +1178,10 @@ namespace Microsoft.Xna.Framework
         /// <summary>
         /// Apply transformation on all vectors within array of <see cref="Vector3"/> by the specified <see cref="Matrix"/> and places the results in an another array.
         /// </summary>
+        /// <remarks>
+        /// Each input vector is treated as (X, Y, Z, 1) for the transform, so translation is applied. The resulting W
+        /// component is not returned and is not used to divide the resulting X, Y, or Z components.
+        /// </remarks>
         /// <param name="sourceArray">Source array.</param>
         /// <param name="matrix">The transformation <see cref="Matrix"/>.</param>
         /// <param name="destinationArray">Destination array.</param>
