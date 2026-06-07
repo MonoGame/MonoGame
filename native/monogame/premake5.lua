@@ -11,8 +11,8 @@ end
 function freetype()
     defines {
         "FT2_BUILD_LIBRARY",
-        "FT_CONFIG_OPTIONS_H=<config/ftoption.h>",
-        "FT_CONFIG_MODULES_H=<config/ftmodule.h>"
+        "FT_CONFIG_OPTIONS_H=\\\"config/ftoption.h\\\"",
+        "FT_CONFIG_MODULES_H=\\\"config/ftmodule.h\\\""
     }
 
     files {
