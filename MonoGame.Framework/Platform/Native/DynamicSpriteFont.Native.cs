@@ -28,48 +28,48 @@ public sealed partial class DynamicSpriteFont : GraphicsResource
         }
 
         CharacterRegion[] characterRegions = BuildCharacterRegions(missingCharacters);
-        EnsureRuntimeGlyphs(_fontHandle,
-                            rasterizedSize,
-                            characterRegions,
-                            out MGF_PageUpdate* pageUpdates,
-                            out int pageUpdateCount,
-                            out MGF_Glyph* glyphs,
-                            out int glyphCount,
-                            out int lineSpacing);
+        EnsureNativeGlyphs(_fontHandle,
+                           rasterizedSize,
+                           characterRegions,
+                           out MGF_PageUpdate* pageUpdates,
+                           out int pageUpdateCount,
+                           out MGF_Glyph* glyphs,
+                           out int glyphCount,
+                           out int lineSpacing);
 
-        ApplyRuntimeGlyphUpdateResults(rasterizedSize,
-                                       pageUpdates,
-                                       pageUpdateCount,
-                                       glyphs,
-                                       glyphCount,
-                                       lineSpacing);
+        ApplyGlyphUpdateResults(rasterizedSize,
+                                pageUpdates,
+                                pageUpdateCount,
+                                glyphs,
+                                glyphCount,
+                                lineSpacing);
     }
 
     private unsafe void PlatformWarmGlyphs(int rasterizedSize, CharacterRegion[] characterRegions)
     {
-        EnsureRuntimeGlyphs(_fontHandle,
-                            rasterizedSize,
-                            characterRegions,
-                            out MGF_PageUpdate* pageUpdates,
-                            out int pageUpdateCount,
-                            out MGF_Glyph* glyphs,
-                            out int glyphCount,
-                            out int lineSpacing);
+        EnsureNativeGlyphs(_fontHandle,
+                           rasterizedSize,
+                           characterRegions,
+                           out MGF_PageUpdate* pageUpdates,
+                           out int pageUpdateCount,
+                           out MGF_Glyph* glyphs,
+                           out int glyphCount,
+                           out int lineSpacing);
 
-        ApplyRuntimeGlyphUpdateResults(rasterizedSize,
-                                       pageUpdates,
-                                       pageUpdateCount,
-                                       glyphs,
-                                       glyphCount,
-                                       lineSpacing);
+        ApplyGlyphUpdateResults(rasterizedSize,
+                                pageUpdates,
+                                pageUpdateCount,
+                                glyphs,
+                                glyphCount,
+                                lineSpacing);
     }
 
-    private unsafe void ApplyRuntimeGlyphUpdateResults(int rasterizedSize,
-                                                       MGF_PageUpdate* pageUpdates,
-                                                       int pageUpdateCount,
-                                                       MGF_Glyph* glyphs,
-                                                       int glyphCount,
-                                                       int lineSpacing)
+    private unsafe void ApplyGlyphUpdateResults(int rasterizedSize,
+                                                MGF_PageUpdate* pageUpdates,
+                                                int pageUpdateCount,
+                                                MGF_Glyph* glyphs,
+                                                int glyphCount,
+                                                int lineSpacing)
     {
 
         int currentPageIndex = _currentPageIndex;
@@ -150,13 +150,30 @@ public sealed partial class DynamicSpriteFont : GraphicsResource
         try
         {
             fontDataHandle = GCHandle.Alloc(fontData, GCHandleType.Pinned);
-            MGF_RuntimeFont* runtimeFont = MGF.RuntimeFont_Create((byte*)fontDataHandle.AddrOfPinnedObject(), fontData.Length);
-            if (runtimeFont == null)
+            MGF_ResultCode resultCode = MGF.MGF_Font_Create((byte*)fontDataHandle.AddrOfPinnedObject(),
+                                                        fontData.Length,
+                                                        out MGF_Font* font);
+
+            if (resultCode != MGF_ResultCode.Success)
             {
-                throw new InvalidOperationException("Failed to create a runtime DynamicSpriteFont from the supplied font data.");
+                throw resultCode switch
+                {
+                    MGF_ResultCode.BackendInitializationFailed => new InvalidOperationException($"Failed to create {nameof(DynamicSpriteFont)} because the font system could not be initialized."),
+                    MGF_ResultCode.InternalError => new InvalidOperationException($"Failed to create {nameof(DynamicSpriteFont)} because an internal font error occurred."),
+                    MGF_ResultCode.InvalidArgument => new InvalidOperationException($"Failed to create {nameof(DynamicSpriteFont)} because invalid arguments were passed to the font system."),
+                    MGF_ResultCode.InvalidFontData => new InvalidOperationException($"Failed to create {nameof(DynamicSpriteFont)} because the supplied font data is invalid."),
+                    MGF_ResultCode.OutOfMemory => new OutOfMemoryException($"Failed to create {nameof(DynamicSpriteFont)} because the font loader ran out of memory while initializing the font face."),
+                    _ => new InvalidOperationException($"Failed to create {nameof(DynamicSpriteFont)} because the font system return {resultCode}")
+                };
             }
 
-            return new FontHandle(runtimeFont);
+            // It should be impossible for a result code to be Success AND the font handle to be null
+            if (font == null)
+            {
+                throw new InvalidOperationException($"Failed to create {nameof(DynamicSpriteFont)} because the font system reported success without returning a font handle.");
+            }
+
+            return new FontHandle(font);
         }
         finally
         {
@@ -167,44 +184,63 @@ public sealed partial class DynamicSpriteFont : GraphicsResource
         }
     }
 
-    private static unsafe void EnsureRuntimeGlyphs(FontHandle fontHandle,
-                                                   int size,
-                                                   CharacterRegion[] runtimeRegions,
-                                                   out MGF_PageUpdate* pageUpdates,
-                                                   out int pageUpdateCount,
-                                                   out MGF_Glyph* glyphs,
-                                                   out int glyphCount,
-                                                   out int lineSpacing)
+    private static unsafe void EnsureNativeGlyphs(FontHandle fontHandle,
+                                                  int size,
+                                                  CharacterRegion[] characterRegions,
+                                                  out MGF_PageUpdate* pageUpdates,
+                                                  out int pageUpdateCount,
+                                                  out MGF_Glyph* glyphs,
+                                                  out int glyphCount,
+                                                  out int lineSpacing)
     {
         GCHandle regionHandle = default;
 
         try
         {
-            MGF_CharacterRegion[] nativeRegions = new MGF_CharacterRegion[runtimeRegions.Length];
-            for (int i = 0; i < runtimeRegions.Length; i++)
+            MGF_CharacterRegion[] nativeRegions = new MGF_CharacterRegion[characterRegions.Length];
+            for (int i = 0; i < characterRegions.Length; i++)
             {
-                nativeRegions[i].Start = runtimeRegions[i].Start;
-                nativeRegions[i].End = runtimeRegions[i].End;
+                nativeRegions[i].Start = characterRegions[i].Start;
+                nativeRegions[i].End = characterRegions[i].End;
             }
 
             regionHandle = GCHandle.Alloc(nativeRegions, GCHandleType.Pinned);
 
-            if (!MGF.RuntimeFont_EnsureGlyphs(fontHandle.Handle,
-                                             size,
-                                             (MGF_CharacterRegion*)regionHandle.AddrOfPinnedObject(),
-                                             nativeRegions.Length,
-                                             out pageUpdates,
-                                             out pageUpdateCount,
-                                             out glyphs,
-                                             out glyphCount,
-                                             out lineSpacing))
+            MGF_FontEnsureGlyphsRequest request = new MGF_FontEnsureGlyphsRequest();
+            request.Font = fontHandle.Handle;
+            request.Size = size;
+            request.CharacterRegions = (MGF_CharacterRegion*)regionHandle.AddrOfPinnedObject();
+            request.CharacterRegionCount = nativeRegions.Length;
+
+            MGF_FontEnsureGlyphsResult result = default;
+            MGF_ResultCode resultCode = MGF.MGF_Font_EnsureGlyphs(&request, &result);
+
+            pageUpdates = result.PageUpdates;
+            pageUpdateCount = result.PageUpdateCount;
+            glyphs = result.Glyphs;
+            glyphCount = result.GlyphCount;
+            lineSpacing = result.LineSpacing;
+
+            if (resultCode != MGF_ResultCode.Success)
             {
-                ThrowRuntimeGlyphUpdateException(fontHandle);
+                throw resultCode switch
+                {
+                    MGF_ResultCode.AtlasCapacityExceeded => new InvalidOperationException($"Failed to update {nameof(DynamicSpriteFont)}because the requested glyphs could not fit within the maximum atlas size."),
+                    MGF_ResultCode.FontSizeSetupFailed => new InvalidOperationException($"Failed to update {nameof(DynamicSpriteFont)} because the requested font size could not be applied."),
+                    MGF_ResultCode.GlyphLoadFailed => new InvalidOperationException($"Failed to update {nameof(DynamicSpriteFont)} because one or more glyphs could not be loaded."),
+                    MGF_ResultCode.GlyphRenderFailed => new InvalidOperationException($"Failed to update {nameof(DynamicSpriteFont)} because one or more glyphs could not be rasterized."),
+                    MGF_ResultCode.InternalError => new InvalidOperationException($"Failed to update {nameof(DynamicSpriteFont)} because an internal font error occurred."),
+                    MGF_ResultCode.InvalidArgument => new InvalidOperationException($"Failed to update {nameof(DynamicSpriteFont)} because invalid glyph update arguments were passed to the font system."),
+                    MGF_ResultCode.NoGlyphData => new InvalidOperationException($"Failed to update {nameof(DynamicSpriteFont)} because the glyph request did not produce any glyph data."),
+                    MGF_ResultCode.OutOfMemory => new OutOfMemoryException($"Failed to update {nameof(DynamicSpriteFont)} because glyph baking ran out of memory."),
+                    MGF_ResultCode.UnsupportedGlyphBitmapFormat => new InvalidOperationException($"Failed to update {nameof(DynamicSpriteFont)} because the glyph bitmap format is not supported."),
+                    _ => new InvalidOperationException($"Failed to update {nameof(DynamicSpriteFont)} because the font system returned {resultCode}.")
+                };
             }
 
             if (pageUpdateCount < 0 || glyphCount <= 0)
             {
-                throw new InvalidOperationException("Runtime DynamicSpriteFont update did not return any glyph data.");
+                throw new InvalidOperationException($"{nameof(DynamicSpriteFont)} update did not return any glyph data.");
             }
         }
         finally
@@ -435,20 +471,6 @@ public sealed partial class DynamicSpriteFont : GraphicsResource
                                 uploadData,
                                 uploadBufferBytes);
         }
-    }
-
-    private static unsafe void ThrowRuntimeGlyphUpdateException(FontHandle fontHandle)
-    {
-        MGF_RuntimeFontErrorCode errorCode = (MGF_RuntimeFontErrorCode)MGF.RuntimeFont_GetLastErrorCode(fontHandle.Handle);
-        string message = Marshal.PtrToStringAnsi(MGF.RuntimeFont_GetLastErrorMessage(fontHandle.Handle))
-            ?? "Failed to update a runtime DynamicSpriteFont from the supplied font data.";
-
-        if (errorCode == MGF_RuntimeFontErrorCode.OutOfMemory)
-        {
-            throw new OutOfMemoryException(message);
-        }
-
-        throw new InvalidOperationException(message);
     }
 
 #else

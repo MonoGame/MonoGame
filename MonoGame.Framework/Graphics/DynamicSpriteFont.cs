@@ -121,7 +121,7 @@ public sealed partial class DynamicSpriteFont : GraphicsResource
     /// <summary>
     /// Creates a <see cref="DynamicSpriteFont"/> from a font file.
     /// </summary>
-    /// <param name="graphicsDevice">The graphics device that will own the runtime font resources.</param>
+    /// <param name="graphicsDevice">The graphics device that will own the dynamic font resources.</param>
     /// <param name="path">The path to a TrueType or OpenType font file.</param>
     /// <param name="size">The initial active size for the dynamic font.</param>
     /// <returns>A new <see cref="DynamicSpriteFont"/> for the supplied font face.</returns>
@@ -142,7 +142,7 @@ public sealed partial class DynamicSpriteFont : GraphicsResource
     /// <summary>
     /// Creates a <see cref="DynamicSpriteFont"/> from a font file.
     /// </summary>
-    /// <param name="graphicsDevice">The graphics device that will own runtime font resources.</param>
+    /// <param name="graphicsDevice">The graphics device that will own dynamic font resources.</param>
     /// <param name="path">The path to a TrueType or OpenType font file.</param>
     /// <param name="size">The initial active size for the dynamic font.</param>
     /// <param name="characterRegions">Optional character regions to warm at creation time.</param>
@@ -190,7 +190,7 @@ public sealed partial class DynamicSpriteFont : GraphicsResource
     /// <summary>
     /// Creates a new <see cref="DynamicSpriteFont"/> from a font stream.
     /// </summary>
-    /// <param name="graphicsDevice">The graphics device that will own runtime font resources.</param>
+    /// <param name="graphicsDevice">The graphics device that will own dynamic font resources.</param>
     /// <param name="stream">The stream containing TrueType or OpenType font data.</param>
     /// <param name="size">The initial active size for the dynamic font.</param>
     /// <returns>A new <see cref="DynamicSpriteFont"/> for the supplied font face.</returns>
@@ -208,7 +208,7 @@ public sealed partial class DynamicSpriteFont : GraphicsResource
     /// <summary>
     /// Creates a new <see cref="DynamicSpriteFont"/> from a font stream.
     /// </summary>
-    /// <param name="graphicsDevice">The graphics device that will own runtime font resources.</param>
+    /// <param name="graphicsDevice">The graphics device that will own dynamic font resources.</param>
     /// <param name="stream">The stream containing TrueType or OpenType font data.</param>
     /// <param name="size">The initial active size for the dynamic font.</param>
     /// <param name="characterRegions">Optional character regions to warm at creation time.</param>
@@ -240,7 +240,7 @@ public sealed partial class DynamicSpriteFont : GraphicsResource
         ValidateSize(size, nameof(size));
 
 #if !NATIVE
-        throw new PlatformNotSupportedException("Runtime SpriteFont baking is currently implemented only for MonoGame.Framework.Native.");
+        throw new PlatformNotSupportedException($"{nameof(DynamicSpriteFont)} is currently implemented only for MonoGame.Framework.Native.");
 #else
         List<CharacterRegion> regions = new List<CharacterRegion>(characterRegions);
 
@@ -552,10 +552,10 @@ public sealed partial class DynamicSpriteFont : GraphicsResource
 
     private sealed unsafe class FontHandle : IDisposable
     {
-        public readonly MGF_RuntimeFont* Handle;
+        public readonly MGF_Font* Handle;
         private bool _isDisposed;
 
-        public FontHandle(MGF_RuntimeFont* handle)
+        public FontHandle(MGF_Font* handle)
         {
             if (handle == null)
             {
@@ -582,7 +582,7 @@ public sealed partial class DynamicSpriteFont : GraphicsResource
 
             if (Handle != null)
             {
-                MGF.RuntimeFont_Destroy(Handle);
+                MGF.MGF_Font_Destroy(Handle);
             }
 
             _isDisposed = true;

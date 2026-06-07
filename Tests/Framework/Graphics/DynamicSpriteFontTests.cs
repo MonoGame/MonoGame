@@ -79,6 +79,14 @@ internal sealed class DynamicSpriteFontTest : GraphicsDeviceTestFixtureBase
     }
 
     [Test]
+    public void FromFile_ValidOtfArguments_SetsInitialSize()
+    {
+        using DynamicSpriteFont font = DynamicSpriteFont.FromFile(gd, Paths.Font("IBMPlexSans-Regular.otf"), 32.0f, Array.Empty<CharacterRegion>());
+
+        Assert.That(font.Size, Is.EqualTo(32.0f));
+    }
+
+    [Test]
     public void FromStream_GraphicsDeviceIsNull_ThrowsArgumentNullException()
     {
         using (Stream stream = OpenRuntimeFontStream())
