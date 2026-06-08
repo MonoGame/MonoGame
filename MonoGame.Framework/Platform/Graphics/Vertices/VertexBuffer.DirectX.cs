@@ -220,7 +220,7 @@ namespace Microsoft.Xna.Framework.Graphics
             int bufferSize,
             int elementSizeInBytes)
         {
-            throw new NotImplementedException();
+            throw new PlatformNotSupportedException();
         }
 
         /// <summary />

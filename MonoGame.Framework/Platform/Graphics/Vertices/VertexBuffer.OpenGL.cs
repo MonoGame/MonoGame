@@ -137,7 +137,7 @@ namespace Microsoft.Xna.Framework.Graphics
             int bufferSize,
             int elementSizeInBytes)
         {
-            throw new NotImplementedException();
+            throw new PlatformNotSupportedException();
         }
 
         private void PlatformSetDataBody<T>(
