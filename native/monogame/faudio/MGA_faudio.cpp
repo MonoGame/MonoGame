@@ -532,6 +532,9 @@ mgint MGA_Voice_GetBufferCount(MGA_Voice* voice)
 {
 	assert(voice != nullptr);
 
+	if (voice->voice == nullptr)
+		return 0;
+
 	FAudioVoiceState state;
 	FAudioSourceVoice_GetState(voice->voice, &state, FAUDIO_VOICE_NOSAMPLESPLAYED);
 	return state.BuffersQueued;
@@ -546,6 +549,22 @@ mgint MGA_Voice_GetFinishedBufferCount(MGA_Voice* voice)
 void MGA_Voice_SetBuffer(MGA_Voice* voice, MGA_Buffer* buffer)
 {
 	assert(voice != nullptr);
+
+	// If the voice has an existing source voice but the new buffer format doesn't match:
+	// We should destroy and recreate the source voice to be safe.
+	if (voice->voice
+		&& buffer
+		&& voice->buffer
+		&& voice->buffer->format
+		&& buffer->format
+		&& (voice->buffer->format->wFormatTag != buffer->format->wFormatTag
+			|| voice->buffer->format->nChannels != buffer->format->nChannels
+			|| voice->buffer->format->nSamplesPerSec != buffer->format->nSamplesPerSec
+			|| voice->buffer->format->wBitsPerSample != buffer->format->wBitsPerSample))
+	{
+		FAudioVoice_DestroyVoice(voice->voice);
+		voice->voice = nullptr;
+	}
 
 	// Stop and remove any pending buffers first.
 	if (voice->voice)
@@ -576,6 +595,9 @@ void MGA_Voice_AppendBuffer(MGA_Voice* voice, mgbyte* buffer, mguint size)
 {
 	assert(voice != nullptr);
 	assert(buffer != nullptr);
+
+	if (voice->voice == nullptr)
+		return;
 
 	// Find a free buffer.
 	MGA_RawBuffer* raw = nullptr;
@@ -621,6 +643,9 @@ void MGA_Voice_AppendBuffer(MGA_Voice* voice, mgbyte* buffer, mguint size)
 void MGA_Voice_Play(MGA_Voice* voice, mgbyte looped)
 {
 	assert(voice != nullptr);
+
+	if (voice->voice == nullptr)
+		return;
 
 	if (voice->buffer != nullptr)
 	{
@@ -781,6 +806,9 @@ void MGA_Voice_SetVolume(MGA_Voice* voice, mgfloat volume)
 void MGA_Voice_SetReverbMix(MGA_Voice* voice, mgfloat mix)
 {
 	assert(voice != nullptr);
+
+	if (voice->voice == nullptr)
+		return;
 
 	if (mix < 0)
 		voice->reverbMix = 0.0f;

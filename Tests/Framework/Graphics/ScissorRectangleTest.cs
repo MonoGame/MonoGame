@@ -29,16 +29,16 @@ namespace MonoGame.Tests.Graphics
         [TearDown]
         public override void TearDown()
         {
-            _spriteBatch.Dispose();
+            _spriteBatch?.Dispose();
             _spriteBatch = null;
 
-            _texture.Dispose();
+            _texture?.Dispose();
             _texture = null;
 
-            _extraRenderTarget.Dispose();
+            _extraRenderTarget?.Dispose();
             _extraRenderTarget = null;
 
-            _rt200x200.Dispose();
+            _rt200x200?.Dispose();
             _rt200x200 = null;
 
             base.TearDown();

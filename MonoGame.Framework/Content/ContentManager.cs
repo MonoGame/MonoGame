@@ -145,7 +145,7 @@ namespace Microsoft.Xna.Framework.Content
 		}
 
         /// <summary>
-        /// Initializes a new instance of the ContentMangaer.
+        /// Initializes a new instance of the ContentManager.
         /// </summary>
         /// <remarks>
         ///     <para>
@@ -170,7 +170,7 @@ namespace Microsoft.Xna.Framework.Content
             AddContentManager(this);
 		}
 
-        /// <inheritdoc cref="ContentManager.ContentManager(IServiceProvider)"/>
+        /// <inheritdoc cref="ContentManager(IServiceProvider)"/>
         /// <param name="serviceProvider"/>
         /// <param name="rootDirectory">The root directory the ContentManager will search for content in.</param>
         public ContentManager(IServiceProvider serviceProvider, string rootDirectory)

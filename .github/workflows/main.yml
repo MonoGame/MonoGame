@@ -25,10 +25,10 @@ jobs:
             shell: bash
           - os: ubuntu-24.04
             platform: linux
-            shell: bash  
+            shell: bash
           - os: ubuntu-22.04-arm
             platform: linux-arm
-            shell: bash  
+            shell: bash
       fail-fast: false
     defaults:
       run:
@@ -356,6 +356,16 @@ jobs:
         with:
           submodules: recursive
 
+      - name: Free disk space
+        if: runner.environment == 'github-hosted' && runner.os == 'Linux'
+        uses: jlumbroso/free-disk-space@main
+        with:
+          android: false
+          dotnet: false 
+          docker-images: true
+          large-packages: true
+          swap-storage: true
+
       - name: Generate global.json
         run: |
           echo '{ "sdk": { "version": "${{ env.DotnetVersion }}", "workloadVersion": "${{ env.DotnetVersion }}" } }' > global.json
@@ -371,6 +381,14 @@ jobs:
         run: |
           brew update
 
+      - name: Check Vulkan
+        if: runner.environment != 'github-hosted' && runner.os == 'macos'
+        run: |
+          vulkaninfo
+
+      - name: Disable Annotations
+        run: echo "::remove-matcher owner=csc::"
+
       - name: Setup Wine
         if: runner.environment == 'github-hosted'
         uses: monogame/monogame-actions/install-wine@v1
@@ -385,11 +403,6 @@ jobs:
         with:
           xcode-version: '${{ env.XCodeVersion }}'
 
-      - name: Download Nuget
-        uses: actions/download-artifact@v4
-        with:
-          path: Artifacts/NuGet
-
       - name: Download tests-desktopgl-${{ matrix.platform }}
         uses: actions/download-artifact@v4
         with:
@@ -402,22 +415,103 @@ jobs:
         with:
           name: tests-windowsdx-${{ matrix.platform }}
           path: tests-windowsdx
-
-      # Run the DirectX tests in two steps: first the audio, then the rest.
-      # This is because the audio tests has some incompatibilities within the runner with ContentManagerTests.
-      - name: Run DirectX Audio Tests
+          
+      - name: Download tests-windowsdx12-${{ matrix.platform }}
         if: runner.os == 'Windows' && runner.environment != 'github-hosted'
-        run: dotnet test --filter Category=Audio MonoGame.Tests.dll 
+        uses: actions/download-artifact@v4
+        with:
+          name: tests-windowsdx12-${{ matrix.platform }}
+          path: tests-windowsdx12
+
+      - name: Download tests-desktopvk-${{ matrix.platform }}
+        uses: actions/download-artifact@v4
+        with:
+          name: tests-desktopvk-${{ matrix.platform }}
+          path: tests-desktopvk
+
+      - name: Check Vulkan SDK
+        if: runner.environment != 'github-hosted' && runner.os == 'macos'
+        run: |
+           ls -l /usr/local/lib/libvulkan.1.dylib
+           file /usr/local/lib/libvulkan.1.dylib
+           echo $DYLD_LIBRARY_PATH
+        working-directory: tests-desktopvk
+
+      # Run the DirectX 11 tests in two steps: first the audio, then the rest.
+      # This is because the audio tests has some incompatibilities within the runner with ContentManagerTests.
+      - name: Run DirectX 11 Audio Tests
+        if: runner.os == 'Windows' && runner.environment != 'github-hosted'
+        run: dotnet test --filter Category=Audio MonoGame.Tests.dll
         env:
           CI: true
         working-directory: tests-windowsdx
         
-      - name: Run DirectX All Tests Except Audio
+      - name: Run DirectX 11 All Tests Except Audio
         if: runner.os == 'Windows' && runner.environment != 'github-hosted'
-        run: dotnet test --filter Category!=Audio MonoGame.Tests.dll  
+        run: dotnet test --filter Category!=Audio MonoGame.Tests.dll
         env:
           CI: true
         working-directory: tests-windowsdx
+        
+      # Run DirectX 12 tests in separate groups.
+      - name: Run DirectX 12 Audio Tests
+        if: runner.os == 'Windows' && runner.environment != 'github-hosted'
+        run: dotnet MonoGame.Tests.dll --where="Category == Audio || Category == Song" --timeout=300000
+        env:
+          CI: true
+        working-directory: tests-windowsdx12
+        
+      - name: Run DirectX 12 GraphicsDevice Tests
+        if: runner.os == 'Windows' && runner.environment != 'github-hosted'
+        run: dotnet MonoGame.Tests.dll --where="Category == GraphicsDevice" --timeout=300000
+        env:
+          CI: true
+        working-directory: tests-windowsdx12
+        
+      - name: Run DirectX 12 MemoryLifeCycle Tests
+        if: runner.os == 'Windows' && runner.environment != 'github-hosted'
+        run: dotnet MonoGame.Tests.dll --where="Category == MemoryLifeCycle" --timeout=300000
+        env:
+          CI: true
+        working-directory: tests-windowsdx12
+        
+      - name: Run DirectX 12 All Tests Except Audio, GraphicsDevice, MemoryLifeCycle
+        if: runner.os == 'Windows' && runner.environment != 'github-hosted'
+        run: dotnet MonoGame.Tests.dll --where="Category != Audio && Category != Song && Category != GraphicsDevice && Category != MemoryLifeCycle" --timeout=600000
+        env:
+          CI: true
+        working-directory: tests-windowsdx12
+
+      # Run Vulkan tests in separate groups.
+      - name: Run Vulkan Audio Tests
+        if: runner.environment != 'github-hosted'
+        run: dotnet MonoGame.Tests.dll --where="Category == Audio || Category == Song" --timeout=300000 --labels=Before
+        env:
+          CI: true
+        working-directory: tests-desktopvk
+        
+      - name: Run Vulkan GraphicsDevice Tests
+        if: runner.environment != 'github-hosted'
+        run: dotnet MonoGame.Tests.dll --where="Category == GraphicsDevice" --timeout=300000 --labels=Before
+        env:
+          CI: true
+          #VK_LOADER_DEBUG: all 
+        working-directory: tests-desktopvk
+        
+      - name: Run Vulkan MemoryLifeCycle Tests
+        if: runner.environment != 'github-hosted'
+        run: dotnet MonoGame.Tests.dll --where="Category == MemoryLifeCycle" --timeout=300000 --labels=Before
+        env:
+          CI: true
+          #VK_LOADER_DEBUG: all 
+        working-directory: tests-desktopvk
+        
+      - name: Run Vulkan All Tests Except Audio, GraphicsDevice, MemoryLifeCycle
+        if: runner.environment != 'github-hosted'
+        run: dotnet MonoGame.Tests.dll --where="Category != Audio && Category != Song && Category != GraphicsDevice && Category != MemoryLifeCycle" --timeout=600000  --labels=Before
+        env:
+          CI: true
+        working-directory: tests-desktopvk
 
       # Run the DesktopGL tests on all platforms using NUnitLite runner not dotnet test
       # We have to run this is bits because the tests crash if too many are run in one go?

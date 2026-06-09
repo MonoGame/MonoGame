@@ -5,6 +5,7 @@
 using System;
 using System.IO;
 using System.Runtime.InteropServices;
+using System.Runtime.Serialization;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using NUnit.Framework;
@@ -866,7 +867,11 @@ namespace MonoGame.Tests.Graphics
             t.Dispose();
         }
 
+
         [Test]
+#if VULKAN
+        [Ignore("Not Bgr565 on Mac")]
+#endif
         [RunOnUI]
         public void GetDataRowPitch()
         {
@@ -885,6 +890,7 @@ namespace MonoGame.Tests.Graphics
 
             tex.Dispose();
         }
+
 
         [Test]
         [RunOnUI]
