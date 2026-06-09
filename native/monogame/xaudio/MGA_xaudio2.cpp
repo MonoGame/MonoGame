@@ -555,6 +555,9 @@ mgint MGA_Voice_GetBufferCount(MGA_Voice* voice)
 {
 	assert(voice != nullptr);
 
+	if (voice->voice == nullptr)
+		return 0;
+
 	XAUDIO2_VOICE_STATE state;
 	voice->voice->GetState(&state, XAUDIO2_VOICE_NOSAMPLESPLAYED);
 	return state.BuffersQueued;
@@ -569,6 +572,20 @@ mgint MGA_Voice_GetFinishedBufferCount(MGA_Voice* voice)
 void MGA_Voice_SetBuffer(MGA_Voice* voice, MGA_Buffer* buffer)
 {
 	assert(voice != nullptr);
+
+	// If the voice has an existing source voice but the new buffer format doesn't match:
+	// We should destroy and recreate the source voice to be safe.
+	if (voice->voice
+		&& buffer
+		&& buffer->format
+		&& (voice->format.wFormatTag != buffer->format->wFormatTag
+			|| voice->format.nChannels != buffer->format->nChannels
+			|| voice->format.nSamplesPerSec != buffer->format->nSamplesPerSec
+			|| voice->format.wBitsPerSample != buffer->format->wBitsPerSample))
+	{
+		voice->voice->DestroyVoice();
+		voice->voice = nullptr;
+	}
 
 	// Stop and remove any pending buffers first.
 	if (voice->voice)
@@ -594,6 +611,9 @@ void MGA_Voice_AppendBuffer(MGA_Voice* voice, mgbyte* buffer, mguint size)
 {
 	assert(voice != nullptr);
 	assert(buffer != nullptr);
+
+	if (voice->voice == nullptr)
+		return;
 
 	// Find a free buffer.
 	MGA_RawBuffer* raw = nullptr;
@@ -640,6 +660,9 @@ void MGA_Voice_Play(MGA_Voice* voice, mgbyte looped)
 {
 	assert(voice != nullptr);
 
+	if (voice->voice == nullptr)
+		return;
+
 	if (voice->buffer != nullptr)
 	{
 		voice->voice->Stop();
@@ -684,12 +707,15 @@ void MGA_Voice_Resume(MGA_Voice* voice)
 {
 	assert(voice != nullptr);
 
+	if (voice->voice == nullptr)
+		return;
+
 	if (voice->state != MGSoundState::Paused)
 	{
 		MGA_Voice_Play(voice, voice->looped);
 		return;
 	}
-	
+
 	voice->voice->Start();
 	voice->state = MGSoundState::Playing;
 }
@@ -741,6 +767,9 @@ mgulong MGA_Voice_GetPosition(MGA_Voice* voice)
 
 static void MGA_Voice_UpdateOutputMatrix(MGA_Voice* voice)
 {
+	if (voice->voice == nullptr)
+		return;
+
 	XAUDIO2_VOICE_DETAILS details;
 	memset(&details, 0, sizeof(details));
 	voice->voice->GetVoiceDetails(&details);
@@ -768,13 +797,21 @@ static void MGA_Voice_UpdateOutputMatrix(MGA_Voice* voice)
 void MGA_Voice_SetPan(MGA_Voice* voice, mgfloat pan)
 {
 	assert(voice != nullptr);
+
+	if (voice->voice == nullptr)
+		return;
+
 	voice->pan = pan;
+
 	MGA_Voice_UpdateOutputMatrix(voice);
 }
 
 void MGA_Voice_SetPitch(MGA_Voice* voice, mgfloat pitch)
 {
 	assert(voice != nullptr);
+
+	if (voice->voice == nullptr)
+		return;
 
 	float ratio = powf(2.0f, pitch);
 	voice->voice->SetFrequencyRatio(ratio);
@@ -783,12 +820,19 @@ void MGA_Voice_SetPitch(MGA_Voice* voice, mgfloat pitch)
 void MGA_Voice_SetVolume(MGA_Voice* voice, mgfloat volume)
 {
 	assert(voice != nullptr);
+
+	if (voice->voice == nullptr)
+		return;
+
 	voice->voice->SetVolume(volume);
 }
 
 void MGA_Voice_SetReverbMix(MGA_Voice* voice, mgfloat mix)
 {
 	assert(voice != nullptr);
+
+	if (voice->voice == nullptr)
+		return;
 
 	if (mix < 0)
 		voice->reverbMix = 0.0f;
@@ -829,6 +873,9 @@ void MGA_Voice_SetFilterMode(MGA_Voice* voice, MGFilterMode mode, mgfloat filter
 {
 	assert(voice != nullptr);
 
+	if (voice->voice == nullptr)
+		return;
+
 	XAUDIO2_VOICE_DETAILS details;
 	memset(&details, 0, sizeof(details));
 	voice->voice->GetVoiceDetails(&details);
@@ -852,6 +899,9 @@ void MGA_Voice_SetFilterMode(MGA_Voice* voice, MGFilterMode mode, mgfloat filter
 void MGA_Voice_ClearFilterMode(MGA_Voice* voice)
 {
 	assert(voice != nullptr);
+
+	if (voice->voice == nullptr)
+		return;
 
 	XAUDIO2_FILTER_PARAMETERS params;
 	params.Type = XAUDIO2_FILTER_TYPE::LowPassFilter;

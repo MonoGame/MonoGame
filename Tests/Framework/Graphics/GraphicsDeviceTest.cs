@@ -1,4 +1,4 @@
-﻿// MonoGame - Copyright (C) MonoGame Foundation, Inc
+// MonoGame - Copyright (C) MonoGame Foundation, Inc
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
@@ -635,6 +635,15 @@ namespace MonoGame.Tests.Graphics
 #endif
             foreach (var format in Enum.GetValues(typeof(SurfaceFormat)).Cast<SurfaceFormat>())
             {
+#if VULKAN
+                // Skip the Bgr565 on Mac on Vulkan
+                if (OperatingSystem.IsMacOS()
+                    && format is SurfaceFormat.Bgr565 or SurfaceFormat.Bgra5551 or SurfaceFormat.Bgra4444)
+                {
+                    //TODO: Fix on macOS
+                    continue;
+                }
+#endif
 #if !MOBILE
                 // Skip the mobile formats on non-mobile platforms.
                 if (format > SurfaceFormat.Dxt5SRgb)

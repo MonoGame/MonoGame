@@ -44,6 +44,12 @@ namespace Microsoft.Xna.Framework.Graphics
             // at lease one adapter per connected monitor.
             PlatformInitializeAdapters(out _adapters);
 
+            if (_adapters.Count == 0)
+            {
+                throw new NoSuitableGraphicsDeviceException(
+                    "No graphics adapters were found!");
+            }
+
             // The first adapter is considered the default.
             _adapters[0].IsDefaultAdapter = true;
         }
@@ -57,7 +63,7 @@ namespace Microsoft.Xna.Framework.Graphics
             }
         }
         
-        public static ReadOnlyCollection<GraphicsAdapter> Adapters 
+        public static ReadOnlyCollection<GraphicsAdapter> Adapters
         {
             get
             {

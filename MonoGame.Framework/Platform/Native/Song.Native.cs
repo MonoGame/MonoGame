@@ -70,10 +70,9 @@ public sealed partial class Song : IEquatable<Song>, IDisposable
 
     #region The playback API used by MediaPlayer
 
-    private unsafe void PlatformInitialize(string fileName)
+    private unsafe void PlatformInitialize(string filePath)
     {
-        var absolutePath = MGP.Platform_MakePath(TitleContainer.Location, fileName);
-        _decoder = MGM.AudioDecoder_Create(absolutePath, out _info);
+        _decoder = MGM.AudioDecoder_Create(filePath, out _info);
 
         if (_decoder == null)
             return;

@@ -44,15 +44,17 @@ namespace Microsoft.Xna.Framework.Audio
         /// <param name="inst">The SoundEffectInstance</param>
         internal static void Add(SoundEffectInstance inst)
         {
-            lock (_locker) {
-
-            if (inst._isPooled)
+            lock (_locker)
             {
-                _pooledInstances.Add(inst);
-                inst._effect = null;
-            }
 
-            _playingInstances.Remove(inst);
+                if (inst._isPooled)
+                {
+                    inst.PlatformClearBuffer();
+                    inst._effect = null;
+                    _pooledInstances.Add(inst);
+                }
+
+                _playingInstances.Remove(inst);
 
             } // lock(_locker)
         }
@@ -147,6 +149,24 @@ namespace Microsoft.Xna.Framework.Audio
             }
 
             } // lock (_locker)
+        }
+
+        internal static void Shutdown()
+        {
+            lock (_locker)
+            {
+                foreach (var inst in _playingInstances)
+                {
+                    inst.Dispose();
+                }
+                _playingInstances.Clear();
+
+                foreach (var inst in _pooledInstances)
+                {
+                    inst.Dispose();
+                }
+                _pooledInstances.Clear();
+            }
         }
 
         /// <summary>
