@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -11,6 +11,7 @@ namespace MonoGame.Tests.Framework
     public static class GameComponentTest
     {
         [Test]
+        [RunOnUI]
 #if DESKTOPGL
         [Ignore("This crashes inside SDL on Mac!")]
 #endif

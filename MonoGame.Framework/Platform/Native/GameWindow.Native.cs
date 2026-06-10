@@ -107,6 +107,10 @@ internal class NativeGameWindow : GameWindow
 
         // Create the window which size may be changed by the platform.
         _handle = MGP.Window_Create(platform.Handle, ref _width, ref _height, title);
+        if (_handle == null)
+        {
+            throw new NoSuitableGraphicsDeviceException("Failed to initialize SDL window!");
+        }
 
         _windows[(nint)_handle] = this;
 
