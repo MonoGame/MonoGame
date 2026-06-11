@@ -293,6 +293,7 @@ namespace MonoGame.Tests.Graphics
             vertexBuffer.Dispose();
         }
 
+#if VULKAN || DIRECTX12
         [Test]
         //[TestCase(true)]
         [TestCase(false, 0, 4, true, null)]
@@ -354,6 +355,7 @@ namespace MonoGame.Tests.Graphics
 
             vertexBuffer.Dispose();
         }
+#endif
 
         [Test]
         //[TestCase(true)]

@@ -128,18 +128,6 @@ namespace Microsoft.Xna.Framework.Graphics
             });
         }
 
-        private void PlatformSetData<T>(
-            int offsetInBytes,
-            Span<T> data,
-            int elementCount,
-            int vertexStride,
-            SetDataOptions options,
-            int bufferSize,
-            int elementSizeInBytes)
-        {
-            throw new PlatformNotSupportedException();
-        }
-
         private void PlatformSetDataBody<T>(
             int offsetInBytes, T[] data, int startIndex, int elementCount, int vertexStride, SetDataOptions options, int bufferSize, int elementSizeInBytes)
             where T : struct

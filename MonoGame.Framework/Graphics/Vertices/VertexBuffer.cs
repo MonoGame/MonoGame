@@ -208,6 +208,66 @@ namespace Microsoft.Xna.Framework.Graphics
         }
 
         /// <summary>
+        /// Sets the vertex buffer data, specifying the index at which to start copying from the source data array,
+        /// and the number of elements to copy from the source data array. This is the same as calling
+        /// <see cref="SetData{T}(int, T[], int, int, int)"/>  with <c>offsetInBytes</c> equal to <c>0</c>,
+        /// and <c>vertexStride</c> equal to <c>sizeof(T)</c>.
+        /// </summary>
+        /// <typeparam name="T">Type of elements in the data array.</typeparam>
+        /// <param name="data">Data array to be passed to the shader.</param>
+        /// <param name="startIndex">Index at which to start copying from <paramref name="data"/>.
+        /// Must be within the <paramref name="data"/> array bounds.</param>
+        /// <param name="elementCount">Number of elements to copy from <paramref name="data"/>.
+        /// The combination of <paramref name="startIndex"/> and <paramref name="elementCount"/>
+        /// must be within the <paramref name="data"/> array bounds.</param>
+        public void SetData<T>(T[] data, int startIndex, int elementCount) where T : struct
+        {
+            var elementSizeInBytes = ReflectionHelpers.FastSizeOf<T>();
+            SetDataInternal<T>(0, data, startIndex, elementCount, elementSizeInBytes, SetDataOptions.None);
+		}
+
+        /// <summary>
+        /// Sets the vertex buffer data. This is the same as calling <see cref="SetData{T}(int, T[], int, int, int)"/>
+        /// with <c>offsetInBytes</c> and <c>startIndex</c> equal to <c>0</c>, <c>elementCount</c> equal to <c>data.Length</c>,
+        /// and <c>vertexStride</c> equal to <c>sizeof(T)</c>.
+        /// </summary>
+        /// <typeparam name="T">Type of elements in the data array.</typeparam>
+        /// <param name="data">Data array to be passed to the shader.</param>
+        /// <inheritdoc cref="SetData{T}(int, T[], int, int, int)" path="/remarks"/>
+        public void SetData<T>(T[] data) where T : struct
+        {
+            var elementSizeInBytes = ReflectionHelpers.FastSizeOf<T>();
+            SetDataInternal<T>(0, data, 0, data.Length, elementSizeInBytes, SetDataOptions.None);
+        }
+
+        /// <summary/>
+        protected void SetDataInternal<T>(int offsetInBytes, T[] data, int startIndex, int elementCount, int vertexStride, SetDataOptions options) where T : struct
+        {
+            if (data == null)
+                throw new ArgumentNullException("data");
+
+            var elementSizeInBytes = ReflectionHelpers.FastSizeOf<T>();
+            var bufferSize = VertexCount * VertexDeclaration.VertexStride;
+
+            if (vertexStride == 0)
+                vertexStride = elementSizeInBytes;
+
+            var vertexByteSize = VertexCount * VertexDeclaration.VertexStride;
+            if (vertexStride > vertexByteSize)
+                throw new ArgumentOutOfRangeException("vertexStride", "Vertex stride can not be larger than the vertex buffer size.");
+
+            if (startIndex + elementCount > data.Length || elementCount <= 0)
+                throw new ArgumentOutOfRangeException("data","The array specified in the data parameter is not the correct size for the amount of data requested.");
+            if (elementCount > 1 && (elementCount * vertexStride > bufferSize))
+                throw new InvalidOperationException("The vertex stride is larger than the vertex buffer.");
+            if (vertexStride < elementSizeInBytes)
+                throw new ArgumentOutOfRangeException("The vertex stride must be greater than or equal to the size of the specified data (" + elementSizeInBytes + ").");
+
+            PlatformSetData<T>(offsetInBytes, data, startIndex, elementCount, vertexStride, options, bufferSize, elementSizeInBytes);
+        }
+
+#if NATIVE
+        /// <summary>
         /// Sets the vertex buffer data, uses a Span including only relevant data to be copied rather than the full source array,
         /// and the first index in the buffer to start copying to. Assumes the full Span will be copied with no padding between elements.
         /// </summary>
@@ -242,39 +302,6 @@ namespace Microsoft.Xna.Framework.Graphics
         }
 
         /// <summary>
-        /// Sets the vertex buffer data, specifying the index at which to start copying from the source data array,
-        /// and the number of elements to copy from the source data array. This is the same as calling
-        /// <see cref="SetData{T}(int, T[], int, int, int)"/>  with <c>offsetInBytes</c> equal to <c>0</c>,
-        /// and <c>vertexStride</c> equal to <c>sizeof(T)</c>.
-        /// </summary>
-        /// <typeparam name="T">Type of elements in the data array.</typeparam>
-        /// <param name="data">Data array to be passed to the shader.</param>
-        /// <param name="startIndex">Index at which to start copying from <paramref name="data"/>.
-        /// Must be within the <paramref name="data"/> array bounds.</param>
-        /// <param name="elementCount">Number of elements to copy from <paramref name="data"/>.
-        /// The combination of <paramref name="startIndex"/> and <paramref name="elementCount"/>
-        /// must be within the <paramref name="data"/> array bounds.</param>
-		public void SetData<T>(T[] data, int startIndex, int elementCount) where T : struct
-        {
-            var elementSizeInBytes = ReflectionHelpers.FastSizeOf<T>();
-            SetDataInternal<T>(0, data, startIndex, elementCount, elementSizeInBytes, SetDataOptions.None);
-		}
-
-        /// <summary>
-        /// Sets the vertex buffer data. This is the same as calling <see cref="SetData{T}(int, T[], int, int, int)"/>
-        /// with <c>offsetInBytes</c> and <c>startIndex</c> equal to <c>0</c>, <c>elementCount</c> equal to <c>data.Length</c>,
-        /// and <c>vertexStride</c> equal to <c>sizeof(T)</c>.
-        /// </summary>
-        /// <typeparam name="T">Type of elements in the data array.</typeparam>
-        /// <param name="data">Data array to be passed to the shader.</param>
-        /// <inheritdoc cref="SetData{T}(int, T[], int, int, int)" path="/remarks"/>
-        public void SetData<T>(T[] data) where T : struct
-        {
-            var elementSizeInBytes = ReflectionHelpers.FastSizeOf<T>();
-            SetDataInternal<T>(0, data, 0, data.Length, elementSizeInBytes, SetDataOptions.None);
-        }
-
-        /// <summary>
         /// Sets the vertex buffer data. This is the same as calling <see cref="SetData{T}(int, Span{T})"/>
         /// with <c>destinationStartIndex</c> equal to <c>0</c>
         /// </summary>
@@ -285,32 +312,6 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             var elementSizeInBytes = ReflectionHelpers.FastSizeOf<T>();
             SetDataInternal<T>(0, data, data.Length, SetDataOptions.None);
-        }
-
-        /// <summary/>
-        protected void SetDataInternal<T>(int offsetInBytes, T[] data, int startIndex, int elementCount, int vertexStride, SetDataOptions options) where T : struct
-        {
-            if (data == null)
-                throw new ArgumentNullException("data");
-
-            var elementSizeInBytes = ReflectionHelpers.FastSizeOf<T>();
-            var bufferSize = VertexCount * VertexDeclaration.VertexStride;
-
-            if (vertexStride == 0)
-                vertexStride = elementSizeInBytes;
-
-            var vertexByteSize = VertexCount * VertexDeclaration.VertexStride;
-            if (vertexStride > vertexByteSize)
-                throw new ArgumentOutOfRangeException("vertexStride", "Vertex stride can not be larger than the vertex buffer size.");
-
-            if (startIndex + elementCount > data.Length || elementCount <= 0)
-                throw new ArgumentOutOfRangeException("data","The array specified in the data parameter is not the correct size for the amount of data requested.");
-            if (elementCount > 1 && (elementCount * vertexStride > bufferSize))
-                throw new InvalidOperationException("The vertex stride is larger than the vertex buffer.");
-            if (vertexStride < elementSizeInBytes)
-                throw new ArgumentOutOfRangeException("The vertex stride must be greater than or equal to the size of the specified data (" + elementSizeInBytes + ").");
-
-            PlatformSetData<T>(offsetInBytes, data, startIndex, elementCount, vertexStride, options, bufferSize, elementSizeInBytes);
         }
 
         /// <summary/>
@@ -330,5 +331,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
             PlatformSetData<T>(offsetInBytes, data, elementCount, VertexDeclaration.VertexStride, options, bufferSize, elementSizeInBytes);
         }
+#endif
+
     }
 }
