@@ -132,7 +132,8 @@ namespace DX {
             char str[64] = {};
             sprintf_s(str, "**ERROR** Fatal Error with HRESULT of %08X\n", static_cast<unsigned int>(hr));
             OutputDebugStringA(str);
-            __debugbreak();
+            if (IsDebuggerPresent())
+                __debugbreak();
 #endif
             throw com_exception(hr);
         }

@@ -513,6 +513,7 @@ namespace Microsoft.Xna.Framework.Graphics
             var supportsEtc1 = graphicsDevice.GraphicsCapabilities.SupportsEtc1;
             var supportsEtc2 = graphicsDevice.GraphicsCapabilities.SupportsEtc2;
             var supportsAtitc = graphicsDevice.GraphicsCapabilities.SupportsAtitc;
+            var supportsAstc = graphicsDevice.GraphicsCapabilities.SupportsAstc;
             var supportsFloat = graphicsDevice.GraphicsCapabilities.SupportsFloatTextures;
             var supportsHalfFloat = graphicsDevice.GraphicsCapabilities.SupportsHalfFloatTextures;
             var supportsNormalized = graphicsDevice.GraphicsCapabilities.SupportsNormalized;
@@ -527,7 +528,7 @@ namespace Microsoft.Xna.Framework.Graphics
             case SurfaceFormat.ColorSRgb:
                 if (!supportsSRgb)
                     goto case SurfaceFormat.Color;
-                glInternalFormat = PixelInternalFormat.Srgb;
+                glInternalFormat = PixelInternalFormat.Srgb8Alpha8;
                 glFormat = PixelFormat.Rgba;
                 glType = PixelType.UnsignedByte;
                 break;
@@ -693,6 +694,42 @@ namespace Microsoft.Xna.Framework.Graphics
 				glInternalFormat = PixelInternalFormat.AtcRgbaInterpolatedAlphaAmd;
 				glFormat = PixelFormat.CompressedTextureFormats;
 				break;
+            case SurfaceFormat.Astc4X4Rgba:
+                if (!supportsAstc)
+                    goto case InvalidFormat;
+                glInternalFormat = PixelInternalFormat.Astc4X4Rgba;
+                glFormat = PixelFormat.CompressedTextureFormats;
+                break;
+            case SurfaceFormat.Astc5X5Rgba:
+                if (!supportsAstc)
+                    goto case InvalidFormat;
+                glInternalFormat = PixelInternalFormat.Astc5X5Rgba;
+                glFormat = PixelFormat.CompressedTextureFormats;
+                break;
+            case SurfaceFormat.Astc6X6Rgba:
+                if (!supportsAstc)
+                    goto case InvalidFormat;
+                glInternalFormat = PixelInternalFormat.Astc6X6Rgba;
+                glFormat = PixelFormat.CompressedTextureFormats;
+                break;
+            case SurfaceFormat.Astc8X8Rgba:
+                if (!supportsAstc)
+                    goto case InvalidFormat;
+                glInternalFormat = PixelInternalFormat.Astc8X8Rgba;
+                glFormat = PixelFormat.CompressedTextureFormats;
+                break;
+            case SurfaceFormat.Astc10X10Rgba:
+                if (!supportsAstc)
+                    goto case InvalidFormat;
+                glInternalFormat = PixelInternalFormat.Astc10X10Rgba;
+                glFormat = PixelFormat.CompressedTextureFormats;
+                break;
+            case SurfaceFormat.Astc12X12Rgba:
+                if (!supportsAstc)
+                    goto case InvalidFormat;
+                glInternalFormat = PixelInternalFormat.Astc12X12Rgba;
+                glFormat = PixelFormat.CompressedTextureFormats;
+                break;
             case SurfaceFormat.RgbEtc1:
                 if (!supportsEtc1)
                     goto case InvalidFormat;
@@ -795,6 +832,12 @@ namespace Microsoft.Xna.Framework.Graphics
                 case SurfaceFormat.Dxt5SRgb:
                 case SurfaceFormat.RgbaAtcExplicitAlpha:
                 case SurfaceFormat.RgbaAtcInterpolatedAlpha:
+                case SurfaceFormat.Astc4X4Rgba:
+                case SurfaceFormat.Astc5X5Rgba:
+                case SurfaceFormat.Astc6X6Rgba:
+                case SurfaceFormat.Astc8X8Rgba:
+                case SurfaceFormat.Astc10X10Rgba:
+                case SurfaceFormat.Astc12X12Rgba:
                 case SurfaceFormat.RgbaPvrtc2Bpp:
                 case SurfaceFormat.RgbaPvrtc4Bpp:
                 case SurfaceFormat.RgbEtc1:
@@ -837,6 +880,12 @@ namespace Microsoft.Xna.Framework.Graphics
                 case SurfaceFormat.RgbaAtcInterpolatedAlpha:
                 case SurfaceFormat.Rgba8Etc2:
                 case SurfaceFormat.SRgb8A8Etc2:
+                case SurfaceFormat.Astc4X4Rgba:
+                case SurfaceFormat.Astc5X5Rgba:
+                case SurfaceFormat.Astc6X6Rgba:
+                case SurfaceFormat.Astc8X8Rgba:
+                case SurfaceFormat.Astc10X10Rgba:
+                case SurfaceFormat.Astc12X12Rgba:
                     // One texel in DXT3 and DXT5 is a minimum 4x4 block, which is 16 bytes
                     return 16;
                 case SurfaceFormat.Alpha8:
@@ -940,8 +989,29 @@ namespace Microsoft.Xna.Framework.Graphics
                 case SurfaceFormat.SRgb8A8Etc2:
                 case SurfaceFormat.RgbaAtcExplicitAlpha:
                 case SurfaceFormat.RgbaAtcInterpolatedAlpha:
+                case SurfaceFormat.Astc4X4Rgba:
                     width = 4;
                     height = 4;
+                    break;
+                case SurfaceFormat.Astc5X5Rgba:
+                    width = 5;
+                    height = 5;
+                    break;
+                case SurfaceFormat.Astc6X6Rgba:
+                    width = 6;
+                    height = 6;
+                    break;
+                case SurfaceFormat.Astc8X8Rgba:
+                    width = 8;
+                    height = 8;
+                    break;
+                case SurfaceFormat.Astc10X10Rgba:
+                    width = 10;
+                    height = 10;
+                    break;
+                case SurfaceFormat.Astc12X12Rgba:
+                    width = 12;
+                    height = 12;
                     break;
                 default:
                     width = 1;

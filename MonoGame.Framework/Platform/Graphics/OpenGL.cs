@@ -184,6 +184,7 @@ namespace MonoGame.OpenGL
         SampleCoverage = 0x80A0,
         DebugOutputSynchronous = 0x8242,
         DebugOutput = 0x92E0,
+        FramebufferSrgb = 0x8DB9,
     }
 
     internal enum VertexPointerType
@@ -416,9 +417,17 @@ namespace MonoGame.OpenGL
         // ATITC
         AtcRgbaExplicitAlphaAmd = 0x8C93,
         AtcRgbaInterpolatedAlphaAmd = 0x87EE,
+        // ASTC
+        Astc4X4Rgba = 0x93B0,
+        Astc5X5Rgba = 0x93B2,
+        Astc6X6Rgba = 0x93B4,
+        Astc8X8Rgba = 0x93B7,
+        Astc10X10Rgba = 0x93BB,
+        Astc12X12Rgba = 0x93BD,
         // ETC1
         Etc1 = 0x8D64,
         Srgb = 0x8C40,
+        Srgb8Alpha8 = 0x8C43,
 
         // ETC2 RGB8A1
         Etc2Rgb8 = 0x9274,

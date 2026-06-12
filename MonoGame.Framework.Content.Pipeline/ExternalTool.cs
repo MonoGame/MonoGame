@@ -162,8 +162,15 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
             if (File.Exists(command))
                 return command;
 
+            var rid = RuntimeInformation.ProcessArchitecture == Architecture.Arm64 ? "arm64" : "x64";
+
             // For Linux check specific subfolder
             var lincom = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "linux", command);
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux) && File.Exists(lincom))
+                return lincom;
+
+            // For Linux check specific subfolder for current process rid
+            lincom = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, $"linux-{rid}", command);
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux) && File.Exists(lincom))
                 return lincom;
 
@@ -171,6 +178,11 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
             var maccom = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "osx", command);
             if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX) && File.Exists(maccom))
                 return maccom;
+
+            // For Windows check specific subfolder for current process rid
+            var winExe = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, $"windows-{rid}", command + ".exe");
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows) && File.Exists(winExe))
+                return winExe;
 
             // We don't have a full path, so try running through the system path to find it.
             var paths = AppDomain.CurrentDomain.BaseDirectory +

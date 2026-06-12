@@ -4,6 +4,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.Contracts;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
@@ -33,6 +34,7 @@ namespace MonoGame.Tests
 				public override void Has_correct_default_value () { }
 
 				[Test]
+				[RunOnUI]
 				public void Is_available_before_Run ()
 				{
 					Assert.That (Game, HasThisProperty.Not.Null);
@@ -59,12 +61,14 @@ namespace MonoGame.Tests
 				public override void Has_correct_default_value () { }
 
 				[Test]
+				[RunOnUI]
 				public void Is_available_before_Run ()
 				{
 					Assert.That (Game, HasThisProperty.Not.Null);
 				}
 
 				[Test]
+				[RunOnUI]
 				public void Is_not_provided_as_a_service ()
 				{
 					Assert.IsNull (Game.Services.GetService (typeof (ContentManager)));
@@ -81,6 +85,7 @@ namespace MonoGame.Tests
 				public override void Has_correct_default_value () { }
 
 				[Test]
+				[RunOnUI]
 				public void Is_invalid_without_IGraphicsDeviceService ()
 				{
 					Assert.IsNull (Game.Services.GetService (typeof (IGraphicsDeviceService)));
@@ -90,6 +95,7 @@ namespace MonoGame.Tests
 				}
 
 				[Test]
+				[RunOnUI]
 				public void Is_valid_with_IGraphicsDeviceService ()
 				{
 					var service = new MockGraphicsDeviceService ();
@@ -99,6 +105,7 @@ namespace MonoGame.Tests
 				}
 
 				[Test]
+				[RunOnUI]
 				public void Is_not_available_in_graphical_game_before_Run ()
 				{
 					Game.MakeGraphical ();
@@ -188,6 +195,7 @@ namespace MonoGame.Tests
 				public override void Has_correct_default_value () { }
 
 				[Test]
+				[RunOnUI]
 				public void Is_available_before_Run ()
 				{
 					Assert.That (Game, HasThisProperty.Not.Null);
@@ -204,6 +212,7 @@ namespace MonoGame.Tests
 				public override void Has_correct_default_value () { }
 
 				[Test]
+				[RunOnUI]
 				public void Is_available_before_Run ()
 				{
 					Assert.That (Game, HasThisProperty.Not.Null);
@@ -237,6 +246,7 @@ namespace MonoGame.Tests
 				public override void Has_correct_default_value () { }
 
 				[Test]
+				[RunOnUI]
 				public void Is_available_before_Run ()
 				{
 					Game.MakeGraphical ();
@@ -244,6 +254,7 @@ namespace MonoGame.Tests
 				}
 
 				[Test]
+				[RunOnUI]
 				public void Is_available_in_non_graphical_game ()
 				{
 					Assert.That (Game, HasThisProperty.Not.Null);
@@ -298,6 +309,7 @@ namespace MonoGame.Tests
 				}
 
 				[Test]
+				[RunOnUI]
 				public virtual void Has_correct_default_value ()
 				{
 					if (!_defaultValue.HasValue)
@@ -338,6 +350,7 @@ namespace MonoGame.Tests
 				{ }
 
 				[Test]
+				[RunOnUI]
 				public void Is_read_only ()
 				{
 					if (PropertyInfo.GetGetMethod() == null)
@@ -365,6 +378,7 @@ namespace MonoGame.Tests
 				}
 
 				[Test]
+				[RunOnUI]
 				public void Is_read_write ()
 				{
 					if (PropertyInfo.GetGetMethod() == null)

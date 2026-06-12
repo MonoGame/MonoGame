@@ -122,6 +122,13 @@ namespace MonoGame.Tests.Graphics
                         }
                         break;
                 }
+
+                // HACK: For some reason this new Present makes the Mac DesktopGL
+                // platform get stuck...  so we're disabling it.
+#if !DESKTOPGL
+                // We have to present or the rendering never begins.
+                gd.Present();
+#endif
             };
 
             Predicate<int> exitCondition = frame => state == 4 || frame > 15;
