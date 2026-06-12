@@ -6,7 +6,7 @@ using System.Globalization;
 
 namespace MonoGame.Tests.Framework
 {
-    class Vector2Test
+    class Vector2Test : VectorTestBase
     {
         [Test]
         public void CatmullRom()
@@ -484,52 +484,48 @@ namespace MonoGame.Tests.Framework
         }
 
         [Test]
-        public void RoundWithMidpointMode()
+        [TestCaseSource(nameof(MidpointRoundingValues))]
+        public void RoundWithMidpointMode(MidpointRounding mode)
         {
             // ROUND with a midpoint mode
 
             Vector2 roundMidpointSrc = new Vector2(1.5f - float.Epsilon, 2.5f + float.Epsilon);
-            foreach (var mode in Enum.GetValues<MidpointRounding>())
-            {
-                var roundMidpointMember = roundMidpointSrc;
-                roundMidpointMember.Round(mode);
+            var roundMidpointMember = roundMidpointSrc;
+            roundMidpointMember.Round(mode);
 
-                Vector2 roundMidpointResult;
-                Vector2.Round(ref roundMidpointSrc, out roundMidpointResult, mode);
+            Vector2 roundMidpointResult;
+            Vector2.Round(ref roundMidpointSrc, out roundMidpointResult, mode);
 
-                Vector2 expectedRoundMidpoint = new Vector2(
-                    MathF.Round(roundMidpointSrc.X, mode),
-                    MathF.Round(roundMidpointSrc.Y, mode)
-                );
-                Assert.AreEqual(expectedRoundMidpoint, roundMidpointMember);
-                Assert.AreEqual(expectedRoundMidpoint, Vector2.Round(roundMidpointSrc, mode));
-                Assert.AreEqual(expectedRoundMidpoint, roundMidpointResult);
-            }
+            Vector2 expectedRoundMidpoint = new Vector2(
+                MathF.Round(roundMidpointSrc.X, mode),
+                MathF.Round(roundMidpointSrc.Y, mode)
+            );
+            Assert.AreEqual(expectedRoundMidpoint, roundMidpointMember);
+            Assert.AreEqual(expectedRoundMidpoint, Vector2.Round(roundMidpointSrc, mode));
+            Assert.AreEqual(expectedRoundMidpoint, roundMidpointResult);
         }
 
         [Test]
-        public void RoundWithDigitAndMidpointMode()
+        [TestCaseSource(nameof(MidpointRoundingValues))]
+        public void RoundWithDigitAndMidpointMode(MidpointRounding mode)
         {
             // ROUND with a digit and a midpoint mode
 
             const int digits = 2;
             Vector2 roundMidpointDigitSrc = new Vector2(1.5f - float.Epsilon, 2.5f + float.Epsilon);
-            foreach (var mode in Enum.GetValues<MidpointRounding>())
-            {
-                var roundMidpointDigitMember = roundMidpointDigitSrc;
-                roundMidpointDigitMember.Round(digits, mode);
+            var roundMidpointDigitMember = roundMidpointDigitSrc;
+            roundMidpointDigitMember.Round(digits, mode);
 
-                Vector2 roundMidpointDigitResult;
-                Vector2.Round(ref roundMidpointDigitSrc, out roundMidpointDigitResult, digits, mode);
+            Vector2 roundMidpointDigitResult;
+            Vector2.Round(ref roundMidpointDigitSrc, out roundMidpointDigitResult, digits, mode);
 
-                Vector2 expectedRoundMidpoint = new Vector2(
-                    MathF.Round(roundMidpointDigitSrc.X, digits, mode),
-                    MathF.Round(roundMidpointDigitSrc.Y, digits, mode)
-                );
-                Assert.AreEqual(expectedRoundMidpoint, roundMidpointDigitMember);
-                Assert.AreEqual(expectedRoundMidpoint, Vector2.Round(roundMidpointDigitSrc, digits, mode));
-                Assert.AreEqual(expectedRoundMidpoint, roundMidpointDigitResult);
-            }
+            Vector2 expectedRoundMidpoint = new Vector2(
+                MathF.Round(roundMidpointDigitSrc.X, digits, mode),
+                MathF.Round(roundMidpointDigitSrc.Y, digits, mode)
+            );
+            Assert.AreEqual(expectedRoundMidpoint, roundMidpointDigitMember);
+            Assert.AreEqual(expectedRoundMidpoint, Vector2.Round(roundMidpointDigitSrc, digits, mode));
+            Assert.AreEqual(expectedRoundMidpoint, roundMidpointDigitResult);
         }
 
         [Test]
