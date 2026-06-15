@@ -1,4 +1,4 @@
-﻿// MonoGame - Copyright (C) MonoGame Foundation, Inc
+// MonoGame - Copyright (C) MonoGame Foundation, Inc
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 using System;
@@ -29,7 +29,7 @@ namespace MonoGame.Tests.Graphics {
 	    [TearDown]
 	    public override void TearDown()
 	    {
-            _spriteBatch.Dispose();
+            _spriteBatch?.Dispose();
 	        _spriteBatch = null;
 
 	        base.TearDown();

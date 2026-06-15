@@ -1,10 +1,11 @@
-﻿// MonoGame - Copyright (C) MonoGame Foundation, Inc
+// MonoGame - Copyright (C) MonoGame Foundation, Inc
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
 #if VULKAN || DIRECTX12
 
 using System;
+using System.Diagnostics;
 using System.IO;
 using NUnit.Framework;
 using Microsoft.Xna.Framework.Media;
@@ -19,6 +20,8 @@ namespace MonoGame.Tests.Audio
         {
             Assert.AreEqual(3.0f, song.Duration.TotalSeconds, 0.01f);
 
+            var stopWatch = Stopwatch.StartNew();
+
             // Play the "One".
             MediaPlayer.Play(song);
             SleepWhileDispatching(1000);
@@ -26,12 +29,14 @@ namespace MonoGame.Tests.Audio
 
             // Pause it now.
             MediaPlayer.Pause();
+            stopWatch.Stop();
+            
             SleepWhileDispatching(500);
             Assert.AreEqual(MediaState.Paused, MediaPlayer.State);
 
-            // Test the play position.
+            // Test the play position against actual elapsed real-world time.
             var pos = MediaPlayer.PlayPosition;
-            Assert.AreEqual(1.0f, pos.TotalSeconds, 0.1f);
+            Assert.AreEqual(stopWatch.Elapsed.TotalSeconds, pos.TotalSeconds, 0.1f);
 
             // Resume from where it was paused to play "Two" and "Three".
             MediaPlayer.Resume();

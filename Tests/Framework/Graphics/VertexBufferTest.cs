@@ -22,6 +22,7 @@ namespace MonoGame.Tests.Graphics
             new VertexPositionTexture(new Vector3(7,8,9), new Vector2(0.5f,0.6f)),
             new VertexPositionTexture(new Vector3(10,11,12), new Vector2(0.7f,0.8f))
         };
+        public Span<VertexPositionTexture> savedDataAsSpan => savedData.AsSpan();
         VertexPositionTexture vertexZero = new VertexPositionTexture(Vector3.Zero, Vector2.Zero);
         
         [Test]
@@ -291,6 +292,70 @@ namespace MonoGame.Tests.Graphics
 
             vertexBuffer.Dispose();
         }
+
+#if VULKAN || DIRECTX12
+        [Test]
+        //[TestCase(true)]
+        [TestCase(false, 0, 4, true, null)]
+        [TestCase(false, 1, 3, true, null)]
+        [TestCase(false, 1, 2, true, null)]
+        [TestCase(false, 4, 1, false, typeof(ArgumentOutOfRangeException))]
+        [RunOnUI]
+        public void SetDataStructWithSpan(bool dynamic, int destinationStartIndex, int elementCount, bool shouldSucceed, Type expectedExceptionType)
+        {
+            const int size = 4;
+            var testData = new VertexPositionTexture[size];
+            for (var i = 0; i < size; i++)
+            {
+                testData[i] = new VertexPositionTexture(
+                    new Vector3(i * 3, i * 3 + 1, i * 3 + 2),
+                    new Vector2(i * 2 / (float)10, (i * 2 + 1) / (float)10));
+            }
+
+            var vertexBuffer = (dynamic)
+                ? new DynamicVertexBuffer(gd, typeof(VertexPositionTexture), savedData.Length,
+                    BufferUsage.None)
+                : new VertexBuffer(gd, typeof(VertexPositionTexture), savedData.Length,
+                    BufferUsage.None);
+            var dataSpan = new Span<VertexPositionTexture>();
+            if (shouldSucceed)
+            { 
+                dataSpan = new Span<VertexPositionTexture>(testData, destinationStartIndex, elementCount);
+            }
+            else
+            {
+                dataSpan = new Span<VertexPositionTexture>(testData);
+            }
+
+            var vertexStride = VertexPositionTexture.VertexDeclaration.VertexStride;
+
+            // initialize data with standard call
+            vertexBuffer.SetData(savedData);
+
+            if (!shouldSucceed)
+                Assert.Throws(expectedExceptionType, () => vertexBuffer.SetData(destinationStartIndex, savedDataAsSpan));
+            else
+            {
+                // initialize with standard call
+                vertexBuffer.SetData(destinationStartIndex, dataSpan);
+
+                var readData = new VertexPositionTexture[savedData.Length];
+                vertexBuffer.GetData(0, readData, 0, savedData.Length, vertexStride);
+                Assert.AreEqual(
+                    dataSpan.ToArray(),
+                    readData.Take(destinationStartIndex..(destinationStartIndex + elementCount)).ToArray());
+                for(int i = 0; i < savedData.Length; i++)
+                {
+                    if (i < destinationStartIndex || i >= destinationStartIndex + elementCount)
+                    {
+                        Assert.AreEqual(savedData[i], readData[i]);
+                    }
+                }
+            }
+
+            vertexBuffer.Dispose();
+        }
+#endif
 
         [Test]
         //[TestCase(true)]
