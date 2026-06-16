@@ -951,6 +951,8 @@ namespace
                                      "glyph generation completed but the final output snapshot was incomplete.");
                 return MGF_ResultCode_NoGlyphData;
             }
+
+            return MGF_ResultCode_Success;
         }
         catch (const std::bad_alloc&)
         {
