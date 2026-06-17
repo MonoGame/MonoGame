@@ -265,8 +265,7 @@ public:
         if (m_swapChain) {
             bool lost = HandleLost(m_swapChain->ResizeBuffers(m_backBufferCount, width, height, backBufferFormat, flags));
             if (lost) return;
-        }
-        else {
+        } else {
             // Create a descriptor for the swap chain.
             DXGI_SWAP_CHAIN_DESC1 swapChainDesc = {};
             swapChainDesc.Width = width;
