@@ -197,7 +197,6 @@ Use when the issue is target-platform-specific, OS-specific, device-specific, or
 | Add runtime and dynamic SpriteFont support                  | `feature`, `scope: spritefont`, `scope: content-pipeline` |
 | Fix MGCB task failing after `dotnet tool restore` confusion | `bug`, `scope: mgcb`, `scope: tooling`                    |
 | Update Windows runner image in CI                           | `enhancement`, `scope: build`                             |
-| Add OpenXR integration                                      | `feature`, `scope: graphics`, `scope: native`             |
 | Trackpad gestures on macOS                                  | `feature`, `scope: input`, `platform: macos`              |
 | Vulkan swapchain layout regression after backend change     | `bug`, `scope: vulkan`, `regression`                      |
 | Add migration note for a behavior-changing template update  | `docs`, `scope: templates`, `behavior-change`             |
