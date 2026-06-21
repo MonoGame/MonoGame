@@ -17,7 +17,7 @@ namespace MonoGame.Tests.Graphics
         [TestCase(-1f)]
 #if DESKTOPGL
         [TestCase(1f, Ignore = "fails similarity test. Needs Investigating")]
-#elif VULKAN
+#elif VULKAN && MACOS
         [TestCase(1f, Ignore = "Constant depth bias has no effect on float-depth polygons at z=0; not supported on MoltenVK. See https://registry.khronos.org/vulkan/specs/latest/html/vkspec.html#primsrast-depthbias")]  
 #else
         [TestCase(1f)]
