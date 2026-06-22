@@ -64,8 +64,8 @@ public sealed class BuildNativeDependenciesTask : FrostingTask<BuildContext>
             .Append("-S").AppendQuoted(context.MakeAbsolute(new DirectoryPath(faudioSourceDir)).FullPath)
             .Append("-B").AppendQuoted(context.MakeAbsolute(new DirectoryPath(faudioBuildDir)).FullPath)
             .Append("-DBUILD_SHARED_LIBS=OFF")
-            .Append($"-DCMAKE_C_STANDARD_INCLUDE_DIRECTORIES={context.MakeAbsolute(new DirectoryPath(sdlIncludeDir))}")
-            .Append($"-DCMAKE_CXX_STANDARD_INCLUDE_DIRECTORIES={context.MakeAbsolute(new DirectoryPath(sdlIncludeDir))}")
+            .Append($"-DCMAKE_C_STANDARD_INCLUDE_DIRECTORIES=\"{context.MakeAbsolute(new DirectoryPath(sdlIncludeDir))}\"")
+            .Append($"-DCMAKE_CXX_STANDARD_INCLUDE_DIRECTORIES=\"{context.MakeAbsolute(new DirectoryPath(sdlIncludeDir))}\"")
             .Append("-DBUILD_SDL3=OFF");
 
         AppendPlatformCMakeArgs(configureArgs, context, isSDL: false, targetArch);

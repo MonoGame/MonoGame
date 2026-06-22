@@ -82,6 +82,25 @@ namespace Microsoft.Xna.Framework.Graphics
             }
         }
 
+        internal int PlatformGetMaxMultiSampleCount(SurfaceFormat sformat)
+        {
+            var format = SharpDXHelper.ToFormat(sformat);
+
+            // Find the maximum supported level starting with the game's requested multisampling level
+            // and halving each time until reaching 0 (meaning no multisample support).
+            var qualityLevels = 0;
+            var maxLevel = 32;
+            while (maxLevel > 0)
+            {
+                qualityLevels = _d3dDevice.CheckMultisampleQualityLevels(format, maxLevel);
+                if (qualityLevels > 0)
+                    break;
+                maxLevel /= 2;
+            }
+
+            return maxLevel;
+        }
+
 #if WINDOWS
 
         private void CorrectBackBufferSize()
@@ -259,7 +278,7 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             // Clamp MultiSampleCount
             PresentationParameters.MultiSampleCount =
-                GetClampedMultisampleCount(PresentationParameters.MultiSampleCount);
+                GetClampedMultisampleCount(PresentationParameters.BackBufferFormat, PresentationParameters.MultiSampleCount);
 
             _d3dContext.OutputMerger.SetTargets((SharpDX.Direct3D11.DepthStencilView)null,
                                                 (SharpDX.Direct3D11.RenderTargetView)null);

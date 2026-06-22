@@ -73,8 +73,8 @@ template <class T>
 void mg_remove(std::vector<T>& vector, const T& element)
 {
     auto new_end = std::remove(vector.begin(), vector.end(), element);
-    assert(new_end != vector.end());
-    vector.erase(new_end, vector.end());
+    if (new_end != vector.end())
+        vector.erase(new_end, vector.end());
 }
 
 // Removes the element without preserving order.

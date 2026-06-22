@@ -50,6 +50,9 @@ public partial class GraphicsDevice
 
     private unsafe void PlatformInitialize()
     {
+        PresentationParameters.MultiSampleCount =
+                GetClampedMultisampleCount(PresentationParameters.BackBufferFormat, PresentationParameters.MultiSampleCount);
+
         MGG.GraphicsDevice_ResizeSwapchain(
                 Handle,
                 PresentationParameters.DeviceWindowHandle,
@@ -57,6 +60,7 @@ public partial class GraphicsDevice
                 PresentationParameters.BackBufferHeight,
                 PresentationParameters.BackBufferFormat,
                 PresentationParameters.DepthStencilFormat,
+                PresentationParameters.MultiSampleCount,
                 PresentationParameters.PresentationInterval.GetSyncInterval());
 
         // Setup the default texture.
@@ -64,11 +68,16 @@ public partial class GraphicsDevice
         DefaultTexture.SetData(new[] { Color.Black, Color.Black, Color.Black, Color.Black });
     }
 
+    internal int PlatformGetMaxMultiSampleCount(SurfaceFormat format)
+    {
+        return 4;
+    }
+
     private unsafe void OnPresentationChanged()
     {
         // Clamp MultiSampleCount
         PresentationParameters.MultiSampleCount =
-                GetClampedMultisampleCount(PresentationParameters.MultiSampleCount);
+                GetClampedMultisampleCount(PresentationParameters.BackBufferFormat, PresentationParameters.MultiSampleCount);
 
         // Finish any frame that is currently rendering.
         if (_currentFrame > -1)
@@ -85,6 +94,7 @@ public partial class GraphicsDevice
             PresentationParameters.BackBufferHeight,
             PresentationParameters.BackBufferFormat,
             PresentationParameters.DepthStencilFormat,
+            PresentationParameters.MultiSampleCount,
             PresentationParameters.PresentationInterval.GetSyncInterval());
 
         _viewport = new Viewport(
