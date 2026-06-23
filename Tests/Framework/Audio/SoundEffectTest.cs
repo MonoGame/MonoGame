@@ -393,6 +393,18 @@ namespace MonoGame.Tests.Audio
             Assert.Throws<ArgumentNullException>(() => SoundEffect.FromStream(null));
         }
 
+#if !XNA
+        [Test]
+        public void SoundEffectFromStream_PcmFmtChunkWithTrailingBytes_Loads()
+        {
+            using (FileStream stream = File.OpenRead(@"Assets/Audio/pcm-fmt40-cb0.wav"))
+            using (SoundEffect sound = SoundEffect.FromStream(stream))
+            {
+                Assert.AreEqual(84014 / 10, (int)sound.Duration.TotalMilliseconds / 10);
+            }
+        }
+#endif
+
         [TestCase(@"Assets/Audio/blast_mono.wav", 7165)]
         [TestCase(@"Assets/Audio/blast_mono_22hz.wav", 7165)]
         [TestCase(@"Assets/Audio/blast_mono_11hz.wav", 7165)]
