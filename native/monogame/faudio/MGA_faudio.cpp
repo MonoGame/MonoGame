@@ -323,7 +323,7 @@ void MGA_Buffer_InitializeFormat(MGA_Buffer* buffer, mgbyte* waveHeader, mgbyte*
 		assert((length % wformat.nBlockAlign) == 0);
 
 		// Calculate duration
-		buffer->duration = (mgulong)((length * 1000) / buffer->format->nAvgBytesPerSec);
+		buffer->duration = ((mgulong)length * 1000) / buffer->format->nAvgBytesPerSec;
 
 		buffer->length = length;
 		buffer->data = (uint8_t*)malloc(length);
@@ -433,7 +433,7 @@ void MGA_Buffer_InitializePCM(MGA_Buffer* buffer, mgbyte* waveData, mgint offset
 		memcpy(buffer->data, waveData + offset, length);
 
 	// Calculate duration
-	buffer->duration = (mgulong)((length * 1000) / buffer->format->nAvgBytesPerSec);
+	buffer->duration = ((mgulong)length * 1000) / buffer->format->nAvgBytesPerSec;
 
 	// Set the buffer structure passed to SubmitSourceBuffer.
 	memset(&buffer->buffer, 0, sizeof(buffer->buffer));
@@ -469,11 +469,11 @@ void MGA_Buffer_InitializeXact(MGA_Buffer* buffer, mguint codec, mgbyte* waveDat
 	// Calculate duration (approximate for compressed formats)
 	if (codec == 0x166) // WMA
 	{
-		buffer->duration = (mgulong)((length * 1000) / (sampleRate * channels * 2));
+		buffer->duration = ((mgulong)length * 1000) / (sampleRate * channels * 2);
 	}
 	else
 	{
-		buffer->duration = (mgulong)((length * 1000) / buffer->format->nAvgBytesPerSec);
+		buffer->duration = ((mgulong)length * 1000) / buffer->format->nAvgBytesPerSec;
 	}
 }
 
