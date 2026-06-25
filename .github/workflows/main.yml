@@ -381,13 +381,6 @@ jobs:
         run: |
           brew update
 
-      - name: Install Full Vulkan SDK
-        if: runner.os == 'macos'
-        uses: humbletim/install-vulkan-sdk@v1.2
-        with:
-          version: 1.4.309.0
-          cache: true          
-
       - name: Check Vulkan
         if: runner.environment != 'github-hosted' && runner.os == 'macos'
         run: |
