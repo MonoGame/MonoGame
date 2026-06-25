@@ -5,7 +5,6 @@
 using System;
 using System.Runtime.InteropServices;
 using System.Text;
-using System.Runtime.CompilerServices;
 using System.Collections.Generic;
 using System.Diagnostics;
 using MonoGame.Framework.Utilities;
@@ -1591,7 +1590,7 @@ namespace MonoGame.OpenGL
             if (intPtr == IntPtr.Zero) {
                 throw new OutOfMemoryException ();
             }
-            fixed (char* chars = str + RuntimeHelpers.OffsetToStringData / 2) {
+            fixed (char* chars = str) {
                 int bytes = Encoding.ASCII.GetBytes (chars, str.Length, (byte*)((void*)intPtr), num);
                 Marshal.WriteByte (intPtr, bytes, 0);
                 return intPtr;
