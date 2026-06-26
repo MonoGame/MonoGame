@@ -22,6 +22,7 @@ namespace MonoGame.Tests.Audio
         /// is called after calling Pause(), Stop().
         /// </summary>
         [Test]
+        [RunOnUI]
         public void SoundEffectPauseStopPlay()
         {
             var se = new SoundEffect(new byte[16000], 8000, AudioChannels.Mono);

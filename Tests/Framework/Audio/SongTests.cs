@@ -68,6 +68,7 @@ namespace MonoGame.Tests.Audio
         }
 
         [Test]
+        [RunOnUI]
         public void SongTestOgg()
         {
             var song = _content.Load<Song>("Assets/Audio/Song/one_two_three");
@@ -75,6 +76,7 @@ namespace MonoGame.Tests.Audio
         }
 
         [Test]
+        [RunOnUI]
         public void SongTestMP3()
         {
             string relativePath = "Assets/Audio/Song/one_two_three.mp3";
