@@ -549,7 +549,7 @@ jobs:
 
       - name: Run Game Tests
         if: runner.environment != 'github-hosted' || runner.os == 'Linux' 
-        run: dotnet MonoGame.Tests.dll --timeout=300000 --where="Category = GameTest"
+        run: ${{matrix.prefix}} dotnet MonoGame.Tests.dll --timeout=300000 --where="Category = GameTest"
         env:
           CI: true
         working-directory: tests-desktopgl
