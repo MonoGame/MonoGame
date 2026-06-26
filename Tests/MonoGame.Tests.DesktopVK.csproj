@@ -8,6 +8,7 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <GenerateProgramFile>false</GenerateProgramFile>
     <DefineConstants>VULKAN;DESKTOP</DefineConstants>
+    <DefineConstants Condition="$([MSBuild]::IsOSPlatform('MacOS'))">$(DefineConstants);MACOS</DefineConstants>
     <Platforms>AnyCPU;ARM64;x64</Platforms>
   </PropertyGroup>
 
