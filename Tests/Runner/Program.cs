@@ -59,7 +59,9 @@ namespace MonoGame.Tests
         {
             mainThread = Thread.CurrentThread;
             // Force the capture of the MainUI thread
+#if DESKTOPGL
             Threading.IsOnUIThread();
+#endif
             mainThreadSynchronizationContext = new MainThreadSynchronizationContext(mainThread);
             SynchronizationContext.SetSynchronizationContext(mainThreadSynchronizationContext);
             
