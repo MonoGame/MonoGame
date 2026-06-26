@@ -11,10 +11,12 @@ using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using System.Threading;
 using System.Diagnostics;
+using MonoGame.Tests;
 
 namespace MonoGame.Tests.Audio
 {
     [Category("Audio")]
+    [RunOnUiTestFixture]
     class SoundEffectInstanceTest : AudioTestFixtureBase
     {
         /// <summary>
@@ -22,7 +24,6 @@ namespace MonoGame.Tests.Audio
         /// is called after calling Pause(), Stop().
         /// </summary>
         [Test]
-        [RunOnUI]
         public void SoundEffectPauseStopPlay()
         {
             var se = new SoundEffect(new byte[16000], 8000, AudioChannels.Mono);
