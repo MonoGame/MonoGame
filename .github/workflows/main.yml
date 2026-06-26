@@ -391,7 +391,6 @@ jobs:
           ls -l /usr/local/lib/libvulkan.1.dylib
           file /usr/local/lib/libvulkan.1.dylib
           echo $DYLD_LIBRARY_PATH
-        working-directory: tests-desktopvk          
 
       - name: Disable Annotations
         run: echo "::remove-matcher owner=csc::"
