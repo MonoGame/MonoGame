@@ -9,9 +9,11 @@ using System.Threading;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Audio;
 using NUnit.Framework;
+using MonoGame.Tests;
 
 namespace MonoGame.Tests.Framework
 {
+    [RunOnUiTestFixture]
     class FrameworkDispatcherTest
     {
         [Test]
