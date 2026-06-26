@@ -54,6 +54,7 @@ namespace MonoGame.Tests.Framework
 
 #if !XNA
         [Test]
+        [RunOnUI]
         [Category ("Audio")]
         public void UpdatesSoundEffectInstancePool()
         {
