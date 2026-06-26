@@ -342,10 +342,12 @@ jobs:
             platform: linux
             shell: bash
             filter: --where="Category != Audio"
+            prefix: xvfb-run -a -s "-screen 0 1024x768x24"
           - os: ubuntu-24.04-arm
             platform: linux
             shell: bash
             filter: --where="Category != Audio"
+            prefix: xvfb-run -a -s "-screen 0 1024x768x24"
       fail-fast: false
     defaults:
       run:
@@ -380,6 +382,12 @@ jobs:
         if: runner.environment == 'github-hosted' && runner.os == 'macos'
         run: |
           brew update
+
+      - name: Setup xvfb
+        if: runner.environment == 'github-hosted' && runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y xvfb
 
       - name: Check Vulkan
         if: runner.environment != 'github-hosted' && runner.os == 'macos'
@@ -515,7 +523,7 @@ jobs:
       # We have to run this is bits because the tests crash if too many are run in one go?
       - name: Run Framework Tests
         if: runner.environment != 'github-hosted' || runner.os != 'Windows' 
-        run: dotnet MonoGame.Tests.dll --timeout=300000 --test MonoGame.Tests.Framework ${{matrix.filter}}
+        run: ${{matrix.prefix}} dotnet MonoGame.Tests.dll --timeout=300000 --test MonoGame.Tests.Framework ${{matrix.filter}}
         env:
           CI: true
         working-directory: tests-desktopgl
