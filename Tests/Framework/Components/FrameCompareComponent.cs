@@ -5,17 +5,14 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.Concurrent;
-using System.Diagnostics;
 using System.IO;
-using System.Linq;
-using System.Runtime.InteropServices;
-using System.Text;
 using System.Threading;
 
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
 using NUnit.Framework;
+using System.Globalization;
 
 // TODO: It's likely that a more sophisticated approach will be required for
 //       comparing images.  In particular, comparing pixel deltas would give
@@ -242,7 +239,7 @@ namespace MonoGame.Tests.Components {
 
 				var frameInfo = Game.Services.RequireService<IFrameInfoSource> ().FrameInfo;
 
-				var fileName = string.Format (_fileNameFormat, frameInfo.DrawNumber);
+				var fileName = string.Format (CultureInfo.InvariantCulture, _fileNameFormat, frameInfo.DrawNumber);
 
 				string frameOutputPath = null;
 				if (OutputDirectory != null)

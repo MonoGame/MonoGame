@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using MonoGame.Framework.Utilities;
+using System.Globalization;
 
 namespace Microsoft.Xna.Framework.Content
 {
@@ -393,7 +394,7 @@ namespace Microsoft.Xna.Framework.Content
                     {
                         if (!(v is T))
                         {
-                            throw new ContentLoadException(String.Format("Error loading shared resource. Expected type {0}, received type {1}", typeof(T).Name, v.GetType().Name));
+                            throw new ContentLoadException(String.Format(CultureInfo.InvariantCulture, "Error loading shared resource. Expected type {0}, received type {1}", typeof(T).Name, v.GetType().Name));
                         }
                         fixup((T)v);
                     }));

@@ -2,13 +2,14 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
 using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input.Touch;
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Globalization;
 
 
 namespace Microsoft.Xna.Framework
@@ -168,7 +169,7 @@ namespace Microsoft.Xna.Framework
             {
                 string name = GetType().Name;
                 throw new ObjectDisposedException(
-                    name, string.Format("The {0} object was used after being Disposed.", name));
+                    name, string.Format(CultureInfo.InvariantCulture, "The {0} object was used after being Disposed.", name));
             }
         }
 
@@ -491,7 +492,7 @@ namespace Microsoft.Xna.Framework
                 Platform.RunLoop();
                 break;
             default:
-                throw new ArgumentException(string.Format(
+                throw new ArgumentException(string.Format(CultureInfo.InvariantCulture,
                     "Handling for the run behavior {0} is not implemented.", runBehavior));
             }
         }

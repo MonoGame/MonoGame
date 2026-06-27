@@ -2,13 +2,14 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
+using MonoGame.Framework.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
 using System.Linq;
 using System.Reflection;
-using MonoGame.Framework.Utilities;
-using System.Diagnostics.CodeAnalysis;
 
 namespace Microsoft.Xna.Framework.Content
 {
@@ -169,7 +170,7 @@ namespace Microsoft.Xna.Framework.Content
                 if (elementType == typeof(System.Array))
                     reader = new ArrayReader<Array>();
                 else
-                    throw new ContentLoadException(string.Format("Content reader could not be found for {0} type.", elementType.FullName));
+                    throw new ContentLoadException(String.Format(CultureInfo.InvariantCulture, "Content reader could not be found for {0} type.", elementType.FullName));
 
             // We use the construct delegate to pick the correct existing 
             // object to be the target of deserialization.

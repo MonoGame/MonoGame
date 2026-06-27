@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Resources;
 
@@ -42,7 +43,7 @@ namespace Microsoft.Xna.Framework.Content
         /// </exception>
         protected override System.IO.Stream OpenStream(string assetName)
         {
-            object obj = this.resource.GetObject(assetName);
+            object obj = this.resource.GetObject(assetName, CultureInfo.InvariantCulture);
             if (obj == null)
             {
                 throw new ContentLoadException("Resource not found");

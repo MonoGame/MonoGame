@@ -2,19 +2,18 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
-using System;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Threading;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using MonoGame.Tests.Components;
 using MonoGame.Tests.Utilities;
 using NUnit.Framework;
-using NUnit.Framework.Internal;
+using System;
+using System.Collections.Generic;
+using System.Globalization;
+using System.IO;
+using System.Linq;
+using System.Threading;
 
 namespace MonoGame.Tests.Graphics
 {
@@ -178,8 +177,8 @@ namespace MonoGame.Tests.Graphics
             {
                 var frame = _submittedFrames[i];
 
-                var capturedPath = string.Format(capturedImagePath, i + 1);
-                var referencePath = string.Format(referenceImagePath, i + 1);
+                var capturedPath = string.Format(CultureInfo.InvariantCulture, capturedImagePath, i + 1);
+                var referencePath = string.Format(CultureInfo.InvariantCulture, referenceImagePath, i + 1);
 
                 if (!File.Exists(referencePath))
                 {
@@ -219,7 +218,7 @@ namespace MonoGame.Tests.Graphics
 
                 if (result.SaveDiff)
                 {
-                    var name = string.Format(fileName, i + 1);
+                    var name = string.Format(CultureInfo.InvariantCulture, fileName, i + 1);
                     var path = GetDiffPath(name);
                     result.DiffPath = path;
                     Directory.CreateDirectory(Path.GetDirectoryName(path));
@@ -311,7 +310,7 @@ namespace MonoGame.Tests.Graphics
         {
 			var folderName = TestContext.CurrentContext.GetTestFolderName();
             var directory = Paths.CapturedFrameDiff(folderName);
-            var diffFileName = string.Format("diff-{0}", name);
+            var diffFileName = string.Format(CultureInfo.InvariantCulture, "diff-{0}", name);
             return Path.Combine (directory, diffFileName);
         }
 

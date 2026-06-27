@@ -3,8 +3,9 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System;
-using System.Runtime.Serialization;
 using System.Diagnostics;
+using System.Globalization;
+using System.Runtime.Serialization;
 
 namespace Microsoft.Xna.Framework
 {
@@ -116,10 +117,10 @@ namespace Microsoft.Xna.Framework
             get
             {
                 return string.Concat(
-                    this.X.ToString(), "  ",
-                    this.Y.ToString(), "  ",
-                    this.Z.ToString(), "  ",
-                    this.W.ToString()
+                    this.X.ToString(CultureInfo.InvariantCulture), "  ",
+                    this.Y.ToString(CultureInfo.InvariantCulture), "  ",
+                    this.Z.ToString(CultureInfo.InvariantCulture), "  ",
+                    this.W.ToString(CultureInfo.InvariantCulture)
                 );
             }
         }
@@ -1244,6 +1245,17 @@ namespace Microsoft.Xna.Framework
         public override string ToString()
         {
             return "{X:" + X + " Y:" + Y + " Z:" + Z + " W:" + W + "}";
+        }
+
+        /// <summary>
+        /// Returns a <see cref="String"/> representation of this <see cref="Vector4"/> in the format:
+        /// {X:[<see cref="X"/>] Y:[<see cref="Y"/>] Z:[<see cref="Z"/>] W:[<see cref="W"/>]}
+        /// </summary>
+        /// <param name="formatProvider">Format provider for <see cref="X"/>, <see cref="Y"/>, <see cref="Z"/> and <see cref="W"/>.</param>
+        /// <returns>A <see cref="String"/> representation of this <see cref="Vector4"/>.</returns>
+        public string ToString(IFormatProvider formatProvider)
+        {
+            return "{X:" + X.ToString(formatProvider) + " Y:" + Y.ToString(formatProvider) + " Z:" + Z.ToString(formatProvider) + " W:" + W.ToString(formatProvider) + "}";
         }
 
         /// <summary>

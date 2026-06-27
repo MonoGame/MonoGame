@@ -4,6 +4,7 @@
 
 using System;
 using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
 
 namespace Microsoft.Xna.Framework.Graphics.PackedVector
 {
@@ -102,7 +103,17 @@ namespace Microsoft.Xna.Framework.Graphics.PackedVector
         /// <inheritdoc />
         public override string ToString()
         {
-            return ToVector3().ToString();
+            return ToVector3().ToString(CultureInfo.CurrentCulture);
+        }
+
+        /// <summary>
+        /// Serializes the packed vector to a string using the specified format provider.
+        /// </summary>
+        /// <param name="formatProvider">Format provider to utilise</param>
+        /// <returns>String representation of this <see cref="Bgr565"/></returns>
+        public string ToString(IFormatProvider formatProvider)
+        {
+            return ToVector3().ToString(formatProvider);
         }
 
         /// <inheritdoc />

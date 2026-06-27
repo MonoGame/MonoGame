@@ -11,6 +11,7 @@ using Microsoft.Xna.Framework;
 using NUnit.Framework;
 
 using MonoGame.Tests.Components;
+using System.Globalization;
 
 namespace MonoGame.Tests.Visual {
 	[RunOnUiTestFixture]
@@ -183,8 +184,8 @@ namespace MonoGame.Tests.Visual {
 
 			foreach (var result in results) {
 
-				string diffFileName = string.Format (
-					"diff-{0}-{1}.png",
+				string diffFileName = string.Format (CultureInfo.InvariantCulture,
+                    "diff-{0}-{1}.png",
 					Path.GetFileNameWithoutExtension (result.ReferenceImagePath),
 					Path.GetFileNameWithoutExtension (result.CapturedImagePath));
 

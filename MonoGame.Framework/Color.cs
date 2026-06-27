@@ -6,6 +6,7 @@ using System;
 using System.Text;
 using System.Runtime.Serialization;
 using System.Diagnostics;
+using System.Globalization;
 
 namespace Microsoft.Xna.Framework
 {
@@ -1842,10 +1843,10 @@ namespace Microsoft.Xna.Framework
             get
             {
                 return string.Concat(
-                    this.R.ToString(), "  ",
-                    this.G.ToString(), "  ",
-                    this.B.ToString(), "  ",
-                    this.A.ToString()
+                    this.R.ToString(CultureInfo.InvariantCulture), "  ",
+                    this.G.ToString(CultureInfo.InvariantCulture), "  ",
+                    this.B.ToString(CultureInfo.InvariantCulture), "  ",
+                    this.A.ToString(CultureInfo.InvariantCulture)
                 );
             }
         }
@@ -1867,7 +1868,7 @@ namespace Microsoft.Xna.Framework
             sb.Append(B);
             sb.Append(" A:");
             sb.Append(A);
-            sb.Append("}");
+            sb.Append('}');
             return sb.ToString();
         }
 

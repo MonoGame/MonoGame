@@ -4,6 +4,7 @@
 
 using System;
 using System.Diagnostics;
+using System.Globalization;
 using System.Runtime.Serialization;
 
 namespace Microsoft.Xna.Framework
@@ -446,7 +447,7 @@ namespace Microsoft.Xna.Framework
             {
                 return string.Concat(
                     this.Normal.DebugDisplayString, "  ",
-                    this.D.ToString()
+                    this.D.ToString(CultureInfo.InvariantCulture)
                     );
             }
         }

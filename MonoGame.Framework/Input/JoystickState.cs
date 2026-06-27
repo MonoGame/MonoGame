@@ -2,6 +2,7 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
+using System.Globalization;
 using System.Linq;
 using System.Text;
 
@@ -114,7 +115,7 @@ namespace Microsoft.Xna.Framework.Input
             {
                 ret.Append(", Axes=");
                 foreach (var axis in Axes)
-                    ret.Append((axis > 0 ? "+" : "") + axis.ToString("00000") + " ");
+                    ret.Append((axis > 0 ? "+" : "") + axis.ToString("00000", CultureInfo.InvariantCulture) + " ");
                 ret.Length--;
 
                 ret.Append(", Buttons=");
@@ -127,7 +128,7 @@ namespace Microsoft.Xna.Framework.Input
                 ret.Length--;
             }
 
-            ret.Append("]");
+            ret.Append(']');
             return ret.ToString();
         }
     }

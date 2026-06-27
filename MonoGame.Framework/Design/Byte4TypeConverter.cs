@@ -43,7 +43,7 @@ namespace Microsoft.Xna.Framework.Design
 
             if (destinationType == typeof(string))
             {
-                return vec.PackedValue.ToString();
+                return vec.PackedValue.ToString(culture);
             }
 
             return base.ConvertTo(context, culture, value, destinationType);

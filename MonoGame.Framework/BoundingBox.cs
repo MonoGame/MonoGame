@@ -5,6 +5,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Globalization;
 using System.Runtime.Serialization;
 
 namespace Microsoft.Xna.Framework
@@ -877,7 +878,17 @@ namespace Microsoft.Xna.Framework
         /// <returns>A <see cref="String"/> representation of this <see cref="BoundingBox"/>.</returns>
         public override string ToString()
         {
-            return "{{Min:" + this.Min.ToString() + " Max:" + this.Max.ToString() + "}}";
+            return "{{Min:" + this.Min.ToString(CultureInfo.CurrentCulture) + " Max:" + this.Max.ToString(CultureInfo.CurrentCulture) + "}}";
+        }
+
+        /// <summary>
+        /// Serializes the <see cref="BoundingBox"/> to a string using the specified format provider.
+        /// </summary>
+        /// <param name="formatProvider">Format provider to utilise</param>
+        /// <returns>String representation of this <see cref="BoundingBox"/></returns>
+        public string ToString(IFormatProvider formatProvider)
+        {
+            return "{{Min:" + this.Min.ToString(formatProvider) + " Max:" + this.Max.ToString(formatProvider) + "}}";
         }
 
         /// <summary>

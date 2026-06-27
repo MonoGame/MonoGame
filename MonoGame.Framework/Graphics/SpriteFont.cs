@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
+using System.Globalization;
 using System.Text;
 
 namespace Microsoft.Xna.Framework.Graphics 
@@ -268,7 +269,7 @@ namespace Microsoft.Xna.Framework.Graphics
             {
                 if(!TryGetRegionIdx(c, pRegions, out int regionIdx))
                 {
-                    c = char.IsUpper(c) ? char.ToLower(c) : char.ToUpper(c);
+                    c = char.IsUpper(c) ? char.ToLower(c, CultureInfo.InvariantCulture) : char.ToUpper(c, CultureInfo.InvariantCulture);
                     TryGetRegionIdx(c, pRegions, out regionIdx);
                 }
 

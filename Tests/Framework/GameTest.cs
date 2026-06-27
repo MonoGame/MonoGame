@@ -2,14 +2,13 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
+using Microsoft.Xna.Framework;
+using NUnit.Framework;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Globalization;
 using System.Reflection;
-using System.Threading;
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
-using NUnit.Framework;
 
 namespace MonoGame.Tests {
 	static partial class GameTest
@@ -521,8 +520,8 @@ namespace MonoGame.Tests {
                         default: throw new NotSupportedException(Action.ToString());
                     }
 
-					return string.Format (
-						       "{0}({1:0}{2})",
+					return string.Format (CultureInfo.InvariantCulture,
+                               "{0}({1:0}{2})",
 						       actionInitial,
 						       ElapsedGameTime.TotalMilliseconds,
 						       WasRunningSlowly ? "!" : "");

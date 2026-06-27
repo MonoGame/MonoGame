@@ -2,11 +2,12 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
-using System;
-using System.IO;
-using System.Runtime.InteropServices;
 using Microsoft.Xna.Framework.Content;
 using MonoGame.Framework.Utilities;
+using System;
+using System.Globalization;
+using System.IO;
+using System.Runtime.InteropServices;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
@@ -421,7 +422,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
             var dataByteSize = width*height*depth*fSize;
             if (elementCount * tSize != dataByteSize)
-                throw new ArgumentException(string.Format("elementCount is not the right size, " +
+                throw new ArgumentException(string.Format(CultureInfo.InvariantCulture, "elementCount is not the right size, " +
                                             "elementCount * sizeof(T) is {0}, but data size is {1}.",
                                             elementCount * tSize, dataByteSize), "elementCount");
         }

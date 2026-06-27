@@ -4,6 +4,7 @@
 
 using System;
 using System.Diagnostics;
+using System.Globalization;
 using System.Runtime.Serialization;
 
 namespace Microsoft.Xna.Framework
@@ -2421,10 +2422,10 @@ namespace Microsoft.Xna.Framework
                 }
 
                 return string.Concat(
-                     "( ", this.M11.ToString(), "  ", this.M12.ToString(), "  ", this.M13.ToString(), "  ", this.M14.ToString(), " )  \r\n",
-                     "( ", this.M21.ToString(), "  ", this.M22.ToString(), "  ", this.M23.ToString(), "  ", this.M24.ToString(), " )  \r\n",
-                     "( ", this.M31.ToString(), "  ", this.M32.ToString(), "  ", this.M33.ToString(), "  ", this.M34.ToString(), " )  \r\n",
-                     "( ", this.M41.ToString(), "  ", this.M42.ToString(), "  ", this.M43.ToString(), "  ", this.M44.ToString(), " )");
+                     "( ", this.M11.ToString(CultureInfo.InvariantCulture), "  ", this.M12.ToString(CultureInfo.InvariantCulture), "  ", this.M13.ToString(CultureInfo.InvariantCulture), "  ", this.M14.ToString(CultureInfo.InvariantCulture), " )  \r\n",
+                     "( ", this.M21.ToString(CultureInfo.InvariantCulture), "  ", this.M22.ToString(CultureInfo.InvariantCulture), "  ", this.M23.ToString(CultureInfo.InvariantCulture), "  ", this.M24.ToString(CultureInfo.InvariantCulture), " )  \r\n",
+                     "( ", this.M31.ToString(CultureInfo.InvariantCulture), "  ", this.M32.ToString(CultureInfo.InvariantCulture), "  ", this.M33.ToString(CultureInfo.InvariantCulture), "  ", this.M34.ToString(CultureInfo.InvariantCulture), " )  \r\n",
+                     "( ", this.M41.ToString(CultureInfo.InvariantCulture), "  ", this.M42.ToString(CultureInfo.InvariantCulture), "  ", this.M43.ToString(CultureInfo.InvariantCulture), "  ", this.M44.ToString(CultureInfo.InvariantCulture), " )");
             }
         }
 

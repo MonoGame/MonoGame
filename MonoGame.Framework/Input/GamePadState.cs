@@ -2,6 +2,8 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
+using System.Globalization;
+
 namespace Microsoft.Xna.Framework.Input
 {
     /// <summary>
@@ -217,7 +219,7 @@ namespace Microsoft.Xna.Framework.Input
                 return "[GamePadState: IsConnected = 0]";
 
             return "[GamePadState: IsConnected=" + (IsConnected ? "1" : "0") +
-                   ", PacketNumber=" + PacketNumber.ToString("00000") +
+                   ", PacketNumber=" + PacketNumber.ToString("00000", CultureInfo.InvariantCulture) +
                    ", Buttons=" + Buttons +
                    ", DPad=" + DPad +
                    ", ThumbSticks=" + ThumbSticks +

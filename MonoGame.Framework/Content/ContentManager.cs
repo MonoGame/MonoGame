@@ -620,14 +620,14 @@ namespace Microsoft.Xna.Framework.Content
                 // This never executes as asset.Key is never null.  This just forces the
                 // linker to include the ReloadAsset function when AOT compiled.
                 if (asset.Key == null)
-                    ReloadAsset(asset.Key, Convert.ChangeType(asset.Value, asset.Value.GetType()));
+                    ReloadAsset(asset.Key, Convert.ChangeType(asset.Value, asset.Value.GetType(), CultureInfo.InvariantCulture));
 
                 var methodInfo = ReflectionHelpers.GetMethodInfo(typeof(ContentManager), "ReloadAsset");
                 // Up the callstack, it is ensured that the type of asset.Value can be used to make a generic method for.
                 #pragma warning disable IL2060, IL3050
                 var genericMethod = methodInfo.MakeGenericMethod(asset.Value.GetType());
                 #pragma warning restore IL2060, IL3050
-                genericMethod.Invoke(this, new object[] { asset.Key, Convert.ChangeType(asset.Value, asset.Value.GetType()) });
+                genericMethod.Invoke(this, new object[] { asset.Key, Convert.ChangeType(asset.Value, asset.Value.GetType(), CultureInfo.InvariantCulture) });
             }
         }
 

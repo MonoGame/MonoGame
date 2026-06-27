@@ -2,13 +2,9 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using System.Globalization;
 
 namespace MonoGame.Tests.Components {
 	class DrawFrameNumberComponent : DrawableGameComponent {
@@ -41,7 +37,7 @@ namespace MonoGame.Tests.Components {
 
 			// TODO: Add support for different placements and colors.
 			_batch.Begin ();
-			_batch.DrawString (_font, frameInfo.DrawNumber.ToString(), Vector2.Zero, Color.White);
+			_batch.DrawString (_font, frameInfo.DrawNumber.ToString(CultureInfo.InvariantCulture), Vector2.Zero, Color.White);
 			_batch.End ();
 		}
 	}

@@ -2,12 +2,10 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using System.Collections.Generic;
+using System.Globalization;
 
 namespace MonoGame.Tests.Components {
 	class ImplicitDrawOrderComponent : VisualTestDrawableGameComponent {
@@ -68,7 +66,7 @@ namespace MonoGame.Tests.Components {
 
 			_spriteBatch.Begin ();
 			DrawStatusString (
-			    string.Format ("{0} drawables", _drawables.Count),
+			    string.Format (CultureInfo.InvariantCulture, "{0} drawables", _drawables.Count),
 			    0, _drawablesOrderedCorrectly);
 			_spriteBatch.End ();
 		}
@@ -135,7 +133,7 @@ namespace MonoGame.Tests.Components {
 				var position = new Vector2 (_number * halfEx, 0);
 
 				_spriteBatch.Begin (SpriteSortMode.Immediate, BlendState.AlphaBlend);
-				_spriteBatch.DrawString (_owner._font, _number.ToString (), position, _color);
+				_spriteBatch.DrawString (_owner._font, _number.ToString (CultureInfo.InvariantCulture), position, _color);
 				_spriteBatch.End ();
 			}
 		}

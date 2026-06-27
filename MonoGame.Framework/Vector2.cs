@@ -4,6 +4,7 @@
 
 using System;
 using System.Diagnostics;
+using System.Globalization;
 using System.Runtime.CompilerServices;
 using System.Runtime.Serialization;
 
@@ -87,8 +88,8 @@ namespace Microsoft.Xna.Framework
             get
             {
                 return string.Concat(
-                    this.X.ToString(), "  ",
-                    this.Y.ToString()
+                    this.X.ToString(CultureInfo.InvariantCulture), "  ",
+                    this.Y.ToString(CultureInfo.InvariantCulture)
                 );
             }
         }
@@ -985,6 +986,17 @@ namespace Microsoft.Xna.Framework
         public override string ToString()
         {
             return "{X:" + X + " Y:" + Y + "}";
+        }
+
+        /// <summary>
+        /// Returns a <see cref="String"/> representation of this <see cref="Vector2"/> in the format:
+        /// {X:[<see cref="X"/>] Y:[<see cref="Y"/>]}
+        /// </summary>
+        /// <param name="formatProvider">Format provider for <see cref="X"/> and <see cref="Y"/></param>
+        /// <returns>A <see cref="String"/> representation of this <see cref="Vector2"/>.</returns>
+        public string ToString(IFormatProvider formatProvider)
+        {
+            return "{X:" + X.ToString(formatProvider) + " Y:" + Y.ToString(formatProvider) + "}";
         }
 
         /// <summary>
