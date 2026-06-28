@@ -645,6 +645,12 @@ namespace Microsoft.Xna.Framework.Graphics
             var stencil = 0;
             
             var sampleCount = GetClampedMultisampleCount(preferredFormat, preferredMultiSampleCount);
+            if (sampleCount > 0 && preferredDepthFormat != DepthFormat.None)
+            {
+                GL.GetInteger(GetPName.MaxSamples, out int maxDepthMultiSampleCount);
+                GraphicsExtensions.CheckGLError();
+                sampleCount = Math.Min(sampleCount, maxDepthMultiSampleCount);
+            }
             
             if (sampleCount > 0 && this.framebufferHelper.SupportsBlitFramebuffer)
             {
@@ -713,11 +719,8 @@ namespace Microsoft.Xna.Framework.Graphics
                     }
                 }
             }
-
-            if (color != 0)
-                renderTarget.GLColorBuffer = color;
-            else
-                renderTarget.GLColorBuffer = renderTarget.GLTexture;
+            
+            renderTarget.GLColorBuffer = color;
             renderTarget.GLDepthBuffer = depth;
             renderTarget.GLStencilBuffer = stencil;
         }
@@ -732,7 +735,7 @@ namespace Microsoft.Xna.Framework.Graphics
             color = renderTarget.GLColorBuffer;
             depth = renderTarget.GLDepthBuffer;
             stencil = renderTarget.GLStencilBuffer;
-            colorIsRenderbuffer = color != renderTarget.GLTexture;
+            colorIsRenderbuffer = color != 0;
 
             if (color != 0)
             {
@@ -842,14 +845,16 @@ namespace Microsoft.Xna.Framework.Graphics
                 this.framebufferHelper.BindFramebuffer(glFramebuffer);
                 var renderTargetBinding = this._currentRenderTargetBindings[0];
                 var renderTarget = renderTargetBinding.RenderTarget as IRenderTarget;
-                this.framebufferHelper.FramebufferRenderbuffer((int)FramebufferAttachment.DepthAttachment, renderTarget.GLDepthBuffer, 0);
-                this.framebufferHelper.FramebufferRenderbuffer((int)FramebufferAttachment.StencilAttachment, renderTarget.GLStencilBuffer, 0);
+                if (renderTarget.GLDepthBuffer != 0)
+                    this.framebufferHelper.FramebufferRenderbuffer((int)FramebufferAttachment.DepthAttachment, renderTarget.GLDepthBuffer, 0);
+                if (renderTarget.GLStencilBuffer != 0)
+                    this.framebufferHelper.FramebufferRenderbuffer((int)FramebufferAttachment.StencilAttachment, renderTarget.GLStencilBuffer, 0);
                 for (var i = 0; i < this._currentRenderTargetCount; ++i)
                 {
                     renderTargetBinding = this._currentRenderTargetBindings[i];
                     renderTarget = renderTargetBinding.RenderTarget as IRenderTarget;
                     var attachement = (int)(FramebufferAttachment.ColorAttachment0 + i);
-                    if (renderTarget.GLColorBuffer != renderTarget.GLTexture)
+                    if (renderTarget.GLColorBuffer != 0)
                         this.framebufferHelper.FramebufferRenderbuffer(attachement, renderTarget.GLColorBuffer, 0);
                     else
                         this.framebufferHelper.FramebufferTexture2D(attachement, (int)renderTarget.GetFramebufferTarget(renderTargetBinding), renderTarget.GLTexture, 0, renderTarget.MultiSampleCount);
@@ -1278,7 +1283,6 @@ namespace Microsoft.Xna.Framework.Graphics
         internal int PlatformGetMaxMultiSampleCount(SurfaceFormat sformat)
         {
             // For OpenGL we don't seem to check the correct setting per-format.
-
             int maxMultiSampleCount;
             GL.GetInteger(GetPName.MaxSamples, out maxMultiSampleCount);
             return maxMultiSampleCount;
