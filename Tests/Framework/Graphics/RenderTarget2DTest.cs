@@ -198,7 +198,6 @@ namespace MonoGame.Tests.Graphics
         [TestCase(DepthFormat.Depth24Stencil8, 0)]
         [TestCase(DepthFormat.Depth24Stencil8, 1)]
         [TestCase(DepthFormat.Depth24Stencil8, 4)]
-        [RunOnUI]
         public void ClearAndGetDataWithMultiSample(DepthFormat depthFormat, int multiSampleCount)
         {
             const int size = 16;
