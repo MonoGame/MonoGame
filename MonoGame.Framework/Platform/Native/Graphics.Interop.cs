@@ -194,6 +194,7 @@ internal static unsafe partial class MGG
         int height,
         SurfaceFormat color,
         DepthFormat depth,
+        int multiSampleCount,
         int syncInterval);
 
     [DllImport(MGP.MonoGameNativeDLL, EntryPoint = "MGG_GraphicsDevice_BeginFrame", ExactSpelling = true)]

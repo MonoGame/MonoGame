@@ -60,8 +60,6 @@ public:
 
     void GetBackBufferData(uint32_t x, uint32_t y, uint32_t w, uint32_t h, uint8_t* data, size_t stride);
 
-    uint64_t CreateQueryHandle();
-
     CommandContext* GetCommandContext() const;
 
     ID3D12Device* GetD3DDevice() const;

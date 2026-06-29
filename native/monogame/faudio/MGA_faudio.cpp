@@ -293,25 +293,55 @@ void MGA_Buffer_InitializeFormat(MGA_Buffer* buffer, mgbyte* waveHeader, mgbyte*
 
 	if (wformat.wFormatTag == FAUDIO_FORMAT_PCM)
 	{
-		buffer->format = (FAudioWaveFormatEx*)malloc(sizeof(FAudioWaveFormatEx));
-		memcpy(buffer->format, &wformat, sizeof(FAudioWaveFormatEx));
+		MGA_Buffer_InitializePCM(
+			buffer,
+			waveData,
+			0,
+			length,
+			wformat.wBitsPerSample,
+			wformat.nSamplesPerSec,
+			wformat.nChannels,
+			loopStart,
+			loopLength);
 
-		// We make a copy of the input sound data as it
-		// is a C# buffer that will go away after this call.
-		buffer->data = (uint8_t*)malloc(length);
-		memcpy(buffer->data, waveData, length);
-		buffer->length = length;
+		return;
+	}
+
+	if (wformat.wFormatTag == FAUDIO_FORMAT_IEEE_FLOAT)
+	{
+		buffer->format = (FAudioWaveFormatEx*)malloc(sizeof(FAudioWaveFormatEx));
+		memset(buffer->format, 0, sizeof(FAudioWaveFormatEx));
+		buffer->format->wFormatTag = FAUDIO_FORMAT_IEEE_FLOAT;
+		buffer->format->nSamplesPerSec = wformat.nSamplesPerSec;
+		buffer->format->nChannels = wformat.nChannels;
+		buffer->format->nBlockAlign = wformat.nBlockAlign;
+		buffer->format->wBitsPerSample = wformat.wBitsPerSample;
+		buffer->format->nAvgBytesPerSec = buffer->format->nSamplesPerSec * buffer->format->nBlockAlign;
+		buffer->format->cbSize = 0;
+
+		// Buffer should be block aligned.
+		assert((length % wformat.nBlockAlign) == 0);
 
 		// Calculate duration
-		if (buffer->format->nAvgBytesPerSec > 0)
-			buffer->duration = (mgulong)((length * 1000) / buffer->format->nAvgBytesPerSec);
-		else
-		{
-			// TODO: Fallback to something else?
-			buffer->duration = 0;
-		}
+		buffer->duration = ((mgulong)length * 1000) / buffer->format->nAvgBytesPerSec;
+
+		buffer->length = length;
+		buffer->data = (uint8_t*)malloc(length);
+		memcpy(buffer->data, waveData, length);
+
+		memset(&buffer->buffer, 0, sizeof(buffer->buffer));
+		buffer->buffer.pAudioData = buffer->data;
+		buffer->buffer.AudioBytes = length;
+		buffer->buffer.LoopBegin = loopStart;
+		buffer->buffer.LoopLength = loopLength;
+		buffer->buffer.LoopCount = 0;
+		buffer->buffer.Flags = 0;
+		buffer->buffer.pContext = nullptr;
+
+		return;
 	}
-	else if (wformat.wFormatTag == FAUDIO_FORMAT_MSADPCM)
+
+	if (wformat.wFormatTag == FAUDIO_FORMAT_MSADPCM)
 	{
 		const size_t size = sizeof(FAudioADPCMWaveFormat) + (7 * sizeof(FAudioADPCMCoefSet));
 		FAudioADPCMWaveFormat* format = (FAudioADPCMWaveFormat*)malloc(size);
@@ -333,6 +363,10 @@ void MGA_Buffer_InitializeFormat(MGA_Buffer* buffer, mgbyte* waveHeader, mgbyte*
 		format->aCoef[5] = { 460, -208 };
 		format->aCoef[6] = { 392, -232 };
 
+		mgulong totalBlocks = length / wformat.nBlockAlign;
+		mgulong totalSamples = totalBlocks * format->wSamplesPerBlock;
+		buffer->duration = (mgulong)((totalSamples * 1000) / wformat.nSamplesPerSec);
+
 		// NOTE: XAudio only supports up to 512 as the samples per block.
 		// Larger values are not supported and the sound will be wrong.
 		if (format->wSamplesPerBlock > 512)
@@ -347,27 +381,28 @@ void MGA_Buffer_InitializeFormat(MGA_Buffer* buffer, mgbyte* waveHeader, mgbyte*
 		buffer->data = (uint8_t*)malloc(length);
 		memcpy(buffer->data, waveData, length);
 
-		// Use the samples per second as average bytes per second is usually 0.
-		uint32_t samplesPerBlock = (format->wfx.nBlockAlign / format->wfx.nChannels - 7) * 2 + 2;
-		uint32_t sampleCount = ((uint32_t)buffer->length / format->wfx.nBlockAlign) * samplesPerBlock;
-		buffer->duration = (mgulong)(((float)sampleCount / (float)format->wfx.nSamplesPerSec) * 1000.0f);
-	}
-	else
-	{
-		// TODO: This API doesn't have a way to indicate that the format
-		// provided was not supported and this buffer is uninitialized.
-		throw 0;
+		memset(&buffer->buffer, 0, sizeof(buffer->buffer));
+		buffer->buffer.pAudioData = buffer->data;
+		buffer->buffer.AudioBytes = length;
+		buffer->buffer.LoopBegin = loopStart;
+		buffer->buffer.LoopLength = loopLength;
+		buffer->buffer.LoopCount = 0;
+		buffer->buffer.Flags = 0;
+		buffer->buffer.pContext = nullptr;
+
+		return;
 	}
 
-	// Set the buffer structure passed to SubmitSourceBuffer.
-	memset(&buffer->buffer, 0, sizeof(buffer->buffer));
-	buffer->buffer.pAudioData = buffer->data;
-	buffer->buffer.AudioBytes = length;
-	buffer->buffer.LoopBegin = loopStart;
-	buffer->buffer.LoopLength = loopLength;
-	buffer->buffer.LoopCount = 0;
-	buffer->buffer.Flags = 0;
-	buffer->buffer.pContext = nullptr;
+
+	if (wformat.wFormatTag == FAUDIO_FORMAT_WMAUDIO2)
+	{
+		// TODO: The API here needs to change to pass
+		// additional data for this format to work.
+	}
+	
+	// TODO: This API doesn't have a way to indicate that the format
+	// provided was not supported and this buffer is uninitialized.
+	throw 0;
 }
 
 void MGA_Buffer_InitializePCM(MGA_Buffer* buffer, mgbyte* waveData, mgint offset, mgint length, mgint sampleBits, mgint sampleRate, mgint channels, mgint loopStart, mgint loopLength)
@@ -398,7 +433,7 @@ void MGA_Buffer_InitializePCM(MGA_Buffer* buffer, mgbyte* waveData, mgint offset
 		memcpy(buffer->data, waveData + offset, length);
 
 	// Calculate duration
-	buffer->duration = (mgulong)((length * 1000) / buffer->format->nAvgBytesPerSec);
+	buffer->duration = ((mgulong)length * 1000) / buffer->format->nAvgBytesPerSec;
 
 	// Set the buffer structure passed to SubmitSourceBuffer.
 	memset(&buffer->buffer, 0, sizeof(buffer->buffer));
@@ -434,11 +469,11 @@ void MGA_Buffer_InitializeXact(MGA_Buffer* buffer, mguint codec, mgbyte* waveDat
 	// Calculate duration (approximate for compressed formats)
 	if (codec == 0x166) // WMA
 	{
-		buffer->duration = (mgulong)((length * 1000) / (sampleRate * channels * 2));
+		buffer->duration = ((mgulong)length * 1000) / (sampleRate * channels * 2);
 	}
 	else
 	{
-		buffer->duration = (mgulong)((length * 1000) / buffer->format->nAvgBytesPerSec);
+		buffer->duration = ((mgulong)length * 1000) / buffer->format->nAvgBytesPerSec;
 	}
 }
 
@@ -497,6 +532,9 @@ mgint MGA_Voice_GetBufferCount(MGA_Voice* voice)
 {
 	assert(voice != nullptr);
 
+	if (voice->voice == nullptr)
+		return 0;
+
 	FAudioVoiceState state;
 	FAudioSourceVoice_GetState(voice->voice, &state, FAUDIO_VOICE_NOSAMPLESPLAYED);
 	return state.BuffersQueued;
@@ -511,6 +549,22 @@ mgint MGA_Voice_GetFinishedBufferCount(MGA_Voice* voice)
 void MGA_Voice_SetBuffer(MGA_Voice* voice, MGA_Buffer* buffer)
 {
 	assert(voice != nullptr);
+
+	// If the voice has an existing source voice but the new buffer format doesn't match:
+	// We should destroy and recreate the source voice to be safe.
+	if (voice->voice
+		&& buffer
+		&& voice->buffer
+		&& voice->buffer->format
+		&& buffer->format
+		&& (voice->buffer->format->wFormatTag != buffer->format->wFormatTag
+			|| voice->buffer->format->nChannels != buffer->format->nChannels
+			|| voice->buffer->format->nSamplesPerSec != buffer->format->nSamplesPerSec
+			|| voice->buffer->format->wBitsPerSample != buffer->format->wBitsPerSample))
+	{
+		FAudioVoice_DestroyVoice(voice->voice);
+		voice->voice = nullptr;
+	}
 
 	// Stop and remove any pending buffers first.
 	if (voice->voice)
@@ -541,6 +595,9 @@ void MGA_Voice_AppendBuffer(MGA_Voice* voice, mgbyte* buffer, mguint size)
 {
 	assert(voice != nullptr);
 	assert(buffer != nullptr);
+
+	if (voice->voice == nullptr)
+		return;
 
 	// Find a free buffer.
 	MGA_RawBuffer* raw = nullptr;
@@ -586,6 +643,9 @@ void MGA_Voice_AppendBuffer(MGA_Voice* voice, mgbyte* buffer, mguint size)
 void MGA_Voice_Play(MGA_Voice* voice, mgbyte looped)
 {
 	assert(voice != nullptr);
+
+	if (voice->voice == nullptr)
+		return;
 
 	if (voice->buffer != nullptr)
 	{
@@ -714,6 +774,10 @@ static void MGA_Voice_UpdateOutputMatrix(MGA_Voice* voice)
 void MGA_Voice_SetPan(MGA_Voice* voice, mgfloat pan)
 {
 	assert(voice != nullptr);
+
+	if (voice->voice == nullptr)
+		return;
+
 	voice->pan = pan;
 	MGA_Voice_UpdateOutputMatrix(voice);
 }
@@ -721,6 +785,9 @@ void MGA_Voice_SetPan(MGA_Voice* voice, mgfloat pan)
 void MGA_Voice_SetPitch(MGA_Voice* voice, mgfloat pitch)
 {
 	assert(voice != nullptr);
+
+	if (voice->voice == nullptr)
+		return;
 
 	float ratio = powf(2.0f, pitch);
 	FAudioSourceVoice_SetFrequencyRatio(voice->voice, ratio, FAUDIO_COMMIT_NOW);
@@ -730,12 +797,18 @@ void MGA_Voice_SetVolume(MGA_Voice* voice, mgfloat volume)
 {
 	assert(voice != nullptr);
 
+	if (voice->voice == nullptr)
+		return;
+
 	FAudioVoice_SetVolume(voice->voice, volume, FAUDIO_COMMIT_NOW);
 }
 
 void MGA_Voice_SetReverbMix(MGA_Voice* voice, mgfloat mix)
 {
 	assert(voice != nullptr);
+
+	if (voice->voice == nullptr)
+		return;
 
 	if (mix < 0)
 		voice->reverbMix = 0.0f;
@@ -785,6 +858,9 @@ void MGA_Voice_SetFilterMode(MGA_Voice* voice, MGFilterMode mode, mgfloat filter
 {
 	assert(voice != nullptr);
 
+	if (voice->voice == nullptr)
+		return;
+
 	FAudioVoiceDetails details;
 	memset(&details, 0, sizeof(details));
 	FAudioVoice_GetVoiceDetails(voice->voice, &details);
@@ -809,6 +885,9 @@ void MGA_Voice_ClearFilterMode(MGA_Voice* voice)
 {
 	assert(voice != nullptr);
 
+	if (voice->voice == nullptr)
+		return;
+
 	FAudioFilterParameters params;
 	params.Type = FAudioLowPassFilter;
 	params.Frequency = FAUDIO_MAX_FILTER_FREQUENCY;
@@ -819,6 +898,9 @@ void MGA_Voice_ClearFilterMode(MGA_Voice* voice)
 void MGA_Voice_Apply3D(MGA_Voice* voice, Listener& listener, Emitter& emitter, mgfloat distanceScale)
 {
 	assert(voice != nullptr);
+
+	if (voice->voice == nullptr)
+		return;
 
 	F3DAUDIO_LISTENER f3dListener;
 	f3dListener.OrientFront.x = listener.Forward.X;

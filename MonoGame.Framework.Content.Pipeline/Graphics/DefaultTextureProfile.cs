@@ -133,7 +133,13 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
                     break;
 
                 case TextureProcessorOutputFormat.AstcCompressed:
-                    GraphicsUtil.CompressAstc(context, content, isSpriteFont);
+                case TextureProcessorOutputFormat.AstcCompressed4x4:
+                case TextureProcessorOutputFormat.AstcCompressed5x5:
+                case TextureProcessorOutputFormat.AstcCompressed6x6:
+                case TextureProcessorOutputFormat.AstcCompressed8x8:
+                case TextureProcessorOutputFormat.AstcCompressed10x10:
+                case TextureProcessorOutputFormat.AstcCompressed12x12:
+                    GraphicsUtil.CompressAstc(context, content, isSpriteFont, format);
                     break;
 
                 case TextureProcessorOutputFormat.Color16Bit:

@@ -9,13 +9,12 @@ using NUnit.Framework;
 
 namespace MonoGame.Tests.Graphics
 {
-    [TestFixture]
     [NonParallelizable]
+    [RunOnUiTestFixture]
     internal class OcclusionQueryTest : GraphicsDeviceTestFixtureBase
     {
 
         [Test]
-        [RunOnUI]
         public void ConstructorsAndProperties()
         {
             Assert.Throws<ArgumentNullException>(() => new OcclusionQuery(null));
@@ -32,7 +31,6 @@ namespace MonoGame.Tests.Graphics
         }
 
         [Test]
-        [RunOnUI]
         public void MismatchedBeginEnd()
         {
             var occlusionQuery = new OcclusionQuery(gd);
@@ -46,7 +44,6 @@ namespace MonoGame.Tests.Graphics
         }
 
         [Test]
-        [RunOnUI]
         public void QueryOccludedSprites()
         {
             var spriteBatch = new SpriteBatch(gd);
@@ -122,6 +119,13 @@ namespace MonoGame.Tests.Graphics
                         }
                         break;
                 }
+
+                // HACK: For some reason this new Present makes the Mac DesktopGL
+                // platform get stuck...  so we're disabling it.
+#if !DESKTOPGL
+                // We have to present or the rendering never begins.
+                gd.Present();
+#endif
             };
 
             Predicate<int> exitCondition = frame => state == 4 || frame > 15;

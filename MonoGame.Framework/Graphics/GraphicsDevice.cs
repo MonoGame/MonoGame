@@ -382,8 +382,10 @@ namespace Microsoft.Xna.Framework.Graphics
             Dispose(false);
         }
 
-        internal int GetClampedMultisampleCount(int multiSampleCount)
+        internal int GetClampedMultisampleCount(SurfaceFormat format, int multiSampleCount)
         {
+            var maxMultiSampleCount = PlatformGetMaxMultiSampleCount(format);
+
             if (multiSampleCount > 1)
             {
                 // Round down MultiSampleCount to the nearest power of two
@@ -396,9 +398,10 @@ namespace Microsoft.Xna.Framework.Graphics
                 msc = msc | (msc >> 2);
                 msc = msc | (msc >> 4);
                 msc -= (msc >> 1);
+
                 // and clamp it to what the device can handle
-                if (msc > GraphicsCapabilities.MaxMultiSampleCount)
-                    msc = GraphicsCapabilities.MaxMultiSampleCount;
+                if (msc > maxMultiSampleCount)
+                    msc = maxMultiSampleCount;
 
                 return msc;
             }
