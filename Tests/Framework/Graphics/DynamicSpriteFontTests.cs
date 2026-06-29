@@ -11,9 +11,8 @@ using NUnit.Framework;
 
 namespace MonoGame.Tests.Graphics;
 
-[TestFixture]
 [NonParallelizable]
-[RunOnUI]
+[RunOnUiTestFixture]
 internal sealed class DynamicSpriteFontTest : GraphicsDeviceTestFixtureBase
 {
 #if DIRECTX12 || VULKAN
