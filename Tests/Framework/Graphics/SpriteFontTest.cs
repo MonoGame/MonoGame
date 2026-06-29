@@ -548,7 +548,6 @@ But the answer was still '42'.
         [Test]
         [TestCase("Default", "The quick brown fox")]
         [TestCase("Default", "The quick brown fox\njumps over the lazy dog.")]
-        [RunOnUI]
         public void MeasureString_StringAndStringBuilder_ReturnSameValue(string fontName, string text)
         {
             SpriteFont font = game.Content.Load<SpriteFont>(Paths.Font(fontName));
