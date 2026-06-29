@@ -11,8 +11,8 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace MonoGame.Tests.Graphics
 {
-    [TestFixture]
     [NonParallelizable]
+    [RunOnUiTestFixture]
     class VertexBufferTest : GraphicsDeviceTestFixtureBase
     {
         VertexPositionTexture[] savedData = new VertexPositionTexture[] 
@@ -28,7 +28,6 @@ namespace MonoGame.Tests.Graphics
         [Test]
         //[TestCase(true)]
         [TestCase(false)]
-        [RunOnUI]
         public void ShouldSetAndGetData(bool dynamic)
         {   
             var vertexBuffer = (dynamic)
@@ -46,7 +45,6 @@ namespace MonoGame.Tests.Graphics
         [Test]
         //[TestCase(true)]
         [TestCase(false)]
-        [RunOnUI]
         public void ShouldSetAndGetData_elementCount(bool dynamic)
         {
             var vertexBuffer = (dynamic)
@@ -67,7 +65,6 @@ namespace MonoGame.Tests.Graphics
         [Test]
         //[TestCase(true)]
         [TestCase(false)]
-        [RunOnUI]
         public void ShouldSetAndGetData_startIndex(bool dynamic)
         {
             var vertexBuffer = (dynamic)
@@ -88,7 +85,6 @@ namespace MonoGame.Tests.Graphics
         [Test]
         //[TestCase(true)]
         [TestCase(false)]
-        [RunOnUI]
         public void ShouldSetAndGetData_offsetInBytes(bool dynamic)
         {
             var vertexBuffer = (dynamic)
@@ -109,7 +105,6 @@ namespace MonoGame.Tests.Graphics
         [Test]
         //[TestCase(true)]
         [TestCase(false)]
-        [RunOnUI]
         public void ShouldSetAndGetDataBytes(bool dynamic)
         {
             var vertexBuffer = (dynamic)
@@ -147,7 +142,6 @@ namespace MonoGame.Tests.Graphics
         [TestCase(false, 79, 2, false, typeof(ArgumentOutOfRangeException))]
         [TestCase(false, 80, 0, false, typeof(ArgumentOutOfRangeException))]
         [TestCase(false, 80, 1, false, typeof(ArgumentOutOfRangeException))]
-        [RunOnUI]
         public void SetDataWithElementCount(bool dynamic, int startIndex, int elementCount, bool shouldSucceed, Type expectedExceptionType)
         {
             var vertexBuffer = (dynamic)
@@ -192,7 +186,6 @@ namespace MonoGame.Tests.Graphics
         [TestCase(false, 1, 81, typeof(ArgumentOutOfRangeException))]
         [TestCase(false, 2, 81, typeof(ArgumentOutOfRangeException))]
 #endif
-        [RunOnUI]
         public void SetDataWithElementCountAndVertexStride(bool dynamic, int elementCount, int vertexStride, Type expectedExceptionType)
         {
             var vertexBuffer = (dynamic)
@@ -219,7 +212,6 @@ namespace MonoGame.Tests.Graphics
         }
 
         [Test]
-        [RunOnUI]
         public void BetterGetSetDataVertexStrideTest()
         {
             const int size = 5;
@@ -268,7 +260,6 @@ namespace MonoGame.Tests.Graphics
         [TestCase(false, 4, 16, false, typeof(ArgumentOutOfRangeException))]
         [TestCase(false, 4, 20, true, null)]
         [TestCase(false, 5, 20, false, typeof(ArgumentOutOfRangeException))]
-        [RunOnUI]
         public void SetDataStructWithElementCountAndVertexStride(bool dynamic, int elementCount, int vertexStride, bool shouldSucceed, Type expectedExceptionType)
         {
             var vertexBuffer = (dynamic)
@@ -300,7 +291,6 @@ namespace MonoGame.Tests.Graphics
         [TestCase(false, 1, 3, true, null)]
         [TestCase(false, 1, 2, true, null)]
         [TestCase(false, 4, 1, false, typeof(ArgumentOutOfRangeException))]
-        [RunOnUI]
         public void SetDataStructWithSpan(bool dynamic, int destinationStartIndex, int elementCount, bool shouldSucceed, Type expectedExceptionType)
         {
             const int size = 4;
@@ -360,7 +350,6 @@ namespace MonoGame.Tests.Graphics
         [Test]
         //[TestCase(true)]
         [TestCase(false)]
-        [RunOnUI]
         public void GetPosition(bool dynamic)
         {
             var vertexBuffer = (dynamic)
@@ -382,7 +371,6 @@ namespace MonoGame.Tests.Graphics
         [Test]
         //[TestCase(true)]
         [TestCase(false)]
-        [RunOnUI]
         public void SetPosition(bool dynamic)
         {
             var vertexBuffer = (dynamic)
@@ -411,7 +399,6 @@ namespace MonoGame.Tests.Graphics
         [Test]
         //[TestCase(true)]
         [TestCase(false)]
-        [RunOnUI]
         public void GetTextureCoordinate(bool dynamic)
         {
             var vertexBuffer = (dynamic)
@@ -434,7 +421,6 @@ namespace MonoGame.Tests.Graphics
         [Test]
         //[TestCase(true)]
         [TestCase(false)]
-        [RunOnUI]
         public void SetTextureCoordinate(bool dynamic)
         {
             var vertexBuffer = (dynamic)
@@ -478,7 +464,6 @@ namespace MonoGame.Tests.Graphics
         }
 
         [Test]
-        [RunOnUI]
         public void ShouldSucceedWhenVertexFormatDoesMatchShader()
         {
             var vertexBuffer = new VertexBuffer(
@@ -498,7 +483,6 @@ namespace MonoGame.Tests.Graphics
 #if DESKTOPGL
         [Ignore("we should figure out if there's a way to check this in OpenGL")]
 #endif
-        [RunOnUI]
         public void ShouldThrowHelpfulExceptionWhenVertexFormatDoesNotMatchShader()
         {
             var vertexBuffer = new VertexBuffer(
@@ -527,7 +511,6 @@ namespace MonoGame.Tests.Graphics
         }
 
         [Test]
-        [RunOnUI]
         public void NullDeviceShouldThrowArgumentNullException()
         {
             Assert.Throws<ArgumentNullException>(() => 

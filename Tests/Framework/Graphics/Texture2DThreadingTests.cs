@@ -12,15 +12,14 @@ using NUnit.Framework;
 
 namespace MonoGame.Tests.Graphics
 {
-    [TestFixture]
     [NonParallelizable]
 #if DESKTOPGL
     [Ignore("GL doesn't work well with threads.")]
 #endif
+    [RunOnUiTestFixture]
     class Texture2DThreadingTests : GraphicsDeviceTestFixtureBase
     {
         [Test]
-        [RunOnUI]
         public void CreateSetAndGetData()
         {
             const int Width = 32;
@@ -63,7 +62,6 @@ namespace MonoGame.Tests.Graphics
         }
 
         [Test]
-        [RunOnUI]
         public void BackgroundLoading()
         {
             const int COUNT = 400;

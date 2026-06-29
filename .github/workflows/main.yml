@@ -384,7 +384,13 @@ jobs:
       - name: Check Vulkan
         if: runner.environment != 'github-hosted' && runner.os == 'macos'
         run: |
-          vulkaninfo
+          echo "VULKAN_SDK: $VULKAN_SDK"
+          echo "VK_ICD_FILENAMES: $VK_ICD_FILENAMES"
+          which vulkaninfo
+          vulkaninfo --summary
+          ls -l /usr/local/lib/libvulkan.1.dylib
+          file /usr/local/lib/libvulkan.1.dylib
+          echo $DYLD_LIBRARY_PATH
 
       - name: Disable Annotations
         run: echo "::remove-matcher owner=csc::"
@@ -428,14 +434,6 @@ jobs:
         with:
           name: tests-desktopvk-${{ matrix.platform }}
           path: tests-desktopvk
-
-      - name: Check Vulkan SDK
-        if: runner.environment != 'github-hosted' && runner.os == 'macos'
-        run: |
-           ls -l /usr/local/lib/libvulkan.1.dylib
-           file /usr/local/lib/libvulkan.1.dylib
-           echo $DYLD_LIBRARY_PATH
-        working-directory: tests-desktopvk
 
       # Run the DirectX 11 tests in two steps: first the audio, then the rest.
       # This is because the audio tests has some incompatibilities within the runner with ContentManagerTests.

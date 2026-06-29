@@ -14,12 +14,11 @@ using MonoGame.OpenGL;
 
 namespace MonoGame.Tests.Graphics
 {
-    [TestFixture]
     [NonParallelizable]
+    [RunOnUiTestFixture]
     internal class GraphicsDeviceTest : GraphicsDeviceTestFixtureBase
     {
         [Test]
-        [RunOnUI]
         public void BlendFactor()
         {
             Assert.AreEqual(Color.White, gd.BlendFactor);
@@ -40,7 +39,6 @@ namespace MonoGame.Tests.Graphics
         }
 
         [Test]
-        [RunOnUI]
         public void CtorAdapterNull()
         {
             Assert.Throws<ArgumentNullException>(
@@ -48,7 +46,6 @@ namespace MonoGame.Tests.Graphics
         }
 
         [Test]
-        [RunOnUI]
         public void CtorPresentationParametersNull()
         {
             Assert.Throws<ArgumentNullException>(
@@ -56,7 +53,6 @@ namespace MonoGame.Tests.Graphics
         }
 
         [Test]
-        [RunOnUI]
         public void DisposedWhenDisposingInvoked()
         {
             var count = 0;
@@ -76,7 +72,6 @@ namespace MonoGame.Tests.Graphics
         }
 
         [Test]
-        [RunOnUI]
         public void ResetDoesNotTriggerDeviceLost()
         {
             // TODO figure out exactly when a device is lost
@@ -102,7 +97,6 @@ namespace MonoGame.Tests.Graphics
         }
 
         [Test]
-        [RunOnUI]
         public void ResetDoesNotClearState()
         {
             gd.RasterizerState = RasterizerState.CullNone;
@@ -126,7 +120,6 @@ namespace MonoGame.Tests.Graphics
         }
 
         [Test, Ignore("Make sure dynamic graphics resources are notified when graphics device is lost")]
-        [RunOnUI]
         public void ContentLostResources()
         {
             // https://blogs.msdn.microsoft.com/shawnhar/2007/12/12/virtualizing-the-graphicsdevice-in-xna-game-studio-2-0/
@@ -160,14 +153,12 @@ namespace MonoGame.Tests.Graphics
 #if DESKTOPGL
         [Ignore("Does not throw the exception. Needs Investigating")]
 #endif
-        [RunOnUI]
         public void ResetWindowHandleNullThrowsException()
         {
             Assert.Throws<ArgumentException>(() => gd.Reset(new PresentationParameters()));
         }
 
 		[Test]
-        [RunOnUI]
 		public void Clear()
 		{
 			var colors = new Color [] {
@@ -192,7 +183,6 @@ namespace MonoGame.Tests.Graphics
 		}
 
         [Test]
-        [RunOnUI]
         public void DrawPrimitivesParameterValidation()
         {
             var vertexBuffer = new VertexBuffer(
@@ -227,7 +217,6 @@ namespace MonoGame.Tests.Graphics
         }
 
         [Test]
-        [RunOnUI]
         public void DrawIndexedPrimitivesParameterValidation()
         {
             var vertexBuffer = new VertexBuffer(
@@ -288,7 +277,6 @@ namespace MonoGame.Tests.Graphics
         // This overload of DrawIndexedPrimitives is not supported on XNA.
 #if !XNA
         [Test]
-        [RunOnUI]
         public void DrawIndexedPrimitivesParameterValidation2()
         {
             var vertexBuffer = new VertexBuffer(
@@ -340,7 +328,6 @@ namespace MonoGame.Tests.Graphics
 
 #if XNA || DIRECTX
         [Test]
-        [RunOnUI]
         public void DrawInstancedPrimitivesParameterValidation()
         {
             var vertexBuffer = new VertexBuffer(
@@ -391,7 +378,6 @@ namespace MonoGame.Tests.Graphics
         }
 
         [Test]
-        [RunOnUI]
         public void DrawInstancedPrimitivesVisualTest()
         {
             VertexBuffer vertexBuffer = null;
@@ -471,7 +457,6 @@ namespace MonoGame.Tests.Graphics
 #endif
 
         [Test]
-        [RunOnUI]
         public void DrawUserPrimitivesParameterValidation()
         {
             var vertexDataNonEmpty = new[]
@@ -521,7 +506,6 @@ namespace MonoGame.Tests.Graphics
         }
 
         [Test]
-        [RunOnUI]
         public void DrawUserIndexedPrimitivesParameterValidation()
         {
             var vertexDataNonEmpty = new[]
@@ -614,7 +598,6 @@ namespace MonoGame.Tests.Graphics
 #if DESKTOPGL
         [Ignore("Vertex Textures are not implemented for OpenGL")]
 #endif
-        [RunOnUI]
         public void VertexTexturesGetSet()
         {
             // TODO: The availability of vertex textures should depend on GraphicsProfile.
@@ -682,7 +665,6 @@ namespace MonoGame.Tests.Graphics
 #if DESKTOPGL
         [Ignore("Vertex Textures are not implemented for OpenGL")]
 #endif
-        [RunOnUI]
         public void VertexTextureVisualTest()
         {
             // Implements an extremely simple terrain that reads from a heightmap in the vertex shader.
@@ -754,7 +736,6 @@ namespace MonoGame.Tests.Graphics
 #if DESKTOPGL
         [Ignore("Vertex samplers are not implemented for OpenGL")]
 #endif
-        [RunOnUI]
         public void VertexSamplerStatesGetSet()
         {
             var samplerState = new SamplerState { Filter = TextureFilter.Point };
@@ -767,7 +748,6 @@ namespace MonoGame.Tests.Graphics
         }
 
         [Test]
-        [RunOnUI]
         public void PresentInvalidOperationException()
         {
             // This should work else it means we had
@@ -789,7 +769,6 @@ namespace MonoGame.Tests.Graphics
 
 #if DESKTOPGL
         [Test]
-        [RunOnUI]
         public void DifferentVboGetsSet()
         {
             var vb1 = new VertexBuffer(gd, VertexPosition.VertexDeclaration, 6, BufferUsage.None);
@@ -828,7 +807,6 @@ namespace MonoGame.Tests.Graphics
 
         [Test]
         [TestCaseSource("BackBufferRects")]
-        [RunOnUI]
         public void GetBackBufferData(Rectangle? rectangle)
         {
             gd.Clear(Color.CornflowerBlue);
@@ -863,7 +841,6 @@ namespace MonoGame.Tests.Graphics
         }
 
         [Test]
-        [RunOnUI]
         public void DisposeReferencedResources()
         {
             var rt = new RenderTarget2D(gdm.GraphicsDevice, 5, 5);

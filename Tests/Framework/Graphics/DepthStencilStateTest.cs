@@ -10,19 +10,17 @@ using NUnit.Framework;
 
 namespace MonoGame.Tests.Graphics
 {
-    [TestFixture]
     [NonParallelizable]
+    [RunOnUiTestFixture]
     internal class DepthStencilStateTest : GraphicsDeviceTestFixtureBase
     {
         [Test]
-        [RunOnUI]
         public void ShouldNotBeAbleToSetNullDepthStencilState()
         {
             Assert.Throws<ArgumentNullException>(() => gd.DepthStencilState = null);
         }
 
         [Test]
-        [RunOnUI]
         public void ShouldNotBeAbleToMutateStateObjectAfterBindingToGraphicsDevice()
         {
             var depthStencilState = new DepthStencilState();
@@ -42,7 +40,6 @@ namespace MonoGame.Tests.Graphics
         }
 
         [Test]
-        [RunOnUI]
         public void ShouldNotBeAbleToMutateDefaultStateObjects()
         {
             DoAsserts(DepthStencilState.Default, d => Assert.Throws<InvalidOperationException>(d));
@@ -72,7 +69,6 @@ namespace MonoGame.Tests.Graphics
 
         [TestCase(false)]
         [TestCase(true)]
-        [RunOnUI]
         public void VisualTestDepthBufferEnable(bool depthBufferEnable)
         {
             PrepareFrameCapture();
@@ -100,7 +96,6 @@ namespace MonoGame.Tests.Graphics
         }
 
         [Test]
-        [RunOnUI]
         public void VisualTestStencilBuffer()
         {
             PrepareFrameCapture();

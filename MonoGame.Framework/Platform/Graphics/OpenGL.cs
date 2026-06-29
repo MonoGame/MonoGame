@@ -1583,15 +1583,19 @@ namespace MonoGame.OpenGL
 
         protected unsafe static IntPtr MarshalStringToPtr (string str)
         {
-            if (string.IsNullOrEmpty (str)) {
+            if (string.IsNullOrEmpty (str))
+            {
                 return IntPtr.Zero;
             }
             int num = Encoding.ASCII.GetMaxByteCount (str.Length) + 1;
             IntPtr intPtr = Marshal.AllocHGlobal (num);
-            if (intPtr == IntPtr.Zero) {
+            if (intPtr == IntPtr.Zero)
+            {
                 throw new OutOfMemoryException ();
             }
-            fixed (char* chars = str + RuntimeHelpers.OffsetToStringData / 2) {
+            
+            fixed (char* chars = str)
+            {
                 int bytes = Encoding.ASCII.GetBytes (chars, str.Length, (byte*)((void*)intPtr), num);
                 Marshal.WriteByte (intPtr, bytes, 0);
                 return intPtr;

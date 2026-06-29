@@ -9,12 +9,11 @@ using NUnit.Framework;
 
 namespace MonoGame.Tests.Graphics
 {
-    [TestFixture]
     [NonParallelizable]
+    [RunOnUiTestFixture]
     class RenderTargetCubeTest : GraphicsDeviceTestFixtureBase
     {
         [Test]
-        [RunOnUI]
         public void ZeroSizeShouldFailTest()
         {
             RenderTargetCube renderTarget;
@@ -22,7 +21,6 @@ namespace MonoGame.Tests.Graphics
         }
 
         [Test]
-        [RunOnUI]
         public void NullDeviceShouldThrowArgumentNullException()
         {
             Assert.Throws<ArgumentNullException>(() => 
@@ -37,7 +35,6 @@ namespace MonoGame.Tests.Graphics
         [TestCase(1)]
         [TestCase(8)]
         [TestCase(31)]
-        [RunOnUI]
         public void ShouldClearRenderTargetAndGetData(int size)
         {
             var dataSize = size * size;
@@ -87,7 +84,6 @@ namespace MonoGame.Tests.Graphics
 #endif
         [TestCase(SurfaceFormat.NormalizedByte2, SurfaceFormat.Color)]
         [TestCase(SurfaceFormat.NormalizedByte4, SurfaceFormat.Color)]
-        [RunOnUI]
         public void PreferredSurfaceFormatTest(SurfaceFormat preferredSurfaceFormat, SurfaceFormat expectedSurfaceFormat)
         {                    
             var renderTarget = new RenderTargetCube(gd, 16, false, preferredSurfaceFormat, DepthFormat.None);
