@@ -1,0 +1,117 @@
+name: Sync develop to next - update detected
+
+on:
+  schedule:
+    - cron: '0 2 * * 0'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  sync:
+    name: Sync develop into next
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - name: Configure git identity
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Check sync status
+        id: sync_check
+        run: |
+          git fetch origin develop next
+          DEVELOP_SHA=$(git rev-parse origin/develop)
+          NEXT_SHA=$(git rev-parse origin/next)
+          echo "develop_sha=$DEVELOP_SHA" >> "$GITHUB_OUTPUT"
+          if git merge-base --is-ancestor "$DEVELOP_SHA" "$NEXT_SHA"; then
+            echo "in_sync=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "in_sync=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Check for existing open sync PR
+        id: existing_pr
+        if: steps.sync_check.outputs.in_sync == 'false'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          PR_NUMBER=$(gh pr list --base next --label "sync" --state open )
+          if [ -n "$PR_NUMBER" ]; then
+            echo "exists=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "exists=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Fail if sync PR already open
+        if: steps.existing_pr.outputs.exists == 'true'
+        run: |
+          echo "A sync PR is already open and unmerged. Merge or close it before a new sync can run."
+          exit 1
+
+      - name: Test merge (dry run)
+        id: dry_run
+        if: steps.existing_pr.outputs.exists == 'false'
+        run: |
+          TMPDIR=$(mktemp -d)
+          git worktree add "$TMPDIR" origin/next
+          cd "$TMPDIR"
+          git merge --no-commit --no-ff origin/develop 2>&1 | tee /tmp/merge_output.txt
+          MERGE_EXIT=${PIPESTATUS[0]}
+          git merge --abort 2>/dev/null || true
+          cd "$GITHUB_WORKSPACE"
+          git worktree remove --force "$TMPDIR"
+          if [ $MERGE_EXIT -eq 0 ]; then
+            echo "has_conflicts=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "has_conflicts=true" >> "$GITHUB_OUTPUT"
+            CONFLICT_FILES=$(grep "^CONFLICT" /tmp/merge_output.txt | sed 's/^CONFLICT ([^)]*): //' | head -20)
+            {
+              echo "conflict_files<<EOF"
+              echo "$CONFLICT_FILES"
+              echo "EOF"
+            } >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Create sync branch
+        id: create_branch
+        if: steps.existing_pr.outputs.exists == 'false'
+        run: |
+          DATE=$(date -u +%Y%m%d)
+          BRANCH="sync/develop-into-next-${DATE}"
+          echo "branch=$BRANCH" >> "$GITHUB_OUTPUT"
+          git checkout -b "$BRANCH" origin/next
+          if [ "${{ steps.dry_run.outputs.has_conflicts }}" == "true" ]; then
+            git merge --no-edit origin/develop || true
+            git add -A
+            git commit -m "chore: sync develop to next -- NEEDS CONFLICT RESOLUTION" || true
+          else
+            git merge --no-edit origin/develop
+          fi
+          git push origin "$BRANCH"
+
+      - name: Prepare PR body
+        id: pr_body
+        if: steps.create_branch.conclusion == 'success'
+        run: |
+          if [ "${{ steps.dry_run.outputs.has_conflicts }}" == "true" ]; then
+            printf 'Conflicts detected from develop, action needed\n\n### Conflicting files\n\n```\n%s\n```\n' "${{ steps.dry_run.outputs.conflict_files }}" > /tmp/pr_body.md
+            echo "title=[skip ci] Sync develop to next - conflicts" >> "$GITHUB_OUTPUT"
+          else
+            printf 'Clean synchronisation to next, no issues detected\n' > /tmp/pr_body.md
+            echo "title=[skip ci] Sync develop to next" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Open sync PR
+        if: steps.create_branch.conclusion == 'success'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh pr create --base next --head "${{ steps.create_branch.outputs.branch }}" --title "${{ steps.pr_body.outputs.title }}" --body-file /tmp/pr_body.md --label "sync" --reviewer "MonoGame/maintainers"
