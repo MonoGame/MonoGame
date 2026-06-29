@@ -15,7 +15,8 @@ void* MP_ImportBitmap(const char* importPath, MGCP_Bitmap& bitmap)
     void* data = nullptr;
 
     f = stbi__fopen(importPath, "rb");
-    if (!f) goto err;
+    if (!f)
+        return (void*)"The file was not found.";
 
     if (stbi_is_hdr_from_file(f))
     {

@@ -1,4 +1,4 @@
-// MonoGame - Copyright (C) The MonoGame Team
+// MonoGame - Copyright (C) MonoGame Foundation, Inc
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
@@ -106,9 +106,11 @@ internal class NativeGameWindow : GameWindow
         var title = Title == null ? AssemblyHelper.GetDefaultWindowTitle() : Title;
 
         // Create the window which size may be changed by the platform.
-        byte* _title = stackalloc byte[StringInterop.GetMaxSize(title)];
-        StringInterop.CopyString(_title, title);
-        _handle = MGP.Window_Create(platform.Handle, ref _width, ref _height, _title);
+        _handle = MGP.Window_Create(platform.Handle, ref _width, ref _height, title);
+        if (_handle == null)
+        {
+            throw new NoSuitableGraphicsDeviceException("Failed to initialize SDL window!");
+        }
 
         _windows[(nint)_handle] = this;
 
@@ -164,7 +166,13 @@ internal class NativeGameWindow : GameWindow
             MGP.Window_ExitFullScreen(_handle);
         }
 
-        ClientResize(pp.BackBufferWidth, pp.BackBufferHeight);
+        if (_width == pp.BackBufferWidth && _height == pp.BackBufferHeight)
+            return;
+
+        _width = pp.BackBufferWidth;
+        _height = pp.BackBufferHeight;
+
+        MGP.Window_SetClientSize(_handle, pp.BackBufferWidth, pp.BackBufferHeight);
     }
 
     public unsafe void ClientResize(int width, int height)
@@ -172,45 +180,17 @@ internal class NativeGameWindow : GameWindow
         if (_width == width && _height == height)
             return;
 
-        if (!IsFullScreen)
-            MGP.Window_SetClientSize(_handle, width, height);
+        _width = width;
+        _height = height;
 
-        UpdateBackBufferSize(width, height);
+        MGP.Window_SetClientSize(_handle, width, height);
 
         OnClientSizeChanged();
     }
 
-    private void UpdateBackBufferSize(int width, int height)
-    {
-        _width = width;
-        _height = height;
-
-        // TODO: Implement sperate swap change logic for
-        // non-primary windows.
-
-        // TODO: We should expose a feature to allow
-        // for either the swapchain to resize to match
-        // the window size or remain fixed size and stretch.
-
-        // Only the primary window will resize the
-        // default back buffer.
-        if (!_primaryWindow)
-            return;
-
-        var manager = _platform.Game.graphicsDeviceManager;
-        if (manager.GraphicsDevice == null)
-            return;
-
-        manager.PreferredBackBufferWidth = _width;
-        manager.PreferredBackBufferHeight = _height;
-        manager.ApplyChanges();
-    }
-
     protected override unsafe void SetTitle(string title)
     {
-        byte* _title = stackalloc byte[StringInterop.GetMaxSize(title)];
-        StringInterop.CopyString(_title, title);
-        MGP.Window_SetTitle(_handle, _title);
+        MGP.Window_SetTitle(_handle, title);
     }
 
     internal unsafe void Show(bool show)

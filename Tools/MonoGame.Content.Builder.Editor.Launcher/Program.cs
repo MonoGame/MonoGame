@@ -1,4 +1,4 @@
-// MonoGame - Copyright (C) The MonoGame Team
+// MonoGame - Copyright (C) MonoGame Foundation, Inc
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
@@ -22,9 +22,15 @@ namespace MonoGame.Content.Builder.Editor.Launcher
             var mgcbEditorArgs = args.Length > 0 && !string.IsNullOrWhiteSpace(args[0]) ? $"\"{args[0]}\"" : "";
 
             if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+            {
+                var ensureExecutablePath = Path.Combine(mgcbEditorApp, "Contents/MacOS/mgcb-editor-mac");
+                Process.Start("chmod", $"+x \"{ensureExecutablePath}\"");
                 Process.Start("open", $"-n \"{mgcbEditorApp}\" --args {mgcbEditorArgs}");
+            }
             else
+            {
                 Process.Start(mgcbEditorApp, mgcbEditorArgs);
+            }
         }
     }
 }

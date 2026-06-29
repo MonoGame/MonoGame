@@ -1,4 +1,4 @@
-// MonoGame - Copyright (C) The MonoGame Team
+// MonoGame - Copyright (C) MonoGame Foundation, Inc
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
@@ -45,9 +45,27 @@ public partial class VertexBuffer
         //
         var discard = _isDynamic && options != SetDataOptions.NoOverwrite;
 
-        MGG.Buffer_SetData(GraphicsDevice.Handle, ref Handle, offsetInBytes, (byte*)dataPtr, dataBytes, (byte)(discard ? 1 : 0));
+        MGG.Buffer_SetData(GraphicsDevice.Handle, ref Handle, offsetInBytes, (byte*)dataPtr, elementCount, vertexStride, elementSizeInBytes, discard);
 
         dataHandle.Free();
+    }
+
+    private unsafe void PlatformSetData<T>(int offsetInBytes, Span<T> data, int elementCount, int vertexStride, SetDataOptions options, int bufferSize, int elementSizeInBytes)
+    {
+        var dataBytes = elementCount * elementSizeInBytes;
+
+        // TODO: We need to figure out the correct behavior 
+        // for SetDataOptions.None on a dynamic buffer.
+        //
+        // For now we always discard as it is a pretty safe default.
+        //
+        fixed (void* ptr = &data[0])
+        {
+            var discard = _isDynamic && options != SetDataOptions.NoOverwrite;
+
+            var dataPtr = (byte*)ptr;
+            MGG.Buffer_SetData(GraphicsDevice.Handle, ref Handle, offsetInBytes, dataPtr, elementCount, vertexStride, elementSizeInBytes, discard);
+        }
     }
 
     private unsafe void PlatformGraphicsDeviceResetting()

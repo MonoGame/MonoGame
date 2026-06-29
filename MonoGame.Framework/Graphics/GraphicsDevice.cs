@@ -8,6 +8,7 @@ using System.Diagnostics;
 using System.Globalization;
 using MonoGame.Framework.Utilities;
 using System.Runtime.InteropServices;
+using System.Linq;
 
 
 namespace Microsoft.Xna.Framework.Graphics
@@ -154,7 +155,7 @@ namespace Microsoft.Xna.Framework.Graphics
         // Use WeakReference for the global resources list as we do not know when a resource
         // may be disposed and collected. We do not want to prevent a resource from being
         // collected by holding a strong reference to it in this list.
-        private readonly List<WeakReference> _resources = new List<WeakReference>();
+        private readonly HashSet<WeakReference> _resources = new HashSet<WeakReference>();
 
         // TODO Graphics Device events need implementing
         /// <summary>
@@ -381,8 +382,10 @@ namespace Microsoft.Xna.Framework.Graphics
             Dispose(false);
         }
 
-        internal int GetClampedMultisampleCount(int multiSampleCount)
+        internal int GetClampedMultisampleCount(SurfaceFormat format, int multiSampleCount)
         {
+            var maxMultiSampleCount = PlatformGetMaxMultiSampleCount(format);
+
             if (multiSampleCount > 1)
             {
                 // Round down MultiSampleCount to the nearest power of two
@@ -395,9 +398,10 @@ namespace Microsoft.Xna.Framework.Graphics
                 msc = msc | (msc >> 2);
                 msc = msc | (msc >> 4);
                 msc -= (msc >> 1);
+
                 // and clamp it to what the device can handle
-                if (msc > GraphicsCapabilities.MaxMultiSampleCount)
-                    msc = GraphicsCapabilities.MaxMultiSampleCount;
+                if (msc > maxMultiSampleCount)
+                    msc = maxMultiSampleCount;
 
                 return msc;
             }
@@ -779,6 +783,9 @@ namespace Microsoft.Xna.Framework.Graphics
             if (presentationParameters == null)
                 throw new ArgumentNullException("presentationParameters");
 
+            if (presentationParameters.DeviceWindowHandle == IntPtr.Zero)
+                throw new ArgumentException("The DeviceWindowHandle property of the PresentationParameters must be set before calling Reset.", "presentationParameters");
+
             PresentationParameters = presentationParameters;
             Reset();
         }
@@ -801,7 +808,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 }
 
                 // Remove references to resources that have been garbage collected.
-                _resources.RemoveAll(wr => !wr.IsAlive);
+                _resources.RemoveWhere(wr => !wr.IsAlive);
             }
         }
 

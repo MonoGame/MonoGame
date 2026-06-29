@@ -1,4 +1,4 @@
-// MonoGame - Copyright (C) The MonoGame Team
+// MonoGame - Copyright (C) MonoGame Foundation, Inc
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
@@ -19,19 +19,10 @@ public static partial class MessageBox
     {
         _taskCompletionSource = new TaskCompletionSource<int?>();
 
-        var button_bytes = new List<nint>();
-
-        byte* _title = stackalloc byte[StringInterop.GetMaxSize(title)];
-        StringInterop.CopyString(_title, title);
-        byte* _description = stackalloc byte[StringInterop.GetMaxSize(description)];
-        StringInterop.CopyString(_description, description);
-        byte* _buttons = stackalloc byte[StringInterop.GetMaxSize(buttons)];
-        StringInterop.CopyStrings(_buttons, buttons);
-
-        int result = MGP.Window_ShowMessageBox(_window, _title, _description, _buttons, buttons.Count);
+        string buttonsStr = string.Join("\0", buttons) + "\0";
+        int result = MGP.Window_ShowMessageBox(_window, title, description, buttonsStr, buttons.Count);
 
         _taskCompletionSource.SetResult(result);
-
         return _taskCompletionSource.Task;
     }
 

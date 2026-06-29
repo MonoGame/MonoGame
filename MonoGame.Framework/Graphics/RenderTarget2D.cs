@@ -84,7 +84,7 @@ namespace Microsoft.Xna.Framework.Graphics
 	        : base(graphicsDevice, width, height, mipMap, QuerySelectedFormat(graphicsDevice, preferredFormat), SurfaceType.RenderTarget, shared, arraySize)
 	    {
             DepthStencilFormat = preferredDepthFormat;
-            MultiSampleCount = graphicsDevice.GetClampedMultisampleCount(preferredMultiSampleCount);
+            MultiSampleCount = graphicsDevice.GetClampedMultisampleCount(Format, preferredMultiSampleCount);
             RenderTargetUsage = usage;
 
             PlatformConstruct(graphicsDevice, width, height, mipMap, preferredDepthFormat, preferredMultiSampleCount, usage, shared);
@@ -196,7 +196,7 @@ namespace Microsoft.Xna.Framework.Graphics
             : base(graphicsDevice, width, height, mipMap, format, surfaceType)
         {
             DepthStencilFormat = depthFormat;
-            MultiSampleCount = graphicsDevice.GetClampedMultisampleCount(preferredMultiSampleCount);
+            MultiSampleCount = graphicsDevice.GetClampedMultisampleCount(Format, preferredMultiSampleCount);
             RenderTargetUsage = usage;
 		}
 

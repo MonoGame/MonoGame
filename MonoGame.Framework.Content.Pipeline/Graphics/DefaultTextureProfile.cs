@@ -20,6 +20,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
                     platform == TargetPlatform.NativeClient ||
                     platform == TargetPlatform.RaspberryPi ||
                     platform == TargetPlatform.Windows ||
+                    platform == TargetPlatform.WindowsDX12 ||
                     platform == TargetPlatform.iOS ||
                     platform == TargetPlatform.Web;
         }
@@ -63,7 +64,8 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
                     if (format != TextureProcessorOutputFormat.PvrCompressed)
                         throw new PlatformNotSupportedException("iOS platform only supports PVR texture compression");
                 }
-                else if (platform == TargetPlatform.Windows ||
+                else if (   platform == TargetPlatform.Windows ||
+                            platform == TargetPlatform.WindowsDX12 ||
                             platform == TargetPlatform.DesktopGL ||
                             platform == TargetPlatform.DesktopVK ||
                             platform == TargetPlatform.MacOSX ||
@@ -131,7 +133,13 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
                     break;
 
                 case TextureProcessorOutputFormat.AstcCompressed:
-                    GraphicsUtil.CompressAstc(context, content, isSpriteFont);
+                case TextureProcessorOutputFormat.AstcCompressed4x4:
+                case TextureProcessorOutputFormat.AstcCompressed5x5:
+                case TextureProcessorOutputFormat.AstcCompressed6x6:
+                case TextureProcessorOutputFormat.AstcCompressed8x8:
+                case TextureProcessorOutputFormat.AstcCompressed10x10:
+                case TextureProcessorOutputFormat.AstcCompressed12x12:
+                    GraphicsUtil.CompressAstc(context, content, isSpriteFont, format);
                     break;
 
                 case TextureProcessorOutputFormat.Color16Bit:

@@ -1,0 +1,72 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+    <RollForward>Major</RollForward>
+    <IsPackable>false</IsPackable>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <GenerateProgramFile>false</GenerateProgramFile>
+    <DefineConstants>VULKAN;DESKTOP</DefineConstants>
+    <DefineConstants Condition="$([MSBuild]::IsOSPlatform('MacOS'))">$(DefineConstants);MACOS</DefineConstants>
+    <Platforms>AnyCPU;ARM64;x64</Platforms>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="NUnitLite" Version="3.13.2" />
+    <PackageReference Include="NUnit3TestAdapter" Version="4.5.0" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.7.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Remove="bin\**\*" />
+    <Compile Remove="Framework\WindowsDX\**" />
+    <Compile Remove="obj\**" />
+    <Compile Remove="Properties/**/*" />
+    <Compile Remove="Interactive/**/*" />
+    <Compile Remove="Runner/iOS/**/*" />
+
+    <Compile Remove="Framework/SDL/**/*" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="Assets/**/*" CopyToOutputDirectory="PreserveNewest" />
+
+    <Content Include="..\MonoGame.Framework\Platform\Graphics\Effect\Resources\*.fx*">
+      <Link>Assets\Effects\Stock\%(Filename)%(Extension)</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Remove="Framework\WindowsDX\**" />
+    <EmbeddedResource Remove="obj\**" />
+    <None Remove="Framework\WindowsDX\**" />
+    <None Remove="obj\**" />
+  </ItemGroup>
+  
+  <PropertyGroup>
+    <_LowerCasePlatform>$([MSBuild]::ValueOrDefault('$(Platform)', '').ToLowerInvariant())</_LowerCasePlatform>
+    <_OSArchitecture>$([System.Runtime.InteropServices.RuntimeInformation]::OSArchitecture.ToString().ToLowerInvariant())</_OSArchitecture>
+    <NativePlatform Condition="'$(_LowerCasePlatform)' == 'arm64' or '$(_LowerCasePlatform)' == 'x64'">$(_LowerCasePlatform)</NativePlatform>
+    <NativePlatform Condition="'$(NativePlatform)' == '' And '$(_OSArchitecture)' != ''">$(_OSArchitecture)</NativePlatform>
+    <NativePlatform Condition="'$(NativePlatform)' == ''">x64</NativePlatform>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\MonoGame.Framework\MonoGame.Framework.Native.csproj" />
+
+    <NativeLib Include="..\Artifacts\native\mgruntime\desktopvk\windows\$(NativePlatform)\$(Configuration)\mgruntime.dll" Condition="Exists('..\Artifacts\native\mgruntime\desktopvk\windows\$(NativePlatform)\$(Configuration)\mgruntime.dll')" PackagePath="runtimes\win-$(NativePlatform)\native" />
+    <NativeLib Include="..\Artifacts\native\mgruntime\desktopvk\linux\$(NativePlatform)\$(Configuration)\libmgruntime.so" Condition="Exists('..\Artifacts\native\mgruntime\desktopvk\linux\$(NativePlatform)\$(Configuration)\libmgruntime.so')" PackagePath="runtimes\linux-$(NativePlatform)\native" />
+    <NativeLib Include="..\Artifacts\native\mgruntime\desktopvk\macosx\$(Configuration)\libmgruntime.dylib" Condition="Exists('..\Artifacts\native\mgruntime\desktopvk\macosx\$(Configuration)\libmgruntime.dylib')" PackagePath="runtimes\osx\native" />
+  </ItemGroup>
+	
+	<ItemGroup>
+		<Content Include="@(NativeLib)" Visible="false">
+			<PackagePath>%(PackagePath)</PackagePath>
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</Content>
+		<UpToDateCheckBuilt Include="@(NativeLib->'$(OutputPath)%(Filename)%(Extension)')"><Original>%(Identity)</Original></UpToDateCheckBuilt>
+	</ItemGroup>
+	
+</Project>

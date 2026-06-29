@@ -1,4 +1,4 @@
-// MonoGame - Copyright (C) The MonoGame Team
+// MonoGame - Copyright (C) MonoGame Foundation, Inc
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
@@ -7,6 +7,10 @@ using System.Runtime.InteropServices;
 
 namespace MonoGame.Interop;
 
+internal enum ProcessorType : uint
+{
+    ZeroTransparentPixels = 0b1,
+}
 
 /// <summary>
 /// MonoGame native calls for high performance reading and writing of images.
@@ -17,10 +21,14 @@ internal static unsafe partial class MGI
     public static extern void ReadRGBA(
         byte* data,
         int dataBytes,
-        byte zeroTransparentPixels,
+        ProcessorType processors,
         out int width,
         out int height,
         out byte* rgba);
+
+    [DllImport(MGP.MonoGameNativeDLL, EntryPoint = "MGI_FreeRGBA", ExactSpelling = true)]
+    public static extern void FreeRGBA(
+        byte* rgba);
 
     [DllImport(MGP.MonoGameNativeDLL, EntryPoint = "MGI_WriteJpg", ExactSpelling = true)]
     public static extern void WriteJpg(

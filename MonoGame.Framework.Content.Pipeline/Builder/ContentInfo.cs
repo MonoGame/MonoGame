@@ -3,6 +3,7 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using Microsoft.Xna.Framework.Content.Pipeline;
+using MonoGame.Framework.Utilities;
 
 namespace MonoGame.Framework.Content.Pipeline.Builder;
 
@@ -16,7 +17,7 @@ namespace MonoGame.Framework.Content.Pipeline.Builder;
 /// <param name="outputPath">The desired output path to be setup based on the input path to the content.</param>
 public class ContentInfo(string contentRoot = "", bool shouldBuild = true, IContentImporter? importer = null, IContentProcessor? processor = null, Func<string, string>? outputPath = null)
 {
-    private readonly Func<string, string> _outputPath = outputPath ?? (shouldBuild ? GetDefaultOutputPath : GetDefaultCopyPath);
+    private readonly Func<string, string> _outputPath = outputPath ?? (s => s);
 
     /// <summary>
     /// A relative path to be used as a prefix to the output path.
@@ -43,30 +44,19 @@ public class ContentInfo(string contentRoot = "", bool shouldBuild = true, ICont
     /// <summary>
     /// Gets the desired output path for the current <see cref="ShouldBuild"/> operation.
     /// </summary>
-    /// <param name="filePath">A relative path to the content file.</param>
+    /// <param name="filePath">A relative path to the content file (without extension in case of build action).</param>
     /// <returns>Desired relative path for the output content.</returns>
     public string GetOutputPath(string filePath) => _outputPath(filePath);
 
     /// <summary>
-    /// Gets the default relative output filepath when building content. By default only the extension gets replaced with .xnb extension.
+    /// Returns a hash code that is unique to the importer and processor
+    /// settings used to build the content.
     /// </summary>
-    /// <param name="filePath">A relative path to the content file.</param>
-    /// <returns>Desired relative path for the built content.</returns>
-    public static string GetDefaultOutputPath(string filePath)
+    public int MakeBuildHash()
     {
-        var extLength = Path.GetExtension(filePath).Length;
-        if (extLength > 0)
-        {
-            filePath = filePath[..^extLength];
-        }
-
-        return filePath + ".xnb";
+        var hash = new Hash();
+        ContentBuilderHelper.HashTypeAndProperties(Importer, ref hash);
+        ContentBuilderHelper.HashTypeAndProperties(Processor, ref hash);
+        return hash.Value;
     }
-
-    /// <summary>
-    /// Gets the default relative output filepath when copying content. By default input and output relative paths match.
-    /// </summary>
-    /// <param name="filePath">A relative path to the content file.</param>
-    /// <returns>Desired relative path for the coppied content.</returns>
-    public static string GetDefaultCopyPath(string filePath) => filePath;
 }

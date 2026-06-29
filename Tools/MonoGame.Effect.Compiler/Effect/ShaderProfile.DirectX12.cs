@@ -27,7 +27,7 @@ namespace MonoGame.Effect
             macros.Add("SM6", "1");
         }
 
-        internal override void ValidateShaderModels(MonoGame.Effect.TPGParser.PassInfo pass)
+        internal override void ValidateShaderModels(PassInfo pass)
         {
             if (!string.IsNullOrEmpty(pass.vsFunction))
             {
@@ -327,7 +327,7 @@ namespace MonoGame.Effect
                     {
                         var textureName = match.Groups[1].Value;
                         var textureSlot = int.Parse(match.Groups[4].Value);
-                        var textureDim = match.Groups[3].Value;
+                        var textureDim = match.Groups[3].Value?.ToLower();
 
                         var sampler = new ShaderData.Sampler();
 
@@ -359,7 +359,8 @@ namespace MonoGame.Effect
                             sampler = samplerDescriptions.First(sd => sd.samplerSlot == textureSlot);
                         }
 
-                        sampler.state = shaderResult.ShaderInfo.SamplerStates[sampler.samplerName].State;
+                        if (shaderResult.ShaderInfo.SamplerStates.TryGetValue(sampler.samplerName, out var ssamp))                         
+                            sampler.state = ssamp.State;
                         sampler.textureSlot = textureSlot;
                         sampler.parameterName = textureName;
 
@@ -369,8 +370,16 @@ namespace MonoGame.Effect
                                 sampler.type = MojoShader.MOJOSHADER_samplerType.MOJOSHADER_SAMPLER_2D;
                                 break;
 
+                            case "3d":
+                                sampler.type = MojoShader.MOJOSHADER_samplerType.MOJOSHADER_SAMPLER_VOLUME;
+                                break;
+
                             case "cube":
                                 sampler.type = MojoShader.MOJOSHADER_samplerType.MOJOSHADER_SAMPLER_CUBE;
+                                break;
+
+                            case "2darray":
+                                sampler.type = MojoShader.MOJOSHADER_samplerType.MOJOSHADER_SAMPLER_VOLUME;
                                 break;
 
                             default:

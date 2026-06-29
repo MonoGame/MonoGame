@@ -1,4 +1,4 @@
-// MonoGame - Copyright (C) The MonoGame Team
+// MonoGame - Copyright (C) MonoGame Foundation, Inc
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
@@ -17,9 +17,13 @@ public sealed partial class SoundEffect
 
     internal unsafe MGA_Buffer* Buffer;
 
-    private unsafe static void PlatformInitialize()
+    private static unsafe void PlatformInitialize()
     {
         System = MGA.System_Create();
+        if (System == null)
+        {
+            throw new NoAudioHardwareException("Audio has failed to initialize.");
+        }
     }
 
     internal unsafe static void PlatformShutdown()
@@ -100,6 +104,11 @@ public sealed partial class SoundEffect
     {
         // This is only the platform specific non-streaming
         // Xact sound handling as PCM is already handled.
+
+        // NOTE: This is something done in all our XACT implementations
+        // and i'm unsure why it is needed...  but it makes things work.
+        if (codec == MiniFormatTag.Adpcm)
+            blockAlignment = (blockAlignment + 22) * channels;
 
         Buffer = MGA.Buffer_Create(System);
         fixed (byte* b = buffer)

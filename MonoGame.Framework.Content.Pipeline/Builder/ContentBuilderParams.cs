@@ -17,7 +17,7 @@ namespace MonoGame.Framework.Content.Pipeline.Builder;
 /// A list of arguments used by <see cref="ContentBuilder"/>.
 /// <para>Use <see cref="ContentBuilderParams.Parse"/> to acquire the arguments from the passed cli args.</para>
 /// </summary>
-public record ContentBuilderParams
+public class ContentBuilderParams
 {
     class RootOptions : BinderBase<ContentBuilderParams>
     {
@@ -151,19 +151,19 @@ public record ContentBuilderParams
     /// Set the mode in which the content builder is run in. See <see cref="ContentBuilderMode"/> for available modes.
     /// </summary>
     /// <value><see cref="ContentBuilderMode.None"/> by default.</value>
-    public ContentBuilderMode Mode { get; init; } = ContentBuilderMode.None;
+    public ContentBuilderMode Mode { get; set; } = ContentBuilderMode.None;
 
     /// <summary>
     /// Gets or sets the working directory of the <see cref="ContentBuilder"/>.
     /// </summary>
     /// <value><see cref="Directory.GetCurrentDirectory"/> by default.</value>
-    public string WorkingDirectory { get; init; } = Directory.GetCurrentDirectory();
+    public string WorkingDirectory { get; set; } = Directory.GetCurrentDirectory();
 
     /// <summary>
     /// Gets or sets the location of the content relative to the <see cref="WorkingDirectory"/>.
     /// </summary>
     /// <value><c>Content</c> by default.</value>
-    public string SourceDirectory { get; init; } = "Content";
+    public string SourceDirectory { get; set; } = "Content";
 
     /// <summary>
     /// Gets the rooted location of <see cref="SourceDirectory"/>.
@@ -174,7 +174,7 @@ public record ContentBuilderParams
     /// Gets or sets the location for the content output relative to the <see cref="WorkingDirectory"/>.
     /// </summary>
     /// <value><c>bin/Content</c> by default.</value>
-    public string OutputDirectory { get; init; } = "bin/Content";
+    public string OutputDirectory { get; set; } = "bin/Content";
 
     /// <summary>
     /// Gets the rooted location of <see cref="OutputDirectory"/>.
@@ -185,7 +185,7 @@ public record ContentBuilderParams
     /// Gets or sets the location for the intermediate files for content build relative to the <see cref="WorkingDirectory"/>.
     /// </summary>
     /// <value><c>obj/Content</c> by default.</value>
-    public string IntermediateDirectory { get; init; } = "obj/Content";
+    public string IntermediateDirectory { get; set; } = "obj/Content";
 
     /// <summary>
     /// Gets the rooted location of <see cref="IntermediateDirectory"/>.
@@ -196,37 +196,43 @@ public record ContentBuilderParams
     /// Gets or sets the desired platform for <see cref="ContentBuilder"/> to build the content for.
     /// </summary>
     /// <value><see cref="TargetPlatform.DesktopGL"/> by default.</value>
-    public TargetPlatform Platform { get; init; } = TargetPlatform.DesktopGL;
+    public TargetPlatform Platform { get; set; } = TargetPlatform.DesktopGL;
 
     /// <summary>
     /// Gets or sets the desired graphics profile for <see cref="ContentBuilder"/> to build the content for.
     /// </summary>
     /// <value><see cref="GraphicsProfile.HiDef"/> by default.</value>
-    public GraphicsProfile GraphicsProfile { get; init; } = GraphicsProfile.HiDef;
+    public GraphicsProfile GraphicsProfile { get; set; } = GraphicsProfile.HiDef;
 
     /// <summary>
     /// Gets or sets if <see cref="ContentBuilder"/> should compress each built content file.
     /// </summary>
     /// <value><c>false</c> by default.</value>
-    public bool CompressContent { get; init; } = false;
+    public bool CompressContent { get; set; } = false;
 
     /// <summary>
     /// Gets or sets the logging level of information that <see cref="ContentBuilder"/> will display to console.
     /// </summary>
     /// <value><see cref="LogLevel.Info"/> by default.</value>
-    public LogLevel LogLevel { get; init; } = LogLevel.Info;
+    public LogLevel LogLevel { get; set; } = LogLevel.Info;
 
     /// <summary>
-    /// Should the content builder skip cleaning up old content cache data after the build is finished in <see cref="ContentBuilderMode.Builder"/> mode.
+    /// Should the <see cref="ContentBuilder"/> rebuild all the assets and ignore the content cache.
     /// </summary>
     /// <value><c>false</c> by default.</value>
-    public bool SkipClean { get; init; } = false;
+    public bool Rebuild { get; set; } = false;
+
+    /// <summary>
+    /// Should the <see cref="ContentBuilder"/> skip cleaning up old content cache data after the build is finished in <see cref="ContentBuilderMode.Builder"/> mode.
+    /// </summary>
+    /// <value><c>false</c> by default.</value>
+    public bool SkipClean { get; set; } = false;
 
     /// <summary>
     /// A list of servers to start up when the <see cref="Mode"/> is set to <see cref="ContentBuilderMode.Server"/>.
     /// </summary>
     /// <value>A collection of <see cref="ContentServer"/> classes found by scaning all referenced assemblies.</value>
-    public List<ContentServer> Servers { get; init; } = []; // TODO: Fix command line display
+    public List<ContentServer> Servers { get; set; } = []; // TODO: Fix command line display
 
     /// <summary>
     /// Parses out the main entry point args into a <see cref="ContentBuilderParams"/> to be used by <see cref="ContentBuilder"/>.
@@ -243,21 +249,38 @@ public record ContentBuilderParams
         var rootOptions = new RootOptions(rootCommand);
 
         var buildCommand = new Command("build", "Build all the content.");
+        var rebuildOption = new Option<bool>(
+                name: "--rebuild",
+                description: "Should the builder rebuild all the assets and ignore the content cache.",
+                getDefaultValue: () => defaultValues.Rebuild);
+        buildCommand.AddOption(rebuildOption);
         var skipCleanOption = new Option<bool>(
                 name: "--skip-clean",
                 description: "Should the builder skip cleaning up old content cache data after the build is finished.",
                 getDefaultValue: () => defaultValues.SkipClean);
         buildCommand.AddOption(skipCleanOption);
         buildCommand.SetHandler(
-            (contentBuilder, skipCleanOption) => ret = contentBuilder with { Mode = ContentBuilderMode.Builder, SkipClean = skipCleanOption },
+            (contentBuilder, rebuildOption, skipCleanOption) =>
+            {
+                ret = contentBuilder;
+                ret.Mode = ContentBuilderMode.Builder;
+                ret.Rebuild = rebuildOption;
+                ret.SkipClean = skipCleanOption;
+            },
             rootOptions,
+            rebuildOption,
             skipCleanOption);
         rootCommand.AddCommand(buildCommand);
 
         var serverCommand = new Command("server", "Start a content server.");
         var sererOptions = new ServerOptions(serverCommand);
         serverCommand.SetHandler(
-            (contentBuilder, sererOptions) => ret = contentBuilder with { Mode = ContentBuilderMode.Server, Servers = sererOptions },
+            (contentBuilder, sererOptions) =>
+            {
+                ret = contentBuilder;
+                ret.Mode = ContentBuilderMode.Server;
+                ret.Servers = sererOptions;
+            },
             rootOptions,
             sererOptions);
         rootCommand.AddCommand(serverCommand);
@@ -271,7 +294,7 @@ public record ContentBuilderParams
 
         if (helpShown)
         {
-            ret = ret with { Mode = ContentBuilderMode.None };
+            ret.Mode = ContentBuilderMode.None;
         }
 
         return ret;

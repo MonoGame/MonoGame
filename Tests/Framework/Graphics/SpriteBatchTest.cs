@@ -1,4 +1,4 @@
-﻿// MonoGame - Copyright (C) MonoGame Foundation, Inc
+// MonoGame - Copyright (C) MonoGame Foundation, Inc
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
@@ -9,8 +9,8 @@ using Microsoft.Xna.Framework.Graphics;
 using NUnit.Framework;
 
 namespace MonoGame.Tests.Graphics {
-    [TestFixture]
     [NonParallelizable]
+	[RunOnUiTestFixture]
 	class SpriteBatchTest : GraphicsDeviceTestFixtureBase {
 		private SpriteBatch _spriteBatch;
 		private Texture2D _texture;
@@ -41,18 +41,17 @@ namespace MonoGame.Tests.Graphics {
 	    [TearDown]
 	    public override void TearDown()
 	    {
-	        _spriteBatch.Dispose();
-            _texture.Dispose();
-            _texture2.Dispose();
-            _texture3.Dispose();
-            _effect.Dispose();
-            _effect2.Dispose();
+	        _spriteBatch?.Dispose();
+            _texture?.Dispose();
+            _texture2?.Dispose();
+            _texture3?.Dispose();
+            _effect?.Dispose();
+            _effect2?.Dispose();
 
             base.TearDown();
 	    }
 
         [Test]
-        [RunOnUI]
         public void BeginCalledTwiceThrows()
         {
             _spriteBatch.Begin();
@@ -60,14 +59,12 @@ namespace MonoGame.Tests.Graphics {
         }
 
         [Test]
-        [RunOnUI]
         public void BeginNotCalledThrows()
         {
             Assert.Throws<InvalidOperationException>(() => _spriteBatch.End());
         }
         
         [Test]
-        [RunOnUI]
         public void NullDeviceShouldThrowArgumentNullException()
         {
             Assert.Throws<ArgumentNullException>(() => 
@@ -79,7 +76,6 @@ namespace MonoGame.Tests.Graphics {
         }
         
 		[Test]
-        [RunOnUI]
 		public void Draw_without_blend ()
 		{
             PrepareFrameCapture();
@@ -92,7 +88,6 @@ namespace MonoGame.Tests.Graphics {
 		}
 
 		[Test]
-        [RunOnUI]
 		public void Draw_with_additive_blend ()
 		{
             PrepareFrameCapture();
@@ -106,7 +101,6 @@ namespace MonoGame.Tests.Graphics {
 		}
 
 		[Test]
-        [RunOnUI]
 		public void Draw_normal ()
 		{
             PrepareFrameCapture();
@@ -122,7 +116,6 @@ namespace MonoGame.Tests.Graphics {
 		[TestCase(1.5f, 1.5f)]
 		[TestCase(0.75f, 2.0f)]
 		[TestCase(1.25f, 0.8f)]
-        [RunOnUI]
 		public void Draw_stretched (float xScale, float yScale)
 		{
             PrepareFrameCapture();
@@ -140,7 +133,6 @@ namespace MonoGame.Tests.Graphics {
 		[TestCase("Red")]
 		[TestCase("GreenYellow")]
 		[TestCase("Teal")]
-        [RunOnUI]
 		public void Draw_with_filter_color (string colorName)
 		{
 			var color = colorName.ToColor ();
@@ -157,7 +149,6 @@ namespace MonoGame.Tests.Graphics {
 		[TestCase (1.41f)]
 		[TestCase (2.17f)]
 		[TestCase (2.81f)]
-        [RunOnUI]
 		public void Draw_rotated (float rotation)
 		{
             PrepareFrameCapture();
@@ -175,7 +166,6 @@ namespace MonoGame.Tests.Graphics {
 		}
 
 		[Test]
-        [RunOnUI]
 		public void Draw_with_source_rect ()
 		{
             PrepareFrameCapture();
@@ -192,7 +182,6 @@ namespace MonoGame.Tests.Graphics {
 		[TestCase(10, 10, 40, 40)]
 		[TestCase(30, 30, 30, 50)]
 		[TestCase(20, 30, 80, 60)]
-        [RunOnUI]
 		public void Draw_with_source_and_dest_rect (int x, int y, int width, int height)
 		{
             PrepareFrameCapture();
@@ -209,7 +198,6 @@ namespace MonoGame.Tests.Graphics {
 		[TestCase("Red", 120)]
 		[TestCase("White", 80)]
 		[TestCase("GreenYellow", 200)]
-        [RunOnUI]
 		public void Draw_with_alpha_blending (string colorName, byte alpha)
 		{
             PrepareFrameCapture();
@@ -228,7 +216,6 @@ namespace MonoGame.Tests.Graphics {
 		[TestCase (SpriteEffects.FlipHorizontally)]
 		[TestCase (SpriteEffects.FlipVertically)]
 		[TestCase (SpriteEffects.FlipHorizontally | SpriteEffects.FlipVertically)]
-        [RunOnUI]
 		public void Draw_with_SpriteEffects (SpriteEffects effects)
 		{
             PrepareFrameCapture();
@@ -255,7 +242,6 @@ namespace MonoGame.Tests.Graphics {
 		// in directly results in an enormous test name (and captured
 		// image filename).
 		[Test]
-        [RunOnUI]
 		public void Draw_with_matrix ([Range(0, 4)]int matrixIndex)
 		{
             PrepareFrameCapture();
@@ -279,7 +265,6 @@ namespace MonoGame.Tests.Graphics {
         // Disabled on XNA because the sorting algorithm is probably different
         [TestCase(SpriteSortMode.Texture)]
 #endif
-        [RunOnUI]
         public void Draw_with_SpriteSortMode(SpriteSortMode sortMode)
         {
             Similarity = 0.995f;
@@ -314,7 +299,6 @@ namespace MonoGame.Tests.Graphics {
 		//_spriteBatch.GraphicsDevice.RasterizerState.ScissorTestEnable = false;
 
         [Test]
-        [RunOnUI]
         public void DrawRequiresTexture()
         {
             _spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Opaque);
@@ -323,7 +307,6 @@ namespace MonoGame.Tests.Graphics {
         }
 
         [Test]
-        [RunOnUI]
         public void DrawWithTexture()
         {
             Assert.That(gd.Textures[0], Is.Null);
@@ -336,7 +319,6 @@ namespace MonoGame.Tests.Graphics {
         }
 
         [Test]
-        [RunOnUI]
         public void DrawWithCustomEffectAndTwoTextures()
         {
             var customSpriteEffect = AssetTestUtility.LoadEffect(content, "CustomSpriteBatchEffect");
@@ -357,7 +339,6 @@ namespace MonoGame.Tests.Graphics {
         }
 
         [Test]
-        [RunOnUI]
         public void DrawWithLayerDepth()
         {
             PrepareFrameCapture();
@@ -437,7 +418,6 @@ namespace MonoGame.Tests.Graphics {
         // There are possibly also some differences because of how rasterization is handled.
         [Ignore("OpenGL produces a slightly different result")]
 #endif
-        [RunOnUI]
         public void Draw_many()
         {
             PrepareFrameCapture();
@@ -453,7 +433,6 @@ namespace MonoGame.Tests.Graphics {
         
         [TestCase(SpriteSortMode.Deferred)]
         [TestCase(SpriteSortMode.Immediate)]
-        [RunOnUI]
         public void Draw_with_viewport_changing(SpriteSortMode sortMode)
         {
             Similarity = 0.975f;

@@ -1,4 +1,4 @@
-// MonoGame - Copyright (C) The MonoGame Team
+// MonoGame - Copyright (C) MonoGame Foundation, Inc
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
@@ -6,7 +6,7 @@
 
 #include "mg_common.h"
 
-#include <sdl.h>
+#include <SDL.h>
 
 #if _WIN32
 #include <combaseapi.h>
@@ -190,11 +190,31 @@ struct MGP_Cursor
 
 MGP_Platform* MGP_Platform_Create(MGGameRunBehavior& behavior)
 {
-	SDL_Init(
-		SDL_INIT_VIDEO |
-		SDL_INIT_JOYSTICK |
-		SDL_INIT_GAMECONTROLLER |
-		SDL_INIT_HAPTIC);
+    // NOTE: Use this on Windows when you see:
+    //
+    // Detected memory leaks!
+    // Dumping objects ->
+    // {327} normal block at 0x000001AFF5CB3F10, 120 bytes long.
+    //
+    // The number in the {} is the allocation number.  Put it below
+    // to have the debugger stop on that allocation so you can
+    // identify the source of the memory leak.
+    //
+    //_CrtSetBreakAlloc(327);
+
+	if (SDL_WasInit(0) == 0) {
+		if (SDL_Init(
+			SDL_INIT_VIDEO |
+			SDL_INIT_JOYSTICK |
+			SDL_INIT_GAMECONTROLLER |
+			SDL_INIT_HAPTIC) < 0)
+		{
+			printf("SDL_Init failed: %s\n", SDL_GetError());
+            fflush(stdout);
+
+			return nullptr;
+		}
+	}
 
 	SDL_DisableScreenSaver();
 
@@ -218,34 +238,33 @@ void MGP_Platform_Destroy(MGP_Platform* platform)
 	delete platform;
 }
 
-mgbyte* MGP_Platform_MakePath(mgbyte* location, mgbyte* path)
+void* MGP_Platform_MakePath(const char* location, const char* path)
 {
     assert(location != nullptr);
     assert(path != nullptr);
 
-    size_t length = strlen((const char*)path) + 1;
-    if (location[0])
-        length += strlen((const char*)location) + 1;
+    size_t location_len = strlen(location);
+    size_t path_len = strlen(path);
+    size_t separator_len = (location_len > 0) ? strlen(MG_PATH_SEPARATOR) : 0;
 
-#if _WIN32
-    // Windows requires marshaled strings to be allocated like this.
-    char* fpath = (char*)CoTaskMemAlloc(length);    
-#else
-    char* fpath = (char*)malloc(length);
-#endif
+    size_t length = location_len + separator_len + path_len + 1;
 
-    if (location[0])
-    {
-        strcpy_s(fpath, length, (const char*)location);
-        strcat_s(fpath, length, MG_PATH_SEPARATOR);
-        strcat_s(fpath, length, (const char*)path);
-    }
-    else
-    {
-        strcpy_s(fpath, length, (const char*)path);
+    char* fpath = (char*)SDL_malloc(length);
+    assert(fpath != nullptr);
+
+    if (location_len > 0) {
+        snprintf(fpath, length, "%s%s%s", location, MG_PATH_SEPARATOR, path);
+    } else {
+        snprintf(fpath, length, "%s", path);
     }
 
-    return (mgbyte*)fpath;
+	return reinterpret_cast<void*>(fpath);
+}
+
+void MGP_Platform_Free(void* ptr)
+{
+    assert(ptr != nullptr);
+    SDL_free(ptr);
 }
 
 void MGP_Platform_BeforeInitialize(MGP_Platform* platform)
@@ -258,7 +277,7 @@ MGMonoGamePlatform MGP_Platform_GetPlatform()
 #if MG_VULKAN
     return MGMonoGamePlatform::DesktopVK;
 #elif MG_DIRECTX12
-    return MGMonoGamePlatform::Windows;
+    return MGMonoGamePlatform::WindowsDX12;
 #else
     assert(false);
     return (MGMonoGamePlatform)-1;
@@ -423,10 +442,11 @@ mgbyte MGP_Platform_PollEvent(MGP_Platform* platform, MGP_Event& event_)
             auto controller = SDL_GameControllerOpen(ev.cdevice.which);
             if (controller != nullptr)
             {
-                platform->controllers.emplace(ev.cdevice.which, controller);
+                auto instanceId = SDL_JoystickInstanceID(SDL_GameControllerGetJoystick(controller));
+                platform->controllers.emplace(instanceId, controller);
                 event_.Type = MGEventType::ControllerAdded;
                 event_.Timestamp = ev.cdevice.timestamp;
-                event_.Controller.Id = ev.cdevice.which;
+                event_.Controller.Id = instanceId;
                 event_.Controller.Input = MGControllerInput::INVALID;
                 event_.Controller.Value = 0;
                 return true;
@@ -477,8 +497,6 @@ mgbyte MGP_Platform_PollEvent(MGP_Platform* platform, MGP_Event& event_)
                 // (This maps the range of values to -32767:32767 instead of SDL's -32768:32767)
                 event_.Controller.Value = (event_.Controller.Value == -32768 ? 32767 : ~event_.Controller.Value + 1);
             }
-            else
-
             return true;
             break;
 
@@ -645,8 +663,8 @@ mgbyte MGP_Platform_PollEvent(MGP_Platform* platform, MGP_Event& event_)
             event_.Type = MGEventType::DropFile;
             event_.Drop.Window = MGP_WindowFromId(platform, ev.drop.windowID);
 
-            static char TempPath[_MAX_PATH];
-            strcpy_s(TempPath, _MAX_PATH, ev.drop.file);
+            static char TempPath[MAX_PATH_SIZE];
+            snprintf(TempPath, MAX_PATH_SIZE, "%s", ev.drop.file);
             SDL_free(ev.drop.file);
 
             event_.Drop.File = TempPath;
@@ -679,6 +697,19 @@ mgbyte MGP_Platform_BeforeUpdate(MGP_Platform* platform)
 mgbyte MGP_Platform_BeforeDraw(MGP_Platform* platform)
 {
 	assert(platform != nullptr);
+
+    // TO DO: Vulkan wants that we stop rendering if the window is minimized on Windows (because surface extent is 0x0 when this happens, which will crash Vulkan).
+    // This code assume that we only have one primary window. If we ever implement multi-window support, this will need to be changed.
+    for (auto window : platform->windows)
+    {
+        if (window != nullptr)
+        {
+            auto flags = SDL_GetWindowFlags(window->window);
+            if ((flags & SDL_WINDOW_MINIMIZED) != 0)
+                return false;
+        }
+    }
+
 	return true;
 }
 
@@ -686,7 +717,7 @@ MGP_Window* MGP_Window_Create(
     MGP_Platform* platform,
     mgint& width,
     mgint& height,
-    mgbyte* title)
+    const char* title)
 {
 	assert(platform != nullptr);
     assert(width > 0);
@@ -706,9 +737,19 @@ MGP_Window* MGP_Window_Create(
 	#error Not implemented
 #endif
 
-    title = title ? title : (mgbyte*)"";
+    title = title ? title : "";
 
 	window->window = SDL_CreateWindow((const char*)title, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, width, height, flags);
+	
+	if (window->window == nullptr)
+	{
+		printf("SDL_CreateWindow failed: %s\n", SDL_GetError());
+        fflush(stdout);
+
+		delete window;
+		return nullptr;
+	}
+
     window->windowId = SDL_GetWindowID(window->window);
 
 	platform->windows.push_back(window);
@@ -785,12 +826,12 @@ void MGP_Window_SetIsBorderless(MGP_Window* window, mgbyte borderless)
 	SDL_SetWindowBordered(window->window, borderless ? SDL_FALSE : SDL_TRUE);
 }
 
-void MGP_Window_SetTitle(MGP_Window* window, mgbyte* title)
+void MGP_Window_SetTitle(MGP_Window* window, const char* title)
 {
     assert(window != nullptr);
 
-    title = title ? title : (mgbyte*)"";
-    SDL_SetWindowTitle(window->window, (const char*)title);
+    title = title ? title : "";
+    SDL_SetWindowTitle(window->window, title);
 }
 
 void MGP_Window_Show(MGP_Window* window, mgbyte show)
@@ -818,7 +859,30 @@ void MGP_Window_SetPosition(MGP_Window* window, mgint x, mgint y)
 void MGP_Window_SetClientSize(MGP_Window* window, mgint width, mgint height)
 {
     assert(window != nullptr);
-    SDL_SetWindowSize(window->window, width, height);
+
+    // Resizing with SDL depends on the fullscreen mode.
+    // If we're in exclusive-fullscreen, SDL_SetWindowDisplayMode()
+    // is needed to be called with the closest requested size.
+    // If windowed-fullscreen or just windowed, only
+    // SDL_SetWindowSize() is needed.
+
+    auto flags = SDL_GetWindowFlags(window->window);
+
+    if ((flags & SDL_WINDOW_FULLSCREEN) != 0)
+    {
+        SDL_DisplayMode closest{ 0, 0, 0, 0, nullptr };
+        const SDL_DisplayMode desired{ 0, width, height, 60, nullptr };
+        if (SDL_GetClosestDisplayMode(0, &desired, &closest))
+        {
+            SDL_SetWindowDisplayMode(window->window, &closest);
+            // We need to call SDL_SetWindowSize() as well otherwise
+            // SDL won't send resize proper resize events to our
+            // event queue for the Viewport to update properly.
+            SDL_SetWindowSize(window->window, closest.w, closest.h);
+        }
+    }
+    else
+        SDL_SetWindowSize(window->window, width, height);
 }
 
 void MGP_Window_SetCursor(MGP_Window* window, MGP_Cursor* cursor)
@@ -848,7 +912,7 @@ void MGP_Window_ExitFullScreen(MGP_Window* window)
     SDL_SetWindowFullscreen(window->window, 0);
 }
 
-mgint MGP_Window_ShowMessageBox(MGP_Window* window, mgbyte* title, mgbyte* description, mgbyte* buttons, mgint count)
+mgint MGP_Window_ShowMessageBox(MGP_Window* window, const char* title, const char* description, const char* buttons, mgint count)
 {
     SDL_MessageBoxData data;
     data.window = (window != nullptr ? window->window : nullptr);
@@ -862,10 +926,14 @@ mgint MGP_Window_ShowMessageBox(MGP_Window* window, mgbyte* title, mgbyte* descr
 #endif
 
     auto bdata = new SDL_MessageBoxButtonData[count];
+    const char* p = buttons;
     for (int i = 0; i < count; i++)
     {
         bdata[i].buttonid = i;
-        bdata[i].text = (const char*)buttons[i];
+        bdata[i].text = p;
+        // Since we have double null-terminated strings,
+        // we can safely assume the next button text starts after the current one.
+        p += strlen(p) + 1;
         bdata[i].flags = 0;
     }
 
@@ -1004,7 +1072,7 @@ mgbyte MGP_GamePad_SetVibration(MGP_Platform* platform, mgint identifer, mgfloat
     if (pair == platform->controllers.end())
         return false;
 
-    auto supported = SDL_GameControllerRumble(pair->second, (UINT16)(leftMotor * 0xFFFF), (UINT16)(rightMotor * 0xFFFF), INT_MAX);
+    auto supported = SDL_GameControllerRumble(pair->second, (mgushort)(leftMotor * 0xFFFF), (mgushort)(rightMotor * 0xFFFF), INT_MAX);
     return supported == 0;
 }
 

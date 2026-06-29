@@ -1,10 +1,18 @@
-// MonoGame - Copyright (C) The MonoGame Team
+// MonoGame - Copyright (C) MonoGame Foundation, Inc
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
 #include "api_MGG.h"
 
 #include "mg_common.h"
+
+#include "AlphaTestEffect.dx12.mgfxo.h"
+#include "BasicEffect.dx12.mgfxo.h"
+#include "DualTextureEffect.dx12.mgfxo.h"
+#include "EnvironmentMapEffect.dx12.mgfxo.h"
+#include "SkinnedEffect.dx12.mgfxo.h"
+#include "SpriteEffect.dx12.mgfxo.h"
+#include "mg_effect.h"
 
 #include "directx12.h"
 #include "CommandContext.h"
@@ -15,7 +23,6 @@
 
 #ifdef _WIN32
 #include <Windows.h>
-#include "directx12.resources.h"
 #endif
 
 #if defined(MG_SDL2)
@@ -28,9 +35,7 @@ using namespace Microsoft::WRL;
 
 typedef mguint FrameCounter;
 
-const FrameCounter kFreeFrames = 2;
-
-static void MGDX_DestroyFrameResources(MGG_GraphicsDevice* device, mgint currentFrame, mgbool free_all);
+static void MGDX_DestroyFrameResources(MGG_GraphicsDevice* device, FrameCounter currentFrame, mgbool free_all);
 
 struct MGG_GraphicsAdapter
 {
@@ -50,6 +55,8 @@ const int MAX_TEXTURE_SLOTS = 16;
 struct MGG_GraphicsDevice
 {
 	FrameCounter frame = 0;
+	FrameCounter freeFrames = 0;
+	bool is_recording = false;
 
 	DeviceResources* resources = nullptr;
 	CommandContext* context = nullptr;
@@ -87,6 +94,7 @@ struct MGG_GraphicsDevice
 
 	std::queue<MGG_Buffer*> destroyBuffers;
 	std::queue<MGG_Texture*> destroyTextures;
+	std::queue<MGG_OcclusionQuery*> destroyQuery;
 
 	std::vector<MGG_Buffer*> discarded;
 	std::vector<MGG_Buffer*> pending;
@@ -95,11 +103,11 @@ struct MGG_GraphicsDevice
 
 struct MGG_Buffer
 {
-	mgint frame;
+	FrameCounter frame = 0;
 
 	MGBufferType type;
 
-	// heapType = BufferType::Static;
+	D3D12_HEAP_TYPE heapType;
 	size_t dataSize = 0;
 	size_t actualSize = 0;
 	D3D12_RESOURCE_STATES m_currentState; // for static buffers
@@ -112,10 +120,12 @@ struct MGG_Buffer
 
 struct MGG_Texture
 {
-	mgint frame;
+	FrameCounter frame = 0;
 
 	MGSurfaceFormat format;
 	Texture* texture = nullptr;
+
+	Texture* depthTexture = nullptr;
 };
 
 struct MGG_InputLayout
@@ -139,6 +149,7 @@ struct MGG_BlendState
 struct MGG_DepthStencilState
 {
 	D3D12_DEPTH_STENCIL_DESC desc;
+	mgint referenceStencil;
 };
 
 struct MGG_RasterizerState
@@ -154,12 +165,14 @@ struct MGG_SamplerState
 
 struct MGG_OcclusionQuery
 {
-	uint64_t handle;
+	FrameCounter frame = 0;
+
+	int32_t index = -1;
 
 	Microsoft::WRL::ComPtr<ID3D12Resource> buffer;
 	Microsoft::WRL::ComPtr<D3D12MA::Allocation> alloc;
 
-	uint64_t fence;
+	uint64_t fence = 0;
 };
 
 struct MGG_GraphicsSystem
@@ -172,47 +185,6 @@ struct MGG_GraphicsSystem
 
 	std::vector<MGG_GraphicsAdapter*> adapters;
 };
-
-void MGG_EffectResource_GetBytecode(mgbyte* name, mgbyte*& bytecode, mgint& size)
-{
-	bytecode = nullptr;
-	size = 0;
-
-	// TODO: Move this to use the new MGFXC header generation.
-	// 
-	// Get the handle of this DLL.
-	HMODULE module;
-	::GetModuleHandleExA(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS, (LPCSTR)&MGG_EffectResource_GetBytecode, &module);
-
-	LPCWSTR id = L"";
-
-	if (strcmp((const char*)name, "AlphaTestEffect") == 0)
-		id = MAKEINTRESOURCEW(C_AlphaTestEffect);
-	else if (strcmp((const char*)name, "BasicEffect") == 0)
-		id = MAKEINTRESOURCEW(C_BasicEffect);
-	else if (strcmp((const char*)name, "DualTextureEffect") == 0)
-		id = MAKEINTRESOURCEW(C_DualTextureEffect);
-	else if (strcmp((const char*)name, "EnvironmentMapEffect") == 0)
-		id = MAKEINTRESOURCEW(C_EnvironmentMapEffect);
-	else if (strcmp((const char*)name, "SkinnedEffect") == 0)
-		id = MAKEINTRESOURCEW(C_SkinnedEffect);
-	else if (strcmp((const char*)name, "SpriteEffect") == 0)
-		id = MAKEINTRESOURCEW(C_SpriteEffect);
-
-	auto handle = ::FindResourceW(module, id, L"BIN");
-	if (handle == nullptr)
-		return;
-
-	size = ::SizeofResource(module, handle);
-	if (size == 0)
-		return;
-
-	HGLOBAL global = ::LoadResource(module, handle);
-	if (global == nullptr)
-		return;
-
-	bytecode = (mgbyte*)LockResource(global);
-}
 
 MGG_GraphicsSystem* MGG_GraphicsSystem_Create()
 {
@@ -425,6 +397,7 @@ MGG_GraphicsDevice* MGG_GraphicsDevice_Create(MGG_GraphicsSystem* system, MGG_Gr
 
 	device->context = device->resources->GetCommandContext();
 	device->pipelineManager = new PipelineStateManager(device->resources);
+	device->freeFrames = device->resources->GetBackBufferCount() + 1;
 
 	return device;
 }
@@ -433,8 +406,17 @@ void MGG_GraphicsDevice_Destroy(MGG_GraphicsDevice* device)
 {
 	assert(device != nullptr);
 
+	// Be sure we're done drawing.
+	// Prevents some exceptions while shutting down.
+	device->resources->WaitForGpu();
 
 	MGDX_DestroyFrameResources(device, 0, true);
+
+	if (device->depthTexture)
+		delete device->depthTexture;
+
+	delete device->pipelineManager;
+	delete device->resources;
 
 	delete device;
 }
@@ -457,13 +439,35 @@ void MGG_GraphicsDevice_GetCaps(MGG_GraphicsDevice* device, MGG_GraphicsDevice_C
 #endif
 }
 
+void MGG_GraphicsDevice_ResolveRenderTargets(MGG_GraphicsDevice* device)
+{
+	assert(device != nullptr);
+
+	auto& currentRT = device->context->m_currentRT;
+	if (currentRT.size() == 0)
+		return;
+
+	// We resolve MSAA and mips to the active command buffer.
+
+	for (int i = 0; i < currentRT.size(); ++i)
+	{
+		auto renderTarget = currentRT[i];
+		if (renderTarget->GetMipLevels() <= 1)
+			continue;
+
+		device->context->GenerateMipmap(renderTarget);
+	}
+}
+
 void MGG_GraphicsDevice_ResizeSwapchain(
 	MGG_GraphicsDevice* device,
 	void* nativeWindowHandle,
 	mgint width,
 	mgint height,
 	MGSurfaceFormat color,
-	MGDepthFormat depth)
+	MGDepthFormat depth,
+	mgint multiSampleCount,
+	mgint syncInterval)
 {
 #if !defined(_GAMING_XBOX)
 
@@ -479,13 +483,9 @@ void MGG_GraphicsDevice_ResizeSwapchain(
 #error Not Implemented
 #endif
 
-	//resetCallback = OnDeviceLost;
-	//DxDevice.SetDeviceResetCallback(resetCallback);
 #endif
 
-	int sampleCount = 1; // PresentationParameters.MultiSampleCount;
-	//Vector4 clear = DiscardColor.ToVector4();
-	device->resources->CreateWindowSizeDependentResources(width, height, 0, 0, 0, 0, sampleCount);
+	device->resources->CreateWindowSizeDependentResources(width, height, 0, 0, 0, 0, multiSampleCount);
 
 	if (device->depthTexture)
 	{
@@ -495,9 +495,9 @@ void MGG_GraphicsDevice_ResizeSwapchain(
 
 	if (depth != MGDepthFormat::None)
 	{
-		device->depthTexture = new  Texture(width, height, depth);
-		//if (sampleCount > 1)
-			//DepthTexture.SetMSAA(sampleCount);
+		device->depthTexture = new Texture(width, height, depth);
+		if (multiSampleCount > 1)
+			device->depthTexture->SetMSAA(multiSampleCount);
 		device->depthTexture->Create(device->resources);
 	}
 }
@@ -505,6 +505,7 @@ void MGG_GraphicsDevice_ResizeSwapchain(
 mgint MGG_GraphicsDevice_BeginFrame(MGG_GraphicsDevice* device)
 {
 	assert(device != nullptr);
+	assert(!device->is_recording);
 
 #if defined(_GAMING_XBOX)
 	device->resources->WaitForOrigin();
@@ -522,6 +523,8 @@ mgint MGG_GraphicsDevice_BeginFrame(MGG_GraphicsDevice* device)
 	device->viewportDirty = true;
 	device->scissorDirty = true;
 
+	device->is_recording = true;
+
 	return frameIndex;
 }
 
@@ -536,10 +539,9 @@ void MGG_GraphicsDevice_Clear(MGG_GraphicsDevice* device, MGClearOptions options
 	device->context->Clear(options, color.X, color.Y, color.Z, color.W, depth, stencil);
 }
 
-static void MGDX_DestroyFrameResources(MGG_GraphicsDevice* device, mgint currentFrame, mgbool free_all)
+static void MGDX_DestroyFrameResources(MGG_GraphicsDevice* device, FrameCounter currentFrame, mgbool free_all)
 {
 	assert(device != nullptr);
-	assert(currentFrame >= 0);
 
 	// Delete resources that haven't been used in a few frames 
 	{
@@ -547,7 +549,7 @@ static void MGDX_DestroyFrameResources(MGG_GraphicsDevice* device, mgint current
 		{
 			auto buffer = device->destroyBuffers.front();
 			auto diff = currentFrame - buffer->frame;
-			if (!free_all && diff < kFreeFrames || (0xFFFF - diff) < kFreeFrames)
+			if (!free_all && diff < device->freeFrames)
 				break;
 
 			device->destroyBuffers.pop();
@@ -559,13 +561,35 @@ static void MGDX_DestroyFrameResources(MGG_GraphicsDevice* device, mgint current
 		{
 			auto texture = device->destroyTextures.front();
 			auto diff = currentFrame - texture->frame;
-			if (!free_all && diff < kFreeFrames || (0xFFFF - diff) < kFreeFrames)
+			if (!free_all && diff < device->freeFrames)
 				break;
 
 			device->destroyTextures.pop();
 
-			delete texture->texture;
+			if (texture->texture) {
+				texture->texture->FreeDescriptors(device->resources);
+				delete texture->texture;
+			}
+			if (texture->depthTexture) {
+				texture->depthTexture->FreeDescriptors(device->resources);
+				delete texture->depthTexture;
+			}
 			delete texture;
+		}
+
+		while (device->destroyQuery.size() > 0)
+		{
+			auto query = device->destroyQuery.front();
+			auto diff = currentFrame - query->frame;
+			if (!free_all && diff < device->freeFrames)
+				break;
+
+			device->destroyQuery.pop();
+
+			device->resources->GetGraphicsHeaps()->FreeQueryIndex(query->index);
+			query->buffer.Reset();
+			query->alloc.Reset();
+			delete query;
 		}
 	}
 }
@@ -575,6 +599,7 @@ void MGG_GraphicsDevice_Present(MGG_GraphicsDevice* device, mgint currentFrame, 
 	assert(device != nullptr);
 	assert(syncInterval >= 0);
 	assert(currentFrame >= 0);
+	assert(device->is_recording);
 
 #if !defined(_GAMING_XBOX)
 	device->resources->Present(syncInterval, 0);
@@ -583,6 +608,7 @@ void MGG_GraphicsDevice_Present(MGG_GraphicsDevice* device, mgint currentFrame, 
 #endif
 
 	++device->frame;
+	device->is_recording = false;
 
 	// Move the pending buffers to the free list 
 	// for reuse on the next frame.
@@ -622,6 +648,10 @@ void MGG_GraphicsDevice_SetDepthStencilState(MGG_GraphicsDevice* device, MGG_Dep
 
 	auto& depthStencilState = device->pipelineManager->impl->m_currentPSODesc.DepthStencilState;
 	depthStencilState = state->desc;
+	
+	// Set stencil reference on every frame.
+	auto commandList = device->context->GetCommandList();
+	commandList->OMSetStencilRef(state->referenceStencil);
 }
 
 void MGG_GraphicsDevice_SetRasterizerState(MGG_GraphicsDevice* device, MGG_RasterizerState* state)
@@ -666,22 +696,61 @@ void MGG_GraphicsDevice_SetScissorRectangle(MGG_GraphicsDevice* device, mgint x,
 	device->scissorDirty = true;
 }
 
-void MGG_GraphicsDevice_SetRenderTargets(MGG_GraphicsDevice* device, MGG_Texture** targets, mgint count)
+void MGG_GraphicsDevice_SetRenderTargets(MGG_GraphicsDevice* device, MGG_Texture** targets, mgint* arraySlices, mgint count)
 {
 	assert(device != nullptr);
 
 	if (targets == nullptr || count == 0)
 	{
-		device->context->SetRenderTarget(nullptr, 0, device->depthTexture);
+		device->context->SetRenderTarget(nullptr, nullptr, 0, device->depthTexture);
 	}
 	else
 	{
-		/*
-		device->context->SetRenderTarget(
-		DxCommandContext.SetRenderTarget(rtHandle.AddrOfPinnedObject(), (uint)_currentRenderTargetCount, (_currentRenderTargetBindings[0].RenderTarget as RenderTarget2D).DxDepthTexture);
-		rtHandle.Free();
-		var renderTarget = (IRenderTarget)_currentRenderTargetBindings[0].RenderTarget;
-		*/
+		std::vector<Texture*> colorTargets;
+		colorTargets.reserve(count);
+		for (size_t i = 0; i < count; i++) {
+			colorTargets.push_back(targets[i]->texture);
+			targets[i]->frame = device->frame;
+		}
+
+		device->context->SetRenderTarget(colorTargets.data(), arraySlices, count, targets[0]->depthTexture);
+	}
+}
+
+void MGG_GraphicsDevice_GetBackBufferData(MGG_GraphicsDevice* device, mgint x, mgint y, mgint width, mgint height, void* data, mgint count, mgint dataBytes)
+{
+	assert(device != nullptr);
+	assert(data != nullptr);
+	assert(count > 0);
+	assert(dataBytes > 0);
+
+	// If we're currently recording we need to flush the
+	// /command buffer to finishing rendering.
+	bool restart_cmdlist = false;
+	if (device->is_recording)
+	{
+		auto context = device->resources->GetCommandContext();
+		context->cmd->Close(true);
+		context->cmd = nullptr;
+		restart_cmdlist = true;
+	}
+
+	assert(data != nullptr);
+	assert(dataBytes > 0);
+	device->resources->GetBackBufferData(x,y, width, height, (uint8_t*)data, dataBytes);
+
+	if (restart_cmdlist)
+	{
+		auto context = device->resources->GetCommandContext();
+		context->Reset();
+
+		device->pipelineManager->Prepare();
+		device->indexBufferDirty = true;
+		device->vertexBuffersDirty = 0xFFFFFFFF;
+		device->texturesDirty = true;
+		device->samplersDirty = true;
+		device->viewportDirty = true;
+		device->scissorDirty = true;
 	}
 }
 
@@ -785,6 +854,9 @@ void MGDX_ApplyState(MGG_GraphicsDevice* device)
 	{
 		cl->RSSetViewports(1, &device->viewport);
 		device->viewportDirty = false;
+
+		if (!device->scissorTestEnable)
+			device->scissorDirty = true;
 	}
 
 	if (device->scissorDirty)
@@ -807,13 +879,19 @@ void MGDX_ApplyState(MGG_GraphicsDevice* device)
 
 	if (device->indexBufferDirty)
 	{
-		D3D12_INDEX_BUFFER_VIEW ibv;
-		ibv.BufferLocation = device->indexBuffer->GpuAddress();
-		ibv.Format = device->indexBufferSize == MGIndexElementSize::ThirtyTwoBits ? DXGI_FORMAT_R32_UINT : DXGI_FORMAT_R16_UINT;
-		ibv.SizeInBytes = device->indexBuffer->dataSize;
+		// NOTE: Is this just wasted cycles clearing the index buffer?
+		if (device->indexBuffer == nullptr)
+			cl->IASetIndexBuffer(nullptr);
+		else
+		{
+			D3D12_INDEX_BUFFER_VIEW ibv;
+			ibv.BufferLocation = device->indexBuffer->GpuAddress();
+			ibv.Format = device->indexBufferSize == MGIndexElementSize::ThirtyTwoBits ? DXGI_FORMAT_R32_UINT : DXGI_FORMAT_R16_UINT;
+			ibv.SizeInBytes = device->indexBuffer->dataSize;
 
-		cl->IASetIndexBuffer(&ibv);
-		device->indexBuffer->frame = currentFrame;
+			cl->IASetIndexBuffer(&ibv);
+			device->indexBuffer->frame = currentFrame;
+		}
 
 		device->indexBufferDirty = false;
 	}
@@ -830,6 +908,15 @@ void MGDX_ApplyState(MGG_GraphicsDevice* device)
 			auto buffer = device->vertexBuffers[i];
 			if (!buffer)
 				continue;
+
+
+			if (i >= device->layout->streamStrides.size())
+			{
+				// Vertex buffer is out of sync with current layout.
+				// Clean up leftover vertex buffer slot.
+				device->vertexBuffers[i] = nullptr;
+				continue;
+			}
 
 			vbv.BufferLocation = buffer->GpuAddress() + device->vertexOffsets[i];
 			vbv.StrideInBytes = device->layout->streamStrides[i];
@@ -978,8 +1065,6 @@ void MGG_GraphicsDevice_DrawIndexedInstanced(MGG_GraphicsDevice* device, MGPrimi
 	auto indexCount = MGDX_GetIndexCount(primitiveType, primitiveCount);
 
 	cl->DrawIndexedInstanced(indexCount, instanceCount, indexStart, vertexStart, 0);
-
-	MG_NOT_IMPLEMEMTED;
 }
 
 
@@ -1014,8 +1099,8 @@ MGG_BlendState* MGG_BlendState_Create(MGG_GraphicsDevice* device, MGG_BlendState
 		bstate.SrcBlend = BlendToD3D12_BLEND[(int)infos[i].colorSourceBlend];
 		bstate.DestBlend = BlendToD3D12_BLEND[(int)infos[i].colorDestBlend];
 		bstate.BlendOp = BlendFunctionToD3D12_BLEND_OP[(int)infos[i].colorBlendFunc];
-		bstate.SrcBlendAlpha = BlendToD3D12_BLEND[(int)infos[i].alphaSourceBlend];
-		bstate.DestBlendAlpha = BlendToD3D12_BLEND[(int)infos[i].alphaDestBlend];
+		bstate.SrcBlendAlpha = BlendToAlphaD3D12_BLEND[(int)infos[i].alphaSourceBlend];
+		bstate.DestBlendAlpha = BlendToAlphaD3D12_BLEND[(int)infos[i].alphaDestBlend];
 		bstate.BlendOpAlpha = BlendFunctionToD3D12_BLEND_OP[(int)infos[i].alphaBlendFunc];
 		bstate.RenderTargetWriteMask = (uint8_t)infos[i].colorWriteChannels;
 	}
@@ -1055,6 +1140,7 @@ MGG_DepthStencilState* MGG_DepthStencilState_Create(MGG_GraphicsDevice* device, 
 	state->desc.BackFace.StencilPassOp = StencilOperationToD3D12_D3D12_STENCIL_OP[(int)info->stencilPass];
 	state->desc.BackFace.StencilFailOp = StencilOperationToD3D12_D3D12_STENCIL_OP[(int)info->stencilFail];
 	state->desc.BackFace.StencilDepthFailOp = StencilOperationToD3D12_D3D12_STENCIL_OP[(int)info->stencilDepthBufferFail];
+	state->referenceStencil = info->referenceStencil;
 
 	return state;
 }
@@ -1101,7 +1187,8 @@ MGG_RasterizerState* MGG_RasterizerState_Create(MGG_GraphicsDevice* device, MGG_
 		break;
 	}
 
-	state->desc.DepthBias = info->depthBias;
+	state->desc.DepthBias = info->depthBias * ((1 << 24) - 1);
+	state->desc.DepthBiasClamp = 0.0f;
 	state->desc.DepthClipEnable = info->depthClipEnable;
 	state->desc.SlopeScaledDepthBias = info->slopeScaleDepthBias;
 	state->desc.MultisampleEnable = info->multiSampleAntiAlias;
@@ -1127,14 +1214,7 @@ MGG_SamplerState* MGG_SamplerState_Create(MGG_GraphicsDevice* device, MGG_Sample
 	assert(info != nullptr);
 
 	auto state = new MGG_SamplerState();
-
-	state->sampler = new Graphics::Sampler(
-		device->resources,
-		info->Filter,
-		info->AddressU,
-		info->AddressV,
-		info->AddressW);
-
+	state->sampler = new Graphics::Sampler(device->resources, info);
 	return state;
 }
 
@@ -1162,7 +1242,8 @@ static MGG_Buffer* MGDX_BufferDiscard(MGG_GraphicsDevice* device, MGG_Buffer* bu
 
 	// Search for the best fit from the free list.		
 	MGG_Buffer* best = nullptr;
-	for (int i=0; i < device->free.size(); i++)
+	auto bestIndex = -1;
+	for (int i = 0; i < device->free.size(); i++)
 	{
 		auto curr = device->free[i];
 
@@ -1176,19 +1257,22 @@ static MGG_Buffer* MGDX_BufferDiscard(MGG_GraphicsDevice* device, MGG_Buffer* bu
 		if (best == nullptr || best->actualSize > currSize)
 		{
 			best = curr;
+			bestIndex = i;
 
 			if (currSize == dataSize)
-			{
-				device->free[i] = device->free.back();
-				device->free.pop_back();
 				break;
-			}
 		}
 	}
 
 	// We didn't find a match, so allocate a new one.
 	if (best == nullptr)
 		best = MGG_Buffer_Create(device, type, dataSize);
+
+	else
+	{
+		device->free[bestIndex] = device->free.back();
+		device->free.pop_back();
+	}
 
 	best->dataSize = dataSize;
 
@@ -1211,7 +1295,7 @@ MGG_Buffer* MGG_Buffer_Create(MGG_GraphicsDevice* device, MGBufferType type, mgi
 	// TODO: All heaps are dynamic at the moment
 	// can we fix that later?
 	buffer->m_currentState = D3D12_RESOURCE_STATE_GENERIC_READ;
-	allocDesc.HeapType = D3D12_HEAP_TYPE_UPLOAD;
+	buffer->heapType = allocDesc.HeapType = D3D12_HEAP_TYPE_UPLOAD;
 	/*
 	switch (buffer->heapType)
 	{
@@ -1254,11 +1338,15 @@ void MGG_Buffer_Destroy(MGG_GraphicsDevice* device, MGG_Buffer* buffer)
 	device->destroyBuffers.push(buffer);
 }
 
-void MGG_Buffer_SetData(MGG_GraphicsDevice* device, MGG_Buffer*& buffer, mgint offset, mgbyte* data, mgint length, mgbyte discard)
+void MGG_Buffer_SetData(MGG_GraphicsDevice* device, MGG_Buffer*& buffer, mgint offset, mgbyte* data, mgint elementCount, mgint vertexStride, mgint elementSizeInBytes, mgbool discard)
 {
 	assert(device != nullptr);
 	assert(buffer != nullptr);
 	assert(data != nullptr);
+	assert(offset >= 0);
+	assert(elementCount > 0);
+	assert(vertexStride > 0);
+	assert(elementSizeInBytes > 0);
 
 	// TODO: Force discard here if we find we're
 	// copying over data still in use.  See NX.
@@ -1306,11 +1394,23 @@ void MGG_Buffer_SetData(MGG_GraphicsDevice* device, MGG_Buffer*& buffer, mgint o
 		}
 	}
 
+	// Temp fix for now
+	auto length = elementCount * elementSizeInBytes;
+
 	// Copy the data.
 	UINT8* pVertexDataBegin;
 	CD3DX12_RANGE readRange(0, 0);
 	DX::ThrowIfFailed(buffer->m_res->Map(0, &readRange, reinterpret_cast<void**>(&pVertexDataBegin)));
-	memcpy(pVertexDataBegin + offset, data, length);
+	pVertexDataBegin += offset;
+	if (vertexStride == elementSizeInBytes)
+		memcpy(pVertexDataBegin, data, length);
+	else
+	{
+		auto bytesToCopy = elementSizeInBytes < vertexStride ? elementSizeInBytes : vertexStride;
+		for (auto i = 0; i < elementCount; i++)
+			memcpy((void*)(pVertexDataBegin + (i * vertexStride)), data + (i * elementSizeInBytes), bytesToCopy);
+		length = vertexStride * (elementCount - 1) + elementSizeInBytes;
+	}
 	CD3DX12_RANGE writeRange(offset, offset + length);
 	buffer->m_res->Unmap(0, &writeRange);
 }
@@ -1322,45 +1422,59 @@ void MGG_Buffer_GetData(MGG_GraphicsDevice* device, MGG_Buffer* buffer, mgint of
 	assert(data != nullptr);
 
 	ComPtr<ID3D12Resource> intermediateBuffer;
-	ComPtr<D3D12MA::Allocation> intermediateAlloc;
-	CD3DX12_RESOURCE_DESC resourceDesc = CD3DX12_RESOURCE_DESC::Buffer(dataStride * dataCount);
-	D3D12MA::ALLOCATION_DESC allocDesc = { D3D12MA::ALLOCATION_FLAG_NONE, D3D12_HEAP_TYPE_READBACK };
-	device->resources->GetAllocator()->CreateResource(
-		&allocDesc, &resourceDesc,
-		D3D12_RESOURCE_STATE_COPY_DEST, nullptr,
-		intermediateAlloc.ReleaseAndGetAddressOf(),
-		IID_GRAPHICS_PPV_ARGS(intermediateBuffer.ReleaseAndGetAddressOf()));
+	if (buffer->heapType == D3D12_HEAP_TYPE_UPLOAD)
+		intermediateBuffer = buffer->m_res;
+	else
+	{
+		ComPtr<D3D12MA::Allocation> intermediateAlloc;
+		CD3DX12_RESOURCE_DESC resourceDesc = CD3DX12_RESOURCE_DESC::Buffer(dataStride * dataCount);
+		D3D12MA::ALLOCATION_DESC allocDesc = { D3D12MA::ALLOCATION_FLAG_NONE, D3D12_HEAP_TYPE_READBACK };
+		DX::ThrowIfFailed(device->resources->GetAllocator()->CreateResource(
+			&allocDesc,
+			&resourceDesc,
+			D3D12_RESOURCE_STATE_COPY_DEST,
+			nullptr,
+			intermediateAlloc.ReleaseAndGetAddressOf(),
+			IID_GRAPHICS_PPV_ARGS(intermediateBuffer.ReleaseAndGetAddressOf())));
 
-	auto cmd = device->resources->BeginCommandList();
-	auto cmdList = cmd->Get();
+		auto cmd = device->resources->BeginCommandList();
+		auto cmdList = cmd->Get();
 
-	if (buffer->m_currentState != D3D12_RESOURCE_STATE_COPY_SOURCE) {
-		const D3D12_RESOURCE_BARRIER toCopySourceBarrier = CD3DX12_RESOURCE_BARRIER::Transition(
-			buffer->m_res.Get(), buffer->m_currentState, D3D12_RESOURCE_STATE_COPY_SOURCE
-		);
-		cmdList->ResourceBarrier(1, &toCopySourceBarrier);
+		if (buffer->m_currentState != D3D12_RESOURCE_STATE_COMMON) {
+			const D3D12_RESOURCE_BARRIER toCopySourceBarrier = CD3DX12_RESOURCE_BARRIER::Transition(
+				buffer->m_res.Get(), D3D12_RESOURCE_STATE_COMMON, D3D12_RESOURCE_STATE_COPY_SOURCE
+			);
+			cmdList->ResourceBarrier(1, &toCopySourceBarrier);
+		}
+
+		cmdList->CopyBufferRegion(intermediateBuffer.Get(), 0, buffer->m_res.Get(), offset, dataStride * dataCount);
+
+		if (buffer->m_currentState != D3D12_RESOURCE_STATE_COMMON) {
+			const D3D12_RESOURCE_BARRIER revertBarrier = CD3DX12_RESOURCE_BARRIER::Transition(
+				buffer->m_res.Get(), D3D12_RESOURCE_STATE_COMMON, buffer->m_currentState
+			);
+			cmdList->ResourceBarrier(1, &revertBarrier);
+		}
+
+		cmd->Close(true);
 	}
-
-	cmdList->CopyBufferRegion(intermediateBuffer.Get(), 0, buffer->m_res.Get(), offset, dataStride * dataCount);
-
-	if (buffer->m_currentState != D3D12_RESOURCE_STATE_COPY_SOURCE) {
-		const D3D12_RESOURCE_BARRIER revertBarrier = CD3DX12_RESOURCE_BARRIER::Transition(
-			buffer->m_res.Get(), D3D12_RESOURCE_STATE_COPY_SOURCE, buffer->m_currentState
-		);
-		cmdList->ResourceBarrier(1, &revertBarrier);
-	}
-
-	cmd->Close(true);
 
 	UINT8* pSourceDataBegin;
 	DX::ThrowIfFailed(intermediateBuffer->Map(0, nullptr, reinterpret_cast<void**>(&pSourceDataBegin)));
-	if (dataStride == dataStride)
+	pSourceDataBegin += offset;
+	if (dataStride == dataBytes)
+	{
 		memcpy(data, pSourceDataBegin, dataStride * dataCount);
-	else {
-		for (auto i = 0; i < dataCount; i++)
-			memcpy(data + (i * dataStride), (void*)(pSourceDataBegin + (i * dataStride)), dataStride);
 	}
-	CD3DX12_RANGE writeRange(0, 0); // We haven't write to the buffer
+	else
+	{
+		auto bytesToCopy = dataBytes < dataStride ? dataBytes : dataStride;
+		for (auto i = 0; i < dataCount; i++)
+		{
+			memcpy(data + (i * dataBytes), (void*)(pSourceDataBegin + (i * dataStride)), bytesToCopy);
+		}
+	}
+	CD3DX12_RANGE writeRange(0, 0); // We haven't written to the buffer
 	intermediateBuffer->Unmap(0, &writeRange);
 }
 
@@ -1382,11 +1496,30 @@ MGG_Texture* MGG_Texture_Create(
 	assert(mipmaps > 0);
 	assert(slices > 0);
 	assert(type != MGTextureType::Cube || (slices % 6) == 0);
+	// TODO: Pass slices down into texture ctor and implement handling.
+	// We already use it in Vulkan to define array layers.
 
 	auto texture = new MGG_Texture();
 
+	mgint depthOrArray;
+	switch (type)
+	{
+	default:
+	case MGTextureType::_2D:
+		assert(depth == 1);
+		depthOrArray = slices;
+		break;
+	case MGTextureType::_3D:
+		depthOrArray = depth * slices;
+		break;
+	case MGTextureType::Cube:
+		assert(depth == 1);
+		depthOrArray = slices;
+		break;
+	}
+
 	texture->format = format;
-	texture->texture = new Texture(SurfaceType::Texture, TextureDimension::Texture2D, width, height, mipmaps, format);
+	texture->texture = new Texture(SurfaceType::Texture, (TextureDimension)type, width, height, depthOrArray, mipmaps, format);
 	texture->texture->Create(device->resources);
 
 	return texture;
@@ -1415,7 +1548,33 @@ MGG_Texture* MGG_RenderTarget_Create(
 	assert(type != MGTextureType::Cube || (slices % 6) == 0);
 
 	auto texture = new MGG_Texture();
+
+	mgint depthOrArray;
+	switch (type)
+	{
+	default:
+	case MGTextureType::_2D:
+		assert(depth == 1);
+		depthOrArray = slices;
+		break;
+	case MGTextureType::_3D:
+		depthOrArray = depth * slices;
+		break;
+	case MGTextureType::Cube:
+		assert(depth == 1);
+		depthOrArray = slices;
+		break;
+	}
+
 	texture->format = format;
+	texture->texture = new Texture(SurfaceType::RenderTarget, (TextureDimension)type, width, height, depthOrArray, mipmaps, format);
+	texture->texture->Create(device->resources);
+
+	if (depthFormat != MGDepthFormat::None)
+	{
+		texture->depthTexture = new Texture(width, height, depthFormat);
+		texture->depthTexture->Create(device->resources);
+	}
 
 	return texture;
 }
@@ -1532,20 +1691,26 @@ void MGG_Texture_SetData(MGG_GraphicsDevice* device, MGG_Texture* texture, mgint
 	assert(device != nullptr);
 	assert(texture != nullptr);
 
-	if (x == 0 && y == 0 && width == 0 && height == 0)
+	uint32_t tmips = texture->texture->GetMipLevels();
+	uint32_t twidth = texture->texture->GetWidth(level);
+	uint32_t theight = texture->texture->GetHeight(level);
+	uint32_t tdepth = texture->texture->GetDepthOrArraySize(level);
+
+	// If no arguments passed thru then use the defaults.
+	if (x == 0 && y == 0 && z == 0 && width == 0 && height == 0 && depth == 0)
 	{
-		width = texture->texture->GetWidth();
-		height = texture->texture->GetHeight();
+		width = twidth;
+		height = theight;
+		depth = tdepth;
 	}
 
-	//assert(level >= 0 && level < texture->info.mipLevels);
-	//assert(slice >= 0 && slice < texture->info.arrayLayers);
-	//assert(x >= 0 && x < texture->info.extent.width);
-	//assert(y >= 0 && y < texture->info.extent.height);
-	//assert(z >= 0 && z < texture->info.extent.depth);
-	//assert(x + width <= texture->info.extent.width);
-	//assert(y + height <= texture->info.extent.height);
-	//assert(z + depth <= texture->info.extent.depth);
+	assert(level >= 0 && level < tmips);
+	assert(x >= 0 && x < twidth);
+	assert(y >= 0 && y < theight);
+	assert(z >= 0 && z < tdepth);
+	assert(x + width <= twidth);
+	assert(y + height <= theight);
+	assert(z + depth <= tdepth);
 
 	assert(data != nullptr);
 	assert(dataBytes > 0);
@@ -1553,10 +1718,10 @@ void MGG_Texture_SetData(MGG_GraphicsDevice* device, MGG_Texture* texture, mgint
 	uint32_t subres = (slice * texture->texture->GetMipLevels()) + level;
 	size_t rowPitch = GetTexturePitch(texture->format, width);
 
-	if (x == 0 && y == 0 && width == texture->texture->GetWidth() && height == texture->texture->GetHeight())
+	if (x == 0 && y == 0 && z == 0 && width == twidth && height == theight && depth == tdepth)
 		texture->texture->SetData(device->resources, subres, data, dataBytes, rowPitch);
 	else
-		texture->texture->SetData(device->resources, subres, x, y, width, height, data, dataBytes, rowPitch);
+		texture->texture->SetData(device->resources, subres, x, y, z, width, height, depth, data, dataBytes, rowPitch);
 }
 
 void MGG_Texture_GetData(MGG_GraphicsDevice* device, MGG_Texture* texture, mgint level, mgint slice, mgint x, mgint y, mgint z, mgint width, mgint height, mgint depth, mgbyte* data, mgint dataBytes)
@@ -1564,18 +1729,65 @@ void MGG_Texture_GetData(MGG_GraphicsDevice* device, MGG_Texture* texture, mgint
 	assert(device != nullptr);
 	assert(texture != nullptr);
 
-	//assert(level >= 0 && level < texture->info.mipLevels);
-	//assert(slice >= 0 && slice < texture->info.arrayLayers);
-	//assert(x >= 0 && x < texture->info.extent.width);
-	//assert(y >= 0 && y < texture->info.extent.height);
-	//assert(z >= 0 && z < texture->info.extent.depth);
-	//assert(x + width <= texture->info.extent.width);
-	//assert(y + height <= texture->info.extent.height);
-	//assert(z + depth <= texture->info.extent.depth);
+	uint32_t tmips = texture->texture->GetMipLevels();
+	uint32_t twidth = texture->texture->GetWidth(level);
+	uint32_t theight = texture->texture->GetHeight(level);
+	uint32_t tdepth = texture->texture->GetDepthOrArraySize(level);
+
+	// If no arguments passed thru then use the defaults.
+	if (x == 0 && y == 0 && z == 0 && width == 0 && height == 0 && depth == 0)
+	{
+		width = twidth;
+		height = theight;
+		depth = tdepth;
+	}
+
+	assert(level >= 0 && level < tmips);
+	assert(x >= 0 && x < twidth);
+	assert(y >= 0 && y < theight);
+	assert(z >= 0 && z < tdepth);
+	assert(x + width <= twidth);
+	assert(y + height <= theight);
+	assert(z + depth <= tdepth);
 
 	assert(data != nullptr);
 	assert(dataBytes > 0);
 
+	// If this is a render target and we're currently rendering
+	// to it we need to flush the command buffer until it is ready.
+	bool restart_cmdlist = false;
+	if (	device->is_recording &&
+			texture->texture->IsRenderTarget() &&
+			texture->frame == device->frame)
+	{
+		auto context = device->resources->GetCommandContext();
+		context->cmd->Close(true);
+
+		context->cmd = nullptr;
+		restart_cmdlist = true;
+	}
+
+	assert(data != nullptr);
+	assert(dataBytes > 0);
+
+	uint32_t subres = (slice * texture->texture->GetMipLevels()) + level;
+	size_t rowPitch = GetTexturePitch(texture->format, width);
+
+	texture->texture->GetData(device->resources, subres, x, y, z, width, height, depth, data, dataBytes);
+
+	if (restart_cmdlist)
+	{
+		auto context = device->resources->GetCommandContext();
+		context->Reset();
+
+		device->pipelineManager->Prepare();
+		device->indexBufferDirty = true;
+		device->vertexBuffersDirty = 0xFFFFFFFF;
+		device->texturesDirty = true;
+		device->samplersDirty = true;
+		device->viewportDirty = true;
+		device->scissorDirty = true;
+	}
 }
 
 static const LPCSTR MGVertexElementUsageToLPCSTR[] =
@@ -1639,7 +1851,14 @@ MGG_InputLayout* MGG_InputLayout_Create(
 		elem.SemanticIndex = elements[i].SemanticIndex;
 		elem.AlignedByteOffset = elements[i].AlignedByteOffset;
 		elem.InputSlot = elements[i].VertexBufferSlot;
-		elem.InputSlotClass = D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA; // TODO: instancing!
+
+		// instanceFrequency is set on InstanceDataStepRate at:
+		// AsInputElement() in VertexInputLayout.GenerateInputElements()
+		// We can use MGG_InputElement.InstanceDataStepRate to identify GPU instancing.
+		elem.InputSlotClass = elements[i].InstanceDataStepRate > 0
+			? D3D12_INPUT_CLASSIFICATION_PER_INSTANCE_DATA
+			: D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA;
+
 		elem.InstanceDataStepRate = elements[i].InstanceDataStepRate;
 		elem.Format = MGVertexElementFormatToDXGI_FORMAT[(int)elements[i].Format];
 		layout->elements.push_back(elem);
@@ -1695,7 +1914,7 @@ MGG_OcclusionQuery* MGG_OcclusionQuery_Create(MGG_GraphicsDevice* device)
 
 	auto query = new MGG_OcclusionQuery();
 
-	query->handle = device->resources->GetGraphicsHeaps()->CreateQueryHandle();
+	query->index = device->resources->GetGraphicsHeaps()->GetQueryIndex();
 
 	CD3DX12_RESOURCE_DESC resourceDesc = CD3DX12_RESOURCE_DESC::Buffer(8);
 	D3D12MA::ALLOCATION_DESC allocDesc = { D3D12MA::ALLOCATION_FLAG_COMMITTED, D3D12_HEAP_TYPE_READBACK };
@@ -1716,7 +1935,8 @@ void MGG_OcclusionQuery_Destroy(MGG_GraphicsDevice* device, MGG_OcclusionQuery* 
 	if (!query)
 		return;
 
-	delete query;
+	// Queue the occulusion query for later destruction.
+	device->destroyQuery.push(query);
 }
 
 void MGG_OcclusionQuery_Begin(MGG_GraphicsDevice* device, MGG_OcclusionQuery* query)
@@ -1726,10 +1946,12 @@ void MGG_OcclusionQuery_Begin(MGG_GraphicsDevice* device, MGG_OcclusionQuery* qu
 
 	auto cl = device->context->GetCommandList();
 
+	query->frame = device->frame;
+
 	cl->BeginQuery(
 		device->resources->GetGraphicsHeaps()->GetQueryHeap(),
 		D3D12_QUERY_TYPE_OCCLUSION,
-		query->handle);
+		query->index);
 }
 
 void MGG_OcclusionQuery_End(MGG_GraphicsDevice* device, MGG_OcclusionQuery* query)
@@ -1743,13 +1965,14 @@ void MGG_OcclusionQuery_End(MGG_GraphicsDevice* device, MGG_OcclusionQuery* quer
 	cl->EndQuery(
 		heap,
 		D3D12_QUERY_TYPE_OCCLUSION,
-		query->handle);
+		query->index);
 
 	cl->ResolveQueryData(
 		heap,
 		D3D12_QUERY_TYPE_OCCLUSION,
-		query->handle, 1, query->buffer.Get(), 0);
+		query->index, 1, query->buffer.Get(), 0);
 
+	query->frame = device->frame;
 	query->fence = device->resources->GetCommandQueue()->SignalFence();
 }
 
@@ -1762,16 +1985,11 @@ mgbyte MGG_OcclusionQuery_GetResult(MGG_GraphicsDevice* device, MGG_OcclusionQue
 	if (!cq->IsFenceComplete(query->fence))
 		return false;
 
-	D3D12_RANGE readbackBufferRange{ 0, 8 };
-	void* pReadbackBufferData{};
-	query->buffer->Map(0, &readbackBufferRange, &pReadbackBufferData);
+	D3D12_RANGE range { 0, 8 };
+	uint64_t* pValue;
+	query->buffer->Map(0, &range, (void**)&pValue);
+	pixelCount = *pValue;
+	query->buffer->Unmap(0, nullptr);
 
-	uint64_t value;
-	memcpy(&value, pReadbackBufferData, 8);
-
-	CD3DX12_RANGE writeRange(0, 0);
-	query->buffer->Unmap(0, &writeRange);
-
-	pixelCount = value;
 	return true;
 }

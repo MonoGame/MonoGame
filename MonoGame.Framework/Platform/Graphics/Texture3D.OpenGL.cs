@@ -75,8 +75,69 @@ namespace Microsoft.Xna.Framework.Graphics
         private void PlatformGetData<T>(int level, int left, int top, int right, int bottom, int front, int back, T[] data, int startIndex, int elementCount)
              where T : struct
         {
+#if GLES
+            throw new NotSupportedException("OpenGL ES 2.0 doesn't support 3D textures.");
+#else
+            var width = right - left;
+            var height = bottom - top;
+            var depth = back - front;
 
-            throw new NotImplementedException();
+            Threading.BlockOnUIThread(() =>
+            {
+                GL.BindTexture(glTarget, glTexture);
+                GraphicsExtensions.CheckGLError();
+
+                // If we're getting a subset of the texture, we need to read the entire level and copy the relevant portion
+                if (left != 0 || top != 0 || front != 0 || width != Width || height != Height || depth != Depth)
+                {
+                    var elementSizeInByte = Marshal.SizeOf<T>();
+                    var levelWidth = Math.Max(Width >> level, 1);
+                    var levelHeight = Math.Max(Height >> level, 1);
+                    var levelDepth = Math.Max(Depth >> level, 1);
+                    var levelSize = levelWidth * levelHeight * levelDepth * Format.GetSize();
+                    var tempData = new byte[levelSize];
+
+                    var tempHandle = GCHandle.Alloc(tempData, GCHandleType.Pinned);
+                    try
+                    {
+                        GL.GetTexImage(glTarget, level, glFormat, glType, tempData);
+                        GraphicsExtensions.CheckGLError();
+
+                        // Copy the subset to the output array
+                        var dataHandle = GCHandle.Alloc(data, GCHandleType.Pinned);
+                        try
+                        {
+                            var dataPtr = (IntPtr)(dataHandle.AddrOfPinnedObject().ToInt64() + startIndex * elementSizeInByte);
+                            var formatSize = Format.GetSize();
+
+                            for (int z = 0; z < depth; z++)
+                            {
+                                for (int y = 0; y < height; y++)
+                                {
+                                    var sourceIndex = ((front + z) * levelHeight * levelWidth + (top + y) * levelWidth + left) * formatSize;
+                                    var destIndex = (z * height * width + y * width) * formatSize;
+                                    Marshal.Copy(tempData, sourceIndex, dataPtr + destIndex, width * formatSize);
+                                }
+                            }
+                        }
+                        finally
+                        {
+                            dataHandle.Free();
+                        }
+                    }
+                    finally
+                    {
+                        tempHandle.Free();
+                    }
+                }
+                else
+                {
+                    // Get the entire texture level - we can read directly into the data array
+                    GL.GetTexImage(glTarget, level, glFormat, glType, data);
+                    GraphicsExtensions.CheckGLError();
+                }
+            });
+#endif
         }
     }
 }

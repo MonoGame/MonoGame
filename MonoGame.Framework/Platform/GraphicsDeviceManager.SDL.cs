@@ -10,7 +10,8 @@ namespace Microsoft.Xna.Framework
     {
         partial void PlatformInitialize(PresentationParameters presentationParameters)
         {
-            var surfaceFormat = _game.graphicsDeviceManager.PreferredBackBufferFormat.GetColorFormat();
+            var backBufferFormat = _game.graphicsDeviceManager.PreferredBackBufferFormat;
+            var surfaceFormat = backBufferFormat.GetColorFormat();
             var depthStencilFormat = _game.graphicsDeviceManager.PreferredDepthStencilFormat;
 
             // TODO Need to get this data from the Presentation Parameters
@@ -18,6 +19,11 @@ namespace Microsoft.Xna.Framework
             Sdl.GL.SetAttribute(Sdl.GL.Attribute.GreenSize, surfaceFormat.G);
             Sdl.GL.SetAttribute(Sdl.GL.Attribute.BlueSize, surfaceFormat.B);
             Sdl.GL.SetAttribute(Sdl.GL.Attribute.AlphaSize, surfaceFormat.A);
+
+            if (backBufferFormat == SurfaceFormat.ColorSRgb || backBufferFormat == SurfaceFormat.Bgr32SRgb || backBufferFormat == SurfaceFormat.Bgra32SRgb)
+            {
+                Sdl.GL.SetAttribute(Sdl.GL.Attribute.FramebufferSRGBCapable, 1);
+            }
 
             switch (depthStencilFormat)
             {
