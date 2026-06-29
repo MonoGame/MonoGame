@@ -1322,6 +1322,106 @@ namespace Microsoft.Xna.Framework
 
         #endregion
 
+        #region TransformCoord
+
+        /// <summary>
+        /// Creates a new <see cref="Vector3"/> that contains a transformation of the specified vector by the specified <see cref="Matrix"/>, mapping it back to w = 1.
+        /// </summary>
+        /// <param name="vector">Source <see cref="Vector3"/> which represents a 3D vector.</param>
+        /// <param name="matrix">The transformation <see cref="Matrix"/>.</param>
+        /// <returns>Transformed vector.</returns>
+        public static Vector3 TransformCoord(Vector3 vector, Matrix matrix)
+        {
+            TransformCoord(ref vector, ref matrix, out vector);
+            return vector;
+        }
+
+        /// <summary>
+        /// Creates a new <see cref="Vector3"/> that contains a transformation of the specified vector by the specified <see cref="Matrix"/>, mapping it back to w = 1.
+        /// </summary>
+        /// <param name="vector">Source <see cref="Vector3"/> which represents a 3D vector.</param>
+        /// <param name="matrix">The transformation <see cref="Matrix"/>.</param>
+        /// <param name="result">Transformed vector as an output parameter.</param>
+        public static void TransformCoord(ref Vector3 vector, ref Matrix matrix, out Vector3 result)
+        {
+            var x = (vector.X * matrix.M11) + (vector.Y * matrix.M21) + (vector.Z * matrix.M31) + matrix.M41;
+            var y = (vector.X * matrix.M12) + (vector.Y * matrix.M22) + (vector.Z * matrix.M32) + matrix.M42;
+            var z = (vector.X * matrix.M13) + (vector.Y * matrix.M23) + (vector.Z * matrix.M33) + matrix.M43;
+            var invW = 1f / ((vector.X * matrix.M14) + (vector.Y * matrix.M24) + (vector.Z * matrix.M34) + matrix.M44);
+
+            result.X = x * invW;
+            result.Y = y * invW;
+            result.Z = z * invW;
+        }
+
+        /// <summary>
+        /// Apply transformation on vectors within array of <see cref="Vector3"/> by the specified <see cref="Matrix"/> and places the results in an another array, mapping them back to w = 1.
+        /// </summary>
+        /// <param name="sourceArray">Source array.</param>
+        /// <param name="sourceIndex">The starting index of transformation in the source array.</param>
+        /// <param name="matrix">The transformation <see cref="Matrix"/>.</param>
+        /// <param name="destinationArray">Destination array.</param>
+        /// <param name="destinationIndex">The starting index in the destination array, where the first <see cref="Vector3"/> should be written.</param>
+        /// <param name="length">The number of vectors to be transformed.</param>
+        public static void TransformCoord(Vector3[] sourceArray,
+         int sourceIndex,
+         ref Matrix matrix,
+         Vector3[] destinationArray,
+         int destinationIndex,
+         int length)
+        {
+            if (sourceArray == null)
+                throw new ArgumentNullException("sourceArray");
+            if (destinationArray == null)
+                throw new ArgumentNullException("destinationArray");
+            if(sourceArray.Length < sourceIndex + length)
+                throw new ArgumentException("Source array length is lesser than sourceIndex + length");
+            if (destinationArray.Length < destinationIndex + length)
+                throw new ArgumentException("Destination array length is lesser than destinationIndex + length");
+
+            for (int x = 0; x < length; x++)
+            {
+                var vector = sourceArray[sourceIndex + x];
+                var invW = 1f / ((vector.X * matrix.M14) + (vector.Y * matrix.M24) + (vector.Z * matrix.M34) + matrix.M44);
+
+                destinationArray[destinationIndex + x] =
+                     new Vector3(
+                        ((vector.X * matrix.M11) + (vector.Y * matrix.M21) + (vector.Z * matrix.M31) + matrix.M41) * invW,
+                        ((vector.X * matrix.M12) + (vector.Y * matrix.M22) + (vector.Z * matrix.M32) + matrix.M42) * invW,
+                        ((vector.X * matrix.M13) + (vector.Y * matrix.M23) + (vector.Z * matrix.M33) + matrix.M43) * invW);
+            }
+        }
+
+        /// <summary>
+        /// Apply transformation on all vectors within array of <see cref="Vector3"/> by the specified <see cref="Matrix"/> and places the results in an another array, mapping them back to w = 1.
+        /// </summary>
+        /// <param name="sourceArray">Source array.</param>
+        /// <param name="matrix">The transformation <see cref="Matrix"/>.</param>
+        /// <param name="destinationArray">Destination array.</param>
+        public static void TransformCoord(Vector3[] sourceArray, ref Matrix matrix, Vector3[] destinationArray)
+        {
+            if(sourceArray == null)
+                throw new ArgumentNullException("sourceArray");
+            if (destinationArray == null)
+                throw new ArgumentNullException("destinationArray");
+            if (destinationArray.Length < sourceArray.Length)
+                throw new ArgumentException("Destination array length is lesser than source array length");
+
+            for (var i = 0; i < sourceArray.Length; i++)
+            {
+                var vector = sourceArray[i];
+                var invW = 1f / ((vector.X * matrix.M14) + (vector.Y * matrix.M24) + (vector.Z * matrix.M34) + matrix.M44);
+
+                destinationArray[i] =
+                    new Vector3(
+                        ((vector.X * matrix.M11) + (vector.Y * matrix.M21) + (vector.Z * matrix.M31) + matrix.M41) * invW,
+                        ((vector.X * matrix.M12) + (vector.Y * matrix.M22) + (vector.Z * matrix.M32) + matrix.M42) * invW,
+                        ((vector.X * matrix.M13) + (vector.Y * matrix.M23) + (vector.Z * matrix.M33) + matrix.M43) * invW);
+            }
+        }
+
+        #endregion
+
         /// <summary>
         /// Deconstruction method for <see cref="Vector3"/>.
         /// </summary>

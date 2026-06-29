@@ -80,6 +80,25 @@ namespace MonoGame.Tests.Framework
         }
 
         [Test]
+        public void TransformCoord()
+        {
+            var expectedResult1 = new Vector3(11, 2, 3);
+
+            var v1 = new Vector3(1, 2, 3);
+            var m1 = Matrix.CreateTranslation(10, 0, 0);
+
+            Vector3 result1;
+
+            Assert.That(expectedResult1, Is.EqualTo(Vector3.TransformCoord(v1, m1)).Using(Vector3Comparer.Epsilon));
+
+            // OUTPUT OVERLOADS TEST
+
+            Vector3.TransformCoord(ref v1, ref m1, out result1);
+
+            Assert.That(expectedResult1, Is.EqualTo(result1).Using(Vector3Comparer.Epsilon));
+        }
+
+        [Test]
         public void HashCode() {
             // Checking for overflows in hash calculation.
             var max = new Vector3(float.MaxValue, float.MaxValue, float.MaxValue);
