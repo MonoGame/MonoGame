@@ -141,8 +141,8 @@ internal sealed class DynamicSpriteFontTest : GraphicsDeviceTestFixtureBase
             Texture2D initialTexture = font.GetTexture(0);
             font.MeasureString("abc");
 
-            Assert.That(initialTexture.Width, Is.GreaterThan(1));
-            Assert.That(initialTexture.Height, Is.GreaterThan(1));
+            Assert.That(initialTexture.Width, Is.EqualTo(1024));
+            Assert.That(initialTexture.Height, Is.EqualTo(1024));
             Assert.That(font.GetTexture(0), Is.SameAs(initialTexture));
         }
     }    

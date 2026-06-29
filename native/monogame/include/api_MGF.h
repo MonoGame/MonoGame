@@ -60,7 +60,6 @@ struct MGF_PageUpdate
     mgbyte* AtlasRgba;
     mgint AtlasWidth;
     mgint AtlasHeight;
-    mgbool AtlasRebuilt;
 };
 
 struct MGF_BakeSpriteFontRequest

@@ -60,8 +60,6 @@ internal unsafe struct MGF_PageUpdate
     public byte* AtlasRgba;
     public int AtlasWidth;
     public int AtlasHeight;
-    [MarshalAs(UnmanagedType.U1)]
-    public bool AtlasRebuilt;
 }
 
 [StructLayout(LayoutKind.Sequential)]

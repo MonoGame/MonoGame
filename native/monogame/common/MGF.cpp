@@ -108,8 +108,7 @@ struct MGF_Font
 namespace
 {
     constexpr mgint Padding = 1;
-    constexpr mgint MinimumAtlasSize = 256;
-    constexpr mgint MaximumAtlasSize = 4096;
+    constexpr mgint FixedAtlasSize = 1024;
 
     const char* mgf_result_code_name(MGF_ResultCode resultCode)
     {
@@ -227,15 +226,6 @@ namespace
         }
 
         return MGF_ResultCode_Success;
-    }
-
-    mgint next_power_of_two(mgint value)
-    {
-        mgint result = 1;
-        while (result < value)
-            result <<= 1;
-
-        return result;
     }
 
     std::vector<mgchar> collect_characters(const MGF_CharacterRegion* characterRegions, mgint characterRegionCount)
@@ -391,67 +381,10 @@ namespace
         return MGF_ResultCode_Success;
     }
 
-    mgint estimate_initial_atlas_size(const std::vector<GlyphBuildInfo>& glyphs)
-    {
-        mgint totalArea = 0;
-
-        for (const GlyphBuildInfo& glyph : glyphs)
-        {
-            if (glyph.Width == 0 || glyph.Height == 0)
-                continue;
-
-            totalArea += (glyph.Width + Padding) * (glyph.Height + Padding);
-        }
-
-        if (totalArea == 0)
-            return 1;
-
-        mgint estimated = static_cast<mgint>(std::ceil(std::sqrt(static_cast<double>(totalArea) * 1.5)));
-        estimated = std::max(MinimumAtlasSize, estimated);
-        estimated = std::min(MaximumAtlasSize, estimated);
-        return next_power_of_two(estimated);
-    }
-
-    mgint estimate_initial_atlas_size(const std::vector<GlyphBuildInfo>& requiredGlyphs,
-                                      const std::vector<GlyphBuildInfo>& optionalGlyphs)
-    {
-        mgint totalArea = 0;
-
-        for (const GlyphBuildInfo& glyph : requiredGlyphs)
-        {
-            if (glyph.Width == 0 || glyph.Height == 0)
-                continue;
-
-            totalArea += (glyph.Width + Padding) * (glyph.Height + Padding);
-        }
-
-        for (const GlyphBuildInfo& glyph : optionalGlyphs)
-        {
-            if (glyph.Width == 0 || glyph.Height == 0)
-                continue;
-
-            totalArea += (glyph.Width + Padding) * (glyph.Height + Padding);
-        }
-
-        if (totalArea == 0)
-            return 1;
-
-        mgint estimated = static_cast<mgint>(std::ceil(std::sqrt(static_cast<double>(totalArea) * 1.5)));
-        estimated = std::max(MinimumAtlasSize, estimated);
-        estimated = std::min(MaximumAtlasSize, estimated);
-        return next_power_of_two(estimated);
-    }
-
     struct PackResult
     {
         std::vector<GlyphBuildInfo> PackedGlyphs;
         std::vector<GlyphBuildInfo> UnpackedGlyphs;
-    };
-
-    struct PageUpdateInfo
-    {
-        size_t PageIndex;
-        mgbool AtlasRebuilt;
     };
 
     FontAtlasPage* try_get_current_page(MGF_Font& font)
@@ -480,54 +413,19 @@ namespace
                           page.AtlasWidth);
     }
 
+    void initialize_page(FontAtlasPage& page, mgint pageIndex)
+    {
+        page.Index = pageIndex;
+        page.AtlasWidth = FixedAtlasSize;
+        page.AtlasHeight = FixedAtlasSize;
+        page.Atlas.assign(static_cast<size_t>(page.AtlasWidth) * static_cast<size_t>(page.AtlasHeight) * 4, 0);
+        initialize_packer(page);
+    }
+
     void set_page_index(std::vector<GlyphBuildInfo>& glyphs, mgint pageIndex)
     {
         for (GlyphBuildInfo& glyph : glyphs)
             glyph.PageIndex = pageIndex;
-    }
-
-    mgbool pack_glyphs(stbrp_context* packContext, std::vector<GlyphBuildInfo>& glyphs)
-    {
-        std::vector<stbrp_rect> rects;
-        std::vector<size_t> glyphIndices;
-        rects.reserve(glyphs.size());
-        glyphIndices.reserve(glyphs.size());
-
-        for (size_t i = 0; i < glyphs.size(); ++i)
-        {
-            GlyphBuildInfo& glyph = glyphs[i];
-            if (glyph.Width <= 0 || glyph.Height <= 0)
-            {
-                glyph.AtlasX = 0;
-                glyph.AtlasY = 0;
-                continue;
-            }
-
-            stbrp_rect rect = {};
-            rect.id = static_cast<int>(i);
-            rect.w = static_cast<stbrp_coord>(glyph.Width + Padding);
-            rect.h = static_cast<stbrp_coord>(glyph.Height + Padding);
-            rects.push_back(rect);
-            glyphIndices.push_back(i);
-        }
-
-        if (rects.empty())
-            return true;
-
-        stbrp_pack_rects(packContext, rects.data(), static_cast<int>(rects.size()));
-
-        for (size_t rectIndex = 0; rectIndex < rects.size(); ++rectIndex)
-        {
-            const stbrp_rect& rect = rects[rectIndex];
-            if (rect.was_packed == 0)
-                return false;
-
-            GlyphBuildInfo& glyph = glyphs[glyphIndices[rectIndex]];
-            glyph.AtlasX = rect.x;
-            glyph.AtlasY = rect.y;
-        }
-
-        return true;
     }
 
     PackResult pack_glyph_group(stbrp_context* packContext, const std::vector<GlyphBuildInfo>& glyphs)
@@ -626,73 +524,6 @@ namespace
             rasterize_glyph(page.Atlas, page.AtlasWidth, glyph);
     }
 
-    mgbool rebuild_page(FontAtlasPage& page,
-                        const std::vector<GlyphBuildInfo>& requiredGlyphs,
-                        const std::vector<GlyphBuildInfo>& optionalGlyphs,
-                        mgint startingAtlasSize,
-                        std::vector<GlyphBuildInfo>& remainingOptionalGlyphs)
-    {
-        mgint atlasSize = startingAtlasSize > 0 ?
-            startingAtlasSize :
-            estimate_initial_atlas_size(requiredGlyphs, optionalGlyphs);
-
-        if (atlasSize < MinimumAtlasSize)
-            atlasSize = MinimumAtlasSize;
-
-        while (atlasSize <= MaximumAtlasSize)
-        {
-            stbrp_context requiredContext = {};
-            std::vector<stbrp_node> requiredNodes(static_cast<size_t>(atlasSize));
-            stbrp_init_target(&requiredContext,
-                              atlasSize,
-                              atlasSize,
-                              requiredNodes.data(),
-                              atlasSize);
-
-            // Existing glyphs are treated as required so a rebuild never drops glyphs that were
-            // already visible to managed code.  Only overflow from the newly requested set spills to
-            // another page.
-            PackResult requiredResult = pack_glyph_group(&requiredContext, requiredGlyphs);
-            if (!requiredResult.UnpackedGlyphs.empty())
-            {
-                atlasSize *= 2;
-                continue;
-            }
-
-            PackResult optionalResult = pack_glyph_group(&requiredContext, optionalGlyphs);
-            if (!optionalResult.UnpackedGlyphs.empty() && atlasSize < MaximumAtlasSize)
-            {
-                atlasSize *= 2;
-                continue;
-            }
-
-            page.AtlasWidth = atlasSize;
-            page.AtlasHeight = atlasSize;
-            page.Glyphs = std::move(requiredResult.PackedGlyphs);
-            page.Glyphs.insert(page.Glyphs.end(),
-                               std::make_move_iterator(optionalResult.PackedGlyphs.begin()),
-                               std::make_move_iterator(optionalResult.PackedGlyphs.end()));
-
-            set_page_index(page.Glyphs, page.Index);
-
-            initialize_packer(page);
-            if (!pack_glyphs(&page.PackContext, page.Glyphs))
-            {
-                if (atlasSize == MaximumAtlasSize)
-                    return false;
-
-                atlasSize *= 2;
-                continue;
-            }
-
-            rasterize_page(page);
-            remainingOptionalGlyphs = std::move(optionalResult.UnpackedGlyphs);
-            return true;
-        }
-
-        return false;
-    }
-
     void rebuild_lookup(MGF_Font& font)
     {
         font.GlyphLookup.clear();
@@ -759,41 +590,26 @@ namespace
         }
     }
 
-    void update_page_results(MGF_Font& font, const std::vector<PageUpdateInfo>& pageUpdates)
+    void update_page_results(MGF_Font& font, const std::vector<size_t>& pageUpdates)
     {
-        std::vector<PageUpdateInfo> uniqueUpdates;
+        std::vector<size_t> uniqueUpdates;
         uniqueUpdates.reserve(pageUpdates.size());
 
-        // A single ensure call can append to a page and later rebuild that same page.  The public
-        // result only needs the final page snapshot plus whether any rebuild happened along the way.
-        for (const PageUpdateInfo& pageUpdate : pageUpdates)
+        for (size_t pageIndex : pageUpdates)
         {
-            bool merged = false;
-            for (PageUpdateInfo& existing : uniqueUpdates)
-            {
-                if (existing.PageIndex != pageUpdate.PageIndex)
-                    continue;
-
-                existing.AtlasRebuilt = existing.AtlasRebuilt || pageUpdate.AtlasRebuilt;
-                merged = true;
-                break;
-            }
-
-            if (!merged)
-                uniqueUpdates.push_back(pageUpdate);
+            if (std::find(uniqueUpdates.begin(), uniqueUpdates.end(), pageIndex) == uniqueUpdates.end())
+                uniqueUpdates.push_back(pageIndex);
         }
 
         font.PageUpdates.resize(uniqueUpdates.size());
         for (size_t i = 0; i < uniqueUpdates.size(); ++i)
         {
-            const PageUpdateInfo& pageUpdate = uniqueUpdates[i];
-            const FontAtlasPage& page = font.Pages[pageUpdate.PageIndex];
+            const FontAtlasPage& page = font.Pages[uniqueUpdates[i]];
             MGF_PageUpdate& result = font.PageUpdates[i];
             result.PageIndex = page.Index;
             result.AtlasRgba = page.Atlas.empty() ? nullptr : const_cast<mgbyte*>(page.Atlas.data());
             result.AtlasWidth = page.AtlasWidth;
             result.AtlasHeight = page.AtlasHeight;
-            result.AtlasRebuilt = pageUpdate.AtlasRebuilt;
         }
     }
 
@@ -843,7 +659,7 @@ namespace
             }
 
             FontAtlasPage* updatedPage = nullptr;
-            std::vector<PageUpdateInfo> touchedPages;
+            std::vector<size_t> touchedPages;
             std::vector<GlyphBuildInfo> remainingGlyphs = std::move(newGlyphs);
             while (!remainingGlyphs.empty())
             {
@@ -851,77 +667,41 @@ namespace
                 if (writablePage == nullptr)
                 {
                     FontAtlasPage page = {};
-                    page.Index = static_cast<mgint>(font.Pages.size());
+                    initialize_page(page, static_cast<mgint>(font.Pages.size()));
                     font.Pages.push_back(std::move(page));
                     writablePage = &font.Pages.back();
                 }
 
-                std::vector<GlyphBuildInfo> glyphsToAppend = remainingGlyphs;
-                set_page_index(glyphsToAppend, writablePage->Index);
-
-                // Appending into the existing packer is the cheapest path because it preserves the
-                // current atlas image and existing glyph coordinates.  We only rebuild when the new
-                // rectangles no longer fit in the current page layout.
-                if (writablePage->AtlasWidth > 0 &&
-                    writablePage->AtlasHeight > 0 &&
-                    pack_glyphs(&writablePage->PackContext, glyphsToAppend))
+                set_page_index(remainingGlyphs, writablePage->Index);
+                PackResult packResult = pack_glyph_group(&writablePage->PackContext, remainingGlyphs);
+                if (!packResult.PackedGlyphs.empty())
                 {
-                    for (const GlyphBuildInfo& glyph : glyphsToAppend)
+                    for (const GlyphBuildInfo& glyph : packResult.PackedGlyphs)
                         rasterize_glyph(writablePage->Atlas, writablePage->AtlasWidth, glyph);
 
                     writablePage->Glyphs.insert(writablePage->Glyphs.end(),
-                                                std::make_move_iterator(glyphsToAppend.begin()),
-                                                std::make_move_iterator(glyphsToAppend.end()));
+                                                std::make_move_iterator(packResult.PackedGlyphs.begin()),
+                                                std::make_move_iterator(packResult.PackedGlyphs.end()));
 
                     updatedPage = writablePage;
-                    touchedPages.push_back({ static_cast<size_t>(writablePage->Index), false });
-                    remainingGlyphs.clear();
+                    touchedPages.push_back(static_cast<size_t>(writablePage->Index));
+                    remainingGlyphs = std::move(packResult.UnpackedGlyphs);
                 }
-                else
+
+                if (remainingGlyphs.empty())
                 {
-                    if (writablePage->AtlasWidth >= MaximumAtlasSize &&
-                        writablePage->AtlasHeight >= MaximumAtlasSize)
-                    {
-                        FontAtlasPage page = {};
-                        page.Index = static_cast<mgint>(font.Pages.size());
-                        font.Pages.push_back(std::move(page));
-                        continue;
-                    }
-
-                    std::vector<GlyphBuildInfo> remainingAfterPage;
-                    mgint startingAtlasSize = writablePage->AtlasWidth > 0 ?
-                        writablePage->AtlasWidth :
-                        estimate_initial_atlas_size(writablePage->Glyphs, remainingGlyphs);
-
-                    if (!rebuild_page(*writablePage,
-                                      writablePage->Glyphs,
-                                      remainingGlyphs,
-                                      startingAtlasSize,
-                                      remainingAfterPage))
-                    {
-                        if (!writablePage->Glyphs.empty())
-                        {
-                            FontAtlasPage page = {};
-                            page.Index = static_cast<mgint>(font.Pages.size());
-                            font.Pages.push_back(std::move(page));
-                            continue;
-                        }
-
-                        return MGF_ResultCode_AtlasCapacityExceeded;
-                    }
-
-                    updatedPage = writablePage;
-                    touchedPages.push_back({ static_cast<size_t>(writablePage->Index), true });
-                    bool pageAcceptedNewGlyphs = remainingAfterPage.size() < remainingGlyphs.size();
-                    remainingGlyphs = std::move(remainingAfterPage);
-
-                    if (!remainingGlyphs.empty() && !pageAcceptedNewGlyphs)
-                    {
-                        FontAtlasPage page = {};
-                        page.Index = static_cast<mgint>(font.Pages.size());
-                        font.Pages.push_back(std::move(page));
-                    }
+                    continue;
                 }
+
+                if (writablePage->Glyphs.empty())
+                {
+                    return MGF_ResultCode_AtlasCapacityExceeded;
+                }
+
+                // When the current fixed-size atlas page fills up, spill remaining glyphs into a new page
+                FontAtlasPage page = {};
+                initialize_page(page, static_cast<mgint>(font.Pages.size()));
+                font.Pages.push_back(std::move(page));
             }
 
             update_glyph_results(font);

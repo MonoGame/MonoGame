@@ -355,7 +355,7 @@ public sealed partial class DynamicSpriteFont : GraphicsResource
             nextTexture = new Texture2D(GraphicsDevice, pageUpdate.AtlasWidth, pageUpdate.AtlasHeight, false, SurfaceFormat.Color);
         }
 
-        if (pageUpdate.AtlasRebuilt || nextTexture != currentTexture)
+        if (nextTexture != currentTexture)
         {
             MGG.Texture_SetData(GraphicsDevice.Handle,
                                 nextTexture.Handle,
