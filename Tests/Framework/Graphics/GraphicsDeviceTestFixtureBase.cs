@@ -1,4 +1,4 @@
-﻿// MonoGame - Copyright (C) MonoGame Foundation, Inc
+// MonoGame - Copyright (C) MonoGame Foundation, Inc
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
@@ -18,8 +18,9 @@ using NUnit.Framework.Internal;
 
 namespace MonoGame.Tests.Graphics
 {
-    [RunOnUI] 
-    internal class GraphicsDeviceTestFixtureBase
+    [Category("GraphicsDevice")]
+    [RunOnUiTestFixture]
+    internal abstract class GraphicsDeviceTestFixtureBase
     {
         protected TestGameBase game;
         protected GraphicsDeviceManager gdm;
@@ -52,7 +53,7 @@ namespace MonoGame.Tests.Graphics
         #region SetUp and TearDown
 
         [SetUp]
-        [RunOnUI]
+        [Category("GraphicsDevice")]
         public virtual void SetUp()
         {
             game = new TestGameBase();
@@ -81,7 +82,6 @@ namespace MonoGame.Tests.Graphics
         }
 
         [TearDown]
-        [RunOnUI]
         public virtual void TearDown()
         {
             game.Dispose();

@@ -9,12 +9,11 @@ using NUnit.Framework;
 
 namespace MonoGame.Tests.Graphics
 {
-    [TestFixture]
     [NonParallelizable]
+    [RunOnUiTestFixture]
     class TextureCubeTest : GraphicsDeviceTestFixtureBase
     {
         [Test]
-        [RunOnUI]
         public void ZeroSizeShouldFailTest()
         {
             TextureCube texture;
@@ -25,7 +24,6 @@ namespace MonoGame.Tests.Graphics
         [TestCase(1)]
         [TestCase(8)]
         [TestCase(31)]
-        [RunOnUI]
         public void ShouldSetAndGetData(int size)
         {
             var dataSize = size * size;
@@ -48,7 +46,6 @@ namespace MonoGame.Tests.Graphics
         }
 
         [Test]
-        [RunOnUI]
         public void GetAndSetDataDxtCompressed()
         {
             var t = content.Load<TextureCube>(Paths.Texture ("SampleCube64DXT1Mips"));
@@ -106,7 +103,6 @@ namespace MonoGame.Tests.Graphics
         // DXT1
         [TestCase(8, "SampleCube64DXT1Mips", 0)]
         [TestCase(8, "SampleCube64DXT1Mips", 1)]
-        [RunOnUI]
         // TODO DXT5
         //[TestCase(16, "SampleCube64DXT5Mips", 0)]
         //[TestCase(16, "SampleCube64DXT5Mips", 1)]
@@ -165,7 +161,6 @@ namespace MonoGame.Tests.Graphics
         [Test]
         [TestCase("SampleCube64DXT1Mips", 8)]
         //[TestCase("SampleCube64DXT5Mips", 16)]
-        [RunOnUI]
         public void GetAndSetDataDxtDontRoundWhenOutsideBounds(string texName, int bs)
         {
             var t = content.Load<TextureCube>(Paths.Texture(texName));
@@ -187,7 +182,6 @@ namespace MonoGame.Tests.Graphics
         [Test]
         [TestCase("SampleCube64DXT1Mips", 8)]
         //[TestCase("SampleCube64DXT5Mips", 16)]
-        [RunOnUI]
         public void GetAndSetDataDxtLowerMips(string texName, int bs)
         {
             var t = content.Load<TextureCube>(Paths.Texture(texName));
@@ -214,7 +208,6 @@ namespace MonoGame.Tests.Graphics
         }
 
         [Test]
-        [RunOnUI]
         public void NullDeviceShouldThrowArgumentNullException()
         {
             Assert.Throws<ArgumentNullException>(() => 

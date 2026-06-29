@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,6 +8,7 @@ using MonoGame.Tests.Framework.Components;
 
 namespace MonoGame.Tests.Framework
 {
+    [RunOnUiTestFixture]
     public static class GameComponentTest
     {
         [Test]
@@ -62,7 +63,5 @@ namespace MonoGame.Tests.Framework
             Assert.That(postBaseInitialize.InitOrder == -1);
             Assert.That(postBaseInitialize2.InitOrder == -1);
         }
-
-
     }
 }

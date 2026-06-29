@@ -70,33 +70,32 @@ struct mem_image
 
 	mem_image()
 	{
-		dataBytes = grow;
+		dataSize = grow;
 		data = (mgbyte*)malloc(grow);
-		offset = 0;
+		pos = 0;
 	}
 
 	mgbyte* data;
-	mgint dataBytes;
-	size_t offset;
+	mgint dataSize;
+	size_t pos;
 };
 
 static void mem_image_write(void* context, void* data, int size)
 {
 	mem_image* image = (mem_image*)context;
 
-	size_t offset = image->offset + size;
+	size_t end = image->pos + size;
 
-
-	if (offset > image->dataBytes)
+	if (end > image->dataSize)
 	{
 		// TODO:  Need a better strategy for memory growth.
 		// TODO:  Need to handle allocation failure gracefully.
-		image->dataBytes = (mgint)(offset + mem_image::grow); // Need a better algo!
-		image->data = (mgbyte*)realloc(image->data, image->dataBytes);
+		image->dataSize = (mgint)(end + mem_image::grow); // Need a better algo!
+		image->data = (mgbyte*)realloc(image->data, image->dataSize);
 	}
 
-	memcpy(image->data + image->offset, data, size);
-	image->offset = offset;
+	memcpy(image->data + image->pos, data, size);
+	image->pos = end;
 }
 
 void MGI_WriteJpg(mgbyte* data, mgint dataBytes, mgint width, mgint height, mgint quality, mgbyte*& jpg, mgint& jpgBytes)
@@ -107,8 +106,8 @@ void MGI_WriteJpg(mgbyte* data, mgint dataBytes, mgint width, mgint height, mgin
 	mem_image image;
 	stbi_write_jpg_to_func(mem_image_write, &image, width, height, 4, data, quality);
 
-	jpg = (mgbyte*)realloc(image.data, image.offset);
-	jpgBytes = image.dataBytes;
+	jpg = (mgbyte*)realloc(image.data, image.pos);
+	jpgBytes = image.pos;
 }
 
 void MGI_WritePng(mgbyte* data, mgint dataBytes, mgint width, mgint height, mgbyte*& png, mgint& pngBytes)
@@ -117,8 +116,8 @@ void MGI_WritePng(mgbyte* data, mgint dataBytes, mgint width, mgint height, mgby
 	pngBytes = 0;
 
 	mem_image image;
-	stbi_write_png_to_func(mem_image_write, &image, width, height, 4, data, 4);
+	stbi_write_png_to_func(mem_image_write, &image, width, height, 4, data, width * 4);
 
-	png = (mgbyte*)realloc(image.data, image.offset);
-	pngBytes = image.dataBytes;
+	png = (mgbyte*)realloc(image.data, image.pos);
+	pngBytes = image.pos;
 }

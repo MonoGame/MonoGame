@@ -73,7 +73,8 @@
 
 #ifndef D3D12MA_ASSERT
     #include <cassert>
-    #define D3D12MA_ASSERT(cond) assert(cond)
+    // MG Change:  Don't assert unless the debugger is connected.
+    #define D3D12MA_ASSERT(cond) assert(!IsDebuggerPresent() || (cond))
 #endif
 
 // Assert that will be called very often, like inside data structures e.g. operator[].
