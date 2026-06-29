@@ -422,6 +422,14 @@ namespace
         initialize_packer(page);
     }
 
+    FontAtlasPage& add_page(MGF_Font& font)
+    {
+        font.Pages.emplace_back();
+        FontAtlasPage& page = font.Pages.back();
+        initialize_page(page, static_cast<mgint>(font.Pages.size() - 1));
+        return page;
+    }
+
     void set_page_index(std::vector<GlyphBuildInfo>& glyphs, mgint pageIndex)
     {
         for (GlyphBuildInfo& glyph : glyphs)
@@ -433,11 +441,9 @@ namespace
         PackResult result = {};
         std::vector<GlyphBuildInfo> mutableGlyphs = glyphs;
         std::vector<stbrp_rect> rects;
-        std::vector<size_t> glyphIndices;
         std::vector<mgbool> packedFlags(mutableGlyphs.size(), true);
 
         rects.reserve(mutableGlyphs.size());
-        glyphIndices.reserve(mutableGlyphs.size());
 
         for (size_t i = 0; i < mutableGlyphs.size(); ++i)
         {
@@ -454,7 +460,6 @@ namespace
             rect.w = static_cast<stbrp_coord>(glyph.Width + Padding);
             rect.h = static_cast<stbrp_coord>(glyph.Height + Padding);
             rects.push_back(rect);
-            glyphIndices.push_back(i);
         }
 
         if (!rects.empty())
@@ -464,10 +469,11 @@ namespace
             for (size_t rectIndex = 0; rectIndex < rects.size(); ++rectIndex)
             {
                 const stbrp_rect& rect = rects[rectIndex];
-                GlyphBuildInfo& glyph = mutableGlyphs[glyphIndices[rectIndex]];
+                const size_t glyphIndex = static_cast<size_t>(rect.id);
+                GlyphBuildInfo& glyph = mutableGlyphs[glyphIndex];
                 if (rect.was_packed == 0)
                 {
-                    packedFlags[glyphIndices[rectIndex]] = false;
+                    packedFlags[glyphIndex] = false;
                     continue;
                 }
 
@@ -666,10 +672,7 @@ namespace
                 FontAtlasPage* writablePage = try_get_current_page(font);
                 if (writablePage == nullptr)
                 {
-                    FontAtlasPage page = {};
-                    initialize_page(page, static_cast<mgint>(font.Pages.size()));
-                    font.Pages.push_back(std::move(page));
-                    writablePage = &font.Pages.back();
+                    writablePage = &add_page(font);
                 }
 
                 set_page_index(remainingGlyphs, writablePage->Index);
@@ -699,9 +702,7 @@ namespace
                 }
 
                 // When the current fixed-size atlas page fills up, spill remaining glyphs into a new page
-                FontAtlasPage page = {};
-                initialize_page(page, static_cast<mgint>(font.Pages.size()));
-                font.Pages.push_back(std::move(page));
+                add_page(font);
             }
 
             update_glyph_results(font);

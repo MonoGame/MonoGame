@@ -436,6 +436,47 @@ internal sealed class DynamicSpriteFontTest : GraphicsDeviceTestFixtureBase
     }
 
     [Test]
+    public void DrawString_SampleShapedDeferredBatch_AfterRepeatedFontRecreation_DoesNotThrow()
+    {
+        string visibleAscii = CreateVisibleAsciiString();
+
+        for (int i = 0; i < 3; i++)
+        {
+            using (Stream stream = OpenRuntimeFontStream())
+            using (SpriteBatch spriteBatch = new SpriteBatch(gd))
+            {
+                using DynamicSpriteFont font = DynamicSpriteFont.FromStream(gd, stream, 128.0f, Array.Empty<CharacterRegion>());
+
+                spriteBatch.Begin();
+
+                Assert.DoesNotThrow(() => spriteBatch.DrawString(font,
+                                                                 "Small texture atlas: This line will be drawn before page growth.",
+                                                                 new Vector2(40.0f, 40.0f),
+                                                                 Color.Yellow));
+
+                Texture2D textureBeforeLargeDraw = font.GetTexture(0);
+
+                Assert.DoesNotThrow(() => spriteBatch.DrawString(font,
+                                                                 visibleAscii,
+                                                                 new Vector2(40.0f, 280.0f),
+                                                                 Color.White));
+
+                Assert.DoesNotThrow(() => spriteBatch.DrawString(font,
+                                                                 "Everything after page growth should still draw.",
+                                                                 new Vector2(40.0f, 360.0f),
+                                                                 Color.White));
+
+                Texture2D textureAfterLargeDraw = font.GetTexture(0);
+
+                Assert.DoesNotThrow(() => spriteBatch.End());
+                Assert.That(textureBeforeLargeDraw, Is.Not.Null);
+                Assert.That(textureAfterLargeDraw, Is.Not.Null);
+                Assert.That(font.TotalPages, Is.GreaterThan(1));
+            }
+        }
+    }
+
+    [Test]
     public void MeasureStringStringBuilder_SizeChanges_ChangesMeasuredWidth()
     {
         using (Stream stream = OpenRuntimeFontStream())
@@ -587,6 +628,22 @@ internal sealed class DynamicSpriteFontTest : GraphicsDeviceTestFixtureBase
     private static Stream OpenRuntimeFontStream()
     {
         return File.OpenRead(Paths.Font("IBMPlexSans-Regular.ttf"));
+    }
+
+    private static string CreateVisibleAsciiString()
+    {
+        StringBuilder builder = new StringBuilder();
+
+        for (int i = 0; i < 255; i++)
+        {
+            char character = (char)i;
+            if (!char.IsControl(character))
+            {
+                builder.Append(character);
+            }
+        }
+
+        return builder.ToString();
     }
 #endif
 }
