@@ -458,7 +458,6 @@ namespace MonoGame.Tests.Graphics
 
 #if XNA || DIRECTX || DIRECTX12 || VULKAN
         [Test]
-        [RunOnUI]
         public void DrawInstancedPrimitivesUsesInstanceData()
         {
             var renderTarget = new RenderTarget2D(gd, 64, 32, false, SurfaceFormat.Color, DepthFormat.None);
