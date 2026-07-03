@@ -1,4 +1,4 @@
-// MIT License - Copyright (C) The Mono.Xna Team
+﻿// MIT License - Copyright (C) The Mono.Xna Team
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
@@ -1028,7 +1028,7 @@ namespace Microsoft.Xna.Framework
             sb.Append(this.Y);
             sb.Append(" Z:");
             sb.Append(this.Z);
-            sb.Append("}");
+            sb.Append('}');
             return sb.ToString();
         }
 

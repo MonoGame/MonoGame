@@ -443,6 +443,9 @@ void MGG_GraphicsDevice_ResolveRenderTargets(MGG_GraphicsDevice* device)
 {
 	assert(device != nullptr);
 
+	if (!device->is_recording)
+		return;
+
 	auto& currentRT = device->context->m_currentRT;
 	if (currentRT.size() == 0)
 		return;
