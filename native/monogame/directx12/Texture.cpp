@@ -114,11 +114,15 @@ void Texture::Create(DeviceResources* device, bool createViews) {
         pClearValue = &optimizedClearValue;
 
     D3D12_HEAP_FLAGS heapFlags = D3D12_HEAP_FLAG_NONE;
+    D3D12MA::ALLOCATION_FLAGS allocFlags = D3D12MA::ALLOCATION_FLAG_NONE;
 
     // In this context SurfaceType::SwapChainRenderTarget mean the displayable RT used on Gaming.Xbox rendering
     // Not a resource managed by IDXGISwapChain3 (Desktop only, cf Texture(DeviceResources*, IDXGISwapChain3*, int))
     if (impl->m_type == SurfaceType::SwapChainRenderTarget)
+    {
         heapFlags |= D3D12_HEAP_FLAG_ALLOW_DISPLAY;
+        allocFlags = D3D12MA::ALLOCATION_FLAG_COMMITTED;
+    }
 
     bool isMSAA = CheckMSAA(device->GetD3DDevice());
     if (!isMSAA)
@@ -130,7 +134,7 @@ void Texture::Create(DeviceResources* device, bool createViews) {
 
     // ALLOCATION_FLAG_COMMITTED uses dedicated allocation.
     // ALLOCATION_FLAG_NONE places the resource into existing preallocated pool.
-    D3D12MA::ALLOCATION_DESC allocDesc = { D3D12MA::ALLOCATION_FLAG_NONE, D3D12_HEAP_TYPE_DEFAULT, heapFlags };
+    D3D12MA::ALLOCATION_DESC allocDesc = { allocFlags, D3D12_HEAP_TYPE_DEFAULT, heapFlags };
 
     ThrowIfFailed(device->GetAllocator()->CreateResource(
         &allocDesc,
