@@ -765,9 +765,9 @@ ID3D12Resource* Graphics::DeviceResources::TakeUploadBuffer(D3D12_HEAP_TYPE type
         upload.desc = desc;
         upload.type = type;
 
-        // ALLOCATION_FLAG_COMMITTED uses dedicated allocation.
-        // ALLOCATION_FLAG_NONE places the resource into existing preallocated pool.
-        D3D12MA::ALLOCATION_DESC allocDesc = { D3D12MA::ALLOCATION_FLAG_COMMITTED, type };
+        // We want these generally small temp buffers used to transfer data
+        // to and from the GPU into shared pages and not a dedicated allocation.
+        D3D12MA::ALLOCATION_DESC allocDesc = { D3D12MA::ALLOCATION_FLAG_NONE, type };
         HRESULT hr = pImpl->m_allocator->CreateResource(
             &allocDesc, &desc,
             state, nullptr,
