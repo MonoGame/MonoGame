@@ -37,11 +37,11 @@ namespace MonoGame.Tests {
 
             Services.AddService<IFrameInfoSource>(this);
 			SuppressExtraUpdatesAndDraws = true;
-		}
+        }
 
-		#region IFrameInfoSource Implementation
+        #region IFrameInfoSource Implementation
 
-		private FrameInfo _frameInfo;
+        private FrameInfo _frameInfo;
 		public FrameInfo FrameInfo
 		{
 			get { return _frameInfo; }

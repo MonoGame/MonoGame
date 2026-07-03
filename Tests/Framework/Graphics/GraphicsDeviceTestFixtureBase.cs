@@ -22,6 +22,17 @@ namespace MonoGame.Tests.Graphics
     [RunOnUiTestFixture]
     internal abstract class GraphicsDeviceTestFixtureBase
     {
+        static GraphicsDeviceTestFixtureBase()
+        {
+            // This is here to hint to the codebase that we're
+            // running unit tests.
+            //
+            // In particular we're using this to lower the memory
+            // usage of the D3D12 backend for our unit test runner machine.
+            //
+            Environment.SetEnvironmentVariable("MG_RUNNING_UNIT_TESTS", "1");
+        }
+
         protected TestGameBase game;
         protected GraphicsDeviceManager gdm;
         protected GraphicsDevice gd;

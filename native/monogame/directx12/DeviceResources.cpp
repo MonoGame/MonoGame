@@ -247,10 +247,16 @@ public:
 #if !defined(_GAMING_XBOX)
             desc.pAdapter = adapter;
 
-            // TODO: This really needs to be configurable.
-            // Another reason for:
-            // // https://github.com/MonoGame/MonoGame/issues/9382
-            desc.PreferredBlockSize = 4ull * 1024 * 1024;   // 4 MB instead of default 64MB that it defaults to.
+            // The unit tests will fail on our current Windows runner
+            // if we do not reduce the block size we get OOM errors.
+            //
+            // Note we're not having this issue on Vulkan on the same
+            // Windows runner.  So what are we doing wrong on DX12 that
+            // we need to do this here?
+            //
+            const char* running_unit_tests = std::getenv("MG_RUNNING_UNIT_TESTS");
+            if (running_unit_tests != nullptr)
+                desc.PreferredBlockSize = 4ull * 1024 * 1024;
 #else
             Microsoft::WRL::ComPtr<IDXGIDevice1> dxgiDevice;
             Microsoft::WRL::ComPtr<IDXGIAdapter> dxgiAdapter;
