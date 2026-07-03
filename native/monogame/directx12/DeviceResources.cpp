@@ -44,7 +44,7 @@ private:
     std::unique_ptr<CommandContext> m_commandContext;
     std::unique_ptr<Heaps> m_heaps;
     Microsoft::WRL::ComPtr<D3D12MA::Allocator> m_allocator;
-    Microsoft::WRL::ComPtr<D3D12MA::Pool> m_transientBufferPool;
+    //Microsoft::WRL::ComPtr<D3D12MA::Pool> m_transientBufferPool;
 
     struct TempBuffer
     {
@@ -87,7 +87,7 @@ public:
 
         m_tempBuffers.clear();
         m_commandContext.reset();
-        m_transientBufferPool.Reset();
+        //m_transientBufferPool.Reset();
         m_heaps.reset();
         m_commandListPool.reset();
         m_queue.reset();
@@ -246,6 +246,11 @@ public:
             desc.pDevice = m_d3dDevice.Get();
 #if !defined(_GAMING_XBOX)
             desc.pAdapter = adapter;
+
+            // TODO: This really needs to be configurable.
+            // Another reason for:
+            // // https://github.com/MonoGame/MonoGame/issues/9382
+            desc.PreferredBlockSize = 4ull * 1024 * 1024;   // 4 MB instead of default 64MB that it defaults to.
 #else
             Microsoft::WRL::ComPtr<IDXGIDevice1> dxgiDevice;
             Microsoft::WRL::ComPtr<IDXGIAdapter> dxgiAdapter;
@@ -255,14 +260,14 @@ public:
 #endif
             D3D12MA::CreateAllocator(&desc, &m_allocator);
 
-            D3D12MA::POOL_DESC poolDesc = {};
-            poolDesc.HeapProperties.Type = D3D12_HEAP_TYPE_UPLOAD; // We use an UPLOAD heap for temporary VBs/IBs (best for CPU-write-once, GPU-read-once data cf https://learn.microsoft.com/en-us/windows/win32/api/d3d12/ne-d3d12-d3d12_heap_type#constants)
-            poolDesc.Flags = D3D12MA::POOL_FLAG_ALGORITHM_LINEAR;
-            poolDesc.HeapFlags = D3D12_HEAP_FLAG_ALLOW_ONLY_BUFFERS;
-            poolDesc.BlockSize = MAX_BACK_BUFFER_COUNT * MAX_BUFFER_PER_FRAME * D3D12_DEFAULT_RESOURCE_PLACEMENT_ALIGNMENT; // Alignment of buffers is always 64KB
-            poolDesc.MinBlockCount = poolDesc.MaxBlockCount = 1;
-            poolDesc.MaxBlockCount = 1;
-            m_allocator->CreatePool(&poolDesc, &m_transientBufferPool);
+            //D3D12MA::POOL_DESC poolDesc = {};
+            //poolDesc.HeapProperties.Type = D3D12_HEAP_TYPE_UPLOAD; // We use an UPLOAD heap for temporary VBs/IBs (best for CPU-write-once, GPU-read-once data cf https://learn.microsoft.com/en-us/windows/win32/api/d3d12/ne-d3d12-d3d12_heap_type#constants)
+            //poolDesc.Flags = D3D12MA::POOL_FLAG_ALGORITHM_LINEAR;
+            //poolDesc.HeapFlags = D3D12_HEAP_FLAG_ALLOW_ONLY_BUFFERS;
+            //poolDesc.BlockSize = MAX_BACK_BUFFER_COUNT * MAX_BUFFER_PER_FRAME * D3D12_DEFAULT_RESOURCE_PLACEMENT_ALIGNMENT; // Alignment of buffers is always 64KB
+            //poolDesc.MinBlockCount = poolDesc.MaxBlockCount = 1;
+            //poolDesc.MaxBlockCount = 1;
+            //m_allocator->CreatePool(&poolDesc, &m_transientBufferPool);
         }
 
         m_commandContext = std::make_unique<CommandContext>(device);
@@ -472,7 +477,7 @@ public:
         m_commandListPool.reset();
         m_queue.reset();
         m_heaps.reset();
-        m_transientBufferPool.Reset();
+        //m_transientBufferPool.Reset();
         m_swapChain.Reset();
         m_d3dDevice.Reset();
         m_dxgiFactory.Reset();
@@ -694,15 +699,15 @@ D3D12MA::Allocator* Graphics::DeviceResources::GetAllocator() const {
     return pImpl->m_allocator.Get();
 }
 
-D3D12MA::Pool* Graphics::DeviceResources::GetTransientBufferPool() const {
-    return pImpl->m_transientBufferPool.Get();
-}
+//D3D12MA::Pool* Graphics::DeviceResources::GetTransientBufferPool() const {
+//    return pImpl->m_transientBufferPool.Get();
+//}
 
 Texture* Graphics::DeviceResources::GetMainTarget() const noexcept {
     return pImpl->GetMainTarget();
 }
 
-ID3D12Resource* Graphics::DeviceResources::TakeUploadBuffer(D3D12_HEAP_TYPE type, D3D12_RESOURCE_STATES state, D3D12_RESOURCE_DESC& desc)
+ID3D12Resource* Graphics::DeviceResources::TakeUploadBuffer(D3D12_HEAP_TYPE type, D3D12_RESOURCE_STATES state, D3D12_RESOURCE_DESC& desc) const
 {
     std::lock_guard<std::mutex> lock(pImpl->m_bufferMutex);
 
@@ -723,26 +728,60 @@ ID3D12Resource* Graphics::DeviceResources::TakeUploadBuffer(D3D12_HEAP_TYPE type
             continue;
 
         buffer = iter->buffer.Get();
-        iter->fence = 0;
+		iter->fence = UINT64_MAX;   // TODO: Handle fence wrap.
         break;
     }
 
     if (buffer == nullptr)
-    { 
+    {
+        // TODO: These should be configurable.
+        // https://github.com/MonoGame/MonoGame/issues/9382
+        constexpr size_t MAX_BUFFER_POOL_SIZE = 64;
+	    constexpr size_t MIN_BUFFER_POOL_SIZE = 32;
+
+        // Evict old buffers that are too small to reduce memory pressure.
+        // This will likely mean we'll keep creating larger and larger buffers.
+		// It's not ideal. Should we have more sophisticated memory management?
+        if (pImpl->m_tempBuffers.size() >= MAX_BUFFER_POOL_SIZE)
+        {
+            auto evictionIter = pImpl->m_tempBuffers.begin();
+            while (pImpl->m_tempBuffers.size() >= MIN_BUFFER_POOL_SIZE
+                && evictionIter != pImpl->m_tempBuffers.end())
+            {
+                if (evictionIter->fence <= fence
+                    && evictionIter->desc.Width < desc.Width)
+                {
+                    evictionIter = pImpl->m_tempBuffers.erase(evictionIter);
+                }
+                else
+                {
+                    ++evictionIter;
+                }
+            }
+        }
+
         Impl::TempBuffer upload;
-        upload.fence = 0;
+        upload.fence = UINT64_MAX;  // TODO: Handle fence wrap.
         upload.desc = desc;
         upload.type = type;
 
+        // ALLOCATION_FLAG_COMMITTED uses dedicated allocation.
+        // ALLOCATION_FLAG_NONE places the resource into existing preallocated pool.
         D3D12MA::ALLOCATION_DESC allocDesc = { D3D12MA::ALLOCATION_FLAG_COMMITTED, type };
-        pImpl->m_allocator->CreateResource(
+        HRESULT hr = pImpl->m_allocator->CreateResource(
             &allocDesc, &desc,
             state, nullptr,
             upload.alloc.ReleaseAndGetAddressOf(),
             IID_GRAPHICS_PPV_ARGS(upload.buffer.ReleaseAndGetAddressOf()));
 
-        upload.buffer->SetName(L"tempBuffer");
-        upload.alloc->SetName(L"tempAlloc");
+        ThrowIfFailed(hr);
+
+        if (upload.buffer)
+            upload.buffer->SetName(L"tempBuffer");
+
+        if (upload.alloc)
+            upload.alloc->SetName(L"tempAlloc");
+
         pImpl->m_tempBuffers.push_back(upload);
 
         buffer = upload.buffer.Get();

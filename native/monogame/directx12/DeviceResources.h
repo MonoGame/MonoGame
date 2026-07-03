@@ -71,7 +71,7 @@ public:
     D3D12MA::Pool* GetTransientBufferPool() const;
     Texture* GetMainTarget() const noexcept;
 
-    ID3D12Resource* TakeUploadBuffer(D3D12_HEAP_TYPE type, D3D12_RESOURCE_STATES state, D3D12_RESOURCE_DESC& desc);
+    ID3D12Resource* TakeUploadBuffer(D3D12_HEAP_TYPE type, D3D12_RESOURCE_STATES state, D3D12_RESOURCE_DESC& desc) const;
     void ReturnUploadBuffer(ID3D12Resource* buffer, uint64_t fence);
 };
 

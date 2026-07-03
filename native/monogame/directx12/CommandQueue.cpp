@@ -29,9 +29,14 @@ uint64_t CommandQueue::ExecuteCommandList(ID3D12CommandList* commandList)
 {
     // Send the command list off to the GPU for processing.
     ThrowIfFailed(((ID3D12GraphicsCommandList*)commandList)->Close());
+
+    // Make sure the fence covers ExecuteCommandLists call.
+    std::lock_guard lock(m_fenceMutex);
     m_queue->ExecuteCommandLists(1, &commandList);
 
-    return SignalFence();
+    m_queue->Signal(m_fence.Get(), m_nextFenceValue);
+
+    return m_nextFenceValue++;
 }
 
 uint64_t CommandQueue::SignalFence()
@@ -66,9 +71,25 @@ void CommandQueue::WaitForFenceCPUBlocking(uint64_t fenceValue)
         return;
 
     HANDLE evt = CreateEventEx(nullptr, nullptr, 0, EVENT_MODIFY_STATE | SYNCHRONIZE);
-    m_fence->SetEventOnCompletion(fenceValue, evt);
-    WaitForSingleObjectEx(evt, INFINITE, FALSE);
+    HRESULT hr = m_fence->SetEventOnCompletion(fenceValue, evt);
+    ThrowIfFailed(hr);
+
+    // 5 seconds should be more than enough.
+    // https://learn.microsoft.com/en-us/windows-hardware/drivers/display/timeout-detection-and-recovery
+    // "The default timeout period in Windows is two seconds."
+    // "If the GPU can't complete or preempt the current task within the TDR timeout period, the OS diagnoses that the GPU is frozen."
+    DWORD waitResult = WaitForSingleObjectEx(evt, 5000, FALSE);
+
     CloseHandle(evt);
+    if (waitResult == WAIT_TIMEOUT)
+    {
+        ThrowIfFailed(DXGI_ERROR_DEVICE_HUNG);
+    }
+    else if (waitResult == WAIT_FAILED)
+    {
+        DWORD win32Error = GetLastError();
+        ThrowIfFailed(HRESULT_FROM_WIN32(win32Error));
+    }
 
     std::lock_guard lock(m_fenceMutex);
     m_lastCompletedFenceValue = fenceValue;
@@ -101,6 +122,9 @@ void CommandQueue::ResumeX() {
 #endif
 
 CommandList* CommandListPool::Begin() {
+    // Ensure m_fenceMutex is acquired before m_mutex.
+    uint64_t currentFence = m_queue->PollCurrentFenceValue();
+
     CommandList* ctx = nullptr;
 
     std::lock_guard lock(m_mutex);
@@ -108,12 +132,12 @@ CommandList* CommandListPool::Begin() {
     if (m_contextsRepo.empty()) {
         ctx = new CommandList(this);
         m_contexts.emplace_back(ctx);
-        ctx->m_allocator = NewAllocator(m_queue->PollCurrentFenceValue());
+        ctx->m_allocator = NewAllocator(currentFence);
         ThrowIfFailed(m_device->CreateCommandList(0, m_queue->GetType(), ctx->m_allocator, nullptr, IID_GRAPHICS_PPV_ARGS(ctx->m_list.ReleaseAndGetAddressOf())));
         ctx->m_list->SetName((m_name + L" CommandList").c_str());
     } else {
         ctx = m_contextsRepo.front();
-        ctx->m_allocator = NewAllocator(m_queue->PollCurrentFenceValue());
+        ctx->m_allocator = NewAllocator(currentFence);
         ctx->m_list->Reset(ctx->m_allocator, nullptr);
         m_contextsRepo.pop();
     }
@@ -123,6 +147,7 @@ CommandList* CommandListPool::Begin() {
 
 uint64_t CommandListPool::CloseList(CommandList* ctx, bool blocking)
 {
+    // Ensure m_fenceMutex is acquired before m_mutex.
     uint64_t fenceValue = m_queue->ExecuteCommandList(ctx->m_list.Get());
 
     if (blocking)

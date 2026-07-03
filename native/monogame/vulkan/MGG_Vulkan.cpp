@@ -4827,7 +4827,8 @@ static MGG_Buffer* MGVK_BufferDiscard(MGG_GraphicsDevice* device, MGG_Buffer* bu
 	}
 
 	// We didn't find a match, so allocate a new one.
-	buffer = MGG_Buffer_Create(device, type, false, dataSize);
+	auto dynamic = type == MGBufferType::Constant;
+	buffer = MGG_Buffer_Create(device, type, dynamic, dataSize);
 
 	return buffer;
 }

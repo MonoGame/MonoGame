@@ -531,6 +531,18 @@ void MGG_GraphicsDevice_Destroy(MGG_GraphicsDevice* device)
 	if (device->depthTexture)
 		delete device->depthTexture;
 
+	for (auto discardedBuffer : device->discarded)
+		delete discardedBuffer;
+	device->discarded.clear();
+
+	for (auto pendingBuffer : device->pending)
+		delete pendingBuffer;
+	device->pending.clear();
+
+	for (auto freeBuffer : device->free)
+		delete freeBuffer;
+	device->free.clear();
+
 	delete device->pipelineManager;
 	delete device->resources;
 
@@ -1142,7 +1154,7 @@ void MGDX_ApplyState(MGG_GraphicsDevice* device)
 			// TODO: We should be using a commutative hash in SetSamplerState.
 			// TODO: Hashing the pointers can be dangerous... use unique ids.
 
-			uint32_t hash = MG_ComputeHash((mgbyte*)device->samplers[s], maxSlot * sizeof(MGG_SamplerState*));
+			uint32_t hash = MG_ComputeHash(reinterpret_cast<mgbyte*>(device->samplers[s]), (maxSlot + 1) * sizeof(MGG_SamplerState*));
 			auto iter = device->samplerSetHandles.find(hash);			
 			if (iter != device->samplerSetHandles.end())
 			{

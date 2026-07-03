@@ -128,7 +128,9 @@ void Texture::Create(DeviceResources* device, bool createViews) {
     if (impl->m_allowUAV)
         resDesc.Format = ConvertSRVtoResourceFormat(impl->m_desc.Format);
 
-    D3D12MA::ALLOCATION_DESC allocDesc = { D3D12MA::ALLOCATION_FLAG_COMMITTED, D3D12_HEAP_TYPE_DEFAULT, heapFlags };
+    // ALLOCATION_FLAG_COMMITTED uses dedicated allocation.
+    // ALLOCATION_FLAG_NONE places the resource into existing preallocated pool.
+    D3D12MA::ALLOCATION_DESC allocDesc = { D3D12MA::ALLOCATION_FLAG_NONE, D3D12_HEAP_TYPE_DEFAULT, heapFlags };
 
     ThrowIfFailed(device->GetAllocator()->CreateResource(
         &allocDesc,
