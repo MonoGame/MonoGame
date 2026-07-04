@@ -12,7 +12,7 @@ MonoGame has a `master` branch for stable releases and a `develop` branch for da
 
 If you are looking for ways to help, you should start by looking at the [Help Wanted tasks](https://github.com/mono/MonoGame/issues?q=is%3Aissue+is%3Aopen+label%3A%22Help+Wanted%22).  Please let us know if you plan to work on an issue so that others are not duplicating your work.
 
-> !! An Issue should proceed any PR to outline the change (Unless it is minor or a documentation update), whether it is an actual bug report, a proposal for correction, or additional functionality.
+> !! An Issue should precede any PR to outline the change (Unless it is minor or a documentation update), whether it is an actual bug report, a proposal for correction, or additional functionality.
 
 The MonoGame project follows standard [GitHub flow](https://guides.github.com/introduction/flow/index.html).  You should learn and be familiar with how to [use Git](https://help.github.com/articles/set-up-git/), how to [create a fork of MonoGame](https://help.github.com/articles/fork-a-repo/), and how to [submit a Pull Request](https://help.github.com/articles/using-pull-requests/).
 
