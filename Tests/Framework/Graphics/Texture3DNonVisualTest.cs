@@ -9,9 +9,8 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace MonoGame.Tests.Graphics
 {
-    [TestFixture]
     [NonParallelizable]
-    [RunOnUI]
+    [RunOnUiTestFixture]
     internal class Texture3DNonVisualTest : GraphicsDeviceTestFixtureBase
     {
         Texture3D t;
@@ -44,7 +43,6 @@ namespace MonoGame.Tests.Graphics
         }
 
         [Test]
-        [RunOnUI]
         public void ZeroSizeShouldFailTest()
         {
             Texture3D texture;
@@ -59,7 +57,6 @@ namespace MonoGame.Tests.Graphics
         }
 
         [Test]
-        [RunOnUI]
         public void SetData1ParameterTest()
         {
             Color[] written = new Color[a];
@@ -71,7 +68,6 @@ namespace MonoGame.Tests.Graphics
         [TestCase(a, 0, a)]
         [TestCase(a + 1, 0, a)]
         [TestCase(a + 1, 1, a)]
-        [RunOnUI]
         public void SetData3ParametersSuccessTest(int arrayLength, int startIndex, int elementCount)
         {
             Color[] write = new Color[arrayLength];
@@ -100,7 +96,6 @@ namespace MonoGame.Tests.Graphics
         [TestCase(a, 1, a)]
         [TestCase(a, 0, a + 1)]
         [TestCase(a + 1, 1, a + 1)]
-        [RunOnUI]
         public void SetData3ParametersExceptionTest(int arrayLength, int startIndex, int elementCount)
         {
             Color[] write = new Color[arrayLength];
@@ -116,7 +111,6 @@ namespace MonoGame.Tests.Graphics
         [TestCase((w - 2) * (h - 2) * (d - 2), 0, (w - 2) * (h - 2) * (d - 2), 1, 1, 1, w - 2, h - 2, d - 2)]
         [TestCase(a, 0, a, 0, 0, 0, w, h, d)]
         [TestCase(a + 1, 1, a, 0, 0, 0, w, h, d)]
-        [RunOnUI]
         public void SetData9ParametersSuccessTest(int arrayLength, int startIndex, int elementCount, int x, int y, int z, int w, int h, int d)
         {
             Color[] write = new Color[arrayLength];
@@ -143,7 +137,6 @@ namespace MonoGame.Tests.Graphics
         [Test]
         [TestCase(a, 0, a, -1, -1, -1, w + 1, h + 1, d + 1)]
         [TestCase(a, 1, a, 0, 0, 0, w, h, d)]
-        [RunOnUI]
         public void SetData9ParametersExceptionTest(int arrayLength, int startIndex, int elementCount, int x, int y, int z, int w, int h, int d)
         {
             Color[] write = new Color[arrayLength];
@@ -155,7 +148,6 @@ namespace MonoGame.Tests.Graphics
         }
 
         [Test]
-        [RunOnUI]
         public void NullDeviceShouldThrowArgumentNullException()
         {
             Assert.Throws<ArgumentNullException>(() => 

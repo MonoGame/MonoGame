@@ -344,7 +344,9 @@ namespace Microsoft.Xna.Framework.Graphics
 
             framebufferHelper = FramebufferHelper.Create(this);
 
-            if (GraphicsCapabilities.SupportsSRgb)
+            var backBufferFormat = PresentationParameters.BackBufferFormat;
+            if (GraphicsCapabilities.SupportsSRgb &&
+                (backBufferFormat == SurfaceFormat.ColorSRgb || backBufferFormat == SurfaceFormat.Bgr32SRgb || backBufferFormat == SurfaceFormat.Bgra32SRgb))
             {
                 GL.Enable(EnableCap.FramebufferSrgb);
                 GraphicsExtensions.CheckGLError();

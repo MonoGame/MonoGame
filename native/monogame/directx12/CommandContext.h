@@ -51,6 +51,7 @@ public:
     CommandContext(DeviceResources* deviceResources); // CommandContext cannot be constructed from C#
     ~CommandContext();
 
+    void Reset();
     void Reset(unsigned int backBufferIndex);
     uint64_t Close();
 
@@ -72,6 +73,5 @@ public:
 
     void CreateDefaultRootSignature();
     void CreateGenerateMipPipelineResources();
-
 };
 }

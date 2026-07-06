@@ -29,6 +29,7 @@ private:
     HWND m_window;
 #endif
 
+    bool m_allowTearing = false;
     uint32_t m_backBufferIndex = 0;
     MGSurfaceFormat m_backBufferFormat;
     uint32_t m_backBufferCount;
@@ -216,7 +217,17 @@ public:
         }
 
         m_commandContext = std::make_unique<CommandContext>(device);
+
+        BOOL allowTearing = FALSE;
+        if (SUCCEEDED(m_dxgiFactory->CheckFeatureSupport(
+            DXGI_FEATURE_PRESENT_ALLOW_TEARING,
+            &allowTearing,
+            sizeof(allowTearing))))
+        {
+            m_allowTearing = allowTearing == TRUE;
+        }
     }
+
 
     // TODO: all that should probably be moved to the MG backend
     void CreateWindowSizeDependentResources(DeviceResources* device, unsigned int width, unsigned int height, float r, float g, float b, float a, int msaaCount) {
@@ -246,9 +257,13 @@ public:
 #else
         const DXGI_FORMAT backBufferFormat = TextureFormatToDXGI_FORMAT(m_backBufferFormat);
 
+        UINT flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;
+        if (m_allowTearing)
+            flags |= DXGI_SWAP_CHAIN_FLAG_ALLOW_TEARING;
+
         // If the swap chain already exists, resize it, otherwise create one.
         if (m_swapChain) {
-            bool lost = HandleLost(m_swapChain->ResizeBuffers(m_backBufferCount, width, height, backBufferFormat, DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH));
+            bool lost = HandleLost(m_swapChain->ResizeBuffers(m_backBufferCount, width, height, backBufferFormat, flags));
             if (lost) return;
         } else {
             // Create a descriptor for the swap chain.
@@ -263,7 +278,7 @@ public:
             swapChainDesc.Scaling = DXGI_SCALING_STRETCH;
             swapChainDesc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;
             swapChainDesc.AlphaMode = DXGI_ALPHA_MODE_IGNORE;
-            swapChainDesc.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;
+            swapChainDesc.Flags = flags;
 
             DXGI_SWAP_CHAIN_FULLSCREEN_DESC fsSwapChainDesc = {};
             fsSwapChainDesc.Scaling = DXGI_MODE_SCALING_UNSPECIFIED;
@@ -352,6 +367,9 @@ public:
 #else
     void Present(UINT sync, UINT flags) {
         BeforePresent();
+
+        if (sync == 0 && m_allowTearing)
+            flags |= DXGI_PRESENT_ALLOW_TEARING;
 
         HandleLost(m_swapChain->Present(sync, flags));
 

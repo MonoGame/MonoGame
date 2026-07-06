@@ -67,9 +67,8 @@ CommandContext::~CommandContext() {
     }
 }
 
-void CommandContext::Reset(unsigned int currentFrame) {
-    m_backBufferIndex = currentFrame;
-
+void CommandContext::Reset()
+{
     for (auto t : m_tempTextures[m_backBufferIndex]) {
         t->FreeDescriptors(m_deviceRes);
         delete t;
@@ -87,10 +86,16 @@ void CommandContext::Reset(unsigned int currentFrame) {
     };
     cmdList->SetDescriptorHeaps(_countof(descriptorHeaps), descriptorHeaps);
 
+    m_cbOffset = 0;
+}
+
+void CommandContext::Reset(unsigned int currentFrame) {
+    m_backBufferIndex = currentFrame;
+
+    Reset();
+
     m_currentRT.clear();
     m_currentDepthStencil = nullptr;
-
-    m_cbOffset = 0;
 }
 
 uint64_t CommandContext::Close() {

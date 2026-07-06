@@ -8,10 +8,10 @@ using MonoGame.Tests.Framework.Components;
 
 namespace MonoGame.Tests.Framework
 {
+    [RunOnUiTestFixture]
     public static class GameComponentTest
     {
         [Test]
-        [RunOnUI]
 #if DESKTOPGL
         [Ignore("This crashes inside SDL on Mac!")]
 #endif
@@ -63,7 +63,5 @@ namespace MonoGame.Tests.Framework
             Assert.That(postBaseInitialize.InitOrder == -1);
             Assert.That(postBaseInitialize2.InitOrder == -1);
         }
-
-
     }
 }

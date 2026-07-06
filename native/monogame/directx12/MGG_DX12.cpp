@@ -443,6 +443,9 @@ void MGG_GraphicsDevice_ResolveRenderTargets(MGG_GraphicsDevice* device)
 {
 	assert(device != nullptr);
 
+	if (!device->is_recording)
+		return;
+
 	auto& currentRT = device->context->m_currentRT;
 	if (currentRT.size() == 0)
 		return;
@@ -742,7 +745,7 @@ void MGG_GraphicsDevice_GetBackBufferData(MGG_GraphicsDevice* device, mgint x, m
 	if (restart_cmdlist)
 	{
 		auto context = device->resources->GetCommandContext();
-		context->Reset(context->m_backBufferIndex);
+		context->Reset();
 
 		device->pipelineManager->Prepare();
 		device->indexBufferDirty = true;
@@ -1778,7 +1781,7 @@ void MGG_Texture_GetData(MGG_GraphicsDevice* device, MGG_Texture* texture, mgint
 	if (restart_cmdlist)
 	{
 		auto context = device->resources->GetCommandContext();
-		context->Reset(context->m_backBufferIndex);
+		context->Reset();
 
 		device->pipelineManager->Prepare();
 		device->indexBufferDirty = true;

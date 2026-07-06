@@ -9,12 +9,11 @@ using NUnit.Framework;
 
 namespace MonoGame.Tests.Graphics
 {
-    [TestFixture]
     [NonParallelizable]
+    [RunOnUiTestFixture]
     class RenderTarget2DTest : GraphicsDeviceTestFixtureBase
     {
         [Test]
-        [RunOnUI]
         public void ZeroSizeShouldFailTest()
         {
             RenderTarget2D renderTarget;
@@ -24,7 +23,6 @@ namespace MonoGame.Tests.Graphics
         }
 
         [Test]
-        [RunOnUI]
         public void NullDeviceShouldThrowArgumentNullException()
         {
             Assert.Throws<ArgumentNullException>(() => 
@@ -39,7 +37,6 @@ namespace MonoGame.Tests.Graphics
 #if XNA
         [Ignore("XNA mipmaps fail our pixel comparison tests")]
 #endif
-        [RunOnUI]
         public void GenerateMips()
         {
 #if VULKAN
@@ -140,7 +137,6 @@ namespace MonoGame.Tests.Graphics
 #endif
         [TestCase(SurfaceFormat.NormalizedByte2, SurfaceFormat.Color)]
         [TestCase(SurfaceFormat.NormalizedByte4, SurfaceFormat.Color)]
-        [RunOnUI]
         public void PreferredSurfaceFormatTest(SurfaceFormat preferredSurfaceFormat, SurfaceFormat expectedSurfaceFormat)
         {                    
             var renderTarget = new RenderTarget2D(gd, 16, 16, false, preferredSurfaceFormat, DepthFormat.None);
@@ -152,7 +148,6 @@ namespace MonoGame.Tests.Graphics
 #if DESKTOPGL
         [Ignore ("Causes GL.GetError() returned 1282. Need to fix.")]
 #endif
-        [RunOnUI]
         public void GetDataMSAA()
         {
             const int size = 100;
@@ -178,7 +173,6 @@ namespace MonoGame.Tests.Graphics
         [Test]
         [TestCase(1)]
         [TestCase(2)]
-        [RunOnUI]
         public void GetSharedHandle(int preferredMultiSampleCount)
         {
             var rt = new RenderTarget2D(gd, 16, 16, false, SurfaceFormat.Color, DepthFormat.None, preferredMultiSampleCount, RenderTargetUsage.PlatformContents, true);            
