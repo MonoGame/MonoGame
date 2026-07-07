@@ -8,7 +8,7 @@ concurrency:
 
 env:
   DotnetVersion: 9.0.314
-  XCodeVersion: 26.4
+  XCodeVersion: 26.3
   
 jobs:
   build:
