@@ -544,9 +544,10 @@ void MGG_GraphicsDevice_Destroy(MGG_GraphicsDevice* device)
 	device->free.clear();
 
 	delete device->pipelineManager;
-	delete device->resources;
 
+	auto resources = device->resources;
 	delete device;
+	delete resources;
 }
 
 void MGG_GraphicsDevice_GetCaps(MGG_GraphicsDevice* device, MGG_GraphicsDevice_Caps& caps)
