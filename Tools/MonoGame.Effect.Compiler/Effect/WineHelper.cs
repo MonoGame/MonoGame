@@ -39,15 +39,15 @@ namespace MonoGame.Effect.Compiler
             proc.StartInfo.CreateNoWindow = true;
             proc.StartInfo.RedirectStandardOutput = true;
 
-            foreach (var wine in exes)
+            foreach (var exe in exes)
             {
                 proc.StartInfo.FileName = "which";
-                proc.StartInfo.Arguments = wine;
+                proc.StartInfo.Arguments = exe;
                 proc.Start();
                 proc.WaitForExit();
                 if (proc.ExitCode == 0)
                 {
-                    return wine;
+                    return exe;
                 }
             }
             return string.Empty;
