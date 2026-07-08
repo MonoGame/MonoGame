@@ -29,6 +29,8 @@ private:
     HWND m_window;
 #endif
 
+    std::atomic<uint32_t> m_frame = 0;
+
     bool m_allowTearing = false;
     uint32_t m_backBufferIndex = 0;
     MGSurfaceFormat m_backBufferFormat;
@@ -52,6 +54,7 @@ private:
         D3D12_RESOURCE_DESC desc;
         Microsoft::WRL::ComPtr<ID3D12Resource> buffer;
         Microsoft::WRL::ComPtr<D3D12MA::Allocation> alloc;
+        uint32_t frame;
     };
 
     std::mutex m_bufferMutex;
@@ -112,6 +115,23 @@ public:
 
         // Must be last as it will dump memory leaks.
         m_allocator.Reset();
+    }
+
+    void CleanupTempBuffers(uint32_t frame)
+    {
+        const int FREE_DELAY = 16;
+
+        auto iter = m_tempBuffers.begin();
+        for (; iter != m_tempBuffers.end();)
+        {
+            if ((frame - iter->frame) > FREE_DELAY)
+            {
+                iter = m_tempBuffers.erase(iter);
+                continue;
+            }
+
+            iter++;
+        }
     }
 
 #if defined(_GAMING_XBOX)
@@ -392,6 +412,11 @@ public:
         m_heaps->Prepare(m_backBufferIndex);
         m_commandContext->Reset(m_backBufferIndex);
 
+        {
+            std::lock_guard<std::mutex> lock(m_bufferMutex);
+            CleanupTempBuffers(m_frame);
+        }
+
         std::vector<D3D12_RESOURCE_BARRIER> batch;
         GetMainTarget()->Transition(batch, m_commandContext->GetCommandList(), D3D12_RESOURCE_STATE_RENDER_TARGET);
 
@@ -427,6 +452,7 @@ public:
         m_queue->PresentX(1, &planeParameters, nullptr);
 
         m_backBufferIndex = (m_backBufferIndex + 1) % m_backBufferCount;
+        ++m_frame;
     }
 #else
     void Present(UINT sync, bool vsync) {
@@ -441,6 +467,7 @@ public:
         m_fenceValues[m_backBufferIndex] = m_queue->SignalFence();
 
         m_backBufferIndex = m_swapChain->GetCurrentBackBufferIndex();
+        ++m_frame;
     }
 
     void SetWindow(HWND window) noexcept {
@@ -703,6 +730,12 @@ ID3D12Resource* Graphics::DeviceResources::TakeUploadBuffer(D3D12_HEAP_TYPE type
 {
     std::lock_guard<std::mutex> lock(pImpl->m_bufferMutex);
 
+    const uint32_t frame = pImpl->m_frame;
+
+    int retry_count = 0;
+
+RETRY_FIND_BUFFER:
+
     uint64_t fence = pImpl->m_queue->PollCurrentFenceValue();
 
     ID3D12Resource* buffer = nullptr;
@@ -712,50 +745,44 @@ ID3D12Resource* Graphics::DeviceResources::TakeUploadBuffer(D3D12_HEAP_TYPE type
     {
         if (iter->fence > fence)
             continue;
-
         if (iter->type != type)
             continue;
-
         if (iter->desc.Width < desc.Width)
             continue;
 
         buffer = iter->buffer.Get();
-		iter->fence = UINT64_MAX;   // TODO: Handle fence wrap.
+		iter->fence = UINT64_MAX;
+        iter->frame = frame;
         break;
     }
 
     if (buffer == nullptr)
     {
-        // TODO: These should be configurable.
-        // https://github.com/MonoGame/MonoGame/issues/9382
-        constexpr size_t MAX_BUFFER_POOL_SIZE = 64;
-	    constexpr size_t MIN_BUFFER_POOL_SIZE = 32;
+        pImpl->CleanupTempBuffers(frame);
 
-        // Evict old buffers that are too small to reduce memory pressure.
-        // This will likely mean we'll keep creating larger and larger buffers.
-		// It's not ideal. Should we have more sophisticated memory management?
-        if (pImpl->m_tempBuffers.size() >= MAX_BUFFER_POOL_SIZE)
+        const int MAX_BUFFER_POOL_SIZE = 32;
+        if (pImpl->m_tempBuffers.size() > MAX_BUFFER_POOL_SIZE)
         {
-            auto evictionIter = pImpl->m_tempBuffers.begin();
-            while (pImpl->m_tempBuffers.size() >= MIN_BUFFER_POOL_SIZE
-                && evictionIter != pImpl->m_tempBuffers.end())
+            if (retry_count > 10)
             {
-                if (evictionIter->fence <= fence
-                    && evictionIter->desc.Width < desc.Width)
-                {
-                    evictionIter = pImpl->m_tempBuffers.erase(evictionIter);
-                }
-                else
-                {
-                    ++evictionIter;
-                }
+                // If we've retried a few times either we don't
+                // have one that is reusable of this type/size or
+                // we have some VERY heavy work happening... either
+                // way don't block further and allocate one more.
+            }
+            else
+            {
+                // The upload buffers are being processed by the GPU, so if we
+                // retry it should free one to avoid using too much memory.
+                goto RETRY_FIND_BUFFER;
             }
         }
 
         Impl::TempBuffer upload;
-        upload.fence = UINT64_MAX;  // TODO: Handle fence wrap.
+        upload.fence = UINT64_MAX;
         upload.desc = desc;
         upload.type = type;
+        upload.frame = frame;
 
         // We want these generally small temp buffers used to transfer data
         // to and from the GPU into shared pages and not a dedicated allocation.
