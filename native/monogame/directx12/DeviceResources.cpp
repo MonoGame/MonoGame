@@ -290,7 +290,7 @@ public:
 
 
     // TODO: all that should probably be moved to the MG backend
-    void CreateWindowSizeDependentResources(DeviceResources* device, unsigned int width, unsigned int height, float r, float g, float b, float a, int msaaCount, bool vsync) {
+    void CreateWindowSizeDependentResources(DeviceResources* device, unsigned int width, unsigned int height, float r, float g, float b, float a, int msaaCount) {
         WaitForGpu();
 
 #if defined(_GAMING_XBOX)
@@ -440,10 +440,11 @@ public:
         m_backBufferIndex = (m_backBufferIndex + 1) % m_backBufferCount;
     }
 #else
-    void Present(UINT sync, UINT flags) {
+    void Present(UINT sync, bool vsync) {
         BeforePresent();
 
-        if (sync == 0 && m_allowTearing)
+        UINT flags = 0;
+        if (sync == 0 && !vsync && m_allowTearing)
             flags |= DXGI_PRESENT_ALLOW_TEARING;
 
         HandleLost(m_swapChain->Present(sync, flags));
@@ -625,8 +626,8 @@ void DeviceResources::CreateDeviceResources(IDXGIFactory6* factory, IDXGIAdapter
 #endif
 
 // These resources need to be recreated every time the window size is changed.
-void DeviceResources::CreateWindowSizeDependentResources(int width, int height, float r, float g, float b, float a, int msaaCount, bool vsync) {
-    pImpl->CreateWindowSizeDependentResources(this, width, height, r, g, b, a, msaaCount, vsync);
+void DeviceResources::CreateWindowSizeDependentResources(int width, int height, float r, float g, float b, float a, int msaaCount) {
+    pImpl->CreateWindowSizeDependentResources(this, width, height, r, g, b, a, msaaCount);
 }
 
 // Prepare the command list and render target for rendering.
@@ -653,8 +654,8 @@ void DeviceResources::Resume() {
 }
 #else
 
-void DeviceResources::Present(int sync, int flags) {
-    pImpl->Present(sync, flags);
+void DeviceResources::Present(int sync, bool vsync) {
+    pImpl->Present(sync, vsync);
 }
 
 void DeviceResources::SetWindow(void* hwnd) {

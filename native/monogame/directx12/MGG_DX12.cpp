@@ -618,7 +618,7 @@ void MGG_GraphicsDevice_ResizeSwapchain(
 
 	device->vsync = syncInterval > 0;
 
-	device->resources->CreateWindowSizeDependentResources(width, height, 0, 0, 0, 0, multiSampleCount, device->vsync);
+	device->resources->CreateWindowSizeDependentResources(width, height, 0, 0, 0, 0, multiSampleCount);
 	device->begin_frame_index = -1;
 
 	if (device->depthTexture)
@@ -744,7 +744,7 @@ void MGG_GraphicsDevice_Present(MGG_GraphicsDevice* device, mgint currentFrame, 
 	assert(device->is_recording);
 
 #if !defined(_GAMING_XBOX)
-	device->resources->Present(syncInterval, device->vsync ? 0 : DXGI_PRESENT_ALLOW_TEARING);
+	device->resources->Present(syncInterval, device->vsync);
 #else
 	device->resources->PresentX();
 #endif
