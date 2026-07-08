@@ -19,6 +19,11 @@ public sealed class RepackForDeployTask : FrostingTask<BuildContext>
         // mgcb
         context.DotNetPack(context.GetProjectPath(ProjectType.Tools, "MonoGame.Content.Builder"), context.DotNetPackSettings);
 
+        // Repack mgcb-editor-linux with all existing architectures.
+        // This ensures libmgpipeline.so is shipped for both linux-x64 and linux-arm64.
+        context.DotNetPublish(context.GetProjectPath(ProjectType.MGCBEditor, "Linux"), context.DotNetPublishSettings);
+        context.DotNetPack(context.GetProjectPath(ProjectType.MGCBEditorLauncher, "Linux"), context.DotNetPackSettings);
+
         context.DotNetPackSettings.MSBuildSettings.Properties.Remove("DisableNativeBuild");
     }
 }
