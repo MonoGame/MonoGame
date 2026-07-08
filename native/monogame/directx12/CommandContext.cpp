@@ -57,9 +57,12 @@ CommandContext::CommandContext(DeviceResources* deviceResources) : m_deviceRes(d
     }
 }
 
-CommandContext::~CommandContext() {
-    for (size_t i = 0; i < MAX_BACK_BUFFER_COUNT; ++i) {
-        for (auto t : m_tempTextures[i]) {
+CommandContext::~CommandContext()
+{
+    for (size_t i = 0; i < MAX_BACK_BUFFER_COUNT; ++i)
+    {
+        for (auto t : m_tempTextures[i])
+        {
             t->FreeDescriptors(m_deviceRes);
             delete t;
         }

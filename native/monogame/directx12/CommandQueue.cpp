@@ -121,7 +121,8 @@ void CommandQueue::ResumeX() {
 }
 #endif
 
-CommandList* CommandListPool::Begin() {
+CommandList* CommandListPool::Begin()
+{
     // Ensure m_fenceMutex is acquired before m_mutex.
     uint64_t currentFence = m_queue->PollCurrentFenceValue();
 
