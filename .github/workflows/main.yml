@@ -26,16 +26,13 @@ jobs:
           - os: ubuntu-24.04
             platform: linux
             shell: bash
-            container: registry.gitlab.steamos.cloud/steamrt/sniper/sdk:latest
           - os: ubuntu-22.04-arm
             platform: linux-arm
             shell: bash
-            container: registry.gitlab.steamos.cloud/steamrt/sniper/sdk/arm64:latest
       fail-fast: false
     defaults:
       run:
         shell: ${{ matrix.shell }}
-    container: ${{ (matrix.platform == 'linux' || matrix.platform == 'linux-arm') && matrix.container || null }}
     steps:
       - name: Free disk space
         if: runner.environment == 'github-hosted' && runner.os == 'Linux'
@@ -205,6 +202,59 @@ jobs:
         env:
           ACTIONS_RUNTIME_TOKEN: ${{ env.ACTIONS_RUNTIME_TOKEN }}
           ACTIONS_RUNTIME_URL: "${{ env.ACTIONS_RUNTIME_URL }}"
+
+  build-native:
+    needs: [ build ]
+    name: buildnative-${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        include:
+          - os: ubuntu-22.04
+            platform: linux
+            shell: bash
+            container: registry.gitlab.steamos.cloud/steamrt/sniper/sdk:latest
+          - os: ubuntu-22.04-arm64
+            platform: linux
+            shell: bash
+            container: registry.gitlab.steamos.cloud/steamrt/sniper/sdk/arm64:latest
+      fail-fast: false
+    defaults:
+      run:
+        shell: ${{ matrix.shell }}
+    container: ${{ matrix.container }}
+    steps:
+      - name: Clone Repository
+        uses: actions/checkout@v5
+        with:
+          submodules: recursive
+      - name: Install SDL2 deps on Linux
+        run: |
+          sudo apt-get install -y --no-install-recommends \
+            libasound2-dev libpulse-dev libaudio-dev libjack-jackd2-dev libsndio-dev libsamplerate0-dev \
+            libx11-dev libxext-dev libxrandr-dev libxcursor-dev libxfixes-dev libxi-dev libxss-dev \
+            libwayland-dev libxkbcommon-dev libdrm-dev libgbm-dev libgl1-mesa-dev libgles2-mesa-dev \
+            libegl1-mesa-dev libdbus-1-dev libibus-1.0-dev libudev-dev fcitx-libs-dev \
+            libpipewire-0.3-dev libdecor-0-dev
+      - name: Build Premake5
+        run: |
+          git clone https://github.com/premake/premake-core.git ${GITHUB_WORKSPACE}/premake-core
+          cd ${GITHUB_WORKSPACE}/premake-core
+          ./Bootstrap.sh
+          echo "${GITHUB_WORKSPACE}/premake-core/bin/release" >> "$GITHUB_PATH"
+      - name: Generate global.json
+        run: |
+          echo '{ "sdk": { "version": "${{ env.DotnetVersion }}" } }' > global.json
+          echo "runner.arch=${{ runner.arch }}"
+      - name: Setup .NET Core SDK
+        uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: '${{ env.DotnetVersion }}'
+          global-json-file: "./global.json"
+      - name: Build
+        run: |
+          dotnet run --project build/Build.csproj -- --target="Build Native"
+          dotnet run --project build/Build.csproj -- --target="Build Content Pipeline"
 
   pack-native-runtime:
     name: PackNativeRuntime
