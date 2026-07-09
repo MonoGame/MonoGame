@@ -92,7 +92,9 @@ public:
         m_heaps.reset();
         m_commandListPool.reset();
         m_queue.reset();
+#if !defined(_GAMING_XBOX)
         m_swapChain.Reset();
+#endif
 
 #if defined(_DEBUG)
         Microsoft::WRL::ComPtr<ID3D12DebugDevice> debugDevice;
@@ -103,7 +105,7 @@ public:
 #endif
         m_d3dDevice.Reset();
 
-#if defined(_DEBUG)
+#if defined(_DEBUG) && !defined(_GAMING_XBOX)
         Microsoft::WRL::ComPtr<IDXGIDebug1> dxgiDebug;
         if (SUCCEEDED(DXGIGetDebugInterface1(0, IID_PPV_ARGS(&dxgiDebug)))) {
             dxgiDebug->ReportLiveObjects(
@@ -111,8 +113,10 @@ public:
                 DXGI_DEBUG_RLO_FLAGS(DXGI_DEBUG_RLO_DETAIL | DXGI_DEBUG_RLO_IGNORE_INTERNAL));
         }
 #endif
-        m_dxgiFactory.Reset();
 
+#if !defined(_GAMING_XBOX)
+        m_dxgiFactory.Reset();
+#endif
         // Must be last as it will dump memory leaks.
         m_allocator.Reset();
     }
@@ -288,6 +292,7 @@ public:
         m_commandContext = std::make_unique<CommandContext>(device);
 
         BOOL allowTearing = FALSE;
+#if !defined(_GAMING_XBOX)
         if (SUCCEEDED(m_dxgiFactory->CheckFeatureSupport(
             DXGI_FEATURE_PRESENT_ALLOW_TEARING,
             &allowTearing,
@@ -295,6 +300,7 @@ public:
         {
             m_allowTearing = allowTearing == TRUE;
         }
+#endif
     }
 
 
@@ -319,7 +325,7 @@ public:
 
 #if defined(_GAMING_XBOX)
         for (UINT n = 0; n < m_backBufferCount; n++) {
-            m_displayTargets[n] = new Texture(SurfaceType::SwapChainRenderTarget, TextureDimension::Texture2D, width, height, 1, m_backBufferFormat);
+            m_displayTargets[n] = new Texture(SurfaceType::SwapChainRenderTarget, TextureDimension::Texture2D, width, height, 1, 1, m_backBufferFormat);
             m_displayTargets[n]->SetClearColor(r, g, b, a);
             m_displayTargets[n]->Create(device);
         }
