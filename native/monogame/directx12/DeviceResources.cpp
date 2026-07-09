@@ -523,6 +523,8 @@ public:
         m_queue->ResumeX();
 
         RegisterFrameEvents();
+
+        WaitForOrigin();
     }
 
     void WaitForOrigin() {
