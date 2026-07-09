@@ -35,7 +35,7 @@ jobs:
     defaults:
       run:
         shell: ${{ matrix.shell }}
-    container: ${{ matrix.os == 'linux' && matrix.container || null }}
+    container: ${{ matrix.platform == 'linux' || matrix.platform == 'linux-arm' && matrix.container || null }}
     steps:
       - name: Free disk space
         if: runner.environment == 'github-hosted' && runner.os == 'Linux'
