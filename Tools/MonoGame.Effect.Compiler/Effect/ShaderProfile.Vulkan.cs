@@ -1,4 +1,4 @@
-﻿// MonoGame - Copyright (C) MonoGame Foundation, Inc
+// MonoGame - Copyright (C) MonoGame Foundation, Inc
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
@@ -403,14 +403,14 @@ namespace MonoGame.Effect
 
                     foreach (SpirvVariable input in sorted)
                     {
-                        var a = new ShaderData.Attribute();
                         var semanticId = input.HlslSemantic ?? input.Id.Replace("%in_var_", "");
 
                         var m = Regex.Match(semanticId, @"(\D+)(\d+)?");
-                        if (m.Groups[2].Success)
-                            a.index = int.Parse(m.Groups[2].Value);
-                        else
-                            a.index = 0;
+                        int indexOffset = m.Groups[2].Success
+                            ? int.Parse(m.Groups[2].Value)
+                            : 0;
+
+                        var usage = VertexElementUsage.TextureCoordinate;
 
                         if (m.Groups[1].Success)
                         {
@@ -419,57 +419,82 @@ namespace MonoGame.Effect
                                 default:
                                     // Give a warning which hopefully someone notices.
                                     errorsAndWarnings += $"Unknown vertex shader input semantic `{m.Groups[1].Value}`; defaulting to texture coord.\n";
-                                    a.usage = VertexElementUsage.TextureCoordinate;
+                                    usage = VertexElementUsage.TextureCoordinate;
                                     break;
                                 case "TEXCOORD":
-                                    a.usage = VertexElementUsage.TextureCoordinate;
+                                    usage = VertexElementUsage.TextureCoordinate;
                                     break;
                                 // NOTE: Some shaders incorrectly pass in SV_POSITION to
                                 // the vertex shader which is allowed in DX11, so we allow
                                 // it here as well.
                                 case "SV_POSITION":
                                 case "POSITION":
-                                    a.usage = VertexElementUsage.Position;
+                                    usage = VertexElementUsage.Position;
                                     break;
                                 case "NORMAL":
-                                    a.usage = VertexElementUsage.Normal;
+                                    usage = VertexElementUsage.Normal;
                                     break;
                                 case "TANGENT":
-                                    a.usage = VertexElementUsage.Tangent;
+                                    usage = VertexElementUsage.Tangent;
                                     break;
                                 case "BINORMAL":
-                                    a.usage = VertexElementUsage.Binormal;
+                                    usage = VertexElementUsage.Binormal;
                                     break;
                                 case "COLOR":
-                                    a.usage = VertexElementUsage.Color;
+                                    usage = VertexElementUsage.Color;
                                     break;
                                 case "BLENDINDICES":
-                                    a.usage = VertexElementUsage.BlendIndices;
+                                    usage = VertexElementUsage.BlendIndices;
                                     break;
                                 case "BLENDWEIGHT":
-                                    a.usage = VertexElementUsage.BlendWeight;
+                                    usage = VertexElementUsage.BlendWeight;
                                     break;
                                 case "DEPTH":
-                                    a.usage = VertexElementUsage.Depth;
+                                    usage = VertexElementUsage.Depth;
                                     break;
                                 case "FOG":
-                                    a.usage = VertexElementUsage.Fog;
+                                    usage = VertexElementUsage.Fog;
                                     break;
                                 case "POINTSIZE":
-                                    a.usage = VertexElementUsage.PointSize;
+                                    usage = VertexElementUsage.PointSize;
                                     break;
                                 case "TESSELLATEFACTOR":
-                                    a.usage = VertexElementUsage.TessellateFactor;
+                                    usage = VertexElementUsage.TessellateFactor;
                                     break;
                             }
                         }
 
-                        // TODO: These are unused at runtime under the
-                        // new native backends, we will remove them soon.               
-                        a.location = 0;
-                        a.name = string.Empty;
+                        uint locationCount = 1;
+                        var pointerType = input.Pointer?.PointerType;
+                        
+                        if (pointerType is SpirvTypeArray spirvTypeArray)
+                        {
+                            locationCount = spirvTypeArray.Length;
+                            if (spirvTypeArray.ElementType is SpirvTypeMatrix spirvTypeMatrix)
+                            {
+                                locationCount *= spirvTypeMatrix.Columns;
+                            }
+                        }
+                        else if (pointerType is SpirvTypeMatrix spirvTypeMatrix)
+                        {
+                            locationCount = spirvTypeMatrix.Columns;
+                        }
 
-                        attributes.Add(a);
+                        for (int locationIndex = 0; locationIndex < locationCount; locationIndex++)
+                        {
+                            var a = new ShaderData.Attribute
+                            {
+                                usage = usage,
+                                index = indexOffset + locationIndex,
+                                
+                                // TODO: These are unused at runtime under the
+                                // new native backends, we will remove them soon.               
+                                location = 0,
+                                name = string.Empty,
+                            };
+
+                            attributes.Add(a);
+                        }
                     }
                 }
 
