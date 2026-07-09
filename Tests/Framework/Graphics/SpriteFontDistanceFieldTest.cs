@@ -10,7 +10,7 @@ using NUnit.Framework;
 
 namespace MonoGame.Tests.Graphics
 {
-    [TestFixture]
+    [RunOnUiTestFixture]
     [NonParallelizable]
     class SpriteFontDistanceFieldTest : GraphicsDeviceTestFixtureBase
     {
@@ -34,7 +34,6 @@ namespace MonoGame.Tests.Graphics
         }
 
         [Test]
-        [RunOnUI]
         public void DefaultFont_IsNotDistanceField()
         {
             // Internal property should report false for existing assets.
@@ -42,7 +41,6 @@ namespace MonoGame.Tests.Graphics
         }
 
         [Test]
-        [RunOnUI]
         public void DistanceFieldFlags_TriggerEffectParameterApplication()
         {
             // Arrange: reflectively set internal DF metadata on an existing font instance
