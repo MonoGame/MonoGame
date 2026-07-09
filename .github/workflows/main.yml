@@ -26,13 +26,16 @@ jobs:
           - os: ubuntu-24.04
             platform: linux
             shell: bash
+            container: registry.gitlab.steamos.cloud/steamrt/sniper/sdk:latest
           - os: ubuntu-22.04-arm
             platform: linux-arm
             shell: bash
+            container: registry.gitlab.steamos.cloud/steamrt/sniper/sdk/arm64:latest
       fail-fast: false
     defaults:
       run:
         shell: ${{ matrix.shell }}
+    container: ${{ matrix.os == 'linux' && matrix.container || null }}
     steps:
       - name: Free disk space
         if: runner.environment == 'github-hosted' && runner.os == 'Linux'
