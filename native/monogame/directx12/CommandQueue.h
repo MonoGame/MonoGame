@@ -31,20 +31,17 @@ public:
 #endif
 
     uint64_t PollCurrentFenceValue();
-    ID3D12Fence* GetFence() { return m_fence.Get(); }
     D3D12_COMMAND_LIST_TYPE GetType() const { return m_type; }
 
 private:
     Microsoft::WRL::ComPtr<ID3D12CommandQueue> m_queue;
-    D3D12_COMMAND_LIST_TYPE  m_type;
+    D3D12_COMMAND_LIST_TYPE m_type;
     std::wstring m_name;
 
     std::mutex m_fenceMutex;
-    std::mutex m_eventMutex;
 
     Microsoft::WRL::ComPtr<ID3D12Fence> m_fence;
-    uint64_t m_lastCompletedFenceValue = 0;
-    uint64_t m_nextFenceValue = m_lastCompletedFenceValue + 1;
+    uint64_t m_nextFenceValue = 1;
 };
 
 // Simplification of https://github.com/microsoft/DirectX-Graphics-Samples/blob/master/MiniEngine/Core/CommandAllocatorPool.cpp
@@ -58,13 +55,8 @@ class CommandListPool {
     std::mutex m_mutex;
 
     std::wstring m_name;
-    
-    std::vector<std::unique_ptr<CommandList>> m_contexts;
-    std::vector<Microsoft::WRL::ComPtr<ID3D12CommandAllocator>> m_allocators;
 
-    // free pool
-    std::queue<CommandList*> m_contextsRepo;
-    std::queue<std::pair<uint64_t, ID3D12CommandAllocator*>> m_allocatorsRepo;  
+    std::vector<CommandList*> m_freeContexts;
 
 public:
     CommandListPool(ID3D12Device* device, CommandQueue* queue)
@@ -72,11 +64,12 @@ public:
     {
     }
 
+    ~CommandListPool();
+
     CommandList* Begin();
 
 private:
 
-    ID3D12CommandAllocator* NewAllocator(uint64_t fenceValue);
     uint64_t CloseList(CommandList* ctx, bool blocking);
 
     friend class CommandList;
@@ -89,7 +82,8 @@ private:
     friend class CommandListPool;
 
     CommandListPool* m_pool = nullptr;
-    ID3D12CommandAllocator* m_allocator = nullptr;
+    Microsoft::WRL::ComPtr<ID3D12CommandAllocator> m_allocator;
+    uint64_t m_fence = 0;
 
     Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList> m_list;
 
