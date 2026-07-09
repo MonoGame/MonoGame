@@ -43,9 +43,9 @@ jobs:
         with:
           android: false
           dotnet: false 
-          docker-images: true
-          large-packages: true
-          swap-storage: true
+          docker-images: false
+          large-packages: false
+          swap-storage: false
 
       - name: Clone repository
         uses: actions/checkout@v5
