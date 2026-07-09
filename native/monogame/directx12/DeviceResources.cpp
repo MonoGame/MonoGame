@@ -769,7 +769,7 @@ RETRY_FIND_BUFFER:
         const int MAX_BUFFER_POOL_SIZE = 32;
         if (pImpl->m_tempBuffers.size() > MAX_BUFFER_POOL_SIZE)
         {
-            if (retry_count > 10)
+            if (++retry_count > 10)
             {
                 // If we've retried a few times either we don't
                 // have one that is reusable of this type/size or
