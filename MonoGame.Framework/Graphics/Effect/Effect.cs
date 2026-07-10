@@ -1,4 +1,4 @@
-// MonoGame - Copyright (C) The MonoGame Team
+﻿// MonoGame - Copyright (C) MonoGame Foundation, Inc
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
@@ -9,6 +9,9 @@ using MonoGame.Framework.Utilities;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
+    /// <summary>
+    /// Used to set and query shader effects, and to choose techniques.
+    /// </summary>
 	public class Effect : GraphicsResource
     {
         struct MGFXHeader 
@@ -26,7 +29,13 @@ namespace Microsoft.Xna.Framework.Graphics
             /// We should avoid supporting old versions for very long if at all 
             /// as users should be rebuilding content when packaging their game.
             /// </remarks>
-            public const int MGFXVersion = 10;
+            public const int MGFXVersion = 11;
+
+            /// <summary>
+            /// This is the minimum version of MGFX file we can support
+            /// for cases when the changes are backwards compatible.
+            /// </summary>
+            public const int MGFXMinVersion = 10;
 
             public int Signature;
             public int Version;
@@ -35,10 +44,23 @@ namespace Microsoft.Xna.Framework.Graphics
             public int HeaderSize;
         }
 
+        /// <summary>
+        /// Gets a collection of shader parameters used for this effect.
+        /// </summary>
         public EffectParameterCollection Parameters { get; private set; }
 
+        /// <summary>
+        /// Gets a collection of shader techniques that are defined for this effect.
+        /// </summary>
         public EffectTechniqueCollection Techniques { get; private set; }
 
+        /// <summary>
+        /// Gets or sets the active technique.
+        /// </summary>
+        /// <remarks>
+        /// If there are multiple techiques in an effect and you want to use a new technique in the next pass,
+        /// you must set <b>CurrentTechnique</b> to the new technique before making the rendering pass.
+        /// </remarks>
         public EffectTechnique CurrentTechnique { get; set; }
   
         internal ConstantBuffer[] ConstantBuffers { get; private set; }
@@ -55,7 +77,11 @@ namespace Microsoft.Xna.Framework.Graphics
             }
             this.GraphicsDevice = graphicsDevice;
 		}
-			
+
+        /// <summary>
+        /// Creates a clone of the <see cref="Effect"/>.
+        /// </summary>
+        /// <param name="cloneSource"><see cref="Effect"/> to clone.</param>
 		protected Effect(Effect cloneSource)
             : this(cloneSource.GraphicsDevice)
 		{
@@ -63,16 +89,30 @@ namespace Microsoft.Xna.Framework.Graphics
             Clone(cloneSource);
 		}
 
+        /// <inheritdoc cref="Effect(GraphicsDevice, byte[], int, int)"/>
         public Effect(GraphicsDevice graphicsDevice, byte[] effectCode)
             : this(graphicsDevice, effectCode, 0, effectCode.Length)
         {
         }
 
-
+        /// <summary>
+        /// Creates a new instance of <see cref="Effect"/>.
+        /// </summary>
+        /// <param name="graphicsDevice">Graphics device</param>
+        /// <param name="effectCode">The effect code.</param>
+        /// <param name="index">Start position to read from in the <paramref name="effectCode"/> array.</param>
+        /// <param name="count">Number of bytes to read from the <paramref name="effectCode"/> array.</param>
+        /// <exception cref="Exception">Invoked when the <paramref name="effectCode"/> is not a valid MGFX effect file or is for an incompatible version of MonoGame.</exception>
+        /// <exception cref="ArgumentException">This <paramref name="effectCode"/> is invalid.</exception>
+        /// <remarks>
+        /// The <paramref name="index"/> and <paramref name="count"/> parameters do not need to take the header of the file into account; this will be calculated first,
+        /// and the <paramref name="index"/> and <paramref name="count"/> will be adjusted to point to the effect content after the header. <br/>
+        /// Therefore,do <strong>not</strong> enter the size of the header into those parameters! This is done for you!
+        /// </remarks>
         public Effect (GraphicsDevice graphicsDevice, byte[] effectCode, int index, int count)
             : this(graphicsDevice)
 		{
-			// By default we currently cache all unique byte streams
+			// By default, we currently cache all unique byte streams
 			// and use cloning to populate the effect with parameters,
 			// techniques, and passes.
 			//
@@ -105,7 +145,7 @@ namespace Microsoft.Xna.Framework.Graphics
             {
                 // Create one.
                 cloneSource = new Effect(graphicsDevice);
-                    cloneSource.ReadEffect(reader);
+                cloneSource.ReadEffect(header, reader);
 
                 // Check file tail to ensure we parsed the content correctly.
                     var tail = reader.ReadInt32();
@@ -128,11 +168,11 @@ namespace Microsoft.Xna.Framework.Graphics
             header.Version = (int)effectCode[index++];
             header.Profile = (int)effectCode[index++];
             header.EffectKey = BitConverter.ToInt32(effectCode, index); index += 4;
-            header.HeaderSize = index;
+            header.HeaderSize = 10;
 
             if (header.Signature != MGFXHeader.MGFXSignature)
                 throw new Exception("This does not appear to be a MonoGame MGFX file!");
-            if (header.Version < MGFXHeader.MGFXVersion)
+            if (header.Version < MGFXHeader.MGFXMinVersion)
                 throw new Exception("This MGFX effect is for an older release of MonoGame and needs to be rebuilt.");
             if (header.Version > MGFXHeader.MGFXVersion)
                 throw new Exception("This MGFX effect seems to be for a newer release of MonoGame.");
@@ -192,10 +232,14 @@ namespace Microsoft.Xna.Framework.Graphics
             return new Effect(this);
 		}
 
+        /// <summary>
+        /// Applies the effect state just prior to rendering the effect.
+        /// </summary>
         protected internal virtual void OnApply()
         {
         }
 
+        /// <inheritdoc cref="IDisposable.Dispose()"/>
         protected override void Dispose(bool disposing)
         {
             if (!IsDisposed)
@@ -224,6 +268,9 @@ namespace Microsoft.Xna.Framework.Graphics
             base.Dispose(disposing);
         }
 
+        /// <summary>
+        /// The GraphicsDevice is resetting, so GPU resources must be recreated.
+        /// </summary>
         internal protected override void GraphicsDeviceResetting()
         {
             for (var i = 0; i < ConstantBuffers.Length; i++)
@@ -232,7 +279,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
         #region Effect File Reader
 
-		private void ReadEffect (BinaryReader reader)
+		private void ReadEffect (MGFXHeader header, BinaryReader reader)
 		{
 			// TODO: Maybe we should be reading in a string 
 			// table here to save some bytes in the file.
@@ -265,7 +312,7 @@ namespace Microsoft.Xna.Framework.Graphics
             _shaders = new Shader[reader.ReadInt32()];
 
             for (var s = 0; s < _shaders.Length; s++)
-                _shaders[s] = new Shader(GraphicsDevice, reader);
+                _shaders[s] = new Shader(GraphicsDevice, header.Version, reader);
 
             Parameters = ReadParameters(reader);
 

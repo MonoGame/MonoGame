@@ -1,4 +1,4 @@
-﻿// MonoGame - Copyright (C) The MonoGame Team
+﻿// MonoGame - Copyright (C) MonoGame Foundation, Inc
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
@@ -12,7 +12,8 @@ using System.Linq;
 namespace MonoGame.Tests.Graphics
 {
 
-    [TestFixture]
+    [NonParallelizable]
+    [RunOnUiTestFixture]
     internal sealed class ModelTest : GraphicsDeviceTestFixtureBase
     {
         // model exported from default blender project.

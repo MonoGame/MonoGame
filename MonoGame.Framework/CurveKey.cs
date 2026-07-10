@@ -174,16 +174,19 @@ namespace Microsoft.Xna.Framework
 
         #region Inherited Methods
 
+        /// <inheritdoc/>
         public int CompareTo(CurveKey other)
         {
             return this._position.CompareTo(other._position);
         }
 
+        /// <inheritdoc/>
         public bool Equals(CurveKey other)
         {
             return (this == other);
         }
 
+        /// <inheritdoc/>
         public override bool Equals(object obj)
         {
             if (obj is CurveKey other)

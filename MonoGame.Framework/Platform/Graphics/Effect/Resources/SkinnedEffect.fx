@@ -58,7 +58,7 @@ void Skin(inout VSInputNmTxWeights vin, uniform int boneCount)
 {
     float4x3 skinning = 0;
 
-    [unroll]
+    UNROLL
     for (int i = 0; i < boneCount; i++)
     {
         skinning += Bones[vin.Indices[i]] * vin.Weights[i];

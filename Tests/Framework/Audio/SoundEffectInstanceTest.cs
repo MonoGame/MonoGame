@@ -1,4 +1,4 @@
-﻿// MonoGame - Copyright (C) The MonoGame Team
+﻿// MonoGame - Copyright (C) MonoGame Foundation, Inc
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
@@ -10,18 +10,13 @@ using NUnit.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using System.Threading;
+using System.Diagnostics;
 
 namespace MonoGame.Tests.Audio
 {
-    class SoundEffectInstanceTest
+    [Category("Audio")]
+    class SoundEffectInstanceTest : AudioTestFixtureBase
     {
-        [SetUp]
-        public void SetUp()
-        {
-            // Necessary to get audio initialised
-            FrameworkDispatcher.Update();
-        }
-
         /// <summary>
         /// Unit test for issue #7372 where the Sound effects instance does not play after Play()
         /// is called after calling Pause(), Stop().
@@ -29,7 +24,6 @@ namespace MonoGame.Tests.Audio
         [Test]
         public void SoundEffectPauseStopPlay()
         {
-
             var se = new SoundEffect(new byte[16000], 8000, AudioChannels.Mono);
             
             using (var instance = se.CreateInstance())
@@ -53,17 +47,5 @@ namespace MonoGame.Tests.Audio
                 Assert.AreEqual(SoundState.Paused, instance.State);
             }
         }
-
-
-        private static void SleepWhileDispatching(int ms)
-        {
-            int cycles = ms / 10;
-            for (int i = 0; i < cycles; i++)
-            {
-                FrameworkDispatcher.Update();
-                Thread.Sleep(10);
-            }
-        }
-
     }
 }

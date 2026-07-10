@@ -1,4 +1,4 @@
-// MonoGame - Copyright (C) The MonoGame Team
+// MonoGame - Copyright (C) MonoGame Foundation, Inc
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
@@ -20,6 +20,10 @@ namespace Microsoft.Xna.Framework
         /// </summary>
         public Game Game { get; private set; }
 
+        /// <summary>
+        /// Indicates whether <see cref="Update(GameTime)">GameComponent.Update(GameTime)</see> should be
+        /// called when <see cref="Game.Update(GameTime)">Game.Update(GameTime)</see> is called.
+        /// </summary>
         public bool Enabled
         {
             get { return _enabled; }
@@ -33,6 +37,11 @@ namespace Microsoft.Xna.Framework
             }
         }
 
+        /// <summary>
+        /// Indicates the order in which the <see cref="GameComponent"/>
+        /// should be updated relative to other <see cref="GameComponent"/> instances.
+        /// Lower values are updated first.
+        /// </summary>
         public int UpdateOrder
         {
             get { return _updateOrder; }
@@ -61,11 +70,15 @@ namespace Microsoft.Xna.Framework
             this.Game = game;
         }
 
+        /// <summary/>
         ~GameComponent()
         {
             Dispose(false);
         }
 
+        /// <summary>
+        /// Called when the <see cref="GameComponent"/> needs to be initialized.
+        /// </summary>
         public virtual void Initialize() { }
 
         /// <summary>

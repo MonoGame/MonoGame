@@ -9,6 +9,10 @@ using MonoGame.Framework.Utilities;
 
 namespace Microsoft.Xna.Framework.Content
 {
+    /// <summary>
+    /// Defines a worker object that implements most of <see cref="ContentManager.Load{T}(string)">ContentManger.Load</see>.
+    /// A new content reader is constructed for each asset loaded.
+    /// </summary>
     public sealed class ContentReader : BinaryReader
     {
         private ContentManager contentManager;
@@ -37,6 +41,9 @@ namespace Microsoft.Xna.Framework.Content
 			this.version = version;
         }
 
+        /// <summary>
+        /// Gets a reference to the <see cref="ContentManager"/> instance that is using this content reader.
+        /// </summary>
         public ContentManager ContentManager
         {
             get
@@ -44,7 +51,10 @@ namespace Microsoft.Xna.Framework.Content
                 return contentManager;
             }
         }
-        
+
+        /// <summary>
+        /// Gets the name of the asset currently being read by this content reader.
+        /// </summary>
         public string AssetName
         {
             get
@@ -101,6 +111,42 @@ namespace Microsoft.Xna.Framework.Content
                 fixup.Value(sharedResources[fixup.Key]);
         }
 
+        /// <summary>
+        /// Reads a relative link to an external file from the underlying stream and returns an asset of type
+        /// <typeparamref name="T"/> loaded from the external file.
+        /// </summary>
+        /// <typeparam name="T">The type of asset to expected to be loaded from the external file.</typeparam>
+        /// <returns>
+        /// The asset of type <typeparamref name="T"/> loaded from the external file at the relative link read from
+        /// the underlying stream.  If the relative link read was null or an empty string, then the default
+        /// implementation of type <typeparamref name="T"/> is returned.
+        /// </returns>
+        /// <exception cref="ArgumentNullException">The relative link to the external file read is null or an empty string.</exception>
+        /// <exception cref="ObjectDisposedException">
+        /// This was called after the <see cref="ContentManager">ContentReader.ContentManager</see> was disposed.
+        ///
+        /// -or
+        ///
+        /// The stream is closed.
+        /// </exception>
+        /// <exception cref="ContentLoadException">
+        /// The type of asset in the external file does not match the type specified by <typeparamref name="T"/>.
+        /// 
+        /// -or-
+        ///
+        /// A content file matching the relative link to the external file could not be found.
+        ///
+        /// -or-
+        ///
+        /// The specified path in the relative link to the external file read is invalid (for example, a directory in
+        /// the path does not exist).
+        ///
+        /// -or-
+        ///
+        /// An error occurred while opening the external file.
+        /// </exception>
+        /// <exception cref="EndOfStreamException">The end of stream is reached.</exception>
+        /// <exception cref="IOException">An I/O error occurred.</exception>
         public T ReadExternalReference<T>()
         {
             var externalReference = ReadString();
@@ -113,6 +159,13 @@ namespace Microsoft.Xna.Framework.Content
             return default(T);
         }
 
+        /// <summary>
+        /// Reads a <see cref="Matrix"/> value from the underlying stream.
+        /// </summary>
+        /// <returns>The <see cref="Matrix"/> that was read.</returns>
+        /// <exception cref="EndOfStreamException">The end of stream is reached.</exception>
+        /// <exception cref="ObjectDisposedException">The stream is closed.</exception>
+        /// <exception cref="IOException">An I/O error occurred.</exception>
         public Matrix ReadMatrix()
         {
             Matrix result = new Matrix();
@@ -147,11 +200,32 @@ namespace Microsoft.Xna.Framework.Content
                 contentManager.RecordDisposable(disposable);
         }
 
+        /// <summary>
+        /// Reads a single managed object from the underlying stream as an instance of the specified type. Can be
+        /// called recursively.
+        /// </summary>
+        /// <typeparam name="T">The type of object to read.</typeparam>
+        /// <returns>The object that was read.</returns>
+        /// <exception cref="ObjectDisposedException">The stream is closed.</exception>
+        /// <exception cref="IOException">An I/O error occurred.</exception>
+        /// <exception cref="FormatException">The stream is corrupted.</exception>
+        /// <exception cref="ContentLoadException">Type reader index read from stream is out of bounds</exception>
         public T ReadObject<T>()
         {
             return InnerReadObject(default(T));
         }
 
+        /// <summary>
+        /// Reads a single managed object from the underlying stream as an instance of the specified type. Can be
+        /// called recursively.
+        /// </summary>
+        /// <typeparam name="T">The type of object to read.</typeparam>
+        /// <param name="typeReader">The <see cref="ContentTypeReader"/> to use to read the object.</param>
+        /// <returns>The object that was read.</returns>
+        /// <exception cref="ObjectDisposedException">The stream is closed.</exception>
+        /// <exception cref="IOException">An I/O error occurred.</exception>
+        /// <exception cref="FormatException">The stream is corrupted.</exception>
+        /// <exception cref="ContentLoadException">Type reader index read from stream is out of bounds</exception>
         public T ReadObject<T>(ContentTypeReader typeReader)
         {
             var result = (T)typeReader.Read(this, default(T));            
@@ -159,6 +233,17 @@ namespace Microsoft.Xna.Framework.Content
             return result;
         }
 
+        /// <summary>
+        /// Reads a single managed object from the underlying stream as an instance of the specified type. Can be
+        /// called recursively.
+        /// </summary>
+        /// <typeparam name="T">The type of object to read.</typeparam>
+        /// <param name="existingInstance">An existing object to write into.</param>
+        /// <returns>The object that was read.</returns>
+        /// <exception cref="ObjectDisposedException">The stream is closed.</exception>
+        /// <exception cref="IOException">An I/O error occurred.</exception>
+        /// <exception cref="FormatException">The stream is corrupted.</exception>
+        /// <exception cref="ContentLoadException">Type reader index read from stream is out of bounds</exception>
         public T ReadObject<T>(T existingInstance)
         {
             return InnerReadObject(existingInstance);
@@ -181,6 +266,18 @@ namespace Microsoft.Xna.Framework.Content
             return result;
         }
 
+        /// <summary>
+        /// Reads a single managed object from the underlying stream as an instance of the specified type. Can be
+        /// called recursively.
+        /// </summary>
+        /// <typeparam name="T">The type of object to read.</typeparam>
+        /// <param name="typeReader">The <see cref="ContentTypeReader"/> to use to read the object.</param>
+        /// <param name="existingInstance">An existing object to write into.</param>
+        /// <returns>The object that was read.</returns>
+        /// <exception cref="ObjectDisposedException">The stream is closed.</exception>
+        /// <exception cref="IOException">An I/O error occurred.</exception>
+        /// <exception cref="FormatException">The stream is corrupted.</exception>
+        /// <exception cref="ContentLoadException">Type reader index read from stream is out of bounds</exception>
         public T ReadObject<T>(ContentTypeReader typeReader, T existingInstance)
         {
             if (!ReflectionHelpers.IsValueType(typeReader.TargetType))
@@ -193,6 +290,13 @@ namespace Microsoft.Xna.Framework.Content
             return result;
         }
 
+        /// <summary>
+        /// Reads a <see cref="Quaternion"/> from the underlying stream.
+        /// </summary>
+        /// <returns>The <see cref="Quaternion"/> that was read.</returns>
+        /// <exception cref="EndOfStreamException">The end of stream is reached.</exception>
+        /// <exception cref="ObjectDisposedException">The stream is closed.</exception>
+        /// <exception cref="IOException">An I/O error occurred.</exception>
         public Quaternion ReadQuaternion()
         {
             Quaternion result = new Quaternion();
@@ -203,16 +307,45 @@ namespace Microsoft.Xna.Framework.Content
             return result;
         }
 
+        /// <summary>
+        /// Reads a single managed object from the current stream as an instance of the specified type.  If you specify
+        /// a base class of the actual object type, this method reads data only from the base type.
+        /// </summary>
+        /// <typeparam name="T">The type of object to read.</typeparam>
+        /// <returns>The object that was read.</returns>
+        /// <exception cref="EndOfStreamException">The end of stream is reached.</exception>
+        /// <exception cref="ObjectDisposedException">The stream is closed.</exception>
+        /// <exception cref="IOException">An I/O error occurred.</exception>
         public T ReadRawObject<T>()
         {
 			return (T)ReadRawObject<T> (default(T));
         }
 
+        /// <summary>
+        /// Reads a single managed object from the current stream as an instance of the specified type.  If you specify
+        /// a base class of the actual object type, this method reads data only from the base type.
+        /// </summary>
+        /// <typeparam name="T">The type of object to read.</typeparam>
+        /// <param name="typeReader">The <see cref="ContentTypeReader"/> to use to read the object.</param>
+        /// <returns>The object that was read.</returns>
+        /// <exception cref="EndOfStreamException">The end of stream is reached.</exception>
+        /// <exception cref="ObjectDisposedException">The stream is closed.</exception>
+        /// <exception cref="IOException">An I/O error occurred.</exception>
         public T ReadRawObject<T>(ContentTypeReader typeReader)
         {
             return (T)ReadRawObject<T>(typeReader, default(T));
         }
 
+        /// <summary>
+        /// Reads a single managed object from the current stream as an instance of the specified type.  If you specify
+        /// a base class of the actual object type, this method reads data only from the base type.
+        /// </summary>
+        /// <typeparam name="T">The type of object to read.</typeparam>
+        /// <param name="existingInstance">An existing object to write into.</param>
+        /// <returns>The object that was read.</returns>
+        /// <exception cref="EndOfStreamException">The end of stream is reached.</exception>
+        /// <exception cref="ObjectDisposedException">The stream is closed.</exception>
+        /// <exception cref="IOException">An I/O error occurred.</exception>
         public T ReadRawObject<T>(T existingInstance)
         {
             Type objectType = typeof(T);
@@ -224,11 +357,33 @@ namespace Microsoft.Xna.Framework.Content
             throw new NotSupportedException();
         }
 
+        /// <summary>
+        /// Reads a single managed object from the current stream as an instance of the specified type.  If you specify
+        /// a base class of the actual object type, this method reads data only from the base type.
+        /// </summary>
+        /// <typeparam name="T">The type of object to read.</typeparam>
+        /// <param name="typeReader">The <see cref="ContentTypeReader"/> to use to read the object.</param>
+        /// <param name="existingInstance">An existing object to write into.</param>
+        /// <returns>The object that was read.</returns>
+        /// <exception cref="EndOfStreamException">The end of stream is reached.</exception>
+        /// <exception cref="ObjectDisposedException">The stream is closed.</exception>
+        /// <exception cref="IOException">An I/O error occurred.</exception>
         public T ReadRawObject<T>(ContentTypeReader typeReader, T existingInstance)
         {
             return (T)typeReader.Read(this, existingInstance);
         }
 
+        /// <summary>
+        /// Reads a shared resource ID and records it for subsequent fix-up.
+        /// </summary>
+        /// <typeparam name="T">The type of the shared resource.</typeparam>
+        /// <param name="fixup">The fix-up action to perform.</param>
+        /// <exception cref="ObjectDisposedException">The stream is closed.</exception>
+        /// <exception cref="IOException">An I/O error occurred.</exception>
+        /// <exception cref="FormatException">The stream is corrupted.</exception>
+        /// <exception cref="ContentLoadException">
+        /// The type of the shared resource read does not match the specified <typeparamref name="T"/> type.
+        /// </exception>
         public void ReadSharedResource<T>(Action<T> fixup)
         {
             int index = Read7BitEncodedInt();
@@ -245,6 +400,13 @@ namespace Microsoft.Xna.Framework.Content
             }
         }
 
+        /// <summary>
+        /// Reads a <see cref="Vector2"/> from the underlying stream.
+        /// </summary>
+        /// <returns>The <see cref="Vector2"/> that was read.</returns>
+        /// <exception cref="EndOfStreamException">The end of stream is reached.</exception>
+        /// <exception cref="ObjectDisposedException">The stream is closed.</exception>
+        /// <exception cref="IOException">An I/O error occurred.</exception>
         public Vector2 ReadVector2()
         {
             Vector2 result = new Vector2();
@@ -253,6 +415,13 @@ namespace Microsoft.Xna.Framework.Content
             return result;
         }
 
+        /// <summary>
+        /// Reads a <see cref="Vector3"/> from the underlying stream.
+        /// </summary>
+        /// <returns>The <see cref="Vector3"/> that was read.</returns>
+        /// <exception cref="EndOfStreamException">The end of stream is reached.</exception>
+        /// <exception cref="ObjectDisposedException">The stream is closed.</exception>
+        /// <exception cref="IOException">An I/O error occurred.</exception>
         public Vector3 ReadVector3()
         {
             Vector3 result = new Vector3();
@@ -262,6 +431,13 @@ namespace Microsoft.Xna.Framework.Content
             return result;
         }
 
+        /// <summary>
+        /// Reads a <see cref="Vector4"/> from the underlying stream.
+        /// </summary>
+        /// <returns>The <see cref="Vector4"/> that was read.</returns>
+        /// <exception cref="EndOfStreamException">The end of stream is reached.</exception>
+        /// <exception cref="ObjectDisposedException">The stream is closed.</exception>
+        /// <exception cref="IOException">An I/O error occurred.</exception>
         public Vector4 ReadVector4()
         {
             Vector4 result = new Vector4();
@@ -272,6 +448,13 @@ namespace Microsoft.Xna.Framework.Content
             return result;
         }
 
+        /// <summary>
+        /// Reads a <see cref="Color"/> from the underlying stream.
+        /// </summary>
+        /// <returns>The <see cref="Color"/> that was read.</returns>
+        /// <exception cref="EndOfStreamException">The end of stream is reached.</exception>
+        /// <exception cref="ObjectDisposedException">The stream is closed.</exception>
+        /// <exception cref="IOException">An I/O error occurred.</exception>
         public Color ReadColor()
         {
             Color result = new Color();

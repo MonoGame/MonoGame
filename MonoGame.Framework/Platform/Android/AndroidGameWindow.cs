@@ -1,4 +1,4 @@
-// MonoGame - Copyright (C) The MonoGame Team
+// MonoGame - Copyright (C) MonoGame Foundation, Inc
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
@@ -12,7 +12,6 @@ using MonoGame.OpenGL;
 
 namespace Microsoft.Xna.Framework
 {
-    [CLSCompliant(false)]
     public class AndroidGameWindow : GameWindow, IDisposable
     {
         internal MonoGameAndroidGameView GameView { get; private set; }
@@ -25,6 +24,17 @@ namespace Microsoft.Xna.Framework
 
         public override IntPtr Handle { get { return IntPtr.Zero; } }
 
+        public override Point Position
+        {
+            get
+            {
+                return Point.Zero;
+            }
+
+            set
+            {
+            }
+        }
 
         public void SetResumer(IResumeManager resumer)
         {
@@ -37,10 +47,16 @@ namespace Microsoft.Xna.Framework
 
             Point size;
             // GetRealSize() was defined in JellyBeanMr1 / API 17 / Android 4.2
-            if (Build.VERSION.SdkInt < BuildVersionCodes.JellyBeanMr1)
+            if (!OperatingSystem.IsAndroidVersionAtLeast(17))
             {
                 size.X = activity.Resources.DisplayMetrics.WidthPixels;
                 size.Y = activity.Resources.DisplayMetrics.HeightPixels;
+            }
+            else if (OperatingSystem.IsAndroidVersionAtLeast(30)) // API 30 and Above
+            {
+                var rect = activity.WindowManager.CurrentWindowMetrics.Bounds;
+                size.X = rect.Width ();
+                size.Y = rect.Height ();
             }
             else
             {

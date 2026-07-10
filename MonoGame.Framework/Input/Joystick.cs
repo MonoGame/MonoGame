@@ -1,4 +1,4 @@
-﻿// MonoGame - Copyright (C) The MonoGame Team
+﻿// MonoGame - Copyright (C) MonoGame Foundation, Inc
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
@@ -41,10 +41,10 @@ namespace Microsoft.Xna.Framework.Input
         }
 
         /// <summary>
-        /// Gets the capabilites of the joystick.
+        /// Gets the capabilities of the joystick.
         /// </summary>
         /// <param name="index">Index of the joystick you want to access.</param>
-        /// <returns>The capabilites of the joystick.</returns>
+        /// <returns>The capabilities of the joystick.</returns>
         public static JoystickCapabilities GetCapabilities(int index)
         {
             return PlatformGetCapabilities(index);

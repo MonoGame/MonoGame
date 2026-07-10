@@ -1,10 +1,11 @@
-﻿// MonoGame - Copyright (C) The MonoGame Team
+﻿// MonoGame - Copyright (C) MonoGame Foundation, Inc
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System;
 using System.Runtime.InteropServices;
 using MonoGame.OpenGL;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
@@ -43,7 +44,9 @@ namespace Microsoft.Xna.Framework.Graphics
             }
         }
 
-        private void PlatformGetData<T>(int offsetInBytes, T[] data, int startIndex, int elementCount, int vertexStride)
+        private void PlatformGetData<
+           [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors | DynamicallyAccessedMemberTypes.NonPublicConstructors)] T
+        >(int offsetInBytes, T[] data, int startIndex, int elementCount, int vertexStride)
             where T : struct
         {
 #if GLES
@@ -57,7 +60,9 @@ namespace Microsoft.Xna.Framework.Graphics
 
 #if !GLES
 
-        private void GetBufferData<T>(int offsetInBytes, T[] data, int startIndex, int elementCount, int vertexStride)
+        private void GetBufferData<
+            [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors | DynamicallyAccessedMemberTypes.NonPublicConstructors)] T
+        >(int offsetInBytes, T[] data, int startIndex, int elementCount, int vertexStride)
             where T : struct
         {
             GL.BindBuffer(BufferTarget.ArrayBuffer, vbo);
@@ -89,7 +94,7 @@ namespace Microsoft.Xna.Framework.Graphics
                     var tmpPtr = tmpHandle.AddrOfPinnedObject();
                     for (var i = 0; i < elementCount; i++)
                     {
-                        data[startIndex + i] = (T)Marshal.PtrToStructure(tmpPtr, typeof(T));
+                        data[startIndex + i] = Marshal.PtrToStructure<T>(tmpPtr);
                         tmpPtr = (IntPtr)(tmpPtr.ToInt64() + vertexStride);
                     }
                 }
@@ -187,6 +192,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
         }
 
+        /// <summary/>
         protected override void Dispose(bool disposing)
         {
             if (!IsDisposed)

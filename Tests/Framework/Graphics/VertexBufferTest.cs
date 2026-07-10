@@ -1,4 +1,4 @@
-﻿// MonoGame - Copyright (C) The MonoGame Team
+﻿// MonoGame - Copyright (C) MonoGame Foundation, Inc
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
@@ -11,7 +11,8 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace MonoGame.Tests.Graphics
 {
-    [TestFixture]
+    [NonParallelizable]
+    [RunOnUiTestFixture]
     class VertexBufferTest : GraphicsDeviceTestFixtureBase
     {
         VertexPositionTexture[] savedData = new VertexPositionTexture[] 
@@ -21,8 +22,10 @@ namespace MonoGame.Tests.Graphics
             new VertexPositionTexture(new Vector3(7,8,9), new Vector2(0.5f,0.6f)),
             new VertexPositionTexture(new Vector3(10,11,12), new Vector2(0.7f,0.8f))
         };
+        public Span<VertexPositionTexture> savedDataAsSpan => savedData.AsSpan();
         VertexPositionTexture vertexZero = new VertexPositionTexture(Vector3.Zero, Vector2.Zero);
         
+        [Test]
         //[TestCase(true)]
         [TestCase(false)]
         public void ShouldSetAndGetData(bool dynamic)
@@ -39,6 +42,7 @@ namespace MonoGame.Tests.Graphics
             vertexBuffer.Dispose();
         }
 
+        [Test]
         //[TestCase(true)]
         [TestCase(false)]
         public void ShouldSetAndGetData_elementCount(bool dynamic)
@@ -58,6 +62,7 @@ namespace MonoGame.Tests.Graphics
             vertexBuffer.Dispose();
         }
 
+        [Test]
         //[TestCase(true)]
         [TestCase(false)]
         public void ShouldSetAndGetData_startIndex(bool dynamic)
@@ -77,6 +82,7 @@ namespace MonoGame.Tests.Graphics
             vertexBuffer.Dispose();
         }
         
+        [Test]
         //[TestCase(true)]
         [TestCase(false)]
         public void ShouldSetAndGetData_offsetInBytes(bool dynamic)
@@ -96,6 +102,7 @@ namespace MonoGame.Tests.Graphics
             vertexBuffer.Dispose();
         }
 
+        [Test]
         //[TestCase(true)]
         [TestCase(false)]
         public void ShouldSetAndGetDataBytes(bool dynamic)
@@ -119,6 +126,7 @@ namespace MonoGame.Tests.Graphics
             vertexBuffer.Dispose();
         }
 
+        [Test]
         //[TestCase(true)]
         [TestCase(false, -1, 0, false, typeof(ArgumentOutOfRangeException))]
         [TestCase(false, 0, 0, false, typeof(ArgumentOutOfRangeException))]
@@ -159,6 +167,7 @@ namespace MonoGame.Tests.Graphics
             vertexBuffer.Dispose();
         }
 
+        [Test]
         [TestCase(false, 1, -1, typeof(ArgumentOutOfRangeException))]
         [TestCase(false, 0, 0, typeof(ArgumentOutOfRangeException))]
         [TestCase(false, 80, 0, null)]
@@ -243,6 +252,7 @@ namespace MonoGame.Tests.Graphics
             }
         }
 
+        [Test]
         //[TestCase(true)]
         [TestCase(false, 1, 20, true, null)]
         [TestCase(false, 3, 20, true, null)]
@@ -274,6 +284,70 @@ namespace MonoGame.Tests.Graphics
             vertexBuffer.Dispose();
         }
 
+#if VULKAN || DIRECTX12
+        [Test]
+        //[TestCase(true)]
+        [TestCase(false, 0, 4, true, null)]
+        [TestCase(false, 1, 3, true, null)]
+        [TestCase(false, 1, 2, true, null)]
+        [TestCase(false, 4, 1, false, typeof(ArgumentOutOfRangeException))]
+        public void SetDataStructWithSpan(bool dynamic, int destinationStartIndex, int elementCount, bool shouldSucceed, Type expectedExceptionType)
+        {
+            const int size = 4;
+            var testData = new VertexPositionTexture[size];
+            for (var i = 0; i < size; i++)
+            {
+                testData[i] = new VertexPositionTexture(
+                    new Vector3(i * 3, i * 3 + 1, i * 3 + 2),
+                    new Vector2(i * 2 / (float)10, (i * 2 + 1) / (float)10));
+            }
+
+            var vertexBuffer = (dynamic)
+                ? new DynamicVertexBuffer(gd, typeof(VertexPositionTexture), savedData.Length,
+                    BufferUsage.None)
+                : new VertexBuffer(gd, typeof(VertexPositionTexture), savedData.Length,
+                    BufferUsage.None);
+            var dataSpan = new Span<VertexPositionTexture>();
+            if (shouldSucceed)
+            { 
+                dataSpan = new Span<VertexPositionTexture>(testData, destinationStartIndex, elementCount);
+            }
+            else
+            {
+                dataSpan = new Span<VertexPositionTexture>(testData);
+            }
+
+            var vertexStride = VertexPositionTexture.VertexDeclaration.VertexStride;
+
+            // initialize data with standard call
+            vertexBuffer.SetData(savedData);
+
+            if (!shouldSucceed)
+                Assert.Throws(expectedExceptionType, () => vertexBuffer.SetData(destinationStartIndex, savedDataAsSpan));
+            else
+            {
+                // initialize with standard call
+                vertexBuffer.SetData(destinationStartIndex, dataSpan);
+
+                var readData = new VertexPositionTexture[savedData.Length];
+                vertexBuffer.GetData(0, readData, 0, savedData.Length, vertexStride);
+                Assert.AreEqual(
+                    dataSpan.ToArray(),
+                    readData.Take(destinationStartIndex..(destinationStartIndex + elementCount)).ToArray());
+                for(int i = 0; i < savedData.Length; i++)
+                {
+                    if (i < destinationStartIndex || i >= destinationStartIndex + elementCount)
+                    {
+                        Assert.AreEqual(savedData[i], readData[i]);
+                    }
+                }
+            }
+
+            vertexBuffer.Dispose();
+        }
+#endif
+
+        [Test]
         //[TestCase(true)]
         [TestCase(false)]
         public void GetPosition(bool dynamic)
@@ -294,6 +368,7 @@ namespace MonoGame.Tests.Graphics
             vertexBuffer.Dispose();
         }
 
+        [Test]
         //[TestCase(true)]
         [TestCase(false)]
         public void SetPosition(bool dynamic)
@@ -321,6 +396,7 @@ namespace MonoGame.Tests.Graphics
             vertexBuffer.Dispose();
         }
 
+        [Test]
         //[TestCase(true)]
         [TestCase(false)]
         public void GetTextureCoordinate(bool dynamic)
@@ -342,6 +418,7 @@ namespace MonoGame.Tests.Graphics
             vertexBuffer.Dispose();
         }
 
+        [Test]
         //[TestCase(true)]
         [TestCase(false)]
         public void SetTextureCoordinate(bool dynamic)
@@ -422,8 +499,12 @@ namespace MonoGame.Tests.Graphics
 #else
             Assert.That(ex.Message, Is.EqualTo("An error occurred while preparing to draw. "
                 + "This is probably because the current vertex declaration does not include all the elements "
-                + "required by the current vertex shader. The current vertex declaration includes these elements: " 
+                + "required by the current vertex shader. The current vertex declaration includes these elements: "
+#if VULKAN || DIRECTX12
+                + "POSITION0."));
+#else
                 + "NORMAL0, TEXCOORD0."));
+#endif
 #endif
 
             vertexBuffer.Dispose();

@@ -1,4 +1,4 @@
-// MonoGame - Copyright (C) The MonoGame Team
+// MonoGame - Copyright (C) MonoGame Foundation, Inc
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
@@ -47,13 +47,12 @@ namespace Microsoft.Xna.Framework.Graphics
             GraphicsExtensions.CheckGLError();
             if (compiled != (int)Bool.True)
             {
-                var log = GL.GetShaderInfoLog(_shaderHandle);
-                Debug.WriteLine(log);
+                var errorLog = GL.GetShaderInfoLog(_shaderHandle);
 
                 GraphicsDevice.DisposeShader(_shaderHandle);
                 _shaderHandle = -1;
 
-                throw new InvalidOperationException("Shader Compilation Failed");
+                throw new ShaderCompilerException(SourceFile, Entrypoint, Stage, errorLog, _glslCode);
             }
 
             return _shaderHandle;

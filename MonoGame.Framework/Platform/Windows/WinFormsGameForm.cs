@@ -1,4 +1,4 @@
-﻿// MonoGame - Copyright (C) The MonoGame Team
+﻿// MonoGame - Copyright (C) MonoGame Foundation, Inc
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
@@ -222,8 +222,8 @@ namespace Microsoft.Xna.Framework.Windows
             for (uint i = 0; i < count; i++)
             {
                 uint buffSize = DragQueryFile(hdrop, i, null, int.MaxValue);
-                StringBuilder builder = new StringBuilder((int)buffSize);
-                DragQueryFile(hdrop, i, builder, buffSize);
+                StringBuilder builder = new StringBuilder((int)buffSize + 1); // +1 for null terminator
+                DragQueryFile(hdrop, i, builder, buffSize + 1);
                 files[i] = builder.ToString();
             }
 

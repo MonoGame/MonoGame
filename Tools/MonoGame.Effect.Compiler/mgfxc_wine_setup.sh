@@ -15,6 +15,14 @@ then
     exit 1
 fi
 
+# wine 8 is the minimum requirement for dotnet 8
+# wine --version will output "wine-#.# (Distro #.#.#)" or "wine-#.#"
+WINE_VERSION=$(wine --version 2>&1 | grep -oP 'wine-\d+' | sed 's/wine-//')
+if (( $WINE_VERSION < 8 )); then
+    echo "Wine version $WINE_VERSION is below the minimum required version (8.0)."
+    exit 1
+fi
+
 # init wine stuff
 export WINEARCH=win64
 export WINEPREFIX=$HOME/.winemonogame
@@ -36,15 +44,14 @@ wine64 regedit crashdialog.reg
 popd
 
 # get dotnet
-DOTNET_URL="https://download.visualstudio.microsoft.com/download/pr/44d08222-aaa9-4d35-b24b-d0db03432ab7/52a4eb5922afd19e8e0d03e0dbbb41a0/dotnet-sdk-6.0.302-win-x64.zip"
+DOTNET_URL="https://builds.dotnet.microsoft.com/dotnet/Sdk/8.0.201/dotnet-sdk-8.0.201-win-x64.zip"
 curl $DOTNET_URL --output "$SCRIPT_DIR/dotnet-sdk.zip"
 7z x "$SCRIPT_DIR/dotnet-sdk.zip" -o"$WINEPREFIX/drive_c/windows/system32/"
 
 # get d3dcompiler_47
 FIREFOX_URL="https://download-installer.cdn.mozilla.net/pub/firefox/releases/62.0.3/win64/ach/Firefox%20Setup%2062.0.3.exe"
 curl $FIREFOX_URL --output "$SCRIPT_DIR/firefox.exe"
-7z x "$SCRIPT_DIR/firefox.exe" -o"$SCRIPT_DIR/firefox_data/"
-cp -f "$SCRIPT_DIR/firefox_data/core/d3dcompiler_47.dll" "$WINEPREFIX/drive_c/windows/system32/d3dcompiler_47.dll"
+7z e "$SCRIPT_DIR/firefox.exe" "core/d3dcompiler_47.dll" -o"$WINEPREFIX/drive_c/windows/system32/" -aoa
 
 # append MGFXC_WINE_PATH env variable
 echo -e "\nexport MGFXC_WINE_PATH=$HOME/.winemonogame" >> ~/.profile

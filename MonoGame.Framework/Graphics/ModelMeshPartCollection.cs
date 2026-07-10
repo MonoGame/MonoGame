@@ -5,9 +5,16 @@ using System.Collections.ObjectModel;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
-
+    /// <summary>
+    /// Represents a collection of <see cref="ModelMeshPart"/> objects.
+    /// </summary>
 	public sealed class ModelMeshPartCollection : ReadOnlyCollection<ModelMeshPart>
 	{
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ModelMeshPartCollection"/>
+        /// class that is a read-only wrapper around the specified list.
+        /// </summary>
+        /// <param name="list">The list to wrap.</param>
 		public ModelMeshPartCollection(IList<ModelMeshPart> list)
 			: base(list)
 		{

@@ -1,9 +1,10 @@
-﻿// MonoGame - Copyright (C) The MonoGame Team
+﻿// MonoGame - Copyright (C) MonoGame Foundation, Inc
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System;
 using System.Collections.ObjectModel;
+using System.Globalization;
 using System.IO;
 
 namespace Microsoft.Xna.Framework.Content.Pipeline.Audio
@@ -122,7 +123,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Audio
                 // the type is WAV... else it is ok.
                 if (    (audioFileType == AudioFileType.Wav || _fileType == AudioFileType.Wav) &&
                         audioFileType != _fileType)
-                    throw new ArgumentException("Incorrect file type!", "audioFileType");
+                    throw new ArgumentException(string.Format(CultureInfo.InvariantCulture, "Incorrect file type! Expected '.wav' but found '.{0}'. Did you mean to use the Mp3Importer?", _fileType), "audioFileType");
 
                 // Only provide the data for WAV files.
                 if (audioFileType == AudioFileType.Wav)
@@ -157,7 +158,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Audio
             }
             catch (Exception ex)
             {
-                var message = string.Format("Failed to open file {0}. Ensure the file is a valid audio file and is not DRM protected.", Path.GetFileNameWithoutExtension(audioFileName));
+                var message = string.Format(CultureInfo.InvariantCulture, "There was an error processing '{0}'\n {1}", Path.GetFileNameWithoutExtension(audioFileName), ex.Message);
                 throw new InvalidContentException(message, ex);
             }
         }
@@ -179,6 +180,16 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Audio
             DefaultAudioProfile.ConvertToFormat(this, formatType, quality, saveToFile);
         }
 
+        /// <summary>
+        /// Sets the data and properties for the audio content.
+        /// </summary>
+        /// <param name="data">The audio data to be set.</param>
+        /// <param name="format">The audio format.</param>
+        /// <param name="duration">The duration of the audio.</param>
+        /// <param name="loopStart">The start position of the loop.</param>
+        /// <param name="loopLength">The length of the loop.</param>
+        /// <exception cref="ArgumentNullException">Thrown when the data or format is null.</exception>
+        /// <remarks>The values for LoopStart and LoopLength are consumed as a number of samples and not a concrete unit of time.</remarks>
         public void SetData(byte[] data, AudioFormat format, TimeSpan duration, int loopStart, int loopLength)
         {
             if (data == null)
@@ -193,6 +204,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Audio
             _loopLength = loopLength;
         }
 
+        /// <inheritdoc cref="IDisposable.Dispose()"/>
         public void Dispose()
         {
             _disposed = true;

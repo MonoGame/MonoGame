@@ -1,4 +1,4 @@
-﻿// MonoGame - Copyright (C) The MonoGame Team
+﻿// MonoGame - Copyright (C) MonoGame Foundation, Inc
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
@@ -158,13 +158,14 @@ namespace MonoGame.Tools.Pipeline
             cmdImport.MenuText = "Import";
 
             cmdSave = new Command();
-            cmdSave.MenuText = "Save...";
+            cmdSave.MenuText = "Save";
             cmdSave.ToolTip = "Save";
             cmdSave.Image = Global.GetEtoIcon("Commands.Save.png");
             cmdSave.Shortcut = Application.Instance.CommonModifier | Keys.S;
 
             cmdSaveAs = new Command();
-            cmdSaveAs.MenuText = "Save As";
+            cmdSaveAs.MenuText = "Save As...";
+            cmdSaveAs.ToolTip = "Save As";
             cmdSaveAs.Image = Global.GetEtoIcon("Commands.SaveAs.png");
 
             cmdExit = new Command();

@@ -1,4 +1,4 @@
-// MonoGame - Copyright (C) The MonoGame Team
+// MonoGame - Copyright (C) MonoGame Foundation, Inc
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
@@ -62,8 +62,11 @@ namespace Microsoft.Xna.Framework.Graphics
 
 	    private void PlatformSetData<T>(int level,
                                      int left, int top, int right, int bottom, int front, int back,
-                                     T[] data, int startIndex, int elementCount, int width, int height, int depth)
+                                     T[] data, int startIndex, int elementCount)
         {
+            var width = right - left;
+            var height = bottom - top;
+
             var elementSizeInByte = ReflectionHelpers.SizeOf<T>.Get();
             var dataHandle = GCHandle.Alloc(data, GCHandleType.Pinned);
             try

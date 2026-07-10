@@ -1,4 +1,4 @@
-﻿// MonoGame - Copyright (C) The MonoGame Team
+﻿// MonoGame - Copyright (C) MonoGame Foundation, Inc
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
@@ -19,19 +19,11 @@ namespace Microsoft.Xna.Framework
                 case PresentInterval.One:
                 case PresentInterval.Two:
                 default:
-#if WINDOWS_UAP
-                    effect = SharpDX.DXGI.SwapEffect.FlipSequential;
-#else
                     effect = SharpDX.DXGI.SwapEffect.Discard;
-#endif
                     break;
 
                 case PresentInterval.Immediate:
-#if WINDOWS_UAP
-                    effect = SharpDX.DXGI.SwapEffect.FlipSequential;
-#else
                     effect = SharpDX.DXGI.SwapEffect.Sequential;
-#endif
                     break;
             }
 
@@ -71,11 +63,7 @@ namespace Microsoft.Xna.Framework
                 case SurfaceFormat.Bgra5551:
                     return SharpDX.DXGI.Format.B5G5R5A1_UNorm;
                 case SurfaceFormat.Bgra4444:
-#if WINDOWS_UAP
-                    return SharpDX.DXGI.Format.B4G4R4A4_UNorm;
-#else
                     return (SharpDX.DXGI.Format)115;
-#endif
                 case SurfaceFormat.Dxt1:
                     return SharpDX.DXGI.Format.BC1_UNorm;
                 case SurfaceFormat.Dxt3:

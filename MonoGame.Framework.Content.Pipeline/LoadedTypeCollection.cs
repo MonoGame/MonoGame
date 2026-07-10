@@ -1,4 +1,4 @@
-﻿// MonoGame - Copyright (C) The MonoGame Team
+﻿// MonoGame - Copyright (C) MonoGame Foundation, Inc
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
@@ -19,6 +19,9 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
     {
         private static List<T> _all;
 
+        /// <summary>
+        /// Creates a new LoadedTypeCollection.
+        /// </summary>
         public LoadedTypeCollection()
         {
             // Scan the already loaded assemblies.
@@ -61,6 +64,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
             }
         }
 
+        /// <inheritdoc cref="IEnumerable{T}.GetEnumerator()"/>
         public IEnumerator<T> GetEnumerator()
         {
             return _all.GetEnumerator();

@@ -5,9 +5,10 @@ using System.Collections.ObjectModel;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
-	// Summary:
-	//     Represents a collection of effects associated with a model.
-	public sealed class ModelEffectCollection : ReadOnlyCollection<Effect>
+    /// <summary>
+    /// Represents a collection of effects associated with a model.
+    /// </summary>
+    public sealed class ModelEffectCollection : ReadOnlyCollection<Effect>
 	{
 		internal ModelEffectCollection(IList<Effect> list)
 			: base(list)
@@ -29,16 +30,19 @@ namespace Microsoft.Xna.Framework.Graphics
 			Items.Remove (item);
 		}
 
-	    // Summary:
-	    //     Returns a ModelEffectCollection.Enumerator that can iterate through a ModelEffectCollection.
-	    public new ModelEffectCollection.Enumerator GetEnumerator()
+        /// <summary>
+        /// Returns a <see cref="ModelEffectCollection.Enumerator">ModelEffectCollection.Enumerator</see>
+        /// that can iterate through a collection.
+        /// </summary>
+        public new ModelEffectCollection.Enumerator GetEnumerator()
 		{
 			return new ModelEffectCollection.Enumerator((List<Effect>)Items);
 		}
 
-	    // Summary:
-	    //     Provides the ability to iterate through the bones in an ModelEffectCollection.
-	    public struct Enumerator : IEnumerator<Effect>, IDisposable, IEnumerator
+        /// <summary>
+        /// Enumerator to iterate through the <see cref="ModelEffectCollection"/>
+        /// </summary>
+        public struct Enumerator : IEnumerator<Effect>, IDisposable, IEnumerator
 	    {
 			List<Effect>.Enumerator enumerator;
             bool disposed;
@@ -49,12 +53,10 @@ namespace Microsoft.Xna.Framework.Graphics
                 disposed = false;
 			}
 
-	        // Summary:
-	        //     Gets the current element in the ModelEffectCollection.
-	        public Effect Current { get { return enumerator.Current; } }
+	        /// <inheritdoc/>
+            public Effect Current { get { return enumerator.Current; } }
 
-	        // Summary:
-	        //     Immediately releases the unmanaged resources used by this object.
+	        /// <inheritdoc cref="IDisposable.Dispose()"/>
 	        public void Dispose()
             {
                 if (!disposed)
@@ -63,9 +65,8 @@ namespace Microsoft.Xna.Framework.Graphics
                     disposed = true;
                 }
             }
-	        //
-	        // Summary:
-	        //     Advances the enumerator to the next element of the ModelEffectCollection.
+
+	        /// <inheritdoc/>
 	        public bool MoveNext() { return enumerator.MoveNext(); }
 
 	        #region IEnumerator Members

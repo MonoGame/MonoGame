@@ -1,73 +1,10 @@
-#region License
-/*
-Microsoft Public License (Ms-PL)
-MonoGame - Copyright © 2009-2012 The MonoGame Team
-
-All rights reserved.
-
-This license governs use of the accompanying software. If you use the software,
-you accept this license. If you do not accept the license, do not use the
-software.
-
-1. Definitions
-
-The terms "reproduce," "reproduction," "derivative works," and "distribution"
-have the same meaning here as under U.S. copyright law.
-
-A "contribution" is the original software, or any additions or changes to the
-software.
-
-A "contributor" is any person that distributes its contribution under this
-license.
-
-"Licensed patents" are a contributor's patent claims that read directly on its
-contribution.
-
-2. Grant of Rights
-
-(A) Copyright Grant- Subject to the terms of this license, including the
-license conditions and limitations in section 3, each contributor grants you a
-non-exclusive, worldwide, royalty-free copyright license to reproduce its
-contribution, prepare derivative works of its contribution, and distribute its
-contribution or any derivative works that you create.
-
-(B) Patent Grant- Subject to the terms of this license, including the license
-conditions and limitations in section 3, each contributor grants you a
-non-exclusive, worldwide, royalty-free license under its licensed patents to
-make, have made, use, sell, offer for sale, import, and/or otherwise dispose of
-its contribution in the software or derivative works of the contribution in the
-software.
-
-3. Conditions and Limitations
-
-(A) No Trademark License- This license does not grant you rights to use any
-contributors' name, logo, or trademarks.
-
-(B) If you bring a patent claim against any contributor over patents that you
-claim are infringed by the software, your patent license from such contributor
-to the software ends automatically.
-
-(C) If you distribute any portion of the software, you must retain all
-copyright, patent, trademark, and attribution notices that are present in the
-software.
-
-(D) If you distribute any portion of the software in source code form, you may
-do so only under this license by including a complete copy of this license with
-your distribution. If you distribute any portion of the software in compiled or
-object code form, you may only do so under a license that complies with this
-license.
-
-(E) The software is licensed "as-is." You bear the risk of using it. The
-contributors give no express warranties, guarantees or conditions. You may have
-additional consumer rights under your local laws which this license cannot
-change. To the extent permitted under your local laws, the contributors exclude
-the implied warranties of merchantability, fitness for a particular purpose and
-non-infringement.
-*/
-#endregion License
+// MonoGame - Copyright (C) MonoGame Foundation, Inc
+// This file is subject to the terms and conditions defined in
+// file 'LICENSE.txt', which is part of this source code package.
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.Contracts;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
@@ -82,11 +19,13 @@ using NUnit.Framework.Constraints;
 
 namespace MonoGame.Tests 
 {
+	[RunOnUiTestFixture]
 	partial class GameTest 
     {
 		public static class Properties 
         {
-			[TestFixture]
+			[Category("GameTest")]
+			[RunOnUiTestFixture]
 			public class Components : ReadOnlyPropertyFixtureBase<GameComponentCollection> 
             {
 				public Components ()
@@ -102,7 +41,8 @@ namespace MonoGame.Tests
 				}
 			}
 
-			[TestFixture]
+			[Category("GameTest")]
+			[RunOnUiTestFixture]
 			public class Content : ReadWritePropertyFixtureBase<ContentManager> {
 				public Content ()
 					: base (g => g.Content)
@@ -133,7 +73,8 @@ namespace MonoGame.Tests
 				}
 			}
 
-			[TestFixture]
+			[Category("GameTest")]
+			[RunOnUiTestFixture]
 			public class GraphicsDevice_ : ReadOnlyPropertyFixtureBase<GraphicsDevice> {
 				public GraphicsDevice_ ()
 					: base (g => g.GraphicsDevice)
@@ -181,7 +122,8 @@ namespace MonoGame.Tests
 				}
 			}
 
-			[TestFixture]
+			[Category("GameTest")]
+			[RunOnUiTestFixture]
 			public class InactiveSleepTime : ReadWritePropertyFixtureBase<TimeSpan> {
 				public InactiveSleepTime ()
 					: base (g => g.InactiveSleepTime)
@@ -198,7 +140,8 @@ namespace MonoGame.Tests
 				}
 			}
 
-			[TestFixture]
+			[Category("GameTest")]
+			[RunOnUiTestFixture]
 			public class IsActive : ReadOnlyPropertyFixtureBase<bool> {
 				public IsActive ()
 					: base (g => g.IsActive)
@@ -207,7 +150,8 @@ namespace MonoGame.Tests
 				}
 			}
 
-			[TestFixture]
+			[Category("GameTest")]
+			[RunOnUiTestFixture]
 			public class IsFixedTimeStep : ReadWritePropertyFixtureBase<bool> {
 				public IsFixedTimeStep ()
 					: base (g => g.IsFixedTimeStep)
@@ -221,7 +165,8 @@ namespace MonoGame.Tests
 				public override void Cannot_set_illegal_value (Tuple<bool, Type> valueAndException) { }
 			}
 
-			[TestFixture]
+			[Category("GameTest")]
+			[RunOnUiTestFixture]
 			public class IsMouseVisible : ReadWritePropertyFixtureBase<bool> {
 				public IsMouseVisible ()
 					: base (g => g.IsMouseVisible)
@@ -235,7 +180,8 @@ namespace MonoGame.Tests
 				public override void Cannot_set_illegal_value (Tuple<bool, Type> valueAndException) { }
 			}
 
-			[TestFixture]
+			[Category("GameTest")]
+			[RunOnUiTestFixture]
 			public class LaunchParameters_ : ReadOnlyPropertyFixtureBase<LaunchParameters> {
 				public LaunchParameters_ ()
 					: base (g => g.LaunchParameters)
@@ -250,7 +196,8 @@ namespace MonoGame.Tests
 				}
 			}
 
-			[TestFixture]
+			[Category("GameTest")]
+			[RunOnUiTestFixture]
 			public class Services : ReadOnlyPropertyFixtureBase<GameServiceContainer> {
 				public Services ()
 					: base (g => g.Services)
@@ -265,7 +212,8 @@ namespace MonoGame.Tests
 				}
 			}
 
-			[TestFixture]
+			[Category("GameTest")]
+			[RunOnUiTestFixture]
 			public class TargetElapsedTime : ReadWritePropertyFixtureBase<TimeSpan> {
 				public TargetElapsedTime ()
 					: base (g => g.TargetElapsedTime)
@@ -281,7 +229,8 @@ namespace MonoGame.Tests
 				}
 			}
 
-			[TestFixture]
+			[Category("GameTest")]
+			[RunOnUiTestFixture]
 			public class Window : ReadOnlyPropertyFixtureBase<GameWindow> {
 				public Window ()
 					: base (g => g.Window)
@@ -303,6 +252,7 @@ namespace MonoGame.Tests
 				}
 			}
 
+			[RunOnUiTestFixture]
 			public abstract class PropertyFixtureBase<PropertyT> : FixtureBase {
 				private Func<Game, PropertyT> _getter;
 				protected PropertyFixtureBase (Expression<Func<Game, PropertyT> > propertyExpression)
@@ -384,6 +334,7 @@ namespace MonoGame.Tests
 				}
 			}
 
+			[RunOnUiTestFixture]
 			public abstract class ReadOnlyPropertyFixtureBase<PropertyT> : PropertyFixtureBase<PropertyT> {
 				protected ReadOnlyPropertyFixtureBase (
 					Expression<Func<Game, PropertyT> > propertyExpression)
@@ -400,6 +351,7 @@ namespace MonoGame.Tests
 				}
 			}
 
+			[RunOnUiTestFixture]
 			public abstract class ReadWritePropertyFixtureBase<PropertyT> : PropertyFixtureBase<PropertyT> {
 				protected ReadWritePropertyFixtureBase (
 					Expression<Func<Game, PropertyT>> propertyExpression)

@@ -33,10 +33,16 @@ using System.Collections.Generic;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
+    /// <summary>
+    /// A collection that manipulates <see cref="DisplayMode"/> instances.
+    /// </summary>
     public class DisplayModeCollection : IEnumerable<DisplayMode>
     {
         private readonly List<DisplayMode> _modes;
 
+        /// <summary>
+        /// Gets the <see cref="DisplayMode"/> instance with the specified format.
+        /// </summary>
         public IEnumerable<DisplayMode> this[SurfaceFormat format]
         {
             get 
@@ -51,6 +57,7 @@ namespace Microsoft.Xna.Framework.Graphics
             }
         }
 
+        /// <inheritdoc />
         public IEnumerator<DisplayMode> GetEnumerator()
         {
             return _modes.GetEnumerator();

@@ -1,4 +1,4 @@
-﻿// MonoGame - Copyright (C) The MonoGame Team
+﻿// MonoGame - Copyright (C) MonoGame Foundation, Inc
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
@@ -14,7 +14,11 @@ namespace Microsoft.Xna.Framework.Input
         static KeysHelper()
         {
             _map = new HashSet<int>();
+#if NET45
             var allKeys = (Keys[])Enum.GetValues(typeof(Keys));
+#else
+            var allKeys = Enum.GetValues<Keys>();
+#endif
             foreach (var key in allKeys)
             {
                 _map.Add((int)key);

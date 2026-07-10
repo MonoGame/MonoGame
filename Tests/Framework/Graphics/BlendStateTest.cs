@@ -1,4 +1,4 @@
-﻿// MonoGame - Copyright (C) The MonoGame Team
+﻿// MonoGame - Copyright (C) MonoGame Foundation, Inc
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
@@ -9,7 +9,8 @@ using NUnit.Framework;
 
 namespace MonoGame.Tests.Graphics
 {
-    [TestFixture]
+    [NonParallelizable]
+    [RunOnUiTestFixture]
     internal class BlendStateTest : GraphicsDeviceTestFixtureBase
     {
         [Test]
@@ -59,7 +60,7 @@ namespace MonoGame.Tests.Graphics
             assertMethod(() => blendState.ColorWriteChannels1 = ColorWriteChannels.All);
             assertMethod(() => blendState.ColorWriteChannels2 = ColorWriteChannels.All);
             assertMethod(() => blendState.ColorWriteChannels3 = ColorWriteChannels.All);
-// The Mac build bot GL driver does not support independent blend states
+            // The Mac build bot GL driver does not support independent blend states
 #if !XNA && !DESKTOPGL
             assertMethod(() => blendState.IndependentBlendEnable = true);
 #endif
@@ -109,7 +110,7 @@ namespace MonoGame.Tests.Graphics
             {
                 for (var x = 0; x < blends.Length; x++)
                 {
-                    blendStates[(y*blends.Length) + x] = new BlendState
+                    blendStates[(y * blends.Length) + x] = new BlendState
                     {
                         ColorSourceBlend = blends[y],
                         AlphaSourceBlend = blends[y],
@@ -131,9 +132,9 @@ namespace MonoGame.Tests.Graphics
             {
                 for (var x = 0; x < blends.Length; x++)
                 {
-                    var pos = offset + new Vector2(x*size.X, y*size.Y);
-                    spriteBatch.Begin(SpriteSortMode.Deferred, blendStates[(y*blends.Length) + x]);
-                    spriteBatch.Draw(texture, new Rectangle((int) pos.X, (int) pos.Y, (int) size.X, (int) size.Y),
+                    var pos = offset + new Vector2(x * size.X, y * size.Y);
+                    spriteBatch.Begin(SpriteSortMode.Deferred, blendStates[(y * blends.Length) + x]);
+                    spriteBatch.Draw(texture, new Rectangle((int)pos.X, (int)pos.Y, (int)size.X, (int)size.Y),
                         Color.White);
                     spriteBatch.End();
                 }

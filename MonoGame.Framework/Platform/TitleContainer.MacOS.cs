@@ -1,4 +1,4 @@
-// MonoGame - Copyright (C) The MonoGame Team
+// MonoGame - Copyright (C) MonoGame Foundation, Inc
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
@@ -18,20 +18,15 @@ namespace Microsoft.Xna.Framework
         static partial void PlatformInit()
         {
             Location = NSBundle.MainBundle.ResourcePath;
-#if IOS
             SupportRetina = UIScreen.MainScreen.Scale >= 2.0f;
             RetinaScale = (int)Math.Round(UIScreen.MainScreen.Scale);
-#endif
         }
 
-#if IOS
         static internal bool SupportRetina { get; private set; }
         static internal int RetinaScale { get; private set; }
-#endif
 
         private static Stream PlatformOpenStream(string safeName)
         {
-#if IOS
             var absolutePath = Path.Combine(Location, safeName);
             if (SupportRetina)
             {
@@ -46,11 +41,12 @@ namespace Microsoft.Xna.Framework
                         return File.OpenRead(absolutePathX);
                 }
             }
-            return File.OpenRead(absolutePath);
-#else
-            var absolutePath = Path.Combine(Location, safeName);
-            return File.OpenRead(absolutePath);
-#endif
+            if (File.Exists(absolutePath))
+            {
+                return File.OpenRead(absolutePath);
+            }
+
+            return null;
         }
     }
 }

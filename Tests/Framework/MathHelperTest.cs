@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using NUnit.Framework;
+using System;
 
 namespace MonoGame.Tests.Framework
 {
@@ -66,7 +67,7 @@ namespace MonoGame.Tests.Framework
         public void Min()
         {
             Assert.AreEqual(-0.5f, MathHelper.Min(-0.5f, -0.5f));
-            Assert.AreEqual(-0.5f, MathHelper.Min(-0.5f,0.0f));
+            Assert.AreEqual(-0.5f, MathHelper.Min(-0.5f, 0.0f));
             Assert.AreEqual(-0.5f, MathHelper.Min(0.0f, -0.5f));
             Assert.AreEqual(0, MathHelper.Min(0, 0));
             Assert.AreEqual(-5, MathHelper.Min(-5, 5));
@@ -77,7 +78,7 @@ namespace MonoGame.Tests.Framework
         public void Max()
         {
             Assert.AreEqual(-0.5f, MathHelper.Min(-0.5f, -0.5f));
-            Assert.AreEqual(0.0f, MathHelper.Max(-0.5f,0.0f));
+            Assert.AreEqual(0.0f, MathHelper.Max(-0.5f, 0.0f));
             Assert.AreEqual(0.0f, MathHelper.Max(0.0f, -0.5f));
             Assert.AreEqual(0, MathHelper.Max(0, 0));
             Assert.AreEqual(5, MathHelper.Max(-5, 5));
@@ -152,6 +153,76 @@ namespace MonoGame.Tests.Framework
         {
             var actualValue = MathHelper.WrapAngle(angle);
             Assert.AreEqual(expectedValue, actualValue);
+        }
+
+        [TestCase(int.MaxValue)]
+        [TestCase(int.MinValue)]
+        public void GenerateRandomUpperLimit(int maxValue)
+        {
+            MathHelper.Random rng = new MathHelper.Random();
+            var resultInt1 = rng.Next(maxValue);
+            var resultInt2 = rng.Next(maxValue);
+            var resultInt3 = rng.Next(maxValue);
+            var resultInt4 = rng.Next(maxValue);
+            var resultInt5 = rng.Next(maxValue);
+
+            // Max cannot be less than 0, so it is reset to 0 for comparison
+            if (maxValue < 0) maxValue = 0;
+
+            Assert.LessOrEqual(resultInt1, maxValue);
+            Assert.LessOrEqual(resultInt2, maxValue);
+            Assert.LessOrEqual(resultInt3, maxValue);
+            Assert.LessOrEqual(resultInt4, maxValue);
+            Assert.LessOrEqual(resultInt5, maxValue);
+        }
+
+        [TestCase(int.MinValue, int.MaxValue)]
+        [TestCase(int.MinValue, int.MinValue)]
+        [TestCase(int.MaxValue, int.MinValue)]
+        [TestCase(int.MaxValue, int.MaxValue)]
+        public void GenerateRandomRangeLimitInt(int minValue, int maxValue)
+        {
+            MathHelper.Random rng = new MathHelper.Random();
+            var resultInt1 = rng.Next(minValue, maxValue);
+            var resultInt2 = rng.Next(minValue, maxValue);
+            var resultInt3 = rng.Next(minValue, maxValue);
+            var resultInt4 = rng.Next(minValue, maxValue);
+            var resultInt5 = rng.Next(minValue, maxValue);
+
+            // If the minimum is the maximum, then max cannot return higher.
+            if (minValue == int.MaxValue) maxValue = minValue;
+
+            Assert.That(resultInt1 >= minValue && resultInt1 <= maxValue);
+            Assert.That(resultInt2 >= minValue && resultInt2 <= maxValue);
+            Assert.That(resultInt3 >= minValue && resultInt3 <= maxValue);
+            Assert.That(resultInt4 >= minValue && resultInt4 <= maxValue);
+            Assert.That(resultInt5 >= minValue && resultInt5 <= maxValue);
+        }
+
+        [TestCase(float.MinValue, float.MaxValue)]
+        [TestCase(float.MinValue, float.MinValue)]
+        [TestCase(float.MaxValue, float.MaxValue)]
+        [TestCase(MathHelper.Log10E, MathHelper.Log2E)]
+        [TestCase(MathHelper.PiOver2, MathHelper.Pi)]
+        [TestCase(MathHelper.PiOver4, MathHelper.Pi)]
+        [TestCase(float.MinValue, MathHelper.Tau)]
+        public void GenerateRandomUpperLimitFloat(float minValue, float maxValue)
+        {
+            MathHelper.Random rng = new MathHelper.Random();
+            var resultInt1 = rng.NextFloat(minValue, maxValue);
+            var resultInt2 = rng.NextFloat(minValue, maxValue);
+            var resultInt3 = rng.NextFloat(minValue, maxValue);
+            var resultInt4 = rng.NextFloat(minValue, maxValue);
+            var resultInt5 = rng.NextFloat(minValue, maxValue);
+
+            // Max cannot be less than 0, so it is reset to 0 for comparison
+            if (maxValue < 0) maxValue = 0;
+
+            Assert.That(resultInt1 >= minValue && resultInt1 <= maxValue);
+            Assert.That(resultInt2 >= minValue && resultInt2 <= maxValue);
+            Assert.That(resultInt3 >= minValue && resultInt3 <= maxValue);
+            Assert.That(resultInt4 >= minValue && resultInt4 <= maxValue);
+            Assert.That(resultInt5 >= minValue && resultInt5 <= maxValue);
         }
     }
 }

@@ -1,4 +1,4 @@
-﻿// MonoGame - Copyright (C) The MonoGame Team
+﻿// MonoGame - Copyright (C) MonoGame Foundation, Inc
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
@@ -12,20 +12,20 @@ namespace Microsoft.Xna.Framework.Input
     public static partial class GamePad
     {
         /// <summary>
-        /// Returns the capabilites of the connected controller.
+        /// Returns the capabilities of the connected controller.
         /// </summary>
         /// <param name="playerIndex">Player index for the controller you want to query.</param>
-        /// <returns>The capabilites of the controller.</returns>
+        /// <returns>The capabilities of the controller.</returns>
         public static GamePadCapabilities GetCapabilities(PlayerIndex playerIndex)
         {
             return GetCapabilities((int)playerIndex);
         }
 
         /// <summary>
-        /// Returns the capabilites of the connected controller.
+        /// Returns the capabilities of the connected controller.
         /// </summary>
         /// <param name="index">Index for the controller you want to query.</param>
-        /// <returns>The capabilites of the controller.</returns>
+        /// <returns>The capabilities of the controller.</returns>
         public static GamePadCapabilities GetCapabilities(int index)
         {
             if (index < 0 || index >= PlatformGetMaxNumberOfGamePads())

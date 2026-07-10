@@ -186,6 +186,9 @@ namespace MonoGame.Effect
 				glslCode = "#extension GL_OES_standard_derivatives : enable\r\n" + glslCode;
 			}
 
+			// Fix "uniform vec4 ps_uniforms_ivec4" to be "uniform ivec4 ps_uniforms_ivec4":
+			glslCode = glslCode.Replace("uniform vec4 ps_uniforms_ivec4", "uniform ivec4 ps_uniforms_ivec4");
+
 			// Store the code for serialization.
 			dxshader.ShaderCode = Encoding.ASCII.GetBytes (glslCode);
 

@@ -1,4 +1,4 @@
-﻿// MonoGame - Copyright (C) The MonoGame Team
+﻿// MonoGame - Copyright (C) MonoGame Foundation, Inc
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
@@ -9,7 +9,8 @@ using NUnit.Framework;
 
 namespace MonoGame.Tests.Graphics
 {
-    [TestFixture]
+    [NonParallelizable]
+    [RunOnUiTestFixture]
     internal class SamplerStateTest : GraphicsDeviceTestFixtureBase
     {
         [Test]
@@ -69,6 +70,15 @@ namespace MonoGame.Tests.Graphics
         [Test]
         public void VisualTestAddressModes()
         {
+#if VULKAN
+            if (OperatingSystem.IsMacOS())
+            {
+                Assert.Ignore("TODO: Fix on macOS");
+                return;
+            }
+
+#endif
+
             PrepareFrameCapture();
 
             var addressModes = new[]

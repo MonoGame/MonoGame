@@ -1,4 +1,4 @@
-﻿// MonoGame - Copyright (C) The MonoGame Team
+﻿// MonoGame - Copyright (C) MonoGame Foundation, Inc
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
@@ -10,7 +10,7 @@ using System.Collections.ObjectModel;
 namespace Microsoft.Xna.Framework.Graphics
 {
     /// <summary>
-    /// Represents a collection of ModelMesh objects.
+    /// Represents a collection of <see cref="ModelMesh"/> objects.
     /// </summary>
     public sealed class ModelMeshCollection : ReadOnlyCollection<ModelMesh>
     {
@@ -21,7 +21,7 @@ namespace Microsoft.Xna.Framework.Graphics
         }
 
         /// <summary>
-        /// Retrieves a ModelMesh from the collection, given the name of the mesh.
+        /// Retrieves a <see cref="ModelMesh"/> from the collection, given the name of the mesh.
         /// </summary>
         /// <param name="meshName">The name of the mesh to retrieve.</param>
         public ModelMesh this[string meshName]
@@ -60,9 +60,9 @@ namespace Microsoft.Xna.Framework.Graphics
         }
 
         /// <summary>
-        /// Returns a ModelMeshCollection.Enumerator that can iterate through a ModelMeshCollection.
+        /// Returns a <see cref="ModelMeshCollection.Enumerator">ModelMeshCollection.Enumerator</see>
+        /// that can iterate through a collection.
         /// </summary>
-        /// <returns></returns>
         public new Enumerator GetEnumerator()
         {
             return new Enumerator(this);
@@ -115,6 +115,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 get { return _collection[_position]; }
             }
 
+            /// <inheritdoc/>
             public void Reset()
             {
                 _position = -1;

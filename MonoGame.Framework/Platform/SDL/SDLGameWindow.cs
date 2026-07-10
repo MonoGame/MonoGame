@@ -1,4 +1,4 @@
-// MonoGame - Copyright (C) The MonoGame Team
+// MonoGame - Copyright (C) MonoGame Foundation, Inc
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
@@ -108,13 +108,14 @@ namespace Microsoft.Xna.Framework
             Sdl.SetHint("SDL_JOYSTICK_ALLOW_BACKGROUND_EVENTS", "1");
 
             // when running NUnit tests entry assembly can be null
-            if (Assembly.GetEntryAssembly() != null)
+            var entryAssembly = Assembly.GetEntryAssembly();
+            if (entryAssembly != null)
             {
                 using (
                     var stream =
-                        Assembly.GetEntryAssembly().GetManifestResourceStream(Assembly.GetEntryAssembly().EntryPoint.DeclaringType.Namespace + ".Icon.bmp") ??
-                        Assembly.GetEntryAssembly().GetManifestResourceStream("Icon.bmp") ??
-                        Assembly.GetExecutingAssembly().GetManifestResourceStream("MonoGame.bmp"))
+                        entryAssembly.GetManifestResourceStream(entryAssembly.GetName().Name + ".Icon.bmp") ??
+                        entryAssembly.GetManifestResourceStream("Icon.bmp") ??
+                        typeof(SdlGameWindow).Assembly.GetManifestResourceStream("MonoGame.bmp"))
                 {
                     if (stream != null)
                         using (var br = new BinaryReader(stream))
@@ -159,7 +160,7 @@ namespace Microsoft.Xna.Framework
             _height = GraphicsDeviceManager.DefaultBackBufferHeight;
 
             _handle = Sdl.Window.Create(
-                AssemblyHelper.GetDefaultWindowTitle(),
+                Title == null ? AssemblyHelper.GetDefaultWindowTitle() : Title,
                 winx, winy, _width, _height, initflags
             );
 
@@ -222,19 +223,26 @@ namespace Microsoft.Xna.Framework
             Sdl.Rectangle displayRect;
             Sdl.Display.GetBounds(displayIndex, out displayRect);
 
-            if (_willBeFullScreen != IsFullScreen || _hardwareSwitch != _game.graphicsDeviceManager.HardwareModeSwitch)
-            {
-                var fullscreenFlag = _game.graphicsDeviceManager.HardwareModeSwitch ? Sdl.Window.State.Fullscreen : Sdl.Window.State.FullscreenDesktop;
-                Sdl.Window.SetFullscreen(Handle, (_willBeFullScreen) ? fullscreenFlag : 0);
-                _hardwareSwitch = _game.graphicsDeviceManager.HardwareModeSwitch;
-            }
+            // fullcreen mode needs to change
+            var fullScreenChanged = _willBeFullScreen != IsFullScreen;
+            var hardwareSwitchChanged = _hardwareSwitch != _game.graphicsDeviceManager.HardwareModeSwitch;
+            _hardwareSwitch = _game.graphicsDeviceManager.HardwareModeSwitch;
+
+            // set fullscreen to windowed mode
+            if (!_willBeFullScreen && fullScreenChanged)
+                Sdl.Window.SetFullscreen(Handle, 0);
+
+            // set fullscreen to desktop fullscreen
+            if (_willBeFullScreen && !_hardwareSwitch && (fullScreenChanged || hardwareSwitchChanged))
+                Sdl.Window.SetFullscreen(Handle, Sdl.Window.State.FullscreenDesktop);
+
             // If going to exclusive full-screen mode, force the window to minimize on focus loss (Windows only)
             if (CurrentPlatform.OS == OS.Windows)
             {
                 Sdl.SetHint("SDL_VIDEO_MINIMIZE_ON_FOCUS_LOSS", _willBeFullScreen && _hardwareSwitch ? "1" : "0");
             }
 
-            if (!_willBeFullScreen || _game.graphicsDeviceManager.HardwareModeSwitch)
+            if (!_willBeFullScreen || _hardwareSwitch)
             {
                 Sdl.Window.SetSize(Handle, clientWidth, clientHeight);
                 _width = clientWidth;
@@ -245,6 +253,10 @@ namespace Microsoft.Xna.Framework
                 _width = displayRect.Width;
                 _height = displayRect.Height;
             }
+
+            // set fullscreen to hardware fullscreen
+            if (_willBeFullScreen && _hardwareSwitch  && (fullScreenChanged || hardwareSwitchChanged))
+                Sdl.Window.SetFullscreen(Handle, Sdl.Window.State.Fullscreen);
 
             int ignore, minx = 0, miny = 0;
             Sdl.Window.GetBorderSize(_handle, out miny, out minx, out ignore, out ignore);
@@ -298,6 +310,10 @@ namespace Microsoft.Xna.Framework
                 _game.GraphicsDevice.PresentationParameters.BackBufferHeight == height) {
                 return;
             }
+
+            if (_game.GraphicsDevice.RasterizerState.ScissorTestEnable && _game.GraphicsDevice.ScissorRectangle == _game.GraphicsDevice.Viewport.Bounds)
+                _game.GraphicsDevice.ScissorRectangle = new Rectangle(0, 0, width, height);
+
             _game.GraphicsDevice.PresentationParameters.BackBufferWidth = width;
             _game.GraphicsDevice.PresentationParameters.BackBufferHeight = height;
             _game.GraphicsDevice.Viewport = new Viewport(0, 0, width, height);

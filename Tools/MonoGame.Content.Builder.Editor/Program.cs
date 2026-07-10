@@ -1,4 +1,4 @@
-﻿// MonoGame - Copyright (C) The MonoGame Team
+﻿// MonoGame - Copyright (C) MonoGame Foundation, Inc
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
@@ -28,7 +28,7 @@ namespace MonoGame.Tools.Pipeline
 #elif WPF
             var app = new Application(Platforms.Wpf);
 #else
-            var app = new Application(Platforms.Mac64);
+            var app = new Application(Platforms.macOS);
 #endif
 
             app.Style = "PipelineTool";

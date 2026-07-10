@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>net6.0</TargetFramework>
+    <TargetFramework>net8.0</TargetFramework>
     <RollForward>Major</RollForward>
     <Description>The MonoGame Framework Content Builder Editor (MGCB-Editor) is a graphical tool used for editing your content projects ready for processing.</Description>
     <BaseOutputPath>..\..\Artifacts\MonoGame.Content.Builder.Editor.Launcher\Windows</BaseOutputPath>
@@ -15,10 +15,10 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Content Include="..\..\Artifacts\MonoGame.Content.Builder.Editor\Windows\Release\publish\**\*">
+    <None Include="..\..\Artifacts\MonoGame.Content.Builder.Editor\Windows\Release\publish\**\*">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <Link>mgcb-editor-windows-data\%(RecursiveDir)%(Filename)%(Extension)</Link>
-    </Content>
+    </None>
   </ItemGroup>
 
 </Project>

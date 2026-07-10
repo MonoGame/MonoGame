@@ -3,6 +3,9 @@ using System.Collections.Generic;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
+    /// <summary>
+    /// Represents a collection of <see cref="EffectPass"/> objects.
+    /// </summary>
     public class EffectPassCollection : IEnumerable<EffectPass>
     {
 		private readonly EffectPass[] _passes;
@@ -21,11 +24,18 @@ namespace Microsoft.Xna.Framework.Graphics
             return new EffectPassCollection(passes);
         }
 
+        /// <summary>
+        /// Retrieves the <see cref="EffectPass"/> at the specified index in the collection.
+        /// </summary>
         public EffectPass this[int index]
         {
             get { return _passes[index]; }
         }
 
+        /// <summary>
+        /// Retrieves a <see cref="EffectPass"/> from the collection, given the name of the pass.
+        /// </summary>
+        /// <param name="name">The name of the pass to retrieve.</param>
         public EffectPass this[string name]
         {
             get 
@@ -40,11 +50,18 @@ namespace Microsoft.Xna.Framework.Graphics
 		    }
         }
 
+        /// <summary>
+        /// Gets the number of elements contained in the collection.
+        /// </summary>
         public int Count
         {
             get { return _passes.Length; }
         }
 
+        /// <summary>
+        /// Returns a <see cref="EffectPassCollection.Enumerator">EffectPassCollection.Enumerator</see>
+        /// that can iterate through a collection.
+        /// </summary>
         public Enumerator GetEnumerator()
         {
             return new Enumerator(_passes);
@@ -60,6 +77,9 @@ namespace Microsoft.Xna.Framework.Graphics
             return _passes.GetEnumerator();
         }
 
+        /// <summary>
+        /// Enumerator to iterate through the <see cref="EffectPassCollection"/>
+        /// </summary>
         public struct Enumerator : IEnumerator<EffectPass>
         {
             private readonly EffectPass[] _array;
@@ -73,6 +93,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 _current = null;
             }
 
+            /// <inheritdoc/>
             public bool MoveNext()
             {
                 if (_index < _array.Length)
@@ -86,11 +107,13 @@ namespace Microsoft.Xna.Framework.Graphics
                 return false;
             }
 
+            /// <inheritdoc/>
             public EffectPass Current
             {
                 get { return _current; }
             }
 
+            /// <inheritdoc cref="IDisposable.Dispose()"/>
             public void Dispose()
             {
 
