@@ -326,7 +326,6 @@ namespace MonoGame.Tests.Graphics
         }
 #endif
 
-#if XNA || DIRECTX || DIRECTX12 || VULKAN
         [Test]
         public void DrawInstancedPrimitivesParameterValidation()
         {
@@ -537,7 +536,6 @@ namespace MonoGame.Tests.Graphics
                 renderTarget.Dispose();
             }
         }
-#endif
 
         [Test]
         public void DrawUserPrimitivesParameterValidation()
