@@ -7,13 +7,13 @@ public partial class PowerStatus
     {
         return SystemInformation.PowerStatus.BatteryChargeStatus switch
         {
-            BatteryChargeStatus.Charging => BatteryChargeStatus.Charging,
-            BatteryChargeStatus.NoSystemBattery => BatteryChargeStatus.NoBattery,
-            BatteryChargeStatus.NotCharging => BatteryChargeStatus.OnBattery,
-            BatteryChargeStatus.Unknown => BatteryChargeStatus.Unknown,
-            BatteryChargeStatus.High => BatteryChargeStatus.OnBattery,
-            BatteryChargeStatus.Low => BatteryChargeStatus.OnBattery,
-            BatteryChargeStatus.Critical => BatteryChargeStatus.OnBattery,
+            SystemInformation.PowerStatus.BatteryChargeStatus.BatteryChargeStatus.Charging => BatteryChargeStatus.Charging,
+            SystemInformation.PowerStatus.BatteryChargeStatus.BatteryChargeStatus.NoSystemBattery => BatteryChargeStatus.NoBattery,
+            SystemInformation.PowerStatus.BatteryChargeStatus.BatteryChargeStatus.NotCharging => BatteryChargeStatus.OnBattery,
+            SystemInformation.PowerStatus.BatteryChargeStatus.BatteryChargeStatus.Unknown => BatteryChargeStatus.Unknown,
+            SystemInformation.PowerStatus.BatteryChargeStatus.BatteryChargeStatus.High => BatteryChargeStatus.OnBattery,
+            SystemInformation.PowerStatus.BatteryChargeStatus.BatteryChargeStatus.Low => BatteryChargeStatus.OnBattery,
+            SystemInformation.PowerStatus.BatteryChargeStatus.BatteryChargeStatus.Critical => BatteryChargeStatus.OnBattery,
             _ => BatteryChargeStatus.Unknown
         };
     }
