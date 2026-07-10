@@ -1,4 +1,4 @@
-// MonoGame - Copyright (C) The MonoGame Team
+// MonoGame - Copyright (C) MonoGame Foundation, Inc
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
                 
@@ -20,10 +20,10 @@ struct MGG_Texture;
 MG_EXPORT MGM_AudioDecoder* MGM_AudioDecoder_Create(const char* filepath, MGM_AudioDecoderInfo& info);
 MG_EXPORT void MGM_AudioDecoder_Destroy(MGM_AudioDecoder* decoder);
 MG_EXPORT void MGM_AudioDecoder_SetPosition(MGM_AudioDecoder* decoder, mgulong timeMS);
-MG_EXPORT mgbool MGM_AudioDecoder_Decode(MGM_AudioDecoder* decoder, mgbyte*& buffer, mguint& size);
+MG_EXPORT mgbyte MGM_AudioDecoder_Decode(MGM_AudioDecoder* decoder, mgbyte*& buffer, mguint& size);
 MG_EXPORT MGM_VideoDecoder* MGM_VideoDecoder_Create(MGG_GraphicsDevice* device, const char* filepath, MGM_VideoDecoderInfo& info);
 MG_EXPORT void MGM_VideoDecoder_Destroy(MGM_VideoDecoder* decoder);
 MG_EXPORT MGM_AudioDecoder* MGM_VideoDecoder_GetAudioDecoder(MGM_VideoDecoder* decoder, MGM_AudioDecoderInfo& info);
 MG_EXPORT mgulong MGM_VideoDecoder_GetPosition(MGM_VideoDecoder* decoder);
-MG_EXPORT void MGM_VideoDecoder_SetLooped(MGM_VideoDecoder* decoder, mgbool looped);
+MG_EXPORT void MGM_VideoDecoder_SetLooped(MGM_VideoDecoder* decoder, mgbyte looped);
 MG_EXPORT MGG_Texture* MGM_VideoDecoder_Decode(MGM_VideoDecoder* decoder);

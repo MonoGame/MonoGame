@@ -1,4 +1,4 @@
-﻿// MonoGame - Copyright (C) MonoGame Foundation, Inc
+// MonoGame - Copyright (C) MonoGame Foundation, Inc
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 using System;
@@ -9,8 +9,8 @@ using Microsoft.Xna.Framework.Graphics;
 using NUnit.Framework;
 
 namespace MonoGame.Tests.Graphics {
-	[TestFixture]
     [NonParallelizable]
+	[RunOnUiTestFixture]
 	class SpriteFontTest : GraphicsDeviceTestFixtureBase {
 
 		private SpriteBatch _spriteBatch;
@@ -28,7 +28,7 @@ namespace MonoGame.Tests.Graphics {
 	    [TearDown]
 	    public override void TearDown()
 	    {
-            _spriteBatch.Dispose();
+            _spriteBatch?.Dispose();
 	        _spriteBatch = null;
 
 	        base.TearDown();
@@ -59,7 +59,13 @@ namespace MonoGame.Tests.Graphics {
         [TestCase("SegoeKeycaps", "The quick brown fox jumps over the lazy dog. 1234567890", 988, 20)]
         [TestCase("SegoeKeycaps", "The quick brown fox jumps\nover the lazy dog.\n1234567890", 448, 58)]
         [TestCase("SegoeKeycaps", "!", 16, 20)] // LSB=1, W=15, RSB=0
-        [RunOnUI]
+        [TestCase("fontMenuBold01", "THE QUICK BROWN FOX JUMPS OVER THE LAZY DOG. 1234567890!@", 1383, 59)]
+        [TestCase("fontMenuBold01", "the quick brown fox jumps over the lazy dog. 1234567890!@",  1383, 59)]
+        [TestCase("fontMenuBold01", "The quick brown fox jumps over the lazy dog. 1234567890",  1342, 59)]
+        [TestCase("Roboto", "The quick brown fox jumps over the lazy dog. 1234567890", 421, 19)]
+        [TestCase("Roboto", "The quick brown fox jumps over the lazy dog.\r1234567890", 417, 19)]
+        [TestCase("Roboto", "The quick brown fox jumps\nover the lazy dog.\n1234567890", 195, 57)]
+        [TestCase("Roboto", "The quick brown fox jumps over the lazy dog. 1234567890!@", 439, 19)]
         public void MeasureString_returns_correct_values(string fontName, string text, float width, float height)
         {
             var font = game.Content.Load<SpriteFont>(Paths.Font(fontName));
@@ -69,7 +75,6 @@ namespace MonoGame.Tests.Graphics {
         }
 
 		[Test]
-        [RunOnUI]
 		public void Plain ()
 		{
             PrepareFrameCapture();
@@ -87,7 +92,6 @@ namespace MonoGame.Tests.Graphics {
 		}
 
 		[Test]
-        [RunOnUI]
 		public void Rotated ()
 		{
             PrepareFrameCapture();
@@ -113,7 +117,6 @@ namespace MonoGame.Tests.Graphics {
 		}
 
 		[Test]
-        [RunOnUI]
 		public void Scaled ()
 		{
             PrepareFrameCapture();
@@ -142,7 +145,6 @@ namespace MonoGame.Tests.Graphics {
 		[TestCase(SpriteEffects.FlipHorizontally)]
 		[TestCase(SpriteEffects.FlipVertically)]
 		[TestCase(SpriteEffects.FlipHorizontally | SpriteEffects.FlipVertically)]
-        [RunOnUI]
 		public void Draw_with_SpriteEffects (SpriteEffects effects)
 		{
             PrepareFrameCapture();
@@ -168,7 +170,6 @@ namespace MonoGame.Tests.Graphics {
 		}
 
 		[Test]
-        [RunOnUI]
 		public void Origins_rotated ()
 		{
             PrepareFrameCapture();
@@ -218,7 +219,6 @@ namespace MonoGame.Tests.Graphics {
 		}
 
 		[Test]
-        [RunOnUI]
 		public void Origins_scaled ()
 		{
             PrepareFrameCapture();
@@ -268,7 +268,6 @@ namespace MonoGame.Tests.Graphics {
 		}
         
 		[Test]
-        [RunOnUI]
 		public void Draw_with_LayerDepth()
 		{
             PrepareFrameCapture();
@@ -408,7 +407,6 @@ namespace MonoGame.Tests.Graphics {
 		}
         
 		[Test]
-        [RunOnUI]
 		public void Hullabaloo ()
 		{
             PrepareFrameCapture();
@@ -424,7 +422,6 @@ namespace MonoGame.Tests.Graphics {
 		}
 
 		[Test]
-        [RunOnUI]
 		public void Hullabaloo2 ()
 		{
             PrepareFrameCapture();
@@ -449,7 +446,6 @@ So he wrote a routine
 To ask 'What's it all mean?'
 But the answer was still '42'.
                 R Humphries, Sutton Coldfield", TestName = "Multiline_verbatimString")]
-        [RunOnUI]
 		public void Multiline (string text)
 		{
             PrepareFrameCapture();
@@ -492,7 +488,6 @@ But the answer was still '42'.
 		}
 
 		[Test]
-        [RunOnUI]
 		public void Font_spacing_is_respected ()
 		{
             PrepareFrameCapture();
@@ -523,7 +518,6 @@ But the answer was still '42'.
         [TestCase("The rain in España stays mainly in the plain - now in français")]
         [TestCase("\x1f")]
         [TestCase("\x7f")]
-        [RunOnUI]
         public void Throws_when_drawing_unavailable_characters(string text)
 		{
             _spriteBatch.Begin ();
@@ -536,7 +530,6 @@ But the answer was still '42'.
         [TestCase('ñ')]
         [TestCase((char)127)]
         [TestCase((char)31)]
-        [RunOnUI]
         public void Throws_when_setting_unavailable_DefaultCharacter(char character)
 		{
             Assert.Throws<ArgumentException> (() =>
@@ -547,7 +540,6 @@ But the answer was still '42'.
         [TestCase((char)32)]
         [TestCase((char)63)]
         [TestCase((char)126)]
-        [RunOnUI]
         public void Does_not_throw_when_setting_available_DefaultCharacter(char character)
         {
             Assert.DoesNotThrow(() => _defaultFont.DefaultCharacter = character);

@@ -2,23 +2,23 @@
 
 ![MonoGame](https://raw.githubusercontent.com/MonoGame/MonoGame.Logo/refs/heads/master/FullColorOnLight/LogoOnly_128px.png)
 
- [![Join the chat at https://discord.gg/monogame](https://img.shields.io/discord/355231098122272778?style=flat-square&color=%237289DA&label=Discord%20server&logo=discord&logoColor=white)](https://discord.gg/monogame) 
+ [![Join the chat at https://discord.gg/monogame](https://img.shields.io/discord/355231098122272778?style=flat-square&color=%237289DA&label=Discord%20server&logo=discord&logoColor=white)](https://discord.gg/monogame)
  ![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/monogame/monogame/main.yml?style=flat-square)
- [![Donate](https://img.shields.io/badge/donate-F1465A?style=flat-square&logo=monogame&logoColor=FFFFFF)](https://monogame.net/donate/) 
+ [![Donate](https://img.shields.io/badge/donate-F1465A?style=flat-square&logo=monogame&logoColor=FFFFFF)](https://monogame.net/donate/)
 
  One framework for creating powerful cross-platform games
 
-[Supported Platforms](#supported-platforms) • 
-[Resources](#resources) • 
-[Samples](#samples) • 
-[Support and Contributions](#support-and-contributions) • 
-[Source Code](#source-code) • 
-[Helpful Links](#helpful-links) • 
+[Supported Platforms](#supported-platforms) •
+[Resources](#resources) •
+[Samples](#samples) •
+[Support and Contributions](#support-and-contributions) •
+[Source Code](#source-code) •
+[Helpful Links](#helpful-links) •
 [License](#license)
 
 ## Overview
 
-**MonoGame** is a simple and powerful .NET framework for creating games for desktop PCs, video game consoles, and mobile devices using the C# programming language. It has been successfully used to create games such as [Streets of Rage 4](https://store.steampowered.com/app/985890/Streets_of_Rage_4/), [Carrion](https://store.steampowered.com/app/953490/CARRION/), [Celeste](https://store.steampowered.com/app/504230/Celeste/), [Stardew Valley](https://store.steampowered.com/app/413150/Stardew_Valley/), and [many others](https://monogame.net/showcase/). 
+**MonoGame** is a simple and powerful .NET framework for creating games for desktop PCs, video game consoles, and mobile devices using the C# programming language. It has been successfully used to create games such as [Streets of Rage 4](https://store.steampowered.com/app/985890/Streets_of_Rage_4/), [Carrion](https://store.steampowered.com/app/953490/CARRION/), [Celeste](https://store.steampowered.com/app/504230/Celeste/), [Stardew Valley](https://store.steampowered.com/app/413150/Stardew_Valley/), and [many others](https://monogame.net/showcase/).
 
 It is an open-source re-implementation of the discontinued [Microsoft's XNA Framework](https://msdn.microsoft.com/en-us/library/bb200104.aspx).
 
@@ -27,17 +27,26 @@ It is an open-source re-implementation of the discontinued [Microsoft's XNA Fram
 We support a growing list of platforms across the desktop, mobile, and console space. If there is a platform we do not support, please [make a request](https://github.com/MonoGame/MonoGame/issues) or [come help us](CONTRIBUTING.md) add it.
 
 * Desktop PCs
-  * Windows 8.1 and up (OpenGL & DirectX)
-  * Linux (OpenGL)
-  * macOS 10.15 and up (OpenGL)
+  * Windows 10 (22H2+) and up (OpenGL[^1] & DirectX 10[^2])
+  * Linux[^3] and up (OpenGL[^1])
+  * macOS 13 "Ventura" and up (OpenGL[^1])
 * Mobile/Tablet Devices
-  * Android 6.0 and up (OpenGL)
-  * iPhone/iPad 10.0 and up (OpenGL)
+  * Android 6 (API 23) and up (OpenGL)
+  * iOS/iPadOS 12.2 and up (OpenGL)
 * [Consoles (for registered developers)](https://docs.monogame.net/articles/console_access.html)
   * PlayStation 4
   * PlayStation 5
-  * Xbox One (XDK only) (GDK coming soon)
+  * Xbox (GDKX & XDK)
   * Nintendo Switch
+
+> [!NOTE]
+> Vulkan and DirectX12 graphics support is also being added in **preview** for `3.8.5` for supported platforms.
+
+[^1]: An experimental Vulkan implementation is available to source code users.
+
+[^2]: An experimental DirectX 12 implementation is available to source code users.
+
+[^3]: Requires a distribution with glibc 2.27 or up. This includes SteamOS 3.0 and up, Ubuntu 22.04 and up, Debian 12 and up, CentOS 9 and up among other unlisted distributions.
 
 ## Resources
 
@@ -51,18 +60,18 @@ We support a growing list of platforms across the desktop, mobile, and console s
 
 Check out the awesome [game samples](https://github.com/MonoGame/MonoGame.Samples) maintained by the MonoGame team:
 
-|[Platformer 2D Sample](https://github.com/MonoGame/MonoGame.Samples/blob/3.8.2/Platformer2D/README.md) | [NeonShooter](https://github.com/MonoGame/MonoGame.Samples/blob/3.8.2/NeonShooter/README.md)|
+|[Platformer 2D Sample](https://github.com/MonoGame/MonoGame.Samples/blob/3.8.2/Platformer2D/README.md)|[NeonShooter](https://github.com/MonoGame/MonoGame.Samples/blob/3.8.2/NeonShooter/README.md)|
 |-|-|
-|Supported on all platforms | Supported on all platforms |
-|[![Platformer 2D Sample](https://raw.githubusercontent.com/MonoGame/MonoGame.Samples/refs/heads/3.8.2/Images/Platformer2D-Sample.png)](https://github.com/MonoGame/MonoGame.Samples/blob/3.8.2/Platformer2D/README.md) | [![NeonShooter Sample](https://raw.githubusercontent.com/MonoGame/MonoGame.Samples/refs/heads/3.8.2/Images/NeonShooter-Sample.png)](https://github.com/MonoGame/MonoGame.Samples/blob/3.8.2/NeonShooter/README.md) |
-|The [Platformer 2D](https://github.com/MonoGame/MonoGame.Samples/blob/3.8.2/Platformer2D/README.md) sample is a basic 2D platformer pulled from the original XNA samples and upgraded for MonoGame.| [Neon Shooter](https://github.com/MonoGame/MonoGame.Samples/blob/3.8.2/NeonShooter/README.md) Is a graphically intensive twin-stick shooter with particle effects and save data from Michael Hoffman |
+|Supported on all platforms|Supported on all platforms|
+|[![Platformer 2D Sample](https://raw.githubusercontent.com/MonoGame/MonoGame.Samples/refs/heads/3.8.2/Images/Platformer2D-Sample.png)](https://github.com/MonoGame/MonoGame.Samples/blob/3.8.2/Platformer2D/README.md)|[![NeonShooter Sample](https://raw.githubusercontent.com/MonoGame/MonoGame.Samples/refs/heads/3.8.2/Images/NeonShooter-Sample.png)](https://github.com/MonoGame/MonoGame.Samples/blob/3.8.2/NeonShooter/README.md)|
+|The [Platformer 2D](https://github.com/MonoGame/MonoGame.Samples/blob/3.8.2/Platformer2D/README.md) sample is a basic 2D platformer pulled from the original XNA samples and upgraded for MonoGame.|[Neon Shooter](https://github.com/MonoGame/MonoGame.Samples/blob/3.8.2/NeonShooter/README.md) Is a graphically intensive twin-stick shooter with particle effects and save data from Michael Hoffman|
 |||
 
-| [Auto Pong Sample](https://github.com/MonoGame/MonoGame.Samples/blob/3.8.2/AutoPong/README.md) | [Ship Game 3D](https://github.com/MonoGame/MonoGame.Samples/blob/3.8.2/ShipGame/README.md) |
+|[Auto Pong Sample](https://github.com/MonoGame/MonoGame.Samples/blob/3.8.2/AutoPong/README.md)|[Ship Game 3D](https://github.com/MonoGame/MonoGame.Samples/blob/3.8.2/ShipGame/README.md)|
 |-|-|
-| Supported on all platforms | GL / DX / iOS / Android |
-| [![Auto Pong Sample](https://raw.githubusercontent.com/MonoGame/MonoGame.Samples/refs/heads/3.8.2/Images/AutoPong_1.gif)](https://github.com/MonoGame/MonoGame.Samples/blob/3.8.2/AutoPong/README.md) | [![ShipGame 3D Sample](https://raw.githubusercontent.com/MonoGame/MonoGame.Samples/refs/heads/3.8.2/Images/ShipGame.png)](https://github.com/MonoGame/MonoGame.Samples/blob/3.8.2/ShipGame/README.md) |
-| A short [sample project](https://github.com/MonoGame/MonoGame.Samples/blob/3.8.2/AutoPong/README.md) showing you how to make the classic game of pong, with generated soundfx, in 300 lines of code. | 3D Ship Game (Descent clone) sample, pulled from the XNA archives and updated for MonoGame |
+|Supported on all platforms|GL / DX / iOS / Android|
+|[![Auto Pong Sample](https://raw.githubusercontent.com/MonoGame/MonoGame.Samples/refs/heads/3.8.2/Images/AutoPong_1.gif)](https://github.com/MonoGame/MonoGame.Samples/blob/3.8.2/AutoPong/README.md)|[![ShipGame 3D Sample](https://raw.githubusercontent.com/MonoGame/MonoGame.Samples/refs/heads/3.8.2/Images/ShipGame.png)](https://github.com/MonoGame/MonoGame.Samples/blob/3.8.2/ShipGame/README.md)|
+|A short [sample project](https://github.com/MonoGame/MonoGame.Samples/blob/3.8.2/AutoPong/README.md) showing you how to make the classic game of pong, with generated soundfx, in 300 lines of code.|3D Ship Game (Descent clone) sample, pulled from the XNA archives and updated for MonoGame|
 |||
 
 ## Support and Contributions
@@ -102,6 +111,7 @@ A high level breakdown of the components of the framework:
 * The [mgcb](Tools/MonoGame.Content.Builder) is a command line tool for content processing.
 * The [mgfxc](Tools/MonoGame.Effect.Compiler) is a command line effect compiler tool.
 * The [mgcb-editor](Tools/MonoGame.Content.Builder.Editor) tool is a GUI frontend for content processing.
+* (Preview) The [Content Builder Project](MonoGame.Framework.Content.Pipeline/Builder/) is a new console app framework for content processing.
 
 ## Helpful Links
 

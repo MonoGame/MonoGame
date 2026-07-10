@@ -42,8 +42,8 @@ namespace MonoGame.Tests.Audio
         [Test]
         public static void AudioEngineCtor()
         {
-            Assert.Throws<ArgumentNullException>(() => new AudioEngine(null));
-            Assert.Throws<ArgumentNullException>(() => new AudioEngine(""));
+            Assert.Throws<ArgumentException>(() => new AudioEngine(null));
+            Assert.Throws<ArgumentException>(() => new AudioEngine(""));
             //Assert.Throws<DirectoryNotFoundException>(() => new AudioEngine(@"This\Does\Not\Exist.xgs"));
             Assert.Throws<FileNotFoundException>(() => new AudioEngine(@"Assets\Audio\Win\NotTheFile.xgs"));
 

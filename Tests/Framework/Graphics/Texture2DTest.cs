@@ -2,21 +2,22 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 using System;
+using System.IO;
+using System.Linq;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using NUnit.Framework;
 
 namespace MonoGame.Tests.Graphics
 {
-    [TestFixture]
     [NonParallelizable]
+    [RunOnUiTestFixture]
     class Texture2DTest : GraphicsDeviceTestFixtureBase
     {
         [Test]
         [TestCase(1, 1)]
         [TestCase(8, 8)]
         [TestCase(31, 7)]
-        [RunOnUI]
         public void ShouldSetAndGetData(int width, int height)
         {
             var dataSize = width * height;
@@ -37,7 +38,6 @@ namespace MonoGame.Tests.Graphics
         [TestCase(1, 1)]
         [TestCase(8, 8)]
         [TestCase(31, 7)]
-        [RunOnUI]
         public void ShouldSetAndGetDataForLevel(int width, int height)
         {
             var texture2D = new Texture2D(gd, width, height, true, SurfaceFormat.Color);
@@ -61,7 +61,6 @@ namespace MonoGame.Tests.Graphics
         }
 
         [Test]
-        [RunOnUI]
         public void ShouldGetDataFromRectangle()
         {
             const int dataSize = 128 * 128;
@@ -91,7 +90,6 @@ namespace MonoGame.Tests.Graphics
         [TestCase(SurfaceFormat.Color, true)]
         [TestCase(SurfaceFormat.ColorSRgb, false)]
         [TestCase(SurfaceFormat.ColorSRgb, true)]
-        [RunOnUI]
         public void DrawWithSRgbFormats(SurfaceFormat textureFormat, bool sRgbSourceTexture)
         {
             PrepareFrameCapture();
@@ -149,7 +147,6 @@ namespace MonoGame.Tests.Graphics
 #if DESKTOPGL
         [Ignore("Not yet implemented in OpenGL")]
 #endif
-        [RunOnUI]
         public void ShouldSetAndGetDataForTextureArray(int width, int height)
         {
             const int arraySize = 4;
@@ -177,7 +174,6 @@ namespace MonoGame.Tests.Graphics
 
 #if DIRECTX
         [Test]
-        [RunOnUI]
         public void TextureArrayAsRenderTargetAndShaderResource()
         {
             PrepareFrameCapture();
@@ -234,7 +230,6 @@ namespace MonoGame.Tests.Graphics
 #endif
 
         [Test]
-        [RunOnUI]
         public void SetDataRowPitch()
         {
             PrepareFrameCapture();
@@ -249,6 +244,115 @@ namespace MonoGame.Tests.Graphics
             sb.Dispose();
 
             CheckFrames();
+        }
+
+        static readonly Color[] sampleTextureColors = [Color.CornflowerBlue, Color.Red, Color.Green, Color.Blue, Color.White, Color.Black, Color.Transparent, new Color(Color.DarkSlateBlue, 0.5f), Color.Chartreuse];
+        static Texture2D MakeSampleTexture(GraphicsDevice gd, int width, int height, out Color[] pixels)
+        {
+            // Make an array of colors matching the width and height
+            static Color getExpectedColor(int index) => sampleTextureColors[index % sampleTextureColors.Length];
+            pixels =
+                Enumerable.Range(0, width * height)
+                .Select(getExpectedColor)
+                .ToArray();
+
+            // Make a texture with the data
+            Texture2D tex = new Texture2D(gd, width, height);
+            tex.SetData(pixels);
+
+            return tex;
+        }
+
+        [Test]
+        // Nice small square
+        [TestCase(64, 64)]
+        // One pixel
+        [TestCase(1, 1)]
+        // Large square
+        [TestCase(2048, 2048)]
+        // Large non-square
+        [TestCase(2048, 1234)]
+        // Small non-power-of-2 square
+        [TestCase(7, 7)]
+        // Small non-square
+        [TestCase(15, 31)]
+        public void SaveAsPngShouldWork(int width, int height)
+        {
+            using var source = MakeSampleTexture(gd, width, height, out var expectedPixels);
+            // Save the texture to a memory stream
+            using var stream = new MemoryStream(width * height * 4); // 4 bytes in a Color;
+            source.SaveAsPng(stream, width, height);
+
+            source.Dispose();
+
+            // Create a new texture from the stream
+            using var result = Texture2D.FromStream(gd, stream);
+
+            // The result should be the same size
+            Assert.AreEqual(result.width, width);
+            Assert.AreEqual(result.height, height);
+
+            Color[] resultPixels = new Color[width * height];
+            result.GetData(resultPixels);
+
+            // It should have the same pixels
+            Assert.AreEqual(expectedPixels, resultPixels);
+
+            result.Dispose();
+        }
+
+        [Test]
+        // Nice small square
+        [TestCase(64, 64)]
+        // One pixel
+        [TestCase(1, 1)]
+        // Large square
+        [TestCase(1024, 1024)]
+        // Large non-square
+        [TestCase(1024, 1234)]
+        // Small non-power-of-2 square
+        [TestCase(7, 7)]
+        // Small non-square
+        [TestCase(15, 31)]
+        public void SaveAsJpegShouldWork(int width, int height)
+        {
+            // Make a test texture and save it to a memory stream
+            using var source = MakeSampleTexture(gd, width, height, out var expectedPixels);
+            using var stream = new MemoryStream(width * height * 4); // 4 bytes in a Color;
+            source.SaveAsJpeg(stream, width, height);
+
+            // Create a new texture from the stream.
+            using var result = Texture2D.FromStream(gd, stream);
+            // Read back pixels
+            var resultPixels = new Color[width * height];
+            result.GetData(resultPixels);
+
+            // The maximum value by which a source pixel and the destination pixel can vary in one color channel
+            const int tolerance = 35;// This is arbitrary and was chosen just because it works with the test cases and the generated sample images
+
+            // Compare the source pixels to the result pixels, with tolerance
+            for (int i = 0; i < expectedPixels.Length; i++)
+            {
+                Color expectedPixel = expectedPixels[i];
+                Color resultPixel = resultPixels[i];
+                int rDiff = Math.Abs(expectedPixel.R - resultPixel.R);
+                int gDiff = Math.Abs(expectedPixel.G - resultPixel.G);
+                int bDiff = Math.Abs(expectedPixel.B - resultPixel.B);
+                // Don't test alpha because jpeg doesn't support it
+
+                bool withinTolerance =
+                    rDiff <= tolerance &&
+                    gDiff <= tolerance &&
+                    bDiff <= tolerance;
+                Assert.True(withinTolerance,
+                    "Pixel {0} ({1}, {2}) differs beyond tolerance: {3} expected, got {4}.",
+                    i,
+                    i % width,
+                    i / width,
+                    expectedPixel,
+                    resultPixel
+                    );
+            }
         }
     }
 }

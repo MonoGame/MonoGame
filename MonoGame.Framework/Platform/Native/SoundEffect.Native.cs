@@ -1,4 +1,4 @@
-// MonoGame - Copyright (C) The MonoGame Team
+// MonoGame - Copyright (C) MonoGame Foundation, Inc
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
@@ -17,9 +17,13 @@ public sealed partial class SoundEffect
 
     internal unsafe MGA_Buffer* Buffer;
 
-    private unsafe static void PlatformInitialize()
+    private static unsafe void PlatformInitialize()
     {
         System = MGA.System_Create();
+        if (System == null)
+        {
+            throw new NoAudioHardwareException("Audio has failed to initialize.");
+        }
     }
 
     internal unsafe static void PlatformShutdown()
@@ -70,7 +74,9 @@ public sealed partial class SoundEffect
             unsafe
             {
                 Buffer = MGA.Buffer_Create(System);
-                MGA.Buffer_InitializeFormat(Buffer, headerData, waveData, waveData.Length, 0, 0);
+                fixed (byte* h = headerData)
+                fixed (byte* w = waveData)
+                    MGA.Buffer_InitializeFormat(Buffer, h, w, waveData.Length, 0, 0);
 
                 var milliseconds = MGA.Buffer_GetDuration(Buffer);
                 duration = TimeSpan.FromMilliseconds(milliseconds);
@@ -81,13 +87,16 @@ public sealed partial class SoundEffect
     private unsafe void PlatformInitializePcm(byte[] buffer, int offset, int count, int sampleBits, int sampleRate, AudioChannels channels, int loopStart, int loopLength)
     {
         Buffer = MGA.Buffer_Create(System);
-        MGA.Buffer_InitializePCM(Buffer, buffer, offset, count, sampleBits, sampleRate, (int)channels, loopStart, loopLength);
+        fixed (byte* b = buffer)
+            MGA.Buffer_InitializePCM(Buffer, b, offset, count, sampleBits, sampleRate, (int)channels, loopStart, loopLength);
     }
 
     private unsafe void PlatformInitializeFormat(byte[] header, byte[] buffer, int bufferSize, int loopStart, int loopLength)
     {
         Buffer = MGA.Buffer_Create(System);
-        MGA.Buffer_InitializeFormat(Buffer, header, buffer, bufferSize, loopStart, loopLength);
+        fixed (byte* h = header)
+        fixed (byte* b = buffer)
+            MGA.Buffer_InitializeFormat(Buffer, h, b, bufferSize, loopStart, loopLength);
     }
 
     // TODO: This should go away after we move to FAudio's Xact implementation.
@@ -96,8 +105,14 @@ public sealed partial class SoundEffect
         // This is only the platform specific non-streaming
         // Xact sound handling as PCM is already handled.
 
+        // NOTE: This is something done in all our XACT implementations
+        // and i'm unsure why it is needed...  but it makes things work.
+        if (codec == MiniFormatTag.Adpcm)
+            blockAlignment = (blockAlignment + 22) * channels;
+
         Buffer = MGA.Buffer_Create(System);
-        MGA.Buffer_InitializeXact(Buffer, (uint)codec, buffer, buffer.Length, sampleRate, blockAlignment, channels, loopStart, loopLength);
+        fixed (byte* b = buffer)
+            MGA.Buffer_InitializeXact(Buffer, (uint)codec, b, buffer.Length, sampleRate, blockAlignment, channels, loopStart, loopLength);
 
         var milliseconds = MGA.Buffer_GetDuration(Buffer);
         duration = TimeSpan.FromMilliseconds(milliseconds);

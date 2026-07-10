@@ -11,7 +11,11 @@ using Microsoft.Xna.Framework.Content.Pipeline.Graphics;
 using Microsoft.Xna.Framework.Graphics;
 using System.Collections.Generic;
 
+// Disable lack of namespace warning for the types used for unit tests.
+#pragma warning disable CA1050
+
 #region The Basics
+
 public class TheBasics
 {
     public int PublicField;
@@ -19,11 +23,7 @@ public class TheBasics
     private int PrivateField;
     internal int InternalField;
 
-    public string GetSetProperty
-    {
-        get;
-        set;
-    }
+    public string GetSetProperty { get; set; }
 
     public string GetOnlyProperty
     {
@@ -46,9 +46,11 @@ public class NestedClass
     public string Name;
     public bool IsEnglish;
 }
+
 #endregion
 
 #region Inheritance
+
 public class InheritanceBase
 {
     public int elf;
@@ -58,9 +60,11 @@ public class Inheritance : InheritanceBase
 {
     public string hello;
 }
+
 #endregion
 
 #region IncludingPrivateMembers
+
 public class IncludingPrivateMembers
 {
     public IncludingPrivateMembers()
@@ -80,17 +84,21 @@ public class IncludingPrivateMembers
         return elf;
     }
 }
+
 #endregion
 
 #region ExcludingPublicMembers
+
 public class ExcludingPublicMembers
 {
     [ContentSerializerIgnore]
     public int elf; // will not be serialized
 }
+
 #endregion
 
 #region RenamingXmlElements
+
 public class RenamingXmlElements
 {
     [ContentSerializer(ElementName = "ShawnSaysHello")]
@@ -118,16 +126,20 @@ public class RenamingXmlElements
         dimensions = value;
     }
 }
+
 #endregion
 
 #region NullReferences
+
 public class NullReferences
 {
     public string hello = "world";
 }
+
 #endregion
 
 #region OptionalElements
+
 public class OptionalElements
 {
     [ContentSerializer(Optional = true)]
@@ -148,14 +160,17 @@ public class OptionalElements
 
     public CullMode g = CullMode.CullClockwiseFace;
 }
+
 #endregion
 
 #region AllowNull
+
 public class AllowNull
 {
     [ContentSerializer(AllowNull = false)]
     string a;
 }
+
 #endregion
 
 #region Collections
@@ -198,24 +213,30 @@ public class Collections
         set { ColorArray[i] = value; }
     }
 }
+
 #endregion
 
 #region CollectionItemName
+
 public class CollectionItemName
 {
     [ContentSerializer(ElementName = "w00t", CollectionItemName = "Flibble")]
     public string[] StringArray;
 }
+
 #endregion
 
 #region Dictionaries
+
 public class Dictionaries
 {
     public Dictionary<int, bool> TestDictionary = new Dictionary<int, bool>();
 }
+
 #endregion
 
 #region Primitive Types
+
 public class PrimitiveTypes
 {
     public char Char;
@@ -231,12 +252,14 @@ public class PrimitiveTypes
     public ulong ULong;
     public float Float;
     public double Double;
-    public char? NullChar;                        
+    public char? NullChar;
     public char? NotNullChar;
 }
+
 #endregion
 
 #region MathTypes
+
 public class MathTypes
 {
     public Point Point;
@@ -252,16 +275,23 @@ public class MathTypes
     public List<Vector2> Vector2List = new List<Vector2>();
     public List<Vector2> Vector2ListEmpty = new List<Vector2>();
 }
+
 #endregion
 
 #region PolymorphicTypes
+
 public class PolymorphicA
 {
     public bool Value;
 }
 
-public class PolymorphicB : PolymorphicA { }
-public class PolymorphicC : PolymorphicA { }
+public class PolymorphicB : PolymorphicA
+{
+}
+
+public class PolymorphicC : PolymorphicA
+{
+}
 
 public class PolymorphicTypes
 {
@@ -272,9 +302,11 @@ public class PolymorphicTypes
     public ICollection<int> IntCollection;
     public object UntypedDictionary;
 }
+
 #endregion
 
 #region FlattenContent
+
 public class FlattenContent
 {
     [ContentSerializer(FlattenContent = true)]
@@ -283,9 +315,11 @@ public class FlattenContent
     [ContentSerializer(FlattenContent = true, CollectionItemName = "Boo")]
     public string[] Collection;
 }
+
 #endregion
 
 #region SharedResources
+
 public class SharedResources
 {
     [ContentSerializer(SharedResource = true)]
@@ -311,6 +345,7 @@ public class Linked2
 #endregion
 
 #region CircularReferences
+
 public class CircularReferences
 {
     public CircularLinked Head;
@@ -322,22 +357,25 @@ public class CircularLinked
 
     public CircularLinked Next;
 }
+
 #endregion
 
 #region ExternalReferences
+
 public class ExternalReferences
 {
     public ExternalReference<Texture2D> Texture;
     public ExternalReference<Texture2D> Texture2;
     public ExternalReference<Effect> Shader;
 }
+
 #endregion
 
 #region FontDescription
+
 class ExtendedFontDescription : FontDescription
 {
-    public ExtendedFontDescription()
-        : base("Arial", 14, 0)
+    public ExtendedFontDescription() : base("Arial", 14, 0)
     {
     }
 
@@ -349,16 +387,20 @@ class ExtendedFontDescription : FontDescription
 
     private List<string> _list = new List<string>();
 }
+
 #endregion
 
 #region SystemTypes
+
 class SystemTypes
 {
     public TimeSpan TimeSpan;
 }
+
 #endregion
 
 #region GetterOnlyProperties
+
 class GetterOnlyProperties
 {
     private readonly List<int> _intList;
@@ -430,13 +472,15 @@ class GetterOnlyProperties
         IntStringDictionaryWithPrivateSetter = new Dictionary<int, string>();
         _intStringDictionary = new Dictionary<int, string>();
         _customClass = new AnotherClass();
-        _customClassArray = new [] { new AnotherClass { A = 42 } };
+        _customClassArray = new[] { new AnotherClass { A = 42 } };
         _customStruct = new AnotherStruct();
     }
 }
+
 #endregion
 
 #region GetterOnlyPolymorphicArrayProperties
+
 class GetterOnlyPolymorphicArrayProperties
 {
     private readonly AnotherClass[] _customClassArray;
@@ -456,9 +500,11 @@ class GetterOnlyPolymorphicArrayProperties
         _customClassArray = new[] { new AnotherClass { A = 42 } };
     }
 }
+
 #endregion
 
 #region GenericTypes
+
 class GenericTypes
 {
     public GenericClass<int> A;
@@ -470,13 +516,16 @@ class GenericClass<T>
 {
     public T Value;
 }
+
 public class GenericArg
 {
     public int Value;
 }
+
 #endregion
 
 #region ChildCollections
+
 public class ChildCollections
 {
     private readonly ChildrenCollection _children;
@@ -515,9 +564,11 @@ public class ChildCollectionChild : ContentItem
     [ContentSerializerIgnore]
     public ChildCollections Parent { get; set; }
 }
+
 #endregion
 
 #region Colors
+
 public class Colors
 {
     public Color White { get; set; }
@@ -527,12 +578,14 @@ public class Colors
     public Color Green { get; set; }
     public Color Blue { get; set; }
 }
+
 #endregion
 
 class StructArrayNoElements
 {
-    public Vector2[] Vector2ArrayNoElements = new Vector2[] {};
+    public Vector2[] Vector2ArrayNoElements = new Vector2[] { };
 }
+
 
 namespace MonoGame.Tests.ContentPipeline
 {
@@ -597,3 +650,5 @@ namespace MonoGame.Tests.SomethingElse.ContentPipeline
         public bool Value;
     }
 }
+
+#pragma warning restore CA1050

@@ -4,12 +4,16 @@
 
 
 using System;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Microsoft.Xna.Framework.Graphics.PackedVector
 {
     /// <summary>
     /// Packed vector type containing four 8-bit signed normalized values, ranging from −1 to 1.
     /// </summary>
+#if XNADESIGNPROVIDED
+    [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.Interfaces | DynamicallyAccessedMemberTypes.PublicParameterlessConstructor)]
+#endif
     public struct NormalizedByte4 : IPackedVector<uint>, IEquatable<NormalizedByte4>
     {
         private uint _packed;

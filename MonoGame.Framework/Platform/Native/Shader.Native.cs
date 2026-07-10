@@ -1,10 +1,10 @@
-// MonoGame - Copyright (C) The MonoGame Team
+// MonoGame - Copyright (C) MonoGame Foundation, Inc
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
 using MonoGame.Interop;
 using System.Collections.Generic;
-using System.Runtime.InteropServices;
+
 
 namespace Microsoft.Xna.Framework.Graphics;
 
@@ -39,12 +39,15 @@ partial class Shader
         var vertexInputLayout = vertexBuffers.ToImmutable();
         vertexInputLayout.GenerateInputElements(Attributes, out var inputElements, out var streamStrides);
 
-        inputLayout.Ptr = MGG.InputLayout_Create(
-            GraphicsDevice.Handle,
-            streamStrides,
-            streamStrides.Length,
-            inputElements,
-            inputElements.Length);
+        fixed (int* s = streamStrides)
+        fixed (MGG_InputElement* i = inputElements)
+            inputLayout.Ptr = MGG.InputLayout_Create(
+                GraphicsDevice.Handle,
+                Handle,
+                s,
+                streamStrides.Length,
+                i,
+                inputElements.Length);
 
         _cache.Add(vertexInputLayout, inputLayout);
 

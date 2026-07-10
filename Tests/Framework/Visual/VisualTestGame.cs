@@ -17,6 +17,10 @@ namespace MonoGame.Tests.Visual {
 				GraphicsProfile = GraphicsProfile.HiDef,
 			};
 
+            /// Enable fixed time step
+            IsFixedTimeStep = true;
+            TargetElapsedTime = TimeSpan.FromSeconds(1.0 / 30.0); // 30 FPS
+
 			Services.AddService<IFrameCaptureSource> (this);
 		}
 

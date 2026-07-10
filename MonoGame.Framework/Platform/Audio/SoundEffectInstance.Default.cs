@@ -103,6 +103,11 @@ namespace Microsoft.Xna.Framework.Audio
             throw new NotImplementedException();
         }
 
+        internal void PlatformClearBuffer()
+        {
+            throw new NotImplementedException();
+        }
+
         private void PlatformDispose(bool disposing)
         {
             throw new NotImplementedException();

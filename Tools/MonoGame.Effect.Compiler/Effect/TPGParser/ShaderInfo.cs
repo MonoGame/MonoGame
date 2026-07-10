@@ -6,7 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 
-namespace MonoGame.Effect.TPGParser
+namespace MonoGame.Effect
 {
     public class ShaderInfo
 	{

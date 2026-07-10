@@ -19,7 +19,9 @@ namespace Microsoft.Xna.Framework
         private static bool _initialized = false;
 
         /// <summary>
-        /// Processes framework events.
+        /// Processes internal framework updates and raises events.
+        /// If you don't use the <see cref="Game"/> class you should call this from your update loop.
+        /// This method is not thread safe.
         /// </summary>
         public static void Update()
         {

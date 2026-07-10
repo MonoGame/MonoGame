@@ -40,7 +40,11 @@ void PipelineStateManager::SetDeviceParameters() {
 }
 
 // Taken from Microsoft's MiniEngine https://github.com/microsoft/DirectX-Graphics-Samples/blob/master/MiniEngine/Core/Hash.h
+#if defined(_M_X64) || defined(__x86_64__)
 #define ENABLE_SSE_CRC32 1
+#else
+#define ENABLE_SSE_CRC32 0
+#endif
 inline size_t HashRange(const uint32_t* const Begin, const uint32_t* const End, size_t Hash) {
 #if ENABLE_SSE_CRC32
     const uint64_t* Iter64 = (const uint64_t*)AlignUp((uint64_t)Begin, 8);

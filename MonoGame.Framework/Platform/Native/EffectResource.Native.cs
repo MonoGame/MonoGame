@@ -1,7 +1,8 @@
-// MonoGame - Copyright (C) The MonoGame Team
+// MonoGame - Copyright (C) MonoGame Foundation, Inc
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
+using System;
 using MonoGame.Interop;
 using System.Runtime.InteropServices;
 
@@ -21,9 +22,8 @@ internal partial class EffectResource
         byte* data;
         int size;
         MGG.EffectResource_GetBytecode(name, out data, out size);
-
         var bytecode = new byte[size];
-        Marshal.Copy((nint)data, bytecode, 0, size);
+        Marshal.Copy((IntPtr)data, bytecode, 0, size);
         return bytecode;
     }
 }

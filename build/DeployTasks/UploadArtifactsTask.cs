@@ -1,18 +1,35 @@
-﻿
+
+using System.Runtime.InteropServices;
+
 namespace BuildScripts;
 
 [TaskName("UploadArtifacts")]
 public sealed class UploadArtifactsTask : AsyncFrostingTask<BuildContext>
 {
+    private static readonly int DefaultTimeoutInSeconds = 100;
+    private readonly Func<string, HttpClient> _httpClientFactoryFunction;
+
+    public UploadArtifactsTask(Func<string, HttpClient> httpClientFactoryFunction)
+    {
+        _httpClientFactoryFunction = httpClientFactoryFunction;
+    }
+
     public override bool ShouldRun(BuildContext context) => context.BuildSystem().IsRunningOnGitHubActions;
 
     public override async Task RunAsync(BuildContext context)
     {
+        LogHttpClientTimeout(context);
+
         var os = context.Environment.Platform.Family switch
         {
             PlatformFamily.Windows => "windows",
             PlatformFamily.OSX => "macos",
             _ => "linux"
+        };
+        var arch = RuntimeInformation.OSArchitecture switch
+        {
+            Architecture.Arm64 => "arm64",
+            _ => "x64"
         };
 
         // Clean up build tools if installed
@@ -42,17 +59,59 @@ public sealed class UploadArtifactsTask : AsyncFrostingTask<BuildContext>
             DeleteToolStore(context, path);
         }
 
-        var version = BuildContext.CalculateVersion(context);
+        // Upload mgpipeline and mgruntime native libraries
+        switch (context.Environment.Platform.Family)
+        {
+            case PlatformFamily.Windows:
+                // Both architectures are built on the same runner, upload each separately
+                foreach (var winArch in new[] { "x64", "arm64" })
+                {
+                    await context.GitHubActions().Commands.UploadArtifact(new DirectoryPath($"Artifacts/native/mgpipeline/windows/{winArch}/Release/"), $"mgpipeline-windows-{winArch}.{context.Version}");
+                    // DX12 (windowsdx) and Vulkan (desktopvk) native binaries uploaded separately
+                    await context.GitHubActions().Commands.UploadArtifact(new DirectoryPath($"Artifacts/native/mgruntime/windowsdx/windows/{winArch}/"), $"mgnative-windows-dx-{winArch}.{context.Version}");
+                    await context.GitHubActions().Commands.UploadArtifact(new DirectoryPath($"Artifacts/native/mgruntime/desktopvk/windows/{winArch}/"), $"mgnative-windows-vk-{winArch}.{context.Version}");
+                }
+                break;
+            case PlatformFamily.Linux:
+                await context.GitHubActions().Commands.UploadArtifact(new DirectoryPath($"Artifacts/native/mgpipeline/linux/{arch}/Release/"), $"mgpipeline-linux-{arch}.{context.Version}");
+                await context.GitHubActions().Commands.UploadArtifact(new DirectoryPath($"Artifacts/native/mgruntime/desktopvk/linux/{arch}/"), $"mgnative-linux-{arch}.{context.Version}");
+                break;
+            case PlatformFamily.OSX:
+                // macOS produces universal binaries
+                await context.GitHubActions().Commands.UploadArtifact(new DirectoryPath("Artifacts/native/mgpipeline/macosx/Release/"), $"mgpipeline-macos.{context.Version}");
+                await context.GitHubActions().Commands.UploadArtifact(new DirectoryPath("Artifacts/native/mgruntime/desktopvk/macosx/"), $"mgnative-macos.{context.Version}");
+                break;
+            default:
+                throw new NotSupportedException($"Platform {context.Environment.Platform.Family} is not supported for static library checks.");
+        }
 
-        await context.GitHubActions().Commands.UploadArtifact(new DirectoryPath(context.NuGetsDirectory.FullPath), $"nuget-{os}.{version}");
+        // Upload Binaries (managed .NET assemblies)
+        // macOS uses universal binaries — no arch suffix
+        var managedSuffix = context.Environment.Platform.Family == PlatformFamily.OSX
+            ? os
+            : $"{os}-{arch}";
+        await context.GitHubActions().Commands.UploadArtifact(new DirectoryPath("Artifacts/MonoGame.Framework/"), $"mgframework-{managedSuffix}.{context.Version}");
+        await context.GitHubActions().Commands.UploadArtifact(new DirectoryPath("Artifacts/Binaries/"), $"mgbinaries-{managedSuffix}.{context.Version}");
+
+        if (context.IsRunningOnLinux() && RuntimeInformation.OSArchitecture == Architecture.Arm64)
+        {
+            // we don't build tests etc on linux arm
+            return;
+        }
+
+        // Upload NuGet packages
+        await context.GitHubActions().Commands.UploadArtifact(new DirectoryPath(context.NuGetsDirectory), $"nuget-{os}.{context.Version}");
         await context.GitHubActions().Commands.UploadArtifact(new DirectoryPath(System.IO.Path.Combine(context.BuildOutput, "Tests", "DesktopGL", "Release")), $"tests-desktopgl-{os}");
+        await context.GitHubActions().Commands.UploadArtifact(new DirectoryPath(System.IO.Path.Combine(context.BuildOutput, "Tests", "DesktopVK", "Release")), $"tests-desktopvk-{os}");
         if (context.IsRunningOnWindows())
         {
             await context.GitHubActions().Commands.UploadArtifact(new DirectoryPath(System.IO.Path.Combine(context.BuildOutput, "Tests", "WindowsDX", "Release")), $"tests-windowsdx-{os}");
+            
+            await context.GitHubActions().Commands.UploadArtifact(new DirectoryPath(System.IO.Path.Combine(context.BuildOutput, "Tests", "WindowsDX12", "Release")), $"tests-windowsdx12-{os}");
 
             // Assuming that the .vsix file has already been created and is located at this exact path.
             var vsixFilePath = System.IO.Path.Combine(context.BuildOutput, "MonoGame.Templates.VSExtension", "net472", "MonoGame.Templates.VSExtension.vsix");
-            await context.GitHubActions().Commands.UploadArtifact(new FilePath(vsixFilePath), $"MonoGame.Templates.VSExtension.{version}.vsix");
+            await context.GitHubActions().Commands.UploadArtifact(new FilePath(vsixFilePath), $"MonoGame.Templates.VSExtension.{context.Version}.vsix");
         }
     }
 
@@ -75,8 +134,28 @@ public sealed class UploadArtifactsTask : AsyncFrostingTask<BuildContext>
                     context.Log.Information($"Deleting: {file}");
                     System.IO.File.Delete(file);
                 }
-                
+
             }
+        }
+    }
+
+    private void LogHttpClientTimeout(BuildContext context)
+    {
+        var testClient = _httpClientFactoryFunction("HttpClient.Timeout");
+
+        var timeoutInSeconds = testClient.Timeout.TotalSeconds;
+
+        if (timeoutInSeconds > DefaultTimeoutInSeconds)
+        {
+            context.Log.Information($"HttpClient.Timeout is set at: {testClient.Timeout.TotalSeconds} seconds.");
+        }
+        else if (Math.Abs(timeoutInSeconds - DefaultTimeoutInSeconds) < 0.01)
+        {
+            context.Log.Warning($"HttpClient.Timeout is set at: {testClient.Timeout.TotalSeconds} seconds.");
+        }
+        else
+        {
+            context.Log.Error($"HttpClient.Timeout is set at: {testClient.Timeout.TotalSeconds} seconds.");
         }
     }
 }

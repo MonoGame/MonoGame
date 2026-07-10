@@ -1,4 +1,4 @@
-// MonoGame - Copyright (C) The MonoGame Team
+// MonoGame - Copyright (C) MonoGame Foundation, Inc
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
@@ -34,8 +34,6 @@ internal partial class GraphicsCapabilities
         SupportsSeparateBlendStates = true;
 
         MaxTextureAnisotropy = (device.GraphicsProfile == GraphicsProfile.Reach) ? 2 : 16;
-
-        _maxMultiSampleCount = 4;// GetMaxMultiSampleCount(device);
     }
 
 }

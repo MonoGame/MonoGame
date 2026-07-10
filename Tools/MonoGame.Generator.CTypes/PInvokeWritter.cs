@@ -1,4 +1,4 @@
-// MonoGame - Copyright (C) The MonoGame Team
+// MonoGame - Copyright (C) MonoGame Foundation, Inc
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
@@ -32,7 +32,7 @@ class PinvokeWritter
         _structWritter = structWritter;
 
         _outputText = new StringBuilder($"""
-        // MonoGame - Copyright (C) The MonoGame Team
+        // MonoGame - Copyright (C) MonoGame Foundation, Inc
         // This file is subject to the terms and conditions defined in
         // file 'LICENSE.txt', which is part of this source code package.
                         
@@ -83,7 +83,7 @@ class PinvokeWritter
         if (!method.IsStatic)
             return false;
 
-        var import = method.GetCustomAttribute<LibraryImportAttribute>();
+        var import = method.GetCustomAttribute<DllImportAttribute>();
         if (import == null)
             return false;
 
@@ -110,7 +110,7 @@ class PinvokeWritter
 
     private void GenerateMethod(MethodInfo method)
     {
-        var import = method.GetCustomAttribute<LibraryImportAttribute>();
+        var import = method.GetCustomAttribute<DllImportAttribute>();
 
         var rtype = Util.GetCTypeOrEnum(method.ReturnType);
         var fname = import.EntryPoint ?? method.Name;

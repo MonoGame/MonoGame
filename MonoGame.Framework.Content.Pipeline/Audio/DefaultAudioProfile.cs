@@ -16,10 +16,12 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Audio
         {
             return  platform == TargetPlatform.Android ||
                     platform == TargetPlatform.DesktopGL ||
+                    platform == TargetPlatform.DesktopVK ||
                     platform == TargetPlatform.MacOSX ||
                     platform == TargetPlatform.NativeClient ||
                     platform == TargetPlatform.RaspberryPi ||
                     platform == TargetPlatform.Windows ||
+                    platform == TargetPlatform.WindowsDX12 ||
                     platform == TargetPlatform.iOS ||
                     platform == TargetPlatform.Web;
         }
@@ -47,7 +49,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Audio
             if ( platform == TargetPlatform.Windows )
                 targetFormat = ConversionFormat.WindowsMedia;
 
-            else if (platform == TargetPlatform.DesktopGL)
+            else if (platform == TargetPlatform.DesktopGL || platform == TargetPlatform.DesktopVK)
                 targetFormat = ConversionFormat.Vorbis;
             else if (platform == TargetPlatform.Web)
                 targetFormat = ConversionFormat.Mp3;
@@ -114,7 +116,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Audio
                             sampleFormat = kv[1].Trim('"').ToLowerInvariant();
                             break;
                         case "streams.stream.0.bit_rate":
-                            averageBytesPerSecond = (int.Parse(kv[1].Trim('"'), numberFormat)/8);
+                            averageBytesPerSecond = (int)long.Parse(kv[1].Trim('"'), numberFormat)/8;
                             break;
                         case "format.format_name":
                             formatName = kv[1].Trim('"').ToLowerInvariant();

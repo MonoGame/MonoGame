@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Linq;
+using MonoGame.Effect.Compiler;
+using SharpDX.D3DCompiler;
 
 namespace MonoGame.Effect
 {
@@ -7,39 +9,33 @@ namespace MonoGame.Effect
     {
         public static byte[] CompileHLSL(ShaderResult shaderResult, string shaderFunction, string shaderProfile, ref string errorsAndWarnings)
         {
-            SharpDX.D3DCompiler.ShaderBytecode shaderByteCode;
+            ShaderBytecode shaderByteCode;
             try
             {
-                SharpDX.D3DCompiler.ShaderFlags shaderFlags = 0;
+                ShaderFlags shaderFlags = 0;
 
                 // While we never allow preshaders, this flag is invalid for
                 // the DX11 shader compiler which doesn't allow preshaders
                 // in the first place.
-                //shaderFlags |= SharpDX.D3DCompiler.ShaderFlags.NoPreshader;
+                //shaderFlags |= ShaderFlags.NoPreshader;
 
                 if (shaderResult.Profile == ShaderProfile.DirectX_11)
-                    shaderFlags |= SharpDX.D3DCompiler.ShaderFlags.EnableBackwardsCompatibility;
+                    shaderFlags |= ShaderFlags.EnableBackwardsCompatibility;
 
                 if (shaderResult.Debug)
                 {
-                    shaderFlags |= SharpDX.D3DCompiler.ShaderFlags.SkipOptimization;
-                    shaderFlags |= SharpDX.D3DCompiler.ShaderFlags.Debug;
+                    shaderFlags |= ShaderFlags.SkipOptimization;
+                    shaderFlags |= ShaderFlags.Debug;
                 }
                 else
                 {
-                    shaderFlags |= SharpDX.D3DCompiler.ShaderFlags.OptimizationLevel3;
+                    shaderFlags |= ShaderFlags.OptimizationLevel3;
                 }
 
                 // Compile the shader into bytecode.                
-                var result = SharpDX.D3DCompiler.ShaderBytecode.Compile(
-                    shaderResult.FileContent,
-                    shaderFunction,
-                    shaderProfile,
-                    shaderFlags,
-                    0,
-                    null,
-                    null,
-                    shaderResult.FilePath);
+                var result = (Environment.OSVersion.Platform != PlatformID.Unix) ?
+                    ShaderBytecode.Compile(shaderResult.FileContent, shaderFunction, shaderProfile, shaderFlags, 0, null, null, shaderResult.FilePath) :
+                    WineHelper.RunFxc2(shaderResult.FileContent, shaderFunction, shaderProfile, shaderFlags, shaderResult.FilePath);
 
                 // Store all the errors and warnings to log out later.
                 errorsAndWarnings += result.Message;
@@ -50,7 +46,7 @@ namespace MonoGame.Effect
                 shaderByteCode = result.Bytecode;
                 //var source = shaderByteCode.Disassemble();
             }
-            catch (SharpDX.CompilationException ex)
+            catch (Exception ex)
             {
                 errorsAndWarnings += ex.Message;
                 throw new ShaderCompilerException();

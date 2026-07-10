@@ -251,6 +251,12 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
         /// </summary>
         public bool XnaComptatible { get; set; }
 
+        /// <summary>
+        /// If true, the custom axis up direction of the FBX model will be ignored.
+        /// <defaultValue>true</defaultValue>
+        /// </summary>
+        public bool IgnoreFbxUpDirection { get; set; } = true;
+
         public override NodeContent Import(string filename, ContentImporterContext context)
         {
             if (filename == null)
@@ -286,6 +292,9 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
                 // This flag is very important when PostProcessSteps.FindDegenerates is used
                 // because FindDegenerates converts degenerate triangles to points and lines!
                 importer.SetConfig(new Assimp.Configs.RemoveDegeneratePrimitivesConfig(true));
+
+                // FBXIgnoreUpDirectionConfig(true) can be set to ignore the up direction for custom axis.
+                importer.SetConfig(new Assimp.Configs.FBXIgnoreUpDirectionConfig(IgnoreFbxUpDirection));
 
                 // Note about Assimp post-processing:
                 // Keep post-processing to a minimum. The ModelImporter should import
@@ -329,7 +338,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
                 if (_xnaCompatible)
                     ImportXnaMaterials();
                 else
-                    ImportMaterials(); 
+                    ImportMaterials();
 
                 ImportNodes();      // Create _pivots and _rootNode (incl. children).
                 ImportSkeleton();   // Create skeleton (incl. animations) and add to _rootNode.

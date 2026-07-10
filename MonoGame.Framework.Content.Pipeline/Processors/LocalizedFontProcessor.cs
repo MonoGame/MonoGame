@@ -29,6 +29,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
     /// use a small fraction of these. Building only the characters we need is far more
     /// efficient than if we tried to include the entire CJK character region.
     /// </summary>
+    [Obsolete($"Please use {nameof(FontImporter)} for importing and {nameof(FontDescriptionProcessor)} for processing instead.")]
     [ContentProcessor]
     public class LocalizedFontProcessor : ContentProcessor<LocalizedFontDescription,
                                                     SpriteFontContent>
@@ -95,13 +96,13 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
                 context.AddDependency(absolutePath);
             }
 
-            var parameters = new OpaqueDataDictionary ();
-            parameters.Add ("PremultiplyAlpha", PremultiplyAlpha);
-            parameters.Add ("TextureFormat", TextureFormat);
             // After adding the necessary characters, we can use the built in
             // FontDescriptionProcessor to do the hard work of building the font for us.
-            return context.Convert<FontDescription,
-                SpriteFontContent>(input, "FontDescriptionProcessor", parameters);
+            return context.Convert<FontDescription, SpriteFontContent>(input, new FontDescriptionProcessor
+            {
+                PremultiplyAlpha = PremultiplyAlpha,
+                TextureFormat = TextureFormat
+            });
         }
     }
 }

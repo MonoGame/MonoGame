@@ -136,18 +136,22 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
                 glyphBitmap = new PixelBitmapContent<byte>((int)gHA, (int)gVA);
             }
 
-            // not sure about this at all
+            // I wouldn't say I'm a 100% sure, but I feel a lot surer about this than what it was before.
             var abc = new ABCFloat();
-            abc.A = face->glyph->metrics.horiBearingX.Value >> 6;
-            abc.B = face->glyph->metrics.width.Value >> 6;
+            abc.A = face->glyph->bitmap_left;
+            abc.B = face->glyph->bitmap.width;
             abc.C = (face->glyph->metrics.horiAdvance.Value >> 6) - (abc.A + abc.B);
-            abc.A -= face->glyph->bitmap_left;
-            abc.B += face->glyph->bitmap_left;
 
-            // Construct the output Glyph object.
+            // nkast fix, but only when necessary, this way we can have nice arial fonts without breaking the crucial Kingthings Petrock.
+            if ((*face->glyph).bitmap_left < 0)
+            {
+                abc.A -= face->glyph->bitmap_left;
+                abc.B += face->glyph->bitmap_left;
+            }
+
             return new GlyphData(glyphIndex, glyphBitmap)
             {
-                XOffset = -(face->glyph->advance.x.Value >> 6),
+                XOffset = face->glyph->bitmap_left,
                 XAdvance = face->glyph->metrics.horiAdvance.Value >> 6,
                 YOffset = -(face->glyph->metrics.horiBearingY.Value >> 6),
                 CharacterWidths = abc

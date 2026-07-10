@@ -129,7 +129,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Utilities
     internal static class CrunchHelpers
     {
         /// <summary>
-        /// This method will use Crunch to compress the <see cref="sourceBitmap"/> into the
+        /// This method will use Crunch to compress the <paramref name="sourceBitmap"/> into the
         /// desired <see cref="CrunchFormat"/>.
         ///
         /// <para>

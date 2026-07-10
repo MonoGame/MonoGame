@@ -1,6 +1,6 @@
 {
   "profiles": {
-    "MonoGame.Tests.WindowsVK": {
+    "MonoGame.Tests.DesktopVK": {
       "commandName": "Project",
       "nativeDebugging": true
     }

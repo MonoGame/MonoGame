@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework;
+using System.IO;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
@@ -7,21 +8,10 @@ using NUnit.Framework;
 
 namespace MonoGame.Tests.Content
 {
-    [TestFixture]
     [NonParallelizable]
+    [RunOnUiTestFixture]
     internal class ContentManagerTest : GraphicsDeviceTestFixtureBase
     {
-        [TestCase("C:\\image.png")]
-        [TestCase("\\image.png")]
-        [TestCase("/image.png")]
-        public void ThrowExceptionIfAssetNameIsRootedPath(string assetName)
-        {
-            GameServiceContainer services = new GameServiceContainer();
-            ContentManager content = new ContentManager(services, "Content");
-            var exception = Assert.Throws<ContentLoadException>(() => content.Load<Texture2D>(assetName));
-            StringAssert.Contains("rooted (absolute)", exception.Message);
-        }
-
         [Test]
         // Tests loading a texture from a XNB file
         public void CorrectlyLoadTextureFromXnb()
@@ -56,8 +46,7 @@ namespace MonoGame.Tests.Content
 
             var exception = Assert.Throws<ContentLoadException>(() => content.Load<Texture2D>(Paths.Texture("NotExisting")));
             StringAssert.StartsWith("The content file was not found.", exception.Message);
-            Assert.IsNotNull(exception.InnerException);
-            StringAssert.StartsWith("Could not find file", exception.InnerException.Message);
+            Assert.IsInstanceOf(typeof(FileNotFoundException), exception.InnerException);
         }
 
         [Test]
@@ -68,8 +57,7 @@ namespace MonoGame.Tests.Content
 
             var exception = Assert.Throws<ContentLoadException>(() => content.Load<SoundEffect>(Paths.Texture("UniquePng")));
             StringAssert.StartsWith("The content file was not found.", exception.Message);
-            Assert.IsNotNull(exception.InnerException);
-            StringAssert.StartsWith("Could not find file", exception.InnerException.Message);
+            Assert.IsInstanceOf(typeof(FileNotFoundException), exception.InnerException);
         }
     }
 }

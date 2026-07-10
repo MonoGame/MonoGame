@@ -1,15 +1,10 @@
-// MonoGame - Copyright (C) The MonoGame Team
+// MonoGame - Copyright (C) MonoGame Foundation, Inc
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
 #include "api_MGI.h"
 
-#define STBI_NO_PSD
-#define STBI_NO_BMP
-#define STBI_NO_TGA
-#define STBI_NO_HDR
-#define STBI_NO_PIC
-#define STBI_NO_PNM
+#include <type_traits>
 
 #if defined(_WIN32)
 #define __STDC_LIB_EXT1__
@@ -21,8 +16,14 @@
 #define STB_IMAGE_WRITE_IMPLEMENTATION
 #include "stb_image_write.h"
 
+inline constexpr bool operator&(MGProcessorType Lhs, MGProcessorType Rhs)
+{
+    return static_cast<bool>(static_cast<std::underlying_type_t<MGProcessorType>>(Lhs) &
+                                        static_cast<std::underlying_type_t<MGProcessorType>>(Rhs));
+}
 
-void MGI_ReadRGBA(mgbyte* data, mgint dataBytes, mgbool zeroTransparentPixels, mgint& width, mgint& height, mgbyte*& rgba)
+
+void MGI_ReadRGBA(mgbyte* data, mgint dataBytes, MGProcessorType processors, mgint& width, mgint& height, mgbyte*& rgba)
 {
 	width = 0;
 	height = 0;
@@ -38,10 +39,10 @@ void MGI_ReadRGBA(mgbyte* data, mgint dataBytes, mgbool zeroTransparentPixels, m
 	}
 
 	// If the original image before conversion had alpha...
-	if (zeroTransparentPixels && c == 4)
+    if ((processors & MGProcessorType::ZeroTransparentPixels) && c == 4)
 	{
 		// XNA blacks out any pixels with an alpha of zero.
-		for (int i = 0; i < w * h; i += 4)
+		for (int i = 0; i < 4 * w * h; i += 4)
 		{
 			if (image[i + 3] == 0)
 			{
@@ -57,39 +58,44 @@ void MGI_ReadRGBA(mgbyte* data, mgint dataBytes, mgbool zeroTransparentPixels, m
 	height = h;
 }
 
+void MGI_FreeRGBA(mgbyte* rgba)
+{
+	if (rgba)
+		STBI_FREE(rgba);
+}
+
 struct mem_image
 {
 	static const size_t grow = 4096;
 
 	mem_image()
 	{
-		dataBytes = grow;
+		dataSize = grow;
 		data = (mgbyte*)malloc(grow);
-		offset = 0;
+		pos = 0;
 	}
 
 	mgbyte* data;
-	mgint dataBytes;
-	size_t offset;
+	mgint dataSize;
+	size_t pos;
 };
 
 static void mem_image_write(void* context, void* data, int size)
 {
 	mem_image* image = (mem_image*)context;
 
-	size_t offset = image->offset + size;
+	size_t end = image->pos + size;
 
-
-	if (offset > image->dataBytes)
+	if (end > image->dataSize)
 	{
 		// TODO:  Need a better strategy for memory growth.
 		// TODO:  Need to handle allocation failure gracefully.
-		image->dataBytes = (mgint)(offset + mem_image::grow); // Need a better algo!
-		image->data = (mgbyte*)realloc(image->data, image->dataBytes);
+		image->dataSize = (mgint)(end + mem_image::grow); // Need a better algo!
+		image->data = (mgbyte*)realloc(image->data, image->dataSize);
 	}
 
-	memcpy(image->data + image->offset, data, size);
-	image->offset = offset;
+	memcpy(image->data + image->pos, data, size);
+	image->pos = end;
 }
 
 void MGI_WriteJpg(mgbyte* data, mgint dataBytes, mgint width, mgint height, mgint quality, mgbyte*& jpg, mgint& jpgBytes)
@@ -100,8 +106,8 @@ void MGI_WriteJpg(mgbyte* data, mgint dataBytes, mgint width, mgint height, mgin
 	mem_image image;
 	stbi_write_jpg_to_func(mem_image_write, &image, width, height, 4, data, quality);
 
-	jpg = (mgbyte*)realloc(image.data, image.offset);
-	jpgBytes = image.dataBytes;
+	jpg = (mgbyte*)realloc(image.data, image.pos);
+	jpgBytes = image.pos;
 }
 
 void MGI_WritePng(mgbyte* data, mgint dataBytes, mgint width, mgint height, mgbyte*& png, mgint& pngBytes)
@@ -110,8 +116,8 @@ void MGI_WritePng(mgbyte* data, mgint dataBytes, mgint width, mgint height, mgby
 	pngBytes = 0;
 
 	mem_image image;
-	stbi_write_png_to_func(mem_image_write, &image, width, height, 4, data, 4);
+	stbi_write_png_to_func(mem_image_write, &image, width, height, 4, data, width * 4);
 
-	png = (mgbyte*)realloc(image.data, image.offset);
-	pngBytes = image.dataBytes;
+	png = (mgbyte*)realloc(image.data, image.pos);
+	pngBytes = image.pos;
 }

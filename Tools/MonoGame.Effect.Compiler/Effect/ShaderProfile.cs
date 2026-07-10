@@ -11,6 +11,7 @@ using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading;
+using Microsoft.Xna.Framework.Content.Pipeline;
 using MonoGame.Effect.TPGParser;
 
 namespace MonoGame.Effect
@@ -29,6 +30,8 @@ namespace MonoGame.Effect
         public static readonly ShaderProfile OpenGL = FromName("OpenGL");
 
         public static readonly ShaderProfile DirectX_11 = FromName("DirectX_11");
+
+        public static readonly ShaderProfile DirectX_12 = FromName("DirectX_12");
 
         public static readonly ShaderProfile Vulkan = FromName("Vulkan");
 
@@ -78,6 +81,15 @@ namespace MonoGame.Effect
             minor = int.Parse(match.Groups["minor"].Value, NumberStyles.Integer, CultureInfo.InvariantCulture);
         }
 
+        public static ShaderProfile GetProfileForPlatform(TargetPlatform platform) => platform switch
+        {
+            TargetPlatform.Windows => ShaderProfile.DirectX_11,
+            TargetPlatform.iOS or TargetPlatform.Android or TargetPlatform.DesktopGL or TargetPlatform.MacOSX or TargetPlatform.RaspberryPi or TargetPlatform.Web => ShaderProfile.OpenGL,
+            TargetPlatform.DesktopVK => ShaderProfile.Vulkan,
+            TargetPlatform.WindowsDX12 or TargetPlatform.XboxOne or TargetPlatform.XboxSeries => ShaderProfile.DirectX_12,
+            _ => ShaderProfile.FromName(platform.ToString())
+        };
+
         private class StringConverter : TypeConverter
         {
             public override object ConvertFrom(ITypeDescriptorContext context, CultureInfo culture, object value)
@@ -94,77 +106,6 @@ namespace MonoGame.Effect
                 }
 
                 return base.ConvertFrom(context, culture, value);
-            }
-        }
-
-        protected static int RunTool(string exe, string args, out string stdout, out string stderr)
-        {
-            stdout = string.Empty;
-            stderr = string.Empty;
-            var processInfo = new ProcessStartInfo
-            {
-                Arguments = args,
-                CreateNoWindow = true,
-                WindowStyle = ProcessWindowStyle.Hidden,
-                ErrorDialog = false,
-                FileName = exe,
-                UseShellExecute = false,
-                RedirectStandardOutput = true,
-                RedirectStandardError = true,
-                RedirectStandardInput = true,
-            };
-
-            using (var process = new Process { StartInfo = processInfo })
-            {
-                process.Start();
-                string stderrOutput = string.Empty;
-                string stdoutOutput = string.Empty;
-                var stdoutThread = new Thread(new ThreadStart(() =>
-                {
-                    var memory = new MemoryStream();
-                    process.StandardOutput.BaseStream.CopyTo(memory);
-                    var bytes = new byte[memory.Position];
-                    memory.Seek(0, SeekOrigin.Begin);
-                    memory.Read(bytes, 0, bytes.Length);
-                    stdoutOutput = System.Text.Encoding.ASCII.GetString(bytes);
-                }));
-                stdoutThread.Start();
-
-                var stderrThread = new Thread(new ThreadStart(() =>
-                {
-                    var memory = new MemoryStream();
-                    process.StandardError.BaseStream.CopyTo(memory);
-                    var bytes = new byte[memory.Position];
-                    memory.Seek(0, SeekOrigin.Begin);
-                    memory.Read(bytes, 0, bytes.Length);
-                    stderrOutput = System.Text.Encoding.ASCII.GetString(bytes);
-                }));
-                stderrThread.Start();
-
-                process.WaitForExit();
-
-                stdoutThread.Join();
-                stderrThread.Join();
-
-                stderr = stderrOutput;
-                stdout = stdoutOutput;
-
-                return process.ExitCode;
-            }
-        }
-
-        /// <summary>
-        /// Safely deletes the file if it exists.
-        /// </summary>
-        /// <param name="filePath">The path to the file to delete.</param>
-        protected static void DeleteFile(string filePath)
-        {
-            try
-            {
-                File.Delete(filePath);
-            }
-            catch (Exception)
-            {
             }
         }
     }

@@ -52,8 +52,6 @@ namespace Microsoft.Xna.Framework.Windows
 
         public const int WM_SYSCOMMAND = 0x0112;
 
-        public const int WM_SETTING­CHANGE = 0x001A;
-
         public bool AllowAltF4 = true;
 
         internal bool IsResizing { get; set; }
@@ -224,8 +222,8 @@ namespace Microsoft.Xna.Framework.Windows
             for (uint i = 0; i < count; i++)
             {
                 uint buffSize = DragQueryFile(hdrop, i, null, int.MaxValue);
-                StringBuilder builder = new StringBuilder((int)buffSize);
-                DragQueryFile(hdrop, i, builder, buffSize + 1); // Extra byte for null terminator
+                StringBuilder builder = new StringBuilder((int)buffSize + 1); // +1 for null terminator
+                DragQueryFile(hdrop, i, builder, buffSize + 1);
                 files[i] = builder.ToString();
             }
 

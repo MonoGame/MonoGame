@@ -1,0 +1,15 @@
+<Project>
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.1</TargetFramework>
+    <NoWarn>NU5128</NoWarn>
+    <IncludeBuildOutput>false</IncludeBuildOutput>
+    <ProduceOutputs>false</ProduceOutputs>
+    <DebugType>None</DebugType>
+    <GenerateDependencyFile>false</GenerateDependencyFile>
+    <EnableDefaultItems>false</EnableDefaultItems>
+  </PropertyGroup>
+
+  <Import Project="..\..\MonoGame.props" />
+
+</Project>

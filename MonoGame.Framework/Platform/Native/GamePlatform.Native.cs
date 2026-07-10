@@ -1,4 +1,4 @@
-// MonoGame - Copyright (C) The MonoGame Team
+// MonoGame - Copyright (C) MonoGame Foundation, Inc
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
@@ -31,7 +31,12 @@ class NativeGamePlatform : GamePlatform
 
     public unsafe NativeGamePlatform(Game game) : base(game)
     {
-        Handle = MGP.Platform_Create(out GameRunBehavior behavior);
+        GameRunBehavior behavior;
+        Handle = MGP.Platform_Create(out behavior);
+        if (Handle == null)
+        {
+            throw new NoSuitableGraphicsDeviceException("Failed to initialize SDL platform!");
+        }
 
         DefaultRunBehavior = behavior;
 
@@ -42,6 +47,7 @@ class NativeGamePlatform : GamePlatform
         Mouse.WindowHandle = _window.Handle;
         MessageBox._window = _window._handle;
         GamePad.Handle = Handle;
+        OnIsMouseVisibleChanged();
     }
 
     internal static unsafe MGG_GraphicsSystem* GraphicsSystem
@@ -49,7 +55,13 @@ class NativeGamePlatform : GamePlatform
         get
         {
             if (_system == null)
+            {
                 _system = MGG.GraphicsSystem_Create();
+                if (_system == null)
+                {
+                    throw new NoSuitableGraphicsDeviceException("Failed to initialize graphics system!");
+                }
+            }
 
             return _system;
         }
@@ -83,12 +95,13 @@ class NativeGamePlatform : GamePlatform
 
     private unsafe void PollEvents()
     {
-        while (MGP.Platform_PollEvent(Handle, out MGP_Event event_))
+        MGP_Event event_;
+        while (MGP.Platform_PollEvent(Handle, out event_) != 0)
         {
             switch (event_.Type)
             {
                 case EventType.Quit:
-                    _isExiting++;
+                    Game.Exit();
                     break;
 
                 case EventType.WindowGainedFocus:
@@ -111,7 +124,7 @@ class NativeGamePlatform : GamePlatform
                 { 
                     var window = NativeGameWindow.FromHandle(event_.Window.Window);
                     if (Window == window)
-                        _isExiting++;
+                        Game.Exit();
                     break;
                 }
 
@@ -176,8 +189,8 @@ class NativeGamePlatform : GamePlatform
                     var window = NativeGameWindow.FromHandle(event_.MouseWheel.Window);
                     if (window != null)
                     {
-                        window.MouseState.ScrollWheelValue = event_.MouseWheel.Scroll;
-                        window.MouseState.HorizontalScrollWheelValue = event_.MouseWheel.ScrollH;
+                        window.MouseState.ScrollWheelValue += event_.MouseWheel.Scroll;
+                        window.MouseState.HorizontalScrollWheelValue += event_.MouseWheel.ScrollH;
                     }
                     break;
                 }
@@ -290,17 +303,17 @@ class NativeGamePlatform : GamePlatform
 
     public override unsafe bool BeforeRun()
     {        
-        return MGP.Platform_BeforeRun(Handle);
+        return MGP.Platform_BeforeRun(Handle) == 0 ? false : true;
     }
 
     public override unsafe bool BeforeUpdate(GameTime gameTime)
     {
-        return MGP.Platform_BeforeUpdate(Handle);
+        return MGP.Platform_BeforeUpdate(Handle) == 0 ? false : true;
     }
 
     public override unsafe bool BeforeDraw(GameTime gameTime)
     {
-        return MGP.Platform_BeforeDraw(Handle);
+        return MGP.Platform_BeforeDraw(Handle) == 0 ? false : true;
     }
 
     public override unsafe void EnterFullScreen()
@@ -326,7 +339,7 @@ class NativeGamePlatform : GamePlatform
 
     protected override unsafe void OnIsMouseVisibleChanged()
     {
-        MGP.Mouse_SetVisible(Handle, Game.IsMouseVisible);
+        MGP.Mouse_SetVisible(Handle, (byte)(IsMouseVisible ? 1 : 0));
     }
 
     protected unsafe override void Dispose(bool disposing)
@@ -336,6 +349,12 @@ class NativeGamePlatform : GamePlatform
             _window.Destroy();
             _window = null;
             Window = null;
+        }
+        
+        if (_system != null)
+        {
+            MGG.GraphicsSystem_Destroy(_system);
+            _system = null;
         }
 
         if (Handle != null)

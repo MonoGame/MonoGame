@@ -8,6 +8,7 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <GenerateProgramFile>false</GenerateProgramFile>
     <DefineConstants>WINDOWS;DIRECTX12</DefineConstants>
+    <Platforms>AnyCPU;ARM64;x64</Platforms>
   </PropertyGroup>
 
   <ItemGroup>
@@ -19,7 +20,7 @@
   <ItemGroup>
     <Compile Remove="bin\**\*" />
     <Compile Remove="Framework\WindowsDX\**" />
-    <Compile Remove="obj\**\*" />
+    <Compile Remove="obj\**" />
     <Compile Remove="Properties/**/*" />
     <Compile Remove="Interactive/**/*" />
     <Compile Remove="Runner/iOS/**/*" />
@@ -38,28 +39,31 @@
 
   <ItemGroup>
     <EmbeddedResource Remove="Framework\WindowsDX\**" />
+    <EmbeddedResource Remove="obj\**" />
     <None Remove="Framework\WindowsDX\**" />
+    <None Remove="obj\**" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Compile Remove="Framework\Audio\DynamicSoundEffectInstanceTest.cs" />
-    <Compile Remove="Framework\Audio\SoundEffectInstanceTest.cs" />
-    <Compile Remove="Framework\Audio\SoundEffectTest.cs" />
-    <Compile Remove="Framework\Audio\XactTest.cs" />
-  </ItemGroup>
+  <PropertyGroup>
+    <_LowerCasePlatform>$([MSBuild]::ValueOrDefault('$(Platform)', '').ToLowerInvariant())</_LowerCasePlatform>
+    <_OSArchitecture>$([System.Runtime.InteropServices.RuntimeInformation]::OSArchitecture.ToString().ToLowerInvariant())</_OSArchitecture>
+    <NativePlatform Condition="'$(_LowerCasePlatform)' == 'arm64' or '$(_LowerCasePlatform)' == 'x64'">$(_LowerCasePlatform)</NativePlatform>
+    <NativePlatform Condition="'$(NativePlatform)' == '' And '$(_OSArchitecture)' != ''">$(_OSArchitecture)</NativePlatform>
+    <NativePlatform Condition="'$(NativePlatform)' == ''">x64</NativePlatform>
+  </PropertyGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\MonoGame.Framework\MonoGame.Framework.Native.csproj" />
-    <ProjectReference Include="..\native\monogame\windowsdx.vcxproj" />
-
-	  <Content Include="..\Artifacts\monogame.native\windows\windowsdx\$(Configuration)\monogame.native.dll">
-		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-	  </Content>
-	  
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Framework\Audio\" />
-  </ItemGroup>
-
+    <ItemGroup>
+		<ProjectReference Include="..\MonoGame.Framework\MonoGame.Framework.Native.csproj" />
+	
+		<NativeLib Include="..\Artifacts\native\mgruntime\windowsdx\windows\$(NativePlatform)\$(Configuration)\mgruntime.dll" Condition="Exists('..\Artifacts\native\mgruntime\windowsdx\windows\$(NativePlatform)\$(Configuration)\mgruntime.dll')" PackagePath="runtimes\win-$(NativePlatform)\native" />
+    </ItemGroup>
+	
+	<ItemGroup>
+		<Content Include="@(NativeLib)" Visible="false">
+			<PackagePath>%(PackagePath)</PackagePath>
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</Content>
+		<UpToDateCheckBuilt Include="@(NativeLib->'$(OutputPath)%(Filename)%(Extension)')"><Original>%(Identity)</Original></UpToDateCheckBuilt>
+	</ItemGroup>
+	
 </Project>

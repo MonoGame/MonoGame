@@ -1,14 +1,12 @@
-// MonoGame - Copyright (C) The MonoGame Team
+// MonoGame - Copyright (C) MonoGame Foundation, Inc
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
-using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Input;
-using MonoGame.Framework.Utilities;
-using MonoGame.Interop;
 using System;
 using System.Collections.Generic;
-using System.Drawing;
+using Microsoft.Xna.Framework.Graphics;
+using MonoGame.Framework.Utilities;
+using MonoGame.Interop;
 
 namespace Microsoft.Xna.Framework;
 
@@ -37,24 +35,24 @@ internal class NativeGameWindow : GameWindow
     {
         get
         {
-            return MGP.Window_GetAllowUserResizing(_handle);
+            return MGP.Window_GetAllowUserResizing(_handle) == 0 ? false : true;
         }
 
         set
         {
-            MGP.Window_SetAllowUserResizing(_handle, value);
+            MGP.Window_SetAllowUserResizing(_handle, (byte)(value ? 1 : 0));
         }
     }
     public override unsafe bool IsBorderless
     {
         get
         {
-            return MGP.Window_GetIsBorderless(_handle);
+            return MGP.Window_GetIsBorderless(_handle) == 0 ? false : true;
         }
 
         set
         {
-            MGP.Window_SetIsBorderless(_handle, value);
+            MGP.Window_SetIsBorderless(_handle, (byte)(value ? 1 : 0));
         }
     }
 
@@ -75,7 +73,9 @@ internal class NativeGameWindow : GameWindow
             int x = 0, y = 0;
 
             if (!IsFullScreen)
+            {
                 MGP.Window_GetPosition(_handle, out x, out y);
+            }
 
             return new Point(x, y);
         }
@@ -106,17 +106,20 @@ internal class NativeGameWindow : GameWindow
         var title = Title == null ? AssemblyHelper.GetDefaultWindowTitle() : Title;
 
         // Create the window which size may be changed by the platform.
-        _handle = MGP.Window_Create(
-            platform.Handle,
-            ref _width,
-            ref _height,
-            title);
+        _handle = MGP.Window_Create(platform.Handle, ref _width, ref _height, title);
+        if (_handle == null)
+        {
+            throw new NoSuitableGraphicsDeviceException("Failed to initialize SDL window!");
+        }
 
         _windows[(nint)_handle] = this;
 
         var icon = AssemblyHelper.GetDefaultWindowIcon();
         if (icon != null)
-            MGP.Window_SetIconBitmap(_handle, icon, icon.Length);
+        {
+            fixed(byte* i = icon)
+                MGP.Window_SetIconBitmap(_handle, i, icon.Length);
+        }
 
         Handle = MGP.Window_GetNativeHandle(_handle);
     }
@@ -154,7 +157,7 @@ internal class NativeGameWindow : GameWindow
             IsFullScreen = pp.IsFullScreen;
             HardwareModeSwitch = pp.HardwareModeSwitch;
 
-            MGP.Window_EnterFullScreen(_handle, HardwareModeSwitch);
+            MGP.Window_EnterFullScreen(_handle, (byte)(HardwareModeSwitch ? 1 : 0));
         }
         else if (!pp.IsFullScreen && IsFullScreen)
         {
@@ -163,7 +166,13 @@ internal class NativeGameWindow : GameWindow
             MGP.Window_ExitFullScreen(_handle);
         }
 
-        ClientResize(pp.BackBufferWidth, pp.BackBufferHeight);
+        if (_width == pp.BackBufferWidth && _height == pp.BackBufferHeight)
+            return;
+
+        _width = pp.BackBufferWidth;
+        _height = pp.BackBufferHeight;
+
+        MGP.Window_SetClientSize(_handle, pp.BackBufferWidth, pp.BackBufferHeight);
     }
 
     public unsafe void ClientResize(int width, int height)
@@ -171,38 +180,12 @@ internal class NativeGameWindow : GameWindow
         if (_width == width && _height == height)
             return;
 
-        if (!IsFullScreen)
-            MGP.Window_SetClientSize(_handle, width, height);
-
-        UpdateBackBufferSize(width, height);
-
-        OnClientSizeChanged();
-    }
-
-    private void UpdateBackBufferSize(int width, int height)
-    {
         _width = width;
         _height = height;
 
-        // TODO: Implement sperate swap change logic for
-        // non-primary windows.
+        MGP.Window_SetClientSize(_handle, width, height);
 
-        // TODO: We should expose a feature to allow
-        // for either the swapchain to resize to match
-        // the window size or remain fixed size and stretch.
-
-        // Only the primary window will resize the
-        // default back buffer.
-        if (!_primaryWindow)
-            return;
-
-        var manager = _platform.Game.graphicsDeviceManager;
-        if (manager.GraphicsDevice == null)
-            return;
-
-        manager.PreferredBackBufferWidth = _width;
-        manager.PreferredBackBufferHeight = _height;
-        manager.ApplyChanges();
+        OnClientSizeChanged();
     }
 
     protected override unsafe void SetTitle(string title)
@@ -212,6 +195,6 @@ internal class NativeGameWindow : GameWindow
 
     internal unsafe void Show(bool show)
     {
-        MGP.Window_Show(_handle, show);
+        MGP.Window_Show(_handle, (byte)(show ? 1 : 0));
     }
 }

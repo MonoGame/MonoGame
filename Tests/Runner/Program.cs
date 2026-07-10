@@ -29,32 +29,56 @@ namespace MonoGame.Tests
     {
         static Thread mainThread = Thread.CurrentThread;
         static MainThreadSynchronizationContext mainThreadSynchronizationContext;
-        public static TestResult Invoke (Func<TestResult> func, TestResult result)
+        public static TestResult Invoke(Func<TestResult> func, TestResult result)
         {
-            if (Thread.CurrentThread != mainThread) {
+            if (Thread.CurrentThread != mainThread)
+            {
                 TestResult r = result;
-                mainThreadSynchronizationContext.Send (state => {
-                    try {
-                    r = func();
-                    } catch (Exception ex) {
-                        r.RecordException (ex);
+                mainThreadSynchronizationContext.Send(state =>
+                {
+                    try
+                    {
+                        r = func();
+                    }
+                    catch (Exception ex)
+                    {
+                        r.RecordException(ex);
                     }
                 }, null);
                 return r;
-            } else {
+            }
+            else
+            {
                 return func();
             }
         }
-        static async Task<int> Main(string [] args)
+        
+        [STAThread]
+        static async Task<int> Main(string[] args)
         {
             mainThread = Thread.CurrentThread;
             mainThreadSynchronizationContext = new MainThreadSynchronizationContext(mainThread);
-            SynchronizationContext.SetSynchronizationContext (mainThreadSynchronizationContext);
+            SynchronizationContext.SetSynchronizationContext(mainThreadSynchronizationContext);
+            
             int result = 0;
-            var task = Task.Run (() => result = new AutoRun().Execute(args)).ContinueWith ((t) => {
-                mainThreadSynchronizationContext.End ();
-            }, continuationOptions: TaskContinuationOptions.ExecuteSynchronously);
-            mainThreadSynchronizationContext.ExecuteQueuedCallbacks ();
+            bool testsComplete = false;
+            
+            var task = Task.Run(() =>
+            {
+                try
+                {
+                    result = new AutoRun().Execute(args);
+                }
+                finally
+                {
+                    testsComplete = true;
+                    mainThreadSynchronizationContext.End();
+                }
+            });
+            
+            // Process callbacks on the main thread while tests run
+            mainThreadSynchronizationContext.ExecuteQueuedCallbacks();
+            
             await task;
             return result;
         }

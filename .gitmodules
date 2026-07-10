@@ -1,6 +1,3 @@
-[submodule "ThirdParty/Dependencies"]
-	path = ThirdParty/Dependencies
-	url = https://github.com/MonoGame/MonoGame.Dependencies.git
 [submodule "ThirdParty/SDL_GameControllerDB"]
 	path = ThirdParty/SDL_GameControllerDB
 	url = https://github.com/gabomdq/SDL_GameControllerDB.git
@@ -21,7 +18,16 @@
 	url = https://github.com/zeux/volk.git
 [submodule "src/monogame/external/vma"]
 	path = native/monogame/external/vma
-	url = https://github.com/LunarG/VulkanMemoryAllocator.git
+	url = https://github.com/GPUOpen-LibrariesAndSDKs/VulkanMemoryAllocator.git
 [submodule "external/MonoGame.Templates"]
 	path = external/MonoGame.Templates
 	url = https://github.com/MonoGame/MonoGame.Templates.git
+[submodule "external/stb"]
+	path = external/stb
+	url = https://github.com/nothings/stb
+[submodule "external/CppNet"]
+	path = external/CppNet
+	url = https://github.com/MonoGame/CppNet.git
+[submodule "native/monogame/external/faudio"]
+	path = native/monogame/external/faudio
+	url = https://github.com/FNA-XNA/FAudio.git

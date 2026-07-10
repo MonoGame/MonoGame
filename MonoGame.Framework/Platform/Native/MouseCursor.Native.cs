@@ -1,4 +1,4 @@
-// MonoGame - Copyright (C) The MonoGame Team
+// MonoGame - Copyright (C) MonoGame Foundation, Inc
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
@@ -36,7 +36,9 @@ public partial class MouseCursor
         var bytes = new byte[texture.Width * texture.Height * 4];
         texture.GetData(bytes);
 
-        var handle = MGP.Cursor_CreateCustom(bytes, texture.Width, texture.Height, originx, originy);
+        MGP_Cursor* handle;
+        fixed (byte* b = bytes)
+            handle = MGP.Cursor_CreateCustom(b, texture.Width, texture.Height, originx, originy);
 
         return new MouseCursor((nint)handle);
     }

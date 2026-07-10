@@ -68,14 +68,14 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
             Filename = filename;
 
             string stdout, stderr;
-            var result = FFmpeg.Run(
+            var result = FFprobe.Run(
                 string.Format("-i \"{0}\" -show_format -select_streams v -show_streams -print_format ini", Filename),
                 out stdout,
                 out stderr);
 
             if (result != 0)
             {
-                throw new Exception($"ffmpeg exited with {result}:\n{stderr}");
+                throw new Exception($"ffprobe exited with {result}:\n{stderr}");
             }
 
             var lines = stdout.Split(Environment.NewLine.ToCharArray(), StringSplitOptions.RemoveEmptyEntries);

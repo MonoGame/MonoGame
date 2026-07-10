@@ -1,20 +1,26 @@
 ﻿
 namespace BuildScripts;
 
+[TaskName("Build Shaders")]
+[IsDependentOn(typeof(BuildShadersDX11Task))]
+[IsDependentOn(typeof(BuildShadersDX12Task))]
+[IsDependentOn(typeof(BuildShadersOGLTask))]
+[IsDependentOn(typeof(BuildShadersVulkanTask))]
+public sealed class BuildShadersTask : FrostingTask<BuildContext> { }
+
 [TaskName("Build Frameworks")]
 [IsDependentOn(typeof(BuildNativeTask))]
-[IsDependentOn(typeof(BuildDesktopVKTask))]
 [IsDependentOn(typeof(BuildDesktopGLTask))]
 [IsDependentOn(typeof(BuildWindowsDXTask))]
 [IsDependentOn(typeof(BuildAndroidTask))]
 [IsDependentOn(typeof(BuildiOSTask))]
 [IsDependentOn(typeof(BuildContentPipelineTask))]
-[IsDependentOn(typeof(BuildConsoleCheckTask))]
 public sealed class BuildFrameworksTask : FrostingTask<BuildContext> { }
 
 [TaskName("Build Tools")]
 [IsDependentOn(typeof(BuildMGFXCTask))]
 [IsDependentOn(typeof(BuildContentPipelineTask))]
+[IsDependentOn(typeof(BuildDevToolsTask))]
 [IsDependentOn(typeof(BuildMGCBTask))]
 [IsDependentOn(typeof(BuildMGCBEditorTask))]
 public sealed class BuildToolsTask : FrostingTask<BuildContext> { }
@@ -31,6 +37,7 @@ public sealed class BuildAllTestsTask : FrostingTask<BuildContext> { }
 
 
 [TaskName("Build All")]
+[IsDependentOn(typeof(BuildShadersTask))]
 [IsDependentOn(typeof(BuildFrameworksTask))]
 [IsDependentOn(typeof(BuildToolsTask))]
 [IsDependentOn(typeof(BuildTemplatesTask))]
@@ -45,7 +52,18 @@ public sealed class DeployTask : FrostingTask<BuildContext> { }
 
 [TaskName("Test")]
 [IsDependentOn(typeof(DownloadTestArtifactsTask))]
-public sealed class TestTask : FrostingTask<BuildContext> {}
+public sealed class TestTask : FrostingTask<BuildContext> { }
+
+[TaskName("TestNuGet")]
+[IsDependentOn(typeof(TestNuGetSetupTask))]
+[IsDependentOn(typeof(TestDesktopGLTask))]
+[IsDependentOn(typeof(TestWindowsDXTask))]
+[IsDependentOn(typeof(TestAndroidTask))]
+[IsDependentOn(typeof(TestiOSTask))]
+[IsDependentOn(typeof(TestBlank2DStarterKitTask))]
+[IsDependentOn(typeof(TestFull2DStarterKitTask))]
+[IsDependentOn(typeof(TestNuGetSummaryTask))]
+public sealed class TestNuGetTask : FrostingTask<BuildContext> { }
 
 [TaskName("Default")]
 [IsDependentOn(typeof(BuildAllTask))]

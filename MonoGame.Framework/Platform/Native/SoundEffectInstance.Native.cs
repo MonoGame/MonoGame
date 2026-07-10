@@ -1,9 +1,8 @@
-// MonoGame - Copyright (C) The MonoGame Team
+// MonoGame - Copyright (C) MonoGame Foundation, Inc
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System;
-using Microsoft.Xna.Framework.Graphics;
 using MonoGame.Interop;
 
 
@@ -46,7 +45,7 @@ public partial class SoundEffectInstance : IDisposable
     private unsafe void PlatformPlay()
     {
         if (Voice != null)
-            MGA.Voice_Play(Voice, _isLooped);
+            MGA.Voice_Play(Voice, (byte)(_isLooped ? 1 : 0));
     }
 
     private unsafe void PlatformResume()
@@ -58,7 +57,7 @@ public partial class SoundEffectInstance : IDisposable
     private unsafe void PlatformStop(bool immediate)
     {
         if (Voice != null)
-            MGA.Voice_Stop(Voice, immediate);
+            MGA.Voice_Stop(Voice, (byte)(immediate ? 1 : 0));
     }
 
     private unsafe void PlatformSetPan(float pan)
@@ -103,6 +102,15 @@ public partial class SoundEffectInstance : IDisposable
     {
         if (Voice != null)
             MGA.Voice_ClearFilterMode(Voice);
+    }
+
+    internal unsafe void PlatformClearBuffer()
+    {
+        if (Voice != null)
+        {
+            MGA.Voice_Destroy(Voice);
+            Voice = null;
+        }
     }
 
     private unsafe void PlatformDispose(bool disposing)

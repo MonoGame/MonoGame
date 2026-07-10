@@ -2,6 +2,7 @@
 namespace BuildScripts;
 
 [TaskName("Build Android")]
+[IsDependentOn(typeof(BuildShadersOGLTask))]
 public sealed class BuildAndroidTask : FrostingTask<BuildContext>
 {
     public override bool ShouldRun(BuildContext context) => context.IsWorkloadInstalled("android");
@@ -18,6 +19,7 @@ public sealed class BuildAndroidTask : FrostingTask<BuildContext>
             Verbosity = DotNetVerbosity.Minimal,
             Configuration = context.DotNetPackSettings.Configuration,
         };
+
         context.DotNetBuild(context.GetProjectPath(ProjectType.Framework, "Android"), installSettings);
         context.DotNetPack(context.GetProjectPath(ProjectType.Framework, "Android"), context.DotNetPackSettings);
     }

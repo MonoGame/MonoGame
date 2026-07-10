@@ -145,7 +145,7 @@ namespace Microsoft.Xna.Framework.Content
 		}
 
         /// <summary>
-        /// Initializes a new instance of the ContentMangaer.
+        /// Initializes a new instance of the ContentManager.
         /// </summary>
         /// <remarks>
         ///     <para>
@@ -170,7 +170,7 @@ namespace Microsoft.Xna.Framework.Content
             AddContentManager(this);
 		}
 
-        /// <inheritdoc cref="ContentManager.ContentManager(IServiceProvider)"/>
+        /// <inheritdoc cref="ContentManager(IServiceProvider)"/>
         /// <param name="serviceProvider"/>
         /// <param name="rootDirectory">The root directory the ContentManager will search for content in.</param>
         public ContentManager(IServiceProvider serviceProvider, string rootDirectory)
@@ -346,10 +346,6 @@ namespace Microsoft.Xna.Framework.Content
             if (disposed)
             {
                 throw new ObjectDisposedException("ContentManager");
-            }
-            if (Path.IsPathRooted(assetName))
-            {
-                throw new ContentLoadException("assetName '" + assetName + "' cannot be a rooted (absolute) path. Remove any leading drive letters (e.g. 'C:'), forward slashes or backslashes");
             }
 
             T result = default(T);
@@ -627,7 +623,10 @@ namespace Microsoft.Xna.Framework.Content
                     ReloadAsset(asset.Key, Convert.ChangeType(asset.Value, asset.Value.GetType()));
 
                 var methodInfo = ReflectionHelpers.GetMethodInfo(typeof(ContentManager), "ReloadAsset");
+                // Up the callstack, it is ensured that the type of asset.Value can be used to make a generic method for.
+                #pragma warning disable IL2060, IL3050
                 var genericMethod = methodInfo.MakeGenericMethod(asset.Value.GetType());
+                #pragma warning restore IL2060, IL3050
                 genericMethod.Invoke(this, new object[] { asset.Key, Convert.ChangeType(asset.Value, asset.Value.GetType()) });
             }
         }
@@ -700,9 +699,17 @@ namespace Microsoft.Xna.Framework.Content
                 throw new ObjectDisposedException("ContentManager");
             }
 
+            // On some platforms, name and slash direction matter.
+            // We store the asset by a /-separating key rather than how the
+            // path to the file was passed to us to avoid
+            // loading "content/asset1.xnb" and "content\\ASSET1.xnb" as if they were two
+            // different files. This matches stock XNA behavior.
+            // The dictionary will ignore case differences
+            var key = assetName.Replace('\\', '/');
+
             //Check if the asset exists
             object asset;
-            if (loadedAssets.TryGetValue(assetName, out asset))
+            if (loadedAssets.TryGetValue(key, out asset))
             {
                 //Check if it's disposable and remove it from the disposable list if so
                 var disposable = asset as IDisposable;
@@ -712,7 +719,7 @@ namespace Microsoft.Xna.Framework.Content
                     disposableAssets.Remove(disposable);
                 }
 
-                loadedAssets.Remove(assetName);
+                loadedAssets.Remove(key);
             }
         }
 

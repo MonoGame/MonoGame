@@ -2,8 +2,6 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
-using System;
-
 namespace Microsoft.Xna.Framework.Content.Pipeline
 {
     /// <summary>
@@ -19,8 +17,13 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
         /// </summary>
         protected ContentImporter()
         {
-
+            Version = (GetType().Assembly.GetName().Version ?? new Version()).ToString();
         }
+
+        /// <summary>
+        /// Gets or sets the version of the current content importer that will be used to determien if the content needs to be rebuilt.
+        /// </summary>
+        public virtual string Version { get; set; }
 
         /// <summary>
         /// Called by the framework when importing a game asset. This is the method called by XNA when an asset is to be imported into an object that can be recognized by the Content Pipeline.

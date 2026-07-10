@@ -13,15 +13,8 @@ using Microsoft.Xna.Framework.Graphics;
 namespace MonoGame.Tests.Audio
 {
     [Category("Audio")]
-    public class SoundEffectTests
+    public class SoundEffectTests : AudioTestFixtureBase
     {
-        [SetUp]
-        public void Setup()
-        {
-            // Necessary to get audio initialised
-            FrameworkDispatcher.Update();
-        }
-
         [Test]
         public void Statics()
         {
@@ -400,6 +393,18 @@ namespace MonoGame.Tests.Audio
             Assert.Throws<ArgumentNullException>(() => SoundEffect.FromStream(null));
         }
 
+#if !XNA
+        [Test]
+        public void SoundEffectFromStream_PcmFmtChunkWithTrailingBytes_Loads()
+        {
+            using (FileStream stream = File.OpenRead(@"Assets/Audio/pcm-fmt40-cb0.wav"))
+            using (SoundEffect sound = SoundEffect.FromStream(stream))
+            {
+                Assert.AreEqual(84014 / 10, (int)sound.Duration.TotalMilliseconds / 10);
+            }
+        }
+#endif
+
         [TestCase(@"Assets/Audio/blast_mono.wav", 7165)]
         [TestCase(@"Assets/Audio/blast_mono_22hz.wav", 7165)]
         [TestCase(@"Assets/Audio/blast_mono_11hz.wav", 7165)]
@@ -418,7 +423,7 @@ namespace MonoGame.Tests.Audio
         [TestCase(@"Assets/Audio/tone_stereo_44khz_16bit.wav", 500)]
 #if !XNA
         // XNA does not support 24-bit, 32-bit float, MS-ADPCM or IMA/ADPCM in SoundEffect.FromStream, but MonoGame does
-#if DIRECTX
+#if DIRECTX || DIRECTX12 || VULKAN
         [TestCase(@"Assets/Audio/blast_mono_44hz_adpcm_ms.wav", 7202)]
         [TestCase(@"Assets/Audio/blast_mono_22hz_adpcm_ms.wav", 7202)]
         [TestCase(@"Assets/Audio/blast_mono_11hz_adpcm_ms.wav", 7202)]
@@ -454,43 +459,13 @@ namespace MonoGame.Tests.Audio
         }
 #endif
 
-        // Proxy for the content manager used in SoundEffectFromContent
-        class GraphicsDeviceProxy : IGraphicsDeviceService
-        {
-            public GraphicsDevice GraphicsDevice
-            {
-                get { return null; }
-            }
-
-            public event EventHandler<EventArgs> DeviceCreated;
-
-            public event EventHandler<EventArgs> DeviceDisposing;
-
-            public event EventHandler<EventArgs> DeviceReset;
-
-            public event EventHandler<EventArgs> DeviceResetting;
-        }
-
-        class ContentManagerProxy : ContentManager
-        {
-            public ContentManagerProxy(IServiceProvider services): base(services) {}
-
-            protected override Stream OpenStream(string assetName)
-            {
-                var fileName = Path.Combine(RootDirectory, assetName + ".xnb");
-                if (File.Exists(fileName))
-                    return new FileStream(fileName, FileMode.Open, FileAccess.Read);
-                return base.OpenStream(assetName);
-            }
-        }
-
         [TestCase("tone_mono_44khz_8bit", 5000000)]
         [TestCase("tone_stereo_44khz_8bit", 5000000)]
         [TestCase("tone_mono_44khz_16bit", 5000000)]
         [TestCase("tone_stereo_44khz_16bit", 5000000)]
 #if !XNA
         // XNA does not support 32-bit float, MS-ADPCM or IMA/ADPCM in SoundEffect.FromStream, but MonoGame does
-#if !DIRECTX
+#if !DIRECTX && !DIRECTX12 && !VULKAN
         [TestCase("tone_mono_44khz_imaadpcm", 6010000)]
         [TestCase("tone_stereo_44khz_imaadpcm", 5300000)]
 #endif
@@ -502,10 +477,7 @@ namespace MonoGame.Tests.Audio
 #endif
         public void SoundEffectFromContent(string filename, long durationTicks)
         {
-            var services = new GameServiceContainer();
-            services.AddService<IGraphicsDeviceService>(new GraphicsDeviceProxy());
-            var content = new ContentManagerProxy(services);
-            var soundEffect = content.Load<SoundEffect>(Paths.Audio(filename));
+            var soundEffect = _content.Load<SoundEffect>(Paths.Audio(filename));
             Assert.AreEqual(durationTicks, soundEffect.Duration.Ticks);
         }
     }

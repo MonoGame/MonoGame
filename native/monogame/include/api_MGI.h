@@ -1,4 +1,4 @@
-// MonoGame - Copyright (C) The MonoGame Team
+// MonoGame - Copyright (C) MonoGame Foundation, Inc
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
                 
@@ -13,6 +13,7 @@
 
 
 
-MG_EXPORT void MGI_ReadRGBA(mgbyte* data, mgint dataBytes, mgbool zeroTransparentPixels, mgint& width, mgint& height, mgbyte*& rgba);
+MG_EXPORT void MGI_ReadRGBA(mgbyte* data, mgint dataBytes, MGProcessorType processors, mgint& width, mgint& height, mgbyte*& rgba);
+MG_EXPORT void MGI_FreeRGBA(mgbyte* rgba);
 MG_EXPORT void MGI_WriteJpg(mgbyte* data, mgint dataBytes, mgint width, mgint height, mgint quality, mgbyte*& jpg, mgint& jpgBytes);
 MG_EXPORT void MGI_WritePng(mgbyte* data, mgint dataBytes, mgint width, mgint height, mgbyte*& png, mgint& pngBytes);

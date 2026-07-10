@@ -4,6 +4,7 @@
 
 using System;
 using MonoGame.Framework.Utilities;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
@@ -82,7 +83,7 @@ namespace Microsoft.Xna.Framework.Graphics
         /// <paramref name="type"/> parameter.
         /// </exception>
         /// <exception cref="InvalidOperationException">This resource could not be created.</exception>
-		public DynamicVertexBuffer(GraphicsDevice graphicsDevice, Type type, int vertexCount, BufferUsage bufferUsage)
+		public DynamicVertexBuffer(GraphicsDevice graphicsDevice, [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicParameterlessConstructor)] Type type, int vertexCount, BufferUsage bufferUsage)
             : base(graphicsDevice, VertexDeclaration.FromType(type), vertexCount, bufferUsage, true)
         {
         }

@@ -47,13 +47,12 @@ namespace Microsoft.Xna.Framework.Graphics
             GraphicsExtensions.CheckGLError();
             if (compiled != (int)Bool.True)
             {
-                var log = GL.GetShaderInfoLog(_shaderHandle);
-                Debug.WriteLine(log);
+                var errorLog = GL.GetShaderInfoLog(_shaderHandle);
 
                 GraphicsDevice.DisposeShader(_shaderHandle);
                 _shaderHandle = -1;
 
-                throw new InvalidOperationException("Shader Compilation Failed");
+                throw new ShaderCompilerException(SourceFile, Entrypoint, Stage, errorLog, _glslCode);
             }
 
             return _shaderHandle;

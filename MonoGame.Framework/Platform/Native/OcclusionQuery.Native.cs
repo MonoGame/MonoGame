@@ -1,4 +1,4 @@
-// MonoGame - Copyright (C) The MonoGame Team
+// MonoGame - Copyright (C) MonoGame Foundation, Inc
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
@@ -27,7 +27,7 @@ partial class OcclusionQuery
 
     private unsafe bool PlatformGetResult(out int pixelCount)
     {
-        return MGG.OcclusionQuery_GetResult(GraphicsDevice.Handle, Handle, out pixelCount);
+        return MGG.OcclusionQuery_GetResult(GraphicsDevice.Handle, Handle, out pixelCount) == 0 ? false : true;
     }
 
     protected unsafe override void Dispose(bool disposing)

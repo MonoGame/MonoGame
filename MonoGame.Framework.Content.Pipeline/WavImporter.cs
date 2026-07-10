@@ -35,7 +35,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
 
             // Validate the format of the input.
             if (content.Format.SampleRate < 8000 || content.Format.SampleRate > 48000)
-                throw new InvalidContentException(string.Format("Audio file {0} contains audio data with unsupported sample rate of {1}KHz. Supported sample rates are from 8KHz up to 48KHz.", Path.GetFileName(filename), content.Format.SampleRate));
+                throw new InvalidContentException(string.Format("Audio file {0} contains audio data with unsupported sample rate of {1}Hz. Supported sample rates are from 8000Hz up to 48000Hz.", Path.GetFileName(filename), content.Format.SampleRate));
             var validPcm = content.Format.Format == 1 && (content.Format.BitsPerSample == 8 || content.Format.BitsPerSample == 16 || content.Format.BitsPerSample == 24);
             var validAdpcm = (content.Format.Format == 2 || content.Format.Format == 17) && content.Format.BitsPerSample == 4;
             var validIeeeFloat = content.Format.Format == 3 && content.Format.BitsPerSample == 32;

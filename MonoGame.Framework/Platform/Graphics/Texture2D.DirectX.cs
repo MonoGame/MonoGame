@@ -237,6 +237,20 @@ namespace Microsoft.Xna.Framework.Graphics
             return new SharpDX.Direct3D11.Texture2D(GraphicsDevice._d3dDevice, desc);
         }
 
+        public static Texture2D FromSharedHandle(
+            GraphicsDevice graphicsDevice,
+            IntPtr sharedHandle,
+            int width,
+            int height,
+            SurfaceFormat format)
+        {
+            var d3dTexture = graphicsDevice._d3dDevice
+                .OpenSharedResource<SharpDX.Direct3D11.Texture2D>(sharedHandle);
+            var texture = new Texture2D(graphicsDevice, width, height, false, format);
+            texture.SetNativeTexture(d3dTexture);
+            return texture;
+        }
+
         private void PlatformReload(Stream textureStream)
         {
         }

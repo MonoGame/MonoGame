@@ -1,4 +1,4 @@
-// MonoGame - Copyright (C) The MonoGame Team
+// MonoGame - Copyright (C) MonoGame Foundation, Inc
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
@@ -31,7 +31,11 @@ public sealed partial class TextureCollection
             var tex = _textures[i];
 
             if (_textures[i] == null || _textures[i].IsDisposed)
+            {
+                // TODO: Should we use device.DefaultTexture here
+                // and not depend on the platform code to handle it?
                 MGG.GraphicsDevice_SetTexture(device.Handle, _stage, i, null);
+            }
             else
             {
                 MGG.GraphicsDevice_SetTexture(device.Handle, _stage, i, tex.Handle);

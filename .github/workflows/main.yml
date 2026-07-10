@@ -5,6 +5,10 @@ on: [push, pull_request]
 concurrency:
   group: ${{ github.ref }}
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+env:
+  DotnetVersion: 9.0.314
+  XCodeVersion: 26.3
   
 jobs:
   build:
@@ -12,28 +16,79 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [windows-latest, macos-latest, ubuntu-24.04]
+        include:
+          - os: windows-2022
+            platform: windows
+            shell: pwsh
+          - os: macos-26
+            platform: macos
+            shell: bash
+          - os: ubuntu-24.04
+            platform: linux
+            shell: bash
+          - os: ubuntu-22.04-arm
+            platform: linux-arm
+            shell: bash
       fail-fast: false
+    defaults:
+      run:
+        shell: ${{ matrix.shell }}
     steps:
+      - name: Free disk space
+        if: runner.environment == 'github-hosted' && runner.os == 'Linux'
+        uses: jlumbroso/free-disk-space@main
+        with:
+          android: false
+          dotnet: false 
+          docker-images: true
+          large-packages: true
+          swap-storage: true
+
       - name: Clone repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           submodules: recursive
 
-      - name: Setup .NET Core SDK
-        uses: actions/setup-dotnet@v4
-        with:
-          dotnet-version: '8.0.x'
-
-      - name: Setup DotNet on linux/Windows
-        if: runner.environment == 'github-hosted' && (runner.os == 'Linux' || runner.os == 'windows')
+      - name: Generate global.json
         run: |
-          dotnet workload install android
+          echo '{ "sdk": { "version": "${{ env.DotnetVersion }}" } }' > global.json
+          echo "runner.arch=${{ runner.arch }}"
+
+      - name: Setup .NET Core SDK
+        uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: '${{ env.DotnetVersion }}'
+          global-json-file: "./global.json"
+          
+      - name: Setup Android Dependencies
+        if: runner.arch != 'arm64'
+        uses: monogame/monogame-actions/install-android-dependencies@v1
+
+      - name: Setup DotNet on Windows
+        if: runner.environment == 'github-hosted' && runner.os == 'windows'
+        run: |
+          dotnet workload install android ios --version ${{ env.DotnetVersion }}
+
+      - name: Setup DotNet on linux
+        if: runner.environment == 'github-hosted' && runner.os == 'Linux' && runner.arch == 'x64'
+        run: |
+          dotnet workload install android --version ${{ env.DotnetVersion }}
+
+      - name: Update Homebrew
+        if: runner.environment == 'github-hosted' && runner.os == 'macos'
+        run: |
+          brew update
 
       - name: Setup DotNet on MacOS
         if: runner.environment == 'github-hosted' && runner.os == 'macos'
         run: |
-          dotnet workload install android macos ios
+          dotnet workload install macos ios --version ${{ env.DotnetVersion }}
+
+      - name: Pin xcode version
+        uses: maxim-lobanov/setup-xcode@v1
+        if: runner.environment == 'github-hosted' && runner.os == 'macos'
+        with:
+          xcode-version: '${{ env.XCodeVersion }}'
 
       - name: Add msbuild to PATH
         if: runner.os == 'Windows'
@@ -41,8 +96,16 @@ jobs:
 
       - name: Setup Premake5
         uses: abel0b/setup-premake@v2.4
+        if: runner.os != 'Linux' || runner.arch != 'ARM64'
         with:
           version: "5.0.0-beta2"
+      - name: Build Premake5
+        if: runner.os == 'Linux' && runner.arch == 'ARM64'
+        run: |
+          git clone https://github.com/premake/premake-core.git ${GITHUB_WORKSPACE}/premake-core
+          cd ${GITHUB_WORKSPACE}/premake-core
+          ./Bootstrap.sh
+          echo "${GITHUB_WORKSPACE}/premake-core/bin/release" >> "$GITHUB_PATH"
 
       - name: Setup Java
         uses: actions/setup-java@v4
@@ -51,41 +114,38 @@ jobs:
           java-version: '17'
 
       - name: Install Vulkan SDK
-        uses: humbletim/setup-vulkan-sdk@523828e49cd4afabce369c39c7ee6543a2b7a735
+        uses: humbletim/setup-vulkan-sdk@v1.2.1
+        if: runner.os != 'macos'
         with:
-          vulkan-query-version: 1.3.283.0
+          vulkan-query-version: 1.4.309.0
           vulkan-use-cache: true
+          vulkan-components: 'Vulkan-Headers, Vulkan-Loader'
+
+      - name: Install Full Vulkan SDK
+        if: runner.os == 'macos'
+        uses: humbletim/install-vulkan-sdk@v1.2
+        with:
+          version: 1.4.309.0
+          cache: true
 
       - name: Disable Annotations
         run: echo "::remove-matcher owner=csc::"
 
-      - name: install wine64 on linux
-        if: runner.environment == 'github-hosted' && runner.os == 'Linux'
-        run: |
-          sudo apt install p7zip-full curl
-          sudo dpkg --add-architecture i386 
-          sudo mkdir -pm755 /etc/apt/keyrings
-          sudo wget -O /etc/apt/keyrings/winehq-archive.key https://dl.winehq.org/wine-builds/winehq.key
-          sudo wget -NP /etc/apt/sources.list.d/ https://dl.winehq.org/wine-builds/ubuntu/dists/noble/winehq-noble.sources
-          sudo apt update && sudo apt install --install-recommends winehq-stable
-          wget -qO- https://monogame.net/downloads/net9_mgfxc_wine_setup.sh | bash
+      - name: Setup Wine
+        uses: monogame/monogame-actions/install-wine@v1
 
-      - name: install wine64 on MacOS
-        if: runner.environment == 'github-hosted' && runner.os == 'macos'
+      - name: Install Fonts
+        uses: monogame/monogame-actions/install-fonts@v1
+        
+      - name: Install SDL2 deps on Linux
+        if: runner.os == 'Linux'
         run: |
-          brew install wine-stable p7zip
-          sudo mkdir -p /usr/local/lib
-          ls -n /Applications/ | grep Xcode*
-          sudo xcode-select -s /Applications/Xcode_16.2.app/Contents/Developer
-          wget -qO- https://monogame.net/downloads/net9_mgfxc_wine_setup.sh | bash
-
-      - name: Install Arial Font
-        if: runner.environment == 'github-hosted' && runner.os == 'Linux'
-        run: |
-          echo "ttf-mscorefonts-installer msttcorefonts/accepted-mscorefonts-eula select true" | sudo debconf-set-selections
-          sudo apt install -y ttf-mscorefonts-installer
-          sudo fc-cache
-          fc-match Arial
+          sudo apt-get install -y --no-install-recommends \
+            libasound2-dev libpulse-dev libaudio-dev libjack-jackd2-dev libsndio-dev libsamplerate0-dev \
+            libx11-dev libxext-dev libxrandr-dev libxcursor-dev libxfixes-dev libxi-dev libxss-dev \
+            libwayland-dev libxkbcommon-dev libdrm-dev libgbm-dev libgl1-mesa-dev libgles2-mesa-dev \
+            libegl1-mesa-dev libdbus-1-dev libibus-1.0-dev libudev-dev fcitx-libs-dev \
+            libpipewire-0.3-dev libdecor-0-dev
 
       - name: Dotnet Restore Templates
         if: runner.environment == 'github-hosted' && runner.os == 'Windows'
@@ -93,21 +153,46 @@ jobs:
           dotnet restore Templates/MonoGame.Templates.VSExtension
 
       - name: Build
+        if: runner.os != 'Linux' || runner.arch != 'ARM64'
         run: |
           dotnet run --project build/Build.csproj -- --target=Default
+        env:
+          DOTNET_SYSTEM_NET_SECURITY_NOREVOCATIONCHECKBYDEFAULT: 1 # android compilation is failing randomly due to downloads from microsofts website during it
 
+      - name: Build
+        if: runner.os == 'Linux' && runner.arch == 'ARM64'
+        run: |
+          dotnet run --project build/Build.csproj -- --target="Build Shaders"
+          dotnet run --project build/Build.csproj -- --target="Build Native"
+          dotnet run --project build/Build.csproj -- --target="Build Content Pipeline"
+        env:
+          DOTNET_SYSTEM_NET_SECURITY_NOREVOCATIONCHECKBYDEFAULT: 1 # android compilation is failing randomly due to downloads from microsofts website during it
+          
       - name: Run Tools Tests
-        run:   |
-              if [ "$RUNNER_OS" == "Windows" ]; then
-                    dotnet test Tools/MonoGame.Tools.Tests/MonoGame.Tools.Tests.csproj --blame-hang-timeout 5m -c Release
-              elif [ "$RUNNER_OS" == "Linux" ]; then
-                    MGFXC_WINE_PATH=/home/runner/.winemonogame dotnet test Tools/MonoGame.Tools.Tests/MonoGame.Tools.Tests.csproj --blame-hang-timeout 5m -c Release --filter="TestCategory!=Audio"
-              else
-                    MGFXC_WINE_PATH=/Users/runner/.winemonogame dotnet test Tools/MonoGame.Tools.Tests/MonoGame.Tools.Tests.csproj --blame-hang-timeout 5m -c Release --filter="TestCategory!=Audio"
-              fi
+        if: runner.os != 'Linux' || runner.arch != 'ARM64'
+        run: |
+          if [ "$RUNNER_OS" == "Windows" ]; then
+                dotnet test Tools/MonoGame.Tools.Tests/MonoGame.Tools.Tests.csproj --blame-hang-timeout 5m -c Release
+          elif [ "$RUNNER_OS" == "Linux" ]; then
+                MGFXC_WINE_PATH=/home/runner/.winemonogame dotnet test Tools/MonoGame.Tools.Tests/MonoGame.Tools.Tests.csproj --blame-hang-timeout 5m -c Release --filter="TestCategory!=Audio"
+          else
+                MGFXC_WINE_PATH=/Users/runner/.winemonogame dotnet test Tools/MonoGame.Tools.Tests/MonoGame.Tools.Tests.csproj --blame-hang-timeout 5m -c Release --filter="TestCategory!=Audio"
+          fi
         env:
           CI: true
         shell: bash
+
+      - name: Setup DotNet on MacOS for DotNet 9
+        if: runner.environment == 'github-hosted' && runner.os == 'macos'
+        run: |
+          dotnet workload install macos ios --version ${{ env.DotnetVersion }}
+
+      - name: Test generated Nuget packages
+        if: runner.os != 'Linux'
+        run: dotnet run --project build/Build.csproj -- --target=TestNuGet --framework net9.0
+        env:
+          ACTIONS_RUNTIME_TOKEN: ${{ env.ACTIONS_RUNTIME_TOKEN }}
+          ACTIONS_RUNTIME_URL: "${{ env.ACTIONS_RUNTIME_URL }}"           
 
       - name: Expose GitHub Runtime
         uses: crazy-max/ghaction-github-runtime@v3
@@ -117,105 +202,212 @@ jobs:
         env:
           ACTIONS_RUNTIME_TOKEN: ${{ env.ACTIONS_RUNTIME_TOKEN }}
           ACTIONS_RUNTIME_URL: "${{ env.ACTIONS_RUNTIME_URL }}"
+
+  pack-native-runtime:
+    name: PackNativeRuntime
+    needs: [ build ]
+    runs-on: ubuntu-latest
+    permissions:
+        packages: write
+        contents: write
+    steps:
+        - name: Clone Repository
+          uses: actions/checkout@v5
+          with:
+            submodules: recursive
+
+        - name: Generate global.json
+          run: |
+            echo '{ "sdk": { "version": "${{ env.DotnetVersion }}" } }' > global.json
+
+        - name: Setup .NET Core SDK
+          uses: actions/setup-dotnet@v5
+          with:
+            dotnet-version: '${{ env.DotnetVersion }}'
+            global-json-file: "./global.json"
+
+        - name: Expose GitHub Runtime
+          uses: crazy-max/ghaction-github-runtime@v3
+
+        - name: Pack Native Runtime
+          run: dotnet run --project build/Build.csproj -- --target="Pack Native Runtime"
+          env:
+            ACTIONS_RUNTIME_TOKEN: ${{ env.ACTIONS_RUNTIME_TOKEN }}
+            ACTIONS_RUNTIME_URL: "${{ env.ACTIONS_RUNTIME_URL }}"
+
+  package-binaries:
+    name: PackageBinaries
+    needs: [ build, pack-native-runtime, tests ]
+    runs-on: ubuntu-latest
+    permissions:
+        packages: write
+        contents: write
+    steps:
+        - name: Clone Repository
+          uses: actions/checkout@v5
+          with:
+            submodules: recursive
+
+        - name: Generate global.json
+          run: |
+            echo '{ "sdk": { "version": "${{ env.DotnetVersion }}" } }' > global.json
+
+        - name: Setup .NET Core SDK
+          uses: actions/setup-dotnet@v5
+          with:
+            dotnet-version: '${{ env.DotnetVersion }}'
+
+        - name: Expose GitHub Runtime
+          uses: crazy-max/ghaction-github-runtime@v3
+
+        - name: Upload Binaries package
+          run: dotnet run --project build/Build.csproj -- --target=DeployBinaries
+          env:
+            ACTIONS_RUNTIME_TOKEN: ${{ env.ACTIONS_RUNTIME_TOKEN }}
+            ACTIONS_RUNTIME_URL: "${{ env.ACTIONS_RUNTIME_URL }}"
+
   deploy:
-      name: Deploy
-      needs: [ build, tests ]
-      runs-on: ubuntu-latest
-      if: ${{ github.event_name == 'push' }}
-      permissions:
-          packages: write
-          contents: write
-      steps:
-          - name: Clone Repository
-            uses: actions/checkout@v4
+    name: Deploy
+    needs: [ build, pack-native-runtime, tests ]
+    runs-on: ubuntu-latest
+    if: ${{ github.event_name == 'push' }}
+    permissions:
+        packages: write
+        contents: write
+    steps:
+        - name: Clone Repository
+          uses: actions/checkout@v4
+          with:
+            submodules: recursive
 
-          - name: Setup .NET
-            uses: actions/setup-dotnet@v4
-            with:
-              dotnet-version: '8.0.x'
+        - name: Generate global.json
+          run: |
+            echo '{ "sdk": { "version": "${{ env.DotnetVersion }}" } }' > global.json
 
-          - name: Expose GitHub Runtime
-            uses: crazy-max/ghaction-github-runtime@v3
+        - name: Setup .NET Core SDK
+          uses: actions/setup-dotnet@v5
+          with:
+            dotnet-version: '${{ env.DotnetVersion }}'
+            global-json-file: "./global.json"
 
-          - name: Push Nugets
-            run: dotnet run --project build/Build.csproj -- --target=Deploy
-            env:
-              GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-              NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}
-              MARKETPLACE_PAT: ${{ secrets.MARKETPLACE_PAT }}
+        - name: Expose GitHub Runtime
+          uses: crazy-max/ghaction-github-runtime@v3
 
-          - name: Make a Release
-            if: github.ref_type == 'tag'
-            uses: ncipollo/release-action@v1
-            with:
-              name: 'MonoGame ${{ github.ref_name }}'
-              tag: ${{ github.ref_name }}
-              allowUpdates: true
-              removeArtifacts: true
-              artifacts: "nugets/*.nupkg;vsix/MonoGame.Templates.VSExtension.vsix"
-              token: ${{ secrets.GITHUB_TOKEN }}
+        - name: Push Nugets
+          run: dotnet run --project build/Build.csproj -- --target=Deploy
+          env:
+            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+            NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}
+            MARKETPLACE_PAT: ${{ secrets.MARKETPLACE_PAT }}
+
+        - name: Make a Release
+          if: github.ref_type == 'tag'
+          uses: ncipollo/release-action@v1
+          with:
+            name: 'MonoGame ${{ github.ref_name }}'
+            tag: ${{ github.ref_name }}
+            allowUpdates: true
+            removeArtifacts: true
+            artifacts: "nugets/*.nupkg;vsix/MonoGame.Templates.VSExtension.vsix"
+            token: ${{ secrets.GITHUB_TOKEN }}
+
+  choose-runner:
+    runs-on: ubuntu-latest
+    outputs:
+      runner: ${{ steps.runner.outputs.runner }}
+
+    steps:
+    - id: runner
+      run: |
+        if [ "${{ github.repository }}" == "MonoGame/MonoGame" ]; then
+          echo "::set-output name=runner::-selfhosted-"    
+        else
+          echo "::set-output name=runner::-"
+        fi
 
   tests:
     name: tests-${{ matrix.os }}
-    needs: [ build ]
+    needs: [ build, pack-native-runtime, choose-runner ]
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
         include:
-          - os: windows
+          - os: windows${{ needs.choose-runner.outputs.runner }}latest
             platform: windows
-            shell: cmd
-          - os: macos
+            shell: pwsh
+          - os: macos${{ needs.choose-runner.outputs.runner }}15
             platform: macos
             shell: bash
           - os: ubuntu-24.04
             platform: linux
             shell: bash
             filter: --where="Category != Audio"
-          # - os: linux
-          #   platform: linux
+          - os: ubuntu-24.04-arm
+            platform: linux
+            shell: bash
+            filter: --where="Category != Audio"
       fail-fast: false
     defaults:
       run:
         shell: ${{ matrix.shell }}
     steps:
       - name: Clone repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           submodules: recursive
 
+      - name: Free disk space
+        if: runner.environment == 'github-hosted' && runner.os == 'Linux'
+        uses: jlumbroso/free-disk-space@main
+        with:
+          android: false
+          dotnet: false 
+          docker-images: true
+          large-packages: true
+          swap-storage: true
+
+      - name: Generate global.json
+        run: |
+          echo '{ "sdk": { "version": "${{ env.DotnetVersion }}", "workloadVersion": "${{ env.DotnetVersion }}" } }' > global.json
+
       - name: Setup .NET Core SDK
+        uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: '${{ env.DotnetVersion }}'
+          global-json-file: "./global.json"
+
+      - name: Update Homebrew
+        if: runner.environment == 'github-hosted' && runner.os == 'macos'
+        run: |
+          brew update
+
+      - name: Check Vulkan
+        if: runner.environment != 'github-hosted' && runner.os == 'macos'
+        run: |
+          echo "VULKAN_SDK: $VULKAN_SDK"
+          echo "VK_ICD_FILENAMES: $VK_ICD_FILENAMES"
+          which vulkaninfo
+          vulkaninfo --summary
+          ls -l /usr/local/lib/libvulkan.1.dylib
+          file /usr/local/lib/libvulkan.1.dylib
+          echo $DYLD_LIBRARY_PATH
+
+      - name: Disable Annotations
+        run: echo "::remove-matcher owner=csc::"
+
+      - name: Setup Wine
         if: runner.environment == 'github-hosted'
-        uses: actions/setup-dotnet@v4
+        uses: monogame/monogame-actions/install-wine@v1
+
+      - name: Install Fonts
+        if: runner.environment == 'github-hosted'
+        uses: monogame/monogame-actions/install-fonts@v1
+
+      - name: Pin xcode version
+        uses: maxim-lobanov/setup-xcode@v1
+        if: runner.environment == 'github-hosted' && runner.os == 'macos'
         with:
-          dotnet-version: '8.0.x'
-
-      - name: install wine64 on linux
-        if: runner.os == 'Linux' && runner.environment == 'github-hosted'
-        run: |
-          sudo apt install p7zip-full curl
-          sudo dpkg --add-architecture i386 
-          sudo mkdir -pm755 /etc/apt/keyrings
-          sudo wget -O /etc/apt/keyrings/winehq-archive.key https://dl.winehq.org/wine-builds/winehq.key
-          sudo wget -NP /etc/apt/sources.list.d/ https://dl.winehq.org/wine-builds/ubuntu/dists/noble/winehq-noble.sources
-          sudo apt update && sudo apt install --install-recommends winehq-stable
-
-      - name: Install Arial Font
-        if: runner.os == 'Linux' && runner.environment == 'github-hosted'
-        run: |
-          echo "ttf-mscorefonts-installer msttcorefonts/accepted-mscorefonts-eula select true" | sudo debconf-set-selections
-          sudo apt install -y ttf-mscorefonts-installer
-          sudo fc-cache
-          fc-match Arial
-
-      - name: Setup Wine 
-        if: runner.os != 'Windows' && runner.environment == 'github-hosted'
-        run: wget -qO- https://monogame.net/downloads/net9_mgfxc_wine_setup.sh | bash
-
-      - name: Download Nuget
-        uses: actions/download-artifact@v4
-        with:
-          path: Artifacts/NuGet
+          xcode-version: '${{ env.XCodeVersion }}'
 
       - name: Download tests-desktopgl-${{ matrix.platform }}
         uses: actions/download-artifact@v4
@@ -224,31 +416,105 @@ jobs:
           path: tests-desktopgl
           
       - name: Download tests-windowsdx-${{ matrix.platform }}
-        if: runner.os == 'Windows'
+        if: runner.os == 'Windows' && runner.environment != 'github-hosted'
         uses: actions/download-artifact@v4
         with:
           name: tests-windowsdx-${{ matrix.platform }}
           path: tests-windowsdx
+          
+      - name: Download tests-windowsdx12-${{ matrix.platform }}
+        if: runner.os == 'Windows' && runner.environment != 'github-hosted'
+        uses: actions/download-artifact@v4
+        with:
+          name: tests-windowsdx12-${{ matrix.platform }}
+          path: tests-windowsdx12
 
-      # Run the DirectX tests in two steps: first the audio, then the rest.
+      - name: Download tests-desktopvk-${{ matrix.platform }}
+        uses: actions/download-artifact@v4
+        with:
+          name: tests-desktopvk-${{ matrix.platform }}
+          path: tests-desktopvk
+
+      # Run the DirectX 11 tests in two steps: first the audio, then the rest.
       # This is because the audio tests has some incompatibilities within the runner with ContentManagerTests.
-      - name: Run DirectX Audio Tests
-        if: runner.os == 'Windows'
-        run: dotnet test --filter Category=Audio MonoGame.Tests.dll 
+      - name: Run DirectX 11 Audio Tests
+        if: runner.os == 'Windows' && runner.environment != 'github-hosted'
+        run: dotnet test --filter Category=Audio MonoGame.Tests.dll
         env:
           CI: true
         working-directory: tests-windowsdx
         
-      - name: Run DirectX All Tests Except Audio
-        if: runner.os == 'Windows'
-        run: dotnet test --filter Category!=Audio MonoGame.Tests.dll 
+      - name: Run DirectX 11 All Tests Except Audio
+        if: runner.os == 'Windows' && runner.environment != 'github-hosted'
+        run: dotnet test --filter Category!=Audio MonoGame.Tests.dll
         env:
           CI: true
         working-directory: tests-windowsdx
+        
+      # Run DirectX 12 tests in separate groups.
+      - name: Run DirectX 12 Audio Tests
+        if: runner.os == 'Windows' && runner.environment != 'github-hosted'
+        run: dotnet MonoGame.Tests.dll --where="Category == Audio || Category == Song" --timeout=300000
+        env:
+          CI: true
+        working-directory: tests-windowsdx12
+        
+      - name: Run DirectX 12 GraphicsDevice Tests
+        if: runner.os == 'Windows' && runner.environment != 'github-hosted'
+        run: dotnet MonoGame.Tests.dll --where="Category == GraphicsDevice" --timeout=300000
+        env:
+          CI: true
+        working-directory: tests-windowsdx12
+        
+      - name: Run DirectX 12 MemoryLifeCycle Tests
+        if: runner.os == 'Windows' && runner.environment != 'github-hosted'
+        run: dotnet MonoGame.Tests.dll --where="Category == MemoryLifeCycle" --timeout=300000
+        env:
+          CI: true
+        working-directory: tests-windowsdx12
+        
+      - name: Run DirectX 12 All Tests Except Audio, GraphicsDevice, MemoryLifeCycle
+        if: runner.os == 'Windows' && runner.environment != 'github-hosted'
+        run: dotnet MonoGame.Tests.dll --where="Category != Audio && Category != Song && Category != GraphicsDevice && Category != MemoryLifeCycle" --timeout=600000
+        env:
+          CI: true
+        working-directory: tests-windowsdx12
+
+      # Run Vulkan tests in separate groups.
+      - name: Run Vulkan Audio Tests
+        if: runner.environment != 'github-hosted'
+        run: dotnet MonoGame.Tests.dll --where="Category == Audio || Category == Song" --timeout=300000 --labels=Before
+        env:
+          CI: true
+        working-directory: tests-desktopvk
+        
+      - name: Run Vulkan GraphicsDevice Tests
+        if: runner.environment != 'github-hosted'
+        run: dotnet MonoGame.Tests.dll --where="Category == GraphicsDevice" --timeout=300000 --labels=Before
+        env:
+          CI: true
+          #VK_LOADER_DEBUG: all 
+        working-directory: tests-desktopvk
+        
+      - name: Run Vulkan MemoryLifeCycle Tests
+        if: runner.environment != 'github-hosted'
+        run: dotnet MonoGame.Tests.dll --where="Category == MemoryLifeCycle" --timeout=300000 --labels=Before
+        env:
+          CI: true
+          #VK_LOADER_DEBUG: all 
+        working-directory: tests-desktopvk
+        
+      - name: Run Vulkan All Tests Except Audio, GraphicsDevice, MemoryLifeCycle
+        if: runner.environment != 'github-hosted'
+        run: dotnet MonoGame.Tests.dll --where="Category != Audio && Category != Song && Category != GraphicsDevice && Category != MemoryLifeCycle" --timeout=600000  --labels=Before
+        env:
+          CI: true
+        working-directory: tests-desktopvk
 
       # Run the DesktopGL tests on all platforms using NUnitLite runner not dotnet test
       # We have to run this is bits because the tests crash if too many are run in one go?
       - name: Run Framework Tests
+        if: runner.environment != 'github-hosted' || runner.os != 'Windows' 
         run: dotnet MonoGame.Tests.dll --timeout=300000 --test MonoGame.Tests.Framework ${{matrix.filter}}
         env:
           CI: true
@@ -274,6 +540,7 @@ jobs:
         working-directory: tests-desktopgl
 
       - name: Run Game Tests
+        if: runner.environment != 'github-hosted' || runner.os == 'Linux' 
         run: dotnet MonoGame.Tests.dll --timeout=300000 --where="Category = GameTest"
         env:
           CI: true

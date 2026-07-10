@@ -1,4 +1,4 @@
-// MonoGame - Copyright (C) The MonoGame Team
+// MonoGame - Copyright (C) MonoGame Foundation, Inc
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
@@ -44,7 +44,7 @@ public partial class Texture2D : Texture
         var dataHandle = GCHandle.Alloc(data, GCHandleType.Pinned);
         var elementSizeInByte = ReflectionHelpers.FastSizeOf<T>();
         var startBytes = startIndex * elementSizeInByte;
-        var dataPtr = (IntPtr)(dataHandle.AddrOfPinnedObject().ToInt64() + startBytes);
+        var dataPtr = (nint)(dataHandle.AddrOfPinnedObject().ToInt64() + startBytes);
 
         unsafe
         {
@@ -71,7 +71,7 @@ public partial class Texture2D : Texture
         var dataHandle = GCHandle.Alloc(data, GCHandleType.Pinned);
         var elementSizeInByte = ReflectionHelpers.FastSizeOf<T>();
         var startBytes = startIndex * elementSizeInByte;
-        var dataPtr = (IntPtr)(dataHandle.AddrOfPinnedObject().ToInt64() + startBytes);
+        var dataPtr = (nint)(dataHandle.AddrOfPinnedObject().ToInt64() + startBytes);
 
         unsafe
         {
@@ -98,7 +98,7 @@ public partial class Texture2D : Texture
         var dataHandle = GCHandle.Alloc(data, GCHandleType.Pinned);
         var elementSizeInByte = ReflectionHelpers.FastSizeOf<T>();
         var startBytes = startIndex * elementSizeInByte;
-        var dataPtr = (IntPtr)(dataHandle.AddrOfPinnedObject().ToInt64() + startBytes);
+        var dataPtr = (nint)(dataHandle.AddrOfPinnedObject().ToInt64() + startBytes);
 
         MGG.Texture_GetData(
             GraphicsDevice.Handle,
@@ -119,12 +119,17 @@ public partial class Texture2D : Texture
 
     private static unsafe Texture2D PlatformFromStream(GraphicsDevice graphicsDevice, Stream stream, Action<byte[]> colorProcessor)
     {
-        // HACK: Clear the default zero action as we do this natively.
+        ProcessorType processor = 0;
         if (colorProcessor == DefaultColorProcessors.ZeroTransparentPixels)
+        {
             colorProcessor = null;
+            processor |= ProcessorType.ZeroTransparentPixels;
+        }
 
-        // Simply read it all into memory as it will be fast
-        // for most cases and simplifies the native API.
+        if (stream.CanSeek)
+            stream.Seek(0, SeekOrigin.Begin);
+        else
+            throw new ArgumentException("Stream must support seeking.", nameof(stream));
 
         var dataLength = (int)stream.Length;
         var streamTemp = new byte[dataLength];
@@ -140,13 +145,13 @@ public partial class Texture2D : Texture
             MGI.ReadRGBA(
                 (byte*)handle.AddrOfPinnedObject(),
                 dataLength,
-                colorProcessor == null ? true : false,
+                processor,
                 out width,
                 out height,
                 out rgba);
 
             if (rgba == null)
-                return null;
+                throw new InvalidOperationException("Failed to read valid RGBA data from the stream, it may not be a valid image format or the data is corrupted.");
         }
         finally
         {
@@ -174,7 +179,7 @@ public partial class Texture2D : Texture
                 rgba,
                 rgbaBytes);
 
-            Marshal.FreeHGlobal((nint)rgba);
+            MGI.FreeRGBA(rgba);
 
             return texture;
         }
@@ -185,7 +190,7 @@ public partial class Texture2D : Texture
         // Ideally we change this to use Span which avoids this.
         var bytes = new byte[rgbaBytes];
         Marshal.Copy((nint)rgba, bytes, 0, rgbaBytes);
-        Marshal.FreeHGlobal((nint)rgba);
+        MGI.FreeRGBA(rgba);
 
         // Do the processing.
         colorProcessor(bytes);
@@ -203,7 +208,10 @@ public partial class Texture2D : Texture
             byte* jpg;
             int jpgBytes;
 
-            MGI.WriteJpg((byte*)ptr, data.Length, width, height, 90, out jpg, out jpgBytes);
+            // 91% is sort of a magic number that makes our unit tests
+            // pass (meaning resulting images are good quality) but the
+            // compressed file size is a little larger.
+            MGI.WriteJpg((byte*)ptr, data.Length, width, height, 91, out jpg, out jpgBytes);
 
             stream.Write(new ReadOnlySpan<byte>(jpg, jpgBytes));
         }
@@ -240,7 +248,7 @@ public partial class Texture2D : Texture
             MGI.ReadRGBA(
                 (byte*)handle.AddrOfPinnedObject(),
                 dataLength,
-                true,
+                ProcessorType.ZeroTransparentPixels,
                 out width,
                 out height,
                 out rgba);
@@ -267,6 +275,6 @@ public partial class Texture2D : Texture
             rgba,
             width * height);
 
-        Marshal.FreeHGlobal((nint)rgba);
+        MGI.FreeRGBA(rgba);
     }
 }
