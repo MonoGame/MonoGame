@@ -71,6 +71,7 @@ public sealed class ShaderCompilerException : Exception
         SourceCode = sourceCode;
     }
 
+    /// <inheritdoc />
     public override string ToString()
     {
         // Return all the data we got by default.

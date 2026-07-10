@@ -127,7 +127,7 @@ namespace Microsoft.Xna.Framework.Input
                 ret.Length--;
             }
 
-            ret.Append("]");
+            ret.Append(']');
             return ret.ToString();
         }
     }

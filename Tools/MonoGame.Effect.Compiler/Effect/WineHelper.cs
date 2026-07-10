@@ -14,6 +14,7 @@ namespace MonoGame.Effect.Compiler
     static class WineHelper
     {
         static string _wineExecutable = "wine";
+        static string _winePathExecutable = "winepath";
 
         static WineHelper()
         {
@@ -22,7 +23,7 @@ namespace MonoGame.Effect.Compiler
                 throw new PlatformNotSupportedException("WineHelper is only supported on Unix platforms.");
             }
 
-            if (!DetectWine() || !SetupWine())
+            if (!DetectWine() || !SetupWine() || !DetectWinePath())
             {
                 var os = RuntimeInformation.IsOSPlatform(OSPlatform.OSX) ? "macos" : "linux";
                 var errMessage = $"Error: MGFXC0001: MGFXC effect compiler requires a valid Wine installation to be able to compile shaders. Please visit https://docs.monogame.net/errors/mgfx0001?tab={os} for more details.";
@@ -31,31 +32,40 @@ namespace MonoGame.Effect.Compiler
             }
         }
 
+        static string Which(params string[] exes)
+        {
+            var proc = new Process();
+            proc.StartInfo.UseShellExecute = false;
+            proc.StartInfo.CreateNoWindow = true;
+            proc.StartInfo.RedirectStandardOutput = true;
+
+            foreach (var exe in exes)
+            {
+                proc.StartInfo.FileName = "which";
+                proc.StartInfo.Arguments = exe;
+                proc.Start();
+                proc.WaitForExit();
+                if (proc.ExitCode == 0)
+                {
+                    return exe;
+                }
+            }
+            return string.Empty;
+        }
+
+        static bool DetectWinePath()
+        {
+            _winePathExecutable =Which("winepath");
+            return !string.IsNullOrEmpty(_winePathExecutable);
+        }
+
         static bool DetectWine()
         {
             string[] wineCommands = RuntimeInformation.IsOSPlatform(OSPlatform.Linux) ?
                 ["wine64", "wine"] :
                 ["wine", "wine64"];
-            var proc = new Process();
-            proc.StartInfo.Arguments = "--version";
-            proc.StartInfo.UseShellExecute = false;
-            proc.StartInfo.CreateNoWindow = true;
-            proc.StartInfo.RedirectStandardOutput = true;
-
-            foreach (var wine in wineCommands)
-            {
-                proc.StartInfo.FileName = "which";
-                proc.StartInfo.Arguments = wine;
-                proc.Start();
-                proc.WaitForExit();
-                if (proc.ExitCode == 0)
-                {
-                    _wineExecutable = wine;
-                    return true;
-                }
-            }
-
-            return false;
+            _wineExecutable = Which(wineCommands);
+            return !string.IsNullOrEmpty(_wineExecutable);
         }
 
         static bool SetupWine()
@@ -74,16 +84,21 @@ namespace MonoGame.Effect.Compiler
             return true;
         }
 
-        static int RunInWine(string cmd)
+        static int RunInWine(string cmd, out string output)
         {
+            Console.WriteLine($"Running in Wine: {_wineExecutable} {cmd}");
             var proc = new Process();
             proc.StartInfo.FileName = _wineExecutable;
             proc.StartInfo.Arguments = cmd;
             proc.StartInfo.CreateNoWindow = true;
-            proc.StartInfo.UseShellExecute = true;
+            proc.StartInfo.UseShellExecute = false;
+            proc.StartInfo.RedirectStandardOutput = true;
+            proc.StartInfo.RedirectStandardError = true;
 
             proc.Start();
             proc.WaitForExit();
+
+            output = proc.StandardOutput.ReadToEnd() + proc.StandardError.ReadToEnd();
 
             return proc.ExitCode;
         }
@@ -91,7 +106,7 @@ namespace MonoGame.Effect.Compiler
         static string GetWinePath(string path)
         {
             var proc = new Process();
-            proc.StartInfo.FileName = "winepath";
+            proc.StartInfo.FileName = _winePathExecutable;
             proc.StartInfo.Arguments = $"-w \"{path}\"";
             proc.StartInfo.UseShellExecute = false;
             proc.StartInfo.RedirectStandardOutput = true;
@@ -113,20 +128,27 @@ namespace MonoGame.Effect.Compiler
                 File.WriteAllText(srcPath, fileContents);
 
                 var cmd = $"dotnet c:\\fxccs.dll {GetWinePath(srcPath)} {shaderFunction} {shaderProfile} {(int)shaderFlags} {displayPath} {GetWinePath(dstPath)}";
-                var result = RunInWine(cmd);
+                var result = RunInWine(cmd, out string output);
                 if (result == 0)
                 {
                     ret = new CompilationResult(new ShaderBytecode(File.ReadAllBytes(dstPath)), Result.Ok, "");
                 }
+                else
+                {
+                    ret = new CompilationResult(null, Result.Fail, $"\nWine returned exit code {result}.\nOutput:\n{output}");
+                }
             }
-            catch { }
+            catch (Exception e)
+            {
+                ret = new CompilationResult(null, Result.Fail, $"\n{e.Message}");
+            }
 
             File.Delete(srcPath);
             File.Delete(dstPath);
 
-            if (ret == null)
+            if (ret.ResultCode != Result.Ok)
             {
-                throw new Exception("Failed to compile shader!");
+                throw new Exception($"Failed to compile shader!\n{ret.Message}");
             }
 
             return ret;

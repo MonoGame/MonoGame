@@ -320,7 +320,7 @@ internal static unsafe partial class MGG
     #region Buffer
 
     [DllImport(MGP.MonoGameNativeDLL, EntryPoint = "MGG_Buffer_Create", ExactSpelling = true)]
-    public static extern MGG_Buffer* Buffer_Create(MGG_GraphicsDevice* device, BufferType type, int sizeInBytes);
+    public static extern MGG_Buffer* Buffer_Create(MGG_GraphicsDevice* device, BufferType type, bool dynamic, int sizeInBytes);
 
     [DllImport(MGP.MonoGameNativeDLL, EntryPoint = "MGG_Buffer_Destroy", ExactSpelling = true)]
     public static extern void Buffer_Destroy(MGG_GraphicsDevice* device, MGG_Buffer* buffer);
