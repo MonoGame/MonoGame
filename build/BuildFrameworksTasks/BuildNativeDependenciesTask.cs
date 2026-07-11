@@ -37,8 +37,8 @@ public sealed class BuildNativeDependenciesTask : FrostingTask<BuildContext>
         RecreateDirectory(context, sdlBuildDir);
 
         var configureArgs = new ProcessArgumentBuilder()
-            .Append("-S").AppendQuoted(context.MakeAbsolute(new DirectoryPath(sdlSourceDir)).FullPath)
-            .Append("-B").AppendQuoted(context.MakeAbsolute(new DirectoryPath(sdlBuildDir)).FullPath)
+            .Append("-S").AppendQuoted(sdlSourceDir)
+            .Append("-B").AppendQuoted(sdlBuildDir)
             .Append("-DSDL_STATIC=ON")
             .Append("-DSDL_TEST=OFF");
 
@@ -61,11 +61,11 @@ public sealed class BuildNativeDependenciesTask : FrostingTask<BuildContext>
         var sdlIncludeDir = System.IO.Path.Combine("native/monogame/external/sdl2/sdl", "include");
 
         var configureArgs = new ProcessArgumentBuilder()
-            .Append("-S").AppendQuoted(context.MakeAbsolute(new DirectoryPath(faudioSourceDir)).FullPath)
-            .Append("-B").AppendQuoted(context.MakeAbsolute(new DirectoryPath(faudioBuildDir)).FullPath)
+            .Append("-S").AppendQuoted(faudioSourceDir)
+            .Append("-B").AppendQuoted(faudioBuildDir)
             .Append("-DBUILD_SHARED_LIBS=OFF")
-            .Append($"-DCMAKE_C_STANDARD_INCLUDE_DIRECTORIES=\"{context.MakeAbsolute(new DirectoryPath(sdlIncludeDir))}\"")
-            .Append($"-DCMAKE_CXX_STANDARD_INCLUDE_DIRECTORIES=\"{context.MakeAbsolute(new DirectoryPath(sdlIncludeDir))}\"")
+            .Append($"-DCMAKE_C_STANDARD_INCLUDE_DIRECTORIES=\"{sdlIncludeDir}\"")
+            .Append($"-DCMAKE_CXX_STANDARD_INCLUDE_DIRECTORIES=\"{sdlIncludeDir}\"")
             .Append("-DBUILD_SDL3=OFF");
 
         AppendPlatformCMakeArgs(configureArgs, context, isSDL: false, targetArch);
@@ -99,14 +99,14 @@ public sealed class BuildNativeDependenciesTask : FrostingTask<BuildContext>
             case PlatformFamily.OSX:
                 args.Append("-DCMAKE_OSX_ARCHITECTURES=x86_64;arm64");
                 args.Append("-DCMAKE_OSX_DEPLOYMENT_TARGET=10.15");
+                args.Append("-DCMAKE_POSITION_INDEPENDENT_CODE=ON");
                 break;
         }
     }
 
     private void RunCMake(BuildContext context, ProcessArgumentBuilder args, string errorMessage)
     {
-        var settings = new ProcessSettings { Arguments = args };
-        if (context.StartProcess("cmake", settings) != 0)
+        if (context.StartProcessWithDocker("cmake", "", args) != 0)
         {
             throw new Exception(errorMessage);
         }
@@ -116,7 +116,7 @@ public sealed class BuildNativeDependenciesTask : FrostingTask<BuildContext>
     {
         var buildArgs = new ProcessArgumentBuilder()
             .Append("--build")
-            .AppendQuoted(context.MakeAbsolute(new DirectoryPath(buildDir)).FullPath)
+            .AppendQuoted(buildDir)
             .Append("--config").Append(config)
             .Append("--parallel");
 
