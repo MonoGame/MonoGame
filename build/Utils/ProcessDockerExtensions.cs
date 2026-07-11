@@ -43,16 +43,14 @@ public static class ProcessDockerExtensions
             args.Prepend("-w");
             args.Prepend($"{System.IO.Path.GetFullPath(".")}:/src");
             args.Prepend("-v");
-            if (!string.IsNullOrEmpty(volumeMount))
-            {
-                args.Prepend("type=bind,source=\"$PWD/.tools\",target=/tools");
-                args.Prepend("--mount");
-            }
             args.Prepend("run");
             command = "docker";
         }
-        var settings = new ProcessSettings { Arguments = args, WorkingDirectory = workingDirectory };
-        settings.NoWorkingDirectory = useDocker;
+        var settings = new ProcessSettings {
+            Arguments = args,
+            WorkingDirectory = workingDirectory,
+            NoWorkingDirectory = useDocker,
+        };
         return context.StartProcess(command, settings);
     }
 
