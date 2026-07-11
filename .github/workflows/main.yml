@@ -182,6 +182,7 @@ jobs:
           fi
         env:
           CI: true
+          DisableNativeBuild: true
         shell: bash
 
       - name: Setup DotNet on MacOS for DotNet 9
