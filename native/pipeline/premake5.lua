@@ -2,7 +2,7 @@
 -- This file is subject to the terms and conditions defined in
 -- file 'LICENSE.txt', which is part of this source code package.
 newoption {
-    trigger = "arch",
+    trigger = "mg-arch",
     value = "ARCH",
     description = "Target architecture (x64 or arm64)",
     default = "x64",
@@ -21,7 +21,7 @@ function pipeline_native()
         filter {}
         platform_target_path = "../../Artifacts/native/mgpipeline/%{cfg.system}/%{cfg.platform}/%{cfg.buildcfg}"
     else
-        local target_arch = _OPTIONS["arch"] or "x64"
+        local target_arch = _OPTIONS["mg-arch"] or "x64"
         architecture(target_arch == "arm64" and "ARM64" or "x64")
         if os.target() == "macosx" then
             platform_target_path = "../../Artifacts/native/mgpipeline/%{cfg.system}/%{cfg.buildcfg}"
