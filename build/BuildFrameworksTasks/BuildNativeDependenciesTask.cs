@@ -37,8 +37,8 @@ public sealed class BuildNativeDependenciesTask : FrostingTask<BuildContext>
         RecreateDirectory(context, sdlBuildDir);
 
         var configureArgs = new ProcessArgumentBuilder()
-            .Append("-S").AppendQuoted(sdlSourceDir)
-            .Append("-B").AppendQuoted(sdlBuildDir)
+            .Append("-S").AppendQuoted(context.MakeAbsoluteForDocker(new DirectoryPath(sdlSourceDir)).FullPath)
+            .Append("-B").AppendQuoted(context.MakeAbsoluteForDocker(new DirectoryPath(sdlBuildDir)).FullPath)
             .Append("-DSDL_STATIC=ON")
             .Append("-DSDL_TEST=OFF");
 
@@ -61,11 +61,11 @@ public sealed class BuildNativeDependenciesTask : FrostingTask<BuildContext>
         var sdlIncludeDir = System.IO.Path.Combine("native/monogame/external/sdl2/sdl", "include");
 
         var configureArgs = new ProcessArgumentBuilder()
-            .Append("-S").AppendQuoted(faudioSourceDir)
-            .Append("-B").AppendQuoted(faudioBuildDir)
+            .Append("-S").AppendQuoted(context.MakeAbsoluteForDocker(new DirectoryPath(faudioSourceDir)).FullPath)
+            .Append("-B").AppendQuoted(context.MakeAbsoluteForDocker(new DirectoryPath(faudioBuildDir)).FullPath)
             .Append("-DBUILD_SHARED_LIBS=OFF")
-            .Append($"-DCMAKE_C_STANDARD_INCLUDE_DIRECTORIES=\"{sdlIncludeDir}\"")
-            .Append($"-DCMAKE_CXX_STANDARD_INCLUDE_DIRECTORIES=\"{sdlIncludeDir}\"")
+            .Append($"-DCMAKE_C_STANDARD_INCLUDE_DIRECTORIES=\"{context.MakeAbsoluteForDocker(new DirectoryPath(sdlIncludeDir)).FullPath}\"")
+            .Append($"-DCMAKE_CXX_STANDARD_INCLUDE_DIRECTORIES=\"{context.MakeAbsoluteForDocker(new DirectoryPath(sdlIncludeDir)).FullPath}\"")
             .Append("-DBUILD_SDL3=OFF");
 
         AppendPlatformCMakeArgs(configureArgs, context, isSDL: false, targetArch);
@@ -99,7 +99,6 @@ public sealed class BuildNativeDependenciesTask : FrostingTask<BuildContext>
             case PlatformFamily.OSX:
                 args.Append("-DCMAKE_OSX_ARCHITECTURES=x86_64;arm64");
                 args.Append("-DCMAKE_OSX_DEPLOYMENT_TARGET=10.15");
-                args.Append("-DCMAKE_POSITION_INDEPENDENT_CODE=ON");
                 break;
         }
     }
@@ -116,7 +115,7 @@ public sealed class BuildNativeDependenciesTask : FrostingTask<BuildContext>
     {
         var buildArgs = new ProcessArgumentBuilder()
             .Append("--build")
-            .AppendQuoted(buildDir)
+            .AppendQuoted(context.MakeAbsoluteForDocker(new DirectoryPath(buildDir)).FullPath)
             .Append("--config").Append(config)
             .Append("--parallel");
 
