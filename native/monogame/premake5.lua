@@ -9,7 +9,7 @@ if vulkan_sdk == nil and os.target() == "macosx" then
 end
 
 newoption {
-    trigger = "arch",
+    trigger = "mg-arch",
     value = "ARCH",
     description = "Target architecture (x64 or arm64)",
     default = "x64",
@@ -28,7 +28,7 @@ function common(project_name)
         filter {}
         platform_target_path = "../../Artifacts/native/mgruntime/" .. project_name .. "/%{cfg.system}/%{cfg.platform}/%{cfg.buildcfg}"
     else
-        local target_arch = _OPTIONS["arch"] or "x64"
+        local target_arch = _OPTIONS["mg-arch"] or "x64"
         architecture(target_arch == "arm64" and "ARM64" or "x64")
         if os.target() == "macosx" then
             platform_target_path = "../../Artifacts/native/mgruntime/" .. project_name .. "/%{cfg.system}/%{cfg.buildcfg}"

@@ -25,7 +25,7 @@ public sealed class BuildPremake
             {
                 // Linux/macOS build for the host architecture only
                 var arch = RuntimeInformation.OSArchitecture == Architecture.Arm64 ? "arm64" : "x64";
-                Scaffold(context, name, workingDirectory, $"--arch={arch} gmake2");
+                Scaffold(context, name, workingDirectory, $"--mg-arch={arch} gmake2");
                 Make(context, name, workingDirectory);
 
                 break;
