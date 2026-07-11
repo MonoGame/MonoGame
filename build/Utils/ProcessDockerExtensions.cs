@@ -52,7 +52,7 @@ public static class ProcessDockerExtensions
             command = "docker";
         }
         var settings = new ProcessSettings { Arguments = args, WorkingDirectory = workingDirectory };
-        settings.NoWorkingDirectory = !useDocker;
+        settings.NoWorkingDirectory = useDocker;
         return context.StartProcess(command, settings);
     }
 
