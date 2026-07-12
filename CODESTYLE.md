@@ -29,7 +29,7 @@ else
 `case` statements should be indented from the switch statement like this:
 
 ```csharp
-switch (someExpression) 
+switch (someExpression)
 {
    case 0:
       DoSomething();
@@ -39,7 +39,7 @@ switch (someExpression)
       DoSomethingElse();
       break;
 
-   case 2: 
+   case 2:
       {
          int n = 1;
          DoAnotherThing(n);
@@ -103,7 +103,7 @@ Each file should start with a copyright notice. This is a short statement declar
 All methods should use XML doc comments. For internal dev comments, the `<devdoc>` tag should be used.
 
 ```csharp
-public class Foo 
+public class Foo
 {
     /// <summary>Public stuff about the method</summary>
     /// <param name="bar">What a neat parameter!</param>
@@ -213,9 +213,9 @@ The reasons to extend the public rules (no Hungarian, underscore prefix for memb
 ```csharp
 using System;
 
-namespace MyNamespace 
+namespace MyNamespace
 {
-    public class MyClass : IFoo 
+    public class MyClass : IFoo
     {
         #region Fields
         int foo;

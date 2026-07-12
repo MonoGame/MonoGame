@@ -3,18 +3,18 @@
 ![MonoGame](https://raw.githubusercontent.com/MonoGame/MonoGame.Logo/refs/heads/master/FullColorOnLight/LogoOnly_128px.png)
 
 
- [![Join the chat at https://discord.gg/monogame](https://img.shields.io/discord/355231098122272778?style=flat-square&color=%237289DA&label=Discord%20server&logo=discord&logoColor=white)](https://discord.gg/monogame) 
+ [![Join the chat at https://discord.gg/monogame](https://img.shields.io/discord/355231098122272778?style=flat-square&color=%237289DA&label=Discord%20server&logo=discord&logoColor=white)](https://discord.gg/monogame)
  ![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/monogame/monogame/main.yml?style=flat-square)
- [![Donate](https://img.shields.io/badge/donate-F1465A?style=flat-square&logo=monogame&logoColor=FFFFFF)](https://monogame.net/donate/) 
+ [![Donate](https://img.shields.io/badge/donate-F1465A?style=flat-square&logo=monogame&logoColor=FFFFFF)](https://monogame.net/donate/)
 
  One framework for creating powerful cross-platfrom games
 
-[Supported Platforms](#supported-platforms) • 
-[Resources](#resources) • 
-[Samples](#samples) • 
-[Support and Contributions](#support-and-contributions) • 
-[Source Code](#source-code) • 
-[Helpful Links](#helpful-links) • 
+[Supported Platforms](#supported-platforms) •
+[Resources](#resources) •
+[Samples](#samples) •
+[Support and Contributions](#support-and-contributions) •
+[Source Code](#source-code) •
+[Helpful Links](#helpful-links) •
 [License](#license)
 </div>
 

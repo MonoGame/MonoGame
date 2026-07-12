@@ -46,7 +46,7 @@ Over 70 PRs since our last release. Fixes & Updates include:
 - SDL bumped to 2.32.2
 - VS2022 Extension with new 2D cross-platform project templates
 - Content pipeline working on all supported platforms
-- Content Pipeline updated to use the new FreeType and FreeImage 
+- Content Pipeline updated to use the new FreeType and FreeImage
 - Improved / updated content pipeline dependencies (Textures, Audio, Input)
 - Several SoundEffect fixes, including OpenAL update
 - GamePad button mappings on Android and iOS, Plus Joystick input fixes
@@ -54,7 +54,7 @@ Over 70 PRs since our last release. Fixes & Updates include:
 - Fix Android MediaPlayer Song
 - Preliminary scaffolding for new Native platform
 - API Documentation updates
-- Vulkan in preview 
+- Vulkan in preview
 
 Massive thanks to our 16 1st time contributors! We're grateful for helping us make MonoGame Better.
 
