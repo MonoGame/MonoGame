@@ -1,30 +1,32 @@
-using SDL2;
 using MonoGame.Framework.Devices.Power;
 
-public partial class PowerStatus
+namespace MonoGame.Framework.Devices.Power
 {
-    private BatteryChargeStatus PlatformBatteryChargeStatus()
+    public partial class PowerStatus
     {
-        SDL.SDL_PowerState state = SDL.SDL_GetPowerInfo(out _, out _);
-        return state switch
+        private BatteryChargeStatus PlatformBatteryChargeStatus()
         {
-            SDL.SDL_PowerState.SDL_POWERSTATE_CHARGED => BatteryChargeStatus.Full,
-            SDL.SDL_PowerState.SDL_POWERSTATE_CHARGING => BatteryChargeStatus.Charging,
-            SDL.SDL_PowerState.SDL_POWERSTATE_ON_BATTERY => BatteryChargeStatus.OnBattery,
-            SDL.SDL_PowerState.SDL_POWERSTATE_NO_BATTERY => BatteryChargeStatus.NoBattery,
-            _ => BatteryChargeStatus.Unknown
-        };
-    }
+            Sdl.PowerState state = Sdl.SDL_GetPowerInfo(out _, out _);
+            return state switch
+            {
+                Sdl.PowerState.Charged => BatteryChargeStatus.Full,
+                Sdl.PowerState.Charging => BatteryChargeStatus.Charging,
+                Sdl.PowerState.OnBattery => BatteryChargeStatus.OnBattery,
+                Sdl.PowerState.NoBattery => BatteryChargeStatus.NoBattery,
+                _ => BatteryChargeStatus.Unknown
+            };
+        }
 
-    private PowerLineStatus PlatformPowerLineStatus()
-    {
-        SDL.SDL_PowerState state = SDL.SDL_GetPowerInfo(out _, out _);
-        return state == SDL.SDL_PowerState.SDL_POWERSTATE_ON_BATTERY ? PowerLineStatus.Offline : PowerLineStatus.Online;
-    }
+        private PowerLineStatus PlatformPowerLineStatus()
+        {
+            Sdl.PowerState state = Sdl.SDL_GetPowerInfo(out _, out _);
+            return state == Sdl.PowerState.OnBattery ? PowerLineStatus.Offline : PowerLineStatus.Online;
+        }
 
-    private int PlatformBatteryLifePercent()
-    {
-        SDL.SDL_GetPowerInfo(out int percent, out _);
-        return percent;
+        private int PlatformBatteryLifePercent()
+        {
+            Sdl.SDL_GetPowerInfo(out _, out int percent);
+            return percent;
+        }
     }
 }
