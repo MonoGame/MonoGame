@@ -52,5 +52,5 @@
     <Folder Include="Platform\Graphics\Vertices\" />
   </ItemGroup>
 
-  <Import Project="MonoGame.Framework.Devices.Sensors.targets" />
+  <Import Project="MonoGame.Framework.Devices.targets" />
 </Project>
