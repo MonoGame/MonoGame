@@ -1,43 +1,45 @@
 using UIKit;
-using MonoGame.Framework.Devices.Power;
 
-public partial class PowerStatus
+namespace MonoGame.Framework.Devices.Power
 {
-    public PowerStatus()
+    public sealed partial class PowerStatus
     {
-        UIDevice.CurrentDevice.BatteryMonitoringEnabled = true;
-    }
-
-    private BatteryChargeStatus PlatformBatteryChargeStatus()
-    {
-        return UIDevice.CurrentDevice.BatteryState switch
+        public PowerStatus()
         {
-            UIDeviceBatteryState.Charging => BatteryChargeStatus.Charging,
-            UIDeviceBatteryState.Full => BatteryChargeStatus.Full,
-            UIDeviceBatteryState.Unplugged => BatteryChargeStatus.OnBattery,
-            UIDeviceBatteryState.Unknown => BatteryChargeStatus.Unknown,
-            _ => BatteryChargeStatus.Unknown
-        };
-    }
+            UIDevice.CurrentDevice.BatteryMonitoringEnabled = true;
+        }
 
-    private PowerLineStatus PlatformPowerLineStatus()
-    {
-        var state = UIDevice.CurrentDevice.BatteryState;
-
-        return state switch
+        private BatteryChargeStatus PlatformBatteryChargeStatus()
         {
-            UIDeviceBatteryState.Charging => PowerLineStatus.Online,
-            UIDeviceBatteryState.Full => PowerLineStatus.Online,
-            UIDeviceBatteryState.Unplugged => PowerLineStatus.Offline,
-            _ => PowerLineStatus.Unknown
-        };
-    }
+            return UIDevice.CurrentDevice.BatteryState switch
+            {
+                UIDeviceBatteryState.Charging => BatteryChargeStatus.Charging,
+                UIDeviceBatteryState.Full => BatteryChargeStatus.Full,
+                UIDeviceBatteryState.Unplugged => BatteryChargeStatus.OnBattery,
+                UIDeviceBatteryState.Unknown => BatteryChargeStatus.Unknown,
+                _ => BatteryChargeStatus.Unknown
+            };
+        }
 
-    private int PlatformBatteryLifePercent()
-    {
-        float level = UIDevice.CurrentDevice.BatteryLevel;
-        if (level < 0)
-            return -1;
-        return (int)(level * 100);
+        private PowerLineStatus PlatformPowerLineStatus()
+        {
+            var state = UIDevice.CurrentDevice.BatteryState;
+
+            return state switch
+            {
+                UIDeviceBatteryState.Charging => PowerLineStatus.Online,
+                UIDeviceBatteryState.Full => PowerLineStatus.Online,
+                UIDeviceBatteryState.Unplugged => PowerLineStatus.Offline,
+                _ => PowerLineStatus.Unknown
+            };
+        }
+
+        private int PlatformBatteryLifePercent()
+        {
+            float level = UIDevice.CurrentDevice.BatteryLevel;
+            if (level < 0)
+                return -1;
+            return (int)(level * 100);
+        }
     }
 }
