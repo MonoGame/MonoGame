@@ -1,35 +1,39 @@
 using System.Windows.Forms;
-using MonoGame.Framework.Devices.Power;
+using FormsBatteryChargeStatus = System.Windows.Forms.BatteryChargeStatus;
+using FormsPowerLineStatus = System.Windows.Forms.PowerLineStatus;
 
-public partial class PowerStatus
+namespace MonoGame.Framework.Devices.Power
 {
-    private BatteryChargeStatus PlatformBatteryChargeStatus()
+    public sealed partial class PowerStatus
     {
-        return SystemInformation.PowerStatus.BatteryChargeStatus switch
+        private BatteryChargeStatus PlatformBatteryChargeStatus()
         {
-            SystemInformation.PowerStatus.BatteryChargeStatus.BatteryChargeStatus.Charging => BatteryChargeStatus.Charging,
-            SystemInformation.PowerStatus.BatteryChargeStatus.BatteryChargeStatus.NoSystemBattery => BatteryChargeStatus.NoBattery,
-            SystemInformation.PowerStatus.BatteryChargeStatus.BatteryChargeStatus.NotCharging => BatteryChargeStatus.OnBattery,
-            SystemInformation.PowerStatus.BatteryChargeStatus.BatteryChargeStatus.Unknown => BatteryChargeStatus.Unknown,
-            SystemInformation.PowerStatus.BatteryChargeStatus.BatteryChargeStatus.High => BatteryChargeStatus.OnBattery,
-            SystemInformation.PowerStatus.BatteryChargeStatus.BatteryChargeStatus.Low => BatteryChargeStatus.OnBattery,
-            SystemInformation.PowerStatus.BatteryChargeStatus.BatteryChargeStatus.Critical => BatteryChargeStatus.OnBattery,
-            _ => BatteryChargeStatus.Unknown
-        };
-    }
+            return SystemInformation.PowerStatus.BatteryChargeStatus switch
+            {
+                FormsBatteryChargeStatus.Charging => BatteryChargeStatus.Charging,
+                FormsBatteryChargeStatus.NoSystemBattery => BatteryChargeStatus.NoBattery,
+                FormsBatteryChargeStatus.NotCharging => BatteryChargeStatus.OnBattery,
+                FormsBatteryChargeStatus.Unknown => BatteryChargeStatus.Unknown,
+                FormsBatteryChargeStatus.High => BatteryChargeStatus.OnBattery,
+                FormsBatteryChargeStatus.Low => BatteryChargeStatus.OnBattery,
+                FormsBatteryChargeStatus.Critical => BatteryChargeStatus.OnBattery,
+                _ => BatteryChargeStatus.Unknown
+            };
+        }
 
-    private PowerLineStatus PlatformPowerLineStatus()
-    {
-        return SystemInformation.PowerStatus.PowerLineStatus switch
+        private PowerLineStatus PlatformPowerLineStatus()
         {
-            PowerLineStatus.Offline => PowerLineStatus.Offline,
-            PowerLineStatus.Online => PowerLineStatus.Online,
-            _ => PowerLineStatus.Unknown
-        };
-    }
+            return SystemInformation.PowerStatus.PowerLineStatus switch
+            {
+                FormsPowerLineStatus.Offline => PowerLineStatus.Offline,
+                FormsPowerLineStatus.Online => PowerLineStatus.Online,
+                _ => PowerLineStatus.Unknown
+            };
+        }
 
-    private int PlatformBatteryLifePercent()
-    {
-        return (int)(SystemInformation.PowerStatus.BatteryLifePercent * 100);
+        private int PlatformBatteryLifePercent()
+        {
+            return (int)(SystemInformation.PowerStatus.BatteryLifePercent * 100);
+        }
     }
 }
