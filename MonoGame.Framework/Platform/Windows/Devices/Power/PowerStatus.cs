@@ -1,6 +1,4 @@
 using System.Windows.Forms;
-using FormsBatteryChargeStatus = System.Windows.Forms.BatteryChargeStatus;
-using FormsPowerLineStatus = System.Windows.Forms.PowerLineStatus;
 
 namespace MonoGame.Framework.Devices.Power
 {
@@ -10,13 +8,12 @@ namespace MonoGame.Framework.Devices.Power
         {
             return SystemInformation.PowerStatus.BatteryChargeStatus switch
             {
-                FormsBatteryChargeStatus.Charging => BatteryChargeStatus.Charging,
-                FormsBatteryChargeStatus.NoSystemBattery => BatteryChargeStatus.NoBattery,
-                FormsBatteryChargeStatus.NotCharging => BatteryChargeStatus.OnBattery,
-                FormsBatteryChargeStatus.Unknown => BatteryChargeStatus.Unknown,
-                FormsBatteryChargeStatus.High => BatteryChargeStatus.OnBattery,
-                FormsBatteryChargeStatus.Low => BatteryChargeStatus.OnBattery,
-                FormsBatteryChargeStatus.Critical => BatteryChargeStatus.OnBattery,
+                System.Windows.Forms.BatteryChargeStatus.Charging => BatteryChargeStatus.Charging,
+                System.Windows.Forms.BatteryChargeStatus.NoSystemBattery => BatteryChargeStatus.NoBattery,
+                System.Windows.Forms.BatteryChargeStatus.Unknown => BatteryChargeStatus.Unknown,
+                System.Windows.Forms.BatteryChargeStatus.High => BatteryChargeStatus.OnBattery,
+                System.Windows.Forms.BatteryChargeStatus.Low => BatteryChargeStatus.OnBattery,
+                System.Windows.Forms.BatteryChargeStatus.Critical => BatteryChargeStatus.OnBattery,
                 _ => BatteryChargeStatus.Unknown
             };
         }
@@ -25,8 +22,8 @@ namespace MonoGame.Framework.Devices.Power
         {
             return SystemInformation.PowerStatus.PowerLineStatus switch
             {
-                FormsPowerLineStatus.Offline => PowerLineStatus.Offline,
-                FormsPowerLineStatus.Online => PowerLineStatus.Online,
+                System.Windows.Forms.PowerLineStatus.Offline => PowerLineStatus.Offline,
+                System.Windows.Forms.PowerLineStatus.Online => PowerLineStatus.Online,
                 _ => PowerLineStatus.Unknown
             };
         }
