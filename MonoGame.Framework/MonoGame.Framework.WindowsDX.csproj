@@ -53,6 +53,7 @@
     <Compile Include="Platform\Utilities\ReflectionHelpers.Legacy.cs" />
     <Compile Include="Platform\Utilities\TimerHelper.cs" />
     <Compile Include="Platform\Windows\HorizontalMouseWheelEventArgs.cs" />
+    <Compile Include="Platform\Windows\Devices\Power\PowerStatus.cs" />
     <Compile Include="Platform\Windows\WinFormsGameForm.cs" />
     <Compile Include="Platform\Windows\WinFormsGamePlatform.cs" />
     <Compile Include="Platform\Windows\WinFormsGameWindow.cs" />
