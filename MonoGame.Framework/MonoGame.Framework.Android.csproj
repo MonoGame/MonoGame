@@ -44,6 +44,7 @@
     <Compile Include="Platform\Android\AndroidGameActivity.cs" />
     <Compile Include="Platform\Android\AndroidGamePlatform.cs" />
     <Compile Include="Platform\Android\AndroidGameWindow.cs" />
+    <Compile Include="Platform\Android\Devices\Power\PowerStatus.cs" />
     <Compile Include="Platform\Android\Devices\Sensors\Accelerometer.cs" />
     <Compile Include="Platform\Android\Devices\Sensors\Compass.cs" />
     <Compile Include="Platform\Android\Input\Keyboard.cs" />
