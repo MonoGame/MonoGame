@@ -48,6 +48,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Include="Platform\iOS\Devices\Power\PowerStatus.cs" />
     <Compile Include="Platform\iOS\Devices\Sensors\Accelerometer.cs" />
     <Compile Include="Platform\iOS\Devices\Sensors\Compass.cs" />
     <Compile Include="Platform\iOS\iOSGamePlatform.cs" />
