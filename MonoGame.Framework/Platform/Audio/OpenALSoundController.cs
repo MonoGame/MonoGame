@@ -695,18 +695,5 @@ namespace Microsoft.Xna.Framework.Audio
             Alc.DeviceResume(_device);
         }
 #endif
-
-#if DESKTOPGL || ANGLE
-        /// <summary>
-        /// Temporary diagnostic helper - remove before shipping.
-        /// </summary>
-        public static string GetExtensionSupportInfo()
-        {
-            bool hasReopen = Alc.IsExtensionPresent(IntPtr.Zero, "ALC_SOFT_reopen_device");
-            bool hasDisconnect = Alc.IsExtensionPresent(IntPtr.Zero, "ALC_EXT_disconnect");
-            bool hasSystemEvents = Alc.IsExtensionPresent(IntPtr.Zero, "ALC_SOFT_system_events");
-            return $"ALC_SOFT_reopen_device={hasReopen}, ALC_EXT_disconnect={hasDisconnect}, ALC_SOFT_system_events={hasSystemEvents}";
-        }
-#endif
     }
 }
