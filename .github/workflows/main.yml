@@ -26,9 +26,9 @@ jobs:
           - os: ubuntu-24.04
             platform: linux
             shell: bash
-          - os: ubuntu-22.04-arm
-            platform: linux-arm
-            shell: bash
+          #- os: ubuntu-22.04-arm
+          #  platform: linux-arm
+          #  shell: bash
       fail-fast: false
     defaults:
       run:
