@@ -1,5 +1,282 @@
 ﻿# Changelog
 
+## 3.8.5 Release - July 15th - 2026
+
+A Long awaited release
+
+### What has Changed - 3.8.5
+
+## What's Changed
+* Bump extension versions to 3.8.4.0 for next release. by @CartBlanche in https://github.com/MonoGame/MonoGame/pull/8808
+* Add Version to Artifact zip files. by @CartBlanche in https://github.com/MonoGame/MonoGame/pull/8817
+* Workflow concurrency update by @SimonDarksideJ in https://github.com/MonoGame/MonoGame/pull/8818
+* Add NO_AUDIO switch to build without audio by @ThomasFOG in https://github.com/MonoGame/MonoGame/pull/8750
+* Mojo Fix by @CartBlanche in https://github.com/MonoGame/MonoGame/pull/8824
+* Add version to mgcb output and fix Usage name output by @CartBlanche in https://github.com/MonoGame/MonoGame/pull/8823
+* DirectX 12 Support by @tomspilman in https://github.com/MonoGame/MonoGame/pull/8646
+* Fix build error where the Effect Compiler was referening the Pipeline by @dellis1972 in https://github.com/MonoGame/MonoGame/pull/8839
+* Native Framework Net Standard 2.1 Support by @tomspilman in https://github.com/MonoGame/MonoGame/pull/8838
+* Some small improvements to WineHelper.cs by @dellis1972 in https://github.com/MonoGame/MonoGame/pull/8814
+* Add SDL mapping for Key 35 (102 key backslash or UK pound key) by @MLSTRM in https://github.com/MonoGame/MonoGame/pull/7945
+* Fix issue where the NewItem templates do not appear on MacOS by @dellis1972 in https://github.com/MonoGame/MonoGame/pull/8841
+* Better Runtime Shader Compiler Errors by @tomspilman in https://github.com/MonoGame/MonoGame/pull/8813
+* Fix unhandled exception when invalid target platform is provided in mgcb by @JakeLegendXIII in https://github.com/MonoGame/MonoGame/pull/8713
+* [Pipeline Tool] Output the location MGCB looks for a font in the error message - migrated by @SimonDarksideJ in https://github.com/MonoGame/MonoGame/pull/8844
+* Added ProjectDirectory to ContentProcessorContext by @tomspilman in https://github.com/MonoGame/MonoGame/pull/8845
+* Fix BoundingSphere.CreateMerged by @prollin in https://github.com/MonoGame/MonoGame/pull/8847
+* Fix MGFX to use ExternalToo.Run by @dellis1972 in https://github.com/MonoGame/MonoGame/pull/8848
+* Fix AOT type signatures and error handling by @ThomasFOG in https://github.com/MonoGame/MonoGame/pull/8850
+* Fix MGCB calling ffmpeg with ffprobe arguments by @ameoverflow in https://github.com/MonoGame/MonoGame/pull/8856
+* Changed SDL fullscreen calls order by @Nebulaxin in https://github.com/MonoGame/MonoGame/pull/8034
+* Extend `PlayerIndex` Enum To Support 8 Players On Compatible Platforms by @AristurtleDev in https://github.com/MonoGame/MonoGame/pull/8809
+* Update Glyph reading to handle multiple casings / fallback by @SimonDarksideJ in https://github.com/MonoGame/MonoGame/pull/8855
+* Added ToHSVL() to Color by @ThomasFOG in https://github.com/MonoGame/MonoGame/pull/8857
+* Implementing Thomas's RNG implementation to replace PR #3789 by @SimonDarksideJ in https://github.com/MonoGame/MonoGame/pull/8861
+* [Content.Pipeline] Fix referencing source directly requireing extra s… by @harry-cpp in https://github.com/MonoGame/MonoGame/pull/8852
+* Fix "MathHelper.Random" tests in https://github.com/MonoGame/MonoGame/pull/8866
+* Fix XML Documentation in Random.cs by @bunniico in https://github.com/MonoGame/MonoGame/pull/8867
+* Issue #6661: Moved content writing from Flush to new method FinalizeContent by @h3allen in https://github.com/MonoGame/MonoGame/pull/8266
+* Make additional windows visible. Fixes #7427 by @stromkos in https://github.com/MonoGame/MonoGame/pull/7456
+* Fixed the kernings in spritefont at the import. by @MutsiMutsi in https://github.com/MonoGame/MonoGame/pull/8837
+* Only extract the needed d3dcompiler_47.dll by @Kwyrky in https://github.com/MonoGame/MonoGame/pull/8846
+* Net Standard 2.1 Support for Native Platform (part 2) by @tomspilman in https://github.com/MonoGame/MonoGame/pull/8853
+* Add native pipeline support and texture related functionality by @sepcnt in https://github.com/MonoGame/MonoGame/pull/8871
+* Add ToHSL(), ToHSV(), FromHSL() and FromHSV() functions to Color by @Abyz08 in https://github.com/MonoGame/MonoGame/pull/8876
+* Fix 2 summary by @warquys in https://github.com/MonoGame/MonoGame/pull/8883
+* Remove the `RestoreContentCompiler` as it was redundant. by @dellis1972 in https://github.com/MonoGame/MonoGame/pull/8815
+* [Content.Pipeline] Add new content project system by @harry-cpp in https://github.com/MonoGame/MonoGame/pull/8830
+* Bump OpenAL to 1.24.3.1 by @dellis1972 in https://github.com/MonoGame/MonoGame/pull/8882
+* Fix XML compiler warnings. by @CartBlanche in https://github.com/MonoGame/MonoGame/pull/8890
+* [Build] Fix mgcb not including native libs and some build code cleanup by @harry-cpp in https://github.com/MonoGame/MonoGame/pull/8891
+* [Pipeline] Move ProjectDirectory to ContentProcessorContext and mark a couple of methods as obsolete by @harry-cpp in https://github.com/MonoGame/MonoGame/pull/8892
+* Revert xml change in Random. I was overzealous with my change. by @CartBlanche in https://github.com/MonoGame/MonoGame/pull/8898
+* [Pipeline] Automatically build the native pipeline when building the main cs project by @harry-cpp in https://github.com/MonoGame/MonoGame/pull/8893
+* Fix native backends by @ThomasFOG in https://github.com/MonoGame/MonoGame/pull/8900
+* [CI] Fix uploading mgpipeline by @harry-cpp in https://github.com/MonoGame/MonoGame/pull/8902
+* Fixed Relative Source Paths In Pipeline Builder by @tomspilman in https://github.com/MonoGame/MonoGame/pull/8904
+* [CI] Fix fork builds not working with actions enabled by @harry-cpp in https://github.com/MonoGame/MonoGame/pull/8907
+* Update template checkout for 3.8.5.develop.3 by @SimonDarksideJ in https://github.com/MonoGame/MonoGame/pull/8908
+* [CI] Deploy step improvements by @harry-cpp in https://github.com/MonoGame/MonoGame/pull/8910
+* Removed unused parameters in AudioEngine constructor. by @Lucasharskamp in https://github.com/MonoGame/MonoGame/pull/8889
+* [CI] Fix StaticLib check for Unix by @harry-cpp in https://github.com/MonoGame/MonoGame/pull/8914
+* Improved the .editorconfig as discussed with the contributors. by @Lucasharskamp in https://github.com/MonoGame/MonoGame/pull/8911
+* [Pipeline] Improve Windows msbuild detection by @harry-cpp in https://github.com/MonoGame/MonoGame/pull/8920
+* Fixed IL Trimming warnings on DesktopGL/WindowsDX by @Lucasharskamp in https://github.com/MonoGame/MonoGame/pull/8915
+* Fix bounds calculation on blacking out pixels by @Vectovox in https://github.com/MonoGame/MonoGame/pull/8918
+* Fix type collision by @ThomasFOG in https://github.com/MonoGame/MonoGame/pull/8924
+* Supported platforms update by @ThomasFOG in https://github.com/MonoGame/MonoGame/pull/8926
+* More robust GL extension loading by @ThomasFOG in https://github.com/MonoGame/MonoGame/pull/8927
+* [CI] Hook up shader compilation to build by @harry-cpp in https://github.com/MonoGame/MonoGame/pull/8916
+* Fix readme footnotes by @ThomasFOG in https://github.com/MonoGame/MonoGame/pull/8929
+* Make a Better Error Message for Audio Imports by @dellis1972 in https://github.com/MonoGame/MonoGame/pull/8932
+* Upgrade Android and iOS to use modern Methods. by @dellis1972 in https://github.com/MonoGame/MonoGame/pull/8921
+* Bump OpenAL to Fix iOS by @dellis1972 in https://github.com/MonoGame/MonoGame/pull/8935
+* Fixes DirectX 12 shader building by @ThomasFOG in https://github.com/MonoGame/MonoGame/pull/8939
+* Link CoreAudio and AudioToolbox when using OpenAL on iOS [WIP] by @dellis1972 in https://github.com/MonoGame/MonoGame/pull/8938
+* 3.8.5 template update checkout by @SimonDarksideJ in https://github.com/MonoGame/MonoGame/pull/8947
+* Fix Vulkan constant buffer reflection data parsing by @ThomasFOG in https://github.com/MonoGame/MonoGame/pull/8941
+* Content Builder Fixes by @tomspilman in https://github.com/MonoGame/MonoGame/pull/8949
+* [Pipeline] Drop mgfx reference by @harry-cpp in https://github.com/MonoGame/MonoGame/pull/8948
+* Add CppNet as a submodule and drop the Dependencies submodule by @harry-cpp in https://github.com/MonoGame/MonoGame/pull/8953
+* Bump MonoGame.Tool.X deps by @harry-cpp in https://github.com/MonoGame/MonoGame/pull/8954
+* [Pipeline] Improve CppNet referencing by @harry-cpp in https://github.com/MonoGame/MonoGame/pull/8960
+* Fix the Native backend SDL platform issues by @ThomasFOG in https://github.com/MonoGame/MonoGame/pull/8958
+* Quoted shader file paths and fixed Vulkan task name by @arosolino in https://github.com/MonoGame/MonoGame/pull/8969
+* Content Builder Fixes by @tomspilman in https://github.com/MonoGame/MonoGame/pull/8961
+* Initial binaries packaging by @SimonDarksideJ in https://github.com/MonoGame/MonoGame/pull/8959
+* Patch Binaries release - Add missing tools by @SimonDarksideJ in https://github.com/MonoGame/MonoGame/pull/8971
+* Repoint vulkanmemoryallocator to correct git repo by @harry-cpp in https://github.com/MonoGame/MonoGame/pull/8982
+* Update DesktopGL to SDL 2.32.10 by @ThomasFOG in https://github.com/MonoGame/MonoGame/pull/8989
+* [Pipeline] Refactor the content builder by @harry-cpp in https://github.com/MonoGame/MonoGame/pull/8988
+* Update MGCB editor references for updated CP by @SimonDarksideJ in https://github.com/MonoGame/MonoGame/pull/8979
+* Made TPGParser Private by @tomspilman in https://github.com/MonoGame/MonoGame/pull/8983
+* Feature/cake nuget testing by @SimonDarksideJ in https://github.com/MonoGame/MonoGame/pull/8928
+* [Pipeline] Fix builder dependency caching by @harry-cpp in https://github.com/MonoGame/MonoGame/pull/8991
+* Cross Platform Vulkan Native Backend Support by @sepcnt in https://github.com/MonoGame/MonoGame/pull/8903
+* Fix texture importer error message by @tomspilman in https://github.com/MonoGame/MonoGame/pull/8995
+* [Pipeline] Add version and fix caching for importers and processors by @harry-cpp in https://github.com/MonoGame/MonoGame/pull/8998
+* [Pipeline] Fix builder not detecting failed builds if a dependency fails by @harry-cpp in https://github.com/MonoGame/MonoGame/pull/8996
+* DesktopVK fixes by @ThomasFOG in https://github.com/MonoGame/MonoGame/pull/8999
+* Update DllImport attributes to use AL.LibraryName by @dellis1972 in https://github.com/MonoGame/MonoGame/pull/9015
+* Updated to Readme and Requirements by @SimonDarksideJ in https://github.com/MonoGame/MonoGame/pull/9017
+* Fix backslashes in content builder paths by @tomspilman in https://github.com/MonoGame/MonoGame/pull/8997
+* Fix typo in comment by @dellis1972 in https://github.com/MonoGame/MonoGame/pull/9030
+* [Native] WindowsDX12 fixes #2 by @arosolino in https://github.com/MonoGame/MonoGame/pull/9031
+* Use global.json to pin the SDK version we use to build by @dellis1972 in https://github.com/MonoGame/MonoGame/pull/9051
+* Add Support for Texture3D on OpenGL by @dellis1972 in https://github.com/MonoGame/MonoGame/pull/9046
+* Updated template checkout for Development by @SimonDarksideJ in https://github.com/MonoGame/MonoGame/pull/9075
+* Update dotnet setup to exclude android workload for MacOS by @SimonDarksideJ in https://github.com/MonoGame/MonoGame/pull/9086
+* Add more robust SPIR-V parsing to Vulkan shader compilation by @TheKrumpet in https://github.com/MonoGame/MonoGame/pull/9082
+* Update workflow to use dotnet9 by @SimonDarksideJ in https://github.com/MonoGame/MonoGame/pull/9091
+* Revert "Throw Exception In `Content.Load` When `assetName` Is A Rootd Path. (#8569) by @AristurtleDev in https://github.com/MonoGame/MonoGame/pull/9090
+* Fixed Vulkan validation errors introduced by parsing changes by @TheKrumpet in https://github.com/MonoGame/MonoGame/pull/9093
+* Vulkan constant buffers now use the offset and sizing specified by the SPIR-V by @TheKrumpet in https://github.com/MonoGame/MonoGame/pull/9092
+* fix dotnet 9 to latest sdk by @SimonDarksideJ in https://github.com/MonoGame/MonoGame/pull/9102
+* Update installation targets for Visual Studio versions by @dellis1972 in https://github.com/MonoGame/MonoGame/pull/9096
+* Support comparison samplers in Vulkan by @TheKrumpet in https://github.com/MonoGame/MonoGame/pull/9106
+* Fix independent blend state flag not respected by @Vectovox in https://github.com/MonoGame/MonoGame/pull/9073
+* Force reading global.json file by @SimonDarksideJ in https://github.com/MonoGame/MonoGame/pull/9110
+* Patch tests workflow for Windows by @SimonDarksideJ in https://github.com/MonoGame/MonoGame/pull/9112
+* Update template checkout for new CB templates by @SimonDarksideJ in https://github.com/MonoGame/MonoGame/pull/9115
+* [MGCBEditor] Fix dependency inclusion and workload warnings by @harry-cpp in https://github.com/MonoGame/MonoGame/pull/9122
+* Fix typo by renaming serilizer variable to serializer in ContentBuilderHelper by @RyanNielson in https://github.com/MonoGame/MonoGame/pull/9118
+* [MGCBEditor] Fix macOS app bundle sometimes not having an executable … by @harry-cpp in https://github.com/MonoGame/MonoGame/pull/9123
+* [Builder] Fix output extension cutting by @harry-cpp in https://github.com/MonoGame/MonoGame/pull/9124
+* [Builder] Fix external deps loading by @harry-cpp in https://github.com/MonoGame/MonoGame/pull/9126
+* WindowsDX12: Mark scissor as dirty if viewport changed and no custom scissor test. by @arosolino in https://github.com/MonoGame/MonoGame/pull/9108
+* Remove ConsoleCheck project by @harry-cpp in https://github.com/MonoGame/MonoGame/pull/9125
+* Remove unused hidden character and property from Winforms by @SimonDarksideJ in https://github.com/MonoGame/MonoGame/pull/9128
+* FAudio for DesktopVK Platform by @tomspilman in https://github.com/MonoGame/MonoGame/pull/9136
+* WIP Vulkan Fixes by @tomspilman in https://github.com/MonoGame/MonoGame/pull/9044
+* Update template checkout by @SimonDarksideJ in https://github.com/MonoGame/MonoGame/pull/9130
+* [CI] Add packaging for the new native backend libraries by @harry-cpp in https://github.com/MonoGame/MonoGame/pull/9140
+* Use HashSet to track GraphicsDevice resources by @riperiperi in https://github.com/MonoGame/MonoGame/pull/9027
+* [Content.Pipeline] Improve the default logger by @harry-cpp in https://github.com/MonoGame/MonoGame/pull/9146
+* [Content.Pipeline] Skip scanning paths starting with dot by @harry-cpp in https://github.com/MonoGame/MonoGame/pull/9147
+* Fix content building for Windows DX12 by @tomspilman in https://github.com/MonoGame/MonoGame/pull/9148
+* Updated license year and verified documents by @SimonDarksideJ in https://github.com/MonoGame/MonoGame/pull/9151
+* Refresh templates checkout to use the preview releases by @SimonDarksideJ in https://github.com/MonoGame/MonoGame/pull/9143
+* Update Copyright to MonoGame Foundation, Inc by @JakeLegendXIII in https://github.com/MonoGame/MonoGame/pull/9150
+* [Content.Pipeline] Fix not setting active context for the base building of asset by @harry-cpp in https://github.com/MonoGame/MonoGame/pull/9153
+* Vulkan: fix incorrect variable lifetime by @ForNeVeR in https://github.com/MonoGame/MonoGame/pull/9165
+* [WIP] Native Song Implementation  by @tomspilman in https://github.com/MonoGame/MonoGame/pull/9154
+* Add contributor declaration to PR template by @dellis1972 in https://github.com/MonoGame/MonoGame/pull/9168
+* Fix Color.FromHSV hue progression and parameter normalization by @AristurtleDev in https://github.com/MonoGame/MonoGame/pull/9170
+* Update template checkout for builder targets update by @SimonDarksideJ in https://github.com/MonoGame/MonoGame/pull/9171
+* Allow content builder importers to match more than the extension by @Epicguru in https://github.com/MonoGame/MonoGame/pull/9175
+* [Content.Pipeline] Sanitise paths in importer context by @harry-cpp in https://github.com/MonoGame/MonoGame/pull/9178
+* Disable CoPilot when in VSCode by @dellis1972 in https://github.com/MonoGame/MonoGame/pull/9177
+* [Content.Pipeline] Add FontImporter by @harry-cpp in https://github.com/MonoGame/MonoGame/pull/9183
+* Fix file drag-and-drop path truncation on Windows DirectX by @hactazia in https://github.com/MonoGame/MonoGame/pull/9135
+* Update Unload to match Load / format by @JakeLegendXIII in https://github.com/MonoGame/MonoGame/pull/9194
+* Doc cleanup by @tomspilman in https://github.com/MonoGame/MonoGame/pull/9200
+* Fixed internal OGL interface to be internal. by @tomspilman in https://github.com/MonoGame/MonoGame/pull/9201
+* Add gamepad profile validation for iOS/tvOS by @wahab-cide in https://github.com/MonoGame/MonoGame/pull/9132
+* Refactored Matrix.CreateBillboard for better readability by @rds1983 in https://github.com/MonoGame/MonoGame/pull/9045
+* Updated the Keys.None xml description to align with other "none" implementations to avoid confusion. by @SimonDarksideJ in https://github.com/MonoGame/MonoGame/pull/9203
+* Add step to pin Xcode version to 26.0.1 by @dellis1972 in https://github.com/MonoGame/MonoGame/pull/9216
+* #9205 Unit tests for SaveAsPng and SaveAsJpeg by @mghoffmann in https://github.com/MonoGame/MonoGame/pull/9208
+* Update ToVkImageViewType to support VK_IMAGE_VIEW_TYPE_2D_ARRAY by @acarteas in https://github.com/MonoGame/MonoGame/pull/9220
+* Implements #9206: RenderTarget3D is missing XML comments by @MerjTek in https://github.com/MonoGame/MonoGame/pull/9222
+* Fixed WavImporter InvalidContentException string unit error, correcting units from KHz to Hz where appropriate. by @kbarkevich in https://github.com/MonoGame/MonoGame/pull/9238
+* Update Xcode version to 26.2 in workflow by @dellis1972 in https://github.com/MonoGame/MonoGame/pull/9260
+* Add Missing scalar * Matrix operator by @dellis1972 in https://github.com/MonoGame/MonoGame/pull/9263
+* Increasing descriptor pool size and uniform ringbuffer size. by @uygary in https://github.com/MonoGame/MonoGame/pull/9271
+* Fixes new Content Builder duplicate asset dependencies by @tomspilman in https://github.com/MonoGame/MonoGame/pull/9268
+* Update to Content Builder .targets to work for any build configuration by @SimonDarksideJ in https://github.com/MonoGame/MonoGame/pull/9176
+* Unsubscribed from _components.ComponentAdded and ComponentRemoved in Game.Dispose(bool) method by @mghoffmann in https://github.com/MonoGame/MonoGame/pull/9266
+* Add null checks to prevent crashes on shutdown when using Song by @dellis1972 in https://github.com/MonoGame/MonoGame/pull/9264
+* Centralise SoundEffect shutdown and resetting the _systemState to SoundSystemState.NotInitialized by @CartBlanche in https://github.com/MonoGame/MonoGame/pull/9262
+* Minor updates to the TitleContainer for Native by @dellis1972 in https://github.com/MonoGame/MonoGame/pull/9259
+* Add readonly public accessor for GamePadButtons._buttons by @envoidia in https://github.com/MonoGame/MonoGame/pull/9230
+* #9221 - Set mouse visibility when calling NativeGamePlatform by @acarteas in https://github.com/MonoGame/MonoGame/pull/9249
+* WindowsDX12 doesn't properly exit when closing the Window. by @arosolino in https://github.com/MonoGame/MonoGame/pull/9252
+* Missing Vulkan Image Layout Transitions by @uygary in https://github.com/MonoGame/MonoGame/pull/9276
+* Fixing memcpy Bug in MGG_Buffer_GetData by @uygary in https://github.com/MonoGame/MonoGame/pull/9278
+* Native SDL Gamepads are improperly mapping from instance ids by @arosolino in https://github.com/MonoGame/MonoGame/pull/9261
+* Fixes game staying in Fullscreen when switching back to Windowed by @arosolino in https://github.com/MonoGame/MonoGame/pull/9256
+* Add Vulkan and DX12 to Issue template by @dellis1972 in https://github.com/MonoGame/MonoGame/pull/9267
+* Bump nuget dependencies for build by @SimonDarksideJ in https://github.com/MonoGame/MonoGame/pull/9287
+* Add Homebrew update step for macOS environment by @dellis1972 in https://github.com/MonoGame/MonoGame/pull/9291
+* Waiting for Device Idle Before Destroying Graphics Device on Shutdown by @uygary in https://github.com/MonoGame/MonoGame/pull/9283
+* Increasing HttpClient Timeout for UploadArtifacts Task by @uygary in https://github.com/MonoGame/MonoGame/pull/9290
+* Stencil Handling in RenderTarget2D by @uygary in https://github.com/MonoGame/MonoGame/pull/9280
+* Add SetNativeTexture and FromSharedHandle for zero-copy texture sharing by @mfkl in https://github.com/MonoGame/MonoGame/pull/9254
+* Cleaning-up Pipelines Pointing at the TargetSetCache Before Destroying TargetSetCache Itself by @uygary in https://github.com/MonoGame/MonoGame/pull/9297
+* Adding Agents file to direct AI/LLM use within MonoGame projects by @SimonDarksideJ in https://github.com/MonoGame/MonoGame/pull/9298
+* Refactor GitHub Actions for Wine and Fonts installation by @dellis1972 in https://github.com/MonoGame/MonoGame/pull/9304
+* Added additional Color.FromNonPremultiplied overloads with new argument types by @awteeter in https://github.com/MonoGame/MonoGame/pull/9301
+* Upgrade agent files for AI models in https://github.com/MonoGame/MonoGame/pull/9310
+* Update CI workflow to include Ubuntu 22.04 ARM and build both linux and win arm64 by @dellis1972 in https://github.com/MonoGame/MonoGame/pull/9224
+* Update templates to latest for `3.8.5` by @SimonDarksideJ in https://github.com/MonoGame/MonoGame/pull/9302
+* Dont fallback to GLES2 if we have GLES3 by @dellis1972 in https://github.com/MonoGame/MonoGame/pull/9312
+* Enabling GPU instancing in DX12 by @uygary in https://github.com/MonoGame/MonoGame/pull/9306
+* [Content.Pipeline] Really quick fix for content server by @harry-cpp in https://github.com/MonoGame/MonoGame/pull/9309
+* Add Additonal ASTC blockSize support  by @dellis1972 in https://github.com/MonoGame/MonoGame/pull/9286
+* Update min xCode version to 26.4 by @SimonDarksideJ in https://github.com/MonoGame/MonoGame/pull/9318
+* Fixes Vulkan Unit Tests by @tomspilman in https://github.com/MonoGame/MonoGame/pull/9196
+* Add codestyle guidelines for nullable reference types by @AristurtleDev in https://github.com/MonoGame/MonoGame/pull/9321
+* Pin dotnet and workloads to 9.0.314. Pin xcode to 26.3 so it matches by @dellis1972 in https://github.com/MonoGame/MonoGame/pull/9328
+* More Vulkan Fixes by @tomspilman in https://github.com/MonoGame/MonoGame/pull/9324
+* Updating template checkout for release by @SimonDarksideJ in https://github.com/MonoGame/MonoGame/pull/9330
+* DirectX 12 Unit Tests by @tomspilman in https://github.com/MonoGame/MonoGame/pull/9329
+* Bump MojoShader to latest by @tomspilman in https://github.com/MonoGame/MonoGame/pull/9331
+* Patches two issues with the Preview.5 release of the templates: by @SimonDarksideJ in https://github.com/MonoGame/MonoGame/pull/9332
+* Update Vulkan custom border color feature handling by @dellis1972 in https://github.com/MonoGame/MonoGame/pull/9335
+* fix type in agents.md by @MutsiMutsi in https://github.com/MonoGame/MonoGame/pull/9340
+* Adding missing layout transition. by @uygary in https://github.com/MonoGame/MonoGame/pull/9342
+* Fixing GPU Instancing on Vulkan by @uygary in https://github.com/MonoGame/MonoGame/pull/9344
+* Point struct scalar multiplication/division operators by @not-phoeniix in https://github.com/MonoGame/MonoGame/pull/8745
+* Fix for adding alpha to sRGB in OpenGL by @ericlothspeich in https://github.com/MonoGame/MonoGame/pull/9336
+* Fix NativeLib path for DirectX12 and DesktopVK tests to use NativePlatform variable by @AristurtleDev in https://github.com/MonoGame/MonoGame/pull/9348
+* Srgb Framebuffer by @ericlothspeich in https://github.com/MonoGame/MonoGame/pull/9338
+* Running Native Backend Tests in  CI Pipeline & Fixing Failing Tests by @uygary in https://github.com/MonoGame/MonoGame/pull/9352
+* Patch builder.targets to recognise VK/DX12 by @SimonDarksideJ in https://github.com/MonoGame/MonoGame/pull/9360
+* Update Windows runner from 'windows-latest' to 'windows-2022' by @dellis1972 in https://github.com/MonoGame/MonoGame/pull/9366
+* Escape SDL include directory for faduio by @arosolino in https://github.com/MonoGame/MonoGame/pull/9367
+* Only enable sRGB flag if the back buffer is compatible by @arosolino in https://github.com/MonoGame/MonoGame/pull/9371
+* Add Span<T> overloads to VertexBuffer.SetData<T> by @trevorlecrone in https://github.com/MonoGame/MonoGame/pull/9359
+* DX12: Fixes invalid render target state after requesting texture data on an active render target by @arosolino in https://github.com/MonoGame/MonoGame/pull/9369
+* More Vulkan Improvements by @tomspilman in https://github.com/MonoGame/MonoGame/pull/9363
+* Add THIRD-PARTY-NOTICES file by @AristurtleDev in https://github.com/MonoGame/MonoGame/pull/9374
+* Add Property to ignore custom FBX Axis rotation by @dellis1972 in https://github.com/MonoGame/MonoGame/pull/8963
+* Fix the RasterizerStateTest to only ignore the problem tests , NOT all of them by @dellis1972 in https://github.com/MonoGame/MonoGame/pull/9387
+* Add Triage Document by @AristurtleDev in https://github.com/MonoGame/MonoGame/pull/9386
+* Fix native SoundEffect duration overflow for large WAV files by @AristurtleDev in https://github.com/MonoGame/MonoGame/pull/9390
+* Class-wide Decoration Support for RunOnUIAttribute by @uygary in https://github.com/MonoGame/MonoGame/pull/9376
+* Fix `SoundEffect.FromStream` parsing for oversided WAV `fmt` chunks by @AristurtleDev in https://github.com/MonoGame/MonoGame/pull/9389
+* Removing OffsetToStringData Use and Fixing Pointer Arithmetic Bug by @uygary in https://github.com/MonoGame/MonoGame/pull/9391
+* Add GPU instancing regression test by @danyalahmed1995 in https://github.com/MonoGame/MonoGame/pull/9354
+* added missing documentation (CS1591 errors) and CA1834 (use char, not string) warnings in the project. by @Lucasharskamp in https://github.com/MonoGame/MonoGame/pull/9226
+* Revert #9354 by @SimonDarksideJ in https://github.com/MonoGame/MonoGame/pull/9401
+* Initial commit for GitHub validation by @SimonDarksideJ in https://github.com/MonoGame/MonoGame/pull/9400
+* DX12: Allow support for turning Vsync off by @arosolino in https://github.com/MonoGame/MonoGame/pull/9380
+* DX12: Allow changing back buffer size followed by setting a custom render target by @arosolino in https://github.com/MonoGame/MonoGame/pull/9378
+* Cleanup teamcity directory by @JakeLegendXIII in https://github.com/MonoGame/MonoGame/pull/9409
+* Bumped MessagePack to 2.5.301 due to vulnerability by @CartBlanche in https://github.com/MonoGame/MonoGame/pull/9413
+* Add better error information for the WineHelper by @dellis1972 in https://github.com/MonoGame/MonoGame/pull/9414
+* Repacking native dependencies for MGCB Editor. by @uygary in https://github.com/MonoGame/MonoGame/pull/9411
+* Updated the templates checkout for the latest CB template fix by @SimonDarksideJ in https://github.com/MonoGame/MonoGame/pull/9381
+* Native Backend GPU Instancing Test Fixes by @uygary in https://github.com/MonoGame/MonoGame/pull/9406
+* Vulkan: fall back to BGRA sRGB swapchain format by @ericlothspeich in https://github.com/MonoGame/MonoGame/pull/9373
+* Fix Issue #8065. MultiSampling on RenderTargets for DesktopGL/Vulkan by @dellis1972 in https://github.com/MonoGame/MonoGame/pull/9356
+* DirectX 12 Threading and Performance Fixes by @tomspilman in https://github.com/MonoGame/MonoGame/pull/9405
+* #9426 Fixed summaries for AlphaDestinationBlend and ColorDestinationBlend by @VladBeu4 in https://github.com/MonoGame/MonoGame/pull/9427
+* Native GraphicsDevice Cleanup by @tomspilman in https://github.com/MonoGame/MonoGame/pull/9419
+* Update Templates to latest by @SimonDarksideJ in https://github.com/MonoGame/MonoGame/pull/9428
+* 3.8.5-Preview references in Templates to 3.8.5 full by @SimonDarksideJ in https://github.com/MonoGame/MonoGame/pull/9429
+* Updated templates submodule once more. by @tomspilman in https://github.com/MonoGame/MonoGame/pull/9431
+* Update main.yml by @CartBlanche in https://github.com/MonoGame/MonoGame/pull/9433
+
+## New Contributors
+* @MLSTRM made their first contribution in https://github.com/MonoGame/MonoGame/pull/7945
+* @ameoverflow made their first contribution in https://github.com/MonoGame/MonoGame/pull/8856
+* @bunniico made their first contribution in https://github.com/MonoGame/MonoGame/pull/8867
+* @sepcnt made their first contribution in https://github.com/MonoGame/MonoGame/pull/8871
+* @Abyz08 made their first contribution in https://github.com/MonoGame/MonoGame/pull/8876
+* @warquys made their first contribution in https://github.com/MonoGame/MonoGame/pull/8883
+* @Lucasharskamp made their first contribution in https://github.com/MonoGame/MonoGame/pull/8889
+* @RyanNielson made their first contribution in https://github.com/MonoGame/MonoGame/pull/9118
+* @riperiperi made their first contribution in https://github.com/MonoGame/MonoGame/pull/9027
+* @ForNeVeR made their first contribution in https://github.com/MonoGame/MonoGame/pull/9165
+* @Epicguru made their first contribution in https://github.com/MonoGame/MonoGame/pull/9175
+* @hactazia made their first contribution in https://github.com/MonoGame/MonoGame/pull/9135
+* @wahab-cide made their first contribution in https://github.com/MonoGame/MonoGame/pull/9132
+* @mghoffmann made their first contribution in https://github.com/MonoGame/MonoGame/pull/9208
+* @acarteas made their first contribution in https://github.com/MonoGame/MonoGame/pull/9220
+* @MerjTek made their first contribution in https://github.com/MonoGame/MonoGame/pull/9222
+* @kbarkevich made their first contribution in https://github.com/MonoGame/MonoGame/pull/9238
+* @envoidia made their first contribution in https://github.com/MonoGame/MonoGame/pull/9230
+* @mfkl made their first contribution in https://github.com/MonoGame/MonoGame/pull/9254
+* @awteeter made their first contribution in https://github.com/MonoGame/MonoGame/pull/9301
+* @not-phoeniix made their first contribution in https://github.com/MonoGame/MonoGame/pull/8745
+* @ericlothspeich made their first contribution in https://github.com/MonoGame/MonoGame/pull/9336
+* @trevorlecrone made their first contribution in https://github.com/MonoGame/MonoGame/pull/9359
+* @danyalahmed1995 made their first contribution in https://github.com/MonoGame/MonoGame/pull/9354
+* @VladBeu4 made their first contribution in https://github.com/MonoGame/MonoGame/pull/9427
+
+**Full Changelog**: https://github.com/MonoGame/MonoGame/compare/v3.8.4.1...v3.8.5
+
 ## 3.8.4 Release - April 2nd - 2025
 
 Fastest MonoGame release to date!  WIth a total of 7 Previews, all vetted by the community.
