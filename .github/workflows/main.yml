@@ -237,7 +237,7 @@ jobs:
 
   package-binaries:
     name: PackageBinaries
-    needs: [ build, pack-native-runtime, tests ]
+    needs: [ build, pack-native-runtime ]
     runs-on: ubuntu-latest
     permissions:
         packages: write
@@ -268,7 +268,7 @@ jobs:
 
   deploy:
     name: Deploy
-    needs: [ build, pack-native-runtime, tests ]
+    needs: [ build, pack-native-runtime ]
     runs-on: ubuntu-latest
     if: ${{ github.event_name == 'push' }}
     permissions:

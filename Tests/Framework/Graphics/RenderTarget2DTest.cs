@@ -184,5 +184,43 @@ namespace MonoGame.Tests.Graphics
             rt.Dispose();
         }
 #endif
+
+        [Test]
+        [TestCase(DepthFormat.None, 0)]
+        [TestCase(DepthFormat.None, 1)]
+        [TestCase(DepthFormat.None, 4)]
+        [TestCase(DepthFormat.Depth16, 0)]
+        [TestCase(DepthFormat.Depth16, 1)]
+        [TestCase(DepthFormat.Depth16, 4)]
+        [TestCase(DepthFormat.Depth24, 0)]
+        [TestCase(DepthFormat.Depth24, 1)]
+        [TestCase(DepthFormat.Depth24, 4)]
+        [TestCase(DepthFormat.Depth24Stencil8, 0)]
+        [TestCase(DepthFormat.Depth24Stencil8, 1)]
+        [TestCase(DepthFormat.Depth24Stencil8, 4)]
+        public void ClearAndGetDataWithMultiSample(DepthFormat depthFormat, int multiSampleCount)
+        {
+            const int size = 16;
+            var rt = new RenderTarget2D(gd, size, size, mipMap: false, SurfaceFormat.Color, depthFormat, multiSampleCount, RenderTargetUsage.DiscardContents);
+            try
+            {
+                var previousTargets = gd.GetRenderTargets();
+                gd.SetRenderTarget(rt);
+                gd.Clear(Color.MonoGameOrange);
+                gd.SetRenderTargets(previousTargets);
+
+                var pixels = new Color[size * size];
+                rt.GetData(pixels);
+
+                for (int i=0; i < pixels.Length; i++)
+                {
+                    Assert.AreEqual(Color.MonoGameOrange, pixels[i], $"Pixel {i} should be {Color.MonoGameOrange} but was {pixels[i]}");
+                }
+            }
+            finally
+            {
+               rt.Dispose(); 
+            }
+        }
     }
 }

@@ -4,11 +4,18 @@
 
 namespace Microsoft.Xna.Framework.Graphics
 {
+    /// <summary>
+    /// The shader stage to compile or set shader resources for.
+    /// </summary>
     public enum ShaderStage
     {
+        /// <summary>
+        /// Vertex related shader resources, such as vertex shader and vertex buffers.
+        /// </summary>
         Vertex,
-        Pixel,
-
-        Count,
+        /// <summary>
+        /// Pixel related shader resources, such as pixel shader and pixel buffers.
+        /// </summary>
+        Pixel
     }
 }
