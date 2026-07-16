@@ -37,6 +37,11 @@ public class EffectProcessor : ContentProcessor<EffectContent, CompiledEffectCon
     /// <remarks>If you get an error during processing, compilation stops immediately. The effect processor displays an error message. Once you fix the current error, it is possible you may get more errors on subsequent compilation attempts.</remarks>
     public override CompiledEffectContent Process(EffectContent input, ContentProcessorContext context)
     {
+        if (input.Identity == null)
+        {
+            throw new InvalidContentException("Passed EffectContent input is invalid!");
+        }
+
         var options = new Options
         {
             SourceFile = input.Identity.SourceFilename,
@@ -83,12 +88,12 @@ public class EffectProcessor : ContentProcessor<EffectContent, CompiledEffectCon
         catch (ShaderCompilerException)
         {
             // This will log any warnings and errors and throw.
-            ProcessErrorsAndWarnings(true, shaderErrorsAndWarnings, input, context);
+            ProcessErrorsAndWarnings(true, shaderErrorsAndWarnings, input.Identity, context);
             throw;
         }
 
         // Process any warning messages that the shader compiler might have produced.
-        ProcessErrorsAndWarnings(false, shaderErrorsAndWarnings, input, context);
+        ProcessErrorsAndWarnings(false, shaderErrorsAndWarnings, input.Identity, context);
 
         // Write out the effect to a runtime format.
         CompiledEffectContent result;
@@ -108,7 +113,7 @@ public class EffectProcessor : ContentProcessor<EffectContent, CompiledEffectCon
         return result;
     }
 
-    private static void ProcessErrorsAndWarnings(bool buildFailed, string shaderErrorsAndWarnings, EffectContent input, ContentProcessorContext context)
+    private static void ProcessErrorsAndWarnings(bool buildFailed, string shaderErrorsAndWarnings, ContentIdentity inputIdentity, ContentProcessorContext context)
     {
         // Split the errors and warnings into individual lines.
         var errorsAndWarningArray = shaderErrorsAndWarnings.Split(["\n", "\r", Environment.NewLine], StringSplitOptions.RemoveEmptyEntries);
@@ -125,7 +130,7 @@ public class EffectProcessor : ContentProcessor<EffectContent, CompiledEffectCon
                 if (buildFailed)
                     allErrorsAndWarnings.AppendLine(errorOrWarningLine);
                 else
-                    context.Logger.Log(LogLevel.Warning, $"{errorOrWarningLine}: {context.Logger.GetCurrentFilename(input.Identity)}");
+                    context.Logger.Log(LogLevel.Warning, $"{errorOrWarningLine}: {context.Logger.GetCurrentFilename(inputIdentity)}");
 
                 continue;
             }
@@ -137,15 +142,15 @@ public class EffectProcessor : ContentProcessor<EffectContent, CompiledEffectCon
             // Try to ensure a good file name for the error message.
             if (string.IsNullOrEmpty(fileName))
             {
-                fileName = input.Identity.SourceFilename;
+                fileName = inputIdentity.SourceFilename;
             }
             else if (!File.Exists(fileName))
             {
-                var folder = Path.GetDirectoryName(input.Identity.SourceFilename) ?? "";
+                var folder = Path.GetDirectoryName(inputIdentity.SourceFilename) ?? "";
                 fileName = Path.Combine(folder, fileName);
             }
 
-            var newIdentity = new ContentIdentity(fileName, input.Identity.SourceTool, lineAndColumn);
+            var newIdentity = new ContentIdentity(fileName, inputIdentity.SourceTool, lineAndColumn);
 
             // If we got an exception then we'll be throwing an exception
             // below, so just gather the lines to throw later.
@@ -165,7 +170,7 @@ public class EffectProcessor : ContentProcessor<EffectContent, CompiledEffectCon
 
         if (buildFailed)
         {
-            throw new InvalidContentException(allErrorsAndWarnings.ToString(), identity ?? input.Identity);
+            throw new InvalidContentException(allErrorsAndWarnings.ToString(), identity ?? inputIdentity);
         }
     }
 

@@ -332,7 +332,10 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
             var boneIndices = new Dictionary<string, int>();
             var flattenedBones = MeshHelper.FlattenSkeleton(skeleton);
             for (var i = 0; i < flattenedBones.Count; i++)
-                boneIndices.Add(flattenedBones[i].Name, i);
+            {
+                string name = flattenedBones[i].Name ?? throw new InvalidContentException("Bone name cannot be null.");
+                boneIndices[name] = i;
+            }
 
             var vertexChannel = geometry.Vertices.Channels[vertexChannelIndex];
             if (vertexChannel is not VertexChannel<BoneWeightCollection> inputWeights)

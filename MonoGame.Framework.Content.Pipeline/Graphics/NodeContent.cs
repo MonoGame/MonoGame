@@ -11,11 +11,6 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
     public class NodeContent : ContentItem
     {
         /// <summary>
-        /// Gets or sets the name of the content item.
-        /// </summary>
-        public required new string Name { get; set; }
-
-        /// <summary>
         /// Gets the value of the local Transform property, multiplied by the AbsoluteTransform of the parent.
         /// </summary>
         public Matrix AbsoluteTransform => Parent != null ? Transform * Parent.AbsoluteTransform : Transform;

@@ -10,11 +10,6 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
     public class EffectContent : ContentItem
     {
         /// <summary>
-        /// Gets or sets the identity of the content item.
-        /// </summary>
-        public new required ContentIdentity Identity { get; set; }
-
-        /// <summary>
         /// Gets or sets the effect program source code.
         /// </summary>
         public string EffectCode { get; set; } = "";

@@ -11,7 +11,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
     /// </summary>
     public sealed class ModelMeshContent
     {
-        internal ModelMeshContent(string name, MeshContent sourceMesh, ModelBoneContent parentBone, BoundingSphere boundingSphere,
+        internal ModelMeshContent(string? name, MeshContent sourceMesh, ModelBoneContent parentBone, BoundingSphere boundingSphere,
             IList<ModelMeshPartContent> meshParts)
         {
             Name = name;
@@ -34,7 +34,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
         /// <summary>
         /// Gets the name of the mesh.
         /// </summary>
-        public string Name { get; }
+        public string? Name { get; }
 
         /// <summary>
         /// Gets the parent bone model.

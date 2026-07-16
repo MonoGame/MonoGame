@@ -32,7 +32,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
         /// <summary>
         /// Gets or sets the name of the current  <see cref="MeshContent"/> object being processed.
         /// </summary>
-        public string Name
+        public string? Name
         {
             get => _meshContent.Name;
             set => _meshContent.Name = value;
