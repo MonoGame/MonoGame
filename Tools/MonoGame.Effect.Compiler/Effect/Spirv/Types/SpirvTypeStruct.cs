@@ -51,9 +51,10 @@ internal class SpirvTypeStruct : SpirvTypeBase
             memberNames = [];
         }
 
-        for (int memberIdx = 3; memberIdx < parts.Length; memberIdx++)
+        for (int partsIdx = 3; partsIdx < parts.Length; partsIdx++)
         {
-            string memberTypeId = parts[memberIdx];
+            var memberTypeId = parts[partsIdx];
+            var memberIdx = partsIdx - 3;
 
             if (!context.Types.TryGetValue(memberTypeId, out var type))
             {
