@@ -13,7 +13,7 @@ namespace MonoGame.Effect
     public class SamplerStateInfo
     {
         private SamplerState _state;
-        
+
         private bool _dirty;
 
         private TextureFilterType _minFilter;
@@ -47,7 +47,7 @@ namespace MonoGame.Effect
 
         public string Name { get; set; }
 
-        public string TextureName { get; set; }
+        public string? TextureName { get; set; }
 
         public TextureFilterType MinFilter
         {
@@ -192,7 +192,7 @@ namespace MonoGame.Effect
             // Do we need to disable mipmapping?
             if (_mipFilter == TextureFilterType.None)
             {
-                // TODO: This is the only option we have right now for 
+                // TODO: This is the only option we have right now for
                 // disabling mipmapping.  We should add support for MinLod
                 // and MaxLod which potentially does a better job at this.
                 _state.MipMapLevelOfDetailBias = -16.0f;
@@ -201,7 +201,7 @@ namespace MonoGame.Effect
 
             _dirty = false;
         }
-        
+
         public SamplerState State
         {
             get

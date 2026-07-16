@@ -361,7 +361,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
                     PostProcessSteps.OptimizeMeshes |
                     PostProcessSteps.Triangulate
 
-                    // Unused: 
+                    // Unused:
                     //PostProcessSteps.CalculateTangentSpace
                     //PostProcessSteps.Debone |
                     //PostProcessSteps.FindInstances |      // No effect + slow?
@@ -385,7 +385,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
                 FindSkeleton();     // Find _rootBone, _bones, _deformationBones.
 
                 // Create _materials.
-                if (_xnaCompatible)
+                if (XnaCompatible)
                     ImportXnaMaterials();
                 else
                     ImportMaterials();

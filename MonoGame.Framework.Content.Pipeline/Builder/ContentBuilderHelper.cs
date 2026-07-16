@@ -8,6 +8,7 @@ using MonoGame.Framework.Content.Pipeline.Builder.Server;
 using MonoGame.Framework.Utilities;
 using System.Collections;
 using System.Diagnostics.Contracts;
+using System.Globalization;
 using System.Reflection;
 using YamlDotNet.Core;
 using YamlDotNet.Core.Events;
@@ -226,7 +227,7 @@ static class ContentBuilderHelper
         return true;
     }
 
-    public static void HashTypeAndProperties(object importerOrProcessor, ref Hash hash)
+    public static void HashTypeAndProperties(object? importerOrProcessor, ref Hash hash)
     {
         // Use the YAML serializer to generate a string with the
         // type and properties of this importer/processor.
