@@ -21,8 +21,7 @@ internal class SpirvTypeInt : SpirvTypeScalar
             return null;
 
         var id = parts[0];
-        if (!context.Names.TryGetValue(id, out var name))
-            return null;
+        context.Names.TryGetValue(id, out var name);
 
         if (!uint.TryParse(parts[3], CultureInfo.InvariantCulture, out uint width))
             return null;
