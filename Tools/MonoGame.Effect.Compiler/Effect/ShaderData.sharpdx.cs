@@ -61,9 +61,8 @@ namespace MonoGame.Effect
                                 samplerSlot = rdesc.BindPoint,
                                 parameterName = samplerName
                             };
-                            
-                            SamplerStateInfo state;
-                            if (samplerStates.TryGetValue(samplerName, out state))
+
+                            if (samplerStates.TryGetValue(samplerName, out var state))
                             {
                                 sampler.parameterName = state.TextureName ?? samplerName;
                                 sampler.state = state.State;

@@ -11,11 +11,6 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
     /// </summary>
     public sealed class PositionCollection : Collection<Vector3>
     {
-        /// <summary>
-        /// Initializes a new instance of PositionCollection.
-        /// </summary>
-        public PositionCollection()
-        {
-        }
+        
     }
 }
