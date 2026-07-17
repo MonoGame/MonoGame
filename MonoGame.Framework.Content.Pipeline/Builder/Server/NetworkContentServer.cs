@@ -2,6 +2,7 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
+using System.Globalization;
 using System.Net;
 using Microsoft.Xna.Framework.Content.Pipeline;
 
@@ -117,7 +118,7 @@ public class NetworkContentServer : ContentServer
         {
             if (fileExists && sentLastModifiedTimeStr != null)
             {
-                var sentLastModifiedTime = long.Parse(sentLastModifiedTimeStr);
+                var sentLastModifiedTime = long.Parse(sentLastModifiedTimeStr, CultureInfo.InvariantCulture);
                 if (sentLastModifiedTime == currentLastModifiedTime)
                 {
                     fileExists = false;

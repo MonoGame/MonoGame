@@ -2,10 +2,7 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
-using System;
 using Microsoft.Xna.Framework.Content.Pipeline.Audio;
-using System.IO;
-using MonoGame.Framework.Content.Pipeline.Builder;
 
 namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
 {
@@ -15,20 +12,11 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
     [ContentProcessor(DisplayName = "Sound Effect - MonoGame")]
     public class SoundEffectProcessor : ContentProcessor<AudioContent, SoundEffectContent>
     {
-        ConversionQuality quality = ConversionQuality.Best;
-
         /// <summary>
         /// Gets or sets the target format quality of the audio content.
         /// </summary>
         /// <value>The ConversionQuality of this audio data.</value>
-        public ConversionQuality Quality { get { return quality; } set { quality = value; } }
-
-        /// <summary>
-        /// Initializes a new instance of SoundEffectProcessor.
-        /// </summary>
-        public SoundEffectProcessor()
-        {
-        }
+        public ConversionQuality Quality { get; set; } = ConversionQuality.Best;
 
         /// <summary>
         /// Builds the content for the source audio.
@@ -38,17 +26,22 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
         /// <returns>The built audio.</returns>
         public override SoundEffectContent Process(AudioContent input, ContentProcessorContext context)
         {
-            if (input == null)
-                throw new ArgumentNullException("input");
-            if (context == null)
-                throw new ArgumentNullException("context");
+            ArgumentNullException.ThrowIfNull(input);
+            ArgumentNullException.ThrowIfNull(context);
 
             var profile = AudioProfile.ForPlatform(context.TargetPlatform);
-            var finalQuality = profile.ConvertAudio(context.TargetPlatform, quality, input);
-            if (quality != finalQuality)
-                context.Logger.LogMessage("Failed to convert using \"{0}\" quality, used \"{1}\" quality", quality, finalQuality);
+            var finalQuality = profile.ConvertAudio(context.TargetPlatform, Quality, input);
+            if (Quality != finalQuality)
+                context.Logger.Log(LogLevel.Info, $"Failed to convert using \"{Quality}\" quality, used \"{finalQuality}\" quality");
 
-            return new SoundEffectContent(input.Format.NativeWaveFormat, input.Data, input.LoopStart, input.LoopLength, (int)input.Duration.TotalMilliseconds);
+            return new SoundEffectContent
+            {
+                Format = [.. input.Format.NativeWaveFormat],
+                Data = [.. input.Data],
+                LoopStart = input.LoopStart,
+                LoopLength = input.LoopLength,
+                Duration = (int)input.Duration.TotalMilliseconds
+            };
         }
     }
 }

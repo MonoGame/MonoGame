@@ -10,7 +10,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
     /// An importer should produce results in the standard intermediate object model. If an asset has information not supported by the object model, the importer should output it as opaque data (key/value attributes attached to the relevant object). By following this procedure, a content pipeline can access specialized digital content creation (DCC) tool information, even when that information has not been fully standardized into the official object model.
     /// You can also design custom importers that accept and import types containing specific third-party extensions to the object model.
     /// </summary>
-    public abstract class ContentImporter<T> : IContentImporter
+    public abstract class ContentImporter<T> : IContentImporter where T : notnull
     {
         /// <summary>
         /// Initializes a new instance of ContentImporter.
@@ -39,12 +39,10 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
         /// <param name="filename">Name of a game asset file.</param>
         /// <param name="context">Contains information for importing a game asset, such as a logger interface.</param>
         /// <returns>Resulting game asset.</returns>
-        Object IContentImporter.Import(string filename, ContentImporterContext context)
+        object IContentImporter.Import(string filename, ContentImporterContext context)
         {
-            if (filename == null)
-                throw new ArgumentNullException("filename");
-            if (context == null)
-                throw new ArgumentNullException("context");
+            ArgumentNullException.ThrowIfNull(filename);
+            ArgumentNullException.ThrowIfNull(context);
             return Import(filename, context);
         }
     }

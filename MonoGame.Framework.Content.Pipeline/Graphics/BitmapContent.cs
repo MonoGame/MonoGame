@@ -2,7 +2,6 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
-using System;
 using Microsoft.Xna.Framework.Graphics;
 
 namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
@@ -12,23 +11,19 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
     /// </summary>
     public abstract class BitmapContent : ContentItem
     {
-        int height;
-        int width;
+        private int _height;
+        private int _width;
 
         /// <summary>
         /// Gets or sets the height of the bitmap, in pixels.
         /// </summary>
         public int Height
         {
-            get
-            {
-                return height;
-            }
+            get => _height;
             protected set
             {
-                if (value <= 0)
-                    throw new ArgumentOutOfRangeException("height");
-                height = value;
+                ArgumentOutOfRangeException.ThrowIfNegativeOrZero(value);
+                _height = value;
             }
         }
 
@@ -37,15 +32,11 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
         /// </summary>
         public int Width
         {
-            get
-            {
-                return width;
-            }
+            get => _width;
             protected set
             {
-                if (value <= 0)
-                    throw new ArgumentOutOfRangeException("width");
-                width = value;
+                ArgumentOutOfRangeException.ThrowIfNegativeOrZero(value);
+                _width = value;
             }
         }
 
@@ -76,10 +67,8 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
         /// <param name="destinationBitmap">BitmapContent being overwritten.</param>
         public static void Copy(BitmapContent sourceBitmap, BitmapContent destinationBitmap)
         {
-            if (sourceBitmap == null)
-                throw new ArgumentNullException("sourceBitmap");
-            if (destinationBitmap == null)
-                throw new ArgumentNullException("destinationBitmap");
+            ArgumentNullException.ThrowIfNull(sourceBitmap);
+            ArgumentNullException.ThrowIfNull(destinationBitmap);
 
             var sourceRegion = new Rectangle(0, 0, sourceBitmap.Width, sourceBitmap.Height);
             var destinationRegion = new Rectangle(0, 0, destinationBitmap.Width, destinationBitmap.Height);
@@ -99,11 +88,9 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
         {
             ValidateCopyArguments(sourceBitmap, sourceRegion, destinationBitmap, destinationRegion);
 
-            SurfaceFormat sourceFormat;
-            if (!sourceBitmap.TryGetFormat(out sourceFormat))
+            if (!sourceBitmap.TryGetFormat(out var sourceFormat))
                 throw new InvalidOperationException("Could not retrieve surface format of source bitmap");
-            SurfaceFormat destinationFormat;
-            if (!destinationBitmap.TryGetFormat(out destinationFormat))
+            if (!destinationBitmap.TryGetFormat(out var destinationFormat))
                 throw new InvalidOperationException("Could not retrieve surface format of destination bitmap");
 
             // If the formats are the same and the regions are the full bounds of the bitmaps and they are the same size, do a simpler copy
@@ -127,7 +114,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
             {
                 // Resize the intermediate if required
                 if (intermediate.Width != destinationRegion.Width || intermediate.Height != destinationRegion.Height)
-                    intermediate = intermediate.Resize(destinationRegion.Width, destinationRegion.Height) as PixelBitmapContent<Vector4>;
+                    intermediate = intermediate.Resize<PixelBitmapContent<Vector4>>(destinationRegion.Width, destinationRegion.Height);
                 // Copy from the intermediate to the destination
                 if (destinationBitmap.TryCopyFrom(intermediate, new Rectangle(0, 0, intermediate.Width, intermediate.Height), destinationRegion))
                     return;
@@ -153,10 +140,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
         /// Returns a string description of the bitmap resource.
         /// </summary>
         /// <returns>Description of the bitmap.</returns>
-        public override string ToString()
-        {
-            return string.Format("{0}, {1}x{2}", GetType().Name, Width, Height);
-        }
+        public override string ToString() => $"{GetType().Name}, {Width}x{Height}";
 
         /// <summary>
         /// Attempts to copy a region from a specified bitmap.
@@ -192,10 +176,9 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
         /// <param name="destinationRegion">Region of bitmap to be overwritten.</param>
         protected static void ValidateCopyArguments(BitmapContent sourceBitmap, Rectangle sourceRegion, BitmapContent destinationBitmap, Rectangle destinationRegion)
         {
-            if (sourceBitmap == null)
-                throw new ArgumentNullException("sourceBitmap");
-            if (destinationBitmap == null)
-                throw new ArgumentNullException("destinationBitmap");
+            ArgumentNullException.ThrowIfNull(sourceBitmap);
+            ArgumentNullException.ThrowIfNull(destinationBitmap);
+
             // Make sure regions are within the bounds of the bitmaps
             if (sourceRegion.Left < 0
                 || sourceRegion.Top < 0
@@ -203,14 +186,15 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
                 || sourceRegion.Height <= 0
                 || sourceRegion.Right > sourceBitmap.Width
                 || sourceRegion.Bottom > sourceBitmap.Height)
-                throw new ArgumentOutOfRangeException("sourceRegion");
+                throw new ArgumentOutOfRangeException(nameof(sourceRegion));
+
             if (destinationRegion.Left < 0
                 || destinationRegion.Top < 0
                 || destinationRegion.Width <= 0
                 || destinationRegion.Height <= 0
                 || destinationRegion.Right > destinationBitmap.Width
                 || destinationRegion.Bottom > destinationBitmap.Height)
-                throw new ArgumentOutOfRangeException("destinationRegion");
+                throw new ArgumentOutOfRangeException(nameof(destinationRegion));
         }
     }
 }

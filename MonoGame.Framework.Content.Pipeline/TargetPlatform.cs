@@ -2,7 +2,6 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
-using System;
 using System.ComponentModel;
 using System.Globalization;
 
@@ -103,17 +102,12 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
         XboxSeries
     }
 
-
     /// <summary>
     /// Deserialize legacy Platforms from .MGCB files.
     /// </summary>
-    internal class TargetPlatformTypeConverter : EnumConverter
+    internal class TargetPlatformTypeConverter(Type type) : EnumConverter(type)
     {
-        public TargetPlatformTypeConverter(Type type) : base(type)
-        {
-        }
-
-        public override object ConvertFrom(ITypeDescriptorContext context, CultureInfo culture, object value)
+        public override object? ConvertFrom(ITypeDescriptorContext? context, CultureInfo? culture, object value)
         {   
             try
             {
