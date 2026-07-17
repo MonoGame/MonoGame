@@ -265,18 +265,13 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
 
             if (CurrentPlatform.OS == OS.Linux && !AssimpLibrary.Instance.IsLibraryLoaded)
             {
-                var targetDir = new FileInfo(Assembly.GetExecutingAssembly().Location).Directory?.FullName ?? "";
-                var assimpLib = Path.Combine(targetDir, "libassimp.so");
-
-                try
-                {
-                    AssimpLibrary.Instance.LoadLibrary(assimpLib, assimpLib);
-                }
-                catch { }
+                var path = Path.Combine(AppContext.BaseDirectory, "runtimes", CurrentPlatform.Rid, "native", AssimpLibrary.Instance.DefaultLibraryName);
+                _context.Logger.Log(LogLevel.Info, $"Loading assimp from {path}");
+                AssimpLibrary.Instance.LoadLibrary(path);
             }
             if (CurrentPlatform.OS == OS.MacOSX && !AssimpLibrary.Instance.IsLibraryLoaded)
             {
-                var path = Path.Combine(AppContext.BaseDirectory, "runtimes", "osx", "native", AssimpLibrary.Instance.DefaultLibraryName);
+                var path = Path.Combine(AppContext.BaseDirectory, "runtimes", CurrentPlatform.Rid, "native", AssimpLibrary.Instance.DefaultLibraryName);
                 _context.Logger.Log(LogLevel.Info, $"Loading assimp from {path}");
                 AssimpLibrary.Instance.LoadLibrary(path);
             }
