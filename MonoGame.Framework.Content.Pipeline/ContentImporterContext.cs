@@ -25,14 +25,6 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
         public abstract string OutputDirectory { get; }
 
         /// <summary>
-        /// Initializes a new instance of ContentImporterContext.
-        /// </summary>
-        public ContentImporterContext()
-        {
-
-        }
-
-        /// <summary>
         /// Adds a dependency to the specified file. This causes a rebuild of the file, when modified, on subsequent incremental builds.
         /// </summary>
         /// <param name="filename">Name of an asset file.</param>

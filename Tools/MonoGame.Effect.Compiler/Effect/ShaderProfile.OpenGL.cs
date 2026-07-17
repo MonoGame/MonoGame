@@ -34,14 +34,14 @@ namespace MonoGame.Effect
             {
                 ParseShaderModel(pass.vsModel, GlslVertexShaderRegex, out major, out minor);
                 if (major > 3)
-                    throw new Exception(String.Format("Invalid profile '{0}'. Vertex shader '{1}' must be SM 3.0 or lower!", pass.vsModel, pass.vsFunction));
+                    throw new Exception($"Invalid profile '{pass.vsModel}'. Vertex shader '{pass.vsFunction}' must be SM 3.0 or lower!");
             }
 
             if (!string.IsNullOrEmpty(pass.psFunction))
             {
                 ParseShaderModel(pass.psModel, GlslPixelShaderRegex, out major, out minor);
                 if (major > 3)
-                    throw new Exception(String.Format("Invalid profile '{0}'. Pixel shader '{1}' must be SM 3.0 or lower!", pass.vsModel, pass.psFunction));
+                    throw new Exception($"Invalid profile '{pass.vsModel}'. Pixel shader '{pass.psFunction}' must be SM 3.0 or lower!");
             }
         }
 

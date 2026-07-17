@@ -2,8 +2,6 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
-using System;
-
 namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
 {
     /// <summary>
@@ -11,30 +9,23 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
     /// </summary>
     public abstract class ContentTypeWriter
     {
-        private readonly Type _targetType;
-        /// <summary/>
-        protected int _typeVersion;
-
         /// <summary>
         /// Determines if deserialization into an existing object is possible.
         /// </summary>
         /// <value>true if the object can be deserialized into; false otherwise.</value>
-        public virtual bool CanDeserializeIntoExistingObject
-        {
-            get { return false; }
-        }
+        public virtual bool CanDeserializeIntoExistingObject => false;
 
         /// <summary>
         /// Gets the type handled by this compiler component.
         /// </summary>
         /// <value>The type handled by this compiler component.</value>
-        public Type TargetType { get { return _targetType; } }
+        public Type TargetType { get; }
 
         /// <summary>
         /// Gets a format version number for this type.
         /// </summary>
         /// <value>A format version number for this type.</value>
-        public virtual int TypeVersion { get { return _typeVersion; } }
+        public virtual int TypeVersion { get; protected set; }
 
         /// <summary>
         /// Initializes a new instance of the ContentTypeWriter class.
@@ -42,12 +33,10 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
         /// <param name="targetType"></param>
         protected ContentTypeWriter(Type targetType)
         {
-            if (targetType == null)
-                throw new ArgumentNullException();
-
-            _targetType = targetType;
+            ArgumentNullException.ThrowIfNull(targetType);
+            TargetType = targetType;
         }
-        
+
         /// <summary>
         /// Gets the assembly qualified name of the runtime loader for this type.
         /// </summary>
@@ -60,10 +49,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
         /// </summary>
         /// <param name="targetPlatform">The target platform.</param>
         /// <returns>The qualified name.</returns>
-        public virtual string GetRuntimeType(TargetPlatform targetPlatform)
-        {
-            return _targetType.FullName + ", " + _targetType.Assembly.FullName;
-        }
+        public virtual string GetRuntimeType(TargetPlatform targetPlatform) => $"{TargetType.FullName}, {TargetType.Assembly.FullName }";
 
         /// <summary>
         /// Retrieves and caches nested type writers and allows for reflection over the target data type. Called by the framework at creation time.
@@ -71,7 +57,6 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
         /// <param name="compiler">The content compiler.</param>
         protected virtual void Initialize(ContentCompiler compiler)
         {
-
         }
 
         /// <summary>
@@ -80,7 +65,6 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
         /// <param name="writer">The content writer.</param>
         internal virtual void OnAddedToContentWriter(ContentWriter writer)
         {
-
         }
 
         /// <summary>

@@ -3,6 +3,7 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using Microsoft.Xna.Framework.Content.Pipeline.Graphics;
 using Microsoft.Xna.Framework.Graphics;
@@ -56,7 +57,7 @@ internal struct BasisUFormat
     public string encoderFlag;
 
     // Instead of constructing one of these yourself, please use one of the many predefined static class members.
-    private BasisUFormat(int code, string name, bool isLinearColorSpace=false, bool nonUastcCompatible=false, string encoderFlag="")
+    private BasisUFormat(int code, string name, bool isLinearColorSpace = false, bool nonUastcCompatible = false, string encoderFlag = "")
     {
         this.code = code;
         this.name = name;
@@ -266,7 +267,7 @@ internal static class BasisU
     /// so the only way to control the output is to control the working dir.
     /// </param>
     /// <returns>The exit code for the basisu process. </returns>
-    public static int Run(string args, out string stdOut, out string stdErr, string stdIn=null, string workingDirectory=null)
+    public static int Run(string args, out string stdOut, out string stdErr, string? stdIn = null, string? workingDirectory = null)
     {
         return Basisu.Run(args, out stdOut, out stdErr, stdIn, workingDirectory);
     }
@@ -439,7 +440,7 @@ internal static class BasisU
         BitmapContent sourceBitmap,
         SurfaceFormat format,
         out byte[] encodedBytes,
-        out string failureMessage)
+        out string? failureMessage)
     {
         failureMessage = null;
         encodedBytes = Array.Empty<byte>();
@@ -447,9 +448,9 @@ internal static class BasisU
 
         // these files will likely be created during this method, and should be
         //  deleted before exiting the function.
-        string pngFileName = null;
-        string intermediateFileName = null;
-        string ktxFileName = null;
+        string? pngFileName = null;
+        string? intermediateFileName = null;
+        string? ktxFileName = null;
 
         try
         {
@@ -507,7 +508,7 @@ internal static class BasisU
         string basisFileName,
         BasisUFormat basisUFormat,
         IContentContext context,
-        out string outputKtxFileName,
+        [MaybeNullWhen(false)] out string outputKtxFileName,
         out string error
     )
     {
@@ -575,7 +576,7 @@ internal static class BasisU
         out string stdErr)
     {
         var absImageFileName = Path.GetFullPath(imageFileName);
-        var uastcFlag = format.encoderFlag ?? (format.nonUastcCompatible ? "": "-uastc");
+        var uastcFlag = format.encoderFlag ?? (format.nonUastcCompatible ? "" : "-uastc");
         var argStr = $"-file \"{absImageFileName}\" {uastcFlag} -ktx2 -output_file \"{intermediateFileName}\"";
         var exitCode = Run(
             args: argStr,
