@@ -249,6 +249,12 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
         /// </summary>
         public bool IgnoreFbxUpDirection { get; set; } = true;
 
+        /// <summary>
+        /// If true, the pixot points for the FBX model will be preserved
+        /// <defaultValue>true</defaultValue>
+        /// </summary>
+        public bool PreservePivots {get; set; } = true;
+
         public override NodeContent Import(string filename, ContentImporterContext context)
         {
             ArgumentNullException.ThrowIfNull(filename);
@@ -346,6 +352,9 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
                 // FBXIgnoreUpDirectionConfig(true) can be set to ignore the up direction for custom axis.
                 importer.SetConfig(new Assimp.Configs.FBXIgnoreUpDirectionConfig(IgnoreFbxUpDirection));
 
+                // FBXPreservePivotsConfig(true)
+                importer.SetConfig(new Assimp.Configs.FBXPreservePivotsConfig(PreservePivots));
+
                 // Note about Assimp post-processing:
                 // Keep post-processing to a minimum. The ModelImporter should import
                 // the model as is. We don't want to lose any information, i.e. empty
@@ -397,8 +406,10 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
                 // mesh, we can flatten it out so the mesh is the root node.
                 if (_rootNode.Children.Count == 1 && _rootNode.Children[0] is MeshContent)
                 {
-                    var absXform = _rootNode.Children[0].AbsoluteTransform;
-                    _rootNode = _rootNode.Children[0];
+                    var mesh = _rootNode.Children[0];
+                    var absXform = mesh.AbsoluteTransform;
+                    _rootNode.Children.Remove(mesh);
+                    _rootNode = mesh;
                     _rootNode.Identity = _identity;
                     _rootNode.Transform = absXform;
                 }
