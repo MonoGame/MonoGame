@@ -1,4 +1,6 @@
 using System.Diagnostics;
+using MonoGame.Framework.Content.Pipeline.Builder;
+using NVorbis;
 
 namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 {
@@ -10,6 +12,18 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
         private static bool IsFinite(float v) => !float.IsInfinity(v) && !float.IsNaN(v);
 
         private static bool IsFinite(this Vector3 v) => IsFinite(v.X) && IsFinite(v.Y) && IsFinite(v.Z);
+
+        static Vector3 CalculateOrigin(GeometryContent geom)
+        {
+            var boundsMin = new Vector3(float.MaxValue);
+            var boundsMax = new Vector3(float.MinValue);
+            foreach (var position in geom.Vertices.Positions)
+            {
+                boundsMin = Vector3.Min(boundsMin, position);
+                boundsMax = Vector3.Max(boundsMax, position);
+            }
+            return (boundsMin + boundsMax) * 0.5f;
+        }
 
         /// <summary>
         /// Generates vertex normals by accumulation of triangle face normals.
@@ -54,6 +68,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
             }
 
             var positionIndices = geom.Vertices.PositionIndices;
+            var origin = CalculateOrigin(geom);
             Debug.Assert(positionIndices.Count == channel.Count, "The position and channel sizes were different!");
 
             // Accumulate all the triangle face normals for each vertex.
@@ -105,16 +120,10 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
                     normals[i] = normal / len;
                 else
                 {
-                    // TODO: It would be nice to be able to log this to
-                    // the pipeline so that it can be fixed in the model.
-
-                    // TODO: We could maybe void this by a better algorithm
-                    // above for generating the normals.
-
-                    // We have a zero length normal.  You can argue that putting
-                    // anything here is better than nothing, but by leaving it to
-                    // zero it allows the caller to detect this and react to it.
-                    normals[i] = Vector3.Zero;
+                    // degenerate triangle backup, calculate a normal which points away from the model origin.
+                    // seems like a decent fallback to me. Worse case Vector3.Zero.
+                    var radialNormal = geom.Vertices.Positions[i] - origin;
+                    normals[i] = radialNormal.Length() > 0.0f ? Vector3.Normalize(radialNormal) : Vector3.Zero;
                 }
             }
 
