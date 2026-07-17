@@ -274,6 +274,8 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
                 catch { }
             }
 
+            _context.Logger.Log(LogLevel.Info, $"{AssimpLibrary.Instance.GetVersion()}");
+
             _identity = new ContentIdentity(filename, _importerName);
 
             using var importer = new AssimpContext();
