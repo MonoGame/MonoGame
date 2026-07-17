@@ -62,7 +62,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="AssimpNetter" Version="6.0.4.0" />
+    <PackageReference Include="AssimpNetter" Version="6.0.5.0" ExcludeAssets="native;build" />
+    <PackageReference Include="MonoGame.Library.Assimp" Version="6.0.5.1" />
     <PackageReference Include="BCnEncoder.Net" Version="2.1.0" />
     <PackageReference Include="Microsoft.VisualBasic" Version="10.3.0" />
     <PackageReference Include="MonoGame.Library.FreeType" Version="2.13.2.3" />
