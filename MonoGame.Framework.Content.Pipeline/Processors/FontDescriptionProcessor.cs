@@ -2,11 +2,7 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
-using System;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.IO;
-using System.Linq;
 using Microsoft.Win32;
 using Microsoft.Xna.Framework.Content.Pipeline.Graphics;
 using MonoGame.Framework.Utilities;
@@ -17,17 +13,10 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
     [ContentProcessor(DisplayName = "Sprite Font Description - MonoGame")]
     public class FontDescriptionProcessor : ContentProcessor<FontDescription, SpriteFontContent>
     {
-        [DefaultValue(true)]
-        public virtual bool PremultiplyAlpha { get; set; }
+        [DefaultValue(true)] public virtual bool PremultiplyAlpha { get; set; } = true;
 
         [DefaultValue(typeof(TextureProcessorOutputFormat), "Compressed")]
-        public virtual TextureProcessorOutputFormat TextureFormat { get; set; }
-
-        public FontDescriptionProcessor()
-        {
-            PremultiplyAlpha = true;
-            TextureFormat = TextureProcessorOutputFormat.Compressed;
-        }
+        public virtual TextureProcessorOutputFormat TextureFormat { get; set; } = TextureProcessorOutputFormat.Compressed;
 
         public override SpriteFontContent Process(FontDescription input, ContentProcessorContext context)
         {
@@ -37,17 +26,26 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
             // Look for fonts by filename
             if (string.IsNullOrWhiteSpace(fontFile))
             {
-                var directories = new List<string> { Path.GetDirectoryName(input.Identity.SourceFilename) };
+                var directories = new List<string>();
+                if (input.Identity != null &&
+                    Path.GetDirectoryName(input.Identity.SourceFilename) is string spath &&
+                    !string.IsNullOrWhiteSpace(spath))
+                {
+                    directories.Add(spath);
+                }
                 var extensions = new string[] { "", ".ttf", ".ttc", ".otf" };
 
-                // Add special per platform directories
-                if (CurrentPlatform.OS == OS.Windows)
-                    directories.Add(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Fonts)));
-                else if (CurrentPlatform.OS == OS.MacOSX)
+                switch (CurrentPlatform.OS)
                 {
-                    directories.Add(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Personal), "Library", "Fonts"));
-                    directories.Add("/Library/Fonts");
-                    directories.Add("/System/Library/Fonts/Supplemental");
+                    // Add special per platform directories
+                    case OS.Windows:
+                        directories.Add(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Fonts)));
+                        break;
+                    case OS.MacOSX:
+                        directories.Add(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Personal), "Library", "Fonts"));
+                        directories.Add("/Library/Fonts");
+                        directories.Add("/System/Library/Fonts/Supplemental");
+                        break;
                 }
 
                 foreach (var dir in directories)
@@ -66,7 +64,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
             if (!File.Exists(fontFile))
                 throw new FileNotFoundException("Could not find \"" + input.FontName + "\" font file at \"" + fontFile + "\".");
 
-            context.Logger.LogMessage("Building Font {0}", fontFile);
+            context.Logger.Log(LogLevel.Info, $"Building Font {fontFile}");
 
             // Get the platform specific texture profile.
             var texProfile = TextureProfile.ForPlatform(context.TargetPlatform);
@@ -74,12 +72,9 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
             {
                 if (!File.Exists(fontFile))
                 {
-                    throw new Exception(string.Format("Could not load {0}", fontFile));
+                    throw new Exception($"Could not load {fontFile}");
                 }
-                var lineSpacing = 0f;
-                long yOffsetMin = 0;
-                var glyphs = ImportFont(input, out lineSpacing, out yOffsetMin, context, fontFile);
-
+                var glyphs = ImportFont(input, out float lineSpacing, out var yOffsetMin, fontFile);
                 var glyphData = new HashSet<GlyphData>(glyphs.Select(x => x.Data));
 
                 // Optimize.
@@ -89,10 +84,9 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
                 }
 
                 // We need to know how to pack the glyphs.
-                bool requiresPot, requiresSquare;
-                texProfile.Requirements(context, TextureFormat, out requiresPot, out requiresSquare);
+                texProfile.Requirements(context, TextureFormat, out var requiresPot, out var requiresSquare);
 
-                var face = GlyphPacker.ArrangeGlyphs(glyphData.ToArray(), requiresPot, requiresSquare);
+                var face = GlyphPacker.ArrangeGlyphs([.. glyphData], requiresPot, requiresSquare);
 
                 // Adjust line and character spacing.
                 lineSpacing += input.Spacing;
@@ -102,7 +96,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
                 {
                     output.CharacterMap.Add(glyph.Character);
 
-                    var texRect = glyph.Data.Subrect;
+                    var texRect = glyph.Data.SubRect;
                     output.Glyphs.Add(texRect);
 
                     var cropping = new Rectangle(0, (int)(glyph.Data.YOffset - yOffsetMin), (int)glyph.Data.XAdvance, output.VerticalLineSpacing);
@@ -170,15 +164,14 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
             return output;
         }
 
-        private static Glyph[] ImportFont(FontDescription options, out float lineSpacing, out long yOffsetMin, ContentProcessorContext context, string fontName)
+        private static Glyph[] ImportFont(FontDescription options, out float lineSpacing, out long yOffsetMin, string fontName)
         {
             // Which importer knows how to read this source font?
-            IFontImporter importer;
 
-            var TrueTypeFileExtensions = new List<string> { ".ttf", ".ttc", ".otf" };
+            var trueTypeFileExtensions = new List<string> { ".ttf", ".ttc", ".otf" };
             //var BitmapFileExtensions = new List<string> { ".bmp", ".png", ".gif" };
 
-            string fileExtension = Path.GetExtension(fontName).ToLowerInvariant();
+            var fileExtension = Path.GetExtension(fontName).ToLowerInvariant();
 
             //			if (BitmapFileExtensions.Contains(fileExtension))
             //			{
@@ -186,10 +179,10 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
             //			}
             //			else
             //			{
-            if (!TrueTypeFileExtensions.Contains(fileExtension))
+            if (!trueTypeFileExtensions.Contains(fileExtension))
                 throw new PipelineException("Unknown file extension " + fileExtension);
 
-            importer = new SharpFontImporter();
+            var importer = new SharpFontImporter();
 
             // Import the source font data.
             importer.Import(options, fontName);
@@ -231,20 +224,29 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
             return glyphs.ToArray();
         }
 
-        private string FindFont(string name, string style)
+        private static string? FindFont(string name, string style)
         {
             if (CurrentPlatform.OS == OS.Windows)
             {
 #pragma warning disable CA1416 // Validate platform compatibility
                 var fontDirectory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Windows), "Fonts");
-                foreach (var key in new RegistryKey[] { Registry.LocalMachine, Registry.CurrentUser })
+                foreach (var key in new[] { Registry.LocalMachine, Registry.CurrentUser })
                 {
                     var subkey = key.OpenSubKey(@"SOFTWARE\Microsoft\Windows NT\CurrentVersion\Fonts", false);
+                    if (subkey == null)
+                    {
+                        return null;
+                    }
+
                     foreach (var font in subkey.GetValueNames().OrderBy(x => x))
                     {
                         if (font.StartsWith(name, StringComparison.OrdinalIgnoreCase))
                         {
-                            var fontPath = subkey.GetValue(font).ToString();
+                            var fontPath = subkey.GetValue(font)?.ToString();
+                            if (string.IsNullOrWhiteSpace(fontPath))
+                            {
+                                return null;
+                            }
 
                             // The registry value might have trailing NUL characters
                             // See https://github.com/MonoGame/MonoGame/issues/4061
@@ -263,37 +265,36 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
             }
             else if (CurrentPlatform.OS == OS.Linux)
             {
-                string s, e;
-                ExternalTool.Run("/bin/bash", string.Format("-c \"fc-match -f '%{{file}}:%{{family}}\\n' '{0}:style={1}'\"", name, style), out s, out e);
+                ExternalTool.Run("/bin/bash", $"-c \"fc-match -f '%{{file}}:%{{family}}\\n' '{name}:style={style}'\"", out var s, out var e);
                 s = s.Trim();
 
                 var split = s.Split(':');
                 if (split.Length < 2)
-                    return string.Empty;
+                    return null;
 
                 // check font family, fontconfig might return a fallback
-                if (split[1].Contains(","))
+                if (split[1].Contains(','))
                 {
                     // this file defines multiple family names
                     var families = split[1].Split(',');
                     foreach (var f in families)
                     {
-                        if (f.ToLowerInvariant() == name.ToLowerInvariant())
+                        if (f.Equals(name, StringComparison.InvariantCultureIgnoreCase))
                             return split[0];
                     }
                     // didn't find it
-                    return string.Empty;
+                    return null;
                 }
                 else
                 {
-                    if (split[1].ToLowerInvariant() != name.ToLowerInvariant())
-                        return string.Empty;
+                    if (!split[1].Equals(name, StringComparison.InvariantCultureIgnoreCase))
+                        return null;
                 }
 
                 return split[0];
             }
 
-            return String.Empty;
+            return null;
         }
 
          private static bool MatchFont(string fontPath, string fontName, string fontStyle)

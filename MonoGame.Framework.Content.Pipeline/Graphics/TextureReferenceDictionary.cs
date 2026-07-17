@@ -9,11 +9,5 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
     /// </summary>
     public sealed class TextureReferenceDictionary : NamedValueDictionary<ExternalReference<TextureContent>>
     {
-        /// <summary>
-        /// Initializes a new instance of TextureReferenceDictionary.
-        /// </summary>
-        public TextureReferenceDictionary()
-        {
-        }
     }
 }

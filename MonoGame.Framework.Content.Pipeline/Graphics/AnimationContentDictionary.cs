@@ -7,13 +7,5 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
     /// <summary>
     /// Collection of named animations.
     /// </summary>
-    public sealed class AnimationContentDictionary : NamedValueDictionary<AnimationContent>
-    {
-        /// <summary>
-        /// Initializes a new instance of AnimationContentDictionary.
-        /// </summary>
-        public AnimationContentDictionary()
-        {
-        }
-    }
+    public sealed class AnimationContentDictionary : NamedValueDictionary<AnimationContent>;
 }

@@ -2,27 +2,23 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
-using System;
-using TOutput = System.DateTime;
+namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler;
 
-namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
+/// <summary>
+/// Writes the DateTime value to the output.
+/// </summary>
+[ContentTypeWriter]
+class DateTimeWriter : BuiltInContentWriter<DateTime>
 {
     /// <summary>
-    /// Writes the DateTime value to the output.
+    /// Writes the value to the output.
     /// </summary>
-    [ContentTypeWriter]
-    class DateTimeWriter : BuiltInContentWriter<TOutput>
+    /// <param name="output">The output writer object.</param>
+    /// <param name="value">The value to write to the output.</param>
+    protected override void Write(ContentWriter output, DateTime value)
     {
-        /// <summary>
-        /// Writes the value to the output.
-        /// </summary>
-        /// <param name="output">The output writer object.</param>
-        /// <param name="value">The value to write to the output.</param>
-        protected internal override void Write(ContentWriter output, TOutput value)
-        {
-            UInt64 ticks = (UInt64)value.Ticks & ~((UInt64)0xC << 62);
-            UInt64 kind = (UInt64)value.Kind << 62;
-            output.Write((UInt64)(ticks | kind));
-        }
+        var ticks = (ulong)value.Ticks & ~(3ul << 62);
+        var kind = (ulong)value.Kind << 62;
+        output.Write(ticks | kind);
     }
 }

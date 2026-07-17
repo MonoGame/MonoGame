@@ -14,7 +14,7 @@ internal partial class ConstantBuffer
 
     private unsafe void PlatformInitialize()
     {
-        Handle = MGG.Buffer_Create(GraphicsDevice.Handle, BufferType.Constant, _buffer.Length);
+        Handle = MGG.Buffer_Create(GraphicsDevice.Handle, BufferType.Constant, true, _buffer.Length);
     }
 
     private void PlatformClear()
