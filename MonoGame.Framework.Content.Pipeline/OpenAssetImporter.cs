@@ -282,7 +282,10 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
                 AssimpLibrary.Instance.LoadLibrary(path);
             }
 
-            _context.Logger.Log(LogLevel.Info, $"{AssimpLibrary.Instance.DefaultLibraryName} v{AssimpLibrary.Instance.GetVersionMajor()}.{AssimpLibrary.Instance.GetVersionMinor()}.{AssimpLibrary.Instance.GetVersionRevision()} from {AssimpLibrary.Instance.LibraryPath}");
+            var v = AssimpLibrary.Instance.GetVersionAsVersion();
+            _context.Logger.Log(LogLevel.Info, $"{AssimpLibrary.Instance.DefaultLibraryName} v{v.Major}.{v.Minor}.{v.Build}.{v.Revision} from {AssimpLibrary.Instance.LibraryPath}");
+            _context.Logger.Log(LogLevel.Info, $"{AssimpLibrary.Instance.GetBranchName()}");
+            AssimpLibrary.Instance.EnableVerboseLogging(true);
 
             _identity = new ContentIdentity(filename, _importerName);
 
