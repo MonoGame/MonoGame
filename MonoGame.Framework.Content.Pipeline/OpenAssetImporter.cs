@@ -5,6 +5,7 @@
 using System.Diagnostics;
 using System.Numerics;
 using System.Reflection;
+using System.Runtime.InteropServices;
 using Assimp;
 using Assimp.Unmanaged;
 using Microsoft.Xna.Framework.Content.Pipeline.Graphics;
@@ -262,7 +263,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
 
             _context = context;
 
-            if (CurrentPlatform.OS == OS.Linux)
+            if (CurrentPlatform.OS == OS.Linux && !AssimpLibrary.Instance.IsLibraryLoaded)
             {
                 var targetDir = new FileInfo(Assembly.GetExecutingAssembly().Location).Directory?.FullName ?? "";
                 var assimpLib = Path.Combine(targetDir, "libassimp.so");
@@ -273,8 +274,20 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
                 }
                 catch { }
             }
+            if (CurrentPlatform.OS == OS.MacOSX && !AssimpLibrary.Instance.IsLibraryLoaded)
+            {
+                var path = Path.Combine(AppContext.BaseDirectory, "runtimes", "osx", "native", AssimpLibrary.Instance.DefaultLibraryName);
+                _context.Logger.Log(LogLevel.Info, $"Loading assimp from {path}");
+                AssimpLibrary.Instance.LoadLibrary(path);
+            }
+            if (CurrentPlatform.OS == OS.Windows && !AssimpLibrary.Instance.IsLibraryLoaded)
+            {
+                var path = Path.Combine(AppContext.BaseDirectory, "runtimes", CurrentPlatform.Rid, "native", AssimpLibrary.Instance.DefaultLibraryName);
+                _context.Logger.Log(LogLevel.Info, $"Loading assimp from {path}");
+                AssimpLibrary.Instance.LoadLibrary(path);
+            }
 
-            _context.Logger.Log(LogLevel.Info, $"{AssimpLibrary.Instance.GetVersion()}");
+            _context.Logger.Log(LogLevel.Info, $"{AssimpLibrary.Instance.DefaultLibraryName} v{AssimpLibrary.Instance.GetVersionMajor()}.{AssimpLibrary.Instance.GetVersionMinor()}.{AssimpLibrary.Instance.GetVersionRevision()} from {AssimpLibrary.Instance.LibraryPath}");
 
             _identity = new ContentIdentity(filename, _importerName);
 
