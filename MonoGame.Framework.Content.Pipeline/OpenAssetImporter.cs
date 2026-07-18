@@ -357,8 +357,9 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
             {
                 // FBXPreservePivotsConfig(false) can be set to remove transformation
                 // pivots. However, Assimp does not automatically correct animations!
-                // --> Leave default settings, handle transformation pivots explicitly.
-                //importer.SetConfig(new Assimp.Configs.FBXPreservePivotsConfig(false));
+                // we default PreservePivots to true (like assimp) but we want to give
+                // users the control to enable this if they want.
+                importer.SetConfig(new Assimp.Configs.FBXPreservePivotsConfig(PreservePivots));
 
                 // Set flag to remove degenerate faces (points and lines).
                 // This flag is very important when PostProcessSteps.FindDegenerates is used

@@ -1,6 +1,4 @@
 using System.Diagnostics;
-using MonoGame.Framework.Content.Pipeline.Builder;
-using NVorbis;
 
 namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 {
