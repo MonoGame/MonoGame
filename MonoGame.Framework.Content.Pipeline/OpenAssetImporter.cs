@@ -301,6 +301,9 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
             // because FindDegenerates converts degenerate triangles to points and lines!
             importer.SetConfig(new Assimp.Configs.RemoveDegeneratePrimitivesConfig(true));
 
+            // FBXIgnoreUpDirectionConfig(true) can be set to ignore the up direction for custom axis.
+            importer.SetConfig(new Assimp.Configs.FBXIgnoreUpDirectionConfig(IgnoreFbxUpDirection));
+
             // Note about Assimp post-processing:
             // Keep post-processing to a minimum. The ModelImporter should import
             // the model as is. We don't want to lose any information, i.e. empty
