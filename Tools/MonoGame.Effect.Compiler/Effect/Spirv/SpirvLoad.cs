@@ -9,22 +9,23 @@ namespace MonoGame.Effect.Compiler.Effect.Spirv
     // https://registry.khronos.org/SPIR-V/specs/unified1/SPIRV.html#OpLoad
     internal class SpirvLoad
     {
-        public string Id { get; private set; }
-        public SpirvTypeBase ResultType { get; private set; }
-        public SpirvVariable Variable { get; private set; }
+        public required string Id { get; init; }
+        public required SpirvTypeBase ResultType { get; init; }
+        public required SpirvVariable Variable { get; init; }
 
-        internal static SpirvLoad ParseLoad(string[] parts, SpirvReflectionInfo.SpirvParseContext context)
+        internal static SpirvLoad? ParseLoad(string[] parts, SpirvReflectionInfo.SpirvParseContext context)
         {
-            if (!context.Types.TryGetValue(parts[3], out SpirvTypeBase spirvTypeBase))
+            if (parts.Length < 5)
+                return null;
+            
+            if (!context.Types.TryGetValue(parts[3], out var spirvTypeBase))
             {
                 Debug.WriteLine($"OpLoad referenced unparsed type {parts[3]}");
                 return null;
             }
 
-            if (!context.Variables.TryGetValue(parts[4], out SpirvVariable spirvVariable))
-            {
+            if (!context.Variables.TryGetValue(parts[4], out var spirvVariable))
                 return null;
-            }
 
             return new SpirvLoad
             {

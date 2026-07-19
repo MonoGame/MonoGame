@@ -68,7 +68,7 @@ namespace Microsoft.Xna.Framework.Graphics
         /// <summary>
         /// Gets or sets the blend factor for the destination alpha, which is the
         /// percentage of the destination alpha included in the blended result.
-        /// The default is <see cref="Blend.One"/>.
+        /// The default is <see cref="Blend.Zero"/>.
         /// </summary>
         /// <value>
         /// A value from the <see cref="Blend"/> enumeration.
@@ -119,7 +119,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
         /// <summary>
         /// Gets or sets the blend factor for the destination color.
-        /// The default is <see cref="Blend.One"/>.
+        /// The default is <see cref="Blend.Zero"/>.
         /// </summary>
         /// <value>
         /// A value from the <see cref="Blend"/> enumeration.

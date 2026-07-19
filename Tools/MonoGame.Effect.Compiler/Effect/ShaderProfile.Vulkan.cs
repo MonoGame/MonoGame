@@ -1,9 +1,10 @@
-﻿// MonoGame - Copyright (C) MonoGame Foundation, Inc
+// MonoGame - Copyright (C) MonoGame Foundation, Inc
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -31,13 +32,13 @@ namespace MonoGame.Effect
             if (!string.IsNullOrEmpty(pass.vsFunction))
             {
                 if (pass.vsModel != "vs_6_0")
-                    throw new Exception(String.Format("Invalid Vulkan vertex profile '{0}'! Requires vs_6_0.", pass.vsModel));
+                    throw new Exception($"Invalid Vulkan vertex profile '{pass.vsModel}'! Requires vs_6_0.");
             }
 
             if (!string.IsNullOrEmpty(pass.psFunction))
             {
                 if (pass.psModel != "ps_6_0")
-                    throw new Exception(String.Format("Invalid Vulkan pixel profile '{0}'! Requires ps_6_0.", pass.psModel));
+                    throw new Exception($"Invalid Vulkan pixel profile '{pass.psModel}'! Requires ps_6_0.");
             }
         }
 
@@ -110,7 +111,7 @@ namespace MonoGame.Effect
         {
             const int SlotOffset = 32;
 
-            var outputPath = Path.GetDirectoryName(shaderResult.OutputFilePath);
+            var outputPath = Path.GetDirectoryName(shaderResult.OutputFilePath) ?? "";
             var sourceFileName = Path.GetFileNameWithoutExtension(shaderResult.FilePath) + "." + shaderFunction;
 
             // TODO: We have no intermediate folder in 2MGFX for temp stuff
@@ -261,9 +262,13 @@ namespace MonoGame.Effect
                             throw new ShaderCompilerException();
                         }
 
-                        SpirvTypeStruct constantBuffer = variable.Pointer.PointerType as SpirvTypeStruct;
-                        ConstantBufferData cbuffer = ConstantBufferData.BuildFromSpirvStruct(constantBuffer);
+                        if (variable.Pointer.PointerType is not SpirvTypeStruct constantBuffer)
+                        {
+                            errorsAndWarnings += $"Type for {variable.Pointer.Name ?? variable.Pointer.Id} was `Struct` but PointerType was not `SpirvTypeStruct`.";
+                            throw new ShaderCompilerException();
+                        }
 
+                        var cbuffer = ConstantBufferData.BuildFromSpirvStruct(constantBuffer);
                         if (cbuffer.Size > 0)
                         {
                             var match = effect.ConstantBuffers.FindIndex(e => e.SameAs(cbuffer));
@@ -292,25 +297,25 @@ namespace MonoGame.Effect
                             var samplerVariable = sampledImage.LoadedSampler.Variable;
                             var imageVariable = sampledImage.LoadedImage.Variable;
 
-                            var samplerType = samplerVariable.Pointer.PointerType as SpirvTypeSampler;
-                            var imageType = imageVariable.Pointer.PointerType as SpirvTypeImage;
+                            var samplerType = (SpirvTypeSampler)samplerVariable.Pointer.PointerType;
+                            var imageType = (SpirvTypeImage)imageVariable.Pointer.PointerType;
 
                             var sampler = new ShaderData.Sampler
                             {
-                                samplerSlot = (int)samplerVariable.BindingSlot.Value - SlotOffset,
-                                samplerName = samplerVariable.Name,
-                                textureSlot = (int)imageVariable.BindingSlot.Value - SlotOffset,
+                                samplerSlot = (int)(samplerVariable.BindingSlot ?? 0) - SlotOffset,
+                                samplerName = samplerVariable.Name ?? samplerVariable.Id,
+                                textureSlot = (int)(imageVariable.BindingSlot ?? 0) - SlotOffset,
                             };
 
                             // This image is only sampled by one sampler, we can safely use the texture name for the parameter.
                             if (sampledImages.Count() == 1)
                             {
-                                sampler.parameterName = imageVariable.Name;
+                                sampler.parameterName = imageVariable.Name ?? imageVariable.Id;
                             }
                             // otherwise make a composite name for this image/sampler combo.
                             else
                             {
-                                sampler.parameterName = $"{samplerVariable.Name}+{imageVariable.Name}";
+                                sampler.parameterName = $"{samplerVariable.Name ?? imageVariable.Id}+{imageVariable.Name ?? imageVariable.Id}";
                             }
 
                             switch (imageType.Dimensionality)
@@ -329,7 +334,7 @@ namespace MonoGame.Effect
                                     break;
                             }
 
-                            if (!shaderResult.ShaderInfo.SamplerStates.TryGetValue(samplerVariable.Name, out SamplerStateInfo samplerStateInfo))
+                            if (!shaderResult.ShaderInfo.SamplerStates.TryGetValue(samplerVariable.Name ?? samplerVariable.Id, out SamplerStateInfo? samplerStateInfo))
                             {
                                 errorsAndWarnings += $"Could not find sampler state info for sampler '{samplerVariable.Name}'; using defaults\n";
                                 samplerStateInfo = new SamplerStateInfo();
@@ -360,16 +365,16 @@ namespace MonoGame.Effect
                                     continue;
 
                                 var imageVariable = image.Variable;
-                                var imageType = imageVariable.Pointer.PointerType as SpirvTypeImage;
+                                var imageType = (SpirvTypeImage)imageVariable.Pointer.PointerType;
 
                                 var sampler = new ShaderData.Sampler
                                 {
                                     samplerSlot = -1,
                                     samplerName = string.Empty,
-                                    textureSlot = (int)imageVariable.BindingSlot.Value - SlotOffset,
+                                    textureSlot = (int)(imageVariable.BindingSlot ?? 0) - SlotOffset,
                                 };
 
-                                sampler.parameterName = imageVariable.Name;
+                                sampler.parameterName = imageVariable.Name ?? imageVariable.Id;
 
                                 switch (imageType.Dimensionality)
                                 {
@@ -403,73 +408,98 @@ namespace MonoGame.Effect
 
                     foreach (SpirvVariable input in sorted)
                     {
-                        var a = new ShaderData.Attribute();
                         var semanticId = input.HlslSemantic ?? input.Id.Replace("%in_var_", "");
 
                         var m = Regex.Match(semanticId, @"(\D+)(\d+)?");
-                        if (m.Groups[2].Success)
-                            a.index = int.Parse(m.Groups[2].Value);
-                        else
-                            a.index = 0;
+                        int indexOffset = m.Groups[2].Success
+                            ? int.Parse(m.Groups[2].Value, CultureInfo.InvariantCulture)
+                            : 0;
+
+                        var usage = VertexElementUsage.TextureCoordinate;
 
                         if (m.Groups[1].Success)
                         {
-                            switch (m.Groups[1].Value.ToUpper())
+                            switch (m.Groups[1].Value.ToUpper(CultureInfo.InvariantCulture))
                             {
                                 default:
                                     // Give a warning which hopefully someone notices.
                                     errorsAndWarnings += $"Unknown vertex shader input semantic `{m.Groups[1].Value}`; defaulting to texture coord.\n";
-                                    a.usage = VertexElementUsage.TextureCoordinate;
+                                    usage = VertexElementUsage.TextureCoordinate;
                                     break;
                                 case "TEXCOORD":
-                                    a.usage = VertexElementUsage.TextureCoordinate;
+                                    usage = VertexElementUsage.TextureCoordinate;
                                     break;
                                 // NOTE: Some shaders incorrectly pass in SV_POSITION to
                                 // the vertex shader which is allowed in DX11, so we allow
                                 // it here as well.
                                 case "SV_POSITION":
                                 case "POSITION":
-                                    a.usage = VertexElementUsage.Position;
+                                    usage = VertexElementUsage.Position;
                                     break;
                                 case "NORMAL":
-                                    a.usage = VertexElementUsage.Normal;
+                                    usage = VertexElementUsage.Normal;
                                     break;
                                 case "TANGENT":
-                                    a.usage = VertexElementUsage.Tangent;
+                                    usage = VertexElementUsage.Tangent;
                                     break;
                                 case "BINORMAL":
-                                    a.usage = VertexElementUsage.Binormal;
+                                    usage = VertexElementUsage.Binormal;
                                     break;
                                 case "COLOR":
-                                    a.usage = VertexElementUsage.Color;
+                                    usage = VertexElementUsage.Color;
                                     break;
                                 case "BLENDINDICES":
-                                    a.usage = VertexElementUsage.BlendIndices;
+                                    usage = VertexElementUsage.BlendIndices;
                                     break;
                                 case "BLENDWEIGHT":
-                                    a.usage = VertexElementUsage.BlendWeight;
+                                    usage = VertexElementUsage.BlendWeight;
                                     break;
                                 case "DEPTH":
-                                    a.usage = VertexElementUsage.Depth;
+                                    usage = VertexElementUsage.Depth;
                                     break;
                                 case "FOG":
-                                    a.usage = VertexElementUsage.Fog;
+                                    usage = VertexElementUsage.Fog;
                                     break;
                                 case "POINTSIZE":
-                                    a.usage = VertexElementUsage.PointSize;
+                                    usage = VertexElementUsage.PointSize;
                                     break;
                                 case "TESSELLATEFACTOR":
-                                    a.usage = VertexElementUsage.TessellateFactor;
+                                    usage = VertexElementUsage.TessellateFactor;
                                     break;
                             }
                         }
 
-                        // TODO: These are unused at runtime under the
-                        // new native backends, we will remove them soon.               
-                        a.location = 0;
-                        a.name = string.Empty;
+                        uint locationCount = 1;
+                        var pointerType = input.Pointer?.PointerType;
 
-                        attributes.Add(a);
+                        if (pointerType is SpirvTypeArray spirvTypeArray)
+                        {
+                            locationCount = spirvTypeArray.Length;
+                            if (spirvTypeArray.ElementType is SpirvTypeMatrix spirvTypeMatrix)
+                            {
+                                locationCount *= spirvTypeMatrix.Columns;
+                            }
+                        }
+                        else if (pointerType is SpirvTypeMatrix spirvTypeMatrix)
+                        {
+                            locationCount = spirvTypeMatrix.Columns;
+                        }
+
+                        for (int locationIndex = 0; locationIndex < locationCount; locationIndex++)
+                        {
+                            var a = new ShaderData.Attribute
+                            {
+                                usage = usage,
+                                index = indexOffset + locationIndex,
+
+                                // TODO: These are unused at runtime under the
+                                // new native backends, we will remove them soon.
+                                location = 0,
+                                name = string.Empty,
+                            };
+
+                            attributes.Add(a);
+                        }
                     }
                 }
 

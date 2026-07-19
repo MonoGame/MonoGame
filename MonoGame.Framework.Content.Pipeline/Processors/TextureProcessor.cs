@@ -2,7 +2,6 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
-using System;
 using System.ComponentModel;
 using Microsoft.Xna.Framework.Content.Pipeline.Graphics;
 using Microsoft.Xna.Framework.Graphics;
@@ -16,23 +15,13 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
     public class TextureProcessor : ContentProcessor<TextureContent, TextureContent>
     {
         /// <summary>
-        /// Creates a new instance of the TextureProcessor class.
-        /// </summary>
-        public TextureProcessor()
-        {
-            ColorKeyColor = new Color(255, 0, 255, 255);
-            ColorKeyEnabled = true;
-            PremultiplyAlpha = true;
-        }
-
-        /// <summary>
         /// Gets or sets the color key color.
         /// <remarks>
         /// Typically used to make the background color of a texture transparent.
         /// </remarks>
         /// </summary>
         [DefaultValueAttribute(typeof(Color), "255,0,255,255")]
-        public virtual Color ColorKeyColor { get; set; }
+        public virtual Color ColorKeyColor { get; set; } = new Color(255, 0, 255, 255);
 
         /// <summary>
         /// Gets or sets the color key flag.
@@ -41,7 +30,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
         /// </remarks>
         /// </summary>
         [DefaultValueAttribute(true)]
-        public virtual bool ColorKeyEnabled { get; set; }
+        public virtual bool ColorKeyEnabled { get; set; } = true;
 
         /// <summary>
         /// Gets or sets the generate mipmaps flag.
@@ -52,7 +41,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
         /// Gets or sets the premultiply alpha flag.
         /// </summary>
         [DefaultValueAttribute(true)]
-        public virtual bool PremultiplyAlpha { get; set; }
+        public virtual bool PremultiplyAlpha { get; set; } = true;
 
         /// <summary>
         /// Gets or sets the resize to power of two flag.
@@ -72,8 +61,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
         /// <inheritdoc/>
         public override TextureContent Process(TextureContent input, ContentProcessorContext context)
         {
-            SurfaceFormat format;
-            if (input.Faces[0][0].TryGetFormat(out format))
+            if (input.Faces[0][0].TryGetFormat(out var format))
             {
                 // If it is already a compressed format, we cannot do anything else so just return it
                 if (format.IsCompressedFormat())
@@ -90,8 +78,8 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
                 }
                 catch (Exception ex)
                 {
-                    context.Logger.LogImportantMessage("Could not convert input texture for processing. " + ex.ToString());
-                    throw ex;
+                    context.Logger.Log(LogLevel.Error, $"Could not convert input texture for processing. {ex}");
+                    throw;
                 }
 
                 if (GenerateMipmaps)

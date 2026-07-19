@@ -284,9 +284,9 @@ namespace MonoGame.Effect
 
 		public class d3dx_parameter
 		{
-			public string name;
-			public string semantic;
-			public object data;
+			public string name = "";
+			public string semantic = "";
+			public object? data;
 			public D3DXPARAMETER_CLASS class_;
 			public D3DXPARAMETER_TYPE  type;
 			public uint rows;
@@ -300,15 +300,15 @@ namespace MonoGame.Effect
             public int bufferIndex = -1;
             public int bufferOffset = -1;
 
-		    public d3dx_parameter[] annotation_handles = null;
-			public d3dx_parameter[] member_handles;
+		    public d3dx_parameter[]? annotation_handles = null;
+			public d3dx_parameter[]? member_handles;
 
             public override string ToString()
             {
                 if (rows > 0 || columns > 0)
-                    return string.Format("{0} {1}{2}x{3} {4} : cb{5},{6}", class_, type, rows, columns, name, bufferIndex, bufferOffset);
+                    return $"{class_} {type}{rows}x{columns} {name} : cb{bufferIndex},{bufferOffset}";
                 else
-                    return string.Format("{0} {1} {2}", class_, type, name);
+                    return $"{class_} {type} {name}";
             }
 		}
 		
@@ -317,37 +317,37 @@ namespace MonoGame.Effect
 			public uint operation;
 			public uint index;
 			public STATE_TYPE type;
-			public d3dx_parameter parameter;
+			public required d3dx_parameter parameter;
 		}
 
 		public class d3dx_sampler
 		{
 		    public uint state_count = 0;
-		    public d3dx_state[] states = null;
+		    public d3dx_state[]? states = null;
 		}
 		
 		public class d3dx_pass
 		{
-			public string name;
+			public string name = "";
 			public uint state_count;
 		    public uint annotation_count = 0;
 
-			public BlendState blendState;
-			public DepthStencilState depthStencilState;
-			public RasterizerState rasterizerState;
+			public required BlendState blendState;
+			public required DepthStencilState depthStencilState;
+			public required RasterizerState rasterizerState;
 
-			public d3dx_state[] states;
-		    public d3dx_parameter[] annotation_handles = null;
+			public d3dx_state[] states = [];
+		    public d3dx_parameter[]? annotation_handles = null;
 		}
 
 		public class d3dx_technique
 		{
-			public string name;
+			public required string name;
 			public uint pass_count;
 		    public uint annotation_count = 0;
 
-		    public d3dx_parameter[] annotation_handles = null;
-			public d3dx_pass[] pass_handles;
+		    public d3dx_parameter[]? annotation_handles = null;
+			public required d3dx_pass[] pass_handles;
 		}
 
         public class state_info
@@ -663,25 +663,29 @@ namespace MonoGame.Effect
             effect.Techniques = new d3dx_technique[shaderInfo.Techniques.Count];
             for (var t = 0; t < shaderInfo.Techniques.Count; t++)
             {
-                var tinfo = shaderInfo.Techniques[t]; ;
+                var tinfo = shaderInfo.Techniques[t];
 
-                var technique = new d3dx_technique();
-                technique.name = tinfo.name;
-                technique.pass_count = (uint)tinfo.Passes.Count;
-                technique.pass_handles = new d3dx_pass[tinfo.Passes.Count];
+                var technique = new d3dx_technique
+                {
+                    name = tinfo.name,
+                    pass_count = (uint)tinfo.Passes.Count,
+                    pass_handles = new d3dx_pass[tinfo.Passes.Count]
+                };
 
                 for (var p = 0; p < tinfo.Passes.Count; p++)
                 {
                     var pinfo = tinfo.Passes[p];
 
-                    var pass = new d3dx_pass();
-                    pass.name = pinfo.name ?? string.Empty;
+                    var pass = new d3dx_pass
+					{
+						name = pinfo.name ?? string.Empty,
 
-                    pass.blendState = pinfo.blendState;
-                    pass.depthStencilState = pinfo.depthStencilState;
-                    pass.rasterizerState = pinfo.rasterizerState;
+						blendState = pinfo.blendState,
+						depthStencilState = pinfo.depthStencilState,
+						rasterizerState = pinfo.rasterizerState,
 
-                    pass.state_count = 0;
+						state_count = 0
+					};
                     var tempstate = new d3dx_state[2];
 
                     shaderResult.Profile.ValidateShaderModels(pinfo);
@@ -747,10 +751,12 @@ namespace MonoGame.Effect
                         // Store the index for runtime lookup.
                         shader._samplers[s].parameter = parameters.Count;
 
-                        var param = new d3dx_parameter();
-                        param.class_ = D3DXPARAMETER_CLASS.OBJECT;
-                        param.name = sampler.parameterName;
-                        param.semantic = string.Empty;
+                        var param = new d3dx_parameter
+                        {
+                            class_ = D3DXPARAMETER_CLASS.OBJECT,
+                            name = sampler.parameterName,
+                            semantic = string.Empty
+                        };
 
                         switch (sampler.type)
                         {
@@ -806,19 +812,23 @@ namespace MonoGame.Effect
                 shaderData.ShaderProfile = shaderProfile;
             }
 
-            var state = new d3dx_state();
-            state.index = 0;
-            state.type = STATE_TYPE.CONSTANT;
-            state.operation = isVertexShader ? (uint)146 : (uint)147;
-
-            state.parameter = new d3dx_parameter();
-            state.parameter.name = string.Empty;
-            state.parameter.semantic = string.Empty;
-            state.parameter.class_ = D3DXPARAMETER_CLASS.OBJECT;
-            state.parameter.type = isVertexShader ? D3DXPARAMETER_TYPE.VERTEXSHADER : D3DXPARAMETER_TYPE.PIXELSHADER;
-            state.parameter.rows = 0;
-            state.parameter.columns = 0;
-            state.parameter.data = shaderData.SharedIndex;
+            var state = new d3dx_state
+            {
+                index = 0,
+                type = STATE_TYPE.CONSTANT,
+                operation = isVertexShader ? (uint)146 : (uint)147,
+                parameter = new d3dx_parameter
+                {
+                    name = string.Empty,
+					semantic = string.Empty,
+					class_ = D3DXPARAMETER_CLASS.OBJECT,
+					type = isVertexShader ? D3DXPARAMETER_TYPE.VERTEXSHADER : D3DXPARAMETER_TYPE.PIXELSHADER,
+					rows = 0,
+					columns = 0,
+					data = shaderData.SharedIndex
+                }
+			};
+            
 
             return state;
         }
@@ -834,21 +844,22 @@ namespace MonoGame.Effect
                 if (state.type != STATE_TYPE.CONSTANT)
                     throw new NotSupportedException("We do not support shader expressions!");
 
-                return (int)state.parameter.data;
+				if (state.parameter.data is int idata)
+					return idata;
             }
 
             return -1;
         }
 
-        public d3dx_parameter[] Objects { get; private set; }
+		public d3dx_parameter[] Objects { get; private set; } = [];
 
-        public d3dx_parameter[] Parameters { get; private set; }
+		public d3dx_parameter[] Parameters { get; private set; } = [];
 
-        public d3dx_technique[] Techniques { get; private set; }
+        public d3dx_technique[] Techniques { get; private set; } = [];
 
-        public List<ShaderData> Shaders { get; private set; }
+        public List<ShaderData> Shaders { get; private set; } = [];
 
-        public List<ConstantBufferData> ConstantBuffers { get; private set; }
+        public List<ConstantBufferData> ConstantBuffers { get; private set; } = [];
 	}
 }
 
