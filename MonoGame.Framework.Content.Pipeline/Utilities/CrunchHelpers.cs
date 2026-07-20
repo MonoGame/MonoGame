@@ -166,15 +166,15 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Utilities
             BitmapContent sourceBitmap,
             CrunchFormat crunchFormat,
             out byte[] encodedBytes,
-            out string failureMessage)
+            out string? failureMessage)
         {
             failureMessage = null;
-            encodedBytes = Array.Empty<byte>();
+            encodedBytes = [];
 
             // these files will likely be created during this method, and should be
             //  deleted before exiting the function.
-            string pngFileName = null;
-            string ktxFileName = null;
+            string? pngFileName = null;
+            string? ktxFileName = null;
 
             try
             {
@@ -217,7 +217,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Utilities
             CrunchFormat format,
             string pngFileName,
             string intermediateFileName,
-            out string errorMessage
+            out string? errorMessage
         )
         {
             errorMessage = null;

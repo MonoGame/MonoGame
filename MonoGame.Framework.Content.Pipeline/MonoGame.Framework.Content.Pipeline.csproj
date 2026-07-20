@@ -17,6 +17,15 @@
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <!-- CS1591 - Disable XML documentation warnings. -->
+    <!-- NU5100 - NuGet warns if we copy assemblies but don't reference them. -->
+    <!-- NU5118 - NuGet warns if we duplicate include executable. -->
+    <!-- NETSDK1206 - Disable nuget rid complaining. -->
+    <NoWarn>CS1591;NU5100;NU5118;NETSDK1206</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>
@@ -41,20 +50,8 @@
     <Compile Include="..\MonoGame.Framework\Utilities\Hash.cs">
       <Link>Utilities\Hash.cs</Link>
     </Compile>
-    <Compile Include="..\MonoGame.Framework\Utilities\ReflectionHelpers.cs">
-      <Link>Utilities\ReflectionHelpers.cs</Link>
-    </Compile>
-    <Compile Include="..\MonoGame.Framework\Platform\Utilities\AssemblyHelper.cs">
-      <Link>Utilities\AssemblyHelper.cs</Link>
-    </Compile>
-    <Compile Include="..\MonoGame.Framework\Platform\Utilities\ReflectionHelpers.Default.cs">
-      <Link>Utilities\ReflectionHelpers.Default.cs</Link>
-    </Compile>
     <Compile Include="..\MonoGame.Framework\Graphics\GraphicsExtensions.cs">
       <Link>Utilities\GraphicsExtensions.cs</Link>
-    </Compile>
-    <Compile Include="..\MonoGame.Framework\Content\ContentExtensions.cs">
-      <Link>Utilities\ContentExtensions.cs</Link>
     </Compile>
   </ItemGroup>
 
@@ -113,12 +110,6 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
-
-  <PropertyGroup>
-    <!-- NU5100 - NuGet warns if we copy assemblies but don't reference them; we suppress those warnings. -->
-    <!-- CS1591 - Disable XML documentation warnings. -->
-    <NoWarn>NU5100;CS1591</NoWarn>
-  </PropertyGroup>
   
   <Import Project="..\external\CppNet\CppNet.targets" />
 

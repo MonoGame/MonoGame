@@ -2,9 +2,7 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
-using System;
 using System.Collections;
-using System.Collections.Generic;
 
 namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 {
@@ -12,28 +10,17 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
     /// Provides methods and properties for maintaining a vertex channel.
     /// A vertex channel is a list of arbitrary data with one value for each vertex. Channels are stored inside a GeometryContent and identified by name.
     /// </summary>
-    public abstract class VertexChannel : IList, ICollection, IEnumerable
+    public abstract class VertexChannel : IList
     {
-        string name;
-
         /// <summary>
         /// Allows overriding classes to implement the list, and for properties/methods in this class to access it.
         /// </summary>
-        internal abstract IList Items
-        {
-            get;
-        }
+        internal abstract IList Items { get;  }
 
         /// <summary>
         /// Gets the number of elements in the vertex channel
         /// </summary>
-        public int Count
-        {
-            get
-            {
-                return Items.Count;
-            }
-        }
+        public int Count => Items.Count;
 
         /// <summary>
         /// Gets the type of data contained in this channel.
@@ -43,76 +30,36 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
         /// <summary>
         /// Gets or sets the element at the specified index.
         /// </summary>
-        public Object this[int index]
+        public object? this[int index]
         {
-            get
-            {
-                return Items[index];
-            }
-            set
-            {
-                Items[index] = value;
-            }
+            get => Items[index];
+            set => Items[index] = value;
         }
 
         /// <summary>
         /// Gets the name of the vertex channel.
         /// </summary>
-        public string Name
-        {
-            get
-            {
-                return name;
-            }
-            internal set
-            {
-                name = value;
-            }
-        }
+        public string Name { get; internal set; }
 
         /// <summary>
         /// Gets a value indicating whether access to the collection is synchronized (thread safe).
         /// </summary>
-        bool System.Collections.ICollection.IsSynchronized
-        {
-            get
-            {
-                return false;
-            }
-        }
+        bool ICollection.IsSynchronized => false;
 
         /// <summary>
         /// Gets an object that can be used to synchronize access to the collection.
         /// </summary>
-        Object System.Collections.ICollection.SyncRoot
-        {
-            get
-            {
-                return this;
-            }
-        }
+        object ICollection.SyncRoot => this;
 
         /// <summary>
         /// Gets a value indicating whether this list has a fixed size.
         /// </summary>
-        bool System.Collections.IList.IsFixedSize
-        {
-            get
-            {
-                return false;
-            }
-        }
+        bool IList.IsFixedSize => false;
 
         /// <summary>
         /// Gets a value indicating whether this object is read-only.
         /// </summary>
-        bool System.Collections.IList.IsReadOnly
-        {
-            get
-            {
-                return false;
-            }
-        }
+        bool IList.IsReadOnly => false;
 
         /// <summary>
         /// Creates an instance of VertexChannel.
@@ -128,39 +75,27 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
         /// </summary>
         /// <param name="value">Element being searched for.</param>
         /// <returns>true if the element is present; false otherwise.</returns>
-        public bool Contains(Object value)
-        {
-            return Items.Contains(value);
-        }
+        public bool Contains(object? value) => Items.Contains(value);
 
         /// <summary>
         /// Copies the elements of the channel to an array, starting at the specified index.
         /// </summary>
         /// <param name="array">Array that will receive the copied channel elements.</param>
         /// <param name="index">Starting index for copy operation.</param>
-        public void CopyTo(Array array, int index)
-        {
-            ((ICollection)Items).CopyTo(array, index);
-        }
+        public void CopyTo(Array array, int index) => Items.CopyTo(array, index);
 
         /// <summary>
         /// Gets an enumerator interface for reading channel content.
         /// </summary>
         /// <returns>Enumeration of the channel content.</returns>
-        public IEnumerator GetEnumerator()
-        {
-            return Items.GetEnumerator();
-        }
+        public IEnumerator GetEnumerator() => Items.GetEnumerator();
 
         /// <summary>
         /// Gets the index of the specified item.
         /// </summary>
         /// <param name="value">Item whose index is to be retrieved.</param>
         /// <returns>Index of specified item.</returns>
-        public int IndexOf(Object value)
-        {
-            return Items.IndexOf(value);
-        }
+        public int IndexOf(object? value) => Items.IndexOf(value);
 
         /// <summary>
         /// Reads channel content and automatically converts it to the specified vector format.
@@ -174,28 +109,19 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
         /// </summary>
         /// <param name="value">The element to add.</param>
         /// <returns>Index of the element.</returns>
-        int IList.Add(Object value)
-        {
-            return Items.Add(value);
-        }
+        int IList.Add(object? value) => Items.Add(value);
 
         /// <summary>
         /// Removes all elements from the collection.
         /// </summary>
-        void IList.Clear()
-        {
-            Items.Clear();
-        }
+        void IList.Clear() => Items.Clear();
 
         /// <summary>
         /// Inserts an element into the collection at the specified position.
         /// </summary>
         /// <param name="index">Index at which to insert the element.</param>
         /// <param name="value">The element to insert.</param>
-        void IList.Insert(int index, Object value)
-        {
-            Items.Insert(index, value);
-        }
+        void IList.Insert(int index, object? value) => Items.Insert(index, value);
 
         /// <summary>
         /// Inserts the range of values from the enumerable into the channel.
@@ -208,19 +134,13 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
         /// Removes a specified element from the collection.
         /// </summary>
         /// <param name="value">The element to remove.</param>
-        void IList.Remove(Object value)
-        {
-            Items.Remove(value);
-        }
+        void IList.Remove(object? value) => Items.Remove(value);
 
         /// <summary>
         /// Removes the element at the specified index position.
         /// </summary>
         /// <param name="index">Index of the element to remove.</param>
-        void IList.RemoveAt(int index)
-        {
-            Items.RemoveAt(index);
-        }
+        void IList.RemoveAt(int index) => Items.RemoveAt(index);
 
         /// <summary>
         /// Removes a range of values from the channel.

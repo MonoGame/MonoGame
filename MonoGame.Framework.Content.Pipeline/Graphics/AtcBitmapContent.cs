@@ -2,7 +2,6 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
-using System;
 using BCnEncoder.Shared;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Content.Pipeline.Utilities;
@@ -14,13 +13,12 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
     /// </summary>
     public abstract class AtcBitmapContent : BitmapContent
     {
-        internal byte[] _bitmapData;
+        private byte[] _bitmapData = [];
 
         /// <summary>
         /// Initializes a new instance of AtcBitmapContent.
         /// </summary>
         public AtcBitmapContent()
-            : base()
         {
         }
 
@@ -29,32 +27,23 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
         /// </summary>
         /// <param name="width">Width, in pixels, of the bitmap resource.</param>
         /// <param name="height">Height, in pixels, of the bitmap resource.</param>
-        public AtcBitmapContent(int width, int height)
-            : base(width, height)
+        public AtcBitmapContent(int width, int height) : base(width, height)
         {
         }
 
         /// <inheritdoc/>
-        public override byte[] GetPixelData()
-        {
-            return _bitmapData;
-        }
+        public override byte[] GetPixelData() => _bitmapData;
 
         /// <inheritdoc/>
-        public override void SetPixelData(byte[] sourceData)
-        {
-            _bitmapData = sourceData;
-        }
+        public override void SetPixelData(byte[] sourceData) => _bitmapData = sourceData;
 
         /// <inheritdoc/>
-		protected override bool TryCopyFrom(BitmapContent sourceBitmap, Rectangle sourceRegion, Rectangle destinationRegion)
+        protected override bool TryCopyFrom(BitmapContent sourceBitmap, Rectangle sourceRegion, Rectangle destinationRegion)
         {
-            SurfaceFormat sourceFormat;
-            if (!sourceBitmap.TryGetFormat(out sourceFormat))
+            if (!sourceBitmap.TryGetFormat(out var sourceFormat))
                 return false;
 
-            SurfaceFormat format;
-            TryGetFormat(out format);
+            TryGetFormat(out var format);
 
             // A shortcut for copying the entire bitmap to another bitmap of the same type and format
             if (format == sourceFormat && (sourceRegion == new Rectangle(0, 0, Width, Height)) && sourceRegion == destinationRegion)
@@ -68,11 +57,11 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
                 return false;
 
             // If the source is not Vector4 or requires resizing, send it through BitmapContent.Copy
-            if (!(sourceBitmap is PixelBitmapContent<Vector4>) || sourceRegion.Width != destinationRegion.Width || sourceRegion.Height != destinationRegion.Height)
+            if (sourceBitmap is not PixelBitmapContent<Vector4> || sourceRegion.Width != destinationRegion.Width || sourceRegion.Height != destinationRegion.Height)
             {
                 try
                 {
-                    BitmapContent.Copy(sourceBitmap, sourceRegion, this, destinationRegion);
+                    Copy(sourceBitmap, sourceRegion, this, destinationRegion);
                     return true;
                 }
                 catch (InvalidOperationException)
@@ -81,18 +70,12 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
                 }
             }
 
-            CompressionFormat compressionFormat;
-            switch (format)
+            var compressionFormat = format switch
             {
-                case SurfaceFormat.RgbaAtcExplicitAlpha:
-                    compressionFormat = CompressionFormat.AtcExplicitAlpha;
-                    break;
-                case SurfaceFormat.RgbaAtcInterpolatedAlpha:
-                    compressionFormat = CompressionFormat.AtcInterpolatedAlpha;
-                    break;
-                default:
-                    throw new PipelineException();
-            }
+                SurfaceFormat.RgbaAtcExplicitAlpha => CompressionFormat.AtcExplicitAlpha,
+                SurfaceFormat.RgbaAtcInterpolatedAlpha => CompressionFormat.AtcInterpolatedAlpha,
+                _ => throw new PipelineException(),
+            };
             BcnUtil.Encode(
                 sourceBitmap: sourceBitmap,
                 destinationFormat: compressionFormat,
@@ -100,18 +83,16 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 
             SetPixelData(compressedBytes);
 
-			return true;
+            return true;
         }
 
         /// <inheritdoc/>
         protected override bool TryCopyTo(BitmapContent destinationBitmap, Rectangle sourceRegion, Rectangle destinationRegion)
         {
-            SurfaceFormat destinationFormat;
-            if (!destinationBitmap.TryGetFormat(out destinationFormat))
+            if (!destinationBitmap.TryGetFormat(out SurfaceFormat destinationFormat))
                 return false;
 
-            SurfaceFormat format;
-            TryGetFormat(out format);
+            TryGetFormat(out var format);
 
             // A shortcut for copying the entire bitmap to another bitmap of the same type and format
             if (format == destinationFormat && (sourceRegion == new Rectangle(0, 0, Width, Height)) && sourceRegion == destinationRegion)

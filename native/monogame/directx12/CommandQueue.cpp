@@ -113,8 +113,7 @@ void CommandQueue::ResumeX() {
 
 CommandListPool::~CommandListPool()
 {
-    auto iter = m_freeContexts.begin();
-    for (; iter != m_freeContexts.end(); iter++)
+    for (auto iter = m_allContexts.begin(); iter != m_allContexts.end(); iter++)
         delete (*iter);
 }
 
@@ -144,6 +143,7 @@ CommandList* CommandListPool::Begin()
     ThrowIfFailed(m_device->CreateCommandAllocator(m_queue->GetType(), IID_GRAPHICS_PPV_ARGS(ctx->m_allocator.GetAddressOf())));
     ThrowIfFailed(m_device->CreateCommandList(0, m_queue->GetType(), ctx->m_allocator.Get(), nullptr, IID_GRAPHICS_PPV_ARGS(ctx->m_list.ReleaseAndGetAddressOf())));
     ctx->m_list->SetName((m_name + L" CommandList").c_str());
+    m_allContexts.push_back(ctx);
 
     return ctx;
 }

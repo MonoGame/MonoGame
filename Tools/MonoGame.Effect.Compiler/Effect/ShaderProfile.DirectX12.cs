@@ -4,6 +4,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -32,13 +33,13 @@ namespace MonoGame.Effect
             if (!string.IsNullOrEmpty(pass.vsFunction))
             {
                 if (pass.vsModel != "vs_6_0")
-                    throw new Exception(String.Format("Invalid DirectX 12 vertex profile '{0}'! Requires vs_6_0.", pass.vsModel));
+                    throw new Exception($"Invalid DirectX 12 vertex profile '{pass.vsModel}'! Requires vs_6_0.");
             }
 
             if (!string.IsNullOrEmpty(pass.psFunction))
             {
                 if (pass.psModel != "ps_6_0")
-                    throw new Exception(String.Format("Invalid DirectX 12 pixel profile '{0}'! Requires ps_6_0.", pass.psModel));
+                    throw new Exception($"Invalid DirectX 12 pixel profile '{pass.psModel}'! Requires ps_6_0.");
             }
         }
 
@@ -149,10 +150,10 @@ namespace MonoGame.Effect
                     //var format = match.Groups[6].Value;
 
                     // Get the element index.
-                    a.index = int.Parse(match.Groups[2].Value);
+                    a.index = int.Parse(match.Groups[2].Value, CultureInfo.InvariantCulture);
 
                     // Get the element type.
-                    var name = match.Groups[1].Value.ToUpper();
+                    var name = match.Groups[1].Value.ToUpper(CultureInfo.InvariantCulture);
                     switch (name)
                     {
                         default:
@@ -162,7 +163,7 @@ namespace MonoGame.Effect
                             break;
                         case "POSITION":
                             a.usage = VertexElementUsage.Position;
-                            break;                            
+                            break;
                         case "NORMAL":
                             a.usage = VertexElementUsage.Normal;
                             break;
@@ -199,7 +200,7 @@ namespace MonoGame.Effect
                     }
 
                     // TODO: These are unused at runtime under the
-                    // new native backends, we will remove them soon.               
+                    // new native backends, we will remove them soon.
                     a.location = 0;
                     a.name = string.Empty;
 
@@ -212,7 +213,7 @@ namespace MonoGame.Effect
             var cbuffers = new List<ConstantBufferData>();
             {
                 var reader = new StringReader(reflectionData);
-                ConstantBufferData current = null;
+                ConstantBufferData? current = null;
                 for(;;)
                 {
                     var line = reader.ReadLine();
@@ -226,9 +227,9 @@ namespace MonoGame.Effect
 
                     if (line.StartsWith("; cbuffer "))
                     {
-                        var name = line.Substring(10);
+                        var name = line[10..];
                         current = new ConstantBufferData(name);
-                        continue;                        
+                        continue;
                     }
 
                     // Nothing to do if we're not in a cbuffer block.
@@ -239,7 +240,7 @@ namespace MonoGame.Effect
                     if (cbufmatch.Success)
                     {
                         var cBufferSize = cbufmatch.Groups[3].Value;
-                        current.SetSize(int.Parse(cBufferSize));
+                        current.SetSize(int.Parse(cBufferSize, CultureInfo.InvariantCulture));
                         cbuffers.Add(current);
                         current = null;
                         continue;
@@ -251,7 +252,7 @@ namespace MonoGame.Effect
                         var paramType = match.Groups[1].Value;
                         var paramName = match.Groups[2].Value;
                         var paramOffset = match.Groups[3].Value;
-                        current.AddParameter(paramName, paramType, int.Parse(paramOffset));
+                        current.AddParameter(paramName, paramType, int.Parse(paramOffset, CultureInfo.InvariantCulture));
                         continue;
                     }
                 }
@@ -301,7 +302,7 @@ namespace MonoGame.Effect
                         var samplerDesc = new ShaderData.Sampler()
                         {
                             samplerName = samplerName,
-                            samplerSlot = int.Parse(samplerSlot),
+                            samplerSlot = int.Parse(samplerSlot, CultureInfo.InvariantCulture),
                             textureSlot = -1,
                             parameterName = String.Empty
                         };
@@ -332,15 +333,15 @@ namespace MonoGame.Effect
                     if (match.Success)
                     {
                         var textureName = match.Groups[1].Value;
-                        var textureSlot = int.Parse(match.Groups[4].Value);
-                        var textureDim = match.Groups[3].Value?.ToLower();
+                        var textureSlot = int.Parse(match.Groups[4].Value, CultureInfo.InvariantCulture);
+                        var textureDim = match.Groups[3].Value?.ToLower(CultureInfo.InvariantCulture);
 
                         var sampler = new ShaderData.Sampler();
 
-                        // Find the sampler state for the texture... we try multiple 
+                        // Find the sampler state for the texture... we try multiple
                         // ways here because things are sort of broken.
                         //
-                        // TODO: We need to refactor MGFX to seperate 
+                        // TODO: We need to refactor MGFX to seperate
                         // samplers and textures... they do not belong toether!
                         //
 
@@ -348,7 +349,7 @@ namespace MonoGame.Effect
                         bool found = false;
                         foreach (var s in shaderResult.ShaderInfo.SamplerStates.Values)
                         {
-                            if (s.TextureName == null)
+                            if (string.IsNullOrEmpty(s.TextureName))
                                 continue;
 
                             if (s.TextureName != textureName)
@@ -357,17 +358,21 @@ namespace MonoGame.Effect
                             sampler = samplerDescriptions.First(sd => sd.samplerName == s.Name);
                             found = true;
                         }
- 
+
                         if (!found)
                         {
                             // Try to match assuming samplers and textures have the same register index.
                             // This can be wrong in some cases, but best we can do right now.
                             sampler = samplerDescriptions.FirstOrDefault(sd => sd.samplerSlot == textureSlot);
-                            if (sampler.samplerName == null)
-                                sampler.samplerName = string.Empty;
+                            sampler.samplerName ??= string.Empty;
                         }
 
-                        if (shaderResult.ShaderInfo.SamplerStates.TryGetValue(sampler.samplerName, out var ssamp))                         
+                        if (string.IsNullOrEmpty(sampler.samplerName))
+                        {
+                            throw new Exception($"Sample name is empty for {shaderFunction} slot {textureSlot}.");
+                        }
+
+                        if (shaderResult.ShaderInfo.SamplerStates.TryGetValue(sampler.samplerName, out var ssamp))
                             sampler.state = ssamp.State;
                         sampler.textureSlot = textureSlot;
                         sampler.parameterName = textureName;
