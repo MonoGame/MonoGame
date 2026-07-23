@@ -23,9 +23,21 @@ namespace Microsoft.Xna.Framework {
             OnOrientationChanged();
         }
 
-		#region GameWindow Members
+        #region GameWindow Members
 
-		public override bool AllowUserResizing {
+        public override Point Position
+        {
+            get
+            {
+                return Point.Zero;
+            }
+
+            set
+            {
+            }
+        }
+
+        public override bool AllowUserResizing {
 			get { return false; }
 			set { /* Do nothing. */ }
 		}

@@ -5,13 +5,19 @@
 using Microsoft.Xna.Framework.Graphics;
 namespace Microsoft.Xna.Framework.Content
 {
+    [System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.All)]
     internal class VertexDeclarationReader : ContentTypeReader<VertexDeclaration>
 	{
 		protected internal override VertexDeclaration Read(ContentReader reader, VertexDeclaration existingInstance)
         {
 			var vertexStride = reader.ReadInt32();
 			var elementCount = reader.ReadInt32();
-			VertexElement[] elements = new VertexElement[elementCount];
+			if (vertexStride == 0)
+            {
+				return VertexDeclaration.GetOrCreate(0, []);
+            }
+
+			var elements = new VertexElement[elementCount];
 			for (int i = 0; i < elementCount; ++i)
 			{
 				var offset = reader.ReadInt32();

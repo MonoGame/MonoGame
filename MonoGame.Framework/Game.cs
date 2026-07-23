@@ -5,10 +5,6 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-#if WINDOWS_UAP
-using System.Threading.Tasks;
-using Windows.ApplicationModel.Activation;
-#endif
 using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
@@ -124,6 +120,8 @@ namespace Microsoft.Xna.Framework
                         if (disposable != null)
                             disposable.Dispose();
                     }
+                    _components.ComponentAdded -= Components_ComponentAdded;
+                    _components.ComponentRemoved -= Components_ComponentRemoved;
                     _components = null;
 
                     if (_content != null)
@@ -151,7 +149,9 @@ namespace Microsoft.Xna.Framework
                     ContentTypeReaderManager.ClearTypeCreators();
 
                     if (SoundEffect._systemState == SoundEffect.SoundSystemState.Initialized)
-                        SoundEffect.PlatformShutdown();
+                    {
+                        SoundEffect.Shutdown();
+                    }
                 }
 #if ANDROID
                 Activity = null;
@@ -381,10 +381,6 @@ namespace Microsoft.Xna.Framework
         /// </summary>
         public event EventHandler<ExitingEventArgs> Exiting;
 
-#if WINDOWS_UAP
-        public ApplicationExecutionState PreviousExecutionState { get; internal set; }
-#endif
-
         #endregion
 
         #region Public Methods
@@ -505,9 +501,6 @@ namespace Microsoft.Xna.Framework
         private Stopwatch _gameTimer;
         private long _previousTicks = 0;
         private int _updateFrameLag;
-#if WINDOWS_UAP
-        private readonly object _locker = new object();
-#endif
 
         /// <summary>
         /// Run one iteration of the game loop.
@@ -528,12 +521,7 @@ namespace Microsoft.Xna.Framework
 
             if (!IsActive && (InactiveSleepTime.TotalMilliseconds >= 1.0))
             {
-#if WINDOWS_UAP
-                lock (_locker)
-                    System.Threading.Monitor.Wait(_locker, (int)InactiveSleepTime.TotalMilliseconds);
-#else
                 System.Threading.Thread.Sleep((int)InactiveSleepTime.TotalMilliseconds);
-#endif
             }
 
             // Advance the accumulated elapsed time.
@@ -553,10 +541,6 @@ namespace Microsoft.Xna.Framework
                 // We only have a precision timer on Windows, so other platforms may still overshoot
 #if WINDOWS && !DESKTOPGL
                 MonoGame.Framework.Utilities.TimerHelper.SleepForNoMoreThan(sleepTime);
-#elif WINDOWS_UAP
-                lock (_locker)
-                    if (sleepTime >= 2.0)
-                        System.Threading.Monitor.Wait(_locker, 1);
 #elif DESKTOPGL || ANDROID || IOS
                 if (sleepTime >= 2.0)
                     System.Threading.Thread.Sleep(1);
@@ -633,9 +617,9 @@ namespace Microsoft.Xna.Framework
 
                 if (!exitingEventArgs.Cancel)
                 {
+                    UnloadContent();
                     Platform.Exit();
                     EndRun();
-                    UnloadContent();
                 }
 
                 _shouldExit = false;
@@ -692,7 +676,7 @@ namespace Microsoft.Xna.Framework
         protected virtual void Initialize()
         {
             // TODO: This should be removed once all platforms use the new GraphicsDeviceManager
-#if !(WINDOWS && DIRECTX)
+#if !(WINDOWS && DIRECTX) && !NATIVE
             applyChanges(graphicsDeviceManager);
 #endif
 
@@ -811,7 +795,7 @@ namespace Microsoft.Xna.Framework
         //        break entirely the possibility that additional platforms could
         //        be added by third parties without changing MonoGame itself.
 
-#if !(WINDOWS && DIRECTX)
+#if !(WINDOWS && DIRECTX) && !NATIVE
         internal void applyChanges(GraphicsDeviceManager manager)
         {
 			Platform.BeginScreenDeviceChange(GraphicsDevice.PresentationParameters.IsFullScreen);

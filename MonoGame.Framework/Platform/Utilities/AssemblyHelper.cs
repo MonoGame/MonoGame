@@ -3,6 +3,7 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System;
+using System.IO;
 using System.Reflection;
 
 namespace MonoGame.Framework.Utilities
@@ -36,6 +37,30 @@ namespace MonoGame.Framework.Utilities
             }
 
             return windowTitle;
+        }
+
+        public static byte[] GetDefaultWindowIcon()
+        {
+            var entryAssembly = Assembly.GetEntryAssembly();
+
+            if (entryAssembly != null)
+            {
+                using (
+                    var stream =
+                        entryAssembly.GetManifestResourceStream(entryAssembly.GetName().Name + ".Icon.bmp") ??
+                        entryAssembly.GetManifestResourceStream("Icon.bmp") ??
+                        typeof(AssemblyHelper).Assembly.GetManifestResourceStream("MonoGame.bmp"))
+                {
+                    if (stream != null)
+                        using (var br = new BinaryReader(stream))
+                        {
+                            var bytes = br.ReadBytes((int)stream.Length);
+                            return bytes;
+                        }
+                }
+            }
+
+            return null;
         }
     }
 }

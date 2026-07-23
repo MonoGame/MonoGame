@@ -126,15 +126,14 @@ namespace MonoGame.Effect
                     type = samplers[i].type,
                 };
 
-                SamplerStateInfo state;
-                if (samplerStates.TryGetValue(originalSamplerName, out state))
+                if (samplerStates.TryGetValue(originalSamplerName, out var state))
                 {
                     sampler.state = state.State;
                     sampler.parameterName = state.TextureName ?? originalSamplerName;
                 }
 
                 // Store the sampler.
-			    dxshader._samplers[i] = sampler;
+                dxshader._samplers[i] = sampler;
 			}
 
 			// Gather all the parameters used by this shader.
@@ -185,6 +184,9 @@ namespace MonoGame.Effect
 			{
 				glslCode = "#extension GL_OES_standard_derivatives : enable\r\n" + glslCode;
 			}
+
+			// Fix "uniform vec4 ps_uniforms_ivec4" to be "uniform ivec4 ps_uniforms_ivec4":
+			glslCode = glslCode.Replace("uniform vec4 ps_uniforms_ivec4", "uniform ivec4 ps_uniforms_ivec4");
 
 			// Store the code for serialization.
 			dxshader.ShaderCode = Encoding.ASCII.GetBytes (glslCode);

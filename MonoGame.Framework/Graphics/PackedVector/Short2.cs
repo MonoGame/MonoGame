@@ -4,13 +4,17 @@
 
 
 using System;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Microsoft.Xna.Framework.Graphics.PackedVector
 {
     /// <summary>
     /// Packed vector type containing two 16-bit signed integer values.
     /// </summary>
-	public struct Short2 : IPackedVector<uint>, IEquatable<Short2>
+#if XNADESIGNPROVIDED
+    [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.Interfaces | DynamicallyAccessedMemberTypes.PublicParameterlessConstructor)]
+#endif
+    public struct Short2 : IPackedVector<uint>, IEquatable<Short2>
 	{
 		private uint _short2Packed;
 
@@ -115,8 +119,8 @@ namespace Microsoft.Xna.Framework.Graphics.PackedVector
 			const float minNeg = ~(int)maxPos; // two's complement
 
             // clamp the value between min and max values
-            var word2 = ((uint) MathF.Round(MathHelper.Clamp(vectorX, minNeg, maxPos)) & 0xFFFF);
-            var word1 = (((uint) MathF.Round(MathHelper.Clamp(vectorY, minNeg, maxPos)) & 0xFFFF) << 0x10);
+            var word2 = (uint)((int) MathF.Round(MathHelper.Clamp(vectorX, minNeg, maxPos)) & 0xFFFF);
+            var word1 = (uint)(((int) MathF.Round(MathHelper.Clamp(vectorY, minNeg, maxPos)) & 0xFFFF) << 0x10);
 
             return (word2 | word1);
 		}

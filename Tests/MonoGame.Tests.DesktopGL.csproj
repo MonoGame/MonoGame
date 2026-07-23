@@ -8,6 +8,9 @@
     <IsPackable>false</IsPackable>
     <GenerateProgramFile>false</GenerateProgramFile>
     <DefineConstants>DESKTOPGL</DefineConstants>
+    <DefineConstants Condition=" $([MSBuild]::IsOsPlatform('osx')) " >$(DefineConstants);MACOS</DefineConstants>
+    <DefineConstants Condition=" $([MSBuild]::IsOsPlatform('windows')) " >$(DefineConstants);WINDOWS</DefineConstants>
+    <DefineConstants Condition=" $([MSBuild]::IsOsPlatform('linux')) " >$(DefineConstants);LINUX</DefineConstants>
   </PropertyGroup>
 
   <ItemGroup>

@@ -175,7 +175,7 @@ namespace MonoGame.Tools.Pipeline
                 sourceFile = split[0];
 
                 if (split.Length > 0)
-                    link = split[1];
+                    link = PathHelper.Normalize(split[1]);
             }
 
             // Make sure the source file is relative to the project.
@@ -230,7 +230,7 @@ namespace MonoGame.Tools.Pipeline
                 sourceFile = split[0];
 
                 if (split.Length > 0)
-                    link = split[1];
+                    link = PathHelper.Normalize(split[1]);
             }
 
             // Make sure the source file is relative to the project.
@@ -448,22 +448,23 @@ namespace MonoGame.Tools.Pipeline
                         }
                         else if (buildAction.Equals("Content") || buildAction.Equals("None"))
                         {
-                            string include, copyToOutputDirectory;
-                            ReadIncludeContent(io, out include, out copyToOutputDirectory);
+                            string include, link, copyToOutputDirectory;
+                            ReadIncludeContent(io, out include, out link, out copyToOutputDirectory);
 
                             if (!string.IsNullOrEmpty(copyToOutputDirectory) && !copyToOutputDirectory.Equals("Never"))
                             {
                                 var sourceFilePath = Path.GetDirectoryName(projectFilePath);
                                 sourceFilePath += "\\" + include;
 
-                                OnCopy(sourceFilePath);
+                                var sourceFileArg = (link == null) ? sourceFilePath : sourceFilePath + ";" + link;
+                                OnCopy(sourceFileArg);
                             }
                         }
                         else if (buildAction.Equals("Compile"))
                         {
-                            string include, name, importer, processor;
+                            string include, link, name, importer, processor;
                             string[] processorParams;
-                            ReadIncludeCompile(io, out include, out name, out importer, out processor, out processorParams);
+                            ReadIncludeCompile(io, out include, out link, out name, out importer, out processor, out processorParams);
 
                             Importer = importer;
                             Processor = processor;
@@ -476,7 +477,8 @@ namespace MonoGame.Tools.Pipeline
                             var sourceFilePath = Path.GetDirectoryName(projectFilePath);
                             sourceFilePath += "\\" + include;
 
-                            OnBuild(sourceFilePath);
+                            var sourceFileArg = (link == null) ? sourceFilePath : sourceFilePath + ";" + link;
+                            OnBuild(sourceFileArg);
                         }
                     }
                 }
@@ -511,8 +513,9 @@ namespace MonoGame.Tools.Pipeline
             }
         }
 
-        private void ReadIncludeContent(XmlReader io, out string include, out string copyToOutputDirectory)
+        private void ReadIncludeContent(XmlReader io, out string include, out string link, out string copyToOutputDirectory)
         {
+            link = null;
             copyToOutputDirectory = null;
             include = io.GetAttribute("Include").Unescape();
 
@@ -527,6 +530,10 @@ namespace MonoGame.Tools.Pipeline
                     {
                         switch (io.LocalName)
                         {
+                            case "Link":
+                                io.Read();
+                                link = io.Value.Unescape();
+                                break;
                             case "CopyToOutputDirectory":
                                 io.Read();
                                 copyToOutputDirectory = io.Value.Unescape();
@@ -539,11 +546,13 @@ namespace MonoGame.Tools.Pipeline
 
         private void ReadIncludeCompile(XmlReader io,
                                         out string include,
+                                        out string link,
                                         out string name,
                                         out string importer,
                                         out string processor,
                                         out string[] processorParams)
         {
+            link = null;
             name = null;
             importer = null;
             processor = null;
@@ -562,6 +571,10 @@ namespace MonoGame.Tools.Pipeline
                     {
                         switch (io.LocalName)
                         {
+                            case "Link":
+                                io.Read();
+                                link = io.Value.Unescape();
+                                break;
                             case "Name":
                                 io.Read();
                                 name = io.Value.Unescape();

@@ -2,10 +2,8 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
-using System;
 using Microsoft.Xna.Framework.Content.Pipeline.Processors;
 using Microsoft.Xna.Framework.Graphics;
-
 
 namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 {
@@ -15,12 +13,12 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
         {
             return  platform == TargetPlatform.Android ||
                     platform == TargetPlatform.DesktopGL ||
+                    platform == TargetPlatform.DesktopVK ||
                     platform == TargetPlatform.MacOSX ||
                     platform == TargetPlatform.NativeClient ||
                     platform == TargetPlatform.RaspberryPi ||
                     platform == TargetPlatform.Windows ||
-                    platform == TargetPlatform.WindowsPhone8 ||
-                    platform == TargetPlatform.WindowsStoreApp ||
+                    platform == TargetPlatform.WindowsDX12 ||
                     platform == TargetPlatform.iOS ||
                     platform == TargetPlatform.Web;
         }
@@ -29,10 +27,15 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
         {
             switch (format)
             {
+#pragma warning disable CS0618 // Type or member is obsolete
+                case TextureProcessorOutputFormat.Etc1Compressed:
+#pragma warning restore CS0618 // Type or member is obsolete
+
                 case TextureProcessorOutputFormat.AtcCompressed:
                 case TextureProcessorOutputFormat.DxtCompressed:
-                case TextureProcessorOutputFormat.Etc1Compressed:
+                case TextureProcessorOutputFormat.EtcCompressed:
                 case TextureProcessorOutputFormat.PvrCompressed:
+                case TextureProcessorOutputFormat.AstcCompressed:
                     return true;
             }
             return false;
@@ -43,14 +46,14 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
             // Select the default texture compression format for the target platform
             if (format == TextureProcessorOutputFormat.Compressed)
             {
-                if (platform == TargetPlatform.iOS)
-                    format = TextureProcessorOutputFormat.PvrCompressed;
-                else if (platform == TargetPlatform.Android)
-                    format = TextureProcessorOutputFormat.Etc1Compressed;
-                else
-                    format = TextureProcessorOutputFormat.DxtCompressed;
+                format = platform switch
+                {
+                    TargetPlatform.iOS => TextureProcessorOutputFormat.PvrCompressed,
+                    TargetPlatform.Android => TextureProcessorOutputFormat.EtcCompressed,
+                    _ => TextureProcessorOutputFormat.DxtCompressed
+                };
             }
-
+           
             if (IsCompressedTextureFormat(format))
             {
                 // Make sure the target platform supports the selected texture compression format
@@ -59,10 +62,10 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
                     if (format != TextureProcessorOutputFormat.PvrCompressed)
                         throw new PlatformNotSupportedException("iOS platform only supports PVR texture compression");
                 }
-                else if (platform == TargetPlatform.Windows ||
-                            platform == TargetPlatform.WindowsPhone8 ||
-                            platform == TargetPlatform.WindowsStoreApp ||
+                else if (   platform == TargetPlatform.Windows ||
+                            platform == TargetPlatform.WindowsDX12 ||
                             platform == TargetPlatform.DesktopGL ||
+                            platform == TargetPlatform.DesktopVK ||
                             platform == TargetPlatform.MacOSX ||
                             platform == TargetPlatform.NativeClient ||
                             platform == TargetPlatform.Web)
@@ -91,23 +94,22 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
                     requiresPowerOfTwo = context.TargetProfile == GraphicsProfile.Reach;
                     break;
 
-                case TextureProcessorOutputFormat.PvrCompressed:
+#pragma warning disable CS0618 // Type or member is obsolete
                 case TextureProcessorOutputFormat.Etc1Compressed:
+#pragma warning restore CS0618 // Type or member is obsolete
+
+                case TextureProcessorOutputFormat.PvrCompressed:
+                case TextureProcessorOutputFormat.EtcCompressed:
                     requiresPowerOfTwo = true;
                     break;
             }
 
             // Does it require square textures?
-            switch (format)
+            requiresSquare = format switch
             {
-                default:
-                    requiresSquare = false;
-                    break;
-
-                case TextureProcessorOutputFormat.PvrCompressed:
-                    requiresSquare = true;
-                    break;
-            }
+                TextureProcessorOutputFormat.PvrCompressed => true,
+                _ => false
+            };
         }
 
         protected override void PlatformCompressTexture(ContentProcessorContext context, TextureContent content, TextureProcessorOutputFormat format, bool isSpriteFont)
@@ -123,6 +125,16 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
                     GraphicsUtil.CompressAti(context, content, isSpriteFont);
                     break;
 
+                case TextureProcessorOutputFormat.AstcCompressed:
+                case TextureProcessorOutputFormat.AstcCompressed4x4:
+                case TextureProcessorOutputFormat.AstcCompressed5x5:
+                case TextureProcessorOutputFormat.AstcCompressed6x6:
+                case TextureProcessorOutputFormat.AstcCompressed8x8:
+                case TextureProcessorOutputFormat.AstcCompressed10x10:
+                case TextureProcessorOutputFormat.AstcCompressed12x12:
+                    GraphicsUtil.CompressAstc(context, content, isSpriteFont, format);
+                    break;
+
                 case TextureProcessorOutputFormat.Color16Bit:
                     GraphicsUtil.CompressColor16Bit(context, content);
                     break;
@@ -131,8 +143,14 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
                     GraphicsUtil.CompressDxt(context, content, isSpriteFont);
                     break;
 
+#pragma warning disable CS0618 // Type or member is obsolete
                 case TextureProcessorOutputFormat.Etc1Compressed:
+#pragma warning restore CS0618 // Type or member is obsolete
                     GraphicsUtil.CompressEtc1(context, content, isSpriteFont);
+                    break;
+
+                case TextureProcessorOutputFormat.EtcCompressed:
+                    GraphicsUtil.CompressEtc(context, content, isSpriteFont);
                     break;
 
                 case TextureProcessorOutputFormat.PvrCompressed:

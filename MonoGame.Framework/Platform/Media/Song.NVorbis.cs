@@ -126,11 +126,6 @@ namespace Microsoft.Xna.Framework.Media
             return null;
         }
 
-        private TimeSpan PlatformGetDuration()
-        {
-            return _duration;
-        }
-
         private bool PlatformIsProtected()
         {
             return false;
@@ -139,11 +134,6 @@ namespace Microsoft.Xna.Framework.Media
         private bool PlatformIsRated()
         {
             return false;
-        }
-
-        private string PlatformGetName()
-        {
-            return Path.GetFileNameWithoutExtension(_name);
         }
 
         private int PlatformGetPlayCount()

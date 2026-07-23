@@ -8,7 +8,8 @@ using NUnit.Framework;
 
 namespace MonoGame.Tests.Graphics
 {
-    [TestFixture]
+    [NonParallelizable]
+    [RunOnUiTestFixture]
     internal class EffectTest : GraphicsDeviceTestFixtureBase
     {
         [Test]

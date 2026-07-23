@@ -9,7 +9,8 @@ using NUnit.Framework;
 
 namespace MonoGame.Tests.Graphics
 {
-    [TestFixture]
+    [NonParallelizable]
+    [RunOnUiTestFixture]
     class RenderTargetCubeTest : GraphicsDeviceTestFixtureBase
     {
         [Test]
@@ -30,6 +31,7 @@ namespace MonoGame.Tests.Graphics
             GC.GetTotalMemory(true); // collect uninitialized renderTarget
         }
 
+        [Test]
         [TestCase(1)]
         [TestCase(8)]
         [TestCase(31)]
@@ -66,7 +68,8 @@ namespace MonoGame.Tests.Graphics
 
             renderTargetCube.Dispose();
         }
-                
+
+        [Test]
         [TestCase(SurfaceFormat.Color, SurfaceFormat.Color)]
         // unsupported renderTarget formats
         [TestCase(SurfaceFormat.Alpha8, SurfaceFormat.Color)]

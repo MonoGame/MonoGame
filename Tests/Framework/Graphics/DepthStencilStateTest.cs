@@ -10,7 +10,8 @@ using NUnit.Framework;
 
 namespace MonoGame.Tests.Graphics
 {
-    [TestFixture]
+    [NonParallelizable]
+    [RunOnUiTestFixture]
     internal class DepthStencilStateTest : GraphicsDeviceTestFixtureBase
     {
         [Test]

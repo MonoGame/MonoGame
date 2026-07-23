@@ -7,15 +7,16 @@ using System.Linq;
 using Microsoft.Xna.Framework.Graphics;
 using NUnit.Framework;
 
-// HACK: Only enable for XNA and DirectX which are the 
-// only platforms which currently correctly implement 
-// the GraphicsAdapter API.
-#if XNA || DIRECTX
-
 namespace MonoGame.Tests.Graphics
 {
+    [TestFixture]
     class GraphicsAdapterTest
     {
+        // HACK: Only enable for XNA and DirectX which are the 
+        // only platforms which currently correctly implement 
+        // the GraphicsAdapter API.
+        // TODO: Enable this for DIRECTX12 as well, and find a solution to display scaling.
+#if XNA || DIRECTX
         private static bool Equals(DisplayMode m1, DisplayMode m2)
         {
             return m1.Width == m2.Width &&
@@ -109,7 +110,7 @@ namespace MonoGame.Tests.Graphics
         [TestCase(GraphicsProfile.HiDef, SurfaceFormat.Dxt3, SurfaceFormat.Color, false)]
         [TestCase(GraphicsProfile.Reach, SurfaceFormat.Dxt5, SurfaceFormat.Color, false)]
         [TestCase(GraphicsProfile.HiDef, SurfaceFormat.Dxt5, SurfaceFormat.Color, false)]
-#if !XNA        
+#if !XNA
         [TestCase(GraphicsProfile.Reach, SurfaceFormat.Dxt1a, SurfaceFormat.Color, false)]
         [TestCase(GraphicsProfile.HiDef, SurfaceFormat.Dxt1a, SurfaceFormat.Color, false)]
         [TestCase(GraphicsProfile.Reach, SurfaceFormat.Dxt1SRgb, SurfaceFormat.Color, false)]
@@ -138,7 +139,8 @@ namespace MonoGame.Tests.Graphics
             Assert.AreEqual(selectedDepthFormat, DepthFormat.None);
             Assert.AreEqual(selectedMultiSampleCount, 0);
         }
+#endif // XNA || DIRECTX
     }
 }
 
-#endif // XNA || DIRECTX
+

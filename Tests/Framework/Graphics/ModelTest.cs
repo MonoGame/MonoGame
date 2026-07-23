@@ -12,7 +12,8 @@ using System.Linq;
 namespace MonoGame.Tests.Graphics
 {
 
-    [TestFixture]
+    [NonParallelizable]
+    [RunOnUiTestFixture]
     internal sealed class ModelTest : GraphicsDeviceTestFixtureBase
     {
         // model exported from default blender project.

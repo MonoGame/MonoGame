@@ -20,28 +20,6 @@ namespace Microsoft.Xna.Framework.Input
         private static readonly Dictionary<int, GamePadInfo> Gamepads = new Dictionary<int, GamePadInfo>();
         private static readonly Dictionary<int, int> _translationTable = new Dictionary<int, int>();
 
-        /// <summary>
-        /// Initialies the internal database of gamepad mappings for an SDL context
-        /// </summary>
-        public static void InitDatabase()
-        {
-            using (var stream = ReflectionHelpers.GetAssembly(typeof(GamePad)).GetManifestResourceStream("gamecontrollerdb.txt"))
-            {
-                if (stream != null)
-                {
-                    using (var reader = new BinaryReader(stream))
-                    {
-                        try
-                        {
-                            var src = Sdl.RwFromMem(reader.ReadBytes((int)stream.Length), (int)stream.Length);
-                            Sdl.GameController.AddMappingFromRw(src, 1);
-                        }
-                        catch { }
-                    }
-                }
-            }
-        }
-
         internal static void AddDevice(int deviceId)
         {
             var gamepad = new GamePadInfo();
@@ -118,87 +96,33 @@ namespace Microsoft.Xna.Framework.Input
 
             var gamecontroller = Gamepads[index].Device;
             var caps = new GamePadCapabilities();
-            var mapping = Sdl.GameController.GetMapping(gamecontroller).Split(',');
 
             caps.IsConnected = true;
             caps.DisplayName = Sdl.GameController.GetName(gamecontroller);
             caps.Identifier = Sdl.Joystick.GetGUID(Sdl.GameController.GetJoystick(gamecontroller)).ToString();
             caps.HasLeftVibrationMotor = caps.HasRightVibrationMotor = Sdl.GameController.HasRumble(gamecontroller) != 0;
             caps.GamePadType = GamePadType.GamePad;
-
-            foreach (var map in mapping)
-            {
-                var split = map.Split(':');
-                if (split.Length != 2)
-                    continue;
-
-                switch (split[0])
-                {
-                    case "a":
-                        caps.HasAButton = true;
-                        break;
-                    case "b":
-                        caps.HasBButton = true;
-                        break;
-                    case "x":
-                        caps.HasXButton = true;
-                        break;
-                    case "y":
-                        caps.HasYButton = true;
-                        break;
-                    case "back":
-                        caps.HasBackButton = true;
-                        break;
-                    case "guide":
-                        caps.HasBigButton = true;
-                        break;
-                    case "start":
-                        caps.HasStartButton = true;
-                        break;
-                    case "dpleft":
-                        caps.HasDPadLeftButton = true;
-                        break;
-                    case "dpdown":
-                        caps.HasDPadDownButton = true;
-                        break;
-                    case "dpright":
-                        caps.HasDPadRightButton = true;
-                        break;
-                    case "dpup":
-                        caps.HasDPadUpButton = true;
-                        break;
-                    case "leftshoulder":
-                        caps.HasLeftShoulderButton = true;
-                        break;
-                    case "lefttrigger":
-                        caps.HasLeftTrigger = true;
-                        break;
-                    case "rightshoulder":
-                        caps.HasRightShoulderButton = true;
-                        break;
-                    case "righttrigger":
-                        caps.HasRightTrigger = true;
-                        break;
-                    case "leftstick":
-                        caps.HasLeftStickButton = true;
-                        break;
-                    case "rightstick":
-                        caps.HasRightStickButton = true;
-                        break;
-                    case "leftx":
-                        caps.HasLeftXThumbStick = true;
-                        break;
-                    case "lefty":
-                        caps.HasLeftYThumbStick = true;
-                        break;
-                    case "rightx":
-                        caps.HasRightXThumbStick = true;
-                        break;
-                    case "righty":
-                        caps.HasRightYThumbStick = true;
-                        break;
-                }
-            }
+            caps.HasAButton = Sdl.GameController.HasButton(gamecontroller, Sdl.GameController.Button.A);
+            caps.HasBButton = Sdl.GameController.HasButton(gamecontroller, Sdl.GameController.Button.B);
+            caps.HasXButton = Sdl.GameController.HasButton(gamecontroller, Sdl.GameController.Button.X);
+            caps.HasYButton = Sdl.GameController.HasButton(gamecontroller, Sdl.GameController.Button.Y);
+            caps.HasBackButton = Sdl.GameController.HasButton(gamecontroller, Sdl.GameController.Button.Back);
+            caps.HasBigButton = Sdl.GameController.HasButton(gamecontroller, Sdl.GameController.Button.Guide);
+            caps.HasStartButton = Sdl.GameController.HasButton(gamecontroller, Sdl.GameController.Button.Start);
+            caps.HasDPadLeftButton = Sdl.GameController.HasButton(gamecontroller, Sdl.GameController.Button.DpadLeft);
+            caps.HasDPadDownButton = Sdl.GameController.HasButton(gamecontroller, Sdl.GameController.Button.DpadDown);
+            caps.HasDPadRightButton = Sdl.GameController.HasButton(gamecontroller, Sdl.GameController.Button.DpadRight);
+            caps.HasDPadUpButton = Sdl.GameController.HasButton(gamecontroller, Sdl.GameController.Button.DpadUp);
+            caps.HasLeftShoulderButton = Sdl.GameController.HasButton(gamecontroller, Sdl.GameController.Button.LeftShoulder);
+            caps.HasLeftTrigger = Sdl.GameController.HasAxis(gamecontroller, Sdl.GameController.Axis.TriggerLeft);
+            caps.HasRightShoulderButton = Sdl.GameController.HasButton(gamecontroller, Sdl.GameController.Button.RightShoulder);
+            caps.HasRightTrigger = Sdl.GameController.HasAxis(gamecontroller, Sdl.GameController.Axis.TriggerRight);
+            caps.HasLeftStickButton = Sdl.GameController.HasButton(gamecontroller, Sdl.GameController.Button.LeftStick);
+            caps.HasRightStickButton = Sdl.GameController.HasButton(gamecontroller, Sdl.GameController.Button.RightStick);
+            caps.HasLeftXThumbStick = Sdl.GameController.HasAxis(gamecontroller, Sdl.GameController.Axis.LeftX);
+            caps.HasLeftYThumbStick = Sdl.GameController.HasAxis(gamecontroller, Sdl.GameController.Axis.LeftY);
+            caps.HasRightXThumbStick = Sdl.GameController.HasAxis(gamecontroller, Sdl.GameController.Axis.RightX);
+            caps.HasRightYThumbStick = Sdl.GameController.HasAxis(gamecontroller, Sdl.GameController.Axis.RightY);
 
             return caps;
         }

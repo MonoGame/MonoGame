@@ -2,11 +2,13 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
+#pragma warning disable
+
 using System;
 using System.Collections.Generic;
 using System.IO;
 
-namespace MonoGame.Effect.TPGParser
+namespace MonoGame.Effect
 {
     public class ShaderInfo
 	{

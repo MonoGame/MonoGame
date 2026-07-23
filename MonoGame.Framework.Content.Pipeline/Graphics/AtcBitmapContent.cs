@@ -2,44 +2,48 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
-using System;
+using BCnEncoder.Shared;
 using Microsoft.Xna.Framework.Graphics;
-using ATI.TextureConverter;
+using Microsoft.Xna.Framework.Content.Pipeline.Utilities;
 
 namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 {
+    /// <summary>
+    /// Provides properties and methods for creating and maintaining an ATC compressed bitmap resource.
+    /// </summary>
     public abstract class AtcBitmapContent : BitmapContent
     {
-        internal byte[] _bitmapData;
+        private byte[] _bitmapData = [];
 
+        /// <summary>
+        /// Initializes a new instance of AtcBitmapContent.
+        /// </summary>
         public AtcBitmapContent()
-            : base()
         {
         }
 
-        public AtcBitmapContent(int width, int height)
-            : base(width, height)
+        /// <summary>
+        /// Initializes a new instance of AtcBitmapContent with the specified width or height.
+        /// </summary>
+        /// <param name="width">Width, in pixels, of the bitmap resource.</param>
+        /// <param name="height">Height, in pixels, of the bitmap resource.</param>
+        public AtcBitmapContent(int width, int height) : base(width, height)
         {
         }
 
-        public override byte[] GetPixelData()
-        {
-            return _bitmapData;
-        }
+        /// <inheritdoc/>
+        public override byte[] GetPixelData() => _bitmapData;
 
-        public override void SetPixelData(byte[] sourceData)
-        {
-            _bitmapData = sourceData;
-        }
+        /// <inheritdoc/>
+        public override void SetPixelData(byte[] sourceData) => _bitmapData = sourceData;
 
-		protected override bool TryCopyFrom(BitmapContent sourceBitmap, Rectangle sourceRegion, Rectangle destinationRegion)
+        /// <inheritdoc/>
+        protected override bool TryCopyFrom(BitmapContent sourceBitmap, Rectangle sourceRegion, Rectangle destinationRegion)
         {
-            SurfaceFormat sourceFormat;
-            if (!sourceBitmap.TryGetFormat(out sourceFormat))
+            if (!sourceBitmap.TryGetFormat(out var sourceFormat))
                 return false;
 
-            SurfaceFormat format;
-            TryGetFormat(out format);
+            TryGetFormat(out var format);
 
             // A shortcut for copying the entire bitmap to another bitmap of the same type and format
             if (format == sourceFormat && (sourceRegion == new Rectangle(0, 0, Width, Height)) && sourceRegion == destinationRegion)
@@ -53,11 +57,11 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
                 return false;
 
             // If the source is not Vector4 or requires resizing, send it through BitmapContent.Copy
-            if (!(sourceBitmap is PixelBitmapContent<Vector4>) || sourceRegion.Width != destinationRegion.Width || sourceRegion.Height != destinationRegion.Height)
+            if (sourceBitmap is not PixelBitmapContent<Vector4> || sourceRegion.Width != destinationRegion.Width || sourceRegion.Height != destinationRegion.Height)
             {
                 try
                 {
-                    BitmapContent.Copy(sourceBitmap, sourceRegion, this, destinationRegion);
+                    Copy(sourceBitmap, sourceRegion, this, destinationRegion);
                     return true;
                 }
                 catch (InvalidOperationException)
@@ -66,39 +70,29 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
                 }
             }
 
-            // Convert to full colour 32-bit format. Floating point would be preferred for processing, but it appears the ATICompressor does not support this
-            var colorBitmap = new PixelBitmapContent<Color>(sourceRegion.Width, sourceRegion.Height);
-            BitmapContent.Copy(sourceBitmap, sourceRegion, colorBitmap, new Rectangle(0, 0, colorBitmap.Width, colorBitmap.Height));
-            sourceBitmap = colorBitmap;
-
-			ATICompressor.CompressionFormat targetFormat;
-			switch (format)
+            var compressionFormat = format switch
             {
-				case SurfaceFormat.RgbaAtcExplicitAlpha:
-					targetFormat = ATICompressor.CompressionFormat.AtcRgbaExplicitAlpha;
-					break;
-				case SurfaceFormat.RgbaAtcInterpolatedAlpha:
-					targetFormat = ATICompressor.CompressionFormat.AtcRgbaInterpolatedAlpha;
-					break;
-				default:
-					return false;
-			}
+                SurfaceFormat.RgbaAtcExplicitAlpha => CompressionFormat.AtcExplicitAlpha,
+                SurfaceFormat.RgbaAtcInterpolatedAlpha => CompressionFormat.AtcInterpolatedAlpha,
+                _ => throw new PipelineException(),
+            };
+            BcnUtil.Encode(
+                sourceBitmap: sourceBitmap,
+                destinationFormat: compressionFormat,
+                out var compressedBytes);
 
-			var sourceData = sourceBitmap.GetPixelData();
-			var compressedData = ATICompressor.Compress(sourceData, Width, Height, targetFormat);
-			SetPixelData(compressedData);
+            SetPixelData(compressedBytes);
 
-			return true;
+            return true;
         }
 
+        /// <inheritdoc/>
         protected override bool TryCopyTo(BitmapContent destinationBitmap, Rectangle sourceRegion, Rectangle destinationRegion)
         {
-            SurfaceFormat destinationFormat;
-            if (!destinationBitmap.TryGetFormat(out destinationFormat))
+            if (!destinationBitmap.TryGetFormat(out SurfaceFormat destinationFormat))
                 return false;
 
-            SurfaceFormat format;
-            TryGetFormat(out format);
+            TryGetFormat(out var format);
 
             // A shortcut for copying the entire bitmap to another bitmap of the same type and format
             if (format == destinationFormat && (sourceRegion == new Rectangle(0, 0, Width, Height)) && sourceRegion == destinationRegion)
@@ -107,7 +101,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
                 return true;
             }
 
-            // No other support for copying from a ATC texture yet
+            // No other support for copying from an ATC texture yet
             return false;
         }
     }

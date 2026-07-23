@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using System.Linq;
 
@@ -6,7 +7,7 @@ namespace Microsoft.Xna.Framework.Content
 {
     internal static class ContentExtensions
     {
-        public static ConstructorInfo GetDefaultConstructor(this Type type)
+        public static ConstructorInfo GetDefaultConstructor([DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors | DynamicallyAccessedMemberTypes.NonPublicConstructors)] this Type type)
         {
 #if NET45
             var typeInfo = type.GetTypeInfo();
@@ -18,7 +19,7 @@ namespace Microsoft.Xna.Framework.Content
 #endif
         }
 
-        public static PropertyInfo[] GetAllProperties(this Type type)
+        public static PropertyInfo[] GetAllProperties([DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.NonPublicProperties | DynamicallyAccessedMemberTypes.PublicProperties)] this Type type)
         {
 
             // Sometimes, overridden properties of abstract classes can show up even with 
@@ -42,7 +43,7 @@ namespace Microsoft.Xna.Framework.Content
         }
 
 
-        public static FieldInfo[] GetAllFields(this Type type)
+        public static FieldInfo[] GetAllFields([DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.NonPublicFields | DynamicallyAccessedMemberTypes.PublicFields)] this Type type)
         {
 #if NET45
             FieldInfo[] fields= type.GetTypeInfo().DeclaredFields.ToArray();

@@ -9,9 +9,11 @@ using NUnit.Framework;
 
 namespace MonoGame.Tests.Graphics
 {
-	[TestFixture]
+    [NonParallelizable]
+	[RunOnUiTestFixture]
 	class ShaderTest : GraphicsDeviceTestFixtureBase
     {
+        [Test]
 		[TestCase("NoEffect")]
 		[TestCase("HighContrast")]
 		[TestCase("Bevels")]

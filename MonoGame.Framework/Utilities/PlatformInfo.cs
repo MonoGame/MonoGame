@@ -28,8 +28,6 @@ namespace MonoGame.Framework.Utilities
                 return MonoGamePlatform.WebGL;
 #elif WINDOWS && DIRECTX
                 return MonoGamePlatform.Windows;
-#elif WINDOWS_UAP
-                return MonoGamePlatform.WindowsUniversal;
 #elif SWITCH
                 return MonoGamePlatform.NintendoSwitch;
 #elif XB1
@@ -38,8 +36,6 @@ namespace MonoGame.Framework.Utilities
                 return MonoGamePlatform.PlayStation4;
 #elif PLAYSTATION5
                 return MonoGamePlatform.PlayStation5;
-#elif STADIA
-                return MonoGamePlatform.Stadia;
 #else
                 return PlatformGetMonoGamePlatform();
 #endif

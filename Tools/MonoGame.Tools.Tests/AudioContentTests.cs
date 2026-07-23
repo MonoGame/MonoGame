@@ -11,6 +11,7 @@ using NUnit.Framework;
 
 namespace MonoGame.Tests.ContentPipeline
 {
+    [Category("Audio")]
     class AudioContentTests
     {
         [Test]

@@ -1,8 +1,9 @@
-﻿// MonoGame - Copyright (C) MonoGame Foundation, Inc
+// MonoGame - Copyright (C) MonoGame Foundation, Inc
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -13,11 +14,25 @@ using Microsoft.Xna.Framework.Graphics;
 using MonoGame.Tests.Components;
 using MonoGame.Tests.Utilities;
 using NUnit.Framework;
+using NUnit.Framework.Internal;
 
 namespace MonoGame.Tests.Graphics
 {
-    internal class GraphicsDeviceTestFixtureBase
+    [Category("GraphicsDevice")]
+    [RunOnUiTestFixture]
+    internal abstract class GraphicsDeviceTestFixtureBase
     {
+        static GraphicsDeviceTestFixtureBase()
+        {
+            // This is here to hint to the codebase that we're
+            // running unit tests.
+            //
+            // In particular we're using this to lower the memory
+            // usage of the D3D12 backend for our unit test runner machine.
+            //
+            Environment.SetEnvironmentVariable("MG_RUNNING_UNIT_TESTS", "1");
+        }
+
         protected TestGameBase game;
         protected GraphicsDeviceManager gdm;
         protected GraphicsDevice gd;
@@ -49,6 +64,7 @@ namespace MonoGame.Tests.Graphics
         #region SetUp and TearDown
 
         [SetUp]
+        [Category("GraphicsDevice")]
         public virtual void SetUp()
         {
             game = new TestGameBase();
@@ -162,7 +178,7 @@ namespace MonoGame.Tests.Graphics
             var referenceImageDirectory = Paths.ReferenceImage(folderName);
             var outputDirectory = Paths.CapturedFrame(folderName);
             var fileName = TestContext.CurrentContext.GetTestFrameFileNameFormat(_totalFramesExpected);
-            var capturedImagePath = Path.Combine(outputDirectory, fileName);
+            var capturedImagePath = Path.Combine(TestContext.CurrentContext.TestDirectory, outputDirectory, fileName);
             var referenceImagePath = Path.Combine(referenceImageDirectory, fileName);
             
             var allResults = new List<FrameComparisonResult>();

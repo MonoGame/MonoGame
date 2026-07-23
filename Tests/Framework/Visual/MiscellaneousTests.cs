@@ -1,13 +1,15 @@
-﻿// MonoGame - Copyright (C) MonoGame Foundation, Inc
+// MonoGame - Copyright (C) MonoGame Foundation, Inc
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
-
+using System;
+using System.Runtime.InteropServices;
 using Microsoft.Xna.Framework;
 using MonoGame.Tests.Components;
 using NUnit.Framework;
 
 namespace MonoGame.Tests.Visual {
-	[TestFixture]
+	[NonParallelizable]
+	[RunOnUiTestFixture]
 	class MiscellaneousTests : VisualTestFixtureBase
     {
 		[Test]
@@ -40,11 +42,15 @@ namespace MonoGame.Tests.Visual {
 			RunSingleFrameTest ();
 		}
 
-		[Test, Ignore("Fix me!")]
+		[Test]
 		public void SpaceshipModel ()
 		{
+			if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows)) {
+				Assert.Ignore();
+			}
 			Game.Components.Add (new SpaceshipModelDrawComponent(Game));
-			RunMultiFrameTest (captureCount: 10, captureStride: 2);
+            // only require 95% similarity since we need to take into account floating point rotation accuracy.
+			RunMultiFrameTest (captureCount: 10, captureStride: 2, similarity: 0.95f);
 		}
 	}
 }

@@ -131,6 +131,7 @@ namespace Microsoft.Xna.Framework.Audio
                 {
                     case "fmt ":
                         {
+                            int formatChunkBytesRead = 16;
                             audioFormat = reader.ReadInt16(); // 2
                             channels = reader.ReadInt16(); // 4
                             frequency = reader.ReadInt32();  // 8
@@ -142,10 +143,12 @@ namespace Microsoft.Xna.Framework.Audio
                             if (chunkSize > 16)
                             {
                                 int extraDataSize = reader.ReadInt16();
+                                formatChunkBytesRead += 2;
                                 if (audioFormat == FormatIma4)
                                 {
                                     samplesPerBlock = reader.ReadInt16();
                                     extraDataSize -= 2;
+                                    formatChunkBytesRead += 2;
                                 }
                                 if (extraDataSize > 0)
                                 {
@@ -156,6 +159,19 @@ namespace Microsoft.Xna.Framework.Audio
                                         for (int i = 0; i < extraDataSize; ++i)
                                             reader.ReadByte();
                                     }
+                                }
+                                formatChunkBytesRead += extraDataSize;
+                            }
+
+                            int remainingFormatChunkBytes = chunkSize - formatChunkBytesRead;
+                            if (remainingFormatChunkBytes > 0)
+                            {
+                                if (reader.BaseStream.CanSeek)
+                                    reader.BaseStream.Seek(remainingFormatChunkBytes, SeekOrigin.Current);
+                                else
+                                {
+                                    for (int i = 0; i < remainingFormatChunkBytes; ++i)
+                                        reader.ReadByte();
                                 }
                             }
                         }

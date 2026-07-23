@@ -1,20 +1,10 @@
-#region File Description
-//-----------------------------------------------------------------------------
-// LocalizedFontProcessor.cs
-//
-// Microsoft XNA Community Game Platform
-// Copyright (C) Microsoft Corporation. All rights reserved.
-//-----------------------------------------------------------------------------
-#endregion
+// MonoGame - Copyright (C) MonoGame Foundation, Inc
+// This file is subject to the terms and conditions defined in
+// file 'LICENSE.txt', which is part of this source code package.
 
-#region Using Statements
 using System.ComponentModel;
-using System.IO;
 using System.Xml;
-using Microsoft.Xna.Framework.Content.Pipeline;
 using Microsoft.Xna.Framework.Content.Pipeline.Graphics;
-using Microsoft.Xna.Framework.Content.Pipeline.Processors;
-#endregion
 
 namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
 {
@@ -29,32 +19,31 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
     /// use a small fraction of these. Building only the characters we need is far more
     /// efficient than if we tried to include the entire CJK character region.
     /// </summary>
+    [Obsolete($"Please use {nameof(FontImporter)} for importing and {nameof(FontDescriptionProcessor)} for processing instead.")]
     [ContentProcessor]
-    public class LocalizedFontProcessor : ContentProcessor<LocalizedFontDescription,
-                                                    SpriteFontContent>
+    public class LocalizedFontProcessor : ContentProcessor<LocalizedFontDescription, SpriteFontContent>
     {
+        /// <summary>
+        /// Gets or Sets the premultiply alpha flag.
+        /// </summary>
         [DefaultValue(true)]
-        public virtual bool PremultiplyAlpha { get; set; }
+        public virtual bool PremultiplyAlpha { get; set; } = true;
 
+        /// <summary>
+        /// Gets or Sets the target texture output format.
+        /// </summary>
         [DefaultValue(typeof(TextureProcessorOutputFormat), "Compressed")]
-        public virtual TextureProcessorOutputFormat TextureFormat { get; set; }
-
-        public LocalizedFontProcessor ()
-        {
-              PremultiplyAlpha = true;
-              TextureFormat = TextureProcessorOutputFormat.Compressed;
-        }
+        public virtual TextureProcessorOutputFormat TextureFormat { get; set; } = TextureProcessorOutputFormat.Compressed;
 
         /// <summary>
         /// Converts a font description into SpriteFont format.
         /// </summary>
-        public override SpriteFontContent Process(LocalizedFontDescription input,
-                                                  ContentProcessorContext context)
+        public override SpriteFontContent Process(LocalizedFontDescription input, ContentProcessorContext context)
         {
             // Scan each .resx file in turn.
-            foreach (string resourceFile in input.ResourceFiles)
+            foreach (var resourceFile in input.ResourceFiles)
             {
-                string absolutePath = Path.GetFullPath(resourceFile.Replace ('\\', Path.DirectorySeparatorChar).Replace ('/', Path.DirectorySeparatorChar));
+                var absolutePath = Path.GetFullPath(resourceFile.Replace('\\', Path.DirectorySeparatorChar).Replace('/', Path.DirectorySeparatorChar));
 
                 // Make sure the .resx file really does exist.
                 if (!File.Exists(absolutePath))
@@ -63,20 +52,23 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
                 }
 
                 // Load the .resx data.
-                XmlDocument xmlDocument = new XmlDocument();
-
+                var xmlDocument = new XmlDocument();
                 xmlDocument.Load(absolutePath);
 
                 // Scan each string from the .resx file.
-                foreach (XmlNode xmlNode in xmlDocument.SelectNodes("root/data/value"))
+                var nodes = xmlDocument.SelectNodes("root/data/value");
+                if (nodes != null)
                 {
-                    string resourceString = xmlNode.InnerText;
-
-                    // Scan each character of the string.
-                    foreach (char usedCharacter in resourceString)
+                    foreach (XmlNode xmlNode in nodes)
                     {
-                        if (!input.Characters.Contains (usedCharacter))
-                            input.Characters.Add(usedCharacter);
+                        var resourceString = xmlNode.InnerText;
+
+                        // Scan each character of the string.
+                        foreach (var usedCharacter in resourceString)
+                        {
+                            if (!input.Characters.Contains(usedCharacter))
+                                input.Characters.Add(usedCharacter);
+                        }
                     }
                 }
 
@@ -84,13 +76,13 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
                 context.AddDependency(absolutePath);
             }
 
-            var parameters = new OpaqueDataDictionary ();
-            parameters.Add ("PremultiplyAlpha", PremultiplyAlpha);
-            parameters.Add ("TextureFormat", TextureFormat);
             // After adding the necessary characters, we can use the built in
             // FontDescriptionProcessor to do the hard work of building the font for us.
-            return context.Convert<FontDescription,
-                SpriteFontContent>(input, "FontDescriptionProcessor", parameters);
+            return context.Convert<FontDescription, SpriteFontContent>(input, new FontDescriptionProcessor
+            {
+                PremultiplyAlpha = PremultiplyAlpha,
+                TextureFormat = TextureFormat
+            });
         }
     }
 }

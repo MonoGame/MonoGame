@@ -22,7 +22,9 @@ namespace Microsoft.Xna.Framework
             _gameWindow = new AndroidGameWindow(Game.Activity, game);
             Window = _gameWindow;
 
+#if !NO_AUDIO
             MediaLibrary.Context = Game.Activity;
+#endif
         }
 
         protected override void Dispose(bool disposing)

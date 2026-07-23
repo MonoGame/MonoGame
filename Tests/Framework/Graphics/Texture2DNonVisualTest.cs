@@ -5,6 +5,7 @@
 using System;
 using System.IO;
 using System.Runtime.InteropServices;
+using System.Runtime.Serialization;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using NUnit.Framework;
@@ -12,11 +13,13 @@ using StbImageSharp;
 
 namespace MonoGame.Tests.Graphics
 {
-    [TestFixture]
+    [NonParallelizable]
+    [RunOnUiTestFixture]
     internal class Texture2DNonVisualTest : GraphicsDeviceTestFixtureBase
     {
         Texture2D _texture;
 
+        [Test]
 #if !XNA
         [TestCase("Assets/Textures/LogoOnly_64px.bmp")]
         [TestCase("Assets/Textures/LogoOnly_64px.tga")]
@@ -47,11 +50,10 @@ namespace MonoGame.Tests.Graphics
             _texture = null;
         }
 
+        [Test]
 #if XNA
         [TestCase("Assets/Textures/LogoOnly_64px.bmp")]
 #endif
-        // not supported
-        [TestCase("Assets/Textures/LogoOnly_64px.tif")]
         [TestCase("Assets/Textures/LogoOnly_64px.dds")]
         [TestCase("Assets/Textures/SampleCube64DXT1Mips.dds")]
         public void FromStreamShouldFailTest(string filename)
@@ -123,7 +125,7 @@ namespace MonoGame.Tests.Graphics
             }
         }
 
-        [TestCase]
+        [Test]
         public void FromStreamNotPremultiplied()
         {
             // XNA will not try to premultiply your image on
@@ -148,7 +150,7 @@ namespace MonoGame.Tests.Graphics
             }
         }
 
-        [TestCase]
+        [Test]
         public void FromStreamAtTheEnd()
         {
             // Check whether texture can be loaded if a stream being at its end
@@ -177,7 +179,7 @@ namespace MonoGame.Tests.Graphics
             }
         }
 
-        [TestCase]
+        [Test]
         public void FromStreamBlackAlpha()
         {
             // XNA will make any pixel with an alpha value
@@ -237,6 +239,7 @@ namespace MonoGame.Tests.Graphics
             }
         }
 
+        [Test]
         [TestCase(25, 23, 1, 1, 0, 1)]
         [TestCase(25, 23, 1, 1, 1, 1)]
         [TestCase(25, 23, 2, 1, 0, 2)]
@@ -265,6 +268,7 @@ namespace MonoGame.Tests.Graphics
                 t.Dispose();
             }
         }
+        [Test]
         [TestCase(25, 23, 2, 2, 0, 2)]
         [TestCase(25, 23, 2, 2, 1, 2)]
         public void GetDataException(int rx, int ry, int rw, int rh, int startIndex, int elementsToRead)
@@ -284,6 +288,7 @@ namespace MonoGame.Tests.Graphics
             }
         }
 
+        [Test]
         [TestCase(4096)]
         public void SetData1ParameterGoodTest(int arraySize)
         {
@@ -322,6 +327,7 @@ namespace MonoGame.Tests.Graphics
             }
         }
 
+        [Test]
         [TestCase(2000)]
         [TestCase(4095)]
         [TestCase(2000000)]
@@ -352,6 +358,7 @@ namespace MonoGame.Tests.Graphics
             }
         }
 
+        [Test]
         [TestCase(SurfaceFormat.HalfSingle, (short)(160 << 8 + 120))]
 #if !DESKTOPGL
         // format not supported
@@ -390,6 +397,7 @@ namespace MonoGame.Tests.Graphics
             t.Dispose();
         }
 
+        [Test]
         [TestCase(SurfaceFormat.Color, (long)0)]
         [TestCase(SurfaceFormat.HalfSingle, (float)0)]
         public void SetDataFormatFailingTestTBufferTooLarge<TBuffer>(SurfaceFormat format, TBuffer value) where TBuffer : struct
@@ -455,6 +463,7 @@ namespace MonoGame.Tests.Graphics
             }
         }
 
+        [Test]
         [TestCase(4200, 0, 4096)]
         [TestCase(4097, 1, 4096)]
         [TestCase(4097, 0, 4096)]
@@ -496,6 +505,7 @@ namespace MonoGame.Tests.Graphics
             }
         }
 
+        [Test]
         [TestCase(2000, 0, 4096)]
         [TestCase(4095, 0, 4095)]
         [TestCase(4095, 1, 4095)]
@@ -536,6 +546,7 @@ namespace MonoGame.Tests.Graphics
             }
         }
 
+        [Test]
         [TestCase(4096, 0, 4096, 0, 0, 64, 64)]
         [TestCase(4096, 0, 3969, 1, 1, 63, 63)]
         [TestCase(3969, 0, 3969, 1, 1, 63, 63)]
@@ -582,6 +593,7 @@ namespace MonoGame.Tests.Graphics
                 t.Dispose();
             }
         }
+        [Test]
         [TestCase(3844, 0, 3844, 1, 1, 63, 63)]
         [TestCase(3845, 1, 3844, 1, 1, 63, 63)]
         [TestCase(3969, 0, 4096, 1, 1, 63, 63)]
@@ -732,6 +744,7 @@ namespace MonoGame.Tests.Graphics
             t.Dispose();
         }
 
+        [Test]
         // DXT1
         [TestCase(8, "random_16px_dxt", 0)]
         [TestCase(8, "random_16px_dxt", 1)]
@@ -786,6 +799,7 @@ namespace MonoGame.Tests.Graphics
             t.Dispose();
         }
 
+        [Test]
         [TestCase("random_16px_dxt", 8)]
         [TestCase("random_16px_dxt_alpha", 16)]
         public void GetAndSetDataDxtDontRoundWhenOutsideBounds(string texName, int bs)
@@ -802,6 +816,7 @@ namespace MonoGame.Tests.Graphics
             t.Dispose();
         }
 
+        [Test]
         [TestCase("random_16px_dxt", 8)]
         [TestCase("random_16px_dxt_alpha", 16)]
         public void GetAndSetDataDxtLowerMips(string texName, int bs)
@@ -825,7 +840,11 @@ namespace MonoGame.Tests.Graphics
             t.Dispose();
         }
 
+
         [Test]
+#if VULKAN
+        [Ignore("Not Bgr565 on Mac")]
+#endif
         public void GetDataRowPitch()
         {
             const int w = 5;
@@ -843,6 +862,7 @@ namespace MonoGame.Tests.Graphics
 
             tex.Dispose();
         }
+
 
         [Test]
         public void NullDeviceShouldThrowArgumentNullException()

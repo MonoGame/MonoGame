@@ -1,13 +1,10 @@
 ﻿/*
 This was adapted from a version I found online. Here's the original header:
- 	Based on the Public Domain MaxRectsBinPack.cpp source by Jukka Jylänki
- 	https://github.com/juj/RectangleBinPack/
- 	Ported to C# by Sven Magnus
- 	This version is also public domain - do whatever you want with it.
+    Based on the Public Domain MaxRectsBinPack.cpp source by Jukka Jylänki
+    https://github.com/juj/RectangleBinPack/
+    Ported to C# by Sven Magnus
+    This version is also public domain - do whatever you want with it.
 */
-
-using System;
-using System.Collections.Generic;
 
 namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 {
@@ -34,7 +31,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
         /// <summary>
         /// Padding to add to both sides in the horizontal dimension. Default is 0.
         /// </summary>
-        public int PaddingWidth { get; set; }
+        public int PaddingWidth { get; }
 
         /// <summary>
         /// Padding to add to both sides in the vertical dimension. Default is 0.
@@ -108,8 +105,8 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
             GrowIncrement = growIncrement;
             AllowRotations = allowRotation;
 
-            _usedRectangles = new List<Rectangle>();
-            _freeRectangles = new List<Rectangle>();
+            _usedRectangles = [];
+            _freeRectangles = [];
 
             var n = new Rectangle(0, 0, width, height);
             _freeRectangles.Add(n);
@@ -262,10 +259,8 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
         /// </exception>
         public void Insert(Point[] sizes, Rectangle[] bounds, int indexOffset = 0, MaxRectsHeuristic heuristic = MaxRectsHeuristic.Bssf)
         {
-            if (sizes == null)
-                throw new ArgumentNullException(nameof(sizes));
-            if (bounds == null)
-                throw new ArgumentNullException(nameof(bounds));
+            ArgumentNullException.ThrowIfNull(sizes);
+            ArgumentNullException.ThrowIfNull(bounds);
             if (indexOffset < 0)
                 throw new ArgumentOutOfRangeException(nameof(indexOffset), "Index offset must be larger than 0.");
             if (bounds.Length - indexOffset < sizes.Length)
@@ -581,7 +576,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
         }
 
         /// Returns 0 if the two intervals i1 and i2 are disjoint, or the length of their overlap otherwise.
-        private int CommonIntervalLength(int i1Start, int i1End, int i2Start, int i2End)
+        private static int CommonIntervalLength(int i1Start, int i1End, int i2Start, int i2End)
         {
             if (i1End < i2Start || i2End < i1Start)
                 return 0;
@@ -709,7 +704,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
                 }
         }
 
-        private bool IsContainedIn(Rectangle a, Rectangle b)
+        private static bool IsContainedIn(Rectangle a, Rectangle b)
         {
             return a.Left >= b.Left &&
                    a.Top >= b.Top &&

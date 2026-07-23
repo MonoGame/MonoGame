@@ -2,21 +2,19 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
-using System;
-
 namespace Microsoft.Xna.Framework.Content.Pipeline
 {
     /// <summary>
     /// Provides a base class to use when developing custom processor components. All processors must derive from this class.
     /// </summary>
-    public abstract class ContentProcessor<TInput, TOutput> : IContentProcessor
+    public abstract class ContentProcessor<TInput, TOutput> : IContentProcessor where TOutput : notnull
     {
         /// <summary>
         /// Initializes a new instance of the ContentProcessor class.
         /// </summary>
         protected ContentProcessor()
         {
-
+            Version = (GetType().Assembly.GetName().Version ?? new Version()).ToString();
         }
 
         /// <summary>
@@ -28,20 +26,19 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
         public abstract TOutput Process(TInput input, ContentProcessorContext context);
 
         /// <summary>
+        /// Gets or sets the version of the current content processor that will be used to determien if the content needs to be rebuilt.
+        /// </summary>
+        public virtual string Version { get; set; }
+
+        /// <summary>
         /// Gets the expected object type of the input parameter to IContentProcessor.Process.
         /// </summary>
-        Type IContentProcessor.InputType
-        {
-            get { return typeof(TInput); }
-        }
+        Type IContentProcessor.InputType => typeof(TInput);
 
         /// <summary>
         /// Gets the object type returned by IContentProcessor.Process.
         /// </summary>
-        Type IContentProcessor.OutputType
-        {
-            get { return typeof(TOutput); }
-        }
+        Type IContentProcessor.OutputType => typeof(TOutput);
 
         /// <summary>
         /// Processes the specified input data and returns the result.
@@ -51,13 +48,11 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
         /// <returns>The processed input.</returns>
         object IContentProcessor.Process(object input, ContentProcessorContext context)
         {
-            if (input == null)
-                throw new ArgumentNullException("input");
-            if (context == null)
-                throw new ArgumentNullException("context");
-            if (!(input is TInput))
+            ArgumentNullException.ThrowIfNull(input);
+            ArgumentNullException.ThrowIfNull(context);
+            if (input is not TInput tinput)
                 throw new InvalidOperationException("input is not of the expected type");
-            return Process((TInput)input, context);
+            return Process(tinput, context);
         }
     }
 }

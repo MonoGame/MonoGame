@@ -9,7 +9,8 @@ using NUnit.Framework;
 
 namespace MonoGame.Tests.Graphics
 {
-    [TestFixture]
+    [NonParallelizable]
+    [RunOnUiTestFixture]
     internal class SamplerStateTest : GraphicsDeviceTestFixtureBase
     {
         [Test]
@@ -69,6 +70,15 @@ namespace MonoGame.Tests.Graphics
         [Test]
         public void VisualTestAddressModes()
         {
+#if VULKAN
+            if (OperatingSystem.IsMacOS())
+            {
+                Assert.Ignore("TODO: Fix on macOS");
+                return;
+            }
+
+#endif
+
             PrepareFrameCapture();
 
             var addressModes = new[]

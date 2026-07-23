@@ -2,7 +2,6 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
-using System;
 using System.Collections.ObjectModel;
 
 namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
@@ -19,11 +18,12 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
         internal MipmapChainCollection(int count, bool fixedSize)
         {
             for (var i = 0; i < count; i++)
-                Add(new MipmapChain());
+                Add([]);
 
             _fixedSize = fixedSize;
         }
 
+        /// <inheritdoc/>
         protected override void ClearItems()
         {
             if (_fixedSize)
@@ -32,6 +32,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
             base.ClearItems();
         }
 
+        /// <inheritdoc/>
         protected override void RemoveItem(int index)
         {
             if (_fixedSize)
@@ -40,6 +41,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
             base.RemoveItem(index);
         }
 
+        /// <inheritdoc/>
         protected override void InsertItem(int index, MipmapChain item)
         {
             if (_fixedSize)

@@ -30,10 +30,7 @@ namespace Microsoft.Xna.Framework.Graphics
             int back,
             T[] data,
             int startIndex,
-            int elementCount,
-            int width, 
-            int height, 
-            int depth)
+            int elementCount)
         {
             throw new NotImplementedException();
         }

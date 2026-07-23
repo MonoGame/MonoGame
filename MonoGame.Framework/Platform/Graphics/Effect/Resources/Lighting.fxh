@@ -20,7 +20,7 @@ ColorPair ComputeLights(float3 eyeVector, float3 worldNormal, uniform int numLig
     float3x3 lightSpecular = 0;
     float3x3 halfVectors = 0;
     
-    [unroll]
+    UNROLL
     for (int i = 0; i < numLights; i++)
     {
         lightDirections[i] = float3x3(DirLight0Direction,     DirLight1Direction,     DirLight2Direction)    [i];

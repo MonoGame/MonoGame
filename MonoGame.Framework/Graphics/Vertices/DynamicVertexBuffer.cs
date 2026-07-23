@@ -4,6 +4,7 @@
 
 using System;
 using MonoGame.Framework.Utilities;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
@@ -82,7 +83,7 @@ namespace Microsoft.Xna.Framework.Graphics
         /// <paramref name="type"/> parameter.
         /// </exception>
         /// <exception cref="InvalidOperationException">This resource could not be created.</exception>
-		public DynamicVertexBuffer(GraphicsDevice graphicsDevice, Type type, int vertexCount, BufferUsage bufferUsage)
+		public DynamicVertexBuffer(GraphicsDevice graphicsDevice, [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicParameterlessConstructor)] Type type, int vertexCount, BufferUsage bufferUsage)
             : base(graphicsDevice, VertexDeclaration.FromType(type), vertexCount, bufferUsage, true)
         {
         }
@@ -131,7 +132,7 @@ namespace Microsoft.Xna.Framework.Graphics
         /// </exception>
         public void SetData<T>(T[] data, int startIndex, int elementCount, SetDataOptions options) where T : struct
         {
-            var elementSizeInBytes = ReflectionHelpers.SizeOf<T>.Get();
+            var elementSizeInBytes = ReflectionHelpers.FastSizeOf<T>();
             base.SetDataInternal<T>(0, data, startIndex, elementCount, elementSizeInBytes, options);
         }
     }

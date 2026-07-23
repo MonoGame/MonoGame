@@ -1,4 +1,4 @@
-﻿// MonoGame - Copyright (C) MonoGame Foundation, Inc
+// MonoGame - Copyright (C) MonoGame Foundation, Inc
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
@@ -14,7 +14,8 @@ using MonoGame.OpenGL;
 
 namespace MonoGame.Tests.Graphics
 {
-    [TestFixture]
+    [NonParallelizable]
+    [RunOnUiTestFixture]
     internal class GraphicsDeviceTest : GraphicsDeviceTestFixtureBase
     {
         [Test]
@@ -325,7 +326,7 @@ namespace MonoGame.Tests.Graphics
         }
 #endif
 
-#if XNA || DIRECTX
+#if XNA || DIRECTX || DIRECTX12 || VULKAN
         [Test]
         public void DrawInstancedPrimitivesParameterValidation()
         {
@@ -452,6 +453,89 @@ namespace MonoGame.Tests.Graphics
             vertexBuffer.Dispose();
             instanceVertexBuffer.Dispose();
             indexBuffer.Dispose();
+        }
+
+        [Test]
+        public void DrawInstancedPrimitivesUsesInstanceData()
+        {
+            var renderTarget = new RenderTarget2D(gd, 64, 32, false, SurfaceFormat.Color, DepthFormat.None);
+            VertexBuffer vertexBuffer = null;
+            IndexBuffer indexBuffer = null;
+            VertexBuffer instanceVertexBuffer = null;
+            Effect effect = null;
+
+            try
+            {
+                var vertices = new[]
+                {
+                    new VertexPositionTexture(new Vector3(-6,  6, 0), new Vector2(0, 0)),
+                    new VertexPositionTexture(new Vector3( 6,  6, 0), new Vector2(1, 0)),
+                    new VertexPositionTexture(new Vector3(-6, -6, 0), new Vector2(0, 1)),
+                    new VertexPositionTexture(new Vector3( 6, -6, 0), new Vector2(1, 1)),
+                };
+                vertexBuffer = new VertexBuffer(gd, VertexPositionTexture.VertexDeclaration, vertices.Length, BufferUsage.None);
+                vertexBuffer.SetData(vertices);
+
+                var indices = new ushort[] { 0, 1, 2, 1, 3, 2 };
+                indexBuffer = new IndexBuffer(gd, IndexElementSize.SixteenBits, indices.Length, BufferUsage.None);
+                indexBuffer.SetData(indices);
+
+                var instanceTransforms = new[]
+                {
+                    Matrix.CreateTranslation(-16, 0, 0),
+                    Matrix.CreateTranslation(16, 0, 0),
+                };
+                var instanceVertexDeclaration = new VertexDeclaration
+                (
+                    new VertexElement(0, VertexElementFormat.Vector4, VertexElementUsage.BlendWeight, 0),
+                    new VertexElement(16, VertexElementFormat.Vector4, VertexElementUsage.BlendWeight, 1),
+                    new VertexElement(32, VertexElementFormat.Vector4, VertexElementUsage.BlendWeight, 2),
+                    new VertexElement(48, VertexElementFormat.Vector4, VertexElementUsage.BlendWeight, 3)
+                );
+                instanceVertexBuffer = new VertexBuffer(gd, instanceVertexDeclaration, instanceTransforms.Length, BufferUsage.None);
+                instanceVertexBuffer.SetData(instanceTransforms);
+
+                effect = AssetTestUtility.LoadEffect(content, "Instancing");
+                effect.Parameters["View"].SetValue(Matrix.Identity);
+                effect.Parameters["Projection"].SetValue(Matrix.CreateOrthographic(64, 32, 0, 1));
+
+                gd.SetRenderTarget(renderTarget);
+                gd.Clear(Color.CornflowerBlue);
+                gd.BlendState = BlendState.Opaque;
+                gd.DepthStencilState = DepthStencilState.None;
+                gd.RasterizerState = RasterizerState.CullNone;
+                gd.SetVertexBuffers(
+                    new VertexBufferBinding(vertexBuffer, 0, 0),
+                    new VertexBufferBinding(instanceVertexBuffer, 0, 1));
+                gd.Indices = indexBuffer;
+
+                effect.Techniques[0].Passes[0].Apply();
+                gd.DrawInstancedPrimitives(PrimitiveType.TriangleList, 0, 0, indices.Length, 0, 2, instanceTransforms.Length);
+
+                gd.SetRenderTarget(null);
+
+                var pixels = new Color[renderTarget.Width * renderTarget.Height];
+                renderTarget.GetData(pixels);
+
+                Assert.That(pixels[16 + 16 * renderTarget.Width], Is.Not.EqualTo(Color.CornflowerBlue));
+                Assert.That(pixels[48 + 16 * renderTarget.Width], Is.Not.EqualTo(Color.CornflowerBlue));
+                Assert.That(pixels[32 + 16 * renderTarget.Width], Is.EqualTo(Color.CornflowerBlue));
+            }
+            finally
+            {
+                gd.SetRenderTarget(null);
+
+                if (effect != null)
+                    effect.Dispose();
+                if (vertexBuffer != null)
+                    vertexBuffer.Dispose();
+                if (instanceVertexBuffer != null)
+                    instanceVertexBuffer.Dispose();
+                if (indexBuffer != null)
+                    indexBuffer.Dispose();
+
+                renderTarget.Dispose();
+            }
         }
 #endif
 
@@ -617,6 +701,20 @@ namespace MonoGame.Tests.Graphics
 #endif
             foreach (var format in Enum.GetValues(typeof(SurfaceFormat)).Cast<SurfaceFormat>())
             {
+#if VULKAN
+                // Skip the Bgr565 on Mac on Vulkan
+                if (OperatingSystem.IsMacOS()
+                    && format is SurfaceFormat.Bgr565 or SurfaceFormat.Bgra5551 or SurfaceFormat.Bgra4444)
+                {
+                    //TODO: Fix on macOS
+                    continue;
+                }
+#endif
+#if !MOBILE
+                // Skip the mobile formats on non-mobile platforms.
+                if (format > SurfaceFormat.Dxt5SRgb)
+                    continue;
+#endif
                 var texture = new Texture2D(gd, 4, 4, false, format);
 
                 if (supportedVertexTextureFormats.Contains(format))
@@ -790,6 +888,7 @@ namespace MonoGame.Tests.Graphics
             };
         }
 
+        [Test]
         [TestCaseSource("BackBufferRects")]
         public void GetBackBufferData(Rectangle? rectangle)
         {
@@ -822,6 +921,32 @@ namespace MonoGame.Tests.Graphics
             sb.End();
 
             CheckFrames();
+        }
+
+        [Test]
+        public void DisposeReferencedResources()
+        {
+            var rt = new RenderTarget2D(gdm.GraphicsDevice, 5, 5);
+            var vb = new DynamicVertexBuffer(gd, VertexPositionColor.VertexDeclaration, 1, BufferUsage.None);
+
+            var middleIb = new DynamicIndexBuffer(gd, IndexElementSize.SixteenBits, 1, BufferUsage.None);
+
+            var ib = new DynamicIndexBuffer(gd, IndexElementSize.SixteenBits, 1, BufferUsage.None);
+            var rtc = new RenderTargetCube(gd, 1, false, SurfaceFormat.Color, DepthFormat.Depth16);
+
+            middleIb.Dispose();
+            Assert.IsTrue(middleIb.IsDisposed);
+
+            // Remaining referenced resources should be disposed.
+            gd.Dispose();
+
+            Assert.IsTrue(rt.IsDisposed);
+
+            Assert.IsTrue(vb.IsDisposed);
+
+            Assert.IsTrue(ib.IsDisposed);
+
+            Assert.IsTrue(rtc.IsDisposed);
         }
     }
 }

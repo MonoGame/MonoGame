@@ -12,13 +12,14 @@
     <AppendTargetFrameworkToOutputPath>False</AppendTargetFrameworkToOutputPath>
     <AssemblyName>mgcb-editor-mac</AssemblyName>
     <ImplicitUsings>true</ImplicitUsings>
+    <RuntimeIdentifiers>osx-x64;osx-arm64</RuntimeIdentifiers>
   </PropertyGroup>
 
   <ItemGroup>
-    <Content Include="..\..\Artifacts\MonoGame.Content.Builder.Editor\Mac\Release\MGCB Editor.app\**\*">
+    <None Include="..\..\Artifacts\MonoGame.Content.Builder.Editor\Mac\Release\mgcb-editor-mac.app\**\*">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <Link>MGCB Editor.app\%(RecursiveDir)%(Filename)%(Extension)</Link>
-    </Content>
+    </None>
   </ItemGroup>
 
 </Project>

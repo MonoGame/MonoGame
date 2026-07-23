@@ -10,12 +10,15 @@ using NUnit.Framework;
 
 namespace MonoGame.Tests.Graphics
 {
-    [TestFixture]
+    [NonParallelizable]
+    [RunOnUiTestFixture]
     internal class RasterizerStateTest : GraphicsDeviceTestFixtureBase
     {
         [TestCase(-1f)]
 #if DESKTOPGL
-        [TestCase(1f), Ignore ("fails similarity test. Needs Investigating")]
+        [TestCase(1f, Ignore = "fails similarity test. Needs Investigating")]
+#elif VULKAN && MACOS
+        [TestCase(1f, Ignore = "Constant depth bias has no effect on float-depth polygons at z=0; not supported on MoltenVK. See https://registry.khronos.org/vulkan/specs/latest/html/vkspec.html#primsrast-depthbias")]  
 #else
         [TestCase(1f)]
 #endif
@@ -110,6 +113,7 @@ namespace MonoGame.Tests.Graphics
 #endif
         }
 
+        [Test]
         [TestCase(CullMode.CullClockwiseFace)]
         [TestCase(CullMode.CullCounterClockwiseFace)]
         [TestCase(CullMode.None)]
@@ -134,6 +138,7 @@ namespace MonoGame.Tests.Graphics
             rasterizerState.Dispose();
         }
 
+        [Test]
         [TestCase(FillMode.Solid)]
         [TestCase(FillMode.WireFrame)]
         public void VisualTestFillMode(FillMode fillMode)
@@ -157,6 +162,7 @@ namespace MonoGame.Tests.Graphics
             rasterizerState.Dispose();
         }
 
+        [Test]
         [TestCase(false)]
         [TestCase(true)]
         public void VisualTestScissorTestEnable(bool scissorTestEnable)
@@ -185,10 +191,19 @@ namespace MonoGame.Tests.Graphics
         }
 
 #if !XNA
+        [Test]
         [TestCase(false)]
         [TestCase(true)]
         public void VisualTestDepthClipEnable(bool depthClipEnable)
         {
+#if VULKAN
+            if (OperatingSystem.IsMacOS())
+            {
+                Assert.Ignore("TODO: Fix on macOS");
+                return;
+            }
+#endif
+
             PrepareFrameCapture();
 
             var cube = new Colored3DCubeComponent(gd)

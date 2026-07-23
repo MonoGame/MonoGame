@@ -10,110 +10,66 @@ namespace Microsoft.Xna.Framework.Media
 {
     public sealed partial class Song : IEquatable<Song>, IDisposable
     {
-        private SoundEffectInstance _sound;
-
         private void PlatformInitialize(string fileName)
         {
-
-#if MONOMAC || (WINDOWS && OPENGL) || WEB
-
-            using (var s = File.OpenRead(_name))
-            {
-                var soundEffect = SoundEffect.FromStream(s);
-                _sound = soundEffect.CreateInstance();
-            }
-#endif
+            throw new NotImplementedException();
         }
 
         private void PlatformDispose(bool disposing)
         {
-            if (_sound == null)
-                return;
-
-            _sound.Dispose();
-            _sound = null;
+            throw new NotImplementedException();
         }
 
 		internal void OnFinishedPlaying (object sender, EventArgs args)
 		{
-			if (DonePlaying == null)
-				return;
-			
-			DonePlaying(sender, args);
+			throw new NotImplementedException();
 		}
 
-		/// <summary>
-		/// Set the event handler for "Finished Playing". Done this way to prevent multiple bindings.
-		/// </summary>
 		internal void SetEventHandler(FinishedPlayingHandler handler)
 		{
-			if (DonePlaying != null)
-				return;
-			
-			DonePlaying += handler;
+			throw new NotImplementedException();
 		}
 
 		internal void Play(TimeSpan? startPosition)
 		{	
-			if (startPosition.HasValue)
-				throw new Exception("startPosition not implemented on this Platform"); //Should be possible to implement in OpenAL
-			if ( _sound == null )
-				return;
-
-            PlatformPlay();
-
-            _playCount++;
+			throw new NotImplementedException();
         }
 
         private void PlatformPlay()
         {
-            _sound.Play();
+            throw new NotImplementedException();
         }
 
 		internal void Resume()
 		{
-			if (_sound == null)
-				return;
-
-            PlatformResume();
+			throw new NotImplementedException();
 		}
 
         private void PlatformResume()
         {
-            _sound.Resume();
+            throw new NotImplementedException();
         }
 		
 		internal void Pause()
 		{			            
-			if ( _sound == null )
-				return;
-			
-			_sound.Pause();
+			throw new NotImplementedException();
         }
 		
 		internal void Stop()
 		{
-			if ( _sound == null )
-				return;
-			
-			_sound.Stop();
-			_playCount = 0;
+			throw new NotImplementedException();
 		}
 
 		internal float Volume
 		{
 			get
 			{
-				if (_sound != null)
-					return _sound.Volume;
-				else
-					return 0.0f;
+				throw new NotImplementedException();
 			}
 			
 			set
 			{
-				if ( _sound != null && _sound.Volume != value )
-					_sound.Volume = value;
+				throw new NotImplementedException();
 			}			
 		}
 
@@ -121,59 +77,58 @@ namespace Microsoft.Xna.Framework.Media
         {
             get
             {
-                // TODO: Implement
-                return new TimeSpan(0);				
+                throw new NotImplementedException();				
+            }
+
+            set
+            {
+                throw new NotImplementedException();
             }
         }
 
         private Album PlatformGetAlbum()
         {
-            return null;
+            throw new NotImplementedException();
         }
 
         private Artist PlatformGetArtist()
         {
-            return null;
+            throw new NotImplementedException();
         }
 
         private Genre PlatformGetGenre()
         {
-            return null;
-        }
-
-        private TimeSpan PlatformGetDuration()
-        {
-            return _duration;
+            throw new NotImplementedException();
         }
 
         private bool PlatformIsProtected()
         {
-            return false;
+            throw new NotImplementedException();
         }
 
         private bool PlatformIsRated()
         {
-            return false;
+            throw new NotImplementedException();
         }
 
         private string PlatformGetName()
         {
-            return Path.GetFileNameWithoutExtension(_name);
+            throw new NotImplementedException();
         }
 
         private int PlatformGetPlayCount()
         {
-            return _playCount;
+            throw new NotImplementedException();
         }
 
         private int PlatformGetRating()
         {
-            return 0;
+            throw new NotImplementedException();
         }
 
         private int PlatformGetTrackNumber()
         {
-            return 0;
+            throw new NotImplementedException();
         }
     }
 }

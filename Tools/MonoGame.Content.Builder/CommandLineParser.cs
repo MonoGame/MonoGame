@@ -15,7 +15,7 @@ namespace MonoGame.Content.Builder
 {
     /// <summary>
     /// Adapted from this generic command line argument parser:
-    /// http://blogs.msdn.com/b/shawnhar/archive/2012/04/20/a-reusable-reflection-based-command-line-parser.aspx     
+    /// https://shawnhargreaves.com/blog/a-reusable-reflection-based-command-line-parser.html     
     /// </summary>
     public class MGBuildParser
     {
@@ -398,9 +398,9 @@ namespace MonoGame.Content.Builder
 
                 return true;
             }
-            catch
+            catch(Exception ex)
             {
-                ShowError("Invalid value '{0}' for option '{1}'", value, GetAttribute<CommandLineParameterAttribute>(member).Name);
+                ShowError("Invalid value '{0}' for option '{1}': {2}", value, GetAttribute<CommandLineParameterAttribute>(member).Name, ex.Message);
                 return false;
             }
         }
@@ -425,9 +425,27 @@ namespace MonoGame.Content.Builder
 
         static object ChangeType(string value, Type type)
         {
-            var converter = TypeDescriptor.GetConverter(type);
-
-            return converter.ConvertFromInvariantString(value);
+            if (type.IsEnum)
+            {
+                object result;
+                // Try to parse the provided value using case-insensitive matching.
+                if (Enum.TryParse(type, value, true, out result) && Enum.IsDefined(type, result))
+                {
+                    return result;
+                }
+                else
+                {
+                    // Build a list of valid values.
+                    string validValues = string.Join(", ", Enum.GetNames(type));
+                    throw new Exception(string.Format("Valid values are: '{0}'.", validValues));
+                }
+            }
+            else
+            {
+                // For non-enum types, use the standard type converter.
+                var converter = TypeDescriptor.GetConverter(type);
+                return converter.ConvertFromInvariantString(value);
+            }
         }
 
 
@@ -503,7 +521,7 @@ namespace MonoGame.Content.Builder
                 return;
             }
 
-            var name = Path.GetFileNameWithoutExtension(Process.GetCurrentProcess().ProcessName);
+            var name = Assembly.GetEntryAssembly().GetName().Name;
 
             if (!string.IsNullOrEmpty(Title))
             {
@@ -567,7 +585,19 @@ namespace MonoGame.Content.Builder
                     s = s.PadRight(35, ' ');
 
                     // Wrap text description
-                    var bw = Math.Max(60, Console.BufferWidth);
+                    int bw = 60;
+                    try
+                    {
+                        // Only try to access Console.BufferWidth if we have a valid console
+                        if (Console.IsOutputRedirected == false)
+                            bw = Math.Max(60, Console.BufferWidth);
+                    }
+                    catch (IOException)
+                    {
+                        // Use default width if console is not available
+                        bw = 80;
+                    }
+                    
                     var desc = attr.Description.Split(' ');
 
                     foreach(var dw in desc)

@@ -29,7 +29,7 @@ namespace Microsoft.Xna.Framework.Graphics
         /// <summary>
         /// Raised when the <see cref="GraphicsDevice"/> has reset.
         /// </summary>
-        /// <seealso cref="Microsoft.Xna.Framework.Graphics.GraphicsDevice.Reset"/>
+        /// <seealso cref="Microsoft.Xna.Framework.Graphics.GraphicsDevice.Reset()"/>
         event EventHandler<EventArgs> DeviceReset;
 
         /// <summary>

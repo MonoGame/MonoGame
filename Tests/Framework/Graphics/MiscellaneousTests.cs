@@ -3,6 +3,8 @@ using NUnit.Framework;
 
 namespace MonoGame.Tests.Graphics
 {
+    [NonParallelizable]
+    [RunOnUiTestFixture]
     internal class MiscellaneousTests : GraphicsDeviceTestFixtureBase
     {
         [Test]

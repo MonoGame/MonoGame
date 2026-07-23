@@ -1,100 +1,539 @@
-// MonoGame - Copyright (C) The MonoGame Team
+// MonoGame - Copyright (C) MonoGame Foundation, Inc
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
+using MonoGame.Framework.Utilities;
+using MonoGame.Interop;
 using System;
+using System.Collections.Generic;
+using System.Runtime.InteropServices;
+
 
 namespace Microsoft.Xna.Framework.Graphics;
 
+
 public partial class GraphicsDevice
 {
-    private void PlatformSetup()
-    {
+    internal unsafe MGG_GraphicsDevice* Handle;
 
+    internal Texture2D DefaultTexture;
+
+    private int _currentFrame = -1;
+
+    private readonly Dictionary<int, DynamicVertexBuffer> _userVertexBuffers = new Dictionary<int, DynamicVertexBuffer>();
+    private DynamicIndexBuffer _userIndexBuffer16;
+    private DynamicIndexBuffer _userIndexBuffer32;
+
+    private unsafe readonly MGG_Texture*[] _curRenderTargets = new MGG_Texture*[4];
+    private readonly int[] _currentRenderTargetArraySlices = new int[4];
+
+    internal static int ShaderProfile
+    {
+        get; private set;
     }
 
-    private void PlatformInitialize()
+    private unsafe void PlatformSetup()
     {
+        // Creates the device, but no swap chain yet.
+        Handle = MGG.GraphicsDevice_Create(NativeGamePlatform.GraphicsSystem, Adapter.Handle);
+
+        // Get the device caps.
+        MGG_GraphicsDevice_Caps caps;
+        MGG.GraphicsDevice_GetCaps(Handle, out caps);
+
+        MaxTextureSlots = caps.MaxTextureSlots;
+        MaxVertexTextureSlots = caps.MaxVertexTextureSlots;
+        _maxVertexBufferSlots = caps.MaxVertexBufferSlots;
+        ShaderProfile = caps.ShaderProfile;
+        UseHalfPixelOffset = false;
     }
 
-    private void OnPresentationChanged()
+    private unsafe void PlatformInitialize()
     {
+        PresentationParameters.MultiSampleCount =
+                GetClampedMultisampleCount(PresentationParameters.BackBufferFormat, PresentationParameters.MultiSampleCount);
+
+        MGG.GraphicsDevice_ResizeSwapchain(
+                Handle,
+                PresentationParameters.DeviceWindowHandle,
+                PresentationParameters.BackBufferWidth,
+                PresentationParameters.BackBufferHeight,
+                PresentationParameters.BackBufferFormat,
+                PresentationParameters.DepthStencilFormat,
+                PresentationParameters.MultiSampleCount,
+                PresentationParameters.PresentationInterval.GetSyncInterval());
+
+        // Setup the default texture.
+        DefaultTexture = new Texture2D(this, 2, 2);
+        DefaultTexture.SetData(new[] { Color.Black, Color.Black, Color.Black, Color.Black });
     }
 
-    private void PlatformClear(ClearOptions options, Vector4 color, float depth, int stencil)
+    internal int PlatformGetMaxMultiSampleCount(SurfaceFormat format)
     {
-
+        return 4;
     }
 
-    private void PlatformDispose()
+    private unsafe void OnPresentationChanged()
     {
+        // Clamp MultiSampleCount
+        PresentationParameters.MultiSampleCount =
+                GetClampedMultisampleCount(PresentationParameters.BackBufferFormat, PresentationParameters.MultiSampleCount);
+
+        // Finish any frame that is currently rendering.
+        if (_currentFrame > -1)
+        {
+            var syncInterval = PresentationParameters.PresentationInterval.GetSyncInterval();
+            MGG.GraphicsDevice_Present(Handle, _currentFrame, syncInterval);
+        }
+
+        // Now resize the back buffer.
+        MGG.GraphicsDevice_ResizeSwapchain(
+            Handle,
+            PresentationParameters.DeviceWindowHandle,
+            PresentationParameters.BackBufferWidth,
+            PresentationParameters.BackBufferHeight,
+            PresentationParameters.BackBufferFormat,
+            PresentationParameters.DepthStencilFormat,
+            PresentationParameters.MultiSampleCount,
+            PresentationParameters.PresentationInterval.GetSyncInterval());
+
+        _viewport = new Viewport(
+            0,
+            0,
+            PresentationParameters.BackBufferWidth,
+            PresentationParameters.BackBufferHeight,
+            _viewport.MinDepth,
+            _viewport.MaxDepth);
+
+        _scissorRectangle = new Rectangle(
+            0,
+            0,
+            PresentationParameters.BackBufferWidth,
+            PresentationParameters.BackBufferHeight);
+
+        // Begin a new frame it if was previously rendering.
+        if (_currentFrame > -1)
+        {
+            _currentFrame = -1;
+            BeginFrame();
+        }
     }
 
-    private void PlatformPresent()
+    private unsafe void BeginFrame()
     {
+        if (_currentFrame > -1)
+            return;
+
+        // Start the command buffer now.
+        _currentFrame = MGG.GraphicsDevice_BeginFrame(Handle);
+
+        // We must reapply all the state on a new command buffer.
+        _scissorRectangleDirty = true;
+        _blendFactorDirty = true;
+        _blendStateDirty = true;
+        _pixelShaderDirty = true;
+        _vertexShaderDirty = true;
+        _depthStencilStateDirty = true;
+        _indexBufferDirty = true;
+        _rasterizerStateDirty = true;
+        _vertexBuffersDirty = true;
+        Textures.Dirty();
+        SamplerStates.Dirty();
+
+        MGG.GraphicsDevice_SetViewport(
+            Handle,
+            _viewport.X,
+            _viewport.Y,
+            _viewport.Width,
+            _viewport.Height,
+            _viewport.MinDepth,
+            _viewport.MaxDepth);
+
+        PlatformApplyDefaultRenderTarget();
     }
 
-    private void PlatformSetViewport(ref Viewport value)
+    private unsafe void PlatformClear(ClearOptions options, Vector4 color, float depth, int stencil)
     {
+        BeginFrame();
+
+        PlatformBeginApplyState();
+        MGG.GraphicsDevice_Clear(Handle, options, ref color, depth, stencil);
     }
 
-    private void PlatformApplyDefaultRenderTarget()
+    private unsafe void PlatformDispose()
     {
+        foreach (var vb in _userVertexBuffers.Values)
+            vb.Dispose();
+        _userVertexBuffers.Clear();
+
+        if (_userIndexBuffer16 != null)
+        {
+            _userIndexBuffer16.Dispose();
+            _userIndexBuffer16 = null;
+        }
+
+        if (_userIndexBuffer32 != null)
+        {
+            _userIndexBuffer32.Dispose();
+            _userIndexBuffer32 = null;
+        }
+
+        DefaultTexture.Dispose();
+
+        if (Handle != null)
+        {
+            MGG.GraphicsDevice_Destroy(Handle);
+            Handle = null;
+        }
     }
 
-    private void PlatformResolveRenderTargets()
+    private unsafe void PlatformPresent()
     {
-        // Resolving MSAA render targets should be done here.
+        if (_currentFrame < 0)
+            return;
+
+        var syncInterval = PresentationParameters.PresentationInterval.GetSyncInterval();
+        MGG.GraphicsDevice_Present(Handle, _currentFrame, syncInterval);
+        _currentFrame = -1;
     }
 
-    private IRenderTarget PlatformApplyRenderTargets()
+    private unsafe void PlatformSetViewport(ref Viewport viewport)
     {
-        return null;
+        BeginFrame();
+
+        MGG.GraphicsDevice_SetViewport(
+            Handle,
+            viewport.X,
+            viewport.Y,
+            viewport.Width,
+            viewport.Height,
+            viewport.MinDepth,
+            viewport.MaxDepth);
+    }
+
+    private unsafe void PlatformApplyDefaultRenderTarget()
+    {
+        BeginFrame();
+
+        _viewport = new Viewport(
+            0,
+            0,
+            PresentationParameters.BackBufferWidth,
+            PresentationParameters.BackBufferHeight,
+            _viewport.MinDepth,
+            _viewport.MaxDepth);
+
+        _scissorRectangle = new Rectangle(
+            0,
+            0,
+            PresentationParameters.BackBufferWidth,
+            PresentationParameters.BackBufferHeight);
+
+        MGG.GraphicsDevice_SetRenderTargets(Handle, null, null, 0);
+    }
+
+    private unsafe void PlatformResolveRenderTargets()
+    {
+        MGG.GraphicsDevice_ResolveRenderTargets(Handle);
+    }
+
+    private unsafe IRenderTarget PlatformApplyRenderTargets()
+    {
+        BeginFrame();
+
+        Array.Clear(_curRenderTargets, 0, 4);
+
+        IRenderTarget first = null;
+
+        for (var i = 0; i < _currentRenderTargetCount; i++)
+        {
+            var binding = _currentRenderTargetBindings[i];
+            var target = binding.RenderTarget;
+            _curRenderTargets[i] = target.Handle;
+            _currentRenderTargetArraySlices[i] = binding.ArraySlice;
+            if (i == 0)
+                first = target as IRenderTarget;
+        }
+
+        fixed (MGG_Texture** targets = _curRenderTargets)
+        fixed (int* arraySlices = _currentRenderTargetArraySlices)
+            MGG.GraphicsDevice_SetRenderTargets(Handle, targets, arraySlices, _currentRenderTargetCount);
+        
+        return first;
     }
 
     private void PlatformBeginApplyState()
     {
+        BeginFrame();
     }
 
     private void PlatformApplyBlend()
     {
+        if (_blendStateDirty)
+        {
+            _actualBlendState.PlatformApplyState(this);
+            _blendStateDirty = false;
+        }
+
+        if (_blendFactorDirty)
+        {
+            // TODO?
+            _blendFactorDirty = false;
+        }
     }
 
-    private void PlatformApplyState(bool applyShaders)
+    private unsafe void PlatformApplyState(bool applyShaders)
     {
+        if (_scissorRectangleDirty)
+        {
+            MGG.GraphicsDevice_SetScissorRectangle(
+                Handle,
+                _scissorRectangle.X,
+                _scissorRectangle.Y,
+                _scissorRectangle.Width,
+                _scissorRectangle.Height);
+
+            _scissorRectangleDirty = false;
+        }
+
+        // If we're not applying shaders then early out now.
+        if (!applyShaders)
+            return;
+
+        if (_vertexShader == null)
+            throw new InvalidOperationException("A vertex shader must be set!");
+        if (_pixelShader == null)
+            throw new InvalidOperationException("A pixel shader must be set!");
+
+        bool layoutChanged = false;
+
+        // Change the vertex shader first as it can cause changes
+        // to other states that the shader depends on.
+        if (_vertexShaderDirty)
+        {
+            MGG.GraphicsDevice_SetShader(Handle, ShaderStage.Vertex, _vertexShader.Handle);
+            _vertexBuffersDirty = true;
+            unchecked { _graphicsMetrics._vertexShaderCount++; }
+        }
+
+        if (_pixelShaderDirty)
+        {
+            MGG.GraphicsDevice_SetShader(Handle, ShaderStage.Pixel, _pixelShader.Handle);
+            unchecked { _graphicsMetrics._pixelShaderCount++; }
+        }
+
+        if (_indexBufferDirty)
+        {
+            if (_indexBuffer != null)
+                MGG.GraphicsDevice_SetIndexBuffer(Handle, _indexBuffer.IndexElementSize, _indexBuffer.Handle);
+        }
+
+        if (layoutChanged || _vertexBuffersDirty)
+        {
+            var layout = _vertexShader.GetOrCreateLayout(_vertexBuffers);
+            MGG.GraphicsDevice_SetInputLayout(Handle, layout);
+        }
+
+        if (_vertexBuffersDirty)
+        {
+            for (var slot = 0; slot < _vertexBuffers.Count; slot++)
+            {
+                var vertexBufferBinding = _vertexBuffers.Get(slot);
+                var buffer = vertexBufferBinding.VertexBuffer;
+
+                MGG.GraphicsDevice_SetVertexBuffer(Handle, slot, buffer.Handle, vertexBufferBinding.VertexOffset);
+            }
+        }
+        _vertexConstantBuffers.SetConstantBuffers(this);
+        _pixelConstantBuffers.SetConstantBuffers(this);
+
+        VertexTextures.SetTextures(this);
+        VertexSamplerStates.PlatformSetSamplers(this);
+
+        Textures.SetTextures(this);
+        SamplerStates.PlatformSetSamplers(this);
+
+        _indexBufferDirty = false;
+        _vertexBuffersDirty = false;
+        _vertexShaderDirty = false;
+        _pixelShaderDirty = false;
     }
 
-    private void PlatformDrawIndexedPrimitives(PrimitiveType primitiveType, int baseVertex, int startIndex, int primitiveCount)
+    private int SetUserVertexBuffer<T>(T[] vertexData, int vertexOffset, int vertexCount, VertexDeclaration vertexDecl)
+        where T : struct
     {
+        DynamicVertexBuffer buffer;
+
+        if (!_userVertexBuffers.TryGetValue(vertexDecl.GetHashCode(), out buffer) || buffer.VertexCount < vertexCount)
+        {
+            // Dispose the previous buffer if we have one.
+            if (buffer != null)
+                buffer.Dispose();
+
+            buffer = new DynamicVertexBuffer(this, vertexDecl, Math.Max(vertexCount, 2000), BufferUsage.WriteOnly);
+            _userVertexBuffers[vertexDecl.GetHashCode()] = buffer;
+        }
+
+        var startVertex = buffer.UserOffset;
+
+        if ((vertexCount + buffer.UserOffset) < buffer.VertexCount)
+        {
+            buffer.UserOffset += vertexCount;
+            buffer.SetData(startVertex * vertexDecl.VertexStride, vertexData, vertexOffset, vertexCount, vertexDecl.VertexStride, SetDataOptions.NoOverwrite);
+        }
+        else
+        {
+            buffer.UserOffset = vertexCount;
+            buffer.SetData(vertexData, vertexOffset, vertexCount, SetDataOptions.Discard);
+            startVertex = 0;
+        }
+
+        SetVertexBuffer(buffer);
+
+        return startVertex;
     }
 
-    private void PlatformDrawUserPrimitives<T>(PrimitiveType primitiveType, T[] vertexData, int vertexOffset, VertexDeclaration vertexDeclaration, int vertexCount) where T : struct
+    private int SetUserIndexBuffer<T>(T[] indexData, int indexOffset, int indexCount)
+        where T : struct
     {
+        DynamicIndexBuffer buffer;
+
+        var indexSize = ReflectionHelpers.FastSizeOf<T>();
+        var indexElementSize = indexSize == 2 ? IndexElementSize.SixteenBits : IndexElementSize.ThirtyTwoBits;
+
+        var requiredIndexCount = Math.Max(indexCount, 6000);
+        if (indexElementSize == IndexElementSize.SixteenBits)
+        {
+            if (_userIndexBuffer16 == null || _userIndexBuffer16.IndexCount < requiredIndexCount)
+            {
+                if (_userIndexBuffer16 != null)
+                    _userIndexBuffer16.Dispose();
+
+                _userIndexBuffer16 = new DynamicIndexBuffer(this, indexElementSize, requiredIndexCount, BufferUsage.WriteOnly);
+            }
+
+            buffer = _userIndexBuffer16;
+        }
+        else
+        {
+            if (_userIndexBuffer32 == null || _userIndexBuffer32.IndexCount < requiredIndexCount)
+            {
+                if (_userIndexBuffer32 != null)
+                    _userIndexBuffer32.Dispose();
+
+                _userIndexBuffer32 = new DynamicIndexBuffer(this, indexElementSize, requiredIndexCount, BufferUsage.WriteOnly);
+            }
+
+            buffer = _userIndexBuffer32;
+        }
+
+        var startIndex = buffer.UserOffset;
+
+        if ((indexCount + buffer.UserOffset) < buffer.IndexCount)
+        {
+            buffer.UserOffset += indexCount;
+            buffer.SetData(startIndex * indexSize, indexData, indexOffset, indexCount, SetDataOptions.NoOverwrite);
+        }
+        else
+        {
+            startIndex = 0;
+            buffer.UserOffset = indexCount;
+            buffer.SetData(indexData, indexOffset, indexCount, SetDataOptions.Discard);
+        }
+
+        Indices = buffer;
+
+        return startIndex;
     }
 
-    private void PlatformDrawPrimitives(PrimitiveType primitiveType, int vertexStart, int vertexCount)
+    private unsafe void PlatformDrawIndexedPrimitives(PrimitiveType primitiveType, int baseVertex, int startIndex, int primitiveCount)
     {
+        ApplyState(true);
+        if (baseVertex < 0)
+            baseVertex = 0;
+        if (startIndex < 0)
+            startIndex = 0;
+
+        MGG.GraphicsDevice_DrawIndexed(Handle, primitiveType, primitiveCount, startIndex, baseVertex);
     }
 
-    private void PlatformDrawUserIndexedPrimitives<T>(PrimitiveType primitiveType, T[] vertexData, int vertexOffset, int numVertices, short[] indexData, int indexOffset, int primitiveCount, VertexDeclaration vertexDeclaration) where T : struct
+    private unsafe  void PlatformDrawUserPrimitives<T>(PrimitiveType primitiveType, T[] vertexData, int vertexOffset, VertexDeclaration vertexDeclaration, int vertexCount) where T : struct
     {
+        var startVertex = SetUserVertexBuffer(vertexData, vertexOffset, vertexCount, vertexDeclaration);
+        ApplyState(true);
+
+        MGG.GraphicsDevice_Draw(Handle, primitiveType, startVertex, vertexCount);
     }
 
-    private void PlatformDrawUserIndexedPrimitives<T>(PrimitiveType primitiveType, T[] vertexData, int vertexOffset, int numVertices, int[] indexData, int indexOffset, int primitiveCount, VertexDeclaration vertexDeclaration) where T : struct
+    private unsafe void PlatformDrawPrimitives(PrimitiveType primitiveType, int vertexStart, int vertexCount)
     {
+        ApplyState(true);
+        if (vertexStart < 0)
+            vertexStart = 0;
+
+        MGG.GraphicsDevice_Draw(Handle, primitiveType, vertexStart, vertexCount);
     }
 
-    private void PlatformDrawInstancedPrimitives(PrimitiveType primitiveType, int baseVertex, int startIndex, int primitiveCount, int baseInstance, int instanceCount)
+    private unsafe void PlatformDrawUserIndexedPrimitives<T>(PrimitiveType primitiveType, T[] vertexData, int vertexOffset, int numVertices, short[] indexData, int indexOffset, int primitiveCount, VertexDeclaration vertexDeclaration) where T : struct
     {
+        var indexCount = GetElementCountArray(primitiveType, primitiveCount);
+        var startVertex = SetUserVertexBuffer(vertexData, vertexOffset, numVertices, vertexDeclaration);
+        var startIndex = SetUserIndexBuffer(indexData, indexOffset, indexCount);
+        ApplyState(true);
+
+        MGG.GraphicsDevice_DrawIndexed(Handle, primitiveType, primitiveCount, startIndex, startVertex);
     }
 
-    private void PlatformGetBackBufferData<T>(Rectangle? rect, T[] data, int startIndex, int count) where T : struct
+    private unsafe void PlatformDrawUserIndexedPrimitives<T>(PrimitiveType primitiveType, T[] vertexData, int vertexOffset, int numVertices, int[] indexData, int indexOffset, int primitiveCount, VertexDeclaration vertexDeclaration) where T : struct
     {
-        throw new NotImplementedException();
+        var indexCount = GetElementCountArray(primitiveType, primitiveCount);
+        var startVertex = SetUserVertexBuffer(vertexData, vertexOffset, numVertices, vertexDeclaration);
+        var startIndex = SetUserIndexBuffer(indexData, indexOffset, indexCount);
+        ApplyState(true);
+
+        MGG.GraphicsDevice_DrawIndexed(Handle, primitiveType, primitiveCount, startIndex, startVertex);
     }
 
-    private static Rectangle PlatformGetTitleSafeArea(int x, int y, int width, int height)
+    private unsafe void PlatformDrawInstancedPrimitives(PrimitiveType primitiveType, int baseVertex, int startIndex, int primitiveCount, int baseInstance, int instanceCount)
     {
+        ApplyState(true);
+
+        MGG.GraphicsDevice_DrawIndexedInstanced(Handle, primitiveType, primitiveCount, startIndex, baseVertex, instanceCount);
+    }
+
+    private unsafe void PlatformGetBackBufferData<T>(Rectangle? rect, T[] data, int startIndex, int count) where T : struct
+    {
+        var rectangle = rect ?? new Rectangle(0, 0, PresentationParameters.BackBufferWidth, PresentationParameters.BackBufferHeight);
+        var tSize = Marshal.SizeOf<T>();
+        GCHandle dataHandle = default;
+        try
+        {
+            dataHandle = GCHandle.Alloc(
+                data, GCHandleType.Pinned);
+            IntPtr pData = dataHandle.AddrOfPinnedObject();
+            MGG.GraphicsDevice_GetBackBufferData(
+                Handle,
+                rectangle.X,
+                rectangle.Y,
+                rectangle.Width,
+                rectangle.Height,
+                pData + startIndex * tSize,
+                count,
+                tSize);
+        }
+        finally
+        {
+            if (dataHandle.IsAllocated)
+            {
+                dataHandle.Free();
+            }
+        }
+    }
+
+    private static unsafe Rectangle PlatformGetTitleSafeArea(int x, int y, int width, int height)
+    {
+        MGG.GraphicsDevice_GetTitleSafeArea(ref x, ref y, ref width, ref height);
+
         return new Rectangle(x, y, width, height);
     }
 }

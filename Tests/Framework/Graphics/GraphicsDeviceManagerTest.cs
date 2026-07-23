@@ -9,7 +9,8 @@ using NUnit.Framework;
 
 namespace MonoGame.Tests.Graphics
 {
-    [TestFixture]
+    [NonParallelizable]
+    [RunOnUiTestFixture]
     internal class GraphicsDeviceManagerTest
     {
         [Test]
@@ -323,6 +324,7 @@ namespace MonoGame.Tests.Graphics
         }
     }
 
+    [RunOnUiTestFixture]
     internal class GraphicsDeviceManagerFixtureTest : GraphicsDeviceTestFixtureBase
     {
         [Test]
@@ -412,6 +414,7 @@ namespace MonoGame.Tests.Graphics
 
         }
 
+        [Test]
         [TestCase(false)]
         [TestCase(true)]
 #if DESKTOPGL
@@ -515,7 +518,7 @@ namespace MonoGame.Tests.Graphics
         [Test]
         public void TooHighMultiSampleCountClampedToMaxSupported()
         {
-            var maxMultiSampleCount = gd.GraphicsCapabilities.MaxMultiSampleCount;
+            var maxMultiSampleCount = gd.PlatformGetMaxMultiSampleCount(gdm.PreferredBackBufferFormat);
             gdm.PreferMultiSampling = true;
 
             gdm.PreparingDeviceSettings += (sender, args) =>

@@ -102,22 +102,22 @@ namespace Microsoft.Xna.Framework
         }
 
         /// <summary>
-        ///   Check if this <see cref="BoundingBox"/> contains a <see cref="BoundingFrustum"/>.
+        ///   Determines if this <see cref="BoundingBox"/> contains or intersects with a specified <see cref="BoundingFrustum"/>.
+        ///   NOTE: This method may return false positives (indicating an intersection or containment when there is none)
+        ///   to improve performance. Use with caution if precision is critical.
         /// </summary>
         /// <param name="frustum">The <see cref="BoundingFrustum"/> to test for overlap.</param>
         /// <returns>
-        ///   A value indicating if this <see cref="BoundingBox"/> contains,
-        ///   intersects with or is disjoint with <paramref name="frustum"/>.
+        ///   A <see cref="ContainmentType"/> value indicating whether this <see cref="BoundingBox"/>
+        ///   contains or intersects the <paramref name="frustum"/>.
         /// </returns>
         public ContainmentType Contains(BoundingFrustum frustum)
         {
-            //TODO: bad done here need a fix. 
-            //Because question is not frustum contain box but reverse and this is not the same
             int i;
             ContainmentType contained;
             Vector3[] corners = frustum.GetCorners();
 
-            // First we check if frustum is in box
+            // First we check every corner of a frustum
             for (i = 0; i < corners.Length; i++)
             {
                 this.Contains(ref corners[i], out contained);
@@ -128,13 +128,13 @@ namespace Microsoft.Xna.Framework
             if (i == corners.Length) // This means we checked all the corners and they were all contain or instersect
                 return ContainmentType.Contains;
 
-            if (i != 0)             // if i is not equal to zero, we can fastpath and say that this box intersects
+            if (i != 0)              // If i is not equal to zero, we can fastpath and say that this box intersects
                 return ContainmentType.Intersects;
 
 
-            // If we get here, it means the first (and only) point we checked was actually contained in the frustum.
-            // So we assume that all other points will also be contained. If one of the points is disjoint, we can
-            // exit immediately saying that the result is Intersects
+            // If we get here, it means the first (and only) point we checked was disjoint from frustum.
+            // So we assume that if all other points of frustum are inside the box, then box contains the frustum.
+            // Otherwise we exit immediately saying that the result is Intersects
             i++;
             for (; i < corners.Length; i++)
             {
@@ -144,7 +144,90 @@ namespace Microsoft.Xna.Framework
 
             }
 
-            // If we get here, then we know all the points were actually contained, therefore result is Contains
+            // If we get here, then we know that only one point is disjoint, therefore result is Contains
+            return ContainmentType.Contains;
+        }
+
+        /// <summary>
+        ///   Determines if this <see cref="BoundingBox"/> contains or intersects with a specified <see cref="BoundingFrustum"/>.
+        ///   This method is precise and will significantly affect performance.
+        /// </summary>
+        /// <param name="frustum">The <see cref="BoundingFrustum"/> to test for overlap.</param>
+        /// <returns>
+        ///   A <see cref="ContainmentType"/> value indicating whether this <see cref="BoundingBox"/>
+        ///   contains or intersects the <paramref name="frustum"/>.
+        /// </returns>
+        public ContainmentType ContainsPrecise(BoundingFrustum frustum)
+        {
+            Vector3[] boxNormals = new Vector3[]
+            {
+                Vector3.Up,
+                Vector3.Right,
+                Vector3.Forward
+            };
+
+            Vector3[] frustumNormals = new Vector3[]
+            {
+                frustum.Left.Normal,
+                frustum.Right.Normal,
+                frustum.Top.Normal,
+                frustum.Bottom.Normal,
+                frustum.Far.Normal
+            };
+
+            // allAxes = box normals + frustum normals + cross products of box normals and frustum normals
+            Vector3[] allAxes = new Vector3[23]; // 3 + 5 + 3 * 5
+
+            allAxes[0] = boxNormals[0];
+            allAxes[1] = boxNormals[1];
+            allAxes[2] = boxNormals[2];
+
+            for (int i = 0; i < frustumNormals.Length; i++)
+            {
+                allAxes[3 + i] = frustumNormals[i];
+                for (int j = 0; j < boxNormals.Length; j++)
+                {
+                    allAxes[8 + i * boxNormals.Length + j] = Vector3.Cross(frustumNormals[i], boxNormals[j]);
+                }
+            }
+
+            var boxCorners = GetCorners();
+            var frustumCorners = frustum.GetCorners();
+
+            bool intersects = false;
+
+            for (int i = 0; i < allAxes.Length; i++)
+            {
+                // Project both shapes on the axis
+
+                float boxMin = float.MaxValue, boxMax = float.MinValue;
+                float frustumMin = float.MaxValue, frustumMax = float.MinValue;
+
+                foreach (var point in boxCorners)
+                {
+                    var dot = Vector3.Dot(point, allAxes[i]);
+                    if (boxMin > dot) boxMin = dot;
+                    if (boxMax < dot) boxMax = dot;
+                }
+
+                foreach (var point in frustumCorners)
+                {
+                    var dot = Vector3.Dot(point, allAxes[i]);
+                    if (frustumMin > dot) frustumMin = dot;
+                    if (frustumMax < dot) frustumMax = dot;
+                }
+
+                // If we find a gap, we are sure the shapes are disjoint
+                if (boxMax < frustumMin || boxMin > frustumMax)
+                    return ContainmentType.Disjoint;
+                // If frustum projection isn't contained inside box projection - there is an intersection
+                else if (boxMax < frustumMax || boxMin > frustumMin)
+                    intersects = true;
+            }
+
+            if (intersects)
+                return ContainmentType.Intersects;
+
             return ContainmentType.Contains;
         }
 

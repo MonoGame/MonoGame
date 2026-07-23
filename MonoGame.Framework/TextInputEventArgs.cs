@@ -8,7 +8,7 @@ using Microsoft.Xna.Framework.Input;
 namespace Microsoft.Xna.Framework
 {
     /// <summary>
-    /// This class is used in the <see cref="GameWindow.TextInput"/> event as <see cref="EventArgs"/>.
+    /// This class is used in <see cref="GameWindow"/>'s TextInput event as <see cref="EventArgs"/>.
     /// </summary>
     public struct TextInputEventArgs
     {

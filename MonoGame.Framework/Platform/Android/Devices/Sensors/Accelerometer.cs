@@ -7,12 +7,12 @@ using Android.Content;
 using Android.Hardware;
 using Microsoft.Xna.Framework;
 
-namespace Microsoft.Devices.Sensors
+namespace MonoGame.Framework.Devices.Sensors
 {
     /// <summary>
     /// Provides Android applications access to the device's accelerometer sensor.
     /// </summary>
-    public sealed class Accelerometer : SensorBase<AccelerometerReading>
+    public sealed partial class Accelerometer : SensorBase<AccelerometerReading>
     {
         static readonly int MaxSensorCount = 10;
         static SensorManager sensorManager;
@@ -25,38 +25,33 @@ namespace Microsoft.Devices.Sensors
         /// <summary>
         /// Gets or sets whether the device on which the application is running supports the accelerometer sensor.
         /// </summary>
-        public static bool IsSupported
+
+        public static bool PlatformIsSupported()
         {
-            get
-            {
-                if (sensorManager == null)
-                    Initialize();
-                return sensor != null;
-            }
+            if (sensorManager == null)
+                Initialize();
+            return sensor != null;
         }
 
         /// <summary>
         /// Gets the current state of the accelerometer. The value is a member of the SensorState enumeration.
         /// </summary>
-        public SensorState State
+        public SensorState PlatformSensorState()
         {
-            get
+            if (IsDisposed)
+                throw new ObjectDisposedException(GetType().Name);
+            if (sensorManager == null)
             {
-                if (IsDisposed)
-                    throw new ObjectDisposedException(GetType().Name);
-                if (sensorManager == null)
-                {
-                    Initialize();
-                    state = sensor != null ? SensorState.Initializing : SensorState.NotSupported;
-                }
-                return state;
+                Initialize();
+                state = sensor != null ? SensorState.Initializing : SensorState.NotSupported;
             }
+            return state;
         }
 
         /// <summary>
         /// Creates a new instance of the Accelerometer object.
         /// </summary>
-        public Accelerometer()
+        internal void PlatformAccelerometer()
         {
             if (instanceCount >= MaxSensorCount)
                 throw new SensorFailedException("The limit of 10 simultaneous instances of the Accelerometer class per application has been exceeded.");
@@ -69,7 +64,7 @@ namespace Microsoft.Devices.Sensors
         /// <summary>
         /// Initializes the platform resources required for the accelerometer sensor.
         /// </summary>
-        static void Initialize()
+        static void PlatformInitialize()
         {
             sensorManager = (SensorManager)Game.Activity.GetSystemService(Context.SensorService);
             sensor = sensorManager.GetDefaultSensor(SensorType.Accelerometer);
@@ -88,7 +83,7 @@ namespace Microsoft.Devices.Sensors
         /// <summary>
         /// Starts data acquisition from the accelerometer.
         /// </summary>
-        public override void Start()
+        internal void PlatformStart()
         {
             if (IsDisposed)
                 throw new ObjectDisposedException(GetType().Name);
@@ -121,7 +116,7 @@ namespace Microsoft.Devices.Sensors
         /// <summary>
         /// Stops data acquisition from the accelerometer.
         /// </summary>
-        public override void Stop()
+        internal void PlatformStop()
         {
             if (IsDisposed)
                 throw new ObjectDisposedException(GetType().Name);
@@ -139,7 +134,7 @@ namespace Microsoft.Devices.Sensors
             state = SensorState.Disabled;
         }
 
-        protected override void Dispose(bool disposing)
+        internal void PlatformDispose(bool disposing)
         {
             if (!IsDisposed)
             {
@@ -155,7 +150,6 @@ namespace Microsoft.Devices.Sensors
                     }
                 }
             }
-            base.Dispose(disposing);
         }
 
         class SensorListener : Java.Lang.Object, ISensorEventListener
@@ -205,4 +199,3 @@ namespace Microsoft.Devices.Sensors
         }
     }
 }
-

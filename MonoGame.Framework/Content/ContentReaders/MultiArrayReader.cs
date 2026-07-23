@@ -4,21 +4,31 @@
 
 using System;
 using MonoGame.Framework.Utilities;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Microsoft.Xna.Framework.Content
 {
-    internal class MultiArrayReader<T> : ContentTypeReader<Array>
+    /// <summary>
+    /// This type is not meant to be used directly by MonoGame users.
+    /// Its purpose is to allow to work-around AOT issues when loading assets with the ContentManager fail due to the absence of runtime-reflection support in that context (i.e. missing types due to trimming and inability to statically discover them at compile-time).
+    /// If ContentManager.Load() throws an NotSupportedExeception, the message should provide insights on how to fix it.
+    /// </summary>
+    [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.All)]
+    public class MultiArrayReader<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.All)] T> : ContentTypeReader<Array>
     {
         ContentTypeReader elementReader;
 
+        /// <summary/>
         public MultiArrayReader() { }
 
+        /// <summary/>
         protected internal override void Initialize(ContentTypeReaderManager manager)
         {
             Type readerType = typeof(T);
             elementReader = manager.GetTypeReader(readerType);
         }
 
+        /// <summary/>
         protected internal override Array Read(ContentReader input, Array existingInstance)
         {
             var rank = input.ReadInt32();
@@ -31,12 +41,14 @@ namespace Microsoft.Xna.Framework.Content
                 count *= dimensions[d] = input.ReadInt32();
 
 
+            // The programmer utilizing this function must ensure that the type T is not trimmed.
+#pragma warning disable IL3050 
             var array = existingInstance;
             if (array == null)
                 array = Array.CreateInstance(typeof(T), dimensions);//new T[count];
             else if (dimensions.Length != array.Rank)
                 throw new RankException("existingInstance");
-
+#pragma warning restore IL3050
             var indices = new int[rank];
 
             for (int i = 0; i < count; i++)

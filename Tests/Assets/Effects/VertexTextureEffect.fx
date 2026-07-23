@@ -2,43 +2,12 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
-matrix WorldViewProj;
+#if SM6
 
-float HeightMapSize;
-Texture2D HeightMapTexture;
+#define PS_PROFILE ps_6_0
+#define VS_PROFILE vs_6_0
 
-sampler2D HeightMapSampler = sampler_state
-{
-    Texture = (HeightMapTexture);
-    MinFilter = POINT;
-    MagFilter = POINT;
-    MipFilter = NONE;
-};
-
-struct VSOutput
-{
-    float4 PositionPS : SV_Position;
-    float4 Color : COLOR0;
-};
-
-VSOutput VS_Main(float2 xy : POSITION)
-{
-    float height = tex2Dlod(HeightMapSampler, float4((xy + float2(0.5, 0.5)) / HeightMapSize, 0, 0)).r;
-    float3 worldPosition = float3(xy.x, height, xy.y);
-
-    VSOutput output;
-    output.PositionPS = mul(float4(worldPosition, 1), WorldViewProj);
-    output.Color = float4(xy.x / HeightMapSize, xy.y / HeightMapSize, 0, 1);
-
-    return output;
-}
-
-float4 PS_Main(VSOutput input) : COLOR0
-{
-    return input.Color;
-}
-
-#if SM4
+#elif SM4
 
 #define PS_PROFILE ps_4_0
 #define VS_PROFILE vs_4_0
@@ -49,6 +18,65 @@ float4 PS_Main(VSOutput input) : COLOR0
 #define VS_PROFILE vs_3_0
 
 #endif
+
+matrix WorldViewProj;
+
+float HeightMapSize;
+
+#if SM6
+
+Texture2D<float4> HeightMapTexture : register(t0);
+
+sampler HeightMapSampler : register(s0) = sampler_state
+{
+    Texture = (HeightMapTexture);
+    MinFilter = POINT;
+    MagFilter = POINT;
+    MipFilter = NONE;
+};
+
+#else
+
+Texture2D HeightMapTexture : register(t0);
+
+sampler2D HeightMapSampler : register(s0) = sampler_state 
+{
+    Texture = (HeightMapTexture);
+    MinFilter = POINT;
+    MagFilter = POINT;
+    MipFilter = NONE;
+};
+
+#endif
+
+struct VSOutput
+{
+    float4 PositionPS : SV_Position;
+    float4 Color : COLOR0;
+};
+
+VSOutput VS_Main(float2 xy : POSITION)
+{
+#if SM6
+    float height = HeightMapTexture.SampleLevel(HeightMapSampler, (xy + float2(0.5, 0.5)) / HeightMapSize, 0).r;
+#else
+    float height = tex2Dlod(HeightMapSampler, float4((xy + float2(0.5, 0.5)) / HeightMapSize, 0, 0)).r;
+#endif
+
+    float3 worldPosition = float3(xy.x, height, xy.y);
+
+    VSOutput output;
+    output.PositionPS = mul(float4(worldPosition, 1), WorldViewProj);
+    output.Color = float4(xy.x / HeightMapSize, xy.y / HeightMapSize, 0, 1);
+
+    return output;
+}
+
+float4 PS_Main(VSOutput input) : SV_TARGET0
+{
+    return input.Color;
+}
+
 
 technique
 {

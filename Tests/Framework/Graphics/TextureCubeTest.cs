@@ -9,7 +9,8 @@ using NUnit.Framework;
 
 namespace MonoGame.Tests.Graphics
 {
-    [TestFixture]
+    [NonParallelizable]
+    [RunOnUiTestFixture]
     class TextureCubeTest : GraphicsDeviceTestFixtureBase
     {
         [Test]
@@ -19,6 +20,7 @@ namespace MonoGame.Tests.Graphics
             Assert.Throws<ArgumentOutOfRangeException>(() => texture = new TextureCube(gd, 0, false, SurfaceFormat.Color));
         }
 
+        [Test]
         [TestCase(1)]
         [TestCase(8)]
         [TestCase(31)]
@@ -97,6 +99,7 @@ namespace MonoGame.Tests.Graphics
             t.Dispose();
         }
 
+        [Test]
         // DXT1
         [TestCase(8, "SampleCube64DXT1Mips", 0)]
         [TestCase(8, "SampleCube64DXT1Mips", 1)]
@@ -155,6 +158,7 @@ namespace MonoGame.Tests.Graphics
             t.Dispose();
         }
 
+        [Test]
         [TestCase("SampleCube64DXT1Mips", 8)]
         //[TestCase("SampleCube64DXT5Mips", 16)]
         public void GetAndSetDataDxtDontRoundWhenOutsideBounds(string texName, int bs)
@@ -175,6 +179,7 @@ namespace MonoGame.Tests.Graphics
             t.Dispose();
         }
 
+        [Test]
         [TestCase("SampleCube64DXT1Mips", 8)]
         //[TestCase("SampleCube64DXT5Mips", 16)]
         public void GetAndSetDataDxtLowerMips(string texName, int bs)

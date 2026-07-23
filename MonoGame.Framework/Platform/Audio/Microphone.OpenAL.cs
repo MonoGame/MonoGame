@@ -7,13 +7,11 @@ using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using MonoGame.Framework.Utilities;
 
-#if OPENAL
 using MonoGame.OpenAL;
 #if IOS || MONOMAC
 using AudioToolbox;
 using AudioUnit;
 using AVFoundation;
-#endif
 #endif
 
 namespace Microsoft.Xna.Framework.Audio

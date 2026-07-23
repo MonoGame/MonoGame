@@ -9,6 +9,7 @@ using NUnit.Framework;
 
 namespace MonoGame.Tests.ContentPipeline
 {
+    [Category("Audio")]
     class WavImporterTests
     {
         [Test]
@@ -16,7 +17,7 @@ namespace MonoGame.Tests.ContentPipeline
         {
             var context = new TestImporterContext("TestObj", "TestBin");
             Assert.Throws<ArgumentNullException>(() => new WavImporter().Import(null, context));
-            Assert.Throws<ArgumentNullException>(() => new WavImporter().Import("", context));
+            Assert.Throws<ArgumentException>(() => new WavImporter().Import("", context));
             Assert.Throws<ArgumentNullException>(() => new WavImporter().Import(@"Assets/Audio/bark_mono_44hz_8bit.wav", null));
             Assert.Throws<FileNotFoundException>(() => new WavImporter().Import(@"this\does\not\exist.wav", context));
         }

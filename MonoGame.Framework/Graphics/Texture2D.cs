@@ -299,7 +299,7 @@ namespace Microsoft.Xna.Framework.Graphics
         ///     <item>
         ///         <description>
         ///             The <paramref name="arraySlice"/> parameter is less than zero or is greater than or equal to the
-        ///             <see cref="ArraySize"/> of this texture.
+        ///             internal array buffer of this texture.
         ///         </description>
         ///     </item>
         ///     <item>
@@ -493,7 +493,7 @@ namespace Microsoft.Xna.Framework.Graphics
         ///     <item>
         ///         <description>
         ///             The <paramref name="arraySlice"/> parameter is less than zero or is greater than or equal to the
-        ///             <see cref="ArraySize"/> of this texture.
+        ///             internal array buffer of this texture.
         ///         </description>
         ///     </item>
         ///     <item>
@@ -788,7 +788,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 throw new ArgumentException("Rectangle must be inside the texture bounds", "rect");
             if (data == null)
                 throw new ArgumentNullException("data");
-            var tSize = ReflectionHelpers.SizeOf<T>.Get();
+            var tSize = ReflectionHelpers.FastSizeOf<T>();
             var fSize = Format.GetSize();
             if (tSize > fSize || fSize % tSize != 0)
                 throw new ArgumentException("Type T is of an invalid size for the format of this texture.", "T");
@@ -802,12 +802,11 @@ namespace Microsoft.Xna.Framework.Graphics
             {
                 int blockWidth, blockHeight;
                 Format.GetBlockSize(out blockWidth, out blockHeight);
-                int blockWidthMinusOne = blockWidth - 1;
-                int blockHeightMinusOne = blockHeight - 1;
                 // round x and y down to next multiple of block size; width and height up to next multiple of block size
-                var roundedWidth = (checkedRect.Width + blockWidthMinusOne) & ~blockWidthMinusOne;
-                var roundedHeight = (checkedRect.Height + blockHeightMinusOne) & ~blockHeightMinusOne;
-                checkedRect = new Rectangle(checkedRect.X & ~blockWidthMinusOne, checkedRect.Y & ~blockHeightMinusOne,
+                // we need to use this rather than the old code where because ASTC Compressed Textures are NOT Powers of 2.
+                var roundedWidth = (checkedRect.Width + blockWidth - 1) / blockWidth * blockWidth;
+                var roundedHeight = (checkedRect.Height + blockHeight - 1) / blockHeight * blockHeight;
+                checkedRect = new Rectangle(checkedRect.X / blockWidth * blockWidth, checkedRect.Y / blockHeight * blockHeight,
 #if OPENGL
                     // OpenGL only: The last two mip levels require the width and height to be
                     // passed as 2x2 and 1x1, but there needs to be enough data passed to occupy

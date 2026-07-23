@@ -4,17 +4,13 @@
 
 namespace Microsoft.Xna.Framework.Content.Pipeline
 {
+    /// <summary>
+    /// Provides methods for reading H.264 video files for use in the Content Pipeline
+    /// </summary>
     [ContentImporter(".mp4", DisplayName = "H.264 Video - MonoGame", DefaultProcessor = "VideoProcessor")]
     public class H264Importer : ContentImporter<VideoContent>
     {
-        public H264Importer()
-        {
-        }
-
-        public override VideoContent Import(string filename, ContentImporterContext context)
-        {
-            var content = new VideoContent(filename);
-            return content;
-        }
+        /// <inheritdoc/>
+        public override VideoContent Import(string filename, ContentImporterContext context) => new(filename);
     }
 }
