@@ -84,6 +84,7 @@ namespace Microsoft.Xna.Framework
         public override void RunLoop()
         {
             Sdl.Window.Show(Window.Handle);
+            _view.ApplyInitialHighDpiBackBuffer();
 
             while (true)
             {
