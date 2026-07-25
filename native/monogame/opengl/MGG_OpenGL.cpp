@@ -158,6 +158,22 @@ namespace
 
         device->context.MakeCurrent();
     }
+
+    GLbitfield ToClearMask(MGClearOptions options)
+    {
+        GLbitfield clearMask = 0;
+
+        if ((static_cast<mgint>(options) & static_cast<mgint>(MGClearOptions::Target)) != 0)
+            clearMask |= GL_COLOR_BUFFER_BIT;
+
+        if ((static_cast<mgint>(options) & static_cast<mgint>(MGClearOptions::DepthBuffer)) != 0)
+            clearMask |= GL_DEPTH_BUFFER_BIT;
+
+        if ((static_cast<mgint>(options) & static_cast<mgint>(MGClearOptions::Stencil)) != 0)
+            clearMask |= GL_STENCIL_BUFFER_BIT;
+
+        return clearMask;
+    }
 }
 
 void MGG_EffectResource_GetByteCode(const char* name, mgbyte*& bytecode, mgint& size)
@@ -290,12 +306,18 @@ mgint MGG_GraphicsDevice_BeginFrame(MGG_GraphicsDevice* device)
 
 void MGG_GraphicsDevice_Clear(MGG_GraphicsDevice* device, MGClearOptions options, Vector4& color, mgfloat depth, mgint stencil)
 {
-    (void)options;
-    (void)color;
-    (void)depth;
-    (void)stencil;
-    (void)device;
-    MGGL_NOT_IMPLEMENTED("MGG_GraphicsDevice_Clear");
+    assert(device != nullptr);
+
+    if (static_cast<mgint>(options) == 0)
+        return;
+
+    EnsureContext(device);
+    assert(device->isInFrame);
+
+    glClearColor(color.X, color.Y, color.Z, color.W);
+    glClearDepth(depth);
+    glClearStencil(stencil);
+    glClear(ToClearMask(options));
 }
 
 void MGG_GraphicsDevice_Present(MGG_GraphicsDevice* device, mgint currentFrame, mgint syncInterval)
@@ -362,24 +384,21 @@ void MGG_GraphicsDevice_GetTitleSafeArea(mgint& x, mgint& y, mgint& width, mgint
 
 void MGG_GraphicsDevice_SetViewport(MGG_GraphicsDevice* device, mgint x, mgint y, mgint width, mgint height, mgfloat minDepth, mgfloat maxDepth)
 {
-    (void)device;
-    (void)x;
-    (void)y;
-    (void)width;
-    (void)height;
-    (void)minDepth;
-    (void)maxDepth;
-    MGGL_NOT_IMPLEMENTED("MGG_GraphicsDevice_SetViewport");
+    assert(device != nullptr);
+
+    EnsureContext(device);
+
+    glViewport(x, y, width, height);
+    glDepthRange(minDepth, maxDepth);
 }
 
 void MGG_GraphicsDevice_SetScissorRectangle(MGG_GraphicsDevice* device, mgint x, mgint y, mgint width, mgint height)
 {
-    (void)device;
-    (void)x;
-    (void)y;
-    (void)width;
-    (void)height;
-    MGGL_NOT_IMPLEMENTED("MGG_GraphicsDevice_SetScissorRectangle");
+    assert(device != nullptr);
+
+    EnsureContext(device);
+
+    glScissor(x, y, width, height);
 }
 
 void MGG_GraphicsDevice_SetRenderTargets(MGG_GraphicsDevice* device, MGG_Texture** targets, mgint* arraySlices, mgint count)
