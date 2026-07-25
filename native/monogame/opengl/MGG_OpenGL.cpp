@@ -148,6 +148,16 @@ namespace
         if (adapter->modes.empty())
             adapter->modes.push_back(adapter->currentDisplayMode);
     }
+
+    void EnsureContext(MGG_GraphicsDevice* device)
+    {
+        assert(device != nullptr);
+
+        if (device->window == nullptr || device->context.handle == nullptr)
+            MGGL_FAIL("OpenGL device not initialized", "ResizeSwapChain must create a window context before use");
+
+        device->context.MakeCurrent();
+    }
 }
 
 void MGG_EffectResource_GetByteCode(const char* name, mgbyte*& bytecode, mgint& size)
@@ -244,21 +254,38 @@ void MGG_GraphicsDevice_ResizeSwapChain(
     mgint multiSampleCount,
     mgint syncInterval)
 {
-    (void)device;
-    (void)nativeWindowHandle;
-    (void)width;
-    (void)height;
-    (void)color;
-    (void)depth;
-    (void)multiSampleCount;
-    (void)syncInterval;
-    MGGL_NOT_IMPLEMENTED("MGG_GraphicsDevice_ResizeSwapChain");
+    assert(device != nullptr);
+    assert(nativeWindowHandle != nullptr);
+    assert(width > 0);
+    assert(height > 0);
+    assert(syncInterval >= 0);
+
+    SDL_Window* window = static_cast<SDL_Window*>(nativeWindowHandle);
+
+    device->window = window;
+    device->context.Create(window);
+    device->context.width = width;
+    device->context.height = height;
+    device->context.SetSwapInterval(syncInterval);
+
+    device->backBufferWidth = width;
+    device->backBufferHeight = height;
+    device->backBufferFormat = color;
+    device->depthFormat = depth;
+    device->multiSampleCount = multiSampleCount;
 }
 
 mgint MGG_GraphicsDevice_BeginFrame(MGG_GraphicsDevice* device)
 {
-    (void)device;
-    MGGL_NOT_IMPLEMENTED("MGG_GraphicsDevice_BeginFrame");
+    assert(device != nullptr);
+
+    EnsureContext(device);
+
+    if (device->isInFrame)
+        MGGL_FAIL("OpenGL frame ownership error", "BeginFrame called while a frame is already active");
+
+    device->isInFrame = true;
+    return device->frame;
 }
 
 void MGG_GraphicsDevice_Clear(MGG_GraphicsDevice* device, MGClearOptions options, Vector4& color, mgfloat depth, mgint stencil)
@@ -273,10 +300,21 @@ void MGG_GraphicsDevice_Clear(MGG_GraphicsDevice* device, MGClearOptions options
 
 void MGG_GraphicsDevice_Present(MGG_GraphicsDevice* device, mgint currentFrame, mgint syncInterval)
 {
-    (void)device;
-    (void)currentFrame;
-    (void)syncInterval;
-    MGGL_NOT_IMPLEMENTED("MGG_GraphicsDevice_Present");
+    assert(device != nullptr);
+    assert(currentFrame >= 0);
+    assert(syncInterval >= 0);
+
+    EnsureContext(device);
+
+    if (!device->isInFrame)
+        MGGL_FAIL("OpenGL frame ownership error", "Present called without an active frame");
+
+    device->context.SetSwapInterval(syncInterval);
+
+    SDL_GL_SwapWindow(device->window);
+
+    ++device->frame;
+    device->isInFrame = false;
 }
 
 void MGG_GraphicsDevice_SetBlendState(MGG_GraphicsDevice* device, MGG_BlendState* state, mgfloat factorR, mgfloat factorG, mgfloat factorB, mgfloat factorA)
