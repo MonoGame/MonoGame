@@ -84,7 +84,7 @@ struct MGG_Buffer
     GLenum usage = GL_STATIC_DRAW;
     MGBufferType type = MGBufferType::Vertex;
     mgbool dynamic = false;
-    mgint sizeInbytes = 0;
+    mgint sizeInBytes = 0;
     std::vector<mgbyte> shadowData;
 };
 
@@ -148,7 +148,7 @@ namespace
     [[noreturn]] void MGGL_Fail(const char* file, int line, const char* action, const char* detail)
     {
         char message[512];
-        snprintf(message, sizeof(message), "%s, %s", action, detail);
+        snprintf(message, sizeof(message), "%s: %s", action, detail);
         MG_Print_StdError(file, line, message);
         MG_GENERATE_TRAP();
         abort();
@@ -165,7 +165,7 @@ namespace
         abort();
     }
 
-#define MGGL_NOT_IMPLEMENTED(functionName) FailNotImplemented(__FILE__, __LINE__, functionName);
+#define MGGL_NOT_IMPLEMENTED(functionName) FailNotImplemented(__FILE__, __LINE__, functionName)
 
     MGG_DisplayMode ToDisplayMode(const SDL_DisplayMode& mode)
     {
@@ -399,7 +399,7 @@ namespace
         case MGDepthFormat::Depth24Stencil8:
             return GL_DEPTH_STENCIL_ATTACHMENT;
         default:
-            MGGL_FAIL("Unsupported depth format", "depth attachment point is not mapped");
+            MGGL_FAIL("Unsupported depth format", "unknown OpenGL framebuffer attachment");
         }
     }
 
@@ -819,12 +819,12 @@ namespace
     }
 }
 
-void MGG_EffectResource_GetByteCode(const char* name, mgbyte*& bytecode, mgint& size)
+void MGG_EffectResource_GetBytecode(const char* name, mgbyte*& bytecode, mgint& size)
 {
     assert(name != nullptr);
     (void)bytecode;
     (void)size;
-    MGGL_NOT_IMPLEMENTED("MGG_EffectResource_GetByteCode");
+    MGGL_NOT_IMPLEMENTED("MGG_EffectResource_GetBytecode");
 }
 
 MGG_GraphicsSystem* MGG_GraphicsSystem_Create()
@@ -903,7 +903,7 @@ void MGG_GraphicsDevice_GetCaps(MGG_GraphicsDevice* device, MGG_GraphicsDevice_C
     caps.ShaderProfile = OpenGLShaderProfile;
 }
 
-void MGG_GraphicsDevice_ResizeSwapChain(
+void MGG_GraphicsDevice_ResizeSwapchain(
     MGG_GraphicsDevice* device,
     void* nativeWindowHandle,
     mgint width,
@@ -1205,8 +1205,8 @@ void MGG_GraphicsDevice_DrawIndexed(MGG_GraphicsDevice* device, MGPrimitiveType 
         MGGL_FAIL("Indexed draw requires an index buffer", "MGG_GraphicsDevice_SetIndexBuffer must bind a buffer before DrawIndexed");
 
     mgint indexCount = GetIndexedElementCount(primitiveType, primitiveCount);
-    mgint indexSizeIntBytes = GetIndexElementSizeInBytes(device->indexElementSize);
-    intptr_t indexByteOffset = static_cast<intptr_t>(indexStart) * indexSizeIntBytes;
+    mgint indexSizeInBytes = GetIndexElementSizeInBytes(device->indexElementSize);
+    intptr_t indexByteOffset = static_cast<intptr_t>(indexStart) * indexSizeInBytes;
 
     device->context.functions.DrawElementsBaseVertex(
         ToPrimitiveMode(primitiveType),
@@ -1381,7 +1381,6 @@ void MGG_SamplerState_Destroy(MGG_GraphicsDevice* device, MGG_SamplerState* stat
 
     if (state->handle != 0)
         device->context.functions.DeleteSamplers(1, &state->handle);
-
     delete state;
 }
 
@@ -1397,7 +1396,7 @@ MGG_Buffer* MGG_Buffer_Create(MGG_GraphicsDevice* device, MGBufferType type, mgb
     buffer->usage = ToBufferUsage(dynamic);
     buffer->type = type;
     buffer->dynamic = dynamic;
-    buffer->sizeInbytes = sizeInBytes;
+    buffer->sizeInBytes = sizeInBytes;
     buffer->shadowData.resize(sizeInBytes);
 
     device->context.functions.GenBuffers(1, &buffer->handle);
@@ -1452,7 +1451,7 @@ void MGG_Buffer_SetData(MGG_GraphicsDevice* device, MGG_Buffer*& buffer, mgint o
     assert(elementSizeInBytes > 0);
 
     mgint copySpan = GetCopySpan(elementCount, vertexStride, elementSizeInBytes);
-    assert(offset + copySpan <= buffer->sizeInbytes);
+    assert(offset + copySpan <= buffer->sizeInBytes);
 
     CopyToShadowData(buffer->shadowData.data() + offset, data, elementCount, vertexStride, elementSizeInBytes);
 
@@ -1463,7 +1462,7 @@ void MGG_Buffer_SetData(MGG_GraphicsDevice* device, MGG_Buffer*& buffer, mgint o
     {
         device->context.functions.BufferData(
             buffer->target,
-            buffer->sizeInbytes,
+            buffer->sizeInBytes,
             buffer->shadowData.data(),
             buffer->usage);
         return;
@@ -1487,7 +1486,7 @@ void MGG_Buffer_GetData(MGG_GraphicsDevice* device, MGG_Buffer* buffer, mgint of
     assert(dataStride > 0);
 
     mgint copySpan = GetCopySpan(dataCount, dataStride, dataBytes);
-    assert(offset + copySpan <= buffer->sizeInbytes);
+    assert(offset + copySpan <= buffer->sizeInBytes);
 
     CopyFromShadowData(buffer->shadowData.data() + offset, data, dataCount, dataBytes, dataStride);
 }
