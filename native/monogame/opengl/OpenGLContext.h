@@ -11,17 +11,27 @@ struct OpenGLFunctions
 {
     PFNGLACTIVETEXTUREPROC ActiveTexture = nullptr;
     PFNGLBINDBUFFERPROC BindBuffer = nullptr;
+    PFNGLBINDFRAMEBUFFERPROC BindFramebuffer = nullptr;
+    PFNGLBINDRENDERBUFFERPROC BindRenderbuffer = nullptr;
     PFNGLBINDSAMPLERPROC BindSampler = nullptr;
     PFNGLBUFFERDATAPROC BufferData = nullptr;
     PFNGLBUFFERSUBDATAPROC BufferSubData = nullptr;
+    PFNGLCHECKFRAMEBUFFERSTATUSPROC CheckFramebufferStatus = nullptr;
     PFNGLDELETEBUFFERSPROC DeleteBuffers = nullptr;
+    PFNGLDELETEFRAMEBUFFERSPROC DeleteFramebuffers = nullptr;
+    PFNGLDELETERENDERBUFFERSPROC DeleteRenderbuffers = nullptr;
     PFNGLDELETESAMPLERSPROC DeleteSamplers = nullptr;
+    PFNGLFRAMEBUFFERRENDERBUFFERPROC FramebufferRenderbuffer = nullptr;
+    PFNGLFRAMEBUFFERTEXTURE2DPROC FramebufferTexture2D = nullptr;
     PFNGLGENBUFFERSPROC GenBuffers = nullptr;
+    PFNGLGENFRAMEBUFFERSPROC GenFramebuffers = nullptr;
+    PFNGLGENRENDERBUFFERSPROC GenRenderbuffers = nullptr;
     PFNGLGENSAMPLERSPROC GenSamplers = nullptr;
     PFNGLBINDVERTEXARRAYPROC BindVertexArray = nullptr;
     PFNGLDELETEVERTEXARRAYSPROC DeleteVertexArrays = nullptr;
     PFNGLGENVERTEXARRAYSPROC GenVertexArrays = nullptr;
     PFNGLDRAWELEMENTSBASEVERTEXPROC DrawElementsBaseVertex = nullptr;
+    PFNGLRENDERBUFFERSTORAGEPROC RenderbufferStorage = nullptr;
     PFNGLSAMPLERPARAMETERFPROC SamplerParameterf = nullptr;
     PFNGLSAMPLERPARAMETERFVPROC SamplerParameterfv = nullptr;
     PFNGLSAMPLERPARAMETERIPROC SamplerParameteri = nullptr;

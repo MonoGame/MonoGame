@@ -73,6 +73,8 @@ struct MGG_GraphicsDevice
     std::array<std::array<MGG_Texture*, 16>, static_cast<size_t>(MGShaderStage::Count)> textures = {};
     std::array<std::array<MGG_SamplerState*, 16>, static_cast<size_t>(MGShaderStage::Count)> samplers = {};
     std::array<std::array<GLenum, 16>, static_cast<size_t>(MGShaderStage::Count)> textureTargets = {};
+    MGG_Texture* currentRenderTarget = nullptr;
+    GLuint currentFramebuffer = 0;
 };
 
 struct MGG_Buffer
@@ -101,6 +103,12 @@ struct MGG_Texture
     mgint mipmaps = 0;
     mgint slices = 0;
     mgint bytesPerPixel = 0;
+    mgbool isRenderTarget = false;
+    MGDepthFormat depthFormat = MGDepthFormat::None;
+    mgint multiSampleCount = 0;
+    MGRenderTargetUsage renderTargetUsage = MGRenderTargetUsage::DiscardContents;
+    GLuint framebuffer = 0;
+    GLuint depthRenderbuffer = 0;
     std::vector<std::vector<mgbyte>> shadowData;
 };
 
@@ -362,6 +370,39 @@ namespace
         }
     }
 
+    GLenum ToDepthRenderbufferFormat(MGDepthFormat format)
+    {
+        switch (format)
+        {
+        case MGDepthFormat::None:
+            return 0;
+        case MGDepthFormat::Depth16:
+            return GL_DEPTH_COMPONENT16;
+        case MGDepthFormat::Depth24:
+            return GL_DEPTH_COMPONENT24;
+        case MGDepthFormat::Depth24Stencil8:
+            return GL_DEPTH24_STENCIL8;
+        default:
+            MGGL_FAIL("Unsupported depth format", "depth renderbuffer format is not mapped");
+        }
+    }
+
+    GLenum ToDepthAttachment(MGDepthFormat format)
+    {
+        switch (format)
+        {
+        case MGDepthFormat::None:
+            return 0;
+        case MGDepthFormat::Depth16:
+        case MGDepthFormat::Depth24:
+            return GL_DEPTH_ATTACHMENT;
+        case MGDepthFormat::Depth24Stencil8:
+            return GL_DEPTH_STENCIL_ATTACHMENT;
+        default:
+            MGGL_FAIL("Unsupported depth format", "depth attachment point is not mapped");
+        }
+    }
+
     mgint GetMipExtent(mgint baseExtent, mgint level)
     {
         assert(baseExtent > 0);
@@ -472,6 +513,103 @@ namespace
 
         glBindTexture(texture->target, static_cast<GLuint>(previousBinding));
         device->context.functions.ActiveTexture(static_cast<GLenum>(previousActiveTexture));
+    }
+
+    void BeginFramebufferEdit(MGG_GraphicsDevice* device, GLint& previousFramebuffer, GLint& previousRenderbuffer)
+    {
+        assert(device != nullptr);
+
+        glGetIntegerv(GL_FRAMEBUFFER_BINDING, &previousFramebuffer);
+        glGetIntegerv(GL_RENDERBUFFER_BINDING, &previousRenderbuffer);
+        device->context.functions.BindFramebuffer(GL_FRAMEBUFFER, 0);
+        device->context.functions.BindRenderbuffer(GL_RENDERBUFFER, 0);
+    }
+
+    void EndFramebufferEdit(MGG_GraphicsDevice* device, GLint previousFramebuffer, GLint previousRenderbuffer)
+    {
+        assert(device != nullptr);
+
+        device->context.functions.BindFramebuffer(GL_FRAMEBUFFER, static_cast<GLuint>(previousFramebuffer));
+        device->context.functions.BindRenderbuffer(GL_RENDERBUFFER, static_cast<GLuint>(previousRenderbuffer));
+    }
+
+    MGG_Texture* CreateTextureResource(
+        MGG_GraphicsDevice* device,
+        MGTextureType type,
+        MGSurfaceFormat format,
+        mgint width,
+        mgint height,
+        mgint depth,
+        mgint mipmaps,
+        mgint slices)
+    {
+        assert(device != nullptr);
+
+        // TODO: add 3D, cube, and array texture creation
+        if (type != MGTextureType::_2D || depth != 1 || slices != 1)
+            MGGL_FAIL("Unsupported texture shape", "need to add 3D, cube, and array texture support");
+
+        TextureFormatInfo formatInfo = GetTextureFormatInfo(format);
+
+        MGG_Texture* texture = new MGG_Texture();
+        texture->target = GL_TEXTURE_2D;
+        texture->type = type;
+        texture->format = format;
+        texture->internalFormat = formatInfo.internalFormat;
+        texture->pixelFormat = formatInfo.pixelFormat;
+        texture->pixelType = formatInfo.pixelType;
+        texture->width = width;
+        texture->height = height;
+        texture->depth = depth;
+        texture->mipmaps = mipmaps;
+        texture->slices = slices;
+        texture->bytesPerPixel = formatInfo.bytesPerPixel;
+        texture->shadowData.resize(static_cast<size_t>(mipmaps * slices));
+
+        glGenTextures(1, &texture->handle);
+        if (texture->handle == 0)
+            MGGL_FAIL("glGenTextures failed", "texture creation returned 0");
+
+        GLint previousActiveTexture = 0;
+        GLint previousBinding = 0;
+        glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+        BeginTextureEdit(device, texture, previousActiveTexture, previousBinding);
+        glTexParameteri(texture->target, GL_TEXTURE_BASE_LEVEL, 0);
+        glTexParameteri(texture->target, GL_TEXTURE_MAX_LEVEL, mipmaps - 1);
+        glTexParameteri(texture->target, GL_TEXTURE_MIN_FILTER, mipmaps > 1 ? GL_LINEAR_MIPMAP_LINEAR : GL_LINEAR);
+        glTexParameteri(texture->target, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glTexParameteri(texture->target, GL_TEXTURE_WRAP_S, GL_REPEAT);
+        glTexParameteri(texture->target, GL_TEXTURE_WRAP_T, GL_REPEAT);
+
+        if (formatInfo.usesSwizzle)
+        {
+            glTexParameteri(texture->target, GL_TEXTURE_SWIZZLE_R, formatInfo.swizzleR);
+            glTexParameteri(texture->target, GL_TEXTURE_SWIZZLE_G, formatInfo.swizzleG);
+            glTexParameteri(texture->target, GL_TEXTURE_SWIZZLE_B, formatInfo.swizzleB);
+            glTexParameteri(texture->target, GL_TEXTURE_SWIZZLE_A, formatInfo.swizzleA);
+        }
+
+        for (mgint level = 0; level < mipmaps; ++level)
+        {
+            mgint mipWidth = GetMipExtent(width, level);
+            mgint mipHeight = GetMipExtent(height, level);
+            std::vector<mgbyte>& shadow = texture->shadowData[GetTextureSubresourceIndex(texture, level, 0)];
+            shadow.resize(GetTextureByteCount(mipWidth, mipHeight, 1, texture->bytesPerPixel));
+
+            glTexImage2D(
+                texture->target,
+                level,
+                texture->internalFormat,
+                mipWidth,
+                mipHeight,
+                0,
+                texture->pixelFormat,
+                texture->pixelType,
+                shadow.data());
+        }
+
+        EndTextureEdit(device, texture, previousActiveTexture, previousBinding);
+        return texture;
     }
 
     void CopyTextureRegionToShadow(
@@ -787,6 +925,8 @@ void MGG_GraphicsDevice_ResizeSwapChain(
     device->context.Create(window);
     device->vertexArray = device->context.defaultVertexArray;
     device->context.BindDefaultVertexArray();
+    device->currentRenderTarget = nullptr;
+    device->currentFramebuffer = 0;
     device->context.width = width;
     device->context.height = height;
     device->context.SetSwapInterval(syncInterval);
@@ -907,11 +1047,41 @@ void MGG_GraphicsDevice_SetScissorRectangle(MGG_GraphicsDevice* device, mgint x,
 
 void MGG_GraphicsDevice_SetRenderTargets(MGG_GraphicsDevice* device, MGG_Texture** targets, mgint* arraySlices, mgint count)
 {
-    (void)device;
-    (void)targets;
-    (void)arraySlices;
-    (void)count;
-    MGGL_NOT_IMPLEMENTED("MGG_GraphicsDevice_SetRenderTargets");
+    assert(device != nullptr);
+    assert(count >= 0);
+
+    EnsureContext(device);
+
+    if (count == 0)
+    {
+        device->context.functions.BindFramebuffer(GL_FRAMEBUFFER, 0);
+        glDrawBuffer(GL_BACK);
+        glReadBuffer(GL_BACK);
+        device->currentRenderTarget = nullptr;
+        device->currentFramebuffer = 0;
+        return;
+    }
+
+    // TODO: add multiple render target binding
+    if (count != 1)
+        MGGL_FAIL("Unsupported render target count", "need to add multiple render target binding");
+
+    if (targets == nullptr || arraySlices == nullptr || targets[0] == nullptr)
+        MGGL_FAIL("Invalid render target binding", "one valid render target is required");
+
+    // TODO: add render target array and cube slice binding
+    if (arraySlices[0] != 0)
+        MGGL_FAIL("Unsupported render target slice", "need to add non-zero render target slice binding");
+
+    MGG_Texture* target = targets[0];
+    if (!target->isRenderTarget || target->framebuffer == 0)
+        MGGL_FAIL("Invalid render target binding", "texture does not own a framebuffer");
+
+    device->context.functions.BindFramebuffer(GL_FRAMEBUFFER, target->framebuffer);
+    glDrawBuffer(GL_COLOR_ATTACHMENT0);
+    glReadBuffer(GL_COLOR_ATTACHMENT0);
+    device->currentRenderTarget = target;
+    device->currentFramebuffer = target->framebuffer;
 }
 
 void MGG_GraphicsDevice_SetConstantBuffer(MGG_GraphicsDevice* device, MGShaderStage stage, mgint slot, MGG_Buffer* buffer)
@@ -1059,8 +1229,12 @@ void MGG_GraphicsDevice_DrawIndexedInstanced(MGG_GraphicsDevice* device, MGPrimi
 
 void MGG_GraphicsDevice_ResolveRenderTargets(MGG_GraphicsDevice* device)
 {
-    (void)device;
-    MGGL_NOT_IMPLEMENTED("MGG_GraphicsDevice_ResolveRenderTargets");
+    assert(device != nullptr);
+
+    EnsureContext(device);
+
+    if (device->currentRenderTarget == nullptr)
+        return;
 }
 
 void MGG_GraphicsDevice_GetBackBufferData(MGG_GraphicsDevice* device, mgint x, mgint y, mgint width, mgint height, void* data, mgint count, mgint dataBytes)
@@ -1328,89 +1502,73 @@ MGG_Texture* MGG_Texture_Create(MGG_GraphicsDevice* device, MGTextureType type, 
     assert(slices > 0);
 
     EnsureContext(device);
-
-    // TODO: only 2D implemented right now
-    if (type != MGTextureType::_2D || depth != 1 || slices != 1)
-        MGGL_FAIL("Unsupported texture shape", "texture must be 2D with depth 1 and one slice");
-
-    TextureFormatInfo formatInfo = GetTextureFormatInfo(format);
-
-    MGG_Texture* texture = new MGG_Texture();
-    texture->target = GL_TEXTURE_2D;
-    texture->type = type;
-    texture->format = format;
-    texture->internalFormat = formatInfo.internalFormat;
-    texture->pixelFormat = formatInfo.pixelFormat;
-    texture->pixelType = formatInfo.pixelType;
-    texture->width = width;
-    texture->height = height;
-    texture->depth = depth;
-    texture->mipmaps = mipmaps;
-    texture->slices = slices;
-    texture->bytesPerPixel = formatInfo.bytesPerPixel;
-    texture->shadowData.resize(static_cast<size_t>(mipmaps * slices));
-
-    glGenTextures(1, &texture->handle);
-    if (texture->handle == 0)
-        MGGL_FAIL("glGenTextures failed", "texture creation returned 0");
-
-    GLint previousActiveTexture = 0;
-    GLint previousBinding = 0;
-    glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-    BeginTextureEdit(device, texture, previousActiveTexture, previousBinding);
-    glTexParameteri(texture->target, GL_TEXTURE_BASE_LEVEL, 0);
-    glTexParameteri(texture->target, GL_TEXTURE_MAX_LEVEL, mipmaps - 1);
-    glTexParameteri(texture->target, GL_TEXTURE_MIN_FILTER, mipmaps > 1 ? GL_LINEAR_MIPMAP_LINEAR : GL_LINEAR);
-    glTexParameteri(texture->target, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glTexParameteri(texture->target, GL_TEXTURE_WRAP_S, GL_REPEAT);
-    glTexParameteri(texture->target, GL_TEXTURE_WRAP_T, GL_REPEAT);
-
-    if (formatInfo.usesSwizzle)
-    {
-        glTexParameteri(texture->target, GL_TEXTURE_SWIZZLE_R, formatInfo.swizzleR);
-        glTexParameteri(texture->target, GL_TEXTURE_SWIZZLE_G, formatInfo.swizzleG);
-        glTexParameteri(texture->target, GL_TEXTURE_SWIZZLE_B, formatInfo.swizzleB);
-        glTexParameteri(texture->target, GL_TEXTURE_SWIZZLE_A, formatInfo.swizzleA);
-    }
-
-    for (mgint level = 0; level < mipmaps; ++level)
-    {
-        mgint mipWidth = GetMipExtent(width, level);
-        mgint mipHeight = GetMipExtent(height, level);
-        std::vector<mgbyte>& shadow = texture->shadowData[GetTextureSubresourceIndex(texture, level, 0)];
-        shadow.resize(GetTextureByteCount(mipWidth, mipHeight, 1, texture->bytesPerPixel));
-
-        glTexImage2D(
-            texture->target,
-            level,
-            texture->internalFormat,
-            mipWidth,
-            mipHeight,
-            0,
-            texture->pixelFormat,
-            texture->pixelType,
-            shadow.data());
-    }
-
-    EndTextureEdit(device, texture, previousActiveTexture, previousBinding);
-
-    return texture;
+    return CreateTextureResource(device, type, format, width, height, depth, mipmaps, slices);
 }
 
 MGG_Texture* MGG_RenderTarget_Create(MGG_GraphicsDevice* device, MGTextureType type, MGSurfaceFormat format, mgint width, mgint height, mgint depth, mgint mipmaps, mgint slices, MGDepthFormat depthFormat, mgint multiSampleCount, MGRenderTargetUsage usage)
 {
-    (void)device;
-    (void)type;
-    (void)format;
-    (void)width;
-    (void)height;
-    (void)depth;
-    (void)mipmaps;
-    (void)slices;
-    (void)depthFormat;
-    (void)multiSampleCount;
-    (void)usage;
-    MGGL_NOT_IMPLEMENTED("MGG_RenderTarget_Create");
+    assert(device != nullptr);
+    assert(width > 0);
+    assert(height > 0);
+    assert(depth > 0);
+    assert(mipmaps > 0);
+    assert(slices > 0);
+    assert(multiSampleCount >= 0);
+
+    EnsureContext(device);
+
+    // TODO: add multisampled render target allocation and resolve
+    if (multiSampleCount > 0)
+        MGGL_FAIL("Unsupported render target multisampling", "need to add multisampled render target support");
+
+    // TODO: add render target mip allocation
+    if (mipmaps != 1)
+        MGGL_FAIL("Unsupported render target mipmaps", "need to add render target mip levels");
+
+    MGG_Texture* texture = CreateTextureResource(device, type, format, width, height, depth, mipmaps, slices);
+    texture->isRenderTarget = true;
+    texture->depthFormat = depthFormat;
+    texture->multiSampleCount = multiSampleCount;
+    texture->renderTargetUsage = usage;
+
+    GLint previousFramebuffer = 0;
+    GLint previousRenderbuffer = 0;
+    BeginFramebufferEdit(device, previousFramebuffer, previousRenderbuffer);
+
+    device->context.functions.GenFramebuffers(1, &texture->framebuffer);
+    if (texture->framebuffer == 0)
+        MGGL_FAIL("glGenFramebuffers failed", "framebuffer creation returned 0");
+
+    device->context.functions.BindFramebuffer(GL_FRAMEBUFFER, texture->framebuffer);
+    device->context.functions.FramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, texture->target, texture->handle, 0);
+    glDrawBuffer(GL_COLOR_ATTACHMENT0);
+    glReadBuffer(GL_COLOR_ATTACHMENT0);
+
+    if (depthFormat != MGDepthFormat::None)
+    {
+        device->context.functions.GenRenderbuffers(1, &texture->depthRenderbuffer);
+        if (texture->depthRenderbuffer == 0)
+            MGGL_FAIL("glGenRenderbuffers failed", "depth renderbuffer creation returned 0");
+
+        device->context.functions.BindRenderbuffer(GL_RENDERBUFFER, texture->depthRenderbuffer);
+        device->context.functions.RenderbufferStorage(
+            GL_RENDERBUFFER,
+            ToDepthRenderbufferFormat(depthFormat),
+            width,
+            height);
+        device->context.functions.FramebufferRenderbuffer(
+            GL_FRAMEBUFFER,
+            ToDepthAttachment(depthFormat),
+            GL_RENDERBUFFER,
+            texture->depthRenderbuffer);
+    }
+
+    GLenum framebufferStatus = device->context.functions.CheckFramebufferStatus(GL_FRAMEBUFFER);
+    if (framebufferStatus != GL_FRAMEBUFFER_COMPLETE)
+        MGGL_FAIL("OpenGL framebuffer incomplete", "framebuffer status check failed");
+
+    EndFramebufferEdit(device, previousFramebuffer, previousRenderbuffer);
+    return texture;
 }
 
 void MGG_Texture_Destroy(MGG_GraphicsDevice* device, MGG_Texture* texture)
@@ -1424,6 +1582,15 @@ void MGG_Texture_Destroy(MGG_GraphicsDevice* device, MGG_Texture* texture)
 
     GLint previousActiveTexture = 0;
     glGetIntegerv(GL_ACTIVE_TEXTURE, &previousActiveTexture);
+
+    if (device->currentRenderTarget == texture)
+    {
+        device->context.functions.BindFramebuffer(GL_FRAMEBUFFER, 0);
+        glDrawBuffer(GL_BACK);
+        glReadBuffer(GL_BACK);
+        device->currentRenderTarget = nullptr;
+        device->currentFramebuffer = 0;
+    }
 
     for (size_t stageIndex = 0; stageIndex < ShaderStageCount; ++stageIndex)
     {
@@ -1447,6 +1614,12 @@ void MGG_Texture_Destroy(MGG_GraphicsDevice* device, MGG_Texture* texture)
     }
 
     device->context.functions.ActiveTexture(static_cast<GLenum>(previousActiveTexture));
+
+    if (texture->depthRenderbuffer != 0)
+        device->context.functions.DeleteRenderbuffers(1, &texture->depthRenderbuffer);
+
+    if (texture->framebuffer != 0)
+        device->context.functions.DeleteFramebuffers(1, &texture->framebuffer);
 
     if (texture->handle != 0)
         glDeleteTextures(1, &texture->handle);
@@ -1506,6 +1679,10 @@ void MGG_Texture_GetData(MGG_GraphicsDevice* device, MGG_Texture* texture, mgint
     assert(slice >= 0);
     assert(slice < texture->slices);
     assert(dataBytes > 0);
+
+    // TODO: add GPU readback for render target textures
+    if (texture->isRenderTarget)
+        MGGL_FAIL("Render target readback not implemented", "need to add render target readback");
 
     mgint resolvedWidth = 0;
     mgint resolvedHeight = 0;
