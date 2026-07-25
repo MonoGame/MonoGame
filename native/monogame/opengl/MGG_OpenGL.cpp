@@ -341,27 +341,24 @@ void MGG_GraphicsDevice_Present(MGG_GraphicsDevice* device, mgint currentFrame, 
 
 void MGG_GraphicsDevice_SetBlendState(MGG_GraphicsDevice* device, MGG_BlendState* state, mgfloat factorR, mgfloat factorG, mgfloat factorB, mgfloat factorA)
 {
-    (void)device;
-    (void)state;
+    assert(device != nullptr);
     (void)factorR;
     (void)factorG;
     (void)factorB;
     (void)factorA;
-    MGGL_NOT_IMPLEMENTED("MGG_GraphicsDevice_SetBlendState");
+    device->blendState = state;
 }
 
 void MGG_GraphicsDevice_SetDepthStencilState(MGG_GraphicsDevice* device, MGG_DepthStencilState* state)
 {
-    (void)device;
-    (void)state;
-    MGGL_NOT_IMPLEMENTED("MGG_GraphicsDevice_SetDepthStencilState");
+    assert(device != nullptr);
+    device->depthStencilState = state;
 }
 
 void MGG_GraphicsDevice_SetRasterizerState(MGG_GraphicsDevice* device, MGG_RasterizerState* state)
 {
-    (void)device;
-    (void)state;
-    MGGL_NOT_IMPLEMENTED("MGG_GraphicsDevice_SetRasterizerState");
+    assert(device != nullptr);
+    device->rasterizerState = state;
 }
 
 void MGG_GraphicsDevice_GetTitleSafeArea(mgint& x, mgint& y, mgint& width, mgint& height)
@@ -520,58 +517,66 @@ void MGG_GraphicsDevice_GetBackBufferData(MGG_GraphicsDevice* device, mgint x, m
 
 MGG_BlendState* MGG_BlendState_Create(MGG_GraphicsDevice* device, MGG_BlendState_Info* infos)
 {
-    (void)device;
-    (void)infos;
-    MGGL_NOT_IMPLEMENTED("MGG_BlendState_Create");
+    assert(device != nullptr);
+    assert(infos != nullptr);
+
+    MGG_BlendState* state = new MGG_BlendState();
+    memcpy(state->infos, infos, sizeof(state->infos));
+    return state;
 }
 
 void MGG_BlendState_Destroy(MGG_GraphicsDevice* device, MGG_BlendState* state)
 {
-    (void)device;
-    (void)state;
-    MGGL_NOT_IMPLEMENTED("MGG_BlendState_Destroy");
+    assert(device != nullptr);
+    delete state;
 }
 
 MGG_DepthStencilState* MGG_DepthStencilState_Create(MGG_GraphicsDevice* device, MGG_DepthStencilState_Info* info)
 {
-    (void)device;
-    (void)info;
-    MGGL_NOT_IMPLEMENTED("MGG_DepthStencilState_Create");
+    assert(device != nullptr);
+    assert(info != nullptr);
+
+    MGG_DepthStencilState* state = new MGG_DepthStencilState();
+    state->info = *info;
+    return state;
 }
 
 void MGG_DepthStencilState_Destroy(MGG_GraphicsDevice* device, MGG_DepthStencilState* state)
 {
-    (void)device;
-    (void)state;
-    MGGL_NOT_IMPLEMENTED("MGG_DepthStencilState_Destroy");
+    assert(device != nullptr);
+    delete state;
 }
 
 MGG_RasterizerState* MGG_RasterizerState_Create(MGG_GraphicsDevice* device, MGG_RasterizerState_Info* info)
 {
-    (void)device;
-    (void)info;
-    MGGL_NOT_IMPLEMENTED("MGG_RasterizerState_Create");
+    assert(device != nullptr);
+    assert(info != nullptr);
+
+    MGG_RasterizerState* state = new MGG_RasterizerState();
+    state->info = *info;
+    return state;
 }
 
 void MGG_RasterizerState_Destroy(MGG_GraphicsDevice* device, MGG_RasterizerState* state)
 {
-    (void)device;
-    (void)state;
-    MGGL_NOT_IMPLEMENTED("MGG_RasterizerState_Destroy");
+    assert(device != nullptr);
+    delete state;
 }
 
 MGG_SamplerState* MGG_SamplerState_Create(MGG_GraphicsDevice* device, MGG_SamplerState_Info* info)
 {
-    (void)device;
-    (void)info;
-    MGGL_NOT_IMPLEMENTED("MGG_SamplerState_Create");
+    assert(device != nullptr);
+    assert(info != nullptr);
+
+    MGG_SamplerState* state = new MGG_SamplerState();
+    state->info = *info;
+    return state;
 }
 
 void MGG_SamplerState_Destroy(MGG_GraphicsDevice* device, MGG_SamplerState* state)
 {
-    (void)device;
-    (void)state;
-    MGGL_NOT_IMPLEMENTED("MGG_SamplerState_Destroy");
+    assert(device != nullptr);
+    delete state;
 }
 
 MGG_Buffer* MGG_Buffer_Create(MGG_GraphicsDevice* device, MGBufferType type, mgbool dynamic, mgint sizeInBytes)
