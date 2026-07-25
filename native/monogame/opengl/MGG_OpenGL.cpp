@@ -83,6 +83,11 @@ struct MGG_OcclusionQuery
 
 namespace
 {
+    constexpr mgint MaxTextureSlots = 16;
+    constexpr mgint MaxVertexTextureSlots = 16;
+    constexpr mgint MaxVertexBufferSlots = 16;
+    constexpr mgint OpenGLShaderProfile = 0;
+
     [[noreturn]] void MGGL_Fail(const char* file, int line, const char* action, const char* detail)
     {
         char message[512];
@@ -104,6 +109,45 @@ namespace
     }
 
 #define MGGL_NOT_IMPLEMENTED(functionName) FailNotImplemented(__FILE__, __LINE__, functionName);
+
+    MGG_DisplayMode ToDisplayMode(const SDL_DisplayMode& mode)
+    {
+        MGG_DisplayMode result;
+        result.format = MGSurfaceFormat::Color;
+        result.width = mode.w;
+        result.height = mode.h;
+        return result;
+    }
+
+    void PopulateDisplayModes(MGG_GraphicsAdapter* adapter, mgint displayIndex)
+    {
+        adapter->modes.clear();
+
+        SDL_DisplayMode currentMode;
+        if (SDL_GetCurrentDisplayMode(displayIndex, &currentMode) == 0)
+            adapter->currentDisplayMode = ToDisplayMode(currentMode);
+        else
+            adapter->currentDisplayMode = { MGSurfaceFormat::Color, 1280, 720 };
+
+        mgint modeCount = SDL_GetNumDisplayModes(displayIndex);
+        if (modeCount <= 0)
+        {
+            adapter->modes.push_back(adapter->currentDisplayMode);
+            return;
+        }
+
+        adapter->modes.reserve(modeCount);
+
+        for (mgint i = 0; i < modeCount; ++i)
+        {
+            SDL_DisplayMode mode;
+            if (SDL_GetDisplayMode(displayIndex, i, &mode) == 0)
+                adapter->modes.push_back(ToDisplayMode(mode));
+        }
+
+        if (adapter->modes.empty())
+            adapter->modes.push_back(adapter->currentDisplayMode);
+    }
 }
 
 void MGG_EffectResource_GetByteCode(const char* name, mgbyte*& bytecode, mgint& size)
@@ -116,47 +160,78 @@ void MGG_EffectResource_GetByteCode(const char* name, mgbyte*& bytecode, mgint& 
 
 MGG_GraphicsSystem* MGG_GraphicsSystem_Create()
 {
-    MGGL_NOT_IMPLEMENTED("MGG_GraphicsSystem_Create");
+    MGG_GraphicsSystem* system = new MGG_GraphicsSystem();
+
+    MGG_GraphicsAdapter* adapter = new MGG_GraphicsAdapter();
+    adapter->deviceName = "Display0";
+    adapter->description = "MonoGame Native OpenGL backend";
+    PopulateDisplayModes(adapter, 0);
+
+    system->adapters.push_back(adapter);
+
+    return system;
 }
 
 void MGG_GraphicsSystem_Destroy(MGG_GraphicsSystem* system)
 {
-    (void)system;
-    MGGL_NOT_IMPLEMENTED("MGG_GraphicsSystem_Destroy");
+    assert(system != nullptr);
+
+    for (MGG_GraphicsAdapter* adapter : system->adapters)
+        delete adapter;
+
+    delete system;
 }
 
 MGG_GraphicsAdapter* MGG_GraphicsAdapter_Get(MGG_GraphicsSystem* system, mgint index)
 {
-    (void)system;
-    (void)index;
-    MGGL_NOT_IMPLEMENTED("MGG_GraphicsAdapter_Get");
+    assert(system != nullptr);
+
+    if (index < 0 || static_cast<size_t>(index) >= system->adapters.size())
+        return nullptr;
+
+    return system->adapters[index];
 }
 
 void MGG_GraphicsAdapter_GetInfo(MGG_GraphicsAdapter* adapter, MGG_GraphicsAdaptor_Info& info)
 {
-    (void)adapter;
-    (void)info;
-    MGGL_NOT_IMPLEMENTED("MGG_GraphicsAdapter_GetInfo");
+    assert(adapter != nullptr);
+
+    info.DeviceName = const_cast<char*>(adapter->deviceName.c_str());
+    info.Description = const_cast<char*>(adapter->description.c_str());
+    info.DeviceId = adapter->deviceId;
+    info.Revision = adapter->revision;
+    info.VendorId = adapter->vendorId;
+    info.SubSystemId = adapter->subsystemId;
+    info.MonitorHandle = adapter->monitorHandle;
+    info.DisplayModes = adapter->modes.empty() ? nullptr : adapter->modes.data();
+    info.DisplayModeCount = static_cast<mgint>(adapter->modes.size());
+    info.CurrentDisplayMode = adapter->currentDisplayMode;
 }
 
 MGG_GraphicsDevice* MGG_GraphicsDevice_Create(MGG_GraphicsSystem* system, MGG_GraphicsAdapter* adapter)
 {
-    (void)system;
-    (void)adapter;
-    MGGL_NOT_IMPLEMENTED("MGG_GraphicsDevice_Create");
+    assert(system != nullptr);
+    assert(adapter != nullptr);
+
+    return new MGG_GraphicsDevice();
 }
 
 void MGG_GraphicsDevice_Destroy(MGG_GraphicsDevice* device)
 {
-    (void)device;
-    MGGL_NOT_IMPLEMENTED("MGG_GraphicsDevice_Destroy");
+    assert(device != nullptr);
+
+    device->context.Destroy();
+    delete device;
 }
 
 void MGG_GraphicsDevice_GetCaps(MGG_GraphicsDevice* device, MGG_GraphicsDevice_Caps& caps)
 {
-    (void)device;
-    (void)caps;
-    MGGL_NOT_IMPLEMENTED("MGG_GraphicsDevice_GetCaps");
+    assert(device != nullptr);
+
+    caps.MaxTextureSlots = MaxTextureSlots;
+    caps.MaxVertexTextureSlots = MaxVertexTextureSlots;
+    caps.MaxVertexBufferSlots = MaxVertexBufferSlots;
+    caps.ShaderProfile = OpenGLShaderProfile;
 }
 
 void MGG_GraphicsDevice_ResizeSwapChain(
@@ -231,11 +306,20 @@ void MGG_GraphicsDevice_SetRasterizerState(MGG_GraphicsDevice* device, MGG_Raste
 
 void MGG_GraphicsDevice_GetTitleSafeArea(mgint& x, mgint& y, mgint& width, mgint& height)
 {
-    (void)x;
-    (void)y;
-    (void)width;
-    (void)height;
-    MGGL_NOT_IMPLEMENTED("MGG_GraphicsDevice_GetTitleSafeArea");
+    SDL_Rect bounds;
+    if (SDL_GetDisplayUsableBounds(0, &bounds) == 0)
+    {
+        x = bounds.x;
+        y = bounds.y;
+        width = bounds.w;
+        height = bounds.h;
+        return;
+    }
+
+    x = 0;
+    y = 0;
+    width = 0;
+    height = 0;
 }
 
 void MGG_GraphicsDevice_SetViewport(MGG_GraphicsDevice* device, mgint x, mgint y, mgint width, mgint height, mgfloat minDepth, mgfloat maxDepth)
