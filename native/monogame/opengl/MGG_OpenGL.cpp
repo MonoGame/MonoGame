@@ -634,21 +634,45 @@ void MGG_GraphicsDevice_SetInputLayout(MGG_GraphicsDevice* device, MGG_InputLayo
 
 void MGG_GraphicsDevice_Draw(MGG_GraphicsDevice* device, MGPrimitiveType primitiveType, mgint vertexStart, mgint vertexCount)
 {
-    (void)device;
-    (void)primitiveType;
-    (void)vertexStart;
-    (void)vertexCount;
-    MGGL_NOT_IMPLEMENTED("MGG_GraphicsDevice_Draw");
+    assert(device != nullptr);
+    assert(vertexStart >= 0);
+
+    if (vertexCount <= 0)
+        return;
+
+    EnsureContext(device);
+    EnsureVertexArray(device);
+    assert(device->isInFrame);
+
+    glDrawArrays(ToPrimitiveMode(primitiveType), vertexStart, vertexCount);
 }
 
 void MGG_GraphicsDevice_DrawIndexed(MGG_GraphicsDevice* device, MGPrimitiveType primitiveType, mgint primitiveCount, mgint indexStart, mgint vertexStart)
 {
-    (void)device;
-    (void)primitiveType;
-    (void)primitiveCount;
-    (void)indexStart;
-    (void)vertexStart;
-    MGGL_NOT_IMPLEMENTED("MGG_GraphicsDevice_DrawIndexed");
+    assert(device != nullptr);
+    assert(indexStart >= 0);
+    assert(vertexStart >= 0);
+
+    if (primitiveCount <= 0)
+        return;
+
+    EnsureContext(device);
+    EnsureVertexArray(device);
+    assert(device->isInFrame);
+
+    if (device->indexBuffer == nullptr)
+        MGGL_FAIL("Indexed draw requires an index buffer", "MGG_GraphicsDevice_SetIndexBuffer must bind a buffer before DrawIndexed");
+
+    mgint indexCount = GetIndexedElementCount(primitiveType, primitiveCount);
+    mgint indexSizeIntBytes = GetIndexElementSizeInBytes(device->indexElementSize);
+    intptr_t indexByteOffset = static_cast<intptr_t>(indexStart) * indexSizeIntBytes;
+
+    device->context.functions.DrawElementsBaseVertex(
+        ToPrimitiveMode(primitiveType),
+        indexCount,
+        ToIndexType(device->indexElementSize),
+        reinterpret_cast<const void*>(indexByteOffset),
+        vertexStart);
 }
 
 void MGG_GraphicsDevice_DrawIndexedInstanced(MGG_GraphicsDevice* device, MGPrimitiveType primitiveType, mgint primitiveCount, mgint indexStart, mgint vertexStart, mgint instanceCount)
@@ -747,43 +771,109 @@ void MGG_SamplerState_Destroy(MGG_GraphicsDevice* device, MGG_SamplerState* stat
 
 MGG_Buffer* MGG_Buffer_Create(MGG_GraphicsDevice* device, MGBufferType type, mgbool dynamic, mgint sizeInBytes)
 {
-    (void)device;
-    (void)type;
-    (void)dynamic;
-    (void)sizeInBytes;
-    MGGL_NOT_IMPLEMENTED("MGG_Buffer_Create");
+    assert(device != nullptr);
+    assert(sizeInBytes > 0);
+
+    EnsureContext(device);
+
+    MGG_Buffer* buffer = new MGG_Buffer();
+    buffer->target = ToBufferTarget(type);
+    buffer->usage = ToBufferUsage(dynamic);
+    buffer->type = type;
+    buffer->dynamic = dynamic;
+    buffer->sizeInbytes = sizeInBytes;
+    buffer->shadowData.resize(sizeInBytes);
+
+    device->context.functions.GenBuffers(1, &buffer->handle);
+    if (buffer->handle == 0)
+        MGGL_FAIL("glGenBuffers failed", "buffer creation returned 0");
+
+    device->context.functions.BindBuffer(buffer->target, buffer->handle);
+    device->context.functions.BufferData(buffer->target, sizeInBytes, buffer->shadowData.data(), buffer->usage);
+
+    return buffer;
 }
 
 void MGG_Buffer_Destroy(MGG_GraphicsDevice* device, MGG_Buffer* buffer)
 {
-    (void)device;
-    (void)buffer;
-    MGGL_NOT_IMPLEMENTED("MGG_Buffer_Destroy");
+    assert(device != nullptr);
+
+    if (buffer == nullptr)
+        return;
+
+    EnsureContext(device);
+
+    if (device->indexBuffer == buffer)
+    {
+        EnsureVertexArray(device);
+        device->context.functions.BindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+        device->indexBuffer = nullptr;
+    }
+
+    for (mgint slot = 0; slot < MaxVertexBufferSlots; ++slot)
+    {
+        if (device->vertexBuffers[slot] == buffer)
+        {
+            device->vertexBuffers[slot] = nullptr;
+            device->vertexOffsets[slot] = 0;
+        }
+    }
+
+    if (buffer->handle != 0)
+        device->context.functions.DeleteBuffers(1, &buffer->handle);
+
+    delete buffer;
 }
 
 void MGG_Buffer_SetData(MGG_GraphicsDevice* device, MGG_Buffer*& buffer, mgint offset, mgbyte* data, mgint elementCount, mgint vertexStride, mgint elementSizeInBytes, mgbool discard)
 {
-    (void)device;
-    (void)buffer;
-    (void)offset;
-    (void)data;
-    (void)elementCount;
-    (void)vertexStride;
-    (void)elementSizeInBytes;
-    (void)discard;
-    MGGL_NOT_IMPLEMENTED("MGG_Buffer_SetData");
+    assert(device != nullptr);
+    assert(buffer != nullptr);
+    assert(data != nullptr);
+    assert(offset >= 0);
+    assert(elementCount > 0);
+    assert(vertexStride > 0);
+    assert(elementSizeInBytes > 0);
+
+    mgint copySpan = GetCopySpan(elementCount, vertexStride, elementSizeInBytes);
+    assert(offset + copySpan <= buffer->sizeInbytes);
+
+    CopyToShadowData(buffer->shadowData.data() + offset, data, elementCount, vertexStride, elementSizeInBytes);
+
+    EnsureContext(device);
+    device->context.functions.BindBuffer(buffer->target, buffer->handle);
+
+    if (discard)
+    {
+        device->context.functions.BufferData(
+            buffer->target,
+            buffer->sizeInbytes,
+            buffer->shadowData.data(),
+            buffer->usage);
+        return;
+    }
+
+    device->context.functions.BufferSubData(
+        buffer->target,
+        offset,
+        copySpan,
+        buffer->shadowData.data() + offset);
 }
 
 void MGG_Buffer_GetData(MGG_GraphicsDevice* device, MGG_Buffer* buffer, mgint offset, mgbyte* data, mgint dataCount, mgint dataBytes, mgint dataStride)
 {
-    (void)device;
-    (void)buffer;
-    (void)offset;
-    (void)data;
-    (void)dataCount;
-    (void)dataBytes;
-    (void)dataStride;
-    MGGL_NOT_IMPLEMENTED("MGG_Buffer_GetData");
+    assert(device != nullptr);
+    assert(buffer != nullptr);
+    assert(data != nullptr);
+    assert(offset >= 0);
+    assert(dataCount > 0);
+    assert(dataBytes > 0);
+    assert(dataStride > 0);
+
+    mgint copySpan = GetCopySpan(dataCount, dataStride, dataBytes);
+    assert(offset + copySpan <= buffer->sizeInbytes);
+
+    CopyFromShadowData(buffer->shadowData.data() + offset, data, dataCount, dataBytes, dataStride);
 }
 
 MGG_Texture* MGG_Texture_Create(MGG_GraphicsDevice* device, MGTextureType type, MGSurfaceFormat format, mgint width, mgint height, mgint depth, mgint mipmaps, mgint slices)
