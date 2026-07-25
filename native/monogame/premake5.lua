@@ -90,6 +90,21 @@ function vulkan()
     filter {}
 end
 
+-- OpenGL is supported on desktop platforms through SDL.
+function opengl()
+    defines {"MG_OPENGL"}
+
+    files {"opengl/**.h", "opengl/**.cpp"}
+
+    filter {"system:windows"}
+    links {"opengl32"}
+    filter {"system:macosx"}
+    links {"OpenGL.framework"}
+    filter {"system:linux"}
+    links {"GL"}
+    filter {}
+end
+
 -- DirectX12 is supported on Xbox and Windows.
 function directx12()
     defines {"MG_DIRECTX12"}
@@ -164,6 +179,13 @@ project "desktopvk"
 common("desktopvk")
 sdl2()
 vulkan()
+faudio()
+configs()
+
+project "desktopgl"
+common("desktopgl")
+sdl2()
+opengl()
 faudio()
 configs()
 
