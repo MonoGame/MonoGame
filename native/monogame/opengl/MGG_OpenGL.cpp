@@ -6,6 +6,8 @@
 
 #include <SDL.h>
 #include <SDL_opengl.h>
+#include <array>
+#include <cstdint>
 
 struct MGG_GraphicsAdapter
 {
@@ -45,6 +47,8 @@ struct MGG_SamplerState
     MGG_SamplerState_Info info;
 };
 
+struct MGG_Buffer;
+
 struct MGG_GraphicsDevice
 {
     SDL_Window* window = nullptr;
@@ -59,10 +63,22 @@ struct MGG_GraphicsDevice
     MGG_BlendState* blendState = nullptr;
     MGG_DepthStencilState* depthStencilState = nullptr;
     MGG_RasterizerState* rasterizerState = nullptr;
+    GLuint vertexArray = 0;
+    MGG_Buffer* indexBuffer = nullptr;
+    MGIndexElementSize indexElementSize = MGIndexElementSize::SixteenBits;
+    std::array<MGG_Buffer*, 16> vertexBuffers = {};
+    std::array<mgint, 16> vertexOffsets = {};
 };
 
 struct MGG_Buffer
 {
+    GLuint handle = 0;
+    GLenum target = 0;
+    GLenum usage = GL_STATIC_DRAW;
+    MGBufferType type = MGBufferType::Vertex;
+    mgbool dynamic = false;
+    mgint sizeInbytes = 0;
+    std::vector<mgbyte> shadowData;
 };
 
 struct MGG_Texture
@@ -159,6 +175,16 @@ namespace
         device->context.MakeCurrent();
     }
 
+    void EnsureVertexArray(MGG_GraphicsDevice* device)
+    {
+        assert(device != nullptr);
+
+        if (device->vertexArray == 0)
+            device->vertexArray = device->context.defaultVertexArray;
+
+        device->context.functions.BindVertexArray(device->vertexArray);
+    }
+
     GLbitfield ToClearMask(MGClearOptions options)
     {
         GLbitfield clearMask = 0;
@@ -173,6 +199,136 @@ namespace
             clearMask |= GL_STENCIL_BUFFER_BIT;
 
         return clearMask;
+    }
+
+    GLenum ToBufferTarget(MGBufferType type)
+    {
+        switch (type)
+        {
+        case MGBufferType::Index:
+            return GL_ELEMENT_ARRAY_BUFFER;
+        case MGBufferType::Vertex:
+            return GL_ARRAY_BUFFER;
+        case MGBufferType::Constant:
+            return GL_UNIFORM_BUFFER;
+        default:
+            MGGL_FAIL("Unsupported buffer type", "unknown OpenGl buffer target");
+        }
+    }
+
+    GLenum ToBufferUsage(mgbool dynamic)
+    {
+        return dynamic ? GL_DYNAMIC_DRAW : GL_STATIC_DRAW;
+    }
+
+    GLenum ToPrimitiveMode(MGPrimitiveType primitiveType)
+    {
+        switch (primitiveType)
+        {
+        case MGPrimitiveType::TriangleList:
+            return GL_TRIANGLES;
+        case MGPrimitiveType::TriangleStrip:
+            return GL_TRIANGLE_STRIP;
+        case MGPrimitiveType::LineList:
+            return GL_LINES;
+        case MGPrimitiveType::LineStrip:
+            return GL_LINE_STRIP;
+        case MGPrimitiveType::PointList:
+            return GL_POINTS;
+        default:
+            MGGL_FAIL("Unsupported primitive type", "unknown OpenGL primitive mode");
+        }
+    }
+
+    mgint GetIndexedElementCount(MGPrimitiveType primitiveType, mgint primitiveCount)
+    {
+        switch (primitiveType)
+        {
+        case MGPrimitiveType::TriangleList:
+            return primitiveCount * 3;
+        case MGPrimitiveType::TriangleStrip:
+            return primitiveCount + 2;
+        case MGPrimitiveType::LineList:
+            return primitiveCount * 2;
+        case MGPrimitiveType::LineStrip:
+            return primitiveCount + 1;
+        case MGPrimitiveType::PointList:
+            return primitiveCount;
+        default:
+            MGGL_FAIL("Unsupported primitive type", "unknown indexed primitive count mapping");
+        }
+    }
+
+    GLenum ToIndexType(MGIndexElementSize size)
+    {
+        switch (size)
+        {
+        case MGIndexElementSize::SixteenBits:
+            return GL_UNSIGNED_SHORT;
+        case MGIndexElementSize::ThirtyTwoBits:
+            return GL_UNSIGNED_INT;
+        default:
+            MGGL_FAIL("Unsupported index element size", "unknown OpenGL index type");
+        }
+    }
+
+    mgint GetIndexElementSizeInBytes(MGIndexElementSize size)
+    {
+        switch (size)
+        {
+        case MGIndexElementSize::SixteenBits:
+            return static_cast<mgint>(sizeof(uint16_t));
+        case MGIndexElementSize::ThirtyTwoBits:
+            return static_cast<mgint>(sizeof(uint32_t));
+        default:
+            MGGL_FAIL("Unsupported index element size", "unknown OpenGL index element width");
+        }
+    }
+
+    mgint GetCopySpan(mgint itemCount, mgint destinationStride, mgint sourceBytes)
+    {
+        assert(itemCount > 0);
+        assert(destinationStride > 0);
+        assert(sourceBytes > 0);
+
+        return sourceBytes + (itemCount - 1) * destinationStride;
+    }
+
+    void CopyToShadowData(mgbyte* destination, mgbyte* source, mgint itemCount, mgint destinationStride, mgint sourceBytes)
+    {
+        assert(destination != nullptr);
+        assert(source != nullptr);
+
+        if (destinationStride == sourceBytes)
+        {
+            memcpy(destination, source, itemCount * sourceBytes);
+            return;
+        }
+
+        for (mgint i = 0; i < itemCount; ++i)
+        {
+            memcpy(destination + i * destinationStride, source + i * sourceBytes, sourceBytes);
+        }
+    }
+
+    void CopyFromShadowData(mgbyte* source, mgbyte* destination, mgint itemCount, mgint destinationBytes, mgint sourceStride)
+    {
+        assert(source != nullptr);
+        assert(destination != nullptr);
+
+        if (sourceStride == destinationBytes)
+        {
+            memcpy(destination, source, itemCount * destinationBytes);
+            return;
+        }
+
+        mgint bytesToCopy = destinationBytes < sourceStride ? destinationBytes : sourceStride;
+        for (mgint i = 0; i < itemCount; ++i)
+        {
+            memcpy(destination, source, bytesToCopy);
+            destination += destinationBytes;
+            source += sourceStride;
+        }
     }
 }
 
@@ -280,6 +436,8 @@ void MGG_GraphicsDevice_ResizeSwapChain(
 
     device->window = window;
     device->context.Create(window);
+    device->vertexArray = device->context.defaultVertexArray;
+    device->context.BindDefaultVertexArray();
     device->context.width = width;
     device->context.height = height;
     device->context.SetSwapInterval(syncInterval);
@@ -436,19 +594,27 @@ void MGG_GraphicsDevice_SetSamplerState(MGG_GraphicsDevice* device, MGShaderStag
 
 void MGG_GraphicsDevice_SetIndexBuffer(MGG_GraphicsDevice* device, MGIndexElementSize size, MGG_Buffer* buffer)
 {
-    (void)device;
-    (void)size;
-    (void)buffer;
-    MGGL_NOT_IMPLEMENTED("MGG_GraphicsDevice_SetIndexBuffer");
+    assert(device != nullptr);
+
+    EnsureContext(device);
+    EnsureVertexArray(device);
+
+    device->indexBuffer = buffer;
+    device->indexElementSize = size;
+
+    GLuint handle = buffer != nullptr ? buffer->handle : 0;
+    device->context.functions.BindBuffer(GL_ELEMENT_ARRAY_BUFFER, handle);
 }
 
 void MGG_GraphicsDevice_SetVertexBuffer(MGG_GraphicsDevice* device, mgint slot, MGG_Buffer* buffer, mgint vertexOffset)
 {
-    (void)device;
-    (void)slot;
-    (void)vertexOffset;
-    (void)buffer;
-    MGGL_NOT_IMPLEMENTED("MGG_GraphicsDevice_SetVertexBuffer");
+    assert(device != nullptr);
+    assert(slot >= 0);
+    assert(slot < MaxVertexBufferSlots);
+    assert(vertexOffset >= 0);
+
+    device->vertexBuffers[slot] = buffer;
+    device->vertexOffsets[slot] = vertexOffset;
 }
 
 void MGG_GraphicsDevice_SetShader(MGG_GraphicsDevice* device, MGShaderStage stage, MGG_Shader* shader)

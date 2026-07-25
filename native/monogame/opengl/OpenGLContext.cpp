@@ -13,7 +13,7 @@ namespace
         abort();
     }
 
-    #define MGGL_FAIL(action, detail) MGGL_Fail(__FILE__, __LINE__, action, detail)
+#define MGGL_FAIL(action, detail) MGGL_Fail(__FILE__, __LINE__, action, detail)
 
     [[noreturn]] void FailWithSdlError(const char* file, int line, const char* action)
     {
@@ -21,7 +21,22 @@ namespace
         MGGL_Fail(file, line, action, (error != nullptr && error[0] != '\0') ? error : "unknown SDL error");
     }
 
-    #define MGGL_FAIL_SDL(action) FailWithSdlError(__FILE__, __LINE__, action)
+#define MGGL_FAIL_SDL(action) FailWithSdlError(__FILE__, __LINE__, action)
+
+    void* LoadProcAddress(const char* name)
+    {
+        assert(name != nullptr);
+
+        void* address = SDL_GL_GetProcAddress(name);
+        if (address == nullptr)
+        {
+            char message[256];
+            snprintf(message, sizeof(message), "required OpenGL procedure is unavailable: %s", name);
+            MGGL_FAIL("SDL_GL_GetProcAddress failed", message);
+        }
+
+        return address;
+    }
 
     void QueryVersion(mgint& majorVersion, mgint& minorVersion)
     {
@@ -41,6 +56,19 @@ namespace
     }
 }
 
+void OpenGLFunctions::Load()
+{
+    BindBuffer = reinterpret_cast<PFNGLBINDBUFFERPROC>(LoadProcAddress("glBindBuffer"));
+    BufferData = reinterpret_cast<PFNGLBUFFERDATAPROC>(LoadProcAddress("glBufferData"));
+    BufferSubData = reinterpret_cast<PFNGLBUFFERSUBDATAPROC>(LoadProcAddress("glBufferSubData"));
+    DeleteBuffers = reinterpret_cast<PFNGLDELETEBUFFERSPROC>(LoadProcAddress("glDeleteBuffers"));
+    GenBuffers = reinterpret_cast<PFNGLGENBUFFERSPROC>(LoadProcAddress("glGenBuffers"));
+    BindVertexArray = reinterpret_cast<PFNGLBINDVERTEXARRAYPROC>(LoadProcAddress("glBindVertexArray"));
+    DeleteVertexArrays = reinterpret_cast<PFNGLDELETEVERTEXARRAYSPROC>(LoadProcAddress("glDeleteVertexArrays"));
+    GenVertexArrays = reinterpret_cast<PFNGLGENVERTEXARRAYSPROC>(LoadProcAddress("glGenVertexArrays"));
+    DrawElementsBaseVertex = reinterpret_cast<PFNGLDRAWELEMENTSBASEVERTEXPROC>(LoadProcAddress("glDrawElementsBaseVertex"));
+}
+
 void OpenGLContext::Create(SDL_Window* nextWindow)
 {
     assert(nextWindow != nullptr);
@@ -57,19 +85,33 @@ void OpenGLContext::Create(SDL_Window* nextWindow)
 
     window = nextWindow;
     MakeCurrent();
+    functions.Load();
 
     QueryVersion(majorVersion, minorVersion);
     if (majorVersion < 4 || (majorVersion == 4 && minorVersion < 1))
         MGGL_FAIL("OpenGL 4.1 core context required", "created context is below 4.1");
+
+    functions.GenVertexArrays(1, &defaultVertexArray);
+    if (defaultVertexArray == 0)
+        MGGL_FAIL("glGenVertexArrays failed", "default vertex array creation returned 0");
+
+    functions.BindVertexArray(defaultVertexArray);
 }
 
 void OpenGLContext::Destroy()
 {
+    if (handle != nullptr && defaultVertexArray != 0)
+    {
+        MakeCurrent();
+        functions.DeleteVertexArrays(1, &defaultVertexArray);
+    }
+
     if (handle != nullptr)
         SDL_GL_DeleteContext(handle);
 
     window = nullptr;
     handle = nullptr;
+    defaultVertexArray = 0;
     width = 0;
     height = -0;
     syncInterval = 0;
@@ -99,4 +141,10 @@ void OpenGLContext::SetSwapInterval(mgint nextSyncInterval)
         MGGL_FAIL_SDL("SDL_GL_SetSwapInterval failed");
 
     syncInterval = nextSyncInterval;
+}
+
+void OpenGLContext::BindDefaultVertexArray()
+{
+    assert(defaultVertexArray != 0);
+    functions.BindVertexArray(defaultVertexArray);
 }
