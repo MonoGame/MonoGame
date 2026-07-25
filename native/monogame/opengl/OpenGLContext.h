@@ -9,15 +9,22 @@
 
 struct OpenGLFunctions
 {
+    PFNGLACTIVETEXTUREPROC ActiveTexture = nullptr;
     PFNGLBINDBUFFERPROC BindBuffer = nullptr;
+    PFNGLBINDSAMPLERPROC BindSampler = nullptr;
     PFNGLBUFFERDATAPROC BufferData = nullptr;
     PFNGLBUFFERSUBDATAPROC BufferSubData = nullptr;
     PFNGLDELETEBUFFERSPROC DeleteBuffers = nullptr;
+    PFNGLDELETESAMPLERSPROC DeleteSamplers = nullptr;
     PFNGLGENBUFFERSPROC GenBuffers = nullptr;
+    PFNGLGENSAMPLERSPROC GenSamplers = nullptr;
     PFNGLBINDVERTEXARRAYPROC BindVertexArray = nullptr;
     PFNGLDELETEVERTEXARRAYSPROC DeleteVertexArrays = nullptr;
     PFNGLGENVERTEXARRAYSPROC GenVertexArrays = nullptr;
     PFNGLDRAWELEMENTSBASEVERTEXPROC DrawElementsBaseVertex = nullptr;
+    PFNGLSAMPLERPARAMETERFPROC SamplerParameterf = nullptr;
+    PFNGLSAMPLERPARAMETERFVPROC SamplerParameterfv = nullptr;
+    PFNGLSAMPLERPARAMETERIPROC SamplerParameteri = nullptr;
 
     void Load();
 };

@@ -45,9 +45,11 @@ struct MGG_RasterizerState
 struct MGG_SamplerState
 {
     MGG_SamplerState_Info info;
+    GLuint handle = 0;
 };
 
 struct MGG_Buffer;
+struct MGG_Texture;
 
 struct MGG_GraphicsDevice
 {
@@ -68,6 +70,9 @@ struct MGG_GraphicsDevice
     MGIndexElementSize indexElementSize = MGIndexElementSize::SixteenBits;
     std::array<MGG_Buffer*, 16> vertexBuffers = {};
     std::array<mgint, 16> vertexOffsets = {};
+    std::array<std::array<MGG_Texture*, 16>, static_cast<size_t>(MGShaderStage::Count)> textures = {};
+    std::array<std::array<MGG_SamplerState*, 16>, static_cast<size_t>(MGShaderStage::Count)> samplers = {};
+    std::array<std::array<GLenum, 16>, static_cast<size_t>(MGShaderStage::Count)> textureTargets = {};
 };
 
 struct MGG_Buffer
@@ -83,6 +88,20 @@ struct MGG_Buffer
 
 struct MGG_Texture
 {
+    GLuint handle = 0;
+    GLenum target = GL_TEXTURE_2D;
+    MGTextureType type = MGTextureType::_2D;
+    MGSurfaceFormat format = MGSurfaceFormat::Color;
+    GLenum internalFormat = GL_RGBA8;
+    GLenum pixelFormat = GL_RGBA;
+    GLenum pixelType = GL_UNSIGNED_BYTE;
+    mgint width = 0;
+    mgint height = 0;
+    mgint depth = 0;
+    mgint mipmaps = 0;
+    mgint slices = 0;
+    mgint bytesPerPixel = 0;
+    std::vector<std::vector<mgbyte>> shadowData;
 };
 
 struct MGG_Shader
@@ -103,6 +122,20 @@ namespace
     constexpr mgint MaxVertexTextureSlots = 16;
     constexpr mgint MaxVertexBufferSlots = 16;
     constexpr mgint OpenGLShaderProfile = 0;
+    constexpr size_t ShaderStageCount = static_cast<size_t>(MGShaderStage::Count);
+
+    struct TextureFormatInfo
+    {
+        GLenum internalFormat;
+        GLenum pixelFormat;
+        GLenum pixelType;
+        mgint bytesPerPixel;
+        GLint swizzleR;
+        GLint swizzleG;
+        GLint swizzleB;
+        GLint swizzleA;
+        bool usesSwizzle;
+    };
 
     [[noreturn]] void MGGL_Fail(const char* file, int line, const char* action, const char* detail)
     {
@@ -183,6 +216,322 @@ namespace
             device->vertexArray = device->context.defaultVertexArray;
 
         device->context.functions.BindVertexArray(device->vertexArray);
+    }
+
+    size_t ToStageIndex(MGShaderStage stage)
+    {
+        switch (stage)
+        {
+        case MGShaderStage::Vertex:
+            return 0;
+        case MGShaderStage::Pixel:
+            return 1;
+        default:
+            MGGL_FAIL("Unsupported shader stage", "unknown OpenGL shader stage");
+        }
+    }
+
+    mgint GetTextureSlotLimit(MGShaderStage stage)
+    {
+        switch (stage)
+        {
+        case MGShaderStage::Vertex:
+            return MaxVertexTextureSlots;
+        case MGShaderStage::Pixel:
+            return MaxTextureSlots;
+        default:
+            MGGL_FAIL("Unsupported shader stage", "unknown OpenGL texture slot range");
+        }
+    }
+
+    GLuint GetTextureUnit(MGShaderStage stage, mgint slot)
+    {
+        assert(slot >= 0);
+
+        switch (stage)
+        {
+        case MGShaderStage::Vertex:
+            return static_cast<GLuint>(MaxTextureSlots + slot);
+        case MGShaderStage::Pixel:
+            return static_cast<GLuint>(slot);
+        default:
+            MGGL_FAIL("Unsupported shader stage", "unknown OpenGL texture unit mapping");
+        }
+    }
+
+    GLenum ToTextureAddressMode(MGTextureAddressMode mode)
+    {
+        switch (mode)
+        {
+        case MGTextureAddressMode::Wrap:
+            return GL_REPEAT;
+        case MGTextureAddressMode::Clamp:
+            return GL_CLAMP_TO_EDGE;
+        case MGTextureAddressMode::Mirror:
+            return GL_MIRRORED_REPEAT;
+        case MGTextureAddressMode::Border:
+            return GL_CLAMP_TO_BORDER;
+        default:
+            MGGL_FAIL("Unsupported texture address mode", "unknown OpenGL texture wrap mode");
+        }
+    }
+
+    GLenum ToCompareFunction(MGCompareFunction function)
+    {
+        switch (function)
+        {
+        case MGCompareFunction::Always:
+            return GL_ALWAYS;
+        case MGCompareFunction::Never:
+            return GL_NEVER;
+        case MGCompareFunction::Less:
+            return GL_LESS;
+        case MGCompareFunction::LessEqual:
+            return GL_LEQUAL;
+        case MGCompareFunction::Equal:
+            return GL_EQUAL;
+        case MGCompareFunction::GreaterEqual:
+            return GL_GEQUAL;
+        case MGCompareFunction::Greater:
+            return GL_GREATER;
+        case MGCompareFunction::NotEqual:
+            return GL_NOTEQUAL;
+        default:
+            MGGL_FAIL("Unsupported comparison function", "unknown OpenGL comparison function");
+        }
+    }
+
+    void ToTextureFilters(MGTextureFilter filter, GLenum& minFilter, GLenum& magFilter)
+    {
+        switch (filter)
+        {
+        case MGTextureFilter::Point:
+            minFilter = GL_NEAREST_MIPMAP_NEAREST;
+            magFilter = GL_NEAREST;
+            return;
+        case MGTextureFilter::Linear:
+        case MGTextureFilter::Anisotropic:
+            minFilter = GL_LINEAR_MIPMAP_LINEAR;
+            magFilter = GL_LINEAR;
+            return;
+        case MGTextureFilter::LinearMipPoint:
+            minFilter = GL_LINEAR_MIPMAP_NEAREST;
+            magFilter = GL_LINEAR;
+            return;
+        case MGTextureFilter::PointMipLinear:
+            minFilter = GL_NEAREST_MIPMAP_LINEAR;
+            magFilter = GL_NEAREST;
+            return;
+        case MGTextureFilter::MinLinearMagPointMipLinear:
+            minFilter = GL_LINEAR_MIPMAP_LINEAR;
+            magFilter = GL_NEAREST;
+            return;
+        case MGTextureFilter::MinLinearMagPointMipPoint:
+            minFilter = GL_LINEAR_MIPMAP_NEAREST;
+            magFilter = GL_NEAREST;
+            return;
+        case MGTextureFilter::MinPointMagLinearMipLinear:
+            minFilter = GL_NEAREST_MIPMAP_LINEAR;
+            magFilter = GL_LINEAR;
+            return;
+        case MGTextureFilter::MinPointMagLinearMipPoint:
+            minFilter = GL_NEAREST_MIPMAP_NEAREST;
+            magFilter = GL_LINEAR;
+            return;
+        default:
+            MGGL_FAIL("Unsupported texture filter", "unknown OpenGL texture filter");
+        }
+    }
+
+    TextureFormatInfo GetTextureFormatInfo(MGSurfaceFormat format)
+    {
+        switch (format)
+        {
+        case MGSurfaceFormat::Color:
+            return { GL_RGBA8, GL_RGBA, GL_UNSIGNED_BYTE, 4, GL_RED, GL_GREEN, GL_BLUE, GL_ALPHA, false };
+        case MGSurfaceFormat::ColorSRgb:
+            return { GL_SRGB8_ALPHA8, GL_RGBA, GL_UNSIGNED_BYTE, 4, GL_RED, GL_GREEN, GL_BLUE, GL_ALPHA, false };
+        case MGSurfaceFormat::Bgra32:
+            return { GL_RGBA8, GL_BGRA, GL_UNSIGNED_BYTE, 4, GL_RED, GL_GREEN, GL_BLUE, GL_ALPHA, false };
+        case MGSurfaceFormat::Bgra32SRgb:
+            return { GL_SRGB8_ALPHA8, GL_BGRA, GL_UNSIGNED_BYTE, 4, GL_RED, GL_GREEN, GL_BLUE, GL_ALPHA, false };
+        case MGSurfaceFormat::Alpha8:
+            return { GL_R8, GL_RED, GL_UNSIGNED_BYTE, 1, GL_ONE, GL_ONE, GL_ONE, GL_RED, true };
+        default:
+            MGGL_FAIL("Unsupported surface format", "OpenGL texture format is not mapped");
+        }
+    }
+
+    mgint GetMipExtent(mgint baseExtent, mgint level)
+    {
+        assert(baseExtent > 0);
+        assert(level >= 0);
+
+        mgint extent = baseExtent >> level;
+        return extent > 0 ? extent : 1;
+    }
+
+    mgint GetTextureSubresourceIndex(const MGG_Texture* texture, mgint level, mgint slice)
+    {
+        assert(texture != nullptr);
+        assert(level >= 0);
+        assert(level < texture->mipmaps);
+        assert(slice >= 0);
+        assert(slice < texture->slices);
+
+        return slice * texture->mipmaps + level;
+    }
+
+    mgint GetTextureByteCount(mgint width, mgint height, mgint depth, mgint bytesPerPixel)
+    {
+        assert(width > 0);
+        assert(height > 0);
+        assert(depth > 0);
+        assert(bytesPerPixel > 0);
+        return width * height * depth * bytesPerPixel;
+    }
+
+    void ResolveTextureRegion(
+        const MGG_Texture* texture,
+        mgint level,
+        mgint slice,
+        mgint x,
+        mgint y,
+        mgint z,
+        mgint width,
+        mgint height,
+        mgint depth,
+        mgint& resolvedWidth,
+        mgint& resolvedHeight,
+        mgint& resolvedDepth)
+    {
+        assert(texture != nullptr);
+        assert(level >= 0);
+        assert(level < texture->mipmaps);
+        assert(slice >= 0);
+        assert(slice < texture->slices);
+        assert(x >= 0);
+        assert(y >= 0);
+        assert(z >= 0);
+
+        mgint mipWidth = GetMipExtent(texture->width, level);
+        mgint mipHeight = GetMipExtent(texture->height, level);
+        mgint mipDepth = GetMipExtent(texture->depth, level);
+
+        resolvedWidth = width > 0 ? width : mipWidth - x;
+        resolvedHeight = height > 0 ? height : mipHeight - y;
+        resolvedDepth = depth > 0 ? depth : mipDepth - z;
+
+        if (resolvedWidth <= 0 || resolvedHeight <= 0 || resolvedDepth <= 0)
+            MGGL_FAIL("Invalid texture region", "resolved upload region must be positive");
+
+        if (x + resolvedWidth > mipWidth || y + resolvedHeight > mipHeight || z + resolvedDepth > mipDepth)
+            MGGL_FAIL("Invalid texture region", "requested upload region exceeds texture bounds");
+    }
+
+    mgint NormalizeUploadByteCount(const MGG_Texture* texture, mgint width, mgint height, mgint depth, mgint dataBytes)
+    {
+        assert(texture != nullptr);
+        assert(dataBytes > 0);
+
+        mgint pixelCount = width * height * depth;
+        mgint expectedBytes = GetTextureByteCount(width, height, depth, texture->bytesPerPixel);
+
+        if (texture->bytesPerPixel > 1 && dataBytes == pixelCount)
+            return expectedBytes;
+
+        return dataBytes;
+    }
+
+    GLenum GetTextureBindingEnum(GLenum target)
+    {
+        switch (target)
+        {
+        case GL_TEXTURE_2D:
+            return GL_TEXTURE_BINDING_2D;
+        default:
+            MGGL_FAIL("Unsupported texture target", "OpenGL texture target is not mapped");
+        }
+    }
+
+    void BeginTextureEdit(MGG_GraphicsDevice* device, MGG_Texture* texture, GLint& previousActiveTexture, GLint& previousBinding)
+    {
+        assert(device != nullptr);
+        assert(texture != nullptr);
+
+        glGetIntegerv(GL_ACTIVE_TEXTURE, &previousActiveTexture);
+        device->context.functions.ActiveTexture(GL_TEXTURE0);
+        glGetIntegerv(GetTextureBindingEnum(texture->target), &previousBinding);
+        glBindTexture(texture->target, texture->handle);
+    }
+
+    void EndTextureEdit(MGG_GraphicsDevice* device, MGG_Texture* texture, GLint previousActiveTexture, GLint previousBinding)
+    {
+        assert(device != nullptr);
+        assert(texture != nullptr);
+
+        glBindTexture(texture->target, static_cast<GLuint>(previousBinding));
+        device->context.functions.ActiveTexture(static_cast<GLenum>(previousActiveTexture));
+    }
+
+    void CopyTextureRegionToShadow(
+        MGG_Texture* texture,
+        mgint level,
+        mgint slice,
+        mgint x,
+        mgint y,
+        mgint z,
+        mgint width,
+        mgint height,
+        mgint depth,
+        const mgbyte* data)
+    {
+        assert(texture != nullptr);
+        assert(data != nullptr);
+        assert(z == 0);
+        assert(depth == 1);
+
+        std::vector<mgbyte>& shadow = texture->shadowData[GetTextureSubresourceIndex(texture, level, slice)];
+        mgint mipWidth = GetMipExtent(texture->width, level);
+        mgint bytesPerPixel = texture->bytesPerPixel;
+        mgint sourceRowBytes = width * bytesPerPixel;
+        mgint destinationRowBytes = mipWidth * bytesPerPixel;
+        mgbyte* destination = shadow.data() + ((y * mipWidth) + x) * bytesPerPixel;
+
+        for (mgint row = 0; row < height; ++row)
+        {
+            memcpy(destination + row * destinationRowBytes, data + row * sourceRowBytes, sourceRowBytes);
+        }
+    }
+
+    void CopyTextureRegionFromShadow(
+        const MGG_Texture* texture,
+        mgint level,
+        mgint slice,
+        mgint x,
+        mgint y,
+        mgint z,
+        mgint width,
+        mgint height,
+        mgint depth,
+        mgbyte* data)
+    {
+        assert(texture != nullptr);
+        assert(data != nullptr);
+        assert(z == 0);
+        assert(depth == 1);
+
+        const std::vector<mgbyte>& shadow = texture->shadowData[GetTextureSubresourceIndex(texture, level, slice)];
+        mgint mipWidth = GetMipExtent(texture->width, level);
+        mgint bytesPerPixel = texture->bytesPerPixel;
+        mgint sourceRowBytes = mipWidth * bytesPerPixel;
+        mgint destinationRowBytes = width * bytesPerPixel;
+        const mgbyte* source = shadow.data() + ((y * mipWidth) + x) * bytesPerPixel;
+
+        for (mgint row = 0; row < height; ++row)
+        {
+            memcpy(data + row * destinationRowBytes, source + row * sourceRowBytes, destinationRowBytes);
+        }
     }
 
     GLbitfield ToClearMask(MGClearOptions options)
@@ -576,20 +925,42 @@ void MGG_GraphicsDevice_SetConstantBuffer(MGG_GraphicsDevice* device, MGShaderSt
 
 void MGG_GraphicsDevice_SetTexture(MGG_GraphicsDevice* device, MGShaderStage stage, mgint slot, MGG_Texture* texture)
 {
-    (void)device;
-    (void)stage;
-    (void)slot;
-    (void)texture;
-    MGGL_NOT_IMPLEMENTED("MGG_GraphicsDevice_SetTexture");
+    assert(device != nullptr);
+    assert(slot >= 0);
+    assert(slot < GetTextureSlotLimit(stage));
+
+    EnsureContext(device);
+
+    size_t stageIndex = ToStageIndex(stage);
+    GLuint textureUnit = GetTextureUnit(stage, slot);
+    GLenum previousTarget = device->textureTargets[stageIndex][slot];
+
+    device->context.functions.ActiveTexture(GL_TEXTURE0 + textureUnit);
+
+    if (previousTarget != 0 && (texture == nullptr || previousTarget != texture->target))
+        glBindTexture(previousTarget, 0);
+
+    if (texture != nullptr)
+        glBindTexture(texture->target, texture->handle);
+
+    device->textures[stageIndex][slot] = texture;
+    device->textureTargets[stageIndex][slot] = texture != nullptr ? texture->target : 0;
 }
 
 void MGG_GraphicsDevice_SetSamplerState(MGG_GraphicsDevice* device, MGShaderStage stage, mgint slot, MGG_SamplerState* state)
 {
-    (void)device;
-    (void)stage;
-    (void)slot;
-    (void)state;
-    MGGL_NOT_IMPLEMENTED("MGG_GraphicsDevice_SetSamplerState");
+    assert(device != nullptr);
+    assert(slot >= 0);
+    assert(slot < GetTextureSlotLimit(stage));
+
+    EnsureContext(device);
+
+    size_t stageIndex = ToStageIndex(stage);
+    GLuint textureUnit = GetTextureUnit(stage, slot);
+
+    device->context.functions.ActiveTexture(GL_TEXTURE0 + textureUnit);
+    device->context.functions.BindSampler(textureUnit, state != nullptr ? state->handle : 0);
+    device->samplers[stageIndex][slot] = state;
 }
 
 void MGG_GraphicsDevice_SetIndexBuffer(MGG_GraphicsDevice* device, MGIndexElementSize size, MGG_Buffer* buffer)
@@ -758,14 +1129,85 @@ MGG_SamplerState* MGG_SamplerState_Create(MGG_GraphicsDevice* device, MGG_Sample
     assert(device != nullptr);
     assert(info != nullptr);
 
+    EnsureContext(device);
+
     MGG_SamplerState* state = new MGG_SamplerState();
     state->info = *info;
+
+    device->context.functions.GenSamplers(1, &state->handle);
+    if (state->handle == 0)
+        MGGL_FAIL("glGenSamplers failed", "sampler creation returned 0");
+
+    GLenum minFilter = GL_LINEAR_MIPMAP_LINEAR;
+    GLenum magFilter = GL_LINEAR;
+    ToTextureFilters(info->Filter, minFilter, magFilter);
+
+    device->context.functions.SamplerParameteri(state->handle, GL_TEXTURE_WRAP_S, ToTextureAddressMode(info->AddressU));
+    device->context.functions.SamplerParameteri(state->handle, GL_TEXTURE_WRAP_T, ToTextureAddressMode(info->AddressV));
+    device->context.functions.SamplerParameteri(state->handle, GL_TEXTURE_WRAP_R, ToTextureAddressMode(info->AddressW));
+    device->context.functions.SamplerParameteri(state->handle, GL_TEXTURE_MIN_FILTER, minFilter);
+    device->context.functions.SamplerParameteri(state->handle, GL_TEXTURE_MAG_FILTER, magFilter);
+
+    GLfloat borderColor[4];
+    borderColor[0] = static_cast<GLfloat>(info->BorderColor & 0xFF) / 255.0f;
+    borderColor[1] = static_cast<GLfloat>((info->BorderColor >> 8) & 0xFF) / 255.0f;
+    borderColor[2] = static_cast<GLfloat>((info->BorderColor >> 16) & 0xFF) / 255.0f;
+    borderColor[3] = static_cast<GLfloat>((info->BorderColor >> 24) & 0xFF) / 255.0f;
+
+    device->context.functions.SamplerParameterfv(state->handle, GL_TEXTURE_BORDER_COLOR, borderColor);
+    device->context.functions.SamplerParameterf(state->handle, GL_TEXTURE_LOD_BIAS, info->MipMapLevelOfDetailBias);
+    device->context.functions.SamplerParameterf(
+        state->handle,
+        GL_TEXTURE_MAX_LOD,
+        info->MaxMipLevel > 0 ? static_cast<GLfloat>(info->MaxMipLevel) : 1000.0f);
+
+    if (info->FilterMode == MGTextureFilterMode::Comparison)
+    {
+        device->context.functions.SamplerParameteri(state->handle, GL_TEXTURE_COMPARE_MODE, GL_COMPARE_REF_TO_TEXTURE);
+        device->context.functions.SamplerParameteri(state->handle, GL_TEXTURE_COMPARE_FUNC, ToCompareFunction(info->ComparisonFunction));
+    }
+    else
+    {
+        device->context.functions.SamplerParameteri(state->handle, GL_TEXTURE_COMPARE_MODE, GL_NONE);
+    }
+
     return state;
 }
 
 void MGG_SamplerState_Destroy(MGG_GraphicsDevice* device, MGG_SamplerState* state)
 {
     assert(device != nullptr);
+
+    if (state == nullptr)
+        return;
+
+    EnsureContext(device);
+
+    GLint previousActiveTexture = 0;
+    glGetIntegerv(GL_ACTIVE_TEXTURE, &previousActiveTexture);
+
+    for (size_t stageIndex = 0; stageIndex < ShaderStageCount; ++stageIndex)
+    {
+        MGShaderStage stage = stageIndex == 0 ? MGShaderStage::Vertex : MGShaderStage::Pixel;
+        mgint slotLimit = GetTextureSlotLimit(stage);
+
+        for (mgint slot = 0; slot < slotLimit; ++slot)
+        {
+            if (device->samplers[stageIndex][slot] != state)
+                continue;
+
+            GLuint textureUnit = GetTextureUnit(stage, slot);
+            device->context.functions.ActiveTexture(GL_TEXTURE0 + textureUnit);
+            device->context.functions.BindSampler(textureUnit, 0);
+            device->samplers[stageIndex][slot] = nullptr;
+        }
+    }
+
+    device->context.functions.ActiveTexture(static_cast<GLenum>(previousActiveTexture));
+
+    if (state->handle != 0)
+        device->context.functions.DeleteSamplers(1, &state->handle);
+
     delete state;
 }
 
@@ -878,15 +1320,81 @@ void MGG_Buffer_GetData(MGG_GraphicsDevice* device, MGG_Buffer* buffer, mgint of
 
 MGG_Texture* MGG_Texture_Create(MGG_GraphicsDevice* device, MGTextureType type, MGSurfaceFormat format, mgint width, mgint height, mgint depth, mgint mipmaps, mgint slices)
 {
-    (void)device;
-    (void)type;
-    (void)format;
-    (void)width;
-    (void)height;
-    (void)depth;
-    (void)mipmaps;
-    (void)slices;
-    MGGL_NOT_IMPLEMENTED("MGG_Texture_Create");
+    assert(device != nullptr);
+    assert(width > 0);
+    assert(height > 0);
+    assert(depth > 0);
+    assert(mipmaps > 0);
+    assert(slices > 0);
+
+    EnsureContext(device);
+
+    // TODO: only 2D implemented right now
+    if (type != MGTextureType::_2D || depth != 1 || slices != 1)
+        MGGL_FAIL("Unsupported texture shape", "texture must be 2D with depth 1 and one slice");
+
+    TextureFormatInfo formatInfo = GetTextureFormatInfo(format);
+
+    MGG_Texture* texture = new MGG_Texture();
+    texture->target = GL_TEXTURE_2D;
+    texture->type = type;
+    texture->format = format;
+    texture->internalFormat = formatInfo.internalFormat;
+    texture->pixelFormat = formatInfo.pixelFormat;
+    texture->pixelType = formatInfo.pixelType;
+    texture->width = width;
+    texture->height = height;
+    texture->depth = depth;
+    texture->mipmaps = mipmaps;
+    texture->slices = slices;
+    texture->bytesPerPixel = formatInfo.bytesPerPixel;
+    texture->shadowData.resize(static_cast<size_t>(mipmaps * slices));
+
+    glGenTextures(1, &texture->handle);
+    if (texture->handle == 0)
+        MGGL_FAIL("glGenTextures failed", "texture creation returned 0");
+
+    GLint previousActiveTexture = 0;
+    GLint previousBinding = 0;
+    glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+    BeginTextureEdit(device, texture, previousActiveTexture, previousBinding);
+    glTexParameteri(texture->target, GL_TEXTURE_BASE_LEVEL, 0);
+    glTexParameteri(texture->target, GL_TEXTURE_MAX_LEVEL, mipmaps - 1);
+    glTexParameteri(texture->target, GL_TEXTURE_MIN_FILTER, mipmaps > 1 ? GL_LINEAR_MIPMAP_LINEAR : GL_LINEAR);
+    glTexParameteri(texture->target, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(texture->target, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(texture->target, GL_TEXTURE_WRAP_T, GL_REPEAT);
+
+    if (formatInfo.usesSwizzle)
+    {
+        glTexParameteri(texture->target, GL_TEXTURE_SWIZZLE_R, formatInfo.swizzleR);
+        glTexParameteri(texture->target, GL_TEXTURE_SWIZZLE_G, formatInfo.swizzleG);
+        glTexParameteri(texture->target, GL_TEXTURE_SWIZZLE_B, formatInfo.swizzleB);
+        glTexParameteri(texture->target, GL_TEXTURE_SWIZZLE_A, formatInfo.swizzleA);
+    }
+
+    for (mgint level = 0; level < mipmaps; ++level)
+    {
+        mgint mipWidth = GetMipExtent(width, level);
+        mgint mipHeight = GetMipExtent(height, level);
+        std::vector<mgbyte>& shadow = texture->shadowData[GetTextureSubresourceIndex(texture, level, 0)];
+        shadow.resize(GetTextureByteCount(mipWidth, mipHeight, 1, texture->bytesPerPixel));
+
+        glTexImage2D(
+            texture->target,
+            level,
+            texture->internalFormat,
+            mipWidth,
+            mipHeight,
+            0,
+            texture->pixelFormat,
+            texture->pixelType,
+            shadow.data());
+    }
+
+    EndTextureEdit(device, texture, previousActiveTexture, previousBinding);
+
+    return texture;
 }
 
 MGG_Texture* MGG_RenderTarget_Create(MGG_GraphicsDevice* device, MGTextureType type, MGSurfaceFormat format, mgint width, mgint height, mgint depth, mgint mipmaps, mgint slices, MGDepthFormat depthFormat, mgint multiSampleCount, MGRenderTargetUsage usage)
@@ -907,43 +1415,108 @@ MGG_Texture* MGG_RenderTarget_Create(MGG_GraphicsDevice* device, MGTextureType t
 
 void MGG_Texture_Destroy(MGG_GraphicsDevice* device, MGG_Texture* texture)
 {
-    (void)device;
-    (void)texture;
-    MGGL_NOT_IMPLEMENTED("MGG_Texture_Destroy");
+    assert(device != nullptr);
+
+    if (texture == nullptr)
+        return;
+
+    EnsureContext(device);
+
+    GLint previousActiveTexture = 0;
+    glGetIntegerv(GL_ACTIVE_TEXTURE, &previousActiveTexture);
+
+    for (size_t stageIndex = 0; stageIndex < ShaderStageCount; ++stageIndex)
+    {
+        MGShaderStage stage = stageIndex == 0 ? MGShaderStage::Vertex : MGShaderStage::Pixel;
+        mgint slotLimit = GetTextureSlotLimit(stage);
+
+        for (mgint slot = 0; slot < slotLimit; ++slot)
+        {
+            if (device->textures[stageIndex][slot] != texture)
+                continue;
+
+            GLuint textureUnit = GetTextureUnit(stage, slot);
+            device->context.functions.ActiveTexture(GL_TEXTURE0 + textureUnit);
+
+            if (device->textureTargets[stageIndex][slot] != 0)
+                glBindTexture(device->textureTargets[stageIndex][slot], 0);
+
+            device->textures[stageIndex][slot] = nullptr;
+            device->textureTargets[stageIndex][slot] = 0;
+        }
+    }
+
+    device->context.functions.ActiveTexture(static_cast<GLenum>(previousActiveTexture));
+
+    if (texture->handle != 0)
+        glDeleteTextures(1, &texture->handle);
+
+    delete texture;
 }
 
 void MGG_Texture_SetData(MGG_GraphicsDevice* device, MGG_Texture* texture, mgint level, mgint slice, mgint x, mgint y, mgint z, mgint width, mgint height, mgint depth, mgbyte* data, mgint dataBytes)
 {
-    (void)device;
-    (void)texture;
-    (void)level;
-    (void)slice;
-    (void)x;
-    (void)y;
-    (void)z;
-    (void)width;
-    (void)height;
-    (void)depth;
-    (void)data;
-    (void)dataBytes;
-    MGGL_NOT_IMPLEMENTED("MGG_Texture_SetData");
+    assert(device != nullptr);
+    assert(texture != nullptr);
+    assert(data != nullptr);
+    assert(level >= 0);
+    assert(level < texture->mipmaps);
+    assert(slice >= 0);
+    assert(slice < texture->slices);
+    assert(dataBytes > 0);
+
+    EnsureContext(device);
+
+    mgint resolvedWidth = 0;
+    mgint resolvedHeight = 0;
+    mgint resolvedDepth = 0;
+    ResolveTextureRegion(texture, level, slice, x, y, z, width, height, depth, resolvedWidth, resolvedHeight, resolvedDepth);
+
+    mgint expectedBytes = GetTextureByteCount(resolvedWidth, resolvedHeight, resolvedDepth, texture->bytesPerPixel);
+    mgint normalizedBytes = NormalizeUploadByteCount(texture, resolvedWidth, resolvedHeight, resolvedDepth, dataBytes);
+    if (normalizedBytes != expectedBytes)
+        MGGL_FAIL("Texture upload size mismatch", "byte count does not match the upload region");
+
+    CopyTextureRegionToShadow(texture, level, slice, x, y, z, resolvedWidth, resolvedHeight, resolvedDepth, data);
+
+    GLint previousActiveTexture = 0;
+    GLint previousBinding = 0;
+    glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+    BeginTextureEdit(device, texture, previousActiveTexture, previousBinding);
+    glTexSubImage2D(
+        texture->target,
+        level,
+        x,
+        y,
+        resolvedWidth,
+        resolvedHeight,
+        texture->pixelFormat,
+        texture->pixelType,
+        data);
+    EndTextureEdit(device, texture, previousActiveTexture, previousBinding);
 }
 
 void MGG_Texture_GetData(MGG_GraphicsDevice* device, MGG_Texture* texture, mgint level, mgint slice, mgint x, mgint y, mgint z, mgint width, mgint height, mgint depth, mgbyte* data, mgint dataBytes)
 {
-    (void)device;
-    (void)texture;
-    (void)level;
-    (void)slice;
-    (void)x;
-    (void)y;
-    (void)z;
-    (void)width;
-    (void)height;
-    (void)depth;
-    (void)data;
-    (void)dataBytes;
-    MGGL_NOT_IMPLEMENTED("MGG_Texture_GetData");
+    assert(device != nullptr);
+    assert(texture != nullptr);
+    assert(data != nullptr);
+    assert(level >= 0);
+    assert(level < texture->mipmaps);
+    assert(slice >= 0);
+    assert(slice < texture->slices);
+    assert(dataBytes > 0);
+
+    mgint resolvedWidth = 0;
+    mgint resolvedHeight = 0;
+    mgint resolvedDepth = 0;
+    ResolveTextureRegion(texture, level, slice, x, y, z, width, height, depth, resolvedWidth, resolvedHeight, resolvedDepth);
+
+    mgint expectedBytes = GetTextureByteCount(resolvedWidth, resolvedHeight, resolvedDepth, texture->bytesPerPixel);
+    if (dataBytes < expectedBytes)
+        MGGL_FAIL("Texture readback size mismatch", "destination buffer is smaller than the requested region");
+
+    CopyTextureRegionFromShadow(texture, level, slice, x, y, z, resolvedWidth, resolvedHeight, resolvedDepth, data);
 }
 
 MGG_InputLayout* MGG_InputLayout_Create(MGG_GraphicsDevice* device, MGG_Shader* vertexShader, mgint* strides, mgint streamCount, MGG_InputElement* elements, mgint elementCount)
