@@ -10,6 +10,9 @@
 struct OpenGLFunctions
 {
     PFNGLACTIVETEXTUREPROC ActiveTexture = nullptr;
+    PFNGLBLENDCOLORPROC BlendColor = nullptr;
+    PFNGLBLENDEQUATIONSEPARATEEXTPROC BlendEquationSeparate = nullptr;
+    PFNGLBLENDFUNCSEPARATEPROC BlendFuncSeparate = nullptr;
     PFNGLBINDBUFFERPROC BindBuffer = nullptr;
     PFNGLBINDFRAMEBUFFERPROC BindFramebuffer = nullptr;
     PFNGLBINDRENDERBUFFERPROC BindRenderbuffer = nullptr;

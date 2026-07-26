@@ -309,6 +309,113 @@ namespace
         }
     }
 
+    GLenum ToBlendEquation(MGBlendFunction function)
+    {
+        switch (function)
+        {
+        case MGBlendFunction::Add:
+            return GL_FUNC_ADD;
+        case MGBlendFunction::Subtract:
+            return GL_FUNC_SUBTRACT;
+        case MGBlendFunction::ReverseSubtract:
+            return GL_FUNC_REVERSE_SUBTRACT;
+        case MGBlendFunction::Min:
+            return GL_MIN;
+        case MGBlendFunction::Max:
+            return GL_MAX;
+        default:
+            MGGL_FAIL("Unsupported blend function", "unknown OpenGL blend equation");
+        }
+    }
+
+    GLenum ToBlendFactor(MGBlend blend)
+    {
+        switch (blend)
+        {
+        case MGBlend::One:
+            return GL_ONE;
+        case MGBlend::Zero:
+            return GL_ZERO;
+        case MGBlend::SourceColor:
+            return GL_SRC_COLOR;
+        case MGBlend::InverseSourceColor:
+            return GL_ONE_MINUS_SRC_COLOR;
+        case MGBlend::SourceAlpha:
+            return GL_SRC_ALPHA;
+        case MGBlend::InverseSourceAlpha:
+            return GL_ONE_MINUS_SRC_ALPHA;
+        case MGBlend::DestinationColor:
+            return GL_DST_COLOR;
+        case MGBlend::InverseDestinationColor:
+            return GL_ONE_MINUS_DST_COLOR;
+        case MGBlend::DestinationAlpha:
+            return GL_DST_ALPHA;
+        case MGBlend::InverseDestinationAlpha:
+            return GL_ONE_MINUS_DST_ALPHA;
+        case MGBlend::BlendFactor:
+            return GL_CONSTANT_COLOR;
+        case MGBlend::InverseBlendFactor:
+            return GL_ONE_MINUS_CONSTANT_COLOR;
+        case MGBlend::SourceAlphaSaturation:
+            return GL_SRC_ALPHA_SATURATE;
+        default:
+            MGGL_FAIL("Unsupported blend factor", "unknown OpenGL blend factor");
+        }
+    }
+
+    GLenum ToStencilOperation(MGStencilOperation operation)
+    {
+        switch (operation)
+        {
+        case MGStencilOperation::Keep:
+            return GL_KEEP;
+        case MGStencilOperation::Zero:
+            return GL_ZERO;
+        case MGStencilOperation::Replace:
+            return GL_REPLACE;
+        case MGStencilOperation::Increment:
+            return GL_INCR_WRAP;
+        case MGStencilOperation::Decrement:
+            return GL_DECR_WRAP;
+        case MGStencilOperation::IncrementSaturation:
+            return GL_INCR;
+        case MGStencilOperation::DecrementSaturation:
+            return GL_DECR;
+        case MGStencilOperation::Invert:
+            return GL_INVERT;
+        default:
+            MGGL_FAIL("Unsupported stencil operation", "unknown OpenGL stencil operation");
+        }
+    }
+
+    GLenum ToPolygonMode(MGFillMode fillMode)
+    {
+        switch (fillMode)
+        {
+        case MGFillMode::Solid:
+            return GL_FILL;
+        case MGFillMode::WireFrame:
+            return GL_LINE;
+        default:
+            MGGL_FAIL("Unsupported fill mode", "unknown OpenGL polygon mode");
+        }
+    }
+
+    void ToColorMask(MGColorWriteChannels channels, GLboolean& red, GLboolean& green, GLboolean& blue, GLboolean& alpha)
+    {
+        mgint mask = static_cast<mgint>(channels);
+        red = (mask & static_cast<mgint>(MGColorWriteChannels::Red)) != 0 ? GL_TRUE : GL_FALSE;
+        green = (mask & static_cast<mgint>(MGColorWriteChannels::Green)) != 0 ? GL_TRUE : GL_FALSE;
+        blue = (mask & static_cast<mgint>(MGColorWriteChannels::Blue)) != 0 ? GL_TRUE : GL_FALSE;
+        alpha = (mask & static_cast<mgint>(MGColorWriteChannels::Alpha)) != 0 ? GL_TRUE : GL_FALSE;
+    }
+
+    MGDepthFormat GetActiveDepthFormat(const MGG_GraphicsDevice* device)
+    {
+        assert(device != nullptr);
+        return device->currentRenderTarget != nullptr ? device->currentRenderTarget->depthFormat : device->depthFormat;
+    }
+
     void ToTextureFilters(MGTextureFilter filter, GLenum& minFilter, GLenum& magFilter)
     {
         switch (filter)
@@ -989,22 +1096,148 @@ void MGG_GraphicsDevice_Present(MGG_GraphicsDevice* device, mgint currentFrame, 
 void MGG_GraphicsDevice_SetBlendState(MGG_GraphicsDevice* device, MGG_BlendState* state, mgfloat factorR, mgfloat factorG, mgfloat factorB, mgfloat factorA)
 {
     assert(device != nullptr);
-    (void)factorR;
-    (void)factorG;
-    (void)factorB;
-    (void)factorA;
+
+    if (state == nullptr)
+        return;
+
+    EnsureContext(device);
+
+    const MGG_BlendState_Info& info = state->infos[0];
+    bool blendEnabled = !(info.colorSourceBlend == MGBlend::One &&
+        info.colorDestBlend == MGBlend::Zero &&
+        info.alphaSourceBlend == MGBlend::One &&
+        info.alphaDestBlend == MGBlend::Zero);
+
+    if (blendEnabled)
+        glEnable(GL_BLEND);
+    else
+        glDisable(GL_BLEND);
+
+    device->context.functions.BlendColor(factorR, factorG, factorB, factorA);
+    device->context.functions.BlendEquationSeparate(
+        ToBlendEquation(info.colorBlendFunc),
+        ToBlendEquation(info.alphaBlendFunc));
+    device->context.functions.BlendFuncSeparate(
+        ToBlendFactor(info.colorSourceBlend),
+        ToBlendFactor(info.colorDestBlend),
+        ToBlendFactor(info.alphaSourceBlend),
+        ToBlendFactor(info.alphaDestBlend));
+
+    GLboolean writeRed = GL_TRUE;
+    GLboolean writeGreen = GL_TRUE;
+    GLboolean writeBlue = GL_TRUE;
+    GLboolean writeAlpha = GL_TRUE;
+    ToColorMask(info.colorWriteChannels, writeRed, writeGreen, writeBlue, writeAlpha);
+    glColorMask(writeRed, writeGreen, writeBlue, writeAlpha);
+
     device->blendState = state;
 }
 
 void MGG_GraphicsDevice_SetDepthStencilState(MGG_GraphicsDevice* device, MGG_DepthStencilState* state)
 {
     assert(device != nullptr);
+
+    if (state == nullptr)
+        return;
+
+    EnsureContext(device);
+
+    const MGG_DepthStencilState_Info& info = state->info;
+
+    if (info.depthBufferEnable)
+        glEnable(GL_DEPTH_TEST);
+    else
+        glDisable(GL_DEPTH_TEST);
+
+    glDepthFunc(ToCompareFunction(info.depthBufferFunction));
+    glDepthMask(info.depthBufferWriteEnable ? GL_TRUE : GL_FALSE);
+
+    if (info.stencilEnable)
+        glEnable(GL_STENCIL_TEST);
+    else
+        glDisable(GL_STENCIL_TEST);
+
+    glStencilFunc(
+        ToCompareFunction(info.stencilFunction),
+        info.referenceStencil,
+        static_cast<GLuint>(info.stencilMask));
+    glStencilOp(
+        ToStencilOperation(info.stencilFail),
+        ToStencilOperation(info.stencilDepthBufferFail),
+        ToStencilOperation(info.stencilPass));
+    glStencilMask(static_cast<GLuint>(info.stencilWriteMask));
+
     device->depthStencilState = state;
 }
 
 void MGG_GraphicsDevice_SetRasterizerState(MGG_GraphicsDevice* device, MGG_RasterizerState* state)
 {
     assert(device != nullptr);
+
+    if (state == nullptr)
+        return;
+
+    EnsureContext(device);
+
+    const MGG_RasterizerState_Info& info = state->info;
+    bool offscreen = device->currentRenderTarget != nullptr;
+
+    glDisable(GL_DITHER);
+
+    if (info.cullMode == MGCullMode::None)
+    {
+        glDisable(GL_CULL_FACE);
+    }
+    else
+    {
+        glEnable(GL_CULL_FACE);
+        glCullFace(GL_BACK);
+
+        if (info.cullMode == MGCullMode::CullClockwiseFace)
+            glFrontFace(offscreen ? GL_CW : GL_CCW);
+        else
+            glFrontFace(offscreen ? GL_CCW : GL_CW);
+    }
+
+    glPolygonMode(GL_FRONT_AND_BACK, ToPolygonMode(info.fillMode));
+
+    if (info.scissorTestEnable)
+        glEnable(GL_SCISSOR_TEST);
+    else
+        glDisable(GL_SCISSOR_TEST);
+
+    if (info.depthBias != 0.0f || info.slopeScaleDepthBias != 0.0f)
+    {
+        GLint depthMul = 0;
+        switch (GetActiveDepthFormat(device))
+        {
+        case MGDepthFormat::None:
+            depthMul = 0;
+            break;
+        case MGDepthFormat::Depth16:
+            depthMul = 65535;
+            break;
+        case MGDepthFormat::Depth24:
+        case MGDepthFormat::Depth24Stencil8:
+            depthMul = 16777215;
+            break;
+        default:
+            MGGL_FAIL("Unsupported depth format", "unknown OpenGL depth format for polygon offset");
+        }
+
+        glEnable(GL_POLYGON_OFFSET_FILL);
+        glPolygonOffset(info.slopeScaleDepthBias, info.depthBias * depthMul);
+    }
+    else
+    {
+        glDisable(GL_POLYGON_OFFSET_FILL);
+    }
+
+    if (!info.depthClipEnable)
+        glEnable(GL_DEPTH_CLAMP);
+    else
+        glDisable(GL_DEPTH_CLAMP);
+
     device->rasterizerState = state;
 }
 
