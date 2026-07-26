@@ -106,7 +106,6 @@ struct MGG_Buffer
     MGBufferType type = MGBufferType::Vertex;
     mgbool dynamic = false;
     mgint sizeInBytes = 0;
-    std::vector<mgbyte> shadowData;
 };
 
 struct MGG_Texture
@@ -130,7 +129,6 @@ struct MGG_Texture
     MGRenderTargetUsage renderTargetUsage = MGRenderTargetUsage::DiscardContents;
     GLuint framebuffer = 0;
     GLuint depthRenderbuffer = 0;
-    std::vector<std::vector<mgbyte>> shadowData;
 };
 
 struct MGG_Shader
@@ -863,17 +861,6 @@ namespace
         return extent > 0 ? extent : 1;
     }
 
-    mgint GetTextureSubresourceIndex(const MGG_Texture* texture, mgint level, mgint slice)
-    {
-        assert(texture != nullptr);
-        assert(level >= 0);
-        assert(level < texture->mipmaps);
-        assert(slice >= 0);
-        assert(slice < texture->slices);
-
-        return slice * texture->mipmaps + level;
-    }
-
     mgint GetTextureByteCount(mgint width, mgint height, mgint depth, mgint bytesPerPixel)
     {
         assert(width > 0);
@@ -1015,7 +1002,6 @@ namespace
         texture->mipmaps = mipmaps;
         texture->slices = slices;
         texture->bytesPerPixel = formatInfo.bytesPerPixel;
-        texture->shadowData.resize(static_cast<size_t>(mipmaps * slices));
 
         glGenTextures(1, &texture->handle);
         if (texture->handle == 0)
@@ -1044,9 +1030,6 @@ namespace
         {
             mgint mipWidth = GetMipExtent(width, level);
             mgint mipHeight = GetMipExtent(height, level);
-            std::vector<mgbyte>& shadow = texture->shadowData[GetTextureSubresourceIndex(texture, level, 0)];
-            shadow.resize(GetTextureByteCount(mipWidth, mipHeight, 1, texture->bytesPerPixel));
-
             glTexImage2D(
                 texture->target,
                 level,
@@ -1056,71 +1039,11 @@ namespace
                 0,
                 texture->pixelFormat,
                 texture->pixelType,
-                shadow.data());
+                nullptr);
         }
 
         EndTextureEdit(device, texture, previousActiveTexture, previousBinding);
         return texture;
-    }
-
-    void CopyTextureRegionToShadow(
-        MGG_Texture* texture,
-        mgint level,
-        mgint slice,
-        mgint x,
-        mgint y,
-        mgint z,
-        mgint width,
-        mgint height,
-        mgint depth,
-        const mgbyte* data)
-    {
-        assert(texture != nullptr);
-        assert(data != nullptr);
-        assert(z == 0);
-        assert(depth == 1);
-
-        std::vector<mgbyte>& shadow = texture->shadowData[GetTextureSubresourceIndex(texture, level, slice)];
-        mgint mipWidth = GetMipExtent(texture->width, level);
-        mgint bytesPerPixel = texture->bytesPerPixel;
-        mgint sourceRowBytes = width * bytesPerPixel;
-        mgint destinationRowBytes = mipWidth * bytesPerPixel;
-        mgbyte* destination = shadow.data() + ((y * mipWidth) + x) * bytesPerPixel;
-
-        for (mgint row = 0; row < height; ++row)
-        {
-            memcpy(destination + row * destinationRowBytes, data + row * sourceRowBytes, sourceRowBytes);
-        }
-    }
-
-    void CopyTextureRegionFromShadow(
-        const MGG_Texture* texture,
-        mgint level,
-        mgint slice,
-        mgint x,
-        mgint y,
-        mgint z,
-        mgint width,
-        mgint height,
-        mgint depth,
-        mgbyte* data)
-    {
-        assert(texture != nullptr);
-        assert(data != nullptr);
-        assert(z == 0);
-        assert(depth == 1);
-
-        const std::vector<mgbyte>& shadow = texture->shadowData[GetTextureSubresourceIndex(texture, level, slice)];
-        mgint mipWidth = GetMipExtent(texture->width, level);
-        mgint bytesPerPixel = texture->bytesPerPixel;
-        mgint sourceRowBytes = mipWidth * bytesPerPixel;
-        mgint destinationRowBytes = width * bytesPerPixel;
-        const mgbyte* source = shadow.data() + ((y * mipWidth) + x) * bytesPerPixel;
-
-        for (mgint row = 0; row < height; ++row)
-        {
-            memcpy(data + row * destinationRowBytes, source + row * sourceRowBytes, destinationRowBytes);
-        }
     }
 
     GLbitfield ToClearMask(MGClearOptions options)
@@ -1232,40 +1155,24 @@ namespace
         return sourceBytes + (itemCount - 1) * destinationStride;
     }
 
-    void CopyToShadowData(mgbyte* destination, mgbyte* source, mgint itemCount, mgint destinationStride, mgint sourceBytes)
+    void CopyWithStride(const mgbyte* source, mgbyte* destination, mgint itemCount, mgint sourceStride, mgint destinationStride, mgint elementBytes)
     {
-        assert(destination != nullptr);
         assert(source != nullptr);
+        assert(destination != nullptr);
+        assert(itemCount > 0);
+        assert(sourceStride > 0);
+        assert(destinationStride > 0);
+        assert(elementBytes > 0);
 
-        if (destinationStride == sourceBytes)
+        if (sourceStride == destinationStride && sourceStride == elementBytes)
         {
-            memcpy(destination, source, itemCount * sourceBytes);
+            memcpy(destination, source, itemCount * elementBytes);
             return;
         }
 
         for (mgint i = 0; i < itemCount; ++i)
         {
-            memcpy(destination + i * destinationStride, source + i * sourceBytes, sourceBytes);
-        }
-    }
-
-    void CopyFromShadowData(mgbyte* source, mgbyte* destination, mgint itemCount, mgint destinationBytes, mgint sourceStride)
-    {
-        assert(source != nullptr);
-        assert(destination != nullptr);
-
-        if (sourceStride == destinationBytes)
-        {
-            memcpy(destination, source, itemCount * destinationBytes);
-            return;
-        }
-
-        mgint bytesToCopy = destinationBytes < sourceStride ? destinationBytes : sourceStride;
-        for (mgint i = 0; i < itemCount; ++i)
-        {
-            memcpy(destination, source, bytesToCopy);
-            destination += destinationBytes;
-            source += sourceStride;
+            memcpy(destination + i * destinationStride, source + i * sourceStride, elementBytes);
         }
     }
 }
@@ -1705,19 +1612,28 @@ void MGG_GraphicsDevice_SetConstantBuffer(MGG_GraphicsDevice* device, MGShaderSt
 
     GLenum constantType = device->shaders[stageIndex]->constantBufferTypes[slot];
     mgint registerCount = GetConstantRegisterCount(buffer);
+    device->context.functions.BindBuffer(buffer->target, buffer->handle);
+    void* mapped = device->context.functions.MapBuffer(buffer->target, GL_READ_ONLY);
+    if (mapped == nullptr)
+        MGGL_FAIL("glMapBuffer failed", "constant buffer upload could not map buffer contents");
+
     if (constantType == GL_BOOL || constantType == GL_INT)
     {
         device->context.functions.Uniform4iv(
             location,
             registerCount,
-            reinterpret_cast<const GLint*>(buffer->shadowData.data()));
+            reinterpret_cast<const GLint*>(mapped));
+        if (device->context.functions.UnmapBuffer(buffer->target) != GL_TRUE)
+            MGGL_FAIL("glUnmapBuffer failed", "constant buffer upload could not unmap buffer contents");
         return;
     }
 
     device->context.functions.Uniform4fv(
         location,
         registerCount,
-        reinterpret_cast<const GLfloat*>(buffer->shadowData.data()));
+        reinterpret_cast<const GLfloat*>(mapped));
+    if (device->context.functions.UnmapBuffer(buffer->target) != GL_TRUE)
+        MGGL_FAIL("glUnmapBuffer failed", "constant buffer upload could not unmap buffer contents");
 }
 
 void MGG_GraphicsDevice_SetTexture(MGG_GraphicsDevice* device, MGShaderStage stage, mgint slot, MGG_Texture* texture)
@@ -2049,14 +1965,13 @@ MGG_Buffer* MGG_Buffer_Create(MGG_GraphicsDevice* device, MGBufferType type, mgb
     buffer->type = type;
     buffer->dynamic = dynamic;
     buffer->sizeInBytes = sizeInBytes;
-    buffer->shadowData.resize(sizeInBytes);
 
     device->context.functions.GenBuffers(1, &buffer->handle);
     if (buffer->handle == 0)
         MGGL_FAIL("glGenBuffers failed", "buffer creation returned 0");
 
     device->context.functions.BindBuffer(buffer->target, buffer->handle);
-    device->context.functions.BufferData(buffer->target, sizeInBytes, buffer->shadowData.data(), buffer->usage);
+    device->context.functions.BufferData(buffer->target, sizeInBytes, nullptr, buffer->usage);
 
     return buffer;
 }
@@ -2102,29 +2017,31 @@ void MGG_Buffer_SetData(MGG_GraphicsDevice* device, MGG_Buffer*& buffer, mgint o
     assert(vertexStride > 0);
     assert(elementSizeInBytes > 0);
 
-    mgint copySpan = GetCopySpan(elementCount, vertexStride, elementSizeInBytes);
-    assert(offset + copySpan <= buffer->sizeInBytes);
-
-    CopyToShadowData(buffer->shadowData.data() + offset, data, elementCount, vertexStride, elementSizeInBytes);
-
     EnsureContext(device);
     device->context.functions.BindBuffer(buffer->target, buffer->handle);
 
     if (discard)
     {
-        device->context.functions.BufferData(
-            buffer->target,
-            buffer->sizeInBytes,
-            buffer->shadowData.data(),
-            buffer->usage);
+        device->context.functions.BufferData(buffer->target, buffer->sizeInBytes, nullptr, buffer->usage);
+    }
+
+    if (elementSizeInBytes == vertexStride || elementSizeInBytes % vertexStride == 0)
+    {
+        mgint copySpan = elementCount * elementSizeInBytes;
+        assert(offset + copySpan <= buffer->sizeInBytes);
+        device->context.functions.BufferSubData(buffer->target, offset, copySpan, data);
         return;
     }
 
-    device->context.functions.BufferSubData(
-        buffer->target,
-        offset,
-        copySpan,
-        buffer->shadowData.data() + offset);
+    mgint copySpan = GetCopySpan(elementCount, vertexStride, elementSizeInBytes);
+    assert(offset + copySpan <= buffer->sizeInBytes);
+
+    for (mgint elementIndex = 0; elementIndex < elementCount; ++elementIndex)
+    {
+        mgint destinationOffset = offset + elementIndex * vertexStride;
+        const mgbyte* source = data + elementIndex * elementSizeInBytes;
+        device->context.functions.BufferSubData(buffer->target, destinationOffset, elementSizeInBytes, source);
+    }
 }
 
 void MGG_Buffer_GetData(MGG_GraphicsDevice* device, MGG_Buffer* buffer, mgint offset, mgbyte* data, mgint dataCount, mgint dataBytes, mgint dataStride)
@@ -2140,7 +2057,17 @@ void MGG_Buffer_GetData(MGG_GraphicsDevice* device, MGG_Buffer* buffer, mgint of
     mgint copySpan = GetCopySpan(dataCount, dataStride, dataBytes);
     assert(offset + copySpan <= buffer->sizeInBytes);
 
-    CopyFromShadowData(buffer->shadowData.data() + offset, data, dataCount, dataBytes, dataStride);
+    EnsureContext(device);
+    device->context.functions.BindBuffer(buffer->target, buffer->handle);
+    void* mapped = device->context.functions.MapBuffer(buffer->target, GL_READ_ONLY);
+    if (mapped == nullptr)
+        MGGL_FAIL("glMapBuffer failed", "buffer readback could not map buffer contents");
+
+    const mgbyte* source = reinterpret_cast<const mgbyte*>(mapped) + offset;
+    CopyWithStride(source, data, dataCount, dataStride, dataBytes, dataBytes < dataStride ? dataBytes : dataStride);
+
+    if (device->context.functions.UnmapBuffer(buffer->target) != GL_TRUE)
+        MGGL_FAIL("glUnmapBuffer failed", "buffer readback could not unmap buffer contents");
 }
 
 MGG_Texture* MGG_Texture_Create(MGG_GraphicsDevice* device, MGTextureType type, MGSurfaceFormat format, mgint width, mgint height, mgint depth, mgint mipmaps, mgint slices)
@@ -2301,8 +2228,6 @@ void MGG_Texture_SetData(MGG_GraphicsDevice* device, MGG_Texture* texture, mgint
     if (normalizedBytes != expectedBytes)
         MGGL_FAIL("Texture upload size mismatch", "byte count does not match the upload region");
 
-    CopyTextureRegionToShadow(texture, level, slice, x, y, z, resolvedWidth, resolvedHeight, resolvedDepth, data);
-
     GLint previousActiveTexture = 0;
     GLint previousBinding = 0;
     glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
@@ -2344,7 +2269,39 @@ void MGG_Texture_GetData(MGG_GraphicsDevice* device, MGG_Texture* texture, mgint
     if (dataBytes < expectedBytes)
         MGGL_FAIL("Texture readback size mismatch", "destination buffer is smaller than the requested region");
 
-    CopyTextureRegionFromShadow(texture, level, slice, x, y, z, resolvedWidth, resolvedHeight, resolvedDepth, data);
+    GLint previousActiveTexture = 0;
+    GLint previousBinding = 0;
+    glPixelStorei(GL_PACK_ALIGNMENT, 1);
+    BeginTextureEdit(device, texture, previousActiveTexture, previousBinding);
+
+    mgint mipWidth = GetMipExtent(texture->width, level);
+    mgint mipHeight = GetMipExtent(texture->height, level);
+    mgint fullLevelBytes = GetTextureByteCount(mipWidth, mipHeight, 1, texture->bytesPerPixel);
+
+    if (x == 0 && y == 0 && resolvedWidth == mipWidth && resolvedHeight == mipHeight)
+    {
+        device->context.functions.GetTexImage(texture->target, level, texture->pixelFormat, texture->pixelType, data);
+        EndTextureEdit(device, texture, previousActiveTexture, previousBinding);
+        return;
+    }
+
+    std::vector<mgbyte> fullLevelData(static_cast<size_t>(fullLevelBytes));
+    device->context.functions.GetTexImage(
+        texture->target,
+        level,
+        texture->pixelFormat,
+        texture->pixelType,
+        fullLevelData.data());
+
+    mgint sourceRowBytes = mipWidth * texture->bytesPerPixel;
+    mgint destinationRowBytes = resolvedWidth * texture->bytesPerPixel;
+    const mgbyte* source = fullLevelData.data() + ((y * mipWidth) + x) * texture->bytesPerPixel;
+    for (mgint row = 0; row < resolvedHeight; ++row)
+    {
+        memcpy(data + row * destinationRowBytes, source + row * sourceRowBytes, destinationRowBytes);
+    }
+
+    EndTextureEdit(device, texture, previousActiveTexture, previousBinding);
 }
 
 MGG_InputLayout* MGG_InputLayout_Create(MGG_GraphicsDevice* device, MGG_Shader* vertexShader, mgint* strides, mgint streamCount, MGG_InputElement* elements, mgint elementCount)

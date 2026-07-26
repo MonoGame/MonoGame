@@ -7,6 +7,9 @@
 #include <SDL_opengl.h>
 #include <SDL_opengl_glext.h>
 
+// SDL declares glGetTexImage here, but this header set does not expose PFNGLGETTEXIMAGEPROC.
+using MGGLGETTEXIMAGEPROC = decltype(&glGetTexImage);
+
 struct OpenGLFunctions
 {
     PFNGLACTIVETEXTUREPROC ActiveTexture = nullptr;
@@ -38,6 +41,7 @@ struct OpenGLFunctions
     PFNGLGENVERTEXARRAYSPROC GenVertexArrays = nullptr;
     PFNGLDRAWELEMENTSBASEVERTEXPROC DrawElementsBaseVertex = nullptr;
     PFNGLENABLEVERTEXATTRIBARRAYPROC EnableVertexAttribArray = nullptr;
+    MGGLGETTEXIMAGEPROC GetTexImage = nullptr;
     PFNGLFRAMEBUFFERRENDERBUFFERPROC FramebufferRenderbuffer = nullptr;
     PFNGLFRAMEBUFFERTEXTURE2DPROC FramebufferTexture2D = nullptr;
     PFNGLGENBUFFERSPROC GenBuffers = nullptr;
@@ -50,6 +54,7 @@ struct OpenGLFunctions
     PFNGLGETSHADERIVPROC GetShaderiv = nullptr;
     PFNGLGETUNIFORMLOCATIONARBPROC GetUniformLocation = nullptr;
     PFNGLLINKPROGRAMPROC LinkProgram = nullptr;
+    PFNGLMAPBUFFERPROC MapBuffer = nullptr;
     PFNGLRENDERBUFFERSTORAGEPROC RenderbufferStorage = nullptr;
     PFNGLSAMPLERPARAMETERFPROC SamplerParameterf = nullptr;
     PFNGLSAMPLERPARAMETERFVPROC SamplerParameterfv = nullptr;
@@ -58,6 +63,7 @@ struct OpenGLFunctions
     PFNGLUNIFORM1IPROC Uniform1i = nullptr;
     PFNGLUNIFORM4FVPROC Uniform4fv = nullptr;
     PFNGLUNIFORM4IVPROC Uniform4iv = nullptr;
+    PFNGLUNMAPBUFFERPROC UnmapBuffer = nullptr;
     PFNGLUSEPROGRAMPROC UseProgram = nullptr;
     PFNGLVERTEXATTRIBDIVISORPROC VertexAttribDivisor = nullptr;
     PFNGLVERTEXATTRIBPOINTERPROC VertexAttribPointer = nullptr;

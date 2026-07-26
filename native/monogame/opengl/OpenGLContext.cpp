@@ -85,6 +85,7 @@ void OpenGLFunctions::Load()
     DetachShader = reinterpret_cast<PFNGLDETACHSHADERPROC>(LoadProcAddress("glDetachShader"));
     DisableVertexAttribArray = reinterpret_cast<PFNGLDISABLEVERTEXATTRIBARRAYPROC>(LoadProcAddress("glDisableVertexAttribArray"));
     EnableVertexAttribArray = reinterpret_cast<PFNGLENABLEVERTEXATTRIBARRAYPROC>(LoadProcAddress("glEnableVertexAttribArray"));
+    GetTexImage = reinterpret_cast<MGGLGETTEXIMAGEPROC>(LoadProcAddress("glGetTexImage"));
     FramebufferRenderbuffer = reinterpret_cast<PFNGLFRAMEBUFFERRENDERBUFFERPROC>(LoadProcAddress("glFramebufferRenderbuffer"));
     FramebufferTexture2D = reinterpret_cast<PFNGLFRAMEBUFFERTEXTURE2DPROC>(LoadProcAddress("glFramebufferTexture2D"));
     GenBuffers = reinterpret_cast<PFNGLGENBUFFERSPROC>(LoadProcAddress("glGenBuffers"));
@@ -98,6 +99,7 @@ void OpenGLFunctions::Load()
     GetShaderiv = reinterpret_cast<PFNGLGETSHADERIVPROC>(LoadProcAddress("glGetShaderiv"));
     GetUniformLocation = reinterpret_cast<PFNGLGETUNIFORMLOCATIONARBPROC>(LoadProcAddress("glGetUniformLocation"));
     LinkProgram = reinterpret_cast<PFNGLLINKPROGRAMPROC>(LoadProcAddress("glLinkProgram"));
+    MapBuffer = reinterpret_cast<PFNGLMAPBUFFERPROC>(LoadProcAddress("glMapBuffer"));
     DrawElementsBaseVertex = reinterpret_cast<PFNGLDRAWELEMENTSBASEVERTEXPROC>(LoadProcAddress("glDrawElementsBaseVertex"));
     RenderbufferStorage = reinterpret_cast<PFNGLRENDERBUFFERSTORAGEPROC>(LoadProcAddress("glRenderbufferStorage"));
     SamplerParameterf = reinterpret_cast<PFNGLSAMPLERPARAMETERFPROC>(LoadProcAddress("glSamplerParameterf"));
@@ -107,6 +109,7 @@ void OpenGLFunctions::Load()
     Uniform1i = reinterpret_cast<PFNGLUNIFORM1IPROC>(LoadProcAddress("glUniform1i"));
     Uniform4fv = reinterpret_cast<PFNGLUNIFORM4FVPROC>(LoadProcAddress("glUniform4fv"));
     Uniform4iv = reinterpret_cast<PFNGLUNIFORM4IVPROC>(LoadProcAddress("glUniform4iv"));
+    UnmapBuffer = reinterpret_cast<PFNGLUNMAPBUFFERPROC>(LoadProcAddress("glUnmapBuffer"));
     UseProgram = reinterpret_cast<PFNGLUSEPROGRAMPROC>(LoadProcAddress("glUseProgram"));
     VertexAttribDivisor = reinterpret_cast<PFNGLVERTEXATTRIBDIVISORPROC>(LoadProcAddress("glVertexAttribDivisor"));
     VertexAttribPointer = reinterpret_cast<PFNGLVERTEXATTRIBPOINTERPROC>(LoadProcAddress("glVertexAttribPointer"));
