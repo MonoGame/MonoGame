@@ -214,6 +214,25 @@ namespace
 
 #define MGGL_NOT_IMPLEMENTED(functionName) FailNotImplemented(__FILE__, __LINE__, functionName)
 
+    bool HasOpenGLExtension(const char* name)
+    {
+        assert(name != nullptr);
+        return SDL_GL_ExtensionSupported(name) == SDL_TRUE;
+    }
+
+    bool SupportsOpenGLDepthClamp(const MGG_GraphicsDevice* device)
+    {
+        assert(device != nullptr);
+
+        if (device->context.majorVersion > 3)
+            return true;
+
+        if (device->context.majorVersion == 3 && device->context.minorVersion >= 2)
+            return true;
+
+        return HasOpenGLExtension("GL_ARB_depth_clamp");
+    }
+
     MGG_DisplayMode ToDisplayMode(const SDL_DisplayMode& mode)
     {
         MGG_DisplayMode result;
@@ -1257,10 +1276,77 @@ void MGG_GraphicsDevice_GetCaps(MGG_GraphicsDevice* device, MGG_GraphicsDevice_C
 {
     assert(device != nullptr);
 
+    bool supportsNonPowerOfTwo = true;
+    bool supportsTextureFilterAnisotropic = false;
+    bool supportsDepth24 = true;
+    bool supportsPackedDepthStencil = true;
+    bool supportsDepthNonLinear = false;
+    bool supportsTextureMaxLevel = true;
+    bool supportsDxt1 = false;
+    bool supportsS3tc = false;
+    bool supportsSRgb = true;
+    bool supportsDepthClamp = false;
+    bool supportsVertexTextures = true;
+    mgint maxTextureAnisotropy = 16;
+
+    if (device->window != nullptr && device->context.handle != nullptr)
+    {
+        EnsureContext(device);
+
+        supportsS3tc =
+            HasOpenGLExtension("GL_EXT_texture_compression_s3tc") ||
+            HasOpenGLExtension("GL_OES_texture_compression_S3TC") ||
+            HasOpenGLExtension("GL_EXT_texture_compression_dxt3") ||
+            HasOpenGLExtension("GL_EXT_texture_compression_dxt5");
+        supportsDxt1 = supportsS3tc || HasOpenGLExtension("GL_EXT_texture_compression_dxt1");
+        supportsDepthClamp = SupportsOpenGLDepthClamp(device);
+        supportsNonPowerOfTwo =
+            HasOpenGLExtension("GL_ARB_texture_non_power_of_two") ||
+            HasOpenGLExtension("GL_OES_texture_npot");
+        supportsTextureFilterAnisotropic = HasOpenGLExtension("GL_EXT_texture_filter_anisotropic");
+
+        GLint vertexTextureUnits = 0;
+        glGetIntegerv(GL_MAX_VERTEX_TEXTURE_IMAGE_UNITS, &vertexTextureUnits);
+        supportsVertexTextures = vertexTextureUnits > 0;
+
+        if (supportsTextureFilterAnisotropic)
+        {
+            GLfloat reportedMaxAnisotropy = 1.0f;
+            glGetFloatv(GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT, &reportedMaxAnisotropy);
+            if (reportedMaxAnisotropy > 1.0f)
+                maxTextureAnisotropy = static_cast<mgint>(reportedMaxAnisotropy);
+            else
+                maxTextureAnisotropy = 1;
+        }
+        else
+        {
+            maxTextureAnisotropy = 1;
+        }
+    }
+
     caps.MaxTextureSlots = MaxTextureSlots;
     caps.MaxVertexTextureSlots = MaxVertexTextureSlots;
     caps.MaxVertexBufferSlots = MaxVertexBufferSlots;
     caps.ShaderProfile = OpenGLShaderProfile;
+    caps.MaxTextureAnisotropy = maxTextureAnisotropy;
+    caps.SupportsNonPowerOfTwo = supportsNonPowerOfTwo;
+    caps.SupportsTextureFilterAnisotropic = supportsTextureFilterAnisotropic;
+    caps.SupportsDepth24 = supportsDepth24;
+    caps.SupportsPackedDepthStencil = supportsPackedDepthStencil;
+    caps.SupportsDepthNonLinear = supportsDepthNonLinear;
+    caps.SupportsTextureMaxLevel = supportsTextureMaxLevel;
+    caps.SupportsDxt1 = supportsDxt1;
+    caps.SupportsS3tc = supportsS3tc;
+    caps.SupportsSRgb = supportsSRgb;
+    caps.SupportsDepthClamp = supportsDepthClamp;
+    caps.SupportsTextureArrays = false;
+    caps.SupportsVertexTextures = supportsVertexTextures;
+    caps.SupportsFloatTextures = true;
+    caps.SupportsHalfFloatTextures = true;
+    caps.SupportsNormalized = true;
+    caps.SupportsInstancing = true;
+    caps.SupportsBaseIndexInstancing = true;
+    caps.SupportsSeparateBlendStates = true;
 }
 
 void MGG_GraphicsDevice_ResizeSwapchain(
