@@ -27,6 +27,11 @@ public partial class GraphicsDevice
     private unsafe readonly MGG_Texture*[] _curRenderTargets = new MGG_Texture*[4];
     private readonly int[] _currentRenderTargetArraySlices = new int[4];
 
+    private static bool RequiresRenderTargetTransitionStateRefresh()
+    {
+        return PlatformInfo.GraphicsBackend == GraphicsBackend.OpenGL;
+    }
+
     internal static int ShaderProfile
     {
         get; private set;
@@ -268,6 +273,17 @@ public partial class GraphicsDevice
             PresentationParameters.BackBufferWidth,
             PresentationParameters.BackBufferHeight);
 
+        if (RequiresRenderTargetTransitionStateRefresh())
+        {
+            /*
+             * Need to dirty these here when switching back to the backbuffer
+             * so the state gets pushed again on the next apply.
+             * Chris <aristurtledev>
+             */
+            _rasterizerStateDirty = true;
+            Textures.Dirty();
+        }
+
         MGG.GraphicsDevice_SetRenderTargets(Handle, null, null, 0);
     }
 
@@ -279,6 +295,17 @@ public partial class GraphicsDevice
     private unsafe IRenderTarget PlatformApplyRenderTargets()
     {
         BeginFrame();
+
+        if (RequiresRenderTargetTransitionStateRefresh())
+        {
+            /*
+             * Need to dirty these here when switching render targets
+             * so the state gets pushed again on the next apply.
+             * Chris <aristurtledev>
+             */
+            _rasterizerStateDirty = true;
+            Textures.Dirty();
+        }
 
         Array.Clear(_curRenderTargets, 0, 4);
 

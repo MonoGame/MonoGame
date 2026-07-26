@@ -85,6 +85,12 @@ struct MGG_GraphicsDevice
     std::array<std::array<GLenum, 16>, static_cast<size_t>(MGShaderStage::Count)> textureTargets = {};
     std::array<MGG_Shader*, static_cast<size_t>(MGShaderStage::Count)> shaders = {};
     MGG_InputLayout* inputLayout = nullptr;
+    /*
+     * Need to defer this until draw because the vertex buffers
+     * may get rebound after the layout is set.
+     * Chris <aristurtledev>
+     */
+    mgbool inputLayoutDirty = false;
     MGG_ShaderProgram* currentProgram = nullptr;
     std::vector<MGG_ShaderProgram*> programs;
     std::array<mgbool, 16> enabledAttributes = {};
@@ -466,14 +472,22 @@ namespace
 
         GLfloat posFixup[4] = { 1.0f, 1.0f, 0.0f, 0.0f };
         if (device->currentRenderTarget != nullptr)
+        {
+            /*
+             * Need to flip render target Y here so it stays opposite
+             * of the default framebuffer path.
+             * Chris <aristurtledev>
+             */
             posFixup[1] = -1.0f;
+        }
 
         device->context.functions.Uniform4fv(device->currentProgram->posFixupLocation, 1, posFixup);
     }
 
-    void ApplyInputLayout(MGG_GraphicsDevice* device)
+    void ApplyInputLayout(MGG_GraphicsDevice* device, mgint drawVertexOffset = 0)
     {
         assert(device != nullptr);
+        assert(drawVertexOffset >= 0);
 
         EnsureContext(device);
         EnsureVertexArray(device);
@@ -507,7 +521,7 @@ namespace
                 MGGL_FAIL("Vertex buffer binding missing", "input layout requires a vertex buffer before drawing");
 
             mgint stride = device->inputLayout->strides[binding.vertexBufferSlot];
-            intptr_t baseOffset = static_cast<intptr_t>(device->vertexOffsets[binding.vertexBufferSlot]) * stride;
+            intptr_t baseOffset = static_cast<intptr_t>(device->vertexOffsets[binding.vertexBufferSlot] + drawVertexOffset) * stride;
             intptr_t byteOffset = baseOffset + binding.alignedByteOffset;
 
             device->context.functions.BindBuffer(GL_ARRAY_BUFFER, buffer->handle);
@@ -522,6 +536,8 @@ namespace
             device->context.functions.VertexAttribDivisor(binding.location, binding.instanceDataStepRate);
             device->enabledAttributes[binding.location] = true;
         }
+
+        device->inputLayoutDirty = false;
     }
 
     void DestroyProgram(MGG_GraphicsDevice* device, MGG_ShaderProgram* program)
@@ -775,6 +791,22 @@ namespace
     {
         assert(device != nullptr);
         return device->currentRenderTarget != nullptr ? device->currentRenderTarget->depthFormat : device->depthFormat;
+    }
+
+    mgint ToOpenGLWindowY(const MGG_GraphicsDevice* device, mgint y, mgint height)
+    {
+        assert(device != nullptr);
+
+        /*
+         * Need to flip the default framebuffer Y here because OpenGL
+         * uses a bottom-left origin. Render targets already get their
+         * Y fixup through ApplyPosFixup.
+         * Chris <aristurtledev>
+         */
+        if (device->currentRenderTarget != nullptr)
+            return y;
+
+        return device->backBufferHeight - y - height;
     }
 
     void ToTextureFilters(MGTextureFilter filter, GLenum& minFilter, GLenum& magFilter)
@@ -1622,7 +1654,7 @@ void MGG_GraphicsDevice_SetViewport(MGG_GraphicsDevice* device, mgint x, mgint y
     device->viewportMinDepth = minDepth;
     device->viewportMaxDepth = maxDepth;
 
-    glViewport(x, y, width, height);
+    glViewport(x, ToOpenGLWindowY(device, y, height), width, height);
     glDepthRange(minDepth, maxDepth);
     ApplyPosFixup(device);
 }
@@ -1633,7 +1665,7 @@ void MGG_GraphicsDevice_SetScissorRectangle(MGG_GraphicsDevice* device, mgint x,
 
     EnsureContext(device);
 
-    glScissor(x, y, width, height);
+    glScissor(x, ToOpenGLWindowY(device, y, height), width, height);
 }
 
 void MGG_GraphicsDevice_SetRenderTargets(MGG_GraphicsDevice* device, MGG_Texture** targets, mgint* arraySlices, mgint count)
@@ -1785,8 +1817,7 @@ void MGG_GraphicsDevice_SetVertexBuffer(MGG_GraphicsDevice* device, mgint slot, 
 
     device->vertexBuffers[slot] = buffer;
     device->vertexOffsets[slot] = vertexOffset;
-    if (device->inputLayout != nullptr)
-        ApplyInputLayout(device);
+    device->inputLayoutDirty = true;
 }
 
 void MGG_GraphicsDevice_SetShader(MGG_GraphicsDevice* device, MGShaderStage stage, MGG_Shader* shader)
@@ -1825,6 +1856,7 @@ void MGG_GraphicsDevice_SetInputLayout(MGG_GraphicsDevice* device, MGG_InputLayo
 
     device->inputLayout = layout;
     ApplyInputLayout(device);
+    device->inputLayoutDirty = true;
 }
 
 void MGG_GraphicsDevice_Draw(MGG_GraphicsDevice* device, MGPrimitiveType primitiveType, mgint vertexStart, mgint vertexCount)
@@ -1838,6 +1870,9 @@ void MGG_GraphicsDevice_Draw(MGG_GraphicsDevice* device, MGPrimitiveType primiti
     EnsureContext(device);
     EnsureVertexArray(device);
     assert(device->isInFrame);
+
+    if (device->inputLayoutDirty)
+        ApplyInputLayout(device, 0);
 
     glDrawArrays(ToPrimitiveMode(primitiveType), vertexStart, vertexCount);
 }
@@ -1855,6 +1890,13 @@ void MGG_GraphicsDevice_DrawIndexed(MGG_GraphicsDevice* device, MGPrimitiveType 
     EnsureVertexArray(device);
     assert(device->isInFrame);
 
+    /*
+     * Need to fold the vertex start into the attribute offsets here
+     * instead of passing it through the draw call.
+     * Chris <aristurtledev>
+     */
+    ApplyInputLayout(device, vertexStart);
+
     if (device->indexBuffer == nullptr)
         MGGL_FAIL("Indexed draw requires an index buffer", "MGG_GraphicsDevice_SetIndexBuffer must bind a buffer before DrawIndexed");
 
@@ -1862,12 +1904,11 @@ void MGG_GraphicsDevice_DrawIndexed(MGG_GraphicsDevice* device, MGPrimitiveType 
     mgint indexSizeInBytes = GetIndexElementSizeInBytes(device->indexElementSize);
     intptr_t indexByteOffset = static_cast<intptr_t>(indexStart) * indexSizeInBytes;
 
-    device->context.functions.DrawElementsBaseVertex(
+    glDrawElements(
         ToPrimitiveMode(primitiveType),
         indexCount,
         ToIndexType(device->indexElementSize),
-        reinterpret_cast<const void*>(indexByteOffset),
-        vertexStart);
+        reinterpret_cast<const void*>(indexByteOffset));
 }
 
 void MGG_GraphicsDevice_DrawIndexedInstanced(MGG_GraphicsDevice* device, MGPrimitiveType primitiveType, mgint primitiveCount, mgint indexStart, mgint vertexStart, mgint instanceCount)
