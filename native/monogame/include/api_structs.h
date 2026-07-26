@@ -86,6 +86,25 @@ struct MGG_GraphicsDevice_Caps
     mgint MaxVertexTextureSlots;
     mgint MaxVertexBufferSlots;
     mgint ShaderProfile;
+    mgint MaxTextureAnisotropy;
+    mgbool SupportsNonPowerOfTwo;
+    mgbool SupportsTextureFilterAnisotropic;
+    mgbool SupportsDepth24;
+    mgbool SupportsPackedDepthStencil;
+    mgbool SupportsDepthNonLinear;
+    mgbool SupportsTextureMaxLevel;
+    mgbool SupportsDxt1;
+    mgbool SupportsS3tc;
+    mgbool SupportsSRgb;
+    mgbool SupportsDepthClamp;
+    mgbool SupportsTextureArrays;
+    mgbool SupportsVertexTextures;
+    mgbool SupportsFloatTextures;
+    mgbool SupportsHalfFloatTextures;
+    mgbool SupportsNormalized;
+    mgbool SupportsInstancing;
+    mgbool SupportsBaseIndexInstancing;
+    mgbool SupportsSeparateBlendStates;
 };
 
 struct Vector4
