@@ -1,6 +1,13 @@
 #include "api_MGG.h"
 
 #include "mg_common.h"
+#include "AlphaTestEffect.ogl.mgfxo.h"
+#include "BasicEffect.ogl.mgfxo.h"
+#include "DualTextureEffect.ogl.mgfxo.h"
+#include "EnvironmentMapEffect.ogl.mgfxo.h"
+#include "SkinnedEffect.ogl.mgfxo.h"
+#include "SpriteEffect.ogl.mgfxo.h"
+#include "mg_effect.h"
 
 #include "OpenGLContext.h"
 
@@ -50,6 +57,9 @@ struct MGG_SamplerState
 
 struct MGG_Buffer;
 struct MGG_Texture;
+struct MGG_Shader;
+struct MGG_InputLayout;
+struct MGG_ShaderProgram;
 
 struct MGG_GraphicsDevice
 {
@@ -73,8 +83,19 @@ struct MGG_GraphicsDevice
     std::array<std::array<MGG_Texture*, 16>, static_cast<size_t>(MGShaderStage::Count)> textures = {};
     std::array<std::array<MGG_SamplerState*, 16>, static_cast<size_t>(MGShaderStage::Count)> samplers = {};
     std::array<std::array<GLenum, 16>, static_cast<size_t>(MGShaderStage::Count)> textureTargets = {};
+    std::array<MGG_Shader*, static_cast<size_t>(MGShaderStage::Count)> shaders = {};
+    MGG_InputLayout* inputLayout = nullptr;
+    MGG_ShaderProgram* currentProgram = nullptr;
+    std::vector<MGG_ShaderProgram*> programs;
+    std::array<mgbool, 16> enabledAttributes = {};
     MGG_Texture* currentRenderTarget = nullptr;
     GLuint currentFramebuffer = 0;
+    mgint viewportX = 0;
+    mgint viewportY = 0;
+    mgint viewportWidth = 0;
+    mgint viewportHeight = 0;
+    mgfloat viewportMinDepth = 0.0f;
+    mgfloat viewportMaxDepth = 1.0f;
 };
 
 struct MGG_Buffer
@@ -114,10 +135,38 @@ struct MGG_Texture
 
 struct MGG_Shader
 {
+    MGShaderStage stage = MGShaderStage::Vertex;
+    GLuint handle = 0;
+    std::string source;
+    std::vector<GLenum> constantBufferTypes;
+    mgint attributeCount = 0;
 };
 
 struct MGG_InputLayout
 {
+    struct Binding
+    {
+        GLuint location = 0;
+        GLuint vertexBufferSlot = 0;
+        GLint elementCount = 0;
+        GLenum elementType = GL_FLOAT;
+        GLboolean normalized = GL_FALSE;
+        GLuint alignedByteOffset = 0;
+        GLuint instanceDataStepRate = 0;
+    };
+
+    std::vector<Binding> bindings;
+    std::vector<mgint> strides;
+    std::vector<GLuint> enabledLocations;
+};
+
+struct MGG_ShaderProgram
+{
+    MGG_Shader* vertexShader = nullptr;
+    MGG_Shader* pixelShader = nullptr;
+    GLuint handle = 0;
+    GLint posFixupLocation = -1;
+    std::array<std::vector<GLint>, static_cast<size_t>(MGShaderStage::Count)> constantBufferLocations = {};
 };
 
 struct MGG_OcclusionQuery
@@ -265,6 +314,301 @@ namespace
         default:
             MGGL_FAIL("Unsupported shader stage", "unknown OpenGL texture unit mapping");
         }
+    }
+
+    const char* GetStagePrefix(MGShaderStage stage)
+    {
+        switch (stage)
+        {
+        case MGShaderStage::Vertex:
+            return "vs";
+        case MGShaderStage::Pixel:
+            return "ps";
+        default:
+            MGGL_FAIL("Unsupported shader stage", "unknown OpenGL shader prefix");
+        }
+    }
+
+    std::string GetAttributeName(mgint index)
+    {
+        assert(index >= 0);
+
+        char name[32];
+        snprintf(name, sizeof(name), "vs_v%d", index);
+        return name;
+    }
+
+    std::string GetSamplerName(MGShaderStage stage, mgint slot)
+    {
+        assert(slot >= 0);
+
+        char name[32];
+        snprintf(name, sizeof(name), "%s_s%d", GetStagePrefix(stage), slot);
+        return name;
+    }
+
+    std::string GetConstantBufferName(MGShaderStage stage, GLenum type)
+    {
+        const char* typeSuffix = "vec4";
+        if (type == GL_BOOL)
+            typeSuffix = "bool";
+        else if (type == GL_INT)
+            typeSuffix = "ivec4";
+
+        char name[64];
+        snprintf(name, sizeof(name), "%s_uniforms_%s", GetStagePrefix(stage), typeSuffix);
+        return name;
+    }
+
+    mgint GetConstantRegisterCount(const MGG_Buffer* buffer)
+    {
+        assert(buffer != nullptr);
+
+        if ((buffer->sizeInBytes % 16) != 0)
+            MGGL_FAIL("Invalid constant buffer size", "constant buffers must be aligned to 16-byte registers");
+
+        return buffer->sizeInBytes / 16;
+    }
+
+    void ToVertexAttribFormat(MGVertexElementFormat format, GLint& elementCount, GLenum& elementType, GLboolean& normalized)
+    {
+        normalized = GL_FALSE;
+
+        switch (format)
+        {
+        case MGVertexElementFormat::Single:
+            elementCount = 1;
+            elementType = GL_FLOAT;
+            return;
+        case MGVertexElementFormat::Vector2:
+            elementCount = 2;
+            elementType = GL_FLOAT;
+            return;
+        case MGVertexElementFormat::Vector3:
+            elementCount = 3;
+            elementType = GL_FLOAT;
+            return;
+        case MGVertexElementFormat::Vector4:
+            elementCount = 4;
+            elementType = GL_FLOAT;
+            return;
+        case MGVertexElementFormat::Color:
+            elementCount = 4;
+            elementType = GL_UNSIGNED_BYTE;
+            normalized = GL_TRUE;
+            return;
+        case MGVertexElementFormat::Byte4:
+            elementCount = 4;
+            elementType = GL_UNSIGNED_BYTE;
+            return;
+        case MGVertexElementFormat::Short2:
+            elementCount = 2;
+            elementType = GL_SHORT;
+            return;
+        case MGVertexElementFormat::Short4:
+            elementCount = 4;
+            elementType = GL_SHORT;
+            return;
+        case MGVertexElementFormat::NormalizedShort2:
+            elementCount = 2;
+            elementType = GL_SHORT;
+            normalized = GL_TRUE;
+            return;
+        case MGVertexElementFormat::NormalizedShort4:
+            elementCount = 4;
+            elementType = GL_SHORT;
+            normalized = GL_TRUE;
+            return;
+        case MGVertexElementFormat::HalfVector2:
+            elementCount = 2;
+            elementType = GL_HALF_FLOAT;
+            return;
+        case MGVertexElementFormat::HalfVector4:
+            elementCount = 4;
+            elementType = GL_HALF_FLOAT;
+            return;
+        default:
+            MGGL_FAIL("Unsupported vertex element format", "native OpenGL input layout does not recognize this vertex element format");
+        }
+    }
+
+    mgint CountSequentialShaderInputs(const std::string& source)
+    {
+        mgint attributeCount = 0;
+        while (source.find(GetAttributeName(attributeCount)) != std::string::npos)
+            ++attributeCount;
+        return attributeCount;
+    }
+
+    void ApplyPosFixup(MGG_GraphicsDevice* device)
+    {
+        assert(device != nullptr);
+
+        if (device->currentProgram == nullptr || device->currentProgram->posFixupLocation < 0)
+            return;
+
+        GLfloat posFixup[4] = { 1.0f, 1.0f, 0.0f, 0.0f };
+        if (device->currentRenderTarget != nullptr)
+            posFixup[1] = -1.0f;
+
+        device->context.functions.Uniform4fv(device->currentProgram->posFixupLocation, 1, posFixup);
+    }
+
+    void ApplyInputLayout(MGG_GraphicsDevice* device)
+    {
+        assert(device != nullptr);
+
+        EnsureContext(device);
+        EnsureVertexArray(device);
+
+        for (GLuint location = 0; location < device->enabledAttributes.size(); ++location)
+        {
+            if (device->enabledAttributes[location])
+            {
+                device->context.functions.DisableVertexAttribArray(location);
+                device->enabledAttributes[location] = false;
+            }
+        }
+
+        if (device->inputLayout == nullptr)
+            return;
+
+        for (const MGG_InputLayout::Binding& binding : device->inputLayout->bindings)
+        {
+            // TODO: expand the native attribute trackings
+            if (binding.location >= device->enabledAttributes.size())
+                MGGL_FAIL("Unsupported vertex attribute location", "need to expand the native OpenGL attribute tracking range");
+
+            if (binding.vertexBufferSlot >= device->vertexBuffers.size())
+                MGGL_FAIL("Invalid vertex buffer slot", "input layout references a vertex buffer slot outside the device range");
+
+            if (binding.vertexBufferSlot >= device->inputLayout->strides.size())
+                MGGL_FAIL("Invalid vertex buffer stride", "input layout references a stride slot outside the stream count");
+
+            MGG_Buffer* buffer = device->vertexBuffers[binding.vertexBufferSlot];
+            if (buffer == nullptr)
+                MGGL_FAIL("Vertex buffer binding missing", "input layout requires a vertex buffer before drawing");
+
+            mgint stride = device->inputLayout->strides[binding.vertexBufferSlot];
+            intptr_t baseOffset = static_cast<intptr_t>(device->vertexOffsets[binding.vertexBufferSlot]) * stride;
+            intptr_t byteOffset = baseOffset + binding.alignedByteOffset;
+
+            device->context.functions.BindBuffer(GL_ARRAY_BUFFER, buffer->handle);
+            device->context.functions.EnableVertexAttribArray(binding.location);
+            device->context.functions.VertexAttribPointer(
+                binding.location,
+                binding.elementCount,
+                binding.elementType,
+                binding.normalized,
+                stride,
+                reinterpret_cast<const void*>(byteOffset));
+            device->context.functions.VertexAttribDivisor(binding.location, binding.instanceDataStepRate);
+            device->enabledAttributes[binding.location] = true;
+        }
+    }
+
+    void DestroyProgram(MGG_GraphicsDevice* device, MGG_ShaderProgram* program)
+    {
+        assert(device != nullptr);
+
+        if (program == nullptr)
+            return;
+
+        if (device->currentProgram == program)
+        {
+            device->context.functions.UseProgram(0);
+            device->currentProgram = nullptr;
+        }
+
+        if (program->handle != 0)
+        {
+            if (program->vertexShader != nullptr && program->vertexShader->handle != 0)
+                device->context.functions.DetachShader(program->handle, program->vertexShader->handle);
+
+            if (program->pixelShader != nullptr && program->pixelShader->handle != 0)
+                device->context.functions.DetachShader(program->handle, program->pixelShader->handle);
+
+            device->context.functions.DeleteProgram(program->handle);
+        }
+
+        delete program;
+    }
+
+    MGG_ShaderProgram* GetOrCreateProgram(MGG_GraphicsDevice* device)
+    {
+        assert(device != nullptr);
+
+        MGG_Shader* vertexShader = device->shaders[ToStageIndex(MGShaderStage::Vertex)];
+        MGG_Shader* pixelShader = device->shaders[ToStageIndex(MGShaderStage::Pixel)];
+        if (vertexShader == nullptr || pixelShader == nullptr)
+            MGGL_FAIL("Shader program binding incomplete", "vertex and pixel shaders must both be set before linking");
+
+        for (MGG_ShaderProgram* program : device->programs)
+        {
+            if (program->vertexShader == vertexShader && program->pixelShader == pixelShader)
+                return program;
+        }
+
+        MGG_ShaderProgram* program = new MGG_ShaderProgram();
+        program->vertexShader = vertexShader;
+        program->pixelShader = pixelShader;
+        program->handle = device->context.functions.CreateProgram();
+        if (program->handle == 0)
+            MGGL_FAIL("glCreateProgram failed", "shader program creation returned 0");
+
+        device->context.functions.AttachShader(program->handle, vertexShader->handle);
+        device->context.functions.AttachShader(program->handle, pixelShader->handle);
+
+        for (mgint attributeIndex = 0; attributeIndex < vertexShader->attributeCount; ++attributeIndex)
+        {
+            std::string attributeName = GetAttributeName(attributeIndex);
+            device->context.functions.BindAttribLocation(
+                program->handle,
+                static_cast<GLuint>(attributeIndex),
+                attributeName.c_str());
+        }
+
+        device->context.functions.LinkProgram(program->handle);
+
+        GLint linked = GL_FALSE;
+        device->context.functions.GetProgramiv(program->handle, GL_LINK_STATUS, &linked);
+        if (linked != GL_TRUE)
+        {
+            char infoLog[2048] = {};
+            device->context.functions.GetProgramInfoLog(
+                program->handle,
+                static_cast<GLsizei>(sizeof(infoLog)),
+                nullptr,
+                infoLog);
+            DestroyProgram(device, program);
+            MGGL_FAIL("OpenGL program link failed", infoLog[0] != '\0' ? infoLog : "shader program link failed without an info log");
+        }
+
+        device->context.functions.UseProgram(program->handle);
+        program->posFixupLocation = device->context.functions.GetUniformLocation(program->handle, "posFixup");
+
+        for (size_t stageIndex = 0; stageIndex < ShaderStageCount; ++stageIndex)
+        {
+            MGShaderStage stage = stageIndex == 0 ? MGShaderStage::Vertex : MGShaderStage::Pixel;
+            for (mgint slot = 0; slot < GetTextureSlotLimit(stage); ++slot)
+            {
+                std::string samplerName = GetSamplerName(stage, slot);
+                GLint samplerLocation = device->context.functions.GetUniformLocation(program->handle, samplerName.c_str());
+                if (samplerLocation >= 0)
+                    device->context.functions.Uniform1i(samplerLocation, static_cast<GLint>(GetTextureUnit(stage, slot)));
+            }
+
+            MGG_Shader* shader = device->shaders[stageIndex];
+            for (GLenum constantType : shader->constantBufferTypes)
+            {
+                std::string constantBufferName = GetConstantBufferName(stage, constantType);
+                GLint location = device->context.functions.GetUniformLocation(program->handle, constantBufferName.c_str());
+                program->constantBufferLocations[stageIndex].push_back(location);
+            }
+        }
+
+        device->programs.push_back(program);
+        return program;
     }
 
     GLenum ToTextureAddressMode(MGTextureAddressMode mode)
@@ -926,14 +1270,6 @@ namespace
     }
 }
 
-void MGG_EffectResource_GetBytecode(const char* name, mgbyte*& bytecode, mgint& size)
-{
-    assert(name != nullptr);
-    (void)bytecode;
-    (void)size;
-    MGGL_NOT_IMPLEMENTED("MGG_EffectResource_GetBytecode");
-}
-
 MGG_GraphicsSystem* MGG_GraphicsSystem_Create()
 {
     MGG_GraphicsSystem* system = new MGG_GraphicsSystem();
@@ -996,6 +1332,16 @@ void MGG_GraphicsDevice_Destroy(MGG_GraphicsDevice* device)
 {
     assert(device != nullptr);
 
+    if (device->context.handle != nullptr)
+    {
+        EnsureContext(device);
+
+        for (MGG_ShaderProgram* program : device->programs)
+            DestroyProgram(device, program);
+
+        device->programs.clear();
+    }
+
     device->context.Destroy();
     delete device;
 }
@@ -1033,6 +1379,8 @@ void MGG_GraphicsDevice_ResizeSwapchain(
     device->vertexArray = device->context.defaultVertexArray;
     device->context.BindDefaultVertexArray();
     device->currentRenderTarget = nullptr;
+    device->inputLayout = nullptr;
+    device->currentProgram = nullptr;
     device->currentFramebuffer = 0;
     device->context.width = width;
     device->context.height = height;
@@ -1043,6 +1391,15 @@ void MGG_GraphicsDevice_ResizeSwapchain(
     device->backBufferFormat = color;
     device->depthFormat = depth;
     device->multiSampleCount = multiSampleCount;
+    device->viewportX = 0;
+    device->viewportY = 0;
+    device->viewportWidth = width;
+    device->viewportHeight = height;
+    device->viewportMinDepth = 0.0f;
+    device->viewportMaxDepth = 1.0f;
+
+    glViewport(0, 0, width, height);
+    glScissor(0, 0, width, height);
 }
 
 mgint MGG_GraphicsDevice_BeginFrame(MGG_GraphicsDevice* device)
@@ -1265,8 +1622,16 @@ void MGG_GraphicsDevice_SetViewport(MGG_GraphicsDevice* device, mgint x, mgint y
 
     EnsureContext(device);
 
+    device->viewportX = x;
+    device->viewportY = y;
+    device->viewportWidth = width;
+    device->viewportHeight = height;
+    device->viewportMinDepth = minDepth;
+    device->viewportMaxDepth = maxDepth;
+
     glViewport(x, y, width, height);
     glDepthRange(minDepth, maxDepth);
+    ApplyPosFixup(device);
 }
 
 void MGG_GraphicsDevice_SetScissorRectangle(MGG_GraphicsDevice* device, mgint x, mgint y, mgint width, mgint height)
@@ -1292,6 +1657,7 @@ void MGG_GraphicsDevice_SetRenderTargets(MGG_GraphicsDevice* device, MGG_Texture
         glReadBuffer(GL_BACK);
         device->currentRenderTarget = nullptr;
         device->currentFramebuffer = 0;
+        ApplyPosFixup(device);
         return;
     }
 
@@ -1315,15 +1681,43 @@ void MGG_GraphicsDevice_SetRenderTargets(MGG_GraphicsDevice* device, MGG_Texture
     glReadBuffer(GL_COLOR_ATTACHMENT0);
     device->currentRenderTarget = target;
     device->currentFramebuffer = target->framebuffer;
+    ApplyPosFixup(device);
 }
 
 void MGG_GraphicsDevice_SetConstantBuffer(MGG_GraphicsDevice* device, MGShaderStage stage, mgint slot, MGG_Buffer* buffer)
 {
-    (void)device;
-    (void)stage;
-    (void)slot;
-    (void)buffer;
-    MGGL_NOT_IMPLEMENTED("MGG_GraphicsDevice_SetConstantBuffer");
+    assert(device != nullptr);
+    assert(slot >= 0);
+    assert(buffer != nullptr);
+
+    EnsureContext(device);
+
+    size_t stageIndex = ToStageIndex(stage);
+    if (device->currentProgram == nullptr)
+        MGGL_FAIL("Constant buffer binding requires a linked program", "set vertex and pixel shaders before applying effect constants");
+
+    if (static_cast<size_t>(slot) >= device->currentProgram->constantBufferLocations[stageIndex].size())
+        MGGL_FAIL("Invalid constant buffer slot", "shader constant buffer slot is outside the linked program range");
+
+    GLint location = device->currentProgram->constantBufferLocations[stageIndex][slot];
+    if (location < 0)
+        return;
+
+    GLenum constantType = device->shaders[stageIndex]->constantBufferTypes[slot];
+    mgint registerCount = GetConstantRegisterCount(buffer);
+    if (constantType == GL_BOOL || constantType == GL_INT)
+    {
+        device->context.functions.Uniform4iv(
+            location,
+            registerCount,
+            reinterpret_cast<const GLint*>(buffer->shadowData.data()));
+        return;
+    }
+
+    device->context.functions.Uniform4fv(
+        location,
+        registerCount,
+        reinterpret_cast<const GLfloat*>(buffer->shadowData.data()));
 }
 
 void MGG_GraphicsDevice_SetTexture(MGG_GraphicsDevice* device, MGShaderStage stage, mgint slot, MGG_Texture* texture)
@@ -1389,21 +1783,46 @@ void MGG_GraphicsDevice_SetVertexBuffer(MGG_GraphicsDevice* device, mgint slot, 
 
     device->vertexBuffers[slot] = buffer;
     device->vertexOffsets[slot] = vertexOffset;
+    if (device->inputLayout != nullptr)
+        ApplyInputLayout(device);
 }
 
 void MGG_GraphicsDevice_SetShader(MGG_GraphicsDevice* device, MGShaderStage stage, MGG_Shader* shader)
 {
-    (void)device;
-    (void)stage;
-    (void)shader;
-    MGGL_NOT_IMPLEMENTED("MGG_GraphicsDevice_SetShader");
+    assert(device != nullptr);
+    assert(shader != nullptr);
+    assert(shader->stage == stage);
+
+    EnsureContext(device);
+
+    size_t stageIndex = ToStageIndex(stage);
+    device->shaders[stageIndex] = shader;
+
+    if (device->shaders[ToStageIndex(MGShaderStage::Vertex)] == nullptr ||
+        device->shaders[ToStageIndex(MGShaderStage::Pixel)] == nullptr)
+    {
+        return;
+    }
+
+    MGG_ShaderProgram* program = GetOrCreateProgram(device);
+    if (device->currentProgram != program)
+    {
+        device->context.functions.UseProgram(program->handle);
+        device->currentProgram = program;
+    }
+
+    ApplyPosFixup(device);
 }
 
 void MGG_GraphicsDevice_SetInputLayout(MGG_GraphicsDevice* device, MGG_InputLayout* layout)
 {
-    (void)device;
-    (void)layout;
-    MGGL_NOT_IMPLEMENTED("MGG_GraphicsDevice_SetInputLayout");
+    assert(device != nullptr);
+
+    if (layout == nullptr)
+        return;
+
+    device->inputLayout = layout;
+    ApplyInputLayout(device);
 }
 
 void MGG_GraphicsDevice_Draw(MGG_GraphicsDevice* device, MGPrimitiveType primitiveType, mgint vertexStart, mgint vertexCount)
@@ -1930,36 +2349,143 @@ void MGG_Texture_GetData(MGG_GraphicsDevice* device, MGG_Texture* texture, mgint
 
 MGG_InputLayout* MGG_InputLayout_Create(MGG_GraphicsDevice* device, MGG_Shader* vertexShader, mgint* strides, mgint streamCount, MGG_InputElement* elements, mgint elementCount)
 {
-    (void)device;
-    (void)vertexShader;
-    (void)strides;
-    (void)streamCount;
-    (void)elements;
-    (void)elementCount;
-    MGGL_NOT_IMPLEMENTED("MGG_InputLayout_Create");
+    assert(device != nullptr);
+    assert(vertexShader != nullptr);
+    assert(vertexShader->stage == MGShaderStage::Vertex);
+    assert(strides != nullptr);
+    assert(streamCount >= 0);
+    assert(elements != nullptr);
+    assert(elementCount >= 0);
+
+    if (elementCount < vertexShader->attributeCount)
+        MGGL_FAIL("Input layout is missing shader inputs", "vertex declaration does not cover every translated shader attribute");
+
+    MGG_InputLayout* layout = new MGG_InputLayout();
+    layout->strides.assign(strides, strides + streamCount);
+
+    for (mgint elementIndex = 0; elementIndex < elementCount; ++elementIndex)
+    {
+        const MGG_InputElement& element = elements[elementIndex];
+
+        MGG_InputLayout::Binding binding;
+        binding.location = static_cast<GLuint>(elementIndex);
+        binding.vertexBufferSlot = element.VertexBufferSlot;
+        binding.alignedByteOffset = element.AlignedByteOffset;
+        binding.instanceDataStepRate = element.InstanceDataStepRate;
+        ToVertexAttribFormat(element.Format, binding.elementCount, binding.elementType, binding.normalized);
+
+        layout->bindings.push_back(binding);
+        layout->enabledLocations.push_back(binding.location);
+    }
+
+    return layout;
 }
 
 void MGG_InputLayout_Destroy(MGG_GraphicsDevice* device, MGG_InputLayout* layout)
 {
-    (void)device;
-    (void)layout;
-    MGGL_NOT_IMPLEMENTED("MGG_InputLayout_Destroy");
+    assert(device != nullptr);
+
+    if (layout == nullptr)
+        return;
+
+    if (device->inputLayout == layout)
+        device->inputLayout = nullptr;
+
+    delete layout;
 }
 
 MGG_Shader* MGG_Shader_Create(MGG_GraphicsDevice* device, MGShaderStage stage, mgbyte* bytecode, mgint sizeInBytes)
 {
-    (void)device;
-    (void)stage;
-    (void)bytecode;
-    (void)sizeInBytes;
-    MGGL_NOT_IMPLEMENTED("MGG_Shader_Create");
+    assert(device != nullptr);
+    assert(bytecode != nullptr);
+    assert(sizeInBytes > 0);
+
+    EnsureContext(device);
+
+    GLenum shaderType = GL_VERTEX_SHADER;
+    switch (stage)
+    {
+    case MGShaderStage::Vertex:
+        shaderType = GL_VERTEX_SHADER;
+        break;
+    case MGShaderStage::Pixel:
+        shaderType = GL_FRAGMENT_SHADER;
+        break;
+    default:
+        MGGL_FAIL("Unsupported shader stage", "native OpenGL shader creation only supports vertex and pixel stages");
+    }
+
+    MGG_Shader* shader = new MGG_Shader();
+    shader->stage = stage;
+    shader->source.assign(reinterpret_cast<const char*>(bytecode), sizeInBytes);
+    shader->attributeCount = CountSequentialShaderInputs(shader->source);
+
+    if (shader->source.find(GetConstantBufferName(stage, GL_BOOL)) != std::string::npos)
+        shader->constantBufferTypes.push_back(GL_BOOL);
+
+    if (shader->source.find(GetConstantBufferName(stage, GL_INT)) != std::string::npos)
+        shader->constantBufferTypes.push_back(GL_INT);
+
+    if (shader->source.find(GetConstantBufferName(stage, GL_FLOAT)) != std::string::npos)
+        shader->constantBufferTypes.push_back(GL_FLOAT);
+
+    shader->handle = device->context.functions.CreateShader(shaderType);
+    if (shader->handle == 0)
+        MGGL_FAIL("glCreateShader failed", "shader creation returned 0");
+
+    const GLchar* source = shader->source.c_str();
+    GLint sourceLength = static_cast<GLint>(shader->source.size());
+    device->context.functions.ShaderSource(shader->handle, 1, &source, &sourceLength);
+    device->context.functions.CompileShader(shader->handle);
+
+    GLint compiled = GL_FALSE;
+    device->context.functions.GetShaderiv(shader->handle, GL_COMPILE_STATUS, &compiled);
+    if (compiled != GL_TRUE)
+    {
+        char infoLog[2048] = {};
+        device->context.functions.GetShaderInfoLog(
+            shader->handle,
+            static_cast<GLsizei>(sizeof(infoLog)),
+            nullptr,
+            infoLog);
+        device->context.functions.DeleteShader(shader->handle);
+        delete shader;
+        MGGL_FAIL("OpenGL shader compile failed", infoLog[0] != '\0' ? infoLog : "shader compilation failed without an info log");
+    }
+
+    return shader;
 }
 
 void MGG_Shader_Destroy(MGG_GraphicsDevice* device, MGG_Shader* shader)
 {
-    (void)device;
-    (void)shader;
-    MGGL_NOT_IMPLEMENTED("MGG_Shader_Destroy");
+    assert(device != nullptr);
+
+    if (shader == nullptr)
+        return;
+
+    EnsureContext(device);
+
+    size_t stageIndex = ToStageIndex(shader->stage);
+    if (device->shaders[stageIndex] == shader)
+        device->shaders[stageIndex] = nullptr;
+
+    for (size_t i = 0; i < device->programs.size();)
+    {
+        MGG_ShaderProgram* program = device->programs[i];
+        if (program->vertexShader == shader || program->pixelShader == shader)
+        {
+            DestroyProgram(device, program);
+            device->programs.erase(device->programs.begin() + static_cast<ptrdiff_t>(i));
+            continue;
+        }
+
+        ++i;
+    }
+
+    if (shader->handle != 0)
+        device->context.functions.DeleteShader(shader->handle);
+
+    delete shader;
 }
 
 MGG_OcclusionQuery* MGG_OcclusionQuery_Create(MGG_GraphicsDevice* device)
