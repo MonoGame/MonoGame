@@ -21,7 +21,6 @@ namespace Microsoft.Xna.Framework.Graphics
         internal IGraphicsContext Context { get; private set; }
 #endif
 
-#if !GLES
         private DrawBuffersEnum[] _drawBuffers;
         private DrawBuffersEnum[] _maskedDrawBuffers;
 #endif
@@ -320,20 +319,21 @@ namespace Microsoft.Xna.Framework.Graphics
                 glMinorVersion = 1;
             }
 #endif
-
-#if !GLES
             // Initialize draw buffer attachment array
-            int maxDrawBuffers;
-            GL.GetInteger(GetPName.MaxDrawBuffers, out maxDrawBuffers);
-            GraphicsExtensions.CheckGLError ();
-			_drawBuffers = new DrawBuffersEnum[maxDrawBuffers];
-            _maskedDrawBuffers = new DrawBuffersEnum[maxDrawBuffers];
-			for (int i = 0; i < maxDrawBuffers; i++)
+            if ((GL.BoundApi == GL.RenderApi.ES && glMajorVersion >= 3)
+            || (GL.BoundApi == GL.RenderApi.GL))
             {
-				_drawBuffers[i] = (DrawBuffersEnum)(FramebufferAttachment.ColorAttachment0Ext + i);
-                _maskedDrawBuffers[i] = DrawBuffersEnum.None;
+                int maxDrawBuffers;
+                GL.GetInteger(GetPName.MaxDrawBuffers, out maxDrawBuffers);
+                GraphicsExtensions.CheckGLError();
+                _drawBuffers = new DrawBuffersEnum[maxDrawBuffers];
+                _maskedDrawBuffers = new DrawBuffersEnum[maxDrawBuffers];
+                for (int i = 0; i < maxDrawBuffers; i++) 
+                {
+                    _drawBuffers[i] = (DrawBuffersEnum)(FramebufferAttachment.ColorAttachment0Ext + i);
+                    _maskedDrawBuffers[i] = DrawBuffersEnum.None;
+                }
             }
-#endif
         }
 
         private void PlatformInitialize()
@@ -887,7 +887,12 @@ namespace Microsoft.Xna.Framework.Graphics
                                         : DrawBuffersEnum.None;
             }
 
-            GL.DrawBuffers(_currentRenderTargetCount, _maskedDrawBuffers);
+            if ((GL.BoundApi == GL.RenderApi.ES && glMajorVersion >= 3)
+            || (GL.BoundApi == GL.RenderApi.GL))
+            {
+                GL.DrawBuffers(_currentRenderTargetCount, _maskedDrawBuffers);
+            }
+            
             GraphicsExtensions.CheckGLError();
         }
 #endif
@@ -925,6 +930,7 @@ namespace Microsoft.Xna.Framework.Graphics
             {
                 this.framebufferHelper.BindFramebuffer(glFramebuffer);
             }
+
 #if !GLES
             ApplyRenderTargetDrawBuffers(_shaderProgram);
 #endif
