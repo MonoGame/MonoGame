@@ -21,9 +21,7 @@ namespace Microsoft.Xna.Framework.Graphics
         internal IGraphicsContext Context { get; private set; }
 #endif
 
-#if !GLES
         private DrawBuffersEnum[] _drawBuffers;
-#endif
 
         enum ResourceType
         {
@@ -320,15 +318,17 @@ namespace Microsoft.Xna.Framework.Graphics
             }
 #endif
 
-#if !GLES
             // Initialize draw buffer attachment array
-            int maxDrawBuffers;
-            GL.GetInteger(GetPName.MaxDrawBuffers, out maxDrawBuffers);
-            GraphicsExtensions.CheckGLError();
-            _drawBuffers = new DrawBuffersEnum[maxDrawBuffers];
-            for (int i = 0; i < maxDrawBuffers; i++)
-                _drawBuffers[i] = (DrawBuffersEnum)(FramebufferAttachment.ColorAttachment0Ext + i);
-#endif
+            if ((GL.BoundApi == GL.RenderApi.ES && glMajorVersion >= 3)
+            || (GL.BoundApi == GL.RenderApi.GL))
+            {
+                int maxDrawBuffers;
+                GL.GetInteger(GetPName.MaxDrawBuffers, out maxDrawBuffers);
+                GraphicsExtensions.CheckGLError();
+                _drawBuffers = new DrawBuffersEnum[maxDrawBuffers];
+                for (int i = 0; i < maxDrawBuffers; i++)
+                    _drawBuffers[i] = (DrawBuffersEnum)(FramebufferAttachment.ColorAttachment0Ext + i);
+            }
         }
 
         private void PlatformInitialize()
@@ -869,9 +869,12 @@ namespace Microsoft.Xna.Framework.Graphics
             {
                 this.framebufferHelper.BindFramebuffer(glFramebuffer);
             }
-#if !GLES
-            GL.DrawBuffers(this._currentRenderTargetCount, this._drawBuffers);
-#endif
+
+            if ((GL.BoundApi == GL.RenderApi.ES && glMajorVersion >= 3)
+            || (GL.BoundApi == GL.RenderApi.GL))
+            {
+                GL.DrawBuffers(this._currentRenderTargetCount, this._drawBuffers);
+            }
 
             // Reset the raster state because we flip vertices
             // when rendering offscreen and hence the cull direction.
