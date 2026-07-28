@@ -8,6 +8,7 @@ using System.Runtime.InteropServices;
 using Microsoft.Xna.Framework;
 using NUnit.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Graphics.PackedVector;
 
 namespace MonoGame.Tests.Graphics
 {
@@ -500,7 +501,7 @@ namespace MonoGame.Tests.Graphics
             Assert.That(ex.Message, Is.EqualTo("An error occurred while preparing to draw. "
                 + "This is probably because the current vertex declaration does not include all the elements "
                 + "required by the current vertex shader. The current vertex declaration includes these elements: "
-#if VULKAN || DIRECTX12
+#if VULKAN || DIRECTX12 || OPENGL
                 + "POSITION0."));
 #else
                 + "NORMAL0, TEXCOORD0."));
@@ -519,6 +520,118 @@ namespace MonoGame.Tests.Graphics
                 vertexBuffer.Dispose();
             });
             GC.GetTotalMemory(true); // collect uninitialized vertexBuffer
+        }
+
+        [Test]
+        public void TestVertexInterpolation_NormalizedShort4()
+        {
+            TestVertexInterpolation(new NormalizedShort4[]
+            {
+                new NormalizedShort4(0, 0, 0, 0),
+                new NormalizedShort4(0, 1, 0, 0),
+                new NormalizedShort4(1, 0, 0, 0),
+                new NormalizedShort4(1, 1, 0, 0)
+            },
+            VertexElementFormat.NormalizedShort4);
+        }
+
+        [Test]
+        public void TestVertexInterpolation_NormalizedShort2()
+        {
+            TestVertexInterpolation(new NormalizedShort2[]
+            {
+                new NormalizedShort2(0, 0),
+                new NormalizedShort2(0, 1),
+                new NormalizedShort2(1, 0),
+                new NormalizedShort2(1, 1)
+            },
+            VertexElementFormat.NormalizedShort2);
+        }
+
+        private void TestVertexInterpolation<TVertex>(TVertex[] data, VertexElementFormat format)
+            where TVertex : struct
+        {
+            Effect effect = content.Load<Effect>(Paths.CompiledEffect("VertexInterpolationTest"));
+
+            RenderTarget2D rt = null;
+            VertexBuffer vbPos = null;
+            VertexDeclaration decl = null;
+            VertexBuffer vbData = null;
+
+            try
+            {
+                rt = new RenderTarget2D(gd, 256, 256, false,
+                    SurfaceFormat.Color, DepthFormat.None, 0, RenderTargetUsage.PreserveContents);
+
+                Vector3[] posData = new Vector3[]
+                {
+                    new Vector3(-1, -1, 0),
+                    new Vector3(-1, 1, 0),
+                    new Vector3(1, -1, 0),
+                    new Vector3(1, 1, 0),
+                };
+                vbPos = new VertexBuffer(gd, VertexPosition.VertexDeclaration, 4, BufferUsage.WriteOnly);
+                vbPos.SetData(posData);
+
+                decl = new VertexDeclaration(
+                    new VertexElement
+                    {
+                        Offset = 0,
+                        UsageIndex = 0,
+                        VertexElementFormat = format,
+                        VertexElementUsage = VertexElementUsage.TextureCoordinate
+                    });
+
+                vbData = new VertexBuffer(gd, decl, 4, BufferUsage.WriteOnly);
+                vbData.SetData(data);
+
+                gd.SetRenderTarget(rt);
+
+                effect.CurrentTechnique.Passes[0].Apply();
+
+                gd.BlendState = BlendState.Opaque;
+                gd.RasterizerState = RasterizerState.CullNone;
+                gd.DepthStencilState = DepthStencilState.None;
+
+                gd.SetVertexBuffers(new VertexBufferBinding[]
+                {
+                    new VertexBufferBinding(vbPos),
+                    new VertexBufferBinding(vbData)
+                });
+
+                gd.DrawPrimitives(PrimitiveType.TriangleStrip, 0, 2);
+
+                gd.SetRenderTarget(null);
+
+                Color[] color = rt.GetColorData();
+                Vector3[] corners = new Vector3[]
+                {
+                    color[0].ToVector3(),
+                    color[rt.Width - 1].ToVector3(),
+                    color[(rt.Height * rt.Width) - rt.Width].ToVector3(),
+                    color[(rt.Height * rt.Width) - 1].ToVector3(),
+                };
+
+                Vector3[] truth = new Vector3[]
+                {
+                    new Color(0, 255, 0, 255).ToVector3(),
+                    new Color(255, 255, 0, 255).ToVector3(),
+                    new Color(0, 0, 0, 255).ToVector3(),
+                    new Color(255, 0, 0, 255).ToVector3(),
+                };
+
+                Assert.Less((corners[0] - truth[0]).LengthSquared(), 0.001f);
+                Assert.Less((corners[1] - truth[1]).LengthSquared(), 0.001f);
+                Assert.Less((corners[2] - truth[2]).LengthSquared(), 0.001f);
+                Assert.Less((corners[3] - truth[3]).LengthSquared(), 0.001f);
+            }
+            finally
+            {
+                rt?.Dispose();
+                vbPos?.Dispose();
+                decl?.Dispose();
+                vbData?.Dispose();
+            }
         }
     }
 }
