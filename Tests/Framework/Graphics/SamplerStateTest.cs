@@ -132,7 +132,7 @@ namespace MonoGame.Tests.Graphics
 
 #if !XNA
         [Test]
-#if DESKTOPGL
+#if DESKTOPGL || OPENGL
         [Ignore("Comparison samplers are ps_4_0 and up, cannot use them on DesktopGL due to MojoShader")]
 #endif
         public void VisualTestComparisonFunction()

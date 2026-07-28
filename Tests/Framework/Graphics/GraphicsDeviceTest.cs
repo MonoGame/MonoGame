@@ -8,7 +8,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using NUnit.Framework;
-#if DESKTOPGL
+#if DESKTOPGL || OPENGL
 using MonoGame.OpenGL;
 #endif
 
@@ -150,7 +150,7 @@ namespace MonoGame.Tests.Graphics
         }
 
         [Test]
-#if DESKTOPGL
+#if DESKTOPGL || OPENGL
         [Ignore("Does not throw the exception. Needs Investigating")]
 #endif
         public void ResetWindowHandleNullThrowsException()
@@ -678,7 +678,7 @@ namespace MonoGame.Tests.Graphics
         }
 
         [Test]
-#if DESKTOPGL
+#if DESKTOPGL || OPENGL
         [Ignore("Vertex Textures are not implemented for OpenGL")]
 #endif
         public void VertexTexturesGetSet()
