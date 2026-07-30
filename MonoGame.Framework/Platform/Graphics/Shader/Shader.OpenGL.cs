@@ -88,6 +88,22 @@ namespace Microsoft.Xna.Framework.Graphics
 
             upgraded = upgraded.Replace("varying ", "in ");
 
+            if (upgraded.Contains("gl_FragColor"))
+            {
+                upgraded = upgraded.Replace("gl_FragColor", "_mgColor0");
+
+                if (!upgraded.Contains("layout(location = 0) out vec4 _mgColor0;"))
+                {
+                    var marker = "#endif\n";
+                    var decl = "layout(location = 0) out vec4 _mgColor0;\n";
+                    var markerIndex = upgraded.IndexOf(marker, StringComparison.Ordinal);
+                    if (markerIndex >= 0)
+                        upgraded = upgraded.Insert(markerIndex + marker.Length, decl);
+                    else
+                        upgraded = decl + upgraded;
+                }
+            }
+
             for (var i = 0; i < 8; i++)
             {
                 var legacyDefine = $"#define ps_oC{i} gl_FragData[{i}]";
