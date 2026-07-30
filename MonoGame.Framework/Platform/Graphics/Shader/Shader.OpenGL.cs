@@ -5,6 +5,7 @@
 using System;
 using System.IO;
 using System.Diagnostics;
+using System.Text;
 using MonoGame.OpenGL;
 
 namespace Microsoft.Xna.Framework.Graphics
@@ -38,7 +39,12 @@ namespace Microsoft.Xna.Framework.Graphics
             //
             _shaderHandle = GL.CreateShader(Stage == ShaderStage.Vertex ? ShaderType.VertexShader : ShaderType.FragmentShader);
             GraphicsExtensions.CheckGLError();
-            GL.ShaderSource(_shaderHandle, _glslCode);
+
+            var glslCode = _glslCode;
+            if (GL.BoundApi == GL.RenderApi.ES && GraphicsDevice.glMajorVersion >= 3)
+                glslCode = UpgradeEs2ShaderSourceToEs3(glslCode, Stage);
+
+            GL.ShaderSource(_shaderHandle, glslCode);
             GraphicsExtensions.CheckGLError();
             GL.CompileShader(_shaderHandle);
             GraphicsExtensions.CheckGLError();
@@ -52,10 +58,50 @@ namespace Microsoft.Xna.Framework.Graphics
                 GraphicsDevice.DisposeShader(_shaderHandle);
                 _shaderHandle = -1;
 
-                throw new ShaderCompilerException(SourceFile, Entrypoint, Stage, errorLog, _glslCode);
+                throw new ShaderCompilerException(SourceFile, Entrypoint, Stage, errorLog, glslCode);
             }
 
             return _shaderHandle;
+        }
+
+        private static string UpgradeEs2ShaderSourceToEs3(string glslCode, ShaderStage stage)
+        {
+            // Let's hack the emitted code to be ES 3.x syntax, see what happens.
+            var upgraded = glslCode;
+
+            if (!upgraded.Contains("#version"))
+                upgraded = "#version 300 es\n" + upgraded;
+
+            upgraded = upgraded
+                .Replace("texture2D(", "texture(")
+                .Replace("textureCube(", "texture(")
+                .Replace("texture3D(", "texture(");
+
+            if (stage == ShaderStage.Vertex)
+            {
+                upgraded = upgraded
+                    .Replace("attribute ", "in ")
+                    .Replace("varying ", "out ");
+
+                return upgraded;
+            }
+
+            upgraded = upgraded.Replace("varying ", "in ");
+
+            for (var i = 0; i < 8; i++)
+            {
+                var legacyDefine = $"#define ps_oC{i} gl_FragData[{i}]";
+                if (!upgraded.Contains(legacyDefine))
+                    continue;
+
+                var replacement = new StringBuilder();
+                replacement.AppendLine($"layout(location = {i}) out vec4 _mgColor{i};");
+                replacement.Append($"#define ps_oC{i} _mgColor{i}");
+
+                upgraded = upgraded.Replace(legacyDefine, replacement.ToString());
+            }
+
+            return upgraded;
         }
 
         internal void GetVertexAttributeLocations(int program)
