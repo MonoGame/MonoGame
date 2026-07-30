@@ -57,12 +57,8 @@ public partial class GraphicsDevice
     internal bool SupportsBaseIndexInstancing { get; private set; }
     internal bool SupportsSeparateBlendStates { get; private set; }
 
-    private unsafe void PlatformSetup()
+    private unsafe void RefreshCapabilities()
     {
-        // Creates the device, but no swap chain yet.
-        Handle = MGG.GraphicsDevice_Create(NativeGamePlatform.GraphicsSystem, Adapter.Handle);
-
-        // Get the device caps.
         MGG_GraphicsDevice_Caps caps;
         MGG.GraphicsDevice_GetCaps(Handle, out caps);
 
@@ -89,6 +85,14 @@ public partial class GraphicsDevice
         SupportsInstancing = caps.SupportsInstancing;
         SupportsBaseIndexInstancing = caps.SupportsBaseIndexInstancing;
         SupportsSeparateBlendStates = caps.SupportsSeparateBlendStates;
+    }
+
+    private unsafe void PlatformSetup()
+    {
+        // Creates the device, but no swap chain yet.
+        Handle = MGG.GraphicsDevice_Create(NativeGamePlatform.GraphicsSystem, Adapter.Handle);
+
+        RefreshCapabilities();
         UseHalfPixelOffset = false;
     }
 
@@ -106,6 +110,9 @@ public partial class GraphicsDevice
                 PresentationParameters.DepthStencilFormat,
                 PresentationParameters.MultiSampleCount,
                 PresentationParameters.PresentationInterval.GetSyncInterval());
+
+        RefreshCapabilities();
+        GraphicsCapabilities.Initialize(this);
 
         // Setup the default texture.
         DefaultTexture = new Texture2D(this, 2, 2);
@@ -140,6 +147,9 @@ public partial class GraphicsDevice
             PresentationParameters.DepthStencilFormat,
             PresentationParameters.MultiSampleCount,
             PresentationParameters.PresentationInterval.GetSyncInterval());
+
+        RefreshCapabilities();
+        GraphicsCapabilities.Initialize(this);
 
         _viewport = new Viewport(
             0,
