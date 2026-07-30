@@ -2,12 +2,13 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
-using System;
-using System.IO;
-using System.Text;
-using System.Runtime.InteropServices;
-using System.Diagnostics;
 using MonoGame.Framework.Utilities;
+using System;
+using System.Diagnostics;
+using System.Diagnostics.Contracts;
+using System.IO;
+using System.Runtime.InteropServices;
+using System.Text;
 
 internal static class Sdl
 {
@@ -142,17 +143,20 @@ internal static class Sdl
         public byte Minor;
         public byte Patch;
 
+        [Pure]
         public static bool operator >(Version version1, Version version2)
         {
             return ConcatenateVersion(version1) > ConcatenateVersion(version2);
         }
 
+        [Pure]
         public static bool operator <(Version version1, Version version2)
         {
             return ConcatenateVersion(version1) < ConcatenateVersion(version2);
         }
 
 
+        [Pure]
         public static bool operator ==(Version version1, Version version2)
         {
             return version1.Major == version2.Major &&
@@ -180,21 +184,25 @@ internal static class Sdl
             }
         }
 
+        [Pure]
         public static bool operator !=(Version version1, Version version2)
         {
             return !(version1 == version2);
         }
 
+        [Pure]
         public static bool operator >=(Version version1, Version version2)
         {
             return version1 == version2 || version1 > version2;
         }
 
+        [Pure]
         public static bool operator <=(Version version1, Version version2)
         {
             return version1 == version2 || version1 < version2;
         }
 
+        [Pure]
         public override string ToString()
         {
             return Major + "." + Minor + "." + Patch;

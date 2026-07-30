@@ -1,4 +1,5 @@
-﻿using System.Runtime.InteropServices;
+﻿using System.Diagnostics.Contracts;
+using System.Runtime.InteropServices;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
@@ -65,6 +66,7 @@ namespace Microsoft.Xna.Framework.Graphics
         /// <returns>
         /// <see langword="true"/> if the objects are the same; <see langword="false"/> otherwise.
         /// </returns>
+        [Pure]
         public static bool operator ==(VertexPositionColorNormal left, VertexPositionColorNormal right)
         {
             return (((left.Position == right.Position) && (left.Color == right.Color)) && (left.Normal == right.Normal));
@@ -78,6 +80,7 @@ namespace Microsoft.Xna.Framework.Graphics
         /// <returns>
         /// <see langword="true"/> if the objects are different; <see langword="false"/> otherwise.
         /// </returns>
+        [Pure]
         public static bool operator !=(VertexPositionColorNormal left, VertexPositionColorNormal right)
         {
             return !(left == right);

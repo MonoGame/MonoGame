@@ -5,6 +5,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Diagnostics.Contracts;
 using System.Runtime.Serialization;
 
 namespace Microsoft.Xna.Framework
@@ -389,6 +390,7 @@ namespace Microsoft.Xna.Framework
         /// <param name="count">The number of points to iterate</param>
         /// <returns>A bounding box that encapsulates the given point cloud.</returns>
         /// <exception cref="System.ArgumentException">Thrown if the given array is null or has no points.</exception>
+        [Pure]
         public static BoundingBox CreateFromPoints(Vector3[] points, int index = 0, int count = -1)
         {
             if (points == null || points.Length == 0)
@@ -422,6 +424,7 @@ namespace Microsoft.Xna.Framework
         /// <param name="count">The number of points to iterate</param>
         /// <returns>A bounding box that encapsulates the given point cloud.</returns>
         /// <exception cref="System.ArgumentException">Thrown if the given list is null or has no points.</exception>
+        [Pure]
         public static BoundingBox CreateFromPoints(List<Vector3> points, int index = 0, int count = -1)
         {
             if (points == null || points.Count == 0)
@@ -453,6 +456,7 @@ namespace Microsoft.Xna.Framework
         /// <param name="points">The list of <see cref="Vector3"/> instances defining the point cloud to bound.</param>
         /// <returns>A <see cref="BoundingBox"/> that encloses the given point cloud.</returns>
         /// <exception cref="System.ArgumentException">Thrown if the given list has no points.</exception>
+        [Pure]
         public static BoundingBox CreateFromPoints(IEnumerable<Vector3> points)
         {
             if (points == null)
@@ -484,6 +488,7 @@ namespace Microsoft.Xna.Framework
         /// </summary>
         /// <param name="sphere">The <see cref="BoundingSphere"/> to enclose.</param>
         /// <returns>A <see cref="BoundingBox"/> enclosing <paramref name="sphere"/>.</returns>
+        [Pure]
         public static BoundingBox CreateFromSphere(BoundingSphere sphere)
         {
             BoundingBox result;
@@ -511,6 +516,7 @@ namespace Microsoft.Xna.Framework
         /// <returns>
         ///   The <see cref="BoundingBox"/> enclosing <paramref name="original"/> and <paramref name="additional"/>.
         /// </returns>
+        [Pure]
         public static BoundingBox CreateMerged(BoundingBox original, BoundingBox additional)
         {
             BoundingBox result;
@@ -841,6 +847,7 @@ namespace Microsoft.Xna.Framework
         ///   <code>true</code> if <paramref name="a"/> is equal to this <paramref name="b"/>,
         ///   <code>false</code> if it is not.
         /// </returns>
+        [Pure]
         public static bool operator ==(BoundingBox a, BoundingBox b)
         {
             return a.Equals(b);
@@ -855,6 +862,7 @@ namespace Microsoft.Xna.Framework
         ///   <code>true</code> if <paramref name="a"/> is not equal to this <paramref name="b"/>,
         ///   <code>false</code> if it is.
         /// </returns>
+        [Pure]
         public static bool operator !=(BoundingBox a, BoundingBox b)
         {
             return !a.Equals(b);

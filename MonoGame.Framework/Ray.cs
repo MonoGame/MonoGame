@@ -4,6 +4,7 @@
 
 using System;
 using System.Diagnostics;
+using System.Diagnostics.Contracts;
 using System.Runtime.Serialization;
 
 namespace Microsoft.Xna.Framework
@@ -313,6 +314,7 @@ namespace Microsoft.Xna.Framework
         /// <param name="a">A ray to check for inequality.</param>
         /// <param name="b">A ray to check for inequality.</param>
         /// <returns><code>true</code> if the two rays are not equal, <code>false</code> if they are.</returns>
+        [Pure]
         public static bool operator !=(Ray a, Ray b)
         {
             return !a.Equals(b);
@@ -324,6 +326,7 @@ namespace Microsoft.Xna.Framework
         /// <param name="a">A ray to check for equality.</param>
         /// <param name="b">A ray to check for equality.</param>
         /// <returns><code>true</code> if the two rays are equals, <code>false</code> if they are not.</returns>
+        [Pure]
         public static bool operator ==(Ray a, Ray b)
         {
             return a.Equals(b);

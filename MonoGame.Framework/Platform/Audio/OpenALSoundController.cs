@@ -1,11 +1,12 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.IO;
-using System.Runtime.InteropServices;
 using MonoGame.Framework.Utilities;
 using MonoGame.OpenAL;
 using MonoGame.OpenGL;
+using System;
+using System.Collections.Generic;
+using System.Diagnostics.Contracts;
+using System.IO;
+using System.Linq;
+using System.Runtime.InteropServices;
 
 #if ANDROID
 using System.Globalization;
@@ -37,6 +38,7 @@ namespace Microsoft.Xna.Framework.Audio
             }
         }
 
+        [Pure]
         public static bool IsStereoFormat(ALFormat format)
         {
             return (format == ALFormat.Stereo8

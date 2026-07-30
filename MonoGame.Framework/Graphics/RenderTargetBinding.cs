@@ -5,6 +5,7 @@
 // Author: Kenneth James Pouncey
 
 using System;
+using System.Diagnostics.Contracts;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
@@ -91,6 +92,7 @@ namespace Microsoft.Xna.Framework.Graphics
         /// The <paramref name="arraySlice" /> is less than zero or greater than the array size of the render target
         /// </exception>
         /// <exception cref="InvalidOperationException">Texture arrays are not supported by the current graphics device.</exception>
+        [Pure]
         public RenderTargetBinding(RenderTarget2D renderTarget, int arraySlice)
         {
             if (renderTarget == null)
@@ -148,6 +150,7 @@ namespace Microsoft.Xna.Framework.Graphics
         /// </summary>
         /// <param name="renderTarget">The render target to convert.</param>
         /// <returns>A new <b>RenderTargetBinding</b> instance bound to the specified render target.</returns>
+        [Pure]
         public static implicit operator RenderTargetBinding(RenderTarget2D renderTarget)
         {
             return new RenderTargetBinding(renderTarget);
@@ -160,11 +163,12 @@ namespace Microsoft.Xna.Framework.Graphics
         /// </summary>
         /// <param name="renderTarget">The render target to convert.</param>
         /// <returns>A new <b>RenderTargetBinding</b> instance bound to the specified render target.</returns>
+        [Pure]
         public static implicit operator RenderTargetBinding(RenderTarget3D renderTarget)
         {
             return new RenderTargetBinding(renderTarget);
         }
 
 #endif
-	}
+    }
 }

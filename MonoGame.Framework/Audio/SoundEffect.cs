@@ -3,6 +3,7 @@
 // file 'LICENSE.txt', which is part of this source code package.
 ﻿
 using System;
+using System.Diagnostics.Contracts;
 using System.IO;
 
 namespace Microsoft.Xna.Framework.Audio
@@ -293,6 +294,7 @@ namespace Microsoft.Xna.Framework.Audio
         /// <param name="sampleRate">Sample rate, in Hertz (Hz). Must be between 8000 Hz and 48000 Hz</param>
         /// <param name="channels">Number of channels in the audio data.</param>
         /// <returns>The duration of the audio data.</returns>
+        [Pure]
         public static TimeSpan GetSampleDuration(int sizeInBytes, int sampleRate, AudioChannels channels)
         {
             if (sizeInBytes < 0)
@@ -324,6 +326,7 @@ namespace Microsoft.Xna.Framework.Audio
         /// <param name="sampleRate">Sample rate, in Hertz (Hz), of audio data. Must be between 8,000 and 48,000 Hz.</param>
         /// <param name="channels">Number of channels in the audio data.</param>
         /// <returns>The size in bytes of a single sample of audio data.</returns>
+        [Pure]
         public static int GetSampleSizeInBytes(TimeSpan duration, int sampleRate, AudioChannels channels)
         {
             if (duration < TimeSpan.Zero || duration > TimeSpan.FromMilliseconds(0x7FFFFFF))

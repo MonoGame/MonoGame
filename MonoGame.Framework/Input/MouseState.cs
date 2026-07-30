@@ -2,6 +2,8 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
+using System.Diagnostics.Contracts;
+
 namespace Microsoft.Xna.Framework.Input
 {
     /// <summary>
@@ -99,6 +101,7 @@ namespace Microsoft.Xna.Framework.Input
         /// <param name="left">MouseState instance on the left of the equal sign.</param>
         /// <param name="right">MouseState instance  on the right of the equal sign.</param>
         /// <returns>true if the instances are equal; false otherwise.</returns>
+        [Pure]
         public static bool operator ==(MouseState left, MouseState right)
         {
             return left._x == right._x &&
@@ -114,6 +117,7 @@ namespace Microsoft.Xna.Framework.Input
         /// <param name="left">MouseState instance on the left of the equal sign.</param>
         /// <param name="right">MouseState instance  on the right of the equal sign.</param>
         /// <returns>true if the objects are not equal; false otherwise.</returns>
+        [Pure]
         public static bool operator !=(MouseState left, MouseState right)
         {
             return !(left == right);

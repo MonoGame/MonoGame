@@ -1,13 +1,15 @@
-﻿using System;
+﻿using Microsoft.Xna.Framework.Graphics.PackedVector;
+using System;
 using System.ComponentModel;
-using System.Globalization;
-using Microsoft.Xna.Framework.Graphics.PackedVector;
 using System.Diagnostics.CodeAnalysis;
+using System.Diagnostics.Contracts;
+using System.Globalization;
 
 namespace Microsoft.Xna.Framework.Design
 {
     internal static class VectorConversion
     {
+        [Pure]
         public static bool CanConvertTo(ITypeDescriptorContext context, [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.Interfaces)] Type destinationType)
         {
             if (destinationType == typeof(float))
@@ -24,6 +26,7 @@ namespace Microsoft.Xna.Framework.Design
             return false;
         }
 
+        [Pure]
         public static object ConvertToFromVector4(ITypeDescriptorContext context, CultureInfo culture, Vector4 value, [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.Interfaces | DynamicallyAccessedMemberTypes.PublicParameterlessConstructor)] Type destinationType)
         {
             if (destinationType == typeof(float))

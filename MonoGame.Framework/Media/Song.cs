@@ -3,6 +3,7 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System;
+using System.Diagnostics.Contracts;
 using System.IO;
 
 namespace Microsoft.Xna.Framework.Media
@@ -150,7 +151,8 @@ namespace Microsoft.Xna.Framework.Media
         /// <summary>
         /// Determines whether the specified Song instances are equal.
         /// </summary>
-		public static bool operator ==(Song song1, Song song2)
+		[Pure]
+        public static bool operator ==(Song song1, Song song2)
 		{
 			if((object)song1 == null)
 			{
@@ -163,6 +165,7 @@ namespace Microsoft.Xna.Framework.Media
         /// <summary>
         /// Determines whether the specified Song instances are not equal.
         /// </summary>
+        [Pure]
         public static bool operator !=(Song song1, Song song2)
 		{
 		    return !(song1 == song2);

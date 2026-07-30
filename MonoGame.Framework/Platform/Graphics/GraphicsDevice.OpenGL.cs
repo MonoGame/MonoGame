@@ -6,6 +6,8 @@ using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using System.Diagnostics;
+using System.Diagnostics.Contracts;
+
 
 #if ANGLE
 using OpenTK.Graphics;
@@ -40,31 +42,37 @@ namespace Microsoft.Xna.Framework.Graphics
             public ResourceType type;
             public int handle;
 
+            [Pure]
             public static ResourceHandle Texture(int handle)
             {
                 return new ResourceHandle() { type = ResourceType.Texture, handle = handle };
             }
 
+            [Pure]
             public static ResourceHandle Buffer(int handle)
             {
                 return new ResourceHandle() { type = ResourceType.Buffer, handle = handle };
             }
 
+            [Pure]
             public static ResourceHandle Shader(int handle)
             {
                 return new ResourceHandle() { type = ResourceType.Shader, handle = handle };
             }
 
+            [Pure]
             public static ResourceHandle Program(int handle)
             {
                 return new ResourceHandle() { type = ResourceType.Program, handle = handle };
             }
 
+            [Pure]
             public static ResourceHandle Query(int handle)
             {
                 return new ResourceHandle() { type = ResourceType.Query, handle = handle };
             }
 
+            [Pure]
             public static ResourceHandle Framebuffer(int handle)
             {
                 return new ResourceHandle() { type = ResourceType.Framebuffer, handle = handle };

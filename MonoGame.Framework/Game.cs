@@ -5,6 +5,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Diagnostics.Contracts;
 using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
@@ -1176,6 +1177,7 @@ namespace Microsoft.Xna.Framework
                 Item = item;
             }
 
+            [Pure]
             public static AddJournalEntry<T> CreateKey(T item)
             {
                 return new AddJournalEntry<T>(-1, item);

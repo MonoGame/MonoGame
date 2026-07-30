@@ -4,8 +4,9 @@
 
 using System;
 using System.Diagnostics;
-using System.Text;
+using System.Diagnostics.Contracts;
 using System.Runtime.Serialization;
+using System.Text;
 
 namespace Microsoft.Xna.Framework
 {
@@ -202,9 +203,9 @@ namespace Microsoft.Xna.Framework
             this.Y = value.Y;
             this.Z = z;
         }
-        
+
         #endregion
-        
+
         #region Public Methods
 
         /// <summary>
@@ -213,6 +214,7 @@ namespace Microsoft.Xna.Framework
         /// <param name="value1">The first vector to add.</param>
         /// <param name="value2">The second vector to add.</param>
         /// <returns>The result of the vector addition.</returns>
+        [Pure]
         public static Vector3 Add(Vector3 value1, Vector3 value2)
         {
             value1.X += value2.X;
@@ -245,6 +247,7 @@ namespace Microsoft.Xna.Framework
         /// <param name="amount1">Barycentric scalar <c>b2</c> which represents a weighting factor towards second vector of 3d-triangle.</param>
         /// <param name="amount2">Barycentric scalar <c>b3</c> which represents a weighting factor towards third vector of 3d-triangle.</param>
         /// <returns>The cartesian translation of barycentric coordinates.</returns>
+        [Pure]
         public static Vector3 Barycentric(Vector3 value1, Vector3 value2, Vector3 value3, float amount1, float amount2)
         {
             return new Vector3(
@@ -278,6 +281,7 @@ namespace Microsoft.Xna.Framework
         /// <param name="value4">The fourth vector in interpolation.</param>
         /// <param name="amount">Weighting factor.</param>
         /// <returns>The result of CatmullRom interpolation.</returns>
+        [Pure]
         public static Vector3 CatmullRom(Vector3 value1, Vector3 value2, Vector3 value3, Vector3 value4, float amount)
         {
             return new Vector3(
@@ -317,6 +321,7 @@ namespace Microsoft.Xna.Framework
         /// </summary>
         /// <param name="value">Source <see cref="Vector3"/>.</param>
         /// <returns>The rounded <see cref="Vector3"/>.</returns>
+        [Pure]
         public static Vector3 Ceiling(Vector3 value)
         {
             value.X = MathF.Ceiling(value.X);
@@ -344,6 +349,7 @@ namespace Microsoft.Xna.Framework
         /// <param name="min">The min value.</param>
         /// <param name="max">The max value.</param>
         /// <returns>The clamped value.</returns>
+        [Pure]
         public static Vector3 Clamp(Vector3 value1, Vector3 min, Vector3 max)
         {
             return new Vector3(
@@ -372,6 +378,7 @@ namespace Microsoft.Xna.Framework
         /// <param name="vector1">The first vector.</param>
         /// <param name="vector2">The second vector.</param>
         /// <returns>The cross product of two vectors.</returns>
+        [Pure]
         public static Vector3 Cross(Vector3 vector1, Vector3 vector2)
         {
             Cross(ref vector1, ref vector2, out vector1);
@@ -400,6 +407,7 @@ namespace Microsoft.Xna.Framework
         /// <param name="value1">The first vector.</param>
         /// <param name="value2">The second vector.</param>
         /// <returns>The distance between two vectors.</returns>
+        [Pure]
         public static float Distance(Vector3 value1, Vector3 value2)
         {
             float result;
@@ -425,6 +433,7 @@ namespace Microsoft.Xna.Framework
         /// <param name="value1">The first vector.</param>
         /// <param name="value2">The second vector.</param>
         /// <returns>The squared distance between two vectors.</returns>
+        [Pure]
         public static float DistanceSquared(Vector3 value1, Vector3 value2)
         {
             return  (value1.X - value2.X) * (value1.X - value2.X) +
@@ -451,6 +460,7 @@ namespace Microsoft.Xna.Framework
         /// <param name="value1">Source <see cref="Vector3"/>.</param>
         /// <param name="value2">Divisor <see cref="Vector3"/>.</param>
         /// <returns>The result of dividing the vectors.</returns>
+        [Pure]
         public static Vector3 Divide(Vector3 value1, Vector3 value2)
         {
             value1.X /= value2.X;
@@ -465,6 +475,7 @@ namespace Microsoft.Xna.Framework
         /// <param name="value1">Source <see cref="Vector3"/>.</param>
         /// <param name="divider">Divisor scalar.</param>
         /// <returns>The result of dividing a vector by a scalar.</returns>
+        [Pure]
         public static Vector3 Divide(Vector3 value1, float divider)
         {
             float factor = 1 / divider;
@@ -507,6 +518,7 @@ namespace Microsoft.Xna.Framework
         /// <param name="value1">The first vector.</param>
         /// <param name="value2">The second vector.</param>
         /// <returns>The dot product of two vectors.</returns>
+        [Pure]
         public static float Dot(Vector3 value1, Vector3 value2)
         {
             return value1.X * value2.X + value1.Y * value2.Y + value1.Z * value2.Z;
@@ -566,6 +578,7 @@ namespace Microsoft.Xna.Framework
         /// </summary>
         /// <param name="value">Source <see cref="Vector3"/>.</param>
         /// <returns>The rounded <see cref="Vector3"/>.</returns>
+        [Pure]
         public static Vector3 Floor(Vector3 value)
         {
             value.X = MathF.Floor(value.X);
@@ -609,6 +622,7 @@ namespace Microsoft.Xna.Framework
         /// <param name="tangent2">The second tangent vector.</param>
         /// <param name="amount">Weighting factor.</param>
         /// <returns>The hermite spline interpolation vector.</returns>
+        [Pure]
         public static Vector3 Hermite(Vector3 value1, Vector3 tangent1, Vector3 value2, Vector3 tangent2, float amount)
         {
             return new Vector3(MathHelper.Hermite(value1.X, tangent1.X, value2.X, tangent2.X, amount),
@@ -657,6 +671,7 @@ namespace Microsoft.Xna.Framework
         /// <param name="value2">The second vector.</param>
         /// <param name="amount">Weighting value(between 0.0 and 1.0).</param>
         /// <returns>The result of linear interpolation of the specified vectors.</returns>
+        [Pure]
         public static Vector3 Lerp(Vector3 value1, Vector3 value2, float amount)
         {
             return new Vector3(
@@ -689,6 +704,7 @@ namespace Microsoft.Xna.Framework
         /// <param name="value2">The second vector.</param>
         /// <param name="amount">Weighting value(between 0.0 and 1.0).</param>
         /// <returns>The result of linear interpolation of the specified vectors.</returns>
+        [Pure]
         public static Vector3 LerpPrecise(Vector3 value1, Vector3 value2, float amount)
         {
             return new Vector3(
@@ -720,6 +736,7 @@ namespace Microsoft.Xna.Framework
         /// <param name="value1">The first vector.</param>
         /// <param name="value2">The second vector.</param>
         /// <returns>The <see cref="Vector3"/> with maximal values from the two vectors.</returns>
+        [Pure]
         public static Vector3 Max(Vector3 value1, Vector3 value2)
         {
             return new Vector3(
@@ -747,6 +764,7 @@ namespace Microsoft.Xna.Framework
         /// <param name="value1">The first vector.</param>
         /// <param name="value2">The second vector.</param>
         /// <returns>The <see cref="Vector3"/> with minimal values from the two vectors.</returns>
+        [Pure]
         public static Vector3 Min(Vector3 value1, Vector3 value2)
         {
             return new Vector3(
@@ -774,6 +792,7 @@ namespace Microsoft.Xna.Framework
         /// <param name="value1">Source <see cref="Vector3"/>.</param>
         /// <param name="value2">Source <see cref="Vector3"/>.</param>
         /// <returns>The result of the vector multiplication.</returns>
+        [Pure]
         public static Vector3 Multiply(Vector3 value1, Vector3 value2)
         {
             value1.X *= value2.X;
@@ -788,6 +807,7 @@ namespace Microsoft.Xna.Framework
         /// <param name="value1">Source <see cref="Vector3"/>.</param>
         /// <param name="scaleFactor">Scalar value.</param>
         /// <returns>The result of the vector multiplication with a scalar.</returns>
+        [Pure]
         public static Vector3 Multiply(Vector3 value1, float scaleFactor)
         {
             value1.X *= scaleFactor;
@@ -827,6 +847,7 @@ namespace Microsoft.Xna.Framework
         /// </summary>
         /// <param name="value">Source <see cref="Vector3"/>.</param>
         /// <returns>The result of the vector inversion.</returns>
+        [Pure]
         public static Vector3 Negate(Vector3 value)
         {
             value = new Vector3(-value.X, -value.Y, -value.Z);
@@ -862,6 +883,7 @@ namespace Microsoft.Xna.Framework
         /// </summary>
         /// <param name="value">Source <see cref="Vector3"/>.</param>
         /// <returns>Unit vector.</returns>
+        [Pure]
         public static Vector3 Normalize(Vector3 value)
         {
             float factor = MathF.Sqrt((value.X * value.X) + (value.Y * value.Y) + (value.Z * value.Z));
@@ -889,6 +911,7 @@ namespace Microsoft.Xna.Framework
         /// <param name="vector">Source <see cref="Vector3"/>.</param>
         /// <param name="normal">Reflection normal.</param>
         /// <returns>Reflected vector.</returns>
+        [Pure]
         public static Vector3 Reflect(Vector3 vector, Vector3 normal)
         {
             // I is the original array
@@ -938,6 +961,7 @@ namespace Microsoft.Xna.Framework
         /// </summary>
         /// <param name="value">Source <see cref="Vector3"/>.</param>
         /// <returns>The rounded <see cref="Vector3"/>.</returns>
+        [Pure]
         public static Vector3 Round(Vector3 value)
         {
             value.X = MathF.Round(value.X);
@@ -965,6 +989,7 @@ namespace Microsoft.Xna.Framework
         /// <param name="value2">Source <see cref="Vector3"/>.</param>
         /// <param name="amount">Weighting value.</param>
         /// <returns>Cubic interpolation of the specified vectors.</returns>
+        [Pure]
         public static Vector3 SmoothStep(Vector3 value1, Vector3 value2, float amount)
         {
             return new Vector3(
@@ -993,6 +1018,7 @@ namespace Microsoft.Xna.Framework
         /// <param name="value1">Source <see cref="Vector3"/>.</param>
         /// <param name="value2">Source <see cref="Vector3"/>.</param>
         /// <returns>The result of the vector subtraction.</returns>
+        [Pure]
         public static Vector3 Subtract(Vector3 value1, Vector3 value2)
         {
             value1.X -= value2.X;
@@ -1040,6 +1066,7 @@ namespace Microsoft.Xna.Framework
         /// <param name="position">Source <see cref="Vector3"/>.</param>
         /// <param name="matrix">The transformation <see cref="Matrix"/>.</param>
         /// <returns>Transformed <see cref="Vector3"/>.</returns>
+        [Pure]
         public static Vector3 Transform(Vector3 position, Matrix matrix)
         {
             Transform(ref position, ref matrix, out position);
@@ -1068,6 +1095,7 @@ namespace Microsoft.Xna.Framework
         /// <param name="value">Source <see cref="Vector3"/>.</param>
         /// <param name="rotation">The <see cref="Quaternion"/> which contains rotation transformation.</param>
         /// <returns>Transformed <see cref="Vector3"/>.</returns>
+        [Pure]
         public static Vector3 Transform(Vector3 value, Quaternion rotation)
         {
             Vector3 result;
@@ -1234,6 +1262,7 @@ namespace Microsoft.Xna.Framework
         /// <param name="normal">Source <see cref="Vector3"/> which represents a normal vector.</param>
         /// <param name="matrix">The transformation <see cref="Matrix"/>.</param>
         /// <returns>Transformed normal.</returns>
+        [Pure]
         public static Vector3 TransformNormal(Vector3 normal, Matrix matrix)
         {
             TransformNormal(ref normal, ref matrix, out normal);
@@ -1351,6 +1380,7 @@ namespace Microsoft.Xna.Framework
         /// Converts a <see cref="System.Numerics.Vector3"/> to a <see cref="Vector3"/>.
         /// </summary>
         /// <param name="value">The converted value.</param>
+        [Pure]
         public static implicit operator Vector3(System.Numerics.Vector3 value)
         {
             return new Vector3(value.X, value.Y, value.Z);
@@ -1362,6 +1392,7 @@ namespace Microsoft.Xna.Framework
         /// <param name="value1"><see cref="Vector3"/> instance on the left of the equal sign.</param>
         /// <param name="value2"><see cref="Vector3"/> instance on the right of the equal sign.</param>
         /// <returns><c>true</c> if the instances are equal; <c>false</c> otherwise.</returns>
+        [Pure]
         public static bool operator ==(Vector3 value1, Vector3 value2)
         {
             return value1.X == value2.X
@@ -1375,6 +1406,7 @@ namespace Microsoft.Xna.Framework
         /// <param name="value1"><see cref="Vector3"/> instance on the left of the not equal sign.</param>
         /// <param name="value2"><see cref="Vector3"/> instance on the right of the not equal sign.</param>
         /// <returns><c>true</c> if the instances are not equal; <c>false</c> otherwise.</returns>	
+        [Pure]
         public static bool operator !=(Vector3 value1, Vector3 value2)
         {
             return !(value1 == value2);
@@ -1386,6 +1418,7 @@ namespace Microsoft.Xna.Framework
         /// <param name="value1">Source <see cref="Vector3"/> on the left of the add sign.</param>
         /// <param name="value2">Source <see cref="Vector3"/> on the right of the add sign.</param>
         /// <returns>Sum of the vectors.</returns>
+        [Pure]
         public static Vector3 operator +(Vector3 value1, Vector3 value2)
         {
             value1.X += value2.X;
@@ -1399,6 +1432,7 @@ namespace Microsoft.Xna.Framework
         /// </summary>
         /// <param name="value">Source <see cref="Vector3"/> on the right of the sub sign.</param>
         /// <returns>Result of the inversion.</returns>
+        [Pure]
         public static Vector3 operator -(Vector3 value)
         {
             value = new Vector3(-value.X, -value.Y, -value.Z);
@@ -1411,6 +1445,7 @@ namespace Microsoft.Xna.Framework
         /// <param name="value1">Source <see cref="Vector3"/> on the left of the sub sign.</param>
         /// <param name="value2">Source <see cref="Vector3"/> on the right of the sub sign.</param>
         /// <returns>Result of the vector subtraction.</returns>
+        [Pure]
         public static Vector3 operator -(Vector3 value1, Vector3 value2)
         {
             value1.X -= value2.X;
@@ -1425,6 +1460,7 @@ namespace Microsoft.Xna.Framework
         /// <param name="value1">Source <see cref="Vector3"/> on the left of the mul sign.</param>
         /// <param name="value2">Source <see cref="Vector3"/> on the right of the mul sign.</param>
         /// <returns>Result of the vector multiplication.</returns>
+        [Pure]
         public static Vector3 operator *(Vector3 value1, Vector3 value2)
         {
             value1.X *= value2.X;
@@ -1439,6 +1475,7 @@ namespace Microsoft.Xna.Framework
         /// <param name="value">Source <see cref="Vector3"/> on the left of the mul sign.</param>
         /// <param name="scaleFactor">Scalar value on the right of the mul sign.</param>
         /// <returns>Result of the vector multiplication with a scalar.</returns>
+        [Pure]
         public static Vector3 operator *(Vector3 value, float scaleFactor)
         {
             value.X *= scaleFactor;
@@ -1453,6 +1490,7 @@ namespace Microsoft.Xna.Framework
         /// <param name="scaleFactor">Scalar value on the left of the mul sign.</param>
         /// <param name="value">Source <see cref="Vector3"/> on the right of the mul sign.</param>
         /// <returns>Result of the vector multiplication with a scalar.</returns>
+        [Pure]
         public static Vector3 operator *(float scaleFactor, Vector3 value)
         {
             value.X *= scaleFactor;
@@ -1467,6 +1505,7 @@ namespace Microsoft.Xna.Framework
         /// <param name="value1">Source <see cref="Vector3"/> on the left of the div sign.</param>
         /// <param name="value2">Divisor <see cref="Vector3"/> on the right of the div sign.</param>
         /// <returns>The result of dividing the vectors.</returns>
+        [Pure]
         public static Vector3 operator /(Vector3 value1, Vector3 value2)
         {
             value1.X /= value2.X;
@@ -1481,6 +1520,7 @@ namespace Microsoft.Xna.Framework
         /// <param name="value1">Source <see cref="Vector3"/> on the left of the div sign.</param>
         /// <param name="divider">Divisor scalar on the right of the div sign.</param>
         /// <returns>The result of dividing a vector by a scalar.</returns>
+        [Pure]
         public static Vector3 operator /(Vector3 value1, float divider)
         {
             float factor = 1 / divider;

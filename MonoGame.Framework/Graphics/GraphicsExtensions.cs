@@ -4,6 +4,8 @@
 
 using System;
 using System.Diagnostics;
+using System.Diagnostics.Contracts;
+
 
 #if OPENGL
 #if DESKTOPGL || GLES
@@ -20,6 +22,7 @@ namespace Microsoft.Xna.Framework.Graphics
     static class GraphicsExtensions
     {
 #if OPENGL
+        [Pure]
         public static int OpenGLNumberOfElements(this VertexElementFormat elementFormat)
         {
             switch (elementFormat)
@@ -64,6 +67,7 @@ namespace Microsoft.Xna.Framework.Graphics
             throw new ArgumentException();
         }
 
+        [Pure]
         public static VertexPointerType OpenGLVertexPointerType(this VertexElementFormat elementFormat)
         {
             switch (elementFormat)
@@ -108,7 +112,8 @@ namespace Microsoft.Xna.Framework.Graphics
             throw new ArgumentException();
         }
 
-		public static VertexAttribPointerType OpenGLVertexAttribPointerType(this VertexElementFormat elementFormat)
+        [Pure]
+        public static VertexAttribPointerType OpenGLVertexAttribPointerType(this VertexElementFormat elementFormat)
         {
             switch (elementFormat)
             {
@@ -154,6 +159,7 @@ namespace Microsoft.Xna.Framework.Graphics
             throw new ArgumentException();
         }
 
+        [Pure]
         public static bool OpenGLVertexAttribNormalized(this VertexElement element)
         {
             // TODO: This may or may not be the right behavor.  
@@ -178,6 +184,7 @@ namespace Microsoft.Xna.Framework.Graphics
             }
         }
 
+        [Pure]
         public static ColorPointerType OpenGLColorPointerType(this VertexElementFormat elementFormat)
         {
             switch (elementFormat)
@@ -224,7 +231,8 @@ namespace Microsoft.Xna.Framework.Graphics
             throw new ArgumentException();
         }
 
-       public static NormalPointerType OpenGLNormalPointerType(this VertexElementFormat elementFormat)
+        [Pure]
+        public static NormalPointerType OpenGLNormalPointerType(this VertexElementFormat elementFormat)
         {
             switch (elementFormat)
             {
@@ -270,7 +278,8 @@ namespace Microsoft.Xna.Framework.Graphics
             throw new ArgumentException();
         }
 
-       public static TexCoordPointerType OpenGLTexCoordPointerType(this VertexElementFormat elementFormat)
+        [Pure]
+        public static TexCoordPointerType OpenGLTexCoordPointerType(this VertexElementFormat elementFormat)
         {
             switch (elementFormat)
             {
@@ -316,8 +325,9 @@ namespace Microsoft.Xna.Framework.Graphics
             throw new ArgumentException();
         }
 
-		
-		public static BlendEquationMode GetBlendEquationMode (this BlendFunction function)
+
+        [Pure]
+        public static BlendEquationMode GetBlendEquationMode (this BlendFunction function)
 		{
 			switch (function) {
 			case BlendFunction.Add:
@@ -338,7 +348,8 @@ namespace Microsoft.Xna.Framework.Graphics
 			}
 		}
 
-		public static BlendingFactorSrc GetBlendFactorSrc (this Blend blend)
+        [Pure]
+        public static BlendingFactorSrc GetBlendFactorSrc (this Blend blend)
 		{
 			switch (blend) {
             case Blend.BlendFactor:
@@ -373,7 +384,8 @@ namespace Microsoft.Xna.Framework.Graphics
 
 		}
 
-		public static BlendingFactorDest GetBlendFactorDest (this Blend blend)
+        [Pure]
+        public static BlendingFactorDest GetBlendFactorDest (this Blend blend)
 		{
 			switch (blend) {
             case Blend.BlendFactor:
@@ -408,6 +420,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
 		}
 
+        [Pure]
         public static DepthFunction GetDepthFunction(this CompareFunction compare)
         {
             switch (compare)
@@ -439,6 +452,7 @@ namespace Microsoft.Xna.Framework.Graphics
         /// </summary>
         /// <returns>An OpenTK.Graphics.ColorFormat instance.</returns>
         /// <param name="format">The <see cref="SurfaceFormat"/> to convert.</param>
+        [Pure]
         internal static ColorFormat GetColorFormat(this SurfaceFormat format)
         {
             switch (format)
@@ -472,6 +486,7 @@ namespace Microsoft.Xna.Framework.Graphics
         /// </summary>
         /// <returns>A value according to EXT_swap_control</returns>
         /// <param name="interval">The <see cref="PresentInterval"/> to convert.</param>
+        [Pure]
         internal static int GetSwapInterval(this PresentInterval interval)
         {
             // See http://www.opengl.org/registry/specs/EXT/swap_control.txt
@@ -497,7 +512,9 @@ namespace Microsoft.Xna.Framework.Graphics
 #endif
 
         const SurfaceFormat InvalidFormat = (SurfaceFormat)int.MaxValue;
-		internal static void GetGLFormat (this SurfaceFormat format,
+
+        [Pure]
+        internal static void GetGLFormat (this SurfaceFormat format,
             GraphicsDevice graphicsDevice,
             out PixelInternalFormat glInternalFormat,
             out PixelFormat glFormat,
@@ -919,6 +936,7 @@ namespace Microsoft.Xna.Framework.Graphics
             }
         }
 
+        [Pure]
         public static int GetSize(this VertexElementFormat elementFormat)
         {
             switch (elementFormat)
@@ -962,6 +980,7 @@ namespace Microsoft.Xna.Framework.Graphics
             return 0;
         }
 
+        [Pure]
         public static void GetBlockSize(this SurfaceFormat surfaceFormat, out int width, out int height)
         {
             switch (surfaceFormat)
