@@ -1913,13 +1913,38 @@ void MGG_GraphicsDevice_DrawIndexed(MGG_GraphicsDevice* device, MGPrimitiveType 
 
 void MGG_GraphicsDevice_DrawIndexedInstanced(MGG_GraphicsDevice* device, MGPrimitiveType primitiveType, mgint primitiveCount, mgint indexStart, mgint vertexStart, mgint instanceCount)
 {
-    (void)device;
-    (void)primitiveType;
-    (void)primitiveCount;
-    (void)indexStart;
-    (void)vertexStart;
-    (void)instanceCount;
-    MGGL_NOT_IMPLEMENTED("MGG_GraphicsDevice_DrawIndexedInstanced");
+    assert(device != nullptr);
+    assert(indexStart >= 0);
+    assert(vertexStart >= 0);
+    assert(instanceCount >= 0);
+
+    if (primitiveCount <= 0 || instanceCount <= 0)
+        return;
+
+    EnsureContext(device);
+    EnsureVertexArray(device);
+    assert(device->isInFrame);
+
+    /*
+     * Need to fold the vertex start into the attribute offsets here
+     * instead of passing it through the draw call.
+     * Chris <aristurtledev>
+     */
+    ApplyInputLayout(device, vertexStart);
+
+    if (device->indexBuffer == nullptr)
+        MGGL_FAIL("Indexed instanced draw requires an index buffer", "MGG_GraphicsDevice_SetIndexBuffer must bind a buffer before DrawIndexedInstanced");
+
+    mgint indexCount = GetIndexedElementCount(primitiveType, primitiveCount);
+    mgint indexSizeInBytes = GetIndexElementSizeInBytes(device->indexElementSize);
+    intptr_t indexByteOffset = static_cast<intptr_t>(indexStart) * indexSizeInBytes;
+
+    device->context.functions.DrawElementsInstanced(
+        ToPrimitiveMode(primitiveType),
+        indexCount,
+        ToIndexType(device->indexElementSize),
+        reinterpret_cast<const void*>(indexByteOffset),
+        instanceCount);
 }
 
 void MGG_GraphicsDevice_ResolveRenderTargets(MGG_GraphicsDevice* device)
@@ -1934,15 +1959,49 @@ void MGG_GraphicsDevice_ResolveRenderTargets(MGG_GraphicsDevice* device)
 
 void MGG_GraphicsDevice_GetBackBufferData(MGG_GraphicsDevice* device, mgint x, mgint y, mgint width, mgint height, void* data, mgint count, mgint dataBytes)
 {
-    (void)device;
-    (void)x;
-    (void)y;
-    (void)width;
-    (void)height;
-    (void)data;
-    (void)count;
-    (void)dataBytes;
-    MGGL_NOT_IMPLEMENTED("MGG_GraphicsDevice_GetBackBufferData");
+    assert(device != nullptr);
+    assert(data != nullptr);
+    assert(count > 0);
+    assert(dataBytes > 0);
+
+    EnsureContext(device);
+
+    if (device->currentRenderTarget != nullptr)
+        MGGL_FAIL("Backbuffer readback requires the default framebuffer", "need to switch off render targets before calling GetBackBufferData");
+
+    size_t requiredBytes = static_cast<size_t>(width) * static_cast<size_t>(height) * 4;
+    size_t destinationBytes = static_cast<size_t>(count) * static_cast<size_t>(dataBytes);
+    if (destinationBytes < requiredBytes)
+        MGGL_FAIL("Backbuffer readback size mismatch", "destination buffer is smaller than the requested region");
+
+    GLint previousReadBuffer = 0;
+    GLint previousPackAlignment = 0;
+    glGetIntegerv(GL_READ_BUFFER, &previousReadBuffer);
+    glGetIntegerv(GL_PACK_ALIGNMENT, &previousPackAlignment);
+
+    glReadBuffer(GL_BACK);
+    glPixelStorei(GL_PACK_ALIGNMENT, 1);
+
+    std::vector<mgbyte> scratch(requiredBytes);
+    glReadPixels(
+        x,
+        ToOpenGLWindowY(device, y, height),
+        width,
+        height,
+        GL_RGBA,
+        GL_UNSIGNED_BYTE,
+        scratch.data());
+
+    glReadBuffer(static_cast<GLenum>(previousReadBuffer));
+    glPixelStorei(GL_PACK_ALIGNMENT, previousPackAlignment);
+
+    size_t rowBytes = static_cast<size_t>(width) * 4;
+    mgbyte* destination = static_cast<mgbyte*>(data);
+    for (mgint row = 0; row < height; ++row)
+    {
+        const mgbyte* sourceRow = scratch.data() + static_cast<size_t>(height - row - 1) * rowBytes;
+        memcpy(destination + static_cast<size_t>(row) * rowBytes, sourceRow, rowBytes);
+    }
 }
 
 MGG_BlendState* MGG_BlendState_Create(MGG_GraphicsDevice* device, MGG_BlendState_Info* infos)
