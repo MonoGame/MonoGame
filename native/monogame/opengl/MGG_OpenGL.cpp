@@ -15,6 +15,7 @@
 #include <SDL_opengl.h>
 #include <array>
 #include <cstdint>
+#include <vector>
 
 struct MGG_GraphicsAdapter
 {
@@ -129,6 +130,10 @@ struct MGG_Texture
     mgint mipmaps = 0;
     mgint slices = 0;
     mgint bytesPerPixel = 0;
+    mgint bytesPerBlock = 0;
+    mgint blockWidth = 1;
+    mgint blockHeight = 1;
+    mgbool isCompressed = false;
     mgbool isRenderTarget = false;
     MGDepthFormat depthFormat = MGDepthFormat::None;
     mgint multiSampleCount = 0;
@@ -191,11 +196,15 @@ namespace
         GLenum pixelFormat;
         GLenum pixelType;
         mgint bytesPerPixel;
+        mgint bytesPerBlock;
+        mgint blockWidth;
+        mgint blockHeight;
         GLint swizzleR;
         GLint swizzleG;
         GLint swizzleB;
         GLint swizzleA;
         bool usesSwizzle;
+        bool isCompressed;
     };
 
     [[noreturn]] void MGGL_Fail(const char* file, int line, const char* action, const char* detail)
@@ -856,17 +865,35 @@ namespace
         switch (format)
         {
         case MGSurfaceFormat::Color:
-            return { GL_RGBA8, GL_RGBA, GL_UNSIGNED_BYTE, 4, GL_RED, GL_GREEN, GL_BLUE, GL_ALPHA, false };
+            return { GL_RGBA8, GL_RGBA, GL_UNSIGNED_BYTE, 4, 4, 1, 1, GL_RED, GL_GREEN, GL_BLUE, GL_ALPHA, false, false };
         case MGSurfaceFormat::ColorSRgb:
-            return { GL_SRGB8_ALPHA8, GL_RGBA, GL_UNSIGNED_BYTE, 4, GL_RED, GL_GREEN, GL_BLUE, GL_ALPHA, false };
+            return { GL_SRGB8_ALPHA8, GL_RGBA, GL_UNSIGNED_BYTE, 4, 4, 1, 1, GL_RED, GL_GREEN, GL_BLUE, GL_ALPHA, false, false };
         case MGSurfaceFormat::Bgra32:
-            return { GL_RGBA8, GL_BGRA, GL_UNSIGNED_BYTE, 4, GL_RED, GL_GREEN, GL_BLUE, GL_ALPHA, false };
+            return { GL_RGBA8, GL_BGRA, GL_UNSIGNED_BYTE, 4, 4, 1, 1, GL_RED, GL_GREEN, GL_BLUE, GL_ALPHA, false, false };
         case MGSurfaceFormat::Bgra32SRgb:
-            return { GL_SRGB8_ALPHA8, GL_BGRA, GL_UNSIGNED_BYTE, 4, GL_RED, GL_GREEN, GL_BLUE, GL_ALPHA, false };
+            return { GL_SRGB8_ALPHA8, GL_BGRA, GL_UNSIGNED_BYTE, 4, 4, 1, 1, GL_RED, GL_GREEN, GL_BLUE, GL_ALPHA, false, false };
         case MGSurfaceFormat::Alpha8:
-            return { GL_R8, GL_RED, GL_UNSIGNED_BYTE, 1, GL_ONE, GL_ONE, GL_ONE, GL_RED, true };
+            return { GL_R8, GL_RED, GL_UNSIGNED_BYTE, 1, 1, 1, 1, GL_ONE, GL_ONE, GL_ONE, GL_RED, true, false };
+        case MGSurfaceFormat::Dxt1:
+            return { GL_COMPRESSED_RGB_S3TC_DXT1_EXT, 0, 0, 0, 8, 4, 4, GL_RED, GL_GREEN, GL_BLUE, GL_ALPHA, false, true };
+        case MGSurfaceFormat::Dxt1SRgb:
+            return { GL_COMPRESSED_SRGB_S3TC_DXT1_EXT, 0, 0, 0, 8, 4, 4, GL_RED, GL_GREEN, GL_BLUE, GL_ALPHA, false, true };
+        case MGSurfaceFormat::Dxt1a:
+            return { GL_COMPRESSED_RGBA_S3TC_DXT1_EXT, 0, 0, 0, 8, 4, 4, GL_RED, GL_GREEN, GL_BLUE, GL_ALPHA, false, true };
+        case MGSurfaceFormat::Dxt3:
+            return { GL_COMPRESSED_RGBA_S3TC_DXT3_EXT, 0, 0, 0, 16, 4, 4, GL_RED, GL_GREEN, GL_BLUE, GL_ALPHA, false, true };
+        case MGSurfaceFormat::Dxt3SRgb:
+            return { GL_COMPRESSED_SRGB_ALPHA_S3TC_DXT3_EXT, 0, 0, 0, 16, 4, 4, GL_RED, GL_GREEN, GL_BLUE, GL_ALPHA, false, true };
+        case MGSurfaceFormat::Dxt5:
+            return { GL_COMPRESSED_RGBA_S3TC_DXT5_EXT, 0, 0, 0, 16, 4, 4, GL_RED, GL_GREEN, GL_BLUE, GL_ALPHA, false, true };
+        case MGSurfaceFormat::Dxt5SRgb:
+            return { GL_COMPRESSED_SRGB_ALPHA_S3TC_DXT5_EXT, 0, 0, 0, 16, 4, 4, GL_RED, GL_GREEN, GL_BLUE, GL_ALPHA, false, true };
+        case MGSurfaceFormat::Single:
+            return { GL_R32F, GL_RED, GL_FLOAT, 4, 4, 1, 1, GL_RED, GL_GREEN, GL_BLUE, GL_ALPHA, false, false };
+        case MGSurfaceFormat::HalfSingle:
+            return { GL_R16F, GL_RED, GL_HALF_FLOAT, 2, 2, 1, 1, GL_RED, GL_GREEN, GL_BLUE, GL_ALPHA, false, false };
         default:
-            MGGL_FAIL("Unsupported surface format", "OpenGL texture format is not mapped");
+            MGGL_FAIL("Unsupported surface format", "OpenGL surface format is not mapped");
         }
     }
 
@@ -921,6 +948,52 @@ namespace
         return width * height * depth * bytesPerPixel;
     }
 
+    mgint GetTextureBlockCount(mgint extent, mgint blockExtent)
+    {
+        assert(extent > 0);
+        assert(blockExtent > 0);
+        return (extent + blockExtent - 1) / blockExtent;
+    }
+
+    mgint GetTextureByteCount(const MGG_Texture* texture, mgint width, mgint height, mgint depth)
+    {
+        assert(texture != nullptr);
+        assert(width > 0);
+        assert(height > 0);
+        assert(depth > 0);
+
+        if (!texture->isCompressed)
+            return GetTextureByteCount(width, height, depth, texture->bytesPerPixel);
+
+        return GetTextureBlockCount(width, texture->blockWidth)
+            * GetTextureBlockCount(height, texture->blockHeight)
+            * depth
+            * texture->bytesPerBlock;
+    }
+
+    mgint GetTextureRowBytes(const MGG_Texture* texture, mgint width)
+    {
+        assert(texture != nullptr);
+        assert(width > 0);
+
+        if (!texture->isCompressed)
+            return width * texture->bytesPerPixel;
+
+        return GetTextureBlockCount(width, texture->blockWidth) * texture->bytesPerBlock;
+    }
+
+    mgint GetTextureSliceByteCount(const MGG_Texture* texture, mgint width, mgint height)
+    {
+        assert(texture != nullptr);
+        assert(width > 0);
+        assert(height > 0);
+
+        if (!texture->isCompressed)
+            return width * height * texture->bytesPerPixel;
+
+        return GetTextureRowBytes(texture, width) * GetTextureBlockCount(height, texture->blockHeight);
+    }
+
     void ResolveTextureRegion(
         const MGG_Texture* texture,
         mgint level,
@@ -963,6 +1036,9 @@ namespace
     {
         assert(texture != nullptr);
         assert(dataBytes > 0);
+
+        if (texture->isCompressed)
+            return dataBytes;
 
         mgint pixelCount = width * height * depth;
         mgint expectedBytes = GetTextureByteCount(width, height, depth, texture->bytesPerPixel);
@@ -1039,6 +1115,17 @@ namespace
             MGGL_FAIL("Unsupported texture shape", "need to add 3D, cube, and array texture support");
 
         TextureFormatInfo formatInfo = GetTextureFormatInfo(format);
+        if (formatInfo.isCompressed
+            && ((device->context.functions.CompressedTexImage2D == nullptr)
+                || (device->context.functions.CompressedTexSubImage2D == nullptr)
+                || (device->context.functions.GetCompressedTexImage == nullptr)
+                || !(HasOpenGLExtension("GL_EXT_texture_compression_s3tc")
+                    || HasOpenGLExtension("GL_OES_texture_compression_S3TC")
+                    || HasOpenGLExtension("GL_EXT_texture_compression_dxt3")
+                    || HasOpenGLExtension("GL_EXT_texture_compression_dxt5"))))
+        {
+            MGGL_FAIL("Unsupported surface format", "OpenGL compressed textures require S3TC support from the current driver");
+        }
 
         MGG_Texture* texture = new MGG_Texture();
         texture->target = GL_TEXTURE_2D;
@@ -1053,6 +1140,10 @@ namespace
         texture->mipmaps = mipmaps;
         texture->slices = slices;
         texture->bytesPerPixel = formatInfo.bytesPerPixel;
+        texture->bytesPerBlock = formatInfo.bytesPerBlock;
+        texture->blockWidth = formatInfo.blockWidth;
+        texture->blockHeight = formatInfo.blockHeight;
+        texture->isCompressed = formatInfo.isCompressed;
 
         glGenTextures(1, &texture->handle);
         if (texture->handle == 0)
@@ -1081,16 +1172,31 @@ namespace
         {
             mgint mipWidth = GetMipExtent(width, level);
             mgint mipHeight = GetMipExtent(height, level);
-            glTexImage2D(
-                texture->target,
-                level,
-                texture->internalFormat,
-                mipWidth,
-                mipHeight,
-                0,
-                texture->pixelFormat,
-                texture->pixelType,
-                nullptr);
+            if (formatInfo.isCompressed)
+            {
+                device->context.functions.CompressedTexImage2D(
+                    texture->target,
+                    level,
+                    texture->internalFormat,
+                    mipWidth,
+                    mipHeight,
+                    0,
+                    GetTextureByteCount(texture, mipWidth, mipHeight, 1),
+                    nullptr);
+            }
+            else
+            {
+                glTexImage2D(
+                    texture->target,
+                    level,
+                    texture->internalFormat,
+                    mipWidth,
+                    mipHeight,
+                    0,
+                    texture->pixelFormat,
+                    texture->pixelType,
+                    nullptr);
+            }
         }
 
         EndTextureEdit(device, texture, previousActiveTexture, previousBinding);
@@ -2409,7 +2515,7 @@ void MGG_Texture_SetData(MGG_GraphicsDevice* device, MGG_Texture* texture, mgint
     mgint resolvedDepth = 0;
     ResolveTextureRegion(texture, level, slice, x, y, z, width, height, depth, resolvedWidth, resolvedHeight, resolvedDepth);
 
-    mgint expectedBytes = GetTextureByteCount(resolvedWidth, resolvedHeight, resolvedDepth, texture->bytesPerPixel);
+    mgint expectedBytes = GetTextureByteCount(texture, resolvedWidth, resolvedHeight, resolvedDepth);
     mgint normalizedBytes = NormalizeUploadByteCount(texture, resolvedWidth, resolvedHeight, resolvedDepth, dataBytes);
     if (normalizedBytes != expectedBytes)
         MGGL_FAIL("Texture upload size mismatch", "byte count does not match the upload region");
@@ -2418,16 +2524,54 @@ void MGG_Texture_SetData(MGG_GraphicsDevice* device, MGG_Texture* texture, mgint
     GLint previousBinding = 0;
     glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
     BeginTextureEdit(device, texture, previousActiveTexture, previousBinding);
-    glTexSubImage2D(
-        texture->target,
-        level,
-        x,
-        y,
-        resolvedWidth,
-        resolvedHeight,
-        texture->pixelFormat,
-        texture->pixelType,
-        data);
+    if (texture->isCompressed)
+    {
+        mgint mipWidth = GetMipExtent(texture->width, level);
+        mgint mipHeight = GetMipExtent(texture->height, level);
+        bool isFullLevelRegion = x == 0
+            && y == 0
+            && resolvedWidth == mipWidth
+            && resolvedHeight == mipHeight;
+
+        if (isFullLevelRegion)
+        {
+            device->context.functions.CompressedTexImage2D(
+                texture->target,
+                level,
+                texture->internalFormat,
+                mipWidth,
+                mipHeight,
+                0,
+                normalizedBytes,
+                data);
+        }
+        else
+        {
+            device->context.functions.CompressedTexSubImage2D(
+                texture->target,
+                level,
+                x,
+                y,
+                resolvedWidth,
+                resolvedHeight,
+                texture->internalFormat,
+                normalizedBytes,
+                data);
+        }
+    }
+    else
+    {
+        glTexSubImage2D(
+            texture->target,
+            level,
+            x,
+            y,
+            resolvedWidth,
+            resolvedHeight,
+            texture->pixelFormat,
+            texture->pixelType,
+            data);
+    }
     EndTextureEdit(device, texture, previousActiveTexture, previousBinding);
 }
 
@@ -2451,7 +2595,7 @@ void MGG_Texture_GetData(MGG_GraphicsDevice* device, MGG_Texture* texture, mgint
     mgint resolvedDepth = 0;
     ResolveTextureRegion(texture, level, slice, x, y, z, width, height, depth, resolvedWidth, resolvedHeight, resolvedDepth);
 
-    mgint expectedBytes = GetTextureByteCount(resolvedWidth, resolvedHeight, resolvedDepth, texture->bytesPerPixel);
+    mgint expectedBytes = GetTextureByteCount(texture, resolvedWidth, resolvedHeight, resolvedDepth);
     if (dataBytes < expectedBytes)
         MGGL_FAIL("Texture readback size mismatch", "destination buffer is smaller than the requested region");
 
@@ -2462,29 +2606,57 @@ void MGG_Texture_GetData(MGG_GraphicsDevice* device, MGG_Texture* texture, mgint
 
     mgint mipWidth = GetMipExtent(texture->width, level);
     mgint mipHeight = GetMipExtent(texture->height, level);
-    mgint fullLevelBytes = GetTextureByteCount(mipWidth, mipHeight, 1, texture->bytesPerPixel);
+    mgint fullLevelBytes = GetTextureByteCount(texture, mipWidth, mipHeight, 1);
 
     if (x == 0 && y == 0 && resolvedWidth == mipWidth && resolvedHeight == mipHeight)
     {
-        device->context.functions.GetTexImage(texture->target, level, texture->pixelFormat, texture->pixelType, data);
+        if (texture->isCompressed)
+            device->context.functions.GetCompressedTexImage(texture->target, level, data);
+        else
+            device->context.functions.GetTexImage(texture->target, level, texture->pixelFormat, texture->pixelType, data);
         EndTextureEdit(device, texture, previousActiveTexture, previousBinding);
         return;
     }
 
     std::vector<mgbyte> fullLevelData(static_cast<size_t>(fullLevelBytes));
-    device->context.functions.GetTexImage(
-        texture->target,
-        level,
-        texture->pixelFormat,
-        texture->pixelType,
-        fullLevelData.data());
-
-    mgint sourceRowBytes = mipWidth * texture->bytesPerPixel;
-    mgint destinationRowBytes = resolvedWidth * texture->bytesPerPixel;
-    const mgbyte* source = fullLevelData.data() + ((y * mipWidth) + x) * texture->bytesPerPixel;
-    for (mgint row = 0; row < resolvedHeight; ++row)
+    if (texture->isCompressed)
     {
-        memcpy(data + row * destinationRowBytes, source + row * sourceRowBytes, destinationRowBytes);
+        device->context.functions.GetCompressedTexImage(texture->target, level, fullLevelData.data());
+
+        mgint sourceRowBytes = GetTextureRowBytes(texture, mipWidth);
+        mgint destinationRowBytes = GetTextureRowBytes(texture, resolvedWidth);
+        mgint sourceSliceBytes = GetTextureSliceByteCount(texture, mipWidth, mipHeight);
+        mgint destinationSliceBytes = GetTextureSliceByteCount(texture, resolvedWidth, resolvedHeight);
+        mgint sourceBlockX = x / texture->blockWidth;
+        mgint sourceBlockY = y / texture->blockHeight;
+        mgint rowCount = GetTextureBlockCount(resolvedHeight, texture->blockHeight);
+        mgint blockOffsetBytes = sourceBlockX * texture->bytesPerBlock;
+
+        for (mgint depthIndex = 0; depthIndex < resolvedDepth; ++depthIndex)
+        {
+            const mgbyte* sourceSlice = fullLevelData.data() + depthIndex * sourceSliceBytes + sourceBlockY * sourceRowBytes + blockOffsetBytes;
+            mgbyte* destinationSlice = data + depthIndex * destinationSliceBytes;
+
+            for (mgint row = 0; row < rowCount; ++row)
+                memcpy(destinationSlice + row * destinationRowBytes, sourceSlice + row * sourceRowBytes, destinationRowBytes);
+        }
+    }
+    else
+    {
+        device->context.functions.GetTexImage(
+            texture->target,
+            level,
+            texture->pixelFormat,
+            texture->pixelType,
+            fullLevelData.data());
+
+        mgint sourceRowBytes = mipWidth * texture->bytesPerPixel;
+        mgint destinationRowBytes = resolvedWidth * texture->bytesPerPixel;
+        const mgbyte* source = fullLevelData.data() + ((y * mipWidth) + x) * texture->bytesPerPixel;
+        for (mgint row = 0; row < resolvedHeight; ++row)
+        {
+            memcpy(data + row * destinationRowBytes, source + row * sourceRowBytes, destinationRowBytes);
+        }
     }
 
     EndTextureEdit(device, texture, previousActiveTexture, previousBinding);
