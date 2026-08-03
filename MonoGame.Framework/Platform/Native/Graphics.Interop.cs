@@ -62,6 +62,43 @@ internal struct MGG_GraphicsDevice_Caps
     public int MaxVertexTextureSlots;
     public int MaxVertexBufferSlots;
     public int ShaderProfile;
+    public int MaxTextureAnisotropy;
+    [MarshalAs(UnmanagedType.I1)]
+    public bool SupportsNonPowerOfTwo;
+    [MarshalAs(UnmanagedType.I1)]
+    public bool SupportsTextureFilterAnisotropic;
+    [MarshalAs(UnmanagedType.I1)]
+    public bool SupportsDepth24;
+    [MarshalAs(UnmanagedType.I1)]
+    public bool SupportsPackedDepthStencil;
+    [MarshalAs(UnmanagedType.I1)]
+    public bool SupportsDepthNonLinear;
+    [MarshalAs(UnmanagedType.I1)]
+    public bool SupportsTextureMaxLevel;
+    [MarshalAs(UnmanagedType.I1)]
+    public bool SupportsDXt1;
+    [MarshalAs(UnmanagedType.I1)]
+    public bool SupportsS3tc;
+    [MarshalAs(UnmanagedType.I1)]
+    public bool SupportsSRgb;
+    [MarshalAs(UnmanagedType.I1)]
+    public bool SupportsDepthClamp;
+    [MarshalAs(UnmanagedType.I1)]
+    public bool SupportsTextureArrays;
+    [MarshalAs(UnmanagedType.I1)]
+    public bool SupportsVertexTextures;
+    [MarshalAs(UnmanagedType.I1)]
+    public bool SupportsFloatTextures;
+    [MarshalAs(UnmanagedType.I1)]
+    public bool SupportsHalfFloatTextures;
+    [MarshalAs(UnmanagedType.I1)]
+    public bool SupportsNormalized;
+    [MarshalAs(UnmanagedType.I1)]
+    public bool SupportsInstancing;
+    [MarshalAs(UnmanagedType.I1)]
+    public bool SupportsBaseIndexInstancing;
+    [MarshalAs(UnmanagedType.I1)]
+    public bool SupportsSeparateBlendStates;
 }
 
 [StructLayout(LayoutKind.Sequential)]
