@@ -1739,7 +1739,7 @@ void MGG_GraphicsDevice_GetCaps(MGG_GraphicsDevice* device, MGG_GraphicsDevice_C
 	caps.SupportsNormalized = true;
 	caps.SupportsInstancing = true;
 	caps.SupportsBaseIndexInstancing = true;
-	caps.SupportsSeparateBlendStates - true;	
+	caps.SupportsSeparateBlendStates = true;	
 
 	// Vulkan shader profile from pipeline.
 	caps.ShaderProfile = 80;
