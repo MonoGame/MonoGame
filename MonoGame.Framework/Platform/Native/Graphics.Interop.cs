@@ -76,7 +76,7 @@ internal struct MGG_GraphicsDevice_Caps
     [MarshalAs(UnmanagedType.I1)]
     public bool SupportsTextureMaxLevel;
     [MarshalAs(UnmanagedType.I1)]
-    public bool SupportsDXt1;
+    public bool SupportsDxt1;
     [MarshalAs(UnmanagedType.I1)]
     public bool SupportsS3tc;
     [MarshalAs(UnmanagedType.I1)]
