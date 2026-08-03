@@ -1734,6 +1734,7 @@ void MGG_GraphicsDevice_GetCaps(MGG_GraphicsDevice* device, MGG_GraphicsDevice_C
 	caps.SupportsSRgb = true;
 	caps.SupportsDepthClamp = true;
 	caps.SupportsTextureArrays = true;
+	caps.SupportsVertexTextures = true;
 	caps.SupportsFloatTextures = true;
 	caps.SupportsHalfFloatTextures = true;
 	caps.SupportsNormalized = true;
