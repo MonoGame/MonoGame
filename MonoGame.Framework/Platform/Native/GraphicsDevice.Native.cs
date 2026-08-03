@@ -65,6 +65,25 @@ public partial class GraphicsDevice
         MaxVertexTextureSlots = caps.MaxVertexTextureSlots;
         _maxVertexBufferSlots = caps.MaxVertexBufferSlots;
         ShaderProfile = caps.ShaderProfile;
+        MaxTextureAnisotropy = caps.MaxTextureAnisotropy;
+        SupportsNonPowerOfTwo = caps.SupportsNonPowerOfTwo;
+        SupportsTextureFilterAnisotropic = caps.SupportsTextureFilterAnisotropic;
+        SupportsDepth24 = caps.SupportsDepth24;
+        SupportsPackedDepthStencil = caps.SupportsPackedDepthStencil;
+        SupportsDepthNonLinear = caps.SupportsDepthNonLinear;
+        SupportsTextureMaxLevel = caps.SupportsTextureMaxLevel;
+        SupportsDxt1 = caps.SupportsDxt1;
+        SupportsS3tc = caps.SupportsS3tc;
+        SupportsSRgb = caps.SupportsSRgb;
+        SupportsDepthClamp = caps.SupportsDepthClamp;
+        SupportsTextureArrays = caps.SupportsTextureArrays;
+        SupportsVertexTextures = caps.SupportsVertexTextures;
+        SupportsFloatTextures = caps.SupportsFloatTextures;
+        SupportsHalfFloatTextures = caps.SupportsHalfFloatTextures;
+        SupportsNormalized = caps.SupportsNormalized;
+        SupportsInstancing = caps.SupportsInstancing;
+        SupportsBaseIndexInstancing = caps.SupportsBaseIndexInstancing;
+        SupportsSeparateBlendStates = caps.SupportsSeparateBlendStates;
         UseHalfPixelOffset = false;
     }
 
