@@ -85,6 +85,8 @@ struct MGG_GraphicsDevice
     std::array<std::array<MGG_SamplerState*, 16>, static_cast<size_t>(MGShaderStage::Count)> samplers = {};
     std::array<std::array<GLenum, 16>, static_cast<size_t>(MGShaderStage::Count)> textureTargets = {};
     std::array<MGG_Shader*, static_cast<size_t>(MGShaderStage::Count)> shaders = {};
+    std::array<MGG_Texture*, 4> currentRenderTargets = {};
+    std::array<mgint, 4> currentRenderTargetSlices = {};
     MGG_InputLayout* inputLayout = nullptr;
     /*
      * Need to defer this until draw because the vertex buffers
@@ -96,6 +98,7 @@ struct MGG_GraphicsDevice
     std::vector<MGG_ShaderProgram*> programs;
     std::array<mgbool, 16> enabledAttributes = {};
     MGG_Texture* currentRenderTarget = nullptr;
+    mgint currentRenderTargetCount = 0;
     GLuint currentFramebuffer = 0;
     mgint viewportX = 0;
     mgint viewportY = 0;
@@ -184,6 +187,7 @@ struct MGG_OcclusionQuery
 
 namespace
 {
+    constexpr mgint MaxRenderTargetBindings = 4;
     constexpr mgint MaxTextureSlots = 16;
     constexpr mgint MaxVertexTextureSlots = 16;
     constexpr mgint MaxVertexBufferSlots = 16;
@@ -480,7 +484,7 @@ namespace
             return;
 
         GLfloat posFixup[4] = { 1.0f, 1.0f, 0.0f, 0.0f };
-        if (device->currentRenderTarget != nullptr)
+        if (device->currentRenderTargetCount > 0)
         {
             /*
              * Need to flip render target Y here so it stays opposite
@@ -799,7 +803,7 @@ namespace
     MGDepthFormat GetActiveDepthFormat(const MGG_GraphicsDevice* device)
     {
         assert(device != nullptr);
-        return device->currentRenderTarget != nullptr ? device->currentRenderTarget->depthFormat : device->depthFormat;
+        return device->currentRenderTargetCount > 0 ? device->currentRenderTargets[0]->depthFormat : device->depthFormat;
     }
 
     mgint ToOpenGLWindowY(const MGG_GraphicsDevice* device, mgint y, mgint height)
@@ -812,10 +816,21 @@ namespace
          * Y fixup through ApplyPosFixup.
          * Chris <aristurtledev>
          */
-        if (device->currentRenderTarget != nullptr)
+        if (device->currentRenderTargetCount > 0)
             return y;
 
         return device->backBufferHeight - y - height;
+    }
+
+    void ClearCurrentRenderTargets(MGG_GraphicsDevice* device)
+    {
+        assert(device != nullptr);
+
+        device->currentRenderTargets.fill(nullptr);
+        device->currentRenderTargetSlices.fill(0);
+        device->currentRenderTarget = nullptr;
+        device->currentRenderTargetCount = 0;
+        device->currentFramebuffer = 0;
     }
 
     void ToTextureFilters(MGTextureFilter filter, GLenum& minFilter, GLenum& magFilter)
@@ -1107,6 +1122,20 @@ namespace
 
         glBindTexture(texture->target, static_cast<GLuint>(previousBinding));
         device->context.functions.ActiveTexture(static_cast<GLenum>(previousActiveTexture));
+    }
+
+    void AttachFramebufferColorTarget(MGG_GraphicsDevice* device, GLenum target, GLenum attachment, MGG_Texture* texture, mgint slice)
+    {
+        assert(device != nullptr);
+        assert(texture != nullptr);
+        assert(slice >= 0);
+
+        device->context.functions.FramebufferTexture2D(
+            target,
+            attachment,
+            GetTextureImageTarget(texture, slice),
+            texture->handle,
+            0);
     }
 
     void BeginFramebufferEdit(MGG_GraphicsDevice* device, GLint& previousFramebuffer, GLint& previousRenderbuffer)
@@ -1618,10 +1647,9 @@ void MGG_GraphicsDevice_ResizeSwapchain(
     device->context.Create(window);
     device->vertexArray = device->context.defaultVertexArray;
     device->context.BindDefaultVertexArray();
-    device->currentRenderTarget = nullptr;
+    ClearCurrentRenderTargets(device);
     device->inputLayout = nullptr;
     device->currentProgram = nullptr;
-    device->currentFramebuffer = 0;
     device->context.width = width;
     device->context.height = height;
     device->context.SetSwapInterval(syncInterval);
@@ -1777,7 +1805,7 @@ void MGG_GraphicsDevice_SetRasterizerState(MGG_GraphicsDevice* device, MGG_Raste
     EnsureContext(device);
 
     const MGG_RasterizerState_Info& info = state->info;
-    bool offscreen = device->currentRenderTarget != nullptr;
+    bool offscreen = device->currentRenderTargetCount > 0;
 
     glDisable(GL_DITHER);
 
@@ -1895,32 +1923,81 @@ void MGG_GraphicsDevice_SetRenderTargets(MGG_GraphicsDevice* device, MGG_Texture
         device->context.functions.BindFramebuffer(GL_FRAMEBUFFER, 0);
         glDrawBuffer(GL_BACK);
         glReadBuffer(GL_BACK);
-        device->currentRenderTarget = nullptr;
-        device->currentFramebuffer = 0;
+        ClearCurrentRenderTargets(device);
         ApplyPosFixup(device);
         return;
     }
 
-    // TODO: add multiple render target binding
-    if (count != 1)
-        MGGL_FAIL("Unsupported render target count", "need to add multiple render target binding");
-
     if (targets == nullptr || arraySlices == nullptr || targets[0] == nullptr)
-        MGGL_FAIL("Invalid render target binding", "one valid render target is required");
+        MGGL_FAIL("Invalid render target binding", "need at least one valid render target");
 
-    // TODO: add render target array and cube slice binding
-    if (arraySlices[0] != 0)
-        MGGL_FAIL("Unsupported render target slice", "need to add non-zero render target slice binding");
+    /*
+     * Keep this capped at 4 for now so I can get the binding path in
+     * place first before trying to widen the implementation
+     * Chris <aristurtledev>
+     */
+    if (count > MaxRenderTargetBindings)
+        MGGL_FAIL("Unsupported render target count", "need to widen the native render target binding path past 4");
 
-    MGG_Texture* target = targets[0];
-    if (!target->isRenderTarget || target->framebuffer == 0)
+    MGG_Texture* firstTarget = targets[0];
+    if (!firstTarget->isRenderTarget || firstTarget->framebuffer == 0)
         MGGL_FAIL("Invalid render target binding", "texture does not own a framebuffer");
 
-    device->context.functions.BindFramebuffer(GL_FRAMEBUFFER, target->framebuffer);
-    glDrawBuffer(GL_COLOR_ATTACHMENT0);
+    device->context.functions.BindFramebuffer(GL_FRAMEBUFFER, firstTarget->framebuffer);
+    mgint multiSampleCount = firstTarget->multiSampleCount;
+
+    std::array<GLenum, MaxRenderTargetBindings> drawBuffers = {};
+
+    for (mgint i = 0; i < count; ++i)
+    {
+        MGG_Texture* target = targets[i];
+        if (target == nullptr)
+            MGGL_FAIL("Invalid render target binding", "need every render target slot to have a texture");
+
+        if (!target->isRenderTarget || target->framebuffer == 0)
+            MGGL_FAIL("Invalid render target binding", "texture does not own a framebuffer");
+
+        if (target->multiSampleCount != multiSampleCount)
+            MGGL_FAIL("Unsupported render target multisampling", "need every bound render target to use the same sample count");
+
+        mgint arraySlice = arraySlices[i];
+        if (arraySlice < 0 || arraySlice >= target->slices)
+            MGGL_FAIL("Unsupported render target slice", "need the bound render target slice to stay in range");
+
+        if (target->type == MGTextureType::_2D && arraySlice != 0)
+            MGGL_FAIL("Unsupported render target slice", "2D render targets only expose slice 0");
+
+        // TODO: add array render target binding
+        if (target->type != MGTextureType::_2D && target->type != MGTextureType::Cube)
+            MGGL_FAIL("Unsupported render target shape", "need array render target binding");
+
+        GLenum attachment = GL_COLOR_ATTACHMENT0 + i;
+        AttachFramebufferColorTarget(device, GL_FRAMEBUFFER, attachment, target, arraySlice);
+        drawBuffers[i] = attachment;
+        device->currentRenderTargets[i] = target;
+        device->currentRenderTargetSlices[i] = arraySlice;
+    }
+
+    for (mgint i = count; i < MaxRenderTargetBindings; ++i)
+    {
+        device->context.functions.FramebufferRenderbuffer(
+            GL_FRAMEBUFFER,
+            GL_COLOR_ATTACHMENT0 + i,
+            GL_RENDERBUFFER,
+            0);
+        device->currentRenderTargets[i] = nullptr;
+        device->currentRenderTargetSlices[i] = 0;
+    }
+
+    GLenum framebufferStatus = device->context.functions.CheckFramebufferStatus(GL_FRAMEBUFFER);
+    if (framebufferStatus != GL_FRAMEBUFFER_COMPLETE)
+        MGGL_FAIL("OpenGL framebuffer incomplete", "render target binding left the framebuffer incomplete");
+
+    device->context.functions.DrawBuffers(count, drawBuffers.data());
     glReadBuffer(GL_COLOR_ATTACHMENT0);
-    device->currentRenderTarget = target;
-    device->currentFramebuffer = target->framebuffer;
+    device->currentRenderTarget = firstTarget;
+    device->currentRenderTargetCount = count;
+    device->currentFramebuffer = firstTarget->framebuffer;
     ApplyPosFixup(device);
 }
 
@@ -2168,7 +2245,7 @@ void MGG_GraphicsDevice_ResolveRenderTargets(MGG_GraphicsDevice* device)
 
     EnsureContext(device);
 
-    if (device->currentRenderTarget == nullptr)
+    if (device->currentRenderTargetCount == 0)
         return;
 }
 
@@ -2181,7 +2258,7 @@ void MGG_GraphicsDevice_GetBackBufferData(MGG_GraphicsDevice* device, mgint x, m
 
     EnsureContext(device);
 
-    if (device->currentRenderTarget != nullptr)
+    if (device->currentRenderTargetCount > 0)
         MGGL_FAIL("Backbuffer readback requires the default framebuffer", "need to switch off render targets before calling GetBackBufferData");
 
     size_t requiredBytes = static_cast<size_t>(width) * static_cast<size_t>(height) * 4;
@@ -2496,9 +2573,24 @@ MGG_Texture* MGG_RenderTarget_Create(MGG_GraphicsDevice* device, MGTextureType t
 
     EnsureContext(device);
 
-    // TODO: add cube and array render target allocation/binding
-    if (type != MGTextureType::_2D || depth != 1 || slices != 1)
-        MGGL_FAIL("Unsupported render target shape", "need cube and array render target support");
+    if (type == MGTextureType::_2D)
+    {
+        if (depth != 1 || slices != 1)
+            MGGL_FAIL("Unsupported render target shape", "2D render targets use depth 1 and one slice");
+    }
+    else if (type == MGTextureType::Cube)
+    {
+        if (depth != 1)
+            MGGL_FAIL("Unsupported render target depth", "cube render targets use depth 1");
+
+        if (slices != 6)
+            MGGL_FAIL("Unsupported render target slice count", "cube render targets need all six faces");
+    }
+    else
+    {
+        // TODO: add array and 3D render target support
+        MGGL_FAIL("Unsupported render target shape", "need array and 3D render target support");
+    }
 
     // TODO: add multisampled render target allocation and resolve
     if (multiSampleCount > 0)
@@ -2523,7 +2615,12 @@ MGG_Texture* MGG_RenderTarget_Create(MGG_GraphicsDevice* device, MGTextureType t
         MGGL_FAIL("glGenFramebuffers failed", "framebuffer creation returned 0");
 
     device->context.functions.BindFramebuffer(GL_FRAMEBUFFER, texture->framebuffer);
-    device->context.functions.FramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, texture->target, texture->handle, 0);
+    device->context.functions.FramebufferTexture2D(
+        GL_FRAMEBUFFER,
+        GL_COLOR_ATTACHMENT0,
+        GetTextureImageTarget(texture, 0),
+        texture->handle,
+        0);
     glDrawBuffer(GL_COLOR_ATTACHMENT0);
     glReadBuffer(GL_COLOR_ATTACHMENT0);
 
@@ -2566,13 +2663,25 @@ void MGG_Texture_Destroy(MGG_GraphicsDevice* device, MGG_Texture* texture)
     GLint previousActiveTexture = 0;
     glGetIntegerv(GL_ACTIVE_TEXTURE, &previousActiveTexture);
 
-    if (device->currentRenderTarget == texture)
+    bool unbindRenderTargets = device->currentRenderTarget == texture;
+    if (!unbindRenderTargets)
+    {
+        for (mgint i = 0; i < device->currentRenderTargetCount; ++i)
+        {
+            if (device->currentRenderTargets[i] == texture)
+            {
+                unbindRenderTargets = true;
+                break;
+            }
+        }
+    }
+
+    if (unbindRenderTargets)
     {
         device->context.functions.BindFramebuffer(GL_FRAMEBUFFER, 0);
         glDrawBuffer(GL_BACK);
         glReadBuffer(GL_BACK);
-        device->currentRenderTarget = nullptr;
-        device->currentFramebuffer = 0;
+        ClearCurrentRenderTargets(device);
     }
 
     for (size_t stageIndex = 0; stageIndex < ShaderStageCount; ++stageIndex)
