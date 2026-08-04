@@ -2121,8 +2121,9 @@ void MGG_GraphicsDevice_SetRenderTargets(MGG_GraphicsDevice* device, MGG_Texture
 void MGG_GraphicsDevice_SetConstantBuffer(MGG_GraphicsDevice* device, MGShaderStage stage, mgint slot, MGG_Buffer* buffer)
 {
     assert(device != nullptr);
-    assert(slot >= 0);
-    assert(buffer != nullptr);
+
+    if (buffer == nullptr)
+        return;
 
     EnsureContext(device);
 
@@ -2130,7 +2131,7 @@ void MGG_GraphicsDevice_SetConstantBuffer(MGG_GraphicsDevice* device, MGShaderSt
     if (device->currentProgram == nullptr)
         MGGL_FAIL("Constant buffer binding requires a linked program", "set vertex and pixel shaders before applying effect constants");
 
-    if (static_cast<size_t>(slot) >= device->currentProgram->constantBufferLocations[stageIndex].size())
+    if (slot < 0 || static_cast<size_t>(slot) >= device->currentProgram->constantBufferLocations[stageIndex].size())
         MGGL_FAIL("Invalid constant buffer slot", "shader constant buffer slot is outside the linked program range");
 
     GLint location = device->currentProgram->constantBufferLocations[stageIndex][slot];
@@ -2251,9 +2252,9 @@ void MGG_GraphicsDevice_SetShader(MGG_GraphicsDevice* device, MGShaderStage stag
     {
         device->context.functions.UseProgram(program->handle);
         device->currentProgram = program;
+        device->inputLayoutDirty = true;
+        ApplyPosFixup(device);
     }
-
-    ApplyPosFixup(device);
 }
 
 void MGG_GraphicsDevice_SetInputLayout(MGG_GraphicsDevice* device, MGG_InputLayout* layout)
@@ -2264,7 +2265,11 @@ void MGG_GraphicsDevice_SetInputLayout(MGG_GraphicsDevice* device, MGG_InputLayo
         return;
 
     device->inputLayout = layout;
-    ApplyInputLayout(device);
+    
+    /*
+     * Do we need to call ApplyLayout here???
+     */
+
     device->inputLayoutDirty = true;
 }
 
@@ -2440,43 +2445,46 @@ void MGG_GraphicsDevice_GetBackBufferData(MGG_GraphicsDevice* device, mgint x, m
     if (x < 0 || y < 0 || x + width > device->backBufferWidth || y + height > device->backBufferHeight)
         MGGL_FAIL("Invalid backbuffer readback region", "requested backbuffer readback region exceeds the current backbuffer bounds");
 
-    if (device->currentRenderTargetCount > 0)
-        MGGL_FAIL("Backbuffer readback requires the default framebuffer", "need to switch off render targets before calling GetBackBufferData");
-
     TextureFormatInfo formatInfo = GetTextureFormatInfo(device->backBufferFormat);
-    size_t requiredBytes = static_cast<size_t>(width) * static_cast<size_t>(height) * static_cast<size_t>(formatInfo.bytesPerPixel);
+    size_t rowBytes = static_cast<size_t>(width) * static_cast<size_t>(formatInfo.bytesPerPixel);
+    size_t totalBytes = rowBytes * static_cast<size_t>(height);
     size_t destinationBytes = static_cast<size_t>(count) * static_cast<size_t>(dataBytes);
-    if (destinationBytes < requiredBytes)
+    if (destinationBytes < totalBytes)
         MGGL_FAIL("Backbuffer readback size mismatch", "destination buffer is smaller than the requested region");
 
+    GLint previousFramebuffer = 0;
     GLint previousReadBuffer = 0;
     GLint previousPackAlignment = 0;
+    glGetIntegerv(GL_FRAMEBUFFER_BINDING, &previousFramebuffer);
     glGetIntegerv(GL_READ_BUFFER, &previousReadBuffer);
     glGetIntegerv(GL_PACK_ALIGNMENT, &previousPackAlignment);
 
+    device->context.functions.BindFramebuffer(GL_FRAMEBUFFER, 0);
     glReadBuffer(GL_BACK);
     glPixelStorei(GL_PACK_ALIGNMENT, 1);
 
-    std::vector<mgbyte> scratch(requiredBytes);
+    std::vector<mgbyte> pixels(totalBytes);
+    mgint flippedY = device->backBufferHeight - y - height;
     glReadPixels(
         x,
-        ToOpenGLWindowY(device, y, height),
+        flippedY,
         width,
         height,
-        GL_RGBA,
-        GL_UNSIGNED_BYTE,
-        scratch.data());
+        formatInfo.pixelFormat,
+        formatInfo.pixelType,
+        pixels.data());
 
-    glReadBuffer(static_cast<GLenum>(previousReadBuffer));
-    glPixelStorei(GL_PACK_ALIGNMENT, previousPackAlignment);
-
-    size_t rowBytes = static_cast<size_t>(width) * 4;
     mgbyte* destination = static_cast<mgbyte*>(data);
     for (mgint row = 0; row < height; ++row)
     {
-        const mgbyte* sourceRow = scratch.data() + static_cast<size_t>(height - row - 1) * rowBytes;
-        memcpy(destination + static_cast<size_t>(row) * rowBytes, sourceRow, rowBytes);
+        size_t sourceOffset = static_cast<size_t>(height - row - 1) * rowBytes;
+        size_t destinationOffset = static_cast<size_t>(row) * rowBytes;
+        memcpy(destination + destinationOffset, pixels.data() + sourceOffset, rowBytes);
     }
+
+    glPixelStorei(GL_PACK_ALIGNMENT, previousPackAlignment);
+    glReadBuffer(previousReadBuffer);
+    device->context.functions.BindFramebuffer(GL_FRAMEBUFFER, static_cast<GLuint>(previousFramebuffer));
 }
 
 MGG_BlendState* MGG_BlendState_Create(MGG_GraphicsDevice* device, MGG_BlendState_Info* infos)
@@ -3053,9 +3061,8 @@ void MGG_Texture_GetData(MGG_GraphicsDevice* device, MGG_Texture* texture, mgint
     assert(slice < texture->slices);
     assert(dataBytes > 0);
 
-    // TODO: add GPU readback for render target textures
-    if (texture->isRenderTarget)
-        MGGL_FAIL("Render target readback not implemented", "need to add render target readback");
+    if (texture->isRenderTarget && IsRenderTargetBound(device, texture))
+        MGG_GraphicsDevice_ResolveRenderTargets(device);
 
     mgint resolvedWidth = 0;
     mgint resolvedHeight = 0;
