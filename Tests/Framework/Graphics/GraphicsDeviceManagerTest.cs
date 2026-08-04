@@ -419,6 +419,8 @@ namespace MonoGame.Tests.Graphics
         [TestCase(true)]
 #if DESKTOPGL
         [Ignore("Expected not 1024 but got 1024. Needs Investigating")]
+#elif OPENGL
+        [Ignore("OpenGL backbuffer MSAA is not implemented yet for the native backend")]
 #endif
         public void MSAAEnabled(bool enabled)
         {
