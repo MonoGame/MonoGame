@@ -1,5 +1,3 @@
-using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 
 namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
@@ -9,15 +7,9 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
     /// </summary>
     public static class MeshHelper
     {
-        static bool IsFinite(float v)
-        {
-            return !float.IsInfinity(v) && !float.IsNaN(v);
-        }
+        private static bool IsFinite(float v) => !float.IsInfinity(v) && !float.IsNaN(v);
 
-        static bool IsFinite(this Vector3 v)
-        {
-            return IsFinite(v.X) && IsFinite(v.Y) && IsFinite(v.Z);
-        }
+        private static bool IsFinite(this Vector3 v) => IsFinite(v.X) && IsFinite(v.Y) && IsFinite(v.Z);
 
         /// <summary>
         /// Generates vertex normals by accumulation of triangle face normals.
@@ -39,7 +31,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
         /// <param name="geom">The geometry which will receive the normals.</param>
         /// <param name="overwriteExistingNormals">Overwrite or skip over geometry with existing normals.</param>
         /// <remarks>
-        /// We use a "Mean Weighted Equally" method generate vertex normals from triangle 
+        /// We use a "Mean Weighted Equally" method generate vertex normals from triangle
         /// face normals.  If normal cannot be calculated from the geometry we set it to zero.
         /// </remarks>
         public static void CalculateNormals(GeometryContent geom, bool overwriteExistingNormals)
@@ -89,7 +81,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
                     // to look best in most cases, but is more expensive to calculate.
                     //
                     // There is also an idea of weighting by triangle area, but IMO the
-                    // triangle area doesn't always have a direct relationship to the 
+                    // triangle area doesn't always have a direct relationship to the
                     // shape of a mesh.
                     //
                     // For more ideas see:
@@ -167,10 +159,9 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
             var normals = channels.Get<Vector3>(VertexChannelNames.Normal(0));
             var uvs = channels.Get<Vector2>(textureCoordinateChannelName);
 
-            Vector3[] tangents, bitangents;
-            CalculateTangentFrames(verts.Positions, indices, normals, uvs, out tangents, out bitangents);
+            CalculateTangentFrames(verts.Positions, indices, normals, uvs, out var tangents, out var bitangents);
 
-            // All the indices are 1:1 with the others, so we 
+            // All the indices are 1:1 with the others, so we
             // can just add the new channels in place.
 
             if (!string.IsNullOrEmpty(tangentChannelName))
@@ -196,11 +187,11 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
                                                   out Vector3[] tangents,
                                                   out Vector3[] bitangents)
         {
-            // Lengyel, Eric. “Computing Tangent Space Basis Vectors for an Arbitrary Mesh”. 
+            // Lengyel, Eric. “Computing Tangent Space Basis Vectors for an Arbitrary Mesh”.
             // Terathon Software 3D Graphics Library, 2001.
             // http://www.terathon.com/code/tangent.html
 
-            // Hegde, Siddharth. "Messing with Tangent Space". Gamasutra, 2007. 
+            // Hegde, Siddharth. "Messing with Tangent Space". Gamasutra, 2007.
             // http://www.gamasutra.com/view/feature/129939/messing_with_tangent_space.php
 
             var numVerts = positions.Count;
@@ -298,7 +289,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
                     // We couldn't find a good tanget for this vertex.
                     //
                     // Rather than set them to zero which could produce
-                    // errors in other parts of the pipeline, we just take        
+                    // errors in other parts of the pipeline, we just take
                     // a guess at something that may look ok.
 
                     t = Vector3.Cross(n, Vector3.UnitX);
@@ -311,7 +302,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
                 }
 
                 // Gram-Schmidt orthogonalize
-                // TODO: This can be zero can cause NaNs on 
+                // TODO: This can be zero can cause NaNs on
                 // normalize... how do we fix this?
                 var tangent = t - n * Vector3.Dot(n, t);
                 tangent = Vector3.Normalize(tangent);
@@ -334,11 +325,10 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
         /// </summary>
         /// <param name="node">The node from which to begin the search for the skeleton.</param>
         /// <returns>The root bone of the skeletion or null if none is found.</returns>
-        public static BoneContent FindSkeleton(NodeContent node)
+        public static BoneContent? FindSkeleton(NodeContent? node)
         {
             // We should always get a node to search!
-            if (node == null)
-                throw new ArgumentNullException("node");
+            ArgumentNullException.ThrowIfNull(node);
 
             // Search up thru the hierarchy.
             for (; node != null; node = node.Parent)
@@ -347,16 +337,15 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
                 var root = node as BoneContent;
                 if (root != null)
                 {
-                    while (root.Parent is BoneContent)
-                        root = (BoneContent)root.Parent;
+                    while (root.Parent is BoneContent parent)
+                        root = parent;
                     return root;
                 }
 
                 // Next try searching the children for a root bone.
                 foreach (var nodeContent in node.Children)
                 {
-                    var bone = nodeContent as BoneContent;
-                    if (bone == null)
+                    if (nodeContent is not BoneContent bone)
                         continue;
 
                     // If we found a bone
@@ -382,16 +371,14 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
         /// </summary>
         public static IList<BoneContent> FlattenSkeleton(BoneContent skeleton)
         {
-            if (skeleton == null)
-                throw new ArgumentNullException("skeleton");
+            ArgumentNullException.ThrowIfNull(skeleton);
 
             var results = new List<BoneContent>();
-            var work = new Stack<NodeContent>(new[] { skeleton });
+            var work = new Stack<NodeContent>([skeleton]);
             while (work.Count > 0)
             {
                 var top = work.Pop();
-                var bone = top as BoneContent;
-                if (bone != null)
+                if (top is BoneContent bone)
                     results.Add(bone);
 
                 for (var i = top.Children.Count - 1; i >= 0; i--)
@@ -407,7 +394,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
         /// from each other.
         /// </summary>
         /// <param name="mesh">Mesh to be processed.</param>
-        /// <param name="tolerance">Tolerance value that determines how close 
+        /// <param name="tolerance">Tolerance value that determines how close
         /// positions must be to each other to be merged.</param>
         /// <remarks>
         /// This method will also update the <see cref="VertexContent.PositionIndices"/>
@@ -415,16 +402,10 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
         /// </remarks>
         public static void MergeDuplicatePositions(MeshContent mesh, float tolerance)
         {
-            if (mesh == null)
-                throw new ArgumentNullException("mesh");
+            ArgumentNullException.ThrowIfNull(mesh);
 
             // TODO Improve performance with spatial partitioning scheme
-            var indexLists = new List<IndexUpdateList>();
-            foreach (var geom in mesh.Geometry)
-            {
-                var list = new IndexUpdateList(geom.Vertices.PositionIndices);
-                indexLists.Add(list);
-            }
+            var indexLists = mesh.Geometry.Select(geom => new IndexUpdateList(geom.Vertices.PositionIndices)).ToList();
 
             for (var i = mesh.Positions.Count - 1; i >= 1; i--)
             {
@@ -450,8 +431,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
         /// <param name="geometry">Geometry to be processed.</param>
         public static void MergeDuplicateVertices(GeometryContent geometry)
         {
-            if (geometry == null)
-                throw new ArgumentNullException("geometry");
+            ArgumentNullException.ThrowIfNull(geometry);
 
             var verts = geometry.Vertices;
             var hashMap = new Dictionary<int, List<VertexData>>();
@@ -475,8 +455,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
                 var hash = iData.ComputeHash();
 
                 var merged = false;
-                List<VertexData> candidates;
-                if (hashMap.TryGetValue(hash, out candidates))
+                if (hashMap.TryGetValue(hash, out var candidates))
                 {
                     for (var candidateIndex = 0; candidateIndex < candidates.Count; candidateIndex++)
                     {
@@ -489,13 +468,14 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
                         verts.RemoveAt(vIndex);
                         merged = true;
                     }
+
                     if (!merged)
                         candidates.Add(iData);
                 }
                 else
                 {
                     // no vertices with the same hash yet, create a new list for the data
-                    hashMap.Add(hash, new List<VertexData> { iData });
+                    hashMap.Add(hash, [iData]);
                 }
 
                 if (!merged)
@@ -509,14 +489,13 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
         /// <summary>
         /// Merge vertices with the same <see cref="VertexContent.PositionIndices"/> and
         /// <see cref="VertexChannel"/> data within the <see cref="MeshContent.Geometry"/>
-        /// of this mesh. If you want to merge positions too, call 
+        /// of this mesh. If you want to merge positions too, call
         /// <see cref="MergeDuplicatePositions"/> on your mesh before this function.
         /// </summary>
         /// <param name="mesh">Mesh to be processed</param>
         public static void MergeDuplicateVertices(MeshContent mesh)
         {
-            if (mesh == null)
-                throw new ArgumentNullException("mesh");
+            ArgumentNullException.ThrowIfNull(mesh);
             foreach (var geom in mesh.Geometry)
                 MergeDuplicateVertices(geom);
         }
@@ -544,8 +523,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
         public static void SwapWindingOrder(MeshContent mesh)
         {
             // Gotta have a mesh to run!
-            if (mesh == null)
-                throw new ArgumentNullException("mesh");
+            ArgumentNullException.ThrowIfNull(mesh);
 
             foreach (var geom in mesh.Geometry)
             {
@@ -567,8 +545,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
         /// <param name="transform">The transform matrix to apply to the scene.</param>
         public static void TransformScene(NodeContent scene, Matrix transform)
         {
-            if (scene == null)
-                throw new ArgumentException("scene");
+            ArgumentNullException.ThrowIfNull(scene);
 
             // If the transformation is an identity matrix, this is a no-op and
             // we can save ourselves a bunch of work in the first place.
@@ -587,8 +564,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
                     work.Push(child);
 
                 // Transform the mesh content.
-                var mesh = node as MeshContent;
-                if (mesh != null)
+                if (node is MeshContent mesh)
                     mesh.TransformContents(ref transform);
 
                 // Transform local coordinate system using "similarity transform".
@@ -597,8 +573,8 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
                 // Transform animations.
                 foreach (var animationContent in node.Animations.Values)
                     foreach (var animationChannel in animationContent.Channels.Values)
-                        for (int i = 0; i < animationChannel.Count; i++)
-                            animationChannel[i].Transform = inverseTransform * animationChannel[i].Transform * transform;
+                        foreach (var t in animationChannel)
+                            t.Transform = inverseTransform * t.Transform * transform;
             }
         }
 
@@ -619,37 +595,21 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
             // Since XNA does not have a 3x3 matrix, use the "scalar triple product"
             // (see http://en.wikipedia.org/wiki/Triple_product) to calculate the
             // determinant.
-            float d = Vector3.Dot(xform.Right, Vector3.Cross(xform.Forward, xform.Up));
-            return d < 0.0f;
-        }
-
-        #region Private helpers
-
-        private static void UpdatePositionIndices(MeshContent mesh, int from, int to)
-        {
-            foreach (var geom in mesh.Geometry)
-            {
-                for (var i = 0; i < geom.Vertices.PositionIndices.Count; i++)
-                {
-                    var index = geom.Vertices.PositionIndices[i];
-                    if (index == from)
-                        geom.Vertices.PositionIndices[i] = to;
-                }
-            }
+            return Vector3.Dot(xform.Right, Vector3.Cross(xform.Forward, xform.Up)) < 0.0f;
         }
 
         private class VertexData
         {
-            public int Index;
-            public int PositionIndex;
-            public object[] ChannelData;
+            public int Index { get; set; }
+            public int PositionIndex { get; set; }
+            public required object?[] ChannelData { get; set; }
 
             // Compute a hash based on PositionIndex and ChannelData
             public int ComputeHash()
             {
                 var hash = PositionIndex;
                 foreach (var channel in ChannelData)
-                    hash ^= channel.GetHashCode();
+                    hash ^= channel?.GetHashCode() ?? 0;
 
                 return hash;
             }
@@ -683,7 +643,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
             public IndexUpdateList(IList<int> collectionToUpdate)
             {
                 _collectionToUpdate = collectionToUpdate;
-                _indexPositions = new Dictionary<int, List<int>>();
+                _indexPositions = [];
                 Initialize();
             }
 
@@ -692,23 +652,23 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
                 for (var pos = 0; pos < _collectionToUpdate.Count; pos++)
                 {
                     var v = _collectionToUpdate[pos];
-                    if (_indexPositions.ContainsKey(v))
-                        _indexPositions[v].Add(pos);
+                    if (_indexPositions.TryGetValue(v, out var position))
+                        position.Add(pos);
                     else
-                        _indexPositions.Add(v, new List<int> {pos});
+                        _indexPositions.Add(v, [pos]);
                 }
             }
 
             public void Update(int from, int to)
             {
-                if (from == to || !_indexPositions.ContainsKey(from))
+                if (from == to || !_indexPositions.TryGetValue(from, out var position))
                     return;
 
-                foreach (var pos in _indexPositions[from])
+                foreach (var pos in position)
                     _collectionToUpdate[pos] = to;
 
-                if (_indexPositions.ContainsKey(to))
-                    _indexPositions[to].AddRange(_indexPositions[from]);
+                if (_indexPositions.TryGetValue(to, out var indexPosition))
+                    indexPosition.AddRange(_indexPositions[from]);
                 else
                     _indexPositions.Add(to, _indexPositions[from]);
 
@@ -733,11 +693,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 
                     newIndex++;
                 }
-
             }
-
         }
-
-        #endregion
     }
 }

@@ -24,19 +24,19 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
         /// <summary>
         /// Returns or sets the external reference to the effects content.
         /// </summary>
-        public ExternalReference<EffectContent> Effect
+        public ExternalReference<EffectContent>? Effect
         {
-            get { return GetReferenceTypeProperty<ExternalReference<EffectContent>>(EffectKey); }
-            set { SetProperty(EffectKey, value); }
+            get => GetReferenceTypeProperty<ExternalReference<EffectContent>>(EffectKey);
+            set => SetProperty(EffectKey, value);
         }
 
         /// <summary>
         /// Returns or sets the external reference to the effects compiled content.
         /// </summary>
-        public ExternalReference<CompiledEffectContent> CompiledEffect
+        public ExternalReference<CompiledEffectContent>? CompiledEffect
         {
-            get { return GetReferenceTypeProperty<ExternalReference<CompiledEffectContent>>(CompiledEffectKey); }
-            set { SetProperty(CompiledEffectKey, value); }
+            get => GetReferenceTypeProperty<ExternalReference<CompiledEffectContent>>(CompiledEffectKey);
+            set => SetProperty(CompiledEffectKey, value);
         }
     }
 }

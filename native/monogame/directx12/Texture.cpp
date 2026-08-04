@@ -114,11 +114,15 @@ void Texture::Create(DeviceResources* device, bool createViews) {
         pClearValue = &optimizedClearValue;
 
     D3D12_HEAP_FLAGS heapFlags = D3D12_HEAP_FLAG_NONE;
+    D3D12MA::ALLOCATION_FLAGS allocFlags = D3D12MA::ALLOCATION_FLAG_NONE;
 
     // In this context SurfaceType::SwapChainRenderTarget mean the displayable RT used on Gaming.Xbox rendering
     // Not a resource managed by IDXGISwapChain3 (Desktop only, cf Texture(DeviceResources*, IDXGISwapChain3*, int))
     if (impl->m_type == SurfaceType::SwapChainRenderTarget)
+    {
         heapFlags |= D3D12_HEAP_FLAG_ALLOW_DISPLAY;
+        allocFlags = D3D12MA::ALLOCATION_FLAG_COMMITTED;
+    }
 
     bool isMSAA = CheckMSAA(device->GetD3DDevice());
     if (!isMSAA)
@@ -128,24 +132,30 @@ void Texture::Create(DeviceResources* device, bool createViews) {
     if (impl->m_allowUAV)
         resDesc.Format = ConvertSRVtoResourceFormat(impl->m_desc.Format);
 
-    D3D12MA::ALLOCATION_DESC allocDesc = { D3D12MA::ALLOCATION_FLAG_COMMITTED, D3D12_HEAP_TYPE_DEFAULT, heapFlags };
-    device->GetAllocator()->CreateResource(
+    // ALLOCATION_FLAG_COMMITTED uses dedicated allocation.
+    // ALLOCATION_FLAG_NONE places the resource into existing preallocated pool.
+    D3D12MA::ALLOCATION_DESC allocDesc = { allocFlags, D3D12_HEAP_TYPE_DEFAULT, heapFlags };
+
+    ThrowIfFailed(device->GetAllocator()->CreateResource(
         &allocDesc,
         &resDesc,
         impl->m_currentState,
         pClearValue,
         impl->m_alloc.ReleaseAndGetAddressOf(),
-        IID_GRAPHICS_PPV_ARGS(impl->m_res.ReleaseAndGetAddressOf()));
+        IID_GRAPHICS_PPV_ARGS(impl->m_res.ReleaseAndGetAddressOf())));
 
     switch (impl->m_type) {
     case SurfaceType::Texture:
         impl->m_res->SetName(L"Unnamed Texture");
+        impl->m_alloc->SetName(L"Unnamed Texture Alloc");
         break;
     case SurfaceType::RenderTarget:
         impl->m_res->SetName(L"Unnamed RenderTarget");
+        impl->m_alloc->SetName(L"Unnamed RenderTarget Alloc");
         break;
     case SurfaceType::SwapChainRenderTarget:
         impl->m_res->SetName(L"Unnamed SwapChainRenderTarget");
+        impl->m_alloc->SetName(L"Unnamed SwapChainRenderTarget Alloc");
         break;
     }
 
@@ -302,18 +312,14 @@ void Texture::SetMSAA(int sampleCount) {
 
 void Texture::SetData(DeviceResources* device, uint32_t subResId, uint8_t* data, size_t size, size_t rowPitch)
 {
-    ComPtr<ID3D12Resource> uploadBuffer;
-    ComPtr<D3D12MA::Allocation> uploadAlloc;
     const UINT64 uploadSize = GetRequiredIntermediateSize(impl->m_res.Get(), subResId, 1);
     CD3DX12_RESOURCE_DESC resourceDesc = CD3DX12_RESOURCE_DESC::Buffer(uploadSize);
-    D3D12MA::ALLOCATION_DESC allocDesc = { D3D12MA::ALLOCATION_FLAG_COMMITTED, D3D12_HEAP_TYPE_UPLOAD };
-    ThrowIfFailed(device->GetAllocator()->CreateResource(
-        &allocDesc,
-        &resourceDesc,
-        D3D12_RESOURCE_STATE_GENERIC_READ,
-        nullptr,
-        uploadAlloc.ReleaseAndGetAddressOf(),
-        IID_GRAPHICS_PPV_ARGS(uploadBuffer.ReleaseAndGetAddressOf())));
+
+    Microsoft::WRL::ComPtr<ID3D12Resource> uploadBuffer =
+        device->TakeUploadBuffer(
+            D3D12_HEAP_TYPE_UPLOAD,
+            D3D12_RESOURCE_STATE_GENERIC_READ,
+            resourceDesc);
 
     auto cmd = device->BeginCommandList();
     auto cmdList = cmd->Get();
@@ -337,7 +343,6 @@ void Texture::SetData(DeviceResources* device, uint32_t subResId, uint8_t* data,
         break;
     }
 
-    GetDepthOrArraySize();
     D3D12_SUBRESOURCE_DATA initData = { data, rowPitch, slicePitch };
     UpdateSubresources(cmdList, impl->m_res.Get(), uploadBuffer.Get(), 0, subResId, 1, &initData);
 
@@ -347,7 +352,8 @@ void Texture::SetData(DeviceResources* device, uint32_t subResId, uint8_t* data,
     );
     cmdList->ResourceBarrier(1, &destToShaderResBarrier);
 
-    cmd->Close(true);
+    uint64_t fence = cmd->Close(false);
+    device->ReturnUploadBuffer(uploadBuffer.Get(), fence);
 }
 
 #ifdef _GAMING_XBOX
@@ -376,18 +382,13 @@ void Graphics::Texture::SetData(DeviceResources* device, uint32_t subResId, uint
     device->GetD3DDevice()->GetCopyableFootprints(
         &copyDesc, 0, 1, 0, nullptr, nullptr, &fpRowPitch, &uploadBufferSize);
     const UINT64 dstRowPitch = (fpRowPitch + (TEXTURE_DATA_PITCH_ALIGNMENT - 1)) & ~(UINT64)(TEXTURE_DATA_PITCH_ALIGNMENT - 1);
-
-    // Create the upload buffer.
-    Microsoft::WRL::ComPtr<ID3D12Resource> uploadBuffer;
-    Microsoft::WRL::ComPtr<D3D12MA::Allocation> uploadAlloc;
-    D3D12MA::ALLOCATION_DESC allocDesc = {
-        D3D12MA::ALLOCATION_FLAG_COMMITTED, D3D12_HEAP_TYPE_UPLOAD };
     auto uploadBufferDesc = CD3DX12_RESOURCE_DESC::Buffer(uploadBufferSize);
-    device->GetAllocator()->CreateResource(
-        &allocDesc, &uploadBufferDesc,
-        D3D12_RESOURCE_STATE_GENERIC_READ, nullptr,
-        uploadAlloc.ReleaseAndGetAddressOf(),
-        IID_GRAPHICS_PPV_ARGS(uploadBuffer.ReleaseAndGetAddressOf()));
+
+    Microsoft::WRL::ComPtr<ID3D12Resource> uploadBuffer =
+        device->TakeUploadBuffer(
+            D3D12_HEAP_TYPE_UPLOAD,
+            D3D12_RESOURCE_STATE_GENERIC_READ,
+            uploadBufferDesc);
 
     // Copy the data to the upload buffer.
     {
@@ -437,7 +438,9 @@ void Graphics::Texture::SetData(DeviceResources* device, uint32_t subResId, uint
     );
     cmdList->ResourceBarrier(1, &toShaderResBarrier);
 
-    cmd->Close(true);
+    uint64_t fence = cmd->Close(false);
+
+    device->ReturnUploadBuffer(uploadBuffer.Get(), fence);
 }
 
 #ifdef _GAMING_XBOX
@@ -465,21 +468,19 @@ void Graphics::Texture::GetData(DeviceResources* device, uint32_t subResId, uint
     UINT64 fpRowPitch = 0;
     device->GetD3DDevice()->GetCopyableFootprints(&copyDesc, 0, 1, 0, nullptr, nullptr, &fpRowPitch, &readbackBufferSize);
     const UINT64 dstRowPitch = (fpRowPitch + static_cast<uint64_t>(TEXTURE_DATA_PITCH_ALIGNMENT) - 1u) & ~(static_cast<uint64_t>(TEXTURE_DATA_PITCH_ALIGNMENT) - 1u);
-
-    Microsoft::WRL::ComPtr<ID3D12Resource> readbackBuffer;
-    Microsoft::WRL::ComPtr<D3D12MA::Allocation> readbackAlloc;
-    D3D12MA::ALLOCATION_DESC allocDesc = { D3D12MA::ALLOCATION_FLAG_COMMITTED, D3D12_HEAP_TYPE_READBACK };
     auto readbackBufferDesc = CD3DX12_RESOURCE_DESC::Buffer(readbackBufferSize);
-    device->GetAllocator()->CreateResource(
-        &allocDesc, &readbackBufferDesc,
-        D3D12_RESOURCE_STATE_COPY_DEST, nullptr,
-        readbackAlloc.ReleaseAndGetAddressOf(),
-        IID_GRAPHICS_PPV_ARGS(readbackBuffer.ReleaseAndGetAddressOf()));
+
+    Microsoft::WRL::ComPtr<ID3D12Resource> readbackBuffer =
+        device->TakeUploadBuffer(
+            D3D12_HEAP_TYPE_READBACK,
+            D3D12_RESOURCE_STATE_COPY_DEST,
+            readbackBufferDesc);
 
     auto cmd = device->BeginCommandList();
     auto cmdList = cmd->Get();
 
-    if (impl->m_currentState != D3D12_RESOURCE_STATE_COPY_SOURCE) {
+    if (impl->m_currentState != D3D12_RESOURCE_STATE_COPY_SOURCE)
+    {
         const D3D12_RESOURCE_BARRIER toCopySourceBarrier = CD3DX12_RESOURCE_BARRIER::Transition(
             impl->m_res.Get(), impl->m_currentState, D3D12_RESOURCE_STATE_COPY_SOURCE
         );
@@ -504,7 +505,9 @@ void Graphics::Texture::GetData(DeviceResources* device, uint32_t subResId, uint
     );
     cmdList->ResourceBarrier(1, &revertBarrier);
 
-    cmd->Close(true);
+    uint64_t fence = cmd->Close(true);
+
+    device->ReturnUploadBuffer(readbackBuffer.Get(), fence);
 
     // Phew, the copy is done we can map the resource and read it now
 
@@ -572,9 +575,7 @@ void Texture::AllowUAV() {
     impl->m_desc.Flags |= D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS;
 }
 
-std::vector<D3D12_RESOURCE_BARRIER> Texture::s_batchedBarriers = {};
-
-void Texture::TransitionBatched(D3D12_RESOURCE_STATES newState) {
+void Texture::TransitionBatched(std::vector<D3D12_RESOURCE_BARRIER>& batch, D3D12_RESOURCE_STATES newState) {
     if (impl->m_currentState == newState)
         return;
 
@@ -583,26 +584,26 @@ void Texture::TransitionBatched(D3D12_RESOURCE_STATES newState) {
     if (impl->m_type == SurfaceType::SwapChainRenderTarget && newState == D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE)
         return;
 
-    s_batchedBarriers.push_back(CD3DX12_RESOURCE_BARRIER::Transition(
+    batch.push_back(CD3DX12_RESOURCE_BARRIER::Transition(
         impl->m_res.Get(), impl->m_currentState, newState
     ));
     impl->m_currentState = newState;
 }
 
-void Texture::TransitionBatched(D3D12_RESOURCE_STATES oldState, D3D12_RESOURCE_STATES newState, UINT subresource) {
-    s_batchedBarriers.push_back(CD3DX12_RESOURCE_BARRIER::Transition(
+void Texture::TransitionBatched(std::vector<D3D12_RESOURCE_BARRIER>& batch, D3D12_RESOURCE_STATES oldState, D3D12_RESOURCE_STATES newState, UINT subresource) {
+    batch.push_back(CD3DX12_RESOURCE_BARRIER::Transition(
         impl->m_res.Get(), oldState, newState, subresource
     ));
 }
 
-void Texture::SendTransitionBatch(ID3D12GraphicsCommandList* commandList) {
-    if (s_batchedBarriers.empty())
+void Texture::SendTransitionBatch(std::vector<D3D12_RESOURCE_BARRIER>& batch, ID3D12GraphicsCommandList* commandList) {
+    if (batch.empty())
         return;
-    commandList->ResourceBarrier(s_batchedBarriers.size(), s_batchedBarriers.data());
-    s_batchedBarriers.clear();
+    commandList->ResourceBarrier(batch.size(), batch.data());
+    batch.clear();
 }
 
-void Texture::Transition(ID3D12GraphicsCommandList* commandList, D3D12_RESOURCE_STATES newState) {
-    TransitionBatched(newState);
-    SendTransitionBatch(commandList);
+void Texture::Transition(std::vector<D3D12_RESOURCE_BARRIER>& batch, ID3D12GraphicsCommandList* commandList, D3D12_RESOURCE_STATES newState) {
+    TransitionBatched(batch, newState);
+    SendTransitionBatch(batch, commandList);
 }

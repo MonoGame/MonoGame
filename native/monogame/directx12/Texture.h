@@ -32,18 +32,17 @@ public:
     void SetData(DeviceResources* device, uint32_t subResId, uint32_t x, uint32_t y, uint32_t z, uint32_t w, uint32_t h, uint32_t d, uint8_t* data, size_t size, size_t rowPitch);
     void GetData(DeviceResources* device, uint32_t subResId, uint32_t x, uint32_t y, uint32_t z, uint32_t w, uint32_t h, uint32_t d, uint8_t* data, size_t dataSize);
 
-    static std::vector<D3D12_RESOURCE_BARRIER> s_batchedBarriers;
 
     // store a transition barrier but don't send it immediately, allow sending multiple barrier at once easily
-    void TransitionBatched(D3D12_RESOURCE_STATES newState);
+    void TransitionBatched(std::vector<D3D12_RESOURCE_BARRIER>& batch, D3D12_RESOURCE_STATES newState);
     // be careful, this function doesn't store the current state (since it could be different for each subresource and will be a pain to track)
     // you should probably stick to TransitionBatched(newState) unless you know what you're doing
-    void TransitionBatched(D3D12_RESOURCE_STATES oldState, D3D12_RESOURCE_STATES newState, UINT subresource);
+    void TransitionBatched(std::vector<D3D12_RESOURCE_BARRIER>& batch, D3D12_RESOURCE_STATES oldState, D3D12_RESOURCE_STATES newState, UINT subresource);
     // send all the barriers waiting
-    static void SendTransitionBatch(ID3D12GraphicsCommandList* commandList);
+    static void SendTransitionBatch(std::vector<D3D12_RESOURCE_BARRIER>& batch, ID3D12GraphicsCommandList* commandList);
 
     // shorthand for TransitionBatched() + SendTransitionBatch(), used when you are sure you want to add only a single barrier
-    void Transition(ID3D12GraphicsCommandList* commandList, D3D12_RESOURCE_STATES newState);
+    void Transition(std::vector<D3D12_RESOURCE_BARRIER>& batch, ID3D12GraphicsCommandList* commandList, D3D12_RESOURCE_STATES newState);
 
     bool CheckMSAA(ID3D12Device* device);
     void AllowUAV();

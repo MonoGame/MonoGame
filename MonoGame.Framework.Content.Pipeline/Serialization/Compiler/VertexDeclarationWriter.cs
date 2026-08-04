@@ -4,24 +4,29 @@
 
 using Microsoft.Xna.Framework.Content.Pipeline.Processors;
 
-namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
+namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler;
+
+[ContentTypeWriter]
+class VertexDeclarationWriter : BuiltInContentWriter<VertexDeclarationContent>
 {
-    [ContentTypeWriter]
-    class VertexDeclarationWriter : BuiltInContentWriter<VertexDeclarationContent>
+    protected override void Write(ContentWriter output, VertexDeclarationContent value)
     {
-        protected internal override void Write(ContentWriter output, VertexDeclarationContent value)
+        if (value.VertexStride == null)
         {
-            // If fpr whatever reason there isn't a vertex stride defined, it's going to
-            // cause problems after reading it in, so better to fail early here.
-            output.Write((uint)value.VertexStride.Value);
-            output.Write((uint)value.VertexElements.Count);
-            foreach (var element in value.VertexElements)
-            {
-                output.Write((uint)element.Offset);
-                output.Write((int)element.VertexElementFormat);
-                output.Write((int)element.VertexElementUsage);
-                output.Write((uint)element.UsageIndex);
-            }
+            output.Write(0);
+            return;
+        }
+
+        // If fpr whatever reason there isn't a vertex stride defined, it's going to
+        // cause problems after reading it in, so better to fail early here.
+        output.Write((uint)value.VertexStride);
+        output.Write((uint)value.VertexElements.Count);
+        foreach (var element in value.VertexElements)
+        {
+            output.Write((uint)element.Offset);
+            output.Write((int)element.VertexElementFormat);
+            output.Write((int)element.VertexElementUsage);
+            output.Write((uint)element.UsageIndex);
         }
     }
 }

@@ -7,20 +7,15 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Intermediate
     [ContentTypeSerializer]
     class NamedValueDictionarySerializer<T> : ContentTypeSerializer<NamedValueDictionary<T>>
     {
-        private ContentTypeSerializer _keySerializer;
+        private ContentTypeSerializer _keySerializer = null!;
+        private ContentSerializerAttribute _keyFormat = null!;
+        private ContentSerializerAttribute _valueFormat = null!;
 
-        private ContentSerializerAttribute _keyFormat;
-        private ContentSerializerAttribute _valueFormat;
-
-        public NamedValueDictionarySerializer() :
-            base("namedValueDictionary")
+        public NamedValueDictionarySerializer() : base("namedValueDictionary")
         {
         }
 
-        public override bool CanDeserializeIntoExistingObject
-        {
-            get { return true; }
-        }
+        public override bool CanDeserializeIntoExistingObject => true;
 
         protected internal override void Initialize(IntermediateSerializer serializer)
         {
@@ -39,10 +34,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Intermediate
             };
         }
 
-        public override bool ObjectIsEmpty(NamedValueDictionary<T> value)
-        {
-            return value.Count == 0;
-        }
+        public override bool ObjectIsEmpty(NamedValueDictionary<T>? value) => value == null || value.Count == 0;
 
         protected internal override void ScanChildren(IntermediateSerializer serializer, ChildCallback callback, NamedValueDictionary<T> value)
         {
@@ -50,10 +42,9 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Intermediate
                 callback(serializer.GetTypeSerializer(typeof(T)), kvp.Value);
         }
 
-        protected internal override NamedValueDictionary<T> Deserialize(IntermediateReader input, ContentSerializerAttribute format, NamedValueDictionary<T> existingInstance)
+        protected internal override NamedValueDictionary<T> Deserialize(IntermediateReader input, ContentSerializerAttribute format, NamedValueDictionary<T>? existingInstance)
         {
-            var result = existingInstance ?? new NamedValueDictionary<T>();
-
+            var result = existingInstance ?? [];
             var valueSerializer = input.Serializer.GetTypeSerializer(result.DefaultSerializerType);
 
             while (input.MoveToElement(format.CollectionItemName))
@@ -62,7 +53,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Intermediate
 
                 var key = input.ReadObject<string>(_keyFormat, _keySerializer);
                 var value = input.ReadObject<T>(_valueFormat, valueSerializer);
-                result.Add(key,value);
+                result.Add(key, value);
 
                 input.Xml.ReadEndElement();
             }
@@ -70,10 +61,12 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Intermediate
             return result;
         }
 
-        protected internal override void Serialize(IntermediateWriter output, NamedValueDictionary<T> value, ContentSerializerAttribute format)
+        protected internal override void Serialize(IntermediateWriter output, NamedValueDictionary<T>? value, ContentSerializerAttribute format)
         {
-            var valueSerializer = output.Serializer.GetTypeSerializer(value.DefaultSerializerType);
+            if (value == null)
+                return;
 
+            var valueSerializer = output.Serializer.GetTypeSerializer(value.DefaultSerializerType);
             foreach (var kvp in value)
             {
                 output.Xml.WriteStartElement(format.CollectionItemName);

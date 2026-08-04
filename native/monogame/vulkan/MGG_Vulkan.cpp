@@ -1878,6 +1878,12 @@ void MGVK_RecreateSwapChain(
 			goto RETRY_SURFACE_FORMAT_SEARCH;
 		}
 
+		if (surface_format == VK_FORMAT_UNDEFINED && vkColor == VK_FORMAT_R8G8B8A8_SRGB)
+		{
+			vkColor = VK_FORMAT_B8G8R8A8_SRGB;
+			goto RETRY_SURFACE_FORMAT_SEARCH;
+		}
+
 		if (surface_format == VK_FORMAT_UNDEFINED)
 		{
 			// TODO: We need a better "log" method that isn't just printfs.
@@ -2474,6 +2480,12 @@ static void MGVK_DestroyFrameResources(MGG_GraphicsDevice* device, FrameCounter 
 			if (texture->view != VK_NULL_HANDLE)
 				vkDestroyImageView(device->device, texture->view, nullptr);
 
+			if (texture->msImage != VK_NULL_HANDLE)
+			{
+				vkDestroyImageView(device->device, texture->resolve_view, nullptr);
+				vmaDestroyImage(device->allocator, texture->msImage, texture->msAllocation);
+			}
+
 			vmaDestroyImage(device->allocator, texture->image, texture->allocation);
 			mg_remove(device->all_textures, texture);
 			delete texture;
@@ -2876,9 +2888,7 @@ void MGG_GraphicsDevice_SetVertexBuffer(MGG_GraphicsDevice* device, mgint slot, 
 	assert(device != nullptr);
 	assert(buffer != nullptr);
 
-	// TODO: Support multiple VB streams!
-	assert(slot == 0);
-	assert(vertexOffset == 0);
+	assert(slot >= 0 && slot < 8);
 
 	device->vertexBuffers[slot] = buffer;
 	device->vertexOffsets[slot] = vertexOffset;
@@ -3287,7 +3297,7 @@ static void MGVK_UpdateRenderPass(MGG_GraphicsDevice* device, FrameCounter curre
 			desc.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
 			desc.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
 			desc.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
-			desc.finalLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
+			desc.finalLayout = firstTarget->isSwapchain ? VK_IMAGE_LAYOUT_PRESENT_SRC_KHR : VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
 
 			num_attachments++;
 		}
@@ -4855,7 +4865,8 @@ static MGG_Buffer* MGVK_BufferDiscard(MGG_GraphicsDevice* device, MGG_Buffer* bu
 	}
 
 	// We didn't find a match, so allocate a new one.
-	buffer = MGG_Buffer_Create(device, type, dataSize);
+	auto dynamic = type == MGBufferType::Constant;
+	buffer = MGG_Buffer_Create(device, type, dynamic, dataSize);
 
 	return buffer;
 }
@@ -4914,9 +4925,9 @@ static MGG_Buffer* MGVK_Buffer_Create(MGG_GraphicsDevice* device, MGBufferType t
 	return buffer;
 }
 
-MGG_Buffer* MGG_Buffer_Create(MGG_GraphicsDevice* device, MGBufferType type, mgint sizeInBytes)
+MGG_Buffer* MGG_Buffer_Create(MGG_GraphicsDevice* device, MGBufferType type, mgbool dynamic, mgint sizeInBytes)
 {
-	return MGVK_Buffer_Create(device, type, sizeInBytes, false);
+	return MGVK_Buffer_Create(device, type, sizeInBytes, !dynamic);
 }
 
 static void MGVK_BufferCopyAndFlush(MGG_GraphicsDevice* device, MGG_Buffer* buffer, int destOffset, mgbyte* data, int dataBytes)
@@ -5061,11 +5072,6 @@ void MGG_Buffer_SetData(MGG_GraphicsDevice* device, MGG_Buffer*& buffer, mgint o
 	}
 
 	// Do the copy and flush.
-	auto size = elementCount * vertexStride;
-	if (elementSizeInBytes < vertexStride)
-	{
-		size -= vertexStride - elementSizeInBytes;
-	}
 	MGVK_BufferCopyAndFlush(device, buffer, offset, data, elementCount, elementSizeInBytes, vertexStride);
 }
 
@@ -5213,7 +5219,7 @@ MGG_Texture* MGG_RenderTarget_Create(
 		create_info.extent.depth = depth;
 		create_info.mipLevels = mipmaps;
 		create_info.arrayLayers = slices;
-        create_info.samples = ToVkSampleCount(multiSampleCount);
+        create_info.samples = VK_SAMPLE_COUNT_1_BIT;
 		create_info.tiling = VK_IMAGE_TILING_OPTIMAL;
 		create_info.usage = VK_IMAGE_USAGE_SAMPLED_BIT | 
                         VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | 
@@ -5228,6 +5234,37 @@ MGG_Texture* MGG_RenderTarget_Create(
 
 		texture->view = CreateImageView(device, texture, create_info.mipLevels);
 		VK_SET_OBJECT_NAME(device->device, texture->view, VK_OBJECT_TYPE_IMAGE_VIEW, "MGG_Texture.view (RenderTarget id: %llu)", texture->id);
+		
+		if (multiSampleCount > 1)
+		{
+			auto ms_create_info = create_info;
+			ms_create_info.samples = ToVkSampleCount(multiSampleCount);
+			ms_create_info.usage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
+			VmaAllocationCreateInfo allocInfo = {};
+			allocInfo.usage = VMA_MEMORY_USAGE_GPU_ONLY;
+			VkResult res = vmaCreateImage(device->allocator, &ms_create_info, &allocInfo,
+				&texture->msImage, &texture->msAllocation, nullptr);
+			VK_CHECK_RESULT(res);
+			VK_SET_OBJECT_NAME(device->device, texture->msImage, VK_OBJECT_TYPE_IMAGE,
+				"MGG_Texture.msImage (RenderTarget id: %llu)", texture->id);
+
+			VkImageViewCreateInfo image_view_create_info = { VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO };
+			image_view_create_info.image = texture->image;
+			image_view_create_info.viewType = ToVkImageViewType(texture->type);
+			image_view_create_info.format = texture->info.format;
+			image_view_create_info.subresourceRange.aspectMask = DetermineAspectMask(texture->info.format);
+			image_view_create_info.subresourceRange.baseMipLevel = 0;
+			image_view_create_info.subresourceRange.levelCount = 1;
+			image_view_create_info.subresourceRange.baseArrayLayer = 0;
+			image_view_create_info.subresourceRange.layerCount = texture->info.arrayLayers;
+
+			res = vkCreateImageView(device->device, &image_view_create_info, NULL, &texture->resolve_view);
+			VK_CHECK_RESULT(res);
+			VK_SET_OBJECT_NAME(device->device, texture->resolve_view, VK_OBJECT_TYPE_IMAGE_VIEW,
+				"MGG_Texture.resolve_view (RenderTarget id: %llu)", texture->id);
+
+		}
+
 		texture->target_view = CreateImageView(device, texture, create_info.mipLevels);
 		VK_SET_OBJECT_NAME(device->device, texture->target_view, VK_OBJECT_TYPE_IMAGE_VIEW, "MGG_Texture.target_view (RenderTarget id: %llu)", texture->id);
 
