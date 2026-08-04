@@ -345,15 +345,15 @@ public partial class GraphicsDevice
 
     private void PlatformApplyBlend()
     {
-        if (_blendStateDirty)
+        /*
+         * BlendFactor goes through the same native call as BlendState.
+         * If it changes, we need to reapply the state.
+         * - Chris <aristurtledev>
+         */
+        if (_blendStateDirty || _blendFactorDirty)
         {
             _actualBlendState.PlatformApplyState(this);
             _blendStateDirty = false;
-        }
-
-        if (_blendFactorDirty)
-        {
-            // TODO?
             _blendFactorDirty = false;
         }
     }

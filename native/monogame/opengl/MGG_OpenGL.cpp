@@ -142,6 +142,8 @@ struct MGG_Texture
     mgint multiSampleCount = 0;
     MGRenderTargetUsage renderTargetUsage = MGRenderTargetUsage::DiscardContents;
     GLuint framebuffer = 0;
+    GLuint resolveFramebuffer = 0;
+    GLuint colorRenderbuffer = 0;
     GLuint depthRenderbuffer = 0;
 };
 
@@ -822,6 +824,20 @@ namespace
         return device->backBufferHeight - y - height;
     }
 
+    bool IsRenderTargetBound(const MGG_GraphicsDevice* device, const MGG_Texture* texture)
+    {
+        assert(device != nullptr);
+        assert(texture != nullptr);
+
+        for (mgint i = 0; i < device->currentRenderTargetCount; ++i)
+        {
+            if (device->currentRenderTargets[i] == texture)
+                return true;
+        }
+
+        return false;
+    }
+
     void ClearCurrentRenderTargets(MGG_GraphicsDevice* device)
     {
         assert(device != nullptr);
@@ -831,6 +847,12 @@ namespace
         device->currentRenderTarget = nullptr;
         device->currentRenderTargetCount = 0;
         device->currentFramebuffer = 0;
+    }
+
+    bool UsesMultisampledRenderTarget(const MGG_Texture* texture)
+    {
+        assert(texture != nullptr);
+        return texture->isRenderTarget && texture->multiSampleCount > 0;
     }
 
     void ToTextureFilters(MGTextureFilter filter, GLenum& minFilter, GLenum& magFilter)
@@ -1129,6 +1151,16 @@ namespace
         assert(device != nullptr);
         assert(texture != nullptr);
         assert(slice >= 0);
+
+        if (UsesMultisampledRenderTarget(texture))
+        {
+            device->context.functions.FramebufferRenderbuffer(
+                target,
+                attachment,
+                GL_RENDERBUFFER,
+                texture->colorRenderbuffer);
+            return;
+        }
 
         device->context.functions.FramebufferTexture2D(
             target,
@@ -2247,6 +2279,65 @@ void MGG_GraphicsDevice_ResolveRenderTargets(MGG_GraphicsDevice* device)
 
     if (device->currentRenderTargetCount == 0)
         return;
+
+    if (UsesMultisampledRenderTarget(device->currentRenderTargets[0]))
+    {
+        bool restoreScissor = device->rasterizerState != nullptr && device->rasterizerState->info.scissorTestEnable;
+        if (restoreScissor)
+            glDisable(GL_SCISSOR_TEST);
+
+        device->context.functions.BindFramebuffer(GL_READ_FRAMEBUFFER, device->currentFramebuffer);
+
+        for (mgint i = 0; i < device->currentRenderTargetCount; ++i)
+        {
+            MGG_Texture* renderTarget = device->currentRenderTargets[i];
+            assert(renderTarget != nullptr);
+            assert(renderTarget->resolveFramebuffer != 0);
+
+            device->context.functions.BindFramebuffer(GL_DRAW_FRAMEBUFFER, renderTarget->resolveFramebuffer);
+            device->context.functions.FramebufferTexture2D(
+                GL_DRAW_FRAMEBUFFER,
+                GL_COLOR_ATTACHMENT0,
+                GetTextureImageTarget(renderTarget, device->currentRenderTargetSlices[i]),
+                renderTarget->handle,
+                0);
+            glReadBuffer(GL_COLOR_ATTACHMENT0 + i);
+            glDrawBuffer(GL_COLOR_ATTACHMENT0);
+            device->context.functions.BlitFramebuffer(
+                0,
+                0,
+                renderTarget->width,
+                renderTarget->height,
+                0,
+                0,
+                renderTarget->width,
+                renderTarget->height,
+                GL_COLOR_BUFFER_BIT,
+                GL_NEAREST);
+        }
+
+        device->context.functions.BindFramebuffer(GL_FRAMEBUFFER, device->currentFramebuffer);
+        glReadBuffer(GL_COLOR_ATTACHMENT0);
+        if (restoreScissor)
+            glEnable(GL_SCISSOR_TEST);
+    }
+
+    for (mgint i = 0; i < device->currentRenderTargetCount; ++i)
+    {
+        MGG_Texture* renderTarget = device->currentRenderTargets[i];
+        assert(renderTarget != nullptr);
+        assert(renderTarget->isRenderTarget);
+        assert(renderTarget->mipmaps > 0);
+
+        if (renderTarget->mipmaps <= 1)
+            continue;
+
+        GLint previousActiveTexture = 0;
+        GLint previousBinding = 0;
+        BeginTextureEdit(device, renderTarget, previousActiveTexture, previousBinding);
+        device->context.functions.GenerateMipmap(renderTarget->target);
+        EndTextureEdit(device, renderTarget, previousActiveTexture, previousBinding);
+    }
 }
 
 void MGG_GraphicsDevice_GetBackBufferData(MGG_GraphicsDevice* device, mgint x, mgint y, mgint width, mgint height, void* data, mgint count, mgint dataBytes)
@@ -2258,10 +2349,17 @@ void MGG_GraphicsDevice_GetBackBufferData(MGG_GraphicsDevice* device, mgint x, m
 
     EnsureContext(device);
 
+    if (width <= 0 || height <= 0)
+        MGGL_FAIL("Invalid backbuffer readback region", "requested backbuffer readback region must be positive");
+
+    if (x < 0 || y < 0 || x + width > device->backBufferWidth || y + height > device->backBufferHeight)
+        MGGL_FAIL("Invalid backbuffer readback region", "requested backbuffer readback region exceeds the current backbuffer bounds");
+
     if (device->currentRenderTargetCount > 0)
         MGGL_FAIL("Backbuffer readback requires the default framebuffer", "need to switch off render targets before calling GetBackBufferData");
 
-    size_t requiredBytes = static_cast<size_t>(width) * static_cast<size_t>(height) * 4;
+    TextureFormatInfo formatInfo = GetTextureFormatInfo(device->backBufferFormat);
+    size_t requiredBytes = static_cast<size_t>(width) * static_cast<size_t>(height) * static_cast<size_t>(formatInfo.bytesPerPixel);
     size_t destinationBytes = static_cast<size_t>(count) * static_cast<size_t>(dataBytes);
     if (destinationBytes < requiredBytes)
         MGGL_FAIL("Backbuffer readback size mismatch", "destination buffer is smaller than the requested region");
@@ -2592,14 +2690,6 @@ MGG_Texture* MGG_RenderTarget_Create(MGG_GraphicsDevice* device, MGTextureType t
         MGGL_FAIL("Unsupported render target shape", "need array and 3D render target support");
     }
 
-    // TODO: add multisampled render target allocation and resolve
-    if (multiSampleCount > 0)
-        MGGL_FAIL("Unsupported render target multisampling", "need to add multisampled render target support");
-
-    // TODO: add render target mip allocation
-    if (mipmaps != 1)
-        MGGL_FAIL("Unsupported render target mipmaps", "need to add render target mip levels");
-
     MGG_Texture* texture = CreateTextureResource(device, type, format, width, height, depth, mipmaps, slices);
     texture->isRenderTarget = true;
     texture->depthFormat = depthFormat;
@@ -2614,13 +2704,42 @@ MGG_Texture* MGG_RenderTarget_Create(MGG_GraphicsDevice* device, MGTextureType t
     if (texture->framebuffer == 0)
         MGGL_FAIL("glGenFramebuffers failed", "framebuffer creation returned 0");
 
+    if (multiSampleCount > 0)
+    {
+        device->context.functions.GenFramebuffers(1, &texture->resolveFramebuffer);
+        if (texture->resolveFramebuffer == 0)
+            MGGL_FAIL("glGenFramebuffers failed", "resolve framebuffer creation returned 0");
+    }
+
     device->context.functions.BindFramebuffer(GL_FRAMEBUFFER, texture->framebuffer);
-    device->context.functions.FramebufferTexture2D(
-        GL_FRAMEBUFFER,
-        GL_COLOR_ATTACHMENT0,
-        GetTextureImageTarget(texture, 0),
-        texture->handle,
-        0);
+    if (multiSampleCount > 0)
+    {
+        device->context.functions.GenRenderbuffers(1, &texture->colorRenderbuffer);
+        if (texture->colorRenderbuffer == 0)
+            MGGL_FAIL("glGenRenderbuffers failed", "color attachment creation returned 0");
+
+        device->context.functions.BindRenderbuffer(GL_RENDERBUFFER, texture->colorRenderbuffer);
+        device->context.functions.RenderbufferStorageMultisample(
+            GL_RENDERBUFFER,
+            multiSampleCount,
+            texture->internalFormat,
+            width,
+            height);
+        device->context.functions.FramebufferRenderbuffer(
+            GL_FRAMEBUFFER,
+            GL_COLOR_ATTACHMENT0,
+            GL_RENDERBUFFER,
+            texture->colorRenderbuffer);
+    }
+    else
+    {
+        device->context.functions.FramebufferTexture2D(
+            GL_FRAMEBUFFER,
+            GL_COLOR_ATTACHMENT0,
+            GetTextureImageTarget(texture, 0),
+            texture->handle,
+            0);
+    }
     glDrawBuffer(GL_COLOR_ATTACHMENT0);
     glReadBuffer(GL_COLOR_ATTACHMENT0);
 
@@ -2631,11 +2750,23 @@ MGG_Texture* MGG_RenderTarget_Create(MGG_GraphicsDevice* device, MGTextureType t
             MGGL_FAIL("glGenRenderbuffers failed", "depth renderbuffer creation returned 0");
 
         device->context.functions.BindRenderbuffer(GL_RENDERBUFFER, texture->depthRenderbuffer);
-        device->context.functions.RenderbufferStorage(
-            GL_RENDERBUFFER,
-            ToDepthRenderbufferFormat(depthFormat),
-            width,
-            height);
+        if (multiSampleCount > 0)
+        {
+            device->context.functions.RenderbufferStorageMultisample(
+                GL_RENDERBUFFER,
+                multiSampleCount,
+                ToDepthRenderbufferFormat(depthFormat),
+                width,
+                height);
+        }
+        else
+        {
+            device->context.functions.RenderbufferStorage(
+                GL_RENDERBUFFER,
+                ToDepthRenderbufferFormat(depthFormat),
+                width,
+                height);
+        }
         device->context.functions.FramebufferRenderbuffer(
             GL_FRAMEBUFFER,
             ToDepthAttachment(depthFormat),
@@ -2646,6 +2777,23 @@ MGG_Texture* MGG_RenderTarget_Create(MGG_GraphicsDevice* device, MGTextureType t
     GLenum framebufferStatus = device->context.functions.CheckFramebufferStatus(GL_FRAMEBUFFER);
     if (framebufferStatus != GL_FRAMEBUFFER_COMPLETE)
         MGGL_FAIL("OpenGL framebuffer incomplete", "framebuffer status check failed");
+
+    if (multiSampleCount > 0)
+    {
+        device->context.functions.BindFramebuffer(GL_FRAMEBUFFER, texture->resolveFramebuffer);
+        device->context.functions.FramebufferTexture2D(
+            GL_FRAMEBUFFER,
+            GL_COLOR_ATTACHMENT0,
+            GetTextureImageTarget(texture, 0),
+            texture->handle,
+            0);
+        glDrawBuffer(GL_COLOR_ATTACHMENT0);
+        glReadBuffer(GL_COLOR_ATTACHMENT0);
+
+        framebufferStatus = device->context.functions.CheckFramebufferStatus(GL_FRAMEBUFFER);
+        if (framebufferStatus != GL_FRAMEBUFFER_COMPLETE)
+            MGGL_FAIL("OpenGL framebuffer incomplete", "resolve framebuffer status check failed");
+    }
 
     EndFramebufferEdit(device, previousFramebuffer, previousRenderbuffer);
     return texture;
@@ -2663,20 +2811,7 @@ void MGG_Texture_Destroy(MGG_GraphicsDevice* device, MGG_Texture* texture)
     GLint previousActiveTexture = 0;
     glGetIntegerv(GL_ACTIVE_TEXTURE, &previousActiveTexture);
 
-    bool unbindRenderTargets = device->currentRenderTarget == texture;
-    if (!unbindRenderTargets)
-    {
-        for (mgint i = 0; i < device->currentRenderTargetCount; ++i)
-        {
-            if (device->currentRenderTargets[i] == texture)
-            {
-                unbindRenderTargets = true;
-                break;
-            }
-        }
-    }
-
-    if (unbindRenderTargets)
+    if (IsRenderTargetBound(device, texture))
     {
         device->context.functions.BindFramebuffer(GL_FRAMEBUFFER, 0);
         glDrawBuffer(GL_BACK);
@@ -2709,6 +2844,12 @@ void MGG_Texture_Destroy(MGG_GraphicsDevice* device, MGG_Texture* texture)
 
     if (texture->depthRenderbuffer != 0)
         device->context.functions.DeleteRenderbuffers(1, &texture->depthRenderbuffer);
+
+    if (texture->colorRenderbuffer != 0)
+        device->context.functions.DeleteRenderbuffers(1, &texture->colorRenderbuffer);
+
+    if (texture->resolveFramebuffer != 0)
+        device->context.functions.DeleteFramebuffers(1, &texture->resolveFramebuffer);
 
     if (texture->framebuffer != 0)
         device->context.functions.DeleteFramebuffers(1, &texture->framebuffer);
