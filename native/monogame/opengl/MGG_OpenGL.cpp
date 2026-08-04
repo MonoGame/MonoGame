@@ -250,9 +250,14 @@ namespace
         return SDL_GL_ExtensionSupported(name) == SDL_TRUE;
     }
 
-    bool SupportsOpenGLDepthClamp(const MGG_GraphicsDevice* device)
+    bool SupportsOpenGLDepthClamp(MGG_GraphicsDevice* device)
     {
         assert(device != nullptr);
+
+        if (device->window == nullptr || device->context.handle == nullptr)
+            return false;
+
+        EnsureContext(device);
 
         if (device->context.majorVersion > 3)
             return true;
