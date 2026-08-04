@@ -1605,9 +1605,14 @@ void MGG_GraphicsDevice_Destroy(MGG_GraphicsDevice* device)
 
         for (MGG_ShaderProgram* program : device->programs)
             DestroyProgram(device, program);
-
-        device->programs.clear();
     }
+    else
+    {
+        for (MGG_ShaderProgram* program : device->programs)
+            delete program;
+    }
+
+    device->programs.clear();
 
     device->context.Destroy();
     delete device;
