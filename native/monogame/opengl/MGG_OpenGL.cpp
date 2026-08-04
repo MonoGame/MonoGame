@@ -2764,24 +2764,9 @@ MGG_Texture* MGG_RenderTarget_Create(MGG_GraphicsDevice* device, MGTextureType t
 
     EnsureContext(device);
 
-    if (type == MGTextureType::_2D)
-    {
-        if (depth != 1 || slices != 1)
-            MGGL_FAIL("Unsupported render target shape", "2D render targets use depth 1 and one slice");
-    }
-    else if (type == MGTextureType::Cube)
-    {
-        if (depth != 1)
-            MGGL_FAIL("Unsupported render target depth", "cube render targets use depth 1");
-
-        if (slices != 6)
-            MGGL_FAIL("Unsupported render target slice count", "cube render targets need all six faces");
-    }
-    else
-    {
-        // TODO: add array and 3D render target support
-        MGGL_FAIL("Unsupported render target shape", "need array and 3D render target support");
-    }
+    if (type == MGTextureType::_3D)
+        // TODO: add 3D render target support once there is a layer aware framebuffer attachment path
+        MGGL_FAIL("Unsupported render target shape", "need a layer aware framebuffer attachment path for 3D render targets");
 
     MGG_Texture* texture = CreateTextureResource(device, type, format, width, height, depth, mipmaps, slices);
     texture->isRenderTarget = true;
