@@ -32,6 +32,26 @@ public partial class GraphicsDevice
         get; private set;
     }
 
+    internal int MaxTextureAnisotropy { get; private set; }
+    internal bool SupportsNonPowerOfTwo { get; private set; }
+    internal bool SupportsTextureFilterAnisotropic { get; private set; }
+    internal bool SupportsDepth24 { get; private set; }
+    internal bool SupportsPackedDepthStencil { get; private set; }
+    internal bool SupportsDepthNonLinear { get; private set; }
+    internal bool SupportsTextureMaxLevel { get; private set; }
+    internal bool SupportsDxt1 { get; private set; }
+    internal bool SupportsS3tc { get; private set; }
+    internal bool SupportsSRgb { get; private set; }
+    internal bool SupportsDepthClamp { get; private set; }
+    internal bool SupportsTextureArrays { get; private set; }
+    internal bool SupportsVertexTextures { get; private set; }
+    internal bool SupportsFloatTextures { get; private set; }
+    internal bool SupportsHalfFloatTextures { get; private set; }
+    internal bool SupportsNormalized { get; private set; }
+    internal bool SupportsInstancing { get; private set; }
+    internal bool SupportsBaseIndexInstancing { get; private set; }
+    internal bool SupportsSeparateBlendStates { get; private set; }
+
     private unsafe void PlatformSetup()
     {
         // Creates the device, but no swap chain yet.
@@ -45,6 +65,25 @@ public partial class GraphicsDevice
         MaxVertexTextureSlots = caps.MaxVertexTextureSlots;
         _maxVertexBufferSlots = caps.MaxVertexBufferSlots;
         ShaderProfile = caps.ShaderProfile;
+        MaxTextureAnisotropy = caps.MaxTextureAnisotropy;
+        SupportsNonPowerOfTwo = caps.SupportsNonPowerOfTwo;
+        SupportsTextureFilterAnisotropic = caps.SupportsTextureFilterAnisotropic;
+        SupportsDepth24 = caps.SupportsDepth24;
+        SupportsPackedDepthStencil = caps.SupportsPackedDepthStencil;
+        SupportsDepthNonLinear = caps.SupportsDepthNonLinear;
+        SupportsTextureMaxLevel = caps.SupportsTextureMaxLevel;
+        SupportsDxt1 = caps.SupportsDxt1;
+        SupportsS3tc = caps.SupportsS3tc;
+        SupportsSRgb = caps.SupportsSRgb;
+        SupportsDepthClamp = caps.SupportsDepthClamp;
+        SupportsTextureArrays = caps.SupportsTextureArrays;
+        SupportsVertexTextures = caps.SupportsVertexTextures;
+        SupportsFloatTextures = caps.SupportsFloatTextures;
+        SupportsHalfFloatTextures = caps.SupportsHalfFloatTextures;
+        SupportsNormalized = caps.SupportsNormalized;
+        SupportsInstancing = caps.SupportsInstancing;
+        SupportsBaseIndexInstancing = caps.SupportsBaseIndexInstancing;
+        SupportsSeparateBlendStates = caps.SupportsSeparateBlendStates;
         UseHalfPixelOffset = false;
     }
 
