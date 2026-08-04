@@ -1769,10 +1769,48 @@ void MGG_GraphicsDevice_Clear(MGG_GraphicsDevice* device, MGClearOptions options
     EnsureContext(device);
     assert(device->isInFrame);
 
+    GLboolean colorWriteMask[4] = {};
+    GLboolean depthWriteMask = GL_FALSE;
+    GLint stencilWriteMask = 0;
+    GLint scissorBox[4] = {};
+    GLboolean depthTestEnabled = glIsEnabled(GL_DEPTH_TEST);
+    GLboolean stencilTestEnabled = glIsEnabled(GL_STENCIL_TEST);
+
+    glGetBooleanv(GL_COLOR_WRITEMASK, colorWriteMask);
+    glGetBooleanv(GL_DEPTH_WRITEMASK, &depthWriteMask);
+    glGetIntegerv(GL_STENCIL_WRITEMASK, &stencilWriteMask);
+    glGetIntegerv(GL_SCISSOR_BOX, scissorBox);
+
+    glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
+    glDepthMask(GL_TRUE);
+    glStencilMask(static_cast<GLuint>(~0u));
+    glScissor(device->viewportX, ToOpenGLWindowY(device, device->viewportY, device->viewportHeight), device->viewportWidth, device->viewportHeight);
+
+    if ((static_cast<mgint>(options) & static_cast<mgint>(MGClearOptions::DepthBuffer)) != 0)
+        glEnable(GL_DEPTH_TEST);
+
+    if ((static_cast<mgint>(options) & static_cast<mgint>(MGClearOptions::Stencil)) != 0)
+        glEnable(GL_STENCIL_TEST);
+
     glClearColor(color.X, color.Y, color.Z, color.W);
     glClearDepth(depth);
     glClearStencil(stencil);
     glClear(ToClearMask(options));
+
+    glColorMask(colorWriteMask[0], colorWriteMask[1], colorWriteMask[2], colorWriteMask[3]);
+    glDepthMask(depthWriteMask);
+    glStencilMask(static_cast<GLuint>(stencilWriteMask));
+    glScissor(scissorBox[0], scissorBox[1], scissorBox[2], scissorBox[3]);
+
+    if (depthTestEnabled)
+        glEnable(GL_DEPTH_TEST);
+    else
+        glDisable(GL_DEPTH_TEST);
+
+    if (stencilTestEnabled)
+        glEnable(GL_STENCIL_TEST);
+    else
+        glDisable(GL_STENCIL_TEST);
 }
 
 void MGG_GraphicsDevice_Present(MGG_GraphicsDevice* device, mgint currentFrame, mgint syncInterval)
