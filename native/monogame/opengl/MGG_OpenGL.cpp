@@ -168,7 +168,7 @@ struct MGG_InputLayout
 {
     struct Binding
     {
-        GLuint location = 0;
+        GLuint attributeIndex = 0;
         GLuint vertexBufferSlot = 0;
         GLint elementCount = 0;
         GLenum elementType = GL_FLOAT;
@@ -179,7 +179,6 @@ struct MGG_InputLayout
 
     std::vector<Binding> bindings;
     std::vector<mgint> strides;
-    std::vector<GLuint> enabledLocations;
 };
 
 struct MGG_ShaderProgram
@@ -188,6 +187,7 @@ struct MGG_ShaderProgram
     MGG_Shader* pixelShader = nullptr;
     GLuint handle = 0;
     GLint posFixupLocation = -1;
+    std::vector<GLint> attributeLocations;
     std::array<std::vector<GLint>, static_cast<size_t>(MGShaderStage::Count)> constantBufferLocations = {};
 };
 
@@ -518,47 +518,55 @@ namespace
 
         for (GLuint location = 0; location < device->enabledAttributes.size(); ++location)
         {
-            if (device->enabledAttributes[location])
-            {
-                device->context.functions.DisableVertexAttribArray(location);
-                device->enabledAttributes[location] = false;
-            }
+            if (!device->enabledAttributes[location])
+                continue;
+
+            device->context.functions.DisableVertexAttribArray(location);
+            device->enabledAttributes[location] = false;
         }
 
         if (device->inputLayout == nullptr)
             return;
 
+        if (device->currentProgram == nullptr)
+            MGGL_FAIL("Missing shader program", "input layout application requires a linked shader program");
+
         for (const MGG_InputLayout::Binding& binding : device->inputLayout->bindings)
         {
-            // TODO: expand the native attribute trackings
-            if (binding.location >= device->enabledAttributes.size())
-                MGGL_FAIL("Unsupported vertex attribute location", "need to expand the native OpenGL attribute tracking range");
-
             if (binding.vertexBufferSlot >= device->vertexBuffers.size())
-                MGGL_FAIL("Invalid vertex buffer slot", "input layout references a vertex buffer slot outside the device range");
+                MGGL_FAIL("Invalid vertex buffer slot", "input layout references a vertex buffer slot beyond the supported range");
 
             if (binding.vertexBufferSlot >= device->inputLayout->strides.size())
-                MGGL_FAIL("Invalid vertex buffer stride", "input layout references a stride slot outside the stream count");
+                MGGL_FAIL("Invalid vertex stride table", "input layout references a vertex stream that does not have a recorded stride");
 
             MGG_Buffer* buffer = device->vertexBuffers[binding.vertexBufferSlot];
             if (buffer == nullptr)
-                MGGL_FAIL("Vertex buffer binding missing", "input layout requires a vertex buffer before drawing");
+                MGGL_FAIL("Missing vertex buffer binding", "input layout application requires every referenced vertex buffer slot to be bound");
 
             mgint stride = device->inputLayout->strides[binding.vertexBufferSlot];
             intptr_t baseOffset = static_cast<intptr_t>(device->vertexOffsets[binding.vertexBufferSlot] + drawVertexOffset) * stride;
             intptr_t byteOffset = baseOffset + binding.alignedByteOffset;
+            if (binding.attributeIndex >= device->currentProgram->attributeLocations.size())
+                MGGL_FAIL("Invalid shader attribute index", "input layout references a shader attribute index that is not active for the linked program");
+
+            GLint location = device->currentProgram->attributeLocations[binding.attributeIndex];
+            if (location < 0)
+                continue;
+
+            if (static_cast<size_t>(location) >= device->enabledAttributes.size())
+                MGGL_FAIL("Unsupported shader attribute location", "linked OpenGL program reported an attribute location beyond the native OpenGL tracking limit");
 
             device->context.functions.BindBuffer(GL_ARRAY_BUFFER, buffer->handle);
-            device->context.functions.EnableVertexAttribArray(binding.location);
+            device->context.functions.EnableVertexAttribArray(static_cast<GLuint>(location));
             device->context.functions.VertexAttribPointer(
-                binding.location,
+                static_cast<GLuint>(location),
                 binding.elementCount,
                 binding.elementType,
                 binding.normalized,
                 stride,
                 reinterpret_cast<const void*>(byteOffset));
-            device->context.functions.VertexAttribDivisor(binding.location, binding.instanceDataStepRate);
-            device->enabledAttributes[binding.location] = true;
+            device->context.functions.VertexAttribDivisor(static_cast<GLuint>(location), binding.instanceDataStepRate);
+            device->enabledAttributes[location] = true;
         }
 
         device->inputLayoutDirty = false;
@@ -616,51 +624,54 @@ namespace
         device->context.functions.AttachShader(program->handle, vertexShader->handle);
         device->context.functions.AttachShader(program->handle, pixelShader->handle);
 
-        for (mgint attributeIndex = 0; attributeIndex < vertexShader->attributeCount; ++attributeIndex)
-        {
-            std::string attributeName = GetAttributeName(attributeIndex);
-            device->context.functions.BindAttribLocation(
-                program->handle,
-                static_cast<GLuint>(attributeIndex),
-                attributeName.c_str());
-        }
-
         device->context.functions.LinkProgram(program->handle);
 
         GLint linked = GL_FALSE;
         device->context.functions.GetProgramiv(program->handle, GL_LINK_STATUS, &linked);
         if (linked != GL_TRUE)
         {
-            char infoLog[2048] = {};
-            device->context.functions.GetProgramInfoLog(
-                program->handle,
-                static_cast<GLsizei>(sizeof(infoLog)),
-                nullptr,
-                infoLog);
-            DestroyProgram(device, program);
-            MGGL_FAIL("OpenGL program link failed", infoLog[0] != '\0' ? infoLog : "shader program link failed without an info log");
+            char log[2048] = {};
+            GLsizei length = 0;
+            device->context.functions.GetProgramInfoLog(program->handle, sizeof(log), &length, log);
+            MGGL_FAIL("glLinkProgram failed", length > 0 ? log : "program link failed without an info log");
         }
 
         device->context.functions.UseProgram(program->handle);
         program->posFixupLocation = device->context.functions.GetUniformLocation(program->handle, "posFixup");
+        program->attributeLocations.reserve(vertexShader->attributeCount);
+        for (mgint index = 0; index < vertexShader->attributeCount; ++index)
+        {
+            std::string attributeName = GetAttributeName(index);
+            program->attributeLocations.push_back(device->context.functions.GetAttribLocation(program->handle, attributeName.c_str()));
+        }
+
+        for (mgint slot = 0; slot < GetTextureSlotLimit(MGShaderStage::Vertex); ++slot)
+        {
+            std::string samplerName = GetSamplerName(MGShaderStage::Vertex, slot);
+            GLint location = device->context.functions.GetUniformLocation(program->handle, samplerName.c_str());
+            if (location >= 0)
+                device->context.functions.Uniform1i(location, static_cast<GLint>(GetTextureUnit(MGShaderStage::Vertex, slot)));
+        }
+
+        for (mgint slot = 0; slot < GetTextureSlotLimit(MGShaderStage::Pixel); ++slot)
+        {
+            std::string samplerName = GetSamplerName(MGShaderStage::Pixel, slot);
+            GLint location = device->context.functions.GetUniformLocation(program->handle, samplerName.c_str());
+            if (location >= 0)
+                device->context.functions.Uniform1i(location, static_cast<GLint>(GetTextureUnit(MGShaderStage::Pixel, slot)));
+        }
 
         for (size_t stageIndex = 0; stageIndex < ShaderStageCount; ++stageIndex)
         {
+            MGG_Shader* shader = stageIndex == 0 ? vertexShader : pixelShader;
             MGShaderStage stage = stageIndex == 0 ? MGShaderStage::Vertex : MGShaderStage::Pixel;
-            for (mgint slot = 0; slot < GetTextureSlotLimit(stage); ++slot)
-            {
-                std::string samplerName = GetSamplerName(stage, slot);
-                GLint samplerLocation = device->context.functions.GetUniformLocation(program->handle, samplerName.c_str());
-                if (samplerLocation >= 0)
-                    device->context.functions.Uniform1i(samplerLocation, static_cast<GLint>(GetTextureUnit(stage, slot)));
-            }
+            std::vector<GLint>& locations = program->constantBufferLocations[stageIndex];
+            locations.reserve(shader->constantBufferTypes.size());
 
-            MGG_Shader* shader = device->shaders[stageIndex];
-            for (GLenum constantType : shader->constantBufferTypes)
+            for (GLenum type : shader->constantBufferTypes)
             {
-                std::string constantBufferName = GetConstantBufferName(stage, constantType);
-                GLint location = device->context.functions.GetUniformLocation(program->handle, constantBufferName.c_str());
-                program->constantBufferLocations[stageIndex].push_back(location);
+                std::string uniformName = GetConstantBufferName(stage, type);
+                locations.push_back(device->context.functions.GetUniformLocation(program->handle, uniformName.c_str()));
             }
         }
 
@@ -3074,25 +3085,23 @@ MGG_InputLayout* MGG_InputLayout_Create(MGG_GraphicsDevice* device, MGG_Shader* 
     assert(elements != nullptr);
     assert(elementCount >= 0);
 
-    if (elementCount < vertexShader->attributeCount)
-        MGGL_FAIL("Input layout is missing shader inputs", "vertex declaration does not cover every translated shader attribute");
-
     MGG_InputLayout* layout = new MGG_InputLayout();
-    layout->strides.assign(strides, strides + streamCount);
+    layout->strides.resize(streamCount);
+    for (mgint streamIndex = 0; streamIndex < streamCount; ++streamIndex)
+        layout->strides[streamIndex] = strides[streamIndex];
+
+    layout->bindings.reserve(elementCount);
 
     for (mgint elementIndex = 0; elementIndex < elementCount; ++elementIndex)
     {
-        const MGG_InputElement& element = elements[elementIndex];
-
         MGG_InputLayout::Binding binding;
-        binding.location = static_cast<GLuint>(elementIndex);
-        binding.vertexBufferSlot = element.VertexBufferSlot;
-        binding.alignedByteOffset = element.AlignedByteOffset;
-        binding.instanceDataStepRate = element.InstanceDataStepRate;
-        ToVertexAttribFormat(element.Format, binding.elementCount, binding.elementType, binding.normalized);
+        binding.attributeIndex = static_cast<GLuint>(elementIndex);
+        binding.vertexBufferSlot = elements[elementIndex].VertexBufferSlot;
+        binding.alignedByteOffset = elements[elementIndex].AlignedByteOffset;
+        binding.instanceDataStepRate = elements[elementIndex].InstanceDataStepRate;
+        ToVertexAttribFormat(elements[elementIndex].Format, binding.elementCount, binding.elementType, binding.normalized);
 
         layout->bindings.push_back(binding);
-        layout->enabledLocations.push_back(binding.location);
     }
 
     return layout;
@@ -3101,9 +3110,6 @@ MGG_InputLayout* MGG_InputLayout_Create(MGG_GraphicsDevice* device, MGG_Shader* 
 void MGG_InputLayout_Destroy(MGG_GraphicsDevice* device, MGG_InputLayout* layout)
 {
     assert(device != nullptr);
-
-    if (layout == nullptr)
-        return;
 
     if (device->inputLayout == layout)
         device->inputLayout = nullptr;
