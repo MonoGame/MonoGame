@@ -331,12 +331,12 @@ namespace
     {
         switch (stage)
         {
-        case MGShaderStage::Vertex:
-            return 0;
-        case MGShaderStage::Pixel:
-            return 1;
-        default:
-            MGGL_FAIL("Unsupported shader stage", "unknown OpenGL shader stage");
+            case MGShaderStage::Vertex:
+                return 0;
+            case MGShaderStage::Pixel:
+                return 1;
+            default:
+                MGGL_FAIL("Unsupported shader stage", "unknown OpenGL shader stage");
         }
     }
 
@@ -344,12 +344,12 @@ namespace
     {
         switch (stage)
         {
-        case MGShaderStage::Vertex:
-            return MaxVertexTextureSlots;
-        case MGShaderStage::Pixel:
-            return MaxTextureSlots;
-        default:
-            MGGL_FAIL("Unsupported shader stage", "unknown OpenGL texture slot range");
+            case MGShaderStage::Vertex:
+                return MaxVertexTextureSlots;
+            case MGShaderStage::Pixel:
+                return MaxTextureSlots;
+            default:
+                MGGL_FAIL("Unsupported shader stage", "unknown OpenGL texture slot range");
         }
     }
 
@@ -359,12 +359,12 @@ namespace
 
         switch (stage)
         {
-        case MGShaderStage::Vertex:
-            return static_cast<GLuint>(MaxTextureSlots + slot);
-        case MGShaderStage::Pixel:
-            return static_cast<GLuint>(slot);
-        default:
-            MGGL_FAIL("Unsupported shader stage", "unknown OpenGL texture unit mapping");
+            case MGShaderStage::Vertex:
+                return static_cast<GLuint>(MaxTextureSlots + slot);
+            case MGShaderStage::Pixel:
+                return static_cast<GLuint>(slot);
+            default:
+                MGGL_FAIL("Unsupported shader stage", "unknown OpenGL texture unit mapping");
         }
     }
 
@@ -372,12 +372,12 @@ namespace
     {
         switch (stage)
         {
-        case MGShaderStage::Vertex:
-            return "vs";
-        case MGShaderStage::Pixel:
-            return "ps";
-        default:
-            MGGL_FAIL("Unsupported shader stage", "unknown OpenGL shader prefix");
+            case MGShaderStage::Vertex:
+                return "vs";
+            case MGShaderStage::Pixel:
+                return "ps";
+            default:
+                MGGL_FAIL("Unsupported shader stage", "unknown OpenGL shader prefix");
         }
     }
 
@@ -695,16 +695,16 @@ namespace
     {
         switch (mode)
         {
-        case MGTextureAddressMode::Wrap:
-            return GL_REPEAT;
-        case MGTextureAddressMode::Clamp:
-            return GL_CLAMP_TO_EDGE;
-        case MGTextureAddressMode::Mirror:
-            return GL_MIRRORED_REPEAT;
-        case MGTextureAddressMode::Border:
-            return GL_CLAMP_TO_BORDER;
-        default:
-            MGGL_FAIL("Unsupported texture address mode", "unknown OpenGL texture wrap mode");
+            case MGTextureAddressMode::Wrap:
+                return GL_REPEAT;
+            case MGTextureAddressMode::Clamp:
+                return GL_CLAMP_TO_EDGE;
+            case MGTextureAddressMode::Mirror:
+                return GL_MIRRORED_REPEAT;
+            case MGTextureAddressMode::Border:
+                return GL_CLAMP_TO_BORDER;
+            default:
+                MGGL_FAIL("Unsupported texture address mode", "unknown OpenGL texture wrap mode");
         }
     }
 
@@ -712,24 +712,24 @@ namespace
     {
         switch (function)
         {
-        case MGCompareFunction::Always:
-            return GL_ALWAYS;
-        case MGCompareFunction::Never:
-            return GL_NEVER;
-        case MGCompareFunction::Less:
-            return GL_LESS;
-        case MGCompareFunction::LessEqual:
-            return GL_LEQUAL;
-        case MGCompareFunction::Equal:
-            return GL_EQUAL;
-        case MGCompareFunction::GreaterEqual:
-            return GL_GEQUAL;
-        case MGCompareFunction::Greater:
-            return GL_GREATER;
-        case MGCompareFunction::NotEqual:
-            return GL_NOTEQUAL;
-        default:
-            MGGL_FAIL("Unsupported comparison function", "unknown OpenGL comparison function");
+            case MGCompareFunction::Always:
+                return GL_ALWAYS;
+            case MGCompareFunction::Never:
+                return GL_NEVER;
+            case MGCompareFunction::Less:
+                return GL_LESS;
+            case MGCompareFunction::LessEqual:
+                return GL_LEQUAL;
+            case MGCompareFunction::Equal:
+                return GL_EQUAL;
+            case MGCompareFunction::GreaterEqual:
+                return GL_GEQUAL;
+            case MGCompareFunction::Greater:
+                return GL_GREATER;
+            case MGCompareFunction::NotEqual:
+                return GL_NOTEQUAL;
+            default:
+                MGGL_FAIL("Unsupported comparison function", "unknown OpenGL comparison function");
         }
     }
 
@@ -737,18 +737,18 @@ namespace
     {
         switch (function)
         {
-        case MGBlendFunction::Add:
-            return GL_FUNC_ADD;
-        case MGBlendFunction::Subtract:
-            return GL_FUNC_SUBTRACT;
-        case MGBlendFunction::ReverseSubtract:
-            return GL_FUNC_REVERSE_SUBTRACT;
-        case MGBlendFunction::Min:
-            return GL_MIN;
-        case MGBlendFunction::Max:
-            return GL_MAX;
-        default:
-            MGGL_FAIL("Unsupported blend function", "unknown OpenGL blend equation");
+            case MGBlendFunction::Add:
+                return GL_FUNC_ADD;
+            case MGBlendFunction::Subtract:
+                return GL_FUNC_SUBTRACT;
+            case MGBlendFunction::ReverseSubtract:
+                return GL_FUNC_REVERSE_SUBTRACT;
+            case MGBlendFunction::Min:
+                return GL_MIN;
+            case MGBlendFunction::Max:
+                return GL_MAX;
+            default:
+                MGGL_FAIL("Unsupported blend function", "unknown OpenGL blend equation");
         }
     }
 
@@ -756,34 +756,34 @@ namespace
     {
         switch (blend)
         {
-        case MGBlend::One:
-            return GL_ONE;
-        case MGBlend::Zero:
-            return GL_ZERO;
-        case MGBlend::SourceColor:
-            return GL_SRC_COLOR;
-        case MGBlend::InverseSourceColor:
-            return GL_ONE_MINUS_SRC_COLOR;
-        case MGBlend::SourceAlpha:
-            return GL_SRC_ALPHA;
-        case MGBlend::InverseSourceAlpha:
-            return GL_ONE_MINUS_SRC_ALPHA;
-        case MGBlend::DestinationColor:
-            return GL_DST_COLOR;
-        case MGBlend::InverseDestinationColor:
-            return GL_ONE_MINUS_DST_COLOR;
-        case MGBlend::DestinationAlpha:
-            return GL_DST_ALPHA;
-        case MGBlend::InverseDestinationAlpha:
-            return GL_ONE_MINUS_DST_ALPHA;
-        case MGBlend::BlendFactor:
-            return GL_CONSTANT_COLOR;
-        case MGBlend::InverseBlendFactor:
-            return GL_ONE_MINUS_CONSTANT_COLOR;
-        case MGBlend::SourceAlphaSaturation:
-            return GL_SRC_ALPHA_SATURATE;
-        default:
-            MGGL_FAIL("Unsupported blend factor", "unknown OpenGL blend factor");
+            case MGBlend::One:
+                return GL_ONE;
+            case MGBlend::Zero:
+                return GL_ZERO;
+            case MGBlend::SourceColor:
+                return GL_SRC_COLOR;
+            case MGBlend::InverseSourceColor:
+                return GL_ONE_MINUS_SRC_COLOR;
+            case MGBlend::SourceAlpha:
+                return GL_SRC_ALPHA;
+            case MGBlend::InverseSourceAlpha:
+                return GL_ONE_MINUS_SRC_ALPHA;
+            case MGBlend::DestinationColor:
+                return GL_DST_COLOR;
+            case MGBlend::InverseDestinationColor:
+                return GL_ONE_MINUS_DST_COLOR;
+            case MGBlend::DestinationAlpha:
+                return GL_DST_ALPHA;
+            case MGBlend::InverseDestinationAlpha:
+                return GL_ONE_MINUS_DST_ALPHA;
+            case MGBlend::BlendFactor:
+                return GL_CONSTANT_COLOR;
+            case MGBlend::InverseBlendFactor:
+                return GL_ONE_MINUS_CONSTANT_COLOR;
+            case MGBlend::SourceAlphaSaturation:
+                return GL_SRC_ALPHA_SATURATE;
+            default:
+                MGGL_FAIL("Unsupported blend factor", "unknown OpenGL blend factor");
         }
     }
 
@@ -791,24 +791,24 @@ namespace
     {
         switch (operation)
         {
-        case MGStencilOperation::Keep:
-            return GL_KEEP;
-        case MGStencilOperation::Zero:
-            return GL_ZERO;
-        case MGStencilOperation::Replace:
-            return GL_REPLACE;
-        case MGStencilOperation::Increment:
-            return GL_INCR_WRAP;
-        case MGStencilOperation::Decrement:
-            return GL_DECR_WRAP;
-        case MGStencilOperation::IncrementSaturation:
-            return GL_INCR;
-        case MGStencilOperation::DecrementSaturation:
-            return GL_DECR;
-        case MGStencilOperation::Invert:
-            return GL_INVERT;
-        default:
-            MGGL_FAIL("Unsupported stencil operation", "unknown OpenGL stencil operation");
+            case MGStencilOperation::Keep:
+                return GL_KEEP;
+            case MGStencilOperation::Zero:
+                return GL_ZERO;
+            case MGStencilOperation::Replace:
+                return GL_REPLACE;
+            case MGStencilOperation::Increment:
+                return GL_INCR_WRAP;
+            case MGStencilOperation::Decrement:
+                return GL_DECR_WRAP;
+            case MGStencilOperation::IncrementSaturation:
+                return GL_INCR;
+            case MGStencilOperation::DecrementSaturation:
+                return GL_DECR;
+            case MGStencilOperation::Invert:
+                return GL_INVERT;
+            default:
+                MGGL_FAIL("Unsupported stencil operation", "unknown OpenGL stencil operation");
         }
     }
 
@@ -816,12 +816,12 @@ namespace
     {
         switch (fillMode)
         {
-        case MGFillMode::Solid:
-            return GL_FILL;
-        case MGFillMode::WireFrame:
-            return GL_LINE;
-        default:
-            MGGL_FAIL("Unsupported fill mode", "unknown OpenGL polygon mode");
+            case MGFillMode::Solid:
+                return GL_FILL;
+            case MGFillMode::WireFrame:
+                return GL_LINE;
+            default:
+                MGGL_FAIL("Unsupported fill mode", "unknown OpenGL polygon mode");
         }
     }
 
@@ -891,41 +891,41 @@ namespace
     {
         switch (filter)
         {
-        case MGTextureFilter::Point:
-            minFilter = GL_NEAREST_MIPMAP_NEAREST;
-            magFilter = GL_NEAREST;
-            return;
-        case MGTextureFilter::Linear:
-        case MGTextureFilter::Anisotropic:
-            minFilter = GL_LINEAR_MIPMAP_LINEAR;
-            magFilter = GL_LINEAR;
-            return;
-        case MGTextureFilter::LinearMipPoint:
-            minFilter = GL_LINEAR_MIPMAP_NEAREST;
-            magFilter = GL_LINEAR;
-            return;
-        case MGTextureFilter::PointMipLinear:
-            minFilter = GL_NEAREST_MIPMAP_LINEAR;
-            magFilter = GL_NEAREST;
-            return;
-        case MGTextureFilter::MinLinearMagPointMipLinear:
-            minFilter = GL_LINEAR_MIPMAP_LINEAR;
-            magFilter = GL_NEAREST;
-            return;
-        case MGTextureFilter::MinLinearMagPointMipPoint:
-            minFilter = GL_LINEAR_MIPMAP_NEAREST;
-            magFilter = GL_NEAREST;
-            return;
-        case MGTextureFilter::MinPointMagLinearMipLinear:
-            minFilter = GL_NEAREST_MIPMAP_LINEAR;
-            magFilter = GL_LINEAR;
-            return;
-        case MGTextureFilter::MinPointMagLinearMipPoint:
-            minFilter = GL_NEAREST_MIPMAP_NEAREST;
-            magFilter = GL_LINEAR;
-            return;
-        default:
-            MGGL_FAIL("Unsupported texture filter", "unknown OpenGL texture filter");
+            case MGTextureFilter::Point:
+                minFilter = GL_NEAREST_MIPMAP_NEAREST;
+                magFilter = GL_NEAREST;
+                return;
+            case MGTextureFilter::Linear:
+            case MGTextureFilter::Anisotropic:
+                minFilter = GL_LINEAR_MIPMAP_LINEAR;
+                magFilter = GL_LINEAR;
+                return;
+            case MGTextureFilter::LinearMipPoint:
+                minFilter = GL_LINEAR_MIPMAP_NEAREST;
+                magFilter = GL_LINEAR;
+                return;
+            case MGTextureFilter::PointMipLinear:
+                minFilter = GL_NEAREST_MIPMAP_LINEAR;
+                magFilter = GL_NEAREST;
+                return;
+            case MGTextureFilter::MinLinearMagPointMipLinear:
+                minFilter = GL_LINEAR_MIPMAP_LINEAR;
+                magFilter = GL_NEAREST;
+                return;
+            case MGTextureFilter::MinLinearMagPointMipPoint:
+                minFilter = GL_LINEAR_MIPMAP_NEAREST;
+                magFilter = GL_NEAREST;
+                return;
+            case MGTextureFilter::MinPointMagLinearMipLinear:
+                minFilter = GL_NEAREST_MIPMAP_LINEAR;
+                magFilter = GL_LINEAR;
+                return;
+            case MGTextureFilter::MinPointMagLinearMipPoint:
+                minFilter = GL_NEAREST_MIPMAP_NEAREST;
+                magFilter = GL_LINEAR;
+                return;
+            default:
+                MGGL_FAIL("Unsupported texture filter", "unknown OpenGL texture filter");
         }
     }
 
@@ -933,36 +933,36 @@ namespace
     {
         switch (format)
         {
-        case MGSurfaceFormat::Color:
-            return { GL_RGBA8, GL_RGBA, GL_UNSIGNED_BYTE, 4, 4, 1, 1, GL_RED, GL_GREEN, GL_BLUE, GL_ALPHA, false, false };
-        case MGSurfaceFormat::ColorSRgb:
-            return { GL_SRGB8_ALPHA8, GL_RGBA, GL_UNSIGNED_BYTE, 4, 4, 1, 1, GL_RED, GL_GREEN, GL_BLUE, GL_ALPHA, false, false };
-        case MGSurfaceFormat::Bgra32:
-            return { GL_RGBA8, GL_BGRA, GL_UNSIGNED_BYTE, 4, 4, 1, 1, GL_RED, GL_GREEN, GL_BLUE, GL_ALPHA, false, false };
-        case MGSurfaceFormat::Bgra32SRgb:
-            return { GL_SRGB8_ALPHA8, GL_BGRA, GL_UNSIGNED_BYTE, 4, 4, 1, 1, GL_RED, GL_GREEN, GL_BLUE, GL_ALPHA, false, false };
-        case MGSurfaceFormat::Alpha8:
-            return { GL_R8, GL_RED, GL_UNSIGNED_BYTE, 1, 1, 1, 1, GL_ONE, GL_ONE, GL_ONE, GL_RED, true, false };
-        case MGSurfaceFormat::Dxt1:
-            return { GL_COMPRESSED_RGB_S3TC_DXT1_EXT, 0, 0, 0, 8, 4, 4, GL_RED, GL_GREEN, GL_BLUE, GL_ALPHA, false, true };
-        case MGSurfaceFormat::Dxt1SRgb:
-            return { GL_COMPRESSED_SRGB_S3TC_DXT1_EXT, 0, 0, 0, 8, 4, 4, GL_RED, GL_GREEN, GL_BLUE, GL_ALPHA, false, true };
-        case MGSurfaceFormat::Dxt1a:
-            return { GL_COMPRESSED_RGBA_S3TC_DXT1_EXT, 0, 0, 0, 8, 4, 4, GL_RED, GL_GREEN, GL_BLUE, GL_ALPHA, false, true };
-        case MGSurfaceFormat::Dxt3:
-            return { GL_COMPRESSED_RGBA_S3TC_DXT3_EXT, 0, 0, 0, 16, 4, 4, GL_RED, GL_GREEN, GL_BLUE, GL_ALPHA, false, true };
-        case MGSurfaceFormat::Dxt3SRgb:
-            return { GL_COMPRESSED_SRGB_ALPHA_S3TC_DXT3_EXT, 0, 0, 0, 16, 4, 4, GL_RED, GL_GREEN, GL_BLUE, GL_ALPHA, false, true };
-        case MGSurfaceFormat::Dxt5:
-            return { GL_COMPRESSED_RGBA_S3TC_DXT5_EXT, 0, 0, 0, 16, 4, 4, GL_RED, GL_GREEN, GL_BLUE, GL_ALPHA, false, true };
-        case MGSurfaceFormat::Dxt5SRgb:
-            return { GL_COMPRESSED_SRGB_ALPHA_S3TC_DXT5_EXT, 0, 0, 0, 16, 4, 4, GL_RED, GL_GREEN, GL_BLUE, GL_ALPHA, false, true };
-        case MGSurfaceFormat::Single:
-            return { GL_R32F, GL_RED, GL_FLOAT, 4, 4, 1, 1, GL_RED, GL_GREEN, GL_BLUE, GL_ALPHA, false, false };
-        case MGSurfaceFormat::HalfSingle:
-            return { GL_R16F, GL_RED, GL_HALF_FLOAT, 2, 2, 1, 1, GL_RED, GL_GREEN, GL_BLUE, GL_ALPHA, false, false };
-        default:
-            MGGL_FAIL("Unsupported surface format", "OpenGL surface format is not mapped");
+            case MGSurfaceFormat::Color:
+                return { GL_RGBA8, GL_RGBA, GL_UNSIGNED_BYTE, 4, 4, 1, 1, GL_RED, GL_GREEN, GL_BLUE, GL_ALPHA, false, false };
+            case MGSurfaceFormat::ColorSRgb:
+                return { GL_SRGB8_ALPHA8, GL_RGBA, GL_UNSIGNED_BYTE, 4, 4, 1, 1, GL_RED, GL_GREEN, GL_BLUE, GL_ALPHA, false, false };
+            case MGSurfaceFormat::Bgra32:
+                return { GL_RGBA8, GL_BGRA, GL_UNSIGNED_BYTE, 4, 4, 1, 1, GL_RED, GL_GREEN, GL_BLUE, GL_ALPHA, false, false };
+            case MGSurfaceFormat::Bgra32SRgb:
+                return { GL_SRGB8_ALPHA8, GL_BGRA, GL_UNSIGNED_BYTE, 4, 4, 1, 1, GL_RED, GL_GREEN, GL_BLUE, GL_ALPHA, false, false };
+            case MGSurfaceFormat::Alpha8:
+                return { GL_R8, GL_RED, GL_UNSIGNED_BYTE, 1, 1, 1, 1, GL_ONE, GL_ONE, GL_ONE, GL_RED, true, false };
+            case MGSurfaceFormat::Dxt1:
+                return { GL_COMPRESSED_RGB_S3TC_DXT1_EXT, 0, 0, 0, 8, 4, 4, GL_RED, GL_GREEN, GL_BLUE, GL_ALPHA, false, true };
+            case MGSurfaceFormat::Dxt1SRgb:
+                return { GL_COMPRESSED_SRGB_S3TC_DXT1_EXT, 0, 0, 0, 8, 4, 4, GL_RED, GL_GREEN, GL_BLUE, GL_ALPHA, false, true };
+            case MGSurfaceFormat::Dxt1a:
+                return { GL_COMPRESSED_RGBA_S3TC_DXT1_EXT, 0, 0, 0, 8, 4, 4, GL_RED, GL_GREEN, GL_BLUE, GL_ALPHA, false, true };
+            case MGSurfaceFormat::Dxt3:
+                return { GL_COMPRESSED_RGBA_S3TC_DXT3_EXT, 0, 0, 0, 16, 4, 4, GL_RED, GL_GREEN, GL_BLUE, GL_ALPHA, false, true };
+            case MGSurfaceFormat::Dxt3SRgb:
+                return { GL_COMPRESSED_SRGB_ALPHA_S3TC_DXT3_EXT, 0, 0, 0, 16, 4, 4, GL_RED, GL_GREEN, GL_BLUE, GL_ALPHA, false, true };
+            case MGSurfaceFormat::Dxt5:
+                return { GL_COMPRESSED_RGBA_S3TC_DXT5_EXT, 0, 0, 0, 16, 4, 4, GL_RED, GL_GREEN, GL_BLUE, GL_ALPHA, false, true };
+            case MGSurfaceFormat::Dxt5SRgb:
+                return { GL_COMPRESSED_SRGB_ALPHA_S3TC_DXT5_EXT, 0, 0, 0, 16, 4, 4, GL_RED, GL_GREEN, GL_BLUE, GL_ALPHA, false, true };
+            case MGSurfaceFormat::Single:
+                return { GL_R32F, GL_RED, GL_FLOAT, 4, 4, 1, 1, GL_RED, GL_GREEN, GL_BLUE, GL_ALPHA, false, false };
+            case MGSurfaceFormat::HalfSingle:
+                return { GL_R16F, GL_RED, GL_HALF_FLOAT, 2, 2, 1, 1, GL_RED, GL_GREEN, GL_BLUE, GL_ALPHA, false, false };
+            default:
+                MGGL_FAIL("Unsupported surface format", "OpenGL surface format is not mapped");
         }
     }
 
@@ -970,16 +970,16 @@ namespace
     {
         switch (format)
         {
-        case MGDepthFormat::None:
-            return 0;
-        case MGDepthFormat::Depth16:
-            return GL_DEPTH_COMPONENT16;
-        case MGDepthFormat::Depth24:
-            return GL_DEPTH_COMPONENT24;
-        case MGDepthFormat::Depth24Stencil8:
-            return GL_DEPTH24_STENCIL8;
-        default:
-            MGGL_FAIL("Unsupported depth format", "depth renderbuffer format is not mapped");
+            case MGDepthFormat::None:
+                return 0;
+            case MGDepthFormat::Depth16:
+                return GL_DEPTH_COMPONENT16;
+            case MGDepthFormat::Depth24:
+                return GL_DEPTH_COMPONENT24;
+            case MGDepthFormat::Depth24Stencil8:
+                return GL_DEPTH24_STENCIL8;
+            default:
+                MGGL_FAIL("Unsupported depth format", "depth renderbuffer format is not mapped");
         }
     }
 
@@ -987,15 +987,15 @@ namespace
     {
         switch (format)
         {
-        case MGDepthFormat::None:
-            return 0;
-        case MGDepthFormat::Depth16:
-        case MGDepthFormat::Depth24:
-            return GL_DEPTH_ATTACHMENT;
-        case MGDepthFormat::Depth24Stencil8:
-            return GL_DEPTH_STENCIL_ATTACHMENT;
-        default:
-            MGGL_FAIL("Unsupported depth format", "unknown OpenGL framebuffer attachment");
+            case MGDepthFormat::None:
+                return 0;
+            case MGDepthFormat::Depth16:
+            case MGDepthFormat::Depth24:
+                return GL_DEPTH_ATTACHMENT;
+            case MGDepthFormat::Depth24Stencil8:
+                return GL_DEPTH_STENCIL_ATTACHMENT;
+            default:
+                MGGL_FAIL("Unsupported depth format", "unknown OpenGL framebuffer attachment");
         }
     }
 
@@ -1122,14 +1122,14 @@ namespace
     {
         switch (target)
         {
-        case GL_TEXTURE_2D:
-            return GL_TEXTURE_BINDING_2D;
-        case GL_TEXTURE_3D:
-            return GL_TEXTURE_BINDING_3D;
-        case GL_TEXTURE_CUBE_MAP:
-            return GL_TEXTURE_BINDING_CUBE_MAP;
-        default:
-            MGGL_FAIL("Unsupported texture target", "OpenGL texture target is not mapped");
+            case GL_TEXTURE_2D:
+                return GL_TEXTURE_BINDING_2D;
+            case GL_TEXTURE_3D:
+                return GL_TEXTURE_BINDING_3D;
+            case GL_TEXTURE_CUBE_MAP:
+                return GL_TEXTURE_BINDING_CUBE_MAP;
+            default:
+                MGGL_FAIL("Unsupported texture target", "OpenGL texture target is not mapped");
         }
     }
 
@@ -1141,20 +1141,20 @@ namespace
 
         switch (texture->type)
         {
-        case MGTextureType::_2D:
-            if (slice != 0)
-                MGGL_FAIL("Unsupported texture slice", "2D textures only expose slice 0");
+            case MGTextureType::_2D:
+                if (slice != 0)
+                    MGGL_FAIL("Unsupported texture slice", "2D textures only expose slice 0");
 
-            return GL_TEXTURE_2D;
-        case MGTextureType::_3D:
-            if (slice != 0)
-                MGGL_FAIL("Unsupported texture slice", "3D texture depth slices are not separate image targets");
+                return GL_TEXTURE_2D;
+            case MGTextureType::_3D:
+                if (slice != 0)
+                    MGGL_FAIL("Unsupported texture slice", "3D texture depth slices are not separate image targets");
 
-            return GL_TEXTURE_3D;
-        case MGTextureType::Cube:
-            return GL_TEXTURE_CUBE_MAP_POSITIVE_X + slice;
-        default:
-            MGGL_FAIL("Unsupported texture target", "OpenGL texture target is not mapped");
+                return GL_TEXTURE_3D;
+            case MGTextureType::Cube:
+                return GL_TEXTURE_CUBE_MAP_POSITIVE_X + slice;
+            default:
+                MGGL_FAIL("Unsupported texture target", "OpenGL texture target is not mapped");
         }
     }
 
@@ -1242,9 +1242,9 @@ namespace
                 || (device->context.functions.CompressedTexSubImage2D == nullptr)
                 || (device->context.functions.GetCompressedTexImage == nullptr)
                 || !(HasOpenGLExtension("GL_EXT_texture_compression_s3tc")
-                    || HasOpenGLExtension("GL_OES_texture_compression_S3TC")
-                    || HasOpenGLExtension("GL_EXT_texture_compression_dxt3")
-                    || HasOpenGLExtension("GL_EXT_texture_compression_dxt5"))))
+                     || HasOpenGLExtension("GL_OES_texture_compression_S3TC")
+                     || HasOpenGLExtension("GL_EXT_texture_compression_dxt3")
+                     || HasOpenGLExtension("GL_EXT_texture_compression_dxt5"))))
         {
             MGGL_FAIL("Unsupported surface format", "OpenGL compressed textures require S3TC support from the current driver");
         }
@@ -1268,29 +1268,29 @@ namespace
 
         switch (type)
         {
-        case MGTextureType::_2D:
-            if (slices != 1)
-                MGGL_FAIL("Unsupported texture shape", "need to add 2D texture arrays");
+            case MGTextureType::_2D:
+                if (slices != 1)
+                    MGGL_FAIL("Unsupported texture shape", "need to add 2D texture arrays");
 
-            texture->target = GL_TEXTURE_2D;
-            break;
-        case MGTextureType::_3D:
+                texture->target = GL_TEXTURE_2D;
+                break;
+            case MGTextureType::_3D:
                 if (slices != 1)
                     MGGL_FAIL("Unsupported texture shape", "3D textures use depth, not array slices");
 
-            texture->target = GL_TEXTURE_3D;
-            break;
-        case MGTextureType::Cube:
-            if (width != height)
-                MGGL_FAIL("Unsupported cube texture dimensions", "cube textures need square faces");
+                texture->target = GL_TEXTURE_3D;
+                break;
+            case MGTextureType::Cube:
+                if (width != height)
+                    MGGL_FAIL("Unsupported cube texture dimensions", "cube textures need square faces");
 
-            if (slices != 6)
-                MGGL_FAIL("Unsupported cube texture slice count", "cube textures need six faces");
+                if (slices != 6)
+                    MGGL_FAIL("Unsupported cube texture slice count", "cube textures need six faces");
 
-            texture->target = GL_TEXTURE_CUBE_MAP;
-            break;
-        default:
-            MGGL_FAIL("Unsupported texture shape", "need to add any remaining texture shapes separately");
+                texture->target = GL_TEXTURE_CUBE_MAP;
+                break;
+            default:
+                MGGL_FAIL("Unsupported texture shape", "need to add any remaining texture shapes separately");
         }
 
         if (formatInfo.isCompressed && type == MGTextureType::_3D)
@@ -1426,14 +1426,14 @@ namespace
     {
         switch (type)
         {
-        case MGBufferType::Index:
-            return GL_ELEMENT_ARRAY_BUFFER;
-        case MGBufferType::Vertex:
-            return GL_ARRAY_BUFFER;
-        case MGBufferType::Constant:
-            return GL_UNIFORM_BUFFER;
-        default:
-            MGGL_FAIL("Unsupported buffer type", "unknown OpenGl buffer target");
+            case MGBufferType::Index:
+                return GL_ELEMENT_ARRAY_BUFFER;
+            case MGBufferType::Vertex:
+                return GL_ARRAY_BUFFER;
+            case MGBufferType::Constant:
+                return GL_UNIFORM_BUFFER;
+            default:
+                MGGL_FAIL("Unsupported buffer type", "unknown OpenGl buffer target");
         }
     }
 
@@ -1446,18 +1446,18 @@ namespace
     {
         switch (primitiveType)
         {
-        case MGPrimitiveType::TriangleList:
-            return GL_TRIANGLES;
-        case MGPrimitiveType::TriangleStrip:
-            return GL_TRIANGLE_STRIP;
-        case MGPrimitiveType::LineList:
-            return GL_LINES;
-        case MGPrimitiveType::LineStrip:
-            return GL_LINE_STRIP;
-        case MGPrimitiveType::PointList:
-            return GL_POINTS;
-        default:
-            MGGL_FAIL("Unsupported primitive type", "unknown OpenGL primitive mode");
+            case MGPrimitiveType::TriangleList:
+                return GL_TRIANGLES;
+            case MGPrimitiveType::TriangleStrip:
+                return GL_TRIANGLE_STRIP;
+            case MGPrimitiveType::LineList:
+                return GL_LINES;
+            case MGPrimitiveType::LineStrip:
+                return GL_LINE_STRIP;
+            case MGPrimitiveType::PointList:
+                return GL_POINTS;
+            default:
+                MGGL_FAIL("Unsupported primitive type", "unknown OpenGL primitive mode");
         }
     }
 
@@ -1465,18 +1465,18 @@ namespace
     {
         switch (primitiveType)
         {
-        case MGPrimitiveType::TriangleList:
-            return primitiveCount * 3;
-        case MGPrimitiveType::TriangleStrip:
-            return primitiveCount + 2;
-        case MGPrimitiveType::LineList:
-            return primitiveCount * 2;
-        case MGPrimitiveType::LineStrip:
-            return primitiveCount + 1;
-        case MGPrimitiveType::PointList:
-            return primitiveCount;
-        default:
-            MGGL_FAIL("Unsupported primitive type", "unknown indexed primitive count mapping");
+            case MGPrimitiveType::TriangleList:
+                return primitiveCount * 3;
+            case MGPrimitiveType::TriangleStrip:
+                return primitiveCount + 2;
+            case MGPrimitiveType::LineList:
+                return primitiveCount * 2;
+            case MGPrimitiveType::LineStrip:
+                return primitiveCount + 1;
+            case MGPrimitiveType::PointList:
+                return primitiveCount;
+            default:
+                MGGL_FAIL("Unsupported primitive type", "unknown indexed primitive count mapping");
         }
     }
 
@@ -1484,12 +1484,12 @@ namespace
     {
         switch (size)
         {
-        case MGIndexElementSize::SixteenBits:
-            return GL_UNSIGNED_SHORT;
-        case MGIndexElementSize::ThirtyTwoBits:
-            return GL_UNSIGNED_INT;
-        default:
-            MGGL_FAIL("Unsupported index element size", "unknown OpenGL index type");
+            case MGIndexElementSize::SixteenBits:
+                return GL_UNSIGNED_SHORT;
+            case MGIndexElementSize::ThirtyTwoBits:
+                return GL_UNSIGNED_INT;
+            default:
+                MGGL_FAIL("Unsupported index element size", "unknown OpenGL index type");
         }
     }
 
@@ -1497,12 +1497,12 @@ namespace
     {
         switch (size)
         {
-        case MGIndexElementSize::SixteenBits:
-            return static_cast<mgint>(sizeof(uint16_t));
-        case MGIndexElementSize::ThirtyTwoBits:
-            return static_cast<mgint>(sizeof(uint32_t));
-        default:
-            MGGL_FAIL("Unsupported index element size", "unknown OpenGL index element width");
+            case MGIndexElementSize::SixteenBits:
+                return static_cast<mgint>(sizeof(uint16_t));
+            case MGIndexElementSize::ThirtyTwoBits:
+                return static_cast<mgint>(sizeof(uint32_t));
+            default:
+                MGGL_FAIL("Unsupported index element size", "unknown OpenGL index element width");
         }
     }
 
@@ -1843,9 +1843,9 @@ void MGG_GraphicsDevice_SetBlendState(MGG_GraphicsDevice* device, MGG_BlendState
 
     const MGG_BlendState_Info& info = state->infos[0];
     bool blendEnabled = !(info.colorSourceBlend == MGBlend::One &&
-        info.colorDestBlend == MGBlend::Zero &&
-        info.alphaSourceBlend == MGBlend::One &&
-        info.alphaDestBlend == MGBlend::Zero);
+                          info.colorDestBlend == MGBlend::Zero &&
+                          info.alphaSourceBlend == MGBlend::One &&
+                          info.alphaDestBlend == MGBlend::Zero);
 
     if (blendEnabled)
         glEnable(GL_BLEND);
@@ -1950,18 +1950,18 @@ void MGG_GraphicsDevice_SetRasterizerState(MGG_GraphicsDevice* device, MGG_Raste
         GLint depthMul = 0;
         switch (GetActiveDepthFormat(device))
         {
-        case MGDepthFormat::None:
-            depthMul = 0;
-            break;
-        case MGDepthFormat::Depth16:
-            depthMul = 65535;
-            break;
-        case MGDepthFormat::Depth24:
-        case MGDepthFormat::Depth24Stencil8:
-            depthMul = 16777215;
-            break;
-        default:
-            MGGL_FAIL("Unsupported depth format", "unknown OpenGL depth format for polygon offset");
+            case MGDepthFormat::None:
+                depthMul = 0;
+                break;
+            case MGDepthFormat::Depth16:
+                depthMul = 65535;
+                break;
+            case MGDepthFormat::Depth24:
+            case MGDepthFormat::Depth24Stencil8:
+                depthMul = 16777215;
+                break;
+            default:
+                MGGL_FAIL("Unsupported depth format", "unknown OpenGL depth format for polygon offset");
         }
 
         glEnable(GL_POLYGON_OFFSET_FILL);
@@ -2265,7 +2265,7 @@ void MGG_GraphicsDevice_SetInputLayout(MGG_GraphicsDevice* device, MGG_InputLayo
         return;
 
     device->inputLayout = layout;
-    
+
     /*
      * Do we need to call ApplyLayout here???
      */
@@ -3182,14 +3182,14 @@ MGG_Shader* MGG_Shader_Create(MGG_GraphicsDevice* device, MGShaderStage stage, m
     GLenum shaderType = GL_VERTEX_SHADER;
     switch (stage)
     {
-    case MGShaderStage::Vertex:
-        shaderType = GL_VERTEX_SHADER;
-        break;
-    case MGShaderStage::Pixel:
-        shaderType = GL_FRAGMENT_SHADER;
-        break;
-    default:
-        MGGL_FAIL("Unsupported shader stage", "native OpenGL shader creation only supports vertex and pixel stages");
+        case MGShaderStage::Vertex:
+            shaderType = GL_VERTEX_SHADER;
+            break;
+        case MGShaderStage::Pixel:
+            shaderType = GL_FRAGMENT_SHADER;
+            break;
+        default:
+            MGGL_FAIL("Unsupported shader stage", "native OpenGL shader creation only supports vertex and pixel stages");
     }
 
     MGG_Shader* shader = new MGG_Shader();
