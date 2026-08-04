@@ -1231,6 +1231,7 @@ namespace
         mgint slices)
     {
         assert(device != nullptr);
+        EnsureContext(device);
 
         if (type != MGTextureType::_3D && depth != 1)
             MGGL_FAIL("Unsupported texture depth", "non-3D textures use depth 1; array textures need separate support");
