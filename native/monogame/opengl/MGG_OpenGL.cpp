@@ -1635,15 +1635,21 @@ void MGG_GraphicsDevice_GetCaps(MGG_GraphicsDevice* device, MGG_GraphicsDevice_C
     bool supportsVertexTextures = true;
     mgint maxTextureAnisotropy = 16;
 
+    /*
+     * OpenGl can only get texture capabilities if there is a context
+     * Chris <aristurtledev>
+     */
     if (device->window != nullptr && device->context.handle != nullptr)
     {
         EnsureContext(device);
 
-        supportsS3tc =
-            HasOpenGLExtension("GL_EXT_texture_compression_s3tc") ||
-            HasOpenGLExtension("GL_OES_texture_compression_S3TC") ||
-            HasOpenGLExtension("GL_EXT_texture_compression_dxt3") ||
-            HasOpenGLExtension("GL_EXT_texture_compression_dxt5");
+        supportsS3tc = (device->context.functions.CompressedTexImage2D != nullptr)
+            && (device->context.functions.CompressedTexSubImage2D != nullptr)
+            && (device->context.functions.GetCompressedTexImage != nullptr)
+            && (HasOpenGLExtension("GL_EXT_texture_compression_s3tc")
+                || HasOpenGLExtension("GL_OES_texture_compression_S3TC")
+                || HasOpenGLExtension("GL_EXT_texture_compression_dxt3")
+                || HasOpenGLExtension("GL_EXT_texture_compression_dxt5"));
         supportsDxt1 = supportsS3tc || HasOpenGLExtension("GL_EXT_texture_compression_dxt1");
         supportsDepthClamp = SupportsOpenGLDepthClamp(device);
         supportsNonPowerOfTwo =
