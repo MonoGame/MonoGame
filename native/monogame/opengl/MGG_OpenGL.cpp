@@ -3242,21 +3242,29 @@ void MGG_Shader_Destroy(MGG_GraphicsDevice* device, MGG_Shader* shader)
 
     EnsureContext(device);
 
-    size_t stageIndex = ToStageIndex(shader->stage);
-    if (device->shaders[stageIndex] == shader)
-        device->shaders[stageIndex] = nullptr;
-
-    for (size_t i = 0; i < device->programs.size();)
+    for (size_t stageIndex = 0; stageIndex < ShaderStageCount; ++stageIndex)
     {
-        MGG_ShaderProgram* program = device->programs[i];
-        if (program->vertexShader == shader || program->pixelShader == shader)
+        if (device->shaders[stageIndex] == shader)
+            device->shaders[stageIndex] = nullptr;
+    }
+
+    if (device->currentProgram != nullptr &&
+        (device->currentProgram->vertexShader == shader || device->currentProgram->pixelShader == shader))
+    {
+        device->currentProgram = nullptr;
+    }
+
+    for (size_t index = 0; index < device->programs.size();)
+    {
+        MGG_ShaderProgram* program = device->programs[index];
+        if (program->vertexShader != shader && program->pixelShader != shader)
         {
-            DestroyProgram(device, program);
-            device->programs.erase(device->programs.begin() + static_cast<ptrdiff_t>(i));
+            ++index;
             continue;
         }
 
-        ++i;
+        DestroyProgram(device, program);
+        device->programs.erase(device->programs.begin() + static_cast<ptrdiff_t>(index));
     }
 
     if (shader->handle != 0)
