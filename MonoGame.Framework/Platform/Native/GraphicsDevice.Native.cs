@@ -162,6 +162,24 @@ public partial class GraphicsDevice
 
     private unsafe void PlatformDispose()
     {
+        foreach (var vb in _userVertexBuffers.Values)
+            vb.Dispose();
+        _userVertexBuffers.Clear();
+
+        if (_userIndexBuffer16 != null)
+        {
+            _userIndexBuffer16.Dispose();
+            _userIndexBuffer16 = null;
+        }
+
+        if (_userIndexBuffer32 != null)
+        {
+            _userIndexBuffer32.Dispose();
+            _userIndexBuffer32 = null;
+        }
+
+        DefaultTexture.Dispose();
+
         if (Handle != null)
         {
             MGG.GraphicsDevice_Destroy(Handle);

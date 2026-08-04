@@ -2,9 +2,6 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
-using System;
-using System.Collections.Generic;
-
 namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
 {
     /// <summary>
@@ -13,7 +10,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
     /// <typeparam name="T">The content type being written.</typeparam>
     class BuiltInContentWriter<T> : ContentTypeWriter<T>
     {
-        private List<ContentTypeWriter> _genericTypes;
+        private List<ContentTypeWriter>? _genericTypes;
 
         /// <inheritdoc/>
         internal override void OnAddedToContentWriter(ContentWriter output)
@@ -22,7 +19,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
 
             if (TargetType.IsGenericType)
             {
-                _genericTypes = new List<ContentTypeWriter>();
+                _genericTypes = [];
                 var arguments = TargetType.GetGenericArguments();
                 foreach (var arg in arguments)
                     _genericTypes.Add(output.GetTypeWriter(arg));
@@ -34,7 +31,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
         /// </summary>
         /// <param name="output">The output writer object.</param>
         /// <param name="value">The value to write to the output.</param>
-        protected internal override void Write(ContentWriter output, T value)
+        protected override void Write(ContentWriter output, T value)
         {
         }
 
@@ -46,7 +43,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
         public override string GetRuntimeReader(TargetPlatform targetPlatform)
         {
             // Change "Writer" in this class name to "Reader" and use the runtime type namespace and assembly
-            var readerClassName = this.GetType().Name.Replace("Writer", "Reader");
+            var readerClassName = GetType().Name.Replace("Writer", "Reader");
 
             // Add generic arguments if they exist.
             if (_genericTypes != null)
@@ -57,7 +54,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
                     readerClassName += "[";
                     readerClassName += argWriter.GetRuntimeType(targetPlatform);
                     readerClassName += "]";
-                    // Important: Do not add a space char after the comma because 
+                    // Important: Do not add a space char after the comma because
                     // this will not work with Type.GetType in Xamarin.Android!
                     readerClassName += ",";
                 }
@@ -68,7 +65,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
             // From looking at XNA-produced XNBs, it appears built-in
             // type readers don't need assembly qualification.
             var readerNamespace = typeof(ContentTypeReader).Namespace;
-            return readerNamespace + "." + readerClassName;
+            return $"{readerNamespace}.{readerClassName}";
         }
     }
 }

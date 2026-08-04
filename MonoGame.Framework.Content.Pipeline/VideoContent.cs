@@ -2,8 +2,6 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
-using System;
-using System.Linq;
 using Microsoft.Xna.Framework.Media;
 using System.Globalization;
 using MonoGame.Tool;
@@ -16,48 +14,43 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
     public class VideoContent : ContentItem, IDisposable
     {
         private bool _disposed;
-        private int _bitsPerSecond;
-        private TimeSpan _duration;
-        private float _framesPerSecond;
-        private int _height;
-        private int _width;
 
         /// <summary>
         /// Gets the bit rate for this video.
         /// </summary>
-        public int BitsPerSecond { get { return _bitsPerSecond; } }
+        public int BitsPerSecond { get; }
 
         /// <summary>
         /// Gets the duration of this video.
         /// </summary>
-        public TimeSpan Duration { get { return _duration; } }
+        public TimeSpan Duration { get; }
 
         /// <summary>
         /// Gets or sets the file name for this video.
         /// </summary>
-        [ContentSerializerAttribute]
+        [ContentSerializer]
         public string Filename { get; set; }
 
         /// <summary>
         /// Gets the frame rate for this video.
         /// </summary>
-        public float FramesPerSecond { get { return _framesPerSecond; } }
+        public float FramesPerSecond { get; }
 
         /// <summary>
         /// Gets the height of this video.
         /// </summary>
-        public int Height { get { return _height; } }
+        public int Height { get; }
 
         /// <summary>
         /// Gets or sets the type of soundtrack accompanying the video.
         /// </summary>
-        [ContentSerializerAttribute]
+        [ContentSerializer]
         public VideoSoundtrackType VideoSoundtrackType { get; set; }
 
         /// <summary>
         /// Gets the width of this video.
         /// </summary>
-        public int Width { get { return _width; } }
+        public int Width { get; }
 
         /// <summary>
         /// Initializes a new copy of the VideoContent class for the specified video file.
@@ -65,13 +58,13 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
         /// <param name="filename">The file name of the video to import.</param>
         public VideoContent(string filename)
         {
+            ArgumentException.ThrowIfNullOrEmpty(filename);
+            if (!File.Exists(filename))
+                throw new FileNotFoundException(filename);
+
             Filename = filename;
 
-            string stdout, stderr;
-            var result = FFprobe.Run(
-                string.Format("-i \"{0}\" -show_format -select_streams v -show_streams -print_format ini", Filename),
-                out stdout,
-                out stderr);
+            var result = FFprobe.Run($"-i \"{Filename}\" -show_format -select_streams v -show_streams -print_format ini", out var stdout, out var stderr);
 
             if (result != 0)
             {
@@ -84,29 +77,29 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
                 if (!line.Contains('='))
                     continue;
 
-                var key = line.Substring(0, line.IndexOf('='));
-                var value = line.Substring(line.IndexOf('=') + 1);
+                var key = line[..line.IndexOf('=')];
+                var value = line[(line.IndexOf('=') + 1)..];
                 switch (key)
                 {
                     case "duration":
-                        _duration = TimeSpan.FromSeconds(double.Parse(value, CultureInfo.InvariantCulture));
+                        Duration = TimeSpan.FromSeconds(double.Parse(value, CultureInfo.InvariantCulture));
                         break;
 
                     case "bit_rate":
-                        _bitsPerSecond = int.Parse(value, CultureInfo.InvariantCulture);
+                        BitsPerSecond = int.Parse(value, CultureInfo.InvariantCulture);
                         break;
 
                     case "width":
-                        _width = int.Parse(value, CultureInfo.InvariantCulture);
+                        Width = int.Parse(value, CultureInfo.InvariantCulture);
                         break;
 
                     case "height":
-                        _height = int.Parse(value, CultureInfo.InvariantCulture);
+                        Height = int.Parse(value, CultureInfo.InvariantCulture);
                         break;
 
                     case "r_frame_rate":
                         var frac = value.Split('/');
-                        _framesPerSecond = float.Parse(frac[0], CultureInfo.InvariantCulture) / float.Parse(frac[1], CultureInfo.InvariantCulture);
+                        FramesPerSecond = float.Parse(frac[0], CultureInfo.InvariantCulture) / float.Parse(frac[1], CultureInfo.InvariantCulture);
                         break;
                 }
             }

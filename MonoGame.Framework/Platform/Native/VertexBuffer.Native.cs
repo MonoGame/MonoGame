@@ -16,7 +16,7 @@ public partial class VertexBuffer
 
     private unsafe void PlatformConstruct()
     {
-        Handle = MGG.Buffer_Create(GraphicsDevice.Handle, BufferType.Vertex, VertexCount * VertexDeclaration.VertexStride);
+        Handle = MGG.Buffer_Create(GraphicsDevice.Handle, BufferType.Vertex, _isDynamic, VertexCount * VertexDeclaration.VertexStride);
     }
 
     private unsafe void PlatformGetData<T>(int offsetInBytes, T[] data, int startIndex, int elementCount, int vertexStride)

@@ -100,6 +100,7 @@ namespace MonoGame.Tests.Graphics
                 barrier.RemoveParticipant();
             });
 
+            thread.IsBackground = true;
             thread.Start();
 
             int frames = 0;

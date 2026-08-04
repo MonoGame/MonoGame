@@ -2,9 +2,6 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
-using System;
-using System.Collections.Generic;
-using System.Threading;
 using Microsoft.Xna.Framework.Content.Pipeline;
 using MonoGame.Framework.Content.Pipeline.Builder;
 
@@ -52,11 +49,11 @@ namespace MonoGame.Framework.Content
     /// </summary>
     internal static class ContextScopeFactory
     {
-        private static AsyncLocal<List<IContentContext>> _contextStack = new AsyncLocal<List<IContentContext>>
+        private static readonly AsyncLocal<List<IContentContext>> _contextStack = new()
         {
             Value = new List<IContentContext>(1)
         };
-        private static AsyncLocal<IContentContext> _activeContext = new AsyncLocal<IContentContext>();
+        private static readonly AsyncLocal<IContentContext> _activeContext = new();
 
         /// <summary>
         /// Returns true when the <see cref="ActiveContext"/> is a valid <see cref="IContentContext"/> instance.
@@ -81,7 +78,7 @@ namespace MonoGame.Framework.Content
         {
             get
             {
-                if (!HasActiveContext)
+                if (_activeContext.Value == null)
                 {
                     throw new PipelineException(
                         $"Cannot access {nameof(ActiveContext)} because there is no active context. Make sure that {nameof(ContextScopeFactory)}.{nameof(BeginContext)} has been called with the `using` keyword");
@@ -136,9 +133,7 @@ namespace MonoGame.Framework.Content
         /// </returns>
         public static IContentContext BeginContext(IContentContext scope)
         {
-            if (_contextStack.Value == null)
-                _contextStack.Value = new List<IContentContext>(1);
-
+            _contextStack.Value ??= new List<IContentContext>(1);
             _contextStack.Value.Add(scope);
             _activeContext.Value = scope;
             return scope;
@@ -163,56 +158,47 @@ namespace MonoGame.Framework.Content
             /// </summary>
             public virtual void Dispose()
             {
+                GC.SuppressFinalize(this);
+                if (_contextStack.Value == null)
+                {
+                    return;
+                }
+
                 _contextStack.Value.Remove(this);
 
+                if (_activeContext.Value == this && _contextStack.Value.Count > 0)
+                {
+                    // either use the "most recent" (aka, last) context, or if the list is empty there is no context.
+                    _activeContext.Value = _contextStack.Value[^1];
+                }
+
                 // if someone else has already claimed the activeContext, then we don't need to care.
-                if (_activeContext.Value != this) return;
-
-                // either use the "most recent" (aka, last) context, or if the list is empty,
-                //  there is no context.
-                _activeContext.Value = _contextStack.Value.Count > 0
-                    ? _contextStack.Value[^1]
-                    : null;
             }
-
         }
 
-        private class ContentProcessorContextAdapter : ContextScope
+        private class ContentProcessorContextAdapter(ContentProcessorContext context) : ContextScope
         {
-            private readonly ContentProcessorContext _context;
-
-            public ContentProcessorContextAdapter(ContentProcessorContext context)
-            {
-                _context = context;
-            }
-
-            public override string IntermediateDirectory => _context.IntermediateDirectory;
-            public override ContentBuildLogger Logger => _context.Logger;
-            public override ContentIdentity SourceIdentity => _context.SourceIdentity;
+            public override string IntermediateDirectory => context.IntermediateDirectory;
+            public override ContentBuildLogger Logger => context.Logger;
+            public override ContentIdentity SourceIdentity => context.SourceIdentity;
 
             public override void Dispose()
             {
                 base.Dispose();
-                if (_context is IDisposable disposable)
+                if (context is IDisposable disposable)
                 {
                     disposable.Dispose();
                 }
             }
         }
 
-        private class ContentImporterContextAdapter : ContextScope
+        private class ContentImporterContextAdapter(ContentImporterContext context, PipelineBuildEvent evt) : ContextScope
         {
-            private readonly ContentImporterContext _context;
-
-            public ContentImporterContextAdapter(ContentImporterContext context, PipelineBuildEvent evt)
-            {
-                _context = context;
-                SourceIdentity = new ContentIdentity(sourceFilename: evt.SourceFile);
-            }
+            private readonly ContentImporterContext _context = context;
 
             public override string IntermediateDirectory => _context.IntermediateDirectory;
             public override ContentBuildLogger Logger => _context.Logger;
-            public override ContentIdentity SourceIdentity { get; }
+            public override ContentIdentity SourceIdentity { get; } = new ContentIdentity(sourceFilename: evt.SourceFile);
         }
     }
 }
