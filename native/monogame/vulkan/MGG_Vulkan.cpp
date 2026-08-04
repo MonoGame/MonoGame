@@ -1714,6 +1714,34 @@ void MGG_GraphicsDevice_GetCaps(MGG_GraphicsDevice* device, MGG_GraphicsDevice_C
 	caps.MaxVertexBufferSlots = 8;
 	caps.MaxVertexTextureSlots = 8;
 
+	/*
+	 * The following values match what were hard coded on the manage side
+	 * in GraphicsCapabilities.Native.cs
+	 * 
+	 * They were moved here, we need to update the hard coded values to
+	 * get the actual caps from the device itself
+	 * - Chris <aristurtledev>
+	 */
+	caps.MaxTextureAnisotropy = 16;
+	caps.SupportsNonPowerOfTwo = true;
+	caps.SupportsTextureFilterAnisotropic = true;
+	caps.SupportsDepth24 = true;
+	caps.SupportsPackedDepthStencil = true;
+	caps.SupportsDepthNonLinear = false;
+	caps.SupportsTextureMaxLevel = true;
+	caps.SupportsDXt1 = true;
+	caps.SupportsS3tc = true;
+	caps.SupportsSRgb = true;
+	caps.SupportsDepthClamp = true;
+	caps.SupportsTextureArrays = true;
+	caps.SupportsVertexTextures = true;
+	caps.SupportsFloatTextures = true;
+	caps.SupportsHalfFloatTextures = true;
+	caps.SupportsNormalized = true;
+	caps.SupportsInstancing = true;
+	caps.SupportsBaseIndexInstancing = true;
+	caps.SupportsSeparateBlendStates = true;	
+
 	// Vulkan shader profile from pipeline.
 	caps.ShaderProfile = 80;
 }
