@@ -68,7 +68,7 @@ struct OpenGLFunctions
     PFNGLGETQUERYOBJECTUIVPROC GetQueryObjectuiv = nullptr;
     PFNGLGETSHADERINFOLOGPROC GetShaderInfoLog = nullptr;
     PFNGLGETSHADERIVPROC GetShaderiv = nullptr;
-    PFNGLGETUNIFORMLOCATIONARBPROC GetUniformLocation = nullptr;
+    PFNGLGETUNIFORMLOCATIONPROC GetUniformLocation = nullptr;
     PFNGLLINKPROGRAMPROC LinkProgram = nullptr;
     PFNGLMAPBUFFERPROC MapBuffer = nullptr;
     PFNGLRENDERBUFFERSTORAGEPROC RenderbufferStorage = nullptr;

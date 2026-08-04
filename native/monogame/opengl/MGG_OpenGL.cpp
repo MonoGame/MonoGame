@@ -17,6 +17,14 @@
 #include <cstdint>
 #include <vector>
 
+#ifndef GL_TEXTURE_MAX_ANISOTROPY_EXT
+#define GL_TEXTURE_MAX_ANISOTROPY_EXT 0x84FE
+#endif
+
+#ifndef GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT
+#define GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT 0x84FF
+#endif
+
 struct MGG_GraphicsAdapter
 {
     std::string deviceName;
@@ -185,6 +193,7 @@ struct MGG_ShaderProgram
 
 struct MGG_OcclusionQuery
 {
+    GLuint handle = 0;
 };
 
 namespace
@@ -1890,10 +1899,13 @@ void MGG_GraphicsDevice_SetRasterizerState(MGG_GraphicsDevice* device, MGG_Raste
         glDisable(GL_POLYGON_OFFSET_FILL);
     }
 
-    if (!info.depthClipEnable)
-        glEnable(GL_DEPTH_CLAMP);
-    else
-        glDisable(GL_DEPTH_CLAMP);
+    if (SupportsOpenGLDepthClamp(device))
+    {
+        if (!info.depthClipEnable)
+            glEnable(GL_DEPTH_CLAMP);
+        else
+            glDisable(GL_DEPTH_CLAMP);
+    }
 
     device->rasterizerState = state;
 }
@@ -3195,35 +3207,68 @@ void MGG_Shader_Destroy(MGG_GraphicsDevice* device, MGG_Shader* shader)
 
 MGG_OcclusionQuery* MGG_OcclusionQuery_Create(MGG_GraphicsDevice* device)
 {
-    (void)device;
-    MGGL_NOT_IMPLEMENTED("MGG_OcclusionQuery_Create");
+    assert(device != nullptr);
+
+    EnsureContext(device);
+
+    MGG_OcclusionQuery* query = new MGG_OcclusionQuery();
+    device->context.functions.GenQueries(1, &query->handle);
+    if (query->handle == 0)
+        MGGL_FAIL("glGenQueries failed", "occlusion query creation returned 0");
+
+    return query;
 }
 
 void MGG_OcclusionQuery_Destroy(MGG_GraphicsDevice* device, MGG_OcclusionQuery* query)
 {
-    (void)device;
-    (void)query;
-    MGGL_NOT_IMPLEMENTED("MGG_OcclusionQuery_Destroy");
+    assert(device != nullptr);
+
+    if (query == nullptr)
+        return;
+
+    EnsureContext(device);
+
+    if (query->handle != 0)
+        device->context.functions.DeleteQueries(1, &query->handle);
+
+    delete query;
 }
 
 void MGG_OcclusionQuery_Begin(MGG_GraphicsDevice* device, MGG_OcclusionQuery* query)
 {
-    (void)device;
-    (void)query;
-    MGGL_NOT_IMPLEMENTED("MGG_OcclusionQuery_Begin");
+    assert(device != nullptr);
+    assert(query != nullptr);
+
+    EnsureContext(device);
+    device->context.functions.BeginQuery(GL_SAMPLES_PASSED, query->handle);
 }
 
 void MGG_OcclusionQuery_End(MGG_GraphicsDevice* device, MGG_OcclusionQuery* query)
 {
-    (void)device;
-    (void)query;
-    MGGL_NOT_IMPLEMENTED("MGG_OcclusionQuery_End");
+    assert(device != nullptr);
+    assert(query != nullptr);
+
+    EnsureContext(device);
+    device->context.functions.EndQuery(GL_SAMPLES_PASSED);
 }
 
 mgbyte MGG_OcclusionQuery_GetResult(MGG_GraphicsDevice* device, MGG_OcclusionQuery* query, mgint& pixelCount)
 {
-    (void)device;
-    (void)query;
-    (void)pixelCount;
-    MGGL_NOT_IMPLEMENTED("MGG_OcclusionQuery_GetResult");
+    assert(device != nullptr);
+    assert(query != nullptr);
+
+    EnsureContext(device);
+
+    GLuint resultAvailable = 0;
+    device->context.functions.GetQueryObjectuiv(query->handle, GL_QUERY_RESULT_AVAILABLE, &resultAvailable);
+    if (resultAvailable == 0)
+    {
+        pixelCount = 0;
+        return false;
+    }
+
+    GLuint result = 0;
+    device->context.functions.GetQueryObjectuiv(query->handle, GL_QUERY_RESULT, &result);
+    pixelCount = static_cast<mgint>(result);
+    return true;
 }

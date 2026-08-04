@@ -110,7 +110,7 @@ void OpenGLFunctions::Load()
     GetQueryObjectuiv = reinterpret_cast<PFNGLGETQUERYOBJECTUIVPROC>(LoadProcAddress("glGetQueryObjectuiv"));
     GetShaderInfoLog = reinterpret_cast<PFNGLGETSHADERINFOLOGPROC>(LoadProcAddress("glGetShaderInfoLog"));
     GetShaderiv = reinterpret_cast<PFNGLGETSHADERIVPROC>(LoadProcAddress("glGetShaderiv"));
-    GetUniformLocation = reinterpret_cast<PFNGLGETUNIFORMLOCATIONARBPROC>(LoadProcAddress("glGetUniformLocation"));
+    GetUniformLocation = reinterpret_cast<PFNGLGETUNIFORMLOCATIONPROC>(LoadProcAddress("glGetUniformLocation"));
     LinkProgram = reinterpret_cast<PFNGLLINKPROGRAMPROC>(LoadProcAddress("glLinkProgram"));
     MapBuffer = reinterpret_cast<PFNGLMAPBUFFERPROC>(LoadProcAddress("glMapBuffer"));
     DrawElementsBaseVertex = reinterpret_cast<PFNGLDRAWELEMENTSBASEVERTEXPROC>(LoadProcAddress("glDrawElementsBaseVertex"));
