@@ -419,63 +419,70 @@ namespace
 
     void ToVertexAttribFormat(MGVertexElementFormat format, GLint& elementCount, GLenum& elementType, GLboolean& normalized)
     {
-        normalized = GL_FALSE;
-
         switch (format)
         {
-        case MGVertexElementFormat::Single:
-            elementCount = 1;
-            elementType = GL_FLOAT;
-            return;
-        case MGVertexElementFormat::Vector2:
-            elementCount = 2;
-            elementType = GL_FLOAT;
-            return;
-        case MGVertexElementFormat::Vector3:
-            elementCount = 3;
-            elementType = GL_FLOAT;
-            return;
-        case MGVertexElementFormat::Vector4:
-            elementCount = 4;
-            elementType = GL_FLOAT;
-            return;
-        case MGVertexElementFormat::Color:
-            elementCount = 4;
-            elementType = GL_UNSIGNED_BYTE;
-            normalized = GL_TRUE;
-            return;
-        case MGVertexElementFormat::Byte4:
-            elementCount = 4;
-            elementType = GL_UNSIGNED_BYTE;
-            return;
-        case MGVertexElementFormat::Short2:
-            elementCount = 2;
-            elementType = GL_SHORT;
-            return;
-        case MGVertexElementFormat::Short4:
-            elementCount = 4;
-            elementType = GL_SHORT;
-            return;
-        case MGVertexElementFormat::NormalizedShort2:
-            elementCount = 2;
-            elementType = GL_SHORT;
-            normalized = GL_TRUE;
-            return;
-        case MGVertexElementFormat::NormalizedShort4:
-            elementCount = 4;
-            elementType = GL_SHORT;
-            normalized = GL_TRUE;
-            return;
-        case MGVertexElementFormat::HalfVector2:
-            elementCount = 2;
-            elementType = GL_HALF_FLOAT;
-            return;
-        case MGVertexElementFormat::HalfVector4:
-            elementCount = 4;
-            elementType = GL_HALF_FLOAT;
-            return;
-        default:
-            MGGL_FAIL("Unsupported vertex element format", "native OpenGL input layout does not recognize this vertex element format");
+            case MGVertexElementFormat::Single:
+                elementCount = 1;
+                elementType = GL_FLOAT;
+                normalized = GL_FALSE;
+                return;
+            case MGVertexElementFormat::Vector2:
+                elementCount = 2;
+                elementType = GL_FLOAT;
+                normalized = GL_FALSE;
+                return;
+            case MGVertexElementFormat::Vector3:
+                elementCount = 3;
+                elementType = GL_FLOAT;
+                normalized = GL_FALSE;
+                return;
+            case MGVertexElementFormat::Vector4:
+                elementCount = 4;
+                elementType = GL_FLOAT;
+                normalized = GL_FALSE;
+                return;
+            case MGVertexElementFormat::Color:
+                elementCount = 4;
+                elementType = GL_UNSIGNED_BYTE;
+                normalized = GL_TRUE;
+                return;
+            case MGVertexElementFormat::Byte4:
+                elementCount = 4;
+                elementType = GL_UNSIGNED_BYTE;
+                normalized = GL_FALSE;
+                return;
+            case MGVertexElementFormat::Short2:
+                elementCount = 2;
+                elementType = GL_SHORT;
+                normalized = GL_FALSE;
+                return;
+            case MGVertexElementFormat::Short4:
+                elementCount = 4;
+                elementType = GL_SHORT;
+                normalized = GL_FALSE;
+                return;
+            case MGVertexElementFormat::NormalizedShort2:
+                elementCount = 2;
+                elementType = GL_SHORT;
+                normalized = GL_TRUE;
+                return;
+            case MGVertexElementFormat::NormalizedShort4:
+                elementCount = 4;
+                elementType = GL_SHORT;
+                normalized = GL_TRUE;
+                return;
+            case MGVertexElementFormat::HalfVector2:
+                elementCount = 2;
+                elementType = GL_HALF_FLOAT;
+                normalized = GL_FALSE;
+                return;
+            case MGVertexElementFormat::HalfVector4:
+                elementCount = 4;
+                elementType = GL_HALF_FLOAT;
+                normalized = GL_FALSE;
+                return;
+            default:
+                MGGL_FAIL("Unsupported vertex element format", "native OpenGL input layout does not recognize this vertex element format");
         }
     }
 
