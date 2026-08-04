@@ -455,8 +455,6 @@ namespace MonoGame.Tests.Graphics
             indexBuffer.Dispose();
         }
 
-<<<<<<< HEAD
-=======
         [Test]
         public void DrawInstancedPrimitivesUsesInstanceData()
         {
@@ -541,8 +539,6 @@ namespace MonoGame.Tests.Graphics
         }
 #endif
 
->>>>>>> origin/develop
-        [Test]
         public void DrawUserPrimitivesParameterValidation()
         {
             var vertexDataNonEmpty = new[]
