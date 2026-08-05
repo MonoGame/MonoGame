@@ -250,6 +250,16 @@ namespace
         return SDL_GL_ExtensionSupported(name) == SDL_TRUE;
     }
 
+    void EnsureContext(MGG_GraphicsDevice* device)
+    {
+        assert(device != nullptr);
+
+        if (device->window == nullptr || device->context.handle == nullptr)
+            MGGL_FAIL("OpenGL device not initialized", "ResizeSwapChain must create a window context before use");
+
+        device->context.MakeCurrent();
+    }    
+
     bool SupportsOpenGLDepthClamp(MGG_GraphicsDevice* device)
     {
         assert(device != nullptr);
@@ -305,16 +315,6 @@ namespace
 
         if (adapter->modes.empty())
             adapter->modes.push_back(adapter->currentDisplayMode);
-    }
-
-    void EnsureContext(MGG_GraphicsDevice* device)
-    {
-        assert(device != nullptr);
-
-        if (device->window == nullptr || device->context.handle == nullptr)
-            MGGL_FAIL("OpenGL device not initialized", "ResizeSwapChain must create a window context before use");
-
-        device->context.MakeCurrent();
     }
 
     void EnsureVertexArray(MGG_GraphicsDevice* device)
@@ -937,6 +937,12 @@ namespace
                 return { GL_RGBA8, GL_RGBA, GL_UNSIGNED_BYTE, 4, 4, 1, 1, GL_RED, GL_GREEN, GL_BLUE, GL_ALPHA, false, false };
             case MGSurfaceFormat::ColorSRgb:
                 return { GL_SRGB8_ALPHA8, GL_RGBA, GL_UNSIGNED_BYTE, 4, 4, 1, 1, GL_RED, GL_GREEN, GL_BLUE, GL_ALPHA, false, false };
+            case MGSurfaceFormat::Bgr565:
+                return { GL_RGB565, GL_RGB, GL_UNSIGNED_SHORT_5_6_5, 2, 2, 1, 1, GL_RED, GL_GREEN, GL_BLUE, GL_ALPHA, false, false };
+            case MGSurfaceFormat::Bgra4444:
+                return { GL_RGBA4, GL_RGBA, GL_UNSIGNED_SHORT_4_4_4_4, 2, 2, 1, 1, GL_RED, GL_GREEN, GL_BLUE, GL_ALPHA, false, false };
+            case MGSurfaceFormat::Bgra5551:
+                return { GL_RGB5_A1, GL_RGBA, GL_UNSIGNED_SHORT_5_5_5_1, 2, 2, 1, 1, GL_RED, GL_GREEN, GL_BLUE, GL_ALPHA, false, false };
             case MGSurfaceFormat::Bgra32:
                 return { GL_RGBA8, GL_BGRA, GL_UNSIGNED_BYTE, 4, 4, 1, 1, GL_RED, GL_GREEN, GL_BLUE, GL_ALPHA, false, false };
             case MGSurfaceFormat::Bgra32SRgb:
@@ -957,10 +963,29 @@ namespace
                 return { GL_COMPRESSED_RGBA_S3TC_DXT5_EXT, 0, 0, 0, 16, 4, 4, GL_RED, GL_GREEN, GL_BLUE, GL_ALPHA, false, true };
             case MGSurfaceFormat::Dxt5SRgb:
                 return { GL_COMPRESSED_SRGB_ALPHA_S3TC_DXT5_EXT, 0, 0, 0, 16, 4, 4, GL_RED, GL_GREEN, GL_BLUE, GL_ALPHA, false, true };
+            case MGSurfaceFormat::Rgba1010102:
+                return { GL_RGB10_A2, GL_RGBA, GL_UNSIGNED_INT_2_10_10_10_REV, 4, 4, 1, 1, GL_RED, GL_GREEN, GL_BLUE, GL_ALPHA, false, false };
             case MGSurfaceFormat::Single:
                 return { GL_R32F, GL_RED, GL_FLOAT, 4, 4, 1, 1, GL_RED, GL_GREEN, GL_BLUE, GL_ALPHA, false, false };
+            case MGSurfaceFormat::HalfVector2:
+                return { GL_RG16F, GL_RG, GL_HALF_FLOAT, 4, 4, 1, 1, GL_RED, GL_GREEN, GL_BLUE, GL_ALPHA, false, false };
+            case MGSurfaceFormat::HalfVector4:
+            case MGSurfaceFormat::HdrBlendable:
+                return { GL_RGBA16F, GL_RGBA, GL_HALF_FLOAT, 8, 8, 1, 1, GL_RED, GL_GREEN, GL_BLUE, GL_ALPHA, false, false };
             case MGSurfaceFormat::HalfSingle:
                 return { GL_R16F, GL_RED, GL_HALF_FLOAT, 2, 2, 1, 1, GL_RED, GL_GREEN, GL_BLUE, GL_ALPHA, false, false };
+            case MGSurfaceFormat::Vector2:
+                return { GL_RG32F, GL_RG, GL_FLOAT, 8, 8, 1, 1, GL_RED, GL_GREEN, GL_BLUE, GL_ALPHA, false, false };
+            case MGSurfaceFormat::Vector4:
+                return { GL_RGBA32F, GL_RGBA, GL_FLOAT, 16, 16, 1, 1, GL_RED, GL_GREEN, GL_BLUE, GL_ALPHA, false, false };
+            case MGSurfaceFormat::NormalizedByte2:
+                return { GL_RG8_SNORM, GL_RG, GL_BYTE, 2, 2, 1, 1, GL_RED, GL_GREEN, GL_BLUE, GL_ALPHA, false, false };
+            case MGSurfaceFormat::NormalizedByte4:
+                return { GL_RGBA8_SNORM, GL_RGBA, GL_BYTE, 4, 4, 1, 1, GL_RED, GL_GREEN, GL_BLUE, GL_ALPHA, false, false };
+            case MGSurfaceFormat::Rg32:
+                return { GL_RG16, GL_RG, GL_UNSIGNED_SHORT, 4, 4, 1, 1, GL_RED, GL_GREEN, GL_BLUE, GL_ALPHA, false, false };
+            case MGSurfaceFormat::Rgba64:
+                return { GL_RGBA16, GL_RGBA, GL_UNSIGNED_SHORT, 8, 8, 1, 1, GL_RED, GL_GREEN, GL_BLUE, GL_ALPHA, false, false };
             default:
                 MGGL_FAIL("Unsupported surface format", "OpenGL surface format is not mapped");
         }
