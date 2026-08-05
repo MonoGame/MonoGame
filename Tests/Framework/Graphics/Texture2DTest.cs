@@ -198,12 +198,12 @@ namespace MonoGame.Tests.Graphics
                     if (useSpan)
                     {
 #if VULKAN || DIRECTX12
-                        texture2D.SetData<Color>(i, null, savedData.AsSpan());
+                        texture2D.SetData<Color>(j, i, null, savedData.AsSpan());
 #endif
                     }
                     else
                     {
-                        texture2D.SetData(savedData);
+                        texture2D.SetData(j, i, null, savedData, 0, savedData.Length);
                     }
 
                     var readData = new Color[levelSize];
