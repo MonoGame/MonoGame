@@ -93,6 +93,56 @@ public partial class Texture2D : Texture
         dataHandle.Free();
     }
 
+    private unsafe void PlatformSetData<T>(int level, int arraySlice, Rectangle rect, Span<T> data) where T : struct
+    {
+        var elementSizeInByte = ReflectionHelpers.FastSizeOf<T>();
+        var dataBytes = data.Length * elementSizeInByte;
+
+        fixed (void* ptr = &data[0])
+        {
+
+            var dataPtr = (byte*)ptr;
+            MGG.Texture_SetData(
+                GraphicsDevice.Handle,
+                Handle,
+                level,
+                arraySlice,
+                rect.X,
+                rect.Y,
+                0,
+                rect.Width,
+                rect.Height,
+                1,
+                (byte*)dataPtr,
+                dataBytes);
+        }
+    }
+
+    private unsafe void PlatformSetData<T>(int level, Span<T> data) where T : struct
+    {
+        var elementSizeInByte = ReflectionHelpers.FastSizeOf<T>();
+        var dataBytes = data.Length * elementSizeInByte;
+
+        fixed (void* ptr = &data[0])
+        {
+
+            var dataPtr = (byte*)ptr;
+            MGG.Texture_SetData(
+                GraphicsDevice.Handle,
+                Handle,
+                level,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                (byte*)dataPtr,
+                dataBytes);
+        }
+    }
+
     private unsafe void PlatformGetData<T>(int level, int arraySlice, Rectangle rect, T[] data, int startIndex, int elementCount) where T : struct
     {
         var dataHandle = GCHandle.Alloc(data, GCHandleType.Pinned);

@@ -20,7 +20,11 @@ namespace MonoGame.Tests.Graphics
     class Texture2DThreadingTests : GraphicsDeviceTestFixtureBase
     {
         [Test]
-        public void CreateSetAndGetData()
+        [TestCase(false)]
+#if VULKAN || DIRECTX12
+        [TestCase(true)]
+#endif
+        public void CreateSetAndGetData(bool useSpan)
         {
             const int Width = 32;
             const int Height = 32;
@@ -38,8 +42,16 @@ namespace MonoGame.Tests.Graphics
                     var pixels = new Color[Width * Height];
                     for (int i = 0; i < pixels.Length; i++)
                         pixels[i] = fillColor;
-
-                    texture.SetData(pixels);
+                    if (useSpan)
+                    {
+#if VULKAN || DIRECTX12
+                        texture.SetData<Color>(pixels.AsSpan());
+#endif
+                    }
+                    else
+                    {
+                        texture.SetData(pixels);
+                    }
 
                     readBack = new Color[Width * Height];
                     texture.GetData(readBack);

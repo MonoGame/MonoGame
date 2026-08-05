@@ -270,7 +270,7 @@ namespace Microsoft.Xna.Framework.Graphics
         /// </summary>
         /// <typeparam name="T">The type of the elements in the array.</typeparam>
         /// <param name="level">The mipmap level where the data will be placed.</param>
-        /// <param name="arraySlice">Index inside the texture array</param>
+        /// <param name="arraySlice">Index of the texture we want to copy to inside the texture array</param>
         /// <param name="rect">
         /// The section of the texture where the data will be placed.  null indicates the data will be copied over the
         /// entire texture.
@@ -459,12 +459,151 @@ namespace Microsoft.Xna.Framework.Graphics
             PlatformSetData(0, data, 0, data.Length);
         }
 
+#if NATIVE
+
+        /// <summary>
+        /// Copies an Span of data to the texture.
+        /// </summary>
+        /// <typeparam name="T">The type of the elements in the Span.</typeparam>
+        /// <param name="level">The mipmap level where the data will be placed.</param>
+        /// <param name="arraySlice">Index of the texture we want to copy to inside the texture array</param>
+        /// <param name="rect">
+        /// The section of the texture where the data will be placed. null indicates the data will be copied over the
+        /// entire texture.
+        /// </param>
+        /// <param name="data">
+        /// The Span of data to copy.  If <paramref name="rect"/> is null, the number of elements in the Span must be
+        /// equal to the size of the texture, which is <see cref="Width"/> x <see cref="Height"/>; otherwise, the number
+        /// of elements in the Span should be equal to the size of the rectangle.
+        /// </param>
+        /// <exception cref="ArgumentException">
+        /// One of the following conditions is true:
+        /// <list type="bullet">
+        ///     <item>
+        ///         <description>
+        ///             The <paramref name="level"/> parameter is larger than the number of levels in this texture.
+        ///         </description>
+        ///     </item>
+        ///     <item>
+        ///         <description>
+        ///             The <paramref name="arraySlice"/> parameter is greater than zero and the texture arrays are not
+        ///             supported on the graphics device.
+        ///         </description>
+        ///     </item>
+        ///     <item>
+        ///         <description>
+        ///             The <paramref name="arraySlice"/> parameter is less than zero or is greater than or equal to the
+        ///             internal array buffer of this texture.
+        ///         </description>
+        ///     </item>
+        ///     <item>
+        ///         <description>
+        ///             The <paramref name="rect"/> is outside the bounds of the texture.
+        ///         </description>
+        ///     </item>
+        ///     <item>
+        ///         <description>
+        ///             The <typeparamref name="T"/> type size is invalid for the format of this texture.
+        ///         </description>
+        ///     </item>
+        /// </list>
+        /// </exception>
+        /// <exception cref="ArgumentNullException">The <paramref name="data"/> parameter is null.</exception>
+        public void SetData<T>(int level, int arraySlice, Rectangle? rect, Span<T> data) where T : struct
+        {
+            Rectangle checkedRect;
+            ValidateParams(level, arraySlice, rect, data, data.Length, out checkedRect);
+            PlatformSetData(level, arraySlice, checkedRect, data);
+        }
+
+        /// <summary>
+        /// Copies an Span of data to the texture.
+        /// </summary>
+        /// <typeparam name="T">The type of the elements in the Span.</typeparam>
+        /// <param name="level">The mipmap level where the data will be placed.</param>
+        /// <param name="rect">
+        /// The section of the texture where the data will be placed. null indicates the data will be copied over the
+        /// entire texture.
+        /// </param>
+        /// <param name="data">
+        /// The Span of data to copy.  If <paramref name="rect"/> is null, the number of elements in the Span must be
+        /// equal to the size of the texture, which is <see cref="Width"/> x <see cref="Height"/>; otherwise, the number
+        /// of elements in the Span should be equal to the size of the rectangle.
+        /// </param>
+        /// <exception cref="ArgumentException">
+        /// One of the following conditions is true:
+        /// <list type="bullet">
+        ///     <item>
+        ///         <description>
+        ///             The <paramref name="level"/> parameter is larger than the number of levels in this texture.
+        ///         </description>
+        ///     </item>
+        ///     <item>
+        ///         <description>
+        ///             The <paramref name="rect"/> is outside the bounds of the texture.
+        ///         </description>
+        ///     </item>
+        ///     <item>
+        ///         <description>
+        ///             The <typeparamref name="T"/> type size is invalid for the format of this texture.
+        ///         </description>
+        ///     </item>
+        ///     <item>
+        ///         <description>
+        ///             The <paramref name="data"/> Span parameter is too small.
+        ///             length of the data Span.
+        ///         </description>
+        ///     </item>
+        /// </list>
+        /// </exception>
+        /// <exception cref="ArgumentNullException">The <paramref name="data"/> parameter is null.</exception>
+        public void SetData<T>(int level, Rectangle? rect, Span<T> data) where T : struct
+        {
+            Rectangle checkedRect;
+            ValidateParams(level, 0, rect, data, data.Length, out checkedRect);
+            if (rect.HasValue)
+                PlatformSetData(level, 0, checkedRect, data);
+            else
+                PlatformSetData(level, data);
+        }
+
+        /// <summary>
+        /// Copies an Span of data to the texture.
+        /// </summary>
+        /// <typeparam name="T">The type of the elements in the Span.</typeparam>
+        /// <param name="data"> The Span of data to copy.</param>
+        /// <exception cref="ArgumentException">
+        /// One of the following conditions is true:
+        /// <list type="bullet">
+        ///     <item>
+        ///         <description>
+        ///             The <typeparamref name="T"/> type size is invalid for the format of this texture.
+        ///         </description>
+        ///     </item>
+        ///     <item>
+        ///         <description>
+        ///             The <paramref name="data"/> Span parameter is too small.
+        ///             length of the data Span.
+        ///         </description>
+        ///     </item>
+        /// </list>
+        /// </exception>
+        /// <exception cref="ArgumentNullException">The <paramref name="data"/> parameter is null.</exception>
+		public void SetData<T>(Span<T> data) where T : struct
+        {
+            Rectangle checkedRect;
+            ValidateParams(0, 0, null, data, data.Length, out checkedRect);
+            PlatformSetData(0, data);
+        }
+
+#endif
+
         /// <summary>
         /// Copies texture data into an array
         /// </summary>
         /// <typeparam name="T">The type of the elements in the array.</typeparam>
         /// <param name="level">The mipmap level to copy from.</param>
-        /// <param name="arraySlice">Index inside the texture array</param>
+        /// <param name="arraySlice">Index of the texture we want to copy from inside the texture array</param>
         /// <param name="rect">
         /// The section of the texture where the data will be copied from.  null indicates the data will be copied over
         /// the entire texture.
@@ -776,6 +915,30 @@ namespace Microsoft.Xna.Framework.Graphics
         private void ValidateParams<T>(int level, int arraySlice, Rectangle? rect, T[] data,
             int startIndex, int elementCount, out Rectangle checkedRect) where T : struct
         {
+            if (data == null)
+                throw new ArgumentNullException("data");
+            if (startIndex < 0 || startIndex >= data.Length)
+                throw new ArgumentException("startIndex must be at least zero and smaller than data.Length.", "startIndex");
+            if (data.Length < startIndex + elementCount)
+                throw new ArgumentException("The data array is too small.");
+            CommonValidations<T>(level, arraySlice, rect, elementCount, out checkedRect);
+        }
+
+#if NATIVE
+        private void ValidateParams<T>(int level, int arraySlice, Rectangle? rect, Span<T> data,
+            int elementCount, out Rectangle checkedRect) where T : struct
+        {
+            if (data == null)
+                throw new ArgumentNullException("data");
+            if (data.Length < elementCount)
+                throw new ArgumentException("The data array is too small.");
+            CommonValidations<T>(level, arraySlice, rect, elementCount, out checkedRect);
+        }
+#endif
+
+        private void CommonValidations<T>(int level, int arraySlice, Rectangle? rect,
+             int elementCount, out Rectangle checkedRect) where T : struct
+        {
             var textureBounds = new Rectangle(0, 0, Math.Max(width >> level, 1), Math.Max(height >> level, 1));
             checkedRect = rect ?? textureBounds;
             if (level < 0 || level >= LevelCount)
@@ -786,16 +949,10 @@ namespace Microsoft.Xna.Framework.Graphics
                 throw new ArgumentException("arraySlice must be smaller than the ArraySize of this texture and larger than 0.", "arraySlice");
             if (!textureBounds.Contains(checkedRect) || checkedRect.Width <= 0 || checkedRect.Height <= 0)
                 throw new ArgumentException("Rectangle must be inside the texture bounds", "rect");
-            if (data == null)
-                throw new ArgumentNullException("data");
             var tSize = ReflectionHelpers.FastSizeOf<T>();
             var fSize = Format.GetSize();
             if (tSize > fSize || fSize % tSize != 0)
-                throw new ArgumentException("Type T is of an invalid size for the format of this texture.", "T");
-            if (startIndex < 0 || startIndex >= data.Length)
-                throw new ArgumentException("startIndex must be at least zero and smaller than data.Length.", "startIndex");
-            if (data.Length < startIndex + elementCount)
-                throw new ArgumentException("The data array is too small.");
+                throw new ArgumentException("Type T is of an invalid size for the format of this texture.", "T");;
 
             int dataByteSize;
             if (Format.IsCompressedFormat())
