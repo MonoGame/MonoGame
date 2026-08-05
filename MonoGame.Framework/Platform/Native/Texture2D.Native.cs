@@ -93,15 +93,13 @@ public partial class Texture2D : Texture
         dataHandle.Free();
     }
 
-    private unsafe void PlatformSetData<T>(int level, int arraySlice, Rectangle rect, Span<T> data) where T : struct
+    private unsafe void PlatformSetData<T>(int level, int arraySlice, Rectangle rect, ReadOnlySpan<T> data) where T : struct
     {
         var elementSizeInByte = ReflectionHelpers.FastSizeOf<T>();
         var dataBytes = data.Length * elementSizeInByte;
 
-        fixed (void* ptr = &data[0])
+        fixed (T* dataPtr = data)
         {
-
-            var dataPtr = (byte*)ptr;
             MGG.Texture_SetData(
                 GraphicsDevice.Handle,
                 Handle,
@@ -118,15 +116,13 @@ public partial class Texture2D : Texture
         }
     }
 
-    private unsafe void PlatformSetData<T>(int level, Span<T> data) where T : struct
+    private unsafe void PlatformSetData<T>(int level, ReadOnlySpan<T> data) where T : struct
     {
         var elementSizeInByte = ReflectionHelpers.FastSizeOf<T>();
         var dataBytes = data.Length * elementSizeInByte;
 
-        fixed (void* ptr = &data[0])
+        fixed (T* dataPtr = data)
         {
-
-            var dataPtr = (byte*)ptr;
             MGG.Texture_SetData(
                 GraphicsDevice.Handle,
                 Handle,

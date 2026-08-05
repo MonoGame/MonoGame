@@ -667,7 +667,7 @@ namespace MonoGame.Tests.Graphics
                 {
                     data[i] = Color.White;
                 }
-                Span<Color> dataAsSpan = data.AsSpan();
+                ReadOnlySpan<Color> dataAsSpan = data.AsSpan();
                 Texture2D t = Texture2D.FromStream(gd, reader.BaseStream);
                 t.GetData(reference);
                 t.SetData(dataAsSpan);
@@ -710,7 +710,7 @@ namespace MonoGame.Tests.Graphics
                 {
                     data[i] = Color.White;
                 }
-                Span<Color> dataAsSpan = data.AsSpan();
+                ReadOnlySpan<Color> dataAsSpan = data.AsSpan();
                 Texture2D t = Texture2D.FromStream(gd, reader.BaseStream);
                 t.GetData(reference);
                 // Span is ref local and can't be passed in the lambda for Assert.Throws, hence the try-catch
@@ -762,7 +762,7 @@ namespace MonoGame.Tests.Graphics
                 buffer[i] = value;
 
             var t = new Texture2D(gd, textureSize, 1, false, format);
-            var bufferAsSpan = buffer.AsSpan();
+            ReadOnlySpan<TBuffer>bufferAsSpan = buffer.AsSpan();
             t.SetData(bufferAsSpan);
 
             var buffer2 = new TBuffer[bufferSize];
@@ -792,7 +792,7 @@ namespace MonoGame.Tests.Graphics
                 buffer[i] = value;
 
             var t = new Texture2D(gd, textureSize, 1, false, format);
-            var bufferAsSpan = buffer.AsSpan();
+            ReadOnlySpan<TBuffer> bufferAsSpan = buffer.AsSpan();
             // Span is ref local and can't be passed in the lambda for Assert.Throws, hence the try-catch
             bool exceptionThrown = false;
             try
@@ -826,7 +826,7 @@ namespace MonoGame.Tests.Graphics
                 buffer[i] = value;
 
             var t = new Texture2D(gd, textureSize, 1, false, format);
-            var bufferAsSpan = buffer.AsSpan();
+            ReadOnlySpan<Vector3> bufferAsSpan = buffer.AsSpan();
             // Span is ref local and can't be passed in the lambda for Assert.Throws, hence the try-catch
             bool exceptionThrown = false;
             try
@@ -857,7 +857,7 @@ namespace MonoGame.Tests.Graphics
                     data[i] = Color.White;
                 }
                 Texture2D t = Texture2D.FromStream(gd, reader.BaseStream);
-                Span<Color> dataAsSpan = data.AsSpan();
+                ReadOnlySpan<Color> dataAsSpan = data.AsSpan();
                 t.GetData(reference);
                 if(use4Params)
                 {
@@ -912,7 +912,7 @@ namespace MonoGame.Tests.Graphics
                     data[i] = Color.White;
                 }
                 Texture2D t = Texture2D.FromStream(gd, reader.BaseStream);
-                Span<Color> dataAsSpan = data.AsSpan();
+                ReadOnlySpan<Color> dataAsSpan = data.AsSpan();
                 t.GetData(reference);
                 bool exceptionThrown = false;
                 try

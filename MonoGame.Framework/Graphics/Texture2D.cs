@@ -509,7 +509,7 @@ namespace Microsoft.Xna.Framework.Graphics
         /// </list>
         /// </exception>
         /// <exception cref="ArgumentNullException">The <paramref name="data"/> parameter is null.</exception>
-        public void SetData<T>(int level, int arraySlice, Rectangle? rect, Span<T> data) where T : struct
+        public void SetData<T>(int level, int arraySlice, Rectangle? rect, ReadOnlySpan<T> data) where T : struct
         {
             Rectangle checkedRect;
             ValidateParams(level, arraySlice, rect, data, data.Length, out checkedRect);
@@ -557,7 +557,7 @@ namespace Microsoft.Xna.Framework.Graphics
         /// </list>
         /// </exception>
         /// <exception cref="ArgumentNullException">The <paramref name="data"/> parameter is null.</exception>
-        public void SetData<T>(int level, Rectangle? rect, Span<T> data) where T : struct
+        public void SetData<T>(int level, Rectangle? rect, ReadOnlySpan<T> data) where T : struct
         {
             Rectangle checkedRect;
             ValidateParams(level, 0, rect, data, data.Length, out checkedRect);
@@ -589,7 +589,7 @@ namespace Microsoft.Xna.Framework.Graphics
         /// </list>
         /// </exception>
         /// <exception cref="ArgumentNullException">The <paramref name="data"/> parameter is null.</exception>
-		public void SetData<T>(Span<T> data) where T : struct
+		public void SetData<T>(ReadOnlySpan<T> data) where T : struct
         {
             Rectangle checkedRect;
             ValidateParams(0, 0, null, data, data.Length, out checkedRect);
@@ -925,7 +925,7 @@ namespace Microsoft.Xna.Framework.Graphics
         }
 
 #if NATIVE
-        private void ValidateParams<T>(int level, int arraySlice, Rectangle? rect, Span<T> data,
+        private void ValidateParams<T>(int level, int arraySlice, Rectangle? rect, ReadOnlySpan<T> data,
             int elementCount, out Rectangle checkedRect) where T : struct
         {
             if (data == null)
