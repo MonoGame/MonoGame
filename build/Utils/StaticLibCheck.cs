@@ -1,3 +1,4 @@
+using System;
 using Cake.Common.Tools.VSWhere.Latest;
 
 namespace BuildScripts;
@@ -80,7 +81,7 @@ public static class StaticLibCheck
 
         if (!passedTests)
         {
-            throw new Exception("Invalid library linkage detected!");
+            throw new InvalidOperationException("Invalid library linkage detected!");
         }
     }
 
@@ -115,12 +116,13 @@ public static class StaticLibCheck
 
             var processOutputList = processOutput.ToList();
             var passedTests = true;
-            for (int i = 3; i < processOutputList.Count; i++)
+            int i = 3;
+            while (i < processOutputList.Count)
             {
                 var libPath = processOutputList[i].Trim().Split(' ')[^1];
                 if (libPath.Contains('['))
                 {
-                    i += 2;
+                    i += 3; // Skip the next two lines as before
                     continue;
                 }
 
@@ -133,11 +135,12 @@ public static class StaticLibCheck
                     context.Information($"INVALID: {libPath}");
                     passedTests = false;
                 }
+                i++;
             }
 
             if (!passedTests)
             {
-                throw new Exception($"Invalid library linkage detected in arch '{arch}' for {filePath}!");
+                throw new InvalidOperationException($"Invalid library linkage detected in arch '{arch}' for {filePath}!");
             }
         }
     }
@@ -181,7 +184,7 @@ public static class StaticLibCheck
 
         if (!passedTests)
         {
-            throw new Exception("Invalid library linkage detected!");
+            throw new InvalidOperationException("Invalid library linkage detected!");
         }
     }
 }

@@ -21,7 +21,7 @@ public enum ProjectType
 
 public class BuildContext : FrostingContext
 {
-    public static string VersionBase = "3.8.5";
+    public const string VersionBase = "3.8.5";
     public static readonly Regex VersionRegex = new(@"^v\d+.\d+.\d+", RegexOptions.Compiled | RegexOptions.IgnoreCase);
     public static readonly string DefaultRepositoryUrl = "https://github.com/MonoGame/MonoGame";
 
@@ -184,7 +184,7 @@ public class BuildContext : FrostingContext
     {
         if (this.StartProcess(command, new ProcessSettings { WorkingDirectory = ShellWorkingDir, Arguments = args }) != 0)
         {
-            throw new Exception($"Execution failed for: {command} {args}");
+            throw new InvalidOperationException($"Execution failed for: {command} {args}");
         }
     }
 
@@ -240,7 +240,7 @@ public class BuildContext : FrostingContext
         this.Information("");
     }
 
-    private static string CalculateVersion(ICakeContext context)
+    public string CalculateVersion(ICakeContext context)
     {
         var tags = GitAliases.GitTags(context, ".");
         foreach (var tag in tags)
@@ -248,7 +248,7 @@ public class BuildContext : FrostingContext
             var match = VersionRegex.Match(tag.FriendlyName);
             if (match.Success)
             {
-                VersionBase = match.Captures[0].ToString()[1..];
+                var versionBase = match.Captures[0].ToString()[1..];
             }
         }
 
@@ -264,10 +264,10 @@ public class BuildContext : FrostingContext
             {
                 var baseVersion = workflow.RefName.Split('/')[^1];
                 if (!VersionRegex.IsMatch(baseVersion))
-                    throw new Exception($"Invalid tag: {baseVersion}");
+                    throw new ArgumentException($"Invalid tag: {baseVersion}", nameof(context));
 
-                VersionBase = baseVersion[1..];
-                return VersionBase;
+                var versionBase = baseVersion.Substring(1);
+                return versionBase;
             }
             else if (workflow.RefType == GitHubActionsRefType.Branch && workflow.RefName != "refs/heads/master")
             {

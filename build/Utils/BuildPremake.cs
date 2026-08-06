@@ -1,4 +1,3 @@
-
 using System.Runtime.InteropServices;
 
 namespace BuildScripts;
@@ -43,13 +42,13 @@ public sealed class BuildPremake
         exit = context.StartProcess("premake5", new ProcessSettings { WorkingDirectory = workingDirectory, Arguments = "clean" });
         if (exit != 0)
         {
-            throw new Exception($"{name} Premake clean failed! {exit}");
+            throw new InvalidOperationException($"{name} Premake clean failed! {exit}");
         }
 
         exit = context.StartProcess("premake5", new ProcessSettings { WorkingDirectory = workingDirectory, Arguments = premakeArguments });
         if (exit != 0)
         {
-            throw new Exception($"{name} Premake generation failed! {exit}");
+            throw new InvalidOperationException($"{name} Premake generation failed! {exit}");
         }
     }
 
@@ -58,7 +57,7 @@ public sealed class BuildPremake
         int exit = context.StartProcess("msbuild", new ProcessSettings { WorkingDirectory = workingDirectory, Arguments = $"{solutionFile} /p:Configuration=Release /p:Platform={arch}" });
         if (exit != 0)
         {
-            throw new Exception($"{name} build failed with msbuild! {exit}");
+            throw new InvalidOperationException($"{name} build failed with msbuild! {exit}");
         }
     }
 
@@ -67,7 +66,7 @@ public sealed class BuildPremake
         int exit = context.StartProcess("make", new ProcessSettings { WorkingDirectory = workingDirectory, Arguments = "config=release" });
         if (exit != 0)
         {
-            throw new Exception($"{name} build failed with make! {exit}");
+            throw new InvalidOperationException($"{name} build failed with make! {exit}");
         }
     }
 }
