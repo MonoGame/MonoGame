@@ -6,12 +6,28 @@
 
 #include "mg_common.h"
 
+#if defined(MG_XBOXONE)
+#include "AlphaTestEffect.xb.mgfxo.h"
+#include "BasicEffect.xb.mgfxo.h"
+#include "DualTextureEffect.xb.mgfxo.h"
+#include "EnvironmentMapEffect.xb.mgfxo.h"
+#include "SkinnedEffect.xb.mgfxo.h"
+#include "SpriteEffect.xb.mgfxo.h"
+#elif defined(MG_XBOXSERIES)
+#include "AlphaTestEffect.xs.mgfxo.h"
+#include "BasicEffect.xs.mgfxo.h"
+#include "DualTextureEffect.xs.mgfxo.h"
+#include "EnvironmentMapEffect.xs.mgfxo.h"
+#include "SkinnedEffect.xs.mgfxo.h"
+#include "SpriteEffect.xs.mgfxo.h"
+#else
 #include "AlphaTestEffect.dx12.mgfxo.h"
 #include "BasicEffect.dx12.mgfxo.h"
 #include "DualTextureEffect.dx12.mgfxo.h"
 #include "EnvironmentMapEffect.dx12.mgfxo.h"
 #include "SkinnedEffect.dx12.mgfxo.h"
 #include "SpriteEffect.dx12.mgfxo.h"
+#endif
 #include "mg_effect.h"
 
 #include "directx12.h"
@@ -152,6 +168,9 @@ struct MGG_GraphicsAdapter
 };
 
 const int MAX_TEXTURE_SLOTS = 16;
+
+// The current graphics device global.
+static MGG_GraphicsDevice* g_GraphicsDevice = nullptr;
 
 struct MGG_GraphicsDevice
 {
@@ -505,7 +524,7 @@ MGG_GraphicsDevice* MGG_GraphicsDevice_Create(MGG_GraphicsSystem* system, MGG_Gr
 	assert(system != nullptr);
 	assert(adapter != nullptr);
 
-	auto device = new MGG_GraphicsDevice();
+	auto device = g_GraphicsDevice = new MGG_GraphicsDevice();
 
 	// TODO: Don't initialize the back buffer here... just the device.
 	device->resources = new DeviceResources(MGSurfaceFormat::Color, 2);
@@ -525,6 +544,8 @@ MGG_GraphicsDevice* MGG_GraphicsDevice_Create(MGG_GraphicsSystem* system, MGG_Gr
 void MGG_GraphicsDevice_Destroy(MGG_GraphicsDevice* device)
 {
 	assert(device != nullptr);
+
+	g_GraphicsDevice = nullptr;
 
 	// Be sure we're done drawing.
 	// Prevents some exceptions while shutting down.
@@ -566,6 +587,26 @@ void MGG_GraphicsDevice_Destroy(MGG_GraphicsDevice* device)
 	delete resources;
 }
 
+void MGDX_Suspend()
+{
+#if defined(_GAMING_XBOX)
+	if (!g_GraphicsDevice)
+		return;
+
+	g_GraphicsDevice->resources->Suspend();
+#endif
+}
+
+void MGDX_Resume()
+{
+#if defined(_GAMING_XBOX)
+	if (!g_GraphicsDevice)
+		return;
+
+	g_GraphicsDevice->resources->Resume();
+#endif
+}
+
 void MGG_GraphicsDevice_GetCaps(MGG_GraphicsDevice* device, MGG_GraphicsDevice_Caps& caps)
 {
 	assert(device != nullptr);
@@ -577,8 +618,10 @@ void MGG_GraphicsDevice_GetCaps(MGG_GraphicsDevice* device, MGG_GraphicsDevice_C
 	caps.MaxVertexTextureSlots = 16;
 
 	// The shader profile id from the pipeline.
-#if defined(_GAMING_XBOX)	
-	caps.ShaderProfile = 21;	// For Xbox One and Xbox Series X/S.
+#if defined(MG_XBOXONE)	
+	caps.ShaderProfile = 21;	// For Xbox One
+#elif defined(MG_XBOXSERIES)	
+	caps.ShaderProfile = 22;	// For Xbox Series X/S.
 #else
 	caps.ShaderProfile = 2;
 #endif

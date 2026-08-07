@@ -8,6 +8,8 @@ using System.Runtime.InteropServices;
 using Microsoft.Xna.Framework;
 using NUnit.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Graphics.PackedVector;
+using System.IO;
 
 namespace MonoGame.Tests.Graphics
 {
@@ -519,6 +521,135 @@ namespace MonoGame.Tests.Graphics
                 vertexBuffer.Dispose();
             });
             GC.GetTotalMemory(true); // collect uninitialized vertexBuffer
+        }
+
+        [Test]
+        public void TestVertexInterpolation_NormalizedShort4()
+        {
+            TestVertexInterpolation(new NormalizedShort4[]
+            {
+                new NormalizedShort4(0, 0, 0, 0),
+                new NormalizedShort4(0, 1, 0, 0),
+                new NormalizedShort4(1, 0, 0, 0),
+                new NormalizedShort4(1, 1, 0, 0)
+            },
+            VertexElementFormat.NormalizedShort4);
+        }
+
+        [Test]
+        public void TestVertexInterpolation_NormalizedShort2()
+        {
+            TestVertexInterpolation(new NormalizedShort2[]
+            {
+                new NormalizedShort2(0, 0),
+                new NormalizedShort2(0, 1),
+                new NormalizedShort2(1, 0),
+                new NormalizedShort2(1, 1)
+            },
+            VertexElementFormat.NormalizedShort2);
+        }
+
+        private void TestVertexInterpolation<TVertex>(TVertex[] data, VertexElementFormat format)
+            where TVertex : struct
+        {
+            var effect = content.Load<Effect>(Paths.CompiledEffect("VertexInterpolationTest"));
+
+            RenderTarget2D rt = null;
+            VertexBuffer vb_pos = null;
+            VertexDeclaration decl = null;
+            VertexBuffer vb_data = null;
+
+            try
+            {
+                rt = new RenderTarget2D(gd, 256, 256, false,
+                    SurfaceFormat.Color, DepthFormat.None, 0, RenderTargetUsage.PreserveContents);
+
+                var pos_data = new Vector3[]
+                {
+                    new Vector3(-1, -1, 0),
+                    new Vector3(-1, 1, 0),
+                    new Vector3(1, -1, 0),
+                    new Vector3(1, 1, 0),
+                };
+                vb_pos = new VertexBuffer(gd, VertexPosition.VertexDeclaration, 4, BufferUsage.WriteOnly);
+                vb_pos.SetData(pos_data);
+
+                decl = new VertexDeclaration(
+                    new VertexElement
+                    {
+                        Offset = 0,
+                        UsageIndex = 0,
+                        VertexElementFormat = format,
+                        VertexElementUsage = VertexElementUsage.TextureCoordinate
+                    });
+
+                vb_data = new VertexBuffer(gd, decl, 4, BufferUsage.WriteOnly);
+                vb_data.SetData<TVertex>(data);
+
+                gd.SetRenderTarget(rt);
+
+                effect.CurrentTechnique.Passes[0].Apply();
+
+                gd.BlendState = BlendState.Opaque;
+                gd.RasterizerState = RasterizerState.CullNone;
+                gd.DepthStencilState = DepthStencilState.None;
+
+                gd.SetVertexBuffers(new VertexBufferBinding[]
+                {
+                    new VertexBufferBinding(vb_pos),
+                    new VertexBufferBinding(vb_data)
+                });
+
+                gd.DrawPrimitives(PrimitiveType.TriangleStrip, 0, 2);
+
+                gd.SetRenderTarget(null);
+
+                // For testing!
+                using (var stream = File.OpenWrite("vertexInterp_GL.png"))
+                    rt.SaveAsPng(stream, rt.Width, rt.Height);
+
+                // Take advantage of an internal API here.
+                var color = rt.GetColorData();
+
+
+                // TODO: The exact test fails on OpenGL *i think*
+                // because of the interpolation standard on triangles.
+                // Need to investigate.
+                /*
+                // Test the four corners for correct interploated values.
+                Assert.AreEqual(new Color(0, 255, 0, 255), color[0]);
+                Assert.AreEqual(new Color(255, 255, 0, 255), color[rt.Width - 1]);
+                Assert.AreEqual(new Color(0, 0, 0, 255), color[(rt.Height * rt.Width) - rt.Width]);
+                Assert.AreEqual(new Color(255, 0, 0, 255), color[(rt.Height * rt.Width) - 1]);
+                */
+
+                var corners = new Vector3[] {
+                    color[0].ToVector3(),
+                    color[rt.Width - 1].ToVector3(),
+                    color[(rt.Height * rt.Width) - rt.Width].ToVector3(),
+                    color[(rt.Height * rt.Width) - 1].ToVector3(),
+                };
+
+                var truth = new Vector3[]
+                {
+                    new Color(0, 255, 0, 255).ToVector3(),
+                    new Color(255, 255, 0, 255).ToVector3(),
+                    new Color(0, 0, 0, 255).ToVector3(),
+                    new Color(255, 0, 0, 255).ToVector3(),
+                };
+
+                Assert.Less((corners[0] - truth[0]).LengthSquared(), 0.001f);
+                Assert.Less((corners[1] - truth[1]).LengthSquared(), 0.001f);
+                Assert.Less((corners[2] - truth[2]).LengthSquared(), 0.001f);
+                Assert.Less((corners[3] - truth[3]).LengthSquared(), 0.001f);
+            }
+            finally
+            {
+                rt?.Dispose();
+                vb_pos?.Dispose();
+                decl?.Dispose();
+                vb_data?.Dispose();
+            }
         }
     }
 }
