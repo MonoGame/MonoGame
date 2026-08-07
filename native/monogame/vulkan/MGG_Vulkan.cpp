@@ -3076,7 +3076,7 @@ static void MGVK_UpdateRenderPass(MGG_GraphicsDevice* device, FrameCounter curre
 {
     const int MAX_ATTACHMENTS = 6;
 
-	if (!device->renderTargetDirty)
+	if (device->inRenderPass && !device->renderTargetDirty)
 		return;
 
 	MGVK_EndRenderPass(device, commandBuffer);
