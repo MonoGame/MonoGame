@@ -1872,7 +1872,7 @@ namespace Microsoft.Xna.Framework
         }
 
         /// <summary>
-        /// Translate a non-premultipled alpha <see cref="Color"/> to a <see cref="Color"/> that contains premultiplied alpha.
+        /// Translate a non-premultiplied alpha <see cref="Color"/> to a <see cref="Color"/> that contains premultiplied alpha.
         /// </summary>
         /// <param name="color">A <see cref="Color"/> representing a non-premultiplied color.</param>
         /// <returns>A <see cref="Color"/> which contains premultiplied alpha data.</returns>
@@ -1882,7 +1882,7 @@ namespace Microsoft.Xna.Framework
         }
 
         /// <summary>
-        /// Translate a non-premultipled alpha <see cref="Color"/> to a <see cref="Color"/> that contains premultiplied alpha.
+        /// Translate a non-premultiplied alpha <see cref="Color"/> to a <see cref="Color"/> that contains premultiplied alpha.
         /// </summary>
         /// <param name="vector">A <see cref="Vector4"/> representing color.</param>
         /// <returns>A <see cref="Color"/> which contains premultiplied alpha data.</returns>
@@ -1892,7 +1892,7 @@ namespace Microsoft.Xna.Framework
         }
 
         /// <summary>
-        /// Translate a non-premultipled alpha <see cref="Color"/> to a <see cref="Color"/> that contains premultiplied alpha.
+        /// Translate a non-premultiplied alpha <see cref="Color"/> to a <see cref="Color"/> that contains premultiplied alpha.
         /// </summary>
         /// <param name="r">Red component value from 0.0f to 1.0f.</param>
         /// <param name="g">Green component value from 0.0f to 1.0f.</param>
@@ -1905,7 +1905,7 @@ namespace Microsoft.Xna.Framework
         }
 
         /// <summary>
-        /// Translate a non-premultipled alpha <see cref="Color"/> to a <see cref="Color"/> that contains premultiplied alpha.
+        /// Translate a non-premultiplied alpha <see cref="Color"/> to a <see cref="Color"/> that contains premultiplied alpha.
         /// </summary>
         /// <param name="r">Red component value from 0 to 255.</param>
         /// <param name="g">Green component value from 0 to 255.</param>
@@ -2130,7 +2130,7 @@ namespace Microsoft.Xna.Framework
             v = MathHelper.Clamp(v, 0.0f, 1.0f);
 
             if (s == 0)
-                r = g = b = v;
+                ;
             //working out which segment of colour wheel the hue is.
             int i = (int)(h / 60.0f);
             float f = (h % 60.0f) / 60.0f;
@@ -2141,7 +2141,6 @@ namespace Microsoft.Xna.Framework
             switch (i)
             {
                 case 0:
-                    r = v;
                     g = t;
                     b = p;
                     break;
@@ -2166,7 +2165,6 @@ namespace Microsoft.Xna.Framework
                     b = v;
                     break;
                 default:
-                    r = v;
                     g = p;
                     b = q;
                     break;

@@ -40,7 +40,7 @@ namespace Microsoft.Xna.Framework
             {
                 return string.Concat(
                     "Center( ", this.Center.DebugDisplayString, " )  \r\n",
-                    "Radius( ", this.Radius.ToString(), " )"
+                    "Radius( ", this.Radius.ToString(System.Globalization.CultureInfo.InvariantCulture), " )"
                     );
             }
         }
@@ -153,9 +153,8 @@ namespace Microsoft.Xna.Framework
 
             if (dmin <= Radius * Radius)
                 return ContainmentType.Intersects;
-
-            //else disjoint
-            return ContainmentType.Disjoint;
+            else
+                return ContainmentType.Disjoint;
         }
 
         /// <summary>
@@ -286,80 +285,38 @@ namespace Microsoft.Xna.Framework
         /// <returns>The new <see cref="BoundingSphere"/>.</returns>
         public static BoundingSphere CreateFromPoints(IEnumerable<Vector3> points)
         {
-            if (points == null )
-                throw new ArgumentNullException("points");
+            if (points == null)
+                throw new ArgumentNullException(nameof(points));
 
-            // From "Real-Time Collision Detection" (Page 89)
+            // Find the minimum and maximum points along each axis
+            Vector3 min = new Vector3(float.MaxValue, float.MaxValue, float.MaxValue);
+            Vector3 max = new Vector3(float.MinValue, float.MinValue, float.MinValue);
 
-            var minx = new Vector3(float.MaxValue, float.MaxValue, float.MaxValue);
-            var maxx = -minx;
-            var miny = minx;
-            var maxy = -minx;
-            var minz = minx;
-            var maxz = -minx;
-
-            // Find the most extreme points along the principle axis.
-            var numPoints = 0;           
             foreach (var pt in points)
             {
-                ++numPoints;
+                min.X = Math.Min(min.X, pt.X);
+                min.Y = Math.Min(min.Y, pt.Y);
+                min.Z = Math.Min(min.Z, pt.Z);
 
-                if (pt.X < minx.X) 
-                    minx = pt;
-                if (pt.X > maxx.X) 
-                    maxx = pt;
-                if (pt.Y < miny.Y) 
-                    miny = pt;
-                if (pt.Y > maxy.Y) 
-                    maxy = pt;
-                if (pt.Z < minz.Z) 
-                    minz = pt;
-                if (pt.Z > maxz.Z) 
-                    maxz = pt;
+                max.X = Math.Max(max.X, pt.X);
+                max.Y = Math.Max(max.Y, pt.Y);
+                max.Z = Math.Max(max.Z, pt.Z);
             }
 
-            if (numPoints == 0)
-                throw new ArgumentException("You should have at least one point in points.");
+            // Center is the midpoint between min and max
+            Vector3 center = new Vector3(
+                (min.X + max.X) * 0.5f,
+                (min.Y + max.Y) * 0.5f,
+                (min.Z + max.Z) * 0.5f
+            );
 
-            var sqDistX = Vector3.DistanceSquared(maxx, minx);
-            var sqDistY = Vector3.DistanceSquared(maxy, miny);
-            var sqDistZ = Vector3.DistanceSquared(maxz, minz);
-
-            // Pick the pair of most distant points.
-            var min = minx;
-            var max = maxx;
-            if (sqDistY > sqDistX && sqDistY > sqDistZ) 
-            {
-                max = maxy;
-                min = miny;
-            }
-            if (sqDistZ > sqDistX && sqDistZ > sqDistY) 
-            {
-                max = maxz;
-                min = minz;
-            }
-            
-            var center = (min + max) * 0.5f;
-            var radius = Vector3.Distance(max, center);
-            
-            // Test every point and expand the sphere.
-            // The current bounding sphere is just a good approximation and may not enclose all points.            
-            // From: Mathematics for 3D Game Programming and Computer Graphics, Eric Lengyel, Third Edition.
-            // Page 218
-            float sqRadius = radius * radius;
+            // Find the radius as the maximum distance from the center to any point
+            float radius = 0f;
             foreach (var pt in points)
             {
-                Vector3 diff = (pt-center);
-                float sqDist = diff.LengthSquared();
-                if (sqDist > sqRadius)
-                {
-                    float distance = MathF.Sqrt(sqDist); // equal to diff.Length();
-                    Vector3 direction = diff / distance;
-                    Vector3 G = center - radius * direction;
-                    center = (G + pt) / 2;
-                    radius = Vector3.Distance(pt, center);
-                    sqRadius = radius * radius;
-                }
+                float distance = Vector3.Distance(center, pt);
+                if (distance > radius)
+                    radius = distance;
             }
 
             return new BoundingSphere(center, radius);
@@ -417,7 +374,7 @@ namespace Microsoft.Xna.Framework
         /// <returns><c>true</c> if the instances are equal; <c>false</c> otherwise.</returns>
         public bool Equals(BoundingSphere other)
         {
-            return this.Center == other.Center && this.Radius == other.Radius;
+            return Center.Equals(other.Center) && Radius.Equals(other.Radius);
         }
 
         /// <summary>
@@ -425,13 +382,16 @@ namespace Microsoft.Xna.Framework
         /// </summary>
         /// <param name="obj">The <see cref="Object"/> to compare.</param>
         /// <returns><c>true</c> if the instances are equal; <c>false</c> otherwise.</returns>
-        public override bool Equals(object obj)
-        {
-            if (obj is BoundingSphere)
-                return this.Equals((BoundingSphere)obj);
+        private const float Epsilon = 1e-6f;
 
-            return false;
-        }
+public override bool Equals(object obj)
+{
+    if (!(obj is BoundingSphere other))
+        return false;
+
+    return this.Center.Equals(other.Center)
+        && Math.Abs(this.Radius - other.Radius) < Epsilon;
+}
 
         /// <summary>
         /// Gets the hash code of this <see cref="BoundingSphere"/>.

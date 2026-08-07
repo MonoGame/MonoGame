@@ -11,7 +11,7 @@ namespace Microsoft.Xna.Framework
     /// Defines a viewing frustum for intersection operations.
     /// </summary>
     [DebuggerDisplay("{DebugDisplayString,nq}")]
-    public class BoundingFrustum : IEquatable<BoundingFrustum>
+    public sealed class BoundingFrustum : IEquatable<BoundingFrustum>
     {
         #region Private Fields
 
@@ -45,9 +45,12 @@ namespace Microsoft.Xna.Framework
             get { return this._matrix; }
             set
             {
+                if (this._matrix == value)
+                    return; // Avoid unnecessary recalculation if the matrix hasn't changed
+
                 this._matrix = value;
-                this.CreatePlanes();    // FIXME: The odds are the planes will be used a lot more often than the matrix
-                this.CreateCorners();   // is updated, so this should help performance. I hope ;)
+                this.CreatePlanes();    // The planes will be used more often than the matrix is updated
+                this.CreateCorners();
             }
         }
 
@@ -343,7 +346,10 @@ namespace Microsoft.Xna.Framework
 		public void GetCorners(Vector3[] corners)
         {
 			if (corners == null) throw new ArgumentNullException("corners");
-		    if (corners.Length < CornerCount) throw new ArgumentOutOfRangeException("corners");
+		    if (corners.Length < CornerCount)
+            {
+                throw new ArgumentException("Not enough corners in array", nameof(corners));
+            }
 
             this._corners.CopyTo(corners, 0);
         }
@@ -365,7 +371,7 @@ namespace Microsoft.Xna.Framework
         public bool Intersects(BoundingBox box)
         {
 			var result = false;
-			this.Intersects(ref box, out result);
+		 this.Intersects(ref box, out result);
 			return result;
         }
 
@@ -473,7 +479,7 @@ namespace Microsoft.Xna.Framework
                 case ContainmentType.Intersects:
                     throw new NotImplementedException();
                 default:
-                    throw new ArgumentOutOfRangeException();
+                    throw new ArgumentOutOfRangeException("parameterName", "A more meaningful message describing the error.");
             }
         } 
 

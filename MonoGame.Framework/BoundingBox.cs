@@ -159,6 +159,19 @@ namespace Microsoft.Xna.Framework
         /// </returns>
         public ContainmentType ContainsPrecise(BoundingFrustum frustum)
         {
+            // Helper function to project points onto an axis and get min/max
+            static void ProjectOntoAxis(Vector3[] points, Vector3 axis, out float min, out float max)
+            {
+                min = float.MaxValue;
+                max = float.MinValue;
+                for (int i = 0; i < points.Length; i++)
+                {
+                    float projection = Vector3.Dot(points[i], axis);
+                    if (projection < min) min = projection;
+                    if (projection > max) max = projection;
+                }
+            }
+
             Vector3[] boxNormals = new Vector3[]
             {
                 Vector3.Up,
@@ -175,60 +188,37 @@ namespace Microsoft.Xna.Framework
                 frustum.Far.Normal
             };
 
-            // allAxes = box normals + frustum normals + cross products of box normals and frustum normals
-            Vector3[] allAxes = new Vector3[23]; // 3 + 5 + 3 * 5
+            Vector3[] boxCorners = GetCorners();
+            Vector3[] frustumCorners = frustum.GetCorners();
 
-            allAxes[0] = boxNormals[0];
-            allAxes[1] = boxNormals[1];
-            allAxes[2] = boxNormals[2];
-
-            for (int i = 0; i < frustumNormals.Length; i++)
+            // Build all axes to test (box normals, frustum normals, and cross products)
+            List<Vector3> axes = new List<Vector3>(8);
+            axes.AddRange(boxNormals);
+            axes.AddRange(frustumNormals);
+            for (int i = 0; i < boxNormals.Length; i++)
             {
-                allAxes[3 + i] = frustumNormals[i];
-                for (int j = 0; j < boxNormals.Length; j++)
+                for (int j = 0; j < frustumNormals.Length; j++)
                 {
-                    allAxes[8 + i * boxNormals.Length + j] = Vector3.Cross(frustumNormals[i], boxNormals[j]);
+                    Vector3 axis = Vector3.Cross(boxNormals[i], frustumNormals[j]);
+                    if (axis.LengthSquared() > 1e-6f) // Avoid near-zero axes
+                        axes.Add(Vector3.Normalize(axis));
                 }
             }
 
-            var boxCorners = GetCorners();
-            var frustumCorners = frustum.GetCorners();
-
-            bool intersects = false;
-
-            for (int i = 0; i < allAxes.Length; i++)
+            bool allInside = true;
+            foreach (var axis in axes)
             {
-                // Project both shapes on the axis
+                ProjectOntoAxis(boxCorners, axis, out float minA, out float maxA);
+                ProjectOntoAxis(frustumCorners, axis, out float minB, out float maxB);
 
-                float boxMin = float.MaxValue, boxMax = float.MinValue;
-                float frustumMin = float.MaxValue, frustumMax = float.MinValue;
-
-                foreach (var point in boxCorners)
-                {
-                    var dot = Vector3.Dot(point, allAxes[i]);
-                    if (boxMin > dot) boxMin = dot;
-                    if (boxMax < dot) boxMax = dot;
-                }
-
-                foreach (var point in frustumCorners)
-                {
-                    var dot = Vector3.Dot(point, allAxes[i]);
-                    if (frustumMin > dot) frustumMin = dot;
-                    if (frustumMax < dot) frustumMax = dot;
-                }
-
-                // If we find a gap, we are sure the shapes are disjoint
-                if (boxMax < frustumMin || boxMin > frustumMax)
+                if (maxA < minB || maxB < minA)
                     return ContainmentType.Disjoint;
-                // If frustum projection isn't contained inside box projection - there is an intersection
-                else if (boxMax < frustumMax || boxMin > frustumMin)
-                    intersects = true;
+
+                if (!(minA <= minB && maxA >= maxB))
+                    allInside = false;
             }
 
-            if (intersects)
-                return ContainmentType.Intersects;
-
-            return ContainmentType.Contains;
+            return allInside ? ContainmentType.Contains : ContainmentType.Intersects;
         }
 
         /// <summary>
@@ -241,86 +231,30 @@ namespace Microsoft.Xna.Framework
         /// </returns>
         public ContainmentType Contains(BoundingSphere sphere)
         {
-            if (sphere.Center.X - Min.X >= sphere.Radius
-                && sphere.Center.Y - Min.Y >= sphere.Radius
-                && sphere.Center.Z - Min.Z >= sphere.Radius
-                && Max.X - sphere.Center.X >= sphere.Radius
-                && Max.Y - sphere.Center.Y >= sphere.Radius
-                && Max.Z - sphere.Center.Z >= sphere.Radius)
+            // Check if sphere is completely outside box
+            if (sphere.Center.X + sphere.Radius < Min.X ||
+                sphere.Center.X - sphere.Radius > Max.X ||
+                sphere.Center.Y + sphere.Radius < Min.Y ||
+                sphere.Center.Y - sphere.Radius > Max.Y ||
+                sphere.Center.Z + sphere.Radius < Min.Z ||
+                sphere.Center.Z - sphere.Radius > Max.Z)
+            {
+                return ContainmentType.Disjoint;
+            }
+
+            // Check if sphere is completely inside box
+            if (sphere.Center.X - sphere.Radius >= Min.X &&
+                sphere.Center.X + sphere.Radius <= Max.X &&
+                sphere.Center.Y - sphere.Radius >= Min.Y &&
+                sphere.Center.Y + sphere.Radius <= Max.Y &&
+                sphere.Center.Z - sphere.Radius >= Min.Z &&
+                sphere.Center.Z + sphere.Radius <= Max.Z)
+            {
                 return ContainmentType.Contains;
-
-            double dmin = 0;
-
-            double e = sphere.Center.X - Min.X;
-            if (e < 0)
-            {
-                if (e < -sphere.Radius)
-                {
-                    return ContainmentType.Disjoint;
-                }
-                dmin += e * e;
-            }
-            else
-            {
-                e = sphere.Center.X - Max.X;
-                if (e > 0)
-                {
-                    if (e > sphere.Radius)
-                    {
-                        return ContainmentType.Disjoint;
-                    }
-                    dmin += e * e;
-                }
             }
 
-            e = sphere.Center.Y - Min.Y;
-            if (e < 0)
-            {
-                if (e < -sphere.Radius)
-                {
-                    return ContainmentType.Disjoint;
-                }
-                dmin += e * e;
-            }
-            else
-            {
-                e = sphere.Center.Y - Max.Y;
-                if (e > 0)
-                {
-                    if (e > sphere.Radius)
-                    {
-                        return ContainmentType.Disjoint;
-                    }
-                    dmin += e * e;
-                }
-            }
-
-            e = sphere.Center.Z - Min.Z;
-            if (e < 0)
-            {
-                if (e < -sphere.Radius)
-                {
-                    return ContainmentType.Disjoint;
-                }
-                dmin += e * e;
-            }
-            else
-            {
-                e = sphere.Center.Z - Max.Z;
-                if (e > 0)
-                {
-                    if (e > sphere.Radius)
-                    {
-                        return ContainmentType.Disjoint;
-                    }
-                    dmin += e * e;
-                }
-            }
-
-            if (dmin <= sphere.Radius * sphere.Radius)
-                return ContainmentType.Intersects;
-
-            return ContainmentType.Disjoint;
+            // Otherwise, it intersects
+            return ContainmentType.Intersects;
         }
 
         /// <summary>
@@ -391,26 +325,28 @@ namespace Microsoft.Xna.Framework
         /// <exception cref="System.ArgumentException">Thrown if the given array is null or has no points.</exception>
         public static BoundingBox CreateFromPoints(Vector3[] points, int index = 0, int count = -1)
         {
-            if (points == null || points.Length == 0)
-                throw new ArgumentException();
+            if (points == null)
+                throw new ArgumentNullException(nameof(points));
+            if (index < 0 || index > points.Length)
+                throw new ArgumentOutOfRangeException(nameof(index));
+            if (count < -1)
+                throw new ArgumentOutOfRangeException(nameof(count));
 
-            if (count == -1)
-                count = points.Length;
+            int actualCount = (count == -1) ? points.Length - index : count;
+            if (actualCount < 1 || index + actualCount > points.Length)
+                throw new ArgumentOutOfRangeException(nameof(count));
 
-            var minVec = MaxVector3;
-            var maxVec = MinVector3;
-            for (int i = index; i < count; i++)
-            {                
-                minVec.X = (minVec.X < points[i].X) ? minVec.X : points[i].X;
-                minVec.Y = (minVec.Y < points[i].Y) ? minVec.Y : points[i].Y;
-                minVec.Z = (minVec.Z < points[i].Z) ? minVec.Z : points[i].Z;
+            Vector3 min = points[index];
+            Vector3 max = points[index];
 
-                maxVec.X = (maxVec.X > points[i].X) ? maxVec.X : points[i].X;
-                maxVec.Y = (maxVec.Y > points[i].Y) ? maxVec.Y : points[i].Y;
-                maxVec.Z = (maxVec.Z > points[i].Z) ? maxVec.Z : points[i].Z;
+            for (int i = index + 1, end = index + actualCount; i < end; i++)
+            {
+                Vector3 point = points[i];
+                min = Vector3.Min(min, point);
+                max = Vector3.Max(max, point);
             }
 
-            return new BoundingBox(minVec, maxVec);
+            return new BoundingBox(min, max);
         }
 
 
@@ -424,26 +360,39 @@ namespace Microsoft.Xna.Framework
         /// <exception cref="System.ArgumentException">Thrown if the given list is null or has no points.</exception>
         public static BoundingBox CreateFromPoints(List<Vector3> points, int index = 0, int count = -1)
         {
-            if (points == null || points.Count == 0)
-                throw new ArgumentException();
+            if (points == null)
+                throw new ArgumentNullException(nameof(points));
+            if (points.Count == 0)
+                throw new ArgumentException("The points list cannot be empty.", nameof(points));
+            if (index < 0 || index > points.Count)
+                throw new ArgumentOutOfRangeException(nameof(index));
+            if (count < -1)
+                throw new ArgumentOutOfRangeException(nameof(count));
 
-            if (count == -1)
-                count = points.Count;
+            int actualCount = (count == -1) ? points.Count - index : count;
+            if (actualCount < 1 || index + actualCount > points.Count)
+                throw new ArgumentOutOfRangeException(nameof(count));
 
-            var minVec = MaxVector3;
-            var maxVec = MinVector3;
-            for (int i = index; i < count; i++)
+            Vector3 min = points[index];
+            Vector3 max = points[index];
+
+            for (int i = index + 1; i < index + actualCount; i++)
             {
-                minVec.X = (minVec.X < points[i].X) ? minVec.X : points[i].X;
-                minVec.Y = (minVec.Y < points[i].Y) ? minVec.Y : points[i].Y;
-                minVec.Z = (minVec.Z < points[i].Z) ? minVec.Z : points[i].Z;
-
-                maxVec.X = (maxVec.X > points[i].X) ? maxVec.X : points[i].X;
-                maxVec.Y = (maxVec.Y > points[i].Y) ? maxVec.Y : points[i].Y;
-                maxVec.Z = (maxVec.Z > points[i].Z) ? maxVec.Z : points[i].Z;
+                UpdateMinMax(ref min, ref max, points[i]);
             }
 
-            return new BoundingBox(minVec, maxVec);
+            return new BoundingBox(min, max);
+        }
+
+        private static void UpdateMinMax(ref Vector3 min, ref Vector3 max, Vector3 point)
+        {
+            min.X = Math.Min(min.X, point.X);
+            min.Y = Math.Min(min.Y, point.Y);
+            min.Z = Math.Min(min.Z, point.Z);
+
+            max.X = Math.Max(max.X, point.X);
+            max.Y = Math.Max(max.Y, point.Y);
+            max.Z = Math.Max(max.Z, point.Z);
         }
 
 
@@ -456,8 +405,7 @@ namespace Microsoft.Xna.Framework
         public static BoundingBox CreateFromPoints(IEnumerable<Vector3> points)
         {
             if (points == null)
-                throw new ArgumentNullException();
-
+                throw new ArgumentNullException(nameof(points));
             var empty = true;
             var minVec = MaxVector3;
             var maxVec = MinVector3;
@@ -474,7 +422,7 @@ namespace Microsoft.Xna.Framework
                 empty = false;
             }
             if (empty)
-                throw new ArgumentException();
+                throw new ArgumentException("The argument provided is invalid for this operation.");
 
             return new BoundingBox(minVec, maxVec);
         }

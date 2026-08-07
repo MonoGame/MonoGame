@@ -168,7 +168,7 @@ namespace Microsoft.Xna.Framework
             {
                 string name = GetType().Name;
                 throw new ObjectDisposedException(
-                    name, string.Format("The {0} object was used after being Disposed.", name));
+                    name, string.Format(System.Globalization.CultureInfo.InvariantCulture, "The {0} object was used after being Disposed.", name));
             }
         }
 
@@ -831,7 +831,7 @@ namespace Microsoft.Xna.Framework
         {
             AssertNotDisposed();
             // Draw and EndDraw should not be called if BeginDraw returns false.
-            // http://stackoverflow.com/questions/4054936/manual-control-over-when-to-redraw-the-screen/4057180#4057180
+            // http://stackoverflow.com/questions/4054936/manual-control_over-when-to-redraw-the-screen/4057180#4057180
             // http://stackoverflow.com/questions/4235439/xna-3-1-to-4-0-requires-constant-redraw-or-will-display-a-purple-screen
             if (Platform.BeforeDraw(gameTime) && BeginDraw())
             {

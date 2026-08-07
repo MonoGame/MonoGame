@@ -104,7 +104,10 @@ namespace Microsoft.Xna.Framework
             {
                 return PlatformOpenStream(safeName);
             }
-            catch { }
+            catch (Exception)
+            {
+                // Intentionally ignored: method returns null on error.
+            }
 
             return null;
         }

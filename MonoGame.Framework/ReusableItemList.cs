@@ -7,11 +7,12 @@ using System.Collections.Generic;
 
 namespace Microsoft.Xna.Framework
 {
-    internal class ReusableItemList<T> : ICollection<T>, IEnumerator<T>
+    internal class ReusableItemList<T> : ICollection<T>, IEnumerator<T>, IDisposable
     {
         private readonly List<T> _list = new List<T>();
         private int _listTop = 0;
         private int _iteratorIndex;
+        private bool _disposed;
 
         #region ICollection<T> Members
 
@@ -145,6 +146,29 @@ namespace Microsoft.Xna.Framework
 
         public void Dispose()
         {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (_disposed)
+                return;
+
+            if (disposing)
+            {
+                // Free managed resources here if needed
+                _list.Clear();
+            }
+
+            // Free unmanaged resources here if any
+
+            _disposed = true;
+        }
+
+        ~ReusableItemList()
+        {
+            Dispose(false);
         }
 
         #endregion

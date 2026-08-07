@@ -13,7 +13,7 @@ namespace Microsoft.Xna.Framework
     /// </summary>
     public class GameServiceContainer : IServiceProvider
     {
-        Dictionary<Type, object> services;
+        readonly Dictionary<Type, object> services;
 
         /// <summary>
         /// Create an empty <see cref="GameServiceContainer"/>.

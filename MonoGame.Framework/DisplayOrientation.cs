@@ -13,9 +13,9 @@ namespace Microsoft.Xna.Framework
     public enum DisplayOrientation
     {
         /// <summary>
-        /// The default orientation.
+        /// No display orientation is set.
         /// </summary>
-        Default = 0,
+        None = 0,
         /// <summary>
         /// The display is rotated counterclockwise into a landscape orientation. Width is greater than height.
         /// </summary>
