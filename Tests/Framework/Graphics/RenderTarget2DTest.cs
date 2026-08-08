@@ -292,7 +292,11 @@ namespace MonoGame.Tests.Graphics
 
                 var good = new Color(255, 143, 143, 255);
                 foreach (var color in data)
-                    Assert.AreEqual(good, color);
+                {
+                    // Some graphics drivers can be off in color because of
+                    // subtle blend math optimizations... so use a tolerance.
+                    Assert.True(good.AreEqual(color, 2), $"Color mismatch! {color} should be {good}");
+                }
             }
         }
     }
