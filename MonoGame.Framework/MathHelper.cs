@@ -148,9 +148,10 @@ namespace Microsoft.Xna.Framework
             double sCubed = s * s * s;
             double sSquared = s * s;
 
-            if (amount == 0f)
+            const float epsilon = 1e-6f;
+            if (Math.Abs(amount) < epsilon)
                 result = value1;
-            else if (amount == 1f)
+            else if (Math.Abs(amount - 1f) < epsilon)
                 result = value2;
             else
                 result = (2 * v1 - 2 * v2 + t2 + t1) * sCubed +

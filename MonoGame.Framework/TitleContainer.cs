@@ -54,7 +54,7 @@ namespace Microsoft.Xna.Framework
                 var response = task.Result;
                 if (!response)
                 {
-                    throw new Exception($"Content client failed to get a valid response for content: {name}");
+                    throw FileNotFoundException(name, null);
                 }
             }
 

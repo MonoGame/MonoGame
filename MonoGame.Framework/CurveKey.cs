@@ -12,7 +12,7 @@ namespace Microsoft.Xna.Framework
     /// </summary>
     // TODO : [TypeConverter(typeof(ExpandableObjectConverter))]
     [DataContract]
-    public class CurveKey : IEquatable<CurveKey>, IComparable<CurveKey>
+    public sealed class CurveKey : IEquatable<CurveKey>, IComparable<CurveKey>
     {
         #region Private Fields
 
@@ -156,10 +156,11 @@ namespace Microsoft.Xna.Framework
             if (object.Equals(value2, null))
                 return object.Equals(value1, null);
 
-            return (value1._position == value2._position)
-                && (value1._value == value2._value)
-                && (value1._tangentIn == value2._tangentIn)
-                && (value1._tangentOut == value2._tangentOut)
+            const float epsilon = 1e-6f;
+            return (Math.Abs(value1._position - value2._position) < epsilon)
+                && (Math.Abs(value1._value - value2._value) < epsilon)
+                && (Math.Abs(value1._tangentIn - value2._tangentIn) < epsilon)
+                && (Math.Abs(value1._tangentOut - value2._tangentOut) < epsilon)
                 && (value1._continuity == value2._continuity);
         }
 

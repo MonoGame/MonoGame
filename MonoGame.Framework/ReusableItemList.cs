@@ -44,8 +44,6 @@ namespace Microsoft.Xna.Framework
 			}
 			else
 			{
-				// Damm...Mono fails in this!
-				//return (T) Activator.CreateInstance(typeof(T));
 				return default(T);
 			}
 		}
@@ -54,14 +52,14 @@ namespace Microsoft.Xna.Framework
 		{
 			get
 			{
-				if (index >= _listTop) 
-					throw new IndexOutOfRangeException();
+				if (index >= _listTop)
+					throw new ArgumentOutOfRangeException(nameof(index));
 				return _list[index];
 			}
 			set
 			{
-				if (index >= _listTop) 
-					throw new IndexOutOfRangeException();
+				if (index >= _listTop)
+					throw new ArgumentOutOfRangeException(nameof(index));
 				_list[index] = value;
 			}
 		}

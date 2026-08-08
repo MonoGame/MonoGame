@@ -331,16 +331,15 @@ namespace Microsoft.Xna.Framework
         }
 
         /// <summary>
-        /// Check if this <see cref="Plane"/> is equal to another <see cref="Plane"/>.
+        /// Determines whether the specified object is equal to the current <see cref="Plane"/>.
         /// </summary>
-        /// <param name="other">An <see cref="Object"/> to check for equality with this <see cref="Plane"/>.</param>
-        /// <returns>
-        /// <code>true</code> if the specified <see cref="object"/> is equal to this <see cref="Plane"/>,
-        /// <code>false</code> if it is not.
-        /// </returns>
-        public override bool Equals(object other)
+        /// <param name="obj">The object to compare with the current <see cref="Plane"/>.</param>
+        /// <returns>true if the specified object is equal to the current <see cref="Plane"/>; otherwise, false.</returns>
+        public override bool Equals(object obj)
         {
-            return (other is Plane) ? this.Equals((Plane)other) : false;
+            if (obj is Plane other)
+                return Equals(other);
+            return false;
         }
 
         /// <summary>
@@ -353,7 +352,12 @@ namespace Microsoft.Xna.Framework
         /// </returns>
         public bool Equals(Plane other)
         {
-            return ((Normal == other.Normal) && (D == other.D));
+            const float epsilon = 1e-6f;
+            return
+                Math.Abs(Normal.X - other.Normal.X) < epsilon &&
+                Math.Abs(Normal.Y - other.Normal.Y) < epsilon &&
+                Math.Abs(Normal.Z - other.Normal.Z) < epsilon &&
+                Math.Abs(D - other.D) < epsilon;
         }
 
         /// <summary>
@@ -445,9 +449,9 @@ namespace Microsoft.Xna.Framework
             get
             {
                 return string.Concat(
-                    this.Normal.DebugDisplayString, "  ",
-                    this.D.ToString()
-                    );
+                    "Normal  ", this.Normal.ToString(), "  D: ", 
+                    this.D.ToString(System.Globalization.CultureInfo.InvariantCulture)
+                );
             }
         }
 

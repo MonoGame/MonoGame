@@ -6,6 +6,7 @@ using System;
 using System.Text;
 using System.Runtime.Serialization;
 using System.Diagnostics;
+using System.Globalization;
 
 namespace Microsoft.Xna.Framework
 {
@@ -388,7 +389,7 @@ namespace Microsoft.Xna.Framework
         }
 
         /// <summary>
-        /// Converts a <see cref="System.Numerics.Vector4"/> to a <see cref="Vector4"/> by mapping XYZW -> RGBA.
+        /// Converts a <see cref="System.Numerics.Vector4"/> to a <see cref="Color"/> by mapping XYZW -> RGBA.
         /// </summary>
         /// <param name="value">The converted value.</param>
         /// <returns></returns>
@@ -1842,10 +1843,9 @@ namespace Microsoft.Xna.Framework
             get
             {
                 return string.Concat(
-                    this.R.ToString(), "  ",
-                    this.G.ToString(), "  ",
-                    this.B.ToString(), "  ",
-                    this.A.ToString()
+                    this.R.ToString(CultureInfo.InvariantCulture), "  ", this.G.ToString(CultureInfo.InvariantCulture), "  ",
+                    this.B.ToString(CultureInfo.InvariantCulture), "  ",
+                    this.A.ToString(CultureInfo.InvariantCulture)
                 );
             }
         }
@@ -2008,17 +2008,17 @@ namespace Microsoft.Xna.Framework
             // calculating hue
             if (delta == 0f)
                 h = 0.0f;
-            else if (max == r)
+            else if (Math.Abs(max - r) < 1e-6f)
                 h = (float)(60.0 * (((g - b) / delta) % 6.0));
-            else if (max == g)
-                h = (float)(60.0 * (((b - r) / delta) + 2.0));
+            else if (Math.Abs(max - g) < 1e-6f)
+                h = (float)(60.0 * (((b - r) / delta) + 2.0)); 
             else
                 h = (float)((60.0 * (((r - g) / delta)) + 4.0));
 
             if (h < 0.0f)
                 h += 360.0f;
             // calculating saturation
-                s = 0.0f;
+            s = 0.0f;
             if (max != 0.0)
                 s = (float)((delta / max) * 100.0);
             
@@ -2128,9 +2128,6 @@ namespace Microsoft.Xna.Framework
             h %= 360.0f;
             s = MathHelper.Clamp(s, 0.0f, 1.0f);
             v = MathHelper.Clamp(v, 0.0f, 1.0f);
-
-            if (s == 0)
-                ;
             //working out which segment of colour wheel the hue is.
             int i = (int)(h / 60.0f);
             float f = (h % 60.0f) / 60.0f;

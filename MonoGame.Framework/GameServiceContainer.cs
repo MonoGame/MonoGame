@@ -49,19 +49,19 @@ namespace Microsoft.Xna.Framework
         /// <summary>
         /// Get a service provider for the service of the specified type.
         /// </summary>
-        /// <param name="type">The type of the service.</param>
+        /// <param name="serviceType">The type of the service.</param>
         /// <returns>
         /// A service provider for the service of the specified type or <code>null</code> if
         /// no suitable service provider is registered in this container.
         /// </returns>
         /// <exception cref="ArgumentNullException">If the specified type is <code>null</code>.</exception>
-        public object GetService(Type type)
+        public object GetService(Type serviceType)
         {
-            if (type == null)
-                throw new ArgumentNullException("type");
+            if (serviceType == null)
+                throw new ArgumentNullException("serviceType");
 						
             object service;
-            if (services.TryGetValue(type, out service))
+            if (services.TryGetValue(serviceType, out service))
                 return service;
 
             return null;

@@ -87,16 +87,9 @@ namespace Microsoft.Xna.Framework
         {
             get { return _window; }
 
-
             protected set
             {
-                if (_window == null)
-                {
-                    Mouse.PrimaryWindow = value;
-                    TouchPanel.PrimaryWindow = value;
-                }
-
-                _window = value;
+               _window = value;
             }
         }
 

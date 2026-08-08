@@ -177,6 +177,9 @@ namespace Microsoft.Xna.Framework
         #region Properties
 
 #if ANDROID
+        /// <summary>
+        /// Gets or sets the current Android activity associated with the game.
+        /// </summary>
         public static AndroidGameActivity Activity { get; internal set; }
 #endif
         private static Game _instance = null;
