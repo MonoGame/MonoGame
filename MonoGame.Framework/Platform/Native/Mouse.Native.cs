@@ -35,6 +35,8 @@ public static partial class Mouse
         PrimaryWindow.MouseState.Y = y;
 
         var window = PrimaryWindow as NativeGameWindow;
+        if (window._handle == null)
+            return;
 
         MGP.Mouse_WarpPosition(window._handle, x, y);
     }
@@ -44,6 +46,9 @@ public static partial class Mouse
         // TODO: Multiple window support?
 
         var window = PrimaryWindow as NativeGameWindow;
+        if (window._handle == null)
+            return;
+
         MGP.Window_SetCursor(window._handle, (MGP_Cursor*)cursor.Handle);
     }
 }

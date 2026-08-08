@@ -27,11 +27,6 @@ public partial class GraphicsDevice
     private unsafe readonly MGG_Texture*[] _curRenderTargets = new MGG_Texture*[4];
     private readonly int[] _currentRenderTargetArraySlices = new int[4];
 
-    private static bool RequiresRenderTargetTransitionStateRefresh()
-    {
-        return PlatformInfo.GraphicsBackend == GraphicsBackend.OpenGL;
-    }
-
     internal static int ShaderProfile
     {
         get; private set;
@@ -283,13 +278,13 @@ public partial class GraphicsDevice
             PresentationParameters.BackBufferWidth,
             PresentationParameters.BackBufferHeight);
 
-        if (RequiresRenderTargetTransitionStateRefresh())
+        /*
+         * OpenGL leaves these bindings stale after a render target switch.
+         * Need to set this to dirty so the state gets pushed again on the next apply.
+         * Chris <aristurtledev>
+         */
+        if (PlatformInfo.GraphicsBackend == GraphicsBackend.OpenGL)
         {
-            /*
-             * Need to dirty these here when switching back to the backbuffer
-             * so the state gets pushed again on the next apply.
-             * Chris <aristurtledev>
-             */
             _rasterizerStateDirty = true;
             Textures.Dirty();
         }
@@ -306,13 +301,13 @@ public partial class GraphicsDevice
     {
         BeginFrame();
 
-        if (RequiresRenderTargetTransitionStateRefresh())
+        /*
+         * OpenGL leaves these bindings stale after a render target switch.
+         * Need to set this to dirty so the state gets pushed again on the next apply.
+         * Chris <aristurtledev>
+         */
+        if (PlatformInfo.GraphicsBackend == GraphicsBackend.OpenGL)
         {
-            /*
-             * Need to dirty these here when switching render targets
-             * so the state gets pushed again on the next apply.
-             * Chris <aristurtledev>
-             */
             _rasterizerStateDirty = true;
             Textures.Dirty();
         }

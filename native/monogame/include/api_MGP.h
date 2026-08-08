@@ -15,6 +15,18 @@
 struct MGP_Platform;
 struct MGP_Window;
 struct MGP_Cursor;
+struct MGP_OpenGLWindowCreateInfo
+{
+    mgint redSize;
+    mgint greenSize;
+    mgint blueSize;
+    mgint alphaSize;
+    mgint framebufferSrgbCapable;
+    mgint depthSize;
+    mgint stencilSize;
+    mgint multiSampleBuffers;
+    mgint multiSampleSamples;
+};
 
 MG_EXPORT MGP_Platform* MGP_Platform_Create(MGGameRunBehavior& behavior);
 MG_EXPORT void MGP_Platform_Destroy(MGP_Platform* platform);
@@ -28,7 +40,7 @@ MG_EXPORT void* MGP_Platform_MakePath(const char* location, const char* path);
 MG_EXPORT void MGP_Platform_Free(void* ptr);
 MG_EXPORT MGMonoGamePlatform MGP_Platform_GetPlatform();
 MG_EXPORT MGGraphicsBackend MGP_Platform_GetGraphicsBackend();
-MG_EXPORT MGP_Window* MGP_Window_Create(MGP_Platform* platform, mgint& width, mgint& height, const char* title);
+MG_EXPORT MGP_Window* MGP_Window_Create(MGP_Platform* platform, mgint& width, mgint& height, const char* title, const MGP_OpenGLWindowCreateInfo* openGLCreateInfo);
 MG_EXPORT void MGP_Window_Destroy(MGP_Window* window);
 MG_EXPORT void MGP_Window_SetIconBitmap(MGP_Window* window, mgbyte* icon, mgint length);
 MG_EXPORT void* MGP_Window_GetNativeHandle(MGP_Window* window);

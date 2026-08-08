@@ -208,6 +208,20 @@ internal struct MGP_ControllerCaps
     public bool HasVoiceSupport;
 }
 
+[StructLayout(LayoutKind.Sequential)]
+internal struct MGP_OpenGLWindowCreateInfo
+{
+    public int RedSize;
+    public int GreenSize;
+    public int BlueSize;
+    public int AlphaSize;
+    public int FramebufferSrgbCapable;
+    public int DepthSize;
+    public int StencilSize;
+    public int MultiSampleBuffers;
+    public int MultiSampleSamples;
+}
+
 
 [MGHandle]
 internal readonly struct MGP_Platform { }
@@ -282,7 +296,25 @@ internal static unsafe partial class MGP
     #region Window
 
     [DllImport(MonoGameNativeDLL, EntryPoint = "MGP_Window_Create", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
-    public static extern MGP_Window* Window_Create(MGP_Platform* platform, ref int width, ref int height, [MarshalAs(UnmanagedType.LPUTF8Str)] string title);
+    private static extern MGP_Window* _Window_Create(
+        MGP_Platform* platform,
+        ref int width,
+        ref int height,
+        [MarshalAs(UnmanagedType.LPUTF8Str)] string title,
+        MGP_OpenGLWindowCreateInfo* openGLCreateInfo);
+
+    public static MGP_Window* Window_Create(MGP_Platform* platform, ref int width, ref int height, string title)
+    {
+        return _Window_Create(platform, ref width, ref height, title, null);
+    }
+
+    public static MGP_Window* Window_Create(MGP_Platform* platform, ref int width, ref int height, string title, ref MGP_OpenGLWindowCreateInfo openGLCreateInfo)
+    {
+        fixed (MGP_OpenGLWindowCreateInfo* openGLCreateInfoPtr = &openGLCreateInfo)
+        {
+            return _Window_Create(platform, ref width, ref height, title, openGLCreateInfoPtr);
+        }
+    }
 
     [DllImport(MonoGameNativeDLL, EntryPoint = "MGP_Window_Destroy", ExactSpelling = true)]
     public static extern void Window_Destroy(MGP_Window* window);

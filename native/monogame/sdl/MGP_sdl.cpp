@@ -721,7 +721,8 @@ MGP_Window* MGP_Window_Create(
     MGP_Platform* platform,
     mgint& width,
     mgint& height,
-    const char* title)
+    const char* title,
+    const MGP_OpenGLWindowCreateInfo* openGLCreateInfo)
 {
 	assert(platform != nullptr);
     assert(width > 0);
@@ -742,8 +743,15 @@ MGP_Window* MGP_Window_Create(
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 1);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
     SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
-    SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
-    SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 8);
+    SDL_GL_SetAttribute(SDL_GL_RED_SIZE, openGLCreateInfo != nullptr ? openGLCreateInfo->redSize : 8);
+    SDL_GL_SetAttribute(SDL_GL_GREEN_SIZE, openGLCreateInfo != nullptr ? openGLCreateInfo->greenSize : 8);
+    SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE, openGLCreateInfo != nullptr ? openGLCreateInfo->blueSize : 8);
+    SDL_GL_SetAttribute(SDL_GL_ALPHA_SIZE, openGLCreateInfo != nullptr ? openGLCreateInfo->alphaSize : 8);
+    SDL_GL_SetAttribute(SDL_GL_FRAMEBUFFER_SRGB_CAPABLE, openGLCreateInfo != nullptr ? openGLCreateInfo->framebufferSrgbCapable : 0);
+    SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, openGLCreateInfo != nullptr ? openGLCreateInfo->depthSize : 24);
+    SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, openGLCreateInfo != nullptr ? openGLCreateInfo->stencilSize : 8);
+    SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, openGLCreateInfo != nullptr ? openGLCreateInfo->multiSampleBuffers : 0);
+    SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, openGLCreateInfo != nullptr ? openGLCreateInfo->multiSampleSamples : 0);
     SDL_GL_SetAttribute(SDL_GL_ACCELERATED_VISUAL, 1);
 #if defined(__APPLE__)
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_FLAGS, SDL_GL_CONTEXT_FORWARD_COMPATIBLE_FLAG);
