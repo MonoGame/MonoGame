@@ -284,6 +284,8 @@ namespace MonoGame.Tests.Graphics
             renderTarget.Dispose();
 
             return new WeakReference(renderTarget);
+        }
+
         [Test]
         public void TestRenderTargetSync()
         {
