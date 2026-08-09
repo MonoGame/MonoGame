@@ -234,9 +234,17 @@ namespace MonoGame.Tests.Graphics
          * - Chris <aristurtledev>
          */
         [Test]
-        public void DisposeAfterUse_NonMsaaRenderTarget_DoesNotRemainReferencedByGraphicsDevice()
+        [TestCase(DepthFormat.None, 0)]
+        [TestCase(DepthFormat.None, 4)]
+        [TestCase(DepthFormat.Depth16, 0)]
+        [TestCase(DepthFormat.Depth16, 4)]
+        [TestCase(DepthFormat.Depth24, 0)]
+        [TestCase(DepthFormat.Depth24, 4)]
+        [TestCase(DepthFormat.Depth24Stencil8, 0)]
+        [TestCase(DepthFormat.Depth24Stencil8, 4)]
+        public void DisposeAfterUse_NonMsaaRenderTarget_DoesNotRemainReferencedByGraphicsDevice(DepthFormat depthFormat, int preferredMultiSampleCount)
         {
-            WeakReference weakRef = CreateAndDisposeRenderTarget();
+            WeakReference weakRef = CreateAndDisposeRenderTarget(depthFormat, preferredMultiSampleCount);
 
             GC.Collect();
             GC.WaitForPendingFinalizers();
@@ -256,7 +264,7 @@ namespace MonoGame.Tests.Graphics
          * - Chris <aristurtledev>
          */
         [MethodImpl(MethodImplOptions.NoInlining)]
-        private WeakReference CreateAndDisposeRenderTarget()
+        private WeakReference CreateAndDisposeRenderTarget(DepthFormat depthFormat, int preferredMultiSampleCount)
         {
             RenderTarget2D renderTarget = new RenderTarget2D(
                 gd,
@@ -264,7 +272,9 @@ namespace MonoGame.Tests.Graphics
                 16,
                 false,
                 SurfaceFormat.Color,
-                DepthFormat.None);
+                depthFormat,
+                preferredMultiSampleCount,
+                RenderTargetUsage.DiscardContents);
 
             gd.SetRenderTarget(renderTarget);
             gd.Clear(Color.CornflowerBlue);

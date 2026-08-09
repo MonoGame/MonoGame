@@ -3,6 +3,7 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System;
+using System.Runtime.CompilerServices;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using NUnit.Framework;
@@ -89,6 +90,66 @@ namespace MonoGame.Tests.Graphics
             var renderTarget = new RenderTargetCube(gd, 16, false, preferredSurfaceFormat, DepthFormat.None);
                     
             Assert.AreEqual(renderTarget.Format, expectedSurfaceFormat);
+        }
+
+        /*
+         * A disposed render target cube should not be kept alive by references held by the
+         * graphics device. This verifies that once a face has been used and the render target
+         * has been unbound and disposed, the garbage collector is able to collect it.
+         *
+         * See issue: https://github.com/MonoGame/MonoGame/issues/9485
+         *
+         * - Chris <aristurtledev>
+         */
+        [Test]
+        [TestCase(DepthFormat.None, 0)]
+        [TestCase(DepthFormat.None, 4)]
+        [TestCase(DepthFormat.Depth16, 0)]
+        [TestCase(DepthFormat.Depth16, 4)]
+        [TestCase(DepthFormat.Depth24, 0)]
+        [TestCase(DepthFormat.Depth24, 4)]
+        [TestCase(DepthFormat.Depth24Stencil8, 0)]
+        [TestCase(DepthFormat.Depth24Stencil8, 4)]
+        public void DisposeAfterUse_RenderTargetCube_DoesNotRemainReferencedByGraphicsDevice(DepthFormat depthFormat, int preferredMultiSampleCount)
+        {
+            WeakReference weakRef = CreateAndDisposeRenderTargetCube(depthFormat, preferredMultiSampleCount);
+
+            GC.Collect();
+            GC.WaitForPendingFinalizers();
+            GC.Collect();
+
+            Assert.False(
+                weakRef.IsAlive,
+                "Disposed RenderTargetCube was still strongly referenced by the GraphicsDevice.");
+        }
+
+        /*
+         * The render target cube creation and disposal need to be in a separate non-inlined method.
+         * If these were done in the actual test method above, the JIT could keep the local reference
+         * alive, causing the test to fail even though the graphics device is no longer holding
+         * a strong reference to the render target cube.
+         *
+         * - Chris <aristurtledev>
+         */
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        private WeakReference CreateAndDisposeRenderTargetCube(DepthFormat depthFormat, int preferredMultiSampleCount)
+        {
+            RenderTargetCube renderTarget = new RenderTargetCube(
+                gd,
+                16,
+                false,
+                SurfaceFormat.Color,
+                depthFormat,
+                preferredMultiSampleCount,
+                RenderTargetUsage.DiscardContents);
+
+            gd.SetRenderTarget(renderTarget, CubeMapFace.PositiveX);
+            gd.Clear(Color.CornflowerBlue);
+            gd.SetRenderTarget(null, CubeMapFace.PositiveX);
+
+            renderTarget.Dispose();
+
+            return new WeakReference(renderTarget);
         }
     }
 }
