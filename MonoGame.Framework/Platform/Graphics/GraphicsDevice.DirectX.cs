@@ -611,7 +611,25 @@ namespace Microsoft.Xna.Framework.Graphics
             else
             {
                 _tempRenderTargetBinding[0] = new RenderTargetBinding(renderTarget, arraySlice);
-                SetRenderTargets(_tempRenderTargetBinding);
+                
+                try
+                {
+				    SetRenderTargets(_tempRenderTargetBinding);
+                }
+                finally
+                {
+                    /*
+                     * This is only temporary storage for the single render target overload.
+                     * If we  do not clear this and the ser disposes the render target before
+                     * a new one i set, the graphics device will keep a strong reference to
+                     * the render target, preventing the garbage collector fom collecting it.
+                     *
+                     * See issue: https://github.com/MonoGame/MonoGame/issues/9485
+                     *
+                     * - Chris <aristurtledev>
+                     */
+                    _tempRenderTargetBinding[0] = default;
+                }
             }
         }
 
@@ -623,7 +641,25 @@ namespace Microsoft.Xna.Framework.Graphics
             else
             {
                 _tempRenderTargetBinding[0] = new RenderTargetBinding(renderTarget, arraySlice);
-                SetRenderTargets(_tempRenderTargetBinding);
+                
+                try
+                {
+				    SetRenderTargets(_tempRenderTargetBinding);
+                }
+                finally
+                {
+                    /*
+                     * This is only temporary storage for the single render target overload.
+                     * If we  do not clear this and the ser disposes the render target before
+                     * a new one i set, the graphics device will keep a strong reference to
+                     * the render target, preventing the garbage collector fom collecting it.
+                     *
+                     * See issue: https://github.com/MonoGame/MonoGame/issues/9485
+                     *
+                     * - Chris <aristurtledev>
+                     */
+                    _tempRenderTargetBinding[0] = default;
+                }
             }
         }
 

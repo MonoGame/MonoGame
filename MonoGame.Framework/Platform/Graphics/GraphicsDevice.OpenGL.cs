@@ -730,48 +730,53 @@ namespace Microsoft.Xna.Framework.Graphics
             var color = 0;
             var depth = 0;
             var stencil = 0;
-            var colorIsRenderbuffer = false;
 
             color = renderTarget.GLColorBuffer;
             depth = renderTarget.GLDepthBuffer;
             stencil = renderTarget.GLStencilBuffer;
-            colorIsRenderbuffer = color != 0;
 
             if (color != 0)
-            {
-                if (colorIsRenderbuffer)
-                    this.framebufferHelper.DeleteRenderbuffer(color);
-                if (stencil != 0 && stencil != depth)
-                    this.framebufferHelper.DeleteRenderbuffer(stencil);
-                if (depth != 0)
-                    this.framebufferHelper.DeleteRenderbuffer(depth);
+                this.framebufferHelper.DeleteRenderbuffer(color);
+            if (stencil != 0 && stencil != depth)
+                this.framebufferHelper.DeleteRenderbuffer(stencil);
+            if (depth != 0)
+                this.framebufferHelper.DeleteRenderbuffer(depth);
 
-                var bindingsToDelete = new List<RenderTargetBinding[]>();
-                foreach (var bindings in this.glFramebuffers.Keys)
+            /*
+             * The framebuffer cache holds render target bindings which keep a strong
+             * reference to the render target.  If w do not remove these when the render
+             * target is disposed, the graphics device will prevent the garbage collector
+             * from collecting it.
+             *
+             * See issue: https://github.com/MonoGame/MonoGame/issues/9485
+             *
+             * - Chris <aristurtledev>
+             */
+            var bindingsToDelete = new List<RenderTargetBinding[]>();
+            foreach (var bindings in this.glFramebuffers.Keys)
+            {
+                foreach (var binding in bindings)
                 {
-                    foreach (var binding in bindings)
+                    if (binding.RenderTarget == renderTarget)
                     {
-                        if (binding.RenderTarget == renderTarget)
-                        {
-                            bindingsToDelete.Add(bindings);
-                            break;
-                        }
+                        bindingsToDelete.Add(bindings);
+                        break;
                     }
                 }
+            }
 
-                foreach (var bindings in bindingsToDelete)
+            foreach (var bindings in bindingsToDelete)
+            {
+                var fbo = 0;
+                if (this.glFramebuffers.TryGetValue(bindings, out fbo))
                 {
-                    var fbo = 0;
-                    if (this.glFramebuffers.TryGetValue(bindings, out fbo))
-                    {
-                        this.framebufferHelper.DeleteFramebuffer(fbo);
-                        this.glFramebuffers.Remove(bindings);
-                    }
-                    if (this.glResolveFramebuffers.TryGetValue(bindings, out fbo))
-                    {
-                        this.framebufferHelper.DeleteFramebuffer(fbo);
-                        this.glResolveFramebuffers.Remove(bindings);
-                    }
+                    this.framebufferHelper.DeleteFramebuffer(fbo);
+                    this.glFramebuffers.Remove(bindings);
+                }
+                if (this.glResolveFramebuffers.TryGetValue(bindings, out fbo))
+                {
+                    this.framebufferHelper.DeleteFramebuffer(fbo);
+                    this.glResolveFramebuffers.Remove(bindings);
                 }
             }
         }

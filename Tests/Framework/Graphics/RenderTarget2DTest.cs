@@ -3,6 +3,7 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System;
+using System.Runtime.CompilerServices;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using NUnit.Framework;
@@ -221,6 +222,57 @@ namespace MonoGame.Tests.Graphics
             {
                rt.Dispose(); 
             }
+        }
+
+        /*
+         * A disposed render target should not be kept alive by references held by the
+         * graphics device.  This verifies that once the render target has been unbound
+         * and disposed, the garbage collector is able to collect it.
+         *
+         * See issue: https://github.com/MonoGame/MonoGame/issues/9485
+         *
+         * - Chris <aristurtledev>
+         */
+        [Test]
+        public void DisposeAfterUse_NonMsaaRenderTarget_DoesNotRemainReferencedByGraphicsDevice()
+        {
+            WeakReference weakRef = CreateAndDisposeRenderTarget();
+
+            GC.Collect();
+            GC.WaitForPendingFinalizers();
+            GC.Collect();
+
+            Assert.False(
+                weakRef.IsAlive,
+                "Disposed RenderTarget2D was still strongly referenced by the GraphicsDevice.");
+        }
+
+        /*
+         * The render target creation and disposal need to be in a separate non-inlined method.
+         * If these were done in the actual test method above, the JIT could keep the local reference
+         * alive, causing the test to fail even though the graphics device is no longer holding
+         * a strong reference to the render target.
+         *
+         * - Chris <aristurtledev>
+         */
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        private WeakReference CreateAndDisposeRenderTarget()
+        {
+            RenderTarget2D renderTarget = new RenderTarget2D(
+                gd,
+                16,
+                16,
+                false,
+                SurfaceFormat.Color,
+                DepthFormat.None);
+
+            gd.SetRenderTarget(renderTarget);
+            gd.Clear(Color.CornflowerBlue);
+            gd.SetRenderTarget(null);
+
+            renderTarget.Dispose();
+
+            return new WeakReference(renderTarget);
         }
     }
 }
