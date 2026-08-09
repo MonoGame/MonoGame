@@ -4,6 +4,7 @@
 
 using System;
 using System.Runtime.CompilerServices;
+using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using NUnit.Framework;
@@ -283,6 +284,80 @@ namespace MonoGame.Tests.Graphics
             renderTarget.Dispose();
 
             return new WeakReference(renderTarget);
+        [Test]
+        public void TestRenderTargetSync()
+        {
+            // This test is based on issue:
+            // https://github.com/MonoGame/MonoGame/issues/9425
+
+            var accumulationRenderTarget = new RenderTarget2D(
+                gd,
+                400,
+                200,
+                false, //Also fixed if mipMap is set to true
+                SurfaceFormat.Color,
+                DepthFormat.None,
+                0,
+                RenderTargetUsage.PreserveContents);
+
+            var auxRenderTarget = new RenderTarget2D(gd, 600, 600);
+
+            var spriteBatch = new SpriteBatch(gd);
+
+            var whiteSquareTexture = new Texture2D(gd, 1, 1);
+            whiteSquareTexture.SetData(new Color[] { Color.White });
+
+            var maxBlendState = new BlendState
+            {
+                ColorSourceBlend = Blend.One,
+                ColorDestinationBlend = Blend.One,
+                ColorBlendFunction = BlendFunction.Max,
+                AlphaSourceBlend = Blend.One,
+                AlphaDestinationBlend = Blend.One,
+                AlphaBlendFunction = BlendFunction.Max,
+            };
+
+            var _rectangles = new List<Rectangle>
+            {
+                new(0, 0, 200, 200),
+                new(200, 0, 200, 200)
+            };
+
+
+            // Do this a few times as we could get lucky
+            // and not have a GPU artifact on one test.
+
+            for (int t = 0; t < 6; t++)
+            {
+                gd.SetRenderTarget(accumulationRenderTarget);
+                gd.Clear(Color.Red);
+
+                for (int i = 0; i < _rectangles.Count; i++)
+                {
+                    gd.SetRenderTarget(auxRenderTarget);
+                    gd.Clear(Color.Black);
+
+                    spriteBatch.Begin();
+                    spriteBatch.Draw(whiteSquareTexture, _rectangles[i], Color.White * 0.75f);
+                    spriteBatch.End();
+
+                    gd.SetRenderTarget(accumulationRenderTarget);
+
+                    spriteBatch.Begin(blendState: maxBlendState);
+                    spriteBatch.Draw(auxRenderTarget, Vector2.Zero, Color.White * 0.75f);
+                    spriteBatch.End();
+                }
+
+                var data = accumulationRenderTarget.GetColorData();
+
+                var good = new Color(255, 143, 143, 255);
+                foreach (var color in data)
+                {
+                    // Some graphics drivers can be off in color because of
+                    // subtle blend math optimizations... so use a tolerance.
+                    Assert.True(good.AreEqual(color, 2), $"Color mismatch! {color} should be {good}");
+                }
+            }
         }
     }
 }
