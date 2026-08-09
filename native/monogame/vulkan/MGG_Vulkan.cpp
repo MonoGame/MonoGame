@@ -647,9 +647,9 @@ static VkFormat ToVkFormat(MGVertexElementFormat format)
 	case MGVertexElementFormat::Short4:
 		return VK_FORMAT_R16G16B16A16_SINT;
 	case MGVertexElementFormat::NormalizedShort2:
-		return VK_FORMAT_R16G16_SSCALED;
+		return VK_FORMAT_R16G16_SNORM;
 	case MGVertexElementFormat::NormalizedShort4:
-		return VK_FORMAT_R16G16B16A16_SSCALED;
+		return VK_FORMAT_R16G16B16A16_SNORM;
 	case MGVertexElementFormat::HalfVector2:
 		return VK_FORMAT_R16G16_SFLOAT;
 	case MGVertexElementFormat::HalfVector4:
