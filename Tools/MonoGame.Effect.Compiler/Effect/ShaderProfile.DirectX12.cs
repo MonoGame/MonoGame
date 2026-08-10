@@ -22,6 +22,11 @@ namespace MonoGame.Effect
         {
         }
 
+        protected DirectX12ShaderProfile(string name, byte formatId)
+            : base(name, formatId)
+        {
+        }
+
         internal override void AddMacros(Dictionary<string, string> macros)
         {
             macros.Add("HLSL", "1");
@@ -48,6 +53,11 @@ namespace MonoGame.Effect
         private static readonly Regex ResourceSampler = new Regex(@";[\W]+(?<ResName>[\S]+)[\W]+sampler[\W]+(?<ResFormat>[\S]+)[\W]+(?<ResDim>[\S]+)[\W]+[\S]+[\W]+s(?<ResBind>[\d]*)[\W]+(?<ResCount>[\d]*)", RegexOptions.Compiled);
         private static readonly Regex ResourceTexture = new Regex(@";[\W]+(?<ResName>[\S]+)[\W]+texture[\W]+(?<ResFormat>[\S]+)[\W]+(?<ResDim>[\S]+)[\W]+[\S]+[\W]+t(?<ResBind>[\d]*)[\W]+(?<ResCount>[\d]*)", RegexOptions.Compiled);
         private static readonly Regex InputAttribute = new Regex(@"; (\w+)\s+(\d+)\s+([xyzw]+)\s+(\d+)\s+(\w+)\s+(\w+)\s+([xyzw]+)", RegexOptions.Multiline | RegexOptions.Compiled);
+
+        protected virtual int RunTool(string arguments, out string stdout, out string stderr)
+        {
+            return Dxc.Run(arguments, out stdout, out stderr);
+        }
 
         internal override ShaderData CreateShader(ShaderResult shaderResult, string shaderFunction, string shaderProfile, bool isVertexShader, EffectObject effect, ref string errorsAndWarnings)
         {
@@ -82,7 +92,7 @@ namespace MonoGame.Effect
 
                 // Compile the shader once just to get reflection info.
                 string stdout, stderr;
-                var result = Dxc.Run(toolArgs + "\"" + inputFile + "\"", out reflectionData, out stderr);
+                var result = RunTool(toolArgs + "\"" + inputFile + "\"", out reflectionData, out stderr);
                 errorsAndWarnings += stderr;
                 if (result > 0)
                     throw new ShaderCompilerException();
@@ -105,7 +115,7 @@ namespace MonoGame.Effect
                 }
 
                 toolArgs += "/Fo " + "\"" + outputFile + "\"" + " ";
-                result = Dxc.Run(toolArgs + "\"" + inputFile + "\"", out stdout, out stderr);
+                result = RunTool(toolArgs + "\"" + inputFile + "\"", out stdout, out stderr);
                 errorsAndWarnings += stderr;
                 if (result > 0)
                     throw new ShaderCompilerException();
@@ -153,8 +163,8 @@ namespace MonoGame.Effect
                     a.index = int.Parse(match.Groups[2].Value, CultureInfo.InvariantCulture);
 
                     // Get the element type.
-                    var name = match.Groups[1].Value.ToUpper(CultureInfo.InvariantCulture);
-                    switch (name)
+                    var name = match.Groups[1].Value;
+                    switch (name.ToUpper(CultureInfo.InvariantCulture))
                     {
                         default:
                             // Give a warning which hopefully someone notices.
@@ -368,9 +378,7 @@ namespace MonoGame.Effect
                         }
 
                         if (string.IsNullOrEmpty(sampler.samplerName))
-                        {
                             throw new Exception($"Sample name is empty for {shaderFunction} slot {textureSlot}.");
-                        }
 
                         if (shaderResult.ShaderInfo.SamplerStates.TryGetValue(sampler.samplerName, out var ssamp))
                             sampler.state = ssamp.State;

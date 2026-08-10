@@ -9,6 +9,7 @@ using Microsoft.Xna.Framework;
 using NUnit.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Graphics.PackedVector;
+using System.IO;
 
 namespace MonoGame.Tests.Graphics
 {
@@ -16,7 +17,7 @@ namespace MonoGame.Tests.Graphics
     [RunOnUiTestFixture]
     class VertexBufferTest : GraphicsDeviceTestFixtureBase
     {
-        VertexPositionTexture[] savedData = new VertexPositionTexture[] 
+        VertexPositionTexture[] savedData = new VertexPositionTexture[]
         {
             new VertexPositionTexture(new Vector3(1,2,3), new Vector2(0.1f,0.2f)),
             new VertexPositionTexture(new Vector3(4,5,6), new Vector2(0.3f,0.4f)),
@@ -25,12 +26,12 @@ namespace MonoGame.Tests.Graphics
         };
         public Span<VertexPositionTexture> savedDataAsSpan => savedData.AsSpan();
         VertexPositionTexture vertexZero = new VertexPositionTexture(Vector3.Zero, Vector2.Zero);
-        
+
         [Test]
         //[TestCase(true)]
         [TestCase(false)]
         public void ShouldSetAndGetData(bool dynamic)
-        {   
+        {
             var vertexBuffer = (dynamic)
                 ?new DynamicVertexBuffer(gd, typeof(VertexPositionTexture), savedData.Length, BufferUsage.None)
                 :new VertexBuffer(gd, typeof(VertexPositionTexture), savedData.Length, BufferUsage.None);
@@ -82,7 +83,7 @@ namespace MonoGame.Tests.Graphics
 
             vertexBuffer.Dispose();
         }
-        
+
         [Test]
         //[TestCase(true)]
         [TestCase(false)]
@@ -205,7 +206,7 @@ namespace MonoGame.Tests.Graphics
                 var readDataBytes = new byte[savedDataBytes.Length];
                 vertexBuffer.GetData(0, readDataBytes, 0, elementCount, vertexStride);
                 Assert.AreEqual(
-                    savedDataBytes.Take(elementCount).ToArray(), 
+                    savedDataBytes.Take(elementCount).ToArray(),
                     readDataBytes.Take(elementCount).ToArray());
             }
 
@@ -310,7 +311,7 @@ namespace MonoGame.Tests.Graphics
                     BufferUsage.None);
             var dataSpan = new Span<VertexPositionTexture>();
             if (shouldSucceed)
-            { 
+            {
                 dataSpan = new Span<VertexPositionTexture>(testData, destinationStartIndex, elementCount);
             }
             else
@@ -408,7 +409,7 @@ namespace MonoGame.Tests.Graphics
             vertexBuffer.SetData(savedData);
 
             var readData = new Vector2[4];
-            var vertexStride = VertexPositionTexture.VertexDeclaration.VertexStride;                
+            var vertexStride = VertexPositionTexture.VertexDeclaration.VertexStride;
             var offsetInBytes = VertexPositionTexture.VertexDeclaration.GetVertexElements()[1].Offset;
             vertexBuffer.GetData(offsetInBytes, readData, 0, 4, vertexStride);
             Assert.AreEqual(savedData[0].TextureCoordinate, readData[0]);
@@ -514,7 +515,7 @@ namespace MonoGame.Tests.Graphics
         [Test]
         public void NullDeviceShouldThrowArgumentNullException()
         {
-            Assert.Throws<ArgumentNullException>(() => 
+            Assert.Throws<ArgumentNullException>(() =>
             {
                 var vertexBuffer = new VertexBuffer(null, typeof(VertexPositionTexture), 3, BufferUsage.None);
                 vertexBuffer.Dispose();
@@ -551,27 +552,27 @@ namespace MonoGame.Tests.Graphics
         private void TestVertexInterpolation<TVertex>(TVertex[] data, VertexElementFormat format)
             where TVertex : struct
         {
-            Effect effect = content.Load<Effect>(Paths.CompiledEffect("VertexInterpolationTest"));
+            var effect = content.Load<Effect>(Paths.CompiledEffect("VertexInterpolationTest"));
 
             RenderTarget2D rt = null;
-            VertexBuffer vbPos = null;
+            VertexBuffer vb_pos = null;
             VertexDeclaration decl = null;
-            VertexBuffer vbData = null;
+            VertexBuffer vb_data = null;
 
             try
             {
                 rt = new RenderTarget2D(gd, 256, 256, false,
                     SurfaceFormat.Color, DepthFormat.None, 0, RenderTargetUsage.PreserveContents);
 
-                Vector3[] posData = new Vector3[]
+                var pos_data = new Vector3[]
                 {
                     new Vector3(-1, -1, 0),
                     new Vector3(-1, 1, 0),
                     new Vector3(1, -1, 0),
                     new Vector3(1, 1, 0),
                 };
-                vbPos = new VertexBuffer(gd, VertexPosition.VertexDeclaration, 4, BufferUsage.WriteOnly);
-                vbPos.SetData(posData);
+                vb_pos = new VertexBuffer(gd, VertexPosition.VertexDeclaration, 4, BufferUsage.WriteOnly);
+                vb_pos.SetData(pos_data);
 
                 decl = new VertexDeclaration(
                     new VertexElement
@@ -582,8 +583,8 @@ namespace MonoGame.Tests.Graphics
                         VertexElementUsage = VertexElementUsage.TextureCoordinate
                     });
 
-                vbData = new VertexBuffer(gd, decl, 4, BufferUsage.WriteOnly);
-                vbData.SetData(data);
+                vb_data = new VertexBuffer(gd, decl, 4, BufferUsage.WriteOnly);
+                vb_data.SetData<TVertex>(data);
 
                 gd.SetRenderTarget(rt);
 
@@ -595,24 +596,41 @@ namespace MonoGame.Tests.Graphics
 
                 gd.SetVertexBuffers(new VertexBufferBinding[]
                 {
-                    new VertexBufferBinding(vbPos),
-                    new VertexBufferBinding(vbData)
+                    new VertexBufferBinding(vb_pos),
+                    new VertexBufferBinding(vb_data)
                 });
 
                 gd.DrawPrimitives(PrimitiveType.TriangleStrip, 0, 2);
 
                 gd.SetRenderTarget(null);
 
-                Color[] color = rt.GetColorData();
-                Vector3[] corners = new Vector3[]
-                {
+                // For testing!
+                using (var stream = File.OpenWrite("vertexInterp_GL.png"))
+                    rt.SaveAsPng(stream, rt.Width, rt.Height);
+
+                // Take advantage of an internal API here.
+                var color = rt.GetColorData();
+
+
+                // TODO: The exact test fails on OpenGL *i think*
+                // because of the interpolation standard on triangles.
+                // Need to investigate.
+                /*
+                // Test the four corners for correct interploated values.
+                Assert.AreEqual(new Color(0, 255, 0, 255), color[0]);
+                Assert.AreEqual(new Color(255, 255, 0, 255), color[rt.Width - 1]);
+                Assert.AreEqual(new Color(0, 0, 0, 255), color[(rt.Height * rt.Width) - rt.Width]);
+                Assert.AreEqual(new Color(255, 0, 0, 255), color[(rt.Height * rt.Width) - 1]);
+                */
+
+                var corners = new Vector3[] {
                     color[0].ToVector3(),
                     color[rt.Width - 1].ToVector3(),
                     color[(rt.Height * rt.Width) - rt.Width].ToVector3(),
                     color[(rt.Height * rt.Width) - 1].ToVector3(),
                 };
 
-                Vector3[] truth = new Vector3[]
+                var truth = new Vector3[]
                 {
                     new Color(0, 255, 0, 255).ToVector3(),
                     new Color(255, 255, 0, 255).ToVector3(),
@@ -628,9 +646,9 @@ namespace MonoGame.Tests.Graphics
             finally
             {
                 rt?.Dispose();
-                vbPos?.Dispose();
+                vb_pos?.Dispose();
                 decl?.Dispose();
-                vbData?.Dispose();
+                vb_data?.Dispose();
             }
         }
     }

@@ -394,6 +394,22 @@ namespace MonoGame.Tests.Graphics
             Assert.AreEqual(0, count);
         }
 
+#if VULKAN || DIRECTX12
+        [Test]
+        public void BackBufferAndViewportUpdateOnResize()
+        {
+            int width = 100;
+            int height = 50;
+
+            ((NativeGameWindow)game.Window).ClientResize(width, height);
+
+            Assert.AreEqual(width, gd.PresentationParameters.BackBufferWidth);
+            Assert.AreEqual(height, gd.PresentationParameters.BackBufferHeight);
+            Assert.AreEqual(width, gd.Viewport.Width);
+            Assert.AreEqual(height, gd.Viewport.Height);
+        }
+#endif
+
         [Test]
 #if DESKTOPGL
         [Ignore("Expected 2 but got 3. Needs Investigating")]
