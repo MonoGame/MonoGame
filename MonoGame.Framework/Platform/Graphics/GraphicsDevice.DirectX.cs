@@ -611,7 +611,16 @@ namespace Microsoft.Xna.Framework.Graphics
             else
             {
                 _tempRenderTargetBinding[0] = new RenderTargetBinding(renderTarget, arraySlice);
-                SetRenderTargets(_tempRenderTargetBinding);
+                
+                try
+                {
+				    SetRenderTargets(_tempRenderTargetBinding);
+                }
+                finally
+                {
+                    // Clear temporary strong reference.
+                    _tempRenderTargetBinding[0] = default;
+                }
             }
         }
 
@@ -623,7 +632,16 @@ namespace Microsoft.Xna.Framework.Graphics
             else
             {
                 _tempRenderTargetBinding[0] = new RenderTargetBinding(renderTarget, arraySlice);
-                SetRenderTargets(_tempRenderTargetBinding);
+                
+                try
+                {
+				    SetRenderTargets(_tempRenderTargetBinding);
+                }
+                finally
+                {
+                    // Clear temporary strong reference.
+                    _tempRenderTargetBinding[0] = default;
+                }
             }
         }
 
