@@ -92,15 +92,8 @@ namespace MonoGame.Tests.Graphics
             Assert.AreEqual(renderTarget.Format, expectedSurfaceFormat);
         }
 
-        /*
-         * A disposed render target cube should not be kept alive by references held by the
-         * graphics device. This verifies that once a face has been used and the render target
-         * has been unbound and disposed, the garbage collector is able to collect it.
-         *
-         * See issue: https://github.com/MonoGame/MonoGame/issues/9485
-         *
-         * - Chris <aristurtledev>
-         */
+        // Disposed render target cubes should not stay referenced by the GraphicsDevice.
+        // See issue: https://github.com/MonoGame/MonoGame/issues/9485
         [Test]
         [TestCase(DepthFormat.None, 0)]
         [TestCase(DepthFormat.None, 4)]
@@ -123,14 +116,7 @@ namespace MonoGame.Tests.Graphics
                 "Disposed RenderTargetCube was still strongly referenced by the GraphicsDevice.");
         }
 
-        /*
-         * The render target cube creation and disposal need to be in a separate non-inlined method.
-         * If these were done in the actual test method above, the JIT could keep the local reference
-         * alive, causing the test to fail even though the graphics device is no longer holding
-         * a strong reference to the render target cube.
-         *
-         * - Chris <aristurtledev>
-         */
+        // Keep creation and disposal out of the test method so the JIT does not extend the local lifetime.
         [MethodImpl(MethodImplOptions.NoInlining)]
         private WeakReference CreateAndDisposeRenderTargetCube(DepthFormat depthFormat, int preferredMultiSampleCount)
         {
