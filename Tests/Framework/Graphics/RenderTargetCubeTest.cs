@@ -1,4 +1,4 @@
-﻿// MonoGame - Copyright (C) MonoGame Foundation, Inc
+// MonoGame - Copyright (C) MonoGame Foundation, Inc
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
@@ -137,5 +137,46 @@ namespace MonoGame.Tests.Graphics
 
             return new WeakReference(renderTarget);
         }
+
+         // Creating a RenderTargetCube on the WindowsDX backend with MSAA enabled and a depth format
+         // other than DepthFormat.None failed during construction with an exception
+         // See: https://github.com/MonoGame/MonoGame/issues/9489
+#if DIRECTX
+        [Test]
+        [TestCase(DepthFormat.Depth16)]
+        [TestCase(DepthFormat.Depth24)]
+        [TestCase(DepthFormat.Depth24Stencil8)]
+        public void RenderedMultisampledRenderTargetCubeFaceWithDepthBuffer_CanBeReadBack(DepthFormat depthFormat)
+        {
+            RenderTargetCube rt = null;
+
+            try
+            {
+                rt = new RenderTargetCube(
+                    gd,
+                    16,
+                    false,
+                    SurfaceFormat.Color,
+                    depthFormat,
+                    4,
+                    RenderTargetUsage.DiscardContents);
+
+                gd.SetRenderTarget(rt, CubeMapFace.PositiveX);
+                gd.Clear(ClearOptions.Target | ClearOptions.DepthBuffer, Color.CornflowerBlue, 1.0f, 0);
+                gd.SetRenderTarget(null, CubeMapFace.PositiveX);
+
+                Color[] readData = new Color[16 * 16];
+                rt.GetData(CubeMapFace.PositiveX, readData);
+
+                for (int i = 0; i < readData.Length; i++)
+                    Assert.AreEqual(Color.CornflowerBlue, readData[i]);
+            }
+            finally
+            {
+                if (rt != null)
+                    rt.Dispose();
+            }
+        }
+#endif
     }
 }
