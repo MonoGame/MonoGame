@@ -742,16 +742,7 @@ namespace Microsoft.Xna.Framework.Graphics
             if (depth != 0)
                 this.framebufferHelper.DeleteRenderbuffer(depth);
 
-            /*
-             * The framebuffer cache holds render target bindings which keep a strong
-             * reference to the render target.  If w do not remove these when the render
-             * target is disposed, the graphics device will prevent the garbage collector
-             * from collecting it.
-             *
-             * See issue: https://github.com/MonoGame/MonoGame/issues/9485
-             *
-             * - Chris <aristurtledev>
-             */
+            // Remove cached framebuffer bindings that still reference this render target.
             var bindingsToDelete = new List<RenderTargetBinding[]>();
             foreach (var bindings in this.glFramebuffers.Keys)
             {
