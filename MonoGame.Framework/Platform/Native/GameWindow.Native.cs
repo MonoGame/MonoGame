@@ -148,13 +148,10 @@ internal class NativeGameWindow : GameWindow
         _icon = AssemblyHelper.GetDefaultWindowIcon();
 
 #if OPENGL
-        /*
-         * OpenGL needs the presentation parameters first so the window can be
-         * created later with the right SDL_GL attributes
-         *
-         * So we skip window creation for OpenGL path here and delay it
-         * - Chris <aristurtledev>
-         */
+        // OpenGL needs the presentation parameters first so the window can be
+        // created later with the right SDL_GL attributes.
+        //
+        // So we skip window creation for OpenGL path here and delay it.
 #else
         CreateWindow();
 #endif

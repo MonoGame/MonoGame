@@ -96,11 +96,6 @@ struct MGG_GraphicsDevice
     std::array<MGG_Texture*, 4> currentRenderTargets = {};
     std::array<mgint, 4> currentRenderTargetSlices = {};
     MGG_InputLayout* inputLayout = nullptr;
-    /*
-     * Need to defer this until draw because the vertex buffers
-     * may get rebound after the layout is set.
-     * Chris <aristurtledev>
-     */
     mgbool inputLayoutDirty = false;
     MGG_ShaderProgram* currentProgram = nullptr;
     std::vector<MGG_ShaderProgram*> programs;
@@ -509,11 +504,8 @@ namespace
         GLfloat posFixup[4] = { 1.0f, 1.0f, 0.0f, 0.0f };
         if (device->currentRenderTargetCount > 0)
         {
-            /*
-             * Need to flip render target Y here so it stays opposite
-             * of the default framebuffer path.
-             * Chris <aristurtledev>
-             */
+            // Offscreen targets need the oppsite Y fixup so the shader
+            // preserves MonoGame's default render target orientation.
             posFixup[1] = -1.0f;
         }
 
@@ -844,12 +836,9 @@ namespace
     {
         assert(device != nullptr);
 
-        /*
-         * Need to flip the default framebuffer Y here because OpenGL
-         * uses a bottom-left origin. Render targets already get their
-         * Y fixup through ApplyPosFixup.
-         * Chris <aristurtledev>
-         */
+        // Convert backbuffer coordinates to OpenGL's bottom-left window
+        // origin here.  Offscreen targets stay in render target space and
+        // get their draw time Y fixup through ApplyPosFixup.
         if (device->currentRenderTargetCount > 0)
             return y;
 
@@ -1660,10 +1649,7 @@ void MGG_GraphicsDevice_GetCaps(MGG_GraphicsDevice* device, MGG_GraphicsDevice_C
     bool supportsVertexTextures = true;
     mgint maxTextureAnisotropy = 16;
 
-    /*
-     * OpenGl can only get texture capabilities if there is a context
-     * Chris <aristurtledev>
-     */
+    // OpenGL can only get texture caps if there is a context.
     if (device->window != nullptr && device->context.handle != nullptr)
     {
         EnsureContext(device);
@@ -2073,11 +2059,8 @@ void MGG_GraphicsDevice_SetRenderTargets(MGG_GraphicsDevice* device, MGG_Texture
     if (targets == nullptr || arraySlices == nullptr || targets[0] == nullptr)
         MGGL_FAIL("Invalid render target binding", "need at least one valid render target");
 
-    /*
-     * Keep this capped at 4 for now so I can get the binding path in
-     * place first before trying to widen the implementation
-     * Chris <aristurtledev>
-     */
+    // TODO: Keep this capped at 4 for now so I can get the binding path
+    //       in place first before trying to widen the implementation.
     if (count > MaxRenderTargetBindings)
         MGGL_FAIL("Unsupported render target count", "need to widen the native render target binding path past 4");
 
@@ -2291,10 +2274,7 @@ void MGG_GraphicsDevice_SetInputLayout(MGG_GraphicsDevice* device, MGG_InputLayo
 
     device->inputLayout = layout;
 
-    /*
-     * Do we need to call ApplyLayout here???
-     */
-
+    // Do we need to call ApplyLayout first here????
     device->inputLayoutDirty = true;
 }
 
@@ -2329,11 +2309,8 @@ void MGG_GraphicsDevice_DrawIndexed(MGG_GraphicsDevice* device, MGPrimitiveType 
     EnsureVertexArray(device);
     assert(device->isInFrame);
 
-    /*
-     * Need to fold the vertex start into the attribute offsets here
-     * instead of passing it through the draw call.
-     * Chris <aristurtledev>
-     */
+    // Apply vertexStart through the attribute bindings because this
+    // indexed draw path uses glDrawELements without a separate base vertex.
     ApplyInputLayout(device, vertexStart);
 
     if (device->indexBuffer == nullptr)
@@ -2364,11 +2341,8 @@ void MGG_GraphicsDevice_DrawIndexedInstanced(MGG_GraphicsDevice* device, MGPrimi
     EnsureVertexArray(device);
     assert(device->isInFrame);
 
-    /*
-     * Need to fold the vertex start into the attribute offsets here
-     * instead of passing it through the draw call.
-     * Chris <aristurtledev>
-     */
+    // Apply vertexStart through the attribute bindings because this
+    // indexed draw path uses glDrawElements without a separate base-vertex.
     ApplyInputLayout(device, vertexStart);
 
     if (device->indexBuffer == nullptr)

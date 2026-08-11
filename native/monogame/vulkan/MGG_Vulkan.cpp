@@ -1702,14 +1702,11 @@ void MGG_GraphicsDevice_GetCaps(MGG_GraphicsDevice* device, MGG_GraphicsDevice_C
 	caps.MaxVertexBufferSlots = 8;
 	caps.MaxVertexTextureSlots = 8;
 
-	/*
-	 * The following values match what were hard coded on the manage side
-	 * in GraphicsCapabilities.Native.cs
-	 * 
-	 * They were moved here, we need to update the hard coded values to
-	 * get the actual caps from the device itself
-	 * - Chris <aristurtledev>
-	 */
+	// TODO: The following values match what were hard coded on the managed
+	// 		 side in GraphicsCapabilities.Native.cs
+	//
+	//		 Need to update the hard code values to get the actual caps
+	//		 from the device itself.
 	caps.MaxTextureAnisotropy = 16;
 	caps.SupportsNonPowerOfTwo = true;
 	caps.SupportsTextureFilterAnisotropic = true;

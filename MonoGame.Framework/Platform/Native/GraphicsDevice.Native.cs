@@ -278,11 +278,8 @@ public partial class GraphicsDevice
             PresentationParameters.BackBufferWidth,
             PresentationParameters.BackBufferHeight);
 
-        /*
-         * OpenGL leaves these bindings stale after a render target switch.
-         * Need to set this to dirty so the state gets pushed again on the next apply.
-         * Chris <aristurtledev>
-         */
+        // OpenGL leaves these bindings stale after a render target switch.
+        // Need to set this to dirty so the state gets pushed again on the next apply.
         if (PlatformInfo.GraphicsBackend == GraphicsBackend.OpenGL)
         {
             _rasterizerStateDirty = true;
@@ -301,11 +298,8 @@ public partial class GraphicsDevice
     {
         BeginFrame();
 
-        /*
-         * OpenGL leaves these bindings stale after a render target switch.
-         * Need to set this to dirty so the state gets pushed again on the next apply.
-         * Chris <aristurtledev>
-         */
+        // OpenGL leaves these bindings stale after a render target switch.
+        // Need to set this to dirty so the state gets pushed again on the next apply.
         if (PlatformInfo.GraphicsBackend == GraphicsBackend.OpenGL)
         {
             _rasterizerStateDirty = true;
@@ -340,11 +334,8 @@ public partial class GraphicsDevice
 
     private void PlatformApplyBlend()
     {
-        /*
-         * BlendFactor goes through the same native call as BlendState.
-         * If it changes, we need to reapply the state.
-         * - Chris <aristurtledev>
-         */
+        // BlendFactor goes through the same native call as BlendState.
+        // If it changes, we need to reapply the state.
         if (_blendStateDirty || _blendFactorDirty)
         {
             _actualBlendState.PlatformApplyState(this);

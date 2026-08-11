@@ -19,11 +19,8 @@ internal partial class ConstantBuffer
 
     private unsafe void PlatformClear()
     {
-        /*
-         * Need to drop the OpenGL buffer here on reset so it gets
-         * recreated and uploaded again the next time it is used.
-         * Chris <aristurtledev>
-         */
+        // Need to drop the OpenGL buffer here on reset so it gets recreated and
+        // uploaded again the next time it is used.
         if (PlatformInfo.GraphicsBackend == GraphicsBackend.OpenGL)
         {
             if (Handle != null)

@@ -38,11 +38,8 @@ public partial class BlendState
             }
         }
 
-        /*
-         * Need to read this from the device here because it can change
-         * without rebinding the blend state itself.
-         * Chris <aristurtledev>
-         */
+        // Need to read from the device here because it can change
+        // without rebinding the blend state itself.
         Color blendFactor = device.BlendFactor;
         MGG.GraphicsDevice_SetBlendState(device.Handle, Handle, blendFactor.R / 255.0f, blendFactor.G / 255.0f, blendFactor.B / 255.0f, blendFactor.A / 255.0f);
     }
