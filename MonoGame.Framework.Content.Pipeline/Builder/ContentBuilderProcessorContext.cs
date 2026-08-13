@@ -27,7 +27,7 @@ class ContentBuilderProcessorContext(ContentBuilder builder, string relativePath
 
     public override ContentIdentity SourceIdentity => new ContentIdentity(sourceFilename: _relativeContentPath);
 
-    public override string OutputDirectory => _builder.Parameters.OutputDirectory;
+    public override string OutputDirectory => _builder.Parameters.RootedOutputDirectory;
 
     public override string OutputFilename { get; } = outputFilename;
 
