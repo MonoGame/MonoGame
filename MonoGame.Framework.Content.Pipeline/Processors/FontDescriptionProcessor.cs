@@ -37,7 +37,13 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
             // Look for fonts by filename
             if (string.IsNullOrWhiteSpace(fontFile))
             {
-                var directories = new List<string> { Path.GetDirectoryName(input.Identity.SourceFilename) };
+                var directories = new List<string>();
+                if (input.Identity != null &&
+                    Path.GetDirectoryName(input.Identity.SourceFilename) is string spath &&
+                    !string.IsNullOrWhiteSpace(spath))
+                {
+                    directories.Add(spath);
+                }
                 var extensions = new string[] { "", ".ttf", ".ttc", ".otf" };
 
                 // Add special per platform directories
