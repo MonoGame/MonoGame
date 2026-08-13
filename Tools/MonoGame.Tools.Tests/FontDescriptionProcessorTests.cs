@@ -163,6 +163,45 @@ namespace MonoGame.Tests.ContentPipeline
             }
         }
 
+        // When kerning is disabled, the space character's advance width should be preserved in the kerning array.
+        // See: https://github.com/monogame/monogame/issues/4027
+        [Test]
+        public void BuildFontFromDescription_WhenKerningDisabled_PreservesSpaceAdvance()
+        {
+
+            FontDescription withKerning = null;
+            using (var input = XmlReader.Create(new StringReader(ArialFont)))
+                withKerning = IntermediateSerializer.Deserialize<FontDescription>(input, "");
+
+
+            FontDescription withoutKerning = null;
+            using (var input = XmlReader.Create(new StringReader(ArialFontWithoutKerning)))
+                withoutKerning = IntermediateSerializer.Deserialize<FontDescription>(input, "");
+
+            using TestProcessorContext context = new TestProcessorContext(TargetPlatform.Windows, "Arial.xnb");
+            var processor = new FontDescriptionProcessor();
+            SpriteFontContent withKerningContnet = processor.Process(withKerning, context);
+            SpriteFontContent withoutKerningContent = processor.Process(withoutKerning, context);
+
+            int spaceIndex = withKerningContnet.CharacterMap.IndexOf(' ');
+
+            Vector3 spaceWithKerning = withKerningContnet.Kerning[spaceIndex];
+            Vector3 spaceWithoutKerning = withoutKerningContent.Kerning[spaceIndex];
+
+            // Kerning stores the glyph advance as three parts:
+            // X = left side bearing
+            // Y = glyph width
+            // Z = right side bearing
+            //
+            // With kerning enabled, space can be split across those components,
+            // for example (1, 8, 0). With kerning disabled, MonoGame flattens the
+            // full advance into Y, so the equivalent result becomes (0, 9, 0).
+            float expectedSpaceWidth = spaceWithKerning.X + spaceWithKerning.Y + spaceWithKerning.Z;
+
+            Assert.That(spaceWithoutKerning.Y, Is.EqualTo(expectedSpaceWidth));
+
+        }
+
         static string ArialFont = @"<?xml version=""1.0"" encoding=""utf-8""?>
 <XnaContent xmlns:Graphics=""Microsoft.Xna.Framework.Content.Pipeline.Graphics"">
   <Asset Type=""Graphics:FontDescription"">
@@ -170,6 +209,24 @@ namespace MonoGame.Tests.ContentPipeline
     <Size>20</Size>
     <Spacing>0</Spacing>
     <UseKerning>true</UseKerning>
+    <Style>Bold</Style>
+    <CharacterRegions>
+      <CharacterRegion>
+        <Start>&#32;</Start>
+        <End>&#126;</End>
+      </CharacterRegion>
+    </CharacterRegions>
+  </Asset>
+</XnaContent>
+";
+
+        static string ArialFontWithoutKerning = @"<?xml version=""1.0"" encoding=""utf-8""?>
+<XnaContent xmlns:Graphics=""Microsoft.Xna.Framework.Content.Pipeline.Graphics"">
+  <Asset Type=""Graphics:FontDescription"">
+    <FontName>Arial</FontName>
+    <Size>20</Size>
+    <Spacing>0</Spacing>
+    <UseKerning>false</UseKerning>
     <Style>Bold</Style>
     <CharacterRegions>
       <CharacterRegion>
