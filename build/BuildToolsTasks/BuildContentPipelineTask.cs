@@ -1,4 +1,5 @@
-﻿
+﻿using System.Runtime.InteropServices;
+
 namespace BuildScripts;
 
 [TaskName("Build Content Pipeline")]
@@ -15,10 +16,13 @@ public sealed class BuildContentPipelineTask : FrostingTask<BuildContext>
         switch (context.Environment.Platform.Family)
         {
             case PlatformFamily.Windows:
-                context.CheckLib("native/mgpipeline/windows/Release/mgpipeline.dll");
+                // Both architectures are built on Windows, so lets check both.
+                context.CheckLib("native/mgpipeline/windows/x64/Release/mgpipeline.dll");
+                context.CheckLib("native/mgpipeline/windows/arm64/Release/mgpipeline.dll");
                 break;
             case PlatformFamily.Linux:
-                context.CheckLib("native/mgpipeline/linux/Release/libmgpipeline.so");
+                var arch = RuntimeInformation.OSArchitecture == Architecture.Arm64 ? "arm64" : "x64";
+                context.CheckLib($"native/mgpipeline/linux/{arch}/Release/libmgpipeline.so");
                 break;
             case PlatformFamily.OSX:
                 context.CheckLib("native/mgpipeline/macosx/Release/libmgpipeline.dylib");

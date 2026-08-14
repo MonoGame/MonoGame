@@ -44,6 +44,13 @@ namespace Microsoft.Xna.Framework.Graphics
             return _resourceView;
         }
 
+        internal void SetNativeTexture(Resource texture)
+        {
+            SharpDX.Utilities.Dispose(ref _resourceView);
+            SharpDX.Utilities.Dispose(ref _texture);
+            _texture = texture;
+        }
+
         private void PlatformGraphicsDeviceResetting()
         {
             SharpDX.Utilities.Dispose(ref _resourceView);

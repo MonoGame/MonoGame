@@ -25,7 +25,7 @@ class ContentBuilderProcessorContext(ContentBuilder builder, string relativePath
 
     public override ContentBuildLogger Logger => _builder.Logger;
 
-    public override ContentIdentity SourceIdentity => throw new NotImplementedException();
+    public override ContentIdentity SourceIdentity => new ContentIdentity(sourceFilename: _relativeContentPath);
 
     public override string OutputDirectory => _builder.Parameters.OutputDirectory;
 
@@ -76,8 +76,7 @@ class ContentBuilderProcessorContext(ContentBuilder builder, string relativePath
     public override ExternalReference<TOutput> BuildAsset<TInput, TOutput>(ExternalReference<TInput> sourceAsset,
         IContentImporter importer, IContentProcessor processor, string? assetName)
     {
-        var outputRelativePath = string.IsNullOrWhiteSpace(assetName) ? GetNextOutputPath() : assetName;
-        _builder.BuildAndWriteContent(sourceAsset.Filename, new ContentInfo(_contentInfo.ContentRoot, true, importer, processor), outputRelativePath, this);
+        var outputRelativePath = _builder.BuildAndWriteContent(sourceAsset.Filename, new ContentInfo(_contentInfo.ContentRoot, true, importer, processor), assetName, this);
 
         return new ExternalReference<TOutput>(Path.Combine(_builder.Parameters.RootedOutputDirectory, outputRelativePath));
     }

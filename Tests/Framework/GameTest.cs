@@ -12,16 +12,20 @@ using Microsoft.Xna.Framework.Graphics;
 using NUnit.Framework;
 
 namespace MonoGame.Tests {
-	static partial class GameTest {
-		public abstract class FixtureBase {
+	static partial class GameTest
+    {
+		[RunOnUiTestFixture]
+		public abstract class FixtureBase
+        {
 			private MockGame _game;
 
-			protected MockGame Game {
+			protected MockGame Game
+            {
 				get { return _game; }
 			}
 
 			[SetUp]
-			public virtual void SetUp ()
+			public virtual void SetUp()
 			{
 				Paths.SetStandardWorkingDirectory();
 				_game = new MockGame ();
@@ -35,9 +39,10 @@ namespace MonoGame.Tests {
 			}
 		}
 
-		[TestFixture]
 		[Category("GameTest")]
-		public class Disposal : FixtureBase {
+		[RunOnUiTestFixture]
+		public class Disposal : FixtureBase
+        {
 			[TestCase ("Components")]
 			[TestCase ("Content")]
 			[TestCase ("GraphicsDevice")]
@@ -119,33 +124,38 @@ namespace MonoGame.Tests {
 
 			private static void AssertDoesNotThrow<T> (TestDelegate code) where T : Exception
 			{
-				try {
+				try
+                {
 					code ();
-				} catch (T ex) {
+				}
+                catch (T ex) {
 					Assert.AreEqual (null, ex);
-				} catch (Exception ex) {
+				}
+                catch (Exception ex)
+                {
 					Console.WriteLine (
 						"AssertDoesNotThrow<{0}> caught and ignored {1}", typeof(T), ex);
 				}
 			}
 		}
 
-		[TestFixture]
 		[Category("GameTest")]
-		public class Behaviors : FixtureBase {
+		[RunOnUiTestFixture]
+		public class Behaviors : FixtureBase
+        {
 			[Test, Ignore("Fix me!")]
-			public void Nongraphical_run_succeeds ()
+			public void Nongraphical_run_succeeds()
 			{
-				Game.Run ();
+				Game.Run();
 
 				Assert.That (Game, Has.Property ("UpdateCount").EqualTo (1));
 				Assert.That (Game, Has.Property ("DrawCount").EqualTo (0));
 			}
 
 			[Test, Ignore("Fix me!")]
-			public void Fixed_time_step_skips_draw_when_update_is_slow ()
+			public void Fixed_time_step_skips_draw_when_update_is_slow()
 			{
-				Game.MakeGraphical ();
+				Game.MakeGraphical();
 
 				var targetElapsedTime = TimeSpan.FromSeconds (1f / 10f);
 				var slowUpdateTime = TimeSpan.FromSeconds (targetElapsedTime.TotalSeconds * 2);
@@ -177,8 +187,8 @@ namespace MonoGame.Tests {
             }
         }
 
-        [TestFixture]
 		[Category("GameTest")]
+        [RunOnUiTestFixture]
         public class Misc
         {
             [Test]
@@ -288,8 +298,9 @@ namespace MonoGame.Tests {
 
         }
 
-		public class MockGame : TestGameBase {
-			public MockGame ()
+		public class MockGame : TestGameBase
+        {
+			public MockGame()
 			{
 				MinUpdateCount = int.MaxValue;
 				MinDrawCount = int.MaxValue;
@@ -297,42 +308,49 @@ namespace MonoGame.Tests {
 				MaxDrawCount = 1;
 			}
 
-			public MockGame MakeGraphical ()
+			public MockGame MakeGraphical()
 			{
 				if (Services.GetService (typeof (IGraphicsDeviceManager)) == null)
 					new GraphicsDeviceManager (this);
 				return this;
 			}
 
-			public int MinUpdateCount {
+			public int MinUpdateCount
+            {
 				get; set;
 			}
 
-			public int MaxUpdateCount {
+			public int MaxUpdateCount
+            {
 				get; set;
 			}
 
-			public int MinDrawCount {
+			public int MinDrawCount
+            {
 				get; set;
 			}
 
-			public int MaxDrawCount {
+			public int MaxDrawCount
+            {
 				get; set;
 			}
 
-			public int UpdateCount {
+			public int UpdateCount
+            {
 				get; private set;
 			}
 
-			public int DrawCount {
+			public int DrawCount
+            {
 				get; private set;
 			}
 
-			public ExitReason ExitReason {
+			public ExitReason ExitReason
+            {
 				get; private set;
 			}
 
-			private void EvaluateExitCriteria ()
+			private void EvaluateExitCriteria()
 			{
 				ExitReason reason;
 				if (UpdateCount >= MinUpdateCount && DrawCount >= MinDrawCount)
@@ -344,15 +362,16 @@ namespace MonoGame.Tests {
 				else
 					reason = ExitReason.None;
 
-				if (reason != ExitReason.None) {
+				if (reason != ExitReason.None)
+                {
 					ExitReason = reason;
 					DoExit();
 				}
 			}
 
-			protected override void BeginRun ()
+			protected override void BeginRun()
 			{
-				base.BeginRun ();
+				base.BeginRun();
 				UpdateCount = 0;
 				DrawCount = 0;
 			}
@@ -365,16 +384,16 @@ namespace MonoGame.Tests {
 #endif
             }
 
-			protected override void Update (GameTime gameTime)
+			protected override void Update(GameTime gameTime)
 			{
-				base.Update (gameTime);
+				base.Update(gameTime);
 				UpdateCount++;
 				EvaluateExitCriteria ();
 			}
 
-			protected override void Draw (GameTime gameTime)
+			protected override void Draw(GameTime gameTime)
 			{
-				base.Draw (gameTime);
+				base.Draw(gameTime);
 				DrawCount++;
 				EvaluateExitCriteria ();
 			}
@@ -387,18 +406,19 @@ namespace MonoGame.Tests {
 			MaxDrawSatisfied
 		}
 
-		private class SlowUpdater : GameComponent {
+		private class SlowUpdater : GameComponent
+        {
 			private TimeSpan _updateTime;
-			public SlowUpdater (Game game, TimeSpan updateTime) :
-				base (game)
+			public SlowUpdater(Game game, TimeSpan updateTime) :
+				base(game)
 			{
 				_updateTime = updateTime;
 			}
 
 			int _count = 0;
-			public override void Update (GameTime gameTime)
+			public override void Update(GameTime gameTime)
 			{
-				base.Update (gameTime);
+				base.Update(gameTime);
 
 				if (_count >= 4)
 					return;
@@ -417,80 +437,89 @@ namespace MonoGame.Tests {
 			}
 		}
 
-		private class RunLoopLogger : DrawableGameComponent {
-			public RunLoopLogger (Game game) :
+		private class RunLoopLogger : DrawableGameComponent
+        {
+			public RunLoopLogger(Game game) :
 				base (game)
 			{
 			}
 
-			private List<Entry> _entries = new List<Entry> ();
-			public IEnumerable<Entry> GetEntries ()
+			private List<Entry> _entries = new List<Entry>();
+			public IEnumerable<Entry> GetEntries()
 			{
 				return _entries.ToArray ();
 			}
 
-			public override void Update (GameTime gameTime)
+			public override void Update(GameTime gameTime)
 			{
 				base.Update (gameTime);
-				_entries.Add (Entry.FromUpdate (gameTime));
+				_entries.Add (Entry.FromUpdate(gameTime));
 			}
 
-			public override void Draw (GameTime gameTime)
+			public override void Draw(GameTime gameTime)
 			{
 				base.Draw (gameTime);
-				_entries.Add (Entry.FromDraw (gameTime));
+				_entries.Add (Entry.FromDraw(gameTime));
 			}
 
-			public string GetLogString ()
+			public string GetLogString()
 			{
-				return string.Join (" ", _entries);
+				return string.Join(" ", _entries);
 			}
 
-			public struct Entry {
-				public static Entry FromDraw (GameTime gameTime)
+			public struct Entry
+            {
+				public static Entry FromDraw(GameTime gameTime)
 				{
-					return new Entry {
-						       Action = RunLoopAction.Draw,
-						       ElapsedGameTime = gameTime.ElapsedGameTime,
-						       TotalGameTime = gameTime.TotalGameTime,
-						       WasRunningSlowly = gameTime.IsRunningSlowly
+					return new Entry
+                    {
+					   Action = RunLoopAction.Draw,
+					   ElapsedGameTime = gameTime.ElapsedGameTime,
+					   TotalGameTime = gameTime.TotalGameTime,
+					   WasRunningSlowly = gameTime.IsRunningSlowly,
 					};
 				}
 
 				public static Entry FromUpdate (GameTime gameTime)
 				{
-					return new Entry {
-						       Action = RunLoopAction.Update,
-						       ElapsedGameTime = gameTime.ElapsedGameTime,
-						       TotalGameTime = gameTime.TotalGameTime,
-						       WasRunningSlowly = gameTime.IsRunningSlowly
+					return new Entry
+                    {
+					   Action = RunLoopAction.Update,
+					   ElapsedGameTime = gameTime.ElapsedGameTime,
+					   TotalGameTime = gameTime.TotalGameTime,
+					   WasRunningSlowly = gameTime.IsRunningSlowly,
 					};
 				}
 
-				public RunLoopAction Action {
+				public RunLoopAction Action
+                {
 					get; set;
 				}
 
-				public TimeSpan ElapsedGameTime {
+				public TimeSpan ElapsedGameTime
+                {
 					get; set;
 				}
 
-				public TimeSpan TotalGameTime {
+				public TimeSpan TotalGameTime
+                {
 					get; set;
 				}
 
-				public bool WasRunningSlowly {
+				public bool WasRunningSlowly
+                {
 					get; set;
 				}
 
-				public override string ToString ()
+				public override string ToString()
 				{
 					char actionInitial;
-					switch (Action) {
-					case RunLoopAction.Draw: actionInitial = 'd'; break;
-					case RunLoopAction.Update: actionInitial = 'u'; break;
-					default: throw new NotSupportedException (Action.ToString ());
-					}
+					switch (Action)
+                    {
+                        case RunLoopAction.Draw: actionInitial = 'd'; break;
+                        case RunLoopAction.Update: actionInitial = 'u'; break;
+                        default: throw new NotSupportedException(Action.ToString());
+                    }
 
 					return string.Format (
 						       "{0}({1:0}{2})",
@@ -501,9 +530,10 @@ namespace MonoGame.Tests {
 			}
 		}
 
-		private enum RunLoopAction {
+		private enum RunLoopAction
+        {
 			Draw,
-				Update
+			Update,
 		}
 	}
 }

@@ -48,8 +48,7 @@ namespace MonoGame.OpenGL
 
             if (GL.BoundApi == GL.RenderApi.ES && libES3 != IntPtr.Zero)
                 Library = libES3;
-
-            if (GL.BoundApi == GL.RenderApi.ES && libES2 != IntPtr.Zero)
+            else if (GL.BoundApi == GL.RenderApi.ES && libES2 != IntPtr.Zero)
                 Library = libES2;
             else if (GL.BoundApi == GL.RenderApi.GL && libGL != IntPtr.Zero)
                 Library = libGL;

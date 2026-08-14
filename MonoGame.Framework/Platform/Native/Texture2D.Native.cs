@@ -208,7 +208,10 @@ public partial class Texture2D : Texture
             byte* jpg;
             int jpgBytes;
 
-            MGI.WriteJpg((byte*)ptr, data.Length, width, height, 90, out jpg, out jpgBytes);
+            // 91% is sort of a magic number that makes our unit tests
+            // pass (meaning resulting images are good quality) but the
+            // compressed file size is a little larger.
+            MGI.WriteJpg((byte*)ptr, data.Length, width, height, 91, out jpg, out jpgBytes);
 
             stream.Write(new ReadOnlySpan<byte>(jpg, jpgBytes));
         }

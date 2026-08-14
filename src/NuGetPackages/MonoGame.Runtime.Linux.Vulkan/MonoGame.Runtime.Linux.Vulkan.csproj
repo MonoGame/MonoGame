@@ -1,9 +1,16 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
-    <Content Include="..\..\..\Artifacts\native\mgruntime\desktopvk\linux\Release\libmgruntime.so"
-      Condition="Exists('..\..\..\Artifacts\native\mgruntime\desktopvk\linux\Release\libmgruntime.so')">
+    <!-- x64 -->
+    <Content Include="..\..\..\Artifacts\native\mgruntime\desktopvk\linux\x64\Release\libmgruntime.so"
+      Condition="Exists('..\..\..\Artifacts\native\mgruntime\desktopvk\linux\x64\Release\libmgruntime.so')">
       <PackagePath>runtimes\linux-x64\native</PackagePath>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <!-- arm64 -->
+    <Content Include="..\..\..\Artifacts\native\mgruntime\desktopvk\linux\arm64\Release\libmgruntime.so"
+      Condition="Exists('..\..\..\Artifacts\native\mgruntime\desktopvk\linux\arm64\Release\libmgruntime.so')">
+      <PackagePath>runtimes\linux-arm64\native</PackagePath>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>

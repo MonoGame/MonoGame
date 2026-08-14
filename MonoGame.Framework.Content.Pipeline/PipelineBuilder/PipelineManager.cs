@@ -1,4 +1,4 @@
-﻿// MonoGame - Copyright (C) MonoGame Foundation, Inc
+// MonoGame - Copyright (C) MonoGame Foundation, Inc
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
@@ -31,6 +31,7 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
         };
 
         private List<ImporterInfo> _importers;
+        private List<(string fileNameEnding, ImporterInfo importerInfo)> _importersByFileEnding;
 
         [DebuggerDisplay("ProcessorInfo: {type.Name}")]
         private struct ProcessorInfo
@@ -183,6 +184,7 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
                 //TODO need better way to update caches
                 _processors = null;
                 _importers = null;
+                _importersByFileEnding = null;
                 _writers = null;
             }
         }
@@ -190,6 +192,7 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
         private void ResolveAssemblies()
         {
             _importers = new List<ImporterInfo>();
+            _importersByFileEnding = new List<(string fileNameEnding, ImporterInfo importerInfo)>();
             _processors = new List<ProcessorInfo>();
             _writers = new List<Type>();
 
@@ -229,18 +232,25 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
                     if (t.IsAbstract)
                         continue;
 
-                    if (t.GetInterface(@"IContentImporter") != null)
+                    if (t.GetInterface(nameof(IContentImporter)) != null)
                     {
                         var attributes = t.GetCustomAttributes(typeof (ContentImporterAttribute), false);
                         if (attributes.Length != 0)
                         {
                             var importerAttribute = attributes[0] as ContentImporterAttribute;
-                            _importers.Add(new ImporterInfo
+                            var importerInfo = new ImporterInfo
                             {
                                 attribute = importerAttribute,
                                 type = t,
                                 assemblyTimestamp = assemblyTimestamp
-                            });
+                            };
+
+                            _importers.Add(importerInfo);
+
+                            foreach (var ext in importerAttribute.FileExtensions)
+                            {
+                                _importersByFileEnding.Add((ext, importerInfo));
+                            }
                         }
                         else
                         {
@@ -256,7 +266,7 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
                             });
                         }
                     }
-                    else if (t.GetInterface(@"IContentProcessor") != null)
+                    else if (t.GetInterface(nameof(IContentProcessor)) != null)
                     {
                         var attributes = t.GetCustomAttributes(typeof (ContentProcessorAttribute), false);
                         if (attributes.Length != 0)
@@ -270,13 +280,19 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
                             });
                         }
                     }
-                    else if (t.GetInterface(@"ContentTypeWriter") != null)
+                    else if (t.GetInterface(nameof(ContentTypeWriter)) != null)
                     {
 						// TODO: This doesn't work... how do i find these?
                         _writers.Add(t);
                     }
                 }
             }
+
+            // Sort importer-extension pairs by extension length descending.
+            // This makes sure that in methods where they are looped through, the one with
+            // the highest priority is found first.
+            // This is important for file endings that are matched by multiple importers.
+            _importersByFileEnding.Sort((a, b) => b.fileNameEnding.Length.CompareTo(a.fileNameEnding.Length));
         }
 
         /// <summary>
@@ -338,20 +354,20 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
         }
 
         /// <summary>
-        /// Returns the importer type name based on the file extension.
+        /// Returns the importer type name based on the file name (including extension).
         /// </summary>
-        /// <param name="ext">File extension to search for.</param>
+        /// <param name="fileNameWithExt">Then name of the file including the extension.</param>
         /// <returns>Importer type name or <see langword="null"/> if not found.</returns>
-        public string FindImporterByExtension(string ext)
+        public string FindImporterByFileName(string fileNameWithExt)
         {
             if (_importers == null)
                 ResolveAssemblies();
 
             // Search for the importer.
-            foreach (var info in _importers)
+            foreach (var pair in _importersByFileEnding)
             {
-                if (info.attribute.FileExtensions.Any(e => e.Equals(ext, StringComparison.InvariantCultureIgnoreCase)))
-                    return info.type.Name;
+                if (fileNameWithExt.EndsWith(pair.fileNameEnding, StringComparison.InvariantCultureIgnoreCase))
+                    return pair.importerInfo.type.Name;
             }
 
             return null;
@@ -428,7 +444,7 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
         {
             // Resolve the importer name.
             if (string.IsNullOrEmpty(importerName))
-                importerName = FindImporterByExtension(Path.GetExtension(sourceFilepath));
+                importerName = FindImporterByFileName(Path.GetExtension(sourceFilepath));
             if (string.IsNullOrEmpty(importerName))
                 throw new Exception(string.Format("Couldn't find a default importer for '{0}'!", sourceFilepath));
 

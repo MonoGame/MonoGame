@@ -128,7 +128,6 @@ namespace MonoGame.Effect
 
             // Create a new shader.
             var shaderData = new ShaderData(isVertexShader, effect.Shaders.Count, bytecode);
-            shaderData.ShaderCode = shaderData.Bytecode;
 
             // Gather the input attributes.
             var attributes = new List<ShaderData.Attribute>();
@@ -153,15 +152,17 @@ namespace MonoGame.Effect
                     a.index = int.Parse(match.Groups[2].Value);
 
                     // Get the element type.
-                    var name = match.Groups[1].Value;
-                    switch (name.ToUpper())
+                    var name = match.Groups[1].Value.ToUpper();
+                    switch (name)
                     {
                         default:
+                            // Give a warning which hopefully someone notices.
+                            errorsAndWarnings += $"Unknown vertex shader input semantic `{name}`; defaulting to texture coord.\n";
                             a.usage = VertexElementUsage.TextureCoordinate;
                             break;
                         case "POSITION":
                             a.usage = VertexElementUsage.Position;
-                            break;
+                            break;                            
                         case "NORMAL":
                             a.usage = VertexElementUsage.Normal;
                             break;
@@ -170,6 +171,9 @@ namespace MonoGame.Effect
                             break;
                         case "BINORMAL":
                             a.usage = VertexElementUsage.Binormal;
+                            break;
+                        case "TEXCOORD":
+                            a.usage = VertexElementUsage.TextureCoordinate;
                             break;
                         case "COLOR":
                             a.usage = VertexElementUsage.Color;
@@ -308,6 +312,8 @@ namespace MonoGame.Effect
             }
 
             // Go thru the texture resources creating final samplers.
+            int textureMaxSlot = -1;
+            int samplerMaxSlot = -1;
             var samplers = new List<ShaderData.Sampler>();
             {
                 var reader = new StringReader(reflectionData);
@@ -327,7 +333,7 @@ namespace MonoGame.Effect
                     {
                         var textureName = match.Groups[1].Value;
                         var textureSlot = int.Parse(match.Groups[4].Value);
-                        var textureDim = match.Groups[3].Value;
+                        var textureDim = match.Groups[3].Value?.ToLower();
 
                         var sampler = new ShaderData.Sampler();
 
@@ -356,10 +362,13 @@ namespace MonoGame.Effect
                         {
                             // Try to match assuming samplers and textures have the same register index.
                             // This can be wrong in some cases, but best we can do right now.
-                            sampler = samplerDescriptions.First(sd => sd.samplerSlot == textureSlot);
+                            sampler = samplerDescriptions.FirstOrDefault(sd => sd.samplerSlot == textureSlot);
+                            if (sampler.samplerName == null)
+                                sampler.samplerName = string.Empty;
                         }
 
-                        sampler.state = shaderResult.ShaderInfo.SamplerStates[sampler.samplerName].State;
+                        if (shaderResult.ShaderInfo.SamplerStates.TryGetValue(sampler.samplerName, out var ssamp))                         
+                            sampler.state = ssamp.State;
                         sampler.textureSlot = textureSlot;
                         sampler.parameterName = textureName;
 
@@ -369,19 +378,50 @@ namespace MonoGame.Effect
                                 sampler.type = MojoShader.MOJOSHADER_samplerType.MOJOSHADER_SAMPLER_2D;
                                 break;
 
+                            case "3d":
+                                sampler.type = MojoShader.MOJOSHADER_samplerType.MOJOSHADER_SAMPLER_VOLUME;
+                                break;
+
                             case "cube":
                                 sampler.type = MojoShader.MOJOSHADER_samplerType.MOJOSHADER_SAMPLER_CUBE;
+                                break;
+
+                            case "2darray":
+                                sampler.type = MojoShader.MOJOSHADER_samplerType.MOJOSHADER_SAMPLER_VOLUME;
                                 break;
 
                             default:
                                 throw new Exception("Unexpected sampler class type: " + textureDim);
                         }
 
+                        // Track the max sampler/texture slots.
+                        if (sampler.textureSlot > textureMaxSlot)
+                            textureMaxSlot = sampler.textureSlot;
+                        if (sampler.samplerSlot > samplerMaxSlot)
+                            samplerMaxSlot = sampler.samplerSlot;
+
                         samplers.Add(sampler);
                     }
                 }
             }
             shaderData._samplers = samplers.ToArray();
+
+            // Generate the layout bindings from our cbuffers, samplers, and textures.
+            using (var stream = new MemoryStream())
+            using (var writer = new BinaryWriter(stream))
+            {
+                writer.Write((uint)0xB00B00);
+
+                // Write the max texture and sampler slots.
+                writer.Write(samplerMaxSlot);
+                writer.Write(textureMaxSlot);
+
+                // Finally write the shader bytecode.
+                writer.Write(shaderData.Bytecode);
+
+                // Store the combined binding layout info and shader code.
+                shaderData.ShaderCode = stream.ToArray();
+            }
 
             effect.Shaders.Add(shaderData);
             return shaderData;

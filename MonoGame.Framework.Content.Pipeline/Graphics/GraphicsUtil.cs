@@ -5,6 +5,7 @@
 using System;
 using System.IO;
 using System.Runtime.InteropServices;
+using Microsoft.Xna.Framework.Content.Pipeline.Processors;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Graphics.PackedVector;
 using MonoGame.Framework.Content.Pipeline.Interop;
@@ -250,7 +251,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
                 content.ConvertBitmapType(typeof(AtcInterpolatedBitmapContent));
         }
 
-        static public void CompressAstc(ContentProcessorContext context, TextureContent content, bool isSpriteFont)
+        static public void CompressAstc(ContentProcessorContext context, TextureContent content, bool isSpriteFont, TextureProcessorOutputFormat format)
         {
             // If sharp alpha is required (for a font texture page), use 16-bit color instead of PVR
             if (isSpriteFont)
@@ -259,8 +260,30 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
                 return;
             }
 
-            // astc supports rgba
-            content.ConvertBitmapType(typeof(AstcBitmapContent));
+            switch (format)
+            {
+                case TextureProcessorOutputFormat.AstcCompressed5x5:
+                    content.ConvertBitmapType(typeof(Astc5x5BitmapContent));
+                    break;
+                case TextureProcessorOutputFormat.AstcCompressed6x6:
+                    content.ConvertBitmapType(typeof(Astc6x6BitmapContent));
+                    break;
+                case TextureProcessorOutputFormat.AstcCompressed8x8:
+                    content.ConvertBitmapType(typeof(Astc8x8BitmapContent));
+                    break;
+                case TextureProcessorOutputFormat.AstcCompressed10x10:
+                    content.ConvertBitmapType(typeof(Astc10x10BitmapContent));
+                    break;
+                case TextureProcessorOutputFormat.AstcCompressed12x12:
+                    content.ConvertBitmapType(typeof(Astc12x12BitmapContent));
+                    break;
+                case TextureProcessorOutputFormat.AstcCompressed4x4:
+                case TextureProcessorOutputFormat.AstcCompressed:
+                default:
+                    // astc supports rgba
+                    content.ConvertBitmapType(typeof(AstcBitmapContent));
+                    break;
+            }
         }
 
         static public void CompressEtc(ContentProcessorContext context, TextureContent content, bool isSpriteFont)

@@ -662,7 +662,7 @@ namespace MonoGame.Effect.TPGParser
 
     #region Token
 
-    public enum TokenType
+    internal enum TokenType
     {
 
             //Non terminal tokens:

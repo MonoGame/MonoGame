@@ -50,13 +50,19 @@ internal struct BasisUFormat
     /// </summary>
     public bool nonUastcCompatible;
 
+    /// <summary>
+    /// When building certain codecs we need to specify a flag other than -uastc.
+    /// </summary>
+    public string encoderFlag;
+
     // Instead of constructing one of these yourself, please use one of the many predefined static class members.
-    private BasisUFormat(int code, string name, bool isLinearColorSpace=false, bool nonUastcCompatible=false)
+    private BasisUFormat(int code, string name, bool isLinearColorSpace=false, bool nonUastcCompatible=false, string encoderFlag="")
     {
         this.code = code;
         this.name = name;
         this.isLinearColorSpace = isLinearColorSpace;
         this.nonUastcCompatible = nonUastcCompatible;
+        this.encoderFlag = encoderFlag;
     }
 
     public override string ToString()
@@ -73,6 +79,61 @@ internal struct BasisUFormat
         code: 10,
         name: "cTFASTC_4x4_RGBA",
         isLinearColorSpace: true
+    );
+
+    /// <summary>
+    /// <see cref="SurfaceFormat.Astc5X5Rgba"/>
+    /// // Opaque+alpha, ASTC 5x5, alpha channel will be opaque for opaque .basis files. Transcoder uses RGB/RGBA/L/LA modes, void extent, and up to two ([0,47] and [0,255]) endpoint precisions.
+    /// </summary>
+    public static readonly BasisUFormat Astc_5x5_Rgba = new BasisUFormat(
+        code: 29,
+        name: "cTFASTC_5x5_RGBA",
+        isLinearColorSpace: true,
+        encoderFlag: "-xuastc_ldr_5x5"
+    );
+
+    /// <summary>
+    /// <see cref="SurfaceFormat.Astc6X6Rgba"/>
+    /// // Opaque+alpha, ASTC 6x6, alpha channel will be opaque for opaque .basis files. Transcoder uses RGB/RGBA/L/LA modes, void extent, and up to two ([0,47] and [0,255]) endpoint precisions.
+    /// </summary>
+    public static readonly BasisUFormat Astc_6x6_Rgba = new BasisUFormat(
+        code: 31,
+        name: "cTFASTC_6x6_RGBA",
+        isLinearColorSpace: true,
+         encoderFlag: "-xuastc_ldr_6x6"
+    );
+
+    /// <summary>
+    /// <see cref="SurfaceFormat.Astc8X8Rgba"/>
+    /// // Opaque+alpha, ASTC 8x8, alpha channel will be opaque for opaque .basis files. Transcoder uses RGB/RGBA/L/LA modes, void extent, and up to two ([0,47] and [0,255]) endpoint precisions.
+    /// </summary>
+    public static readonly BasisUFormat Astc_8x8_Rgba = new BasisUFormat(
+        code: 36,
+        name: "cTFASTC_8x8_RGBA",
+        isLinearColorSpace: true,
+         encoderFlag: "-xuastc_ldr_8x8"
+    );
+
+    /// <summary>
+    /// <see cref="SurfaceFormat.Astc10X10Rgba"/>
+    /// // Opaque+alpha, ASTC 10x10, alpha channel will be opaque for opaque .basis files. Transcoder uses RGB/RGBA/L/LA modes, void extent, and up to two ([0,47] and [0,255]) endpoint precisions.
+    /// </summary>
+    public static readonly BasisUFormat Astc_10x10_Rgba = new BasisUFormat(
+        code: 38,
+        name: "cTFASTC_10x10_RGBA",
+        isLinearColorSpace: true,
+         encoderFlag: "-xuastc_ldr_10x10"
+    );
+
+    /// <summary>
+    /// <see cref="SurfaceFormat.Astc12X12Rgba"/>
+    /// // Opaque+alpha, ASTC 12x12, alpha channel will be opaque for opaque .basis files. Transcoder uses RGB/RGBA/L/LA modes, void extent, and up to two ([0,47] and [0,255]) endpoint precisions.
+    /// </summary>
+    public static readonly BasisUFormat Astc_12x12_Rgba = new BasisUFormat(
+        code: 40,
+        name: "cTFASTC_12x12_RGBA",
+        isLinearColorSpace: true,
+         encoderFlag: "-xuastc_ldr_12x12"
     );
 
     /// <summary>
@@ -235,9 +296,34 @@ internal static class BasisU
         error = "";
         switch (format)
         {
-            // ASTC format
+            // ASTC 4x4 format
             case SurfaceFormat.Astc4X4Rgba:
                 basisUFormat = BasisUFormat.Astc_4x4_Rgba;
+                return true;
+
+            // ASTC 5x5 format
+            case SurfaceFormat.Astc5X5Rgba:
+                basisUFormat = BasisUFormat.Astc_5x5_Rgba;
+                return true;
+
+            // ASTC 6x6 format
+            case SurfaceFormat.Astc6X6Rgba:
+                basisUFormat = BasisUFormat.Astc_6x6_Rgba;
+                return true;
+
+            // ASTC 8x8 format
+            case SurfaceFormat.Astc8X8Rgba:
+                basisUFormat = BasisUFormat.Astc_8x8_Rgba;
+                return true;
+
+            // ASTC 10x10 format
+            case SurfaceFormat.Astc10X10Rgba:
+                basisUFormat = BasisUFormat.Astc_10x10_Rgba;
+                return true;
+
+            // ASTC 12x12 format
+            case SurfaceFormat.Astc12X12Rgba:
+                basisUFormat = BasisUFormat.Astc_12x12_Rgba;
                 return true;
 
             // ATC formats
@@ -489,7 +575,7 @@ internal static class BasisU
         out string stdErr)
     {
         var absImageFileName = Path.GetFullPath(imageFileName);
-        var uastcFlag = format.nonUastcCompatible ? "": "-uastc";
+        var uastcFlag = format.encoderFlag ?? (format.nonUastcCompatible ? "": "-uastc");
         var argStr = $"-file \"{absImageFileName}\" {uastcFlag} -ktx2 -output_file \"{intermediateFileName}\"";
         var exitCode = Run(
             args: argStr,

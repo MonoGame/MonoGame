@@ -29,6 +29,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
     /// use a small fraction of these. Building only the characters we need is far more
     /// efficient than if we tried to include the entire CJK character region.
     /// </summary>
+    [Obsolete($"Please use {nameof(FontImporter)} for importing and {nameof(FontDescriptionProcessor)} for processing instead.")]
     [ContentProcessor]
     public class LocalizedFontProcessor : ContentProcessor<LocalizedFontDescription,
                                                     SpriteFontContent>

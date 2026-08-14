@@ -50,6 +50,9 @@ public partial class GraphicsDevice
 
     private unsafe void PlatformInitialize()
     {
+        PresentationParameters.MultiSampleCount =
+                GetClampedMultisampleCount(PresentationParameters.BackBufferFormat, PresentationParameters.MultiSampleCount);
+
         MGG.GraphicsDevice_ResizeSwapchain(
                 Handle,
                 PresentationParameters.DeviceWindowHandle,
@@ -57,6 +60,7 @@ public partial class GraphicsDevice
                 PresentationParameters.BackBufferHeight,
                 PresentationParameters.BackBufferFormat,
                 PresentationParameters.DepthStencilFormat,
+                PresentationParameters.MultiSampleCount,
                 PresentationParameters.PresentationInterval.GetSyncInterval());
 
         // Setup the default texture.
@@ -64,11 +68,16 @@ public partial class GraphicsDevice
         DefaultTexture.SetData(new[] { Color.Black, Color.Black, Color.Black, Color.Black });
     }
 
+    internal int PlatformGetMaxMultiSampleCount(SurfaceFormat format)
+    {
+        return 4;
+    }
+
     private unsafe void OnPresentationChanged()
     {
         // Clamp MultiSampleCount
         PresentationParameters.MultiSampleCount =
-                GetClampedMultisampleCount(PresentationParameters.MultiSampleCount);
+                GetClampedMultisampleCount(PresentationParameters.BackBufferFormat, PresentationParameters.MultiSampleCount);
 
         // Finish any frame that is currently rendering.
         if (_currentFrame > -1)
@@ -85,6 +94,7 @@ public partial class GraphicsDevice
             PresentationParameters.BackBufferHeight,
             PresentationParameters.BackBufferFormat,
             PresentationParameters.DepthStencilFormat,
+            PresentationParameters.MultiSampleCount,
             PresentationParameters.PresentationInterval.GetSyncInterval());
 
         _viewport = new Viewport(
@@ -152,6 +162,24 @@ public partial class GraphicsDevice
 
     private unsafe void PlatformDispose()
     {
+        foreach (var vb in _userVertexBuffers.Values)
+            vb.Dispose();
+        _userVertexBuffers.Clear();
+
+        if (_userIndexBuffer16 != null)
+        {
+            _userIndexBuffer16.Dispose();
+            _userIndexBuffer16 = null;
+        }
+
+        if (_userIndexBuffer32 != null)
+        {
+            _userIndexBuffer32.Dispose();
+            _userIndexBuffer32 = null;
+        }
+
+        DefaultTexture.Dispose();
+
         if (Handle != null)
         {
             MGG.GraphicsDevice_Destroy(Handle);
@@ -307,7 +335,7 @@ public partial class GraphicsDevice
         }
 
         if (_vertexBuffersDirty)
-       {
+        {
             for (var slot = 0; slot < _vertexBuffers.Count; slot++)
             {
                 var vertexBufferBinding = _vertexBuffers.Get(slot);

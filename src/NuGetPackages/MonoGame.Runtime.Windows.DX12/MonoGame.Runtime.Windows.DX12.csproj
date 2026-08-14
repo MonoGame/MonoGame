@@ -1,9 +1,16 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
-    <Content Include="..\..\..\Artifacts\native\mgruntime\windowsdx\windows\Release\mgruntime.dll"
-      Condition="Exists('..\..\..\Artifacts\native\mgruntime\windowsdx\windows\Release\mgruntime.dll')">
+    <!-- x64 -->
+    <Content Include="..\..\..\Artifacts\native\mgruntime\windowsdx\windows\x64\Release\mgruntime.dll"
+      Condition="Exists('..\..\..\Artifacts\native\mgruntime\windowsdx\windows\x64\Release\mgruntime.dll')">
       <PackagePath>runtimes\win-x64\native</PackagePath>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <!-- arm64 -->
+    <Content Include="..\..\..\Artifacts\native\mgruntime\windowsdx\windows\arm64\Release\mgruntime.dll"
+      Condition="Exists('..\..\..\Artifacts\native\mgruntime\windowsdx\windows\arm64\Release\mgruntime.dll')">
+      <PackagePath>runtimes\win-arm64\native</PackagePath>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>

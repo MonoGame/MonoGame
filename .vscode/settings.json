@@ -2,5 +2,9 @@
     "dotnetCoreExplorer.searchpatterns": [
         "Artifacts/Tests/**/MonoGame.Tests.dll",
         "Artifacts/Tests/**/MonoGame.Tools.Tests.dll"
-    ]
+    ],
+    "github.copilot.enable": {
+        "*": false
+    },
+    "chat.agent.enabled": false
 }

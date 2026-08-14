@@ -40,6 +40,18 @@ namespace Microsoft.Xna.Framework.Graphics
             throw new NotImplementedException();
         }
 
+        private void PlatformSetDataInternal<T>(
+            int offsetInBytes,
+            Span<T> data,
+            int elementCount,
+            int vertexStride,
+            SetDataOptions options,
+            int bufferSize,
+            int elementSizeInBytes)
+        {
+            throw new NotImplementedException();
+        }
+
         private void PlatformGraphicsDeviceResetting()
         {
             throw new NotImplementedException();

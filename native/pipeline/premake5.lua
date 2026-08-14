@@ -1,9 +1,34 @@
 -- MonoGame - Copyright (C) MonoGame Foundation, Inc
 -- This file is subject to the terms and conditions defined in
 -- file 'LICENSE.txt', which is part of this source code package.
-function pipeline_native()
-    platform_target_path = "../../Artifacts/native/mgpipeline/%{cfg.system}/%{cfg.buildcfg}"
+newoption {
+    trigger = "arch",
+    value = "ARCH",
+    description = "Target architecture (x64 or arm64)",
+    default = "x64",
+    allowed = {
+        { "x64", "64-bit x86" },
+        { "arm64", "64-bit ARM" }
+    }
+}
 
+function pipeline_native()
+    if os.target() == "windows" then
+        filter "platforms:x64"
+        architecture "x86_64"
+        filter "platforms:arm64"
+        architecture "ARM64"
+        filter {}
+        platform_target_path = "../../Artifacts/native/mgpipeline/%{cfg.system}/%{cfg.platform}/%{cfg.buildcfg}"
+    else
+        local target_arch = _OPTIONS["arch"] or "x64"
+        architecture(target_arch == "arm64" and "ARM64" or "x64")
+        if os.target() == "macosx" then
+            platform_target_path = "../../Artifacts/native/mgpipeline/%{cfg.system}/%{cfg.buildcfg}"
+        else
+            platform_target_path = "../../Artifacts/native/mgpipeline/%{cfg.system}/" .. target_arch .. "/%{cfg.buildcfg}"
+        end
+    end
     kind "SharedLib"
     language "C++"
 
@@ -11,7 +36,6 @@ function pipeline_native()
              "STB_IMAGE_RESIZE_IMPLEMENTATION"}
 
     filter "system:windows"
-    architecture "x64"
     defines {"STBI_WINDOWS_UTF8", "STBIW_WINDOWS_UTF8"}
 
     filter "system:linux"
@@ -28,6 +52,9 @@ end
 
 workspace "pipeline"
 configurations {"Debug", "Release"}
+if os.target() == "windows" then
+    platforms { "x64", "arm64" }
+end
 
 project "mgpipeline"
 pipeline_native()

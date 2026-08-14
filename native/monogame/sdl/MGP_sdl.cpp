@@ -190,13 +190,30 @@ struct MGP_Cursor
 
 MGP_Platform* MGP_Platform_Create(MGGameRunBehavior& behavior)
 {
-	// Check if SDL is already initialized to avoid reference count overflow
+    // NOTE: Use this on Windows when you see:
+    //
+    // Detected memory leaks!
+    // Dumping objects ->
+    // {327} normal block at 0x000001AFF5CB3F10, 120 bytes long.
+    //
+    // The number in the {} is the allocation number.  Put it below
+    // to have the debugger stop on that allocation so you can
+    // identify the source of the memory leak.
+    //
+    //_CrtSetBreakAlloc(327);
+
 	if (SDL_WasInit(0) == 0) {
-		SDL_Init(
+		if (SDL_Init(
 			SDL_INIT_VIDEO |
 			SDL_INIT_JOYSTICK |
 			SDL_INIT_GAMECONTROLLER |
-			SDL_INIT_HAPTIC);
+			SDL_INIT_HAPTIC) < 0)
+		{
+			printf("SDL_Init failed: %s\n", SDL_GetError());
+            fflush(stdout);
+
+			return nullptr;
+		}
 	}
 
 	SDL_DisableScreenSaver();
@@ -425,10 +442,11 @@ mgbyte MGP_Platform_PollEvent(MGP_Platform* platform, MGP_Event& event_)
             auto controller = SDL_GameControllerOpen(ev.cdevice.which);
             if (controller != nullptr)
             {
-                platform->controllers.emplace(ev.cdevice.which, controller);
+                auto instanceId = SDL_JoystickInstanceID(SDL_GameControllerGetJoystick(controller));
+                platform->controllers.emplace(instanceId, controller);
                 event_.Type = MGEventType::ControllerAdded;
                 event_.Timestamp = ev.cdevice.timestamp;
-                event_.Controller.Id = ev.cdevice.which;
+                event_.Controller.Id = instanceId;
                 event_.Controller.Input = MGControllerInput::INVALID;
                 event_.Controller.Value = 0;
                 return true;
@@ -722,6 +740,16 @@ MGP_Window* MGP_Window_Create(
     title = title ? title : "";
 
 	window->window = SDL_CreateWindow((const char*)title, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, width, height, flags);
+	
+	if (window->window == nullptr)
+	{
+		printf("SDL_CreateWindow failed: %s\n", SDL_GetError());
+        fflush(stdout);
+
+		delete window;
+		return nullptr;
+	}
+
     window->windowId = SDL_GetWindowID(window->window);
 
 	platform->windows.push_back(window);

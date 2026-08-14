@@ -34,8 +34,6 @@ internal partial class GraphicsCapabilities
         SupportsSeparateBlendStates = true;
 
         MaxTextureAnisotropy = (device.GraphicsProfile == GraphicsProfile.Reach) ? 2 : 16;
-
-        _maxMultiSampleCount = 4;// GetMaxMultiSampleCount(device);
     }
 
 }
