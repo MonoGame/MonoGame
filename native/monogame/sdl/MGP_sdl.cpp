@@ -706,7 +706,7 @@ mgbyte MGP_Platform_BeforeDraw(MGP_Platform* platform)
     // This code assume that we only have one primary window. If we ever implement multi-window support, this will need to be changed.
     for (auto window : platform->windows)
     {
-        if (window != nullptr)
+        if (window != nullptr && window->window != nullptr)
         {
             auto flags = SDL_GetWindowFlags(window->window);
             if ((flags & SDL_WINDOW_MINIMIZED) != 0)
@@ -717,19 +717,19 @@ mgbyte MGP_Platform_BeforeDraw(MGP_Platform* platform)
 	return true;
 }
 
-MGP_Window* MGP_Window_Create(
-    MGP_Platform* platform,
+static mgbyte MGP_Window_CreateNativeWindowInternal(
+    MGP_Window* window,
     mgint& width,
     mgint& height,
     const char* title,
-    const MGP_OpenGLWindowCreateInfo* openGLCreateInfo)
+    const MGP_WindowCreateInfo* windowCreateInfo)
 {
-	assert(platform != nullptr);
+	assert(window!= nullptr);
     assert(width > 0);
     assert(height > 0);
 
-	auto window = new MGP_Window();
-	window->platform = platform;
+    if (window->window != nullptr)
+        return true;
 
     // TODO: Why did this start with SDL_WINDOW_FULLSCREEN_DESKTOP in the old C# SDL?
     // We should write coments to document odd behaviors like this.
@@ -743,15 +743,15 @@ MGP_Window* MGP_Window_Create(
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 1);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
     SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
-    SDL_GL_SetAttribute(SDL_GL_RED_SIZE, openGLCreateInfo != nullptr ? openGLCreateInfo->redSize : 8);
-    SDL_GL_SetAttribute(SDL_GL_GREEN_SIZE, openGLCreateInfo != nullptr ? openGLCreateInfo->greenSize : 8);
-    SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE, openGLCreateInfo != nullptr ? openGLCreateInfo->blueSize : 8);
-    SDL_GL_SetAttribute(SDL_GL_ALPHA_SIZE, openGLCreateInfo != nullptr ? openGLCreateInfo->alphaSize : 8);
-    SDL_GL_SetAttribute(SDL_GL_FRAMEBUFFER_SRGB_CAPABLE, openGLCreateInfo != nullptr ? openGLCreateInfo->framebufferSrgbCapable : 0);
-    SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, openGLCreateInfo != nullptr ? openGLCreateInfo->depthSize : 24);
-    SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, openGLCreateInfo != nullptr ? openGLCreateInfo->stencilSize : 8);
-    SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, openGLCreateInfo != nullptr ? openGLCreateInfo->multiSampleBuffers : 0);
-    SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, openGLCreateInfo != nullptr ? openGLCreateInfo->multiSampleSamples : 0);
+    SDL_GL_SetAttribute(SDL_GL_RED_SIZE, windowCreateInfo != nullptr ? windowCreateInfo->redSize : 8);
+    SDL_GL_SetAttribute(SDL_GL_GREEN_SIZE, windowCreateInfo != nullptr ? windowCreateInfo->greenSize : 8);
+    SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE, windowCreateInfo != nullptr ? windowCreateInfo->blueSize : 8);
+    SDL_GL_SetAttribute(SDL_GL_ALPHA_SIZE, windowCreateInfo != nullptr ? windowCreateInfo->alphaSize : 8);
+    SDL_GL_SetAttribute(SDL_GL_FRAMEBUFFER_SRGB_CAPABLE, windowCreateInfo != nullptr ? windowCreateInfo->framebufferSrgbCapable : 0);
+    SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, windowCreateInfo != nullptr ? windowCreateInfo->depthSize : 24);
+    SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, windowCreateInfo != nullptr ? windowCreateInfo->stencilSize : 8);
+    SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, windowCreateInfo != nullptr ? windowCreateInfo->multiSampleBuffers : 0);
+    SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, windowCreateInfo != nullptr ? windowCreateInfo->multiSampleSamples : 0);
     SDL_GL_SetAttribute(SDL_GL_ACCELERATED_VISUAL, 1);
 #if defined(__APPLE__)
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_FLAGS, SDL_GL_CONTEXT_FORWARD_COMPATIBLE_FLAG);
@@ -771,16 +771,50 @@ MGP_Window* MGP_Window_Create(
 	{
 		printf("SDL_CreateWindow failed: %s\n", SDL_GetError());
         fflush(stdout);
-
-		delete window;
-		return nullptr;
+        return false;
 	}
 
     window->windowId = SDL_GetWindowID(window->window);
+    return true;
+}
 
-	platform->windows.push_back(window);
+MGP_Window* MGP_Window_Create(
+    MGP_Platform* platform,
+    mgint& width,
+    mgint& height,
+    const char* title,
+    const MGP_WindowCreateInfo* windowCreateInfo)
+{
+    assert(platform != nullptr);
+    assert(width > 0);
+    assert(height > 0);
 
-	return window;
+    auto window = new MGP_Window();
+    window->platform = platform;
+
+    platform->windows.push_back(window);
+
+#if defined(MG_VULKAN) || defined(MG_DIRECTX12)
+    if (!MGP_Window_CreateNativeWindowInternal(window, width, height, title, windowCreateInfo))
+    {
+        mg_remove(platform->window, window);
+        delete window;
+        return nullptr;
+    }
+#endif
+
+    return window;
+}
+
+mgbyte MGP_Window_CreateNativeWindow(
+    MGP_Window* window,
+    mgint& width,
+    mgint& height,
+    const char* title,
+    const MGP_WindowCreateInfo* windowCreateInfo)
+{
+    assert(window != nullptr);
+    return MGP_Window_CreateNativeWindowInternal(window, width, height, title, windowCreateInfo);
 }
 
 void MGP_Window_Destroy(MGP_Window* window)
@@ -788,8 +822,8 @@ void MGP_Window_Destroy(MGP_Window* window)
 	assert(window != nullptr);
 	assert(window->platform != nullptr);
 
-	assert(window->window != nullptr);
-	SDL_DestroyWindow(window->window);
+	if(window->window != nullptr);
+	    SDL_DestroyWindow(window->window);
 
 	mg_remove(window->platform->windows, window);
 	delete window;
@@ -808,7 +842,6 @@ void MGP_Window_SetIconBitmap(MGP_Window* window, mgbyte* icon, mgint length)
 void* MGP_Window_GetNativeHandle(MGP_Window* window)
 {
 	assert(window != nullptr);
-	assert(window->window != nullptr);
 	return window->window;
 }
 

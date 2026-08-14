@@ -13,7 +13,11 @@ namespace Microsoft.Xna.Framework;
 
 internal class NativeGameWindow : GameWindow
 {
+    // Logical native window object.
     internal unsafe MGP_Window* _handle;
+
+    // Actual created native window handle.
+    private IntPtr _nativeHandle;
 
     private static readonly Dictionary<nint, NativeGameWindow> _windows = new Dictionary<nint, NativeGameWindow>();
 
@@ -29,8 +33,9 @@ internal class NativeGameWindow : GameWindow
 
     private int _width;
     private int _height;
-    private IntPtr _nativeHandle;
     private byte[] _icon;
+
+    private bool HasCreatedWindow => _nativeHandle != IntPtr.Zero;
 
     public static NativeGameWindow FromHandle(nint handle)
     {
@@ -44,7 +49,7 @@ internal class NativeGameWindow : GameWindow
     {
         get
         {
-            if (_handle == null)
+            if (!HasCreatedWindow)
                 return _allowUserResizing;
 
             return MGP.Window_GetAllowUserResizing(_handle) == 0 ? false : true;
@@ -54,7 +59,7 @@ internal class NativeGameWindow : GameWindow
         {
             _allowUserResizing = value;
 
-            if (_handle != null)
+            if (HasCreatedWindow)
                 MGP.Window_SetAllowUserResizing(_handle, (byte)(value ? 1 : 0));
         }
     }
@@ -62,7 +67,7 @@ internal class NativeGameWindow : GameWindow
     {
         get
         {
-            if (_handle == null)
+            if (!HasCreatedWindow)
                 return _borderless;
 
             return MGP.Window_GetIsBorderless(_handle) == 0 ? false : true;
@@ -72,7 +77,7 @@ internal class NativeGameWindow : GameWindow
         {
             _borderless = value;
 
-            if (_handle != null)
+            if (HasCreatedWindow)
                 MGP.Window_SetIsBorderless(_handle, (byte)(value ? 1 : 0));
         }
     }
@@ -100,7 +105,7 @@ internal class NativeGameWindow : GameWindow
             int x = 0;
             int y = 0;
 
-            if (_handle == null)
+            if (!HasCreatedWindow)
             {
                 if (_hasPendingPosition)
                 {
@@ -121,7 +126,7 @@ internal class NativeGameWindow : GameWindow
             _positionX = value.X;
             _positionY = value.Y;
 
-            if (_handle != null)
+            if (HasCreatedWindow)
                 MGP.Window_SetPosition(_handle, value.X, value.Y);
         }
     }
@@ -147,14 +152,7 @@ internal class NativeGameWindow : GameWindow
 
         _icon = AssemblyHelper.GetDefaultWindowIcon();
 
-#if OPENGL
-        // OpenGL needs the presentation parameters first so the window can be
-        // created later with the right SDL_GL attributes.
-        //
-        // So we skip window creation for OpenGL path here and delay it.
-#else
         CreateWindow();
-#endif
     }
 
     internal unsafe void Destroy()
@@ -184,28 +182,41 @@ internal class NativeGameWindow : GameWindow
 
         // Create the window which size may be changed by the platform
         _handle = MGP.Window_Create(_platform.Handle, ref _width, ref _height, title);
-        AttachWindow();
-    }
-
-    internal unsafe void CreateWindow(MGP_OpenGLWindowCreateInfo openGLCreateInfo)
-    {
-        if (_handle != null)
-            return;
-
-        string title = Title == null ? AssemblyHelper.GetDefaultWindowTitle() : Title;
-
-        // Create the window which size may be changed by the platform
-        _handle = MGP.Window_Create(_platform.Handle, ref _width, ref _height, title, ref openGLCreateInfo);
-        AttachWindow();
-    }
-
-    private unsafe void AttachWindow()
-    {
         if (_handle == null)
             throw new NoSuitableGraphicsDeviceException("Failed to initialize SDL window!");
 
         _windows[(nint)_handle] = this;
+        TryAttachWindow();
+    }
+
+    internal unsafe void CreateWindow(MGP_WindowCreateInfo windowCreateInfo)
+    {
+        if (_handle == null)
+            CreateWindow();
+
+        if (HasCreatedWindow)
+            return;
+
+        string title = Title == null ? AssemblyHelper.GetDefaultWindowTitle() : Title;
+
+        if (MGP.Window_CreateNativeWindow(_handle, ref _width, ref _height, title, ref windowCreateInfo) == 0)
+            throw new NoSuitableGraphicsDeviceException("Failed to initialize native window!");
+
+        if (!TryAttachWindow())
+            throw new NoSuitableGraphicsDeviceException("Failed to initialize native window!");
+    }
+
+    private unsafe bool TryAttachWindow()
+    {
+        if (_handle == null)
+            return false;
+
+        if (HasCreatedWindow)
+            return true;
+
         _nativeHandle = MGP.Window_GetNativeHandle(_handle);
+        if (_nativeHandle == IntPtr.Zero)
+            return false;
 
         if (_icon != null)
         {
@@ -233,6 +244,8 @@ internal class NativeGameWindow : GameWindow
             Mouse.WindowHandle = Handle;
             MessageBox._window = _handle;
         }
+
+        return true;
     }
 
     public override void BeginScreenDeviceChange(bool willBeFullScreen)
@@ -258,14 +271,14 @@ internal class NativeGameWindow : GameWindow
             IsFullScreen = pp.IsFullScreen;
             HardwareModeSwitch = pp.HardwareModeSwitch;
 
-            if (_handle != null)
+            if (HasCreatedWindow)
                 MGP.Window_EnterFullScreen(_handle, (byte)(HardwareModeSwitch ? 1 : 0));
         }
         else if (!pp.IsFullScreen && IsFullScreen)
         {
             IsFullScreen = pp.IsFullScreen;
 
-            if (_handle != null)
+            if (HasCreatedWindow)
                 MGP.Window_ExitFullScreen(_handle);
         }
 
@@ -275,7 +288,7 @@ internal class NativeGameWindow : GameWindow
         _width = pp.BackBufferWidth;
         _height = pp.BackBufferHeight;
 
-        if (_handle != null)
+        if (HasCreatedWindow)
             MGP.Window_SetClientSize(_handle, pp.BackBufferWidth, pp.BackBufferHeight);
     }
 
@@ -287,7 +300,7 @@ internal class NativeGameWindow : GameWindow
         _width = width;
         _height = height;
 
-        if (_handle != null)
+        if (HasCreatedWindow)
             MGP.Window_SetClientSize(_handle, width, height);
 
         _platform.Game.GraphicsDevice.PresentationParameters.BackBufferWidth = width;
@@ -299,7 +312,7 @@ internal class NativeGameWindow : GameWindow
 
     protected override unsafe void SetTitle(string title)
     {
-        if (_handle != null)
+        if (HasCreatedWindow)
             MGP.Window_SetTitle(_handle, title);
     }
 
@@ -307,7 +320,7 @@ internal class NativeGameWindow : GameWindow
     {
         _visible = show;
 
-        if (_handle != null)
+        if (HasCreatedWindow)
             MGP.Window_Show(_handle, (byte)(show ? 1 : 0));
     }
 }

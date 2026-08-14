@@ -209,7 +209,7 @@ internal struct MGP_ControllerCaps
 }
 
 [StructLayout(LayoutKind.Sequential)]
-internal struct MGP_OpenGLWindowCreateInfo
+internal struct MGP_WindowCreateInfo
 {
     public int RedSize;
     public int GreenSize;
@@ -301,18 +301,26 @@ internal static unsafe partial class MGP
         ref int width,
         ref int height,
         [MarshalAs(UnmanagedType.LPUTF8Str)] string title,
-        MGP_OpenGLWindowCreateInfo* openGLCreateInfo);
+        MGP_WindowCreateInfo* openGLCreateInfo);
+
+    [DllImport(MonoGameNativeDLL, EntryPoint = "MGP_Window_CreateNativeWindow", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    private static extern byte _Window_CreateNativeWindow(
+        MGP_Window* window,
+        ref int width,
+        ref int height,
+        [MarshalAs(UnmanagedType.LPUTF8Str)] string title,
+        MGP_WindowCreateInfo* windowCreateinfo);
 
     public static MGP_Window* Window_Create(MGP_Platform* platform, ref int width, ref int height, string title)
     {
         return _Window_Create(platform, ref width, ref height, title, null);
     }
 
-    public static MGP_Window* Window_Create(MGP_Platform* platform, ref int width, ref int height, string title, ref MGP_OpenGLWindowCreateInfo openGLCreateInfo)
+    public static byte Window_CreateNativeWindow(MGP_Window* window, ref int width, ref int height, string title, ref MGP_WindowCreateInfo windowCreateInfo)
     {
-        fixed (MGP_OpenGLWindowCreateInfo* openGLCreateInfoPtr = &openGLCreateInfo)
+        fixed (MGP_WindowCreateInfo* windowCreateInfoPtr = &windowCreateInfo)
         {
-            return _Window_Create(platform, ref width, ref height, title, openGLCreateInfoPtr);
+            return _Window_CreateNativeWindow(window, ref width, ref height, title, windowCreateInfoPtr);
         }
     }
 

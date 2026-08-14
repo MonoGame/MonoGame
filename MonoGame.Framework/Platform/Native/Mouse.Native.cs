@@ -2,8 +2,8 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
-using MonoGame.Interop;
 using System;
+using MonoGame.Interop;
 
 namespace Microsoft.Xna.Framework.Input;
 
@@ -35,7 +35,7 @@ public static partial class Mouse
         PrimaryWindow.MouseState.Y = y;
 
         var window = PrimaryWindow as NativeGameWindow;
-        if (window._handle == null)
+        if (window == null || window.Handle == null)
             return;
 
         MGP.Mouse_WarpPosition(window._handle, x, y);
@@ -46,7 +46,7 @@ public static partial class Mouse
         // TODO: Multiple window support?
 
         var window = PrimaryWindow as NativeGameWindow;
-        if (window._handle == null)
+        if (window == null || window.Handle == IntPtr.Zero)
             return;
 
         MGP.Window_SetCursor(window._handle, (MGP_Cursor*)cursor.Handle);
