@@ -113,6 +113,7 @@
   
   <Import Project="..\external\CppNet\CppNet.targets" />
 
+  <Import Project="..\Switch2\MonoGame.Framework.Content.Pipeline.targets" Condition="exists('..\Switch2\MonoGame.Framework.Content.Pipeline.targets')" />
   <Import Project="..\Switch\MonoGame.Framework.Content.Pipeline.targets" Condition="exists('..\Switch\MonoGame.Framework.Content.Pipeline.targets')" />
   <Import Project="..\XBoxOne\MonoGame.Framework.Content.Pipeline.targets" Condition="exists('..\XBoxOne\MonoGame.Framework.Content.Pipeline.targets')" />
   <Import Project="..\PlayStation4\MonoGame.Framework.Content.Pipeline.targets" Condition="exists('..\PlayStation4\MonoGame.Framework.Content.Pipeline.targets')" />
@@ -120,6 +121,7 @@
   <Import Project="..\PSVita\MonoGame.Framework.Content.Pipeline.targets" Condition="exists('..\PSVita\MonoGame.Framework.Content.Pipeline.targets')" />
   <Import Project="..\GDKX\MonoGame.Framework.Content.Pipeline.targets" Condition="exists('..\GDKX\MonoGame.Framework.Content.Pipeline.targets')" />
 
+  <Import Project="..\Switch2\MonoGame.Effect.Compiler.targets" Condition="exists('..\Switch2\MonoGame.Effect.Compiler.targets')" />
   <Import Project="..\Switch\MonoGame.Effect.Compiler.targets" Condition="exists('..\Switch\MonoGame.Effect.Compiler.targets')" />
   <Import Project="..\XBoxOne\MonoGame.Effect.Compiler.targets" Condition="exists('..\XBoxOne\MonoGame.Effect.Compiler.targets')" />
   <Import Project="..\PlayStation4\MonoGame.Effect.Compiler.targets" Condition="exists('..\PlayStation4\MonoGame.Effect.Compiler.targets')" />
@@ -134,8 +136,8 @@
     <Exec Command="premake5 vs2022" WorkingDirectory="../native/pipeline/" />
     <!-- Build x64 -->
     <Exec Command="&quot;$(MGMSBuild)&quot; pipeline.sln /p:Configuration=$(Configuration) /p:Platform=x64" WorkingDirectory="../native/pipeline/" />
-    <!-- Build arm64 (cross-compile on same host) -->
-    <Exec Command="&quot;$(MGMSBuild)&quot; pipeline.sln /p:Configuration=$(Configuration) /p:Platform=ARM64" WorkingDirectory="../native/pipeline/" />
+    <!-- Build arm64 (cross-compile on same host) when building from CI -->
+    <Exec Command="&quot;$(MGMSBuild)&quot; pipeline.sln /p:Configuration=$(Configuration) /p:Platform=ARM64" WorkingDirectory="../native/pipeline/" Condition="'$(BuildingInsideVisualStudio)' != 'true'" />
   </Target>
 
   <Target Name="BuildMGCPU" Condition="'$(DisableNativeBuild)' != 'True' and '$(OS)' != 'Windows_NT'" BeforeTargets="CollectPackageReferences">

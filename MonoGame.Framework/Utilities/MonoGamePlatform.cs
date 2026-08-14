@@ -73,5 +73,10 @@ namespace MonoGame.Framework.Utilities
         /// Cross platform desktop using Vulkan.
         /// </summary>
         DesktopVK,
+
+        /// <summary>
+        /// Nintendo Switch 2 platform.
+        /// </summary>
+        NintendoSwitch2,
     }
 }
