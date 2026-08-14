@@ -46,11 +46,11 @@ namespace Microsoft.Xna.Framework.Graphics
 
         private void PlatformGetData<T>(int offsetInBytes, T[] data, int startIndex, int elementCount) where T : struct
         {
-#if GLES
             // Buffers are write-only on OpenGL ES 1.1 and 2.0.  See the GL_OES_mapbuffer extension for more information.
             // http://www.khronos.org/registry/gles/extensions/OES/OES_mapbuffer.txt
-            throw new NotSupportedException("Index buffers are write-only on OpenGL ES platforms");
-#else
+            if (GraphicsDevice != null && !GraphicsDevice.GraphicsCapabilities.SupportsMapBuffer)
+                throw new NotSupportedException("IndexBuffer.GetData is not supported on OpenGL ES versions below 3.0. Index buffers are write-only on those OpenGL ES platforms");
+
             if (Threading.IsOnUIThread())
             {
                 GetBufferData(offsetInBytes, data, startIndex, elementCount);
@@ -59,38 +59,64 @@ namespace Microsoft.Xna.Framework.Graphics
             {
                 Threading.BlockOnUIThread(() => GetBufferData(offsetInBytes, data, startIndex, elementCount));
             }
-#endif
         }
 
-#if !GLES
         private void GetBufferData<T>(int offsetInBytes, T[] data, int startIndex, int elementCount) where T : struct
         {
             GL.BindBuffer(BufferTarget.ElementArrayBuffer, ibo);
             GraphicsExtensions.CheckGLError();
+
             var elementSizeInByte = Marshal.SizeOf<T>();
-            IntPtr ptr = GL.MapBuffer(BufferTarget.ElementArrayBuffer, BufferAccess.ReadOnly);
-            // Pointer to the start of data to read in the index buffer
+            var dataSize = elementCount * elementSizeInByte;
+            IntPtr ptr;
+
+#if GLES
+            if (GraphicsDevice != null && !GraphicsDevice.GraphicsCapabilities.SupportsMapBuffer)
+                throw new NotSupportedException("IndexBuffer.GetBufferData is not supported on OpenGL ES versions below 3.0.");
+
+            ptr = GL.MapBufferRange(
+                BufferTarget.ElementArrayBuffer,
+                (IntPtr)offsetInBytes,
+                (IntPtr)dataSize,
+                (int)GL.MapBufferAccessMask.MapReadBit);
+#else
+            // Desktop OpenGL uses glMapBuffer and adjusts the pointer
+            ptr = GL.MapBuffer(BufferTarget.ElementArrayBuffer, BufferAccess.ReadOnly);
             ptr = new IntPtr(ptr.ToInt64() + offsetInBytes);
-            if (typeof(T) == typeof(byte))
-            {
-                byte[] buffer = data as byte[];
-                // If data is already a byte[] we can skip the temporary buffer
-                // Copy from the index buffer to the destination array
-                Marshal.Copy(ptr, buffer, startIndex * elementSizeInByte, elementCount * elementSizeInByte);
-            }
-            else
-            {
-                // Temporary buffer to store the copied section of data
-                byte[] buffer = new byte[elementCount * elementSizeInByte];
-                // Copy from the index buffer to the temporary buffer
-                Marshal.Copy(ptr, buffer, 0, buffer.Length);
-                // Copy from the temporary buffer to the destination array
-                Buffer.BlockCopy(buffer, 0, data, startIndex * elementSizeInByte, elementCount * elementSizeInByte);
-            }
-            GL.UnmapBuffer(BufferTarget.ElementArrayBuffer);
-            GraphicsExtensions.CheckGLError();
-        }
 #endif
+
+            GraphicsExtensions.CheckGLError();
+
+            if (ptr == IntPtr.Zero)
+            {
+                throw new InvalidOperationException("Failed to map index buffer for reading");
+            }
+
+            try
+            {
+                if (typeof(T) == typeof(byte))
+                {
+                    byte[] buffer = data as byte[];
+                    // If data is already a byte[] we can skip the temporary buffer
+                    // Copy from the index buffer to the destination array
+                    Marshal.Copy(ptr, buffer, startIndex * elementSizeInByte, elementCount * elementSizeInByte);
+                }
+                else
+                {
+                    // Temporary buffer to store the copied section of data
+                    byte[] buffer = new byte[elementCount * elementSizeInByte];
+                    // Copy from the index buffer to the temporary buffer
+                    Marshal.Copy(ptr, buffer, 0, buffer.Length);
+                    // Copy from the temporary buffer to the destination array
+                    Buffer.BlockCopy(buffer, 0, data, startIndex * elementSizeInByte, elementCount * elementSizeInByte);
+                }
+            }
+            finally
+            {
+                GL.UnmapBuffer(BufferTarget.ElementArrayBuffer);
+                GraphicsExtensions.CheckGLError();
+            }
+        }
 
         private void PlatformSetData<T>(int offsetInBytes, T[] data, int startIndex, int elementCount, SetDataOptions options)
             where T : struct
