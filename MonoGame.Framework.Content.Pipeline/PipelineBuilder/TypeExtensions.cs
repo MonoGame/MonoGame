@@ -2,7 +2,6 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
-using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 
 namespace MonoGame.Framework.Content.Pipeline.Builder
@@ -17,20 +16,14 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
         /// </summary>
         /// <param name="color">The color to convert.</param>
         /// <returns>The converted color.</returns>
-        public static Color ToColor(this System.Drawing.Color color)
-        {
-            return new Color(color.R, color.G, color.B, color.A);
-        }
+        public static Color ToColor(this System.Drawing.Color color) => new(color.R, color.G, color.B, color.A);
 
         /// <summary>
         /// Takes a <see cref="System.Drawing.Color">System.Drawing.Color</see> and converts it to a <see cref="Vector3">Vector3</see>.
         /// </summary>
         /// <param name="color">The color to convert.</param>
         /// <returns>The resulting <see cref="Vector3"/>.</returns>
-        public static Vector3 ToVector3(this System.Drawing.Color color)
-        {
-            return new Vector3(color.R / 255.0f, color.G / 255.0f, color.B / 255.0f);
-        }
+        public static Vector3 ToVector3(this System.Drawing.Color color) => new(color.R / 255.0f, color.G / 255.0f, color.B / 255.0f);
 
         /// <summary>
         /// Adds an item to the list if it is not already present.

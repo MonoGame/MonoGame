@@ -12,6 +12,16 @@
     <AppendTargetFrameworkToOutputPath>False</AppendTargetFrameworkToOutputPath>
     <AssemblyName>mgfxc</AssemblyName>
     <UseAppHost>true</UseAppHost>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <!-- NU5100 - NuGet warns if we copy assemblies but don't reference them. -->
+    <!-- NU5118 - NuGet warns if we duplicate include executable. -->
+    <!-- NETSDK1206 - Disable nuget rid complaining. -->
+    <NoWarn>NU5100;NU5118;NETSDK1206</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>
@@ -39,6 +49,7 @@
   
   <Import Project="..\..\external\CppNet\CppNet.targets" />
 
+  <Import Project="..\..\Switch2\MonoGame.Effect.Compiler.targets" Condition="exists('..\..\Switch2\MonoGame.Effect.Compiler.targets')" />
   <Import Project="..\..\Switch\MonoGame.Effect.Compiler.targets" Condition="exists('..\..\Switch\MonoGame.Effect.Compiler.targets')" />
   <Import Project="..\..\XBoxOne\MonoGame.Effect.Compiler.targets" Condition="exists('..\..\XBoxOne\MonoGame.Effect.Compiler.targets')" />
   <Import Project="..\..\PlayStation4\MonoGame.Effect.Compiler.targets" Condition="exists('..\..\PlayStation4\MonoGame.Effect.Compiler.targets')" />

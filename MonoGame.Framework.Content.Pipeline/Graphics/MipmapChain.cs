@@ -12,19 +12,15 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
     public sealed class MipmapChain : Collection<BitmapContent>
     {
         /// <summary>
-        /// Initializes a new instance of MipmapChain.
-        /// </summary>
-        public MipmapChain()
-        {
-        }
-
-        /// <summary>
-        /// Initializes a new instance of MipmapChain with the specified mipmap.
+        /// Initializes a new instance of MipmapChainp.
         /// </summary>
         /// <param name="bitmap"></param>
-        public MipmapChain(BitmapContent bitmap)
+        public MipmapChain(BitmapContent? bitmap = null)
         {
-            Add(bitmap);
+            if (bitmap != null)
+            {
+                Add(bitmap);
+            }
         }
 
         /// <summary>
@@ -32,9 +28,6 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
         /// </summary>
         /// <param name="bitmap">Bitmap used for the mipmap chain.</param>
         /// <returns>Resultant mipmap chain.</returns>
-        public static implicit operator MipmapChain(BitmapContent bitmap)
-        {
-            return new MipmapChain(bitmap);
-        }
+        public static implicit operator MipmapChain(BitmapContent bitmap) => new(bitmap);
     }
 }

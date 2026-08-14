@@ -730,48 +730,44 @@ namespace Microsoft.Xna.Framework.Graphics
             var color = 0;
             var depth = 0;
             var stencil = 0;
-            var colorIsRenderbuffer = false;
 
             color = renderTarget.GLColorBuffer;
             depth = renderTarget.GLDepthBuffer;
             stencil = renderTarget.GLStencilBuffer;
-            colorIsRenderbuffer = color != 0;
 
             if (color != 0)
-            {
-                if (colorIsRenderbuffer)
-                    this.framebufferHelper.DeleteRenderbuffer(color);
-                if (stencil != 0 && stencil != depth)
-                    this.framebufferHelper.DeleteRenderbuffer(stencil);
-                if (depth != 0)
-                    this.framebufferHelper.DeleteRenderbuffer(depth);
+                this.framebufferHelper.DeleteRenderbuffer(color);
+            if (stencil != 0 && stencil != depth)
+                this.framebufferHelper.DeleteRenderbuffer(stencil);
+            if (depth != 0)
+                this.framebufferHelper.DeleteRenderbuffer(depth);
 
-                var bindingsToDelete = new List<RenderTargetBinding[]>();
-                foreach (var bindings in this.glFramebuffers.Keys)
+            // Remove cached framebuffer bindings that still reference this render target.
+            var bindingsToDelete = new List<RenderTargetBinding[]>();
+            foreach (var bindings in this.glFramebuffers.Keys)
+            {
+                foreach (var binding in bindings)
                 {
-                    foreach (var binding in bindings)
+                    if (binding.RenderTarget == renderTarget)
                     {
-                        if (binding.RenderTarget == renderTarget)
-                        {
-                            bindingsToDelete.Add(bindings);
-                            break;
-                        }
+                        bindingsToDelete.Add(bindings);
+                        break;
                     }
                 }
+            }
 
-                foreach (var bindings in bindingsToDelete)
+            foreach (var bindings in bindingsToDelete)
+            {
+                var fbo = 0;
+                if (this.glFramebuffers.TryGetValue(bindings, out fbo))
                 {
-                    var fbo = 0;
-                    if (this.glFramebuffers.TryGetValue(bindings, out fbo))
-                    {
-                        this.framebufferHelper.DeleteFramebuffer(fbo);
-                        this.glFramebuffers.Remove(bindings);
-                    }
-                    if (this.glResolveFramebuffers.TryGetValue(bindings, out fbo))
-                    {
-                        this.framebufferHelper.DeleteFramebuffer(fbo);
-                        this.glResolveFramebuffers.Remove(bindings);
-                    }
+                    this.framebufferHelper.DeleteFramebuffer(fbo);
+                    this.glFramebuffers.Remove(bindings);
+                }
+                if (this.glResolveFramebuffers.TryGetValue(bindings, out fbo))
+                {
+                    this.framebufferHelper.DeleteFramebuffer(fbo);
+                    this.glResolveFramebuffers.Remove(bindings);
                 }
             }
         }

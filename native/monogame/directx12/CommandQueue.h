@@ -57,6 +57,7 @@ class CommandListPool {
     std::wstring m_name;
 
     std::vector<CommandList*> m_freeContexts;
+    std::vector<CommandList*> m_allContexts;
 
 public:
     CommandListPool(ID3D12Device* device, CommandQueue* queue)

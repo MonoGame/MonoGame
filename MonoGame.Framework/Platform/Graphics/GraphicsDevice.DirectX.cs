@@ -611,7 +611,16 @@ namespace Microsoft.Xna.Framework.Graphics
             else
             {
                 _tempRenderTargetBinding[0] = new RenderTargetBinding(renderTarget, arraySlice);
-                SetRenderTargets(_tempRenderTargetBinding);
+                
+                try
+                {
+				    SetRenderTargets(_tempRenderTargetBinding);
+                }
+                finally
+                {
+                    // Clear temporary strong reference.
+                    _tempRenderTargetBinding[0] = default;
+                }
             }
         }
 
@@ -623,7 +632,16 @@ namespace Microsoft.Xna.Framework.Graphics
             else
             {
                 _tempRenderTargetBinding[0] = new RenderTargetBinding(renderTarget, arraySlice);
-                SetRenderTargets(_tempRenderTargetBinding);
+                
+                try
+                {
+				    SetRenderTargets(_tempRenderTargetBinding);
+                }
+                finally
+                {
+                    // Clear temporary strong reference.
+                    _tempRenderTargetBinding[0] = default;
+                }
             }
         }
 
@@ -644,10 +662,21 @@ namespace Microsoft.Xna.Framework.Graphics
             {
                 var renderTargetBinding = _currentRenderTargetBindings[i];
 
-                // Resolve MSAA render targets
-                var renderTarget = renderTargetBinding.RenderTarget as RenderTarget2D;
-                if (renderTarget != null && renderTarget.MultiSampleCount > 1)
-                    renderTarget.ResolveSubresource();
+                // Need to resolve the individual face that was just rendered.
+                // If not handled separately here, multisampled cube render targets
+                // will not be resolved with they are unbound.
+                var renderTargetCube = renderTargetBinding.RenderTarget as RenderTargetCube;
+                if (renderTargetCube != null && renderTargetCube.MultiSampleCount > 1)
+                {
+                    renderTargetCube.ResolveSubresource(renderTargetBinding.ArraySlice);
+                }
+                else
+                {
+                    // Resolve MSAA render targets
+                    var renderTarget = renderTargetBinding.RenderTarget as RenderTarget2D;
+                    if (renderTarget != null && renderTarget.MultiSampleCount > 1)
+                        renderTarget.ResolveSubresource();
+                }
 
                 // Generate mipmaps.
                 if (renderTargetBinding.RenderTarget.LevelCount > 1)

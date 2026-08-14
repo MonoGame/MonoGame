@@ -9,33 +9,39 @@ namespace MonoGame.Effect.Compiler.Effect.Spirv
 {
     internal class SpirvSampledImage
     {
-        public string Id { get; private set; }
-        public SpirvLoad LoadedSampler { get; private set; }
-        public SpirvLoad LoadedImage { get; private set; }
-        public SpirvTypeSampledImage SampleType { get; private set; }
+        public required string Id { get; init; }
+        public required SpirvLoad LoadedSampler { get; init; }
+        public required SpirvLoad LoadedImage { get; init; }
+        public required SpirvTypeSampledImage? SampleType { get; init; }
 
-        internal static SpirvSampledImage ParseSampledImage(string[] parts, SpirvReflectionInfo.SpirvParseContext context)
+        internal static SpirvSampledImage? ParseSampledImage(string[] parts, SpirvReflectionInfo.SpirvParseContext context)
         {
+            if (parts.Length < 6)
+            {
+                return null;
+            }
+
             string id = parts[0];
 
-            if (!context.Types.TryGetValue(parts[3], out SpirvTypeBase spirvTypeBase))
+            if (!context.Types.TryGetValue(parts[3], out var spirvTypeBase))
             {
                 Debug.WriteLine($"OpSampledImage {id} referenced unparsed type {parts[3]}");
                 return null;
             }
-            else if (spirvTypeBase is not SpirvTypeSampledImage)
+
+            if (spirvTypeBase is not SpirvTypeSampledImage sampledImage)
             {
                 Debug.WriteLine($"OpSampledImage {id} referenced type {spirvTypeBase.Name ?? spirvTypeBase.Id} that is not a SampledImage type");
                 return null;
             }
 
-            if (!context.Loads.TryGetValue(parts[4], out SpirvLoad imageLoad))
+            if (!context.Loads.TryGetValue(parts[4], out var imageLoad))
             {
                 Debug.WriteLine($"OpSampledImage {id} referenced unparsed image load {parts[4]}");
                 return null;
             }
 
-            if (!context.Loads.TryGetValue(parts[5], out SpirvLoad sampledLoad))
+            if (!context.Loads.TryGetValue(parts[5], out var sampledLoad))
             {
                 Debug.WriteLine($"OpSampledImage {id} referenced unparsed sampler load {parts[5]}");
                 return null;
@@ -46,7 +52,7 @@ namespace MonoGame.Effect.Compiler.Effect.Spirv
                 Id = id,
                 LoadedSampler = sampledLoad,
                 LoadedImage = imageLoad,
-                SampleType = spirvTypeBase as SpirvTypeSampledImage
+                SampleType = sampledImage
             };
         }
     }

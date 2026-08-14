@@ -218,7 +218,10 @@ namespace MonoGame.Tests.ContentPipeline
         {
             NodeContent input;
             {
-                input = new NodeContent();
+                input = new NodeContent
+                {
+                    Name = "Test"
+                };
 
                 var mesh = new MeshContent()
                 {

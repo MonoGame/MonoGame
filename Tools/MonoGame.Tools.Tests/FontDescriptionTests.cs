@@ -59,13 +59,13 @@ namespace MonoGame.Tests.ContentPipeline
             }
 
             Assert.Throws<ArgumentNullException>(() => new FontDescription(null, 1, 1));
-            Assert.Throws<ArgumentNullException>(() => new FontDescription("", 1, 1));
+            Assert.Throws<ArgumentException>(() => new FontDescription("", 1, 1));
             Assert.Throws<ArgumentOutOfRangeException>(() => new FontDescription("Aye", 0, 1));
             Assert.Throws<ArgumentOutOfRangeException>(() => new FontDescription("Aye", -1, 1));
 
             {
                 var font = new FontDescription("Bee", 1, 1);
-                
+
                 font.DefaultCharacter = 'A';
                 Assert.AreEqual('A', font.DefaultCharacter);
                 font.DefaultCharacter = null;
@@ -74,7 +74,7 @@ namespace MonoGame.Tests.ContentPipeline
                 font.FontName = "See";
                 Assert.AreEqual("See", font.FontName);
                 Assert.Throws<ArgumentNullException>(() => font.FontName = null);
-                Assert.Throws<ArgumentNullException>(() => font.FontName = "");
+                Assert.Throws<ArgumentException>(() => font.FontName = "");
 
                 font.Size = 2;
                 Assert.AreEqual(2, font.Size);

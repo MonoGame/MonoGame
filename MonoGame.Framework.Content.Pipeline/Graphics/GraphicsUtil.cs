@@ -2,8 +2,6 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
-using System;
-using System.IO;
 using System.Runtime.InteropServices;
 using Microsoft.Xna.Framework.Content.Pipeline.Processors;
 using Microsoft.Xna.Framework.Graphics;
@@ -14,11 +12,11 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 {
     public static class GraphicsUtil
     {
-        internal static BitmapContent Resize(this BitmapContent bitmap, int newWidth, int newHeight)
+        internal static T Resize<T>(this T bitmap, int newWidth, int newHeight)
+            where T : BitmapContent
         {
             BitmapContent src = bitmap;
-            SurfaceFormat format;
-            src.TryGetFormat(out format);
+            src.TryGetFormat(out var format);
             var intermediateFormat = SurfaceFormat.Vector4;
 
             switch (format)
@@ -60,10 +58,10 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
                     data = dstPtr,
                 };
 
-                IntPtr err = MGCP.MP_ResizeBitmap(ref srcBitmap, ref dstBitmap);
+                var err = MGCP.MP_ResizeBitmap(ref srcBitmap, ref dstBitmap);
                 if (err != IntPtr.Zero)
                 {
-                    string errorMsg = System.Runtime.InteropServices.Marshal.PtrToStringUTF8(err);
+                    var errorMsg = Marshal.PtrToStringUTF8(err);
                     throw new InvalidContentException($"Bitmap resize failed: {errorMsg}");
                 }
             }
@@ -75,32 +73,29 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
                     dstHandle.Free();
             }
 
-            switch (intermediateFormat)
+            src = intermediateFormat switch
             {
-                case SurfaceFormat.Color:
-                    src = new PixelBitmapContent<Color>(newWidth, newHeight);
-                    break;
-                case SurfaceFormat.Rgba64:
-                    src = new PixelBitmapContent<Rgba64>(newWidth, newHeight);
-                    break;
-                case SurfaceFormat.Vector4:
-                    src = new PixelBitmapContent<Vector4>(newWidth, newHeight);
-                    break;
-                default:
-                    throw new InvalidOperationException($"Unexpected intermediate format: {intermediateFormat}");
-            }
-
+                SurfaceFormat.Color => new PixelBitmapContent<Color>(newWidth, newHeight),
+                SurfaceFormat.Rgba64 => new PixelBitmapContent<Rgba64>(newWidth, newHeight),
+                SurfaceFormat.Vector4 => new PixelBitmapContent<Vector4>(newWidth, newHeight),
+                _ => throw new InvalidOperationException($"Unexpected intermediate format: {intermediateFormat}"),
+            };
             src.SetPixelData(newBytes);
 
             // Convert back to source type if required
             if (format != intermediateFormat)
             {
-                var s = (BitmapContent)Activator.CreateInstance(bitmap.GetType(), new object[] { newWidth, newHeight });
+                var s = (T)Activator.CreateInstance(bitmap.GetType(), [newWidth, newHeight])!;
                 BitmapContent.Copy(src, s);
                 src = s;
             }
 
-            return src;
+            if (src is not T ret)
+            {
+                throw new Exception($"Invalid return type for bitmap, expected {typeof(T)}, got {src}");
+            }
+
+            return ret;
         }
 
         public static bool IsPowerOfTwo(int x)
@@ -146,13 +141,12 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
         /// </summary>
         /// <param name="bitmap">A bitmap of full-colour floating point pixel data in RGBA or BGRA order.</param>
         /// <returns>A member of the AlphaRange enum to describe the range of alpha in the pixel data.</returns>
-		static AlphaRange CalculateAlphaRange(BitmapContent bitmap)
+        private static AlphaRange CalculateAlphaRange(BitmapContent bitmap)
         {
-			AlphaRange result = AlphaRange.Opaque;
-			var pixelBitmap = bitmap as PixelBitmapContent<Vector4>;
-			if (pixelBitmap != null)
-			{
-				for (int y = 0; y < pixelBitmap.Height; ++y)
+            var result = AlphaRange.Opaque;
+            if (bitmap is PixelBitmapContent<Vector4> pixelBitmap)
+            {
+                for (var y = 0; y < pixelBitmap.Height; ++y)
                 {
                     var row = pixelBitmap.GetRow(y);
                     foreach (var pixel in row)
@@ -162,8 +156,8 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
                         else if (pixel.W < 1.0)
                             return AlphaRange.Full;
                     }
-				}
-			}
+                }
+            }
             return result;
         }
 
@@ -180,9 +174,9 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
             var width = content.Faces[0][0].Height;
             var height = content.Faces[0][0].Width;
 
-			if (!IsPowerOfTwo(width) || !IsPowerOfTwo(height) || (width != height))
+            if (!IsPowerOfTwo(width) || !IsPowerOfTwo(height) || (width != height))
             {
-                context.Logger.LogWarning(null, content.Identity, "PVR compression requires width and height to be powers of two and equal. Falling back to 16-bit color.");
+                context.Logger.Log(LogLevel.Warning, "PVR compression requires width and height to be powers of two and equal. Falling back to 16-bit color.");
                 CompressColor16Bit(context, content);
                 return;
             }
@@ -191,10 +185,9 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 
             var alphaRange = CalculateAlphaRange(face);
 
-            if (alphaRange == AlphaRange.Opaque)
-                content.ConvertBitmapType(typeof(PvrtcRgb4BitmapContent));
-            else
-                content.ConvertBitmapType(typeof(PvrtcRgba4BitmapContent));
+            content.ConvertBitmapType(alphaRange == AlphaRange.Opaque
+                ? typeof(PvrtcRgb4BitmapContent)
+                : typeof(PvrtcRgba4BitmapContent));
         }
 
         public static void CompressDxt(ContentProcessorContext context, TextureContent content, bool isSpriteFont)
@@ -233,7 +226,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
                 content.ConvertBitmapType(typeof(Dxt5BitmapContent));
         }
 
-        static public void CompressAti(ContentProcessorContext context, TextureContent content, bool isSpriteFont)
+        public static void CompressAti(ContentProcessorContext context, TextureContent content, bool isSpriteFont)
         {
             // If sharp alpha is required (for a font texture page), use 16-bit color instead of PVR
             if (isSpriteFont)
@@ -245,13 +238,12 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
             var face = content.Faces[0][0];
             var alphaRange = CalculateAlphaRange(face);
 
-            if (alphaRange == AlphaRange.Full)
-                content.ConvertBitmapType(typeof(AtcExplicitBitmapContent));
-            else
-                content.ConvertBitmapType(typeof(AtcInterpolatedBitmapContent));
+            content.ConvertBitmapType(alphaRange == AlphaRange.Full
+                ? typeof(AtcExplicitBitmapContent)
+                : typeof(AtcInterpolatedBitmapContent));
         }
 
-        static public void CompressAstc(ContentProcessorContext context, TextureContent content, bool isSpriteFont, TextureProcessorOutputFormat format)
+        public static void CompressAstc(ContentProcessorContext context, TextureContent content, bool isSpriteFont, TextureProcessorOutputFormat format)
         {
             // If sharp alpha is required (for a font texture page), use 16-bit color instead of PVR
             if (isSpriteFont)
@@ -286,7 +278,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
             }
         }
 
-        static public void CompressEtc(ContentProcessorContext context, TextureContent content, bool isSpriteFont)
+        public static void CompressEtc(ContentProcessorContext context, TextureContent content, bool isSpriteFont)
         {
             // If sharp alpha is required (for a font texture page), use 16-bit color instead of PVR
             if (isSpriteFont)
@@ -298,19 +290,18 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
             var face = content.Faces[0][0];
             var alphaRange = CalculateAlphaRange(face);
 
-
             // confirm texture meets ETC requirements
             if (!IsPowerOfTwo(face.Width) || !IsPowerOfTwo(face.Height))
             {
                 // pick a fallback format based on the alpha range.
                 if (alphaRange != AlphaRange.Opaque)
                 {
-                    context.Logger.LogWarning(null, content.Identity, "ETC compression requires width and height to be powers of two due to hardware restrictions on some devices. Falling back to BGR565.");
+                    context.Logger.Log(LogLevel.Warning, "ETC compression requires width and height to be powers of two due to hardware restrictions on some devices. Falling back to BGR565.");
                     content.ConvertBitmapType(typeof(PixelBitmapContent<Bgra4444>));
                 }
                 else
                 {
-                    context.Logger.LogWarning(null, content.Identity, "ETC compression requires width and height to be powers of two due to hardware restrictions on some devices. Falling back to BGR565.");
+                    context.Logger.Log(LogLevel.Warning, "ETC compression requires width and height to be powers of two due to hardware restrictions on some devices. Falling back to BGR565.");
                     content.ConvertBitmapType(typeof(PixelBitmapContent<Bgr565>));
                 }
 
@@ -328,7 +319,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
             content.ConvertBitmapType(typeof(Etc2BitmapContent));
         }
 
-        static public void CompressEtc1(ContentProcessorContext context, TextureContent content, bool isSpriteFont)
+        public static void CompressEtc1(ContentProcessorContext context, TextureContent content, bool isSpriteFont)
         {
             // If sharp alpha is required (for a font texture page), use 16-bit color instead of PVR
             if (isSpriteFont)
@@ -350,38 +341,38 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
                 // Since we already enforce POT for PVR and DXT in Reach, we will also enforce POT for ETC1
                 if (!IsPowerOfTwo(face.Width) || !IsPowerOfTwo(face.Height))
                 {
-                    context.Logger.LogWarning(null, content.Identity, "ETC1 compression requires width and height to be powers of two due to hardware restrictions on some devices. Falling back to BGR565.");
+                    context.Logger.Log(LogLevel.Warning, "ETC1 compression requires width and height to be powers of two due to hardware restrictions on some devices. Falling back to BGR565.");
                     content.ConvertBitmapType(typeof(PixelBitmapContent<Bgr565>));
                 }
                 else
+                {
                     // use ETC1 when there is no alpha
                     content.ConvertBitmapType(typeof(Etc1BitmapContent));
-
+                }
             }
         }
 
-        static public void CompressColor16Bit(ContentProcessorContext context, TextureContent content)
+        public static void CompressColor16Bit(ContentProcessorContext context, TextureContent content)
         {
             var face = content.Faces[0][0];
             var alphaRange = CalculateAlphaRange(face);
-
-            if (alphaRange == AlphaRange.Opaque)
-                content.ConvertBitmapType(typeof(PixelBitmapContent<Bgr565>));
-            else if (alphaRange == AlphaRange.Cutout)
-                content.ConvertBitmapType(typeof(PixelBitmapContent<Bgra5551>));
-            else
-                content.ConvertBitmapType(typeof(PixelBitmapContent<Bgra4444>));
+            content.ConvertBitmapType(alphaRange switch
+            {
+                AlphaRange.Opaque => typeof(PixelBitmapContent<Bgr565>),
+                AlphaRange.Cutout => typeof(PixelBitmapContent<Bgra5551>),
+                _ => typeof(PixelBitmapContent<Bgra4444>)
+            });
         }
 
 
         // Compress the greyscale font texture page using a specially-formulated DXT3 mode
-        static public unsafe void CompressFontDXT3(TextureContent content)
+        public static unsafe void CompressFontDXT3(TextureContent content)
         {
             if (content.Faces.Count > 1)
                 throw new PipelineException("Font textures should only have one face");
 
             var block = new Vector4[16];
-            for (int i = 0; i < content.Faces[0].Count; ++i)
+            for (var i = 0; i < content.Faces[0].Count; ++i)
             {
                 var face = content.Faces[0][i];
                 var xBlocks = (face.Width + 3) / 4;
@@ -392,12 +383,9 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
                 var bytes = face.GetPixelData();
                 fixed (byte* b = bytes)
                 {
-                    Vector4* colors = (Vector4*)b;
+                    var colors = (Vector4*)b;
 
-                    int w = 0;
-                    int h = 0;
-                    int x = 0;
-                    int y = 0;
+                    var (w, h, x, y) = (0, 0, 0, 0);
                     while (h < (face.Height & ~3))
                     {
                         w = 0;
@@ -427,7 +415,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
                             block[14] = colors[w + h3 + 2];
                             block[15] = colors[w + h3 + 3];
 
-                            int offset = (x + y * xBlocks) * 16;
+                            var offset = (x + y * xBlocks) * 16;
                             CompressFontDXT3Block(block, buffer, offset);
 
                             w += 4;
@@ -439,14 +427,14 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
                         {
                             var cols = face.Width - w;
                             Array.Clear(block, 0, 16);
-                            for (int r = 0; r < 4; ++r)
+                            for (var r = 0; r < 4; ++r)
                             {
                                 h0 = (h + r) * face.Width;
-                                for (int c = 0; c < cols; ++c)
+                                for (var c = 0; c < cols; ++c)
                                     block[(r * 4) + c] = colors[w + h0 + c];
                             }
 
-                            int offset = (x + y * xBlocks) * 16;
+                            var offset = (x + y * xBlocks) * 16;
                             CompressFontDXT3Block(block, buffer, offset);
                         }
 
@@ -508,28 +496,28 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
         // 01 = color1
         // 10 = 2/3 * color0 + 1/3 * color1
         // 11 = 1/3 * color0 + 2/3 * color1
-        static byte[] dxt3Map = new byte[] { 0, 2, 3, 1 };
+        private static readonly byte[] Dxt3Map = [0, 2, 3, 1];
 
         // Compress a single 4x4 block from colors into buffer at the given offset
-        static void CompressFontDXT3Block(Vector4[] colors, byte[] buffer, int offset)
+        private static void CompressFontDXT3Block(Vector4[] colors, byte[] buffer, int offset)
         {
             // Get the alpha into a 0-15 range
-            int a0 = (int)(colors[0].W * 15.0);
-            int a1 = (int)(colors[1].W * 15.0);
-            int a2 = (int)(colors[2].W * 15.0);
-            int a3 = (int)(colors[3].W * 15.0);
-            int a4 = (int)(colors[4].W * 15.0);
-            int a5 = (int)(colors[5].W * 15.0);
-            int a6 = (int)(colors[6].W * 15.0);
-            int a7 = (int)(colors[7].W * 15.0);
-            int a8 = (int)(colors[8].W * 15.0);
-            int a9 = (int)(colors[9].W * 15.0);
-            int a10 = (int)(colors[10].W * 15.0);
-            int a11 = (int)(colors[11].W * 15.0);
-            int a12 = (int)(colors[12].W * 15.0);
-            int a13 = (int)(colors[13].W * 15.0);
-            int a14 = (int)(colors[14].W * 15.0);
-            int a15 = (int)(colors[15].W * 15.0);
+            var a0 = (int)(colors[0].W * 15.0);
+            var a1 = (int)(colors[1].W * 15.0);
+            var a2 = (int)(colors[2].W * 15.0);
+            var a3 = (int)(colors[3].W * 15.0);
+            var a4 = (int)(colors[4].W * 15.0);
+            var a5 = (int)(colors[5].W * 15.0);
+            var a6 = (int)(colors[6].W * 15.0);
+            var a7 = (int)(colors[7].W * 15.0);
+            var a8 = (int)(colors[8].W * 15.0);
+            var a9 = (int)(colors[9].W * 15.0);
+            var a10 = (int)(colors[10].W * 15.0);
+            var a11 = (int)(colors[11].W * 15.0);
+            var a12 = (int)(colors[12].W * 15.0);
+            var a13 = (int)(colors[13].W * 15.0);
+            var a14 = (int)(colors[14].W * 15.0);
+            var a15 = (int)(colors[15].W * 15.0);
 
             // Duplicate the top two bits into the bottom two bits so we get one of four values: b0000, b0101, b1010, b1111
             a0 = (a0 & 0xC) | (a0 >> 2);
@@ -604,10 +592,10 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
             a15 = (a15 & 0xC) | (a15 >> 2);
 
             // Color indices (00 = color0, 01 = color1, 10 = 2/3 * color0 + 1/3 * color1, 11 = 1/3 * color0 + 2/3 * color1)
-            buffer[offset + 12] = (byte)((dxt3Map[a3 >> 2] << 6) | (dxt3Map[a2 >> 2] << 4) | (dxt3Map[a1 >> 2] << 2) | dxt3Map[a0 >> 2]);
-            buffer[offset + 13] = (byte)((dxt3Map[a7 >> 2] << 6) | (dxt3Map[a6 >> 2] << 4) | (dxt3Map[a5 >> 2] << 2) | dxt3Map[a4 >> 2]);
-            buffer[offset + 14] = (byte)((dxt3Map[a11 >> 2] << 6) | (dxt3Map[a10 >> 2] << 4) | (dxt3Map[a9 >> 2] << 2) | dxt3Map[a8 >> 2]);
-            buffer[offset + 15] = (byte)((dxt3Map[a15 >> 2] << 6) | (dxt3Map[a14 >> 2] << 4) | (dxt3Map[a13 >> 2] << 2) | dxt3Map[a12 >> 2]);
+            buffer[offset + 12] = (byte)((Dxt3Map[a3 >> 2] << 6) | (Dxt3Map[a2 >> 2] << 4) | (Dxt3Map[a1 >> 2] << 2) | Dxt3Map[a0 >> 2]);
+            buffer[offset + 13] = (byte)((Dxt3Map[a7 >> 2] << 6) | (Dxt3Map[a6 >> 2] << 4) | (Dxt3Map[a5 >> 2] << 2) | Dxt3Map[a4 >> 2]);
+            buffer[offset + 14] = (byte)((Dxt3Map[a11 >> 2] << 6) | (Dxt3Map[a10 >> 2] << 4) | (Dxt3Map[a9 >> 2] << 2) | Dxt3Map[a8 >> 2]);
+            buffer[offset + 15] = (byte)((Dxt3Map[a15 >> 2] << 6) | (Dxt3Map[a14 >> 2] << 4) | (Dxt3Map[a13 >> 2] << 2) | Dxt3Map[a12 >> 2]);
         }
     }
 }
