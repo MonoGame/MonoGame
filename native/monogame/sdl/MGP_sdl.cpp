@@ -797,7 +797,7 @@ MGP_Window* MGP_Window_Create(
 #if defined(MG_VULKAN) || defined(MG_DIRECTX12)
     if (!MGP_Window_CreateNativeWindowInternal(window, width, height, title, windowCreateInfo))
     {
-        mg_remove(platform->window, window);
+        mg_remove(platform->windows, window);
         delete window;
         return nullptr;
     }
