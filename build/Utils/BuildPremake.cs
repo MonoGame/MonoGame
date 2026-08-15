@@ -24,19 +24,9 @@ public sealed class BuildPremake
             case PlatformFamily.OSX:
             {
                 // Linux/macOS build for the host architecture only
-                var isArm64 = RuntimeInformation.OSArchitecture == Architecture.Arm64;
-                var arch = isArm64 ? "arm64" : "x64";
+                var arch = RuntimeInformation.OSArchitecture == Architecture.Arm64 ? "arm64" : "x64";
                 Scaffold(context, name, workingDirectory, $"--arch={arch} gmake2");
-
-                var makeArgs = "config=release";
-                if(name == "mgruntime" && context.IsRunningOnLinux() && isArm64)
-                {
-                    // OpenGL shader headers are not generated on Linux Arm64 because
-                    // it does not support the version of wine we need atm
-                    makeArgs = "desktopvk config=release";
-                }
-
-                Make(context, name, workingDirectory, makeArgs);
+                Make(context, name, workingDirectory);
 
                 break;
             }
@@ -72,9 +62,9 @@ public sealed class BuildPremake
         }
     }
 
-    private void Make(BuildContext context, string name, string workingDirectory, string arguments)
+    private void Make(BuildContext context, string name, string workingDirectory)
     {
-        int exit = context.StartProcess("make", new ProcessSettings { WorkingDirectory = workingDirectory, Arguments = arguments });
+        int exit = context.StartProcess("make", new ProcessSettings { WorkingDirectory = workingDirectory, Arguments = "config=release" });
         if (exit != 0)
         {
             throw new Exception($"{name} build failed with make! {exit}");
