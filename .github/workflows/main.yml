@@ -132,7 +132,7 @@ jobs:
         run: echo "::remove-matcher owner=csc::"
 
       - name: Setup Wine
-        uses: monogame/monogame-actions/install-wine@v1
+        uses: monogame/monogame-actions/install-wine@v2
 
       - name: Install Fonts
         uses: monogame/monogame-actions/install-fonts@v1
