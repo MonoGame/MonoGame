@@ -161,6 +161,9 @@ namespace Microsoft.Xna.Framework.Audio
 
         public void SeekToPosition(TimeSpan pos)
         {
+            if (Reader == null)
+                return;
+
             Reader.TimePosition = pos;
             AL.SourceStop(alSourceId);
             ALHelper.CheckError("Failed to stop source.");
@@ -176,6 +179,9 @@ namespace Microsoft.Xna.Framework.Audio
 
         public TimeSpan GetLength()
         {
+            if (Reader == null)
+                return TimeSpan.Zero;
+
             return Reader.TotalTime;
         }
 
