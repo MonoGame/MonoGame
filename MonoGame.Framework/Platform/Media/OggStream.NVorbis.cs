@@ -67,7 +67,8 @@ namespace Microsoft.Xna.Framework.Audio
                 {
                     case ALSourceState.Playing:
                     case ALSourceState.Paused:
-                        return;
+                        if (Ready) return;
+                        break;
 
                     case ALSourceState.Stopped:
                         lock (prepareMutex)
