@@ -253,7 +253,7 @@ namespace
             MGGL_FAIL("OpenGL device not initialized", "ResizeSwapChain must create a window context before use");
 
         device->context.MakeCurrent();
-    }    
+    }
 
     bool SupportsOpenGLDepthClamp(MGG_GraphicsDevice* device)
     {
@@ -1784,6 +1784,7 @@ void MGG_GraphicsDevice_Clear(MGG_GraphicsDevice* device, MGClearOptions options
     GLboolean depthWriteMask = GL_FALSE;
     GLint stencilWriteMask = 0;
     GLint scissorBox[4] = {};
+    GLboolean scissorTestEnabled = glIsEnabled(GL_SCISSOR_TEST);
     GLboolean depthTestEnabled = glIsEnabled(GL_DEPTH_TEST);
     GLboolean stencilTestEnabled = glIsEnabled(GL_STENCIL_TEST);
 
@@ -1795,7 +1796,11 @@ void MGG_GraphicsDevice_Clear(MGG_GraphicsDevice* device, MGClearOptions options
     glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
     glDepthMask(GL_TRUE);
     glStencilMask(static_cast<GLuint>(~0u));
-    glScissor(device->viewportX, ToOpenGLWindowY(device, device->viewportY, device->viewportHeight), device->viewportWidth, device->viewportHeight);
+
+    // Clear should affect the whole active target, not only the
+    // current viewport-sized scissor rectangle, to match XNA behavior
+    if (scissorTestEnabled)
+        glDisable(GL_SCISSOR_TEST);
 
     if ((static_cast<mgint>(options) & static_cast<mgint>(MGClearOptions::DepthBuffer)) != 0)
         glEnable(GL_DEPTH_TEST);
@@ -1812,6 +1817,9 @@ void MGG_GraphicsDevice_Clear(MGG_GraphicsDevice* device, MGClearOptions options
     glDepthMask(depthWriteMask);
     glStencilMask(static_cast<GLuint>(stencilWriteMask));
     glScissor(scissorBox[0], scissorBox[1], scissorBox[2], scissorBox[3]);
+
+    if (scissorTestEnabled)
+        glEnable(GL_SCISSOR_TEST);
 
     if (depthTestEnabled)
         glEnable(GL_DEPTH_TEST);
