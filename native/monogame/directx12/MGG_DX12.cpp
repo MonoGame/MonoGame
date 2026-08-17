@@ -179,6 +179,7 @@ struct MGG_GraphicsDevice
 	bool is_recording = false;
 	bool vsync = true;
 	int begin_frame_index = -1;
+	mgint multiSampleCount = 0;
 
 	DeviceResources* resources = nullptr;
 	CommandContext* context = nullptr;
@@ -653,6 +654,12 @@ void MGG_GraphicsDevice_GetCaps(MGG_GraphicsDevice* device, MGG_GraphicsDevice_C
 #endif
 }
 
+mgint MGG_GraphicsDevice_GetBackBufferMultiSampleCount(MGG_GraphicsDevice* device)
+{
+	assert(device != nullptr);
+	return device->multiSampleCount;
+}
+
 void MGG_GraphicsDevice_ResolveRenderTargets(MGG_GraphicsDevice* device)
 {
 	assert(device != nullptr);
@@ -703,6 +710,7 @@ void MGG_GraphicsDevice_ResizeSwapchain(
 #endif
 
 	device->vsync = syncInterval > 0;
+	device->multiSampleCount = multiSampleCount;
 
 	device->resources->CreateWindowSizeDependentResources(width, height, 0, 0, 0, 0, multiSampleCount);
 	device->begin_frame_index = -1;

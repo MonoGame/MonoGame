@@ -224,6 +224,9 @@ internal static unsafe partial class MGG
     [DllImport(MGP.MonoGameNativeDLL, EntryPoint = "MGG_GraphicsDevice_GetCaps", ExactSpelling = true)]
     public static extern void GraphicsDevice_GetCaps(MGG_GraphicsDevice* device, out MGG_GraphicsDevice_Caps caps);
 
+    [DllImport(MGP.MonoGameNativeDLL, EntryPoint = "MGG_GraphicsDevice_GetBackBufferMultiSampleCount", ExactSpelling = true)]
+    public static extern int GraphicsDevice_GetBackBufferMultiSampleCount(MGG_GraphicsDevice* device);
+
     [DllImport(MGP.MonoGameNativeDLL, EntryPoint = "MGG_GraphicsDevice_ResizeSwapchain", ExactSpelling = true)]
     public static extern void GraphicsDevice_ResizeSwapchain(
         MGG_GraphicsDevice* device,

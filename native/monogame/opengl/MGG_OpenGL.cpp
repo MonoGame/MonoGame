@@ -1719,6 +1719,17 @@ void MGG_GraphicsDevice_GetCaps(MGG_GraphicsDevice* device, MGG_GraphicsDevice_C
     caps.SupportsSeparateBlendStates = true;
 }
 
+mgint MGG_GraphicsDevice_GetBackBufferMultiSampleCount(MGG_GraphicsDevice* device)
+{
+    assert(device != nullptr);
+
+    if (device->window == nullptr || device->context.handle == nullptr)
+        return 0;
+
+    EnsureContext(device);
+    return device->multiSampleCount;
+}
+
 void MGG_GraphicsDevice_ResizeSwapchain(
     MGG_GraphicsDevice* device,
     void* nativeWindowHandle,
@@ -1752,13 +1763,18 @@ void MGG_GraphicsDevice_ResizeSwapchain(
     device->backBufferHeight = height;
     device->backBufferFormat = color;
     device->depthFormat = depth;
-    device->multiSampleCount = multiSampleCount;
     device->viewportX = 0;
     device->viewportY = 0;
     device->viewportWidth = width;
     device->viewportHeight = height;
     device->viewportMinDepth = 0.0f;
     device->viewportMaxDepth = 1.0f;
+
+    GLint sampleBuffers = 0;
+    GLint samples = 0;
+    glGetIntegerv(GL_SAMPLE_BUFFERS, &sampleBuffers);
+    glGetIntegerv(GL_SAMPLES, &samples);
+    device->multiSampleCount = (sampleBuffers > 0 && samples > 0) ? static_cast<mgint>(samples) : 0;
 
     glViewport(0, 0, width, height);
     glScissor(0, 0, width, height);

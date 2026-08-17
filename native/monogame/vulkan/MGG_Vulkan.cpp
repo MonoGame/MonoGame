@@ -1732,6 +1732,12 @@ void MGG_GraphicsDevice_GetCaps(MGG_GraphicsDevice* device, MGG_GraphicsDevice_C
 	caps.ShaderProfile = 80;
 }
 
+mgint MGG_GraphicsDevice_GetBackBufferMultiSampleCount(MGG_GraphicsDevice* device)
+{
+	assert(device != nullptr);
+	return device->multiSampleCount;
+}
+
 void MGVK_RecreateSwapChain(
 	MGG_GraphicsDevice* device,
 	void* nativeWindowHandle,
