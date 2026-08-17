@@ -63,6 +63,7 @@ internal struct MGG_GraphicsDevice_Caps
     public int MaxVertexBufferSlots;
     public int ShaderProfile;
     public int MaxTextureAnisotropy;
+    public int MaxMultiSampleCount;
     [MarshalAs(UnmanagedType.I1)]
     public bool SupportsNonPowerOfTwo;
     [MarshalAs(UnmanagedType.I1)]
@@ -193,7 +194,7 @@ internal static unsafe partial class MGG
 
     #region Graphics System
 
-    
+
     [DllImport(MGP.MonoGameNativeDLL, EntryPoint = "MGG_GraphicsSystem_Create", ExactSpelling = true)]
     public static extern MGG_GraphicsSystem* GraphicsSystem_Create();
 
@@ -258,7 +259,7 @@ internal static unsafe partial class MGG
         ref int y,
         ref int width,
         ref int height);
-    
+
     [DllImport(MGP.MonoGameNativeDLL, EntryPoint = "MGG_GraphicsDevice_SetViewport", ExactSpelling = true)]
     public static extern void GraphicsDevice_SetViewport(
         MGG_GraphicsDevice* device,

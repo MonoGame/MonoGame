@@ -33,6 +33,7 @@ public partial class GraphicsDevice
     }
 
     internal int MaxTextureAnisotropy { get; private set; }
+    internal int MaxMultiSampleCount { get; private set; }
     internal bool SupportsNonPowerOfTwo { get; private set; }
     internal bool SupportsTextureFilterAnisotropic { get; private set; }
     internal bool SupportsDepth24 { get; private set; }
@@ -62,6 +63,7 @@ public partial class GraphicsDevice
         _maxVertexBufferSlots = caps.MaxVertexBufferSlots;
         ShaderProfile = caps.ShaderProfile;
         MaxTextureAnisotropy = caps.MaxTextureAnisotropy;
+        MaxMultiSampleCount = caps.MaxMultiSampleCount;
         SupportsNonPowerOfTwo = caps.SupportsNonPowerOfTwo;
         SupportsTextureFilterAnisotropic = caps.SupportsTextureFilterAnisotropic;
         SupportsDepth24 = caps.SupportsDepth24;
@@ -116,7 +118,7 @@ public partial class GraphicsDevice
 
     internal int PlatformGetMaxMultiSampleCount(SurfaceFormat format)
     {
-        return 4;
+        return MaxMultiSampleCount;
     }
 
     private unsafe void OnPresentationChanged()
@@ -323,7 +325,7 @@ public partial class GraphicsDevice
         fixed (MGG_Texture** targets = _curRenderTargets)
         fixed (int* arraySlices = _currentRenderTargetArraySlices)
             MGG.GraphicsDevice_SetRenderTargets(Handle, targets, arraySlices, _currentRenderTargetCount);
-        
+
         return first;
     }
 

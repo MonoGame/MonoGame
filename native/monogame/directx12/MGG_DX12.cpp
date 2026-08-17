@@ -135,7 +135,7 @@ public:
 				chunks.push_back(NewChunk(resources, CHUNK_SIZE));
 			}
 		}
-				
+
 		auto& chunk = chunks[currentChunk];
 		Alloc alloc { chunk.addrs + offset, chunk.mapped + offset };
 		offset += bytes;
@@ -244,7 +244,7 @@ struct MGG_Buffer
 
 	Microsoft::WRL::ComPtr<D3D12MA::Allocation> m_alloc;
 	Microsoft::WRL::ComPtr<ID3D12Resource> m_res;
-	
+
 	inline D3D12_GPU_VIRTUAL_ADDRESS GpuAddress() { return m_res->GetGPUVirtualAddress(); }
 };
 
@@ -312,7 +312,7 @@ struct MGG_OcclusionQuery
 struct MGG_GraphicsSystem
 {
 #if defined(_GAMING_XBOX)
-	
+
 #else
 	Microsoft::WRL::ComPtr<IDXGIFactory6> dxgiFactory;
 #endif
@@ -625,6 +625,7 @@ void MGG_GraphicsDevice_GetCaps(MGG_GraphicsDevice* device, MGG_GraphicsDevice_C
 	caps.MaxTextureAnisotropy = 16;
 	caps.SupportsNonPowerOfTwo = true;
 	caps.SupportsTextureFilterAnisotropic = true;
+	caps.MaxMultiSampleCount = 4;
 	caps.SupportsDepth24 = true;
 	caps.SupportsPackedDepthStencil = true;
 	caps.SupportsDepthNonLinear = false;
@@ -643,9 +644,9 @@ void MGG_GraphicsDevice_GetCaps(MGG_GraphicsDevice* device, MGG_GraphicsDevice_C
 	caps.SupportsSeparateBlendStates = true;
 
 	// The shader profile id from the pipeline.
-#if defined(MG_XBOXONE)	
+#if defined(MG_XBOXONE)
 	caps.ShaderProfile = 21;	// For Xbox One
-#elif defined(MG_XBOXSERIES)	
+#elif defined(MG_XBOXSERIES)
 	caps.ShaderProfile = 22;	// For Xbox Series X/S.
 #else
 	caps.ShaderProfile = 2;
@@ -770,7 +771,7 @@ static void MGDX_DestroyFrameResources(MGG_GraphicsDevice* device, FrameCounter 
 
 	std::lock_guard lock(device->resourceMutex);
 
-	// Delete resources that haven't been used in a few frames 
+	// Delete resources that haven't been used in a few frames
 	{
 		while (device->destroyBuffers.size() > 0)
 		{
@@ -840,7 +841,7 @@ void MGG_GraphicsDevice_Present(MGG_GraphicsDevice* device, mgint currentFrame, 
 	{
 		std::lock_guard lock(device->resourceMutex);
 
-		// Move the pending buffers to the free list 
+		// Move the pending buffers to the free list
 		// for reuse on the next frame.
 		device->free.insert(device->free.end(), device->pending.begin(), device->pending.end());
 		device->pending.clear();
@@ -882,7 +883,7 @@ void MGG_GraphicsDevice_SetDepthStencilState(MGG_GraphicsDevice* device, MGG_Dep
 
 	auto& depthStencilState = device->pipelineManager->impl->m_currentPSODesc.DepthStencilState;
 	depthStencilState = state->desc;
-	
+
 	// Set stencil reference on every frame.
 	auto commandList = device->context->GetCommandList();
 	commandList->OMSetStencilRef(state->referenceStencil);
@@ -896,7 +897,7 @@ void MGG_GraphicsDevice_SetRasterizerState(MGG_GraphicsDevice* device, MGG_Raste
 	auto& rasterizerState = device->pipelineManager->impl->m_currentPSODesc.RasterizerState;
 	rasterizerState = state->desc;
 	device->scissorTestEnable = state->scissorTestEnable;
-	device->scissorDirty = true;	
+	device->scissorDirty = true;
 }
 
 void MGG_GraphicsDevice_GetTitleSafeArea(mgint& x, mgint& y, mgint& width, mgint& height)
@@ -1059,7 +1060,7 @@ void MGG_GraphicsDevice_SetShader(MGG_GraphicsDevice* device, MGShaderStage stag
 	assert(shader != nullptr);
 	assert(shader->stage == stage);
 
-	
+
 	if (stage == MGShaderStage::Vertex)
 	{
 		device->pipelineManager->impl->m_currentPSODesc.VS = { shader->bytecode.data(), shader->bytecode.size() };
@@ -1195,7 +1196,7 @@ void MGDX_ApplyState(MGG_GraphicsDevice* device)
 			buffer->dirty = false;
 			auto alloc = ringBuffer.Allocate(device->resources, buffer->actualSize);
 			memcpy(alloc.mapped, buffer->push, buffer->actualSize);
-			cl->SetGraphicsRootConstantBufferView(i, alloc.addrs);			
+			cl->SetGraphicsRootConstantBufferView(i, alloc.addrs);
 		}
 
 		device->uniformsDirty = 0;
@@ -1240,7 +1241,7 @@ void MGDX_ApplyState(MGG_GraphicsDevice* device)
 			// TODO: Hashing the pointers can be dangerous... use unique ids.
 
 			uint32_t hash = MG_ComputeHash(reinterpret_cast<mgbyte*>(device->samplers[s]), (maxSlot + 1) * sizeof(MGG_SamplerState*));
-			auto iter = device->samplerSetHandles.find(hash);			
+			auto iter = device->samplerSetHandles.find(hash);
 			if (iter != device->samplerSetHandles.end())
 			{
 				UINT tableIndex = s == (int)MGShaderStage::Pixel ? 5 : 4;
@@ -1298,7 +1299,7 @@ void MGG_GraphicsDevice_Draw(MGG_GraphicsDevice* device, MGPrimitiveType primiti
 {
 	assert(device != nullptr);
 	assert(vertexStart >= 0);
-	
+
 	if (vertexCount <= 0)
 		return;
 
@@ -1538,7 +1539,7 @@ static MGG_Buffer* MGDX_FindFreeBuffer(MGG_GraphicsDevice* device, size_t dataSi
 {
 	std::lock_guard lock(device->resourceMutex);
 
-	// Search for the best fit from the free list.		
+	// Search for the best fit from the free list.
 	MGG_Buffer* best = nullptr;
 	auto bestIndex = -1;
 	for (int i = 0; i < device->free.size(); i++)
@@ -1761,7 +1762,7 @@ void MGG_Buffer_SetData(MGG_GraphicsDevice* device, MGG_Buffer*& buffer, mgint o
 				device->vertexBuffersDirty |= 1ul << i;
 			}
 		}
-	
+
 		if (device->indexBuffer == last)
 		{
 			device->indexBuffer = buffer;
@@ -1879,7 +1880,7 @@ void MGG_Buffer_GetData(MGG_GraphicsDevice* device, MGG_Buffer* buffer, mgint of
 	// Don't allow a read outside the bounds of the buffer.
 	size_t readBytes = std::min<size_t>(buffer->dataSize - offset, dataStride * dataCount);
 	ComPtr<ID3D12Resource> readback = MGDX_Buffer_GetReadbackData(device, buffer, offset, dataCount, dataStride);
-	
+
 	UINT8* pSourceDataBegin;
 	DX::ThrowIfFailed(readback->Map(0, nullptr, reinterpret_cast<void**>(&pSourceDataBegin)));
 	pSourceDataBegin += offset;

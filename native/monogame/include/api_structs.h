@@ -87,6 +87,7 @@ struct MGG_GraphicsDevice_Caps
     mgint MaxVertexBufferSlots;
     mgint ShaderProfile;
     mgint MaxTextureAnisotropy;
+    mgint MaxMultiSampleCount;
     mgbool SupportsNonPowerOfTwo;
     mgbool SupportsTextureFilterAnisotropic;
     mgbool SupportsDepth24;

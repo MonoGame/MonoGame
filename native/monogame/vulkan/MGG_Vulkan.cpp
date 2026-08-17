@@ -105,7 +105,7 @@ static void setObjectNameVariadic(
     info.objectType = type;
     info.objectHandle = object;
     info.pObjectName = finalName;
-    
+
     vkSetDebugUtilsObjectNameEXT(device, &info);
 }
 
@@ -1018,7 +1018,7 @@ void MGG_GraphicsAdapter_GetInfo(MGG_GraphicsAdapter* adapter, MGG_GraphicsAdapt
 	// Get the number of display modes for the primary display
 	int displayIndex = 0; // Primary display
 	int numModes = SDL_GetNumDisplayModes(displayIndex);
-	
+
 	if (adapter->modes.size() == 0 && numModes > 0)
 	{
 		// Enumerate available display modes
@@ -1031,7 +1031,7 @@ void MGG_GraphicsAdapter_GetInfo(MGG_GraphicsAdapter* adapter, MGG_GraphicsAdapt
 				displayMode.width = mode.w;
 				displayMode.height = mode.h;
 				displayMode.format = MGSurfaceFormat::Color;
-				
+
 				bool found = false;
 				for (auto m : adapter->modes)
 				{
@@ -1042,13 +1042,13 @@ void MGG_GraphicsAdapter_GetInfo(MGG_GraphicsAdapter* adapter, MGG_GraphicsAdapt
 						break;
 					}
 				}
-				
+
 				if (!found)
 					adapter->modes.push_back(displayMode);
 			}
 		}
 	}
-	
+
 	// Get current display mode
 	SDL_DisplayMode currentMode;
 	if (SDL_GetCurrentDisplayMode(displayIndex, &currentMode) == 0)
@@ -1375,15 +1375,15 @@ MGG_GraphicsDevice* MGG_GraphicsDevice_Create(MGG_GraphicsSystem* system, MGG_Gr
 
 	// This is technically required by -fvk-use-dx-layout, but the driver may still accept it and it'll just work. It might also cause shader compilation failures, or insane rendering.
 	// This has pretty good coverage.
-	if (!scalarBlockLayoutSupported) 
+	if (!scalarBlockLayoutSupported)
 		printf("%s is not supported by this driver!\n", VK_EXT_SCALAR_BLOCK_LAYOUT_EXTENSION_NAME);
 	if (!device->customBorderColorSupported) // We can live without this extention.
 		printf("%s is not supported by this driver!\n", VK_EXT_CUSTOM_BORDER_COLOR_EXTENSION_NAME);
 	// This is only required for reflection information when compiling shaders, so worst case it's just a validation failure. TODO: Potentially look at stripping this from the SPIR-V?
-	if (!hlslFunctionalitySupported) 
+	if (!hlslFunctionalitySupported)
 		printf("%s is not supported by this driver!\n", VK_GOOGLE_HLSL_FUNCTIONALITY1_EXTENSION_NAME);
 	// This is the same as above - fine if it's not there.
-	if (!userTypeSupported) 
+	if (!userTypeSupported)
 		printf("%s is not supported by this driver!\n", VK_GOOGLE_USER_TYPE_EXTENSION_NAME);
 
 	std::vector<const char*> extensions;
@@ -1417,7 +1417,7 @@ MGG_GraphicsDevice* MGG_GraphicsDevice_Create(MGG_GraphicsSystem* system, MGG_Gr
 		VkPhysicalDeviceFeatures2 supportedFeatures2 = { VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2 };
 		supportedFeatures2.pNext = &supportedCbc;
 		vkGetPhysicalDeviceFeatures2(device->physicalDevice, &supportedFeatures2);
-		
+
 		extensions.push_back(VK_EXT_CUSTOM_BORDER_COLOR_EXTENSION_NAME);
 		customBorderColorFeatures.customBorderColors = supportedCbc.customBorderColors;
 		customBorderColorFeatures.customBorderColorWithoutFormat = supportedCbc.customBorderColorWithoutFormat;
@@ -1501,12 +1501,12 @@ MGG_GraphicsDevice* MGG_GraphicsDevice_Create(MGG_GraphicsSystem* system, MGG_Gr
 	memset(device->descriptorSets, 0, sizeof(device->descriptorSets));
 	memset(device->dynamicOffsets, 0, sizeof(device->dynamicOffsets));
 	memset(device->vertexBuffers, 0, sizeof(device->vertexBuffers));
-	memset(device->vertexOffsets, 0, sizeof(device->vertexOffsets));	
+	memset(device->vertexOffsets, 0, sizeof(device->vertexOffsets));
 	memset(device->uniforms, 0, sizeof(device->uniforms));
 	memset(device->textures, 0, sizeof(device->textures));
 	memset(device->samplers, 0, sizeof(device->samplers));
 	memset(&device->pipelineState, 0, sizeof(device->pipelineState));
-	
+
 	// Setup default "null" textures for each type.
 	{
 		auto tex = MGG_Texture_Create(device, MGTextureType::_2D, MGSurfaceFormat::Color, 2, 2, 1, 1, 1);
@@ -1582,7 +1582,7 @@ static void MGVK_CleanupSwapChain(MGG_GraphicsDevice* device)
 			vkDestroyRenderPass(device->device, targetSetCache->renderPass, nullptr);
 			vkDestroyFramebuffer(device->device, targetSetCache->framebuffer, nullptr);
 			delete targetSetCache;
-			
+
 			// Erase the element and get an iterator to the next one.
 			itr = cache.erase(itr);
 		}
@@ -1710,6 +1710,7 @@ void MGG_GraphicsDevice_GetCaps(MGG_GraphicsDevice* device, MGG_GraphicsDevice_C
 	caps.MaxTextureAnisotropy = 16;
 	caps.SupportsNonPowerOfTwo = true;
 	caps.SupportsTextureFilterAnisotropic = true;
+	caps.MaxMultiSampleCount = 4;
 	caps.SupportsDepth24 = true;
 	caps.SupportsPackedDepthStencil = true;
 	caps.SupportsDepthNonLinear = false;
@@ -1897,11 +1898,11 @@ void MGVK_RecreateSwapChain(
 	uint32_t presentModeCount = 0;
 	res = vkGetPhysicalDeviceSurfacePresentModesKHR(device->physicalDevice, device->surface, &presentModeCount, nullptr);
 	VK_CHECK_RESULT(res);
-	
+
 	std::vector<VkPresentModeKHR> presentModes(presentModeCount);
 	res = vkGetPhysicalDeviceSurfacePresentModesKHR(device->physicalDevice, device->surface, &presentModeCount, presentModes.data());
 	VK_CHECK_RESULT(res);
-	
+
 	// Prefer MAILBOX -> IMMEDIATE -> FIFO (FIFO is always supported)
 	device->syncInterval = syncInterval; // 0 is IMMEDIATE, 1 is either MAILBOX or FIFO, 2 is half-Vsync and we currently don't support that on Vulkan.
 	VkPresentModeKHR selectedPresentMode = VK_PRESENT_MODE_FIFO_KHR; // Default, guaranteed to be supported by Vulkan specs.
@@ -2163,7 +2164,7 @@ void MGG_GraphicsDevice_ResizeSwapchain(
 
 	auto vkColor = ToVkFormat(color);
 	auto vkDepth = ToVkFormat(depth);
-	
+
 	MGVK_RecreateSwapChain(device, nativeWindowHandle, width, height, vkColor, vkDepth, multiSampleCount, syncInterval);
 
 	MGVK_PrepareFrame(device);
@@ -2260,7 +2261,7 @@ void MGVK_PrepareFrame(MGG_GraphicsDevice* device)
 	// We should pass the device->frame rather than swapchain_image_index.
 	// Otherwise age calculation will underflow.
 	MGVK_DestroyFrameResources(device, device->frame, false);
-	
+
 	frame.uniformOffset = 0;
 	if (frame.uniforms == NULL)
 	{
@@ -2406,8 +2407,8 @@ static void MGVK_DestroyPipelines(MGG_GraphicsDevice* device, std::function<bool
 static void MGVK_DestroyFrameResources(MGG_GraphicsDevice* device, FrameCounter currentFrame, mgbyte free_all)
 {
 	assert(device != nullptr);
-	
-	// Delete resources that haven't been used in a few frames 
+
+	// Delete resources that haven't been used in a few frames
 	{
 		while (!device->destroyBuffers.empty())
 		{
@@ -2643,9 +2644,9 @@ void MGG_GraphicsDevice_Present(MGG_GraphicsDevice* device, mgint currentFrame, 
 			printf("Swapchain suboptimal. Recreating swapchain...\n");
 		else
 			printf("Swapchain out of date. Recreating swapchain...\n");
-			
+
 		MGVK_RecreateSwapChain(device);
-				
+
 		if (device->swapchain == VK_NULL_HANDLE)
 			printf("Couldn't recreate swapchain!\n");
 	}
@@ -2657,7 +2658,7 @@ void MGG_GraphicsDevice_Present(MGG_GraphicsDevice* device, mgint currentFrame, 
 	frame.image_index = -1;
 	frame.is_rendering = true;
 
-	// Move the pending buffers to the free list 
+	// Move the pending buffers to the free list
 	// for reuse on the next frame.
 	if (device->pending != nullptr)
 	{
@@ -2835,7 +2836,7 @@ void MGG_GraphicsDevice_SetConstantBuffer(MGG_GraphicsDevice* device, MGShaderSt
 	}
 	else
 	{
-		if (buffer->dirty)		
+		if (buffer->dirty)
 			device->uniformsDirty |= 1 << (int)stage;
 	}
 }
@@ -3287,7 +3288,7 @@ static void MGVK_UpdateRenderPass(MGG_GraphicsDevice* device, FrameCounter curre
 			create_info.pSubpasses = &subpass_desc;
 			create_info.pDependencies = dependencies;
 			if (first->isSwapchain)
-			{				
+			{
 				create_info.dependencyCount = 1;
 
 				dependencies[0].srcSubpass = VK_SUBPASS_EXTERNAL;
@@ -3493,7 +3494,7 @@ static void MGVK_UpdateDescriptors(MGG_GraphicsDevice* device, FrameCounter curr
 	// bound to the descriptor set. If we don't, some frame will use the
 	// wrong buffer if the descriptor is retrieved from the cache (and will
 	// result in flickers/broken rendering).
-	// 
+	//
 	// TO DO: refactor the descriptor cache and uniforms buffer handling so
 	// that we don't create twice as much descriptor due to this.
 	hash = MG_ComputeHash(device->frameIndex, hash);
@@ -3511,7 +3512,7 @@ static void MGVK_UpdateDescriptors(MGG_GraphicsDevice* device, FrameCounter curr
 		}
 
 		assert(shader->freeSets.size() > 0);
-		
+
 		info = shader->freeSets.front();
 		shader->freeSets.pop();
 
@@ -3632,7 +3633,7 @@ static MGVK_Program* MGVK_ProgramGetOrCreate(MGG_GraphicsDevice* device, MGG_Sha
 
 static VkPipeline MGVK_CreatePipeline(MGG_GraphicsDevice* device)
 {
-	// TODO: We could hit hash collisions here, so we 
+	// TODO: We could hit hash collisions here, so we
 	// eventually need to implement some fast hash
 	// collision detection and resolution.
 
@@ -3722,11 +3723,11 @@ static VkPipeline MGVK_CreatePipeline(MGG_GraphicsDevice* device)
 	if (pstate.rasterizerState->multiSampleAntiAlias && pstate.targets && pstate.targets->set.targets[0])
 	{
 		multisampling.rasterizationSamples = ToVkSampleCount(pstate.targets->set.targets[0]->multiSampleCount);
-		
+
 		// Enable sample shading for higher quality if supported by the device and MSAA is active
 		if (device->deviceFeatures.sampleRateShading)
 		{
-			multisampling.sampleShadingEnable = VK_TRUE; 
+			multisampling.sampleShadingEnable = VK_TRUE;
 			multisampling.minSampleShading = 0.2f; // Run fragment shader on at least 20% of samples
 		}
 		else
@@ -3742,7 +3743,7 @@ static VkPipeline MGVK_CreatePipeline(MGG_GraphicsDevice* device)
 		multisampling.sampleShadingEnable = VK_FALSE;
 		multisampling.minSampleShading = 1.0f;
 	}
-    
+
 	pipelineInfo.pMultisampleState = &multisampling;
 	pipelineInfo.renderPass = pstate.targets->renderPass;
 
@@ -3870,7 +3871,7 @@ static void MGVK_UpdatePipeline(MGG_GraphicsDevice* device, VkCommandBuffer comm
 			MGVK_UpdateDescriptors(device, currentFrame, program->pixel, &device->descriptorSets[setCount++], dynamicOffset);
 		}
 
-		// Bind the new descriptor sets.		
+		// Bind the new descriptor sets.
 		vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS,
 			program->layout, setOffset, setCount, device->descriptorSets, offsetCount, device->dynamicOffsets);
 
@@ -3928,7 +3929,7 @@ void MGG_GraphicsDevice_Draw(MGG_GraphicsDevice* device, MGPrimitiveType primiti
 {
 	assert(device != nullptr);
 	assert(vertexStart >= 0);
-	
+
 	if (vertexCount <= 0)
 		return;
 
@@ -4023,11 +4024,11 @@ void MGG_GraphicsDevice_DrawIndexedInstanced(
 
 	vkCmdDrawIndexed(
 		frame.commandBuffer,
-		indexCount,       
-		instanceCount,    
-		indexStart,       
-		vertexStart,      
-		0);               
+		indexCount,
+		instanceCount,
+		indexStart,
+		vertexStart,
+		0);
 }
 
 inline mgint getMipScalar(mgint level, mgint value)
@@ -4100,7 +4101,7 @@ uint32_t getVkFormatBlockAlignment(VkFormat format) {
 void MGG_GraphicsDevice_ResolveRenderTargets(MGG_GraphicsDevice* device)
 {
 	assert(device != nullptr);
-	
+
     auto psoTargets = device->pipelineState.targets;
     if (!psoTargets)
         return;
@@ -4190,7 +4191,7 @@ void MGG_GraphicsDevice_ResolveRenderTargets(MGG_GraphicsDevice* device)
                 blit.dstSubresource.mipLevel = j;
                 blit.dstSubresource.baseArrayLayer = 0;
                 blit.dstSubresource.layerCount = renderTarget->info.arrayLayers;
-                
+
                 barrier.subresourceRange.baseMipLevel = j;
                 barrier.oldLayout = VK_IMAGE_LAYOUT_UNDEFINED;
                 barrier.newLayout = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL;
@@ -4198,7 +4199,7 @@ void MGG_GraphicsDevice_ResolveRenderTargets(MGG_GraphicsDevice* device)
                 barrier.dstAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
 
                 vkCmdPipelineBarrier(frame.commandBuffer,
-                    VK_PIPELINE_STAGE_TRANSFER_BIT, 
+                    VK_PIPELINE_STAGE_TRANSFER_BIT,
                     VK_PIPELINE_STAGE_TRANSFER_BIT,
                     0, 0, nullptr, 0, nullptr, 1, &barrier);
 
@@ -4233,7 +4234,7 @@ void MGG_GraphicsDevice_ResolveRenderTargets(MGG_GraphicsDevice* device)
                 VK_PIPELINE_STAGE_TRANSFER_BIT,
                 VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT,
                 0, 0, nullptr, 0, nullptr, 1, &barrier);
-            
+
             renderTarget->layouts[0] = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
         }
     }
@@ -4287,7 +4288,7 @@ void MGG_GraphicsDevice_GetBackBufferData(MGG_GraphicsDevice* device, mgint x, m
 		height,
 		1,
 		1,
-		1 
+		1
 	);
 	VK_SET_OBJECT_NAME(device->device, tempRgbaTexture->image, VK_OBJECT_TYPE_IMAGE, "GetBackBufferData::tempRgbaImage");
 
@@ -4848,7 +4849,7 @@ static MGG_Buffer* MGVK_BufferDiscard(MGG_GraphicsDevice* device, MGG_Buffer* bu
 	device->discarded = buffer;
 	buffer = nullptr;
 
-	// Search for the best fit from the free list.	
+	// Search for the best fit from the free list.
 	MGG_Buffer** curr = &device->free;
 	MGG_Buffer** best = nullptr;
 	while (*curr != nullptr)
@@ -4899,7 +4900,7 @@ static MGG_Buffer* MGVK_Buffer_Create(MGG_GraphicsDevice* device, MGBufferType t
 
 	buffer->actualSize = buffer->dataSize = sizeInBytes;
 	buffer->type = type;
-	
+
 	if (type == MGBufferType::Constant && !no_push)
 	{
 		// Uniform buffers never use real buffers.  We just
@@ -5068,7 +5069,7 @@ void MGG_Buffer_SetData(MGG_GraphicsDevice* device, MGG_Buffer*& buffer, mgint o
 				{
 					device->uniforms[i] = buffer;
 					device->uniformsDirty |= 1 << (int)i;
-				}		
+				}
 			}
 			break;
 
@@ -5240,9 +5241,9 @@ MGG_Texture* MGG_RenderTarget_Create(
 		create_info.arrayLayers = slices;
         create_info.samples = VK_SAMPLE_COUNT_1_BIT;
 		create_info.tiling = VK_IMAGE_TILING_OPTIMAL;
-		create_info.usage = VK_IMAGE_USAGE_SAMPLED_BIT | 
-                        VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | 
-                        VK_IMAGE_USAGE_TRANSFER_SRC_BIT | 
+		create_info.usage = VK_IMAGE_USAGE_SAMPLED_BIT |
+                        VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT |
+                        VK_IMAGE_USAGE_TRANSFER_SRC_BIT |
                         VK_IMAGE_USAGE_TRANSFER_DST_BIT;
 		create_info.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
 		create_info.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
@@ -5253,7 +5254,7 @@ MGG_Texture* MGG_RenderTarget_Create(
 
 		texture->view = CreateImageView(device, texture, create_info.mipLevels);
 		VK_SET_OBJECT_NAME(device->device, texture->view, VK_OBJECT_TYPE_IMAGE_VIEW, "MGG_Texture.view (RenderTarget id: %llu)", texture->id);
-		
+
 		if (multiSampleCount > 1)
 		{
 			auto ms_create_info = create_info;
@@ -5444,7 +5445,7 @@ void MGG_Texture_GetData(MGG_GraphicsDevice* device, MGG_Texture* texture, mgint
 {
 	assert(device != nullptr);
 	assert(texture != nullptr);
-    
+
 	MGVK_ClampAndValidateTextureRegion(texture, level, slice, x, y, z, width, height, depth);
 
 	assert(data != nullptr);
@@ -5836,7 +5837,7 @@ void MGG_OcclusionQuery_End(MGG_GraphicsDevice* device, MGG_OcclusionQuery* quer
     VkFence fence;
     VkFenceCreateInfo fenceInfo = { VK_STRUCTURE_TYPE_FENCE_CREATE_INFO };
     VK_CHECK_RESULT(vkCreateFence(device->device, &fenceInfo, nullptr, &fence));
-    
+
     VkSubmitInfo submitInfo = { VK_STRUCTURE_TYPE_SUBMIT_INFO };
     submitInfo.commandBufferCount = 1;
     submitInfo.pCommandBuffers = &frame.commandBuffer;

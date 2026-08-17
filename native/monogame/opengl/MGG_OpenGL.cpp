@@ -1648,6 +1648,7 @@ void MGG_GraphicsDevice_GetCaps(MGG_GraphicsDevice* device, MGG_GraphicsDevice_C
     bool supportsDepthClamp = false;
     bool supportsVertexTextures = true;
     mgint maxTextureAnisotropy = 16;
+    mgint maxMultiSampleCount = 0;
 
     // OpenGL can only get texture caps if there is a context.
     if (device->window != nullptr && device->context.handle != nullptr)
@@ -1672,6 +1673,11 @@ void MGG_GraphicsDevice_GetCaps(MGG_GraphicsDevice* device, MGG_GraphicsDevice_C
         glGetIntegerv(GL_MAX_VERTEX_TEXTURE_IMAGE_UNITS, &vertexTextureUnits);
         supportsVertexTextures = vertexTextureUnits > 0;
 
+        GLint reportedMaxMultiSampleCount = 0;
+        glGetIntegerv(GL_MAX_SAMPLES, &reportedMaxMultiSampleCount);
+        if (reportedMaxMultiSampleCount > 0)
+            maxMultiSampleCount = static_cast<mgint>(reportedMaxMultiSampleCount);
+
         if (supportsTextureFilterAnisotropic)
         {
             GLfloat reportedMaxAnisotropy = 1.0f;
@@ -1692,6 +1698,7 @@ void MGG_GraphicsDevice_GetCaps(MGG_GraphicsDevice* device, MGG_GraphicsDevice_C
     caps.MaxVertexBufferSlots = MaxVertexBufferSlots;
     caps.ShaderProfile = OpenGLShaderProfile;
     caps.MaxTextureAnisotropy = maxTextureAnisotropy;
+    caps.MaxMultiSampleCount = maxMultiSampleCount;
     caps.SupportsNonPowerOfTwo = supportsNonPowerOfTwo;
     caps.SupportsTextureFilterAnisotropic = supportsTextureFilterAnisotropic;
     caps.SupportsDepth24 = supportsDepth24;

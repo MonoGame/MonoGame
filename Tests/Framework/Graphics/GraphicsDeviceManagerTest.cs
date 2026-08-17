@@ -347,7 +347,7 @@ namespace MonoGame.Tests.Graphics
             Assert.AreEqual(1, resetCount);
             Assert.AreEqual(1, resettingCount);
         }
-        
+
         [Test]
         public void NewDeviceDoesNotTriggerReset()
         {
@@ -532,7 +532,7 @@ namespace MonoGame.Tests.Graphics
             }, "GraphicsDevice.Reset(PresentationParameters)");
         }
 
-#if DIRECTX
+#if DIRECTX || OPENGL
         [Test]
         public void TooHighMultiSampleCountClampedToMaxSupported()
         {
@@ -560,7 +560,7 @@ namespace MonoGame.Tests.Graphics
             gdm.GraphicsDevice.Reset(pp3);
             Assert.AreEqual
                 (maxMultiSampleCount, gdm.GraphicsDevice.PresentationParameters.MultiSampleCount);
-            
+
         }
 #endif
     }
