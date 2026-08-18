@@ -132,6 +132,13 @@ public partial class GraphicsDevice
             MGG.GraphicsDevice_Present(Handle, _currentFrame, syncInterval);
         }
 
+        if (PlatformInfo.GraphicsBackend == GraphicsBackend.OpenGL)
+        {
+            NativeGameWindow window = NativeGameWindow.Instance;
+            if (window != null)
+                window.ApplyPendingNativeWindowChanges(PresentationParameters);
+        }
+
         // Now resize the back buffer.
         MGG.GraphicsDevice_ResizeSwapchain(
             Handle,

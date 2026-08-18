@@ -327,6 +327,9 @@ internal static unsafe partial class MGP
     [DllImport(MonoGameNativeDLL, EntryPoint = "MGP_Window_Destroy", ExactSpelling = true)]
     public static extern void Window_Destroy(MGP_Window* window);
 
+    [DllImport(MonoGameNativeDLL, EntryPoint = "MGP_Window_DestroyNativeWindow", ExactSpelling = true)]
+    public static extern void Window_DestroyNativeWindow(MGP_Window* window);
+
     [DllImport(MonoGameNativeDLL, EntryPoint = "MGP_Window_SetIconBitmap", ExactSpelling = true)]
     public static extern void Window_SetIconBitmap(MGP_Window* window, byte* icon, int length);
 

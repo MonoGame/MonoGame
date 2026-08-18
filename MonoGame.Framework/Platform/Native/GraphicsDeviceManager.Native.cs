@@ -4,12 +4,27 @@
 
 using System;
 using Microsoft.Xna.Framework.Graphics;
+using MonoGame.Framework.Utilities;
 using MonoGame.Interop;
 
 namespace Microsoft.Xna.Framework;
 
 public partial class GraphicsDeviceManager
 {
+    partial void PlatformApplyChanges(GraphicsDeviceInformation gdi)
+    {
+        if (PlatformInfo.GraphicsBackend != GraphicsBackend.OpenGL)
+            return;
+
+        NativeGameWindow window = _game.Window as NativeGameWindow;
+        if (window == null)
+            return;
+
+        MGP_WindowCreateInfo windowCreateInfo = default;
+        FillWindowCreateInfo(gdi.PresentationParameters, ref windowCreateInfo);
+        window.QueueNativeWindowRecreationIfNeeded(gdi.PresentationParameters, windowCreateInfo);
+    }
+
     partial void PlatformInitialize(PresentationParameters presentationParameters)
     {
         NativeGameWindow window = _game.Window as NativeGameWindow;

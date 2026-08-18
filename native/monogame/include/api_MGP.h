@@ -43,6 +43,7 @@ MG_EXPORT MGGraphicsBackend MGP_Platform_GetGraphicsBackend();
 MG_EXPORT MGP_Window* MGP_Window_Create(MGP_Platform* platform, mgint& width, mgint& height, const char* title, const MGP_WindowCreateInfo* windowCreateInfo);
 MG_EXPORT mgbyte MGP_Window_CreateNativeWindow(MGP_Window* window, mgint& width, mgint& height, const char* title, const MGP_WindowCreateInfo* windowCreateInfo);
 MG_EXPORT void MGP_Window_Destroy(MGP_Window* window);
+MG_EXPORT void MGP_Window_DestroyNativeWindow(MGP_Window* window);
 MG_EXPORT void MGP_Window_SetIconBitmap(MGP_Window* window, mgbyte* icon, mgint length);
 MG_EXPORT void* MGP_Window_GetNativeHandle(MGP_Window* window);
 MG_EXPORT mgbyte MGP_Window_GetAllowUserResizing(MGP_Window* window);

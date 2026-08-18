@@ -30,12 +30,17 @@ internal class NativeGameWindow : GameWindow
     private bool _hasPendingPosition;
     private int _positionX;
     private int _positionY;
+    private bool _hasWindowCreateInfo;
+    private bool _hasPendingWindowCreateInfo;
 
     private int _width;
     private int _height;
     private byte[] _icon;
+    private MGP_WindowCreateInfo _windowCreateInfo;
+    private MGP_WindowCreateInfo _pendingWindowCreateInfo;
 
     private bool HasCreatedWindow => _nativeHandle != IntPtr.Zero;
+    internal static NativeGameWindow Instance { get; private set; }
 
     public static NativeGameWindow FromHandle(nint handle)
     {
@@ -152,6 +157,8 @@ internal class NativeGameWindow : GameWindow
 
         _icon = AssemblyHelper.GetDefaultWindowIcon();
 
+        Instance = this;
+
         CreateWindow();
     }
 
@@ -171,6 +178,9 @@ internal class NativeGameWindow : GameWindow
             Mouse.WindowHandle = IntPtr.Zero;
             MessageBox._window = null;
         }
+
+        if (Instance == this)
+            Instance = null;
     }
 
     internal unsafe void CreateWindow()
@@ -195,7 +205,12 @@ internal class NativeGameWindow : GameWindow
             CreateWindow();
 
         if (HasCreatedWindow)
-            return;
+        {
+            if (!NeedsNativeWindowRecreation(windowCreateInfo))
+                return;
+
+            DestroyNativeWindow();
+        }
 
         string title = Title == null ? AssemblyHelper.GetDefaultWindowTitle() : Title;
 
@@ -204,6 +219,80 @@ internal class NativeGameWindow : GameWindow
 
         if (!TryAttachWindow())
             throw new NoSuitableGraphicsDeviceException("Failed to initialize native window!");
+
+        _windowCreateInfo = windowCreateInfo;
+        _hasWindowCreateInfo = true;
+        _hasPendingWindowCreateInfo = false;
+    }
+
+    internal void QueueNativeWindowRecreationIfNeeded(PresentationParameters pp, MGP_WindowCreateInfo windowCreateInfo)
+    {
+        if (!NeedsNativeWindowRecreation(windowCreateInfo))
+            return;
+
+        _width = pp.BackBufferWidth;
+        _height = pp.BackBufferHeight;
+        _pendingWindowCreateInfo = windowCreateInfo;
+        _hasPendingWindowCreateInfo = true;
+    }
+
+    internal unsafe void ApplyPendingNativeWindowChanges(PresentationParameters pp)
+    {
+        if (!_hasPendingWindowCreateInfo)
+        {
+            pp.DeviceWindowHandle = Handle;
+            return;
+        }
+
+        RecreateNativeWindow(pp, _pendingWindowCreateInfo);
+        _hasPendingWindowCreateInfo = false;
+    }
+
+    private unsafe void RecreateNativeWindow(PresentationParameters pp, MGP_WindowCreateInfo windowCreateInfo)
+    {
+        if (_handle == null)
+            CreateWindow();
+
+        _width = pp.BackBufferWidth;
+        _height = pp.BackBufferHeight;
+
+        DestroyNativeWindow();
+        CreateWindow(windowCreateInfo);
+        pp.DeviceWindowHandle = Handle;
+    }
+
+    private unsafe void DestroyNativeWindow()
+    {
+        if (!HasCreatedWindow)
+            return;
+
+        if (!IsFullScreen)
+        {
+            Point position = Position;
+            _hasPendingPosition = true;
+            _positionX = position.X;
+            _positionY = position.Y;
+        }
+
+        MGP.Window_DestroyNativeWindow(_handle);
+        _nativeHandle = IntPtr.Zero;
+    }
+
+    private bool NeedsNativeWindowRecreation(MGP_WindowCreateInfo windowCreateInfo)
+    {
+        if (!HasCreatedWindow || !_hasWindowCreateInfo)
+            return true;
+
+        return
+            _windowCreateInfo.RedSize != windowCreateInfo.RedSize ||
+            _windowCreateInfo.GreenSize != windowCreateInfo.GreenSize ||
+            _windowCreateInfo.BlueSize != windowCreateInfo.BlueSize ||
+            _windowCreateInfo.AlphaSize != windowCreateInfo.AlphaSize ||
+            _windowCreateInfo.FramebufferSrgbCapable != windowCreateInfo.FramebufferSrgbCapable ||
+            _windowCreateInfo.DepthSize != windowCreateInfo.DepthSize ||
+            _windowCreateInfo.StencilSize != windowCreateInfo.StencilSize ||
+            _windowCreateInfo.MultiSampleBuffers != windowCreateInfo.MultiSampleBuffers ||
+            _windowCreateInfo.MultiSampleSamples != windowCreateInfo.MultiSampleSamples;
     }
 
     private unsafe bool TryAttachWindow()

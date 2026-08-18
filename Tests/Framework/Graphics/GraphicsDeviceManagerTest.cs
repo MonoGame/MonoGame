@@ -118,7 +118,14 @@ namespace MonoGame.Tests.Graphics
                 Assert.False(pp.IsFullScreen);
                 Assert.AreEqual(PresentInterval.One, pp.PresentationInterval);
                 Assert.AreEqual(new Rectangle(0, 0, 800, 480), pp.Bounds);
+
+#if OPENGL
+                // Native OpenGL doesn't create the actual SDL window until graphics initialization,
+                // after the final presentation parameters have been configured.
+                Assert.AreEqual(IntPtr.Zero, pp.DeviceWindowHandle);
+#else
                 Assert.AreNotEqual(IntPtr.Zero, pp.DeviceWindowHandle);
+#endif
                 Assert.AreEqual(DisplayOrientation.Default, pp.DisplayOrientation);
                 Assert.AreEqual(RenderTargetUsage.DiscardContents, pp.RenderTargetUsage);
                 Assert.AreEqual(0, pp.MultiSampleCount);
@@ -531,6 +538,30 @@ namespace MonoGame.Tests.Graphics
                 gdm.GraphicsDevice.Reset(pp);
             }, "GraphicsDevice.Reset(PresentationParameters)");
         }
+
+#if OPENGL
+        [Test]
+        public void ApplyChangesRecreatesNativeWindowWhenDepthStencilFormatChanges()
+        {
+            var game = new TestGameBase();
+            var gdm = new GraphicsDeviceManager(game);
+
+            game.InitializeOnly();
+
+            IntPtr oldWindowHandle = game.GraphicsDevice.PresentationParameters.DeviceWindowHandle;
+
+            gdm.PreferredDepthStencilFormat = DepthFormat.None;
+            gdm.ApplyChanges();
+
+            var pp = game.GraphicsDevice.PresentationParameters;
+            Assert.AreEqual(DepthFormat.None, pp.DepthStencilFormat);
+            Assert.AreEqual(game.Window.Handle, pp.DeviceWindowHandle);
+            Assert.AreNotEqual(IntPtr.Zero, pp.DeviceWindowHandle);
+            Assert.AreNotEqual(oldWindowHandle, pp.DeviceWindowHandle);
+
+            game.Dispose();
+        }
+#endif
 
 #if DIRECTX || OPENGL
         [Test]

@@ -829,6 +829,18 @@ void MGP_Window_Destroy(MGP_Window* window)
 	delete window;
 }
 
+void MGP_Window_DestroyNativeWindow(MGP_Window* window)
+{
+    assert(window != nullptr);
+
+    if (window->window == nullptr)
+        return;
+
+    SDL_DestroyWindow(window->window);
+    window->window = nullptr;
+    window->windowId = 0;
+}
+
 void MGP_Window_SetIconBitmap(MGP_Window* window, mgbyte* icon, mgint length)
 {
     assert(window != nullptr);
