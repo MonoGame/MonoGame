@@ -138,16 +138,39 @@ void OpenGLContext::Create(SDL_Window* nextWindow)
     if (handle != nullptr && window == nextWindow)
         return;
 
-    if (handle != nullptr)
-        Destroy();
+    SDL_GLContext previousHandle = handle;
+    SDL_Window* previousWindow = window;
 
-    handle = SDL_GL_CreateContext(nextWindow);
-    if (handle == nullptr)
+    if (previousHandle != nullptr)
+    {
+        // On Windows the GL conext is tied to the pixel format of the window it was
+        // created for, so create the new context with resource sharing enabled before
+        // getting rid of the old one.
+        if (SDL_GL_GetCurrentContext() != previousHandle || SDL_GL_GetCurrentWindow() != previousWindow)
+        {
+            if (SDL_GL_MakeCurrent(previousWindow, previousHandle) < 0)
+                MGGL_FAIL_SDL("SDL_GL_MakeCurrent failed");
+        }
+
+        SDL_GL_SetAttribute(SDL_GL_SHARE_WITH_CURRENT_CONTEXT, 1);
+    }
+
+    SDL_GLContext nextHandle = SDL_GL_CreateContext(nextWindow);
+    if (previousHandle != nullptr)
+        SDL_GL_SetAttribute(SDL_GL_SHARE_WITH_CURRENT_CONTEXT, 0);
+
+    if (nextHandle == nullptr)
         MGGL_FAIL_SDL("SDL_GL_CreateContext failed");
 
+    handle = nextHandle;
     window = nextWindow;
     MakeCurrent();
     functions.Load();
+
+    // The new context is current and shares resources with the old context, so we
+    // dont' need to keep the old context around anymore.
+    if (previousHandle != nullptr)
+        SDL_GL_DeleteContext(previousHandle);
 
     QueryVersion(majorVersion, minorVersion);
     if (majorVersion < 4 || (majorVersion == 4 && minorVersion < 1))
@@ -162,14 +185,15 @@ void OpenGLContext::Create(SDL_Window* nextWindow)
 
 void OpenGLContext::Destroy()
 {
-    if (handle != nullptr && defaultVertexArray != 0)
-    {
-        MakeCurrent();
-        functions.DeleteVertexArrays(1, &defaultVertexArray);
-    }
-
     if (handle != nullptr)
+    {
+        // The SDl window may have already been recreated, so clear the current
+        // context instead of trying to make it current on the old window again.
+        if (SDL_GL_GetCurrentContext() == handle && SDL_GL_MakeCurrent(nullptr, nullptr) < 0)
+            MGGL_FAIL_SDL("SDL_GL_MakeCurrent failed");
+
         SDL_GL_DeleteContext(handle);
+    }
 
     window = nullptr;
     handle = nullptr;

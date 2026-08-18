@@ -561,6 +561,34 @@ namespace MonoGame.Tests.Graphics
 
             game.Dispose();
         }
+
+        [Test]
+        public void ApplyChangesRecreatesNativeWindowWhenBackBufferFormatChangesToSrgb()
+        {
+            var game = new TestGameBase();
+            var gdm = new GraphicsDeviceManager(game);
+
+            game.InitializeOnly();
+
+            if (!game.GraphicsDevice.GraphicsCapabilities.SupportsSRgb)
+            {
+                game.Dispose();
+                Assert.Ignore("OpenGL sRGB backbuffer support is unavailable on this device.");
+            }
+
+            IntPtr oldWindowHandle = game.GraphicsDevice.PresentationParameters.DeviceWindowHandle;
+
+            gdm.PreferredBackBufferFormat = SurfaceFormat.ColorSRgb;
+            gdm.ApplyChanges();
+
+            var pp = game.GraphicsDevice.PresentationParameters;
+            Assert.AreEqual(SurfaceFormat.ColorSRgb, pp.BackBufferFormat);
+            Assert.AreEqual(game.Window.Handle, pp.DeviceWindowHandle);
+            Assert.AreNotEqual(IntPtr.Zero, pp.DeviceWindowHandle);
+            Assert.AreNotEqual(oldWindowHandle, pp.DeviceWindowHandle);
+
+            game.Dispose();
+        }
 #endif
 
 #if DIRECTX || OPENGL

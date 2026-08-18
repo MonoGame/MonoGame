@@ -150,6 +150,15 @@ public partial class GraphicsDevice
             requestedMultiSampleCount,
             PresentationParameters.PresentationInterval.GetSyncInterval());
 
+        if (PlatformInfo.GraphicsBackend == GraphicsBackend.OpenGL)
+        {
+            NativeGameWindow window = NativeGameWindow.Instance;
+            if (window != null)
+                // OpenGL may keep the old SDl window around until the new
+                // GL context has been successfully created and made current.
+                window.FinalizePendingNativeWindowChanges();
+        }
+
         RefreshCapabilities();
         UpdateBackBufferMultiSampleCount();
         GraphicsCapabilities.Initialize(this);

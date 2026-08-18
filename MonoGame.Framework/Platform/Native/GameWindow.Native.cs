@@ -255,10 +255,29 @@ internal class NativeGameWindow : GameWindow
 
         _width = pp.BackBufferWidth;
         _height = pp.BackBufferHeight;
+        string title = Title == null ? AssemblyHelper.GetDefaultWindowTitle() : Title;
 
-        DestroyNativeWindow();
-        CreateWindow(windowCreateInfo);
+        // OpenGL framebuffer attributes are set when teh SDL window is created,
+        // so we need to recreate the native window before creating th new GL context
+        if (MGP.Window_BeginRecreateNativeWindow(_handle, ref _width, ref _height, title, ref windowCreateInfo) == 0)
+            throw new NoSuitableGraphicsDeviceException("Failed to initialize native window!");
+
+        _nativeHandle = IntPtr.Zero;
+        if (!TryAttachWindow())
+            throw new NoSuitableGraphicsDeviceException("Failed to initialize native window!");
+
+        _windowCreateInfo = windowCreateInfo;
+        _hasWindowCreateInfo = true;
         pp.DeviceWindowHandle = Handle;
+    }
+
+    internal unsafe void FinalizePendingNativeWindowChanges()
+    {
+        if (_handle == null)
+            return;
+
+        // Native code tracks whether a staged OpenGL window replacement is pending.
+        MGP.Window_FinalizeRecreateNativeWindow(_handle);
     }
 
     private unsafe void DestroyNativeWindow()

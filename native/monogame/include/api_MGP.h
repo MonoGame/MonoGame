@@ -1,7 +1,7 @@
 // MonoGame - Copyright (C) MonoGame Foundation, Inc
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
-                
+
 // This code is auto generated, don't modify it by hand.
 // To regenerate it run: Tools/MonoGame.Generator.CTypes
 
@@ -42,6 +42,8 @@ MG_EXPORT MGMonoGamePlatform MGP_Platform_GetPlatform();
 MG_EXPORT MGGraphicsBackend MGP_Platform_GetGraphicsBackend();
 MG_EXPORT MGP_Window* MGP_Window_Create(MGP_Platform* platform, mgint& width, mgint& height, const char* title, const MGP_WindowCreateInfo* windowCreateInfo);
 MG_EXPORT mgbyte MGP_Window_CreateNativeWindow(MGP_Window* window, mgint& width, mgint& height, const char* title, const MGP_WindowCreateInfo* windowCreateInfo);
+MG_EXPORT mgbyte MGP_Window_BeginRecreateNativeWindow(MGP_Window* window, mgint& width, mgint& height, const char* title, const MGP_WindowCreateInfo* windowCreateInfo);
+MG_EXPORT void MGP_Window_FinalizeRecreateNativeWindow(MGP_Window* window);
 MG_EXPORT void MGP_Window_Destroy(MGP_Window* window);
 MG_EXPORT void MGP_Window_DestroyNativeWindow(MGP_Window* window);
 MG_EXPORT void MGP_Window_SetIconBitmap(MGP_Window* window, mgbyte* icon, mgint length);

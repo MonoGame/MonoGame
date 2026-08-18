@@ -328,7 +328,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 var roundedWidth = (checkedRect.Width + 3) & ~0x3;
                 var roundedHeight = (checkedRect.Height + 3) & ~0x3;
                 checkedRect = new Rectangle(checkedRect.X & ~0x3, checkedRect.Y & ~0x3,
-#if OPENGL
+#if OPENGL || NATIVE
                     // OpenGL only: The last two mip levels require the width and height to be
                     // passed as 2x2 and 1x1, but there needs to be enough data passed to occupy
                     // a 4x4 block.

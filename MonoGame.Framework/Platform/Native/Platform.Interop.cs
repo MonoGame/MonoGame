@@ -311,6 +311,14 @@ internal static unsafe partial class MGP
         [MarshalAs(UnmanagedType.LPUTF8Str)] string title,
         MGP_WindowCreateInfo* windowCreateinfo);
 
+    [DllImport(MonoGameNativeDLL, EntryPoint = "MGP_Window_BeginRecreateNativeWindow", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    private static extern byte _Window_BeginRecreateNativeWindow(
+        MGP_Window* window,
+        ref int width,
+        ref int height,
+        [MarshalAs(UnmanagedType.LPUTF8Str)] string title,
+        MGP_WindowCreateInfo* windowCreateInfo);
+
     public static MGP_Window* Window_Create(MGP_Platform* platform, ref int width, ref int height, string title)
     {
         return _Window_Create(platform, ref width, ref height, title, null);
@@ -324,11 +332,22 @@ internal static unsafe partial class MGP
         }
     }
 
+    public static byte Window_BeginRecreateNativeWindow(MGP_Window* window, ref int width, ref int height, string title, ref MGP_WindowCreateInfo windowCreateInfo)
+    {
+        fixed (MGP_WindowCreateInfo* windowCreateInfoPtr = &windowCreateInfo)
+        {
+            return _Window_BeginRecreateNativeWindow(window, ref width, ref height, title, windowCreateInfoPtr);
+        }
+    }
+
     [DllImport(MonoGameNativeDLL, EntryPoint = "MGP_Window_Destroy", ExactSpelling = true)]
     public static extern void Window_Destroy(MGP_Window* window);
 
     [DllImport(MonoGameNativeDLL, EntryPoint = "MGP_Window_DestroyNativeWindow", ExactSpelling = true)]
     public static extern void Window_DestroyNativeWindow(MGP_Window* window);
+
+    [DllImport(MonoGameNativeDLL, EntryPoint = "MGP_Window_FinalizeRecreateNativeWindow", ExactSpelling = true)]
+    public static extern void Window_FinalizeRecreateNativeWindow(MGP_Window* window);
 
     [DllImport(MonoGameNativeDLL, EntryPoint = "MGP_Window_SetIconBitmap", ExactSpelling = true)]
     public static extern void Window_SetIconBitmap(MGP_Window* window, byte* icon, int length);
@@ -364,7 +383,7 @@ internal static unsafe partial class MGP
     public static extern void Window_SetClientSize(MGP_Window* window, int width, int height);
 
     [DllImport(MonoGameNativeDLL, EntryPoint = "MGP_Window_SetCursor", ExactSpelling = true)]
-    public static extern void Window_SetCursor(MGP_Window* window, MGP_Cursor* cursor);        
+    public static extern void Window_SetCursor(MGP_Window* window, MGP_Cursor* cursor);
 
     [DllImport(MonoGameNativeDLL, EntryPoint = "MGP_Window_ShowMessageBox", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
     public static extern int Window_ShowMessageBox(

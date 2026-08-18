@@ -200,6 +200,20 @@ namespace
     constexpr mgint OpenGLShaderProfile = 0;
     constexpr size_t ShaderStageCount = static_cast<size_t>(MGShaderStage::Count);
 
+    bool IsSrgbBackBufferFormat(MGSurfaceFormat format)
+    {
+        switch (format)
+        {
+            case MGSurfaceFormat::ColorSRgb:
+            case MGSurfaceFormat::Bgr32SRgb:
+            case MGSurfaceFormat::Bgra32SRgb:
+                return true;
+
+            default:
+                return false;
+        }
+    }
+
     struct TextureFormatInfo
     {
         GLenum internalFormat;
@@ -932,8 +946,12 @@ namespace
                 return { GL_RGBA4, GL_RGBA, GL_UNSIGNED_SHORT_4_4_4_4, 2, 2, 1, 1, GL_RED, GL_GREEN, GL_BLUE, GL_ALPHA, false, false };
             case MGSurfaceFormat::Bgra5551:
                 return { GL_RGB5_A1, GL_RGBA, GL_UNSIGNED_SHORT_5_5_5_1, 2, 2, 1, 1, GL_RED, GL_GREEN, GL_BLUE, GL_ALPHA, false, false };
+            case MGSurfaceFormat::Bgr32:
+                return { GL_RGBA8, GL_BGRA, GL_UNSIGNED_BYTE, 4, 4, 1, 1, GL_RED, GL_GREEN, GL_BLUE, GL_ONE, true, false };
             case MGSurfaceFormat::Bgra32:
                 return { GL_RGBA8, GL_BGRA, GL_UNSIGNED_BYTE, 4, 4, 1, 1, GL_RED, GL_GREEN, GL_BLUE, GL_ALPHA, false, false };
+            case MGSurfaceFormat::Bgr32SRgb:
+                return { GL_SRGB8_ALPHA8, GL_BGRA, GL_UNSIGNED_BYTE, 4, 4, 1, 1, GL_RED, GL_GREEN, GL_BLUE, GL_ONE, true, false };
             case MGSurfaceFormat::Bgra32SRgb:
                 return { GL_SRGB8_ALPHA8, GL_BGRA, GL_UNSIGNED_BYTE, 4, 4, 1, 1, GL_RED, GL_GREEN, GL_BLUE, GL_ALPHA, false, false };
             case MGSurfaceFormat::Alpha8:
@@ -1109,10 +1127,30 @@ namespace
         resolvedDepth = depth > 0 ? depth : mipDepth - z;
 
         if (resolvedWidth <= 0 || resolvedHeight <= 0 || resolvedDepth <= 0)
-            MGGL_FAIL("Invalid texture region", "resolved upload region must be positive");
+            MGGL_FAIL("Invalid texture region", "resolved texture region must be positive");
 
-        if (x + resolvedWidth > mipWidth || y + resolvedHeight > mipHeight || z + resolvedDepth > mipDepth)
-            MGGL_FAIL("Invalid texture region", "requested upload region exceeds texture bounds");
+        if (!texture->isCompressed
+            && (x + resolvedWidth > mipWidth || y + resolvedHeight > mipHeight || z + resolvedDepth > mipDepth))
+        {
+            MGGL_FAIL("Invalid texture region", "requested texture region exceeds texture bounds");
+        }
+
+        if (texture->isCompressed)
+        {
+            mgint mipBlockWidth = GetTextureBlockCount(mipWidth, texture->blockWidth);
+            mgint mipBlockHeight = GetTextureBlockCount(mipHeight, texture->blockHeight);
+            mgint regionBlockX = x / texture->blockWidth;
+            mgint regionBlockY = y / texture->blockHeight;
+            mgint regionBlockWidth = GetTextureBlockCount(resolvedWidth, texture->blockWidth);
+            mgint regionBlockHeight = GetTextureBlockCount(resolvedHeight, texture->blockHeight);
+
+            if (regionBlockX + regionBlockWidth > mipBlockWidth
+                || regionBlockY + regionBlockHeight > mipBlockHeight
+                || z + resolvedDepth > mipDepth)
+            {
+                MGGL_FAIL("Invalid texture region", "requested compressed texture region exceeds texture bounds");
+            }
+        }
     }
 
     mgint NormalizeUploadByteCount(const MGG_Texture* texture, mgint width, mgint height, mgint depth, mgint dataBytes)
@@ -1775,6 +1813,14 @@ void MGG_GraphicsDevice_ResizeSwapchain(
     glGetIntegerv(GL_SAMPLE_BUFFERS, &sampleBuffers);
     glGetIntegerv(GL_SAMPLES, &samples);
     device->multiSampleCount = (sampleBuffers > 0 && samples > 0) ? static_cast<mgint>(samples) : 0;
+
+    if (device->context.majorVersion > 2 || (device->context.majorVersion == 2 && device->context.minorVersion >= 1))
+    {
+        if (IsSrgbBackBufferFormat(color))
+            glEnable(GL_FRAMEBUFFER_SRGB);
+        else
+            glDisable(GL_FRAMEBUFFER_SRGB);
+    }
 
     glViewport(0, 0, width, height);
     glScissor(0, 0, width, height);
