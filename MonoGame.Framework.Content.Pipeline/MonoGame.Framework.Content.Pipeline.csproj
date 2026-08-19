@@ -69,7 +69,7 @@
     <PackageReference Include="MonoGame.Library.MojoShader" Version="1.0.0.7" />
     <PackageReference Include="MonoGame.Tool.Basisu" Version="2.0.2.1" />
     <PackageReference Include="MonoGame.Tool.Crunch" Version="1.0.4.7" />
-    <PackageReference Include="MonoGame.Tool.Dxc" Version="1.8.2505.11" />
+    <PackageReference Include="MonoGame.Tool.Dxc" Version="1.9.2607.1" />
     <PackageReference Include="MonoGame.Tool.FFmpeg" Version="7.0.0.10" />
     <PackageReference Include="MonoGame.Tool.FFprobe" Version="7.0.0.10" />
     <PackageReference Include="SharpDX" Version="4.0.1" />
