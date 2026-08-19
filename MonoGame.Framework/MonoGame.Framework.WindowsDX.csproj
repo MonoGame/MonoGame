@@ -72,11 +72,11 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.NETCore.App" Version="2.1.30" />
     <PackageReference Include="Microsoft.NETCore.Jit" Version="2.0.8" />
-    <PackageReference Version="4.0.1" Include="SharpDX" />
-    <PackageReference Version="4.0.1" Include="SharpDX.Direct2D1" />
-    <PackageReference Version="4.0.1" Include="SharpDX.Direct3D11" />
-    <PackageReference Version="4.0.1" Include="SharpDX.DXGI" />
-    <PackageReference Version="4.0.1" Include="SharpDX.XInput" />
+    <PackageReference Version="4.2.0" Include="SharpDX" />
+    <PackageReference Version="4.2.0" Include="SharpDX.Direct2D1" />
+    <PackageReference Version="4.2.0" Include="SharpDX.Direct3D11" />
+    <PackageReference Version="4.2.0" Include="SharpDX.DXGI" />
+    <PackageReference Version="4.2.0" Include="SharpDX.XInput" />
     <PackageReference Include="System.Net.Http" Version="4.3.4" />
     <PackageReference Include="System.Security.Cryptography.X509Certificates" Version="4.3.2" />
   </ItemGroup>
