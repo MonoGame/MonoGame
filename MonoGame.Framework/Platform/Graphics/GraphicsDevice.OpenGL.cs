@@ -380,16 +380,23 @@ namespace Microsoft.Xna.Framework.Graphics
             // So overwrite these states with what is needed to perform
             // the clear correctly and restore it afterwards.
             //
-		    var prevScissorRect = ScissorRectangle;
+            var prevScissorTestEnable = _lastRasterizerState.ScissorTestEnable;
 		    var prevDepthStencilState = DepthStencilState;
             var prevBlendState = BlendState;
-            ScissorRectangle = _viewport.Bounds;
             // DepthStencilState.Default has the Stencil Test disabled; 
             // make sure stencil test is enabled before we clear since
             // some drivers won't clear with stencil test disabled
             DepthStencilState = this.clearDepthStencilState;
 		    BlendState = BlendState.Opaque;
             ApplyState(false);
+
+            // Clear should affect the whole active target, not only the
+            // current viewport-sized scissor rectangle, to match XNA behavior
+            if (prevScissorTestEnable)
+            {
+                GL.Disable(EnableCap.ScissorTest);
+                GraphicsExtensions.CheckGLError();
+            }
 
             ClearBufferMask bufferMask = 0;
             if ((options & ClearOptions.Target) == ClearOptions.Target)
@@ -435,7 +442,12 @@ namespace Microsoft.Xna.Framework.Graphics
 #endif
            		
             // Restore the previous render state.
-		    ScissorRectangle = prevScissorRect;
+            if (prevScissorTestEnable)
+            {
+                GL.Enable(EnableCap.ScissorTest);
+                GraphicsExtensions.CheckGLError();
+            }
+
 		    DepthStencilState = prevDepthStencilState;
 		    BlendState = prevBlendState;
         }
