@@ -90,6 +90,11 @@ internal struct MGG_DepthStencilState_Info
     public StencilOperation stencilDepthBufferFail;
     public StencilOperation stencilFail;
     public StencilOperation stencilPass;
+    public bool twoSidedStencilMode;
+    public CompareFunction counterClockwiseStencilFunction;
+    public StencilOperation counterClockwiseStencilDepthBufferFail;
+    public StencilOperation counterClockwiseStencilFail;
+    public StencilOperation counterClockwiseStencilPass;
 }
 
 [StructLayout(LayoutKind.Sequential)]
