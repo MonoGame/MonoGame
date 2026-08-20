@@ -120,6 +120,11 @@ struct MGG_DepthStencilState_Info
     MGStencilOperation stencilDepthBufferFail;
     MGStencilOperation stencilFail;
     MGStencilOperation stencilPass;
+    mgbool twoSidedStencilMode;
+    MGCompareFunction counterClockwiseStencilFunction;
+    MGStencilOperation counterClockwiseStencilDepthBufferFail;
+    MGStencilOperation counterClockwiseStencilFail;
+    MGStencilOperation counterClockwiseStencilPass;
 };
 
 struct MGG_RasterizerState_Info

@@ -1400,10 +1400,17 @@ MGG_DepthStencilState* MGG_DepthStencilState_Create(MGG_GraphicsDevice* device, 
 	state->desc.FrontFace.StencilPassOp = StencilOperationToD3D12_D3D12_STENCIL_OP[(int)info->stencilPass];
 	state->desc.FrontFace.StencilFailOp = StencilOperationToD3D12_D3D12_STENCIL_OP[(int)info->stencilFail];
 	state->desc.FrontFace.StencilDepthFailOp = StencilOperationToD3D12_D3D12_STENCIL_OP[(int)info->stencilDepthBufferFail];
-	state->desc.BackFace.StencilFunc = CompareFunctionToD3D12_COMPARISON_FUNC[(int)info->stencilFunction];
-	state->desc.BackFace.StencilPassOp = StencilOperationToD3D12_D3D12_STENCIL_OP[(int)info->stencilPass];
-	state->desc.BackFace.StencilFailOp = StencilOperationToD3D12_D3D12_STENCIL_OP[(int)info->stencilFail];
-	state->desc.BackFace.StencilDepthFailOp = StencilOperationToD3D12_D3D12_STENCIL_OP[(int)info->stencilDepthBufferFail];
+	if (info->twoSidedStencilMode)
+	{
+		state->desc.BackFace.StencilFunc = CompareFunctionToD3D12_COMPARISON_FUNC[(int)info->counterClockwiseStencilFunction];
+		state->desc.BackFace.StencilPassOp = StencilOperationToD3D12_D3D12_STENCIL_OP[(int)info->counterClockwiseStencilPass];
+		state->desc.BackFace.StencilFailOp = StencilOperationToD3D12_D3D12_STENCIL_OP[(int)info->counterClockwiseStencilFail];
+		state->desc.BackFace.StencilDepthFailOp = StencilOperationToD3D12_D3D12_STENCIL_OP[(int)info->counterClockwiseStencilDepthBufferFail];
+	}
+	else
+	{
+		state->desc.BackFace = state->desc.FrontFace;
+	}
 	state->referenceStencil = info->referenceStencil;
 
 	return state;
