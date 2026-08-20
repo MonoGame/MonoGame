@@ -139,5 +139,105 @@ namespace MonoGame.Tests.Graphics
             depthStencilState.Dispose();
             cube.UnloadContent();
         }
+
+        [Test]
+        public void TwoSidedStencilModeUsesSeparateClockwiseAndCounterClockwiseStencilStates()
+        {
+            VertexPositionColor[] stencilTriangles = new VertexPositionColor[]
+            {
+                // Uses counter clockwise stencil state
+                new VertexPositionColor(new Vector3(-0.95f, -0.75f, 0f), Color.Red),
+                new VertexPositionColor(new Vector3(-0.15f, -0.75f, 0f), Color.Red),
+                new VertexPositionColor(new Vector3(-0.55f, 0.55f, 0f), Color.Red),
+
+                // Flip the winding order so this uses regular stencil state.
+                new VertexPositionColor(new Vector3(0.55f, 0.55f, 0f), Color.Red),
+                new VertexPositionColor(new Vector3(0.95f, -0.75f, 0f), Color.Red),
+                new VertexPositionColor(new Vector3(0.15f, -0.75f, 0f), Color.Red)
+            };
+
+            VertexPositionColor[] fullScreenTriangle = new VertexPositionColor[]
+            {
+                new VertexPositionColor(new Vector3(-1f, -1f, 0f), Color.Green),
+                new VertexPositionColor(new Vector3(3f, -1f, 0f), Color.Green),
+                new VertexPositionColor(new Vector3(-1f, 3f, 0f), Color.Green)
+            };
+
+            using RenderTarget2D renderTarget = new RenderTarget2D(gd, 64, 64, false, SurfaceFormat.Color,DepthFormat.Depth24Stencil8);
+            using BasicEffect effect = new BasicEffect(gd) { VertexColorEnabled = true };
+
+            // Disable color writes for first pass, only modify stencil buffer.
+            using BlendState stencilOnlyBlendState = new BlendState() { ColorWriteChannels = ColorWriteChannels.None };
+
+            // counter-clockwise face writes 3 to the stencil buffer
+            using DepthStencilState twoSidedStencilState = new DepthStencilState()
+            {
+                    DepthBufferEnable = false,
+                    DepthBufferWriteEnable = false,
+                    StencilEnable = true,
+                    StencilFunction = CompareFunction.Always,
+                    StencilPass = StencilOperation.Keep,
+                    StencilFail = StencilOperation.Keep,
+                    StencilDepthBufferFail = StencilOperation.Keep,
+                    TwoSidedStencilMode = true,
+                    CounterClockwiseStencilFunction = CompareFunction.Always,
+                    CounterClockwiseStencilPass = StencilOperation.Replace,
+                    CounterClockwiseStencilFail = StencilOperation.Keep,
+                    CounterClockwiseStencilDepthBufferFail = StencilOperation.Keep,
+                    ReferenceStencil = 3
+            };
+
+            // only draw where the stencil value is 3
+            using DepthStencilState stencilTestState = new DepthStencilState()
+            {
+                    DepthBufferEnable = false,
+                    DepthBufferWriteEnable = false,
+                    StencilEnable = true,
+                    StencilFunction = CompareFunction.Equal,
+                    StencilPass = StencilOperation.Keep,
+                    StencilFail = StencilOperation.Keep,
+                    StencilDepthBufferFail = StencilOperation.Keep,
+                    ReferenceStencil = 3
+            };
+            using RasterizerState rasterizerState = new RasterizerState() { CullMode = CullMode.None };
+
+            gd.SetRenderTarget(renderTarget!);
+            gd.Clear(ClearOptions.Target | ClearOptions.DepthBuffer | ClearOptions.Stencil, Color.Black, 1f, 1);
+
+            gd.BlendState = stencilOnlyBlendState!;
+            gd.DepthStencilState = twoSidedStencilState!;
+            gd.RasterizerState = rasterizerState!;
+
+            // Draw both windings into the stencil buffer
+            foreach (EffectPass pass in effect.CurrentTechnique.Passes)
+            {
+                pass.Apply();
+                gd.DrawUserPrimitives(PrimitiveType.TriangleList, stencilTriangles, 0, 2);
+            }
+
+            gd.BlendState = BlendState.Opaque;
+            gd.DepthStencilState = stencilTestState!;
+
+            // Draw over the entire target.
+            // Only pixels where the stencil value is 3 should be changed to green.
+            foreach (EffectPass pass in effect.CurrentTechnique.Passes)
+            {
+                pass.Apply();
+                gd.DrawUserPrimitives(PrimitiveType.TriangleList, fullScreenTriangle, 0, 1);
+            }
+
+            gd.SetRenderTarget(null);
+
+            Color[] pixels = renderTarget.GetColorData();
+            int leftIndex = (renderTarget.Height / 2) * renderTarget.Width + (renderTarget.Width / 4);
+            int rightIndex = (renderTarget.Height / 2) * renderTarget.Width + ((renderTarget.Width * 3) / 4);
+            int backgroundIndex = (renderTarget.Height / 8) * renderTarget.Width + (renderTarget.Width / 2);
+
+            // counter-clockwise triangle write 3, regular triangle did not
+            // untouched pixels should have remained clear color
+            Assert.AreEqual(Color.Green, pixels[leftIndex]);
+            Assert.AreEqual(Color.Black, pixels[rightIndex]);
+            Assert.AreEqual(Color.Black, pixels[backgroundIndex]);
+        }
     }
 }
