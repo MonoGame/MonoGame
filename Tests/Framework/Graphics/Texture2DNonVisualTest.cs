@@ -363,10 +363,10 @@ namespace MonoGame.Tests.Graphics
 #if !DESKTOPGL
         // format not supported
         [TestCase(SurfaceFormat.Vector4, (long)(200 << 48 + 180 << 32 + 160 << 16 + 120))]
+        [TestCase(SurfaceFormat.Bgr32, (uint)((200u << 24) | (180u << 16) | (160u << 8) | 120u))]
+        [TestCase(SurfaceFormat.Bgr32SRgb, (uint)((200u << 24) | (180u << 16) | (160u << 8) | 120u))]
 #endif
         [TestCase(SurfaceFormat.Vector2, (float)(200 << 48 + 180 << 32 + 160 << 16 + 120))]
-        [TestCase(SurfaceFormat.Bgr32, 0x7f563412u)]
-        [TestCase(SurfaceFormat.Bgr32SRgb, 0x7f563412u)]
         [TestCase(SurfaceFormat.Color, (float)(200 << 24 + 180 << 16 + 160 << 8 + 120))]
         [TestCase(SurfaceFormat.Color, (byte)150)]
         [TestCase(SurfaceFormat.Color, (short)(160 << 8 + 120))]
@@ -860,9 +860,9 @@ namespace MonoGame.Tests.Graphics
                 data[i] = (short) i;
             tex.SetData(data);
             var getData = new short[size];
-            tex.GetData(data);
+            tex.GetData(getData);
             for (var i = 0; i < getData.Length; i++)
-                Assert.AreEqual((short) i, data[i]);
+                Assert.AreEqual((short) i, getData[i]);
 
             tex.Dispose();
         }

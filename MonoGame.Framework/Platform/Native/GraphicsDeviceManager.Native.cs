@@ -21,7 +21,12 @@ public partial class GraphicsDeviceManager
             return;
 
         MGP_WindowCreateInfo windowCreateInfo = default;
-        FillWindowCreateInfo(gdi.PresentationParameters, ref windowCreateInfo);
+
+        GraphicsDevice gd = GraphicsDevice;
+        int requestedMultiSampleCount = gd == null
+                                        ? GraphicsDevice.NormalizeMultiSampleCount(gdi.PresentationParameters.MultiSampleCount, 0)
+                                        : gd.GetClampedMultisampleCount(gdi.PresentationParameters.BackBufferFormat, gdi.PresentationParameters.MultiSampleCount);
+        FillWindowCreateInfo(gdi.PresentationParameters, requestedMultiSampleCount, ref windowCreateInfo);
         window.QueueNativeWindowRecreationIfNeeded(gdi.PresentationParameters, windowCreateInfo);
     }
 
@@ -33,13 +38,14 @@ public partial class GraphicsDeviceManager
 
         MGP_WindowCreateInfo windowCreateInfo = default;
 
-        FillWindowCreateInfo(presentationParameters, ref windowCreateInfo);
+        int requestedMultiSampleCount = GraphicsDevice.NormalizeMultiSampleCount(presentationParameters.MultiSampleCount, 0);
+        FillWindowCreateInfo(presentationParameters, requestedMultiSampleCount, ref windowCreateInfo);
 
         window.CreateWindow(windowCreateInfo);
         presentationParameters.DeviceWindowHandle = window.Handle;
     }
 
-    private static void FillWindowCreateInfo(PresentationParameters presentationParameters, ref MGP_WindowCreateInfo windowCreateInfo)
+    private static void FillWindowCreateInfo(PresentationParameters presentationParameters, int requestedMultiSampleCount, ref MGP_WindowCreateInfo windowCreateInfo)
     {
         switch(presentationParameters.BackBufferFormat)
         {
@@ -127,10 +133,10 @@ public partial class GraphicsDeviceManager
                 throw new NotSupportedException();
         }
 
-        if (presentationParameters.MultiSampleCount > 0)
+        if (requestedMultiSampleCount > 0)
         {
             windowCreateInfo.MultiSampleBuffers = 1;
-            windowCreateInfo.MultiSampleSamples = presentationParameters.MultiSampleCount;
+            windowCreateInfo.MultiSampleSamples = requestedMultiSampleCount;
         }
     }
 }

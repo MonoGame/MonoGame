@@ -1170,6 +1170,22 @@ namespace
         return dataBytes;
     }
 
+    GLint GetTexturePixelStoreAlignment(const MGG_Texture* texture)
+    {
+        assert(texture != nullptr);
+
+        if (texture->isCompressed || texture->bytesPerPixel <= 1)
+            return 1;
+
+        if (texture->bytesPerPixel >= 8)
+            return 8;
+
+        if (texture->bytesPerPixel >= 4)
+            return 4;
+
+        return 2;
+    }
+
     GLenum GetTextureBindingEnum(GLenum target)
     {
         switch (target)
@@ -3039,7 +3055,10 @@ void MGG_Texture_SetData(MGG_GraphicsDevice* device, MGG_Texture* texture, mgint
 
     GLint previousActiveTexture = 0;
     GLint previousBinding = 0;
-    glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+    GLint previousUnpackAlignment = 0;
+    glGetIntegerv(GL_UNPACK_ALIGNMENT, &previousUnpackAlignment);
+    // Keep from shifting rows during odd-width 16-bit uploads like Bgr565
+    glPixelStorei(GL_UNPACK_ALIGNMENT, GetTexturePixelStoreAlignment(texture));
     BeginTextureEdit(device, texture, previousActiveTexture, previousBinding);
     GLenum imageTarget = GetTextureImageTarget(texture, slice);
     if (texture->isCompressed)
@@ -3109,6 +3128,7 @@ void MGG_Texture_SetData(MGG_GraphicsDevice* device, MGG_Texture* texture, mgint
             data);
     }
     EndTextureEdit(device, texture, previousActiveTexture, previousBinding);
+    glPixelStorei(GL_UNPACK_ALIGNMENT, previousUnpackAlignment);
 }
 
 void MGG_Texture_GetData(MGG_GraphicsDevice* device, MGG_Texture* texture, mgint level, mgint slice, mgint x, mgint y, mgint z, mgint width, mgint height, mgint depth, mgbyte* data, mgint dataBytes)
@@ -3136,7 +3156,9 @@ void MGG_Texture_GetData(MGG_GraphicsDevice* device, MGG_Texture* texture, mgint
 
     GLint previousActiveTexture = 0;
     GLint previousBinding = 0;
-    glPixelStorei(GL_PACK_ALIGNMENT, 1);
+    GLint previousPackAlignment = 0;
+    glGetIntegerv(GL_PACK_ALIGNMENT, &previousPackAlignment);
+    glPixelStorei(GL_PACK_ALIGNMENT, GetTexturePixelStoreAlignment(texture));
     BeginTextureEdit(device, texture, previousActiveTexture, previousBinding);
     GLenum imageTarget = GetTextureImageTarget(texture, slice);
 
@@ -3152,6 +3174,7 @@ void MGG_Texture_GetData(MGG_GraphicsDevice* device, MGG_Texture* texture, mgint
         else
             device->context.functions.GetTexImage(imageTarget, level, texture->pixelFormat, texture->pixelType, data);
         EndTextureEdit(device, texture, previousActiveTexture, previousBinding);
+        glPixelStorei(GL_PACK_ALIGNMENT, previousPackAlignment);
         return;
     }
 
@@ -3203,6 +3226,7 @@ void MGG_Texture_GetData(MGG_GraphicsDevice* device, MGG_Texture* texture, mgint
     }
 
     EndTextureEdit(device, texture, previousActiveTexture, previousBinding);
+    glPixelStorei(GL_PACK_ALIGNMENT, previousPackAlignment);
 }
 
 MGG_InputLayout* MGG_InputLayout_Create(MGG_GraphicsDevice* device, MGG_Shader* vertexShader, mgint* strides, mgint streamCount, MGG_InputElement* elements, mgint elementCount)

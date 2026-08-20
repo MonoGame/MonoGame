@@ -95,7 +95,10 @@ public partial class GraphicsDevice
 
     private unsafe void PlatformInitialize()
     {
-        int requestedMultiSampleCount = ClampRequestedBackBufferMultiSampleCount();
+        // Swapchain creation needs a sample count up front, so normalize the
+        // requested MSAA value now and reconcile it with the actual backbuffer
+        // sample count after caps are updated.
+        int requestedMultiSampleCount = NormalizeMultiSampleCount(PresentationParameters.MultiSampleCount, MaxMultiSampleCount);
 
         MGG.GraphicsDevice_ResizeSwapchain(
                 Handle,
@@ -108,7 +111,7 @@ public partial class GraphicsDevice
                 PresentationParameters.PresentationInterval.GetSyncInterval());
 
         RefreshCapabilities();
-        UpdateBackBufferMultiSampleCount();
+        UpdateBackBufferMultiSampleCount(requestedMultiSampleCount);
         GraphicsCapabilities.Initialize(this);
 
         // Setup the default texture.
@@ -123,7 +126,10 @@ public partial class GraphicsDevice
 
     private unsafe void OnPresentationChanged()
     {
-        int requestedMultiSampleCount = ClampRequestedBackBufferMultiSampleCount();
+        // Swapchain creation needs a sample count up front, so normalize the
+        // requested MSAA value now and reconcile it with the actual backbuffer
+        // sample count after caps are updated.
+        int requestedMultiSampleCount = NormalizeMultiSampleCount(PresentationParameters.MultiSampleCount, MaxMultiSampleCount);
 
         // Finish any frame that is currently rendering.
         if (_currentFrame > -1)
@@ -160,7 +166,7 @@ public partial class GraphicsDevice
         }
 
         RefreshCapabilities();
-        UpdateBackBufferMultiSampleCount();
+        UpdateBackBufferMultiSampleCount(requestedMultiSampleCount);
         GraphicsCapabilities.Initialize(this);
 
         _viewport = new Viewport(
@@ -185,21 +191,19 @@ public partial class GraphicsDevice
         }
     }
 
-    private int ClampRequestedBackBufferMultiSampleCount()
+    private unsafe void UpdateBackBufferMultiSampleCount(int requestedMultiSampleCount)
     {
-        // OpenGL needs the backbuffer MSAA value before we have created the actual
-        // window and GL context
-        // We don't have a MaxMultiSampleCount to clamp against on the first device
-        // initialization
-        if (PlatformInfo.GraphicsBackend == GraphicsBackend.OpenGL && MaxMultiSampleCount == 0)
-            return PresentationParameters.MultiSampleCount;
+        int actualMultiSampleCount = MGG.GraphicsDevice_GetBackBufferMultiSampleCount(Handle);
 
-        return GetClampedMultisampleCount(PresentationParameters.BackBufferFormat, PresentationParameters.MultiSampleCount);
-    }
+        if (PlatformInfo.GraphicsBackend == GraphicsBackend.OpenGL
+            && actualMultiSampleCount == 0
+            && requestedMultiSampleCount > 0)
+        {
+            PresentationParameters.MultiSampleCount = requestedMultiSampleCount;
+            return;
+        }
 
-    private unsafe void UpdateBackBufferMultiSampleCount()
-    {
-        PresentationParameters.MultiSampleCount = MGG.GraphicsDevice_GetBackBufferMultiSampleCount(Handle);
+        PresentationParameters.MultiSampleCount = actualMultiSampleCount;
     }
 
     private unsafe void BeginFrame()
