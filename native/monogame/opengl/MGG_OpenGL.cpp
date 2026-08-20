@@ -2000,14 +2000,41 @@ void MGG_GraphicsDevice_SetDepthStencilState(MGG_GraphicsDevice* device, MGG_Dep
     else
         glDisable(GL_STENCIL_TEST);
 
-    glStencilFunc(
-        ToCompareFunction(info.stencilFunction),
-        info.referenceStencil,
-        static_cast<GLuint>(info.stencilMask));
-    glStencilOp(
-        ToStencilOperation(info.stencilFail),
-        ToStencilOperation(info.stencilDepthBufferFail),
-        ToStencilOperation(info.stencilPass));
+    if (info.twoSidedStencilMode)
+    {
+        device->context.functions.StencilFuncSeparate(
+            GL_FRONT,
+            ToCompareFunction(info.stencilFunction),
+            info.referenceStencil,
+            static_cast<GLuint>(info.stencilMask));
+        device->context.functions.StencilFuncSeparate(
+            GL_BACK,
+            ToCompareFunction(info.counterClockwiseStencilFunction),
+            info.referenceStencil,
+            static_cast<GLuint>(info.stencilMask));
+        device->context.functions.StencilOpSeparate(
+            GL_FRONT,
+            ToStencilOperation(info.stencilFail),
+            ToStencilOperation(info.stencilDepthBufferFail),
+            ToStencilOperation(info.stencilPass));
+        device->context.functions.StencilOpSeparate(
+            GL_BACK,
+            ToStencilOperation(info.counterClockwiseStencilFail),
+            ToStencilOperation(info.counterClockwiseStencilDepthBufferFail),
+            ToStencilOperation(info.counterClockwiseStencilPass));
+    }
+    else
+    {
+        glStencilFunc(
+            ToCompareFunction(info.stencilFunction),
+            info.referenceStencil,
+            static_cast<GLuint>(info.stencilMask));
+        glStencilOp(
+            ToStencilOperation(info.stencilFail),
+            ToStencilOperation(info.stencilDepthBufferFail),
+            ToStencilOperation(info.stencilPass));
+    }
+
     glStencilMask(static_cast<GLuint>(info.stencilWriteMask));
 
     device->depthStencilState = state;

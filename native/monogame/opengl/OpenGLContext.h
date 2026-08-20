@@ -77,6 +77,8 @@ struct OpenGLFunctions
     PFNGLSAMPLERPARAMETERFVPROC SamplerParameterfv = nullptr;
     PFNGLSAMPLERPARAMETERIPROC SamplerParameteri = nullptr;
     PFNGLSHADERSOURCEPROC ShaderSource = nullptr;
+    PFNGLSTENCILFUNCSEPARATEPROC StencilFuncSeparate = nullptr;
+    PFNGLSTENCILOPSEPARATEPROC StencilOpSeparate = nullptr;
     PFNGLTEXIMAGE3DPROC TexImage3D = nullptr;
     PFNGLTEXSUBIMAGE3DPROC TexSubImage3D = nullptr;
     PFNGLUNIFORM1IPROC Uniform1i = nullptr;

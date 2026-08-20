@@ -120,6 +120,8 @@ void OpenGLFunctions::Load()
     SamplerParameterfv = reinterpret_cast<PFNGLSAMPLERPARAMETERFVPROC>(LoadProcAddress("glSamplerParameterfv"));
     SamplerParameteri = reinterpret_cast<PFNGLSAMPLERPARAMETERIPROC>(LoadProcAddress("glSamplerParameteri"));
     ShaderSource = reinterpret_cast<PFNGLSHADERSOURCEPROC>(LoadProcAddress("glShaderSource"));
+    StencilFuncSeparate = reinterpret_cast<PFNGLSTENCILFUNCSEPARATEPROC>(LoadProcAddress("glStencilFuncSeparate"));
+    StencilOpSeparate = reinterpret_cast<PFNGLSTENCILOPSEPARATEPROC>(LoadProcAddress("glStencilOpSeparate"));
     TexImage3D = reinterpret_cast<PFNGLTEXIMAGE3DPROC>(LoadProcAddress("glTexImage3D"));
     TexSubImage3D = reinterpret_cast<PFNGLTEXSUBIMAGE3DPROC>(LoadProcAddress("glTexSubImage3D"));
     Uniform1i = reinterpret_cast<PFNGLUNIFORM1IPROC>(LoadProcAddress("glUniform1i"));
