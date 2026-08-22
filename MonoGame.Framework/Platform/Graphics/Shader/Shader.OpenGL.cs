@@ -17,14 +17,66 @@ namespace Microsoft.Xna.Framework.Graphics
         // We keep this around for recompiling on context lost and debugging.
         private string _glslCode;
 
+        public uint FragmentOutputMask;
+
         private static int PlatformProfile()
         {
             return 0;
         }
 
+        private static uint GetFragmentOutputMask(string glslCode)
+        {
+            uint fragmentOutputMask = 0;
+
+            // gl_FragColor maps to fragment output 0
+            if (glslCode.Contains("gl_FragColor", StringComparison.Ordinal))
+                fragmentOutputMask |= 1u;
+
+            const string fragmentDataToken = "gl_FragData[";
+            int searchIndex = 0;
+
+            // scan for explicit gl_FragData[n] writes and mark each output slot
+            while (searchIndex < glslCode.Length)
+            {
+                int tokenIndex = glslCode.IndexOf(fragmentDataToken, searchIndex, StringComparison.Ordinal);
+                if (tokenIndex < 0)
+                    break;
+
+                int outputIndex = 0;
+                int indexStart = tokenIndex + fragmentDataToken.Length;
+                int indexEnd = indexStart;
+                while (indexEnd < glslCode.Length)
+                {
+                    char character = glslCode[indexEnd];
+                    if (character < '0' || character > '9')
+                        break;
+
+                    outputIndex = (outputIndex * 10) + (character - '0');
+                    ++indexEnd;
+                }
+
+                // The mask stores up to 32 fragment outputs
+                if (indexEnd > indexStart &&
+                    indexEnd < glslCode.Length &&
+                    glslCode[indexEnd] == ']' &&
+                    outputIndex < 32)
+                {
+                    fragmentOutputMask |= 1u << outputIndex;
+                }
+
+                searchIndex = indexEnd + 1;
+            }
+
+            return fragmentOutputMask;
+        }
+
         private void PlatformConstruct(ShaderStage stage, byte[] shaderBytecode)
         {
             _glslCode = System.Text.Encoding.ASCII.GetString(shaderBytecode);
+            
+            FragmentOutputMask = stage == ShaderStage.Pixel
+                                 ? GetFragmentOutputMask(_glslCode)
+                                 : 0u;
 
             HashKey = MonoGame.Framework.Utilities.Hash.ComputeHash(shaderBytecode);
         }

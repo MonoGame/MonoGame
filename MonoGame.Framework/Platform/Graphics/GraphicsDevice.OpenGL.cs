@@ -23,6 +23,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
 #if !GLES
         private DrawBuffersEnum[] _drawBuffers;
+        private DrawBuffersEnum[] _maskedDrawBuffers;
 #endif
 
         enum ResourceType
@@ -326,8 +327,12 @@ namespace Microsoft.Xna.Framework.Graphics
             GL.GetInteger(GetPName.MaxDrawBuffers, out maxDrawBuffers);
             GraphicsExtensions.CheckGLError ();
 			_drawBuffers = new DrawBuffersEnum[maxDrawBuffers];
+            _maskedDrawBuffers = new DrawBuffersEnum[maxDrawBuffers];
 			for (int i = 0; i < maxDrawBuffers; i++)
+            {
 				_drawBuffers[i] = (DrawBuffersEnum)(FramebufferAttachment.ColorAttachment0Ext + i);
+                _maskedDrawBuffers[i] = DrawBuffersEnum.None;
+            }
 #endif
         }
 
@@ -844,6 +849,49 @@ namespace Microsoft.Xna.Framework.Graphics
             }
         }
 
+#if !GLES
+        private static uint GetDrawBufferMask(int drawBufferCount)
+        {
+            if (drawBufferCount <= 0)
+                return 0u;
+
+            if (drawBufferCount >= 32)
+                return uint.MaxValue;
+
+            return (1u << drawBufferCount) - 1u;
+        }
+
+        private void ApplyRenderTargetDrawBuffers(ShaderProgram shaderProgram)
+        {
+            if (_currentRenderTargetCount <= 0)
+                return;
+
+            uint fragmentOutputMask = shaderProgram != null
+                                      ? shaderProgram.FragmentOutputMask
+                                      : 0u;
+            
+            uint activeDrawBufferMask = GetDrawBufferMask(_currentRenderTargetCount);
+            
+            if (fragmentOutputMask == 0u ||
+                (fragmentOutputMask & activeDrawBufferMask) == activeDrawBufferMask)
+            {
+                GL.DrawBuffers(_currentRenderTargetCount, _drawBuffers);
+                GraphicsExtensions.CheckGLError();
+                return;
+            }
+
+            for (int i = 0; i < _currentRenderTargetCount; ++i)
+            {
+                _maskedDrawBuffers[i] = (fragmentOutputMask & (1u << i)) != 0u
+                                        ? _drawBuffers[i]
+                                        : DrawBuffersEnum.None;
+            }
+
+            GL.DrawBuffers(_currentRenderTargetCount, _maskedDrawBuffers);
+            GraphicsExtensions.CheckGLError();
+        }
+#endif
+
         private IRenderTarget PlatformApplyRenderTargets()
         {
             var glFramebuffer = 0;
@@ -878,7 +926,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 this.framebufferHelper.BindFramebuffer(glFramebuffer);
             }
 #if !GLES
-            GL.DrawBuffers(this._currentRenderTargetCount, this._drawBuffers);
+            ApplyRenderTargetDrawBuffers(_shaderProgram);
 #endif
 
             // Reset the raster state because we flip vertices
@@ -926,6 +974,11 @@ namespace Microsoft.Xna.Framework.Graphics
                 GraphicsExtensions.CheckGLError();
                 _shaderProgram = shaderProgram;
             }
+
+#if !GLES
+            if (IsRenderTargetBound)
+                ApplyRenderTargetDrawBuffers(shaderProgram);
+#endif
 
             var posFixupLoc = shaderProgram.GetUniformLocation("posFixup");
             if (posFixupLoc == -1)
