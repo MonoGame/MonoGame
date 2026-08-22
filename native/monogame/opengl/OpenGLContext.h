@@ -20,7 +20,9 @@ struct OpenGLFunctions
     PFNGLBINDATTRIBLOCATIONPROC BindAttribLocation = nullptr;
     PFNGLBLENDCOLORPROC BlendColor = nullptr;
     PFNGLBLENDEQUATIONSEPARATEEXTPROC BlendEquationSeparate = nullptr;
+    PFNGLBLENDEQUATIONSEPARATEIPROC BlendEquationSeparatei = nullptr;
     PFNGLBLENDFUNCSEPARATEPROC BlendFuncSeparate = nullptr;
+    PFNGLBLENDFUNCSEPARATEIPROC BlendFuncSeparatei = nullptr;
     PFNGLBINDBUFFERPROC BindBuffer = nullptr;
     PFNGLBINDFRAMEBUFFERPROC BindFramebuffer = nullptr;
     PFNGLBINDRENDERBUFFERPROC BindRenderbuffer = nullptr;
@@ -30,6 +32,7 @@ struct OpenGLFunctions
     PFNGLBUFFERDATAPROC BufferData = nullptr;
     PFNGLBUFFERSUBDATAPROC BufferSubData = nullptr;
     PFNGLCHECKFRAMEBUFFERSTATUSPROC CheckFramebufferStatus = nullptr;
+    PFNGLCOLORMASKIPROC ColorMaski = nullptr;
     PFNGLCOMPILESHADERPROC CompileShader = nullptr;
     MGGLCOMPRESSEDTEXIMAGE2DPROC CompressedTexImage2D = nullptr;
     MGGLCOMPRESSEDTEXSUBIMAGE2DPROC CompressedTexSubImage2D = nullptr;

@@ -155,6 +155,7 @@ struct MGG_Shader
     MGShaderStage stage = MGShaderStage::Vertex;
     GLuint handle = 0;
     std::string source;
+    uint32_t fragmentOutputMask = 0;
     std::vector<GLenum> constantBufferTypes;
     mgint attributeCount = 0;
 };
@@ -181,6 +182,7 @@ struct MGG_ShaderProgram
     MGG_Shader* vertexShader = nullptr;
     MGG_Shader* pixelShader = nullptr;
     GLuint handle = 0;
+    uint32_t fragmentOutputMask = 0;
     GLint posFixupLocation = -1;
     std::vector<GLint> attributeLocations;
     std::array<std::vector<GLint>, static_cast<size_t>(MGShaderStage::Count)> constantBufferLocations = {};
@@ -508,6 +510,63 @@ namespace
         return attributeCount;
     }
 
+    uint32_t GetFragmentOutputMask(const std::string& source)
+    {
+        uint32_t fragmentOutputMask = 0;
+
+        // gl_FragColor maps to fragment output 0
+        if (source.find("gl_FragColor") != std::string::npos)
+            fragmentOutputMask |= 1u;
+
+        const std::string fragmentDataToken = "gl_FragData[";
+        size_t searchIndex = 0;
+
+        // scan for explicit gl_FragData[n] writes and mark each output slot
+        while (searchIndex < source.size())
+        {
+            size_t tokenIndex = source.find(fragmentDataToken, searchIndex);
+            if (tokenIndex == std::string::npos)
+                break;
+
+            uint32_t outputIndex = 0;
+            size_t indexStart = tokenIndex + fragmentDataToken.size();
+            size_t indexEnd = indexStart;
+            while (indexEnd < source.size())
+            {
+                char character = source[indexEnd];
+                if (character < '0' || character > '9')
+                    break;
+
+                outputIndex = (outputIndex * 10u) + static_cast<uint32_t>(character - '0');
+                ++indexEnd;
+            }
+
+            // The mask stores up to 32 fragment outputs
+            if (indexEnd > indexStart &&
+                indexEnd < source.size() &&
+                source[indexEnd] == ']' &&
+                outputIndex < 32)
+            {
+                fragmentOutputMask |= 1u << outputIndex;
+            }
+
+            searchIndex = indexEnd + 1;
+        }
+
+        return fragmentOutputMask;
+    }
+
+    uint32_t GetDrawBufferMask(mgint drawBufferCount)
+    {
+        if (drawBufferCount <= 0)
+            return 0u;
+
+        if (drawBufferCount >= 32)
+            return UINT32_MAX;
+
+        return (1u << drawBufferCount) - 1u;
+    }
+
     void ApplyPosFixup(MGG_GraphicsDevice* device)
     {
         assert(device != nullptr);
@@ -524,6 +583,41 @@ namespace
         }
 
         device->context.functions.Uniform4fv(device->currentProgram->posFixupLocation, 1, posFixup);
+    }
+
+    void ApplyCurrentDrawBuffers(MGG_GraphicsDevice* device)
+    {
+        assert(device != nullptr);
+
+        if (device->currentRenderTargetCount <= 0)
+            return;
+
+        uint32_t fragmentOutputMask = device->currentProgram != nullptr
+                                      ? device->currentProgram->fragmentOutputMask
+                                      : 0u;
+
+        uint32_t activeDrawBufferMask = GetDrawBufferMask(device->currentRenderTargetCount);
+
+        if (fragmentOutputMask == 0u ||
+            (fragmentOutputMask & activeDrawBufferMask) == activeDrawBufferMask)
+        {
+            std::array<GLenum, MaxRenderTargetBindings> drawBuffers = {};
+            for (mgint i = 0; i < device->currentRenderTargetCount; ++i)
+                drawBuffers[i] = static_cast<GLenum>(GL_COLOR_ATTACHMENT0 + i);
+
+            device->context.functions.DrawBuffers(device->currentRenderTargetCount, drawBuffers.data());
+            return;
+        }
+
+        std::array<GLenum, MaxRenderTargetBindings> drawBuffers = {};
+        for (mgint i = 0; i < device->currentRenderTargetCount; ++i)
+        {
+            drawBuffers[i] = (fragmentOutputMask & (1u << i)) != 0u
+                             ? static_cast<GLenum>(GL_COLOR_ATTACHMENT0 + i)
+                             : GL_NONE;
+        }
+
+        device->context.functions.DrawBuffers(device->currentRenderTargetCount, drawBuffers.data());
     }
 
     void ApplyInputLayout(MGG_GraphicsDevice* device, mgint drawVertexOffset = 0)
@@ -635,6 +729,7 @@ namespace
         MGG_ShaderProgram* program = new MGG_ShaderProgram();
         program->vertexShader = vertexShader;
         program->pixelShader = pixelShader;
+        program->fragmentOutputMask = pixelShader->fragmentOutputMask;
         program->handle = device->context.functions.CreateProgram();
         if (program->handle == 0)
             MGGL_FAIL("glCreateProgram failed", "shader program creation returned 0");
@@ -791,6 +886,14 @@ namespace
             default:
                 MGGL_FAIL("Unsupported blend factor", "unknown OpenGL blend factor");
         }
+    }
+
+    bool IsBlendEnabled(const MGG_BlendState_Info& info)
+    {
+        return !(info.colorSourceBlend == MGBlend::One &&
+                 info.colorDestBlend == MGBlend::Zero &&
+                 info.alphaSourceBlend == MGBlend::One &&
+                 info.alphaDestBlend == MGBlend::Zero);
     }
 
     GLenum ToStencilOperation(MGStencilOperation operation)
@@ -1770,7 +1873,9 @@ void MGG_GraphicsDevice_GetCaps(MGG_GraphicsDevice* device, MGG_GraphicsDevice_C
     caps.SupportsNormalized = true;
     caps.SupportsInstancing = true;
     caps.SupportsBaseIndexInstancing = true;
-    caps.SupportsSeparateBlendStates = true;
+    caps.SupportsSeparateBlendStates = device->context.functions.BlendEquationSeparatei != nullptr &&
+                                       device->context.functions.BlendFuncSeparatei != nullptr &&
+                                       device->context.functions.ColorMaski != nullptr;
 }
 
 mgint MGG_GraphicsDevice_GetBackBufferMultiSampleCount(MGG_GraphicsDevice* device)
@@ -1945,11 +2050,15 @@ void MGG_GraphicsDevice_SetBlendState(MGG_GraphicsDevice* device, MGG_BlendState
 
     EnsureContext(device);
 
-    const MGG_BlendState_Info& info = state->infos[0];
-    bool blendEnabled = !(info.colorSourceBlend == MGBlend::One &&
-                          info.colorDestBlend == MGBlend::Zero &&
-                          info.alphaSourceBlend == MGBlend::One &&
-                          info.alphaDestBlend == MGBlend::Zero);
+    bool blendEnabled = false;
+    for (const MGG_BlendState_Info& info : state->infos)
+    {
+        if (IsBlendEnabled(info))
+        {
+            blendEnabled = true;
+            break;
+        }
+    }
 
     if (blendEnabled)
         glEnable(GL_BLEND);
@@ -1957,21 +2066,28 @@ void MGG_GraphicsDevice_SetBlendState(MGG_GraphicsDevice* device, MGG_BlendState
         glDisable(GL_BLEND);
 
     device->context.functions.BlendColor(factorR, factorG, factorB, factorA);
-    device->context.functions.BlendEquationSeparate(
-        ToBlendEquation(info.colorBlendFunc),
-        ToBlendEquation(info.alphaBlendFunc));
-    device->context.functions.BlendFuncSeparate(
-        ToBlendFactor(info.colorSourceBlend),
-        ToBlendFactor(info.colorDestBlend),
-        ToBlendFactor(info.alphaSourceBlend),
-        ToBlendFactor(info.alphaDestBlend));
+    for (GLuint i = 0; i < std::size(state->infos); ++i)
+    {
+        const MGG_BlendState_Info& info = state->infos[i];
 
-    GLboolean writeRed = GL_TRUE;
-    GLboolean writeGreen = GL_TRUE;
-    GLboolean writeBlue = GL_TRUE;
-    GLboolean writeAlpha = GL_TRUE;
-    ToColorMask(info.colorWriteChannels, writeRed, writeGreen, writeBlue, writeAlpha);
-    glColorMask(writeRed, writeGreen, writeBlue, writeAlpha);
+        device->context.functions.BlendEquationSeparatei(
+            i,
+            ToBlendEquation(info.colorBlendFunc),
+            ToBlendEquation(info.alphaBlendFunc));
+        device->context.functions.BlendFuncSeparatei(
+            i,
+            ToBlendFactor(info.colorSourceBlend),
+            ToBlendFactor(info.colorDestBlend),
+            ToBlendFactor(info.alphaSourceBlend),
+            ToBlendFactor(info.alphaDestBlend));
+
+        GLboolean writeRed = GL_TRUE;
+        GLboolean writeGreen = GL_TRUE;
+        GLboolean writeBlue = GL_TRUE;
+        GLboolean writeAlpha = GL_TRUE;
+        ToColorMask(info.colorWriteChannels, writeRed, writeGreen, writeBlue, writeAlpha);
+        device->context.functions.ColorMaski(i, writeRed, writeGreen, writeBlue, writeAlpha);
+    }
 
     device->blendState = state;
 }
@@ -2191,8 +2307,6 @@ void MGG_GraphicsDevice_SetRenderTargets(MGG_GraphicsDevice* device, MGG_Texture
     device->context.functions.BindFramebuffer(GL_FRAMEBUFFER, firstTarget->framebuffer);
     mgint multiSampleCount = firstTarget->multiSampleCount;
 
-    std::array<GLenum, MaxRenderTargetBindings> drawBuffers = {};
-
     for (mgint i = 0; i < count; ++i)
     {
         MGG_Texture* target = targets[i];
@@ -2218,7 +2332,6 @@ void MGG_GraphicsDevice_SetRenderTargets(MGG_GraphicsDevice* device, MGG_Texture
 
         GLenum attachment = GL_COLOR_ATTACHMENT0 + i;
         AttachFramebufferColorTarget(device, GL_FRAMEBUFFER, attachment, target, arraySlice);
-        drawBuffers[i] = attachment;
         device->currentRenderTargets[i] = target;
         device->currentRenderTargetSlices[i] = arraySlice;
     }
@@ -2238,11 +2351,11 @@ void MGG_GraphicsDevice_SetRenderTargets(MGG_GraphicsDevice* device, MGG_Texture
     if (framebufferStatus != GL_FRAMEBUFFER_COMPLETE)
         MGGL_FAIL("OpenGL framebuffer incomplete", "render target binding left the framebuffer incomplete");
 
-    device->context.functions.DrawBuffers(count, drawBuffers.data());
-    glReadBuffer(GL_COLOR_ATTACHMENT0);
     device->currentRenderTarget = firstTarget;
     device->currentRenderTargetCount = count;
     device->currentFramebuffer = firstTarget->framebuffer;
+    ApplyCurrentDrawBuffers(device);
+    glReadBuffer(GL_COLOR_ATTACHMENT0);
     ApplyPosFixup(device);
 }
 
@@ -2383,6 +2496,9 @@ void MGG_GraphicsDevice_SetShader(MGG_GraphicsDevice* device, MGShaderStage stag
         device->inputLayoutDirty = true;
         ApplyPosFixup(device);
     }
+
+    if (device->currentRenderTargetCount > 0)
+        ApplyCurrentDrawBuffers(device);
 }
 
 void MGG_GraphicsDevice_SetInputLayout(MGG_GraphicsDevice* device, MGG_InputLayout* layout)
@@ -3322,6 +3438,11 @@ MGG_Shader* MGG_Shader_Create(MGG_GraphicsDevice* device, MGShaderStage stage, m
     MGG_Shader* shader = new MGG_Shader();
     shader->stage = stage;
     shader->source.assign(reinterpret_cast<const char*>(bytecode), sizeInBytes);
+    
+    shader->fragmentOutputMask = stage == MGShaderStage::Pixel
+                                 ? GetFragmentOutputMask(shader->source)
+                                 : 0u;
+
     shader->attributeCount = CountSequentialShaderInputs(shader->source);
 
     if (shader->source.find(GetConstantBufferName(stage, GL_BOOL)) != std::string::npos)

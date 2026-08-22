@@ -63,7 +63,13 @@ void OpenGLFunctions::Load()
     BindAttribLocation = reinterpret_cast<PFNGLBINDATTRIBLOCATIONPROC>(LoadProcAddress("glBindAttribLocation"));
     BlendColor = reinterpret_cast<PFNGLBLENDCOLORPROC>(LoadProcAddress("glBlendColor"));
     BlendEquationSeparate = reinterpret_cast<PFNGLBLENDEQUATIONSEPARATEPROC>(LoadProcAddress("glBlendEquationSeparate"));
+    BlendEquationSeparatei = reinterpret_cast<PFNGLBLENDEQUATIONSEPARATEIPROC>(LoadProcAddress("glBlendEquationSeparatei"));
+    if (BlendEquationSeparatei == nullptr)
+        BlendEquationSeparatei = reinterpret_cast<PFNGLBLENDEQUATIONSEPARATEIPROC>(LoadProcAddress("glBlendEquationSeparateiARB"));
     BlendFuncSeparate = reinterpret_cast<PFNGLBLENDFUNCSEPARATEPROC>(LoadProcAddress("glBlendFuncSeparate"));
+    BlendFuncSeparatei = reinterpret_cast<PFNGLBLENDFUNCSEPARATEIPROC>(LoadProcAddress("glBlendFuncSeparatei"));
+    if (BlendFuncSeparatei == nullptr)
+        BlendFuncSeparatei = reinterpret_cast<PFNGLBLENDFUNCSEPARATEIPROC>(LoadProcAddress("glBlendFuncSeparateiARB"));
     BindBuffer = reinterpret_cast<PFNGLBINDBUFFERPROC>(LoadProcAddress("glBindBuffer"));
     BindFramebuffer = reinterpret_cast<PFNGLBINDFRAMEBUFFERPROC>(LoadProcAddress("glBindFramebuffer"));
     BindRenderbuffer = reinterpret_cast<PFNGLBINDRENDERBUFFERPROC>(LoadProcAddress("glBindRenderbuffer"));
@@ -73,6 +79,7 @@ void OpenGLFunctions::Load()
     BufferData = reinterpret_cast<PFNGLBUFFERDATAPROC>(LoadProcAddress("glBufferData"));
     BufferSubData = reinterpret_cast<PFNGLBUFFERSUBDATAPROC>(LoadProcAddress("glBufferSubData"));
     CheckFramebufferStatus = reinterpret_cast<PFNGLCHECKFRAMEBUFFERSTATUSPROC>(LoadProcAddress("glCheckFramebufferStatus"));
+    ColorMaski = reinterpret_cast<PFNGLCOLORMASKIPROC>(LoadProcAddress("glColorMaski"));
     CompileShader = reinterpret_cast<PFNGLCOMPILESHADERPROC>(LoadProcAddress("glCompileShader"));
     CompressedTexImage2D = reinterpret_cast<MGGLCOMPRESSEDTEXIMAGE2DPROC>(LoadProcAddress("glCompressedTexImage2D"));
     CompressedTexSubImage2D = reinterpret_cast<MGGLCOMPRESSEDTEXSUBIMAGE2DPROC>(LoadProcAddress("glCompressedTexSubImage2D"));
