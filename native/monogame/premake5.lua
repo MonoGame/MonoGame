@@ -92,7 +92,7 @@ end
 
 function metal()
     defines {"MG_METAL"}
-    files {"metal/**.h", "metal/**.cpp"}
+    files {"metal/**.h", "metal/**.m", "metal/**.mm"}
 
     includedirs {}
 

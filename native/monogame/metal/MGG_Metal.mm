@@ -6,34 +6,224 @@
 
 #include "mg_common.h"
 
-#if defined(MG_SDL2)
-#include <SDL_vulkan.h>
+//#if defined(MG_SDL2)
+#include <SDL_metal.h>
 #include <SDL_syswm.h>
 #include <SDL_events.h>
-#endif
+//#endif
+
+#import <Metal/Metal.h>
+#import <QuartzCore/CAMetalLayer.h>
 
 const int MAX_TEXTURE_SLOTS = 16;
 
+struct MGG_GraphicsAdapter
+{
+    MGG_DisplayMode current = { MGSurfaceFormat::Color, 0, 0 };
+
+	std::vector<MGG_DisplayMode> modes;
+};
+
+struct MGG_GraphicsSystem
+{
+	id<MTLDevice> metalDevice = nil;
+	std::vector<MGG_GraphicsAdapter*> adapters;
+};
+
+struct MGG_Texture
+{
+
+};
+
+struct MGG_SamplerState
+{
+
+};
+
+struct MGG_BlendState
+{
+
+};
+
+struct MGG_RasterizerState
+{
+
+};
+
+struct MGG_DepthStencilState
+{
+
+};
+
+struct MGG_InputLayout
+{
+
+};
+
+struct MGG_GraphicsDevice
+{
+//#if defined(MG_SDL2)
+	SDL_Window* window = nullptr;
+//#else
+//#error Not Implemented
+//#endif
+	SDL_MetalView metalView = nullptr;
+	CAMetalLayer* metalLayer = nullptr;
+
+	MGG_Texture* textures[(mgint)MGShaderStage::Count][MAX_TEXTURE_SLOTS] = { 0 };
+	MGG_SamplerState* samplers[(mgint)MGShaderStage::Count][MAX_TEXTURE_SLOTS] = { 0 };
+
+	// state arrays
+	std::map<uint32_t, MGG_BlendState*> blendStates;
+	std::map<uint32_t, MGG_RasterizerState*> rasterizerStates;
+	std::map<uint32_t, MGG_DepthStencilState*> depthStencilStates;
+};
+
+
+
+static MGSurfaceFormat SDLFormatToMGSurfaceFormat(Uint32 sdlFormat)
+{
+	switch (sdlFormat)
+	{
+		case SDL_PIXELFORMAT_RGB565:
+			return MGSurfaceFormat::Bgr565;
+		case SDL_PIXELFORMAT_ARGB1555:
+			return MGSurfaceFormat::Bgra5551;
+		case SDL_PIXELFORMAT_ARGB4444:
+			return MGSurfaceFormat::Bgra4444;
+		case SDL_PIXELFORMAT_ABGR8888:
+			return MGSurfaceFormat::Bgra32;
+		case SDL_PIXELFORMAT_RGBA8888:
+			return MGSurfaceFormat::Color;
+		case SDL_PIXELFORMAT_RGB332:
+			return MGSurfaceFormat::Bgr32;
+		case SDL_PIXELFORMAT_RGBA4444:
+			return MGSurfaceFormat::Bgra4444;
+		case SDL_PIXELFORMAT_RGBA5551:
+			return MGSurfaceFormat::Bgra5551;
+		case SDL_PIXELFORMAT_ARGB2101010:
+			return MGSurfaceFormat::Rgba1010102;
+		default:
+			return MGSurfaceFormat::Color;
+	}
+}
+
 MGG_GraphicsSystem* MGG_GraphicsSystem_Create()
 {
-    return nullptr;
+    auto system = new MGG_GraphicsSystem();
+    // create the metal system
+	system->metalDevice = MTLCreateSystemDefaultDevice();
+	if (!system->metalDevice)
+	{
+		printf("Metal is not supported on this device.\n");
+		delete system;
+		return nullptr;
+	}
+    // enumerate the create the adapters
+    int displayCount = SDL_GetNumVideoDisplays();
+	for (int i = 0; i < displayCount; ++i)
+	{
+		auto adapter = new MGG_GraphicsAdapter();
+		system->adapters.push_back(adapter);
+	}
+    return system;
 }
 
 void MGG_GraphicsSystem_Destroy(MGG_GraphicsSystem* system)
 {
 	assert(system != nullptr);
 
+    // Clean up all adapters
+    for (auto adapter : system->adapters)
+    {
+        delete adapter;
+    }
+    system->adapters.clear();
+
+	[system->metalDevice release];
+
 	delete system;
 }
 
 MGG_GraphicsAdapter* MGG_GraphicsAdapter_Get(MGG_GraphicsSystem* system, mgint index)
 {
-	return nullptr;
+	if (index < 0 || index >= system->adapters.size())
+		return nullptr;
+
+	return system->adapters[index];
 }
 
 void MGG_GraphicsAdapter_GetInfo(MGG_GraphicsAdapter* adapter, MGG_GraphicsAdaptor_Info& info)
 {
     assert(adapter != nullptr);
+	info.CurrentDisplayMode = adapter->current;
+	info.Description = (void *)SDL_GetCurrentVideoDriver();
+	info.VendorId = 0;
+	info.SubSystemId = 0;
+	info.MonitorHandle = 0;
+	info.DeviceId = 0;
+	
+	int displayIndex = 0; // Primary display
+	int numModes = SDL_GetNumDisplayModes(displayIndex);
+	
+	if (adapter->modes.size() == 0 && numModes > 0)
+	{
+		// Enumerate available display modes
+		for (int i = 0; i < numModes; i++)
+		{
+			SDL_DisplayMode mode;
+			if (SDL_GetDisplayMode(displayIndex, i, &mode) == 0)
+			{
+				MGG_DisplayMode displayMode;
+				displayMode.width = mode.w;
+				displayMode.height = mode.h;
+				displayMode.format = SDLFormatToMGSurfaceFormat(mode.format);
+				
+				bool found = false;
+				for (auto m : adapter->modes)
+				{
+					if (m.width == displayMode.width &&
+						m.height == displayMode.height)
+					{
+						found = true;
+						break;
+					}
+				}
+				
+				if (!found)
+					adapter->modes.push_back(displayMode);
+			}
+		}
+	}
+	
+	// Get current display mode
+	SDL_DisplayMode currentMode;
+	if (SDL_GetCurrentDisplayMode(displayIndex, &currentMode) == 0)
+	{
+		info.CurrentDisplayMode.width = currentMode.w;
+		info.CurrentDisplayMode.height = currentMode.h;
+		info.CurrentDisplayMode.format = SDLFormatToMGSurfaceFormat(currentMode.format);
+	}
+	else
+	{
+		// Fallback to desktop display mode
+		SDL_DisplayMode desktopMode;
+		if (SDL_GetDesktopDisplayMode(displayIndex, &desktopMode) == 0)
+		{
+			info.CurrentDisplayMode.width = desktopMode.w;
+			info.CurrentDisplayMode.height = desktopMode.h;
+			info.CurrentDisplayMode.format = SDLFormatToMGSurfaceFormat(desktopMode.format);
+		}
+		else
+		{
+			// Final fallback
+			info.CurrentDisplayMode.width = 1920;
+			info.CurrentDisplayMode.height = 1080;
+			info.CurrentDisplayMode.format = MGSurfaceFormat::Color;
+		}
+	}
+	info.DisplayModeCount = adapter->modes.size();
+	info.DisplayModes = adapter->modes.data();
 }
 
 MGG_GraphicsDevice* MGG_GraphicsDevice_Create(MGG_GraphicsSystem* system, MGG_GraphicsAdapter* adapter)
@@ -41,7 +231,11 @@ MGG_GraphicsDevice* MGG_GraphicsDevice_Create(MGG_GraphicsSystem* system, MGG_Gr
 	assert(system != nullptr);
 	assert(adapter != nullptr);
 
-    return nullptr;
+	auto device = new MGG_GraphicsDevice();
+
+	// we need to create a metal device here and store it in the MGG_GraphicsDevice struct
+
+    return device;
 }
 
 void MGG_GraphicsDevice_Destroy(MGG_GraphicsDevice* device)
@@ -74,6 +268,22 @@ void MGG_GraphicsDevice_ResizeSwapchain(
 	mgint syncInterval)
 {
 	assert(device);
+//#if defined(MG_SDL2)
+	auto sdl_window = (SDL_Window*)nativeWindowHandle;
+	if (sdl_window != device->window)
+	{
+		device->window = sdl_window;
+		device->metalView = SDL_Metal_CreateView(sdl_window);
+		device->metalLayer = (__bridge CAMetalLayer*)SDL_Metal_GetLayer(device->metalView);
+	}
+
+	// On resize the swapchain is placed under the title bar
+	// and not in the client area for some reason.  This fixes it.
+	// int wx, wy;
+	// SDL_GetWindowPosition(device->window, &wx, &wy);
+	// SDL_SetWindowPosition(device->window, wx+1, wy);
+	// SDL_SetWindowPosition(device->window, wx, wy);
+//#endif
 }
 
 mgint MGG_GraphicsDevice_BeginFrame(MGG_GraphicsDevice* device)
