@@ -13,7 +13,7 @@ using NUnit.Framework;
 namespace MonoGame.Tests.Graphics
 {
     [NonParallelizable]
-#if DESKTOPGL
+#if DESKTOPGL || OPENGL
     [Ignore("GL doesn't work well with threads.")]
 #endif
     [RunOnUiTestFixture]
