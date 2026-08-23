@@ -514,44 +514,32 @@ namespace
     {
         uint32_t fragmentOutputMask = 0;
 
-        // gl_FragColor maps to fragment output 0
-        if (source.find("gl_FragColor") != std::string::npos)
+        // GraphicsDevice supports up to 8 simultaneous render targets
+        // gl_FragColor and gl_FragData[0] both map to fragment output 0.
+        if (source.find("gl_FragColor") != std::string::npos ||
+            source.find("gl_FragData[0]") != std::string::npos)
             fragmentOutputMask |= 1u;
 
-        const std::string fragmentDataToken = "gl_FragData[";
-        size_t searchIndex = 0;
+        if (source.find("gl_FragData[1]") != std::string::npos)
+            fragmentOutputMask |= 1u << 1;
 
-        // scan for explicit gl_FragData[n] writes and mark each output slot
-        while (searchIndex < source.size())
-        {
-            size_t tokenIndex = source.find(fragmentDataToken, searchIndex);
-            if (tokenIndex == std::string::npos)
-                break;
+        if (source.find("gl_FragData[2]") != std::string::npos)
+            fragmentOutputMask |= 1u << 2;
 
-            uint32_t outputIndex = 0;
-            size_t indexStart = tokenIndex + fragmentDataToken.size();
-            size_t indexEnd = indexStart;
-            while (indexEnd < source.size())
-            {
-                char character = source[indexEnd];
-                if (character < '0' || character > '9')
-                    break;
+        if (source.find("gl_FragData[3]") != std::string::npos)
+            fragmentOutputMask |= 1u << 3;
 
-                outputIndex = (outputIndex * 10u) + static_cast<uint32_t>(character - '0');
-                ++indexEnd;
-            }
+        if (source.find("gl_FragData[4]") != std::string::npos)
+            fragmentOutputMask |= 1u << 4;
 
-            // The mask stores up to 32 fragment outputs
-            if (indexEnd > indexStart &&
-                indexEnd < source.size() &&
-                source[indexEnd] == ']' &&
-                outputIndex < 32)
-            {
-                fragmentOutputMask |= 1u << outputIndex;
-            }
+        if (source.find("gl_FragData[5]") != std::string::npos)
+            fragmentOutputMask |= 1u << 5;
 
-            searchIndex = indexEnd + 1;
-        }
+        if (source.find("gl_FragData[6]") != std::string::npos)
+            fragmentOutputMask |= 1u << 6;
+
+        if (source.find("gl_FragData[7]") != std::string::npos)
+            fragmentOutputMask |= 1u << 7;
 
         return fragmentOutputMask;
     }
