@@ -1806,6 +1806,7 @@ void MGG_GraphicsDevice_GetCaps(MGG_GraphicsDevice* device, MGG_GraphicsDevice_C
     bool supportsVertexTextures = true;
     mgint maxTextureAnisotropy = 16;
     mgint maxMultiSampleCount = 0;
+    mgint maxVertexTextureSlots = 0;
 
     // OpenGL can only get texture caps if there is a context.
     if (device->window != nullptr && device->context.handle != nullptr)
@@ -1826,9 +1827,12 @@ void MGG_GraphicsDevice_GetCaps(MGG_GraphicsDevice* device, MGG_GraphicsDevice_C
             HasOpenGLExtension("GL_OES_texture_npot");
         supportsTextureFilterAnisotropic = HasOpenGLExtension("GL_EXT_texture_filter_anisotropic");
 
-        GLint vertexTextureUnits = 0;
-        glGetIntegerv(GL_MAX_VERTEX_TEXTURE_IMAGE_UNITS, &vertexTextureUnits);
-        supportsVertexTextures = vertexTextureUnits > 0;
+        GLint reportedVertexTextureUnits = 0;
+        glGetIntegerv(GL_MAX_VERTEX_TEXTURE_IMAGE_UNITS, &reportedVertexTextureUnits);
+        if (reportedVertexTextureUnits > 0)
+            maxVertexTextureSlots = std::min(static_cast<mgint>(reportedVertexTextureUnits), MaxVertexTextureSlots);
+
+        supportsVertexTextures = maxVertexTextureSlots > 0;
 
         GLint reportedMaxMultiSampleCount = 0;
         glGetIntegerv(GL_MAX_SAMPLES, &reportedMaxMultiSampleCount);
@@ -1851,7 +1855,6 @@ void MGG_GraphicsDevice_GetCaps(MGG_GraphicsDevice* device, MGG_GraphicsDevice_C
     }
 
     caps.MaxTextureSlots = MaxTextureSlots;
-    caps.MaxVertexTextureSlots = MaxVertexTextureSlots;
     caps.MaxVertexBufferSlots = MaxVertexBufferSlots;
     caps.ShaderProfile = OpenGLShaderProfile;
     caps.MaxTextureAnisotropy = maxTextureAnisotropy;
@@ -1867,7 +1870,18 @@ void MGG_GraphicsDevice_GetCaps(MGG_GraphicsDevice* device, MGG_GraphicsDevice_C
     caps.SupportsSRgb = supportsSRgb;
     caps.SupportsDepthClamp = supportsDepthClamp;
     caps.SupportsTextureArrays = false;
-    caps.SupportsVertexTextures = supportsVertexTextures;
+
+    // TODO: We can detect the vertex texture capacity from above, but
+    //       due to limitations in the shader/effect pipeline, we can't 
+    //       compile a shader for OpenGl to prove it.
+    //
+    //       So until we can do that, we'll hard code them to 0 and false here. 
+    //
+    //      When we can prove it with the new shader system, just replace the 
+    //      0 and false below with the commented values.
+    caps.MaxVertexTextureSlots = 0 /* maxVertexTextureSlots; */;
+    caps.SupportsVertexTextures = false /* supportsVertexTextures */;
+
     caps.SupportsFloatTextures = true;
     caps.SupportsHalfFloatTextures = true;
     caps.SupportsNormalized = true;
