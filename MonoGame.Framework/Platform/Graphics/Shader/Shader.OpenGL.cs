@@ -28,44 +28,32 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             uint fragmentOutputMask = 0;
 
-            // gl_FragColor maps to fragment output 0
-            if (glslCode.Contains("gl_FragColor", StringComparison.Ordinal))
+            // GraphicsDevice supports up to 8 simultaneous render targets.
+            // gl_FragColor and gl_FragData[0] both map to fragment output 0.
+            if (glslCode.Contains("gl_FragColor", StringComparison.Ordinal) ||
+                glslCode.Contains("gl_FragData[0]", StringComparison.Ordinal))
                 fragmentOutputMask |= 1u;
 
-            const string fragmentDataToken = "gl_FragData[";
-            int searchIndex = 0;
+            if (glslCode.Contains("gl_FragData[1]", StringComparison.Ordinal))
+                fragmentOutputMask |= 1u << 1;
 
-            // scan for explicit gl_FragData[n] writes and mark each output slot
-            while (searchIndex < glslCode.Length)
-            {
-                int tokenIndex = glslCode.IndexOf(fragmentDataToken, searchIndex, StringComparison.Ordinal);
-                if (tokenIndex < 0)
-                    break;
+            if (glslCode.Contains("gl_FragData[2]", StringComparison.Ordinal))
+                fragmentOutputMask |= 1u << 2;
 
-                int outputIndex = 0;
-                int indexStart = tokenIndex + fragmentDataToken.Length;
-                int indexEnd = indexStart;
-                while (indexEnd < glslCode.Length)
-                {
-                    char character = glslCode[indexEnd];
-                    if (character < '0' || character > '9')
-                        break;
+            if (glslCode.Contains("gl_FragData[3]", StringComparison.Ordinal))
+                fragmentOutputMask |= 1u << 3;
 
-                    outputIndex = (outputIndex * 10) + (character - '0');
-                    ++indexEnd;
-                }
+            if (glslCode.Contains("gl_FragData[4]", StringComparison.Ordinal))
+                fragmentOutputMask |= 1u << 4;
 
-                // The mask stores up to 32 fragment outputs
-                if (indexEnd > indexStart &&
-                    indexEnd < glslCode.Length &&
-                    glslCode[indexEnd] == ']' &&
-                    outputIndex < 32)
-                {
-                    fragmentOutputMask |= 1u << outputIndex;
-                }
+            if (glslCode.Contains("gl_FragData[5]", StringComparison.Ordinal))
+                fragmentOutputMask |= 1u << 5;
 
-                searchIndex = indexEnd + 1;
-            }
+            if (glslCode.Contains("gl_FragData[6]", StringComparison.Ordinal))
+                fragmentOutputMask |= 1u << 6;
+
+            if (glslCode.Contains("gl_FragData[7]", StringComparison.Ordinal))
+                fragmentOutputMask |= 1u << 7;
 
             return fragmentOutputMask;
         }
