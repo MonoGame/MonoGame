@@ -62,7 +62,7 @@ jobs:
           
       - name: Setup Android Dependencies
         if: runner.arch != 'arm64'
-        uses: monogame/monogame-actions/install-android-dependencies@v1
+        uses: monogame/monogame-actions/install-android-dependencies@v1.0.3
 
       - name: Setup DotNet on Windows
         if: runner.environment == 'github-hosted' && runner.os == 'windows'
@@ -132,10 +132,10 @@ jobs:
         run: echo "::remove-matcher owner=csc::"
 
       - name: Setup Wine
-        uses: monogame/monogame-actions/install-wine@v1
+        uses: monogame/monogame-actions/install-wine@v1.0.3
 
       - name: Install Fonts
-        uses: monogame/monogame-actions/install-fonts@v1
+        uses: monogame/monogame-actions/install-fonts@v1.0.3
         
       - name: Install SDL2 deps on Linux
         if: runner.os == 'Linux'
@@ -397,11 +397,11 @@ jobs:
 
       - name: Setup Wine
         if: runner.environment == 'github-hosted'
-        uses: monogame/monogame-actions/install-wine@v1
+        uses: monogame/monogame-actions/install-wine@v1.0.3
 
       - name: Install Fonts
         if: runner.environment == 'github-hosted'
-        uses: monogame/monogame-actions/install-fonts@v1
+        uses: monogame/monogame-actions/install-fonts@v1.0.3
 
       - name: Pin xcode version
         uses: maxim-lobanov/setup-xcode@v1
