@@ -99,7 +99,7 @@ namespace MonoGame.Tests.Graphics
             gd.Clear(Color.Transparent);
 
             using SpriteBatch sb = new SpriteBatch(gd);
-            sb.Begin(SpriteSortMode.Immediate, BlendState.Opaque);
+            sb.Begin(blendState: BlendState.Opaque);
             sb.Draw(pixel, Vector2.Zero, Color.White);
             sb.End();
 
@@ -159,7 +159,7 @@ namespace MonoGame.Tests.Graphics
             // SpriteBatch writes SV_Target0, so RT0 still uses its configured red write mask
             Assert.That(rt0Pixels[0], Is.EqualTo(new Color(255, 0, 0, 0)));
 
-            // RT1 has a green write mas, but the shader has no output for this target
+            // RT1 has a green write mask, but the shader has no output for this target
             Assert.That(rt1Pixels[0], Is.EqualTo(Color.Transparent));
         }
 #endif
