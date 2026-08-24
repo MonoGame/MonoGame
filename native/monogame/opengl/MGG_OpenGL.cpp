@@ -608,6 +608,20 @@ namespace
         device->context.functions.DrawBuffers(device->currentRenderTargetCount, drawBuffers.data());
     }
 
+    void ApplyAllCurrentDrawBuffers(MGG_GraphicsDevice* device)
+    {
+        assert(device != nullptr);
+
+        if (device->currentRenderTargetCount <= 0)
+            return;
+
+        std::array<GLenum, MaxRenderTargetBindings> drawBuffers = {};
+        for (mgint i = 0; i < device->currentRenderTargetCount; ++i)
+            drawBuffers[i] = static_cast<GLenum>(GL_COLOR_ATTACHMENT0 + i);
+
+        device->context.functions.DrawBuffers(device->currentRenderTargetCount, drawBuffers.data());
+    }
+
     void ApplyInputLayout(MGG_GraphicsDevice* device, mgint drawVertexOffset = 0)
     {
         assert(device != nullptr);
@@ -1972,6 +1986,13 @@ void MGG_GraphicsDevice_Clear(MGG_GraphicsDevice* device, MGClearOptions options
     EnsureContext(device);
     assert(device->isInFrame);
 
+    bool restoreDrawBuffers = device->currentRenderTargetCount > 1;
+
+    // Clear applies to all bound render targets, regardless of the current
+    // shader output mask.  Temporarily enable all active draw buffers before clearing.
+    if (restoreDrawBuffers)
+        ApplyAllCurrentDrawBuffers(device);
+
     GLboolean colorWriteMask[4] = {};
     GLboolean depthWriteMask = GL_FALSE;
     GLint stencilWriteMask = 0;
@@ -2009,6 +2030,9 @@ void MGG_GraphicsDevice_Clear(MGG_GraphicsDevice* device, MGClearOptions options
     glDepthMask(depthWriteMask);
     glStencilMask(static_cast<GLuint>(stencilWriteMask));
     glScissor(scissorBox[0], scissorBox[1], scissorBox[2], scissorBox[3]);
+
+    if (restoreDrawBuffers)
+        ApplyCurrentDrawBuffers(device);
 
     if (scissorTestEnabled)
         glEnable(GL_SCISSOR_TEST);
