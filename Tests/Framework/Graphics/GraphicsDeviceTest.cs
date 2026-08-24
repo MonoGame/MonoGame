@@ -678,7 +678,7 @@ namespace MonoGame.Tests.Graphics
         }
 
         [Test]
-#if DESKTOPGL || OPENGL
+#if DESKTOPGL || DESKTOPGL4
         [Ignore("Vertex Textures are not implemented for OpenGL")]
 #endif
         public void VertexTexturesGetSet()
@@ -745,7 +745,7 @@ namespace MonoGame.Tests.Graphics
         }
 
         [Test]
-#if DESKTOPGL || OPENGL
+#if DESKTOPGL || DESKTOPGL4
         [Ignore("Vertex Textures are not implemented for OpenGL")]
 #endif
         public void VertexTextureVisualTest()
@@ -816,7 +816,7 @@ namespace MonoGame.Tests.Graphics
         }
 
         [Test]
-#if DESKTOPGL || OPENGL
+#if DESKTOPGL || DESKTOPGL4
         [Ignore("Vertex samplers are not implemented for OpenGL")]
 #endif
         public void VertexSamplerStatesGetSet()

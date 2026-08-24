@@ -119,7 +119,7 @@ namespace MonoGame.Tests.Graphics
                 Assert.AreEqual(PresentInterval.One, pp.PresentationInterval);
                 Assert.AreEqual(new Rectangle(0, 0, 800, 480), pp.Bounds);
 
-#if OPENGL
+#if DESKTOPGL4
                 // Native OpenGL doesn't create the actual SDL window until graphics initialization,
                 // after the final presentation parameters have been configured.
                 Assert.AreEqual(IntPtr.Zero, pp.DeviceWindowHandle);
@@ -442,7 +442,7 @@ namespace MonoGame.Tests.Graphics
         [TestCase(true)]
 #if DESKTOPGL
         [Ignore("Expected not 1024 but got 1024. Needs Investigating")]
-#elif OPENGL
+#elif DESKTOPGL4
         [Ignore("OpenGL backbuffer MSAA is not implemented yet for the native backend")]
 #endif
         public void MSAAEnabled(bool enabled)
@@ -539,7 +539,7 @@ namespace MonoGame.Tests.Graphics
             }, "GraphicsDevice.Reset(PresentationParameters)");
         }
 
-#if OPENGL
+#if DESKTOPGL4
         [Test]
         public void ApplyChangesRecreatesNativeWindowWhenDepthStencilFormatChanges()
         {
@@ -591,7 +591,7 @@ namespace MonoGame.Tests.Graphics
         }
 #endif
 
-#if DIRECTX || OPENGL
+#if DIRECTX || DESKTOPGL4
         [Test]
         public void TooHighMultiSampleCountClampedToMaxSupported()
         {

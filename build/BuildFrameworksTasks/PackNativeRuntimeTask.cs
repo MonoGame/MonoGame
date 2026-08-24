@@ -33,23 +33,23 @@ public sealed class PackNativeRuntimeTask : AsyncFrostingTask<BuildContext>
             await DownloadArtifactAsync(context, $"mgnative-windows-vk-x64.{context.Version}", "Artifacts/native/mgruntime/desktopvk/windows/x64/");
             await DownloadArtifactAsync(context, $"mgnative-windows-vk-arm64.{context.Version}", "Artifacts/native/mgruntime/desktopvk/windows/arm64/");
 
-            // Windows OpenGL (desktopgl) - both architectures built on same runner
-            await DownloadArtifactAsync(context, $"mgnative-windows-gl-x64.{context.Version}", "Artifacts/native/mgruntime/desktopgl/windows/x64");
-            await DownloadArtifactAsync(context, $"mgnative-windows-gl-arm64.{context.Version}", "Artifacts/native/mgruntime/desktopgl/windows/arm64");
+            // Windows OpenGL (desktopgl4) - both architectures built on same runner
+            await DownloadArtifactAsync(context, $"mgnative-windows-desktopgl4-x64.{context.Version}", "Artifacts/native/mgruntime/desktopgl4/windows/x64");
+            await DownloadArtifactAsync(context, $"mgnative-windows-desktopgl4-arm64.{context.Version}", "Artifacts/native/mgruntime/desktopgl4/windows/arm64");
 
             // Linux Vulkan - x64 and arm64 from separate runners
             await DownloadArtifactAsync(context, $"mgnative-linux-x64.{context.Version}", "Artifacts/native/mgruntime/desktopvk/linux/x64/");
             await DownloadArtifactAsync(context, $"mgnative-linux-arm64.{context.Version}", "Artifacts/native/mgruntime/desktopvk/linux/arm64/");
 
-            // Linux OpenGL (desktopgl) - x64 and arm64 from separate runners
-            await DownloadArtifactAsync(context, $"mgnative-linux-gl-x64.{context.Version}", "Artifacts/native/mgruntime/desktopgl/linux/x64");
-            await DownloadArtifactAsync(context, $"mgnative-linux-gl-arm64.{context.Version}", "Artifacts/native/mgruntime/desktopgl/linux/arm64");
+            // Linux OpenGL (desktopgl4) - x64 and arm64 from separate runners
+            await DownloadArtifactAsync(context, $"mgnative-linux-desktopgl4-x64.{context.Version}", "Artifacts/native/mgruntime/desktopgl4/linux/x64");
+            await DownloadArtifactAsync(context, $"mgnative-linux-desktopgl4-arm64.{context.Version}", "Artifacts/native/mgruntime/desktopgl4/linux/arm64");
 
             // macOS Vulkan - universal binary (x64 + arm64 in one file)
             await DownloadArtifactAsync(context, $"mgnative-macos.{context.Version}", "Artifacts/native/mgruntime/desktopvk/macosx/");
 
-            // macOS OpenGL (desktopgl) - universal binary (x64 + arm64 in one file).
-            await DownloadArtifactAsync(context, $"mgnative-macos-gl.{context.Version}", "Artifacts/native/mgruntime/desktopgl/macosx/");
+            // macOS OpenGL (desktopgl4) - universal binary (x64 + arm64 in one file).
+            await DownloadArtifactAsync(context, $"mgnative-macos-desktopgl4.{context.Version}", "Artifacts/native/mgruntime/desktopgl4/macosx/");
         }
 
         // Pack all runtime NuGet packages with whatever native binaries are available.
@@ -57,11 +57,11 @@ public sealed class PackNativeRuntimeTask : AsyncFrostingTask<BuildContext>
         // For local builds, only the locally built binaries will be included.
         context.DotNetPack("src/NuGetPackages/MonoGame.Runtime.Windows.DX12/MonoGame.Runtime.Windows.DX12.csproj", context.DotNetPackSettings);
         context.DotNetPack("src/NuGetPackages/MonoGame.Runtime.Windows.Vulkan/MonoGame.Runtime.Windows.Vulkan.csproj", context.DotNetPackSettings);
-        context.DotNetPack("src/NuGetPackages/MonoGame.Runtime.Windows.OpenGL/MonoGame.Runtime.Windows.OpenGL.csproj", context.DotNetPackSettings);
+        context.DotNetPack("src/NuGetPackages/MonoGame.Runtime.Windows.DesktopGL4/MonoGame.Runtime.Windows.DesktopGL4.csproj", context.DotNetPackSettings);
         context.DotNetPack("src/NuGetPackages/MonoGame.Runtime.Mac.Vulkan/MonoGame.Runtime.Mac.Vulkan.csproj", context.DotNetPackSettings);
-        context.DotNetPack("src/NuGetPackages/MonoGame.Runtime.Mac.OpenGL/MonoGame.Runtime.Mac.OpenGL.csproj", context.DotNetPackSettings);
+        context.DotNetPack("src/NuGetPackages/MonoGame.Runtime.Mac.DesktopGL4/MonoGame.Runtime.Mac.DesktopGL4.csproj", context.DotNetPackSettings);
         context.DotNetPack("src/NuGetPackages/MonoGame.Runtime.Linux.Vulkan/MonoGame.Runtime.Linux.Vulkan.csproj", context.DotNetPackSettings);
-        context.DotNetPack("src/NuGetPackages/MonoGame.Runtime.Linux.OpenGL/MonoGame.Runtime.Linux.OpenGL.csproj", context.DotNetPackSettings);
+        context.DotNetPack("src/NuGetPackages/MonoGame.Runtime.Linux.DesktopGL4/MonoGame.Runtime.Linux.DesktopGL4.csproj", context.DotNetPackSettings);
 
         if (context.BuildSystem().IsRunningOnGitHubActions)
         {

@@ -147,7 +147,7 @@ namespace MonoGame.Tests.Graphics
         }
 
         [Test]
-#if DESKTOPGL || OPENGL
+#if DESKTOPGL || DESKTOPGL4
         [Ignore ("Causes GL.GetError() returned 1282. Need to fix.")]
 #endif
         public void GetDataMSAA()

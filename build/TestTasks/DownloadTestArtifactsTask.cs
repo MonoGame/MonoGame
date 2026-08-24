@@ -17,7 +17,7 @@ public sealed class DownloadTestArtifactsTask : AsyncFrostingTask<BuildContext>
         context.CreateDirectory("tests-tools");
         await context.GitHubActions().Commands.DownloadArtifact($"tests-tools-{os}", "tests-tools");
         await context.GitHubActions().Commands.DownloadArtifact($"tests-desktopgl-{os}", "tests-desktopgl");
-        await context.GitHubActions().Commands.DownloadArtifact($"tests-opengl-{os}", "tests-opengl");
+        await context.GitHubActions().Commands.DownloadArtifact($"tests-desktopgl4-{os}", "tests-desktopgl4");
         if (context.IsRunningOnWindows())
             await context.GitHubActions().Commands.DownloadArtifact($"tests-windowsdx-{os}", "tests-windowsdx");
     }

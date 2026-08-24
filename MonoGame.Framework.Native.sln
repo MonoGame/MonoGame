@@ -23,9 +23,9 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MonoGame.Tests.WindowsDX12"
 		{CC33DB03-389E-8F7A-81DC-4020ED856DCF} = {CC33DB03-389E-8F7A-81DC-4020ED856DCF}
 	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "desktopgl", "native\monogame\desktopgl.vcxproj", "{72D4243F-DE3E-D9B5-277D-8A5B9326B70A}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "desktopgl4", "native\monogame\desktopgl4.vcxproj", "{72D4243F-DE3E-D9B5-277D-8A5B9326B70A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MonoGame.Tests.OpenGL", "Tests\MonoGame.Tests.OpenGL.csproj", "{74DDD980-D85E-E545-3862-B9ECE3F6FF54}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MonoGame.Tests.DesktopGL4", "Tests\MonoGame.Tests.DesktopGL4.csproj", "{74DDD980-D85E-E545-3862-B9ECE3F6FF54}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

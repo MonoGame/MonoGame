@@ -182,8 +182,8 @@ vulkan()
 faudio()
 configs()
 
-project "desktopgl"
-common("desktopgl")
+project "desktopgl4"
+common("desktopgl4")
 sdl2()
 opengl()
 faudio()

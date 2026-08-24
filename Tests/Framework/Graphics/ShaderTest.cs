@@ -21,7 +21,7 @@ namespace MonoGame.Tests.Graphics
 		[TestCase("ColorFlip")]
 		[TestCase("Invert")]
 		[TestCase("BlackOut")]
-#if !DESKTOPGL && !OPENGL
+#if !DESKTOPGL && !DESKTOPGL4
         // TODO this does not render for some reason, we need to fix this
         [TestCase("RainbowH")]
 #endif

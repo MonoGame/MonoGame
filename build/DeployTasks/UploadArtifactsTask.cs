@@ -67,22 +67,22 @@ public sealed class UploadArtifactsTask : AsyncFrostingTask<BuildContext>
                 foreach (var winArch in new[] { "x64", "arm64" })
                 {
                     await context.GitHubActions().Commands.UploadArtifact(new DirectoryPath($"Artifacts/native/mgpipeline/windows/{winArch}/Release/"), $"mgpipeline-windows-{winArch}.{context.Version}");
-                    // DX12 (windowsdx), Vulkan (desktopvk), and OpenGL (desktopgl) native binaries uploaded separately
+                    // DX12 (windowsdx), Vulkan (desktopvk), and OpenGL (desktopgl4) native binaries uploaded separately
                     await context.GitHubActions().Commands.UploadArtifact(new DirectoryPath($"Artifacts/native/mgruntime/windowsdx/windows/{winArch}/"), $"mgnative-windows-dx-{winArch}.{context.Version}");
                     await context.GitHubActions().Commands.UploadArtifact(new DirectoryPath($"Artifacts/native/mgruntime/desktopvk/windows/{winArch}/"), $"mgnative-windows-vk-{winArch}.{context.Version}");
-                    await context.GitHubActions().Commands.UploadArtifact(new DirectoryPath($"Artifacts/native/mgruntime/desktopgl/windows/{winArch}/"), $"mgnative-windows-gl-{winArch}.{context.Version}");
+                    await context.GitHubActions().Commands.UploadArtifact(new DirectoryPath($"Artifacts/native/mgruntime/desktopgl4/windows/{winArch}/"), $"mgnative-windows-desktopgl4-{winArch}.{context.Version}");
                 }
                 break;
             case PlatformFamily.Linux:
                 await context.GitHubActions().Commands.UploadArtifact(new DirectoryPath($"Artifacts/native/mgpipeline/linux/{arch}/Release/"), $"mgpipeline-linux-{arch}.{context.Version}");
                 await context.GitHubActions().Commands.UploadArtifact(new DirectoryPath($"Artifacts/native/mgruntime/desktopvk/linux/{arch}/"), $"mgnative-linux-{arch}.{context.Version}");
-                await context.GitHubActions().Commands.UploadArtifact(new DirectoryPath($"Artifacts/native/mgruntime/desktopgl/linux/{arch}/"), $"mgnative-linux-gl-{arch}.{context.Version}");
+                await context.GitHubActions().Commands.UploadArtifact(new DirectoryPath($"Artifacts/native/mgruntime/desktopgl4/linux/{arch}/"), $"mgnative-linux-desktopgl4-{arch}.{context.Version}");
                 break;
             case PlatformFamily.OSX:
                 // macOS produces universal binaries
                 await context.GitHubActions().Commands.UploadArtifact(new DirectoryPath("Artifacts/native/mgpipeline/macosx/Release/"), $"mgpipeline-macos.{context.Version}");
                 await context.GitHubActions().Commands.UploadArtifact(new DirectoryPath("Artifacts/native/mgruntime/desktopvk/macosx/"), $"mgnative-macos.{context.Version}");
-                await context.GitHubActions().Commands.UploadArtifact(new DirectoryPath("Artifacts/native/mgruntime/desktopgl/macosx/"), $"mgnative-macos-gl.{context.Version}");
+                await context.GitHubActions().Commands.UploadArtifact(new DirectoryPath("Artifacts/native/mgruntime/desktopgl4/macosx/"), $"mgnative-macos-desktopgl4.{context.Version}");
                 break;
             default:
                 throw new NotSupportedException($"Platform {context.Environment.Platform.Family} is not supported for static library checks.");
@@ -105,7 +105,7 @@ public sealed class UploadArtifactsTask : AsyncFrostingTask<BuildContext>
         // Upload NuGet packages
         await context.GitHubActions().Commands.UploadArtifact(new DirectoryPath(context.NuGetsDirectory), $"nuget-{os}.{context.Version}");
         await context.GitHubActions().Commands.UploadArtifact(new DirectoryPath(System.IO.Path.Combine(context.BuildOutput, "Tests", "DesktopGL", "Release")), $"tests-desktopgl-{os}");
-        await context.GitHubActions().Commands.UploadArtifact(new DirectoryPath(System.IO.Path.Combine(context.BuildOutput, "Tests", "OpenGL", "Release")), $"tests-opengl-{os}");
+        await context.GitHubActions().Commands.UploadArtifact(new DirectoryPath(System.IO.Path.Combine(context.BuildOutput, "Tests", "DesktopGL4", "Release")), $"tests-desktopgl4-{os}");
         await context.GitHubActions().Commands.UploadArtifact(new DirectoryPath(System.IO.Path.Combine(context.BuildOutput, "Tests", "DesktopVK", "Release")), $"tests-desktopvk-{os}");
         if (context.IsRunningOnWindows())
         {

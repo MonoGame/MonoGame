@@ -7,7 +7,7 @@
     <IsPackable>false</IsPackable>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <GenerateProgramFile>false</GenerateProgramFile>
-    <DefineConstants>OPENGL;DESKTOP</DefineConstants>
+    <DefineConstants>DESKTOPGL4;DESKTOP</DefineConstants>
     <DefineConstants Condition="$([MSBuild]::IsOSPlatform('MacOS'))">$(DefineConstants);MACOS</DefineConstants>
     <Platforms>AnyCPU;ARM64;x64</Platforms>
   </PropertyGroup>
@@ -56,9 +56,9 @@
   <ItemGroup>
     <ProjectReference Include="..\MonoGame.Framework\MonoGame.Framework.Native.csproj" />
 
-    <NativeLib Include="..\Artifacts\native\mgruntime\desktopgl\windows\$(NativePlatform)\$(Configuration)\mgruntime.dll" Condition="Exists('..\Artifacts\native\mgruntime\desktopgl\windows\$(NativePlatform)\$(Configuration)\mgruntime.dll')" PackagePath="runtimes\win-$(NativePlatform)\native" />
-    <NativeLib Include="..\Artifacts\native\mgruntime\desktopgl\linux\$(NativePlatform)\$(Configuration)\libmgruntime.so" Condition="Exists('..\Artifacts\native\mgruntime\desktopgl\linux\$(NativePlatform)\$(Configuration)\libmgruntime.so')" PackagePath="runtimes\linux-$(NativePlatform)\native" />
-    <NativeLib Include="..\Artifacts\native\mgruntime\desktopgl\macosx\$(Configuration)\libmgruntime.dylib" Condition="Exists('..\Artifacts\native\mgruntime\desktopgl\macosx\$(Configuration)\libmgruntime.dylib')" PackagePath="runtimes\osx\native" />
+    <NativeLib Include="..\Artifacts\native\mgruntime\desktopgl4\windows\$(NativePlatform)\$(Configuration)\mgruntime.dll" Condition="Exists('..\Artifacts\native\mgruntime\desktopgl4\windows\$(NativePlatform)\$(Configuration)\mgruntime.dll')" PackagePath="runtimes\win-$(NativePlatform)\native" />
+    <NativeLib Include="..\Artifacts\native\mgruntime\desktopgl4\linux\$(NativePlatform)\$(Configuration)\libmgruntime.so" Condition="Exists('..\Artifacts\native\mgruntime\desktopgl4\linux\$(NativePlatform)\$(Configuration)\libmgruntime.so')" PackagePath="runtimes\linux-$(NativePlatform)\native" />
+    <NativeLib Include="..\Artifacts\native\mgruntime\desktopgl4\macosx\$(Configuration)\libmgruntime.dylib" Condition="Exists('..\Artifacts\native\mgruntime\desktopgl4\macosx\$(Configuration)\libmgruntime.dylib')" PackagePath="runtimes\osx\native" />
   </ItemGroup>
 
   <ItemGroup>
