@@ -1,0 +1,46 @@
+// MonoGame - Copyright (C) MonoGame Foundation, Inc
+// This file is subject to the terms and conditions defined in
+// file 'LICENSE.txt', which is part of this source code package.
+
+using System;
+using MonoGame.Interop;
+
+namespace Microsoft.Xna.Framework.Input;
+
+public static partial class Mouse
+{
+    private static IntPtr PlatformGetWindowHandle()
+    {
+        return PrimaryWindow.Handle;
+    }
+
+    private static void PlatformSetWindowHandle(IntPtr windowHandle)
+    {
+    }
+
+    private static unsafe MouseState PlatformGetState(GameWindow window)
+    {
+        return window.MouseState;
+    }
+
+    private static unsafe void PlatformSetPosition(int x, int y)
+    {
+        PrimaryWindow.MouseState.X = x;
+        PrimaryWindow.MouseState.Y = y;
+
+        WebGameWindow window = PrimaryWindow as WebGameWindow;
+        if (window == null || window.Handle == null)
+            return;
+
+        MGP.Mouse_WarpPosition(window._handle, x, y);
+    }
+
+    private static unsafe void PlatformSetCursor(MouseCursor cursor)
+    {
+        WebGameWindow window = PrimaryWindow as WebGameWindow;
+        if (window == null || window.Handle == IntPtr.Zero)
+            return;
+
+        MGP.Window_SetCursor(window._handle, (MGP_Cursor*)cursor.Handle);
+    }
+}

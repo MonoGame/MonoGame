@@ -1,0 +1,68 @@
+// MonoGame - Copyright (C) MonoGame Foundation, Inc
+// This file is subject to the terms and conditions defined in
+// file 'LICENSE.txt', which is part of this source code package.
+
+using MonoGame.Interop;
+using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Runtime.InteropServices;
+
+namespace Microsoft.Xna.Framework.Graphics;
+
+partial class GraphicsAdapter
+{
+    internal unsafe MGG_GraphicsAdapter* Handle;
+
+    private static unsafe void PlatformInitializeAdapters(out ReadOnlyCollection<GraphicsAdapter> adapters)
+    {
+        List<GraphicsAdapter> found = new List<GraphicsAdapter>();
+
+        while (true)
+        {
+            MGG_GraphicsAdapter* handle = MGG.GraphicsAdapter_Get(WebGamePlatform.GraphicsSystem, found.Count);
+            if (handle == null)
+                break;
+
+            MGG_GraphicsAdaptor_Info info;
+            MGG.GraphicsAdapter_GetInfo(handle, out info);
+
+            GraphicsAdapter adapter = new GraphicsAdapter();
+            adapter.Handle = handle;
+            adapter.DeviceName = Marshal.PtrToStringUTF8(info.DeviceName);
+            adapter.Description = Marshal.PtrToStringUTF8(info.Description);
+            adapter.DeviceId = info.DeviceId;
+            adapter.Revision = info.Revision;
+            adapter.VendorId = info.VendorId;
+            adapter.SubSystemId = info.SubSystemId;
+            adapter.MonitorHandle = info.MonitorHandle;
+            adapter.IsDefaultAdapter = found.Count == 0;
+            adapter._currentDisplayMode = new DisplayMode(
+                info.CurrentDisplayMode.width,
+                info.CurrentDisplayMode.height,
+                info.CurrentDisplayMode.format);
+
+            List<DisplayMode> modes = new List<DisplayMode>();
+
+            for (int i = 0; i < info.DisplayModeCount; i++)
+            {
+                DisplayMode mode = new DisplayMode(
+                    info.DisplayModes[i].width,
+                    info.DisplayModes[i].height,
+                    info.DisplayModes[i].format);
+
+                modes.Add(mode);
+            }
+
+            adapter._supportedDisplayModes = new DisplayModeCollection(modes);
+            found.Add(adapter);
+        }
+
+        adapters = new ReadOnlyCollection<GraphicsAdapter>(found);
+    }
+
+    private bool PlatformIsProfileSupported(GraphicsProfile graphicsProfile)
+    {
+        return true;
+    }
+}
