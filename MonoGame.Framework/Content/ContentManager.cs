@@ -50,8 +50,9 @@ namespace Microsoft.Xna.Framework.Content
             'S', // Nintendo Switch
             'b', // WebAssembly and Bridge.NET
             'V', // DesktopVK
-            'G', // Windows GDK
+            'G', // Windows DirectX 12
             's', // Xbox Series
+            'U', // Nintendo Switch 2
 
             // NOTE: There are additional identifiers for consoles that
             // are not defined in this repository.  Be sure to ask the

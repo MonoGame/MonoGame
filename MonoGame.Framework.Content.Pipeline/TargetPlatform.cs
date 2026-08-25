@@ -99,7 +99,12 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
         /// <summary>
         /// Xbox Series S|X
         /// </summary>
-        XboxSeries
+        XboxSeries,
+
+        /// <summary>
+        /// Nintendo Switch 2
+        /// </summary>
+        Switch2,
     }
 
     /// <summary>

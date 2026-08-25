@@ -27,6 +27,9 @@ struct MGA_RawBuffer
 	uint32_t length = 0;
 };
 
+// The current XAudio2 device global.
+static MGA_System* g_AudioSystem = nullptr;
+
 struct MGA_System
 {
 	IXAudio2* audio = nullptr;
@@ -97,10 +100,9 @@ public:
 	}
 };
 
-
 MGA_System* MGA_System_Create()
 {
-	auto system = new MGA_System();
+	auto system = g_AudioSystem = new MGA_System();
 
 	auto err = XAudio2Create(&system->audio, 0, XAUDIO2_DEFAULT_PROCESSOR);
 	assert(err >= S_OK);
@@ -148,6 +150,8 @@ void MGA_System_Destroy(MGA_System* system)
 {
 	assert(system != nullptr);
 
+	g_AudioSystem =  nullptr;
+
 	// TODO: Should we be stopping any playing sounds here first?
 
 
@@ -168,6 +172,26 @@ void MGA_System_Destroy(MGA_System* system)
 	delete system->callbacks;
 
 	delete system;
+}
+
+void MGXA_Suspend()
+{
+#if defined(_GAMING_XBOX)
+	if (!g_AudioSystem)
+		return;
+
+	g_AudioSystem->audio->StopEngine();
+#endif
+}
+
+void MGXA_Resume()
+{
+#if defined(_GAMING_XBOX)
+	if (!g_AudioSystem)
+		return;
+
+	g_AudioSystem->audio->StartEngine();
+#endif
 }
 
 mgint MGA_System_GetMaxInstances()

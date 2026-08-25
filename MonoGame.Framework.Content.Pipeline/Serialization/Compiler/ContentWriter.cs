@@ -51,6 +51,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
             'V', // DesktopVK (Vulkan)
             'G', // Windows GDK
             's', // Xbox Series
+            'U', // Nintendo Switch 2
         ];
 
         /// <summary>

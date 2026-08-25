@@ -5,7 +5,12 @@
 #pragma once
 #include <string.h>
 
-#if defined(MG_DIRECTX12)
+
+#if defined(MG_XBOXONE)
+#define MG_BUILTIN_EFFECT_SYMBOL(name) name##_xb_mgfxo
+#elif defined(MG_XBOXSERIES)
+#define MG_BUILTIN_EFFECT_SYMBOL(name) name##_xs_mgfxo
+#elif defined(MG_DIRECTX12)
 #define MG_BUILTIN_EFFECT_SYMBOL(name) name##_dx12_mgfxo
 #elif defined(MG_VULKAN)
 #define MG_BUILTIN_EFFECT_SYMBOL(name) name##_vk_mgfxo

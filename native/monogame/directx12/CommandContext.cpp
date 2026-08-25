@@ -12,9 +12,9 @@
 #include "Heaps.h"
 
 #if defined(_GAMING_XBOX_SCARLETT)
-#include "GenerateMips_Scarlett.h"
+#include "GenerateMips_xs.h"
 #elif defined(_GAMING_XBOX)
-#include "GenerateMips_XboxOne.h"
+#include "GenerateMips_xb.h"
 #else
 #include "GenerateMips_Desktop.h"
 #endif
