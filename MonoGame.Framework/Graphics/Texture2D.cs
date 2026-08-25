@@ -785,18 +785,6 @@ namespace Microsoft.Xna.Framework.Graphics
             CommonValidations<T>(level, arraySlice, rect, elementCount, out checkedRect);
         }
 
-#if NATIVE
-        private void ValidateParams<T>(int level, int arraySlice, Rectangle? rect, ReadOnlySpan<T> data,
-            int elementCount, out Rectangle checkedRect) where T : struct
-        {
-            if (data == null)
-                throw new ArgumentNullException("data");
-            if (data.Length < elementCount)
-                throw new ArgumentException("The data array is too small.");
-            CommonValidations<T>(level, arraySlice, rect, elementCount, out checkedRect);
-        }
-#endif
-
         private void CommonValidations<T>(int level, int arraySlice, Rectangle? rect,
              int elementCount, out Rectangle checkedRect) where T : struct
         {

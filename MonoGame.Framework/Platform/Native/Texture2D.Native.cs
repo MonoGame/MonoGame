@@ -165,6 +165,16 @@ public partial class Texture2D : Texture
         PlatformSetData(0, data);
     }
 
+    private void ValidateParams<T>(int level, int arraySlice, Rectangle? rect, ReadOnlySpan<T> data,
+            int elementCount, out Rectangle checkedRect) where T : struct
+    {
+        if (data == null)
+            throw new ArgumentNullException("data");
+        if (data.Length < elementCount)
+            throw new ArgumentException("The data array is too small.");
+        CommonValidations<T>(level, arraySlice, rect, elementCount, out checkedRect);
+    }
+
     private unsafe void PlatformConstruct(int width, int height, bool mipmap, SurfaceFormat format, SurfaceType type, bool shared)
     {
         // Ignore creation calls for RenderTargets and Swapchains.
