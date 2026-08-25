@@ -30,6 +30,141 @@ public partial class Texture2D : Texture
         this.ArraySize = arraySize;
     }
 
+    /// <summary>
+    /// Copies an Span of data to the texture.
+    /// </summary>
+    /// <typeparam name="T">The type of the elements in the Span.</typeparam>
+    /// <param name="level">The mipmap level where the data will be placed.</param>
+    /// <param name="arraySlice">Index of the texture we want to copy to inside the texture array</param>
+    /// <param name="rect">
+    /// The section of the texture where the data will be placed. null indicates the data will be copied over the
+    /// entire texture.
+    /// </param>
+    /// <param name="data">
+    /// The Span of data to copy.  If <paramref name="rect"/> is null, the number of elements in the Span must be
+    /// equal to the size of the texture, which is <see cref="Width"/> x <see cref="Height"/>; otherwise, the number
+    /// of elements in the Span should be equal to the size of the rectangle.
+    /// </param>
+    /// <exception cref="ArgumentException">
+    /// One of the following conditions is true:
+    /// <list type="bullet">
+    ///     <item>
+    ///         <description>
+    ///             The <paramref name="level"/> parameter is larger than the number of levels in this texture.
+    ///         </description>
+    ///     </item>
+    ///     <item>
+    ///         <description>
+    ///             The <paramref name="arraySlice"/> parameter is greater than zero and the texture arrays are not
+    ///             supported on the graphics device.
+    ///         </description>
+    ///     </item>
+    ///     <item>
+    ///         <description>
+    ///             The <paramref name="arraySlice"/> parameter is less than zero or is greater than or equal to the
+    ///             internal array buffer of this texture.
+    ///         </description>
+    ///     </item>
+    ///     <item>
+    ///         <description>
+    ///             The <paramref name="rect"/> is outside the bounds of the texture.
+    ///         </description>
+    ///     </item>
+    ///     <item>
+    ///         <description>
+    ///             The <typeparamref name="T"/> type size is invalid for the format of this texture.
+    ///         </description>
+    ///     </item>
+    /// </list>
+    /// </exception>
+    /// <exception cref="ArgumentNullException">The <paramref name="data"/> parameter is null.</exception>
+    public void SetData<T>(int level, int arraySlice, Rectangle? rect, ReadOnlySpan<T> data) where T : struct
+    {
+        Rectangle checkedRect;
+        ValidateParams(level, arraySlice, rect, data, data.Length, out checkedRect);
+        PlatformSetData(level, arraySlice, checkedRect, data);
+    }
+
+    /// <summary>
+    /// Copies an Span of data to the texture.
+    /// </summary>
+    /// <typeparam name="T">The type of the elements in the Span.</typeparam>
+    /// <param name="level">The mipmap level where the data will be placed.</param>
+    /// <param name="rect">
+    /// The section of the texture where the data will be placed. null indicates the data will be copied over the
+    /// entire texture.
+    /// </param>
+    /// <param name="data">
+    /// The Span of data to copy.  If <paramref name="rect"/> is null, the number of elements in the Span must be
+    /// equal to the size of the texture, which is <see cref="Width"/> x <see cref="Height"/>; otherwise, the number
+    /// of elements in the Span should be equal to the size of the rectangle.
+    /// </param>
+    /// <exception cref="ArgumentException">
+    /// One of the following conditions is true:
+    /// <list type="bullet">
+    ///     <item>
+    ///         <description>
+    ///             The <paramref name="level"/> parameter is larger than the number of levels in this texture.
+    ///         </description>
+    ///     </item>
+    ///     <item>
+    ///         <description>
+    ///             The <paramref name="rect"/> is outside the bounds of the texture.
+    ///         </description>
+    ///     </item>
+    ///     <item>
+    ///         <description>
+    ///             The <typeparamref name="T"/> type size is invalid for the format of this texture.
+    ///         </description>
+    ///     </item>
+    ///     <item>
+    ///         <description>
+    ///             The <paramref name="data"/> Span parameter is too small.
+    ///             length of the data Span.
+    ///         </description>
+    ///     </item>
+    /// </list>
+    /// </exception>
+    /// <exception cref="ArgumentNullException">The <paramref name="data"/> parameter is null.</exception>
+    public void SetData<T>(int level, Rectangle? rect, ReadOnlySpan<T> data) where T : struct
+    {
+        Rectangle checkedRect;
+        ValidateParams(level, 0, rect, data, data.Length, out checkedRect);
+        if (rect.HasValue)
+            PlatformSetData(level, 0, checkedRect, data);
+        else
+            PlatformSetData(level, data);
+    }
+
+    /// <summary>
+    /// Copies an Span of data to the texture.
+    /// </summary>
+    /// <typeparam name="T">The type of the elements in the Span.</typeparam>
+    /// <param name="data"> The Span of data to copy.</param>
+    /// <exception cref="ArgumentException">
+    /// One of the following conditions is true:
+    /// <list type="bullet">
+    ///     <item>
+    ///         <description>
+    ///             The <typeparamref name="T"/> type size is invalid for the format of this texture.
+    ///         </description>
+    ///     </item>
+    ///     <item>
+    ///         <description>
+    ///             The <paramref name="data"/> Span parameter is too small.
+    ///             length of the data Span.
+    ///         </description>
+    ///     </item>
+    /// </list>
+    /// </exception>
+    /// <exception cref="ArgumentNullException">The <paramref name="data"/> parameter is null.</exception>
+    public void SetData<T>(ReadOnlySpan<T> data) where T : struct
+    {
+        Rectangle checkedRect;
+        ValidateParams(0, 0, null, data, data.Length, out checkedRect);
+        PlatformSetData(0, data);
+    }
+
     private unsafe void PlatformConstruct(int width, int height, bool mipmap, SurfaceFormat format, SurfaceType type, bool shared)
     {
         // Ignore creation calls for RenderTargets and Swapchains.
