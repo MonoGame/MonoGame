@@ -19,8 +19,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Audio
                     platform == TargetPlatform.RaspberryPi ||
                     platform == TargetPlatform.Windows ||
                     platform == TargetPlatform.WindowsDX12 ||
-                    platform == TargetPlatform.iOS ||
-                    platform == TargetPlatform.Web;
+                    platform == TargetPlatform.iOS;
         }
 
         public override ConversionQuality ConvertAudio(TargetPlatform platform, ConversionQuality quality, AudioContent content)
@@ -48,8 +47,6 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Audio
 
             else if (platform == TargetPlatform.DesktopGL || platform == TargetPlatform.DesktopVK)
                 targetFormat = ConversionFormat.Vorbis;
-            else if (platform == TargetPlatform.Web)
-                targetFormat = ConversionFormat.Mp3;
 
             // Get the song output path with the target format extension.
             outputFileName = Path.ChangeExtension(outputFileName, AudioHelper.GetExtension(targetFormat));

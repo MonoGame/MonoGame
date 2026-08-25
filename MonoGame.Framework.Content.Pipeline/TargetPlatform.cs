@@ -82,11 +82,6 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
         Switch,
 
         /// <summary>
-        /// WebAssembly and Bridge.NET
-        /// </summary>
-        Web,
-
-        /// <summary>
         /// All desktop versions using Vulkan.
         /// </summary>
         DesktopVK,
@@ -113,13 +108,13 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
     internal class TargetPlatformTypeConverter(Type type) : EnumConverter(type)
     {
         public override object? ConvertFrom(ITypeDescriptorContext? context, CultureInfo? culture, object value)
-        {   
+        {
             try
             {
                 return base.ConvertFrom(context, culture, value);
             }
             catch (FormatException)
-            { 
+            {
                 // convert legacy Platforms
                 if (value.Equals("Linux") || value.Equals("WindowsGL"))
                     return TargetPlatform.DesktopGL;

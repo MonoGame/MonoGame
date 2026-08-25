@@ -24,8 +24,6 @@ namespace MonoGame.Framework.Utilities
                 return MonoGamePlatform.iOS;
 #elif TVOS
                 return MonoGamePlatform.tvOS;
-#elif WEB
-                return MonoGamePlatform.WebGL;
 #elif WINDOWS && DIRECTX
                 return MonoGamePlatform.Windows;
 #elif SWITCH

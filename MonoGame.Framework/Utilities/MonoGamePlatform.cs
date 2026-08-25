@@ -35,15 +35,10 @@ namespace MonoGame.Framework.Utilities
         Windows,
 
         /// <summary>
-        /// WebGL platform.
-        /// </summary>
-        WebGL,
-
-        /// <summary>
         /// Xbox One platform.
         /// </summary>
         XboxOne,
-        
+
         /// <summary>
         /// Windows platform using DirectX 12.
         /// </summary>

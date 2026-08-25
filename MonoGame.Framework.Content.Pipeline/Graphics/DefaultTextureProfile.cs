@@ -19,8 +19,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
                     platform == TargetPlatform.RaspberryPi ||
                     platform == TargetPlatform.Windows ||
                     platform == TargetPlatform.WindowsDX12 ||
-                    platform == TargetPlatform.iOS ||
-                    platform == TargetPlatform.Web;
+                    platform == TargetPlatform.iOS;
         }
 
         private static bool IsCompressedTextureFormat(TextureProcessorOutputFormat format)
@@ -53,7 +52,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
                     _ => TextureProcessorOutputFormat.DxtCompressed
                 };
             }
-           
+
             if (IsCompressedTextureFormat(format))
             {
                 // Make sure the target platform supports the selected texture compression format
@@ -67,8 +66,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
                             platform == TargetPlatform.DesktopGL ||
                             platform == TargetPlatform.DesktopVK ||
                             platform == TargetPlatform.MacOSX ||
-                            platform == TargetPlatform.NativeClient ||
-                            platform == TargetPlatform.Web)
+                            platform == TargetPlatform.NativeClient)
                 {
                     if (format != TextureProcessorOutputFormat.DxtCompressed)
                         throw new PlatformNotSupportedException(platform + " platform only supports DXT texture compression");
