@@ -13,11 +13,13 @@ internal sealed class WebGamePlatform : GamePlatform
 {
     internal unsafe MGP_Platform* Handle;
 
+    private readonly BrowserHostReadyInfo _readyInfo;
     private readonly WebGameWindow _window;
 
     public unsafe WebGamePlatform(Game game) : base(game)
     {
-        _window = new WebGameWindow(this, true);
+        _readyInfo = WebHostRuntime.GetReadyInfo();
+        _window = new WebGameWindow(this, _readyInfo, true);
         Window = _window;
         GamePad.Handle = Handle;
     }
@@ -26,13 +28,24 @@ internal sealed class WebGamePlatform : GamePlatform
 
     public override GameRunBehavior DefaultRunBehavior => GameRunBehavior.Asynchronous;
 
+    public override void BeforeInitialize()
+    {
+        base.BeforeInitialize();
+        IsActive = _readyInfo.HasFocus && _readyInfo.IsPageVisible;
+    }
+
+    public override bool BeforeRun()
+    {
+        return WebHostRuntime.IsReady;
+    }
+
     public override void Exit()
     {
     }
 
     public override void RunLoop()
     {
-        throw new NotImplementedException();
+        throw new InvalidOperationException("The browser platform requires a browser managed asynchronous run loop.");
     }
 
     public override void StartRunLoop()

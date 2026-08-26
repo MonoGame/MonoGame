@@ -19,18 +19,21 @@ internal sealed class WebGameWindow : GameWindow
     private bool _allowUserResizing;
     private bool _isBorderless;
 
-    public WebGameWindow(WebGamePlatform platform, bool primaryWindow)
+    public WebGameWindow(WebGamePlatform platform, BrowserHostReadyInfo readyInfo, bool primaryWindow)
     {
         if (platform == null)
             throw new ArgumentNullException(nameof(platform));
+        if (readyInfo == null)
+            throw new ArgumentNullException(nameof(readyInfo));
 
         _platform = platform;
         _clientBounds = new Rectangle(
             0,
             0,
-            GraphicsDeviceManager.DefaultBackBufferWidth,
-            GraphicsDeviceManager.DefaultBackBufferHeight);
+            readyInfo.CanvasClientWidth,
+            readyInfo.CanvasClientHeight);
         _screenDeviceName = string.Empty;
+        Title = readyInfo.ApplicationName;
 
         Instance = this;
     }
