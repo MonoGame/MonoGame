@@ -59,5 +59,11 @@
     <Compile Remove="Platform\Native\TitleContainer.Native.cs" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Content Include="Platform\Web\Host\**\*">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
   <Import Project="MonoGame.Framework.Devices.Sensors.targets" />
 </Project>
