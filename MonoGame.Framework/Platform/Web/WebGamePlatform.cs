@@ -21,7 +21,6 @@ internal sealed class WebGamePlatform : GamePlatform
         _readyInfo = WebHostRuntime.GetReadyInfo();
         _window = new WebGameWindow(this, _readyInfo, true);
         Window = _window;
-        GamePad.Handle = Handle;
     }
 
     internal static unsafe MGG_GraphicsSystem* GraphicsSystem => throw new NotImplementedException();
@@ -41,6 +40,8 @@ internal sealed class WebGamePlatform : GamePlatform
 
     public override void Exit()
     {
+        WebHostRuntime.StopRunLoop();
+        RaiseAsyncRunLoopEnded();
     }
 
     public override void RunLoop()
@@ -50,7 +51,7 @@ internal sealed class WebGamePlatform : GamePlatform
 
     public override void StartRunLoop()
     {
-        throw new NotImplementedException();
+        WebHostRuntime.StartRunLoop();
     }
 
     public override bool BeforeUpdate(GameTime gameTime)

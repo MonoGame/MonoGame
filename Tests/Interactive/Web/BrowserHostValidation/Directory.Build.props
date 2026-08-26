@@ -1,0 +1,10 @@
+<Project>
+
+  <PropertyGroup>
+    <MonoGamePlatform>BrowserHostValidation</MonoGamePlatform>
+    <BaseIntermediateOutputPath>obj\</BaseIntermediateOutputPath>
+    <BaseOutputPath>bin\</BaseOutputPath>
+    <AppendTargetFrameworkToOutputPath>true</AppendTargetFrameworkToOutputPath>
+  </PropertyGroup>
+
+</Project>

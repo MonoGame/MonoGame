@@ -14,6 +14,7 @@ internal static class WebHostRuntime
     private static readonly object s_syncRoot = new object();
 
     private static BrowserHostReadyInfo s_readyInfo;
+    private static bool s_runLoopActive;
 
     internal static bool IsReady
     {
@@ -25,6 +26,17 @@ internal static class WebHostRuntime
             }
         }
     }
+
+    internal static bool IsRunLoopActive
+    {
+        get
+        {
+            lock (s_syncRoot)
+            {
+                return s_runLoopActive;
+            }
+        }
+    }    
 
     internal static void Initialize(BrowserHostReadyInfo readyInfo)
     {
@@ -40,6 +52,7 @@ internal static class WebHostRuntime
         lock (s_syncRoot)
         {
             s_readyInfo = readyInfo;
+            s_runLoopActive = false;
         }
 
         Debug.Assert(IsReady);
@@ -53,6 +66,25 @@ internal static class WebHostRuntime
                 throw new InvalidOperationException("The browser host runtime has not been initialized.");
 
             return s_readyInfo;
+        }
+    }
+
+    internal static void StartRunLoop()
+    {
+        lock (s_syncRoot)
+        {
+            if (s_readyInfo == null)
+                throw new InvalidOperationException("The browser host runtime has not been initialized.");
+
+            s_runLoopActive = true;
+        }
+    }
+
+    internal static void StopRunLoop()
+    {
+        lock (s_syncRoot)
+        {
+            s_runLoopActive = false;
         }
     }
 }

@@ -6,6 +6,8 @@ const HostStage = Object.freeze({
     HostBootstrap: "HostBootstrap",
     CanvasCreation: "CanvasCreation",
     WebGL2Creation: "WebGL2Creation",
+    WasmLoad: "WasmLoad",
+    ManagedBootstrap: "ManagedBootstrap",
     RuntimeBoundary: "RuntimeBoundary"
 });
 
@@ -31,6 +33,9 @@ class MonoGameWebHost {
         this.gl = null;
         this.canvasHandle = null;
         this.graphicsContextHandle = null;
+        this.runtime = null;
+        this.bootstrapExports = null;
+        this.managedFrameHandle = null;
     }
 
     static bootFromDocument(document_) {
@@ -44,7 +49,7 @@ class MonoGameWebHost {
 
         const host = new MonoGameWebHost(root);
         activeHost = host;
-        host.start();
+        void host.startAsync();
         return host;
     }
 
@@ -54,16 +59,36 @@ class MonoGameWebHost {
             applicationName: dataset.applicationName || "MonoGame.Web",
             canvasId: dataset.canvasId || "monogame-canvas",
             contentBaseUri: dataset.contentBaseUri || "./",
-            statusId: dataset.statusId || "monogame-host-status"
+            statusId: dataset.statusId || "monogame-host-status",
+            runtimeScriptUri: this.getOptionalConfigValue(dataset.runtimeScriptUri),
+            bootstrapAssemblyName: this.getOptionalConfigValue(dataset.bootstrapAssemblyName),
+            bootstrapTypeName: this.getOptionalConfigValue(dataset.bootstrapTypeName),
+            mainAssemblyName: this.getOptionalConfigValue(dataset.mainAssemblyName)
         };
     }
 
-    start() {
+    getOptionalConfigValue(value) {
+        if (value == null || value.length === 0) {
+            return null;
+        }
+
+        return value;
+    }
+
+    async startAsync() {
         try {
             this.logStage(HostStage.HostBootstrap, "Bootstrapping browser host.");
             this.resolveCanvas();
             this.createWebGL2Context();
-            this.logStage(HostStage.RuntimeBoundary, "Host is ready.");
+
+            if (!this.hasManagedRuntimeConfiguration()) {
+                this.logStage(HostStage.RuntimeBoundary, "Host is ready.");
+                return;
+            }
+
+            await this.loadManagedRuntimeAsync();
+            await this.initializeManagedHostAsync();
+            await this.launchManagedApplicationAsync();
         }
         catch (error) {
             this.handleStartupFailure(error);
@@ -115,6 +140,168 @@ class MonoGameWebHost {
         this.gl = gl;
         this.graphicsContextHandle = createOpaqueHandle("webgl2", gl);
         this.logStage(HostStage.WebGL2Creation, "WebGL2 context created.");
+    }
+
+    hasManagedRuntimeConfiguration() {
+        return this.config.runtimeScriptUri != null
+            && this.config.bootstrapAssemblyName != null
+            && this.config.bootstrapTypeName != null
+            && this.config.mainAssemblyName != null;
+    }
+
+    async loadManagedRuntimeAsync() {
+        this.logStage(HostStage.WasmLoad, "Loading managed runtime.");
+
+        const runtimeModule = await import(this.config.runtimeScriptUri);
+        const dotnet = runtimeModule.dotnet ?? globalThis.dotnet;
+        if (dotnet == null) {
+            throw new BrowserHostStartupError(
+                HostStage.WasmLoad,
+                "dotnet_runtime_missing",
+                "The configured runtime script did not expose a dotnet runtime entry.");
+        }
+
+        if (typeof dotnet.create === "function") {
+            this.runtime = await dotnet.create();
+        }
+        else if (typeof dotnet.withDiagnosticTracing === "function") {
+            this.runtime = await dotnet.withDiagnosticTracing(false).create();
+        }
+        else {
+            throw new BrowserHostStartupError(
+                HostStage.WasmLoad,
+                "dotnet_runtime_shape_unsupported",
+                "The configured dotnet runtime does not expose a supported create() API.");
+        }
+
+        if (typeof this.runtime.getAssemblyExports !== "function") {
+            throw new BrowserHostStartupError(
+                HostStage.WasmLoad,
+                "dotnet_exports_missing",
+                "The configured dotnet runtime does not expose getAssemblyExports().");
+        }
+
+        if (typeof this.runtime.runMain !== "function" && typeof this.runtime.runMainAndExit !== "function") {
+            throw new BrowserHostStartupError(
+                HostStage.WasmLoad,
+                "dotnet_main_missing",
+                "The configured dotnet runtime does not expose runMain() or runMainAndExit().");
+        }
+    }
+
+    async initializeManagedHostAsync() {
+        this.logStage(HostStage.ManagedBootstrap, "Initializing managed browser host.");
+
+        const exportsRoot = await this.runtime.getAssemblyExports(
+            this.normalizeAssemblyName(this.config.bootstrapAssemblyName));
+        const bootstrapExports = this.resolveExportPath(exportsRoot, this.config.bootstrapTypeName);
+        if (bootstrapExports == null) {
+            throw new BrowserHostStartupError(
+                HostStage.ManagedBootstrap,
+                "managed_bootstrap_missing",
+                `The configured bootstrap type '${this.config.bootstrapTypeName}' was not found.`);
+        }
+
+        if (typeof bootstrapExports.InitializeHost !== "function") {
+            throw new BrowserHostStartupError(
+                HostStage.ManagedBootstrap,
+                "managed_initialize_missing",
+                "The configured bootstrap type does not expose InitializeHost().");
+        }
+
+        if (typeof bootstrapExports.Tick !== "function") {
+            throw new BrowserHostStartupError(
+                HostStage.ManagedBootstrap,
+                "managed_tick_missing",
+                "The configured bootstrap type does not expose Tick().");
+        }
+
+        this.bootstrapExports = bootstrapExports;
+        this.bootstrapExports.InitializeHost(JSON.stringify(this.createStartupInfo()));
+        this.logStage(HostStage.ManagedBootstrap, "Managed browser host initialized.");
+    }
+
+    async launchManagedApplicationAsync() {
+        this.logStage(HostStage.RuntimeBoundary, "Launching managed application.");
+
+        const mainAssemblyName = this.normalizeAssemblyName(this.config.mainAssemblyName);
+        let runMainPromise;
+
+        if (typeof this.runtime.runMain === "function") {
+            runMainPromise = Promise.resolve(this.runtime.runMain(mainAssemblyName, []));
+        }
+        else {
+            runMainPromise = Promise.resolve(this.runtime.runMainAndExit(mainAssemblyName, []));
+        }
+
+        this.scheduleManagedFrame();
+        this.logStage(HostStage.RuntimeBoundary, "Managed application launched.");
+        await runMainPromise;
+    }
+
+    createStartupInfo() {
+        return {
+            applicationName: this.config.applicationName,
+            canvasClientHeight: this.canvas.clientHeight,
+            canvasClientWidth: this.canvas.clientWidth,
+            canvasHeight: this.canvas.height,
+            canvasHandle: this.canvasHandle,
+            canvasId: this.canvas.id,
+            canvasWidth: this.canvas.width,
+            contentBaseUri: this.config.contentBaseUri,
+            devicePixelRatio: window.devicePixelRatio || 1,
+            graphicsApi: "WebGL2",
+            graphicsContextHandle: this.graphicsContextHandle,
+            hasFocus: document.hasFocus(),
+            hostVersion: 1,
+            isPageVisible: document.visibilityState !== "hidden"
+        };
+    }
+
+    normalizeAssemblyName(assemblyName) {
+        if (assemblyName.endsWith(".dll")) {
+            return assemblyName;
+        }
+
+        return `${assemblyName}.dll`;
+    }
+
+    resolveExportPath(root, path) {
+        const parts = path.split(".");
+        let current = root;
+
+        for (const part of parts) {
+            if (current == null) {
+                return null;
+            }
+
+            current = current[part];
+        }
+
+        return current ?? null;
+    }
+
+    scheduleManagedFrame() {
+        this.managedFrameHandle = requestAnimationFrame(async () => {
+            this.managedFrameHandle = null;
+
+            try {
+                const shouldContinue = await this.bootstrapExports.Tick();
+                if (shouldContinue) {
+                    this.scheduleManagedFrame();
+                }
+                else {
+                    this.logStage(HostStage.RuntimeBoundary, "Managed run loop ended.");
+                }
+            }
+            catch (error) {
+                this.handleStartupFailure(
+                    new BrowserHostStartupError(
+                        HostStage.ManagedBootstrap,
+                        "managed_tick_failed",
+                        error instanceof Error ? error.message : String(error)));
+            }
+        });
     }
 
     handleStartupFailure(error) {
