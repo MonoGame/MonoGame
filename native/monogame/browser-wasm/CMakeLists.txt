@@ -18,21 +18,61 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 get_filename_component(MONOGAME_NATIVE_ROOT "${CMAKE_CURRENT_LIST_DIR}/.." ABSOLUTE)
 get_filename_component(MONOGAME_SOURCE_ROOT "${MONOGAME_NATIVE_ROOT}/../.." ABSOLUTE)
 set(MONOGAME_BROWSER_OUTPUT_ROOT "${MONOGAME_SOURCE_ROOT}/Artifacts/native/mgruntime/webgl2/browser-wasm")
+set(_monogameSdl2Root "${MONOGAME_NATIVE_ROOT}/external/sdl2/sdl")
 
-set(SDL_SHARED OFF CACHE BOOL "" FORCE)
-set(SDL_STATIC ON CACHE BOOL "" FORCE)
-set(SDL_TEST OFF CACHE BOOL "" FORCE)
-set(SDL_TESTS OFF CACHE BOOL "" FORCE)
-set(SDL_INSTALL_TESTS OFF CACHE BOOL "" FORCE)
-set(SDL_ASSEMBLY OFF CACHE BOOL "" FORCE)
-set(SDL_PTHREADS OFF CACHE BOOL "" FORCE)
-set(SDL_CMAKE_DEBUG_POSTFIX "" CACHE STRING "" FORCE)
+# Keep this aligned with SDL's Emscripten source selection when the vendored
+# SDL version changes. Add missing source folders here if a later SDL update
+# fails to link because the curated browser list is incomplete.
+file(GLOB MONOGAME_BROWSER_SDL2_SOURCES
+    "${_monogameSdl2Root}/src/*.c"
+    "${_monogameSdl2Root}/src/atomic/*.c"
+    "${_monogameSdl2Root}/src/audio/*.c"
+    "${_monogameSdl2Root}/src/audio/dummy/*.c"
+    "${_monogameSdl2Root}/src/audio/disk/*.c"
+    "${_monogameSdl2Root}/src/audio/emscripten/*.c"
+    "${_monogameSdl2Root}/src/cpuinfo/*.c"
+    "${_monogameSdl2Root}/src/dynapi/*.c"
+    "${_monogameSdl2Root}/src/events/*.c"
+    "${_monogameSdl2Root}/src/file/*.c"
+    "${_monogameSdl2Root}/src/filesystem/emscripten/*.c"
+    "${_monogameSdl2Root}/src/haptic/*.c"
+    "${_monogameSdl2Root}/src/haptic/dummy/*.c"
+    "${_monogameSdl2Root}/src/joystick/*.c"
+    "${_monogameSdl2Root}/src/joystick/emscripten/*.c"
+    "${_monogameSdl2Root}/src/libm/*.c"
+    "${_monogameSdl2Root}/src/loadso/dlopen/*.c"
+    "${_monogameSdl2Root}/src/locale/*.c"
+    "${_monogameSdl2Root}/src/locale/emscripten/*.c"
+    "${_monogameSdl2Root}/src/misc/*.c"
+    "${_monogameSdl2Root}/src/misc/emscripten/*.c"
+    "${_monogameSdl2Root}/src/power/*.c"
+    "${_monogameSdl2Root}/src/power/emscripten/*.c"
+    "${_monogameSdl2Root}/src/render/*.c"
+    "${_monogameSdl2Root}/src/render/opengles2/*.c"
+    "${_monogameSdl2Root}/src/render/software/*.c"
+    "${_monogameSdl2Root}/src/sensor/*.c"
+    "${_monogameSdl2Root}/src/sensor/dummy/*.c"
+    "${_monogameSdl2Root}/src/stdlib/*.c"
+    "${_monogameSdl2Root}/src/thread/*.c"
+    "${_monogameSdl2Root}/src/thread/generic/*.c"
+    "${_monogameSdl2Root}/src/timer/*.c"
+    "${_monogameSdl2Root}/src/timer/unix/*.c"
+    "${_monogameSdl2Root}/src/video/*.c"
+    "${_monogameSdl2Root}/src/video/emscripten/*.c"
+    "${_monogameSdl2Root}/src/video/yuv2rgb/*.c")
 
-add_subdirectory("${MONOGAME_NATIVE_ROOT}/external/sdl2/sdl" "${CMAKE_CURRENT_BINARY_DIR}/sdl")
+add_library(SDL2-static STATIC ${MONOGAME_BROWSER_SDL2_SOURCES})
 
-target_compile_options(SDL2-static PRIVATE "-sUSE_SDL=0" "-Wno-warn-absolute-paths")
+target_compile_definitions(SDL2-static PRIVATE SDL_STATIC_LIB)
+target_compile_options(SDL2-static PRIVATE
+    "-sUSE_SDL=0"
+    "-Wno-warn-absolute-paths"
+    "-idirafter"
+    "${_monogameSdl2Root}/src/video/khronos")
+target_include_directories(SDL2-static PUBLIC "${_monogameSdl2Root}/include")
 set_target_properties(SDL2-static PROPERTIES
     DEBUG_POSTFIX ""
+    OUTPUT_NAME "SDL2"
     ARCHIVE_OUTPUT_DIRECTORY "${MONOGAME_BROWSER_OUTPUT_ROOT}/$<CONFIG>")
 
 add_library(mgruntime STATIC
@@ -55,7 +95,7 @@ target_include_directories(mgruntime PRIVATE
     "${MONOGAME_NATIVE_ROOT}/common"
     "${MONOGAME_NATIVE_ROOT}/sdl"
     "${MONOGAME_NATIVE_ROOT}/opengl"
-    "${MONOGAME_NATIVE_ROOT}/external/sdl2/sdl/include"
+    "${_monogameSdl2Root}/include"
     "${MONOGAME_SOURCE_ROOT}/external/stb")
 
 set_target_properties(mgruntime PROPERTIES
