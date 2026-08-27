@@ -218,6 +218,15 @@ namespace
     constexpr mgint OpenGLShaderProfile = 0;
     constexpr size_t ShaderStageCount = static_cast<size_t>(MGShaderStage::Count);
 
+    constexpr bool IsBrowserOpenGL()
+    {
+#if defined(__EMSCRIPTEN__)
+        return true;
+#else
+        return false;
+#endif
+    }
+
     bool IsSrgbBackBufferFormat(MGSurfaceFormat format)
     {
         switch (format)
@@ -642,6 +651,35 @@ namespace
         return (1u << drawBufferCount) - 1u;
     }
 
+    void ApplyBrowserAwarePolygonMode(MGFillMode fillMode)
+    {
+#if defined(__EMSCRIPTEN__)
+        if (fillMode != MGFillMode::Solid)
+            MGGL_Fail(__FILE__, __LINE__, "Unsupported fill mode", "browser WebGL2 currently supports solid rasterization only");
+#else
+        glPolygonMode(GL_FRONT_AND_BACK, ToPolygonMode(fillMode));
+#endif
+    }
+
+    void ApplyBrowserAwareDrawBuffer(MGG_GraphicsDevice* device, GLenum drawBuffer)
+    {
+        assert(device != nullptr);
+
+#if defined(__EMSCRIPTEN__)
+        GLenum drawBuffers[1] = { drawBuffer };
+        device->context.functions.DrawBuffers(1, drawBuffers);
+#else
+        glDrawBuffer(drawBuffer);
+#endif
+    }
+
+    void ResetBrowserAwareBackBufferDrawBuffer()
+    {
+#if !defined(__EMSCRIPTEN__)
+        glDrawBuffer(GL_BACK);
+#endif
+    }
+
     void ApplyPosFixup(MGG_GraphicsDevice* device)
     {
         assert(device != nullptr);
@@ -1012,6 +1050,16 @@ namespace
 
     GLenum ToPolygonMode(MGFillMode fillMode)
     {
+#if defined(__EMSCRIPTEN__)
+        switch (fillMode)
+        {
+            case MGFillMode::Solid:
+            case MGFillMode::WireFrame:
+                return 0;
+            default:
+                MGGL_FAIL("Unsupported fill mode", "unknown OpenGL polygon mode");
+        }
+#else
         switch (fillMode)
         {
             case MGFillMode::Solid:
@@ -1021,6 +1069,7 @@ namespace
             default:
                 MGGL_FAIL("Unsupported fill mode", "unknown OpenGL polygon mode");
         }
+#endif
     }
 
     void ToColorMask(MGColorWriteChannels channels, GLboolean& red, GLboolean& green, GLboolean& blue, GLboolean& alpha)
@@ -2306,7 +2355,7 @@ void MGG_GraphicsDevice_SetRasterizerState(MGG_GraphicsDevice* device, MGG_Raste
             glFrontFace(offscreen ? GL_CCW : GL_CW);
     }
 
-    glPolygonMode(GL_FRONT_AND_BACK, ToPolygonMode(info.fillMode));
+    ApplyBrowserAwarePolygonMode(info.fillMode);
 
     if (info.scissorTestEnable)
         glEnable(GL_SCISSOR_TEST);
@@ -2406,7 +2455,7 @@ void MGG_GraphicsDevice_SetRenderTargets(MGG_GraphicsDevice* device, MGG_Texture
     if (count == 0)
     {
         device->context.functions.BindFramebuffer(GL_FRAMEBUFFER, 0);
-        glDrawBuffer(GL_BACK);
+        ResetBrowserAwareBackBufferDrawBuffer();
         glReadBuffer(GL_BACK);
         ClearCurrentRenderTargets(device);
         ApplyPosFixup(device);
@@ -2748,7 +2797,7 @@ void MGG_GraphicsDevice_ResolveRenderTargets(MGG_GraphicsDevice* device)
                 renderTarget->handle,
                 0);
             glReadBuffer(GL_COLOR_ATTACHMENT0 + i);
-            glDrawBuffer(GL_COLOR_ATTACHMENT0);
+            ApplyBrowserAwareDrawBuffer(device, GL_COLOR_ATTACHMENT0);
             device->context.functions.BlitFramebuffer(
                 0,
                 0,
@@ -3184,7 +3233,7 @@ MGG_Texture* MGG_RenderTarget_Create(MGG_GraphicsDevice* device, MGTextureType t
             texture->handle,
             0);
     }
-    glDrawBuffer(GL_COLOR_ATTACHMENT0);
+    ApplyBrowserAwareDrawBuffer(device, GL_COLOR_ATTACHMENT0);
     glReadBuffer(GL_COLOR_ATTACHMENT0);
 
     if (depthFormat != MGDepthFormat::None)
@@ -3231,7 +3280,7 @@ MGG_Texture* MGG_RenderTarget_Create(MGG_GraphicsDevice* device, MGTextureType t
             GetTextureImageTarget(texture, 0),
             texture->handle,
             0);
-        glDrawBuffer(GL_COLOR_ATTACHMENT0);
+        ApplyBrowserAwareDrawBuffer(device, GL_COLOR_ATTACHMENT0);
         glReadBuffer(GL_COLOR_ATTACHMENT0);
 
         framebufferStatus = device->context.functions.CheckFramebufferStatus(GL_FRAMEBUFFER);
@@ -3267,7 +3316,7 @@ void MGG_Texture_Destroy(MGG_GraphicsDevice* device, MGG_Texture* texture)
     if (IsRenderTargetBound(device, texture))
     {
         device->context.functions.BindFramebuffer(GL_FRAMEBUFFER, 0);
-        glDrawBuffer(GL_BACK);
+        ResetBrowserAwareBackBufferDrawBuffer();
         glReadBuffer(GL_BACK);
         ClearCurrentRenderTargets(device);
     }
@@ -3471,9 +3520,17 @@ void MGG_Texture_GetData(MGG_GraphicsDevice* device, MGG_Texture* texture, mgint
     if (x == 0 && y == 0 && z == 0 && resolvedWidth == mipWidth && resolvedHeight == mipHeight && resolvedDepth == mipDepth)
     {
         if (texture->isCompressed)
+        {
+            if (device->context.functions.GetCompressedTexImage == nullptr)
+                MGGL_FAIL("Texture readback unsupported", "compressed texture readback is unavailable on the current OpenGL backend");
             device->context.functions.GetCompressedTexImage(imageTarget, level, data);
+        }
         else
+        {
+            if (device->context.functions.GetTexImage == nullptr)
+                MGGL_FAIL("Texture readback unsupported", "texture readback is unavailable on the current OpenGL backend");
             device->context.functions.GetTexImage(imageTarget, level, texture->pixelFormat, texture->pixelType, data);
+        }
         EndTextureEdit(device, texture, previousActiveTexture, previousBinding);
         glPixelStorei(GL_PACK_ALIGNMENT, previousPackAlignment);
         return;
@@ -3482,6 +3539,9 @@ void MGG_Texture_GetData(MGG_GraphicsDevice* device, MGG_Texture* texture, mgint
     std::vector<mgbyte> fullLevelData(static_cast<size_t>(fullLevelBytes));
     if (texture->isCompressed)
     {
+        if (device->context.functions.GetCompressedTexImage == nullptr)
+            MGGL_FAIL("Texture readback unsupported", "compressed texture readback is unavailable on the current OpenGL backend");
+
         device->context.functions.GetCompressedTexImage(imageTarget, level, fullLevelData.data());
 
         mgint sourceRowBytes = GetTextureRowBytes(texture, mipWidth);
@@ -3504,6 +3564,9 @@ void MGG_Texture_GetData(MGG_GraphicsDevice* device, MGG_Texture* texture, mgint
     }
     else
     {
+        if (device->context.functions.GetTexImage == nullptr)
+            MGGL_FAIL("Texture readback unsupported", "texture readback is unavailable on the current OpenGL backend");
+
         device->context.functions.GetTexImage(
             imageTarget,
             level,

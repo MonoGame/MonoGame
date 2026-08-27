@@ -1,0 +1,19 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <ItemGroup>
+    <None Include="MonoGame.Runtime.Browser.WebGL2.props" Pack="true" PackagePath="buildTransitive" />
+
+    <Content Include="..\..\..\Artifacts\native\mgruntime\webgl2\browser-wasm\Release\libSDL2.a"
+      Condition="Exists('..\..\..\Artifacts\native\mgruntime\webgl2\browser-wasm\Release\libSDL2.a')">
+      <PackagePath>runtimes\browser-wasm\native</PackagePath>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+
+    <Content Include="..\..\..\Artifacts\native\mgruntime\webgl2\browser-wasm\Release\mgruntime.a"
+      Condition="Exists('..\..\..\Artifacts\native\mgruntime\webgl2\browser-wasm\Release\mgruntime.a')">
+      <PackagePath>runtimes\browser-wasm\native</PackagePath>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+</Project>

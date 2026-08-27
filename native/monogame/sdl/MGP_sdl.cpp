@@ -286,7 +286,11 @@ MGMonoGamePlatform MGP_Platform_GetPlatform()
 #elif MG_DIRECTX12
     return MGMonoGamePlatform::WindowsDX12;
 #elif MG_OPENGL
+#if defined(__EMSCRIPTEN__)
+    return MGMonoGamePlatform::WebGL;
+#else
     return MGMonoGamePlatform::DesktopGL;
+#endif
 #else
     assert(false);
     return (MGMonoGamePlatform)-1;
@@ -794,7 +798,11 @@ static mgbyte MGP_Window_CreateNativeWindowInternal(
 #if defined(MG_VULKAN) || defined(MG_DIRECTX12)
 	flags |= SDL_WINDOW_VULKAN;
 #elif defined(MG_OPENGL)
-
+#if defined(__EMSCRIPTEN__)
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_ES);
+#else
     if (!MGP_Window_DetectOpenGLVersion(window->contextMajorVersion, window->contextMinorVersion))
     {
         return false;
@@ -805,6 +813,7 @@ static mgbyte MGP_Window_CreateNativeWindowInternal(
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, window->contextMajorVersion);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, window->contextMinorVersion);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
+#endif
     SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
     SDL_GL_SetAttribute(SDL_GL_RED_SIZE, windowCreateInfo != nullptr ? windowCreateInfo->redSize : 8);
     SDL_GL_SetAttribute(SDL_GL_GREEN_SIZE, windowCreateInfo != nullptr ? windowCreateInfo->greenSize : 8);
@@ -816,7 +825,7 @@ static mgbyte MGP_Window_CreateNativeWindowInternal(
     SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, windowCreateInfo != nullptr ? windowCreateInfo->multiSampleBuffers : 0);
     SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, windowCreateInfo != nullptr ? windowCreateInfo->multiSampleSamples : 0);
     SDL_GL_SetAttribute(SDL_GL_ACCELERATED_VISUAL, 1);
-#if defined(__APPLE__)
+#if defined(__APPLE__) && !defined(__EMSCRIPTEN__)
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_FLAGS, SDL_GL_CONTEXT_FORWARD_COMPATIBLE_FLAG);
 #else
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_FLAGS, 0);

@@ -43,4 +43,13 @@
     </Content>
   </ItemGroup>
 
+  <!--
+    browser-wasm currently does not reliably flow NativeFileReference items
+    from referenced class libraries into the consuming app, so the validation
+    harness imports the browser runtime props directly for now.
+    See: https://github.com/dotnet/runtime/issues/114724
+  -->
+  <Import Project="..\..\..\..\src\NuGetPackages\MonoGame.Runtime.Browser.WebGL2\MonoGame.Runtime.Browser.WebGL2.props"
+    Condition="Exists('..\..\..\..\src\NuGetPackages\MonoGame.Runtime.Browser.WebGL2\MonoGame.Runtime.Browser.WebGL2.props')" />
+
 </Project>
