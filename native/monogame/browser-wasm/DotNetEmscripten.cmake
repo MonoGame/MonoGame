@@ -33,6 +33,22 @@ function(monogame_find_latest_path outputVariable globPattern description)
     set(${outputVariable} "${latestMatch}" PARENT_SCOPE)
 endfunction()
 
+function(monogame_find_workload_path outputVariable packGlobPattern packRelativeSuffix description)
+    if(DEFINED DOTNET_EMSCRIPTEN_PACK_VERSION AND NOT "${DOTNET_EMSCRIPTEN_PACK_VERSION}" STREQUAL "")
+        monogame_find_latest_path(
+            _monogameResolvedPath
+            "packs/${packGlobPattern}/${DOTNET_EMSCRIPTEN_PACK_VERSION}/${packRelativeSuffix}"
+            "${description} for .NET workload pack version ${DOTNET_EMSCRIPTEN_PACK_VERSION}")
+    else()
+        monogame_find_latest_path(
+            _monogameResolvedPath
+            "packs/${packGlobPattern}/*/${packRelativeSuffix}"
+            "${description}")
+    endif()
+
+    set(${outputVariable} "${_monogameResolvedPath}" PARENT_SCOPE)
+endfunction()
+
 function(monogame_write_emscripten_wrapper wrapperPath toolPath)
     if(CMAKE_HOST_WIN32)
         file(TO_NATIVE_PATH "${toolPath}" nativeToolPath)
@@ -73,50 +89,93 @@ function(monogame_write_emscripten_wrapper wrapperPath toolPath)
     endif()
 endfunction()
 
-if(NOT DEFINED DOTNET_EMSCRIPTEN_ROOT_PATH)
-    monogame_find_latest_path(
+set(DOTNET_EMSCRIPTEN_PACK_VERSION "" CACHE STRING "Pinned .NET WebAssembly workload pack version, for example 8.0.30 or 10.0.11")
+
+if(CMAKE_HOST_WIN32)
+    set(_monogameNodeRelativeSuffix "tools/bin/node.exe")
+    set(_monogamePythonRelativeSuffix "tools/python.exe")
+else()
+    set(_monogameNodeRelativeSuffix "tools/bin/node*")
+    set(_monogamePythonRelativeSuffix "tools/python*")
+endif()
+
+if(NOT DEFINED DOTNET_EMSCRIPTEN_ROOT_PATH OR "${DOTNET_EMSCRIPTEN_ROOT_PATH}" STREQUAL "")
+    monogame_find_workload_path(
         DOTNET_EMSCRIPTEN_ROOT_PATH
-        "packs/Microsoft.NET.Runtime.Emscripten.*.Sdk.*/*/tools/emscripten"
+        "Microsoft.NET.Runtime.Emscripten.*.Sdk.*"
+        "tools/emscripten"
         "the .NET Emscripten SDK")
 endif()
 
-if(NOT DEFINED DOTNET_EMSCRIPTEN_NODE_JS)
-    monogame_find_latest_path(
+if(NOT DEFINED DOTNET_EMSCRIPTEN_NODE_JS OR "${DOTNET_EMSCRIPTEN_NODE_JS}" STREQUAL "")
+    monogame_find_workload_path(
         DOTNET_EMSCRIPTEN_NODE_JS
-        "packs/Microsoft.NET.Runtime.Emscripten.*.Node.*/*/tools/bin/node*"
+        "Microsoft.NET.Runtime.Emscripten.*.Node.*"
+        "${_monogameNodeRelativeSuffix}"
         "the .NET Emscripten Node runtime")
 endif()
 
-if(NOT DEFINED DOTNET_EMSCRIPTEN_PYTHON)
-    monogame_find_latest_path(
+if(NOT DEFINED DOTNET_EMSCRIPTEN_PYTHON OR "${DOTNET_EMSCRIPTEN_PYTHON}" STREQUAL "")
+    monogame_find_workload_path(
         DOTNET_EMSCRIPTEN_PYTHON
-        "packs/Microsoft.NET.Runtime.Emscripten.*.Python.*/*/tools/python*"
+        "Microsoft.NET.Runtime.Emscripten.*.Python.*"
+        "${_monogamePythonRelativeSuffix}"
         "the .NET Emscripten Python runtime")
 endif()
 
-if(NOT DEFINED DOTNET_EMSCRIPTEN_SEED_CACHE_ROOT)
-    monogame_find_latest_path(
+if(NOT DEFINED DOTNET_EMSCRIPTEN_SEED_CACHE_ROOT OR "${DOTNET_EMSCRIPTEN_SEED_CACHE_ROOT}" STREQUAL "")
+    monogame_find_workload_path(
         DOTNET_EMSCRIPTEN_SEED_CACHE_ROOT
-        "packs/Microsoft.NET.Runtime.Emscripten.*.Cache.*/*/tools/emscripten/cache"
+        "Microsoft.NET.Runtime.Emscripten.*.Cache.*"
+        "tools/emscripten/cache"
         "the .NET Emscripten cache pack")
 endif()
 
 get_filename_component(DOTNET_EMSCRIPTEN_ROOT_PATH "${DOTNET_EMSCRIPTEN_ROOT_PATH}" ABSOLUTE)
+set(DOTNET_EMSCRIPTEN_ROOT_PATH "${DOTNET_EMSCRIPTEN_ROOT_PATH}" CACHE PATH "Resolved .NET Emscripten SDK root" FORCE)
+get_filename_component(DOTNET_EMSCRIPTEN_NODE_JS "${DOTNET_EMSCRIPTEN_NODE_JS}" ABSOLUTE)
+set(DOTNET_EMSCRIPTEN_NODE_JS "${DOTNET_EMSCRIPTEN_NODE_JS}" CACHE FILEPATH "Resolved .NET Emscripten Node runtime" FORCE)
+get_filename_component(DOTNET_EMSCRIPTEN_PYTHON "${DOTNET_EMSCRIPTEN_PYTHON}" ABSOLUTE)
+set(DOTNET_EMSCRIPTEN_PYTHON "${DOTNET_EMSCRIPTEN_PYTHON}" CACHE FILEPATH "Resolved .NET Emscripten Python runtime" FORCE)
 get_filename_component(DOTNET_EMSCRIPTEN_SEED_CACHE_ROOT "${DOTNET_EMSCRIPTEN_SEED_CACHE_ROOT}" ABSOLUTE)
+set(DOTNET_EMSCRIPTEN_SEED_CACHE_ROOT "${DOTNET_EMSCRIPTEN_SEED_CACHE_ROOT}" CACHE PATH "Resolved .NET Emscripten seed cache root" FORCE)
+get_filename_component(_monogameNativeRoot "${CMAKE_CURRENT_LIST_DIR}/.." ABSOLUTE)
+get_filename_component(_monogameSourceRoot "${_monogameNativeRoot}/../.." ABSOLUTE)
+set(_monogameBrowserArtifactsRoot "${_monogameSourceRoot}/Artifacts/native/mgruntime/webgl2/browser-wasm")
 get_filename_component(_monogameEmscriptenToolsRoot "${DOTNET_EMSCRIPTEN_ROOT_PATH}/.." ABSOLUTE)
 get_filename_component(_monogamePythonRoot "${DOTNET_EMSCRIPTEN_PYTHON}" DIRECTORY)
+set(_monogameRealEmscriptenPlatformFile "${DOTNET_EMSCRIPTEN_ROOT_PATH}/cmake/Modules/Platform/Emscripten.cmake")
 
-set(DOTNET_EMSCRIPTEN_CACHE_ROOT "${CMAKE_BINARY_DIR}/emscripten-cache" CACHE PATH "Writable Emscripten cache root")
+set(DOTNET_EMSCRIPTEN_CACHE_ROOT "${_monogameBrowserArtifactsRoot}/toolchain/cache" CACHE PATH "Writable Emscripten cache root")
 set(DOTNET_EMSCRIPTEN_TEMP_ROOT "${CMAKE_BINARY_DIR}/emscripten-tmp" CACHE PATH "Writable Emscripten temp root")
 set(DOTNET_EMSCRIPTEN_CONFIG_PATH "${CMAKE_BINARY_DIR}/.emscripten" CACHE FILEPATH "Generated Emscripten config")
 set(DOTNET_EMSCRIPTEN_WRAPPER_ROOT "${CMAKE_BINARY_DIR}/emscripten-tools" CACHE PATH "Generated Emscripten wrapper root")
 
+set(CMAKE_TRY_COMPILE_PLATFORM_VARIABLES
+    DOTNET_EMSCRIPTEN_ROOT_PATH
+    DOTNET_EMSCRIPTEN_NODE_JS
+    DOTNET_EMSCRIPTEN_PYTHON
+    DOTNET_EMSCRIPTEN_SEED_CACHE_ROOT
+    DOTNET_EMSCRIPTEN_CACHE_ROOT
+    DOTNET_EMSCRIPTEN_TEMP_ROOT
+    DOTNET_EMSCRIPTEN_CONFIG_PATH
+    DOTNET_EMSCRIPTEN_WRAPPER_ROOT)
+
 file(MAKE_DIRECTORY "${DOTNET_EMSCRIPTEN_CACHE_ROOT}")
 file(MAKE_DIRECTORY "${DOTNET_EMSCRIPTEN_TEMP_ROOT}")
 file(MAKE_DIRECTORY "${DOTNET_EMSCRIPTEN_WRAPPER_ROOT}")
+file(MAKE_DIRECTORY "${DOTNET_EMSCRIPTEN_WRAPPER_ROOT}/cmake/Modules/Platform")
 
 if(NOT EXISTS "${DOTNET_EMSCRIPTEN_CACHE_ROOT}/sysroot_install.stamp")
     file(COPY "${DOTNET_EMSCRIPTEN_SEED_CACHE_ROOT}/" DESTINATION "${DOTNET_EMSCRIPTEN_CACHE_ROOT}")
+endif()
+
+if(NOT EXISTS "${DOTNET_EMSCRIPTEN_ROOT_PATH}/.emscripten")
+    message(FATAL_ERROR "Could not locate the workload Emscripten config template at '${DOTNET_EMSCRIPTEN_ROOT_PATH}/.emscripten'.")
+endif()
+
+if(NOT EXISTS "${_monogameRealEmscriptenPlatformFile}")
+    message(FATAL_ERROR "Could not locate the workload Emscripten platform file at '${_monogameRealEmscriptenPlatformFile}'.")
 endif()
 
 file(READ "${DOTNET_EMSCRIPTEN_ROOT_PATH}/.emscripten" _monogameEmscriptenConfig)
@@ -133,13 +192,8 @@ set(ENV{EM_CONFIG} "${DOTNET_EMSCRIPTEN_CONFIG_PATH}")
 set(ENV{EM_CACHE} "${DOTNET_EMSCRIPTEN_CACHE_ROOT}")
 set(ENV{EMCC_TEMP_DIR} "${DOTNET_EMSCRIPTEN_TEMP_ROOT}")
 
-set(CMAKE_TRY_COMPILE_TARGET_TYPE STATIC_LIBRARY)
-set(EMSCRIPTEN_FORCE_COMPILERS OFF CACHE BOOL "" FORCE)
-set(EMSCRIPTEN_ROOT_PATH "${DOTNET_EMSCRIPTEN_ROOT_PATH}")
-include("${DOTNET_EMSCRIPTEN_ROOT_PATH}/cmake/Modules/Platform/Emscripten.cmake")
-
 if(CMAKE_HOST_WIN32)
-    set(_monogameWrapperSuffix ".cmd")
+    set(_monogameWrapperSuffix ".bat")
     set(_monogameToolSuffix ".bat")
 else()
     set(_monogameWrapperSuffix "")
@@ -147,23 +201,22 @@ else()
 endif()
 
 set(_monogameEmccWrapper "${DOTNET_EMSCRIPTEN_WRAPPER_ROOT}/emcc${_monogameWrapperSuffix}")
-set(_monogameEmxxWrapper "${DOTNET_EMSCRIPTEN_WRAPPER_ROOT}/emxx${_monogameWrapperSuffix}")
+set(_monogameEmxxWrapper "${DOTNET_EMSCRIPTEN_WRAPPER_ROOT}/em++${_monogameWrapperSuffix}")
 set(_monogameEmarWrapper "${DOTNET_EMSCRIPTEN_WRAPPER_ROOT}/emar${_monogameWrapperSuffix}")
 set(_monogameEmranlibWrapper "${DOTNET_EMSCRIPTEN_WRAPPER_ROOT}/emranlib${_monogameWrapperSuffix}")
 set(_monogameEmnmWrapper "${DOTNET_EMSCRIPTEN_WRAPPER_ROOT}/emnm${_monogameWrapperSuffix}")
+set(_monogameEmconfigWrapper "${DOTNET_EMSCRIPTEN_WRAPPER_ROOT}/em-config${_monogameWrapperSuffix}")
 
 monogame_write_emscripten_wrapper("${_monogameEmccWrapper}" "${DOTNET_EMSCRIPTEN_ROOT_PATH}/emcc${_monogameToolSuffix}")
 monogame_write_emscripten_wrapper("${_monogameEmxxWrapper}" "${DOTNET_EMSCRIPTEN_ROOT_PATH}/em++${_monogameToolSuffix}")
 monogame_write_emscripten_wrapper("${_monogameEmarWrapper}" "${DOTNET_EMSCRIPTEN_ROOT_PATH}/emar${_monogameToolSuffix}")
 monogame_write_emscripten_wrapper("${_monogameEmranlibWrapper}" "${DOTNET_EMSCRIPTEN_ROOT_PATH}/emranlib${_monogameToolSuffix}")
 monogame_write_emscripten_wrapper("${_monogameEmnmWrapper}" "${DOTNET_EMSCRIPTEN_ROOT_PATH}/emnm${_monogameToolSuffix}")
+monogame_write_emscripten_wrapper("${_monogameEmconfigWrapper}" "${DOTNET_EMSCRIPTEN_ROOT_PATH}/em-config${_monogameToolSuffix}")
+file(WRITE "${DOTNET_EMSCRIPTEN_WRAPPER_ROOT}/cmake/Modules/Platform/Emscripten.cmake"
+    "include(\"${_monogameRealEmscriptenPlatformFile}\")\n")
 
-set(CMAKE_C_COMPILER "${_monogameEmccWrapper}" CACHE FILEPATH "" FORCE)
-set(CMAKE_CXX_COMPILER "${_monogameEmxxWrapper}" CACHE FILEPATH "" FORCE)
-set(CMAKE_AR "${_monogameEmarWrapper}" CACHE FILEPATH "" FORCE)
-set(CMAKE_RANLIB "${_monogameEmranlibWrapper}" CACHE FILEPATH "" FORCE)
-set(CMAKE_NM "${_monogameEmnmWrapper}" CACHE FILEPATH "" FORCE)
-set(CMAKE_C_COMPILER_AR "${CMAKE_AR}" CACHE FILEPATH "" FORCE)
-set(CMAKE_CXX_COMPILER_AR "${CMAKE_AR}" CACHE FILEPATH "" FORCE)
-set(CMAKE_C_COMPILER_RANLIB "${CMAKE_RANLIB}" CACHE FILEPATH "" FORCE)
-set(CMAKE_CXX_COMPILER_RANLIB "${CMAKE_RANLIB}" CACHE FILEPATH "" FORCE)
+set(CMAKE_TRY_COMPILE_TARGET_TYPE STATIC_LIBRARY)
+set(EMSCRIPTEN_FORCE_COMPILERS OFF CACHE BOOL "" FORCE)
+set(EMSCRIPTEN_ROOT_PATH "${DOTNET_EMSCRIPTEN_WRAPPER_ROOT}" CACHE PATH "" FORCE)
+include("${_monogameRealEmscriptenPlatformFile}")
