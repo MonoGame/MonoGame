@@ -24,11 +24,9 @@ internal static partial class BrowserHostValidationBootstrap
         if (!WebHostRuntime.IsRunLoopActive)
             return false;
 
-        Game game = Game.Instance;
-        if (game == null)
+        if (!Program.Tick())
             return false;
 
-        game.Tick();
         return WebHostRuntime.IsRunLoopActive;
     }
 }

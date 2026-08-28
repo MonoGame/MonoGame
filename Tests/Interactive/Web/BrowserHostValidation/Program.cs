@@ -20,4 +20,13 @@ internal static class Program
         _game = new BrowserHostValidationGame();
         _game.Run();
     }
+
+    internal static bool Tick()
+    {
+        if (_game == null)
+            return false;
+
+        _game.Tick();
+        return true;
+    }
 }
