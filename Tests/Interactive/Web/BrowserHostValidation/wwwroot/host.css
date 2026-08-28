@@ -1,0 +1,51 @@
+/* 
+ * MonoGame - Copyright (C) MonoGame Foundation, Inc
+ * This file is subject to the terms and conditions defined in
+ * file 'LICENSE.txt', which is part of this source code package.
+ */
+html,
+body {
+    margin: 0;
+    width: 100%;
+    height: 100%;
+}
+
+body {
+    background: #101418;
+    color: #f5f7fa;
+}
+
+#monogame-host {
+    position: relative;
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
+}
+
+#monogame-canvas {
+    display: block;
+    width: 100%;
+    height: 100%;
+    border: 0;
+    background: #000000;
+}
+
+.host-status {
+    position: absolute;
+    left: 1rem;
+    right: 1rem;
+    bottom: 1rem;
+    margin: 0;
+    padding: 0.75rem 1rem;
+    background: rgba(136, 35, 35, 0.92);
+    color: #ffffff;
+    font: 14px/1.4 "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.noscript-banner {
+    margin: 0;
+    padding: 1rem;
+    background: #882323;
+    color: #ffffff;
+    font: 14px/1.4 "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+}
