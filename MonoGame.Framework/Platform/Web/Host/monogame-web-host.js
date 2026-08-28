@@ -57,7 +57,7 @@ class MonoGameWebHost {
         const dataset = root.dataset;
         return {
             applicationName: dataset.applicationName || "MonoGame.Web",
-            canvasId: dataset.canvasId || "monogame-canvas",
+            canvasId: dataset.canvasId || "canvas",
             contentBaseUri: dataset.contentBaseUri || "./",
             statusId: dataset.statusId || "monogame-host-status",
             runtimeScriptUri: this.getOptionalConfigValue(dataset.runtimeScriptUri),
@@ -109,10 +109,16 @@ class MonoGameWebHost {
         }
 
         this.canvas = canvas;
+        if (canvas.id !== "canvas") {
+            canvas.id = "canvas";
+        }
+
+        globalThis.Module = globalThis.Module || {};
+        globalThis.Module.canvas = canvas;
         this.canvasHandle = createOpaqueHandle("canvas", canvas);
         this.logStage(
             HostStage.CanvasCreation,
-            `Canvas '${this.config.canvasId}' ready at ${canvas.width}x${canvas.height}.`);
+            `Canvas '${canvas.id}' ready at ${canvas.width}x${canvas.height}.`);
     }
 
     createWebGL2Context() {
@@ -161,18 +167,25 @@ class MonoGameWebHost {
                 "The configured runtime script did not expose a dotnet runtime entry.");
         }
 
-        if (typeof dotnet.create === "function") {
-            this.runtime = await dotnet.create();
+        let runtimeBuilder = dotnet;
+        if (typeof runtimeBuilder.withDiagnosticTracing === "function") {
+            runtimeBuilder = runtimeBuilder.withDiagnosticTracing(false);
         }
-        else if (typeof dotnet.withDiagnosticTracing === "function") {
-            this.runtime = await dotnet.withDiagnosticTracing(false).create();
+
+        if (typeof runtimeBuilder.withModuleConfig === "function") {
+            runtimeBuilder = runtimeBuilder.withModuleConfig({
+                canvas: this.canvas
+            });
         }
-        else {
+
+        if (typeof runtimeBuilder.create !== "function") {
             throw new BrowserHostStartupError(
                 HostStage.WasmLoad,
                 "dotnet_runtime_shape_unsupported",
                 "The configured dotnet runtime does not expose a supported create() API.");
         }
+
+        this.runtime = await runtimeBuilder.create();
 
         if (typeof this.runtime.getAssemblyExports !== "function") {
             throw new BrowserHostStartupError(
