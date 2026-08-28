@@ -13,24 +13,25 @@
       "binaryDir": "${sourceDir}/../build/${presetName}"
     },
     {
-      "name": "browser-wasm-net10-base",
+      "name": "browser-wasm-runtime-base",
       "hidden": true,
       "inherits": "browser-wasm-base",
       "cacheVariables": {
         "CMAKE_TOOLCHAIN_FILE": "${sourceDir}/DotNetEmscripten.cmake",
-        "DOTNET_EMSCRIPTEN_PACK_VERSION": "10.0.11"
+        "DOTNET_EMSCRIPTEN_MIN_PACK_VERSION": "9.0.0",
+        "DOTNET_EMSCRIPTEN_PREFERRED_PACK_MAJOR": "9"
       }
     },
     {
-      "name": "browser-wasm-debug-net10",
-      "inherits": "browser-wasm-net10-base",
+      "name": "browser-wasm-debug",
+      "inherits": "browser-wasm-runtime-base",
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Debug"
       }
     },
     {
-      "name": "browser-wasm-release-net10",
-      "inherits": "browser-wasm-net10-base",
+      "name": "browser-wasm-release",
+      "inherits": "browser-wasm-runtime-base",
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Release"
       }
@@ -38,12 +39,12 @@
   ],
   "buildPresets": [
     {
-      "name": "browser-wasm-debug-net10",
-      "configurePreset": "browser-wasm-debug-net10"
+      "name": "browser-wasm-debug",
+      "configurePreset": "browser-wasm-debug"
     },
     {
-      "name": "browser-wasm-release-net10",
-      "configurePreset": "browser-wasm-release-net10"
+      "name": "browser-wasm-release",
+      "configurePreset": "browser-wasm-release"
     }
   ]
 }

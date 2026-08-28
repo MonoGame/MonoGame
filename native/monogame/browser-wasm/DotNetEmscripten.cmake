@@ -33,19 +33,105 @@ function(monogame_find_latest_path outputVariable globPattern description)
     set(${outputVariable} "${latestMatch}" PARENT_SCOPE)
 endfunction()
 
-function(monogame_find_workload_path outputVariable packGlobPattern packRelativeSuffix description)
-    if(DEFINED DOTNET_EMSCRIPTEN_PACK_VERSION AND NOT "${DOTNET_EMSCRIPTEN_PACK_VERSION}" STREQUAL "")
-        monogame_find_latest_path(
-            _monogameResolvedPath
-            "packs/${packGlobPattern}/${DOTNET_EMSCRIPTEN_PACK_VERSION}/${packRelativeSuffix}"
-            "${description} for .NET workload pack version ${DOTNET_EMSCRIPTEN_PACK_VERSION}")
-    else()
-        monogame_find_latest_path(
-            _monogameResolvedPath
-            "packs/${packGlobPattern}/*/${packRelativeSuffix}"
-            "${description}")
+function(monogame_collect_workload_matches outputVariable globPattern)
+    set(matches)
+
+    foreach(dotnetRoot IN LISTS _monogameDotNetRootCandidates)
+        if(EXISTS "${dotnetRoot}")
+            file(GLOB currentMatches LIST_DIRECTORIES TRUE "${dotnetRoot}/${globPattern}")
+            list(APPEND matches ${currentMatches})
+        endif()
+    endforeach()
+
+    list(REMOVE_DUPLICATES matches)
+    set(${outputVariable} "${matches}" PARENT_SCOPE)
+endfunction()
+
+function(monogame_get_pack_version_from_path outputVariable packPath)
+    file(TO_CMAKE_PATH "${packPath}" normalizedPackPath)
+    string(REGEX MATCH "/([0-9]+\\.[0-9]+\\.[0-9]+)/tools($|/.*)" versionMatch "${normalizedPackPath}")
+
+    if(NOT versionMatch)
+        message(FATAL_ERROR "Could not determine the .NET workload pack version from path '${packPath}'.")
     endif()
 
+    set(${outputVariable} "${CMAKE_MATCH_1}" PARENT_SCOPE)
+endfunction()
+
+function(monogame_get_pack_major outputVariable packVersion)
+    string(REGEX MATCH "^([0-9]+)\\." majorMatch "${packVersion}")
+
+    if(NOT majorMatch)
+        message(FATAL_ERROR "Could not determine the .NET workload pack major version from '${packVersion}'.")
+    endif()
+
+    set(${outputVariable} "${CMAKE_MATCH_1}" PARENT_SCOPE)
+endfunction()
+
+function(monogame_find_supported_pack_version outputVariable packGlobPattern description)
+    if(DEFINED DOTNET_EMSCRIPTEN_PACK_VERSION AND NOT "${DOTNET_EMSCRIPTEN_PACK_VERSION}" STREQUAL "")
+        if(DOTNET_EMSCRIPTEN_PACK_VERSION VERSION_LESS DOTNET_EMSCRIPTEN_MIN_PACK_VERSION)
+            message(FATAL_ERROR
+                "The pinned .NET workload pack version ${DOTNET_EMSCRIPTEN_PACK_VERSION} is below the minimum supported version "
+                "${DOTNET_EMSCRIPTEN_MIN_PACK_VERSION}. Lower DOTNET_EMSCRIPTEN_MIN_PACK_VERSION only if you are intentionally "
+                "reproducing an older unsupported toolchain.")
+        endif()
+
+        monogame_find_latest_path(
+            _monogameResolvedPath
+            "packs/${packGlobPattern}/${DOTNET_EMSCRIPTEN_PACK_VERSION}/tools/emscripten"
+            "${description} for .NET workload pack version ${DOTNET_EMSCRIPTEN_PACK_VERSION}")
+        set(${outputVariable} "${DOTNET_EMSCRIPTEN_PACK_VERSION}" PARENT_SCOPE)
+        return()
+    endif()
+
+    monogame_collect_workload_matches(matches "packs/${packGlobPattern}/*/tools/emscripten")
+
+    if(NOT matches)
+        message(FATAL_ERROR "Could not locate ${description} in the installed .NET workload. Install a supported browser-wasm workload before configuring CMake.")
+    endif()
+
+    set(supportedEntries)
+    set(preferredEntries)
+
+    foreach(match IN LISTS matches)
+        monogame_get_pack_version_from_path(packVersion "${match}")
+
+        if(packVersion VERSION_LESS DOTNET_EMSCRIPTEN_MIN_PACK_VERSION)
+            continue()
+        endif()
+
+        list(APPEND supportedEntries "${packVersion}|${match}")
+        monogame_get_pack_major(packMajor "${packVersion}")
+
+        if("${packMajor}" STREQUAL "${DOTNET_EMSCRIPTEN_PREFERRED_PACK_MAJOR}")
+            list(APPEND preferredEntries "${packVersion}|${match}")
+        endif()
+    endforeach()
+
+    if(preferredEntries)
+        set(candidateEntries ${preferredEntries})
+    else()
+        set(candidateEntries ${supportedEntries})
+    endif()
+
+    if(NOT candidateEntries)
+        message(FATAL_ERROR
+            "Could not locate ${description} at or above the minimum supported .NET workload pack version "
+            "${DOTNET_EMSCRIPTEN_MIN_PACK_VERSION}. Install a supported browser-wasm workload or lower the minimum only for local troubleshooting.")
+    endif()
+
+    list(SORT candidateEntries COMPARE NATURAL ORDER DESCENDING)
+    list(GET candidateEntries 0 resolvedEntry)
+    string(REGEX REPLACE "^([^|]+)\\|.*$" "\\1" resolvedPackVersion "${resolvedEntry}")
+    set(${outputVariable} "${resolvedPackVersion}" PARENT_SCOPE)
+endfunction()
+
+function(monogame_find_workload_path outputVariable packGlobPattern packRelativeSuffix description)
+    monogame_find_latest_path(
+        _monogameResolvedPath
+        "packs/${packGlobPattern}/${DOTNET_EMSCRIPTEN_RESOLVED_PACK_VERSION}/${packRelativeSuffix}"
+        "${description} for .NET workload pack version ${DOTNET_EMSCRIPTEN_RESOLVED_PACK_VERSION}")
     set(${outputVariable} "${_monogameResolvedPath}" PARENT_SCOPE)
 endfunction()
 
@@ -89,7 +175,9 @@ function(monogame_write_emscripten_wrapper wrapperPath toolPath)
     endif()
 endfunction()
 
-set(DOTNET_EMSCRIPTEN_PACK_VERSION "" CACHE STRING "Pinned .NET WebAssembly workload pack version, for example 8.0.30 or 10.0.11")
+set(DOTNET_EMSCRIPTEN_PACK_VERSION "" CACHE STRING "Pinned .NET WebAssembly workload pack version. Leave empty to auto-detect a supported installed version.")
+set(DOTNET_EMSCRIPTEN_MIN_PACK_VERSION "9.0.0" CACHE STRING "Minimum supported .NET WebAssembly workload pack version.")
+set(DOTNET_EMSCRIPTEN_PREFERRED_PACK_MAJOR "9" CACHE STRING "Preferred .NET WebAssembly workload pack major when multiple supported versions are installed.")
 
 if(CMAKE_HOST_WIN32)
     set(_monogameNodeRelativeSuffix "tools/bin/node.exe")
@@ -98,6 +186,13 @@ else()
     set(_monogameNodeRelativeSuffix "tools/bin/node*")
     set(_monogamePythonRelativeSuffix "tools/python*")
 endif()
+
+monogame_find_supported_pack_version(
+    DOTNET_EMSCRIPTEN_RESOLVED_PACK_VERSION
+    "Microsoft.NET.Runtime.Emscripten.*.Sdk.*"
+    "the .NET Emscripten SDK")
+set(DOTNET_EMSCRIPTEN_RESOLVED_PACK_VERSION "${DOTNET_EMSCRIPTEN_RESOLVED_PACK_VERSION}" CACHE STRING "Resolved .NET WebAssembly workload pack version." FORCE)
+message(STATUS "Using .NET Emscripten workload pack version ${DOTNET_EMSCRIPTEN_RESOLVED_PACK_VERSION}.")
 
 if(NOT DEFINED DOTNET_EMSCRIPTEN_ROOT_PATH OR "${DOTNET_EMSCRIPTEN_ROOT_PATH}" STREQUAL "")
     monogame_find_workload_path(
@@ -152,6 +247,10 @@ set(DOTNET_EMSCRIPTEN_CONFIG_PATH "${CMAKE_BINARY_DIR}/.emscripten" CACHE FILEPA
 set(DOTNET_EMSCRIPTEN_WRAPPER_ROOT "${CMAKE_BINARY_DIR}/emscripten-tools" CACHE PATH "Generated Emscripten wrapper root")
 
 set(CMAKE_TRY_COMPILE_PLATFORM_VARIABLES
+    DOTNET_EMSCRIPTEN_PACK_VERSION
+    DOTNET_EMSCRIPTEN_MIN_PACK_VERSION
+    DOTNET_EMSCRIPTEN_PREFERRED_PACK_MAJOR
+    DOTNET_EMSCRIPTEN_RESOLVED_PACK_VERSION
     DOTNET_EMSCRIPTEN_ROOT_PATH
     DOTNET_EMSCRIPTEN_NODE_JS
     DOTNET_EMSCRIPTEN_PYTHON
