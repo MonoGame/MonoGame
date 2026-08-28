@@ -207,14 +207,19 @@ MGP_Platform* MGP_Platform_Create(MGGameRunBehavior& behavior)
     // to have the debugger stop on that allocation so you can
     // identify the source of the memory leak.
     //
-    //_CrtSetBreakAlloc(327);
+	//_CrtSetBreakAlloc(327);
 
 	if (SDL_WasInit(0) == 0) {
-		if (SDL_Init(
-			SDL_INIT_VIDEO |
-			SDL_INIT_JOYSTICK |
-			SDL_INIT_GAMECONTROLLER |
-			SDL_INIT_HAPTIC) < 0)
+        Uint32 initFlags =
+            SDL_INIT_VIDEO |
+            SDL_INIT_JOYSTICK |
+            SDL_INIT_GAMECONTROLLER;
+
+#if !defined(__EMSCRIPTEN__)
+        initFlags |= SDL_INIT_HAPTIC;
+#endif
+
+		if (SDL_Init(initFlags) < 0)
 		{
 			printf("SDL_Init failed: %s\n", SDL_GetError());
             fflush(stdout);
@@ -1322,4 +1327,3 @@ mgbyte MGP_GamePad_SetVibration(MGP_Platform* platform, mgint identifer, mgfloat
     auto supported = SDL_GameControllerRumble(pair->second, (mgushort)(leftMotor * 0xFFFF), (mgushort)(rightMotor * 0xFFFF), INT_MAX);
     return supported == 0;
 }
-
