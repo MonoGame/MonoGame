@@ -6,7 +6,7 @@ using System;
 
 namespace Microsoft.Xna.Framework;
 
-internal sealed class BrowserHostReadyInfo
+public sealed class BrowserHostReadyInfo
 {
     public int HostVersion { get; }
     public string ApplicationName { get; }
@@ -22,7 +22,7 @@ internal sealed class BrowserHostReadyInfo
     public double DevicePixelRatio { get; }
     public bool IsPageVisible { get; }
     public bool HasFocus { get; }
-        
+
     public BrowserHostReadyInfo(
         int hostVersion,
         string applicationName,

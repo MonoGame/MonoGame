@@ -7,7 +7,7 @@ using System.Diagnostics;
 
 namespace Microsoft.Xna.Framework;
 
-internal static class WebHostRuntime
+public static class WebHostRuntime
 {
     private const int CurrentHostVersion = 1;
 
@@ -27,7 +27,7 @@ internal static class WebHostRuntime
         }
     }
 
-    internal static bool IsRunLoopActive
+    public static bool IsRunLoopActive
     {
         get
         {
@@ -36,9 +36,9 @@ internal static class WebHostRuntime
                 return s_runLoopActive;
             }
         }
-    }    
+    }
 
-    internal static void Initialize(BrowserHostReadyInfo readyInfo)
+    public static void Initialize(BrowserHostReadyInfo readyInfo)
     {
         if (readyInfo == null)
             throw new ArgumentNullException(nameof(readyInfo));
