@@ -2092,7 +2092,8 @@ mgbyte MGG_GraphicsDevice_ResizeSwapchain(
     glGetIntegerv(GL_SAMPLES, &samples);
     device->multiSampleCount = (sampleBuffers > 0 && samples > 0) ? static_cast<mgint>(samples) : 0;
 
-    if (device->context.majorVersion > 2 || (device->context.majorVersion == 2 && device->context.minorVersion >= 1))
+    if (!IsBrowserOpenGL()
+        && (device->context.majorVersion > 2 || (device->context.majorVersion == 2 && device->context.minorVersion >= 1)))
     {
         if (IsSrgbBackBufferFormat(color))
             glEnable(GL_FRAMEBUFFER_SRGB);
