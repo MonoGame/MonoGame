@@ -104,3 +104,4 @@ _*
 /native/**/*.make
 /native/**/Makefile
 /native/**/*.mgfxo.h
+/native/monogame/build/**/*
