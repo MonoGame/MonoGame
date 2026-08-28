@@ -16,17 +16,10 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">
-      <_Parameter1>BrowserHostValidation</_Parameter1>
-    </AssemblyAttribute>
-  </ItemGroup>  
-
-  <ItemGroup>
     <Compile Remove="bin\**\*" />
     <Compile Remove="obj\**\*" />
     <Compile Remove="Platform\**\*" />
     <Compile Remove="Properties\**\*" />
-    <Compile Remove="Utilities\DynamicallyAccessedMembers.cs" />
     <Compile Remove="Utilities\System.Numerics.Vectors\**\*" />
     <Compile Remove="Devices\**\*" />
   </ItemGroup>

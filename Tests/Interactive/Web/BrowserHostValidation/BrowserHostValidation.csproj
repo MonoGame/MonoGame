@@ -4,7 +4,7 @@
     <AssemblyName>BrowserHostValidation</AssemblyName>
     <OutputType>Exe</OutputType>
     <RootNamespace>BrowserHostValidation</RootNamespace>
-    <TargetFramework>net10.0</TargetFramework>
+    <TargetFramework>net9.0</TargetFramework>
     <RuntimeIdentifier>browser-wasm</RuntimeIdentifier>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <Nullable>enable</Nullable>
