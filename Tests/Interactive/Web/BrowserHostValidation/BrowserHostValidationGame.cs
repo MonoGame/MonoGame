@@ -12,6 +12,9 @@ namespace BrowserHostValidation;
 [SupportedOSPlatform("browser")]
 internal sealed class BrowserHostValidationGame : Game
 {
+    private const int ExitAfterDrawCount = 300;
+
+    private int _drawCount;
     private bool _reportedFirstUpdate;
     private bool _reportedFirstDraw;
 
@@ -67,9 +70,17 @@ internal sealed class BrowserHostValidationGame : Game
             _reportedFirstDraw = true;
             BrowserHostValidationReporter.ReportPhase(
                 "firstDraw",
-                "First Draw() reached. Requesting Exit().");
+                "First Draw() reached. Clearing CornflowerBlue for visual validation.");
+        }
 
-            // TODO: just exit for now until we can present in the WebGL2 backend.
+        GraphicsDevice.Clear(Color.CornflowerBlue);
+
+        _drawCount++;
+        if (_drawCount == ExitAfterDrawCount)
+        {
+            BrowserHostValidationReporter.ReportPhase(
+                "visualValidationComplete",
+                "Rendered CornflowerBlue frames for visual validation. Requesting Exit().");
             Exit();
         }
 
