@@ -72,8 +72,8 @@
     <PackageReference Include="MonoGame.Tool.Dxc" Version="1.8.2505.11" />
     <PackageReference Include="MonoGame.Tool.FFmpeg" Version="7.0.0.10" />
     <PackageReference Include="MonoGame.Tool.FFprobe" Version="7.0.0.10" />
-    <PackageReference Include="SharpDX" Version="4.0.1" />
-    <PackageReference Include="SharpDX.D3DCompiler" Version="4.0.1" />
+    <PackageReference Include="SharpDX" Version="4.2.0" />
+    <PackageReference Include="SharpDX.D3DCompiler" Version="4.2.0" />
     <PackageReference Include="LibKTX" Version="0.9.2" />
     <PackageReference Include="System.CommandLine" Version="2.0.0-beta4.22272.1" />
     <PackageReference Include="YamlDotNet" Version="16.3.0" />

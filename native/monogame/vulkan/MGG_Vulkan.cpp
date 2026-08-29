@@ -4551,7 +4551,21 @@ MGG_DepthStencilState* MGG_DepthStencilState_Create(MGG_GraphicsDevice* device, 
 	depth.front.compareMask = info->stencilMask;
 	depth.front.writeMask = info->stencilWriteMask;
 	depth.front.reference = info->referenceStencil;
-	depth.back = depth.front;
+	if (info->twoSidedStencilMode)
+	{
+		depth.back.failOp = ToVkStencilOp(info->counterClockwiseStencilFail);
+		depth.back.passOp = ToVkStencilOp(info->counterClockwiseStencilPass);
+		depth.back.depthFailOp = ToVkStencilOp(info->counterClockwiseStencilDepthBufferFail);
+		depth.back.compareOp = ToVkCompareOp(info->counterClockwiseStencilFunction);
+		depth.back.compareMask = info->stencilMask;
+		depth.back.writeMask = info->stencilWriteMask;
+		depth.back.reference = info->referenceStencil;
+	}
+	else
+	{
+		depth.back = depth.front;
+	}
+
 	depth.minDepthBounds = 0.0f;
 	depth.maxDepthBounds = 1.0f;
 

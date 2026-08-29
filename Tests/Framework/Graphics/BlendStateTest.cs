@@ -81,6 +81,90 @@ namespace MonoGame.Tests.Graphics
         }
 
         [Test]
+        public void SingleOutputShaderOnlyWritesToFirstRenderTarget()
+        {
+            using Texture2D pixel = new Texture2D(gd, 1, 1, false, SurfaceFormat.Color);
+            pixel.SetData(new Color[] { Color.White });
+
+            using RenderTarget2D rt0 = new RenderTarget2D(gd, 1, 1, false, SurfaceFormat.Color, DepthFormat.None);
+            using RenderTarget2D rt1 = new RenderTarget2D(gd, 1, 1, false, SurfaceFormat.Color, DepthFormat.None);
+            
+            RenderTargetBinding[] rts =
+            {
+                    new RenderTargetBinding(rt0),
+                    new RenderTargetBinding(rt1)
+            };
+
+            gd.SetRenderTargets(rts);
+            gd.Clear(Color.Transparent);
+
+            using SpriteBatch sb = new SpriteBatch(gd);
+            sb.Begin(blendState: BlendState.Opaque);
+            sb.Draw(pixel, Vector2.Zero, Color.White);
+            sb.End();
+
+            gd.SetRenderTarget(null);
+
+            Color[] rt0Pixels = new Color[1];
+            Color[] rt1Pixels = new Color[1];
+
+            rt0.GetData(rt0Pixels);
+            rt1.GetData(rt1Pixels);
+
+            // XNA writes SpriteBatch's single SV_Target0 output only to RT0
+            Assert.That(rt0Pixels[0], Is.EqualTo(Color.White));
+            Assert.That(rt1Pixels[0], Is.EqualTo(Color.Transparent));
+        }
+
+#if !XNA
+        [Test]
+        public void SingleOutputShaderRespectsIndependentBlendColorWriteChannels()
+        {
+            if (!gd.GraphicsCapabilities.SupportsSeparateBlendStates)
+                Assert.Ignore("Separate blend states are unavailable on this device.");
+
+            using BlendState blendState = new BlendState();
+            blendState.IndependentBlendEnable = true;
+            blendState[0].ColorWriteChannels = ColorWriteChannels.Red;
+            blendState[1].ColorWriteChannels = ColorWriteChannels.Green;
+
+            using Texture2D pixel = new Texture2D(gd, 1, 1, false, SurfaceFormat.Color);
+            pixel.SetData(new Color[] { Color.White });
+
+            using RenderTarget2D rt0 = new RenderTarget2D(gd, 1, 1, false, SurfaceFormat.Color, DepthFormat.None);
+            using RenderTarget2D rt1 = new RenderTarget2D(gd, 1, 1, false, SurfaceFormat.Color, DepthFormat.None);
+
+            RenderTargetBinding[] rts = new RenderTargetBinding[]
+            {
+                new RenderTargetBinding(rt0),
+                new RenderTargetBinding(rt1)
+            };
+
+            gd.SetRenderTargets(rts);
+            gd.Clear(Color.Transparent);
+
+            using SpriteBatch sb = new SpriteBatch(gd);
+            sb.Begin(blendState: blendState);
+            sb.Draw(pixel, Vector2.Zero, Color.White);
+            sb.End();
+
+            gd.SetRenderTarget(null);
+
+            Color[] rt0Pixels = new Color[1];
+            Color[] rt1Pixels = new Color[1];
+
+            rt0.GetData(rt0Pixels);
+            rt1.GetData(rt1Pixels);
+            
+            // SpriteBatch writes SV_Target0, so RT0 still uses its configured red write mask
+            Assert.That(rt0Pixels[0], Is.EqualTo(new Color(255, 0, 0, 0)));
+
+            // RT1 has a green write mask, but the shader has no output for this target
+            Assert.That(rt1Pixels[0], Is.EqualTo(Color.Transparent));
+        }
+#endif
+
+        [Test]
 #if DESKTOPGL
         [Ignore("Fails similarity test. Needs Investigating")]
 #endif

@@ -34,13 +34,8 @@ namespace Microsoft.Xna.Framework.Media
 
         private static Callback _callback;
 
-        private class Callback : IAsyncCallback
+        private class Callback : CallbackBase, IAsyncCallback
         {
-            public void Dispose()
-            {
-            }
-
-            public IDisposable Shadow { get; set; }
             public void Invoke(AsyncResult asyncResultRef)
             {
                 var ev = _session.EndGetEvent(asyncResultRef);
