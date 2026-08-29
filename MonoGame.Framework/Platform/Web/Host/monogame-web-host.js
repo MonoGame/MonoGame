@@ -247,9 +247,9 @@ class MonoGameWebHost {
             runMainPromise = Promise.resolve(this.runtime.runMainAndExit(mainAssemblyName, []));
         }
 
-        await runMainPromise;
         this.scheduleManagedFrame();
         this.logStage(HostStage.RuntimeBoundary, "Managed application launched.");
+        await runMainPromise;
     }
 
     createStartupInfo() {
