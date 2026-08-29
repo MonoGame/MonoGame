@@ -36,6 +36,7 @@
     <Compile Include="Platform\GraphicsDeviceManager.Web.cs" />
     <Compile Include="Platform\Graphics\GraphicsAdapter.Web.cs" />
     <Compile Include="Platform\Graphics\GraphicsDevice.Web.cs" />
+    <Compile Include="Platform\Graphics\Texture2D.Web.cs" />
     <Compile Include="Platform\Audio\DynamicSoundEffectInstance.Default.cs" />
     <Compile Include="Platform\Audio\Microphone.Default.cs" />
     <Compile Include="Platform\Audio\SoundEffect.Web.cs" />
