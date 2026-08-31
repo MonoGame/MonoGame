@@ -4,14 +4,16 @@
 
 using System;
 using System.IO;
+using System.Runtime.Versioning;
 
 namespace Microsoft.Xna.Framework;
 
+[SupportedOSPlatform("browser")]
 partial class TitleContainer
 {
     static partial void PlatformInit()
     {
-        Location = AppContext.BaseDirectory;
+        Location = string.Empty;
     }
 
     static partial void PlatformCheckStreamPath(string name)
@@ -24,30 +26,9 @@ partial class TitleContainer
             throw new ArgumentException("Invalid filename. TitleContainer.OpenStream does not accept remote absolute URIs.", nameof(name));
     }
 
-    static partial void PlatformFetchContent(string name, ref bool handled, ref bool response)
-    {
-        if (ContentProvider == null)
-            return;
-
-        handled = true;
-        response = ContentProvider.FetchContent(NormalizeRelativePath(name)).GetAwaiter().GetResult();
-    }
-
     private static Stream PlatformOpenStream(string safeName)
     {
-        if (ContentProvider != null)
-        {
-            try
-            {
-                return ContentProvider.OpenReadStream(safeName);
-            }
-            catch
-            {
-                return null;
-            }
-        }
-
-        return null;
+        return BrowserAssetCache.OpenReadStream(safeName);
     }
 
     private static Stream PlatformOpenWriteStream(string safeName)

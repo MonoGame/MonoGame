@@ -14,6 +14,7 @@ const HostStage = Object.freeze({
 let activeHost = null;
 let nextHandleId = 1;
 const hostObjectRegistry = new Map();
+const contentBase64ByPath = new Map();
 
 class BrowserHostStartupError extends Error {
     constructor(stage, code, message) {
@@ -351,6 +352,72 @@ function resolveOpaqueHandle(handle) {
     return hostObjectRegistry.get(handle) ?? null;
 }
 
+function normalizeContentPath(relativePath) {
+    if (relativePath == null || relativePath.length === 0) {
+        return null;
+    }
+
+    return relativePath.replace(/\\/g, "/");
+}
+
+function resolveContentUri(relativePath) {
+    const normalizedPath = normalizeContentPath(relativePath);
+    if (normalizedPath == null) {
+        return null;
+    }
+
+    const contentBaseUri = activeHost?.config?.contentBaseUri || "./";
+    return new URL(normalizedPath, new URL(contentBaseUri, document.baseURI)).toString();
+}
+
+function tryGetContentBase64(relativePath) {
+    const normalizedPath = normalizeContentPath(relativePath);
+    if (normalizedPath == null) {
+        return null;
+    }
+
+    if (contentBase64ByPath.has(normalizedPath)) {
+        return contentBase64ByPath.get(normalizedPath);
+    }
+
+    const requestUri = resolveContentUri(normalizedPath);
+    if (requestUri == null) {
+        return null;
+    }
+
+    // TODO: Using synchronous XHR preserves TitleContainer semantics for now.
+    //       We can replace this with an async browser asset pipeline once the
+    //       framework loading can do async boundaries.
+    const request = new XMLHttpRequest();
+    request.open("GET", requestUri, false);
+    request.overrideMimeType("text/plain; charset=x-user-defined");
+
+    try {
+        request.send();
+    }
+    catch {
+        return null;
+    }
+
+    if (request.status < 200 || request.status >= 300) {
+        return null;
+    }
+
+    const encodedContent = encodeResponseTextAsBase64(request.responseText);
+    contentBase64ByPath.set(normalizedPath, encodedContent);
+    return encodedContent;
+}
+
+function encodeResponseTextAsBase64(responseText) {
+    let binary = "";
+
+    for (let index = 0; index < responseText.length; index += 1) {
+        binary += String.fromCharCode(responseText.charCodeAt(index) & 0xff);
+    }
+
+    return btoa(binary);
+}
+
 function runSelfCheck() {
     const marker = { ok: true };
     const handle = createOpaqueHandle("self-check", marker);
@@ -364,7 +431,8 @@ function runSelfCheck() {
 
 globalThis.MonoGameWebHost = {
     getActiveHost: () => activeHost,
-    resolveOpaqueHandle
+    resolveOpaqueHandle,
+    tryGetContentBase64
 };
 
 runSelfCheck();

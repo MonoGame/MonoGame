@@ -17,7 +17,6 @@ namespace Microsoft.Xna.Framework
     {
         static partial void PlatformInit();
         static partial void PlatformCheckStreamPath(string name);
-        static partial void PlatformFetchContent(string name, ref bool handled, ref bool response);
 
         static TitleContainer()
         {
@@ -53,15 +52,9 @@ namespace Microsoft.Xna.Framework
 
             if (ContentProvider != null)
             {
-                bool handled = false;
-                bool response = false;
-                PlatformFetchContent(name, ref handled, ref response);
-                if (!handled)
-                {
-                    var task = Task.Run(() => ContentProvider.FetchContent(name));
-                    task.Wait();
-                    response = task.Result;
-                }
+                var task = Task.Run(() => ContentProvider.FetchContent(name));
+                task.Wait();
+                bool response = task.Result;
 
                 if (!response)
                 {
