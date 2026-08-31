@@ -13,6 +13,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
         {
             return  platform == TargetPlatform.Android ||
                     platform == TargetPlatform.DesktopGL ||
+                    platform == TargetPlatform.WebGL2 ||
                     platform == TargetPlatform.DesktopVK ||
                     platform == TargetPlatform.MacOSX ||
                     platform == TargetPlatform.NativeClient ||
@@ -49,6 +50,10 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
                 {
                     TargetPlatform.iOS => TextureProcessorOutputFormat.PvrCompressed,
                     TargetPlatform.Android => TextureProcessorOutputFormat.EtcCompressed,
+                    // TODO: Validate if we need browser specific compression policy
+                    //       defined here. For now, just explicitly setting it to the
+                    //      same path that DesktopGL used
+                    TargetPlatform.WebGL2 => TextureProcessorOutputFormat.DxtCompressed,
                     _ => TextureProcessorOutputFormat.DxtCompressed
                 };
             }
@@ -64,6 +69,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
                 else if (   platform == TargetPlatform.Windows ||
                             platform == TargetPlatform.WindowsDX12 ||
                             platform == TargetPlatform.DesktopGL ||
+                            platform == TargetPlatform.WebGL2 ||
                             platform == TargetPlatform.DesktopVK ||
                             platform == TargetPlatform.MacOSX ||
                             platform == TargetPlatform.NativeClient)

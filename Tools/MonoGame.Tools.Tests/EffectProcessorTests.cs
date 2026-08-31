@@ -84,6 +84,7 @@ namespace MonoGame.Tests.ContentPipeline
         public void TestParser(string effectFile)
         {
             BuildEffect(effectFile, TargetPlatform.DesktopGL);
+            BuildEffect(effectFile, targetPlatform.WebGL2);
         }
 
         [Test]
@@ -112,6 +113,7 @@ namespace MonoGame.Tests.ContentPipeline
             BuildEffect(effectFile, TargetPlatform.WindowsGDK);
 #endif
             BuildEffect(effectFile, TargetPlatform.DesktopGL);
+            BuildEffect(effectFile, targetPlatform.WebGL2);
             BuildEffect(effectFile, TargetPlatform.DesktopVK);
         }
 

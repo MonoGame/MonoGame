@@ -40,6 +40,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
             'i', // iOS
             'a', // Android
             'd', // DesktopGL
+            'b', // WebGL2
             'X', // MacOSX
             'n', // NativeClient
             'r', // RaspberryPi
@@ -47,7 +48,6 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
             '5', // PlayStation5
             'O', // XboxOne
             'S', // Nintendo Switch
-            'b', // WebAssembly and Bridge.NET
             'V', // DesktopVK (Vulkan)
             'G', // Windows GDK
             's', // Xbox Series

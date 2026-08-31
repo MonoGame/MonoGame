@@ -4,6 +4,7 @@
 
 using System;
 using System.IO;
+using System.Reflection;
 using Microsoft.Xna.Framework.Content.Pipeline;
 using MonoGame.Framework.Content.Pipeline.Builder;
 using NUnit.Framework;
@@ -59,6 +60,9 @@ namespace MonoGame.Tests.ContentPipeline
 
             args = ContentBuilderParams.Parse("server");
             Assert.AreEqual(ContentBuilderMode.Server, args.Mode);
+
+            args = ContentBuilderParams.Parse("build", "-p", "WebGL2");
+            Assert.AreEqual(TargetPlatform.WebGL2, args.Platform);
         }
     } 
 }

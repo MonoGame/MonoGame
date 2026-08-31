@@ -44,6 +44,12 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
         DesktopGL,
 
         /// <summary>
+        /// Browser WebGL2 deployments.
+        /// (MonoGame)
+        /// </summary>
+        WebGL2,
+
+        /// <summary>
         /// Apple Mac OSX-based devices (iMac, MacBook, MacBook Air, etc)
         /// (MonoGame)
         /// </summary>
