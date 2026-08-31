@@ -21,6 +21,9 @@ internal static partial class BrowserHostValidationBootstrap
     [JSExport]
     public static bool Tick()
     {
+        if (!Program.IsRunLoopStarted)
+            return !Program.IsMainCompleted;
+
         if (!WebHostRuntime.IsRunLoopActive)
             return false;
 

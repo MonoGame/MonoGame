@@ -2,7 +2,10 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
+using System;
 using System.Runtime.Versioning;
+using System.Threading.Tasks;
+using Microsoft.Xna.Framework;
 
 namespace BrowserHostValidation;
 
@@ -10,16 +13,41 @@ namespace BrowserHostValidation;
 internal static class Program
 {
     private static BrowserHostValidationGame? _game;
+    private static readonly TaskCompletionSource<bool> s_runLoopCompletion =
+        new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
+    private static bool s_mainCompleted;
+    private static bool s_runLoopStarted;
 
-    private static void Main()
+    private static async Task Main()
     {
-        BrowserHostValidationReporter.ReportPhase(
-            "entryPoint",
-            "Managed entry point reached. Constructing the validation game.");
+        try
+        {
+            BrowserHostValidationReporter.ReportPhase(
+                "entryPoint",
+                "Managed entry point reached. Constructing the validation game.");
 
-        _game = new BrowserHostValidationGame();
-        _game.Run();
+            _game = new BrowserHostValidationGame();
+            _game.Exiting += OnGameExiting;
+            _game.Run();
+            s_runLoopStarted = true;
+            await s_runLoopCompletion.Task;
+        }
+        catch (Exception exception)
+        {
+            BrowserHostValidationReporter.ReportPhase(
+                "entryPointError",
+                exception.ToString());
+            throw;
+        }
+        finally
+        {
+            s_mainCompleted = true;
+        }
     }
+
+    internal static bool IsMainCompleted => s_mainCompleted;
+
+    internal static bool IsRunLoopStarted => s_runLoopStarted;
 
     internal static bool Tick()
     {
@@ -28,5 +56,10 @@ internal static class Program
 
         _game.Tick();
         return true;
+    }
+
+    private static void OnGameExiting(object? sender, ExitingEventArgs eventArgs)
+    {
+        s_runLoopCompletion.TrySetResult(true);
     }
 }
