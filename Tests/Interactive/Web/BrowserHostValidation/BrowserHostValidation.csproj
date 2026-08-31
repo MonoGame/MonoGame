@@ -6,7 +6,6 @@
     <RootNamespace>BrowserHostValidation</RootNamespace>
     <TargetFramework>net9.0</TargetFramework>
     <RuntimeIdentifier>browser-wasm</RuntimeIdentifier>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <Nullable>enable</Nullable>
     <WasmMainJSPath>wwwroot/main.js</WasmMainJSPath>
     <WasmBuildNative>true</WasmBuildNative>
@@ -16,6 +15,8 @@
   <ItemGroup>
     <ProjectReference Include="..\..\..\..\MonoGame.Framework\MonoGame.Framework.Web.csproj" />
   </ItemGroup>
+
+  <Import Project="..\Content\BuildContent.targets" />
 
   <!--
     browser-wasm currently does not reliably flow NativeFileReference items
