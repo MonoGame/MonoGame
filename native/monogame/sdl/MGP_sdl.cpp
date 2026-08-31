@@ -233,7 +233,11 @@ MGP_Platform* MGP_Platform_Create(MGGameRunBehavior& behavior)
 	SDL_SetHint("SDL_VIDEO_MINIMIZE_ON_FOCUS_LOSS", "0");
 	SDL_SetHint("SDL_JOYSTICK_ALLOW_BACKGROUND_EVENTS", "1");
 
+#if defined(__EMSCRIPTEN__)
+    behavior = MGGameRunBehavior::Asynchronous;
+#else
 	behavior = MGGameRunBehavior::Synchronous;
+#endif
 
 	auto platform = new MGP_Platform();
 	return platform;

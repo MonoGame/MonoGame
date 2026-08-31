@@ -71,6 +71,12 @@ class NativeGamePlatform : GamePlatform
 
     public override unsafe void Exit()
     {
+        if (DefaultRunBehavior == GameRunBehavior.Asynchronous)
+        {
+            RaiseAsyncRunLoopEnded();
+            return;
+        }
+
         Interlocked.Increment(ref _isExiting);
     }
 
@@ -282,6 +288,7 @@ class NativeGamePlatform : GamePlatform
 
     public override unsafe void StartRunLoop()
     {
+        _window.Show(true);
         MGP.Platform_StartRunLoop(Handle);
     }
 
