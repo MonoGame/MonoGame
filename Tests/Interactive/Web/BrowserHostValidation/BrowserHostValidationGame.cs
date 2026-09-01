@@ -7,6 +7,7 @@ using System.IO;
 using System.Runtime.Versioning;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using MonoGame.Framework.Utilities;
 
 namespace BrowserHostValidation;
 
@@ -50,6 +51,8 @@ internal sealed class BrowserHostValidationGame : Game
 
     protected override void Initialize()
     {
+        ValidatePlatformInfo();
+
         BrowserHostValidationReporter.ReportPhase(
             "initialize",
             "Initialize() reached.");
@@ -258,5 +261,24 @@ internal sealed class BrowserHostValidationGame : Game
         }
 
         validationTintParameter.SetValue(new Vector4(0.75f, 1.0f, 0.75f, 1.0f));
+    }
+
+    private static void ValidatePlatformInfo()
+    {
+        if (PlatformInfo.MonoGamePlatform != MonoGamePlatform.WebGL)
+        {
+            throw new InvalidOperationException(
+                $"Expected PlatformInfo.MonoGamePlatform to be {MonoGamePlatform.WebGL}, but it was {PlatformInfo.MonoGamePlatform}.");
+        }
+
+        if (PlatformInfo.GraphicsBackend != GraphicsBackend.OpenGL)
+        {
+            throw new InvalidOperationException(
+                $"Expected PlatformInfo.GraphicsBackend to be {GraphicsBackend.OpenGL}, but it was {PlatformInfo.GraphicsBackend}.");
+        }
+
+        BrowserHostValidationReporter.ReportPhase(
+            "platformInfoValidated",
+            "Validated the shared native PlatformInfo values WebGL and OpenGL.");
     }
 }

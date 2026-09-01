@@ -10,10 +10,11 @@
     <WasmMainJSPath>wwwroot/main.js</WasmMainJSPath>
     <WasmBuildNative>true</WasmBuildNative>
     <AppendTargetFrameworkToOutputPath>true</AppendTargetFrameworkToOutputPath>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\..\MonoGame.Framework\MonoGame.Framework.Web.csproj" />
+    <ProjectReference Include="..\..\..\..\MonoGame.Framework\MonoGame.Framework.Native.csproj" />
   </ItemGroup>
 
   <Import Project="..\Content\BuildContent.targets" />
