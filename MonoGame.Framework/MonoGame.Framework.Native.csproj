@@ -46,6 +46,7 @@
     <Compile Include="Platform\Threading.cs" />
     <Compile Include="Platform\Desktop\Devices\Sensors\Accelerometer.cs" />
     <Compile Include="Platform\Desktop\Devices\Sensors\Compass.cs" />
+    <Compile Include="Platform\Desktop\Devices\Sensors\Gyrometer.cs" />
   </ItemGroup>
 
   <ItemGroup>
