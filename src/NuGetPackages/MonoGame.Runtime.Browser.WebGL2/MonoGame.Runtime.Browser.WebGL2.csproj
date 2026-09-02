@@ -2,6 +2,7 @@
 
   <ItemGroup>
     <None Include="MonoGame.Runtime.Browser.WebGL2.props" Pack="true" PackagePath="buildTransitive" />
+    <None Include="MonoGame.Runtime.Browser.WebGL2.targets" Pack="true" PackagePath="buildTransitive" />
     <None Include="..\..\..\MonoGame.Framework\Platform\Web\Host\monogame-web-host.js" Pack="true" PackagePath="buildTransitive" Link="monogame-web-host.js" />
 
     <Content Include="..\..\..\Artifacts\native\mgruntime\webgl2\browser-wasm\Release\libSDL2.a"

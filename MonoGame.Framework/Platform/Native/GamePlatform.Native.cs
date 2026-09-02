@@ -315,6 +315,9 @@ class NativeGamePlatform : GamePlatform
 
     public override unsafe bool BeforeUpdate(GameTime gameTime)
     {
+        if (DefaultRunBehavior == GameRunBehavior.Asynchronous)
+            PollEvents();
+
         return MGP.Platform_BeforeUpdate(Handle) == 0 ? false : true;
     }
 

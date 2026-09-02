@@ -7,13 +7,12 @@ const HostStage = Object.freeze({
     CanvasCreation: "CanvasCreation",
     WebGL2Creation: "WebGL2Creation",
     WasmLoad: "WasmLoad",
+    ContentStaging: "ContentStaging",
     ManagedBootstrap: "ManagedBootstrap",
     RuntimeBoundary: "RuntimeBoundary"
 });
 
 let activeHost = null;
-let nextHandleId = 1;
-const hostObjectRegistry = new Map();
 const contentBase64ByPath = new Map();
 
 class BrowserHostStartupError extends Error {
@@ -31,9 +30,6 @@ class MonoGameWebHost {
         this.config = this.readConfig(root);
         this.statusElement = document.getElementById(this.config.statusId);
         this.canvas = null;
-        this.gl = null;
-        this.canvasHandle = null;
-        this.graphicsContextHandle = null;
         this.runtime = null;
         this.bootstrapExports = null;
         this.managedFrameHandle = null;
@@ -60,6 +56,7 @@ class MonoGameWebHost {
             applicationName: dataset.applicationName || "MonoGame.Web",
             canvasId: dataset.canvasId || "canvas",
             contentBaseUri: dataset.contentBaseUri || "./",
+            startupContentManifestUri: dataset.startupContentManifestUri || "Content/content-manifest.txt",
             statusId: dataset.statusId || "monogame-host-status",
             runtimeScriptUri: this.getOptionalConfigValue(dataset.runtimeScriptUri),
             bootstrapAssemblyName: this.getOptionalConfigValue(dataset.bootstrapAssemblyName),
@@ -88,6 +85,7 @@ class MonoGameWebHost {
             }
 
             await this.loadManagedRuntimeAsync();
+            await this.stageStartupContentAsync();
             await this.initializeManagedHostAsync();
             await this.launchManagedApplicationAsync();
         }
@@ -116,7 +114,6 @@ class MonoGameWebHost {
 
         globalThis.Module = globalThis.Module || {};
         globalThis.Module.canvas = canvas;
-        this.canvasHandle = createOpaqueHandle("canvas", canvas);
         this.logStage(
             HostStage.CanvasCreation,
             `Canvas '${canvas.id}' ready at ${canvas.width}x${canvas.height}.`);
@@ -136,16 +133,14 @@ class MonoGameWebHost {
             stencil: true
         };
 
-        const gl = this.canvas.getContext("webgl2", contextOptions);
-        if (gl == null) {
+        const context = this.canvas.getContext("webgl2", contextOptions);
+        if (context == null) {
             throw new BrowserHostStartupError(
                 HostStage.WebGL2Creation,
                 "webgl2_unavailable",
                 "The browser host could not create a WebGL2 context.");
         }
 
-        this.gl = gl;
-        this.graphicsContextHandle = createOpaqueHandle("webgl2", gl);
         this.logStage(HostStage.WebGL2Creation, "WebGL2 context created.");
     }
 
@@ -216,13 +211,6 @@ class MonoGameWebHost {
                 `The configured bootstrap type '${this.config.bootstrapTypeName}' was not found.`);
         }
 
-        if (typeof bootstrapExports.InitializeHost !== "function") {
-            throw new BrowserHostStartupError(
-                HostStage.ManagedBootstrap,
-                "managed_initialize_missing",
-                "The configured bootstrap type does not expose InitializeHost().");
-        }
-
         if (typeof bootstrapExports.Tick !== "function") {
             throw new BrowserHostStartupError(
                 HostStage.ManagedBootstrap,
@@ -231,8 +219,93 @@ class MonoGameWebHost {
         }
 
         this.bootstrapExports = bootstrapExports;
-        this.bootstrapExports.InitializeHost(JSON.stringify(this.createStartupInfo()));
         this.logStage(HostStage.ManagedBootstrap, "Managed browser host initialized.");
+    }
+
+    async stageStartupContentAsync() {
+        this.logStage(HostStage.ContentStaging, "Staging startup content.");
+        await this.stageContentManifestAsync(this.config.startupContentManifestUri);
+        this.logStage(HostStage.ContentStaging, "Startup content staged.");
+    }
+
+    async stageContentManifestAsync(manifestUri) {
+        const fileSystem = this.getFileSystem();
+        const requestUri = this.resolveContentUri(manifestUri);
+        const response = await fetch(requestUri);
+        if (!response.ok) {
+            throw new BrowserHostStartupError(
+                HostStage.ContentStaging,
+                "content_manifest_fetch_failed",
+                `The content manifest '${manifestUri}' could not be downloaded. HTTP ${response.status}.`);
+        }
+
+        const manifestText = await response.text();
+        const contentPaths = manifestText
+            .split(/\r?\n/)
+            .map((path) => path.trim())
+            .filter((path) => path.length > 0)
+            .map((path) => this.normalizeVfsPath(path));
+
+        // TODO: Just going to request all startup assets
+        //       we might need add a bounded request pool
+        //       if projects exceed browser connection limits
+        await Promise.all(contentPaths.map(async (contentPath) => {
+            const contentResponse = await fetch(this.resolveContentUri(contentPath));
+            if (!contentResponse.ok) {
+                throw new BrowserHostStartupError(
+                    HostStage.ContentStaging,
+                    "content_asset_fetch_failed",
+                    `The startup asset '${contentPath}' could not be downloaded. HTTP ${contentResponse.status}.`);
+            }
+
+            const directoryPath = contentPath.substring(0, contentPath.lastIndexOf("/"));
+            if (directoryPath.length > 0) {
+                fileSystem.mkdirTree(`/${directoryPath}`);
+            }
+
+            fileSystem.writeFile(`/${contentPath}`, new Uint8Array(await contentResponse.arrayBuffer()));
+        }));
+    }
+
+    getFileSystem() {
+        const fileSystem = this.runtime?.Module?.FS;
+        if (fileSystem == null
+            || typeof fileSystem.mkdirTree !== "function"
+            || typeof fileSystem.writeFile !== "function") {
+            throw new BrowserHostStartupError(
+                HostStage.ContentStaging,
+                "emscripten_filesystem_missing",
+                "The managed runtime did not expose an Emscripten filesystem capable of staging content.");
+        }
+
+        return fileSystem;
+    }
+
+    normalizeVfsPath(path) {
+        const normalizedPath = normalizeContentPath(path);
+        if (normalizedPath == null
+            || !normalizedPath.startsWith("Content/")
+            || normalizedPath.includes("/../")
+            || normalizedPath.endsWith("/..")) {
+            throw new BrowserHostStartupError(
+                HostStage.ContentStaging,
+                "content_manifest_path_invalid",
+                `The content manifest contains an invalid path '${path}'.`);
+        }
+
+        return normalizedPath;
+    }
+
+    resolveContentUri(relativePath) {
+        const normalizedPath = normalizeContentPath(relativePath);
+        if (normalizedPath == null) {
+            throw new BrowserHostStartupError(
+                HostStage.ContentStaging,
+                "content_uri_invalid",
+                "The browser host received an empty content path.");
+        }
+
+        return new URL(normalizedPath, new URL(this.config.contentBaseUri, document.baseURI)).toString();
     }
 
     async launchManagedApplicationAsync() {
@@ -251,25 +324,6 @@ class MonoGameWebHost {
         this.scheduleManagedFrame();
         this.logStage(HostStage.RuntimeBoundary, "Managed application launched.");
         await runMainPromise;
-    }
-
-    createStartupInfo() {
-        return {
-            applicationName: this.config.applicationName,
-            canvasClientHeight: this.canvas.clientHeight,
-            canvasClientWidth: this.canvas.clientWidth,
-            canvasHeight: this.canvas.height,
-            canvasHandle: this.canvasHandle,
-            canvasId: this.canvas.id,
-            canvasWidth: this.canvas.width,
-            contentBaseUri: this.config.contentBaseUri,
-            devicePixelRatio: window.devicePixelRatio || 1,
-            graphicsApi: "WebGL2",
-            graphicsContextHandle: this.graphicsContextHandle,
-            hasFocus: document.hasFocus(),
-            hostVersion: 1,
-            isPageVisible: document.visibilityState !== "hidden"
-        };
     }
 
     normalizeAssemblyName(assemblyName) {
@@ -341,17 +395,6 @@ class MonoGameWebHost {
     }
 }
 
-function createOpaqueHandle(kind, value) {
-    const handle = `${kind}:${nextHandleId}`;
-    nextHandleId += 1;
-    hostObjectRegistry.set(handle, value);
-    return handle;
-}
-
-function resolveOpaqueHandle(handle) {
-    return hostObjectRegistry.get(handle) ?? null;
-}
-
 function normalizeContentPath(relativePath) {
     if (relativePath == null || relativePath.length === 0) {
         return null;
@@ -418,22 +461,10 @@ function encodeResponseTextAsBase64(responseText) {
     return btoa(binary);
 }
 
-function runSelfCheck() {
-    const marker = { ok: true };
-    const handle = createOpaqueHandle("self-check", marker);
-
-    console.assert(
-        resolveOpaqueHandle(handle) === marker,
-        "[MonoGame.Web Host] Opaque handle registry self-check failed.");
-
-    hostObjectRegistry.delete(handle);
-}
-
 globalThis.MonoGameWebHost = {
     getActiveHost: () => activeHost,
-    resolveOpaqueHandle,
+    stageContentManifestAsync: (manifestUri) => activeHost?.stageContentManifestAsync(manifestUri),
     tryGetContentBase64
 };
 
-runSelfCheck();
 MonoGameWebHost.bootFromDocument(document);

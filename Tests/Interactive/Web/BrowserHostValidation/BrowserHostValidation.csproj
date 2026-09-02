@@ -27,5 +27,7 @@
   -->
   <Import Project="..\..\..\..\src\NuGetPackages\MonoGame.Runtime.Browser.WebGL2\MonoGame.Runtime.Browser.WebGL2.props"
     Condition="Exists('..\..\..\..\src\NuGetPackages\MonoGame.Runtime.Browser.WebGL2\MonoGame.Runtime.Browser.WebGL2.props')" />
+  <Import Project="..\..\..\..\src\NuGetPackages\MonoGame.Runtime.Browser.WebGL2\MonoGame.Runtime.Browser.WebGL2.targets"
+    Condition="Exists('..\..\..\..\src\NuGetPackages\MonoGame.Runtime.Browser.WebGL2\MonoGame.Runtime.Browser.WebGL2.targets')" />
 
 </Project>
