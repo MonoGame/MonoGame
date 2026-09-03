@@ -6,6 +6,7 @@ using System;
 using System.Diagnostics;
 using System.Threading;
 using Microsoft.Xna.Framework.Graphics;
+using MonoGame.Framework;
 
 namespace Microsoft.Xna.Framework.Media
 {
@@ -82,10 +83,10 @@ namespace Microsoft.Xna.Framework.Media
         /// Gets the media playback state, <see cref="MediaState"/>.
         /// </summary>
         public MediaState State
-        { 
+        {
             get
             {
-                // Give the platform code a chance to update 
+                // Give the platform code a chance to update
                 // the playback state before we return the result.
                 PlatformGetState(ref _state);
                 return _state;
@@ -103,7 +104,7 @@ namespace Microsoft.Xna.Framework.Media
         public float Volume
         {
             get { return _volume; }
-            
+
             set
             {
                 if (value < 0.0f || value > 1.0f)
@@ -123,6 +124,7 @@ namespace Microsoft.Xna.Framework.Media
         /// <summary>
         /// Creates a new instance of <see cref="VideoPlayer"/> class.
         /// </summary>
+        [UnsupportedOn("DesktopGL;Windows", "VideoPlayer is not implemented on this platform.")]
         public VideoPlayer()
         {
             _state = MediaState.Stopped;
@@ -191,7 +193,7 @@ namespace Microsoft.Xna.Framework.Media
             if (_currentVideo == video)
             {
                 var state = State;
-							
+
                 // No work to do if we're already
                 // playing this video.
                 if (state == MediaState.Playing)
@@ -206,7 +208,7 @@ namespace Microsoft.Xna.Framework.Media
                     return;
                 }
             }
-            
+
             _currentVideo = video;
 
             PlatformPlay();
@@ -231,7 +233,7 @@ namespace Microsoft.Xna.Framework.Media
             {
                 //We timed out - attempt to stop to fix any bad state
                 Stop();
-                throw new InvalidOperationException("cannot start video"); 
+                throw new InvalidOperationException("cannot start video");
             }
         }
 

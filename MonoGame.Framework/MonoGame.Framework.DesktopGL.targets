@@ -4,4 +4,8 @@
     <MonoGamePlatform>DesktopGL</MonoGamePlatform>
   </PropertyGroup>
 
+  <ItemGroup>
+    <CompilerVisibleProperty Include="MonoGamePlatform" />
+  </ItemGroup>
+
 </Project>
