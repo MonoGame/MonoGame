@@ -6,8 +6,9 @@ public class Builder : ContentBuilder
 {
     public override IContentCollection GetContentCollection()
     {
-        var contentCollection = new ContentCollection();
+        ContentCollection contentCollection = new ContentCollection();
         contentCollection.Include<WildcardRule>("*");
+        contentCollection.IncludeCopy<WildcardRule>("*.txt");
         return contentCollection;
     }
 }

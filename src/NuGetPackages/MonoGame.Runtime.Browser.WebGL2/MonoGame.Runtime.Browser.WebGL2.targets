@@ -1,101 +1,111 @@
 <Project>
 
-  <Target Name="GenerateMonoGameBrowserContentManifest"
+  <Target Name="GenerateMonoGameAssetManifests"
     AfterTargets="ResolveCoreStaticWebAssets"
     Condition="'$(RuntimeIdentifier)' == 'browser-wasm'">
     <PropertyGroup>
-      <MonoGameBrowserContentManifestDirectory>$(IntermediateOutputPath)monogame-browser-content\</MonoGameBrowserContentManifestDirectory>
-      <MonoGameBrowserContentManifestPath>$(MonoGameBrowserContentManifestDirectory)content-manifest.txt</MonoGameBrowserContentManifestPath>
-      <MonoGameBrowserContentBundleManifestDirectory>$(MonoGameBrowserContentManifestDirectory)bundles\</MonoGameBrowserContentBundleManifestDirectory>
+      <MonoGameAssetManifestDirectory>$(IntermediateOutputPath)monogame-assets\</MonoGameAssetManifestDirectory>
+      <MonoGameAssetManifestPath>$(MonoGameAssetManifestDirectory)content-manifest.txt</MonoGameAssetManifestPath>
+      <MonoGameAssetPackManifestDirectory>$(MonoGameAssetManifestDirectory)asset-packs\</MonoGameAssetPackManifestDirectory>
     </PropertyGroup>
 
     <ItemGroup>
-      <_MonoGameBrowserContentAsset Include="@(StaticWebAsset)"
-        Condition="$([System.String]::Copy('%(StaticWebAsset.RelativePath)').StartsWith('Content/'))">
-        <ManifestPath>$([System.Text.RegularExpressions.Regex]::Replace('%(StaticWebAsset.RelativePath)', '#\[\.\{fingerprint\}\]\?', ''))</ManifestPath>
-      </_MonoGameBrowserContentAsset>
-      <_MonoGameBrowserStartupContentAsset Include="@(_MonoGameBrowserContentAsset)"
-        Condition="'@(MonoGameBrowserStartupContent)' == ''" />
+      <StaticWebAsset Remove="@(_MonoGameAssetManifestStaticWebAsset)" />
+      <StaticWebAssetEndpoint Remove="@(_MonoGameAssetManifestStaticWebAssetEndpoint)" />
+      <_MonoGameAsset Remove="@(_MonoGameAsset)" />
+      <_MonoGameStartupAsset Remove="@(_MonoGameStartupAsset)" />
+      <_MonoGameAssetPack Remove="@(_MonoGameAssetPack)" />
+      <_MonoGameAssetPackName Remove="@(_MonoGameAssetPackName)" />
+      <_MonoGameDistinctAssetPackName Remove="@(_MonoGameDistinctAssetPackName)" />
+      <_MonoGameAssetManifest Remove="@(_MonoGameAssetManifest)" />
+      <_MonoGameAssetManifestStaticWebAsset Remove="@(_MonoGameAssetManifestStaticWebAsset)" />
+      <_MonoGameAssetManifestStaticWebAssetEndpoint Remove="@(_MonoGameAssetManifestStaticWebAssetEndpoint)" />
     </ItemGroup>
 
-    <MakeDir Directories="$(MonoGameBrowserContentManifestDirectory)" />
-    <MakeDir Directories="$(MonoGameBrowserContentBundleManifestDirectory)"
-      Condition="'@(MonoGameBrowserContentBundle)' != ''" />
+    <ItemGroup>
+      <_MonoGameAsset Include="@(StaticWebAsset)"
+        Condition="$([System.String]::Copy('%(StaticWebAsset.RelativePath)').StartsWith('Content/'))">
+        <ManifestPath>$([System.Text.RegularExpressions.Regex]::Replace('%(StaticWebAsset.RelativePath)', '#\[\.\{fingerprint\}\]\?', ''))</ManifestPath>
+      </_MonoGameAsset>
+      <_MonoGameStartupAsset Include="@(_MonoGameAsset)" />
+      <_MonoGameAssetPack Include="@(MonoGameAsset)"
+        Condition="'%(MonoGameAsset.AssetPack)' != '' And '%(MonoGameAsset.AssetPack)' != 'base'">
+        <ManifestPath>%(Identity)</ManifestPath>
+      </_MonoGameAssetPack>
+    </ItemGroup>
+
+    <ItemGroup>
+      <_MonoGameStartupAsset Remove="@(_MonoGameAssetPack)"
+        MatchOnMetadata="ManifestPath" />
+    </ItemGroup>
+
+    <MakeDir Directories="$(MonoGameAssetManifestDirectory)" />
+    <MakeDir Directories="$(MonoGameAssetPackManifestDirectory)"
+      Condition="'@(_MonoGameAssetPack)' != ''" />
 
     <WriteLinesToFile
-      File="$(MonoGameBrowserContentManifestPath)"
-      Lines="@(_MonoGameBrowserStartupContentAsset->'%(ManifestPath)')"
-      Condition="'@(MonoGameBrowserStartupContent)' == ''"
+      File="$(MonoGameAssetManifestPath)"
+      Lines="@(_MonoGameStartupAsset->'%(ManifestPath)')"
       Overwrite="true" />
 
-    <WriteLinesToFile
-      File="$(MonoGameBrowserContentManifestPath)"
-      Lines="@(MonoGameBrowserStartupContent)"
-      Condition="'@(MonoGameBrowserStartupContent)' != ''"
-      Overwrite="true" />
+    <Error
+      Condition="'@(_MonoGameAssetPack)' != '' And $([System.String]::Copy('%(_MonoGameAssetPack.AssetPack)').Contains('/'))"
+      Text="MonoGameAsset '%(_MonoGameAssetPack.Identity)' AssetPack '%(_MonoGameAssetPack.AssetPack)' must not contain '/'." />
 
     <Error
-      Condition="'@(MonoGameBrowserContentBundle)' != '' And '%(MonoGameBrowserContentBundle.BundleName)' == ''"
-      Text="MonoGameBrowserContentBundle '%(MonoGameBrowserContentBundle.Identity)' must specify BundleName." />
+      Condition="'@(_MonoGameAssetPack)' != '' And $([System.String]::Copy('%(_MonoGameAssetPack.AssetPack)').Contains('\\'))"
+      Text="MonoGameAsset '%(_MonoGameAssetPack.Identity)' AssetPack '%(_MonoGameAssetPack.AssetPack)' must not contain '\\'." />
 
     <Error
-      Condition="'@(MonoGameBrowserContentBundle)' != '' And $([System.String]::Copy('%(MonoGameBrowserContentBundle.BundleName)').Contains('/'))"
-      Text="MonoGameBrowserContentBundle BundleName '%(MonoGameBrowserContentBundle.BundleName)' must not contain '/'." />
-
-    <Error
-      Condition="'@(MonoGameBrowserContentBundle)' != '' And $([System.String]::Copy('%(MonoGameBrowserContentBundle.BundleName)').Contains('\\'))"
-      Text="MonoGameBrowserContentBundle BundleName '%(MonoGameBrowserContentBundle.BundleName)' must not contain '\\'." />
-
-    <Error
-      Condition="'@(MonoGameBrowserContentBundle)' != '' And $([System.String]::Copy('%(MonoGameBrowserContentBundle.BundleName)').Contains('..'))"
-      Text="MonoGameBrowserContentBundle BundleName '%(MonoGameBrowserContentBundle.BundleName)' must not contain '..'." />
+      Condition="'@(_MonoGameAssetPack)' != '' And $([System.String]::Copy('%(_MonoGameAssetPack.AssetPack)').Contains('..'))"
+      Text="MonoGameAsset '%(_MonoGameAssetPack.Identity)' AssetPack '%(_MonoGameAssetPack.AssetPack)' must not contain '..'." />
 
     <WriteLinesToFile
-      File="$(MonoGameBrowserContentBundleManifestDirectory)%(MonoGameBrowserContentBundle.BundleName).txt"
-      Lines="@(MonoGameBrowserContentBundle)"
-      Condition="'@(MonoGameBrowserContentBundle)' != ''"
+      File="$(MonoGameAssetPackManifestDirectory)%(_MonoGameAssetPack.AssetPack).txt"
+      Lines="@(_MonoGameAssetPack->'%(ManifestPath)')"
+      Condition="'@(_MonoGameAssetPack)' != ''"
       Overwrite="true" />
 
     <ItemGroup>
-      <_MonoGameBrowserContentBundleName Include="@(MonoGameBrowserContentBundle->'%(BundleName)')" />
+      <_MonoGameAssetPackName Include="@(_MonoGameAssetPack->'%(AssetPack)')" />
     </ItemGroup>
 
-    <RemoveDuplicates Inputs="@(_MonoGameBrowserContentBundleName)">
-      <Output TaskParameter="Filtered" ItemName="_MonoGameBrowserContentBundleName" />
+    <RemoveDuplicates Inputs="@(_MonoGameAssetPackName)">
+      <Output TaskParameter="Filtered" ItemName="_MonoGameDistinctAssetPackName" />
     </RemoveDuplicates>
 
     <ItemGroup>
-      <_MonoGameBrowserContentManifest Include="$(MonoGameBrowserContentManifestPath)">
+      <_MonoGameAssetManifest Include="$(MonoGameAssetManifestPath)">
         <RelativePath>Content/content-manifest.txt</RelativePath>
-      </_MonoGameBrowserContentManifest>
-      <_MonoGameBrowserContentManifest Include="@(_MonoGameBrowserContentBundleName->'$(MonoGameBrowserContentBundleManifestDirectory)%(Identity).txt')">
-        <RelativePath>Content/bundles/%(_MonoGameBrowserContentBundleName.Identity).txt</RelativePath>
-      </_MonoGameBrowserContentManifest>
+      </_MonoGameAssetManifest>
+      <_MonoGameAssetManifest Include="@(_MonoGameDistinctAssetPackName->'$(MonoGameAssetPackManifestDirectory)%(Identity).txt')">
+        <RelativePath>Content/asset-packs/%(_MonoGameDistinctAssetPackName.Identity).txt</RelativePath>
+      </_MonoGameAssetManifest>
     </ItemGroup>
 
     <DefineStaticWebAssets
-      CandidateAssets="@(_MonoGameBrowserContentManifest)"
+      CandidateAssets="@(_MonoGameAssetManifest)"
       SourceType="Computed"
       SourceId="$(PackageId)"
-      ContentRoot="$(MonoGameBrowserContentManifestDirectory)"
+      ContentRoot="$(MonoGameAssetManifestDirectory)"
       BasePath="$(StaticWebAssetBasePath)"
       AssetKind="All"
       AssetMode="CurrentProject"
       AssetRole="Primary"
       AssetMergeSource="$(StaticWebAssetMergeTarget)">
-      <Output TaskParameter="Assets" ItemName="_MonoGameBrowserContentManifestStaticWebAsset" />
+      <Output TaskParameter="Assets" ItemName="_MonoGameAssetManifestStaticWebAsset" />
     </DefineStaticWebAssets>
 
     <DefineStaticWebAssetEndpoints
-      CandidateAssets="@(_MonoGameBrowserContentManifestStaticWebAsset)"
+      CandidateAssets="@(_MonoGameAssetManifestStaticWebAsset)"
       ExistingEndpoints="@(StaticWebAssetEndpoint)"
       ContentTypeMappings="@(StaticWebAssetContentTypeMapping)">
-      <Output TaskParameter="Endpoints" ItemName="_MonoGameBrowserContentManifestStaticWebAssetEndpoint" />
+      <Output TaskParameter="Endpoints" ItemName="_MonoGameAssetManifestStaticWebAssetEndpoint" />
     </DefineStaticWebAssetEndpoints>
 
     <ItemGroup>
-      <StaticWebAsset Include="@(_MonoGameBrowserContentManifestStaticWebAsset)" />
-      <StaticWebAssetEndpoint Include="@(_MonoGameBrowserContentManifestStaticWebAssetEndpoint)" />
+      <StaticWebAsset Include="@(_MonoGameAssetManifestStaticWebAsset)" />
+      <StaticWebAssetEndpoint Include="@(_MonoGameAssetManifestStaticWebAssetEndpoint)" />
     </ItemGroup>
   </Target>
 

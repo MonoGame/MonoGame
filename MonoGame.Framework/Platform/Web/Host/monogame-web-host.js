@@ -33,6 +33,7 @@ class MonoGameWebHost {
         this.runtime = null;
         this.bootstrapExports = null;
         this.managedFrameHandle = null;
+        this.assetPackStagingPromises = new Map();
     }
 
     static bootFromDocument(document_) {
@@ -255,7 +256,7 @@ class MonoGameWebHost {
                 throw new BrowserHostStartupError(
                     HostStage.ContentStaging,
                     "content_asset_fetch_failed",
-                    `The startup asset '${contentPath}' could not be downloaded. HTTP ${contentResponse.status}.`);
+                    `The content asset '${contentPath}' could not be downloaded. HTTP ${contentResponse.status}.`);
             }
 
             const directoryPath = contentPath.substring(0, contentPath.lastIndexOf("/"));
@@ -265,6 +266,30 @@ class MonoGameWebHost {
 
             fileSystem.writeFile(`/${contentPath}`, new Uint8Array(await contentResponse.arrayBuffer()));
         }));
+    }
+
+    async stageAssetPackAsync(assetPackName) {
+        const normalizedAssetPackName = this.normalizeAssetPackName(assetPackName);
+        let stagingPromise = this.assetPackStagingPromises.get(normalizedAssetPackName);
+        if (stagingPromise == null) {
+            const manifestUri = `Content/asset-packs/${encodeURIComponent(normalizedAssetPackName)}.txt`;
+            this.logStage(HostStage.ContentStaging, `Staging asset pack '${normalizedAssetPackName}'.`);
+            stagingPromise = this.stageContentManifestAsync(manifestUri);
+            this.assetPackStagingPromises.set(normalizedAssetPackName, stagingPromise);
+
+            try {
+                await stagingPromise;
+                this.logStage(HostStage.ContentStaging, `Asset pack '${normalizedAssetPackName}' staged.`);
+            }
+            catch (error) {
+                this.assetPackStagingPromises.delete(normalizedAssetPackName);
+                throw error;
+            }
+
+            return;
+        }
+
+        await stagingPromise;
     }
 
     getFileSystem() {
@@ -294,6 +319,21 @@ class MonoGameWebHost {
         }
 
         return normalizedPath;
+    }
+
+    normalizeAssetPackName(assetPackName) {
+        if (typeof assetPackName !== "string"
+            || assetPackName.length === 0
+            || assetPackName.includes("/")
+            || assetPackName.includes("\\")
+            || assetPackName.includes("..")) {
+            throw new BrowserHostStartupError(
+                HostStage.ContentStaging,
+                "asset_pack_name_invalid",
+                `The asset pack name '${assetPackName}' is invalid.`);
+        }
+
+        return assetPackName;
     }
 
     resolveContentUri(relativePath) {
@@ -463,6 +503,16 @@ function encodeResponseTextAsBase64(responseText) {
 
 globalThis.MonoGameWebHost = {
     getActiveHost: () => activeHost,
+    stageAssetPackAsync: async (assetPackName) => {
+        if (activeHost == null) {
+            throw new BrowserHostStartupError(
+                HostStage.ContentStaging,
+                "asset_pack_host_unavailable",
+                "The browser host is not available to stage an asset pack.");
+        }
+
+        await activeHost.stageAssetPackAsync(assetPackName);
+    },
     stageContentManifestAsync: (manifestUri) => activeHost?.stageContentManifestAsync(manifestUri),
     tryGetContentBase64
 };

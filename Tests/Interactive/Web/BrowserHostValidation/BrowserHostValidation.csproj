@@ -17,6 +17,11 @@
     <ProjectReference Include="..\..\..\..\MonoGame.Framework\MonoGame.Framework.Native.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <MonoGameAsset Include="Content/monogame_logo.xnb;Content/validation-raw.txt"
+      AssetPack="validation-texture" />
+  </ItemGroup>
+
   <Import Project="..\Content\BuildContent.targets" />
 
   <!--

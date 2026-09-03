@@ -27,4 +27,8 @@
     </Content>
   </ItemGroup>
 
+  <ItemGroup Condition="'$(RuntimeIdentifier)' == 'browser-wasm' and Exists('$(MSBuildThisFileDirectory)WebInterop.cs')">
+    <Compile Include="$(MSBuildThisFileDirectory)WebInterop.cs" Link="MonoGame\Runtime\Browser\WebGL2\WebInterop.cs" />
+  </ItemGroup>
+
 </Project>

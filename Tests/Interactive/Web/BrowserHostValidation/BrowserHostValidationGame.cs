@@ -5,6 +5,7 @@
 using System;
 using System.IO;
 using System.Runtime.Versioning;
+using System.Text;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using MonoGame.Framework.Utilities;
@@ -20,6 +21,9 @@ internal sealed class BrowserHostValidationGame : Game
     private const string ValidationFontContentAssetName = "arial";
     private const string ValidationFontContentStreamAssetName = "Content/arial.xnb";
     private const string ValidationFontSampleText = "SpriteFont content pipeline validation";
+    private const string ValidationMissingAssetPath = "Content/missing-validation-raw.txt";
+    private const string ValidationRawAssetContents = "MonoGame.Web raw-file validation.\n";
+    private const string ValidationRawAssetPath = "Content/validation-raw.txt";
     private const string ValidationTextureContentAssetName = "monogame_logo";
     private const string ValidationTextureContentStreamAssetName = "Content/monogame_logo.xnb";
     private const int ValidationTextureMaxWidth = 384;
@@ -61,6 +65,10 @@ internal sealed class BrowserHostValidationGame : Game
 
     protected override void LoadContent()
     {
+        ValidateRawFile();
+        ValidateRawFileReopen();
+        ValidateMissingAsset();
+
         _spriteBatch = new SpriteBatch(GraphicsDevice);
         _validationTextureFromContent = LoadValidatedContent<Texture2D>(
             ValidationTextureContentAssetName,
@@ -209,6 +217,62 @@ internal sealed class BrowserHostValidationGame : Game
             throw new InvalidOperationException(
                 $"The content pipeline asset '{assetName}' did not begin with the expected XNB header.");
         }
+    }
+
+    private static void ValidateRawFile()
+    {
+        OpenValidatedRawFile();
+
+        BrowserHostValidationReporter.ReportPhase(
+            "rawFileValidated",
+            "Validated TitleContainer.OpenStream for a raw file staged in the named asset pack.");
+    }
+
+    private static void ValidateRawFileReopen()
+    {
+        OpenValidatedRawFile();
+
+        BrowserHostValidationReporter.ReportPhase(
+            "rawFileReopenValidated",
+            "Validated reopening a raw file through TitleContainer.OpenStream after its first stream was disposed.");
+    }
+
+    private static void OpenValidatedRawFile()
+    {
+        using Stream rawFileStream = TitleContainer.OpenStream(ValidationRawAssetPath);
+        using StreamReader rawFileReader = new StreamReader(rawFileStream, Encoding.UTF8, false);
+        string rawFileContents = rawFileReader.ReadToEnd();
+
+        if (!string.Equals(rawFileContents, ValidationRawAssetContents, StringComparison.Ordinal))
+        {
+            throw new InvalidOperationException(
+                $"The raw file '{ValidationRawAssetPath}' did not contain the expected validation content.");
+        }
+    }
+
+    private static void ValidateMissingAsset()
+    {
+        try
+        {
+            using Stream missingAssetStream = TitleContainer.OpenStream(ValidationMissingAssetPath);
+        }
+        catch (FileNotFoundException exception)
+        {
+            if (!exception.Message.Contains(ValidationMissingAssetPath, StringComparison.Ordinal))
+            {
+                throw new InvalidOperationException(
+                    $"The missing asset error did not identify '{ValidationMissingAssetPath}'.",
+                    exception);
+            }
+
+            BrowserHostValidationReporter.ReportPhase(
+                "missingAssetValidated",
+                "Validated the path-specific FileNotFoundException for an unstaged raw file.");
+            return;
+        }
+
+        throw new InvalidOperationException(
+            $"TitleContainer.OpenStream unexpectedly opened missing asset '{ValidationMissingAssetPath}'.");
     }
 
     private void ValidateTextureDimensions()

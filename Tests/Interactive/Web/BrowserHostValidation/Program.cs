@@ -6,12 +6,15 @@ using System;
 using System.Runtime.Versioning;
 using System.Threading.Tasks;
 using Microsoft.Xna.Framework;
+using MonoGame.Runtime.Browser.WebGL2;
 
 namespace BrowserHostValidation;
 
 [SupportedOSPlatform("browser")]
 internal static class Program
 {
+    private const string ValidationTextureAssetPackName = "validation-texture";
+
     private static BrowserHostValidationGame? _game;
     private static readonly TaskCompletionSource<bool> s_runLoopCompletion =
         new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
@@ -25,6 +28,14 @@ internal static class Program
             BrowserHostValidationReporter.ReportPhase(
                 "entryPoint",
                 "Managed entry point reached. Constructing the validation game.");
+
+            BrowserHostValidationReporter.ReportPhase(
+                "assetPackStaging",
+                "Staging the validation texture asset pack through the browser host.");
+            await WebInterop.StageAssetPackAsync(ValidationTextureAssetPackName);
+            BrowserHostValidationReporter.ReportPhase(
+                "assetPackStaged",
+                "The validation texture asset pack was staged before Content.Load<Texture2D>.");
 
             _game = new BrowserHostValidationGame();
             _game.Exiting += OnGameExiting;

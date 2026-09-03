@@ -1,6 +1,8 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
+    <Compile Remove="WebInterop.cs" />
+    <None Include="WebInterop.cs" Pack="true" PackagePath="buildTransitive" />
     <None Include="MonoGame.Runtime.Browser.WebGL2.props" Pack="true" PackagePath="buildTransitive" />
     <None Include="MonoGame.Runtime.Browser.WebGL2.targets" Pack="true" PackagePath="buildTransitive" />
     <None Include="..\..\..\MonoGame.Framework\Platform\Web\Host\monogame-web-host.js" Pack="true" PackagePath="buildTransitive" Link="monogame-web-host.js" />

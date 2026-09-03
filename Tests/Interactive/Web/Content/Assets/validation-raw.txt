@@ -1,0 +1,1 @@
+MonoGame.Web raw-file validation.
