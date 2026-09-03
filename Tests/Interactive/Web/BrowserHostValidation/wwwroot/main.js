@@ -2,6 +2,13 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
+globalThis.MonoGameWebHostConfiguration = {
+    runtimeScriptUri: "./_framework/dotnet.js",
+    bootstrapAssemblyName: "BrowserHostValidation.dll",
+    bootstrapTypeName: "BrowserHostValidation.BrowserHostValidationBootstrap",
+    mainAssemblyName: "BrowserHostValidation.dll"
+};
+
 globalThis.MonoGameWebHostValidation = {
     reportPhase(phaseName, message) {
         console.info("[BrowserHostValidation]", phaseName, message);

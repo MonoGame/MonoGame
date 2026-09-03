@@ -221,7 +221,7 @@ internal sealed class BrowserHostValidationGame : Game
 
     private static void ValidateRawFile()
     {
-        OpenValidatedRawFile();
+        OpenValidatedRawFile(ValidationRawAssetPath, ValidationRawAssetContents);
 
         BrowserHostValidationReporter.ReportPhase(
             "rawFileValidated",
@@ -230,23 +230,23 @@ internal sealed class BrowserHostValidationGame : Game
 
     private static void ValidateRawFileReopen()
     {
-        OpenValidatedRawFile();
+        OpenValidatedRawFile(ValidationRawAssetPath, ValidationRawAssetContents);
 
         BrowserHostValidationReporter.ReportPhase(
             "rawFileReopenValidated",
             "Validated reopening a raw file through TitleContainer.OpenStream after its first stream was disposed.");
     }
 
-    private static void OpenValidatedRawFile()
+    private static void OpenValidatedRawFile(string assetPath, string expectedContents)
     {
-        using Stream rawFileStream = TitleContainer.OpenStream(ValidationRawAssetPath);
+        using Stream rawFileStream = TitleContainer.OpenStream(assetPath);
         using StreamReader rawFileReader = new StreamReader(rawFileStream, Encoding.UTF8, false);
         string rawFileContents = rawFileReader.ReadToEnd();
 
-        if (!string.Equals(rawFileContents, ValidationRawAssetContents, StringComparison.Ordinal))
+        if (!string.Equals(rawFileContents, expectedContents, StringComparison.Ordinal))
         {
             throw new InvalidOperationException(
-                $"The raw file '{ValidationRawAssetPath}' did not contain the expected validation content.");
+                $"The raw file '{assetPath}' did not contain the expected validation content.");
         }
     }
 

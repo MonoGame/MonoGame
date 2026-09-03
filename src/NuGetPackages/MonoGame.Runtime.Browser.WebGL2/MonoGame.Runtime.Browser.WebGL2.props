@@ -8,8 +8,10 @@
     <MonoGameBrowserWebGL2SdlRuntimePath Condition="'$(MonoGameBrowserWebGL2SdlRuntimePath)' == '' and Exists('$(MSBuildThisFileDirectory)..\runtimes\browser-wasm\native\libSDL2.a')">$(MSBuildThisFileDirectory)..\runtimes\browser-wasm\native\libSDL2.a</MonoGameBrowserWebGL2SdlRuntimePath>
     <MonoGameBrowserWebGL2SdlRuntimePath Condition="'$(MonoGameBrowserWebGL2SdlRuntimePath)' == '' and Exists('$(MonoGameBrowserWebGL2ArtifactsRoot)\$(Configuration)\libSDL2.a')">$(MonoGameBrowserWebGL2ArtifactsRoot)\$(Configuration)\libSDL2.a</MonoGameBrowserWebGL2SdlRuntimePath>
     <MonoGameBrowserWebGL2SdlRuntimePath Condition="'$(MonoGameBrowserWebGL2SdlRuntimePath)' == '' and Exists('$(MonoGameBrowserWebGL2ArtifactsRoot)\Release\libSDL2.a')">$(MonoGameBrowserWebGL2ArtifactsRoot)\Release\libSDL2.a</MonoGameBrowserWebGL2SdlRuntimePath>
-    <MonoGameBrowserWebGL2HostScriptPath Condition="'$(MonoGameBrowserWebGL2HostScriptPath)' == '' and Exists('$(MSBuildThisFileDirectory)..\..\..\MonoGame.Framework\Platform\Web\Host\monogame-web-host.js')">$(MSBuildThisFileDirectory)..\..\..\MonoGame.Framework\Platform\Web\Host\monogame-web-host.js</MonoGameBrowserWebGL2HostScriptPath>
-    <MonoGameBrowserWebGL2HostScriptPath Condition="'$(MonoGameBrowserWebGL2HostScriptPath)' == '' and Exists('$(MSBuildThisFileDirectory)monogame-web-host.js')">$(MSBuildThisFileDirectory)monogame-web-host.js</MonoGameBrowserWebGL2HostScriptPath>
+    <MonoGameBrowserWebGL2HostIndexPath Condition="'$(MonoGameBrowserWebGL2HostIndexPath)' == '' and Exists('$(MSBuildThisFileDirectory)Host\index.html')">$(MSBuildThisFileDirectory)Host\index.html</MonoGameBrowserWebGL2HostIndexPath>
+    <MonoGameBrowserWebGL2HostStylesheetPath Condition="'$(MonoGameBrowserWebGL2HostStylesheetPath)' == '' and Exists('$(MSBuildThisFileDirectory)Host\host.css')">$(MSBuildThisFileDirectory)Host\host.css</MonoGameBrowserWebGL2HostStylesheetPath>
+    <MonoGameBrowserWebGL2HostScriptPath Condition="'$(MonoGameBrowserWebGL2HostScriptPath)' == '' and Exists('$(MSBuildThisFileDirectory)Host\monogame-web-host.js')">$(MSBuildThisFileDirectory)Host\monogame-web-host.js</MonoGameBrowserWebGL2HostScriptPath>
+    <UserRuntimeConfig Condition="'$(UserRuntimeConfig)' == '' and !Exists('$(MSBuildProjectDirectory)\runtimeconfig.template.json') and Exists('$(MSBuildThisFileDirectory)Host\browser.runtimeconfig.template.json')">$(MSBuildThisFileDirectory)Host\browser.runtimeconfig.template.json</UserRuntimeConfig>
     <EmccExtraLDFlags Condition="'$(RuntimeIdentifier)' == 'browser-wasm'">$(EmccExtraLDFlags) -sMIN_WEBGL_VERSION=2 -sMAX_WEBGL_VERSION=2 -sFULL_ES3=1</EmccExtraLDFlags>
   </PropertyGroup>
 
@@ -23,6 +25,18 @@
 
   <ItemGroup Condition="'$(RuntimeIdentifier)' == 'browser-wasm' and '$(MonoGameBrowserWebGL2HostScriptPath)' != '' and !Exists('wwwroot\monogame-web-host.js')">
     <Content Include="$(MonoGameBrowserWebGL2HostScriptPath)" Link="wwwroot\monogame-web-host.js">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(RuntimeIdentifier)' == 'browser-wasm' and '$(MonoGameBrowserWebGL2HostIndexPath)' != '' and !Exists('wwwroot\index.html')">
+    <Content Include="$(MonoGameBrowserWebGL2HostIndexPath)" Link="wwwroot\index.html">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(RuntimeIdentifier)' == 'browser-wasm' and '$(MonoGameBrowserWebGL2HostStylesheetPath)' != '' and !Exists('wwwroot\host.css')">
+    <Content Include="$(MonoGameBrowserWebGL2HostStylesheetPath)" Link="wwwroot\host.css">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>

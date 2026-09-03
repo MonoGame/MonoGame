@@ -13,7 +13,7 @@ namespace BrowserHostValidation;
 [SupportedOSPlatform("browser")]
 internal static class Program
 {
-    private const string ValidationTextureAssetPackName = "validation-texture";
+    private const string ValidationAssetPackName = "validation-texture";
 
     private static BrowserHostValidationGame? _game;
     private static readonly TaskCompletionSource<bool> s_runLoopCompletion =
@@ -31,11 +31,11 @@ internal static class Program
 
             BrowserHostValidationReporter.ReportPhase(
                 "assetPackStaging",
-                "Staging the validation texture asset pack through the browser host.");
-            await WebInterop.StageAssetPackAsync(ValidationTextureAssetPackName);
+                "Staging the validation asset pack through the browser host.");
+            await WebInterop.StageAssetPackAsync(ValidationAssetPackName);
             BrowserHostValidationReporter.ReportPhase(
                 "assetPackStaged",
-                "The validation texture asset pack was staged before Content.Load<Texture2D>.");
+                "The validation asset pack was staged before its Content.Load calls.");
 
             _game = new BrowserHostValidationGame();
             _game.Exiting += OnGameExiting;
