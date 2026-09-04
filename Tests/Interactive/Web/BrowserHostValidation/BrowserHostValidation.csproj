@@ -18,7 +18,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <MonoGameAsset Include="Content/monogame_logo.xnb;Content/validation-raw.txt"
+    <MonoGameAsset Include="Content/arial.xnb;Content/monogame_logo.xnb;Content/validation-raw.txt"
       AssetPack="validation-texture" />
   </ItemGroup>
 

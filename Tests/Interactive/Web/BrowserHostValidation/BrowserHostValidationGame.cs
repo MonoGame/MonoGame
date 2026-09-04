@@ -22,7 +22,7 @@ internal sealed class BrowserHostValidationGame : Game
     private const string ValidationFontContentStreamAssetName = "Content/arial.xnb";
     private const string ValidationFontSampleText = "SpriteFont content pipeline validation";
     private const string ValidationMissingAssetPath = "Content/missing-validation-raw.txt";
-    private const string ValidationRawAssetContents = "MonoGame.Web raw-file validation.\n";
+    private const string ValidationRawAssetContents = "MonoGame.Web raw-file validation.";
     private const string ValidationRawAssetPath = "Content/validation-raw.txt";
     private const string ValidationTextureContentAssetName = "monogame_logo";
     private const string ValidationTextureContentStreamAssetName = "Content/monogame_logo.xnb";
@@ -241,9 +241,10 @@ internal sealed class BrowserHostValidationGame : Game
     {
         using Stream rawFileStream = TitleContainer.OpenStream(assetPath);
         using StreamReader rawFileReader = new StreamReader(rawFileStream, Encoding.UTF8, false);
-        string rawFileContents = rawFileReader.ReadToEnd();
+        string rawFileContents = rawFileReader.ReadLine() ?? string.Empty;
 
-        if (!string.Equals(rawFileContents, expectedContents, StringComparison.Ordinal))
+        if (!string.Equals(rawFileContents, expectedContents, StringComparison.Ordinal)
+            || rawFileReader.ReadLine() != null)
         {
             throw new InvalidOperationException(
                 $"The raw file '{assetPath}' did not contain the expected validation content.");
