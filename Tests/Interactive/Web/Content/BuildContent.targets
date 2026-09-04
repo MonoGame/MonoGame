@@ -1,19 +1,25 @@
 <Project>
-  <Target Name="BuildContent" BeforeTargets="AssignTargetPaths;ResolveCurrentProjectStaticWebAssetsInputs">
+  <!-- Browser static assets resolve during PrepareResources, before BeforeCompile. -->
+  <PropertyGroup Condition="'$(RuntimeIdentifier)' == 'browser-wasm'">
+    <PrepareResourcesDependsOn>BuildContent;$(PrepareResourcesDependsOn)</PrepareResourcesDependsOn>
+  </PropertyGroup>
+
+  <Target Name="BuildContent" BeforeTargets="BeforeCompile">
     <PropertyGroup>
-      <ContentOutput>$(ProjectDir)$(OutputPath)</ContentOutput>
-      <ContentTemp>$(ProjectDir)$(IntermediateOutputPath)</ContentTemp>
-      <ContentArgs>build -p $(MonoGamePlatform) -s Content/Assets -o $(ContentOutput) -i $(ContentTemp)</ContentArgs>
+      <ContentOutput>$([System.IO.Path]::TrimEndingDirectorySeparator('$(ProjectDir)$(OutputPath)'))</ContentOutput>
+      <ContentOutput Condition="'$(MonoGamePlatform)' == 'WebGL2'">$([System.IO.Path]::TrimEndingDirectorySeparator('$(ProjectDir)wwwroot'))</ContentOutput>
+      <ContentTemp>$([System.IO.Path]::TrimEndingDirectorySeparator('$(ProjectDir)$(IntermediateOutputPath)'))</ContentTemp>
+      <ContentArgs>build -p $(MonoGamePlatform) -s Content/Assets -o &quot;$(ContentOutput)&quot; -i &quot;$(ContentTemp)&quot;</ContentArgs>
       <ContentCommand>$(MSBuildThisFileDirectory)bin\Debug\Content</ContentCommand>
     </PropertyGroup>
     <MSBuild Projects="$(MSBuildThisFileDirectory)Content.csproj" Targets="Build" RemoveProperties="Configuration;TargetFramework;RuntimeIdentifier;RuntimeIdentifiers" />
-    <Exec Command="$(ContentCommand) $(ContentArgs)" WorkingDirectory="$(MSBuildThisFileDirectory)..\" CustomErrorRegularExpression="\[E\] .+" CustomWarningRegularExpression="\[W\] .+" />
+    <Exec Command="&quot;$(ContentCommand)&quot; $(ContentArgs)" WorkingDirectory="$(MSBuildThisFileDirectory)..\" CustomErrorRegularExpression="\[E\] .+" CustomWarningRegularExpression="\[W\] .+" />
    </Target>
   <Target Name="AddGeneratedContentAssets"
-    DependsOnTargets="BuildContent"
-    BeforeTargets="AssignTargetPaths;ResolveCurrentProjectStaticWebAssetsInputs">
+    AfterTargets="BuildContent">
     <ItemGroup>
-      <GeneratedAsset Include="$(ProjectDir)$(OutputPath)Content\**\*" />
+      <GeneratedAsset Include="$(ProjectDir)$(OutputPath)Content\**\*" Condition="'$(MonoGamePlatform)' != 'WebGL2'" />
+      <GeneratedAsset Include="$(ContentOutput)\Content\**\*" Condition="'$(MonoGamePlatform)' == 'WebGL2'" />
 
       <AndroidAsset Include="@(GeneratedAsset)"
         Condition="'$(MonoGamePlatform)' == 'Android'">
@@ -24,23 +30,14 @@
         Condition="'$(MonoGamePlatform)' == 'MacOSX' Or '$(MonoGamePlatform)' == 'iOS'">
         <Link>Content\%(GeneratedAsset.RecursiveDir)%(GeneratedAsset.Filename)%(GeneratedAsset.Extension)</Link>
       </BundledResource>
+
+      <!-- Generated files are absent during default item evaluation, but present on later builds; replace any default item so static-asset discovery sees each file once. -->
+      <Content Remove="@(GeneratedAsset->'wwwroot\Content\%(RecursiveDir)%(Filename)%(Extension)')"
+        Condition="'$(MonoGamePlatform)' == 'WebGL2'" />
+      <Content Include="@(GeneratedAsset->'wwwroot\Content\%(RecursiveDir)%(Filename)%(Extension)')"
+        Condition="'$(MonoGamePlatform)' == 'WebGL2'">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
     </ItemGroup>
-
-    <ItemGroup Condition="'$(MonoGamePlatform)' == 'WebGL2'">
-      <GeneratedWebContentDirectory Include="@(GeneratedAsset->'$(ProjectDir)wwwroot\Content\%(RecursiveDir)')" />
-      <GeneratedWebContentFile Include="@(GeneratedAsset)">
-        <DestinationPath>$(ProjectDir)wwwroot\Content\%(RecursiveDir)%(Filename)%(Extension)</DestinationPath>
-      </GeneratedWebContentFile>
-    </ItemGroup>
-
-    <MakeDir
-      Directories="@(GeneratedWebContentDirectory)"
-      Condition="'$(MonoGamePlatform)' == 'WebGL2'" />
-
-    <Copy
-      SourceFiles="@(GeneratedWebContentFile)"
-      DestinationFiles="@(GeneratedWebContentFile->'%(DestinationPath)')"
-      SkipUnchangedFiles="true"
-      Condition="'$(MonoGamePlatform)' == 'WebGL2'" />
   </Target>
 </Project>
