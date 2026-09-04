@@ -53,16 +53,21 @@ class MonoGameWebHost {
 
     readConfig(root) {
         const dataset = root.dataset;
+        const runtimeConfiguration = globalThis.MonoGameWebHostConfiguration ?? {};
         return {
             applicationName: dataset.applicationName || "MonoGame.Web",
             canvasId: dataset.canvasId || "canvas",
             contentBaseUri: dataset.contentBaseUri || "./",
             startupContentManifestUri: dataset.startupContentManifestUri || "Content/content-manifest.txt",
             statusId: dataset.statusId || "monogame-host-status",
-            runtimeScriptUri: this.getOptionalConfigValue(dataset.runtimeScriptUri),
-            bootstrapAssemblyName: this.getOptionalConfigValue(dataset.bootstrapAssemblyName),
-            bootstrapTypeName: this.getOptionalConfigValue(dataset.bootstrapTypeName),
+            runtimeScriptUri: this.getOptionalConfigValue(dataset.runtimeScriptUri)
+                ?? this.getOptionalConfigValue(runtimeConfiguration.runtimeScriptUri),
+            bootstrapAssemblyName: this.getOptionalConfigValue(dataset.bootstrapAssemblyName)
+                ?? this.getOptionalConfigValue(runtimeConfiguration.bootstrapAssemblyName),
+            bootstrapTypeName: this.getOptionalConfigValue(dataset.bootstrapTypeName)
+                ?? this.getOptionalConfigValue(runtimeConfiguration.bootstrapTypeName),
             mainAssemblyName: this.getOptionalConfigValue(dataset.mainAssemblyName)
+                ?? this.getOptionalConfigValue(runtimeConfiguration.mainAssemblyName)
         };
     }
 
@@ -77,13 +82,9 @@ class MonoGameWebHost {
     async startAsync() {
         try {
             this.logStage(HostStage.HostBootstrap, "Bootstrapping browser host.");
+            this.validateManagedRuntimeConfiguration();
             this.resolveCanvas();
             this.createWebGL2Context();
-
-            if (!this.hasManagedRuntimeConfiguration()) {
-                this.logStage(HostStage.RuntimeBoundary, "Host is ready.");
-                return;
-            }
 
             await this.loadManagedRuntimeAsync();
             await this.stageStartupContentAsync();
@@ -145,11 +146,30 @@ class MonoGameWebHost {
         this.logStage(HostStage.WebGL2Creation, "WebGL2 context created.");
     }
 
-    hasManagedRuntimeConfiguration() {
-        return this.config.runtimeScriptUri != null
-            && this.config.bootstrapAssemblyName != null
-            && this.config.bootstrapTypeName != null
-            && this.config.mainAssemblyName != null;
+    validateManagedRuntimeConfiguration() {
+        const missingConfigurationNames = [];
+        if (this.config.runtimeScriptUri == null) {
+            missingConfigurationNames.push("runtimeScriptUri");
+        }
+
+        if (this.config.bootstrapAssemblyName == null) {
+            missingConfigurationNames.push("bootstrapAssemblyName");
+        }
+
+        if (this.config.bootstrapTypeName == null) {
+            missingConfigurationNames.push("bootstrapTypeName");
+        }
+
+        if (this.config.mainAssemblyName == null) {
+            missingConfigurationNames.push("mainAssemblyName");
+        }
+
+        if (missingConfigurationNames.length > 0) {
+            throw new BrowserHostStartupError(
+                HostStage.HostBootstrap,
+                "managed_runtime_configuration_missing",
+                `The browser host requires ${missingConfigurationNames.join(", ")}.`);
+        }
     }
 
     async loadManagedRuntimeAsync() {
