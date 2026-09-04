@@ -2,21 +2,26 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
+using MonoGame.Interop;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace Microsoft.Xna.Framework.Storage
 {
+    // NOTE: This is the original design for Windows support for Storage from XNA 4:
+    //
     //	User storage is usually in the "My Documents" folder of the user who is currently logged in, in the SavedGames folder.
     //	A subfolder is created for each game according to the titleName passed to the OpenContainer method.
     //	When no PlayerIndex is specified, content is saved in the AllPlayers folder. When a PlayerIndex is specified,
     //	the content is saved in the Player1, Player2, Player3, or Player4 folder, depending on which PlayerIndex
     //	was passed to BeginShowSelector.
+    //
 
     /// <summary>
     /// Contains a logical collection of files used for user-data storage.
@@ -24,27 +29,27 @@ namespace Microsoft.Xna.Framework.Storage
     /// <remarks>MSDN documentation contains related conceptual article: https://learn.microsoft.com/en-us/previous-versions/windows/xna/bb199074(v=xnagamestudio.40)</remarks>
     public partial class StorageContainer : IDisposable
     {
+        private readonly StorageDevice _device;
         private readonly PlayerIndex? _playerIndex;
+        private readonly string _containerName;
 
-        // In memory container
-        // Use relative file names as keys
-        private Dictionary<string, byte[]> _containers;
-        private List<string> _isContainerDirty;
-        private object _processingLock;
-        private bool _isProcessing;
+        class Blob
+        {
+            public MemoryStream content;
+            public bool directory;
+            public bool deleted;
+            public bool dirty;
+        }
 
-        // In-memory directory tracking
-        // Use relative directory names as keys
-        private readonly HashSet<string> _directories = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        private Dictionary<string, Blob> _cache;
 
         /// <summary>
         /// Gets a bool value indicating whether the instance has been disposed.
         /// </summary>
         public bool IsDisposed { get; private set; }
 
-        private readonly string _containerName;
         /// <summary>
-        /// Returns container name of the title.
+        /// Returns container identifier name.
         /// </summary>
         public string ContainerName
         {
@@ -54,7 +59,6 @@ namespace Microsoft.Xna.Framework.Storage
             }
         }
 
-        private readonly StorageDevice _storageDevice;
         /// <summary>
         /// Returns the <see cref="StorageDevice"/> that holds logical files for the container.
         /// </summary>
@@ -62,7 +66,7 @@ namespace Microsoft.Xna.Framework.Storage
         {
             get
             {
-                return _storageDevice;
+                return _device;
             }
         }
 
@@ -72,41 +76,34 @@ namespace Microsoft.Xna.Framework.Storage
         public event EventHandler<EventArgs> Disposing;
 
         /// <summary>
-        /// Returns true if some kind of processing is in progress and false if it isn't
-        /// </summary>
-        public bool IsProcessing
-        {
-            get
-            {
-                return _isProcessing;
-            }
-        }
-
-        /// <summary>
         /// Initializes a new instance of the <see cref="StorageContainer"/> class.
         /// </summary>
         /// <param name='device'>The attached storage-device.</param>
-        /// <param name='containerName'> The name of the title.</param>
+        /// <param name='containerName'> The identifier for the container.</param>
         /// <param name='playerIndex'>The <see cref="PlayerIndex"/> of the player to save the data.</param>
         internal StorageContainer(StorageDevice device, string containerName, PlayerIndex? playerIndex)
         {
             if (string.IsNullOrEmpty(containerName))
                 throw new ArgumentNullException("containerName", "A title name must be provided.");
 
-            _storageDevice = device;
-            _containerName = PlatformSanitizeFileName(containerName);
+            _device = device;
+            _containerName = containerName;
             _playerIndex = playerIndex;
+        }
 
-            _isProcessing = false;
+        private static string SanitizeDirPath(string path)
+        {
+            path = SanitizeFilePath(path);
+            if (!path.EndsWith('/'))
+                path += "/";
+            return path;
+        }
 
-            _containers = new Dictionary<string, byte[]>();
-            _isContainerDirty = new List<string>();
-
-            _processingLock = new object();
-
-            PlatformInitialize();
-
-            LoadData();
+        private static string SanitizeFilePath(string path)
+        {
+            path = path.Replace('\\', '/');
+            path = path.ToLower();
+            return path;
         }
 
         /// <summary>
@@ -118,20 +115,80 @@ namespace Microsoft.Xna.Framework.Storage
             if (string.IsNullOrEmpty(directoryName))
                 throw new ArgumentNullException("directoryName", "A directory name must be provided.");
 
-            PlatformCreateDirectory(directoryName);
+            var path = SanitizeDirPath(directoryName);
+
+            if (_cache == null)
+                PlatformUpdateCache();
+
+            // TODO: If the directory is in a subfolder folder, should
+            // i throw if the parent directory has not been created?
+
+            if (!_cache.TryGetValue(path, out var data))
+            {
+                data = new Blob();
+                data.directory = true;
+                data.dirty = true;
+                _cache[path] = data;
+            }
+            else
+            {
+                if (data.deleted)
+                    data.deleted = false;
+            }
         }
 
         /// <summary>
         /// Creates a file in the storage-container.
         /// </summary>
         /// <param name="fileName">Relative path of the file to be created.</param>
+        /// <param name="truncate">If the file exists set it to 0 bytes otherwise append.</param>
         /// <returns>Returns <see cref="Stream"/> for the created file.</returns>
-        public Stream CreateFile(string fileName)
+        public Stream CreateFile(string fileName, bool truncate = true)
         {
             if (string.IsNullOrEmpty(fileName))
                 throw new ArgumentNullException("fileName", "A file name must be provided.");
 
-            return PlatformCreateFile(fileName);
+            var path = SanitizeFilePath(fileName);
+
+            if (_cache == null)
+                PlatformUpdateCache();
+
+            // TODO: If the file is in a folder, should
+            // i throw if the directory has not been created?
+
+            if (!_cache.TryGetValue(path, out var blob))
+            {
+                blob = new Blob();
+                blob.content = new MemoryStream();
+                _cache[path] = blob;
+            }
+            else
+            {
+                if (blob.deleted)
+                    blob.deleted = false;
+
+                if (truncate)
+                {
+                    if (blob.content == null)
+                        blob.content = new MemoryStream();
+                    else
+                    {
+                        // Reset the stream.
+                        blob.content.Position = 0;
+                        blob.content.SetLength(0);
+                    }
+                }
+                else
+                {
+                    // We're appending... so load the file from disk first.
+                    blob.content = PlatformLoadFile(path);
+                    blob.content.Position = blob.content.Length;
+                }
+            }
+
+            blob.dirty = true;
+
+            return new StorageStream(blob.content, true, true);
         }
 
         /// <summary>
@@ -143,7 +200,25 @@ namespace Microsoft.Xna.Framework.Storage
             if (string.IsNullOrEmpty(directoryName))
                 throw new ArgumentNullException("directoryName", "A directory name must be provided.");
 
-            PlatformDeleteDirectory(directoryName);
+            var path = SanitizeDirPath(directoryName);
+
+            if (_cache == null)
+                PlatformUpdateCache();
+
+            if (!_cache.TryGetValue(path, out var blob))
+                return;
+
+            blob.deleted = true;
+
+            // Remove all the files and directories that are
+            // contained within this directory.
+            foreach (var key in _cache.Keys.ToList())
+            {
+                if (key.StartsWith(path) && path.Length != key.Length)
+                    _cache.Remove(key);
+            }
+            
+            blob.dirty = true;
         }
 
         /// <summary>
@@ -155,7 +230,17 @@ namespace Microsoft.Xna.Framework.Storage
             if (string.IsNullOrEmpty(fileName))
                 throw new ArgumentNullException("fileName", "A file name must be provided.");
 
-            PlatformDeleteFile(fileName);
+            var path = SanitizeFilePath(fileName);
+
+            if (_cache == null)
+                PlatformUpdateCache();
+
+            if (!_cache.TryGetValue(path, out var blob))
+                return;
+
+            blob.content = null;
+            blob.deleted = true;
+            blob.dirty = true;
         }
 
         /// <summary>
@@ -168,7 +253,12 @@ namespace Microsoft.Xna.Framework.Storage
             if (string.IsNullOrEmpty(directoryName))
                 throw new ArgumentNullException("directoryName", "A directory name must be provided.");
 
-            return PlatformDirectoryExists(directoryName);
+            var path = SanitizeDirPath(directoryName);
+
+            if (_cache == null)
+                PlatformUpdateCache();
+
+            return _cache.TryGetValue(path, out var blob) && !blob.deleted;
         }
 
         /// <summary>
@@ -181,8 +271,12 @@ namespace Microsoft.Xna.Framework.Storage
             if (string.IsNullOrEmpty(fileName))
                 throw new ArgumentNullException("fileName", "A file name must be provided.");
 
-            return PlatformFileExists(fileName);
+            var path = SanitizeFilePath(fileName);
 
+            if (_cache == null)
+                PlatformUpdateCache();
+
+            return _cache.TryGetValue(path, out var blob) && !blob.deleted;
         }
 
         /// <summary>
@@ -191,7 +285,22 @@ namespace Microsoft.Xna.Framework.Storage
         /// <returns>List of directory names.</returns>
         public string[] GetDirectoryNames()
         {
-            return PlatformGetDirectoryNames();
+            var dirs = new List<string>();
+
+            if (_cache == null)
+                PlatformUpdateCache();
+
+            foreach (var pair in _cache)
+            {
+                if (!pair.Value.directory)
+                    continue;
+                if (pair.Value.deleted)
+                    continue;
+
+                dirs.Add(pair.Key.TrimEnd('/'));
+            }
+
+            return dirs.ToArray();
         }
 
         /// <summary>
@@ -204,7 +313,23 @@ namespace Microsoft.Xna.Framework.Storage
             if (string.IsNullOrEmpty(searchPattern))
                 throw new ArgumentNullException("searchPattern", "A search pattern must be provided.");
 
-            return PlatformGetDirectoryNames(searchPattern);
+            if (_cache == null)
+                PlatformUpdateCache();
+
+            var dirs = new List<string>();
+
+            foreach (var pair in _cache)
+            {
+                if (!pair.Value.directory)
+                    continue;
+                if (pair.Value.deleted)
+                    continue;
+
+                // TODO: How do i simply do the search pattern matching?
+                //dirs.Add(pair.Key);
+            }
+
+            return dirs.ToArray();
         }
 
         /// <summary>
@@ -213,7 +338,22 @@ namespace Microsoft.Xna.Framework.Storage
         /// <returns>List of file names.</returns>
         public string[] GetFileNames()
         {
-            return PlatformGetFileNames();
+            if (_cache == null)
+                PlatformUpdateCache();
+
+            var files = new List<string>();
+
+            foreach (var pair in _cache)
+            {
+                if (pair.Value.directory)
+                    continue;
+                if (pair.Value.deleted)
+                    continue;
+
+                files.Add(pair.Key);
+            }
+
+            return files.ToArray();
         }
 
         /// <summary>
@@ -226,7 +366,23 @@ namespace Microsoft.Xna.Framework.Storage
             if (string.IsNullOrEmpty(searchPattern))
                 throw new ArgumentNullException("searchPattern", "A search pattern must be provided.");
 
-            return PlatformGetFileNames(searchPattern);
+            if (_cache == null)
+                PlatformUpdateCache();
+
+            var files = new List<string>();
+
+            foreach (var pair in _cache)
+            {
+                if (pair.Value.directory)
+                    continue;
+                if (pair.Value.deleted)
+                    continue;
+
+                // TODO: How do i simply do the search pattern matching?
+                //files.Add(pair.Key);
+            }
+
+            return files.ToArray();
         }
 
         /// <summary>
@@ -237,39 +393,90 @@ namespace Microsoft.Xna.Framework.Storage
         /// <returns><see cref="Stream"/> object for the opened file.</returns>
         public Stream OpenFile(string fileName, FileMode fileMode)
         {
-            return OpenFile(fileName, fileMode, FileAccess.ReadWrite, FileShare.ReadWrite);
-        }
+            // TODO: Need a custom file stream object that handles
+            // detecting changes to files on write.  Also need to enforce
+            // read only streams.
 
-        /// <summary>
-        /// Opens a file contained in storage-container.
-        /// </summary>
-        /// <param name="fileName">Relative path of the file.</param>
-        /// <param name="fileMode"><see cref="FileMode"/> that specifies how the file is opened.</param>
-        /// <param name="fileAccess"><see cref="FileAccess"/> that specifies access mode.</param>
-        /// <returns><see cref="Stream"/> object for the opened file.</returns>
-        public Stream OpenFile(string fileName, FileMode fileMode, FileAccess fileAccess)
-        {
-            return OpenFile(fileName, fileMode, fileAccess, FileShare.ReadWrite);
-        }
-
-        /// <summary>
-        /// Opens a file contained in storage-container.
-        /// </summary>
-        /// <param name="fileName">Relative path of the file.</param>
-        /// <param name="fileMode"><see cref="FileMode"/> that specifies how the file is opened.</param>
-        /// <param name="fileAccess"><see cref="FileAccess"/> that specifies access mode.</param>
-        /// <param name="fileShare">A bitwise combination of <see cref="FileShare"/> enumeration values that specifies access modes for other stream objects.</param>
-        /// <returns><see cref="Stream"/> object for the opened file.</returns>
-        public Stream OpenFile(string fileName, FileMode fileMode, FileAccess fileAccess, FileShare fileShare)
-        {
             if (string.IsNullOrEmpty(fileName))
                 throw new ArgumentNullException("fileName", "A file name must be provided.");
 
-            return PlatformOpenFile(fileName, fileMode, fileAccess, fileShare);
+            var path = SanitizeFilePath(fileName);
+
+            if (_cache == null)
+                PlatformUpdateCache();
+
+            bool exists = _cache.TryGetValue(path, out var blob) && blob.deleted == false;
+
+            if (fileMode == FileMode.CreateNew)
+            {
+                if (exists)
+                    throw new IOException(); // This seems silly.
+
+                return CreateFile(fileName, true);
+            }
+
+            if (fileMode == FileMode.Create)
+                return CreateFile(fileName, true);
+
+            if (fileMode == FileMode.OpenOrCreate)
+            {
+                if (exists)
+                {
+                    blob.content.Position = 0;
+                    return new StorageStream(blob.content, true, true);
+                }
+
+                return CreateFile(fileName, false);
+            }
+
+            if (fileMode == FileMode.Truncate)
+            {
+                if (!exists)
+                    throw new FileNotFoundException();
+
+                blob.content.Position = 0;
+                blob.content.SetLength(0);
+                return new StorageStream(blob.content, true, true);
+            }
+
+            if (fileMode == FileMode.Append)
+            {
+                if (!exists)
+                    throw new FileNotFoundException();
+                return new StorageStream(blob.content, true, true);
+            }
+
+            if (!exists)
+                throw new FileNotFoundException();
+
+            // Load the file from disk if we haven't before.
+            if (blob.content == null)
+                blob.content = PlatformLoadFile(path);
+
+            blob.content.Position = 0;
+            return new StorageStream(blob.content, true, true);
         }
 
         /// <summary>
-        /// Disposes un-managed objects referenced by this object.
+        /// Flushes the changes made to the container to storage.
+        /// </summary>
+        /// <remarks>
+        /// This call guarantees to not partially write data and corrupt your saves.
+        /// </remarks>
+        public void Commit()
+        {
+            if (_cache != null)
+                PlatformCommit();
+        }        
+
+
+        ~StorageContainer()
+        {
+            PlatformDispose();
+        }
+
+        /// <summary>
+        /// Frees allocations made by the container without applying pending storage operations.
         /// </summary>
         public void Dispose()
         {
@@ -281,232 +488,8 @@ namespace Microsoft.Xna.Framework.Storage
         {
             if (!IsDisposed)
             {
-                if (disposing)
-                {
-                    // Save any unsaved changes before disposing
-                    if (_isContainerDirty != null && _isContainerDirty.Count > 0)
-                    {
-                        SaveData();
-
-                        // Wait for async save to complete
-                        while (_isProcessing)
-                        {
-                            Thread.Sleep(10);
-                        }
-                    }
-
-                    // Dispose managed resources here.
-                    if (Disposing != null)
-                    {
-                        Disposing.Invoke(this, EventArgs.Empty);
-                    }
-                }
-
-                // Dispose unmanaged resources here (if any).
+                PlatformDispose();
                 IsDisposed = true;
-            }
-        }
-
-        /// <summary>
-        /// Retrieves the data for a specified container.
-        /// </summary>
-        /// <returns>The byte array representing the container data, or null if the container doesn't exist or the name is invalid.</returns>
-        private byte[] GetContainerData()
-        {
-            if (string.IsNullOrEmpty(_containerName))
-                return null;
-
-            lock (_processingLock)
-            {
-                if (_containers != null && _containers.ContainsKey(_containerName))
-                    return _containers[_containerName];
-            }
-
-            return null;
-        }
-
-        /// <summary>
-        /// Sets the data for the current container, creating the container if it doesn't exist.
-        /// </summary>
-        /// <param name="data">The byte array containing the data to store in the container.</param>
-        public void SetContainerData(byte[] data)
-        {
-            if (string.IsNullOrEmpty(_containerName) || !(data != null && data.Length > 0))
-                return;
-
-            lock (_processingLock)
-            {
-                if (_containers == null)
-                    _containers = new Dictionary<string, byte[]>();
-
-                // Make a copy to prevent the input data from being freed elsewhere.
-                byte[] copiedData = null;
-                if (_containers.ContainsKey(_containerName) && _containers[_containerName] != null && _containers[_containerName].Length == data.Length)
-                    copiedData = _containers[_containerName]; // Reuse buffer if possible.
-                else
-                    copiedData = new byte[data.Length]; // Possible garbage generation by replacing the previous buffer.
-
-                Array.Copy(data, copiedData, data.Length);
-
-                if (_containers.ContainsKey(_containerName))
-                    _containers[_containerName] = copiedData;
-                else
-                    _containers.Add(_containerName, copiedData);
-
-                if (_isContainerDirty == null)
-                    _isContainerDirty = new List<string>();
-                if (!_isContainerDirty.Contains(_containerName))
-                    _isContainerDirty.Add(_containerName);
-            }
-        }
-
-        /// <summary>
-        /// Loads the container's data from persistent storage (disk).
-        /// </summary>
-        public void LoadData()
-        {
-            if (string.IsNullOrEmpty(_containerName))
-                return;
-
-            _isProcessing = true;
-
-            lock (_processingLock)
-            {
-                ReadContainer();
-
-                _isProcessing = false;
-            }
-        }
-
-        /// <summary>
-        /// Saves all container data asynchronously.
-        /// </summary>
-        public void SaveData()
-        {
-            if (string.IsNullOrEmpty(_containerName))
-                return;
-
-            _isProcessing = true;
-
-            lock (_processingLock)
-            {
-                WriteContainer();
-
-                _isProcessing = false;
-            }
-        }
-
-        /// <summary>
-        /// Writes the container data to the platform's storage.
-        /// </summary>
-        private void WriteContainer()
-        {
-            if (_containers == null)
-                return;
-
-            // Serialize directories and files
-            // Format: [dirCount][dirLen][dirName]...[fileCount][fileNameLen][fileName][fileDataLen][fileData]...
-            lock (_processingLock)
-            {
-                var dirList = (_directories != null) ? _directories.ToList() : new List<string>();
-                var fileList = _containers.Keys.ToList();
-
-                int byteCount = 1; // 1 byte for dir count
-                foreach (var dir in dirList)
-                {
-                    byteCount += 2; // dir name length
-                    byteCount += Encoding.Unicode.GetByteCount(dir);
-                }
-                byteCount += 1; // 1 byte for file count
-                foreach (var file in fileList)
-                {
-                    byteCount += 2; // file name length
-                    byteCount += Encoding.Unicode.GetByteCount(file);
-                    byteCount += 4; // file data length (int)
-                    if (_containers[file] != null)
-                        byteCount += _containers[file].Length;
-                }
-
-                byte[] data = new byte[byteCount];
-                int currentByte = 0;
-
-                // Directories
-                data[currentByte++] = (byte)dirList.Count;
-                foreach (var dir in dirList)
-                {
-                    int nameLen = Encoding.Unicode.GetByteCount(dir);
-                    data[currentByte++] = (byte)(nameLen & 0xFF);
-                    data[currentByte++] = (byte)((nameLen >> 8) & 0xFF);
-                    Array.Copy(Encoding.Unicode.GetBytes(dir), 0, data, currentByte, nameLen);
-                    currentByte += nameLen;
-                }
-
-                // Files
-                data[currentByte++] = (byte)fileList.Count;
-                foreach (var file in fileList)
-                {
-                    int nameLen = Encoding.Unicode.GetByteCount(file);
-                    data[currentByte++] = (byte)(nameLen & 0xFF);
-                    data[currentByte++] = (byte)((nameLen >> 8) & 0xFF);
-                    Array.Copy(Encoding.Unicode.GetBytes(file), 0, data, currentByte, nameLen);
-                    currentByte += nameLen;
-                    int fileLen = _containers[file]?.Length ?? 0;
-                    data[currentByte++] = (byte)(fileLen & 0xFF);
-                    data[currentByte++] = (byte)((fileLen >> 8) & 0xFF);
-                    data[currentByte++] = (byte)((fileLen >> 16) & 0xFF);
-                    data[currentByte++] = (byte)((fileLen >> 24) & 0xFF);
-                    if (fileLen > 0)
-                    {
-                        Array.Copy(_containers[file], 0, data, currentByte, fileLen);
-                        currentByte += fileLen;
-                    }
-                    if (_isContainerDirty.Contains(file))
-                        _isContainerDirty.Remove(file);
-                }
-
-                PlatformWriteContainer(data, true);
-            }
-        }
-
-        /// <summary>
-        /// Reads data from the platform's storage and populates the container dictionary.
-        /// </summary>
-        private void ReadContainer()
-        {
-            byte[] data = PlatformReadContainer(true);
-            if (data == null || data.Length == 0)
-                return;
-
-            lock (_processingLock)
-            {
-                int currentByte = 0;
-                // Directories
-                int dirCount = data[currentByte++];
-                _directories?.Clear();
-                for (int i = 0; i < dirCount; i++)
-                {
-                    int nameLen = data[currentByte++] | (data[currentByte++] << 8);
-                    string dir = Encoding.Unicode.GetString(data, currentByte, nameLen);
-                    currentByte += nameLen;
-                    _directories.Add(dir);
-                }
-                // Files
-                int fileCount = data[currentByte++];
-                _containers?.Clear();
-                for (int i = 0; i < fileCount; i++)
-                {
-                    int nameLen = data[currentByte++] | (data[currentByte++] << 8);
-                    string file = Encoding.Unicode.GetString(data, currentByte, nameLen);
-                    currentByte += nameLen;
-                    int fileLen = data[currentByte++] | (data[currentByte++] << 8) | (data[currentByte++] << 16) | (data[currentByte++] << 24);
-                    byte[] fileData = new byte[fileLen];
-                    if (fileLen > 0)
-                    {
-                        Array.Copy(data, currentByte, fileData, 0, fileLen);
-                        currentByte += fileLen;
-                    }
-                    _containers[file] = fileData;
-                }
             }
         }
     }

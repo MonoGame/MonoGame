@@ -1,87 +1,115 @@
-﻿using System;
+﻿// MonoGame - Copyright (C) MonoGame Foundation, Inc
+// This file is subject to the terms and conditions defined in
+// file 'LICENSE.txt', which is part of this source code package.
+
+using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Runtime.InteropServices;
+using MonoGame.Interop;
 
 namespace Microsoft.Xna.Framework.Storage
 {
     partial class StorageContainer
     {
-        private string _storagePath;
-        internal string StoragePath { get => _storagePath; }
+        internal unsafe MG_StorageContainer* _handle;
 
-        private string PlatformInitialize()
+        private unsafe void PlatformDispose()
         {
-            throw new NotImplementedException();
+            MG_Storage.CloseContainer(_handle);
+            _handle = null;
         }
 
-        private Stream PlatformOpenFile(string file, FileMode fileMode, FileAccess fileAccess, FileShare fileShare)
+        public unsafe MemoryStream PlatformLoadFile(string path)
         {
-            throw new NotImplementedException();
+            byte* data = MG_Storage.FileLoad(_handle, path, out int size);
+            var content = new MemoryStream(size);
+            content.SetLength(size);
+            Marshal.Copy((IntPtr)data, content.GetBuffer(), 0, size);
+            return content;
         }
 
-        private string[] PlatformGetFileNames(string searchPattern)
+        public unsafe void PlatformUpdateCache()
         {
-            throw new NotImplementedException();
+            _cache = new Dictionary<string, Blob>();
+
+            byte** filesAndDirectories = null;
+            int count = 0;
+
+            MG_Storage.EnumerateContent(_handle, out filesAndDirectories, out count);
+
+            for (int i=0; i < count; i++)
+            {
+                byte* utf8_string = filesAndDirectories[i];
+                var path = Marshal.PtrToStringUTF8((nint)utf8_string);
+
+                var blob = new Blob();
+                if (path.EndsWith('/'))
+                    blob.directory = true;
+
+                _cache[path] = blob;
+            }
         }
 
-        private string[] PlatformGetFileNames()
+        public unsafe void PlatformCommit()
         {
-            throw new NotImplementedException();
-        }
+            // TODO: How do we enforce an atomic commit
+            // on platforms without that functionality?
 
-        private string[] PlatformGetDirectoryNames(string searchPattern)
-        {
-            throw new NotImplementedException();
-        }
+            // First we process the directories.
+            foreach (var pair in _cache)
+            {
+                var blob = pair.Value;
+                if (!blob.directory)
+                    continue;
 
-        private string[] PlatformGetDirectoryNames()
-        {
-            throw new NotImplementedException();
-        }
+                if (!blob.dirty)
+                    continue;
 
-        private bool PlatformFileExists(string file)
-        {
-            throw new NotImplementedException();
-        }
+                var path = pair.Key;
 
-        private bool PlatformDirectoryExists(string directory)
-        {
-            throw new NotImplementedException();
-        }
+                if (blob.deleted)
+                    MG_Storage.DirectoryDelete(_handle, path);
+                else
+                    MG_Storage.DirectoryCreate(_handle, path);
+            }
 
-        private void PlatformDeleteFile(string file)
-        {
-            throw new NotImplementedException();
-        }
+            // Then we process the files.
+            foreach (var pair in _cache)
+            {
+                var blob = pair.Value;
+                if (blob.directory)
+                    continue;
 
-        private void PlatformDeleteDirectory(string directory)
-        {
-            throw new NotImplementedException();
-        }
+                if (!blob.dirty)
+                    continue;
 
-        private Stream PlatformCreateFile(string fileName)
-        {
-            throw new NotImplementedException();
-        }
+                var path = pair.Key;
 
-        private void PlatformCreateDirectory(string directoryName)
-        {
-            throw new NotImplementedException();
-        }
+                if (blob.deleted)
+                    MG_Storage.FileDelete(_handle, path);
+                else
+                {
+                    var data = blob.content.ToArray();
+                    fixed(byte* ptr = data)
+                        MG_Storage.FileSave(_handle, path, ptr, data.Length);
+                }
+            }
 
-        private byte[] PlatformReadContainer(bool value)
-        {
-            throw new NotImplementedException();
-        }
+            // Let the native layer the changes are done.
+            MG_Storage.CommitContainer(_handle);
 
-        private void PlatformWriteContainer(byte[] data, bool value)
-        {
-            throw new NotImplementedException();
-        }
-
-        public static string PlatformSanitizeFileName(string fileName)
-        {
-            throw new NotImplementedException();
+            // Cleanup the deleted/dirty entries.
+            var remove = new List<string>();
+            foreach (var pair in _cache)
+            {
+                if (pair.Value.deleted)
+                    remove.Add(pair.Key);
+                else
+                    pair.Value.dirty = false;
+            }
+            foreach (var key in remove)
+                _cache.Remove(key);
         }
     }
 }
