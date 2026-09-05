@@ -1747,26 +1747,9 @@ void MGVK_RecreateSwapChain(
 
 		device->window = sdl_window;
 	}
-
-	// On resize the swapchain is placed under the title bar
-	// and not in the client area for some reason.  This fixes it.
-	int wx, wy;
-	SDL_GetWindowPosition(device->window, &wx, &wy);
-	SDL_SetWindowPosition(device->window, wx+1, wy);
-	SDL_SetWindowPosition(device->window, wx, wy);
-
 #else
 #error Not Implemented
 #endif
-
-	if (width == device->swapchainWidth &&
-		height == device->swapchainHeight &&
-		vkColor == device->colorFormat &&
-		vkDepth == device->depthFormat &&
-		syncInterval == device->syncInterval &&
-		multiSampleCount == device->multiSampleCount &&
-		device->swapchain != VK_NULL_HANDLE)
-		return;
 
 	MGVK_CleanupSwapChain(device);
 
@@ -1777,6 +1760,14 @@ void MGVK_RecreateSwapChain(
 	// If max extent is zero'd, it means the window is minimized, and we should leave the swapchain to VK_NULL_HANDLE and stop rendering (this is done in MGP_Platform_BeforeDraw()).
 	if (surface_capabilities.maxImageExtent.width == 0 || surface_capabilities.maxImageExtent.height == 0)
 		return;
+
+#ifdef DEBUG
+	printf("RecreateSwapchain: req=%d,%d, cur=%d,%d, min=%d,%d, max=%d,%d\n",
+		width, height,
+		surface_capabilities.currentExtent.width, surface_capabilities.currentExtent.height,
+		surface_capabilities.minImageExtent.width, surface_capabilities.minImageExtent.height,
+		surface_capabilities.maxImageExtent.width, surface_capabilities.maxImageExtent.height);
+#endif
 
 	// Clamp the multisample count to the max supported.
 	{
@@ -1798,9 +1789,14 @@ void MGVK_RecreateSwapChain(
 		multiSampleCount = std::clamp(multiSampleCount, 1, maxMultisampleCount);
 	}
 
+	// We store the requested/intended size as canonical swapchain dimensions on the device.
+	device->swapchainWidth = width;
+	device->swapchainHeight = height;
+
+	// Clamp for actual swapchain creation.
 	// We apply the extent range to the entire swapchain size to avoid surface scaling and errors.
-	device->swapchainWidth = std::clamp(width, surface_capabilities.minImageExtent.width, surface_capabilities.maxImageExtent.width);
-	device->swapchainHeight = std::clamp(height, surface_capabilities.minImageExtent.height, surface_capabilities.maxImageExtent.height);
+	uint32_t clampedWidth = std::clamp(width, surface_capabilities.minImageExtent.width, surface_capabilities.maxImageExtent.width);
+	uint32_t clampedHeight = std::clamp(height, surface_capabilities.minImageExtent.height, surface_capabilities.maxImageExtent.height);
 	device->colorFormat = vkColor;
 	device->depthFormat = vkDepth;
 	device->multiSampleCount = multiSampleCount;
@@ -1857,8 +1853,8 @@ void MGVK_RecreateSwapChain(
 	// Requested swapchain extent will be clamped based on the surface's min/max extent.
 	// In most cases these will match the current extent, as specified at window/surface creation time.
 	VkExtent2D extent;
-	extent.width = device->swapchainWidth;
-	extent.height = device->swapchainHeight;
+	extent.width = clampedWidth;
+	extent.height = clampedHeight;
 
 	/*
 	VkSwapchainPresentScalingCreateInfoEXT scalingCreateInfo = {};
@@ -2017,7 +2013,7 @@ void MGVK_RecreateSwapChain(
 		VkImageCreateInfo image_create_info = { VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO };
 		image_create_info.imageType = VK_IMAGE_TYPE_2D;
 		image_create_info.format = surface_format;
-		image_create_info.extent = { device->swapchainWidth, device->swapchainHeight, 1 };
+		image_create_info.extent = { clampedWidth, clampedHeight, 1 };
 		image_create_info.mipLevels = 1;
 		image_create_info.arrayLayers = 1;
 		image_create_info.samples = VK_SAMPLE_COUNT_1_BIT;
@@ -2099,6 +2095,12 @@ void MGVK_RecreateSwapChain(MGG_GraphicsDevice* device)
 		return;
 	}
 
+#ifdef MG_SDL2
+	// Ensure any pending resize is flushed in the SDL event queue.
+	SDL_PumpEvents();
+#endif
+
+	// Preserve the developer's intended backbuffer dimensions.
 	MGVK_RecreateSwapChain(
 		device,
 		device->window,
@@ -2128,20 +2130,32 @@ void MGG_GraphicsDevice_ResizeSwapchain(
 	if (multiSampleCount == 0)
 		multiSampleCount = 1;
 
-	// Swapchain resize should not happen manually in Vulkan, we should leave this work to
-	// vkQueuePresentKHR() and vkAcquireNextImageKHR() which will react to surface changes.
-	// We should only let this through if the swapchain needs to be created or if syncInterval has changed.
-	if (device->swapchain != VK_NULL_HANDLE &&
-		device->syncInterval == syncInterval &&
-		device->multiSampleCount == multiSampleCount)
-		return;
-
 	auto vkColor = ToVkFormat(color);
 	auto vkDepth = ToVkFormat(depth);
-	
+
+	// Skip recreation if nothing of importance has actually changed.
+	if (device->swapchain != VK_NULL_HANDLE &&
+		device->swapchainWidth == static_cast<uint32_t>(width) &&
+		device->swapchainHeight == static_cast<uint32_t>(height) &&
+		device->colorFormat == vkColor &&
+		device->depthFormat == vkDepth &&
+		device->syncInterval == syncInterval &&
+		device->multiSampleCount == multiSampleCount)
+	{
+		return;
+	}
+
+	bool isSwapchainBound = device->targets.targets[0] != nullptr &&
+		device->targets.targets[0]->isSwapchain;
+
 	MGVK_RecreateSwapChain(device, nativeWindowHandle, width, height, vkColor, vkDepth, multiSampleCount, syncInterval);
 
 	MGVK_PrepareFrame(device);
+
+	if (isSwapchainBound)
+	{
+		MGG_GraphicsDevice_SetRenderTargets(device, nullptr, nullptr, 0);
+	}
 }
 
 
@@ -2610,19 +2624,21 @@ void MGG_GraphicsDevice_Present(MGG_GraphicsDevice* device, mgint currentFrame, 
 		MGVK_CleanupPendingTransfers(device);
 	}
 
-	if (res == VK_ERROR_OUT_OF_DATE_KHR || res == VK_SUBOPTIMAL_KHR)
+	if (res == VK_ERROR_OUT_OF_DATE_KHR)
 	{
 		// This will happen if the window is minimized too.
+		printf("Swapchain out of date. Recreating swapchain...\n");
 
-		if (res == VK_SUBOPTIMAL_KHR)
-			printf("Swapchain suboptimal. Recreating swapchain...\n");
-		else
-			printf("Swapchain out of date. Recreating swapchain...\n");
-			
 		MGVK_RecreateSwapChain(device);
-				
+
 		if (device->swapchain == VK_NULL_HANDLE)
 			printf("Couldn't recreate swapchain!\n");
+	}
+	else if (res == VK_SUBOPTIMAL_KHR)
+	{
+		// Intentionally ignored. The swapchain is still presentable.
+		// This fires when the swapchain size differs from the window size.
+		// macOS or Wayland compositors perform scaling, so this is not an error.
 	}
 	else
 	{
