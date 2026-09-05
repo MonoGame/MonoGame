@@ -9,11 +9,13 @@ using System.Diagnostics;
 using System.IO;
 using NUnit.Framework;
 using Microsoft.Xna.Framework.Media;
+using MonoGame.Tests;
 
 namespace MonoGame.Tests.Audio
 {
 
     [Category("Song")]
+    [RunOnUiTestFixture]
     public class SongTests : AudioTestFixtureBase
     {
         private void RunTests(Song song)
