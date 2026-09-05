@@ -16,10 +16,12 @@ body:
         required: true
 - type: checkboxes
   id: llmdeclaration
-  options:
-    - label: I used an LLM to generate the code or fix in this Issue.
-      required: false
-      description: This is so maintainers are aware of the usage of a LLM to generate the code, this is so we do not accidently copy the code into the actual project.
+  attributes:
+    label: LLM Declaration
+    options:
+      - label: I used an LLM to generate the code or fix in this Issue.
+        required: false
+        description: This is so maintainers are aware of the usage of a LLM to generate the code, this is so we do not accidently copy the code into the actual project.
 - type: input
   id: monogame-version
   validations:
