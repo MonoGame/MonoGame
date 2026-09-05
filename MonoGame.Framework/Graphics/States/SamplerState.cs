@@ -318,7 +318,7 @@ namespace Microsoft.Xna.Framework.Graphics
             _filterMode = cloneSource._filterMode;
         }
 
-        internal SamplerState Clone()
+        public SamplerState Clone()
         {
             return new SamplerState(this);
         }
