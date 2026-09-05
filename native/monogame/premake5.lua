@@ -8,6 +8,39 @@ if vulkan_sdk == nil and os.target() == "macosx" then
     error("Error: VULKAN_SDK environment variable is not set. Please set it to your Vulkan SDK installation path.")
 end
 
+function freetype()
+    defines {
+        "FT2_BUILD_LIBRARY",
+        "FT_CONFIG_OPTIONS_H=\"config/ftoption.h\"",
+        "FT_CONFIG_MODULES_H=\"config/ftmodule.h\""
+    }
+
+    files {
+        "freetype/**.h",
+
+        "../../external/freetype/src/base/ftsystem.c",
+        "../../external/freetype/src/base/ftinit.c",
+        "../../external/freetype/src/base/ftdebug.c",
+        "../../external/freetype/src/base/ftbase.c",
+        "../../external/freetype/src/base/ftbitmap.c",
+        "../../external/freetype/src/base/ftmm.c",
+
+        "../../external/freetype/src/truetype/truetype.c",
+        "../../external/freetype/src/cff/cff.c",
+        "../../external/freetype/src/sfnt/sfnt.c",
+        "../../external/freetype/src/smooth/smooth.c",
+        "../../external/freetype/src/gzip/ftgzip.c",
+        "../../external/freetype/src/psaux/psaux.c",
+        "../../external/freetype/src/pshinter/pshinter.c",
+        "../../external/freetype/src/psnames/psnames.c"
+    }
+
+    includedirs {
+        "freetype",
+        "../../external/freetype/include"
+    }
+end
+
 newoption {
     trigger = "arch",
     value = "ARCH",
@@ -48,6 +81,8 @@ function common(project_name)
 
     files {"include/**.h", "common/**.h", "common/**.cpp"}
     includedirs {"include", "../../external/stb"}
+
+    freetype()
 end
 
 -- SDL is supported on all desktop platforms.
@@ -108,18 +143,18 @@ function faudio()
     files {"faudio/**.h", "faudio/**.cpp"}
 
     includedirs {"external/faudio/include"}
-    
+
     filter {"system:windows"}
     libdirs {"external/faudio/build/%{cfg.platform}/Release"}
     links {"FAudio.lib"}
-    
+
     filter {"system:macosx"}
     libdirs {"external/faudio/build"}
     linkoptions {
         "-Wl,-force_load,external/faudio/build/libFAudio.a",
         "-Wl,-ld_classic"
     }
-    
+
     filter {"system:linux"}
     linkoptions {"external/faudio/build/libFAudio.a"}
     filter {}

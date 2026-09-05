@@ -2,6 +2,17 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
+// TODO: In order to create a shared API for SpriteFont and the new DynamicSpriteFont
+//       a new `Microsoft.Xna.Graphics.FontGlyph` type was created.  This type is to
+//       be a struct shared by both that will replace the `SpriteFont.Glyph` that is
+//       nested here.  However, since `SpriteFont.Glyph` is a public type, we can't just
+//       simply remove it or swap it out for the new `FontGlyph` type.  Instead i have
+//       kept it here for now so we don't break the public API.  Before releasing the
+//       next major SemVer update (4.x), we should replace all instances of `SpriteFont.Glyph`
+//       with the new `FontGlyph`
+//
+//  - Chris (AristurtleDev)
+
 // Original code from SilverSprite Project
 using System;
 using System.Collections.Generic;
@@ -24,7 +35,9 @@ namespace Microsoft.Xna.Framework.Graphics
 				"Character cannot be resolved by this SpriteFont.";
 		}
 
+        private readonly FontGlyph[] _fontGlyphs;
         private readonly Glyph[] _glyphs;
+        private readonly PreparedTextFont _preparedTextFont;
         private readonly CharacterRegion[] _regions;
         private char? _defaultCharacter;
         private int _defaultGlyphIndex = -1;
@@ -71,23 +84,28 @@ namespace Microsoft.Xna.Framework.Graphics
 			LineSpacing = lineSpacing;
 			Spacing = spacing;
 
+            _fontGlyphs = new FontGlyph[characters.Count];
             _glyphs = new Glyph[characters.Count];
             var regions = new Stack<CharacterRegion>();
 
 			for (var i = 0; i < characters.Count; i++) 
             {
-				_glyphs[i] = new Glyph 
+                FontGlyph glyph = new FontGlyph
                 {
-					BoundsInTexture = glyphBounds[i],
-					Cropping = cropping[i],
+                    BoundsInTexture = glyphBounds[i],
+                    Cropping = cropping[i],
                     Character = characters[i],
+                    Size = 0,
 
                     LeftSideBearing = kerning[i].X,
                     Width = kerning[i].Y,
                     RightSideBearing = kerning[i].Z,
 
                     WidthIncludingBearings = kerning[i].X + kerning[i].Y + kerning[i].Z
-				};
+                };
+
+                _fontGlyphs[i] = glyph;
+                _glyphs[i] = CreatePublicGlyph(glyph);
                 
                 if(regions.Count == 0 || characters[i] > (regions.Peek().End+1))
                 {
@@ -109,6 +127,13 @@ namespace Microsoft.Xna.Framework.Graphics
 
             _regions = regions.ToArray();
             Array.Reverse(_regions);
+
+            _preparedTextFont = new PreparedTextFont(_texture,
+                                                     _fontGlyphs,
+                                                     lineSpacing,
+                                                     spacing,
+                                                     -1,
+                                                     Errors.TextContainsUnresolvableCharacters);
 
 			DefaultCharacter = defaultCharacter;
 		}
@@ -153,8 +178,11 @@ namespace Microsoft.Xna.Framework.Graphics
                         throw new ArgumentException(Errors.UnresolvableCharacter);
                 }
                 else
+                {
                     _defaultGlyphIndex = -1;
+                }
 
+                _preparedTextFont.UpdateDefaultGlyphIndex(_defaultGlyphIndex);
                 _defaultCharacter = value;
             }
         }
@@ -179,7 +207,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		/// this font.</returns>
 		public Vector2 MeasureString(string text)
 		{
-			var source = new CharacterSource(text);
+			var source = new FontCharacterSource(text);
 			Vector2 size;
 			MeasureString(ref source, out size);
 			return size;
@@ -194,74 +222,17 @@ namespace Microsoft.Xna.Framework.Graphics
 		/// this font.</returns>
 		public Vector2 MeasureString(StringBuilder text)
 		{
-			var source = new CharacterSource(text);
+			var source = new FontCharacterSource(text);
 			Vector2 size;
 			MeasureString(ref source, out size);
 			return size;
 		}
 
-		internal unsafe void MeasureString(ref CharacterSource text, out Vector2 size)
+		internal void MeasureString(ref FontCharacterSource text, out Vector2 size)
 		{
-			if (text.Length == 0)
-            {
-				size = Vector2.Zero;
-				return;
-			}
-
-			var width = 0.0f;
-			var finalLineHeight = (float)LineSpacing;
-            
-			var offset = Vector2.Zero;
-            var firstGlyphOfLine = true;
-
-            fixed (Glyph* pGlyphs = Glyphs)
-            for (var i = 0; i < text.Length; ++i)
-            {
-                var c = text[i];
-
-                if (c == '\r')
-                    continue;
-
-                if (c == '\n')
-                {
-                    finalLineHeight = LineSpacing;
-
-                    offset.X = 0;
-                    offset.Y += LineSpacing;
-                    firstGlyphOfLine = true;
-                    continue;
-                }
-
-                var currentGlyphIndex = GetGlyphIndexOrDefault(c);
-                Debug.Assert(currentGlyphIndex >= 0 && currentGlyphIndex < Glyphs.Length, "currentGlyphIndex was outside the bounds of the array.");
-                var pCurrentGlyph = pGlyphs + currentGlyphIndex;
-
-                // The first character on a line might have a negative left side bearing.
-                // In this scenario, SpriteBatch/SpriteFont normally offset the text to the right,
-                //  so that text does not hang off the left side of its rectangle.
-                if (firstGlyphOfLine) {
-                    offset.X = Math.Max(pCurrentGlyph->LeftSideBearing, 0);
-                    firstGlyphOfLine = false;
-                } else {
-                    offset.X += Spacing + pCurrentGlyph->LeftSideBearing;
-                }
-
-                offset.X += pCurrentGlyph->Width;
-
-                var proposedWidth = offset.X + Math.Max(pCurrentGlyph->RightSideBearing, 0);
-                if (proposedWidth > width)
-                    width = proposedWidth;
-
-                offset.X += pCurrentGlyph->RightSideBearing;
-
-                if (pCurrentGlyph->Cropping.Height > finalLineHeight)
-                    finalLineHeight = pCurrentGlyph->Cropping.Height;
-            }
-
-            size.X = width;
-            size.Y = offset.Y + finalLineHeight;
+			size = _preparedTextFont.MeasureString(ref text);
 		}
-        
+
         internal unsafe bool TryGetGlyphIndex(char c, out int index)
         {
             fixed (CharacterRegion* pRegions = _regions)
@@ -319,48 +290,13 @@ namespace Microsoft.Xna.Framework.Graphics
 
         internal int GetGlyphIndexOrDefault(char c)
         {
-            int glyphIdx;
-            if (!TryGetGlyphIndex(c, out glyphIdx))
-            {
-                if (_defaultGlyphIndex == -1)
-                    throw new ArgumentException(Errors.TextContainsUnresolvableCharacters, "text");
-
-                return _defaultGlyphIndex;
-            }
-            else
-                return glyphIdx;
+            return _preparedTextFont.GetGlyphIndexOrDefault(c);
         }
-        
-        internal struct CharacterSource 
+
+        internal PreparedTextFont GetPreparedTextFont()
         {
-			private readonly string _string;
-			private readonly StringBuilder _builder;
-
-			public CharacterSource(string s)
-			{
-				_string = s;
-				_builder = null;
-				Length = s.Length;
-			}
-
-			public CharacterSource(StringBuilder builder)
-			{
-				_builder = builder;
-				_string = null;
-				Length = _builder.Length;
-			}
-
-			public readonly int Length;
-			public char this [int index] 
-            {
-				get 
-                {
-					if (_string != null)
-						return _string[index];
-					return _builder[index];
-				}
-			}
-		}
+            return _preparedTextFont;
+        }
 
         /// <summary>
         /// Struct that defines the spacing, Kerning, and bounds of a character.
@@ -410,6 +346,19 @@ namespace Microsoft.Xna.Framework.Graphics
                 return "CharacterIndex=" + Character + ", Glyph=" + BoundsInTexture + ", Cropping=" + Cropping + ", Kerning=" + LeftSideBearing + "," + Width + "," + RightSideBearing;
 			}
 		}
+
+        private static Glyph CreatePublicGlyph(FontGlyph glyph)
+        {
+            Glyph publicGlyph = new Glyph();
+            publicGlyph.Character = glyph.Character;
+            publicGlyph.BoundsInTexture = glyph.BoundsInTexture;
+            publicGlyph.Cropping = glyph.Cropping;
+            publicGlyph.LeftSideBearing = glyph.LeftSideBearing;
+            publicGlyph.RightSideBearing = glyph.RightSideBearing;
+            publicGlyph.Width = glyph.Width;
+            publicGlyph.WidthIncludingBearings = glyph.WidthIncludingBearings;
+            return publicGlyph;
+        }
 
         private struct CharacterRegion
         {
