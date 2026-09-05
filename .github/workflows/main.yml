@@ -117,7 +117,7 @@ jobs:
         uses: humbletim/setup-vulkan-sdk@v1.2.1
         if: runner.os != 'macos'
         with:
-          vulkan-query-version: 1.4.309.0
+          vulkan-query-version: 1.4.341.0
           vulkan-use-cache: true
           vulkan-components: 'Vulkan-Headers, Vulkan-Loader'
 
@@ -125,7 +125,7 @@ jobs:
         if: runner.os == 'macos'
         uses: humbletim/install-vulkan-sdk@v1.2
         with:
-          version: 1.4.309.0
+          version: 1.4.341.0
           cache: true
 
       - name: Disable Annotations
