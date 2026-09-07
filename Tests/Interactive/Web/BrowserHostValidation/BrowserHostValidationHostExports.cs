@@ -8,10 +8,10 @@ using System.Runtime.Versioning;
 namespace BrowserHostValidation;
 
 [SupportedOSPlatform("browser")]
-internal static partial class BrowserHostValidationBootstrap
+internal static partial class BrowserHostValidationHostExports
 {
     [JSExport]
-    public static bool Tick()
+    internal static bool Tick()
     {
         if (!Program.IsRunLoopStarted)
             return !Program.IsMainCompleted;

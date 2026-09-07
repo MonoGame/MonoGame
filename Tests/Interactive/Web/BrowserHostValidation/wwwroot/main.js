@@ -4,8 +4,7 @@
 
 globalThis.MonoGameWebHostConfiguration = {
     runtimeScriptUri: "./_framework/dotnet.js",
-    bootstrapAssemblyName: "BrowserHostValidation.dll",
-    bootstrapTypeName: "BrowserHostValidation.BrowserHostValidationBootstrap",
+    hostExportsTypeName: "BrowserHostValidation.BrowserHostValidationHostExports",
     mainAssemblyName: "BrowserHostValidation.dll"
 };
 

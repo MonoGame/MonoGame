@@ -8,7 +8,7 @@ const HostStage = Object.freeze({
     WebGL2Creation: "WebGL2Creation",
     WasmLoad: "WasmLoad",
     ContentStaging: "ContentStaging",
-    ManagedBootstrap: "ManagedBootstrap",
+    ManagedExports: "ManagedExports",
     RuntimeBoundary: "RuntimeBoundary"
 });
 
@@ -31,7 +31,7 @@ class MonoGameWebHost {
         this.statusElement = document.getElementById(this.config.statusId);
         this.canvas = null;
         this.runtime = null;
-        this.bootstrapExports = null;
+        this.hostExports = null;
         this.managedFrameHandle = null;
         this.assetPackStagingPromises = new Map();
     }
@@ -62,10 +62,8 @@ class MonoGameWebHost {
             statusId: dataset.statusId || "monogame-host-status",
             runtimeScriptUri: this.getOptionalConfigValue(dataset.runtimeScriptUri)
                 ?? this.getOptionalConfigValue(runtimeConfiguration.runtimeScriptUri),
-            bootstrapAssemblyName: this.getOptionalConfigValue(dataset.bootstrapAssemblyName)
-                ?? this.getOptionalConfigValue(runtimeConfiguration.bootstrapAssemblyName),
-            bootstrapTypeName: this.getOptionalConfigValue(dataset.bootstrapTypeName)
-                ?? this.getOptionalConfigValue(runtimeConfiguration.bootstrapTypeName),
+            hostExportsTypeName: this.getOptionalConfigValue(dataset.hostExportsTypeName)
+                ?? this.getOptionalConfigValue(runtimeConfiguration.hostExportsTypeName),
             mainAssemblyName: this.getOptionalConfigValue(dataset.mainAssemblyName)
                 ?? this.getOptionalConfigValue(runtimeConfiguration.mainAssemblyName)
         };
@@ -88,7 +86,7 @@ class MonoGameWebHost {
 
             await this.loadManagedRuntimeAsync();
             await this.stageStartupContentAsync();
-            await this.initializeManagedHostAsync();
+            await this.initializeManagedExportsAsync();
             await this.launchManagedApplicationAsync();
         }
         catch (error) {
@@ -152,12 +150,8 @@ class MonoGameWebHost {
             missingConfigurationNames.push("runtimeScriptUri");
         }
 
-        if (this.config.bootstrapAssemblyName == null) {
-            missingConfigurationNames.push("bootstrapAssemblyName");
-        }
-
-        if (this.config.bootstrapTypeName == null) {
-            missingConfigurationNames.push("bootstrapTypeName");
+        if (this.config.hostExportsTypeName == null) {
+            missingConfigurationNames.push("hostExportsTypeName");
         }
 
         if (this.config.mainAssemblyName == null) {
@@ -219,28 +213,28 @@ class MonoGameWebHost {
         }
     }
 
-    async initializeManagedHostAsync() {
-        this.logStage(HostStage.ManagedBootstrap, "Initializing managed browser host.");
+    async initializeManagedExportsAsync() {
+        this.logStage(HostStage.ManagedExports, "Initializing managed host exports.");
 
         const exportsRoot = await this.runtime.getAssemblyExports(
-            this.normalizeAssemblyName(this.config.bootstrapAssemblyName));
-        const bootstrapExports = this.resolveExportPath(exportsRoot, this.config.bootstrapTypeName);
-        if (bootstrapExports == null) {
+            this.normalizeAssemblyName(this.config.mainAssemblyName));
+        const hostExports = this.resolveExportPath(exportsRoot, this.config.hostExportsTypeName);
+        if (hostExports == null) {
             throw new BrowserHostStartupError(
-                HostStage.ManagedBootstrap,
-                "managed_bootstrap_missing",
-                `The configured bootstrap type '${this.config.bootstrapTypeName}' was not found.`);
+                HostStage.ManagedExports,
+                "managed_host_exports_missing",
+                `The configured host exports type '${this.config.hostExportsTypeName}' was not found.`);
         }
 
-        if (typeof bootstrapExports.Tick !== "function") {
+        if (typeof hostExports.Tick !== "function") {
             throw new BrowserHostStartupError(
-                HostStage.ManagedBootstrap,
+                HostStage.ManagedExports,
                 "managed_tick_missing",
-                "The configured bootstrap type does not expose Tick().");
+                "The configured host exports type does not expose Tick().");
         }
 
-        this.bootstrapExports = bootstrapExports;
-        this.logStage(HostStage.ManagedBootstrap, "Managed browser host initialized.");
+        this.hostExports = hostExports;
+        this.logStage(HostStage.ManagedExports, "Managed host exports initialized.");
     }
 
     async stageStartupContentAsync() {
@@ -414,7 +408,7 @@ class MonoGameWebHost {
             this.managedFrameHandle = null;
 
             try {
-                const shouldContinue = await this.bootstrapExports.Tick();
+                const shouldContinue = await this.hostExports.Tick();
                 if (shouldContinue) {
                     this.scheduleManagedFrame();
                 }
@@ -425,7 +419,7 @@ class MonoGameWebHost {
             catch (error) {
                 this.handleStartupFailure(
                     new BrowserHostStartupError(
-                        HostStage.ManagedBootstrap,
+                        HostStage.ManagedExports,
                         "managed_tick_failed",
                         error instanceof Error ? error.message : String(error)));
             }
