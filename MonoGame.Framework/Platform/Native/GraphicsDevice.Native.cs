@@ -139,6 +139,8 @@ public partial class GraphicsDevice
         _vertexBuffersDirty = true;
         Textures.Dirty();
         SamplerStates.Dirty();
+        VertexTextures.Dirty();
+        VertexSamplerStates.Dirty();
 
         MGG.GraphicsDevice_SetViewport(
             Handle,

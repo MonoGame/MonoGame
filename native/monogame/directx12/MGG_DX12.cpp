@@ -705,6 +705,7 @@ static void MGDX_PrepareNextFrame(MGG_GraphicsDevice* device)
 	device->pipelineManager->Prepare();
 	device->indexBufferDirty = true;
 	device->vertexBuffersDirty = 0xFFFFFFFF;
+	memset(device->uniforms, 0, sizeof(device->uniforms));
 	memset(device->textures, 0, sizeof(device->textures));
 	device->texturesDirty = true;
 	device->samplerSetHandles.clear();
@@ -958,6 +959,7 @@ void MGG_GraphicsDevice_GetBackBufferData(MGG_GraphicsDevice* device, mgint x, m
 		device->vertexBuffersDirty = 0xFFFFFFFF;
 		device->texturesDirty = true;
 		device->samplersDirty = true;
+		device->uniformsDirty = 0xFFFFFFFF;
 		device->viewportDirty = true;
 		device->scissorDirty = true;
 	}
@@ -2190,6 +2192,7 @@ void MGG_Texture_GetData(MGG_GraphicsDevice* device, MGG_Texture* texture, mgint
 		device->vertexBuffersDirty = 0xFFFFFFFF;
 		device->texturesDirty = true;
 		device->samplersDirty = true;
+		device->uniformsDirty = 0xFFFFFFFF;
 		device->viewportDirty = true;
 		device->scissorDirty = true;
 	}
