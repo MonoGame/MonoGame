@@ -5,6 +5,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Diagnostics.Contracts;
 using System.Runtime.Serialization;
 
 namespace Microsoft.Xna.Framework
@@ -242,6 +243,7 @@ namespace Microsoft.Xna.Framework
         /// </summary>
         /// <param name="box">The box to create the sphere from.</param>
         /// <returns>The new <see cref="BoundingSphere"/>.</returns>
+        [Pure]
         public static BoundingSphere CreateFromBoundingBox(BoundingBox box)
         {
             BoundingSphere result;
@@ -274,6 +276,7 @@ namespace Microsoft.Xna.Framework
         /// </summary>
         /// <param name="frustum">The frustum to create the sphere from.</param>
         /// <returns>The new <see cref="BoundingSphere"/>.</returns>
+        [Pure]
         public static BoundingSphere CreateFromFrustum(BoundingFrustum frustum)
         {
             return CreateFromPoints(frustum.GetCorners());
@@ -284,6 +287,7 @@ namespace Microsoft.Xna.Framework
         /// </summary>
         /// <param name="points">List of point to create the sphere from.</param>
         /// <returns>The new <see cref="BoundingSphere"/>.</returns>
+        [Pure]
         public static BoundingSphere CreateFromPoints(IEnumerable<Vector3> points)
         {
             if (points == null )
@@ -371,6 +375,7 @@ namespace Microsoft.Xna.Framework
         /// <param name="original">First sphere.</param>
         /// <param name="additional">Second sphere.</param>
         /// <returns>The new <see cref="BoundingSphere"/>.</returns>
+        [Pure]
         public static BoundingSphere CreateMerged(BoundingSphere original, BoundingSphere additional)
         {
             BoundingSphere result;
@@ -618,6 +623,7 @@ namespace Microsoft.Xna.Framework
         /// <param name="a"><see cref="BoundingSphere"/> instance on the left of the equal sign.</param>
         /// <param name="b"><see cref="BoundingSphere"/> instance on the right of the equal sign.</param>
         /// <returns><c>true</c> if the instances are equal; <c>false</c> otherwise.</returns>
+        [Pure]
         public static bool operator == (BoundingSphere a, BoundingSphere b)
         {
             return a.Equals(b);
@@ -629,6 +635,7 @@ namespace Microsoft.Xna.Framework
         /// <param name="a"><see cref="BoundingSphere"/> instance on the left of the not equal sign.</param>
         /// <param name="b"><see cref="BoundingSphere"/> instance on the right of the not equal sign.</param>
         /// <returns><c>true</c> if the instances are not equal; <c>false</c> otherwise.</returns>
+        [Pure]
         public static bool operator != (BoundingSphere a, BoundingSphere b)
         {
             return !a.Equals(b);

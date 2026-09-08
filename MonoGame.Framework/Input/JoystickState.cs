@@ -2,6 +2,7 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
+using System.Diagnostics.Contracts;
 using System.Linq;
 using System.Text;
 
@@ -43,6 +44,7 @@ namespace Microsoft.Xna.Framework.Input
         /// <param name="left">The first <see cref="Microsoft.Xna.Framework.Input.JoystickState"/> to compare.</param>
         /// <param name="right">The second <see cref="Microsoft.Xna.Framework.Input.JoystickState"/> to compare.</param>
         /// <returns><c>true</c> if <c>left</c> and <c>right</c> are equal; otherwise, <c>false</c>.</returns>
+        [Pure]
         public static bool operator ==(JoystickState left, JoystickState right)
         {
             return left.IsConnected == right.IsConnected &&
@@ -58,6 +60,7 @@ namespace Microsoft.Xna.Framework.Input
         /// <param name="left">The first <see cref="Microsoft.Xna.Framework.Input.JoystickState"/> to compare.</param>
         /// <param name="right">The second <see cref="Microsoft.Xna.Framework.Input.JoystickState"/> to compare.</param>
         /// <returns><c>true</c> if <c>left</c> and <c>right</c> are not equal; otherwise, <c>false</c>.</returns>
+        [Pure]
         public static bool operator !=(JoystickState left, JoystickState right)
         {
             return !(left == right);

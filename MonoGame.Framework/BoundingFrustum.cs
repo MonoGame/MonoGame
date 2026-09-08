@@ -4,6 +4,7 @@
 
 using System;
 using System.Diagnostics;
+using System.Diagnostics.Contracts;
 
 namespace Microsoft.Xna.Framework
 {
@@ -143,6 +144,7 @@ namespace Microsoft.Xna.Framework
         /// <param name="a"><see cref="BoundingFrustum"/> instance on the left of the equal sign.</param>
         /// <param name="b"><see cref="BoundingFrustum"/> instance on the right of the equal sign.</param>
         /// <returns><c>true</c> if the instances are equal; <c>false</c> otherwise.</returns>
+        [Pure]
         public static bool operator ==(BoundingFrustum a, BoundingFrustum b)
         {
             if (Equals(a, null))
@@ -160,6 +162,7 @@ namespace Microsoft.Xna.Framework
         /// <param name="a"><see cref="BoundingFrustum"/> instance on the left of the not equal sign.</param>
         /// <param name="b"><see cref="BoundingFrustum"/> instance on the right of the not equal sign.</param>
         /// <returns><c>true</c> if the instances are not equal; <c>false</c> otherwise.</returns>
+        [Pure]
         public static bool operator !=(BoundingFrustum a, BoundingFrustum b)
         {
             return !(a == b);

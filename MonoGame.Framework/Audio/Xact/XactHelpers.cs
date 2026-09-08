@@ -3,6 +3,7 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System;
+using System.Diagnostics.Contracts;
 
 namespace Microsoft.Xna.Framework.Audio
 {
@@ -10,6 +11,7 @@ namespace Microsoft.Xna.Framework.Audio
 	{
         static internal readonly Random Random = new Random();
 
+        [Pure]
         public static float ParseDecibels(byte decibles)
         {
             //lazy 4-param fitting:
@@ -30,6 +32,7 @@ namespace Microsoft.Xna.Framework.Audio
             return dB;
         }
 
+        [Pure]
         public static float ParseVolumeFromDecibels(byte decibles)
         {
             //lazy 4-param fitting:
@@ -50,6 +53,7 @@ namespace Microsoft.Xna.Framework.Audio
             return ParseVolumeFromDecibels(dB);
         }
 
+        [Pure]
         public static float ParseVolumeFromDecibels(float decibles)
         {
             // Convert from decibles to linear volume.

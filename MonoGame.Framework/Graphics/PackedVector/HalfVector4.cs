@@ -4,6 +4,7 @@
 
 using System;
 using System.Diagnostics.CodeAnalysis;
+using System.Diagnostics.Contracts;
 
 namespace Microsoft.Xna.Framework.Graphics.PackedVector
 {
@@ -109,6 +110,7 @@ namespace Microsoft.Xna.Framework.Graphics.PackedVector
         /// <param name="a">The value on the left of the equality operator.</param>
         /// <param name="b">The value on the right of the equality operator.</param>
         /// <returns>true if the two values are equal; otherwise, false.</returns>
+        [Pure]
         public static bool operator ==(HalfVector4 a, HalfVector4 b)
         {
             return a.Equals(b);
@@ -120,6 +122,7 @@ namespace Microsoft.Xna.Framework.Graphics.PackedVector
         /// <param name="a">The value on the left of the inequality operator.</param>
         /// <param name="b">The value on the right of the inequality operator.</param>
         /// <returns>true if the two value are not equal; otherwise, false.</returns>
+        [Pure]
         public static bool operator !=(HalfVector4 a, HalfVector4 b)
         {
             return !a.Equals(b);

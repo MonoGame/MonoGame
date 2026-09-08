@@ -3,9 +3,10 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System;
-using System.Text;
-using System.Runtime.Serialization;
 using System.Diagnostics;
+using System.Diagnostics.Contracts;
+using System.Runtime.Serialization;
+using System.Text;
 
 namespace Microsoft.Xna.Framework
 {
@@ -392,6 +393,7 @@ namespace Microsoft.Xna.Framework
         /// </summary>
         /// <param name="value">The converted value.</param>
         /// <returns></returns>
+        [Pure]
         public static implicit operator Color(System.Numerics.Vector4 value)
         {
             return new Color(value.X, value.Y, value.Z, value.W);
@@ -403,6 +405,7 @@ namespace Microsoft.Xna.Framework
         /// <param name="a"><see cref="Color"/> instance on the left of the equal sign.</param>
         /// <param name="b"><see cref="Color"/> instance on the right of the equal sign.</param>
         /// <returns><c>true</c> if the instances are equal; <c>false</c> otherwise.</returns>
+        [Pure]
         public static bool operator ==(Color a, Color b)
         {
             return (a._packedValue == b._packedValue);
@@ -414,6 +417,7 @@ namespace Microsoft.Xna.Framework
         /// <param name="a"><see cref="Color"/> instance on the left of the not equal sign.</param>
         /// <param name="b"><see cref="Color"/> instance on the right of the not equal sign.</param>
         /// <returns><c>true</c> if the instances are not equal; <c>false</c> otherwise.</returns>	
+        [Pure]
         public static bool operator !=(Color a, Color b)
         {
             return (a._packedValue != b._packedValue);
@@ -1724,6 +1728,7 @@ namespace Microsoft.Xna.Framework
         /// <param name="value2">Destination <see cref="Color"/>.</param>
         /// <param name="amount">Interpolation factor.</param>
         /// <returns>Interpolated <see cref="Color"/>.</returns>
+        [Pure]
         public static Color Lerp(Color value1, Color value2, Single amount)
         {
             amount = MathHelper.Clamp(amount, 0, 1);
@@ -1755,6 +1760,7 @@ namespace Microsoft.Xna.Framework
         /// <param name="value">The source color value to multiply.</param>
         /// <param name="scale">The value to multiply the RGBA component values by.</param>
         /// <returns>The new color value created as a result of the multiplication.</returns>
+        [Pure]
         public static Color Multiply(Color value, float scale)
         {
             return new Color((int)(value.R * scale), (int)(value.G * scale), (int)(value.B * scale), (int)(value.A * scale));
@@ -1766,6 +1772,7 @@ namespace Microsoft.Xna.Framework
         /// <param name="value">The source color value to multiply.</param>
         /// <param name="scale">The value to multiply the Alpha component value by.</param>
         /// <returns>The new color value created as a result of the multiplication.</returns>
+        [Pure]
         public static Color MultiplyAlpha(Color value, float scale)
         {
             return new Color(value.R, value.G, value.B, (int)(value.A * scale));
@@ -1777,6 +1784,7 @@ namespace Microsoft.Xna.Framework
         /// <param name="value">The source color value to multiply.</param>
         /// <param name="scale">The value to multiply the RGBA component values by.</param>
         /// <returns>The new color value created as a result of the multiplication.</returns>
+        [Pure]
         public static Color operator *(Color value, float scale)
         {
             return new Color((int)(value.R * scale), (int)(value.G * scale), (int)(value.B * scale), (int)(value.A * scale));
@@ -1788,6 +1796,7 @@ namespace Microsoft.Xna.Framework
         /// <param name="scale">The value to multiply the RGBA component values by.</param>
         /// <param name="value">The source color value to multiply.</param>
         /// <returns>The new color value created as a result of the multiplication.</returns>
+        [Pure]
         public static Color operator *(float scale, Color value)
         {
             return new Color((int)(value.R * scale), (int)(value.G * scale), (int)(value.B * scale), (int)(value.A * scale));
@@ -1799,6 +1808,7 @@ namespace Microsoft.Xna.Framework
         /// <param name="color1">The first color to be multiplied.</param>
         /// <param name="color2">The second color to be multiplied.</param>
         /// <returns>The new color value created as a result of the multiplication.</returns>
+        [Pure]
         public static Color operator *(Color color1, Color color2)
         {
             return new Color(
@@ -1813,6 +1823,7 @@ namespace Microsoft.Xna.Framework
         /// Gets a <see cref="Vector3"/> representation for this object.
         /// </summary>
         /// <returns>A <see cref="Vector3"/> representation for this object.</returns>
+        [Pure]
         public Vector3 ToVector3()
         {
             return new Vector3(R / 255.0f, G / 255.0f, B / 255.0f);
@@ -1822,6 +1833,7 @@ namespace Microsoft.Xna.Framework
         /// Gets a <see cref="Vector4"/> representation for this object.
         /// </summary>
         /// <returns>A <see cref="Vector4"/> representation for this object.</returns>
+        [Pure]
         public Vector4 ToVector4()
         {
             return new Vector4(R / 255.0f, G / 255.0f, B / 255.0f, A / 255.0f);
@@ -1876,6 +1888,7 @@ namespace Microsoft.Xna.Framework
         /// </summary>
         /// <param name="color">A <see cref="Color"/> representing a non-premultiplied color.</param>
         /// <returns>A <see cref="Color"/> which contains premultiplied alpha data.</returns>
+        [Pure]
         public static Color FromNonPremultiplied(Color color)
         {
             return FromNonPremultiplied(color.R, color.G, color.B, color.A);
@@ -1886,6 +1899,7 @@ namespace Microsoft.Xna.Framework
         /// </summary>
         /// <param name="vector">A <see cref="Vector4"/> representing color.</param>
         /// <returns>A <see cref="Color"/> which contains premultiplied alpha data.</returns>
+        [Pure]
         public static Color FromNonPremultiplied(Vector4 vector)
         {
             return new Color(vector.X * vector.W, vector.Y * vector.W, vector.Z * vector.W, vector.W);
@@ -1899,6 +1913,7 @@ namespace Microsoft.Xna.Framework
         /// <param name="b">Blue component value from 0.0f to 1.0f.</param>
         /// <param name="a">Alpha component value from 0.0f to 1.0f.</param>
         /// <returns>A <see cref="Color"/> which contains premultiplied alpha data.</returns>
+        [Pure]
         public static Color FromNonPremultiplied(float r, float g, float b, float a)
         {
             return new Color(r * a, g * a, b * a, a);
@@ -1912,6 +1927,7 @@ namespace Microsoft.Xna.Framework
         /// <param name="b">Blue component value from 0 to 255.</param>
         /// <param name="a">Alpha component value from 0 to 255.</param>
         /// <returns>A <see cref="Color"/> which contains premultiplied alpha data.</returns>
+        [Pure]
         public static Color FromNonPremultiplied(int r, int g, int b, int a)
         {
             return new Color(r * a / 255, g * a / 255, b * a / 255, a);
@@ -2071,7 +2087,7 @@ namespace Microsoft.Xna.Framework
             else
                 return c;
         }
-        
+
         /// <summary>
         /// Creates a <see cref="Color"/> from HSL values
         /// </summary>
@@ -2079,6 +2095,7 @@ namespace Microsoft.Xna.Framework
         /// <param name="s">Saturation component value, from 0.0f to 100.0f</param>
         /// <param name="l">Luminosity (brightness) component value, from 0.0f to 100.0f</param>
         /// <returns><see cref="Color"/> with the HSL values</returns>
+        [Pure]
         public static Color FromHSL(float h, float s, float l)
         {
             s /= 100;
@@ -2110,7 +2127,7 @@ namespace Microsoft.Xna.Framework
             return new Color(r, g, b);
 
         }
-        
+
         /// <summary>
         /// Creates a <see cref="Color"/> from HSV values. 
         /// </summary>
@@ -2118,6 +2135,7 @@ namespace Microsoft.Xna.Framework
         /// <param name="s">Saturation component value, ranging from 0.0f to 1.0f</param>
         /// <param name="v">Value component value, ranging from 0.0f to 1.0f</param>
         /// <returns><see cref="Color"/> with the HSV values</returns>
+        [Pure]
         public static Color FromHSV(float h, float s, float v)
         {
             //defining values for easier colour conversion at end

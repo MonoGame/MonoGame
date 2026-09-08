@@ -4,6 +4,7 @@
 
 using System;
 using System.Diagnostics;
+using System.Diagnostics.Contracts;
 
 
 namespace Microsoft.Xna.Framework.Graphics
@@ -142,6 +143,7 @@ namespace Microsoft.Xna.Framework.Graphics
         /// <see langword="true"/> if the <paramref name="left"/> and <paramref name="right"/> are
         /// the same; otherwise, <see langword="false"/>.
         /// </returns>
+        [Pure]
         public static bool operator ==(VertexInputLayout left, VertexInputLayout right)
         {
             return Equals(left, right);
@@ -157,6 +159,7 @@ namespace Microsoft.Xna.Framework.Graphics
         /// <see langword="true"/> if the <paramref name="left"/> and <paramref name="right"/> are
         /// the different; otherwise, <see langword="false"/>.
         /// </returns>
+        [Pure]
         public static bool operator !=(VertexInputLayout left, VertexInputLayout right)
         {
             return !Equals(left, right);

@@ -4,6 +4,7 @@
 
 using System;
 using System.Diagnostics;
+using System.Diagnostics.Contracts;
 using System.Runtime.CompilerServices;
 using System.Runtime.Serialization;
 
@@ -98,6 +99,7 @@ namespace Microsoft.Xna.Framework
         /// <param name="value1">Source <see cref="Point"/> on the left of the add sign.</param>
         /// <param name="value2">Source <see cref="Point"/> on the right of the add sign.</param>
         /// <returns>Sum of the points.</returns>
+        [Pure]
         public static Point operator +(Point value1, Point value2)
         {
             return new Point(value1.X + value2.X, value1.Y + value2.Y);
@@ -109,6 +111,7 @@ namespace Microsoft.Xna.Framework
         /// <param name="value1">Source <see cref="Point"/> on the left of the sub sign.</param>
         /// <param name="value2">Source <see cref="Point"/> on the right of the sub sign.</param>
         /// <returns>Result of the subtraction.</returns>
+        [Pure]
         public static Point operator -(Point value1, Point value2)
         {
             return new Point(value1.X - value2.X, value1.Y - value2.Y);
@@ -120,6 +123,7 @@ namespace Microsoft.Xna.Framework
         /// <param name="value1">Source <see cref="Point"/> on the left of the mul sign.</param>
         /// <param name="value2">Source <see cref="Point"/> on the right of the mul sign.</param>
         /// <returns>Result of the multiplication.</returns>
+        [Pure]
         public static Point operator *(Point value1, Point value2)
         {
             return new Point(value1.X * value2.X, value1.Y * value2.Y);
@@ -131,6 +135,7 @@ namespace Microsoft.Xna.Framework
         /// <param name="value">Source <see cref="Point"/> on the left of the mul sign.</param>
         /// <param name="scaleFactor">Scalar value on the right of the mul sign.</param>
         /// <returns>Result of multiplying point with a scalar.</returns>
+        [Pure]
         public static Point operator *(Point value, int scaleFactor)
         {
             value.X *= scaleFactor;
@@ -144,6 +149,7 @@ namespace Microsoft.Xna.Framework
         /// <param name="scaleFactor">Scalar value on the left of the mul sign.</param>
         /// <param name="value">Source <see cref="Point"/> on the right of the mul sign.</param>
         /// <returns>Result of multiplying point with a scalar.</returns>
+        [Pure]
         public static Point operator *(int scaleFactor, Point value)
         {
             value.X *= scaleFactor;
@@ -157,6 +163,7 @@ namespace Microsoft.Xna.Framework
         /// <param name="source">Source <see cref="Point"/> on the left of the div sign.</param>
         /// <param name="divisor">Divisor <see cref="Point"/> on the right of the div sign.</param>
         /// <returns>The result of dividing the points.</returns>
+        [Pure]
         public static Point operator /(Point source, Point divisor)
         {
             return new Point(source.X / divisor.X, source.Y / divisor.Y);
@@ -168,6 +175,7 @@ namespace Microsoft.Xna.Framework
         /// <param name="value">Source <see cref="Point"/> on the left of the div sign.</param>
         /// <param name="scaleFactor">Scalar value on the right of the div sign.</param>
         /// <returns>Result of dividing point by a scalar.</returns>
+        [Pure]
         public static Point operator /(Point value, int scaleFactor)
         {
             value.X /= scaleFactor;
@@ -181,6 +189,7 @@ namespace Microsoft.Xna.Framework
         /// <param name="a"><see cref="Point"/> instance on the left of the equal sign.</param>
         /// <param name="b"><see cref="Point"/> instance on the right of the equal sign.</param>
         /// <returns><c>true</c> if the instances are equal; <c>false</c> otherwise.</returns>
+        [Pure]
         public static bool operator ==(Point a, Point b)
         {
             return a.Equals(b);
@@ -192,6 +201,7 @@ namespace Microsoft.Xna.Framework
         /// <param name="a"><see cref="Point"/> instance on the left of the not equal sign.</param>
         /// <param name="b"><see cref="Point"/> instance on the right of the not equal sign.</param>
         /// <returns><c>true</c> if the instances are not equal; <c>false</c> otherwise.</returns>
+        [Pure]
         public static bool operator !=(Point a, Point b)
         {
             return !a.Equals(b);

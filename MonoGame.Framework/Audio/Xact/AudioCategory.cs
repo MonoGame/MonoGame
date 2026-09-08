@@ -3,9 +3,10 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System;
-using System.Diagnostics;
-using System.IO;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.Diagnostics.Contracts;
+using System.IO;
 
 namespace Microsoft.Xna.Framework.Audio
 {
@@ -151,6 +152,7 @@ namespace Microsoft.Xna.Framework.Audio
         /// <param name="first">First AudioCategory instance to compare.</param>
         /// <param name="second">Second AudioCategory instance to compare.</param>
         /// <returns>true if the objects are equal or false if they aren't.</returns>
+        [Pure]
         public static bool operator ==(AudioCategory first, AudioCategory second)
         {
             return first._engine == second._engine && first._name.Equals(second._name, StringComparison.Ordinal);
@@ -162,6 +164,7 @@ namespace Microsoft.Xna.Framework.Audio
         /// <param name="first">First AudioCategory instance to compare.</param>
         /// <param name="second">Second AudioCategory instance to compare.</param>
         /// <returns>true if the objects are not equal or false if they are.</returns>
+        [Pure]
         public static bool operator !=(AudioCategory first, AudioCategory second)
         {
             return first._engine != second._engine || !first._name.Equals(second._name, StringComparison.Ordinal);

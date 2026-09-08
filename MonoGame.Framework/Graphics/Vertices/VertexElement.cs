@@ -3,6 +3,7 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System;
+using System.Diagnostics.Contracts;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
@@ -156,6 +157,7 @@ namespace Microsoft.Xna.Framework.Graphics
         /// <see langword="true"/> if the <paramref name="left"/> and <paramref name="right"/> are
         /// the same; otherwise, <see langword="false"/>.
         /// </returns>
+        [Pure]
         public static bool operator ==(VertexElement left, VertexElement right)
         {
             return left.Equals(right);
@@ -171,6 +173,7 @@ namespace Microsoft.Xna.Framework.Graphics
         /// <see langword="true"/> if the <paramref name="left"/> and <paramref name="right"/> are
         /// the different; otherwise, <see langword="false"/>.
         /// </returns>
+        [Pure]
         public static bool operator !=(VertexElement left, VertexElement right)
         {
             return !left.Equals(right);

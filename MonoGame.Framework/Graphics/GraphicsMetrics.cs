@@ -2,6 +2,8 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
+using System.Diagnostics.Contracts;
+
 namespace Microsoft.Xna.Framework.Graphics
 {
     /// <summary>
@@ -64,6 +66,7 @@ namespace Microsoft.Xna.Framework.Graphics
         /// <param name="value1">Source <see cref="GraphicsMetrics"/> on the left of the sub sign.</param>
         /// <param name="value2">Source <see cref="GraphicsMetrics"/> on the right of the sub sign.</param>
         /// <returns>Difference between two sets of metrics.</returns>
+        [Pure]
         public static GraphicsMetrics operator -(GraphicsMetrics value1, GraphicsMetrics value2)
         {
             return new GraphicsMetrics()
@@ -85,6 +88,7 @@ namespace Microsoft.Xna.Framework.Graphics
         /// <param name="value1">Source <see cref="GraphicsMetrics"/> on the left of the add sign.</param>
         /// <param name="value2">Source <see cref="GraphicsMetrics"/> on the right of the add sign.</param>
         /// <returns>Combination of two sets of metrics.</returns>
+        [Pure]
         public static GraphicsMetrics operator +(GraphicsMetrics value1, GraphicsMetrics value2)
         {
             return new GraphicsMetrics()

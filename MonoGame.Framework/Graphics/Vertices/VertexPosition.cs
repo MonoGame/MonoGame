@@ -2,8 +2,9 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
-using System.Runtime.Serialization;
+using System.Diagnostics.Contracts;
 using System.Runtime.InteropServices;
+using System.Runtime.Serialization;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
@@ -59,6 +60,7 @@ namespace Microsoft.Xna.Framework.Graphics
         /// <returns>
         /// <see langword="true"/> if the vertices are the same; <see langword="false"/> otherwise.
         /// </returns>
+        [Pure]
         public static bool operator == (VertexPosition left, VertexPosition right)
 		{
 			return left.Position == right.Position;
@@ -72,6 +74,7 @@ namespace Microsoft.Xna.Framework.Graphics
         /// <returns>
         /// <see langword="true"/> if the vertices are different; <see langword="false"/> otherwise.
         /// </returns>
+        [Pure]
         public static bool operator != (VertexPosition left, VertexPosition right)
 		{
 			return !(left == right);

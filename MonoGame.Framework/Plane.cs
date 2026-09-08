@@ -4,6 +4,7 @@
 
 using System;
 using System.Diagnostics;
+using System.Diagnostics.Contracts;
 using System.Runtime.Serialization;
 
 namespace Microsoft.Xna.Framework
@@ -16,6 +17,7 @@ namespace Microsoft.Xna.Framework
         /// <param name="point">The point to check with</param>
         /// <param name="plane">The plane to check against</param>
         /// <returns>Greater than zero if on the positive side, less than zero if on the negative size, 0 otherwise</returns>
+        [Pure]
         public static float ClassifyPoint(ref Vector3 point, ref Plane plane)
         {
             return point.X * plane.Normal.X + point.Y * plane.Normal.Y + point.Z * plane.Normal.Z + plane.D;
@@ -27,6 +29,7 @@ namespace Microsoft.Xna.Framework
         /// <param name="point">The point to check</param>
         /// <param name="plane">The place to check</param>
         /// <returns>The perpendicular distance from the point to the plane</returns>
+        [Pure]
         public static float PerpendicularDistance(ref Vector3 point, ref Plane plane)
         {
             // dist = (ax + by + cz + d) / sqrt(a*a + b*b + c*c)
@@ -217,6 +220,7 @@ namespace Microsoft.Xna.Framework
         /// <param name="plane">The normalized plane to transform.</param>
         /// <param name="matrix">The transformation matrix.</param>
         /// <returns>The transformed plane.</returns>
+        [Pure]
         public static Plane Transform(Plane plane, Matrix matrix)
         {
             Plane result;
@@ -253,6 +257,7 @@ namespace Microsoft.Xna.Framework
         /// <param name="plane">The normalized plane to transform.</param>
         /// <param name="rotation">The quaternion rotation.</param>
         /// <returns>The transformed plane.</returns>
+        [Pure]
         public static Plane Transform(Plane plane, Quaternion rotation)
         {
             Plane result;
@@ -288,6 +293,7 @@ namespace Microsoft.Xna.Framework
         /// </summary>
         /// <param name="value">The <see cref="Plane"/> to normalize.</param>
         /// <returns>A normalized version of the specified <see cref="Plane"/>.</returns>
+        [Pure]
         public static Plane Normalize(Plane value)
         {
 			Plane ret;
@@ -314,6 +320,7 @@ namespace Microsoft.Xna.Framework
         /// <param name="plane1">A <see cref="Plane"/> to check for inequality.</param>
         /// <param name="plane2">A <see cref="Plane"/> to check for inequality.</param>
         /// <returns><code>true</code> if the two planes are not equal, <code>false</code> if they are.</returns>
+        [Pure]
         public static bool operator !=(Plane plane1, Plane plane2)
         {
             return !plane1.Equals(plane2);
@@ -325,6 +332,7 @@ namespace Microsoft.Xna.Framework
         /// <param name="plane1">A <see cref="Plane"/> to check for equality.</param>
         /// <param name="plane2">A <see cref="Plane"/> to check for equality.</param>
         /// <returns><code>true</code> if the two planes are equal, <code>false</code> if they are not.</returns>
+        [Pure]
         public static bool operator ==(Plane plane1, Plane plane2)
         {
             return plane1.Equals(plane2);
@@ -487,6 +495,7 @@ namespace Microsoft.Xna.Framework
         /// Converts a <see cref="System.Numerics.Plane"/> to a <see cref="Plane"/>.
         /// </summary>
         /// <param name="value">The converted value.</param>
+        [Pure]
         public static implicit operator Plane(System.Numerics.Plane value)
         {
             return new Plane(value.Normal, value.D);

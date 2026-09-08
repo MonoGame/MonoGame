@@ -4,6 +4,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.Contracts;
 
 namespace Microsoft.Xna.Framework.Input
 {
@@ -289,6 +290,7 @@ namespace Microsoft.Xna.Framework.Input
         /// <param name="a"><see cref="KeyboardState"/> instance to the left of the equality operator.</param>
         /// <param name="b"><see cref="KeyboardState"/> instance to the right of the equality operator.</param>
         /// <returns>true if the instances are equal; false otherwise.</returns>
+        [Pure]
         public static bool operator ==(KeyboardState a, KeyboardState b)
         {
             return a._keys0 == b._keys0
@@ -307,6 +309,7 @@ namespace Microsoft.Xna.Framework.Input
         /// <param name="a"><see cref="KeyboardState"/> instance to the left of the inequality operator.</param>
         /// <param name="b"><see cref="KeyboardState"/> instance to the right of the inequality operator.</param>
         /// <returns>true if the instances are different; false otherwise.</returns>
+        [Pure]
         public static bool operator !=(KeyboardState a, KeyboardState b)
         {
             return !(a == b);

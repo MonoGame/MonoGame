@@ -3,8 +3,9 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System;
-using System.Runtime.Serialization;
 using System.Diagnostics;
+using System.Diagnostics.Contracts;
+using System.Runtime.Serialization;
 
 namespace Microsoft.Xna.Framework
 {
@@ -211,6 +212,7 @@ namespace Microsoft.Xna.Framework
         /// <param name="a"><see cref="Rectangle"/> instance on the left of the equal sign.</param>
         /// <param name="b"><see cref="Rectangle"/> instance on the right of the equal sign.</param>
         /// <returns><c>true</c> if the instances are equal; <c>false</c> otherwise.</returns>
+        [Pure]
         public static bool operator ==(Rectangle a, Rectangle b)
         {
             return ((a.X == b.X) && (a.Y == b.Y) && (a.Width == b.Width) && (a.Height == b.Height));
@@ -222,6 +224,7 @@ namespace Microsoft.Xna.Framework
         /// <param name="a"><see cref="Rectangle"/> instance on the left of the not equal sign.</param>
         /// <param name="b"><see cref="Rectangle"/> instance on the right of the not equal sign.</param>
         /// <returns><c>true</c> if the instances are not equal; <c>false</c> otherwise.</returns>
+        [Pure]
         public static bool operator !=(Rectangle a, Rectangle b)
         {
             return !(a == b);
@@ -409,6 +412,7 @@ namespace Microsoft.Xna.Framework
         /// <param name="value1">The first <see cref="Rectangle"/>.</param>
         /// <param name="value2">The second <see cref="Rectangle"/>.</param>
         /// <returns>Overlapping region of the two rectangles.</returns>
+        [Pure]
         public static Rectangle Intersect(Rectangle value1, Rectangle value2)
         {
             Rectangle rectangle;
@@ -496,6 +500,7 @@ namespace Microsoft.Xna.Framework
         /// <param name="value1">The first <see cref="Rectangle"/>.</param>
         /// <param name="value2">The second <see cref="Rectangle"/>.</param>
         /// <returns>The union of the two rectangles.</returns>
+        [Pure]
         public static Rectangle Union(Rectangle value1, Rectangle value2)
         {
             int x = Math.Min(value1.X, value2.X);

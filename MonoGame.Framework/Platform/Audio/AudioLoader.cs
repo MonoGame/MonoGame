@@ -2,9 +2,10 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
-using System;
-using System.IO;
 using MonoGame.OpenAL;
+using System;
+using System.Diagnostics.Contracts;
+using System.IO;
 
 namespace Microsoft.Xna.Framework.Audio
 {
@@ -15,6 +16,7 @@ namespace Microsoft.Xna.Framework.Audio
         internal const int FormatIeee = 3;
         internal const int FormatIma4 = 17;
 
+        [Pure]
         public static ALFormat GetSoundFormat(int format, int channels, int bits)
         {
             switch (format)
@@ -58,6 +60,7 @@ namespace Microsoft.Xna.Framework.Audio
 
         // Converts block alignment in bytes to sample alignment, primarily for compressed formats
         // Calculation of sample alignment from http://kcat.strangesoft.net/openal-extensions/SOFT_block_alignment.txt
+        [Pure]
         public static int SampleAlignment(ALFormat format, int blockAlignment)
         {
             switch (format)
@@ -86,6 +89,7 @@ namespace Microsoft.Xna.Framework.Audio
         /// <param name="samplesPerBlock">Gets the number of samples per block.</param>
         /// <param name="sampleCount">Gets the total number of samples.</param>
         /// <returns>The byte buffer containing the waveform data or compressed blocks.</returns>
+        [Pure]
         public static byte[] Load(Stream stream, out ALFormat format, out int frequency, out int channels, out int blockAlignment, out int bitsPerSample, out int samplesPerBlock, out int sampleCount)
         {
             byte[] audioData = null;

@@ -2,6 +2,8 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
+using System.Diagnostics.Contracts;
+
 namespace Microsoft.Xna.Framework.Input
 {
     /// <summary>
@@ -38,6 +40,7 @@ namespace Microsoft.Xna.Framework.Input
         /// <param name="left">The first object to compare.</param>
         /// <param name="right">The second object to compare.</param>
         /// <returns>true if <paramref name="left"/> and <paramref name="right"/> are equal; otherwise, false.</returns>
+        [Pure]
         public static bool operator ==(GamePadTriggers left, GamePadTriggers right)
         {
             return (left.Left == right.Left) && (left.Right == right.Right);
@@ -49,6 +52,7 @@ namespace Microsoft.Xna.Framework.Input
         /// <param name="left">The first object to compare.</param>
         /// <param name="right">The second object to compare.</param>
         /// <returns>true if <paramref name="left"/> and <paramref name="right"/> are not equal; otherwise, false.</returns>
+        [Pure]
         public static bool operator !=(GamePadTriggers left, GamePadTriggers right)
         {
             return !(left == right);

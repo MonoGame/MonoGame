@@ -5,6 +5,7 @@
 #region Using clause
 using System;
 using System.Diagnostics;
+using System.Diagnostics.Contracts;
 #endregion Using clause
 
 
@@ -337,6 +338,7 @@ namespace Microsoft.Xna.Framework.Input.Touch
         /// <param name="value1">The value on the left of the inequality operator.</param>
         /// <param name="value2">The value on the right of the inequality operator.</param>
         /// <returns><see langword="true"/> if the two values are not equal; otherwise, <see langword="false"/>.</returns>
+        [Pure]
         public static bool operator !=(TouchLocation value1, TouchLocation value2)
         {
 			return  value1._id != value2._id || 
@@ -352,6 +354,7 @@ namespace Microsoft.Xna.Framework.Input.Touch
         /// <param name="value1">The value on the left of the equality operator.</param>
         /// <param name="value2">The value on the right of the equality operator.</param>
         /// <returns><see langword="true"/> if the two values are equal; otherwise, <see langword="false"/>.</returns>
+        [Pure]
         public static bool operator ==(TouchLocation value1, TouchLocation value2)
         {
             return  value1._id == value2._id && 
