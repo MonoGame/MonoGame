@@ -257,7 +257,7 @@ internal class NativeGameWindow : GameWindow
         _height = pp.BackBufferHeight;
         string title = Title == null ? AssemblyHelper.GetDefaultWindowTitle() : Title;
 
-        // OpenGL framebuffer attributes are set when teh SDL window is created,
+        // OpenGL framebuffer attributes are set when the SDL window is created,
         // so we need to recreate the native window before creating th new GL context
         if (MGP.Window_BeginRecreateNativeWindow(_handle, ref _width, ref _height, title, ref windowCreateInfo) == 0)
             throw new NoSuitableGraphicsDeviceException("Failed to initialize native window!");
