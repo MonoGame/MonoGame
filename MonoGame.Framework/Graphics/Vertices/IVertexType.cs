@@ -8,7 +8,7 @@
         /// <summary>
         /// Vertex declaration, which defines per-vertex data.
         /// </summary>
-        VertexDeclaration VertexDeclaration
+        static abstract VertexDeclaration VertexDeclaration
         {
             get;
         }
