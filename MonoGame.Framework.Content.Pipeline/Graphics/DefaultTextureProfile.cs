@@ -2,10 +2,8 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
-using System;
 using Microsoft.Xna.Framework.Content.Pipeline.Processors;
 using Microsoft.Xna.Framework.Graphics;
-
 
 namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 {
@@ -48,14 +46,14 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
             // Select the default texture compression format for the target platform
             if (format == TextureProcessorOutputFormat.Compressed)
             {
-                if (platform == TargetPlatform.iOS)
-                    format = TextureProcessorOutputFormat.PvrCompressed;
-                else if (platform == TargetPlatform.Android)
-                    format = TextureProcessorOutputFormat.EtcCompressed;
-                else
-                    format = TextureProcessorOutputFormat.DxtCompressed;
+                format = platform switch
+                {
+                    TargetPlatform.iOS => TextureProcessorOutputFormat.PvrCompressed,
+                    TargetPlatform.Android => TextureProcessorOutputFormat.EtcCompressed,
+                    _ => TextureProcessorOutputFormat.DxtCompressed
+                };
             }
-
+           
             if (IsCompressedTextureFormat(format))
             {
                 // Make sure the target platform supports the selected texture compression format
@@ -107,16 +105,11 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
             }
 
             // Does it require square textures?
-            switch (format)
+            requiresSquare = format switch
             {
-                default:
-                    requiresSquare = false;
-                    break;
-
-                case TextureProcessorOutputFormat.PvrCompressed:
-                    requiresSquare = true;
-                    break;
-            }
+                TextureProcessorOutputFormat.PvrCompressed => true,
+                _ => false
+            };
         }
 
         protected override void PlatformCompressTexture(ContentProcessorContext context, TextureContent content, TextureProcessorOutputFormat format, bool isSpriteFont)

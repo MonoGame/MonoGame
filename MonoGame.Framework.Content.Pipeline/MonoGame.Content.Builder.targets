@@ -41,19 +41,21 @@
         <Output TaskParameter="Output" ItemName="ContentReferences"/>
     </CollectContentReferences>
 
-    <Error Text="The MonoGamePlatform property was not defined in the project!  It must be set to Windows, WindowsGL, , MacOSX, iOS, Linux, DesktopGL, RaspberryPi, Android, NativeClient, PlayStation4, PSVita, XboxOne or PlayStationMobile."
+    <Error Text="The MonoGamePlatform property was not defined in the project!  It must be set to Windows, WindowsGL, WindowsDX12, MacOSX, iOS, Linux, DesktopGL, DesktopVK, RaspberryPi, Android, NativeClient, PlayStation4, PSVita, XboxOne or PlayStationMobile."
        Condition="	'$(MonoGamePlatform)' != 'Windows' And
-			'$(MonoGamePlatform)' != 'iOS' And       
-			'$(MonoGamePlatform)' != 'Android' And       
-			'$(MonoGamePlatform)' != 'Linux' And           
-			'$(MonoGamePlatform)' != 'DesktopGL' And           
-			'$(MonoGamePlatform)' != 'MacOSX' And       
-			'$(MonoGamePlatform)' != 'NativeClient' And       
-			'$(MonoGamePlatform)' != 'RaspberryPi' And       
-			'$(MonoGamePlatform)' != 'PlayStation4' And       
-			'$(MonoGamePlatform)' != 'PlayStation5' And       
+			'$(MonoGamePlatform)' != 'iOS' And 
+			'$(MonoGamePlatform)' != 'Android' And 
+			'$(MonoGamePlatform)' != 'Linux' And 
+			'$(MonoGamePlatform)' != 'DesktopGL' And 
+			'$(MonoGamePlatform)' != 'DesktopVK' And 
+			'$(MonoGamePlatform)' != 'MacOSX' And 
+			'$(MonoGamePlatform)' != 'NativeClient' And 
+			'$(MonoGamePlatform)' != 'RaspberryPi' And 
+			'$(MonoGamePlatform)' != 'PlayStation4' And 
+			'$(MonoGamePlatform)' != 'PlayStation5' And 
 			'$(MonoGamePlatform)' != 'XboxOne' And 
-			'$(MonoGamePlatform)' != 'WindowsGL'" />
+			'$(MonoGamePlatform)' != 'WindowsGL' And 
+			'$(MonoGamePlatform)' != 'WindowsDX12'" />
 
     <Error
         Text="The MonoGame content builder executable could not be located at '$(MonoGameContentBuilderExe)'!"

@@ -50,8 +50,9 @@ namespace Microsoft.Xna.Framework.Content
             'S', // Nintendo Switch
             'b', // WebAssembly and Bridge.NET
             'V', // DesktopVK
-            'G', // Windows GDK
+            'G', // Windows DirectX 12
             's', // Xbox Series
+            'U', // Nintendo Switch 2
 
             // NOTE: There are additional identifiers for consoles that
             // are not defined in this repository.  Be sure to ask the
@@ -145,7 +146,7 @@ namespace Microsoft.Xna.Framework.Content
 		}
 
         /// <summary>
-        /// Initializes a new instance of the ContentMangaer.
+        /// Initializes a new instance of the ContentManager.
         /// </summary>
         /// <remarks>
         ///     <para>
@@ -170,7 +171,7 @@ namespace Microsoft.Xna.Framework.Content
             AddContentManager(this);
 		}
 
-        /// <inheritdoc cref="ContentManager.ContentManager(IServiceProvider)"/>
+        /// <inheritdoc cref="ContentManager(IServiceProvider)"/>
         /// <param name="serviceProvider"/>
         /// <param name="rootDirectory">The root directory the ContentManager will search for content in.</param>
         public ContentManager(IServiceProvider serviceProvider, string rootDirectory)

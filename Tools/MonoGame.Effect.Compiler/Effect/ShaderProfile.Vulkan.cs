@@ -1,9 +1,10 @@
-﻿// MonoGame - Copyright (C) MonoGame Foundation, Inc
+// MonoGame - Copyright (C) MonoGame Foundation, Inc
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -31,13 +32,13 @@ namespace MonoGame.Effect
             if (!string.IsNullOrEmpty(pass.vsFunction))
             {
                 if (pass.vsModel != "vs_6_0")
-                    throw new Exception(String.Format("Invalid Vulkan vertex profile '{0}'! Requires vs_6_0.", pass.vsModel));
+                    throw new Exception($"Invalid Vulkan vertex profile '{pass.vsModel}'! Requires vs_6_0.");
             }
 
             if (!string.IsNullOrEmpty(pass.psFunction))
             {
                 if (pass.psModel != "ps_6_0")
-                    throw new Exception(String.Format("Invalid Vulkan pixel profile '{0}'! Requires ps_6_0.", pass.psModel));
+                    throw new Exception($"Invalid Vulkan pixel profile '{pass.psModel}'! Requires ps_6_0.");
             }
         }
 
@@ -110,7 +111,7 @@ namespace MonoGame.Effect
         {
             const int SlotOffset = 32;
 
-            var outputPath = Path.GetDirectoryName(shaderResult.OutputFilePath);
+            var outputPath = Path.GetDirectoryName(shaderResult.OutputFilePath) ?? "";
             var sourceFileName = Path.GetFileNameWithoutExtension(shaderResult.FilePath) + "." + shaderFunction;
 
             // TODO: We have no intermediate folder in 2MGFX for temp stuff
@@ -190,17 +191,34 @@ namespace MonoGame.Effect
                     //toolArgs += "-Fd \"" + dbgFile + "\" ";
                 }
                 toolArgs += "\"" + hlslFile + "\"";
-                toolResult = Dxc.Run(toolArgs, out stdout, out stderr);
 
+                // Ok first build gathers reflection info.
+                toolResult = Dxc.Run(toolArgs, out stdout, out stderr);
                 errorsAndWarnings += stderr;
 
-                // jcf: this tool doesn't seem to use stderr for output
-                //      but if the return code was not success=0 then treat stdout as stderr
                 if (toolResult != 0)
                 {
-                    errorsAndWarnings += string.Format("DXC.exe returned error code '{0}'.\n", toolResult);
+                    errorsAndWarnings += $"DXC.exe returned error code '{toolResult}'.\n";
                     errorsAndWarnings += stdout;
                     throw new ShaderCompilerException();
+                }
+
+                string[] reflectionDataArray = File.ReadAllLines(reflectFile);
+                SpirvReflectionInfo reflectionInfo = SpirvReflectionInfo.Parse(reflectionDataArray);
+
+                // This second build is for generating the shader binary without
+                // reflection info that forces Google VK extensions into the binary.
+                {
+                    toolArgs = toolArgs.Replace("-fspv-reflect ", "");
+                    toolResult = Dxc.Run(toolArgs, out stdout, out stderr);
+                    errorsAndWarnings += stderr;
+
+                    if (toolResult != 0)
+                    {
+                        errorsAndWarnings += $"DXC.exe returned error code '{toolResult}'.\n";
+                        errorsAndWarnings += stdout;
+                        throw new ShaderCompilerException();
+                    }
                 }
 
                 // Load up the compiled shader.
@@ -212,9 +230,6 @@ namespace MonoGame.Effect
                     if (bytecode.SequenceEqual(shader.Bytecode))
                         return shader;
                 }
-
-                string[] reflectionDataArray = File.ReadAllLines(reflectFile);
-                SpirvReflectionInfo reflectionInfo = SpirvReflectionInfo.Parse(reflectionDataArray);
 
                 // Keep the debug file if we are creating a new shader
                 // and debug shaders are enabled.
@@ -247,9 +262,13 @@ namespace MonoGame.Effect
                             throw new ShaderCompilerException();
                         }
 
-                        SpirvTypeStruct constantBuffer = variable.Pointer.PointerType as SpirvTypeStruct;
-                        ConstantBufferData cbuffer = ConstantBufferData.BuildFromSpirvStruct(constantBuffer);
+                        if (variable.Pointer.PointerType is not SpirvTypeStruct constantBuffer)
+                        {
+                            errorsAndWarnings += $"Type for {variable.Pointer.Name ?? variable.Pointer.Id} was `Struct` but PointerType was not `SpirvTypeStruct`.";
+                            throw new ShaderCompilerException();
+                        }
 
+                        var cbuffer = ConstantBufferData.BuildFromSpirvStruct(constantBuffer);
                         if (cbuffer.Size > 0)
                         {
                             var match = effect.ConstantBuffers.FindIndex(e => e.SameAs(cbuffer));
@@ -278,25 +297,25 @@ namespace MonoGame.Effect
                             var samplerVariable = sampledImage.LoadedSampler.Variable;
                             var imageVariable = sampledImage.LoadedImage.Variable;
 
-                            var samplerType = samplerVariable.Pointer.PointerType as SpirvTypeSampler;
-                            var imageType = imageVariable.Pointer.PointerType as SpirvTypeImage;
+                            var samplerType = (SpirvTypeSampler)samplerVariable.Pointer.PointerType;
+                            var imageType = (SpirvTypeImage)imageVariable.Pointer.PointerType;
 
                             var sampler = new ShaderData.Sampler
                             {
-                                samplerSlot = (int)samplerVariable.BindingSlot.Value - SlotOffset,
-                                samplerName = samplerVariable.Name,
-                                textureSlot = (int)imageVariable.BindingSlot.Value - SlotOffset,
+                                samplerSlot = (int)(samplerVariable.BindingSlot ?? 0) - SlotOffset,
+                                samplerName = samplerVariable.Name ?? samplerVariable.Id,
+                                textureSlot = (int)(imageVariable.BindingSlot ?? 0) - SlotOffset,
                             };
 
                             // This image is only sampled by one sampler, we can safely use the texture name for the parameter.
                             if (sampledImages.Count() == 1)
                             {
-                                sampler.parameterName = imageVariable.Name;
+                                sampler.parameterName = imageVariable.Name ?? imageVariable.Id;
                             }
                             // otherwise make a composite name for this image/sampler combo.
                             else
                             {
-                                sampler.parameterName = $"{samplerVariable.Name}+{imageVariable.Name}";
+                                sampler.parameterName = $"{samplerVariable.Name ?? imageVariable.Id}+{imageVariable.Name ?? imageVariable.Id}";
                             }
 
                             switch (imageType.Dimensionality)
@@ -315,7 +334,7 @@ namespace MonoGame.Effect
                                     break;
                             }
 
-                            if (!shaderResult.ShaderInfo.SamplerStates.TryGetValue(samplerVariable.Name, out SamplerStateInfo samplerStateInfo))
+                            if (!shaderResult.ShaderInfo.SamplerStates.TryGetValue(samplerVariable.Name ?? samplerVariable.Id, out SamplerStateInfo? samplerStateInfo))
                             {
                                 errorsAndWarnings += $"Could not find sampler state info for sampler '{samplerVariable.Name}'; using defaults\n";
                                 samplerStateInfo = new SamplerStateInfo();
@@ -323,6 +342,59 @@ namespace MonoGame.Effect
 
                             sampler.state = samplerStateInfo.State;
                             samplers.Add(sampler);
+                        }
+
+                        if (!sampledImages.Any())
+                        {
+                            // This is for handling textures that are read via .Load and not a sampler.
+                            var imageLoads = reflectionInfo.ImageLoads.Where(si => si.Variable == variable).DistinctBy(si => si.Variable);
+                            foreach (var image in imageLoads)
+                            {
+                                bool found = false;
+
+                                foreach (var ss in shaderResult.ShaderInfo.SamplerStates)
+                                {
+                                    if (ss.Value.TextureName == variable.Name)
+                                    {
+                                        found = true;
+                                        break;
+                                    }
+                                }
+
+                                if (found)
+                                    continue;
+
+                                var imageVariable = image.Variable;
+                                var imageType = (SpirvTypeImage)imageVariable.Pointer.PointerType;
+
+                                var sampler = new ShaderData.Sampler
+                                {
+                                    samplerSlot = -1,
+                                    samplerName = string.Empty,
+                                    textureSlot = (int)(imageVariable.BindingSlot ?? 0) - SlotOffset,
+                                };
+
+                                sampler.parameterName = imageVariable.Name ?? imageVariable.Id;
+
+                                switch (imageType.Dimensionality)
+                                {
+                                    case ImageDimensionality.OneD:
+                                        sampler.type = MojoShader.MOJOSHADER_samplerType.MOJOSHADER_SAMPLER_1D;
+                                        break;
+                                    case ImageDimensionality.TwoD:
+                                        sampler.type = MojoShader.MOJOSHADER_samplerType.MOJOSHADER_SAMPLER_2D;
+                                        break;
+                                    case ImageDimensionality.ThreeD:
+                                        sampler.type = MojoShader.MOJOSHADER_samplerType.MOJOSHADER_SAMPLER_VOLUME;
+                                        break;
+                                    case ImageDimensionality.Cube:
+                                        sampler.type = MojoShader.MOJOSHADER_samplerType.MOJOSHADER_SAMPLER_CUBE;
+                                        break;
+                                }
+
+                                sampler.state = null;
+                                samplers.Add(sampler);
+                            }
                         }
                     }
                 }
@@ -336,64 +408,98 @@ namespace MonoGame.Effect
 
                     foreach (SpirvVariable input in sorted)
                     {
-                        var a = new ShaderData.Attribute();
                         var semanticId = input.HlslSemantic ?? input.Id.Replace("%in_var_", "");
 
                         var m = Regex.Match(semanticId, @"(\D+)(\d+)?");
-                        if (m.Groups[2].Success)
-                            a.index = int.Parse(m.Groups[2].Value);
-                        else
-                            a.index = 0;
+                        int indexOffset = m.Groups[2].Success
+                            ? int.Parse(m.Groups[2].Value, CultureInfo.InvariantCulture)
+                            : 0;
+
+                        var usage = VertexElementUsage.TextureCoordinate;
 
                         if (m.Groups[1].Success)
                         {
-                            switch (m.Groups[1].Value.ToUpper())
+                            switch (m.Groups[1].Value.ToUpper(CultureInfo.InvariantCulture))
                             {
                                 default:
-                                    a.usage = VertexElementUsage.TextureCoordinate;
+                                    // Give a warning which hopefully someone notices.
+                                    errorsAndWarnings += $"Unknown vertex shader input semantic `{m.Groups[1].Value}`; defaulting to texture coord.\n";
+                                    usage = VertexElementUsage.TextureCoordinate;
                                     break;
+                                case "TEXCOORD":
+                                    usage = VertexElementUsage.TextureCoordinate;
+                                    break;
+                                // NOTE: Some shaders incorrectly pass in SV_POSITION to
+                                // the vertex shader which is allowed in DX11, so we allow
+                                // it here as well.
+                                case "SV_POSITION":
                                 case "POSITION":
-                                    a.usage = VertexElementUsage.Position;
+                                    usage = VertexElementUsage.Position;
                                     break;
                                 case "NORMAL":
-                                    a.usage = VertexElementUsage.Normal;
+                                    usage = VertexElementUsage.Normal;
                                     break;
                                 case "TANGENT":
-                                    a.usage = VertexElementUsage.Tangent;
+                                    usage = VertexElementUsage.Tangent;
                                     break;
                                 case "BINORMAL":
-                                    a.usage = VertexElementUsage.Binormal;
+                                    usage = VertexElementUsage.Binormal;
                                     break;
                                 case "COLOR":
-                                    a.usage = VertexElementUsage.Color;
+                                    usage = VertexElementUsage.Color;
                                     break;
                                 case "BLENDINDICES":
-                                    a.usage = VertexElementUsage.BlendIndices;
+                                    usage = VertexElementUsage.BlendIndices;
                                     break;
                                 case "BLENDWEIGHT":
-                                    a.usage = VertexElementUsage.BlendWeight;
+                                    usage = VertexElementUsage.BlendWeight;
                                     break;
                                 case "DEPTH":
-                                    a.usage = VertexElementUsage.Depth;
+                                    usage = VertexElementUsage.Depth;
                                     break;
                                 case "FOG":
-                                    a.usage = VertexElementUsage.Fog;
+                                    usage = VertexElementUsage.Fog;
                                     break;
                                 case "POINTSIZE":
-                                    a.usage = VertexElementUsage.PointSize;
+                                    usage = VertexElementUsage.PointSize;
                                     break;
                                 case "TESSELLATEFACTOR":
-                                    a.usage = VertexElementUsage.TessellateFactor;
+                                    usage = VertexElementUsage.TessellateFactor;
                                     break;
                             }
                         }
 
-                        // TODO: These are unused at runtime under the
-                        // new native backends, we will remove them soon.               
-                        a.location = 0;
-                        a.name = string.Empty;
+                        uint locationCount = 1;
+                        var pointerType = input.Pointer?.PointerType;
 
-                        attributes.Add(a);
+                        if (pointerType is SpirvTypeArray spirvTypeArray)
+                        {
+                            locationCount = spirvTypeArray.Length;
+                            if (spirvTypeArray.ElementType is SpirvTypeMatrix spirvTypeMatrix)
+                            {
+                                locationCount *= spirvTypeMatrix.Columns;
+                            }
+                        }
+                        else if (pointerType is SpirvTypeMatrix spirvTypeMatrix)
+                        {
+                            locationCount = spirvTypeMatrix.Columns;
+                        }
+
+                        for (int locationIndex = 0; locationIndex < locationCount; locationIndex++)
+                        {
+                            var a = new ShaderData.Attribute
+                            {
+                                usage = usage,
+                                index = indexOffset + locationIndex,
+
+                                // TODO: These are unused at runtime under the
+                                // new native backends, we will remove them soon.
+                                location = 0,
+                                name = string.Empty,
+                            };
+
+                            attributes.Add(a);
+                        }
                     }
                 }
 
@@ -418,6 +524,7 @@ namespace MonoGame.Effect
                     uint uniformSlots = 0;
                     uint textureSlots = 0;
                     uint samplerSlots = 0;
+                    var textureTypes = new uint[16];
 
                     // We just have one cbuffer at 0 right now.
                     if (cbufferIndex.Count > 0)
@@ -432,30 +539,43 @@ namespace MonoGame.Effect
                     {
                         if (s.textureSlot == s.samplerSlot)
                         {
+                            textureTypes[s.textureSlot] = ToTextureType(s.type);
+
                             textureSlots |= (uint)(1 << s.textureSlot);
                             samplerSlots |= (uint)(1 << s.textureSlot);
                             binding.binding = (uint)(s.textureSlot + SlotOffset);
                             binding.descriptorType = VkDescriptorType.COMBINED_IMAGE_SAMPLER;
                             bindings.Add(binding);
-
                             continue;
                         }
 
-                        samplerSlots |= (uint)(1 << s.samplerSlot);
-                        binding.binding = (uint)(s.samplerSlot + SlotOffset);
-                        binding.descriptorType = VkDescriptorType.SAMPLER;
-                        bindings.Add(binding);
+                        if (s.samplerSlot > 0)
+                        {
+                            samplerSlots |= (uint)(1 << s.samplerSlot);
+                            binding.binding = (uint)(s.samplerSlot + SlotOffset);
+                            binding.descriptorType = VkDescriptorType.SAMPLER;
+                            bindings.Add(binding);
+                        }
 
-                        textureSlots |= (uint)(1 << s.textureSlot);
-                        binding.binding = (uint)(s.textureSlot + SlotOffset);
-                        binding.descriptorType = VkDescriptorType.SAMPLED_IMAGE;
-                        bindings.Add(binding);
+                        if (s.textureSlot > 0)
+                        {
+                            textureTypes[s.textureSlot] = ToTextureType(s.type);
+
+                            textureSlots |= (uint)(1 << s.textureSlot);
+                            binding.binding = (uint)(s.textureSlot + SlotOffset);
+                            binding.descriptorType = VkDescriptorType.SAMPLED_IMAGE;
+                            bindings.Add(binding);
+                        }
                     }
 
                     // Write the slot bits.
                     writer.Write(uniformSlots);
                     writer.Write(textureSlots);
                     writer.Write(samplerSlots);
+
+                    // Write the texture types.
+                    for (int i = 0; i < textureTypes.Length; i++)
+                        writer.Write(textureTypes[i]);
 
                     // Write the bindings.
                     writer.Write((uint)bindings.Count);
@@ -489,6 +609,22 @@ namespace MonoGame.Effect
                     }
                     catch { }
                 }
+            }
+        }
+
+        private static uint ToTextureType(MojoShader.MOJOSHADER_samplerType type)
+        {
+            // NOTE:  This matches MGTextureType in the native bindings.
+            // Ideally we would move to this in the shader API too.
+            switch (type)
+            {
+                default:
+                case MojoShader.MOJOSHADER_samplerType.MOJOSHADER_SAMPLER_2D:
+                    return 0;
+                case MojoShader.MOJOSHADER_samplerType.MOJOSHADER_SAMPLER_VOLUME:
+                    return 1;
+                case MojoShader.MOJOSHADER_samplerType.MOJOSHADER_SAMPLER_CUBE:
+                    return 2;
             }
         }
     }

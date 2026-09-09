@@ -27,6 +27,9 @@ struct MGA_RawBuffer
 	uint32_t length = 0;
 };
 
+// The current XAudio2 device global.
+static MGA_System* g_AudioSystem = nullptr;
+
 struct MGA_System
 {
 	IXAudio2* audio = nullptr;
@@ -97,10 +100,9 @@ public:
 	}
 };
 
-
 MGA_System* MGA_System_Create()
 {
-	auto system = new MGA_System();
+	auto system = g_AudioSystem = new MGA_System();
 
 	auto err = XAudio2Create(&system->audio, 0, XAUDIO2_DEFAULT_PROCESSOR);
 	assert(err >= S_OK);
@@ -148,6 +150,8 @@ void MGA_System_Destroy(MGA_System* system)
 {
 	assert(system != nullptr);
 
+	g_AudioSystem =  nullptr;
+
 	// TODO: Should we be stopping any playing sounds here first?
 
 
@@ -168,6 +172,26 @@ void MGA_System_Destroy(MGA_System* system)
 	delete system->callbacks;
 
 	delete system;
+}
+
+void MGXA_Suspend()
+{
+#if defined(_GAMING_XBOX)
+	if (!g_AudioSystem)
+		return;
+
+	g_AudioSystem->audio->StopEngine();
+#endif
+}
+
+void MGXA_Resume()
+{
+#if defined(_GAMING_XBOX)
+	if (!g_AudioSystem)
+		return;
+
+	g_AudioSystem->audio->StartEngine();
+#endif
 }
 
 mgint MGA_System_GetMaxInstances()
@@ -253,10 +277,59 @@ void MGA_Buffer_InitializeFormat(MGA_Buffer* buffer, mgbyte* waveHeader, mgbyte*
 
 	auto wformat = (WAVEFORMATEX*)waveHeader;
 
+	if (wformat->wFormatTag == WAVE_FORMAT_PCM)
+	{
+		MGA_Buffer_InitializePCM(
+			buffer,
+			waveData,
+			0,
+			length,
+			wformat->wBitsPerSample,
+			wformat->nSamplesPerSec,
+			wformat->nChannels,
+			loopStart,
+			loopLength);
+
+		return;
+	}
+
+	if (wformat->wFormatTag == WAVE_FORMAT_IEEE_FLOAT)
+	{
+		buffer->format = (WAVEFORMATEX*)malloc(sizeof(WAVEFORMATEX));
+		memset(buffer->format, 0, sizeof(WAVEFORMATEX));
+		buffer->format->wFormatTag = WAVE_FORMAT_IEEE_FLOAT;
+		buffer->format->nSamplesPerSec = wformat->nSamplesPerSec;
+		buffer->format->nChannels = wformat->nChannels;
+		buffer->format->nBlockAlign = wformat->nBlockAlign;
+		buffer->format->wBitsPerSample = wformat->wBitsPerSample;
+		buffer->format->nAvgBytesPerSec = buffer->format->nSamplesPerSec * buffer->format->nBlockAlign;
+		buffer->format->cbSize = 0;
+
+		// Buffer should be block aligned.
+		assert((length % wformat->nBlockAlign) == 0);
+
+		// Calculate duration
+		buffer->duration = ((mgulong)length * 1000) / buffer->format->nAvgBytesPerSec;
+
+		buffer->length = length;
+		buffer->data = (uint8_t*)malloc(length);
+		memcpy(buffer->data, waveData, length);
+
+		memset(&buffer->buffer, 0, sizeof(buffer->buffer));
+		buffer->buffer.pAudioData = buffer->data;
+		buffer->buffer.AudioBytes = length;
+		buffer->buffer.LoopBegin = loopStart;
+		buffer->buffer.LoopLength = loopLength;
+		buffer->buffer.LoopCount = 0;
+		buffer->buffer.Flags = 0;
+		buffer->buffer.pContext = nullptr;
+
+		return;
+	}
+
 	if (wformat->wFormatTag == WAVE_FORMAT_ADPCM)
 	{
 		// We are assuming MSADPCM here!
-
 		const size_t size = sizeof(ADPCMWAVEFORMAT) + (7 * sizeof(ADPCMCOEFSET));
 		auto format = (ADPCMWAVEFORMAT*)malloc(size);
 		memset(format, 0, sizeof(ADPCMWAVEFORMAT));
@@ -277,6 +350,10 @@ void MGA_Buffer_InitializeFormat(MGA_Buffer* buffer, mgbyte* waveHeader, mgbyte*
 		format->aCoef[5] = { 460, -208 };
 		format->aCoef[6] = { 392, -232 };
 
+		mgulong totalBlocks = length / wformat->nBlockAlign;
+		mgulong totalSamples = totalBlocks * format->wSamplesPerBlock;
+		buffer->duration = (mgulong)((totalSamples * 1000) / wformat->nSamplesPerSec);
+
 		// NOTE: XAudio only supports up to 512 as the samples per block.
 		// Larger values are not supported and the sound will be wrong.
 		if (format->wSamplesPerBlock > 512)
@@ -291,7 +368,7 @@ void MGA_Buffer_InitializeFormat(MGA_Buffer* buffer, mgbyte* waveHeader, mgbyte*
 		buffer->data = (uint8_t*)malloc(length);
 		memcpy(buffer->data, waveData, length);
 
-		memset(&buffer->buffer, 0, sizeof(XAUDIO2_BUFFER));
+		memset(&buffer->buffer, 0, sizeof(buffer->buffer));
 		buffer->buffer.pAudioData = buffer->data;
 		buffer->buffer.AudioBytes = length;
 		buffer->buffer.LoopBegin = loopStart;
@@ -299,12 +376,20 @@ void MGA_Buffer_InitializeFormat(MGA_Buffer* buffer, mgbyte* waveHeader, mgbyte*
 		buffer->buffer.LoopCount = 0;
 		buffer->buffer.Flags = 0;
 		buffer->buffer.pContext = nullptr;
+
+		return;
 	}
-	else if (wformat->wFormatTag == WAVE_FORMAT_WMAUDIO2)
+
+
+	if (wformat->wFormatTag == WAVE_FORMAT_WMAUDIO2)
 	{
 		// TODO: The API here needs to change to pass
 		// additional data for this format to work.
 	}
+	
+	// TODO: This API doesn't have a way to indicate that the format
+	// provided was not supported and this buffer is uninitialized.
+	throw 0;
 }
 
 void MGA_Buffer_InitializePCM(MGA_Buffer* buffer, mgbyte* waveData, mgint offset, mgint length, mgint sampleBits, mgint sampleRate, mgint channels, mgint loopStart, mgint loopLength)
@@ -335,7 +420,7 @@ void MGA_Buffer_InitializePCM(MGA_Buffer* buffer, mgbyte* waveData, mgint offset
 		memcpy(buffer->data, waveData + offset, length);
 
 	// Calculate duration
-	buffer->duration = (mgulong)((length * 1000) / buffer->format->nAvgBytesPerSec);
+	buffer->duration = ((mgulong)length * 1000) / buffer->format->nAvgBytesPerSec;
 
 	// Set the buffer structure passed to SubmitSourceBuffer.
 	memset(&buffer->buffer, 0, sizeof(buffer->buffer));
@@ -494,6 +579,9 @@ mgint MGA_Voice_GetBufferCount(MGA_Voice* voice)
 {
 	assert(voice != nullptr);
 
+	if (voice->voice == nullptr)
+		return 0;
+
 	XAUDIO2_VOICE_STATE state;
 	voice->voice->GetState(&state, XAUDIO2_VOICE_NOSAMPLESPLAYED);
 	return state.BuffersQueued;
@@ -508,6 +596,20 @@ mgint MGA_Voice_GetFinishedBufferCount(MGA_Voice* voice)
 void MGA_Voice_SetBuffer(MGA_Voice* voice, MGA_Buffer* buffer)
 {
 	assert(voice != nullptr);
+
+	// If the voice has an existing source voice but the new buffer format doesn't match:
+	// We should destroy and recreate the source voice to be safe.
+	if (voice->voice
+		&& buffer
+		&& buffer->format
+		&& (voice->format.wFormatTag != buffer->format->wFormatTag
+			|| voice->format.nChannels != buffer->format->nChannels
+			|| voice->format.nSamplesPerSec != buffer->format->nSamplesPerSec
+			|| voice->format.wBitsPerSample != buffer->format->wBitsPerSample))
+	{
+		voice->voice->DestroyVoice();
+		voice->voice = nullptr;
+	}
 
 	// Stop and remove any pending buffers first.
 	if (voice->voice)
@@ -533,6 +635,9 @@ void MGA_Voice_AppendBuffer(MGA_Voice* voice, mgbyte* buffer, mguint size)
 {
 	assert(voice != nullptr);
 	assert(buffer != nullptr);
+
+	if (voice->voice == nullptr)
+		return;
 
 	// Find a free buffer.
 	MGA_RawBuffer* raw = nullptr;
@@ -579,6 +684,9 @@ void MGA_Voice_Play(MGA_Voice* voice, mgbyte looped)
 {
 	assert(voice != nullptr);
 
+	if (voice->voice == nullptr)
+		return;
+
 	if (voice->buffer != nullptr)
 	{
 		voice->voice->Stop();
@@ -623,12 +731,15 @@ void MGA_Voice_Resume(MGA_Voice* voice)
 {
 	assert(voice != nullptr);
 
+	if (voice->voice == nullptr)
+		return;
+
 	if (voice->state != MGSoundState::Paused)
 	{
 		MGA_Voice_Play(voice, voice->looped);
 		return;
 	}
-	
+
 	voice->voice->Start();
 	voice->state = MGSoundState::Playing;
 }
@@ -680,6 +791,9 @@ mgulong MGA_Voice_GetPosition(MGA_Voice* voice)
 
 static void MGA_Voice_UpdateOutputMatrix(MGA_Voice* voice)
 {
+	if (voice->voice == nullptr)
+		return;
+
 	XAUDIO2_VOICE_DETAILS details;
 	memset(&details, 0, sizeof(details));
 	voice->voice->GetVoiceDetails(&details);
@@ -707,13 +821,21 @@ static void MGA_Voice_UpdateOutputMatrix(MGA_Voice* voice)
 void MGA_Voice_SetPan(MGA_Voice* voice, mgfloat pan)
 {
 	assert(voice != nullptr);
+
+	if (voice->voice == nullptr)
+		return;
+
 	voice->pan = pan;
+
 	MGA_Voice_UpdateOutputMatrix(voice);
 }
 
 void MGA_Voice_SetPitch(MGA_Voice* voice, mgfloat pitch)
 {
 	assert(voice != nullptr);
+
+	if (voice->voice == nullptr)
+		return;
 
 	float ratio = powf(2.0f, pitch);
 	voice->voice->SetFrequencyRatio(ratio);
@@ -722,12 +844,19 @@ void MGA_Voice_SetPitch(MGA_Voice* voice, mgfloat pitch)
 void MGA_Voice_SetVolume(MGA_Voice* voice, mgfloat volume)
 {
 	assert(voice != nullptr);
+
+	if (voice->voice == nullptr)
+		return;
+
 	voice->voice->SetVolume(volume);
 }
 
 void MGA_Voice_SetReverbMix(MGA_Voice* voice, mgfloat mix)
 {
 	assert(voice != nullptr);
+
+	if (voice->voice == nullptr)
+		return;
 
 	if (mix < 0)
 		voice->reverbMix = 0.0f;
@@ -768,6 +897,9 @@ void MGA_Voice_SetFilterMode(MGA_Voice* voice, MGFilterMode mode, mgfloat filter
 {
 	assert(voice != nullptr);
 
+	if (voice->voice == nullptr)
+		return;
+
 	XAUDIO2_VOICE_DETAILS details;
 	memset(&details, 0, sizeof(details));
 	voice->voice->GetVoiceDetails(&details);
@@ -791,6 +923,9 @@ void MGA_Voice_SetFilterMode(MGA_Voice* voice, MGFilterMode mode, mgfloat filter
 void MGA_Voice_ClearFilterMode(MGA_Voice* voice)
 {
 	assert(voice != nullptr);
+
+	if (voice->voice == nullptr)
+		return;
 
 	XAUDIO2_FILTER_PARAMETERS params;
 	params.Type = XAUDIO2_FILTER_TYPE::LowPassFilter;

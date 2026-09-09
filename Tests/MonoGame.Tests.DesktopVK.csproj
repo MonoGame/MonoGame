@@ -2,12 +2,13 @@
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>net8.0-windows</TargetFramework>
+    <TargetFramework>net8.0</TargetFramework>
     <RollForward>Major</RollForward>
     <IsPackable>false</IsPackable>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <GenerateProgramFile>false</GenerateProgramFile>
-    <DefineConstants>WINDOWS;VULKAN;DESKTOP</DefineConstants>
+    <DefineConstants>VULKAN;DESKTOP</DefineConstants>
+    <DefineConstants Condition="$([MSBuild]::IsOSPlatform('MacOS'))">$(DefineConstants);MACOS</DefineConstants>
     <Platforms>AnyCPU;ARM64;x64</Platforms>
   </PropertyGroup>
 
@@ -43,20 +44,22 @@
     <None Remove="Framework\WindowsDX\**" />
     <None Remove="obj\**" />
   </ItemGroup>
-
+  
   <PropertyGroup>
-    <NativePlatform Condition="'$(Platform)' == 'ARM64' or '$(Platform)' == 'x64'">$(Platform)</NativePlatform>
-    <NativePlatform Condition="'$(NativePlatform)' == '' And '$(PROCESSOR_ARCHITECTURE)' == 'ARM64'">ARM64</NativePlatform>
+    <_LowerCasePlatform>$([MSBuild]::ValueOrDefault('$(Platform)', '').ToLowerInvariant())</_LowerCasePlatform>
+    <_OSArchitecture>$([System.Runtime.InteropServices.RuntimeInformation]::OSArchitecture.ToString().ToLowerInvariant())</_OSArchitecture>
+    <NativePlatform Condition="'$(_LowerCasePlatform)' == 'arm64' or '$(_LowerCasePlatform)' == 'x64'">$(_LowerCasePlatform)</NativePlatform>
+    <NativePlatform Condition="'$(NativePlatform)' == '' And '$(_OSArchitecture)' != ''">$(_OSArchitecture)</NativePlatform>
     <NativePlatform Condition="'$(NativePlatform)' == ''">x64</NativePlatform>
   </PropertyGroup>
 
-    <ItemGroup>
-		<ProjectReference Include="..\MonoGame.Framework\MonoGame.Framework.Native.csproj" />
-	
-		<NativeLib Include="..\Artifacts\native\mgruntime\desktopvk\windows\$(Configuration)\mgruntime.dll" Condition="Exists('..\Artifacts\native\mgruntime\desktopvk\windows\$(Configuration)\mgruntime.dll')" PackagePath="runtimes\win-$(NativePlatform)\native" />
-	    <NativeLib Include="..\Artifacts\native\mgruntime\desktopvk\linux\$(Configuration)\libmgruntime.so" Condition="Exists('..\Artifacts\native\mgruntime\desktopvk\linux\$(Configuration)\libmgruntime.so')" PackagePath="runtimes\linux-x64\native" />
-	    <NativeLib Include="..\Artifacts\native\mgruntime\desktopvk\macos\$(Configuration)\libmgruntime.dylib" Condition="Exists('..\Artifacts\native\mgruntime\desktopvk\macos\$(Configuration)\libmgruntime.dylib')" PackagePath="runtimes\osx\native" />
-    </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\MonoGame.Framework\MonoGame.Framework.Native.csproj" />
+
+    <NativeLib Include="..\Artifacts\native\mgruntime\desktopvk\windows\$(NativePlatform)\$(Configuration)\mgruntime.dll" Condition="Exists('..\Artifacts\native\mgruntime\desktopvk\windows\$(NativePlatform)\$(Configuration)\mgruntime.dll')" PackagePath="runtimes\win-$(NativePlatform)\native" />
+    <NativeLib Include="..\Artifacts\native\mgruntime\desktopvk\linux\$(NativePlatform)\$(Configuration)\libmgruntime.so" Condition="Exists('..\Artifacts\native\mgruntime\desktopvk\linux\$(NativePlatform)\$(Configuration)\libmgruntime.so')" PackagePath="runtimes\linux-$(NativePlatform)\native" />
+    <NativeLib Include="..\Artifacts\native\mgruntime\desktopvk\macosx\$(Configuration)\libmgruntime.dylib" Condition="Exists('..\Artifacts\native\mgruntime\desktopvk\macosx\$(Configuration)\libmgruntime.dylib')" PackagePath="runtimes\osx\native" />
+  </ItemGroup>
 	
 	<ItemGroup>
 		<Content Include="@(NativeLib)" Visible="false">

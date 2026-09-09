@@ -1,4 +1,4 @@
-﻿using System.IO;
+using System.IO;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Content;
@@ -8,8 +8,8 @@ using NUnit.Framework;
 
 namespace MonoGame.Tests.Content
 {
-    [TestFixture]
     [NonParallelizable]
+    [RunOnUiTestFixture]
     internal class ContentManagerTest : GraphicsDeviceTestFixtureBase
     {
         [Test]

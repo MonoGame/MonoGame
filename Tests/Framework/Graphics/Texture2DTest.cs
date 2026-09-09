@@ -10,23 +10,36 @@ using NUnit.Framework;
 
 namespace MonoGame.Tests.Graphics
 {
-    [TestFixture]
     [NonParallelizable]
-    [RunOnUI]
+    [RunOnUiTestFixture]
     class Texture2DTest : GraphicsDeviceTestFixtureBase
     {
         [Test]
-        [TestCase(1, 1)]
-        [TestCase(8, 8)]
-        [TestCase(31, 7)]
-        [RunOnUI]
-        public void ShouldSetAndGetData(int width, int height)
+        [TestCase(1, 1, false)]
+        [TestCase(8, 8, false)]
+        [TestCase(31, 7, false)]
+#if VULKAN || DIRECTX12
+        [TestCase(1, 1, true)]
+        [TestCase(8, 8, true)]
+        [TestCase(31, 7, true)]
+#endif
+        public void ShouldSetAndGetData(int width, int height, bool useSpan)
         {
             var dataSize = width * height;
             var texture2D = new Texture2D(gd, width, height, false, SurfaceFormat.Color);
             var savedData = new Color[dataSize];
             for (var index = 0; index < dataSize; index++) savedData[index] = new Color(index % 255, index % 255, index % 255);
-            texture2D.SetData(savedData);
+
+            if(useSpan)
+            {
+#if VULKAN || DIRECTX12
+                texture2D.SetData<Color>(savedData.AsSpan());
+#endif
+            }
+            else
+            {
+                texture2D.SetData(savedData);
+            }
 
             var readData = new Color[dataSize];
             texture2D.GetData(readData);
@@ -37,11 +50,15 @@ namespace MonoGame.Tests.Graphics
         }
 
         [Test]
-        [TestCase(1, 1)]
-        [TestCase(8, 8)]
-        [TestCase(31, 7)]
-        [RunOnUI]
-        public void ShouldSetAndGetDataForLevel(int width, int height)
+        [TestCase(1, 1, false)]
+        [TestCase(8, 8, false)]
+        [TestCase(31, 7, false)]
+#if VULKAN || DIRECTX12
+        [TestCase(1, 1, true)]
+        [TestCase(8, 8, true)]
+        [TestCase(31, 7, true)]
+#endif
+        public void ShouldSetAndGetDataForLevel(int width, int height, bool useSpan)
         {
             var texture2D = new Texture2D(gd, width, height, true, SurfaceFormat.Color);
 
@@ -52,7 +69,16 @@ namespace MonoGame.Tests.Graphics
                 var savedData = new Color[levelSize];
                 for (var index = 0; index < levelSize; index++)
                     savedData[index] = new Color(index % 255, index % 255, index % 255);
-                texture2D.SetData(i, null, savedData, 0, savedData.Length);
+                if (useSpan)
+                {
+#if VULKAN || DIRECTX12
+                    texture2D.SetData<Color>(i, null, savedData.AsSpan());
+#endif
+                }
+                else
+                {
+                    texture2D.SetData(i, null, savedData, 0, savedData.Length);
+                }
 
                 var readData = new Color[levelSize];
                 texture2D.GetData(i, null, readData, 0, savedData.Length);
@@ -64,7 +90,6 @@ namespace MonoGame.Tests.Graphics
         }
 
         [Test]
-        [RunOnUI]
         public void ShouldGetDataFromRectangle()
         {
             const int dataSize = 128 * 128;
@@ -94,7 +119,6 @@ namespace MonoGame.Tests.Graphics
         [TestCase(SurfaceFormat.Color, true)]
         [TestCase(SurfaceFormat.ColorSRgb, false)]
         [TestCase(SurfaceFormat.ColorSRgb, true)]
-        [RunOnUI]
         public void DrawWithSRgbFormats(SurfaceFormat textureFormat, bool sRgbSourceTexture)
         {
             PrepareFrameCapture();
@@ -146,14 +170,19 @@ namespace MonoGame.Tests.Graphics
 
 #if !XNA
         [Test]
-        [TestCase(1, 1)]
-        [TestCase(8, 8)]
-        [TestCase(31, 7)]
+        [TestCase(1, 1, false)]
+        [TestCase(8, 8, false)]
+        [TestCase(31, 7, false)]
+#if VULKAN || DIRECTX12
+        [TestCase(1, 1, true)]
+        [TestCase(8, 8, true)]
+        [TestCase(31, 7, true)]
+#endif
+
 #if DESKTOPGL
         [Ignore("Not yet implemented in OpenGL")]
 #endif
-        [RunOnUI]
-        public void ShouldSetAndGetDataForTextureArray(int width, int height)
+        public void ShouldSetAndGetDataForTextureArray(int width, int height, bool useSpan)
         {
             const int arraySize = 4;
             var texture2D = new Texture2D(gd, width, height, true, SurfaceFormat.Color, arraySize);
@@ -166,7 +195,16 @@ namespace MonoGame.Tests.Graphics
                     var savedData = new Color[levelSize];
                     for (var index = 0; index < levelSize; index++)
                         savedData[index] = new Color((index + i) % 255, (index + i) % 255, (index + i) % 255);
-                    texture2D.SetData(j, i, null, savedData, 0, savedData.Length);
+                    if (useSpan)
+                    {
+#if VULKAN || DIRECTX12
+                        texture2D.SetData<Color>(j, i, null, savedData.AsSpan());
+#endif
+                    }
+                    else
+                    {
+                        texture2D.SetData(j, i, null, savedData, 0, savedData.Length);
+                    }
 
                     var readData = new Color[levelSize];
                     texture2D.GetData(j, i, null, readData, 0, readData.Length);
@@ -180,7 +218,6 @@ namespace MonoGame.Tests.Graphics
 
 #if DIRECTX
         [Test]
-        [RunOnUI]
         public void TextureArrayAsRenderTargetAndShaderResource()
         {
             PrepareFrameCapture();
@@ -237,7 +274,6 @@ namespace MonoGame.Tests.Graphics
 #endif
 
         [Test]
-        [RunOnUI]
         public void SetDataRowPitch()
         {
             PrepareFrameCapture();
@@ -295,7 +331,6 @@ namespace MonoGame.Tests.Graphics
         }
 
         [Test]
-        [RunOnUI]
         // Nice small square
         [TestCase(64, 64, SurfaceFormat.Color)]
         // One pixel
@@ -340,7 +375,6 @@ namespace MonoGame.Tests.Graphics
         }
 
         [Test]
-        [RunOnUI]
         // Nice small square
         [TestCase(64, 64, SurfaceFormat.Color)]
         // One pixel

@@ -33,6 +33,10 @@ class NativeGamePlatform : GamePlatform
     {
         GameRunBehavior behavior;
         Handle = MGP.Platform_Create(out behavior);
+        if (Handle == null)
+        {
+            throw new NoSuitableGraphicsDeviceException("Failed to initialize SDL platform!");
+        }
 
         DefaultRunBehavior = behavior;
 
@@ -51,7 +55,13 @@ class NativeGamePlatform : GamePlatform
         get
         {
             if (_system == null)
+            {
                 _system = MGG.GraphicsSystem_Create();
+                if (_system == null)
+                {
+                    throw new NoSuitableGraphicsDeviceException("Failed to initialize graphics system!");
+                }
+            }
 
             return _system;
         }

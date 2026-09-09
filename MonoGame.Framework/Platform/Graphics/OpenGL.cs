@@ -34,6 +34,7 @@ namespace MonoGame.OpenGL
     }
     internal enum DrawBuffersEnum
     {
+        None = 0,
         UnsignedShort,
         UnsignedInt,
     }
@@ -184,6 +185,7 @@ namespace MonoGame.OpenGL
         SampleCoverage = 0x80A0,
         DebugOutputSynchronous = 0x8242,
         DebugOutput = 0x92E0,
+        FramebufferSrgb = 0x8DB9,
     }
 
     internal enum VertexPointerType
@@ -426,6 +428,7 @@ namespace MonoGame.OpenGL
         // ETC1
         Etc1 = 0x8D64,
         Srgb = 0x8C40,
+        Srgb8Alpha8 = 0x8C43,
 
         // ETC2 RGB8A1
         Etc2Rgb8 = 0x9274,
@@ -1581,15 +1584,19 @@ namespace MonoGame.OpenGL
 
         protected unsafe static IntPtr MarshalStringToPtr (string str)
         {
-            if (string.IsNullOrEmpty (str)) {
+            if (string.IsNullOrEmpty (str))
+            {
                 return IntPtr.Zero;
             }
             int num = Encoding.ASCII.GetMaxByteCount (str.Length) + 1;
             IntPtr intPtr = Marshal.AllocHGlobal (num);
-            if (intPtr == IntPtr.Zero) {
+            if (intPtr == IntPtr.Zero)
+            {
                 throw new OutOfMemoryException ();
             }
-            fixed (char* chars = str + RuntimeHelpers.OffsetToStringData / 2) {
+            
+            fixed (char* chars = str)
+            {
                 int bytes = Encoding.ASCII.GetBytes (chars, str.Length, (byte*)((void*)intPtr), num);
                 Marshal.WriteByte (intPtr, bytes, 0);
                 return intPtr;

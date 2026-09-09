@@ -196,11 +196,11 @@ namespace Microsoft.Xna.Framework.Graphics
         /// Vector2[] texCoords = new Vector2[numVertices];
         /// vertexBuffer.SetData(12, texCoords, 0, numVertices, vertexBuffer.VertexDeclaration.VertexStride);
         /// </code>
-        /// </remarks>
-        /// <remarks>
+        /// <para>
         /// If you provide a <c>byte[]</c> in the <paramref name="data"/> parameter, then you should almost certainly
         /// set <paramref name="vertexStride"/> to <c>1</c>, to avoid leaving any padding between the <c>byte</c> values
         /// when they are copied into the vertex buffer.
+        /// </para>
         /// </remarks>
         public void SetData<T>(int offsetInBytes, T[] data, int startIndex, int elementCount, int vertexStride) where T : struct
         {
@@ -220,7 +220,7 @@ namespace Microsoft.Xna.Framework.Graphics
         /// <param name="elementCount">Number of elements to copy from <paramref name="data"/>.
         /// The combination of <paramref name="startIndex"/> and <paramref name="elementCount"/>
         /// must be within the <paramref name="data"/> array bounds.</param>
-		public void SetData<T>(T[] data, int startIndex, int elementCount) where T : struct
+        public void SetData<T>(T[] data, int startIndex, int elementCount) where T : struct
         {
             var elementSizeInBytes = ReflectionHelpers.FastSizeOf<T>();
             SetDataInternal<T>(0, data, startIndex, elementCount, elementSizeInBytes, SetDataOptions.None);
@@ -233,6 +233,7 @@ namespace Microsoft.Xna.Framework.Graphics
         /// </summary>
         /// <typeparam name="T">Type of elements in the data array.</typeparam>
         /// <param name="data">Data array to be passed to the shader.</param>
+        /// <inheritdoc cref="SetData{T}(int, T[], int, int, int)" path="/remarks"/>
         public void SetData<T>(T[] data) where T : struct
         {
             var elementSizeInBytes = ReflectionHelpers.FastSizeOf<T>();

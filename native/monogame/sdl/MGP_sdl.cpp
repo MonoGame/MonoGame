@@ -202,13 +202,18 @@ MGP_Platform* MGP_Platform_Create(MGGameRunBehavior& behavior)
     //
     //_CrtSetBreakAlloc(327);
 
-	// Check if SDL is already initialized to avoid reference count overflow
 	if (SDL_WasInit(0) == 0) {
-		SDL_Init(
+		if (SDL_Init(
 			SDL_INIT_VIDEO |
 			SDL_INIT_JOYSTICK |
 			SDL_INIT_GAMECONTROLLER |
-			SDL_INIT_HAPTIC);
+			SDL_INIT_HAPTIC) < 0)
+		{
+			printf("SDL_Init failed: %s\n", SDL_GetError());
+            fflush(stdout);
+
+			return nullptr;
+		}
 	}
 
 	SDL_DisableScreenSaver();
@@ -735,6 +740,16 @@ MGP_Window* MGP_Window_Create(
     title = title ? title : "";
 
 	window->window = SDL_CreateWindow((const char*)title, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, width, height, flags);
+	
+	if (window->window == nullptr)
+	{
+		printf("SDL_CreateWindow failed: %s\n", SDL_GetError());
+        fflush(stdout);
+
+		delete window;
+		return nullptr;
+	}
+
     window->windowId = SDL_GetWindowID(window->window);
 
 	platform->windows.push_back(window);

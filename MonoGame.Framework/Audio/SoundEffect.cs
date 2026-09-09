@@ -124,6 +124,7 @@ namespace Microsoft.Xna.Framework.Audio
         
         internal static void Shutdown()
         {
+            SoundEffectInstancePool.Shutdown();
             PlatformShutdown();
             _systemState = SoundSystemState.NotInitialized;
         }
