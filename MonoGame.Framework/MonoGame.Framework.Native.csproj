@@ -13,6 +13,7 @@
     <Configurations>Debug;Release</Configurations>
     <Platforms>AnyCPU</Platforms>
     <IsAotCompatible>true</IsAotCompatible>
+    <Nullable>enable</Nullable>
   </PropertyGroup>
 
   <ItemGroup>
