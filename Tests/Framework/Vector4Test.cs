@@ -1,11 +1,12 @@
 ﻿using Microsoft.Xna.Framework;
 using NUnit.Framework;
+using System;
 using System.ComponentModel;
 using System.Globalization;
 
 namespace MonoGame.Tests.Framework
 {
-    class Vector4Test
+    class Vector4Test : VectorTestBase
     {
         [Test]
         public void TypeConverter()
@@ -230,6 +231,83 @@ namespace MonoGame.Tests.Framework
             Assert.AreEqual(new Vector4(0.0f, 0.0f, 1.0f, 1.0f), Vector4.Round(vector4));
             Assert.AreEqual(new Vector4(0.0f, 0.0f, 1.0f, 1.0f), roundResult);
         }
+
+        [Test]
+        [TestCaseSource(nameof(MidpointRoundingValues))]
+        public void RoundWithMidpointMode(MidpointRounding mode)
+        {
+            // ROUND with a midpoint mode
+
+            Vector4 roundMidpointSrc = new Vector4(0.5f, 1.5f - float.Epsilon, 2.5f + float.Epsilon, 3.5f);
+            var roundMidpointMember = roundMidpointSrc;
+            roundMidpointMember.Round(mode);
+
+            Vector4 roundMidpointResult;
+            Vector4.Round(ref roundMidpointSrc, out roundMidpointResult, mode);
+
+            Vector4 expectedRoundMidpoint = new Vector4(
+                MathF.Round(roundMidpointSrc.X, mode),
+                MathF.Round(roundMidpointSrc.Y, mode),
+                MathF.Round(roundMidpointSrc.Z, mode),
+                MathF.Round(roundMidpointSrc.W, mode)
+            );
+            Assert.AreEqual(expectedRoundMidpoint, roundMidpointMember);
+            Assert.AreEqual(expectedRoundMidpoint, Vector4.Round(roundMidpointSrc, mode));
+            Assert.AreEqual(expectedRoundMidpoint, roundMidpointResult);
+        }
+
+        [Test]
+        [TestCaseSource(nameof(MidpointRoundingValues))]
+
+        public void RoundWithDigitAndMidpointMode(MidpointRounding mode)
+        {
+            // ROUND with a digit and a midpoint mode
+
+            const int digits = 2;
+            Vector4 roundMidpointDigitSrc = new Vector4(0.5f, 1.5f - float.Epsilon, 2.5f + float.Epsilon, 3.5f);
+            var roundMidpointDigitMember = roundMidpointDigitSrc;
+            roundMidpointDigitMember.Round(digits, mode);
+
+            Vector4 roundMidpointDigitResult;
+            Vector4.Round(ref roundMidpointDigitSrc, out roundMidpointDigitResult, digits, mode);
+
+            Vector4 expectedRoundMidpoint = new Vector4(
+                MathF.Round(roundMidpointDigitSrc.X, digits, mode),
+                MathF.Round(roundMidpointDigitSrc.Y, digits, mode),
+                MathF.Round(roundMidpointDigitSrc.Z, digits, mode),
+                MathF.Round(roundMidpointDigitSrc.W, digits, mode)
+            );
+            Assert.AreEqual(expectedRoundMidpoint, roundMidpointDigitMember);
+            Assert.AreEqual(expectedRoundMidpoint, Vector4.Round(roundMidpointDigitSrc, digits, mode));
+            Assert.AreEqual(expectedRoundMidpoint, roundMidpointDigitResult);
+        }
+
+        [Test]
+        public void RoundWithDigit()
+        {
+            // ROUND with a digit
+
+            const int digits = 2;
+
+            Vector4 roundDigitsSrc = new Vector4(0.1f, 0.12f, 0.123f, 0.5678f);
+
+            var roundDigitsMember = roundDigitsSrc;
+            roundDigitsMember.Round(digits);
+
+            Vector4 roundDigitsResult;
+            Vector4.Round(ref roundDigitsSrc, out roundDigitsResult, digits);
+
+            Vector4 expectedRoundDigits = new Vector4(
+                    MathF.Round(roundDigitsSrc.X, digits),
+                    MathF.Round(roundDigitsSrc.Y, digits),
+                    MathF.Round(roundDigitsSrc.Z, digits),
+                    MathF.Round(roundDigitsSrc.W, digits)
+                );
+            Assert.AreEqual(expectedRoundDigits, roundDigitsMember);
+            Assert.AreEqual(expectedRoundDigits, Vector4.Round(roundDigitsSrc, digits));
+            Assert.AreEqual(expectedRoundDigits, roundDigitsResult);
+        }
+
 #endif
     }
 }
