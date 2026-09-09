@@ -2,13 +2,14 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
-using System;
-using System.Linq;
-using System.Threading;
-using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using NUnit.Framework;
+using NUnitLite;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading;
 
 namespace MonoGame.Tests.Graphics
 {
@@ -20,7 +21,11 @@ namespace MonoGame.Tests.Graphics
     class Texture2DThreadingTests : GraphicsDeviceTestFixtureBase
     {
         [Test]
-        public void CreateSetAndGetData()
+        [TestCase(false)]
+#if VULKAN || DIRECTX12
+        [TestCase(true)]
+#endif
+        public void CreateSetAndGetData(bool useSpan)
         {
             const int Width = 32;
             const int Height = 32;
@@ -38,8 +43,16 @@ namespace MonoGame.Tests.Graphics
                     var pixels = new Color[Width * Height];
                     for (int i = 0; i < pixels.Length; i++)
                         pixels[i] = fillColor;
-
-                    texture.SetData(pixels);
+                    if (useSpan)
+                    {
+#if VULKAN || DIRECTX12
+                        texture.SetData<Color>(pixels.AsSpan());
+#endif
+                    }
+                    else
+                    {
+                        texture.SetData(pixels);
+                    }
 
                     readBack = new Color[Width * Height];
                     texture.GetData(readBack);
@@ -62,7 +75,11 @@ namespace MonoGame.Tests.Graphics
         }
 
         [Test]
-        public void BackgroundLoading()
+        [TestCase(false)]
+#if VULKAN || DIRECTX12
+        [TestCase(true)]
+#endif
+        public void BackgroundLoading(bool useSpan)
         {
             const int COUNT = 400;
             const int WIDTH = 128;
@@ -87,8 +104,18 @@ namespace MonoGame.Tests.Graphics
                             pixels[i] = Color.MonoGameOrange;
 
                         barrier.SignalAndWait();
-                        tex.SetData(pixels);
-                        tex.SetData(pixels);
+                        if (useSpan)
+                        {
+#if VULKAN || DIRECTX12
+                            tex.SetData<Color>(pixels.AsSpan());
+                            tex.SetData<Color>(pixels.AsSpan());
+#endif
+                        }
+                        else
+                        {
+                            tex.SetData(pixels);
+                            tex.SetData(pixels);
+                        }
                         loaded.Add(tex);
                     }
                 }
