@@ -1,7 +1,7 @@
 using System;
-using Android.Content;
+using global::Android.Content;
 using Microsoft.Xna.Framework.Media;
-using Android.App;
+using global::Android.App;
 
 namespace Microsoft.Xna.Framework
 {
@@ -11,7 +11,7 @@ namespace Microsoft.Xna.Framework
 		
 		public override void OnReceive(Context context, Intent intent)
 		{
-			Android.Util.Log.Info("MonoGame", intent.Action.ToString());
+			global::Android.Util.Log.Info("MonoGame", intent.Action.ToString());
 			if(intent.Action == Intent.ActionScreenOff)
 			{
                 OnLocked();

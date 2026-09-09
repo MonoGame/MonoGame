@@ -3,8 +3,8 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System;
-using Android.OS;
-using Android.Views;
+using global::Android.OS;
+using global::Android.Views;
 
 namespace Microsoft.Xna.Framework.Input
 {
@@ -174,7 +174,7 @@ namespace Microsoft.Xna.Framework.Input
             var dvc = InputDevice.GetDevice(gamePad._deviceId);
             if (dvc == null)
             {
-                Android.Util.Log.Debug("MonoGame", $"Detected controller disconnect [{index}]");
+                global::Android.Util.Log.Debug("MonoGame", $"Detected controller disconnect [{index}]");
                 gamePad._isConnected = false;
                 return GamePadState.Default;
             }
@@ -221,14 +221,14 @@ namespace Microsoft.Xna.Framework.Input
                 }
                 else if (pad != null && !pad._isConnected && pad._descriptor == device.Descriptor)
                 {
-                    Android.Util.Log.Debug("MonoGame", "Found previous controller [" + i + "] " + device.Name);
+                    global::Android.Util.Log.Debug("MonoGame", "Found previous controller [" + i + "] " + device.Name);
                     pad._deviceId = device.Id;
                     pad._isConnected = true;
                     return pad;
                 }
                 else if (pad == null)
                 {
-                    Android.Util.Log.Debug("MonoGame", "Found new controller [" + i + "] " + device.Name);
+                    global::Android.Util.Log.Debug("MonoGame", "Found new controller [" + i + "] " + device.Name);
                     pad = new AndroidGamePad(device);
                     GamePads[i] = pad;
                     return pad;
@@ -243,7 +243,7 @@ namespace Microsoft.Xna.Framework.Input
             // If we're holding onto a disconnected pad, overwrite it with this one
             if (firstDisconnectedPadId >= 0)
             {
-                Android.Util.Log.Debug("MonoGame", "Found new controller in place of disconnected controller [" + firstDisconnectedPadId + "] " + device.Name);
+                global::Android.Util.Log.Debug("MonoGame", "Found new controller in place of disconnected controller [" + firstDisconnectedPadId + "] " + device.Name);
                 var pad = new AndroidGamePad(device);
                 GamePads[firstDisconnectedPadId] = pad;
                 return pad;
