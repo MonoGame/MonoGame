@@ -1064,7 +1064,7 @@ namespace Microsoft.Xna.Framework
         /// <param name="result">Transformed <see cref="Vector4"/> as an output parameter.</param>
         public static void Transform(ref Vector2 value, ref Quaternion rotation, out Vector4 result)
         {
-            float x = 2 * (0 - rotation.Z * value.Y);
+            float x = -2 * rotation.Z * value.Y;
             float y = 2 * rotation.Z * value.X;
             float z = 2 * (rotation.X * value.Y - rotation.Y * value.X);
 
