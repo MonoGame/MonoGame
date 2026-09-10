@@ -1064,7 +1064,14 @@ namespace Microsoft.Xna.Framework
         /// <param name="result">Transformed <see cref="Vector4"/> as an output parameter.</param>
         public static void Transform(ref Vector2 value, ref Quaternion rotation, out Vector4 result)
         {
-            throw new NotImplementedException();
+            float x = -2 * rotation.Z * value.Y;
+            float y = 2 * rotation.Z * value.X;
+            float z = 2 * (rotation.X * value.Y - rotation.Y * value.X);
+
+            result.X = value.X + x * rotation.W + (rotation.Y * z - rotation.Z * y);
+            result.Y = value.Y + y * rotation.W + (rotation.Z * x - rotation.X * z);
+            result.Z = z * rotation.W + (rotation.X * y - rotation.Y * x);
+            result.W = 1f;
         }
 
         /// <summary>
@@ -1089,7 +1096,14 @@ namespace Microsoft.Xna.Framework
         /// <param name="result">Transformed <see cref="Vector4"/> as an output parameter.</param>
         public static void Transform(ref Vector3 value, ref Quaternion rotation, out Vector4 result)
         {
-            throw new NotImplementedException();
+            float x = 2 * (rotation.Y * value.Z - rotation.Z * value.Y);
+            float y = 2 * (rotation.Z * value.X - rotation.X * value.Z);
+            float z = 2 * (rotation.X * value.Y - rotation.Y * value.X);
+
+            result.X = value.X + x * rotation.W + (rotation.Y * z - rotation.Z * y);
+            result.Y = value.Y + y * rotation.W + (rotation.Z * x - rotation.X * z);
+            result.Z = value.Z + z * rotation.W + (rotation.X * y - rotation.Y * x);
+            result.W = 1f;
         }
 
         /// <summary>
@@ -1118,7 +1132,14 @@ namespace Microsoft.Xna.Framework
         /// <param name="result">Transformed <see cref="Vector4"/> as an output parameter.</param>
         public static void Transform(ref Vector4 value, ref Quaternion rotation, out Vector4 result)
         {
-            throw new NotImplementedException();
+            float x = 2 * (rotation.Y * value.Z - rotation.Z * value.Y);
+            float y = 2 * (rotation.Z * value.X - rotation.X * value.Z);
+            float z = 2 * (rotation.X * value.Y - rotation.Y * value.X);
+
+            result.X = value.X + x * rotation.W + (rotation.Y * z - rotation.Z * y);
+            result.Y = value.Y + y * rotation.W + (rotation.Z * x - rotation.X * z);
+            result.Z = value.Z + z * rotation.W + (rotation.X * y - rotation.Y * x);
+            result.W = value.W;
         }
 
         /// <summary>
