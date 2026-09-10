@@ -125,3 +125,8 @@
 /processorParam:Version=3.8.3.1
 /build:VertexTextureEffect.fx
 
+#begin VertexInterpolationTest.fx
+/importer:EffectImporter
+/processor:EffectProcessor
+/processorParam:DebugMode=Auto
+/build:VertexInterpolationTest.fx

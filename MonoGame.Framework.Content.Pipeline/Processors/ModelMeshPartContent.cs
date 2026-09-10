@@ -12,88 +12,54 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
     /// </summary>
     public sealed class ModelMeshPartContent
     {
-        private IndexCollection _indexBuffer;
-        private MaterialContent _material;
-        private int _numVertices;
-        private int _primitiveCount;
-        private int _startIndex;
-        private VertexBufferContent _vertexBuffer;
-        private int _vertexOffset;
-
-        internal ModelMeshPartContent() { }
-
-        internal ModelMeshPartContent(VertexBufferContent vertexBuffer, IndexCollection indices, int vertexOffset,
-                                      int numVertices, int startIndex, int primitiveCount)
+        internal ModelMeshPartContent(VertexBufferContent? vertexBuffer, IndexCollection? indices, int vertexOffset, int numVertices, int startIndex, int primitiveCount)
         {
-            _vertexBuffer = vertexBuffer;
-            _indexBuffer = indices;
-            _vertexOffset = vertexOffset;
-            _numVertices = numVertices;
-            _startIndex = startIndex;
-            _primitiveCount = primitiveCount;
+            VertexBuffer = vertexBuffer;
+            IndexBuffer = indices;
+            VertexOffset = vertexOffset;
+            NumVertices = numVertices;
+            StartIndex = startIndex;
+            PrimitiveCount = primitiveCount;
         }
-
 
         /// <summary>
         /// Gets the collection of indices for this mesh part.
         /// </summary>
-        public IndexCollection IndexBuffer
-        {
-            get { return _indexBuffer; }
-        }
+        public IndexCollection? IndexBuffer { get; }
 
         /// <summary>
         /// Gets the material of this mesh part.
         /// </summary>
-        public MaterialContent Material
-        {
-            get { return _material; }
-            set { _material = value; }
-        }
+        public MaterialContent? Material { get; set; }
 
         /// <summary>
         /// Gets the number of vertices used in this mesh part.
         /// </summary>
-        public int NumVertices
-        {
-            get { return _numVertices; }
-        }
+        public int NumVertices { get; }
 
         /// <summary>
         /// Gets the number of primitives to render for this mesh part.
         /// </summary>
-        public int PrimitiveCount
-        {
-            get { return _primitiveCount; }
-        }
+        public int PrimitiveCount { get; }
 
         /// <summary>
         /// Gets the location in the index buffer at which to start reading vertices.
         /// </summary>
-        public int StartIndex
-        {
-            get { return _startIndex; }
-        }
+        public int StartIndex { get; }
 
         /// <summary>
         /// Gets a user-defined tag object.
         /// </summary>
-        public object Tag { get; set; }
+        public object? Tag { get; set; }
 
         /// <summary>
         /// Gets the collection of vertices for this mesh part.
         /// </summary>
-        public VertexBufferContent VertexBuffer
-        {
-            get { return _vertexBuffer; }
-        }
+        public VertexBufferContent? VertexBuffer { get; }
 
         /// <summary>
         /// Gets the offset from the start of the index buffer to the first vertex index.
         /// </summary>
-        public int VertexOffset
-        {
-            get { return _vertexOffset; }
-        }
+        public int VertexOffset { get; }
     }
 }

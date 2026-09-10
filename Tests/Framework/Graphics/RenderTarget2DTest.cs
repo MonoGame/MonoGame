@@ -3,6 +3,8 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System;
+using System.Runtime.CompilerServices;
+using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using NUnit.Framework;
@@ -184,5 +186,167 @@ namespace MonoGame.Tests.Graphics
             rt.Dispose();
         }
 #endif
+
+        [Test]
+        [TestCase(DepthFormat.None, 0)]
+        [TestCase(DepthFormat.None, 1)]
+        [TestCase(DepthFormat.None, 4)]
+        [TestCase(DepthFormat.Depth16, 0)]
+        [TestCase(DepthFormat.Depth16, 1)]
+        [TestCase(DepthFormat.Depth16, 4)]
+        [TestCase(DepthFormat.Depth24, 0)]
+        [TestCase(DepthFormat.Depth24, 1)]
+        [TestCase(DepthFormat.Depth24, 4)]
+        [TestCase(DepthFormat.Depth24Stencil8, 0)]
+        [TestCase(DepthFormat.Depth24Stencil8, 1)]
+        [TestCase(DepthFormat.Depth24Stencil8, 4)]
+        public void ClearAndGetDataWithMultiSample(DepthFormat depthFormat, int multiSampleCount)
+        {
+            const int size = 16;
+            var rt = new RenderTarget2D(gd, size, size, mipMap: false, SurfaceFormat.Color, depthFormat, multiSampleCount, RenderTargetUsage.DiscardContents);
+            try
+            {
+                var previousTargets = gd.GetRenderTargets();
+                gd.SetRenderTarget(rt);
+                gd.Clear(Color.MonoGameOrange);
+                gd.SetRenderTargets(previousTargets);
+
+                var pixels = new Color[size * size];
+                rt.GetData(pixels);
+
+                for (int i=0; i < pixels.Length; i++)
+                {
+                    Assert.AreEqual(Color.MonoGameOrange, pixels[i], $"Pixel {i} should be {Color.MonoGameOrange} but was {pixels[i]}");
+                }
+            }
+            finally
+            {
+               rt.Dispose(); 
+            }
+        }
+
+        
+        // Disposed render targets should not stay referenced by the GraphicsDevice.
+        // See issue: https://github.com/MonoGame/MonoGame/issues/9485
+        [Test]
+        [TestCase(DepthFormat.None, 0)]
+        [TestCase(DepthFormat.None, 4)]
+        [TestCase(DepthFormat.Depth16, 0)]
+        [TestCase(DepthFormat.Depth16, 4)]
+        [TestCase(DepthFormat.Depth24, 0)]
+        [TestCase(DepthFormat.Depth24, 4)]
+        [TestCase(DepthFormat.Depth24Stencil8, 0)]
+        [TestCase(DepthFormat.Depth24Stencil8, 4)]
+        public void DisposeAfterUse_NonMsaaRenderTarget_DoesNotRemainReferencedByGraphicsDevice(DepthFormat depthFormat, int preferredMultiSampleCount)
+        {
+            WeakReference weakRef = CreateAndDisposeRenderTarget(depthFormat, preferredMultiSampleCount);
+
+            GC.Collect();
+            GC.WaitForPendingFinalizers();
+            GC.Collect();
+
+            Assert.False(
+                weakRef.IsAlive,
+                "Disposed RenderTarget2D was still strongly referenced by the GraphicsDevice.");
+        }
+
+        // Keep creation and disposal out of the test method so the JIT does not extend the local lifetime.
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        private WeakReference CreateAndDisposeRenderTarget(DepthFormat depthFormat, int preferredMultiSampleCount)
+        {
+            RenderTarget2D renderTarget = new RenderTarget2D(
+                gd,
+                16,
+                16,
+                false,
+                SurfaceFormat.Color,
+                depthFormat,
+                preferredMultiSampleCount,
+                RenderTargetUsage.DiscardContents);
+
+            gd.SetRenderTarget(renderTarget);
+            gd.Clear(Color.CornflowerBlue);
+            gd.SetRenderTarget(null);
+
+            renderTarget.Dispose();
+
+            return new WeakReference(renderTarget);
+        }
+
+        [Test]
+        public void TestRenderTargetSync()
+        {
+            // This test is based on issue:
+            // https://github.com/MonoGame/MonoGame/issues/9425
+
+            var accumulationRenderTarget = new RenderTarget2D(
+                gd,
+                400,
+                200,
+                false, //Also fixed if mipMap is set to true
+                SurfaceFormat.Color,
+                DepthFormat.None,
+                0,
+                RenderTargetUsage.PreserveContents);
+
+            var auxRenderTarget = new RenderTarget2D(gd, 600, 600);
+
+            var spriteBatch = new SpriteBatch(gd);
+
+            var whiteSquareTexture = new Texture2D(gd, 1, 1);
+            whiteSquareTexture.SetData(new Color[] { Color.White });
+
+            var maxBlendState = new BlendState
+            {
+                ColorSourceBlend = Blend.One,
+                ColorDestinationBlend = Blend.One,
+                ColorBlendFunction = BlendFunction.Max,
+                AlphaSourceBlend = Blend.One,
+                AlphaDestinationBlend = Blend.One,
+                AlphaBlendFunction = BlendFunction.Max,
+            };
+
+            var _rectangles = new List<Rectangle>
+            {
+                new(0, 0, 200, 200),
+                new(200, 0, 200, 200)
+            };
+
+
+            // Do this a few times as we could get lucky
+            // and not have a GPU artifact on one test.
+
+            for (int t = 0; t < 6; t++)
+            {
+                gd.SetRenderTarget(accumulationRenderTarget);
+                gd.Clear(Color.Red);
+
+                for (int i = 0; i < _rectangles.Count; i++)
+                {
+                    gd.SetRenderTarget(auxRenderTarget);
+                    gd.Clear(Color.Black);
+
+                    spriteBatch.Begin();
+                    spriteBatch.Draw(whiteSquareTexture, _rectangles[i], Color.White * 0.75f);
+                    spriteBatch.End();
+
+                    gd.SetRenderTarget(accumulationRenderTarget);
+
+                    spriteBatch.Begin(blendState: maxBlendState);
+                    spriteBatch.Draw(auxRenderTarget, Vector2.Zero, Color.White * 0.75f);
+                    spriteBatch.End();
+                }
+
+                var data = accumulationRenderTarget.GetColorData();
+
+                var good = new Color(255, 143, 143, 255);
+                foreach (var color in data)
+                {
+                    // Some graphics drivers can be off in color because of
+                    // subtle blend math optimizations... so use a tolerance.
+                    Assert.True(good.AreEqual(color, 2), $"Color mismatch! {color} should be {good}");
+                }
+            }
+        }
     }
 }

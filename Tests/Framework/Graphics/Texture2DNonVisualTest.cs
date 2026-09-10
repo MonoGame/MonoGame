@@ -652,6 +652,299 @@ namespace MonoGame.Tests.Graphics
             }
         }
 
+#if VULKAN || DIRECTX12
+        [Test]
+        [TestCase(4096)]
+        public void SetDataWithSpan1ParameterGoodTest(int arraySize)
+        {
+            using (System.IO.StreamReader reader = new System.IO.StreamReader("Assets/Textures/LogoOnly_64px.png"))
+            {
+                Color[] data = new Color[arraySize];
+                
+                Color[] reference = new Color[4096];
+                Color[] written = new Color[4096];
+                for (int i = 0; i < arraySize; i++)
+                {
+                    data[i] = Color.White;
+                }
+                ReadOnlySpan<Color> dataAsSpan = data.AsSpan();
+                Texture2D t = Texture2D.FromStream(gd, reader.BaseStream);
+                t.GetData(reference);
+                t.SetData(dataAsSpan);
+                t.GetData(written);
+                for (int i = 0; i < written.Length; i++)
+                {
+                    if (i < arraySize)
+                    {
+                        Assert.AreEqual(255, written[i].R, "Bad color written in position:{0};", i);
+                        Assert.AreEqual(255, written[i].G, "Bad color written in position:{0};", i);
+                        Assert.AreEqual(255, written[i].B, "Bad color written in position:{0};", i);
+                        Assert.AreEqual(255, written[i].A, "Bad color written in position:{0};", i);
+                    }
+                    else
+                    {
+                        Assert.AreEqual(reference[i].R, written[i].R, "Color written in position:{0}; beyond array data", i);
+                        Assert.AreEqual(reference[i].G, written[i].G, "Color written in position:{0}; beyond array data", i);
+                        Assert.AreEqual(reference[i].B, written[i].B, "Color written in position:{0}; beyond array data", i);
+                        Assert.AreEqual(reference[i].A, written[i].A, "Color written in position:{0}; beyond array data", i);
+                    }
+                }
+
+                t.Dispose();
+            }
+        }
+
+        [Test]
+        [TestCase(2000)]
+        [TestCase(4095)]
+        [TestCase(2000000)]
+        [TestCase(4097)]
+        public void SetDataWithSpan1ParameterExceptionTest(int arraySize)
+        {
+            using (System.IO.StreamReader reader = new System.IO.StreamReader("Assets/Textures/LogoOnly_64px.png"))
+            {
+                Color[] data = new Color[arraySize];
+                Color[] reference = new Color[4096];
+                Color[] written = new Color[4096];
+                for (int i = 0; i < arraySize; i++)
+                {
+                    data[i] = Color.White;
+                }
+                ReadOnlySpan<Color> dataAsSpan = data.AsSpan();
+                Texture2D t = Texture2D.FromStream(gd, reader.BaseStream);
+                t.GetData(reference);
+                // Span is ref local and can't be passed in the lambda for Assert.Throws, hence the try-catch
+                bool exceptionThrown = false;
+                try
+                {
+                    t.SetData(dataAsSpan);
+                }
+                catch (Exception ex)
+                {
+                    exceptionThrown = true;
+                }
+                Assert.True(exceptionThrown);
+                t.GetData(written);
+                for (int i = 0; i < written.Length; i++)
+                {
+                    Assert.AreEqual(reference[i].R, written[i].R, "Bad color written in position:{0};", i);
+                    Assert.AreEqual(reference[i].G, written[i].G, "Bad color written in position:{0};", i);
+                    Assert.AreEqual(reference[i].B, written[i].B, "Bad color written in position:{0};", i);
+                    Assert.AreEqual(reference[i].A, written[i].A, "Bad color written in position:{0};", i);
+                }
+                t.Dispose();
+            }
+        }
+
+        [Test]
+        [TestCase(SurfaceFormat.HalfSingle, (short)(160 << 8 + 120))]
+        // format not supported
+        [TestCase(SurfaceFormat.Vector4, (long)(200 << 48 + 180 << 32 + 160 << 16 + 120))]
+        [TestCase(SurfaceFormat.Vector2, (float)(200 << 48 + 180 << 32 + 160 << 16 + 120))]
+        [TestCase(SurfaceFormat.Color, (float)(200 << 24 + 180 << 16 + 160 << 8 + 120))]
+        [TestCase(SurfaceFormat.Color, (byte)150)]
+        [TestCase(SurfaceFormat.Color, (short)(160 << 8 + 120))]
+        [TestCase(SurfaceFormat.Single, (byte)150)]
+        [TestCase(SurfaceFormat.Single, (short)(160 << 8 + 120))]
+        [TestCase(SurfaceFormat.Single, (float)(200 << 24 + 180 << 16 + 160 << 8 + 120))]
+        public void SetDataASSpanFormatTest<TBuffer>(SurfaceFormat format, TBuffer value) where TBuffer : struct
+        {
+            const int textureSize = 16;
+
+            var surfaceFormatSize = GetFormatSize(format);
+            var textureSizeBytes = textureSize * surfaceFormatSize;
+
+            var tSizeBytes = Marshal.SizeOf(typeof(TBuffer));
+            var bufferSize = textureSizeBytes / tSizeBytes;
+
+            var buffer = new TBuffer[bufferSize];
+            for (var i = 0; i < bufferSize; i++)
+                buffer[i] = value;
+
+            var t = new Texture2D(gd, textureSize, 1, false, format);
+            ReadOnlySpan<TBuffer>bufferAsSpan = buffer.AsSpan();
+            t.SetData(bufferAsSpan);
+
+            var buffer2 = new TBuffer[bufferSize];
+            t.GetData(buffer2);
+
+            for (var i = 0; i < buffer.Length; i++)
+                Assert.AreEqual(buffer[i], buffer2[i]);
+
+            t.Dispose();
+        }
+
+        [Test]
+        [TestCase(SurfaceFormat.Color, (long)0)]
+        [TestCase(SurfaceFormat.HalfSingle, (float)0)]
+        public void SetDataWithSpanFormatFailingTestTBufferTooLarge<TBuffer>(SurfaceFormat format, TBuffer value) where TBuffer : struct
+        {
+            const int textureSize = 16;
+
+            var surfaceFormatSize = GetFormatSize(format);
+            var textureSizeBytes = textureSize * surfaceFormatSize;
+
+            var tSizeBytes = Marshal.SizeOf(typeof(TBuffer));
+            var bufferSize = textureSizeBytes / tSizeBytes;
+
+            var buffer = new TBuffer[bufferSize];
+            for (var i = 0; i < bufferSize; i++)
+                buffer[i] = value;
+
+            var t = new Texture2D(gd, textureSize, 1, false, format);
+            ReadOnlySpan<TBuffer> bufferAsSpan = buffer.AsSpan();
+            // Span is ref local and can't be passed in the lambda for Assert.Throws, hence the try-catch
+            bool exceptionThrown = false;
+            try
+            {
+                t.SetData(bufferAsSpan);
+            }
+            catch (ArgumentException ex)
+            {
+                exceptionThrown = true;
+            }
+            Assert.True(exceptionThrown);
+
+            t.Dispose();
+        }
+
+        [Test]
+        public void SetDataWithSpanFormatFailingTestModTBufferNotZero()
+        {
+            const int textureSize = 12;
+            var format = SurfaceFormat.Vector4;
+            var value = new Vector3(20, 15, 18);
+
+            var surfaceFormatSize = GetFormatSize(format);
+            var textureSizeBytes = textureSize * surfaceFormatSize;
+
+            var tSizeBytes = 12;
+            var bufferSize = textureSizeBytes / tSizeBytes;
+
+            var buffer = new Vector3[bufferSize];
+            for (var i = 0; i < bufferSize; i++)
+                buffer[i] = value;
+
+            var t = new Texture2D(gd, textureSize, 1, false, format);
+            ReadOnlySpan<Vector3> bufferAsSpan = buffer.AsSpan();
+            // Span is ref local and can't be passed in the lambda for Assert.Throws, hence the try-catch
+            bool exceptionThrown = false;
+            try
+            {
+                t.SetData(bufferAsSpan);
+            }
+            catch (ArgumentException ex)
+            {
+                exceptionThrown = true;
+            }
+            Assert.True(exceptionThrown);
+
+            t.Dispose();
+        }
+
+        [Test]
+        [TestCase(4096, false)]
+        [TestCase(4096, true)]
+        public void SetDataWithSpan3And4ParameterGoodTest(int arraySize, bool use4Params)
+        {
+            using (System.IO.StreamReader reader = new System.IO.StreamReader("Assets/Textures/LogoOnly_64px.png"))
+            {
+                Color[] data = new Color[arraySize];
+                Color[] written = new Color[4096];
+                Color[] reference = new Color[4096];
+                for (int i = 0; i < arraySize; i++)
+                {
+                    data[i] = Color.White;
+                }
+                Texture2D t = Texture2D.FromStream(gd, reader.BaseStream);
+                ReadOnlySpan<Color> dataAsSpan = data.AsSpan();
+                t.GetData(reference);
+                if(use4Params)
+                {
+                    t.SetData(0, new Rectangle(0, 0, 64, 64), dataAsSpan);
+                }
+                else
+                {
+                    t.SetData(0, 0, new Rectangle(0, 0, 64, 64), dataAsSpan);
+                }
+                
+                t.GetData(written);
+                for (int i = 0; i < written.Length; i++)
+                {
+                    if (i < arraySize)
+                    {
+                        Assert.AreEqual(255, written[i].R, "Bad color written in position:{0};", i);
+                        Assert.AreEqual(255, written[i].G, "Bad color written in position:{0};", i);
+                        Assert.AreEqual(255, written[i].B, "Bad color written in position:{0};", i);
+                        Assert.AreEqual(255, written[i].A, "Bad color written in position:{0};", i);
+                    }
+                    else
+                    {
+                        Assert.AreEqual(reference[i].R, written[i].R, "Color written in position:{0}; beyond array data", i);
+                        Assert.AreEqual(reference[i].G, written[i].G, "Color written in position:{0}; beyond array data", i);
+                        Assert.AreEqual(reference[i].B, written[i].B, "Color written in position:{0}; beyond array data", i);
+                        Assert.AreEqual(reference[i].A, written[i].A, "Color written in position:{0}; beyond array data", i);
+                    }
+                }
+
+                t.Dispose();
+            }
+        }
+
+        [Test]
+        [TestCase(4095, 0, 0, 64, 64, false)]
+        [TestCase(4097, 0, 0, 64, 64, false)]
+        [TestCase(4096, -1, -1, 64, 64, false)]
+        [TestCase(4096, 0, 0, -64, -64, false)]
+        [TestCase(4095, 0, 0, 64, 64, true)]
+        [TestCase(4097, 0, 0, 64, 64, true)]
+        [TestCase(4096, -1, -1, 64, 64, true)]
+        [TestCase(4096, 0, 0, -64, -64, true)]
+        public void SetDataWithSpan3and4ParameterExceptionTest(int arraySize, int x, int y, int w, int h, bool use4Params)
+        { 
+            using (System.IO.StreamReader reader = new System.IO.StreamReader("Assets/Textures/LogoOnly_64px.png"))
+            {
+                Color[] data = new Color[arraySize];
+                Color[] written = new Color[4096];
+                Color[] reference = new Color[4096];
+                for (int i = 0; i < arraySize; i++)
+                {
+                    data[i] = Color.White;
+                }
+                Texture2D t = Texture2D.FromStream(gd, reader.BaseStream);
+                ReadOnlySpan<Color> dataAsSpan = data.AsSpan();
+                t.GetData(reference);
+                bool exceptionThrown = false;
+                try
+                {
+                    if (use4Params)
+                    {
+                        t.SetData(0, new Rectangle(x, y, w, h), dataAsSpan);
+                    }
+                    else
+                    {
+                        t.SetData(0, 0, new Rectangle(x, y, w, h), dataAsSpan);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    exceptionThrown = true;
+                }
+                Assert.True(exceptionThrown);
+                t.GetData(written);
+                for (int i = 0; i < written.Length; i++)
+                {
+                    Assert.AreEqual(reference[i].R, written[i].R, "Bad color written in position:{0};", i);
+                    Assert.AreEqual(reference[i].G, written[i].G, "Bad color written in position:{0};", i);
+                    Assert.AreEqual(reference[i].B, written[i].B, "Bad color written in position:{0};", i);
+                    Assert.AreEqual(reference[i].A, written[i].A, "Bad color written in position:{0};", i);
+                }
+
+                t.Dispose();
+            }
+        }
+#endif
+
         [Test]
         public void GetAndSetDataDxtCompressed()
         {

@@ -128,9 +128,11 @@ namespace DX {
     inline void ThrowIfFailed(HRESULT hr)
     {
         if (FAILED(hr)) {
-#ifdef _DEBUG
             char str[64] = {};
             sprintf_s(str, "**ERROR** Fatal Error with HRESULT of %08X\n", static_cast<unsigned int>(hr));
+            fprintf(stderr, "%s", str);
+            fflush(stderr);
+#ifdef _DEBUG
             OutputDebugStringA(str);
             if (IsDebuggerPresent())
                 __debugbreak();
@@ -168,6 +170,8 @@ namespace DX {
         return size;
     }
 }
+
+extern bool MGG_EnableDebugLayer;
 
 // Enable off by default warnings to improve code conformance
 #pragma warning(default : 4061 4062 4191 4242 4263 4264 4265 4266 4289 4365 4746 4826 4841 4986 4987 5029 5038 5042)

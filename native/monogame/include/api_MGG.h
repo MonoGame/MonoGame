@@ -64,7 +64,7 @@ MG_EXPORT MGG_RasterizerState* MGG_RasterizerState_Create(MGG_GraphicsDevice* de
 MG_EXPORT void MGG_RasterizerState_Destroy(MGG_GraphicsDevice* device, MGG_RasterizerState* state);
 MG_EXPORT MGG_SamplerState* MGG_SamplerState_Create(MGG_GraphicsDevice* device, MGG_SamplerState_Info* info);
 MG_EXPORT void MGG_SamplerState_Destroy(MGG_GraphicsDevice* device, MGG_SamplerState* state);
-MG_EXPORT MGG_Buffer* MGG_Buffer_Create(MGG_GraphicsDevice* device, MGBufferType type, mgint sizeInBytes);
+MG_EXPORT MGG_Buffer* MGG_Buffer_Create(MGG_GraphicsDevice* device, MGBufferType type, mgbool dynamic, mgint sizeInBytes);
 MG_EXPORT void MGG_Buffer_Destroy(MGG_GraphicsDevice* device, MGG_Buffer* buffer);
 MG_EXPORT void MGG_Buffer_SetData(MGG_GraphicsDevice* device, MGG_Buffer*& buffer, mgint offset, mgbyte* data, mgint elementCount, mgint vertexStride, mgint elementSizeInBytes, mgbool discard);
 MG_EXPORT void MGG_Buffer_GetData(MGG_GraphicsDevice* device, MGG_Buffer* buffer, mgint offset, mgbyte* data, mgint dataCount, mgint dataBytes, mgint dataStride);

@@ -56,10 +56,7 @@ namespace MonoGame.Effect
         /// <summary>
         /// Returns the profile by name or null if no match is found.
         /// </summary>
-        public static ShaderProfile FromName(string name)
-        {
-            return _profiles.FirstOrDefault(p => p.Name == name);
-        }
+        public static ShaderProfile FromName(string name) => _profiles.FirstOrDefault(p => p.Name == name) ?? throw new Exception($"No shader profile for: {name} found.");
 
         internal abstract void AddMacros(Dictionary<string, string> macros);
 
@@ -86,13 +83,13 @@ namespace MonoGame.Effect
             TargetPlatform.Windows => ShaderProfile.DirectX_11,
             TargetPlatform.iOS or TargetPlatform.Android or TargetPlatform.DesktopGL or TargetPlatform.MacOSX or TargetPlatform.RaspberryPi or TargetPlatform.Web => ShaderProfile.OpenGL,
             TargetPlatform.DesktopVK => ShaderProfile.Vulkan,
-            TargetPlatform.WindowsDX12 or TargetPlatform.XboxOne or TargetPlatform.XboxSeries => ShaderProfile.DirectX_12,
+            TargetPlatform.WindowsDX12 => ShaderProfile.DirectX_12,
             _ => ShaderProfile.FromName(platform.ToString())
         };
 
         private class StringConverter : TypeConverter
         {
-            public override object ConvertFrom(ITypeDescriptorContext context, CultureInfo culture, object value)
+            public override object? ConvertFrom(ITypeDescriptorContext? context, CultureInfo? culture, object value)
             {
                 if (value is string)
                 {

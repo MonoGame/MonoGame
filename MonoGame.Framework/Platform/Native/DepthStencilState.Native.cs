@@ -25,6 +25,11 @@ public partial class DepthStencilState
             info.stencilDepthBufferFail = StencilDepthBufferFail;
             info.stencilFail = StencilFail;
             info.stencilPass = StencilPass;
+            info.twoSidedStencilMode = TwoSidedStencilMode;
+            info.counterClockwiseStencilFunction = CounterClockwiseStencilFunction;
+            info.counterClockwiseStencilDepthBufferFail = CounterClockwiseStencilDepthBufferFail;
+            info.counterClockwiseStencilFail = CounterClockwiseStencilFail;
+            info.counterClockwiseStencilPass = CounterClockwiseStencilPass;
 
             Handle = MGG.DepthStencilState_Create(device.Handle, &info);
         }

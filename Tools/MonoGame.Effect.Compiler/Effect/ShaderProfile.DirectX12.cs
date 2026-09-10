@@ -4,6 +4,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -21,6 +22,11 @@ namespace MonoGame.Effect
         {
         }
 
+        protected DirectX12ShaderProfile(string name, byte formatId)
+            : base(name, formatId)
+        {
+        }
+
         internal override void AddMacros(Dictionary<string, string> macros)
         {
             macros.Add("HLSL", "1");
@@ -32,13 +38,13 @@ namespace MonoGame.Effect
             if (!string.IsNullOrEmpty(pass.vsFunction))
             {
                 if (pass.vsModel != "vs_6_0")
-                    throw new Exception(String.Format("Invalid DirectX 12 vertex profile '{0}'! Requires vs_6_0.", pass.vsModel));
+                    throw new Exception($"Invalid DirectX 12 vertex profile '{pass.vsModel}'! Requires vs_6_0.");
             }
 
             if (!string.IsNullOrEmpty(pass.psFunction))
             {
                 if (pass.psModel != "ps_6_0")
-                    throw new Exception(String.Format("Invalid DirectX 12 pixel profile '{0}'! Requires ps_6_0.", pass.psModel));
+                    throw new Exception($"Invalid DirectX 12 pixel profile '{pass.psModel}'! Requires ps_6_0.");
             }
         }
 
@@ -47,6 +53,11 @@ namespace MonoGame.Effect
         private static readonly Regex ResourceSampler = new Regex(@";[\W]+(?<ResName>[\S]+)[\W]+sampler[\W]+(?<ResFormat>[\S]+)[\W]+(?<ResDim>[\S]+)[\W]+[\S]+[\W]+s(?<ResBind>[\d]*)[\W]+(?<ResCount>[\d]*)", RegexOptions.Compiled);
         private static readonly Regex ResourceTexture = new Regex(@";[\W]+(?<ResName>[\S]+)[\W]+texture[\W]+(?<ResFormat>[\S]+)[\W]+(?<ResDim>[\S]+)[\W]+[\S]+[\W]+t(?<ResBind>[\d]*)[\W]+(?<ResCount>[\d]*)", RegexOptions.Compiled);
         private static readonly Regex InputAttribute = new Regex(@"; (\w+)\s+(\d+)\s+([xyzw]+)\s+(\d+)\s+(\w+)\s+(\w+)\s+([xyzw]+)", RegexOptions.Multiline | RegexOptions.Compiled);
+
+        protected virtual int RunTool(string arguments, out string stdout, out string stderr)
+        {
+            return Dxc.Run(arguments, out stdout, out stderr);
+        }
 
         internal override ShaderData CreateShader(ShaderResult shaderResult, string shaderFunction, string shaderProfile, bool isVertexShader, EffectObject effect, ref string errorsAndWarnings)
         {
@@ -81,7 +92,7 @@ namespace MonoGame.Effect
 
                 // Compile the shader once just to get reflection info.
                 string stdout, stderr;
-                var result = Dxc.Run(toolArgs + "\"" + inputFile + "\"", out reflectionData, out stderr);
+                var result = RunTool(toolArgs + "\"" + inputFile + "\"", out reflectionData, out stderr);
                 errorsAndWarnings += stderr;
                 if (result > 0)
                     throw new ShaderCompilerException();
@@ -104,7 +115,7 @@ namespace MonoGame.Effect
                 }
 
                 toolArgs += "/Fo " + "\"" + outputFile + "\"" + " ";
-                result = Dxc.Run(toolArgs + "\"" + inputFile + "\"", out stdout, out stderr);
+                result = RunTool(toolArgs + "\"" + inputFile + "\"", out stdout, out stderr);
                 errorsAndWarnings += stderr;
                 if (result > 0)
                     throw new ShaderCompilerException();
@@ -128,7 +139,6 @@ namespace MonoGame.Effect
 
             // Create a new shader.
             var shaderData = new ShaderData(isVertexShader, effect.Shaders.Count, bytecode);
-            shaderData.ShaderCode = shaderData.Bytecode;
 
             // Gather the input attributes.
             var attributes = new List<ShaderData.Attribute>();
@@ -150,13 +160,15 @@ namespace MonoGame.Effect
                     //var format = match.Groups[6].Value;
 
                     // Get the element index.
-                    a.index = int.Parse(match.Groups[2].Value);
+                    a.index = int.Parse(match.Groups[2].Value, CultureInfo.InvariantCulture);
 
                     // Get the element type.
                     var name = match.Groups[1].Value;
-                    switch (name.ToUpper())
+                    switch (name.ToUpper(CultureInfo.InvariantCulture))
                     {
                         default:
+                            // Give a warning which hopefully someone notices.
+                            errorsAndWarnings += $"Unknown vertex shader input semantic `{name}`; defaulting to texture coord.\n";
                             a.usage = VertexElementUsage.TextureCoordinate;
                             break;
                         case "POSITION":
@@ -170,6 +182,9 @@ namespace MonoGame.Effect
                             break;
                         case "BINORMAL":
                             a.usage = VertexElementUsage.Binormal;
+                            break;
+                        case "TEXCOORD":
+                            a.usage = VertexElementUsage.TextureCoordinate;
                             break;
                         case "COLOR":
                             a.usage = VertexElementUsage.Color;
@@ -195,7 +210,7 @@ namespace MonoGame.Effect
                     }
 
                     // TODO: These are unused at runtime under the
-                    // new native backends, we will remove them soon.               
+                    // new native backends, we will remove them soon.
                     a.location = 0;
                     a.name = string.Empty;
 
@@ -208,7 +223,7 @@ namespace MonoGame.Effect
             var cbuffers = new List<ConstantBufferData>();
             {
                 var reader = new StringReader(reflectionData);
-                ConstantBufferData current = null;
+                ConstantBufferData? current = null;
                 for(;;)
                 {
                     var line = reader.ReadLine();
@@ -222,9 +237,9 @@ namespace MonoGame.Effect
 
                     if (line.StartsWith("; cbuffer "))
                     {
-                        var name = line.Substring(10);
+                        var name = line[10..];
                         current = new ConstantBufferData(name);
-                        continue;                        
+                        continue;
                     }
 
                     // Nothing to do if we're not in a cbuffer block.
@@ -235,7 +250,7 @@ namespace MonoGame.Effect
                     if (cbufmatch.Success)
                     {
                         var cBufferSize = cbufmatch.Groups[3].Value;
-                        current.SetSize(int.Parse(cBufferSize));
+                        current.SetSize(int.Parse(cBufferSize, CultureInfo.InvariantCulture));
                         cbuffers.Add(current);
                         current = null;
                         continue;
@@ -247,7 +262,7 @@ namespace MonoGame.Effect
                         var paramType = match.Groups[1].Value;
                         var paramName = match.Groups[2].Value;
                         var paramOffset = match.Groups[3].Value;
-                        current.AddParameter(paramName, paramType, int.Parse(paramOffset));
+                        current.AddParameter(paramName, paramType, int.Parse(paramOffset, CultureInfo.InvariantCulture));
                         continue;
                     }
                 }
@@ -297,7 +312,7 @@ namespace MonoGame.Effect
                         var samplerDesc = new ShaderData.Sampler()
                         {
                             samplerName = samplerName,
-                            samplerSlot = int.Parse(samplerSlot),
+                            samplerSlot = int.Parse(samplerSlot, CultureInfo.InvariantCulture),
                             textureSlot = -1,
                             parameterName = String.Empty
                         };
@@ -308,6 +323,8 @@ namespace MonoGame.Effect
             }
 
             // Go thru the texture resources creating final samplers.
+            int textureMaxSlot = -1;
+            int samplerMaxSlot = -1;
             var samplers = new List<ShaderData.Sampler>();
             {
                 var reader = new StringReader(reflectionData);
@@ -326,15 +343,15 @@ namespace MonoGame.Effect
                     if (match.Success)
                     {
                         var textureName = match.Groups[1].Value;
-                        var textureSlot = int.Parse(match.Groups[4].Value);
-                        var textureDim = match.Groups[3].Value?.ToLower();
+                        var textureSlot = int.Parse(match.Groups[4].Value, CultureInfo.InvariantCulture);
+                        var textureDim = match.Groups[3].Value?.ToLower(CultureInfo.InvariantCulture);
 
                         var sampler = new ShaderData.Sampler();
 
-                        // Find the sampler state for the texture... we try multiple 
+                        // Find the sampler state for the texture... we try multiple
                         // ways here because things are sort of broken.
                         //
-                        // TODO: We need to refactor MGFX to seperate 
+                        // TODO: We need to refactor MGFX to seperate
                         // samplers and textures... they do not belong toether!
                         //
 
@@ -342,7 +359,7 @@ namespace MonoGame.Effect
                         bool found = false;
                         foreach (var s in shaderResult.ShaderInfo.SamplerStates.Values)
                         {
-                            if (s.TextureName == null)
+                            if (string.IsNullOrEmpty(s.TextureName))
                                 continue;
 
                             if (s.TextureName != textureName)
@@ -351,15 +368,19 @@ namespace MonoGame.Effect
                             sampler = samplerDescriptions.First(sd => sd.samplerName == s.Name);
                             found = true;
                         }
- 
+
                         if (!found)
                         {
                             // Try to match assuming samplers and textures have the same register index.
                             // This can be wrong in some cases, but best we can do right now.
-                            sampler = samplerDescriptions.First(sd => sd.samplerSlot == textureSlot);
+                            sampler = samplerDescriptions.FirstOrDefault(sd => sd.samplerSlot == textureSlot);
+                            sampler.samplerName ??= string.Empty;
                         }
 
-                        if (shaderResult.ShaderInfo.SamplerStates.TryGetValue(sampler.samplerName, out var ssamp))                         
+                        if (string.IsNullOrEmpty(sampler.samplerName))
+                            throw new Exception($"Sample name is empty for {shaderFunction} slot {textureSlot}.");
+
+                        if (shaderResult.ShaderInfo.SamplerStates.TryGetValue(sampler.samplerName, out var ssamp))
                             sampler.state = ssamp.State;
                         sampler.textureSlot = textureSlot;
                         sampler.parameterName = textureName;
@@ -386,11 +407,34 @@ namespace MonoGame.Effect
                                 throw new Exception("Unexpected sampler class type: " + textureDim);
                         }
 
+                        // Track the max sampler/texture slots.
+                        if (sampler.textureSlot > textureMaxSlot)
+                            textureMaxSlot = sampler.textureSlot;
+                        if (sampler.samplerSlot > samplerMaxSlot)
+                            samplerMaxSlot = sampler.samplerSlot;
+
                         samplers.Add(sampler);
                     }
                 }
             }
             shaderData._samplers = samplers.ToArray();
+
+            // Generate the layout bindings from our cbuffers, samplers, and textures.
+            using (var stream = new MemoryStream())
+            using (var writer = new BinaryWriter(stream))
+            {
+                writer.Write((uint)0xB00B00);
+
+                // Write the max texture and sampler slots.
+                writer.Write(samplerMaxSlot);
+                writer.Write(textureMaxSlot);
+
+                // Finally write the shader bytecode.
+                writer.Write(shaderData.Bytecode);
+
+                // Store the combined binding layout info and shader code.
+                shaderData.ShaderCode = stream.ToArray();
+            }
 
             effect.Shaders.Add(shaderData);
             return shaderData;

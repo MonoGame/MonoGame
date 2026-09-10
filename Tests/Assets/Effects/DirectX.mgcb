@@ -98,3 +98,8 @@
 /processorParam:DebugMode=Auto
 /build:TextureArrayEffect.fx
 
+#begin VertexInterpolationTest.fx
+/importer:EffectImporter
+/processor:EffectProcessor
+/processorParam:DebugMode=Auto
+/build:VertexInterpolationTest.fx

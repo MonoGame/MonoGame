@@ -9,15 +9,13 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
     /// </summary>
     public sealed class ModelBoneContent
     {
-        private ModelBoneContentCollection _children;
-        private int _index;
-        private string _name;
-        private ModelBoneContent _parent;
+        private readonly int _index;
+        private readonly string? _name;
+        private readonly ModelBoneContent? _parent;
+        private ModelBoneContentCollection _children = new([]);
         private Matrix _transform;
 
-        internal ModelBoneContent() { }
-
-        internal ModelBoneContent(string name, int index, Matrix transform, ModelBoneContent parent)
+        internal ModelBoneContent(string? name, int index, Matrix transform, ModelBoneContent? parent)
         {
             _name = name;
             _index = index;
@@ -30,41 +28,32 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
         /// </summary>
         public ModelBoneContentCollection Children
         {
-            get { return _children; }
-            internal set { _children = value; }
+            get => _children;
+            internal set => _children = value;
         }
 
         /// <summary>
         /// Returns the index of this bone content.
         /// </summary>
-        public int Index
-        {
-            get { return _index; }
-        }
+        public int Index => _index;
 
         /// <summary>
         /// Returns the name of this bone content.
         /// </summary>
-        public string Name
-        {
-            get { return _name; }
-        }
+        public string? Name => _name;
 
         /// <summary>
         /// Returns teh parent of this bone content.
         /// </summary>
-        public ModelBoneContent Parent
-        {
-            get { return _parent; }
-        }
+        public ModelBoneContent? Parent => _parent;
 
         /// <summary>
         /// Returns or sets the transform matrix of this bone content.
         /// </summary>
         public Matrix Transform
         {
-            get { return _transform; }
-            set { _transform = value; }
+            get => _transform;
+            set => _transform = value;
         }
     }
 }

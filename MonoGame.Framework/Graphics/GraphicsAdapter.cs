@@ -7,6 +7,9 @@ using System.Collections.ObjectModel;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
+    /// <summary>
+    /// Provides methods to retrieve and manipulate graphics adapters.
+    /// </summary>
     public sealed partial class GraphicsAdapter : IDisposable
     {
         /// <summary>
@@ -54,6 +57,9 @@ namespace Microsoft.Xna.Framework.Graphics
             _adapters[0].IsDefaultAdapter = true;
         }
 
+        /// <summary>
+        /// Gets the default adapter.
+        /// </summary>
         public static GraphicsAdapter DefaultAdapter
         {
             get
@@ -63,6 +69,9 @@ namespace Microsoft.Xna.Framework.Graphics
             }
         }
         
+        /// <summary>
+        /// Collection of available adapters on the system.
+        /// </summary>
         public static ReadOnlyCollection<GraphicsAdapter> Adapters
         {
             get
@@ -102,27 +111,62 @@ namespace Microsoft.Xna.Framework.Graphics
         /// </summary>
         public static bool UseDebugLayers { get; set; }
 
+        /// <summary>
+        /// Retrieves a string used for presentation to the user.
+        /// </summary>
         public string Description { get; private set; }
 
+        /// <summary>
+        /// Retrieves a value that is used to help identify a particular chip set.
+        /// </summary>
         public int DeviceId { get; private set; }
 
+        /// <summary>
+        /// Retrieves a string that contains the device name for a Microsoft Windows Graphics Device Interface (GDI).
+        /// </summary>
         public string DeviceName { get; private set; }
 
+        /// <summary>
+        /// Retrieves a value used to identify the manufacturer.
+        /// </summary>
         public int VendorId { get; private set; }
 
+        /// <summary>
+        /// Determines if this instance of GraphicsAdapter is the default adapter.
+        /// </summary>
         public bool IsDefaultAdapter { get; private set; }
 
+        /// <summary>
+        /// Retrieves the handle of the monitor associated with the Microsoft Direct3D object.
+        /// </summary>
+        /// <remarks>
+        /// Native OS monitor handle for this adapter.
+        /// Only intended for calling into native OS or platform APIs, do not free or assume the lifetime is permanent.
+        /// This value only works on DirectX platforms.
+        /// </remarks>
         public IntPtr MonitorHandle { get; private set; }
 
+        /// <summary>
+        /// Retrieves a value used to help identify the revision level of a particular chip set.
+        /// </summary>
         public int Revision { get; private set; }
 
+        /// <summary>
+        /// Retrieves a value used to identify the subsystem.
+        /// </summary>
         public int SubSystemId { get; private set; }
        
+        /// <summary>
+        /// Returns a collection of supported display modes for the current adapter.
+        /// </summary>
         public DisplayModeCollection SupportedDisplayModes
         {
             get { return _supportedDisplayModes; }
         }
 
+        /// <summary>
+        /// Gets the current display mode.
+        /// </summary>
         public DisplayMode CurrentDisplayMode
         {
             get { return _currentDisplayMode; }
@@ -184,11 +228,19 @@ namespace Microsoft.Xna.Framework.Graphics
             return (format == selectedFormat) && (depthFormat == selectedDepthFormat) && (multiSampleCount == selectedMultiSampleCount);
 		}
 
+        /// <summary>
+        /// Tests to see if the adapter supports the requested profile.
+        /// </summary>
+        /// <param name="graphicsProfile">Defines a set of graphic capabilities.</param>
+        /// <returns>True if the Native version is used. The DirectX version checks the device's supported feature level and returns True if the Graphics Profile is supported and False if not.</returns>
         public bool IsProfileSupported(GraphicsProfile graphicsProfile)
         {
             return PlatformIsProfileSupported(graphicsProfile);
         }
 
+        /// <summary>
+        /// Usually releases unmanaged resources, but this class doesn't keep resources. This method is only included for XNA compatibility.
+        /// </summary>
         public void Dispose()
         {
             // We don't keep any resources, so we have
