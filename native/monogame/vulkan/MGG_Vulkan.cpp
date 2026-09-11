@@ -5890,3 +5890,19 @@ mgbyte MGG_OcclusionQuery_GetResult(MGG_GraphicsDevice* device, MGG_OcclusionQue
 		return false; // Return false indicating the result is not available.
 	}
 }
+
+MG_EXPORT void MGG_GraphicsDevice_GetNativeHandles(const MGG_GraphicsDevice* device, MGP_NativeGraphicsHandles* handles)
+{
+	if (!device || !handles)
+	{
+		return;
+	}
+
+	handles->Backend          = MGGraphicsBackend::Vulkan;
+	handles->Instance         = device->instance;
+	handles->PhysicalDevice   = device->physicalDevice;
+	handles->LogicalDevice    = device->device;
+	handles->Queue            = static_cast<void*>(device->queue);
+	handles->QueueFamilyIndex = static_cast<mgint>(device->graphicsQueueFamily);
+	handles->QueueIndex       = 0;
+}
