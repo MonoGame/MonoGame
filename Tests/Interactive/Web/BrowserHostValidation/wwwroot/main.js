@@ -16,6 +16,12 @@ globalThis.MonoGameWebHostValidation = {
 
 try {
     await import("./monogame-web-host.js");
+
+    const canvas = document.getElementById("canvas");
+    if (canvas != null) {
+        canvas.style.width = "960px";
+        canvas.style.height = "540px";
+    }
 }
 catch (error) {
     const statusElement = document.getElementById("monogame-host-status");

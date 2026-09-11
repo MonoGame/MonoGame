@@ -34,6 +34,7 @@ class MonoGameWebHost {
         this.hostExports = null;
         this.managedFrameHandle = null;
         this.assetPackStagingPromises = new Map();
+        this.canvasResizeObserver = null;
     }
 
     static bootFromDocument(document_) {
@@ -197,6 +198,7 @@ class MonoGameWebHost {
         }
 
         this.runtime = await runtimeBuilder.create();
+        this.observeCanvasSize();
 
         if (typeof this.runtime.getAssemblyExports !== "function") {
             throw new BrowserHostStartupError(
@@ -211,6 +213,40 @@ class MonoGameWebHost {
                 "dotnet_main_missing",
                 "The configured dotnet runtime does not expose runMain() or runMainAndExit().");
         }
+    }
+
+    observeCanvasSize() {
+        const notifyCanvasResize = this.runtime?.Module?._MGP_Web_NotifyCanvasResize;
+        if (typeof notifyCanvasResize !== "function") {
+            throw new BrowserHostStartupError(
+                HostStage.WasmLoad,
+                "native_canvas_resize_missing",
+                "The managed runtime does not expose the native canvas resize callback.");
+        }
+
+        const reportCanvasSize = (width, height) => {
+            const normalizedWidth = Math.round(width);
+            const normalizedHeight = Math.round(height);
+            if (normalizedWidth > 0 && normalizedHeight > 0) {
+                notifyCanvasResize(normalizedWidth, normalizedHeight);
+            }
+        };
+
+        if (typeof ResizeObserver !== "function") {
+            throw new BrowserHostStartupError(
+                HostStage.WasmLoad,
+                "resize_observer_unavailable",
+                "The browser does not support ResizeObserver.");
+        }
+
+        this.canvasResizeObserver = new ResizeObserver((entries) => {
+            for (const entry of entries) {
+                if (entry.target === this.canvas) {
+                    reportCanvasSize(entry.contentRect.width, entry.contentRect.height);
+                }
+            }
+        });
+        this.canvasResizeObserver.observe(this.canvas);
     }
 
     async initializeManagedExportsAsync() {

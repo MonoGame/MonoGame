@@ -8,6 +8,11 @@
 
 #include <SDL.h>
 
+#if defined(__EMSCRIPTEN__)
+#include "MGP_sdl_browser.h"
+#include "../web/MGP_web.h"
+#endif
+
 #if _WIN32
 #include <combaseapi.h>
 #endif
@@ -181,6 +186,12 @@ struct MGP_Window
 
     SDL_Window* window = nullptr;
     SDL_Window* retiredWindow = nullptr;
+
+#if defined(__EMSCRIPTEN__)
+    mgbyte allowUserResizing = false;
+    mgint lastBrowserResizeWidth = -1;
+    mgint lastBrowserResizeHeight = -1;
+#endif
 #if defined(MG_OPENGL)
     mgint contextMajorVersion = 4;
     mgint contextMinorVersion = 1;
@@ -246,6 +257,10 @@ MGP_Platform* MGP_Platform_Create(MGGameRunBehavior& behavior)
 void MGP_Platform_Destroy(MGP_Platform* platform)
 {
 	assert(platform != nullptr);
+
+#if defined(__EMSCRIPTEN__)
+    MGP_Web_OnPlatformDestroyed(platform);
+#endif
 
 	// Destroy any active windows that may have been leaked.
 	for (auto window : platform->windows)
@@ -333,6 +348,41 @@ static MGP_Window* MGP_WindowFromId(MGP_Platform* platform, Uint32 windowId)
 
     return nullptr;
 }
+
+#if defined(__EMSCRIPTEN__)
+void MGP_Sdl_QueueBrowserResizeForWindow(MGP_Window* window, mgint width, mgint height)
+{
+    assert(window != nullptr);
+
+    if (width <= 0 || height <= 0 || window->window == nullptr)
+        return;
+
+    if (window->lastBrowserResizeWidth == width
+        && window->lastBrowserResizeHeight == height)
+    {
+        return;
+    }
+
+    window->lastBrowserResizeWidth = width;
+    window->lastBrowserResizeHeight = height;
+
+    MGP_Event event_{};
+    event_.Type = MGEventType::WindowResized;
+    event_.Timestamp = SDL_GetTicks();
+    event_.Window.Window = window;
+    event_.Window.Data1 = width;
+    event_.Window.Data2 = height;
+    window->platform->queued_events.push(event_);
+}
+
+void MGP_Sdl_QueueBrowserResize(MGP_Platform* platform, mgint width, mgint height)
+{
+    assert(platform != nullptr);
+
+    for (MGP_Window* window : platform->windows)
+        MGP_Sdl_QueueBrowserResizeForWindow(window, width, height);
+}
+#endif
 
 static int UTF8ToUnicode(int utf8)
 {
@@ -1047,12 +1097,16 @@ mgbyte MGP_Window_GetAllowUserResizing(MGP_Window* window)
 	assert(window != nullptr);
 	assert(window->window != nullptr);
 
+#if defined(__EMSCRIPTEN__)
+    return window->allowUserResizing;
+#else
 	auto flags = SDL_GetWindowFlags(window->window);
 
 	if ((flags & SDL_WINDOW_RESIZABLE) != 0)
 		return true;
 
 	return false;
+#endif
 }
 
 void MGP_Window_SetAllowUserResizing(MGP_Window* window, mgbyte allow)
@@ -1060,7 +1114,11 @@ void MGP_Window_SetAllowUserResizing(MGP_Window* window, mgbyte allow)
 	assert(window != nullptr);
 	assert(window->window != nullptr);
 
+#if defined(__EMSCRIPTEN__)
+    window->allowUserResizing = allow;
+#else
 	SDL_SetWindowResizable(window->window, allow ? SDL_TRUE : SDL_FALSE);
+#endif
 }
 
 mgbyte MGP_Window_GetIsBorderless(MGP_Window* window)
