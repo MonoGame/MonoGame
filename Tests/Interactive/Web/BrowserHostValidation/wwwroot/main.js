@@ -11,6 +11,21 @@ globalThis.MonoGameWebHostConfiguration = {
 globalThis.MonoGameWebHostValidation = {
     reportPhase(phaseName, message) {
         console.info("[BrowserHostValidation]", phaseName, message);
+    },
+    validateCanvasSize(drawingBufferWidth, drawingBufferHeight, cssWidth, cssHeight) {
+        const canvas = document.getElementById("canvas");
+        if (canvas == null) {
+            throw new Error("The validation canvas was not found.");
+        }
+
+        const canvasBounds = canvas.getBoundingClientRect();
+        if (canvas.width !== drawingBufferWidth
+            || canvas.height !== drawingBufferHeight
+            || Math.round(canvasBounds.width) !== cssWidth
+            || Math.round(canvasBounds.height) !== cssHeight) {
+            throw new Error(
+                `Expected canvas drawing buffer ${drawingBufferWidth}x${drawingBufferHeight} and CSS size ${cssWidth}x${cssHeight}, but found drawing buffer ${canvas.width}x${canvas.height} and CSS size ${canvasBounds.width}x${canvasBounds.height}.`);
+        }
     }
 };
 

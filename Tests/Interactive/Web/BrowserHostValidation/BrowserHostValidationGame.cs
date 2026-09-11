@@ -28,13 +28,19 @@ internal sealed class BrowserHostValidationGame : Game
     private const string ValidationTextureContentStreamAssetName = "Content/monogame_logo.xnb";
     private const int ValidationTextureMaxWidth = 384;
     private const int ValidationTextureMaxHeight = 224;
-    private const int ExpectedResizeWidth = 960;
-    private const int ExpectedResizeHeight = 540;
+    private const int ExpectedCssResizeWidth = 960;
+    private const int ExpectedCssResizeHeight = 540;
+    private const int ExpectedProgrammaticResizeWidth = 640;
+    private const int ExpectedProgrammaticResizeHeight = 360;
+
+    private readonly GraphicsDeviceManager _graphicsDeviceManager;
 
     private int _drawCount;
+    private bool _cssResizeValidated;
+    private bool _programmaticResizeRequested;
+    private bool _programmaticResizeValidated;
     private bool _reportedFirstDraw;
     private bool _reportedFirstValidationDraw;
-    private bool _resizeValidated;
     private Effect? _validationEffectFromContent;
     private SpriteBatch? _spriteBatch;
     private SpriteFont? _validationFontFromContent;
@@ -42,9 +48,9 @@ internal sealed class BrowserHostValidationGame : Game
 
     public BrowserHostValidationGame()
     {
-        GraphicsDeviceManager graphicsDeviceManager = new GraphicsDeviceManager(this);
-        graphicsDeviceManager.PreferredBackBufferWidth = 1280;
-        graphicsDeviceManager.PreferredBackBufferHeight = 720;
+        _graphicsDeviceManager = new GraphicsDeviceManager(this);
+        _graphicsDeviceManager.PreferredBackBufferWidth = 1280;
+        _graphicsDeviceManager.PreferredBackBufferHeight = 720;
 
         Content.RootDirectory = "Content";
         IsMouseVisible = true;
@@ -132,10 +138,16 @@ internal sealed class BrowserHostValidationGame : Game
         }
 
         _drawCount++;
-        if (_drawCount == ExitAfterDrawCount - 60 && !_resizeValidated)
+        if (_drawCount == ExitAfterDrawCount - 90 && !_cssResizeValidated)
         {
             throw new InvalidOperationException(
-                $"Expected a canvas resize to {ExpectedResizeWidth}x{ExpectedResizeHeight}, but ClientSizeChanged was not raised.");
+                $"Expected a CSS canvas resize to {ExpectedCssResizeWidth}x{ExpectedCssResizeHeight}, but ClientSizeChanged was not raised.");
+        }
+
+        if (_drawCount == ExitAfterDrawCount - 60 && !_programmaticResizeValidated)
+        {
+            throw new InvalidOperationException(
+                $"Expected a programmatic back-buffer resize to {ExpectedProgrammaticResizeWidth}x{ExpectedProgrammaticResizeHeight}, but ClientSizeChanged was not raised.");
         }
 
         if (_drawCount == ExitAfterDrawCount)
@@ -147,6 +159,19 @@ internal sealed class BrowserHostValidationGame : Game
         }
 
         base.Draw(gameTime);
+    }
+
+    protected override void Update(GameTime gameTime)
+    {
+        if (_cssResizeValidated && !_programmaticResizeRequested)
+        {
+            _programmaticResizeRequested = true;
+            _graphicsDeviceManager.PreferredBackBufferWidth = ExpectedProgrammaticResizeWidth;
+            _graphicsDeviceManager.PreferredBackBufferHeight = ExpectedProgrammaticResizeHeight;
+            _graphicsDeviceManager.ApplyChanges();
+        }
+
+        base.Update(gameTime);
     }
 
     protected override void UnloadContent()
@@ -179,23 +204,62 @@ internal sealed class BrowserHostValidationGame : Game
     private void OnClientSizeChanged(object sender, EventArgs eventArgs)
     {
         Rectangle clientBounds = Window.ClientBounds;
-        if (clientBounds.Width != ExpectedResizeWidth || clientBounds.Height != ExpectedResizeHeight)
-        {
-            throw new InvalidOperationException(
-                $"Expected canvas resize to {ExpectedResizeWidth}x{ExpectedResizeHeight}, but received {clientBounds.Width}x{clientBounds.Height}.");
-        }
-
         Viewport viewport = GraphicsDevice.Viewport;
-        if (viewport.Width != ExpectedResizeWidth || viewport.Height != ExpectedResizeHeight)
+
+        if (!_cssResizeValidated)
         {
-            throw new InvalidOperationException(
-                $"Expected viewport resize to {ExpectedResizeWidth}x{ExpectedResizeHeight}, but received {viewport.Width}x{viewport.Height}.");
+            ValidateResize(
+                clientBounds,
+                viewport,
+                ExpectedCssResizeWidth,
+                ExpectedCssResizeHeight,
+                "CSS canvas");
+
+            _cssResizeValidated = true;
+            BrowserHostValidationReporter.ReportPhase(
+                "cssResizeValidated",
+                "Validated ClientSizeChanged from a CSS canvas resize while Window.AllowUserResizing is false.");
+            return;
         }
 
-        _resizeValidated = true;
-        BrowserHostValidationReporter.ReportPhase(
-            "resizeValidated",
-            "Validated ClientSizeChanged from a CSS canvas resize while Window.AllowUserResizing is false.");
+        if (_programmaticResizeRequested && !_programmaticResizeValidated)
+        {
+            ValidateResize(
+                clientBounds,
+                viewport,
+                ExpectedProgrammaticResizeWidth,
+                ExpectedProgrammaticResizeHeight,
+                "programmatic back-buffer");
+            BrowserHostValidationReporter.ValidateCanvasSize(
+                ExpectedProgrammaticResizeWidth,
+                ExpectedProgrammaticResizeHeight,
+                ExpectedCssResizeWidth,
+                ExpectedCssResizeHeight);
+
+            _programmaticResizeValidated = true;
+            BrowserHostValidationReporter.ReportPhase(
+                "programmaticResizeValidated",
+                "Validated ClientSizeChanged and a resized canvas drawing buffer from GraphicsDeviceManager.ApplyChanges while CSS size remained 960x540.");
+            return;
+        }
+
+        throw new InvalidOperationException(
+            $"ClientSizeChanged was raised unexpectedly for {clientBounds.Width}x{clientBounds.Height}.");
+    }
+
+    private static void ValidateResize(Rectangle clientBounds, Viewport viewport, int expectedWidth, int expectedHeight, string resizeSource)
+    {
+        if (clientBounds.Width != expectedWidth || clientBounds.Height != expectedHeight)
+        {
+            throw new InvalidOperationException(
+                $"Expected {resizeSource} resize to {expectedWidth}x{expectedHeight}, but received {clientBounds.Width}x{clientBounds.Height}.");
+        }
+
+        if (viewport.Width != expectedWidth || viewport.Height != expectedHeight)
+        {
+            throw new InvalidOperationException(
+                $"Expected {resizeSource} viewport resize to {expectedWidth}x{expectedHeight}, but received {viewport.Width}x{viewport.Height}.");
+        }
     }
 
     private static Rectangle CreateDestinationRectangle(Texture2D texture, int left, int top)

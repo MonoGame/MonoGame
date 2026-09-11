@@ -12,4 +12,7 @@ internal static partial class BrowserHostValidationReporter
 {
     [JSImport("globalThis.MonoGameWebHostValidation.reportPhase")]
     internal static partial void ReportPhase(string phaseName, string message);
+
+    [JSImport("globalThis.MonoGameWebHostValidation.validateCanvasSize")]
+    internal static partial void ValidateCanvasSize(int drawingBufferWidth, int drawingBufferHeight, int cssWidth, int cssHeight);
 }
