@@ -452,4 +452,25 @@ internal static unsafe partial class MGG
     public static extern byte OcclusionQuery_GetResult(MGG_GraphicsDevice* device, MGG_OcclusionQuery* query, out int pixelCount);
 
     #endregion
+
+    #region Native Interop
+
+    [StructLayout(LayoutKind.Sequential)]
+    internal struct MGP_NativeGraphicsHandles
+    {
+        public int Backend;
+        public nint Instance;
+        public nint PhysicalDevice;
+        public nint LogicalDevice;
+        public nint Queue;
+        public int QueueFamilyIndex;
+        public int QueueIndex;
+    }
+
+    [DllImport(MGP.MonoGameNativeDLL, EntryPoint = "MGG_GraphicsDevice_GetNativeHandles", ExactSpelling = true)]
+    public static extern void GraphicsDevice_GetNativeHandles(
+        MGG_GraphicsDevice* device,
+        out MGP_NativeGraphicsHandles handles);
+
+    #endregion
 }

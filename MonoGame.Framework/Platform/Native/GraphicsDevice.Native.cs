@@ -536,4 +536,24 @@ public partial class GraphicsDevice
 
         return new Rectangle(x, y, width, height);
     }
+
+    /// <summary>
+    /// Retrieves the native graphics API handles for XR or external interop.
+    /// <see cref="NativeGraphicsHandles.PhysicalDevice"/>, <see cref="NativeGraphicsHandles.LogicalDevice"/> and <see cref="NativeGraphicsHandles.Queue"/>
+    /// are always populated for the native backends.
+    /// Check <see cref="NativeGraphicsHandles.Backend"/> for backend-specific field availability.
+    /// </summary>
+    public unsafe NativeGraphicsHandles GetNativeHandles()
+    {
+        MGG.GraphicsDevice_GetNativeHandles(Handle, out var native);
+
+        return new NativeGraphicsHandles(
+            (GraphicsBackend)native.Backend,
+            native.Instance,
+            native.PhysicalDevice,
+            native.LogicalDevice,
+            native.Queue,
+            native.QueueFamilyIndex,
+            native.QueueIndex);
+    }
 }
