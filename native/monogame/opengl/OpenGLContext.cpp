@@ -38,6 +38,12 @@ namespace
         return address;
     }
 
+    void* TryLoadProcAddress(const char* name)
+    {
+        assert(name != nullptr);
+        return SDL_GL_GetProcAddress(name);
+    }
+
     void QueryVersion(mgint& majorVersion, mgint& minorVersion)
     {
         GLint major = 0;
@@ -63,13 +69,13 @@ void OpenGLFunctions::Load()
     BindAttribLocation = reinterpret_cast<PFNGLBINDATTRIBLOCATIONPROC>(LoadProcAddress("glBindAttribLocation"));
     BlendColor = reinterpret_cast<PFNGLBLENDCOLORPROC>(LoadProcAddress("glBlendColor"));
     BlendEquationSeparate = reinterpret_cast<PFNGLBLENDEQUATIONSEPARATEPROC>(LoadProcAddress("glBlendEquationSeparate"));
-    BlendEquationSeparatei = reinterpret_cast<PFNGLBLENDEQUATIONSEPARATEIPROC>(LoadProcAddress("glBlendEquationSeparatei"));
+    BlendEquationSeparatei = reinterpret_cast<PFNGLBLENDEQUATIONSEPARATEIPROC>(TryLoadProcAddress("glBlendEquationSeparatei"));
     if (BlendEquationSeparatei == nullptr)
-        BlendEquationSeparatei = reinterpret_cast<PFNGLBLENDEQUATIONSEPARATEIPROC>(LoadProcAddress("glBlendEquationSeparateiARB"));
+        BlendEquationSeparatei = reinterpret_cast<PFNGLBLENDEQUATIONSEPARATEIPROC>(TryLoadProcAddress("glBlendEquationSeparateiARB"));
     BlendFuncSeparate = reinterpret_cast<PFNGLBLENDFUNCSEPARATEPROC>(LoadProcAddress("glBlendFuncSeparate"));
-    BlendFuncSeparatei = reinterpret_cast<PFNGLBLENDFUNCSEPARATEIPROC>(LoadProcAddress("glBlendFuncSeparatei"));
+    BlendFuncSeparatei = reinterpret_cast<PFNGLBLENDFUNCSEPARATEIPROC>(TryLoadProcAddress("glBlendFuncSeparatei"));
     if (BlendFuncSeparatei == nullptr)
-        BlendFuncSeparatei = reinterpret_cast<PFNGLBLENDFUNCSEPARATEIPROC>(LoadProcAddress("glBlendFuncSeparateiARB"));
+        BlendFuncSeparatei = reinterpret_cast<PFNGLBLENDFUNCSEPARATEIPROC>(TryLoadProcAddress("glBlendFuncSeparateiARB"));
     BindBuffer = reinterpret_cast<PFNGLBINDBUFFERPROC>(LoadProcAddress("glBindBuffer"));
     BindFramebuffer = reinterpret_cast<PFNGLBINDFRAMEBUFFERPROC>(LoadProcAddress("glBindFramebuffer"));
     BindRenderbuffer = reinterpret_cast<PFNGLBINDRENDERBUFFERPROC>(LoadProcAddress("glBindRenderbuffer"));
@@ -165,6 +171,14 @@ void OpenGLContext::Create(SDL_Window* nextWindow)
     }
 
     SDL_GLContext nextHandle = SDL_GL_CreateContext(nextWindow);
+    if (nextHandle == nullptr && previousHandle == nullptr)
+    {
+        // GL 3.1 remains viable when the required later functionality is available through extensions.
+        SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
+        SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 1);
+        nextHandle = SDL_GL_CreateContext(nextWindow);
+    }
+
     if (previousHandle != nullptr)
         SDL_GL_SetAttribute(SDL_GL_SHARE_WITH_CURRENT_CONTEXT, 0);
 
@@ -174,16 +188,17 @@ void OpenGLContext::Create(SDL_Window* nextWindow)
     handle = nextHandle;
     window = nextWindow;
     MakeCurrent();
+
+    QueryVersion(majorVersion, minorVersion);
+    if (majorVersion < 3 || (majorVersion == 3 && minorVersion < 1))
+        MGGL_FAIL("OpenGL 3.1 core context required", "created context is below 3.1");
+
     functions.Load();
 
     // The new context is current and shares resources with the old context, so we
     // dont' need to keep the old context around anymore.
     if (previousHandle != nullptr)
         SDL_GL_DeleteContext(previousHandle);
-
-    QueryVersion(majorVersion, minorVersion);
-    if (majorVersion < 4 || (majorVersion == 4 && minorVersion < 1))
-        MGGL_FAIL("OpenGL 4.1 core context required", "created context is below 4.1");
 
     functions.GenVertexArrays(1, &defaultVertexArray);
     if (defaultVertexArray == 0)
