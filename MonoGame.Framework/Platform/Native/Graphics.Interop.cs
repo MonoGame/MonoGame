@@ -233,7 +233,7 @@ internal static unsafe partial class MGG
     public static extern int GraphicsDevice_GetBackBufferMultiSampleCount(MGG_GraphicsDevice* device);
 
     [DllImport(MGP.MonoGameNativeDLL, EntryPoint = "MGG_GraphicsDevice_ResizeSwapchain", ExactSpelling = true)]
-    public static extern void GraphicsDevice_ResizeSwapchain(
+    public static extern byte GraphicsDevice_ResizeSwapchain(
         MGG_GraphicsDevice* device,
         nint nativeWindowHandle,
         int width,

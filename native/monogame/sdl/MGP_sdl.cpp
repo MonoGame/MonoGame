@@ -181,6 +181,12 @@ struct MGP_Window
 
     SDL_Window* window = nullptr;
     SDL_Window* retiredWindow = nullptr;
+#if defined(MG_OPENGL)
+    mgint contextMajorVersion = 4;
+    mgint contextMinorVersion = 1;
+    MGP_WindowCreateInfo windowCreateInfo = {};
+    bool hasWindowCreateInfo = false;
+#endif
 };
 
 struct MGP_Cursor
@@ -740,8 +746,8 @@ static mgbyte MGP_Window_CreateNativeWindowInternal(
 #if defined(MG_VULKAN) || defined(MG_DIRECTX12)
 	flags |= SDL_WINDOW_VULKAN;
 #elif defined(MG_OPENGL)
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 4);
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 1);
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, window->contextMajorVersion);
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, window->contextMinorVersion);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
     SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
     SDL_GL_SetAttribute(SDL_GL_RED_SIZE, windowCreateInfo != nullptr ? windowCreateInfo->redSize : 8);
@@ -776,6 +782,15 @@ static mgbyte MGP_Window_CreateNativeWindowInternal(
 	}
 
     window->windowId = SDL_GetWindowID(window->window);
+
+#if defined(MG_OPENGL)
+    if (windowCreateInfo != nullptr)
+    {
+        window->windowCreateInfo = *windowCreateInfo;
+        window->hasWindowCreateInfo = true;
+    }
+#endif
+
     return true;
 }
 
@@ -850,6 +865,39 @@ mgbyte MGP_Window_BeginRecreateNativeWindow(
 
     window->retiredWindow = retiredWindow;
     return true;
+}
+
+mgbyte MGP_Window_RecreateForGraphicsRetry(MGP_Window* window)
+{
+#if defined(MG_OPENGL)
+    assert(window != nullptr);
+    assert(window->window != nullptr);
+
+    if (!window->hasWindowCreateInfo || (window->contextMajorVersion == 3 && window->contextMinorVersion == 1))
+        return false;
+
+    mgint previousMajorVersion = window->contextMajorVersion;
+    mgint previousMinorVersion = window->contextMinorVersion;
+    window->contextMajorVersion = 3;
+    window->contextMinorVersion = 1;
+
+    mgint width = 0;
+    mgint height = 0;
+    SDL_GetWindowSize(window->window, &width, &height);
+    MGP_WindowCreateInfo windowCreateInfo = window->windowCreateInfo;
+
+    if (!MGP_Window_BeginRecreateNativeWindow(window, width, height, SDL_GetWindowTitle(window->window), &windowCreateInfo))
+    {
+        window->contextMajorVersion = previousMajorVersion;
+        window->contextMinorVersion = previousMinorVersion;
+        return false;
+    }
+
+    return true;
+#else
+    (void)window;
+    return false;
+#endif
 }
 
 void MGP_Window_FinalizeRecreateNativeWindow(MGP_Window* window)

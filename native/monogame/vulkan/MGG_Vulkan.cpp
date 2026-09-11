@@ -2144,7 +2144,7 @@ void MGVK_RecreateSwapChain(MGG_GraphicsDevice* device)
     MGG_GraphicsDevice_SetRenderTargets(device, nullptr, nullptr, 0);
 }
 
-void MGG_GraphicsDevice_ResizeSwapchain(
+mgbyte MGG_GraphicsDevice_ResizeSwapchain(
 	MGG_GraphicsDevice* device,
 	void* nativeWindowHandle,
 	mgint width,
@@ -2166,7 +2166,7 @@ void MGG_GraphicsDevice_ResizeSwapchain(
 	if (device->swapchain != VK_NULL_HANDLE &&
 		device->syncInterval == syncInterval &&
 		device->multiSampleCount == multiSampleCount)
-		return;
+		return 1;
 
 	auto vkColor = ToVkFormat(color);
 	auto vkDepth = ToVkFormat(depth);
@@ -2174,6 +2174,7 @@ void MGG_GraphicsDevice_ResizeSwapchain(
 	MGVK_RecreateSwapChain(device, nativeWindowHandle, width, height, vkColor, vkDepth, multiSampleCount, syncInterval);
 
 	MGVK_PrepareFrame(device);
+	return 1;
 }
 
 

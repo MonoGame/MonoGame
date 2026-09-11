@@ -683,7 +683,7 @@ void MGG_GraphicsDevice_ResolveRenderTargets(MGG_GraphicsDevice* device)
 	}
 }
 
-void MGG_GraphicsDevice_ResizeSwapchain(
+mgbyte MGG_GraphicsDevice_ResizeSwapchain(
 	MGG_GraphicsDevice* device,
 	void* nativeWindowHandle,
 	mgint width,
@@ -730,6 +730,7 @@ void MGG_GraphicsDevice_ResizeSwapchain(
 	}
 
 	MGDX_PrepareNextFrame(device);
+	return 1;
 }
 
 static void MGDX_PrepareNextFrame(MGG_GraphicsDevice* device)

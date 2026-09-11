@@ -1874,12 +1874,12 @@ void MGG_GraphicsDevice_GetCaps(MGG_GraphicsDevice* device, MGG_GraphicsDevice_C
     caps.SupportsTextureArrays = false;
 
     // TODO: We can detect the vertex texture capacity from above, but
-    //       due to limitations in the shader/effect pipeline, we can't 
+    //       due to limitations in the shader/effect pipeline, we can't
     //       compile a shader for OpenGl to prove it.
     //
-    //       So until we can do that, we'll hard code them to 0 and false here. 
+    //       So until we can do that, we'll hard code them to 0 and false here.
     //
-    //      When we can prove it with the new shader system, just replace the 
+    //      When we can prove it with the new shader system, just replace the
     //      0 and false below with the commented values.
     caps.MaxVertexTextureSlots = 0 /* maxVertexTextureSlots; */;
     caps.SupportsVertexTextures = false /* supportsVertexTextures */;
@@ -1905,7 +1905,7 @@ mgint MGG_GraphicsDevice_GetBackBufferMultiSampleCount(MGG_GraphicsDevice* devic
     return device->multiSampleCount;
 }
 
-void MGG_GraphicsDevice_ResizeSwapchain(
+mgbyte MGG_GraphicsDevice_ResizeSwapchain(
     MGG_GraphicsDevice* device,
     void* nativeWindowHandle,
     mgint width,
@@ -1923,8 +1923,10 @@ void MGG_GraphicsDevice_ResizeSwapchain(
 
     SDL_Window* window = static_cast<SDL_Window*>(nativeWindowHandle);
 
+    if (!device->context.Create(window))
+        return 0;
+
     device->window = window;
-    device->context.Create(window);
     device->vertexArray = device->context.defaultVertexArray;
     device->context.BindDefaultVertexArray();
     ClearCurrentRenderTargets(device);
@@ -1961,6 +1963,7 @@ void MGG_GraphicsDevice_ResizeSwapchain(
 
     glViewport(0, 0, width, height);
     glScissor(0, 0, width, height);
+    return 1;
 }
 
 mgint MGG_GraphicsDevice_BeginFrame(MGG_GraphicsDevice* device)
@@ -3464,7 +3467,7 @@ MGG_Shader* MGG_Shader_Create(MGG_GraphicsDevice* device, MGShaderStage stage, m
     MGG_Shader* shader = new MGG_Shader();
     shader->stage = stage;
     shader->source.assign(reinterpret_cast<const char*>(bytecode), sizeInBytes);
-    
+
     shader->fragmentOutputMask = stage == MGShaderStage::Pixel
                                  ? GetFragmentOutputMask(shader->source)
                                  : 0u;

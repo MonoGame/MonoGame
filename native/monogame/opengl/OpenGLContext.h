@@ -107,7 +107,7 @@ struct OpenGLContext
     mgint majorVersion = 0;
     mgint minorVersion = 0;
 
-    void Create(SDL_Window* nextWindow);
+    bool Create(SDL_Window* nextWindow);
     void Destroy();
     void MakeCurrent();
     void SetSwapInterval(mgint nextSyncInterval);

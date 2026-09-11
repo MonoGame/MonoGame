@@ -146,12 +146,12 @@ void OpenGLFunctions::Load()
     VertexAttribPointer = reinterpret_cast<PFNGLVERTEXATTRIBPOINTERPROC>(LoadProcAddress("glVertexAttribPointer"));
 }
 
-void OpenGLContext::Create(SDL_Window* nextWindow)
+bool OpenGLContext::Create(SDL_Window* nextWindow)
 {
     assert(nextWindow != nullptr);
 
     if (handle != nullptr && window == nextWindow)
-        return;
+        return true;
 
     SDL_GLContext previousHandle = handle;
     SDL_Window* previousWindow = window;
@@ -172,12 +172,7 @@ void OpenGLContext::Create(SDL_Window* nextWindow)
 
     SDL_GLContext nextHandle = SDL_GL_CreateContext(nextWindow);
     if (nextHandle == nullptr && previousHandle == nullptr)
-    {
-        // GL 3.1 remains viable when the required later functionality is available through extensions.
-        SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
-        SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 1);
-        nextHandle = SDL_GL_CreateContext(nextWindow);
-    }
+        return false;
 
     if (previousHandle != nullptr)
         SDL_GL_SetAttribute(SDL_GL_SHARE_WITH_CURRENT_CONTEXT, 0);
@@ -205,6 +200,7 @@ void OpenGLContext::Create(SDL_Window* nextWindow)
         MGGL_FAIL("glGenVertexArrays failed", "default vertex array creation returned 0");
 
     functions.BindVertexArray(defaultVertexArray);
+    return true;
 }
 
 void OpenGLContext::Destroy()
