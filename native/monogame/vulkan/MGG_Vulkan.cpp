@@ -365,6 +365,7 @@ struct MGG_Texture
 
 	mgbool isTarget = false;
 	mgbool isSwapchain = false;
+	mgbool isExternal = false;
 
 	mgint multiSampleCount = 0;
 
@@ -2447,7 +2448,10 @@ static void MGVK_DestroyFrameResources(MGG_GraphicsDevice* device, FrameCounter 
 				vmaDestroyImage(device->allocator, texture->msImage, texture->msAllocation);
 			}
 
-			vmaDestroyImage(device->allocator, texture->image, texture->allocation);
+			if (texture->allocation != VK_NULL_HANDLE)
+			{
+				vmaDestroyImage(device->allocator, texture->image, texture->allocation);
+			}
 			mg_remove(device->all_textures, texture);
 			delete texture;
 		}
@@ -3186,8 +3190,8 @@ static void MGVK_UpdateRenderPass(MGG_GraphicsDevice* device, FrameCounter curre
                 {
                     desc.loadOp = firstUse ? VK_ATTACHMENT_LOAD_OP_DONT_CARE : VK_ATTACHMENT_LOAD_OP_LOAD;
                     desc.stencilLoadOp = firstUse ? VK_ATTACHMENT_LOAD_OP_DONT_CARE : VK_ATTACHMENT_LOAD_OP_LOAD;
-                    desc.initialLayout = firstUse ? VK_IMAGE_LAYOUT_UNDEFINED : VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
-                    desc.finalLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+                    desc.initialLayout = firstUse ? VK_IMAGE_LAYOUT_UNDEFINED : target->optimal_layout;
+                    desc.finalLayout = target->optimal_layout;
                 }
             }
 
@@ -3236,7 +3240,7 @@ static void MGVK_UpdateRenderPass(MGG_GraphicsDevice* device, FrameCounter curre
 			desc.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
 			desc.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
 			desc.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
-			desc.finalLayout = firstTarget->isSwapchain ? VK_IMAGE_LAYOUT_PRESENT_SRC_KHR : VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+			desc.finalLayout = firstTarget->isSwapchain ? VK_IMAGE_LAYOUT_PRESENT_SRC_KHR : firstTarget->optimal_layout;
 
 			num_attachments++;
 		}
@@ -3342,7 +3346,7 @@ static void MGVK_UpdateRenderPass(MGG_GraphicsDevice* device, FrameCounter curre
 		if (target->isSwapchain)
 			target->layouts[0] = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
 		else
-			target->layouts[0] = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+			target->layouts[0] = target->optimal_layout;
 	}
 
 	// Set the cache for the changed pipeline state.
@@ -5324,6 +5328,57 @@ void MGG_Texture_Destroy(MGG_GraphicsDevice* device, MGG_Texture* texture)
 	if (texture->depthTexture)
 		MGG_Texture_Destroy(device, texture->depthTexture);
 
+	// If this is an externally owned texture (like an external swapchain or image wrapped in a RenderTarget2D).
+	if (texture->isExternal && texture->allocation == VK_NULL_HANDLE)
+	{
+		// Wait for the device to be idle to safely destroy views before the external caller destroys the underlying VkImage.
+		vkDeviceWaitIdle(device->device);
+
+		if (texture->isTarget)
+		{
+			MGVK_DestroyPipelines(device, [texture](const MGVK_PipelineState& s)
+				{
+					for (int i = 0; i < s.targets->set.numTargets; i++)
+					{
+						if (s.targets->set.targets[i] == texture)
+						{
+							return true;
+						}
+					}
+					return false;
+				});
+
+			MGVK_DestroyTargetSets(device, [texture](const MGVK_TargetSetCache* s)
+				{
+					for (int i = 0; i < s->set.numTargets; i++)
+					{
+						if (s->set.targets[i] == texture)
+						{
+							return true;
+						}
+					}
+					return false;
+				});
+
+			if (device->pipelineState.targets && device->pipelineState.targets->set.targets[0] == texture)
+			{
+				device->pipelineState.targets = nullptr;
+			}
+		}
+
+		if (texture->target_view != VK_NULL_HANDLE)
+		{
+			vkDestroyImageView(device->device, texture->target_view, nullptr);
+		}
+		if (texture->view != VK_NULL_HANDLE)
+		{
+			vkDestroyImageView(device->device, texture->view, nullptr);
+		}
+
+		delete texture;
+		return;
+	}
+
 	// Queue the texture for later destruction.
 	device->destroyTextures.push(texture);
 }
@@ -5889,4 +5944,99 @@ mgbyte MGG_OcclusionQuery_GetResult(MGG_GraphicsDevice* device, MGG_OcclusionQue
 		pixelCount = 0;
 		return false; // Return false indicating the result is not available.
 	}
+}
+
+MGG_Texture* MGG_RenderTarget_WrapNativeHandle(
+	MGG_GraphicsDevice* device,
+	void* nativeHandle,
+	MGSurfaceFormat format,
+	mgint width,
+	mgint height,
+	MGDepthFormat depthFormat,
+	mgint multiSampleCount)
+{
+	assert(device != nullptr);
+	assert(nativeHandle != nullptr);
+	assert(width > 0);
+	assert(height > 0);
+
+	auto texture = new MGG_Texture();
+	texture->isTarget = true;
+	texture->isExternal = true; // Marks as externally owned. Prevents image/memory destruction.
+	texture->type = MGTextureType::_2D;
+	texture->format = format;
+	texture->id = ++device->currentTextureId;
+	texture->multiSampleCount = multiSampleCount;
+	texture->usage = MGRenderTargetUsage::DiscardContents;
+
+	// Set the externally-owned VkImage. We don't allocate memory.
+	texture->image = static_cast<VkImage>(nativeHandle);
+	texture->allocation = VK_NULL_HANDLE; // We don't own the image. Prevents us from trying to free image memory.
+
+	// Populate VkImageCreateInfo for view creation.
+	VkImageCreateInfo& create_info = texture->info;
+	create_info.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
+	create_info.imageType = ToVkImageType(texture->type);
+	create_info.flags = ToVkImageCreateFlags(texture->type);
+	create_info.format = ToVkFormat(format);
+	create_info.extent.width = width;
+	create_info.extent.height = height;
+	create_info.extent.depth = 1;
+	create_info.mipLevels = 1;
+	create_info.arrayLayers = 1;
+	create_info.samples = ToVkSampleCount(multiSampleCount);
+	create_info.tiling = VK_IMAGE_TILING_OPTIMAL;
+
+	create_info.usage =
+		VK_IMAGE_USAGE_SAMPLED_BIT
+		| VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT
+		| VK_IMAGE_USAGE_TRANSFER_SRC_BIT
+		| VK_IMAGE_USAGE_TRANSFER_DST_BIT;
+
+	create_info.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
+	create_info.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+
+	texture->layouts[0] = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
+	texture->optimal_layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
+
+	// Create image view for shader sampling.
+	texture->view = CreateImageView(device, texture, 1);
+	VK_SET_OBJECT_NAME(device->device,
+		texture->view,
+		VK_OBJECT_TYPE_IMAGE_VIEW,
+		"MGG_Texture.view (External RenderTarget id: %llu)",
+		texture->id);
+
+	// Create image view for render target.
+	texture->target_view = CreateImageView(device, texture, 1);
+	VK_SET_OBJECT_NAME(device->device,
+		texture->target_view,
+		VK_OBJECT_TYPE_IMAGE_VIEW,
+		"MGG_Texture.target_view (External RenderTarget id: %llu)",
+		texture->id);
+
+	// Create depth buffer if requested (owned by this texture wrapper).
+	if (depthFormat != MGDepthFormat::None)
+	{
+		texture->depthFormat = depthFormat;
+		texture->depthTexture = CreateDepthTexture(device, ToVkFormat(depthFormat), width, height, multiSampleCount);
+
+		VK_SET_OBJECT_NAME(device->device,
+			texture->depthTexture->image,
+			VK_OBJECT_TYPE_IMAGE,
+			"MGG_Texture.depthTexture (External RenderTarget id: %llu)",
+			texture->id);
+
+		texture->depthTexture->target_view = CreateImageView(device,
+			texture->depthTexture,
+			1);
+
+		VK_SET_OBJECT_NAME(device->device,
+			texture->depthTexture->target_view,
+			VK_OBJECT_TYPE_IMAGE_VIEW,
+			"MGG_Texture.depthTexture.target_view (External RenderTarget id: %llu)",
+			texture->id);
+	}
+
+	return texture;
 }
