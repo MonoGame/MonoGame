@@ -191,6 +191,8 @@ struct MGP_Window
     mgbyte allowUserResizing = false;
     mgint lastBrowserResizeWidth = -1;
     mgint lastBrowserResizeHeight = -1;
+    mgbyte browserFocused = false;
+    bool hasBrowserFocusState = false;
 #endif
 #if defined(MG_OPENGL)
     mgint contextMajorVersion = 4;
@@ -381,6 +383,34 @@ void MGP_Sdl_QueueBrowserResize(MGP_Platform* platform, mgint width, mgint heigh
 
     for (MGP_Window* window : platform->windows)
         MGP_Sdl_QueueBrowserResizeForWindow(window, width, height);
+}
+
+static void MGP_Sdl_QueueBrowserFocusForWindow(MGP_Window* window, mgbyte focused)
+{
+    assert(window != nullptr);
+
+    if (window->window == nullptr
+        || (window->hasBrowserFocusState && window->browserFocused == focused))
+    {
+        return;
+    }
+
+    window->browserFocused = focused;
+    window->hasBrowserFocusState = true;
+
+    MGP_Event event_{};
+    event_.Type = focused ? MGEventType::WindowGainedFocus : MGEventType::WindowLostFocus;
+    event_.Timestamp = SDL_GetTicks();
+    event_.Window.Window = window;
+    window->platform->queued_events.push(event_);
+}
+
+void MGP_Sdl_QueueBrowserFocus(MGP_Platform* platform, mgbyte focused)
+{
+    assert(platform != nullptr);
+
+    for (MGP_Window* window : platform->windows)
+        MGP_Sdl_QueueBrowserFocusForWindow(window, focused);
 }
 #endif
 

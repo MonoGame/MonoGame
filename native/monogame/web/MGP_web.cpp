@@ -8,6 +8,8 @@ static MGP_Platform* s_platform = nullptr;
 static bool s_hasPendingCanvasResize = false;
 static mgint s_pendingCanvasResizeWidth = 0;
 static mgint s_pendingCanvasResizeHeight = 0;
+static bool s_hasPendingBrowserFocus = false;
+static mgbyte s_pendingBrowserFocus = false;
 
 extern "C" EMSCRIPTEN_KEEPALIVE void MGP_Web_NotifyCanvasResize(mgint width, mgint height)
 {
@@ -23,6 +25,18 @@ extern "C" EMSCRIPTEN_KEEPALIVE void MGP_Web_NotifyCanvasResize(mgint width, mgi
     }
 
     MGP_Sdl_QueueBrowserResize(s_platform, width, height);
+}
+
+extern "C" EMSCRIPTEN_KEEPALIVE void MGP_Web_NotifyFocusChange(mgbyte focused)
+{
+    if (s_platform == nullptr)
+    {
+        s_pendingBrowserFocus = focused;
+        s_hasPendingBrowserFocus = true;
+        return;
+    }
+
+    MGP_Sdl_QueueBrowserFocus(s_platform, focused);
 }
 
 void MGP_Web_OnPlatformDestroyed(MGP_Platform* platform)
@@ -43,5 +57,11 @@ MG_EXPORT void MGP_Platform_StartRunLoop(MGP_Platform* platform)
             s_pendingCanvasResizeWidth,
             s_pendingCanvasResizeHeight);
         s_hasPendingCanvasResize = false;
+    }
+
+    if (s_hasPendingBrowserFocus)
+    {
+        MGP_Sdl_QueueBrowserFocus(platform, s_pendingBrowserFocus);
+        s_hasPendingBrowserFocus = false;
     }
 }

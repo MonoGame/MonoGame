@@ -113,6 +113,10 @@ class MonoGameWebHost {
             canvas.id = "canvas";
         }
 
+        if (!canvas.hasAttribute("tabindex")) {
+            canvas.tabIndex = 0;
+        }
+
         globalThis.Module = globalThis.Module || {};
         globalThis.Module.canvas = canvas;
         this.logStage(
@@ -199,6 +203,7 @@ class MonoGameWebHost {
 
         this.runtime = await runtimeBuilder.create();
         this.observeCanvasSize();
+        this.observeBrowserLifecycle();
 
         if (typeof this.runtime.getAssemblyExports !== "function") {
             throw new BrowserHostStartupError(
@@ -247,6 +252,27 @@ class MonoGameWebHost {
             }
         });
         this.canvasResizeObserver.observe(this.canvas);
+    }
+
+    observeBrowserLifecycle() {
+        const notifyFocusChange = this.runtime?.Module?._MGP_Web_NotifyFocusChange;
+        if (typeof notifyFocusChange !== "function") {
+            throw new BrowserHostStartupError(
+                HostStage.WasmLoad,
+                "native_focus_change_missing",
+                "The managed runtime does not expose the native focus callback.");
+        }
+
+        const notifyFocus = (focused) => notifyFocusChange(focused ? 1 : 0);
+        const notifyWindowFocus = () => notifyFocus(!document.hidden && document.hasFocus());
+
+        document.addEventListener("visibilitychange", notifyWindowFocus);
+        globalThis.addEventListener("focus", notifyWindowFocus);
+        globalThis.addEventListener("blur", notifyWindowFocus);
+        this.canvas.addEventListener("focus", () => notifyFocus(true));
+        this.canvas.addEventListener("blur", () => notifyFocus(false));
+
+        notifyWindowFocus();
     }
 
     async initializeManagedExportsAsync() {

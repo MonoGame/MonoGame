@@ -15,4 +15,10 @@ internal static partial class BrowserHostValidationReporter
 
     [JSImport("globalThis.MonoGameWebHostValidation.validateCanvasSize")]
     internal static partial void ValidateCanvasSize(int drawingBufferWidth, int drawingBufferHeight, int cssWidth, int cssHeight);
+
+    [JSImport("globalThis.MonoGameWebHostValidation.requestFocusLifecycleValidation")]
+    internal static partial void RequestFocusLifecycleValidation();
+
+    [JSImport("globalThis.MonoGameWebHostValidation.isManualFocusValidationEnabled")]
+    internal static partial bool IsManualFocusValidationEnabled();
 }

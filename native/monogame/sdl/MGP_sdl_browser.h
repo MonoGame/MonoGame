@@ -8,3 +8,4 @@
 
 void MGP_Sdl_QueueBrowserResize(MGP_Platform* platform, mgint width, mgint height);
 void MGP_Sdl_QueueBrowserResizeForWindow(MGP_Window* window, mgint width, mgint height);
+void MGP_Sdl_QueueBrowserFocus(MGP_Platform* platform, mgbyte focused);

@@ -26,6 +26,18 @@ globalThis.MonoGameWebHostValidation = {
             throw new Error(
                 `Expected canvas drawing buffer ${drawingBufferWidth}x${drawingBufferHeight} and CSS size ${cssWidth}x${cssHeight}, but found drawing buffer ${canvas.width}x${canvas.height} and CSS size ${canvasBounds.width}x${canvasBounds.height}.`);
         }
+    },
+    requestFocusLifecycleValidation() {
+        const canvas = document.getElementById("canvas");
+        if (canvas == null) {
+            throw new Error("The validation canvas was not found.");
+        }
+
+        canvas.dispatchEvent(new Event("blur"));
+        canvas.dispatchEvent(new Event("focus"));
+    },
+    isManualFocusValidationEnabled() {
+        return !new URLSearchParams(globalThis.location.search).has("auto-exit");
     }
 };
 

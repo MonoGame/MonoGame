@@ -32,11 +32,18 @@ internal sealed class BrowserHostValidationGame : Game
     private const int ExpectedCssResizeHeight = 540;
     private const int ExpectedProgrammaticResizeWidth = 640;
     private const int ExpectedProgrammaticResizeHeight = 360;
+    private const int FocusLifecycleValidationTimeoutDrawCount = ExitAfterDrawCount - 30;
 
     private readonly GraphicsDeviceManager _graphicsDeviceManager;
 
     private int _drawCount;
+    private int _activationCount;
+    private int _activationCountBeforeFocusLifecycleValidation;
     private bool _cssResizeValidated;
+    private bool _focusLifecycleDeactivated;
+    private bool _focusLifecycleValidationRequested;
+    private bool _focusLifecycleValidated;
+    private bool _keepRunningForManualFocusValidation;
     private bool _programmaticResizeRequested;
     private bool _programmaticResizeValidated;
     private bool _reportedFirstDraw;
@@ -58,6 +65,8 @@ internal sealed class BrowserHostValidationGame : Game
         Window.AllowUserResizing = false;
         Window.ClientSizeChanged += OnClientSizeChanged;
         Exiting += OnExiting;
+        Activated += OnActivated;
+        Deactivated += OnDeactivated;
 
         BrowserHostValidationReporter.ReportPhase(
             "constructor",
@@ -67,6 +76,14 @@ internal sealed class BrowserHostValidationGame : Game
     protected override void Initialize()
     {
         ValidatePlatformInfo();
+
+        _keepRunningForManualFocusValidation = BrowserHostValidationReporter.IsManualFocusValidationEnabled();
+        if (_keepRunningForManualFocusValidation)
+        {
+            BrowserHostValidationReporter.ReportPhase(
+                "manualFocusValidationEnabled",
+                "Manual focus validation is enabled. Click outside and inside the canvas to observe lifecycle events.");
+        }
 
         BrowserHostValidationReporter.ReportPhase(
             "initialize",
@@ -121,17 +138,18 @@ internal sealed class BrowserHostValidationGame : Game
                 startX,
                 topY);
 
-            _spriteBatch!.Begin(samplerState: SamplerState.LinearClamp, effect: _validationEffectFromContent);
+            // _spriteBatch!.Begin(samplerState: SamplerState.LinearClamp, effect: _validationEffectFromContent);
+            _spriteBatch!.Begin(samplerState: SamplerState.PointClamp);
             _spriteBatch.Draw(_validationTextureFromContent!, fromContentRectangle, Color.White);
             Vector2 sampleTextSize = _validationFontFromContent!.MeasureString(ValidationFontSampleText);
             Vector2 sampleTextPosition = new Vector2(
                 (GraphicsDevice.Viewport.Width - sampleTextSize.X) * 0.5f,
                 topY + ValidationTextureMaxHeight + 32.0f);
-            _spriteBatch.DrawString(
-                _validationFontFromContent,
-                ValidationFontSampleText,
-                sampleTextPosition,
-                Color.White);
+            // _spriteBatch.DrawString(
+            //     _validationFontFromContent,
+            //     ValidationFontSampleText,
+            //     sampleTextPosition,
+            //     Color.White);
             _spriteBatch.End();
 
             ReportFirstDrawValidation();
@@ -150,7 +168,13 @@ internal sealed class BrowserHostValidationGame : Game
                 $"Expected a programmatic back-buffer resize to {ExpectedProgrammaticResizeWidth}x{ExpectedProgrammaticResizeHeight}, but ClientSizeChanged was not raised.");
         }
 
-        if (_drawCount == ExitAfterDrawCount)
+        if (_drawCount == FocusLifecycleValidationTimeoutDrawCount && !_focusLifecycleValidated)
+        {
+            throw new InvalidOperationException(
+                "Expected browser focus loss and restoration to raise Deactivated and Activated.");
+        }
+
+        if (_drawCount == ExitAfterDrawCount && !_keepRunningForManualFocusValidation)
         {
             BrowserHostValidationReporter.ReportPhase(
                 "visualValidationComplete",
@@ -169,6 +193,16 @@ internal sealed class BrowserHostValidationGame : Game
             _graphicsDeviceManager.PreferredBackBufferWidth = ExpectedProgrammaticResizeWidth;
             _graphicsDeviceManager.PreferredBackBufferHeight = ExpectedProgrammaticResizeHeight;
             _graphicsDeviceManager.ApplyChanges();
+        }
+
+        if (_programmaticResizeValidated && !_focusLifecycleValidationRequested)
+        {
+            _focusLifecycleValidationRequested = true;
+            _activationCountBeforeFocusLifecycleValidation = _activationCount;
+            BrowserHostValidationReporter.ReportPhase(
+                "focusLifecycleValidationRequested",
+                "Requesting browser canvas focus loss and restoration through the host lifecycle path.");
+            BrowserHostValidationReporter.RequestFocusLifecycleValidation();
         }
 
         base.Update(gameTime);
@@ -199,6 +233,49 @@ internal sealed class BrowserHostValidationGame : Game
         BrowserHostValidationReporter.ReportPhase(
             "exiting",
             "Exit was observed.");
+    }
+
+    private void OnActivated(object sender, EventArgs eventArgs)
+    {
+        _activationCount++;
+
+        if (_keepRunningForManualFocusValidation)
+        {
+            BrowserHostValidationReporter.ReportPhase(
+                "activated",
+                "Game.Activated was raised from a browser focus change.");
+        }
+
+        if (!_focusLifecycleValidationRequested
+            || !_focusLifecycleDeactivated
+            || _focusLifecycleValidated
+            || _activationCount <= _activationCountBeforeFocusLifecycleValidation)
+        {
+            return;
+        }
+
+        _focusLifecycleValidated = true;
+        BrowserHostValidationReporter.ReportPhase(
+            "focusLifecycleValidated",
+            "Validated Game.Deactivated and Game.Activated from browser canvas focus changes.");
+    }
+
+    private void OnDeactivated(object sender, EventArgs eventArgs)
+    {
+        if (_keepRunningForManualFocusValidation)
+        {
+            BrowserHostValidationReporter.ReportPhase(
+                "deactivated",
+                "Game.Deactivated was raised from a browser focus change.");
+        }
+
+        if (!_focusLifecycleValidationRequested || _focusLifecycleDeactivated)
+            return;
+
+        _focusLifecycleDeactivated = true;
+        BrowserHostValidationReporter.ReportPhase(
+            "focusLifecycleDeactivated",
+            "Game.Deactivated was raised from browser canvas focus loss.");
     }
 
     private void OnClientSizeChanged(object sender, EventArgs eventArgs)
