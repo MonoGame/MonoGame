@@ -72,5 +72,117 @@ namespace MonoGame.Tests.Input
 
             CollectionAssert.AreEquivalent(keys, newKeysArray);
         }
+
+        [Test]
+        public void TestBitwiseOperations()
+        {
+            var azState = new KeyboardState(Keys.A, Keys.B, Keys.C, Keys.D, Keys.E, Keys.F, Keys.G, Keys.H, Keys.I, Keys.J, Keys.K, Keys.L, Keys.M, Keys.N, Keys.O, Keys.P, Keys.Q, Keys.R, Keys.S, Keys.T, Keys.U, Keys.V, Keys.W, Keys.X, Keys.Y, Keys.Z);
+
+            var numState = new KeyboardState(Keys.D0, Keys.D1, Keys.D2, Keys.D3, Keys.D4, Keys.D5, Keys.D6, Keys.D7, Keys.D8, Keys.D9);
+
+            var randState = new KeyboardState(Keys.A, Keys.D0, Keys.F1);
+
+            var orState = azState | numState;
+            Assert.AreEqual(true, orState.IsKeyDown(Keys.A));
+            Assert.AreEqual(true, orState.IsKeyDown(Keys.Z));
+            Assert.AreEqual(true, orState.IsKeyDown(Keys.D0));
+            Assert.AreEqual(true, orState.IsKeyDown(Keys.D9));
+            Assert.AreEqual(false, orState.IsKeyDown(Keys.F1));
+
+            var xorState = orState ^ randState;
+            Assert.AreEqual(false, xorState.IsKeyDown(Keys.A));
+            Assert.AreEqual(true, xorState.IsKeyDown(Keys.B));
+            Assert.AreEqual(false, xorState.IsKeyDown(Keys.D0));
+            Assert.AreEqual(true, xorState.IsKeyDown(Keys.D1));
+            Assert.AreEqual(true, xorState.IsKeyDown(Keys.F1));
+
+            var invState = ~orState;
+            Assert.AreEqual(false, invState.IsKeyDown(Keys.A));
+            Assert.AreEqual(false, invState.IsKeyDown(Keys.Z));
+            Assert.AreEqual(false, invState.IsKeyDown(Keys.D0));
+            Assert.AreEqual(false, invState.IsKeyDown(Keys.D9));
+            Assert.AreEqual(true, invState.IsKeyDown(Keys.F1));
+
+            var andState = invState & randState;
+            Assert.AreEqual(false, andState.AnyKeyDown(azState));
+            Assert.AreEqual(false, andState.AnyKeyDown(numState));
+            Assert.AreEqual(true, andState.AnyKeyDown(randState));
+
+            var emptyState = andState & ~andState;
+            Assert.AreEqual(emptyState, KeyboardState.Empty);
+
+            var aState = new KeyboardState(Keys.A);
+            var shfitAState = new KeyboardState(Keys.LeftShift, Keys.A);
+            var bState = new KeyboardState(Keys.B);
+            var shiftBState = new KeyboardState(Keys.LeftShift, Keys.B);
+            var shiftState = new KeyboardState(Keys.LeftShift);
+            var ctrlCState = new KeyboardState(Keys.LeftControl, Keys.C);
+
+            Assert.AreEqual(true, aState.AnyKeyDown(includeModifiers: false));
+            Assert.AreEqual(false, shiftState.AnyKeyDown(includeModifiers: false));
+            Assert.AreEqual(true, shfitAState.AnyKeyDown(includeModifiers: false));
+
+            Assert.AreEqual(true, aState.AnyKeyDown());
+            Assert.AreEqual(true, shiftState.AnyKeyDown());
+            Assert.AreEqual(true, shfitAState.AnyKeyDown());
+
+            // when keys == [A]
+            //   A =         true
+            //   Shift + A = true
+            //   Shift =     false
+            //   B =         false
+            //   Shift + B = false
+            // when keys == [Shift]
+            //   Shift     = false
+            Assert.AreEqual(true, aState.AnyKeyDown(aState, includeModifiers: false));
+            Assert.AreEqual(true, shfitAState.AnyKeyDown(aState, includeModifiers: false));
+            Assert.AreEqual(false, shiftState.AnyKeyDown(aState, includeModifiers: false));
+            Assert.AreEqual(false, bState.AnyKeyDown(aState, includeModifiers: false));
+            Assert.AreEqual(false, shiftBState.AnyKeyDown(aState, includeModifiers: false));
+            Assert.AreEqual(false, ctrlCState.AnyKeyDown(aState, includeModifiers: false));
+            Assert.AreEqual(false, shiftState.AnyKeyDown(shiftState, includeModifiers: false));
+
+            // when keys == [A]
+            //   A =         true
+            //   Shift + A = true
+            //   Shift =     false
+            //   B =         false
+            //   Shift + B = false
+            // when keys == [Shift]
+            //   Shift     = true
+            Assert.AreEqual(true, aState.AnyKeyDown(aState));
+            Assert.AreEqual(true, shfitAState.AnyKeyDown(aState));
+            Assert.AreEqual(false, shiftState.AnyKeyDown(aState));
+            Assert.AreEqual(false, bState.AnyKeyDown(aState));
+            Assert.AreEqual(false, shiftBState.AnyKeyDown(aState));
+            Assert.AreEqual(false, ctrlCState.AnyKeyDown(aState));
+            Assert.AreEqual(true, shiftState.AnyKeyDown(shiftState));
+
+            // when keys == [A]
+            //   A =         false
+            //   Shift + A = false
+            //   Shift =     false
+            //   B =         true
+            //   Shift + B = true
+            Assert.AreEqual(false, aState.AnyKeyDownExcept(aState, includeModifiers: false));
+            Assert.AreEqual(false, shfitAState.AnyKeyDownExcept(aState, includeModifiers: false));
+            Assert.AreEqual(false, shiftState.AnyKeyDownExcept(aState, includeModifiers: false));
+            Assert.AreEqual(true, bState.AnyKeyDownExcept(aState, includeModifiers: false));
+            Assert.AreEqual(true, shiftBState.AnyKeyDownExcept(aState, includeModifiers: false));
+            Assert.AreEqual(true, ctrlCState.AnyKeyDownExcept(aState, includeModifiers: false));
+
+            // when keys == [A]
+            //   A =         false
+            //   Shift + A = true
+            //   Shift =     true
+            //   B =         true
+            //   Shift + B = true
+            Assert.AreEqual(false, aState.AnyKeyDownExcept(aState));
+            Assert.AreEqual(true, shfitAState.AnyKeyDownExcept(aState));
+            Assert.AreEqual(true, shiftState.AnyKeyDownExcept(aState));
+            Assert.AreEqual(true, bState.AnyKeyDownExcept(aState));
+            Assert.AreEqual(true, shiftBState.AnyKeyDownExcept(aState));
+            Assert.AreEqual(true, ctrlCState.AnyKeyDownExcept(aState));
+        }
     }
 }
