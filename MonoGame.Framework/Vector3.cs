@@ -1325,11 +1325,14 @@ namespace Microsoft.Xna.Framework
         #region TransformCoord
 
         /// <summary>
-        /// Creates a new <see cref="Vector3"/> that contains a transformation of the specified vector by the specified <see cref="Matrix"/>, mapping it back to w = 1.
+        /// Creates a new <see cref="Vector3"/> that contains a transformation of the specified position vector by the specified <see cref="Matrix"/> and applies the perspective divide.
         /// </summary>
-        /// <param name="vector">Source <see cref="Vector3"/> which represents a 3D vector.</param>
-        /// <param name="matrix">The transformation <see cref="Matrix"/>.</param>
+        /// <param name="vector">Source <see cref="Vector3"/> representing a position.</param>
+        /// <param name="matrix">The transformation <see cref="Matrix"/> including a projection.</param>
         /// <returns>Transformed vector.</returns>
+        /// <remarks>
+        /// This transform can produce infinity or NaN if the specified position lies exactly on the camera plane.
+        /// </remarks>
         public static Vector3 TransformCoord(Vector3 vector, Matrix matrix)
         {
             TransformCoord(ref vector, ref matrix, out vector);
@@ -1337,11 +1340,14 @@ namespace Microsoft.Xna.Framework
         }
 
         /// <summary>
-        /// Creates a new <see cref="Vector3"/> that contains a transformation of the specified vector by the specified <see cref="Matrix"/>, mapping it back to w = 1.
+        /// Creates a new <see cref="Vector3"/> that contains a transformation of the specified position vector by the specified <see cref="Matrix"/> and applies the perspective divide.
         /// </summary>
-        /// <param name="vector">Source <see cref="Vector3"/> which represents a 3D vector.</param>
-        /// <param name="matrix">The transformation <see cref="Matrix"/>.</param>
+        /// <param name="vector">Source <see cref="Vector3"/> representing a position.</param>
+        /// <param name="matrix">The transformation <see cref="Matrix"/> including a projection.</param>
         /// <param name="result">Transformed vector as an output parameter.</param>
+        /// <remarks>
+        /// This transform can produce infinity or NaN if the specified position lies exactly on the camera plane.
+        /// </remarks>
         public static void TransformCoord(ref Vector3 vector, ref Matrix matrix, out Vector3 result)
         {
             var x = (vector.X * matrix.M11) + (vector.Y * matrix.M21) + (vector.Z * matrix.M31) + matrix.M41;
@@ -1355,14 +1361,18 @@ namespace Microsoft.Xna.Framework
         }
 
         /// <summary>
-        /// Apply transformation on vectors within array of <see cref="Vector3"/> by the specified <see cref="Matrix"/> and places the results in an another array, mapping them back to w = 1.
+        /// Apply transformation on all positions within array of <see cref="Vector3"/> by the specified <see cref="Matrix"/>
+        /// and places the results in an another array, applying the perspective divide.
         /// </summary>
         /// <param name="sourceArray">Source array.</param>
         /// <param name="sourceIndex">The starting index of transformation in the source array.</param>
-        /// <param name="matrix">The transformation <see cref="Matrix"/>.</param>
+        /// <param name="matrix">The transformation <see cref="Matrix"/> including a projection.</param>
         /// <param name="destinationArray">Destination array.</param>
         /// <param name="destinationIndex">The starting index in the destination array, where the first <see cref="Vector3"/> should be written.</param>
         /// <param name="length">The number of vectors to be transformed.</param>
+        /// <remarks>
+        /// This transform can produce infinity or NaN if the specified position lies exactly on the camera plane.
+        /// </remarks>
         public static void TransformCoord(Vector3[] sourceArray,
          int sourceIndex,
          ref Matrix matrix,
@@ -1393,10 +1403,11 @@ namespace Microsoft.Xna.Framework
         }
 
         /// <summary>
-        /// Apply transformation on all vectors within array of <see cref="Vector3"/> by the specified <see cref="Matrix"/> and places the results in an another array, mapping them back to w = 1.
+        /// Apply transformation on all positions within array of <see cref="Vector3"/> by the specified <see cref="Matrix"/>
+        /// and places the results in an another array, applying the perspective divide.
         /// </summary>
         /// <param name="sourceArray">Source array.</param>
-        /// <param name="matrix">The transformation <see cref="Matrix"/>.</param>
+        /// <param name="matrix">The transformation <see cref="Matrix"/> including a projection.</param>
         /// <param name="destinationArray">Destination array.</param>
         public static void TransformCoord(Vector3[] sourceArray, ref Matrix matrix, Vector3[] destinationArray)
         {
