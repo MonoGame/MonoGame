@@ -2,9 +2,6 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using Microsoft.Xna.Framework.Content.Pipeline.Processors;
 
 namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
@@ -14,7 +11,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
     /// </summary>
     public abstract class TextureProfile
     {
-        private static readonly LoadedTypeCollection<TextureProfile> _profiles = new LoadedTypeCollection<TextureProfile>();
+        private static readonly LoadedTypeCollection<TextureProfile> Profiles = new();
 
         /// <summary>
         /// Find the profile for this target platform.
@@ -23,11 +20,8 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
         /// <returns></returns>
         public static TextureProfile ForPlatform(TargetPlatform platform)
         {
-            var profile = _profiles.FirstOrDefault(h => h.Supports(platform));
-            if (profile != null)
-                return profile;
-
-            throw new PipelineException("There is no supported texture profile for the '" + platform + "' platform!");
+            return Profiles.FirstOrDefault(h => h.Supports(platform)) ??
+                throw new PipelineException("There is no supported texture profile for the '" + platform + "' platform!");
         }
 
         /// <summary>
@@ -79,18 +73,18 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
             }
             catch (EntryPointNotFoundException ex)
             {
-                context.Logger.LogImportantMessage("Could not find the entry point to compress the texture. " + ex.ToString());
-                throw ex;
+                context.Logger.Log(LogLevel.Error, $"Could not find the entry point to compress the texture. {ex}");
+                throw;
             }
             catch (DllNotFoundException ex)
             {
-                context.Logger.LogImportantMessage("Could not compress texture. Required shared lib is missing. " + ex.ToString());
-                throw ex;
+                context.Logger.Log(LogLevel.Error, $"Could not compress texture. Required shared lib is missing. {ex}");
+                throw;
             }
             catch (Exception ex)
             {
-                context.Logger.LogImportantMessage("Could not convert texture. " + ex.ToString());
-                throw ex;
+                context.Logger.Log(LogLevel.Error, $"Could not convert texture. {ex}");
+                throw;
             }
         }
 

@@ -34,6 +34,7 @@ namespace MonoGame.OpenGL
     }
     internal enum DrawBuffersEnum
     {
+        None = 0,
         UnsignedShort,
         UnsignedInt,
     }
