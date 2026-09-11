@@ -115,7 +115,7 @@ namespace MonoGame.Tests.Graphics
         }
 
         [Test]
-#if DESKTOPGL
+#if DESKTOPGL || DESKTOPGL4
         [Ignore("Fails under OpenGL!")]
 #endif
         public void EffectParameterShouldBeSetIfSetByNameAndGetByIndex()

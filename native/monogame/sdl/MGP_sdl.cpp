@@ -180,6 +180,13 @@ struct MGP_Window
 	std::string identifier;
 
     SDL_Window* window = nullptr;
+    SDL_Window* retiredWindow = nullptr;
+#if defined(MG_OPENGL)
+    mgint contextMajorVersion = 4;
+    mgint contextMinorVersion = 1;
+    MGP_WindowCreateInfo windowCreateInfo = {};
+    bool hasWindowCreateInfo = false;
+#endif
 };
 
 struct MGP_Cursor
@@ -278,6 +285,8 @@ MGMonoGamePlatform MGP_Platform_GetPlatform()
     return MGMonoGamePlatform::DesktopVK;
 #elif MG_DIRECTX12
     return MGMonoGamePlatform::WindowsDX12;
+#elif MG_OPENGL
+    return MGMonoGamePlatform::DesktopGL;
 #else
     assert(false);
     return (MGMonoGamePlatform)-1;
@@ -290,6 +299,8 @@ MGGraphicsBackend MGP_Platform_GetGraphicsBackend()
     return MGGraphicsBackend::Vulkan;
 #elif MG_DIRECTX12
     return MGGraphicsBackend::DirectX12;
+#elif MG_OPENGL
+    return MGGraphicsBackend::OpenGL;
 #else
     assert(false);
     return (MGGraphicsBackend)-1;
@@ -513,7 +524,7 @@ mgbyte MGP_Platform_PollEvent(MGP_Platform* platform, MGP_Event& event_)
             event_.MouseWheel.Scroll = ev.wheel.y * MOUSE_WHEEL_DELTA;
             event_.MouseWheel.ScrollH = ev.wheel.x * MOUSE_WHEEL_DELTA;
             return true;
-        
+
         case SDL_EventType::SDL_MOUSEBUTTONUP:
         case SDL_EventType::SDL_MOUSEBUTTONDOWN:
             event_.Type = ev.type == SDL_EventType::SDL_MOUSEBUTTONDOWN ? MGEventType::MouseButtonDown : MGEventType::MouseButtonUp;
@@ -702,7 +713,7 @@ mgbyte MGP_Platform_BeforeDraw(MGP_Platform* platform)
     // This code assume that we only have one primary window. If we ever implement multi-window support, this will need to be changed.
     for (auto window : platform->windows)
     {
-        if (window != nullptr)
+        if (window != nullptr && window->window != nullptr)
         {
             auto flags = SDL_GetWindowFlags(window->window);
             if ((flags & SDL_WINDOW_MINIMIZED) != 0)
@@ -713,18 +724,19 @@ mgbyte MGP_Platform_BeforeDraw(MGP_Platform* platform)
 	return true;
 }
 
-MGP_Window* MGP_Window_Create(
-    MGP_Platform* platform,
+static mgbyte MGP_Window_CreateNativeWindowInternal(
+    MGP_Window* window,
     mgint& width,
     mgint& height,
-    const char* title)
+    const char* title,
+    const MGP_WindowCreateInfo* windowCreateInfo)
 {
-	assert(platform != nullptr);
+	assert(window!= nullptr);
     assert(width > 0);
     assert(height > 0);
 
-	auto window = new MGP_Window();
-	window->platform = platform;
+    if (window->window != nullptr)
+        return true;
 
     // TODO: Why did this start with SDL_WINDOW_FULLSCREEN_DESKTOP in the old C# SDL?
     // We should write coments to document odd behaviors like this.
@@ -733,6 +745,27 @@ MGP_Window* MGP_Window_Create(
 
 #if defined(MG_VULKAN) || defined(MG_DIRECTX12)
 	flags |= SDL_WINDOW_VULKAN;
+#elif defined(MG_OPENGL)
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, window->contextMajorVersion);
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, window->contextMinorVersion);
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
+    SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
+    SDL_GL_SetAttribute(SDL_GL_RED_SIZE, windowCreateInfo != nullptr ? windowCreateInfo->redSize : 8);
+    SDL_GL_SetAttribute(SDL_GL_GREEN_SIZE, windowCreateInfo != nullptr ? windowCreateInfo->greenSize : 8);
+    SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE, windowCreateInfo != nullptr ? windowCreateInfo->blueSize : 8);
+    SDL_GL_SetAttribute(SDL_GL_ALPHA_SIZE, windowCreateInfo != nullptr ? windowCreateInfo->alphaSize : 8);
+    SDL_GL_SetAttribute(SDL_GL_FRAMEBUFFER_SRGB_CAPABLE, windowCreateInfo != nullptr ? windowCreateInfo->framebufferSrgbCapable : 0);
+    SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, windowCreateInfo != nullptr ? windowCreateInfo->depthSize : 24);
+    SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, windowCreateInfo != nullptr ? windowCreateInfo->stencilSize : 8);
+    SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, windowCreateInfo != nullptr ? windowCreateInfo->multiSampleBuffers : 0);
+    SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, windowCreateInfo != nullptr ? windowCreateInfo->multiSampleSamples : 0);
+    SDL_GL_SetAttribute(SDL_GL_ACCELERATED_VISUAL, 1);
+#if defined(__APPLE__)
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_FLAGS, SDL_GL_CONTEXT_FORWARD_COMPATIBLE_FLAG);
+#else
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_FLAGS, 0);
+#endif
+    flags |= SDL_WINDOW_OPENGL;
 #else
 	#error Not implemented
 #endif
@@ -740,21 +773,143 @@ MGP_Window* MGP_Window_Create(
     title = title ? title : "";
 
 	window->window = SDL_CreateWindow((const char*)title, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, width, height, flags);
-	
+
 	if (window->window == nullptr)
 	{
 		printf("SDL_CreateWindow failed: %s\n", SDL_GetError());
         fflush(stdout);
-
-		delete window;
-		return nullptr;
+        return false;
 	}
 
     window->windowId = SDL_GetWindowID(window->window);
 
-	platform->windows.push_back(window);
+#if defined(MG_OPENGL)
+    if (windowCreateInfo != nullptr)
+    {
+        window->windowCreateInfo = *windowCreateInfo;
+        window->hasWindowCreateInfo = true;
+    }
+#endif
 
-	return window;
+    return true;
+}
+
+MGP_Window* MGP_Window_Create(
+    MGP_Platform* platform,
+    mgint& width,
+    mgint& height,
+    const char* title,
+    const MGP_WindowCreateInfo* windowCreateInfo)
+{
+    assert(platform != nullptr);
+    assert(width > 0);
+    assert(height > 0);
+
+    auto window = new MGP_Window();
+    window->platform = platform;
+
+    platform->windows.push_back(window);
+
+#if defined(MG_VULKAN) || defined(MG_DIRECTX12)
+    if (!MGP_Window_CreateNativeWindowInternal(window, width, height, title, windowCreateInfo))
+    {
+        mg_remove(platform->windows, window);
+        delete window;
+        return nullptr;
+    }
+#endif
+
+    return window;
+}
+
+mgbyte MGP_Window_CreateNativeWindow(
+    MGP_Window* window,
+    mgint& width,
+    mgint& height,
+    const char* title,
+    const MGP_WindowCreateInfo* windowCreateInfo)
+{
+    assert(window != nullptr);
+    return MGP_Window_CreateNativeWindowInternal(window, width, height, title, windowCreateInfo);
+}
+
+mgbyte MGP_Window_BeginRecreateNativeWindow(
+    MGP_Window* window,
+    mgint& width,
+    mgint& height,
+    const char* title,
+    const MGP_WindowCreateInfo* windowCreateInfo)
+{
+    assert(window != nullptr);
+    assert(window->window != nullptr);
+    assert(width > 0);
+    assert(height > 0);
+
+    if (window->retiredWindow != nullptr)
+        return false;
+
+    // On Windows we need to keep the old SDL window around until the new GL
+    // context has been created with the replacement window.
+    SDL_Window* retiredWindow = window->window;
+    Uint32 retiredWindowId = window->windowId;
+
+    window->window = nullptr;
+    window->windowId = 0;
+
+    if (!MGP_Window_CreateNativeWindowInternal(window, width, height, title, windowCreateInfo))
+    {
+        window->window = retiredWindow;
+        window->windowId = retiredWindowId;
+        return false;
+    }
+
+    window->retiredWindow = retiredWindow;
+    return true;
+}
+
+mgbyte MGP_Window_RecreateForGraphicsRetry(MGP_Window* window)
+{
+#if defined(MG_OPENGL)
+    assert(window != nullptr);
+    assert(window->window != nullptr);
+
+    if (!window->hasWindowCreateInfo || (window->contextMajorVersion == 3 && window->contextMinorVersion == 1))
+        return false;
+
+    mgint previousMajorVersion = window->contextMajorVersion;
+    mgint previousMinorVersion = window->contextMinorVersion;
+    window->contextMajorVersion = 3;
+    window->contextMinorVersion = 1;
+
+    mgint width = 0;
+    mgint height = 0;
+    SDL_GetWindowSize(window->window, &width, &height);
+    MGP_WindowCreateInfo windowCreateInfo = window->windowCreateInfo;
+
+    if (!MGP_Window_BeginRecreateNativeWindow(window, width, height, SDL_GetWindowTitle(window->window), &windowCreateInfo))
+    {
+        window->contextMajorVersion = previousMajorVersion;
+        window->contextMinorVersion = previousMinorVersion;
+        return false;
+    }
+
+    return true;
+#else
+    (void)window;
+    return false;
+#endif
+}
+
+void MGP_Window_FinalizeRecreateNativeWindow(MGP_Window* window)
+{
+    assert(window != nullptr);
+
+    if (window->retiredWindow == nullptr)
+        return;
+
+    // The new GL conext is current, so we can get rid of the old SDL window now.
+    SDL_DestroyWindow(window->retiredWindow);
+    window->retiredWindow = nullptr;
 }
 
 void MGP_Window_Destroy(MGP_Window* window)
@@ -762,11 +917,39 @@ void MGP_Window_Destroy(MGP_Window* window)
 	assert(window != nullptr);
 	assert(window->platform != nullptr);
 
-	assert(window->window != nullptr);
-	SDL_DestroyWindow(window->window);
+	if(window->window != nullptr);
+	    SDL_DestroyWindow(window->window);
+
+    if (window->retiredWindow != nullptr)
+        SDL_DestroyWindow(window->retiredWindow);
 
 	mg_remove(window->platform->windows, window);
 	delete window;
+}
+
+void MGP_Window_DestroyNativeWindow(MGP_Window* window)
+{
+    assert(window != nullptr);
+
+    if (window->window == nullptr)
+        return;
+
+#if defined(MG_OPENGL)
+    // Make sure the GL context is no longer current on this window before
+    // destroying it or WGL could keep a dead window/pixel-format binding alive.
+    if (SDL_GL_GetCurrentWindow() == window->window)
+        SDL_GL_MakeCurrent(nullptr, nullptr);
+#endif
+
+    SDL_DestroyWindow(window->window);
+    window->window = nullptr;
+    window->windowId = 0;
+
+    if (window->retiredWindow != nullptr)
+    {
+        SDL_DestroyWindow(window->retiredWindow);
+        window->retiredWindow = nullptr;
+    }
 }
 
 void MGP_Window_SetIconBitmap(MGP_Window* window, mgbyte* icon, mgint length)
@@ -782,7 +965,6 @@ void MGP_Window_SetIconBitmap(MGP_Window* window, mgbyte* icon, mgint length)
 void* MGP_Window_GetNativeHandle(MGP_Window* window)
 {
 	assert(window != nullptr);
-	assert(window->window != nullptr);
 	return window->window;
 }
 
@@ -889,7 +1071,7 @@ void MGP_Window_SetCursor(MGP_Window* window, MGP_Cursor* cursor)
 {
     assert(window != nullptr);
     assert(cursor != nullptr);
-    
+
     SDL_SetCursor(cursor->cursor);
 }
 

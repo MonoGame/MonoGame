@@ -218,7 +218,7 @@ namespace MonoGame.Tests {
             }
 
             [Test]
-#if DESKTOPGL
+#if DESKTOPGL || DESKTOPGL4
             [Ignore("This crashes inside SDL on Mac!")]
 #endif
             public void ExitHappensAtEndOfTick()
