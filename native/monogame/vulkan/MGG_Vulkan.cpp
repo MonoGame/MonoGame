@@ -13,6 +13,7 @@
 #include "SkinnedEffect.vk.mgfxo.h"
 #include "SpriteEffect.vk.mgfxo.h"
 #include "mg_effect.h"
+#include <sstream>
 
 #define VULKAN_HPP_DISPATCH_LOADER_DYNAMIC 1
 #define VULKAN_HPP_NO_EXCEPTIONS
@@ -915,6 +916,37 @@ MGG_GraphicsSystem* MGG_GraphicsSystem_Create()
 			printf("Validation layers aren't supported (you might want to install the Vulkan SDK to support them).\n");
 	}
 
+	// Enable instance extensions requested by the game.
+	const char* requestedInstanceExtensionsSetting = MGG_Config_GetString(MGConfigKey::VulkanInstanceExtensions);
+	std::vector<std::string> requestedInstanceExtensions;
+	if (requestedInstanceExtensionsSetting != nullptr && requestedInstanceExtensionsSetting[0] != '\0')
+	{
+		std::stringstream ss(requestedInstanceExtensionsSetting);
+		std::string ext;
+
+		while (ss >> ext)
+		{
+			requestedInstanceExtensions.push_back(ext);
+		}
+
+		for (const auto& extensionString : requestedInstanceExtensions)
+		{
+			bool found = false;
+			for (auto existingInstanceExtension : instanceExtensions)
+			{
+				if (strcmp(existingInstanceExtension, extensionString.c_str()) == 0)
+				{
+					found = true;
+					break;
+				}
+			}
+			if (!found)
+			{
+				instanceExtensions.push_back(extensionString.c_str());
+			}
+		}
+	}
+
 	VkInstanceCreateInfo instance_create_info = { VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO };
 	instance_create_info.pApplicationInfo = &app_info;
 	instance_create_info.enabledExtensionCount = instanceExtensions.size();
@@ -1445,6 +1477,37 @@ MGG_GraphicsDevice* MGG_GraphicsDevice_Create(MGG_GraphicsSystem* system, MGG_Gr
 
 		deviceCreateInfo.pEnabledFeatures = nullptr;
 		deviceCreateInfo.pNext = &deviceFeatures2;
+	}
+
+	// Enable device extensions requested by the game.
+	const char* requestedDeviceExtensionsSetting = MGG_Config_GetString(MGConfigKey::VulkanDeviceExtensions);
+	std::vector<std::string> requestedDeviceExtensions;
+	if (requestedDeviceExtensionsSetting != nullptr && requestedDeviceExtensionsSetting[0] != '\0')
+	{
+		std::stringstream ss(requestedDeviceExtensionsSetting);
+		std::string ext;
+
+		while (ss >> ext)
+		{
+			requestedDeviceExtensions.push_back(ext);
+		}
+
+		for (const auto& extensionString : requestedDeviceExtensions)
+		{
+			bool found = false;
+			for (auto existingExtension : extensions)
+			{
+				if (strcmp(existingExtension, extensionString.c_str()) == 0)
+				{
+					found = true;
+					break;
+				}
+			}
+			if (!found)
+			{
+				extensions.push_back(extensionString.c_str());
+			}
+		}
 	}
 
 	deviceCreateInfo.enabledExtensionCount = extensions.size();
@@ -2239,7 +2302,8 @@ void MGVK_PrepareFrame(MGG_GraphicsDevice* device)
 	frame.uniformOffset = 0;
 	if (frame.uniforms == NULL)
 	{
-		frame.uniforms = MGVK_Buffer_Create(device, MGBufferType::Constant, 32 * 1024 * 1024, true);
+		mgint ringbufferSize = MGG_Config_GetInt(MGConfigKey::VulkanUniformRingbufferSize);
+		frame.uniforms = MGVK_Buffer_Create(device, MGBufferType::Constant, ringbufferSize, true);
 		VK_SET_OBJECT_NAME(device->device, frame.uniforms->buffer, VK_OBJECT_TYPE_BUFFER, "MGVK_FrameState.uniforms->buffer");
 	}
 
@@ -3391,7 +3455,11 @@ static void MGVK_UpdateRenderPass(MGG_GraphicsDevice* device, FrameCounter curre
 	device->deferredOcclusionQueries.clear();
 }
 
-static const int DefaultPoolSize = 16384;
+static int GetDescriptorPoolSize()
+{
+	static const int size = MGG_Config_GetInt(MGConfigKey::VulkanDescriptorPoolSize);
+	return size;
+}
 
 static void MGVK_FillDescriptorSetCache(MGG_GraphicsDevice* device, MGG_Shader* shader)
 {
@@ -3400,7 +3468,7 @@ static void MGVK_FillDescriptorSetCache(MGG_GraphicsDevice* device, MGG_Shader* 
 	alloc_info.descriptorPool = shader->pool;
 	alloc_info.descriptorSetCount = 1;
 	alloc_info.pSetLayouts = &shader->setLayout;
-	for (int i = 0; i < DefaultPoolSize; i++)
+	for (int i = 0; i < GetDescriptorPoolSize(); i++)
 	{
 		MGVK_DescriptorInfo* info = new MGVK_DescriptorInfo;
 		info->frame = 0;
@@ -5619,13 +5687,13 @@ MGG_Shader* MGG_Shader_Create(MGG_GraphicsDevice* device, MGShaderStage stage, m
 		{
 			auto& b = layoutBindings[i];
 			pool_sizes[i].type = b.descriptorType;
-			pool_sizes[i].descriptorCount = DefaultPoolSize;
+			pool_sizes[i].descriptorCount = GetDescriptorPoolSize();
 		}
 
 		shader->poolInfo = new VkDescriptorPoolCreateInfo();
 		shader->poolInfo->sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
 		shader->poolInfo->flags = 0;
-		shader->poolInfo->maxSets = DefaultPoolSize;
+		shader->poolInfo->maxSets = GetDescriptorPoolSize();
 		shader->poolInfo->poolSizeCount = layoutBindings.size();
 		shader->poolInfo->pPoolSizes = pool_sizes;
 

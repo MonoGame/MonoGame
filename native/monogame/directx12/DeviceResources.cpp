@@ -3,6 +3,7 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 #include "directx12.h"
+#include "api_MGG.h"
 
 #include "DeviceResources.h"
 #include "GraphicsEnums.h"
@@ -269,16 +270,11 @@ public:
 #if !defined(_GAMING_XBOX)
             desc.pAdapter = adapter;
 
-            // The unit tests will fail on our current Windows runner
-            // if we do not reduce the block size we get OOM errors.
-            //
-            // Note we're not having this issue on Vulkan on the same
-            // Windows runner.  So what are we doing wrong on DX12 that
-            // we need to do this here?
-            //
-            const char* running_unit_tests = std::getenv("MG_RUNNING_UNIT_TESTS");
-            if (running_unit_tests != nullptr)
-                desc.PreferredBlockSize = 4ull * 1024 * 1024;
+            mgint blockSize = MGG_Config_GetInt(MGConfigKey::Dx12PreferredBlockSize);
+            if (blockSize > 0)
+            {
+                desc.PreferredBlockSize = static_cast<UINT64>(blockSize);
+            }
 #else
             Microsoft::WRL::ComPtr<IDXGIDevice1> dxgiDevice;
             Microsoft::WRL::ComPtr<IDXGIAdapter> dxgiAdapter;
@@ -768,7 +764,7 @@ RETRY_FIND_BUFFER:
     {
         pImpl->CleanupTempBuffers(frame);
 
-        const int MAX_BUFFER_POOL_SIZE = 32;
+        const mgint MAX_BUFFER_POOL_SIZE = MGG_Config_GetInt(MGConfigKey::Dx12MaxUploadBufferPoolSize);
         if (pImpl->m_tempBuffers.size() > MAX_BUFFER_POOL_SIZE)
         {
             if (++retry_count > 10)

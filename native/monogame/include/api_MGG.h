@@ -82,3 +82,11 @@ MG_EXPORT void MGG_OcclusionQuery_Destroy(MGG_GraphicsDevice* device, MGG_Occlus
 MG_EXPORT void MGG_OcclusionQuery_Begin(MGG_GraphicsDevice* device, MGG_OcclusionQuery* query);
 MG_EXPORT void MGG_OcclusionQuery_End(MGG_GraphicsDevice* device, MGG_OcclusionQuery* query);
 MG_EXPORT mgbyte MGG_OcclusionQuery_GetResult(MGG_GraphicsDevice* device, MGG_OcclusionQuery* query, mgint& pixelCount);
+MG_EXPORT void MGG_Config_SetString(MGConfigKey key, const char* value);
+MG_EXPORT void MGG_Config_SetInt(MGConfigKey key, mgint value);
+MG_EXPORT mgint MGG_Config_GetKeyCount();
+MG_EXPORT void MGG_Config_GetKeyDetails(mgint index, const char** configKey, mgint* configValue);
+const char* MGG_Config_GetString(MGConfigKey key);
+mgint MGG_Config_GetInt(MGConfigKey key);
+const char* MGG_Config_GetDefaultString(MGConfigKey key);
+mgint MGG_Config_GetDefaultInt(MGConfigKey key);
