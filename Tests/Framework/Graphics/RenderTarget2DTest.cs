@@ -1,4 +1,4 @@
-﻿// MonoGame - Copyright (C) MonoGame Foundation, Inc
+// MonoGame - Copyright (C) MonoGame Foundation, Inc
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
@@ -184,6 +184,85 @@ namespace MonoGame.Tests.Graphics
             var resource = SharpDX.CppObject.FromPointer<SharpDX.DXGI.Resource>(sharedHandle);
 
             rt.Dispose();
+        }
+
+        [Test]
+        public void FromNativeHandle_DirectX()
+        {
+            var desc = new SharpDX.Direct3D11.Texture2DDescription
+            {
+                Width = 32,
+                Height = 32,
+                MipLevels = 1,
+                ArraySize = 1,
+                Format = SharpDX.DXGI.Format.R8G8B8A8_UNorm,
+                SampleDescription = new SharpDX.DXGI.SampleDescription(1, 0),
+                Usage = SharpDX.Direct3D11.ResourceUsage.Default,
+                BindFlags = SharpDX.Direct3D11.BindFlags.RenderTarget | SharpDX.Direct3D11.BindFlags.ShaderResource,
+            };
+
+            using (var d3dTexture = new SharpDX.Direct3D11.Texture2D(gd._d3dDevice, desc))
+            {
+                var rt = RenderTarget2D.FromNativeHandle(gd, d3dTexture.NativePointer, 32, 32);
+                Assert.IsNotNull(rt);
+                Assert.AreEqual(32, rt.Width);
+                Assert.AreEqual(32, rt.Height);
+
+                gd.SetRenderTarget(rt);
+                gd.Clear(Color.CornflowerBlue);
+                gd.SetRenderTarget(null);
+
+                var data = new Color[32 * 32];
+                rt.GetData(data);
+                Assert.AreEqual(Color.CornflowerBlue, data[0]);
+
+                rt.Dispose();
+
+                // Native texture should still be valid, and not destroyed.
+                Assert.IsFalse(d3dTexture.IsDisposed);
+            }
+        }
+#endif
+
+#if DESKTOPGL
+        [Test]
+        public void FromNativeHandle_OpenGL()
+        {
+            int texId = 0;
+            MonoGame.OpenGL.GL.GenTextures(1, out texId);
+            MonoGame.OpenGL.GL.BindTexture(MonoGame.OpenGL.TextureTarget.Texture2D, texId);
+            MonoGame.OpenGL.GL.TexImage2D(
+                MonoGame.OpenGL.TextureTarget.Texture2D,
+                0,
+                MonoGame.OpenGL.PixelInternalFormat.Rgba,
+                32,
+                32,
+                0,
+                MonoGame.OpenGL.PixelFormat.Rgba,
+                MonoGame.OpenGL.PixelType.UnsignedByte,
+                IntPtr.Zero);
+            MonoGame.OpenGL.GL.BindTexture(MonoGame.OpenGL.TextureTarget.Texture2D, 0);
+
+            var rt = RenderTarget2D.FromNativeHandle(gd, (nint)texId, 32, 32);
+            Assert.IsNotNull(rt);
+            Assert.AreEqual(32, rt.Width);
+            Assert.AreEqual(32, rt.Height);
+
+            gd.SetRenderTarget(rt);
+            gd.Clear(Color.CornflowerBlue);
+            gd.SetRenderTarget(null);
+
+            var data = new Color[32 * 32];
+            rt.GetData(data);
+            Assert.AreEqual(Color.CornflowerBlue, data[0]);
+
+            rt.Dispose();
+
+            // Native texture should still be valid and bindable, without a GL error.
+            MonoGame.OpenGL.GL.BindTexture(MonoGame.OpenGL.TextureTarget.Texture2D, texId);
+            Assert.AreEqual(MonoGame.OpenGL.ErrorCode.NoError, MonoGame.OpenGL.GL.GetError());
+            MonoGame.OpenGL.GL.BindTexture(MonoGame.OpenGL.TextureTarget.Texture2D, 0);
+            MonoGame.OpenGL.GL.DeleteTextures(1, ref texId);
         }
 #endif
 

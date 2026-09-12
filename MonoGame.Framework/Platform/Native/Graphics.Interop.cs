@@ -372,6 +372,16 @@ internal static unsafe partial class MGG
         int multiSampleCount,
         RenderTargetUsage usage);
 
+    [DllImport(MGP.MonoGameNativeDLL, EntryPoint = "MGG_RenderTarget_WrapNativeHandle", ExactSpelling = true)]
+    public static extern MGG_Texture* RenderTarget_WrapNativeHandle(
+        MGG_GraphicsDevice* device,
+        nint nativeHandle,
+        SurfaceFormat format,
+        int width,
+        int height,
+        DepthFormat depthFormat,
+        int multiSampleCount);
+
     [DllImport(MGP.MonoGameNativeDLL, EntryPoint = "MGG_Texture_Destroy", ExactSpelling = true)]
     public static extern void Texture_Destroy(MGG_GraphicsDevice* device, MGG_Texture* texture);
 

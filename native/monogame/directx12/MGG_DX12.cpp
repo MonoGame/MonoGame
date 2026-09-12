@@ -2415,3 +2415,36 @@ mgbyte MGG_OcclusionQuery_GetResult(MGG_GraphicsDevice* device, MGG_OcclusionQue
 
 	return true;
 }
+
+MGG_Texture* MGG_RenderTarget_WrapNativeHandle(
+	MGG_GraphicsDevice* device,
+	void* nativeHandle,
+	MGSurfaceFormat format,
+	mgint width,
+	mgint height,
+	MGDepthFormat depthFormat,
+	mgint multiSampleCount)
+{
+	if (!device || !nativeHandle || !device->resources)
+	{
+		return nullptr;
+	}
+
+	auto* external_resource = static_cast<ID3D12Resource*>(nativeHandle);
+
+	const auto texture = new MGG_Texture();
+	texture->format = format;
+
+	// Create a Texture wrapper around the external resource.
+	// This creates RTV + SRV descriptors without allocating memory for the resource itself.
+	texture->texture = new Texture(device->resources, external_resource, format);
+
+	// Create depth buffer if requested (owned by this texture wrapper).
+	if (depthFormat != MGDepthFormat::None)
+	{
+		texture->depthTexture = new Texture(width, height, depthFormat);
+		texture->depthTexture->Create(device->resources);
+	}
+
+	return texture;
+}
