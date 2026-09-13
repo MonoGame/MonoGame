@@ -53,6 +53,7 @@ MG_EXPORT mgbyte MGP_Window_GetAllowUserResizing(MGP_Window* window);
 MG_EXPORT void MGP_Window_SetAllowUserResizing(MGP_Window* window, mgbyte allow);
 MG_EXPORT mgbyte MGP_Window_GetIsBorderless(MGP_Window* window);
 MG_EXPORT void MGP_Window_SetIsBorderless(MGP_Window* window, mgbyte borderless);
+MG_EXPORT mgbyte MGP_Window_GetIsFullscreen(MGP_Window* window);
 MG_EXPORT void MGP_Window_SetTitle(MGP_Window* window, const char* title);
 MG_EXPORT void MGP_Window_Show(MGP_Window* window, mgbyte show);
 MG_EXPORT void MGP_Window_GetPosition(MGP_Window* window, mgint& x, mgint& y);

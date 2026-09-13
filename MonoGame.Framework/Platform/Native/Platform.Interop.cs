@@ -35,6 +35,7 @@ internal enum EventType : uint
 
     DropFile,
     DropComplete,
+    WindowFullscreenChanged,
 }
 
 
@@ -366,6 +367,9 @@ internal static unsafe partial class MGP
 
     [DllImport(MonoGameNativeDLL, EntryPoint = "MGP_Window_SetIsBorderless", ExactSpelling = true)]
     public static extern void Window_SetIsBorderless(MGP_Window* window, byte borderless);
+
+    [DllImport(MonoGameNativeDLL, EntryPoint = "MGP_Window_GetIsFullscreen", ExactSpelling = true)]
+    public static extern byte Window_GetIsFullscreen(MGP_Window* window);
 
     [DllImport(MonoGameNativeDLL, EntryPoint = "MGP_Window_SetTitle", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
     public static extern void Window_SetTitle(MGP_Window* window, [MarshalAs(UnmanagedType.LPUTF8Str)] string title);

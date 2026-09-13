@@ -16,15 +16,30 @@ body {
 }
 
 #monogame-host {
-    position: relative;
-    display: inline-block;
+    position: fixed;
+    inset: 0;
     overflow: hidden;
+}
+
+#monogame-host[data-canvas-resize-policy="Project"],
+#monogame-host[data-canvas-resize-policy="None"] {
+    position: relative;
+    inset: auto;
+    display: inline-block;
 }
 
 #canvas {
     display: block;
+    width: 100%;
+    height: 100%;
     border: 0;
     background: #000000;
+}
+
+#monogame-host[data-canvas-resize-policy="Project"] #canvas,
+#monogame-host[data-canvas-resize-policy="None"] #canvas {
+    width: auto;
+    height: auto;
 }
 
 .host-status {

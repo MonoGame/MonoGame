@@ -303,6 +303,7 @@ enum class MGEventType : mguint
     ControllerStateChange = 15,
     DropFile = 16,
     DropComplete = 17,
+    WindowFullscreenChanged = 18,
 };
 
 enum class MGKeys : mgint

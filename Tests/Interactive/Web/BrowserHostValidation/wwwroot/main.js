@@ -2,10 +2,14 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
+const query = new URLSearchParams(globalThis.location.search);
+const canvasResizePolicy = query.get("canvas-resize-policy") ?? "Adaptive";
+
 globalThis.MonoGameWebHostConfiguration = {
     runtimeScriptUri: "./_framework/dotnet.js",
     hostExportsTypeName: "BrowserHostValidation.BrowserHostValidationHostExports",
-    mainAssemblyName: "BrowserHostValidation.dll"
+    mainAssemblyName: "BrowserHostValidation.dll",
+    canvasResizePolicy
 };
 
 globalThis.MonoGameWebHostValidation = {
@@ -37,7 +41,16 @@ globalThis.MonoGameWebHostValidation = {
         canvas.dispatchEvent(new Event("focus"));
     },
     isManualFocusValidationEnabled() {
-        return !new URLSearchParams(globalThis.location.search).has("auto-exit");
+        return !query.has("auto-exit") || query.has("fullscreen") || query.has("embed-fullscreen");
+    },
+    isFullscreenValidationEnabled() {
+        return query.has("fullscreen");
+    },
+    isEmbeddingFullscreenValidationEnabled() {
+        return query.has("embed-fullscreen");
+    },
+    isAdaptiveCanvasResizeValidationEnabled() {
+        return canvasResizePolicy === "Adaptive";
     }
 };
 
@@ -45,9 +58,20 @@ try {
     await import("./monogame-web-host.js");
 
     const canvas = document.getElementById("canvas");
-    if (canvas != null) {
+    if (canvas != null
+        && canvasResizePolicy === "Adaptive"
+        && !query.has("embed-fullscreen")) {
         canvas.style.width = "960px";
         canvas.style.height = "540px";
+    }
+
+    if (query.has("fullscreen")) {
+        document.addEventListener("fullscreenchange", () => {
+            const fullscreen = document.fullscreenElement === canvas;
+            globalThis.MonoGameWebHostValidation.reportPhase(
+                "browserFullscreenChanged",
+                `Browser canvas fullscreen is ${fullscreen ? "active" : "inactive"}.`);
+        });
     }
 }
 catch (error) {

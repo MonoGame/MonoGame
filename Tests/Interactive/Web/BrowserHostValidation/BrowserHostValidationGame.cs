@@ -39,10 +39,14 @@ internal sealed class BrowserHostValidationGame : Game
     private int _drawCount;
     private int _activationCount;
     private int _activationCountBeforeFocusLifecycleValidation;
+    private bool _adaptiveCanvasResizeValidationEnabled;
     private bool _cssResizeValidated;
+    private bool _embeddingFullscreenValidationEnabled;
     private bool _focusLifecycleDeactivated;
     private bool _focusLifecycleValidationRequested;
     private bool _focusLifecycleValidated;
+    private bool _fullscreenValidationEnabled;
+    private bool _fullscreenValidationRequested;
     private bool _keepRunningForManualFocusValidation;
     private bool _programmaticResizeRequested;
     private bool _programmaticResizeValidated;
@@ -78,11 +82,28 @@ internal sealed class BrowserHostValidationGame : Game
         ValidatePlatformInfo();
 
         _keepRunningForManualFocusValidation = BrowserHostValidationReporter.IsManualFocusValidationEnabled();
+        _adaptiveCanvasResizeValidationEnabled = BrowserHostValidationReporter.IsAdaptiveCanvasResizeValidationEnabled();
+        _embeddingFullscreenValidationEnabled = BrowserHostValidationReporter.IsEmbeddingFullscreenValidationEnabled();
+        _fullscreenValidationEnabled = BrowserHostValidationReporter.IsFullscreenValidationEnabled();
         if (_keepRunningForManualFocusValidation)
         {
             BrowserHostValidationReporter.ReportPhase(
                 "manualFocusValidationEnabled",
                 "Manual focus validation is enabled. Click outside and inside the canvas to observe lifecycle events.");
+        }
+
+        if (_fullscreenValidationEnabled)
+        {
+            BrowserHostValidationReporter.ReportPhase(
+                "fullscreenValidationEnabled",
+                "Fullscreen validation is enabled. The game will request fullscreen and preserve its windowed state if the browser rejects the request.");
+        }
+
+        if (_embeddingFullscreenValidationEnabled)
+        {
+            BrowserHostValidationReporter.ReportPhase(
+                "embeddingFullscreenValidationEnabled",
+                "Embedding fullscreen validation is enabled. Use the embedding host fullscreen control and verify the canvas resize report.");
         }
 
         BrowserHostValidationReporter.ReportPhase(
@@ -156,19 +177,31 @@ internal sealed class BrowserHostValidationGame : Game
         }
 
         _drawCount++;
-        if (_drawCount == ExitAfterDrawCount - 90 && !_cssResizeValidated)
+        if (_embeddingFullscreenValidationEnabled)
+        {
+            base.Draw(gameTime);
+            return;
+        }
+
+        if (_adaptiveCanvasResizeValidationEnabled
+            && _drawCount == ExitAfterDrawCount - 90
+            && !_cssResizeValidated)
         {
             throw new InvalidOperationException(
                 $"Expected a CSS canvas resize to {ExpectedCssResizeWidth}x{ExpectedCssResizeHeight}, but ClientSizeChanged was not raised.");
         }
 
-        if (_drawCount == ExitAfterDrawCount - 60 && !_programmaticResizeValidated)
+        if (_adaptiveCanvasResizeValidationEnabled
+            && _drawCount == ExitAfterDrawCount - 60
+            && !_programmaticResizeValidated)
         {
             throw new InvalidOperationException(
                 $"Expected a programmatic back-buffer resize to {ExpectedProgrammaticResizeWidth}x{ExpectedProgrammaticResizeHeight}, but ClientSizeChanged was not raised.");
         }
 
-        if (_drawCount == FocusLifecycleValidationTimeoutDrawCount && !_focusLifecycleValidated)
+        if (_adaptiveCanvasResizeValidationEnabled
+            && _drawCount == FocusLifecycleValidationTimeoutDrawCount
+            && !_focusLifecycleValidated)
         {
             throw new InvalidOperationException(
                 "Expected browser focus loss and restoration to raise Deactivated and Activated.");
@@ -187,7 +220,9 @@ internal sealed class BrowserHostValidationGame : Game
 
     protected override void Update(GameTime gameTime)
     {
-        if (_cssResizeValidated && !_programmaticResizeRequested)
+        if (_adaptiveCanvasResizeValidationEnabled
+            && _cssResizeValidated
+            && !_programmaticResizeRequested)
         {
             _programmaticResizeRequested = true;
             _graphicsDeviceManager.PreferredBackBufferWidth = ExpectedProgrammaticResizeWidth;
@@ -195,7 +230,9 @@ internal sealed class BrowserHostValidationGame : Game
             _graphicsDeviceManager.ApplyChanges();
         }
 
-        if (_programmaticResizeValidated && !_focusLifecycleValidationRequested)
+        if (_adaptiveCanvasResizeValidationEnabled
+            && _programmaticResizeValidated
+            && !_focusLifecycleValidationRequested)
         {
             _focusLifecycleValidationRequested = true;
             _activationCountBeforeFocusLifecycleValidation = _activationCount;
@@ -203,6 +240,18 @@ internal sealed class BrowserHostValidationGame : Game
                 "focusLifecycleValidationRequested",
                 "Requesting browser canvas focus loss and restoration through the host lifecycle path.");
             BrowserHostValidationReporter.RequestFocusLifecycleValidation();
+        }
+
+        if (_fullscreenValidationEnabled
+            && _focusLifecycleValidated
+            && !_fullscreenValidationRequested)
+        {
+            _fullscreenValidationRequested = true;
+            _graphicsDeviceManager.IsFullScreen = true;
+            _graphicsDeviceManager.ApplyChanges();
+            BrowserHostValidationReporter.ReportPhase(
+                "fullscreenRequested",
+                "Requested fullscreen through GraphicsDeviceManager. The browser may reject the request when no eligible user gesture is active.");
         }
 
         base.Update(gameTime);
@@ -283,6 +332,33 @@ internal sealed class BrowserHostValidationGame : Game
         Rectangle clientBounds = Window.ClientBounds;
         Viewport viewport = GraphicsDevice.Viewport;
 
+        if (_embeddingFullscreenValidationEnabled)
+        {
+            ValidateResize(
+                clientBounds,
+                viewport,
+                clientBounds.Width,
+                clientBounds.Height,
+                "embedding fullscreen viewport");
+            BrowserHostValidationReporter.ValidateCanvasSize(
+                clientBounds.Width,
+                clientBounds.Height,
+                clientBounds.Width,
+                clientBounds.Height);
+            BrowserHostValidationReporter.ReportPhase(
+                "embeddingViewportResizeObserved",
+                $"Validated an embedding-host viewport resize to {clientBounds.Width}x{clientBounds.Height} without changing game fullscreen state.");
+            return;
+        }
+
+        if (!_adaptiveCanvasResizeValidationEnabled)
+        {
+            BrowserHostValidationReporter.ReportPhase(
+                "nonAdaptiveResizeIgnored",
+                $"Ignored browser-host resize {clientBounds.Width}x{clientBounds.Height} because the selected canvas resize policy is not Adaptive.");
+            return;
+        }
+
         if (!_cssResizeValidated)
         {
             ValidateResize(
@@ -317,6 +393,14 @@ internal sealed class BrowserHostValidationGame : Game
             BrowserHostValidationReporter.ReportPhase(
                 "programmaticResizeValidated",
                 "Validated ClientSizeChanged and a resized canvas drawing buffer from GraphicsDeviceManager.ApplyChanges while CSS size remained 960x540.");
+            return;
+        }
+
+        if (_fullscreenValidationRequested)
+        {
+            BrowserHostValidationReporter.ReportPhase(
+                "fullscreenResizeObserved",
+                $"Observed a fullscreen-related client resize to {clientBounds.Width}x{clientBounds.Height}.");
             return;
         }
 

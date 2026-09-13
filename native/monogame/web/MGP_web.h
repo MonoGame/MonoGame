@@ -7,3 +7,5 @@
 #include "api_MGP.h"
 
 void MGP_Web_OnPlatformDestroyed(MGP_Platform* platform);
+void MGP_Web_RequestFullscreen();
+void MGP_Web_ExitFullscreen();

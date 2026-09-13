@@ -126,6 +126,14 @@ class NativeGamePlatform : GamePlatform
                     break;
                 }
 
+                case EventType.WindowFullscreenChanged:
+                {
+                    NativeGameWindow? window = NativeGameWindow.FromHandle(event_.Window.Window);
+                    if (window != null)
+                        window.FullscreenChanged(event_.Window.Data1 != 0);
+                    break;
+                }
+
                 case EventType.WindowClose:
                 { 
                     var window = NativeGameWindow.FromHandle(event_.Window.Window);

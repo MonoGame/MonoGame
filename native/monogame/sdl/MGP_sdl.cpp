@@ -193,6 +193,10 @@ struct MGP_Window
     mgint lastBrowserResizeHeight = -1;
     mgbyte browserFocused = false;
     bool hasBrowserFocusState = false;
+    mgbyte browserFullscreen = false;
+    bool hasBrowserFullscreenState = false;
+    mgbyte browserFullscreenRequestTarget = false;
+    bool browserFullscreenRequestPending = false;
 #endif
 #if defined(MG_OPENGL)
     mgint contextMajorVersion = 4;
@@ -411,6 +415,72 @@ void MGP_Sdl_QueueBrowserFocus(MGP_Platform* platform, mgbyte focused)
 
     for (MGP_Window* window : platform->windows)
         MGP_Sdl_QueueBrowserFocusForWindow(window, focused);
+}
+
+static void MGP_Sdl_QueueBrowserFullscreenForWindow(MGP_Window* window, mgbyte fullscreen, bool force)
+{
+    assert(window != nullptr);
+
+    if (window->window == nullptr
+        || (!force && window->hasBrowserFullscreenState && window->browserFullscreen == fullscreen))
+    {
+        return;
+    }
+
+    window->browserFullscreen = fullscreen;
+    window->hasBrowserFullscreenState = true;
+    window->browserFullscreenRequestPending = false;
+
+    MGP_Event event_{};
+    event_.Type = MGEventType::WindowFullscreenChanged;
+    event_.Timestamp = SDL_GetTicks();
+    event_.Window.Window = window;
+    event_.Window.Data1 = fullscreen;
+    window->platform->queued_events.push(event_);
+}
+
+static void MGP_Sdl_RequestBrowserFullscreen(MGP_Window* window, mgbyte fullscreen)
+{
+    assert(window != nullptr);
+
+    if (window->browserFullscreenRequestPending)
+    {
+        if (window->browserFullscreenRequestTarget == fullscreen)
+            return;
+    }
+    else if (!window->hasBrowserFullscreenState)
+    {
+        if (fullscreen == 0)
+            return;
+    }
+    else if (window->browserFullscreen == fullscreen)
+    {
+        return;
+    }
+
+    window->browserFullscreenRequestTarget = fullscreen;
+    window->browserFullscreenRequestPending = true;
+
+    if (fullscreen != 0)
+        MGP_Web_RequestFullscreen();
+    else
+        MGP_Web_ExitFullscreen();
+}
+
+void MGP_Sdl_QueueBrowserFullscreenChange(MGP_Platform* platform, mgbyte fullscreen)
+{
+    assert(platform != nullptr);
+
+    for (MGP_Window* window : platform->windows)
+        MGP_Sdl_QueueBrowserFullscreenForWindow(window, fullscreen, false);
+}
+
+void MGP_Sdl_QueueBrowserFullscreenFailure(MGP_Platform* platform)
+{
+    assert(platform != nullptr);
+
+    for (MGP_Window* window : platform->windows)
+        MGP_Sdl_QueueBrowserFullscreenForWindow(window, false, true);
 }
 #endif
 
@@ -1170,6 +1240,18 @@ void MGP_Window_SetIsBorderless(MGP_Window* window, mgbyte borderless)
 	SDL_SetWindowBordered(window->window, borderless ? SDL_FALSE : SDL_TRUE);
 }
 
+mgbyte MGP_Window_GetIsFullscreen(MGP_Window* window)
+{
+    assert(window != nullptr);
+
+#if defined(__EMSCRIPTEN__)
+    return window->browserFullscreen;
+#else
+    Uint32 flags = SDL_GetWindowFlags(window->window);
+    return (flags & SDL_WINDOW_FULLSCREEN) != 0 ? 1 : 0;
+#endif
+}
+
 void MGP_Window_SetTitle(MGP_Window* window, const char* title)
 {
     assert(window != nullptr);
@@ -1241,6 +1323,10 @@ void MGP_Window_EnterFullScreen(MGP_Window* window, mgbyte useHardwareModeSwitch
 {
     assert(window != nullptr);
 
+#if defined(__EMSCRIPTEN__)
+    (void)useHardwareModeSwitch;
+    MGP_Sdl_RequestBrowserFullscreen(window, 1);
+#else
     Uint32 flags;
     if (useHardwareModeSwitch)
         flags = SDL_WINDOW_FULLSCREEN;
@@ -1248,12 +1334,18 @@ void MGP_Window_EnterFullScreen(MGP_Window* window, mgbyte useHardwareModeSwitch
         flags = SDL_WINDOW_FULLSCREEN_DESKTOP;
 
     SDL_SetWindowFullscreen(window->window, flags);
+#endif
 }
 
 void MGP_Window_ExitFullScreen(MGP_Window* window)
 {
     assert(window != nullptr);
+
+#if defined(__EMSCRIPTEN__)
+    MGP_Sdl_RequestBrowserFullscreen(window, 0);
+#else
     SDL_SetWindowFullscreen(window->window, 0);
+#endif
 }
 
 mgint MGP_Window_ShowMessageBox(MGP_Window* window, const char* title, const char* description, const char* buttons, mgint count)

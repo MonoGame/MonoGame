@@ -12,6 +12,12 @@ const HostStage = Object.freeze({
     RuntimeBoundary: "RuntimeBoundary"
 });
 
+const CanvasResizePolicy = Object.freeze({
+    Adaptive: "Adaptive",
+    Project: "Project",
+    None: "None"
+});
+
 let activeHost = null;
 const contentBase64ByPath = new Map();
 
@@ -28,6 +34,7 @@ class MonoGameWebHost {
     constructor(root) {
         this.root = root;
         this.config = this.readConfig(root);
+        this.root.dataset.canvasResizePolicy = this.config.canvasResizePolicy;
         this.statusElement = document.getElementById(this.config.statusId);
         this.canvas = null;
         this.runtime = null;
@@ -66,7 +73,10 @@ class MonoGameWebHost {
             hostExportsTypeName: this.getOptionalConfigValue(dataset.hostExportsTypeName)
                 ?? this.getOptionalConfigValue(runtimeConfiguration.hostExportsTypeName),
             mainAssemblyName: this.getOptionalConfigValue(dataset.mainAssemblyName)
-                ?? this.getOptionalConfigValue(runtimeConfiguration.mainAssemblyName)
+                ?? this.getOptionalConfigValue(runtimeConfiguration.mainAssemblyName),
+            canvasResizePolicy: this.getCanvasResizePolicy(
+                this.getOptionalConfigValue(dataset.canvasResizePolicy)
+                ?? this.getOptionalConfigValue(runtimeConfiguration.canvasResizePolicy))
         };
     }
 
@@ -76,6 +86,23 @@ class MonoGameWebHost {
         }
 
         return value;
+    }
+
+    getCanvasResizePolicy(value) {
+        if (value == null) {
+            return CanvasResizePolicy.Adaptive;
+        }
+
+        if (value === CanvasResizePolicy.Adaptive
+            || value === CanvasResizePolicy.Project
+            || value === CanvasResizePolicy.None) {
+            return value;
+        }
+
+        throw new BrowserHostStartupError(
+            HostStage.HostBootstrap,
+            "canvas_resize_policy_invalid",
+            `Canvas resize policy '${value}' is invalid. Use Adaptive, Project, or None.`);
     }
 
     async startAsync() {
@@ -204,6 +231,7 @@ class MonoGameWebHost {
         this.runtime = await runtimeBuilder.create();
         this.observeCanvasSize();
         this.observeBrowserLifecycle();
+        this.observeFullscreen();
 
         if (typeof this.runtime.getAssemblyExports !== "function") {
             throw new BrowserHostStartupError(
@@ -221,6 +249,10 @@ class MonoGameWebHost {
     }
 
     observeCanvasSize() {
+        if (this.config.canvasResizePolicy !== CanvasResizePolicy.Adaptive) {
+            return;
+        }
+
         const notifyCanvasResize = this.runtime?.Module?._MGP_Web_NotifyCanvasResize;
         if (typeof notifyCanvasResize !== "function") {
             throw new BrowserHostStartupError(
@@ -273,6 +305,63 @@ class MonoGameWebHost {
         this.canvas.addEventListener("blur", () => notifyFocus(false));
 
         notifyWindowFocus();
+    }
+
+    observeFullscreen() {
+        const notifyFullscreenChange = this.runtime?.Module?._MGP_Web_NotifyFullscreenChange;
+        const notifyFullscreenFailure = this.runtime?.Module?._MGP_Web_NotifyFullscreenFailure;
+        if (typeof notifyFullscreenChange !== "function"
+            || typeof notifyFullscreenFailure !== "function") {
+            throw new BrowserHostStartupError(
+                HostStage.WasmLoad,
+                "native_fullscreen_change_missing",
+                "The managed runtime does not expose the native fullscreen callbacks.");
+        }
+
+        const reportFullscreenChange = () => {
+            const fullscreen = document.fullscreenElement === this.canvas;
+            notifyFullscreenChange(fullscreen ? 1 : 0);
+        };
+
+        document.addEventListener("fullscreenchange", reportFullscreenChange);
+        document.addEventListener("fullscreenerror", () => {
+            notifyFullscreenFailure();
+        });
+
+        reportFullscreenChange();
+    }
+
+    requestFullscreen() {
+        if (document.fullscreenElement === this.canvas)
+            return;
+
+        void this.requestCanvasFullscreenAsync();
+    }
+
+    exitFullscreen() {
+        if (document.fullscreenElement !== this.canvas) {
+            this.runtime.Module._MGP_Web_NotifyFullscreenFailure();
+            return;
+        }
+
+        void document.exitFullscreen().catch(() => {
+            this.runtime.Module._MGP_Web_NotifyFullscreenChange(
+                document.fullscreenElement === this.canvas ? 1 : 0);
+        });
+    }
+
+    async requestCanvasFullscreenAsync() {
+        if (typeof this.canvas.requestFullscreen !== "function") {
+            this.runtime.Module._MGP_Web_NotifyFullscreenFailure();
+            return;
+        }
+
+        try {
+            await this.canvas.requestFullscreen();
+        }
+        catch {
+            this.runtime.Module._MGP_Web_NotifyFullscreenFailure();
+        }
     }
 
     async initializeManagedExportsAsync() {

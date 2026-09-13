@@ -10,6 +10,26 @@ static mgint s_pendingCanvasResizeWidth = 0;
 static mgint s_pendingCanvasResizeHeight = 0;
 static bool s_hasPendingBrowserFocus = false;
 static mgbyte s_pendingBrowserFocus = false;
+static bool s_hasPendingBrowserFullscreen = false;
+static mgbyte s_pendingBrowserFullscreen = false;
+
+EM_JS(mgbyte, MGP_Web_RequestFullscreenFromHost, (),
+{
+    if (typeof globalThis.MonoGameWebHost?.requestFullscreen !== "function")
+        return 0;
+
+    globalThis.MonoGameWebHost.requestFullscreen();
+    return 1;
+});
+
+EM_JS(mgbyte, MGP_Web_ExitFullscreenFromHost, (),
+{
+    if (typeof globalThis.MonoGameWebHost?.exitFullscreen !== "function")
+        return 0;
+
+    globalThis.MonoGameWebHost.exitFullscreen();
+    return 1;
+});
 
 extern "C" EMSCRIPTEN_KEEPALIVE void MGP_Web_NotifyCanvasResize(mgint width, mgint height)
 {
@@ -39,6 +59,42 @@ extern "C" EMSCRIPTEN_KEEPALIVE void MGP_Web_NotifyFocusChange(mgbyte focused)
     MGP_Sdl_QueueBrowserFocus(s_platform, focused);
 }
 
+extern "C" EMSCRIPTEN_KEEPALIVE void MGP_Web_NotifyFullscreenChange(mgbyte fullscreen)
+{
+    if (s_platform == nullptr)
+    {
+        s_pendingBrowserFullscreen = fullscreen;
+        s_hasPendingBrowserFullscreen = true;
+        return;
+    }
+
+    MGP_Sdl_QueueBrowserFullscreenChange(s_platform, fullscreen);
+}
+
+extern "C" EMSCRIPTEN_KEEPALIVE void MGP_Web_NotifyFullscreenFailure()
+{
+    if (s_platform != nullptr)
+        MGP_Sdl_QueueBrowserFullscreenFailure(s_platform);
+}
+
+void MGP_Web_RequestFullscreen()
+{
+    if (MGP_Web_RequestFullscreenFromHost() != 0)
+        return;
+
+    if (s_platform != nullptr)
+        MGP_Sdl_QueueBrowserFullscreenFailure(s_platform);
+}
+
+void MGP_Web_ExitFullscreen()
+{
+    if (MGP_Web_ExitFullscreenFromHost() != 0)
+        return;
+
+    if (s_platform != nullptr)
+        MGP_Sdl_QueueBrowserFullscreenFailure(s_platform);
+}
+
 void MGP_Web_OnPlatformDestroyed(MGP_Platform* platform)
 {
     if (s_platform == platform)
@@ -63,5 +119,11 @@ MG_EXPORT void MGP_Platform_StartRunLoop(MGP_Platform* platform)
     {
         MGP_Sdl_QueueBrowserFocus(platform, s_pendingBrowserFocus);
         s_hasPendingBrowserFocus = false;
+    }
+
+    if (s_hasPendingBrowserFullscreen)
+    {
+        MGP_Sdl_QueueBrowserFullscreenChange(platform, s_pendingBrowserFullscreen);
+        s_hasPendingBrowserFullscreen = false;
     }
 }

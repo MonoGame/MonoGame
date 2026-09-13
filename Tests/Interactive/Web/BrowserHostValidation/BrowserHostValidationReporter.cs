@@ -21,4 +21,13 @@ internal static partial class BrowserHostValidationReporter
 
     [JSImport("globalThis.MonoGameWebHostValidation.isManualFocusValidationEnabled")]
     internal static partial bool IsManualFocusValidationEnabled();
+
+    [JSImport("globalThis.MonoGameWebHostValidation.isFullscreenValidationEnabled")]
+    internal static partial bool IsFullscreenValidationEnabled();
+
+    [JSImport("globalThis.MonoGameWebHostValidation.isEmbeddingFullscreenValidationEnabled")]
+    internal static partial bool IsEmbeddingFullscreenValidationEnabled();
+
+    [JSImport("globalThis.MonoGameWebHostValidation.isAdaptiveCanvasResizeValidationEnabled")]
+    internal static partial bool IsAdaptiveCanvasResizeValidationEnabled();
 }
