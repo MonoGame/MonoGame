@@ -3,7 +3,9 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using MonoGame.Framework.Utilities;
+#if VULKAN || DIRECTX12
 using MonoGame.Interop;
+#endif
 using NUnit.Framework;
 using System;
 using System.Collections.Generic;
