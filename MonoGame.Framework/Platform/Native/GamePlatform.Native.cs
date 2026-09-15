@@ -115,6 +115,7 @@ class NativeGamePlatform : GamePlatform
                     break;
 
                 case EventType.WindowLostFocus:
+                    Keyboard.Keys.Clear();
                     IsActive = false;
                     break;
 
@@ -155,7 +156,9 @@ class NativeGamePlatform : GamePlatform
                     { 
                         window.OnKeyDown(new InputKeyEventArgs(key));
 
-                        if (window.IsTextInputHandled && char.IsControl(character))
+                        if (event_.Key.Character != 0
+                            && window.IsTextInputHandled
+                            && char.IsControl(character))
                             window.OnTextInput(new TextInputEventArgs(character, key));
                     }
 
