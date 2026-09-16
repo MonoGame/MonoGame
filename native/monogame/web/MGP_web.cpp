@@ -13,6 +13,19 @@ static mgbyte s_pendingBrowserFocus = false;
 static bool s_hasPendingBrowserFullscreen = false;
 static mgbyte s_pendingBrowserFullscreen = false;
 
+EM_JS(mgint, MGP_Web_GetMaximumTouchCountFromNavigator, (),
+{
+    if (typeof navigator === "undefined" || typeof navigator.maxTouchPoints !== "number")
+        return 0;
+
+    return navigator.maxTouchPoints;
+});
+
+mgint MGP_Web_GetMaximumTouchCount()
+{
+    return MGP_Web_GetMaximumTouchCountFromNavigator();
+}
+
 EM_JS(mgbyte, MGP_Web_RequestFullscreenFromHost, (),
 {
     if (typeof globalThis.MonoGameWebHost?.requestFullscreen !== "function")

@@ -36,6 +36,10 @@ internal enum EventType : uint
     DropFile,
     DropComplete,
     WindowFullscreenChanged,
+
+    TouchPressed,
+    TouchMoved,
+    TouchReleased,
 }
 
 
@@ -85,6 +89,15 @@ internal struct MGP_MouseWheelEvent
     public nint Window;
     public int Scroll;
     public int ScrollH;
+}
+
+[StructLayout(LayoutKind.Sequential)]
+internal struct MGP_TouchEvent
+{
+    public nint Window;
+    public int Id;
+    public int X;
+    public int Y;
 }
 
 internal enum SystemCursor : int
@@ -185,6 +198,9 @@ internal struct MGP_Event
 
     [FieldOffset(12)]
     public MGP_MouseWheelEvent MouseWheel;
+
+    [FieldOffset(12)]
+    public MGP_TouchEvent Touch;
 
     [FieldOffset(12)]
     public MGP_DropEvent Drop;
@@ -421,6 +437,13 @@ internal static unsafe partial class MGP
 
     [DllImport(MonoGameNativeDLL, EntryPoint = "MGP_Cursor_Destroy", ExactSpelling = true)]
     public static extern void Cursor_Destroy(MGP_Cursor* cursor);
+
+    #endregion
+
+    #region Touch
+
+    [DllImport(MonoGameNativeDLL, EntryPoint = "MGP_Touch_GetMaximumTouchCount", ExactSpelling = true)]
+    public static extern int Touch_GetMaximumTouchCount();
 
     #endregion
 

@@ -8,6 +8,7 @@ using System.Runtime.Versioning;
 using System.Text;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
 using MonoGame.Framework.Utilities;
 
 namespace BrowserHostValidation;
@@ -48,6 +49,8 @@ internal sealed class BrowserHostValidationGame : Game
     private bool _fullscreenValidationEnabled;
     private bool _fullscreenValidationRequested;
     private bool _keepRunningForManualFocusValidation;
+    private bool _keyboardValidationEnabled;
+    private bool _keyboardValidationValidated;
     private bool _programmaticResizeRequested;
     private bool _programmaticResizeValidated;
     private bool _reportedFirstDraw;
@@ -56,6 +59,7 @@ internal sealed class BrowserHostValidationGame : Game
     private SpriteBatch? _spriteBatch;
     private SpriteFont? _validationFontFromContent;
     private Texture2D? _validationTextureFromContent;
+    private int _keyboardValidationStep;
 
     public BrowserHostValidationGame()
     {
@@ -85,6 +89,7 @@ internal sealed class BrowserHostValidationGame : Game
         _adaptiveCanvasResizeValidationEnabled = BrowserHostValidationReporter.IsAdaptiveCanvasResizeValidationEnabled();
         _embeddingFullscreenValidationEnabled = BrowserHostValidationReporter.IsEmbeddingFullscreenValidationEnabled();
         _fullscreenValidationEnabled = BrowserHostValidationReporter.IsFullscreenValidationEnabled();
+        _keyboardValidationEnabled = BrowserHostValidationReporter.IsKeyboardValidationEnabled();
         if (_keepRunningForManualFocusValidation)
         {
             BrowserHostValidationReporter.ReportPhase(
@@ -104,6 +109,13 @@ internal sealed class BrowserHostValidationGame : Game
             BrowserHostValidationReporter.ReportPhase(
                 "embeddingFullscreenValidationEnabled",
                 "Embedding fullscreen validation is enabled. Use the embedding host fullscreen control and verify the canvas resize report.");
+        }
+
+        if (_keyboardValidationEnabled)
+        {
+            BrowserHostValidationReporter.ReportPhase(
+                "keyboardValidationEnabled",
+                "Keyboard validation is enabled. SDL will receive key down and key up events from the browser.");
         }
 
         BrowserHostValidationReporter.ReportPhase(
@@ -220,6 +232,8 @@ internal sealed class BrowserHostValidationGame : Game
 
     protected override void Update(GameTime gameTime)
     {
+        RunKeyboardValidation();
+
         if (_adaptiveCanvasResizeValidationEnabled
             && _cssResizeValidated
             && !_programmaticResizeRequested)
@@ -257,6 +271,70 @@ internal sealed class BrowserHostValidationGame : Game
         base.Update(gameTime);
     }
 
+    private void RunKeyboardValidation()
+    {
+        if (!_keyboardValidationEnabled || _keyboardValidationValidated)
+        {
+            return;
+        }
+
+        switch (_keyboardValidationStep)
+        {
+            case 0:
+                BrowserHostValidationReporter.RequestKeyboardKeyDown("KeyA", "a");
+                _keyboardValidationStep++;
+                break;
+
+            case 1:
+                ValidateKeyboardState(Keys.A, true, "pressed after a key-down event");
+                BrowserHostValidationReporter.RequestKeyboardKeyUp("KeyA", "a");
+                _keyboardValidationStep++;
+                break;
+
+            case 2:
+                ValidateKeyboardState(Keys.A, false, "released after a key-up event");
+                BrowserHostValidationReporter.RequestKeyboardKeyDown("ArrowRight", "ArrowRight");
+                _keyboardValidationStep++;
+                break;
+
+            case 3:
+                ValidateKeyboardState(Keys.Right, true, "pressed after an arrow-key event");
+                BrowserHostValidationReporter.RequestKeyboardKeyUp("ArrowRight", "ArrowRight");
+                _keyboardValidationStep++;
+                break;
+
+            case 4:
+                ValidateKeyboardState(Keys.Right, false, "released after an arrow-key event");
+                BrowserHostValidationReporter.RequestKeyboardKeyDown("ShiftLeft", "Shift");
+                _keyboardValidationStep++;
+                break;
+
+            case 5:
+                ValidateKeyboardState(Keys.LeftShift, true, "pressed before focus loss");
+                BrowserHostValidationReporter.RequestKeyboardFocusLoss();
+                _keyboardValidationStep++;
+                break;
+
+            case 6:
+                ValidateKeyboardState(Keys.LeftShift, false, "released when focus is lost");
+                BrowserHostValidationReporter.RequestKeyboardFocusRestore();
+                _keyboardValidationStep++;
+                break;
+
+            case 7:
+                if (!IsActive)
+                {
+                    return;
+                }
+
+                _keyboardValidationValidated = true;
+                BrowserHostValidationReporter.ReportPhase(
+                    "keyboardValidated",
+                    "Validated letter, arrow, and modifier key transitions plus held-key clearing when browser focus is lost.");
+                break;
+        }
+    }
+
     protected override void UnloadContent()
     {
         if (_validationTextureFromContent != null)
@@ -282,6 +360,16 @@ internal sealed class BrowserHostValidationGame : Game
         BrowserHostValidationReporter.ReportPhase(
             "exiting",
             "Exit was observed.");
+    }
+
+    private static void ValidateKeyboardState(Keys key, bool expectedDown, string expectedState)
+    {
+        bool isDown = Keyboard.GetState().IsKeyDown(key);
+        if (isDown != expectedDown)
+        {
+            throw new InvalidOperationException(
+                $"Expected {key} to be {expectedState}, but it was {(isDown ? "pressed" : "released")}.");
+        }
     }
 
     private void OnActivated(object sender, EventArgs eventArgs)

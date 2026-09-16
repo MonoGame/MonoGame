@@ -342,6 +342,15 @@ MGGraphicsBackend MGP_Platform_GetGraphicsBackend()
 
 }
 
+mgint MGP_Touch_GetMaximumTouchCount()
+{
+#if defined(__EMSCRIPTEN__)
+    return MGP_Web_GetMaximumTouchCount();
+#else
+    return 0;
+#endif
+}
+
 static MGP_Window* MGP_WindowFromId(MGP_Platform* platform, Uint32 windowId)
 {
     assert(platform != nullptr);
@@ -712,6 +721,39 @@ mgbyte MGP_Platform_PollEvent(MGP_Platform* platform, MGP_Event& event_)
                     break;
             }
             return true;
+
+        case SDL_EventType::SDL_FINGERDOWN:
+        case SDL_EventType::SDL_FINGERMOTION:
+        case SDL_EventType::SDL_FINGERUP:
+        {
+            MGP_Window* window = MGP_WindowFromId(platform, ev.tfinger.windowID);
+            if (window == nullptr)
+                break;
+
+            mgint width = 0;
+            mgint height = 0;
+            SDL_GetWindowSize(window->window, &width, &height);
+
+            switch (ev.type)
+            {
+                case SDL_EventType::SDL_FINGERDOWN:
+                    event_.Type = MGEventType::TouchPressed;
+                    break;
+                case SDL_EventType::SDL_FINGERMOTION:
+                    event_.Type = MGEventType::TouchMoved;
+                    break;
+                case SDL_EventType::SDL_FINGERUP:
+                    event_.Type = MGEventType::TouchReleased;
+                    break;
+            }
+
+            event_.Timestamp = ev.tfinger.timestamp;
+            event_.Touch.Window = window;
+            event_.Touch.Id = static_cast<mgint>(ev.tfinger.fingerId);
+            event_.Touch.X = static_cast<mgint>(ev.tfinger.x * width);
+            event_.Touch.Y = static_cast<mgint>(ev.tfinger.y * height);
+            return true;
+        }
 
         case SDL_EventType::SDL_KEYDOWN:
         {

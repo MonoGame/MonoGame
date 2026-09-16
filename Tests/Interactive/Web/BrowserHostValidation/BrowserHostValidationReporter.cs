@@ -19,6 +19,18 @@ internal static partial class BrowserHostValidationReporter
     [JSImport("globalThis.MonoGameWebHostValidation.requestFocusLifecycleValidation")]
     internal static partial void RequestFocusLifecycleValidation();
 
+    [JSImport("globalThis.MonoGameWebHostValidation.requestKeyboardKeyDown")]
+    internal static partial void RequestKeyboardKeyDown(string code, string key);
+
+    [JSImport("globalThis.MonoGameWebHostValidation.requestKeyboardKeyUp")]
+    internal static partial void RequestKeyboardKeyUp(string code, string key);
+
+    [JSImport("globalThis.MonoGameWebHostValidation.requestKeyboardFocusLoss")]
+    internal static partial void RequestKeyboardFocusLoss();
+
+    [JSImport("globalThis.MonoGameWebHostValidation.requestKeyboardFocusRestore")]
+    internal static partial void RequestKeyboardFocusRestore();
+
     [JSImport("globalThis.MonoGameWebHostValidation.isManualFocusValidationEnabled")]
     internal static partial bool IsManualFocusValidationEnabled();
 
@@ -30,4 +42,7 @@ internal static partial class BrowserHostValidationReporter
 
     [JSImport("globalThis.MonoGameWebHostValidation.isAdaptiveCanvasResizeValidationEnabled")]
     internal static partial bool IsAdaptiveCanvasResizeValidationEnabled();
+
+    [JSImport("globalThis.MonoGameWebHostValidation.isKeyboardValidationEnabled")]
+    internal static partial bool IsKeyboardValidationEnabled();
 }

@@ -5,6 +5,7 @@
 using System;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using Microsoft.Xna.Framework.Input.Touch;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using MonoGame.Interop;
@@ -116,6 +117,7 @@ class NativeGamePlatform : GamePlatform
 
                 case EventType.WindowLostFocus:
                     Keyboard.Keys.Clear();
+                    Window.TouchPanelState.ReleaseAllTouches();
                     IsActive = false;
                     break;
 
@@ -238,6 +240,29 @@ class NativeGamePlatform : GamePlatform
                                 window.MouseState.XButton2 = state;
                                 break;
                          }
+                    }
+                    break;
+                }
+
+                case EventType.TouchPressed:
+                case EventType.TouchMoved:
+                case EventType.TouchReleased:
+                {
+                    NativeGameWindow? window = NativeGameWindow.FromHandle(event_.Touch.Window);
+                    if (window != null)
+                    {
+                        TouchLocationState state = event_.Type switch
+                        {
+                            EventType.TouchPressed => TouchLocationState.Pressed,
+                            EventType.TouchMoved => TouchLocationState.Moved,
+                            EventType.TouchReleased => TouchLocationState.Released,
+                            _ => throw new InvalidOperationException()
+                        };
+
+                        window.TouchPanelState.AddEvent(
+                            event_.Touch.Id,
+                            state,
+                            new Vector2(event_.Touch.X, event_.Touch.Y));
                     }
                     break;
                 }

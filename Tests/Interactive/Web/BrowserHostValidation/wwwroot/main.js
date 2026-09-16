@@ -5,6 +5,13 @@
 const query = new URLSearchParams(globalThis.location.search);
 const canvasResizePolicy = query.get("canvas-resize-policy") ?? "Adaptive";
 
+function dispatchKeyboardEvent(type, code, key) {
+    globalThis.dispatchEvent(new KeyboardEvent(type, {
+        code,
+        key
+    }));
+}
+
 globalThis.MonoGameWebHostConfiguration = {
     runtimeScriptUri: "./_framework/dotnet.js",
     hostExportsTypeName: "BrowserHostValidation.BrowserHostValidationHostExports",
@@ -40,6 +47,28 @@ globalThis.MonoGameWebHostValidation = {
         canvas.dispatchEvent(new Event("blur"));
         canvas.dispatchEvent(new Event("focus"));
     },
+    requestKeyboardKeyDown(code, key) {
+        dispatchKeyboardEvent("keydown", code, key);
+    },
+    requestKeyboardKeyUp(code, key) {
+        dispatchKeyboardEvent("keyup", code, key);
+    },
+    requestKeyboardFocusLoss() {
+        const canvas = document.getElementById("canvas");
+        if (canvas == null) {
+            throw new Error("The validation canvas was not found.");
+        }
+
+        canvas.dispatchEvent(new Event("blur"));
+    },
+    requestKeyboardFocusRestore() {
+        const canvas = document.getElementById("canvas");
+        if (canvas == null) {
+            throw new Error("The validation canvas was not found.");
+        }
+
+        canvas.dispatchEvent(new Event("focus"));
+    },
     isManualFocusValidationEnabled() {
         return !query.has("auto-exit") || query.has("fullscreen") || query.has("embed-fullscreen");
     },
@@ -51,6 +80,9 @@ globalThis.MonoGameWebHostValidation = {
     },
     isAdaptiveCanvasResizeValidationEnabled() {
         return canvasResizePolicy === "Adaptive";
+    },
+    isKeyboardValidationEnabled() {
+        return query.has("keyboard");
     }
 };
 

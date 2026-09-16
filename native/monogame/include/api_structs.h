@@ -235,6 +235,14 @@ struct MGP_MouseWheelEvent
     mgint ScrollH;
 };
 
+struct MGP_TouchEvent
+{
+    void* Window;
+    mgint Id;
+    mgint X;
+    mgint Y;
+};
+
 struct MGP_DropEvent
 {
     void* Window;
@@ -265,6 +273,7 @@ union {
     MG_FIELD_OFFSET(12, MGP_MouseMoveEvent, MouseMove);
     MG_FIELD_OFFSET(12, MGP_MouseButtonEvent, MouseButton);
     MG_FIELD_OFFSET(12, MGP_MouseWheelEvent, MouseWheel);
+    MG_FIELD_OFFSET(12, MGP_TouchEvent, Touch);
     MG_FIELD_OFFSET(12, MGP_DropEvent, Drop);
     MG_FIELD_OFFSET(12, MGP_WindowEvent, Window);
     MG_FIELD_OFFSET(12, MGP_ControllerEvent, Controller);
