@@ -52,7 +52,7 @@ namespace MonoGame.Tests.ContentPipeline
             Assert.AreEqual(88200, format.AverageBytesPerSecond);
             Assert.AreEqual(2, format.BlockAlign);
             Assert.AreEqual(16, format.BitsPerSample);
-            
+
             Assert.IsNotNull(format.NativeWaveFormat);
             Assert.AreEqual(18, format.NativeWaveFormat.Count);
 
@@ -185,6 +185,34 @@ namespace MonoGame.Tests.ContentPipeline
             Assert.Throws<InvalidContentException>(() => { var temp = content.Data; });
         }
 
+        [TestCase(ConversionQuality.Low)]
+        [TestCase(ConversionQuality.Medium)]
+        [TestCase(ConversionQuality.Best)]
+        public void WebGL2Profile_ConvertsSoundEffectsToPcm(ConversionQuality quality)
+        {
+            using AudioContent content = new AudioContent(@"Assets/Audio/tone_mono_44khz_16bit.wav", AudioFileType.Wav);
+            AudioProfile profile = AudioProfile.ForPlatform(TargetPlatform.WebGL2);
+
+            ConversionQuality convertedQuality = profile.ConvertAudio(TargetPlatform.WebGL2, quality, content);
+
+            Assert.AreEqual(quality, convertedQuality);
+            Assert.AreEqual(1, content.Format.Format);
+        }
+
+        [Test]
+        public void WebGL2Profile_ConvertingStreamingAudio_ThrowsPipelineException()
+        {
+            using AudioContent content = new AudioContent(@"Assets/Audio/tone_mono_44khz_16bit.wav", AudioFileType.Wav);
+            AudioProfile profile = AudioProfile.ForPlatform(TargetPlatform.WebGL2);
+            string outputFileName = "validation.xnb";
+
+            Assert.Throws<PipelineException>(() => profile.ConvertStreamingAudio(
+                TargetPlatform.WebGL2,
+                ConversionQuality.Best,
+                content,
+                ref outputFileName));
+        }
+
         private static int ToWavFormat(ConversionFormat format, int bitsPerSample)
         {
             switch (format)
@@ -257,7 +285,7 @@ namespace MonoGame.Tests.ContentPipeline
         [TestCase(@"Assets/Audio/blast_mono_11hz.wav", ConversionFormat.Adpcm, ConversionQuality.Medium, 1, 6027, 11022, 4, 70)]
         [TestCase(@"Assets/Audio/blast_mono_11hz.wav", ConversionFormat.Adpcm, ConversionQuality.Low, 1, 4376, 8003, 4, 70)]
 
-        // 16bit PCM Stereo -> ADPCM 
+        // 16bit PCM Stereo -> ADPCM
         [TestCase(@"Assets/Audio/rock_loop_stereo.wav", ConversionFormat.Adpcm, ConversionQuality.Best, 2, 48240, 44106, 4, 140)]
         [TestCase(@"Assets/Audio/rock_loop_stereo.wav", ConversionFormat.Adpcm, ConversionQuality.Medium, 2, 48240, 44106, 4, 140)]
         [TestCase(@"Assets/Audio/rock_loop_stereo.wav", ConversionFormat.Adpcm, ConversionQuality.Low, 2, 24120, 22053, 4, 140)]

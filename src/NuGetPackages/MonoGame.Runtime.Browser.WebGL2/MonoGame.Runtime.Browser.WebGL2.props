@@ -5,6 +5,9 @@
     <MonoGameBrowserWebGL2NativeRuntimePath Condition="'$(MonoGameBrowserWebGL2NativeRuntimePath)' == '' and Exists('$(MSBuildThisFileDirectory)..\runtimes\browser-wasm\native\mgruntime.a')">$(MSBuildThisFileDirectory)..\runtimes\browser-wasm\native\mgruntime.a</MonoGameBrowserWebGL2NativeRuntimePath>
     <MonoGameBrowserWebGL2NativeRuntimePath Condition="'$(MonoGameBrowserWebGL2NativeRuntimePath)' == '' and Exists('$(MonoGameBrowserWebGL2ArtifactsRoot)\$(Configuration)\mgruntime.a')">$(MonoGameBrowserWebGL2ArtifactsRoot)\$(Configuration)\mgruntime.a</MonoGameBrowserWebGL2NativeRuntimePath>
     <MonoGameBrowserWebGL2NativeRuntimePath Condition="'$(MonoGameBrowserWebGL2NativeRuntimePath)' == '' and Exists('$(MonoGameBrowserWebGL2ArtifactsRoot)\Release\mgruntime.a')">$(MonoGameBrowserWebGL2ArtifactsRoot)\Release\mgruntime.a</MonoGameBrowserWebGL2NativeRuntimePath>
+    <MonoGameBrowserWebGL2FaudioRuntimePath Condition="'$(MonoGameBrowserWebGL2FaudioRuntimePath)' == '' and Exists('$(MSBuildThisFileDirectory)..\runtimes\browser-wasm\native\libFAudio.a')">$(MSBuildThisFileDirectory)..\runtimes\browser-wasm\native\libFAudio.a</MonoGameBrowserWebGL2FaudioRuntimePath>
+    <MonoGameBrowserWebGL2FaudioRuntimePath Condition="'$(MonoGameBrowserWebGL2FaudioRuntimePath)' == '' and Exists('$(MonoGameBrowserWebGL2ArtifactsRoot)\$(Configuration)\libFAudio.a')">$(MonoGameBrowserWebGL2ArtifactsRoot)\$(Configuration)\libFAudio.a</MonoGameBrowserWebGL2FaudioRuntimePath>
+    <MonoGameBrowserWebGL2FaudioRuntimePath Condition="'$(MonoGameBrowserWebGL2FaudioRuntimePath)' == '' and Exists('$(MonoGameBrowserWebGL2ArtifactsRoot)\Release\libFAudio.a')">$(MonoGameBrowserWebGL2ArtifactsRoot)\Release\libFAudio.a</MonoGameBrowserWebGL2FaudioRuntimePath>
     <MonoGameBrowserWebGL2SdlRuntimePath Condition="'$(MonoGameBrowserWebGL2SdlRuntimePath)' == '' and Exists('$(MSBuildThisFileDirectory)..\runtimes\browser-wasm\native\libSDL2.a')">$(MSBuildThisFileDirectory)..\runtimes\browser-wasm\native\libSDL2.a</MonoGameBrowserWebGL2SdlRuntimePath>
     <MonoGameBrowserWebGL2SdlRuntimePath Condition="'$(MonoGameBrowserWebGL2SdlRuntimePath)' == '' and Exists('$(MonoGameBrowserWebGL2ArtifactsRoot)\$(Configuration)\libSDL2.a')">$(MonoGameBrowserWebGL2ArtifactsRoot)\$(Configuration)\libSDL2.a</MonoGameBrowserWebGL2SdlRuntimePath>
     <MonoGameBrowserWebGL2SdlRuntimePath Condition="'$(MonoGameBrowserWebGL2SdlRuntimePath)' == '' and Exists('$(MonoGameBrowserWebGL2ArtifactsRoot)\Release\libSDL2.a')">$(MonoGameBrowserWebGL2ArtifactsRoot)\Release\libSDL2.a</MonoGameBrowserWebGL2SdlRuntimePath>
@@ -18,6 +21,10 @@
 
   <ItemGroup Condition="'$(RuntimeIdentifier)' == 'browser-wasm' and '$(MonoGameBrowserWebGL2NativeRuntimePath)' != ''">
     <NativeFileReference Include="$(MonoGameBrowserWebGL2NativeRuntimePath)" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(RuntimeIdentifier)' == 'browser-wasm' and '$(MonoGameBrowserWebGL2FaudioRuntimePath)' != ''">
+    <NativeFileReference Include="$(MonoGameBrowserWebGL2FaudioRuntimePath)" />
   </ItemGroup>
 
   <ItemGroup Condition="'$(RuntimeIdentifier)' == 'browser-wasm' and '$(MonoGameBrowserWebGL2SdlRuntimePath)' != ''">

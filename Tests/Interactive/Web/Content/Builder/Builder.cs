@@ -7,8 +7,14 @@ public class Builder : ContentBuilder
     public override IContentCollection GetContentCollection()
     {
         ContentCollection contentCollection = new ContentCollection();
-        contentCollection.IncludeCopy<WildcardRule>("*.xnb");
-        contentCollection.IncludeCopy<WildcardRule>("*.txt");
+        contentCollection.Include<WildcardRule>("*.spritefont");
+        contentCollection.Include<WildcardRule>("*.wav");
+
+        // BrowserHostValidation opens these XNB fixtures through TitleContainer.OpenStream.
+        contentCollection.IncludeCopy<WildcardRule>("arial.xnb");
+        contentCollection.IncludeCopy<WildcardRule>("monogame_logo.xnb");
+        contentCollection.IncludeCopy<WildcardRule>("validation_effect.xnb");
+        contentCollection.IncludeCopy<WildcardRule>("validation-raw.txt");
         return contentCollection;
     }
 }

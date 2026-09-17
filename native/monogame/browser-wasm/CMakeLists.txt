@@ -75,6 +75,16 @@ set_target_properties(SDL2-static PROPERTIES
     OUTPUT_NAME "SDL2"
     ARCHIVE_OUTPUT_DIRECTORY "${MONOGAME_BROWSER_OUTPUT_ROOT}/$<CONFIG>")
 
+set(BUILD_SHARED_LIBS OFF CACHE BOOL "" FORCE)
+set(BUILD_SDL3 OFF CACHE BOOL "" FORCE)
+set(XNASONG OFF CACHE BOOL "" FORCE)
+set(FAUDIO_INSTALL OFF CACHE BOOL "" FORCE)
+set(SDL2_INCLUDE_DIRS "${_monogameSdl2Root}/include" CACHE PATH "" FORCE)
+set(SDL2_LIBRARIES SDL2-static CACHE STRING "" FORCE)
+add_subdirectory("${MONOGAME_NATIVE_ROOT}/external/faudio" faudio)
+set_target_properties(FAudio-static PROPERTIES
+    ARCHIVE_OUTPUT_DIRECTORY "${MONOGAME_BROWSER_OUTPUT_ROOT}/$<CONFIG>")
+
 add_library(mgruntime STATIC
     "${MONOGAME_NATIVE_ROOT}/common/MGI.cpp"
     "${MONOGAME_NATIVE_ROOT}/common/MG_Asset.cpp"
@@ -84,12 +94,13 @@ add_library(mgruntime STATIC
     "${MONOGAME_NATIVE_ROOT}/opengl/OpenGLContext.cpp"
     "${MONOGAME_NATIVE_ROOT}/opengl/MGG_OpenGL.cpp"
     "${MONOGAME_NATIVE_ROOT}/sdl/MGP_sdl.cpp"
-    "${MONOGAME_NATIVE_ROOT}/web/MGA_web.cpp"
+    "${MONOGAME_NATIVE_ROOT}/faudio/MGA_faudio.cpp"
     "${MONOGAME_NATIVE_ROOT}/web/MGM_web.cpp"
     "${MONOGAME_NATIVE_ROOT}/web/MGP_web.cpp")
 
 target_compile_definitions(mgruntime PRIVATE DLL_EXPORT MG_SDL2 MG_OPENGL)
 target_compile_options(mgruntime PRIVATE "-Wno-warn-absolute-paths")
+target_link_libraries(mgruntime PRIVATE FAudio-static)
 target_include_directories(mgruntime PRIVATE
     "${MONOGAME_NATIVE_ROOT}/include"
     "${MONOGAME_NATIVE_ROOT}/common"

@@ -84,7 +84,7 @@ namespace MonoGame.Tests.ContentPipeline
         public void TestParser(string effectFile)
         {
             BuildEffect(effectFile, TargetPlatform.DesktopGL);
-            BuildEffect(effectFile, targetPlatform.WebGL2);
+            BuildEffect(effectFile, TargetPlatform.WebGL2);
         }
 
         [Test]

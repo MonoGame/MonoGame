@@ -16,6 +16,12 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
 
+    <Content Include="..\..\..\Artifacts\native\mgruntime\webgl2\browser-wasm\Release\libFAudio.a"
+      Condition="Exists('..\..\..\Artifacts\native\mgruntime\webgl2\browser-wasm\Release\libFAudio.a')">
+      <PackagePath>runtimes\browser-wasm\native</PackagePath>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+
     <Content Include="..\..\..\Artifacts\native\mgruntime\webgl2\browser-wasm\Release\mgruntime.a"
       Condition="Exists('..\..\..\Artifacts\native\mgruntime\webgl2\browser-wasm\Release\mgruntime.a')">
       <PackagePath>runtimes\browser-wasm\native</PackagePath>
