@@ -18,6 +18,15 @@ const CanvasResizePolicy = Object.freeze({
     None: "None"
 });
 
+const SensorState = Object.freeze({
+    NotSupported: 0,
+    Ready: 1,
+    Initializing: 2,
+    NoData: 3,
+    NoPermissions: 4,
+    Disabled: 5
+});
+
 let activeHost = null;
 const contentBase64ByPath = new Map();
 
@@ -42,6 +51,7 @@ class MonoGameWebHost {
         this.managedFrameHandle = null;
         this.assetPackStagingPromises = new Map();
         this.canvasResizeObserver = null;
+        this.accelerometerListener = null;
     }
 
     static bootFromDocument(document_) {
@@ -348,6 +358,92 @@ class MonoGameWebHost {
             this.runtime.Module._MGP_Web_NotifyFullscreenChange(
                 document.fullscreenElement === this.canvas ? 1 : 0);
         });
+    }
+
+    isAccelerometerSupported() {
+        return typeof DeviceMotionEvent !== "undefined";
+    }
+
+    isAccelerometerPermissionRequired() {
+        return this.isAccelerometerSupported()
+            && typeof DeviceMotionEvent.requestPermission === "function";
+    }
+
+    requestAccelerometer() {
+        if (!this.isAccelerometerSupported()) {
+            return SensorState.NotSupported;
+        }
+
+        if (this.accelerometerListener != null) {
+            return SensorState.Ready;
+        }
+
+        if (typeof DeviceMotionEvent.requestPermission !== "function") {
+            this.startAccelerometer();
+            return SensorState.Ready;
+        }
+
+        return SensorState.Initializing;
+    }
+
+    async requestAccelerometerPermissionFromUserGestureAsync() {
+        if (this.runtime == null || !this.isAccelerometerSupported()) {
+            return false;
+        }
+
+        if (this.accelerometerListener != null) {
+            return true;
+        }
+
+        if (!this.isAccelerometerPermissionRequired()) {
+            this.startAccelerometer();
+            return true;
+        }
+
+        return this.requestAccelerometerPermissionAsync();
+    }
+
+    stopAccelerometer() {
+        if (this.accelerometerListener != null) {
+            globalThis.removeEventListener("devicemotion", this.accelerometerListener);
+            this.accelerometerListener = null;
+        }
+    }
+
+    async requestAccelerometerPermissionAsync() {
+        try {
+            const permission = await DeviceMotionEvent.requestPermission();
+            if (permission !== "granted") {
+                this.runtime.Module._MGP_Web_NotifyAccelerometerState(SensorState.NoPermissions);
+                return false;
+            }
+
+            this.startAccelerometer();
+            return true;
+        }
+        catch {
+            this.runtime.Module._MGP_Web_NotifyAccelerometerState(SensorState.NoPermissions);
+            return false;
+        }
+    }
+
+    startAccelerometer() {
+        if (this.accelerometerListener == null) {
+            this.accelerometerListener = (event) => {
+                const acceleration = event.accelerationIncludingGravity;
+                if (acceleration?.x == null || acceleration?.y == null || acceleration?.z == null) {
+                    return;
+                }
+
+                this.runtime.Module._MGP_Web_NotifyAccelerometerReading(
+                    acceleration.x / 9.80665,
+                    acceleration.y / 9.80665,
+                    acceleration.z / 9.80665);
+            };
+            globalThis.addEventListener("devicemotion", this.accelerometerListener);
+        }
+
+        this.runtime.Module._MGP_Web_NotifyAccelerometerState(SensorState.Ready);
     }
 
     async requestCanvasFullscreenAsync() {
@@ -668,6 +764,10 @@ function encodeResponseTextAsBase64(responseText) {
 
 globalThis.MonoGameWebHost = {
     getActiveHost: () => activeHost,
+    isAccelerometerPermissionRequired: () =>
+        activeHost?.isAccelerometerPermissionRequired() ?? false,
+    requestAccelerometerPermissionFromUserGestureAsync: () =>
+        activeHost?.requestAccelerometerPermissionFromUserGestureAsync() ?? Promise.resolve(false),
     stageAssetPackAsync: async (assetPackName) => {
         if (activeHost == null) {
             throw new BrowserHostStartupError(

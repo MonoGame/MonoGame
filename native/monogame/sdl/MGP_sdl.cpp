@@ -351,6 +351,47 @@ mgint MGP_Touch_GetMaximumTouchCount()
 #endif
 }
 
+MG_EXPORT mgbyte MGP_Accelerometer_IsSupported()
+{
+#if defined(__EMSCRIPTEN__)
+    return MGP_Web_Accelerometer_IsSupported();
+#else
+    return 0;
+#endif
+}
+
+MG_EXPORT mgint MGP_Accelerometer_GetState()
+{
+#if defined(__EMSCRIPTEN__)
+    return MGP_Web_Accelerometer_GetState();
+#else
+    return 0;
+#endif
+}
+
+MG_EXPORT void MGP_Accelerometer_Start()
+{
+#if defined(__EMSCRIPTEN__)
+    MGP_Web_Accelerometer_Start();
+#endif
+}
+
+MG_EXPORT void MGP_Accelerometer_Stop()
+{
+#if defined(__EMSCRIPTEN__)
+    MGP_Web_Accelerometer_Stop();
+#endif
+}
+
+MG_EXPORT mgbyte MGP_Accelerometer_GetReading(mgfloat& x, mgfloat& y, mgfloat& z, mgint& sequence)
+{
+#if defined(__EMSCRIPTEN__)
+    return MGP_Web_Accelerometer_GetReading(x, y, z, sequence);
+#else
+    return 0;
+#endif
+}
+
 static MGP_Window* MGP_WindowFromId(MGP_Platform* platform, Uint32 windowId)
 {
     assert(platform != nullptr);

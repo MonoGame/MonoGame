@@ -447,6 +447,25 @@ internal static unsafe partial class MGP
 
     #endregion
 
+    #region Accelerometer
+
+    [DllImport(MonoGameNativeDLL, EntryPoint = "MGP_Accelerometer_IsSupported", ExactSpelling = true)]
+    public static extern byte Accelerometer_IsSupported();
+
+    [DllImport(MonoGameNativeDLL, EntryPoint = "MGP_Accelerometer_GetState", ExactSpelling = true)]
+    public static extern int Accelerometer_GetState();
+
+    [DllImport(MonoGameNativeDLL, EntryPoint = "MGP_Accelerometer_Start", ExactSpelling = true)]
+    public static extern void Accelerometer_Start();
+
+    [DllImport(MonoGameNativeDLL, EntryPoint = "MGP_Accelerometer_Stop", ExactSpelling = true)]
+    public static extern void Accelerometer_Stop();
+
+    [DllImport(MonoGameNativeDLL, EntryPoint = "MGP_Accelerometer_GetReading", ExactSpelling = true)]
+    public static extern byte Accelerometer_GetReading(out float x, out float y, out float z, out int sequence);
+
+    #endregion
+
     #region GamePad
 
     [DllImport(MonoGameNativeDLL, EntryPoint = "MGP_GamePad_GetMaxSupported", ExactSpelling = true)]

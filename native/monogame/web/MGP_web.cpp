@@ -13,6 +13,22 @@ static mgbyte s_pendingBrowserFocus = false;
 static bool s_hasPendingBrowserFullscreen = false;
 static mgbyte s_pendingBrowserFullscreen = false;
 
+enum MGP_WebSensorState : mgint
+{
+    MGP_WEB_SENSOR_STATE_NOT_SUPPORTED = 0,
+    MGP_WEB_SENSOR_STATE_READY = 1,
+    MGP_WEB_SENSOR_STATE_INITIALIZING = 2,
+    MGP_WEB_SENSOR_STATE_NO_DATA = 3,
+    MGP_WEB_SENSOR_STATE_NO_PERMISSIONS = 4,
+    MGP_WEB_SENSOR_STATE_DISABLED = 5,
+};
+
+static mgint s_accelerometerState = MGP_WEB_SENSOR_STATE_NOT_SUPPORTED;
+static mgfloat s_accelerometerX = 0.0f;
+static mgfloat s_accelerometerY = 0.0f;
+static mgfloat s_accelerometerZ = 0.0f;
+static mgint s_accelerometerSequence = 0;
+
 EM_JS(mgint, MGP_Web_GetMaximumTouchCountFromNavigator, (),
 {
     if (typeof navigator === "undefined" || typeof navigator.maxTouchPoints !== "number")
@@ -106,6 +122,68 @@ void MGP_Web_ExitFullscreen()
 
     if (s_platform != nullptr)
         MGP_Sdl_QueueBrowserFullscreenFailure(s_platform);
+}
+
+EM_JS(mgbyte, MGP_Web_AccelerometerIsSupportedFromHost, (),
+{
+    return globalThis.MonoGameWebHost?.getActiveHost?.().isAccelerometerSupported?.() ? 1 : 0;
+});
+
+EM_JS(mgint, MGP_Web_AccelerometerStartFromHost, (),
+{
+    return globalThis.MonoGameWebHost?.getActiveHost?.().requestAccelerometer?.() ?? 0;
+});
+
+EM_JS(void, MGP_Web_AccelerometerStopFromHost, (),
+{
+    globalThis.MonoGameWebHost?.getActiveHost?.().stopAccelerometer?.();
+});
+
+mgbyte MGP_Web_Accelerometer_IsSupported()
+{
+    return MGP_Web_AccelerometerIsSupportedFromHost();
+}
+
+mgint MGP_Web_Accelerometer_Start()
+{
+    s_accelerometerState = MGP_Web_AccelerometerStartFromHost();
+    return s_accelerometerState;
+}
+
+void MGP_Web_Accelerometer_Stop()
+{
+    MGP_Web_AccelerometerStopFromHost();
+    s_accelerometerState = MGP_WEB_SENSOR_STATE_DISABLED;
+}
+
+mgint MGP_Web_Accelerometer_GetState()
+{
+    return s_accelerometerState;
+}
+
+mgbyte MGP_Web_Accelerometer_GetReading(mgfloat& x, mgfloat& y, mgfloat& z, mgint& sequence)
+{
+    if (s_accelerometerSequence == 0)
+        return 0;
+
+    x = s_accelerometerX;
+    y = s_accelerometerY;
+    z = s_accelerometerZ;
+    sequence = s_accelerometerSequence;
+    return 1;
+}
+
+extern "C" EMSCRIPTEN_KEEPALIVE void MGP_Web_NotifyAccelerometerState(mgint state)
+{
+    s_accelerometerState = state;
+}
+
+extern "C" EMSCRIPTEN_KEEPALIVE void MGP_Web_NotifyAccelerometerReading(mgfloat x, mgfloat y, mgfloat z)
+{
+    s_accelerometerX = x;
+    s_accelerometerY = y;
+    s_accelerometerZ = z;
+    ++s_accelerometerSequence;
 }
 
 void MGP_Web_OnPlatformDestroyed(MGP_Platform* platform)

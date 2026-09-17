@@ -6,6 +6,7 @@ using System;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Input.Touch;
+using MonoGame.Framework.Devices.Sensors;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using MonoGame.Interop;
@@ -353,6 +354,8 @@ class NativeGamePlatform : GamePlatform
     {
         if (DefaultRunBehavior == GameRunBehavior.Asynchronous)
             PollEvents();
+
+        Accelerometer.PlatformUpdate();
 
         return MGP.Platform_BeforeUpdate(Handle) == 0 ? false : true;
     }
