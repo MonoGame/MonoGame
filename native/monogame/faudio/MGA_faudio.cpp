@@ -108,7 +108,13 @@ MGA_System* MGA_System_Create()
 {
 	auto system = new MGA_System();
 
-	uint32_t result = FAudioCreate(&system->faudio, 0, FAUDIO_DEFAULT_PROCESSOR);
+	uint32_t flags = 0;
+#if defined(__EMSCRIPTEN__)
+	// SDL's Web Audio backend uses a ScriptProcessorNode, whose buffer size must be a power of two.
+	flags = FAUDIO_1024_QUANTUM;
+#endif
+
+	uint32_t result = FAudioCreate(&system->faudio, flags, FAUDIO_DEFAULT_PROCESSOR);
 	if (result != 0)
 	{
 		delete system;
@@ -967,4 +973,3 @@ void MGA_Voice_Apply3D(MGA_Voice* voice, Listener& listener, Emitter& emitter, m
 	);
 	FAudioSourceVoice_SetFrequencyRatio(voice->voice, dsp.DopplerFactor, FAUDIO_COMMIT_NOW);
 }
-
