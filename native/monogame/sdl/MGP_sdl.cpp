@@ -724,6 +724,54 @@ mgbyte MGP_Platform_BeforeDraw(MGP_Platform* platform)
 	return true;
 }
 
+#if MG_OPENGL
+static mgbyte MGP_Window_DetectOpenGLVersion(int &majorVersion, int &minorVersion)
+{
+    SDL_Window * tempWindow = SDL_CreateWindow(
+        "Temp",
+        SDL_WINDOWPOS_UNDEFINED,
+        SDL_WINDOWPOS_UNDEFINED,
+        1,
+        1,
+        SDL_WINDOW_HIDDEN | SDL_WINDOW_OPENGL
+    );
+    if (!tempWindow)
+        return false;
+
+    SDL_GLContext tempContext = nullptr;
+
+    for (int major = majorVersion; major >= 3; --major)
+    {
+        for (int minor = minorVersion; minor >= 1; --minor)
+        {
+            printf("Trying OpenGL version %d.%d\n", major, minor);
+            SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, major);
+            SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, minor);
+            SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
+
+            tempContext = SDL_GL_CreateContext(tempWindow);
+            if (tempContext)
+            {
+                majorVersion = major;
+                minorVersion = minor;
+                printf("Detected OpenGL version %d.%d\n", majorVersion, minorVersion);
+                SDL_GL_DeleteContext(tempContext);
+                SDL_DestroyWindow(tempWindow);
+                return true;
+            }
+        }
+    }
+
+    printf("Failed to detect a suitable OpenGL version, falling back to default 3.1\n");
+    majorVersion = 3;
+    minorVersion = 1;
+
+    SDL_GL_DeleteContext(tempContext);
+    SDL_DestroyWindow(tempWindow);
+    return false;
+}
+#endif
+
 static mgbyte MGP_Window_CreateNativeWindowInternal(
     MGP_Window* window,
     mgint& width,
@@ -746,6 +794,14 @@ static mgbyte MGP_Window_CreateNativeWindowInternal(
 #if defined(MG_VULKAN) || defined(MG_DIRECTX12)
 	flags |= SDL_WINDOW_VULKAN;
 #elif defined(MG_OPENGL)
+
+    if (!MGP_Window_DetectOpenGLVersion(window->contextMajorVersion, window->contextMinorVersion))
+    {
+        return false;
+    }
+
+    printf("Using OpenGL version %d.%d\n", window->contextMajorVersion, window->contextMinorVersion);
+
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, window->contextMajorVersion);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, window->contextMinorVersion);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
