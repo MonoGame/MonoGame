@@ -36,8 +36,17 @@ namespace Microsoft.Xna.Framework.Input
             window.MouseState.HorizontalScrollWheelValue = ScrollX;
             window.MouseState.ScrollWheelValue = ScrollY;
 
-            window.MouseState.X = x - clientBounds.X;
-            window.MouseState.Y = y - clientBounds.Y;
+            var localX = x - clientBounds.X;
+            var localY = y - clientBounds.Y;
+
+            if (window is SdlGameWindow sdlGameWindow && sdlGameWindow.UseHighDpi)
+            {
+                localX = (int)Math.Round(localX * sdlGameWindow.DpiScaleX);
+                localY = (int)Math.Round(localY * sdlGameWindow.DpiScaleY);
+            }
+
+            window.MouseState.X = localX;
+            window.MouseState.Y = localY;
 
             return window.MouseState;
         }
@@ -46,8 +55,16 @@ namespace Microsoft.Xna.Framework.Input
         {
             PrimaryWindow.MouseState.X = x;
             PrimaryWindow.MouseState.Y = y;
+
+            var localX = x;
+            var localY = y;
+            if (PrimaryWindow is SdlGameWindow sdlGameWindow && sdlGameWindow.UseHighDpi)
+            {
+                localX = (int)Math.Round(x / sdlGameWindow.DpiScaleX);
+                localY = (int)Math.Round(y / sdlGameWindow.DpiScaleY);
+            }
             
-            Sdl.Mouse.WarpInWindow(PrimaryWindow.Handle, x, y);
+            Sdl.Mouse.WarpInWindow(PrimaryWindow.Handle, localX, localY);
         }
 
         private static void PlatformSetCursor(MouseCursor cursor)

@@ -82,6 +82,10 @@ namespace Microsoft.Xna.Framework
             }
         }
 
+        internal bool UseHighDpi => _supportHdpiEnabled;
+        internal float DpiScaleX => _dpiScaleX;
+        internal float DpiScaleY => _dpiScaleY;
+
         public static GameWindow Instance;
         public uint? Id;
         public bool IsFullScreen;
@@ -91,13 +95,17 @@ namespace Microsoft.Xna.Framework
         private bool _disposed;
         private bool _resizable, _borderless, _willBeFullScreen, _mouseVisible, _hardwareSwitch;
         private string _screenDeviceName;
-        private int _width, _height;
+        private int _width, _height, _drawableWidth, _drawableHeight;
+        private float _dpiScaleX = 1f;
+        private float _dpiScaleY = 1f;
         private bool _wasMoved, _supressMoved;
+        private bool _supportHdpiEnabled;
 
         public SdlGameWindow(Game game)
         {
             _game = game;
             _screenDeviceName = "";
+            _supportHdpiEnabled = Environment.GetEnvironmentVariable("MONOGAME_ENABLE_HIGHDPI") == "1";
 
             Instance = this;
 
@@ -143,6 +151,9 @@ namespace Microsoft.Xna.Framework
                 Sdl.Window.State.InputFocus |
                 Sdl.Window.State.MouseFocus;
 
+            if (_supportHdpiEnabled)
+                initflags |= Sdl.Window.State.AllowHighDPI;
+
             if (_handle != IntPtr.Zero)
                 Sdl.Window.Destroy(_handle);
 
@@ -172,12 +183,74 @@ namespace Microsoft.Xna.Framework
             Sdl.Window.SetBordered(_handle, _borderless ? 0 : 1);
             Sdl.Window.SetResizable(_handle, _resizable);
 
+            RefreshScaledDrawableClientSize();
+
             SetCursorVisible(_mouseVisible);
         }
 
         ~SdlGameWindow()
         {
             Dispose(false);
+        }
+
+        private void RefreshScaledDrawableClientSize()
+        {
+            int drawableHeight;
+            int drawableWidth;
+            Sdl.Window.GetSize(Handle, out int logicalWidth, out int logicalHeight);
+            _width = Math.Max(logicalWidth, 1);
+            _height = Math.Max(logicalHeight, 1);
+            drawableWidth = logicalWidth;
+            drawableHeight = logicalHeight;
+            if (_supportHdpiEnabled)
+            {
+                Sdl.GL.GetDrawableSize(Handle, out drawableWidth, out drawableHeight);
+                if (drawableWidth <= 0 || drawableHeight <= 0)
+                {
+                    drawableWidth = logicalWidth;
+                    drawableHeight = logicalHeight;
+                }
+            }
+            _drawableWidth = Math.Max(drawableWidth, 1);
+            _drawableHeight = Math.Max(drawableHeight, 1);
+            _dpiScaleX = (float)_drawableWidth / _width;
+            _dpiScaleY = (float)_drawableHeight / _height;
+        }
+
+        private bool ApplyDrawableBackBufferIfNeeded(bool force = false)
+        {
+            if (_game.GraphicsDevice == null)
+            {
+                return false;
+            }
+            int targetWidth = _width;
+            int targetHeight = _height;
+            if (_supportHdpiEnabled)
+            {
+                targetWidth = _drawableWidth;
+                targetHeight = _drawableHeight;
+            }
+            var pp = _game.GraphicsDevice.PresentationParameters;
+            int currentWidth = pp.BackBufferWidth;
+            int currentHeight = pp.BackBufferHeight;
+            if (currentWidth == targetWidth && currentHeight == targetHeight && !force)
+            {
+                return false;
+            }
+            if (_game.GraphicsDevice.RasterizerState.ScissorTestEnable && _game.GraphicsDevice.ScissorRectangle == _game.GraphicsDevice.Viewport.Bounds)
+            {
+                _game.GraphicsDevice.ScissorRectangle = new Rectangle(0,0, targetWidth, targetHeight);
+            }
+            pp.BackBufferWidth = targetWidth;
+            pp.BackBufferHeight = targetHeight;
+            _game.GraphicsDevice.Viewport = new Viewport(0,0, targetWidth, targetHeight);
+            return true;
+        }
+
+        internal void ApplyInitialHighDpiBackBuffer()
+        {
+            RefreshScaledDrawableClientSize();
+            ApplyDrawableBackBufferIfNeeded(force: true);
         }
 
         private static int GetMouseDisplay()
@@ -258,6 +331,9 @@ namespace Microsoft.Xna.Framework
             if (_willBeFullScreen && _hardwareSwitch  && (fullScreenChanged || hardwareSwitchChanged))
                 Sdl.Window.SetFullscreen(Handle, Sdl.Window.State.Fullscreen);
 
+            RefreshScaledDrawableClientSize();
+            ApplyDrawableBackBufferIfNeeded(force: true);
+
             int ignore, minx = 0, miny = 0;
             Sdl.Window.GetBorderSize(_handle, out miny, out minx, out ignore, out ignore);
 
@@ -300,25 +376,17 @@ namespace Microsoft.Xna.Framework
             }
 
             _wasMoved = true;
+            RefreshScaledDrawableClientSize();
         }
 
         public void ClientResize(int width, int height)
         {
-            // SDL reports many resize events even if the Size didn't change.
-            // Only call the code below if it actually changed.
-            if (_game.GraphicsDevice.PresentationParameters.BackBufferWidth == width &&
-                _game.GraphicsDevice.PresentationParameters.BackBufferHeight == height) {
+            RefreshScaledDrawableClientSize();
+
+            if (!ApplyDrawableBackBufferIfNeeded())
+            {
                 return;
             }
-
-            if (_game.GraphicsDevice.RasterizerState.ScissorTestEnable && _game.GraphicsDevice.ScissorRectangle == _game.GraphicsDevice.Viewport.Bounds)
-                _game.GraphicsDevice.ScissorRectangle = new Rectangle(0, 0, width, height);
-
-            _game.GraphicsDevice.PresentationParameters.BackBufferWidth = width;
-            _game.GraphicsDevice.PresentationParameters.BackBufferHeight = height;
-            _game.GraphicsDevice.Viewport = new Viewport(0, 0, width, height);
-
-            Sdl.Window.GetSize(Handle, out _width, out _height);
 
             OnClientSizeChanged();
         }
