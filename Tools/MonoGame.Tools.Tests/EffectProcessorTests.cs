@@ -113,7 +113,7 @@ namespace MonoGame.Tests.ContentPipeline
             BuildEffect(effectFile, TargetPlatform.WindowsGDK);
 #endif
             BuildEffect(effectFile, TargetPlatform.DesktopGL);
-            BuildEffect(effectFile, targetPlatform.WebGL2);
+            BuildEffect(effectFile, TargetPlatform.WebGL2);
             BuildEffect(effectFile, TargetPlatform.DesktopVK);
         }
 
