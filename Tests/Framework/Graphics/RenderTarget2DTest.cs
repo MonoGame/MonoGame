@@ -243,7 +243,7 @@ namespace MonoGame.Tests.Graphics
                 IntPtr.Zero);
             MonoGame.OpenGL.GL.BindTexture(MonoGame.OpenGL.TextureTarget.Texture2D, 0);
 
-            var rt = RenderTarget2D.FromNativeHandle(gd, (nint)texId, 32, 32);
+            var rt = RenderTarget2D.FromNativeHandle(gd, texId, 32, 32);
             Assert.IsNotNull(rt);
             Assert.AreEqual(32, rt.Width);
             Assert.AreEqual(32, rt.Height);

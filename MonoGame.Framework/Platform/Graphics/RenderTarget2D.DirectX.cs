@@ -193,23 +193,7 @@ namespace Microsoft.Xna.Framework.Graphics
             return desc;
         }
 
-        /// <summary>
-        /// Creates a <see cref="RenderTarget2D"/> that wraps an externally-owned native graphics handle.
-        /// Such as an DX11 texture <c>ID3D11Texture2D*</c>.
-        /// </summary>
-        /// <param name="graphicsDevice">The MonoGame graphics device.</param>
-        /// <param name="handle">The native image handle. <para>This should be <c>ID3D11Texture2D*</c> cast to <see cref="nint"/>.</para></param>
-        /// <param name="width">Image width in pixels.</param>
-        /// <param name="height">Image height in pixels.</param>
-        /// <param name="format">The surface format of the native image.</param>
-        /// <param name="preferredDepthFormat">The preferred depth format of the render target.<para><see cref="DepthFormat.None"/> by default.</para></param>
-        /// <param name="preferredMultiSampleCount">The preferred number of samples per pixel when multisampling.<para><c>0</c> by default.</para></param>
-        /// <remarks>
-        /// WARNING: The returned render target does not own the underlying native image memory.
-        /// The external caller/runtime is responsible for its lifetime.
-        /// </remarks>
-        /// <returns>A non-owning <see cref="RenderTarget2D"/> backed by the native resource handle.</returns>
-        public static RenderTarget2D FromNativeHandle(
+        private static RenderTarget2D PlatformFromNativeHandle(
             GraphicsDevice graphicsDevice,
             nint handle,
             int width,
