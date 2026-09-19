@@ -291,7 +291,7 @@ namespace MonoGame.Tests.Graphics
         }
 
         static readonly Color[] sampleTextureColors = [Color.CornflowerBlue, Color.Red, Color.Green, Color.Blue, Color.White, Color.Black, Color.Transparent, new Color(Color.DarkSlateBlue, 0.5f), Color.Chartreuse];
-        static Texture2D MakeSampleTexture(GraphicsDevice gd, int width, int height, out Color[] pixels)
+        static Texture2D MakeSampleTexture(GraphicsDevice gd, int width, int height, SurfaceFormat format, out Color[] pixels)
         {
             // Make an array of colors matching the width and height
             static Color getExpectedColor(int index) => sampleTextureColors[index % sampleTextureColors.Length];
@@ -299,6 +299,29 @@ namespace MonoGame.Tests.Graphics
                 Enumerable.Range(0, width * height)
                 .Select(getExpectedColor)
                 .ToArray();
+
+            var sRgbFormat = (format == SurfaceFormat.ColorSRgb) ||
+                             (format == SurfaceFormat.Srgb8Etc2) ||
+                             (format == SurfaceFormat.Srgb8A1Etc2) ||
+                             (format == SurfaceFormat.SRgb8A8Etc2);
+
+            if (sRgbFormat)
+            {
+                for (var y = 0; y < height; y++)
+                    for (var x = 0; x < width; x++)
+                    {
+                        var colorValue = pixels[(y * width) + x].ToVector4();
+
+                        // Approximation of sRGB - it's not actually as simple as this,
+                        // but it will suffice for these tests.
+                        colorValue.X = (float)Math.Pow(colorValue.X, 1 / 2.2);
+                        colorValue.Y = (float)Math.Pow(colorValue.Y, 1 / 2.2);
+                        colorValue.Z = (float)Math.Pow(colorValue.Z, 1 / 2.2);
+                        colorValue.W = (float)Math.Pow(colorValue.W, 1 / 2.2);
+
+                        pixels[(y * width) + x] = new Color(colorValue);
+                    }
+            }
 
             // Make a texture with the data
             Texture2D tex = new Texture2D(gd, width, height);
@@ -309,20 +332,26 @@ namespace MonoGame.Tests.Graphics
 
         [Test]
         // Nice small square
-        [TestCase(64, 64)]
+        [TestCase(64, 64, SurfaceFormat.Color)]
         // One pixel
-        [TestCase(1, 1)]
+        [TestCase(1, 1, SurfaceFormat.Color)]
         // Large square
-        [TestCase(2048, 2048)]
+        [TestCase(2048, 2048, SurfaceFormat.Color)]
         // Large non-square
-        [TestCase(2048, 1234)]
+        [TestCase(2048, 1234, SurfaceFormat.Color)]
         // Small non-power-of-2 square
-        [TestCase(7, 7)]
+        [TestCase(7, 7, SurfaceFormat.Color)]
         // Small non-square
-        [TestCase(15, 31)]
-        public void SaveAsPngShouldWork(int width, int height)
+        [TestCase(15, 31, SurfaceFormat.Color)]
+        // Medium square
+        [TestCase(256, 256, SurfaceFormat.Srgb8Etc2)]
+        // Medium square
+        [TestCase(256, 256, SurfaceFormat.Srgb8A1Etc2)]
+        // Medium square
+        [TestCase(256, 256, SurfaceFormat.SRgb8A8Etc2)]
+        public void SaveAsPngShouldWork(int width, int height, SurfaceFormat format)
         {
-            using var source = MakeSampleTexture(gd, width, height, out var expectedPixels);
+            using var source = MakeSampleTexture(gd, width, height, format, out var expectedPixels);
             // Save the texture to a memory stream
             using var stream = new MemoryStream(width * height * 4); // 4 bytes in a Color;
             source.SaveAsPng(stream, width, height);
@@ -347,21 +376,27 @@ namespace MonoGame.Tests.Graphics
 
         [Test]
         // Nice small square
-        [TestCase(64, 64)]
+        [TestCase(64, 64, SurfaceFormat.Color)]
         // One pixel
-        [TestCase(1, 1)]
+        [TestCase(1, 1, SurfaceFormat.Color)]
         // Large square
-        [TestCase(1024, 1024)]
+        [TestCase(1024, 1024, SurfaceFormat.Color)]
         // Large non-square
-        [TestCase(1024, 1234)]
+        [TestCase(1024, 1234, SurfaceFormat.Color)]
         // Small non-power-of-2 square
-        [TestCase(7, 7)]
+        [TestCase(7, 7, SurfaceFormat.Color)]
         // Small non-square
-        [TestCase(15, 31)]
-        public void SaveAsJpegShouldWork(int width, int height)
+        [TestCase(15, 31, SurfaceFormat.Color)]
+        // Medium square
+        [TestCase(256, 256, SurfaceFormat.Srgb8Etc2)]
+        // Medium square
+        [TestCase(256, 256, SurfaceFormat.Srgb8A1Etc2)]
+        // Medium square
+        [TestCase(256, 256, SurfaceFormat.SRgb8A8Etc2)]
+        public void SaveAsJpegShouldWork(int width, int height, SurfaceFormat format)
         {
             // Make a test texture and save it to a memory stream
-            using var source = MakeSampleTexture(gd, width, height, out var expectedPixels);
+            using var source = MakeSampleTexture(gd, width, height, format, out var expectedPixels);
             using var stream = new MemoryStream(width * height * 4); // 4 bytes in a Color;
             source.SaveAsJpeg(stream, width, height);
 

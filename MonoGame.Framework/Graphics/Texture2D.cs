@@ -999,6 +999,39 @@ namespace Microsoft.Xna.Framework.Graphics
 
                     break;
 
+                case SurfaceFormat.Srgb8Etc2:
+                    var srgb8Etc2Data = new Srgb8Etc2[colorDataLength];
+                    GetData(srgb8Etc2Data);
+
+                    for (int i = 0; i < colorDataLength; i++)
+                    {
+                        colorData[i] = new Color(srgb8Etc2Data[i].ToVector4());
+                    }
+
+                    break;
+
+                case SurfaceFormat.Srgb8A1Etc2:
+                    var srgb8A1Etc2Data = new Srgb8A1Etc2[colorDataLength];
+                    GetData(srgb8A1Etc2Data);
+
+                    for (int i = 0; i < colorDataLength; i++)
+                    {
+                        colorData[i] = new Color(srgb8A1Etc2Data[i].ToVector4());
+                    }
+
+                    break;
+
+                case SurfaceFormat.SRgb8A8Etc2:
+                    var sRgb8A8Etc2Data = new SRgb8A8Etc2[colorDataLength];
+                    GetData(sRgb8A8Etc2Data);
+
+                    for (int i = 0; i < colorDataLength; i++)
+                    {
+                        colorData[i] = new Color(sRgb8A8Etc2Data[i].ToVector4());
+                    }
+
+                    break;
+
                 default:
                     throw new Exception("Texture surface format not supported");
             }

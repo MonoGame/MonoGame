@@ -14,6 +14,14 @@ body:
         required: true
       - label: I have searched [open](https://github.com/MonoGame/MonoGame/issues) and [closed](https://github.com/MonoGame/MonoGame/issues?q=is%3Aissue+is%3Aclosed) issues to ensure it has not already been reported.
         required: true
+- type: checkboxes
+  id: llmdeclaration
+  attributes:
+    label: LLM Declaration
+    description: This is so maintainers are aware of the usage of a LLM to generate the code, this is so we do not accidently copy the code into the actual project.
+    options:
+      - label: I used an LLM to generate the code or fix in this Issue.
+        required: false
 - type: input
   id: monogame-version
   validations:

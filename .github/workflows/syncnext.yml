@@ -1,8 +1,8 @@
 name: Sync develop to next - update detected
 
 on:
-  schedule:
-    - cron: '0 2 * * 0'
+  # schedule:
+  #   - cron: '0 2 * * 0'
   workflow_dispatch:
 
 permissions:
