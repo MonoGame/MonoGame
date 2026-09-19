@@ -14,7 +14,12 @@
 #include <SDL.h>
 #include <SDL_opengl.h>
 #include <array>
+#include <condition_variable>
 #include <cstdint>
+#include <functional>
+#include <mutex>
+#include <thread>
+#include <utility>
 #include <vector>
 
 #ifndef GL_TEXTURE_MAX_ANISOTROPY_EXT
@@ -70,6 +75,12 @@ struct MGG_Shader;
 struct MGG_InputLayout;
 struct MGG_ShaderProgram;
 
+struct OpenGLResourceCommand
+{
+    std::function<void()> execute;
+    bool isComplete = false;
+};
+
 struct MGG_GraphicsDevice
 {
     SDL_Window* window = nullptr;
@@ -109,6 +120,11 @@ struct MGG_GraphicsDevice
     mgint viewportHeight = 0;
     mgfloat viewportMinDepth = 0.0f;
     mgfloat viewportMaxDepth = 1.0f;
+    std::thread::id renderThread;
+    bool hasRenderThread = false;
+    std::mutex resourceCommandMutex;
+    std::condition_variable resourceCommandCompleted;
+    std::vector<OpenGLResourceCommand*> resourceCommands;
 };
 
 struct MGG_Buffer
@@ -255,6 +271,74 @@ namespace
 
 #define MGGL_NOT_IMPLEMENTED(functionName) FailNotImplemented(__FILE__, __LINE__, functionName)
 
+    bool IsRenderThread(const MGG_GraphicsDevice* device)
+    {
+        assert(device != nullptr);
+        return device->hasRenderThread && device->renderThread == std::this_thread::get_id();
+    }
+
+    void EstablishRenderThread(MGG_GraphicsDevice* device)
+    {
+        assert(device != nullptr);
+
+        std::thread::id currentThread = std::this_thread::get_id();
+        if (!device->hasRenderThread)
+        {
+            device->renderThread = currentThread;
+            device->hasRenderThread = true;
+            return;
+        }
+
+        if (device->renderThread != currentThread)
+            MGGL_FAIL("OpenGL render-thread ownership error", "ResizeSwapchain must run on the render thread");
+    }
+
+    void ExecuteOnRenderThread(MGG_GraphicsDevice* device, std::function<void()> execute)
+    {
+        assert(device != nullptr);
+
+        if (!device->hasRenderThread || IsRenderThread(device))
+        {
+            execute();
+            return;
+        }
+
+        OpenGLResourceCommand command;
+        command.execute = std::move(execute);
+
+        std::unique_lock<std::mutex> lock(device->resourceCommandMutex);
+        device->resourceCommands.push_back(&command);
+        device->resourceCommandCompleted.wait(lock, [&command]() { return command.isComplete; });
+    }
+
+    void DrainResourceCommands(MGG_GraphicsDevice* device)
+    {
+        assert(device != nullptr);
+        assert(IsRenderThread(device));
+
+        while (true)
+        {
+            OpenGLResourceCommand* command = nullptr;
+            {
+                std::lock_guard<std::mutex> lock(device->resourceCommandMutex);
+                if (device->resourceCommands.empty())
+                    return;
+
+                command = device->resourceCommands.front();
+                device->resourceCommands.erase(device->resourceCommands.begin());
+            }
+
+            command->execute();
+
+            {
+                std::lock_guard<std::mutex> lock(device->resourceCommandMutex);
+                command->isComplete = true;
+            }
+
+            device->resourceCommandCompleted.notify_all();
+        }
+    }
+
     bool HasOpenGLExtension(const char* name)
     {
         assert(name != nullptr);
@@ -267,6 +351,9 @@ namespace
 
         if (device->window == nullptr || device->context.handle == nullptr)
             MGGL_FAIL("OpenGL device not initialized", "ResizeSwapChain must create a window context before use");
+
+        if (device->hasRenderThread && !IsRenderThread(device))
+            MGGL_FAIL("OpenGL render-thread ownership error", "OpenGL calls must run on the render thread");
 
         device->context.MakeCurrent();
     }
@@ -1775,6 +1862,7 @@ void MGG_GraphicsDevice_Destroy(MGG_GraphicsDevice* device)
     if (device->context.handle != nullptr)
     {
         EnsureContext(device);
+        DrainResourceCommands(device);
 
         for (MGG_ShaderProgram* program : device->programs)
             DestroyProgram(device, program);
@@ -1921,6 +2009,8 @@ mgbyte MGG_GraphicsDevice_ResizeSwapchain(
     assert(height > 0);
     assert(syncInterval >= 0);
 
+    EstablishRenderThread(device);
+
     SDL_Window* window = static_cast<SDL_Window*>(nativeWindowHandle);
 
     if (!device->context.Create(window))
@@ -1974,6 +2064,8 @@ mgint MGG_GraphicsDevice_BeginFrame(MGG_GraphicsDevice* device)
 
     if (device->isInFrame)
         MGGL_FAIL("OpenGL frame ownership error", "BeginFrame called while a frame is already active");
+
+    DrainResourceCommands(device);
 
     device->isInFrame = true;
     return device->frame;
@@ -3012,6 +3104,16 @@ MGG_Texture* MGG_Texture_Create(MGG_GraphicsDevice* device, MGTextureType type, 
     assert(mipmaps > 0);
     assert(slices > 0);
 
+    if (device->hasRenderThread && !IsRenderThread(device))
+    {
+        MGG_Texture* texture = nullptr;
+        ExecuteOnRenderThread(device, [=, &texture]()
+        {
+            texture = MGG_Texture_Create(device, type, format, width, height, depth, mipmaps, slices);
+        });
+        return texture;
+    }
+
     EnsureContext(device);
     return CreateTextureResource(device, type, format, width, height, depth, mipmaps, slices);
 }
@@ -3148,6 +3250,15 @@ void MGG_Texture_Destroy(MGG_GraphicsDevice* device, MGG_Texture* texture)
     if (texture == nullptr)
         return;
 
+    if (device->hasRenderThread && !IsRenderThread(device))
+    {
+        ExecuteOnRenderThread(device, [=]()
+        {
+            MGG_Texture_Destroy(device, texture);
+        });
+        return;
+    }
+
     EnsureContext(device);
 
     GLint previousActiveTexture = 0;
@@ -3212,6 +3323,15 @@ void MGG_Texture_SetData(MGG_GraphicsDevice* device, MGG_Texture* texture, mgint
     assert(slice >= 0);
     assert(slice < texture->slices);
     assert(dataBytes > 0);
+
+    if (device->hasRenderThread && !IsRenderThread(device))
+    {
+        ExecuteOnRenderThread(device, [=]()
+        {
+            MGG_Texture_SetData(device, texture, level, slice, x, y, z, width, height, depth, data, dataBytes);
+        });
+        return;
+    }
 
     EnsureContext(device);
 
@@ -3313,6 +3433,15 @@ void MGG_Texture_GetData(MGG_GraphicsDevice* device, MGG_Texture* texture, mgint
     assert(slice >= 0);
     assert(slice < texture->slices);
     assert(dataBytes > 0);
+
+    if (device->hasRenderThread && !IsRenderThread(device))
+    {
+        ExecuteOnRenderThread(device, [=]()
+        {
+            MGG_Texture_GetData(device, texture, level, slice, x, y, z, width, height, depth, data, dataBytes);
+        });
+        return;
+    }
 
     if (texture->isRenderTarget && IsRenderTargetBound(device, texture))
         MGG_GraphicsDevice_ResolveRenderTargets(device);

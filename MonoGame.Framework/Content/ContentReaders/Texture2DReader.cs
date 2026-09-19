@@ -181,17 +181,8 @@ namespace Microsoft.Xna.Framework.Content
 			    }
 			}
 
-#if OPENGL
-			Threading.BlockOnUIThread(readTextureLevels);
-#elif NATIVE
-			if(isOpenGL)
-				Threading.BlockOnUIThread(readTextureLevels);
-			else
-				readTextureLevels();
-#else
 			readTextureLevels();
-#endif
-        			
+
 			return texture;
 		}
     }

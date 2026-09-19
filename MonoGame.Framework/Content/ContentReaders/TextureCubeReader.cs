@@ -4,9 +4,6 @@
 
 using System;
 using Microsoft.Xna.Framework.Graphics;
-#if NATIVE
-using MonoGame.Framework.Utilities;
-#endif
 
 namespace Microsoft.Xna.Framework.Content
 {
@@ -42,16 +39,7 @@ namespace Microsoft.Xna.Framework.Content
                 }
             }
 
-#if OPENGL
-			Threading.BlockOnUIThread(readTextureFaces);
-#elif NATIVE
-			if (PlatformInfo.GraphicsBackend == GraphicsBackend.OpenGL)
-				Threading.BlockOnUIThread(readTextureFaces);
-			else
-				readTextureFaces();
-#else
             readTextureFaces();
-#endif
 
              return textureCube;
         }
