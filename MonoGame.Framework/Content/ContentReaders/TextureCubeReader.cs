@@ -39,7 +39,11 @@ namespace Microsoft.Xna.Framework.Content
                 }
             }
 
+#if OPENGL
+            Threading.BlockOnUIThread(readTextureFaces);
+#else
             readTextureFaces();
+#endif
 
              return textureCube;
         }
