@@ -11,7 +11,6 @@ static std::unordered_map<mgint, std::string> s_strings;
 static std::unordered_map<mgint, mgint>       s_ints;
 
 // Defaults
-
 mgint MGC_Config_GetDefaultInt(MGPlatformConfigKey key)
 {
     switch (key)
@@ -41,6 +40,11 @@ const char* MGC_Config_GetDefaultString(MGPlatformConfigKey key)
 }
 
 // Public Setters
+MG_EXPORT void MGC_Config_SetInt(MGPlatformConfigKey key, mgint value)
+{
+    s_ints[static_cast<mgint>(key)] = value;
+}
+
 MG_EXPORT void MGC_Config_SetString(MGPlatformConfigKey key, const char* value)
 {
     if (value != nullptr)
@@ -53,22 +57,7 @@ MG_EXPORT void MGC_Config_SetString(MGPlatformConfigKey key, const char* value)
     }
 }
 
-MG_EXPORT void MGC_Config_SetInt(MGPlatformConfigKey key, mgint value)
-{
-    s_ints[static_cast<mgint>(key)] = value;
-}
-
 // Internal Getters
-const char* MGC_Config_GetString(MGPlatformConfigKey key)
-{
-    auto it = s_strings.find(static_cast<mgint>(key));
-    if (it != s_strings.end())
-    {
-        return it->second.c_str();
-    }
-    return MGC_Config_GetDefaultString(key);
-}
-
 mgint MGC_Config_GetInt(MGPlatformConfigKey key)
 {
     auto it = s_ints.find(static_cast<mgint>(key));
@@ -77,4 +66,14 @@ mgint MGC_Config_GetInt(MGPlatformConfigKey key)
         return it->second;
     }
     return MGC_Config_GetDefaultInt(key);
+}
+
+const char* MGC_Config_GetString(MGPlatformConfigKey key)
+{
+    auto it = s_strings.find(static_cast<mgint>(key));
+    if (it != s_strings.end())
+    {
+        return it->second.c_str();
+    }
+    return MGC_Config_GetDefaultString(key);
 }

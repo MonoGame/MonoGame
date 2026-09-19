@@ -5,7 +5,7 @@
 namespace MonoGame.Framework;
 
 /// <summary>
-/// Allows configuring platform-specific engine parameters.
+/// Allows configuring platform-specific framework parameters.
 /// </summary>
 /// <remarks>
 /// <para>

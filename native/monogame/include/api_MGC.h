@@ -13,5 +13,5 @@
 
 
 
-MG_EXPORT void MGC_Config_SetString(MGPlatformConfigKey key, const char* value);
 MG_EXPORT void MGC_Config_SetInt(MGPlatformConfigKey key, mgint value);
+MG_EXPORT void MGC_Config_SetString(MGPlatformConfigKey key, const char* value);

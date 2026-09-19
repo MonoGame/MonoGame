@@ -9,7 +9,7 @@
 
 // Internal config getters called by backend code (Vulkan, DX12).
 // Exported setters are declared in the auto-generated api_MGC.h.
-const char* MGC_Config_GetString(MGPlatformConfigKey key);
-mgint MGC_Config_GetInt(MGPlatformConfigKey key);
-const char* MGC_Config_GetDefaultString(MGPlatformConfigKey key);
 mgint MGC_Config_GetDefaultInt(MGPlatformConfigKey key);
+const char* MGC_Config_GetDefaultString(MGPlatformConfigKey key);
+mgint MGC_Config_GetInt(MGPlatformConfigKey key);
+const char* MGC_Config_GetString(MGPlatformConfigKey key);
