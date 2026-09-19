@@ -2,23 +2,13 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
-namespace MonoGame.Framework.Utilities;
+namespace MonoGame.Framework;
 
 public static partial class PlatformConfiguration
 {
     /// <summary>
-    /// Configuration keys for native platform-specific engine parameters.
-    /// </summary>
-    /// <remarks>
-    /// No configuration keys are currently available for DX11.
-    /// </remarks>
-    public enum PlatformConfigKey
-    {
-    }
-
-    /// <summary>
     /// Sets an <see cref="int"/> configuration value.
-    /// <remarks>No-op on DX11.</remarks>
+    /// <remarks>No-op on this platform.</remarks>
     /// </summary>
     public static void Set(PlatformConfigKey key, int value)
     {
@@ -26,7 +16,7 @@ public static partial class PlatformConfiguration
 
     /// <summary>
     /// Sets a <see cref="string"/> configuration value.
-    /// <remarks>No-op on DX11.</remarks>
+    /// <remarks>No-op on this platform.</remarks>
     /// </summary>
     public static void Set(PlatformConfigKey key, string value)
     {

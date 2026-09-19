@@ -452,20 +452,5 @@ internal static unsafe partial class MGG
     public static extern byte OcclusionQuery_GetResult(MGG_GraphicsDevice* device, MGG_OcclusionQuery* query, out int pixelCount);
 
     #endregion
-
-    #region Platform Configuration
-
-    [DllImport(MGP.MonoGameNativeDLL, EntryPoint = "MGG_Config_SetString", ExactSpelling = true)]
-    public static extern void Config_SetString(int key, [MarshalAs(UnmanagedType.LPUTF8Str)] string value);
-
-    [DllImport(MGP.MonoGameNativeDLL, EntryPoint = "MGG_Config_SetInt", ExactSpelling = true)]
-    public static extern void Config_SetInt(int key, int value);
-
-    [DllImport(MGP.MonoGameNativeDLL, EntryPoint = "MGG_Config_GetKeyCount", ExactSpelling = true)]
-    public static extern int Config_GetKeyCount();
-
-    [DllImport(MGP.MonoGameNativeDLL, EntryPoint = "MGG_Config_GetKeyDetails", ExactSpelling = true)]
-    public static extern void Config_GetKeyDetails(int index, out nint configKey, out int configValue);
-
-    #endregion
 }
+

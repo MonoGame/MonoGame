@@ -4,6 +4,7 @@
 
 #include "directx12.h"
 #include "api_MGG.h"
+#include "MGC_Config.h"
 
 #include "DeviceResources.h"
 #include "GraphicsEnums.h"
@@ -269,12 +270,7 @@ public:
             desc.pDevice = m_d3dDevice.Get();
 #if !defined(_GAMING_XBOX)
             desc.pAdapter = adapter;
-
-            mgint blockSize = MGG_Config_GetInt(MGConfigKey::Dx12PreferredBlockSize);
-            if (blockSize > 0)
-            {
-                desc.PreferredBlockSize = static_cast<UINT64>(blockSize);
-            }
+            desc.PreferredBlockSize = static_cast<UINT64>(MGC_Config_GetInt(MGPlatformConfigKey::Dx12PreferredBlockSize));
 #else
             Microsoft::WRL::ComPtr<IDXGIDevice1> dxgiDevice;
             Microsoft::WRL::ComPtr<IDXGIAdapter> dxgiAdapter;
@@ -764,7 +760,7 @@ RETRY_FIND_BUFFER:
     {
         pImpl->CleanupTempBuffers(frame);
 
-        const mgint MAX_BUFFER_POOL_SIZE = MGG_Config_GetInt(MGConfigKey::Dx12MaxUploadBufferPoolSize);
+        const mgint MAX_BUFFER_POOL_SIZE = MGC_Config_GetInt(MGPlatformConfigKey::Dx12MaxUploadBufferPoolSize);
         if (pImpl->m_tempBuffers.size() > MAX_BUFFER_POOL_SIZE)
         {
             if (++retry_count > 10)

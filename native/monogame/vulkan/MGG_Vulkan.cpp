@@ -3,6 +3,7 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 #include "api_MGG.h"
+#include "MGC_Config.h"
 
 #include "mg_common.h"
 
@@ -917,7 +918,7 @@ MGG_GraphicsSystem* MGG_GraphicsSystem_Create()
 	}
 
 	// Enable instance extensions requested by the game.
-	const char* requestedInstanceExtensionsSetting = MGG_Config_GetString(MGConfigKey::VulkanInstanceExtensions);
+	const char* requestedInstanceExtensionsSetting = MGC_Config_GetString(MGPlatformConfigKey::VulkanInstanceExtensions);
 	std::vector<std::string> requestedInstanceExtensions;
 	if (requestedInstanceExtensionsSetting != nullptr && requestedInstanceExtensionsSetting[0] != '\0')
 	{
@@ -1480,7 +1481,7 @@ MGG_GraphicsDevice* MGG_GraphicsDevice_Create(MGG_GraphicsSystem* system, MGG_Gr
 	}
 
 	// Enable device extensions requested by the game.
-	const char* requestedDeviceExtensionsSetting = MGG_Config_GetString(MGConfigKey::VulkanDeviceExtensions);
+	const char* requestedDeviceExtensionsSetting = MGC_Config_GetString(MGPlatformConfigKey::VulkanDeviceExtensions);
 	std::vector<std::string> requestedDeviceExtensions;
 	if (requestedDeviceExtensionsSetting != nullptr && requestedDeviceExtensionsSetting[0] != '\0')
 	{
@@ -2302,7 +2303,7 @@ void MGVK_PrepareFrame(MGG_GraphicsDevice* device)
 	frame.uniformOffset = 0;
 	if (frame.uniforms == NULL)
 	{
-		mgint ringbufferSize = MGG_Config_GetInt(MGConfigKey::VulkanUniformRingbufferSize);
+		mgint ringbufferSize = MGC_Config_GetInt(MGPlatformConfigKey::VulkanUniformRingbufferSize);
 		frame.uniforms = MGVK_Buffer_Create(device, MGBufferType::Constant, ringbufferSize, true);
 		VK_SET_OBJECT_NAME(device->device, frame.uniforms->buffer, VK_OBJECT_TYPE_BUFFER, "MGVK_FrameState.uniforms->buffer");
 	}
@@ -3457,7 +3458,7 @@ static void MGVK_UpdateRenderPass(MGG_GraphicsDevice* device, FrameCounter curre
 
 static int GetDescriptorPoolSize()
 {
-	static const int size = MGG_Config_GetInt(MGConfigKey::VulkanDescriptorPoolSize);
+	static const int size = MGC_Config_GetInt(MGPlatformConfigKey::VulkanDescriptorPoolSize);
 	return size;
 }
 

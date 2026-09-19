@@ -23,6 +23,16 @@ enum class MGFilterMode : mgint
     HighPass = 2,
 };
 
+enum class MGPlatformConfigKey : mgint
+{
+    VulkanInstanceExtensions = 1,
+    VulkanDeviceExtensions = 2,
+    VulkanUniformRingbufferSize = 3,
+    VulkanDescriptorPoolSize = 4,
+    Dx12PreferredBlockSize = 5,
+    Dx12MaxUploadBufferPoolSize = 6,
+};
+
 enum class MGSurfaceFormat : mgint
 {
     Color = 0,
@@ -562,20 +572,4 @@ enum class MGGamePadType : mgint
     DrumKit = 8,
     BigButtonPad = 768,
 };
-
-#define MG_CONFIG_KEYS(MG_CONFIG_DEFINE_ENUM_VALUE) \
-    MG_CONFIG_DEFINE_ENUM_VALUE(VulkanInstanceExtensions,    1) \
-    MG_CONFIG_DEFINE_ENUM_VALUE(VulkanDeviceExtensions,      2) \
-    MG_CONFIG_DEFINE_ENUM_VALUE(VulkanUniformRingbufferSize, 3) \
-    MG_CONFIG_DEFINE_ENUM_VALUE(VulkanDescriptorPoolSize,    4) \
-    MG_CONFIG_DEFINE_ENUM_VALUE(Dx12PreferredBlockSize,      5) \
-    MG_CONFIG_DEFINE_ENUM_VALUE(Dx12MaxUploadBufferPoolSize, 6)
-
-enum class MGConfigKey : mgint
-{
-#define MG_CONFIG_DEFINE_ENUM_VALUE(name, val) name = val,
-    MG_CONFIG_KEYS(MG_CONFIG_DEFINE_ENUM_VALUE)
-#undef MG_CONFIG_DEFINE_ENUM_VALUE
-};
-
 

@@ -2,20 +2,18 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Content;
+using Microsoft.Xna.Framework.Graphics;
+using MonoGame.Framework;
+using MonoGame.Tests.Components;
+using MonoGame.Tests.Utilities;
+using NUnit.Framework;
 using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading;
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Content;
-using Microsoft.Xna.Framework.Graphics;
-using MonoGame.Tests.Components;
-using MonoGame.Tests.Utilities;
-using MonoGame.Framework.Utilities;
-using NUnit.Framework;
-using NUnit.Framework.Internal;
 
 namespace MonoGame.Tests.Graphics
 {
@@ -32,7 +30,7 @@ namespace MonoGame.Tests.Graphics
             // In particular we're using this to lower the memory
             // usage of the D3D12 backend for our unit test runner machine.
             //
-            PlatformConfiguration.Set(PlatformConfiguration.PlatformConfigKey.Dx12PreferredBlockSize, 4 * 1024 * 1024);
+            PlatformConfiguration.Set(PlatformConfigKey.Dx12PreferredBlockSize, 4 * 1024 * 1024);
 #endif
         }
 
