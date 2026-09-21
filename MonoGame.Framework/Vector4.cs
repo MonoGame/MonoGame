@@ -877,6 +877,43 @@ namespace Microsoft.Xna.Framework
         }
 
         /// <summary>
+        /// Round the members of this <see cref="Vector4"/> to the specified number of fractional digits.
+        /// </summary>
+        /// <param name="digits">The number of fractional digits the components will be rounded to.</param>
+        public void Round(int digits)
+        {
+            X = MathF.Round(X, digits);
+            Y = MathF.Round(Y, digits);
+            Z = MathF.Round(Z, digits);
+            W = MathF.Round(W, digits);
+        }
+
+        /// <summary>
+        /// Round the members of this <see cref="Vector4"/> towards the specified number of fractional digits, using the specified rounding convention for midpoint values.
+        /// </summary>
+        /// <param name="digits">The number of fractional digits the components will be rounded to.</param>
+        /// <param name="mode">Specification for how to round a component value if it is midway between two other numbers.</param>
+        public void Round(int digits, MidpointRounding mode)
+        {
+            X = MathF.Round(X, digits, mode);
+            Y = MathF.Round(Y, digits, mode);
+            Z = MathF.Round(Z, digits, mode);
+            W = MathF.Round(W, digits, mode);
+        }
+
+        /// <summary>
+        /// Round the members of this <see cref="Vector4"/> towards the nearest integer value, using the specified rounding convention for midpoint values.
+        /// </summary>
+        /// <param name="mode">Specification for how to round a component value if it is midway between two other numbers.</param>
+        public void Round(MidpointRounding mode)
+        {
+            X = MathF.Round(X, mode);
+            Y = MathF.Round(Y, mode);
+            Z = MathF.Round(Z, mode);
+            W = MathF.Round(W, mode);
+        }
+
+        /// <summary>
         /// Creates a new <see cref="Vector4"/> that contains members from another vector rounded to the nearest integer value.
         /// </summary>
         /// <param name="value">Source <see cref="Vector4"/>.</param>
@@ -891,6 +928,52 @@ namespace Microsoft.Xna.Framework
         }
 
         /// <summary>
+        /// Creates a new <see cref="Vector4"/> that contains members from another vector rounded to the specified number of fractional digits.
+        /// </summary>
+        /// <param name="value">Source <see cref="Vector4"/>.</param>
+        /// <param name="digits">The number of fractional digits in the return value's components.</param>
+        /// <returns>The rounded <see cref="Vector4"/>.</returns>
+        public static Vector4 Round(Vector4 value, int digits)
+        {
+            value.X = MathF.Round(value.X, digits);
+            value.Y = MathF.Round(value.Y, digits);
+            value.Z = MathF.Round(value.Z, digits);
+            value.W = MathF.Round(value.W, digits);
+            return value;
+        }
+
+        /// <summary>
+        /// Creates a new <see cref="Vector4"/> that contains members from another vector rounded to the specified number of fractional digits, using the specified rounding convention for midpoint values.
+        /// </summary>
+        /// <param name="value">Source <see cref="Vector4"/>.</param>
+        /// <param name="digits">The number of fractional digits in the return value's components.</param>
+        /// <param name="mode">Specification for how to round a component value if it is midway between two other numbers.</param>
+        /// <returns>The rounded <see cref="Vector4"/>.</returns>
+        public static Vector4 Round(Vector4 value, int digits, MidpointRounding mode)
+        {
+            value.X = MathF.Round(value.X, digits, mode);
+            value.Y = MathF.Round(value.Y, digits, mode);
+            value.Z = MathF.Round(value.Z, digits, mode);
+            value.W = MathF.Round(value.W, digits, mode);
+            return value;
+        }
+
+        /// <summary>
+        /// Creates a new <see cref="Vector4"/> that contains members from another vector rounded to the specified number of fractional digits, using the specified rounding convention for midpoint values.
+        /// </summary>
+        /// <param name="value">Source <see cref="Vector4"/>.</param>
+        /// <param name="mode">Specification for how to round a component value if it is midway between two other numbers.</param>
+        /// <returns>The rounded <see cref="Vector4"/>.</returns>
+        public static Vector4 Round(Vector4 value, MidpointRounding mode)
+        {
+            value.X = MathF.Round(value.X, mode);
+            value.Y = MathF.Round(value.Y, mode);
+            value.Z = MathF.Round(value.Z, mode);
+            value.W = MathF.Round(value.W, mode);
+            return value;
+        }
+
+        /// <summary>
         /// Creates a new <see cref="Vector4"/> that contains members from another vector rounded to the nearest integer value.
         /// </summary>
         /// <param name="value">Source <see cref="Vector4"/>.</param>
@@ -901,6 +984,49 @@ namespace Microsoft.Xna.Framework
             result.Y = MathF.Round(value.Y);
             result.Z = MathF.Round(value.Z);
             result.W = MathF.Round(value.W);
+        }
+
+        /// <summary>
+        /// Creates a new <see cref="Vector4"/> that contains members from another vector rounded to a specified number of digits.
+        /// </summary>
+        /// <param name="value">Source <see cref="Vector4"/>.</param>
+        /// <param name="result">The rounded <see cref="Vector4"/>.</param>
+        /// <param name="digits">The number of fractional digits in the return value's components.</param>
+        public static void Round(ref Vector4 value, out Vector4 result, int digits)
+        {
+            result.X = MathF.Round(value.X, digits);
+            result.Y = MathF.Round(value.Y, digits);
+            result.Z = MathF.Round(value.Z, digits);
+            result.W = MathF.Round(value.W, digits);
+        }
+
+        /// <summary>
+        /// Creates a new <see cref="Vector4"/> that contains members from another vector rounded to a specified number of digits, using the specified rounding convention for midpoint values.
+        /// </summary>
+        /// <param name="value">Source <see cref="Vector4"/>.</param>
+        /// <param name="result">The rounded <see cref="Vector4"/>.</param>
+        /// <param name="digits">The number of fractional digits in the return value's components.</param>
+        /// <param name="mode">Specification for how to round a component value if it is midway between two other numbers.</param>
+        public static void Round(ref Vector4 value, out Vector4 result, int digits, MidpointRounding mode)
+        {
+            result.X = MathF.Round(value.X, digits, mode);
+            result.Y = MathF.Round(value.Y, digits, mode);
+            result.Z = MathF.Round(value.Z, digits, mode);
+            result.W = MathF.Round(value.W, digits, mode);
+        }
+
+        /// <summary>
+        /// Creates a new <see cref="Vector4"/> that contains members from another vector rounded to the nearest integer value, using the specified rounding convention for midpoint values.
+        /// </summary>
+        /// <param name="value">Source <see cref="Vector4"/>.</param>
+        /// <param name="result">The rounded <see cref="Vector4"/>.</param>
+        /// <param name="mode">Specification for how to round a component value if it is midway between two other numbers.</param>
+        public static void Round(ref Vector4 value, out Vector4 result, MidpointRounding mode)
+        {
+            result.X = MathF.Round(value.X, mode);
+            result.Y = MathF.Round(value.Y, mode);
+            result.Z = MathF.Round(value.Z, mode);
+            result.W = MathF.Round(value.W, mode);
         }
 
         /// <summary>
