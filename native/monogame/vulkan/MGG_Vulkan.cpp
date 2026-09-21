@@ -3981,15 +3981,19 @@ void MGG_GraphicsDevice_DrawIndexedInstanced(
 	mgint primitiveCount,
 	mgint indexStart,
 	mgint vertexStart,
+	mgint baseInstance,
 	mgint instanceCount)
 {
 	assert(device != nullptr);
 	assert(primitiveCount >= 0);
 	assert(indexStart >= 0);
 	assert(vertexStart >= 0);
+	assert(baseInstance >= 0);
 	assert(instanceCount > 0);
 
 	if (primitiveCount <= 0)
+		return;
+	if (instanceCount <= 0)
 		return;
 
 	auto& frame = device->frames[device->frameIndex];
@@ -4018,7 +4022,7 @@ void MGG_GraphicsDevice_DrawIndexedInstanced(
 		instanceCount,    
 		indexStart,       
 		vertexStart,      
-		0);               
+		baseInstance);
 }
 
 inline mgint getMipScalar(mgint level, mgint value)
