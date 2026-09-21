@@ -421,6 +421,9 @@ namespace Microsoft.Xna.Framework.Audio
 
         public void RecycleSource(int sourceId)
         {
+            AL.SourceStop(sourceId);
+            ALHelper.CheckError("Failed to stop source.");
+
             AL.Source(sourceId, ALSourcei.Buffer, 0);
             ALHelper.CheckError("Failed to free source from buffers.");
 
