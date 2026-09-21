@@ -733,6 +733,8 @@ MGP_Window* MGP_Window_Create(
 
 #if defined(MG_VULKAN) || defined(MG_DIRECTX12)
 	flags |= SDL_WINDOW_VULKAN;
+#elif defined(MG_METAL)
+    flags |= SDL_WINDOW_METAL;
 #else
 	#error Not implemented
 #endif

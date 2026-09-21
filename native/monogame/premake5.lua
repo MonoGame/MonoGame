@@ -90,6 +90,17 @@ function vulkan()
     filter {}
 end
 
+function metal()
+    defines {"MG_METAL"}
+    files {"metal/**.h", "metal/**.m", "metal/**.mm"}
+
+    includedirs {}
+
+    filter {"system:macosx"}
+    links {"IOSurface.framework", "Foundation.framework", "QuartzCore.framework", "AppKit.framework"}
+    filter {}
+end
+
 -- DirectX12 is supported on Xbox and Windows.
 function directx12()
     defines {"MG_DIRECTX12"}
@@ -173,5 +184,14 @@ if os.target() == "windows" then
     sdl2()
     directx12()
     xaudio()
+    configs()
+end
+
+if os.target() == "macosx" then
+    project "metal"
+    common("metal")
+    sdl2()
+    metal()
+    faudio()
     configs()
 end
