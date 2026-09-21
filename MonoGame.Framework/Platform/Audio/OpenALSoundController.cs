@@ -32,7 +32,7 @@ namespace Microsoft.Xna.Framework.Audio
             {
                 if (args != null && args.Length > 0)
                     message = String.Format(message, args);
-                
+
                 throw new InvalidOperationException(message + " (Reason: " + AL.GetErrorString(error) + ")");
             }
         }
@@ -73,6 +73,14 @@ namespace Microsoft.Xna.Framework.Audio
         IntPtr NullContext = IntPtr.Zero;
         private int[] allSourcesArray;
 #if DESKTOPGL || ANGLE
+        private Alc.AlcEventCallback _eventCallback;
+        private volatile bool _deviceChangeRequested = false;
+        private readonly object _deviceChangeLock = new object();
+        private bool _supportsDisconnectExt;
+        private bool _supportsReopenDeviceExt;
+        private string _lastDefaultPlaybackDevice;
+#endif
+#if DESKTOPGL || ANGLE
 
         // MacOS & Linux shares a limit of 256.
         internal const int MAX_NUMBER_OF_SOURCES = 256;
@@ -101,7 +109,205 @@ namespace Microsoft.Xna.Framework.Audio
         public bool SupportsEfx { get; private set; }
         public bool SupportsIeee { get; private set; }
 
-        public bool SupportsStereoAngles { get; private set;}
+        public bool SupportsStereoAngles { get; private set; }
+
+#if DESKTOPGL || ANGLE
+        /// <summary>
+        /// Event callback for OpenAL device changes. Called on a background thread.
+        /// Cannot make AL/ALC calls directly from this callback.
+        /// </summary>
+        private void OnDeviceEvent(int eventType, int deviceType, IntPtr device, int messageLength, string message, IntPtr userParam)
+        {
+            var evtType = (AlcEventType)eventType;
+            var devType = (AlcDeviceType)deviceType;
+
+            if (devType != AlcDeviceType.PlaybackDevice)
+                return;
+
+            // Only handle default device changes for playback devices
+            if (evtType == AlcEventType.DefaultDeviceChanged
+            || evtType == AlcEventType.DeviceAdded
+            || evtType == AlcEventType.DeviceRemoved)
+            {
+                // Set flag to trigger device reopening on the main thread
+                // We cannot call OpenAL functions from this callback
+                lock (_deviceChangeLock)
+                {
+                    _deviceChangeRequested = true;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Checks if a device change was requested and handles it.
+        /// Should be called from a safe context (not from the event callback).
+        /// </summary>
+        public void ProcessDeviceChanges()
+        {
+            bool isChangeRequested = false;
+            lock (_deviceChangeLock)
+            {
+                isChangeRequested = _deviceChangeRequested;
+                _deviceChangeRequested = false;
+            }
+
+            // Check if the current device has been disconnected (unplugged)
+            bool isDefaultChanged = HasDefaultPlaybackDeviceChanged();
+            bool isDisconnected = _supportsDisconnectExt && CheckDeviceDisconnected();
+
+            if (isChangeRequested || isDefaultChanged || isDisconnected)
+            {
+                ReopenDefaultDevice();
+            }
+        }
+
+        private bool HasDefaultPlaybackDeviceChanged()
+        {
+            var currentDeviceName = GetDefaultPlaybackDeviceName();
+            if (string.IsNullOrEmpty(currentDeviceName))
+                return false;
+
+            if (string.IsNullOrEmpty(_lastDefaultPlaybackDevice))
+            {
+                _lastDefaultPlaybackDevice = currentDeviceName;
+                return false;
+            }
+
+            if (!string.Equals(_lastDefaultPlaybackDevice, currentDeviceName, StringComparison.Ordinal))
+            {
+                _lastDefaultPlaybackDevice = currentDeviceName;
+                return true;
+            }
+
+            return false;
+        }
+
+        private string GetDefaultPlaybackDeviceName()
+        {
+            try
+            {
+                // ALC_DEFAULT_DEVICE_SPECIFIER = 0x1004
+                return Alc.GetString(IntPtr.Zero, (AlcGetString)0x1004);
+            }
+            catch
+            {
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// Checks if the current audio device has been disconnected.
+        /// Uses ALC_EXT_disconnect extension to poll device connection status.
+        /// </summary>
+        private bool CheckDeviceDisconnected()
+        {
+            try
+            {
+                int[] connected = new int[1];
+                Alc.GetInteger(_device, AlcGetInteger.Connected, 1, connected);
+
+                // If connected is 0 (ALC_FALSE), the device is disconnected
+                return connected[0] == 0;
+            }
+            catch
+            {
+                // If the extension isn't available or query fails, assume connected
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// Reopens the audio device using the current system default.
+        /// </summary>
+        private void ReopenDefaultDevice()
+        {
+            if (!_supportsReopenDeviceExt || _device == IntPtr.Zero)
+                return;
+            
+            try
+            {
+                // Reopen with null to use the new default device
+                // Pass empty attribute array to maintain current settings
+                bool success = Alc.ReopenDevice(_device, null, Array.Empty<int>());
+
+                if (success)
+                {
+                    _lastDefaultPlaybackDevice = GetDefaultPlaybackDeviceName();
+                }
+                else
+                {
+                    // If reopening fails, log but don't crash
+                    // The audio will continue using the old device
+                    System.Diagnostics.Debug.WriteLine("Failed to reopen OpenAL device with new default");
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Exception reopening OpenAL device: {ex.Message}");
+            }
+        }
+
+        /// <summary>
+        /// Initializes device change detection using ALC_SOFT_system_events extension.
+        /// </summary>
+        private void InitializeDeviceChangeDetection()
+        {
+            _supportsDisconnectExt = Alc.IsExtensionPresent(_device, "ALC_EXT_disconnect");
+            _supportsReopenDeviceExt = Alc.IsExtensionPresent(_device, "ALC_SOFT_reopen_device");
+            _lastDefaultPlaybackDevice = GetDefaultPlaybackDeviceName();
+
+            if (!Alc.TryLoadDeviceChangeFunctions())
+            {
+                System.Diagnostics.Debug.WriteLine("OpenAL device change detection functions were not available");
+                return;
+            }
+
+            try
+            {
+                // Check if the system events extension is supported
+                var defaultDeviceChangeSupport = (AlcEventSupport)Alc.EventIsSupported(
+                    (int)AlcEventType.DefaultDeviceChanged,
+                    (int)AlcDeviceType.PlaybackDevice);
+
+                if (defaultDeviceChangeSupport == AlcEventSupport.Supported)
+                {
+                    // Store the callback to prevent it from being garbage collected
+                    _eventCallback = OnDeviceEvent;
+
+                    // Register the event callback
+                    Alc.EventCallback(_eventCallback, IntPtr.Zero);
+
+                    // Enable the default device changed/added/removed events
+                    int[] events =
+                    {
+                        (int)AlcEventType.DefaultDeviceChanged,
+                        (int)AlcEventType.DeviceAdded,
+                        (int)AlcEventType.DeviceRemoved
+                    };
+                    bool enableSuccess = Alc.EventControl(events.Length, events, true);
+
+                    if (enableSuccess)
+                    {
+                        System.Diagnostics.Debug.WriteLine("OpenAL device change detection enabled");
+                    }
+                    else
+                    {
+                        System.Diagnostics.Debug.WriteLine("Failed to enable OpenAL device change detection");
+                    }
+                }
+                else
+                {
+                    System.Diagnostics.Debug.WriteLine("OpenAL device change detection not supported on this platform");
+                }
+            }
+            catch (Exception ex)
+            {
+                // Extension may not be available or supported
+                // This is not a critical error, so just log and continue
+                System.Diagnostics.Debug.WriteLine($"Could not initialize device change detection: {ex.Message}");
+            }
+        }
+#endif
 
         /// <summary>
         /// Sets up the hardware resources used by the controller.
@@ -116,12 +322,17 @@ namespace Microsoft.Xna.Framework.Audio
             if (Alc.IsExtensionPresent(_device, "ALC_EXT_CAPTURE"))
                 Microphone.PopulateCaptureDevices();
 
-            SupportsStereoAngles = AL.IsExtensionPresent ("AL_EXT_STEREO_ANGLES");
+            SupportsStereoAngles = AL.IsExtensionPresent("AL_EXT_STEREO_ANGLES");
+
+#if DESKTOPGL || ANGLE
+            // Initialize device change detection if supported
+            InitializeDeviceChangeDetection();
+#endif
 
             // We have hardware here and it is ready
 
-			allSourcesArray = new int[MAX_NUMBER_OF_SOURCES];
-			AL.GenSources(allSourcesArray);
+            allSourcesArray = new int[MAX_NUMBER_OF_SOURCES];
+            AL.GenSources(allSourcesArray);
             ALHelper.CheckError("Failed to generate sources.");
             Filter = 0;
             if (Efx.IsInitialized)
@@ -129,8 +340,8 @@ namespace Microsoft.Xna.Framework.Audio
                 Filter = Efx.GenFilter();
             }
             availableSourcesCollection = new List<int>(allSourcesArray);
-			inUseSourcesCollection = new List<int>();
-		}
+            inUseSourcesCollection = new List<int>();
+        }
 
         ~OpenALSoundController()
         {
@@ -259,9 +470,9 @@ namespace Microsoft.Xna.Framework.Audio
                 // Activate the instance or else the interruption handler will not be called.
                 AVAudioSession.SharedInstance().SetActive(true);
 
-                int[] attribute = new int[0];
+                int[] attribute = Array.Empty<int>();
 #else
-                int[] attribute = new int[0];
+                int[] attribute = Array.Empty<int>();
 #endif
 
                 _context = Alc.CreateContext(_device, attribute);
@@ -308,15 +519,15 @@ namespace Microsoft.Xna.Framework.Audio
 
         public static OpenALSoundController Instance
         {
-			get
+            get
             {
                 if (_instance == null)
                     throw new NoAudioHardwareException("OpenAL context has failed to initialize. Call SoundEffect.Initialize() before sound operation to get more specific errors.");
-				return _instance;
-			}
-		}
+                return _instance;
+            }
+        }
 
-        public static EffectsExtension Efx
+        internal static EffectsExtension Efx
         {
             get
             {
@@ -349,12 +560,12 @@ namespace Microsoft.Xna.Framework.Audio
 
             if (_context != NullContext)
             {
-                Alc.DestroyContext (_context);
+                Alc.DestroyContext(_context);
                 _context = NullContext;
             }
             if (_device != IntPtr.Zero)
             {
-                Alc.CloseDevice (_device);
+                Alc.CloseDevice(_device);
                 _device = IntPtr.Zero;
             }
         }
@@ -373,11 +584,35 @@ namespace Microsoft.Xna.Framework.Audio
         /// </summary>
         /// <param name="disposing">If true, the managed resources are to be disposed.</param>
 		void Dispose(bool disposing)
-		{
+        {
             if (!_isDisposed)
             {
                 if (disposing)
                 {
+#if DESKTOPGL || ANGLE
+                    // Disable device change events before cleanup
+                    try
+                    {
+                        if (_eventCallback != null)
+                        {
+                            int[] events =
+                            {
+                                (int)AlcEventType.DefaultDeviceChanged,
+                                (int)AlcEventType.DeviceAdded,
+                                (int)AlcEventType.DeviceRemoved
+                            };
+
+                            Alc.EventControl(events.Length, events, false);
+                            Alc.EventCallback(null, IntPtr.Zero);
+                            _eventCallback = null;
+                        }
+                    }
+                    catch
+                    {
+                        // Ignore errors during cleanup
+                    }
+#endif
+
                     for (int i = 0; i < allSourcesArray.Length; i++)
                     {
                         AL.DeleteSource(allSourcesArray[i]);
@@ -388,11 +623,11 @@ namespace Microsoft.Xna.Framework.Audio
                         Efx.DeleteFilter(Filter);
 
                     Microphone.StopMicrophones();
-                    CleanUpOpenAL();                    
+                    CleanUpOpenAL();
                 }
                 _isDisposed = true;
             }
-		}
+        }
 
         /// <summary>
         /// Reserves a sound buffer and return its identifier. If there are no available sources
@@ -401,11 +636,11 @@ namespace Microsoft.Xna.Framework.Audio
         /// </summary>
         /// <returns>The source number of the reserved sound buffer.</returns>
 		public int ReserveSource()
-		{
+        {
             int sourceNumber;
 
             lock (availableSourcesCollection)
-            {                
+            {
                 if (availableSourcesCollection.Count == 0)
                 {
                     throw new InstancePlayLimitException();
@@ -417,7 +652,7 @@ namespace Microsoft.Xna.Framework.Audio
             }
 
             return sourceNumber;
-		}
+        }
 
         public void RecycleSource(int sourceId)
         {
@@ -437,15 +672,15 @@ namespace Microsoft.Xna.Framework.Audio
             inst.SourceId = 0;
             inst.HasSourceId = false;
             inst.SoundState = SoundState.Stopped;
-		}
+        }
 
-        public double SourceCurrentPosition (int sourceId)
-		{
+        public double SourceCurrentPosition(int sourceId)
+        {
             int pos;
-			AL.GetSource (sourceId, ALGetSourcei.SampleOffset, out pos);
+            AL.GetSource(sourceId, ALGetSourcei.SampleOffset, out pos);
             ALHelper.CheckError("Failed to set source offset.");
-			return pos;
-		}
+            return pos;
+        }
 
 #if ANDROID
         void Activity_Paused(object sender, EventArgs e)
