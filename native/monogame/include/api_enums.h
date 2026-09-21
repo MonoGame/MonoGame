@@ -94,7 +94,6 @@ enum class MGShaderStage : mgint
 {
     Vertex = 0,
     Pixel = 1,
-    Count = 2,
 };
 
 enum class MGIndexElementSize : mgint
@@ -269,6 +268,12 @@ enum class MGVertexElementFormat : mgint
 enum class MGProcessorType : mguint
 {
     ZeroTransparentPixels = 1,
+};
+
+enum class MGSongEventType : mgint
+{
+    Completed = 0,
+    Failed = 1,
 };
 
 enum class MGGameRunBehavior : mgint

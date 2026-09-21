@@ -162,6 +162,17 @@ struct MGG_InputElement
     mguint InstanceDataStepRate;
 };
 
+struct MGM_SongInfo
+{
+    mgulong duration;
+};
+
+struct MGM_SongEvent
+{
+    MGSongEventType type;
+    mgulong generation;
+};
+
 struct MGM_AudioDecoderInfo
 {
     mgint samplerate;
