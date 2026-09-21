@@ -13,6 +13,12 @@ struct MGG_Texture;
 #include <stdio.h>
 #include <string.h>
 
+#include <atomic>
+#include <chrono>
+#include <mutex>
+#include <queue>
+#include <thread>
+
 #define OGG_IMPL
 #define VORBIS_IMPL
 #include "minivorbis.h"
@@ -292,81 +298,193 @@ mgbyte MGM_AudioDecoder_Decode(MGM_AudioDecoder* decoder, mgbyte*& buffer, mguin
 	return decoder->Decode(buffer, size);
 }
 
-
-MGM_Song* MGM_Song_Create(const char* filepath, MGM_SongInfo& info)
+struct MGM_Song
 {
-	// TODO: IMPLEMENT
-	(void)filepath;
+	MGM_AudioDecoder* decoder = nullptr;
+	MGA_Voice* voice = nullptr;
+	mgulong duration = 0;
 
-	info.duration = 0;
-	return nullptr;
+	std::atomic_bool stopped = true;
+	std::thread decoderThread;
+	std::mutex eventsMutex;
+	std::queue<MGM_SongEvent> events;
+};
+
+static void MGM_Song_EnqueueEvent(MGM_Song* song, MGSongEventType type, mgulong generation)
+{
+	std::lock_guard<std::mutex> lock(song->eventsMutex);
+	song->events.push({ type, generation });
+}
+
+static void MGM_Song_DecodeStream(MGM_Song* song, mgulong generation)
+{
+	bool startVoice = true;
+
+	while (true)
+	{
+		// Do we need to stop?
+		if (song->stopped.load())
+			break;
+
+		if (MGA_Voice_GetBufferCount(song->voice) > 2)
+		{
+			// TODO: This sucks... add OnBufferEnd type of callback
+			// into the voice API so we don't have useless sleeps.
+			std::this_thread::sleep_for(std::chrono::milliseconds(100));
+			continue;
+		}
+
+		mguint size = 0;
+		mgbyte* buffer = nullptr;
+		bool finished = MGM_AudioDecoder_Decode(song->decoder, buffer, size) != 0;
+
+		if (size > 0)
+		{
+			MGA_Voice_AppendBuffer(song->voice, buffer, size);
+
+			if (startVoice)
+			{
+				MGA_Voice_Play(song->voice, 0);
+				startVoice = false;
+			}
+		}
+
+		if (finished)
+		{
+			if (!song->stopped.load())
+			{
+				// Queue completion for the framework thread.
+				MGM_Song_EnqueueEvent(song, MGSongEventType::Completed, generation);
+			}
+
+			return;
+		}
+	}
+
+	// We're done streaming.
+}
+
+static void MGM_Song_StopInternal(MGM_Song* song, mgbyte immediate)
+{
+	song->stopped.store(true);
+
+	if (song->decoderThread.joinable())
+		song->decoderThread.join();
+
+	MGA_Voice_Stop(song->voice, immediate);
+
+	std::lock_guard<std::mutex> lock(song->eventsMutex);
+	std::queue<MGM_SongEvent>().swap(song->events);
+}
+
+MGM_Song* MGM_Song_Create(const char* filepath, MGA_System* system, MGM_SongInfo& info)
+{
+	assert(filepath != nullptr);
+	assert(system != nullptr);
+
+	MGM_AudioDecoderInfo decoderInfo;
+	MGM_AudioDecoder* decoder = MGM_AudioDecoder_Create(filepath, decoderInfo);
+	if (decoder == nullptr)
+	{
+		info.duration = 0;
+		return nullptr;
+	}
+
+	MGA_Voice* voice = MGA_Voice_Create(system, decoderInfo.samplerate, decoderInfo.channels);
+	if (voice == nullptr)
+	{
+		MGM_AudioDecoder_Destroy(decoder);
+		info.duration = 0;
+		return nullptr;
+	}
+
+	MGM_Song* song = new MGM_Song();
+	song->decoder = decoder;
+	song->voice = voice;
+	song->duration = decoderInfo.duration;
+
+	info.duration = decoderInfo.duration;
+	return song;
 }
 
 void MGM_Song_Destroy(MGM_Song* song)
 {
-	// TODO: IMPLEMENT
-	(void)song;
+	if (song == nullptr)
+		return;
+
+	MGM_Song_StopInternal(song, 1);
+	MGA_Voice_Destroy(song->voice);
+	MGM_AudioDecoder_Destroy(song->decoder);
+	delete song;
 }
 
 mgbyte MGM_Song_Play(MGM_Song* song, mgulong positionMS, mgulong generation)
 {
-	// TODO: IMPLEMENT
-	(void)song;
-	(void)positionMS;
-	(void)generation;
+	if (song == nullptr)
+		return 0;
 
-	return 0;
+	// Stop the current playback, which cleans up the worker and voice state.
+	MGM_Song_StopInternal(song, 1);
+
+	// Move the decoder to the new position.
+	MGM_AudioDecoder_SetPosition(song->decoder, positionMS);
+
+	// The native worker does the rest.
+	song->stopped.store(false);
+	song->decoderThread = std::thread(MGM_Song_DecodeStream, song, generation);
+	return 1;
 }
 
 void MGM_Song_Pause(MGM_Song* song)
 {
-	// TODO: IMPLEMENT
-	(void)song;
+	if (song != nullptr)
+		MGA_Voice_Pause(song->voice);
 }
 
 void MGM_Song_Resume(MGM_Song* song)
 {
-	// TODO: IMPLEMENT
-	(void)song;
+	if (song != nullptr)
+		MGA_Voice_Resume(song->voice);
 }
 
 void MGM_Song_Stop(MGM_Song* song)
 {
-	// TODO: IMPLEMENT
-	(void)song;
+	if (song != nullptr)
+		MGM_Song_StopInternal(song, 0);
 }
 
 void MGM_Song_SetVolume(MGM_Song* song, mgfloat volume)
 {
-	// TODO: IMPLEMENT
-	(void)song;
-	(void)volume;
+	if (song != nullptr)
+		MGA_Voice_SetVolume(song->voice, volume);
 }
 
 mgulong MGM_Song_GetPosition(MGM_Song* song)
 {
-	// TODO: IMPLEMENT
-	(void)song;
+	if (song == nullptr)
+		return 0;
 
-	return 0;
+	mgulong position = MGA_Voice_GetPosition(song->voice);
+	return song->duration > 0 ? position % song->duration : position;
 }
 
 mgulong MGM_Song_GetDuration(MGM_Song* song)
 {
-	// TODO: IMPLEMENT
-	(void)song;
-
-	return 0;
+	return song != nullptr ? song->duration : 0;
 }
 
 mgbyte MGM_Song_TryDequeueEvent(MGM_Song* song, MGM_SongEvent& songEvent)
 {
-	// TODO: IMPLEMENT
-	(void)song;
+	if (song == nullptr)
+		return 0;
 
-	songEvent.type = MGSongEventType::Failed;
-	songEvent.generation = 0;
-	return 0;
+	std::lock_guard<std::mutex> lock(song->eventsMutex);
+	if (song->events.empty())
+		return 0;
+
+	songEvent = song->events.front();
+	song->events.pop();
+	return 1;
 }
 
 MGM_VideoDecoder* MGM_VideoDecoder_TryCreate_Theora(const uint8_t* signature)
