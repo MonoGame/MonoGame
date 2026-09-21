@@ -812,16 +812,31 @@ namespace Microsoft.Xna.Framework.Graphics
                 // we need to use this rather than the old code where because ASTC Compressed Textures are NOT Powers of 2.
                 var roundedWidth = (checkedRect.Width + blockWidth - 1) / blockWidth * blockWidth;
                 var roundedHeight = (checkedRect.Height + blockHeight - 1) / blockHeight * blockHeight;
-                checkedRect = new Rectangle(checkedRect.X / blockWidth * blockWidth, checkedRect.Y / blockHeight * blockHeight,
-#if OPENGL
+
+                int checkedWidth = roundedWidth;
+                int checkedHeight = roundedHeight;
+
+                if (PlatformInfo.GraphicsBackend == GraphicsBackend.OpenGL)
+                {
                     // OpenGL only: The last two mip levels require the width and height to be
                     // passed as 2x2 and 1x1, but there needs to be enough data passed to occupy
                     // a full block.
-                    checkedRect.Width < blockWidth && textureBounds.Width < blockWidth ? textureBounds.Width : roundedWidth,
-                    checkedRect.Height < blockHeight && textureBounds.Height < blockHeight ? textureBounds.Height : roundedHeight);
-#else
-                    roundedWidth, roundedHeight);
-#endif
+                    checkedWidth = checkedRect.Width < blockWidth && textureBounds.Width < blockWidth
+                                    ? textureBounds.Width
+                                    : roundedWidth;
+
+                    checkedHeight = checkedRect.Height < blockHeight && textureBounds.Height < blockHeight
+                                    ? textureBounds.Height
+                                    : roundedHeight;
+                }
+
+                checkedRect = new Rectangle(
+                    checkedRect.X / blockWidth * blockWidth,
+                    checkedRect.Y / blockHeight * blockHeight,
+                    checkedWidth,
+                    checkedHeight
+                );
+
                 if (Format == SurfaceFormat.RgbPvrtc2Bpp || Format == SurfaceFormat.RgbaPvrtc2Bpp)
                 {
                     dataByteSize = (Math.Max(checkedRect.Width, 16) * Math.Max(checkedRect.Height, 8) * 2 + 7) / 8;

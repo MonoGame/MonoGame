@@ -12,7 +12,7 @@ namespace MonoGame.Tests.Framework
     public static class GameComponentTest
     {
         [Test]
-#if DESKTOPGL
+#if DESKTOPGL || DESKTOPGL4
         [Ignore("This crashes inside SDL on Mac!")]
 #endif
         public static void InitializeOrderTest()
