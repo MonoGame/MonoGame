@@ -195,8 +195,15 @@ namespace Microsoft.Xna.Framework.Graphics
         /// <param name="preferredDepthFormat">The preferred depth format of the render target.<para><see cref="DepthFormat.None"/> by default.</para></param>
         /// <param name="preferredMultiSampleCount">The preferred number of samples per pixel when multisampling.<para><c>0</c> by default.</para></param>
         /// <remarks>
-        /// WARNING: The returned render target does not own the underlying native image or texture memory.
+        /// <para>
+        /// The returned render target does not own the underlying native image or texture memory.
         /// The external caller/runtime is responsible for its lifetime.
+        /// </para>
+        /// <para>
+        /// The underlying native resource must have been created with render target / color attachment flags.
+        /// If <see cref="Texture2D.GetData{T}(T[])"/> or <see cref="Texture2D.SetData{T}(T[])"/> is called on this target,
+        /// the native resource must also support transfer/copy operations.
+        /// </para>
         /// </remarks>
         /// <returns>A non-owning <see cref="RenderTarget2D"/> backed by the native resource handle.</returns>
         public static RenderTarget2D FromNativeHandle(
