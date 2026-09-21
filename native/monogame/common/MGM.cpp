@@ -292,6 +292,83 @@ mgbyte MGM_AudioDecoder_Decode(MGM_AudioDecoder* decoder, mgbyte*& buffer, mguin
 	return decoder->Decode(buffer, size);
 }
 
+
+MGM_Song* MGM_Song_Create(const char* filepath, MGM_SongInfo& info)
+{
+	// TODO: IMPLEMENT
+	(void)filepath;
+
+	info.duration = 0;
+	return nullptr;
+}
+
+void MGM_Song_Destroy(MGM_Song* song)
+{
+	// TODO: IMPLEMENT
+	(void)song;
+}
+
+mgbyte MGM_Song_Play(MGM_Song* song, mgulong positionMS, mgulong generation)
+{
+	// TODO: IMPLEMENT
+	(void)song;
+	(void)positionMS;
+	(void)generation;
+
+	return 0;
+}
+
+void MGM_Song_Pause(MGM_Song* song)
+{
+	// TODO: IMPLEMENT
+	(void)song;
+}
+
+void MGM_Song_Resume(MGM_Song* song)
+{
+	// TODO: IMPLEMENT
+	(void)song;
+}
+
+void MGM_Song_Stop(MGM_Song* song)
+{
+	// TODO: IMPLEMENT
+	(void)song;
+}
+
+void MGM_Song_SetVolume(MGM_Song* song, mgfloat volume)
+{
+	// TODO: IMPLEMENT
+	(void)song;
+	(void)volume;
+}
+
+mgulong MGM_Song_GetPosition(MGM_Song* song)
+{
+	// TODO: IMPLEMENT
+	(void)song;
+
+	return 0;
+}
+
+mgulong MGM_Song_GetDuration(MGM_Song* song)
+{
+	// TODO: IMPLEMENT
+	(void)song;
+
+	return 0;
+}
+
+mgbyte MGM_Song_TryDequeueEvent(MGM_Song* song, MGM_SongEvent& songEvent)
+{
+	// TODO: IMPLEMENT
+	(void)song;
+
+	songEvent.type = MGSongEventType::Failed;
+	songEvent.generation = 0;
+	return 0;
+}
+
 MGM_VideoDecoder* MGM_VideoDecoder_TryCreate_Theora(const uint8_t* signature)
 {
 	// TODO: Implement me!
