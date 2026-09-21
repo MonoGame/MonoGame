@@ -2174,7 +2174,7 @@ mgbyte MGG_GraphicsDevice_ResizeSwapchain(
 		device->syncInterval == syncInterval &&
 		device->multiSampleCount == multiSampleCount)
 	{
-		return;
+		return 1;
 	}
 
 	bool isSwapchainBound = device->targets.targets[0] != nullptr &&
@@ -2188,6 +2188,8 @@ mgbyte MGG_GraphicsDevice_ResizeSwapchain(
 	{
 		MGG_GraphicsDevice_SetRenderTargets(device, nullptr, nullptr, 0);
 	}
+
+	return 1;
 }
 
 
