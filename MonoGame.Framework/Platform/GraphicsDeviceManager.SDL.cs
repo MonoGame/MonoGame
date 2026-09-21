@@ -2,7 +2,9 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
+using System;
 using Microsoft.Xna.Framework.Graphics;
+using MonoGame.OpenGL;
 
 namespace Microsoft.Xna.Framework
 {
@@ -51,8 +53,44 @@ namespace Microsoft.Xna.Framework
 
             if (presentationParameters.MultiSampleCount > 0)
             {
-                Sdl.GL.SetAttribute(Sdl.GL.Attribute.MultiSampleBuffers, 1);
-                Sdl.GL.SetAttribute(Sdl.GL.Attribute.MultiSampleSamples, presentationParameters.MultiSampleCount);
+                // Store the "default" multisample count, which will be lowered if necessary to meet GL_MAX_SAMPLES.
+                var multiSampleCount = presentationParameters.MultiSampleCount;
+
+                // We should create a new temporary window to make a best-effort on grabbing GL_MAX_SAMPLES.
+                var temporaryWindowHandle = Sdl.Window.Create(
+                    "glContextInfoWindow",
+                    0,
+                    0,
+                    0,
+                    0,
+                    Sdl.Window.State.OpenGL |
+                    Sdl.Window.State.Hidden
+                );
+
+                // If we do have an SDL window handle now, we can create a temporary GL context to grab GL_MAX_SAMPLES.
+                // Otherwise, just use the previous value (which by default would be 32 if PreferMultiSampling is true).
+                if (temporaryWindowHandle != IntPtr.Zero)
+                {
+                    var temporaryGLContext = Sdl.GL.CreateContext(temporaryWindowHandle);
+
+                    var glMaxSamples = GL.GetMaxSamples();
+                    multiSampleCount = Math.Min(glMaxSamples, multiSampleCount);
+
+                    Sdl.GL.DeleteContext(temporaryGLContext);
+
+                    // We need to destroy the locally-created temporary window instead of leaking it.
+                    Sdl.Window.Destroy(temporaryWindowHandle);
+                }
+
+                // Only set the multisampling attributes if GL_MAX_SAMPLES was above 0.
+                if (multiSampleCount > 0)
+                {
+                    Sdl.GL.SetAttribute(Sdl.GL.Attribute.MultiSampleBuffers, 1);
+                    Sdl.GL.SetAttribute(Sdl.GL.Attribute.MultiSampleSamples, multiSampleCount);
+                }
+
+                // Make sure that the accessible value reflects any reduction in sample count.
+                presentationParameters.MultiSampleCount = multiSampleCount;
             }
 
             ((SdlGameWindow)SdlGameWindow.Instance).CreateWindow();

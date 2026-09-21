@@ -1268,6 +1268,15 @@ namespace MonoGame.OpenGL
 
         internal static int SwapInterval { get; set; }
 
+        internal unsafe static int GetMaxSamples()
+        {
+            GetIntegerv = LoadFunction<GetIntegerDelegate> ("glGetIntegerv");
+
+            int maxSamples = 0;
+            GetIntegerv((int)GetPName.MaxSamples, &maxSamples);
+            return maxSamples;
+        }
+
         internal static void LoadEntryPoints ()
         {
             LoadPlatformEntryPoints ();

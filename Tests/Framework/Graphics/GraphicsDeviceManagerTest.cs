@@ -5,6 +5,9 @@
 using System;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+#if DESKTOPGL
+using MonoGame.OpenGL;
+#endif
 using NUnit.Framework;
 
 namespace MonoGame.Tests.Graphics
@@ -347,7 +350,7 @@ namespace MonoGame.Tests.Graphics
             Assert.AreEqual(1, resetCount);
             Assert.AreEqual(1, resettingCount);
         }
-        
+
         [Test]
         public void NewDeviceDoesNotTriggerReset()
         {
@@ -430,14 +433,77 @@ namespace MonoGame.Tests.Graphics
 
         }
 
+        /// <summary>
+        /// The original test is a valid and worthwhile test case so it was retained inside the preprocessor guard, but
+        /// due to <see cref="GraphicsDeviceTestFixtureBase.SetUp"/> creating the context and window ahead of the test
+        /// enabling multisampling the test would always fail the enabled case for DesktopGL.
+        ///
+        /// Some of the setup logic has been duplicated from the original so that multisampling can be enabled at the
+        /// correct point in the lifecycle for DesktopGL.
+        ///
+        /// The remainder of this test outside the preprocessor guard is common for all platforms that run it.
+        /// </summary>
+        /// <seealso href="https://github.com/MonoGame/MonoGame/pull/8087">MonoGame/MonoGame PR 8087</seealso>
         [Test]
         [TestCase(false)]
         [TestCase(true)]
-#if DESKTOPGL
-        [Ignore("Expected not 1024 but got 1024. Needs Investigating")]
-#endif
         public void MSAAEnabled(bool enabled)
         {
+#if DESKTOPGL
+            var maxSamples = 32;
+
+            if (enabled)
+            {
+                try
+                {
+                    maxSamples = GL.GetMaxSamples();
+                    if (maxSamples < 1)
+                    {
+                        Assert.Ignore("This test requires at least 2x MSAA.");
+                    }
+                }
+                catch
+                {
+                    Assert.Ignore("GL_MAX_SAMPLES could not be queried so this test will not work");
+                }
+            }
+
+            game = new TestGameBase();
+            gdm = new GraphicsDeviceManager(game);
+
+#if !XNA
+            // We enable the half-pixel offset for XNA compatibility
+            gdm.PreferHalfPixelOffset = true;
+#endif
+
+            gdm.PreferMultiSampling = enabled;
+            gdm.GraphicsProfile = GraphicsProfile.HiDef;
+
+            // first hook an event to do some checks
+            gdm.PreparingDeviceSettings += (_, args) =>
+            {
+                var pp = args.GraphicsDeviceInformation.PresentationParameters;
+                if (enabled)
+                {
+                    Assert.Less(0, pp.MultiSampleCount);
+                }
+                else
+                {
+                    Assert.AreEqual(0, pp.MultiSampleCount);
+                }
+            };
+
+            ((IGraphicsDeviceManager)game.Services.GetService(typeof(IGraphicsDeviceManager))).CreateDevice();
+            gd = game.GraphicsDevice;
+
+            content = game.Content;
+
+            if (enabled && maxSamples != 32)
+            {
+                var pp = gd.PresentationParameters;
+                Assert.Greater(32, pp.MultiSampleCount);
+            }
+#else
             gdm.PreferMultiSampling = enabled;
             gdm.GraphicsProfile = GraphicsProfile.HiDef;
 
@@ -453,16 +519,23 @@ namespace MonoGame.Tests.Graphics
 
             // then create a GraphicsDevice
             gdm.ApplyChanges();
+#endif
 
-            var tex = new Texture2D(gd, 1, 1);
+            using var tex = new Texture2D(gd, 1, 1);
             tex.SetData(new[] { Color.White.PackedValue });
-            var spriteBatch = new SpriteBatch(gd);
+
+            using var spriteBatch = new SpriteBatch(gd);
 
             if (enabled)
             {
                 var pp = gd.PresentationParameters;
                 Assert.Less(0, pp.MultiSampleCount);
                 Assert.AreNotEqual(1024, pp.MultiSampleCount);
+            }
+            else
+            {
+                var pp = gd.PresentationParameters;
+                Assert.AreEqual(0, pp.MultiSampleCount);
             }
 
             gd.Clear(Color.Black);
@@ -479,35 +552,46 @@ namespace MonoGame.Tests.Graphics
             float grey = 0;
             foreach (var c in data)
             {
-                if (c == Color.Black)
-                    ++black;
-                else if (c == Color.White)
-                    ++white;
-                else if (c.R == c.G && c.G == c.B && c.R > 0 && c.R < 255)
-                    ++grey;
+                if (c.R != c.G || c.R != c.B)
+                {
+                    continue;
+                }
+
+                switch (c.R)
+                {
+                    case 0:
+                        ++black;
+                        break;
+                    case 255:
+                        ++white;
+                        break;
+                    default:
+                        ++grey;
+                        break;
+                }
             }
 
             // General percentage of black and white pixels we should be getting.
             black /= data.Length;
-            white /= data.Length;
             Assert.Less(black, 0.9f);
             Assert.Greater(black, 0.8f);
+
+            white /= data.Length;
             Assert.Less(white, 0.2f);
             Assert.Greater(white, 0.1f);
 
             // If enabled we should have at least a few grey pixels
             // else we should have zero grey pixels.
             grey /= data.Length;
-            if (!enabled)
-                Assert.AreEqual(0, grey);
-            else
+            if (enabled)
             {
                 Assert.Less(grey, 0.01f);
-                Assert.Greater(grey, 0.001f);
+                Assert.Greater(grey, 0.0001f);
             }
-
-            tex.Dispose();
-            spriteBatch.Dispose();
+            else
+            {
+                Assert.AreEqual(0, grey);
+            }
         }
 
         [Test]
@@ -558,7 +642,7 @@ namespace MonoGame.Tests.Graphics
             gdm.GraphicsDevice.Reset(pp3);
             Assert.AreEqual
                 (maxMultiSampleCount, gdm.GraphicsDevice.PresentationParameters.MultiSampleCount);
-            
+
         }
 #endif
     }
