@@ -94,6 +94,7 @@ enum class MGShaderStage : mgint
 {
     Vertex = 0,
     Pixel = 1,
+    Count = 2,
 };
 
 enum class MGIndexElementSize : mgint
