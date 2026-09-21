@@ -20,6 +20,6 @@ namespace Microsoft.Xna.Framework.Graphics
         /// <summary>
         /// The number of shader stages supported by the current graphics implementation.
         /// </summary>
-        Count        
+        Count
     }
 }
