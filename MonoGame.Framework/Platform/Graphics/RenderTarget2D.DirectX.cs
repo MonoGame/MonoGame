@@ -200,7 +200,8 @@ namespace Microsoft.Xna.Framework.Graphics
             int height,
             SurfaceFormat format = SurfaceFormat.Color,
             DepthFormat preferredDepthFormat = DepthFormat.None,
-            int preferredMultiSampleCount = 0)
+            int preferredMultiSampleCount = 0,
+            bool externalPresentation = false)
         {
             var renderTarget = new RenderTarget2D(
                 graphicsDevice,
