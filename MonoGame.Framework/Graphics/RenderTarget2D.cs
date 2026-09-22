@@ -194,15 +194,15 @@ namespace Microsoft.Xna.Framework.Graphics
         /// <param name="format">The surface format of the native image or texture.</param>
         /// <param name="preferredDepthFormat">The preferred depth format of the render target.<para><see cref="DepthFormat.None"/> by default.</para></param>
         /// <param name="preferredMultiSampleCount">The preferred number of samples per pixel when multisampling.<para><c>0</c> by default.</para></param>
+        /// <param name="externalPresentation">
+        /// <see langword="true"/> if the wrapped native resource is an external swapchain, such as an OpenXR swapchain.
+        /// <see langword="false"/> if the render target will be used for sampling in shaders, such as for use with <see cref="SpriteBatch"/>.
+        /// <para><see langword="false"/> by default.</para>
+        /// </param>
         /// <remarks>
         /// <para>
         /// The returned render target does not own the underlying native image or texture memory.
         /// The external caller/runtime is responsible for its lifetime.
-        /// </para>
-        /// <para>
-        /// The underlying native resource must have been created with render target / color attachment flags.
-        /// If <see cref="Texture2D.GetData{T}(T[])"/> or <see cref="Texture2D.SetData{T}(T[])"/> is called on this target,
-        /// the native resource must also support transfer/copy operations.
         /// </para>
         /// </remarks>
         /// <returns>A non-owning <see cref="RenderTarget2D"/> backed by the native resource handle.</returns>
@@ -213,7 +213,8 @@ namespace Microsoft.Xna.Framework.Graphics
             int height,
             SurfaceFormat format = SurfaceFormat.Color,
             DepthFormat preferredDepthFormat = DepthFormat.None,
-            int preferredMultiSampleCount = 0)
+            int preferredMultiSampleCount = 0,
+            bool externalPresentation = false)
         {
             return PlatformFromNativeHandle(graphicsDevice,
                 handle,
@@ -221,7 +222,8 @@ namespace Microsoft.Xna.Framework.Graphics
                 height,
                 format,
                 preferredDepthFormat,
-                preferredMultiSampleCount);
+                preferredMultiSampleCount,
+                externalPresentation);
         }
 
         /// <summary>

@@ -39,7 +39,8 @@ public partial class RenderTarget2D
         int height,
         SurfaceFormat format = SurfaceFormat.Color,
         DepthFormat preferredDepthFormat = DepthFormat.None,
-        int preferredMultiSampleCount = 0)
+        int preferredMultiSampleCount = 0,
+        bool externalPresentation = false)
     {
         // Call native layer to create an MGG_Texture that wraps the external resource.
         var nativeTexture = MGG.RenderTarget_WrapNativeHandle(
@@ -49,7 +50,8 @@ public partial class RenderTarget2D
             width,
             height,
             preferredDepthFormat,
-            preferredMultiSampleCount);
+            preferredMultiSampleCount,
+            (byte)(externalPresentation ? 1 : 0));
 
         // Use the protected constructor that takes SurfaceType.SwapChainRenderTarget.
         // This skips the PlatformConstruct() call.

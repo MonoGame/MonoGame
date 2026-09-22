@@ -380,7 +380,8 @@ internal static unsafe partial class MGG
         int width,
         int height,
         DepthFormat depthFormat,
-        int multiSampleCount);
+        int multiSampleCount,
+        byte externalPresentation);
 
     [DllImport(MGP.MonoGameNativeDLL, EntryPoint = "MGG_Texture_Destroy", ExactSpelling = true)]
     public static extern void Texture_Destroy(MGG_GraphicsDevice* device, MGG_Texture* texture);

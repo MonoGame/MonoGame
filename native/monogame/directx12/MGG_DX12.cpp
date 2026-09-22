@@ -2423,7 +2423,8 @@ MGG_Texture* MGG_RenderTarget_WrapNativeHandle(
 	mgint width,
 	mgint height,
 	MGDepthFormat depthFormat,
-	mgint multiSampleCount)
+	mgint multiSampleCount,
+	mgbyte externalPresentation)
 {
 	if (!device || !nativeHandle || !device->resources)
 	{

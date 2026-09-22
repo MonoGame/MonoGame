@@ -5953,7 +5953,8 @@ MGG_Texture* MGG_RenderTarget_WrapNativeHandle(
 	mgint width,
 	mgint height,
 	MGDepthFormat depthFormat,
-	mgint multiSampleCount)
+	mgint multiSampleCount,
+	mgbyte externalPresentation)
 {
 	assert(device != nullptr);
 	assert(nativeHandle != nullptr);
@@ -5986,18 +5987,17 @@ MGG_Texture* MGG_RenderTarget_WrapNativeHandle(
 	create_info.arrayLayers = 1;
 	create_info.samples = ToVkSampleCount(multiSampleCount);
 	create_info.tiling = VK_IMAGE_TILING_OPTIMAL;
-
-	create_info.usage =
-		VK_IMAGE_USAGE_SAMPLED_BIT
-		| VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT
-		| VK_IMAGE_USAGE_TRANSFER_SRC_BIT
-		| VK_IMAGE_USAGE_TRANSFER_DST_BIT;
-
 	create_info.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
 	create_info.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
 
-	texture->layouts[0] = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
-	texture->optimal_layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
+	// External presentation surfaces (OpenXR swapchains, etc.) should have COLOR_ATTACHMENT_OPTIMAL.
+	// Otherwise, set layout for normal shader sampling, as in standard RenderTarget2D.
+	VkImageLayout layout = externalPresentation
+		? VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL
+		: VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+
+	texture->layouts[0] = layout;
+	texture->optimal_layout = layout;
 
 	// Create image view for shader sampling.
 	texture->view = CreateImageView(device, texture, 1);
