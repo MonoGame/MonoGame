@@ -196,7 +196,7 @@ namespace Microsoft.Xna.Framework.Graphics
         /// <param name="preferredMultiSampleCount">The preferred number of samples per pixel when multisampling.<para><c>0</c> by default.</para></param>
         /// <param name="externalPresentation">
         /// <see langword="true"/> if the wrapped native resource is an external swapchain, such as an OpenXR swapchain.
-        /// <see langword="false"/> if the render target will be used for sampling in shaders, such as for use with <see cref="SpriteBatch"/>.
+        /// <see langword="false"/> if the render target will be used for sampling in shaders, such as for use as input with <see cref="SpriteBatch"/>.
         /// <para><see langword="false"/> by default.</para>
         /// </param>
         /// <remarks>
