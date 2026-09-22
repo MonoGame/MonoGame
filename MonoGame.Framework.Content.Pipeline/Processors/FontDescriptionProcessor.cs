@@ -116,8 +116,11 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
 
                         if (glyph.Data.IsMetricOnly)
                         {
-                            // Match the metric-only glyph width emitted by XNA-built SpriteFonts without kerning.
-                            // At the importer's 96 DPI, the observed width is one third of the pixel font size.
+                            // TODO: When we move from XNA Compat, this needs to
+                            //       be looked at again
+                            //      Honestly, I don't like this, but here we are...
+                            // XNA gives blank glyphs 1/3 of the font's pixel size when kerning is turned off
+                            // So this is to match that behavior so word spacing stays consistent with XNA
                             width = glyph.Data.XAdvance > 0
                                 // Point-to-pixel is 96 DPI / 72 points-per-inch (~1.33)
                                 ? (float)Math.Ceiling(input.Size * 96.0f / 72.0f / 3.0f)
