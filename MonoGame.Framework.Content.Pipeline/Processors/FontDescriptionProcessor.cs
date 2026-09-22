@@ -99,7 +99,9 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
                     var texRect = glyph.Data.SubRect;
                     output.Glyphs.Add(texRect);
 
-                    var cropping = new Rectangle(0, (int)(glyph.Data.YOffset - yOffsetMin), (int)glyph.Data.XAdvance, output.VerticalLineSpacing);
+                    var cropping = glyph.Data.IsMetricOnly
+                        ? new Rectangle(0, 0, 1, 1)
+                        : new Rectangle(0, (int)(glyph.Data.YOffset - yOffsetMin), (int)glyph.Data.XAdvance, output.VerticalLineSpacing);
                     output.Cropping.Add(cropping);
 
                     // Set the optional character kerning.
@@ -112,11 +114,14 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
                     {
                         float width = texRect.Width;
 
-                        // Whitespace glyphs can carry advance entirely in their metrics.
-                        // Preserve that advance when kerning is disabled so spacing matches XNA.
-                        if (glyph.Data.CharacterWidths.B <= 0 && glyph.Data.XAdvance > width)
+                        if (glyph.Data.IsMetricOnly)
                         {
-                            width = glyph.Data.XAdvance;
+                            // Match the metric-only glyph width emitted by XNA-built SpriteFonts without kerning.
+                            // At the importer's 96 DPI, the observed width is one third of the pixel font size.
+                            width = glyph.Data.XAdvance > 0
+                                // Point-to-pixel is 96 DPI / 72 points-per-inch (~1.33)
+                                ? (float)Math.Ceiling(input.Size * 96.0f / 72.0f / 3.0f)
+                                : 0.0f;
                         }
 
                         output.Kerning.Add(new Vector3(0, width, 0));
