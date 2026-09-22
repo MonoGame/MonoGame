@@ -165,7 +165,7 @@ namespace MonoGame.Framework.Devices.Sensors
             {
                 try
                 {
-                    if (e != null && e.Sensor.Type == SensorType.Gyrometer && gyrometer != null)
+                    if (e != null && e.Sensor.Type == SensorType.Gyroscope && gyrometer != null)
                     {
                         var values = e.Values;
                         try
