@@ -226,6 +226,10 @@ MGP_Platform* MGP_Platform_Create(MGGameRunBehavior& behavior)
     //
 	//_CrtSetBreakAlloc(327);
 
+#if defined(__EMSCRIPTEN__)
+    SDL_SetHint(SDL_HINT_TOUCH_MOUSE_EVENTS, "0");
+#endif
+
 	if (SDL_WasInit(0) == 0) {
         Uint32 initFlags =
             SDL_INIT_VIDEO |
