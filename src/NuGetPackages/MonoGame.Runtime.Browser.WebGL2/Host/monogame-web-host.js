@@ -27,6 +27,11 @@ const SensorState = Object.freeze({
     Disabled: 5
 });
 
+const SongEventType = Object.freeze({
+    Completed: 0,
+    Failed: 1
+});
+
 let activeHost = null;
 const contentBase64ByPath = new Map();
 
@@ -52,6 +57,10 @@ class MonoGameWebHost {
         this.assetPackStagingPromises = new Map();
         this.canvasResizeObserver = null;
         this.accelerometerListener = null;
+        this.audioContext = null;
+        this.songElement = null;
+        this.songGainNode = null;
+        this.activeSong = null;
     }
 
     static bootFromDocument(document_) {
@@ -156,6 +165,7 @@ class MonoGameWebHost {
 
         globalThis.Module = globalThis.Module || {};
         globalThis.Module.canvas = canvas;
+        this.observeAudioActivation();
         this.logStage(
             HostStage.CanvasCreation,
             `Canvas '${canvas.id}' ready at ${canvas.width}x${canvas.height}.`);
@@ -339,6 +349,214 @@ class MonoGameWebHost {
         });
 
         reportFullscreenChange();
+    }
+
+    observeAudioActivation() {
+        const activateAudio = () => {
+            void this.activateAudioAsync();
+        };
+
+        this.canvas.addEventListener("pointerdown", activateAudio, { passive: true });
+        this.canvas.addEventListener("keydown", activateAudio);
+    }
+
+    async activateAudioAsync() {
+        const AudioContextConstructor = globalThis.AudioContext ?? globalThis.webkitAudioContext;
+        if (AudioContextConstructor == null) {
+            return false;
+        }
+
+        this.ensureSongElement();
+
+        try {
+            if (this.audioContext == null) {
+                this.audioContext = new AudioContextConstructor();
+                const source = this.audioContext.createMediaElementSource(this.songElement);
+                this.songGainNode = this.audioContext.createGain();
+                source.connect(this.songGainNode);
+                this.songGainNode.connect(this.audioContext.destination);
+            }
+
+            await this.audioContext.resume();
+            return this.audioContext.state === "running";
+        }
+        catch {
+            return false;
+        }
+    }
+
+    ensureSongElement() {
+        if (this.songElement != null) {
+            return;
+        }
+
+        const songElement = document.createElement("audio");
+        songElement.hidden = true;
+        songElement.preload = "metadata";
+        songElement.crossOrigin = "anonymous";
+        songElement.setAttribute("aria-hidden", "true");
+        songElement.addEventListener("ended", () => this.reportActiveSongEvent(SongEventType.Completed));
+        songElement.addEventListener("error", () => this.reportActiveSongEvent(SongEventType.Failed));
+        this.root.appendChild(songElement);
+        this.songElement = songElement;
+    }
+
+    playSong(songId, mediaPath, positionMilliseconds, volume, commandId) {
+        this.ensureSongElement();
+
+        const mediaUri = this.resolveSongUri(mediaPath);
+        if (mediaUri == null || !this.canPlaySongMedia()) {
+            this.reportSongEvent(songId, commandId, SongEventType.Failed);
+            return true;
+        }
+
+        if (this.audioContext == null || this.audioContext.state !== "running" || this.songGainNode == null) {
+            this.reportSongEvent(songId, commandId, SongEventType.Failed);
+            return true;
+        }
+
+        this.stopActiveSong();
+
+        this.activeSong = {
+            songId,
+            commandId,
+            positionSeconds: Math.max(0, positionMilliseconds / 1000),
+            volume
+        };
+
+        this.songElement.src = mediaUri;
+        this.applyActiveSongVolume();
+        this.songElement.addEventListener("loadedmetadata", () => this.startActiveSongPlayback(true), { once: true });
+        this.songElement.load();
+        return true;
+    }
+
+    pauseSong(songId, commandId) {
+        if (!this.isActiveSong(songId, commandId)) {
+            return;
+        }
+
+        this.songElement.pause();
+    }
+
+    resumeSong(songId, commandId) {
+        if (this.isActiveSong(songId, commandId)) {
+            this.startActiveSongPlayback(false);
+        }
+    }
+
+    stopSong(songId) {
+        if (this.activeSong?.songId === songId) {
+            this.stopActiveSong();
+        }
+    }
+
+    setSongVolume(songId, volume) {
+        if (this.activeSong?.songId !== songId) {
+            return;
+        }
+
+        this.activeSong.volume = volume;
+        this.applyActiveSongVolume();
+    }
+
+    getSongPosition(songId) {
+        if (this.activeSong?.songId !== songId || !Number.isFinite(this.songElement.currentTime)) {
+            return 0;
+        }
+
+        return Math.floor(this.songElement.currentTime * 1000);
+    }
+
+    getSongDuration(songId) {
+        if (this.activeSong?.songId !== songId || !Number.isFinite(this.songElement.duration)) {
+            return 0;
+        }
+
+        return Math.floor(this.songElement.duration * 1000);
+    }
+
+    canPlaySongMedia() {
+        return this.songElement != null && this.songElement.canPlayType("audio/mpeg") !== "";
+    }
+
+    resolveSongUri(mediaPath) {
+        try {
+            const uri = new URL(mediaPath, new URL(this.config.contentBaseUri, document.baseURI));
+            return uri.protocol === "http:" || uri.protocol === "https:" ? uri.toString() : null;
+        }
+        catch {
+            return null;
+        }
+    }
+
+    startActiveSongPlayback(applyStartPosition) {
+        const activeSong = this.activeSong;
+        if (activeSong == null) {
+            return;
+        }
+
+        if (applyStartPosition) {
+            try {
+                this.songElement.currentTime = activeSong.positionSeconds;
+            }
+            catch {
+                this.reportActiveSongEvent(SongEventType.Failed);
+                return;
+            }
+        }
+
+        void this.songElement.play().catch(() => {
+            if (this.isActiveSong(activeSong.songId, activeSong.commandId)) {
+                this.reportActiveSongEvent(SongEventType.Failed);
+            }
+        });
+    }
+
+    stopActiveSong() {
+        if (this.activeSong == null || this.songElement == null) {
+            return;
+        }
+
+        this.activeSong = null;
+        this.songElement.pause();
+        this.songElement.removeAttribute("src");
+        this.songElement.load();
+    }
+
+    applyActiveSongVolume() {
+        if (this.activeSong == null) {
+            return;
+        }
+
+        const volume = Math.min(1, Math.max(0, this.activeSong.volume));
+        if (this.songGainNode != null) {
+            this.songGainNode.gain.value = volume;
+        }
+        else {
+            this.songElement.volume = volume;
+        }
+    }
+
+    isActiveSong(songId, commandId) {
+        return this.activeSong?.songId === songId && this.activeSong.commandId === commandId;
+    }
+
+    reportActiveSongEvent(type) {
+        const activeSong = this.activeSong;
+        if (activeSong == null) {
+            return;
+        }
+
+        this.activeSong = null;
+        this.reportSongEvent(activeSong.songId, activeSong.commandId, type);
+    }
+
+    reportSongEvent(songId, commandId, type) {
+        const notifySongEvent = this.runtime?.Module?._MGM_Web_NotifySongEvent;
+        if (typeof notifySongEvent === "function") {
+            notifySongEvent(songId, commandId, type);
+        }
     }
 
     requestFullscreen() {
