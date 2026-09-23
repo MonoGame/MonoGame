@@ -15,6 +15,11 @@ internal sealed class WebGL2AudioProfile : AudioProfile
 
     public override ConversionQuality ConvertStreamingAudio(TargetPlatform platform, ConversionQuality quality, AudioContent content, ref string outputFileName)
     {
-        throw new PipelineException("Streaming audio content is not supported for the WebGL2 platform.");
+        // For broadest compatibility on web, convert audio to mp3
+        // macOS/iOS + safari supports ogg/vorbis with Safari 18.4+
+        // but older versions would not support it
+        outputFileName = Path.ChangeExtension(outputFileName, AudioHelper.GetExtension(ConversionFormat.Mp3));
+        Directory.CreateDirectory(Path.GetDirectoryName(outputFileName)!);
+        return DefaultAudioProfile.ConvertToFormat(content, ConversionFormat.Mp3, quality, outputFileName);
     }
 }

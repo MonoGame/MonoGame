@@ -200,17 +200,33 @@ namespace MonoGame.Tests.ContentPipeline
         }
 
         [Test]
-        public void WebGL2Profile_ConvertingStreamingAudio_ThrowsPipelineException()
+        public void WebGL2Profile_ConvertingStreamingAudio_CreatesMp3File()
         {
             using AudioContent content = new AudioContent(@"Assets/Audio/tone_mono_44khz_16bit.wav", AudioFileType.Wav);
             AudioProfile profile = AudioProfile.ForPlatform(TargetPlatform.WebGL2);
-            string outputFileName = "validation.xnb";
+            string outputFileName = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName(), "validation.xnb");
 
-            Assert.Throws<PipelineException>(() => profile.ConvertStreamingAudio(
+            try
+            {
+                ConversionQuality convertedQuality = profile.ConvertStreamingAudio(
                 TargetPlatform.WebGL2,
                 ConversionQuality.Best,
                 content,
-                ref outputFileName));
+                ref outputFileName);
+
+                Assert.AreEqual(ConversionQuality.Best, convertedQuality);
+                Assert.That(Path.GetExtension(outputFileName), Is.EqualTo(".mp3"));
+                Assert.That(File.Exists(outputFileName), Is.True);
+            }
+            finally
+            {
+                if (File.Exists(outputFileName))
+                    File.Delete(outputFileName);
+
+                string outputDirectory = Path.GetDirectoryName(outputFileName)!;
+                if (Directory.Exists(outputDirectory))
+                    Directory.Delete(outputDirectory);
+            }
         }
 
         private static int ToWavFormat(ConversionFormat format, int bitsPerSample)
