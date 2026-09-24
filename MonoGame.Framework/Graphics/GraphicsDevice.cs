@@ -382,30 +382,33 @@ namespace Microsoft.Xna.Framework.Graphics
             Dispose(false);
         }
 
+        internal static int NormalizeMultiSampleCount(int multiSampleCount, int maxMultiSampleCount)
+        {
+            if (multiSampleCount <= 1)
+                return 0;
+
+            // Round down MultiSampleCount to the nearest power of two
+            // hack from http://stackoverflow.com/a/2681094
+            // Note: this will return an incorrect, but large value
+            // for very large numbers. That doesn't matter because
+            // the number will get clamped below anyway in this case.
+            var msc = multiSampleCount;
+            msc = msc | (msc >> 1);
+            msc = msc | (msc >> 2);
+            msc = msc | (msc >> 4);
+            msc -= (msc >> 1);
+
+            // and clamp to what the device can handle
+            if (maxMultiSampleCount > 0 && msc > maxMultiSampleCount)
+                msc = maxMultiSampleCount;
+
+            return msc;
+        }
+
         internal int GetClampedMultisampleCount(SurfaceFormat format, int multiSampleCount)
         {
-            var maxMultiSampleCount = PlatformGetMaxMultiSampleCount(format);
-
-            if (multiSampleCount > 1)
-            {
-                // Round down MultiSampleCount to the nearest power of two
-                // hack from http://stackoverflow.com/a/2681094
-                // Note: this will return an incorrect, but large value
-                // for very large numbers. That doesn't matter because
-                // the number will get clamped below anyway in this case.
-                var msc = multiSampleCount;
-                msc = msc | (msc >> 1);
-                msc = msc | (msc >> 2);
-                msc = msc | (msc >> 4);
-                msc -= (msc >> 1);
-
-                // and clamp it to what the device can handle
-                if (msc > maxMultiSampleCount)
-                    msc = maxMultiSampleCount;
-
-                return msc;
-            }
-            else return 0;
+            int maxMultiSampleCount = PlatformGetMaxMultiSampleCount(format);
+            return NormalizeMultiSampleCount(multiSampleCount, maxMultiSampleCount);
         }
 
         internal void Initialize()
