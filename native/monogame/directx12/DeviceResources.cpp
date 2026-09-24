@@ -23,6 +23,7 @@ private:
 #else
     Microsoft::WRL::ComPtr<IDXGIFactory6> m_dxgiFactory;
     Microsoft::WRL::ComPtr<IDXGISwapChain3> m_swapChain;
+    Microsoft::WRL::ComPtr<IDXGIAdapter1> m_adapter;
 
     DeviceResources::DeviceResetCallbackFunc m_lostCbk = nullptr;
 
@@ -206,6 +207,7 @@ public:
 #endif
 
         m_dxgiFactory = factory;
+        m_adapter = adapter;
 
         // Create the DX12 API device object.
         HRESULT hr;
@@ -511,6 +513,7 @@ public:
         m_d3dDevice.Reset();
         m_dxgiFactory.Reset();
         m_allocator.Reset();
+        m_adapter.Reset();
     }
 #endif
 
@@ -704,6 +707,14 @@ void DeviceResources::GetBackBufferData(uint32_t x, uint32_t y, uint32_t w, uint
 
 CommandContext* Graphics::DeviceResources::GetCommandContext() const {
     return pImpl->m_commandContext.get();
+}
+
+IDXGIAdapter1* Graphics::DeviceResources::GetAdapter() const {
+#if defined(_GAMING_XBOX)
+    return nullptr;
+#else
+    return pImpl->m_adapter.Get();
+#endif
 }
 
 ID3D12Device* Graphics::DeviceResources::GetD3DDevice() const {

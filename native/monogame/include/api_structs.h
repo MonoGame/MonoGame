@@ -282,3 +282,15 @@ struct MGP_ControllerCaps
     mgbool HasRightVibrationMotor;
     mgbool HasVoiceSupport;
 };
+
+struct MGP_NativeGraphicsHandles
+{
+    MGGraphicsBackend Backend;
+    void* Instance;
+    void* PhysicalDevice;
+    void* LogicalDevice;
+    void* Queue;
+    mgint QueueFamilyIndex;
+    mgint QueueIndex;
+};
+

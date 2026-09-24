@@ -3746,3 +3746,19 @@ mgbyte MGG_OcclusionQuery_GetResult(MGG_GraphicsDevice* device, MGG_OcclusionQue
     pixelCount = static_cast<mgint>(result);
     return true;
 }
+
+MG_EXPORT void MGG_GraphicsDevice_GetNativeHandles(const MGG_GraphicsDevice* device, MGP_NativeGraphicsHandles* handles)
+{
+	if (!device || !handles)
+	{
+		return;
+	}
+
+	handles->Backend          = MGGraphicsBackend::OpenGL;
+	handles->Instance         = nullptr;    // OpenGL doesn't have an instance handle like Vulkan.
+	handles->PhysicalDevice   = nullptr;    // OpenGL doesn't expose a physical device.
+	handles->LogicalDevice    = static_cast<void*>(device->context.handle);
+	handles->Queue            = nullptr;    // OpenGL doesn't have queues.
+	handles->QueueFamilyIndex = 0;  // OpenGL doesn't have queue families.
+	handles->QueueIndex       = 0;
+}
