@@ -93,9 +93,6 @@ IDE/MonoDevelop/MonoDevelop.MonoGame/templates/Common/MonoGame.Framework.dll.con
 .xmake
 vsxmake2022
 
-# docfx
-_*
-
 # Premake generated files
 /native/**/*.sln
 /native/**/*.csproj
