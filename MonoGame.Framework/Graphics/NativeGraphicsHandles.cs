@@ -8,7 +8,8 @@ namespace Microsoft.Xna.Framework.Graphics;
 
 /// <summary>
 /// Contains native graphics API handles for XR or other external interop.
-/// <see cref="PhysicalDevice"/>, <see cref="LogicalDevice"/> and <see cref="Queue"/> are always populated for the native backends (Vulkan and DX12).
+/// <see cref="LogicalDevice"/> is populated for all native backends.
+/// <see cref="PhysicalDevice"/> and <see cref="Queue"/> are populated for <see cref="GraphicsBackend.Vulkan"/> and <see cref="GraphicsBackend.DirectX12"/>.
 /// Other fields depend on <see cref="Backend"/>.
 /// </summary>
 public readonly struct NativeGraphicsHandles
@@ -43,6 +44,7 @@ public readonly struct NativeGraphicsHandles
     /// <remarks>
     /// Vulkan: <c>VkDevice</c> handle.
     /// DX12: <c>ID3D12Device*</c>.
+    /// OpenGL: <c>SDL_GLContext</c> (platform OpenGL context handle, e.g. <c>HGLRC</c>, <c>GLXContext</c>, or <c>NSOpenGLContext</c>).
     /// Others: Zero.
     /// </remarks>
     public readonly nint LogicalDevice;

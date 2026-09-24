@@ -9,6 +9,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using NUnit.Framework;
+using MonoGame.Framework.Utilities;
 #if DESKTOPGL
 using MonoGame.OpenGL;
 #endif
@@ -949,5 +950,36 @@ namespace MonoGame.Tests.Graphics
 
             Assert.IsTrue(rtc.IsDisposed);
         }
+
+#if VULKAN || DIRECTX12 || DESKTOPGL4
+        [Test]
+        public void GetNativeHandles_ReturnsExpectedHandles()
+        {
+            var handles = gd.GetNativeHandles();
+
+            Assert.AreNotEqual(IntPtr.Zero, handles.LogicalDevice);
+
+#if DESKTOPGL4
+            Assert.AreEqual(GraphicsBackend.OpenGL, handles.Backend);
+            Assert.AreEqual(IntPtr.Zero, handles.PhysicalDevice);
+            Assert.AreEqual(IntPtr.Zero, handles.Instance);
+            Assert.AreEqual(IntPtr.Zero, handles.Queue);
+            Assert.AreEqual(0, handles.QueueFamilyIndex);
+            Assert.AreEqual(0, handles.QueueIndex);
+#elif VULKAN
+            Assert.AreEqual(GraphicsBackend.Vulkan, handles.Backend);
+            Assert.AreNotEqual(IntPtr.Zero, handles.PhysicalDevice);
+            Assert.AreNotEqual(IntPtr.Zero, handles.Instance);
+            Assert.AreNotEqual(IntPtr.Zero, handles.Queue);
+#elif DIRECTX12
+            Assert.AreEqual(GraphicsBackend.DirectX12, handles.Backend);
+            Assert.AreNotEqual(IntPtr.Zero, handles.PhysicalDevice);
+            Assert.AreEqual(IntPtr.Zero, handles.Instance);
+            Assert.AreNotEqual(IntPtr.Zero, handles.Queue);
+            Assert.AreEqual(0, handles.QueueFamilyIndex);
+            Assert.AreEqual(0, handles.QueueIndex);
+#endif
+        }
+#endif
     }
 }

@@ -639,8 +639,8 @@ public partial class GraphicsDevice
 
     /// <summary>
     /// Retrieves the native graphics API handles for XR or external interop.
-    /// <see cref="NativeGraphicsHandles.PhysicalDevice"/>, <see cref="NativeGraphicsHandles.LogicalDevice"/> and <see cref="NativeGraphicsHandles.Queue"/>
-    /// are always populated for the native backends.
+    /// <see cref="NativeGraphicsHandles.LogicalDevice"/> is populated for all native backends.
+    /// <see cref="NativeGraphicsHandles.PhysicalDevice"/> and <see cref="NativeGraphicsHandles.Queue"/> are populated for <see cref="GraphicsBackend.Vulkan"/> and <see cref="GraphicsBackend.DirectX12"/>.
     /// Check <see cref="NativeGraphicsHandles.Backend"/> for backend-specific field availability.
     /// </summary>
     public unsafe NativeGraphicsHandles GetNativeHandles()
