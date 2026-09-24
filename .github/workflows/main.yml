@@ -158,6 +158,7 @@ jobs:
           dotnet run --project build/Build.csproj -- --target=Default
         env:
           DOTNET_SYSTEM_NET_SECURITY_NOREVOCATIONCHECKBYDEFAULT: 1 # android compilation is failing randomly due to downloads from microsofts website during it
+          CI: true
 
       - name: Build
         if: runner.os == 'Linux' && runner.arch == 'ARM64'
@@ -167,6 +168,7 @@ jobs:
           dotnet run --project build/Build.csproj -- --target="Build Content Pipeline"
         env:
           DOTNET_SYSTEM_NET_SECURITY_NOREVOCATIONCHECKBYDEFAULT: 1 # android compilation is failing randomly due to downloads from microsofts website during it
+          CI: true
           
       - name: Run Tools Tests
         if: runner.os != 'Linux' || runner.arch != 'ARM64'
@@ -180,6 +182,7 @@ jobs:
           fi
         env:
           CI: true
+          DisableNativeBuild: true
         shell: bash
 
       - name: Setup DotNet on MacOS for DotNet 9
