@@ -3,6 +3,7 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System;
+using System.Linq;
 using MonoGame.Framework;
 using NUnit.Framework;
 
@@ -40,13 +41,16 @@ namespace MonoGame.Tests.Framework
         [Test]
         public void PlatformConfiguration_EnumValues_HaveMatchingValuesInInterop()
         {
-            var managedNames = Enum.GetNames<PlatformConfiguration.Key>();
-            var interopNames = Enum.GetNames<Interop.PlatformConfigKey>();
-            CollectionAssert.AreEqual(managedNames, interopNames);
+            var managedKeys = Enum.GetValues<PlatformConfiguration.Key>();
+            var interopKeys = Enum.GetValues<Interop.PlatformConfigKey>();
 
-            var managedValues = Array.ConvertAll(Enum.GetValues<PlatformConfiguration.Key>(), k => (int)k);
-            var interopValues = Array.ConvertAll(Enum.GetValues<Interop.PlatformConfigKey>(), k => (int)k);
-            CollectionAssert.AreEqual(managedValues, interopValues);
+            CollectionAssert.AreEqual(
+                managedKeys.Select(k => k.ToString()),
+                interopKeys.Select(k => k.ToString()));
+
+            CollectionAssert.AreEqual(
+                managedKeys.Select(k => (int)k),
+                interopKeys.Select(k => (int)k));
         }
 #endif
     }
