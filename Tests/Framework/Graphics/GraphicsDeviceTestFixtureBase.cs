@@ -30,7 +30,7 @@ namespace MonoGame.Tests.Graphics
             // In particular we're using this to lower the memory
             // usage of the D3D12 backend for our unit test runner machine.
             //
-            PlatformConfiguration.Set(PlatformConfigKey.Dx12PreferredBlockSize, 4 * 1024 * 1024);
+            PlatformConfiguration.Set(PlatformConfiguration.Key.Dx12PreferredBlockSize, 4 * 1024 * 1024);
 #endif
         }
 

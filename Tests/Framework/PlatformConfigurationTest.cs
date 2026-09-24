@@ -2,6 +2,7 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
+using System;
 using MonoGame.Framework;
 using NUnit.Framework;
 
@@ -10,18 +11,40 @@ namespace MonoGame.Tests.Framework
     [TestFixture]
     public class PlatformConfigurationTest
     {
+#if VULKAN || DIRECTX12 || DESKTOPGL4
         [Test]
-        public void TestPlatformConfigurationSetDoesNotThrow()
+        public void PlatformConfiguration_SetWithValidValue_DoesNotThrow()
         {
             Assert.DoesNotThrow(() =>
             {
-                PlatformConfiguration.Set(PlatformConfigKey.VulkanUniformRingbufferSize, 64 * 1024 * 1024);
-                PlatformConfiguration.Set(PlatformConfigKey.VulkanDescriptorPoolSize, 8192);
-                PlatformConfiguration.Set(PlatformConfigKey.VulkanInstanceExtensions, "VK_KHR_external_memory_capabilities");
-                PlatformConfiguration.Set(PlatformConfigKey.VulkanDeviceExtensions, "VK_KHR_external_memory");
-                PlatformConfiguration.Set(PlatformConfigKey.Dx12PreferredBlockSize, 8 * 1024 * 1024);
-                PlatformConfiguration.Set(PlatformConfigKey.Dx12MaxUploadBufferPoolSize, 64);
+                PlatformConfiguration.Set(PlatformConfiguration.Key.VulkanUniformRingbufferSize, 64 * 1024 * 1024);
+                PlatformConfiguration.Set(PlatformConfiguration.Key.VulkanDescriptorPoolSize, 8192);
+                PlatformConfiguration.Set(PlatformConfiguration.Key.VulkanInstanceExtensions, "VK_KHR_external_memory_capabilities");
+                PlatformConfiguration.Set(PlatformConfiguration.Key.VulkanDeviceExtensions, "VK_KHR_external_memory");
+                PlatformConfiguration.Set(PlatformConfiguration.Key.Dx12PreferredBlockSize, 8 * 1024 * 1024);
+                PlatformConfiguration.Set(PlatformConfiguration.Key.Dx12MaxUploadBufferPoolSize, 64);
             });
         }
+#endif
+
+        [Test]
+        public void PlatformConfiguration_SetWithInvalidValue_DoesNotThrow()
+        {
+            Assert.DoesNotThrow(() =>
+            {
+                PlatformConfiguration.Set((PlatformConfiguration.Key)int.MaxValue, 64 * 1024 * 1024);
+            });
+        }
+
+#if VULKAN || DIRECTX12 || DESKTOPGL4
+        [Test]
+        public void PlatformConfiguration_EnumValues_HaveMatchingValuesInInterop()
+        {
+            var managedEnumValues = Enum.GetValues<PlatformConfiguration.Key>();
+            var interopEnumValues = Enum.GetValues<Interop.PlatformConfigKey>();
+
+            CollectionAssert.AreEqual(managedEnumValues, interopEnumValues);
+        }
+#endif
     }
 }

@@ -4,8 +4,19 @@
 
 using MonoGame.Framework;
 using System.Runtime.InteropServices;
+using static MonoGame.Framework.PlatformConfiguration;
 
 namespace MonoGame.Interop;
+
+internal enum PlatformConfigKey
+{
+    VulkanInstanceExtensions = 1,
+    VulkanDeviceExtensions = 2,
+    VulkanUniformRingbufferSize = 3,
+    VulkanDescriptorPoolSize = 4,
+    Dx12PreferredBlockSize = 5,
+    Dx12MaxUploadBufferPoolSize = 6,
+}
 
 internal static unsafe partial class MGC
 {
