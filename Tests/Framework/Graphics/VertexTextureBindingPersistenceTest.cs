@@ -14,8 +14,8 @@ namespace MonoGame.Tests.Graphics
     /// Verifies that a vertex-stage texture fetch (VTF) keeps working across frame
     /// boundaries.
     /// </summary>
-    [TestFixture]
     [NonParallelizable]
+    [RunOnUiTestFixture]
     internal class VertexTextureBindingPersistenceTest : GraphicsDeviceTestFixtureBase
     {
         private const int Frames = 6;
