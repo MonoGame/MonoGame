@@ -3,10 +3,10 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System;
-using Android.App;
-using Android.Content;
-using Android.OS;
-using Android.Views;
+using global::Android.App;
+using global::Android.Content;
+using global::Android.OS;
+using global::Android.Views;
 
 namespace Microsoft.Xna.Framework
 {
@@ -47,7 +47,7 @@ namespace Microsoft.Xna.Framework
 
         public static event EventHandler Paused;
 
-		public override void OnConfigurationChanged (Android.Content.Res.Configuration newConfig)
+		public override void OnConfigurationChanged (global::Android.Content.Res.Configuration newConfig)
 		{
 			// we need to refresh the viewport here.
 			base.OnConfigurationChanged (newConfig);
