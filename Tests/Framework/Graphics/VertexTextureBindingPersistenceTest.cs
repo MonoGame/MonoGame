@@ -15,6 +15,7 @@ namespace MonoGame.Tests.Graphics
     /// boundaries.
     /// </summary>
     [TestFixture]
+    [NonParallelizable]
     internal class VertexTextureBindingPersistenceTest : GraphicsDeviceTestFixtureBase
     {
         private const int Frames = 6;
