@@ -8,6 +8,11 @@
     <None Update="Host\index.html" Pack="true" PackagePath="buildTransitive\Host" />
     <None Update="Host\host.css" Pack="true" PackagePath="buildTransitive\Host" />
     <None Update="Host\monogame-web-host.js" Pack="true" PackagePath="buildTransitive\Host" />
+    <None Update="Host\browser-accelerometer.js" Pack="true" PackagePath="buildTransitive\Host" />
+    <None Update="Host\browser-audio.js" Pack="true" PackagePath="buildTransitive\Host" />
+    <None Update="Host\browser-content.js" Pack="true" PackagePath="buildTransitive\Host" />
+    <None Update="Host\browser-host-common.js" Pack="true" PackagePath="buildTransitive\Host" />
+    <None Update="Host\browser-window.js" Pack="true" PackagePath="buildTransitive\Host" />
     <None Update="Host\browser.runtimeconfig.template.json" Pack="true" PackagePath="buildTransitive\Host" />
 
     <Content Include="..\..\..\Artifacts\native\mgruntime\webgl2\browser-wasm\Release\libSDL2.a"

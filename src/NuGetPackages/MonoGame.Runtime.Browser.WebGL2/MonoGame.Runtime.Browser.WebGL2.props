@@ -14,6 +14,11 @@
     <MonoGameBrowserWebGL2HostIndexPath Condition="'$(MonoGameBrowserWebGL2HostIndexPath)' == '' and Exists('$(MSBuildThisFileDirectory)Host\index.html')">$(MSBuildThisFileDirectory)Host\index.html</MonoGameBrowserWebGL2HostIndexPath>
     <MonoGameBrowserWebGL2HostStylesheetPath Condition="'$(MonoGameBrowserWebGL2HostStylesheetPath)' == '' and Exists('$(MSBuildThisFileDirectory)Host\host.css')">$(MSBuildThisFileDirectory)Host\host.css</MonoGameBrowserWebGL2HostStylesheetPath>
     <MonoGameBrowserWebGL2HostScriptPath Condition="'$(MonoGameBrowserWebGL2HostScriptPath)' == '' and Exists('$(MSBuildThisFileDirectory)Host\monogame-web-host.js')">$(MSBuildThisFileDirectory)Host\monogame-web-host.js</MonoGameBrowserWebGL2HostScriptPath>
+    <MonoGameBrowserWebGL2HostAccelerometerScriptPath Condition="'$(MonoGameBrowserWebGL2HostAccelerometerScriptPath)' == '' and Exists('$(MSBuildThisFileDirectory)Host\browser-accelerometer.js')">$(MSBuildThisFileDirectory)Host\browser-accelerometer.js</MonoGameBrowserWebGL2HostAccelerometerScriptPath>
+    <MonoGameBrowserWebGL2HostAudioScriptPath Condition="'$(MonoGameBrowserWebGL2HostAudioScriptPath)' == '' and Exists('$(MSBuildThisFileDirectory)Host\browser-audio.js')">$(MSBuildThisFileDirectory)Host\browser-audio.js</MonoGameBrowserWebGL2HostAudioScriptPath>
+    <MonoGameBrowserWebGL2HostContentScriptPath Condition="'$(MonoGameBrowserWebGL2HostContentScriptPath)' == '' and Exists('$(MSBuildThisFileDirectory)Host\browser-content.js')">$(MSBuildThisFileDirectory)Host\browser-content.js</MonoGameBrowserWebGL2HostContentScriptPath>
+    <MonoGameBrowserWebGL2HostCommonScriptPath Condition="'$(MonoGameBrowserWebGL2HostCommonScriptPath)' == '' and Exists('$(MSBuildThisFileDirectory)Host\browser-host-common.js')">$(MSBuildThisFileDirectory)Host\browser-host-common.js</MonoGameBrowserWebGL2HostCommonScriptPath>
+    <MonoGameBrowserWebGL2HostWindowScriptPath Condition="'$(MonoGameBrowserWebGL2HostWindowScriptPath)' == '' and Exists('$(MSBuildThisFileDirectory)Host\browser-window.js')">$(MSBuildThisFileDirectory)Host\browser-window.js</MonoGameBrowserWebGL2HostWindowScriptPath>
     <MonoGamePlatform Condition="'$(RuntimeIdentifier)' == 'browser-wasm' and '$(MonoGamePlatform)' == ''">WebGL2</MonoGamePlatform>
     <UserRuntimeConfig Condition="'$(UserRuntimeConfig)' == '' and !Exists('$(MSBuildProjectDirectory)\runtimeconfig.template.json') and Exists('$(MSBuildThisFileDirectory)Host\browser.runtimeconfig.template.json')">$(MSBuildThisFileDirectory)Host\browser.runtimeconfig.template.json</UserRuntimeConfig>
     <EmccExtraLDFlags Condition="'$(RuntimeIdentifier)' == 'browser-wasm'">$(EmccExtraLDFlags) -sMIN_WEBGL_VERSION=2 -sMAX_WEBGL_VERSION=2 -sFULL_ES3=1</EmccExtraLDFlags>
@@ -33,6 +38,24 @@
 
   <ItemGroup Condition="'$(RuntimeIdentifier)' == 'browser-wasm' and '$(MonoGameBrowserWebGL2HostScriptPath)' != '' and !Exists('wwwroot\monogame-web-host.js')">
     <Content Include="$(MonoGameBrowserWebGL2HostScriptPath)" Link="wwwroot\monogame-web-host.js">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(RuntimeIdentifier)' == 'browser-wasm'">
+    <Content Include="$(MonoGameBrowserWebGL2HostAccelerometerScriptPath)" Link="wwwroot\browser-accelerometer.js" Condition="'$(MonoGameBrowserWebGL2HostAccelerometerScriptPath)' != '' and !Exists('wwwroot\browser-accelerometer.js')">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="$(MonoGameBrowserWebGL2HostAudioScriptPath)" Link="wwwroot\browser-audio.js" Condition="'$(MonoGameBrowserWebGL2HostAudioScriptPath)' != '' and !Exists('wwwroot\browser-audio.js')">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="$(MonoGameBrowserWebGL2HostContentScriptPath)" Link="wwwroot\browser-content.js" Condition="'$(MonoGameBrowserWebGL2HostContentScriptPath)' != '' and !Exists('wwwroot\browser-content.js')">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="$(MonoGameBrowserWebGL2HostCommonScriptPath)" Link="wwwroot\browser-host-common.js" Condition="'$(MonoGameBrowserWebGL2HostCommonScriptPath)' != '' and !Exists('wwwroot\browser-host-common.js')">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="$(MonoGameBrowserWebGL2HostWindowScriptPath)" Link="wwwroot\browser-window.js" Condition="'$(MonoGameBrowserWebGL2HostWindowScriptPath)' != '' and !Exists('wwwroot\browser-window.js')">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
