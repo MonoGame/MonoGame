@@ -16,13 +16,13 @@ mgint MGC_Config_GetDefaultInt(MGPlatformConfigKey key)
     switch (key)
     {
         case MGPlatformConfigKey::VulkanUniformRingbufferSize:
-            return 32 * 1024 * 1024;                    // 32 MiB (matches current hard-coded value)
+            return 32 * 1024 * 1024;    // 32 MiB (matches current hard-coded value)
         case MGPlatformConfigKey::VulkanDescriptorPoolSize:
-            return 16384;                               // Matches current DefaultPoolSize
+            return 16384;   // Matches current DefaultPoolSize
         case MGPlatformConfigKey::Dx12PreferredBlockSize:
-            return 0;                                   // 0 = keep D3D12MA default (64 MiB)
+            return 0;   // 0 = keep D3D12MA default (64 MiB)
         case MGPlatformConfigKey::Dx12MaxUploadBufferPoolSize:
-            return 32;                                  // Matches current MAX_BUFFER_POOL_SIZE
+            return 32;  // Matches current MAX_BUFFER_POOL_SIZE
         default:
             return 0;
     }
