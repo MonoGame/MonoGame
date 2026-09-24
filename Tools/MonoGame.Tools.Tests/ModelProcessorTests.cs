@@ -285,7 +285,6 @@ namespace MonoGame.Tests.ContentPipeline
         }
 
         [Test]
-        [Ignore ("Not working yet")]
         /// <summary>
         /// Test to validate a model with missing normals does not throw an exception using the default ModelProcessor.
         /// </summary>
@@ -296,7 +295,10 @@ namespace MonoGame.Tests.ContentPipeline
             var context = new TestImporterContext("TestObj", "TestBin");
             var nodeContent = importer.Import(level1fbx, context);
 
-            ModelProcessor processor = new ModelProcessor();
+            ModelProcessor processor = new ModelProcessor()
+            {
+                GenerateTangentFrames = true,
+            };
             var processorContext = new TestProcessorContext(TargetPlatform.Windows, "level1.xnb");
 
             ModelContent output = null;
@@ -309,7 +311,6 @@ namespace MonoGame.Tests.ContentPipeline
         }
 
         [Test]
-        [Ignore ("Not working yet")]
         /// <summary>
         /// Test to validate a model with missing normals does not throw an exception using a custom ModelProcessor using MeshHelper.CalculateTangentFrames directly.
         /// </summary>
@@ -320,7 +321,10 @@ namespace MonoGame.Tests.ContentPipeline
             var context = new TestImporterContext("TestObj", "TestBin");
             var nodeContent = importer.Import(level1fbx, context);
 
-            NormalMappingModelProcessor processor = new NormalMappingModelProcessor();
+            NormalMappingModelProcessor processor = new NormalMappingModelProcessor()
+            {
+                GenerateTangentFrames = true,
+            };
             var processorContext = new TestProcessorContext(TargetPlatform.Windows, "level1_costum.xnb");
 
             ModelContent output = null;

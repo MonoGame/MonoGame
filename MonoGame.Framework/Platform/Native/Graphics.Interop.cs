@@ -62,6 +62,44 @@ internal struct MGG_GraphicsDevice_Caps
     public int MaxVertexTextureSlots;
     public int MaxVertexBufferSlots;
     public int ShaderProfile;
+    public int MaxTextureAnisotropy;
+    public int MaxMultiSampleCount;
+    [MarshalAs(UnmanagedType.I1)]
+    public bool SupportsNonPowerOfTwo;
+    [MarshalAs(UnmanagedType.I1)]
+    public bool SupportsTextureFilterAnisotropic;
+    [MarshalAs(UnmanagedType.I1)]
+    public bool SupportsDepth24;
+    [MarshalAs(UnmanagedType.I1)]
+    public bool SupportsPackedDepthStencil;
+    [MarshalAs(UnmanagedType.I1)]
+    public bool SupportsDepthNonLinear;
+    [MarshalAs(UnmanagedType.I1)]
+    public bool SupportsTextureMaxLevel;
+    [MarshalAs(UnmanagedType.I1)]
+    public bool SupportsDxt1;
+    [MarshalAs(UnmanagedType.I1)]
+    public bool SupportsS3tc;
+    [MarshalAs(UnmanagedType.I1)]
+    public bool SupportsSRgb;
+    [MarshalAs(UnmanagedType.I1)]
+    public bool SupportsDepthClamp;
+    [MarshalAs(UnmanagedType.I1)]
+    public bool SupportsTextureArrays;
+    [MarshalAs(UnmanagedType.I1)]
+    public bool SupportsVertexTextures;
+    [MarshalAs(UnmanagedType.I1)]
+    public bool SupportsFloatTextures;
+    [MarshalAs(UnmanagedType.I1)]
+    public bool SupportsHalfFloatTextures;
+    [MarshalAs(UnmanagedType.I1)]
+    public bool SupportsNormalized;
+    [MarshalAs(UnmanagedType.I1)]
+    public bool SupportsInstancing;
+    [MarshalAs(UnmanagedType.I1)]
+    public bool SupportsBaseIndexInstancing;
+    [MarshalAs(UnmanagedType.I1)]
+    public bool SupportsSeparateBlendStates;
 }
 
 [StructLayout(LayoutKind.Sequential)]
@@ -161,7 +199,7 @@ internal static unsafe partial class MGG
 
     #region Graphics System
 
-    
+
     [DllImport(MGP.MonoGameNativeDLL, EntryPoint = "MGG_GraphicsSystem_Create", ExactSpelling = true)]
     public static extern MGG_GraphicsSystem* GraphicsSystem_Create();
 
@@ -191,8 +229,11 @@ internal static unsafe partial class MGG
     [DllImport(MGP.MonoGameNativeDLL, EntryPoint = "MGG_GraphicsDevice_GetCaps", ExactSpelling = true)]
     public static extern void GraphicsDevice_GetCaps(MGG_GraphicsDevice* device, out MGG_GraphicsDevice_Caps caps);
 
+    [DllImport(MGP.MonoGameNativeDLL, EntryPoint = "MGG_GraphicsDevice_GetBackBufferMultiSampleCount", ExactSpelling = true)]
+    public static extern int GraphicsDevice_GetBackBufferMultiSampleCount(MGG_GraphicsDevice* device);
+
     [DllImport(MGP.MonoGameNativeDLL, EntryPoint = "MGG_GraphicsDevice_ResizeSwapchain", ExactSpelling = true)]
-    public static extern void GraphicsDevice_ResizeSwapchain(
+    public static extern byte GraphicsDevice_ResizeSwapchain(
         MGG_GraphicsDevice* device,
         nint nativeWindowHandle,
         int width,
@@ -226,7 +267,7 @@ internal static unsafe partial class MGG
         ref int y,
         ref int width,
         ref int height);
-    
+
     [DllImport(MGP.MonoGameNativeDLL, EntryPoint = "MGG_GraphicsDevice_SetViewport", ExactSpelling = true)]
     public static extern void GraphicsDevice_SetViewport(
         MGG_GraphicsDevice* device,
