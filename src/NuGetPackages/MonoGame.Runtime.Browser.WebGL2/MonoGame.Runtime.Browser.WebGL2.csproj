@@ -5,8 +5,6 @@
     <None Include="WebInterop.cs" Pack="true" PackagePath="buildTransitive" />
     <None Include="MonoGame.Runtime.Browser.WebGL2.props" Pack="true" PackagePath="buildTransitive" />
     <None Include="MonoGame.Runtime.Browser.WebGL2.targets" Pack="true" PackagePath="buildTransitive" />
-    <None Update="Host\index.html" Pack="true" PackagePath="buildTransitive\Host" />
-    <None Update="Host\host.css" Pack="true" PackagePath="buildTransitive\Host" />
     <None Update="Host\monogame-web-host.js" Pack="true" PackagePath="buildTransitive\Host" />
     <None Update="Host\browser-accelerometer.js" Pack="true" PackagePath="buildTransitive\Host" />
     <None Update="Host\browser-audio.js" Pack="true" PackagePath="buildTransitive\Host" />

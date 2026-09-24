@@ -61,26 +61,23 @@ class MonoGameWebHost {
     }
 
     /**
-     * Combines package defaults with project configuration, preferring `data-*` values on the host element.
+     * Gets the host configuration from the application's host element.
      *
-     * @param {HTMLElement} root Host element that supplies package configuration.
+     * @param {HTMLElement} root Host element that supplies configuration.
      * @returns {BrowserHostConfiguration} Configuration used to initialize the host.
      */
     readConfig(root) {
         const dataset = root.dataset;
-        const runtimeConfiguration = globalThis.MonoGameWebHostConfiguration ?? {};
         return {
             applicationName: dataset.applicationName || "MonoGame.Web",
             canvasId: dataset.canvasId || "canvas",
             contentBaseUri: dataset.contentBaseUri || "./",
             startupContentManifestUri: dataset.startupContentManifestUri || "Content/content-manifest.txt",
             statusId: dataset.statusId || "monogame-host-status",
-            runtimeScriptUri: this.getOptionalConfigValue(dataset.runtimeScriptUri) ?? this.getOptionalConfigValue(runtimeConfiguration.runtimeScriptUri),
-            hostExportsTypeName: this.getOptionalConfigValue(dataset.hostExportsTypeName) ?? this.getOptionalConfigValue(runtimeConfiguration.hostExportsTypeName),
-            mainAssemblyName: this.getOptionalConfigValue(dataset.mainAssemblyName) ?? this.getOptionalConfigValue(runtimeConfiguration.mainAssemblyName),
-            canvasResizePolicy: this.getCanvasResizePolicy(
-                this.getOptionalConfigValue(dataset.canvasResizePolicy)
-                ?? this.getOptionalConfigValue(runtimeConfiguration.canvasResizePolicy))
+            runtimeScriptUri: this.getOptionalConfigValue(dataset.runtimeScriptUri),
+            hostExportsTypeName: this.getOptionalConfigValue(dataset.hostExportsTypeName),
+            mainAssemblyName: this.getOptionalConfigValue(dataset.mainAssemblyName),
+            canvasResizePolicy: this.getCanvasResizePolicy(this.getOptionalConfigValue(dataset.canvasResizePolicy))
         };
     }
 
@@ -173,7 +170,7 @@ class MonoGameWebHost {
      */
     async initializeManagedRuntimeAsync() {
         this.logStage(HostStage.WasmLoad, "Loading managed runtime.");
-        const runtimeModule = await import(this.config.runtimeScriptUri);
+        const runtimeModule = await import(new URL(this.config.runtimeScriptUri, document.baseURI).toString());
         const dotnet = runtimeModule.dotnet ?? globalThis.dotnet;
         if (dotnet == null) {
             throw new BrowserHostStartupError(HostStage.WasmLoad, "dotnet_runtime_missing", "The configured runtime script did not expose a dotnet runtime entry.");
