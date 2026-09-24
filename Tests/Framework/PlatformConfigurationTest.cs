@@ -40,10 +40,13 @@ namespace MonoGame.Tests.Framework
         [Test]
         public void PlatformConfiguration_EnumValues_HaveMatchingValuesInInterop()
         {
-            var managedEnumValues = Enum.GetValues<PlatformConfiguration.Key>();
-            var interopEnumValues = Enum.GetValues<Interop.PlatformConfigKey>();
+            var managedNames = Enum.GetNames<PlatformConfiguration.Key>();
+            var interopNames = Enum.GetNames<Interop.PlatformConfigKey>();
+            CollectionAssert.AreEqual(managedNames, interopNames);
 
-            CollectionAssert.AreEqual(managedEnumValues, interopEnumValues);
+            var managedValues = Array.ConvertAll(Enum.GetValues<PlatformConfiguration.Key>(), k => (int)k);
+            var interopValues = Array.ConvertAll(Enum.GetValues<Interop.PlatformConfigKey>(), k => (int)k);
+            CollectionAssert.AreEqual(managedValues, interopValues);
         }
 #endif
     }
