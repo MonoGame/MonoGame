@@ -163,43 +163,58 @@ namespace MonoGame.Tests.ContentPipeline
             }
         }
 
-        // When kerning is disabled, the space character's advance width should be preserved in the kerning array.
+        // When kerning is disabled, match the space glyph width emitted by XNA-built SpriteFonts.
         // See: https://github.com/monogame/monogame/issues/4027
         [Test]
-        public void BuildFontFromDescription_WhenKerningDisabled_PreservesSpaceAdvance()
+        public void BuildFontFromDescription_WhenKerningDisabled_MatchesXnaSpaceWidth()
         {
-
-            FontDescription withKerning = null;
-            using (var input = XmlReader.Create(new StringReader(ArialFont)))
-                withKerning = IntermediateSerializer.Deserialize<FontDescription>(input, "");
-
-
             FontDescription withoutKerning = null;
             using (var input = XmlReader.Create(new StringReader(ArialFontWithoutKerning)))
                 withoutKerning = IntermediateSerializer.Deserialize<FontDescription>(input, "");
 
             using TestProcessorContext context = new TestProcessorContext(TargetPlatform.Windows, "Arial.xnb");
             var processor = new FontDescriptionProcessor();
-            SpriteFontContent withKerningContnet = processor.Process(withKerning, context);
             SpriteFontContent withoutKerningContent = processor.Process(withoutKerning, context);
 
-            int spaceIndex = withKerningContnet.CharacterMap.IndexOf(' ');
-
-            Vector3 spaceWithKerning = withKerningContnet.Kerning[spaceIndex];
+            int spaceIndex = withoutKerningContent.CharacterMap.IndexOf(' ');
             Vector3 spaceWithoutKerning = withoutKerningContent.Kerning[spaceIndex];
 
-            // Kerning stores the glyph advance as three parts:
-            // X = left side bearing
-            // Y = glyph width
-            // Z = right side bearing
-            //
-            // With kerning enabled, space can be split across those components,
-            // for example (1, 8, 0). With kerning disabled, MonoGame flattens the
-            // full advance into Y, so the equivalent result becomes (0, 9, 0).
-            float expectedSpaceWidth = spaceWithKerning.X + spaceWithKerning.Y + spaceWithKerning.Z;
+            Assert.That(spaceWithoutKerning.Y, Is.EqualTo(9.0f));
 
-            Assert.That(spaceWithoutKerning.Y, Is.EqualTo(expectedSpaceWidth));
+        }
 
+        // See: https://github.com/MonoGame/MonoGame/issues/6545
+        [Test]
+        public void BuildFontFromDescription_MetricOnlyGlyph_HasNeutralCropping()
+        {
+            FontDescription fontDescription = null;
+            using (var input = XmlReader.Create(new StringReader(ArialFont)))
+                fontDescription = IntermediateSerializer.Deserialize<FontDescription>(input, "");
+
+            using TestProcessorContext context = new TestProcessorContext(TargetPlatform.Windows, "Arial.xnb");
+            FontDescriptionProcessor processor = new FontDescriptionProcessor();
+            SpriteFontContent output = processor.Process(fontDescription, context);
+
+            int spaceIndex = output.CharacterMap.IndexOf(' ');
+
+            Assert.That(output.Cropping[spaceIndex], Is.EqualTo(new Rectangle(0, 0, 1, 1)));
+        }
+
+        // See: https://github.com/MonoGame/MonoGame/issues/6618
+        [Test]
+        public void BuildFontFromDescription_MetricOnlyGlyph_UsesOnePixelWidth()
+        {
+            FontDescription fontDescription = null;
+            using (var input = XmlReader.Create(new StringReader(ArialFont)))
+                fontDescription = IntermediateSerializer.Deserialize<FontDescription>(input, "");
+
+            using TestProcessorContext context = new TestProcessorContext(TargetPlatform.Windows, "Arial.xnb");
+            FontDescriptionProcessor processor = new FontDescriptionProcessor();
+            SpriteFontContent output = processor.Process(fontDescription, context);
+
+            int spaceIndex = output.CharacterMap.IndexOf(' ');
+
+            Assert.That(output.Kerning[spaceIndex].Y, Is.EqualTo(1.0f));
         }
 
         static string ArialFont = @"<?xml version=""1.0"" encoding=""utf-8""?>
