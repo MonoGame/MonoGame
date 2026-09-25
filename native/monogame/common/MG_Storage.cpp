@@ -15,6 +15,9 @@
 #else
 #include <sys/stat.h>
 #include <sys/types.h>
+#include <sys/statvfs.h>
+#include <dirent.h>
+#include <unistd.h>
 #include <fts.h>
 #define MAX_PATH PATH_MAX
 #define FILE_PERMISSIONS 0777
@@ -124,7 +127,7 @@ static bool _MG_Storage_DeleteDirectory(const char* path)
 #else
 
     // Walks the directory tree calling remove for each file then directory.
-    int ok = nftw(tmp, _mg_remove, 20, FTW_DEPTH | FTW_PHYS);
+    int ok = nftw(path, _mg_remove, 20, FTW_DEPTH | FTW_PHYS);
     if (ok == 0)
         return true;
 
@@ -153,8 +156,76 @@ static bool _MG_Storage_CopyDirectory(const char* source, const char* dest)
         return true;
 
 #else
-#error NOT IMPLEMENTED!
-     // TODO: Use nftw and open/read/write/close to copy files.
+
+    if (!_MG_CreateDirectory(dest))
+        return false;
+
+    DIR* h = opendir(source);
+    if (h == nullptr)
+        return false;
+
+    while (true)
+    {
+        struct dirent* e;
+        e = readdir(h);
+        if (e == nullptr)
+            break;
+
+        std::string name = e->d_name;
+        if (name == "." || name == "..")
+            continue;
+
+        std::string spath = source;
+        spath += name;
+
+        std::string dpath = dest;
+        dpath += name;
+
+        if (e->d_type & DT_DIR)
+        {
+            spath += "/";
+            dpath += "/";
+
+            _MG_Storage_CopyDirectory(spath.c_str(), dpath.c_str());
+            continue;
+        }
+
+        // Copy the source file to the des
+
+        const int BUFFER_SIZE = 1024 * 1024;
+        char* buffer = new char[BUFFER_SIZE];
+        FILE* sf = fopen(spath.c_str(), "rb");
+        if (sf == nullptr)
+        {
+            // Copy failed!
+            closedir(h);
+            return false;
+        }
+
+        FILE* df = fopen(dpath.c_str(), "wb");
+        if (df == nullptr)
+        {
+            // Copy failed!
+            fclose(sf);
+            closedir(h);
+            return false;
+        }
+
+        while (true)
+        {
+            int read = fread(buffer, 1, BUFFER_SIZE, sf);
+            if (read <= 0)
+                break;
+
+            fwrite(buffer, 1, read, df);
+        }
+
+        fclose(df);
+        fclose(sf);
+    }
+
+    closedir(h);
+
 #endif
 
     return false;
@@ -282,8 +353,15 @@ mglong MG_Storage_GetTotalSpace(MG_StorageDevice* device)
 
     return total;
 #else
-#error NOT IMPLEMENTED!
-    return 0;
+
+    struct statvfs s;
+    int ok = statvfs(device->root.c_str(), &s);
+    if (ok != 0)
+        return 0;
+
+    uint64_t total_space = (uint64_t)s.f_blocks * s.f_frsize;
+    return total_space;
+
 #endif
 }
 
@@ -304,8 +382,13 @@ mglong MG_Storage_GetFreeSpace(MG_StorageDevice* device)
 
     return free;
 #else
-#error NOT IMPLEMENTED!
-    return 0;
+    struct statvfs s;
+    int ok = statvfs(device->root.c_str(), &s);
+    if (ok != 0)
+        return 0;
+
+    uint64_t free_space = (uint64_t)s.f_bfree * s.f_frsize;
+    return free_space;
 #endif
 }
 
@@ -591,7 +674,13 @@ mgbool MG_Storage_FileDelete(MG_StorageContainer* container, const char* name)
     _MG_Storage_MakeCommitPath(container, path, name);
 
 #if _WIN32
-    return ::DeleteFileA(path);
+    bool result = ::DeleteFileA(path);
+    if (result)
+        return true;
+
+    DWORD err = GetLastError();
+    if (err == ERROR_FILE_NOT_FOUND)
+        return true;
 #else
     int err = unlink(path);
     if (err == 0)
