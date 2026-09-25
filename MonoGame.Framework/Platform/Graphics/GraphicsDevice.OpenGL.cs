@@ -119,7 +119,7 @@ namespace Microsoft.Xna.Framework.Graphics
         private static BufferBindingInfo[] _bufferBindingInfos;
         private static int _activeBufferBindingInfosCount;
         private static bool[] _newEnabledVertexAttributes;
-        internal static readonly List<int> _enabledVertexAttributes = new List<int>();
+        internal static bool[] _enabledVertexAttributes;
         internal static bool _attribsDirty;
 
         internal FramebufferHelper framebufferHelper;
@@ -159,15 +159,15 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             for (var x = 0; x < attrs.Length; x++)
             {
-                if (attrs[x] && !_enabledVertexAttributes.Contains(x))
+                if (attrs[x] && !_enabledVertexAttributes[x])
                 {
-                    _enabledVertexAttributes.Add(x);
+                    _enabledVertexAttributes[x] = true;
                     GL.EnableVertexAttribArray(x);
                     GraphicsExtensions.CheckGLError();
                 }
-                else if (!attrs[x] && _enabledVertexAttributes.Contains(x))
+                else if (!attrs[x] && _enabledVertexAttributes[x])
                 {
-                    _enabledVertexAttributes.Remove(x);
+                    _enabledVertexAttributes[x] = false;
                     GL.DisableVertexAttribArray(x);
                     GraphicsExtensions.CheckGLError();
                 }
@@ -269,6 +269,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
             _maxVertexBufferSlots = MaxVertexAttributes;
             _newEnabledVertexAttributes = new bool[MaxVertexAttributes];
+            _enabledVertexAttributes = new bool[MaxVertexAttributes];
 
 
             // try getting the context version
@@ -341,7 +342,7 @@ namespace Microsoft.Xna.Framework.Graphics
             _viewport = new Viewport(0, 0, PresentationParameters.BackBufferWidth, PresentationParameters.BackBufferHeight);
 
             // Ensure the vertex attributes are reset
-            _enabledVertexAttributes.Clear();
+            Array.Clear(_enabledVertexAttributes, 0, _enabledVertexAttributes.Length); 
 
             // Free all the cached shader programs. 
             _programCache.Clear();
