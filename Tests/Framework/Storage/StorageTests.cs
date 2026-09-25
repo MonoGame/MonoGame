@@ -1,9 +1,15 @@
-﻿using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Storage;
-using NUnit.Framework;
+﻿// MonoGame - Copyright (C) MonoGame Foundation, Inc
+// This file is subject to the terms and conditions defined in
+// file 'LICENSE.txt', which is part of this source code package.
+
+#if NATIVE
+
 using System;
 using System.IO;
 using System.Linq;
+using NUnit.Framework;
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Storage;
 
 namespace MonoGame.Tests.Framework
 {
@@ -316,3 +322,5 @@ namespace MonoGame.Tests.Framework
         }
     }
 }
+
+#endif

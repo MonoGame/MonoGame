@@ -13,7 +13,7 @@
 #include <shellapi.h>
 #include <shlobj.h>
 #else
-
+#error NOT IMPLEMENTED!
 #endif
 
 
@@ -81,6 +81,7 @@ static bool _MG_CreateDirectory(const char* directory)
     if (ok == ERROR_FILE_EXISTS || ok == ERROR_ALREADY_EXISTS)
         return true;
 #else
+#error NOT IMPLEMENTED!
 #endif
 
     return false;
@@ -103,9 +104,7 @@ static bool _MG_Storage_DeleteDirectory(const char* path)
         return true;
 
 #else
-
-#error Fix me!
-
+#error NOT IMPLEMENTED!
 #endif
 
     return false;
@@ -131,9 +130,7 @@ static bool _MG_Storage_CopyDirectory(const char* source, const char* dest)
         return true;
 
 #else
-
-#error Fix me!
-
+#error NOT IMPLEMENTED!
 #endif
 
     return false;
@@ -159,9 +156,7 @@ static bool _MG_Storage_RenameDirectory(const char* source, const char* dest)
         return true;
 
 #else
-
-#error Fix me!
-
+#error NOT IMPLEMENTED!
 #endif
 
     return false;
@@ -182,9 +177,7 @@ static bool _MG_Storage_DirectoryExists(const char* path)
         return true;
 
 #else
-
-#error FIX ME!
-
+#error NOT IMPLEMENTED!
 #endif
 
     return false;
@@ -205,8 +198,9 @@ MG_StorageDevice* MG_Storage_OpenDevice(const char* titleName, mgint playerIndex
     WideCharToMultiByte(CP_UTF8, 0, pszMyDocuments, -1, temp, MAX_PATH, NULL, NULL);
 
     root = temp;
-#else
 
+#else
+#error NOT IMPLEMENTED!
 #endif
 
     MG_StorageDevice* device = new MG_StorageDevice();
@@ -250,6 +244,7 @@ mglong MG_Storage_GetTotalSpace(MG_StorageDevice* device)
 
     return total;
 #else
+#error NOT IMPLEMENTED!
     return 0;
 #endif
 }
@@ -271,6 +266,7 @@ mglong MG_Storage_GetFreeSpace(MG_StorageDevice* device)
 
     return free;
 #else
+#error NOT IMPLEMENTED!
     return 0;
 #endif
 }
@@ -318,6 +314,8 @@ mgbool MG_Storage_DeleteContainer(MG_StorageDevice* device, const char* name)
 
     std::string root = device->root;
     root += name;
+
+    // This is an atomic operation, so just do it.
 
     return _MG_Storage_DeleteDirectory(root.data());
 }
@@ -410,7 +408,7 @@ static bool MG_EnumerateContent(MG_StorageContainer* container, const char* dire
     return true;
 }
 #else
-
+#error NOT IMPLEMENTED!
 #endif
 
 void MG_Storage_EnumerateContent(MG_StorageContainer* container, mgbyte**& filesAndDirectories, mgint& size)
@@ -424,11 +422,7 @@ void MG_Storage_EnumerateContent(MG_StorageContainer* container, mgbyte**& files
     container->content.clear();
     container->results.clear();
 
-#if defined(_WIN32)
     MG_EnumerateContent(container, container->root.c_str());
-#else
-
-#endif
 
     size = container->content.size();
     container->results.resize(size);
@@ -515,13 +509,9 @@ mgbool MG_Storage_FileDelete(MG_StorageContainer* container, const char* name)
     _MG_Storage_MakeCommitPath(container, path, name);
 
 #if _WIN32
-
     return ::DeleteFileA(path);
-
 #else
-
-#error FIX ME!
-
+#error NOT IMPLEMENTED!
     return false;
 #endif
 }
