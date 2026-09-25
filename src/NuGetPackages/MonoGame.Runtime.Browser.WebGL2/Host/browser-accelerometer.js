@@ -14,6 +14,19 @@ export class BrowserAccelerometer {
     constructor(getRuntime) {
         this.getRuntime = getRuntime;
         this.accelerometerListener = null;
+        this.canvas = null;
+        this.permissionGestureListener = null;
+        this.permissionRequestPending = false;
+        this.isRequested = false;
+    }
+
+    /**
+     * Stores the game canvas used to request motion permission after the sensor is started.
+     *
+     * @param {HTMLCanvasElement} canvas Game canvas.
+     */
+    observePermissionGesture(canvas) {
+        this.canvas = canvas;
     }
 
     /** @returns {boolean} Whether the browser supports device-motion events. */
@@ -37,6 +50,8 @@ export class BrowserAccelerometer {
             return SensorState.NotSupported;
         }
 
+        this.isRequested = true;
+
         if (this.accelerometerListener != null) {
             return SensorState.Ready;
         }
@@ -46,16 +61,47 @@ export class BrowserAccelerometer {
             return SensorState.Ready;
         }
 
+        this.addPermissionGestureListener();
         return SensorState.Initializing;
     }
 
+    /** Stops motion event delivery without changing browser permission. */
+    stop() {
+        this.isRequested = false;
+        this.removePermissionGestureListener();
+        if (this.accelerometerListener != null) {
+            globalThis.removeEventListener("devicemotion", this.accelerometerListener);
+            this.accelerometerListener = null;
+        }
+    }
+
+    /** Adds the one-shot canvas gesture handler required by browsers such as iOS Safari. */
+    addPermissionGestureListener() {
+        if (this.canvas == null || this.permissionGestureListener != null) {
+            return;
+        }
+
+        this.permissionGestureListener = () => {
+            void this.requestPermissionFromCanvasGestureAsync();
+        };
+        this.canvas.addEventListener("touchend", this.permissionGestureListener, { passive: true });
+    }
+
+    /** Removes the pending canvas gesture handler. */
+    removePermissionGestureListener() {
+        if (this.canvas != null && this.permissionGestureListener != null) {
+            this.canvas.removeEventListener("touchend", this.permissionGestureListener);
+            this.permissionGestureListener = null;
+        }
+    }
+
     /**
-     * Requests accelerometer permission from a direct user gesture.
+     * Requests browser motion permission from the direct canvas gesture and reports a denial to the native runtime.
      *
-     * @returns {Promise<boolean>} Whether accelerometer monitoring is active.
+     * @returns {Promise<boolean>} Whether permission was granted.
      */
-    async requestPermissionFromUserGestureAsync() {
-        if (this.getRuntime() == null || !this.isSupported()) {
+    async requestPermissionFromCanvasGestureAsync() {
+        if (!this.isRequested || this.permissionRequestPending || this.getRuntime() == null || !this.isSupported()) {
             return false;
         }
 
@@ -68,27 +114,15 @@ export class BrowserAccelerometer {
             return true;
         }
 
-        return this.requestPermissionAsync();
-    }
-
-    /** Stops motion event delivery without changing browser permission. */
-    stop() {
-        if (this.accelerometerListener != null) {
-            globalThis.removeEventListener("devicemotion", this.accelerometerListener);
-            this.accelerometerListener = null;
-        }
-    }
-
-    /**
-     * Requests browser motion permission and reports a denial to the native runtime.
-     *
-     * @returns {Promise<boolean>} Whether permission was granted.
-     */
-    async requestPermissionAsync() {
+        this.permissionRequestPending = true;
         try {
             const permission = await DeviceMotionEvent.requestPermission();
             if (permission !== "granted") {
-                this.getRuntime().Module._MGP_Web_NotifyAccelerometerState(SensorState.NoPermissions);
+                this.notifyState(SensorState.NoPermissions);
+                return false;
+            }
+
+            if (!this.isRequested) {
                 return false;
             }
 
@@ -96,8 +130,20 @@ export class BrowserAccelerometer {
             return true;
         }
         catch {
-            this.getRuntime().Module._MGP_Web_NotifyAccelerometerState(SensorState.NoPermissions);
+            this.notifyState(SensorState.NoPermissions);
             return false;
+        }
+        finally {
+            this.permissionRequestPending = false;
+            this.removePermissionGestureListener();
+        }
+    }
+
+    /** Reports a sensor state when the managed runtime remains available. */
+    notifyState(state) {
+        const notifyState = this.getRuntime()?.Module?._MGP_Web_NotifyAccelerometerState;
+        if (typeof notifyState === "function") {
+            notifyState(state);
         }
     }
 
@@ -113,14 +159,17 @@ export class BrowserAccelerometer {
                 // Browser motion uses meters per second squared;
                 // MonoGame accelerometer readings are expressed in standard gravity units.
                 // So we convert by dividing by 9.80665
-                this.getRuntime().Module._MGP_Web_NotifyAccelerometerReading(
-                    acceleration.x / 9.80665,
-                    acceleration.y / 9.80665,
-                    acceleration.z / 9.80665);
+                const notifyReading = this.getRuntime()?.Module?._MGP_Web_NotifyAccelerometerReading;
+                if (typeof notifyReading === "function") {
+                    notifyReading(
+                        acceleration.x / 9.80665,
+                        acceleration.y / 9.80665,
+                        acceleration.z / 9.80665);
+                }
             };
             globalThis.addEventListener("devicemotion", this.accelerometerListener);
         }
 
-        this.getRuntime().Module._MGP_Web_NotifyAccelerometerState(SensorState.Ready);
+        this.notifyState(SensorState.Ready);
     }
 }

@@ -131,9 +131,10 @@ class MonoGameWebHost {
         }
     }
 
-    /** Resolves the game canvas and listens for gestures that can activate browser audio. */
+    /** Resolves the game canvas and listens for browser-activation gestures. */
     resolveCanvas() {
         this.window.resolveCanvas((stage, message) => this.logStage(stage, message));
+        this.accelerometer.observePermissionGesture(this.window.canvas);
         this.audio.observeActivation(this.window.canvas);
     }
 
@@ -343,14 +344,6 @@ class MonoGameWebHost {
         return this.accelerometer.isSupported();
     }
 
-    isAccelerometerPermissionRequired() {
-        return this.accelerometer.isPermissionRequired();
-    }
-
-    requestAccelerometerPermissionFromUserGestureAsync() {
-        return this.accelerometer.requestPermissionFromUserGestureAsync();
-    }
-
     /**
      * Displays and logs a host error.
      *
@@ -385,8 +378,6 @@ globalThis.MonoGameWebHost = {
     getActiveHost: () => activeHost,
     requestFullscreen: () => activeHost?.requestFullscreen(),
     exitFullscreen: () => activeHost?.exitFullscreen(),
-    isAccelerometerPermissionRequired: () => activeHost?.isAccelerometerPermissionRequired() ?? false,
-    requestAccelerometerPermissionFromUserGestureAsync: () => activeHost?.requestAccelerometerPermissionFromUserGestureAsync() ?? Promise.resolve(false),
     stageAssetPackAsync: async (assetPackName) => {
         if (activeHost == null) {
             throw new BrowserHostStartupError(HostStage.ContentStaging, "asset_pack_host_unavailable", "The browser host is not available to stage an asset pack.");
