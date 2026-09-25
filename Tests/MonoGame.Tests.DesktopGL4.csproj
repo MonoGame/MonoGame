@@ -7,7 +7,7 @@
     <IsPackable>false</IsPackable>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <GenerateProgramFile>false</GenerateProgramFile>
-    <DefineConstants>DESKTOPGL4;DESKTOP</DefineConstants>
+    <DefineConstants>DESKTOPGL4;DESKTOP;NATIVE</DefineConstants>
     <DefineConstants Condition="$([MSBuild]::IsOSPlatform('MacOS'))">$(DefineConstants);MACOS</DefineConstants>
     <Platforms>AnyCPU;ARM64;x64</Platforms>
   </PropertyGroup>
