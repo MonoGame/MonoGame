@@ -198,7 +198,6 @@ MG_StorageDevice* MG_Storage_OpenDevice(const char* titleName, mgint playerIndex
     WideCharToMultiByte(CP_UTF8, 0, pszMyDocuments, -1, temp, MAX_PATH, NULL, NULL);
 
     root = temp;
-
 #else
 #error NOT IMPLEMENTED!
 #endif
