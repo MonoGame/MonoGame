@@ -179,7 +179,52 @@ namespace Microsoft.Xna.Framework.Graphics
         /// </exception>
 		public RenderTarget2D(GraphicsDevice graphicsDevice, int width, int height)
 			: this(graphicsDevice, width, height, false, SurfaceFormat.Color, DepthFormat.None, 0, RenderTargetUsage.DiscardContents)
-		{}
+		{ }
+
+        /// <summary>
+        /// Creates a <see cref="RenderTarget2D"/> that wraps an externally-owned native graphics handle.
+        /// </summary>
+        /// <param name="graphicsDevice">The graphics device.</param>
+        /// <param name="handle">
+        /// The native image or texture handle.
+        /// <para>This should be a handle to an image or texture such as <c>VkImage</c>, <c>GLuint</c>, <c>ID3D12Resource*</c> or <c>ID3D11Texture2D*</c> depending on the platform.</para>
+        /// </param>
+        /// <param name="width">Image width in pixels.</param>
+        /// <param name="height">Image height in pixels.</param>
+        /// <param name="format">The surface format of the native image or texture.</param>
+        /// <param name="preferredDepthFormat">The preferred depth format of the render target.<para><see cref="DepthFormat.None"/> by default.</para></param>
+        /// <param name="preferredMultiSampleCount">The preferred number of samples per pixel when multisampling.<para><c>0</c> by default.</para></param>
+        /// <param name="externalPresentation">
+        /// <see langword="true"/> if the wrapped native resource is an external swapchain, such as an OpenXR swapchain.
+        /// <see langword="false"/> if the render target will be used for sampling in shaders, such as for use as input with <see cref="SpriteBatch"/>.
+        /// <para><see langword="false"/> by default.</para>
+        /// </param>
+        /// <remarks>
+        /// <para>
+        /// The returned render target does not own the underlying native image or texture memory.
+        /// The external caller/runtime is responsible for its lifetime.
+        /// </para>
+        /// </remarks>
+        /// <returns>A non-owning <see cref="RenderTarget2D"/> backed by the native resource handle.</returns>
+        public static RenderTarget2D FromNativeHandle(
+            GraphicsDevice graphicsDevice,
+            nint handle,
+            int width,
+            int height,
+            SurfaceFormat format = SurfaceFormat.Color,
+            DepthFormat preferredDepthFormat = DepthFormat.None,
+            int preferredMultiSampleCount = 0,
+            bool externalPresentation = false)
+        {
+            return PlatformFromNativeHandle(graphicsDevice,
+                handle,
+                width,
+                height,
+                format,
+                preferredDepthFormat,
+                preferredMultiSampleCount,
+                externalPresentation);
+        }
 
         /// <summary>
         /// Allows child class to specify the surface type, eg: a swap chain.
