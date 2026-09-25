@@ -495,7 +495,7 @@ namespace Microsoft.Xna.Framework
         /// <returns><c>true</c> if the instances are equal; <c>false</c> otherwise.</returns>
         public override bool Equals(object obj)
         {
-            return (obj is Vector4) ? this == (Vector4)obj : false;
+            return (obj is Vector4 vector4) ? this == vector4 : false;
         }
 
         /// <summary>
