@@ -20,6 +20,7 @@
   <ItemGroup>
     <Compile Remove="bin\**\*" />
     <Compile Remove="Framework\WindowsDX\**" />
+    <Compile Remove="Framework/Devices/Power/PowerStatusTest.DesktopGL.cs" />
     <Compile Remove="obj\**" />
     <Compile Remove="Properties/**/*" />
     <Compile Remove="Interactive/**/*" />

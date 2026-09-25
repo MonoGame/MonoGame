@@ -28,6 +28,7 @@
     <Compile Remove="Runner/iOS/**/*" />
 
     <Compile Remove="Framework/SDL/**/*" />
+    <Compile Remove="Framework/Devices/Power/PowerStatusTest.DesktopGL.cs" />
   </ItemGroup>
 
   <ItemGroup>
