@@ -86,6 +86,26 @@ struct MGG_GraphicsDevice_Caps
     mgint MaxVertexTextureSlots;
     mgint MaxVertexBufferSlots;
     mgint ShaderProfile;
+    mgint MaxTextureAnisotropy;
+    mgint MaxMultiSampleCount;
+    mgbool SupportsNonPowerOfTwo;
+    mgbool SupportsTextureFilterAnisotropic;
+    mgbool SupportsDepth24;
+    mgbool SupportsPackedDepthStencil;
+    mgbool SupportsDepthNonLinear;
+    mgbool SupportsTextureMaxLevel;
+    mgbool SupportsDxt1;
+    mgbool SupportsS3tc;
+    mgbool SupportsSRgb;
+    mgbool SupportsDepthClamp;
+    mgbool SupportsTextureArrays;
+    mgbool SupportsVertexTextures;
+    mgbool SupportsFloatTextures;
+    mgbool SupportsHalfFloatTextures;
+    mgbool SupportsNormalized;
+    mgbool SupportsInstancing;
+    mgbool SupportsBaseIndexInstancing;
+    mgbool SupportsSeparateBlendStates;
 };
 
 struct Vector4
@@ -120,6 +140,11 @@ struct MGG_DepthStencilState_Info
     MGStencilOperation stencilDepthBufferFail;
     MGStencilOperation stencilFail;
     MGStencilOperation stencilPass;
+    mgbool twoSidedStencilMode;
+    MGCompareFunction counterClockwiseStencilFunction;
+    MGStencilOperation counterClockwiseStencilDepthBufferFail;
+    MGStencilOperation counterClockwiseStencilFail;
+    MGStencilOperation counterClockwiseStencilPass;
 };
 
 struct MGG_RasterizerState_Info
@@ -155,6 +180,17 @@ struct MGG_InputElement
     MGVertexElementFormat Format;
     mguint AlignedByteOffset;
     mguint InstanceDataStepRate;
+};
+
+struct MGM_SongInfo
+{
+    mgulong duration;
+};
+
+struct MGM_SongEvent
+{
+    MGSongEventType type;
+    mgulong generation;
 };
 
 struct MGM_AudioDecoderInfo
@@ -246,4 +282,3 @@ struct MGP_ControllerCaps
     mgbool HasRightVibrationMotor;
     mgbool HasVoiceSupport;
 };
-

@@ -22,6 +22,7 @@ using Microsoft.VisualBasic;
 using System.Collections.Concurrent;
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Serialization;
+using Microsoft.Xna.Framework;
 
 namespace MonoGame.Tests
 {
@@ -57,6 +58,10 @@ namespace MonoGame.Tests
         static async Task<int> Main(string[] args)
         {
             mainThread = Thread.CurrentThread;
+            // Force the capture of the MainUI thread
+#if DESKTOPGL
+            Threading.IsOnUIThread();
+#endif
             mainThreadSynchronizationContext = new MainThreadSynchronizationContext(mainThread);
             SynchronizationContext.SetSynchronizationContext(mainThreadSynchronizationContext);
             

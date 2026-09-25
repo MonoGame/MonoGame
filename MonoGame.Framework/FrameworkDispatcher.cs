@@ -4,6 +4,9 @@
 
 using System;
 using Microsoft.Xna.Framework.Audio;
+#if NATIVE
+using Microsoft.Xna.Framework.Media;
+#endif
 
 namespace Microsoft.Xna.Framework
 {
@@ -36,6 +39,9 @@ namespace Microsoft.Xna.Framework
             DynamicSoundEffectInstanceManager.UpdatePlayingInstances();
             SoundEffectInstancePool.Update();
             Microphone.UpdateMicrophones();
+#if NATIVE
+            MediaPlayer.PlatformUpdate();
+#endif
         }
 
         private static void Initialize()
