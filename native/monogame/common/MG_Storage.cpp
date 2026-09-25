@@ -13,7 +13,11 @@
 #include <shellapi.h>
 #include <shlobj.h>
 #else
-#error NOT IMPLEMENTED!
+#include <sys/stat.h>
+#include <sys/types.h>
+#include <fts.h>
+#define MAX_PATH PATH_MAX
+#define FILE_PERMISSIONS 0777
 #endif
 
 
@@ -67,6 +71,14 @@ static void _MakeFileOperationPath(char* path, const char* source)
     path[strlen(path) + 1] = 0;
 }
 
+#else
+
+static int _mg_remove(const char* fpath, const struct stat* sb, int typeflag)
+{
+    int err = remove(fpath);
+    return err;
+}
+
 #endif
 
 
@@ -81,7 +93,11 @@ static bool _MG_CreateDirectory(const char* directory)
     if (ok == ERROR_FILE_EXISTS || ok == ERROR_ALREADY_EXISTS)
         return true;
 #else
-#error NOT IMPLEMENTED!
+    int ok = mkdir(directory, FILE_PERMISSIONS);
+    if (ok == 0)
+        return true;
+    if (ok == EEXIST)
+        return true;
 #endif
 
     return false;
@@ -89,6 +105,8 @@ static bool _MG_CreateDirectory(const char* directory)
 
 static bool _MG_Storage_DeleteDirectory(const char* path)
 {
+    // This is a recursive delete operation.
+
 #if _WIN32
 
     char tmp[MAX_PATH];
@@ -104,7 +122,12 @@ static bool _MG_Storage_DeleteDirectory(const char* path)
         return true;
 
 #else
-#error NOT IMPLEMENTED!
+
+    // Walks the directory tree calling remove for each file then directory.
+    int ok = nftw(tmp, _mg_remove, 20, FTW_DEPTH | FTW_PHYS);
+    if (ok == 0)
+        return true;
+
 #endif
 
     return false;
@@ -131,6 +154,7 @@ static bool _MG_Storage_CopyDirectory(const char* source, const char* dest)
 
 #else
 #error NOT IMPLEMENTED!
+     // TODO: Use nftw and open/read/write/close to copy files.
 #endif
 
     return false;
@@ -156,7 +180,9 @@ static bool _MG_Storage_RenameDirectory(const char* source, const char* dest)
         return true;
 
 #else
-#error NOT IMPLEMENTED!
+    int ok = rename(source, dest);
+    if (ok == 0)
+        return true;
 #endif
 
     return false;
@@ -177,7 +203,10 @@ static bool _MG_Storage_DirectoryExists(const char* path)
         return true;
 
 #else
-#error NOT IMPLEMENTED!
+    struct stat s;
+    int ok = stat(path, &s);
+    if (ok == 0)
+        return S_ISDIR(s.st_mode);
 #endif
 
     return false;
@@ -199,7 +228,17 @@ MG_StorageDevice* MG_Storage_OpenDevice(const char* titleName, mgint playerIndex
 
     root = temp;
 #else
-#error NOT IMPLEMENTED!
+
+    root = getenv("XDG_DATA_HOME");
+    if (root.length() == 0)
+    {
+        root = getenv("HOME");
+        if (root.length())
+            root = ".";
+        else
+            root += "/.local/share";
+    }
+
 #endif
 
     MG_StorageDevice* device = new MG_StorageDevice();
@@ -362,7 +401,9 @@ static void _MG_Storage_MakeCommitPath(MG_StorageContainer* container, char* pat
         strcat(path, name);
 }
 
+
 #if defined(_WIN32)
+
 static bool MG_EnumerateContent(MG_StorageContainer* container, const char* directory)
 {
     std::string path;
@@ -406,8 +447,50 @@ static bool MG_EnumerateContent(MG_StorageContainer* container, const char* dire
 
     return true;
 }
+
 #else
-#error NOT IMPLEMENTED!
+
+static bool MG_EnumerateContent(MG_StorageContainer* container, const char* directory)
+{
+    DIR* h = opendir(directory);
+    if (h == nullptr)
+        return false;
+
+    while (true)
+    {
+        struct dirent* e;
+        e = readdir(h);
+        if (e == nullptr)
+            break;
+
+        std::string name = e->d_name;
+
+        if (name == "." || name == "..")
+            continue;
+
+        std::string fullpath;
+        fullpath = directory;
+        fullpath += name;
+
+        if (e->d_type & DT_DIR)
+        {
+            fullpath += "/";
+
+            std::string relative = fullpath.substr(container->root.size());
+            container->content.push_back(relative);
+
+            MG_EnumerateContent(container, fullpath.c_str());
+            continue;
+        }
+
+        // Just a file.
+        std::string relative = fullpath.substr(container->root.size());
+        container->content.push_back(relative);
+    }
+
+    closedir(h);
+}
+
 #endif
 
 void MG_Storage_EnumerateContent(MG_StorageContainer* container, mgbyte**& filesAndDirectories, mgint& size)
@@ -510,9 +593,14 @@ mgbool MG_Storage_FileDelete(MG_StorageContainer* container, const char* name)
 #if _WIN32
     return ::DeleteFileA(path);
 #else
-#error NOT IMPLEMENTED!
-    return false;
+    int err = unlink(path);
+    if (err == 0)
+        return true;
+    if (err == ENOENT)
+        return true;
 #endif
+
+    return false;
 }
 
 mgbool MG_Storage_DirectoryExists(MG_StorageContainer* container, const char* name)
@@ -523,7 +611,7 @@ mgbool MG_Storage_DirectoryExists(MG_StorageContainer* container, const char* na
     char path[MAX_PATH];
     _MG_Storage_MakePath(container, path, name);
 
-    return false;
+    return _MG_Storage_DirectoryExists(path);
 }
 
 mgbool MG_Storage_DirectoryDelete(MG_StorageContainer* container, const char* name)
