@@ -31,3 +31,6 @@
 [submodule "native/monogame/external/faudio"]
 	path = native/monogame/external/faudio
 	url = https://github.com/FNA-XNA/FAudio.git
+[submodule "external/freetype"]
+	path = external/freetype
+	url = https://github.com/freetype/freetype.git
