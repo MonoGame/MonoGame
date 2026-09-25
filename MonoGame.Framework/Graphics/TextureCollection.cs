@@ -16,6 +16,17 @@ namespace Microsoft.Xna.Framework.Graphics
         private ShaderStage _stage;
         private int _dirty;
 
+        /// <summary>
+        /// Amount of textures
+        /// </summary>
+        public int Count
+        {
+            get
+            {
+                return Math.Min(_textures.Length, 16);
+            }
+        }
+
         internal TextureCollection(GraphicsDevice graphicsDevice, int maxTextures, ShaderStage stage)
         {
             _graphicsDevice = graphicsDevice;
