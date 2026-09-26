@@ -2,7 +2,7 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
-import { BrowserHostStartupError, HostStage } from "./browser-host-common.js";
+import { BrowserHostError, HostStage } from "./browser-host-common.js";
 
 /**
  * Stages published content into the Emscripten filesystem before synchronous managed APIs use it.
@@ -39,14 +39,14 @@ export class BrowserContent {
      *
      * @param {string} manifestUri Application relative manifest URI.
      * @returns {Promise<void>} Completes when every listed asset is staged.
-     * @throws {BrowserHostStartupError} When the manifest or an asset cannot be downloaded.
+     * @throws {BrowserHostError} When the manifest or an asset cannot be downloaded.
      */
     async stageContentManifestAsync(manifestUri) {
         const fileSystem = this.getFileSystem();
         const requestUri = this.resolveContentUri(manifestUri);
         const response = await fetch(requestUri);
         if (!response.ok) {
-            throw new BrowserHostStartupError(
+            throw new BrowserHostError(
                 HostStage.ContentStaging,
                 "content_manifest_fetch_failed",
                 `The content manifest '${manifestUri}' could not be downloaded. HTTP ${response.status}.`);
@@ -67,7 +67,7 @@ export class BrowserContent {
         await Promise.all(contentPaths.map(async (contentPath) => {
             const contentResponse = await fetch(this.resolveContentUri(contentPath));
             if (!contentResponse.ok) {
-                throw new BrowserHostStartupError(
+                throw new BrowserHostError(
                     HostStage.ContentStaging,
                     "content_asset_fetch_failed",
                     `The content asset '${contentPath}' could not be downloaded. HTTP ${contentResponse.status}.`);
@@ -162,14 +162,14 @@ export class BrowserContent {
      * Returns the Emscripten filesystem used to stage content.
      *
      * @returns {{ mkdirTree: Function, writeFile: Function }} Emscripten filesystem.
-     * @throws {BrowserHostStartupError} When the runtime does not provide content staging APIs.
+     * @throws {BrowserHostError} When the runtime does not provide content staging APIs.
      */
     getFileSystem() {
         const fileSystem = this.getRuntime()?.Module?.FS;
         if (fileSystem == null
             || typeof fileSystem.mkdirTree !== "function"
             || typeof fileSystem.writeFile !== "function") {
-            throw new BrowserHostStartupError(
+            throw new BrowserHostError(
                 HostStage.ContentStaging,
                 "emscripten_filesystem_missing",
                 "The managed runtime did not expose an Emscripten filesystem capable of staging content.");
@@ -183,7 +183,7 @@ export class BrowserContent {
      *
      * @param {string} path Manifest path.
      * @returns {string} Validated virtual filesystem path.
-     * @throws {BrowserHostStartupError} When the path is empty, outside `Content`, or contains parent traversal.
+     * @throws {BrowserHostError} When the path is empty, outside `Content`, or contains parent traversal.
      */
     normalizeVfsPath(path) {
         const normalizedPath = normalizeContentPath(path);
@@ -192,7 +192,7 @@ export class BrowserContent {
             // Parent traversal could escape the content root when the path is written to the virtual filesystem.
             || normalizedPath.includes("/../")
             || normalizedPath.endsWith("/..")) {
-            throw new BrowserHostStartupError(
+            throw new BrowserHostError(
                 HostStage.ContentStaging,
                 "content_manifest_path_invalid",
                 `The content manifest contains an invalid path '${path}'.`);
@@ -206,7 +206,7 @@ export class BrowserContent {
      *
      * @param {string} assetPackName Asset pack name.
      * @returns {string} Validated asset pack name.
-     * @throws {BrowserHostStartupError} When the name is empty or contains path syntax.
+     * @throws {BrowserHostError} When the name is empty or contains path syntax.
      */
     normalizeAssetPackName(assetPackName) {
         if (typeof assetPackName !== "string"
@@ -215,7 +215,7 @@ export class BrowserContent {
             || assetPackName.includes("/")
             || assetPackName.includes("\\")
             || assetPackName.includes("..")) {
-            throw new BrowserHostStartupError(
+            throw new BrowserHostError(
                 HostStage.ContentStaging,
                 "asset_pack_name_invalid",
                 `The asset pack name '${assetPackName}' is invalid.`);
@@ -229,12 +229,12 @@ export class BrowserContent {
      *
      * @param {string} relativePath Application relative content path.
      * @returns {string} Absolute content URL.
-     * @throws {BrowserHostStartupError} When the path is empty.
+     * @throws {BrowserHostError} When the path is empty.
      */
     resolveContentUri(relativePath) {
         const normalizedPath = normalizeContentPath(relativePath);
         if (normalizedPath == null) {
-            throw new BrowserHostStartupError(
+            throw new BrowserHostError(
                 HostStage.ContentStaging,
                 "content_uri_invalid",
                 "The browser host received an empty content path.");

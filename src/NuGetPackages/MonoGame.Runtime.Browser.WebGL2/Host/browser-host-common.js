@@ -7,6 +7,7 @@ export const HostStage = Object.freeze({
     HostBootstrap: "HostBootstrap",
     CanvasCreation: "CanvasCreation",
     WebGL2Creation: "WebGL2Creation",
+    ContextLoss: "ContextLoss",
     WasmLoad: "WasmLoad",
     ContentStaging: "ContentStaging",
     ManagedExports: "ManagedExports",
@@ -37,7 +38,7 @@ export const SongEventType = Object.freeze({
 });
 
 /** Represents an error reported by the browser host. */
-export class BrowserHostStartupError extends Error {
+export class BrowserHostError extends Error {
     /**
      * Creates an error with a startup stage and code.
      *
@@ -47,7 +48,7 @@ export class BrowserHostStartupError extends Error {
      */
     constructor(stage, code, message) {
         super(message);
-        this.name = "BrowserHostStartupError";
+        this.name = "BrowserHostError";
         this.stage = stage;
         this.code = code;
     }

@@ -3,7 +3,7 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 import {
-    BrowserHostStartupError,
+    BrowserHostError,
     CanvasResizePolicy,
     HostStage
 } from "./browser-host-common.js";
@@ -25,6 +25,7 @@ export class BrowserWindow {
         this.getRuntime = getRuntime;
         this.canvas = null;
         this.canvasResizeObserver = null;
+        this.contextLost = false;
     }
 
     /**
@@ -66,7 +67,7 @@ export class BrowserWindow {
      * Creates the WebGL2 context required by the native renderer.
      *
      * @param {(stage: string, message: string) => void} logStage Logs WebGL setup progress.
-     * @throws {BrowserHostStartupError} When the browser cannot create a WebGL2 context.
+     * @throws {BrowserHostError} When the browser cannot create a WebGL2 context.
      */
     createWebGL2Context(logStage) {
         logStage(HostStage.WebGL2Creation, "Requesting WebGL2 context.");
@@ -86,7 +87,7 @@ export class BrowserWindow {
 
         const context = this.canvas.getContext("webgl2", contextOptions);
         if (context == null) {
-            throw new BrowserHostStartupError(
+            throw new BrowserHostError(
                 HostStage.WebGL2Creation,
                 "webgl2_unavailable",
                 "The browser host could not create a WebGL2 context.");
@@ -96,9 +97,28 @@ export class BrowserWindow {
     }
 
     /**
+     * Stops the host when the browser loses the WebGL context.
+     *
+     * Context loss is uncommon but can follow a GPU reset, driver failures,
+     * device change, or if there is resource exhaustion and the browser needs
+     * to reclaim resources.
+     * @param {() => void} onContextLost Stops managed frame scheduling.
+     */
+    observeContextLoss(onContextLost) {
+        this.canvas.addEventListener("webglcontextlost", () => {
+            if (this.contextLost) {
+                return;
+            }
+
+            this.contextLost = true;
+            onContextLost();
+        });
+    }
+
+    /**
      * Forwards CSS canvas size changes when the `Adaptive` policy is selected.
      *
-     * @throws {BrowserHostStartupError} When the runtime or browser cannot report canvas size changes.
+     * @throws {BrowserHostError} When the runtime or browser cannot report canvas size changes.
      */
     observeCanvasSize() {
         if (this.config.canvasResizePolicy !== CanvasResizePolicy.Adaptive) {
@@ -107,7 +127,7 @@ export class BrowserWindow {
 
         const notifyCanvasResize = this.getRuntime()?.Module?._MGP_Web_NotifyCanvasResize;
         if (typeof notifyCanvasResize !== "function") {
-            throw new BrowserHostStartupError(
+            throw new BrowserHostError(
                 HostStage.WasmLoad,
                 "native_canvas_resize_missing",
                 "The managed runtime does not expose the native canvas resize callback.");
@@ -122,7 +142,7 @@ export class BrowserWindow {
         };
 
         if (typeof ResizeObserver !== "function") {
-            throw new BrowserHostStartupError(
+            throw new BrowserHostError(
                 HostStage.WasmLoad,
                 "resize_observer_unavailable",
                 "The browser does not support ResizeObserver.");
@@ -141,12 +161,12 @@ export class BrowserWindow {
     /**
      * Forwards page, window, and canvas focus changes to the native runtime.
      *
-     * @throws {BrowserHostStartupError} When the runtime cannot receive focus changes.
+     * @throws {BrowserHostError} When the runtime cannot receive focus changes.
      */
     observeBrowserLifecycle() {
         const notifyFocusChange = this.getRuntime()?.Module?._MGP_Web_NotifyFocusChange;
         if (typeof notifyFocusChange !== "function") {
-            throw new BrowserHostStartupError(
+            throw new BrowserHostError(
                 HostStage.WasmLoad,
                 "native_focus_change_missing",
                 "The managed runtime does not expose the native focus callback.");
@@ -167,14 +187,14 @@ export class BrowserWindow {
     /**
      * Forwards confirmed browser fullscreen changes and request failures.
      *
-     * @throws {BrowserHostStartupError} When the runtime cannot receive fullscreen changes.
+     * @throws {BrowserHostError} When the runtime cannot receive fullscreen changes.
      */
     observeFullscreen() {
         const notifyFullscreenChange = this.getRuntime()?.Module?._MGP_Web_NotifyFullscreenChange;
         const notifyFullscreenFailure = this.getRuntime()?.Module?._MGP_Web_NotifyFullscreenFailure;
         if (typeof notifyFullscreenChange !== "function"
             || typeof notifyFullscreenFailure !== "function") {
-            throw new BrowserHostStartupError(
+            throw new BrowserHostError(
                 HostStage.WasmLoad,
                 "native_fullscreen_change_missing",
                 "The managed runtime does not expose the native fullscreen callbacks.");
