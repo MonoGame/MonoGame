@@ -746,6 +746,8 @@ mgbyte MGP_Platform_PollEvent(MGP_Platform* platform, MGP_Event& event_)
         case SDL_EventType::SDL_MOUSEBUTTONDOWN:
             event_.Type = ev.type == SDL_EventType::SDL_MOUSEBUTTONDOWN ? MGEventType::MouseButtonDown : MGEventType::MouseButtonUp;
             event_.MouseButton.Window = MGP_WindowFromId(platform, ev.button.windowID);
+            event_.MouseButton.X = ev.button.x;
+            event_.MouseButton.Y = ev.button.y;
             switch (ev.button.button)
             {
                 default:
