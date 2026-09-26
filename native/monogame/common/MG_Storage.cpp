@@ -19,6 +19,7 @@
 #include <dirent.h>
 #include <unistd.h>
 #include <fts.h>
+#include <ftw.h>
 #define MAX_PATH PATH_MAX
 #define FILE_PERMISSIONS 0777
 #endif
