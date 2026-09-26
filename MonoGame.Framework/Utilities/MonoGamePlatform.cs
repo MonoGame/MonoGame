@@ -43,7 +43,7 @@ namespace MonoGame.Framework.Utilities
         /// Xbox One platform.
         /// </summary>
         XboxOne,
-        
+
         /// <summary>
         /// Windows platform using DirectX 12.
         /// </summary>

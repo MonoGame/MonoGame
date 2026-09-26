@@ -10,6 +10,7 @@ public sealed class BuildShadersTask : FrostingTask<BuildContext> { }
 
 [TaskName("Build Frameworks")]
 [IsDependentOn(typeof(BuildNativeTask))]
+[IsDependentOn(typeof(BuildBrowserWebGL2Task))]
 [IsDependentOn(typeof(BuildDesktopGLTask))]
 [IsDependentOn(typeof(BuildWindowsDXTask))]
 [IsDependentOn(typeof(BuildAndroidTask))]
@@ -29,6 +30,12 @@ public sealed class BuildToolsTask : FrostingTask<BuildContext> { }
 [IsDependentOn(typeof(BuildDotNetTemplatesTask))]
 [IsDependentOn(typeof(BuildVSTemplatesTask))]
 public sealed class BuildTemplatesTask : FrostingTask<BuildContext> { }
+
+[TaskName("Build WebGL2")]
+[IsDependentOn(typeof(BuildBrowserWebGL2Task))]
+[IsDependentOn(typeof(BuildMGCBTask))]
+[IsDependentOn(typeof(BuildDotNetTemplatesTask))]
+public sealed class BuildWebGL2Task : FrostingTask<BuildContext> { }
 
 [TaskName("Build All Tests")]
 [IsDependentOn(typeof(BuildTestsTask))]
@@ -58,6 +65,7 @@ public sealed class TestTask : FrostingTask<BuildContext> { }
 [IsDependentOn(typeof(TestNuGetSetupTask))]
 [IsDependentOn(typeof(TestDesktopGLTask))]
 [IsDependentOn(typeof(TestWindowsDXTask))]
+[IsDependentOn(typeof(TestWebTask))]
 [IsDependentOn(typeof(TestAndroidTask))]
 [IsDependentOn(typeof(TestiOSTask))]
 [IsDependentOn(typeof(TestBlank2DStarterKitTask))]

@@ -8,6 +8,11 @@
 
 #include <SDL.h>
 
+#if defined(__EMSCRIPTEN__)
+#include "MGP_sdl_browser.h"
+#include "../web/MGP_web.h"
+#endif
+
 #if _WIN32
 #include <combaseapi.h>
 #endif
@@ -181,6 +186,18 @@ struct MGP_Window
 
     SDL_Window* window = nullptr;
     SDL_Window* retiredWindow = nullptr;
+
+#if defined(__EMSCRIPTEN__)
+    mgbyte allowUserResizing = false;
+    mgint lastBrowserResizeWidth = -1;
+    mgint lastBrowserResizeHeight = -1;
+    mgbyte browserFocused = false;
+    bool hasBrowserFocusState = false;
+    mgbyte browserFullscreen = false;
+    bool hasBrowserFullscreenState = false;
+    mgbyte browserFullscreenRequestTarget = false;
+    bool browserFullscreenRequestPending = false;
+#endif
 #if defined(MG_OPENGL)
     mgint contextMajorVersion = 4;
     mgint contextMinorVersion = 1;
@@ -207,14 +224,23 @@ MGP_Platform* MGP_Platform_Create(MGGameRunBehavior& behavior)
     // to have the debugger stop on that allocation so you can
     // identify the source of the memory leak.
     //
-    //_CrtSetBreakAlloc(327);
+	//_CrtSetBreakAlloc(327);
+
+#if defined(__EMSCRIPTEN__)
+    SDL_SetHint(SDL_HINT_TOUCH_MOUSE_EVENTS, "0");
+#endif
 
 	if (SDL_WasInit(0) == 0) {
-		if (SDL_Init(
-			SDL_INIT_VIDEO |
-			SDL_INIT_JOYSTICK |
-			SDL_INIT_GAMECONTROLLER |
-			SDL_INIT_HAPTIC) < 0)
+        Uint32 initFlags =
+            SDL_INIT_VIDEO |
+            SDL_INIT_JOYSTICK |
+            SDL_INIT_GAMECONTROLLER;
+
+#if !defined(__EMSCRIPTEN__)
+        initFlags |= SDL_INIT_HAPTIC;
+#endif
+
+		if (SDL_Init(initFlags) < 0)
 		{
 			printf("SDL_Init failed: %s\n", SDL_GetError());
             fflush(stdout);
@@ -228,7 +254,11 @@ MGP_Platform* MGP_Platform_Create(MGGameRunBehavior& behavior)
 	SDL_SetHint("SDL_VIDEO_MINIMIZE_ON_FOCUS_LOSS", "0");
 	SDL_SetHint("SDL_JOYSTICK_ALLOW_BACKGROUND_EVENTS", "1");
 
+#if defined(__EMSCRIPTEN__)
+    behavior = MGGameRunBehavior::Asynchronous;
+#else
 	behavior = MGGameRunBehavior::Synchronous;
+#endif
 
 	auto platform = new MGP_Platform();
 	return platform;
@@ -237,6 +267,10 @@ MGP_Platform* MGP_Platform_Create(MGGameRunBehavior& behavior)
 void MGP_Platform_Destroy(MGP_Platform* platform)
 {
 	assert(platform != nullptr);
+
+#if defined(__EMSCRIPTEN__)
+    MGP_Web_OnPlatformDestroyed(platform);
+#endif
 
 	// Destroy any active windows that may have been leaked.
 	for (auto window : platform->windows)
@@ -286,7 +320,11 @@ MGMonoGamePlatform MGP_Platform_GetPlatform()
 #elif MG_DIRECTX12
     return MGMonoGamePlatform::WindowsDX12;
 #elif MG_OPENGL
+#if defined(__EMSCRIPTEN__)
+    return MGMonoGamePlatform::WebGL;
+#else
     return MGMonoGamePlatform::DesktopGL;
+#endif
 #else
     assert(false);
     return (MGMonoGamePlatform)-1;
@@ -308,6 +346,56 @@ MGGraphicsBackend MGP_Platform_GetGraphicsBackend()
 
 }
 
+mgint MGP_Touch_GetMaximumTouchCount()
+{
+#if defined(__EMSCRIPTEN__)
+    return MGP_Web_GetMaximumTouchCount();
+#else
+    return 0;
+#endif
+}
+
+MG_EXPORT mgbyte MGP_Accelerometer_IsSupported()
+{
+#if defined(__EMSCRIPTEN__)
+    return MGP_Web_Accelerometer_IsSupported();
+#else
+    return 0;
+#endif
+}
+
+MG_EXPORT mgint MGP_Accelerometer_GetState()
+{
+#if defined(__EMSCRIPTEN__)
+    return MGP_Web_Accelerometer_GetState();
+#else
+    return 0;
+#endif
+}
+
+MG_EXPORT void MGP_Accelerometer_Start()
+{
+#if defined(__EMSCRIPTEN__)
+    MGP_Web_Accelerometer_Start();
+#endif
+}
+
+MG_EXPORT void MGP_Accelerometer_Stop()
+{
+#if defined(__EMSCRIPTEN__)
+    MGP_Web_Accelerometer_Stop();
+#endif
+}
+
+MG_EXPORT mgbyte MGP_Accelerometer_GetReading(mgfloat& x, mgfloat& y, mgfloat& z, mgint& sequence)
+{
+#if defined(__EMSCRIPTEN__)
+    return MGP_Web_Accelerometer_GetReading(x, y, z, sequence);
+#else
+    return 0;
+#endif
+}
+
 static MGP_Window* MGP_WindowFromId(MGP_Platform* platform, Uint32 windowId)
 {
     assert(platform != nullptr);
@@ -320,6 +408,135 @@ static MGP_Window* MGP_WindowFromId(MGP_Platform* platform, Uint32 windowId)
 
     return nullptr;
 }
+
+#if defined(__EMSCRIPTEN__)
+void MGP_Sdl_QueueBrowserResizeForWindow(MGP_Window* window, mgint width, mgint height)
+{
+    assert(window != nullptr);
+
+    if (width <= 0 || height <= 0 || window->window == nullptr)
+        return;
+
+    if (window->lastBrowserResizeWidth == width
+        && window->lastBrowserResizeHeight == height)
+    {
+        return;
+    }
+
+    window->lastBrowserResizeWidth = width;
+    window->lastBrowserResizeHeight = height;
+
+    MGP_Event event_{};
+    event_.Type = MGEventType::WindowResized;
+    event_.Timestamp = SDL_GetTicks();
+    event_.Window.Window = window;
+    event_.Window.Data1 = width;
+    event_.Window.Data2 = height;
+    window->platform->queued_events.push(event_);
+}
+
+void MGP_Sdl_QueueBrowserResize(MGP_Platform* platform, mgint width, mgint height)
+{
+    assert(platform != nullptr);
+
+    for (MGP_Window* window : platform->windows)
+        MGP_Sdl_QueueBrowserResizeForWindow(window, width, height);
+}
+
+static void MGP_Sdl_QueueBrowserFocusForWindow(MGP_Window* window, mgbyte focused)
+{
+    assert(window != nullptr);
+
+    if (window->window == nullptr
+        || (window->hasBrowserFocusState && window->browserFocused == focused))
+    {
+        return;
+    }
+
+    window->browserFocused = focused;
+    window->hasBrowserFocusState = true;
+
+    MGP_Event event_{};
+    event_.Type = focused ? MGEventType::WindowGainedFocus : MGEventType::WindowLostFocus;
+    event_.Timestamp = SDL_GetTicks();
+    event_.Window.Window = window;
+    window->platform->queued_events.push(event_);
+}
+
+void MGP_Sdl_QueueBrowserFocus(MGP_Platform* platform, mgbyte focused)
+{
+    assert(platform != nullptr);
+
+    for (MGP_Window* window : platform->windows)
+        MGP_Sdl_QueueBrowserFocusForWindow(window, focused);
+}
+
+static void MGP_Sdl_QueueBrowserFullscreenForWindow(MGP_Window* window, mgbyte fullscreen, bool force)
+{
+    assert(window != nullptr);
+
+    if (window->window == nullptr
+        || (!force && window->hasBrowserFullscreenState && window->browserFullscreen == fullscreen))
+    {
+        return;
+    }
+
+    window->browserFullscreen = fullscreen;
+    window->hasBrowserFullscreenState = true;
+    window->browserFullscreenRequestPending = false;
+
+    MGP_Event event_{};
+    event_.Type = MGEventType::WindowFullscreenChanged;
+    event_.Timestamp = SDL_GetTicks();
+    event_.Window.Window = window;
+    event_.Window.Data1 = fullscreen;
+    window->platform->queued_events.push(event_);
+}
+
+static void MGP_Sdl_RequestBrowserFullscreen(MGP_Window* window, mgbyte fullscreen)
+{
+    assert(window != nullptr);
+
+    if (window->browserFullscreenRequestPending)
+    {
+        if (window->browserFullscreenRequestTarget == fullscreen)
+            return;
+    }
+    else if (!window->hasBrowserFullscreenState)
+    {
+        if (fullscreen == 0)
+            return;
+    }
+    else if (window->browserFullscreen == fullscreen)
+    {
+        return;
+    }
+
+    window->browserFullscreenRequestTarget = fullscreen;
+    window->browserFullscreenRequestPending = true;
+
+    if (fullscreen != 0)
+        MGP_Web_RequestFullscreen();
+    else
+        MGP_Web_ExitFullscreen();
+}
+
+void MGP_Sdl_QueueBrowserFullscreenChange(MGP_Platform* platform, mgbyte fullscreen)
+{
+    assert(platform != nullptr);
+
+    for (MGP_Window* window : platform->windows)
+        MGP_Sdl_QueueBrowserFullscreenForWindow(window, fullscreen, false);
+}
+
+void MGP_Sdl_QueueBrowserFullscreenFailure(MGP_Platform* platform)
+{
+    assert(platform != nullptr);
+
+    for (MGP_Window* window : platform->windows)
+        MGP_Sdl_QueueBrowserFullscreenForWindow(window, false, true);
+}
+#endif
 
 static int UTF8ToUnicode(int utf8)
 {
@@ -551,6 +768,39 @@ mgbyte MGP_Platform_PollEvent(MGP_Platform* platform, MGP_Event& event_)
                     break;
             }
             return true;
+
+        case SDL_EventType::SDL_FINGERDOWN:
+        case SDL_EventType::SDL_FINGERMOTION:
+        case SDL_EventType::SDL_FINGERUP:
+        {
+            MGP_Window* window = MGP_WindowFromId(platform, ev.tfinger.windowID);
+            if (window == nullptr)
+                break;
+
+            mgint width = 0;
+            mgint height = 0;
+            SDL_GetWindowSize(window->window, &width, &height);
+
+            switch (ev.type)
+            {
+                case SDL_EventType::SDL_FINGERDOWN:
+                    event_.Type = MGEventType::TouchPressed;
+                    break;
+                case SDL_EventType::SDL_FINGERMOTION:
+                    event_.Type = MGEventType::TouchMoved;
+                    break;
+                case SDL_EventType::SDL_FINGERUP:
+                    event_.Type = MGEventType::TouchReleased;
+                    break;
+            }
+
+            event_.Timestamp = ev.tfinger.timestamp;
+            event_.Touch.Window = window;
+            event_.Touch.Id = static_cast<mgint>(ev.tfinger.fingerId);
+            event_.Touch.X = static_cast<mgint>(ev.tfinger.x * width);
+            event_.Touch.Y = static_cast<mgint>(ev.tfinger.y * height);
+            return true;
+        }
 
         case SDL_EventType::SDL_KEYDOWN:
         {
@@ -796,7 +1046,11 @@ static mgbyte MGP_Window_CreateNativeWindowInternal(
 #if defined(MG_VULKAN) || defined(MG_DIRECTX12)
 	flags |= SDL_WINDOW_VULKAN;
 #elif defined(MG_OPENGL)
-
+#if defined(__EMSCRIPTEN__)
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_ES);
+#else
     if (!MGP_Window_DetectOpenGLVersion(window->contextMajorVersion, window->contextMinorVersion))
     {
         return false;
@@ -807,6 +1061,7 @@ static mgbyte MGP_Window_CreateNativeWindowInternal(
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, window->contextMajorVersion);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, window->contextMinorVersion);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
+#endif
     SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
     SDL_GL_SetAttribute(SDL_GL_RED_SIZE, windowCreateInfo != nullptr ? windowCreateInfo->redSize : 8);
     SDL_GL_SetAttribute(SDL_GL_GREEN_SIZE, windowCreateInfo != nullptr ? windowCreateInfo->greenSize : 8);
@@ -818,7 +1073,7 @@ static mgbyte MGP_Window_CreateNativeWindowInternal(
     SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, windowCreateInfo != nullptr ? windowCreateInfo->multiSampleBuffers : 0);
     SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, windowCreateInfo != nullptr ? windowCreateInfo->multiSampleSamples : 0);
     SDL_GL_SetAttribute(SDL_GL_ACCELERATED_VISUAL, 1);
-#if defined(__APPLE__)
+#if defined(__APPLE__) && !defined(__EMSCRIPTEN__)
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_FLAGS, SDL_GL_CONTEXT_FORWARD_COMPATIBLE_FLAG);
 #else
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_FLAGS, 0);
@@ -1031,12 +1286,16 @@ mgbyte MGP_Window_GetAllowUserResizing(MGP_Window* window)
 	assert(window != nullptr);
 	assert(window->window != nullptr);
 
+#if defined(__EMSCRIPTEN__)
+    return window->allowUserResizing;
+#else
 	auto flags = SDL_GetWindowFlags(window->window);
 
 	if ((flags & SDL_WINDOW_RESIZABLE) != 0)
 		return true;
 
 	return false;
+#endif
 }
 
 void MGP_Window_SetAllowUserResizing(MGP_Window* window, mgbyte allow)
@@ -1044,7 +1303,11 @@ void MGP_Window_SetAllowUserResizing(MGP_Window* window, mgbyte allow)
 	assert(window != nullptr);
 	assert(window->window != nullptr);
 
+#if defined(__EMSCRIPTEN__)
+    window->allowUserResizing = allow;
+#else
 	SDL_SetWindowResizable(window->window, allow ? SDL_TRUE : SDL_FALSE);
+#endif
 }
 
 mgbyte MGP_Window_GetIsBorderless(MGP_Window* window)
@@ -1064,6 +1327,18 @@ void MGP_Window_SetIsBorderless(MGP_Window* window, mgbyte borderless)
 	assert(window != nullptr);
 
 	SDL_SetWindowBordered(window->window, borderless ? SDL_FALSE : SDL_TRUE);
+}
+
+mgbyte MGP_Window_GetIsFullscreen(MGP_Window* window)
+{
+    assert(window != nullptr);
+
+#if defined(__EMSCRIPTEN__)
+    return window->browserFullscreen;
+#else
+    Uint32 flags = SDL_GetWindowFlags(window->window);
+    return (flags & SDL_WINDOW_FULLSCREEN) != 0 ? 1 : 0;
+#endif
 }
 
 void MGP_Window_SetTitle(MGP_Window* window, const char* title)
@@ -1137,6 +1412,10 @@ void MGP_Window_EnterFullScreen(MGP_Window* window, mgbyte useHardwareModeSwitch
 {
     assert(window != nullptr);
 
+#if defined(__EMSCRIPTEN__)
+    (void)useHardwareModeSwitch;
+    MGP_Sdl_RequestBrowserFullscreen(window, 1);
+#else
     Uint32 flags;
     if (useHardwareModeSwitch)
         flags = SDL_WINDOW_FULLSCREEN;
@@ -1144,12 +1423,18 @@ void MGP_Window_EnterFullScreen(MGP_Window* window, mgbyte useHardwareModeSwitch
         flags = SDL_WINDOW_FULLSCREEN_DESKTOP;
 
     SDL_SetWindowFullscreen(window->window, flags);
+#endif
 }
 
 void MGP_Window_ExitFullScreen(MGP_Window* window)
 {
     assert(window != nullptr);
+
+#if defined(__EMSCRIPTEN__)
+    MGP_Sdl_RequestBrowserFullscreen(window, 0);
+#else
     SDL_SetWindowFullscreen(window->window, 0);
+#endif
 }
 
 mgint MGP_Window_ShowMessageBox(MGP_Window* window, const char* title, const char* description, const char* buttons, mgint count)
@@ -1315,4 +1600,3 @@ mgbyte MGP_GamePad_SetVibration(MGP_Platform* platform, mgint identifer, mgfloat
     auto supported = SDL_GameControllerRumble(pair->second, (mgushort)(leftMotor * 0xFFFF), (mgushort)(rightMotor * 0xFFFF), INT_MAX);
     return supported == 0;
 }
-

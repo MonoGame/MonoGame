@@ -38,10 +38,28 @@ namespace
         return address;
     }
 
-    void* TryLoadProcAddress(const char* name)
+    void* LoadOptionalProcAddress(const char* name)
     {
         assert(name != nullptr);
         return SDL_GL_GetProcAddress(name);
+    }
+
+    void* LoadOptionalProcAddress(const char* primaryName, const char* fallbackName)
+    {
+        void* address = LoadOptionalProcAddress(primaryName);
+        if (address == nullptr)
+            address = LoadOptionalProcAddress(fallbackName);
+
+        return address;
+    }
+
+    constexpr bool IsBrowserOpenGL()
+    {
+#if defined(__EMSCRIPTEN__)
+        return true;
+#else
+        return false;
+#endif
     }
 
     void QueryVersion(mgint& majorVersion, mgint& minorVersion)
@@ -69,13 +87,13 @@ void OpenGLFunctions::Load()
     BindAttribLocation = reinterpret_cast<PFNGLBINDATTRIBLOCATIONPROC>(LoadProcAddress("glBindAttribLocation"));
     BlendColor = reinterpret_cast<PFNGLBLENDCOLORPROC>(LoadProcAddress("glBlendColor"));
     BlendEquationSeparate = reinterpret_cast<PFNGLBLENDEQUATIONSEPARATEPROC>(LoadProcAddress("glBlendEquationSeparate"));
-    BlendEquationSeparatei = reinterpret_cast<PFNGLBLENDEQUATIONSEPARATEIPROC>(TryLoadProcAddress("glBlendEquationSeparatei"));
-    if (BlendEquationSeparatei == nullptr)
-        BlendEquationSeparatei = reinterpret_cast<PFNGLBLENDEQUATIONSEPARATEIPROC>(TryLoadProcAddress("glBlendEquationSeparateiARB"));
+    BlendEquationSeparatei = reinterpret_cast<PFNGLBLENDEQUATIONSEPARATEIPROC>(LoadOptionalProcAddress("glBlendEquationSeparatei", "glBlendEquationSeparateiARB"));
+    if (BlendEquationSeparatei == nullptr && IsBrowserOpenGL())
+        BlendEquationSeparatei = reinterpret_cast<PFNGLBLENDEQUATIONSEPARATEIPROC>(LoadOptionalProcAddress("glBlendEquationSeparateiEXT"));
     BlendFuncSeparate = reinterpret_cast<PFNGLBLENDFUNCSEPARATEPROC>(LoadProcAddress("glBlendFuncSeparate"));
-    BlendFuncSeparatei = reinterpret_cast<PFNGLBLENDFUNCSEPARATEIPROC>(TryLoadProcAddress("glBlendFuncSeparatei"));
-    if (BlendFuncSeparatei == nullptr)
-        BlendFuncSeparatei = reinterpret_cast<PFNGLBLENDFUNCSEPARATEIPROC>(TryLoadProcAddress("glBlendFuncSeparateiARB"));
+    BlendFuncSeparatei = reinterpret_cast<PFNGLBLENDFUNCSEPARATEIPROC>(LoadOptionalProcAddress("glBlendFuncSeparatei", "glBlendFuncSeparateiARB"));
+    if (BlendFuncSeparatei == nullptr && IsBrowserOpenGL())
+        BlendFuncSeparatei = reinterpret_cast<PFNGLBLENDFUNCSEPARATEIPROC>(LoadOptionalProcAddress("glBlendFuncSeparateiEXT"));
     BindBuffer = reinterpret_cast<PFNGLBINDBUFFERPROC>(LoadProcAddress("glBindBuffer"));
     BindFramebuffer = reinterpret_cast<PFNGLBINDFRAMEBUFFERPROC>(LoadProcAddress("glBindFramebuffer"));
     BindRenderbuffer = reinterpret_cast<PFNGLBINDRENDERBUFFERPROC>(LoadProcAddress("glBindRenderbuffer"));
@@ -85,7 +103,9 @@ void OpenGLFunctions::Load()
     BufferData = reinterpret_cast<PFNGLBUFFERDATAPROC>(LoadProcAddress("glBufferData"));
     BufferSubData = reinterpret_cast<PFNGLBUFFERSUBDATAPROC>(LoadProcAddress("glBufferSubData"));
     CheckFramebufferStatus = reinterpret_cast<PFNGLCHECKFRAMEBUFFERSTATUSPROC>(LoadProcAddress("glCheckFramebufferStatus"));
-    ColorMaski = reinterpret_cast<PFNGLCOLORMASKIPROC>(LoadProcAddress("glColorMaski"));
+    ColorMaski = reinterpret_cast<PFNGLCOLORMASKIPROC>(LoadOptionalProcAddress("glColorMaski"));
+    if (ColorMaski == nullptr && IsBrowserOpenGL())
+        ColorMaski = reinterpret_cast<PFNGLCOLORMASKIPROC>(LoadOptionalProcAddress("glColorMaskiEXT"));
     CompileShader = reinterpret_cast<PFNGLCOMPILESHADERPROC>(LoadProcAddress("glCompileShader"));
     CompressedTexImage2D = reinterpret_cast<MGGLCOMPRESSEDTEXIMAGE2DPROC>(LoadProcAddress("glCompressedTexImage2D"));
     CompressedTexSubImage2D = reinterpret_cast<MGGLCOMPRESSEDTEXSUBIMAGE2DPROC>(LoadProcAddress("glCompressedTexSubImage2D"));
@@ -94,41 +114,57 @@ void OpenGLFunctions::Load()
     DeleteBuffers = reinterpret_cast<PFNGLDELETEBUFFERSPROC>(LoadProcAddress("glDeleteBuffers"));
     DeleteFramebuffers = reinterpret_cast<PFNGLDELETEFRAMEBUFFERSPROC>(LoadProcAddress("glDeleteFramebuffers"));
     DeleteProgram = reinterpret_cast<PFNGLDELETEPROGRAMPROC>(LoadProcAddress("glDeleteProgram"));
-    DeleteQueries = reinterpret_cast<PFNGLDELETEQUERIESPROC>(LoadProcAddress("glDeleteQueries"));
+    DeleteQueries = reinterpret_cast<PFNGLDELETEQUERIESPROC>(LoadOptionalProcAddress("glDeleteQueries"));
+    if (DeleteQueries == nullptr && IsBrowserOpenGL())
+        DeleteQueries = reinterpret_cast<PFNGLDELETEQUERIESPROC>(LoadOptionalProcAddress("glDeleteQueriesEXT"));
     DeleteRenderbuffers = reinterpret_cast<PFNGLDELETERENDERBUFFERSPROC>(LoadProcAddress("glDeleteRenderbuffers"));
     DeleteSamplers = reinterpret_cast<PFNGLDELETESAMPLERSPROC>(LoadProcAddress("glDeleteSamplers"));
     DeleteShader = reinterpret_cast<PFNGLDELETESHADERPROC>(LoadProcAddress("glDeleteShader"));
     DeleteVertexArrays = reinterpret_cast<PFNGLDELETEVERTEXARRAYSPROC>(LoadProcAddress("glDeleteVertexArrays"));
     DetachShader = reinterpret_cast<PFNGLDETACHSHADERPROC>(LoadProcAddress("glDetachShader"));
     DisableVertexAttribArray = reinterpret_cast<PFNGLDISABLEVERTEXATTRIBARRAYPROC>(LoadProcAddress("glDisableVertexAttribArray"));
-    BeginQuery = reinterpret_cast<PFNGLBEGINQUERYPROC>(LoadProcAddress("glBeginQuery"));
+    BeginQuery = reinterpret_cast<PFNGLBEGINQUERYPROC>(LoadOptionalProcAddress("glBeginQuery"));
+    if (BeginQuery == nullptr && IsBrowserOpenGL())
+        BeginQuery = reinterpret_cast<PFNGLBEGINQUERYPROC>(LoadOptionalProcAddress("glBeginQueryEXT"));
     DrawBuffers = reinterpret_cast<PFNGLDRAWBUFFERSPROC>(LoadProcAddress("glDrawBuffers"));
     DrawElementsInstanced = reinterpret_cast<PFNGLDRAWELEMENTSINSTANCEDPROC>(LoadProcAddress("glDrawElementsInstanced"));
-    EndQuery = reinterpret_cast<PFNGLENDQUERYPROC>(LoadProcAddress("glEndQuery"));
+    EndQuery = reinterpret_cast<PFNGLENDQUERYPROC>(LoadOptionalProcAddress("glEndQuery"));
+    if (EndQuery == nullptr && IsBrowserOpenGL())
+        EndQuery = reinterpret_cast<PFNGLENDQUERYPROC>(LoadOptionalProcAddress("glEndQueryEXT"));
     EnableVertexAttribArray = reinterpret_cast<PFNGLENABLEVERTEXATTRIBARRAYPROC>(LoadProcAddress("glEnableVertexAttribArray"));
-    GetTexImage = reinterpret_cast<MGGLGETTEXIMAGEPROC>(LoadProcAddress("glGetTexImage"));
+    GetTexImage = reinterpret_cast<MGGLGETTEXIMAGEPROC>(LoadOptionalProcAddress("glGetTexImage"));
     FramebufferRenderbuffer = reinterpret_cast<PFNGLFRAMEBUFFERRENDERBUFFERPROC>(LoadProcAddress("glFramebufferRenderbuffer"));
     FramebufferTexture2D = reinterpret_cast<PFNGLFRAMEBUFFERTEXTURE2DPROC>(LoadProcAddress("glFramebufferTexture2D"));
     GenerateMipmap = reinterpret_cast<PFNGLGENERATEMIPMAPPROC>(LoadProcAddress("glGenerateMipmap"));
     GenBuffers = reinterpret_cast<PFNGLGENBUFFERSPROC>(LoadProcAddress("glGenBuffers"));
     GenFramebuffers = reinterpret_cast<PFNGLGENFRAMEBUFFERSPROC>(LoadProcAddress("glGenFramebuffers"));
-    GenQueries = reinterpret_cast<PFNGLGENQUERIESPROC>(LoadProcAddress("glGenQueries"));
+    GenQueries = reinterpret_cast<PFNGLGENQUERIESPROC>(LoadOptionalProcAddress("glGenQueries"));
+    if (GenQueries == nullptr && IsBrowserOpenGL())
+        GenQueries = reinterpret_cast<PFNGLGENQUERIESPROC>(LoadOptionalProcAddress("glGenQueriesEXT"));
     GenRenderbuffers = reinterpret_cast<PFNGLGENRENDERBUFFERSPROC>(LoadProcAddress("glGenRenderbuffers"));
     GenSamplers = reinterpret_cast<PFNGLGENSAMPLERSPROC>(LoadProcAddress("glGenSamplers"));
     GenVertexArrays = reinterpret_cast<PFNGLGENVERTEXARRAYSPROC>(LoadProcAddress("glGenVertexArrays"));
-    GetCompressedTexImage = reinterpret_cast<MGGLGETCOMPRESSEDTEXIMAGEPROC>(LoadProcAddress("glGetCompressedTexImage"));
+    GetCompressedTexImage = reinterpret_cast<MGGLGETCOMPRESSEDTEXIMAGEPROC>(LoadOptionalProcAddress("glGetCompressedTexImage"));
     GetAttribLocation = reinterpret_cast<PFNGLGETATTRIBLOCATIONPROC>(LoadProcAddress("glGetAttribLocation"));
     GetProgramInfoLog = reinterpret_cast<PFNGLGETPROGRAMINFOLOGPROC>(LoadProcAddress("glGetProgramInfoLog"));
     GetProgramiv = reinterpret_cast<PFNGLGETPROGRAMIVPROC>(LoadProcAddress("glGetProgramiv"));
-    GetQueryObjectuiv = reinterpret_cast<PFNGLGETQUERYOBJECTUIVPROC>(LoadProcAddress("glGetQueryObjectuiv"));
+    GetQueryObjectuiv = reinterpret_cast<PFNGLGETQUERYOBJECTUIVPROC>(LoadOptionalProcAddress("glGetQueryObjectuiv"));
+    if (GetQueryObjectuiv == nullptr && IsBrowserOpenGL())
+        GetQueryObjectuiv = reinterpret_cast<PFNGLGETQUERYOBJECTUIVPROC>(LoadOptionalProcAddress("glGetQueryObjectuivEXT"));
     GetShaderInfoLog = reinterpret_cast<PFNGLGETSHADERINFOLOGPROC>(LoadProcAddress("glGetShaderInfoLog"));
     GetShaderiv = reinterpret_cast<PFNGLGETSHADERIVPROC>(LoadProcAddress("glGetShaderiv"));
     GetUniformLocation = reinterpret_cast<PFNGLGETUNIFORMLOCATIONPROC>(LoadProcAddress("glGetUniformLocation"));
     LinkProgram = reinterpret_cast<PFNGLLINKPROGRAMPROC>(LoadProcAddress("glLinkProgram"));
-    MapBuffer = reinterpret_cast<PFNGLMAPBUFFERPROC>(LoadProcAddress("glMapBuffer"));
-    DrawElementsBaseVertex = reinterpret_cast<PFNGLDRAWELEMENTSBASEVERTEXPROC>(LoadProcAddress("glDrawElementsBaseVertex"));
+    MapBuffer = reinterpret_cast<PFNGLMAPBUFFERPROC>(LoadOptionalProcAddress("glMapBuffer"));
+    if (MapBuffer == nullptr && IsBrowserOpenGL())
+        MapBuffer = reinterpret_cast<PFNGLMAPBUFFERPROC>(LoadOptionalProcAddress("glMapBufferOES"));
+    DrawElementsBaseVertex = reinterpret_cast<PFNGLDRAWELEMENTSBASEVERTEXPROC>(LoadOptionalProcAddress("glDrawElementsBaseVertex"));
     RenderbufferStorage = reinterpret_cast<PFNGLRENDERBUFFERSTORAGEPROC>(LoadProcAddress("glRenderbufferStorage"));
-    RenderbufferStorageMultisample = reinterpret_cast<PFNGLRENDERBUFFERSTORAGEMULTISAMPLEPROC>(LoadProcAddress("glRenderbufferStorageMultisample"));
+    RenderbufferStorageMultisample = reinterpret_cast<PFNGLRENDERBUFFERSTORAGEMULTISAMPLEPROC>(LoadOptionalProcAddress("glRenderbufferStorageMultisample"));
+    if (RenderbufferStorageMultisample == nullptr && IsBrowserOpenGL())
+        RenderbufferStorageMultisample = reinterpret_cast<PFNGLRENDERBUFFERSTORAGEMULTISAMPLEPROC>(LoadOptionalProcAddress("glRenderbufferStorageMultisampleEXT"));
+    if (RenderbufferStorageMultisample == nullptr && IsBrowserOpenGL())
+        RenderbufferStorageMultisample = reinterpret_cast<PFNGLRENDERBUFFERSTORAGEMULTISAMPLEPROC>(LoadOptionalProcAddress("glRenderbufferStorageMultisampleANGLE"));
     SamplerParameterf = reinterpret_cast<PFNGLSAMPLERPARAMETERFPROC>(LoadProcAddress("glSamplerParameterf"));
     SamplerParameterfv = reinterpret_cast<PFNGLSAMPLERPARAMETERFVPROC>(LoadProcAddress("glSamplerParameterfv"));
     SamplerParameteri = reinterpret_cast<PFNGLSAMPLERPARAMETERIPROC>(LoadProcAddress("glSamplerParameteri"));
@@ -140,7 +176,9 @@ void OpenGLFunctions::Load()
     Uniform1i = reinterpret_cast<PFNGLUNIFORM1IPROC>(LoadProcAddress("glUniform1i"));
     Uniform4fv = reinterpret_cast<PFNGLUNIFORM4FVPROC>(LoadProcAddress("glUniform4fv"));
     Uniform4iv = reinterpret_cast<PFNGLUNIFORM4IVPROC>(LoadProcAddress("glUniform4iv"));
-    UnmapBuffer = reinterpret_cast<PFNGLUNMAPBUFFERPROC>(LoadProcAddress("glUnmapBuffer"));
+    UnmapBuffer = reinterpret_cast<PFNGLUNMAPBUFFERPROC>(LoadOptionalProcAddress("glUnmapBuffer"));
+    if (UnmapBuffer == nullptr && IsBrowserOpenGL())
+        UnmapBuffer = reinterpret_cast<PFNGLUNMAPBUFFERPROC>(LoadOptionalProcAddress("glUnmapBufferOES"));
     UseProgram = reinterpret_cast<PFNGLUSEPROGRAMPROC>(LoadProcAddress("glUseProgram"));
     VertexAttribDivisor = reinterpret_cast<PFNGLVERTEXATTRIBDIVISORPROC>(LoadProcAddress("glVertexAttribDivisor"));
     VertexAttribPointer = reinterpret_cast<PFNGLVERTEXATTRIBPOINTERPROC>(LoadProcAddress("glVertexAttribPointer"));
@@ -185,8 +223,13 @@ bool OpenGLContext::Create(SDL_Window* nextWindow)
     MakeCurrent();
 
     QueryVersion(majorVersion, minorVersion);
+#if defined(__EMSCRIPTEN__)
+    if (majorVersion < 3)
+        MGGL_FAIL("OpenGL ES 3.0 context required", "created context is below ES 3.0");
+#else
     if (majorVersion < 3 || (majorVersion == 3 && minorVersion < 1))
         MGGL_FAIL("OpenGL 3.1 core context required", "created context is below 3.1");
+#endif
 
     functions.Load();
 
@@ -194,6 +237,7 @@ bool OpenGLContext::Create(SDL_Window* nextWindow)
     // dont' need to keep the old context around anymore.
     if (previousHandle != nullptr)
         SDL_GL_DeleteContext(previousHandle);
+
 
     functions.GenVertexArrays(1, &defaultVertexArray);
     if (defaultVertexArray == 0)
@@ -240,6 +284,13 @@ void OpenGLContext::SetSwapInterval(mgint nextSyncInterval)
 
     if (syncInterval == nextSyncInterval)
         return;
+
+#if defined(__EMSCRIPTEN__)
+    // TODO: browser presentation is compositor driven
+    //       this might need to change if we need expicit timing control
+    syncInterval = nextSyncInterval;
+    return;
+#endif
 
     MakeCurrent();
 

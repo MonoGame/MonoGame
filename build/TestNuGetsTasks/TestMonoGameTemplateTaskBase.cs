@@ -18,6 +18,7 @@ public abstract class TestMonoGameTemplateTaskBase : FrostingTask<BuildContext>
     protected abstract string ProjectFolderName { get; }
     protected abstract string TemplateShortName { get; }
     protected abstract PlatformFamily[] SupportedPlatforms { get; }
+    protected virtual string SuccessMessage => "built successfully";
 
     private class TestResult
     {
@@ -88,20 +89,22 @@ public abstract class TestMonoGameTemplateTaskBase : FrostingTask<BuildContext>
 
             UpdateProjectReferences(context, projectDir, templateVersion);
 
+            CreateTestNuGetConfig(projectDir);
+
             RestoreProject(context, projectDir);
 
             LogCurrentFileContents(context, projectDir);
 
-            BuildProject(context, projectDir);
+            ValidateProject(context, projectDir);
 
-            context.Information($"✅ Test completed successfully! MonoGame {TemplateName} project built without errors.");
+            context.Information($"✅ Test completed successfully. MonoGame {TemplateName} project {SuccessMessage}.");
             context.Information($"📁 Test project preserved at: {projectDir}");
 
             TestResults.Add(new TestResult
             {
                 TemplateName = TemplateName,
                 Status = TestStatus.Success,
-                Message = "Built successfully",
+                Message = SuccessMessage,
                 Platform = currentPlatform
             });
         }
@@ -193,7 +196,7 @@ public abstract class TestMonoGameTemplateTaskBase : FrostingTask<BuildContext>
         context.Information($"Installing MonoGame templates version {templateVersion}...");
         context.StartProcess("dotnet", new ProcessSettings
         {
-            Arguments = $"new install MonoGame.Templates.CSharp::{templateVersion} --nuget-source \"{nugetSourcePath}\""
+            Arguments = $"new install MonoGame.Templates.CSharp@{templateVersion} --nuget-source \"{nugetSourcePath}\""
         });
     }
 
@@ -213,25 +216,23 @@ public abstract class TestMonoGameTemplateTaskBase : FrostingTask<BuildContext>
         var configDir = IOPath.Combine(projectDir, ".config");
         var dotnetToolsPath = IOPath.Combine(configDir, "dotnet-tools.json");
 
-        context.Information($"Replacing dotnet-tools.json with platform-specific version for: {context.Environment.Platform.Family}");
+        context.Information("Replacing dotnet-tools.json with the local package version.");
 
         if (!Directory.Exists(configDir))
         {
             context.CreateDirectory(configDir);
         }
 
-        var toolsJson = GetPlatformSpecificToolsJson(context, version);
+        string toolsJson = GetToolsJson(context, version);
         File.WriteAllText(dotnetToolsPath, toolsJson);
 
-        context.Information("Platform-specific dotnet-tools.json created successfully.");
+        context.Information("dotnet-tools.json created successfully.");
     }
 
-    private string GetPlatformSpecificToolsJson(BuildContext context, string version)
+    protected virtual string GetToolsJson(BuildContext context, string version)
     {
-        var platform = context.Environment.Platform.Family;
-
-        // Base tools that are available on all platforms
-        var baseTools = $$"""
+        PlatformFamily platform = context.Environment.Platform.Family;
+        string baseTools = $$"""
             {
             "version": 1,
             "isRoot": true,
@@ -250,7 +251,6 @@ public abstract class TestMonoGameTemplateTaskBase : FrostingTask<BuildContext>
                 }
             """;
 
-        // Add platform-specific editor tool
         string platformSpecificTool = platform switch
         {
             PlatformFamily.Windows => $$"""
@@ -280,10 +280,24 @@ public abstract class TestMonoGameTemplateTaskBase : FrostingTask<BuildContext>
                 ]
                 }
             """,
-            _ => "" // No platform-specific tool for unknown platforms
+            _ => ""
         };
 
         return baseTools + platformSpecificTool + "\n  }\n}";
+    }
+
+    private void CreateTestNuGetConfig(string projectDir)
+    {
+        string nuGetConfigPath = IOPath.Combine(projectDir, "NuGet.config");
+        string nuGetConfig = """
+            <?xml version="1.0" encoding="utf-8"?>
+            <configuration>
+              <config>
+                <add key="globalPackagesFolder" value="./packages" />
+              </config>
+            </configuration>
+            """;
+        File.WriteAllText(nuGetConfigPath, nuGetConfig);
     }
 
     private void RestoreProject(BuildContext context, string projectDir)
@@ -324,6 +338,9 @@ public abstract class TestMonoGameTemplateTaskBase : FrostingTask<BuildContext>
 
         context.Information("✅ Build completed successfully");
     }
+
+    protected virtual void ValidateProject(BuildContext context, string projectDir)
+        => BuildProject(context, projectDir);
 
     // Regex to match any path ending with MonoGame.Framework.dll
     private static readonly Regex MonoGameFrameworkPathRegex = new(

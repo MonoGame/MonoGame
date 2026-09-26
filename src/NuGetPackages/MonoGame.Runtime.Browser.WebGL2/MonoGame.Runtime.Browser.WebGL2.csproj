@@ -1,0 +1,35 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <ItemGroup>
+    <Compile Remove="WebInterop.cs" />
+    <None Include="WebInterop.cs" Pack="true" PackagePath="buildTransitive" />
+    <None Include="MonoGame.Runtime.Browser.WebGL2.props" Pack="true" PackagePath="buildTransitive" />
+    <None Include="MonoGame.Runtime.Browser.WebGL2.targets" Pack="true" PackagePath="buildTransitive" />
+    <None Include="Host\monogame-web-host.js" Pack="true" PackagePath="buildTransitive\Host" />
+    <None Include="Host\browser-accelerometer.js" Pack="true" PackagePath="buildTransitive\Host" />
+    <None Include="Host\browser-audio.js" Pack="true" PackagePath="buildTransitive\Host" />
+    <None Include="Host\browser-content.js" Pack="true" PackagePath="buildTransitive\Host" />
+    <None Include="Host\browser-host-common.js" Pack="true" PackagePath="buildTransitive\Host" />
+    <None Include="Host\browser-window.js" Pack="true" PackagePath="buildTransitive\Host" />
+    <None Include="Host\browser.runtimeconfig.template.json" Pack="true" PackagePath="buildTransitive\Host" />
+
+    <Content Include="..\..\..\Artifacts\native\mgruntime\webgl2\browser-wasm\Release\libSDL2.a"
+      Condition="Exists('..\..\..\Artifacts\native\mgruntime\webgl2\browser-wasm\Release\libSDL2.a')">
+      <PackagePath>runtimes\browser-wasm\native</PackagePath>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+
+    <Content Include="..\..\..\Artifacts\native\mgruntime\webgl2\browser-wasm\Release\libFAudio.a"
+      Condition="Exists('..\..\..\Artifacts\native\mgruntime\webgl2\browser-wasm\Release\libFAudio.a')">
+      <PackagePath>runtimes\browser-wasm\native</PackagePath>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+
+    <Content Include="..\..\..\Artifacts\native\mgruntime\webgl2\browser-wasm\Release\mgruntime.a"
+      Condition="Exists('..\..\..\Artifacts\native\mgruntime\webgl2\browser-wasm\Release\mgruntime.a')">
+      <PackagePath>runtimes\browser-wasm\native</PackagePath>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+</Project>
