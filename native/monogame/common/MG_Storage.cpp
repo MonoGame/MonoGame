@@ -75,14 +75,6 @@ static void _MakeFileOperationPath(char* path, const char* source)
     path[strlen(path) + 1] = 0;
 }
 
-#else
-
-static int _mg_remove(const char* fpath, const struct stat* sb, int typeflag)
-{
-    int err = remove(fpath);
-    return err;
-}
-
 #endif
 
 
@@ -127,9 +119,40 @@ static bool _MG_Storage_DeleteDirectory(const char* path)
 
 #else
 
-    // Walks the directory tree calling remove for each file then directory.
-    int ok = nftw(path, _mg_remove, 20, FTW_DEPTH | FTW_PHYS);
-    if (ok == 0)
+    DIR* h = opendir(path);
+    if (h == nullptr)
+        return false;
+
+    while (true)
+    {
+        struct dirent* e;
+        e = readdir(h);
+        if (e == nullptr)
+            break;
+
+        std::string name = e->d_name;
+        if (name == "." || name == "..")
+            continue;
+
+        std::string entry = path;
+        entry += name;
+
+        if (e->d_type & DT_DIR)
+        {
+            entry += "/";
+
+            _MG_Storage_DeleteDirectory(entry.c_str());
+            continue;
+        }
+
+        // Delete the file.
+        unlink(entry.c_str());
+    }
+
+    closedir(h);
+
+    int err = remove(fpath);
+    if (err == 0)
         return true;
 
 #endif
