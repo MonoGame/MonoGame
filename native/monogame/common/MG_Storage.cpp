@@ -151,7 +151,7 @@ static bool _MG_Storage_DeleteDirectory(const char* path)
 
     closedir(h);
 
-    int err = remove(fpath);
+    int err = remove(path);
     if (err == 0)
         return true;
 
