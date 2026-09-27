@@ -9,7 +9,7 @@ if vulkan_sdk == nil and os.target() == "macosx" then
 end
 
 newoption {
-    trigger = "arch",
+    trigger = "mg-arch",
     value = "ARCH",
     description = "Target architecture (x64 or arm64)",
     default = "x64",
@@ -28,7 +28,7 @@ function common(project_name)
         filter {}
         platform_target_path = "../../Artifacts/native/mgruntime/" .. project_name .. "/%{cfg.system}/%{cfg.platform}/%{cfg.buildcfg}"
     else
-        local target_arch = _OPTIONS["arch"] or "x64"
+        local target_arch = _OPTIONS["mg-arch"] or "x64"
         architecture(target_arch == "arm64" and "ARM64" or "x64")
         if os.target() == "macosx" then
             platform_target_path = "../../Artifacts/native/mgruntime/" .. project_name .. "/%{cfg.system}/%{cfg.buildcfg}"
@@ -87,6 +87,21 @@ function vulkan()
     filter {"system:macosx"}
     libdirs {path.join(vulkan_sdk, "lib/MoltenVK.xcframework/macos-arm64_x86_64")}
     links {"MoltenVK", "IOSurface.framework", "Foundation.framework", "QuartzCore.framework", "AppKit.framework"}
+    filter {}
+end
+
+-- OpenGL is supported on desktop platforms through SDL.
+function opengl()
+    defines {"MG_OPENGL"}
+
+    files {"opengl/**.h", "opengl/**.cpp"}
+
+    filter {"system:windows"}
+    links {"opengl32"}
+    filter {"system:macosx"}
+    links {"OpenGL.framework"}
+    filter {"system:linux"}
+    links {"GL"}
     filter {}
 end
 
@@ -164,6 +179,13 @@ project "desktopvk"
 common("desktopvk")
 sdl2()
 vulkan()
+faudio()
+configs()
+
+project "desktopgl4"
+common("desktopgl4")
+sdl2()
+opengl()
 faudio()
 configs()
 

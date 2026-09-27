@@ -934,6 +934,40 @@ namespace Microsoft.Xna.Framework
         }
 
         /// <summary>
+        /// Round the members of this <see cref="Vector3"/> towards the specified number of fractional digits.
+        /// </summary>
+        /// <param name="digits">The number of fractional digits the components will be rounded to.</param>
+        public void Round(int digits)
+        {
+            X = MathF.Round(X, digits);
+            Y = MathF.Round(Y, digits);
+            Z = MathF.Round(Z, digits);
+        }
+
+        /// <summary>
+        /// Round the members of this <see cref="Vector3"/> towards the specified number of fractional digits, using the specified rounding convention for midpoint values.
+        /// </summary>
+        /// <param name="digits">The number of fractional digits the components will be rounded to.</param>
+        /// <param name="mode">Specification for how to round a component value if it is midway between two other numbers.</param>
+        public void Round(int digits, MidpointRounding mode)
+        {
+            X = MathF.Round(X, digits, mode);
+            Y = MathF.Round(Y, digits, mode);
+            Z = MathF.Round(Z, digits, mode);
+        }
+
+        /// <summary>
+        /// Round the members of this <see cref="Vector3"/> towards the nearest integer value, using the specified rounding convention for midpoint values.
+        /// </summary>
+        /// <param name="mode">Specification for how to round a component value if it is midway between two other numbers.</param>
+        public void Round(MidpointRounding mode)
+        {
+            X = MathF.Round(X, mode);
+            Y = MathF.Round(Y, mode);
+            Z = MathF.Round(Z, mode);
+        }
+
+        /// <summary>
         /// Creates a new <see cref="Vector3"/> that contains members from another vector rounded to the nearest integer value.
         /// </summary>
         /// <param name="value">Source <see cref="Vector3"/>.</param>
@@ -947,6 +981,49 @@ namespace Microsoft.Xna.Framework
         }
 
         /// <summary>
+        /// Creates a new <see cref="Vector3"/> that contains members from another vector rounded to the specified number of fractional digits.
+        /// </summary>
+        /// <param name="value">Source <see cref="Vector3"/>.</param>
+        /// <param name="digits">The number of fractional digits in the return value's components.</param>
+        /// <returns>The rounded <see cref="Vector3"/>.</returns>
+        public static Vector3 Round(Vector3 value, int digits)
+        {
+            value.X = MathF.Round(value.X, digits);
+            value.Y = MathF.Round(value.Y, digits);
+            value.Z = MathF.Round(value.Z, digits);
+            return value;
+        }
+
+        /// <summary>
+        /// Creates a new <see cref="Vector3"/> that contains members from another vector rounded to the specified number of fractional digits, using the specified rounding convention for midpoint values.
+        /// </summary>
+        /// <param name="value">Source <see cref="Vector3"/>.</param>
+        /// <param name="digits">The number of fractional digits in the return value's components.</param>
+        /// <param name="mode">Specification for how to round a component value if it is midway between two other numbers.</param>
+        /// <returns>The rounded <see cref="Vector3"/>.</returns>
+        public static Vector3 Round(Vector3 value, int digits, MidpointRounding mode)
+        {
+            value.X = MathF.Round(value.X, digits, mode);
+            value.Y = MathF.Round(value.Y, digits, mode);
+            value.Z = MathF.Round(value.Z, digits, mode);
+            return value;
+        }
+
+        /// <summary>
+        /// Creates a new <see cref="Vector3"/> that contains members from another vector rounded to the nearest integer value, using the specified rounding convention for midpoint values.
+        /// </summary>
+        /// <param name="value">Source <see cref="Vector3"/>.</param>
+        /// <param name="mode">Specification for how to round a component value if it is midway between two other numbers.</param>
+        /// <returns>The rounded <see cref="Vector3"/>.</returns>
+        public static Vector3 Round(Vector3 value, MidpointRounding mode)
+        {
+            value.X = MathF.Round(value.X, mode);
+            value.Y = MathF.Round(value.Y, mode);
+            value.Z = MathF.Round(value.Z, mode);
+            return value;
+        }
+
+        /// <summary>
         /// Creates a new <see cref="Vector3"/> that contains members from another vector rounded to the nearest integer value.
         /// </summary>
         /// <param name="value">Source <see cref="Vector3"/>.</param>
@@ -956,6 +1033,46 @@ namespace Microsoft.Xna.Framework
             result.X = MathF.Round(value.X);
             result.Y = MathF.Round(value.Y);
             result.Z = MathF.Round(value.Z);
+        }
+
+        /// <summary>
+        /// Creates a new <see cref="Vector3"/> that contains members from another vector rounded to the specified number of fractional digits.
+        /// </summary>
+        /// <param name="value">Source <see cref="Vector3"/>.</param>
+        /// <param name="result">The rounded <see cref="Vector3"/>.</param>
+        /// <param name="digits">The number of fractional digits in the return value's components.</param>
+        public static void Round(ref Vector3 value, out Vector3 result, int digits)
+        {
+            result.X = MathF.Round(value.X, digits);
+            result.Y = MathF.Round(value.Y, digits);
+            result.Z = MathF.Round(value.Z, digits);
+        }
+
+        /// <summary>
+        /// Creates a new <see cref="Vector3"/> that contains members from another vector rounded to the specified number of fractional digits, using the specified rounding convention for midpoint values.
+        /// </summary>
+        /// <param name="value">Source <see cref="Vector3"/>.</param>
+        /// <param name="result">The rounded <see cref="Vector3"/>.</param>
+        /// <param name="digits">The number of fractional digits in the return value's components.</param>
+        /// <param name="mode">Specification for how to round a component value if it is midway between two other numbers.</param>
+        public static void Round(ref Vector3 value, out Vector3 result, int digits, MidpointRounding mode)
+        {
+            result.X = MathF.Round(value.X, digits, mode);
+            result.Y = MathF.Round(value.Y, digits, mode);
+            result.Z = MathF.Round(value.Z, digits, mode);
+        }
+
+        /// <summary>
+        /// Creates a new <see cref="Vector3"/> that contains members from another vector rounded to the nearest integer value, using the specified rounding convention for midpoint values.
+        /// </summary>
+        /// <param name="value">Source <see cref="Vector3"/>.</param>
+        /// <param name="result">The rounded <see cref="Vector3"/>.</param>
+        /// <param name="mode">Specification for how to round a component value if it is midway between two other numbers.</param>
+        public static void Round(ref Vector3 value, out Vector3 result, MidpointRounding mode)
+        {
+            result.X = MathF.Round(value.X, mode);
+            result.Y = MathF.Round(value.Y, mode);
+            result.Z = MathF.Round(value.Z, mode);
         }
 
         /// <summary>
@@ -1317,6 +1434,117 @@ namespace Microsoft.Xna.Framework
                         (normal.X*matrix.M11) + (normal.Y*matrix.M21) + (normal.Z*matrix.M31),
                         (normal.X*matrix.M12) + (normal.Y*matrix.M22) + (normal.Z*matrix.M32),
                         (normal.X*matrix.M13) + (normal.Y*matrix.M23) + (normal.Z*matrix.M33));
+            }
+        }
+
+        #endregion
+
+        #region TransformCoord
+
+        /// <summary>
+        /// Creates a new <see cref="Vector3"/> that contains a transformation of the specified position vector by the specified <see cref="Matrix"/> and applies the perspective divide.
+        /// </summary>
+        /// <param name="vector">Source <see cref="Vector3"/> representing a position.</param>
+        /// <param name="matrix">The transformation <see cref="Matrix"/> including a projection.</param>
+        /// <returns>Transformed vector.</returns>
+        /// <remarks>
+        /// This transform can produce infinity or NaN if the specified position lies exactly on the camera plane.
+        /// </remarks>
+        public static Vector3 TransformCoord(Vector3 vector, Matrix matrix)
+        {
+            TransformCoord(ref vector, ref matrix, out vector);
+            return vector;
+        }
+
+        /// <summary>
+        /// Creates a new <see cref="Vector3"/> that contains a transformation of the specified position vector by the specified <see cref="Matrix"/> and applies the perspective divide.
+        /// </summary>
+        /// <param name="vector">Source <see cref="Vector3"/> representing a position.</param>
+        /// <param name="matrix">The transformation <see cref="Matrix"/> including a projection.</param>
+        /// <param name="result">Transformed vector as an output parameter.</param>
+        /// <remarks>
+        /// This transform can produce infinity or NaN if the specified position lies exactly on the camera plane.
+        /// </remarks>
+        public static void TransformCoord(ref Vector3 vector, ref Matrix matrix, out Vector3 result)
+        {
+            var x = (vector.X * matrix.M11) + (vector.Y * matrix.M21) + (vector.Z * matrix.M31) + matrix.M41;
+            var y = (vector.X * matrix.M12) + (vector.Y * matrix.M22) + (vector.Z * matrix.M32) + matrix.M42;
+            var z = (vector.X * matrix.M13) + (vector.Y * matrix.M23) + (vector.Z * matrix.M33) + matrix.M43;
+            var invW = 1f / ((vector.X * matrix.M14) + (vector.Y * matrix.M24) + (vector.Z * matrix.M34) + matrix.M44);
+
+            result.X = x * invW;
+            result.Y = y * invW;
+            result.Z = z * invW;
+        }
+
+        /// <summary>
+        /// Apply transformation on all positions within array of <see cref="Vector3"/> by the specified <see cref="Matrix"/>
+        /// and places the results in an another array, applying the perspective divide.
+        /// </summary>
+        /// <param name="sourceArray">Source array.</param>
+        /// <param name="sourceIndex">The starting index of transformation in the source array.</param>
+        /// <param name="matrix">The transformation <see cref="Matrix"/> including a projection.</param>
+        /// <param name="destinationArray">Destination array.</param>
+        /// <param name="destinationIndex">The starting index in the destination array, where the first <see cref="Vector3"/> should be written.</param>
+        /// <param name="length">The number of vectors to be transformed.</param>
+        /// <remarks>
+        /// This transform can produce infinity or NaN if the specified position lies exactly on the camera plane.
+        /// </remarks>
+        public static void TransformCoord(Vector3[] sourceArray,
+         int sourceIndex,
+         ref Matrix matrix,
+         Vector3[] destinationArray,
+         int destinationIndex,
+         int length)
+        {
+            if (sourceArray == null)
+                throw new ArgumentNullException("sourceArray");
+            if (destinationArray == null)
+                throw new ArgumentNullException("destinationArray");
+            if(sourceArray.Length < sourceIndex + length)
+                throw new ArgumentException("Source array length is lesser than sourceIndex + length");
+            if (destinationArray.Length < destinationIndex + length)
+                throw new ArgumentException("Destination array length is lesser than destinationIndex + length");
+
+            for (int x = 0; x < length; x++)
+            {
+                var vector = sourceArray[sourceIndex + x];
+                var invW = 1f / ((vector.X * matrix.M14) + (vector.Y * matrix.M24) + (vector.Z * matrix.M34) + matrix.M44);
+
+                destinationArray[destinationIndex + x] =
+                     new Vector3(
+                        ((vector.X * matrix.M11) + (vector.Y * matrix.M21) + (vector.Z * matrix.M31) + matrix.M41) * invW,
+                        ((vector.X * matrix.M12) + (vector.Y * matrix.M22) + (vector.Z * matrix.M32) + matrix.M42) * invW,
+                        ((vector.X * matrix.M13) + (vector.Y * matrix.M23) + (vector.Z * matrix.M33) + matrix.M43) * invW);
+            }
+        }
+
+        /// <summary>
+        /// Apply transformation on all positions within array of <see cref="Vector3"/> by the specified <see cref="Matrix"/>
+        /// and places the results in an another array, applying the perspective divide.
+        /// </summary>
+        /// <param name="sourceArray">Source array.</param>
+        /// <param name="matrix">The transformation <see cref="Matrix"/> including a projection.</param>
+        /// <param name="destinationArray">Destination array.</param>
+        public static void TransformCoord(Vector3[] sourceArray, ref Matrix matrix, Vector3[] destinationArray)
+        {
+            if(sourceArray == null)
+                throw new ArgumentNullException("sourceArray");
+            if (destinationArray == null)
+                throw new ArgumentNullException("destinationArray");
+            if (destinationArray.Length < sourceArray.Length)
+                throw new ArgumentException("Destination array length is lesser than source array length");
+
+            for (var i = 0; i < sourceArray.Length; i++)
+            {
+                var vector = sourceArray[i];
+                var invW = 1f / ((vector.X * matrix.M14) + (vector.Y * matrix.M24) + (vector.Z * matrix.M34) + matrix.M44);
+
+                destinationArray[i] =
+                    new Vector3(
+                        ((vector.X * matrix.M11) + (vector.Y * matrix.M21) + (vector.Z * matrix.M31) + matrix.M41) * invW,
+                        ((vector.X * matrix.M12) + (vector.Y * matrix.M22) + (vector.Z * matrix.M32) + matrix.M42) * invW,
+                        ((vector.X * matrix.M13) + (vector.Y * matrix.M23) + (vector.Z * matrix.M33) + matrix.M43) * invW);
             }
         }
 

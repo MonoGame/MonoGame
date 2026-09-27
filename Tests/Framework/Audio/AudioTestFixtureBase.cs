@@ -81,5 +81,29 @@ namespace MonoGame.Tests.Audio
                 Thread.Sleep(sleep);
             }
         }
+
+        protected static bool WaitUntilDispatching(Func<bool> condition, TimeSpan timeout)
+        {
+            const int sleep = (int)(1000.0 / 60.0);
+
+            Stopwatch stopwatch = Stopwatch.StartNew();
+
+            while (stopwatch.Elapsed < timeout)
+            {
+                FrameworkDispatcher.Update();
+
+#if !(WINDOWS && DIRECTX) // WindowsDX
+                Threading.Run();
+#endif
+                if (condition())
+                {
+                    return true;
+                }
+
+                Thread.Sleep(sleep);
+            }
+
+            return false;
+        }
     }
 }

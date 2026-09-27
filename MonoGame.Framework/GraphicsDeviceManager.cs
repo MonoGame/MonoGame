@@ -296,7 +296,7 @@ namespace Microsoft.Xna.Framework
 
         #endregion
 
-        partial void PlatformApplyChanges();
+        partial void PlatformApplyChanges(GraphicsDeviceInformation gdi);
 
         partial void PlatformPreparePresentationParameters(PresentationParameters presentationParameters);
 
@@ -354,12 +354,13 @@ namespace Microsoft.Xna.Framework
 
             _game.Window.SetSupportedOrientations(_supportedOrientations);
 
-            // Allow for optional platform specific behavior.
-            PlatformApplyChanges();
-
             // populates a gdi with settings in this gdm and allows users to override them with
             // PrepareDeviceSettings event this information should be applied to the GraphicsDevice
             var gdi = DoPreparingDeviceSettings();
+
+            // Allow for optional platform specific behavior
+            // After device settings are finalized!
+            PlatformApplyChanges(gdi);
 
             if (gdi.GraphicsProfile != GraphicsDevice.GraphicsProfile)
             {

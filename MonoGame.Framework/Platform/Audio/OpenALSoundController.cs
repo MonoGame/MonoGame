@@ -9,9 +9,9 @@ using MonoGame.OpenGL;
 
 #if ANDROID
 using System.Globalization;
-using Android.Content.PM;
-using Android.Content;
-using Android.Media;
+using global::Android.Content.PM;
+using global::Android.Content;
+using global::Android.Media;
 #endif
 
 #if IOS
@@ -194,7 +194,7 @@ namespace Microsoft.Xna.Framework.Audio
                 int updateBuffers = DEFAULT_UPDATE_BUFFER_COUNT;
                 if (OperatingSystem.IsAndroidVersionAtLeast(17))
                 {
-                    Android.Util.Log.Debug("OAL", Game.Activity.PackageManager.HasSystemFeature(PackageManager.FeatureAudioLowLatency) ? "Supports low latency audio playback." : "Does not support low latency audio playback.");
+                    global::Android.Util.Log.Debug("OAL", Game.Activity.PackageManager.HasSystemFeature(PackageManager.FeatureAudioLowLatency) ? "Supports low latency audio playback." : "Does not support low latency audio playback.");
 
                     var audioManager = Game.Activity.GetSystemService(Context.AudioService) as AudioManager;
                     if (audioManager != null)
@@ -216,9 +216,9 @@ namespace Microsoft.Xna.Framework.Audio
                 }
                 else
                 {
-                    Android.Util.Log.Debug("OAL", "Android 4.2 or higher required for low latency audio playback.");
+                    global::Android.Util.Log.Debug("OAL", "Android 4.2 or higher required for low latency audio playback.");
                 }
-                Android.Util.Log.Debug("OAL", "Using sample rate " + frequency + "Hz and " + updateBuffers + " buffers of " + updateSize + " frames.");
+                global::Android.Util.Log.Debug("OAL", "Using sample rate " + frequency + "Hz and " + updateBuffers + " buffers of " + updateSize + " frames.");
 
                 // These are missing and non-standard ALC constants
                 const int AlcFrequency = 0x1007;

@@ -1,7 +1,7 @@
 // MonoGame - Copyright (C) MonoGame Foundation, Inc
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
-                
+
 // This code is auto generated, don't modify it by hand.
 // To regenerate it run: Tools/MonoGame.Generator.CTypes
 
@@ -33,7 +33,8 @@ MG_EXPORT void MGG_GraphicsAdapter_GetInfo(MGG_GraphicsAdapter* adapter, MGG_Gra
 MG_EXPORT MGG_GraphicsDevice* MGG_GraphicsDevice_Create(MGG_GraphicsSystem* system, MGG_GraphicsAdapter* adapter);
 MG_EXPORT void MGG_GraphicsDevice_Destroy(MGG_GraphicsDevice* device);
 MG_EXPORT void MGG_GraphicsDevice_GetCaps(MGG_GraphicsDevice* device, MGG_GraphicsDevice_Caps& caps);
-MG_EXPORT void MGG_GraphicsDevice_ResizeSwapchain(MGG_GraphicsDevice* device, void* nativeWindowHandle, mgint width, mgint height, MGSurfaceFormat color, MGDepthFormat depth, mgint multiSampleCount, mgint syncInterval);
+MG_EXPORT mgint MGG_GraphicsDevice_GetBackBufferMultiSampleCount(MGG_GraphicsDevice* device);
+MG_EXPORT mgbyte MGG_GraphicsDevice_ResizeSwapchain(MGG_GraphicsDevice* device, void* nativeWindowHandle, mgint width, mgint height, MGSurfaceFormat color, MGDepthFormat depth, mgint multiSampleCount, mgint syncInterval);
 MG_EXPORT mgint MGG_GraphicsDevice_BeginFrame(MGG_GraphicsDevice* device);
 MG_EXPORT void MGG_GraphicsDevice_Clear(MGG_GraphicsDevice* device, MGClearOptions options, Vector4& color, mgfloat depth, mgint stencil);
 MG_EXPORT void MGG_GraphicsDevice_Present(MGG_GraphicsDevice* device, mgint currentFrame, mgint syncInterval);

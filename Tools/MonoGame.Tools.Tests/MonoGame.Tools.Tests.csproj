@@ -597,6 +597,12 @@
     <Content Update="..\..\Tests\Assets\Models\Dude\dude_2011.fbx">
       <Link>Assets\Models\Dude\dude_2011.fbx</Link>
     </Content>
+    <Content Update="..\..\Tests\Assets\Models\Wood_Calf_R.FBX">
+      <Link>Assets\Models\Wood_Calf_R.FBX</Link>
+    </Content>
+    <Content Update="..\..\Tests\Assets\Models\spaceship.fbx">
+      <Link>Assets\Models\spaceship.fbx</Link>
+    </Content>
     <Content Update="..\..\Tests\Assets\Models\Dude\upBodyC.tga">
       <Link>Assets\Models\Dude\upBodyC.tga</Link>
     </Content>

@@ -2,38 +2,42 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
+using System;
+
 namespace Microsoft.Xna.Framework.Graphics;
 
 internal partial class GraphicsCapabilities
 {
     private void PlatformInitialize(GraphicsDevice device)
     {
-        SupportsNonPowerOfTwo = device.GraphicsProfile == GraphicsProfile.HiDef;
-        SupportsTextureFilterAnisotropic = true;
+        SupportsNonPowerOfTwo = device.GraphicsProfile == GraphicsProfile.HiDef && device.SupportsNonPowerOfTwo;
+        SupportsTextureFilterAnisotropic = device.SupportsTextureFilterAnisotropic;
 
-        SupportsDepth24 = true;
-        SupportsPackedDepthStencil = true;
-        SupportsDepthNonLinear = false;
-        SupportsTextureMaxLevel = true;
+        SupportsDepth24 = device.SupportsDepth24;
+        SupportsPackedDepthStencil = device.SupportsPackedDepthStencil;
+        SupportsDepthNonLinear = device.SupportsDepthNonLinear;
+        SupportsTextureMaxLevel = device.SupportsTextureMaxLevel;
 
         // Texture compression
-        SupportsDxt1 = true;
-        SupportsS3tc = true;
+        SupportsDxt1 = device.SupportsDxt1;
+        SupportsS3tc = device.SupportsS3tc;
 
-        SupportsSRgb = true;
+        SupportsSRgb = device.SupportsSRgb;
 
-        SupportsTextureArrays = device.GraphicsProfile == GraphicsProfile.HiDef;
-        SupportsDepthClamp = device.GraphicsProfile == GraphicsProfile.HiDef;
-        SupportsVertexTextures = device.GraphicsProfile == GraphicsProfile.HiDef;
-        SupportsFloatTextures = true;
-        SupportsHalfFloatTextures = true;
-        SupportsNormalized = true;
+        SupportsTextureArrays = device.GraphicsProfile == GraphicsProfile.HiDef && device.SupportsTextureArrays;
+        SupportsDepthClamp = device.GraphicsProfile == GraphicsProfile.HiDef && device.SupportsDepthClamp;
+        SupportsVertexTextures = device.GraphicsProfile == GraphicsProfile.HiDef && device.SupportsVertexTextures;
+        SupportsFloatTextures = device.SupportsFloatTextures;
+        SupportsHalfFloatTextures = device.SupportsHalfFloatTextures;
+        SupportsNormalized = device.SupportsNormalized;
 
-        SupportsInstancing = true;
-        SupportsBaseIndexInstancing = true;
-        SupportsSeparateBlendStates = true;
+        SupportsInstancing = device.SupportsInstancing;
+        SupportsBaseIndexInstancing = device.SupportsBaseIndexInstancing;
+        SupportsSeparateBlendStates = device.SupportsSeparateBlendStates;
 
-        MaxTextureAnisotropy = (device.GraphicsProfile == GraphicsProfile.Reach) ? 2 : 16;
+        MaxTextureAnisotropy = device.GraphicsProfile == GraphicsProfile.Reach ?
+                               Math.Max(2, device.MaxTextureAnisotropy) :
+                               device.MaxTextureAnisotropy;
     }
 
 }
