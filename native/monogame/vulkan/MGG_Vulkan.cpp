@@ -4019,16 +4019,13 @@ void MGG_GraphicsDevice_DrawIndexedInstanced(
 	mgint instanceCount)
 {
 	assert(device != nullptr);
-	assert(primitiveCount >= 0);
 	assert(indexStart >= 0);
 	assert(vertexStart >= 0);
 	assert(baseInstance >= 0);
 	assert(instanceCount > 0);
 
-	if (primitiveCount <= 0)
-		return;
-	if (instanceCount <= 0)
-		return;
+    if (primitiveCount <= 0 || instanceCount <= 0)
+        return;
 
 	auto& frame = device->frames[device->frameIndex];
 	assert(frame.is_recording);
