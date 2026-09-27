@@ -67,12 +67,12 @@ jobs:
       - name: Setup DotNet on Windows
         if: runner.environment == 'github-hosted' && runner.os == 'windows'
         run: |
-          dotnet workload install android ios browser-wasm --version ${{ env.DotnetVersion }}
+          dotnet workload install android ios wasm-tools --version ${{ env.DotnetVersion }}
 
       - name: Setup DotNet on linux
         if: runner.environment == 'github-hosted' && runner.os == 'Linux' && runner.arch == 'x64'
         run: |
-          dotnet workload install android browser-wasm --version ${{ env.DotnetVersion }}
+          dotnet workload install android wasm-tools --version ${{ env.DotnetVersion }}
 
       - name: Update Homebrew
         if: runner.environment == 'github-hosted' && runner.os == 'macos'
@@ -82,7 +82,7 @@ jobs:
       - name: Setup DotNet on MacOS
         if: runner.environment == 'github-hosted' && runner.os == 'macos'
         run: |
-          dotnet workload install macos ios browser-wasm --version ${{ env.DotnetVersion }}
+          dotnet workload install macos ios wasm-tools --version ${{ env.DotnetVersion }}
 
       - name: Pin xcode version
         uses: maxim-lobanov/setup-xcode@v1
