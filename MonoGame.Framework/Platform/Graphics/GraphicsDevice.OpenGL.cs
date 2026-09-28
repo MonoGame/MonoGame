@@ -23,7 +23,6 @@ namespace Microsoft.Xna.Framework.Graphics
 
         private DrawBuffersEnum[] _drawBuffers;
         private DrawBuffersEnum[] _maskedDrawBuffers;
-#endif
 
         enum ResourceType
         {
