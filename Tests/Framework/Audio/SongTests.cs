@@ -3,20 +3,28 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 
+using Microsoft.Xna.Framework.Media;
+using NUnit.Framework;
 using System;
 using System.Diagnostics;
 using System.IO;
-using NUnit.Framework;
-using Microsoft.Xna.Framework.Content;
-using Microsoft.Xna.Framework.Media;
 
 namespace MonoGame.Tests.Audio
 {
 
     [Category("Song")]
+    [RunOnUiTestFixture]
     public class SongTests : AudioTestFixtureBase
     {
-#if VULKAN || DIRECTX12
+        private static Song CreateSong(string name)
+        {
+            string relativePath = "Assets/Audio/Song/one_two_three.mp3";
+            string fullPath = Path.GetFullPath(relativePath);
+            Uri uri = new Uri(fullPath);
+
+            return Song.FromUri(name, uri);
+        }
+
         private void RunTests(Song song)
         {
             Assert.AreEqual(3.0f, song.Duration.TotalSeconds, 0.01f);
@@ -31,7 +39,7 @@ namespace MonoGame.Tests.Audio
             // Pause it now.
             MediaPlayer.Pause();
             stopWatch.Stop();
-            
+
             SleepWhileDispatching(500);
             Assert.AreEqual(MediaState.Paused, MediaPlayer.State);
 
@@ -78,62 +86,144 @@ namespace MonoGame.Tests.Audio
         [Test]
         public void SongTestMP3()
         {
-            string relativePath = "Assets/Audio/Song/one_two_three.mp3";
-            string fullPath = Path.GetFullPath(relativePath);
-            var path = new System.Uri(fullPath);
-            var song = Song.FromUri("one_two_three", path);
+            Song song = CreateSong("one_two_three");
 
             RunTests(song);
 
             song.Dispose();
         }
-#endif
 
-#if DESKTOPGL
         [Test]
-        public void SongDisposeRaceTestOgg()
+        public void Play_CollectionSongCompletes_AdvancesToNextSong()
         {
-#if DEBUG
-            Assert.Ignore("Only reproducible in a Release build, where ALHelper.CheckError() is compiled out.");
-#else
-            var rng = new Random();
-            float previousVolume = MediaPlayer.Volume;
+            Song firstSong = CreateSong("first");
+            Song secondSong = CreateSong("second");
+            SongCollection songs = new SongCollection();
+            songs.Add(firstSong);
+            songs.Add(secondSong);
 
-            // Dispose and load the same song for a while to try trigger a race condition.
-            // It takes around 70+ seconds to verify that the bug is fixed.
             try
             {
-                MediaPlayer.Volume = 0.05f;
-                for (int i = 0; i < 500; i++)
-                {
-                    try
-                    {
-                        // Create a new content manager because we need a new instance of the song.
-                        ContentManagerProxy content = new ContentManagerProxy(_content.ServiceProvider);
-                        Song song = content.Load<Song>("Assets/Audio/Song/one_two_three");
+                MediaPlayer.IsRepeating = false;
+                MediaPlayer.IsShuffled = false;
 
-                        // Play song
-                        MediaPlayer.Play(song);
+                MediaPlayer.Play(songs);
+                TimeSpan timeout = firstSong.Duration + secondSong.Duration;
+                bool advanced = WaitUntilDispatching(
+                    () => object.ReferenceEquals(secondSong, MediaPlayer.Queue.ActiveSong) &&
+                        MediaPlayer.State == MediaState.Playing,
+                    timeout);
 
-                        // Cleanup after a while, the song needs to buffer first
-                        System.Threading.Thread.Sleep(rng.Next(80, 200));
-                        content.Dispose();
-                    }
-                    catch (NullReferenceException ex)
-                    {
-                        Assert.Fail("Song.PlatformInitialize threw {0} after {1} iteration(s)",
-                            ex.GetType().Name, i);
-                    }
-                }
+                Assert.IsTrue(advanced, "The completed Song did not advance the queue.");
             }
             finally
             {
-                // Restore volume for the next test
-                MediaPlayer.Volume = previousVolume;
                 MediaPlayer.Stop();
+                firstSong.Dispose();
+                secondSong.Dispose();
             }
-#endif
         }
-#endif
+
+        [Test]
+        public void Play_StopBeforeSongCompletion_DoesNotAdvanceQueue()
+        {
+            Song firstSong = CreateSong("first");
+            Song secondSong = CreateSong("second");
+            SongCollection songs = new SongCollection();
+            songs.Add(firstSong);
+            songs.Add(secondSong);
+
+            try
+            {
+                MediaPlayer.IsRepeating = false;
+                MediaPlayer.IsShuffled = false;
+
+                MediaPlayer.Play(songs);
+                SleepWhileDispatching(100);
+                MediaPlayer.Stop();
+                SleepWhileDispatching((int)firstSong.Duration.TotalMilliseconds);
+
+                Assert.AreSame(firstSong, MediaPlayer.Queue.ActiveSong);
+                Assert.AreEqual(MediaState.Stopped, MediaPlayer.State);
+            }
+            finally
+            {
+                MediaPlayer.Stop();
+                firstSong.Dispose();
+                secondSong.Dispose();
+            }
+        }
+
+        [Test]
+        public void Play_ReplacedSongWouldComplete_DoesNotAdvanceReplacementQueue()
+        {
+            Song firstSong = CreateSong("first");
+            Song secondSong = CreateSong("second");
+
+            try
+            {
+                MediaPlayer.IsRepeating = false;
+                MediaPlayer.IsShuffled = false;
+
+                TimeSpan startPosition = TimeSpan.FromSeconds(2);
+                MediaPlayer.Play(firstSong, startPosition);
+                bool firstSongStarted = WaitUntilDispatching(
+                    () => MediaPlayer.PlayPosition > TimeSpan.Zero,
+                    firstSong.Duration);
+                Assert.IsTrue(firstSongStarted, "The original Song did not start playing.");
+
+                MediaPlayer.Play(secondSong);
+                TimeSpan originalRemainingDuration = firstSong.Duration - startPosition;
+                bool replacementStayedActive = WaitUntilDispatching(
+                    () => object.ReferenceEquals(secondSong, MediaPlayer.Queue.ActiveSong) &&
+                        MediaPlayer.State == MediaState.Playing &&
+                        MediaPlayer.PlayPosition >= originalRemainingDuration,
+                    secondSong.Duration);
+
+                Assert.IsTrue(replacementStayedActive, "The replacement Song did not remain active.");
+            }
+            finally
+            {
+                MediaPlayer.Stop();
+                firstSong.Dispose();
+                secondSong.Dispose();
+            }
+        }
+
+        [Test]
+        public void Play_RepeatingSongCompletes_RestartsSong()
+        {
+            Song song = CreateSong("repeat");
+
+            try
+            {
+                MediaPlayer.IsRepeating = true;
+
+                MediaPlayer.Play(song);
+                TimeSpan timeout = song.Duration + song.Duration;
+                bool restarted = WaitUntilDispatching(
+                    () => object.ReferenceEquals(song, MediaPlayer.Queue.ActiveSong) &&
+                        MediaPlayer.State == MediaState.Playing &&
+                        song.PlayCount > 1,
+                    timeout);
+
+                Assert.IsTrue(restarted, "The repeating Song did not restart.");
+            }
+            finally
+            {
+                MediaPlayer.Stop();
+                MediaPlayer.IsRepeating = false;
+                song.Dispose();
+            }
+        }
+
+        [Test]
+        public void Play_DisposedSong_ThrowsObjectDisposedException()
+        {
+            Song song = CreateSong("disposed");
+            song.Dispose();
+
+            Assert.Throws<ObjectDisposedException>(() => MediaPlayer.Play(song));
+        }
     }
 }

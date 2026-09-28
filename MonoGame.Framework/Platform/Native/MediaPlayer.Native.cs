@@ -12,6 +12,30 @@ public static partial class MediaPlayer
     {
     }
 
+    internal static void PlatformUpdate()
+    {
+        Song song = _queue.ActiveSong;
+        if (song != null)
+            song.Update();
+    }
+
+    internal static void PlatformOnSongFinishedPlaying(object sender, EventArgs args)
+    {
+        Song song = sender as Song;
+        if (song == null || !object.ReferenceEquals(song, _queue.ActiveSong) || State != MediaState.Playing)
+            return;
+
+        OnSongFinishedPlaying(sender, args);
+    }
+
+    internal static void PlatformOnSongFailed(Song song)
+    {
+        if (!object.ReferenceEquals(song, _queue.ActiveSong) || State == MediaState.Stopped)
+            return;
+
+        Stop();
+    }
+
     private static bool PlatformGetIsMuted()
     {
         return _isMuted;
@@ -95,7 +119,7 @@ public static partial class MediaPlayer
             return;
 
         song.Volume = _isMuted ? 0.0f : _volume;
-        song.Play(startPosition, OnSongFinishedPlaying);
+        song.Play(startPosition, PlatformOnSongFinishedPlaying);
     }
 
     private static void PlatformResume()

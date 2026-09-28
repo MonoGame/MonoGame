@@ -1,3 +1,4 @@
+
 // MonoGame - Copyright (C) MonoGame Foundation, Inc
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
@@ -223,7 +224,7 @@ namespace MonoGame.Tests.Graphics
                 gd, VertexPositionColorTexture.VertexDeclaration,
                 3, BufferUsage.None);
             var indexBuffer = new IndexBuffer(
-                gd, IndexElementSize.SixteenBits, 
+                gd, IndexElementSize.SixteenBits,
                 3, BufferUsage.None);
 
             // No vertex shader or pixel shader.
@@ -283,7 +284,7 @@ namespace MonoGame.Tests.Graphics
                 gd, VertexPositionColorTexture.VertexDeclaration,
                 3, BufferUsage.None);
             var indexBuffer = new IndexBuffer(
-                gd, IndexElementSize.SixteenBits, 
+                gd, IndexElementSize.SixteenBits,
                 3, BufferUsage.None);
 
             // No vertex shader or pixel shader.
@@ -326,7 +327,7 @@ namespace MonoGame.Tests.Graphics
         }
 #endif
 
-#if XNA || DIRECTX || DIRECTX12 || VULKAN
+#if XNA || DIRECTX || DIRECTX12 || VULKAN || DESKTOPGL4
         [Test]
         public void DrawInstancedPrimitivesParameterValidation()
         {
@@ -444,7 +445,7 @@ namespace MonoGame.Tests.Graphics
 
             gd.DrawInstancedPrimitives(PrimitiveType.TriangleList, 0, 0, 6, 0, 2, worldTransforms.Length);
 
-            // There is a minor difference in the rasterization between XNA and DirectX. 
+            // There is a minor difference in the rasterization between XNA and DirectX.
             Similarity = 0.98f;
 
             CheckFrames();
@@ -678,7 +679,7 @@ namespace MonoGame.Tests.Graphics
         }
 
         [Test]
-#if DESKTOPGL
+#if DESKTOPGL || DESKTOPGL4
         [Ignore("Vertex Textures are not implemented for OpenGL")]
 #endif
         public void VertexTexturesGetSet()
@@ -688,11 +689,11 @@ namespace MonoGame.Tests.Graphics
 #if XNA
             var supportedVertexTextureFormats = new[]
             {
-                SurfaceFormat.Single, 
-                SurfaceFormat.Vector2, 
+                SurfaceFormat.Single,
+                SurfaceFormat.Vector2,
                 SurfaceFormat.Vector4,
-                SurfaceFormat.HalfSingle, 
-                SurfaceFormat.HalfVector2, 
+                SurfaceFormat.HalfSingle,
+                SurfaceFormat.HalfVector2,
                 SurfaceFormat.HalfVector4,
                 SurfaceFormat.HdrBlendable
             };
@@ -745,7 +746,7 @@ namespace MonoGame.Tests.Graphics
         }
 
         [Test]
-#if DESKTOPGL
+#if DESKTOPGL || DESKTOPGL4
         [Ignore("Vertex Textures are not implemented for OpenGL")]
 #endif
         public void VertexTextureVisualTest()
@@ -816,7 +817,7 @@ namespace MonoGame.Tests.Graphics
         }
 
         [Test]
-#if DESKTOPGL
+#if DESKTOPGL || DESKTOPGL4
         [Ignore("Vertex samplers are not implemented for OpenGL")]
 #endif
         public void VertexSamplerStatesGetSet()

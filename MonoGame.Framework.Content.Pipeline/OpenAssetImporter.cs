@@ -5,6 +5,7 @@
 using System.Diagnostics;
 using System.Numerics;
 using System.Reflection;
+using System.Runtime.InteropServices;
 using Assimp;
 using Assimp.Unmanaged;
 using Microsoft.Xna.Framework.Content.Pipeline.Graphics;
@@ -249,6 +250,12 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
         /// </summary>
         public bool IgnoreFbxUpDirection { get; set; } = true;
 
+        /// <summary>
+        /// If true, the pixot points for the FBX model will be preserved
+        /// <defaultValue>true</defaultValue>
+        /// </summary>
+        public bool PreservePivots {get; set; } = true;
+
         public override NodeContent Import(string filename, ContentImporterContext context)
         {
             ArgumentNullException.ThrowIfNull(filename);
@@ -256,17 +263,29 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
 
             _context = context;
 
-            if (CurrentPlatform.OS == OS.Linux)
+            if (CurrentPlatform.OS == OS.Linux && !AssimpLibrary.Instance.IsLibraryLoaded)
             {
-                var targetDir = new FileInfo(Assembly.GetExecutingAssembly().Location).Directory?.FullName ?? "";
-                var assimpLib = Path.Combine(targetDir, "libassimp.so");
-
-                try
-                {
-                    AssimpLibrary.Instance.LoadLibrary(assimpLib, assimpLib);
-                }
-                catch { }
+                var path = Path.Combine(AppContext.BaseDirectory, "runtimes", CurrentPlatform.Rid, "native", AssimpLibrary.Instance.DefaultLibraryName);
+                _context.Logger.Log(LogLevel.Info, $"Loading assimp from {path}");
+                AssimpLibrary.Instance.LoadLibrary(path);
             }
+            if (CurrentPlatform.OS == OS.MacOSX && !AssimpLibrary.Instance.IsLibraryLoaded)
+            {
+                var path = Path.Combine(AppContext.BaseDirectory, "runtimes", CurrentPlatform.Rid, "native", AssimpLibrary.Instance.DefaultLibraryName);
+                _context.Logger.Log(LogLevel.Info, $"Loading assimp from {path}");
+                AssimpLibrary.Instance.LoadLibrary(path);
+            }
+            if (CurrentPlatform.OS == OS.Windows && !AssimpLibrary.Instance.IsLibraryLoaded)
+            {
+                var path = Path.Combine(AppContext.BaseDirectory, "runtimes", CurrentPlatform.Rid, "native", AssimpLibrary.Instance.DefaultLibraryName);
+                _context.Logger.Log(LogLevel.Info, $"Loading assimp from {path}");
+                AssimpLibrary.Instance.LoadLibrary(path);
+            }
+
+            var v = AssimpLibrary.Instance.GetVersionAsVersion();
+            _context.Logger.Log(LogLevel.Info, $"{AssimpLibrary.Instance.DefaultLibraryName} v{v.Major}.{v.Minor}.{v.Build}.{v.Revision} from {AssimpLibrary.Instance.LibraryPath}");
+            _context.Logger.Log(LogLevel.Info, $"{AssimpLibrary.Instance.GetBranchName()}");
+            AssimpLibrary.Instance.EnableVerboseLogging(true);
 
             _identity = new ContentIdentity(filename, _importerName);
 
@@ -281,6 +300,9 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
             // This flag is very important when PostProcessSteps.FindDegenerates is used
             // because FindDegenerates converts degenerate triangles to points and lines!
             importer.SetConfig(new Assimp.Configs.RemoveDegeneratePrimitivesConfig(true));
+
+            // FBXIgnoreUpDirectionConfig(true) can be set to ignore the up direction for custom axis.
+            importer.SetConfig(new Assimp.Configs.FBXIgnoreUpDirectionConfig(IgnoreFbxUpDirection));
 
             // Note about Assimp post-processing:
             // Keep post-processing to a minimum. The ModelImporter should import
@@ -335,8 +357,9 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
             {
                 // FBXPreservePivotsConfig(false) can be set to remove transformation
                 // pivots. However, Assimp does not automatically correct animations!
-                // --> Leave default settings, handle transformation pivots explicitly.
-                //importer.SetConfig(new Assimp.Configs.FBXPreservePivotsConfig(false));
+                // we default PreservePivots to true (like assimp) but we want to give
+                // users the control to enable this if they want.
+                importer.SetConfig(new Assimp.Configs.FBXPreservePivotsConfig(PreservePivots));
 
                 // Set flag to remove degenerate faces (points and lines).
                 // This flag is very important when PostProcessSteps.FindDegenerates is used
@@ -345,6 +368,9 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
 
                 // FBXIgnoreUpDirectionConfig(true) can be set to ignore the up direction for custom axis.
                 importer.SetConfig(new Assimp.Configs.FBXIgnoreUpDirectionConfig(IgnoreFbxUpDirection));
+
+                // FBXPreservePivotsConfig(true)
+                importer.SetConfig(new Assimp.Configs.FBXPreservePivotsConfig(PreservePivots));
 
                 // Note about Assimp post-processing:
                 // Keep post-processing to a minimum. The ModelImporter should import
@@ -397,8 +423,10 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
                 // mesh, we can flatten it out so the mesh is the root node.
                 if (_rootNode.Children.Count == 1 && _rootNode.Children[0] is MeshContent)
                 {
-                    var absXform = _rootNode.Children[0].AbsoluteTransform;
-                    _rootNode = _rootNode.Children[0];
+                    var mesh = _rootNode.Children[0];
+                    var absXform = mesh.AbsoluteTransform;
+                    _rootNode.Children.Remove(mesh);
+                    _rootNode = mesh;
                     _rootNode.Identity = _identity;
                     _rootNode.Transform = absXform;
                 }

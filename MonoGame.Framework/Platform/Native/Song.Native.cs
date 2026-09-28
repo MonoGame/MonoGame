@@ -3,101 +3,37 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System;
-using System.Threading;
 using Microsoft.Xna.Framework.Audio;
 using MonoGame.Interop;
-
 
 namespace Microsoft.Xna.Framework.Media;
 
 public sealed partial class Song : IEquatable<Song>, IDisposable
 {
-    private unsafe MGM_AudioDecoder* _decoder;
-    private unsafe MGA_Voice* _voice;
-
-    private MGM_AudioDecoderInfo _info;
-
-    private readonly ManualResetEvent _stop = new ManualResetEvent(false);
-    private Thread _thread;
-
+    private unsafe MGM_Song* _song;
+    private ulong _generation;
     private float _volume = 1.0f;
-
-    private unsafe void DecoderStream()
-    {
-        bool start_voice = true;
-        bool finished = false;
-
-        while (true)
-        {
-            // Do we need to stop?
-            if (_stop.WaitOne(0))
-                break;
-
-            var count = MGA.Voice_GetBufferCount(_voice);
-            if (count > 2)
-            {
-                // TODO: This sucks... add OnBufferEnd type of callback
-                // into the voice API so we don't have useless sleeps.
-                Thread.Sleep(100);
-                continue;
-            }
-
-            uint size;
-            byte* buffer;
-            finished = MGM.AudioDecoder_Decode(_decoder, out buffer, out size) == 0 ? false : true;
-
-            if (size > 0)
-            {
-                MGA.Voice_AppendBuffer(_voice, buffer, size);
-
-                if (start_voice)
-                {
-                    MGA.Voice_Play(_voice, 0);
-                    start_voice = false;
-                }
-            }
-
-            if (finished)
-            {
-                // Signal on the main thread.
-                Threading.OnUIThread(() => DonePlaying(this, EventArgs.Empty));
-                break;
-            }
-        }
-
-        // We're done streaming.
-    }
 
     #region The playback API used by MediaPlayer
 
     private unsafe void PlatformInitialize(string filePath)
     {
-        _decoder = MGM.AudioDecoder_Create(filePath, out _info);
-
-        if (_decoder == null)
-            return;
-
         SoundEffect.Initialize();
 
-        _voice = MGA.Voice_Create(SoundEffect.System, _info.samplerate, _info.channels);
-
-        _duration = TimeSpan.FromMilliseconds(_info.duration);
+        MGM_SongInfo info;
+        _song = MGM.Song_Create(filePath, SoundEffect.System, out info);
+        if (_song != null && info.duration > 0)
+            _duration = TimeSpan.FromMilliseconds(info.duration);
     }
 
     private unsafe void PlatformDispose(bool disposing)
     {
         Stop();
 
-        if (_voice != null)
+        if (_song != null)
         {
-            MGA.Voice_Destroy(_voice);
-            _voice = null;
-        }
-
-        if (_decoder != null)
-        {
-            MGM.AudioDecoder_Destroy(_decoder);
-            _decoder = null;
+            MGM.Song_Destroy(_song);
+            _song = null;
         }
     }
 
@@ -117,8 +53,8 @@ public sealed partial class Song : IEquatable<Song>, IDisposable
         {
             _volume = value;
 
-            if (_voice != null)
-                MGA.Voice_SetVolume(_voice, _volume);
+            if (_song != null)
+                MGM.Song_SetVolume(_song, _volume);
         }
     }
 
@@ -126,19 +62,17 @@ public sealed partial class Song : IEquatable<Song>, IDisposable
     {
         get
         {
-            if (_voice == null)
+            if (_song == null)
                 return TimeSpan.Zero;
 
-            var milliseconds = MGA.Voice_GetPosition(_voice);
-            milliseconds %= (ulong)_duration.TotalMilliseconds;
-
+            ulong milliseconds = MGM.Song_GetPosition(_song);
             return TimeSpan.FromMilliseconds(milliseconds);
         }
     }
 
     internal unsafe void Play(TimeSpan? startPosition, FinishedPlayingHandler handler)
     {
-        if (_decoder == null)
+        if (_song == null)
             return;
 
         ulong milliseconds = 0;
@@ -149,53 +83,57 @@ public sealed partial class Song : IEquatable<Song>, IDisposable
         if (DonePlaying == null)
             DonePlaying += handler;
 
-        // Stop the current playback which cleans stuff up.
-        Stop(true);
-
-        // Move the decoder to the new position.
-        MGM.AudioDecoder_SetPosition(_decoder, milliseconds);
-
-        // The thread does the rest of the work.
-        _stop.Reset();
-        _thread = new Thread(DecoderStream);
-        _thread.Name = "MGSongDecoder";
-        _thread.Priority = ThreadPriority.BelowNormal;
-        _thread.Start();
-
-        _playCount++;
+        _generation++;
+        if (MGM.Song_Play(_song, milliseconds, _generation) != 0)
+            _playCount++;
     }
 
     internal unsafe void Pause()
     {
-        if (_voice == null)
-            return;
-
-        // The thread will stop processing on its own.
-        MGA.Voice_Pause(_voice);
+        if (_song != null)
+            MGM.Song_Pause(_song);
     }
 
     internal unsafe void Resume()
     {
-        if (_voice == null)
-            return;
-
-        MGA.Voice_Resume(_voice);
+        if (_song != null)
+            MGM.Song_Resume(_song);
     }
 
     internal unsafe void Stop(bool immediate = false)
     {
-        if (_thread != null)
-        {
-            // Halt the thread.
-            _stop.Set();
-            _thread.Join();
-            _thread = null;
-        }
+        _generation++;
 
-        if (_voice != null)
-            MGA.Voice_Stop(_voice, (byte)(immediate ? 1 : 0));
+        if (_song != null)
+            MGM.Song_Stop(_song);
     }
 
+    internal unsafe void Update()
+    {
+        if (_song == null)
+            return;
+
+        MGM_SongEvent songEvent;
+        while (MGM.Song_TryDequeueEvent(_song, out songEvent) != 0)
+        {
+            if (songEvent.generation != _generation)
+                continue;
+
+            if (songEvent.type == SongEventType.Completed)
+            {
+                if (DonePlaying != null)
+                    DonePlaying(this, EventArgs.Empty);
+
+                return;
+            }
+
+            if (songEvent.type == SongEventType.Failed)
+            {
+                MediaPlayer.PlatformOnSongFailed(this);
+                return;
+            }
+        }
+    }
 
     #endregion
 

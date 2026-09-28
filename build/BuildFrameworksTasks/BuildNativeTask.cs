@@ -10,6 +10,7 @@ public sealed class BuildNativeTask : FrostingTask<BuildContext>
     {
         var buildPremake = new BuildPremake();
         buildPremake.Run(context, "mgruntime", "native/monogame", "monogame.sln");
+        buildPremake.Run(context, "mgpipeline", "native/pipeline", "pipeline.sln");
 
         context.DotNetPack(context.GetProjectPath(ProjectType.Framework, "Native"), context.DotNetPackSettings);
         context.DotNetPack("src/NuGetPackages/MonoGame.Framework/MonoGame.Framework.csproj", context.DotNetPackSettings);

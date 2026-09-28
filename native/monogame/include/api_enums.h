@@ -271,6 +271,12 @@ enum class MGProcessorType : mguint
     ZeroTransparentPixels = 1,
 };
 
+enum class MGSongEventType : mgint
+{
+    Completed = 0,
+    Failed = 1,
+};
+
 enum class MGGameRunBehavior : mgint
 {
     Asynchronous = 0,

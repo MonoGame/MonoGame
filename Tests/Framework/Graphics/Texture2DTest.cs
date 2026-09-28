@@ -178,8 +178,7 @@ namespace MonoGame.Tests.Graphics
         [TestCase(8, 8, true)]
         [TestCase(31, 7, true)]
 #endif
-
-#if DESKTOPGL
+#if DESKTOPGL || DESKTOPGL4
         [Ignore("Not yet implemented in OpenGL")]
 #endif
         public void ShouldSetAndGetDataForTextureArray(int width, int height, bool useSpan)
