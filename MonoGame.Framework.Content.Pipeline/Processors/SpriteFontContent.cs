@@ -46,26 +46,4 @@ public class SpriteFontContent
             DefaultCharacter = desc.DefaultCharacter;
         }
     }
-
-    public string FontName { get; init; } = string.Empty;
-
-    public FontDescriptionStyle Style { get; init; } = FontDescriptionStyle.Regular;
-
-    public float FontSize { get; init; }
-
-    public Texture2DContent Texture { get; init; } = new();
-
-    public List<Rectangle> Glyphs { get; init; } = [];
-
-    public List<Rectangle> Cropping { get; init; } = [];
-
-    public List<char> CharacterMap { get; init; } = [];
-
-    public int VerticalLineSpacing { get; set; }
-
-    public float HorizontalSpacing { get; init; }
-
-    public List<Vector3> Kerning { get; init; } = [];
-
-    public char? DefaultCharacter { get; init; }
 }
