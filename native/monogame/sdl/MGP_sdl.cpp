@@ -9,6 +9,7 @@
 #include <SDL.h>
 
 #if defined(__EMSCRIPTEN__)
+#include <emscripten/html5.h>
 #include "MGP_sdl_browser.h"
 #include "../web/MGP_web.h"
 #endif
@@ -410,6 +411,13 @@ static MGP_Window* MGP_WindowFromId(MGP_Platform* platform, Uint32 windowId)
 }
 
 #if defined(__EMSCRIPTEN__)
+static bool MGP_Sdl_HasBrowserPointerLock()
+{
+    EmscriptenPointerlockChangeEvent status = {};
+    return emscripten_get_pointerlock_status(&status) == EMSCRIPTEN_RESULT_SUCCESS
+        && status.isActive != 0;
+}
+
 void MGP_Sdl_QueueBrowserResizeForWindow(MGP_Window* window, mgint width, mgint height)
 {
     assert(window != nullptr);
@@ -729,6 +737,13 @@ mgbyte MGP_Platform_PollEvent(MGP_Platform* platform, MGP_Event& event_)
             break;
 
         case SDL_EventType::SDL_MOUSEMOTION:
+#if defined(__EMSCRIPTEN__)
+            // Relative mode is armed before the browser accepts a canvas click. Until
+            // pointer lock is active, SDL receives absolute hover coordinates that do
+            // not represent the unbounded deltas expected by a center-warp camera.
+            if (SDL_GetRelativeMouseMode() == SDL_TRUE && !MGP_Sdl_HasBrowserPointerLock())
+                break;
+#endif
             event_.Type = MGEventType::MouseMove;
             event_.MouseMove.Window = MGP_WindowFromId(platform, ev.motion.windowID);
             event_.MouseMove.X = ev.motion.x;
@@ -1480,11 +1495,24 @@ void MGP_Mouse_SetVisible(MGP_Platform* platform, mgbyte visible)
 {
     assert(platform != nullptr);
     SDL_ShowCursor(visible ? SDL_ENABLE : SDL_DISABLE);
+
+#if defined(__EMSCRIPTEN__)
+    if (visible)
+        SDL_SetRelativeMouseMode(SDL_FALSE);
+#endif
 }
 
 void MGP_Mouse_WarpPosition(MGP_Window* window, mgint x, mgint y)
 {
     assert(window != nullptr);
+
+#if defined(__EMSCRIPTEN__)
+    // Browsers cannot move the physical cursor. SDL relative mode acquires pointer
+    // lock from the next canvas click and keeps its logical position movable, so the
+    // MonoGame center-warp pattern continues to receive unbounded movement.
+    SDL_SetRelativeMouseMode(SDL_TRUE);
+#endif
+
     SDL_WarpMouseInWindow(window->window, x, y);
 }
 
