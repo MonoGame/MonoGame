@@ -937,6 +937,31 @@ namespace
         return program;
     }
 
+
+    // We can't link the program when setting the individual shaders. The managed side sets the
+    // vertex and pixel shaders separately, so at that point the other shader may still be from
+    // the previous pass. This can cause us to try linking a combination of shaders that was never
+    // intended to be used together and fail even though the final shader pair is valid.
+    //
+    // Wait until the full pass has been applied and both shaders are set before getting/linking
+    // the program.
+    void ActivateShaderProgram(MGG_GraphicsDevice* device)
+    {
+        assert(device != nullptr);
+
+        MGG_ShaderProgram* program = GetOrCreateProgram(device);
+        if (device->currentProgram != program)
+        {
+            device->context.functions.UseProgram(program->handle);
+            device->currentProgram = program;
+            device->inputLayoutDirty = true;
+            ApplyPosFixup(device);
+        }
+
+        if (device->currentRenderTargetCount > 0)
+            ApplyCurrentDrawBuffers(device);
+    }
+
     GLenum ToTextureAddressMode(MGTextureAddressMode mode)
     {
         switch (mode)
@@ -2558,6 +2583,7 @@ void MGG_GraphicsDevice_SetConstantBuffer(MGG_GraphicsDevice* device, MGShaderSt
         return;
 
     EnsureContext(device);
+    ActivateShaderProgram(device);
 
     size_t stageIndex = ToStageIndex(stage);
     if (device->currentProgram == nullptr)
@@ -2686,24 +2712,6 @@ void MGG_GraphicsDevice_SetShader(MGG_GraphicsDevice* device, MGShaderStage stag
 
     size_t stageIndex = ToStageIndex(stage);
     device->shaders[stageIndex] = shader;
-
-    if (device->shaders[ToStageIndex(MGShaderStage::Vertex)] == nullptr ||
-        device->shaders[ToStageIndex(MGShaderStage::Pixel)] == nullptr)
-    {
-        return;
-    }
-
-    MGG_ShaderProgram* program = GetOrCreateProgram(device);
-    if (device->currentProgram != program)
-    {
-        device->context.functions.UseProgram(program->handle);
-        device->currentProgram = program;
-        device->inputLayoutDirty = true;
-        ApplyPosFixup(device);
-    }
-
-    if (device->currentRenderTargetCount > 0)
-        ApplyCurrentDrawBuffers(device);
 }
 
 void MGG_GraphicsDevice_SetInputLayout(MGG_GraphicsDevice* device, MGG_InputLayout* layout)
@@ -2731,6 +2739,8 @@ void MGG_GraphicsDevice_Draw(MGG_GraphicsDevice* device, MGPrimitiveType primiti
     EnsureVertexArray(device);
     assert(device->isInFrame);
 
+    ActivateShaderProgram(device);
+
     if (device->inputLayoutDirty)
         ApplyInputLayout(device, 0);
 
@@ -2749,6 +2759,8 @@ void MGG_GraphicsDevice_DrawIndexed(MGG_GraphicsDevice* device, MGPrimitiveType 
     EnsureContext(device);
     EnsureVertexArray(device);
     assert(device->isInFrame);
+
+    ActivateShaderProgram(device);
 
     // Apply vertexStart through the attribute bindings because this
     // indexed draw path uses glDrawELements without a separate base vertex.
@@ -2781,6 +2793,8 @@ void MGG_GraphicsDevice_DrawIndexedInstanced(MGG_GraphicsDevice* device, MGPrimi
     EnsureContext(device);
     EnsureVertexArray(device);
     assert(device->isInFrame);
+
+    ActivateShaderProgram(device);
 
     // Apply vertexStart through the attribute bindings because this
     // indexed draw path uses glDrawElements without a separate base-vertex.
