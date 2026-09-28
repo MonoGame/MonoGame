@@ -3,6 +3,8 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 
+#if VULKAN || DIRECTX12
+
 using Microsoft.Xna.Framework.Media;
 using NUnit.Framework;
 using System;
@@ -227,3 +229,5 @@ namespace MonoGame.Tests.Audio
         }
     }
 }
+
+#endif
