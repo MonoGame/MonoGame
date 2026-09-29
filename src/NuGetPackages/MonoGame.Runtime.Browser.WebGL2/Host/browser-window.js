@@ -120,6 +120,10 @@ export class BrowserWindow {
 
     /** Configures the native runtime's optional pointer lock compatibility behavior. */
     configurePointerLock() {
+        if (!this.config.pointerLockEnabled) {
+            return;
+        }
+
         const setPointerLockEnabled = this.getRuntime()?.Module?._MGP_Web_SetPointerLockEnabled;
         if (typeof setPointerLockEnabled !== "function") {
             throw new BrowserHostError(
