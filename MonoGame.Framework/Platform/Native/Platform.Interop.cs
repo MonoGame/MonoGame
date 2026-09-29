@@ -76,6 +76,8 @@ internal struct MGP_MouseButtonEvent
 {
     public nint Window;
     public MouseButton Button;
+    public int X;
+    public int Y;
 }
 
 [StructLayout(LayoutKind.Sequential)]

@@ -740,6 +740,7 @@ static void MGDX_PrepareNextFrame(MGG_GraphicsDevice* device)
 	device->pipelineManager->Prepare();
 	device->indexBufferDirty = true;
 	device->vertexBuffersDirty = 0xFFFFFFFF;
+	memset(device->uniforms, 0, sizeof(device->uniforms));
 	memset(device->textures, 0, sizeof(device->textures));
 	device->texturesDirty = true;
 	device->samplerSetHandles.clear();
@@ -993,6 +994,7 @@ void MGG_GraphicsDevice_GetBackBufferData(MGG_GraphicsDevice* device, mgint x, m
 		device->vertexBuffersDirty = 0xFFFFFFFF;
 		device->texturesDirty = true;
 		device->samplersDirty = true;
+		device->uniformsDirty = 0xFFFFFFFF;
 		device->viewportDirty = true;
 		device->scissorDirty = true;
 	}
@@ -1342,14 +1344,15 @@ void MGG_GraphicsDevice_DrawIndexed(MGG_GraphicsDevice* device, MGPrimitiveType 
 	cl->DrawIndexedInstanced(indexCount, 1, indexStart, vertexStart, 0);
 }
 
-void MGG_GraphicsDevice_DrawIndexedInstanced(MGG_GraphicsDevice* device, MGPrimitiveType primitiveType, mgint primitiveCount, mgint indexStart, mgint vertexStart, mgint instanceCount)
+void MGG_GraphicsDevice_DrawIndexedInstanced(MGG_GraphicsDevice* device, MGPrimitiveType primitiveType, mgint primitiveCount, mgint indexStart, mgint vertexStart, mgint baseInstance, mgint instanceCount)
 {
 	assert(device != nullptr);
 	assert(primitiveCount >= 0);
 	assert(indexStart >= 0);
 	assert(vertexStart >= 0);
+	assert(baseInstance >= 0);
 	assert(instanceCount >= 0);
-
+	
 	if (primitiveCount <= 0)
 		return;
 	if (instanceCount <= 0)
@@ -1363,7 +1366,7 @@ void MGG_GraphicsDevice_DrawIndexedInstanced(MGG_GraphicsDevice* device, MGPrimi
 
 	auto indexCount = MGDX_GetIndexCount(primitiveType, primitiveCount);
 
-	cl->DrawIndexedInstanced(indexCount, instanceCount, indexStart, vertexStart, 0);
+	cl->DrawIndexedInstanced(indexCount, instanceCount, indexStart, vertexStart, baseInstance);
 }
 
 
@@ -2225,6 +2228,7 @@ void MGG_Texture_GetData(MGG_GraphicsDevice* device, MGG_Texture* texture, mgint
 		device->vertexBuffersDirty = 0xFFFFFFFF;
 		device->texturesDirty = true;
 		device->samplersDirty = true;
+		device->uniformsDirty = 0xFFFFFFFF;
 		device->viewportDirty = true;
 		device->scissorDirty = true;
 	}
