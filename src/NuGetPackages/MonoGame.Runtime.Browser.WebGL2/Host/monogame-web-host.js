@@ -2,7 +2,7 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
-import { BrowserAudio } from "./browser-audio.js";s
+import { BrowserAudio } from "./browser-audio.js";
 import { BrowserAccelerometer } from "./browser-accelerometer.js";
 import { BrowserContent } from "./browser-content.js";
 import { BrowserHostError, CanvasResizePolicy, HostStage } from "./browser-host-common.js";
