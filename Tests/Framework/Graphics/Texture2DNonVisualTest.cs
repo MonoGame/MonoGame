@@ -203,7 +203,7 @@ namespace MonoGame.Tests.Graphics
                 }
             }
         }
-        
+
         [Test]
         public void ZeroSizeShouldFailTest()
         {
@@ -363,6 +363,8 @@ namespace MonoGame.Tests.Graphics
 #if !DESKTOPGL
         // format not supported
         [TestCase(SurfaceFormat.Vector4, (long)(200 << 48 + 180 << 32 + 160 << 16 + 120))]
+        [TestCase(SurfaceFormat.Bgr32, (uint)((200u << 24) | (180u << 16) | (160u << 8) | 120u))]
+        [TestCase(SurfaceFormat.Bgr32SRgb, (uint)((200u << 24) | (180u << 16) | (160u << 8) | 120u))]
 #endif
         [TestCase(SurfaceFormat.Vector2, (float)(200 << 48 + 180 << 32 + 160 << 16 + 120))]
         [TestCase(SurfaceFormat.Color, (float)(200 << 24 + 180 << 16 + 160 << 8 + 120))]
@@ -452,6 +454,8 @@ namespace MonoGame.Tests.Graphics
                 case SurfaceFormat.HalfSingle:
                     return 2;
                 case SurfaceFormat.Single:
+                case SurfaceFormat.Bgr32:
+                case SurfaceFormat.Bgr32SRgb:
                 case SurfaceFormat.Color:
                     return 4;
                 case SurfaceFormat.Vector2:
@@ -1001,7 +1005,7 @@ namespace MonoGame.Tests.Graphics
 #endif
         public void LoadOddSizedDxtCompressed()
         {
-            // This is testing that DXT compressed mip levels that 
+            // This is testing that DXT compressed mip levels that
             // are not a multiple of 4 are properly loaded.
 
             var t = content.Load<Texture2D>(Paths.Texture("red_668_dxt"));
@@ -1031,9 +1035,9 @@ namespace MonoGame.Tests.Graphics
                     Assert.AreEqual(0,      b2[p + 1]);
                     Assert.AreEqual(0,      b2[p + 2]);
                     Assert.AreEqual(255,    b2[p + 3]);
-                }            
+                }
             }
-                        
+
             t.Dispose();
         }
 
@@ -1125,7 +1129,7 @@ namespace MonoGame.Tests.Graphics
             t.GetData(3, new Rectangle(0,0,2,2), b2, 0, bs);
             t.GetData(4, new Rectangle(0,0,1,1), b2, 0, bs);
             t.SetData(3, new Rectangle(0,0,2,2), b2, 0, bs);
-            
+
             // would be rounded, but the rectangle is outside the texture area so it wil throw before rounding
             Assert.Throws<ArgumentException>(() => t.GetData(3, new Rectangle(1, 1, 2, 2), b, 0, bs));
             Assert.Throws<ArgumentException>(() => t.GetData(3, new Rectangle(0, 0, 3, 3), b, 0, bs));
@@ -1149,9 +1153,9 @@ namespace MonoGame.Tests.Graphics
                 data[i] = (short) i;
             tex.SetData(data);
             var getData = new short[size];
-            tex.GetData(data);
+            tex.GetData(getData);
             for (var i = 0; i < getData.Length; i++)
-                Assert.AreEqual((short) i, data[i]);
+                Assert.AreEqual((short) i, getData[i]);
 
             tex.Dispose();
         }
@@ -1160,7 +1164,7 @@ namespace MonoGame.Tests.Graphics
         [Test]
         public void NullDeviceShouldThrowArgumentNullException()
         {
-            Assert.Throws<ArgumentNullException>(() => 
+            Assert.Throws<ArgumentNullException>(() =>
             {
                 var texture = new Texture2D(null, 16, 16);
                 texture.Dispose();

@@ -25,10 +25,8 @@ namespace Microsoft.Xna.Framework.Content
             else
                 texture = existingInstance;
 
-#if OPENGL
-            Threading.BlockOnUIThread(() =>
+            void readTextureLevels()
             {
-#endif
                 for (int i = 0; i < levelCount; i++)
                 {
                     int dataSize = reader.ReadInt32();
@@ -43,10 +41,13 @@ namespace Microsoft.Xna.Framework.Content
 
                     ContentManager.ScratchBufferPool.Return(data);
                 }
-#if OPENGL
-            });
-#endif
+            }
 
+#if OPENGL
+            Threading.BlockOnUIThread(readTextureLevels);
+#else
+            readTextureLevels();
+#endif
             return texture;
         }
     }

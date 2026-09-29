@@ -16,6 +16,10 @@ namespace Microsoft.Xna.Framework.Graphics
         /// <summary>
         /// Pixel related shader resources, such as pixel shader and pixel buffers.
         /// </summary>
-        Pixel
+        Pixel,
+        /// <summary>
+        /// The number of shader stages supported by the current graphics implementation.
+        /// </summary>
+        Count        
     }
 }

@@ -25,7 +25,7 @@ public sealed class BuildPremake
             {
                 // Linux/macOS build for the host architecture only
                 var arch = RuntimeInformation.OSArchitecture == Architecture.Arm64 ? "arm64" : "x64";
-                Scaffold(context, name, workingDirectory, $"--arch={arch} gmake2");
+                Scaffold(context, name, workingDirectory, $"--mg-arch={arch} gmake");
                 Make(context, name, workingDirectory);
 
                 break;
@@ -40,13 +40,13 @@ public sealed class BuildPremake
     private void Scaffold(BuildContext context, string name, string workingDirectory, string premakeArguments)
     {
         int exit;
-        exit = context.StartProcess("premake5", new ProcessSettings { WorkingDirectory = workingDirectory, Arguments = "clean" });
+        exit = context.StartProcessWithDocker("premake5", workingDirectory:  workingDirectory, args: "clean");
         if (exit != 0)
         {
             throw new Exception($"{name} Premake clean failed! {exit}");
         }
 
-        exit = context.StartProcess("premake5", new ProcessSettings { WorkingDirectory = workingDirectory, Arguments = premakeArguments });
+        exit = context.StartProcessWithDocker("premake5", workingDirectory: workingDirectory, args: premakeArguments );
         if (exit != 0)
         {
             throw new Exception($"{name} Premake generation failed! {exit}");
@@ -55,7 +55,7 @@ public sealed class BuildPremake
 
     private void BuildForArch(BuildContext context, string name, string workingDirectory, string solutionFile, string arch)
     {
-        int exit = context.StartProcess("msbuild", new ProcessSettings { WorkingDirectory = workingDirectory, Arguments = $"{solutionFile} /p:Configuration=Release /p:Platform={arch}" });
+        int exit = context.StartProcessWithDocker("msbuild", workingDirectory: workingDirectory, args: $"{solutionFile} /p:Configuration=Release /p:Platform={arch}");
         if (exit != 0)
         {
             throw new Exception($"{name} build failed with msbuild! {exit}");
@@ -64,7 +64,7 @@ public sealed class BuildPremake
 
     private void Make(BuildContext context, string name, string workingDirectory)
     {
-        int exit = context.StartProcess("make", new ProcessSettings { WorkingDirectory = workingDirectory, Arguments = "config=release" });
+        int exit = context.StartProcessWithDocker("make", workingDirectory: workingDirectory, args: "config=release");
         if (exit != 0)
         {
             throw new Exception($"{name} build failed with make! {exit}");

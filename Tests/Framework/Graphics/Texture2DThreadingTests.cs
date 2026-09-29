@@ -14,7 +14,7 @@ using System.Threading;
 namespace MonoGame.Tests.Graphics
 {
     [NonParallelizable]
-#if DESKTOPGL
+#if DESKTOPGL || DESKTOPGL4
     [Ignore("GL doesn't work well with threads.")]
 #endif
     [RunOnUiTestFixture]

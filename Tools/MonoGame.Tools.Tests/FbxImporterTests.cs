@@ -28,6 +28,9 @@ namespace MonoGame.Tests.ContentPipeline
 #else
         const string DudeFbx = "Assets/Models/Dude/dude_2011.fbx";
 #endif
+        const string PivotModel = "Assets/Models/Wood_Calf_R.FBX";
+
+        const string SpaceShip = "Assets/Models/spaceship.fbx";
 
         [Test]
         public void Arguments()
@@ -48,10 +51,73 @@ namespace MonoGame.Tests.ContentPipeline
         }
 
         [Test]
-        public void Dude()
+        [TestCase(true)]
+        [TestCase(false)]
+        public void IgnoreFbxUpDirectionTest(bool ignoreFbxUpDirection)
         {
             var context = new TestImporterContext("TestObj", "TestBin");
-            var importer = new FbxImporter();
+            var importer = new FbxImporter()
+            {
+                IgnoreFbxUpDirection = ignoreFbxUpDirection,
+            };
+
+            var nodeContent = importer.Import(SpaceShip, context);
+            var matrixUp = new Matrix(
+                0, 0, 1, 0,
+                1, 0, 0, 0,
+                0, 1, 0, 0,
+                0, 0, 0, 1
+            );
+            Assert.AreEqual("RootNode", nodeContent.Name);
+            Assert.IsNull(nodeContent.Parent);
+            Matrix expected = ignoreFbxUpDirection ? Matrix.Identity : matrixUp;
+
+            Assert.That(expected, Is.EqualTo(nodeContent.Transform).Using(MatrixComparer.Epsilon));
+        }
+
+        [Test]
+        [TestCase(true)]
+        [TestCase(false)]
+        public void PreservePivotsTest(bool preservePivots)
+        {
+            var context = new TestImporterContext("TestObj", "TestBin");
+            var importer = new FbxImporter()
+            {
+                PreservePivots = preservePivots,
+            };
+
+            var nodeContent = importer.Import(PivotModel, context);
+            
+            Assert.AreEqual("leg_down_L03", nodeContent.Name);
+            Assert.IsNull(nodeContent.Parent);
+            Assert.IsInstanceOf<MeshContent>(nodeContent);
+            Assert.AreEqual(0, nodeContent.Children.Count);
+            Assert.AreEqual(0, nodeContent.Animations.Count);
+
+            Matrix expected = preservePivots
+                ? new Matrix(-0.005680f,  0.995421f, -0.095419f, 0f,
+                            0.059148f,  0.095588f,  0.993662f, 0f,
+                            0.998233f,  0.000000f, -0.059420f, 0f,
+                            -1.361540f, -0.737987f, -14.212430f, 1f)
+                : new Matrix(-0.005680f, -0.095419f, -0.995421f, 0f,
+                            0.998233f, -0.059420f,  0.000000f, 0f,
+                            -0.059148f, -0.993662f,  0.095588f, 0f,
+                            0.111688f, 14.296122f, -0.003237f, 1f);
+
+            Assert.That(expected, Is.EqualTo(nodeContent.Transform).Using(MatrixComparer.Epsilon));
+            Assert.AreEqual(nodeContent.Transform, nodeContent.AbsoluteTransform);
+        }
+
+        [Test]
+        [TestCase(true)]
+        [TestCase(false)]
+        public void Dude(bool preservePivots)
+        {
+            var context = new TestImporterContext("TestObj", "TestBin");
+            var importer = new FbxImporter()
+            {
+                PreservePivots = preservePivots,
+            };
 
             var nodeContent = importer.Import(DudeFbx, context);
 
