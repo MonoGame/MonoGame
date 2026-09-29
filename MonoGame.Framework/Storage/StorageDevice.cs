@@ -6,6 +6,7 @@
 
 using System;
 using System.Diagnostics;
+using System.Linq;
 
 namespace Microsoft.Xna.Framework.Storage
 {
@@ -75,6 +76,30 @@ namespace Microsoft.Xna.Framework.Storage
             IsDisposed = true;
         }
 
+        private Exception ValidateContainerName(string name)
+        {
+            if (string.IsNullOrEmpty(name))
+                return new ArgumentNullException("containerName", "A container name must be provided.");
+
+            // Containers cannot begin with ~ as we used this internally on some platforms.
+            if (name[0] == '~')
+                return new ArgumentNullException("containerName", "A container name cannot begin with ~.");
+
+            // Container names cannot include paths.
+            if (name.Contains('\\') || name.Contains('/'))
+                return new ArgumentNullException("containerName", "A container name cannot contain a path separator.");
+
+            // Container names cannot be special reserved names.
+            if (name == "." || name == "..")
+                return new ArgumentNullException("containerName", "A container name cannot be a reserved identifier '.' or '..'.");
+
+            // Don't allow strings outside the ascii range as not all platforms can support it.
+            if (name.All(c => c <= 0x7F) == false)
+                return new ArgumentNullException("containerName", "A container name must contain only ascii characters.");
+
+            return null;
+        }
+
         /// <summary>
         /// Deletes the named container if it exists.
         /// </summary>
@@ -82,8 +107,9 @@ namespace Microsoft.Xna.Framework.Storage
         /// <exception cref="ArgumentNullException"></exception>
         public void DeleteContainer(string containerName)
         {
-            if (string.IsNullOrEmpty(containerName))
-                throw new ArgumentNullException("containerName", "A container name must be provided.");
+            var exception = ValidateContainerName(containerName);
+            if (exception != null)
+                throw exception;
 
             PlatformDeleteContainer(containerName);
         }
@@ -99,12 +125,9 @@ namespace Microsoft.Xna.Framework.Storage
         {
             // TODO: Should containerName be "displayName" like in old XNA?
 
-            if (string.IsNullOrEmpty(containerName))
-                throw new ArgumentNullException("containerName", "A container name must be provided.");
-
-            // TODO: Validate containerName is valid for storage file path!
-            // I think this should be ASCII to support all platforms.
-
+            var exception = ValidateContainerName(containerName);
+            if (exception != null)
+                throw exception;
 
             if (requiredFreeBytes <= 0)
                 throw new ArgumentOutOfRangeException("requiredFreeBytes", "Must be greater than 0.");

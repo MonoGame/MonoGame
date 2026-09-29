@@ -24,8 +24,11 @@ namespace Microsoft.Xna.Framework.Storage
         {
             byte* data = MG_Storage.FileLoad(_handle, path, out int size);
             var content = new MemoryStream(size);
-            content.SetLength(size);
-            Marshal.Copy((IntPtr)data, content.GetBuffer(), 0, size);
+            if (size > 0)
+            {
+                content.SetLength(size);
+                Marshal.Copy((IntPtr)data, content.GetBuffer(), 0, size);
+            }
             return content;
         }
 

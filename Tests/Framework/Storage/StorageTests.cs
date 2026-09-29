@@ -21,7 +21,7 @@ namespace MonoGame.Tests.Framework
 
         const long ContainerSize = 256 * 1024;
 
-        [Test, Platform(Exclude = "Linux", Reason = "Virtualised Display not supported on Linux")]
+        [Test]
         public void OpenContainer_WhenPlayerIndexIsNotNull_ShouldReturnContainer_OnSuccess()
         {
             var device = new StorageDevice(MY_GAME_TITLE, PlayerIndex.One);
