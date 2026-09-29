@@ -25,7 +25,7 @@ namespace Microsoft.Xna.Framework.Graphics
         private readonly ShaderStage _stage;
 
         /// <summary>
-        /// Amount of samples
+        /// Amount of samplers
         /// </summary>
         public int Count
         {
