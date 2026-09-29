@@ -2,7 +2,7 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
-import { BrowserAudio } from "./browser-audio.js";
+import { BrowserAudio } from "./browser-audio.js";s
 import { BrowserAccelerometer } from "./browser-accelerometer.js";
 import { BrowserContent } from "./browser-content.js";
 import { BrowserHostError, CanvasResizePolicy, HostStage } from "./browser-host-common.js";
@@ -23,6 +23,7 @@ let activeHost = null;
  * @property {string | null} hostExportsTypeName
  * @property {string | null} mainAssemblyName
  * @property {"Adaptive" | "Project" | "None"} canvasResizePolicy
+ * @property {boolean} pointerLockEnabled
  */
 
 /** Coordinates browser startup and delegates browser-specific behavior to private host modules. */
@@ -78,7 +79,8 @@ class MonoGameWebHost {
             runtimeScriptUri: this.getOptionalConfigValue(dataset.runtimeScriptUri),
             hostExportsTypeName: this.getOptionalConfigValue(dataset.hostExportsTypeName),
             mainAssemblyName: this.getOptionalConfigValue(dataset.mainAssemblyName),
-            canvasResizePolicy: this.getCanvasResizePolicy(this.getOptionalConfigValue(dataset.canvasResizePolicy))
+            canvasResizePolicy: this.getCanvasResizePolicy(this.getOptionalConfigValue(dataset.canvasResizePolicy)),
+            pointerLockEnabled: this.getBooleanConfigValue(dataset.pointerLock, "pointer-lock")
         };
     }
 
@@ -90,6 +92,26 @@ class MonoGameWebHost {
      */
     getOptionalConfigValue(value) {
         return value == null || value.length === 0 ? null : value;
+    }
+
+    /**
+     * Returns a boolean host setting, defaulting to false when it is absent.
+     *
+     * @param {string | null | undefined} value Configuration value to normalize.
+     * @param {string} name Attribute name without the `data-` prefix.
+     * @returns {boolean} Parsed boolean value.
+     * @throws {BrowserHostError} When the setting is not `true` or `false`.
+     */
+    getBooleanConfigValue(value, name) {
+        if (value == null || value.length === 0 || value === "false") {
+            return false;
+        }
+
+        if (value === "true") {
+            return true;
+        }
+
+        throw new BrowserHostError(HostStage.HostBootstrap, "boolean_configuration_invalid", `The data-${name} setting must be true or false.`);
     }
 
     /**
@@ -193,6 +215,7 @@ class MonoGameWebHost {
         }
 
         this.runtime = await runtimeBuilder.create();
+        this.window.configurePointerLock();
         this.window.observeCanvasSize();
         this.window.observeBrowserLifecycle();
         this.window.observeFullscreen();

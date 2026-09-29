@@ -16,7 +16,7 @@ export class BrowserWindow {
      * Creates the browser window service.
      *
      * @param {HTMLElement} root Host element that contains the game canvas.
-     * @param {{ canvasId: string, canvasResizePolicy: string }} config Window configuration.
+     * @param {{ canvasId: string, canvasResizePolicy: string, pointerLockEnabled: boolean }} config Window configuration.
      * @param {() => object | null} getRuntime Gets the managed runtime.
      */
     constructor(root, config, getRuntime) {
@@ -116,6 +116,19 @@ export class BrowserWindow {
         }
 
         logStage(HostStage.WebGL2Creation, "WebGL2 context created.");
+    }
+
+    /** Configures the native runtime's optional pointer lock compatibility behavior. */
+    configurePointerLock() {
+        const setPointerLockEnabled = this.getRuntime()?.Module?._MGP_Web_SetPointerLockEnabled;
+        if (typeof setPointerLockEnabled !== "function") {
+            throw new BrowserHostError(
+                HostStage.WasmLoad,
+                "native_pointer_lock_configuration_missing",
+                "The managed runtime does not expose the native pointer lock configuration callback.");
+        }
+
+        setPointerLockEnabled(this.config.pointerLockEnabled ? 1 : 0);
     }
 
     /**

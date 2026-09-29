@@ -12,6 +12,7 @@ static bool s_hasPendingBrowserFocus = false;
 static mgbyte s_pendingBrowserFocus = false;
 static bool s_hasPendingBrowserFullscreen = false;
 static mgbyte s_pendingBrowserFullscreen = false;
+static bool s_pointerLockEnabled = false;
 
 enum MGP_WebSensorState : mgint
 {
@@ -40,6 +41,16 @@ EM_JS(mgint, MGP_Web_GetMaximumTouchCountFromNavigator, (),
 mgint MGP_Web_GetMaximumTouchCount()
 {
     return MGP_Web_GetMaximumTouchCountFromNavigator();
+}
+
+extern "C" EMSCRIPTEN_KEEPALIVE void MGP_Web_SetPointerLockEnabled(mgbyte enabled)
+{
+    s_pointerLockEnabled = enabled != 0;
+}
+
+mgbyte MGP_Web_IsPointerLockEnabled()
+{
+    return s_pointerLockEnabled ? 1 : 0;
 }
 
 EM_JS(mgbyte, MGP_Web_RequestFullscreenFromHost, (),

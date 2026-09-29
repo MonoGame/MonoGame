@@ -418,6 +418,13 @@ static bool MGP_Sdl_HasBrowserPointerLock()
         && status.isActive != 0;
 }
 
+static bool MGP_Sdl_IsBrowserPointerLockPending()
+{
+    return MGP_Web_IsPointerLockEnabled() != 0
+        && SDL_GetRelativeMouseMode() == SDL_TRUE
+        && !MGP_Sdl_HasBrowserPointerLock();
+}
+
 void MGP_Sdl_QueueBrowserResizeForWindow(MGP_Window* window, mgint width, mgint height)
 {
     assert(window != nullptr);
@@ -738,10 +745,9 @@ mgbyte MGP_Platform_PollEvent(MGP_Platform* platform, MGP_Event& event_)
 
         case SDL_EventType::SDL_MOUSEMOTION:
 #if defined(__EMSCRIPTEN__)
-            // Relative mode is armed before the browser accepts a canvas click. Until
-            // pointer lock is active, SDL receives absolute hover coordinates that do
-            // not represent the unbounded deltas expected by a center-warp camera.
-            if (SDL_GetRelativeMouseMode() == SDL_TRUE && !MGP_Sdl_HasBrowserPointerLock())
+            // SDL receives absolute hover coordinates until the browser confirms the
+            // requested lock. Retain the game's logical cursor position during that gap.
+            if (MGP_Sdl_IsBrowserPointerLockPending())
                 break;
 #endif
             event_.Type = MGEventType::MouseMove;

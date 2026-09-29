@@ -7,6 +7,7 @@
 #include "api_MGP.h"
 
 void MGP_Web_OnPlatformDestroyed(MGP_Platform* platform);
+mgbyte MGP_Web_IsPointerLockEnabled();
 mgint MGP_Web_GetMaximumTouchCount();
 void MGP_Web_RequestFullscreen();
 void MGP_Web_ExitFullscreen();
