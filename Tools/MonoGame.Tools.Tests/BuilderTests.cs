@@ -4,6 +4,7 @@
 
 using System;
 using System.IO;
+using System.Reflection;
 using Microsoft.Xna.Framework.Content.Pipeline;
 using MonoGame.Framework.Content.Pipeline.Builder;
 using NUnit.Framework;
@@ -45,7 +46,10 @@ namespace MonoGame.Tests.ContentPipeline
             Assert.AreEqual(MakePath(Directory.GetCurrentDirectory(), "obj\\Content"), args.RootedIntermediateDirectory);
 
             args = ContentBuilderParams.Parse("build", "-s", "C:/This/Does/Not/Exist");
-            Assert.AreEqual(MakePath("C:/This/Does/Not/Exist"), args.SourceDirectory);
+            Assert.AreEqual(
+                MakePath(Path.GetRelativePath(Directory.GetCurrentDirectory(), "C:/This/Does/Not/Exist")),
+                args.SourceDirectory);
+            Assert.AreEqual(MakePath("C:/This/Does/Not/Exist"), args.RootedSourceDirectory);
 
             args = ContentBuilderParams.Parse(
                 "build",
@@ -59,6 +63,9 @@ namespace MonoGame.Tests.ContentPipeline
 
             args = ContentBuilderParams.Parse("server");
             Assert.AreEqual(ContentBuilderMode.Server, args.Mode);
+
+            args = ContentBuilderParams.Parse("build", "-p", "WebGL2");
+            Assert.AreEqual(TargetPlatform.WebGL2, args.Platform);
         }
     } 
 }

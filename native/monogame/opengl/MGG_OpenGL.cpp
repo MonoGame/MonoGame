@@ -13,6 +13,7 @@
 
 #include <SDL.h>
 #include <SDL_opengl.h>
+#include <algorithm>
 #include <array>
 #include <condition_variable>
 #include <cstdint>
@@ -133,8 +134,10 @@ struct MGG_Buffer
     GLenum target = 0;
     GLenum usage = GL_STATIC_DRAW;
     MGBufferType type = MGBufferType::Vertex;
+    bool cpuBacked = false;
     mgbool dynamic = false;
     mgint sizeInBytes = 0;
+    std::vector<mgbyte> constantData;
 };
 
 struct MGG_Texture
@@ -217,6 +220,15 @@ namespace
     constexpr mgint MaxVertexBufferSlots = 16;
     constexpr mgint OpenGLShaderProfile = 0;
     constexpr size_t ShaderStageCount = static_cast<size_t>(MGShaderStage::Count);
+
+    constexpr bool IsBrowserOpenGL()
+    {
+#if defined(__EMSCRIPTEN__)
+        return true;
+#else
+        return false;
+#endif
+    }
 
     bool IsSrgbBackBufferFormat(MGSurfaceFormat format)
     {
@@ -642,6 +654,50 @@ namespace
         return (1u << drawBufferCount) - 1u;
     }
 
+#if !defined(__EMSCRIPTEN__)
+    GLenum ToPolygonMode(MGFillMode fillMode)
+    {
+        switch (fillMode)
+        {
+            case MGFillMode::Solid:
+                return GL_FILL;
+            case MGFillMode::WireFrame:
+                return GL_LINE;
+            default:
+                MGGL_FAIL("Unsupported fill mode", "unknown OpenGL polygon mode");
+        }
+    }
+#endif
+
+    void ApplyPolygonMode(MGFillMode fillMode)
+    {
+#if defined(__EMSCRIPTEN__)
+        if (fillMode != MGFillMode::Solid)
+            MGGL_Fail(__FILE__, __LINE__, "Unsupported fill mode", "browser WebGL2 currently supports solid rasterization only");
+#else
+        glPolygonMode(GL_FRONT_AND_BACK, ToPolygonMode(fillMode));
+#endif
+    }
+
+    void SetDrawBuffer(MGG_GraphicsDevice* device, GLenum drawBuffer)
+    {
+        assert(device != nullptr);
+
+#if defined(__EMSCRIPTEN__)
+        GLenum drawBuffers[1] = { drawBuffer };
+        device->context.functions.DrawBuffers(1, drawBuffers);
+#else
+        glDrawBuffer(drawBuffer);
+#endif
+    }
+
+    void ResetBackBufferDrawBuffer()
+    {
+#if !defined(__EMSCRIPTEN__)
+        glDrawBuffer(GL_BACK);
+#endif
+    }
+
     void ApplyPosFixup(MGG_GraphicsDevice* device)
     {
         assert(device != nullptr);
@@ -881,6 +937,31 @@ namespace
         return program;
     }
 
+
+    // We can't link the program when setting the individual shaders. The managed side sets the
+    // vertex and pixel shaders separately, so at that point the other shader may still be from
+    // the previous pass. This can cause us to try linking a combination of shaders that was never
+    // intended to be used together and fail even though the final shader pair is valid.
+    //
+    // Wait until the full pass has been applied and both shaders are set before getting/linking
+    // the program.
+    void ActivateShaderProgram(MGG_GraphicsDevice* device)
+    {
+        assert(device != nullptr);
+
+        MGG_ShaderProgram* program = GetOrCreateProgram(device);
+        if (device->currentProgram != program)
+        {
+            device->context.functions.UseProgram(program->handle);
+            device->currentProgram = program;
+            device->inputLayoutDirty = true;
+            ApplyPosFixup(device);
+        }
+
+        if (device->currentRenderTargetCount > 0)
+            ApplyCurrentDrawBuffers(device);
+    }
+
     GLenum ToTextureAddressMode(MGTextureAddressMode mode)
     {
         switch (mode)
@@ -1007,19 +1088,6 @@ namespace
                 return GL_INVERT;
             default:
                 MGGL_FAIL("Unsupported stencil operation", "unknown OpenGL stencil operation");
-        }
-    }
-
-    GLenum ToPolygonMode(MGFillMode fillMode)
-    {
-        switch (fillMode)
-        {
-            case MGFillMode::Solid:
-                return GL_FILL;
-            case MGFillMode::WireFrame:
-                return GL_LINE;
-            default:
-                MGGL_FAIL("Unsupported fill mode", "unknown OpenGL polygon mode");
         }
     }
 
@@ -2043,7 +2111,8 @@ mgbyte MGG_GraphicsDevice_ResizeSwapchain(
     glGetIntegerv(GL_SAMPLES, &samples);
     device->multiSampleCount = (sampleBuffers > 0 && samples > 0) ? static_cast<mgint>(samples) : 0;
 
-    if (device->context.majorVersion > 2 || (device->context.majorVersion == 2 && device->context.minorVersion >= 1))
+    if (!IsBrowserOpenGL()
+        && (device->context.majorVersion > 2 || (device->context.majorVersion == 2 && device->context.minorVersion >= 1)))
     {
         if (IsSrgbBackBufferFormat(color))
             glEnable(GL_FRAMEBUFFER_SRGB);
@@ -2187,16 +2256,42 @@ void MGG_GraphicsDevice_SetBlendState(MGG_GraphicsDevice* device, MGG_BlendState
         glDisable(GL_BLEND);
 
     device->context.functions.BlendColor(factorR, factorG, factorB, factorA);
-    for (GLuint i = 0; i < std::size(state->infos); ++i)
+    bool supportsSeparateBlendStates = device->context.functions.BlendEquationSeparatei != nullptr &&
+                                       device->context.functions.BlendFuncSeparatei != nullptr &&
+                                       device->context.functions.ColorMaski != nullptr;
+    if (supportsSeparateBlendStates)
     {
-        const MGG_BlendState_Info& info = state->infos[i];
+        for (GLuint i = 0; i < std::size(state->infos); ++i)
+        {
+            const MGG_BlendState_Info& info = state->infos[i];
 
-        device->context.functions.BlendEquationSeparatei(
-            i,
+            device->context.functions.BlendEquationSeparatei(
+                i,
+                ToBlendEquation(info.colorBlendFunc),
+                ToBlendEquation(info.alphaBlendFunc));
+            device->context.functions.BlendFuncSeparatei(
+                i,
+                ToBlendFactor(info.colorSourceBlend),
+                ToBlendFactor(info.colorDestBlend),
+                ToBlendFactor(info.alphaSourceBlend),
+                ToBlendFactor(info.alphaDestBlend));
+
+            GLboolean writeRed = GL_TRUE;
+            GLboolean writeGreen = GL_TRUE;
+            GLboolean writeBlue = GL_TRUE;
+            GLboolean writeAlpha = GL_TRUE;
+            ToColorMask(info.colorWriteChannels, writeRed, writeGreen, writeBlue, writeAlpha);
+            device->context.functions.ColorMaski(i, writeRed, writeGreen, writeBlue, writeAlpha);
+        }
+    }
+    else
+    {
+        const MGG_BlendState_Info& info = state->infos[0];
+
+        device->context.functions.BlendEquationSeparate(
             ToBlendEquation(info.colorBlendFunc),
             ToBlendEquation(info.alphaBlendFunc));
-        device->context.functions.BlendFuncSeparatei(
-            i,
+        device->context.functions.BlendFuncSeparate(
             ToBlendFactor(info.colorSourceBlend),
             ToBlendFactor(info.colorDestBlend),
             ToBlendFactor(info.alphaSourceBlend),
@@ -2207,7 +2302,7 @@ void MGG_GraphicsDevice_SetBlendState(MGG_GraphicsDevice* device, MGG_BlendState
         GLboolean writeBlue = GL_TRUE;
         GLboolean writeAlpha = GL_TRUE;
         ToColorMask(info.colorWriteChannels, writeRed, writeGreen, writeBlue, writeAlpha);
-        device->context.functions.ColorMaski(i, writeRed, writeGreen, writeBlue, writeAlpha);
+        glColorMask(writeRed, writeGreen, writeBlue, writeAlpha);
     }
 
     device->blendState = state;
@@ -2306,7 +2401,7 @@ void MGG_GraphicsDevice_SetRasterizerState(MGG_GraphicsDevice* device, MGG_Raste
             glFrontFace(offscreen ? GL_CCW : GL_CW);
     }
 
-    glPolygonMode(GL_FRONT_AND_BACK, ToPolygonMode(info.fillMode));
+    ApplyPolygonMode(info.fillMode);
 
     if (info.scissorTestEnable)
         glEnable(GL_SCISSOR_TEST);
@@ -2406,7 +2501,7 @@ void MGG_GraphicsDevice_SetRenderTargets(MGG_GraphicsDevice* device, MGG_Texture
     if (count == 0)
     {
         device->context.functions.BindFramebuffer(GL_FRAMEBUFFER, 0);
-        glDrawBuffer(GL_BACK);
+        ResetBackBufferDrawBuffer();
         glReadBuffer(GL_BACK);
         ClearCurrentRenderTargets(device);
         ApplyPosFixup(device);
@@ -2488,6 +2583,7 @@ void MGG_GraphicsDevice_SetConstantBuffer(MGG_GraphicsDevice* device, MGShaderSt
         return;
 
     EnsureContext(device);
+    ActivateShaderProgram(device);
 
     size_t stageIndex = ToStageIndex(stage);
     if (device->currentProgram == nullptr)
@@ -2500,20 +2596,34 @@ void MGG_GraphicsDevice_SetConstantBuffer(MGG_GraphicsDevice* device, MGShaderSt
     if (location < 0)
         return;
 
+    const void* constantData = nullptr;
+    bool usedMappedBuffer = false;
+    if (!buffer->constantData.empty())
+    {
+        constantData = buffer->constantData.data();
+    }
+    else
+    {
+        device->context.functions.BindBuffer(buffer->target, buffer->handle);
+        if (device->context.functions.MapBuffer != nullptr)
+        {
+            constantData = device->context.functions.MapBuffer(buffer->target, GL_READ_ONLY);
+            usedMappedBuffer = constantData != nullptr;
+        }
+    }
+
+    if (constantData == nullptr)
+        MGGL_FAIL("Constant buffer upload failed", "constant buffer contents are unavailable for uniform upload");
+
     GLenum constantType = device->shaders[stageIndex]->constantBufferTypes[slot];
     mgint registerCount = GetConstantRegisterCount(buffer);
-    device->context.functions.BindBuffer(buffer->target, buffer->handle);
-    void* mapped = device->context.functions.MapBuffer(buffer->target, GL_READ_ONLY);
-    if (mapped == nullptr)
-        MGGL_FAIL("glMapBuffer failed", "constant buffer upload could not map buffer contents");
-
     if (constantType == GL_BOOL || constantType == GL_INT)
     {
         device->context.functions.Uniform4iv(
             location,
             registerCount,
-            reinterpret_cast<const GLint*>(mapped));
-        if (device->context.functions.UnmapBuffer(buffer->target) != GL_TRUE)
+            reinterpret_cast<const GLint*>(constantData));
+        if (usedMappedBuffer && device->context.functions.UnmapBuffer(buffer->target) != GL_TRUE)
             MGGL_FAIL("glUnmapBuffer failed", "constant buffer upload could not unmap buffer contents");
         return;
     }
@@ -2521,8 +2631,8 @@ void MGG_GraphicsDevice_SetConstantBuffer(MGG_GraphicsDevice* device, MGShaderSt
     device->context.functions.Uniform4fv(
         location,
         registerCount,
-        reinterpret_cast<const GLfloat*>(mapped));
-    if (device->context.functions.UnmapBuffer(buffer->target) != GL_TRUE)
+        reinterpret_cast<const GLfloat*>(constantData));
+    if (usedMappedBuffer && device->context.functions.UnmapBuffer(buffer->target) != GL_TRUE)
         MGGL_FAIL("glUnmapBuffer failed", "constant buffer upload could not unmap buffer contents");
 }
 
@@ -2602,24 +2712,6 @@ void MGG_GraphicsDevice_SetShader(MGG_GraphicsDevice* device, MGShaderStage stag
 
     size_t stageIndex = ToStageIndex(stage);
     device->shaders[stageIndex] = shader;
-
-    if (device->shaders[ToStageIndex(MGShaderStage::Vertex)] == nullptr ||
-        device->shaders[ToStageIndex(MGShaderStage::Pixel)] == nullptr)
-    {
-        return;
-    }
-
-    MGG_ShaderProgram* program = GetOrCreateProgram(device);
-    if (device->currentProgram != program)
-    {
-        device->context.functions.UseProgram(program->handle);
-        device->currentProgram = program;
-        device->inputLayoutDirty = true;
-        ApplyPosFixup(device);
-    }
-
-    if (device->currentRenderTargetCount > 0)
-        ApplyCurrentDrawBuffers(device);
 }
 
 void MGG_GraphicsDevice_SetInputLayout(MGG_GraphicsDevice* device, MGG_InputLayout* layout)
@@ -2647,6 +2739,8 @@ void MGG_GraphicsDevice_Draw(MGG_GraphicsDevice* device, MGPrimitiveType primiti
     EnsureVertexArray(device);
     assert(device->isInFrame);
 
+    ActivateShaderProgram(device);
+
     if (device->inputLayoutDirty)
         ApplyInputLayout(device, 0);
 
@@ -2665,6 +2759,8 @@ void MGG_GraphicsDevice_DrawIndexed(MGG_GraphicsDevice* device, MGPrimitiveType 
     EnsureContext(device);
     EnsureVertexArray(device);
     assert(device->isInFrame);
+
+    ActivateShaderProgram(device);
 
     // Apply vertexStart through the attribute bindings because this
     // indexed draw path uses glDrawELements without a separate base vertex.
@@ -2705,6 +2801,8 @@ void MGG_GraphicsDevice_DrawIndexedInstanced(
     EnsureContext(device);
     EnsureVertexArray(device);
     assert(device->isInFrame);
+
+    ActivateShaderProgram(device);
 
     // Apply vertexStart through the attribute bindings because this
     // indexed draw path uses glDrawElements without a separate base-vertex.
@@ -2763,7 +2861,7 @@ void MGG_GraphicsDevice_ResolveRenderTargets(MGG_GraphicsDevice* device)
                 renderTarget->handle,
                 0);
             glReadBuffer(GL_COLOR_ATTACHMENT0 + i);
-            glDrawBuffer(GL_COLOR_ATTACHMENT0);
+            SetDrawBuffer(device, GL_COLOR_ATTACHMENT0);
             device->context.functions.BlitFramebuffer(
                 0,
                 0,
@@ -2936,8 +3034,12 @@ MGG_SamplerState* MGG_SamplerState_Create(MGG_GraphicsDevice* device, MGG_Sample
     borderColor[2] = static_cast<GLfloat>((info->BorderColor >> 16) & 0xFF) / 255.0f;
     borderColor[3] = static_cast<GLfloat>((info->BorderColor >> 24) & 0xFF) / 255.0f;
 
-    device->context.functions.SamplerParameterfv(state->handle, GL_TEXTURE_BORDER_COLOR, borderColor);
-    device->context.functions.SamplerParameterf(state->handle, GL_TEXTURE_LOD_BIAS, info->MipMapLevelOfDetailBias);
+    if (!IsBrowserOpenGL())
+    {
+        device->context.functions.SamplerParameterfv(state->handle, GL_TEXTURE_BORDER_COLOR, borderColor);
+        device->context.functions.SamplerParameterf(state->handle, GL_TEXTURE_LOD_BIAS, info->MipMapLevelOfDetailBias);
+    }
+
     device->context.functions.SamplerParameterf(
         state->handle,
         GL_TEXTURE_MAX_LOD,
@@ -3005,6 +3107,13 @@ MGG_Buffer* MGG_Buffer_Create(MGG_GraphicsDevice* device, MGBufferType type, mgb
     buffer->type = type;
     buffer->dynamic = dynamic;
     buffer->sizeInBytes = sizeInBytes;
+    if (type == MGBufferType::Constant && IsBrowserOpenGL())
+    {
+        // WebGL constant buffers are uploaded as uniforms, so keep the bytes on the CPU.
+        buffer->cpuBacked = true;
+        buffer->constantData.resize(static_cast<size_t>(sizeInBytes));
+        return buffer;
+    }
 
     device->context.functions.GenBuffers(1, &buffer->handle);
     if (buffer->handle == 0)
@@ -3057,10 +3166,18 @@ void MGG_Buffer_SetData(MGG_GraphicsDevice* device, MGG_Buffer*& buffer, mgint o
     assert(vertexStride > 0);
     assert(elementSizeInBytes > 0);
 
-    EnsureContext(device);
-    device->context.functions.BindBuffer(buffer->target, buffer->handle);
+    bool useCpuBackedConstantBuffer = buffer->cpuBacked;
 
-    if (discard)
+    if (useCpuBackedConstantBuffer && discard)
+        std::fill(buffer->constantData.begin(), buffer->constantData.end(), 0);
+
+    if (!useCpuBackedConstantBuffer)
+    {
+        EnsureContext(device);
+        device->context.functions.BindBuffer(buffer->target, buffer->handle);
+    }
+
+    if (!useCpuBackedConstantBuffer && discard)
     {
         device->context.functions.BufferData(buffer->target, buffer->sizeInBytes, nullptr, buffer->usage);
     }
@@ -3069,7 +3186,10 @@ void MGG_Buffer_SetData(MGG_GraphicsDevice* device, MGG_Buffer*& buffer, mgint o
     {
         mgint copySpan = elementCount * elementSizeInBytes;
         assert(offset + copySpan <= buffer->sizeInBytes);
-        device->context.functions.BufferSubData(buffer->target, offset, copySpan, data);
+        if (!useCpuBackedConstantBuffer)
+            device->context.functions.BufferSubData(buffer->target, offset, copySpan, data);
+        if (!buffer->constantData.empty())
+            memcpy(buffer->constantData.data() + offset, data, static_cast<size_t>(copySpan));
         return;
     }
 
@@ -3080,7 +3200,10 @@ void MGG_Buffer_SetData(MGG_GraphicsDevice* device, MGG_Buffer*& buffer, mgint o
     {
         mgint destinationOffset = offset + elementIndex * vertexStride;
         const mgbyte* source = data + elementIndex * elementSizeInBytes;
-        device->context.functions.BufferSubData(buffer->target, destinationOffset, elementSizeInBytes, source);
+        if (!useCpuBackedConstantBuffer)
+            device->context.functions.BufferSubData(buffer->target, destinationOffset, elementSizeInBytes, source);
+        if (!buffer->constantData.empty())
+            memcpy(buffer->constantData.data() + destinationOffset, source, static_cast<size_t>(elementSizeInBytes));
     }
 }
 
@@ -3096,6 +3219,13 @@ void MGG_Buffer_GetData(MGG_GraphicsDevice* device, MGG_Buffer* buffer, mgint of
 
     mgint copySpan = GetCopySpan(dataCount, dataStride, dataBytes);
     assert(offset + copySpan <= buffer->sizeInBytes);
+
+    if (!buffer->constantData.empty())
+    {
+        const mgbyte* source = buffer->constantData.data() + offset;
+        CopyWithStride(source, data, dataCount, dataStride, dataBytes, dataBytes < dataStride ? dataBytes : dataStride);
+        return;
+    }
 
     EnsureContext(device);
     device->context.functions.BindBuffer(buffer->target, buffer->handle);
@@ -3199,7 +3329,7 @@ MGG_Texture* MGG_RenderTarget_Create(MGG_GraphicsDevice* device, MGTextureType t
             texture->handle,
             0);
     }
-    glDrawBuffer(GL_COLOR_ATTACHMENT0);
+    SetDrawBuffer(device, GL_COLOR_ATTACHMENT0);
     glReadBuffer(GL_COLOR_ATTACHMENT0);
 
     if (depthFormat != MGDepthFormat::None)
@@ -3246,7 +3376,7 @@ MGG_Texture* MGG_RenderTarget_Create(MGG_GraphicsDevice* device, MGTextureType t
             GetTextureImageTarget(texture, 0),
             texture->handle,
             0);
-        glDrawBuffer(GL_COLOR_ATTACHMENT0);
+        SetDrawBuffer(device, GL_COLOR_ATTACHMENT0);
         glReadBuffer(GL_COLOR_ATTACHMENT0);
 
         framebufferStatus = device->context.functions.CheckFramebufferStatus(GL_FRAMEBUFFER);
@@ -3282,7 +3412,7 @@ void MGG_Texture_Destroy(MGG_GraphicsDevice* device, MGG_Texture* texture)
     if (IsRenderTargetBound(device, texture))
     {
         device->context.functions.BindFramebuffer(GL_FRAMEBUFFER, 0);
-        glDrawBuffer(GL_BACK);
+        ResetBackBufferDrawBuffer();
         glReadBuffer(GL_BACK);
         ClearCurrentRenderTargets(device);
     }
@@ -3486,9 +3616,17 @@ void MGG_Texture_GetData(MGG_GraphicsDevice* device, MGG_Texture* texture, mgint
     if (x == 0 && y == 0 && z == 0 && resolvedWidth == mipWidth && resolvedHeight == mipHeight && resolvedDepth == mipDepth)
     {
         if (texture->isCompressed)
+        {
+            if (device->context.functions.GetCompressedTexImage == nullptr)
+                MGGL_FAIL("Texture readback unsupported", "compressed texture readback is unavailable on the current OpenGL backend");
             device->context.functions.GetCompressedTexImage(imageTarget, level, data);
+        }
         else
+        {
+            if (device->context.functions.GetTexImage == nullptr)
+                MGGL_FAIL("Texture readback unsupported", "texture readback is unavailable on the current OpenGL backend");
             device->context.functions.GetTexImage(imageTarget, level, texture->pixelFormat, texture->pixelType, data);
+        }
         EndTextureEdit(device, texture, previousActiveTexture, previousBinding);
         glPixelStorei(GL_PACK_ALIGNMENT, previousPackAlignment);
         return;
@@ -3497,6 +3635,9 @@ void MGG_Texture_GetData(MGG_GraphicsDevice* device, MGG_Texture* texture, mgint
     std::vector<mgbyte> fullLevelData(static_cast<size_t>(fullLevelBytes));
     if (texture->isCompressed)
     {
+        if (device->context.functions.GetCompressedTexImage == nullptr)
+            MGGL_FAIL("Texture readback unsupported", "compressed texture readback is unavailable on the current OpenGL backend");
+
         device->context.functions.GetCompressedTexImage(imageTarget, level, fullLevelData.data());
 
         mgint sourceRowBytes = GetTextureRowBytes(texture, mipWidth);
@@ -3519,6 +3660,9 @@ void MGG_Texture_GetData(MGG_GraphicsDevice* device, MGG_Texture* texture, mgint
     }
     else
     {
+        if (device->context.functions.GetTexImage == nullptr)
+            MGGL_FAIL("Texture readback unsupported", "texture readback is unavailable on the current OpenGL backend");
+
         device->context.functions.GetTexImage(
             imageTarget,
             level,

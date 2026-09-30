@@ -10,8 +10,13 @@
 // SDL declares glGetTexImage here, but this header set does not expose PFNGLGETTEXIMAGEPROC.
 using MGGLCOMPRESSEDTEXIMAGE2DPROC = decltype(&glCompressedTexImage2D);
 using MGGLCOMPRESSEDTEXSUBIMAGE2DPROC = decltype(&glCompressedTexSubImage2D);
+#if defined(__EMSCRIPTEN__)
+using MGGLGETTEXIMAGEPROC = void (*)(GLenum target, GLint level, GLenum format, GLenum type, void* pixels);
+using MGGLGETCOMPRESSEDTEXIMAGEPROC = void (*)(GLenum target, GLint level, void* img);
+#else
 using MGGLGETTEXIMAGEPROC = decltype(&glGetTexImage);
 using MGGLGETCOMPRESSEDTEXIMAGEPROC = decltype(&glGetCompressedTexImage);
+#endif
 
 struct OpenGLFunctions
 {

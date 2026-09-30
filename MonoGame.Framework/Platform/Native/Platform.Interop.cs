@@ -35,6 +35,11 @@ internal enum EventType : uint
 
     DropFile,
     DropComplete,
+    WindowFullscreenChanged,
+
+    TouchPressed,
+    TouchMoved,
+    TouchReleased,
 }
 
 
@@ -86,6 +91,15 @@ internal struct MGP_MouseWheelEvent
     public nint Window;
     public int Scroll;
     public int ScrollH;
+}
+
+[StructLayout(LayoutKind.Sequential)]
+internal struct MGP_TouchEvent
+{
+    public nint Window;
+    public int Id;
+    public int X;
+    public int Y;
 }
 
 internal enum SystemCursor : int
@@ -186,6 +200,9 @@ internal struct MGP_Event
 
     [FieldOffset(12)]
     public MGP_MouseWheelEvent MouseWheel;
+
+    [FieldOffset(12)]
+    public MGP_TouchEvent Touch;
 
     [FieldOffset(12)]
     public MGP_DropEvent Drop;
@@ -369,6 +386,9 @@ internal static unsafe partial class MGP
     [DllImport(MonoGameNativeDLL, EntryPoint = "MGP_Window_SetIsBorderless", ExactSpelling = true)]
     public static extern void Window_SetIsBorderless(MGP_Window* window, byte borderless);
 
+    [DllImport(MonoGameNativeDLL, EntryPoint = "MGP_Window_GetIsFullscreen", ExactSpelling = true)]
+    public static extern byte Window_GetIsFullscreen(MGP_Window* window);
+
     [DllImport(MonoGameNativeDLL, EntryPoint = "MGP_Window_SetTitle", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
     public static extern void Window_SetTitle(MGP_Window* window, [MarshalAs(UnmanagedType.LPUTF8Str)] string title);
 
@@ -419,6 +439,32 @@ internal static unsafe partial class MGP
 
     [DllImport(MonoGameNativeDLL, EntryPoint = "MGP_Cursor_Destroy", ExactSpelling = true)]
     public static extern void Cursor_Destroy(MGP_Cursor* cursor);
+
+    #endregion
+
+    #region Touch
+
+    [DllImport(MonoGameNativeDLL, EntryPoint = "MGP_Touch_GetMaximumTouchCount", ExactSpelling = true)]
+    public static extern int Touch_GetMaximumTouchCount();
+
+    #endregion
+
+    #region Accelerometer
+
+    [DllImport(MonoGameNativeDLL, EntryPoint = "MGP_Accelerometer_IsSupported", ExactSpelling = true)]
+    public static extern byte Accelerometer_IsSupported();
+
+    [DllImport(MonoGameNativeDLL, EntryPoint = "MGP_Accelerometer_GetState", ExactSpelling = true)]
+    public static extern int Accelerometer_GetState();
+
+    [DllImport(MonoGameNativeDLL, EntryPoint = "MGP_Accelerometer_Start", ExactSpelling = true)]
+    public static extern void Accelerometer_Start();
+
+    [DllImport(MonoGameNativeDLL, EntryPoint = "MGP_Accelerometer_Stop", ExactSpelling = true)]
+    public static extern void Accelerometer_Stop();
+
+    [DllImport(MonoGameNativeDLL, EntryPoint = "MGP_Accelerometer_GetReading", ExactSpelling = true)]
+    public static extern byte Accelerometer_GetReading(out float x, out float y, out float z, out int sequence);
 
     #endregion
 

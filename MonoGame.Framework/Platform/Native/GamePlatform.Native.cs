@@ -5,6 +5,8 @@
 using System;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using Microsoft.Xna.Framework.Input.Touch;
+using MonoGame.Framework.Devices.Sensors;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using MonoGame.Interop;
@@ -72,6 +74,12 @@ class NativeGamePlatform : GamePlatform
 
     public override unsafe void Exit()
     {
+        if (DefaultRunBehavior == GameRunBehavior.Asynchronous)
+        {
+            RaiseAsyncRunLoopEnded();
+            return;
+        }
+
         Interlocked.Increment(ref _isExiting);
     }
 
@@ -110,6 +118,8 @@ class NativeGamePlatform : GamePlatform
                     break;
 
                 case EventType.WindowLostFocus:
+                    Keyboard.Keys.Clear();
+                    Window.TouchPanelState.ReleaseAllTouches();
                     IsActive = false;
                     break;
 
@@ -118,6 +128,14 @@ class NativeGamePlatform : GamePlatform
                     var window = NativeGameWindow.FromHandle(event_.Window.Window);
                     if (window != null)
                         window.ClientResize(event_.Window.Data1, event_.Window.Data2);
+                    break;
+                }
+
+                case EventType.WindowFullscreenChanged:
+                {
+                    NativeGameWindow? window = NativeGameWindow.FromHandle(event_.Window.Window);
+                    if (window != null)
+                        window.FullscreenChanged(event_.Window.Data1 != 0);
                     break;
                 }
 
@@ -142,7 +160,9 @@ class NativeGamePlatform : GamePlatform
                     { 
                         window.OnKeyDown(new InputKeyEventArgs(key));
 
-                        if (window.IsTextInputHandled && char.IsControl(character))
+                        if (event_.Key.Character != 0
+                            && window.IsTextInputHandled
+                            && char.IsControl(character))
                             window.OnTextInput(new TextInputEventArgs(character, key));
                     }
 
@@ -246,6 +266,29 @@ class NativeGamePlatform : GamePlatform
                     break;
                 }
 
+                case EventType.TouchPressed:
+                case EventType.TouchMoved:
+                case EventType.TouchReleased:
+                {
+                    NativeGameWindow? window = NativeGameWindow.FromHandle(event_.Touch.Window);
+                    if (window != null)
+                    {
+                        TouchLocationState state = event_.Type switch
+                        {
+                            EventType.TouchPressed => TouchLocationState.Pressed,
+                            EventType.TouchMoved => TouchLocationState.Moved,
+                            EventType.TouchReleased => TouchLocationState.Released,
+                            _ => throw new InvalidOperationException()
+                        };
+
+                        window.TouchPanelState.AddEvent(
+                            event_.Touch.Id,
+                            state,
+                            new Vector2(event_.Touch.X, event_.Touch.Y));
+                    }
+                    break;
+                }
+
                 case EventType.ControllerAdded:
                 {
                     GamePad.Add(event_.Controller.Id);
@@ -303,6 +346,7 @@ class NativeGamePlatform : GamePlatform
 
     public override unsafe void StartRunLoop()
     {
+        _window.Show(true);
         MGP.Platform_StartRunLoop(Handle);
     }
 
@@ -329,6 +373,11 @@ class NativeGamePlatform : GamePlatform
 
     public override unsafe bool BeforeUpdate(GameTime gameTime)
     {
+        if (DefaultRunBehavior == GameRunBehavior.Asynchronous)
+            PollEvents();
+
+        Accelerometer.PlatformUpdate();
+
         return MGP.Platform_BeforeUpdate(Handle) == 0 ? false : true;
     }
 

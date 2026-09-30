@@ -1,0 +1,112 @@
+<Project>
+
+  <Target Name="GenerateMonoGameAssetManifests"
+    AfterTargets="ResolveCoreStaticWebAssets"
+    Condition="'$(RuntimeIdentifier)' == 'browser-wasm'">
+    <PropertyGroup>
+      <MonoGameAssetManifestDirectory>$(IntermediateOutputPath)monogame-assets\</MonoGameAssetManifestDirectory>
+      <MonoGameAssetManifestPath>$(MonoGameAssetManifestDirectory)content-manifest.txt</MonoGameAssetManifestPath>
+      <MonoGameAssetPackManifestDirectory>$(MonoGameAssetManifestDirectory)asset-packs\</MonoGameAssetPackManifestDirectory>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <StaticWebAsset Remove="@(_MonoGameAssetManifestStaticWebAsset)" />
+      <StaticWebAssetEndpoint Remove="@(_MonoGameAssetManifestStaticWebAssetEndpoint)" />
+      <_MonoGameAsset Remove="@(_MonoGameAsset)" />
+      <_MonoGameStartupAsset Remove="@(_MonoGameStartupAsset)" />
+      <_MonoGameAssetPack Remove="@(_MonoGameAssetPack)" />
+      <_MonoGameAssetPackName Remove="@(_MonoGameAssetPackName)" />
+      <_MonoGameDistinctAssetPackName Remove="@(_MonoGameDistinctAssetPackName)" />
+      <_MonoGameAssetManifest Remove="@(_MonoGameAssetManifest)" />
+      <_MonoGameAssetManifestStaticWebAsset Remove="@(_MonoGameAssetManifestStaticWebAsset)" />
+      <_MonoGameAssetManifestStaticWebAssetEndpoint Remove="@(_MonoGameAssetManifestStaticWebAssetEndpoint)" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <_MonoGameAsset Include="@(StaticWebAsset)"
+        Condition="$([System.String]::Copy('%(StaticWebAsset.RelativePath)').StartsWith('Content/'))">
+        <ManifestPath>$([System.Text.RegularExpressions.Regex]::Replace('%(StaticWebAsset.RelativePath)', '#\[\.\{fingerprint\}\]\?', ''))</ManifestPath>
+      </_MonoGameAsset>
+      <_MonoGameStartupAsset Include="@(_MonoGameAsset)" />
+      <_MonoGameAssetPack Include="@(MonoGameAsset)"
+        Condition="'%(MonoGameAsset.AssetPack)' != '' And '%(MonoGameAsset.AssetPack)' != 'base'">
+        <ManifestPath>%(Identity)</ManifestPath>
+      </_MonoGameAssetPack>
+    </ItemGroup>
+
+    <ItemGroup>
+      <_MonoGameStartupAsset Remove="@(_MonoGameAssetPack)"
+        MatchOnMetadata="ManifestPath" />
+    </ItemGroup>
+
+    <MakeDir Directories="$(MonoGameAssetManifestDirectory)" />
+    <MakeDir Directories="$(MonoGameAssetPackManifestDirectory)"
+      Condition="'@(_MonoGameAssetPack)' != ''" />
+
+    <WriteLinesToFile
+      File="$(MonoGameAssetManifestPath)"
+      Lines="@(_MonoGameStartupAsset->'%(ManifestPath)')"
+      Overwrite="true" />
+
+    <Error
+      Condition="'@(_MonoGameAssetPack)' != '' And $([System.String]::Copy('%(_MonoGameAssetPack.AssetPack)').Contains('/'))"
+      Text="MonoGameAsset '%(_MonoGameAssetPack.Identity)' AssetPack '%(_MonoGameAssetPack.AssetPack)' must not contain '/'." />
+
+    <Error
+      Condition="'@(_MonoGameAssetPack)' != '' And $([System.String]::Copy('%(_MonoGameAssetPack.AssetPack)').Contains('\\'))"
+      Text="MonoGameAsset '%(_MonoGameAssetPack.Identity)' AssetPack '%(_MonoGameAssetPack.AssetPack)' must not contain '\\'." />
+
+    <Error
+      Condition="'@(_MonoGameAssetPack)' != '' And $([System.String]::Copy('%(_MonoGameAssetPack.AssetPack)').Contains('..'))"
+      Text="MonoGameAsset '%(_MonoGameAssetPack.Identity)' AssetPack '%(_MonoGameAssetPack.AssetPack)' must not contain '..'." />
+
+    <WriteLinesToFile
+      File="$(MonoGameAssetPackManifestDirectory)%(_MonoGameAssetPack.AssetPack).txt"
+      Lines="@(_MonoGameAssetPack->'%(ManifestPath)')"
+      Condition="'@(_MonoGameAssetPack)' != ''"
+      Overwrite="true" />
+
+    <ItemGroup>
+      <_MonoGameAssetPackName Include="@(_MonoGameAssetPack->'%(AssetPack)')" />
+    </ItemGroup>
+
+    <RemoveDuplicates Inputs="@(_MonoGameAssetPackName)">
+      <Output TaskParameter="Filtered" ItemName="_MonoGameDistinctAssetPackName" />
+    </RemoveDuplicates>
+
+    <ItemGroup>
+      <_MonoGameAssetManifest Include="$(MonoGameAssetManifestPath)">
+        <RelativePath>Content/content-manifest.txt</RelativePath>
+      </_MonoGameAssetManifest>
+      <_MonoGameAssetManifest Include="@(_MonoGameDistinctAssetPackName->'$(MonoGameAssetPackManifestDirectory)%(Identity).txt')">
+        <RelativePath>Content/asset-packs/%(_MonoGameDistinctAssetPackName.Identity).txt</RelativePath>
+      </_MonoGameAssetManifest>
+    </ItemGroup>
+
+    <DefineStaticWebAssets
+      CandidateAssets="@(_MonoGameAssetManifest)"
+      SourceType="Computed"
+      SourceId="$(PackageId)"
+      ContentRoot="$(MonoGameAssetManifestDirectory)"
+      BasePath="$(StaticWebAssetBasePath)"
+      AssetKind="All"
+      AssetMode="CurrentProject"
+      AssetRole="Primary"
+      AssetMergeSource="$(StaticWebAssetMergeTarget)">
+      <Output TaskParameter="Assets" ItemName="_MonoGameAssetManifestStaticWebAsset" />
+    </DefineStaticWebAssets>
+
+    <DefineStaticWebAssetEndpoints
+      CandidateAssets="@(_MonoGameAssetManifestStaticWebAsset)"
+      ExistingEndpoints="@(StaticWebAssetEndpoint)"
+      ContentTypeMappings="@(StaticWebAssetContentTypeMapping)">
+      <Output TaskParameter="Endpoints" ItemName="_MonoGameAssetManifestStaticWebAssetEndpoint" />
+    </DefineStaticWebAssetEndpoints>
+
+    <ItemGroup>
+      <StaticWebAsset Include="@(_MonoGameAssetManifestStaticWebAsset)" />
+      <StaticWebAssetEndpoint Include="@(_MonoGameAssetManifestStaticWebAssetEndpoint)" />
+    </ItemGroup>
+  </Target>
+
+</Project>
