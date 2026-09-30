@@ -62,6 +62,7 @@ public:
 
     CommandContext* GetCommandContext() const;
 
+    IDXGIAdapter1* GetAdapter() const;
     ID3D12Device* GetD3DDevice() const;
     unsigned int GetBackBufferCount() const;
     CommandList* BeginCommandList() const;
