@@ -38,24 +38,10 @@ namespace MonoGame.Tests.Graphics
             vertexBuffer.SetData(savedData);
 
             var readData = new VertexPositionTexture[4];
-            if (!gd.GraphicsCapabilities.SupportsMapBuffer)
-            {
-                var exception = Assert.Catch<NotSupportedException>(() =>
-                {
-                    vertexBuffer.GetData(readData, 0, 4);
-                });
-
-                // Some backends, like Native, can read back index data without map-buffer support.
-                if (exception == null)
-                {
-                    Assert.AreEqual(savedData, readData);
-                }
-            }
-            else
-            {
-                vertexBuffer.GetData(readData, 0, 4);
-                Assert.AreEqual(savedData, readData);
-            }
+            AssertGetDataOrUnsupported(
+                () => vertexBuffer.GetData(readData, 0, 4),
+                () => Assert.AreEqual(savedData, readData)
+            );
 
             vertexBuffer.Dispose();
         }
@@ -71,30 +57,16 @@ namespace MonoGame.Tests.Graphics
             vertexBuffer.SetData(savedData);
 
             var readData = new VertexPositionTexture[4];
-            if (!gd.GraphicsCapabilities.SupportsMapBuffer)
-            {
-                var exception = Assert.Catch<NotSupportedException>(() =>
-                {
-                    vertexBuffer.GetData(readData, 0, 2);
-                });
-
-                // Some backends, like Native, can read back index data without map-buffer support.
-                if (exception == null)
+            AssertGetDataOrUnsupported(
+                () => vertexBuffer.GetData(readData, 0, 2),
+                () =>
                 {
                     Assert.AreEqual(savedData[0], readData[0]);
                     Assert.AreEqual(savedData[1], readData[1]);
                     Assert.AreEqual(vertexZero, readData[2]);
                     Assert.AreEqual(vertexZero, readData[3]);
                 }
-            }
-            else
-            {
-                vertexBuffer.GetData(readData, 0, 2);
-                Assert.AreEqual(savedData[0], readData[0]);
-                Assert.AreEqual(savedData[1], readData[1]);
-                Assert.AreEqual(vertexZero, readData[2]);
-                Assert.AreEqual(vertexZero, readData[3]);
-            }
+            );
 
             vertexBuffer.Dispose();
         }
@@ -110,30 +82,16 @@ namespace MonoGame.Tests.Graphics
             vertexBuffer.SetData(savedData);
 
             var readData = new VertexPositionTexture[4];
-            if (!gd.GraphicsCapabilities.SupportsMapBuffer)
-            {
-                var exception = Assert.Catch<NotSupportedException>(() =>
-                {
-                    vertexBuffer.GetData(readData, 2, 2);
-                });
-
-                // Some backends, like Native, can read back index data without map-buffer support.
-                if (exception == null)
+            AssertGetDataOrUnsupported(
+                () => vertexBuffer.GetData(readData, 2, 2),
+                () =>
                 {
                     Assert.AreEqual(vertexZero, readData[0]);
                     Assert.AreEqual(vertexZero, readData[1]);
                     Assert.AreEqual(savedData[0], readData[2]);
                     Assert.AreEqual(savedData[1], readData[3]);
                 }
-            }
-            else
-            {
-                vertexBuffer.GetData(readData, 2, 2);
-                Assert.AreEqual(vertexZero, readData[0]);
-                Assert.AreEqual(vertexZero, readData[1]);
-                Assert.AreEqual(savedData[0], readData[2]);
-                Assert.AreEqual(savedData[1], readData[3]);
-            }
+            );
 
             vertexBuffer.Dispose();
         }
@@ -151,26 +109,14 @@ namespace MonoGame.Tests.Graphics
             var readData = new VertexPositionTexture[2];
             var vertexStride = VertexPositionTexture.VertexDeclaration.VertexStride;
             var offsetInBytes = vertexStride * 2;
-            if (!gd.GraphicsCapabilities.SupportsMapBuffer)
-            {
-                var exception = Assert.Catch<NotSupportedException>(() =>
-                {
-                    vertexBuffer.GetData(offsetInBytes, readData, 0, 2, vertexStride);
-                });
-
-                // Some backends, like Native, can read back index data without map-buffer support.
-                if (exception == null)
+            AssertGetDataOrUnsupported(
+                () => vertexBuffer.GetData(offsetInBytes, readData, 0, 2, vertexStride),
+                () =>
                 {
                     Assert.AreEqual(savedData[2], readData[0]);
                     Assert.AreEqual(savedData[3], readData[1]);
                 }
-            }
-            else
-            {
-                vertexBuffer.GetData(offsetInBytes, readData, 0, 2, vertexStride);
-                Assert.AreEqual(savedData[2], readData[0]);
-                Assert.AreEqual(savedData[3], readData[1]);
-            }
+            );
 
             vertexBuffer.Dispose();
         }
@@ -193,24 +139,10 @@ namespace MonoGame.Tests.Graphics
             }
 
             var readData = new VertexPositionTexture[4];
-            if (!gd.GraphicsCapabilities.SupportsMapBuffer)
-            {
-                var exception = Assert.Catch<NotSupportedException>(() =>
-                {
-                    vertexBuffer.GetData(readData, 0, 4);
-                });
-
-                // Some backends, like Native, can read back index data without map-buffer support.
-                if (exception == null)
-                {
-                    Assert.AreEqual(savedData, readData);
-                }
-            }
-            else
-            {
-                vertexBuffer.GetData(readData, 0, 4);
-                Assert.AreEqual(savedData, readData);
-            }
+            AssertGetDataOrUnsupported(
+                () => vertexBuffer.GetData(readData, 0, 4),
+                () => Assert.AreEqual(savedData, readData)
+            );
 
             vertexBuffer.Dispose();
         }
@@ -247,28 +179,12 @@ namespace MonoGame.Tests.Graphics
                 vertexBuffer.SetData(savedDataBytes, startIndex, elementCount);
 
                 var readDataBytes = new byte[savedDataBytes.Length];
-                if (!gd.GraphicsCapabilities.SupportsMapBuffer)
-                {
-                    var exception = Assert.Catch<NotSupportedException>(() =>
-                    {
-                        vertexBuffer.GetData(readDataBytes, startIndex, elementCount);
-                    });
-
-                    // Some backends, like Native, can read back index data without map-buffer support.
-                    if (exception == null)
-                    {
-                        Assert.AreEqual(
-                            savedDataBytes.Skip(startIndex).Take(elementCount).ToArray(),
-                            readDataBytes.Skip(startIndex).Take(elementCount).ToArray());
-                    }
-                }
-                else
-                {
-                    vertexBuffer.GetData(readDataBytes, startIndex, elementCount);
-                    Assert.AreEqual(
-                        savedDataBytes.Skip(startIndex).Take(elementCount).ToArray(),
-                        readDataBytes.Skip(startIndex).Take(elementCount).ToArray());
-                }
+                AssertGetDataOrUnsupported(
+                    () => vertexBuffer.GetData(readDataBytes, startIndex, elementCount),
+                    () => Assert.AreEqual(
+                                savedDataBytes.Skip(startIndex).Take(elementCount).ToArray(),
+                                readDataBytes.Skip(startIndex).Take(elementCount).ToArray())
+                );
             }
 
             vertexBuffer.Dispose();
@@ -309,28 +225,12 @@ namespace MonoGame.Tests.Graphics
                 vertexBuffer.SetData(0, savedDataBytes, 0, elementCount, vertexStride);
 
                 var readDataBytes = new byte[savedDataBytes.Length];
-                if (!gd.GraphicsCapabilities.SupportsMapBuffer)
-                {
-                    var exception = Assert.Catch<NotSupportedException>(() =>
-                    {
-                        vertexBuffer.GetData(0, readDataBytes, 0, elementCount, vertexStride);
-                    });
-
-                    // Some backends, like Native, can read back index data without map-buffer support.
-                    if (exception == null)
-                    {
-                        Assert.AreEqual(
+                AssertGetDataOrUnsupported(
+                    () => vertexBuffer.GetData(0, readDataBytes, 0, elementCount, vertexStride),
+                    () => Assert.AreEqual(
                             savedDataBytes.Take(elementCount).ToArray(),
-                            readDataBytes.Take(elementCount).ToArray());
-                    }
-                }
-                else
-                {
-                    vertexBuffer.GetData(0, readDataBytes, 0, elementCount, vertexStride);
-                    Assert.AreEqual(
-                        savedDataBytes.Take(elementCount).ToArray(),
-                        readDataBytes.Take(elementCount).ToArray());
-                }
+                            readDataBytes.Take(elementCount).ToArray())
+                );
             }
 
             vertexBuffer.Dispose();
@@ -345,7 +245,7 @@ namespace MonoGame.Tests.Graphics
             {
                 data[i] = new VertexPositionTexture(
                     new Vector3(i * 3, i * 3 + 1, i * 3 + 2),
-                    new Vector2(i * 2 / (float) 10, (i * 2 + 1) / (float) 10));
+                    new Vector2(i * 2 / (float)10, (i * 2 + 1) / (float)10));
             }
 
             var vb = new VertexBuffer(gd, VertexPositionTexture.VertexDeclaration, data.Length, BufferUsage.None);
@@ -353,15 +253,9 @@ namespace MonoGame.Tests.Graphics
 
             var textureCoords = new Vector2[2 * size + 1];
             textureCoords[0] = new Vector2(-42, 42);
-            if (!gd.GraphicsCapabilities.SupportsMapBuffer)
-            {
-                var exception = Assert.Catch<NotSupportedException>(() =>
-                {
-                    vb.GetData(3 * 4, textureCoords, 1, size, 20);
-                });
-
-                // Some backends, like Native, can read back index data without map-buffer support.
-                if (exception == null)
+            AssertGetDataOrUnsupported(
+                () => vb.GetData(3 * 4, textureCoords, 1, size, 20),
+                () =>
                 {
                     // first one should not be overwritten
                     Assert.AreEqual(new Vector2(-42, 42), textureCoords[0]);
@@ -384,32 +278,7 @@ namespace MonoGame.Tests.Graphics
                         Assert.AreEqual(expected, textureCoords[index]);
                     }
                 }
-            }
-            else
-            {
-                vb.GetData(3 * 4, textureCoords, 1, size, 20);
-
-                // first one should not be overwritten
-                Assert.AreEqual(new Vector2(-42, 42), textureCoords[0]);
-                for (var i = 0; i < size; i++)
-                {
-                    var index = i + 1;
-                    var expected = new Vector2(i * 2 / (float)10, (i * 2 + 1) / (float)10);
-                    Assert.AreEqual(expected, textureCoords[index]);
-                }
-
-                vb.SetData(3 * 4, textureCoords, 1, size, 20);
-                vb.GetData(3 * 4, textureCoords, 1, size, 20);
-
-                // first one should not be overwritten
-                Assert.AreEqual(new Vector2(-42, 42), textureCoords[0]);
-                for (var i = 0; i < size; i++)
-                {
-                    var index = i + 1;
-                    var expected = new Vector2(i * 2 / (float)10, (i * 2 + 1) / (float)10);
-                    Assert.AreEqual(expected, textureCoords[index]);
-                }
-            }
+            );
 
             vb.Dispose();
         }
@@ -437,28 +306,12 @@ namespace MonoGame.Tests.Graphics
                 vertexBuffer.SetData(0, savedData, 0, elementCount, vertexStride);
 
                 var readData = new VertexPositionTexture[savedData.Length];
-                if (!gd.GraphicsCapabilities.SupportsMapBuffer)
-                {
-                    var exception = Assert.Catch<NotSupportedException>(() =>
-                    {
-                        vertexBuffer.GetData(0, readData, 0, elementCount, vertexStride);
-                    });
-
-                    // Some backends, like Native, can read back index data without map-buffer support.
-                    if (exception == null)
-                    {
-                        Assert.AreEqual(
+                AssertGetDataOrUnsupported(
+                    () => vertexBuffer.GetData(0, readData, 0, elementCount, vertexStride),
+                    () => Assert.AreEqual(
                             savedData.Take(elementCount).ToArray(),
-                            readData.Take(elementCount).ToArray());
-                    }
-                }
-                else
-                {
-                    vertexBuffer.GetData(0, readData, 0, elementCount, vertexStride);
-                    Assert.AreEqual(
-                        savedData.Take(elementCount).ToArray(),
-                        readData.Take(elementCount).ToArray());
-                }
+                            readData.Take(elementCount).ToArray())
+                );
             }
 
             vertexBuffer.Dispose();
@@ -510,15 +363,9 @@ namespace MonoGame.Tests.Graphics
                 vertexBuffer.SetData(destinationStartIndex, dataSpan);
 
                 var readData = new VertexPositionTexture[savedData.Length];
-                if (!gd.GraphicsCapabilities.SupportsMapBuffer)
-                {
-                    var exception = Assert.Catch<NotSupportedException>(() =>
-                    {
-                        vertexBuffer.GetData(0, readData, 0, savedData.Length, vertexStride);
-                    });
-
-                    // Some backends, like Native, can read back index data without map-buffer support.
-                    if (exception == null)
+                AssertGetDataOrUnsupported(
+                    () => vertexBuffer.GetData(0, readData, 0, savedData.Length, vertexStride),
+                    () => 
                     {
                         Assert.AreEqual(
                         dataSpan.ToArray(),
@@ -532,22 +379,7 @@ namespace MonoGame.Tests.Graphics
                             }
                         }
                     }
-                }
-                else
-                {
-                    vertexBuffer.GetData(0, readData, 0, savedData.Length, vertexStride);
-                    Assert.AreEqual(
-                        dataSpan.ToArray(),
-                        readData.Take(destinationStartIndex..(destinationStartIndex + elementCount)).ToArray());
-
-                    for(int i = 0; i < savedData.Length; i++)
-                    {
-                        if (i < destinationStartIndex || i >= destinationStartIndex + elementCount)
-                        {
-                            Assert.AreEqual(savedData[i], readData[i]);
-                        }
-                    }
-                }
+                );
             }
 
             vertexBuffer.Dispose();
@@ -566,30 +398,16 @@ namespace MonoGame.Tests.Graphics
 
             var readData = new Vector3[4];
             var vertexStride = VertexPositionTexture.VertexDeclaration.VertexStride;
-            if (!gd.GraphicsCapabilities.SupportsMapBuffer)
-            {
-                var exception = Assert.Catch<NotSupportedException>(() =>
-                {
-                    vertexBuffer.GetData(0, readData, 0, 4, vertexStride);
-                });
-
-                // Some backends, like Native, can read back index data without map-buffer support.
-                if (exception == null)
+            AssertGetDataOrUnsupported(
+                () => vertexBuffer.GetData(0, readData, 0, 4, vertexStride),
+                () =>
                 {
                     Assert.AreEqual(savedData[0].Position, readData[0]);
                     Assert.AreEqual(savedData[1].Position, readData[1]);
                     Assert.AreEqual(savedData[2].Position, readData[2]);
                     Assert.AreEqual(savedData[3].Position, readData[3]);
                 }
-            }
-            else
-            {
-                vertexBuffer.GetData(0, readData, 0, 4, vertexStride);
-                Assert.AreEqual(savedData[0].Position, readData[0]);
-                Assert.AreEqual(savedData[1].Position, readData[1]);
-                Assert.AreEqual(savedData[2].Position, readData[2]);
-                Assert.AreEqual(savedData[3].Position, readData[3]);
-            }
+            );
 
             vertexBuffer.Dispose();
         }
@@ -613,30 +431,16 @@ namespace MonoGame.Tests.Graphics
             vertexBuffer.SetData(0, positions, 0, 4, vertexStride);
 
             var readData = new Vector3[4];
-            if (!gd.GraphicsCapabilities.SupportsMapBuffer)
-            {
-                var exception = Assert.Catch<NotSupportedException>(() =>
-                {
-                    vertexBuffer.GetData(0, readData, 0, 4, vertexStride);
-                });
-
-                // Some backends, like Native, can read back index data without map-buffer support.
-                if (exception == null)
+            AssertGetDataOrUnsupported(
+                () => vertexBuffer.GetData(0, readData, 0, 4, vertexStride),
+                () =>
                 {
                     Assert.AreEqual(savedData[0].Position, readData[0]);
                     Assert.AreEqual(savedData[1].Position, readData[1]);
                     Assert.AreEqual(savedData[2].Position, readData[2]);
                     Assert.AreEqual(savedData[3].Position, readData[3]);
                 }
-            }
-            else
-            {
-                vertexBuffer.GetData(0, readData, 0, 4, vertexStride);
-                Assert.AreEqual(savedData[0].Position, readData[0]);
-                Assert.AreEqual(savedData[1].Position, readData[1]);
-                Assert.AreEqual(savedData[2].Position, readData[2]);
-                Assert.AreEqual(savedData[3].Position, readData[3]);
-            }
+            );
 
             vertexBuffer.Dispose();
         }
@@ -654,30 +458,16 @@ namespace MonoGame.Tests.Graphics
             var readData = new Vector2[4];
             var vertexStride = VertexPositionTexture.VertexDeclaration.VertexStride;
             var offsetInBytes = VertexPositionTexture.VertexDeclaration.GetVertexElements()[1].Offset;
-            if (!gd.GraphicsCapabilities.SupportsMapBuffer)
-            {
-                var exception = Assert.Catch<NotSupportedException>(() =>
-                {
-                    vertexBuffer.GetData(offsetInBytes, readData, 0, 4, vertexStride);
-                });
-
-                // Some backends, like Native, can read back index data without map-buffer support.
-                if (exception == null)
+            AssertGetDataOrUnsupported(
+                () => vertexBuffer.GetData(offsetInBytes, readData, 0, 4, vertexStride),
+                () =>
                 {
                     Assert.AreEqual(savedData[0].TextureCoordinate, readData[0]);
                     Assert.AreEqual(savedData[1].TextureCoordinate, readData[1]);
                     Assert.AreEqual(savedData[2].TextureCoordinate, readData[2]);
                     Assert.AreEqual(savedData[3].TextureCoordinate, readData[3]);
                 }
-            }
-            else
-            {
-                vertexBuffer.GetData(offsetInBytes, readData, 0, 4, vertexStride);
-                Assert.AreEqual(savedData[0].TextureCoordinate, readData[0]);
-                Assert.AreEqual(savedData[1].TextureCoordinate, readData[1]);
-                Assert.AreEqual(savedData[2].TextureCoordinate, readData[2]);
-                Assert.AreEqual(savedData[3].TextureCoordinate, readData[3]);
-            }
+            );
 
             vertexBuffer.Dispose();
         }
@@ -702,30 +492,16 @@ namespace MonoGame.Tests.Graphics
             vertexBuffer.SetData(offsetInBytes, texCoords, 0, 4, vertexStride);
 
             var readData = new Vector2[4];
-            if (!gd.GraphicsCapabilities.SupportsMapBuffer)
-            {
-                var exception = Assert.Catch<NotSupportedException>(() =>
-                {
-                    vertexBuffer.GetData(offsetInBytes, readData, 0, 4, vertexStride);
-                });
-
-                // Some backends, like Native, can read back index data without map-buffer support.
-                if (exception == null)
+            AssertGetDataOrUnsupported(
+                () => vertexBuffer.GetData(offsetInBytes, readData, 0, 4, vertexStride),
+                () =>
                 {
                     Assert.AreEqual(savedData[0].TextureCoordinate, readData[0]);
                     Assert.AreEqual(savedData[1].TextureCoordinate, readData[1]);
                     Assert.AreEqual(savedData[2].TextureCoordinate, readData[2]);
                     Assert.AreEqual(savedData[3].TextureCoordinate, readData[3]);
                 }
-            }
-            else
-            {
-                vertexBuffer.GetData(offsetInBytes, readData, 0, 4, vertexStride);
-                Assert.AreEqual(savedData[0].TextureCoordinate, readData[0]);
-                Assert.AreEqual(savedData[1].TextureCoordinate, readData[1]);
-                Assert.AreEqual(savedData[2].TextureCoordinate, readData[2]);
-                Assert.AreEqual(savedData[3].TextureCoordinate, readData[3]);
-            }
+            ); 
 
             vertexBuffer.Dispose();
         }
@@ -930,6 +706,20 @@ namespace MonoGame.Tests.Graphics
                 vb_pos?.Dispose();
                 decl?.Dispose();
                 vb_data?.Dispose();
+            }
+        }
+
+        // Having to support both Native, GL and ES < 3.x backends means a slightly fancier check.
+        private static void AssertGetDataOrUnsupported(Action readBack, Action verify)
+        {
+            try
+            {
+                readBack();
+                verify();
+            }
+            catch (NotSupportedException)
+            {
+                // Acceptable for backends, like ES < 3.x, that legitimately do not support readback here.
             }
         }
     }

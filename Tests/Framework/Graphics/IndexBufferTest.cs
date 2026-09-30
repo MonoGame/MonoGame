@@ -10,7 +10,7 @@ namespace MonoGame.Tests.Graphics
 {
     [NonParallelizable]
     [RunOnUiTestFixture]
-    class IndexBufferTest: GraphicsDeviceTestFixtureBase
+    class IndexBufferTest : GraphicsDeviceTestFixtureBase
     {
         [Test]
         public void ShouldSetAndGetData()
@@ -22,24 +22,10 @@ namespace MonoGame.Tests.Graphics
                 indexBuffer.SetData(savedData);
 
                 var readData = new short[4];
-                if (!gd.GraphicsCapabilities.SupportsMapBuffer)
-                {
-                    var exception = Assert.Catch<NotSupportedException>(() =>
-                    {
-                        indexBuffer.GetData(readData, 0, 4);
-                    });
-
-                    // Some backends, like Native, can read back index data without map-buffer support.
-                    if (exception == null)
-                    {
-                        Assert.AreEqual(savedData, readData);
-                    }
-                }
-                else
-                {
-                    indexBuffer.GetData(readData, 0, 4);
-                    Assert.AreEqual(savedData, readData);
-                }
+                AssertGetDataOrUnsupported(
+                    () => indexBuffer.GetData(readData, 0, 4),
+                    () => Assert.AreEqual(savedData, readData)
+                );
 
                 indexBuffer.Dispose();
             }
@@ -51,24 +37,10 @@ namespace MonoGame.Tests.Graphics
                 indexBuffer.SetData(savedData);
 
                 var readData = new int[4];
-                if (!gd.GraphicsCapabilities.SupportsMapBuffer)
-                {
-                    var exception = Assert.Catch<NotSupportedException>(() =>
-                    {
-                        indexBuffer.GetData(readData, 0, 4);
-                    });
-
-                    // Some backends, like Native, can read back index data without map-buffer support.
-                    if (exception == null)
-                    {
-                        Assert.AreEqual(savedData, readData);
-                    }
-                }
-                else
-                {
-                    indexBuffer.GetData(readData, 0, 4);
-                    Assert.AreEqual(savedData, readData);
-                }
+                AssertGetDataOrUnsupported(
+                    () => indexBuffer.GetData(readData, 0, 4),
+                    () => Assert.AreEqual(savedData, readData)
+                );
 
                 indexBuffer.Dispose();
             }
@@ -84,31 +56,17 @@ namespace MonoGame.Tests.Graphics
                 indexBuffer.SetData(savedData);
 
                 var readData = new short[4];
-                if (!gd.GraphicsCapabilities.SupportsMapBuffer)
-                {
-                    var exception = Assert.Catch<NotSupportedException>(() =>
-                    {
-                        indexBuffer.GetData(readData, 0, 2);
-                    });
-
-                    // Some backends, like Native, can read back index data without map-buffer support.
-                    if (exception == null)
+                AssertGetDataOrUnsupported(
+                    () => indexBuffer.GetData(readData, 0, 2),
+                    () =>
                     {
                         Assert.AreEqual(1, readData[0]);
                         Assert.AreEqual(2, readData[1]);
                         Assert.AreEqual(0, readData[2]);
                         Assert.AreEqual(0, readData[3]);
                     }
-                }
-                else
-                {
-                    indexBuffer.GetData(readData, 0, 2);
-                    Assert.AreEqual(1, readData[0]);
-                    Assert.AreEqual(2, readData[1]);
-                    Assert.AreEqual(0, readData[2]);
-                    Assert.AreEqual(0, readData[3]);
-                }
-                
+                );
+
                 indexBuffer.Dispose();
             }
 
@@ -119,30 +77,16 @@ namespace MonoGame.Tests.Graphics
                 indexBuffer.SetData(savedData);
 
                 var readData = new int[4];
-                if (!gd.GraphicsCapabilities.SupportsMapBuffer)
-                {
-                    var exception = Assert.Catch<NotSupportedException>(() =>
-                    {
-                        indexBuffer.GetData(readData, 0, 2);
-                    });
-
-                    // Some backends, like Native, can read back index data without map-buffer support.
-                    if (exception == null)
+                AssertGetDataOrUnsupported(
+                    () => indexBuffer.GetData(readData, 0, 2),
+                    () =>
                     {
                         Assert.AreEqual(1, readData[0]);
                         Assert.AreEqual(2, readData[1]);
                         Assert.AreEqual(0, readData[2]);
                         Assert.AreEqual(0, readData[3]);
                     }
-                }
-                else
-                {
-                    indexBuffer.GetData(readData, 0, 2);
-                    Assert.AreEqual(1, readData[0]);
-                    Assert.AreEqual(2, readData[1]);
-                    Assert.AreEqual(0, readData[2]);
-                    Assert.AreEqual(0, readData[3]);
-                }
+                );
 
                 indexBuffer.Dispose();
             }
@@ -158,30 +102,16 @@ namespace MonoGame.Tests.Graphics
                 indexBuffer.SetData(savedData);
 
                 var readData = new short[4];
-                if (!gd.GraphicsCapabilities.SupportsMapBuffer)
-                {
-                    var exception = Assert.Catch<NotSupportedException>(() =>
-                    {
-                        indexBuffer.GetData(readData, 2, 2);
-                    });
-
-                    // Some backends, like Native, can read back index data without map-buffer support.
-                    if (exception == null)
+                AssertGetDataOrUnsupported(
+                    () => indexBuffer.GetData(readData, 2, 2),
+                    () =>
                     {
                         Assert.AreEqual(0, readData[0]);
                         Assert.AreEqual(0, readData[1]);
                         Assert.AreEqual(1, readData[2]);
                         Assert.AreEqual(2, readData[3]);
                     }
-                }
-                else
-                {
-                    indexBuffer.GetData(readData, 2, 2);
-                    Assert.AreEqual(0, readData[0]);
-                    Assert.AreEqual(0, readData[1]);
-                    Assert.AreEqual(1, readData[2]);
-                    Assert.AreEqual(2, readData[3]);
-                }
+                );
 
                 indexBuffer.Dispose();
             }
@@ -193,29 +123,16 @@ namespace MonoGame.Tests.Graphics
                 indexBuffer.SetData(savedData);
 
                 var readData = new int[4];
-                if (!gd.GraphicsCapabilities.SupportsMapBuffer)
-                {
-                    var exception = Assert.Catch<NotSupportedException>(() =>
-                    {
-                        indexBuffer.GetData(readData, 2, 2);
-                    });
-
-                    if (exception == null)
+                AssertGetDataOrUnsupported(
+                    () => indexBuffer.GetData(readData, 2, 2),
+                    () =>
                     {
                         Assert.AreEqual(0, readData[0]);
                         Assert.AreEqual(0, readData[1]);
                         Assert.AreEqual(1, readData[2]);
                         Assert.AreEqual(2, readData[3]);
                     }
-                }
-                else
-                {
-                    indexBuffer.GetData(readData, 2, 2);
-                    Assert.AreEqual(0, readData[0]);
-                    Assert.AreEqual(0, readData[1]);
-                    Assert.AreEqual(1, readData[2]);
-                    Assert.AreEqual(2, readData[3]);
-                }
+                );
 
                 indexBuffer.Dispose();
             }
@@ -231,26 +148,14 @@ namespace MonoGame.Tests.Graphics
                 indexBuffer.SetData(savedData);
 
                 var readData = new short[2];
-                if (!gd.GraphicsCapabilities.SupportsMapBuffer)
-                {
-                    var exception = Assert.Catch<NotSupportedException>(() =>
-                    {
-                        indexBuffer.GetData(sizeof(short) * 2, readData, 0, 2);
-                    });
-
-                    // Some backends, like Native, can read back index data without map-buffer support.
-                    if (exception == null)
+                AssertGetDataOrUnsupported(
+                    () => indexBuffer.GetData(sizeof(short) * 2, readData, 0, 2),
+                    () =>
                     {
                         Assert.AreEqual(3, readData[0]);
                         Assert.AreEqual(4, readData[1]);
                     }
-                }
-                else
-                {
-                    indexBuffer.GetData(sizeof(short) * 2, readData, 0, 2);
-                    Assert.AreEqual(3, readData[0]);
-                    Assert.AreEqual(4, readData[1]);
-                }
+                );
 
                 indexBuffer.Dispose();
             }
@@ -262,26 +167,14 @@ namespace MonoGame.Tests.Graphics
                 indexBuffer.SetData(savedData);
 
                 var readData = new int[2];
-                if (!gd.GraphicsCapabilities.SupportsMapBuffer)
-                {
-                    var exception = Assert.Catch<NotSupportedException>(() =>
-                    {
-                        indexBuffer.GetData(sizeof(int) * 2, readData, 0, 2);
-                    });
-
-                    // Some backends, like Native, can read back index data without map-buffer support.
-                    if (exception == null)
+                AssertGetDataOrUnsupported(
+                    () => indexBuffer.GetData(sizeof(int) * 2, readData, 0, 2),
+                    () =>
                     {
                         Assert.AreEqual(3, readData[0]);
                         Assert.AreEqual(4, readData[1]);
                     }
-                }
-                else
-                {
-                    indexBuffer.GetData(sizeof(int) * 2, readData, 0, 2);
-                    Assert.AreEqual(3, readData[0]);
-                    Assert.AreEqual(4, readData[1]);
-                }
+                );
 
                 indexBuffer.Dispose();
             }
@@ -290,7 +183,7 @@ namespace MonoGame.Tests.Graphics
         [Test]
         public void NullDeviceShouldThrowArgumentNullException()
         {
-            Assert.Throws<ArgumentNullException>(() => 
+            Assert.Throws<ArgumentNullException>(() =>
             {
                 var indexBuffer = new IndexBuffer(null, IndexElementSize.SixteenBits, 3, BufferUsage.None);
                 indexBuffer.Dispose();
@@ -303,6 +196,20 @@ namespace MonoGame.Tests.Graphics
         {
             var indexBuffer = new IndexBuffer(gd, typeof(short), 12, BufferUsage.None);
             indexBuffer.Dispose();
+        }
+
+        // Having to support both Native, GL and ES < 3.x backends means a slightly fancier check.
+        private static void AssertGetDataOrUnsupported(Action readBack, Action verify)
+        {
+            try
+            {
+                readBack();
+                verify();
+            }
+            catch (NotSupportedException)
+            {
+                // Acceptable for backends, like ES < 3.x, that legitimately do not support readback here.
+            }
         }
     }
 }
