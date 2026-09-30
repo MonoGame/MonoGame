@@ -54,7 +54,7 @@ MG_EXPORT void MGG_GraphicsDevice_SetShader(MGG_GraphicsDevice* device, MGShader
 MG_EXPORT void MGG_GraphicsDevice_SetInputLayout(MGG_GraphicsDevice* device, MGG_InputLayout* layout);
 MG_EXPORT void MGG_GraphicsDevice_Draw(MGG_GraphicsDevice* device, MGPrimitiveType primitiveType, mgint vertexStart, mgint vertexCount);
 MG_EXPORT void MGG_GraphicsDevice_DrawIndexed(MGG_GraphicsDevice* device, MGPrimitiveType primitiveType, mgint primitiveCount, mgint indexStart, mgint vertexStart);
-MG_EXPORT void MGG_GraphicsDevice_DrawIndexedInstanced(MGG_GraphicsDevice* device, MGPrimitiveType primitiveType, mgint primitiveCount, mgint indexStart, mgint vertexStart, mgint instanceCount);
+MG_EXPORT void MGG_GraphicsDevice_DrawIndexedInstanced(MGG_GraphicsDevice* device, MGPrimitiveType primitiveType, mgint primitiveCount, mgint indexStart, mgint vertexStart, mgint baseInstance, mgint instanceCount);
 MG_EXPORT void MGG_GraphicsDevice_ResolveRenderTargets(MGG_GraphicsDevice* device);
 MG_EXPORT void MGG_GraphicsDevice_GetBackBufferData(MGG_GraphicsDevice* device, mgint x, mgint y, mgint width, mgint height, void* data, mgint count, mgint dataBytes);
 MG_EXPORT MGG_BlendState* MGG_BlendState_Create(MGG_GraphicsDevice* device, MGG_BlendState_Info* infos);
@@ -83,3 +83,4 @@ MG_EXPORT void MGG_OcclusionQuery_Destroy(MGG_GraphicsDevice* device, MGG_Occlus
 MG_EXPORT void MGG_OcclusionQuery_Begin(MGG_GraphicsDevice* device, MGG_OcclusionQuery* query);
 MG_EXPORT void MGG_OcclusionQuery_End(MGG_GraphicsDevice* device, MGG_OcclusionQuery* query);
 MG_EXPORT mgbyte MGG_OcclusionQuery_GetResult(MGG_GraphicsDevice* device, MGG_OcclusionQuery* query, mgint& pixelCount);
+MG_EXPORT MGG_Texture* MGG_RenderTarget_WrapNativeHandle(MGG_GraphicsDevice* device, void* nativeHandle, MGSurfaceFormat format, mgint width, mgint height, MGDepthFormat depthFormat, mgint multiSampleCount, mgbyte externalPresentation);

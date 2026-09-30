@@ -1344,14 +1344,15 @@ void MGG_GraphicsDevice_DrawIndexed(MGG_GraphicsDevice* device, MGPrimitiveType 
 	cl->DrawIndexedInstanced(indexCount, 1, indexStart, vertexStart, 0);
 }
 
-void MGG_GraphicsDevice_DrawIndexedInstanced(MGG_GraphicsDevice* device, MGPrimitiveType primitiveType, mgint primitiveCount, mgint indexStart, mgint vertexStart, mgint instanceCount)
+void MGG_GraphicsDevice_DrawIndexedInstanced(MGG_GraphicsDevice* device, MGPrimitiveType primitiveType, mgint primitiveCount, mgint indexStart, mgint vertexStart, mgint baseInstance, mgint instanceCount)
 {
 	assert(device != nullptr);
 	assert(primitiveCount >= 0);
 	assert(indexStart >= 0);
 	assert(vertexStart >= 0);
+	assert(baseInstance >= 0);
 	assert(instanceCount >= 0);
-
+	
 	if (primitiveCount <= 0)
 		return;
 	if (instanceCount <= 0)
@@ -1365,7 +1366,7 @@ void MGG_GraphicsDevice_DrawIndexedInstanced(MGG_GraphicsDevice* device, MGPrimi
 
 	auto indexCount = MGDX_GetIndexCount(primitiveType, primitiveCount);
 
-	cl->DrawIndexedInstanced(indexCount, instanceCount, indexStart, vertexStart, 0);
+	cl->DrawIndexedInstanced(indexCount, instanceCount, indexStart, vertexStart, baseInstance);
 }
 
 
@@ -2452,4 +2453,38 @@ mgbyte MGG_OcclusionQuery_GetResult(MGG_GraphicsDevice* device, MGG_OcclusionQue
 	query->buffer->Unmap(0, nullptr);
 
 	return true;
+}
+
+MGG_Texture* MGG_RenderTarget_WrapNativeHandle(
+	MGG_GraphicsDevice* device,
+	void* nativeHandle,
+	MGSurfaceFormat format,
+	mgint width,
+	mgint height,
+	MGDepthFormat depthFormat,
+	mgint multiSampleCount,
+	mgbyte externalPresentation)
+{
+	if (!device || !nativeHandle || !device->resources)
+	{
+		return nullptr;
+	}
+
+	auto* external_resource = static_cast<ID3D12Resource*>(nativeHandle);
+
+	const auto texture = new MGG_Texture();
+	texture->format = format;
+
+	// Create a Texture wrapper around the external resource.
+	// This creates RTV + SRV descriptors without allocating memory for the resource itself.
+	texture->texture = new Texture(device->resources, external_resource, format);
+
+	// Create depth buffer if requested (owned by this texture wrapper).
+	if (depthFormat != MGDepthFormat::None)
+	{
+		texture->depthTexture = new Texture(width, height, depthFormat);
+		texture->depthTexture->Create(device->resources);
+	}
+
+	return texture;
 }
