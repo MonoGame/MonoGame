@@ -75,7 +75,7 @@ export class BrowserAudio {
     /**
      * Replaces the active Song with the requested Song.
      *
-     * Playback waits for browser audio activation when needed.
+     * Playback begins muted before browser audio activation when needed.
      *
      * @param {number} songId Song handle.
      * @param {string} mediaPath Published Song media path.
@@ -93,11 +93,6 @@ export class BrowserAudio {
             return true;
         }
 
-        if (this.audioContext == null || this.songGainNode == null) {
-            this.reportSongEvent(songId, commandId, SongEventType.Failed);
-            return true;
-        }
-
         this.stopActiveSong();
 
         this.activeSong = {
@@ -105,18 +100,21 @@ export class BrowserAudio {
             commandId,
             mediaUri,
             positionSeconds: Math.max(0, positionMilliseconds / 1000),
-            volume
+            volume,
+            waitingForAudio: !this.isAudioRunning(),
+            waitingForPlaybackActivation: false
         };
 
-        if (this.audioContext.state === "running") {
-            this.loadActiveSongMedia();
-        }
-        else {
-            // WebKit can keep resume() pending until touchend, so loading now could lose the user gesture.
-            this.activeSong.waitingForAudio = true;
-            if (this.audioActivationPromise != null) {
-                void this.loadPendingSongAfterActivationAsync(this.audioActivationPromise);
-            }
+        // A game may start a song on the initial load. However the actual
+        // audio cannot be heard until audio is unlocked from a user gesture 
+        // such as clicking the canvas. 
+        // So we start the song muted so its timeline can advance before user interaction
+        // unlocks audio. Unmuting avoids starting or restarting playback after activation.
+        this.songElement.muted = this.activeSong.waitingForAudio;
+        this.loadActiveSongMedia();
+
+        if (this.activeSong.waitingForAudio && this.audioActivationPromise != null) {
+            void this.loadPendingSongAfterActivationAsync(this.audioActivationPromise);
         }
 
         return true;
@@ -247,15 +245,22 @@ export class BrowserAudio {
      */
     async loadPendingSongAfterActivationAsync(activationPromise) {
         const activated = await activationPromise;
-        if (!activated || this.audioContext?.state !== "running" || this.songGainNode == null) {
+        if (!activated || !this.isAudioRunning()) {
             return;
         }
 
-        if (this.activeSong == null || !this.activeSong.waitingForAudio) {
+        const activeSong = this.activeSong;
+        if (activeSong == null || !activeSong.waitingForAudio) {
             return;
         }
 
-        this.loadActiveSongMedia();
+        activeSong.waitingForAudio = false;
+        this.songElement.muted = false;
+
+        if (activeSong.waitingForPlaybackActivation) {
+            activeSong.waitingForPlaybackActivation = false;
+            this.startActiveSongPlayback(false);
+        }
     }
 
     /** Loads the active Song after the shared audio graph is ready. */
@@ -265,7 +270,6 @@ export class BrowserAudio {
             return;
         }
 
-        activeSong.waitingForAudio = false;
         this.songElement.src = activeSong.mediaUri;
         this.applyActiveSongVolume();
         // Metadata establishes a seekable timeline before applying the requested Song position.
@@ -296,7 +300,12 @@ export class BrowserAudio {
 
         void this.songElement.play().catch(() => {
             if (this.isActiveSong(activeSong.songId, activeSong.commandId)) {
-                this.reportActiveSongEvent(SongEventType.Failed);
+                if (activeSong.waitingForAudio) {
+                    activeSong.waitingForPlaybackActivation = true;
+                }
+                else {
+                    this.reportActiveSongEvent(SongEventType.Failed);
+                }
             }
         });
     }
@@ -328,6 +337,11 @@ export class BrowserAudio {
         else {
             this.songElement.volume = volume;
         }
+    }
+
+    /** @returns {boolean} Whether the shared audio graph can emit sound. */
+    isAudioRunning() {
+        return this.audioContext?.state === "running" && this.songGainNode != null;
     }
 
     /**
