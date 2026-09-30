@@ -362,13 +362,16 @@ namespace MonoGame.Tests.Graphics
                 // initialize with standard call
                 vertexBuffer.SetData(destinationStartIndex, dataSpan);
 
+                // Moved here because we can't pass dataSpan inside the lamda
+                var expectedData = dataSpan.ToArray();
+
                 var readData = new VertexPositionTexture[savedData.Length];
                 AssertGetDataOrUnsupported(
                     () => vertexBuffer.GetData(0, readData, 0, savedData.Length, vertexStride),
                     () => 
                     {
                         Assert.AreEqual(
-                        dataSpan.ToArray(),
+                        expectedData,
                         readData.Take(destinationStartIndex..(destinationStartIndex + elementCount)).ToArray());
 
                         for(int i = 0; i < savedData.Length; i++)
