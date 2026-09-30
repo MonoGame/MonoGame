@@ -18,7 +18,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="MonoGame.Library.SDL" Version="2.32.10.1" />
+    <PackageReference Include="MonoGame.Library.SDL" Version="2.32.10.2" />
   </ItemGroup>
 
   <ItemGroup>

@@ -2,8 +2,7 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
-using System.Diagnostics;
-using MonoGame.Framework.Content.Pipeline.Builder;
+using System.Globalization;
 
 namespace Microsoft.Xna.Framework.Content.Pipeline;
 
@@ -13,72 +12,23 @@ namespace Microsoft.Xna.Framework.Content.Pipeline;
 /// </summary>
 public class ContentBuildLogger
 {
-    private readonly Stack<string> _filenames;
-    private int _indentCount;
-    private string _indentString;
-    private char _indentCharacter;
-    private bool _recreateIndentString;
-    private readonly Stopwatch _stopWatch;
-
-    /// <summary>
-    /// Initializes a new instance of ContentBuildLogger.
-    /// </summary>
-    public ContentBuildLogger()
-    {
-        _filenames = [];
-        _indentCount = 0;
-        _indentString = " ";
-        _recreateIndentString = false;
-        _stopWatch = new();
-        _stopWatch.Start();
-
-        IndentCharacter = '\t';
-        IndentCharacterSize = 1;
-        LoggerRootDirectory = "";
-    }
-
-    /// <summary>
-    /// Indicates if the log should should current time with each logged message as opposed to the time since the logging started.
-    /// </summary>
-    /// <value><c>false</c> by default.</value>
-    public bool ShowRealTime { get; set; }
-
-    /// <summary>
-    /// A character to be used for indentation of <see cref="Log(LogLevel, string)"/> messages.
-    /// </summary>
-    public char IndentCharacter
-    {
-        get => _indentCharacter;
-        set
-        {
-            _indentCharacter = value;
-            _recreateIndentString = true;
-        }
-    }
-
-    /// <summary>
-    /// Indicates how many of <see cref="IndentCharacter"/> should be used for indentation of <see cref="Log(LogLevel, string)"/> messages.
-    /// </summary>
-    public uint IndentCharacterSize { get; set; }
+    private readonly Stack<string> _filenames = [];
+    private int _indentCount = 0;
 
     /// <summary>
     /// Gets or sets the base reference path used when reporting errors during the content build process.
     /// </summary>
-    public string LoggerRootDirectory { get; set; }
+    public string LoggerRootDirectory { get; set; } = "";
 
     /// <summary>
-    /// Creates a string that is the combination of <see cref="IndentCharacter"/> * <see cref="Indent"/> * <see cref="IndentCharacterSize"/>.
+    /// Gets or sets the desired log level to report for.
     /// </summary>
-    protected string IndentString
-    {
-        get
-        {
-            if (_recreateIndentString || _indentString.Length != (_indentCount + _filenames.Count) * IndentCharacterSize)
-                _indentString = new string(_indentCharacter, (_indentCount + _filenames.Count) * (int)IndentCharacterSize);
+    public LogLevel LoggerLogLevel { get; set; }
 
-            return _indentString;
-        }
-    }
+    /// <summary>
+    /// Creates a string that has indentation characters equal to the current identation.
+    /// </summary>
+    protected string IndentString => string.Empty.PadLeft(Math.Max(0, _indentCount), '\t');
 
     /// <summary>
     /// Gets the filename currently being processed, for use in warning and error messages.
@@ -115,28 +65,14 @@ public class ContentBuildLogger
     /// <param name="message"></param>
     public virtual void Log(LogLevel level, string message)
     {
-        Console.ForegroundColor = level switch
-        {
-            LogLevel.Debug => ConsoleColor.Black,
-            LogLevel.Warning => ConsoleColor.Yellow,
-            LogLevel.Error => ConsoleColor.Red,
-            _ => ConsoleColor.Gray
-        };
-
         foreach (var subMessage in message.Split(['\r', '\n'], StringSplitOptions.None))
-        {
-            var time = ShowRealTime ? DateTime.Now.ToString("HH:mm:ss.fff") : _stopWatch.Elapsed.ToString("hh\\:mm\\:ss\\.fff");
-            Console.WriteLine($"{time} [{level.ToString()[0]}] {IndentString}{subMessage}");
-        }
-
-        Console.ForegroundColor = ConsoleColor.Gray;
+            Console.WriteLine($"{level.ToString()[0]}: {IndentString}{subMessage}");
     }
 
     /// <summary>
     /// Outputs a message from the content system with the <see cref="LogLevel.Info"/> log level.
     /// </summary>
-    public void Log(string message)
-        => Log(LogLevel.Info, message);
+    public void Log(string message) => Log(LogLevel.Info, message);
 
     /// <summary>
     /// Outputs a high-priority status message from the content system.
@@ -145,7 +81,7 @@ public class ContentBuildLogger
     /// <param name="messageArgs">Arguments for the reported message.</param>
     [Obsolete("LogImportantMessage is deprecated, please use Log instead.")]
     public virtual void LogImportantMessage(string message, params object[] messageArgs)
-        => Log(LogLevel.Error, string.Format(message, messageArgs));
+        => Log(LogLevel.Error, string.Format(CultureInfo.InvariantCulture, message, messageArgs));
 
     /// <summary>
     /// Outputs a low priority status message from the content system.
@@ -154,7 +90,7 @@ public class ContentBuildLogger
     /// <param name="messageArgs">Arguments for the reported message.</param>
     [Obsolete("LogMessage is deprecated, please use Log instead.")]
     public virtual void LogMessage(string message, params object[] messageArgs)
-        => Log(string.Format(message, messageArgs));
+        => Log(string.Format(CultureInfo.InvariantCulture, message, messageArgs));
 
     /// <summary>
     /// Outputs a warning message from the content system.
@@ -165,19 +101,14 @@ public class ContentBuildLogger
     /// <param name="messageArgs">Arguments for the reported message.</param>
     [Obsolete("LogWarning is deprecated, please use Log instead.")]
     public virtual void LogWarning(string helpLink, ContentIdentity contentIdentity, string message, params object[] messageArgs)
-        => Log(LogLevel.Warning, $"{string.Format(message, messageArgs)}: {GetCurrentFilename(contentIdentity)}");
+        => Log(LogLevel.Warning, $"{string.Format(CultureInfo.InvariantCulture, message, messageArgs)}: {GetCurrentFilename(contentIdentity)}");
 
     /// <summary>
     /// Outputs a message indicating that a content asset has begun processing.
     /// All logger warnings or error exceptions from this time forward to the next PopFile call refer to this file.
     /// </summary>
     /// <param name="filename">Name of the file containing future messages.</param>
-    public virtual void PushFile(string filename)
-    {
-        filename = filename.Sanitize();
-        Log(filename);
-        _filenames.Push(filename);
-    }
+    public virtual void PushFile(string filename) => _filenames.Push(filename);
 
     /// <summary>
     /// Outputs a message indicating that a content asset has completed processing.

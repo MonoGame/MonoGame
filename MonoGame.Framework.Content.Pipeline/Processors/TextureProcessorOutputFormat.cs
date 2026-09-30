@@ -2,8 +2,6 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
-using System;
-
 namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
 {
     /// <summary>
@@ -64,8 +62,38 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
         EtcCompressed,
 
         /// <summary>
-        /// The input texture is compressed using Adaptive Scalable Texture Compression. Used on some Mobile and Intel platforms.
+        /// The input texture is compressed using Adaptive Scalable Texture Compression with a 4x4 block size. Used on some Mobile and Intel platforms.
         /// </summary>
         AstcCompressed,
+        
+        /// <summary>
+        /// The input texture is compressed using Adaptive Scalable Texture Compression with a 4x4 block size. Used on some Mobile and Intel platforms.
+        /// </summary>
+        AstcCompressed4x4,
+
+        /// <summary>
+        /// The input texture is compressed using Adaptive Scalable Texture Compression with a 5x5 block size. Used on some Mobile and Intel platforms.
+        /// </summary>
+        AstcCompressed5x5,
+
+        /// <summary>
+        /// The input texture is compressed using Adaptive Scalable Texture Compression with a 6x6 block size. Used on some Mobile and Intel platforms.
+        /// </summary>
+        AstcCompressed6x6,
+
+        /// <summary>
+        /// The input texture is compressed using Adaptive Scalable Texture Compression with a 8x8 block size. Used on some Mobile and Intel platforms.
+        /// </summary>
+        AstcCompressed8x8,
+
+        /// <summary>
+        /// The input texture is compressed using Adaptive Scalable Texture Compression with a 10x10 block size. Used on some Mobile and Intel platforms.
+        /// </summary>
+        AstcCompressed10x10,
+
+        /// <summary>
+        /// The input texture is compressed using Adaptive Scalable Texture Compression with a 12x12 block size. Used on some Mobile and Intel platforms.
+        /// </summary>
+        AstcCompressed12x12,
     }
 }

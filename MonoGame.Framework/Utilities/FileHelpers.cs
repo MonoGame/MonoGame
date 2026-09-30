@@ -77,7 +77,7 @@ namespace MonoGame.Framework.Utilities
 
                     foreach (var num in bytes)
                     {
-                        safeline.Append("%");
+                        safeline.Append('%');
                         safeline.Append(num.ToString("X"));
                     }
                 }

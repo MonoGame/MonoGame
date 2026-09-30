@@ -5,13 +5,16 @@ namespace BuildScripts;
 [IsDependentOn(typeof(BuildShadersOGLTask))]
 public sealed class BuildAndroidTask : FrostingTask<BuildContext>
 {
-    private string platformName = "Android";
     public override bool ShouldRun(BuildContext context) => context.IsWorkloadInstalled("android");
 
     public override void Run(BuildContext context)
     {
         var arguments = new DotNetMSBuildSettings();
-        arguments.WithProperty("AndroidSdkDirectory", System.Environment.GetEnvironmentVariable ("ANDROID_HOME"));
+        var androidHome = Environment.GetEnvironmentVariable("ANDROID_HOME");
+        if (!string.IsNullOrWhiteSpace(androidHome))
+        {
+            arguments.WithProperty("AndroidSdkDirectory", androidHome);
+        }
         arguments.WithProperty("AcceptAndroidSDKLicenses", "true");
         arguments.WithTarget("InstallAndroidDependencies");
         var installSettings = new DotNetBuildSettings
@@ -21,7 +24,7 @@ public sealed class BuildAndroidTask : FrostingTask<BuildContext>
             Configuration = context.DotNetPackSettings.Configuration,
         };
 
-        context.DotNetBuild(context.GetProjectPath(ProjectType.Framework, platformName), installSettings);
-        context.DotNetPack(context.GetProjectPath(ProjectType.Framework, platformName), context.DotNetPackSettings);
+        context.DotNetBuild(context.GetProjectPath(ProjectType.Framework, "Android"), installSettings);
+        context.DotNetPack(context.GetProjectPath(ProjectType.Framework, "Android"), context.DotNetPackSettings);
     }
 }

@@ -3,41 +3,55 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System.Diagnostics;
+using System.Globalization;
 
-namespace MonoGame.Effect.Compiler.Effect.Spirv
+namespace MonoGame.Effect.Compiler.Effect.Spirv;
+
+// https://registry.khronos.org/SPIR-V/specs/unified1/SPIRV.html#OpTypeArray
+internal class SpirvTypeArray : SpirvTypeBase
 {
-    // https://registry.khronos.org/SPIR-V/specs/unified1/SPIRV.html#OpTypeArray
-    internal class SpirvTypeArray : SpirvTypeBase
+    public override SpirvType Type => SpirvType.Array;
+
+    public required SpirvTypeBase ElementType { get; init; }
+
+    public required uint Length { get; init; }
+
+    public uint ArrayStride { get; private set; }
+
+    public static SpirvTypeArray? Parse(string[] parts, SpirvReflectionInfo.SpirvParseContext context)
     {
-        public override SpirvType Type => SpirvType.Array;
-        public SpirvTypeBase ElementType { get; private set; }
-        public uint Length { get; private set; }
-        public uint? ArrayStride { get; private set; }
+        if (parts.Length < 4)
+            return null;
 
-        protected override void ParseArgs(string[] args, SpirvReflectionInfo.SpirvParseContext context)
+        var id = parts[0];
+        context.Names.TryGetValue(id, out var name);
+
+        if (!context.Types.TryGetValue(parts[3], out var type))
         {
-            if (!context.Types.TryGetValue(args[0], out SpirvTypeBase type))
-            {     
-                Debug.WriteLine($"OpTypeArray {Name ?? Id} uses elements of unencountered type: {args[3]}");
-                return;
-            }
-
-            if (!context.Constants.TryGetValue(args[1], out SpirvConstant constant))
-            {
-                Debug.WriteLine($"OpTypeArray {Name ?? Id} specified unparsed constant for length {args[1]}");
-                return;
-            }
-
-            ElementType = type;
-            Length = (uint)constant.Value;
+            Debug.WriteLine($"OpTypeArray {name ?? id} uses elements of unencountered type: {parts[3]}");
+            return null;
         }
 
-        public override void ApplyDecoration(SpirvDecoration spirvDecoration)
+        if (!context.Constants.TryGetValue(parts[4], out var constant))
         {
-            if (spirvDecoration.Type == SpirvDecorationType.ArrayStride)
-            {
-                ArrayStride = uint.Parse(spirvDecoration.Args[0]);
-            }
+            Debug.WriteLine($"OpTypeArray {name ?? id} specified unparsed constant for length {parts[4]}");
+            return null;
+        }
+
+        return new SpirvTypeArray
+        {
+            Id = id,
+            Name = name,
+            ElementType = type,
+            Length =  (uint)constant.Value
+        };
+    }
+
+    public override void ApplyDecoration(SpirvDecoration spirvDecoration)
+    {
+        if (spirvDecoration.Type == SpirvDecorationType.ArrayStride)
+        {
+            ArrayStride = uint.Parse(spirvDecoration.Args[0], CultureInfo.InvariantCulture);
         }
     }
 }

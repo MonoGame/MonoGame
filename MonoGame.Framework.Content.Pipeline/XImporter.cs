@@ -2,7 +2,6 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
-using System;
 using Microsoft.Xna.Framework.Content.Pipeline.Graphics;
 
 namespace Microsoft.Xna.Framework.Content.Pipeline
@@ -13,13 +12,6 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
     [ContentImporter(".x", DisplayName = "X Importer - MonoGame", DefaultProcessor = "ModelProcessor")]
     public class XImporter : ContentImporter<NodeContent>
     {
-        /// <summary>
-        /// Initializes a new instance of XImporter.
-        /// </summary>
-        public XImporter()
-        {
-        }
-
         /// <summary>
         /// Called by the XNA Framework when importing a .x file to be used as a game asset. This is the method called by the XNA Framework when an asset is to be imported into an object that can be recognized by the Content Pipeline.
         /// </summary>

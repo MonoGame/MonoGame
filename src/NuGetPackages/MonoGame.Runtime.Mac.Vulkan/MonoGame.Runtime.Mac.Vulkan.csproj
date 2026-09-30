@@ -1,0 +1,11 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <ItemGroup>
+    <Content Include="..\..\..\Artifacts\native\mgruntime\desktopvk\macosx\Release\libmgruntime.dylib"
+      Condition="Exists('..\..\..\Artifacts\native\mgruntime\desktopvk\macosx\Release\libmgruntime.dylib')">
+      <PackagePath>runtimes\osx\native</PackagePath>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+</Project>

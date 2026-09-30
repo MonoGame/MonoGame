@@ -1,4 +1,5 @@
-﻿// MonoGame - Copyright (C) MonoGame Foundation, Inc
+
+// MonoGame - Copyright (C) MonoGame Foundation, Inc
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
@@ -14,12 +15,11 @@ using MonoGame.OpenGL;
 
 namespace MonoGame.Tests.Graphics
 {
-    [TestFixture]
     [NonParallelizable]
+    [RunOnUiTestFixture]
     internal class GraphicsDeviceTest : GraphicsDeviceTestFixtureBase
     {
         [Test]
-        [RunOnUI]
         public void BlendFactor()
         {
             Assert.AreEqual(Color.White, gd.BlendFactor);
@@ -40,7 +40,6 @@ namespace MonoGame.Tests.Graphics
         }
 
         [Test]
-        [RunOnUI]
         public void CtorAdapterNull()
         {
             Assert.Throws<ArgumentNullException>(
@@ -48,7 +47,6 @@ namespace MonoGame.Tests.Graphics
         }
 
         [Test]
-        [RunOnUI]
         public void CtorPresentationParametersNull()
         {
             Assert.Throws<ArgumentNullException>(
@@ -56,7 +54,6 @@ namespace MonoGame.Tests.Graphics
         }
 
         [Test]
-        [RunOnUI]
         public void DisposedWhenDisposingInvoked()
         {
             var count = 0;
@@ -76,7 +73,6 @@ namespace MonoGame.Tests.Graphics
         }
 
         [Test]
-        [RunOnUI]
         public void ResetDoesNotTriggerDeviceLost()
         {
             // TODO figure out exactly when a device is lost
@@ -102,7 +98,6 @@ namespace MonoGame.Tests.Graphics
         }
 
         [Test]
-        [RunOnUI]
         public void ResetDoesNotClearState()
         {
             gd.RasterizerState = RasterizerState.CullNone;
@@ -126,7 +121,6 @@ namespace MonoGame.Tests.Graphics
         }
 
         [Test, Ignore("Make sure dynamic graphics resources are notified when graphics device is lost")]
-        [RunOnUI]
         public void ContentLostResources()
         {
             // https://blogs.msdn.microsoft.com/shawnhar/2007/12/12/virtualizing-the-graphicsdevice-in-xna-game-studio-2-0/
@@ -160,14 +154,12 @@ namespace MonoGame.Tests.Graphics
 #if DESKTOPGL
         [Ignore("Does not throw the exception. Needs Investigating")]
 #endif
-        [RunOnUI]
         public void ResetWindowHandleNullThrowsException()
         {
             Assert.Throws<ArgumentException>(() => gd.Reset(new PresentationParameters()));
         }
 
 		[Test]
-        [RunOnUI]
 		public void Clear()
 		{
 			var colors = new Color [] {
@@ -192,7 +184,6 @@ namespace MonoGame.Tests.Graphics
 		}
 
         [Test]
-        [RunOnUI]
         public void DrawPrimitivesParameterValidation()
         {
             var vertexBuffer = new VertexBuffer(
@@ -227,14 +218,13 @@ namespace MonoGame.Tests.Graphics
         }
 
         [Test]
-        [RunOnUI]
         public void DrawIndexedPrimitivesParameterValidation()
         {
             var vertexBuffer = new VertexBuffer(
                 gd, VertexPositionColorTexture.VertexDeclaration,
                 3, BufferUsage.None);
             var indexBuffer = new IndexBuffer(
-                gd, IndexElementSize.SixteenBits, 
+                gd, IndexElementSize.SixteenBits,
                 3, BufferUsage.None);
 
             // No vertex shader or pixel shader.
@@ -288,14 +278,13 @@ namespace MonoGame.Tests.Graphics
         // This overload of DrawIndexedPrimitives is not supported on XNA.
 #if !XNA
         [Test]
-        [RunOnUI]
         public void DrawIndexedPrimitivesParameterValidation2()
         {
             var vertexBuffer = new VertexBuffer(
                 gd, VertexPositionColorTexture.VertexDeclaration,
                 3, BufferUsage.None);
             var indexBuffer = new IndexBuffer(
-                gd, IndexElementSize.SixteenBits, 
+                gd, IndexElementSize.SixteenBits,
                 3, BufferUsage.None);
 
             // No vertex shader or pixel shader.
@@ -338,9 +327,8 @@ namespace MonoGame.Tests.Graphics
         }
 #endif
 
-#if XNA || DIRECTX
+#if XNA || DIRECTX || DIRECTX12 || VULKAN || DESKTOPGL4
         [Test]
-        [RunOnUI]
         public void DrawInstancedPrimitivesParameterValidation()
         {
             var vertexBuffer = new VertexBuffer(
@@ -391,7 +379,6 @@ namespace MonoGame.Tests.Graphics
         }
 
         [Test]
-        [RunOnUI]
         public void DrawInstancedPrimitivesVisualTest()
         {
             VertexBuffer vertexBuffer = null;
@@ -458,7 +445,7 @@ namespace MonoGame.Tests.Graphics
 
             gd.DrawInstancedPrimitives(PrimitiveType.TriangleList, 0, 0, 6, 0, 2, worldTransforms.Length);
 
-            // There is a minor difference in the rasterization between XNA and DirectX. 
+            // There is a minor difference in the rasterization between XNA and DirectX.
             Similarity = 0.98f;
 
             CheckFrames();
@@ -468,10 +455,181 @@ namespace MonoGame.Tests.Graphics
             instanceVertexBuffer.Dispose();
             indexBuffer.Dispose();
         }
+
+        [Test]
+        public void DrawInstancedPrimitivesUsesInstanceData()
+        {
+            var renderTarget = new RenderTarget2D(gd, 64, 32, false, SurfaceFormat.Color, DepthFormat.None);
+            VertexBuffer vertexBuffer = null;
+            IndexBuffer indexBuffer = null;
+            VertexBuffer instanceVertexBuffer = null;
+            Effect effect = null;
+
+            try
+            {
+                var vertices = new[]
+                {
+                    new VertexPositionTexture(new Vector3(-6,  6, 0), new Vector2(0, 0)),
+                    new VertexPositionTexture(new Vector3( 6,  6, 0), new Vector2(1, 0)),
+                    new VertexPositionTexture(new Vector3(-6, -6, 0), new Vector2(0, 1)),
+                    new VertexPositionTexture(new Vector3( 6, -6, 0), new Vector2(1, 1)),
+                };
+                vertexBuffer = new VertexBuffer(gd, VertexPositionTexture.VertexDeclaration, vertices.Length, BufferUsage.None);
+                vertexBuffer.SetData(vertices);
+
+                var indices = new ushort[] { 0, 1, 2, 1, 3, 2 };
+                indexBuffer = new IndexBuffer(gd, IndexElementSize.SixteenBits, indices.Length, BufferUsage.None);
+                indexBuffer.SetData(indices);
+
+                var instanceTransforms = new[]
+                {
+                    Matrix.CreateTranslation(-16, 0, 0),
+                    Matrix.CreateTranslation(16, 0, 0),
+                };
+                var instanceVertexDeclaration = new VertexDeclaration
+                (
+                    new VertexElement(0, VertexElementFormat.Vector4, VertexElementUsage.BlendWeight, 0),
+                    new VertexElement(16, VertexElementFormat.Vector4, VertexElementUsage.BlendWeight, 1),
+                    new VertexElement(32, VertexElementFormat.Vector4, VertexElementUsage.BlendWeight, 2),
+                    new VertexElement(48, VertexElementFormat.Vector4, VertexElementUsage.BlendWeight, 3)
+                );
+                instanceVertexBuffer = new VertexBuffer(gd, instanceVertexDeclaration, instanceTransforms.Length, BufferUsage.None);
+                instanceVertexBuffer.SetData(instanceTransforms);
+
+                effect = AssetTestUtility.LoadEffect(content, "Instancing");
+                effect.Parameters["View"].SetValue(Matrix.Identity);
+                effect.Parameters["Projection"].SetValue(Matrix.CreateOrthographic(64, 32, 0, 1));
+
+                gd.SetRenderTarget(renderTarget);
+                gd.Clear(Color.CornflowerBlue);
+                gd.BlendState = BlendState.Opaque;
+                gd.DepthStencilState = DepthStencilState.None;
+                gd.RasterizerState = RasterizerState.CullNone;
+                gd.SetVertexBuffers(
+                    new VertexBufferBinding(vertexBuffer, 0, 0),
+                    new VertexBufferBinding(instanceVertexBuffer, 0, 1));
+                gd.Indices = indexBuffer;
+
+                effect.Techniques[0].Passes[0].Apply();
+                gd.DrawInstancedPrimitives(PrimitiveType.TriangleList, 0, 0, indices.Length, 0, 2, instanceTransforms.Length);
+
+                gd.SetRenderTarget(null);
+
+                var pixels = new Color[renderTarget.Width * renderTarget.Height];
+                renderTarget.GetData(pixels);
+
+                Assert.That(pixels[16 + 16 * renderTarget.Width], Is.Not.EqualTo(Color.CornflowerBlue));
+                Assert.That(pixels[48 + 16 * renderTarget.Width], Is.Not.EqualTo(Color.CornflowerBlue));
+                Assert.That(pixels[32 + 16 * renderTarget.Width], Is.EqualTo(Color.CornflowerBlue));
+            }
+            finally
+            {
+                gd.SetRenderTarget(null);
+
+                if (effect != null)
+                    effect.Dispose();
+                if (vertexBuffer != null)
+                    vertexBuffer.Dispose();
+                if (instanceVertexBuffer != null)
+                    instanceVertexBuffer.Dispose();
+                if (indexBuffer != null)
+                    indexBuffer.Dispose();
+
+                renderTarget.Dispose();
+            }
+        }
+
+        [Test]
+        public void DrawInstancedPrimitivesUsesBaseInstance()
+        {
+            var renderTarget = new RenderTarget2D(gd, 64, 32, false, SurfaceFormat.Color, DepthFormat.None);
+            VertexBuffer vertexBuffer = null;
+            IndexBuffer indexBuffer = null;
+            VertexBuffer instanceVertexBuffer = null;
+            Effect effect = null;
+
+            try
+            {
+                var vertices = new[]
+                {
+                    new VertexPositionTexture(new Vector3(-6,  6, 0), new Vector2(0, 0)),
+                    new VertexPositionTexture(new Vector3( 6,  6, 0), new Vector2(1, 0)),
+                    new VertexPositionTexture(new Vector3(-6, -6, 0), new Vector2(0, 1)),
+                    new VertexPositionTexture(new Vector3( 6, -6, 0), new Vector2(1, 1)),
+                };
+                vertexBuffer = new VertexBuffer(gd, VertexPositionTexture.VertexDeclaration, vertices.Length, BufferUsage.None);
+                vertexBuffer.SetData(vertices);
+
+                // Setup a quad.
+                var indices = new ushort[] { 0, 1, 2, 1, 3, 2 };
+                indexBuffer = new IndexBuffer(gd, IndexElementSize.SixteenBits, indices.Length, BufferUsage.None);
+                indexBuffer.SetData(indices);
+
+                var instanceTransforms = new[]
+                {
+                    Matrix.CreateTranslation(-16, 0, 0),
+                    Matrix.CreateTranslation(16, 0, 0),
+                };
+                var instanceVertexDeclaration = new VertexDeclaration
+                (
+                    new VertexElement(0, VertexElementFormat.Vector4, VertexElementUsage.BlendWeight, 0),
+                    new VertexElement(16, VertexElementFormat.Vector4, VertexElementUsage.BlendWeight, 1),
+                    new VertexElement(32, VertexElementFormat.Vector4, VertexElementUsage.BlendWeight, 2),
+                    new VertexElement(48, VertexElementFormat.Vector4, VertexElementUsage.BlendWeight, 3)
+                );
+                instanceVertexBuffer = new VertexBuffer(gd, instanceVertexDeclaration, instanceTransforms.Length, BufferUsage.None);
+                instanceVertexBuffer.SetData(instanceTransforms);
+
+                effect = AssetTestUtility.LoadEffect(content, "Instancing");
+                effect.Parameters["View"].SetValue(Matrix.Identity);
+                effect.Parameters["Projection"].SetValue(Matrix.CreateOrthographic(64, 32, 0, 1));
+
+                gd.SetRenderTarget(renderTarget);
+                gd.Clear(Color.CornflowerBlue);
+                gd.BlendState = BlendState.Opaque;
+                gd.DepthStencilState = DepthStencilState.None;
+                gd.RasterizerState = RasterizerState.CullNone;
+                gd.SetVertexBuffers(
+                    new VertexBufferBinding(vertexBuffer, 0, 0),
+                    new VertexBufferBinding(instanceVertexBuffer, 0, 1));
+                gd.Indices = indexBuffer;
+
+                effect.Techniques[0].Passes[0].Apply();
+
+                // Draw the first instance only.
+                gd.DrawInstancedPrimitives(PrimitiveType.TriangleList, 0, 0, 2, 0, 1);
+
+                // Now draw the second instance using the baseInstance parameter.
+                gd.DrawInstancedPrimitives(PrimitiveType.TriangleList, 0, 0, 2, 1, 1);
+
+                gd.SetRenderTarget(null);
+
+                var pixels = new Color[renderTarget.Width * renderTarget.Height];
+                renderTarget.GetData(pixels);
+
+                Assert.That(pixels[16 + 16 * renderTarget.Width], Is.Not.EqualTo(Color.CornflowerBlue));
+                Assert.That(pixels[48 + 16 * renderTarget.Width], Is.Not.EqualTo(Color.CornflowerBlue));
+                Assert.That(pixels[32 + 16 * renderTarget.Width], Is.EqualTo(Color.CornflowerBlue));
+            }
+            finally
+            {
+                gd.SetRenderTarget(null);
+
+                if (effect != null)
+                    effect.Dispose();
+                if (vertexBuffer != null)
+                    vertexBuffer.Dispose();
+                if (instanceVertexBuffer != null)
+                    instanceVertexBuffer.Dispose();
+                if (indexBuffer != null)
+                    indexBuffer.Dispose();
+
+                renderTarget.Dispose();
+            }
+        }
 #endif
 
         [Test]
-        [RunOnUI]
         public void DrawUserPrimitivesParameterValidation()
         {
             var vertexDataNonEmpty = new[]
@@ -521,7 +679,6 @@ namespace MonoGame.Tests.Graphics
         }
 
         [Test]
-        [RunOnUI]
         public void DrawUserIndexedPrimitivesParameterValidation()
         {
             var vertexDataNonEmpty = new[]
@@ -611,10 +768,9 @@ namespace MonoGame.Tests.Graphics
         }
 
         [Test]
-#if DESKTOPGL
+#if DESKTOPGL || DESKTOPGL4
         [Ignore("Vertex Textures are not implemented for OpenGL")]
 #endif
-        [RunOnUI]
         public void VertexTexturesGetSet()
         {
             // TODO: The availability of vertex textures should depend on GraphicsProfile.
@@ -622,11 +778,11 @@ namespace MonoGame.Tests.Graphics
 #if XNA
             var supportedVertexTextureFormats = new[]
             {
-                SurfaceFormat.Single, 
-                SurfaceFormat.Vector2, 
+                SurfaceFormat.Single,
+                SurfaceFormat.Vector2,
                 SurfaceFormat.Vector4,
-                SurfaceFormat.HalfSingle, 
-                SurfaceFormat.HalfVector2, 
+                SurfaceFormat.HalfSingle,
+                SurfaceFormat.HalfVector2,
                 SurfaceFormat.HalfVector4,
                 SurfaceFormat.HdrBlendable
             };
@@ -635,6 +791,15 @@ namespace MonoGame.Tests.Graphics
 #endif
             foreach (var format in Enum.GetValues(typeof(SurfaceFormat)).Cast<SurfaceFormat>())
             {
+#if VULKAN
+                // Skip the Bgr565 on Mac on Vulkan
+                if (OperatingSystem.IsMacOS()
+                    && format is SurfaceFormat.Bgr565 or SurfaceFormat.Bgra5551 or SurfaceFormat.Bgra4444)
+                {
+                    //TODO: Fix on macOS
+                    continue;
+                }
+#endif
 #if !MOBILE
                 // Skip the mobile formats on non-mobile platforms.
                 if (format > SurfaceFormat.Dxt5SRgb)
@@ -670,10 +835,9 @@ namespace MonoGame.Tests.Graphics
         }
 
         [Test]
-#if DESKTOPGL
+#if DESKTOPGL || DESKTOPGL4
         [Ignore("Vertex Textures are not implemented for OpenGL")]
 #endif
-        [RunOnUI]
         public void VertexTextureVisualTest()
         {
             // Implements an extremely simple terrain that reads from a heightmap in the vertex shader.
@@ -742,10 +906,9 @@ namespace MonoGame.Tests.Graphics
         }
 
         [Test]
-#if DESKTOPGL
+#if DESKTOPGL || DESKTOPGL4
         [Ignore("Vertex samplers are not implemented for OpenGL")]
 #endif
-        [RunOnUI]
         public void VertexSamplerStatesGetSet()
         {
             var samplerState = new SamplerState { Filter = TextureFilter.Point };
@@ -758,7 +921,6 @@ namespace MonoGame.Tests.Graphics
         }
 
         [Test]
-        [RunOnUI]
         public void PresentInvalidOperationException()
         {
             // This should work else it means we had
@@ -780,7 +942,6 @@ namespace MonoGame.Tests.Graphics
 
 #if DESKTOPGL
         [Test]
-        [RunOnUI]
         public void DifferentVboGetsSet()
         {
             var vb1 = new VertexBuffer(gd, VertexPosition.VertexDeclaration, 6, BufferUsage.None);
@@ -819,7 +980,6 @@ namespace MonoGame.Tests.Graphics
 
         [Test]
         [TestCaseSource("BackBufferRects")]
-        [RunOnUI]
         public void GetBackBufferData(Rectangle? rectangle)
         {
             gd.Clear(Color.CornflowerBlue);
@@ -851,6 +1011,32 @@ namespace MonoGame.Tests.Graphics
             sb.End();
 
             CheckFrames();
+        }
+
+        [Test]
+        public void DisposeReferencedResources()
+        {
+            var rt = new RenderTarget2D(gdm.GraphicsDevice, 5, 5);
+            var vb = new DynamicVertexBuffer(gd, VertexPositionColor.VertexDeclaration, 1, BufferUsage.None);
+
+            var middleIb = new DynamicIndexBuffer(gd, IndexElementSize.SixteenBits, 1, BufferUsage.None);
+
+            var ib = new DynamicIndexBuffer(gd, IndexElementSize.SixteenBits, 1, BufferUsage.None);
+            var rtc = new RenderTargetCube(gd, 1, false, SurfaceFormat.Color, DepthFormat.Depth16);
+
+            middleIb.Dispose();
+            Assert.IsTrue(middleIb.IsDisposed);
+
+            // Remaining referenced resources should be disposed.
+            gd.Dispose();
+
+            Assert.IsTrue(rt.IsDisposed);
+
+            Assert.IsTrue(vb.IsDisposed);
+
+            Assert.IsTrue(ib.IsDisposed);
+
+            Assert.IsTrue(rtc.IsDisposed);
         }
     }
 }

@@ -1,4 +1,4 @@
-// MonoGame - Copyright (C) The MonoGame Team
+// MonoGame - Copyright (C) MonoGame Foundation, Inc
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
@@ -17,9 +17,13 @@ public sealed partial class SoundEffect
 
     internal unsafe MGA_Buffer* Buffer;
 
-    private unsafe static void PlatformInitialize()
+    private static unsafe void PlatformInitialize()
     {
         System = MGA.System_Create();
+        if (System == null)
+        {
+            throw new NoAudioHardwareException("Audio has failed to initialize.");
+        }
     }
 
     internal unsafe static void PlatformShutdown()

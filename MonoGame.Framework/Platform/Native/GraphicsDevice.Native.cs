@@ -1,4 +1,4 @@
-// MonoGame - Copyright (C) The MonoGame Team
+// MonoGame - Copyright (C) MonoGame Foundation, Inc
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
@@ -32,12 +32,29 @@ public partial class GraphicsDevice
         get; private set;
     }
 
-    private unsafe void PlatformSetup()
-    {
-        // Creates the device, but no swap chain yet.
-        Handle = MGG.GraphicsDevice_Create(NativeGamePlatform.GraphicsSystem, Adapter.Handle);
+    internal int MaxTextureAnisotropy { get; private set; }
+    internal int MaxMultiSampleCount { get; private set; }
+    internal bool SupportsNonPowerOfTwo { get; private set; }
+    internal bool SupportsTextureFilterAnisotropic { get; private set; }
+    internal bool SupportsDepth24 { get; private set; }
+    internal bool SupportsPackedDepthStencil { get; private set; }
+    internal bool SupportsDepthNonLinear { get; private set; }
+    internal bool SupportsTextureMaxLevel { get; private set; }
+    internal bool SupportsDxt1 { get; private set; }
+    internal bool SupportsS3tc { get; private set; }
+    internal bool SupportsSRgb { get; private set; }
+    internal bool SupportsDepthClamp { get; private set; }
+    internal bool SupportsTextureArrays { get; private set; }
+    internal bool SupportsVertexTextures { get; private set; }
+    internal bool SupportsFloatTextures { get; private set; }
+    internal bool SupportsHalfFloatTextures { get; private set; }
+    internal bool SupportsNormalized { get; private set; }
+    internal bool SupportsInstancing { get; private set; }
+    internal bool SupportsBaseIndexInstancing { get; private set; }
+    internal bool SupportsSeparateBlendStates { get; private set; }
 
-        // Get the device caps.
+    private unsafe void RefreshCapabilities()
+    {
         MGG_GraphicsDevice_Caps caps;
         MGG.GraphicsDevice_GetCaps(Handle, out caps);
 
@@ -45,11 +62,44 @@ public partial class GraphicsDevice
         MaxVertexTextureSlots = caps.MaxVertexTextureSlots;
         _maxVertexBufferSlots = caps.MaxVertexBufferSlots;
         ShaderProfile = caps.ShaderProfile;
+        MaxTextureAnisotropy = caps.MaxTextureAnisotropy;
+        MaxMultiSampleCount = caps.MaxMultiSampleCount;
+        SupportsNonPowerOfTwo = caps.SupportsNonPowerOfTwo;
+        SupportsTextureFilterAnisotropic = caps.SupportsTextureFilterAnisotropic;
+        SupportsDepth24 = caps.SupportsDepth24;
+        SupportsPackedDepthStencil = caps.SupportsPackedDepthStencil;
+        SupportsDepthNonLinear = caps.SupportsDepthNonLinear;
+        SupportsTextureMaxLevel = caps.SupportsTextureMaxLevel;
+        SupportsDxt1 = caps.SupportsDxt1;
+        SupportsS3tc = caps.SupportsS3tc;
+        SupportsSRgb = caps.SupportsSRgb;
+        SupportsDepthClamp = caps.SupportsDepthClamp;
+        SupportsTextureArrays = caps.SupportsTextureArrays;
+        SupportsVertexTextures = caps.SupportsVertexTextures;
+        SupportsFloatTextures = caps.SupportsFloatTextures;
+        SupportsHalfFloatTextures = caps.SupportsHalfFloatTextures;
+        SupportsNormalized = caps.SupportsNormalized;
+        SupportsInstancing = caps.SupportsInstancing;
+        SupportsBaseIndexInstancing = caps.SupportsBaseIndexInstancing;
+        SupportsSeparateBlendStates = caps.SupportsSeparateBlendStates;
+    }
+
+    private unsafe void PlatformSetup()
+    {
+        // Creates the device, but no swap chain yet.
+        Handle = MGG.GraphicsDevice_Create(NativeGamePlatform.GraphicsSystem, Adapter.Handle);
+
+        RefreshCapabilities();
         UseHalfPixelOffset = false;
     }
 
     private unsafe void PlatformInitialize()
     {
+        // Swapchain creation needs a sample count up front, so normalize the
+        // requested MSAA value now and reconcile it with the actual backbuffer
+        // sample count after caps are updated.
+        int requestedMultiSampleCount = NormalizeMultiSampleCount(PresentationParameters.MultiSampleCount, MaxMultiSampleCount);
+
         MGG.GraphicsDevice_ResizeSwapchain(
                 Handle,
                 PresentationParameters.DeviceWindowHandle,
@@ -57,24 +107,42 @@ public partial class GraphicsDevice
                 PresentationParameters.BackBufferHeight,
                 PresentationParameters.BackBufferFormat,
                 PresentationParameters.DepthStencilFormat,
+                requestedMultiSampleCount,
                 PresentationParameters.PresentationInterval.GetSyncInterval());
+
+        RefreshCapabilities();
+        UpdateBackBufferMultiSampleCount(requestedMultiSampleCount);
+        GraphicsCapabilities.Initialize(this);
 
         // Setup the default texture.
         DefaultTexture = new Texture2D(this, 2, 2);
         DefaultTexture.SetData(new[] { Color.Black, Color.Black, Color.Black, Color.Black });
     }
 
+    internal int PlatformGetMaxMultiSampleCount(SurfaceFormat format)
+    {
+        return MaxMultiSampleCount;
+    }
+
     private unsafe void OnPresentationChanged()
     {
-        // Clamp MultiSampleCount
-        PresentationParameters.MultiSampleCount =
-                GetClampedMultisampleCount(PresentationParameters.MultiSampleCount);
+        // Swapchain creation needs a sample count up front, so normalize the
+        // requested MSAA value now and reconcile it with the actual backbuffer
+        // sample count after caps are updated.
+        int requestedMultiSampleCount = NormalizeMultiSampleCount(PresentationParameters.MultiSampleCount, MaxMultiSampleCount);
 
         // Finish any frame that is currently rendering.
         if (_currentFrame > -1)
         {
             var syncInterval = PresentationParameters.PresentationInterval.GetSyncInterval();
             MGG.GraphicsDevice_Present(Handle, _currentFrame, syncInterval);
+        }
+
+        if (PlatformInfo.GraphicsBackend == GraphicsBackend.OpenGL)
+        {
+            NativeGameWindow window = NativeGameWindow.Instance;
+            if (window != null)
+                window.ApplyPendingNativeWindowChanges(PresentationParameters);
         }
 
         // Now resize the back buffer.
@@ -85,7 +153,21 @@ public partial class GraphicsDevice
             PresentationParameters.BackBufferHeight,
             PresentationParameters.BackBufferFormat,
             PresentationParameters.DepthStencilFormat,
+            requestedMultiSampleCount,
             PresentationParameters.PresentationInterval.GetSyncInterval());
+
+        if (PlatformInfo.GraphicsBackend == GraphicsBackend.OpenGL)
+        {
+            NativeGameWindow window = NativeGameWindow.Instance;
+            if (window != null)
+                // OpenGL may keep the old SDl window around until the new
+                // GL context has been successfully created and made current.
+                window.FinalizePendingNativeWindowChanges();
+        }
+
+        RefreshCapabilities();
+        UpdateBackBufferMultiSampleCount(requestedMultiSampleCount);
+        GraphicsCapabilities.Initialize(this);
 
         _viewport = new Viewport(
             0,
@@ -109,6 +191,21 @@ public partial class GraphicsDevice
         }
     }
 
+    private unsafe void UpdateBackBufferMultiSampleCount(int requestedMultiSampleCount)
+    {
+        int actualMultiSampleCount = MGG.GraphicsDevice_GetBackBufferMultiSampleCount(Handle);
+
+        if (PlatformInfo.GraphicsBackend == GraphicsBackend.OpenGL
+            && actualMultiSampleCount == 0
+            && requestedMultiSampleCount > 0)
+        {
+            PresentationParameters.MultiSampleCount = requestedMultiSampleCount;
+            return;
+        }
+
+        PresentationParameters.MultiSampleCount = actualMultiSampleCount;
+    }
+
     private unsafe void BeginFrame()
     {
         if (_currentFrame > -1)
@@ -129,6 +226,8 @@ public partial class GraphicsDevice
         _vertexBuffersDirty = true;
         Textures.Dirty();
         SamplerStates.Dirty();
+        VertexTextures.Dirty();
+        VertexSamplerStates.Dirty();
 
         MGG.GraphicsDevice_SetViewport(
             Handle,
@@ -152,6 +251,24 @@ public partial class GraphicsDevice
 
     private unsafe void PlatformDispose()
     {
+        foreach (var vb in _userVertexBuffers.Values)
+            vb.Dispose();
+        _userVertexBuffers.Clear();
+
+        if (_userIndexBuffer16 != null)
+        {
+            _userIndexBuffer16.Dispose();
+            _userIndexBuffer16 = null;
+        }
+
+        if (_userIndexBuffer32 != null)
+        {
+            _userIndexBuffer32.Dispose();
+            _userIndexBuffer32 = null;
+        }
+
+        DefaultTexture.Dispose();
+
         if (Handle != null)
         {
             MGG.GraphicsDevice_Destroy(Handle);
@@ -201,6 +318,14 @@ public partial class GraphicsDevice
             PresentationParameters.BackBufferWidth,
             PresentationParameters.BackBufferHeight);
 
+        // OpenGL leaves these bindings stale after a render target switch.
+        // Need to set this to dirty so the state gets pushed again on the next apply.
+        if (PlatformInfo.GraphicsBackend == GraphicsBackend.OpenGL)
+        {
+            _rasterizerStateDirty = true;
+            Textures.Dirty();
+        }
+
         MGG.GraphicsDevice_SetRenderTargets(Handle, null, null, 0);
     }
 
@@ -212,6 +337,14 @@ public partial class GraphicsDevice
     private unsafe IRenderTarget PlatformApplyRenderTargets()
     {
         BeginFrame();
+
+        // OpenGL leaves these bindings stale after a render target switch.
+        // Need to set this to dirty so the state gets pushed again on the next apply.
+        if (PlatformInfo.GraphicsBackend == GraphicsBackend.OpenGL)
+        {
+            _rasterizerStateDirty = true;
+            Textures.Dirty();
+        }
 
         Array.Clear(_curRenderTargets, 0, 4);
 
@@ -230,7 +363,7 @@ public partial class GraphicsDevice
         fixed (MGG_Texture** targets = _curRenderTargets)
         fixed (int* arraySlices = _currentRenderTargetArraySlices)
             MGG.GraphicsDevice_SetRenderTargets(Handle, targets, arraySlices, _currentRenderTargetCount);
-        
+
         return first;
     }
 
@@ -241,15 +374,12 @@ public partial class GraphicsDevice
 
     private void PlatformApplyBlend()
     {
-        if (_blendStateDirty)
+        // BlendFactor goes through the same native call as BlendState.
+        // If it changes, we need to reapply the state.
+        if (_blendStateDirty || _blendFactorDirty)
         {
             _actualBlendState.PlatformApplyState(this);
             _blendStateDirty = false;
-        }
-
-        if (_blendFactorDirty)
-        {
-            // TODO?
             _blendFactorDirty = false;
         }
     }
@@ -307,7 +437,7 @@ public partial class GraphicsDevice
         }
 
         if (_vertexBuffersDirty)
-       {
+        {
             for (var slot = 0; slot < _vertexBuffers.Count; slot++)
             {
                 var vertexBufferBinding = _vertexBuffers.Get(slot);
@@ -470,7 +600,7 @@ public partial class GraphicsDevice
     {
         ApplyState(true);
 
-        MGG.GraphicsDevice_DrawIndexedInstanced(Handle, primitiveType, primitiveCount, startIndex, baseVertex, instanceCount);
+        MGG.GraphicsDevice_DrawIndexedInstanced(Handle, primitiveType, primitiveCount, startIndex, baseVertex, baseInstance, instanceCount);
     }
 
     private unsafe void PlatformGetBackBufferData<T>(Rectangle? rect, T[] data, int startIndex, int count) where T : struct

@@ -20,11 +20,18 @@ DXGI_FORMAT Graphics::TextureFormatToDXGI_FORMAT(MGSurfaceFormat tf)
     case MGSurfaceFormat::Bgra4444:
         return DXGI_FORMAT_B4G4R4A4_UNORM;
     case MGSurfaceFormat::Dxt1:
+    case MGSurfaceFormat::Dxt1a:
         return DXGI_FORMAT_BC1_UNORM;
     case MGSurfaceFormat::Dxt3:
         return DXGI_FORMAT_BC2_UNORM;
     case MGSurfaceFormat::Dxt5:
         return DXGI_FORMAT_BC3_UNORM;
+    case MGSurfaceFormat::Dxt1SRgb:
+        return DXGI_FORMAT_BC1_UNORM_SRGB;
+    case MGSurfaceFormat::Dxt3SRgb:
+        return DXGI_FORMAT_BC2_UNORM_SRGB;
+    case MGSurfaceFormat::Dxt5SRgb:
+        return DXGI_FORMAT_BC3_UNORM_SRGB;
     case MGSurfaceFormat::NormalizedByte2:
         return DXGI_FORMAT_R8G8_SNORM;
     case MGSurfaceFormat::NormalizedByte4:
@@ -51,6 +58,16 @@ DXGI_FORMAT Graphics::TextureFormatToDXGI_FORMAT(MGSurfaceFormat tf)
         return DXGI_FORMAT_R16G16B16A16_FLOAT;
     case MGSurfaceFormat::HdrBlendable:
         return DXGI_FORMAT_R16G16B16A16_FLOAT;
+    case MGSurfaceFormat::Bgr32:
+        return DXGI_FORMAT_B8G8R8X8_UNORM;
+    case MGSurfaceFormat::Bgra32:
+        return DXGI_FORMAT_B8G8R8A8_UNORM;
+    case MGSurfaceFormat::ColorSRgb:
+        return DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
+    case MGSurfaceFormat::Bgr32SRgb:
+        return DXGI_FORMAT_B8G8R8X8_UNORM_SRGB;
+    case MGSurfaceFormat::Bgra32SRgb:
+        return DXGI_FORMAT_B8G8R8A8_UNORM_SRGB;
     }
     throw std::out_of_range("invalid TextureFormat");
 }

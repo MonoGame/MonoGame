@@ -2,19 +2,18 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
-namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
+namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler;
+
+[ContentTypeWriter]
+class VideoWriter : BuiltInContentWriter<VideoContent>
 {
-    [ContentTypeWriter]
-    class VideoWriter : BuiltInContentWriter<VideoContent>
+    protected override void Write(ContentWriter output, VideoContent value)
     {
-        protected internal override void Write(ContentWriter output, VideoContent value)
-        {
-            output.WriteObject<string>(value.Filename);
-            output.WriteObject<int>((int)value.Duration.TotalMilliseconds);
-            output.WriteObject<int>(value.Width);
-            output.WriteObject<int>(value.Height);
-            output.WriteObject<float>(value.FramesPerSecond);
-            output.WriteObject<int>((int)value.VideoSoundtrackType);
-        }
+        output.WriteObject(value.Filename);
+        output.WriteObject((int)value.Duration.TotalMilliseconds);
+        output.WriteObject(value.Width);
+        output.WriteObject(value.Height);
+        output.WriteObject(value.FramesPerSecond);
+        output.WriteObject((int)value.VideoSoundtrackType);
     }
 }

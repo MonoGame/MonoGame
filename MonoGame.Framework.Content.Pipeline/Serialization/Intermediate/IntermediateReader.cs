@@ -2,21 +2,18 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
-using System;
-using System.Collections.Generic;
-using System.IO;
 using System.Xml;
 
 namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Intermediate
 {
     /// <summary>
-    /// IntermetiateReader is used to read content from the intermediate format.
+    /// IntermediateReader is used to read content from the intermediate format.
     /// </summary>
     public sealed class IntermediateReader
     {
         private readonly string _filePath;
 
-        private readonly Dictionary<string, Action<object>> _resourceFixups;
+        private readonly Dictionary<string, Action<object?>> _resourceFixups;
 
         private readonly Dictionary<string, List<Action<Type, string>>> _externalReferences;
 
@@ -35,8 +32,8 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Intermediate
             Serializer = serializer;
             Xml = xmlReader;
             _filePath = filePath;
-            _resourceFixups = new Dictionary<string, Action<object>>();
-            _externalReferences = new Dictionary<string, List<Action<Type, string>>>();
+            _resourceFixups = [];
+            _externalReferences = [];
         }
 
         /// <summary>
@@ -44,12 +41,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Intermediate
         /// </summary>
         /// <param name="elementName">The name of the element to move to.</param>
         /// <returns><c>true</c> if the element is found, <c>false</c> otherwise.</returns>
-        public bool MoveToElement(string elementName)
-        {
-            var nodeType = Xml.MoveToContent();
-            return  nodeType == XmlNodeType.Element && 
-                    Xml.Name == elementName;
-        }
+        public bool MoveToElement(string elementName) => Xml.MoveToContent() == XmlNodeType.Element && Xml.Name == elementName;
 
         /// <summary>
         /// Reads an object from the XML.
@@ -57,10 +49,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Intermediate
         /// <typeparam name="T">The type of the object.</typeparam>
         /// <param name="format">The format attribute to use.</param>
         /// <returns>The deserialized object of type T.</returns>
-        public T ReadObject<T>(ContentSerializerAttribute format)
-        {
-            return ReadObject(format, Serializer.GetTypeSerializer(typeof(T)), default(T));
-        }
+        public T ReadObject<T>(ContentSerializerAttribute format) => ReadObject(format, Serializer.GetTypeSerializer(typeof(T)), default(T));
 
         /// <summary>
         /// Reads an object from the XML.
@@ -69,10 +58,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Intermediate
         /// <param name="format">The format attribute to use.</param>
         /// <param name="typeSerializer">The type serializer to use.</param>
         /// <returns>The deserialized object of type T.</returns>
-        public T ReadObject<T>(ContentSerializerAttribute format, ContentTypeSerializer typeSerializer)
-        {
-            return ReadObject(format, typeSerializer, default(T));
-        }
+        public T ReadObject<T>(ContentSerializerAttribute format, ContentTypeSerializer typeSerializer) => ReadObject(format, typeSerializer, default(T));
 
         /// <summary>
         /// Reads an object from the XML.
@@ -85,38 +71,36 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Intermediate
         /// <exception cref="InvalidContentException">
         /// Thrown when the element can not be found, is null or cannot be assigned.
         /// </exception>
-        public T ReadObject<T>(ContentSerializerAttribute format, ContentTypeSerializer typeSerializer, T existingInstance)
+        public T ReadObject<T>(ContentSerializerAttribute format, ContentTypeSerializer typeSerializer, T? existingInstance)
         {
             if (!format.FlattenContent)
             {
                 if (!MoveToElement(format.ElementName))
-                    throw NewInvalidContentException(null, "Element '{0}' was not found.", format.ElementName);
+                    throw NewInvalidContentException(null, $"Element '{format.ElementName}' was not found.");
 
                 // Is the object null?
                 var isNull = Xml.GetAttribute("Null");
                 if (isNull != null && XmlConvert.ToBoolean(isNull))
                 {
                     if (!format.AllowNull)
-                        throw NewInvalidContentException(null, "Element '{0}' cannot be null.", format.ElementName);
+                        throw NewInvalidContentException(null, $"Element '{format.ElementName}' cannot be null.");
 
                     Xml.Skip();
-                    return default(T);
+                    return default!;
                 }
 
                 // Is the object overloading the serialized type?
                 if (Xml.MoveToAttribute("Type"))
                 {
-                    var type = ReadTypeName();
-                    if (type == null)
-                        throw NewInvalidContentException(null, "Could not resolve type '{0}'.", Xml.ReadContentAsString());
+                    var type = ReadTypeName() ?? throw NewInvalidContentException(null, $"Could not resolve type '{Xml.ReadContentAsString()}'.");
                     if (!typeSerializer.TargetType.IsAssignableFrom(type))
-                        throw NewInvalidContentException(null, "Type '{0}' is not assignable to '{1}'.", type.FullName, typeSerializer.TargetType.FullName);
+                        throw NewInvalidContentException(null, $"Type '{type.FullName}' is not assignable to '{typeSerializer.TargetType.FullName}'.");
 
                     typeSerializer = Serializer.GetTypeSerializer(type);
                     Xml.MoveToElement();
                 }
             }
-            
+
             return ReadRawObject(format, typeSerializer, existingInstance);
         }
 
@@ -128,10 +112,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Intermediate
         /// <param name="format">The format attribute of the object.</param>
         /// <param name="existingInstance">An existing instance of the object.</param>
         /// <returns>The deserialized object of type T.</returns>
-        public T ReadObject<T>(ContentSerializerAttribute format, T existingInstance)
-        {
-            return ReadObject(format, Serializer.GetTypeSerializer(typeof(T)), existingInstance);            
-        }
+        public T ReadObject<T>(ContentSerializerAttribute format, T existingInstance) => ReadObject(format, Serializer.GetTypeSerializer(typeof(T)), existingInstance);
 
         /// <summary>
         /// Reads a raw object from the XML using the specified format and type serializer.
@@ -142,10 +123,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Intermediate
         /// <exception cref="InvalidContentException">
         /// Thrown when the element can not be found or is null.
         /// </exception>
-        public T ReadRawObject<T>(ContentSerializerAttribute format)
-        {
-            return ReadRawObject(format, Serializer.GetTypeSerializer(typeof(T)), default(T));         
-        }
+        public T ReadRawObject<T>(ContentSerializerAttribute format) => ReadRawObject(format, Serializer.GetTypeSerializer(typeof(T)), default(T));
 
         /// <summary>
         /// Reads an object from the XML.
@@ -154,10 +132,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Intermediate
         /// <param name="format">The format attribute of the object.</param>
         /// <param name="typeSerializer">The type serializer for the object.</param>
         /// <returns>The deserialized object of type T.</returns>
-        public T ReadRawObject<T>(ContentSerializerAttribute format, ContentTypeSerializer typeSerializer)
-        {
-            return ReadRawObject(format, typeSerializer, default(T));         
-        }
+        public T ReadRawObject<T>(ContentSerializerAttribute format, ContentTypeSerializer typeSerializer) => ReadRawObject(format, typeSerializer, default(T));
 
         /// <summary>
         /// Reads a raw object from the XML using the specified format and type serializer.
@@ -170,16 +145,16 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Intermediate
         /// <exception cref="InvalidContentException">
         /// Thrown when the element can not be found or is null.
         /// </exception>
-        public T ReadRawObject<T>(ContentSerializerAttribute format, ContentTypeSerializer typeSerializer, T existingInstance)
+        public T ReadRawObject<T>(ContentSerializerAttribute format, ContentTypeSerializer typeSerializer, T? existingInstance)
         {
             if (format.FlattenContent)
             {
                 Xml.MoveToContent();
-                return (T)typeSerializer.Deserialize(this, format, existingInstance);
+                return (T)typeSerializer.Deserialize(this, format, existingInstance)!;
             }
 
             if (!MoveToElement(format.ElementName))
-                throw NewInvalidContentException(null, "Element '{0}' was not found.", format.ElementName);
+                throw NewInvalidContentException(null, $"Element '{format.ElementName}' was not found.");
 
             var isEmpty = Xml.IsEmptyElement;
             if (!isEmpty)
@@ -193,7 +168,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Intermediate
             if (!isEmpty)
                 Xml.ReadEndElement();
 
-            return (T)result;
+            return (T)result!;
         }
 
         /// <summary>
@@ -207,9 +182,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Intermediate
         /// Thrown when the element can not be found or is null.
         /// </exception>
         public T ReadRawObject<T>(ContentSerializerAttribute format, T existingInstance)
-        {
-            return ReadRawObject(format, Serializer.GetTypeSerializer(typeof(T)), existingInstance);           
-        }
+            => ReadRawObject(format, Serializer.GetTypeSerializer(typeof(T)), existingInstance);
 
         /// <summary>
         /// Reads a shared resource from the XML using the specified format and fixup action.
@@ -220,7 +193,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Intermediate
         /// <exception cref="InvalidContentException">
         /// Thrown if the element specified by the format attribute is not found.
         /// </exception>
-        public void ReadSharedResource<T>(ContentSerializerAttribute format, Action<T> fixup)
+        public void ReadSharedResource<T>(ContentSerializerAttribute format, Action<T?> fixup)
         {
             string str;
 
@@ -229,24 +202,23 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Intermediate
             else
             {
                 if (!MoveToElement(format.ElementName))
-                    throw NewInvalidContentException(null, "Element '{0}' was not found.", format.ElementName);
+                    throw NewInvalidContentException(null, $"Element '{format.ElementName}' was not found.");
 
                 str = Xml.ReadElementContentAsString();
             }
 
             if (string.IsNullOrEmpty(str))
                 return;
-            
+
             // Do we already have one for this?
-            Action<object> prevFixup;
-            if (!_resourceFixups.TryGetValue(str, out prevFixup))
-                _resourceFixups.Add(str, (o) => fixup((T)o));
+            if (!_resourceFixups.TryGetValue(str, out var prevFixup))
+                _resourceFixups.Add(str, (o) => fixup((T?)o));
             else
             {
                 _resourceFixups[str] = (o) =>
                 {
                     prevFixup(o);
-                    fixup((T)o);
+                    fixup((T?)o);
                 };
             }
         }
@@ -256,14 +228,14 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Intermediate
             if (!MoveToElement("Resources"))
                 return;
 
-            var resources = new Dictionary<string, object>();
+            var resources = new Dictionary<string, object?>();
             var resourceFormat = new ContentSerializerAttribute { ElementName = "Resource" };
 
             // Read all the resources.
             Xml.ReadStartElement();
             while (MoveToElement("Resource"))
             {
-                var id = Xml.GetAttribute("ID");
+                var id = Xml.GetAttribute("ID") ?? "";
                 var resource = ReadObject<object>(resourceFormat);
                 resources.Add(id, resource);
             }
@@ -272,8 +244,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Intermediate
             // Execute the fixups.
             foreach (var fixup in _resourceFixups)
             {
-                object resource;
-                if (!resources.TryGetValue(fixup.Key, out resource))
+                if (!resources.TryGetValue(fixup.Key, out var resource))
                     throw new InvalidContentException("Missing shared resource \"" + fixup.Key + "\".");
                 fixup.Value(resource);
             }
@@ -294,18 +265,18 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Intermediate
 
             var str = Xml.ReadElementContentAsString();
 
-            Action<Type, string> fixup = (type, filename) =>
+            if (!_externalReferences.TryGetValue(str, out var fixups))
+                _externalReferences.Add(str, fixups = []);
+            fixups.Add(Fixup);
+            return;
+
+            void Fixup(Type type, string filename)
             {
                 if (type != typeof(T))
                     throw NewInvalidContentException(null, "Invalid external reference type");
 
                 existingInstance.Filename = filename;
-            };
-
-            List<Action<Type, string>> fixups;
-            if (!_externalReferences.TryGetValue(str, out fixups))
-                _externalReferences.Add(str, fixups = new List<Action<Type, string>>());
-            fixups.Add(fixup);
+            }
         }
 
         internal void ReadExternalReferences()
@@ -313,22 +284,18 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Intermediate
             if (!MoveToElement("ExternalReferences"))
                 return;
 
-            var currentDir = Path.GetDirectoryName(_filePath);
+            var currentDir = Path.GetDirectoryName(_filePath) ?? "";
 
             // Read all the external references.
             Xml.ReadStartElement();
             while (MoveToElement("ExternalReference"))
             {
-                List<Action<Type, string>> fixups;
-                var id = Xml.GetAttribute("ID");
-                if (!_externalReferences.TryGetValue(id, out fixups))
-                    throw NewInvalidContentException(null, "Unknown external reference id '{0}'!", id);
+                var id = Xml.GetAttribute("ID") ?? "";
+                if (!_externalReferences.TryGetValue(id, out var fixups))
+                    throw NewInvalidContentException(null, $"Unknown external reference id '{id}'!");
 
                 Xml.MoveToAttribute("TargetType");
-                var targetType = ReadTypeName();
-                if (targetType == null)
-                    throw NewInvalidContentException(null, "Could not resolve type '{0}'.", Xml.ReadContentAsString());
-
+                var targetType = ReadTypeName() ?? throw NewInvalidContentException(null, $"Could not resolve type '{Xml.ReadContentAsString()}'.");
                 Xml.MoveToElement();
                 var filename = Xml.ReadElementString();
                 filename = Path.Combine(currentDir, filename);
@@ -340,22 +307,18 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Intermediate
             Xml.ReadEndElement();
         }
 
-        internal InvalidContentException NewInvalidContentException(Exception innerException, string message, params object[] args)
+        internal InvalidContentException NewInvalidContentException(Exception? innerException, string message)
         {
             var xmlInfo = (IXmlLineInfo)Xml;
-            var lineAndColumn = string.Format("{0},{1}", xmlInfo.LineNumber, xmlInfo.LinePosition);
+            var lineAndColumn = $"{xmlInfo.LineNumber},{xmlInfo.LinePosition}";
             var identity = new ContentIdentity(_filePath, string.Empty, lineAndColumn);
-            return new InvalidContentException(string.Format(message, args), identity, innerException);
+            return new InvalidContentException(message, identity, innerException);
         }
 
         /// <summary>
-        /// Reads the next type in the 
+        /// Reads the next type in the
         /// </summary>
         /// <returns></returns>
-        public Type ReadTypeName()
-        {
-            var typeName = Xml.ReadContentAsString();
-            return Serializer.FindType(typeName);
-        }
+        public Type ReadTypeName() => Serializer.FindType(Xml.ReadContentAsString());
     }
 }

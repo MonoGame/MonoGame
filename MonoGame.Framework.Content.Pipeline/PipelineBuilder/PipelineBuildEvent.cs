@@ -2,11 +2,8 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
-using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
-using System.IO;
 using System.Text;
 using System.Xml;
 using System.Xml.Serialization;
@@ -34,11 +31,11 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
             DestFile = string.Empty;
             Importer = string.Empty;
             Processor = string.Empty;
-            Parameters = new OpaqueDataDictionary();
-            ParametersXml = new List<Pair>();
-            Dependencies = new List<string>();
-            BuildAsset = new List<string>();
-            BuildOutput = new List<string>();
+            Parameters = [];
+            ParametersXml = [];
+            Dependencies = [];
+            BuildAsset = [];
+            BuildOutput = [];
         }
 
         /// <summary>
@@ -74,7 +71,7 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
         /// <summary>
         /// The name of the DLL containing the processor.
         /// </summary>
-        public string Processor { get; set; }
+        public string? Processor { get; set; }
 
         /// <summary>
         /// The date/time stamp of the DLL containing the processor.
@@ -96,13 +93,13 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
         public class Pair
         {
             /// <summary>
-            /// Name of the key..
+            /// Name of the key.
             /// </summary>
-            public string Key { get; set; }
+            public required string Key { get; set; }
             /// <summary>
             /// Value related to the key.
             /// </summary>
-            public string Value { get; set; }
+            public required string Value { get; set; }
         }
 
         /// <summary>
@@ -154,15 +151,15 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
         /// </summary>
         /// <param name="filePath">Path of the file to process.</param>
         /// <returns>PipelineBuildEvent instance.</returns>
-        public static PipelineBuildEvent Load(string filePath)
+        public static PipelineBuildEvent? Load(string filePath)
         {
             var fullFilePath = Path.GetFullPath(filePath);
             var deserializer = new XmlSerializer(typeof (PipelineBuildEvent));
-            PipelineBuildEvent pipelineEvent;
+            PipelineBuildEvent? pipelineEvent;
             try
             {
-                using (var textReader = new XmlTextReader(fullFilePath))
-                    pipelineEvent = (PipelineBuildEvent) deserializer.Deserialize(textReader);
+                using var textReader = new XmlTextReader(fullFilePath);
+                pipelineEvent = (PipelineBuildEvent)deserializer.Deserialize(textReader)!;
             }
             catch (Exception)
             {
@@ -194,8 +191,8 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
 
             // Serialize our state.
             var serializer = new XmlSerializer(typeof (PipelineBuildEvent));
-            using (var textWriter = new StreamWriter(fullFilePath, false, new UTF8Encoding(false)))
-                serializer.Serialize(textWriter, this);
+            using var textWriter = new StreamWriter(fullFilePath, false, new UTF8Encoding(false));
+            serializer.Serialize(textWriter, this);
         }
 
         /// <summary>
@@ -204,7 +201,7 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
         /// <param name="manager">Pipeline manager.</param>
         /// <param name="cachedEvent">Cached build event.</param>
         /// <returns><c>true</c> if the content needs to be rebuilt; otherwise <c>false</c>.</returns>
-        public bool NeedsRebuild(PipelineManager manager, PipelineBuildEvent cachedEvent)
+        public bool NeedsRebuild(PipelineManager manager, PipelineBuildEvent? cachedEvent)
         {
             // If we have no previously cached build event then we cannot
             // be sure that the state hasn't changed... force a rebuild.
@@ -213,7 +210,7 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
 
             // Verify that the last write time of the source file matches
             // what we recorded when it was built.  If it is different
-            // that means someone modified it and we need to rebuild.
+            // that means someone modified it, and we need to rebuild.
             var sourceWriteTime = File.GetLastWriteTime(SourceFile);
             if (cachedEvent.SourceTime != sourceWriteTime)
                 return true;
@@ -259,25 +256,20 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
 
             // Did the parameters change?
             var defaultValues = manager.GetProcessorDefaultValues(Processor);
-            if (!AreParametersEqual(cachedEvent.Parameters, Parameters, defaultValues))
-                return true;
-
-            return false;
+            return !AreParametersEqual(cachedEvent.Parameters, Parameters, defaultValues);
         }
 
-        internal static bool AreParametersEqual(OpaqueDataDictionary parameters0, OpaqueDataDictionary parameters1, OpaqueDataDictionary defaultValues)
+        internal static bool AreParametersEqual(OpaqueDataDictionary? parameters0, OpaqueDataDictionary? parameters1, OpaqueDataDictionary defaultValues)
         {
             Debug.Assert(defaultValues != null, "defaultValues must not be empty.");
-            Debug.Assert(EmptyParameters != null && EmptyParameters.Count == 0);
+            Debug.Assert(EmptyParameters is { Count: 0 });
 
             // Same reference or both null?
             if (parameters0 == parameters1)
                 return true;
 
-            if (parameters0 == null)
-                parameters0 = EmptyParameters;
-            if (parameters1 == null)
-                parameters1 = EmptyParameters;
+            parameters0 ??= EmptyParameters;
+            parameters1 ??= EmptyParameters;
 
             // Are both dictionaries empty?
             if (parameters0.Count == 0 && parameters1.Count == 0)
@@ -287,19 +279,14 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
             // the default values.
             if (parameters0.Count < parameters1.Count)
             {
-                var dummy = parameters0;
-                parameters0 = parameters1;
-                parameters1 = dummy;
+                (parameters0, parameters1) = (parameters1, parameters0);
             }
 
             // Compare parameters0 with parameters1 or defaultValues.
-            foreach (var pair in parameters0)
+            foreach (var (key, value0) in parameters0)
             {
-                object value0 = pair.Value;
-                object value1;
-
                 // Search for matching parameter.
-                if (!parameters1.TryGetValue(pair.Key, out value1) && !defaultValues.TryGetValue(pair.Key, out value1))
+                if (!parameters1.TryGetValue(key, out var value1) && !defaultValues.TryGetValue(key, out value1))
                     return false;
 
                 if (!AreEqual(value0, value1))
@@ -307,23 +294,22 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
             }
 
             // Compare parameters which are only in parameters1 with defaultValues.
-            foreach (var pair in parameters1)
+            foreach (var (key, value) in parameters1)
             {
-                if (parameters0.ContainsKey(pair.Key))
+                if (parameters0.ContainsKey(key))
                     continue;
 
-                object defaultValue;
-                if (!defaultValues.TryGetValue(pair.Key, out defaultValue))
+                if (!defaultValues.TryGetValue(key, out var defaultValue))
                     return false;
 
-                if (!AreEqual(pair.Value, defaultValue))
+                if (!AreEqual(value, defaultValue))
                     return false;
             }
 
             return true;
         }
 
-        private static bool AreEqual(object value0, object value1)
+        private static bool AreEqual(object? value0, object? value1)
         {
             // Are values equal or both null?
             if (Equals(value0, value1))
@@ -334,19 +320,16 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
                 return false;
 
             // Values are of different type: Compare string representation.
-            if (ConvertToString(value0) != ConvertToString(value1))
-                return false;
-
-            return true;
+            return ConvertToString(value0) == ConvertToString(value1);
         }
 
-        private static string ConvertToString(object value)
+        private static string ConvertToString(object? value)
         {
             if (value == null)
-                return null;
+                return "";
 
             var typeConverter = TypeDescriptor.GetConverter(value.GetType());
-            return typeConverter.ConvertToInvariantString(value);
+            return typeConverter.ConvertToInvariantString(value) ?? "";
         }
     }
 }

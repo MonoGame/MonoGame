@@ -43,7 +43,7 @@ namespace Microsoft.Xna.Framework.Graphics
             FastSoftware
         }
 
-        private static ReadOnlyCollection<GraphicsAdapter> _adapters;
+        internal static ReadOnlyCollection<GraphicsAdapter> _adapters;
 
         private DisplayModeCollection _supportedDisplayModes;
 

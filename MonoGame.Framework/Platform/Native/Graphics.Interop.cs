@@ -1,4 +1,4 @@
-// MonoGame - Copyright (C) The MonoGame Team
+// MonoGame - Copyright (C) MonoGame Foundation, Inc
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
@@ -62,6 +62,44 @@ internal struct MGG_GraphicsDevice_Caps
     public int MaxVertexTextureSlots;
     public int MaxVertexBufferSlots;
     public int ShaderProfile;
+    public int MaxTextureAnisotropy;
+    public int MaxMultiSampleCount;
+    [MarshalAs(UnmanagedType.I1)]
+    public bool SupportsNonPowerOfTwo;
+    [MarshalAs(UnmanagedType.I1)]
+    public bool SupportsTextureFilterAnisotropic;
+    [MarshalAs(UnmanagedType.I1)]
+    public bool SupportsDepth24;
+    [MarshalAs(UnmanagedType.I1)]
+    public bool SupportsPackedDepthStencil;
+    [MarshalAs(UnmanagedType.I1)]
+    public bool SupportsDepthNonLinear;
+    [MarshalAs(UnmanagedType.I1)]
+    public bool SupportsTextureMaxLevel;
+    [MarshalAs(UnmanagedType.I1)]
+    public bool SupportsDxt1;
+    [MarshalAs(UnmanagedType.I1)]
+    public bool SupportsS3tc;
+    [MarshalAs(UnmanagedType.I1)]
+    public bool SupportsSRgb;
+    [MarshalAs(UnmanagedType.I1)]
+    public bool SupportsDepthClamp;
+    [MarshalAs(UnmanagedType.I1)]
+    public bool SupportsTextureArrays;
+    [MarshalAs(UnmanagedType.I1)]
+    public bool SupportsVertexTextures;
+    [MarshalAs(UnmanagedType.I1)]
+    public bool SupportsFloatTextures;
+    [MarshalAs(UnmanagedType.I1)]
+    public bool SupportsHalfFloatTextures;
+    [MarshalAs(UnmanagedType.I1)]
+    public bool SupportsNormalized;
+    [MarshalAs(UnmanagedType.I1)]
+    public bool SupportsInstancing;
+    [MarshalAs(UnmanagedType.I1)]
+    public bool SupportsBaseIndexInstancing;
+    [MarshalAs(UnmanagedType.I1)]
+    public bool SupportsSeparateBlendStates;
 }
 
 [StructLayout(LayoutKind.Sequential)]
@@ -90,6 +128,11 @@ internal struct MGG_DepthStencilState_Info
     public StencilOperation stencilDepthBufferFail;
     public StencilOperation stencilFail;
     public StencilOperation stencilPass;
+    public bool twoSidedStencilMode;
+    public CompareFunction counterClockwiseStencilFunction;
+    public StencilOperation counterClockwiseStencilDepthBufferFail;
+    public StencilOperation counterClockwiseStencilFail;
+    public StencilOperation counterClockwiseStencilPass;
 }
 
 [StructLayout(LayoutKind.Sequential)]
@@ -156,7 +199,7 @@ internal static unsafe partial class MGG
 
     #region Graphics System
 
-    
+
     [DllImport(MGP.MonoGameNativeDLL, EntryPoint = "MGG_GraphicsSystem_Create", ExactSpelling = true)]
     public static extern MGG_GraphicsSystem* GraphicsSystem_Create();
 
@@ -186,14 +229,18 @@ internal static unsafe partial class MGG
     [DllImport(MGP.MonoGameNativeDLL, EntryPoint = "MGG_GraphicsDevice_GetCaps", ExactSpelling = true)]
     public static extern void GraphicsDevice_GetCaps(MGG_GraphicsDevice* device, out MGG_GraphicsDevice_Caps caps);
 
+    [DllImport(MGP.MonoGameNativeDLL, EntryPoint = "MGG_GraphicsDevice_GetBackBufferMultiSampleCount", ExactSpelling = true)]
+    public static extern int GraphicsDevice_GetBackBufferMultiSampleCount(MGG_GraphicsDevice* device);
+
     [DllImport(MGP.MonoGameNativeDLL, EntryPoint = "MGG_GraphicsDevice_ResizeSwapchain", ExactSpelling = true)]
-    public static extern void GraphicsDevice_ResizeSwapchain(
+    public static extern byte GraphicsDevice_ResizeSwapchain(
         MGG_GraphicsDevice* device,
         nint nativeWindowHandle,
         int width,
         int height,
         SurfaceFormat color,
         DepthFormat depth,
+        int multiSampleCount,
         int syncInterval);
 
     [DllImport(MGP.MonoGameNativeDLL, EntryPoint = "MGG_GraphicsDevice_BeginFrame", ExactSpelling = true)]
@@ -220,7 +267,7 @@ internal static unsafe partial class MGG
         ref int y,
         ref int width,
         ref int height);
-    
+
     [DllImport(MGP.MonoGameNativeDLL, EntryPoint = "MGG_GraphicsDevice_SetViewport", ExactSpelling = true)]
     public static extern void GraphicsDevice_SetViewport(
         MGG_GraphicsDevice* device,
@@ -270,7 +317,7 @@ internal static unsafe partial class MGG
     public static extern void GraphicsDevice_DrawIndexed(MGG_GraphicsDevice* device, PrimitiveType primitiveType, int primitiveCount, int indexStart, int vertexStart);
 
     [DllImport(MGP.MonoGameNativeDLL, EntryPoint = "MGG_GraphicsDevice_DrawIndexedInstanced", ExactSpelling = true)]
-    public static extern void GraphicsDevice_DrawIndexedInstanced(MGG_GraphicsDevice* device, PrimitiveType primitiveType, int primitiveCount, int indexStart, int vertexStart, int instanceCount);
+    public static extern void GraphicsDevice_DrawIndexedInstanced(MGG_GraphicsDevice* device, PrimitiveType primitiveType, int primitiveCount, int indexStart, int vertexStart, int baseInstance, int instanceCount);
 
     [DllImport(MGP.MonoGameNativeDLL, EntryPoint = "MGG_GraphicsDevice_ResolveRenderTargets", ExactSpelling = true)]
     public static extern void GraphicsDevice_ResolveRenderTargets(MGG_GraphicsDevice* device);
@@ -319,7 +366,7 @@ internal static unsafe partial class MGG
     #region Buffer
 
     [DllImport(MGP.MonoGameNativeDLL, EntryPoint = "MGG_Buffer_Create", ExactSpelling = true)]
-    public static extern MGG_Buffer* Buffer_Create(MGG_GraphicsDevice* device, BufferType type, int sizeInBytes);
+    public static extern MGG_Buffer* Buffer_Create(MGG_GraphicsDevice* device, BufferType type, bool dynamic, int sizeInBytes);
 
     [DllImport(MGP.MonoGameNativeDLL, EntryPoint = "MGG_Buffer_Destroy", ExactSpelling = true)]
     public static extern void Buffer_Destroy(MGG_GraphicsDevice* device, MGG_Buffer* buffer);
@@ -365,6 +412,17 @@ internal static unsafe partial class MGG
         DepthFormat depthFormat,
         int multiSampleCount,
         RenderTargetUsage usage);
+
+    [DllImport(MGP.MonoGameNativeDLL, EntryPoint = "MGG_RenderTarget_WrapNativeHandle", ExactSpelling = true)]
+    public static extern MGG_Texture* RenderTarget_WrapNativeHandle(
+        MGG_GraphicsDevice* device,
+        nint nativeHandle,
+        SurfaceFormat format,
+        int width,
+        int height,
+        DepthFormat depthFormat,
+        int multiSampleCount,
+        byte externalPresentation);
 
     [DllImport(MGP.MonoGameNativeDLL, EntryPoint = "MGG_Texture_Destroy", ExactSpelling = true)]
     public static extern void Texture_Destroy(MGG_GraphicsDevice* device, MGG_Texture* texture);

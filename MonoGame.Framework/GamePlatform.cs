@@ -275,7 +275,7 @@ namespace Microsoft.Xna.Framework
             {
                 Mouse.PrimaryWindow = null;
                 TouchPanel.PrimaryWindow = null;
-
+                GraphicsAdapter._adapters = null;
                 disposed = true;
             }
         }

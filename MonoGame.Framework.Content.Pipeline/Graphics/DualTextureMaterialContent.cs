@@ -22,38 +22,38 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
         /// <inheritdoc cref="BasicMaterialContent.Alpha"/>
         public float? Alpha
         {
-            get { return GetValueTypeProperty<float>(AlphaKey); }
-            set { SetProperty(AlphaKey, value); }
+            get => GetValueTypeProperty<float>(AlphaKey);
+            set => SetProperty(AlphaKey, value);
         }
 
         /// <inheritdoc cref="BasicMaterialContent.DiffuseColor"/>
         public Vector3? DiffuseColor
         {
-            get { return GetValueTypeProperty<Vector3>(DiffuseColorKey); }
-            set { SetProperty(DiffuseColorKey, value); }
+            get => GetValueTypeProperty<Vector3>(DiffuseColorKey);
+            set => SetProperty(DiffuseColorKey, value);
         }
 
         /// <inheritdoc cref="BasicMaterialContent.Texture"/>
-        public ExternalReference<TextureContent> Texture
+        public ExternalReference<TextureContent>? Texture
         {
-            get { return GetTexture(TextureKey); }
-            set { SetTexture(TextureKey, value); }
+            get => GetTexture(TextureKey);
+            set => SetTexture(TextureKey, value);
         }
 
         /// <summary>
         /// Gets or sets the second texture property.
         /// </summary>
-        public ExternalReference<TextureContent> Texture2
+        public ExternalReference<TextureContent>? Texture2
         {
-            get { return GetTexture(Texture2Key); }
-            set { SetTexture(Texture2Key, value); }
+            get => GetTexture(Texture2Key);
+            set => SetTexture(Texture2Key, value);
         }
 
         /// <inheritdoc cref="BasicMaterialContent.VertexColorEnabled"/>
         public bool? VertexColorEnabled
         {
-            get { return GetValueTypeProperty<bool>(VertexColorEnabledKey); }
-            set { SetProperty(VertexColorEnabledKey, value); }
+            get => GetValueTypeProperty<bool>(VertexColorEnabledKey);
+            set => SetProperty(VertexColorEnabledKey, value);
         }
     }
 }

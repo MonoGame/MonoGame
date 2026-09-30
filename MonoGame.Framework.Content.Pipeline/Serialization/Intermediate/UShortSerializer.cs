@@ -2,27 +2,15 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
-using System.Collections.Generic;
 using System.Xml;
 
 namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Intermediate
 {
     [ContentTypeSerializer]
-    class UShortSerializer : ElementSerializer<ushort>
+    class UShortSerializer() : ElementSerializer<ushort>("ushort", 1)
     {
-        public UShortSerializer() :
-            base("ushort", 1)
-        {
-        }
+        protected override ushort Deserialize(string[] inputs, ref int index) => XmlConvert.ToUInt16(inputs[index++]);
 
-        protected internal override ushort Deserialize(string[] inputs, ref int index)
-        {
-            return XmlConvert.ToUInt16(inputs[index++]);
-        }
-
-        protected internal override void Serialize(ushort value, List<string> results)
-        {
-            results.Add(XmlConvert.ToString(value));
-        }
+        protected override void Serialize(ushort value, List<string> results) => results.Add(XmlConvert.ToString(value));
     }
 }

@@ -24,7 +24,7 @@ namespace Microsoft.Xna.Framework.Audio
 
         private static X3DAudio _device3D;
         private static bool _device3DDirty = true;
-        private static Speakers _speakers = Speakers.Stereo;
+        private static Speakers _speakers = Speakers.FrontLeft | Speakers.FrontRight;
 
         // XNA does not expose this, but it exists in X3DAudio.
         public static Speakers Speakers
@@ -368,7 +368,7 @@ namespace Microsoft.Xna.Framework.Audio
             }
 
             _device3DDirty = true;
-            _speakers = Speakers.Stereo;
+            _speakers = Speakers.FrontLeft | Speakers.FrontRight;
         }
     }
 }

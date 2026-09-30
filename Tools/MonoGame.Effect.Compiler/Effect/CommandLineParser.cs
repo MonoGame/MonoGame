@@ -39,18 +39,17 @@ namespace MonoGame.Effect
             // Reflect to find what commandline options are available.
             foreach (var field in optionsObject.GetType().GetFields())
             {
-                String description;
-                var fieldName = GetOptionNameAndDescription(field, out description);
+                var fieldName = GetOptionNameAndDescription(field, out var description);
 
                 if (GetAttribute<RequiredAttribute>(field) != null)
                 {
                     // Record a required option.
                     _requiredOptions.Enqueue(field);
 
-                    _requiredUsageArguments.Add(string.Format("<{0}>", fieldName));
+                    _requiredUsageArguments.Add($"<{fieldName}>");
 
                     if (!string.IsNullOrEmpty(description))
-                        _requiredUsageHelp.Add(string.Format("{0} {1}", fieldName, description));
+                        _requiredUsageHelp.Add($"{fieldName} {description}");
                 }
                 else
                 {
@@ -58,9 +57,9 @@ namespace MonoGame.Effect
                     _optionalOptions.Add(fieldName.ToLowerInvariant(), field);
 
                     if (field.FieldType == typeof(bool))
-                        _optionalUsageHelp.Add(string.Format("/{0} {1}", fieldName, description));
+                        _optionalUsageHelp.Add($"/{fieldName} {description}");
                     else
-                        _optionalUsageHelp.Add(string.Format("/{0}:value {1}", fieldName, description));
+                        _optionalUsageHelp.Add($"/{fieldName}:value {description}");
                 }
             }
         }
@@ -76,7 +75,7 @@ namespace MonoGame.Effect
             }
 
             // Make sure we got all the required options.
-            var missingRequiredOption = _requiredOptions.FirstOrDefault(field => !IsList(field) || GetList(field).Count == 0);
+            var missingRequiredOption = _requiredOptions.FirstOrDefault(field => !IsList(field) || field.GetValue(_optionsObject) is IList { Count: 0 });
 
             if (missingRequiredOption != null)
             {
@@ -114,9 +113,7 @@ namespace MonoGame.Effect
                 var name = split[0];
                 var value = (split.Length > 1) ? split[1] : "true";
 
-                FieldInfo field;
-
-                if (!_optionalOptions.TryGetValue(name.ToLowerInvariant(), out field))
+                if (!_optionalOptions.TryGetValue(name.ToLowerInvariant(), out var field))
                 {
                     ShowError("Unknown option '{0}'", name);
                     return false;
@@ -134,10 +131,10 @@ namespace MonoGame.Effect
         {
             try
             {
-                if (IsList(field))
+                if (field.GetValue(_optionsObject) is IList list)
                 {
                     // Append this value to a list of options.
-                    GetList(field).Add(ChangeType(value, ListElementType(field)));
+                    list.Add(ChangeType(value, ListElementType(field)));
                 }
                 else
                 {
@@ -155,10 +152,9 @@ namespace MonoGame.Effect
         }
 
 
-        static object ChangeType(string value, Type type)
+        static object? ChangeType(string value, Type type)
         {
             var converter = TypeDescriptor.GetConverter(type);
-
             return converter.ConvertFromInvariantString(value);
         }
 
@@ -167,13 +163,6 @@ namespace MonoGame.Effect
         {
             return typeof(IList).IsAssignableFrom(field.FieldType);
         }
-
-
-        IList GetList(FieldInfo field)
-        {
-            return (IList)field.GetValue(_optionsObject);
-        }
-
 
         static Type ListElementType(FieldInfo field)
         {
@@ -194,7 +183,7 @@ namespace MonoGame.Effect
                 return field.Name;
         }
 
-        static string GetOptionNameAndDescription(FieldInfo field, out String description)
+        static string GetOptionNameAndDescription(FieldInfo field, out string? description)
         {
             var nameAttribute = GetAttribute<NameAttribute>(field);
 
@@ -210,7 +199,7 @@ namespace MonoGame.Effect
             }
         }
 
-        public string Title { get; set; }
+        public string? Title { get; set; }
 
         void ShowError(string message, params object[] args)
         {
@@ -243,7 +232,7 @@ namespace MonoGame.Effect
         }
 
 
-        static T GetAttribute<T>(ICustomAttributeProvider provider) where T : Attribute
+        static T? GetAttribute<T>(ICustomAttributeProvider provider) where T : Attribute
         {
             return provider.GetCustomAttributes(typeof(T), false).OfType<T>().FirstOrDefault();
         }
@@ -272,7 +261,7 @@ namespace MonoGame.Effect
             }
 
             public string Name { get; private set; }
-            public string Description { get; protected set; }
+            public string? Description { get; protected set; }
         }
 
         [AttributeUsage(AttributeTargets.Field)]

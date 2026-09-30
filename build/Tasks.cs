@@ -10,7 +10,6 @@ public sealed class BuildShadersTask : FrostingTask<BuildContext> { }
 
 [TaskName("Build Frameworks")]
 [IsDependentOn(typeof(BuildNativeTask))]
-[IsDependentOn(typeof(BuildDesktopVKTask))]
 [IsDependentOn(typeof(BuildDesktopGLTask))]
 [IsDependentOn(typeof(BuildWindowsDXTask))]
 [IsDependentOn(typeof(BuildAndroidTask))]

@@ -3,31 +3,48 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System.Diagnostics;
+using System.Globalization;
 
-namespace MonoGame.Effect.Compiler.Effect.Spirv
+namespace MonoGame.Effect.Compiler.Effect.Spirv;
+
+// https://registry.khronos.org/SPIR-V/specs/unified1/SPIRV.html#OpTypeMatrix
+internal class SpirvTypeMatrix : SpirvTypeBase
 {
-    // https://registry.khronos.org/SPIR-V/specs/unified1/SPIRV.html#OpTypeMatrix
-    internal class SpirvTypeMatrix : SpirvTypeBase
+    public override SpirvType Type => SpirvType.Matrix;
+
+    public required SpirvTypeVector ColumnType { get; init; }
+
+    public required uint Columns { get; init; }
+
+    public static SpirvTypeMatrix? Parse(string[] parts, SpirvReflectionInfo.SpirvParseContext context)
     {
-        public override SpirvType Type => SpirvType.Matrix;
-        public SpirvTypeVector ColumnType { get; private set; }
-        public uint Columns { get; private set; }
+        if (parts.Length < 5)
+            return null;
 
-        protected override void ParseArgs(string[] args, SpirvReflectionInfo.SpirvParseContext context)
+        var id = parts[0];
+        context.Names.TryGetValue(id, out var name);
+
+        if (!context.Types.TryGetValue(parts[3], out var opTypeBase))
         {
-            if (!context.Types.TryGetValue(args[0], out SpirvTypeBase opTypeBase))
-            {
-                Debug.WriteLine($"OpTypeMatrix {Name ?? Id} uses columns of unencountered type: {args[0]}");
-                return;
-            }
-            else if (opTypeBase is not SpirvTypeVector)
-            {
-                Debug.WriteLine($"OpTypeMatrix {Name ?? Id} specifies type {args[0]} for its columns, which is not a vector.");
-                return;
-            }
-
-            ColumnType = opTypeBase as SpirvTypeVector;
-            Columns = uint.Parse(args[1]);
+            Debug.WriteLine($"OpTypeMatrix {name ?? id} uses columns of unencountered type: {parts[3]}");
+            return null;
         }
+
+        if (opTypeBase is not SpirvTypeVector vector)
+        {
+            Debug.WriteLine($"OpTypeMatrix {name ?? id} specifies type {parts[3]} for its columns, which is not a vector.");
+            return null;
+        }
+
+        if (!uint.TryParse(parts[4], CultureInfo.InvariantCulture, out uint columns))
+            return null;
+
+        return new SpirvTypeMatrix
+        {
+            Id = id,
+            Name = name,
+            ColumnType = vector,
+            Columns = columns
+        };
     }
 }

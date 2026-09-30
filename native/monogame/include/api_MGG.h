@@ -1,7 +1,7 @@
-// MonoGame - Copyright (C) The MonoGame Team
+// MonoGame - Copyright (C) MonoGame Foundation, Inc
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
-                
+
 // This code is auto generated, don't modify it by hand.
 // To regenerate it run: Tools/MonoGame.Generator.CTypes
 
@@ -33,7 +33,8 @@ MG_EXPORT void MGG_GraphicsAdapter_GetInfo(MGG_GraphicsAdapter* adapter, MGG_Gra
 MG_EXPORT MGG_GraphicsDevice* MGG_GraphicsDevice_Create(MGG_GraphicsSystem* system, MGG_GraphicsAdapter* adapter);
 MG_EXPORT void MGG_GraphicsDevice_Destroy(MGG_GraphicsDevice* device);
 MG_EXPORT void MGG_GraphicsDevice_GetCaps(MGG_GraphicsDevice* device, MGG_GraphicsDevice_Caps& caps);
-MG_EXPORT void MGG_GraphicsDevice_ResizeSwapchain(MGG_GraphicsDevice* device, void* nativeWindowHandle, mgint width, mgint height, MGSurfaceFormat color, MGDepthFormat depth, mgint syncInterval);
+MG_EXPORT mgint MGG_GraphicsDevice_GetBackBufferMultiSampleCount(MGG_GraphicsDevice* device);
+MG_EXPORT mgbyte MGG_GraphicsDevice_ResizeSwapchain(MGG_GraphicsDevice* device, void* nativeWindowHandle, mgint width, mgint height, MGSurfaceFormat color, MGDepthFormat depth, mgint multiSampleCount, mgint syncInterval);
 MG_EXPORT mgint MGG_GraphicsDevice_BeginFrame(MGG_GraphicsDevice* device);
 MG_EXPORT void MGG_GraphicsDevice_Clear(MGG_GraphicsDevice* device, MGClearOptions options, Vector4& color, mgfloat depth, mgint stencil);
 MG_EXPORT void MGG_GraphicsDevice_Present(MGG_GraphicsDevice* device, mgint currentFrame, mgint syncInterval);
@@ -53,7 +54,7 @@ MG_EXPORT void MGG_GraphicsDevice_SetShader(MGG_GraphicsDevice* device, MGShader
 MG_EXPORT void MGG_GraphicsDevice_SetInputLayout(MGG_GraphicsDevice* device, MGG_InputLayout* layout);
 MG_EXPORT void MGG_GraphicsDevice_Draw(MGG_GraphicsDevice* device, MGPrimitiveType primitiveType, mgint vertexStart, mgint vertexCount);
 MG_EXPORT void MGG_GraphicsDevice_DrawIndexed(MGG_GraphicsDevice* device, MGPrimitiveType primitiveType, mgint primitiveCount, mgint indexStart, mgint vertexStart);
-MG_EXPORT void MGG_GraphicsDevice_DrawIndexedInstanced(MGG_GraphicsDevice* device, MGPrimitiveType primitiveType, mgint primitiveCount, mgint indexStart, mgint vertexStart, mgint instanceCount);
+MG_EXPORT void MGG_GraphicsDevice_DrawIndexedInstanced(MGG_GraphicsDevice* device, MGPrimitiveType primitiveType, mgint primitiveCount, mgint indexStart, mgint vertexStart, mgint baseInstance, mgint instanceCount);
 MG_EXPORT void MGG_GraphicsDevice_ResolveRenderTargets(MGG_GraphicsDevice* device);
 MG_EXPORT void MGG_GraphicsDevice_GetBackBufferData(MGG_GraphicsDevice* device, mgint x, mgint y, mgint width, mgint height, void* data, mgint count, mgint dataBytes);
 MG_EXPORT MGG_BlendState* MGG_BlendState_Create(MGG_GraphicsDevice* device, MGG_BlendState_Info* infos);
@@ -64,7 +65,7 @@ MG_EXPORT MGG_RasterizerState* MGG_RasterizerState_Create(MGG_GraphicsDevice* de
 MG_EXPORT void MGG_RasterizerState_Destroy(MGG_GraphicsDevice* device, MGG_RasterizerState* state);
 MG_EXPORT MGG_SamplerState* MGG_SamplerState_Create(MGG_GraphicsDevice* device, MGG_SamplerState_Info* info);
 MG_EXPORT void MGG_SamplerState_Destroy(MGG_GraphicsDevice* device, MGG_SamplerState* state);
-MG_EXPORT MGG_Buffer* MGG_Buffer_Create(MGG_GraphicsDevice* device, MGBufferType type, mgint sizeInBytes);
+MG_EXPORT MGG_Buffer* MGG_Buffer_Create(MGG_GraphicsDevice* device, MGBufferType type, mgbool dynamic, mgint sizeInBytes);
 MG_EXPORT void MGG_Buffer_Destroy(MGG_GraphicsDevice* device, MGG_Buffer* buffer);
 MG_EXPORT void MGG_Buffer_SetData(MGG_GraphicsDevice* device, MGG_Buffer*& buffer, mgint offset, mgbyte* data, mgint elementCount, mgint vertexStride, mgint elementSizeInBytes, mgbool discard);
 MG_EXPORT void MGG_Buffer_GetData(MGG_GraphicsDevice* device, MGG_Buffer* buffer, mgint offset, mgbyte* data, mgint dataCount, mgint dataBytes, mgint dataStride);
@@ -82,3 +83,4 @@ MG_EXPORT void MGG_OcclusionQuery_Destroy(MGG_GraphicsDevice* device, MGG_Occlus
 MG_EXPORT void MGG_OcclusionQuery_Begin(MGG_GraphicsDevice* device, MGG_OcclusionQuery* query);
 MG_EXPORT void MGG_OcclusionQuery_End(MGG_GraphicsDevice* device, MGG_OcclusionQuery* query);
 MG_EXPORT mgbyte MGG_OcclusionQuery_GetResult(MGG_GraphicsDevice* device, MGG_OcclusionQuery* query, mgint& pixelCount);
+MG_EXPORT MGG_Texture* MGG_RenderTarget_WrapNativeHandle(MGG_GraphicsDevice* device, void* nativeHandle, MGSurfaceFormat format, mgint width, mgint height, MGDepthFormat depthFormat, mgint multiSampleCount, mgbyte externalPresentation);

@@ -1,4 +1,3 @@
-using System;
 using System.Runtime.InteropServices;
 
 namespace MonoGame.Framework.Content.Pipeline.Interop;

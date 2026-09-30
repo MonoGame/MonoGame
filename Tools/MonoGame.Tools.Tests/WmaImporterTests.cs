@@ -17,7 +17,7 @@ namespace MonoGame.Tests.ContentPipeline
         {
             var context = new TestImporterContext("TestObj", "TestBin");
             Assert.Throws<ArgumentNullException>(() => new WmaImporter().Import(null, context));
-            Assert.Throws<ArgumentNullException>(() => new WmaImporter().Import("", context));
+            Assert.Throws<ArgumentException>(() => new WmaImporter().Import("", context));
             Assert.Throws<ArgumentNullException>(() => new WmaImporter().Import(@"Assets/Audio/rock_loop_stereo.wma", null));
             Assert.Throws<FileNotFoundException>(() => new WmaImporter().Import(@"this\does\not\exist.wma", context));
         }

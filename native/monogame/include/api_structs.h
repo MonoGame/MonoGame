@@ -1,4 +1,4 @@
-// MonoGame - Copyright (C) The MonoGame Team
+// MonoGame - Copyright (C) MonoGame Foundation, Inc
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
@@ -86,6 +86,26 @@ struct MGG_GraphicsDevice_Caps
     mgint MaxVertexTextureSlots;
     mgint MaxVertexBufferSlots;
     mgint ShaderProfile;
+    mgint MaxTextureAnisotropy;
+    mgint MaxMultiSampleCount;
+    mgbool SupportsNonPowerOfTwo;
+    mgbool SupportsTextureFilterAnisotropic;
+    mgbool SupportsDepth24;
+    mgbool SupportsPackedDepthStencil;
+    mgbool SupportsDepthNonLinear;
+    mgbool SupportsTextureMaxLevel;
+    mgbool SupportsDxt1;
+    mgbool SupportsS3tc;
+    mgbool SupportsSRgb;
+    mgbool SupportsDepthClamp;
+    mgbool SupportsTextureArrays;
+    mgbool SupportsVertexTextures;
+    mgbool SupportsFloatTextures;
+    mgbool SupportsHalfFloatTextures;
+    mgbool SupportsNormalized;
+    mgbool SupportsInstancing;
+    mgbool SupportsBaseIndexInstancing;
+    mgbool SupportsSeparateBlendStates;
 };
 
 struct Vector4
@@ -120,6 +140,11 @@ struct MGG_DepthStencilState_Info
     MGStencilOperation stencilDepthBufferFail;
     MGStencilOperation stencilFail;
     MGStencilOperation stencilPass;
+    mgbool twoSidedStencilMode;
+    MGCompareFunction counterClockwiseStencilFunction;
+    MGStencilOperation counterClockwiseStencilDepthBufferFail;
+    MGStencilOperation counterClockwiseStencilFail;
+    MGStencilOperation counterClockwiseStencilPass;
 };
 
 struct MGG_RasterizerState_Info
@@ -157,6 +182,17 @@ struct MGG_InputElement
     mguint InstanceDataStepRate;
 };
 
+struct MGM_SongInfo
+{
+    mgulong duration;
+};
+
+struct MGM_SongEvent
+{
+    MGSongEventType type;
+    mgulong generation;
+};
+
 struct MGM_AudioDecoderInfo
 {
     mgint samplerate;
@@ -190,6 +226,8 @@ struct MGP_MouseButtonEvent
 {
     void* Window;
     MGMouseButton Button;
+    mgint X;
+    mgint Y;
 };
 
 struct MGP_MouseWheelEvent
@@ -246,4 +284,3 @@ struct MGP_ControllerCaps
     mgbool HasRightVibrationMotor;
     mgbool HasVoiceSupport;
 };
-

@@ -25,6 +25,8 @@ IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #endregion
 
+#pragma warning disable
+
 using System;
 
 namespace Microsoft.Xna.Framework.Content.Pipeline.Utilities.LZ4

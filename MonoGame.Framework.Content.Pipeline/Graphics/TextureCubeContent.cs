@@ -2,7 +2,6 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
-using System;
 using Microsoft.Xna.Framework.Graphics;
 
 namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
@@ -15,8 +14,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
         /// <summary>
         /// Creates a new TextureCubeContent object.
         /// </summary>
-        public TextureCubeContent() :
-            base(new MipmapChainCollection(6, true))
+        public TextureCubeContent() : base(new MipmapChainCollection(6, true))
         {
         }
 
@@ -24,9 +22,6 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
         /// <remarks>
         /// Validate is not implemented for this texture content type.
         /// </remarks>
-        public override void Validate(GraphicsProfile? targetProf)
-        {
-            throw new NotImplementedException();
-        }
+        public override void Validate(GraphicsProfile? targetProf) => throw new NotImplementedException();
     }
 }

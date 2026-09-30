@@ -1,7 +1,7 @@
 <Project>
   <ItemGroup Condition="$(DefineConstants.Contains('NO_AUDIO')) != 'true'">
-    <PackageReference Version="4.0.1" Include="SharpDX.MediaFoundation" />
-    <PackageReference Version="4.0.1" Include="SharpDX.XAudio2" />
+    <PackageReference Version="4.2.0" Include="SharpDX.MediaFoundation" />
+    <PackageReference Version="4.2.0" Include="SharpDX.XAudio2" />
 	
     <Compile Include="Platform\Audio\DynamicSoundEffectInstance.XAudio.cs" />
     <Compile Include="Platform\Audio\Microphone.Default.cs" />

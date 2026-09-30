@@ -12,9 +12,9 @@
 #include "Heaps.h"
 
 #if defined(_GAMING_XBOX_SCARLETT)
-#include "GenerateMips_Scarlett.h"
+#include "GenerateMips_xs.h"
 #elif defined(_GAMING_XBOX)
-#include "GenerateMips_XboxOne.h"
+#include "GenerateMips_xb.h"
 #else
 #include "GenerateMips_Desktop.h"
 #endif
@@ -57,9 +57,12 @@ CommandContext::CommandContext(DeviceResources* deviceResources) : m_deviceRes(d
     }
 }
 
-CommandContext::~CommandContext() {
-    for (size_t i = 0; i < MAX_BACK_BUFFER_COUNT; ++i) {
-        for (auto t : m_tempTextures[i]) {
+CommandContext::~CommandContext()
+{
+    for (size_t i = 0; i < MAX_BACK_BUFFER_COUNT; ++i)
+    {
+        for (auto t : m_tempTextures[i])
+        {
             t->FreeDescriptors(m_deviceRes);
             delete t;
         }
@@ -67,9 +70,8 @@ CommandContext::~CommandContext() {
     }
 }
 
-void CommandContext::Reset(unsigned int currentFrame) {
-    m_backBufferIndex = currentFrame;
-
+void CommandContext::Reset()
+{
     for (auto t : m_tempTextures[m_backBufferIndex]) {
         t->FreeDescriptors(m_deviceRes);
         delete t;
@@ -87,10 +89,17 @@ void CommandContext::Reset(unsigned int currentFrame) {
     };
     cmdList->SetDescriptorHeaps(_countof(descriptorHeaps), descriptorHeaps);
 
-    m_currentRT.clear();
-    m_currentDepthStencil = nullptr;
-
     m_cbOffset = 0;
+}
+
+void CommandContext::Reset(unsigned int currentFrame) {
+    m_backBufferIndex = currentFrame;
+
+    Reset();
+
+    m_currentRT.clear();
+    m_currentRTV.clear();
+    m_currentDepthStencil = nullptr;
 }
 
 uint64_t CommandContext::Close() {
@@ -100,61 +109,75 @@ uint64_t CommandContext::Close() {
     return fence;
 }
 
-void CommandContext::SetRenderTarget(void* colorTargets, size_t numColorTargets, Texture* depthTarget) {
+void CommandContext::SetRenderTarget(Texture** colorTargets, int32_t* slices, size_t numColorTargets, Texture* depthTarget)
+{
     // Only allow SetRenderTarget between Prepare and Present
     // This check should be replaced by an assert but Monogame's GraphicsDevice::Initialize() call ApplyRenderTargets(null)
     // This is here to avoid adding a platform specific define in the managed code and avoid crashing
-    if (!cmdList) return;
+    if (!cmdList)
+        return;
+
+    std::vector<D3D12_RESOURCE_BARRIER> batch;
 
     for (auto t : m_currentRT)
-        t->TransitionBatched(D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
-    m_currentRT.clear();
+        t->TransitionBatched(batch, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
 
-    if (m_currentDepthStencil != depthTarget) {
+    m_currentRT.clear();
+    m_currentRTV.clear();
+    
+    if (m_currentDepthStencil != depthTarget)
+    {
         if (m_currentDepthStencil)
-            m_currentDepthStencil->TransitionBatched(D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
+            m_currentDepthStencil->TransitionBatched(batch, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
         if (depthTarget)
-            depthTarget->TransitionBatched(D3D12_RESOURCE_STATE_DEPTH_WRITE);
+            depthTarget->TransitionBatched(batch, D3D12_RESOURCE_STATE_DEPTH_WRITE);
     }
 
-    if (colorTargets != nullptr) {
-        D3D12_CPU_DESCRIPTOR_HANDLE* rtvs = new D3D12_CPU_DESCRIPTOR_HANDLE[numColorTargets];
-
-        for (auto i = 0; i < numColorTargets; i++) {
-            Texture* rt = ((Texture**)colorTargets)[i];
-            rtvs[i] = rt->GetRTV();
+    if (colorTargets != nullptr)
+    {
+        for (auto i = 0; i < numColorTargets; i++)
+        {
+            Texture* rt = colorTargets[i];
+            m_currentRTV.push_back(rt->GetRTV(slices[i]));
             m_currentRT.push_back(rt);
 
-            rt->TransitionBatched(D3D12_RESOURCE_STATE_RENDER_TARGET);
+            rt->TransitionBatched(batch, D3D12_RESOURCE_STATE_RENDER_TARGET);
         }
-        Texture::SendTransitionBatch(cmdList);
+        Texture::SendTransitionBatch(batch, cmdList);
 
         if (depthTarget)
-            SetRenderTargets(numColorTargets, rtvs, depthTarget->GetDSV());
+            SetRenderTargets(numColorTargets, m_currentRTV.data(), depthTarget->GetDSV());
         else
-            SetRenderTargets(numColorTargets, rtvs);
-
-        delete[] rtvs;
+            SetRenderTargets(numColorTargets, m_currentRTV.data());
     }
-    else {
-        Texture::SendTransitionBatch(cmdList);
+    else
+    {
         Texture* displayTarget = m_deviceRes->GetMainTarget();
+        if (displayTarget->IsRenderTarget())
+            displayTarget->TransitionBatched(batch,D3D12_RESOURCE_STATE_RENDER_TARGET);
+
+        Texture::SendTransitionBatch(batch, cmdList);
+
         m_currentRT.push_back(displayTarget);
+        m_currentRTV.push_back(displayTarget->GetRTV(0));
         if (depthTarget)
-            SetRenderTarget(displayTarget->GetRTV(), depthTarget->GetDSV());
+            SetRenderTarget(m_currentRTV[0], depthTarget->GetDSV());
         else
-            SetRenderTarget(displayTarget->GetRTV());
+            SetRenderTarget(m_currentRTV[0]);
     }
     m_currentDepthStencil = depthTarget;
 }
 
 void CommandContext::ResolveResource(Texture* source, Texture* dest) {
     CommandList* cmdResolve = cmd;
-    if (!cmd) cmdResolve = m_deviceRes->BeginCommandList(); // we might want to Resolve outside of Draw (to read the back buffer for example), so we create a blocking command list for that purpose
+    if (!cmd)
+        cmdResolve = m_deviceRes->BeginCommandList(); // we might want to Resolve outside of Draw (to read the back buffer for example), so we create a blocking command list for that purpose
 
-    source->TransitionBatched(D3D12_RESOURCE_STATE_RESOLVE_SOURCE);
-    dest->TransitionBatched(D3D12_RESOURCE_STATE_RESOLVE_DEST);
-    Texture::SendTransitionBatch(cmdResolve->Get());
+    std::vector<D3D12_RESOURCE_BARRIER> batch;
+
+    source->TransitionBatched(batch, D3D12_RESOURCE_STATE_RESOLVE_SOURCE);
+    dest->TransitionBatched(batch, D3D12_RESOURCE_STATE_RESOLVE_DEST);
+    Texture::SendTransitionBatch(batch, cmdResolve->Get());
 
     DXGI_FORMAT resolveFormat = dest->GetFormat();
     if (resolveFormat == DXGI_FORMAT_D24_UNORM_S8_UINT) resolveFormat = DXGI_FORMAT_R24_UNORM_X8_TYPELESS;
@@ -163,9 +186,15 @@ void CommandContext::ResolveResource(Texture* source, Texture* dest) {
     if (!cmd) cmdResolve->Close(true);
 }
 
-void CommandContext::GenerateMipmap(Texture* source) {
+void CommandContext::GenerateMipmap(Texture* source)
+{
     CommandList* cmdResolve = cmd;
-    if (!cmd) cmdResolve = m_deviceRes->BeginCommandList(); // we might want to generate mipmap outside of Draw, so we create a blocking command list for that purpose
+    if (!cmd)
+    {
+        // We might want to generate mipmap outside of Draw,
+        // so we create a blocking command list for that purpose
+        cmdResolve = m_deviceRes->BeginCommandList();
+    }
     auto cmdList = cmdResolve->Get();
 
     auto mipLevels = source->GetMipLevels();
@@ -176,31 +205,36 @@ void CommandContext::GenerateMipmap(Texture* source) {
     staging->AllowUAV();
     staging->Create(m_deviceRes);
 
+    std::vector<D3D12_RESOURCE_BARRIER> batch;
+
     // Copy the texture to the staging resource
-    source->Transition(cmdList, D3D12_RESOURCE_STATE_COPY_SOURCE);
+    source->Transition(batch, cmdList, D3D12_RESOURCE_STATE_COPY_SOURCE);
     const CD3DX12_TEXTURE_COPY_LOCATION src(source->Get(), 0);
     const CD3DX12_TEXTURE_COPY_LOCATION dst(staging->Get(), 0);
     cmdList->CopyTextureRegion(&dst, 0, 0, 0, &src, nullptr);
 
-    staging->TransitionBatched(D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE);
+    staging->TransitionBatched(batch, D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE);
     for (uint32_t mip = 1; mip < mipLevels; ++mip)
-        staging->TransitionBatched(D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE, D3D12_RESOURCE_STATE_UNORDERED_ACCESS, mip);
-    Texture::SendTransitionBatch(cmdList);
+        staging->TransitionBatched(batch, D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE, D3D12_RESOURCE_STATE_UNORDERED_ACCESS, mip);
+    Texture::SendTransitionBatch(batch, cmdList);
 
-    m_deviceRes->GetGraphicsHeaps()->CopySRVUAVToShader(staging->GetSRV(), 0);
+    Graphics::Heaps* heaps = m_deviceRes->GetGraphicsHeaps();
+
+    heaps->CopySRVUAVToShader(staging->GetSRV(), 0);
     for (uint16_t mip = 1; mip < mipLevels; ++mip)
-        m_deviceRes->GetGraphicsHeaps()->CopySRVUAVToShader(staging->GetUAV(mip), mip);
+        heaps->CopySRVUAVToShader(staging->GetUAV(mip), mip);
 
     cmdList->SetComputeRootSignature(m_generateMipRootSig.Get());
     cmdList->SetPipelineState(m_generatePipelinePSO.Get());
-    ID3D12DescriptorHeap* descriptorHeaps[] = { m_deviceRes->GetGraphicsHeaps()->GetSRVShaderHeap() };
+    ID3D12DescriptorHeap* descriptorHeaps[] = { heaps->GetSRVShaderHeap() };
     cmdList->SetDescriptorHeaps(_countof(descriptorHeaps), descriptorHeaps);
 
     // Compute the mip
-    uint32_t mipWidth = static_cast<uint32_t>(source->GetWidth());
+    uint32_t mipWidth = source->GetWidth();
     uint32_t mipHeight = source->GetHeight();
-    cmdList->SetComputeRootDescriptorTable(1, m_deviceRes->GetGraphicsHeaps()->GetGpuHandleAtSlot(0));
-    for (uint32_t mip = 1; mip < mipLevels; ++mip) {
+    cmdList->SetComputeRootDescriptorTable(1, heaps->GetGpuHandleAtSlot(0));
+    for (uint32_t mip = 1; mip < mipLevels; ++mip)
+    {
         mipWidth = std::max<uint32_t>(1, mipWidth >> 1);
         mipHeight = std::max<uint32_t>(1, mipHeight >> 1);
 
@@ -209,36 +243,43 @@ void CommandContext::GenerateMipmap(Texture* source) {
         constants.SrcMipIndex = mip - 1;
         constants.InvOutTexelSize = XMFLOAT2(1 / float(mipWidth), 1 / float(mipHeight));
         cmdList->SetComputeRoot32BitConstants(0, static_cast<uint32_t>(sizeof(MipGenerationConstantData) / sizeof(uint32_t)), &constants, 0);
-        cmdList->SetComputeRootDescriptorTable(2, m_deviceRes->GetGraphicsHeaps()->GetGpuHandleAtSlot(mip));
+        cmdList->SetComputeRootDescriptorTable(2, heaps->GetGpuHandleAtSlot(mip));
 
         cmdList->Dispatch((mipWidth + 8 - 1) / 8, (mipHeight + 8 - 1) / 8, 1);
 
-        staging->TransitionBatched(D3D12_RESOURCE_STATE_UNORDERED_ACCESS, D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE, mip);
-        Texture::s_batchedBarriers.push_back(CD3DX12_RESOURCE_BARRIER::UAV(staging->Get()));
-        Texture::SendTransitionBatch(cmdList);
+        staging->TransitionBatched(batch, D3D12_RESOURCE_STATE_UNORDERED_ACCESS, D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE, mip);
+        batch.push_back(CD3DX12_RESOURCE_BARRIER::UAV(staging->Get()));
+        Texture::SendTransitionBatch(batch, cmdList);
     }
-    m_deviceRes->GetGraphicsHeaps()->ApplySRVsToShader();
+    heaps->ApplySRVsToShader();
 
     // Copy back the content of the staging resource to the texture
-    staging->TransitionBatched(D3D12_RESOURCE_STATE_COPY_SOURCE);
-    source->TransitionBatched(D3D12_RESOURCE_STATE_COPY_DEST);
-    Texture::SendTransitionBatch(cmdList);
+    staging->TransitionBatched(batch, D3D12_RESOURCE_STATE_COPY_SOURCE);
+    source->TransitionBatched(batch, D3D12_RESOURCE_STATE_COPY_DEST);
+    Texture::SendTransitionBatch(batch, cmdList);
     cmdList->CopyResource(source->Get(), staging->Get());
 
     // We leave the resource in the pixel shader resource state as it is the most likely to be used
-    source->TransitionBatched(D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
+    source->TransitionBatched(batch, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
 
-    if (cmd) {
+    if (cmd)
+    {
         // If we are in the main context we reset the descriptor heaps for normal rendering
         ID3D12DescriptorHeap* descriptorHeaps[] = {
             m_heaps->GetSRVShaderHeap(),
             m_heaps->GetSamplerShaderHeap()
         };
         cmdList->SetDescriptorHeaps(_countof(descriptorHeaps), descriptorHeaps);
-        m_tempTextures[m_backBufferIndex].push_back(staging); // and keep the temp texture around for deferred deletion
+
+        // Keep the temp texture around for deferred deletion.
+        m_tempTextures[m_backBufferIndex].push_back(staging);
+
+        m_deviceRes->WaitForGpu();
     }
-    else {
-        cmdResolve->Close(true); // otherwise wait for the completion
+    else
+    {
+        // Wait for the completion.
+        cmdResolve->Close(true);
         staging->FreeDescriptors(m_deviceRes);
         delete staging;
     }
@@ -260,8 +301,8 @@ void CommandContext::Clear(MGClearOptions options, float r, float g, float b, fl
 
     if (clearTarget) {
         float color[] = { r, g, b, a };
-        for (auto t : m_currentRT)
-            cmdList->ClearRenderTargetView(t->GetRTV(), color, 0, nullptr);
+        for (auto rtv : m_currentRTV)
+            cmdList->ClearRenderTargetView(rtv, color, 0, nullptr);
     }
 }
 
@@ -318,6 +359,12 @@ void CommandContext::CreateDefaultRootSignature() {
     m_deviceRes->GetD3DDevice()->CreateRootSignature(
         0, pSerializedRootSig->GetBufferPointer(), pSerializedRootSig->GetBufferSize(),
         IID_GRAPHICS_PPV_ARGS(m_rootSig.ReleaseAndGetAddressOf()));
+
+    // Release the blobs.
+    if (pSerializedRootSig)
+        pSerializedRootSig->Release();
+    if (pErrorBlob)
+        pErrorBlob->Release();
 }
 
 void CommandContext::CreateGenerateMipPipelineResources() {

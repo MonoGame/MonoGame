@@ -17,21 +17,30 @@ public sealed class DownloadBinariesTask : AsyncFrostingTask<BuildContext>
 
     public override async Task RunAsync(BuildContext context)
     {
-        foreach (PlatformFamily platform in Enum.GetValues(typeof(PlatformFamily)))
+        // Download managed framework/binaries/pipeline artifacts
+        // Windows: only x64 runner (managed code is arch-independent, single upload)
+        // Linux: both x64 and arm64 runners produce managed artifacts
+        // macOS: universal binary, no arch suffix
+        string[] managedVariants = ["windows-x64", "linux-x64", "linux-arm64"];
+        foreach (var variant in managedVariants)
         {
-            string platformStr = platform switch
-            {
-                PlatformFamily.Windows => "windows",
-                PlatformFamily.OSX => "macos",
-                _ => "linux"
-            };
-            await DownloadArtifactAsync(context, $"mgframework-{platformStr}.{context.Version}", $"Artifacts/MonoGame.Framework/");
-            await DownloadArtifactAsync(context, $"mgbinaries-{platformStr}.{context.Version}", $"{binariesPackagingFolder}MonoGame.Framework/");
-            await DownloadArtifactAsync(context, $"mgpipeline-{platformStr}.{context.Version}", $"{binariesPackagingFolder}MonoGame.Framework/MonoGame.Framework.Content.Pipeline/");
+            await DownloadArtifactAsync(context, $"mgframework-{variant}.{context.Version}", $"Artifacts/MonoGame.Framework/");
+            await DownloadArtifactAsync(context, $"mgbinaries-{variant}.{context.Version}", $"{binariesPackagingFolder}MonoGame.Framework/");
+            await DownloadArtifactAsync(context, $"mgpipeline-{variant}.{context.Version}", $"{binariesPackagingFolder}MonoGame.Framework/MonoGame.Framework.Content.Pipeline/");
         }
+        // macOS (no arch suffix)
+        await DownloadArtifactAsync(context, $"mgframework-macos.{context.Version}", $"Artifacts/MonoGame.Framework/");
+        await DownloadArtifactAsync(context, $"mgbinaries-macos.{context.Version}", $"{binariesPackagingFolder}MonoGame.Framework/");
+        await DownloadArtifactAsync(context, $"mgpipeline-macos.{context.Version}", $"{binariesPackagingFolder}MonoGame.Framework/MonoGame.Framework.Content.Pipeline/");
 
-        // Manually download native Windows binaries, once Linux/Mac are available, they will move the the loop above.
-        await DownloadArtifactAsync(context, $"mgnative-windows.{context.Version}", $"{binariesPackagingFolder}MonoGame.Framework/");
+        // Download native runtime binaries for all platform/arch combinations
+        await DownloadArtifactAsync(context, $"mgnative-windows-dx-x64.{context.Version}", $"{binariesPackagingFolder}MonoGame.Framework/");
+        await DownloadArtifactAsync(context, $"mgnative-windows-dx-arm64.{context.Version}", $"{binariesPackagingFolder}MonoGame.Framework/");
+        await DownloadArtifactAsync(context, $"mgnative-windows-vk-x64.{context.Version}", $"{binariesPackagingFolder}MonoGame.Framework/");
+        await DownloadArtifactAsync(context, $"mgnative-windows-vk-arm64.{context.Version}", $"{binariesPackagingFolder}MonoGame.Framework/");
+        await DownloadArtifactAsync(context, $"mgnative-linux-x64.{context.Version}", $"{binariesPackagingFolder}MonoGame.Framework/");
+        await DownloadArtifactAsync(context, $"mgnative-linux-arm64.{context.Version}", $"{binariesPackagingFolder}MonoGame.Framework/");
+        await DownloadArtifactAsync(context, $"mgnative-macos.{context.Version}", $"{binariesPackagingFolder}MonoGame.Framework/");
 
         context.MoveDirectory(context.GetOutputPath($"{binariesPackagingFolder}/MonoGame.Framework/MonoGame.Framework.Content.Pipeline/"), context.GetOutputPath($"{binariesPackagingFolder}MonoGame.Framework.Content.Pipeline/"));
 

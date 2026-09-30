@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,12 +8,10 @@ using MonoGame.Tests.Framework.Components;
 
 namespace MonoGame.Tests.Framework
 {
+    [RunOnUiTestFixture]
     public static class GameComponentTest
     {
         [Test]
-#if DESKTOPGL
-        [Ignore("This crashes inside SDL on Mac!")]
-#endif
         public static void InitializeOrderTest()
         {
             var game = new TestGameBase();
@@ -62,7 +60,5 @@ namespace MonoGame.Tests.Framework
             Assert.That(postBaseInitialize.InitOrder == -1);
             Assert.That(postBaseInitialize2.InitOrder == -1);
         }
-
-
     }
 }

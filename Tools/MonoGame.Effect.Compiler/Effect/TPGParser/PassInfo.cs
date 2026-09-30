@@ -2,6 +2,8 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
+#pragma warning disable
+
 using System;
 using System.Text.RegularExpressions;
 using Microsoft.Xna.Framework.Graphics;

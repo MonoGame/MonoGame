@@ -16,8 +16,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
         /// Creates an instance of NodeContentCollection.
         /// </summary>
         /// <param name="parent">Parent object of the child objects returned in the collection.</param>
-        internal NodeContentCollection(NodeContent parent)
-            : base(parent)
+        internal NodeContentCollection(NodeContent parent) : base(parent)
         {
         }
 
@@ -26,19 +25,13 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
         /// </summary>
         /// <param name="child">The child of the parent being retrieved.</param>
         /// <returns>The parent of the child object.</returns>
-        protected override NodeContent GetParent(NodeContent child)
-        {
-            return child.Parent;
-        }
+        protected override NodeContent? GetParent(NodeContent child) => child.Parent;
 
         /// <summary>
         /// Modifies the value of the parent object of the specified child object.
         /// </summary>
         /// <param name="child">The child of the parent being modified.</param>
         /// <param name="parent">The new value for the parent object.</param>
-        protected override void SetParent(NodeContent child, NodeContent parent)
-        {
-            child.Parent = parent;
-        }
+        protected override void SetParent(NodeContent child, NodeContent? parent) => child.Parent = parent;
     }
 }

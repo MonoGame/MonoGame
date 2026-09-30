@@ -5,9 +5,11 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Globalization;
 using System.IO;
 using System.Text;
 using System.Text.RegularExpressions;
+using CppNet;
 
 namespace MonoGame.Effect.Compiler
 {
@@ -38,7 +40,7 @@ namespace MonoGame.Effect.Compiler
 
             sourceFiles.Add((sourceFilepath, nativeSourceFilepath));
 
-            var sourceDirectory = Path.GetDirectoryName(sourceFilepath);
+            var sourceDirectory = Path.GetDirectoryName(sourceFilepath) ?? "";
             sourceFiles.Add((sourceDirectory, ConvertToNative(sourceDirectory)));
 
             // Validate the input file exits.
@@ -132,10 +134,10 @@ namespace MonoGame.Effect.Compiler
                         for (int i = 0; i < data.Length; i++)
                         {
                             if (i % 12 == 0)
-                                code.Append($"{Environment.NewLine}\t");
+                                code.Append(CultureInfo.InvariantCulture, $"{Environment.NewLine}\t");
 
                             code.Append("0x");
-                            code.Append(data[i].ToString("x2"));
+                            code.Append(data[i].ToString("x2", CultureInfo.InvariantCulture));
                             code.Append(", ");
                         }
 
@@ -146,7 +148,7 @@ namespace MonoGame.Effect.Compiler
                         symbol = symbol.Substring(0, symbol.Length - 2);
                         symbol = symbol.Replace('.', '_');
 
-                        var guard = $"{symbol.ToUpper()}_H";
+                        var guard = $"{symbol.ToUpper(CultureInfo.InvariantCulture)}_H";
 
                         // Write the header.
                         using (var text = new StreamWriter(stream))
@@ -217,7 +219,7 @@ namespace MonoGame.Effect.Compiler
 
             var result = $"({groups[1]}," + (groups[2].Success && groups[3].Value != "0" ? groups[3] : "1");
             if (groups[4].Success)
-                result += $",{groups[1]},{int.Parse(groups[5].ValueSpan) + 1}";
+                result += $",{groups[1]},{int.Parse(groups[5].ValueSpan, CultureInfo.InvariantCulture) + 1}";
             result += ")";
 
             return result;
@@ -227,12 +229,12 @@ namespace MonoGame.Effect.Compiler
         {
             public void WriteWarning(string file, int line, int column, string message)
             {
-                Console.Error.WriteLine("{0}({1},{2}): warning PREPROCESS01: {3}", ConvertToNative(file), line, column, ConvertMessage(message));
+                Console.Error.WriteLine($"{ConvertToNative(file)}({line},{column}): warning PREPROCESS01: {ConvertMessage(message)}");
             }
 
             public void WriteError(string file, int line, int column, string message)
             {
-                throw new Exception(string.Format("{0}({1},{2}): error PREPROCESS01: {3}", ConvertToNative(file), line, column, ConvertMessage(message)));
+                throw new Exception($"{ConvertToNative(file)}({line},{column}): error PREPROCESS01: {ConvertMessage(message)}");
             }
         }
     }

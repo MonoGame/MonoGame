@@ -78,10 +78,12 @@ Heaps::Heaps(ID3D12Device* device, int backBufferCount) {
     for (UINT n = 0; n < backBufferCount; n++)
         m_srvShaderHeap[n] = std::make_unique<ShaderVisibleDescHeap>(device, D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, 1 << 16);
     for (UINT n = 0; n < backBufferCount; n++)
-        m_samplerShaderHeap[n] = std::make_unique<ShaderVisibleDescHeap>(device, D3D12_DESCRIPTOR_HEAP_TYPE_SAMPLER, 1024);
+        m_samplerShaderHeap[n] = std::make_unique<ShaderVisibleDescHeap>(device, D3D12_DESCRIPTOR_HEAP_TYPE_SAMPLER, 2048);
 
     D3D12_QUERY_HEAP_DESC queryHeapDesc = { D3D12_QUERY_HEAP_TYPE_OCCLUSION, 1024 };
     ThrowIfFailed(m_device->CreateQueryHeap(&queryHeapDesc, IID_GRAPHICS_PPV_ARGS(m_queryHeap.ReleaseAndGetAddressOf())));
+    for (uint32_t h=0; h < 1024; h++)
+        m_freeQuery.push(h);
 }
 
 Heaps::~Heaps() {}
@@ -136,4 +138,23 @@ D3D12_CPU_DESCRIPTOR_HANDLE Heaps::CreateDSVHandle(ID3D12Resource* res, D3D12_DE
     D3D12_CPU_DESCRIPTOR_HANDLE cpuHandle = m_dsvHeap->AllocCpuHandle();
     m_device->CreateDepthStencilView(res, &dsvDesc, cpuHandle);
     return cpuHandle;
+}
+
+int32_t Heaps::GetQueryIndex()
+{
+    if (m_freeQuery.empty())
+    {
+        // TODO: How do we alert this happened?
+        return -1;
+    }
+
+    uint32_t index = m_freeQuery.front();
+    m_freeQuery.pop();
+    return index;
+}
+
+void Heaps::FreeQueryIndex(int32_t index)
+{
+    // No one better free a query twice!
+    m_freeQuery.push(index);
 }

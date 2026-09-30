@@ -6,12 +6,14 @@
 
 #include "GraphicsEnums.h"
 
+struct MGG_SamplerState_Info;
+
 namespace Graphics {
 class DeviceResources;
 
 class Sampler {
 public:
-    Sampler(DeviceResources* device, MGTextureFilter filter, MGTextureAddressMode u, MGTextureAddressMode v, MGTextureAddressMode w);
+    Sampler(DeviceResources* device, MGG_SamplerState_Info* info);
     ~Sampler();
 
     struct InternalData {

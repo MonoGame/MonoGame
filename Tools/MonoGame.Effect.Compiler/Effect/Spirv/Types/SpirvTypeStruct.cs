@@ -2,71 +2,85 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
+using System.Globalization;
 
-namespace MonoGame.Effect.Compiler.Effect.Spirv
+namespace MonoGame.Effect.Compiler.Effect.Spirv;
+
+internal class SpirvTypeStructMember
 {
-    internal class SpirvTypeStructMember
-    {
-        public int Index { get; init; }
-        public SpirvTypeBase Type { get; init; }
-        public string Name { get; init; }
-        public uint? Offset { get; private set; }
-        public uint? MatrixStride { get; private set; }
+    public required int Index { get; init; }
+    public required SpirvTypeBase Type { get; init; }
+    public required string Name { get; init; }
+    public uint Offset { get; private set; }
+    public uint MatrixStride { get; private set; }
 
-        internal void ApplyDecoration(SpirvDecoration decoration)
+    internal void ApplyDecoration(SpirvDecoration decoration)
+    {
+        switch (decoration.Type)
         {
-            switch (decoration.Type)
-            {
-                case SpirvDecorationType.Offset:
-                    Offset = uint.Parse(decoration.Args[0]);
-                    break;
-                case SpirvDecorationType.MatrixStride:
-                    MatrixStride = uint.Parse(decoration.Args[0]);
-                    break;
-            }
+            case SpirvDecorationType.Offset:
+                Offset = uint.Parse(decoration.Args[0], CultureInfo.InvariantCulture);
+                break;
+            case SpirvDecorationType.MatrixStride:
+                MatrixStride = uint.Parse(decoration.Args[0], CultureInfo.InvariantCulture);
+                break;
         }
     }
+}
 
-    // https://registry.khronos.org/SPIR-V/specs/unified1/SPIRV.html#OpTypeStruct
-    internal class SpirvTypeStruct : SpirvTypeBase
+// https://registry.khronos.org/SPIR-V/specs/unified1/SPIRV.html#OpTypeStruct
+internal class SpirvTypeStruct : SpirvTypeBase
+{
+    public override SpirvType Type => SpirvType.Struct;
+
+    public required List<SpirvTypeStructMember> Members { get; init; }
+
+    public static SpirvTypeStruct? Parse(string[] parts, SpirvReflectionInfo.SpirvParseContext context)
     {
-        public override SpirvType Type => SpirvType.Struct;
-        public List<SpirvTypeStructMember> Members { get; private set; }
+        if (parts.Length < 1)
+            return null;
 
-        protected override void ParseArgs(string[] args, SpirvReflectionInfo.SpirvParseContext context)
+        var id = parts[0];
+        context.Names.TryGetValue(id, out var name);
+
+        var members = new List<SpirvTypeStructMember>();
+
+        if (!context.MemberNames.TryGetValue(id, out var memberNames))
         {
-            Members = [];
-
-            if (!context.MemberNames.TryGetValue(Id, out Dictionary<int, string> memberNames))
-            {
-                memberNames = [];
-            }
-
-            for (int memberIdx = 0; memberIdx < args.Length; memberIdx++)
-            {
-                string memberTypeId = args[memberIdx];
-
-                if (!context.Types.TryGetValue(memberTypeId, out SpirvTypeBase type))
-                {
-                    Debug.WriteLine($"OpTypeStruct {Name ?? Id} uses a member of unencountered type: {memberTypeId}");
-                }
-
-                if (!memberNames.TryGetValue(memberIdx, out string memberName))
-                {
-                    Debug.WriteLine($"Could not find name for member {memberIdx} in SpirvTypeStruct {Name ?? Id}");
-                    memberName = memberTypeId;
-                }
-
-                Members.Add(new SpirvTypeStructMember
-                {
-                    Index = memberIdx,
-                    Type = type,
-                    Name = memberName
-                });
-            }
+            memberNames = [];
         }
+
+        for (int partsIdx = 3; partsIdx < parts.Length; partsIdx++)
+        {
+            var memberTypeId = parts[partsIdx];
+            var memberIdx = partsIdx - 3;
+
+            if (!context.Types.TryGetValue(memberTypeId, out var type))
+            {
+                Debug.WriteLine($"OpTypeStruct {name ?? id} uses a member of unencountered type: {memberTypeId}");
+                return null;
+            }
+
+            if (!memberNames.TryGetValue(memberIdx, out var memberName))
+            {
+                Debug.WriteLine($"Could not find name for member {memberIdx} in SpirvTypeStruct {name ?? id}");
+                memberName = memberTypeId;
+            }
+
+            members.Add(new SpirvTypeStructMember
+            {
+                Index = memberIdx,
+                Type = type,
+                Name = memberName
+            });
+        }
+
+        return new SpirvTypeStruct
+        {
+            Id = id,
+            Name = name,
+            Members = members
+        };
     }
 }

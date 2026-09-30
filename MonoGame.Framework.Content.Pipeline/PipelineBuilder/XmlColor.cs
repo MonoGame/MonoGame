@@ -25,26 +25,17 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
         /// Creates a new instance of XmlColor with provided color
         /// </summary>
         /// <param name="c">Color to be stored</param>
-        public XmlColor(Color c)
-        {
-            _color = c;
-        }
+        public XmlColor(Color c) => _color = c;
 
         /// <summary>
         /// Implicit XmlColor -> Color conversion
         /// </summary>
-        public static implicit operator Color(XmlColor x)
-        {
-            return x._color;
-        }
+        public static implicit operator Color(XmlColor x) => x._color;
 
         /// <summary>
         /// Implicit Color -> XmlColor conversion
         /// </summary>
-        public static implicit operator XmlColor(Color c)
-        {
-            return new XmlColor(c);
-        }
+        public static implicit operator XmlColor(Color c) => new(c);
 
         /// <summary>
         /// Returns a string representation of the supplied <see cref="Color"/>.
@@ -62,7 +53,7 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
         {
             if (color.IsNamedColor)
                 return color.Name;
-            return string.Format("{0}, {1}, {2}, {3}", color.R, color.G, color.B, color.A);
+            return $"{color.R}, {color.G}, {color.B}, {color.A}";
         }
 
         /// <summary>
@@ -77,12 +68,11 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
             if (!value.Contains(','))
                 return Color.FromName(value);
 
-            int r, g, b, a;
             var colors = value.Split(',');
-            int.TryParse(colors.Length > 0 ? colors[0] : string.Empty, out r);
-            int.TryParse(colors.Length > 1 ? colors[1] : string.Empty, out g);
-            int.TryParse(colors.Length > 2 ? colors[2] : string.Empty, out b);
-            int.TryParse(colors.Length > 3 ? colors[3] : string.Empty, out a);
+            _ = int.TryParse(colors.Length > 0 ? colors[0] : string.Empty, out int r);
+            _ = int.TryParse(colors.Length > 1 ? colors[1] : string.Empty, out int g);
+            _ = int.TryParse(colors.Length > 2 ? colors[2] : string.Empty, out int b);
+            _ = int.TryParse(colors.Length > 3 ? colors[3] : string.Empty, out int a);
 
             return Color.FromArgb(a, r, g, b);
         }
@@ -93,8 +83,8 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
         [XmlText]
         public string Default
         {
-            get { return FromColor(_color); }
-            set { _color = ToColor(value); }
+            get => FromColor(_color);
+            set => _color = ToColor(value);
         }
     }
 }

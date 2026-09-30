@@ -1,4 +1,4 @@
-﻿using System.Diagnostics;
+using System.Diagnostics;
 using System.Threading;
 using Microsoft.Xna.Framework.Graphics;
 using SharpDX;
@@ -20,20 +20,15 @@ namespace Microsoft.Xna.Framework.Media
 
         private static Callback _callback;
 
-        private class Callback : IAsyncCallback
+        private class Callback : CallbackBase, IAsyncCallback
         {
-            private VideoPlayer _player;
+            private readonly VideoPlayer _player;
 
             public Callback(VideoPlayer player)
             {
                 _player = player;
             }
 
-            public void Dispose()
-            {
-            }
-
-            public IDisposable Shadow { get; set; }
             public void Invoke(AsyncResult asyncResultRef)
             {
                 var ev = _session.EndGetEvent(asyncResultRef);

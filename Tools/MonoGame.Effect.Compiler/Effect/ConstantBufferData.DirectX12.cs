@@ -4,6 +4,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 
@@ -23,7 +24,7 @@ namespace MonoGame.Effect
                 var arrayEndIndex = name.LastIndexOf(']');
                 if (arrayEndIndex == -1 || arrayEndIndex <= arrayStartIndex)
                 {
-                    throw new Exception(String.Format("Invalid array parameter syntax, {0}", name));
+                    throw new Exception($"Invalid array parameter syntax, {name}");
                 }
 
                 var arrayExpression = name.Substring(arrayStartIndex, arrayEndIndex - arrayStartIndex + 1);
@@ -43,7 +44,7 @@ namespace MonoGame.Effect
                         case ']':
                             {
                                 if (currentDim.Length != 0)
-                                    dims.Add(uint.Parse(currentDim.ToString()));
+                                    dims.Add(uint.Parse(currentDim.ToString(), CultureInfo.InvariantCulture));
                                 currentDim.Clear();
                                 break;
                             }
@@ -51,7 +52,7 @@ namespace MonoGame.Effect
                         default:
                             {
                                 if (!Char.IsNumber(arrayExpression[i]))
-                                    throw new Exception(String.Format("Invalid array parameter syntax, {0}", name));
+                                    throw new Exception($"Invalid array parameter syntax, {name}");
                                 currentDim.Append(arrayExpression[i]);
                                 break;
                             }
@@ -59,7 +60,7 @@ namespace MonoGame.Effect
                 }
 
                 if (currentDim.Length != 0)
-                    throw new Exception(String.Format("Invalid array parameter syntax, {0}", name));
+                    throw new Exception($"Invalid array parameter syntax, {name}");
 
                 // Remove array specifier from identifier.
                 name = name.Remove(arrayStartIndex).Trim();
@@ -213,15 +214,12 @@ namespace MonoGame.Effect
                 param.class_ = EffectObject.D3DXPARAMETER_CLASS.SCALAR;
 
             param.member_count = 0;
-            param.element_count = (dims.Count() != 0) ? dims[0] : 0;
+            param.element_count = (dims.Count != 0) ? dims[0] : 0;
 
             if (param.member_count > 0)
             {
                 param.member_handles = new EffectObject.d3dx_parameter[param.member_count];
-                for (var i = 0; i < param.member_count; i++)
-                {
-                    throw new NotImplementedException("Struct parameter members currently not supported.");
-                }
+                throw new NotImplementedException("Struct parameter members currently not supported.");
             }
             else if (param.element_count > 0)
             {

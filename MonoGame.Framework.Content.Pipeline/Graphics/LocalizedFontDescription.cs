@@ -1,17 +1,6 @@
-﻿#region File Description
-//-----------------------------------------------------------------------------
-// LocalizedFontDescription.cs
-//
-// Microsoft XNA Community Game Platform
-// Copyright (C) Microsoft Corporation. All rights reserved.
-//-----------------------------------------------------------------------------
-#endregion
-
-#region Using Statements
-using System.Collections.Generic;
-using Microsoft.Xna.Framework.Content;
-using Microsoft.Xna.Framework.Content.Pipeline.Graphics;
-#endregion
+﻿// MonoGame - Copyright (C) MonoGame Foundation, Inc
+// This file is subject to the terms and conditions defined in
+// file 'LICENSE.txt', which is part of this source code package.
 
 namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 {
@@ -29,11 +18,9 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
         /// <summary>
         /// Constructor.
         /// </summary>
-        public LocalizedFontDescription()
-            : base("Arial", 14, 0)
+        public LocalizedFontDescription() : base("Arial", 14, 0)
         {
         }
-
 
         /// <summary>
         /// Add a new property to our font description, which will allow us to
@@ -43,11 +30,6 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
         /// can be imported as well.
         /// </summary>
         [ContentSerializer(Optional = true, CollectionItemName = "Resx")]
-        public List<string> ResourceFiles
-        {
-            get { return resourceFiles; }
-        }
-
-        List<string> resourceFiles = new List<string>();
+        public List<string> ResourceFiles { get; } = [];
     }
 }

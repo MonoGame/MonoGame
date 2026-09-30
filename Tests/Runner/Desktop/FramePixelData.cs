@@ -26,18 +26,25 @@ namespace MonoGame.Tests
 
         public unsafe void Save(string filename, string attachmentDescription = null)
         {
-			using (var stream = new FileStream(filename, FileMode.Create))
+            var fullPath = Path.GetFullPath(filename);
+
+            using (var stream = new FileStream(fullPath, FileMode.Create))
 			{
 				fixed (Color* ptr = &Data[0])
 				{
 					var writer = new ImageWriter();
-					writer.WriteBmp(ptr, Width, Height, StbImageWriteSharp.ColorComponents.RedGreenBlueAlpha, stream);
-				}
+                    if (filename.EndsWith(".png", StringComparison.OrdinalIgnoreCase))
+					    writer.WritePng(ptr, Width, Height, StbImageWriteSharp.ColorComponents.RedGreenBlueAlpha, stream);
+                    else if (filename.EndsWith(".bmp", StringComparison.OrdinalIgnoreCase))
+                        writer.WriteBmp(ptr, Width, Height, StbImageWriteSharp.ColorComponents.RedGreenBlueAlpha, stream);
+                    else
+                        throw new NotImplementedException();
+                }
 			}
 
             if (attachmentDescription != null)
             {
-                NUnit.Framework.TestContext.AddTestAttachment(filename, attachmentDescription);
+                NUnit.Framework.TestContext.AddTestAttachment(fullPath, attachmentDescription);
             }
         }
     }

@@ -1,11 +1,6 @@
-#region File Description
-//-----------------------------------------------------------------------------
-// NormalMappingModelProcessor.cs
-//
-// This file is subject to the terms and conditions defined in file 'LICENSE.txt', which is part of this source code package.
-// MonoGame - Copyright (C) The MonoGame Team
-//-----------------------------------------------------------------------------
-#endregion
+// MonoGame - Copyright (C) MonoGame Foundation, Inc
+// This file is subject to the terms and conditions defined in
+// file 'LICENSE.txt', which is part of this source code package.
 
 #region Using Statements
 using Microsoft.Xna.Framework.Content.Pipeline;

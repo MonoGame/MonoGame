@@ -50,8 +50,9 @@ namespace Microsoft.Xna.Framework.Content
             'S', // Nintendo Switch
             'b', // WebAssembly and Bridge.NET
             'V', // DesktopVK
-            'G', // Windows GDK
+            'G', // Windows DirectX 12
             's', // Xbox Series
+            'U', // Nintendo Switch 2
 
             // NOTE: There are additional identifiers for consoles that
             // are not defined in this repository.  Be sure to ask the
@@ -145,7 +146,7 @@ namespace Microsoft.Xna.Framework.Content
 		}
 
         /// <summary>
-        /// Initializes a new instance of the ContentMangaer.
+        /// Initializes a new instance of the ContentManager.
         /// </summary>
         /// <remarks>
         ///     <para>
@@ -170,7 +171,7 @@ namespace Microsoft.Xna.Framework.Content
             AddContentManager(this);
 		}
 
-        /// <inheritdoc cref="ContentManager.ContentManager(IServiceProvider)"/>
+        /// <inheritdoc cref="ContentManager(IServiceProvider)"/>
         /// <param name="serviceProvider"/>
         /// <param name="rootDirectory">The root directory the ContentManager will search for content in.</param>
         public ContentManager(IServiceProvider serviceProvider, string rootDirectory)
@@ -699,9 +700,17 @@ namespace Microsoft.Xna.Framework.Content
                 throw new ObjectDisposedException("ContentManager");
             }
 
+            // On some platforms, name and slash direction matter.
+            // We store the asset by a /-separating key rather than how the
+            // path to the file was passed to us to avoid
+            // loading "content/asset1.xnb" and "content\\ASSET1.xnb" as if they were two
+            // different files. This matches stock XNA behavior.
+            // The dictionary will ignore case differences
+            var key = assetName.Replace('\\', '/');
+
             //Check if the asset exists
             object asset;
-            if (loadedAssets.TryGetValue(assetName, out asset))
+            if (loadedAssets.TryGetValue(key, out asset))
             {
                 //Check if it's disposable and remove it from the disposable list if so
                 var disposable = asset as IDisposable;
@@ -711,7 +720,7 @@ namespace Microsoft.Xna.Framework.Content
                     disposableAssets.Remove(disposable);
                 }
 
-                loadedAssets.Remove(assetName);
+                loadedAssets.Remove(key);
             }
         }
 

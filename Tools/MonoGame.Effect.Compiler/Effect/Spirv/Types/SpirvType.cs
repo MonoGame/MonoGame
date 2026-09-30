@@ -3,7 +3,6 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using MonoGame.Effect.Compiler.Effect.Spirv.Types;
-using System.Collections.Generic;
 
 namespace MonoGame.Effect.Compiler.Effect.Spirv
 {
@@ -30,85 +29,37 @@ namespace MonoGame.Effect.Compiler.Effect.Spirv
     internal abstract class SpirvTypeBase
     {
         public abstract SpirvType Type { get; }
-        public string Id { get; private set; }
-        public string Name { get; private set; }
 
-        public override string ToString()
-        {
-            return $"{Type} {Name ?? Id}";
-        }
+        public required string Id { get; init; }
+
+        public required string? Name { get; init; }
+
+        public override string ToString() => $"{Type} {Name ?? Id}";
 
         public virtual void ApplyDecoration(SpirvDecoration spirvDecoration)
         {
-        }
-
-        private void Parse(string[] parts, SpirvReflectionInfo.SpirvParseContext context)
-        {
-            Id = parts[0];
-
-            if (context.Names.TryGetValue(Id, out string name))
-            {
-                Name = name;
-            }
-
-            ParseArgs(parts[3..], context);
         }
 
         protected virtual void ParseArgs(string[] args, SpirvReflectionInfo.SpirvParseContext context)
         {
         }
 
-        internal static SpirvTypeBase ParseType(string[] parts, SpirvReflectionInfo.SpirvParseContext context)
-        {
-            SpirvTypeBase type = null;
-
-            switch (parts[2])
+        internal static SpirvTypeBase? ParseType(string[] parts, SpirvReflectionInfo.SpirvParseContext context) => parts[2] switch
             {
-                case "OpTypeVoid":
-                    type = new SpirvTypeVoid();
-                    break;
-                case "OpTypeBool":
-                    type = new SpirvTypeBool();
-                    break;
-                case "OpTypeInt":
-                    type = new SpirvTypeInt();
-                    break;
-                case "OpTypeFloat":
-                    type = new SpirvTypeFloat();
-                    break;
-                case "OpTypeVector":
-                    type = new SpirvTypeVector();
-                    break;
-                case "OpTypeMatrix":
-                    type = new SpirvTypeMatrix();
-                    break;
-                case "OpTypeImage":
-                    type = new SpirvTypeImage();
-                    break;
-                case "OpTypeSampler":
-                    type = new SpirvTypeSampler();
-                    break;
-                case "OpTypeSampledImage":
-                    type = new SpirvTypeSampledImage();
-                    break;
-                case "OpTypeArray":
-                    type = new SpirvTypeArray();
-                    break;
-                case "OpTypeRuntimeArray":
-                    type = new SpirvTypeRuntimeArray();
-                    break;
-                case "OpTypeStruct":
-                    type = new SpirvTypeStruct();
-                    break;
-                case "OpTypePointer":
-                    type = new SpirvTypePointer();
-                    break;
-                default:
-                    return null;
-            }
-
-            type.Parse(parts, context);
-            return type;
-        }
+                "OpTypeVoid" => SpirvTypeVoid.Parse(parts, context),
+                "OpTypeBool" => SpirvTypeBool.Parse(parts, context),
+                "OpTypeInt" => SpirvTypeInt.Parse(parts, context),
+                "OpTypeFloat" => SpirvTypeFloat.Parse(parts, context),
+                "OpTypeVector" => SpirvTypeVector.Parse(parts, context),
+                "OpTypeMatrix" => SpirvTypeMatrix.Parse(parts, context),
+                "OpTypeImage" => SpirvTypeImage.Parse(parts, context),
+                "OpTypeSampler" => SpirvTypeSampler.Parse(parts, context),
+                "OpTypeSampledImage" => SpirvTypeSampledImage.Parse(parts, context),
+                "OpTypeArray" => SpirvTypeArray.Parse(parts, context),
+                "OpTypeRuntimeArray" => SpirvTypeRuntimeArray.Parse(parts, context),
+                "OpTypeStruct" => SpirvTypeStruct.Parse(parts, context),
+                "OpTypePointer" => SpirvTypePointer.Parse(parts, context),
+                _ => null
+            };
     }
 }

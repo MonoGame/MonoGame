@@ -35,6 +35,8 @@
 
 #endregion
 
+#pragma warning disable
+
 #region LZ4 port
 
 /*

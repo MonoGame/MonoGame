@@ -142,7 +142,20 @@ namespace MonoGame.Tests {
 				throw new ServiceNotFoundException (typeof (T));
 			return service;
 		}
-	}
+
+        public static bool AreEqual(this Color color1, Color color2, int tolerance)
+        {
+            var rDiff = Math.Abs(color1.R - color2.R);
+            var gDiff = Math.Abs(color1.G - color2.G);
+            var bDiff = Math.Abs(color1.B - color2.B);
+            var aDiff = Math.Abs(color1.A - color2.A);
+
+            return  rDiff <= tolerance &&
+                    gDiff <= tolerance &&
+                    bDiff <= tolerance &&
+                    aDiff <= tolerance;
+        }
+    }
 
 	class ServiceNotFoundException : Exception {
 		public ServiceNotFoundException (Type serviceType)

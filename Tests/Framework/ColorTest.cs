@@ -274,7 +274,7 @@ namespace MonoGame.Tests.Framework
             float s = 100;
             float l = 50;
 
-            Color color2 = color1.FromHSL(h, s, l);
+            Color color2 = Color.FromHSL(h, s, l);
 
             Assert.AreEqual(color1, color2);
         }
@@ -287,10 +287,63 @@ namespace MonoGame.Tests.Framework
             float s = 100;
             float v = 100;
 
-            Color color2 = color1.FromHSV(h, s, v);
+            Color color2 = Color.FromHSV(h, s, v);
 
             Assert.AreEqual(color1, color2);
-            
+
+        }
+
+        [Test]
+        public void FromHSV_HueWrapsAround_Above360()
+        {
+            // Hue values should wrap around the color wheel.
+            // 370 degrees should equal 10 degrees
+            // https://github.com/MonoGame/MonoGame/issues/9131
+            var color1 = Color.FromHSV(10.0f, 1.0f, 1.0f);
+            var color2 = Color.FromHSV(370.0f, 1.0f, 1.0f);
+
+            Assert.AreEqual(color1, color2);
+        }
+
+        [Test]
+        public void FromHSV_SmoothProgressionWithinSegment()
+        {
+            // Test that hue progresses smoothly within a 60-degree segment
+            // This catches the bug where f = (int)(h/60) - i always equals 0
+            // https://github.com/MonoGame/MonoGame/issues/9131
+
+            // In the red segment (0-60), colors should transition smoothly
+            // At hue 0: R should be max, G should be min
+            var color0 = Color.FromHSV(0.0f, 1.0f, 1.0f);
+            Assert.AreEqual(255, color0.R);
+            Assert.AreEqual(0, color0.G);
+
+            // At hue 30: R should still be max, but G should be increasing (around 128)
+            var color30 = Color.FromHSV(30.0f, 1.0f, 1.0f);
+            Assert.AreEqual(255, color30.R);
+            Assert.AreEqual(128, color30.G, 1);
+
+            // At hue 60: R should still be max, G should be max
+            var color60 = Color.FromHSV(60.0f, 1.0f, 1.0f);
+            Assert.AreEqual(255, color60.R);
+            Assert.AreEqual(255, color60.G);
+
+            // At hue 0: R should be max, G should be min
+            Assert.AreEqual(255, color0.R);
+            Assert.AreEqual(0, color0.G);
+
+            // Verify smooth progression: G should be monotonically increasing
+            var color10 = Color.FromHSV(10f, 1f, 1f);
+            var color20 = Color.FromHSV(20f, 1f, 1f);
+            var color40 = Color.FromHSV(40f, 1f, 1f);
+            var color50 = Color.FromHSV(50f, 1f, 1f);
+
+            Assert.IsTrue(color0.G < color10.G);
+            Assert.IsTrue(color10.G < color20.G);
+            Assert.IsTrue(color20.G < color30.G);
+            Assert.IsTrue(color30.G < color40.G);
+            Assert.IsTrue(color40.G < color50.G);
+            Assert.IsTrue(color50.G < color60.G);
         }
     }
 }

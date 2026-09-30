@@ -43,8 +43,8 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
         /// </summary>
         public float? Alpha
         {
-            get { return GetValueTypeProperty<float>(AlphaKey); }
-            set { SetProperty(AlphaKey, value); }
+            get => GetValueTypeProperty<float>(AlphaKey);
+            set => SetProperty(AlphaKey, value);
         }
 
         /// <summary>
@@ -52,8 +52,8 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
         /// </summary>
         public Vector3? DiffuseColor
         {
-            get { return GetValueTypeProperty<Vector3>(DiffuseColorKey); }
-            set { SetProperty(DiffuseColorKey, value); }
+            get => GetValueTypeProperty<Vector3>(DiffuseColorKey);
+            set => SetProperty(DiffuseColorKey, value);
         }
 
         /// <summary>
@@ -61,8 +61,8 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
         /// </summary>
         public Vector3? EmissiveColor
         {
-            get { return GetValueTypeProperty<Vector3>(EmissiveColorKey); }
-            set { SetProperty(EmissiveColorKey, value); }
+            get => GetValueTypeProperty<Vector3>(EmissiveColorKey);
+            set => SetProperty(EmissiveColorKey, value);
         }
 
         /// <summary>
@@ -70,8 +70,8 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
         /// </summary>
         public Vector3? SpecularColor
         {
-            get { return GetValueTypeProperty<Vector3>(SpecularColorKey); }
-            set { SetProperty(SpecularColorKey, value); }
+            get => GetValueTypeProperty<Vector3>(SpecularColorKey);
+            set => SetProperty(SpecularColorKey, value);
         }
 
         /// <summary>
@@ -79,17 +79,17 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
         /// </summary>
         public float? SpecularPower
         {
-            get { return GetValueTypeProperty<float>(SpecularPowerKey); }
-            set { SetProperty(SpecularPowerKey, value); }
+            get => GetValueTypeProperty<float>(SpecularPowerKey);
+            set => SetProperty(SpecularPowerKey, value);
         }
 
         /// <summary>
         /// Gets or sets the texture property.
         /// </summary>
-        public ExternalReference<TextureContent> Texture
+        public ExternalReference<TextureContent>? Texture
         {
-            get { return GetTexture(TextureKey); }
-            set { SetTexture(TextureKey, value); }
+            get => GetTexture(TextureKey);
+            set => SetTexture(TextureKey, value);
         }
 
         /// <summary>
@@ -97,8 +97,8 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
         /// </summary>
         public bool? VertexColorEnabled
         {
-            get { return GetValueTypeProperty<bool>(VertexColorEnabledKey); }
-            set { SetProperty(VertexColorEnabledKey, value); }
+            get => GetValueTypeProperty<bool>(VertexColorEnabledKey);
+            set => SetProperty(VertexColorEnabledKey, value);
         }
     }
 }

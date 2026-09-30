@@ -9,7 +9,7 @@ namespace MonoGame.OpenGL
     /// <summary>
     /// Represents an interface for retrieving window information.
     /// </summary>
-    public interface IWindowInfo
+    internal interface IWindowInfo
     {
         /// <summary>
         /// Gets the handle of the window.

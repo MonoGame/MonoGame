@@ -1,4 +1,4 @@
-// MonoGame - Copyright (C) The MonoGame Team
+// MonoGame - Copyright (C) MonoGame Foundation, Inc
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
@@ -18,7 +18,7 @@ public partial class IndexBuffer
     {
         var indexBytes = indexElementSize == IndexElementSize.SixteenBits ? 2 : 4;
 
-        Handle = MGG.Buffer_Create(GraphicsDevice.Handle, BufferType.Index, indexCount * indexBytes);
+        Handle = MGG.Buffer_Create(GraphicsDevice.Handle, BufferType.Index, _isDynamic, indexCount * indexBytes);
     }
 
     private unsafe void PlatformGraphicsDeviceResetting()

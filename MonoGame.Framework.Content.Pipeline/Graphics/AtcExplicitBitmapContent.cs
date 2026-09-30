@@ -23,8 +23,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
         /// </summary>
         /// <param name="width">The width in pixels of the bitmap.</param>
         /// <param name="height">The height in pixels of the bitmap.</param>
-        public AtcExplicitBitmapContent(int width, int height)
-            : base(width, height)
+        public AtcExplicitBitmapContent(int width, int height) : base(width, height)
         {
         }
 

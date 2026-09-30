@@ -187,6 +187,26 @@ namespace Microsoft.Xna.Framework.Graphics
         /// Adaptive scalable texture compression ; 4x4 matrix using rgba channel interpretation
         /// </summary>
         Astc4X4Rgba = 96,
+        /// <summary>
+        /// Adaptive scalable texture compression ; 5x5 matrix using rgba channel interpretation
+        /// </summary>
+        Astc5X5Rgba = 97,
+        /// <summary>
+        /// Adaptive scalable texture compression ; 6x6 matrix using rgba channel interpretation
+        /// </summary>
+        Astc6X6Rgba = 98,
+        /// <summary>
+        /// Adaptive scalable texture compression ; 8x8 matrix using rgba channel interpretation
+        /// </summary>
+        Astc8X8Rgba = 99,
+        /// <summary>
+        /// Adaptive scalable texture compression ; 10x10 matrix using rgba channel interpretation
+        /// </summary>
+        Astc10X10Rgba = 100,
+        /// <summary>
+        /// Adaptive scalable texture compression ; 12x12 matrix using rgba channel interpretation
+        /// </summary>
+        Astc12X12Rgba = 101,
 
         #endregion
     }

@@ -2,8 +2,6 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
-using System;
-
 namespace MonoGame.Effect.Compiler.Effect.Spirv
 {
     // https://registry.khronos.org/SPIR-V/specs/unified1/SPIRV.html#Decoration
@@ -61,21 +59,22 @@ namespace MonoGame.Effect.Compiler.Effect.Spirv
 
     internal class SpirvDecoration
     {
-        public SpirvDecorationType Type { get; private set; }
-        public string[] Args { get; private set; }
+        public required SpirvDecorationType Type { get; init; }
+        public required string[] Args { get; init; }
 
-        internal static SpirvDecoration ParseDecorator(string[] definition)
+        internal static SpirvDecoration? ParseDecorator(string[] definition)
         {
-            if (!Enum.TryParse(definition[0], out SpirvDecorationType decorationType))
-            {
+            if (definition.Length < 2)
                 return null;
-            }
 
-            SpirvDecoration decoration = new();
-            decoration.Type = decorationType;
-            decoration.Args = definition[1..];
+            if (!Enum.TryParse(definition[0], out SpirvDecorationType decorationType))
+                return null;
 
-            return decoration;
+            return new SpirvDecoration
+            {
+                Type = decorationType,
+                Args = definition[1..]
+            };
         }
     }
 }

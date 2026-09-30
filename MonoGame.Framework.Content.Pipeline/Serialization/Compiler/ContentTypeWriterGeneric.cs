@@ -14,8 +14,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
         /// <summary>
         /// Initializes a new instance of the ContentTypeWriter class.
         /// </summary>
-        protected ContentTypeWriter()
-            : base(typeof(T))
+        protected ContentTypeWriter() : base(typeof(T))
         {
         }
 
@@ -24,16 +23,13 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
         /// </summary>
         /// <param name="output">The content writer serializing the value.</param>
         /// <param name="value">The value to write.</param>
-        protected internal override void Write(ContentWriter output, object value)
-        {
-            Write(output, (T)value);
-        }
+        protected internal override void Write(ContentWriter output, object value) => Write(output, (T)value);
 
         /// <summary>
         /// Compiles a strongly typed object into binary format.
         /// </summary>
         /// <param name="output">The content writer serializing the value.</param>
         /// <param name="value">The value to write.</param>
-        protected internal abstract void Write(ContentWriter output, T value);
+        protected abstract void Write(ContentWriter output, T value);
     }
 }

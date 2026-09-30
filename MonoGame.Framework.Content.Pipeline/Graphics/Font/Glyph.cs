@@ -21,46 +21,29 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
     }
 
     // Represents a single character within a font.
-    internal class Glyph
+    internal class Glyph(char character, GlyphData data)
     {
-        // Constructor.
-        public Glyph(char character, GlyphData data)
-        {
-            Character = character;
-            Data = data;
-        }
-
         // Unicode codepoint.
-        public char Character;
+        public char Character { get;  } = character;
 
         // Image and layout data
-        public GlyphData Data;
+        public GlyphData Data { get; } = data;
     }
 
-    internal class GlyphData
+    internal class GlyphData(uint glyphIndex, BitmapContent bitmap, Rectangle? subrect = null)
     {
-        // Constructor.
-        public GlyphData(uint glyphIndex, BitmapContent bitmap, Rectangle? subrect = null)
-        {
-            GlyphIndex = glyphIndex;
-            Bitmap = bitmap;
-            Subrect = subrect.GetValueOrDefault(new Rectangle(0, 0, bitmap.Width, bitmap.Height));
-            Width = bitmap.Width;
-            Height = bitmap.Height;
-        }
-
         // Font-specific index of glyph
-        public uint GlyphIndex;
+        public uint GlyphIndex = glyphIndex;
 
         // Glyph image data (may only use a portion of a larger bitmap).
-        public BitmapContent Bitmap;
-        public Rectangle Subrect;
+        public BitmapContent Bitmap = bitmap;
+        public Rectangle SubRect  = subrect.GetValueOrDefault(new Rectangle(0, 0, bitmap.Width, bitmap.Height));
 
         // Layout information.
         public float XOffset;
         public float YOffset;
-        public int Width;
-        public int Height;
+        public int Width = bitmap.Width;
+        public int Height = bitmap.Height;
 
         public float XAdvance;
 

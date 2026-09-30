@@ -1,4 +1,4 @@
-// MIT License - Copyright (C) The Mono.Xna Team
+﻿// MIT License - Copyright (C) The Mono.Xna Team
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
@@ -1867,8 +1867,18 @@ namespace Microsoft.Xna.Framework
             sb.Append(B);
             sb.Append(" A:");
             sb.Append(A);
-            sb.Append("}");
+            sb.Append('}');
             return sb.ToString();
+        }
+
+        /// <summary>
+        /// Translate a non-premultipled alpha <see cref="Color"/> to a <see cref="Color"/> that contains premultiplied alpha.
+        /// </summary>
+        /// <param name="color">A <see cref="Color"/> representing a non-premultiplied color.</param>
+        /// <returns>A <see cref="Color"/> which contains premultiplied alpha data.</returns>
+        public static Color FromNonPremultiplied(Color color)
+        {
+            return FromNonPremultiplied(color.R, color.G, color.B, color.A);
         }
 
         /// <summary>
@@ -1884,10 +1894,23 @@ namespace Microsoft.Xna.Framework
         /// <summary>
         /// Translate a non-premultipled alpha <see cref="Color"/> to a <see cref="Color"/> that contains premultiplied alpha.
         /// </summary>
-        /// <param name="r">Red component value.</param>
-        /// <param name="g">Green component value.</param>
-        /// <param name="b">Blue component value.</param>
-        /// <param name="a">Alpha component value.</param>
+        /// <param name="r">Red component value from 0.0f to 1.0f.</param>
+        /// <param name="g">Green component value from 0.0f to 1.0f.</param>
+        /// <param name="b">Blue component value from 0.0f to 1.0f.</param>
+        /// <param name="a">Alpha component value from 0.0f to 1.0f.</param>
+        /// <returns>A <see cref="Color"/> which contains premultiplied alpha data.</returns>
+        public static Color FromNonPremultiplied(float r, float g, float b, float a)
+        {
+            return new Color(r * a, g * a, b * a, a);
+        }
+
+        /// <summary>
+        /// Translate a non-premultipled alpha <see cref="Color"/> to a <see cref="Color"/> that contains premultiplied alpha.
+        /// </summary>
+        /// <param name="r">Red component value from 0 to 255.</param>
+        /// <param name="g">Green component value from 0 to 255.</param>
+        /// <param name="b">Blue component value from 0 to 255.</param>
+        /// <param name="a">Alpha component value from 0 to 255.</param>
         /// <returns>A <see cref="Color"/> which contains premultiplied alpha data.</returns>
         public static Color FromNonPremultiplied(int r, int g, int b, int a)
         {
@@ -2037,7 +2060,7 @@ namespace Microsoft.Xna.Framework
         /// <param name="x"></param>
         /// <param name="rh"></param>
         /// <returns>the hue for R, G or B</returns>
-        private float HtoRGB(float c, float x, float rh)
+        private static float HtoRGB(float c, float x, float rh)
         {
             if ((6 * rh) < 1)
                 return (c + (x - c) * 6 * rh);
@@ -2056,7 +2079,7 @@ namespace Microsoft.Xna.Framework
         /// <param name="s">Saturation component value, from 0.0f to 100.0f</param>
         /// <param name="l">Luminosity (brightness) component value, from 0.0f to 100.0f</param>
         /// <returns><see cref="Color"/> with the HSL values</returns>
-        public Color FromHSL(float h, float s, float l)
+        public static Color FromHSL(float h, float s, float l)
         {
             s /= 100;
             l /= 100;
@@ -2095,7 +2118,7 @@ namespace Microsoft.Xna.Framework
         /// <param name="s">Saturation component value, ranging from 0.0f to 1.0f</param>
         /// <param name="v">Value component value, ranging from 0.0f to 1.0f</param>
         /// <returns><see cref="Color"/> with the HSV values</returns>
-        public Color FromHSV(float h, float s, float v)
+        public static Color FromHSV(float h, float s, float v)
         {
             //defining values for easier colour conversion at end
             float r = 0f;
@@ -2103,14 +2126,14 @@ namespace Microsoft.Xna.Framework
             float b = 0f;
 
             h %= 360.0f;
-            s /= 100;
-            v /= 100;
+            s = MathHelper.Clamp(s, 0.0f, 1.0f);
+            v = MathHelper.Clamp(v, 0.0f, 1.0f);
 
             if (s == 0)
                 r = g = b = v;
             //working out which segment of colour wheel the hue is.
             int i = (int)(h / 60.0f);
-            int f = (int)(h / 60.0f) - i;
+            float f = (h % 60.0f) / 60.0f;
             float p = v * (1.0f - s);
             float q = v * (1.0f - s * f);
             float t = v * (1.0f - s * (1.0f - f));

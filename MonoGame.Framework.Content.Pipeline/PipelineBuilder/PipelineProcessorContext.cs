@@ -2,8 +2,6 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
-using System;
-using System.IO;
 using System.Reflection;
 using Microsoft.Xna.Framework.Content.Pipeline;
 using Microsoft.Xna.Framework.Graphics;
@@ -11,58 +9,49 @@ using Microsoft.Xna.Framework.Graphics;
 namespace MonoGame.Framework.Content.Pipeline.Builder
 {
     /// <inheritdoc/>
-    public class PipelineProcessorContext : ContentProcessorContext
+    /// <summary>
+    /// Creates a new pipeline processor context.
+    /// </summary>
+    /// <param name="manager">Pipeline manager.</param>
+    /// <param name="pipelineEvent">Pipeline event.</param>
+    public class PipelineProcessorContext(PipelineManager manager, PipelineBuildEvent pipelineEvent) : ContentProcessorContext
     {
-        private readonly PipelineManager _manager;
+        private readonly PipelineManager _manager = manager;
 
-        private readonly PipelineBuildEvent _pipelineEvent;
-
-        /// <summary>
-        /// Creates a new pipeline processor context.
-        /// </summary>
-        /// <param name="manager">Pipeline manager.</param>
-        /// <param name="pipelineEvent">Pipeline event.</param>
-        public PipelineProcessorContext(PipelineManager manager, PipelineBuildEvent pipelineEvent)
-        {
-            _manager = manager;
-            _pipelineEvent = pipelineEvent;
-        }
+        private readonly PipelineBuildEvent _pipelineEvent = pipelineEvent;
 
         /// <inheritdoc/>
-        public override TargetPlatform TargetPlatform { get { return _manager.Platform; } }
+        public override TargetPlatform TargetPlatform => _manager.Platform;
 
         /// <inheritdoc/>
-        public override GraphicsProfile TargetProfile { get { return _manager.Profile; } }
+        public override GraphicsProfile TargetProfile => _manager.Profile;
 
         /// <inheritdoc/>
-        public override string BuildConfiguration { get { return _manager.Config; } }
+        public override string BuildConfiguration => _manager.Config;
 
         /// <inheritdoc/>
-        public override string IntermediateDirectory { get { return _manager.IntermediateDirectory; } }
+        public override string IntermediateDirectory => _manager.IntermediateDirectory;
 
         /// <inheritdoc/>
-        public override string OutputDirectory { get { return _manager.OutputDirectory; } }
+        public override string OutputDirectory => _manager.OutputDirectory;
 
         /// <inheritdoc/>
-        public override string OutputFilename { get { return _pipelineEvent.DestFile; } }
+        public override string OutputFilename => _pipelineEvent.DestFile;
 
         /// <inheritdoc/>
-        public override OpaqueDataDictionary Parameters { get { return _pipelineEvent.Parameters; } }
+        public override OpaqueDataDictionary Parameters => _pipelineEvent.Parameters;
 
         /// <inheritdoc/>
-        public override string ProjectDirectory { get { return _manager.ProjectDirectory; } }
+        public override string ProjectDirectory => _manager.ProjectDirectory;
 
         /// <inheritdoc/>
-        public override ContentBuildLogger Logger { get { return _manager.Logger; } }
+        public override ContentBuildLogger Logger => _manager.Logger;
 
         /// <inheritdoc/>
-        public override ContentIdentity SourceIdentity { get { return new ContentIdentity(_pipelineEvent.SourceFile); } }
+        public override ContentIdentity SourceIdentity => new(_pipelineEvent.SourceFile);
 
         /// <inheritdoc/>
-        public override void AddDependency(string filename)
-        {
-            _pipelineEvent.Dependencies.AddUnique(filename);
-        }
+        public override void AddDependency(string filename) => _pipelineEvent.Dependencies.AddUnique(filename);
 
         /// <inheritdoc/>
         public override void AddOutputFile(string filename)
@@ -71,20 +60,19 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
         }
 
         /// <inheritdoc/>
-        public override TOutput Convert<TInput, TOutput>(TInput input,
-                                                            string processorName,
-                                                            OpaqueDataDictionary processorParameters)
+        [Obsolete("Please pass importer and processor as instances instead of just their names.")]
+        public override TOutput Convert<TInput, TOutput>(TInput input, string processorName, OpaqueDataDictionary processorParameters)
         {
-            var processor = _manager.CreateProcessor(processorName, processorParameters);
+            var processor = _manager.CreateProcessor(processorName, processorParameters)!;
             var processContext = new PipelineProcessorContext(_manager, new PipelineBuildEvent { Parameters = processorParameters });
             using var _ = ContextScopeFactory.BeginContext(processContext);
-            var processedObject = processor.Process(input, processContext);
+            var processedObject = processor.Process(input!, processContext);
 
             // Add its dependencies and built assets to ours.
             _pipelineEvent.Dependencies.AddRangeUnique(processContext._pipelineEvent.Dependencies);
             _pipelineEvent.BuildAsset.AddRangeUnique(processContext._pipelineEvent.BuildAsset);
 
-            return (TOutput)processedObject;
+            return (TOutput)processedObject!;
         }
 
         public override TOutput Convert<TInput, TOutput>(TInput input, IContentProcessor processor)
@@ -100,27 +88,29 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
                 }
             }
 
+#pragma warning disable CS0618 // Type or member is obsolete
             return Convert<TInput, TOutput>(input, processorName, processorParameters);
+#pragma warning restore CS0618 // Type or member is obsolete
         }
 
-        public override TOutput BuildAndLoadAsset<TInput, TOutput>(ExternalReference<TInput> sourceAsset,
-                                                                    string processorName,
-                                                                    OpaqueDataDictionary processorParameters,
-                                                                    string importerName)
+        [Obsolete("Please pass importer and processor as instances instead of just their names.")]
+        public override TOutput BuildAndLoadAsset<TInput, TOutput>(ExternalReference<TInput> sourceAsset, string processorName,
+            OpaqueDataDictionary? processorParameters, string? importerName)
         {
             var sourceFilepath = PathHelper.Normalize(sourceAsset.Filename);
+            string? procName = processorName;
 
             // The processorName can be null or empty. In this case the asset should
             // be imported but not processed. This is, for example, necessary to merge
             // animation files as described here:
             // http://blogs.msdn.com/b/shawnhar/archive/2010/06/18/merging-animation-files.aspx.
             bool processAsset = !string.IsNullOrEmpty(processorName);
-            _manager.ResolveImporterAndProcessor(sourceFilepath, ref importerName, ref processorName);
+            _manager.ResolveImporterAndProcessor(sourceFilepath, ref importerName, ref procName);
 
             var buildEvent = new PipelineBuildEvent
             {
                 SourceFile = sourceFilepath,
-                Importer = importerName,
+                Importer = importerName!,
                 Processor = processAsset ? processorName : null,
                 Parameters = _manager.ValidateProcessorParameters(processorName, processorParameters),
             };
@@ -147,14 +137,14 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
                 }
             }
 
+#pragma warning disable CS0618 // Type or member is obsolete
             return BuildAndLoadAsset<TInput, TOutput>(sourceAsset, processorName, processorParameters, importerName);
+#pragma warning restore CS0618 // Type or member is obsolete
         }
 
-        public override ExternalReference<TOutput> BuildAsset<TInput, TOutput>(ExternalReference<TInput> sourceAsset,
-                                                                                string processorName,
-                                                                                OpaqueDataDictionary processorParameters,
-                                                                                string importerName,
-                                                                                string assetName)
+        [Obsolete("Please pass importer and processor as instances instead of just their names.")]
+        public override ExternalReference<TOutput> BuildAsset<TInput, TOutput>(ExternalReference<TInput> sourceAsset, string processorName,
+            OpaqueDataDictionary? processorParameters, string? importerName, string? assetName)
         {
             // Be sure we have a good absolute path to the source content
             // or it may not cache correctly and create duplicates.
@@ -186,7 +176,9 @@ namespace MonoGame.Framework.Content.Pipeline.Builder
                 }
             }
 
+#pragma warning disable CS0618 // Type or member is obsolete
             return BuildAsset<TInput, TOutput>(sourceAsset, processorName, processorParameters, importerName, assetName);
+#pragma warning restore CS0618 // Type or member is obsolete
         }
     }
 }

@@ -1,4 +1,4 @@
-// MonoGame - Copyright (C) The MonoGame Team
+// MonoGame - Copyright (C) MonoGame Foundation, Inc
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
@@ -10,6 +10,30 @@ public static partial class MediaPlayer
 {
     private static void PlatformInitialize()
     {
+    }
+
+    internal static void PlatformUpdate()
+    {
+        Song song = _queue.ActiveSong;
+        if (song != null)
+            song.Update();
+    }
+
+    internal static void PlatformOnSongFinishedPlaying(object sender, EventArgs args)
+    {
+        Song song = sender as Song;
+        if (song == null || !object.ReferenceEquals(song, _queue.ActiveSong) || State != MediaState.Playing)
+            return;
+
+        OnSongFinishedPlaying(sender, args);
+    }
+
+    internal static void PlatformOnSongFailed(Song song)
+    {
+        if (!object.ReferenceEquals(song, _queue.ActiveSong) || State == MediaState.Stopped)
+            return;
+
+        Stop();
     }
 
     private static bool PlatformGetIsMuted()
@@ -95,7 +119,7 @@ public static partial class MediaPlayer
             return;
 
         song.Volume = _isMuted ? 0.0f : _volume;
-        song.Play(startPosition, OnSongFinishedPlaying);
+        song.Play(startPosition, PlatformOnSongFinishedPlaying);
     }
 
     private static void PlatformResume()

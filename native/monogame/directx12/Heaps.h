@@ -55,7 +55,7 @@ namespace Graphics {
 
         // Query heap
         Microsoft::WRL::ComPtr<ID3D12QueryHeap> m_queryHeap;
-        size_t m_queryId = 0;
+        std::queue<int32_t> m_freeQuery;
 
         // Shader visible heaps
         std::unique_ptr<ShaderVisibleDescHeap> m_srvShaderHeap[MAX_BACK_BUFFER_COUNT];
@@ -64,6 +64,7 @@ namespace Graphics {
         std::unique_ptr<ShaderVisibleDescHeap> m_samplerShaderHeap[MAX_BACK_BUFFER_COUNT];
         size_t m_samplerShaderHeapPos = 0;
         uint32_t m_samplerSlotUsed = 0;
+
     public:
         Heaps(ID3D12Device* device, int backBufferCount);
         ~Heaps();
@@ -93,6 +94,7 @@ namespace Graphics {
         void FreeDSVHandle(D3D12_CPU_DESCRIPTOR_HANDLE handle) { m_dsvHeap->FreeCpuHandle(handle); }
 
         ID3D12QueryHeap* GetQueryHeap() { return m_queryHeap.Get(); }
-        size_t CreateQueryHandle() { return m_queryId++; }
+        int32_t GetQueryIndex();
+        void FreeQueryIndex(int32_t index);
     };
 }

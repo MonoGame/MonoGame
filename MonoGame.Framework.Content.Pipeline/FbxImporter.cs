@@ -2,7 +2,6 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
-using System;
 using Microsoft.Xna.Framework.Content.Pipeline.Graphics;
 
 namespace Microsoft.Xna.Framework.Content.Pipeline
@@ -13,15 +12,27 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
     [ContentImporter(".fbx", DisplayName = "Fbx Importer - MonoGame", DefaultProcessor = "ModelProcessor")]
     public class FbxImporter : ContentImporter<NodeContent>
     {
+        /// <summary>
+        /// If true, the custom axis up direction of the FBX model will be ignored.
+        /// <defaultValue>true</defaultValue>
+        /// </summary>
+        public bool IgnoreFbxUpDirection { get; set; } = true;
+
+        /// <summary>
+        /// Gets or Sets if the Pivots for an FBX file are preserved or not.
+        /// </summary>
+        public bool PreservePivots { get; set; } = true; 
         /// <inheritdoc/>
         public override NodeContent Import(string filename, ContentImporterContext context)
         {
-            if (filename == null)
-                throw new ArgumentNullException("filename");
-            if (context == null)
-                throw new ArgumentNullException("context");
+            ArgumentNullException.ThrowIfNull(filename);
+            ArgumentNullException.ThrowIfNull(context);
 
-            var importer = new OpenAssetImporter("FbxImporter", true);
+            var importer = new OpenAssetImporter("FbxImporter", true)
+            {
+                PreservePivots = this.PreservePivots,
+                IgnoreFbxUpDirection = this.IgnoreFbxUpDirection
+            };
             return importer.Import(filename, context);
         }
     }

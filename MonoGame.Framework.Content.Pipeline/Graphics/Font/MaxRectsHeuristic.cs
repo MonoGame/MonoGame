@@ -1,9 +1,9 @@
 ﻿/*
 This was adapted from a version I found online. Here's the original header:
- 	Based on the Public Domain MaxRectsBinPack.cpp source by Jukka Jylänki
- 	https://github.com/juj/RectangleBinPack/
- 	Ported to C# by Sven Magnus
- 	This version is also public domain - do whatever you want with it.
+    Based on the Public Domain MaxRectsBinPack.cpp source by Jukka Jylänki
+    https://github.com/juj/RectangleBinPack/
+    Ported to C# by Sven Magnus
+    This version is also public domain - do whatever you want with it.
 */
 
 namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics

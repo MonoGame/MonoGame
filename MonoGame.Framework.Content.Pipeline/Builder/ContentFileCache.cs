@@ -32,12 +32,12 @@ record ContentFileCache : IContentFileCache
 
         if (Path.IsPathRooted(dependencyPath))
         {
-            fullDependencyPath = dependencyPath;
+            fullDependencyPath = Path.GetFullPath(dependencyPath);
             relativeDependencyPath = Path.GetRelativePath(builder.Parameters.RootedSourceDirectory, dependencyPath);
         }
         else
         {
-            fullDependencyPath = Path.Combine(builder.Parameters.RootedSourceDirectory, dependencyPath);
+            fullDependencyPath = Path.GetFullPath(Path.Combine(builder.Parameters.RootedSourceDirectory, dependencyPath));
             relativeDependencyPath = dependencyPath;
         }
 
@@ -83,12 +83,12 @@ record ContentFileCache : IContentFileCache
 
         if (Path.IsPathRooted(outputPath))
         {
-            fullOutputPath = outputPath;
+            fullOutputPath = Path.GetFullPath(outputPath);
             relativeOutputPath = Path.GetRelativePath(builder.Parameters.RootedOutputDirectory, outputPath);
         }
         else
         {
-            fullOutputPath = Path.Combine(builder.Parameters.RootedOutputDirectory, outputPath);
+            fullOutputPath = Path.GetFullPath(Path.Combine(builder.Parameters.RootedOutputDirectory, outputPath));
             relativeOutputPath = outputPath;
         }
 

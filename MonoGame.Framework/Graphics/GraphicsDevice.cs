@@ -8,6 +8,7 @@ using System.Diagnostics;
 using System.Globalization;
 using MonoGame.Framework.Utilities;
 using System.Runtime.InteropServices;
+using System.Linq;
 
 
 namespace Microsoft.Xna.Framework.Graphics
@@ -154,7 +155,7 @@ namespace Microsoft.Xna.Framework.Graphics
         // Use WeakReference for the global resources list as we do not know when a resource
         // may be disposed and collected. We do not want to prevent a resource from being
         // collected by holding a strong reference to it in this list.
-        private readonly List<WeakReference> _resources = new List<WeakReference>();
+        private readonly HashSet<WeakReference> _resources = new HashSet<WeakReference>();
 
         // TODO Graphics Device events need implementing
         /// <summary>
@@ -381,27 +382,33 @@ namespace Microsoft.Xna.Framework.Graphics
             Dispose(false);
         }
 
-        internal int GetClampedMultisampleCount(int multiSampleCount)
+        internal static int NormalizeMultiSampleCount(int multiSampleCount, int maxMultiSampleCount)
         {
-            if (multiSampleCount > 1)
-            {
-                // Round down MultiSampleCount to the nearest power of two
-                // hack from http://stackoverflow.com/a/2681094
-                // Note: this will return an incorrect, but large value
-                // for very large numbers. That doesn't matter because
-                // the number will get clamped below anyway in this case.
-                var msc = multiSampleCount;
-                msc = msc | (msc >> 1);
-                msc = msc | (msc >> 2);
-                msc = msc | (msc >> 4);
-                msc -= (msc >> 1);
-                // and clamp it to what the device can handle
-                if (msc > GraphicsCapabilities.MaxMultiSampleCount)
-                    msc = GraphicsCapabilities.MaxMultiSampleCount;
+            if (multiSampleCount <= 1)
+                return 0;
 
-                return msc;
-            }
-            else return 0;
+            // Round down MultiSampleCount to the nearest power of two
+            // hack from http://stackoverflow.com/a/2681094
+            // Note: this will return an incorrect, but large value
+            // for very large numbers. That doesn't matter because
+            // the number will get clamped below anyway in this case.
+            var msc = multiSampleCount;
+            msc = msc | (msc >> 1);
+            msc = msc | (msc >> 2);
+            msc = msc | (msc >> 4);
+            msc -= (msc >> 1);
+
+            // and clamp to what the device can handle
+            if (maxMultiSampleCount > 0 && msc > maxMultiSampleCount)
+                msc = maxMultiSampleCount;
+
+            return msc;
+        }
+
+        internal int GetClampedMultisampleCount(SurfaceFormat format, int multiSampleCount)
+        {
+            int maxMultiSampleCount = PlatformGetMaxMultiSampleCount(format);
+            return NormalizeMultiSampleCount(multiSampleCount, maxMultiSampleCount);
         }
 
         internal void Initialize()
@@ -804,7 +811,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 }
 
                 // Remove references to resources that have been garbage collected.
-                _resources.RemoveAll(wr => !wr.IsAlive);
+                _resources.RemoveWhere(wr => !wr.IsAlive);
             }
         }
 
@@ -922,7 +929,16 @@ namespace Microsoft.Xna.Framework.Graphics
 			else
 			{
 				_tempRenderTargetBinding[0] = new RenderTargetBinding(renderTarget);
-				SetRenderTargets(_tempRenderTargetBinding);
+				
+                try
+                {
+				    SetRenderTargets(_tempRenderTargetBinding);
+                }
+                finally
+                {
+                    // Clear temporary strong reference.
+                    _tempRenderTargetBinding[0] = default;
+                }
 			}
 		}
 
@@ -943,7 +959,16 @@ namespace Microsoft.Xna.Framework.Graphics
             else
             {
                 _tempRenderTargetBinding[0] = new RenderTargetBinding(renderTarget, cubeMapFace);
-                SetRenderTargets(_tempRenderTargetBinding);
+                
+                try
+                {
+				    SetRenderTargets(_tempRenderTargetBinding);
+                }
+                finally
+                {
+                    // Clear temporary strong reference.
+                    _tempRenderTargetBinding[0] = default;
+                }
             }
         }
 

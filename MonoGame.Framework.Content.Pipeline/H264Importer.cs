@@ -10,18 +10,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
     [ContentImporter(".mp4", DisplayName = "H.264 Video - MonoGame", DefaultProcessor = "VideoProcessor")]
     public class H264Importer : ContentImporter<VideoContent>
     {
-        /// <summary>
-        /// Creates a new instance of H264Importer
-        /// </summary>
-        public H264Importer()
-        {
-        }
-
         /// <inheritdoc/>
-        public override VideoContent Import(string filename, ContentImporterContext context)
-        {
-            var content = new VideoContent(filename);
-            return content;
-        }
+        public override VideoContent Import(string filename, ContentImporterContext context) => new(filename);
     }
 }

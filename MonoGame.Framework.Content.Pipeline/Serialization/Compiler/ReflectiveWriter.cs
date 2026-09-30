@@ -2,53 +2,42 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
-using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
 using System.Reflection;
-using MonoGame.Framework.Utilities;
 
 namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
 {
-    class ReflectiveWriter<T> : ContentTypeWriter
+    class ReflectiveWriter<T>() : ContentTypeWriter(typeof(T))
     {
-        private PropertyInfo[] _properties;
-        private FieldInfo[] _fields;
+        private static readonly HashSet<MemberInfo> SharedResources = [];
 
-        private Type _baseType;
+        private PropertyInfo[] _properties = [];
+        private FieldInfo[] _fields = [];
+        private Type? _baseType;
+        private string _runtimeType = "";
+        private ContentCompiler _compiler = null!;
 
-        private string _runtimeType;
-        private ContentCompiler _compiler;
-        private static HashSet<MemberInfo> _sharedResources = new HashSet<MemberInfo>();
-
-        public ReflectiveWriter()
-            : base(typeof(T))
-        {
-        }
-
-        public override bool CanDeserializeIntoExistingObject
-        {
-            get { return TargetType.IsClass; }
-        }
+        public override bool CanDeserializeIntoExistingObject => TargetType.IsClass;
 
         protected override void Initialize(ContentCompiler compiler)
         {
             _compiler = compiler;
-            var type = ReflectionHelpers.GetBaseType(TargetType);                
+            var type = TargetType.BaseType;
             if (type != null && type != typeof(object) && !TargetType.IsValueType)
                 _baseType = type;
 
-            var runtimeType = TargetType.GetCustomAttributes(typeof(ContentSerializerRuntimeTypeAttribute), false).FirstOrDefault() as ContentSerializerRuntimeTypeAttribute;
-            if (runtimeType != null)
+            if (TargetType.GetCustomAttributes(typeof(ContentSerializerRuntimeTypeAttribute), false).FirstOrDefault() is ContentSerializerRuntimeTypeAttribute runtimeType)
                 _runtimeType = runtimeType.RuntimeType;
 
-            var typeVersion = TargetType.GetCustomAttributes(typeof(ContentSerializerTypeVersionAttribute), false).FirstOrDefault() as ContentSerializerTypeVersionAttribute;
-            if (typeVersion != null)
-                _typeVersion = typeVersion.TypeVersion;
+            if (TargetType.GetCustomAttributes(typeof(ContentSerializerTypeVersionAttribute), false).FirstOrDefault() is ContentSerializerTypeVersionAttribute typeVersion)
+                TypeVersion = typeVersion.TypeVersion;
 
-            _properties = TargetType.GetAllProperties().Where(IsValidProperty).ToArray();
-            _fields = TargetType.GetAllFields().Where(IsValidField).ToArray();
+            const BindingFlags flags = BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly;
+            _properties = [.. TargetType.GetProperties(flags).Where(p =>
+                p.GetGetMethod(true) != null &&
+                p.GetGetMethod(true) == p.GetGetMethod(true)?.GetBaseDefinition() &&
+                IsValidProperty(p))];
+            _fields = [.. TargetType.GetFields(flags).Where(IsValidField)];
         }
 
         /// <inheritdoc/>
@@ -74,15 +63,15 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
                 return false;
 
             // Are we explicitly asked to ignore this item?
-            if (ReflectionHelpers.GetCustomAttribute<ContentSerializerIgnoreAttribute>(property) != null)
+            if (Attribute.GetCustomAttribute(property, typeof(ContentSerializerIgnoreAttribute)) is ContentSerializerIgnoreAttribute)
                 return false;
 
-            var contentSerializerAttribute = ReflectionHelpers.GetCustomAttribute<ContentSerializerAttribute>(property);
-            if (contentSerializerAttribute == null)
+            if (Attribute.GetCustomAttribute(property, typeof(ContentSerializerAttribute)) is not ContentSerializerAttribute contentSerializerAttribute)
             {
                 // There is no ContentSerializerAttribute, so non-public
                 // properties cannot be serialized.
-                if (!ReflectionHelpers.PropertyIsPublic(property))
+                bool isPublic = property.GetGetMethod()?.IsPublic ?? false;
+                if (!isPublic)
                     return false;
 
                 // Check the type reader to see if it is safe to
@@ -95,7 +84,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
             }
             else if (contentSerializerAttribute.SharedResource)
             {
-                _sharedResources.Add(property);
+                SharedResources.Add(property);
             }
 
             return true;
@@ -104,11 +93,10 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
         private bool IsValidField(FieldInfo field)
         {
             // Are we explicitly asked to ignore this item?
-            if (ReflectionHelpers.GetCustomAttribute<ContentSerializerIgnoreAttribute>(field) != null)
+            if (Attribute.GetCustomAttribute(field, typeof(ContentSerializerIgnoreAttribute)) is ContentSerializerIgnoreAttribute)
                 return false;
 
-            var contentSerializerAttribute = ReflectionHelpers.GetCustomAttribute<ContentSerializerAttribute>(field);
-            if (contentSerializerAttribute == null)
+            if (Attribute.GetCustomAttribute(field, typeof(ContentSerializerAttribute)) is not ContentSerializerAttribute contentSerializerAttribute)
             {
                 // There is no ContentSerializerAttribute, so non-public
                 // fields cannot be deserialized.
@@ -121,7 +109,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
             }
             else if (contentSerializerAttribute.SharedResource)
             {
-                _sharedResources.Add(field);
+                SharedResources.Add(field);
             }
 
             return true;
@@ -134,7 +122,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
             Debug.Assert(field != null || property != null);
 
             Type elementType;
-            object memberObject;
+            object? memberObject;
 
             if (property != null)
             {
@@ -143,11 +131,11 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
             }
             else
             {
-                elementType = field.FieldType;
-                memberObject = field.GetValue(parent);
+                elementType = field!.FieldType;
+                memberObject = field!.GetValue(parent);
             }
 
-            if (_sharedResources.Contains(member))
+            if (SharedResources.Contains(member))
                 output.WriteSharedResource(memberObject);
             else
             {
@@ -160,19 +148,10 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
         }
 
         public override string GetRuntimeType(TargetPlatform targetPlatform)
-        {
-            if (string.IsNullOrEmpty(_runtimeType))
-                return base.GetRuntimeType(targetPlatform);
-
-            return _runtimeType;
-        }
+            => string.IsNullOrEmpty(_runtimeType) ? base.GetRuntimeType(targetPlatform) : _runtimeType;
 
         public override string GetRuntimeReader(TargetPlatform targetPlatform)
-        {
-            return "Microsoft.Xna.Framework.Content.ReflectiveReader`1[[" + 
-                        GetRuntimeType(targetPlatform) 
-                    + "]]";
-        }
+            => $"Microsoft.Xna.Framework.Content.ReflectiveReader`1[[{GetRuntimeType(targetPlatform)}]]";
 
         protected internal override void Write(ContentWriter output, object value)
         {

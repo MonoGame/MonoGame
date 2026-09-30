@@ -12,8 +12,8 @@ using System.Linq;
 namespace MonoGame.Tests.Graphics
 {
 
-    [TestFixture]
     [NonParallelizable]
+    [RunOnUiTestFixture]
     internal sealed class ModelTest : GraphicsDeviceTestFixtureBase
     {
         // model exported from default blender project.
@@ -33,7 +33,6 @@ namespace MonoGame.Tests.Graphics
         }
 
         [Test]
-        [RunOnUI]
         public void ShouldDrawSampleModel()
         {
             // model contains a bit more that only the cube, so let extract the cube
@@ -58,7 +57,6 @@ namespace MonoGame.Tests.Graphics
         }
 
         [Test]
-        [RunOnUI]
         public void MeshPartEffectReplacesOldOneOnParentModel()
         {
             // simple model used in test
@@ -75,7 +73,6 @@ namespace MonoGame.Tests.Graphics
 #if !XNA // Tests below are valid for Monogame only because of manual model creation.
 
         [Test]
-        [RunOnUI]
         public void ShouldConstructAndInitialize()
         {
             var actual = new Model(gd, new List<ModelBone>(), new List<ModelMesh>());
@@ -85,7 +82,6 @@ namespace MonoGame.Tests.Graphics
         }
 
         [Test]
-        [RunOnUI]
         public void ShouldNotConstructWhenParamsAreNotValid()
         {
             // simple empty collections to make code more readable.
@@ -99,7 +95,6 @@ namespace MonoGame.Tests.Graphics
         }
 
         [Test]
-        [RunOnUI]
         public void ShouldReadTransformationsFromBones()
         {
             var someBones = new[] { new ModelBone(), new ModelBone() }.ToList();
@@ -116,7 +111,6 @@ namespace MonoGame.Tests.Graphics
         }
 
         [Test]
-        [RunOnUI]
         public void CopyBoneTransformsFrom_Exceptions()
         {
             var someBones = new[] { new ModelBone() }.ToList();
@@ -127,7 +121,6 @@ namespace MonoGame.Tests.Graphics
         }
 
         [Test]
-        [RunOnUI]
         public void CopyBoneTransformsTo_Exceptions()
         {
             var someBones = new[] { new ModelBone() }.ToList();

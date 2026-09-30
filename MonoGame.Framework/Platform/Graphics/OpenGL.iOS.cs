@@ -31,7 +31,7 @@ namespace MonoGame.OpenGL
         }
 	}
 
-    public class GraphicsContext : IGraphicsContext
+    internal class GraphicsContext : IGraphicsContext
     {
         public GraphicsContext ()
         {

@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-
+﻿
 namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 {
     /// <summary>
@@ -10,13 +8,13 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
     {
         private readonly MeshContent _meshContent;
 
-        private MaterialContent _currentMaterial;
+        private MaterialContent? _currentMaterial;
         private OpaqueDataDictionary _currentOpaqueData;
         private bool _geometryDirty;
         private GeometryContent _currentGeometryContent;
 
         private readonly List<VertexChannel> _vertexChannels;
-        private readonly List<object> _vertexChannelData;
+        private readonly List<object?> _vertexChannelData;
 
         private bool _finishedCreation;
         private bool _finishedMesh;
@@ -34,16 +32,10 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
         /// <summary>
         /// Gets or sets the name of the current  <see cref="MeshContent"/> object being processed.
         /// </summary>
-        public string Name
+        public string? Name
         {
-            get
-            {
-                return _meshContent.Name;
-            }
-            set
-            {
-                _meshContent.Name = value;
-            }
+            get => _meshContent.Name;
+            set => _meshContent.Name = value;
         }
 
         /// <summary>
@@ -51,16 +43,17 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
         /// </summary>
         public bool SwapWindingOrder { get; set; }
 
-
         private MeshBuilder(string name)
         {
-            _meshContent = new MeshContent();
-            _vertexChannels = new List<VertexChannel>();
-            _vertexChannelData = new List<object>();
+            _meshContent = new MeshContent
+            {
+                Name = name
+            };
+            _vertexChannels = [];
+            _vertexChannelData = [];
+            _currentOpaqueData = [];
             _currentGeometryContent = new GeometryContent();
-            _currentOpaqueData = new OpaqueDataDictionary();
             _geometryDirty = true;
-            Name = name;
         }
 
         /// <summary>
@@ -77,10 +70,14 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 
             if (_geometryDirty)
             {
-                _currentGeometryContent = new GeometryContent();
-                _currentGeometryContent.Material = _currentMaterial;
+                _currentGeometryContent = new GeometryContent
+                {
+                    Material = _currentMaterial
+                };
                 foreach (var kvp in _currentOpaqueData)
+                {
                     _currentGeometryContent.OpaqueData.Add(kvp.Key, kvp.Value);
+                }
 
                 // we have to copy our vertex channels to the new geometry
                 foreach (var channel in _vertexChannels)
@@ -89,8 +86,8 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
                 }
                 _meshContent.Geometry.Add(_currentGeometryContent);
                 _geometryDirty = false;
-
             }
+
             // Add the vertex to the mesh and then add the vertex position to the indices list
             var pos = _currentGeometryContent.Vertices.Add(indexIntoVertexCollection);
 
@@ -98,10 +95,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
             for (var i = 0; i < _vertexChannels.Count; i++)
             {
                 var channel = _currentGeometryContent.Vertices.Channels[i];
-                var data = _vertexChannelData[i];
-                if (data == null)
-                    throw new InvalidOperationException(string.Format("Missing vertex channel data for channel {0}", channel.Name));
-
+                var data = _vertexChannelData[i] ?? throw new InvalidOperationException($"Missing vertex channel data for channel {channel.Name}");
                 channel.Items.Add(data);
             }
 
@@ -138,10 +132,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
         /// <param name="y">Value of the y component of the vector.</param>
         /// <param name="z">Value of the z component of the vector.</param>
         /// <returns>Index of the inserted vertex.</returns>
-        public int CreatePosition(float x, float y, float z)
-        {
-            return CreatePosition(new Vector3(x, y, z));
-        }
+        public int CreatePosition(float x, float y, float z) => CreatePosition(new Vector3(x, y, z));
 
         /// <summary>
         /// Inserts the specified vertex position into the vertex channel at the specified index.
@@ -229,9 +220,11 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
         public void SetVertexChannelData(int vertexDataIndex, object channelData)
         {
             if (_currentGeometryContent.Vertices.Channels[vertexDataIndex].ElementType != channelData.GetType())
-                throw new InvalidOperationException(string.Format("Channel {0} data has a different type from input. Expected: {1}. Actual: {2}",
-                    vertexDataIndex, _currentGeometryContent.Vertices.Channels[vertexDataIndex].ElementType, channelData.GetType()));
-
+                throw new InvalidOperationException($"""
+                    Channel {vertexDataIndex} data has a different type from input.
+                    Expected: {_currentGeometryContent.Vertices.Channels[vertexDataIndex].ElementType}
+                    Actual: { channelData.GetType()}
+                    """);
             _vertexChannelData[vertexDataIndex] = channelData;
         }
 
@@ -240,9 +233,6 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
         /// </summary>
         /// <param name="name">Name of the mesh.</param>
         /// <returns>Object used when building the mesh.</returns>
-        public static MeshBuilder StartMesh(string name)
-        {
-            return new MeshBuilder(name);
-        }
+        public static MeshBuilder StartMesh(string name) => new(name);
     }
 }

@@ -41,7 +41,7 @@ internal static class PngFileHelper
         // unfortunately, basisU requires an input _file_.
         pngFileName = $"tempImage_{Guid.NewGuid().ToString()}.png"; // TODO: get a project relative path.
         pngFileName = Path.Combine(context.IntermediateDirectory, pngFileName);
-        var directory = Path.GetDirectoryName(pngFileName);
+        var directory = Path.GetDirectoryName(pngFileName) ?? "";
         if (!Directory.Exists(directory))
         {
             Directory.CreateDirectory(directory);
@@ -69,8 +69,7 @@ internal static class PngFileHelper
             IntPtr err = MGCP.MP_ExportBitmap(ref bitmap, pngFileName);
             if (err != IntPtr.Zero)
             {
-                string errorMsg = System.Runtime.InteropServices.Marshal.PtrToStringUTF8(err);
-                throw new InvalidContentException($"Unable to write PNG file '{pngFileName}': {errorMsg}");
+                throw new InvalidContentException($"Unable to write PNG file '{pngFileName}': {Marshal.PtrToStringUTF8(err)}");
             }
         }
         finally

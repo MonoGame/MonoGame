@@ -4,9 +4,9 @@
 
 #include "Include.fxh"
 
-Texture2D SourceTexture : register(t0);
+Texture2D<float4> SourceTexture : register(t0);
 
-SamplerComparisonState SourceSampler : register(s0);
+SamplerComparisonState SourceTextureSampler : register(s0);
 
 struct VSOutput
 {
@@ -17,7 +17,7 @@ struct VSOutput
 
 float4 PS_Main(VSOutput input) : SV_TARGET0
 {
-    float comparisonResult = SourceTexture.SampleCmpLevelZero(SourceSampler, input.uv, 0.5f);
+    float comparisonResult = SourceTexture.SampleCmpLevelZero(SourceTextureSampler, input.uv, 0.5f);
     return float4(comparisonResult, 0, 0, 1);
 }
 

@@ -4,16 +4,23 @@
 
 using Microsoft.Xna.Framework.Content.Pipeline.Processors;
 
-namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
+namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler;
+
+[ContentTypeWriter]
+class VertexBufferWriter : BuiltInContentWriter<VertexBufferContent>
 {
-    [ContentTypeWriter]
-    class VertexBufferWriter : BuiltInContentWriter<VertexBufferContent>
+    protected override void Write(ContentWriter output, VertexBufferContent value)
     {
-        protected internal override void Write(ContentWriter output, VertexBufferContent value)
+        output.WriteRawObject(value.VertexDeclaration);
+
+        if (value.VertexDeclaration.VertexStride is > 0)
         {
-            output.WriteRawObject(value.VertexDeclaration);
             output.Write((uint)(value.VertexData.Length / value.VertexDeclaration.VertexStride));
             output.Write(value.VertexData);
+        }
+        else
+        {
+            output.Write(0);
         }
     }
 }

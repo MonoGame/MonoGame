@@ -2,7 +2,6 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
-using System.Collections.Generic;
 using System.Xml;
 
 namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Intermediate
@@ -10,32 +9,32 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Intermediate
     [ContentTypeSerializer]
     class MatrixSerializer : ElementSerializer<Matrix>
     {
-        public MatrixSerializer() :
-            base("Matrix", 16)
+        public MatrixSerializer() : base("Matrix", 16)
         {
         }
 
-        protected internal override Matrix Deserialize(string[] inputs, ref int index)
+        protected override Matrix Deserialize(string[] inputs, ref int index)
         {
             return new Matrix(XmlConvert.ToSingle(inputs[index++]),
-                                XmlConvert.ToSingle(inputs[index++]),
-                                XmlConvert.ToSingle(inputs[index++]),
-                                XmlConvert.ToSingle(inputs[index++]),
-                                XmlConvert.ToSingle(inputs[index++]),
-                                XmlConvert.ToSingle(inputs[index++]),
-                                XmlConvert.ToSingle(inputs[index++]),
-                                XmlConvert.ToSingle(inputs[index++]),
-                                XmlConvert.ToSingle(inputs[index++]),
-                                XmlConvert.ToSingle(inputs[index++]),
-                                XmlConvert.ToSingle(inputs[index++]),
-                                XmlConvert.ToSingle(inputs[index++]),
-                                XmlConvert.ToSingle(inputs[index++]),
-                                XmlConvert.ToSingle(inputs[index++]),
-                                XmlConvert.ToSingle(inputs[index++]),
-                                XmlConvert.ToSingle(inputs[index++]));
+                XmlConvert.ToSingle(inputs[index++]),
+                XmlConvert.ToSingle(inputs[index++]),
+                XmlConvert.ToSingle(inputs[index++]),
+                XmlConvert.ToSingle(inputs[index++]),
+                XmlConvert.ToSingle(inputs[index++]),
+                XmlConvert.ToSingle(inputs[index++]),
+                XmlConvert.ToSingle(inputs[index++]),
+                XmlConvert.ToSingle(inputs[index++]),
+                XmlConvert.ToSingle(inputs[index++]),
+                XmlConvert.ToSingle(inputs[index++]),
+                XmlConvert.ToSingle(inputs[index++]),
+                XmlConvert.ToSingle(inputs[index++]),
+                XmlConvert.ToSingle(inputs[index++]),
+                XmlConvert.ToSingle(inputs[index++]),
+                XmlConvert.ToSingle(inputs[index++])
+            );
         }
 
-        protected internal override void Serialize(Matrix value, List<string> results)
+        protected override void Serialize(Matrix value, List<string> results)
         {
             results.Add(XmlConvert.ToString(value.M11));
             results.Add(XmlConvert.ToString(value.M12));

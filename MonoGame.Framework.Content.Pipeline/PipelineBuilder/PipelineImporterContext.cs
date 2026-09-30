@@ -4,27 +4,15 @@
 
 using Microsoft.Xna.Framework.Content.Pipeline;
 
-namespace MonoGame.Framework.Content.Pipeline.Builder
+namespace MonoGame.Framework.Content.Pipeline.Builder;
+
+public class PipelineImporterContext(PipelineManager manager, PipelineBuildEvent pipelineEvent) : ContentImporterContext
 {
-    public class PipelineImporterContext : ContentImporterContext
-    {
-        private readonly PipelineManager _manager;
+    public override string IntermediateDirectory => manager.IntermediateDirectory;
 
-        private readonly PipelineBuildEvent _pipelineEvent;
+    public override string OutputDirectory => manager.OutputDirectory;
 
-        public PipelineImporterContext(PipelineManager manager, PipelineBuildEvent pipelineEvent)
-        {
-            _manager = manager;
-            _pipelineEvent = pipelineEvent;
-        }
+    public override ContentBuildLogger Logger => manager.Logger;
 
-        public override string IntermediateDirectory { get { return _manager.IntermediateDirectory; } }
-        public override string OutputDirectory { get { return _manager.OutputDirectory; } }
-        public override ContentBuildLogger Logger { get { return _manager.Logger; } }
-
-        public override void AddDependency(string filename)
-        {
-            _pipelineEvent.Dependencies.AddUnique(filename);
-        }
-    }
+    public override void AddDependency(string filename) => pipelineEvent.Dependencies.AddUnique(filename);
 }

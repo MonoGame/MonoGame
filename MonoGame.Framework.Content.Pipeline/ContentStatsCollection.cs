@@ -2,10 +2,7 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
+using System.Globalization;
 using System.Text;
 using System.Text.RegularExpressions;
 
@@ -14,32 +11,23 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
     /// <summary>
     /// A collection of content building statistics for use in diagnosing content issues.
     /// </summary>
-    public class ContentStatsCollection
+    public partial class ContentStatsCollection
     {
-        private static readonly string _header = "Source File,Dest File,Processor Type,Content Type,Source File Size,Dest File Size,Build Seconds";
-        private static readonly Regex _split = new Regex(",(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)");
+        private const string Header = "Source File,Dest File,Processor Type,Content Type,Source File Size,Dest File Size,Build Seconds";
+        private const string Extension = ".mgstats";
 
-        private readonly object _locker = new object();
-        private readonly Dictionary<string, ContentStats> _statsBySource = new Dictionary<string, ContentStats>(1024);
-
-        /// <summary>
-        /// The file extension used by the content pipeline after building to store the content statistics.
-        /// <remarks><para>Read only - cannot be assigned to</para></remarks>
-        /// </summary>
-        public static readonly string Extension = ".mgstats";
+        private readonly object _locker = new();
+        private readonly Dictionary<string, ContentStats> _statsBySource = new(1024);
 
         /// <summary>
         /// Optionally used for copying stats that were stored in another collection.
         /// </summary>
-        public ContentStatsCollection PreviousStats { get; set; }
+        public ContentStatsCollection? PreviousStats { get; set; }
 
         /// <summary>
         ///  The internal content statistics dictionary.
         /// </summary>
-        public IReadOnlyDictionary<string, ContentStats> Stats
-        {
-            get { return _statsBySource; }
-        }
+        public IReadOnlyDictionary<string, ContentStats> Stats => _statsBySource;
 
         /// <summary>
         ///  Get the content statistics for a source file and returns true if found.
@@ -48,9 +36,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
         {
             lock (_locker)
             {
-                if (!_statsBySource.TryGetValue(sourceFile, out stats))
-                    return false;
-                return true;
+                return _statsBySource.TryGetValue(sourceFile, out stats);
             }
         }
 
@@ -110,13 +96,12 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
                 if (_statsBySource.ContainsKey(sourceFile))
                     return;
 
-                ContentStats stats;
-                if (PreviousStats.TryGetStats(sourceFile, out stats))
+                if (PreviousStats.TryGetStats(sourceFile, out var stats))
                     _statsBySource[stats.SourceFile] = stats;
             }
         }
 
-        private static string GetFriendlyTypeName(Type type)
+        private static string GetFriendlyTypeName(Type? type)
         {
             if (type == null)
                 return "";
@@ -141,7 +126,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
             else if (type.IsArray)
                 return GetFriendlyTypeName(type.GetElementType()) + "[" + new string(',', type.GetArrayRank() - 1) + "]";
             else if (type.IsGenericType)
-                return type.Name.Split('`')[0] + "<" + string.Join(", ", type.GetGenericArguments().Select(x => GetFriendlyTypeName(x)).ToArray()) + ">";
+                return type.Name.Split('`')[0] + "<" + string.Join(", ", type.GetGenericArguments().Select(GetFriendlyTypeName).ToArray()) + ">";
             else
                 return type.Name;
         }
@@ -162,12 +147,12 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
 
                 // The first line is the CSV header... if it doesn't match then
                 // assume the data is invalid or changed formats.
-                if (lines[0] != _header)
+                if (lines[0] != Header)
                     return collection;
 
                 for (var i = 1; i < lines.Length; i++)
                 {
-                    var columns = _split.Split(lines[i]);
+                    var columns = SplitRegex().Split(lines[i]);
                     if (columns.Length != 7)
                         continue;
 
@@ -176,12 +161,11 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
                     stats.DestFile = columns[1].Trim('"');
                     stats.ProcessorType = columns[2].Trim('"');
                     stats.ContentType = columns[3].Trim('"');
-                    stats.SourceFileSize = long.Parse(columns[4]);
-                    stats.DestFileSize = long.Parse(columns[5]);
-                    stats.BuildSeconds = float.Parse(columns[6]);
+                    stats.SourceFileSize = long.Parse(columns[4], CultureInfo.InvariantCulture);
+                    stats.DestFileSize = long.Parse(columns[5], CultureInfo.InvariantCulture);
+                    stats.BuildSeconds = float.Parse(columns[6], CultureInfo.InvariantCulture);
 
-                    if (!collection._statsBySource.ContainsKey(stats.SourceFile))
-                        collection._statsBySource.Add(stats.SourceFile, stats);
+                    collection._statsBySource.TryAdd(stats.SourceFile, stats);
                 }
             }
             catch
@@ -203,16 +187,15 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
             // ensure the output folder exists
             Directory.CreateDirectory(outputPath);
             var filePath = Path.Combine(outputPath, Extension);
-            using (var textWriter = new StreamWriter(filePath, false, new UTF8Encoding(false)))
-            {
-                // Sort the items alphabetically to ensure a consistent output
-                // and better mergability of the resulting file.
-                var contentStats = _statsBySource.Values.OrderBy(c => c.SourceFile, StringComparer.InvariantCulture).ToList();
+            using var textWriter = new StreamWriter(filePath, false, new UTF8Encoding(false));
 
-                textWriter.WriteLine(_header);
-                foreach (var stats in contentStats)
-                    textWriter.WriteLine("\"{0}\",\"{1}\",\"{2}\",\"{3}\",{4},{5},{6}", stats.SourceFile, stats.DestFile, stats.ProcessorType, stats.ContentType, stats.SourceFileSize, stats.DestFileSize, stats.BuildSeconds);
-            }
+            // Sort the items alphabetically to ensure a consistent output
+            // and better mergability of the resulting file.
+            var contentStats = _statsBySource.Values.OrderBy(c => c.SourceFile, StringComparer.InvariantCulture).ToList();
+
+            textWriter.WriteLine(Header);
+            foreach (var stats in contentStats)
+                textWriter.WriteLine("\"{0}\",\"{1}\",\"{2}\",\"{3}\",{4},{5},{6}", stats.SourceFile, stats.DestFile, stats.ProcessorType, stats.ContentType, stats.SourceFileSize, stats.DestFileSize, stats.BuildSeconds);
         }
 
         /// <summary>
@@ -225,9 +208,11 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
 
             foreach (var stats in PreviousStats._statsBySource.Values)
             {
-                if (!_statsBySource.ContainsKey(stats.SourceFile))
-                    _statsBySource.Add(stats.SourceFile, stats);
+                _statsBySource.TryAdd(stats.SourceFile, stats);
             }
         }
+
+        [GeneratedRegex(",(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)", RegexOptions.Compiled)]
+        private static partial Regex SplitRegex();
     }
 }

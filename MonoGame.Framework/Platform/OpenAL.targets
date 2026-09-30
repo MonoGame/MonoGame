@@ -37,7 +37,7 @@
   
   <!-- DesktopGL has its own Song implementation, and need OpenAL binaries -->
   <ItemGroup Condition="$(DefineConstants.Contains('NO_AUDIO')) != 'true' And $(DefineConstants.Contains('DESKTOPGL'))">
-    <PackageReference Include="MonoGame.Library.OpenAL" Version="1.24.3.2" />
+    <PackageReference Include="MonoGame.Library.OpenAL" Version="1.24.3.4" />
 	<PackageReference Include="NVorbis" Version="0.10.4" />
 
     <Compile Include="Platform\Media\OggStream.NVorbis.cs" />

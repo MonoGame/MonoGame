@@ -1,4 +1,4 @@
-// MonoGame - Copyright (C) The MonoGame Team
+// MonoGame - Copyright (C) MonoGame Foundation, Inc
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
@@ -102,6 +102,15 @@ public partial class SoundEffectInstance : IDisposable
     {
         if (Voice != null)
             MGA.Voice_ClearFilterMode(Voice);
+    }
+
+    internal unsafe void PlatformClearBuffer()
+    {
+        if (Voice != null)
+        {
+            MGA.Voice_Destroy(Voice);
+            Voice = null;
+        }
     }
 
     private unsafe void PlatformDispose(bool disposing)

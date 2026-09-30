@@ -1,4 +1,4 @@
-// MonoGame - Copyright (C) The MonoGame Team
+// MonoGame - Copyright (C) MonoGame Foundation, Inc
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
@@ -25,6 +25,11 @@ public partial class DepthStencilState
             info.stencilDepthBufferFail = StencilDepthBufferFail;
             info.stencilFail = StencilFail;
             info.stencilPass = StencilPass;
+            info.twoSidedStencilMode = TwoSidedStencilMode;
+            info.counterClockwiseStencilFunction = CounterClockwiseStencilFunction;
+            info.counterClockwiseStencilDepthBufferFail = CounterClockwiseStencilDepthBufferFail;
+            info.counterClockwiseStencilFail = CounterClockwiseStencilFail;
+            info.counterClockwiseStencilPass = CounterClockwiseStencilPass;
 
             Handle = MGG.DepthStencilState_Create(device.Handle, &info);
         }

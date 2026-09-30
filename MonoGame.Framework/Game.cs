@@ -120,6 +120,8 @@ namespace Microsoft.Xna.Framework
                         if (disposable != null)
                             disposable.Dispose();
                     }
+                    _components.ComponentAdded -= Components_ComponentAdded;
+                    _components.ComponentRemoved -= Components_ComponentRemoved;
                     _components = null;
 
                     if (_content != null)
@@ -147,7 +149,9 @@ namespace Microsoft.Xna.Framework
                     ContentTypeReaderManager.ClearTypeCreators();
 
                     if (SoundEffect._systemState == SoundEffect.SoundSystemState.Initialized)
-                        SoundEffect.PlatformShutdown();
+                    {
+                        SoundEffect.Shutdown();
+                    }
                 }
 #if ANDROID
                 Activity = null;

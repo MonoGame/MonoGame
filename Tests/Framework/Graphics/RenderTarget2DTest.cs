@@ -1,20 +1,21 @@
-﻿// MonoGame - Copyright (C) MonoGame Foundation, Inc
+// MonoGame - Copyright (C) MonoGame Foundation, Inc
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System;
+using System.Runtime.CompilerServices;
+using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using NUnit.Framework;
 
 namespace MonoGame.Tests.Graphics
 {
-    [TestFixture]
     [NonParallelizable]
+    [RunOnUiTestFixture]
     class RenderTarget2DTest : GraphicsDeviceTestFixtureBase
     {
         [Test]
-        [RunOnUI]
         public void ZeroSizeShouldFailTest()
         {
             RenderTarget2D renderTarget;
@@ -24,7 +25,6 @@ namespace MonoGame.Tests.Graphics
         }
 
         [Test]
-        [RunOnUI]
         public void NullDeviceShouldThrowArgumentNullException()
         {
             Assert.Throws<ArgumentNullException>(() => 
@@ -39,9 +39,16 @@ namespace MonoGame.Tests.Graphics
 #if XNA
         [Ignore("XNA mipmaps fail our pixel comparison tests")]
 #endif
-        [RunOnUI]
         public void GenerateMips()
         {
+#if VULKAN
+            if (OperatingSystem.IsMacOS())
+            {
+                Assert.Ignore("TODO: Fix on macOS");
+                return;
+            }
+#endif
+
             // Please note:
             // The reference image was created with the MonoGame/Windows test.
             // Mipmaps created by XNA and MonoGame are different.
@@ -132,7 +139,6 @@ namespace MonoGame.Tests.Graphics
 #endif
         [TestCase(SurfaceFormat.NormalizedByte2, SurfaceFormat.Color)]
         [TestCase(SurfaceFormat.NormalizedByte4, SurfaceFormat.Color)]
-        [RunOnUI]
         public void PreferredSurfaceFormatTest(SurfaceFormat preferredSurfaceFormat, SurfaceFormat expectedSurfaceFormat)
         {                    
             var renderTarget = new RenderTarget2D(gd, 16, 16, false, preferredSurfaceFormat, DepthFormat.None);
@@ -141,15 +147,14 @@ namespace MonoGame.Tests.Graphics
         }
 
         [Test]
-#if DESKTOPGL
+#if DESKTOPGL || DESKTOPGL4
         [Ignore ("Causes GL.GetError() returned 1282. Need to fix.")]
 #endif
-        [RunOnUI]
         public void GetDataMSAA()
         {
             const int size = 100;
             const int size2 = size * size;
-            var rt = new RenderTarget2D(gd, size, size, false, SurfaceFormat.Color, DepthFormat.None, 8, RenderTargetUsage.DiscardContents);
+            var rt = new RenderTarget2D(gd, size, size, false, SurfaceFormat.Color, DepthFormat.None, 4, RenderTargetUsage.DiscardContents);
             var data = new Color[size2];
             // create some arbitrary data here
             for (var i = 0; i < size2; i++)
@@ -170,7 +175,6 @@ namespace MonoGame.Tests.Graphics
         [Test]
         [TestCase(1)]
         [TestCase(2)]
-        [RunOnUI]
         public void GetSharedHandle(int preferredMultiSampleCount)
         {
             var rt = new RenderTarget2D(gd, 16, 16, false, SurfaceFormat.Color, DepthFormat.None, preferredMultiSampleCount, RenderTargetUsage.PlatformContents, true);            
@@ -181,6 +185,247 @@ namespace MonoGame.Tests.Graphics
 
             rt.Dispose();
         }
+
+        [Test]
+        public void FromNativeHandle_DirectX()
+        {
+            var desc = new SharpDX.Direct3D11.Texture2DDescription
+            {
+                Width = 32,
+                Height = 32,
+                MipLevels = 1,
+                ArraySize = 1,
+                Format = SharpDX.DXGI.Format.R8G8B8A8_UNorm,
+                SampleDescription = new SharpDX.DXGI.SampleDescription(1, 0),
+                Usage = SharpDX.Direct3D11.ResourceUsage.Default,
+                BindFlags = SharpDX.Direct3D11.BindFlags.RenderTarget | SharpDX.Direct3D11.BindFlags.ShaderResource,
+            };
+
+            using (var d3dTexture = new SharpDX.Direct3D11.Texture2D(gd._d3dDevice, desc))
+            {
+                var rt = RenderTarget2D.FromNativeHandle(gd, d3dTexture.NativePointer, 32, 32);
+                Assert.IsNotNull(rt);
+                Assert.AreEqual(32, rt.Width);
+                Assert.AreEqual(32, rt.Height);
+
+                gd.SetRenderTarget(rt);
+                gd.Clear(Color.CornflowerBlue);
+                gd.SetRenderTarget(null);
+
+                var data = new Color[32 * 32];
+                rt.GetData(data);
+                Assert.AreEqual(Color.CornflowerBlue, data[0]);
+
+                rt.Dispose();
+
+                // Native texture should still be valid, and not destroyed.
+                Assert.IsFalse(d3dTexture.IsDisposed);
+            }
+        }
 #endif
+
+#if DESKTOPGL
+        [Test]
+        public void FromNativeHandle_OpenGL()
+        {
+            int texId = 0;
+            MonoGame.OpenGL.GL.GenTextures(1, out texId);
+            MonoGame.OpenGL.GL.BindTexture(MonoGame.OpenGL.TextureTarget.Texture2D, texId);
+            MonoGame.OpenGL.GL.TexImage2D(
+                MonoGame.OpenGL.TextureTarget.Texture2D,
+                0,
+                MonoGame.OpenGL.PixelInternalFormat.Rgba,
+                32,
+                32,
+                0,
+                MonoGame.OpenGL.PixelFormat.Rgba,
+                MonoGame.OpenGL.PixelType.UnsignedByte,
+                IntPtr.Zero);
+            MonoGame.OpenGL.GL.BindTexture(MonoGame.OpenGL.TextureTarget.Texture2D, 0);
+
+            var rt = RenderTarget2D.FromNativeHandle(gd, texId, 32, 32);
+            Assert.IsNotNull(rt);
+            Assert.AreEqual(32, rt.Width);
+            Assert.AreEqual(32, rt.Height);
+
+            gd.SetRenderTarget(rt);
+            gd.Clear(Color.CornflowerBlue);
+            gd.SetRenderTarget(null);
+
+            var data = new Color[32 * 32];
+            rt.GetData(data);
+            Assert.AreEqual(Color.CornflowerBlue, data[0]);
+
+            rt.Dispose();
+
+            // Native texture should still be valid and bindable, without a GL error.
+            MonoGame.OpenGL.GL.BindTexture(MonoGame.OpenGL.TextureTarget.Texture2D, texId);
+            Assert.AreEqual(MonoGame.OpenGL.ErrorCode.NoError, MonoGame.OpenGL.GL.GetError());
+            MonoGame.OpenGL.GL.BindTexture(MonoGame.OpenGL.TextureTarget.Texture2D, 0);
+            MonoGame.OpenGL.GL.DeleteTextures(1, ref texId);
+        }
+#endif
+
+        [Test]
+        [TestCase(DepthFormat.None, 0)]
+        [TestCase(DepthFormat.None, 1)]
+        [TestCase(DepthFormat.None, 4)]
+        [TestCase(DepthFormat.Depth16, 0)]
+        [TestCase(DepthFormat.Depth16, 1)]
+        [TestCase(DepthFormat.Depth16, 4)]
+        [TestCase(DepthFormat.Depth24, 0)]
+        [TestCase(DepthFormat.Depth24, 1)]
+        [TestCase(DepthFormat.Depth24, 4)]
+        [TestCase(DepthFormat.Depth24Stencil8, 0)]
+        [TestCase(DepthFormat.Depth24Stencil8, 1)]
+        [TestCase(DepthFormat.Depth24Stencil8, 4)]
+        public void ClearAndGetDataWithMultiSample(DepthFormat depthFormat, int multiSampleCount)
+        {
+            const int size = 16;
+            var rt = new RenderTarget2D(gd, size, size, mipMap: false, SurfaceFormat.Color, depthFormat, multiSampleCount, RenderTargetUsage.DiscardContents);
+            try
+            {
+                var previousTargets = gd.GetRenderTargets();
+                gd.SetRenderTarget(rt);
+                gd.Clear(Color.MonoGameOrange);
+                gd.SetRenderTargets(previousTargets);
+
+                var pixels = new Color[size * size];
+                rt.GetData(pixels);
+
+                for (int i=0; i < pixels.Length; i++)
+                {
+                    Assert.AreEqual(Color.MonoGameOrange, pixels[i], $"Pixel {i} should be {Color.MonoGameOrange} but was {pixels[i]}");
+                }
+            }
+            finally
+            {
+               rt.Dispose(); 
+            }
+        }
+
+        
+        // Disposed render targets should not stay referenced by the GraphicsDevice.
+        // See issue: https://github.com/MonoGame/MonoGame/issues/9485
+        [Test]
+        [TestCase(DepthFormat.None, 0)]
+        [TestCase(DepthFormat.None, 4)]
+        [TestCase(DepthFormat.Depth16, 0)]
+        [TestCase(DepthFormat.Depth16, 4)]
+        [TestCase(DepthFormat.Depth24, 0)]
+        [TestCase(DepthFormat.Depth24, 4)]
+        [TestCase(DepthFormat.Depth24Stencil8, 0)]
+        [TestCase(DepthFormat.Depth24Stencil8, 4)]
+        public void DisposeAfterUse_NonMsaaRenderTarget_DoesNotRemainReferencedByGraphicsDevice(DepthFormat depthFormat, int preferredMultiSampleCount)
+        {
+            WeakReference weakRef = CreateAndDisposeRenderTarget(depthFormat, preferredMultiSampleCount);
+
+            GC.Collect();
+            GC.WaitForPendingFinalizers();
+            GC.Collect();
+
+            Assert.False(
+                weakRef.IsAlive,
+                "Disposed RenderTarget2D was still strongly referenced by the GraphicsDevice.");
+        }
+
+        // Keep creation and disposal out of the test method so the JIT does not extend the local lifetime.
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        private WeakReference CreateAndDisposeRenderTarget(DepthFormat depthFormat, int preferredMultiSampleCount)
+        {
+            RenderTarget2D renderTarget = new RenderTarget2D(
+                gd,
+                16,
+                16,
+                false,
+                SurfaceFormat.Color,
+                depthFormat,
+                preferredMultiSampleCount,
+                RenderTargetUsage.DiscardContents);
+
+            gd.SetRenderTarget(renderTarget);
+            gd.Clear(Color.CornflowerBlue);
+            gd.SetRenderTarget(null);
+
+            renderTarget.Dispose();
+
+            return new WeakReference(renderTarget);
+        }
+
+        [Test]
+        public void TestRenderTargetSync()
+        {
+            // This test is based on issue:
+            // https://github.com/MonoGame/MonoGame/issues/9425
+
+            var accumulationRenderTarget = new RenderTarget2D(
+                gd,
+                400,
+                200,
+                false, //Also fixed if mipMap is set to true
+                SurfaceFormat.Color,
+                DepthFormat.None,
+                0,
+                RenderTargetUsage.PreserveContents);
+
+            var auxRenderTarget = new RenderTarget2D(gd, 600, 600);
+
+            var spriteBatch = new SpriteBatch(gd);
+
+            var whiteSquareTexture = new Texture2D(gd, 1, 1);
+            whiteSquareTexture.SetData(new Color[] { Color.White });
+
+            var maxBlendState = new BlendState
+            {
+                ColorSourceBlend = Blend.One,
+                ColorDestinationBlend = Blend.One,
+                ColorBlendFunction = BlendFunction.Max,
+                AlphaSourceBlend = Blend.One,
+                AlphaDestinationBlend = Blend.One,
+                AlphaBlendFunction = BlendFunction.Max,
+            };
+
+            var _rectangles = new List<Rectangle>
+            {
+                new(0, 0, 200, 200),
+                new(200, 0, 200, 200)
+            };
+
+
+            // Do this a few times as we could get lucky
+            // and not have a GPU artifact on one test.
+
+            for (int t = 0; t < 6; t++)
+            {
+                gd.SetRenderTarget(accumulationRenderTarget);
+                gd.Clear(Color.Red);
+
+                for (int i = 0; i < _rectangles.Count; i++)
+                {
+                    gd.SetRenderTarget(auxRenderTarget);
+                    gd.Clear(Color.Black);
+
+                    spriteBatch.Begin();
+                    spriteBatch.Draw(whiteSquareTexture, _rectangles[i], Color.White * 0.75f);
+                    spriteBatch.End();
+
+                    gd.SetRenderTarget(accumulationRenderTarget);
+
+                    spriteBatch.Begin(blendState: maxBlendState);
+                    spriteBatch.Draw(auxRenderTarget, Vector2.Zero, Color.White * 0.75f);
+                    spriteBatch.End();
+                }
+
+                var data = accumulationRenderTarget.GetColorData();
+
+                var good = new Color(255, 143, 143, 255);
+                foreach (var color in data)
+                {
+                    // Some graphics drivers can be off in color because of
+                    // subtle blend math optimizations... so use a tolerance.
+                    Assert.True(good.AreEqual(color, 2), $"Color mismatch! {color} should be {good}");
+                }
+            }
+        }
     }
 }

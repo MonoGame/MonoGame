@@ -82,6 +82,25 @@ namespace Microsoft.Xna.Framework.Graphics
             }
         }
 
+        internal int PlatformGetMaxMultiSampleCount(SurfaceFormat sformat)
+        {
+            var format = SharpDXHelper.ToFormat(sformat);
+
+            // Find the maximum supported level starting with the game's requested multisampling level
+            // and halving each time until reaching 0 (meaning no multisample support).
+            var qualityLevels = 0;
+            var maxLevel = 32;
+            while (maxLevel > 0)
+            {
+                qualityLevels = _d3dDevice.CheckMultisampleQualityLevels(format, maxLevel);
+                if (qualityLevels > 0)
+                    break;
+                maxLevel /= 2;
+            }
+
+            return maxLevel;
+        }
+
 #if WINDOWS
 
         private void CorrectBackBufferSize()
@@ -259,7 +278,7 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             // Clamp MultiSampleCount
             PresentationParameters.MultiSampleCount =
-                GetClampedMultisampleCount(PresentationParameters.MultiSampleCount);
+                GetClampedMultisampleCount(PresentationParameters.BackBufferFormat, PresentationParameters.MultiSampleCount);
 
             _d3dContext.OutputMerger.SetTargets((SharpDX.Direct3D11.DepthStencilView)null,
                                                 (SharpDX.Direct3D11.RenderTargetView)null);
@@ -592,7 +611,16 @@ namespace Microsoft.Xna.Framework.Graphics
             else
             {
                 _tempRenderTargetBinding[0] = new RenderTargetBinding(renderTarget, arraySlice);
-                SetRenderTargets(_tempRenderTargetBinding);
+                
+                try
+                {
+				    SetRenderTargets(_tempRenderTargetBinding);
+                }
+                finally
+                {
+                    // Clear temporary strong reference.
+                    _tempRenderTargetBinding[0] = default;
+                }
             }
         }
 
@@ -604,7 +632,16 @@ namespace Microsoft.Xna.Framework.Graphics
             else
             {
                 _tempRenderTargetBinding[0] = new RenderTargetBinding(renderTarget, arraySlice);
-                SetRenderTargets(_tempRenderTargetBinding);
+                
+                try
+                {
+				    SetRenderTargets(_tempRenderTargetBinding);
+                }
+                finally
+                {
+                    // Clear temporary strong reference.
+                    _tempRenderTargetBinding[0] = default;
+                }
             }
         }
 
@@ -625,10 +662,21 @@ namespace Microsoft.Xna.Framework.Graphics
             {
                 var renderTargetBinding = _currentRenderTargetBindings[i];
 
-                // Resolve MSAA render targets
-                var renderTarget = renderTargetBinding.RenderTarget as RenderTarget2D;
-                if (renderTarget != null && renderTarget.MultiSampleCount > 1)
-                    renderTarget.ResolveSubresource();
+                // Need to resolve the individual face that was just rendered.
+                // If not handled separately here, multisampled cube render targets
+                // will not be resolved with they are unbound.
+                var renderTargetCube = renderTargetBinding.RenderTarget as RenderTargetCube;
+                if (renderTargetCube != null && renderTargetCube.MultiSampleCount > 1)
+                {
+                    renderTargetCube.ResolveSubresource(renderTargetBinding.ArraySlice);
+                }
+                else
+                {
+                    // Resolve MSAA render targets
+                    var renderTarget = renderTargetBinding.RenderTarget as RenderTarget2D;
+                    if (renderTarget != null && renderTarget.MultiSampleCount > 1)
+                        renderTarget.ResolveSubresource();
+                }
 
                 // Generate mipmaps.
                 if (renderTargetBinding.RenderTarget.LevelCount > 1)

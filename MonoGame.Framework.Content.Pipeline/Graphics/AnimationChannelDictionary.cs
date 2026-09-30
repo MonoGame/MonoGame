@@ -7,13 +7,5 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
     /// <summary>
     /// Collection of animation data channels, one per bone or rigid object.
     /// </summary>
-    public sealed class AnimationChannelDictionary : NamedValueDictionary<AnimationChannel>
-    {
-        /// <summary>
-        /// Initializes a new instance of AnimationChannelDictionary.
-        /// </summary>
-        public AnimationChannelDictionary()
-        {
-        }
-    }
+    public sealed class AnimationChannelDictionary : NamedValueDictionary<AnimationChannel>;
 }

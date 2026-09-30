@@ -2,8 +2,7 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
-using System;
-using System.IO;
+using System.Globalization;
 using Microsoft.Xna.Framework.Content.Pipeline.Graphics;
 using Microsoft.Xna.Framework.Graphics.PackedVector;
 using MonoGame.Framework.Content.Pipeline.Interop;
@@ -51,13 +50,6 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
     public class TextureImporter : ContentImporter<TextureContent>
     {
         /// <summary>
-        /// Initializes a new instance of TextureImporter.
-        /// </summary>
-        public TextureImporter()
-        {
-        }
-
-        /// <summary>
         /// Called by the XNA Framework when importing a texture file to be used as a game asset. This is the method called by the XNA Framework when an asset is to be imported into an object that can be recognized by the Content Pipeline.
         /// </summary>
         /// <param name="filename">Name of a game asset file.</param>
@@ -65,7 +57,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
         /// <returns>Resulting game asset.</returns>
         public override TextureContent Import(string filename, ContentImporterContext context)
         {
-            var ext = Path.GetExtension(filename).ToLower();
+            var ext = Path.GetExtension(filename).ToLower(CultureInfo.InvariantCulture);
 
             // Special case for loading some formats
             switch (ext)
@@ -77,10 +69,10 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
             var output = new Texture2DContent { Identity = new ContentIdentity(filename) };
 
             MGCP_Bitmap bitmap = default;
-            IntPtr err = MGCP.MP_ImportBitmap(filename, ref bitmap);
+            var err = MGCP.MP_ImportBitmap(filename, ref bitmap);
             if (err != IntPtr.Zero)
             {
-                string errorMsg = System.Runtime.InteropServices.Marshal.PtrToStringUTF8(err);
+                var errorMsg = System.Runtime.InteropServices.Marshal.PtrToStringUTF8(err);
                 throw new InvalidContentException($"TextureImporter failed to load '{filename}': {errorMsg}");
             }
             if (bitmap.data == IntPtr.Zero)
@@ -112,7 +104,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
         /// <summary>
         /// Adds a face to the texture content with the specified pixel format.
         /// </summary>
-        private unsafe void AddFace<T>(Texture2DContent output, IntPtr data, int width, int height, int pixelCount, int bytesPerPixel)
+        private static void AddFace<T>(Texture2DContent output, IntPtr data, int width, int height, int pixelCount, int bytesPerPixel)
             where T : struct, IEquatable<T>
         {
             var face = new PixelBitmapContent<T>(width, height);

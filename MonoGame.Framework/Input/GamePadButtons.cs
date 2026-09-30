@@ -9,6 +9,11 @@ namespace Microsoft.Xna.Framework.Input
     /// </summary>
     public struct GamePadButtons
     {
+        /// <summary>
+        /// A value representing all currently pressed buttons
+        /// </summary>
+        public readonly Buttons Buttons => _buttons;
+
         internal readonly Buttons _buttons;
 
         /// <summary>
@@ -196,7 +201,7 @@ namespace Microsoft.Xna.Framework.Input
         /// </summary>
         /// <returns>A hash code for this instance that is suitable for use in hashing algorithms and data structures such as a
         /// hash table.</returns>
-        public override int GetHashCode ()
+        public override int GetHashCode()
         {
             return (int)_buttons;
         }

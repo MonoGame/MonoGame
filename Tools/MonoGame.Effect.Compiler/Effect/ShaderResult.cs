@@ -2,31 +2,28 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
-using System;
-using System.Collections.Generic;
-using System.IO;
 using MonoGame.Effect.TPGParser;
 
 namespace MonoGame.Effect
 {
     public class ShaderResult
     {
-        public ShaderInfo ShaderInfo { get; private set; }
+        public required ShaderInfo ShaderInfo { get; init; }
 
-        public string FilePath { get; private set; }
-        public string RelativeFilePath { get; set; }
+        public required string FilePath { get; init; }
+        public string? RelativeFilePath { get; set; }
 
-        public string FileContent { get; private set; }
+        public required string FileContent { get; init; }
 
-        public string OutputFilePath { get; private set; }
+        public string? OutputFilePath { get; private set; }
 
-        public List<string> Dependencies { get; private set; }
+        public List<string> Dependencies { get; private set; } = [];
 
-        public List<string> AdditionalOutputFiles { get; private set; }
+        public List<string> AdditionalOutputFiles { get; private set; } = [];
 
-        public ShaderProfile Profile { get; private set; }
+        public required ShaderProfile Profile { get; init; }
 
-        public bool Debug { get; private set; }
+        public required bool Debug { get; init; }
 
 
         static public ShaderResult FromFile(string path, Options options, IEffectCompilerOutput output)
@@ -79,15 +76,15 @@ namespace MonoGame.Effect
             var tree = new Parser(new Scanner()).Parse(newFile, fullPath);
             if (tree.Errors.Count > 0)
             {
-                var errors = String.Empty;
+                var errors = string.Empty;
                 foreach (var error in tree.Errors)
-                    errors += string.Format("{0}({1},{2}) : {3}\r\n", error.File, error.Line, error.Column, error.Message);
+                    errors += $"{error.File},({error.Line},{error.Column}) : {error.Message}\r\n";
 
                 throw new Exception(errors);
             }
 
             // Evaluate the results of the parse tree.
-            var shaderInfo = tree.Eval() as ShaderInfo;
+            var shaderInfo = (ShaderInfo)tree.Eval();
 
             // Remove the samplers and techniques so that the shader compiler
             // gets a clean file without any FX file syntax in it.
@@ -96,14 +93,17 @@ namespace MonoGame.Effect
             WhitespaceNodes(TokenType.Sampler_Declaration_States, tree.Nodes, ref cleanFile);
 
             // Setup the rest of the shader info.
-            ShaderResult result = new ShaderResult();
-            result.ShaderInfo = shaderInfo;
-            result.Dependencies = dependencies;
-            result.FilePath = fullPath;
-            result.FileContent = cleanFile;
+            ShaderResult result = new()
+            {
+                ShaderInfo = shaderInfo,
+                Dependencies = dependencies,
+                FilePath = fullPath,
+                FileContent = cleanFile,
+                Profile = options.Profile,
+                Debug = options.Debug
+            };
             if (!string.IsNullOrEmpty(options.OutputFile))
                 result.OutputFilePath = Path.GetFullPath(options.OutputFile);
-            result.AdditionalOutputFiles = new List<string>();
 
             // Remove empty techniques.
             for (var i = 0; i < shaderInfo.Techniques.Count; i++)
@@ -119,9 +119,6 @@ namespace MonoGame.Effect
             // We must have at least one technique.
             if (shaderInfo.Techniques.Count <= 0)
                 throw new Exception("The effect must contain at least one technique and pass!");
-
-            result.Profile = options.Profile;
-            result.Debug = options.Debug;
 
             return result;
         }

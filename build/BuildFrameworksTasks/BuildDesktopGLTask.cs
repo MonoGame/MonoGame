@@ -5,11 +5,9 @@ namespace BuildScripts;
 [IsDependentOn(typeof(BuildShadersOGLTask))]
 public sealed class BuildDesktopGLTask : FrostingTask<BuildContext>
 {
-    private string platformName = "DesktopGL";
     public override void Run(BuildContext context)
     {
-        context.DotNetPack(context.GetProjectPath(ProjectType.Framework, platformName), context.DotNetPackSettings);
-
-        context.PublishBinaries(platformName);
+        context.DotNetPack(context.GetProjectPath(ProjectType.Framework, "DesktopGL"), context.DotNetPackSettings);
+        context.PublishBinaries("DesktopGL");
     }
 }

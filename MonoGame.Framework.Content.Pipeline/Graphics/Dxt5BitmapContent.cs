@@ -9,18 +9,10 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
     /// <summary>
     /// Provides properties and methods for creating and maintaining a Dxt5 compressed bitmap resource.
     /// </summary>
-    public class Dxt5BitmapContent : DxtBitmapContent
+    /// <param name="width">The width in pixels of the bitmap.</param>
+    /// <param name="height">The height in pixels of the bitmap.</param>
+    public class Dxt5BitmapContent(int width, int height) : DxtBitmapContent(16, width, height)
     {
-        /// <summary>
-        /// Creates an instance of Dxt5BitmapContent with the specified width and height.
-        /// </summary>
-        /// <param name="width">The width in pixels of the bitmap.</param>
-        /// <param name="height">The height in pixels of the bitmap.</param>
-        public Dxt5BitmapContent(int width, int height)
-            : base(16, width, height)
-        {
-        }
-
         /// <summary>
         /// Gets the corresponding GPU texture format for the specified bitmap type.
         /// </summary>
@@ -36,9 +28,6 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
         /// Returns a string description of the bitmap.
         /// </summary>
         /// <returns>Description of the bitmap.</returns>
-        public override string ToString()
-        {
-            return "DXT5 " + Width + "x" + Height;
-        }
+        public override string ToString() => "DXT5 " + Width + "x" + Height;
     }
 }

@@ -7,7 +7,8 @@ namespace MonoGame.Tests
     /// <summary>
     /// This class will run any test on the main UI thread. 
     /// This is required for SDL Graphics Tests.
-    /// Add the [RunOnUI] attribute to the test to get it to run on the UI thread.
+    /// Add the <see cref="RunOnUiTestFixtureAttribute"/> instead of <see cref="TestFixtureAttribute"/> to the test class to get all the tests in that class to run on the UI thread.
+    /// Alternatively, add <see cref="RunOnUiAttribute"/> to individual test methods to run only those tests on the UI thread.
     /// </summary>
     public class MainThreadSynchronizationContext : SynchronizationContext
     {

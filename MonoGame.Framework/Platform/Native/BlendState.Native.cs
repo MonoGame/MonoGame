@@ -1,4 +1,4 @@
-// MonoGame - Copyright (C) The MonoGame Team
+// MonoGame - Copyright (C) MonoGame Foundation, Inc
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
@@ -38,7 +38,10 @@ public partial class BlendState
             }
         }
 
-        MGG.GraphicsDevice_SetBlendState(device.Handle, Handle, _blendFactor.R / 255.0f, _blendFactor.G / 255.0f, _blendFactor.B / 255.0f, _blendFactor.A / 255.0f);
+        // Need to read from the device here because it can change
+        // without rebinding the blend state itself.
+        Color blendFactor = device.BlendFactor;
+        MGG.GraphicsDevice_SetBlendState(device.Handle, Handle, blendFactor.R / 255.0f, blendFactor.G / 255.0f, blendFactor.B / 255.0f, blendFactor.A / 255.0f);
     }
 
     partial void PlatformDispose()

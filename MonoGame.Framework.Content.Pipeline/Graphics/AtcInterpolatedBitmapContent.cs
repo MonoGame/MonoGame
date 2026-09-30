@@ -23,8 +23,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
         /// </summary>
         /// <param name="width">The width in pixels of the bitmap.</param>
         /// <param name="height">The height in pixels of the bitmap.</param>
-        public AtcInterpolatedBitmapContent(int width, int height)
-            : base(width, height)
+        public AtcInterpolatedBitmapContent(int width, int height) : base(width, height)
         {
         }
 
@@ -43,9 +42,6 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
         /// Returns a string description of the bitmap.
         /// </summary>
         /// <returns>Description of the bitmap.</returns>
-        public override string ToString()
-        {
-            return "ATITC Interpolated Alpha " + Width + "x" + Height;
-        }
+        public override string ToString() => "ATITC Interpolated Alpha " + Width + "x" + Height;
     }
 }

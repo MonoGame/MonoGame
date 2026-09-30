@@ -1,4 +1,4 @@
-﻿// This code originated from:
+// This code originated from:
 //
 //    http://theinstructionlimit.com/ogg-streaming-using-opentk-and-nvorbis
 //    https://github.com/NVorbis/NVorbis
@@ -395,6 +395,7 @@ namespace Microsoft.Xna.Framework.Audio
 
                 foreach (var stream in threadLocalStreams)
                 {
+                    Action finishedAction = null;
                     lock (stream.prepareMutex)
                     {
                         lock (iterationMutex)
@@ -446,8 +447,10 @@ namespace Microsoft.Xna.Framework.Audio
                             pendingFinish = false;
                             lock (iterationMutex)
                                 streams.Remove(stream);
-                            if (stream.FinishedAction != null)
-                                stream.FinishedAction.Invoke();
+
+                            // Avoid invoking this within the prepareMutex lock.
+                            // Otherwise, we risk a deadlock when downstream Stop() locks stopMutex.
+                            finishedAction = stream.FinishedAction;
                         }
                         else if (!finished && bufferFilled > 0) // queue only successfully filled buffers
                         {
@@ -456,6 +459,14 @@ namespace Microsoft.Xna.Framework.Audio
                         }
                         else if (!stream.IsLooped)
                             continue;
+                    }
+
+                    if (finishedAction != null)
+                    {
+                        finishedAction.Invoke();
+
+                        // If the stream was removed from the list, we can avoid locking the stopMutex.
+                        continue;
                     }
 
                     lock (stream.stopMutex)

@@ -2,12 +2,8 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
-using System;
 using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
-
 
 namespace Microsoft.Xna.Framework.Content.Pipeline
 {
@@ -17,32 +13,22 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
     /// </summary>
     public class LoadedTypeCollection<T> : IEnumerable<T>
     {
-        private static List<T> _all;
+        private static readonly List<T> All = new(24);
 
-        /// <summary>
-        /// Creates a new LoadedTypeCollection.
-        /// </summary>
-        public LoadedTypeCollection()
+        static LoadedTypeCollection()
         {
             // Scan the already loaded assemblies.
-            if (_all == null)
-            {
-                var assemblies = AppDomain.CurrentDomain.GetAssemblies();
-                foreach (var ass in assemblies)
-                    ScanAssembly(ass);
-            }
+            var assemblies = AppDomain.CurrentDomain.GetAssemblies();
+            foreach (var ass in assemblies)
+                ScanAssembly(ass);
 
             // Hook into assembly loading events to gather any new
             // enumeration types that are found.
-            AppDomain.CurrentDomain.AssemblyLoad += (sender, args) => ScanAssembly(args.LoadedAssembly);            
+            AppDomain.CurrentDomain.AssemblyLoad += (_, args) => ScanAssembly(args.LoadedAssembly);
         }
 
         private static void ScanAssembly(Assembly ass)
         {
-            // Initialize the list on first use.
-            if (_all == null)
-                _all = new List<T>(24);
-
             var thisAss = typeof(T).Assembly;
 
             // If the assembly doesn't reference our assembly then it
@@ -59,20 +45,13 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
                     continue;
 
                 // Create an instance of the type and add it to our list.
-                var ttype = (T)Activator.CreateInstance(type);
-                _all.Add(ttype);
+                All.Add((T)Activator.CreateInstance(type)!);
             }
         }
 
         /// <inheritdoc cref="IEnumerable{T}.GetEnumerator()"/>
-        public IEnumerator<T> GetEnumerator()
-        {
-            return _all.GetEnumerator();
-        }
+        public IEnumerator<T> GetEnumerator() => All.GetEnumerator();
 
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return GetEnumerator();
-        }
+        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
     }
 }
