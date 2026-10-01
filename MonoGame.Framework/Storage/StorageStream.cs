@@ -11,12 +11,13 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using static Microsoft.Xna.Framework.Storage.StorageContainer;
 
 namespace Microsoft.Xna.Framework.Storage
 {
     internal class StorageStream : Stream
     {
-        private readonly MemoryStream _stream;
+        private readonly Blob _blob;
 
         private readonly bool _readable;
         private readonly bool _writeable;
@@ -27,20 +28,20 @@ namespace Microsoft.Xna.Framework.Storage
 
         public override bool CanWrite => _writeable;
 
-        public override long Length => _stream.Length;
+        public override long Length => _blob.content.Length;
 
         public override long Position
         {
-            get => _stream.Position;
+            get => _blob.content.Position;
             set
             {
-                _stream.Position = value;
+                _blob.content.Position = value;
             }
         }
 
-        public StorageStream(MemoryStream stream, bool readable, bool writeable)
+        public StorageStream(Blob blob, bool readable, bool writeable)
         {
-            _stream = stream;
+            _blob = blob;
             _readable = readable;
             _writeable = writeable;
         }
@@ -52,26 +53,27 @@ namespace Microsoft.Xna.Framework.Storage
         public override int Read(byte[] buffer, int offset, int count)
         {
             if (_readable)
-                return _stream.Read(buffer, offset, count);
+                return _blob.content.Read(buffer, offset, count);
 
             throw new NotSupportedException("The stream is not readable.");
         }
 
         public override long Seek(long offset, SeekOrigin origin)
         {
-            return _stream.Seek(offset, origin);
+            return _blob.content.Seek(offset, origin);
         }
 
         public override void SetLength(long value)
         {
-            _stream.SetLength(value);
+            _blob.content.SetLength(value);
         }
 
         public override void Write(byte[] buffer, int offset, int count)
         {
             if (_writeable)
             {
-                _stream.Write(buffer, offset, count);
+                _blob.content.Write(buffer, offset, count);
+                _blob.dirty = true;
                 return;
             }
 

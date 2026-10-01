@@ -28,7 +28,7 @@ namespace Microsoft.Xna.Framework.Storage
         private readonly PlayerIndex? _playerIndex;
         private readonly string _containerName;
 
-        class Blob
+        internal class Blob
         {
             public MemoryStream content;
             public bool directory;
@@ -163,15 +163,16 @@ namespace Microsoft.Xna.Framework.Storage
                 }
                 else
                 {
-                    // We're appending... so load the file from disk first.
-                    blob.content = PlatformLoadFile(path);
+                    // Load from disk first.
+                    if (blob.content == null)
+                        blob.content = PlatformLoadFile(path);                   
                     blob.content.Position = blob.content.Length;
                 }
             }
 
             blob.dirty = true;
 
-            return new StorageStream(blob.content, true, true);
+            return new StorageStream(blob, true, true);
         }
 
         /// <summary>
@@ -288,48 +289,62 @@ namespace Microsoft.Xna.Framework.Storage
             return dirs.ToArray();
         }
 
-		private unsafe bool MatchWildcards(char *match, char* file)
+        private bool MatchWildcards(string pattern, string file)
         {
-            // TODO: Maybe re-write this to not need unsafe code
-            // and to not recurse on itself!
+            int p = 0;
+            int pstar = -1;
+            int f = 0;
+            int fstar = 0;
 
-			// Early out on a match all.
-			if (match[0] == '*' && match[1] == 0 && file[0] != 0)
-				return true;
+            while (f < file.Length)
+            {
+                if (p < pattern.Length)
+                {
+                    // Hold the star to consume later.
+                    if (pattern[p] == '*')
+                    {
+                        pstar = p++;
+                        fstar = f;
+                        continue;
+                    }
 
-			while (match[0] != 0)
-			{
-				if (match[0] == '*')
-				{
-					if (MatchWildcards(match + 1, file))
-						return true;
+                    // Consume one char.
+                    if (pattern[p] == '?')
+                    {
+                        p++;
+                        f++;
+                        continue;
+                    }
 
-					if (file[0] != 0 && MatchWildcards(match, file + 1))
-						return true;
+                    // Do we have a match.
+                    if (char.ToLowerInvariant(pattern[p]) == char.ToLowerInvariant(file[f]))
+                    {
+                        p++;
+                        f++;
+                        continue;
+                    }
+                }
 
-					return false;
-				}
-					
-				if (match[0] == '?')
-				{
-					if (file[0] == 0)
-						return false;
+                // We didn't match above, so consume a star.
+                if (pstar != -1)
+                {
+                    p = pstar + 1;
+                    f = ++fstar;
+                    continue;
+                }
 
-					++file;
-					++match;
-					continue;
-				}
+                // No star to consume and no match.
+                return false;
+            }
 
-				if (char.ToLowerInvariant(match[0]) != char.ToLowerInvariant(file[0]))
-					return false;
+            // We are done with the file name, so the rest of the
+            // match pattern must be stars.
+            while (p < pattern.Length && pattern[p] == '*')
+                p++;
 
-				++match;
-				++file;
-			}
-
-			// If we didn't get the end of both we didn't match.
-			return file[0] != 0 && match[0] != 0;
-		}
+            // Did we finish the match pattern?
+            return p == pattern.Length;
+        }
 
         /// <summary>
         /// Returns list of all directories that match the search pattern.
@@ -355,13 +370,8 @@ namespace Microsoft.Xna.Framework.Storage
 
                 var name = pair.Key.TrimEnd('/');
 
-                unsafe
-                {
-                    fixed (char* match = searchPattern)
-                    fixed (char* key = name)
-                        if (MatchWildcards(match, key))
-                            dirs.Add(name);
-                }
+                if (MatchWildcards(searchPattern, name))
+                    dirs.Add(name);
             }
 
             return dirs.ToArray();
@@ -415,13 +425,8 @@ namespace Microsoft.Xna.Framework.Storage
 
                 var name = pair.Key;
 
-                unsafe
-                {
-                    fixed (char* match = searchPattern)
-                    fixed (char* key = name)
-                        if (MatchWildcards(match, key))
-                            files.Add(name);
-                }
+                if (MatchWildcards(searchPattern, name))
+                    files.Add(name);
             }
 
             return files.ToArray();
@@ -449,7 +454,7 @@ namespace Microsoft.Xna.Framework.Storage
             if (fileMode == FileMode.CreateNew)
             {
                 if (exists)
-                    throw new IOException(); // This seems silly.
+                    throw new IOException("File exists"); // This seems silly.
 
                 return CreateFile(fileName, true);
             }
@@ -457,43 +462,39 @@ namespace Microsoft.Xna.Framework.Storage
             if (fileMode == FileMode.Create)
                 return CreateFile(fileName, true);
 
+            // Load the file from disk if we haven't before.
+            if (exists && blob.content == null)
+                blob.content = PlatformLoadFile(path);
+
             if (fileMode == FileMode.OpenOrCreate)
             {
                 if (exists)
                 {
                     blob.content.Position = 0;
-                    return new StorageStream(blob.content, true, true);
+                    return new StorageStream(blob, true, true);
                 }
 
                 return CreateFile(fileName, false);
             }
 
+            if (!exists)
+                throw new FileNotFoundException();
+
             if (fileMode == FileMode.Truncate)
             {
-                if (!exists)
-                    throw new FileNotFoundException();
-
                 blob.content.Position = 0;
                 blob.content.SetLength(0);
-                return new StorageStream(blob.content, true, true);
+                return new StorageStream(blob, true, true);
             }
 
             if (fileMode == FileMode.Append)
             {
-                if (!exists)
-                    throw new FileNotFoundException();
-                return new StorageStream(blob.content, true, true);
+                blob.content.Position = blob.content.Length;
+                return new StorageStream(blob, true, true);
             }
 
-            if (!exists)
-                throw new FileNotFoundException();
-
-            // Load the file from disk if we haven't before.
-            if (blob.content == null)
-                blob.content = PlatformLoadFile(path);
-
             blob.content.Position = 0;
-            return new StorageStream(blob.content, true, true);
+            return new StorageStream(blob, true, true);
         }
 
         /// <summary>

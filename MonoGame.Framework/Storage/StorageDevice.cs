@@ -5,8 +5,8 @@
 #if NATIVE
 
 using System;
-using System.Diagnostics;
 using System.Linq;
+using System.Diagnostics;
 
 namespace Microsoft.Xna.Framework.Storage
 {
@@ -21,6 +21,7 @@ namespace Microsoft.Xna.Framework.Storage
         private string _titleName;
         private readonly PlayerIndex? _player;
 
+        private WeakReference<StorageContainer> _current;
 
         /// <summary>
         /// Returns true if the instance has been disposed.
@@ -71,6 +72,20 @@ namespace Microsoft.Xna.Framework.Storage
             PlatformDispose();
         }
 
+        private StorageContainer GetActiveContainer()
+        {
+            if (_current == null)
+                return null;
+
+            if (!_current.TryGetTarget(out var container))
+                return null;
+
+            if (container.IsDisposed)
+                return null;
+
+            return container;
+        }
+
         /// <summary>
         /// Disposes the device and closes all containers.
         /// </summary>
@@ -78,6 +93,12 @@ namespace Microsoft.Xna.Framework.Storage
         {
             if (IsDisposed)
                 return;
+
+            // Cleanup the last container if we have one still alive.
+            var container = GetActiveContainer();
+            if (container != null)
+                container.Dispose();
+            _current = null;
 
             PlatformDispose();
             GC.SuppressFinalize(this);
@@ -116,6 +137,10 @@ namespace Microsoft.Xna.Framework.Storage
         /// <exception cref="ArgumentNullException"></exception>
         public void DeleteContainer(string containerName)
         {
+            var container = GetActiveContainer();
+            if (container != null)
+                throw new NotSupportedException("You cannot access multiple containers at once.");
+
             var exception = ValidateContainerName(containerName);
             if (exception != null)
                 throw exception;
@@ -124,7 +149,7 @@ namespace Microsoft.Xna.Framework.Storage
         }
 
         /// <summary>
-        /// Opens and existing container or creates a new one.
+        /// Opens an existing container or creates a new one.
         /// </summary>
         /// <param name="containerName">The name of the container.</param>
         /// <param name="requiredFreeBytes">On container creation we check for this available space or return null.</param>
@@ -141,14 +166,21 @@ namespace Microsoft.Xna.Framework.Storage
             if (requiredFreeBytes <= 0)
                 throw new ArgumentOutOfRangeException("requiredFreeBytes", "Must be greater than 0.");
 
+            var container = GetActiveContainer();
+            if (container != null)
+                throw new NotSupportedException("You cannot access multiple containers at once.");
+
             try
             {
-                var container = PlatformOpenContainer(containerName, requiredFreeBytes);
+                container = PlatformOpenContainer(containerName, requiredFreeBytes);
                 if (container == null)
                 {
                     Debug.WriteLine("Failed to open storage container: {0}", containerName);
                     return null;
                 }
+
+                _current = new WeakReference<StorageContainer>(container);
+
                 return container;
             }
             catch (Exception ex)
