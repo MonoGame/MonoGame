@@ -21,7 +21,6 @@
 #include <errno.h>
 #include <fts.h>
 #include <ftw.h>
-#define MAX_PATH PATH_MAX
 #define FILE_PERMISSIONS 0755
 #endif
 
@@ -117,7 +116,6 @@ static bool _MG_Storage_DeleteDirectory(const char* path)
     // This is a recursive delete operation.
 
 #if _WIN32
-
     char tmp[MAX_PATH];
     _MakeFileOperationPath(tmp, path);
 
@@ -129,9 +127,7 @@ static bool _MG_Storage_DeleteDirectory(const char* path)
     int ok = SHFileOperationA(&op);
     if (ok == 0)
         return true;
-
 #else
-
     DIR* h = opendir(path);
     if (h == nullptr)
         return false;
@@ -167,7 +163,6 @@ static bool _MG_Storage_DeleteDirectory(const char* path)
     int err = remove(path);
     if (err == 0)
         return true;
-
 #endif
 
     return false;
@@ -272,7 +267,6 @@ static bool _MG_Storage_CopyDirectory(const char* source, const char* dest)
 static bool _MG_Storage_RenameDirectory(const char* source, const char* dest)
 {
 #if _WIN32
-
     char src[MAX_PATH];
     _MakeFileOperationPath(src, source);
 
@@ -300,7 +294,6 @@ static bool _MG_Storage_RenameDirectory(const char* source, const char* dest)
 static bool _MG_Storage_DirectoryExists(const char* path)
 {
 #if _WIN32
-
     char tmp[MAX_PATH];
     _MakeFileOperationPath(tmp, path);
 
@@ -310,7 +303,6 @@ static bool _MG_Storage_DirectoryExists(const char* path)
 
     if ((att & FILE_ATTRIBUTE_DIRECTORY) != 0)
         return true;
-
 #else
     struct stat s;
     int ok = stat(path, &s);
@@ -326,7 +318,6 @@ MG_StorageDevice* MG_Storage_OpenDevice(const char* titleName, mgint playerIndex
     std::string root;
 
 #if defined(_WIN32)
-
     PWSTR pszMyDocuments;
     HRESULT hr = SHGetKnownFolderPath(FOLDERID_Documents, KF_FLAG_DEFAULT, NULL, &pszMyDocuments);
     if (!SUCCEEDED(hr))
@@ -457,15 +448,15 @@ MG_StorageContainer* MG_Storage_OpenContainer(MG_StorageDevice* device, const ch
     {
         // Check to see if we crashed/powered off in the middle
         // of the save commit... try to restore it.      
-        char last_container[MAX_PATH];
-        strcpy(last_container, container->storage_root.c_str());
-        strcat(last_container, "~");
-        strcat(last_container, container->name.c_str());
+        std::string last_container;
+        last_container = container->storage_root;
+        last_container += "~";
+        last_container += container->name;
 
-        if (_MG_Storage_DirectoryExists(last_container))
+        if (_MG_Storage_DirectoryExists(last_container.c_str()))
         {
             // Restore the last container!
-            _MG_Storage_RenameDirectory(last_container, container->root.c_str());
+            _MG_Storage_RenameDirectory(last_container.c_str(), container->root.c_str());
         }
     }
 
@@ -497,26 +488,26 @@ static void _MG_Storage_MakeCommitPath(MG_StorageContainer* container, std::stri
 {
     // The commit occurs in the game's save path next
     // to the original container with the name ~.
-    char scratch[MAX_PATH];
-    strcpy(scratch, container->storage_root.c_str());
-    strcat(scratch, "~~/");
+    std::string scratch;
+    scratch = container->storage_root;
+    scratch += "~~/";
 
     if (!container->do_commit)
     {
         // TODO: Need to handle failure and bubble it up!
 
         // Make sure any old work is cleared.
-        _MG_Storage_DeleteDirectory(scratch);
+        _MG_Storage_DeleteDirectory(scratch.c_str());
     
         // If the container source folder doesn't exist this is new storage
         // and we just need to create a empty scratch folder.
         if (!_MG_Storage_DirectoryExists(container->root.c_str()))
-            _MG_CreateDirectory(scratch);
+            _MG_CreateDirectory(scratch.c_str());
         else
         {
             // Copy the content of the container on disk to
             // the scratch container folder.
-            _MG_Storage_CopyDirectory(container->root.c_str(), scratch);
+            _MG_Storage_CopyDirectory(container->root.c_str(), scratch.c_str());
         }
 
         container->do_commit = true;
@@ -643,11 +634,10 @@ void MG_Storage_EnumerateContent(MG_StorageContainer* container, mgbyte**& files
     filesAndDirectories = (mgbyte**)container->results.data();
 }
 
-static void _MG_Storage_MakePath(MG_StorageContainer* container, char* path, const char* name)
+static void _MG_Storage_MakePath(MG_StorageContainer* container, std::string& path, const char* name)
 {
-    // TODO: Protect against long paths or disallow them!
-    strcpy(path, container->root.c_str());
-    strcat(path, name);
+    path = container->root.c_str();
+    path += name;
 }
 
 mgbool MG_Storage_FileExists(MG_StorageContainer* container, const char* name)
@@ -655,12 +645,12 @@ mgbool MG_Storage_FileExists(MG_StorageContainer* container, const char* name)
     if (!container)
         return false;
 
-    char path[MAX_PATH];
+    std::string path;
     _MG_Storage_MakePath(container, path, name);
 
 #if _WIN32
     char tmp[MAX_PATH];
-    _MakeFileOperationPath(tmp, path);
+    _MakeFileOperationPath(tmp, path.c_str());
 
     DWORD att = GetFileAttributesA(tmp);
     if (att == INVALID_FILE_ATTRIBUTES)
@@ -670,7 +660,7 @@ mgbool MG_Storage_FileExists(MG_StorageContainer* container, const char* name)
         return false;
 #else
     struct stat s;
-    int ok = stat(path, &s);
+    int ok = stat(path.c_str(), &s);
     if (ok != 0)
         return false;
     if (!S_ISREG(s.st_mode))
@@ -688,10 +678,10 @@ mgbyte* MG_Storage_FileLoad(MG_StorageContainer* container, const char* name, mg
         return nullptr;
     }
 
-    char path[MAX_PATH];
+    std::string path;
     _MG_Storage_MakePath(container, path, name);
 
-    FILE* file = fopen(path, "rb");
+    FILE* file = fopen(path.c_str(), "rb");
     if (file == nullptr)
     {
         size = 0;
@@ -771,10 +761,10 @@ mgbool MG_Storage_DirectoryExists(MG_StorageContainer* container, const char* na
     if (!container)
         return false;
 
-    char path[MAX_PATH];
+    std::string path;
     _MG_Storage_MakePath(container, path, name);
 
-    return _MG_Storage_DirectoryExists(path);
+    return _MG_Storage_DirectoryExists(path.c_str());
 }
 
 mgbool MG_Storage_DirectoryDelete(MG_StorageContainer* container, const char* name)
@@ -820,17 +810,18 @@ void MG_Storage_CommitContainer(MG_StorageContainer* container)
     // If we crash or lose power after this the next time
     // we start up we restore this folder.
     //
-    char last_container[MAX_PATH];
-    strcpy(last_container, container->storage_root.c_str());
-    strcat(last_container, "~");
-    strcat(last_container, container->name.c_str());
-    _MG_Storage_RenameDirectory(container->root.c_str(), last_container);
+    std::string last_container;
+    last_container = container->storage_root;
+    last_container += "~";
+    last_container += container->name;
+    _MG_Storage_RenameDirectory(container->root.c_str(), last_container.c_str());
 
     // Rename the scratch to be the new container.
     _MG_Storage_RenameDirectory(scratch.c_str(), container->root.c_str());
 
     // Finally delete the original/last container.
-    _MG_Storage_DeleteDirectory(last_container);
+    last_container += "/";
+    _MG_Storage_DeleteDirectory(last_container.c_str());
 
     container->do_commit = false;
 }
