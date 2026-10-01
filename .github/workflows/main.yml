@@ -421,32 +421,32 @@ jobs:
           xcode-version: '${{ env.XCodeVersion }}'
 
       - name: Download Nuget
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           path: Artifacts/NuGet
 
       - name: Download tests-desktopgl-${{ matrix.platform }}
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: tests-desktopgl-${{ matrix.platform }}
           path: tests-desktopgl
           
       - name: Download tests-windowsdx-${{ matrix.platform }}
         if: runner.os == 'Windows' && runner.environment != 'github-hosted'
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: tests-windowsdx-${{ matrix.platform }}
           path: tests-windowsdx
           
       - name: Download tests-windowsdx12-${{ matrix.platform }}
         if: runner.os == 'Windows' && runner.environment != 'github-hosted'
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: tests-windowsdx12-${{ matrix.platform }}
           path: tests-windowsdx12
 
       - name: Download tests-desktopvk-${{ matrix.platform }}
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: tests-desktopvk-${{ matrix.platform }}
           path: tests-desktopvk
