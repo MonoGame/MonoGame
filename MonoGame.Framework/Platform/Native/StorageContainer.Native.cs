@@ -20,7 +20,7 @@ namespace Microsoft.Xna.Framework.Storage
             _handle = null;
         }
 
-        public unsafe MemoryStream PlatformLoadFile(string path)
+        private unsafe MemoryStream PlatformLoadFile(string path)
         {
             byte* data = MG_Storage.FileLoad(_handle, path, out int size);
             var content = new MemoryStream(size);
@@ -32,7 +32,7 @@ namespace Microsoft.Xna.Framework.Storage
             return content;
         }
 
-        public unsafe void PlatformUpdateCache()
+        private unsafe void PlatformUpdateCache()
         {
             _cache = new Dictionary<string, Blob>();
 
@@ -54,7 +54,7 @@ namespace Microsoft.Xna.Framework.Storage
             }
         }
 
-        public unsafe void PlatformCommit()
+        private unsafe void PlatformCommit()
         {
             // First we process the directories.
             foreach (var pair in _cache)
