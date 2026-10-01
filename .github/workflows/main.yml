@@ -390,7 +390,7 @@ jobs:
         if: runner.environment == 'github-hosted' && runner.os == 'Linux'
         run: |
           sudo apt-get update
-          sudo apt-get install -y xvfb
+          sudo apt-get install -y xvfb libgl1
 
       - name: Check Vulkan
         if: runner.environment != 'github-hosted' && runner.os == 'macos'
@@ -420,11 +420,6 @@ jobs:
         with:
           xcode-version: '${{ env.XCodeVersion }}'
 
-      - name: Download Nuget
-        uses: actions/download-artifact@v4
-        with:
-          path: Artifacts/NuGet
-
       - name: Download tests-desktopgl-${{ matrix.platform }}
         uses: actions/download-artifact@v4
         with:
@@ -451,6 +446,28 @@ jobs:
           name: tests-desktopvk-${{ matrix.platform }}
           path: tests-desktopvk
 
+      - name: Download tests-desktopgl4-${{ matrix.platform }}
+        if: runner.arch != 'ARM64'
+        uses: actions/download-artifact@v4
+        with:
+          name: tests-desktopgl4-${{ matrix.platform }}
+          path: tests-desktopgl4
+
+      # Run Hosted storage tests for Vulkan and GL4
+      - name: Run Vulkan Storage Tests
+        if: runner.environment == 'github-hosted' && runner.arch != 'ARM64'
+        run: dotnet MonoGame.Tests.dll --where="Category == Storage" --timeout=300000
+        env:
+          CI: true
+        working-directory: tests-desktopvk
+
+      - name: Run DesktopGL4 Storage Tests
+        if: runner.arch != 'ARM64'
+        run: dotnet MonoGame.Tests.dll --where="Category == Storage" --timeout=300000
+        env:
+          CI: true
+        working-directory: tests-desktopgl4
+
       # Run the DirectX 11 tests in two steps: first the audio, then the rest.
       # This is because the audio tests has some incompatibilities within the runner with ContentManagerTests.
       - name: Run DirectX 11 Audio Tests
@@ -468,6 +485,13 @@ jobs:
         working-directory: tests-windowsdx
         
       # Run DirectX 12 tests in separate groups.
+      - name: Run DirectX 12 Storage Tests
+        if: runner.os == 'Windows' && runner.environment == 'github-hosted'
+        run: dotnet MonoGame.Tests.dll --where="Category == Storage" --timeout=300000
+        env:
+          CI: true
+        working-directory: tests-windowsdx12
+
       - name: Run DirectX 12 Audio Tests
         if: runner.os == 'Windows' && runner.environment != 'github-hosted'
         run: dotnet MonoGame.Tests.dll --where="Category == Audio || Category == Song" --timeout=300000

@@ -14,6 +14,7 @@ using Microsoft.Xna.Framework.Storage;
 namespace MonoGame.Tests.Framework
 {
     [TestFixture]
+    [Category("Storage")]
     public class StorageDeviceTests
     {
         const string MY_GAME_TITLE = "MyGame";
