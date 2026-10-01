@@ -190,6 +190,27 @@ jobs:
         run: |
           dotnet workload install macos ios --version ${{ env.DotnetVersion }}
 
+      - name: Run Vulkan Storage Tests
+        if: runner.os != 'Linux' || runner.arch != 'ARM64'
+        run: dotnet MonoGame.Tests.dll --where="Category == Storage" --timeout=300000
+        env:
+          CI: true
+        working-directory: Artifacts/Tests/DesktopVK/Release
+
+      - name: Run DesktopGL4 Storage Tests
+        if: runner.os != 'Linux' || runner.arch != 'ARM64'
+        run: dotnet MonoGame.Tests.dll --where="Category == Storage" --timeout=300000
+        env:
+          CI: true
+        working-directory: Artifacts/Tests/DesktopGL4/Release
+
+      - name: Run DirectX 12 Storage Tests
+        if: runner.os == 'Windows'
+        run: dotnet MonoGame.Tests.dll --where="Category == Storage" --timeout=300000
+        env:
+          CI: true
+        working-directory: Artifacts/Tests/WindowsDX12/Release
+
       - name: Test generated Nuget packages
         if: runner.os != 'Linux'
         run: dotnet run --project build/Build.csproj -- --target=TestNuGet --framework net9.0
@@ -453,9 +474,9 @@ jobs:
           name: tests-desktopgl4-${{ matrix.platform }}
           path: tests-desktopgl4
 
-      # Run Hosted storage tests for Vulkan and GL4
+      # Run storage tests for Vulkan and GL4
       - name: Run Vulkan Storage Tests
-        if: runner.environment == 'github-hosted' && runner.arch != 'ARM64'
+        if: runner.arch != 'ARM64'
         run: dotnet MonoGame.Tests.dll --where="Category == Storage" --timeout=300000
         env:
           CI: true
@@ -486,7 +507,7 @@ jobs:
         
       # Run DirectX 12 tests in separate groups.
       - name: Run DirectX 12 Storage Tests
-        if: runner.os == 'Windows' && runner.environment == 'github-hosted'
+        if: runner.os == 'Windows'
         run: dotnet MonoGame.Tests.dll --where="Category == Storage" --timeout=300000
         env:
           CI: true
