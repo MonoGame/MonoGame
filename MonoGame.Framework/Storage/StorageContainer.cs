@@ -16,19 +16,12 @@ using System.Threading.Tasks;
 
 namespace Microsoft.Xna.Framework.Storage
 {
-    // NOTE: This is the original design for Windows support for Storage from XNA 4:
-    //
-    //	User storage is usually in the "My Documents" folder of the user who is currently logged in, in the SavedGames folder.
-    //	A subfolder is created for each game according to the titleName passed to the OpenContainer method.
-    //	When no PlayerIndex is specified, content is saved in the AllPlayers folder. When a PlayerIndex is specified,
-    //	the content is saved in the Player1, Player2, Player3, or Player4 folder, depending on which PlayerIndex
-    //	was passed to BeginShowSelector.
-    //
-
     /// <summary>
-    /// Contains a logical collection of files used for user-data storage.
-    /// </summary>			
-    /// <remarks>MSDN documentation contains related conceptual article: https://learn.microsoft.com/en-us/previous-versions/windows/xna/bb199074(v=xnagamestudio.40)</remarks>
+    /// A named container for saving user data on the platform's local storage.
+    /// </summary>
+    /// <remarks>
+    /// This is class is in preview and not final.
+    /// </remarks>
     public partial class StorageContainer : IDisposable
     {
         private readonly StorageDevice _device;
@@ -46,7 +39,7 @@ namespace Microsoft.Xna.Framework.Storage
         private Dictionary<string, Blob> _cache;
 
         /// <summary>
-        /// Gets a bool value indicating whether the instance has been disposed.
+        /// Returns true if the instance has been disposed.
         /// </summary>
         public bool IsDisposed { get; private set; }
 
@@ -62,7 +55,7 @@ namespace Microsoft.Xna.Framework.Storage
         }
 
         /// <summary>
-        /// Returns the <see cref="StorageDevice"/> that holds logical files for the container.
+        /// Returns the <see cref="StorageDevice"/> this container was created from.
         /// </summary>
         public StorageDevice StorageDevice
         {
@@ -72,17 +65,6 @@ namespace Microsoft.Xna.Framework.Storage
             }
         }
 
-        /// <summary>
-        /// Fired when <see cref="Dispose"/> is called or object if finalized or collected by the garbage collector.
-        /// </summary>
-        public event EventHandler<EventArgs> Disposing;
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="StorageContainer"/> class.
-        /// </summary>
-        /// <param name='device'>The attached storage-device.</param>
-        /// <param name='containerName'> The identifier for the container.</param>
-        /// <param name='playerIndex'>The <see cref="PlayerIndex"/> of the player to save the data.</param>
         internal StorageContainer(StorageDevice device, string containerName, PlayerIndex? playerIndex)
         {
             _device = device;
@@ -106,9 +88,10 @@ namespace Microsoft.Xna.Framework.Storage
         }
 
         /// <summary>
-        /// Creates a new directory in the storage-container.
+        /// Creates a new directory.
         /// </summary>
         /// <param name="directoryName">Relative path of the directory to be created.</param>
+        /// <remarks>You must call commit to flush this to storage.</remarks>
         public void CreateDirectory(string directoryName)
         {
             if (string.IsNullOrEmpty(directoryName))
@@ -137,11 +120,12 @@ namespace Microsoft.Xna.Framework.Storage
         }
 
         /// <summary>
-        /// Creates a file in the storage-container.
+        /// Creates a new file or appends to an existing one.
         /// </summary>
         /// <param name="fileName">Relative path of the file to be created.</param>
         /// <param name="truncate">If the file exists set it to 0 bytes otherwise append.</param>
         /// <returns>Returns <see cref="Stream"/> for the created file.</returns>
+        /// <remarks>You must call commit to flush this to storage.</remarks>
         public Stream CreateFile(string fileName, bool truncate = true)
         {
             if (string.IsNullOrEmpty(fileName))
@@ -191,9 +175,10 @@ namespace Microsoft.Xna.Framework.Storage
         }
 
         /// <summary>
-        /// Deletes specified directory for the storage-container.
+        /// Deletes a directory and all the content it contains.
         /// </summary>
         /// <param name="directoryName">The relative path of the directory to be deleted.</param>
+        /// <remarks>You must call commit to flush this to storage.</remarks>
         public void DeleteDirectory(string directoryName)
         {
             if (string.IsNullOrEmpty(directoryName))
@@ -221,9 +206,10 @@ namespace Microsoft.Xna.Framework.Storage
         }
 
         /// <summary>
-        /// Deletes a file from the storage-container.
+        /// Deletes a file if it exists.
         /// </summary>
         /// <param name="fileName">The relative path of the file to be deleted.</param>
+        /// <remarks>You must call commit to flush this to storage.</remarks>
         public void DeleteFile(string fileName)
         {
             if (string.IsNullOrEmpty(fileName))
@@ -243,10 +229,10 @@ namespace Microsoft.Xna.Framework.Storage
         }
 
         /// <summary>
-        /// Returns true if specified path exists in the storage-container, false otherwise.
+        /// Returns true if the directory exists.
         /// </summary>
-        /// <param name="directoryName">The relative path of directory to query for.</param>
-        /// <returns>True if queried directory exists, false otherwise.</returns>
+        /// <param name="directoryName">The relative path to the directory.</param>
+        /// <returns>True if the directory exists.</returns>
         public bool DirectoryExists(string directoryName)
         {
             if (string.IsNullOrEmpty(directoryName))
@@ -261,10 +247,10 @@ namespace Microsoft.Xna.Framework.Storage
         }
 
         /// <summary>
-        /// Returns true if the specified file exists in the storage-container, false otherwise.
+        /// Returns true if the file exists.
         /// </summary>
-        /// <param name="fileName">The relative path of file to query for.</param>
-        /// <returns>True if queried file exists, false otherwise.</returns>
+        /// <param name="fileName">The relative path to the file.</param>
+        /// <returns>True if the file exists.</returns>
         public bool FileExists(string fileName)
         {
             if (string.IsNullOrEmpty(fileName))
@@ -279,7 +265,7 @@ namespace Microsoft.Xna.Framework.Storage
         }
 
         /// <summary>
-        /// Returns list of directory names in the storage-container.
+        /// Returns list of all directories in the container.
         /// </summary>
         /// <returns>List of directory names.</returns>
         public string[] GetDirectoryNames()
@@ -346,10 +332,10 @@ namespace Microsoft.Xna.Framework.Storage
 		}
 
         /// <summary>
-        /// Returns list of directory names with given search pattern.
+        /// Returns list of all directories that match the search pattern.
         /// </summary>
         /// <param name="searchPattern">A search pattern that supports single-character ("?") and multicharacter ("*") wildcards.</param>
-        /// <returns>List of matched directory names.</returns>
+        /// <returns>List of relative directory paths.</returns>
         public string[] GetDirectoryNames(string searchPattern)
         {
             if (string.IsNullOrEmpty(searchPattern))
@@ -382,9 +368,9 @@ namespace Microsoft.Xna.Framework.Storage
         }
 
         /// <summary>
-        /// Returns list of file names in the storage-container.
+        /// Returns list of all files in the container.
         /// </summary>
-        /// <returns>List of file names.</returns>
+        /// <returns>List of relative file paths.</returns>
         public string[] GetFileNames()
         {
             if (_cache == null)
@@ -406,10 +392,10 @@ namespace Microsoft.Xna.Framework.Storage
         }
 
         /// <summary>
-        /// Returns list of file names with given search pattern.
+        /// Returns list of all file paths with given search pattern.
         /// </summary>
         /// <param name="searchPattern">A search pattern that supports single-character ("?") and multicharacter ("*") wildcards.</param>
-        /// <returns>List of matched file names.</returns>
+        /// <returns>List of relative file paths.</returns>
         public string[] GetFileNames(string searchPattern)
         {
             if (string.IsNullOrEmpty(searchPattern))
@@ -442,17 +428,14 @@ namespace Microsoft.Xna.Framework.Storage
         }
 
         /// <summary>
-        /// Opens a file contained in storage-container.
+        /// Opens a file.
         /// </summary>
-        /// <param name="fileName">Relative path of the file.</param>
+        /// <param name="fileName">Relative path to the file.</param>
         /// <param name="fileMode"><see cref="FileMode"/> that specifies how the file is opened.</param>
-        /// <returns><see cref="Stream"/> object for the opened file.</returns>
+        /// <returns><see cref="Stream"/> object for the opened file or null.</returns>
+        /// <remarks>You must call commit to flush this to storage if writing to the file.</remarks>
         public Stream OpenFile(string fileName, FileMode fileMode)
         {
-            // TODO: Need a custom file stream object that handles
-            // detecting changes to files on write.  Also need to enforce
-            // read only streams.
-
             if (string.IsNullOrEmpty(fileName))
                 throw new ArgumentNullException("fileName", "A file name must be provided.");
 
@@ -515,16 +498,18 @@ namespace Microsoft.Xna.Framework.Storage
 
         /// <summary>
         /// Flushes the changes made to the container to storage.
+        /// The container can then be reused for future operations or disposed.
         /// </summary>
         /// <remarks>
         /// This call guarantees to not partially write data and corrupt your saves.
+        /// If the game shuts down during commit the system will try to recover
+        /// next time the container is opened.
         /// </remarks>
         public void Commit()
         {
             if (_cache != null)
                 PlatformCommit();
-        }        
-
+        }
 
         ~StorageContainer()
         {
@@ -532,8 +517,9 @@ namespace Microsoft.Xna.Framework.Storage
         }
 
         /// <summary>
-        /// Frees allocations made by the container without applying pending storage operations.
+        /// Frees resources held by the container.
         /// </summary>
+        /// <remarks>This does not flush changes to local storage.</remarks>
         public void Dispose()
         {
             Dispose(true);

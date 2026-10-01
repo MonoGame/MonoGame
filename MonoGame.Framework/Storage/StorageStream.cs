@@ -54,7 +54,7 @@ namespace Microsoft.Xna.Framework.Storage
             if (_readable)
                 return _stream.Read(buffer, offset, count);
 
-            throw new NotSupportedException();
+            throw new NotSupportedException("The stream is not readable.");
         }
 
         public override long Seek(long offset, SeekOrigin origin)
@@ -75,7 +75,7 @@ namespace Microsoft.Xna.Framework.Storage
                 return;
             }
 
-            throw new NotSupportedException();
+            throw new NotSupportedException("The stream is not writable.");
         }
 
         protected unsafe override void Dispose(bool disposing)

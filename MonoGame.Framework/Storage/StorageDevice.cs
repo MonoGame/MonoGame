@@ -10,6 +10,12 @@ using System.Linq;
 
 namespace Microsoft.Xna.Framework.Storage
 {
+    /// <summary>
+    /// The storage system for saving user data on the platform's local storage.
+    /// On some platforms this may also be backed up to cloud storage and
+    /// synchronized across multiple devices.
+    /// </summary>
+    /// <remarks>This is class is in preview and not final.</remarks>
     public sealed partial class StorageDevice : IDisposable
     {
         private string _titleName;
@@ -17,12 +23,12 @@ namespace Microsoft.Xna.Framework.Storage
 
 
         /// <summary>
-        /// Gets a bool value indicating whether the instance has been disposed.
+        /// Returns true if the instance has been disposed.
         /// </summary>
         public bool IsDisposed { get; private set; }
 
         /// <summary>
-        /// Gets the amount of free space on the device.
+        /// Gets the free space on the device in bytes.
         /// </summary>
         public long FreeSpace
         {
@@ -33,7 +39,7 @@ namespace Microsoft.Xna.Framework.Storage
         }
 
         /// <summary>
-        /// Gets the total amount of space on the device.
+        /// Gets the total space on the device in bytes.
         /// </summary>
         public long TotalSpace
         {
@@ -47,8 +53,8 @@ namespace Microsoft.Xna.Framework.Storage
         /// Creates a storage device for saving game data.
         /// </summary>
         /// <param name="titleName">The name of the game title used on some platforms for naming save data.</param>
-        /// <param name="player">The optional player index.  TODO: Why?</param>
-        public StorageDevice(string titleName, PlayerIndex? player)
+        /// <param name="player">The optional player index.</param>
+        public StorageDevice(string titleName, PlayerIndex? player = PlayerIndex.One)
         {
             // TODO: Validate titleName is Ascii.
 
@@ -65,6 +71,9 @@ namespace Microsoft.Xna.Framework.Storage
             PlatformDispose();
         }
 
+        /// <summary>
+        /// Disposes the device and closes all containers.
+        /// </summary>
         public void Dispose()
         {
             if (IsDisposed)
@@ -101,7 +110,7 @@ namespace Microsoft.Xna.Framework.Storage
         }
 
         /// <summary>
-        /// Deletes the named container if it exists.
+        /// Deletes the named container and all its content if it exists.
         /// </summary>
         /// <param name="containerName">The name of the container.</param>
         /// <exception cref="ArgumentNullException"></exception>
@@ -115,7 +124,7 @@ namespace Microsoft.Xna.Framework.Storage
         }
 
         /// <summary>
-        /// Opens and existing container or creates one.
+        /// Opens and existing container or creates a new one.
         /// </summary>
         /// <param name="containerName">The name of the container.</param>
         /// <param name="requiredFreeBytes">On container creation we check for this available space or return null.</param>
