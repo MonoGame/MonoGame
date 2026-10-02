@@ -503,7 +503,7 @@ namespace Microsoft.Xna.Framework.Storage
             {
                 // Append creates a new file if it doesn't exists.
                 if (blob.content == null)
-                    blob.content = new MemoryStream();
+                    return CreateFile(fileName, true);
 
                 blob.content.Position = blob.content.Length;
                 return new StorageStream(blob, true, true);
