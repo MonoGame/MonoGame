@@ -119,6 +119,21 @@ namespace Microsoft.Xna.Framework.Storage
             }
         }
 
+        private Exception IsValidFolder(string path)
+        {
+            int index = path.LastIndexOf('/');
+            if (index == -1)
+                return null;
+
+            var dir = path.Substring(0, index);
+            dir = SanitizeDirPath(dir);
+
+            if (_cache.TryGetValue(dir, out var blob) && !blob.deleted)
+                return null;
+
+            throw new DirectoryNotFoundException("The directory was not found");
+        }
+
         /// <summary>
         /// Creates a new file or appends to an existing one.
         /// </summary>
@@ -136,8 +151,10 @@ namespace Microsoft.Xna.Framework.Storage
             if (_cache == null)
                 PlatformUpdateCache();
 
-            // TODO: If the file is in a folder, should
-            // i throw if the directory has not been created?
+            // Is this file in a folder?
+            var fexcept = IsValidFolder(path);
+            if (fexcept != null)
+                throw fexcept;            
 
             if (!_cache.TryGetValue(path, out var blob))
             {
@@ -449,6 +466,11 @@ namespace Microsoft.Xna.Framework.Storage
             if (_cache == null)
                 PlatformUpdateCache();
 
+            // Is this file in a folder?
+            var fexcept = IsValidFolder(path);
+            if (fexcept != null)
+                throw fexcept;
+
             bool exists = _cache.TryGetValue(path, out var blob) && blob.deleted == false;
 
             if (fileMode == FileMode.CreateNew)
@@ -477,6 +499,16 @@ namespace Microsoft.Xna.Framework.Storage
                 return CreateFile(fileName, false);
             }
 
+            if (fileMode == FileMode.Append)
+            {
+                // Append creates a new file if it doesn't exists.
+                if (blob.content == null)
+                    blob.content = new MemoryStream();
+
+                blob.content.Position = blob.content.Length;
+                return new StorageStream(blob, true, true);
+            }
+
             if (!exists)
                 throw new FileNotFoundException();
 
@@ -484,12 +516,6 @@ namespace Microsoft.Xna.Framework.Storage
             {
                 blob.content.Position = 0;
                 blob.content.SetLength(0);
-                return new StorageStream(blob, true, true);
-            }
-
-            if (fileMode == FileMode.Append)
-            {
-                blob.content.Position = blob.content.Length;
                 return new StorageStream(blob, true, true);
             }
 

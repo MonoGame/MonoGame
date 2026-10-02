@@ -155,6 +155,10 @@ namespace Microsoft.Xna.Framework.Storage
         /// <param name="requiredFreeBytes">On container creation we check for this available space or return null.</param>
         /// <returns>The container or null if it could not be created.</returns>
         /// <exception cref="ArgumentNullException"></exception>
+        /// <remarks>
+        /// Note that if a previous commit failed because of a crash or power loss we will
+        /// recover the last good container state.
+        /// </remarks>
         public StorageContainer OpenContainer(string containerName, long requiredFreeBytes)
         {
             // TODO: Should containerName be "displayName" like in old XNA?

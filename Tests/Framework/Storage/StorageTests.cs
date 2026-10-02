@@ -175,12 +175,38 @@ namespace MonoGame.Tests.Framework
         {
             var device = new StorageDevice(MY_GAME_TITLE, PlayerIndex.One);
             var container = device.OpenContainer(MY_GAME_CONTAINER, ContainerSize);
-            container.CreateDirectory("Alpha");
-            container.CreateDirectory("Beta");
-            container.CreateDirectory("Gamma");
-            var filtered = container.GetDirectoryNames("A*");
-            Assert.IsTrue(filtered.Any(x => x == "alpha"));
-            Assert.IsFalse(filtered.Any(x => x == "beta"));
+            string[] dirs = { "DirA", "DirB", "DirC" };
+            foreach (var d in dirs)
+                container.CreateDirectory(d);
+
+            var found = container.GetDirectoryNames("*");
+            Assert.AreEqual(dirs.Length, found.Length);
+            foreach (var d in dirs)
+                Assert.IsTrue(found.Any(x => x.Equals(d, StringComparison.OrdinalIgnoreCase)));
+
+            found = container.GetDirectoryNames("Dir*");
+            Assert.AreEqual(dirs.Length, found.Length);
+            foreach (var d in dirs)
+                Assert.IsTrue(found.Any(x => x.Equals(d, StringComparison.OrdinalIgnoreCase)));
+
+            found = container.GetDirectoryNames("D*ir?");
+            Assert.AreEqual(dirs.Length, found.Length);
+            foreach (var d in dirs)
+                Assert.IsTrue(found.Any(x => x.Equals(d, StringComparison.OrdinalIgnoreCase)));
+
+            found = container.GetDirectoryNames("Dir?");
+            Assert.AreEqual(dirs.Length, found.Length);
+            foreach (var d in dirs)
+                Assert.IsTrue(found.Any(x => x.Equals(d, StringComparison.OrdinalIgnoreCase)));
+
+            found = container.GetDirectoryNames("D?rA");
+            Assert.AreEqual(1, found.Length);
+            Assert.IsTrue(found[0].Equals(dirs[0], StringComparison.OrdinalIgnoreCase));
+
+            found = container.GetDirectoryNames("dira");
+            Assert.AreEqual(1, found.Length);
+            Assert.IsTrue(found[0].Equals(dirs[0], StringComparison.OrdinalIgnoreCase));
+
             container.Dispose();
             device.Dispose();
         }
@@ -212,14 +238,135 @@ namespace MonoGame.Tests.Framework
         {
             var device = new StorageDevice(MY_GAME_TITLE, PlayerIndex.One);
             var container = device.OpenContainer(MY_GAME_CONTAINER, ContainerSize);
-            container.CreateFile("Alpha.txt").Dispose();
-            container.CreateFile("Beta.txt").Dispose();
-            container.CreateFile("Gamma.txt").Dispose();
-            var filtered = container.GetFileNames("A*");
-            Assert.IsTrue(filtered.Any(x => x == "alpha.txt"));
-            Assert.IsFalse(filtered.Any(x => x == "beta.txt"));
+            string[] files = { "fileA.txt", "fileB.txt", "fileC.txt" };
+            foreach (var f in files)
+            {
+                using (var stream = container.CreateFile(f))
+                using (var writer = new StreamWriter(stream))
+                {
+                    writer.Write("data");
+                }
+            }
+
+            var found = container.GetFileNames("*");
+            Assert.AreEqual(files.Length, found.Length);
+            foreach (var f in files)
+                Assert.IsTrue(found.Any(x => x.Equals(f, StringComparison.OrdinalIgnoreCase)));
+
+            found = container.GetFileNames("*.txt");
+            Assert.AreEqual(files.Length, found.Length);
+            foreach (var f in files)
+                Assert.IsTrue(found.Any(x => x.Equals(f, StringComparison.OrdinalIgnoreCase)));
+
+            found = container.GetFileNames("file?.txt");
+            Assert.AreEqual(files.Length, found.Length);
+            foreach (var f in files)
+                Assert.IsTrue(found.Any(x => x.Equals(f, StringComparison.OrdinalIgnoreCase)));
+
+            found = container.GetFileNames("filea.txt");
+            Assert.AreEqual(1, found.Length);
+            Assert.IsTrue(found[0].Equals(files[0], StringComparison.OrdinalIgnoreCase));
+
             container.Dispose();
             device.Dispose();
+
+        }
+
+        [Test]
+        public void FileOpenOrCreate_ThrowOnMissingDirectory()
+        {
+            var file_name = "folder/file1.txt";
+            string fileContent = "Persisted!";
+
+            var device = new StorageDevice(MY_GAME_TITLE, PlayerIndex.One);
+            var container = device.OpenContainer(MY_GAME_CONTAINER, ContainerSize);
+
+            // These should throw.
+            Assert.Throws(typeof(DirectoryNotFoundException), () => container.CreateFile(file_name));
+            Assert.Throws(typeof(DirectoryNotFoundException), () => container.OpenFile(file_name, FileMode.Open));
+
+            // Create the folder then it should work.
+            container.CreateDirectory("folder");
+            Assert.DoesNotThrow(() => container.CreateFile(file_name));
+            Assert.DoesNotThrow(() => container.OpenFile(file_name, FileMode.Open));
+
+            container.Dispose();
+            device.Dispose();
+        }
+
+        private static string GetContainerPath(string title, string container)
+        {
+            string root;
+
+            if (Environment.OSVersion.Platform == PlatformID.Win32NT)
+                root = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+            else
+            {
+                root = Environment.GetEnvironmentVariable("XDG_DATA_HOME");
+                if (string.IsNullOrEmpty(root))
+                {
+                    root = Environment.GetEnvironmentVariable("HOME");
+                    if (string.IsNullOrEmpty(root))
+                        root = ".";
+                    else
+                        root = Path.Combine(root, ".local", "share");
+                }
+            }
+
+            return Path.Combine(root, "SavedGames", title, container);
+        }
+
+        [Test]
+        public void OpenContainer_CrashRecovery()
+        {
+            var container_name = "crash_test";
+            var file_name = "file1.txt";
+            string fileContent = "Persisted!";
+
+            var container_path = GetContainerPath(MY_GAME_TITLE, container_name);
+            if (Directory.Exists(container_path))
+                Directory.Delete(container_path, true);
+
+            // First write the new container to disk and commit it.
+            {
+                var device = new StorageDevice(MY_GAME_TITLE, PlayerIndex.One);
+                var container = device.OpenContainer(container_name, ContainerSize);
+                using (var stream = container.CreateFile(file_name))
+                using (var writer = new StreamWriter(stream))
+                {
+                    writer.Write(fileContent);
+                }
+
+                // Flush the save data changes to disk.
+                container.Commit();
+                container.Dispose();
+                device.Dispose();
+            }
+
+            // Simulate a crash by renaming the container to ~name.
+            {
+                var crash_path = container_path.Replace(container_name, $"~{container_name}");
+                if (Directory.Exists(crash_path))
+                    Directory.Delete(crash_path, true);
+                Directory.Move(container_path, crash_path);
+            }
+
+            // Check that the crash recovered the content.
+            {
+                var device = new StorageDevice(MY_GAME_TITLE, PlayerIndex.One);
+                var container = device.OpenContainer(container_name, ContainerSize);
+                Assert.IsTrue(container.FileExists(file_name));
+
+                using (var stream = container.OpenFile(file_name, FileMode.Open))
+                using (var reader = new StreamReader(stream))
+                {
+                    var readContent = reader.ReadToEnd();
+                    Assert.AreEqual(fileContent, readContent);
+                }
+
+                container.Dispose();
+                device.Dispose();
+            }
         }
 
         [Test]

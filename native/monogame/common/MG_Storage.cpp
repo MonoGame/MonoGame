@@ -111,13 +111,14 @@ static bool _MG_CreateDirectory(const char* directory)
 #endif
 }
 
-static bool _MG_Storage_DeleteDirectory(const char* path)
+static bool _MG_Storage_DeleteDirectory(const std::string& path)
 {
     // This is a recursive delete operation.
+    // It is not atomic and can fail in the middle of it.
 
 #if _WIN32
     char tmp[MAX_PATH];
-    _MakeFileOperationPath(tmp, path);
+    _MakeFileOperationPath(tmp, path.c_str());
 
     SHFILEOPSTRUCTA op = {};
     op.wFunc = FO_DELETE;
@@ -128,7 +129,13 @@ static bool _MG_Storage_DeleteDirectory(const char* path)
     if (ok == 0)
         return true;
 #else
-    DIR* h = opendir(path);
+
+    // We need the trailing slash.
+    std::string path_ = path;
+    if (path_[path_.size() - 1] != '/')
+        path_ += '/';
+
+    DIR* h = opendir(path_.c_str());
     if (h == nullptr)
         return false;
 
@@ -143,14 +150,12 @@ static bool _MG_Storage_DeleteDirectory(const char* path)
         if (name == "." || name == "..")
             continue;
 
-        std::string entry = path;
+        std::string entry = path_;
         entry += name;
 
         if (e->d_type == DT_DIR)
         {
-            entry += "/";
-
-            _MG_Storage_DeleteDirectory(entry.c_str());
+            _MG_Storage_DeleteDirectory(entry);
             continue;
         }
 
@@ -160,7 +165,7 @@ static bool _MG_Storage_DeleteDirectory(const char* path)
 
     closedir(h);
 
-    int err = remove(path);
+    int err = remove(path_.c_str());
     if (err == 0)
         return true;
 #endif
@@ -291,11 +296,11 @@ static bool _MG_Storage_RenameDirectory(const char* source, const char* dest)
     return false;
 }
 
-static bool _MG_Storage_DirectoryExists(const char* path)
+static bool _MG_Storage_DirectoryExists(const std::string& path)
 {
 #if _WIN32
     char tmp[MAX_PATH];
-    _MakeFileOperationPath(tmp, path);
+    _MakeFileOperationPath(tmp, path.c_str());
 
     DWORD att = GetFileAttributesA(tmp);
     if (att == INVALID_FILE_ATTRIBUTES)
@@ -305,7 +310,7 @@ static bool _MG_Storage_DirectoryExists(const char* path)
         return true;
 #else
     struct stat s;
-    int ok = stat(path, &s);
+    int ok = stat(path.c_str(), &s);
     if (ok == 0)
         return S_ISDIR(s.st_mode);
 #endif
@@ -439,21 +444,29 @@ MG_StorageContainer* MG_Storage_OpenContainer(MG_StorageDevice* device, const ch
     container->root += name;
     container->root += "/";
 
-    // Check to see if we exist.
-    if (_MG_Storage_DirectoryExists(container->root.c_str()))
+    // Get the recovery container path too.
+    std::string last_container;
+    last_container = container->storage_root;
+    last_container += "~";
+    last_container += container->name;
+
+    // Check to see if the container exist.
+    if (_MG_Storage_DirectoryExists(container->root))
     {
-        // Nothing to do... we're good!
+        // If the container exits then we saved successfully in the past.
+        // We know this because we use rename, which is atomic, to place
+        // the final saved container.
+
+        // If ~container exists then we crashed/failed during the final
+        // step of commit which deletes of that directory... clean it up now.
+        _MG_Storage_DeleteDirectory(last_container);
     }
     else
     {
         // Check to see if we crashed/powered off in the middle
-        // of the save commit... try to restore it.      
-        std::string last_container;
-        last_container = container->storage_root;
-        last_container += "~";
-        last_container += container->name;
+        // of the save commit... try to restore it.
 
-        if (_MG_Storage_DirectoryExists(last_container.c_str()))
+        if (_MG_Storage_DirectoryExists(last_container))
         {
             // Restore the last container!
             _MG_Storage_RenameDirectory(last_container.c_str(), container->root.c_str());
@@ -469,11 +482,10 @@ mgbool MG_Storage_DeleteContainer(MG_StorageDevice* device, const char* name)
 
     std::string root = device->root;
     root += name;
-    root += "/";
 
     // This is an atomic operation, so just do it.
 
-    return _MG_Storage_DeleteDirectory(root.data());
+    return _MG_Storage_DeleteDirectory(root);
 }
 
 void MG_Storage_CloseContainer(MG_StorageContainer* container)
@@ -497,12 +509,13 @@ static void _MG_Storage_MakeCommitPath(MG_StorageContainer* container, std::stri
         // TODO: Need to handle failure and bubble it up!
 
         // Make sure any old work is cleared.
-        _MG_Storage_DeleteDirectory(scratch.c_str());
+        _MG_Storage_DeleteDirectory(scratch);
     
         // If the container source folder doesn't exist this is new storage
         // and we just need to create a empty scratch folder.
-        if (!_MG_Storage_DirectoryExists(container->root.c_str()))
+        if (!_MG_Storage_DirectoryExists(container->root))
             _MG_CreateDirectory(scratch.c_str());
+
         else
         {
             // Copy the content of the container on disk to
@@ -764,7 +777,7 @@ mgbool MG_Storage_DirectoryExists(MG_StorageContainer* container, const char* na
     std::string path;
     _MG_Storage_MakePath(container, path, name);
 
-    return _MG_Storage_DirectoryExists(path.c_str());
+    return _MG_Storage_DirectoryExists(path);
 }
 
 mgbool MG_Storage_DirectoryDelete(MG_StorageContainer* container, const char* name)
@@ -776,7 +789,7 @@ mgbool MG_Storage_DirectoryDelete(MG_StorageContainer* container, const char* na
     _MG_Storage_MakeCommitPath(container, path, name);
     path += "/";
 
-    return _MG_Storage_DeleteDirectory(path.c_str());
+    return _MG_Storage_DeleteDirectory(path);
 }
 
 mgbool MG_Storage_DirectoryCreate(MG_StorageContainer* container, const char* name)
@@ -820,8 +833,7 @@ void MG_Storage_CommitContainer(MG_StorageContainer* container)
     _MG_Storage_RenameDirectory(scratch.c_str(), container->root.c_str());
 
     // Finally delete the original/last container.
-    last_container += "/";
-    _MG_Storage_DeleteDirectory(last_container.c_str());
+    _MG_Storage_DeleteDirectory(last_container);
 
     container->do_commit = false;
 }
