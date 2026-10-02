@@ -502,7 +502,7 @@ namespace Microsoft.Xna.Framework.Storage
             if (fileMode == FileMode.Append)
             {
                 // Append creates a new file if it doesn't exists.
-                if (blob.content == null)
+                if (!exists)
                     return CreateFile(fileName, true);
 
                 blob.content.Position = blob.content.Length;
