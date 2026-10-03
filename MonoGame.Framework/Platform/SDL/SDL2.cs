@@ -103,6 +103,15 @@ internal static class Sdl
         GetEvent = 0x2,
     }
 
+    public enum PowerState
+    {
+        Unknown = 0,
+        OnBattery = 1,
+        NoBattery = 2,
+        Charging = 3,
+        Charged = 4
+    }
+
     [StructLayout(LayoutKind.Explicit, Size = 56)]
     public struct Event
     {
@@ -218,6 +227,11 @@ internal static class Sdl
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     public delegate int d_sdl_init(int flags);
     public static d_sdl_init SDL_Init = FuncLoader.LoadFunction<d_sdl_init>(NativeLibrary, "SDL_Init");
+
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    public delegate PowerState d_sdl_get_power_info(out int secs, out int percent);
+    public static d_sdl_get_power_info SDL_GetPowerInfo =
+        FuncLoader.LoadFunction<d_sdl_get_power_info>(NativeLibrary, "SDL_GetPowerInfo");
 
     public static void Init(int flags)
     {
