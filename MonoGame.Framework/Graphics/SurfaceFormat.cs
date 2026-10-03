@@ -160,27 +160,27 @@ namespace Microsoft.Xna.Framework.Graphics
         RgbaAtcInterpolatedAlpha = 81,
 
 		/// <summary>
-        /// Etc2 RGB8 (Android/iOS withh OpenglES 3.0)
+        /// Etc2 RGB8 (Android/iOS with OpenglES 3.0)
 		/// </summary>
         Rgb8Etc2 = 90,
 		/// <summary>
-        /// Etc2 SRGB8 (Android/iOS withh OpenglES 3.0)
+        /// Etc2 SRGB8 (Android/iOS with OpenglES 3.0)
 		/// </summary>
         Srgb8Etc2 = 91,
 		/// <summary>
-        /// Etc2 RGB8A1 (Android/iOS withh OpenglES 3.0)
+        /// Etc2 RGB8A1 (Android/iOS with OpenglES 3.0)
 		/// </summary>
         Rgb8A1Etc2 = 92,
 		/// <summary>
-        /// Etc2 SRGB8A1 (Android/iOS withh OpenglES 3.0)
+        /// Etc2 SRGB8A1 (Android/iOS with OpenglES 3.0)
 		/// </summary>
         Srgb8A1Etc2 = 93,
 		/// <summary>
-        /// Etc2 RGBA8 EAC (Android/iOS withh OpenglES 3.0)
+        /// Etc2 RGBA8 EAC (Android/iOS with OpenglES 3.0)
 		/// </summary>
         Rgba8Etc2 = 94,
 		/// <summary>
-        /// Etc2 SRGB8A8 EAC (Android/iOS withh OpenglES 3.0)
+        /// Etc2 SRGB8A8 EAC (Android/iOS with OpenglES 3.0)
 		/// </summary>
         SRgb8A8Etc2 = 95,
         /// <summary>
