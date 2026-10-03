@@ -559,7 +559,7 @@ namespace Microsoft.Xna.Framework
         /// </returns>
         public override bool Equals(object obj)
         {
-            return (obj is BoundingBox) && this.Equals((BoundingBox)obj);
+            return (obj is BoundingBox other) && this.Equals(other);
         }
 
         /// <summary>
