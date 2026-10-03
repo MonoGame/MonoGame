@@ -22,7 +22,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		public Color Color;
 
         /// <inheritdoc cref="IVertexType.VertexDeclaration"/>
-		public static readonly VertexDeclaration VertexDeclaration;
+		public static readonly VertexDeclaration VertexDeclaration { get; }
 
         /// <summary>
         /// Creates an instance of <see cref="VertexPositionColor"/>.
@@ -33,14 +33,6 @@ namespace Microsoft.Xna.Framework.Graphics
 		{
 			this.Position = position;
 			Color = color;
-		}
-
-		VertexDeclaration IVertexType.VertexDeclaration
-        {
-			get
-            {
-				return VertexDeclaration;
-			}
 		}
 
         /// <inheritdoc/>

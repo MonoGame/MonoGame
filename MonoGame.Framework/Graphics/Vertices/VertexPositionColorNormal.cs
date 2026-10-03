@@ -16,7 +16,7 @@ namespace Microsoft.Xna.Framework.Graphics
         /// <inheritdoc cref="VertexPositionNormalTexture.Normal"/>
         public Vector3 Normal;
         /// <inheritdoc cref="IVertexType.VertexDeclaration"/>
-        public static readonly VertexDeclaration VertexDeclaration;
+        public static VertexDeclaration VertexDeclaration { get; }
 
         /// <summary>
         /// Creates an instance of <see cref="VertexPositionColorNormal"/>.
@@ -29,14 +29,6 @@ namespace Microsoft.Xna.Framework.Graphics
             Position = position;
             Color = color;
             Normal = normal;
-        }
-
-        VertexDeclaration IVertexType.VertexDeclaration
-        {
-            get
-            {
-                return VertexDeclaration;
-            }
         }
 
         /// <inheritdoc/>

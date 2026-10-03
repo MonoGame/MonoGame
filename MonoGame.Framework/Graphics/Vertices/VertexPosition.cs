@@ -20,7 +20,7 @@ namespace Microsoft.Xna.Framework.Graphics
         [DataMember]
 		public Vector3 Position;
         /// <inheritdoc cref="IVertexType.VertexDeclaration"/>
-		public static readonly VertexDeclaration VertexDeclaration;
+		public static VertexDeclaration VertexDeclaration { get; }
 
         /// <summary>
         /// Creates an instance of <see cref="VertexPosition"/>.
@@ -29,11 +29,6 @@ namespace Microsoft.Xna.Framework.Graphics
         public VertexPosition(Vector3 position)
 		{
 			Position = position;
-		}
-
-		VertexDeclaration IVertexType.VertexDeclaration
-        {
-			get { return VertexDeclaration; }
 		}
 
         /// <inheritdoc/>
