@@ -1,15 +1,14 @@
-// MonoGame - Copyright (C) MonoGame Foundation, Inc
+﻿// MonoGame - Copyright (C) MonoGame Foundation, Inc
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
 #if VULKAN || DIRECTX12
 
+using Microsoft.Xna.Framework.Media;
+using NUnit.Framework;
 using System;
 using System.Diagnostics;
 using System.IO;
-using NUnit.Framework;
-using Microsoft.Xna.Framework.Media;
-using MonoGame.Tests;
 
 namespace MonoGame.Tests.Audio
 {
@@ -41,7 +40,7 @@ namespace MonoGame.Tests.Audio
             // Pause it now.
             MediaPlayer.Pause();
             stopWatch.Stop();
-            
+
             SleepWhileDispatching(500);
             Assert.AreEqual(MediaState.Paused, MediaPlayer.State);
 
