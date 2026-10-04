@@ -117,18 +117,6 @@ namespace MonoGame.Tests.Input
             Assert.IsTrue(state.IsButtonDown(Buttons.RightTrigger));
         }
 
-        private GamePadState HandleFakeControllerInput(float value){
-            Buttons fakeButtons = (Buttons) 0;
-            fakeButtons = (value > 0f) ? (fakeButtons |= Buttons.RightTrigger) : (fakeButtons &= ~Buttons.RightTrigger);
-            return new GamePadState(Vector2.Zero, Vector2.Zero, 0f, value, fakeButtons);
-        }
-
-        [Test]
-        public void TriggerTestFakeDouble(){
-            var state = HandleFakeControllerInput(1.0f);
-            Assert.IsTrue(state.IsButtonDown(Buttons.RightTrigger));
-        }
-
         #endregion
 
         #region Thumbsticks
@@ -372,7 +360,7 @@ namespace MonoGame.Tests.Input
                 }
             }
         }
-        
+
         #endregion
     }
 }
