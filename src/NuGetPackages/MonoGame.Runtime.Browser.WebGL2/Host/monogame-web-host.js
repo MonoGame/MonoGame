@@ -73,6 +73,7 @@ class MonoGameWebHost {
         this.managedFrameHandle = null;
         this.contextLost = false;
         this.firstFrameReported = false;
+        this.isDisposed = false;
         this.window = new BrowserWindow(this.config, () => this.runtime);
         this.accelerometer = new BrowserAccelerometer(() => this.runtime);
         this.audio = new BrowserAudio(root, this.config.contentBaseUri, () => this.runtime);
@@ -156,6 +157,14 @@ class MonoGameWebHost {
             onFirstFrame,
             onError
         };
+
+        if (activeHost != null) {
+            throw new BrowserHostError(
+                HostStage.HostBootstrap,
+                "host_already_active",
+                "A MonoGame.Web host is already active. Wait for it to exit before starting another host.");
+        }
+
         const host = new MonoGameWebHost(root, config, statusElement, callbacks);
         activeHost = host;
         void host.startAsync();
@@ -181,6 +190,9 @@ class MonoGameWebHost {
         }
         catch (error) {
             this.handleHostFailure(error);
+        }
+        finally {
+            this.dispose();
         }
     }
 
@@ -333,13 +345,13 @@ class MonoGameWebHost {
      * A later frame is scheduled only when `Tick` returns `true`.
      */
     scheduleManagedFrame() {
-        if (this.contextLost) {
+        if (this.contextLost || this.isDisposed) {
             return;
         }
 
         this.managedFrameHandle = requestAnimationFrame(async () => {
             this.managedFrameHandle = null;
-            if (this.contextLost) {
+            if (this.contextLost || this.isDisposed) {
                 return;
             }
 
@@ -350,15 +362,17 @@ class MonoGameWebHost {
                     this.notify(this.callbacks.onFirstFrame, undefined, "onFirstFrame");
                 }
 
-                if (shouldContinue && !this.contextLost) {
+                if (shouldContinue && !this.contextLost && !this.isDisposed) {
                     this.scheduleManagedFrame();
                 }
                 else {
                     this.logStage(HostStage.RuntimeBoundary, "Managed run loop ended.");
+                    this.dispose();
                 }
             }
             catch (error) {
                 this.handleHostFailure(new BrowserHostError(HostStage.ManagedExports, "managed_tick_failed", error instanceof Error ? error.message : String(error)));
+                this.dispose();
             }
         });
     }
@@ -379,6 +393,32 @@ class MonoGameWebHost {
             HostStage.ContextLoss,
             "webgl_context_lost",
             "The WebGL2 context was lost. MonoGame.Web cannot recover this application; reload the page."));
+        this.dispose();
+    }
+
+    /** Releases browser-owned resources after the application exits or the host fails. */
+    dispose() {
+        if (this.isDisposed) {
+            return;
+        }
+
+        this.isDisposed = true;
+        if (this.managedFrameHandle != null) {
+            cancelAnimationFrame(this.managedFrameHandle);
+            this.managedFrameHandle = null;
+        }
+
+        this.window.dispose();
+        this.accelerometer.dispose();
+        this.audio.dispose();
+        this.hostExports = null;
+        this.runtime = null;
+
+        if (activeHost === this) {
+            activeHost = null;
+        }
+
+        this.logStage(HostStage.RuntimeBoundary, "Browser host disposed.");
     }
 
     playSong(songId, mediaPath, positionMilliseconds, volume, commandId) {

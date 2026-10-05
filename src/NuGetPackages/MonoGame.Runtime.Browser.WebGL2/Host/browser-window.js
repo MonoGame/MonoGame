@@ -24,6 +24,8 @@ export class BrowserWindow {
         this.canvas = null;
         this.canvasResizeObserver = null;
         this.contextLost = false;
+        this.eventAbortController = new AbortController();
+        this.isDisposed = false;
     }
 
     /**
@@ -63,9 +65,10 @@ export class BrowserWindow {
 
     /** Suppresses browser mouse actions that interrupt a canvas game. */
     suppressBrowserMouseDefaults() {
+        const eventOptions = { signal: this.eventAbortController.signal };
         this.canvas.addEventListener("contextmenu", (event) => {
             event.preventDefault();
-        });
+        }, eventOptions);
 
         const suppressUnsupportedButtonAction = (event) => {
             if (event.button === 3 || event.button === 4) {
@@ -75,11 +78,11 @@ export class BrowserWindow {
 
         // SDL2 does not translate buttons 3 and 4, so suppress their browser Back and Forward defaults.
         // Firefox reserves these buttons before dispatching cancellable page events: https://bugzilla.mozilla.org/show_bug.cgi?id=1933746
-        this.canvas.addEventListener("pointerdown", suppressUnsupportedButtonAction);
-        this.canvas.addEventListener("pointerup", suppressUnsupportedButtonAction);
-        this.canvas.addEventListener("mousedown", suppressUnsupportedButtonAction);
-        this.canvas.addEventListener("mouseup", suppressUnsupportedButtonAction);
-        this.canvas.addEventListener("auxclick", suppressUnsupportedButtonAction);
+        this.canvas.addEventListener("pointerdown", suppressUnsupportedButtonAction, eventOptions);
+        this.canvas.addEventListener("pointerup", suppressUnsupportedButtonAction, eventOptions);
+        this.canvas.addEventListener("mousedown", suppressUnsupportedButtonAction, eventOptions);
+        this.canvas.addEventListener("mouseup", suppressUnsupportedButtonAction, eventOptions);
+        this.canvas.addEventListener("auxclick", suppressUnsupportedButtonAction, eventOptions);
     }
 
     /**
@@ -142,13 +145,13 @@ export class BrowserWindow {
      */
     observeContextLoss(onContextLost) {
         this.canvas.addEventListener("webglcontextlost", () => {
-            if (this.contextLost) {
+            if (this.contextLost || this.isDisposed) {
                 return;
             }
 
             this.contextLost = true;
             onContextLost();
-        });
+        }, { signal: this.eventAbortController.signal });
     }
 
     /**
@@ -185,6 +188,10 @@ export class BrowserWindow {
         }
 
         this.canvasResizeObserver = new ResizeObserver((entries) => {
+            if (this.isDisposed) {
+                return;
+            }
+
             for (const entry of entries) {
                 if (entry.target === this.canvas) {
                     reportCanvasSize(entry.contentRect.width, entry.contentRect.height);
@@ -211,11 +218,12 @@ export class BrowserWindow {
         const notifyFocus = (focused) => notifyFocusChange(focused ? 1 : 0);
         const notifyWindowFocus = () => notifyFocus(!document.hidden && document.hasFocus());
 
-        document.addEventListener("visibilitychange", notifyWindowFocus);
-        globalThis.addEventListener("focus", notifyWindowFocus);
-        globalThis.addEventListener("blur", notifyWindowFocus);
-        this.canvas.addEventListener("focus", () => notifyFocus(true));
-        this.canvas.addEventListener("blur", () => notifyFocus(false));
+        const eventOptions = { signal: this.eventAbortController.signal };
+        document.addEventListener("visibilitychange", notifyWindowFocus, eventOptions);
+        globalThis.addEventListener("focus", notifyWindowFocus, eventOptions);
+        globalThis.addEventListener("blur", notifyWindowFocus, eventOptions);
+        this.canvas.addEventListener("focus", () => notifyFocus(true), eventOptions);
+        this.canvas.addEventListener("blur", () => notifyFocus(false), eventOptions);
 
         notifyWindowFocus();
     }
@@ -241,12 +249,25 @@ export class BrowserWindow {
             notifyFullscreenChange(fullscreen ? 1 : 0);
         };
 
-        document.addEventListener("fullscreenchange", reportFullscreenChange);
+        const eventOptions = { signal: this.eventAbortController.signal };
+        document.addEventListener("fullscreenchange", reportFullscreenChange, eventOptions);
         document.addEventListener("fullscreenerror", () => {
             notifyFullscreenFailure();
-        });
+        }, eventOptions);
 
         reportFullscreenChange();
+    }
+
+    /** Removes browser listeners and stops CSS canvas resize observation. */
+    dispose() {
+        if (this.isDisposed) {
+            return;
+        }
+
+        this.isDisposed = true;
+        this.eventAbortController.abort();
+        this.canvasResizeObserver?.disconnect();
+        this.canvasResizeObserver = null;
     }
 
     /** Requests fullscreen for the game canvas. */

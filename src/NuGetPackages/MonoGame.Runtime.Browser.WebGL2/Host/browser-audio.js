@@ -24,6 +24,8 @@ export class BrowserAudio {
         this.songElement = null;
         this.songGainNode = null;
         this.activeSong = null;
+        this.activationAbortController = new AbortController();
+        this.isDisposed = false;
     }
 
     /**
@@ -34,13 +36,18 @@ export class BrowserAudio {
     observeActivation(canvas) {
         const activateAudio = () => this.requestAudioActivation();
 
-        canvas.addEventListener("pointerdown", activateAudio, { passive: true });
-        canvas.addEventListener("touchend", activateAudio);
-        canvas.addEventListener("keydown", activateAudio);
+        const eventOptions = { signal: this.activationAbortController.signal };
+        canvas.addEventListener("pointerdown", activateAudio, { passive: true, signal: this.activationAbortController.signal });
+        canvas.addEventListener("touchend", activateAudio, eventOptions);
+        canvas.addEventListener("keydown", activateAudio, eventOptions);
     }
 
     /** Requests browser audio activation and updates a startup Song when it succeeds. */
     requestAudioActivation() {
+        if (this.isDisposed) {
+            return;
+        }
+
         this.audioActivationPromise = this.activateAsync();
         void this.loadPendingSongAfterActivationAsync(this.audioActivationPromise);
     }
@@ -51,6 +58,10 @@ export class BrowserAudio {
      * @returns {Promise<boolean>} Whether the audio context is running.
      */
     async activateAsync() {
+        if (this.isDisposed) {
+            return false;
+        }
+
         const AudioContextConstructor = globalThis.AudioContext ?? globalThis.webkitAudioContext;
         if (AudioContextConstructor == null) {
             return false;
@@ -67,12 +78,45 @@ export class BrowserAudio {
                 this.songGainNode.connect(this.audioContext.destination);
             }
 
-            await this.audioContext.resume();
-            return this.audioContext.state === "running";
+            const audioContext = this.audioContext;
+            await audioContext.resume();
+            return !this.isDisposed && audioContext.state === "running";
         }
         catch {
             return false;
         }
+    }
+
+    /** Stops media playback, releases audio resources, and removes gesture listeners. */
+    dispose() {
+        if (this.isDisposed) {
+            return;
+        }
+
+        this.isDisposed = true;
+        this.activationAbortController.abort();
+        this.activeSong = null;
+
+        if (this.songElement != null) {
+            this.songElement.pause();
+            this.songElement.removeAttribute("src");
+            this.songElement.load();
+            this.songElement.remove();
+            this.songElement = null;
+        }
+
+        this.songGainNode?.disconnect();
+        this.songGainNode = null;
+
+        if (this.audioContext != null) {
+            const audioContext = this.audioContext;
+            this.audioContext = null;
+            void audioContext.close().catch((error) => {
+                console.warn("[MonoGame.Web Host]", "Audio context close failed.", error);
+            });
+        }
+
+        this.audioActivationPromise = null;
     }
 
     /**
@@ -109,8 +153,8 @@ export class BrowserAudio {
         };
 
         // A game may start a song on the initial load. However the actual
-        // audio cannot be heard until audio is unlocked from a user gesture 
-        // such as clicking the canvas. 
+        // audio cannot be heard until audio is unlocked from a user gesture
+        // such as clicking the canvas.
         // So we start the song muted so its timeline can advance before user interaction
         // unlocks audio. Unmuting avoids starting or restarting playback after activation.
         this.songElement.muted = this.activeSong.waitingForAudio;
@@ -253,7 +297,7 @@ export class BrowserAudio {
      */
     async loadPendingSongAfterActivationAsync(activationPromise) {
         const activated = await activationPromise;
-        if (!activated || !this.isAudioRunning()) {
+        if (this.isDisposed || !activated || !this.isAudioRunning()) {
             return;
         }
 

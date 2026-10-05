@@ -75,6 +75,12 @@ export class BrowserAccelerometer {
         }
     }
 
+    /** Stops motion delivery and releases the host canvas reference. */
+    dispose() {
+        this.stop();
+        this.canvas = null;
+    }
+
     /** Adds the one-shot canvas gesture handler required by browsers such as iOS Safari. */
     addPermissionGestureListener() {
         if (this.canvas == null || this.permissionGestureListener != null) {
