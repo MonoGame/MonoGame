@@ -15,12 +15,10 @@ export class BrowserWindow {
     /**
      * Creates the browser window service.
      *
-     * @param {HTMLElement} root Host element that contains the game canvas.
-     * @param {{ canvasId: string, canvasResizePolicy: string, pointerLockEnabled: boolean }} config Window configuration.
+     * @param {{ canvas: HTMLCanvasElement, canvasResizePolicy: string, pointerLockEnabled: boolean }} config Window configuration.
      * @param {() => object | null} getRuntime Gets the managed runtime.
      */
-    constructor(root, config, getRuntime) {
-        this.root = root;
+    constructor(config, getRuntime) {
         this.config = config;
         this.getRuntime = getRuntime;
         this.canvas = null;
@@ -29,21 +27,20 @@ export class BrowserWindow {
     }
 
     /**
-     * Finds or creates the game canvas and configures it for the native runtime.
+     * Resolves the configured game canvas and prepares it for the native runtime.
      *
      * @param {(stage: string, message: string) => void} logStage Logs canvas setup progress.
      */
     resolveCanvas(logStage) {
         logStage(HostStage.CanvasCreation, "Resolving host canvas.");
 
-        let canvas = document.getElementById(this.config.canvasId);
-        if (canvas == null) {
-            canvas = document.createElement("canvas");
-            canvas.id = this.config.canvasId;
-            canvas.width = 1280;
-            canvas.height = 720;
-            canvas.setAttribute("aria-label", "MonoGame browser host canvas");
-            this.root.appendChild(canvas);
+        const canvas = this.config.canvas;
+
+        if (!(canvas instanceof HTMLCanvasElement)) {
+            throw new BrowserHostError(
+                HostStage.CanvasCreation,
+                "host_canvas_invalid",
+                "The browser host canvas must be an HTMLCanvasElement.");
         }
 
         this.canvas = canvas;

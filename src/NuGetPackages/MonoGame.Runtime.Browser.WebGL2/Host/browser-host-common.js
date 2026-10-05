@@ -21,6 +21,10 @@ export const CanvasResizePolicy = Object.freeze({
     None: "None"
 });
 
+/**
+ * @typedef {(typeof CanvasResizePolicy)[keyof typeof CanvasResizePolicy]} CanvasResizePolicy
+ */
+
 /** Lists the accelerometer states sent to the native runtime. */
 export const SensorState = Object.freeze({
     NotSupported: 0,

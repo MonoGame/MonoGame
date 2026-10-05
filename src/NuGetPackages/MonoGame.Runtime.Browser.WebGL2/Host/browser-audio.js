@@ -32,14 +32,17 @@ export class BrowserAudio {
      * @param {HTMLCanvasElement} canvas Game canvas.
      */
     observeActivation(canvas) {
-        const activateAudio = () => {
-            this.audioActivationPromise = this.activateAsync();
-            void this.loadPendingSongAfterActivationAsync(this.audioActivationPromise);
-        };
+        const activateAudio = () => this.requestAudioActivation();
 
         canvas.addEventListener("pointerdown", activateAudio, { passive: true });
         canvas.addEventListener("touchend", activateAudio);
         canvas.addEventListener("keydown", activateAudio);
+    }
+
+    /** Requests browser audio activation and updates a startup Song when it succeeds. */
+    requestAudioActivation() {
+        this.audioActivationPromise = this.activateAsync();
+        void this.loadPendingSongAfterActivationAsync(this.audioActivationPromise);
     }
 
     /**
@@ -113,8 +116,13 @@ export class BrowserAudio {
         this.songElement.muted = this.activeSong.waitingForAudio;
         this.loadActiveSongMedia();
 
-        if (this.activeSong.waitingForAudio && this.audioActivationPromise != null) {
-            void this.loadPendingSongAfterActivationAsync(this.audioActivationPromise);
+        if (this.activeSong.waitingForAudio) {
+            if (this.audioActivationPromise == null) {
+                this.requestAudioActivation();
+            }
+            else {
+                void this.loadPendingSongAfterActivationAsync(this.audioActivationPromise);
+            }
         }
 
         return true;

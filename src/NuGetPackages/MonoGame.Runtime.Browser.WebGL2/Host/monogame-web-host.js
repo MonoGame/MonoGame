@@ -10,127 +10,156 @@ import { BrowserWindow } from "./browser-window.js";
 
 let activeHost = null;
 
+function getCanvasResizePolicy(value) {
+    if (value === CanvasResizePolicy.Adaptive
+        || value === CanvasResizePolicy.Project
+        || value === CanvasResizePolicy.None) {
+        return value;
+    }
+
+    throw new BrowserHostError(HostStage.HostBootstrap, "canvas_resize_policy_invalid", `Canvas resize policy '${value}' is invalid. Use Adaptive, Project, or None.`);
+}
+
 /**
  * The configuration resolved from package defaults and project settings.
  *
  * @typedef {object} BrowserHostConfiguration
  * @property {string} applicationName
- * @property {string} canvasId
+ * @property {HTMLCanvasElement} canvas
  * @property {string} contentBaseUri
  * @property {string} startupContentManifestUri
- * @property {string} statusId
- * @property {string | null} runtimeScriptUri
- * @property {string | null} hostExportsTypeName
- * @property {string | null} mainAssemblyName
+ * @property {string} runtimeScriptUri
+ * @property {string} hostExportsTypeName
+ * @property {string} mainAssemblyName
  * @property {"Adaptive" | "Project" | "None"} canvasResizePolicy
  * @property {boolean} pointerLockEnabled
  */
 
+/**
+ * The application-owned settings used to start the browser host.
+ *
+ * @typedef {object} BrowserHostStartOptions
+ * @property {HTMLElement} root Element that contains the game canvas.
+ * @property {HTMLCanvasElement} canvas Canvas supplied to the browser runtime.
+ * @property {{ assemblyName: string, hostExportsTypeName: string }} managed Managed application entry points.
+ * @property {string=} applicationName Application name used for host diagnostics.
+ * @property {string=} runtimeScriptUri URI of the .NET browser runtime script.
+ * @property {string=} contentBaseUri Base URI used to resolve published content.
+ * @property {string=} startupContentManifestUri URI of the startup content manifest.
+ * @property {HTMLElement | null=} statusElement Element used for terminal failure text.
+ * @property {CanvasResizePolicy} canvasResizePolicy Canvas resize behavior.
+ * @property {boolean=} pointerLock Enables the browser Pointer Lock compatibility path.
+ * @property {(status: { stage: string, message: string }) => void=} onStatus Receives startup status messages.
+ * @property {() => void=} onFirstFrame Receives the first successful managed frame notification.
+ * @property {(error: { stage: string, code: string, message: string }) => void=} onError Receives terminal host failures.
+ */
+
 /** Coordinates browser startup and delegates browser-specific behavior to private host modules. */
 class MonoGameWebHost {
-    /** @param {HTMLElement} root Root host element. */
-    constructor(root) {
+    /**
+     * @param {HTMLElement} root Root host element.
+     * @param {BrowserHostConfiguration} config Host configuration.
+     * @param {HTMLElement | null} statusElement Host failure element.
+     * @param {{ onStatus: Function | null, onFirstFrame: Function | null, onError: Function | null }} callbacks Presentation callbacks.
+     */
+    constructor(root, config, statusElement, callbacks) {
         this.root = root;
-        this.config = this.readConfig(root);
+        this.config = config;
         this.root.dataset.canvasResizePolicy = this.config.canvasResizePolicy;
-        this.statusElement = document.getElementById(this.config.statusId);
+        this.statusElement = statusElement;
+        this.callbacks = callbacks;
         this.runtime = null;
         this.hostExports = null;
         this.managedFrameHandle = null;
         this.contextLost = false;
-        this.window = new BrowserWindow(root, this.config, () => this.runtime);
+        this.firstFrameReported = false;
+        this.window = new BrowserWindow(this.config, () => this.runtime);
         this.accelerometer = new BrowserAccelerometer(() => this.runtime);
         this.audio = new BrowserAudio(root, this.config.contentBaseUri, () => this.runtime);
         this.content = new BrowserContent(this.config, () => this.runtime, (stage, message) => this.logStage(stage, message));
     }
 
     /**
-     * Creates the host from the package's `#monogame-host` element and begins asynchronous startup.
+     * Starts the browser host using an explicit application-owned configuration object.
      *
-     * @param {Document} document_ Document containing the host element.
+     * @param {BrowserHostStartOptions} options Application-owned host configuration.
      * @returns {MonoGameWebHost} Host coordinator before startup completes.
      */
-    static bootFromDocument(document_) {
-        const root = document_.getElementById("monogame-host");
-        if (root == null) {
-            throw new BrowserHostError(HostStage.HostBootstrap, "host_root_missing", "The browser host root '#monogame-host' was not found.");
+    static start(options) {
+        if (options == null || typeof options !== "object") {
+            throw new BrowserHostError(HostStage.HostBootstrap, "host_configuration_invalid", "The browser host requires a configuration object.");
         }
 
-        const host = new MonoGameWebHost(root);
+        const root = options.root;
+        if (!(root instanceof HTMLElement)) {
+            throw new BrowserHostError(HostStage.HostBootstrap, "host_root_invalid", "The browser host requires an HTMLElement root.");
+        }
+
+        const canvas = options.canvas;
+        if (!(canvas instanceof HTMLCanvasElement)) {
+            throw new BrowserHostError(HostStage.HostBootstrap, "host_canvas_invalid", "The browser host requires an HTMLCanvasElement canvas.");
+        }
+
+        if (!root.contains(canvas)) {
+            throw new BrowserHostError(HostStage.HostBootstrap, "host_canvas_outside_root", "The browser host canvas must be contained by its root element.");
+        }
+
+        const managed = options.managed;
+        if (managed == null || typeof managed !== "object") {
+            throw new BrowserHostError(HostStage.HostBootstrap, "managed_configuration_invalid", "The browser host requires a managed configuration object.");
+        }
+
+        const assemblyName = managed.assemblyName;
+        if (typeof assemblyName !== "string" || assemblyName.trim().length === 0) {
+            throw new BrowserHostError(HostStage.HostBootstrap, "managed_configuration_invalid", "The managed.assemblyName setting must be a non-empty string.");
+        }
+
+        const hostExportsTypeName = managed.hostExportsTypeName;
+        if (typeof hostExportsTypeName !== "string" || hostExportsTypeName.trim().length === 0) {
+            throw new BrowserHostError(HostStage.HostBootstrap, "managed_configuration_invalid", "The managed.hostExportsTypeName setting must be a non-empty string.");
+        }
+
+        const statusElement = options.statusElement ?? null;
+        if (statusElement != null && !(statusElement instanceof HTMLElement)) {
+            throw new BrowserHostError(HostStage.HostBootstrap, "host_status_element_invalid", "The browser host statusElement must be an HTMLElement.");
+        }
+
+        const onStatus = options.onStatus ?? null;
+        if (onStatus != null && typeof onStatus !== "function") {
+            throw new BrowserHostError(HostStage.HostBootstrap, "configuration_callback_invalid", "The onStatus setting must be a function.");
+        }
+
+        const onFirstFrame = options.onFirstFrame ?? null;
+        if (onFirstFrame != null && typeof onFirstFrame !== "function") {
+            throw new BrowserHostError(HostStage.HostBootstrap, "configuration_callback_invalid", "The onFirstFrame setting must be a function.");
+        }
+
+        const onError = options.onError ?? null;
+        if (onError != null && typeof onError !== "function") {
+            throw new BrowserHostError(HostStage.HostBootstrap, "configuration_callback_invalid", "The onError setting must be a function.");
+        }
+
+        const canvasResizePolicy = options.canvasResizePolicy ?? CanvasResizePolicy.Adaptive;
+        const config = {
+            applicationName: options.applicationName ?? "MonoGame.Web",
+            canvas,
+            contentBaseUri: options.contentBaseUri ?? "./",
+            startupContentManifestUri: options.startupContentManifestUri ?? "Content/content-manifest.txt",
+            runtimeScriptUri: options.runtimeScriptUri ?? "./_framework/dotnet.js",
+            hostExportsTypeName,
+            mainAssemblyName: assemblyName,
+            canvasResizePolicy: getCanvasResizePolicy(canvasResizePolicy),
+            pointerLockEnabled: options.pointerLock ?? false
+        };
+        const callbacks = {
+            onStatus,
+            onFirstFrame,
+            onError
+        };
+        const host = new MonoGameWebHost(root, config, statusElement, callbacks);
         activeHost = host;
         void host.startAsync();
         return host;
-    }
-
-    /**
-     * Gets the host configuration from the application's host element.
-     *
-     * @param {HTMLElement} root Host element that supplies configuration.
-     * @returns {BrowserHostConfiguration} Configuration used to initialize the host.
-     */
-    readConfig(root) {
-        const dataset = root.dataset;
-        return {
-            applicationName: dataset.applicationName || "MonoGame.Web",
-            canvasId: dataset.canvasId || "canvas",
-            contentBaseUri: dataset.contentBaseUri || "./",
-            startupContentManifestUri: dataset.startupContentManifestUri || "Content/content-manifest.txt",
-            statusId: dataset.statusId || "monogame-host-status",
-            runtimeScriptUri: this.getOptionalConfigValue(dataset.runtimeScriptUri),
-            hostExportsTypeName: this.getOptionalConfigValue(dataset.hostExportsTypeName),
-            mainAssemblyName: this.getOptionalConfigValue(dataset.mainAssemblyName),
-            canvasResizePolicy: this.getCanvasResizePolicy(this.getOptionalConfigValue(dataset.canvasResizePolicy)),
-            pointerLockEnabled: this.getBooleanConfigValue(dataset.pointerLock, "pointer-lock")
-        };
-    }
-
-    /**
-     * Returns the configuration value, or `null` when it is empty or missing.
-     *
-     * @param {string | null | undefined} value Configuration value to normalize.
-     * @returns {string | null} The supplied value, or `null` when it is absent or empty.
-     */
-    getOptionalConfigValue(value) {
-        return value == null || value.length === 0 ? null : value;
-    }
-
-    /**
-     * Returns a boolean host setting, defaulting to false when it is absent.
-     *
-     * @param {string | null | undefined} value Configuration value to normalize.
-     * @param {string} name Attribute name without the `data-` prefix.
-     * @returns {boolean} Parsed boolean value.
-     * @throws {BrowserHostError} When the setting is not `true` or `false`.
-     */
-    getBooleanConfigValue(value, name) {
-        if (value == null || value.length === 0 || value === "false") {
-            return false;
-        }
-
-        if (value === "true") {
-            return true;
-        }
-
-        throw new BrowserHostError(HostStage.HostBootstrap, "boolean_configuration_invalid", `The data-${name} setting must be true or false.`);
-    }
-
-    /**
-     * Returns the requested canvas resize policy, or `Adaptive` when no policy is specified.
-     *
-     * @param {string | null} value Canvas resize policy to validate.
-     * @returns {"Adaptive" | "Project" | "None"} Requested canvas resize policy.
-     * @throws {BrowserHostError} When the policy is not `Adaptive`, `Project`, or `None`.
-     */
-    getCanvasResizePolicy(value) {
-        if (value == null) {
-            return CanvasResizePolicy.Adaptive;
-        }
-
-        if (value === CanvasResizePolicy.Adaptive || value === CanvasResizePolicy.Project || value === CanvasResizePolicy.None) {
-            return value;
-        }
-
-        throw new BrowserHostError(HostStage.HostBootstrap, "canvas_resize_policy_invalid", `Canvas resize policy '${value}' is invalid. Use Adaptive, Project, or None.`);
     }
 
     /**
@@ -316,6 +345,11 @@ class MonoGameWebHost {
 
             try {
                 const shouldContinue = await this.hostExports.Tick();
+                if (!this.firstFrameReported) {
+                    this.firstFrameReported = true;
+                    this.notify(this.callbacks.onFirstFrame, undefined, "onFirstFrame");
+                }
+
                 if (shouldContinue && !this.contextLost) {
                     this.scheduleManagedFrame();
                 }
@@ -411,6 +445,11 @@ class MonoGameWebHost {
         }
 
         console.error("[MonoGame.Web Host]", message, startupError);
+        this.notify(this.callbacks.onError, {
+            stage: startupError.stage,
+            code: startupError.code,
+            message: startupError.message
+        }, "onError");
     }
 
     /**
@@ -421,7 +460,39 @@ class MonoGameWebHost {
      */
     logStage(stage, message) {
         console.info("[MonoGame.Web Host]", stage, message);
+        this.notify(this.callbacks.onStatus, { stage, message }, "onStatus");
     }
+
+    /**
+     * Delivers a presentation notification without allowing page code to
+     * interrupt browser-host lifecycle handling.
+     *
+     * @param {Function | null | undefined} callback Callback to invoke.
+     * @param {unknown} value Callback value.
+     * @param {string} name Callback setting name.
+     */
+    notify(callback, value, name) {
+        if (callback == null) {
+            return;
+        }
+
+        try {
+            callback(value);
+        }
+        catch (error) {
+            console.error("[MonoGame.Web Host]", `${name} callback failed.`, error);
+        }
+    }
+}
+
+/**
+ * Starts the browser host using an explicit application-owned configuration object.
+ *
+ * @param {BrowserHostStartOptions} options Application-owned host configuration.
+ * @returns {MonoGameWebHost} Host coordinator before startup completes.
+ */
+export function start(options) {
+    return MonoGameWebHost.start(options);
 }
 
 /** Provides host services called by the browser native runtime. */
@@ -439,5 +510,3 @@ globalThis.MonoGameWebHost = {
     stageContentManifestAsync: (manifestUri) => activeHost?.content.stageContentManifestAsync(manifestUri),
     tryGetContentBase64: (relativePath) => activeHost?.content.tryGetContentBase64(relativePath) ?? null
 };
-
-MonoGameWebHost.bootFromDocument(document);

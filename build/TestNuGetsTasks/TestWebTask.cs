@@ -17,6 +17,14 @@ public sealed class TestWebTask : TestMonoGameTemplateTaskBase
         "_monogame/browser-window.js"
     };
     private static readonly string[] UnexpectedPublishedFiles = { "main.js", "host.css" };
+    private static readonly string[] RequiredDefaultShellFragments =
+    {
+        "id=\"monogame-loading\"",
+        "id=\"monogame-error\"",
+        "onStatus:",
+        "onFirstFrame:",
+        "onError:"
+    };
 
     protected override string TemplateName => "WebGL2";
     protected override string ProjectFolderName => "webgl2";
@@ -92,6 +100,21 @@ public sealed class TestWebTask : TestMonoGameTemplateTaskBase
             if (File.Exists(path))
             {
                 throw new InvalidOperationException($"The published WebGL2 template unexpectedly contains '{relativePath}'.");
+            }
+        }
+
+        string indexHtmlPath = IOPath.Combine(publishDirectory, "index.html");
+        string indexHtml = File.ReadAllText(indexHtmlPath);
+        if (!indexHtml.Contains("const { start } = await import(\"./_monogame/monogame-web-host.js\");", StringComparison.Ordinal))
+        {
+            throw new InvalidOperationException("The published WebGL2 template does not use the explicit browser host bootstrap.");
+        }
+
+        foreach (string requiredFragment in RequiredDefaultShellFragments)
+        {
+            if (!indexHtml.Contains(requiredFragment, StringComparison.Ordinal))
+            {
+                throw new InvalidOperationException($"The published WebGL2 template is missing the default startup shell fragment '{requiredFragment}'.");
             }
         }
     }
