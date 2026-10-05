@@ -147,7 +147,7 @@
       <NativeArch Condition="'$([System.Runtime.InteropServices.RuntimeInformation]::OSArchitecture)' == 'Arm64'">arm64</NativeArch>
       <NativeArch Condition="'$(NativeArch)' == ''">x64</NativeArch>
     </PropertyGroup>
-    <Exec Command="premake5 --arch=$(NativeArch) gmake" WorkingDirectory="../native/pipeline/" />
+    <Exec Command="premake5 --mg-arch=$(NativeArch) gmake" WorkingDirectory="../native/pipeline/" />
     <Exec Command="make config=$(Configuration.ToLower())" WorkingDirectory="../native/pipeline/" />
   </Target>
 
