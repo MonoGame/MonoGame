@@ -167,6 +167,11 @@ struct MGG_Texture
     GLuint resolveFramebuffer = 0;
     GLuint colorRenderbuffer = 0;
     GLuint depthRenderbuffer = 0;
+#if defined(__EMSCRIPTEN__)
+    // WebGL2 cannot swizzle Bgr32 alpha to one. Retain its unused source byte
+    // so GetData preserves the MonoGame byte layout.
+    std::vector<mgbyte> bgr32Padding;
+#endif
 };
 
 struct MGG_Shader
@@ -973,7 +978,11 @@ namespace
             case MGTextureAddressMode::Mirror:
                 return GL_MIRRORED_REPEAT;
             case MGTextureAddressMode::Border:
+#if defined(__EMSCRIPTEN__)
+                return GL_CLAMP_TO_EDGE;
+#else
                 return GL_CLAMP_TO_BORDER;
+#endif
             default:
                 MGGL_FAIL("Unsupported texture address mode", "unknown OpenGL texture wrap mode");
         }
@@ -1207,15 +1216,35 @@ namespace
             case MGSurfaceFormat::Bgra5551:
                 return { GL_RGB5_A1, GL_RGBA, GL_UNSIGNED_SHORT_5_5_5_1, 2, 2, 1, 1, GL_RED, GL_GREEN, GL_BLUE, GL_ALPHA, false, false };
             case MGSurfaceFormat::Bgr32:
+#if defined(__EMSCRIPTEN__)
+                return { GL_RGBA8, GL_RGBA, GL_UNSIGNED_BYTE, 4, 4, 1, 1, GL_RED, GL_GREEN, GL_BLUE, GL_ALPHA, false, false };
+#else
                 return { GL_RGBA8, GL_BGRA, GL_UNSIGNED_BYTE, 4, 4, 1, 1, GL_RED, GL_GREEN, GL_BLUE, GL_ONE, true, false };
+#endif
             case MGSurfaceFormat::Bgra32:
+#if defined(__EMSCRIPTEN__)
+                return { GL_RGBA8, GL_RGBA, GL_UNSIGNED_BYTE, 4, 4, 1, 1, GL_RED, GL_GREEN, GL_BLUE, GL_ALPHA, false, false };
+#else
                 return { GL_RGBA8, GL_BGRA, GL_UNSIGNED_BYTE, 4, 4, 1, 1, GL_RED, GL_GREEN, GL_BLUE, GL_ALPHA, false, false };
+#endif
             case MGSurfaceFormat::Bgr32SRgb:
+#if defined(__EMSCRIPTEN__)
+                return { GL_SRGB8_ALPHA8, GL_RGBA, GL_UNSIGNED_BYTE, 4, 4, 1, 1, GL_RED, GL_GREEN, GL_BLUE, GL_ALPHA, false, false };
+#else
                 return { GL_SRGB8_ALPHA8, GL_BGRA, GL_UNSIGNED_BYTE, 4, 4, 1, 1, GL_RED, GL_GREEN, GL_BLUE, GL_ONE, true, false };
+#endif
             case MGSurfaceFormat::Bgra32SRgb:
+#if defined(__EMSCRIPTEN__)
+                return { GL_SRGB8_ALPHA8, GL_RGBA, GL_UNSIGNED_BYTE, 4, 4, 1, 1, GL_RED, GL_GREEN, GL_BLUE, GL_ALPHA, false, false };
+#else
                 return { GL_SRGB8_ALPHA8, GL_BGRA, GL_UNSIGNED_BYTE, 4, 4, 1, 1, GL_RED, GL_GREEN, GL_BLUE, GL_ALPHA, false, false };
+#endif
             case MGSurfaceFormat::Alpha8:
+#if defined(__EMSCRIPTEN__)
+                return { GL_RGBA8, GL_RGBA, GL_UNSIGNED_BYTE, 1, 1, 1, 1, GL_RED, GL_GREEN, GL_BLUE, GL_ALPHA, false, false };
+#else
                 return { GL_R8, GL_RED, GL_UNSIGNED_BYTE, 1, 1, 1, 1, GL_ONE, GL_ONE, GL_ONE, GL_RED, true, false };
+#endif
             case MGSurfaceFormat::Dxt1:
                 return { GL_COMPRESSED_RGB_S3TC_DXT1_EXT, 0, 0, 0, 8, 4, 4, GL_RED, GL_GREEN, GL_BLUE, GL_ALPHA, false, true };
             case MGSurfaceFormat::Dxt1SRgb:
@@ -1354,6 +1383,193 @@ namespace
 
         return GetTextureRowBytes(texture, width) * GetTextureBlockCount(height, texture->blockHeight);
     }
+
+#if defined(__EMSCRIPTEN__)
+    bool RequiresBrowserTextureFormatConversion(MGSurfaceFormat format)
+    {
+        switch (format)
+        {
+            case MGSurfaceFormat::Alpha8:
+            case MGSurfaceFormat::Bgr32:
+            case MGSurfaceFormat::Bgra32:
+            case MGSurfaceFormat::Bgr32SRgb:
+            case MGSurfaceFormat::Bgra32SRgb:
+                return true;
+            default:
+                return false;
+        }
+    }
+
+    bool RequiresBrowserTextureFormatConversion(const MGG_Texture* texture)
+    {
+        assert(texture != nullptr);
+        return RequiresBrowserTextureFormatConversion(texture->format);
+    }
+
+    size_t GetBrowserTextureTexelOffset(
+        const MGG_Texture* texture,
+        mgint level,
+        mgint slice,
+        mgint x,
+        mgint y,
+        mgint z)
+    {
+        assert(texture != nullptr);
+        assert(level >= 0);
+        assert(level < texture->mipmaps);
+        assert(slice >= 0);
+        assert(slice < texture->slices);
+        assert(x >= 0);
+        assert(y >= 0);
+        assert(z >= 0);
+
+        size_t offset = 0;
+        for (mgint mipLevel = 0; mipLevel < level; ++mipLevel)
+        {
+            size_t mipWidth = static_cast<size_t>(GetMipExtent(texture->width, mipLevel));
+            size_t mipHeight = static_cast<size_t>(GetMipExtent(texture->height, mipLevel));
+            size_t mipDepth = static_cast<size_t>(GetMipExtent(texture->depth, mipLevel));
+            offset += mipWidth * mipHeight * mipDepth * static_cast<size_t>(texture->slices);
+        }
+
+        size_t mipWidth = static_cast<size_t>(GetMipExtent(texture->width, level));
+        size_t mipHeight = static_cast<size_t>(GetMipExtent(texture->height, level));
+        size_t mipDepth = static_cast<size_t>(GetMipExtent(texture->depth, level));
+        return offset
+            + ((static_cast<size_t>(slice) * mipDepth + static_cast<size_t>(z)) * mipHeight + static_cast<size_t>(y)) * mipWidth
+            + static_cast<size_t>(x);
+    }
+
+    void ConvertBrowserTextureUpload(
+        MGG_Texture* texture,
+        mgint level,
+        mgint slice,
+        mgint x,
+        mgint y,
+        mgint z,
+        mgint width,
+        mgint height,
+        mgint depth,
+        const mgbyte* source,
+        std::vector<mgbyte>& destination)
+    {
+        assert(texture != nullptr);
+        assert(source != nullptr);
+
+        size_t pixelCount = static_cast<size_t>(width) * static_cast<size_t>(height) * static_cast<size_t>(depth);
+        destination.resize(pixelCount * 4);
+
+        for (mgint depthIndex = 0; depthIndex < depth; ++depthIndex)
+        {
+            for (mgint row = 0; row < height; ++row)
+            {
+                for (mgint column = 0; column < width; ++column)
+                {
+                    size_t pixelIndex = (static_cast<size_t>(depthIndex) * static_cast<size_t>(height) + static_cast<size_t>(row)) * static_cast<size_t>(width) + static_cast<size_t>(column);
+                    mgbyte* convertedPixel = destination.data() + pixelIndex * 4;
+
+                    switch (texture->format)
+                    {
+                        case MGSurfaceFormat::Alpha8:
+                            convertedPixel[0] = 0xFF;
+                            convertedPixel[1] = 0xFF;
+                            convertedPixel[2] = 0xFF;
+                            convertedPixel[3] = source[pixelIndex];
+                            break;
+                        case MGSurfaceFormat::Bgr32:
+                        case MGSurfaceFormat::Bgr32SRgb:
+                        {
+                            const mgbyte* sourcePixel = source + pixelIndex * 4;
+                            convertedPixel[0] = sourcePixel[2];
+                            convertedPixel[1] = sourcePixel[1];
+                            convertedPixel[2] = sourcePixel[0];
+                            convertedPixel[3] = 0xFF;
+
+                            size_t texturePixelIndex = GetBrowserTextureTexelOffset(texture, level, slice, x + column, y + row, z + depthIndex);
+                            assert(texturePixelIndex < texture->bgr32Padding.size());
+                            texture->bgr32Padding[texturePixelIndex] = sourcePixel[3];
+                            break;
+                        }
+                        case MGSurfaceFormat::Bgra32:
+                        case MGSurfaceFormat::Bgra32SRgb:
+                        {
+                            const mgbyte* sourcePixel = source + pixelIndex * 4;
+                            convertedPixel[0] = sourcePixel[2];
+                            convertedPixel[1] = sourcePixel[1];
+                            convertedPixel[2] = sourcePixel[0];
+                            convertedPixel[3] = sourcePixel[3];
+                            break;
+                        }
+                        default:
+                            MGGL_FAIL("Unsupported browser texture format conversion", "the texture format does not have a WebGL2 upload conversion");
+                    }
+                }
+            }
+        }
+    }
+
+    void ConvertBrowserTextureReadback(
+        const MGG_Texture* texture,
+        mgint level,
+        mgint slice,
+        mgint x,
+        mgint y,
+        mgint z,
+        mgint width,
+        mgint height,
+        mgint depth,
+        const mgbyte* source,
+        mgbyte* destination)
+    {
+        assert(texture != nullptr);
+        assert(source != nullptr);
+        assert(destination != nullptr);
+
+        for (mgint depthIndex = 0; depthIndex < depth; ++depthIndex)
+        {
+            for (mgint row = 0; row < height; ++row)
+            {
+                for (mgint column = 0; column < width; ++column)
+                {
+                    size_t pixelIndex = (static_cast<size_t>(depthIndex) * static_cast<size_t>(height) + static_cast<size_t>(row)) * static_cast<size_t>(width) + static_cast<size_t>(column);
+                    const mgbyte* sourcePixel = source + pixelIndex * 4;
+
+                    switch (texture->format)
+                    {
+                        case MGSurfaceFormat::Alpha8:
+                            destination[pixelIndex] = sourcePixel[3];
+                            break;
+                        case MGSurfaceFormat::Bgr32:
+                        case MGSurfaceFormat::Bgr32SRgb:
+                        {
+                            mgbyte* destinationPixel = destination + pixelIndex * 4;
+                            destinationPixel[0] = sourcePixel[2];
+                            destinationPixel[1] = sourcePixel[1];
+                            destinationPixel[2] = sourcePixel[0];
+
+                            size_t texturePixelIndex = GetBrowserTextureTexelOffset(texture, level, slice, x + column, y + row, z + depthIndex);
+                            assert(texturePixelIndex < texture->bgr32Padding.size());
+                            destinationPixel[3] = texture->bgr32Padding[texturePixelIndex];
+                            break;
+                        }
+                        case MGSurfaceFormat::Bgra32:
+                        case MGSurfaceFormat::Bgra32SRgb:
+                        {
+                            mgbyte* destinationPixel = destination + pixelIndex * 4;
+                            destinationPixel[0] = sourcePixel[2];
+                            destinationPixel[1] = sourcePixel[1];
+                            destinationPixel[2] = sourcePixel[0];
+                            destinationPixel[3] = sourcePixel[3];
+                            break;
+                        }
+                        default:
+                            MGGL_FAIL("Unsupported browser texture format conversion", "the texture format does not have a WebGL2 readback conversion");
+                    }
+                }
+            }
+        }
+    }
+#endif
 
     void ResolveTextureRegion(
         const MGG_Texture* texture,
@@ -1554,8 +1770,18 @@ namespace
             MGGL_FAIL("Texture readback unsupported", "the requested texture format is not framebuffer-readable on WebGL2");
         }
 
-        glPixelStorei(GL_PACK_ALIGNMENT, GetTexturePixelStoreAlignment(texture));
+        bool requiresConversion = RequiresBrowserTextureFormatConversion(texture);
+        std::vector<mgbyte> convertedData;
+        mgbyte* readbackData = data;
         mgint sliceBytes = GetTextureSliceByteCount(texture, width, height);
+        if (requiresConversion)
+        {
+            convertedData.resize(static_cast<size_t>(width) * static_cast<size_t>(height) * static_cast<size_t>(depth) * 4);
+            readbackData = convertedData.data();
+            sliceBytes = width * height * 4;
+        }
+
+        glPixelStorei(GL_PACK_ALIGNMENT, requiresConversion ? 4 : GetTexturePixelStoreAlignment(texture));
         for (mgint depthIndex = 0; depthIndex < depth; ++depthIndex)
         {
             if (texture->type == MGTextureType::_3D && depthIndex > 0)
@@ -1566,9 +1792,25 @@ namespace
                 y,
                 width,
                 height,
-                texture->pixelFormat,
-                texture->pixelType,
-                data + depthIndex * sliceBytes);
+                requiresConversion ? GL_RGBA : texture->pixelFormat,
+                requiresConversion ? GL_UNSIGNED_BYTE : texture->pixelType,
+                readbackData + depthIndex * sliceBytes);
+        }
+
+        if (requiresConversion)
+        {
+            ConvertBrowserTextureReadback(
+                texture,
+                level,
+                slice,
+                x,
+                y,
+                z,
+                width,
+                height,
+                depth,
+                convertedData.data(),
+                data);
         }
 
         glPixelStorei(GL_PACK_ALIGNMENT, previousPackAlignment);
@@ -1694,6 +1936,22 @@ namespace
 
         if (formatInfo.isCompressed && type == MGTextureType::_3D)
             MGGL_FAIL("Unsupported texture shape", "need a separate path for compressed 3D textures");
+
+#if defined(__EMSCRIPTEN__)
+        if (format == MGSurfaceFormat::Bgr32 || format == MGSurfaceFormat::Bgr32SRgb)
+        {
+            size_t texelCount = 0;
+            for (mgint level = 0; level < mipmaps; ++level)
+            {
+                size_t mipWidth = static_cast<size_t>(GetMipExtent(width, level));
+                size_t mipHeight = static_cast<size_t>(GetMipExtent(height, level));
+                size_t mipDepth = static_cast<size_t>(GetMipExtent(depth, level));
+                texelCount += mipWidth * mipHeight * mipDepth * static_cast<size_t>(slices);
+            }
+
+            texture->bgr32Padding.resize(texelCount);
+        }
+#endif
 
         glGenTextures(1, &texture->handle);
         if (texture->handle == 0)
@@ -2988,22 +3246,65 @@ void MGG_GraphicsDevice_GetBackBufferData(MGG_GraphicsDevice* device, mgint x, m
     glReadBuffer(GL_BACK);
     glPixelStorei(GL_PACK_ALIGNMENT, 1);
 
-    std::vector<mgbyte> pixels(totalBytes);
+#if defined(__EMSCRIPTEN__)
+    bool requiresConversion = RequiresBrowserTextureFormatConversion(device->backBufferFormat);
+    size_t readbackRowBytes = requiresConversion ? static_cast<size_t>(width) * 4 : rowBytes;
+    GLenum readbackFormat = requiresConversion ? GL_RGBA : formatInfo.pixelFormat;
+    GLenum readbackType = requiresConversion ? GL_UNSIGNED_BYTE : formatInfo.pixelType;
+#else
+    size_t readbackRowBytes = rowBytes;
+    GLenum readbackFormat = formatInfo.pixelFormat;
+    GLenum readbackType = formatInfo.pixelType;
+#endif
+    std::vector<mgbyte> pixels(readbackRowBytes * static_cast<size_t>(height));
     mgint flippedY = device->backBufferHeight - y - height;
     glReadPixels(
         x,
         flippedY,
         width,
         height,
-        formatInfo.pixelFormat,
-        formatInfo.pixelType,
+        readbackFormat,
+        readbackType,
         pixels.data());
 
     mgbyte* destination = static_cast<mgbyte*>(data);
     for (mgint row = 0; row < height; ++row)
     {
-        size_t sourceOffset = static_cast<size_t>(height - row - 1) * rowBytes;
+        size_t sourceOffset = static_cast<size_t>(height - row - 1) * readbackRowBytes;
         size_t destinationOffset = static_cast<size_t>(row) * rowBytes;
+#if defined(__EMSCRIPTEN__)
+        if (requiresConversion)
+        {
+            const mgbyte* sourceRow = pixels.data() + sourceOffset;
+            mgbyte* destinationRow = destination + destinationOffset;
+            for (mgint column = 0; column < width; ++column)
+            {
+                const mgbyte* sourcePixel = sourceRow + static_cast<size_t>(column) * 4;
+                switch (device->backBufferFormat)
+                {
+                    case MGSurfaceFormat::Alpha8:
+                        destinationRow[column] = sourcePixel[3];
+                        break;
+                    case MGSurfaceFormat::Bgr32:
+                    case MGSurfaceFormat::Bgr32SRgb:
+                    case MGSurfaceFormat::Bgra32:
+                    case MGSurfaceFormat::Bgra32SRgb:
+                    {
+                        mgbyte* destinationPixel = destinationRow + static_cast<size_t>(column) * 4;
+                        destinationPixel[0] = sourcePixel[2];
+                        destinationPixel[1] = sourcePixel[1];
+                        destinationPixel[2] = sourcePixel[0];
+                        destinationPixel[3] = sourcePixel[3];
+                        break;
+                    }
+                    default:
+                        MGGL_FAIL("Unsupported browser backbuffer format conversion", "the backbuffer format does not have a WebGL2 readback conversion");
+                }
+            }
+
+            continue;
+        }
+#endif
         memcpy(destination + destinationOffset, pixels.data() + sourceOffset, rowBytes);
     }
 
@@ -3552,12 +3853,35 @@ void MGG_Texture_SetData(MGG_GraphicsDevice* device, MGG_Texture* texture, mgint
     if (normalizedBytes != expectedBytes)
         MGGL_FAIL("Texture upload size mismatch", "byte count does not match the upload region");
 
+    mgbyte* uploadData = data;
+    GLint unpackAlignment = GetTexturePixelStoreAlignment(texture);
+#if defined(__EMSCRIPTEN__)
+    std::vector<mgbyte> convertedData;
+    if (RequiresBrowserTextureFormatConversion(texture))
+    {
+        ConvertBrowserTextureUpload(
+            texture,
+            level,
+            slice,
+            x,
+            y,
+            z,
+            resolvedWidth,
+            resolvedHeight,
+            resolvedDepth,
+            data,
+            convertedData);
+        uploadData = convertedData.data();
+        unpackAlignment = 4;
+    }
+#endif
+
     GLint previousActiveTexture = 0;
     GLint previousBinding = 0;
     GLint previousUnpackAlignment = 0;
     glGetIntegerv(GL_UNPACK_ALIGNMENT, &previousUnpackAlignment);
     // Keep from shifting rows during odd-width 16-bit uploads like Bgr565
-    glPixelStorei(GL_UNPACK_ALIGNMENT, GetTexturePixelStoreAlignment(texture));
+    glPixelStorei(GL_UNPACK_ALIGNMENT, unpackAlignment);
     BeginTextureEdit(device, texture, previousActiveTexture, previousBinding);
     GLenum imageTarget = GetTextureImageTarget(texture, slice);
     if (texture->isCompressed)
@@ -3582,7 +3906,7 @@ void MGG_Texture_SetData(MGG_GraphicsDevice* device, MGG_Texture* texture, mgint
                 mipHeight,
                 0,
                 normalizedBytes,
-                data);
+                uploadData);
         }
         else
         {
@@ -3595,7 +3919,7 @@ void MGG_Texture_SetData(MGG_GraphicsDevice* device, MGG_Texture* texture, mgint
                 resolvedHeight,
                 texture->internalFormat,
                 normalizedBytes,
-                data);
+                uploadData);
         }
     }
     else if (texture->type == MGTextureType::_3D)
@@ -3611,7 +3935,7 @@ void MGG_Texture_SetData(MGG_GraphicsDevice* device, MGG_Texture* texture, mgint
             resolvedDepth,
             texture->pixelFormat,
             texture->pixelType,
-            data);
+            uploadData);
     }
     else
     {
@@ -3624,7 +3948,7 @@ void MGG_Texture_SetData(MGG_GraphicsDevice* device, MGG_Texture* texture, mgint
             resolvedHeight,
             texture->pixelFormat,
             texture->pixelType,
-            data);
+            uploadData);
     }
     EndTextureEdit(device, texture, previousActiveTexture, previousBinding);
     glPixelStorei(GL_UNPACK_ALIGNMENT, previousUnpackAlignment);
