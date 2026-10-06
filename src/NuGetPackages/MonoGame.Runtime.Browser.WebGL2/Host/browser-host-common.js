@@ -6,7 +6,6 @@
 export const HostStage = Object.freeze({
     HostBootstrap: "HostBootstrap",
     CanvasCreation: "CanvasCreation",
-    WebGL2Creation: "WebGL2Creation",
     ContextLoss: "ContextLoss",
     WasmLoad: "WasmLoad",
     ContentStaging: "ContentStaging",

@@ -181,7 +181,6 @@ class MonoGameWebHost {
             this.logStage(HostStage.HostBootstrap, "Bootstrapping browser host.");
             this.validateManagedRuntimeConfiguration();
             this.resolveCanvas();
-            this.createWebGL2Context();
             this.window.observeContextLoss(() => this.handleContextLost());
             await this.initializeManagedRuntimeAsync();
             await this.content.stageStartupContentAsync();
@@ -201,11 +200,6 @@ class MonoGameWebHost {
         this.window.resolveCanvas((stage, message) => this.logStage(stage, message));
         this.accelerometer.observePermissionGesture(this.window.canvas);
         this.audio.observeActivation(this.window.canvas);
-    }
-
-    /** Creates the browser WebGL2 context before the managed runtime starts. */
-    createWebGL2Context() {
-        this.window.createWebGL2Context((stage, message) => this.logStage(stage, message));
     }
 
     /** Validates the project owned managed runtime configuration before browser resources are created. */

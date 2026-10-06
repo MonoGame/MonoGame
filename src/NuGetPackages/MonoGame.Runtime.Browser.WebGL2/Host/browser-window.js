@@ -91,39 +91,6 @@ export class BrowserWindow {
         this.canvas.addEventListener("auxclick", suppressUnsupportedButtonAction, eventOptions);
     }
 
-    /**
-     * Creates the WebGL2 context required by the native renderer.
-     *
-     * @param {(stage: string, message: string) => void} logStage Logs WebGL setup progress.
-     * @throws {BrowserHostError} When the browser cannot create a WebGL2 context.
-     */
-    createWebGL2Context(logStage) {
-        logStage(HostStage.WebGL2Creation, "Requesting WebGL2 context.");
-
-        // WebGL2 context options are fixed renderer requirements.
-        // Application facing settings remain in MonoGame APIs.
-        const contextOptions = {
-            alpha: true,
-            antialias: false,
-            depth: true,
-            desynchronized: false,
-            powerPreference: "high-performance",
-            premultipliedAlpha: true,
-            preserveDrawingBuffer: false,
-            stencil: true
-        };
-
-        const context = this.canvas.getContext("webgl2", contextOptions);
-        if (context == null) {
-            throw new BrowserHostError(
-                HostStage.WebGL2Creation,
-                "webgl2_unavailable",
-                "The browser host could not create a WebGL2 context.");
-        }
-
-        logStage(HostStage.WebGL2Creation, "WebGL2 context created.");
-    }
-
     /** Configures the native runtime's optional pointer lock compatibility behavior. */
     configurePointerLock() {
         if (!this.config.pointerLockEnabled) {
