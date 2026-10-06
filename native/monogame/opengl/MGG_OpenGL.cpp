@@ -1506,6 +1506,77 @@ namespace
         device->context.functions.ActiveTexture(static_cast<GLenum>(previousActiveTexture));
     }
 
+#if defined(__EMSCRIPTEN__)
+    void ReadTextureDataFromFramebuffer(
+        MGG_GraphicsDevice* device,
+        MGG_Texture* texture,
+        mgint level,
+        mgint slice,
+        mgint x,
+        mgint y,
+        mgint z,
+        mgint width,
+        mgint height,
+        mgint depth,
+        mgbyte* data)
+    {
+        assert(device != nullptr);
+        assert(texture != nullptr);
+        assert(data != nullptr);
+        assert(!texture->isCompressed);
+
+        GLint previousFramebuffer = 0;
+        GLint previousPackAlignment = 0;
+        glGetIntegerv(GL_FRAMEBUFFER_BINDING, &previousFramebuffer);
+        glGetIntegerv(GL_PACK_ALIGNMENT, &previousPackAlignment);
+
+        GLuint framebuffer = 0;
+        device->context.functions.GenFramebuffers(1, &framebuffer);
+        if (framebuffer == 0)
+            MGGL_FAIL("glGenFramebuffers failed", "texture readback framebuffer creation returned 0");
+
+        device->context.functions.BindFramebuffer(GL_FRAMEBUFFER, framebuffer);
+        if (texture->type == MGTextureType::_3D)
+            glFramebufferTextureLayer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, texture->handle, level, z);
+        else
+            device->context.functions.FramebufferTexture2D(
+                GL_FRAMEBUFFER,
+                GL_COLOR_ATTACHMENT0,
+                GetTextureImageTarget(texture, slice),
+                texture->handle,
+                level);
+
+        GLenum framebufferStatus = device->context.functions.CheckFramebufferStatus(GL_FRAMEBUFFER);
+        if (framebufferStatus != GL_FRAMEBUFFER_COMPLETE)
+        {
+            device->context.functions.BindFramebuffer(GL_FRAMEBUFFER, static_cast<GLuint>(previousFramebuffer));
+            device->context.functions.DeleteFramebuffers(1, &framebuffer);
+            MGGL_FAIL("Texture readback unsupported", "the requested texture format is not framebuffer-readable on WebGL2");
+        }
+
+        glPixelStorei(GL_PACK_ALIGNMENT, GetTexturePixelStoreAlignment(texture));
+        mgint sliceBytes = GetTextureSliceByteCount(texture, width, height);
+        for (mgint depthIndex = 0; depthIndex < depth; ++depthIndex)
+        {
+            if (texture->type == MGTextureType::_3D && depthIndex > 0)
+                glFramebufferTextureLayer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, texture->handle, level, z + depthIndex);
+
+            glReadPixels(
+                x,
+                y,
+                width,
+                height,
+                texture->pixelFormat,
+                texture->pixelType,
+                data + depthIndex * sliceBytes);
+        }
+
+        glPixelStorei(GL_PACK_ALIGNMENT, previousPackAlignment);
+        device->context.functions.BindFramebuffer(GL_FRAMEBUFFER, static_cast<GLuint>(previousFramebuffer));
+        device->context.functions.DeleteFramebuffers(1, &framebuffer);
+    }
+#endif
+
     void AttachFramebufferColorTarget(MGG_GraphicsDevice* device, GLenum target, GLenum attachment, MGG_Texture* texture, mgint slice)
     {
         assert(device != nullptr);
@@ -3214,6 +3285,11 @@ void MGG_Buffer_GetData(MGG_GraphicsDevice* device, MGG_Buffer* buffer, mgint of
 
     EnsureContext(device);
     device->context.functions.BindBuffer(buffer->target, buffer->handle);
+#if defined(__EMSCRIPTEN__)
+    std::vector<mgbyte> sourceData(static_cast<size_t>(copySpan));
+    glGetBufferSubData(buffer->target, offset, copySpan, sourceData.data());
+    CopyWithStride(sourceData.data(), data, dataCount, dataStride, dataBytes, dataBytes < dataStride ? dataBytes : dataStride);
+#else
     void* mapped = device->context.functions.MapBuffer(buffer->target, GL_READ_ONLY);
     if (mapped == nullptr)
         MGGL_FAIL("glMapBuffer failed", "buffer readback could not map buffer contents");
@@ -3223,6 +3299,7 @@ void MGG_Buffer_GetData(MGG_GraphicsDevice* device, MGG_Buffer* buffer, mgint of
 
     if (device->context.functions.UnmapBuffer(buffer->target) != GL_TRUE)
         MGGL_FAIL("glUnmapBuffer failed", "buffer readback could not unmap buffer contents");
+#endif
 }
 
 MGG_Texture* MGG_Texture_Create(MGG_GraphicsDevice* device, MGTextureType type, MGSurfaceFormat format, mgint width, mgint height, mgint depth, mgint mipmaps, mgint slices)
@@ -3584,6 +3661,25 @@ void MGG_Texture_GetData(MGG_GraphicsDevice* device, MGG_Texture* texture, mgint
     mgint expectedBytes = GetTextureByteCount(texture, resolvedWidth, resolvedHeight, resolvedDepth);
     if (dataBytes < expectedBytes)
         MGGL_FAIL("Texture readback size mismatch", "destination buffer is smaller than the requested region");
+
+#if defined(__EMSCRIPTEN__)
+    if (texture->isCompressed)
+        MGGL_FAIL("Texture readback unsupported", "compressed texture readback is unavailable on WebGL2");
+
+    ReadTextureDataFromFramebuffer(
+        device,
+        texture,
+        level,
+        slice,
+        x,
+        y,
+        z,
+        resolvedWidth,
+        resolvedHeight,
+        resolvedDepth,
+        data);
+    return;
+#endif
 
     GLint previousActiveTexture = 0;
     GLint previousBinding = 0;

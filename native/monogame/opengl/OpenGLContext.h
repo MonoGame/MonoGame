@@ -13,6 +13,11 @@ using MGGLCOMPRESSEDTEXSUBIMAGE2DPROC = decltype(&glCompressedTexSubImage2D);
 #if defined(__EMSCRIPTEN__)
 using MGGLGETTEXIMAGEPROC = void (*)(GLenum target, GLint level, GLenum format, GLenum type, void* pixels);
 using MGGLGETCOMPRESSEDTEXIMAGEPROC = void (*)(GLenum target, GLint level, void* img);
+
+// Emscripten's SDL OpenGL headers omit these WebGL2 declarations. Direct calls
+// retain the procedures in the final browser binary.
+extern "C" void glFramebufferTextureLayer(GLenum target, GLenum attachment, GLuint texture, GLint level, GLint layer);
+extern "C" void glGetBufferSubData(GLenum target, GLintptr offset, GLsizeiptr size, void* data);
 #else
 using MGGLGETTEXIMAGEPROC = decltype(&glGetTexImage);
 using MGGLGETCOMPRESSEDTEXIMAGEPROC = decltype(&glGetCompressedTexImage);
