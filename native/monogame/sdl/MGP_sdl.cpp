@@ -7,6 +7,7 @@
 #include "mg_common.h"
 
 #include <SDL.h>
+#include <string>
 
 #if defined(__EMSCRIPTEN__)
 #include <emscripten/html5.h>
@@ -23,6 +24,9 @@ struct MGP_Platform
 {
     std::vector<MGP_Window*> windows;
     std::queue<MGP_Event> queued_events;
+#if defined(__EMSCRIPTEN__)
+    std::queue<std::string> queued_browser_file_drop_paths;
+#endif
     std::map<mgint, SDL_GameController*> controllers;
 };
 
@@ -551,6 +555,43 @@ void MGP_Sdl_QueueBrowserFullscreenFailure(MGP_Platform* platform)
     for (MGP_Window* window : platform->windows)
         MGP_Sdl_QueueBrowserFullscreenForWindow(window, false, true);
 }
+
+void MGP_Sdl_QueueBrowserFileDrop(MGP_Platform* platform, const char* path)
+{
+    assert(platform != nullptr);
+
+    if (path == nullptr || path[0] == '\0')
+        return;
+
+    // The browser host owns one canvas, so a browser drop belongs to the primary native window.
+    MGP_Window* window = platform->windows.empty() ? nullptr : platform->windows.front();
+    if (window == nullptr || window->window == nullptr)
+        return;
+
+    MGP_Event event_{};
+    event_.Type = MGEventType::DropFile;
+    event_.Timestamp = SDL_GetTicks();
+    event_.Drop.Window = window;
+    event_.Drop.File = nullptr;
+    platform->queued_browser_file_drop_paths.push(path);
+    platform->queued_events.push(event_);
+}
+
+void MGP_Sdl_QueueBrowserFileDropComplete(MGP_Platform* platform)
+{
+    assert(platform != nullptr);
+
+    // The browser host owns one canvas, so a browser drop belongs to the primary native window.
+    MGP_Window* window = platform->windows.empty() ? nullptr : platform->windows.front();
+    if (window == nullptr || window->window == nullptr)
+        return;
+
+    MGP_Event event_{};
+    event_.Type = MGEventType::DropComplete;
+    event_.Timestamp = SDL_GetTicks();
+    event_.Drop.Window = window;
+    platform->queued_events.push(event_);
+}
 #endif
 
 static int UTF8ToUnicode(int utf8)
@@ -660,6 +701,19 @@ mgbyte MGP_Platform_PollEvent(MGP_Platform* platform, MGP_Event& event_)
     {
         event_ = platform->queued_events.front();
         platform->queued_events.pop();
+
+#if defined(__EMSCRIPTEN__)
+        if (event_.Type == MGEventType::DropFile && event_.Drop.File == nullptr)
+        {
+            assert(!platform->queued_browser_file_drop_paths.empty());
+
+            static char TempPath[MAX_PATH_SIZE];
+            snprintf(TempPath, MAX_PATH_SIZE, "%s", platform->queued_browser_file_drop_paths.front().c_str());
+            platform->queued_browser_file_drop_paths.pop();
+            event_.Drop.File = TempPath;
+        }
+#endif
+
         return true;
     }
 

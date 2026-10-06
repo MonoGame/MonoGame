@@ -11,3 +11,5 @@ void MGP_Sdl_QueueBrowserResizeForWindow(MGP_Window* window, mgint width, mgint 
 void MGP_Sdl_QueueBrowserFocus(MGP_Platform* platform, mgbyte focused);
 void MGP_Sdl_QueueBrowserFullscreenChange(MGP_Platform* platform, mgbyte fullscreen);
 void MGP_Sdl_QueueBrowserFullscreenFailure(MGP_Platform* platform);
+void MGP_Sdl_QueueBrowserFileDrop(MGP_Platform* platform, const char* path);
+void MGP_Sdl_QueueBrowserFileDropComplete(MGP_Platform* platform);

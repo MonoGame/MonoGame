@@ -8,6 +8,8 @@ import {
     HostStage
 } from "./browser-host-common.js";
 
+const MaximumStagedDropBytes = 64 * 1024 * 1024;
+
 /**
  * Handles browser canvas, lifecycle, fullscreen, and motion events for the native runtime.
  */
@@ -26,6 +28,10 @@ export class BrowserWindow {
         this.contextLost = false;
         this.eventAbortController = new AbortController();
         this.isDisposed = false;
+        this.pendingDroppedFilePaths = [];
+        this.dropTask = Promise.resolve();
+        this.nextDropBatchId = 0;
+        this.stagedDropBytes = 0;
     }
 
     /**
@@ -258,6 +264,124 @@ export class BrowserWindow {
         reportFullscreenChange();
     }
 
+    /**
+     * Stages browser-dropped files in the Emscripten filesystem and forwards their paths through the native event queue.
+     *
+     * @param {{ mkdirTree: Function, writeFile: Function }} fileSystem Emscripten filesystem.
+     * @throws {BrowserHostError} When the runtime cannot receive browser file drops.
+     */
+    observeFileDrop(fileSystem) {
+        const notifyFileDrop = this.getRuntime()?.Module?._MGP_Web_NotifyFileDrop;
+        const notifyFileDropComplete = this.getRuntime()?.Module?._MGP_Web_NotifyFileDropComplete;
+        if (typeof notifyFileDrop !== "function"
+            || typeof notifyFileDropComplete !== "function") {
+            throw new BrowserHostError(
+                HostStage.WasmLoad,
+                "native_file_drop_missing",
+                "The managed runtime does not expose the native file drop callbacks.");
+        }
+
+        const eventOptions = { signal: this.eventAbortController.signal };
+        this.canvas.addEventListener("dragenter", (event) => event.preventDefault(), eventOptions);
+        this.canvas.addEventListener("dragover", (event) => {
+            event.preventDefault();
+            if (event.dataTransfer != null) {
+                event.dataTransfer.dropEffect = "copy";
+            }
+        }, eventOptions);
+        this.canvas.addEventListener("drop", (event) => {
+            event.preventDefault();
+            const files = Array.from(event.dataTransfer?.files ?? []);
+            if (files.length === 0) {
+                return;
+            }
+
+            this.dropTask = this.dropTask
+                .then(() => this.stageDroppedFilesAsync(files, fileSystem, notifyFileDrop, notifyFileDropComplete))
+                .catch((error) => {
+                    console.error("[MonoGame.Web Host]", "Browser file drop staging failed.", error);
+                });
+        }, eventOptions);
+    }
+
+    /**
+     * Returns the next VFS path requested by the native browser drop callback.
+     *
+     * @returns {string | null} The next staged file path, or `null` when none is pending.
+     */
+    takeDroppedFilePath() {
+        return this.pendingDroppedFilePaths.shift() ?? null;
+    }
+
+    /**
+     * Stages one browser drop before raising its native completion event.
+     *
+     * @param {File[]} files Browser files captured from the drop event.
+     * @param {{ mkdirTree: Function, writeFile: Function }} fileSystem Emscripten filesystem.
+     * @param {Function} notifyFileDrop Native callback for one staged file.
+     * @param {Function} notifyFileDropComplete Native callback for a completed drop.
+     * @returns {Promise<void>} Completes after every supported file within the session staging budget is processed.
+     */
+    async stageDroppedFilesAsync(files, fileSystem, notifyFileDrop, notifyFileDropComplete) {
+        const batchDirectoryPath = `/tmp/monogame-drop/${this.nextDropBatchId++}`;
+        let stagedFileCount = 0;
+
+        for (let index = 0; index < files.length; index++) {
+            if (this.isDisposed) {
+                return;
+            }
+
+            const file = files[index];
+            const fileName = normalizeDroppedFileName(file?.name);
+            if (fileName == null || typeof file.arrayBuffer !== "function") {
+                console.warn("[MonoGame.Web Host]", "Skipped a browser-dropped item without a usable file name or byte stream.");
+                continue;
+            }
+
+            const fileSize = file.size;
+            if (!Number.isSafeInteger(fileSize)
+                || fileSize < 0
+                || fileSize > MaximumStagedDropBytes - this.stagedDropBytes) {
+                console.warn("[MonoGame.Web Host]", `Skipped browser-dropped file '${fileName}' because it exceeds the ${MaximumStagedDropBytes}-byte session staging limit.`);
+                continue;
+            }
+
+            const fileDirectoryPath = `${batchDirectoryPath}/${index}`;
+            const filePath = `${fileDirectoryPath}/${fileName}`;
+            try {
+                const fileBytes = new Uint8Array(await file.arrayBuffer());
+                if (this.isDisposed) {
+                    return;
+                }
+
+                if (fileBytes.byteLength > MaximumStagedDropBytes - this.stagedDropBytes) {
+                    console.warn("[MonoGame.Web Host]", `Skipped browser-dropped file '${fileName}' because its byte stream exceeds the session staging limit.`);
+                    continue;
+                }
+
+                fileSystem.mkdirTree(fileDirectoryPath);
+                fileSystem.writeFile(filePath, fileBytes);
+                this.stagedDropBytes += fileBytes.byteLength;
+            }
+            catch (error) {
+                console.warn("[MonoGame.Web Host]", `Skipped browser-dropped file '${fileName}' because it could not be staged.`, error);
+                continue;
+            }
+
+            if (this.isDisposed) {
+                return;
+            }
+
+            this.pendingDroppedFilePaths.push(filePath);
+            notifyFileDrop();
+            stagedFileCount++;
+        }
+
+        if (!this.isDisposed && stagedFileCount > 0) {
+            notifyFileDropComplete();
+        }
+    }
+
     /** Removes browser listeners and stops CSS canvas resize observation. */
     dispose() {
         if (this.isDisposed) {
@@ -268,6 +392,7 @@ export class BrowserWindow {
         this.eventAbortController.abort();
         this.canvasResizeObserver?.disconnect();
         this.canvasResizeObserver = null;
+        this.pendingDroppedFilePaths.length = 0;
     }
 
     /** Requests fullscreen for the game canvas. */
@@ -311,4 +436,23 @@ export class BrowserWindow {
         }
     }
 
+}
+
+/**
+ * Returns a single browser file name safe to append to a virtual filesystem path.
+ *
+ * @param {unknown} fileName Browser-provided file name.
+ * @returns {string | null} Normalized file name, or `null` when it is unusable.
+ */
+function normalizeDroppedFileName(fileName) {
+    if (typeof fileName !== "string") {
+        return null;
+    }
+
+    const normalizedFileName = fileName.trim().replace(/[\\/]/g, "_");
+    return normalizedFileName.length > 0
+        && normalizedFileName !== "."
+        && normalizedFileName !== ".."
+        ? normalizedFileName
+        : null;
 }

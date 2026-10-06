@@ -2,7 +2,10 @@
 #include "../sdl/MGP_sdl_browser.h"
 #include "MGP_web.h"
 
+#include <cstdlib>
 #include <emscripten/emscripten.h>
+#include <queue>
+#include <string>
 
 static MGP_Platform* s_platform = nullptr;
 static bool s_hasPendingCanvasResize = false;
@@ -13,6 +16,14 @@ static mgbyte s_pendingBrowserFocus = false;
 static bool s_hasPendingBrowserFullscreen = false;
 static mgbyte s_pendingBrowserFullscreen = false;
 static bool s_pointerLockEnabled = false;
+
+struct MGP_WebPendingDropEvent
+{
+    bool complete;
+    std::string path;
+};
+
+static std::queue<MGP_WebPendingDropEvent> s_pendingDropEvents;
 
 enum MGP_WebSensorState : mgint
 {
@@ -37,6 +48,34 @@ EM_JS(mgint, MGP_Web_GetMaximumTouchCountFromNavigator, (),
 
     return navigator.maxTouchPoints;
 });
+
+EM_JS(char*, MGP_Web_TakeDroppedFilePathFromHost, (),
+{
+    const path = globalThis.MonoGameWebHost?.takeDroppedFilePath?.();
+    return typeof path === "string" ? stringToNewUTF8(path) : 0;
+});
+
+static void MGP_Web_QueueDroppedFile(MGP_Platform* platform, const char* path)
+{
+    if (platform == nullptr)
+    {
+        s_pendingDropEvents.push({ false, path });
+        return;
+    }
+
+    MGP_Sdl_QueueBrowserFileDrop(platform, path);
+}
+
+static void MGP_Web_QueueDroppedFileComplete(MGP_Platform* platform)
+{
+    if (platform == nullptr)
+    {
+        s_pendingDropEvents.push({ true, "" });
+        return;
+    }
+
+    MGP_Sdl_QueueBrowserFileDropComplete(platform);
+}
 
 mgint MGP_Web_GetMaximumTouchCount()
 {
@@ -115,6 +154,21 @@ extern "C" EMSCRIPTEN_KEEPALIVE void MGP_Web_NotifyFullscreenFailure()
 {
     if (s_platform != nullptr)
         MGP_Sdl_QueueBrowserFullscreenFailure(s_platform);
+}
+
+extern "C" EMSCRIPTEN_KEEPALIVE void MGP_Web_NotifyFileDrop()
+{
+    char* path = MGP_Web_TakeDroppedFilePathFromHost();
+    if (path == nullptr)
+        return;
+
+    MGP_Web_QueueDroppedFile(s_platform, path);
+    free(path);
+}
+
+extern "C" EMSCRIPTEN_KEEPALIVE void MGP_Web_NotifyFileDropComplete()
+{
+    MGP_Web_QueueDroppedFileComplete(s_platform);
 }
 
 void MGP_Web_RequestFullscreen()
@@ -227,5 +281,16 @@ MG_EXPORT void MGP_Platform_StartRunLoop(MGP_Platform* platform)
     {
         MGP_Sdl_QueueBrowserFullscreenChange(platform, s_pendingBrowserFullscreen);
         s_hasPendingBrowserFullscreen = false;
+    }
+
+    while (!s_pendingDropEvents.empty())
+    {
+        const MGP_WebPendingDropEvent& event_ = s_pendingDropEvents.front();
+        if (event_.complete)
+            MGP_Sdl_QueueBrowserFileDropComplete(platform);
+        else
+            MGP_Sdl_QueueBrowserFileDrop(platform, event_.path.c_str());
+
+        s_pendingDropEvents.pop();
     }
 }

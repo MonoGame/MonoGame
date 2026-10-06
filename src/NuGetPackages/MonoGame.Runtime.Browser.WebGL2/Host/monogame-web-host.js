@@ -260,6 +260,7 @@ class MonoGameWebHost {
         this.window.observeCanvasSize();
         this.window.observeBrowserLifecycle();
         this.window.observeFullscreen();
+        this.window.observeFileDrop(this.content.getFileSystem());
 
         if (typeof this.runtime.getAssemblyExports !== "function") {
             throw new BrowserHostError(HostStage.WasmLoad, "dotnet_exports_missing", "The configured dotnet runtime does not expose getAssemblyExports().");
@@ -469,6 +470,10 @@ class MonoGameWebHost {
         return this.accelerometer.isSupported();
     }
 
+    takeDroppedFilePath() {
+        return this.window.takeDroppedFilePath();
+    }
+
     /**
      * Displays and logs a host failure.
      *
@@ -548,5 +553,6 @@ globalThis.MonoGameWebHost = {
         await activeHost.content.stageAssetPackAsync(assetPackName);
     },
     stageContentManifestAsync: (manifestUri) => activeHost?.content.stageContentManifestAsync(manifestUri),
-    tryGetContentBase64: (relativePath) => activeHost?.content.tryGetContentBase64(relativePath) ?? null
+    tryGetContentBase64: (relativePath) => activeHost?.content.tryGetContentBase64(relativePath) ?? null,
+    takeDroppedFilePath: () => activeHost?.takeDroppedFilePath() ?? null
 };
