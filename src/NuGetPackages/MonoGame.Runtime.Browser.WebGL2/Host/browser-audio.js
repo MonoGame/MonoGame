@@ -4,6 +4,16 @@
 
 import { SongEventType } from "./browser-host-common.js";
 
+const SongMediaTypes = {
+    ".mp3": "audio/mpeg",
+    ".ogg": "audio/ogg",
+    ".opus": "audio/ogg; codecs=opus",
+    ".wav": "audio/wav",
+    ".m4a": "audio/mp4",
+    ".mp4": "audio/mp4",
+    ".webm": "audio/webm"
+};
+
 /**
  * Handles browser audio activation and Song playback through one media element.
  */
@@ -140,7 +150,7 @@ export class BrowserAudio {
         this.ensureSongElement();
 
         const mediaUri = this.resolveSongUri(mediaPath);
-        if (mediaUri == null || !this.canPlaySongMedia()) {
+        if (mediaUri == null || !this.canPlaySongMedia(mediaUri)) {
             this.reportSongEvent(songId, commandId, SongEventType.Failed);
             return true;
         }
@@ -272,9 +282,31 @@ export class BrowserAudio {
         this.songElement = songElement;
     }
 
-    /** @returns {boolean} Whether the browser reports MP3 media support. */
-    canPlaySongMedia() {
-        return this.songElement != null && this.songElement.canPlayType("audio/mpeg") !== "";
+    /**
+     * Returns whether the browser reports support for the published Song media.
+     *
+     * @param {string} mediaUri Absolute Song media URL.
+     * @returns {boolean} Whether the browser can play the media type.
+     */
+    canPlaySongMedia(mediaUri) {
+        const mediaType = this.getSongMediaType(mediaUri);
+        return mediaType != null && this.songElement?.canPlayType(mediaType) !== "";
+    }
+
+    /**
+     * Returns the MIME type for a Song media URL, or `null` when unsupported.
+     *
+     * @param {string} mediaUri Absolute Song media URL.
+     * @returns {string | null} MIME type for browser capability detection.
+    */
+    getSongMediaType(mediaUri) {
+        const pathname = new URL(mediaUri).pathname.toLowerCase();
+        const dotIndex = pathname.lastIndexOf(".");
+        if (dotIndex < 0) {
+            return null;
+        }
+
+        return SongMediaTypes[pathname.slice(dotIndex)] ?? null;
     }
 
     /**
