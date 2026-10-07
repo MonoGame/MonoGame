@@ -77,6 +77,8 @@ export class BrowserAudio {
                 this.songGainNode = this.audioContext.createGain();
                 source.connect(this.songGainNode);
                 this.songGainNode.connect(this.audioContext.destination);
+                this.songElement.volume = 1;
+                this.applyActiveSongVolume();
             }
 
             const audioContext = this.audioContext;
