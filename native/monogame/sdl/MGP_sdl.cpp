@@ -1557,21 +1557,19 @@ void MGP_Mouse_SetVisible(MGP_Platform* platform, mgbyte visible)
     SDL_ShowCursor(visible ? SDL_ENABLE : SDL_DISABLE);
 
 #if defined(__EMSCRIPTEN__)
-    if (visible)
-        SDL_SetRelativeMouseMode(SDL_FALSE);
+    if (MGP_Web_IsPointerLockEnabled() != 0)
+    {
+        // Browsers cannot move the physical cursor. Relative mode acquires Pointer Lock
+        // from the next canvas click so hidden-cursor center-warp cameras retain
+        // unbounded movement without making every logical warp a capture request.
+        SDL_SetRelativeMouseMode(visible ? SDL_FALSE : SDL_TRUE);
+    }
 #endif
 }
 
 void MGP_Mouse_WarpPosition(MGP_Window* window, mgint x, mgint y)
 {
     assert(window != nullptr);
-
-#if defined(__EMSCRIPTEN__)
-    // Browsers cannot move the physical cursor. SDL relative mode acquires pointer
-    // lock from the next canvas click and keeps its logical position movable, so the
-    // MonoGame center-warp pattern continues to receive unbounded movement.
-    SDL_SetRelativeMouseMode(SDL_TRUE);
-#endif
 
     SDL_WarpMouseInWindow(window->window, x, y);
 }
