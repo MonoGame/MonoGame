@@ -26,7 +26,6 @@ struct MGP_Platform
     std::queue<MGP_Event> queued_events;
 #if defined(__EMSCRIPTEN__)
     std::queue<std::string> queued_browser_file_drop_paths;
-    bool browserHostControlsResize = false;
 #endif
     std::map<mgint, SDL_GameController*> controllers;
 };
@@ -195,14 +194,6 @@ struct MGP_Window
 
 #if defined(__EMSCRIPTEN__)
     mgbyte allowUserResizing = false;
-    mgint lastBrowserResizeWidth = -1;
-    mgint lastBrowserResizeHeight = -1;
-    mgbyte browserFocused = false;
-    bool hasBrowserFocusState = false;
-    mgbyte browserFullscreen = false;
-    bool hasBrowserFullscreenState = false;
-    mgbyte browserFullscreenRequestTarget = false;
-    bool browserFullscreenRequestPending = false;
 #endif
 #if defined(MG_OPENGL)
     mgint contextMajorVersion = 4;
@@ -430,202 +421,24 @@ static bool MGP_Sdl_IsBrowserPointerLockPending()
         && !MGP_Sdl_HasBrowserPointerLock();
 }
 
-static bool MGP_Sdl_IsDuplicateBrowserResize(MGP_Window* window, mgint width, mgint height)
+void MGP_Sdl_PushEvent(MGP_Platform* platform, const MGP_Event& event_)
 {
-    if (window == nullptr)
-        return false;
+    assert(platform != nullptr);
 
-    if (window->lastBrowserResizeWidth == width
-        && window->lastBrowserResizeHeight == height)
+    MGP_Event queuedEvent = event_;
+    queuedEvent.Timestamp = SDL_GetTicks();
+
+    if (queuedEvent.Type == MGEventType::DropFile && queuedEvent.Drop.File != nullptr)
     {
-        return true;
-    }
-
-    window->lastBrowserResizeWidth = width;
-    window->lastBrowserResizeHeight = height;
-    return false;
-}
-
-void MGP_Sdl_QueueBrowserResizeForWindow(MGP_Window* window, mgint width, mgint height)
-{
-    assert(window != nullptr);
-
-    if (width <= 0 || height <= 0 || window->window == nullptr)
-        return;
-
-    if (MGP_Sdl_IsDuplicateBrowserResize(window, width, height))
-        return;
-
-    MGP_Event event_{};
-    event_.Type = MGEventType::WindowResized;
-    event_.Timestamp = SDL_GetTicks();
-    event_.Window.Window = window;
-    event_.Window.Data1 = width;
-    event_.Window.Data2 = height;
-    window->platform->queued_events.push(event_);
-}
-
-void MGP_Sdl_QueueBrowserResize(MGP_Platform* platform, mgint width, mgint height)
-{
-    assert(platform != nullptr);
-
-    for (MGP_Window* window : platform->windows)
-        MGP_Sdl_QueueBrowserResizeForWindow(window, width, height);
-}
-
-void MGP_Sdl_SetBrowserCanvasResizeManaged(MGP_Platform* platform, mgbyte managed)
-{
-    assert(platform != nullptr);
-
-    platform->browserHostControlsResize = managed != 0;
-}
-
-static bool MGP_Sdl_IsDuplicateBrowserFocus(MGP_Window* window, mgbyte focused)
-{
-    if (window == nullptr)
-        return false;
-
-    if (window->hasBrowserFocusState && window->browserFocused == focused)
-        return true;
-
-    window->browserFocused = focused;
-    window->hasBrowserFocusState = true;
-    return false;
-}
-
-static void MGP_Sdl_QueueBrowserFocusForWindow(MGP_Window* window, mgbyte focused)
-{
-    assert(window != nullptr);
-
-    if (window->window == nullptr || MGP_Sdl_IsDuplicateBrowserFocus(window, focused))
-        return;
-
-    MGP_Event event_{};
-    event_.Type = focused ? MGEventType::WindowGainedFocus : MGEventType::WindowLostFocus;
-    event_.Timestamp = SDL_GetTicks();
-    event_.Window.Window = window;
-    window->platform->queued_events.push(event_);
-}
-
-void MGP_Sdl_QueueBrowserFocus(MGP_Platform* platform, mgbyte focused)
-{
-    assert(platform != nullptr);
-
-    for (MGP_Window* window : platform->windows)
-        MGP_Sdl_QueueBrowserFocusForWindow(window, focused);
-}
-
-static void MGP_Sdl_QueueBrowserFullscreenForWindow(MGP_Window* window, mgbyte fullscreen)
-{
-    assert(window != nullptr);
-
-    if (window->window == nullptr)
-        return;
-
-    const bool stateChanged = !window->hasBrowserFullscreenState
-        || window->browserFullscreen != fullscreen;
-
-    // A browser confirmation can report the previously confirmed state after a
-    // failed request. It still completes the request, but must not emit a
-    // fullscreen transition that did not occur.
-    window->browserFullscreenRequestPending = false;
-
-    if (!stateChanged)
-        return;
-
-    window->browserFullscreen = fullscreen;
-    window->hasBrowserFullscreenState = true;
-
-    MGP_Event event_{};
-    event_.Type = MGEventType::WindowFullscreenChanged;
-    event_.Timestamp = SDL_GetTicks();
-    event_.Window.Window = window;
-    event_.Window.Data1 = fullscreen;
-    window->platform->queued_events.push(event_);
-}
-
-static void MGP_Sdl_RequestBrowserFullscreen(MGP_Window* window, mgbyte fullscreen)
-{
-    assert(window != nullptr);
-
-    if (window->browserFullscreenRequestPending)
-    {
-        if (window->browserFullscreenRequestTarget == fullscreen)
+        const char* path = reinterpret_cast<const char*>(queuedEvent.Drop.File);
+        if (path[0] == '\0')
             return;
-    }
-    else if (!window->hasBrowserFullscreenState)
-    {
-        if (fullscreen == 0)
-            return;
-    }
-    else if (window->browserFullscreen == fullscreen)
-    {
-        return;
+
+        platform->queued_browser_file_drop_paths.push(path);
+        queuedEvent.Drop.File = nullptr;
     }
 
-    window->browserFullscreenRequestTarget = fullscreen;
-    window->browserFullscreenRequestPending = true;
-
-    if (fullscreen != 0)
-        MGP_Web_RequestFullscreen();
-    else
-        MGP_Web_ExitFullscreen();
-}
-
-void MGP_Sdl_QueueBrowserFullscreenChange(MGP_Platform* platform, mgbyte fullscreen)
-{
-    assert(platform != nullptr);
-
-    for (MGP_Window* window : platform->windows)
-        MGP_Sdl_QueueBrowserFullscreenForWindow(window, fullscreen);
-}
-
-void MGP_Sdl_QueueBrowserFullscreenFailure(MGP_Platform* platform)
-{
-    assert(platform != nullptr);
-
-    for (MGP_Window* window : platform->windows)
-    {
-        if (window != nullptr)
-            window->browserFullscreenRequestPending = false;
-    }
-}
-
-void MGP_Sdl_QueueBrowserFileDrop(MGP_Platform* platform, const char* path)
-{
-    assert(platform != nullptr);
-
-    if (path == nullptr || path[0] == '\0')
-        return;
-
-    // The browser host owns one canvas, so a browser drop belongs to the primary native window.
-    MGP_Window* window = platform->windows.empty() ? nullptr : platform->windows.front();
-    if (window == nullptr || window->window == nullptr)
-        return;
-
-    MGP_Event event_{};
-    event_.Type = MGEventType::DropFile;
-    event_.Timestamp = SDL_GetTicks();
-    event_.Drop.Window = window;
-    event_.Drop.File = nullptr;
-    platform->queued_browser_file_drop_paths.push(path);
-    platform->queued_events.push(event_);
-}
-
-void MGP_Sdl_QueueBrowserFileDropComplete(MGP_Platform* platform)
-{
-    assert(platform != nullptr);
-
-    // The browser host owns one canvas, so a browser drop belongs to the primary native window.
-    MGP_Window* window = platform->windows.empty() ? nullptr : platform->windows.front();
-    if (window == nullptr || window->window == nullptr)
-        return;
-
-    MGP_Event event_{};
-    event_.Type = MGEventType::DropComplete;
-    event_.Timestamp = SDL_GetTicks();
-    event_.Drop.Window = window;
-    platform->queued_events.push(event_);
+    platform->queued_events.push(queuedEvent);
 }
 #endif
 
@@ -1011,7 +824,7 @@ mgbyte MGP_Platform_PollEvent(MGP_Platform* platform, MGP_Event& event_)
                 // The host reports adaptive layout in device pixels. SDL reports
                 // its browser resize callback in CSS pixels, which would otherwise
                 // overwrite the drawing-buffer dimensions after every layout change.
-                if (platform->browserHostControlsResize)
+                if (MGP_Web_IsBrowserCanvasResizeManaged() != 0)
                     break;
 #endif
                 event_.Type = MGEventType::WindowResized;
@@ -1024,7 +837,7 @@ mgbyte MGP_Platform_PollEvent(MGP_Platform* platform, MGP_Event& event_)
 #if defined(__EMSCRIPTEN__)
                 // A programmatic SDL_SetWindowSize uses SIZE_CHANGED. It remains
                 // independent from host-managed browser layout resizing.
-                if (MGP_Sdl_IsDuplicateBrowserResize(
+                if (MGP_Web_IsDuplicateBrowserResize(
                     reinterpret_cast<MGP_Window*>(event_.Window.Window),
                     ev.window.data1,
                     ev.window.data2))
@@ -1243,6 +1056,10 @@ static mgbyte MGP_Window_CreateNativeWindowInternal(
 
     window->windowId = SDL_GetWindowID(window->window);
 
+#if defined(__EMSCRIPTEN__)
+    MGP_Web_OnWindowCreated(window);
+#endif
+
 #if defined(MG_OPENGL)
     if (windowCreateInfo != nullptr)
     {
@@ -1377,6 +1194,10 @@ void MGP_Window_Destroy(MGP_Window* window)
 	assert(window != nullptr);
 	assert(window->platform != nullptr);
 
+#if defined(__EMSCRIPTEN__)
+    MGP_Web_OnWindowDestroyed(window);
+#endif
+
 	if(window->window != nullptr)
 	    SDL_DestroyWindow(window->window);
 
@@ -1399,6 +1220,10 @@ void MGP_Window_DestroyNativeWindow(MGP_Window* window)
     // destroying it or WGL could keep a dead window/pixel-format binding alive.
     if (SDL_GL_GetCurrentWindow() == window->window)
         SDL_GL_MakeCurrent(nullptr, nullptr);
+#endif
+
+#if defined(__EMSCRIPTEN__)
+    MGP_Web_OnNativeWindowDestroyed(window);
 #endif
 
     SDL_DestroyWindow(window->window);
@@ -1481,7 +1306,7 @@ mgbyte MGP_Window_GetIsFullscreen(MGP_Window* window)
     assert(window != nullptr);
 
 #if defined(__EMSCRIPTEN__)
-    return window->browserFullscreen;
+    return MGP_Web_GetBrowserFullscreen(window);
 #else
     Uint32 flags = SDL_GetWindowFlags(window->window);
     return (flags & SDL_WINDOW_FULLSCREEN) != 0 ? 1 : 0;
@@ -1561,7 +1386,7 @@ void MGP_Window_EnterFullScreen(MGP_Window* window, mgbyte useHardwareModeSwitch
 
 #if defined(__EMSCRIPTEN__)
     (void)useHardwareModeSwitch;
-    MGP_Sdl_RequestBrowserFullscreen(window, 1);
+    MGP_Web_RequestBrowserFullscreen(window, 1);
 #else
     Uint32 flags;
     if (useHardwareModeSwitch)
@@ -1578,7 +1403,7 @@ void MGP_Window_ExitFullScreen(MGP_Window* window)
     assert(window != nullptr);
 
 #if defined(__EMSCRIPTEN__)
-    MGP_Sdl_RequestBrowserFullscreen(window, 0);
+    MGP_Web_RequestBrowserFullscreen(window, 0);
 #else
     SDL_SetWindowFullscreen(window->window, 0);
 #endif
