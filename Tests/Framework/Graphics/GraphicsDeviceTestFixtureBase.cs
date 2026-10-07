@@ -2,19 +2,18 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Content;
+using Microsoft.Xna.Framework.Graphics;
+using MonoGame.Framework;
+using MonoGame.Tests.Components;
+using MonoGame.Tests.Utilities;
+using NUnit.Framework;
 using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading;
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Content;
-using Microsoft.Xna.Framework.Graphics;
-using MonoGame.Tests.Components;
-using MonoGame.Tests.Utilities;
-using NUnit.Framework;
-using NUnit.Framework.Internal;
 
 namespace MonoGame.Tests.Graphics
 {
@@ -24,13 +23,15 @@ namespace MonoGame.Tests.Graphics
     {
         static GraphicsDeviceTestFixtureBase()
         {
+#if DIRECTX12
             // This is here to hint to the codebase that we're
             // running unit tests.
             //
             // In particular we're using this to lower the memory
             // usage of the D3D12 backend for our unit test runner machine.
             //
-            Environment.SetEnvironmentVariable("MG_RUNNING_UNIT_TESTS", "1");
+            PlatformConfiguration.Set(PlatformConfiguration.Key.Dx12PreferredBlockSize, 4 * 1024 * 1024);
+#endif
         }
 
         protected TestGameBase game;
