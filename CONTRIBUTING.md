@@ -63,7 +63,7 @@ There has been confusion on this point in the past, so we want to make this clea
 
 If you did not write the code, you do not have ownership of the code and you should not submit it to MonoGame.
 
-If we find a contribution to be in violation of copyright, it will be immediately removed.  We will bar that contributor from the MonoGame project.
+If we find a contribution to be in violation of copyright, it will be immediately removed.  We will ban that contributor from the MonoGame project.
 
 ## Code guidelines
 
