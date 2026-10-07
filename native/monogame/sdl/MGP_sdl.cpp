@@ -515,19 +515,26 @@ void MGP_Sdl_QueueBrowserFocus(MGP_Platform* platform, mgbyte focused)
         MGP_Sdl_QueueBrowserFocusForWindow(window, focused);
 }
 
-static void MGP_Sdl_QueueBrowserFullscreenForWindow(MGP_Window* window, mgbyte fullscreen, bool force)
+static void MGP_Sdl_QueueBrowserFullscreenForWindow(MGP_Window* window, mgbyte fullscreen)
 {
     assert(window != nullptr);
 
-    if (window->window == nullptr
-        || (!force && window->hasBrowserFullscreenState && window->browserFullscreen == fullscreen))
-    {
+    if (window->window == nullptr)
         return;
-    }
+
+    const bool stateChanged = !window->hasBrowserFullscreenState
+        || window->browserFullscreen != fullscreen;
+
+    // A browser confirmation can report the previously confirmed state after a
+    // failed request. It still completes the request, but must not emit a
+    // fullscreen transition that did not occur.
+    window->browserFullscreenRequestPending = false;
+
+    if (!stateChanged)
+        return;
 
     window->browserFullscreen = fullscreen;
     window->hasBrowserFullscreenState = true;
-    window->browserFullscreenRequestPending = false;
 
     MGP_Event event_{};
     event_.Type = MGEventType::WindowFullscreenChanged;
@@ -570,7 +577,7 @@ void MGP_Sdl_QueueBrowserFullscreenChange(MGP_Platform* platform, mgbyte fullscr
     assert(platform != nullptr);
 
     for (MGP_Window* window : platform->windows)
-        MGP_Sdl_QueueBrowserFullscreenForWindow(window, fullscreen, false);
+        MGP_Sdl_QueueBrowserFullscreenForWindow(window, fullscreen);
 }
 
 void MGP_Sdl_QueueBrowserFullscreenFailure(MGP_Platform* platform)
@@ -578,7 +585,10 @@ void MGP_Sdl_QueueBrowserFullscreenFailure(MGP_Platform* platform)
     assert(platform != nullptr);
 
     for (MGP_Window* window : platform->windows)
-        MGP_Sdl_QueueBrowserFullscreenForWindow(window, false, true);
+    {
+        if (window != nullptr)
+            window->browserFullscreenRequestPending = false;
+    }
 }
 
 void MGP_Sdl_QueueBrowserFileDrop(MGP_Platform* platform, const char* path)
