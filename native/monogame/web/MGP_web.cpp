@@ -191,17 +191,17 @@ void MGP_Web_ExitFullscreen()
 
 EM_JS(mgbyte, MGP_Web_AccelerometerIsSupportedFromHost, (),
 {
-    return globalThis.MonoGameWebHost?.getActiveHost?.().isAccelerometerSupported?.() ? 1 : 0;
+    return globalThis.MonoGameWebHost?.getActiveHost?.()?.isAccelerometerSupported?.() ? 1 : 0;
 });
 
 EM_JS(mgint, MGP_Web_AccelerometerStartFromHost, (),
 {
-    return globalThis.MonoGameWebHost?.getActiveHost?.().requestAccelerometer?.() ?? 0;
+    return globalThis.MonoGameWebHost?.getActiveHost?.()?.requestAccelerometer?.() ?? 0;
 });
 
 EM_JS(void, MGP_Web_AccelerometerStopFromHost, (),
 {
-    globalThis.MonoGameWebHost?.getActiveHost?.().stopAccelerometer?.();
+    globalThis.MonoGameWebHost?.getActiveHost?.()?.stopAccelerometer?.();
 });
 
 mgbyte MGP_Web_Accelerometer_IsSupported()
