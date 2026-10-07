@@ -24,9 +24,7 @@ struct MGP_Platform
 {
     std::vector<MGP_Window*> windows;
     std::queue<MGP_Event> queued_events;
-#if defined(__EMSCRIPTEN__)
-    std::queue<std::string> queued_browser_file_drop_paths;
-#endif
+    std::string currentDropFilePath;
     std::map<mgint, SDL_GameController*> controllers;
 };
 
@@ -427,17 +425,6 @@ void MGP_Sdl_PushEvent(MGP_Platform* platform, const MGP_Event& event_)
 
     MGP_Event queuedEvent = event_;
     queuedEvent.Timestamp = SDL_GetTicks();
-
-    if (queuedEvent.Type == MGEventType::DropFile && queuedEvent.Drop.File != nullptr)
-    {
-        const char* path = reinterpret_cast<const char*>(queuedEvent.Drop.File);
-        if (path[0] == '\0')
-            return;
-
-        platform->queued_browser_file_drop_paths.push(path);
-        queuedEvent.Drop.File = nullptr;
-    }
-
     platform->queued_events.push(queuedEvent);
 }
 #endif
@@ -551,15 +538,8 @@ mgbyte MGP_Platform_PollEvent(MGP_Platform* platform, MGP_Event& event_)
         platform->queued_events.pop();
 
 #if defined(__EMSCRIPTEN__)
-        if (event_.Type == MGEventType::DropFile && event_.Drop.File == nullptr)
-        {
-            assert(!platform->queued_browser_file_drop_paths.empty());
-
-            static char TempPath[MAX_PATH_SIZE];
-            snprintf(TempPath, MAX_PATH_SIZE, "%s", platform->queued_browser_file_drop_paths.front().c_str());
-            platform->queued_browser_file_drop_paths.pop();
-            event_.Drop.File = TempPath;
-        }
+        if (event_.Type == MGEventType::DropComplete)
+            MGP_Web_OnDropCompleteDispatched();
 #endif
 
         return true;
@@ -886,11 +866,10 @@ mgbyte MGP_Platform_PollEvent(MGP_Platform* platform, MGP_Event& event_)
             event_.Type = MGEventType::DropFile;
             event_.Drop.Window = MGP_WindowFromId(platform, ev.drop.windowID);
 
-            static char TempPath[MAX_PATH_SIZE];
-            snprintf(TempPath, MAX_PATH_SIZE, "%s", ev.drop.file);
+            platform->currentDropFilePath = ev.drop.file;
             SDL_free(ev.drop.file);
 
-            event_.Drop.File = TempPath;
+            event_.Drop.File = const_cast<char*>(platform->currentDropFilePath.c_str());
             return true;
         }
 

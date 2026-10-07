@@ -4,19 +4,12 @@
 
 #include <climits>
 #include <cstdlib>
+#include <deque>
 #include <emscripten/emscripten.h>
-#include <queue>
 #include <string>
 #include <vector>
 
 static MGP_Platform* s_platform = nullptr;
-static bool s_hasPendingCanvasResize = false;
-static mgint s_pendingCanvasResizeWidth = 0;
-static mgint s_pendingCanvasResizeHeight = 0;
-static bool s_hasPendingBrowserFocus = false;
-static mgbyte s_pendingBrowserFocus = false;
-static bool s_hasPendingBrowserFullscreen = false;
-static mgbyte s_pendingBrowserFullscreen = false;
 static bool s_browserHostControlsResize = false;
 static bool s_pointerLockEnabled = false;
 
@@ -36,13 +29,16 @@ struct MGP_WebWindowState
 
 static std::vector<MGP_WebWindowState> s_browserWindows;
 
-struct MGP_WebPendingDropEvent
+struct MGP_WebDropBatch
 {
-    bool complete;
-    std::string path;
+    std::deque<std::string> paths;
 };
 
-static std::queue<MGP_WebPendingDropEvent> s_pendingDropEvents;
+static constexpr mgint MGP_WEB_FULLSCREEN_FAILURE = -1;
+
+static std::vector<MGP_Event> s_pendingEvents;
+static std::deque<MGP_WebDropBatch> s_dropBatches;
+static bool s_hasOpenDropBatch = false;
 
 static MGP_WebWindowState* MGP_Web_GetWindowState(MGP_Window* window)
 {
@@ -66,6 +62,28 @@ static MGP_WebWindowState* MGP_Web_GetPrimaryWindowState()
     return nullptr;
 }
 
+static void MGP_Web_PushEvent(const MGP_Event& event_)
+{
+    if (s_platform == nullptr)
+    {
+        s_pendingEvents.push_back(event_);
+        return;
+    }
+
+    MGP_Sdl_PushEvent(s_platform, event_);
+}
+
+static MGP_WebDropBatch& MGP_Web_GetOpenDropBatch()
+{
+    if (!s_hasOpenDropBatch)
+    {
+        s_dropBatches.emplace_back();
+        s_hasOpenDropBatch = true;
+    }
+
+    return s_dropBatches.back();
+}
+
 static void MGP_Web_PushWindowEvent(
     MGP_WebWindowState& state,
     MGEventType type,
@@ -77,7 +95,7 @@ static void MGP_Web_PushWindowEvent(
     event_.Window.Window = state.window;
     event_.Window.Data1 = data1;
     event_.Window.Data2 = data2;
-    MGP_Sdl_PushEvent(s_platform, event_);
+    MGP_Web_PushEvent(event_);
 }
 
 static void MGP_Web_QueueBrowserResize(mgint width, mgint height)
@@ -157,6 +175,12 @@ static void MGP_Web_QueueBrowserFullscreenFailure()
     }
 }
 
+void MGP_Web_OnDropCompleteDispatched()
+{
+    if (!s_dropBatches.empty())
+        s_dropBatches.pop_front();
+}
+
 enum MGP_WebSensorState : mgint
 {
     MGP_WEB_SENSOR_STATE_NOT_SUPPORTED = 0,
@@ -187,41 +211,48 @@ EM_JS(char*, MGP_Web_TakeDroppedFilePathFromHost, (),
     return typeof path === "string" ? stringToNewUTF8(path) : 0;
 });
 
-static void MGP_Web_QueueDroppedFile(MGP_Platform* platform, const char* path)
+static void MGP_Web_QueueDroppedFile(const char* path)
 {
-    if (platform == nullptr)
-    {
-        s_pendingDropEvents.push({ false, path });
+    if (path == nullptr || path[0] == '\0')
         return;
-    }
 
-    MGP_WebWindowState* state = MGP_Web_GetPrimaryWindowState();
-    if (state == nullptr)
-        return;
+    MGP_WebDropBatch& batch = MGP_Web_GetOpenDropBatch();
+    batch.paths.emplace_back(path);
 
     MGP_Event event_{};
     event_.Type = MGEventType::DropFile;
-    event_.Drop.Window = state->window;
-    event_.Drop.File = const_cast<char*>(path);
-    MGP_Sdl_PushEvent(platform, event_);
-}
+    event_.Drop.File = const_cast<char*>(batch.paths.back().c_str());
 
-static void MGP_Web_QueueDroppedFileComplete(MGP_Platform* platform)
-{
-    if (platform == nullptr)
+    if (s_platform != nullptr)
     {
-        s_pendingDropEvents.push({ true, "" });
-        return;
+        MGP_WebWindowState* state = MGP_Web_GetPrimaryWindowState();
+        if (state == nullptr)
+            return;
+
+        event_.Drop.Window = state->window;
     }
 
-    MGP_WebWindowState* state = MGP_Web_GetPrimaryWindowState();
-    if (state == nullptr)
-        return;
+    MGP_Web_PushEvent(event_);
+}
+
+static void MGP_Web_QueueDroppedFileComplete()
+{
+    MGP_Web_GetOpenDropBatch();
+    s_hasOpenDropBatch = false;
 
     MGP_Event event_{};
     event_.Type = MGEventType::DropComplete;
-    event_.Drop.Window = state->window;
-    MGP_Sdl_PushEvent(platform, event_);
+
+    if (s_platform != nullptr)
+    {
+        MGP_WebWindowState* state = MGP_Web_GetPrimaryWindowState();
+        if (state == nullptr)
+            return;
+
+        event_.Drop.Window = state->window;
+    }
+
+    MGP_Web_PushEvent(event_);
 }
 
 mgint MGP_Web_GetMaximumTouchCount()
@@ -297,9 +328,11 @@ extern "C" EMSCRIPTEN_KEEPALIVE void MGP_Web_NotifyCanvasResize(mgint width, mgi
 
     if (s_platform == nullptr)
     {
-        s_pendingCanvasResizeWidth = width;
-        s_pendingCanvasResizeHeight = height;
-        s_hasPendingCanvasResize = true;
+        MGP_Event event_{};
+        event_.Type = MGEventType::WindowResized;
+        event_.Window.Data1 = width;
+        event_.Window.Data2 = height;
+        MGP_Web_PushEvent(event_);
         return;
     }
 
@@ -310,8 +343,9 @@ extern "C" EMSCRIPTEN_KEEPALIVE void MGP_Web_NotifyFocusChange(mgbyte focused)
 {
     if (s_platform == nullptr)
     {
-        s_pendingBrowserFocus = focused;
-        s_hasPendingBrowserFocus = true;
+        MGP_Event event_{};
+        event_.Type = focused != 0 ? MGEventType::WindowGainedFocus : MGEventType::WindowLostFocus;
+        MGP_Web_PushEvent(event_);
         return;
     }
 
@@ -322,8 +356,10 @@ extern "C" EMSCRIPTEN_KEEPALIVE void MGP_Web_NotifyFullscreenChange(mgbyte fulls
 {
     if (s_platform == nullptr)
     {
-        s_pendingBrowserFullscreen = fullscreen;
-        s_hasPendingBrowserFullscreen = true;
+        MGP_Event event_{};
+        event_.Type = MGEventType::WindowFullscreenChanged;
+        event_.Window.Data1 = fullscreen;
+        MGP_Web_PushEvent(event_);
         return;
     }
 
@@ -332,6 +368,15 @@ extern "C" EMSCRIPTEN_KEEPALIVE void MGP_Web_NotifyFullscreenChange(mgbyte fulls
 
 extern "C" EMSCRIPTEN_KEEPALIVE void MGP_Web_NotifyFullscreenFailure()
 {
+    if (s_platform == nullptr)
+    {
+        MGP_Event event_{};
+        event_.Type = MGEventType::WindowFullscreenChanged;
+        event_.Window.Data2 = MGP_WEB_FULLSCREEN_FAILURE;
+        MGP_Web_PushEvent(event_);
+        return;
+    }
+
     MGP_Web_QueueBrowserFullscreenFailure();
 }
 
@@ -341,13 +386,13 @@ extern "C" EMSCRIPTEN_KEEPALIVE void MGP_Web_NotifyFileDrop()
     if (path == nullptr)
         return;
 
-    MGP_Web_QueueDroppedFile(s_platform, path);
+    MGP_Web_QueueDroppedFile(path);
     free(path);
 }
 
 extern "C" EMSCRIPTEN_KEEPALIVE void MGP_Web_NotifyFileDropComplete()
 {
-    MGP_Web_QueueDroppedFileComplete(s_platform);
+    MGP_Web_QueueDroppedFileComplete();
 }
 
 void MGP_Web_RequestBrowserFullscreen(MGP_Window* window, mgbyte fullscreen)
@@ -456,6 +501,9 @@ void MGP_Web_OnPlatformDestroyed(MGP_Platform* platform)
     {
         s_platform = nullptr;
         s_browserWindows.clear();
+        s_pendingEvents.clear();
+        s_dropBatches.clear();
+        s_hasOpenDropBatch = false;
     }
 }
 
@@ -500,34 +548,41 @@ MG_EXPORT void MGP_Platform_StartRunLoop(MGP_Platform* platform)
 {
     s_platform = platform;
 
-    if (s_hasPendingCanvasResize)
+    for (const MGP_Event& event_ : s_pendingEvents)
     {
-        MGP_Web_QueueBrowserResize(
-            s_pendingCanvasResizeWidth,
-            s_pendingCanvasResizeHeight);
-        s_hasPendingCanvasResize = false;
+        switch (event_.Type)
+        {
+            case MGEventType::WindowResized:
+                MGP_Web_QueueBrowserResize(event_.Window.Data1, event_.Window.Data2);
+                break;
+            case MGEventType::WindowGainedFocus:
+                MGP_Web_QueueBrowserFocus(1);
+                break;
+            case MGEventType::WindowLostFocus:
+                MGP_Web_QueueBrowserFocus(0);
+                break;
+            case MGEventType::WindowFullscreenChanged:
+                if (event_.Window.Data2 == MGP_WEB_FULLSCREEN_FAILURE)
+                    MGP_Web_QueueBrowserFullscreenFailure();
+                else
+                    MGP_Web_QueueBrowserFullscreenChange(static_cast<mgbyte>(event_.Window.Data1));
+                break;
+            case MGEventType::DropFile:
+            case MGEventType::DropComplete:
+            {
+                MGP_WebWindowState* state = MGP_Web_GetPrimaryWindowState();
+                if (state == nullptr)
+                    break;
+
+                MGP_Event dispatchedEvent = event_;
+                dispatchedEvent.Drop.Window = state->window;
+                MGP_Web_PushEvent(dispatchedEvent);
+                break;
+            }
+            default:
+                break;
+        }
     }
 
-    if (s_hasPendingBrowserFocus)
-    {
-        MGP_Web_QueueBrowserFocus(s_pendingBrowserFocus);
-        s_hasPendingBrowserFocus = false;
-    }
-
-    if (s_hasPendingBrowserFullscreen)
-    {
-        MGP_Web_QueueBrowserFullscreenChange(s_pendingBrowserFullscreen);
-        s_hasPendingBrowserFullscreen = false;
-    }
-
-    while (!s_pendingDropEvents.empty())
-    {
-        const MGP_WebPendingDropEvent& event_ = s_pendingDropEvents.front();
-        if (event_.complete)
-            MGP_Web_QueueDroppedFileComplete(platform);
-        else
-            MGP_Web_QueueDroppedFile(platform, event_.path.c_str());
-
-        s_pendingDropEvents.pop();
-    }
+    s_pendingEvents.clear();
 }
