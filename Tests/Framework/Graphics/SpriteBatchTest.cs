@@ -507,5 +507,127 @@ namespace MonoGame.Tests.Graphics {
 
             CheckFrames();
         }
+
+        [Test]
+        public void Draw_DeferredAlternatingTextures_DrawsEachTextureAtCorrectPosition()
+        {
+            using Texture2D redTexture = new Texture2D(gd, 1, 1);
+            using Texture2D greenTexture = new Texture2D(gd, 1, 1);
+            Color[] pixel = new Color[1];
+
+            redTexture.SetData(new Color[] { Color.Red });
+            greenTexture.SetData(new Color[] { Color.Green });
+
+            gd.Clear(Color.Black);
+
+            // regression test for texture runs in the shared upload buffer
+            // each draw must use its own index offset.
+            _spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.Opaque, SamplerState.PointClamp);
+            _spriteBatch.Draw(redTexture, new Rectangle(20, 20, 20, 20), Color.White);
+            _spriteBatch.Draw(greenTexture, new Rectangle(50, 20, 20, 20), Color.White);
+            _spriteBatch.Draw(redTexture, new Rectangle(80, 20, 20, 20), Color.White);
+            _spriteBatch.End();
+
+            gd.GetBackBufferData(new Rectangle(30, 30, 1, 1), pixel, 0, 1);
+            Assert.That(pixel[0], Is.EqualTo(Color.Red));
+
+            gd.GetBackBufferData(new Rectangle(60, 30, 1, 1), pixel, 0, 1);
+            Assert.That(pixel[0], Is.EqualTo(Color.Green));
+
+            gd.GetBackBufferData(new Rectangle(90, 30, 1, 1), pixel, 0, 1);
+            Assert.That(pixel[0], Is.EqualTo(Color.Red));
+        }
+
+        [Test]
+        public void Draw_DeferredBatchExceedsChunkSize_DrawsSpritesInBothChunks()
+        {
+            const int spritesPerChunk = short.MaxValue / 6;
+            const int spritesPerRow = 100;
+
+            using Texture2D redTexture = new Texture2D(gd, 1, 1);
+            using Texture2D greenTexture = new Texture2D(gd, 1, 1);
+            Color[] pixel = new Color[1];
+
+            redTexture.SetData(new Color[] { Color.Red });
+            greenTexture.SetData(new Color[] { Color.Green });
+
+            gd.Clear(Color.Black);
+
+            // regression test for crossing the 5,461 sprite chunk boundary;
+            // both chunks must use the correct index offsets.
+            _spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.Opaque, SamplerState.PointClamp);
+            for (int i = 0; i < spritesPerChunk; i++)
+            {
+                int x = 20 + i % spritesPerRow;
+                int y = 100 + i / spritesPerRow;
+                _spriteBatch.Draw(redTexture, new Rectangle(x, y, 1, 1), Color.White);
+            }
+            _spriteBatch.Draw(greenTexture, new Rectangle(150, 100, 1, 1), Color.White);
+            _spriteBatch.Draw(redTexture, new Rectangle(151, 100, 1, 1), Color.White);
+            _spriteBatch.End();
+
+            gd.GetBackBufferData(new Rectangle(20, 100, 1, 1), pixel, 0, 1);
+            Assert.That(pixel[0], Is.EqualTo(Color.Red));
+
+            gd.GetBackBufferData(new Rectangle(50, 127, 1, 1), pixel, 0, 1);
+            Assert.That(pixel[0], Is.EqualTo(Color.Red));
+
+            gd.GetBackBufferData(new Rectangle(80, 154, 1, 1), pixel, 0, 1);
+            Assert.That(pixel[0], Is.EqualTo(Color.Red));
+
+            gd.GetBackBufferData(new Rectangle(150, 100, 1, 1), pixel, 0, 1);
+            Assert.That(pixel[0], Is.EqualTo(Color.Green));
+
+            gd.GetBackBufferData(new Rectangle(151, 100, 1, 1), pixel, 0, 1);
+            Assert.That(pixel[0], Is.EqualTo(Color.Red));
+        }
+
+        [Test]
+        public void Draw_DeferredCustomEffectWithTwoTextures_OverridesSlotZeroAndPreservesSlotOne()
+        {
+            using Effect customSpriteEffect = AssetTestUtility.LoadEffect(content, "CustomSpriteBatchEffect");
+            using Texture2D redTexture = new Texture2D(gd, 1, 1);
+            using Texture2D greenTexture = new Texture2D(gd, 1, 1);
+            using Texture2D yellowTexture = new Texture2D(gd, 1, 1);
+            using Texture2D blueTexture = new Texture2D(gd, 1, 1);
+
+            Color[] pixel = new Color[1];
+
+            redTexture.SetData(new Color[] { Color.Red });          // 255, 0, 0, 255
+            greenTexture.SetData(new Color[] { Color.Lime });       // 0, 255, 0, 255
+            yellowTexture.SetData(new Color[] { Color.Yellow });    // 255, 255, 0, 255
+            blueTexture.SetData(new Color[] { Color.Blue });        // 0, 0, 255, 255
+
+            customSpriteEffect.Parameters["SourceTexture"].SetValue(yellowTexture);
+            customSpriteEffect.Parameters["OtherTexture"].SetValue(blueTexture);
+
+            gd.Clear(Color.Black);
+
+            // regression test checking that each texture run must overrides the
+            // effect's slot 0 texture without changing slot 1
+            _spriteBatch.Begin(
+                SpriteSortMode.Deferred,
+                BlendState.Opaque,
+                SamplerState.PointClamp,
+                null,
+                null,
+                customSpriteEffect);
+            _spriteBatch.Draw(redTexture, new Rectangle(20, 50, 20, 20), Color.White);
+            _spriteBatch.Draw(greenTexture, new Rectangle(50, 50, 20, 20), Color.White);
+            _spriteBatch.Draw(redTexture, new Rectangle(80, 50, 20, 20), Color.White);
+            _spriteBatch.End();
+
+            gd.GetBackBufferData(new Rectangle(30, 60, 1, 1), pixel, 0, 1);
+            Assert.That(pixel[0], Is.EqualTo(Color.Magenta));   // 255, 0, 255, 255
+
+            gd.GetBackBufferData(new Rectangle(60, 60, 1, 1), pixel, 0, 1);
+            Assert.That(pixel[0], Is.EqualTo(Color.Cyan));      // 0, 255, 255, 255
+
+            gd.GetBackBufferData(new Rectangle(90, 60, 1, 1), pixel, 0, 1);
+            Assert.That(pixel[0], Is.EqualTo(Color.Magenta));   // 255, 0, 255, 255
+
+            Assert.That(gd.Textures[0], Is.SameAs(redTexture));
+            Assert.That(gd.Textures[1], Is.SameAs(blueTexture));
+        }
     }
 }
