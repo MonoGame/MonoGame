@@ -1377,7 +1377,7 @@ void MGP_Window_Destroy(MGP_Window* window)
 	assert(window != nullptr);
 	assert(window->platform != nullptr);
 
-	if(window->window != nullptr);
+	if(window->window != nullptr)
 	    SDL_DestroyWindow(window->window);
 
     if (window->retiredWindow != nullptr)
