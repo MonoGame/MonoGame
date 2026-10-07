@@ -128,7 +128,7 @@ export class BrowserWindow {
     }
 
     /**
-     * Forwards CSS canvas size changes when the `Adaptive` policy is selected.
+     * Forwards device-pixel canvas size changes when the `Adaptive` policy is selected.
      *
      * @throws {BrowserHostError} When the runtime or browser cannot report canvas size changes.
      */
@@ -138,12 +138,16 @@ export class BrowserWindow {
         }
 
         const notifyCanvasResize = this.getRuntime()?.Module?._MGP_Web_NotifyCanvasResize;
-        if (typeof notifyCanvasResize !== "function") {
+        const setCanvasResizeManaged = this.getRuntime()?.Module?._MGP_Web_SetCanvasResizeManaged;
+        if (typeof notifyCanvasResize !== "function"
+            || typeof setCanvasResizeManaged !== "function") {
             throw new BrowserHostError(
                 HostStage.WasmLoad,
                 "native_canvas_resize_missing",
-                "The managed runtime does not expose the native canvas resize callback.");
+                "The managed runtime does not expose the native canvas resize callbacks.");
         }
+
+        setCanvasResizeManaged(1);
 
         const reportCanvasSize = (width, height) => {
             const normalizedWidth = Math.round(width);
@@ -151,6 +155,15 @@ export class BrowserWindow {
             if (normalizedWidth > 0 && normalizedHeight > 0) {
                 notifyCanvasResize(normalizedWidth, normalizedHeight);
             }
+        };
+
+        const getDevicePixelContentBoxSize = (entry) => {
+            const size = entry.devicePixelContentBoxSize;
+            if (size == null) {
+                return null;
+            }
+
+            return Array.isArray(size) ? size[0] : size;
         };
 
         if (typeof ResizeObserver !== "function") {
@@ -167,11 +180,25 @@ export class BrowserWindow {
 
             for (const entry of entries) {
                 if (entry.target === this.canvas) {
-                    reportCanvasSize(entry.contentRect.width, entry.contentRect.height);
+                    const devicePixelSize = getDevicePixelContentBoxSize(entry);
+                    if (devicePixelSize != null) {
+                        reportCanvasSize(devicePixelSize.inlineSize, devicePixelSize.blockSize);
+                    }
+                    else {
+                        reportCanvasSize(
+                            entry.contentRect.width * globalThis.devicePixelRatio,
+                            entry.contentRect.height * globalThis.devicePixelRatio);
+                    }
                 }
             }
         });
-        this.canvasResizeObserver.observe(this.canvas);
+
+        try {
+            this.canvasResizeObserver.observe(this.canvas, { box: "device-pixel-content-box" });
+        }
+        catch {
+            this.canvasResizeObserver.observe(this.canvas);
+        }
     }
 
     /**

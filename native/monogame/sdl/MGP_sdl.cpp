@@ -26,6 +26,7 @@ struct MGP_Platform
     std::queue<MGP_Event> queued_events;
 #if defined(__EMSCRIPTEN__)
     std::queue<std::string> queued_browser_file_drop_paths;
+    bool browserHostControlsResize = false;
 #endif
     std::map<mgint, SDL_GameController*> controllers;
 };
@@ -470,6 +471,13 @@ void MGP_Sdl_QueueBrowserResize(MGP_Platform* platform, mgint width, mgint heigh
 
     for (MGP_Window* window : platform->windows)
         MGP_Sdl_QueueBrowserResizeForWindow(window, width, height);
+}
+
+void MGP_Sdl_SetBrowserCanvasResizeManaged(MGP_Platform* platform, mgbyte managed)
+{
+    assert(platform != nullptr);
+
+    platform->browserHostControlsResize = managed != 0;
 }
 
 static bool MGP_Sdl_IsDuplicateBrowserFocus(MGP_Window* window, mgbyte focused)
@@ -988,11 +996,24 @@ mgbyte MGP_Platform_PollEvent(MGP_Platform* platform, MGP_Event& event_)
             switch (ev.window.event)
             {
             case SDL_WINDOWEVENT_RESIZED:
+            {
+#if defined(__EMSCRIPTEN__)
+                // The host reports adaptive layout in device pixels. SDL reports
+                // its browser resize callback in CSS pixels, which would otherwise
+                // overwrite the drawing-buffer dimensions after every layout change.
+                if (platform->browserHostControlsResize)
+                    break;
+#endif
+                event_.Type = MGEventType::WindowResized;
+                event_.Window.Data1 = ev.window.data1;
+                event_.Window.Data2 = ev.window.data2;
+                return true;
+            }
+
             case SDL_WINDOWEVENT_SIZE_CHANGED:
 #if defined(__EMSCRIPTEN__)
-                // The browser host observes CSS layout changes that SDL reports from
-                // its window callback too. Remember both sources so one resize reaches
-                // the managed window regardless of callback order.
+                // A programmatic SDL_SetWindowSize uses SIZE_CHANGED. It remains
+                // independent from host-managed browser layout resizing.
                 if (MGP_Sdl_IsDuplicateBrowserResize(
                     reinterpret_cast<MGP_Window*>(event_.Window.Window),
                     ev.window.data1,

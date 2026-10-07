@@ -15,6 +15,7 @@ static bool s_hasPendingBrowserFocus = false;
 static mgbyte s_pendingBrowserFocus = false;
 static bool s_hasPendingBrowserFullscreen = false;
 static mgbyte s_pendingBrowserFullscreen = false;
+static bool s_browserHostControlsResize = false;
 static bool s_pointerLockEnabled = false;
 
 struct MGP_WebPendingDropEvent
@@ -85,6 +86,14 @@ mgint MGP_Web_GetMaximumTouchCount()
 extern "C" EMSCRIPTEN_KEEPALIVE void MGP_Web_SetPointerLockEnabled(mgbyte enabled)
 {
     s_pointerLockEnabled = enabled != 0;
+}
+
+extern "C" EMSCRIPTEN_KEEPALIVE void MGP_Web_SetCanvasResizeManaged(mgbyte managed)
+{
+    s_browserHostControlsResize = managed != 0;
+
+    if (s_platform != nullptr)
+        MGP_Sdl_SetBrowserCanvasResizeManaged(s_platform, managed);
 }
 
 mgbyte MGP_Web_IsPointerLockEnabled()
@@ -261,6 +270,7 @@ void MGP_Web_OnPlatformDestroyed(MGP_Platform* platform)
 MG_EXPORT void MGP_Platform_StartRunLoop(MGP_Platform* platform)
 {
     s_platform = platform;
+    MGP_Sdl_SetBrowserCanvasResizeManaged(platform, s_browserHostControlsResize);
 
     if (s_hasPendingCanvasResize)
     {
