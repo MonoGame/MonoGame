@@ -23,6 +23,10 @@
 #include <utility>
 #include <vector>
 
+#if defined(__EMSCRIPTEN__)
+#include <emscripten/emscripten.h>
+#endif
+
 #ifndef GL_TEXTURE_MAX_ANISOTROPY_EXT
 #define GL_TEXTURE_MAX_ANISOTROPY_EXT 0x84FE
 #endif
@@ -225,6 +229,21 @@ namespace
     constexpr mgint MaxVertexBufferSlots = 16;
     constexpr mgint OpenGLShaderProfile = 0;
     constexpr size_t ShaderStageCount = static_cast<size_t>(MGShaderStage::Count);
+
+#if defined(__EMSCRIPTEN__)
+    bool s_browserWireFrameWarningIssued = false;
+    bool s_browserLodBiasWarningIssued = false;
+    bool s_browserTextureBorderWarningIssued = false;
+
+    void WarnBrowserFeatureUnsupported(bool& warningIssued, const char* message)
+    {
+        if (warningIssued)
+            return;
+
+        warningIssued = true;
+        emscripten_log(EM_LOG_CONSOLE | EM_LOG_WARN, "%s", message);
+    }
+#endif
 
     constexpr bool IsBrowserOpenGL()
     {
@@ -677,8 +696,18 @@ namespace
     void ApplyPolygonMode(MGFillMode fillMode)
     {
 #if defined(__EMSCRIPTEN__)
-        if (fillMode != MGFillMode::Solid)
-            MGGL_Fail(__FILE__, __LINE__, "Unsupported fill mode", "browser WebGL2 currently supports solid rasterization only");
+        switch (fillMode)
+        {
+            case MGFillMode::Solid:
+                return;
+            case MGFillMode::WireFrame:
+                WarnBrowserFeatureUnsupported(
+                    s_browserWireFrameWarningIssued,
+                    "WebGL2 warning: WireFrame fill mode is unsupported and will render as solid.");
+                return;
+            default:
+                MGGL_FAIL("Unsupported fill mode", "unknown OpenGL polygon mode");
+        }
 #else
         glPolygonMode(GL_FRONT_AND_BACK, ToPolygonMode(fillMode));
 #endif
@@ -3385,17 +3414,31 @@ MGG_SamplerState* MGG_SamplerState_Create(MGG_GraphicsDevice* device, MGG_Sample
     device->context.functions.SamplerParameteri(state->handle, GL_TEXTURE_MIN_FILTER, minFilter);
     device->context.functions.SamplerParameteri(state->handle, GL_TEXTURE_MAG_FILTER, magFilter);
 
+#if defined(__EMSCRIPTEN__)
+    if (info->MipMapLevelOfDetailBias != 0.0f)
+    {
+        WarnBrowserFeatureUnsupported(
+            s_browserLodBiasWarningIssued,
+            "WebGL2 warning: SamplerState.MipMapLevelOfDetailBias is unsupported and will be ignored.");
+    }
+
+    if (info->AddressU == MGTextureAddressMode::Border
+        || info->AddressV == MGTextureAddressMode::Border
+        || info->AddressW == MGTextureAddressMode::Border)
+    {
+        WarnBrowserFeatureUnsupported(
+            s_browserTextureBorderWarningIssued,
+            "WebGL2 warning: TextureAddressMode.Border and SamplerState.BorderColor are unsupported; ClampToEdge will be used.");
+    }
+#else
     GLfloat borderColor[4];
     borderColor[0] = static_cast<GLfloat>(info->BorderColor & 0xFF) / 255.0f;
     borderColor[1] = static_cast<GLfloat>((info->BorderColor >> 8) & 0xFF) / 255.0f;
     borderColor[2] = static_cast<GLfloat>((info->BorderColor >> 16) & 0xFF) / 255.0f;
     borderColor[3] = static_cast<GLfloat>((info->BorderColor >> 24) & 0xFF) / 255.0f;
-
-    if (!IsBrowserOpenGL())
-    {
-        device->context.functions.SamplerParameterfv(state->handle, GL_TEXTURE_BORDER_COLOR, borderColor);
-        device->context.functions.SamplerParameterf(state->handle, GL_TEXTURE_LOD_BIAS, info->MipMapLevelOfDetailBias);
-    }
+    device->context.functions.SamplerParameterfv(state->handle, GL_TEXTURE_BORDER_COLOR, borderColor);
+    device->context.functions.SamplerParameterf(state->handle, GL_TEXTURE_LOD_BIAS, info->MipMapLevelOfDetailBias);
+#endif
 
     device->context.functions.SamplerParameterf(
         state->handle,
