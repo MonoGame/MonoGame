@@ -24,6 +24,7 @@ export class BrowserAudio {
         this.songElement = null;
         this.songGainNode = null;
         this.activeSong = null;
+        this.songAbortController = null;
         this.activationAbortController = new AbortController();
         this.isDisposed = false;
     }
@@ -95,6 +96,8 @@ export class BrowserAudio {
 
         this.isDisposed = true;
         this.activationAbortController.abort();
+        this.songAbortController?.abort();
+        this.songAbortController = null;
         this.activeSong = null;
 
         if (this.songElement != null) {
@@ -325,7 +328,9 @@ export class BrowserAudio {
         this.songElement.src = activeSong.mediaUri;
         this.applyActiveSongVolume();
         // Metadata establishes a seekable timeline before applying the requested Song position.
-        this.songElement.addEventListener("loadedmetadata", () => this.startActiveSongPlayback(true), { once: true });
+        const songAbortController = new AbortController();
+        this.songAbortController = songAbortController;
+        this.songElement.addEventListener("loadedmetadata", () => this.startActiveSongPlayback(true), { once: true, signal: songAbortController.signal });
         this.songElement.load();
     }
 
@@ -364,6 +369,9 @@ export class BrowserAudio {
 
     /** Stops and unloads the active Song so stale events cannot complete its replacement. */
     stopActiveSong() {
+        this.songAbortController?.abort();
+        this.songAbortController = null;
+
         if (this.activeSong == null || this.songElement == null) {
             return;
         }
