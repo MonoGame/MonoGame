@@ -18,6 +18,7 @@ export class BrowserAccelerometer {
         this.permissionGestureListener = null;
         this.permissionRequestPending = false;
         this.isRequested = false;
+        this.hasReceivedReading = false;
     }
 
     /**
@@ -53,12 +54,11 @@ export class BrowserAccelerometer {
         this.isRequested = true;
 
         if (this.accelerometerListener != null) {
-            return SensorState.Ready;
+            return this.hasReceivedReading ? SensorState.Ready : SensorState.NoData;
         }
 
         if (!this.isPermissionRequired()) {
-            this.start();
-            return SensorState.Ready;
+            return this.start();
         }
 
         this.addPermissionGestureListener();
@@ -68,6 +68,7 @@ export class BrowserAccelerometer {
     /** Stops motion event delivery without changing browser permission. */
     stop() {
         this.isRequested = false;
+        this.hasReceivedReading = false;
         this.removePermissionGestureListener();
         if (this.accelerometerListener != null) {
             globalThis.removeEventListener("devicemotion", this.accelerometerListener);
@@ -153,8 +154,9 @@ export class BrowserAccelerometer {
         }
     }
 
-    /** Starts forwarding device motion readings and reports that the accelerometer is ready. */
+    /** Starts forwarding device motion readings and waits for the first valid reading. */
     start() {
+        this.hasReceivedReading = false;
         if (this.accelerometerListener == null) {
             this.accelerometerListener = (event) => {
                 const acceleration = event.accelerationIncludingGravity;
@@ -167,15 +169,39 @@ export class BrowserAccelerometer {
                 // So we convert by dividing by 9.80665
                 const notifyReading = this.getRuntime()?.Module?._MGP_Web_NotifyAccelerometerReading;
                 if (typeof notifyReading === "function") {
+                    const [x, y] = this.compensateForScreenOrientation(
+                        acceleration.x,
+                        acceleration.y);
                     notifyReading(
-                        acceleration.x / 9.80665,
-                        acceleration.y / 9.80665,
+                        x / 9.80665,
+                        y / 9.80665,
                         acceleration.z / 9.80665);
+
+                    if (!this.hasReceivedReading) {
+                        this.hasReceivedReading = true;
+                        this.notifyState(SensorState.Ready);
+                    }
                 }
             };
             globalThis.addEventListener("devicemotion", this.accelerometerListener);
         }
 
-        this.notifyState(SensorState.Ready);
+        this.notifyState(SensorState.NoData);
+        return SensorState.NoData;
+    }
+
+    /** Converts device-axis acceleration to the current screen orientation. */
+    compensateForScreenOrientation(x, y) {
+        const angle = globalThis.screen?.orientation?.angle;
+        switch (Number.isFinite(angle) ? angle : 0) {
+            case 90:
+                return [y, -x];
+            case 180:
+                return [-x, -y];
+            case 270:
+                return [-y, x];
+            default:
+                return [x, y];
+        }
     }
 }

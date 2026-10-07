@@ -51,6 +51,7 @@ public sealed partial class Accelerometer : SensorBase<AccelerometerReading>
             throw new AccelerometerFailedException("Failed to start accelerometer data acquisition. Data acquisition already started.", -1);
 
         _started = true;
+        IsDataValid = false;
         _state = SensorState.Initializing;
         if (s_startedInstanceCount++ == 0)
             MGP.Accelerometer_Start();
@@ -65,6 +66,7 @@ public sealed partial class Accelerometer : SensorBase<AccelerometerReading>
             MGP.Accelerometer_Stop();
 
         _started = false;
+        IsDataValid = false;
         _state = SensorState.Disabled;
     }
 

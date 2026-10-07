@@ -2,6 +2,7 @@
 #include "../sdl/MGP_sdl_browser.h"
 #include "MGP_web.h"
 
+#include <climits>
 #include <cstdlib>
 #include <emscripten/emscripten.h>
 #include <queue>
@@ -237,7 +238,8 @@ mgint MGP_Web_Accelerometer_GetState()
 
 mgbyte MGP_Web_Accelerometer_GetReading(mgfloat& x, mgfloat& y, mgfloat& z, mgint& sequence)
 {
-    if (s_accelerometerSequence == 0)
+    if (s_accelerometerState != MGP_WEB_SENSOR_STATE_READY
+        || s_accelerometerSequence == 0)
         return 0;
 
     x = s_accelerometerX;
@@ -257,7 +259,12 @@ extern "C" EMSCRIPTEN_KEEPALIVE void MGP_Web_NotifyAccelerometerReading(mgfloat 
     s_accelerometerX = x;
     s_accelerometerY = y;
     s_accelerometerZ = z;
-    ++s_accelerometerSequence;
+
+    // Zero means that no reading has been received. Wrap before signed overflow
+    // so the sequence remains a valid, non-zero value for the managed caller.
+    s_accelerometerSequence = s_accelerometerSequence == INT_MAX
+        ? 1
+        : s_accelerometerSequence + 1;
 }
 
 void MGP_Web_OnPlatformDestroyed(MGP_Platform* platform)
