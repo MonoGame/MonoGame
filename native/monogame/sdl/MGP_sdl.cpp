@@ -429,6 +429,22 @@ static bool MGP_Sdl_IsBrowserPointerLockPending()
         && !MGP_Sdl_HasBrowserPointerLock();
 }
 
+static bool MGP_Sdl_IsDuplicateBrowserResize(MGP_Window* window, mgint width, mgint height)
+{
+    if (window == nullptr)
+        return false;
+
+    if (window->lastBrowserResizeWidth == width
+        && window->lastBrowserResizeHeight == height)
+    {
+        return true;
+    }
+
+    window->lastBrowserResizeWidth = width;
+    window->lastBrowserResizeHeight = height;
+    return false;
+}
+
 void MGP_Sdl_QueueBrowserResizeForWindow(MGP_Window* window, mgint width, mgint height)
 {
     assert(window != nullptr);
@@ -436,14 +452,8 @@ void MGP_Sdl_QueueBrowserResizeForWindow(MGP_Window* window, mgint width, mgint 
     if (width <= 0 || height <= 0 || window->window == nullptr)
         return;
 
-    if (window->lastBrowserResizeWidth == width
-        && window->lastBrowserResizeHeight == height)
-    {
+    if (MGP_Sdl_IsDuplicateBrowserResize(window, width, height))
         return;
-    }
-
-    window->lastBrowserResizeWidth = width;
-    window->lastBrowserResizeHeight = height;
 
     MGP_Event event_{};
     event_.Type = MGEventType::WindowResized;
@@ -462,18 +472,25 @@ void MGP_Sdl_QueueBrowserResize(MGP_Platform* platform, mgint width, mgint heigh
         MGP_Sdl_QueueBrowserResizeForWindow(window, width, height);
 }
 
+static bool MGP_Sdl_IsDuplicateBrowserFocus(MGP_Window* window, mgbyte focused)
+{
+    if (window == nullptr)
+        return false;
+
+    if (window->hasBrowserFocusState && window->browserFocused == focused)
+        return true;
+
+    window->browserFocused = focused;
+    window->hasBrowserFocusState = true;
+    return false;
+}
+
 static void MGP_Sdl_QueueBrowserFocusForWindow(MGP_Window* window, mgbyte focused)
 {
     assert(window != nullptr);
 
-    if (window->window == nullptr
-        || (window->hasBrowserFocusState && window->browserFocused == focused))
-    {
+    if (window->window == nullptr || MGP_Sdl_IsDuplicateBrowserFocus(window, focused))
         return;
-    }
-
-    window->browserFocused = focused;
-    window->hasBrowserFocusState = true;
 
     MGP_Event event_{};
     event_.Type = focused ? MGEventType::WindowGainedFocus : MGEventType::WindowLostFocus;
@@ -972,17 +989,41 @@ mgbyte MGP_Platform_PollEvent(MGP_Platform* platform, MGP_Event& event_)
             {
             case SDL_WINDOWEVENT_RESIZED:
             case SDL_WINDOWEVENT_SIZE_CHANGED:
+#if defined(__EMSCRIPTEN__)
+                // The browser host observes CSS layout changes that SDL reports from
+                // its window callback too. Remember both sources so one resize reaches
+                // the managed window regardless of callback order.
+                if (MGP_Sdl_IsDuplicateBrowserResize(
+                    reinterpret_cast<MGP_Window*>(event_.Window.Window),
+                    ev.window.data1,
+                    ev.window.data2))
+                {
+                    break;
+                }
+#endif
                 event_.Type = MGEventType::WindowResized;
                 event_.Window.Data1 = ev.window.data1;
                 event_.Window.Data2 = ev.window.data2;
                 return true;
                 break;
             case SDL_WINDOWEVENT_FOCUS_GAINED:
+#if defined(__EMSCRIPTEN__)
+                // BrowserWindow owns the browser focus lifecycle. SDL still
+                // receives this callback to maintain its internal input state.
+                break;
+#else
                 event_.Type = MGEventType::WindowGainedFocus;
                 return true;
+#endif
             case SDL_WINDOWEVENT_FOCUS_LOST:
+#if defined(__EMSCRIPTEN__)
+                // BrowserWindow owns the browser focus lifecycle. SDL still
+                // resets pressed keys before this event reaches MonoGame.
+                break;
+#else
                 event_.Type = MGEventType::WindowLostFocus;
                 return true;
+#endif
             case SDL_WINDOWEVENT_MOVED:
                 event_.Type = MGEventType::WindowMoved;
                 event_.Window.Data1 = ev.window.data1;

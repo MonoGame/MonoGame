@@ -175,7 +175,7 @@ export class BrowserWindow {
     }
 
     /**
-     * Forwards page, window, and canvas focus changes to the native runtime.
+     * Forwards page and window focus changes to the native runtime.
      *
      * @throws {BrowserHostError} When the runtime cannot receive focus changes.
      */
@@ -189,16 +189,14 @@ export class BrowserWindow {
         }
 
         const notifyFocus = (focused) => notifyFocusChange(focused ? 1 : 0);
-        const notifyWindowFocus = () => notifyFocus(!document.hidden && document.hasFocus());
+        const notifyDocumentFocus = () => notifyFocus(!document.hidden && document.hasFocus());
 
         const eventOptions = { signal: this.eventAbortController.signal };
-        document.addEventListener("visibilitychange", notifyWindowFocus, eventOptions);
-        globalThis.addEventListener("focus", notifyWindowFocus, eventOptions);
-        globalThis.addEventListener("blur", notifyWindowFocus, eventOptions);
-        this.canvas.addEventListener("focus", () => notifyFocus(true), eventOptions);
-        this.canvas.addEventListener("blur", () => notifyFocus(false), eventOptions);
+        document.addEventListener("visibilitychange", notifyDocumentFocus, eventOptions);
+        globalThis.addEventListener("focus", () => notifyFocus(true), eventOptions);
+        globalThis.addEventListener("blur", () => notifyFocus(false), eventOptions);
 
-        notifyWindowFocus();
+        notifyDocumentFocus();
     }
 
     /**
