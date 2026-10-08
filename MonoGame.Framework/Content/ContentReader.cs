@@ -16,11 +16,11 @@ namespace Microsoft.Xna.Framework.Content
     public sealed class ContentReader : BinaryReader
     {
         private ContentManager contentManager;
-        private Action<IDisposable> recordDisposableObject;
-        private ContentTypeReaderManager typeReaderManager;
+        private Action<IDisposable>? recordDisposableObject;
+        private ContentTypeReaderManager typeReaderManager = new();
         private string assetName;
-        private List<KeyValuePair<int, Action<object>>> sharedResourceFixups;
-        private ContentTypeReader[] typeReaders;
+        private List<KeyValuePair<int, Action<object?>>> sharedResourceFixups = [];
+        private ContentTypeReader[] typeReaders = [];
 		internal int version;
 		internal int sharedResourceCount;
 
@@ -32,7 +32,7 @@ namespace Microsoft.Xna.Framework.Content
             }
         }
 
-        internal ContentReader(ContentManager manager, Stream stream, string assetName, int version, Action<IDisposable> recordDisposableObject)
+        internal ContentReader(ContentManager manager, Stream? stream, string assetName, int version, Action<IDisposable>? recordDisposableObject)
             : base(stream)
         {
             this.recordDisposableObject = recordDisposableObject;
@@ -63,12 +63,12 @@ namespace Microsoft.Xna.Framework.Content
             }
         }
 
-        internal object ReadAsset<T>()
+        internal object? ReadAsset<T>()
         {
             InitializeTypeReaders();
 
             // Read primary object
-            object result = ReadObject<T>();
+            object? result = ReadObject<T>();
 
             // Read shared resources
             ReadSharedResources();
@@ -76,12 +76,12 @@ namespace Microsoft.Xna.Framework.Content
             return result;
         }
 
-        internal object ReadAsset<T>(T existingInstance)
+        internal object? ReadAsset<T>(T? existingInstance)
         {
             InitializeTypeReaders();
 
             // Read primary object
-            object result = ReadObject<T>(existingInstance);
+            object? result = ReadObject<T>(existingInstance);
 
             // Read shared resources
             ReadSharedResources();
@@ -94,7 +94,7 @@ namespace Microsoft.Xna.Framework.Content
             typeReaderManager = new ContentTypeReaderManager();
             typeReaders = typeReaderManager.LoadAssetReaders(this);
             sharedResourceCount = Read7BitEncodedInt();
-            sharedResourceFixups = new List<KeyValuePair<int, Action<object>>>();
+            sharedResourceFixups = new List<KeyValuePair<int, Action<object?>>>();
         }
 
         internal void ReadSharedResources()
@@ -102,7 +102,7 @@ namespace Microsoft.Xna.Framework.Content
             if (sharedResourceCount <= 0)
                 return;
 
-            var sharedResources = new object[sharedResourceCount];
+            var sharedResources = new object?[sharedResourceCount];
             for (var i = 0; i < sharedResourceCount; ++i)
                 sharedResources[i] = InnerReadObject<object>(null);
 
@@ -121,7 +121,7 @@ namespace Microsoft.Xna.Framework.Content
         /// the underlying stream.  If the relative link read was null or an empty string, then the default
         /// implementation of type <typeparamref name="T"/> is returned.
         /// </returns>
-        /// <exception cref="ArgumentNullException">The relative link to the external file read is null or an empty string.</exception>
+        /// <exception cref="ArgumentNullException">The relative link to the external file read is <see langword="null"/> or an empty string.</exception>
         /// <exception cref="ObjectDisposedException">
         /// This was called after the <see cref="ContentManager">ContentReader.ContentManager</see> was disposed.
         ///
@@ -147,7 +147,7 @@ namespace Microsoft.Xna.Framework.Content
         /// </exception>
         /// <exception cref="EndOfStreamException">The end of stream is reached.</exception>
         /// <exception cref="IOException">An I/O error occurred.</exception>
-        public T ReadExternalReference<T>()
+        public T? ReadExternalReference<T>()
         {
             var externalReference = ReadString();
 
@@ -190,11 +190,10 @@ namespace Microsoft.Xna.Framework.Content
             
         private void RecordDisposable<T>(T result)
         {
-            var disposable = result as IDisposable;
-            if (disposable == null)
+            if (result is not IDisposable disposable)
                 return;
 
-            if (recordDisposableObject != null)
+            if (recordDisposableObject is not null)
                 recordDisposableObject(disposable);
             else
                 contentManager.RecordDisposable(disposable);
@@ -210,7 +209,7 @@ namespace Microsoft.Xna.Framework.Content
         /// <exception cref="IOException">An I/O error occurred.</exception>
         /// <exception cref="FormatException">The stream is corrupted.</exception>
         /// <exception cref="ContentLoadException">Type reader index read from stream is out of bounds</exception>
-        public T ReadObject<T>()
+        public T? ReadObject<T>()
         {
             return InnerReadObject(default(T));
         }
@@ -226,9 +225,9 @@ namespace Microsoft.Xna.Framework.Content
         /// <exception cref="IOException">An I/O error occurred.</exception>
         /// <exception cref="FormatException">The stream is corrupted.</exception>
         /// <exception cref="ContentLoadException">Type reader index read from stream is out of bounds</exception>
-        public T ReadObject<T>(ContentTypeReader typeReader)
+        public T? ReadObject<T>(ContentTypeReader typeReader)
         {
-            var result = (T)typeReader.Read(this, default(T));            
+            var result = (T?)typeReader.Read(this, default(T));            
             RecordDisposable(result);
             return result;
         }
@@ -244,12 +243,12 @@ namespace Microsoft.Xna.Framework.Content
         /// <exception cref="IOException">An I/O error occurred.</exception>
         /// <exception cref="FormatException">The stream is corrupted.</exception>
         /// <exception cref="ContentLoadException">Type reader index read from stream is out of bounds</exception>
-        public T ReadObject<T>(T existingInstance)
+        public T? ReadObject<T>(T? existingInstance)
         {
             return InnerReadObject(existingInstance);
         }
 
-        private T InnerReadObject<T>(T existingInstance)
+        private T? InnerReadObject<T>(T? existingInstance)
         {
             var typeReaderIndex = Read7BitEncodedInt();
             if (typeReaderIndex == 0)
@@ -259,7 +258,7 @@ namespace Microsoft.Xna.Framework.Content
                 throw new ContentLoadException("Incorrect type reader index found!");
 
             var typeReader = typeReaders[typeReaderIndex - 1];
-            var result = (T)typeReader.Read(this, existingInstance);
+            var result = (T?)typeReader.Read(this, existingInstance);
 
             RecordDisposable(result);
 
@@ -278,12 +277,12 @@ namespace Microsoft.Xna.Framework.Content
         /// <exception cref="IOException">An I/O error occurred.</exception>
         /// <exception cref="FormatException">The stream is corrupted.</exception>
         /// <exception cref="ContentLoadException">Type reader index read from stream is out of bounds</exception>
-        public T ReadObject<T>(ContentTypeReader typeReader, T existingInstance)
+        public T? ReadObject<T>(ContentTypeReader typeReader, T existingInstance)
         {
             if (!ReflectionHelpers.IsValueType(typeReader.TargetType))
                 return ReadObject(existingInstance);
 
-            var result = (T)typeReader.Read(this, existingInstance);
+            var result = (T?)typeReader.Read(this, existingInstance);
 
             RecordDisposable(result);
 
@@ -316,9 +315,9 @@ namespace Microsoft.Xna.Framework.Content
         /// <exception cref="EndOfStreamException">The end of stream is reached.</exception>
         /// <exception cref="ObjectDisposedException">The stream is closed.</exception>
         /// <exception cref="IOException">An I/O error occurred.</exception>
-        public T ReadRawObject<T>()
+        public T? ReadRawObject<T>()
         {
-			return (T)ReadRawObject<T> (default(T));
+			return (T?)ReadRawObject<T> (default(T));
         }
 
         /// <summary>
@@ -331,9 +330,9 @@ namespace Microsoft.Xna.Framework.Content
         /// <exception cref="EndOfStreamException">The end of stream is reached.</exception>
         /// <exception cref="ObjectDisposedException">The stream is closed.</exception>
         /// <exception cref="IOException">An I/O error occurred.</exception>
-        public T ReadRawObject<T>(ContentTypeReader typeReader)
+        public T? ReadRawObject<T>(ContentTypeReader typeReader)
         {
-            return (T)ReadRawObject<T>(typeReader, default(T));
+            return (T?)ReadRawObject<T>(typeReader, default(T));
         }
 
         /// <summary>
@@ -346,13 +345,13 @@ namespace Microsoft.Xna.Framework.Content
         /// <exception cref="EndOfStreamException">The end of stream is reached.</exception>
         /// <exception cref="ObjectDisposedException">The stream is closed.</exception>
         /// <exception cref="IOException">An I/O error occurred.</exception>
-        public T ReadRawObject<T>(T existingInstance)
+        public T? ReadRawObject<T>(T? existingInstance)
         {
             Type objectType = typeof(T);
             foreach(ContentTypeReader typeReader in typeReaders)
             {
                 if(typeReader.TargetType == objectType)
-                    return (T)ReadRawObject<T>(typeReader,existingInstance);
+                    return (T?)ReadRawObject<T>(typeReader,existingInstance);
             }
             throw new NotSupportedException();
         }
@@ -368,9 +367,9 @@ namespace Microsoft.Xna.Framework.Content
         /// <exception cref="EndOfStreamException">The end of stream is reached.</exception>
         /// <exception cref="ObjectDisposedException">The stream is closed.</exception>
         /// <exception cref="IOException">An I/O error occurred.</exception>
-        public T ReadRawObject<T>(ContentTypeReader typeReader, T existingInstance)
+        public T? ReadRawObject<T>(ContentTypeReader typeReader, T? existingInstance)
         {
-            return (T)typeReader.Read(this, existingInstance);
+            return (T?)typeReader.Read(this, existingInstance);
         }
 
         /// <summary>
@@ -389,13 +388,13 @@ namespace Microsoft.Xna.Framework.Content
             int index = Read7BitEncodedInt();
             if (index > 0)
             {
-                sharedResourceFixups.Add(new KeyValuePair<int, Action<object>>(index - 1, delegate(object v)
+                sharedResourceFixups.Add(new KeyValuePair<int, Action<object?>>(index - 1, delegate(object? v)
                     {
-                        if (!(v is T))
+                        if (v is not T t)
                         {
-                            throw new ContentLoadException(String.Format("Error loading shared resource. Expected type {0}, received type {1}", typeof(T).Name, v.GetType().Name));
+                            throw new ContentLoadException($"Error loading shared resource. Expected type {typeof(T).Name}, received type {v?.GetType().Name}");
                         }
-                        fixup((T)v);
+                        fixup(t);
                     }));
             }
         }
