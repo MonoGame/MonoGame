@@ -464,10 +464,6 @@ class MonoGameWebHost {
         return this.accelerometer.isSupported();
     }
 
-    takeDroppedFilePath() {
-        return this.window.takeDroppedFilePath();
-    }
-
     /**
      * Displays and logs a host failure.
      *
@@ -545,6 +541,5 @@ globalThis.MonoGameWebHost = {
         await activeHost.content.stageAssetPackAsync(assetPackName);
     },
     stageContentManifestAsync: (manifestUri) => activeHost?.content.stageContentManifestAsync(manifestUri),
-    tryGetContentBase64: (relativePath) => activeHost?.content.tryGetContentBase64(relativePath) ?? null,
-    takeDroppedFilePath: () => activeHost?.takeDroppedFilePath() ?? null
+    tryGetContentBase64: (relativePath) => activeHost?.content.tryGetContentBase64(relativePath) ?? null
 };

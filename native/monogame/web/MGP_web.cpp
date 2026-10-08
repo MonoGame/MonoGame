@@ -3,7 +3,6 @@
 #include "MGP_web.h"
 
 #include <climits>
-#include <cstdlib>
 #include <deque>
 #include <emscripten/emscripten.h>
 #include <string>
@@ -205,12 +204,6 @@ EM_JS(mgint, MGP_Web_GetMaximumTouchCountFromNavigator, (),
     return navigator.maxTouchPoints;
 });
 
-EM_JS(char*, MGP_Web_TakeDroppedFilePathFromHost, (),
-{
-    const path = globalThis.MonoGameWebHost?.takeDroppedFilePath?.();
-    return typeof path === "string" ? stringToNewUTF8(path) : 0;
-});
-
 static void MGP_Web_QueueDroppedFile(const char* path)
 {
     if (path == nullptr || path[0] == '\0')
@@ -382,14 +375,9 @@ extern "C" EMSCRIPTEN_KEEPALIVE void MGP_Web_NotifyFullscreenFailure()
     MGP_Web_QueueBrowserFullscreenFailure();
 }
 
-extern "C" EMSCRIPTEN_KEEPALIVE void MGP_Web_NotifyFileDrop()
+extern "C" EMSCRIPTEN_KEEPALIVE void MGP_Web_NotifyFileDrop(const char* path)
 {
-    char* path = MGP_Web_TakeDroppedFilePathFromHost();
-    if (path == nullptr)
-        return;
-
     MGP_Web_QueueDroppedFile(path);
-    free(path);
 }
 
 extern "C" EMSCRIPTEN_KEEPALIVE void MGP_Web_NotifyFileDropComplete()

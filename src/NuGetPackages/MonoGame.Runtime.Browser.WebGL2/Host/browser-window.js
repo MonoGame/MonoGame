@@ -28,7 +28,6 @@ export class BrowserWindow {
         this.contextLost = false;
         this.eventAbortController = new AbortController();
         this.isDisposed = false;
-        this.pendingDroppedFilePaths = [];
         this.dropTask = Promise.resolve();
         this.nextDropBatchId = 0;
         this.stagedDropBytes = 0;
@@ -263,15 +262,21 @@ export class BrowserWindow {
      * @throws {BrowserHostError} When the runtime cannot receive browser file drops.
      */
     observeFileDrop(fileSystem) {
-        const notifyFileDrop = this.getRuntime()?.Module?._MGP_Web_NotifyFileDrop;
-        const notifyFileDropComplete = this.getRuntime()?.Module?._MGP_Web_NotifyFileDropComplete;
-        if (typeof notifyFileDrop !== "function"
-            || typeof notifyFileDropComplete !== "function") {
+        const module = this.getRuntime()?.Module;
+        if (typeof module?.ccall !== "function"
+            || typeof module._MGP_Web_NotifyFileDropComplete !== "function") {
             throw new BrowserHostError(
                 HostStage.WasmLoad,
                 "native_file_drop_missing",
                 "The managed runtime does not expose the native file drop callbacks.");
         }
+
+        const notifyFileDrop = (filePath) => module.ccall(
+            "MGP_Web_NotifyFileDrop",
+            null,
+            ["string"],
+            [filePath]);
+        const notifyFileDropComplete = () => module._MGP_Web_NotifyFileDropComplete();
 
         const eventOptions = { signal: this.eventAbortController.signal };
         this.canvas.addEventListener("dragenter", (event) => event.preventDefault(), eventOptions);
@@ -294,15 +299,6 @@ export class BrowserWindow {
                     console.error("[MonoGame.Web Host]", "Browser file drop staging failed.", error);
                 });
         }, eventOptions);
-    }
-
-    /**
-     * Returns the next VFS path requested by the native browser drop callback.
-     *
-     * @returns {string | null} The next staged file path, or `null` when none is pending.
-     */
-    takeDroppedFilePath() {
-        return this.pendingDroppedFilePaths.shift() ?? null;
     }
 
     /**
@@ -364,8 +360,7 @@ export class BrowserWindow {
                 return;
             }
 
-            this.pendingDroppedFilePaths.push(filePath);
-            notifyFileDrop();
+            notifyFileDrop(filePath);
             stagedFileCount++;
         }
 
@@ -384,7 +379,6 @@ export class BrowserWindow {
         this.eventAbortController.abort();
         this.canvasResizeObserver?.disconnect();
         this.canvasResizeObserver = null;
-        this.pendingDroppedFilePaths.length = 0;
     }
 
     /** Requests fullscreen for the game canvas. */
