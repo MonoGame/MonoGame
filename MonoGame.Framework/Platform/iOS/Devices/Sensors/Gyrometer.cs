@@ -109,7 +109,7 @@ namespace MonoGame.Framework.Devices.Sensors
             if (this.IsDataValid)
             {
                 this.IsDataValid = true;
-                reading.AngularVelocity = new Vector3((float)data.RotationRate.X, (float)data.RotationRate.Y, (float)data.RotationRate.Z);
+                reading.AngularVelocity = new Vector3((float)data.RotationRate.x, (float)data.RotationRate.y, (float)data.RotationRate.z);
                 reading.Timestamp = DateTime.UtcNow;
                 this.CurrentValue = reading;
                 this.IsDataValid = error == null;
