@@ -254,6 +254,11 @@ namespace Microsoft.Xna.Framework.Graphics
             }
 
             Context.MakeCurrent(windowInfo);
+
+#if DESKTOPGL
+            RetryMSAAIfNeeded(ref windowInfo);
+#endif
+
             Context.SwapInterval = PresentationParameters.PresentationInterval.GetSwapInterval();
 
             Context.MakeCurrent(windowInfo);
@@ -335,6 +340,51 @@ namespace Microsoft.Xna.Framework.Graphics
             }
 #endif
         }
+
+#if DESKTOPGL
+        // SDL might select a non-MSAA default framebuffer for an MSSAA request.
+        // We can't get the actual sample count until **after** a context is created.
+        // This will retry with lower powers of two until a context is created that has samples.
+        private void RetryMSAAIfNeeded(ref WindowInfo windowInfo)
+        {
+            if (PresentationParameters.MultiSampleCount <= 1 || HasMultiSampleBackBuffer())
+                return;
+
+            ((GraphicsContext)Context).DisposeImmediately();
+            Context = null;
+
+            int multiSampleCount = PresentationParameters.MultiSampleCount;
+            while (multiSampleCount > 2)
+            {
+                multiSampleCount /= 2;
+                PresentationParameters.MultiSampleCount = multiSampleCount;
+                GraphicsDeviceManager.CreateOpenGLWindow(PresentationParameters);
+
+                windowInfo = new WindowInfo(SdlGameWindow.Instance.Handle);
+                Context = GL.CreateContext(windowInfo);
+                Context.MakeCurrent(windowInfo);
+
+                if (HasMultiSampleBackBuffer())
+                    return;
+
+                ((GraphicsContext)Context).DisposeImmediately();
+                Context = null;
+            }
+
+            PresentationParameters.MultiSampleCount = 0;
+            GraphicsDeviceManager.CreateOpenGLWindow(PresentationParameters);
+            windowInfo = new WindowInfo(SdlGameWindow.Instance.Handle);
+            Context = GL.CreateContext(windowInfo);
+            Context.MakeCurrent(windowInfo);
+        }
+
+        private static bool HasMultiSampleBackBuffer()
+        {
+            GL.GetInteger(GetPName.SampleBuffers, out int sampleBuffers);
+            GL.GetInteger(GetPName.Samples, out int samples);
+            return sampleBuffers > 0 && samples > 0;
+        }
+#endif
 
         private void PlatformInitialize()
         {
