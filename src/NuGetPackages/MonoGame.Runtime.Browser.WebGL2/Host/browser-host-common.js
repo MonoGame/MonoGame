@@ -24,6 +24,8 @@ export const CanvasResizePolicy = Object.freeze({
  * @typedef {(typeof CanvasResizePolicy)[keyof typeof CanvasResizePolicy]} CanvasResizePolicy
  */
 
+// Keep these values aligned with MGSensorState and MGSongEventType in
+// native/monogame/include/api_enums.h.
 /** Lists the accelerometer states sent to the native runtime. */
 export const SensorState = Object.freeze({
     NotSupported: 0,

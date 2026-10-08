@@ -359,12 +359,12 @@ MG_EXPORT mgbyte MGP_Accelerometer_IsSupported()
 #endif
 }
 
-MG_EXPORT mgint MGP_Accelerometer_GetState()
+MG_EXPORT MGSensorState MGP_Accelerometer_GetState()
 {
 #if defined(__EMSCRIPTEN__)
     return MGP_Web_Accelerometer_GetState();
 #else
-    return 0;
+    return MGSensorState::NotSupported;
 #endif
 }
 

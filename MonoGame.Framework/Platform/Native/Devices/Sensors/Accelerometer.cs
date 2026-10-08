@@ -86,7 +86,7 @@ public sealed partial class Accelerometer : SensorBase<AccelerometerReading>
         if (s_instances.Count == 0)
             return;
 
-        SensorState state = (SensorState)MGP.Accelerometer_GetState();
+        SensorState state = MGP.Accelerometer_GetState();
         for (int index = 0; index < s_instances.Count; index++)
         {
             Accelerometer accelerometer = s_instances[index];

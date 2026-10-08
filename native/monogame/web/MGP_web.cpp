@@ -180,17 +180,7 @@ void MGP_Web_OnDropCompleteDispatched()
         s_dropBatches.pop_front();
 }
 
-enum MGP_WebSensorState : mgint
-{
-    MGP_WEB_SENSOR_STATE_NOT_SUPPORTED = 0,
-    MGP_WEB_SENSOR_STATE_READY = 1,
-    MGP_WEB_SENSOR_STATE_INITIALIZING = 2,
-    MGP_WEB_SENSOR_STATE_NO_DATA = 3,
-    MGP_WEB_SENSOR_STATE_NO_PERMISSIONS = 4,
-    MGP_WEB_SENSOR_STATE_DISABLED = 5,
-};
-
-static mgint s_accelerometerState = MGP_WEB_SENSOR_STATE_NOT_SUPPORTED;
+static MGSensorState s_accelerometerState = MGSensorState::NotSupported;
 static mgfloat s_accelerometerX = 0.0f;
 static mgfloat s_accelerometerY = 0.0f;
 static mgfloat s_accelerometerZ = 0.0f;
@@ -449,26 +439,26 @@ mgbyte MGP_Web_Accelerometer_IsSupported()
     return MGP_Web_AccelerometerIsSupportedFromHost();
 }
 
-mgint MGP_Web_Accelerometer_Start()
+MGSensorState MGP_Web_Accelerometer_Start()
 {
-    s_accelerometerState = MGP_Web_AccelerometerStartFromHost();
+    s_accelerometerState = static_cast<MGSensorState>(MGP_Web_AccelerometerStartFromHost());
     return s_accelerometerState;
 }
 
 void MGP_Web_Accelerometer_Stop()
 {
     MGP_Web_AccelerometerStopFromHost();
-    s_accelerometerState = MGP_WEB_SENSOR_STATE_DISABLED;
+    s_accelerometerState = MGSensorState::Disabled;
 }
 
-mgint MGP_Web_Accelerometer_GetState()
+MGSensorState MGP_Web_Accelerometer_GetState()
 {
     return s_accelerometerState;
 }
 
 mgbyte MGP_Web_Accelerometer_GetReading(mgfloat& x, mgfloat& y, mgfloat& z, mgint& sequence)
 {
-    if (s_accelerometerState != MGP_WEB_SENSOR_STATE_READY
+    if (s_accelerometerState != MGSensorState::Ready
         || s_accelerometerSequence == 0)
         return 0;
 
@@ -481,7 +471,7 @@ mgbyte MGP_Web_Accelerometer_GetReading(mgfloat& x, mgfloat& y, mgfloat& z, mgin
 
 extern "C" EMSCRIPTEN_KEEPALIVE void MGP_Web_NotifyAccelerometerState(mgint state)
 {
-    s_accelerometerState = state;
+    s_accelerometerState = static_cast<MGSensorState>(state);
 }
 
 extern "C" EMSCRIPTEN_KEEPALIVE void MGP_Web_NotifyAccelerometerReading(mgfloat x, mgfloat y, mgfloat z)

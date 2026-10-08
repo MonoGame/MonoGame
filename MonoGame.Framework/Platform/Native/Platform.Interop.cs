@@ -5,6 +5,7 @@
 using System;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
+using MonoGame.Framework.Devices.Sensors;
 using MonoGame.Framework.Utilities;
 using System.Runtime.InteropServices;
 
@@ -455,7 +456,7 @@ internal static unsafe partial class MGP
     public static extern byte Accelerometer_IsSupported();
 
     [DllImport(MonoGameNativeDLL, EntryPoint = "MGP_Accelerometer_GetState", ExactSpelling = true)]
-    public static extern int Accelerometer_GetState();
+    public static extern SensorState Accelerometer_GetState();
 
     [DllImport(MonoGameNativeDLL, EntryPoint = "MGP_Accelerometer_Start", ExactSpelling = true)]
     public static extern void Accelerometer_Start();
