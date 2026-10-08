@@ -305,19 +305,21 @@ mgbyte MGP_Web_GetBrowserFullscreen(MGP_Window* window)
 
 EM_JS(mgbyte, MGP_Web_RequestFullscreenFromHost, (),
 {
-    if (typeof globalThis.MonoGameWebHost?.requestFullscreen !== "function")
+    const host = globalThis.MonoGameWebHost?.getActiveHost?.();
+    if (host == null)
         return 0;
 
-    globalThis.MonoGameWebHost.requestFullscreen();
+    host.requestFullscreen();
     return 1;
 });
 
 EM_JS(mgbyte, MGP_Web_ExitFullscreenFromHost, (),
 {
-    if (typeof globalThis.MonoGameWebHost?.exitFullscreen !== "function")
+    const host = globalThis.MonoGameWebHost?.getActiveHost?.();
+    if (host == null)
         return 0;
 
-    globalThis.MonoGameWebHost.exitFullscreen();
+    host.exitFullscreen();
     return 1;
 });
 
@@ -429,17 +431,29 @@ void MGP_Web_RequestBrowserFullscreen(MGP_Window* window, mgbyte fullscreen)
 
 EM_JS(mgbyte, MGP_Web_AccelerometerIsSupportedFromHost, (),
 {
-    return globalThis.MonoGameWebHost?.getActiveHost?.()?.isAccelerometerSupported?.() ? 1 : 0;
+    const host = globalThis.MonoGameWebHost?.getActiveHost?.();
+    if (host == null)
+        return 0;
+
+    return host.isAccelerometerSupported() ? 1 : 0;
 });
 
 EM_JS(mgint, MGP_Web_AccelerometerStartFromHost, (),
 {
-    return globalThis.MonoGameWebHost?.getActiveHost?.()?.requestAccelerometer?.() ?? 0;
+    const host = globalThis.MonoGameWebHost?.getActiveHost?.();
+    if (host == null)
+        return 0;
+
+    return host.requestAccelerometer();
 });
 
 EM_JS(void, MGP_Web_AccelerometerStopFromHost, (),
 {
-    globalThis.MonoGameWebHost?.getActiveHost?.()?.stopAccelerometer?.();
+    const host = globalThis.MonoGameWebHost?.getActiveHost?.();
+    if (host == null)
+        return;
+
+    host.stopAccelerometer();
 });
 
 mgbyte MGP_Web_Accelerometer_IsSupported()

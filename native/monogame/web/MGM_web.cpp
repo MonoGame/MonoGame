@@ -39,32 +39,56 @@ EM_JS(mgbyte, MGM_Web_Song_Play, (mgint id, const char* mediaPath, mgdouble posi
 
 EM_JS(void, MGM_Web_Song_Pause, (mgint id, mguint commandId),
 {
-    globalThis.MonoGameWebHost?.getActiveHost?.()?.pauseSong(id, commandId);
+    const host = globalThis.MonoGameWebHost?.getActiveHost?.();
+    if (host == null)
+        return;
+
+    host.pauseSong(id, commandId);
 });
 
 EM_JS(void, MGM_Web_Song_Resume, (mgint id, mguint commandId),
 {
-    globalThis.MonoGameWebHost?.getActiveHost?.()?.resumeSong(id, commandId);
+    const host = globalThis.MonoGameWebHost?.getActiveHost?.();
+    if (host == null)
+        return;
+
+    host.resumeSong(id, commandId);
 });
 
 EM_JS(void, MGM_Web_Song_Stop, (mgint id),
 {
-    globalThis.MonoGameWebHost?.getActiveHost?.()?.stopSong(id);
+    const host = globalThis.MonoGameWebHost?.getActiveHost?.();
+    if (host == null)
+        return;
+
+    host.stopSong(id);
 });
 
 EM_JS(void, MGM_Web_Song_SetVolume, (mgint id, mgfloat volume),
 {
-    globalThis.MonoGameWebHost?.getActiveHost?.()?.setSongVolume(id, volume);
+    const host = globalThis.MonoGameWebHost?.getActiveHost?.();
+    if (host == null)
+        return;
+
+    host.setSongVolume(id, volume);
 });
 
 EM_JS(mgdouble, MGM_Web_Song_GetPosition, (mgint id),
 {
-    return globalThis.MonoGameWebHost?.getActiveHost?.()?.getSongPosition(id) ?? 0;
+    const host = globalThis.MonoGameWebHost?.getActiveHost?.();
+    if (host == null)
+        return 0;
+
+    return host.getSongPosition(id);
 });
 
 EM_JS(mgdouble, MGM_Web_Song_GetDuration, (mgint id),
 {
-    return globalThis.MonoGameWebHost?.getActiveHost?.()?.getSongDuration(id) ?? 0;
+    const host = globalThis.MonoGameWebHost?.getActiveHost?.();
+    if (host == null)
+        return 0;
+
+    return host.getSongDuration(id);
 });
 
 static mguint MGM_Song_NextCommandId(MGM_Song* song)

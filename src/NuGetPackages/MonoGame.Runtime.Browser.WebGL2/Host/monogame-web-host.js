@@ -537,8 +537,6 @@ export function start(options) {
 /** Provides host services called by the browser native runtime. */
 globalThis.MonoGameWebHost = {
     getActiveHost: () => activeHost,
-    requestFullscreen: () => activeHost?.requestFullscreen(),
-    exitFullscreen: () => activeHost?.exitFullscreen(),
     stageAssetPackAsync: async (assetPackName) => {
         if (activeHost == null) {
             throw new BrowserHostError(HostStage.ContentStaging, "asset_pack_host_unavailable", "The browser host is not available to stage an asset pack.");
