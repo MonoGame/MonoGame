@@ -1,4 +1,33 @@
-﻿# Changelog
+# Changelog
+
+## Upcoming Release
+
+#### Added support for OpenGL ES 3.0 on Mobile Platforms
+
+MonoGame now support **OpenGL ES 3.0** on iOS and Android.
+Support for OpenGL ES 1.x and 2.0 will be deprecated in the coming months.
+
+**What this means:**
+- **iOS**: Requires iPhone 5S or later (2013+), iOS 7.0+
+- **Android**: Requires Android 4.3+ with OpenGL ES 3.0 compatible GPU
+- **Impact**: Less than 2% of active devices (as of 2024)
+
+**New features enabled:**
+- `VertexBuffer.GetData()` now works on mobile platforms
+- `IndexBuffer.GetData()` now works on mobile platforms
+- `Texture3D` creation and `SetData()` now work on mobile platforms
+- Modern texture formats (ETC2, float textures) enabled by default
+- Better performance through more efficient OpenGL ES 3.0 API
+
+**Migration:**
+- Games will throw `NoSuitableGraphicsDeviceException` on devices without OpenGL ES 3.0
+- Update your minimum OS requirements in app store listings
+- See [MIGRATION_GLES3.md](MIGRATION_GLES3.md) for detailed migration guide
+
+**Technical details:**
+- Implemented `glMapBufferRange` with read access for buffer data retrieval
+- Removed OpenGL ES 2.0 workarounds and capability checks
+- Simplified graphics capability detection
 
 ## 3.8.4 Release - April 2nd - 2025
 

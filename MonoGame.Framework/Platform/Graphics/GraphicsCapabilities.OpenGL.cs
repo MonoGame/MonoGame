@@ -75,7 +75,7 @@ namespace Microsoft.Xna.Framework.Graphics
             // Framebuffer objects
 #if GLES
             SupportsFramebufferObjectARB = GL.BoundApi == GL.RenderApi.ES && (device.glMajorVersion >= 2 || GL.HasExtension("GL_ARB_framebuffer_object")); // always supported on GLES 2.0+
-            SupportsFramebufferObjectEXT = GL.HasExtension("GL_EXT_framebuffer_object");;
+            SupportsFramebufferObjectEXT = GL.HasExtension("GL_EXT_framebuffer_object");
             SupportsFramebufferObjectIMG = GL.HasExtension("GL_IMG_multisampled_render_to_texture") |
                                                  GL.HasExtension("GL_APPLE_framebuffer_multisample") |
                                                  GL.HasExtension("GL_EXT_multisampled_render_to_texture") |
@@ -95,8 +95,9 @@ namespace Microsoft.Xna.Framework.Graphics
             }
             MaxTextureAnisotropy = anisotropy;
 
-            // sRGB
+            // sRGB and texture formats
 #if GLES
+            // sRGB, float textures, and half-float textures are core in OpenGL ES 3.0+
             SupportsSRgb = GL.HasExtension("GL_EXT_sRGB");
             SupportsFloatTextures = GL.BoundApi == GL.RenderApi.ES && (device.glMajorVersion >= 3 || GL.HasExtension("GL_EXT_color_buffer_float"));
             SupportsHalfFloatTextures = GL.BoundApi == GL.RenderApi.ES && (device.glMajorVersion >= 3 || GL.HasExtension("GL_EXT_color_buffer_half_float"));
@@ -104,8 +105,8 @@ namespace Microsoft.Xna.Framework.Graphics
 #else
             SupportsSRgb = GL.HasExtension("GL_EXT_texture_sRGB") && GL.HasExtension("GL_EXT_framebuffer_sRGB");
             SupportsFloatTextures = GL.BoundApi == GL.RenderApi.GL && (device.glMajorVersion >= 3 || GL.HasExtension("GL_ARB_texture_float"));
-            SupportsHalfFloatTextures = GL.BoundApi == GL.RenderApi.GL && (device.glMajorVersion >= 3 || GL.HasExtension("GL_ARB_half_float_pixel"));;
-            SupportsNormalized = GL.BoundApi == GL.RenderApi.GL && (device.glMajorVersion >= 3 || GL.HasExtension("GL_EXT_texture_norm16"));;
+            SupportsHalfFloatTextures = GL.BoundApi == GL.RenderApi.GL && (device.glMajorVersion >= 3 || GL.HasExtension("GL_ARB_half_float_pixel"));
+            SupportsNormalized = GL.BoundApi == GL.RenderApi.GL && (device.glMajorVersion >= 3 || GL.HasExtension("GL_EXT_texture_norm16"));
 #endif
 
             // TODO: Implement OpenGL support for texture arrays
@@ -122,8 +123,10 @@ namespace Microsoft.Xna.Framework.Graphics
 
 #if GLES
             SupportsSeparateBlendStates = false;
+            SupportsMapBuffer = GL.BoundApi == GL.RenderApi.ES && device.glMajorVersion >= 3;
 #else
             SupportsSeparateBlendStates = device.glMajorVersion >= 4 || GL.HasExtension("GL_ARB_draw_buffers_blend");
+            SupportsMapBuffer = device.glMajorVersion >= 3 || GL.HasExtension("GL_ARB_map_buffer_range");
 #endif
         }
 
