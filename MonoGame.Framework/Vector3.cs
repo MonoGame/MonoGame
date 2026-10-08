@@ -530,10 +530,9 @@ namespace Microsoft.Xna.Framework
         /// <returns><c>true</c> if the instances are equal; <c>false</c> otherwise.</returns>
         public override bool Equals(object obj)
         {
-            if (!(obj is Vector3))
+            if (!(obj is Vector3 other))
                 return false;
 
-            var other = (Vector3)obj;
             return  X == other.X &&
                     Y == other.Y &&
                     Z == other.Z;

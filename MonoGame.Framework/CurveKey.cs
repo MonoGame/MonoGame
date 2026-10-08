@@ -189,10 +189,13 @@ namespace Microsoft.Xna.Framework
         /// <inheritdoc/>
         public override bool Equals(object obj)
         {
-            return (obj as CurveKey) != null && Equals((CurveKey)obj);
+            if (obj is CurveKey other)
+            {
+                return Equals(other);
+            }
+            return false;
         }
 
-        /// <inheritdoc/>
         public override int GetHashCode()
         {
             return this._position.GetHashCode() ^ this._value.GetHashCode() ^ this._tangentIn.GetHashCode() ^
