@@ -11,7 +11,6 @@
 #include <SDL_opengl.h>
 #include <SDL_opengl_glext.h>
 
-// SDL declares glGetTexImage here, but this header set does not expose PFNGLGETTEXIMAGEPROC.
 using MGGLCOMPRESSEDTEXIMAGE2DPROC = decltype(&glCompressedTexImage2D);
 using MGGLCOMPRESSEDTEXSUBIMAGE2DPROC = decltype(&glCompressedTexSubImage2D);
 #if defined(__EMSCRIPTEN__)
@@ -23,6 +22,7 @@ using MGGLGETCOMPRESSEDTEXIMAGEPROC = void (*)(GLenum target, GLint level, void*
 extern "C" void glFramebufferTextureLayer(GLenum target, GLenum attachment, GLuint texture, GLint level, GLint layer);
 extern "C" void glGetBufferSubData(GLenum target, GLintptr offset, GLsizeiptr size, void* data);
 #else
+// SDL declares glGetTexImage, but its headers do not expose PFNGLGETTEXIMAGEPROC.
 using MGGLGETTEXIMAGEPROC = decltype(&glGetTexImage);
 using MGGLGETCOMPRESSEDTEXIMAGEPROC = decltype(&glGetCompressedTexImage);
 #endif
@@ -33,7 +33,7 @@ struct OpenGLFunctions
     PFNGLATTACHSHADERPROC AttachShader = nullptr;
     PFNGLBINDATTRIBLOCATIONPROC BindAttribLocation = nullptr;
     PFNGLBLENDCOLORPROC BlendColor = nullptr;
-    PFNGLBLENDEQUATIONSEPARATEEXTPROC BlendEquationSeparate = nullptr;
+    PFNGLBLENDEQUATIONSEPARATEPROC BlendEquationSeparate = nullptr;
     PFNGLBLENDEQUATIONSEPARATEIPROC BlendEquationSeparatei = nullptr;
     PFNGLBLENDFUNCSEPARATEPROC BlendFuncSeparate = nullptr;
     PFNGLBLENDFUNCSEPARATEIPROC BlendFuncSeparatei = nullptr;

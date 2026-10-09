@@ -245,15 +245,6 @@ namespace
     }
 #endif
 
-    constexpr bool IsBrowserOpenGL()
-    {
-#if defined(__EMSCRIPTEN__)
-        return true;
-#else
-        return false;
-#endif
-    }
-
     bool IsSrgbBackBufferFormat(MGSurfaceFormat format)
     {
         switch (format)
@@ -2469,14 +2460,15 @@ mgbyte MGG_GraphicsDevice_ResizeSwapchain(
     glGetIntegerv(GL_SAMPLES, &samples);
     device->multiSampleCount = (sampleBuffers > 0 && samples > 0) ? static_cast<mgint>(samples) : 0;
 
-    if (!IsBrowserOpenGL()
-        && (device->context.majorVersion > 2 || (device->context.majorVersion == 2 && device->context.minorVersion >= 1)))
+#if !defined(__EMSCRIPTEN__)
+    if (device->context.majorVersion > 2 || (device->context.majorVersion == 2 && device->context.minorVersion >= 1))
     {
         if (IsSrgbBackBufferFormat(color))
             glEnable(GL_FRAMEBUFFER_SRGB);
         else
             glDisable(GL_FRAMEBUFFER_SRGB);
     }
+#endif
 
     glViewport(0, 0, width, height);
     glScissor(0, 0, width, height);
@@ -3507,13 +3499,15 @@ MGG_Buffer* MGG_Buffer_Create(MGG_GraphicsDevice* device, MGBufferType type, mgb
     buffer->type = type;
     buffer->dynamic = dynamic;
     buffer->sizeInBytes = sizeInBytes;
-    if (type == MGBufferType::Constant && IsBrowserOpenGL())
+#if defined(__EMSCRIPTEN__)
+    if (type == MGBufferType::Constant)
     {
         // WebGL constant buffers are uploaded as uniforms, so keep the bytes on the CPU.
         buffer->cpuBacked = true;
         buffer->constantData.resize(static_cast<size_t>(sizeInBytes));
         return buffer;
     }
+#endif
 
     device->context.functions.GenBuffers(1, &buffer->handle);
     if (buffer->handle == 0)
