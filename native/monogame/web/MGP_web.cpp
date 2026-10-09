@@ -1,4 +1,8 @@
-#include "../include/api_MGP.h"
+// MonoGame - Copyright (C) MonoGame Foundation, Inc
+// This file is subject to the terms and conditions defined in
+// file 'LICENSE.txt', which is part of this source code package.
+
+#include "api_MGP.h"
 #include "../sdl/MGP_sdl_browser.h"
 #include "MGP_web.h"
 
@@ -535,7 +539,6 @@ void MGP_Web_OnWindowDestroyed(MGP_Window* window)
     }
 }
 
-// browser host owns frame loop
 MG_EXPORT void MGP_Platform_StartRunLoop(MGP_Platform* platform)
 {
     s_platform = platform;

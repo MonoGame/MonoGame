@@ -742,7 +742,7 @@ namespace
         GLfloat posFixup[4] = { 1.0f, 1.0f, 0.0f, 0.0f };
         if (device->currentRenderTargetCount > 0)
         {
-            // Offscreen targets need the oppsite Y fixup so the shader
+            // Offscreen targets need the opposite Y fixup so the shader
             // preserves MonoGame's default render target orientation.
             posFixup[1] = -1.0f;
         }

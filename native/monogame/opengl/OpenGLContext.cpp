@@ -1,3 +1,7 @@
+// MonoGame - Copyright (C) MonoGame Foundation, Inc
+// This file is subject to the terms and conditions defined in
+// file 'LICENSE.txt', which is part of this source code package.
+
 #include "OpenGLContext.h"
 
 #include <SDL_opengl.h>
@@ -196,7 +200,7 @@ bool OpenGLContext::Create(SDL_Window* nextWindow)
 
     if (previousHandle != nullptr)
     {
-        // On Windows the GL conext is tied to the pixel format of the window it was
+        // On Windows the GL context is tied to the pixel format of the window it was
         // created for, so create the new context with resource sharing enabled before
         // getting rid of the old one.
         if (SDL_GL_GetCurrentContext() != previousHandle || SDL_GL_GetCurrentWindow() != previousWindow)
@@ -234,7 +238,7 @@ bool OpenGLContext::Create(SDL_Window* nextWindow)
     functions.Load();
 
     // The new context is current and shares resources with the old context, so we
-    // dont' need to keep the old context around anymore.
+    // don't need to keep the old context around anymore.
     if (previousHandle != nullptr)
         SDL_GL_DeleteContext(previousHandle);
 
@@ -251,7 +255,7 @@ void OpenGLContext::Destroy()
 {
     if (handle != nullptr)
     {
-        // The SDl window may have already been recreated, so clear the current
+        // The SDL window may have already been recreated, so clear the current
         // context instead of trying to make it current on the old window again.
         if (SDL_GL_GetCurrentContext() == handle && SDL_GL_MakeCurrent(nullptr, nullptr) < 0)
             MGGL_FAIL_SDL("SDL_GL_MakeCurrent failed");

@@ -1163,7 +1163,7 @@ void MGP_Window_FinalizeRecreateNativeWindow(MGP_Window* window)
     if (window->retiredWindow == nullptr)
         return;
 
-    // The new GL conext is current, so we can get rid of the old SDL window now.
+    // The new GL context is current, so we can get rid of the old SDL window now.
     SDL_DestroyWindow(window->retiredWindow);
     window->retiredWindow = nullptr;
 }
