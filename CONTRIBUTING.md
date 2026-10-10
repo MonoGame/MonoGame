@@ -73,13 +73,6 @@ It is however allowed to use the latest class library, but if contributions make
 
 > These limitations will be lifted at some point in the near future.
 
-## Large Language Models / Generative AI
-
-We prohibit all content created with generative AI and/or LLMs from being contributed to MonoGame.﻿
-It CANNOT be used for any reason for new code features, documentation, bug fixes, or art content.﻿
-If you did not write the code yourself, you should not be contributing it to MonoGame.﻿
-If we find a contribution to be made with LLMs or other generative AI tools, it will be immediately removed.
-
 ## Licensing
 
 The MonoGame project is under the [Microsoft Public License](https://opensource.org/licenses/MS-PL) except for a few portions of the code.  See the [LICENSE.txt](LICENSE.txt) file for more details.  Third-party libraries used by MonoGame are under their own licenses.  Please refer to those libraries for details on the licenses they use.
