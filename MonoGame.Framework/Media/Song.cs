@@ -171,6 +171,15 @@ namespace Microsoft.Xna.Framework.Media
         /// <summary>
         /// Gets the duration of the <see cref="Song"/>.
         /// </summary>
+        /// <remarks>
+        /// <para>
+        /// On the browser target, a <see cref="Song"/> created through <see cref="FromUri(string, Uri)"/>
+        /// reports <see cref="TimeSpan.Zero"/> because media metadata becomes available asynchronously.
+        /// </para>
+        /// <para>
+        /// Load Songs through the Content Pipeline when the duration must be known before playback.
+        /// </para>
+        /// </remarks>
         public TimeSpan Duration
         {
             get { return _duration; }

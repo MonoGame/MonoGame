@@ -104,12 +104,13 @@ static mguint MGM_Song_NextCommandId(MGM_Song* song)
     return song->commandId;
 }
 
-static void MGM_Song_StopInternal(MGM_Song* song)
+static mguint MGM_Song_StopInternal(MGM_Song* song)
 {
-    MGM_Song_NextCommandId(song);
+    mguint commandId = MGM_Song_NextCommandId(song);
     song->isPlaying = false;
     std::queue<MGM_SongEvent>().swap(song->events);
     MGM_Web_Song_Stop(song->id);
+    return commandId;
 }
 
 extern "C" EMSCRIPTEN_KEEPALIVE void MGM_Web_NotifySongEvent(mgint id, mguint commandId, mgint type)
@@ -144,6 +145,11 @@ MG_EXPORT MGM_Song* MGM_Song_Create(const char* filepath, MGA_System* system, MG
     song->mediaPath = filepath;
     s_songs.emplace(song->id, song);
 
+    // TODO: Browser loads song metadata asynchronously, but the MonoGame path here is
+    //       synchronous, so creation cannot supply the duration.
+    //       Songs loaded from the content pipeline with an XNB get the duration set
+    //       after loading through PlatformInitialize.
+    //       However Songs that are loaded from URI retain a zero duration
     info.duration = 0;
     return song;
 }
@@ -163,8 +169,7 @@ MG_EXPORT mgbyte MGM_Song_Play(MGM_Song* song, mgulong positionMS, mgulong gener
     if (song == nullptr)
         return 0;
 
-    MGM_Song_StopInternal(song);
-    mguint commandId = MGM_Song_NextCommandId(song);
+    mguint commandId = MGM_Song_StopInternal(song);
     song->generation = generation;
     song->isPlaying = true;
 
@@ -179,6 +184,9 @@ MG_EXPORT mgbyte MGM_Song_Play(MGM_Song* song, mgulong positionMS, mgulong gener
         song->isPlaying = false;
     }
 
+    // A non-null Song always accepts the command.
+    // Host handoff and later media failures are reported through the
+    // generation tagged Failed event.
     return 1;
 }
 
