@@ -218,6 +218,15 @@ namespace Microsoft.Xna.Framework.Graphics
         Bc7 = 110,
 
         #endregion
+
+        #region BC5
+
+        /// <summary>
+        /// BC5. Two channel texture format with compression. Surface dimensions must be a multiple 4.
+        /// </summary>
+        Bc5 = 111,
+
+        #endregion
     }
 }
 

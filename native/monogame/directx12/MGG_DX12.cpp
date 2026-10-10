@@ -2055,6 +2055,7 @@ static size_t GetFormatSize(MGSurfaceFormat format)
 	case MGSurfaceFormat::Dxt5:
 	case MGSurfaceFormat::Dxt5SRgb:
 	case MGSurfaceFormat::Bc7:
+	case MGSurfaceFormat::Bc5:
 	case MGSurfaceFormat::RgbaAtcExplicitAlpha:
 	case MGSurfaceFormat::RgbaAtcInterpolatedAlpha:
 	case MGSurfaceFormat::Rgba8Etc2:
@@ -2116,6 +2117,7 @@ static size_t GetTexturePitch(MGSurfaceFormat format, int width)
 	case MGSurfaceFormat::Dxt5:
 	case MGSurfaceFormat::Dxt5SRgb:
 	case MGSurfaceFormat::Bc7:
+	case MGSurfaceFormat::Bc5:
 	case MGSurfaceFormat::RgbPvrtc4Bpp:
 	case MGSurfaceFormat::RgbaPvrtc4Bpp:
 		pitch = ((width + 3) / 4) * size;
