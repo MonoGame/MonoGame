@@ -401,7 +401,7 @@ namespace MonoGame.Tests.Graphics
             Assert.AreEqual(0, count);
         }
 
-#if VULKAN || DIRECTX12
+#if VULKAN || DIRECTX12 || DESKTOPGL4
         [Test]
         public void BackBufferAndViewportUpdateOnResize()
         {
