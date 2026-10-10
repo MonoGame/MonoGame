@@ -109,5 +109,45 @@ namespace MonoGame.Tests.Graphics
             spriteBatch.Dispose();
             swatch.Dispose();
         }
+
+        [Test]
+        public void Custom_Viewport_is_Preserved_After_Render_Pass_Clear()
+        {
+            using var renderTarget = new RenderTarget2D(gd,
+                200,
+                200,
+                false,
+                SurfaceFormat.Color,
+                DepthFormat.None,
+                0,
+                RenderTargetUsage.PreserveContents);
+
+            gd.SetRenderTarget(renderTarget);
+
+            // Set custom letterboxed viewport before clearing the target.
+            gd.Viewport = new Viewport(50, 50, 100, 100);
+            gd.Clear(Color.Black);
+
+            // Fill custom viewport with orange.
+            using var spriteBatch = new SpriteBatch(gd);
+            using var orangePixel = new Texture2D(gd, 1, 1);
+            orangePixel.SetData(new[] { Color.MonoGameOrange });
+
+            spriteBatch.Begin();
+            spriteBatch.Draw(orangePixel, new Rectangle(0, 0, gd.Viewport.Width, gd.Viewport.Height), Color.White);
+            spriteBatch.End();
+
+            gd.SetRenderTarget(null);
+
+            var pixels = new Color[200 * 200];
+            renderTarget.GetData(pixels);
+
+            // Outside the custom viewport must remain black.
+            Assert.AreEqual(Color.Black, pixels[10 * 200 + 10], "Top left letterbox margin must remain black.");
+            Assert.AreEqual(Color.Black, pixels[190 * 200 + 190], "Bottom right letterbox margin must remain black.");
+
+            // Inside the custom viewport must be orange.
+            Assert.AreEqual(Color.MonoGameOrange, pixels[100 * 200 + 100], "Custom viewport center must be orange.");
+        }
     }
 }

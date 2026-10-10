@@ -238,7 +238,10 @@ public partial class GraphicsDevice
             _viewport.MinDepth,
             _viewport.MaxDepth);
 
-        PlatformApplyDefaultRenderTarget();
+        if (_currentRenderTargetCount == 0)
+        {
+            PlatformApplyDefaultRenderTarget();
+        }
     }
 
     private unsafe void PlatformClear(ClearOptions options, Vector4 color, float depth, int stencil)
@@ -303,20 +306,6 @@ public partial class GraphicsDevice
     private unsafe void PlatformApplyDefaultRenderTarget()
     {
         BeginFrame();
-
-        _viewport = new Viewport(
-            0,
-            0,
-            PresentationParameters.BackBufferWidth,
-            PresentationParameters.BackBufferHeight,
-            _viewport.MinDepth,
-            _viewport.MaxDepth);
-
-        _scissorRectangle = new Rectangle(
-            0,
-            0,
-            PresentationParameters.BackBufferWidth,
-            PresentationParameters.BackBufferHeight);
 
         // OpenGL leaves these bindings stale after a render target switch.
         // Need to set this to dirty so the state gets pushed again on the next apply.

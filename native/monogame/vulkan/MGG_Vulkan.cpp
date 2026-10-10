@@ -3402,10 +3402,6 @@ static void MGVK_UpdateRenderPass(MGG_GraphicsDevice* device, FrameCounter curre
 	// Set the cache for the changed pipeline state.
 	device->pipelineState.targets = cached;
 
-	// Set default viewport and scissor.
-	MGG_GraphicsDevice_SetViewport(device, 0, 0, cached->width, cached->height, 0, 1);
-	MGG_GraphicsDevice_SetScissorRectangle(device, 0, 0, cached->width, cached->height);
-
 	// Setup the render pass and pipeline.
 	VkRect2D render_area;
 	render_area.offset.x = 0;

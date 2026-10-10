@@ -421,8 +421,6 @@ internal class NativeGameWindow : GameWindow
         var presentationParameters = graphicsDevice.PresentationParameters;
         presentationParameters.BackBufferWidth = width;
         presentationParameters.BackBufferHeight = height;
-        graphicsDevice.Viewport = new Viewport(0, 0, width, height);
-        graphicsDevice.ScissorRectangle = new Rectangle(0, 0, width, height);
 
         // Recreate the native swapchain to match the new window dimensions.
         // This is not necessary for OpenGL, because backbuffer is tied to the window surface.
@@ -436,6 +434,9 @@ internal class NativeGameWindow : GameWindow
             presentationParameters.DepthStencilFormat,
             presentationParameters.MultiSampleCount,
             presentationParameters.PresentationInterval.GetSyncInterval());
+
+        graphicsDevice.Viewport = new Viewport(0, 0, width, height);
+        graphicsDevice.ScissorRectangle = new Rectangle(0, 0, width, height);
 
         OnClientSizeChanged();
     }
