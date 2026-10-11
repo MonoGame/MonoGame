@@ -89,6 +89,34 @@ namespace MonoGame.Tests.Input
 #endif
         }
 
+        [Test] 
+        public void LeftTriggerFloatWithoutButtonbit()
+        {
+            var state = new GamePadState(Vector2.Zero, Vector2.Zero, leftTrigger: 1.0f, rightTrigger: 0f, button: (Buttons) 0);
+            Assert.IsFalse(state.IsButtonDown(Buttons.LeftTrigger));
+        }
+
+        [Test] 
+        public void LeftTriggerFloatWithButtonbit()
+        {
+            var state = new GamePadState(Vector2.Zero, Vector2.Zero, leftTrigger: 1.0f, rightTrigger: 0f, button: (Buttons.LeftTrigger));
+           Assert.IsTrue(state.IsButtonDown(Buttons.LeftTrigger));
+        }
+
+        [Test] 
+        public void RightTriggerFloatWithoutButtonbit()
+        {
+            var state = new GamePadState(Vector2.Zero, Vector2.Zero, leftTrigger: 0f, rightTrigger: 1.0f, button: (Buttons) 0);
+            Assert.IsFalse(state.IsButtonDown(Buttons.RightTrigger));
+        }
+
+        [Test] 
+        public void RightTriggerFloatWithButtonbit()
+        {
+            var state = new GamePadState(Vector2.Zero, Vector2.Zero, leftTrigger: 0f, rightTrigger: 1.0f, button: (Buttons.RightTrigger));
+            Assert.IsTrue(state.IsButtonDown(Buttons.RightTrigger));
+        }
+
         #endregion
 
         #region Thumbsticks

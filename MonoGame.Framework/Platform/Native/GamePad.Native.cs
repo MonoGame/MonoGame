@@ -172,9 +172,11 @@ static partial class GamePad
                     break;
                 case ControllerInput.LeftTrigger:
                     state.TriggerL = FromAxisValue(value);
+                    state.Buttons = (state.TriggerL > 0f) ? (state.Buttons |= Buttons.LeftTrigger) : (state.Buttons &= ~Buttons.LeftTrigger);
                     break;
                 case ControllerInput.RightTrigger:
                     state.TriggerR = FromAxisValue(value);
+                    state.Buttons = (state.TriggerR > 0f) ? (state.Buttons |= Buttons.RightTrigger) : (state.Buttons &= ~Buttons.RightTrigger);
                     break;
             }
         }
