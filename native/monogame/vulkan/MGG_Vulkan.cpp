@@ -2394,6 +2394,12 @@ static void MGVK_DestroyTargetSets(MGG_GraphicsDevice* device, std::function<boo
 			itr++;
 		else
 		{
+			if (device->pipelineState.targets == itr->second)
+			{
+				device->pipelineState.targets = nullptr;
+				device->renderTargetDirty = true;
+			}
+
             for (int i = 0; i < MGVK_NUM_TARGETS; ++i) {
                 auto& view = itr->second->arraySlicesViews[i];
                 if (view.has_value()) {
@@ -2406,8 +2412,6 @@ static void MGVK_DestroyTargetSets(MGG_GraphicsDevice* device, std::function<boo
 			cache.erase(itr++);
 		}
 	}
-
-	device->pipelineState.targets = nullptr;
 }
 
 static void MGVK_DestroyPipelines(MGG_GraphicsDevice* device, std::function<bool(const MGVK_PipelineState&)> compare)
@@ -5410,11 +5414,6 @@ void MGG_Texture_Destroy(MGG_GraphicsDevice* device, MGG_Texture* texture)
 					}
 					return false;
 				});
-
-			if (device->pipelineState.targets && device->pipelineState.targets->set.targets[0] == texture)
-			{
-				device->pipelineState.targets = nullptr;
-			}
 		}
 
 		if (texture->target_view != VK_NULL_HANDLE)
