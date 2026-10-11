@@ -1509,6 +1509,8 @@ namespace Microsoft.Xna.Framework.Graphics
             {
                 if (disposing)
                 {
+                    _batcher.Dispose();
+
                     if (_spriteEffect != null)
                     {
                         _spriteEffect.Dispose();
