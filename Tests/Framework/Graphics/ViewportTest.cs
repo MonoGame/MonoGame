@@ -86,6 +86,8 @@ namespace MonoGame.Tests.Graphics
             Assert.That(viewportPixel[0], Is.EqualTo(Color.Red));
         }
 
+        // Ensure that Clear preserves a pending scissor test disable.
+        // See: https://github.com/MonoGame/MonoGame/issues/9586
         [Test]
         public void Does_not_restore_scissor_test_after_pending_disable_and_clear()
         {
