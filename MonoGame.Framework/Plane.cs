@@ -333,14 +333,14 @@ namespace Microsoft.Xna.Framework
         /// <summary>
         /// Check if this <see cref="Plane"/> is equal to another <see cref="Plane"/>.
         /// </summary>
-        /// <param name="other">An <see cref="Object"/> to check for equality with this <see cref="Plane"/>.</param>
+        /// <param name="obj">An <see cref="Object"/> to check for equality with this <see cref="Plane"/>.</param>
         /// <returns>
         /// <code>true</code> if the specified <see cref="object"/> is equal to this <see cref="Plane"/>,
         /// <code>false</code> if it is not.
         /// </returns>
-        public override bool Equals(object other)
+        public override bool Equals(object obj)
         {
-            return (other is Plane) ? this.Equals((Plane)other) : false;
+            return (obj is Plane other) ? this.Equals(other) : false;
         }
 
         /// <summary>
