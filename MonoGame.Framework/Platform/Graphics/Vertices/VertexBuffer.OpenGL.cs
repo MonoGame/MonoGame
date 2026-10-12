@@ -49,16 +49,13 @@ namespace Microsoft.Xna.Framework.Graphics
         >(int offsetInBytes, T[] data, int startIndex, int elementCount, int vertexStride)
             where T : struct
         {
-#if GLES
             // Buffers are write-only on OpenGL ES 1.1 and 2.0.  See the GL_OES_mapbuffer extension for more information.
             // http://www.khronos.org/registry/gles/extensions/OES/OES_mapbuffer.txt
-            throw new NotSupportedException("Vertex buffers are write-only on OpenGL ES platforms");
-#else
-            Threading.BlockOnUIThread(() => GetBufferData(offsetInBytes, data, startIndex, elementCount, vertexStride));
-#endif
-        }
+            if (GraphicsDevice != null && !GraphicsDevice.GraphicsCapabilities.SupportsMapBuffer)
+                throw new NotSupportedException("VertexBuffer.GetData is not supported on OpenGL ES versions below 3.0. Vertex buffers are write-only on those OpenGL ES platforms");
 
-#if !GLES
+            Threading.BlockOnUIThread(() => GetBufferData(offsetInBytes, data, startIndex, elementCount, vertexStride));
+        }
 
         private void GetBufferData<
             [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors | DynamicallyAccessedMemberTypes.NonPublicConstructors)] T
@@ -68,47 +65,69 @@ namespace Microsoft.Xna.Framework.Graphics
             GL.BindBuffer(BufferTarget.ArrayBuffer, vbo);
             GraphicsExtensions.CheckGLError();
 
-            // Pointer to the start of data in the vertex buffer
-            var ptr = GL.MapBuffer(BufferTarget.ArrayBuffer, BufferAccess.ReadOnly);
+            var dataSize = elementCount * vertexStride;
+            IntPtr ptr;
+
+#if GLES
+            if (GraphicsDevice != null && !GraphicsDevice.GraphicsCapabilities.SupportsMapBuffer)
+                throw new NotSupportedException("VertexBuffer.GetBufferData is not supported on OpenGL ES versions below 3.0.");
+
+            ptr = GL.MapBufferRange(
+                BufferTarget.ArrayBuffer,
+                (IntPtr)offsetInBytes,
+                (IntPtr)dataSize,
+                (int)GL.MapBufferAccessMask.MapReadBit);
+#else
+            // Desktop OpenGL uses glMapBuffer and adjusts the pointer
+            ptr = GL.MapBuffer(BufferTarget.ArrayBuffer, BufferAccess.ReadOnly);
+            ptr = (IntPtr)(ptr.ToInt64() + offsetInBytes);
+#endif
+
             GraphicsExtensions.CheckGLError();
 
-            ptr = (IntPtr)(ptr.ToInt64() + offsetInBytes);
-
-            if (typeof(T) == typeof(byte) && vertexStride == 1)
+            if (ptr == IntPtr.Zero)
             {
-                // If data is already a byte[] and stride is 1 we can skip the temporary buffer
-                var buffer = data as byte[];
-                Marshal.Copy(ptr, buffer, startIndex * vertexStride, elementCount * vertexStride);
+                throw new InvalidOperationException("Failed to map vertex buffer for reading");
             }
-            else
-            {
-                // Temporary buffer to store the copied section of data
-                var tmp = new byte[elementCount * vertexStride];
-                // Copy from the vertex buffer to the temporary buffer
-                Marshal.Copy(ptr, tmp, 0, tmp.Length);
 
-                // Copy from the temporary buffer to the destination array
-                var tmpHandle = GCHandle.Alloc(tmp, GCHandleType.Pinned);
-                try
+            try
+            {
+                if (typeof(T) == typeof(byte) && vertexStride == 1)
                 {
-                    var tmpPtr = tmpHandle.AddrOfPinnedObject();
-                    for (var i = 0; i < elementCount; i++)
+                    // If data is already a byte[] and stride is 1 we can skip the temporary buffer
+                    var buffer = data as byte[];
+                    Marshal.Copy(ptr, buffer, startIndex * vertexStride, elementCount * vertexStride);
+                }
+                else
+                {
+                    // Temporary buffer to store the copied section of data
+                    var tmp = new byte[elementCount * vertexStride];
+                    // Copy from the vertex buffer to the temporary buffer
+                    Marshal.Copy(ptr, tmp, 0, tmp.Length);
+
+                    // Copy from the temporary buffer to the destination array
+                    var tmpHandle = GCHandle.Alloc(tmp, GCHandleType.Pinned);
+                    try
                     {
-                        data[startIndex + i] = Marshal.PtrToStructure<T>(tmpPtr);
-                        tmpPtr = (IntPtr)(tmpPtr.ToInt64() + vertexStride);
+                        var tmpPtr = tmpHandle.AddrOfPinnedObject();
+                        for (var i = 0; i < elementCount; i++)
+                        {
+                            data[startIndex + i] = Marshal.PtrToStructure<T>(tmpPtr);
+                            tmpPtr = (IntPtr)(tmpPtr.ToInt64() + vertexStride);
+                        }
+                    }
+                    finally
+                    {
+                        tmpHandle.Free();
                     }
                 }
-                finally
-                {
-                    tmpHandle.Free();
-                }
             }
-
-            GL.UnmapBuffer(BufferTarget.ArrayBuffer);
-            GraphicsExtensions.CheckGLError();
+            finally
+            {
+                GL.UnmapBuffer(BufferTarget.ArrayBuffer);
+                GraphicsExtensions.CheckGLError();
+            }
         }
-
-#endif
 
         private void PlatformSetData<T>(
             int offsetInBytes, T[] data, int startIndex, int elementCount, int vertexStride, SetDataOptions options, int bufferSize, int elementSizeInBytes)
