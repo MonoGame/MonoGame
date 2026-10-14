@@ -830,6 +830,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 case SurfaceFormat.Dxt3SRgb:
                 case SurfaceFormat.Dxt5:
                 case SurfaceFormat.Dxt5SRgb:
+                case SurfaceFormat.Bc7:
                 case SurfaceFormat.RgbaAtcExplicitAlpha:
                 case SurfaceFormat.RgbaAtcInterpolatedAlpha:
                 case SurfaceFormat.Astc4X4Rgba:
@@ -876,6 +877,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 case SurfaceFormat.Dxt3SRgb:
                 case SurfaceFormat.Dxt5:
                 case SurfaceFormat.Dxt5SRgb:
+                case SurfaceFormat.Bc7:
                 case SurfaceFormat.RgbaAtcExplicitAlpha:
                 case SurfaceFormat.RgbaAtcInterpolatedAlpha:
                 case SurfaceFormat.Rgba8Etc2:
@@ -978,6 +980,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 case SurfaceFormat.Dxt3SRgb:
                 case SurfaceFormat.Dxt5:
                 case SurfaceFormat.Dxt5SRgb:
+                case SurfaceFormat.Bc7:
                 case SurfaceFormat.RgbPvrtc4Bpp:
                 case SurfaceFormat.RgbaPvrtc4Bpp:
                 case SurfaceFormat.RgbEtc1:

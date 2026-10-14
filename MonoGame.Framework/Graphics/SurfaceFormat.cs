@@ -209,6 +209,15 @@ namespace Microsoft.Xna.Framework.Graphics
         Astc12X12Rgba = 101,
 
         #endregion
+
+        #region BC7
+
+        /// <summary>
+        /// BC7. Texture format with compression. Surface dimensions must be a multiple 4.
+        /// </summary>
+        Bc7 = 110,
+
+        #endregion
     }
 }
 

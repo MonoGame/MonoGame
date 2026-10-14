@@ -32,6 +32,8 @@ DXGI_FORMAT Graphics::TextureFormatToDXGI_FORMAT(MGSurfaceFormat tf)
         return DXGI_FORMAT_BC2_UNORM_SRGB;
     case MGSurfaceFormat::Dxt5SRgb:
         return DXGI_FORMAT_BC3_UNORM_SRGB;
+    case MGSurfaceFormat::Bc7:
+        return DXGI_FORMAT_BC7_UNORM;
     case MGSurfaceFormat::NormalizedByte2:
         return DXGI_FORMAT_R8G8_SNORM;
     case MGSurfaceFormat::NormalizedByte4:

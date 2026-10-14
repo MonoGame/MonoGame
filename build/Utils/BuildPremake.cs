@@ -14,9 +14,7 @@ public sealed class BuildPremake
                 // Generate multi-arch solution in one go.
                 Scaffold(context, name, workingDirectory, "--verbose vs2022");
 
-                // Build for both architectures.
                 BuildForArch(context, name, workingDirectory, solutionFile, "x64");
-                BuildForArch(context, name, workingDirectory, solutionFile, "ARM64");
                 
                 break;
             }

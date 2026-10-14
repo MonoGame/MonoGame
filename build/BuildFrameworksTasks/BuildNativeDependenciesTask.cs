@@ -9,9 +9,7 @@ public sealed class BuildNativeDependenciesTask : FrostingTask<BuildContext>
     {
         if (context.Environment.Platform.Family == PlatformFamily.Windows)
         {
-            // Cross-compile both architectures on the same x64 runner
             BuildDependenciesForArch(context, "x64");
-            BuildDependenciesForArch(context, "arm64");
         }
         else
         {
