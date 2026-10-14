@@ -50,9 +50,10 @@ export class BrowserHostError extends Error {
      * @param {string} stage Startup stage where the error occurred.
      * @param {string} code Error code reported by the host.
      * @param {string} message Message shown to the user.
+     * @param {ErrorOptions=} options Error options.
      */
-    constructor(stage, code, message) {
-        super(message);
+    constructor(stage, code, message, options) {
+        super(message, options);
         this.name = "BrowserHostError";
         this.stage = stage;
         this.code = code;

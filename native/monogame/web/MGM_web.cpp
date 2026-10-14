@@ -38,7 +38,7 @@ EM_JS(mgbyte, MGM_Web_Song_Play, (mgint id, const char* mediaPath, mgdouble posi
     if (host == null)
         return 0;
 
-    return host.playSong(id, UTF8ToString(mediaPath), positionMS, volume, commandId) ? 1 : 0;
+    return host.audio.playSong(id, UTF8ToString(mediaPath), positionMS, volume, commandId) ? 1 : 0;
 });
 
 EM_JS(void, MGM_Web_Song_Pause, (mgint id, mguint commandId),
@@ -47,7 +47,7 @@ EM_JS(void, MGM_Web_Song_Pause, (mgint id, mguint commandId),
     if (host == null)
         return;
 
-    host.pauseSong(id, commandId);
+    host.audio.pauseSong(id, commandId);
 });
 
 EM_JS(void, MGM_Web_Song_Resume, (mgint id, mguint commandId),
@@ -56,7 +56,7 @@ EM_JS(void, MGM_Web_Song_Resume, (mgint id, mguint commandId),
     if (host == null)
         return;
 
-    host.resumeSong(id, commandId);
+    host.audio.resumeSong(id, commandId);
 });
 
 EM_JS(void, MGM_Web_Song_Stop, (mgint id),
@@ -65,7 +65,7 @@ EM_JS(void, MGM_Web_Song_Stop, (mgint id),
     if (host == null)
         return;
 
-    host.stopSong(id);
+    host.audio.stopSong(id);
 });
 
 EM_JS(void, MGM_Web_Song_SetVolume, (mgint id, mgfloat volume),
@@ -74,7 +74,7 @@ EM_JS(void, MGM_Web_Song_SetVolume, (mgint id, mgfloat volume),
     if (host == null)
         return;
 
-    host.setSongVolume(id, volume);
+    host.audio.setSongVolume(id, volume);
 });
 
 EM_JS(mgdouble, MGM_Web_Song_GetPosition, (mgint id),
@@ -83,7 +83,7 @@ EM_JS(mgdouble, MGM_Web_Song_GetPosition, (mgint id),
     if (host == null)
         return 0;
 
-    return host.getSongPosition(id);
+    return host.audio.getSongPosition(id);
 });
 
 EM_JS(mgdouble, MGM_Web_Song_GetDuration, (mgint id),
@@ -92,7 +92,7 @@ EM_JS(mgdouble, MGM_Web_Song_GetDuration, (mgint id),
     if (host == null)
         return 0;
 
-    return host.getSongDuration(id);
+    return host.audio.getSongDuration(id);
 });
 
 static mguint MGM_Song_NextCommandId(MGM_Song* song)

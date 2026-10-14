@@ -69,15 +69,16 @@ class MonoGameWebHost {
         this.statusElement = statusElement;
         this.callbacks = callbacks;
         this.runtime = null;
+        this.native = null;
         this.hostExports = null;
         this.managedFrameHandle = null;
         this.contextLost = false;
         this.firstFrameReported = false;
         this.isDisposed = false;
-        this.window = new BrowserWindow(this.config, () => this.runtime);
-        this.accelerometer = new BrowserAccelerometer(() => this.runtime);
-        this.audio = new BrowserAudio(root, this.config.contentBaseUri, () => this.runtime);
-        this.content = new BrowserContent(this.config, () => this.runtime, (stage, message) => this.logStage(stage, message));
+        this.window = new BrowserWindow(this);
+        this.accelerometer = new BrowserAccelerometer(this);
+        this.audio = new BrowserAudio(this);
+        this.content = new BrowserContent(this);
     }
 
     /**
@@ -145,7 +146,7 @@ class MonoGameWebHost {
             applicationName: options.applicationName ?? "MonoGame.Web",
             canvas,
             contentBaseUri: options.contentBaseUri ?? "./",
-            startupContentManifestUri: options.startupContentManifestUri ?? "Content/content-manifest.txt",
+            startupContentManifestUri: options.startupContentManifestUri ?? "_monogame/content-manifest.txt",
             runtimeScriptUri: options.runtimeScriptUri ?? "./_framework/dotnet.js",
             hostExportsTypeName,
             mainAssemblyName: assemblyName,
@@ -179,7 +180,6 @@ class MonoGameWebHost {
     async startAsync() {
         try {
             this.logStage(HostStage.HostBootstrap, "Bootstrapping browser host.");
-            this.validateManagedRuntimeConfiguration();
             this.resolveCanvas();
             this.window.observeContextLoss(() => this.handleContextLost());
             await this.initializeManagedRuntimeAsync();
@@ -197,29 +197,8 @@ class MonoGameWebHost {
 
     /** Resolves the game canvas and listens for browser-activation gestures. */
     resolveCanvas() {
-        this.window.resolveCanvas((stage, message) => this.logStage(stage, message));
-        this.accelerometer.observePermissionGesture(this.window.canvas);
+        this.window.resolveCanvas();
         this.audio.observeActivation(this.window.canvas);
-    }
-
-    /** Validates the project owned managed runtime configuration before browser resources are created. */
-    validateManagedRuntimeConfiguration() {
-        const missingConfigurationNames = [];
-        if (this.config.runtimeScriptUri == null) {
-            missingConfigurationNames.push("runtimeScriptUri");
-        }
-
-        if (this.config.hostExportsTypeName == null) {
-            missingConfigurationNames.push("hostExportsTypeName");
-        }
-
-        if (this.config.mainAssemblyName == null) {
-            missingConfigurationNames.push("mainAssemblyName");
-        }
-
-        if (missingConfigurationNames.length > 0) {
-            throw new BrowserHostError(HostStage.HostBootstrap, "managed_runtime_configuration_missing", `The browser host requires ${missingConfigurationNames.join(", ")}.`);
-        }
     }
 
     /**
@@ -236,33 +215,79 @@ class MonoGameWebHost {
             throw new BrowserHostError(HostStage.WasmLoad, "dotnet_runtime_missing", "The configured runtime script did not expose a dotnet runtime entry.");
         }
 
-        let runtimeBuilder = dotnet;
-        if (typeof runtimeBuilder.withDiagnosticTracing === "function") {
-            runtimeBuilder = runtimeBuilder.withDiagnosticTracing(false);
-        }
-
-        if (typeof runtimeBuilder.withModuleConfig === "function") {
-            runtimeBuilder = runtimeBuilder.withModuleConfig({ canvas: this.window.canvas });
-        }
-
-        if (typeof runtimeBuilder.create !== "function") {
-            throw new BrowserHostError(HostStage.WasmLoad, "dotnet_runtime_shape_unsupported", "The configured dotnet runtime does not expose a supported create() API.");
-        }
-
+        const runtimeBuilder = dotnet
+            .withDiagnosticTracing(false)
+            .withModuleConfig({ canvas: this.window.canvas });
         this.runtime = await runtimeBuilder.create();
+        this.native = this.resolveNativeExports(this.runtime.Module);
         this.window.configurePointerLock();
         this.window.observeCanvasSize();
         this.window.observeBrowserLifecycle();
         this.window.observeFullscreen();
-        this.window.observeFileDrop(this.content.getFileSystem());
+        this.window.observeFileDrop(this.native.fileSystem);
+    }
 
-        if (typeof this.runtime.getAssemblyExports !== "function") {
-            throw new BrowserHostError(HostStage.WasmLoad, "dotnet_exports_missing", "The configured dotnet runtime does not expose getAssemblyExports().");
+    /**
+     * Resolves the Emscripten callbacks used by browser services.
+     *
+     * @param {object | null | undefined} module Emscripten runtime module.
+     * @returns {object} Immutable native browser services.
+     * @throws {BrowserHostError} When a required native export is unavailable.
+     */
+    resolveNativeExports(module) {
+        if (module == null) {
+            throw new BrowserHostError(HostStage.WasmLoad, "native_module_missing", "The managed runtime did not expose an Emscripten module.");
         }
 
-        if (typeof this.runtime.runMain !== "function" && typeof this.runtime.runMainAndExit !== "function") {
-            throw new BrowserHostError(HostStage.WasmLoad, "dotnet_main_missing", "The configured dotnet runtime does not expose runMain() or runMainAndExit().");
+        const requiredExports = {
+            _MGM_Web_NotifySongEvent: module._MGM_Web_NotifySongEvent,
+            _MGP_Web_NotifyAccelerometerReading: module._MGP_Web_NotifyAccelerometerReading,
+            _MGP_Web_NotifyAccelerometerState: module._MGP_Web_NotifyAccelerometerState,
+            _MGP_Web_NotifyCanvasResize: module._MGP_Web_NotifyCanvasResize,
+            _MGP_Web_NotifyFileDrop: module._MGP_Web_NotifyFileDrop,
+            _MGP_Web_NotifyFileDropComplete: module._MGP_Web_NotifyFileDropComplete,
+            _MGP_Web_NotifyFocusChange: module._MGP_Web_NotifyFocusChange,
+            _MGP_Web_NotifyFullscreenChange: module._MGP_Web_NotifyFullscreenChange,
+            _MGP_Web_NotifyFullscreenFailure: module._MGP_Web_NotifyFullscreenFailure,
+            _MGP_Web_SetCanvasResizeManaged: module._MGP_Web_SetCanvasResizeManaged,
+            _MGP_Web_SetPointerLockEnabled: module._MGP_Web_SetPointerLockEnabled,
+            ccall: module.ccall
+        };
+
+        for (const [name, value] of Object.entries(requiredExports)) {
+            if (typeof value !== "function") {
+                throw new BrowserHostError(HostStage.WasmLoad, "native_export_missing", `The managed runtime does not expose the native '${name}' callback.`);
+            }
         }
+
+        const fileSystem = module.FS;
+        if (fileSystem == null
+            || typeof fileSystem.mkdirTree !== "function"
+            || typeof fileSystem.rmdir !== "function"
+            || typeof fileSystem.unlink !== "function"
+            || typeof fileSystem.writeFile !== "function") {
+            throw new BrowserHostError(HostStage.WasmLoad, "emscripten_filesystem_missing", "The managed runtime did not expose an Emscripten filesystem capable of staging and releasing content.");
+        }
+
+        return Object.freeze({
+            fileSystem: Object.freeze({
+                mkdirTree: fileSystem.mkdirTree.bind(fileSystem),
+                rmdir: fileSystem.rmdir.bind(fileSystem),
+                unlink: fileSystem.unlink.bind(fileSystem),
+                writeFile: fileSystem.writeFile.bind(fileSystem)
+            }),
+            notifyAccelerometerReading: module._MGP_Web_NotifyAccelerometerReading.bind(module),
+            notifyAccelerometerState: module._MGP_Web_NotifyAccelerometerState.bind(module),
+            notifyCanvasResize: module._MGP_Web_NotifyCanvasResize.bind(module),
+            notifyFileDrop: (filePath) => module.ccall("MGP_Web_NotifyFileDrop", null, ["string"], [filePath]),
+            notifyFileDropComplete: module._MGP_Web_NotifyFileDropComplete.bind(module),
+            notifyFocusChange: module._MGP_Web_NotifyFocusChange.bind(module),
+            notifyFullscreenChange: module._MGP_Web_NotifyFullscreenChange.bind(module),
+            notifyFullscreenFailure: module._MGP_Web_NotifyFullscreenFailure.bind(module),
+            notifySongEvent: module._MGM_Web_NotifySongEvent.bind(module),
+            setCanvasResizeManaged: module._MGP_Web_SetCanvasResizeManaged.bind(module),
+            setPointerLockEnabled: module._MGP_Web_SetPointerLockEnabled.bind(module)
+        });
     }
 
     /**
@@ -295,9 +320,7 @@ class MonoGameWebHost {
     async launchManagedApplicationAsync() {
         this.logStage(HostStage.RuntimeBoundary, "Launching managed application.");
         const mainAssemblyName = this.normalizeAssemblyName(this.config.mainAssemblyName);
-        const runMainPromise = typeof this.runtime.runMain === "function"
-            ? Promise.resolve(this.runtime.runMain(mainAssemblyName, []))
-            : Promise.resolve(this.runtime.runMainAndExit(mainAssemblyName, []));
+        const runMainPromise = Promise.resolve(this.runtime.runMain(mainAssemblyName, []));
 
         this.scheduleManagedFrame();
         this.logStage(HostStage.RuntimeBoundary, "Managed application launched.");
@@ -366,7 +389,11 @@ class MonoGameWebHost {
                 }
             }
             catch (error) {
-                this.handleHostFailure(new BrowserHostError(HostStage.ManagedExports, "managed_tick_failed", error instanceof Error ? error.message : String(error)));
+                this.handleHostFailure(new BrowserHostError(
+                    HostStage.ManagedExports,
+                    "managed_tick_failed",
+                    error instanceof Error ? error.message : String(error),
+                    { cause: error }));
                 this.dispose();
             }
         });
@@ -407,6 +434,7 @@ class MonoGameWebHost {
         this.accelerometer.dispose();
         this.audio.dispose();
         this.hostExports = null;
+        this.native = null;
         this.runtime = null;
 
         if (activeHost === this) {
@@ -414,54 +442,6 @@ class MonoGameWebHost {
         }
 
         this.logStage(HostStage.RuntimeBoundary, "Browser host disposed.");
-    }
-
-    playSong(songId, mediaPath, positionMilliseconds, volume, commandId) {
-        return this.audio.playSong(songId, mediaPath, positionMilliseconds, volume, commandId);
-    }
-
-    pauseSong(songId, commandId) {
-        this.audio.pauseSong(songId, commandId);
-    }
-
-    resumeSong(songId, commandId) {
-        this.audio.resumeSong(songId, commandId);
-    }
-
-    stopSong(songId) {
-        this.audio.stopSong(songId);
-    }
-
-    setSongVolume(songId, volume) {
-        this.audio.setSongVolume(songId, volume);
-    }
-
-    getSongPosition(songId) {
-        return this.audio.getSongPosition(songId);
-    }
-
-    getSongDuration(songId) {
-        return this.audio.getSongDuration(songId);
-    }
-
-    requestFullscreen() {
-        this.window.requestFullscreen();
-    }
-
-    exitFullscreen() {
-        this.window.exitFullscreen();
-    }
-
-    requestAccelerometer() {
-        return this.accelerometer.request();
-    }
-
-    stopAccelerometer() {
-        this.accelerometer.stop();
-    }
-
-    isAccelerometerSupported() {
-        return this.accelerometer.isSupported();
     }
 
     /**
@@ -479,7 +459,7 @@ class MonoGameWebHost {
             this.statusElement.textContent = message;
         }
 
-        console.error("[MonoGame.Web Host]", message, startupError);
+        console.error("[MonoGame.Web Host]", message, startupError, startupError.cause);
         this.notify(this.callbacks.onError, {
             stage: startupError.stage,
             code: startupError.code,
@@ -540,6 +520,5 @@ globalThis.MonoGameWebHost = {
 
         await activeHost.content.stageAssetPackAsync(assetPackName);
     },
-    stageContentManifestAsync: (manifestUri) => activeHost?.content.stageContentManifestAsync(manifestUri),
-    tryGetContentBase64: (relativePath) => activeHost?.content.tryGetContentBase64(relativePath) ?? null
+    stageContentManifestAsync: (manifestUri) => activeHost?.content.stageContentManifestAsync(manifestUri)
 };

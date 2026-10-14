@@ -21,14 +21,10 @@ export class BrowserAudio {
     /**
      * Creates the browser audio service.
      *
-     * @param {HTMLElement} root Host element that contains the hidden media element.
-     * @param {string} contentBaseUri Base URI for published Song media.
-     * @param {() => object | null} getRuntime Gets the managed runtime.
+     * @param {object} host Browser host coordinator.
      */
-    constructor(root, contentBaseUri, getRuntime) {
-        this.root = root;
-        this.contentBaseUri = contentBaseUri;
-        this.getRuntime = getRuntime;
+    constructor(host) {
+        this.host = host;
         this.audioActivationPromise = null;
         this.audioContext = null;
         this.songElement = null;
@@ -278,7 +274,7 @@ export class BrowserAudio {
         songElement.setAttribute("aria-hidden", "true");
         songElement.addEventListener("ended", () => this.reportActiveSongEvent(SongEventType.Completed));
         songElement.addEventListener("error", () => this.reportActiveSongEvent(SongEventType.Failed));
-        this.root.appendChild(songElement);
+        this.host.root.appendChild(songElement);
         this.songElement = songElement;
     }
 
@@ -318,7 +314,7 @@ export class BrowserAudio {
     resolveSongUri(mediaPath) {
         try {
             const relativeMediaPath = mediaPath.replace(/^[\\/]+/, "");
-            const uri = new URL(relativeMediaPath, new URL(this.contentBaseUri, document.baseURI));
+            const uri = new URL(relativeMediaPath, new URL(this.host.config.contentBaseUri, document.baseURI));
             // Songs are fetched by the page; non-HTTP schemes bypass the published-asset contract.
             return uri.protocol === "http:" || uri.protocol === "https:" ? uri.toString() : null;
         }
@@ -472,9 +468,6 @@ export class BrowserAudio {
      * @param {number} type Song event type.
      */
     reportSongEvent(songId, commandId, type) {
-        const notifySongEvent = this.getRuntime()?.Module?._MGM_Web_NotifySongEvent;
-        if (typeof notifySongEvent === "function") {
-            notifySongEvent(songId, commandId, type);
-        }
+        this.host.native?.notifySongEvent(songId, commandId, type);
     }
 }

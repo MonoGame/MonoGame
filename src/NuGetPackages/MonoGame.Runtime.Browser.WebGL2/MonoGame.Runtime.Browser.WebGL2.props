@@ -1,6 +1,8 @@
 <Project>
 
   <PropertyGroup>
+    <!-- Match this with the application's Content.RootDirectory. -->
+    <MonoGameBrowserContentRoot Condition="'$(MonoGameBrowserContentRoot)' == ''">Content</MonoGameBrowserContentRoot>
     <MonoGameBrowserWebGL2ArtifactsRoot>$(MSBuildThisFileDirectory)..\..\..\Artifacts\native\mgruntime\webgl2\browser-wasm</MonoGameBrowserWebGL2ArtifactsRoot>
     <MonoGameBrowserWebGL2NativeRuntimePath Condition="'$(MonoGameBrowserWebGL2NativeRuntimePath)' == '' and Exists('$(MSBuildThisFileDirectory)..\runtimes\browser-wasm\native\mgruntime.a')">$(MSBuildThisFileDirectory)..\runtimes\browser-wasm\native\mgruntime.a</MonoGameBrowserWebGL2NativeRuntimePath>
     <MonoGameBrowserWebGL2NativeRuntimePath Condition="'$(MonoGameBrowserWebGL2NativeRuntimePath)' == '' and Exists('$(MonoGameBrowserWebGL2ArtifactsRoot)\$(Configuration)\mgruntime.a')">$(MonoGameBrowserWebGL2ArtifactsRoot)\$(Configuration)\mgruntime.a</MonoGameBrowserWebGL2NativeRuntimePath>

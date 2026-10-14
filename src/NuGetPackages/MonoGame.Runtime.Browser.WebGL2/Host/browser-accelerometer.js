@@ -9,25 +9,16 @@ export class BrowserAccelerometer {
     /**
      * Creates the browser accelerometer service.
      *
-     * @param {() => object | null} getRuntime Gets the managed runtime.
+     * @param {object} host Browser host coordinator.
      */
-    constructor(getRuntime) {
-        this.getRuntime = getRuntime;
+    constructor(host) {
+        this.host = host;
         this.accelerometerListener = null;
-        this.canvas = null;
+        this.canvas = host.config.canvas;
         this.permissionGestureListener = null;
         this.permissionRequestPending = false;
         this.isRequested = false;
         this.hasReceivedReading = false;
-    }
-
-    /**
-     * Stores the game canvas used to request motion permission after the sensor is started.
-     *
-     * @param {HTMLCanvasElement} canvas Game canvas.
-     */
-    observePermissionGesture(canvas) {
-        this.canvas = canvas;
     }
 
     /** @returns {boolean} Whether the browser supports device-motion events. */
@@ -108,7 +99,7 @@ export class BrowserAccelerometer {
      * @returns {Promise<boolean>} Whether permission was granted.
      */
     async requestPermissionFromCanvasGestureAsync() {
-        if (!this.isRequested || this.permissionRequestPending || this.getRuntime() == null || !this.isSupported()) {
+        if (!this.isRequested || this.permissionRequestPending || this.host.native == null || !this.isSupported()) {
             return false;
         }
 
@@ -148,10 +139,7 @@ export class BrowserAccelerometer {
 
     /** Reports a sensor state when the managed runtime remains available. */
     notifyState(state) {
-        const notifyState = this.getRuntime()?.Module?._MGP_Web_NotifyAccelerometerState;
-        if (typeof notifyState === "function") {
-            notifyState(state);
-        }
+        this.host.native?.notifyAccelerometerState(state);
     }
 
     /** Starts forwarding device motion readings and waits for the first valid reading. */
@@ -167,12 +155,11 @@ export class BrowserAccelerometer {
                 // Browser motion uses meters per second squared;
                 // MonoGame accelerometer readings are expressed in standard gravity units.
                 // So we convert by dividing by 9.80665
-                const notifyReading = this.getRuntime()?.Module?._MGP_Web_NotifyAccelerometerReading;
-                if (typeof notifyReading === "function") {
+                if (this.host.native != null) {
                     const [x, y] = this.compensateForScreenOrientation(
                         acceleration.x,
                         acceleration.y);
-                    notifyReading(
+                    this.host.native.notifyAccelerometerReading(
                         x / 9.80665,
                         y / 9.80665,
                         acceleration.z / 9.80665);

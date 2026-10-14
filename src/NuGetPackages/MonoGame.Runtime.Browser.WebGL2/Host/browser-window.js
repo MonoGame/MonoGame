@@ -17,31 +17,28 @@ export class BrowserWindow {
     /**
      * Creates the browser window service.
      *
-     * @param {{ canvas: HTMLCanvasElement, canvasResizePolicy: string, pointerLockEnabled: boolean }} config Window configuration.
-     * @param {() => object | null} getRuntime Gets the managed runtime.
+     * @param {object} host Browser host coordinator.
      */
-    constructor(config, getRuntime) {
-        this.config = config;
-        this.getRuntime = getRuntime;
+    constructor(host) {
+        this.host = host;
         this.canvas = null;
         this.canvasResizeObserver = null;
-        this.contextLost = false;
         this.eventAbortController = new AbortController();
         this.isDisposed = false;
+        this.dropFileSystem = null;
         this.dropTask = Promise.resolve();
         this.nextDropBatchId = 0;
+        this.stagedDropBatches = [];
         this.stagedDropBytes = 0;
     }
 
     /**
      * Resolves the configured game canvas and prepares it for the native runtime.
-     *
-     * @param {(stage: string, message: string) => void} logStage Logs canvas setup progress.
      */
-    resolveCanvas(logStage) {
-        logStage(HostStage.CanvasCreation, "Resolving host canvas.");
+    resolveCanvas() {
+        this.host.logStage(HostStage.CanvasCreation, "Resolving host canvas.");
 
-        const canvas = this.config.canvas;
+        const canvas = this.host.config.canvas;
 
         if (!(canvas instanceof HTMLCanvasElement)) {
             throw new BrowserHostError(
@@ -65,7 +62,7 @@ export class BrowserWindow {
         this.suppressBrowserMouseDefaults();
         globalThis.Module = globalThis.Module || {};
         globalThis.Module.canvas = canvas;
-        logStage(HostStage.CanvasCreation, `Canvas '${canvas.id}' ready at ${canvas.width}x${canvas.height}.`);
+        this.host.logStage(HostStage.CanvasCreation, `Canvas '${canvas.id}' ready at ${canvas.width}x${canvas.height}.`);
     }
 
     /** Suppresses browser mouse actions that interrupt a canvas game. */
@@ -92,19 +89,11 @@ export class BrowserWindow {
 
     /** Configures the native runtime's optional pointer lock compatibility behavior. */
     configurePointerLock() {
-        if (!this.config.pointerLockEnabled) {
+        if (!this.host.config.pointerLockEnabled) {
             return;
         }
 
-        const setPointerLockEnabled = this.getRuntime()?.Module?._MGP_Web_SetPointerLockEnabled;
-        if (typeof setPointerLockEnabled !== "function") {
-            throw new BrowserHostError(
-                HostStage.WasmLoad,
-                "native_pointer_lock_configuration_missing",
-                "The managed runtime does not expose the native pointer lock configuration callback.");
-        }
-
-        setPointerLockEnabled(this.config.pointerLockEnabled ? 1 : 0);
+        this.host.native.setPointerLockEnabled(this.host.config.pointerLockEnabled ? 1 : 0);
     }
 
     /**
@@ -117,11 +106,10 @@ export class BrowserWindow {
      */
     observeContextLoss(onContextLost) {
         this.canvas.addEventListener("webglcontextlost", () => {
-            if (this.contextLost || this.isDisposed) {
+            if (this.isDisposed) {
                 return;
             }
 
-            this.contextLost = true;
             onContextLost();
         }, { signal: this.eventAbortController.signal });
     }
@@ -132,27 +120,17 @@ export class BrowserWindow {
      * @throws {BrowserHostError} When the runtime or browser cannot report canvas size changes.
      */
     observeCanvasSize() {
-        if (this.config.canvasResizePolicy !== CanvasResizePolicy.Adaptive) {
+        if (this.host.config.canvasResizePolicy !== CanvasResizePolicy.Adaptive) {
             return;
         }
 
-        const notifyCanvasResize = this.getRuntime()?.Module?._MGP_Web_NotifyCanvasResize;
-        const setCanvasResizeManaged = this.getRuntime()?.Module?._MGP_Web_SetCanvasResizeManaged;
-        if (typeof notifyCanvasResize !== "function"
-            || typeof setCanvasResizeManaged !== "function") {
-            throw new BrowserHostError(
-                HostStage.WasmLoad,
-                "native_canvas_resize_missing",
-                "The managed runtime does not expose the native canvas resize callbacks.");
-        }
-
-        setCanvasResizeManaged(1);
+        this.host.native.setCanvasResizeManaged(1);
 
         const reportCanvasSize = (width, height) => {
             const normalizedWidth = Math.round(width);
             const normalizedHeight = Math.round(height);
             if (normalizedWidth > 0 && normalizedHeight > 0) {
-                notifyCanvasResize(normalizedWidth, normalizedHeight);
+                this.host.native?.notifyCanvasResize(normalizedWidth, normalizedHeight);
             }
         };
 
@@ -206,15 +184,7 @@ export class BrowserWindow {
      * @throws {BrowserHostError} When the runtime cannot receive focus changes.
      */
     observeBrowserLifecycle() {
-        const notifyFocusChange = this.getRuntime()?.Module?._MGP_Web_NotifyFocusChange;
-        if (typeof notifyFocusChange !== "function") {
-            throw new BrowserHostError(
-                HostStage.WasmLoad,
-                "native_focus_change_missing",
-                "The managed runtime does not expose the native focus callback.");
-        }
-
-        const notifyFocus = (focused) => notifyFocusChange(focused ? 1 : 0);
+        const notifyFocus = (focused) => this.host.native?.notifyFocusChange(focused ? 1 : 0);
         const notifyDocumentFocus = () => notifyFocus(!document.hidden && document.hasFocus());
 
         const eventOptions = { signal: this.eventAbortController.signal };
@@ -231,25 +201,15 @@ export class BrowserWindow {
      * @throws {BrowserHostError} When the runtime cannot receive fullscreen changes.
      */
     observeFullscreen() {
-        const notifyFullscreenChange = this.getRuntime()?.Module?._MGP_Web_NotifyFullscreenChange;
-        const notifyFullscreenFailure = this.getRuntime()?.Module?._MGP_Web_NotifyFullscreenFailure;
-        if (typeof notifyFullscreenChange !== "function"
-            || typeof notifyFullscreenFailure !== "function") {
-            throw new BrowserHostError(
-                HostStage.WasmLoad,
-                "native_fullscreen_change_missing",
-                "The managed runtime does not expose the native fullscreen callbacks.");
-        }
-
         const reportFullscreenChange = () => {
-            const fullscreen = document.fullscreenElement === this.canvas;
-            notifyFullscreenChange(fullscreen ? 1 : 0);
+            const fullscreen = document.fullscreenElement === this.host.root;
+            this.host.native?.notifyFullscreenChange(fullscreen ? 1 : 0);
         };
 
         const eventOptions = { signal: this.eventAbortController.signal };
         document.addEventListener("fullscreenchange", reportFullscreenChange, eventOptions);
         document.addEventListener("fullscreenerror", () => {
-            notifyFullscreenFailure();
+            this.host.native?.notifyFullscreenFailure();
         }, eventOptions);
 
         reportFullscreenChange();
@@ -258,25 +218,13 @@ export class BrowserWindow {
     /**
      * Stages browser-dropped files in the Emscripten filesystem and forwards their paths through the native event queue.
      *
-     * @param {{ mkdirTree: Function, writeFile: Function }} fileSystem Emscripten filesystem.
+     * @param {{ mkdirTree: Function, rmdir: Function, unlink: Function, writeFile: Function }} fileSystem Emscripten filesystem.
      * @throws {BrowserHostError} When the runtime cannot receive browser file drops.
      */
     observeFileDrop(fileSystem) {
-        const module = this.getRuntime()?.Module;
-        if (typeof module?.ccall !== "function"
-            || typeof module._MGP_Web_NotifyFileDropComplete !== "function") {
-            throw new BrowserHostError(
-                HostStage.WasmLoad,
-                "native_file_drop_missing",
-                "The managed runtime does not expose the native file drop callbacks.");
-        }
-
-        const notifyFileDrop = (filePath) => module.ccall(
-            "MGP_Web_NotifyFileDrop",
-            null,
-            ["string"],
-            [filePath]);
-        const notifyFileDropComplete = () => module._MGP_Web_NotifyFileDropComplete();
+        this.dropFileSystem = fileSystem;
+        const notifyFileDrop = (filePath) => this.host.native?.notifyFileDrop(filePath);
+        const notifyFileDropComplete = () => this.host.native?.notifyFileDropComplete();
 
         const eventOptions = { signal: this.eventAbortController.signal };
         this.canvas.addEventListener("dragenter", (event) => event.preventDefault(), eventOptions);
@@ -305,13 +253,18 @@ export class BrowserWindow {
      * Stages one browser drop before raising its native completion event.
      *
      * @param {File[]} files Browser files captured from the drop event.
-     * @param {{ mkdirTree: Function, writeFile: Function }} fileSystem Emscripten filesystem.
+     * @param {{ mkdirTree: Function, rmdir: Function, unlink: Function, writeFile: Function }} fileSystem Emscripten filesystem.
      * @param {Function} notifyFileDrop Native callback for one staged file.
      * @param {Function} notifyFileDropComplete Native callback for a completed drop.
-     * @returns {Promise<void>} Completes after every supported file within the session staging budget is processed.
+     * @returns {Promise<void>} Completes after every supported file within the current staging budget is processed.
      */
     async stageDroppedFilesAsync(files, fileSystem, notifyFileDrop, notifyFileDropComplete) {
         const batchDirectoryPath = `/tmp/monogame-drop/${this.nextDropBatchId++}`;
+        const batch = {
+            directoryPath: batchDirectoryPath,
+            fileDirectoryPaths: [],
+            files: []
+        };
         let stagedFileCount = 0;
 
         for (let index = 0; index < files.length; index++) {
@@ -330,7 +283,7 @@ export class BrowserWindow {
             if (!Number.isSafeInteger(fileSize)
                 || fileSize < 0
                 || fileSize > MaximumStagedDropBytes - this.stagedDropBytes) {
-                console.warn("[MonoGame.Web Host]", `Skipped browser-dropped file '${fileName}' because it exceeds the ${MaximumStagedDropBytes}-byte session staging limit.`);
+                console.warn("[MonoGame.Web Host]", `Skipped browser-dropped file '${fileName}' because it exceeds the ${MaximumStagedDropBytes}-byte staging limit.`);
                 continue;
             }
 
@@ -343,13 +296,15 @@ export class BrowserWindow {
                 }
 
                 if (fileBytes.byteLength > MaximumStagedDropBytes - this.stagedDropBytes) {
-                    console.warn("[MonoGame.Web Host]", `Skipped browser-dropped file '${fileName}' because its byte stream exceeds the session staging limit.`);
+                    console.warn("[MonoGame.Web Host]", `Skipped browser-dropped file '${fileName}' because its byte stream exceeds the staging limit.`);
                     continue;
                 }
 
                 fileSystem.mkdirTree(fileDirectoryPath);
                 fileSystem.writeFile(filePath, fileBytes);
                 this.stagedDropBytes += fileBytes.byteLength;
+                batch.fileDirectoryPaths.push(fileDirectoryPath);
+                batch.files.push({ byteLength: fileBytes.byteLength, path: filePath });
             }
             catch (error) {
                 console.warn("[MonoGame.Web Host]", `Skipped browser-dropped file '${fileName}' because it could not be staged.`, error);
@@ -365,8 +320,47 @@ export class BrowserWindow {
         }
 
         if (!this.isDisposed && stagedFileCount > 0) {
+            this.stagedDropBatches.push(batch);
             notifyFileDropComplete();
         }
+    }
+
+    /** Releases the oldest staged browser drop after native dispatches its completion event. */
+    releaseNextDropBatch() {
+        const batch = this.stagedDropBatches.shift();
+        const fileSystem = this.dropFileSystem;
+        if (batch == null || fileSystem == null) {
+            return;
+        }
+
+        let releasedByteLength = 0;
+        for (const file of batch.files) {
+            try {
+                fileSystem.unlink(file.path);
+                releasedByteLength += file.byteLength;
+            }
+            catch (error) {
+                console.warn("[MonoGame.Web Host]", `Could not release browser dropped file '${file.path}'.`, error);
+            }
+        }
+
+        for (let index = batch.fileDirectoryPaths.length - 1; index >= 0; index--) {
+            try {
+                fileSystem.rmdir(batch.fileDirectoryPaths[index]);
+            }
+            catch (error) {
+                console.warn("[MonoGame.Web Host]", `Could not release browser drop directory '${batch.fileDirectoryPaths[index]}'.`, error);
+            }
+        }
+
+        try {
+            fileSystem.rmdir(batch.directoryPath);
+        }
+        catch (error) {
+            console.warn("[MonoGame.Web Host]", `Could not release browser drop directory '${batch.directoryPath}'.`, error);
+        }
+
+        this.stagedDropBytes -= releasedByteLength;
     }
 
     /** Removes browser listeners and stops CSS canvas resize observation. */
@@ -379,46 +373,51 @@ export class BrowserWindow {
         this.eventAbortController.abort();
         this.canvasResizeObserver?.disconnect();
         this.canvasResizeObserver = null;
+
+        while (this.stagedDropBatches.length > 0) {
+            this.releaseNextDropBatch();
+        }
+
+        this.dropFileSystem = null;
     }
 
-    /** Requests fullscreen for the game canvas. */
+    /** Requests fullscreen for the browser host root. */
     requestFullscreen() {
-        if (document.fullscreenElement === this.canvas) {
+        if (document.fullscreenElement === this.host.root) {
             return;
         }
 
-        void this.requestCanvasFullscreenAsync();
+        void this.requestHostFullscreenAsync();
     }
 
-    /** Requests exit from canvas fullscreen. */
+    /** Requests exit from browser host fullscreen. */
     exitFullscreen() {
-        if (document.fullscreenElement !== this.canvas) {
-            this.getRuntime().Module._MGP_Web_NotifyFullscreenFailure();
+        if (document.fullscreenElement !== this.host.root) {
+            this.host.native?.notifyFullscreenFailure();
             return;
         }
 
         void document.exitFullscreen().catch(() => {
-            this.getRuntime().Module._MGP_Web_NotifyFullscreenChange(
-                document.fullscreenElement === this.canvas ? 1 : 0);
+            this.host.native?.notifyFullscreenChange(document.fullscreenElement === this.host.root ? 1 : 0);
         });
     }
 
     /**
-     * Requests fullscreen for the game canvas and reports the result to the native runtime.
+     * Requests fullscreen for the browser host root and reports the result to the native runtime.
      *
      * @returns {Promise<void>} Completes after the browser accepts or rejects the request.
      */
-    async requestCanvasFullscreenAsync() {
-        if (typeof this.canvas.requestFullscreen !== "function") {
-            this.getRuntime().Module._MGP_Web_NotifyFullscreenFailure();
+    async requestHostFullscreenAsync() {
+        if (typeof this.host.root.requestFullscreen !== "function") {
+            this.host.native?.notifyFullscreenFailure();
             return;
         }
 
         try {
-            await this.canvas.requestFullscreen();
+            await this.host.root.requestFullscreen();
         }
         catch {
-            this.getRuntime().Module._MGP_Web_NotifyFullscreenFailure();
+            this.host.native?.notifyFullscreenFailure();
         }
     }
 

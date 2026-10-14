@@ -156,7 +156,8 @@ namespace Microsoft.Xna.Framework
         /// <remarks>
         /// This event is only supported on desktop and browser platforms.
 		/// On browser platforms, paths identify temporary files copied into the
-		/// Emscripten virtual filesystem for the current application session.
+		/// Emscripten virtual filesystem. Copy a file's contents from the event
+		/// handler when they must be retained after the drop completes.
         /// </remarks>
         public event EventHandler<FileDropEventArgs> FileDrop;
 
