@@ -1,5 +1,19 @@
 <Project>
 
+  <Target Name="WarnOnMonoGameHostScriptOverrides"
+    BeforeTargets="AssignTargetPaths"
+    Condition="'$(RuntimeIdentifier)' == 'browser-wasm'">
+    <ItemGroup>
+      <_MonoGameHostScriptOverride Remove="@(_MonoGameHostScriptOverride)" />
+      <_MonoGameHostScriptOverride Include="$(MSBuildProjectDirectory)\wwwroot\_monogame\*.js" />
+      <Content Remove="wwwroot\_monogame\*.js" />
+    </ItemGroup>
+
+    <Warning
+      Condition="'@(_MonoGameHostScriptOverride)' != ''"
+      Text="MonoGame.Runtime.Browser.WebGL2 does not support overriding individual host scripts under wwwroot\_monogame. The following project files are ignored: @(_MonoGameHostScriptOverride)." />
+  </Target>
+
   <Target Name="GenerateMonoGameAssetManifests"
     AfterTargets="ResolveCoreStaticWebAssets"
     Condition="'$(RuntimeIdentifier)' == 'browser-wasm'">

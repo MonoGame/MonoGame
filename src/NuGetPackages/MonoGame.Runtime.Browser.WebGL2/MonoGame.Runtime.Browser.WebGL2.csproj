@@ -5,12 +5,7 @@
     <None Include="WebInterop.cs" Pack="true" PackagePath="buildTransitive" />
     <None Include="MonoGame.Runtime.Browser.WebGL2.props" Pack="true" PackagePath="buildTransitive" />
     <None Include="MonoGame.Runtime.Browser.WebGL2.targets" Pack="true" PackagePath="buildTransitive" />
-    <None Include="Host\monogame-web-host.js" Pack="true" PackagePath="buildTransitive\Host" />
-    <None Include="Host\browser-accelerometer.js" Pack="true" PackagePath="buildTransitive\Host" />
-    <None Include="Host\browser-audio.js" Pack="true" PackagePath="buildTransitive\Host" />
-    <None Include="Host\browser-content.js" Pack="true" PackagePath="buildTransitive\Host" />
-    <None Include="Host\browser-host-common.js" Pack="true" PackagePath="buildTransitive\Host" />
-    <None Include="Host\browser-window.js" Pack="true" PackagePath="buildTransitive\Host" />
+    <None Include="Host\*.js" Pack="true" PackagePath="buildTransitive\Host" />
     <None Include="Host\browser.runtimeconfig.template.json" Pack="true" PackagePath="buildTransitive\Host" />
 
     <Content Include="..\..\..\Artifacts\native\mgruntime\webgl2\browser-wasm\Release\libSDL2.a"
