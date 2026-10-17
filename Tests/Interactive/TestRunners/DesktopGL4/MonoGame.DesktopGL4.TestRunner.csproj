@@ -1,0 +1,42 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+    <RollForward>Major</RollForward>
+    <PublishReadyToRun>false</PublishReadyToRun>
+    <TieredCompilation>false</TieredCompilation>
+    <MonoGamePlatform>DesktopGL</MonoGamePlatform>
+    <RootNamespace>MonoGame.InteractiveTests</RootNamespace>
+    <AssemblyName>MonoGameDesktopGL4InteractiveTests</AssemblyName>
+    <StartupObject>MonoGame.InteractiveTests.TestRunner</StartupObject>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <_LowerCasePlatform>$([MSBuild]::ValueOrDefault('$(Platform)', '').ToLowerInvariant())</_LowerCasePlatform>
+    <_OSArchitecture>$([System.Runtime.InteropServices.RuntimeInformation]::OSArchitecture.ToString().ToLowerInvariant())</_OSArchitecture>
+    <NativePlatform Condition="'$(_LowerCasePlatform)' == 'arm64' or '$(_LowerCasePlatform)' == 'x64'">$(_LowerCasePlatform)</NativePlatform>
+    <NativePlatform Condition="'$(NativePlatform)' == '' And '$(_OSArchitecture)' != ''">$(_OSArchitecture)</NativePlatform>
+    <NativePlatform Condition="'$(NativePlatform)' == ''">x64</NativePlatform>
+  </PropertyGroup>
+
+  <Import Project="..\..\Common\MonoGame.Interactive.Common.projitems" Label="Shared" />
+  <Import Project="..\..\Tests\MonoGame.Interactive.Tests.projitems" Label="Shared" />
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\..\MonoGame.Framework\MonoGame.Framework.Native.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <NativeLib Include="..\..\..\..\Artifacts\native\mgruntime\desktopgl4\windows\$(NativePlatform)\$(Configuration)\mgruntime.dll" Condition="Exists('..\..\..\..\Artifacts\native\mgruntime\desktopgl4\windows\$(NativePlatform)\$(Configuration)\mgruntime.dll')" />
+    <NativeLib Include="..\..\..\..\Artifacts\native\mgruntime\desktopgl4\linux\$(NativePlatform)\$(Configuration)\libmgruntime.so" Condition="Exists('..\..\..\..\Artifacts\native\mgruntime\desktopgl4\linux\$(NativePlatform)\$(Configuration)\libmgruntime.so')" />
+    <NativeLib Include="..\..\..\..\Artifacts\native\mgruntime\desktopgl4\macosx\$(Configuration)\libmgruntime.dylib" Condition="Exists('..\..\..\..\Artifacts\native\mgruntime\desktopgl4\macosx\$(Configuration)\libmgruntime.dylib')" />
+    <Content Include="@(NativeLib)" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="..\..\..\Assets\Fonts\Default.xnb" Link="Content\Fonts\Default.xnb" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="..\..\..\Assets\Textures\white-1.xnb" Link="Content\Textures\white-1.xnb" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="..\..\..\Assets\Textures\LogoOnly_64px.png" Link="Content\Textures\LogoOnly_64px.png" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="..\..\..\Assets\Effects\Mobile\test.fx.ogl.mgfxo" Link="Content\Effect\test.fx.mgfxo" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+</Project>

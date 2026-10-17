@@ -740,6 +740,7 @@ static void MGDX_PrepareNextFrame(MGG_GraphicsDevice* device)
 	device->pipelineManager->Prepare();
 	device->indexBufferDirty = true;
 	device->vertexBuffersDirty = 0xFFFFFFFF;
+	memset(device->uniforms, 0, sizeof(device->uniforms));
 	memset(device->textures, 0, sizeof(device->textures));
 	device->texturesDirty = true;
 	device->samplerSetHandles.clear();
@@ -993,6 +994,7 @@ void MGG_GraphicsDevice_GetBackBufferData(MGG_GraphicsDevice* device, mgint x, m
 		device->vertexBuffersDirty = 0xFFFFFFFF;
 		device->texturesDirty = true;
 		device->samplersDirty = true;
+		device->uniformsDirty = 0xFFFFFFFF;
 		device->viewportDirty = true;
 		device->scissorDirty = true;
 	}
@@ -1342,14 +1344,15 @@ void MGG_GraphicsDevice_DrawIndexed(MGG_GraphicsDevice* device, MGPrimitiveType 
 	cl->DrawIndexedInstanced(indexCount, 1, indexStart, vertexStart, 0);
 }
 
-void MGG_GraphicsDevice_DrawIndexedInstanced(MGG_GraphicsDevice* device, MGPrimitiveType primitiveType, mgint primitiveCount, mgint indexStart, mgint vertexStart, mgint instanceCount)
+void MGG_GraphicsDevice_DrawIndexedInstanced(MGG_GraphicsDevice* device, MGPrimitiveType primitiveType, mgint primitiveCount, mgint indexStart, mgint vertexStart, mgint baseInstance, mgint instanceCount)
 {
 	assert(device != nullptr);
 	assert(primitiveCount >= 0);
 	assert(indexStart >= 0);
 	assert(vertexStart >= 0);
+	assert(baseInstance >= 0);
 	assert(instanceCount >= 0);
-
+	
 	if (primitiveCount <= 0)
 		return;
 	if (instanceCount <= 0)
@@ -1363,7 +1366,7 @@ void MGG_GraphicsDevice_DrawIndexedInstanced(MGG_GraphicsDevice* device, MGPrimi
 
 	auto indexCount = MGDX_GetIndexCount(primitiveType, primitiveCount);
 
-	cl->DrawIndexedInstanced(indexCount, instanceCount, indexStart, vertexStart, 0);
+	cl->DrawIndexedInstanced(indexCount, instanceCount, indexStart, vertexStart, baseInstance);
 }
 
 
@@ -2225,6 +2228,7 @@ void MGG_Texture_GetData(MGG_GraphicsDevice* device, MGG_Texture* texture, mgint
 		device->vertexBuffersDirty = 0xFFFFFFFF;
 		device->texturesDirty = true;
 		device->samplersDirty = true;
+		device->uniformsDirty = 0xFFFFFFFF;
 		device->viewportDirty = true;
 		device->scissorDirty = true;
 	}
@@ -2449,4 +2453,54 @@ mgbyte MGG_OcclusionQuery_GetResult(MGG_GraphicsDevice* device, MGG_OcclusionQue
 	query->buffer->Unmap(0, nullptr);
 
 	return true;
+}
+
+MGG_Texture* MGG_RenderTarget_WrapNativeHandle(
+	MGG_GraphicsDevice* device,
+	void* nativeHandle,
+	MGSurfaceFormat format,
+	mgint width,
+	mgint height,
+	MGDepthFormat depthFormat,
+	mgint multiSampleCount,
+	mgbyte externalPresentation)
+{
+	if (!device || !nativeHandle || !device->resources)
+	{
+		return nullptr;
+	}
+
+	auto* external_resource = static_cast<ID3D12Resource*>(nativeHandle);
+
+	const auto texture = new MGG_Texture();
+	texture->format = format;
+
+	// Create a Texture wrapper around the external resource.
+	// This creates RTV + SRV descriptors without allocating memory for the resource itself.
+	texture->texture = new Texture(device->resources, external_resource, format);
+
+	// Create depth buffer if requested (owned by this texture wrapper).
+	if (depthFormat != MGDepthFormat::None)
+	{
+		texture->depthTexture = new Texture(width, height, depthFormat);
+		texture->depthTexture->Create(device->resources);
+	}
+
+	return texture;
+}
+
+MG_EXPORT void MGG_GraphicsDevice_GetNativeHandles(const MGG_GraphicsDevice* device, MGP_NativeGraphicsHandles* handles)
+{
+	if (!device || !handles)
+	{
+		return;
+	}
+
+	handles->Backend          = MGGraphicsBackend::DirectX12;
+	handles->Instance         = nullptr;	// DX12 doesn't have an instance handle like Vulkan.
+	handles->PhysicalDevice   = device->resources->GetAdapter();
+	handles->LogicalDevice    = device->resources->GetD3DDevice();
+	handles->Queue            = device->resources->GetCommandQueue()->Get();
+	handles->QueueFamilyIndex = 0;	// DX12 doesn't have queue families.
+	handles->QueueIndex       = 0;
 }

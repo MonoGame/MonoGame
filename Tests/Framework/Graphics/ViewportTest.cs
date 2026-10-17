@@ -86,6 +86,45 @@ namespace MonoGame.Tests.Graphics
             Assert.That(viewportPixel[0], Is.EqualTo(Color.Red));
         }
 
+        // Ensure that Clear preserves a pending scissor test disable.
+        // See: https://github.com/MonoGame/MonoGame/issues/9586
+        [Test]
+        public void Does_not_restore_scissor_test_after_pending_disable_and_clear()
+        {
+            using SpriteBatch sb = new SpriteBatch(gd);
+            using Texture2D swatch = content.Load<Texture2D>(Paths.Texture("white-64"));
+            using RasterizerState scissorEnabled = new RasterizerState { ScissorTestEnable = true };
+            using RasterizerState scissorDisabled = new RasterizerState { ScissorTestEnable = false };
+
+            gd.Clear(Color.CornflowerBlue);
+
+            // Use an empty scissor rectangle so a later incorrectly restored
+            // scissor test prevents the final draw from writing any pixels.
+            gd.ScissorRectangle = new Rectangle(0, 0, 0, 0);
+
+            // Draw A applies the enabled scissor state.
+            sb.Begin(SpriteSortMode.Immediate, BlendState.Opaque, SamplerState.PointClamp,
+                DepthStencilState.Default, scissorEnabled);
+            sb.Draw(swatch, Vector2.Zero, Color.White);
+            sb.End();
+
+            // Queue a disabled scissor state without drawing. Clear must apply it
+            // and leave the scissor test disabled after it completes.
+            gd.RasterizerState = scissorDisabled;
+            gd.Clear(Color.Red);
+
+            // Draw B reuses the disabled state to verify that Clear leaves
+            // the OpenGL scissor test disabled.
+            sb.Begin(SpriteSortMode.Immediate, BlendState.Opaque, SamplerState.PointClamp,
+                DepthStencilState.Default, scissorDisabled);
+            sb.Draw(swatch, Vector2.Zero, Color.Lime);
+            sb.End();
+
+            Color[] pixel = new Color[1];
+            gd.GetBackBufferData(new Rectangle(0, 0, 1, 1), pixel, 0, 1);
+            Assert.That(pixel[0], Is.EqualTo(Color.Lime));
+        }
+
         [Test]
         public void Clips_SpriteBatch_draws()
         {

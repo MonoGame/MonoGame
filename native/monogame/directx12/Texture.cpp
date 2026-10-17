@@ -74,6 +74,45 @@ Texture::Texture(const Texture& other) {
     impl->m_currentState = D3D12_RESOURCE_STATE_COPY_DEST;
 }
 
+Texture::Texture(DeviceResources* device, ID3D12Resource* externalResource, MGSurfaceFormat format) {
+    impl = new InternalData();
+    impl->m_type = SurfaceType::RenderTarget;
+    impl->m_depthFormat = MGDepthFormat::None;
+    impl->m_levels = 1;
+    impl->m_dimension = TextureDimension::Texture2D;
+
+    impl->m_currentState = D3D12_RESOURCE_STATE_RENDER_TARGET;
+    impl->m_alloc = nullptr; // No allocation. This is externally owned.
+
+    impl->m_res = externalResource;
+    impl->m_desc = externalResource->GetDesc();
+
+    DXGI_FORMAT viewFormat = TextureFormatToDXGI_FORMAT(format);
+    impl->m_desc.Format = viewFormat;
+
+    // Create SRV descriptor
+    D3D12_SHADER_RESOURCE_VIEW_DESC srv_desc = {};
+    srv_desc.Format = viewFormat;
+    srv_desc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+
+    bool isMSAA = CheckMSAA(device->GetD3DDevice());
+    srv_desc.ViewDimension = isMSAA ? D3D12_SRV_DIMENSION_TEXTURE2DMS : D3D12_SRV_DIMENSION_TEXTURE2D;
+
+    srv_desc.Texture2D.MostDetailedMip = 0;
+    srv_desc.Texture2D.MipLevels = impl->m_levels;
+    srv_desc.Texture2D.PlaneSlice = 0;
+    impl->m_srvHandle = device->GetGraphicsHeaps()->CreateSRVHandle(externalResource, srv_desc);
+
+    if (impl->m_desc.Flags & D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET) {
+        // Create RTV descriptor.
+        D3D12_RENDER_TARGET_VIEW_DESC rtvDesc = {};
+        rtvDesc.Format = impl->m_desc.Format;
+        rtvDesc.ViewDimension = D3D12_RTV_DIMENSION_TEXTURE2D;
+
+        impl->m_rtvHandles.push_back(device->GetGraphicsHeaps()->CreateRTVHandle(externalResource, rtvDesc));
+    }
+}
+
 #ifndef _GAMING_XBOX
 Texture::Texture(DeviceResources* device, IDXGISwapChain3* swapchain, int bufferId) {
     impl = new InternalData();

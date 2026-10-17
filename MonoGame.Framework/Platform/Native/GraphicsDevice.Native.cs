@@ -226,6 +226,8 @@ public partial class GraphicsDevice
         _vertexBuffersDirty = true;
         Textures.Dirty();
         SamplerStates.Dirty();
+        VertexTextures.Dirty();
+        VertexSamplerStates.Dirty();
 
         MGG.GraphicsDevice_SetViewport(
             Handle,
@@ -598,7 +600,7 @@ public partial class GraphicsDevice
     {
         ApplyState(true);
 
-        MGG.GraphicsDevice_DrawIndexedInstanced(Handle, primitiveType, primitiveCount, startIndex, baseVertex, instanceCount);
+        MGG.GraphicsDevice_DrawIndexedInstanced(Handle, primitiveType, primitiveCount, startIndex, baseVertex, baseInstance, instanceCount);
     }
 
     private unsafe void PlatformGetBackBufferData<T>(Rectangle? rect, T[] data, int startIndex, int count) where T : struct
@@ -635,5 +637,25 @@ public partial class GraphicsDevice
         MGG.GraphicsDevice_GetTitleSafeArea(ref x, ref y, ref width, ref height);
 
         return new Rectangle(x, y, width, height);
+    }
+
+    /// <summary>
+    /// Retrieves the native graphics API handles for XR or external interop.
+    /// <see cref="NativeGraphicsHandles.LogicalDevice"/> is populated for all native backends.
+    /// <see cref="NativeGraphicsHandles.PhysicalDevice"/> and <see cref="NativeGraphicsHandles.Queue"/> are populated for <see cref="GraphicsBackend.Vulkan"/> and <see cref="GraphicsBackend.DirectX12"/>.
+    /// Check <see cref="NativeGraphicsHandles.Backend"/> for backend-specific field availability.
+    /// </summary>
+    public unsafe NativeGraphicsHandles GetNativeHandles()
+    {
+        MGG.GraphicsDevice_GetNativeHandles(Handle, out var native);
+
+        return new NativeGraphicsHandles(
+            (GraphicsBackend)native.Backend,
+            native.Instance,
+            native.PhysicalDevice,
+            native.LogicalDevice,
+            native.Queue,
+            native.QueueFamilyIndex,
+            native.QueueIndex);
     }
 }

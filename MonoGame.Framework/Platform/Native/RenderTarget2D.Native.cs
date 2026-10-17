@@ -31,4 +31,48 @@ public partial class RenderTarget2D
             Handle = null;
         }
     }
+
+    private static unsafe RenderTarget2D PlatformFromNativeHandle(
+        GraphicsDevice graphicsDevice,
+        nint handle,
+        int width,
+        int height,
+        SurfaceFormat format = SurfaceFormat.Color,
+        DepthFormat preferredDepthFormat = DepthFormat.None,
+        int preferredMultiSampleCount = 0,
+        bool externalPresentation = false)
+    {
+        // Call native layer to create an MGG_Texture that wraps the external resource.
+        var nativeTexture = MGG.RenderTarget_WrapNativeHandle(
+            graphicsDevice.Handle,
+            handle,
+            format,
+            width,
+            height,
+            preferredDepthFormat,
+            preferredMultiSampleCount,
+            (byte)(externalPresentation ? 1 : 0));
+
+        // Use the protected constructor that takes SurfaceType.SwapChainRenderTarget.
+        // This skips the PlatformConstruct() call.
+        var renderTarget = new RenderTarget2D(
+            graphicsDevice,
+            width,
+            height,
+            false,
+            format,
+            preferredDepthFormat,
+            preferredMultiSampleCount,
+            RenderTargetUsage.DiscardContents,
+            SurfaceType.SwapChainRenderTarget);
+
+        // Assign the handle to the native wrapper for the source image.
+        // We set Owned = true because MonoGame still owns the MGG_Texture* wrapper (including its views and depth buffer)
+        // and needs to manage its lifetime.
+        // MGG_Texture_Destroy will skip freeing the external image memory.
+        renderTarget.Handle = nativeTexture;
+        renderTarget.Owned = true;
+
+        return renderTarget;
+    }
 }

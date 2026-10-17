@@ -2684,12 +2684,20 @@ void MGG_GraphicsDevice_DrawIndexed(MGG_GraphicsDevice* device, MGPrimitiveType 
         reinterpret_cast<const void*>(indexByteOffset));
 }
 
-void MGG_GraphicsDevice_DrawIndexedInstanced(MGG_GraphicsDevice* device, MGPrimitiveType primitiveType, mgint primitiveCount, mgint indexStart, mgint vertexStart, mgint instanceCount)
+void MGG_GraphicsDevice_DrawIndexedInstanced(
+	MGG_GraphicsDevice* device,
+	MGPrimitiveType primitiveType,
+	mgint primitiveCount,
+	mgint indexStart,
+	mgint vertexStart,
+	mgint baseInstance,
+	mgint instanceCount)
 {
-    assert(device != nullptr);
-    assert(indexStart >= 0);
-    assert(vertexStart >= 0);
-    assert(instanceCount >= 0);
+	assert(device != nullptr);
+	assert(indexStart >= 0);
+	assert(vertexStart >= 0);
+	assert(baseInstance >= 0);
+	assert(instanceCount > 0);
 
     if (primitiveCount <= 0 || instanceCount <= 0)
         return;
@@ -2709,12 +2717,19 @@ void MGG_GraphicsDevice_DrawIndexedInstanced(MGG_GraphicsDevice* device, MGPrimi
     mgint indexSizeInBytes = GetIndexElementSizeInBytes(device->indexElementSize);
     intptr_t indexByteOffset = static_cast<intptr_t>(indexStart) * indexSizeInBytes;
 
-    device->context.functions.DrawElementsInstanced(
-        ToPrimitiveMode(primitiveType),
-        indexCount,
-        ToIndexType(device->indexElementSize),
-        reinterpret_cast<const void*>(indexByteOffset),
-        instanceCount);
+	if (baseInstance > 0)
+	{
+		// TODO: Fix me!
+	}
+	else
+	{	
+	    device->context.functions.DrawElementsInstanced(
+	        ToPrimitiveMode(primitiveType),
+	        indexCount,
+	        ToIndexType(device->indexElementSize),
+	        reinterpret_cast<const void*>(indexByteOffset),
+	        instanceCount);
+		}
 }
 
 void MGG_GraphicsDevice_ResolveRenderTargets(MGG_GraphicsDevice* device)
@@ -3745,4 +3760,20 @@ mgbyte MGG_OcclusionQuery_GetResult(MGG_GraphicsDevice* device, MGG_OcclusionQue
     device->context.functions.GetQueryObjectuiv(query->handle, GL_QUERY_RESULT, &result);
     pixelCount = static_cast<mgint>(result);
     return true;
+}
+
+MG_EXPORT void MGG_GraphicsDevice_GetNativeHandles(const MGG_GraphicsDevice* device, MGP_NativeGraphicsHandles* handles)
+{
+	if (!device || !handles)
+	{
+		return;
+	}
+
+	handles->Backend          = MGGraphicsBackend::OpenGL;
+	handles->Instance         = nullptr;    // OpenGL doesn't have an instance handle like Vulkan.
+	handles->PhysicalDevice   = nullptr;    // OpenGL doesn't expose a physical device.
+	handles->LogicalDevice    = static_cast<void*>(device->context.handle);
+	handles->Queue            = nullptr;    // OpenGL doesn't have queues.
+	handles->QueueFamilyIndex = 0;  // OpenGL doesn't have queue families.
+	handles->QueueIndex       = 0;
 }

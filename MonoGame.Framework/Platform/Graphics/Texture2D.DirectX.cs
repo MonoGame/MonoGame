@@ -25,7 +25,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
         private bool _shared;
         private bool _mipmap;
-        private SampleDescription _sampleDescription;
+        private SampleDescription _sampleDescription = new SampleDescription(1, 0);
 
         private SharpDX.Direct3D11.Texture2D _cachedStagingTexture;
 
@@ -33,7 +33,6 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             _shared = shared;
             _mipmap = mipmap;
-            _sampleDescription = new SampleDescription(1, 0);
         }
 
         private void PlatformSetData<T>(int level, T[] data, int startIndex, int elementCount) where T : struct

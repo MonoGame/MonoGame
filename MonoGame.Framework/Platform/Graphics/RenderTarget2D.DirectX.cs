@@ -192,5 +192,40 @@ namespace Microsoft.Xna.Framework.Graphics
 
             return desc;
         }
+
+        private static RenderTarget2D PlatformFromNativeHandle(
+            GraphicsDevice graphicsDevice,
+            nint handle,
+            int width,
+            int height,
+            SurfaceFormat format = SurfaceFormat.Color,
+            DepthFormat preferredDepthFormat = DepthFormat.None,
+            int preferredMultiSampleCount = 0,
+            bool externalPresentation = false)
+        {
+            var renderTarget = new RenderTarget2D(
+                graphicsDevice,
+                width,
+                height,
+                false,
+                format,
+                preferredDepthFormat,
+                preferredMultiSampleCount,
+                RenderTargetUsage.DiscardContents,
+                SurfaceType.SwapChainRenderTarget);
+
+            var d3DTexture = new SharpDX.Direct3D11.Texture2D(handle);
+            ((SharpDX.IUnknown)d3DTexture).AddReference();
+
+            renderTarget.SetNativeTexture(d3DTexture);
+            renderTarget._msSampleDescription = graphicsDevice.GetSupportedSampleDescription(
+                SharpDXHelper.ToFormat(format),
+                renderTarget.MultiSampleCount);
+
+            // Creates RenderTargetView, and if requested, MSAA texture and DepthStencilView
+            renderTarget.GenerateIfRequired();
+
+            return renderTarget;
+        }
     }
 }

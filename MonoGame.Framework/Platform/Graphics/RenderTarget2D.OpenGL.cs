@@ -12,6 +12,8 @@ namespace Microsoft.Xna.Framework.Graphics
         private static Action<RenderTarget2D> DisposeAction =
             (t) => t.GraphicsDevice.PlatformDeleteRenderTarget(t);
 
+        private bool _isExternal;
+
         int IRenderTarget.GLTexture
         {
             get { return glTexture; }
@@ -43,6 +45,10 @@ namespace Microsoft.Xna.Framework.Graphics
 
         private void PlatformGraphicsDeviceResetting()
         {
+            if (_isExternal)
+            {
+                glTexture = -1;
+            }
         }
 
         /// <summary/>
@@ -54,9 +60,63 @@ namespace Microsoft.Xna.Framework.Graphics
                 {
                     Threading.BlockOnUIThread(DisposeAction, this);
                 }
+
+                if (_isExternal)
+                {
+                    // Disassociate glTexture.
+                    // This is to prevent base.Dispose() from invoking GraphicsDevice.DisposeTexture() on the external texture.
+                    glTexture = -1;
+                }
             }
 
             base.Dispose(disposing);
+        }
+
+        private static RenderTarget2D PlatformFromNativeHandle(
+            GraphicsDevice graphicsDevice,
+            nint handle,
+            int width,
+            int height,
+            SurfaceFormat format = SurfaceFormat.Color,
+            DepthFormat preferredDepthFormat = DepthFormat.None,
+            int preferredMultiSampleCount = 0,
+            bool externalPresentation = false)
+        {
+            var renderTarget = new RenderTarget2D(
+                graphicsDevice,
+                width,
+                height,
+                false,
+                format,
+                preferredDepthFormat,
+                preferredMultiSampleCount,
+                RenderTargetUsage.DiscardContents,
+                SurfaceType.SwapChainRenderTarget)
+            {
+                _isExternal = true,
+                glTexture = (int)handle,
+                glTarget = TextureTarget.Texture2D,
+            };
+
+            format.GetGLFormat(graphicsDevice, out renderTarget.glInternalFormat, out renderTarget.glFormat, out renderTarget.glType);
+
+            if (preferredDepthFormat != DepthFormat.None || renderTarget.MultiSampleCount > 0)
+            {
+                Threading.BlockOnUIThread(() =>
+                {
+                    graphicsDevice.PlatformCreateRenderTarget(
+                        renderTarget,
+                        width,
+                        height,
+                        false,
+                        format,
+                        preferredDepthFormat,
+                        preferredMultiSampleCount,
+                        RenderTargetUsage.DiscardContents);
+                });
+            }
+
+            return renderTarget;
         }
     }
 }

@@ -226,6 +226,8 @@ struct MGP_MouseButtonEvent
 {
     void* Window;
     MGMouseButton Button;
+    mgint X;
+    mgint Y;
 };
 
 struct MGP_MouseWheelEvent
@@ -282,3 +284,15 @@ struct MGP_ControllerCaps
     mgbool HasRightVibrationMotor;
     mgbool HasVoiceSupport;
 };
+
+struct MGP_NativeGraphicsHandles
+{
+    MGGraphicsBackend Backend;
+    void* Instance;
+    void* PhysicalDevice;
+    void* LogicalDevice;
+    void* Queue;
+    mgint QueueFamilyIndex;
+    mgint QueueIndex;
+};
+
