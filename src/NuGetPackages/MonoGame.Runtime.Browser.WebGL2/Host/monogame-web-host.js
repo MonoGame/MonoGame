@@ -29,7 +29,6 @@ function getCanvasResizePolicy(value) {
  * @property {string} contentBaseUri
  * @property {string} startupContentManifestUri
  * @property {string} runtimeScriptUri
- * @property {string} hostExportsTypeName
  * @property {string} mainAssemblyName
  * @property {"Adaptive" | "Project" | "None"} canvasResizePolicy
  * @property {boolean} pointerLockEnabled
@@ -41,7 +40,7 @@ function getCanvasResizePolicy(value) {
  * @typedef {object} BrowserHostStartOptions
  * @property {HTMLElement} root Element that contains the game canvas.
  * @property {HTMLCanvasElement} canvas Canvas supplied to the browser runtime.
- * @property {{ assemblyName: string, hostExportsTypeName: string }} managed Managed application entry points.
+ * @property {{ assemblyName: string }} managed Managed application entry point.
  * @property {string=} applicationName Application name used for host diagnostics.
  * @property {string=} runtimeScriptUri URI of the .NET browser runtime script.
  * @property {string=} contentBaseUri Base URI used to resolve published content.
@@ -70,10 +69,10 @@ class MonoGameWebHost {
         this.callbacks = callbacks;
         this.runtime = null;
         this.native = null;
-        this.hostExports = null;
-        this.managedFrameHandle = null;
+        this.browserGameExports = null;
         this.contextLost = false;
         this.firstFrameReported = false;
+        this.managedFailure = null;
         this.isDisposed = false;
         this.window = new BrowserWindow(this);
         this.accelerometer = new BrowserAccelerometer(this);
@@ -116,11 +115,6 @@ class MonoGameWebHost {
             throw new BrowserHostError(HostStage.HostBootstrap, "managed_configuration_invalid", "The managed.assemblyName setting must be a non-empty string.");
         }
 
-        const hostExportsTypeName = managed.hostExportsTypeName;
-        if (typeof hostExportsTypeName !== "string" || hostExportsTypeName.trim().length === 0) {
-            throw new BrowserHostError(HostStage.HostBootstrap, "managed_configuration_invalid", "The managed.hostExportsTypeName setting must be a non-empty string.");
-        }
-
         const statusElement = options.statusElement ?? null;
         if (statusElement != null && !(statusElement instanceof HTMLElement)) {
             throw new BrowserHostError(HostStage.HostBootstrap, "host_status_element_invalid", "The browser host statusElement must be an HTMLElement.");
@@ -148,7 +142,6 @@ class MonoGameWebHost {
             contentBaseUri: options.contentBaseUri ?? "./",
             startupContentManifestUri: options.startupContentManifestUri ?? "_monogame/content-manifest.txt",
             runtimeScriptUri: options.runtimeScriptUri ?? "./_framework/dotnet.js",
-            hostExportsTypeName,
             mainAssemblyName: assemblyName,
             canvasResizePolicy: getCanvasResizePolicy(canvasResizePolicy),
             pointerLockEnabled: options.pointerLock ?? false
@@ -184,11 +177,13 @@ class MonoGameWebHost {
             this.window.observeContextLoss(() => this.handleContextLost());
             await this.initializeManagedRuntimeAsync();
             await this.content.stageStartupContentAsync();
-            await this.initializeManagedExportsAsync();
+            await this.initializeBrowserGameExportsAsync();
             await this.launchManagedApplicationAsync();
         }
         catch (error) {
-            this.handleHostFailure(error);
+            if (!this.isDisposed) {
+                this.handleHostFailure(this.managedFailure ?? error);
+            }
         }
         finally {
             this.dispose();
@@ -291,29 +286,29 @@ class MonoGameWebHost {
     }
 
     /**
-     * Resolves the configured managed exports and checks that `Tick` is available.
+     * Resolves the fixed browser runtime exports used for context-loss handling.
      *
-     * @returns {Promise<void>} Completes when the host can begin the game loop.
-     * @throws {BrowserHostError} When the configured exports or `Tick` method are missing.
+     * @returns {Promise<void>} Completes when the browser runtime can handle context loss.
+     * @throws {BrowserHostError} When the browser runtime exports are missing.
      */
-    async initializeManagedExportsAsync() {
+    async initializeBrowserGameExportsAsync() {
         this.logStage(HostStage.ManagedExports, "Initializing managed host exports.");
         const exportsRoot = await this.runtime.getAssemblyExports(this.normalizeAssemblyName(this.config.mainAssemblyName));
-        const hostExports = this.resolveExportPath(exportsRoot, this.config.hostExportsTypeName);
-        if (hostExports == null) {
-            throw new BrowserHostError(HostStage.ManagedExports, "managed_host_exports_missing", `The configured host exports type '${this.config.hostExportsTypeName}' was not found.`);
+        const browserGameExports = this.resolveExportPath(exportsRoot, "MonoGame.Runtime.Browser.WebGL2.BrowserGame");
+        if (browserGameExports == null) {
+            throw new BrowserHostError(HostStage.ManagedExports, "browser_game_exports_missing", "The browser runtime does not expose BrowserGame.");
         }
 
-        if (typeof hostExports.Tick !== "function") {
-            throw new BrowserHostError(HostStage.ManagedExports, "managed_tick_missing", "The configured host exports type does not expose Tick().");
+        if (typeof browserGameExports.NotifyContextLost !== "function") {
+            throw new BrowserHostError(HostStage.ManagedExports, "browser_context_loss_export_missing", "The browser runtime does not expose BrowserGame.NotifyContextLost().");
         }
 
-        this.hostExports = hostExports;
+        this.browserGameExports = browserGameExports;
         this.logStage(HostStage.ManagedExports, "Managed host exports initialized.");
     }
 
     /**
-     * Starts the managed application and schedules its first game frame.
+     * Starts the managed application.
      *
      * @returns {Promise<void>} Completes when the managed application exits.
      */
@@ -322,7 +317,6 @@ class MonoGameWebHost {
         const mainAssemblyName = this.normalizeAssemblyName(this.config.mainAssemblyName);
         const runMainPromise = Promise.resolve(this.runtime.runMain(mainAssemblyName, []));
 
-        this.scheduleManagedFrame();
         this.logStage(HostStage.RuntimeBoundary, "Managed application launched.");
         await runMainPromise;
     }
@@ -357,46 +351,27 @@ class MonoGameWebHost {
         return current ?? null;
     }
 
-    /**
-     * Schedules the next game frame.
-     *
-     * A later frame is scheduled only when `Tick` returns `true`.
-     */
-    scheduleManagedFrame() {
-        if (this.contextLost || this.isDisposed) {
+    /** Reports the first frame completed by the Emscripten-managed loop. */
+    notifyManagedFirstFrame() {
+        if (this.isDisposed || this.firstFrameReported) {
             return;
         }
 
-        this.managedFrameHandle = requestAnimationFrame(async () => {
-            this.managedFrameHandle = null;
-            if (this.contextLost || this.isDisposed) {
-                return;
-            }
+        this.firstFrameReported = true;
+        this.notify(this.callbacks.onFirstFrame, undefined, "onFirstFrame");
+    }
 
-            try {
-                const shouldContinue = await this.hostExports.Tick();
-                if (!this.firstFrameReported) {
-                    this.firstFrameReported = true;
-                    this.notify(this.callbacks.onFirstFrame, undefined, "onFirstFrame");
-                }
+    /** Records a managed Emscripten-loop failure until runMain completes. */
+    reportManagedFailure(message, details) {
+        if (this.isDisposed || this.managedFailure != null) {
+            return;
+        }
 
-                if (shouldContinue && !this.contextLost && !this.isDisposed) {
-                    this.scheduleManagedFrame();
-                }
-                else {
-                    this.logStage(HostStage.RuntimeBoundary, "Managed run loop ended.");
-                    this.dispose();
-                }
-            }
-            catch (error) {
-                this.handleHostFailure(new BrowserHostError(
-                    HostStage.ManagedExports,
-                    "managed_tick_failed",
-                    error instanceof Error ? error.message : String(error),
-                    { cause: error }));
-                this.dispose();
-            }
-        });
+        this.managedFailure = new BrowserHostError(
+            HostStage.RuntimeBoundary,
+            "managed_application_failed",
+            message,
+            { cause: new Error(details) });
     }
 
     /** Stops the browser game loop after an unrecoverable WebGL context loss. */
@@ -406,9 +381,8 @@ class MonoGameWebHost {
         }
 
         this.contextLost = true;
-        if (this.managedFrameHandle != null) {
-            cancelAnimationFrame(this.managedFrameHandle);
-            this.managedFrameHandle = null;
+        if (this.browserGameExports != null) {
+            this.browserGameExports.NotifyContextLost();
         }
 
         this.handleHostFailure(new BrowserHostError(
@@ -425,15 +399,10 @@ class MonoGameWebHost {
         }
 
         this.isDisposed = true;
-        if (this.managedFrameHandle != null) {
-            cancelAnimationFrame(this.managedFrameHandle);
-            this.managedFrameHandle = null;
-        }
-
         this.window.dispose();
         this.accelerometer.dispose();
         this.audio.dispose();
-        this.hostExports = null;
+        this.browserGameExports = null;
         this.native = null;
         this.runtime = null;
 
@@ -452,7 +421,11 @@ class MonoGameWebHost {
     handleHostFailure(error) {
         const startupError = error instanceof BrowserHostError
             ? error
-            : new BrowserHostError(HostStage.HostBootstrap, "unexpected_error", error instanceof Error ? error.message : String(error));
+            : new BrowserHostError(
+                HostStage.HostBootstrap,
+                "unexpected_error",
+                error instanceof Error ? error.message : String(error),
+                { cause: error });
         const message = `${startupError.stage}: ${startupError.code} - ${startupError.message}`;
         if (this.statusElement != null) {
             this.statusElement.hidden = false;
@@ -513,6 +486,8 @@ export function start(options) {
 /** Provides host services called by the browser native runtime. */
 globalThis.MonoGameWebHost = {
     getActiveHost: () => activeHost,
+    notifyManagedFirstFrame: () => activeHost?.notifyManagedFirstFrame(),
+    notifyManagedFailure: (message, details) => activeHost?.reportManagedFailure(message, details),
     stageAssetPackAsync: async (assetPackName) => {
         if (activeHost == null) {
             throw new BrowserHostError(HostStage.ContentStaging, "asset_pack_host_unavailable", "The browser host is not available to stage an asset pack.");

@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
-    <Compile Remove="WebInterop.cs" />
+    <None Include="BrowserGame.cs" Pack="true" PackagePath="buildTransitive" />
     <None Include="WebInterop.cs" Pack="true" PackagePath="buildTransitive" />
     <None Include="MonoGame.Runtime.Browser.WebGL2.props" Pack="true" PackagePath="buildTransitive" />
     <None Include="MonoGame.Runtime.Browser.WebGL2.targets" Pack="true" PackagePath="buildTransitive" />
