@@ -36,6 +36,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
         /// Initializes a new instance of ContentImporterAttribute and sets the file name extension supported by the importer.
         /// </summary>
         /// <param name="fileExtension">The list of file name extensions supported by the importer. Prefix each extension with a '.'.</param>
+        [Obsolete("This constructor has been deprecated. When it is finally removed you will need to rebuild your project against the new MonoGame version.")]
         public ContentImporterAttribute(string fileExtension) : this(new string[] {fileExtension})
         {
         }
