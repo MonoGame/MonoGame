@@ -49,11 +49,6 @@ export class BrowserWindow {
 
         this.canvas = canvas;
 
-        // The native SDL/Emscripten integration resolves the conventional canvas ID rather than a project-specific ID.
-        if (canvas.id !== "canvas") {
-            canvas.id = "canvas";
-        }
-
         // Canvas elements are not focusable by default, but SDL keyboard input and focus lifecycle require focus.
         if (!canvas.hasAttribute("tabindex")) {
             canvas.tabIndex = 0;

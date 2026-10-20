@@ -99,6 +99,10 @@ class MonoGameWebHost {
             throw new BrowserHostError(HostStage.HostBootstrap, "host_canvas_invalid", "The browser host requires an HTMLCanvasElement canvas.");
         }
 
+        if (canvas.id !== "canvas") {
+            throw new BrowserHostError(HostStage.HostBootstrap, "host_canvas_id_invalid", "The browser host canvas must have id 'canvas'.");
+        }
+
         if (!root.contains(canvas)) {
             throw new BrowserHostError(HostStage.HostBootstrap, "host_canvas_outside_root", "The browser host canvas must be contained by its root element.");
         }
