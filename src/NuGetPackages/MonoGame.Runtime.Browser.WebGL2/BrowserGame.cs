@@ -22,6 +22,7 @@ public static partial class BrowserGame
     private static Game? _game;
     private static TaskCompletionSource<bool>? _runCompletion;
     private static bool _mainLoopStarted;
+    private static bool _stopRequested;
 
     /// <summary>
     /// Runs <paramref name="game"/> until it exits, then disposes it.
@@ -37,6 +38,12 @@ public static partial class BrowserGame
         if (_game != null)
         {
             throw new InvalidOperationException("A browser game is already running.");
+        }
+
+        if (_stopRequested)
+        {
+            game.Dispose();
+            return;
         }
 
         TaskCompletionSource<bool> runCompletion = new(TaskCreationOptions.RunContinuationsAsynchronously);
@@ -79,6 +86,13 @@ public static partial class BrowserGame
             NotifyManagedFailure(exception.Message, exception.ToString());
             _runCompletion?.TrySetException(exception);
         }
+    }
+
+    [JSExport]
+    internal static void RequestStop()
+    {
+        _stopRequested = true;
+        _game?.Exit();
     }
 
     [JSExport]
