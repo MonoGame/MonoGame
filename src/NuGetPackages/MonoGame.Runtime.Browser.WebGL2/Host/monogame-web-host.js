@@ -43,7 +43,6 @@ function getCanvasResizePolicy(value) {
  * @property {string=} runtimeScriptUri URI of the .NET browser runtime script.
  * @property {string=} contentBaseUri Base URI used to resolve published content.
  * @property {string=} startupContentManifestUri URI of the startup content manifest.
- * @property {HTMLElement | null=} statusElement Element used for terminal failure text.
  * @property {CanvasResizePolicy} canvasResizePolicy Canvas resize behavior.
  * @property {boolean=} pointerLock Enables the browser Pointer Lock compatibility path.
  * @property {(status: { stage: string, message: string }) => void=} onStatus Receives startup status messages.
@@ -56,14 +55,12 @@ class MonoGameWebHost {
     /**
      * @param {HTMLElement} root Root host element.
      * @param {BrowserHostConfiguration} config Host configuration.
-     * @param {HTMLElement | null} statusElement Host failure element.
      * @param {{ onStatus: Function | null, onFirstFrame: Function | null, onError: Function | null }} callbacks Presentation callbacks.
      */
-    constructor(root, config, statusElement, callbacks) {
+    constructor(root, config, callbacks) {
         this.root = root;
         this.config = config;
         this.root.dataset.canvasResizePolicy = this.config.canvasResizePolicy;
-        this.statusElement = statusElement;
         this.callbacks = callbacks;
         this.runtime = null;
         this.native = null;
@@ -107,11 +104,6 @@ class MonoGameWebHost {
             throw new BrowserHostError(HostStage.HostBootstrap, "host_canvas_outside_root", "The browser host canvas must be contained by its root element.");
         }
 
-        const statusElement = options.statusElement ?? null;
-        if (statusElement != null && !(statusElement instanceof HTMLElement)) {
-            throw new BrowserHostError(HostStage.HostBootstrap, "host_status_element_invalid", "The browser host statusElement must be an HTMLElement.");
-        }
-
         const onStatus = options.onStatus ?? null;
         if (onStatus != null && typeof onStatus !== "function") {
             throw new BrowserHostError(HostStage.HostBootstrap, "configuration_callback_invalid", "The onStatus setting must be a function.");
@@ -150,7 +142,7 @@ class MonoGameWebHost {
                 "A MonoGame.Web host is already active. Wait for it to exit before starting another host.");
         }
 
-        const host = new MonoGameWebHost(root, config, statusElement, callbacks);
+        const host = new MonoGameWebHost(root, config, callbacks);
         activeHost = host;
         void host.startAsync();
         return host;
@@ -422,11 +414,6 @@ class MonoGameWebHost {
                 error instanceof Error ? error.message : String(error),
                 { cause: error });
         const message = `${startupError.stage}: ${startupError.code} - ${startupError.message}`;
-        if (this.statusElement != null) {
-            this.statusElement.hidden = false;
-            this.statusElement.textContent = message;
-        }
-
         console.error("[MonoGame.Web Host]", message, startupError, startupError.cause);
         this.notify(this.callbacks.onError, {
             stage: startupError.stage,
