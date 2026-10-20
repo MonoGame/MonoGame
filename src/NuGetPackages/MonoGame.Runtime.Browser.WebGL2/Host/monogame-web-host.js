@@ -29,7 +29,6 @@ function getCanvasResizePolicy(value) {
  * @property {string} contentBaseUri
  * @property {string} startupContentManifestUri
  * @property {string} runtimeScriptUri
- * @property {string} mainAssemblyName
  * @property {"Adaptive" | "Project" | "None"} canvasResizePolicy
  * @property {boolean} pointerLockEnabled
  */
@@ -40,7 +39,6 @@ function getCanvasResizePolicy(value) {
  * @typedef {object} BrowserHostStartOptions
  * @property {HTMLElement} root Element that contains the game canvas.
  * @property {HTMLCanvasElement} canvas Canvas supplied to the browser runtime.
- * @property {{ assemblyName: string }} managed Managed application entry point.
  * @property {string=} applicationName Application name used for host diagnostics.
  * @property {string=} runtimeScriptUri URI of the .NET browser runtime script.
  * @property {string=} contentBaseUri Base URI used to resolve published content.
@@ -105,16 +103,6 @@ class MonoGameWebHost {
             throw new BrowserHostError(HostStage.HostBootstrap, "host_canvas_outside_root", "The browser host canvas must be contained by its root element.");
         }
 
-        const managed = options.managed;
-        if (managed == null || typeof managed !== "object") {
-            throw new BrowserHostError(HostStage.HostBootstrap, "managed_configuration_invalid", "The browser host requires a managed configuration object.");
-        }
-
-        const assemblyName = managed.assemblyName;
-        if (typeof assemblyName !== "string" || assemblyName.trim().length === 0) {
-            throw new BrowserHostError(HostStage.HostBootstrap, "managed_configuration_invalid", "The managed.assemblyName setting must be a non-empty string.");
-        }
-
         const statusElement = options.statusElement ?? null;
         if (statusElement != null && !(statusElement instanceof HTMLElement)) {
             throw new BrowserHostError(HostStage.HostBootstrap, "host_status_element_invalid", "The browser host statusElement must be an HTMLElement.");
@@ -142,7 +130,6 @@ class MonoGameWebHost {
             contentBaseUri: options.contentBaseUri ?? "./",
             startupContentManifestUri: options.startupContentManifestUri ?? "_monogame/content-manifest.txt",
             runtimeScriptUri: options.runtimeScriptUri ?? "./_framework/dotnet.js",
-            mainAssemblyName: assemblyName,
             canvasResizePolicy: getCanvasResizePolicy(canvasResizePolicy),
             pointerLockEnabled: options.pointerLock ?? false
         };
@@ -293,7 +280,7 @@ class MonoGameWebHost {
      */
     async initializeBrowserGameExportsAsync() {
         this.logStage(HostStage.ManagedExports, "Initializing managed host exports.");
-        const exportsRoot = await this.runtime.getAssemblyExports(this.normalizeAssemblyName(this.config.mainAssemblyName));
+        const exportsRoot = await this.runtime.getAssemblyExports(`${this.getMainAssemblyName()}.dll`);
         const browserGameExports = this.resolveExportPath(exportsRoot, "MonoGame.Runtime.Browser.WebGL2.BrowserGame");
         if (browserGameExports == null) {
             throw new BrowserHostError(HostStage.ManagedExports, "browser_game_exports_missing", "The browser runtime does not expose BrowserGame.");
@@ -314,21 +301,25 @@ class MonoGameWebHost {
      */
     async launchManagedApplicationAsync() {
         this.logStage(HostStage.RuntimeBoundary, "Launching managed application.");
-        const mainAssemblyName = this.normalizeAssemblyName(this.config.mainAssemblyName);
-        const runMainPromise = Promise.resolve(this.runtime.runMain(mainAssemblyName, []));
+        const runMainPromise = Promise.resolve(this.runtime.runMain());
 
         this.logStage(HostStage.RuntimeBoundary, "Managed application launched.");
         await runMainPromise;
     }
 
     /**
-     * Returns the assembly name as a DLL filename.
+     * Gets the application's main assembly from the .NET runtime configuration.
      *
-     * @param {string} assemblyName Managed assembly name.
-     * @returns {string} Assembly filename.
+     * @returns {string} Assembly name.
+     * @throws {BrowserHostError} When the runtime does not expose a main assembly.
      */
-    normalizeAssemblyName(assemblyName) {
-        return assemblyName.endsWith(".dll") ? assemblyName : `${assemblyName}.dll`;
+    getMainAssemblyName() {
+        const mainAssemblyName = this.runtime.getConfig().mainAssemblyName;
+        if (typeof mainAssemblyName !== "string" || mainAssemblyName.trim().length === 0) {
+            throw new BrowserHostError(HostStage.WasmLoad, "runtime_main_assembly_missing", "The .NET runtime configuration does not specify a main assembly.");
+        }
+
+        return mainAssemblyName;
     }
 
     /**
