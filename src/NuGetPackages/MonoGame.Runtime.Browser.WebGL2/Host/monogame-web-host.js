@@ -238,8 +238,8 @@ class MonoGameWebHost {
         }
 
         this.native = this.resolveNativeExports(this.runtime.Module);
+        this.window.configureCanvasSize();
         this.window.configurePointerLock();
-        this.window.observeCanvasSize();
         this.window.observeBrowserLifecycle();
         this.window.observeFullscreen();
         this.window.observeFileDrop(this.native.fileSystem);
@@ -394,6 +394,7 @@ class MonoGameWebHost {
 
         this.firstFrameReported = true;
         this.resolveReady();
+        this.window.observeCanvasSize();
         this.notify(this.callbacks.onFirstFrame, undefined, "onFirstFrame");
     }
 

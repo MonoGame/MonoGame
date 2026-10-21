@@ -23,6 +23,8 @@ export class BrowserWindow {
         this.host = host;
         this.canvas = null;
         this.canvasResizeObserver = null;
+        this.initialCanvasWidth = 0;
+        this.initialCanvasHeight = 0;
         this.eventAbortController = new AbortController();
         this.isDisposed = false;
         this.dropFileSystem = null;
@@ -91,6 +93,13 @@ export class BrowserWindow {
         this.host.native.setPointerLockEnabled(this.host.config.pointerLockEnabled ? 1 : 0);
     }
 
+    /** Prevents SDL browser callbacks from overriding Adaptive canvas sizing. */
+    configureCanvasSize() {
+        if (this.host.config.canvasResizePolicy === CanvasResizePolicy.Adaptive) {
+            this.host.native.setCanvasResizeManaged(1);
+        }
+    }
+
     /**
      * Stops the host when the browser loses the WebGL context.
      *
@@ -110,7 +119,7 @@ export class BrowserWindow {
     }
 
     /**
-     * Forwards device-pixel canvas size changes when the `Adaptive` policy is selected.
+     * Starts forwarding device-pixel canvas size changes after the managed initial presentation when the `Adaptive` policy is selected.
      *
      * @throws {BrowserHostError} When the runtime or browser cannot report canvas size changes.
      */
@@ -119,14 +128,27 @@ export class BrowserWindow {
             return;
         }
 
-        this.host.native.setCanvasResizeManaged(1);
+        const initialCanvasBounds = this.canvas.getBoundingClientRect();
+        this.initialCanvasWidth = Math.round(initialCanvasBounds.width * globalThis.devicePixelRatio);
+        this.initialCanvasHeight = Math.round(initialCanvasBounds.height * globalThis.devicePixelRatio);
 
         const reportCanvasSize = (width, height) => {
             const normalizedWidth = Math.round(width);
             const normalizedHeight = Math.round(height);
-            if (normalizedWidth > 0 && normalizedHeight > 0) {
-                this.host.native?.notifyCanvasResize(normalizedWidth, normalizedHeight);
+            if (normalizedWidth <= 0 || normalizedHeight <= 0) {
+                return;
             }
+
+            if (normalizedWidth === this.initialCanvasWidth
+                && normalizedHeight === this.initialCanvasHeight) {
+                this.initialCanvasWidth = 0;
+                this.initialCanvasHeight = 0;
+                return;
+            }
+
+            this.initialCanvasWidth = 0;
+            this.initialCanvasHeight = 0;
+            this.host.native?.notifyCanvasResize(normalizedWidth, normalizedHeight);
         };
 
         const getDevicePixelContentBoxSize = (entry) => {
@@ -153,6 +175,7 @@ export class BrowserWindow {
             for (const entry of entries) {
                 if (entry.target === this.canvas) {
                     const devicePixelSize = getDevicePixelContentBoxSize(entry);
+
                     if (devicePixelSize != null) {
                         reportCanvasSize(devicePixelSize.inlineSize, devicePixelSize.blockSize);
                     }
