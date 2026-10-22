@@ -197,6 +197,8 @@ namespace MonoGame.Tests.Graphics
 #endif
         public void VertexTextureWorksWhenRebindingEveryFrame()
         {
+            if (OperatingSystem.IsMacOS()) Assert.Ignore("Skipping test due to x64 Rosetta issue for now on MacOS");
+
             SetUpVertexTextureFetch();
 
             var counts = new List<int>();
