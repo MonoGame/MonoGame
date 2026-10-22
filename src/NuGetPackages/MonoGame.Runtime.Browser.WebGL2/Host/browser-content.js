@@ -26,7 +26,7 @@ export class BrowserContent {
      * @returns {Promise<void>} Completes when startup content is available in the virtual filesystem.
      */
     async stageStartupContentAsync() {
-        this.host.logStage(HostStage.ContentStaging, "Staging startup content.");
+        this.host.logStage(HostStage.ContentStaging, "Fetching assets...");
         await this.stageContentManifestAsync(this.host.config.startupContentManifestUri);
         this.host.logStage(HostStage.ContentStaging, "Startup content staged.");
     }
@@ -79,8 +79,13 @@ export class BrowserContent {
     async stageContentPathsAsync(contentPaths, fileSystem) {
         const abortController = new AbortController();
         let nextContentPathIndex = 0;
+        let completedFiles = 0;
         const workerCount = Math.min(MaxConcurrentContentFetches, contentPaths.length);
         const workers = [];
+        this.host.notify(this.host.callbacks.onStatus, {
+            stage: HostStage.ContentStaging,
+            message: `Fetching assets: 0/${contentPaths.length} files`
+        }, "onStatus");
 
         for (let workerIndex = 0; workerIndex < workerCount; workerIndex++) {
             workers.push((async () => {
@@ -105,6 +110,11 @@ export class BrowserContent {
                     }
 
                     fileSystem.writeFile(`/${contentPath}`, contentBytes);
+                    completedFiles++;
+                    this.host.notify(this.host.callbacks.onStatus, {
+                        stage: HostStage.ContentStaging,
+                        message: `Fetching assets: ${completedFiles}/${contentPaths.length} files`
+                    }, "onStatus");
                 }
             })());
         }
