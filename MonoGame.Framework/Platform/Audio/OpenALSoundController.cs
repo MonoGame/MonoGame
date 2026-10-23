@@ -94,7 +94,7 @@ namespace Microsoft.Xna.Framework.Audio
         private const int DEFAULT_UPDATE_BUFFER_COUNT = 2;
 #endif
         private List<int> availableSourcesCollection;
-        private List<int> inUseSourcesCollection;
+        private HashSet<int> inUseSourcesCollection;
         bool _isDisposed;
         public bool SupportsIma4 { get; private set; }
         public bool SupportsAdpcm { get; private set; }
@@ -129,7 +129,7 @@ namespace Microsoft.Xna.Framework.Audio
                 Filter = Efx.GenFilter();
             }
             availableSourcesCollection = new List<int>(allSourcesArray);
-			inUseSourcesCollection = new List<int>();
+			inUseSourcesCollection = new HashSet<int>();
 		}
 
         ~OpenALSoundController()
@@ -411,9 +411,10 @@ namespace Microsoft.Xna.Framework.Audio
                     throw new InstancePlayLimitException();
                 }
 
-                sourceNumber = availableSourcesCollection.Last();
+                int lastIndex = availableSourcesCollection.Count - 1;
+                sourceNumber = availableSourcesCollection[lastIndex];
                 inUseSourcesCollection.Add(sourceNumber);
-                availableSourcesCollection.Remove(sourceNumber);
+                availableSourcesCollection.RemoveAt(lastIndex);
             }
 
             return sourceNumber;
