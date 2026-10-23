@@ -10,7 +10,7 @@ namespace Microsoft.Xna.Framework.Graphics
     /// Represents a collection of <see cref="SamplerState"/> objects,
     /// </summary>
     public sealed partial class SamplerStateCollection
-	{
+    {
         private readonly GraphicsDevice _graphicsDevice;
 
         private readonly SamplerState _samplerStateAnisotropicClamp;
@@ -24,7 +24,18 @@ namespace Microsoft.Xna.Framework.Graphics
         private readonly SamplerState[] _actualSamplers;
         private readonly ShaderStage _stage;
 
-		internal SamplerStateCollection(GraphicsDevice device, int maxSamplers, ShaderStage stage)
+        /// <summary>
+        /// Amount of samplers
+        /// </summary>
+        public int Count
+        {
+            get
+            {
+                return _samplers.Length;
+            }
+        }
+
+        internal SamplerStateCollection(GraphicsDevice device, int maxSamplers, ShaderStage stage)
 		{
 		    _graphicsDevice = device;
 
