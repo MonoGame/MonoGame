@@ -121,6 +121,26 @@ namespace MonoGame.OpenAL
     internal enum AlcGetInteger
     {
         CaptureSamples = 0x0312,
+        Connected = 0x0313,
+    }
+
+    internal enum AlcDeviceType
+    {
+        PlaybackDevice = 0x19D4,
+        CaptureDevice = 0x19D5,
+    }
+
+    internal enum AlcEventType
+    {
+        DefaultDeviceChanged = 0x19D6,
+        DeviceAdded = 0x19D7,
+        DeviceRemoved = 0x19D8,
+    }
+
+    internal enum AlcEventSupport
+    {
+        Supported = 0x19D9,
+        NotSupported = 0x19DA,
     }
 
     internal enum EfxFilteri
@@ -579,6 +599,76 @@ namespace MonoGame.OpenAL
         [DllImport(AL.LibraryName, CallingConvention = CallingConvention.Cdecl)]
         internal static extern void alcDeviceResumeSOFT(IntPtr device);
         internal static void DeviceResume(IntPtr device) => alcDeviceResumeSOFT(device);
+#endif
+
+#if DESKTOPGL || ANGLE
+        // ALC_SOFT_system_events extension - for device change detection
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        internal delegate void AlcEventCallback(int eventType, int deviceType, IntPtr device, int messageLength, string message, IntPtr userParam);
+
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        internal delegate int AlcEventIsSupportedDelegate(int eventType, int deviceType);
+
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        internal delegate bool AlcEventControlDelegate(int count, int[] events, bool enable);
+
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        internal delegate void AlcEventCallbackDelegate(AlcEventCallback callback, IntPtr userParam);
+
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        internal delegate bool AlcReopenDeviceDelegate(IntPtr device, string deviceName, int[] attribs);
+
+        internal static AlcEventIsSupportedDelegate EventIsSupported;
+        internal static AlcEventControlDelegate EventControl;
+        internal static AlcEventCallbackDelegate EventCallback;
+        internal static AlcReopenDeviceDelegate ReopenDevice;
+
+        private static IntPtr GetProcAddress(params string[] functionNames)
+        {
+            foreach (var functionName in functionNames)
+            {
+                var procAddress = AL.alGetProcAddress(functionName);
+                if (procAddress != IntPtr.Zero)
+                    return procAddress;
+            }
+
+            return IntPtr.Zero;
+        }
+
+        internal static bool TryLoadDeviceChangeFunctions()
+        {
+            if (EventIsSupported != null
+                && EventControl != null
+                && EventCallback != null
+                && ReopenDevice != null)
+            {
+                return true;
+            }
+
+            var eventIsSupported = GetProcAddress("alcEventIsSupportedSOFT", "alEventIsSupportedSOFT");
+            var eventControl = GetProcAddress("alcEventControlSOFT", "alEventControlSOFT");
+            var eventCallback = GetProcAddress("alcEventCallbackSOFT", "alEventCallbackSOFT");
+            var reopenDevice = GetProcAddress("alcReopenDeviceSOFT", "alReopenDeviceSOFT");
+
+            if (eventIsSupported == IntPtr.Zero
+                || eventControl == IntPtr.Zero
+                || eventCallback == IntPtr.Zero
+                || reopenDevice == IntPtr.Zero)
+            {
+                EventIsSupported = null;
+                EventControl = null;
+                EventCallback = null;
+                ReopenDevice = null;
+                return false;
+            }
+
+            EventIsSupported = Marshal.GetDelegateForFunctionPointer<AlcEventIsSupportedDelegate>(eventIsSupported);
+            EventControl = Marshal.GetDelegateForFunctionPointer<AlcEventControlDelegate>(eventControl);
+            EventCallback = Marshal.GetDelegateForFunctionPointer<AlcEventCallbackDelegate>(eventCallback);
+            ReopenDevice = Marshal.GetDelegateForFunctionPointer<AlcReopenDeviceDelegate>(reopenDevice);
+
+            return true;
+        }
 #endif
     }
 
