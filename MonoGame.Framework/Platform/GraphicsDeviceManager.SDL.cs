@@ -76,15 +76,28 @@ namespace Microsoft.Xna.Framework
                 // Otherwise, just use the previous value (which by default would be 32 if PreferMultiSampling is true).
                 if (temporaryWindowHandle != IntPtr.Zero)
                 {
-                    var temporaryGLContext = Sdl.GL.CreateContext(temporaryWindowHandle);
+                    try
+                    {
+                        var temporaryGLContext = Sdl.GL.CreateContext(temporaryWindowHandle);
 
-                    var glMaxSamples = GL.GetMaxSamples();
-                    multiSampleCount = Math.Min(glMaxSamples, multiSampleCount);
-
-                    Sdl.GL.DeleteContext(temporaryGLContext);
-
-                    // We need to destroy the locally-created temporary window instead of leaking it.
-                    Sdl.Window.Destroy(temporaryWindowHandle);
+                        if (temporaryGLContext != IntPtr.Zero)
+                        {
+                            try
+                            {
+                                var glMaxSamples = GL.GetMaxSamples();
+                                multiSampleCount = Math.Min(glMaxSamples, multiSampleCount);
+                            }
+                            finally
+                            {
+                                Sdl.GL.DeleteContext(temporaryGLContext);
+                            }
+                        }
+                    }
+                    finally
+                    {
+                        // We need to destroy the locally-created temporary window instead of leaking it.
+                        Sdl.Window.Destroy(temporaryWindowHandle);
+                    }
                 }
 
                 // Only set the multisampling attributes if GL_MAX_SAMPLES was above 0.
