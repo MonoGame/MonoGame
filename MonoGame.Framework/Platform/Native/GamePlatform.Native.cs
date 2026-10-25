@@ -377,6 +377,7 @@ class NativeGamePlatform : GamePlatform
             PollEvents();
 
         Accelerometer.PlatformUpdate();
+        KeyboardInput.PlatformUpdate();
 
         return MGP.Platform_BeforeUpdate(Handle) == 0 ? false : true;
     }
@@ -414,6 +415,7 @@ class NativeGamePlatform : GamePlatform
 
     protected unsafe override void Dispose(bool disposing)
     {
+        KeyboardInput.PlatformDispose();
         if (_window != null)
         {
             _window.Destroy();

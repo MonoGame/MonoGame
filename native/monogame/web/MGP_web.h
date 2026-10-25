@@ -6,6 +6,10 @@
 
 #include "api_MGP.h"
 
+mgbyte MGP_Web_KeyboardInput_Show(const char* title, const char* description, const char* defaultText, mgbyte password);
+mgbyte MGP_Web_KeyboardInput_GetResult(void*& result, mgbyte& cancelled);
+void MGP_Web_KeyboardInput_Cancel();
+
 void MGP_Web_OnPlatformDestroyed(MGP_Platform* platform);
 void MGP_Web_OnWindowCreated(MGP_Window* window);
 void MGP_Web_OnNativeWindowDestroyed(MGP_Window* window);

@@ -28,6 +28,39 @@ struct MGP_Platform
     std::map<mgint, SDL_GameController*> controllers;
 };
 
+// TODO: Implementation is for web only, other platforms this is stub
+//       Implement android/ios if/when those platforms are moved to native.
+MG_EXPORT mgbyte MGP_KeyboardInput_Show(const char* title, const char* description, const char* defaultText, mgbyte password)
+{
+#if defined(__EMSCRIPTEN__)
+    return MGP_Web_KeyboardInput_Show(title, description, defaultText, password);
+#else
+    return 0;
+#endif
+}
+
+// TODO: Implementation is for web only, other platforms this is stub
+//       Implement android/ios if/when those platforms are moved to native.
+MG_EXPORT mgbyte MGP_KeyboardInput_GetResult(void*& result, mgbyte& cancelled)
+{
+#if defined(__EMSCRIPTEN__)
+    return MGP_Web_KeyboardInput_GetResult(result, cancelled);
+#else
+    result = nullptr;
+    cancelled = 1;
+    return 0;
+#endif
+}
+
+// TODO: Implementation is for web only, other platforms this is stub
+//       Implement android/ios if/when those platforms are moved to native.
+MG_EXPORT void MGP_KeyboardInput_Cancel()
+{
+#if defined(__EMSCRIPTEN__)
+    MGP_Web_KeyboardInput_Cancel();
+#endif
+}
+
 static std::map<int, MGKeys> s_keymap
 {
     { 8, MGKeys::Back },
@@ -1002,15 +1035,15 @@ static mgbyte MGP_Window_CreateNativeWindowInternal(
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
 #endif
     SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
-    SDL_GL_SetAttribute(SDL_GL_RED_SIZE, windowCreateInfo != nullptr ? windowCreateInfo->redSize : 8);
-    SDL_GL_SetAttribute(SDL_GL_GREEN_SIZE, windowCreateInfo != nullptr ? windowCreateInfo->greenSize : 8);
-    SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE, windowCreateInfo != nullptr ? windowCreateInfo->blueSize : 8);
-    SDL_GL_SetAttribute(SDL_GL_ALPHA_SIZE, windowCreateInfo != nullptr ? windowCreateInfo->alphaSize : 8);
-    SDL_GL_SetAttribute(SDL_GL_FRAMEBUFFER_SRGB_CAPABLE, windowCreateInfo != nullptr ? windowCreateInfo->framebufferSrgbCapable : 0);
-    SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, windowCreateInfo != nullptr ? windowCreateInfo->depthSize : 24);
-    SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, windowCreateInfo != nullptr ? windowCreateInfo->stencilSize : 8);
-    SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, windowCreateInfo != nullptr ? windowCreateInfo->multiSampleBuffers : 0);
-    SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, windowCreateInfo != nullptr ? windowCreateInfo->multiSampleSamples : 0);
+    SDL_GL_SetAttribute(SDL_GL_RED_SIZE, windowCreateInfo != nullptr ? windowCreateInfo->RedSize : 8);
+    SDL_GL_SetAttribute(SDL_GL_GREEN_SIZE, windowCreateInfo != nullptr ? windowCreateInfo->GreenSize : 8);
+    SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE, windowCreateInfo != nullptr ? windowCreateInfo->BlueSize : 8);
+    SDL_GL_SetAttribute(SDL_GL_ALPHA_SIZE, windowCreateInfo != nullptr ? windowCreateInfo->AlphaSize : 8);
+    SDL_GL_SetAttribute(SDL_GL_FRAMEBUFFER_SRGB_CAPABLE, windowCreateInfo != nullptr ? windowCreateInfo->FramebufferSrgbCapable : 0);
+    SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, windowCreateInfo != nullptr ? windowCreateInfo->DepthSize : 24);
+    SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, windowCreateInfo != nullptr ? windowCreateInfo->StencilSize : 8);
+    SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, windowCreateInfo != nullptr ? windowCreateInfo->MultiSampleBuffers : 0);
+    SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, windowCreateInfo != nullptr ? windowCreateInfo->MultiSampleSamples : 0);
     SDL_GL_SetAttribute(SDL_GL_ACCELERATED_VISUAL, 1);
 #if defined(__APPLE__) && !defined(__EMSCRIPTEN__)
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_FLAGS, SDL_GL_CONTEXT_FORWARD_COMPATIBLE_FLAG);
@@ -1055,7 +1088,7 @@ MGP_Window* MGP_Window_Create(
     mgint& width,
     mgint& height,
     const char* title,
-    const MGP_WindowCreateInfo* windowCreateInfo)
+    MGP_WindowCreateInfo* windowCreateInfo)
 {
     assert(platform != nullptr);
     assert(width > 0);
@@ -1083,7 +1116,7 @@ mgbyte MGP_Window_CreateNativeWindow(
     mgint& width,
     mgint& height,
     const char* title,
-    const MGP_WindowCreateInfo* windowCreateInfo)
+    MGP_WindowCreateInfo* windowCreateInfo)
 {
     assert(window != nullptr);
     return MGP_Window_CreateNativeWindowInternal(window, width, height, title, windowCreateInfo);
@@ -1094,7 +1127,7 @@ mgbyte MGP_Window_BeginRecreateNativeWindow(
     mgint& width,
     mgint& height,
     const char* title,
-    const MGP_WindowCreateInfo* windowCreateInfo)
+    MGP_WindowCreateInfo* windowCreateInfo)
 {
     assert(window != nullptr);
     assert(window->window != nullptr);

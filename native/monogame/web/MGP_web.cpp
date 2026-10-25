@@ -15,6 +15,58 @@
 static MGP_Platform* s_platform = nullptr;
 static bool s_browserHostControlsResize = false;
 static bool s_pointerLockEnabled = false;
+static bool s_keyboardInputReady = false;
+static bool s_keyboardInputCancelled = false;
+static std::string s_keyboardInputResult;
+
+EM_JS(mgbyte, MGP_Web_ShowKeyboardInput, (const char* title, const char* description, const char* defaultText, mgbyte password),
+{
+    const host = globalThis.MonoGameWebHost?.getActiveHost();
+    if (!host || host.isDisposed)
+        return 0;
+
+    return host.keyboard.show(UTF8ToString(title), UTF8ToString(description), UTF8ToString(defaultText), password !== 0) ? 1 : 0;
+});
+
+EM_JS(void, MGP_Web_CancelKeyboardInput, (),
+{
+    globalThis.MonoGameWebHost?.getActiveHost()?.keyboard.cancel();
+});
+
+mgbyte MGP_Web_KeyboardInput_Show(const char* title, const char* description, const char* defaultText, mgbyte password)
+{
+    s_keyboardInputReady = false;
+    s_keyboardInputResult.clear();
+    return MGP_Web_ShowKeyboardInput(title ? title : "", description ? description : "", defaultText ? defaultText : "", password);
+}
+
+extern "C" EMSCRIPTEN_KEEPALIVE void MGP_Web_CompleteKeyboardInput(const char* result, mgbyte cancelled)
+{
+    s_keyboardInputResult = result ? result : "";
+    s_keyboardInputCancelled = cancelled != 0;
+    s_keyboardInputReady = true;
+}
+
+mgbyte MGP_Web_KeyboardInput_GetResult(void*& result, mgbyte& cancelled)
+{
+    result = nullptr;
+    cancelled = 1;
+    if (!s_keyboardInputReady)
+        return 0;
+
+    s_keyboardInputReady = false;
+    // Managed code copies this UTF-8 string before the next request can replace it.
+    result = const_cast<char*>(s_keyboardInputResult.c_str());
+    cancelled = s_keyboardInputCancelled ? 1 : 0;
+    return 1;
+}
+
+void MGP_Web_KeyboardInput_Cancel()
+{
+    MGP_Web_CancelKeyboardInput();
+    s_keyboardInputReady = false;
+    s_keyboardInputResult.clear();
+}
 
 struct MGP_WebWindowState
 {

@@ -283,6 +283,19 @@ union {
 };
 #pragma pack(pop)
 
+struct MGP_WindowCreateInfo
+{
+    mgint RedSize;
+    mgint GreenSize;
+    mgint BlueSize;
+    mgint AlphaSize;
+    mgint FramebufferSrgbCapable;
+    mgint DepthSize;
+    mgint StencilSize;
+    mgint MultiSampleBuffers;
+    mgint MultiSampleSamples;
+};
+
 struct MGP_ControllerCaps
 {
     void* Identifier;
@@ -293,3 +306,4 @@ struct MGP_ControllerCaps
     mgbool HasRightVibrationMotor;
     mgbool HasVoiceSupport;
 };
+

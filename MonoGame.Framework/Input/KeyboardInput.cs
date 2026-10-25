@@ -34,11 +34,15 @@ namespace Microsoft.Xna.Framework.Input
 
             IsVisible = true;
 
-            var result = await PlatformShow(title, description, defaultText, usePasswordMode);
-
-            IsVisible = false;
-
-            return result;
+            // PlatformShow can throw which can leave IsVisible in a true state if not handled
+            try
+            {
+                return await PlatformShow(title, description, defaultText, usePasswordMode);
+            }
+            finally
+            {
+                IsVisible = false;
+            }
         }
 
         /// <summary>

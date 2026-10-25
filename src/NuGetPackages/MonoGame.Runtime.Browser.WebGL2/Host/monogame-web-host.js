@@ -5,6 +5,7 @@
 import { BrowserAudio } from "./browser-audio.js";
 import { BrowserAccelerometer } from "./browser-accelerometer.js";
 import { BrowserContent } from "./browser-content.js";
+import { BrowserKeyboard } from "./browser-keyboard.js";
 import { BrowserHostError, CanvasResizePolicy, HostStage } from "./browser-host-common.js";
 import { BrowserWindow } from "./browser-window.js";
 
@@ -26,6 +27,7 @@ function getCanvasResizePolicy(value) {
  * @typedef {object} BrowserHostConfiguration
  * @property {string} applicationName
  * @property {HTMLCanvasElement} canvas
+ * @property {HTMLDialogElement | null} keyboardDialog
  * @property {string} contentBaseUri
  * @property {string} startupContentManifestUri
  * @property {string} runtimeScriptUri
@@ -47,6 +49,7 @@ function getCanvasResizePolicy(value) {
  * @typedef {object} BrowserHostStartOptions
  * @property {HTMLElement} root Element that contains the game canvas.
  * @property {HTMLCanvasElement} canvas Canvas supplied to the browser runtime.
+ * @property {HTMLDialogElement=} keyboardDialog Application owned dialog inside root with marked title, description, input, and cancel elements and a form. Omit when keyboard dialogs are unsupported.
  * @property {string=} applicationName Application name used for host diagnostics.
  * @property {string=} runtimeScriptUri URI of the .NET browser runtime script.
  * @property {string=} contentBaseUri Base URI used to resolve published content.
@@ -89,6 +92,7 @@ class MonoGameWebHost {
         this.accelerometer = new BrowserAccelerometer(this);
         this.audio = new BrowserAudio(this);
         this.content = new BrowserContent(this);
+        this.keyboard = new BrowserKeyboard(this);
     }
 
     /**
@@ -143,7 +147,8 @@ class MonoGameWebHost {
             startupContentManifestUri: options.startupContentManifestUri ?? "_monogame/content-manifest.txt",
             runtimeScriptUri: options.runtimeScriptUri ?? "./_framework/dotnet.js",
             canvasResizePolicy: getCanvasResizePolicy(canvasResizePolicy),
-            pointerLockEnabled: options.pointerLock ?? false
+            pointerLockEnabled: options.pointerLock ?? false,
+            keyboardDialog: options.keyboardDialog ?? null
         };
         const callbacks = {
             onStatus,
@@ -264,6 +269,7 @@ class MonoGameWebHost {
             _MGP_Web_NotifyCanvasResize: module._MGP_Web_NotifyCanvasResize,
             _MGP_Web_NotifyFileDrop: module._MGP_Web_NotifyFileDrop,
             _MGP_Web_NotifyFileDropComplete: module._MGP_Web_NotifyFileDropComplete,
+            _MGP_Web_CompleteKeyboardInput: module._MGP_Web_CompleteKeyboardInput,
             _MGP_Web_NotifyFocusChange: module._MGP_Web_NotifyFocusChange,
             _MGP_Web_NotifyFullscreenChange: module._MGP_Web_NotifyFullscreenChange,
             _MGP_Web_NotifyFullscreenFailure: module._MGP_Web_NotifyFullscreenFailure,
@@ -299,6 +305,7 @@ class MonoGameWebHost {
             notifyCanvasResize: module._MGP_Web_NotifyCanvasResize.bind(module),
             notifyFileDrop: (filePath) => module.ccall("MGP_Web_NotifyFileDrop", null, ["string"], [filePath]),
             notifyFileDropComplete: module._MGP_Web_NotifyFileDropComplete.bind(module),
+            completeKeyboardInput: (text, cancelled) => module.ccall("MGP_Web_CompleteKeyboardInput", null, ["string", "number"], [text, cancelled]),
             notifyFocusChange: module._MGP_Web_NotifyFocusChange.bind(module),
             notifyFullscreenChange: module._MGP_Web_NotifyFullscreenChange.bind(module),
             notifyFullscreenFailure: module._MGP_Web_NotifyFullscreenFailure.bind(module),
@@ -457,6 +464,7 @@ class MonoGameWebHost {
         this.window.dispose();
         this.accelerometer.dispose();
         this.audio.dispose();
+        this.keyboard.dispose();
         this.browserGameExports = null;
         this.native = null;
         this.runtime = null;

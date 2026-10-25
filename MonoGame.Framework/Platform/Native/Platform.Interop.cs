@@ -315,6 +315,15 @@ internal static unsafe partial class MGP
 
     #region Window
 
+    [DllImport(MonoGameNativeDLL, EntryPoint = "MGP_KeyboardInput_Show", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern byte KeyboardInput_Show([MarshalAs(UnmanagedType.LPUTF8Str)] string title, [MarshalAs(UnmanagedType.LPUTF8Str)] string description, [MarshalAs(UnmanagedType.LPUTF8Str)] string defaultText, byte password);
+
+    [DllImport(MonoGameNativeDLL, EntryPoint = "MGP_KeyboardInput_GetResult", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern byte KeyboardInput_GetResult(out nint result, out byte cancelled);
+
+    [DllImport(MonoGameNativeDLL, EntryPoint = "MGP_KeyboardInput_Cancel", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void KeyboardInput_Cancel();
+
     [DllImport(MonoGameNativeDLL, EntryPoint = "MGP_Window_Create", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
     private static extern MGP_Window* _Window_Create(
         MGP_Platform* platform,

@@ -271,16 +271,6 @@ enum class MGProcessorType : mguint
     ZeroTransparentPixels = 1,
 };
 
-enum class MGSensorState : mgint
-{
-    NotSupported = 0,
-    Ready = 1,
-    Initializing = 2,
-    NoData = 3,
-    NoPermissions = 4,
-    Disabled = 5,
-};
-
 enum class MGSongEventType : mgint
 {
     Completed = 0,
@@ -567,6 +557,16 @@ enum class MGSystemCursor : mgint
     SizeAll = 9,
     No = 10,
     Hand = 11,
+};
+
+enum class MGSensorState : mgint
+{
+    NotSupported = 0,
+    Ready = 1,
+    Initializing = 2,
+    NoData = 3,
+    NoPermissions = 4,
+    Disabled = 5,
 };
 
 enum class MGGamePadType : mgint
