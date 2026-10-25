@@ -2,6 +2,8 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
+using System.Diagnostics.CodeAnalysis;
+
 namespace MonoGame.Framework;
 
 /// <summary>
@@ -13,6 +15,7 @@ namespace MonoGame.Framework;
 /// Platform backends read these values before or during device initialization.
 /// </para>
 /// </remarks>
+[Experimental(DiagnosticIds.PlatformConfiguration.DiagnosticId, UrlFormat = DiagnosticIds.PlatformConfiguration.UrlFormat)]
 public static partial class PlatformConfiguration
 {
 }

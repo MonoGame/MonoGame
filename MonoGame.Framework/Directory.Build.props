@@ -9,6 +9,7 @@
     <AssemblyName>MonoGame.Framework</AssemblyName>
     <RootNamespace>Microsoft.Xna.Framework</RootNamespace>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <NoWarn>$(NoWarn);mg_exp_9382</NoWarn>
   </PropertyGroup>
 
 </Project>
