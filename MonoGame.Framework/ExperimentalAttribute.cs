@@ -16,7 +16,7 @@ internal sealed class ExperimentalAttribute(string diagnosticId) : Attribute
 
 internal static class DiagnosticIds
 {
-    private const string DiagnosticIdPrefix = "mg_exp_";
+    private const string DiagnosticIdPrefix = "MG_EXP_";
     private const string BaseUrl = "https://github.com/MonoGame/MonoGame/issues/";
 
     internal static class PlatformConfiguration
