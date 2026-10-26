@@ -1,4 +1,4 @@
-﻿// MonoGame - Copyright (C) MonoGame Foundation, Inc
+// MonoGame - Copyright (C) MonoGame Foundation, Inc
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
@@ -116,6 +116,28 @@ namespace MonoGame.Tests.Input
             var state = new GamePadState(Vector2.Zero, Vector2.Zero, leftTrigger: 0f, rightTrigger: 1.0f, button: (Buttons.RightTrigger));
             Assert.IsTrue(state.IsButtonDown(Buttons.RightTrigger));
         }
+
+#if NATIVE
+        [TestCase(Buttons.LeftTrigger, 0f, false)]
+        [TestCase(Buttons.LeftTrigger, 29f / 255f, false)]
+        [TestCase(Buttons.LeftTrigger, 30f / 255f, true)]
+        [TestCase(Buttons.LeftTrigger, 1.0f, true)]
+        [TestCase(Buttons.RightTrigger, 0f, false)]
+        [TestCase(Buttons.RightTrigger, 29f / 255f, false)]
+        [TestCase(Buttons.RightTrigger, 30f / 255f, true)]
+        [TestCase(Buttons.RightTrigger, 1.0f, true)]
+        public void TestTriggerButtonThreshold(Buttons triggerButton, float triggerValue, bool expectedPressed)
+        {
+            var buttons = GamePad.UpdateTriggerButton(Buttons.None, triggerValue, triggerButton);
+            bool isPressed = buttons.HasFlag(triggerButton);
+            Assert.AreEqual(expectedPressed, isPressed);
+
+            var buttonsReleased = GamePad.UpdateTriggerButton(buttons, 0f, triggerButton);
+            bool isStillPressed = buttonsReleased.HasFlag(triggerButton);
+            Assert.IsFalse(isStillPressed);
+
+        }
+#endif
 
         #endregion
 
