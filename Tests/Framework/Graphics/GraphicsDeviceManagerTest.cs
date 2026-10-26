@@ -454,9 +454,7 @@ namespace MonoGame.Tests.Graphics
         [Test]
         [TestCase(false)]
         [TestCase(true)]
-#if DESKTOPGL
-        [RunOnUI]
-#elif DESKTOPGL4
+#if DESKTOPGL4
         [Ignore("OpenGL backbuffer MSAA is not implemented yet for the native backend")]
 #endif
         public void MSAAEnabled(bool enabled)
