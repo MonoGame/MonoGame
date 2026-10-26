@@ -87,6 +87,17 @@ namespace MonoGame.OpenGL
             _disposed = true;
         }
 
+        internal void DisposeImmediately()
+        {
+            if (_disposed)
+                return;
+
+            Sdl.GL.MakeCurrent(_winHandle, IntPtr.Zero);
+            Sdl.GL.DeleteContext(_context);
+            _context = IntPtr.Zero;
+            _disposed = true;
+        }
+
         private void SetWindowHandle(IWindowInfo info)
         {
             if (info == null)
