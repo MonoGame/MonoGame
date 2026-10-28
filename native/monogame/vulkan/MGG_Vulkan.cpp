@@ -2394,6 +2394,12 @@ static void MGVK_DestroyTargetSets(MGG_GraphicsDevice* device, std::function<boo
 			itr++;
 		else
 		{
+			if (device->pipelineState.targets == itr->second)
+			{
+				device->pipelineState.targets = nullptr;
+				device->renderTargetDirty = true;
+			}
+
             for (int i = 0; i < MGVK_NUM_TARGETS; ++i) {
                 auto& view = itr->second->arraySlicesViews[i];
                 if (view.has_value()) {
@@ -2406,8 +2412,6 @@ static void MGVK_DestroyTargetSets(MGG_GraphicsDevice* device, std::function<boo
 			cache.erase(itr++);
 		}
 	}
-
-	device->pipelineState.targets = nullptr;
 }
 
 static void MGVK_DestroyPipelines(MGG_GraphicsDevice* device, std::function<bool(const MGVK_PipelineState&)> compare)
@@ -5381,8 +5385,39 @@ void MGG_Texture_Destroy(MGG_GraphicsDevice* device, MGG_Texture* texture)
 		// Wait for the device to be idle to safely destroy views before the external caller destroys the underlying VkImage.
 		vkDeviceWaitIdle(device->device);
 
+		// Unbind it from any texture slots so they don't keep a dangling pointer to it.
+		for (int stage = 0; stage < static_cast<mgint>(MGShaderStage::Count); stage++)
+		{
+			for (int slot = 0; slot < MAX_TEXTURE_SLOTS; slot++)
+			{
+				if (device->textures[stage][slot] == texture)
+				{
+					MGG_GraphicsDevice_SetTexture(device, static_cast<MGShaderStage>(stage), slot, nullptr);
+				}
+			}
+		}
+
 		if (texture->isTarget)
 		{
+			// If the texture is still bound to a render target,
+			// prevent it from keeping a dangling pointer to it.
+			bool is_bound = false;
+			for (auto& target : device->targets.targets)
+			{
+				if (target == texture)
+				{
+					is_bound = true;
+					target = nullptr;
+				}
+			}
+
+			if (is_bound)
+			{
+				// End the pass that renders to it, and rebind the backbuffer.
+				MGVK_EndRenderPass(device, device->frames[device->frameIndex].commandBuffer);
+				MGG_GraphicsDevice_SetRenderTargets(device, nullptr, nullptr, 0);
+			}
+
 			MGVK_DestroyPipelines(device, [texture](const MGVK_PipelineState& s)
 				{
 					for (int i = 0; i < s.targets->set.numTargets; i++)
@@ -5406,11 +5441,6 @@ void MGG_Texture_Destroy(MGG_GraphicsDevice* device, MGG_Texture* texture)
 					}
 					return false;
 				});
-
-			if (device->pipelineState.targets && device->pipelineState.targets->set.targets[0] == texture)
-			{
-				device->pipelineState.targets = nullptr;
-			}
 		}
 
 		if (texture->target_view != VK_NULL_HANDLE)
