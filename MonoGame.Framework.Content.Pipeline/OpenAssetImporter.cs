@@ -201,6 +201,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
             }
         }
 
+        private static readonly object _assimpInitLock = new();
         private static readonly List<VectorKey> EmptyVectorKeys = [];
         private static readonly List<QuaternionKey> EmptyQuaternionKeys = [];
 
@@ -263,40 +264,47 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
 
             _context = context;
 
-            if (!AssimpLibrary.Instance.IsLibraryLoaded)
+            lock (_assimpInitLock)
             {
-                // try loading from the BaseDirectory first for Release apps.
-                var path = Path.Combine(AppContext.BaseDirectory, AssimpLibrary.Instance.DefaultLibraryName);
-                if (File.Exists(path))
+                var wasLoaded = AssimpLibrary.Instance.IsLibraryLoaded;
+                if (!AssimpLibrary.Instance.IsLibraryLoaded)
                 {
+                    // try loading from the BaseDirectory first for Release apps.
+                    var path = Path.Combine(AppContext.BaseDirectory, AssimpLibrary.Instance.DefaultLibraryName);
+                    if (File.Exists(path))
+                    {
+                        _context.Logger.Log(LogLevel.Info, $"Loading assimp from {path}");
+                        AssimpLibrary.Instance.LoadLibrary(path);
+                    }
+                }
+
+                if (CurrentPlatform.OS == OS.Linux && !AssimpLibrary.Instance.IsLibraryLoaded)
+                {
+                    var path = Path.Combine(AppContext.BaseDirectory, "runtimes", CurrentPlatform.Rid, "native", AssimpLibrary.Instance.DefaultLibraryName);
                     _context.Logger.Log(LogLevel.Info, $"Loading assimp from {path}");
                     AssimpLibrary.Instance.LoadLibrary(path);
                 }
-            }
+                if (CurrentPlatform.OS == OS.MacOSX && !AssimpLibrary.Instance.IsLibraryLoaded)
+                {
+                    var path = Path.Combine(AppContext.BaseDirectory, "runtimes", CurrentPlatform.Rid, "native", AssimpLibrary.Instance.DefaultLibraryName);
+                    _context.Logger.Log(LogLevel.Info, $"Loading assimp from {path}");
+                    AssimpLibrary.Instance.LoadLibrary(path);
+                }
+                if (CurrentPlatform.OS == OS.Windows && !AssimpLibrary.Instance.IsLibraryLoaded)
+                {
+                    var path = Path.Combine(AppContext.BaseDirectory, "runtimes", CurrentPlatform.Rid, "native", AssimpLibrary.Instance.DefaultLibraryName);
+                    _context.Logger.Log(LogLevel.Info, $"Loading assimp from {path}");
+                    AssimpLibrary.Instance.LoadLibrary(path);
+                }
 
-            if (CurrentPlatform.OS == OS.Linux && !AssimpLibrary.Instance.IsLibraryLoaded)
-            {
-                var path = Path.Combine(AppContext.BaseDirectory, "runtimes", CurrentPlatform.Rid, "native", AssimpLibrary.Instance.DefaultLibraryName);
-                _context.Logger.Log(LogLevel.Info, $"Loading assimp from {path}");
-                AssimpLibrary.Instance.LoadLibrary(path);
+                var v = AssimpLibrary.Instance.GetVersionAsVersion();
+                _context.Logger.Log(LogLevel.Info, $"{AssimpLibrary.Instance.DefaultLibraryName} v{v.Major}.{v.Minor}.{v.Build}.{v.Revision} from {AssimpLibrary.Instance.LibraryPath}");
+                _context.Logger.Log(LogLevel.Info, $"{AssimpLibrary.Instance.GetBranchName()}");
+                if (!wasLoaded)
+                {
+                    AssimpLibrary.Instance.EnableVerboseLogging(true);
+                }
             }
-            if (CurrentPlatform.OS == OS.MacOSX && !AssimpLibrary.Instance.IsLibraryLoaded)
-            {
-                var path = Path.Combine(AppContext.BaseDirectory, "runtimes", CurrentPlatform.Rid, "native", AssimpLibrary.Instance.DefaultLibraryName);
-                _context.Logger.Log(LogLevel.Info, $"Loading assimp from {path}");
-                AssimpLibrary.Instance.LoadLibrary(path);
-            }
-            if (CurrentPlatform.OS == OS.Windows && !AssimpLibrary.Instance.IsLibraryLoaded)
-            {
-                var path = Path.Combine(AppContext.BaseDirectory, "runtimes", CurrentPlatform.Rid, "native", AssimpLibrary.Instance.DefaultLibraryName);
-                _context.Logger.Log(LogLevel.Info, $"Loading assimp from {path}");
-                AssimpLibrary.Instance.LoadLibrary(path);
-            }
-
-            var v = AssimpLibrary.Instance.GetVersionAsVersion();
-            _context.Logger.Log(LogLevel.Info, $"{AssimpLibrary.Instance.DefaultLibraryName} v{v.Major}.{v.Minor}.{v.Build}.{v.Revision} from {AssimpLibrary.Instance.LibraryPath}");
-            _context.Logger.Log(LogLevel.Info, $"{AssimpLibrary.Instance.GetBranchName()}");
-            AssimpLibrary.Instance.EnableVerboseLogging(true);
 
             _identity = new ContentIdentity(filename, _importerName);
 

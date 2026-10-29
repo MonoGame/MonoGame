@@ -10,6 +10,7 @@ class ContentCache : IContentCache
 {
     private const string CacheFileName = "cache.yaml";
 
+    private readonly object _cacheLock = new();
     private Dictionary<string, ContentFileCache> _cache = [];
     private readonly HashSet<string> _unusedOutputs = [];
 
@@ -53,12 +54,24 @@ class ContentCache : IContentCache
             return;
         }
 
-        if (!File.Exists(dirPath))
+        if (!Directory.Exists(dirPath))
         {
             Directory.CreateDirectory(dirPath);
         }
 
-        var text = ContentBuilderHelper.Serializer.Serialize(_cache);
+        string text;
+        lock (_cacheLock)
+        {
+            var sortedCache = new SortedDictionary<string, ContentFileCache>(StringComparer.Ordinal);
+            foreach (var (key, fileCache) in _cache)
+            {
+                fileCache.EnsureDeterministicOrder();
+                sortedCache[key] = fileCache;
+            }
+
+            text = ContentBuilderHelper.Serializer.Serialize(sortedCache);
+        }
+
         File.WriteAllText(cacheFilePath, text);
     }
 
@@ -74,18 +87,26 @@ class ContentCache : IContentCache
 
     public IContentFileCache? ReadContentFileCache(ContentBuilder builder, string relativeOutputPath)
     {
-        if (!_cache.TryGetValue(relativeOutputPath.Sanitize(), out ContentFileCache? fileCache))
+        var key = relativeOutputPath.Sanitize();
+        lock (_cacheLock)
         {
-            return null;
+            if (!_cache.TryGetValue(key, out ContentFileCache? fileCache))
+            {
+                return null;
+            }
+            return fileCache;
         }
-        return fileCache;
     }
 
     public void WriteContentFileCache(ContentBuilder builder, string relativeOutputPath, IContentFileCache? fileCache)
     {
         if (fileCache is ContentFileCache builderFileCache)
         {
-            _cache[relativeOutputPath.Sanitize()] = builderFileCache;
+            var key = relativeOutputPath.Sanitize();
+            lock (_cacheLock)
+            {
+                _cache[key] = builderFileCache;
+            }
         }
     }
 
@@ -96,9 +117,12 @@ class ContentCache : IContentCache
             return;
         }
 
-        foreach (var (outputPath, _) in builderFileCache.Outputs)
+        lock (_cacheLock)
         {
-            _unusedOutputs.Remove(outputPath);
+            foreach (var (outputPath, _) in builderFileCache.Outputs)
+            {
+                _unusedOutputs.Remove(outputPath);
+            }
         }
     }
 

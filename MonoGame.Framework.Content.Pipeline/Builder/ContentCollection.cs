@@ -63,6 +63,7 @@ public class ContentCollection : IContentCollection
     /// An <see cref="IContentProcessor"/> to be used for the building, if its not specified, 
     /// the system will use reflection to try to figure out an apropriate processor.
     /// </param>
+    /// <remarks>Do not pass the same importer/processor instance to multiple <see cref="Include(string, IContentImporter?, IContentProcessor?)"/> calls; with parallel builds they may run concurrently.</remarks>
     public void Include(string inputPath, IContentImporter? contentImporter = null, IContentProcessor? contentProcessor = null)
         => CurrentContent.Include(inputPath, contentImporter, contentProcessor);
 
@@ -79,6 +80,7 @@ public class ContentCollection : IContentCollection
     /// An <see cref="IContentProcessor"/> to be used for the building, if its not specified, 
     /// the system will use reflection to try to figure out an apropriate processor.
     /// </param>
+    /// <remarks>Do not pass the same importer/processor instance to multiple <see cref="Include(string, string, IContentImporter?, IContentProcessor?)"/> calls; with parallel builds they may run concurrently.</remarks>
     public void Include(string inputPath, string outputPath, IContentImporter? contentImporter = null, IContentProcessor? contentProcessor = null)
         => CurrentContent.Include(inputPath, outputPath, contentImporter, contentProcessor);
 
@@ -101,6 +103,11 @@ public class ContentCollection : IContentCollection
     public void IncludeCopy<T>(string includePattern, Func<string, string>? outputPath = null) where T : ContentRule, new()
         => CurrentContent.IncludeCopy<T>(includePattern, outputPath);
 
+    /// <inheritdoc cref="Include{T}(string, Func{IContentImporter}?, Func{IContentProcessor}?)"/>
+    public void Include<T>(string includePattern)
+        where T : ContentRule, new()
+        => Include<T>(includePattern, (Func<IContentImporter>?)null, null);
+
     /// <summary>
     /// Marks the files that match the includePattern to be built with the specified settings.
     /// </summary>
@@ -118,9 +125,40 @@ public class ContentCollection : IContentCollection
     /// An <see cref="IContentProcessor"/> to be used for the building, if its not specified, 
     /// the system will use reflection to try to figure out an apropriate processor.
     /// </param>
+    [Obsolete("Use the overload that accepts factory functions instead.")]
     public void Include<T>(string includePattern, IContentImporter? contentImporter = null, IContentProcessor? contentProcessor = null)
         where T : ContentRule, new()
-        => CurrentContent.Include<T>(includePattern, contentImporter, contentProcessor);
+        => Include<T>(includePattern,
+            contentImporter != null ? () => contentImporter : null,
+            contentProcessor != null ? () => contentProcessor : null);
+
+    /// <summary>
+    /// Marks the files that match the includePattern to be built with the specified settings.
+    /// </summary>
+    /// <typeparam name="T">
+    /// A <see cref="ContentRule"/> to be used for matching the includePattern. Some built in options are:
+    /// <para><see cref="WildcardRule"/> - specifies that input pattern should be a wildcard.</para>
+    /// <para><see cref="RegexRule"/> - specifies that input pattern should be a regex.</para>
+    /// </typeparam>
+    /// <param name="includePattern">A pattern to use for building of content files.</param>
+    /// <param name="contentImporterFactory">
+    /// A factory that creates a fresh, identically configured <see cref="IContentImporter"/> per matched file. If not specified,
+    /// the system will use reflection to try to figure out an apropriate importer.
+    /// </param>
+    /// <param name="contentProcessorFactory">
+    /// A factory that creates a fresh, identically configured <see cref="IContentProcessor"/> per matched file. If not specified,
+    /// the system will use reflection to try to figure out an apropriate processor.
+    /// </param>
+    /// <remarks>Each factory is invoked once per matched file and must return a new, identically configured instance on every call (never a captured shared instance).</remarks>
+    public void Include<T>(string includePattern,
+        Func<IContentImporter>? contentImporterFactory = null,
+        Func<IContentProcessor>? contentProcessorFactory = null)
+        where T : ContentRule, new()
+        => CurrentContent.Include<T>(includePattern, contentImporterFactory, contentProcessorFactory);
+
+    /// <inheritdoc cref="Include{T}(string, Func{string, string}, Func{IContentImporter}?, Func{IContentProcessor}?)"/>
+    public void Include<T>(string includePattern, Func<string, string> outputPath) where T : ContentRule, new()
+        => Include<T>(includePattern, outputPath, (Func<IContentImporter>?)null, null);
 
     /// <summary>
     /// Marks the files that match the includePattern to be built with the specified settings.
@@ -140,9 +178,42 @@ public class ContentCollection : IContentCollection
     /// An <see cref="IContentProcessor"/> to be used for the building, if its not specified, 
     /// the system will use reflection to try to figure out an apropriate processor.
     /// </param>
-    public void Include<T>(string includePattern, Func<string, string> outputPath, IContentImporter? contentImporter = null,
-        IContentProcessor? contentProcessor = null) where T : ContentRule, new()
-         => CurrentContent.Include<T>(includePattern, outputPath, contentImporter, contentProcessor);
+    [Obsolete("Use the overload that accepts factory functions instead.")]
+    public void Include<T>(string includePattern,
+        Func<string, string> outputPath,
+        IContentImporter? contentImporter = null,
+        IContentProcessor? contentProcessor = null)
+        where T : ContentRule, new()
+        => Include<T>(includePattern,
+            outputPath,
+            contentImporter != null ? () => contentImporter : null,
+            contentProcessor != null ? () => contentProcessor : null);
+
+    /// <summary>
+    /// Marks the files that match the includePattern to be built with the specified settings.
+    /// </summary>
+    /// <typeparam name="T">
+    /// A <see cref="ContentRule"/> to be used for matching the includePattern. Some built in options are:
+    /// <para><see cref="WildcardRule"/> - specifies that input pattern should be a wildcard.</para>
+    /// <para><see cref="RegexRule"/> - specifies that input pattern should be a regex.</para>
+    /// </typeparam>
+    /// <param name="includePattern">A pattern to use for building of content files.</param>
+    /// <param name="outputPath">A function that gives a relative output filepath for the specified relative content filepath.</param>
+    /// <param name="contentImporterFactory">
+    /// A factory that creates a fresh, identically configured <see cref="IContentImporter"/> per matched file. If not specified,
+    /// the system will use reflection to try to figure out an apropriate importer.
+    /// </param>
+    /// <param name="contentProcessorFactory">
+    /// A factory that creates a fresh, identically configured <see cref="IContentProcessor"/> per matched file. If not specified,
+    /// the system will use reflection to try to figure out an apropriate processor.
+    /// </param>
+    /// <remarks>Each factory is invoked once per matched file and must return a new, identically configured instance on every call (never a captured shared instance).</remarks>
+    public void Include<T>(string includePattern,
+        Func<string, string> outputPath,
+        Func<IContentImporter>? contentImporterFactory = null,
+        Func<IContentProcessor>? contentProcessorFactory = null)
+        where T : ContentRule, new()
+        => CurrentContent.Include<T>(includePattern, outputPath, contentImporterFactory, contentProcessorFactory);
 
     /// <summary>
     /// Marks the files that match the excludePattern to be excluded from the content handling.

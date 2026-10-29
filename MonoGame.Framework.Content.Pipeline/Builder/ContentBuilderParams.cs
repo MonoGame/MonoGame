@@ -81,6 +81,13 @@ public class ContentBuilderParams
             logLevelOption.AddAlias("-l");
             rootCommand.AddGlobalOption(logLevelOption);
 
+            var maxDegreeOfParallelismOption = new Option<int>(
+                name: "--max-degree-of-parallelism",
+                description: "The maximum number of concurrent content build tasks. If left out or set at a value less than 1, defaults to the CPU core count.",
+                getDefaultValue: () => defaultValues.MaxDegreeOfParallelism);
+            maxDegreeOfParallelismOption.AddAlias("-m");
+            rootCommand.AddGlobalOption(maxDegreeOfParallelismOption);
+
             _contentBuilderArgsFunc = (bindingContext) =>
             {
                 var workingDir = bindingContext.ParseResult.GetValueForOption(workingDirectoryOption) ?? defaultValues.WorkingDirectory;
@@ -93,7 +100,8 @@ public class ContentBuilderParams
                     Platform = bindingContext.ParseResult.GetValueForOption(platformOption),
                     GraphicsProfile = bindingContext.ParseResult.GetValueForOption(graphicsProfileOption),
                     CompressContent = bindingContext.ParseResult.GetValueForOption(compressContentOption),
-                    LogLevel = bindingContext.ParseResult.GetValueForOption(logLevelOption)
+                    LogLevel = bindingContext.ParseResult.GetValueForOption(logLevelOption),
+                    MaxDegreeOfParallelism = bindingContext.ParseResult.GetValueForOption(maxDegreeOfParallelismOption),
                 };
             };
         }
@@ -215,6 +223,21 @@ public class ContentBuilderParams
     /// </summary>
     /// <value><see cref="LogLevel.Info"/> by default.</value>
     public LogLevel LogLevel { get; set; } = LogLevel.Info;
+
+    private int _maxDegreeOfParallelism = Environment.ProcessorCount;
+
+    /// <summary>
+    /// Gets or sets the maximum number of concurrent content build tasks.
+    /// Values less than or equal to 0 are normalized to <see cref="Environment.ProcessorCount"/>.
+    /// </summary>
+    /// <value><see cref="Environment.ProcessorCount"/> by default.</value>
+    public int MaxDegreeOfParallelism
+    {
+        get => _maxDegreeOfParallelism;
+        set => _maxDegreeOfParallelism = value > 0
+            ? value
+            : Environment.ProcessorCount;
+    }
 
     /// <summary>
     /// Should the <see cref="ContentBuilder"/> rebuild all the assets and ignore the content cache.

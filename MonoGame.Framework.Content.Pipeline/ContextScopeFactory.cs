@@ -2,6 +2,7 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
+using System.Collections.Immutable;
 using Microsoft.Xna.Framework.Content.Pipeline;
 using MonoGame.Framework.Content.Pipeline.Builder;
 
@@ -49,11 +50,8 @@ namespace MonoGame.Framework.Content
     /// </summary>
     internal static class ContextScopeFactory
     {
-        private static readonly AsyncLocal<List<IContentContext>> _contextStack = new()
-        {
-            Value = new List<IContentContext>(1)
-        };
-        private static readonly AsyncLocal<IContentContext> _activeContext = new();
+        private static readonly AsyncLocal<ImmutableList<IContentContext>> _contextStack = new();
+        private static readonly AsyncLocal<IContentContext?> _activeContext = new();
 
         /// <summary>
         /// Returns true when the <see cref="ActiveContext"/> is a valid <see cref="IContentContext"/> instance.
@@ -133,8 +131,7 @@ namespace MonoGame.Framework.Content
         /// </returns>
         public static IContentContext BeginContext(IContentContext scope)
         {
-            _contextStack.Value ??= new List<IContentContext>(1);
-            _contextStack.Value.Add(scope);
+            _contextStack.Value = (_contextStack.Value ?? ImmutableList<IContentContext>.Empty).Add(scope);
             _activeContext.Value = scope;
             return scope;
         }
@@ -164,12 +161,12 @@ namespace MonoGame.Framework.Content
                     return;
                 }
 
-                _contextStack.Value.Remove(this);
+                _contextStack.Value = _contextStack.Value.Remove(this);
 
-                if (_activeContext.Value == this && _contextStack.Value.Count > 0)
+                if (_activeContext.Value == this)
                 {
                     // either use the "most recent" (aka, last) context, or if the list is empty there is no context.
-                    _activeContext.Value = _contextStack.Value[^1];
+                    _activeContext.Value = _contextStack.Value.Count > 0 ? _contextStack.Value[^1] : null;
                 }
 
                 // if someone else has already claimed the activeContext, then we don't need to care.

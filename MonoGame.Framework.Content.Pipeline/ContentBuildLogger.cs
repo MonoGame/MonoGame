@@ -2,6 +2,7 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
+using System.Collections.Immutable;
 using System.Globalization;
 
 namespace Microsoft.Xna.Framework.Content.Pipeline;
@@ -12,8 +13,8 @@ namespace Microsoft.Xna.Framework.Content.Pipeline;
 /// </summary>
 public class ContentBuildLogger
 {
-    private readonly Stack<string> _filenames = [];
-    private int _indentCount = 0;
+    private readonly AsyncLocal<ImmutableStack<string>> _filenames = new();
+    private readonly AsyncLocal<int> _indentCount = new();
 
     /// <summary>
     /// Gets or sets the base reference path used when reporting errors during the content build process.
@@ -28,7 +29,7 @@ public class ContentBuildLogger
     /// <summary>
     /// Creates a string that has indentation characters equal to the current identation.
     /// </summary>
-    protected string IndentString => string.Empty.PadLeft(Math.Max(0, _indentCount), '\t');
+    protected string IndentString => string.Empty.PadLeft(Math.Max(0, _indentCount.Value), '\t');
 
     /// <summary>
     /// Gets the filename currently being processed, for use in warning and error messages.
@@ -48,12 +49,15 @@ public class ContentBuildLogger
 
             return Path.GetRelativePath(LoggerRootDirectory, contentIdentity.SourceFilename);
         }
-        if (_filenames.Count > 0)
+        var filenames = _filenames.Value;
+        if (filenames != null && !filenames.IsEmpty)
         {
             if (string.IsNullOrEmpty(LoggerRootDirectory))
-                return _filenames.Peek();
+            {
+                return filenames.Peek();
+            }
 
-            return Path.GetRelativePath(LoggerRootDirectory, _filenames.Peek());
+            return Path.GetRelativePath(LoggerRootDirectory, filenames.Peek());
         }
         return string.Empty;
     }
@@ -108,20 +112,20 @@ public class ContentBuildLogger
     /// All logger warnings or error exceptions from this time forward to the next PopFile call refer to this file.
     /// </summary>
     /// <param name="filename">Name of the file containing future messages.</param>
-    public virtual void PushFile(string filename) => _filenames.Push(filename);
+    public virtual void PushFile(string filename) => _filenames.Value = (_filenames.Value ?? ImmutableStack<string>.Empty).Push(filename);
 
     /// <summary>
     /// Outputs a message indicating that a content asset has completed processing.
     /// </summary>
-    public virtual void PopFile() => _filenames.Pop();
+    public virtual void PopFile() => _filenames.Value = (_filenames.Value ?? ImmutableStack<string>.Empty).Pop();
 
     /// <summary>
     /// Adds an indent for all future Log calls.
     /// </summary>
-    public virtual void Indent() => _indentCount++;
+    public virtual void Indent() => _indentCount.Value = _indentCount.Value + 1;
 
     /// <summary>
     /// Removes an indent for all future Log calls.
     /// </summary>
-    public virtual void Unindent() => _indentCount = Math.Max(0, _indentCount - 1);
+    public virtual void Unindent() => _indentCount.Value = Math.Max(0, _indentCount.Value - 1);
 }
