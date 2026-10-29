@@ -23,6 +23,16 @@ enum class MGFilterMode : mgint
     HighPass = 2,
 };
 
+enum class MGPlatformConfigKey : mgint
+{
+    VulkanInstanceExtensions = 1,
+    VulkanDeviceExtensions = 2,
+    VulkanUniformRingbufferSize = 3,
+    VulkanDescriptorPoolSize = 4,
+    Dx12PreferredBlockSize = 5,
+    Dx12MaxUploadBufferPoolSize = 6,
+};
+
 enum class MGSurfaceFormat : mgint
 {
     Color = 0,
