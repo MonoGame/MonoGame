@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using MonoGame.Framework.Utilities;
 using System.Diagnostics.CodeAnalysis;
+using System.Reflection;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
@@ -193,6 +194,19 @@ namespace Microsoft.Xna.Framework.Graphics
 			return max;
 		}
 
+
+        const BindingFlags allStatics = BindingFlags.Static
+                | BindingFlags.NonPublic // In case vertexType implements IVertexType.VertexDeclaration explicitly
+                | BindingFlags.Public;
+        // This static typeof should not need any DynamicallyAccessedMembers annotation for AOT because
+        // the trimmer can anticipate typeof "constants" like this
+        private static readonly MethodInfo interfaceGetter = typeof(IVertexType)
+                                                .GetProperty(nameof(IVertexType.VertexDeclaration), allStatics)!
+                                                .GetMethod!;
+        // The index of the VertexDeclaration getter method in the interface map for IVertexType will be the same
+        // for every implementing type, so just look it up once with a known type and save some reflection calls.
+        private static readonly int getterMethodIndex = Array.IndexOf(typeof(VertexPosition).GetInterfaceMap(typeof(IVertexType)).InterfaceMethods, interfaceGetter);
+
         /// <summary>
         /// Returns the VertexDeclaration for Type.
         /// </summary>
@@ -202,30 +216,46 @@ namespace Microsoft.Xna.Framework.Graphics
         /// Prefer to use VertexDeclarationCache when the declaration lookup
         /// can be performed with a templated type.
         /// </remarks>
-		internal static VertexDeclaration FromType([DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicParameterlessConstructor)] Type vertexType)
-		{
-			if (vertexType == null)
-				throw new ArgumentNullException("vertexType", "Cannot be null");
+        internal static VertexDeclaration FromType([DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicProperties | DynamicallyAccessedMemberTypes.NonPublicProperties | DynamicallyAccessedMemberTypes.Interfaces)] Type vertexType)
+        {
+            if (vertexType == null)
+                throw new ArgumentNullException(nameof(vertexType), "Cannot be null");
 
             if (!ReflectionHelpers.IsValueType(vertexType))
+                throw new ArgumentException("Must be a value type", nameof(vertexType));
+
+            if (!typeof(IVertexType).IsAssignableFrom(vertexType))
+                throw new ArgumentException($"{nameof(vertexType)} does not implement {nameof(IVertexType)}.");
+
+            var declarationProperty = vertexType.GetProperty(
+                nameof(IVertexType.VertexDeclaration),
+                allStatics);
+
+            object declarationValue;
+
+            if (declarationProperty is null || !typeof(VertexDeclaration).IsAssignableFrom(declarationProperty.PropertyType))
             {
-				throw new ArgumentException("Must be value type", "vertexType");
-			}
+                // Try to get the explicit implementation through the interface map.
+                // This may throw for structs under NativeAOT, so catch that and give a specific message.
+                InterfaceMapping interfaceMap;
+                try
+                {
+                    interfaceMap = vertexType.GetInterfaceMap(typeof(IVertexType));
+                }
+                catch (PlatformNotSupportedException pex)
+                {
+                    throw new ArgumentException($"The type {vertexType.Name} does not implement {nameof(IVertexType)} implicitly. Explicit interface implementations are incompatible with NativeAOT reflection and cannot be used.", nameof(vertexType), pex);
+                }
 
-            var type = Activator.CreateInstance(vertexType) as IVertexType;
-			if (type == null)
-			{
-				throw new ArgumentException("vertexData does not inherit IVertexType");
-			}
+                var mappedGetter = interfaceMap.TargetMethods[getterMethodIndex];
+                declarationValue = mappedGetter.Invoke(null, null);
+            }
+            else
+                declarationValue = declarationProperty.GetValue(null);
 
-            var vertexDeclaration = type.VertexDeclaration;
-			if (vertexDeclaration == null)
-			{
-				throw new Exception("VertexDeclaration cannot be null");
-			}
-
-			return vertexDeclaration;
-		}
+            return (declarationValue as VertexDeclaration)
+                ?? throw new ArgumentException($"{nameof(IVertexType.VertexDeclaration)} on {vertexType.Name} is null.", nameof(vertexType));
+        }
 
         /// <summary>
         /// Gets a copy of the vertex elements.

@@ -15,7 +15,7 @@ namespace Microsoft.Xna.Framework.Graphics
         /// </summary>
         public Vector2 TextureCoordinate;
         /// <inheritdoc cref="IVertexType.VertexDeclaration"/>
-        public static readonly VertexDeclaration VertexDeclaration;
+        public static VertexDeclaration VertexDeclaration { get; }
 
         /// <summary>
         /// Creates an instance of <see cref="VertexPositionTexture"/>.
@@ -26,14 +26,6 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             this.Position = position;
             this.TextureCoordinate = textureCoordinate;
-        }
-
-        VertexDeclaration IVertexType.VertexDeclaration
-        {
-            get
-            {
-                return VertexDeclaration;
-            }
         }
 
         /// <inheritdoc cref="VertexPosition.GetHashCode()"/>
