@@ -524,7 +524,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		    None = new DepthStencilState("DepthStencilState.None", false, false);
 		}
 
-        internal DepthStencilState Clone()
+        public DepthStencilState Clone()
         {
             return new DepthStencilState(this);
         }
