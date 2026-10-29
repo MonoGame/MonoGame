@@ -16,6 +16,8 @@ static partial class GamePad
 
     static internal unsafe MGP_Platform* Handle;
 
+    internal const float DefaultTriggerThreshold = 30f / 255f;
+
     class State
     {
         public int Identifier;
@@ -147,6 +149,11 @@ static partial class GamePad
         return axis / 32767f;
     }
 
+    internal static Buttons UpdateTriggerButton(Buttons buttons, float triggerValue, Buttons triggerButton, float threshold = DefaultTriggerThreshold)
+    {
+        return (triggerValue >= threshold) ? (buttons | triggerButton) : (buttons & ~triggerButton);
+    }
+
     internal static void ChangeState(int identifier, ulong timestamp, ControllerInput input, short value)
     {
         if (!_stateById.TryGetValue(identifier, out var state))
@@ -172,9 +179,11 @@ static partial class GamePad
                     break;
                 case ControllerInput.LeftTrigger:
                     state.TriggerL = FromAxisValue(value);
+                    state.Buttons = UpdateTriggerButton(state.Buttons, state.TriggerL, Buttons.LeftTrigger);
                     break;
                 case ControllerInput.RightTrigger:
                     state.TriggerR = FromAxisValue(value);
+                    state.Buttons = UpdateTriggerButton(state.Buttons, state.TriggerR, Buttons.RightTrigger);
                     break;
             }
         }
