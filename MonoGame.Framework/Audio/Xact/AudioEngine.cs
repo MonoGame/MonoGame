@@ -290,7 +290,7 @@ namespace Microsoft.Xna.Framework.Audio
 
                     if (cue.IsStopped || cue.IsDisposed)
                     {
-                        ActiveCues.Remove(cue);
+                        ActiveCues.RemoveAt(x);
                         continue;
                     }
 
