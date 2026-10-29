@@ -157,6 +157,7 @@ struct MGG_Texture
     mgint blockHeight = 1;
     mgbool isCompressed = false;
     mgbool isRenderTarget = false;
+    mgbool isExternal = false;
     MGDepthFormat depthFormat = MGDepthFormat::None;
     mgint multiSampleCount = 0;
     MGRenderTargetUsage renderTargetUsage = MGRenderTargetUsage::DiscardContents;
@@ -1478,6 +1479,113 @@ namespace
 
         device->context.functions.BindFramebuffer(GL_FRAMEBUFFER, static_cast<GLuint>(previousFramebuffer));
         device->context.functions.BindRenderbuffer(GL_RENDERBUFFER, static_cast<GLuint>(previousRenderbuffer));
+    }
+
+    void ConfigureRenderTargetFramebuffers(MGG_GraphicsDevice* device, MGG_Texture* texture)
+    {
+        assert(device != nullptr);
+        assert(texture != nullptr);
+
+        GLint previousFramebuffer = 0;
+        GLint previousRenderbuffer = 0;
+        BeginFramebufferEdit(device, previousFramebuffer, previousRenderbuffer);
+
+        device->context.functions.GenFramebuffers(1, &texture->framebuffer);
+        if (texture->framebuffer == 0)
+            MGGL_FAIL("glGenFramebuffers failed", "framebuffer creation returned 0");
+
+        if (texture->multiSampleCount > 0)
+        {
+            device->context.functions.GenFramebuffers(1, &texture->resolveFramebuffer);
+            if (texture->resolveFramebuffer == 0)
+                MGGL_FAIL("glGenFramebuffers failed", "resolve framebuffer creation returned 0");
+        }
+
+        device->context.functions.BindFramebuffer(GL_FRAMEBUFFER, texture->framebuffer);
+        if (texture->multiSampleCount > 0)
+        {
+            device->context.functions.GenRenderbuffers(1, &texture->colorRenderbuffer);
+            if (texture->colorRenderbuffer == 0)
+                MGGL_FAIL("glGenRenderbuffers failed", "color attachment creation returned 0");
+
+            device->context.functions.BindRenderbuffer(GL_RENDERBUFFER, texture->colorRenderbuffer);
+            device->context.functions.RenderbufferStorageMultisample(
+                GL_RENDERBUFFER,
+                texture->multiSampleCount,
+                texture->internalFormat,
+                texture->width,
+                texture->height);
+            device->context.functions.FramebufferRenderbuffer(
+                GL_FRAMEBUFFER,
+                GL_COLOR_ATTACHMENT0,
+                GL_RENDERBUFFER,
+                texture->colorRenderbuffer);
+        }
+        else
+        {
+            device->context.functions.FramebufferTexture2D(
+                GL_FRAMEBUFFER,
+                GL_COLOR_ATTACHMENT0,
+                GetTextureImageTarget(texture, 0),
+                texture->handle,
+                0);
+        }
+        glDrawBuffer(GL_COLOR_ATTACHMENT0);
+        glReadBuffer(GL_COLOR_ATTACHMENT0);
+
+        if (texture->depthFormat != MGDepthFormat::None)
+        {
+            device->context.functions.GenRenderbuffers(1, &texture->depthRenderbuffer);
+            if (texture->depthRenderbuffer == 0)
+                MGGL_FAIL("glGenRenderbuffers failed", "depth renderbuffer creation returned 0");
+
+            device->context.functions.BindRenderbuffer(GL_RENDERBUFFER, texture->depthRenderbuffer);
+            if (texture->multiSampleCount > 0)
+            {
+                device->context.functions.RenderbufferStorageMultisample(
+                    GL_RENDERBUFFER,
+                    texture->multiSampleCount,
+                    ToDepthRenderbufferFormat(texture->depthFormat),
+                    texture->width,
+                    texture->height);
+            }
+            else
+            {
+                device->context.functions.RenderbufferStorage(
+                    GL_RENDERBUFFER,
+                    ToDepthRenderbufferFormat(texture->depthFormat),
+                    texture->width,
+                    texture->height);
+            }
+            device->context.functions.FramebufferRenderbuffer(
+                GL_FRAMEBUFFER,
+                ToDepthAttachment(texture->depthFormat),
+                GL_RENDERBUFFER,
+                texture->depthRenderbuffer);
+        }
+
+        GLenum framebufferStatus = device->context.functions.CheckFramebufferStatus(GL_FRAMEBUFFER);
+        if (framebufferStatus != GL_FRAMEBUFFER_COMPLETE)
+            MGGL_FAIL("OpenGL framebuffer incomplete", "framebuffer status check failed");
+
+        if (texture->multiSampleCount > 0)
+        {
+            device->context.functions.BindFramebuffer(GL_FRAMEBUFFER, texture->resolveFramebuffer);
+            device->context.functions.FramebufferTexture2D(
+                GL_FRAMEBUFFER,
+                GL_COLOR_ATTACHMENT0,
+                GetTextureImageTarget(texture, 0),
+                texture->handle,
+                0);
+            glDrawBuffer(GL_COLOR_ATTACHMENT0);
+            glReadBuffer(GL_COLOR_ATTACHMENT0);
+
+            framebufferStatus = device->context.functions.CheckFramebufferStatus(GL_FRAMEBUFFER);
+            if (framebufferStatus != GL_FRAMEBUFFER_COMPLETE)
+                MGGL_FAIL("OpenGL framebuffer incomplete", "resolve framebuffer status check failed");
+        }
+
+        EndFramebufferEdit(device, previousFramebuffer, previousRenderbuffer);
     }
 
     MGG_Texture* CreateTextureResource(
@@ -3155,106 +3263,55 @@ MGG_Texture* MGG_RenderTarget_Create(MGG_GraphicsDevice* device, MGTextureType t
     texture->multiSampleCount = multiSampleCount;
     texture->renderTargetUsage = usage;
 
-    GLint previousFramebuffer = 0;
-    GLint previousRenderbuffer = 0;
-    BeginFramebufferEdit(device, previousFramebuffer, previousRenderbuffer);
+    ConfigureRenderTargetFramebuffers(device, texture);
 
-    device->context.functions.GenFramebuffers(1, &texture->framebuffer);
-    if (texture->framebuffer == 0)
-        MGGL_FAIL("glGenFramebuffers failed", "framebuffer creation returned 0");
+    return texture;
+}
 
-    if (multiSampleCount > 0)
-    {
-        device->context.functions.GenFramebuffers(1, &texture->resolveFramebuffer);
-        if (texture->resolveFramebuffer == 0)
-            MGGL_FAIL("glGenFramebuffers failed", "resolve framebuffer creation returned 0");
-    }
+MG_EXPORT MGG_Texture* MGG_RenderTarget_WrapNativeHandle(
+    MGG_GraphicsDevice* device,
+    void* nativeHandle,
+    MGSurfaceFormat format,
+    mgint width,
+    mgint height,
+    MGDepthFormat depthFormat,
+    mgint multiSampleCount,
+    mgbyte externalPresentation)
+{
+    if (!device || !nativeHandle || width <= 0 || height <= 0)
+        return nullptr;
 
-    device->context.functions.BindFramebuffer(GL_FRAMEBUFFER, texture->framebuffer);
-    if (multiSampleCount > 0)
-    {
-        device->context.functions.GenRenderbuffers(1, &texture->colorRenderbuffer);
-        if (texture->colorRenderbuffer == 0)
-            MGGL_FAIL("glGenRenderbuffers failed", "color attachment creation returned 0");
+    EnsureContext(device);
 
-        device->context.functions.BindRenderbuffer(GL_RENDERBUFFER, texture->colorRenderbuffer);
-        device->context.functions.RenderbufferStorageMultisample(
-            GL_RENDERBUFFER,
-            multiSampleCount,
-            texture->internalFormat,
-            width,
-            height);
-        device->context.functions.FramebufferRenderbuffer(
-            GL_FRAMEBUFFER,
-            GL_COLOR_ATTACHMENT0,
-            GL_RENDERBUFFER,
-            texture->colorRenderbuffer);
-    }
-    else
-    {
-        device->context.functions.FramebufferTexture2D(
-            GL_FRAMEBUFFER,
-            GL_COLOR_ATTACHMENT0,
-            GetTextureImageTarget(texture, 0),
-            texture->handle,
-            0);
-    }
-    glDrawBuffer(GL_COLOR_ATTACHMENT0);
-    glReadBuffer(GL_COLOR_ATTACHMENT0);
+    TextureFormatInfo formatInfo = GetTextureFormatInfo(format);
 
-    if (depthFormat != MGDepthFormat::None)
-    {
-        device->context.functions.GenRenderbuffers(1, &texture->depthRenderbuffer);
-        if (texture->depthRenderbuffer == 0)
-            MGGL_FAIL("glGenRenderbuffers failed", "depth renderbuffer creation returned 0");
+    MGG_Texture* texture = new MGG_Texture();
 
-        device->context.functions.BindRenderbuffer(GL_RENDERBUFFER, texture->depthRenderbuffer);
-        if (multiSampleCount > 0)
-        {
-            device->context.functions.RenderbufferStorageMultisample(
-                GL_RENDERBUFFER,
-                multiSampleCount,
-                ToDepthRenderbufferFormat(depthFormat),
-                width,
-                height);
-        }
-        else
-        {
-            device->context.functions.RenderbufferStorage(
-                GL_RENDERBUFFER,
-                ToDepthRenderbufferFormat(depthFormat),
-                width,
-                height);
-        }
-        device->context.functions.FramebufferRenderbuffer(
-            GL_FRAMEBUFFER,
-            ToDepthAttachment(depthFormat),
-            GL_RENDERBUFFER,
-            texture->depthRenderbuffer);
-    }
+    texture->handle = static_cast<GLuint>(reinterpret_cast<uintptr_t>(nativeHandle));
+    texture->target = GL_TEXTURE_2D;
+    texture->type = MGTextureType::_2D;
+    texture->format = format;
+    texture->internalFormat = formatInfo.internalFormat;
+    texture->pixelFormat = formatInfo.pixelFormat;
+    texture->pixelType = formatInfo.pixelType;
+    texture->width = width;
+    texture->height = height;
+    texture->depth = 1;
+    texture->mipmaps = 1;
+    texture->slices = 1;
+    texture->bytesPerPixel = formatInfo.bytesPerPixel;
+    texture->bytesPerBlock = formatInfo.bytesPerBlock;
+    texture->blockWidth = formatInfo.blockWidth;
+    texture->blockHeight = formatInfo.blockHeight;
+    texture->isCompressed = formatInfo.isCompressed;
+    texture->isRenderTarget = true;
+    texture->isExternal = true;
+    texture->depthFormat = depthFormat;
+    texture->multiSampleCount = multiSampleCount;
+    texture->renderTargetUsage = MGRenderTargetUsage::DiscardContents;
 
-    GLenum framebufferStatus = device->context.functions.CheckFramebufferStatus(GL_FRAMEBUFFER);
-    if (framebufferStatus != GL_FRAMEBUFFER_COMPLETE)
-        MGGL_FAIL("OpenGL framebuffer incomplete", "framebuffer status check failed");
+    ConfigureRenderTargetFramebuffers(device, texture);
 
-    if (multiSampleCount > 0)
-    {
-        device->context.functions.BindFramebuffer(GL_FRAMEBUFFER, texture->resolveFramebuffer);
-        device->context.functions.FramebufferTexture2D(
-            GL_FRAMEBUFFER,
-            GL_COLOR_ATTACHMENT0,
-            GetTextureImageTarget(texture, 0),
-            texture->handle,
-            0);
-        glDrawBuffer(GL_COLOR_ATTACHMENT0);
-        glReadBuffer(GL_COLOR_ATTACHMENT0);
-
-        framebufferStatus = device->context.functions.CheckFramebufferStatus(GL_FRAMEBUFFER);
-        if (framebufferStatus != GL_FRAMEBUFFER_COMPLETE)
-            MGGL_FAIL("OpenGL framebuffer incomplete", "resolve framebuffer status check failed");
-    }
-
-    EndFramebufferEdit(device, previousFramebuffer, previousRenderbuffer);
     return texture;
 }
 
@@ -3322,7 +3379,7 @@ void MGG_Texture_Destroy(MGG_GraphicsDevice* device, MGG_Texture* texture)
     if (texture->framebuffer != 0)
         device->context.functions.DeleteFramebuffers(1, &texture->framebuffer);
 
-    if (texture->handle != 0)
+    if (texture->handle != 0 && !texture->isExternal)
         glDeleteTextures(1, &texture->handle);
 
     delete texture;
