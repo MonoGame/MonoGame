@@ -6,6 +6,7 @@ using System;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Runtime.Serialization;
+using System.Text;
 
 namespace Microsoft.Xna.Framework
 {
@@ -540,9 +541,9 @@ namespace Microsoft.Xna.Framework
         /// <returns><c>true</c> if the instances are equal; <c>false</c> otherwise.</returns>
         public override bool Equals(object obj)
         {
-            if (obj is Vector2)
+            if (obj is Vector2 other)
             {
-                return Equals((Vector2)obj);
+                return Equals(other);
             }
 
             return false;
