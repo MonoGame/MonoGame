@@ -19,6 +19,8 @@ namespace Microsoft.Xna.Framework.Graphics
     /// </summary>
     public partial class GraphicsDevice : IDisposable
     {
+        private const int MaxTexturesLimit = 16;
+
         /// <summary>
         /// Indicates if DX9 style pixel addressing or current standard
         /// pixel addressing should be used. This flag is set to
@@ -351,6 +353,7 @@ namespace Microsoft.Xna.Framework.Graphics
             VertexTextures = new TextureCollection(this, MaxVertexTextureSlots, ShaderStage.Vertex);
             VertexSamplerStates = new SamplerStateCollection(this, MaxVertexTextureSlots, ShaderStage.Vertex);
 
+            MaxTextureSlots = Math.Min(MaxTextureSlots, MaxTexturesLimit);
             Textures = new TextureCollection(this, MaxTextureSlots, ShaderStage.Pixel);
             SamplerStates = new SamplerStateCollection(this, MaxTextureSlots, ShaderStage.Pixel);
 
