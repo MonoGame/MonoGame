@@ -10,6 +10,7 @@ import { BrowserHostError, CanvasResizePolicy, HostStage } from "./browser-host-
 import { BrowserWindow } from "./browser-window.js";
 
 let activeHost = null;
+let runtimeCreationAttempted = false;
 
 function getCanvasResizePolicy(value) {
     if (value === CanvasResizePolicy.Adaptive
@@ -160,7 +161,14 @@ class MonoGameWebHost {
             throw new BrowserHostError(
                 HostStage.HostBootstrap,
                 "host_already_active",
-                "A MonoGame.Web host is already active. Wait for it to exit before starting another host.");
+                "A MonoGame.Web host is already active. Stop it before removing its page elements; reload the page to restart the game.");
+        }
+
+        if (runtimeCreationAttempted) {
+            throw new BrowserHostError(
+                HostStage.HostBootstrap,
+                "host_reload_required",
+                "MonoGame.Web runtime creation has already been attempted. Reload the page before starting another host.");
         }
 
         const host = new MonoGameWebHost(root, config, callbacks);
@@ -237,6 +245,8 @@ class MonoGameWebHost {
         const runtimeBuilder = dotnet
             .withDiagnosticTracing(false)
             .withModuleConfig({ canvas: this.window.canvas });
+        // Runtime creation can leave state behind even when it fails; host cleanup does not unload .NET.
+        runtimeCreationAttempted = true;
         this.runtime = await runtimeBuilder.create();
         if (this.stopRequested) {
             return;
