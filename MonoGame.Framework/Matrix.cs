@@ -1670,7 +1670,42 @@ namespace Microsoft.Xna.Framework
         /// <returns>Hash code of this <see cref="Matrix"/>.</returns>
         public override int GetHashCode()
         {
-            return (((((((((((((((this.M11.GetHashCode() + this.M12.GetHashCode()) + this.M13.GetHashCode()) + this.M14.GetHashCode()) + this.M21.GetHashCode()) + this.M22.GetHashCode()) + this.M23.GetHashCode()) + this.M24.GetHashCode()) + this.M31.GetHashCode()) + this.M32.GetHashCode()) + this.M33.GetHashCode()) + this.M34.GetHashCode()) + this.M41.GetHashCode()) + this.M42.GetHashCode()) + this.M43.GetHashCode()) + this.M44.GetHashCode());
+            unchecked
+            {
+                int hash1 = 17;
+                int hash2 = 17;
+                int hash3 = 17;
+                int hash4 = 17;
+
+                hash1 = hash1 * 31 + M11.GetHashCode();
+                hash2 = hash2 * 31 + M12.GetHashCode();
+                hash3 = hash3 * 31 + M13.GetHashCode();
+                hash4 = hash4 * 31 + M14.GetHashCode();
+
+                hash1 = hash1 * 31 + M21.GetHashCode();
+                hash2 = hash2 * 31 + M22.GetHashCode();
+                hash3 = hash3 * 31 + M23.GetHashCode();
+                hash4 = hash4 * 31 + M24.GetHashCode();
+
+                hash1 = hash1 * 31 + M31.GetHashCode();
+                hash2 = hash2 * 31 + M32.GetHashCode();
+                hash3 = hash3 * 31 + M33.GetHashCode();
+                hash4 = hash4 * 31 + M34.GetHashCode();
+
+                hash1 = hash1 * 31 + M41.GetHashCode();
+                hash2 = hash2 * 31 + M42.GetHashCode();
+                hash3 = hash3 * 31 + M43.GetHashCode();
+                hash4 = hash4 * 31 + M44.GetHashCode();
+
+                int mix = 17;
+
+                mix = mix * 31 + hash1;
+                mix = mix * 31 + hash2;
+                mix = mix * 31 + hash3;
+                mix = mix * 31 + hash4;
+
+                return mix;
+            }
         }
 
         /// <summary>
@@ -2258,6 +2293,33 @@ namespace Microsoft.Xna.Framework
         /// <param name="scaleFactor">Scalar value on the right of the mul sign.</param>
         /// <returns>Result of the matrix multiplication with a scalar.</returns>
         public static Matrix operator *(Matrix matrix, float scaleFactor)
+        {
+		    matrix.M11 = matrix.M11 * scaleFactor;
+		    matrix.M12 = matrix.M12 * scaleFactor;
+		    matrix.M13 = matrix.M13 * scaleFactor;
+		    matrix.M14 = matrix.M14 * scaleFactor;
+		    matrix.M21 = matrix.M21 * scaleFactor;
+		    matrix.M22 = matrix.M22 * scaleFactor;
+		    matrix.M23 = matrix.M23 * scaleFactor;
+		    matrix.M24 = matrix.M24 * scaleFactor;
+		    matrix.M31 = matrix.M31 * scaleFactor;
+		    matrix.M32 = matrix.M32 * scaleFactor;
+		    matrix.M33 = matrix.M33 * scaleFactor;
+		    matrix.M34 = matrix.M34 * scaleFactor;
+		    matrix.M41 = matrix.M41 * scaleFactor;
+		    matrix.M42 = matrix.M42 * scaleFactor;
+		    matrix.M43 = matrix.M43 * scaleFactor;
+		    matrix.M44 = matrix.M44 * scaleFactor;
+		    return matrix;
+        }
+
+        /// <summary>
+        /// Multiplies the elements of matrix by a scalar.
+        /// </summary>
+        /// <param name="scaleFactor">Scalar value on the left of the mul sign.</param>
+        /// <param name="matrix">Source <see cref="Matrix"/> on the right of the mul sign.</param>
+        /// <returns>Result of the matrix multiplication with a scalar.</returns>
+        public static Matrix operator *(float scaleFactor, Matrix matrix)
         {
 		    matrix.M11 = matrix.M11 * scaleFactor;
 		    matrix.M12 = matrix.M12 * scaleFactor;

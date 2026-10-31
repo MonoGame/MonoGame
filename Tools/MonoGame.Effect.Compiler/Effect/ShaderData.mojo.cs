@@ -126,15 +126,14 @@ namespace MonoGame.Effect
                     type = samplers[i].type,
                 };
 
-                SamplerStateInfo state;
-                if (samplerStates.TryGetValue(originalSamplerName, out state))
+                if (samplerStates.TryGetValue(originalSamplerName, out var state))
                 {
                     sampler.state = state.State;
                     sampler.parameterName = state.TextureName ?? originalSamplerName;
                 }
 
                 // Store the sampler.
-			    dxshader._samplers[i] = sampler;
+                dxshader._samplers[i] = sampler;
 			}
 
 			// Gather all the parameters used by this shader.

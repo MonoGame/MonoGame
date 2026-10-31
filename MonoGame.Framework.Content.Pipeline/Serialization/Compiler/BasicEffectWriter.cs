@@ -4,20 +4,19 @@
 
 using Microsoft.Xna.Framework.Content.Pipeline.Graphics;
 
-namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
+namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler;
+
+[ContentTypeWriter]
+class BasicEffectWriter : BuiltInContentWriter<BasicMaterialContent>
 {
-    [ContentTypeWriter]
-    class BasicEffectWriter : BuiltInContentWriter<BasicMaterialContent>
+    protected override void Write(ContentWriter output, BasicMaterialContent value)
     {
-        protected internal override void Write(ContentWriter output, BasicMaterialContent value)
-        {
-            output.WriteExternalReference(value.Textures.ContainsKey(BasicMaterialContent.TextureKey) ? value.Texture : null);
-            output.Write(value.DiffuseColor ?? new Vector3(1, 1, 1));
-            output.Write(value.EmissiveColor ?? new Vector3(0, 0, 0));
-            output.Write(value.SpecularColor ?? new Vector3(1, 1, 1));
-            output.Write(value.SpecularPower ?? 16);
-            output.Write(value.Alpha ?? 1);
-            output.Write(value.VertexColorEnabled ?? false);
-        }
+        output.WriteExternalReference(value.Textures.ContainsKey(BasicMaterialContent.TextureKey) ? value.Texture : null);
+        output.Write(value.DiffuseColor ?? new Vector3(1, 1, 1));
+        output.Write(value.EmissiveColor ?? new Vector3(0, 0, 0));
+        output.Write(value.SpecularColor ?? new Vector3(1, 1, 1));
+        output.Write(value.SpecularPower ?? 16);
+        output.Write(value.Alpha ?? 1);
+        output.Write(value.VertexColorEnabled ?? false);
     }
 }

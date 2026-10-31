@@ -17,7 +17,7 @@ namespace MonoGame.Tests.ContentPipeline
         {
             var context = new TestImporterContext("TestObj", "TestBin");
             Assert.Throws<ArgumentNullException>(() => new OggImporter().Import(null, context));
-            Assert.Throws<ArgumentNullException>(() => new OggImporter().Import("", context));
+            Assert.Throws<ArgumentException>(() => new OggImporter().Import("", context));
             Assert.Throws<ArgumentNullException>(() => new OggImporter().Import(@"Assets/Audio/rock_loop_stereo.ogg", null));
             Assert.Throws<FileNotFoundException>(() => new OggImporter().Import(@"this\does\not\exist.ogg", context));
         }

@@ -2,11 +2,6 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-
-
 namespace Microsoft.Xna.Framework.Content.Pipeline.Audio
 {
     /// <summary>
@@ -14,7 +9,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Audio
     /// </summary>
     public abstract class AudioProfile
     {
-        private static readonly LoadedTypeCollection<AudioProfile> _profiles = new LoadedTypeCollection<AudioProfile>();
+        private static readonly LoadedTypeCollection<AudioProfile> _profiles = new();
 
         /// <summary>
         /// Find the profile for this target platform.
@@ -53,7 +48,6 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Audio
         /// <param name="outputFileName"></param>
         /// <returns>The quality used for conversion which could be different from the suggested quality.</returns>
         public abstract ConversionQuality ConvertStreamingAudio(TargetPlatform platform, ConversionQuality quality, AudioContent content, ref string outputFileName);
-
         
         /// <summary>
         /// Calculates the sample rate based on the conversion quality and the source sample rate.
@@ -61,31 +55,19 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Audio
         /// <param name="quality">The target <see cref="ConversionQuality"/></param>
         /// <param name="sourceSampleRate">The source sample rate.</param>
         /// <returns>The calculated sample rate.</returns>
-        protected static int QualityToSampleRate(ConversionQuality quality, int sourceSampleRate)
-        {
-            switch (quality)
+        protected static int QualityToSampleRate(ConversionQuality quality, int sourceSampleRate) => quality switch
             {
-                case ConversionQuality.Low:
-                    return Math.Max(8000, (int)Math.Floor(sourceSampleRate / 2.0));
-                case ConversionQuality.Medium:
-                    return Math.Max(8000, (int)Math.Floor((sourceSampleRate / 4.0) * 3));
-            }
-
-            return Math.Max(8000, sourceSampleRate);
-        }
+                ConversionQuality.Low => Math.Max(8000, (int)Math.Floor(sourceSampleRate / 2.0)),
+                ConversionQuality.Medium => Math.Max(8000, (int)Math.Floor(sourceSampleRate / 4.0 * 3)),
+                _ => Math.Max(8000, sourceSampleRate)
+            };
 
         /// <summary/>
-        protected static int QualityToBitRate(ConversionQuality quality)
-        {
-            switch (quality)
+        protected static int QualityToBitRate(ConversionQuality quality) => quality switch
             {
-                case ConversionQuality.Low:
-                    return 96000;
-                case ConversionQuality.Medium:
-                    return 128000;
-            }
-
-            return 192000;
-        }
+                ConversionQuality.Low => 96000,
+                ConversionQuality.Medium => 128000,
+                _ => 192000,
+            };
     }
 }

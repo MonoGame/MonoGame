@@ -30,6 +30,8 @@ namespace MonoGame.Framework.Utilities
                 return MonoGamePlatform.Windows;
 #elif SWITCH
                 return MonoGamePlatform.NintendoSwitch;
+#elif SWITCH2
+                return MonoGamePlatform.NintendoSwitch2;
 #elif XB1
                 return MonoGamePlatform.XboxOne;
 #elif PLAYSTATION4

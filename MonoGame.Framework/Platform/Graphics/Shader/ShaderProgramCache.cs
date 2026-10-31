@@ -10,12 +10,14 @@ namespace Microsoft.Xna.Framework.Graphics
     internal class ShaderProgram
     {
         public readonly int Program;
+        public readonly uint FragmentOutputMask;
 
         private readonly Dictionary<string, int> _uniformLocations = new Dictionary<string, int>();
 
-        public ShaderProgram(int program)
+        public ShaderProgram(int program, uint fragmentOutputMask)
         {
             Program = program;
+            FragmentOutputMask = fragmentOutputMask;
         }
 
         public int GetUniformLocation(string name)
@@ -121,7 +123,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 throw new InvalidOperationException("Unable to link effect program");
             }
 
-            return new ShaderProgram(program);
+            return new ShaderProgram(program, pixelShader.FragmentOutputMask);
         }
 
 

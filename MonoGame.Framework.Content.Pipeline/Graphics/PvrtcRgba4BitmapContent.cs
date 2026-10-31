@@ -7,18 +7,13 @@ using Microsoft.Xna.Framework.Graphics;
 namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 {
     /// <inheritdoc/>
-    public class PvrtcRgba4BitmapContent : PvrtcBitmapContent
+    /// <summary>
+    /// Creates an instance of PvrtcRgba4BitBitmapContent with the specified width and height.
+    /// </summary>
+    /// <param name="width">The width in pixels of the bitmap.</param>
+    /// <param name="height">The height in pixels of the bitmap.</param>
+    public class PvrtcRgba4BitmapContent(int width, int height) : PvrtcBitmapContent(width, height)
     {
-        /// <summary>
-        /// Creates an instance of PvrtcRgba4BitBitmapContent with the specified width and height.
-        /// </summary>
-        /// <param name="width">The width in pixels of the bitmap.</param>
-        /// <param name="height">The height in pixels of the bitmap.</param>
-        public PvrtcRgba4BitmapContent(int width, int height)
-            : base(width, height)
-        {
-        }
-
         /// <summary>
         /// Gets the corresponding GPU texture format for the specified bitmap type.
         /// </summary>
@@ -34,9 +29,6 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
         /// Returns a string description of the bitmap.
         /// </summary>
         /// <returns>Description of the bitmap.</returns>
-        public override string ToString()
-        {
-            return "PVRTC RGBA 4bpp " + Width + "x" + Height;
-        }
+        public override string ToString() => $"PVRTC RGBA 4bpp {Width}x{Height}";
     }
 }

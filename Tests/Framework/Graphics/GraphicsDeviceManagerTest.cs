@@ -9,12 +9,11 @@ using NUnit.Framework;
 
 namespace MonoGame.Tests.Graphics
 {
-    [TestFixture]
     [NonParallelizable]
+    [RunOnUiTestFixture]
     internal class GraphicsDeviceManagerTest
     {
         [Test]
-        [RunOnUI]
         public void DefaultParameterValidation()
         {
             var game = new Game();
@@ -39,7 +38,6 @@ namespace MonoGame.Tests.Graphics
         }
 
         [Test]
-        [RunOnUI]
         public void InitializeEventCount()
         {
             var game = new TestGameBase();
@@ -75,7 +73,6 @@ namespace MonoGame.Tests.Graphics
         }
 
         [Test]
-        [RunOnUI]
         public void DoNotModifyPresentationParametersDirectly()
         {
             var game = new TestGameBase();
@@ -97,7 +94,6 @@ namespace MonoGame.Tests.Graphics
         }
 
         [Test]
-        [RunOnUI]
         public void PreparingDeviceSettings()
         {
             var game = new TestGameBase();
@@ -122,7 +118,14 @@ namespace MonoGame.Tests.Graphics
                 Assert.False(pp.IsFullScreen);
                 Assert.AreEqual(PresentInterval.One, pp.PresentationInterval);
                 Assert.AreEqual(new Rectangle(0, 0, 800, 480), pp.Bounds);
+
+#if DESKTOPGL4
+                // Native OpenGL doesn't create the actual SDL window until graphics initialization,
+                // after the final presentation parameters have been configured.
+                Assert.AreEqual(IntPtr.Zero, pp.DeviceWindowHandle);
+#else
                 Assert.AreNotEqual(IntPtr.Zero, pp.DeviceWindowHandle);
+#endif
                 Assert.AreEqual(DisplayOrientation.Default, pp.DisplayOrientation);
                 Assert.AreEqual(RenderTargetUsage.DiscardContents, pp.RenderTargetUsage);
                 Assert.AreEqual(0, pp.MultiSampleCount);
@@ -136,7 +139,6 @@ namespace MonoGame.Tests.Graphics
         }
 
         [Test]
-        [RunOnUI]
         public void PreparingDeviceSettingsEventChangeGraphicsProfile()
         {
             var game = new TestGameBase();
@@ -175,7 +177,6 @@ namespace MonoGame.Tests.Graphics
         }
 
         [Test]
-        [RunOnUI]
         public void PreparingDeviceSettingsArgsPresentationParametersAreApplied()
         {
             var game = new TestGameBase();
@@ -209,7 +210,6 @@ namespace MonoGame.Tests.Graphics
         }
 
         [Test]
-        [RunOnUI]
         public void PreparingDeviceSettingsArgsThrowsWhenPPSetToNull()
         {
             var game = new TestGameBase();
@@ -230,7 +230,6 @@ namespace MonoGame.Tests.Graphics
         }
 
         [Test]
-        [RunOnUI]
         public void ApplyChangesReturnsWhenNoSetterCalled()
         {
             var game = new TestGameBase();
@@ -261,7 +260,6 @@ namespace MonoGame.Tests.Graphics
         }
 
         [Test]
-        [RunOnUI]
         public void ApplyChangesInvokesPreparingDeviceSettings()
         {
             var game = new TestGameBase();
@@ -287,7 +285,6 @@ namespace MonoGame.Tests.Graphics
         }
 
         [Test]
-        [RunOnUI]
         public void ApplyChangesResetsDevice()
         {
             var game = new TestGameBase();
@@ -307,7 +304,6 @@ namespace MonoGame.Tests.Graphics
         }
 
         [Test]
-        [RunOnUI]
         public void DeviceDisposingInvokedAfterDeviceDisposed()
         {
             var game = new TestGameBase();
@@ -335,10 +331,10 @@ namespace MonoGame.Tests.Graphics
         }
     }
 
+    [RunOnUiTestFixture]
     internal class GraphicsDeviceManagerFixtureTest : GraphicsDeviceTestFixtureBase
     {
         [Test]
-        [RunOnUI]
         public void ResettingDeviceTriggersResetEvents()
         {
             var resetCount = 0;
@@ -358,9 +354,8 @@ namespace MonoGame.Tests.Graphics
             Assert.AreEqual(1, resetCount);
             Assert.AreEqual(1, resettingCount);
         }
-        
+
         [Test]
-        [RunOnUI]
         public void NewDeviceDoesNotTriggerReset()
         {
             var resetCount = 0;
@@ -384,7 +379,6 @@ namespace MonoGame.Tests.Graphics
         }
 
         [Test]
-        [RunOnUI]
         public void ClientSizeChangedOnDeviceReset()
         {
             var count = 0;
@@ -407,11 +401,26 @@ namespace MonoGame.Tests.Graphics
             Assert.AreEqual(0, count);
         }
 
+#if VULKAN || DIRECTX12
+        [Test]
+        public void BackBufferAndViewportUpdateOnResize()
+        {
+            int width = 100;
+            int height = 50;
+
+            ((NativeGameWindow)game.Window).ClientResize(width, height);
+
+            Assert.AreEqual(width, gd.PresentationParameters.BackBufferWidth);
+            Assert.AreEqual(height, gd.PresentationParameters.BackBufferHeight);
+            Assert.AreEqual(width, gd.Viewport.Width);
+            Assert.AreEqual(height, gd.Viewport.Height);
+        }
+#endif
+
         [Test]
 #if DESKTOPGL
         [Ignore("Expected 2 but got 3. Needs Investigating")]
 #endif
-        [RunOnUI]
         public void MultiSampleCountRoundsDown()
         {
             gdm.PreferMultiSampling = true;
@@ -433,8 +442,9 @@ namespace MonoGame.Tests.Graphics
         [TestCase(true)]
 #if DESKTOPGL
         [Ignore("Expected not 1024 but got 1024. Needs Investigating")]
+#elif DESKTOPGL4
+        [Ignore("OpenGL backbuffer MSAA is not implemented yet for the native backend")]
 #endif
-        [RunOnUI]
         public void MSAAEnabled(bool enabled)
         {
             gdm.PreferMultiSampling = enabled;
@@ -510,7 +520,6 @@ namespace MonoGame.Tests.Graphics
         }
 
         [Test]
-        [RunOnUI]
         public void UnsupportedMultiSampleCountDoesNotThrowException()
         {
             gdm.PreferMultiSampling = true;
@@ -530,12 +539,63 @@ namespace MonoGame.Tests.Graphics
             }, "GraphicsDevice.Reset(PresentationParameters)");
         }
 
-#if DIRECTX
+#if DESKTOPGL4
         [Test]
-        [RunOnUI]
+        public void ApplyChangesRecreatesNativeWindowWhenDepthStencilFormatChanges()
+        {
+            var game = new TestGameBase();
+            var gdm = new GraphicsDeviceManager(game);
+
+            game.InitializeOnly();
+
+            IntPtr oldWindowHandle = game.GraphicsDevice.PresentationParameters.DeviceWindowHandle;
+
+            gdm.PreferredDepthStencilFormat = DepthFormat.None;
+            gdm.ApplyChanges();
+
+            var pp = game.GraphicsDevice.PresentationParameters;
+            Assert.AreEqual(DepthFormat.None, pp.DepthStencilFormat);
+            Assert.AreEqual(game.Window.Handle, pp.DeviceWindowHandle);
+            Assert.AreNotEqual(IntPtr.Zero, pp.DeviceWindowHandle);
+            Assert.AreNotEqual(oldWindowHandle, pp.DeviceWindowHandle);
+
+            game.Dispose();
+        }
+
+        [Test]
+        public void ApplyChangesRecreatesNativeWindowWhenBackBufferFormatChangesToSrgb()
+        {
+            var game = new TestGameBase();
+            var gdm = new GraphicsDeviceManager(game);
+
+            game.InitializeOnly();
+
+            if (!game.GraphicsDevice.GraphicsCapabilities.SupportsSRgb)
+            {
+                game.Dispose();
+                Assert.Ignore("OpenGL sRGB backbuffer support is unavailable on this device.");
+            }
+
+            IntPtr oldWindowHandle = game.GraphicsDevice.PresentationParameters.DeviceWindowHandle;
+
+            gdm.PreferredBackBufferFormat = SurfaceFormat.ColorSRgb;
+            gdm.ApplyChanges();
+
+            var pp = game.GraphicsDevice.PresentationParameters;
+            Assert.AreEqual(SurfaceFormat.ColorSRgb, pp.BackBufferFormat);
+            Assert.AreEqual(game.Window.Handle, pp.DeviceWindowHandle);
+            Assert.AreNotEqual(IntPtr.Zero, pp.DeviceWindowHandle);
+            Assert.AreNotEqual(oldWindowHandle, pp.DeviceWindowHandle);
+
+            game.Dispose();
+        }
+#endif
+
+#if DIRECTX || DESKTOPGL4
+        [Test]
         public void TooHighMultiSampleCountClampedToMaxSupported()
         {
-            var maxMultiSampleCount = gd.GraphicsCapabilities.MaxMultiSampleCount;
+            var maxMultiSampleCount = gd.PlatformGetMaxMultiSampleCount(gdm.PreferredBackBufferFormat);
             gdm.PreferMultiSampling = true;
 
             gdm.PreparingDeviceSettings += (sender, args) =>
@@ -559,7 +619,7 @@ namespace MonoGame.Tests.Graphics
             gdm.GraphicsDevice.Reset(pp3);
             Assert.AreEqual
                 (maxMultiSampleCount, gdm.GraphicsDevice.PresentationParameters.MultiSampleCount);
-            
+
         }
 #endif
     }

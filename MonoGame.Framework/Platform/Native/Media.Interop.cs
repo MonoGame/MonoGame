@@ -15,6 +15,26 @@ internal readonly struct MGM_AudioDecoder{ }
 [MGHandle]
 internal readonly struct MGM_VideoDecoder { }
 
+[MGHandle]
+internal readonly struct MGM_Song { }
+
+internal enum SongEventType
+{
+    Completed,
+    Failed,
+}
+
+struct MGM_SongInfo
+{
+    public ulong duration;
+}
+
+struct MGM_SongEvent
+{
+    public SongEventType type;
+    public ulong generation;
+}
+
 struct MGM_AudioDecoderInfo
 {
     /// <summary>
@@ -60,6 +80,40 @@ struct MGM_VideoDecoderInfo
 
 internal static unsafe partial class MGM
 {
+    #region Song
+
+    [DllImport(MGP.MonoGameNativeDLL, EntryPoint = "MGM_Song_Create", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern MGM_Song* Song_Create([MarshalAs(UnmanagedType.LPUTF8Str)] string filepath, MGA_System* system, out MGM_SongInfo info);
+
+    [DllImport(MGP.MonoGameNativeDLL, EntryPoint = "MGM_Song_Destroy", ExactSpelling = true)]
+    public static extern void Song_Destroy(MGM_Song* song);
+
+    [DllImport(MGP.MonoGameNativeDLL, EntryPoint = "MGM_Song_Play", ExactSpelling = true)]
+    public static extern byte Song_Play(MGM_Song* song, ulong positionMS, ulong generation);
+
+    [DllImport(MGP.MonoGameNativeDLL, EntryPoint = "MGM_Song_Pause", ExactSpelling = true)]
+    public static extern void Song_Pause(MGM_Song* song);
+
+    [DllImport(MGP.MonoGameNativeDLL, EntryPoint = "MGM_Song_Resume", ExactSpelling = true)]
+    public static extern void Song_Resume(MGM_Song* song);
+
+    [DllImport(MGP.MonoGameNativeDLL, EntryPoint = "MGM_Song_Stop", ExactSpelling = true)]
+    public static extern void Song_Stop(MGM_Song* song);
+
+    [DllImport(MGP.MonoGameNativeDLL, EntryPoint = "MGM_Song_SetVolume", ExactSpelling = true)]
+    public static extern void Song_SetVolume(MGM_Song* song, float volume);
+
+    [DllImport(MGP.MonoGameNativeDLL, EntryPoint = "MGM_Song_GetPosition", ExactSpelling = true)]
+    public static extern ulong Song_GetPosition(MGM_Song* song);
+
+    [DllImport(MGP.MonoGameNativeDLL, EntryPoint = "MGM_Song_GetDuration", ExactSpelling = true)]
+    public static extern ulong Song_GetDuration(MGM_Song* song);
+
+    [DllImport(MGP.MonoGameNativeDLL, EntryPoint = "MGM_Song_TryDequeueEvent", ExactSpelling = true)]
+    public static extern byte Song_TryDequeueEvent(MGM_Song* song, out MGM_SongEvent songEvent);
+
+    #endregion
+
     #region Audio Decoder
 
     /// <summary>

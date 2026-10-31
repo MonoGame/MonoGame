@@ -4,23 +4,18 @@
 
 using Microsoft.Xna.Framework.Content.Pipeline.Processors;
 
-namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
-{
-    [ContentTypeWriter]
-    class CompiledEffectContentWriter : BuiltInContentWriter<CompiledEffectContent>
-    {
-        protected internal override void Write(ContentWriter output, CompiledEffectContent value)
-        {
-            var code = value.GetEffectCode();
-            output.Write(code.Length);
-            output.Write(code);
-        }
+namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler;
 
-        public override string GetRuntimeReader(TargetPlatform targetPlatform)
-        {
-            var type = typeof(ContentReader);
-            var readerType = type.Namespace + ".EffectReader, " + type.Assembly.FullName;
-            return readerType;
-        }
+[ContentTypeWriter]
+class CompiledEffectContentWriter : BuiltInContentWriter<CompiledEffectContent>
+{
+    protected override void Write(ContentWriter output, CompiledEffectContent value)
+    {
+        var code = value.GetEffectCode();
+        output.Write(code.Length);
+        output.Write(code);
     }
+
+    public override string GetRuntimeReader(TargetPlatform targetPlatform)
+        => $"{typeof(ContentReader).Namespace}.EffectReader, {typeof(ContentReader).Assembly.FullName}";
 }

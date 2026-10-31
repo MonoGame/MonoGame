@@ -11,10 +11,12 @@ using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using System.Threading;
 using System.Diagnostics;
+using MonoGame.Tests;
 
 namespace MonoGame.Tests.Audio
 {
     [Category("Audio")]
+    [RunOnUiTestFixture]
     class SoundEffectInstanceTest : AudioTestFixtureBase
     {
         /// <summary>

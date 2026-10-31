@@ -2,50 +2,44 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
 using System.Xml;
-using MonoGame.Framework.Utilities;
 
 namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Intermediate
 {
-    internal class ReflectiveSerializer : ContentTypeSerializer
+    internal class ReflectiveSerializer(Type targetType) : ContentTypeSerializer(targetType, string.Empty)
     {
-        const BindingFlags _bindingFlags = BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly;
+        private const BindingFlags RefBindingFlags = BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly;
 
         private struct ElementInfo
         {
             public ContentSerializerAttribute Attribute;
             public ContentTypeSerializer Serializer;
-            public Action<object, object> Setter;
-            public Func<object, object> Getter;
+            public Action<object?, object?>? Setter;
+            public Func<object?, object?> Getter;
         };
 
-        private readonly List<ElementInfo> _elements = new List<ElementInfo>();
+        private readonly List<ElementInfo> _elements = [];
+        private ContentTypeSerializer? _baseSerializer;
+        private GenericCollectionHelper? _collectionHelper;
 
-        private ContentTypeSerializer _baseSerializer;
-        private GenericCollectionHelper _collectionHelper;
-
-        private bool GetElementInfo(IntermediateSerializer serializer, MemberInfo member, out ElementInfo info)
+        private static bool GetElementInfo(IntermediateSerializer serializer, MemberInfo member, out ElementInfo info)
         {
             info = new ElementInfo();
 
             // Are we ignoring this property?
-            if (ReflectionHelpers.GetCustomAttribute<ContentSerializerIgnoreAttribute>(member) != null)
+            if (Attribute.GetCustomAttribute(member, typeof(ContentSerializerIgnoreAttribute)) is ContentSerializerIgnoreAttribute)
                 return false;
 
             var prop = member as PropertyInfo;
             var field = member as FieldInfo;
 
-            var attrib = ReflectionHelpers.GetCustomAttribute<ContentSerializerAttribute>(member);
-            if (attrib != null)
+            if (Attribute.GetCustomAttribute(member, typeof(ContentSerializerAttribute)) is ContentSerializerAttribute attrib)
             {
                 // Store the attribute for later use.
                 info.Attribute = attrib.Clone();
 
-                // Default the to member name as the element name.
+                // Default to member name as the element name.
                 if (string.IsNullOrEmpty(attrib.ElementName))
                     info.Attribute.ElementName = member.Name;
             }
@@ -56,7 +50,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Intermediate
 
                 if (prop != null)
                 {
-                    // If we don't have at least a public getter then this 
+                    // If we don't have at least a public getter then this
                     // property can't be serialized or deserialized in any way.
                     if (prop.GetGetMethod() == null)
                         return false;
@@ -68,14 +62,14 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Intermediate
                     if (setter != null && !setter.IsPublic)
                         return false;
 
-                    // If there is no setter, and we don't have a type serializer 
-                    // that can deserialize into an existing object, then we have no way 
+                    // If there is no setter, and we don't have a type serializer
+                    // that can deserialize into an existing object, then we have no way
                     // for it to be deserialized.
                     if (setter == null && !serializer.GetTypeSerializer(prop.PropertyType).CanDeserializeIntoExistingObject)
                         return false;
 
                     // Don't serialize or deserialize indexers.
-                    if (prop.GetIndexParameters().Any())
+                    if (prop.GetIndexParameters().Length != 0)
                         return false;
                 }
                 else if (field != null)
@@ -84,8 +78,10 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Intermediate
                         return false;
                 }
 
-                info.Attribute = new ContentSerializerAttribute();
-                info.Attribute.ElementName = member.Name;
+                info.Attribute = new ContentSerializerAttribute
+                {
+                    ElementName = member.Name
+                };
             }
 
             if (prop != null)
@@ -105,11 +101,6 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Intermediate
             return true;
         }
 
-        public ReflectiveSerializer(Type targetType) :
-            base(targetType, string.Empty)
-        {
-        }
-
         protected internal override void Initialize(IntermediateSerializer serializer)
         {
             // If we have a base type then we need to deserialize it first.
@@ -117,50 +108,44 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Intermediate
                 _baseSerializer = serializer.GetTypeSerializer(TargetType.BaseType);
 
             // Cache all our serializable properties.
-            var properties = TargetType.GetProperties(_bindingFlags);
+            var properties = TargetType.GetProperties(RefBindingFlags);
             foreach (var prop in properties)
             {
-                ElementInfo info;
-                if (GetElementInfo(serializer, prop, out info))
+                if (GetElementInfo(serializer, prop, out var info))
                     _elements.Add(info);
             }
 
             // Cache all our serializable fields.
-            var fields = TargetType.GetFields(_bindingFlags);
+            var fields = TargetType.GetFields(RefBindingFlags);
             foreach (var field in fields)
             {
-                ElementInfo info;
-                if (GetElementInfo(serializer, field, out info))
-                    _elements.Add(info);                
+                if (GetElementInfo(serializer, field, out var info))
+                    _elements.Add(info);
             }
 
             if (GenericCollectionHelper.IsGenericCollectionType(TargetType, false))
                 _collectionHelper = serializer.GetCollectionHelper(TargetType);
         }
 
-        public override bool CanDeserializeIntoExistingObject
-        {
-            get { return TargetType.IsClass && TargetType.BaseType != null; }
-        }
+        public override bool CanDeserializeIntoExistingObject => TargetType is { IsClass: true, BaseType: not null };
 
-        protected internal override object Deserialize(IntermediateReader input, ContentSerializerAttribute format, object existingInstance)
+        protected internal override object Deserialize(IntermediateReader input, ContentSerializerAttribute format, object? existingInstance)
         {
             var result = existingInstance;
             if (result == null)
             {
                 try
                 {
-                    result = Activator.CreateInstance(TargetType, true);
+                    result = Activator.CreateInstance(TargetType, true)!;
                 }
                 catch (MissingMethodException e)
                 {
-                    throw new Exception(string.Format("Couldn't create object of type {0}: {1}", TargetType.Name, e.Message), e);
-                }                
+                    throw new Exception($"Couldn't create object of type {TargetType.Name}: {e.Message}", e);
+                }
             }
 
             // First deserialize the base type.
-            if (_baseSerializer != null)
-                _baseSerializer.Deserialize(input, format, result);
+            _baseSerializer?.Deserialize(input, format, result);
 
             // Now deserialize our own elements.
             foreach (var info in _elements)
@@ -169,20 +154,20 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Intermediate
                 {
                     if (!input.MoveToElement(info.Attribute.ElementName))
                     {
-                        // If the the element was optional then we can
+                        // If the element was optional then we can
                         // safely skip it and continue.
                         if (info.Attribute.Optional)
                             continue;
-                        
+
                         // We failed to find a required element.
-                        throw input.NewInvalidContentException(null, "The Xml element `{0}` is required, but element `{1}` was found at line {2}:{3}. Try changing the element order or adding missing elements.", info.Attribute.ElementName, input.Xml.Name, ((IXmlLineInfo)input.Xml).LineNumber, ((IXmlLineInfo)input.Xml).LinePosition);
+                        throw input.NewInvalidContentException(null, $"The Xml element `{info.Attribute.ElementName}` is required, but element `{input.Xml.Name}` was found at line {((IXmlLineInfo)input.Xml).LineNumber}:{((IXmlLineInfo)input.Xml).LinePosition}. Try changing the element order or adding missing elements.");
                     }
                 }
 
                 if (info.Attribute.SharedResource)
                 {
-                    Action<object> fixup = (o) => info.Setter(result, o);
-                    input.ReadSharedResource(info.Attribute, fixup);
+                    void Fixup(object? o) => info.Setter!(result, o);
+                    input.ReadSharedResource(info.Attribute, (Action<object?>)Fixup);
                 }
                 else if (info.Setter == null)
                 {
@@ -196,13 +181,12 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Intermediate
                 }
             }
 
-            if (_collectionHelper != null)
-                _collectionHelper.Deserialize(input, result, format);
+            _collectionHelper?.Deserialize(input, result, format);
 
             return result;
         }
 
-        public override bool ObjectIsEmpty(object value)
+        public override bool ObjectIsEmpty(object? value)
         {
             if (_baseSerializer != null)
                 return _baseSerializer.ObjectIsEmpty(value);
@@ -211,14 +195,13 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Intermediate
             return false;
         }
 
-        protected internal override void ScanChildren(IntermediateSerializer serializer, ChildCallback callback, object value)
+        protected internal override void ScanChildren(IntermediateSerializer serializer, ChildCallback callback, object? value)
         {
-            if (serializer.AlreadyScanned(value))
+            if (value == null || serializer.AlreadyScanned(value))
                 return;
 
             // First scan the base type.
-            if (_baseSerializer != null)
-                _baseSerializer.ScanChildren(serializer, callback, value);
+            _baseSerializer?.ScanChildren(serializer, callback, value);
 
             // Now scan our own elements.
             foreach (var info in _elements)
@@ -234,15 +217,13 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Intermediate
                 elementSerializer.ScanChildren(serializer, callback, elementValue);
             }
 
-            if (_collectionHelper != null)
-                _collectionHelper.ScanChildren(callback, value);
+            _collectionHelper?.ScanChildren(callback, value);
         }
 
-        protected internal override void Serialize(IntermediateWriter output, object value, ContentSerializerAttribute format)
+        protected internal override void Serialize(IntermediateWriter output, object? value, ContentSerializerAttribute format)
         {
             // First serialize the base type.
-            if (_baseSerializer != null)
-                _baseSerializer.Serialize(output, value, format);
+            _baseSerializer?.Serialize(output, value, format);
 
             // Now serialize our own elements.
             foreach (var info in _elements)
@@ -255,8 +236,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Intermediate
                     output.WriteObjectInternal(elementValue, info.Attribute, info.Serializer, info.Serializer.TargetType);
             }
 
-            if (_collectionHelper != null)
-                _collectionHelper.Serialize(output, value, format);
+            _collectionHelper?.Serialize(output, value, format);
         }
     }
 }

@@ -2,10 +2,7 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
-using System;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.Linq;
 using Microsoft.Xna.Framework.Content.Pipeline.Graphics;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Graphics.PackedVector;
@@ -18,25 +15,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
     [ContentProcessor(DisplayName = "Model - MonoGame")]
     public class ModelProcessor : ContentProcessor<NodeContent, ModelContent>
     {
-        private ContentIdentity _identity;
-
-        #region Fields for default values
-
-        private bool _colorKeyEnabled = true;
-        private bool _generateMipmaps = true;
-        private bool _premultiplyTextureAlpha = true;
-        private bool _premultiplyVertexColors = true;
-        private float _scale = 1.0f;
-        private TextureProcessorOutputFormat _textureFormat = TextureProcessorOutputFormat.Compressed;
-
-        #endregion
-
-        /// <summary>
-        /// Initializes a new instance of <b>ModelProcessor</b>.
-        /// </summary>
-        public ModelProcessor() { }
-
-        #region Properties
+        private ContentIdentity? _identity;
 
         /// <summary>
         /// Gets or Sets the background color used for transparency
@@ -48,11 +27,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
         /// marked as transparent (Alpha 0).  The default value is <b>false</b>.
         /// </summary>
         [DefaultValue(true)]
-        public virtual bool ColorKeyEnabled
-        {
-            get { return _colorKeyEnabled; }
-            set { _colorKeyEnabled = value; }
-        }
+        public virtual bool ColorKeyEnabled { get; set; } = true;
 
         /// <summary>
         /// Gets or Sets the default effect class to apply to this model. The default value is <b>BasicEffect</b>
@@ -64,11 +39,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
         /// value is <b>false</b>.
         /// </summary>
         [DefaultValue(true)]
-        public virtual bool GenerateMipmaps
-        {
-            get { return _generateMipmaps; }
-            set { _generateMipmaps = value; }
-        }
+        public virtual bool GenerateMipmaps { get; set; } = true;
 
         /// <summary>
         /// Gets or Sets a value that indicates whether model tangents should be generated for use in Normal Mapping.
@@ -81,22 +52,14 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
         /// The default value is <b>true</b>.
         /// </summary>
         [DefaultValue(true)]
-        public virtual bool PremultiplyTextureAlpha
-        {
-            get { return _premultiplyTextureAlpha; }
-            set { _premultiplyTextureAlpha = value; }
-        }
+        public virtual bool PremultiplyTextureAlpha { get; set; } = true;
 
         /// <summary>
         /// Gets or Sets a value that indicates whether the selected texture will be treated as an Vertex Color Mask.
         /// The default value is <b>true</b>.
         /// </summary>
         [DefaultValue(true)]
-        public virtual bool PremultiplyVertexColors
-        {
-            get { return _premultiplyVertexColors; }
-            set { _premultiplyVertexColors = value; }
-        }
+        public virtual bool PremultiplyVertexColors { get; set; } = true;
 
         /// <summary>
         /// Gets or Sets a value that indicates if the model texture(s) dimensions should be resized to the next largest
@@ -123,11 +86,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
         /// Gets or Sets the default model scale.  The default value is <b>1.0f</b>.
         /// </summary>
         [DefaultValue(1.0f)]
-        public virtual float Scale
-        {
-            get { return _scale; }
-            set { _scale = value; }
-        }
+        public virtual float Scale { get; set; } = 1.0f;
 
         /// <summary>
         /// Gets or Sets a value indicating whether the winding order is swapped.  This is useful for models that appear
@@ -139,13 +98,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
         /// Gets or Sets the format of the texture to process (e.g. raw color, DXT).  The default value is <b>compressed</b>.
         /// </summary>
 		[DefaultValue(typeof(TextureProcessorOutputFormat), "Compressed")]
-        public virtual TextureProcessorOutputFormat TextureFormat
-        {
-            get { return _textureFormat; }
-            set { _textureFormat = value; }
-        }
-
-        #endregion
+        public virtual TextureProcessorOutputFormat TextureFormat { get; set; } = TextureProcessorOutputFormat.Compressed;
 
         /// <summary>
         /// Converts mesh content to model content.
@@ -179,8 +132,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
             foreach (var inputMaterial in distinctMaterials)
             {
                 var geomsWithMaterial = geometries.Where(g => g.Material == inputMaterial).ToList();
-                var material = ConvertMaterial(inputMaterial, context);
-
+                var material = inputMaterial != null ? ConvertMaterial(inputMaterial, context) : null;
                 ProcessGeometryUsingMaterial(material, geomsWithMaterial, context);
             }
 
@@ -191,13 +143,13 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
             return new ModelContent(rootNode, boneList, meshList);
         }
 
-        private ModelBoneContent ProcessNode(NodeContent node, ModelBoneContent parent, List<ModelBoneContent> boneList, List<ModelMeshContent> meshList, ContentProcessorContext context)
+        private ModelBoneContent ProcessNode(NodeContent node, ModelBoneContent? parent, List<ModelBoneContent> boneList, List<ModelMeshContent> meshList, ContentProcessorContext context)
         {
             var result = new ModelBoneContent(node.Name, boneList.Count, node.Transform, parent);
             boneList.Add(result);
 
-            if (node is MeshContent)
-                meshList.Add(ProcessMesh(node as MeshContent, result, context));
+            if (node is MeshContent meshContent)
+                meshList.Add(ProcessMesh(meshContent, result, context));
 
             var children = new List<ModelBoneContent>();
             foreach (var child in node.Children)
@@ -215,7 +167,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
 
 			if (GenerateTangentFrames)
             {
-                context.Logger.LogMessage("Generating tangent frames.");
+                context.Logger.Log(LogLevel.Info, "Generating tangent frames.");
                 foreach (GeometryContent geom in mesh.Geometry)
                 {
                     if (!geom.Vertices.Channels.Contains(VertexChannelNames.Normal(0)))
@@ -239,7 +191,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
                 var vertexCount = vertices.VertexCount;
                 ModelMeshPartContent partContent;
                 if (vertexCount == 0)
-                    partContent = new ModelMeshPartContent();
+                    partContent = new ModelMeshPartContent(null, null, 0, 0, 0, 0);
                 else
                 {
                     var geomBuffer = geometry.Vertices.CreateVertexBuffer();
@@ -280,44 +232,37 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
                 TextureFormat = TextureFormat,
                 DefaultEffect = DefaultEffect
             };
-            
+
             return context.Convert<MaterialContent, MaterialContent>(material, processor);
         }
 
         /// <summary />
-        protected virtual void ProcessGeometryUsingMaterial(MaterialContent material,
-                                                            IEnumerable<GeometryContent> geometryCollection,
-                                                            ContentProcessorContext context)
+        protected virtual void ProcessGeometryUsingMaterial(MaterialContent? material, IEnumerable<GeometryContent> geometryCollection, ContentProcessorContext context)
         {
             // If we don't get a material then assign a default one.
-            if (material == null)
-                material = MaterialProcessor.CreateDefaultMaterial(DefaultEffect);
+            material ??= MaterialProcessor.CreateDefaultMaterial(DefaultEffect);
 
             // Test requirements from the assigned material.
             int textureChannels;
-            bool vertexWeights = false;
-            if (material is DualTextureMaterialContent)
+            var vertexWeights = false;
+            switch (material)
             {
-                textureChannels = 2;
-            }
-            else if (material is SkinnedMaterialContent)
-            {
-                textureChannels = 1;
-                vertexWeights = true;
-            }
-            else if (material is EnvironmentMapMaterialContent)
-            {
-                textureChannels = 1;
-            }
-            else if (material is AlphaTestMaterialContent)
-            {
-                textureChannels = 1;
-            }
-            else
-            {
-                // Just check for a "Texture" which should cover custom Effects
-                // and BasicEffect which can have an optional texture.
-                textureChannels = material.Textures.ContainsKey("Texture") ? 1 : 0;
+                case DualTextureMaterialContent:
+                    textureChannels = 2;
+                    break;
+                case SkinnedMaterialContent:
+                    textureChannels = 1;
+                    vertexWeights = true;
+                    break;
+                case EnvironmentMapMaterialContent:
+                case AlphaTestMaterialContent:
+                    textureChannels = 1;
+                    break;
+                default:
+                    // Just check for a "Texture" which should cover custom Effects
+                    // and BasicEffect which can have an optional texture.
+                    textureChannels = material.Textures.ContainsKey("Texture") ? 1 : 0;
+                    break;
             }
 
             // By default we must set the vertex color property
@@ -340,10 +285,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
                 {
                     if (!geometry.Vertices.Channels.Contains(VertexChannelNames.TextureCoordinate(i)))
                         throw new InvalidContentException(
-                            string.Format("The mesh \"{0}\", using {1}, contains geometry that is missing texture coordinates for channel {2}.",
-                            geometry.Parent.Name,
-                            MaterialProcessor.GetDefaultEffect(material),
-                            i),
+                            $"The mesh \"{geometry.Parent?.Name}\", using {MaterialProcessor.GetDefaultEffect(material)}, contains geometry that is missing texture coordinates for channel {i}.",
                             _identity);
                 }
 
@@ -358,9 +300,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
                 {
                     var weightsName = VertexChannelNames.EncodeName(VertexElementUsage.BlendWeight, 0);
                     if (!geometry.Vertices.Channels.Contains(weightsName))
-                        throw new InvalidContentException(
-                            string.Format("The skinned mesh \"{0}\" contains geometry without any vertex weights.", geometry.Parent.Name),
-                            _identity);
+                        throw new InvalidContentException($"The skinned mesh \"{geometry.Parent?.Name}\" contains geometry without any vertex weights.", _identity);
                 }
             }
         }
@@ -379,35 +319,29 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
                 ProcessWeightsChannel(geometry, vertexChannelIndex, _identity);
         }
 
-        private static void ProcessWeightsChannel(GeometryContent geometry, int vertexChannelIndex, ContentIdentity identity)
+        private static void ProcessWeightsChannel(GeometryContent geometry, int vertexChannelIndex, ContentIdentity? identity)
         {
             // NOTE: Portions of this code is from the XNA CPU Skinning
             // sample under Ms-PL, (c) Microsoft Corporation.
 
             // create a map of Name->Index of the bones
-            var skeleton = MeshHelper.FindSkeleton(geometry.Parent);
-            if (skeleton == null)
-            {
+            var skeleton = MeshHelper.FindSkeleton(geometry.Parent) ??
                 throw new InvalidContentException(
                     "Skeleton not found. Meshes that contain a Weights vertex channel cannot be processed without access to the skeleton data.",
                     identity);
-            }
-
             var boneIndices = new Dictionary<string, int>();
             var flattenedBones = MeshHelper.FlattenSkeleton(skeleton);
             for (var i = 0; i < flattenedBones.Count; i++)
-                boneIndices.Add(flattenedBones[i].Name, i);
+            {
+                string name = flattenedBones[i].Name ?? throw new InvalidContentException("Bone name cannot be null.");
+                boneIndices[name] = i;
+            }
 
             var vertexChannel = geometry.Vertices.Channels[vertexChannelIndex];
-            var inputWeights = vertexChannel as VertexChannel<BoneWeightCollection>;
-            if (inputWeights == null)
+            if (vertexChannel is not VertexChannel<BoneWeightCollection> inputWeights)
             {
                 throw new InvalidContentException(
-                    string.Format(
-                        "Vertex channel \"{0}\" is the wrong type. It has element type {1}. Type {2} is expected.",
-                        vertexChannel.Name,
-                        vertexChannel.ElementType.FullName,
-                        "Microsoft.Xna.Framework.Content.Pipeline.Graphics.BoneWeightCollection"),
+                    $"Vertex channel \"{vertexChannel.Name}\" is the wrong type. It has element type {vertexChannel.ElementType.FullName}. Type {nameof(BoneWeightCollection)} is expected.",
                     identity);
             }
             var outputIndices = new Byte4[inputWeights.Count];
@@ -445,14 +379,13 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
             for (var i = 0; i < weights.Count; i++)
             {
                 var weight = weights[i];
-
-                if (!boneIndices.ContainsKey(weight.BoneName))
+                if (!boneIndices.TryGetValue(weight.BoneName, out int value))
                 {
-                    var errorMessage = string.Format("Bone '{0}' was not found in the skeleton! Skeleton bones are: '{1}'.", weight.BoneName, string.Join("', '", boneIndices.Keys));
+                    var errorMessage = $"Bone '{weight.BoneName}' was not found in the skeleton! Skeleton bones are: '{string.Join("', '", boneIndices.Keys)}'.";
                     throw new Exception(errorMessage);
                 }
 
-                tempIndices[i] = boneIndices[weight.BoneName];
+                tempIndices[i] = value;
                 tempWeights[i] = weight.Weight;
             }
 

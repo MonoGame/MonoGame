@@ -2,8 +2,6 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
-using System;
-using System.Linq;
 using Microsoft.Xna.Framework.Graphics;
 
 namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
@@ -13,18 +11,10 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
     /// </summary>
     public abstract class TextureContent : ContentItem
     {
-        MipmapChainCollection faces;
-
         /// <summary>
         /// Collection of image faces that hold a single mipmap chain for a regular 2D texture, six chains for a cube map, or an arbitrary number for volume and array textures.
         /// </summary>
-        public MipmapChainCollection Faces
-        {
-            get
-            {
-                return faces;
-            }
-        }
+        public MipmapChainCollection Faces { get; }
 
         /// <summary>
         /// Initializes a new instance of TextureContent with the specified face collection.
@@ -32,7 +22,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
         /// <param name="faces">Mipmap chain containing the face collection.</param>
         protected TextureContent(MipmapChainCollection faces)
         {
-            this.faces = faces;
+            Faces = faces;
         }
 
         /// <summary>
@@ -41,36 +31,34 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
         /// <param name="newBitmapType">Type being converted to. The new type must be a subclass of BitmapContent, such as PixelBitmapContent or DxtBitmapContent.</param>
         public void ConvertBitmapType(Type newBitmapType)
         {
-            if (newBitmapType == null)
-                throw new ArgumentNullException("newBitmapType");
+            ArgumentNullException.ThrowIfNull(newBitmapType);
 
             if (!newBitmapType.IsSubclassOf(typeof (BitmapContent)))
-                throw new ArgumentException(string.Format("Type '{0}' is not a subclass of BitmapContent.", newBitmapType));
+                throw new ArgumentException($"Type '{newBitmapType}' is not a subclass of BitmapContent.", nameof(newBitmapType));
 
             if (newBitmapType.IsAbstract)
-                throw new ArgumentException(string.Format("Type '{0}' is abstract and cannot be allocated.", newBitmapType));
+                throw new ArgumentException($"Type '{newBitmapType}' is abstract and cannot be allocated.", nameof(newBitmapType));
 
             if (newBitmapType.ContainsGenericParameters)
-                throw new ArgumentException(string.Format("Type '{0}' contains generic parameters and cannot be allocated.", newBitmapType));
+                throw new ArgumentException($"Type '{newBitmapType}' contains generic parameters and cannot be allocated.", nameof(newBitmapType));
 
-            if (newBitmapType.GetConstructor(new Type[2] {typeof (int), typeof (int)}) == null)
-                throw new ArgumentException(string.Format("Type '{0} does not have a constructor with signature (int, int) and cannot be allocated.",
-                                                          newBitmapType));
+            if (newBitmapType.GetConstructor([typeof (int), typeof (int)]) == null)
+                throw new ArgumentException($"Type '{newBitmapType} does not have a constructor with signature (int, int) and cannot be allocated.", nameof(newBitmapType));
 
-            foreach (var mipChain in faces)
+            foreach (var mipChain in Faces)
             {
                 for (var i = 0; i < mipChain.Count; i++)
                 {
                     var src = mipChain[i];
                     if (src.GetType() != newBitmapType)
                     {
-                        var dst = (BitmapContent)Activator.CreateInstance(newBitmapType, new object[] { src.Width,src.Height });
+                        var dst = (BitmapContent)Activator.CreateInstance(newBitmapType, src.Width, src.Height)!;
                         BitmapContent.Copy(src, dst);
                         mipChain[i] = dst;
                     }
                 }
             }
-        }        
+        }
 
         /// <summary>
         /// Generates a full set of mipmaps for the texture.
@@ -78,21 +66,21 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
         /// <param name="overwriteExistingMipmaps">true if the existing mipmap set is replaced with the new set; false otherwise.</param>
         public virtual void GenerateMipmaps(bool overwriteExistingMipmaps)
         {
-            // If we already have mipmaps and we're not supposed to overwrite
+            // If we already have mipmaps, and we're not supposed to overwrite
             // them then return without any generation.
-            if (!overwriteExistingMipmaps && faces.Any(f => f.Count > 1))
+            if (!overwriteExistingMipmaps && Faces.Any(f => f.Count > 1))
                 return;
 
             // Generate the mips for each face.
-            foreach (var face in faces)
+            foreach (var face in Faces)
             {
                 // Remove any existing mipmaps.
                 var faceBitmap = face[0];
                 face.Clear();
                 face.Add(faceBitmap);
                 var faceType = faceBitmap.GetType();
-                int width = faceBitmap.Width;
-                int height = faceBitmap.Height;
+                var width = faceBitmap.Width;
+                var height = faceBitmap.Height;
                 while (width > 1 || height > 1)
                 {
                     if (width > 1)
@@ -100,7 +88,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
                     if (height > 1)
                         height /= 2;
 
-                    var mip = (BitmapContent)Activator.CreateInstance(faceType, new object[] { width, height });
+                    var mip = (BitmapContent)Activator.CreateInstance(faceType, width, height)!;
                     BitmapContent.Copy(faceBitmap, mip);
                     face.Add(mip);
                 }

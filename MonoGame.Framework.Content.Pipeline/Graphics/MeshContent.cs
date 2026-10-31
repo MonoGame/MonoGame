@@ -9,38 +9,23 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
     /// </summary>
     public class MeshContent : NodeContent
     {
-        GeometryContentCollection geometry;
-        PositionCollection positions;
-
         /// <summary>
         /// Gets the list of geometry batches for the mesh.
         /// </summary>
-        public GeometryContentCollection Geometry
-        {
-            get
-            {
-                return geometry;
-            }
-        }
+        public GeometryContentCollection Geometry { get; }
 
         /// <summary>
         /// Gets the list of vertex position values.
         /// </summary>
-        public PositionCollection Positions
-        {
-            get
-            {
-                return positions;
-            }
-        }
+        public PositionCollection Positions { get; }
 
         /// <summary>
         /// Initializes a new instance of MeshContent.
         /// </summary>
         public MeshContent()
         {
-            geometry = new GeometryContentCollection(this);
-            positions = new PositionCollection();
+            Geometry = new GeometryContentCollection(this);
+            Positions = [];
         }
 
         /// <summary>
@@ -49,19 +34,18 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
         internal void TransformContents(ref Matrix xform)
         {
             // Transform positions
-            for (int i = 0; i < positions.Count; i++)
-                positions[i] = Vector3.Transform(positions[i], xform);
+            for (int i = 0; i < Positions.Count; i++)
+                Positions[i] = Vector3.Transform(Positions[i], xform);
 
             // Transform all vectors too:
             // Normals are "tangent covectors", which need to be transformed using the
             // transpose of the inverse matrix!
-            Matrix inverseTranspose = Matrix.Transpose(Matrix.Invert(xform));
-            foreach (var geom in geometry)
+            var inverseTranspose = Matrix.Transpose(Matrix.Invert(xform));
+            foreach (var geom in Geometry)
             {
                 foreach (var channel in geom.Vertices.Channels)
                 {
-                    var vector3Channel = channel as VertexChannel<Vector3>;
-                    if (vector3Channel == null)
+                    if (channel is not VertexChannel<Vector3> vector3Channel)
                         continue;
 
                     if (channel.Name.StartsWith("Normal") ||
@@ -70,7 +54,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
                     {
                         for (int i = 0; i < vector3Channel.Count; i++)
                         {
-                            Vector3 normal = vector3Channel[i];
+                            var normal = vector3Channel[i];
                             Vector3.TransformNormal(ref normal, ref inverseTranspose, out normal);
                             Vector3.Normalize(ref normal, out normal);
                             vector3Channel[i] = normal;

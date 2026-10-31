@@ -4,23 +4,34 @@
 
 using System.Diagnostics;
 
-namespace MonoGame.Effect.Compiler.Effect.Spirv
+namespace MonoGame.Effect.Compiler.Effect.Spirv;
+
+// https://registry.khronos.org/SPIR-V/specs/unified1/SPIRV.html#OpTypeRuntimeArray
+internal class SpirvTypeRuntimeArray : SpirvTypeBase
 {
-    // https://registry.khronos.org/SPIR-V/specs/unified1/SPIRV.html#OpTypeRuntimeArray
-    internal class SpirvTypeRuntimeArray : SpirvTypeBase
+    public override SpirvType Type => SpirvType.RuntimeArray;
+
+    public required SpirvTypeBase ElementType { get; init; }
+
+    public static SpirvTypeRuntimeArray? Parse(string[] parts, SpirvReflectionInfo.SpirvParseContext context)
     {
-        public override SpirvType Type => SpirvType.RuntimeArray;
-        public SpirvTypeBase ElementType { get; private set; }
+        if (parts.Length < 4)
+            return null;
 
-        protected override void ParseArgs(string[] args, SpirvReflectionInfo.SpirvParseContext context)
+        var id = parts[0];
+        context.Names.TryGetValue(id, out var name);
+
+        if (!context.Types.TryGetValue(parts[3], out var type))
         {
-            if (!context.Types.TryGetValue(args[0], out SpirvTypeBase type))
-            {
-                Debug.WriteLine($"OpTypeRuntimeArray {Name ?? Id} uses elements of unencountered type {args[1]}");
-                return;
-            }
-
-            ElementType = type;
+            Debug.WriteLine($"OpTypeRuntimeArray {name ?? id} uses elements of unencountered type {parts[3]}");
+            return null;
         }
+
+        return new SpirvTypeRuntimeArray
+        {
+            Id = id,
+            Name = name,
+            ElementType = type
+        };
     }
 }

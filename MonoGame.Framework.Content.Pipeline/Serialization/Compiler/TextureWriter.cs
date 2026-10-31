@@ -4,17 +4,16 @@
 
 using Microsoft.Xna.Framework.Content.Pipeline.Graphics;
 
-namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
+namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler;
+
+[ContentTypeWriter]
+internal class TextureWriter : BuiltInContentWriter<TextureContent>
 {
-    [ContentTypeWriter]
-    internal class TextureWriter : BuiltInContentWriter<TextureContent>
+    protected override void Write(ContentWriter output, TextureContent value)
     {
-        protected internal override void Write(ContentWriter output, TextureContent value)
-        {
-            // Do nothing.
-            // The TextureWriter is not used to write anything, but it is used by
-            // the ExternalReferenceWriter when an ExternalReference<TextureContent>
-            // is written! (See ExternalReferenceWriter implementation.)
-        }
+        // Do nothing.
+        // The TextureWriter is not used to write anything, but it is used by
+        // the ExternalReferenceWriter when an ExternalReference<TextureContent>
+        // is written! (See ExternalReferenceWriter implementation.)
     }
 }

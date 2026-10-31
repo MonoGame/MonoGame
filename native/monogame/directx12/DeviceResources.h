@@ -51,7 +51,7 @@ public:
     void Resume();
     void WaitForOrigin();
 #else
-    void Present(int sync, int flags);
+    void Present(int sync, bool vsync);
     void SetWindow(void* hwnd);
     void Reset();
     typedef void (*DeviceResetCallbackFunc)();
@@ -60,18 +60,19 @@ public:
 
     void GetBackBufferData(uint32_t x, uint32_t y, uint32_t w, uint32_t h, uint8_t* data, size_t stride);
 
-    uint64_t CreateQueryHandle();
-
     CommandContext* GetCommandContext() const;
 
+    IDXGIAdapter1* GetAdapter() const;
     ID3D12Device* GetD3DDevice() const;
     unsigned int GetBackBufferCount() const;
     CommandList* BeginCommandList() const;
     CommandQueue* GetCommandQueue() const;
     Heaps* GetGraphicsHeaps() const;
     D3D12MA::Allocator* GetAllocator() const;
-    D3D12MA::Pool* GetTransientBufferPool() const;
     Texture* GetMainTarget() const noexcept;
+
+    ID3D12Resource* TakeUploadBuffer(D3D12_HEAP_TYPE type, D3D12_RESOURCE_STATES state, D3D12_RESOURCE_DESC& desc) const;
+    void ReturnUploadBuffer(ID3D12Resource* buffer, uint64_t fence);
 };
 
 }

@@ -3,31 +3,42 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System.Diagnostics;
+using System.Globalization;
 
-namespace MonoGame.Effect.Compiler.Effect.Spirv
+namespace MonoGame.Effect.Compiler.Effect.Spirv;
+
+// https://registry.khronos.org/SPIR-V/specs/unified1/SPIRV.html#OpTypeVector
+internal class SpirvTypeVector : SpirvTypeBase
 {
-    // https://registry.khronos.org/SPIR-V/specs/unified1/SPIRV.html#OpTypeVector
-    internal class SpirvTypeVector : SpirvTypeBase
+    public override SpirvType Type => SpirvType.Vector;
+
+    public required SpirvTypeScalar ElementType { get; init; }
+
+    public required uint Dimensions { get; init; }
+
+    public static SpirvTypeVector? Parse(string[] parts, SpirvReflectionInfo.SpirvParseContext context)
     {
-        public override SpirvType Type => SpirvType.Vector;
-        public SpirvTypeScalar ElementType { get; private set; }
-        public uint Dimensions { get; private set; }
+        if (parts.Length < 5)
+            return null;
 
-        protected override void ParseArgs(string[] args, SpirvReflectionInfo.SpirvParseContext context)
+        var id = parts[0];
+        context.Names.TryGetValue(id, out var name);
+
+        if (!context.Types.TryGetValue(parts[3], out var type) || type is not SpirvTypeScalar value)
         {
-            if (!context.Types.TryGetValue(args[0], out SpirvTypeBase type))
-            {
-                Debug.WriteLine($"OpTypeVector {Name ?? Id} uses elements of unencountered type {args[0]}");
-                return;
-            }
-            else if (type is not SpirvTypeScalar)
-            {
-                Debug.WriteLine($"OpTypeVector {Name ?? Id} uses elements of unencountered type {args[0]}");
-                return;
-            }
-
-            ElementType = type as SpirvTypeScalar;
-            Dimensions = uint.Parse(args[1]);
+            Debug.WriteLine($"OpTypeVector {name ?? id} uses elements of unencountered type {parts[3]}");
+            return null;
         }
+
+        if (!uint.TryParse(parts[4], CultureInfo.InvariantCulture, out uint dimensions))
+            return null;
+
+        return new SpirvTypeVector
+        {
+            Id = id,
+            Name = name,
+            ElementType = value,
+            Dimensions = dimensions
+        };
     }
 }

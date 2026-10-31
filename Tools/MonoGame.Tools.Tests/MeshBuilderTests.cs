@@ -16,7 +16,7 @@ namespace MonoGame.Tests.ContentPipeline
         [Test]
         public void NodeContentInitializesTransformToIdentity()
         {
-            var nodeContent = new NodeContent();
+            var nodeContent = new NodeContent { Name = "" };
             Assert.AreEqual(Matrix.Identity, nodeContent.Transform);
         }
 

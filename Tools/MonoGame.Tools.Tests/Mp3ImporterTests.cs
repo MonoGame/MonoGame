@@ -17,7 +17,7 @@ namespace MonoGame.Tests.ContentPipeline
         {
             var context = new TestImporterContext("TestObj", "TestBin");
             Assert.Throws<ArgumentNullException>(() => new Mp3Importer().Import(null, context));
-            Assert.Throws<ArgumentNullException>(() => new Mp3Importer().Import("", context));
+            Assert.Throws<ArgumentException>(() => new Mp3Importer().Import("", context));
             Assert.Throws<ArgumentNullException>(() => new Mp3Importer().Import(@"Assets/Audio/rock_loop_stereo.mp3", null));
             Assert.Throws<FileNotFoundException>(() => new Mp3Importer().Import(@"this\does\not\exist.mp3", context));
         }

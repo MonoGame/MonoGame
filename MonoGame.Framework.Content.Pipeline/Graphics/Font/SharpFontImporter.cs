@@ -2,25 +2,20 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
-using System;
-using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using FreeTypeAPI;
 
 namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 {
     // Uses FreeType to rasterize TrueType fonts into a series of glyph bitmaps.
-    unsafe internal class SharpFontImporter : IFontImporter
+    internal unsafe class SharpFontImporter : IFontImporter
     {
         // Properties hold the imported font data.
-        public IEnumerable<Glyph> Glyphs { get; private set; }
+        public IEnumerable<Glyph> Glyphs { get; private set; } = [];
 
         public float LineSpacing { get; private set; }
 
         public long YOffsetMin { get; private set; }
-
-        // Size of the temp surface used for GDI+ rasterization.
-        const int MaxGlyphSize = 1024;
 
         public void Import(FontDescription options, string fontName)
         {
@@ -36,10 +31,10 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
             var glyphMaps = new Dictionary<uint, GlyphData>();
 
             // Rasterize each character in turn.
-            foreach (char character in characters)
+            foreach (var character in characters)
             {
-                uint glyphIndex = FreeType.FT_Get_Char_Index(face, new CULong(character));
-                if (!glyphMaps.TryGetValue(glyphIndex, out GlyphData glyphData))
+                var glyphIndex = FreeType.FT_Get_Char_Index(face, new CULong(character));
+                if (!glyphMaps.TryGetValue(glyphIndex, out var glyphData))
                 {
                     glyphData = ImportGlyph(glyphIndex, face);
                     glyphMaps.Add(glyphIndex, glyphData);
@@ -60,7 +55,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
             CheckError(FreeType.FT_Done_FreeType(library));
         }
 
-        private void CheckError(int error)
+        private static void CheckError(int error)
         {
             if (error == 0)
                 return;
@@ -69,7 +64,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
         }
 
         // Attempts to instantiate the requested GDI+ font object.
-        private FT_Face* CreateFontFace(FT_Library* library, FontDescription options, string fontName)
+        private static FT_Face* CreateFontFace(FT_Library* library, FontDescription options, string fontName)
         {
             const uint dpi = 96;
 
@@ -88,11 +83,11 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
             CheckError(FreeType.FT_Render_Glyph(face->glyph));
 
             // Render the character.
-            BitmapContent glyphBitmap = null;
+            BitmapContent? glyphBitmap = null;
             if (face->glyph->bitmap.width > 0 && face->glyph->bitmap.rows > 0)
             {
                 glyphBitmap = new PixelBitmapContent<byte>((int)face->glyph->bitmap.width, (int)face->glyph->bitmap.rows);
-                byte[] gpixelAlphas = new byte[face->glyph->bitmap.width * face->glyph->bitmap.rows];
+                var gpixelAlphas = new byte[face->glyph->bitmap.width * face->glyph->bitmap.rows];
                 //if the character bitmap has 1bpp we have to expand the buffer data to get the 8bpp pixel data
                 //each byte in bitmap.bufferdata contains the value of to 8 pixels in the row
                 //if bitmap is of width 10, each row has 2 bytes with 10 valid bits, and the last 6 bits of 2nd byte must be discarded
@@ -100,14 +95,14 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
                 {
                     //variables needed for the expansion, amount of written data, length of the data to write
                     int written = 0, length = (int)(face->glyph->bitmap.width * face->glyph->bitmap.rows);
-                    for (int i = 0; written < length; i++)
+                    for (var i = 0; written < length; i++)
                     {
                         //width in pixels of each row
-                        int width = (int)face->glyph->bitmap.width;
+                        var width = (int)face->glyph->bitmap.width;
                         while (width > 0)
                         {
                             //valid data in the current byte
-                            int stride = MathHelper.Min(8, width);
+                            var stride = MathHelper.Min(8, width);
                             //copy the valid bytes to pixeldata
                             //System.Array.Copy(ExpandByte(face.Glyph.Bitmap.BufferData[i]), 0, gpixelAlphas, written, stride);
                             ExpandByteAndCopy(face->glyph->bitmap.buffer[i], stride, gpixelAlphas, written);
@@ -160,7 +155,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 
 
         /// <summary>
-        /// Reads each individual bit of a byte from left to right and expands it to a full byte, 
+        /// Reads each individual bit of a byte from left to right and expands it to a full byte,
         /// ones get byte.maxvalue, and zeros get byte.minvalue.
         /// </summary>
         /// <param name="origin">Byte to expand and copy</param>
@@ -169,10 +164,9 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
         /// <param name="startIndex">Position where to begin copying the results in destination</param>
         private static void ExpandByteAndCopy(byte origin, int length, byte[] destination, int startIndex)
         {
-            byte tmp;
-            for (int i = 7; i > 7 - length; i--)
+            for (var i = 7; i > 7 - length; i--)
             {
-                tmp = (byte)(1 << i);
+                var tmp = (byte)(1 << i);
                 if (origin / tmp == 1)
                 {
                     destination[startIndex + 7 - i] = byte.MaxValue;

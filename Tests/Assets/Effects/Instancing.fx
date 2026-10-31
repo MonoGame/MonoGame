@@ -28,7 +28,18 @@ VSOutput VS(VSInput input, float4x4 worldTransposed : BLENDWEIGHT)
 {
     VSOutput output = (VSOutput)0;
     
+    // HLSL defaults to column-major packing, so the vertex data appears transposed in the shader.
+#if VULKAN
+    // DXC already expects the vertex data transposed, so no manual transposition is needed.
+    // https://github.com/microsoft/DirectXShaderCompiler/blob/main/docs/SPIR-V.rst#vectors-and-matrices
+    // "Conceptually HLSL matrices are row-major while SPIR-V matrices are column-major, thus all HLSL matrices are represented by their transposes."
+    // "Matrix multiplication: need to swap the operands. mat1 x mat2 should be translated as transpose(mat2) x transpose(mat1). Then the result is transpose(mat1 x mat2)."
+    float4x4 world = worldTransposed;
+#else
+    // A manual transposition is required to restore the correct layout for FXC.
+    // https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/dx-graphics-hlsl-per-component-math#matrix-ordering
     float4x4 world = transpose(worldTransposed);
+#endif
     float4 positionWorld = mul(input.Position, world);
     float4 positionView = mul(positionWorld, View);
     output.Position = mul(positionView, Projection);

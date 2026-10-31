@@ -13,13 +13,11 @@ namespace MonoGame.Framework.DevTools;
 public class NetworkContentProvider : IContentProvider
 {
     private const string ModifiedTimesFilename = "ModifiedTimes.yaml";
-    private readonly HttpClient _client;
     private readonly Dictionary<string, long> _modifiedTimes;
     private readonly string _location;
 
     public NetworkContentProvider()
     {
-        _client = new HttpClient { Timeout = TimeSpan.FromMinutes(30) };
         if (OperatingSystem.IsWindows() || OperatingSystem.IsMacOS() || OperatingSystem.IsMacCatalyst() || OperatingSystem.IsLinux())
         {
             _location = AppDomain.CurrentDomain.BaseDirectory;
@@ -39,20 +37,21 @@ public class NetworkContentProvider : IContentProvider
 
     public async Task<bool> FetchContent(string relativePath)
     {
-        _client.DefaultRequestHeaders.Clear();
-        _client.DefaultRequestHeaders.Add("Path", relativePath);
+        using var client = new HttpClient { Timeout = TimeSpan.FromMinutes(30) };
+        client.DefaultRequestHeaders.Clear();
+        client.DefaultRequestHeaders.Add("Path", relativePath);
         if (_modifiedTimes.TryGetValue(relativePath, out var lastModifiedTime))
         {
             var absolutePath = Path.Combine(_location, relativePath);
             if (File.Exists(absolutePath)) // TODO: Maybe also cache information about the write time of the file and use that as well
             {
-                _client.DefaultRequestHeaders.Add("LastModifiedTime", lastModifiedTime.ToString());
+                client.DefaultRequestHeaders.Add("LastModifiedTime", lastModifiedTime.ToString());
             }
         }
 
         try
         {
-            await using var stream = await _client.GetStreamAsync(Address);
+            await using var stream = await client.GetStreamAsync(Address);
             var lastModifiedTimeBytes = new byte[sizeof(long)];
             var readBytes = await stream.ReadAsync(lastModifiedTimeBytes);
             if (readBytes != lastModifiedTimeBytes.Length)

@@ -1,25 +1,22 @@
-﻿using System;
-using System.Collections.Generic;
+﻿// MonoGame - Copyright (C) MonoGame Foundation, Inc
+// This file is subject to the terms and conditions defined in
+// file 'LICENSE.txt', which is part of this source code package.
+
 using System.Xml;
 
 namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Intermediate
 {
     [ContentTypeSerializer]
-    class CurveKeyCollectionSerializer : ContentTypeSerializer<CurveKeyCollection>
+    class CurveKeyCollectionSerializer() : ContentTypeSerializer<CurveKeyCollection>("Keys")
     {
-        public CurveKeyCollectionSerializer() :
-            base("Keys")
-        { }
-
-        public override bool CanDeserializeIntoExistingObject
-        { get { return true; } }
+        public override bool CanDeserializeIntoExistingObject => true;
 
         protected internal override CurveKeyCollection Deserialize(
             IntermediateReader input,
             ContentSerializerAttribute format,
-            CurveKeyCollection existingInstance)
+            CurveKeyCollection? existingInstance)
         {
-            var result = existingInstance ?? new CurveKeyCollection();
+            var result = existingInstance ?? [];
 
             if (input.Xml.HasValue)
             {
@@ -61,11 +58,11 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Intermediate
 
         protected internal override void Serialize(
             IntermediateWriter output,
-            CurveKeyCollection value,
+            CurveKeyCollection? value,
             ContentSerializerAttribute format)
         {
             var elements = new List<string>();
-            foreach (var curveKey in value)
+            foreach (var curveKey in value ?? [])
             {
                 // Order: Position, Value, TangentIn, TangentOut and Continuity
                 elements.Add(XmlConvert.ToString(curveKey.Position));

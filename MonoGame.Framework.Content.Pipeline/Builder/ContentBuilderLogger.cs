@@ -32,7 +32,7 @@ class ContentBuilderLogger : ContentBuildLogger
             _ => ConsoleColor.Gray
         };
 
-        var currentPath = _relativePaths.Count > 0 ? $"{string.Join(": ", _relativePaths)}: " : "";
+        var currentPath = _relativePaths.Count > 0 ? $"{string.Join(" > ", _relativePaths.Reverse())}: " : "";
         var spacing = string.Empty.PadLeft(Math.Max(0, _indentCount * 2), ' ');
         var time = LoggerLogLevel <= LogLevel.Debug ?  $"{_stopWatch.Elapsed:hh\\:mm\\:ss\\.fff} " : "";
 

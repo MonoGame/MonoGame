@@ -71,6 +71,10 @@ namespace Microsoft.Xna.Framework.Audio
         {
         }
 
+        internal void PlatformClearBuffer()
+        {
+        }
+
         private void PlatformDispose(bool disposing)
         {
         }

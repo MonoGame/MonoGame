@@ -3,14 +3,12 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using MonoGame.Framework.Content.Pipeline.Builder;
-using System;
-using System.IO;
 
 namespace Microsoft.Xna.Framework.Content.Pipeline
 {
     /// <summary>
     /// Specifies external references to a data file for the content item.
-    /// 
+    ///
     /// While the object model is instantiated, reference file names are absolute. When the file containing the external reference is serialized to disk, file names are relative to the file. This allows movement of the content tree to a different location without breaking internal links.
     /// </summary>
     /// <typeparam name="T"></typeparam>
@@ -24,19 +22,10 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
         /// <summary>
         /// Initializes a new instance of ExternalReference.
         /// </summary>
-        public ExternalReference()
-        {
-            Filename = string.Empty;
-        }
-
-        /// <summary>
-        /// Initializes a new instance of ExternalReference.
-        /// </summary>
         /// <param name="filename">The name of the referenced file.</param>
-        public ExternalReference(string filename)
+        public ExternalReference(string filename = "")
         {
-            if (string.IsNullOrEmpty(filename))
-                throw new ArgumentNullException("filename");
+            ArgumentNullException.ThrowIfNull(filename);
             Filename = filename;
         }
 
@@ -48,9 +37,8 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
         public ExternalReference(string filename, ContentIdentity relativeToContent)
         {
             if (string.IsNullOrEmpty(filename))
-                throw new ArgumentNullException("filename");
-            if (relativeToContent == null)
-                throw new ArgumentNullException("relativeToContent");
+                throw new ArgumentNullException(nameof(filename));
+            ArgumentNullException.ThrowIfNull(relativeToContent);
             if (string.IsNullOrEmpty(relativeToContent.SourceFilename))
                 throw new ArgumentNullException("relativeToContent.SourceFilename");
 
@@ -59,7 +47,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
             // down to the asset path. We don't appear to have any way to do
             // that from here, so we'll work with the absolute path and let the
             // higher level process sort out any relative paths they need.
-            var basePath = Path.GetDirectoryName(relativeToContent.SourceFilename);
+            var basePath = Path.GetDirectoryName(relativeToContent.SourceFilename) ?? "";
             Filename = PathHelper.Normalize(Path.GetFullPath(Path.Combine(basePath, filename)));
         }
     }

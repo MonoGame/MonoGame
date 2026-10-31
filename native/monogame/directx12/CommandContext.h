@@ -42,6 +42,7 @@ public:
 
     std::vector<Texture*> m_tempTextures[MAX_BACK_BUFFER_COUNT];
 
+    std::vector<D3D12_CPU_DESCRIPTOR_HANDLE> m_currentRTV;
     std::vector<Texture*> m_currentRT;
     Texture* m_currentDepthStencil = nullptr;
 
@@ -50,10 +51,11 @@ public:
     CommandContext(DeviceResources* deviceResources); // CommandContext cannot be constructed from C#
     ~CommandContext();
 
+    void Reset();
     void Reset(unsigned int backBufferIndex);
     uint64_t Close();
 
-    void SetRenderTarget(void* colorTargets, size_t numColorTargets, Texture* depthTarget);
+    void SetRenderTarget(Texture** colorTargets, int32_t* slices, size_t numColorTargets, Texture* depthTarget);
     void ResolveResource(Texture* source, Texture* dest);
     void GenerateMipmap(Texture* source);
     void Clear(MGClearOptions options, float r, float g, float b, float a, float depth, int stencil);
@@ -71,6 +73,5 @@ public:
 
     void CreateDefaultRootSignature();
     void CreateGenerateMipPipelineResources();
-
 };
 }

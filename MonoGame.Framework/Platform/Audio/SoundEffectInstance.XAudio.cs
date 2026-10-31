@@ -394,6 +394,10 @@ namespace Microsoft.Xna.Framework.Audio
             _voice.SetFilterParameters(filter);            
         }
 
+        internal void PlatformClearBuffer()
+        {
+        }
+
         private void PlatformDispose(bool disposing)
         {
             if (disposing)

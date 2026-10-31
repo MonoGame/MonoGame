@@ -21,7 +21,7 @@ public enum ProjectType
 
 public class BuildContext : FrostingContext
 {
-    public static string VersionBase = "3.8.4";
+    public static string VersionBase = "3.8.5";
     public static readonly Regex VersionRegex = new(@"^v\d+.\d+.\d+", RegexOptions.Compiled | RegexOptions.IgnoreCase);
     public static readonly string DefaultRepositoryUrl = "https://github.com/MonoGame/MonoGame";
 

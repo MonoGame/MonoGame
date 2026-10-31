@@ -37,31 +37,31 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
         /// <inheritdoc cref="BasicMaterialContent.Alpha"/>
         public float? Alpha
         {
-            get { return GetValueTypeProperty<float>(AlphaKey); }
-            set { SetProperty(AlphaKey, value); }
+            get => GetValueTypeProperty<float>(AlphaKey);
+            set => SetProperty(AlphaKey, value);
         }
 
         /// <inheritdoc cref="BasicMaterialContent.DiffuseColor"/>
         public Vector3? DiffuseColor
         {
-            get { return GetValueTypeProperty<Vector3>(DiffuseColorKey); }
-            set { SetProperty(DiffuseColorKey, value); }
+            get => GetValueTypeProperty<Vector3>(DiffuseColorKey);
+            set => SetProperty(DiffuseColorKey, value);
         }
 
         /// <inheritdoc cref="BasicMaterialContent.EmissiveColor"/>
         public Vector3? EmissiveColor
         {
-            get { return GetValueTypeProperty<Vector3>(EmissiveColorKey); }
-            set { SetProperty(EmissiveColorKey, value); }
+            get => GetValueTypeProperty<Vector3>(EmissiveColorKey);
+            set => SetProperty(EmissiveColorKey, value);
         }
 
         /// <summary>
         /// Gets or sets the environment map property.
         /// </summary>
-        public ExternalReference<TextureContent> EnvironmentMap
+        public ExternalReference<TextureContent>? EnvironmentMap
         {
-            get { return GetTexture(EnvironmentMapKey); }
-            set { SetTexture(EnvironmentMapKey, value); }
+            get => GetTexture(EnvironmentMapKey);
+            set => SetTexture(EnvironmentMapKey, value);
         }
 
         /// <summary>
@@ -69,8 +69,8 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
         /// </summary>
         public float? EnvironmentMapAmount
         {
-            get { return GetValueTypeProperty<float>(EnvironmentMapAmountKey); }
-            set { SetProperty(EnvironmentMapAmountKey, value); }
+            get => GetValueTypeProperty<float>(EnvironmentMapAmountKey);
+            set => SetProperty(EnvironmentMapAmountKey, value);
         }
 
         /// <summary>
@@ -78,8 +78,8 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
         /// </summary>
         public Vector3? EnvironmentMapSpecular
         {
-            get { return GetValueTypeProperty<Vector3>(EnvironmentMapSpecularKey); }
-            set { SetProperty(EnvironmentMapSpecularKey, value); }
+            get => GetValueTypeProperty<Vector3>(EnvironmentMapSpecularKey);
+            set => SetProperty(EnvironmentMapSpecularKey, value);
         }
 
         /// <summary>
@@ -87,15 +87,15 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
         /// </summary>
         public float? FresnelFactor
         {
-            get { return GetValueTypeProperty<float>(FresnelFactorKey); }
-            set { SetProperty(FresnelFactorKey, value); }
+            get => GetValueTypeProperty<float>(FresnelFactorKey);
+            set => SetProperty(FresnelFactorKey, value);
         }
 
         /// <inheritdoc cref="BasicMaterialContent.Texture"/>
-        public ExternalReference<TextureContent> Texture
+        public ExternalReference<TextureContent>? Texture
         {
-            get { return GetTexture(TextureKey); }
-            set { SetTexture(TextureKey, value); }
+            get => GetTexture(TextureKey);
+            set => SetTexture(TextureKey, value);
         }
     }
 }

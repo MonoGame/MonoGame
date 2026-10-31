@@ -1,4 +1,4 @@
-// MIT License - Copyright (C) The Mono.Xna Team
+﻿// MIT License - Copyright (C) The Mono.Xna Team
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
@@ -1867,8 +1867,18 @@ namespace Microsoft.Xna.Framework
             sb.Append(B);
             sb.Append(" A:");
             sb.Append(A);
-            sb.Append("}");
+            sb.Append('}');
             return sb.ToString();
+        }
+
+        /// <summary>
+        /// Translate a non-premultipled alpha <see cref="Color"/> to a <see cref="Color"/> that contains premultiplied alpha.
+        /// </summary>
+        /// <param name="color">A <see cref="Color"/> representing a non-premultiplied color.</param>
+        /// <returns>A <see cref="Color"/> which contains premultiplied alpha data.</returns>
+        public static Color FromNonPremultiplied(Color color)
+        {
+            return FromNonPremultiplied(color.R, color.G, color.B, color.A);
         }
 
         /// <summary>
@@ -1884,10 +1894,23 @@ namespace Microsoft.Xna.Framework
         /// <summary>
         /// Translate a non-premultipled alpha <see cref="Color"/> to a <see cref="Color"/> that contains premultiplied alpha.
         /// </summary>
-        /// <param name="r">Red component value.</param>
-        /// <param name="g">Green component value.</param>
-        /// <param name="b">Blue component value.</param>
-        /// <param name="a">Alpha component value.</param>
+        /// <param name="r">Red component value from 0.0f to 1.0f.</param>
+        /// <param name="g">Green component value from 0.0f to 1.0f.</param>
+        /// <param name="b">Blue component value from 0.0f to 1.0f.</param>
+        /// <param name="a">Alpha component value from 0.0f to 1.0f.</param>
+        /// <returns>A <see cref="Color"/> which contains premultiplied alpha data.</returns>
+        public static Color FromNonPremultiplied(float r, float g, float b, float a)
+        {
+            return new Color(r * a, g * a, b * a, a);
+        }
+
+        /// <summary>
+        /// Translate a non-premultipled alpha <see cref="Color"/> to a <see cref="Color"/> that contains premultiplied alpha.
+        /// </summary>
+        /// <param name="r">Red component value from 0 to 255.</param>
+        /// <param name="g">Green component value from 0 to 255.</param>
+        /// <param name="b">Blue component value from 0 to 255.</param>
+        /// <param name="a">Alpha component value from 0 to 255.</param>
         /// <returns>A <see cref="Color"/> which contains premultiplied alpha data.</returns>
         public static Color FromNonPremultiplied(int r, int g, int b, int a)
         {

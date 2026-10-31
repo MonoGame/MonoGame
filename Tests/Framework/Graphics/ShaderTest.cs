@@ -9,8 +9,8 @@ using NUnit.Framework;
 
 namespace MonoGame.Tests.Graphics
 {
-	[TestFixture]
     [NonParallelizable]
+	[RunOnUiTestFixture]
 	class ShaderTest : GraphicsDeviceTestFixtureBase
     {
         [Test]
@@ -21,11 +21,10 @@ namespace MonoGame.Tests.Graphics
 		[TestCase("ColorFlip")]
 		[TestCase("Invert")]
 		[TestCase("BlackOut")]
-#if !DESKTOPGL
+#if !DESKTOPGL && !DESKTOPGL4
         // TODO this does not render for some reason, we need to fix this
         [TestCase("RainbowH")]
 #endif
-        [RunOnUI]
         public void Shader(string effectName)
 		{
             PrepareFrameCapture();

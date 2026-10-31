@@ -25,7 +25,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
         private bool _shared;
         private bool _mipmap;
-        private SampleDescription _sampleDescription;
+        private SampleDescription _sampleDescription = new SampleDescription(1, 0);
 
         private SharpDX.Direct3D11.Texture2D _cachedStagingTexture;
 
@@ -33,7 +33,6 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             _shared = shared;
             _mipmap = mipmap;
-            _sampleDescription = new SampleDescription(1, 0);
         }
 
         private void PlatformSetData<T>(int level, T[] data, int startIndex, int elementCount) where T : struct
@@ -235,6 +234,20 @@ namespace Microsoft.Xna.Framework.Graphics
             // TODO: Move this to SetData() if we want to make Immutable textures!
             var desc = GetTexture2DDescription();
             return new SharpDX.Direct3D11.Texture2D(GraphicsDevice._d3dDevice, desc);
+        }
+
+        public static Texture2D FromSharedHandle(
+            GraphicsDevice graphicsDevice,
+            IntPtr sharedHandle,
+            int width,
+            int height,
+            SurfaceFormat format)
+        {
+            var d3dTexture = graphicsDevice._d3dDevice
+                .OpenSharedResource<SharpDX.Direct3D11.Texture2D>(sharedHandle);
+            var texture = new Texture2D(graphicsDevice, width, height, false, format);
+            texture.SetNativeTexture(d3dTexture);
+            return texture;
         }
 
         private void PlatformReload(Stream textureStream)

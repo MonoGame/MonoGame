@@ -1,17 +1,25 @@
-﻿using SharpDX;
+using SharpDX;
 using SharpDX.MediaFoundation;
 using System;
+using System.Runtime.InteropServices;
 
 namespace Microsoft.Xna.Framework.Media
 {
     public sealed partial class Video : IDisposable
     {
+        // Managed CreateSampleGrabberSinkActivate wrapper was made internal, and relying on reflection would be even worse.
+        [DllImport("mf.dll", ExactSpelling = true, PreserveSig = false)]
+        private static extern void MFCreateSampleGrabberSinkActivate(
+            IntPtr pIMFMediaType,
+            IntPtr pIMFSampleGrabberSinkCallback,
+            out IntPtr ppIActivate);
+
         private Topology _topology;
         internal Topology Topology { get { return _topology; } }
 
         internal VideoSampleGrabber SampleGrabber { get; private set; }
 
-        MediaType _mediaType;
+        private MediaType _mediaType;
 
         private void PlatformInitialize()
         {
@@ -24,13 +32,28 @@ namespace Microsoft.Xna.Framework.Media
 
             SharpDX.MediaFoundation.MediaSource mediaSource;
             {
-                SourceResolver resolver = new SourceResolver();
+                using SourceResolver resolver = new SourceResolver();
 
-                ObjectType otype;
-                ComObject source = resolver.CreateObjectFromURL(FileName, SourceResolverFlags.MediaSource, null, out otype);
-                mediaSource = source.QueryInterface<SharpDX.MediaFoundation.MediaSource>();
-                resolver.Dispose();
-                source.Dispose();
+                SharpDX.IUnknown source = resolver.CreateObjectFromURL(FileName,
+                    SourceResolverFlags.MediaSource,
+                    null,
+                    out ObjectType objectType);
+                if (objectType != ObjectType.MediaSource)
+                {
+                    throw new NotSupportedException($"{FileName} is not a media source.");
+                }
+
+                try
+                {
+                    mediaSource = SharpDX.ComObject.As<SharpDX.MediaFoundation.MediaSource>(source);
+                }
+                finally
+                {
+                    if (source is IDisposable disposableSource)
+                    {
+                        disposableSource.Dispose();
+                    }
+                }
             }
 
             PresentationDescriptor presDesc;
@@ -68,7 +91,12 @@ namespace Microsoft.Xna.Framework.Media
                         // Specify that we want the data to come in as RGB32.
                         _mediaType.Set(MediaTypeAttributeKeys.Subtype, new Guid("00000016-0000-0010-8000-00AA00389B71"));
 
-                        MediaFactory.CreateSampleGrabberSinkActivate(_mediaType, SampleGrabber, out activate);
+                        IntPtr pCallback = CppObject.ToCallbackPtr<SampleGrabberSinkCallback>(SampleGrabber);
+
+                        MFCreateSampleGrabberSinkActivate(_mediaType.NativePointer, pCallback, out IntPtr pActivate);
+                        
+                        activate = new Activate(pActivate);
+
                         outputNode.Object = activate;
                     }
 

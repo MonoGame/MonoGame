@@ -68,6 +68,11 @@ enum class MGSurfaceFormat : mgint
     Rgba8Etc2 = 94,
     SRgb8A8Etc2 = 95,
     Astc4X4Rgba = 96,
+    Astc5X5Rgba = 97,
+    Astc6X6Rgba = 98,
+    Astc8X8Rgba = 99,
+    Astc10X10Rgba = 100,
+    Astc12X12Rgba = 101,
 };
 
 enum class MGDepthFormat : mgint
@@ -264,6 +269,12 @@ enum class MGVertexElementFormat : mgint
 enum class MGProcessorType : mguint
 {
     ZeroTransparentPixels = 1,
+};
+
+enum class MGSongEventType : mgint
+{
+    Completed = 0,
+    Failed = 1,
 };
 
 enum class MGGameRunBehavior : mgint
@@ -516,6 +527,7 @@ enum class MGMonoGamePlatform : mgint
     PlayStation5 = 10,
     NintendoSwitch = 11,
     DesktopVK = 12,
+    NintendoSwitch2 = 13,
 };
 
 enum class MGGraphicsBackend : mgint

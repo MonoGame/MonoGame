@@ -196,8 +196,8 @@ namespace MonoGame.Effect
             writer.Write((byte)param.columns);
 
             // Write the elements or struct members.
-            WriteParameters(writer, param.member_handles, (int)param.element_count);
-            WriteParameters(writer, param.member_handles, (int)param.member_count);
+            WriteParameters(writer, param.member_handles!, (int)param.element_count);
+            WriteParameters(writer, param.member_handles!, (int)param.member_count);
 
             if (param.element_count == 0 && param.member_count == 0)
             {
@@ -206,18 +206,18 @@ namespace MonoGame.Effect
                     case EffectParameterType.Bool:
                     case EffectParameterType.Int32:
                     case EffectParameterType.Single:
-                        writer.Write((byte[])param.data);
+                        writer.Write((byte[])param.data!);
                         break;
                 }
             }
         }
 
-        private static void WriteAnnotations(BinaryWriter writer, d3dx_parameter[] annotations)
+        private static void WriteAnnotations(BinaryWriter writer, d3dx_parameter[]? annotations)
         {
             var count = annotations == null ? 0 : annotations.Length;
             writer.Write(count);
             for (var i = 0; i < count; i++)
-                WriteParameter(writer, annotations[i]);
+                WriteParameter(writer, annotations![i]);
         }
 	}
 }

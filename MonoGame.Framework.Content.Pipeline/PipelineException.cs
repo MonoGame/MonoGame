@@ -2,7 +2,7 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
-using System;
+using System.Globalization;
 using System.Runtime.Serialization;
 
 namespace Microsoft.Xna.Framework.Content.Pipeline
@@ -10,7 +10,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
     /// <summary>
     /// Thrown when errors are encountered during a content pipeline build.
     /// </summary>
-    [SerializableAttribute]
+    [Serializable]
     public class PipelineException : Exception
     {
         /// <summary>
@@ -25,10 +25,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
         /// </summary>
         /// <param name="serializationInfo">Information necessary for serialization and deserialization of the content item.</param>
         /// <param name="streamingContext">Information necessary for the source and destination of a given serialized stream. Also provides an additional caller-defined context.</param>
-        protected PipelineException(
-            SerializationInfo serializationInfo,
-            StreamingContext streamingContext
-            )
+        protected PipelineException(SerializationInfo serializationInfo, StreamingContext streamingContext)
         {
         }
 
@@ -36,9 +33,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
         /// Initializes a new instance of the PipelineException class with the specified error message.
         /// </summary>
         /// <param name="message">A message that describes the error.</param>
-        public PipelineException(
-            string message
-            )
+        public PipelineException(string message)
             : base(message)
         {
         }
@@ -48,11 +43,8 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
         /// </summary>
         /// <param name="message">A message that describes the error.</param>
         /// <param name="innerException">The exception that is the cause of the current exception. If innerException is not a null reference, the current exception is raised in a catch block that handles the inner exception.</param>
-        public PipelineException(
-            string message,
-            Exception innerException
-            )
-            :base(message, innerException)
+        public PipelineException(string message, Exception innerException)
+            : base(message, innerException)
         {
         }
 
@@ -61,11 +53,8 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
         /// </summary>
         /// <param name="message">A message that describes the error.</param>
         /// <param name="messageArgs">Array of strings specifying message-related arguments.</param>
-        public PipelineException(
-            string message,
-            params Object[] messageArgs
-            )
-            : base(String.Format(message, messageArgs))
+        public PipelineException(string message, params object[] messageArgs)
+            : base(string.Format(CultureInfo.InvariantCulture, message, messageArgs))
         {
         }
     }

@@ -32,7 +32,7 @@ namespace MonoGame.Effect
             pp.addFeature(Feature.LINEMARKERS);
             pp.setListener(new MGErrorListener(output));
             pp.setFileSystem(new MGFileSystem(dependencies));
-            pp.setQuoteIncludePath(new List<string> { Path.GetDirectoryName(fullPath) });
+            pp.setQuoteIncludePath([Path.GetDirectoryName(fullPath) ?? ""]);
 
             foreach (var define in defines)
                 pp.addMacro(define.Key, define.Value);
@@ -136,7 +136,7 @@ namespace MonoGame.Effect
 
             public VirtualFile getParentFile()
             {
-                return new MGFile(Path.GetDirectoryName(_path), _dependencies);
+                return new MGFile(Path.GetDirectoryName(_path) ?? "", _dependencies);
             }
 
             public VirtualFile getChildFile(string name)
