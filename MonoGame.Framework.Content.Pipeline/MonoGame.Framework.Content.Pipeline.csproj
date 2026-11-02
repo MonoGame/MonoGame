@@ -25,7 +25,8 @@
     <!-- NU5100 - NuGet warns if we copy assemblies but don't reference them. -->
     <!-- NU5118 - NuGet warns if we duplicate include executable. -->
     <!-- NETSDK1206 - Disable nuget rid complaining. -->
-    <NoWarn>CS1591;NU5100;NU5118;NETSDK1206;NU5104</NoWarn>
+    <!-- CS0618 - Disable obsolete warnings. -->
+    <NoWarn>CS1591;NU5100;NU5118;NETSDK1206;NU5104;CS0618</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>
