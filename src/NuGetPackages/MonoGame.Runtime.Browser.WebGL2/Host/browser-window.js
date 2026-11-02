@@ -128,9 +128,8 @@ export class BrowserWindow {
             return;
         }
 
-        const initialCanvasBounds = this.canvas.getBoundingClientRect();
-        this.initialCanvasWidth = Math.round(initialCanvasBounds.width * globalThis.devicePixelRatio);
-        this.initialCanvasHeight = Math.round(initialCanvasBounds.height * globalThis.devicePixelRatio);
+        this.initialCanvasWidth = this.canvas.width;
+        this.initialCanvasHeight = this.canvas.height;
 
         const reportCanvasSize = (width, height) => {
             const normalizedWidth = Math.round(width);
