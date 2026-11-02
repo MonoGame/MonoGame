@@ -468,6 +468,6 @@ export class BrowserAudio {
      * @param {number} type Song event type.
      */
     reportSongEvent(songId, commandId, type) {
-        this.host.native?.notifySongEvent(songId, commandId, type);
+        this.host.native?.notifySongEvent?.(songId, commandId, type);
     }
 }

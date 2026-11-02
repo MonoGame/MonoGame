@@ -273,7 +273,6 @@ class MonoGameWebHost {
         }
 
         const requiredExports = {
-            _MGM_Web_NotifySongEvent: module._MGM_Web_NotifySongEvent,
             _MGP_Web_NotifyAccelerometerReading: module._MGP_Web_NotifyAccelerometerReading,
             _MGP_Web_NotifyAccelerometerState: module._MGP_Web_NotifyAccelerometerState,
             _MGP_Web_NotifyCanvasResize: module._MGP_Web_NotifyCanvasResize,
@@ -319,7 +318,10 @@ class MonoGameWebHost {
             notifyFocusChange: module._MGP_Web_NotifyFocusChange.bind(module),
             notifyFullscreenChange: module._MGP_Web_NotifyFullscreenChange.bind(module),
             notifyFullscreenFailure: module._MGP_Web_NotifyFullscreenFailure.bind(module),
-            notifySongEvent: module._MGM_Web_NotifySongEvent.bind(module),
+            // If a game doesn't use a `Song` then the native object is trimmed out during runtime linking.
+            notifySongEvent: typeof module._MGM_Web_NotifySongEvent === "function"
+                ? module._MGM_Web_NotifySongEvent.bind(module)
+                : null,
             setCanvasResizeManaged: module._MGP_Web_SetCanvasResizeManaged.bind(module),
             setPointerLockEnabled: module._MGP_Web_SetPointerLockEnabled.bind(module)
         });
