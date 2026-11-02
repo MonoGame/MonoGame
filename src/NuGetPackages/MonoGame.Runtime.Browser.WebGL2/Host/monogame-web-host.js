@@ -184,7 +184,7 @@ class MonoGameWebHost {
      */
     async startAsync() {
         try {
-            if (this.stopRequested) {
+            if (this.isDisposed || this.stopRequested) {
                 return;
             }
 
@@ -192,17 +192,17 @@ class MonoGameWebHost {
             this.resolveCanvas();
             this.window.observeContextLoss(() => this.handleContextLost());
             await this.initializeManagedRuntimeAsync();
-            if (this.stopRequested) {
+            if (this.isDisposed || this.stopRequested) {
                 return;
             }
 
             await this.content.stageStartupContentAsync();
-            if (this.stopRequested) {
+            if (this.isDisposed || this.stopRequested) {
                 return;
             }
 
             await this.initializeBrowserGameExportsAsync();
-            if (this.stopRequested) {
+            if (this.isDisposed || this.stopRequested) {
                 return;
             }
 
@@ -233,7 +233,7 @@ class MonoGameWebHost {
     async initializeManagedRuntimeAsync() {
         this.logStage(HostStage.WasmLoad, "Loading managed runtime.");
         const runtimeModule = await import(new URL(this.config.runtimeScriptUri, document.baseURI).toString());
-        if (this.stopRequested) {
+        if (this.isDisposed || this.stopRequested) {
             return;
         }
 
@@ -247,11 +247,12 @@ class MonoGameWebHost {
             .withModuleConfig({ canvas: this.window.canvas });
         // Runtime creation can leave state behind even when it fails; host cleanup does not unload .NET.
         runtimeCreationAttempted = true;
-        this.runtime = await runtimeBuilder.create();
-        if (this.stopRequested) {
+        const runtime = await runtimeBuilder.create();
+        if (this.isDisposed || this.stopRequested) {
             return;
         }
 
+        this.runtime = runtime;
         this.native = this.resolveNativeExports(this.runtime.Module);
         this.window.configureCanvasSize();
         this.window.configurePointerLock();
@@ -336,6 +337,10 @@ class MonoGameWebHost {
     async initializeBrowserGameExportsAsync() {
         this.logStage(HostStage.ManagedExports, "Initializing managed host exports.");
         const exportsRoot = await this.runtime.getAssemblyExports(`${this.getMainAssemblyName()}.dll`);
+        if (this.isDisposed || this.stopRequested) {
+            return;
+        }
+
         const browserGameExports = this.resolveExportPath(exportsRoot, "MonoGame.Runtime.Browser.WebGL2.BrowserGame");
         if (browserGameExports == null) {
             throw new BrowserHostError(HostStage.ManagedExports, "browser_game_exports_missing", "The browser runtime does not expose BrowserGame.");
@@ -360,7 +365,7 @@ class MonoGameWebHost {
      */
     async launchManagedApplicationAsync() {
         this.logStage(HostStage.RuntimeBoundary, "Launching managed application.");
-        if (this.stopRequested) {
+        if (this.isDisposed || this.stopRequested) {
             return;
         }
 

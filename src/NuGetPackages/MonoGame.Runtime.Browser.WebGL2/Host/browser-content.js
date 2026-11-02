@@ -28,6 +28,10 @@ export class BrowserContent {
     async stageStartupContentAsync() {
         this.host.logStage(HostStage.ContentStaging, "Fetching assets...");
         await this.stageContentManifestAsync(this.host.config.startupContentManifestUri);
+        if (this.host.isDisposed) {
+            return;
+        }
+
         this.host.logStage(HostStage.ContentStaging, "Startup content staged.");
     }
 
@@ -50,6 +54,10 @@ export class BrowserContent {
 
         const requestUri = this.resolveContentUri(normalizedManifestUri);
         const response = await fetch(requestUri);
+        if (this.host.isDisposed) {
+            return;
+        }
+
         if (!response.ok) {
             throw new BrowserHostError(
                 HostStage.ContentStaging,
@@ -58,6 +66,9 @@ export class BrowserContent {
         }
 
         const manifestText = await response.text();
+        if (this.host.isDisposed) {
+            return;
+        }
 
         // Normalize each entry before it becomes a virtual-filesystem path.
         const contentPaths = manifestText
@@ -89,11 +100,15 @@ export class BrowserContent {
 
         for (let workerIndex = 0; workerIndex < workerCount; workerIndex++) {
             workers.push((async () => {
-                while (nextContentPathIndex < contentPaths.length) {
+                while (!this.host.isDisposed && nextContentPathIndex < contentPaths.length) {
                     const contentPath = contentPaths[nextContentPathIndex++];
                     const contentResponse = await fetch(this.resolveContentUri(contentPath), {
                         signal: abortController.signal
                     });
+                    if (this.host.isDisposed) {
+                        return;
+                    }
+
                     if (!contentResponse.ok) {
                         throw new BrowserHostError(
                             HostStage.ContentStaging,
@@ -102,6 +117,9 @@ export class BrowserContent {
                     }
 
                     const contentBytes = new Uint8Array(await contentResponse.arrayBuffer());
+                    if (this.host.isDisposed) {
+                        return;
+                    }
 
                     // Emscripten writeFile does not create parents, while managed content opens the published path unchanged.
                     const directoryPath = contentPath.substring(0, contentPath.lastIndexOf("/"));
@@ -146,6 +164,10 @@ export class BrowserContent {
 
             try {
                 await stagingPromise;
+                if (this.host.isDisposed) {
+                    return;
+                }
+
                 this.host.logStage(HostStage.ContentStaging, `Asset pack '${normalizedAssetPackName}' staged.`);
             }
             catch (error) {
