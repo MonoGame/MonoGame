@@ -1426,6 +1426,49 @@ namespace
         return RequiresBrowserTextureFormatConversion(texture->format);
     }
 
+    bool RequiresBrowserReadbackConversion(MGSurfaceFormat format)
+    {
+        return RequiresBrowserTextureFormatConversion(format)
+            || format == MGSurfaceFormat::Bgr565
+            || format == MGSurfaceFormat::Bgra4444
+            || format == MGSurfaceFormat::Bgra5551;
+    }
+
+    void PackBrowserReadbackPixel(MGSurfaceFormat format, const mgbyte* source, mgbyte* destination)
+    {
+        uint16_t packed = 0;
+        switch (format)
+        {
+            case MGSurfaceFormat::Bgr565:
+                packed = static_cast<uint16_t>(((source[0] >> 3) << 11) | ((source[1] >> 2) << 5) | (source[2] >> 3));
+                break;
+            case MGSurfaceFormat::Bgra4444:
+                packed = static_cast<uint16_t>(((source[0] >> 4) << 12) | ((source[1] >> 4) << 8) | ((source[2] >> 4) << 4) | (source[3] >> 4));
+                break;
+            case MGSurfaceFormat::Bgra5551:
+                packed = static_cast<uint16_t>(((source[0] >> 3) << 11) | ((source[1] >> 3) << 6) | ((source[2] >> 3) << 1) | (source[3] >> 7));
+                break;
+            default:
+                MGGL_FAIL("Unsupported packed readback format", "the texture does not use a 16-bit packed transfer layout");
+        }
+
+        // WebAssembly stores the packed upload values in little-endian order.
+        destination[0] = static_cast<mgbyte>(packed);
+        destination[1] = static_cast<mgbyte>(packed >> 8);
+    }
+
+    bool IsBrowserReadbackPairSupported(GLenum format, GLenum type)
+    {
+        if (format == GL_RGBA && (type == GL_UNSIGNED_BYTE || type == GL_FLOAT))
+            return true;
+
+        GLint implementationFormat = 0;
+        GLint implementationType = 0;
+        glGetIntegerv(GL_IMPLEMENTATION_COLOR_READ_FORMAT, &implementationFormat);
+        glGetIntegerv(GL_IMPLEMENTATION_COLOR_READ_TYPE, &implementationType);
+        return format == static_cast<GLenum>(implementationFormat) && type == static_cast<GLenum>(implementationType);
+    }
+
     size_t GetBrowserTextureTexelOffset(
         const MGG_Texture* texture,
         mgint level,
@@ -1556,6 +1599,11 @@ namespace
 
                     switch (texture->format)
                     {
+                        case MGSurfaceFormat::Bgr565:
+                        case MGSurfaceFormat::Bgra4444:
+                        case MGSurfaceFormat::Bgra5551:
+                            PackBrowserReadbackPixel(texture->format, sourcePixel, destination + pixelIndex * 2);
+                            break;
                         case MGSurfaceFormat::Alpha8:
                             destination[pixelIndex] = sourcePixel[3];
                             break;
@@ -1763,7 +1811,7 @@ namespace
 
         GLint previousFramebuffer = 0;
         GLint previousPackAlignment = 0;
-        glGetIntegerv(GL_FRAMEBUFFER_BINDING, &previousFramebuffer);
+        glGetIntegerv(GL_READ_FRAMEBUFFER_BINDING, &previousFramebuffer);
         glGetIntegerv(GL_PACK_ALIGNMENT, &previousPackAlignment);
 
         GLuint framebuffer = 0;
@@ -1771,26 +1819,31 @@ namespace
         if (framebuffer == 0)
             MGGL_FAIL("glGenFramebuffers failed", "texture readback framebuffer creation returned 0");
 
-        device->context.functions.BindFramebuffer(GL_FRAMEBUFFER, framebuffer);
+        device->context.functions.BindFramebuffer(GL_READ_FRAMEBUFFER, framebuffer);
         if (texture->type == MGTextureType::_3D)
-            glFramebufferTextureLayer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, texture->handle, level, z);
+            glFramebufferTextureLayer(GL_READ_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, texture->handle, level, z);
         else
             device->context.functions.FramebufferTexture2D(
-                GL_FRAMEBUFFER,
+                GL_READ_FRAMEBUFFER,
                 GL_COLOR_ATTACHMENT0,
                 GetTextureImageTarget(texture, slice),
                 texture->handle,
                 level);
 
-        GLenum framebufferStatus = device->context.functions.CheckFramebufferStatus(GL_FRAMEBUFFER);
+        GLenum framebufferStatus = device->context.functions.CheckFramebufferStatus(GL_READ_FRAMEBUFFER);
         if (framebufferStatus != GL_FRAMEBUFFER_COMPLETE)
         {
-            device->context.functions.BindFramebuffer(GL_FRAMEBUFFER, static_cast<GLuint>(previousFramebuffer));
-            device->context.functions.DeleteFramebuffers(1, &framebuffer);
             MGGL_FAIL("Texture readback unsupported", "the requested texture format is not framebuffer-readable on WebGL2");
         }
 
-        bool requiresConversion = RequiresBrowserTextureFormatConversion(texture);
+        bool requiresConversion = RequiresBrowserReadbackConversion(texture->format);
+        GLenum readbackFormat = requiresConversion ? GL_RGBA : texture->pixelFormat;
+        GLenum readbackType = requiresConversion ? GL_UNSIGNED_BYTE : texture->pixelType;
+        if (!IsBrowserReadbackPairSupported(readbackFormat, readbackType))
+        {
+            MGGL_FAIL("Texture readback unsupported", "the browser does not advertise the requested lossless readback format/type pair");
+        }
+
         std::vector<mgbyte> convertedData;
         mgbyte* readbackData = data;
         mgint sliceBytes = GetTextureSliceByteCount(texture, width, height);
@@ -1805,16 +1858,31 @@ namespace
         for (mgint depthIndex = 0; depthIndex < depth; ++depthIndex)
         {
             if (texture->type == MGTextureType::_3D && depthIndex > 0)
-                glFramebufferTextureLayer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, texture->handle, level, z + depthIndex);
+            {
+                glFramebufferTextureLayer(GL_READ_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, texture->handle, level, z + depthIndex);
+                if (device->context.functions.CheckFramebufferStatus(GL_READ_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+                {
+                    MGGL_FAIL("Texture readback unsupported", "the requested texture layer is not framebuffer-readable on WebGL2");
+                }
+            }
+
+            if (glGetError() != GL_NO_ERROR)
+            {
+                MGGL_FAIL("Texture readback failed", "an OpenGL error occurred before glReadPixels");
+            }
 
             glReadPixels(
                 x,
                 y,
                 width,
                 height,
-                requiresConversion ? GL_RGBA : texture->pixelFormat,
-                requiresConversion ? GL_UNSIGNED_BYTE : texture->pixelType,
+                readbackFormat,
+                readbackType,
                 readbackData + depthIndex * sliceBytes);
+            if (glGetError() != GL_NO_ERROR)
+            {
+                MGGL_FAIL("Texture readback failed", "glReadPixels rejected the requested texture readback");
+            }
         }
 
         if (requiresConversion)
@@ -1834,7 +1902,7 @@ namespace
         }
 
         glPixelStorei(GL_PACK_ALIGNMENT, previousPackAlignment);
-        device->context.functions.BindFramebuffer(GL_FRAMEBUFFER, static_cast<GLuint>(previousFramebuffer));
+        device->context.functions.BindFramebuffer(GL_READ_FRAMEBUFFER, static_cast<GLuint>(previousFramebuffer));
         device->context.functions.DeleteFramebuffers(1, &framebuffer);
     }
 #endif
@@ -3259,19 +3327,35 @@ void MGG_GraphicsDevice_GetBackBufferData(MGG_GraphicsDevice* device, mgint x, m
     GLint previousFramebuffer = 0;
     GLint previousReadBuffer = 0;
     GLint previousPackAlignment = 0;
-    glGetIntegerv(GL_FRAMEBUFFER_BINDING, &previousFramebuffer);
+#if defined(__EMSCRIPTEN__)
+    constexpr GLenum framebufferTarget = GL_READ_FRAMEBUFFER;
+    constexpr GLenum framebufferBinding = GL_READ_FRAMEBUFFER_BINDING;
+#else
+    constexpr GLenum framebufferTarget = GL_FRAMEBUFFER;
+    constexpr GLenum framebufferBinding = GL_FRAMEBUFFER_BINDING;
+#endif
+    glGetIntegerv(framebufferBinding, &previousFramebuffer);
     glGetIntegerv(GL_READ_BUFFER, &previousReadBuffer);
     glGetIntegerv(GL_PACK_ALIGNMENT, &previousPackAlignment);
 
-    device->context.functions.BindFramebuffer(GL_FRAMEBUFFER, 0);
+    device->context.functions.BindFramebuffer(framebufferTarget, 0);
     glReadBuffer(GL_BACK);
     glPixelStorei(GL_PACK_ALIGNMENT, 1);
 
 #if defined(__EMSCRIPTEN__)
-    bool requiresConversion = RequiresBrowserTextureFormatConversion(device->backBufferFormat);
+    bool requiresConversion = RequiresBrowserReadbackConversion(device->backBufferFormat);
     size_t readbackRowBytes = requiresConversion ? static_cast<size_t>(width) * 4 : rowBytes;
     GLenum readbackFormat = requiresConversion ? GL_RGBA : formatInfo.pixelFormat;
     GLenum readbackType = requiresConversion ? GL_UNSIGNED_BYTE : formatInfo.pixelType;
+    if (!IsBrowserReadbackPairSupported(readbackFormat, readbackType))
+    {
+        MGGL_FAIL("Backbuffer readback unsupported", "the browser does not advertise the requested lossless readback format/type pair");
+    }
+
+    if (glGetError() != GL_NO_ERROR)
+    {
+        MGGL_FAIL("Backbuffer readback failed", "an OpenGL error occurred before glReadPixels");
+    }
 #else
     size_t readbackRowBytes = rowBytes;
     GLenum readbackFormat = formatInfo.pixelFormat;
@@ -3287,6 +3371,12 @@ void MGG_GraphicsDevice_GetBackBufferData(MGG_GraphicsDevice* device, mgint x, m
         readbackFormat,
         readbackType,
         pixels.data());
+#if defined(__EMSCRIPTEN__)
+    if (glGetError() != GL_NO_ERROR)
+    {
+        MGGL_FAIL("Backbuffer readback failed", "glReadPixels rejected the requested backbuffer readback");
+    }
+#endif
 
     mgbyte* destination = static_cast<mgbyte*>(data);
     for (mgint row = 0; row < height; ++row)
@@ -3303,6 +3393,11 @@ void MGG_GraphicsDevice_GetBackBufferData(MGG_GraphicsDevice* device, mgint x, m
                 const mgbyte* sourcePixel = sourceRow + static_cast<size_t>(column) * 4;
                 switch (device->backBufferFormat)
                 {
+                    case MGSurfaceFormat::Bgr565:
+                    case MGSurfaceFormat::Bgra4444:
+                    case MGSurfaceFormat::Bgra5551:
+                        PackBrowserReadbackPixel(device->backBufferFormat, sourcePixel, destinationRow + static_cast<size_t>(column) * 2);
+                        break;
                     case MGSurfaceFormat::Alpha8:
                         destinationRow[column] = sourcePixel[3];
                         break;
@@ -3330,8 +3425,8 @@ void MGG_GraphicsDevice_GetBackBufferData(MGG_GraphicsDevice* device, mgint x, m
     }
 
     glPixelStorei(GL_PACK_ALIGNMENT, previousPackAlignment);
+    device->context.functions.BindFramebuffer(framebufferTarget, static_cast<GLuint>(previousFramebuffer));
     glReadBuffer(previousReadBuffer);
-    device->context.functions.BindFramebuffer(GL_FRAMEBUFFER, static_cast<GLuint>(previousFramebuffer));
 }
 
 MGG_BlendState* MGG_BlendState_Create(MGG_GraphicsDevice* device, MGG_BlendState_Info* infos)
