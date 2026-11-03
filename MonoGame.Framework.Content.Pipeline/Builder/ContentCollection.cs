@@ -63,7 +63,11 @@ public class ContentCollection : IContentCollection
     /// An <see cref="IContentProcessor"/> to be used for the building, if its not specified, 
     /// the system will use reflection to try to figure out an apropriate processor.
     /// </param>
-    /// <remarks>Do not pass the same importer/processor instance to multiple <see cref="Include(string, IContentImporter?, IContentProcessor?)"/> calls; with parallel builds they may run concurrently.</remarks>
+    /// <remarks>
+    /// Do not use this overload if you will be passing in a stateful <see cref="IContentProcessor"/> or <see cref="IContentProcessor"/> if <see cref="ContentBuilderParams.MaxDegreeOfParallelism"/> is greater than 1.
+    /// Assets being built concurrently using the same instance may cause issues.
+    /// In that case, use the overload that accepts factory functions instead, and make sure the instances returned by those functions are transient.
+    /// </remarks>
     public void Include(string inputPath, IContentImporter? contentImporter = null, IContentProcessor? contentProcessor = null)
         => CurrentContent.Include(inputPath, contentImporter, contentProcessor);
 
@@ -80,7 +84,11 @@ public class ContentCollection : IContentCollection
     /// An <see cref="IContentProcessor"/> to be used for the building, if its not specified, 
     /// the system will use reflection to try to figure out an apropriate processor.
     /// </param>
-    /// <remarks>Do not pass the same importer/processor instance to multiple <see cref="Include(string, string, IContentImporter?, IContentProcessor?)"/> calls; with parallel builds they may run concurrently.</remarks>
+    /// <remarks>
+    /// Do not use this overload if you will be passing in a stateful <see cref="IContentProcessor"/> or <see cref="IContentProcessor"/> if <see cref="ContentBuilderParams.MaxDegreeOfParallelism"/> is greater than 1.
+    /// Assets being built concurrently using the same instance may cause issues.
+    /// In that case, use the overload that accepts factory functions instead, and make sure the instances returned by those functions are transient.
+    /// </remarks>
     public void Include(string inputPath, string outputPath, IContentImporter? contentImporter = null, IContentProcessor? contentProcessor = null)
         => CurrentContent.Include(inputPath, outputPath, contentImporter, contentProcessor);
 
@@ -125,6 +133,11 @@ public class ContentCollection : IContentCollection
     /// An <see cref="IContentProcessor"/> to be used for the building, if its not specified, 
     /// the system will use reflection to try to figure out an apropriate processor.
     /// </param>
+    /// <remarks>
+    /// Do not use this overload if you will be passing in a stateful <see cref="IContentProcessor"/> or <see cref="IContentProcessor"/> if <see cref="ContentBuilderParams.MaxDegreeOfParallelism"/> is greater than 1.
+    /// Assets being built concurrently using the same instance may cause issues.
+    /// In that case, use the overload that accepts factory functions instead, and make sure the instances returned by those functions are transient.
+    /// </remarks>
     [Obsolete("Use the overload that accepts factory functions instead.")]
     public void Include<T>(string includePattern, IContentImporter? contentImporter = null, IContentProcessor? contentProcessor = null)
         where T : ContentRule, new()
@@ -149,7 +162,10 @@ public class ContentCollection : IContentCollection
     /// A factory that creates a fresh, identically configured <see cref="IContentProcessor"/> per matched file. If not specified,
     /// the system will use reflection to try to figure out an apropriate processor.
     /// </param>
-    /// <remarks>Each factory is invoked once per matched file and must return a new, identically configured instance on every call (never a captured shared instance).</remarks>
+    /// <remarks>
+    /// Each factory is invoked once per matched file and must return a new, identically configured instance on every call (never a captured shared instance).
+    /// This ensures stateful processors or importers are not reused across multiple files, which could cause issues when building content in parallel.
+    /// </remarks>
     public void Include<T>(string includePattern,
         Func<IContentImporter>? contentImporterFactory = null,
         Func<IContentProcessor>? contentProcessorFactory = null)
@@ -178,7 +194,12 @@ public class ContentCollection : IContentCollection
     /// An <see cref="IContentProcessor"/> to be used for the building, if its not specified, 
     /// the system will use reflection to try to figure out an apropriate processor.
     /// </param>
-    [Obsolete("Use the overload that accepts factory functions instead.")]
+    /// <remarks>
+    /// Do not use this overload if you will be passing in a stateful <see cref="IContentProcessor"/> or <see cref="IContentProcessor"/> if <see cref="ContentBuilderParams.MaxDegreeOfParallelism"/> is greater than 1.
+    /// Assets being built concurrently using the same instance may cause issues.
+    /// In that case, use the overload that accepts factory functions instead, and make sure the instances returned by those functions are transient.
+    /// </remarks>
+    [Obsolete("Use the overload that accepts factory functions instead to ensure the same instance isn't reused.")]
     public void Include<T>(string includePattern,
         Func<string, string> outputPath,
         IContentImporter? contentImporter = null,
@@ -207,7 +228,10 @@ public class ContentCollection : IContentCollection
     /// A factory that creates a fresh, identically configured <see cref="IContentProcessor"/> per matched file. If not specified,
     /// the system will use reflection to try to figure out an apropriate processor.
     /// </param>
-    /// <remarks>Each factory is invoked once per matched file and must return a new, identically configured instance on every call (never a captured shared instance).</remarks>
+    /// <remarks>
+    /// Each factory is invoked once per matched file and must return a new, identically configured instance on every call (never a captured shared instance).
+    /// This ensures stateful processors or importers are not reused across multiple files, which could cause issues when building content in parallel.
+    /// </remarks>
     public void Include<T>(string includePattern,
         Func<string, string> outputPath,
         Func<IContentImporter>? contentImporterFactory = null,
