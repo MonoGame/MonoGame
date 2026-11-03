@@ -544,5 +544,18 @@ But the answer was still '42'.
         {
             Assert.DoesNotThrow(() => _defaultFont.DefaultCharacter = character);
         }
+
+        [Test]
+        [TestCase("Default", "The quick brown fox")]
+        [TestCase("Default", "The quick brown fox\njumps over the lazy dog.")]
+        public void MeasureString_StringAndStringBuilder_ReturnSameValue(string fontName, string text)
+        {
+            SpriteFont font = game.Content.Load<SpriteFont>(Paths.Font(fontName));
+
+            Vector2 stringSize = font.MeasureString(text);
+            Vector2 builderSize = font.MeasureString(new StringBuilder(text));
+
+            Assert.That(builderSize, Is.EqualTo(stringSize).Using(Vector2Comparer.Epsilon));
+        }        
 	}
 }
