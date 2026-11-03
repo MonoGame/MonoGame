@@ -54,6 +54,12 @@ namespace Microsoft.Xna.Framework.Graphics
 
         private VertexPositionColorTexture[] _vertexArray;
 
+        private DynamicVertexBuffer _vertexBuffer;
+
+        private DynamicIndexBuffer _indexBuffer;
+
+        private TextureRun[] _textureRuns;
+
         public SpriteBatcher(GraphicsDevice device, int capacity = 0)
 		{
             _device = device;
@@ -70,6 +76,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 _batchItemList[i] = new SpriteBatchItem();
 
             EnsureArrayCapacity(capacity);
+            _textureRuns = new TextureRun[capacity];
 		}
 
         /// <summary>
@@ -142,7 +149,52 @@ namespace Microsoft.Xna.Framework.Graphics
 
             _vertexArray = new VertexPositionColorTexture[4 * numBatchItems];
         }
-                
+
+        private void EnsureBufferCapacity(int numBatchItems)
+        {
+            int vertexCount = 4 * numBatchItems;
+            int indexCount = 6 * numBatchItems;
+
+            if (_vertexBuffer != null
+                && _vertexBuffer.VertexCount >= vertexCount
+                && _indexBuffer != null
+                && _indexBuffer.IndexCount >= indexCount)
+            {
+                return;
+            }
+
+            if (_vertexBuffer != null)
+            {
+                _vertexBuffer.Dispose();
+            }
+
+            if (_indexBuffer != null)
+            {
+                _indexBuffer.Dispose();
+            }
+
+            _vertexBuffer = new DynamicVertexBuffer(
+                _device,
+                VertexPositionColorTexture.VertexDeclaration,
+                vertexCount,
+                BufferUsage.WriteOnly);
+            _indexBuffer = new DynamicIndexBuffer(
+                _device,
+                IndexElementSize.SixteenBits,
+                indexCount,
+                BufferUsage.WriteOnly);
+        }
+
+        private void EnsureTextureRunCapacity(int numBatchItems)
+        {
+            if (numBatchItems <= _textureRuns.Length)
+            {
+                return;
+            }
+
+            Array.Resize(ref _textureRuns, numBatchItems);
+        }
+
         /// <summary>
         /// Sorts the batch items and then groups batch drawing into maximal allowed batch sets that do not
         /// overflow the 16 bit array indices for vertices.
@@ -168,8 +220,6 @@ namespace Microsoft.Xna.Framework.Graphics
 				break;
 			}
 
-            // Determine how many iterations through the drawing code we need to make
-            int batchIndex = 0;
             int batchCount = _batchItemCount;
 
             
@@ -177,6 +227,28 @@ namespace Microsoft.Xna.Framework.Graphics
             {
                 _device._graphicsMetrics._spriteCount += batchCount;
             }
+
+            if (sortMode == SpriteSortMode.Immediate)
+            {
+                DrawImmediateBatch(effect);
+                _batchItemCount = 0;
+                return;
+            }
+
+            DrawBufferedBatch(effect);
+
+            // return items to the pool.
+            _batchItemCount = 0;
+        }
+
+        /// <summary>
+        /// Draws an immediate batch without changing its upload and draw timing.
+        /// </summary>
+        /// <param name="effect">The custom effect to apply to the geometry.</param>
+        private unsafe void DrawImmediateBatch(Effect effect)
+        {
+            int batchIndex = 0;
+            int batchCount = _batchItemCount;
 
             // Iterate through the batches, doing short.MaxValue sets of vertices only.
             while(batchCount > 0)
@@ -228,9 +300,101 @@ namespace Microsoft.Xna.Framework.Graphics
                 // large batches
                 batchCount -= numBatchesToProcess;
             }
-            // return items to the pool.  
-            _batchItemCount = 0;
 		}
+
+        /// <summary>
+        /// Draws each existing processing chunk after uploading its vertices and indices once.
+        /// </summary>
+        /// <param name="effect">The custom effect to apply to the geometry.</param>
+        private unsafe void DrawBufferedBatch(Effect effect)
+        {
+            int batchIndex = 0;
+            int batchCount = _batchItemCount;
+
+            while (batchCount > 0)
+            {
+                int numBatchesToProcess = Math.Min(batchCount, MaxBatchSize);
+                EnsureBufferCapacity(numBatchesToProcess);
+                EnsureTextureRunCapacity(numBatchesToProcess);
+
+                int textureRunCount = 0;
+                int textureRunStart = 0;
+                Texture2D texture = null;
+
+                // Avoid the array checking overhead by using pointer indexing!
+                fixed (VertexPositionColorTexture* vertexArrayFixedPtr = _vertexArray)
+                {
+                    VertexPositionColorTexture* vertexArrayPtr = vertexArrayFixedPtr;
+
+                    // Build the chunk's vertices and contiguous texture runs.
+                    for (int i = 0; i < numBatchesToProcess; i++, batchIndex++, vertexArrayPtr += 4)
+                    {
+                        SpriteBatchItem item = _batchItemList[batchIndex];
+
+                        // A texture change ends the previous run and starts a new one.
+                        if (!ReferenceEquals(item.Texture, texture))
+                        {
+                            if (texture != null)
+                            {
+                                _textureRuns[textureRunCount++] = new TextureRun(
+                                    texture,
+                                    textureRunStart,
+                                    i - textureRunStart);
+                            }
+
+                            texture = item.Texture;
+                            textureRunStart = i;
+                        }
+
+                        // Store the SpriteBatchItem data in the chunk vertex array.
+                        *(vertexArrayPtr + 0) = item.vertexTL;
+                        *(vertexArrayPtr + 1) = item.vertexTR;
+                        *(vertexArrayPtr + 2) = item.vertexBL;
+                        *(vertexArrayPtr + 3) = item.vertexBR;
+
+                        // Release the texture.
+                        item.Texture = null;
+                    }
+                }
+
+                // Record the final texture run in the chunk.
+                if (texture != null)
+                {
+                    _textureRuns[textureRunCount++] = new TextureRun(
+                        texture,
+                        textureRunStart,
+                        numBatchesToProcess - textureRunStart);
+                }
+
+                _vertexBuffer.SetData(
+                    _vertexArray,
+                    0,
+                    4 * numBatchesToProcess,
+                    SetDataOptions.Discard);
+                _indexBuffer.SetData(
+                    _index,
+                    0,
+                    6 * numBatchesToProcess,
+                    SetDataOptions.Discard);
+                _device.SetVertexBuffer(_vertexBuffer);
+                _device.Indices = _indexBuffer;
+
+                // Draw each texture run in its original order from the uploaded chunk.
+                try
+                {
+                    for (int i = 0; i < textureRunCount; i++)
+                    {
+                        DrawTextureRun(_textureRuns[i], effect);
+                    }
+                }
+                finally
+                {
+                    Array.Clear(_textureRuns, 0, textureRunCount);
+                }
+
+                batchCount -= numBatchesToProcess;
+            }
+        }
 
         /// <summary>
         /// Sends the triangle list to the graphics device. Here is where the actual drawing starts.
@@ -283,6 +447,64 @@ namespace Microsoft.Xna.Framework.Graphics
                     VertexPositionColorTexture.VertexDeclaration);
             }
         }
+
+        private void DrawTextureRun(TextureRun textureRun, Effect effect)
+        {
+            if (effect != null)
+            {
+                EffectPassCollection passes = effect.CurrentTechnique.Passes;
+                foreach (EffectPass pass in passes)
+                {
+                    pass.Apply();
+                    _device.Textures[0] = textureRun.Texture;
+                    _device.DrawIndexedPrimitives(
+                        PrimitiveType.TriangleList,
+                        0,
+                        textureRun.StartSprite * 6,
+                        textureRun.SpriteCount * 2);
+                }
+            }
+            else
+            {
+                _device.Textures[0] = textureRun.Texture;
+                _device.DrawIndexedPrimitives(
+                    PrimitiveType.TriangleList,
+                    0,
+                    textureRun.StartSprite * 6,
+                    textureRun.SpriteCount * 2);
+            }
+        }
+
+        /// <summary>
+        /// Releases the buffers owned by this batcher.
+        /// </summary>
+        public void Dispose()
+        {
+            if (_vertexBuffer != null)
+            {
+                _vertexBuffer.Dispose();
+                _vertexBuffer = null;
+            }
+
+            if (_indexBuffer != null)
+            {
+                _indexBuffer.Dispose();
+                _indexBuffer = null;
+            }
+        }
+
+        private readonly struct TextureRun
+        {
+            public readonly Texture2D Texture;
+            public readonly int StartSprite;
+            public readonly int SpriteCount;
+
+            public TextureRun(Texture2D texture, int startSprite, int spriteCount)
+            {
+                Texture = texture;
+                StartSprite = startSprite;
+                SpriteCount = spriteCount;
+            }
+        }
 	}
 }
-
