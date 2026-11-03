@@ -25,7 +25,7 @@ namespace Microsoft.Xna.Framework.Content
 
 		private string _rootDirectory = string.Empty;
 		private IServiceProvider serviceProvider;
-        private Dictionary<string, object> loadedAssets = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase);
+        private Dictionary<string, object?> loadedAssets = new Dictionary<string, object?>(StringComparer.OrdinalIgnoreCase);
 		private List<IDisposable> disposableAssets = new List<IDisposable>();
         private bool disposed;
 
@@ -128,7 +128,7 @@ namespace Microsoft.Xna.Framework.Content
                     if (contentRef.IsAlive)
                     {
                         var contentManager = (ContentManager)contentRef.Target;
-                        if (contentManager != null)
+                        if (contentManager is not null)
                             contentManager.ReloadGraphicsAssets();
                     }
                     else
@@ -160,12 +160,12 @@ namespace Microsoft.Xna.Framework.Content
         ///     </para>
         /// </remarks>
         /// <param name="serviceProvider">The service provider that the ContentManager should use to locate services.</param>
-        /// <exception cref="ArgumentNullException">The <paramref name="serviceProvider"/> parameter is null.</exception>
+        /// <exception cref="ArgumentNullException">The <paramref name="serviceProvider"/> parameter is <see langword="null"/>.</exception>
 		public ContentManager(IServiceProvider serviceProvider)
 		{
-			if (serviceProvider == null)
+			if (serviceProvider is null)
 			{
-				throw new ArgumentNullException("serviceProvider");
+				throw new ArgumentNullException(nameof(serviceProvider));
 			}
 			this.serviceProvider = serviceProvider;
             AddContentManager(this);
@@ -176,13 +176,13 @@ namespace Microsoft.Xna.Framework.Content
         /// <param name="rootDirectory">The root directory the ContentManager will search for content in.</param>
         public ContentManager(IServiceProvider serviceProvider, string rootDirectory)
 		{
-			if (serviceProvider == null)
+			if (serviceProvider is null)
 			{
-				throw new ArgumentNullException("serviceProvider");
+				throw new ArgumentNullException(nameof(serviceProvider));
 			}
-			if (rootDirectory == null)
+			if (rootDirectory is null)
 			{
-				throw new ArgumentNullException("rootDirectory");
+				throw new ArgumentNullException(nameof(rootDirectory));
 			}
 			this.RootDirectory = rootDirectory;
 			this.serviceProvider = serviceProvider;
@@ -249,7 +249,7 @@ namespace Microsoft.Xna.Framework.Content
         /// <returns>
         /// The loaded asset. Repeated calls to load the same asset will return the same object instance.
         /// </returns>
-        /// <exception cref="ArgumentNullException">The <paramref name="assetName"/> parameter is null or an empty string.</exception>
+        /// <exception cref="ArgumentNullException">The <paramref name="assetName"/> parameter is <see langword="null"/> or an empty string.</exception>
         /// <exception cref="ObjectDisposedException">This was called after the ContentManger was disposed.</exception>
         /// <exception cref="ContentLoadException">
         /// The type of the <paramref name="assetName"/> in the file does not match the type of asset requested as
@@ -268,7 +268,7 @@ namespace Microsoft.Xna.Framework.Content
         ///
         /// An error occurred while opening the content file.
         /// </exception>
-        public virtual T LoadLocalized<T> (string assetName)
+        public virtual T? LoadLocalized<T> (string assetName)
         {
             string [] cultureNames =
             {
@@ -319,7 +319,7 @@ namespace Microsoft.Xna.Framework.Content
         /// <returns>
         /// The loaded asset. Repeated calls to load the same asset will return the same object instance.
         /// </returns>
-        /// <exception cref="ArgumentNullException">The <paramref name="assetName"/> parameter is null or an empty string.</exception>
+        /// <exception cref="ArgumentNullException">The <paramref name="assetName"/> parameter is <see langword="null"/> or an empty string.</exception>
         /// <exception cref="ObjectDisposedException">This was called after the ContentManger was disposed.</exception>
         /// <exception cref="ContentLoadException">
         /// The type of the <paramref name="assetName"/> in the file does not match the type of asset requested as
@@ -338,18 +338,18 @@ namespace Microsoft.Xna.Framework.Content
         ///
         /// An error occurred while opening the content file.
         /// </exception>
-		public virtual T Load<T>(string assetName)
+		public virtual T? Load<T>(string assetName)
 		{
             if (string.IsNullOrEmpty(assetName))
             {
-                throw new ArgumentNullException("assetName");
+                throw new ArgumentNullException(nameof(assetName));
             }
             if (disposed)
             {
-                throw new ObjectDisposedException("ContentManager");
+                throw new ObjectDisposedException(nameof(ContentManager));
             }
 
-            T result = default(T);
+            T? result = default(T);
 
             // On some platforms, name and slash direction matter.
             // We store the asset by a /-separating key rather than how the
@@ -360,7 +360,7 @@ namespace Microsoft.Xna.Framework.Content
             var key = assetName.Replace('\\', '/');
 
             // Check for a previously loaded asset first
-            object asset = null;
+            object? asset = null;
             if (loadedAssets.TryGetValue(key, out asset))
             {
                 if (asset is T)
@@ -420,19 +420,19 @@ namespace Microsoft.Xna.Framework.Content
 		}
 
         /// <summary />
-		protected T ReadAsset<T>(string assetName, Action<IDisposable> recordDisposableObject)
+		protected T? ReadAsset<T>(string assetName, Action<IDisposable>? recordDisposableObject)
 		{
 			if (string.IsNullOrEmpty(assetName))
 			{
-				throw new ArgumentNullException("assetName");
+				throw new ArgumentNullException(nameof(assetName));
 			}
 			if (disposed)
 			{
-				throw new ObjectDisposedException("ContentManager");
+				throw new ObjectDisposedException(nameof(ContentManager));
 			}
 
 			string originalAssetName = assetName;
-			object result = null;
+			object? result = null;
 
             try
             {
@@ -454,9 +454,9 @@ namespace Microsoft.Xna.Framework.Content
             {
                 // If the file is not found, we try searching a file with differents extensions
                 // based on the type of asset searched (e.g. '.bmp' and '.png' for a Texture2D)
-                if (ex.InnerException != null &&
-                    (ex.InnerException is FileNotFoundException ||
-                    ex.InnerException is DirectoryNotFoundException))
+                if (ex.InnerException is not null and
+                    (FileNotFoundException or
+                    DirectoryNotFoundException))
                 {
                     // only try if an image file exist to avoid loosing the original error
                     if (typeof(Texture2D).IsAssignableFrom(typeof(T)) &&
@@ -480,15 +480,15 @@ namespace Microsoft.Xna.Framework.Content
                     throw;
             }
 
-			if (result == null)
+			if (result is null)
             {
 				throw new ContentLoadException("Could not load " + originalAssetName + " asset!");
             }
 
-			return (T)result;
+			return (T?)result;
 		}
 
-        private ContentReader GetContentReaderFromXnb(string originalAssetName, Stream stream, BinaryReader xnbReader, Action<IDisposable> recordDisposableObject)
+        private ContentReader GetContentReaderFromXnb(string originalAssetName, Stream stream, BinaryReader xnbReader, Action<IDisposable>? recordDisposableObject)
         {
             // The first 4 bytes should be the "XNB" header. i use that to detect an invalid file
             byte x = xnbReader.ReadByte();
@@ -515,7 +515,7 @@ namespace Microsoft.Xna.Framework.Content
             // The next int32 is the length of the XNB file
             int xnbLength = xnbReader.ReadInt32();
 
-            Stream decompressedStream = null;
+            Stream? decompressedStream = null;
             if (compressedLzx || compressedLz4)
             {
                 // Decompress the xnb
@@ -556,16 +556,20 @@ namespace Microsoft.Xna.Framework.Content
             return false;
         }
 
-        internal Texture2D LoadTexture2DFromImageFile(string assetName)
+        internal Texture2D? LoadTexture2DFromImageFile(string assetName)
         {
-            IGraphicsDeviceService graphicsDeviceService = serviceProvider.GetService(typeof(IGraphicsDeviceService)) as IGraphicsDeviceService;
+            IGraphicsDeviceService graphicsDeviceService = (IGraphicsDeviceService)
+                (
+                serviceProvider.GetService(typeof(IGraphicsDeviceService))
+                ?? throw new InvalidOperationException("No Graphics Device Service")
+                );
 
             foreach (string extension in supportedTexture2DExtensions)
             {
                 string assetPath = Path.Combine(RootDirectory, assetName);
                 assetPath = Path.ChangeExtension(assetPath, extension);
 
-                Stream stream = null;
+                Stream stream;
 
                 // Handle absolute paths the same way as XNB loading
 #if DESKTOPGL || WINDOWS
@@ -584,7 +588,7 @@ namespace Microsoft.Xna.Framework.Content
                 stream = memStream;
 #endif
 
-                if (stream != null)
+                if (stream is not null)
                 {
                     using (stream)
                     {
@@ -599,7 +603,7 @@ namespace Microsoft.Xna.Framework.Content
 
         internal void RecordDisposable(IDisposable disposable)
         {
-            Debug.Assert(disposable != null, "The disposable is null!");
+            Debug.Assert(disposable is not null, "The disposable is null!");
 
             // Avoid recording disposable objects twice. ReloadAsset will try to record the disposables again.
             // We don't know which asset recorded which disposable so just guard against storing multiple of the same instance.
@@ -608,7 +612,7 @@ namespace Microsoft.Xna.Framework.Content
         }
 
         /// <summary />
-        protected virtual Dictionary<string, object> LoadedAssets
+        protected virtual Dictionary<string, object?> LoadedAssets
         {
             get { return loadedAssets; }
         }
@@ -620,29 +624,27 @@ namespace Microsoft.Xna.Framework.Content
             {
                 // This never executes as asset.Key is never null.  This just forces the
                 // linker to include the ReloadAsset function when AOT compiled.
-                if (asset.Key == null)
-                    ReloadAsset(asset.Key, Convert.ChangeType(asset.Value, asset.Value.GetType()));
+                if (asset.Key is null)
+                    ReloadAsset(asset.Key, asset.Value is null ? asset.Value : Convert.ChangeType(asset.Value, asset.Value.GetType()));
 
-                var methodInfo = ReflectionHelpers.GetMethodInfo(typeof(ContentManager), "ReloadAsset");
+                var methodInfo = ReflectionHelpers.GetMethodInfo(typeof(ContentManager), nameof(ReloadAsset));
                 // Up the callstack, it is ensured that the type of asset.Value can be used to make a generic method for.
                 #pragma warning disable IL2060, IL3050
-                var genericMethod = methodInfo.MakeGenericMethod(asset.Value.GetType());
+                var genericMethod = methodInfo.MakeGenericMethod(asset.Value?.GetType() ?? typeof(object));
                 #pragma warning restore IL2060, IL3050
-                genericMethod.Invoke(this, new object[] { asset.Key, Convert.ChangeType(asset.Value, asset.Value.GetType()) });
+                genericMethod.Invoke(this, new object?[] { asset.Key, asset.Value is null ? null : Convert.ChangeType(asset.Value, asset.Value.GetType()) });
             }
         }
 
         /// <summary />
-        protected virtual void ReloadAsset<T>(string originalAssetName, T currentAsset)
+        protected virtual void ReloadAsset<T>(string? assetName, T? currentAsset)
         {
-			string assetName = originalAssetName;
-			if (string.IsNullOrEmpty(assetName))
-			{
-				throw new ArgumentNullException("assetName");
-			}
+            if (string.IsNullOrEmpty(assetName))
+                throw new ArgumentNullException(nameof(assetName));
+
 			if (disposed)
 			{
-				throw new ObjectDisposedException("ContentManager");
+				throw new ObjectDisposedException(nameof(ContentManager));
 			}
 
             var stream = OpenStream(assetName);
@@ -667,7 +669,7 @@ namespace Microsoft.Xna.Framework.Content
 		    // Look for disposable assets.
 		    foreach (var disposable in disposableAssets)
 		    {
-		        if (disposable != null)
+		        if (disposable is not null)
                 {
 		            disposable.Dispose();
                 }
@@ -687,17 +689,17 @@ namespace Microsoft.Xna.Framework.Content
         /// The asset name, relative to the <see cref="RootDirectory">ContentManager.RootDirectory</see>, and not
         /// including the .xnb extension.
         /// </param>
-        /// <exception cref="ArgumentNullException">The <paramref name="assetName"/> parameter is null or an empty string.</exception>
+        /// <exception cref="ArgumentNullException">The <paramref name="assetName"/> parameter is <see langword="null"/> or an empty string.</exception>
         /// <exception cref="ObjectDisposedException">This was called after the ContentManger was disposed.</exception>
         public virtual void UnloadAsset(string assetName)
         {
             if (string.IsNullOrEmpty(assetName))
             {
-                throw new ArgumentNullException("assetName");
+                throw new ArgumentNullException(nameof(assetName));
             }
             if (disposed)
             {
-                throw new ObjectDisposedException("ContentManager");
+                throw new ObjectDisposedException(nameof(ContentManager));
             }
 
             // On some platforms, name and slash direction matter.
@@ -709,12 +711,11 @@ namespace Microsoft.Xna.Framework.Content
             var key = assetName.Replace('\\', '/');
 
             //Check if the asset exists
-            object asset;
+            object? asset;
             if (loadedAssets.TryGetValue(key, out asset))
             {
                 //Check if it's disposable and remove it from the disposable list if so
-                var disposable = asset as IDisposable;
-                if (disposable != null)
+                if (asset is IDisposable disposable)
                 {
                     disposable.Dispose();
                     disposableAssets.Remove(disposable);
@@ -734,7 +735,7 @@ namespace Microsoft.Xna.Framework.Content
         /// </remarks>
         /// <param name="assetNames">The collection containing the names of assets to unload.</param>
         /// <exception cref="ArgumentNullException">
-        /// If the <paramref name="assetNames"/> parameter is null.
+        /// If the <paramref name="assetNames"/> parameter is <see langword="null"/>.
         ///
         /// -or-
         ///
@@ -743,13 +744,13 @@ namespace Microsoft.Xna.Framework.Content
         /// <exception cref="ObjectDisposedException">This was called after the ContentManger was disposed.</exception>
         public virtual void UnloadAssets(IList<string> assetNames)
         {
-            if (assetNames == null)
+            if (assetNames is null)
             {
-                throw new ArgumentNullException("assetNames");
+                throw new ArgumentNullException(nameof(assetNames));
             }
             if (disposed)
             {
-                throw new ObjectDisposedException("ContentManager");
+                throw new ObjectDisposedException(nameof(ContentManager));
             }
 
             for (int i = 0; i < assetNames.Count; i++)
