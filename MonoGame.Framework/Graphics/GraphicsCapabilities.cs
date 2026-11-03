@@ -120,5 +120,7 @@ namespace Microsoft.Xna.Framework.Graphics
         internal bool SupportsBaseIndexInstancing { get; private set; }
 
         internal bool SupportsSeparateBlendStates { get; private set; }
+
+        internal bool SupportsMapBuffer { get; private set; }
     }
 }
