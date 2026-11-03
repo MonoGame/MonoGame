@@ -26,7 +26,7 @@ namespace Microsoft.Xna.Framework.Content
 		private string _rootDirectory = string.Empty;
 		private IServiceProvider serviceProvider;
         private Dictionary<string, object> loadedAssets = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase);
-		private List<IDisposable> disposableAssets = new List<IDisposable>();
+		private HashSet<IDisposable> disposableAssets = new HashSet<IDisposable>();
         private bool disposed;
 
 		private static object ContentManagerLock = new object();
