@@ -72,9 +72,9 @@ public class ContentCollection : IContentCollection
     /// the system will use reflection to try to figure out an apropriate processor.
     /// </param>
     /// <remarks>
-    /// Do not use this overload if you will be passing in a stateful <see cref="IContentProcessor"/> or <see cref="IContentProcessor"/> if <see cref="ContentBuilderParams.MaxDegreeOfParallelism"/> is greater than 1.
+    /// Do not use the same <see cref="IContentProcessor"/> or <see cref="IContentProcessor"/> instance if it's stateful and <see cref="ContentBuilderParams.MaxDegreeOfParallelism"/> is greater than 1.
     /// Assets being built concurrently using the same instance may cause issues.
-    /// In that case, use the overload that accepts factory functions instead, and make sure the instances returned by those functions are transient.
+    /// In that case, use transient instances for each.
     /// </remarks>
     public ContentCollection Include(string inputPath, IContentImporter? contentImporter = null, IContentProcessor? contentProcessor = null)
     {
@@ -96,9 +96,9 @@ public class ContentCollection : IContentCollection
     /// the system will use reflection to try to figure out an apropriate processor.
     /// </param>
     /// <remarks>
-    /// Do not use this overload if you will be passing in a stateful <see cref="IContentProcessor"/> or <see cref="IContentProcessor"/> if <see cref="ContentBuilderParams.MaxDegreeOfParallelism"/> is greater than 1.
+    /// Do not use the same <see cref="IContentProcessor"/> or <see cref="IContentProcessor"/> instance if it's stateful and <see cref="ContentBuilderParams.MaxDegreeOfParallelism"/> is greater than 1.
     /// Assets being built concurrently using the same instance may cause issues.
-    /// In that case, use the overload that accepts factory functions instead, and make sure the instances returned by those functions are transient.
+    /// In that case, use transient instances for each.
     /// </remarks>
     public ContentCollection Include(string inputPath, string outputPath, IContentImporter? contentImporter = null, IContentProcessor? contentProcessor = null)
     {
