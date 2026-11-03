@@ -7,6 +7,7 @@
     <BaseOutputPath>..\Artifacts\Tests\$(MonoGamePlatform)</BaseOutputPath>
     <AppendTargetFrameworkToOutputPath>False</AppendTargetFrameworkToOutputPath>
     <UseAppHost>true</UseAppHost>
+    <NoWarn>$(NoWarn);MG_EXP_9382</NoWarn>
   </PropertyGroup>
 
 </Project>
