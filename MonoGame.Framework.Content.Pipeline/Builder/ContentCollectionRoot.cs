@@ -10,7 +10,7 @@ class ContentCollectionRoot(string contentRoot)
 {
     private readonly string _contentRoot = contentRoot;
     private readonly Dictionary<string, ContentInfo?> _imputFiles = [];
-    private readonly List<(ContentRule rule, ContentInfo? info)> _rules = [];
+    private readonly List<(ContentRule rule, ContentInfo? info, Func<IContentImporter>? importerFactory, Func<IContentProcessor>? processorFactory)> _rules = [];
 
     public void IncludeCopy(string inputPath, string? outputPath)
         => _imputFiles[inputPath.Sanitize()] = new(_contentRoot, false, null, null, string.IsNullOrWhiteSpace(outputPath) ? (s => s) : (_ => outputPath));
@@ -28,23 +28,23 @@ class ContentCollectionRoot(string contentRoot)
     {
         var rule = new T { Pattern = includePattern };
         RemoveFilesByRule(rule, false, outputPath ?? (s => s));
-        _rules.Add((rule, new(_contentRoot, false, null, null, outputPath)));
+        _rules.Add((rule, new(_contentRoot, false, null, null, outputPath), null, null));
     }
 
-    public void Include<T>(string includePattern, IContentImporter? contentImporter, IContentProcessor? contentProcessor)
+    public void Include<T>(string includePattern, Func<IContentImporter>? contentImporter, Func<IContentProcessor>? contentProcessor)
         where T : ContentRule, new()
     {
         var rule = new T { Pattern = includePattern };
         RemoveFilesByRule(rule, true, s => s);
-        _rules.Add((rule, new(_contentRoot, true, contentImporter, contentProcessor)));
+        _rules.Add((rule, new(_contentRoot, true), contentImporter, contentProcessor));
     }
 
-    public void Include<T>(string includePattern, Func<string, string> outputPath, IContentImporter? contentImporter, IContentProcessor? contentProcessor)
+    public void Include<T>(string includePattern, Func<string, string> outputPath, Func<IContentImporter>? contentImporter, Func<IContentProcessor>? contentProcessor)
         where T : ContentRule, new()
     {
         var rule = new T { Pattern = includePattern };
         RemoveFilesByRule(rule, true, outputPath);
-        _rules.Add((rule, new(_contentRoot, true, contentImporter, contentProcessor, outputPath)));
+        _rules.Add((rule, new(_contentRoot, true, null, null, outputPath), contentImporter, contentProcessor));
     }
 
     public void Exclude<T>(string excludePattern)
@@ -52,7 +52,7 @@ class ContentCollectionRoot(string contentRoot)
     {
         var rule = new T { Pattern = excludePattern };
         RemoveFilesByRule(rule, true, null);
-        _rules.Add((rule, null));
+        _rules.Add((rule, null, null, null));
     }
 
     public bool GetContentInfo(string filePath, out List<ContentInfo> contentInfos)
@@ -76,7 +76,7 @@ class ContentCollectionRoot(string contentRoot)
 
         for (int i = _rules.Count - 1; i >= 0; i--)
         {
-            (ContentRule rule, ContentInfo? info) rule = _rules[i];
+            var rule = _rules[i];
             if (rule.rule.IsMatch(filePath))
             {
                 if (rule.info == null)
@@ -98,7 +98,9 @@ class ContentCollectionRoot(string contentRoot)
                 }
 
                 usedOutputs.Add(outputPath);
-                contentInfos.Add(rule.info); // TODO: check for build action
+                contentInfos.Add(rule.importerFactory == null && rule.processorFactory == null
+                    ? rule.info
+                    : new ContentInfo(rule.info.ContentRoot, true, rule.importerFactory?.Invoke(), rule.processorFactory?.Invoke(), rule.info.GetOutputPath)); // TODO: check for build action
                 shouldBuild = rule.info?.ShouldBuild;
             }
         }

@@ -3,6 +3,8 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System.Collections;
+using System.Collections.Immutable;
+using System.Diagnostics;
 using System.Reflection;
 using Microsoft.Xna.Framework.Content.Pipeline;
 using Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler;
@@ -29,10 +31,68 @@ public abstract class ContentBuilder
 
     private class SkipLogException() : Exception;
 
+    private sealed class InFlightBuild
+    {
+        public required int OwnerThreadId { get; init; }
+
+        public TaskCompletionSource<BuildResult> Completion { get; } =
+            new(TaskCreationOptions.RunContinuationsAsynchronously);
+    }
+
+    private readonly record struct BuildResult(
+        string RelativeSourcePath,
+        int BuildHash,
+        IContentFileCache? FileCache,
+        bool Failed);
+
+    internal static readonly StringComparer PathComparer =
+        OperatingSystem.IsWindows() || OperatingSystem.IsMacOS()
+            ? StringComparer.OrdinalIgnoreCase
+            : StringComparer.Ordinal;
+
+    private static readonly ImmutableHashSet<string> EmptyBuildStack =
+        ImmutableHashSet<string>
+            .Empty
+            .WithComparer(PathComparer);
+
     private readonly Queue<ContentRequest> _contentRequestQueue = [];
     private readonly object _contentRequestLock = new();
     private readonly Dictionary<string, List<ContentInfo>> _content = [];
-    private readonly Dictionary<string, string> _outputContent = [];
+
+    /// <summary>
+    /// Destination to source mapping.
+    /// </summary>
+    private readonly Dictionary<string, string> _outputContent = new(PathComparer);
+
+    private readonly object _coordinatorLock = new();
+
+    /// <summary>
+    /// Resource to build mapping.
+    /// </summary>
+    private readonly Dictionary<string, InFlightBuild> _inFlightByPath = new(PathComparer);
+
+    /// <summary>
+    /// Build to resource mapping.
+    /// </summary>
+    private readonly Dictionary<int, string> _threadWaitingOnPath = [];
+
+    /// <summary>
+    /// Resource stack for the current build.
+    /// </summary>
+    private readonly AsyncLocal<ImmutableHashSet<string>> _activeBuildStack = new();
+
+    /// <summary>
+    /// Contains the build results in the current batch.
+    /// </summary>
+    /// <remarks>
+    /// It should remain <see langword="null"/> in server mode.
+    /// </remarks>
+    private Dictionary<string, BuildResult>? _batchResultsInCurrentRun;
+
+    private readonly Lazy<ContentCompiler> _compiler = new(static () => new ContentCompiler());
+
+    private uint _failedToBuild;
+    private uint _succeededToBuild;
 
     /// <summary>
     /// Parameters to be used by the <see cref="ContentBuilder"/> or any of its subsystems.
@@ -61,12 +121,20 @@ public abstract class ContentBuilder
     /// <summary>
     /// Returns the number of content items that failed to build.
     /// </summary>
-    public uint FailedToBuild { get; private set; }
+    public uint FailedToBuild
+    {
+        get => Volatile.Read(ref _failedToBuild);
+        private set => Interlocked.Exchange(ref _failedToBuild, value);
+    }
 
     /// <summary>
     /// Returns the number of content items that built successfully.
     /// </summary>
-    public uint SucceededToBuild { get; private set; }
+    public uint SucceededToBuild
+    {
+        get => Volatile.Read(ref _succeededToBuild);
+        private set => Interlocked.Exchange(ref _succeededToBuild, value);
+    }
 
     /// <summary>
     /// Initiates a build of the specified asset and then writes down the result to disk..
@@ -93,16 +161,18 @@ public abstract class ContentBuilder
         try
         {
             ProcessContent(relativeSrcPath, contentInfo, true, ref relativeDstPath, parentContext);
-            SucceededToBuild++;
+            Interlocked.Increment(ref _succeededToBuild);
+
             return relativeDstPath;
         }
         catch (Exception ex)
         {
-            FailedToBuild++;
+            Interlocked.Increment(ref _failedToBuild);
             if (ex is not SkipLogException)
             {
                 Logger.Log(LogLevel.Error, $"Content failed to build: {ex}");
             }
+
             return parentContext != null ? throw new SkipLogException() : null;
         }
         finally
@@ -121,16 +191,26 @@ public abstract class ContentBuilder
     /// <returns>The built object that the <see cref="IContentProcessor.Process(object, ContentProcessorContext)"/> returned.</returns>
     public object? BuildAndLoadContent(string relativeSrcPath, ContentInfo contentInfo, string? relativeDstPath = null, ContentProcessorContext? parentContext = null)
     {
+        if (Path.IsPathRooted(relativeSrcPath))
+        {
+            if (parentContext != null)
+            {
+                var assetRoot = PathHelper.NormalizeDirectory(parentContext.ProjectDirectory);
+                relativeSrcPath = PathHelper.GetRelativePath(assetRoot, relativeSrcPath);
+            }
+        }
+
         Logger.PushFile(Path.Combine(Parameters.RootedSourceDirectory, relativeSrcPath));
         try
         {
             var content = ProcessContent(relativeSrcPath, contentInfo, false, ref relativeDstPath, parentContext);
-            SucceededToBuild++;
+            Interlocked.Increment(ref _succeededToBuild);
+
             return content;
         }
         catch (Exception ex)
         {
-            FailedToBuild++;
+            Interlocked.Increment(ref _failedToBuild);
             if (ex is not SkipLogException)
             {
                 Logger.Log(LogLevel.Error, $"Content failed to build: {ex}");
@@ -144,19 +224,28 @@ public abstract class ContentBuilder
         {
             Logger.PopFile();
         }
+
         return null;
     }
 
-    private object? ProcessContent(string relativePath, ContentInfo contentInfo, bool writeToDisk, ref string? relativeDstPath, ContentProcessorContext? parentContext)
+    private object? ProcessContent(string relativeSrcPath,
+        ContentInfo contentInfo,
+        bool writeToDisk,
+        ref string? relativeDstPath,
+        ContentProcessorContext? parentContext)
     {
-        var filePath = Path.Combine(Parameters.RootedSourceDirectory, relativePath);
-
         if (string.IsNullOrEmpty(relativeDstPath))
-            relativeDstPath = relativePath.GetDestinationPath(contentInfo.ShouldBuild, contentInfo.GetOutputPath);
+        {
+            relativeDstPath = relativeSrcPath.GetDestinationPath(contentInfo.ShouldBuild, contentInfo.GetOutputPath);
+        }
+        else if (contentInfo.ShouldBuild && !relativeDstPath.EndsWith(".xnb", StringComparison.OrdinalIgnoreCase))
+        {
+            relativeDstPath += ".xnb";
+        }
 
         if (contentInfo.ShouldBuild) // ensure importer and processor are set
         {
-            if (!ContentBuilderHelper.GetImporter(relativePath, contentInfo.Importer, out IContentImporter importer))
+            if (!ContentBuilderHelper.GetImporter(relativeSrcPath, contentInfo.Importer, out IContentImporter importer))
             {
                 Logger.Log(LogLevel.Warning, "Importer: Not found");
                 return null;
@@ -173,17 +262,58 @@ public abstract class ContentBuilder
         }
 
         var relativeDestPath = Path.Combine(contentInfo.ContentRoot, relativeDstPath).Sanitize();
+        var buildHash = contentInfo.ShouldBuild
+            ? contentInfo.MakeBuildHash()
+            : 0;
 
         // Dependency content that is imported/processed gets a
         // hash code appended to the file name to avoid conflicts.
         if (parentContext != null && contentInfo.ShouldBuild)
-            relativeDestPath = relativeDestPath.Replace(".xnb", $".{contentInfo.MakeBuildHash():x}.xnb");
-
-        var outputPath = Path.Combine(Parameters.RootedOutputDirectory, relativeDestPath).Sanitize();
-        var outputDir = Path.GetDirectoryName(outputPath);
+        {
+            relativeDestPath = $"{relativeDestPath[..^4]}.{buildHash:x}.xnb";
+        }
 
         // Return the caller the final completed content path.
         relativeDstPath = relativeDestPath;
+
+        var previousBuildStack = _activeBuildStack.Value ?? EmptyBuildStack;
+        var buildStackKey = writeToDisk ? relativeDestPath : $"{relativeSrcPath}#{buildHash:x}";
+        if (previousBuildStack.Contains(relativeDestPath) || previousBuildStack.Contains(buildStackKey))
+        {
+            throw new PipelineException($"Circular content dependency detected while building '{relativeDestPath}'.");
+        }
+
+        if (!writeToDisk)
+        {
+            _activeBuildStack.Value = previousBuildStack.Add(buildStackKey);
+            try
+            {
+                return ExecuteBuild(relativeSrcPath, contentInfo, writeToDisk: false, relativeDestPath, parentContext, out _);
+            }
+            finally
+            {
+                _activeBuildStack.Value = previousBuildStack;
+            }
+        }
+
+        RunSingleFlight(relativeSrcPath, contentInfo, relativeDestPath, buildHash, previousBuildStack, parentContext);
+
+        return null;
+    }
+
+    private object? ExecuteBuild(
+        string relativeSrcPath,
+        ContentInfo contentInfo,
+        bool writeToDisk,
+        string relativeDstPath,
+        ContentProcessorContext? parentContext,
+        out IContentFileCache? resultingFileCache)
+    {
+        resultingFileCache = null;
+
+        var filePath = Path.Combine(Parameters.RootedSourceDirectory, relativeSrcPath);
+        var outputPath = Path.Combine(Parameters.RootedOutputDirectory, relativeDstPath).Sanitize();
+        var outputDir = Path.GetDirectoryName(outputPath);
 
         if (string.IsNullOrWhiteSpace(outputDir))
             return null;
@@ -191,13 +321,18 @@ public abstract class ContentBuilder
         if (!Directory.Exists(outputDir))
             Directory.CreateDirectory(outputDir);
 
-        var fileCache = ContentCache.ReadContentFileCache(this, relativeDestPath);
-        if (fileCache != null && fileCache.IsValid(this, contentInfo))
+        if (writeToDisk)
         {
-            Logger.Log(LogLevel.Debug, $"Cache: Found");
-            ContentCache.MarkUsed(fileCache);
-            (parentContext as ContentBuilderProcessorContext)?.ContentFileCache.AddDependency(this, fileCache);
-            return null;
+            var fileCache = ContentCache.ReadContentFileCache(this, relativeDstPath);
+            if (fileCache != null && fileCache.IsValid(this, contentInfo))
+            {
+                Logger.Log(LogLevel.Debug, $"Cache: Found");
+                ContentCache.MarkUsed(fileCache);
+                (parentContext as ContentBuilderProcessorContext)?.ContentFileCache.AddDependency(this, fileCache);
+                resultingFileCache = fileCache;
+
+                return null;
+            }
         }
 
         if (!contentInfo.ShouldBuild)
@@ -210,11 +345,13 @@ public abstract class ContentBuilder
             File.Copy(filePath, outputPath);
 
             var fileCopyCache = ContentCache.CreateContentFileCache(this, contentInfo);
-            fileCopyCache.AddDependency(this, relativePath);
+            fileCopyCache.AddDependency(this, relativeSrcPath);
             fileCopyCache.AddOutputFile(this, outputPath);
-            ContentCache.WriteContentFileCache(this, relativeDestPath, fileCopyCache);
+            ContentCache.WriteContentFileCache(this, relativeDstPath, fileCopyCache);
             ContentCache.MarkUsed(fileCopyCache);
             (parentContext as ContentBuilderProcessorContext)?.ContentFileCache.AddDependency(this, fileCopyCache);
+            resultingFileCache = fileCopyCache;
+
             return null;
         }
 
@@ -224,27 +361,185 @@ public abstract class ContentBuilder
         Logger.Log(Path.GetRelativePath(Logger.LoggerRootDirectory, outputPath).Sanitize());
 
         var contentFileCache = ContentCache.CreateContentFileCache(this, contentInfo);
-        contentFileCache.AddDependency(this, relativePath);
+        contentFileCache.AddDependency(this, relativeSrcPath);
 
         var importContext = new ContentBuilderImporterContext(this, contentFileCache);
         var importedObject = contentInfo.Importer!.Import(filePath, importContext);
 
-        var processorContext = new ContentBuilderProcessorContext(this, relativePath, contentInfo, contentFileCache, outputPath);
+        var processorContext = new ContentBuilderProcessorContext(this, relativeSrcPath, contentInfo, contentFileCache, outputPath);
         using var _ = ContextScopeFactory.BeginContext(processorContext);
         var processedObject = contentInfo.Processor!.Process(importedObject, processorContext);
 
         if (writeToDisk)
         {
-            var compiler = new ContentCompiler();
             using var stream = new FileStream(outputPath, FileMode.Create, FileAccess.Write, FileShare.None);
-            compiler.Compile(stream, processedObject, Parameters.Platform, Parameters.GraphicsProfile, Parameters.CompressContent, Parameters.RootedOutputDirectory, outputDir);
+            _compiler.Value.Compile(stream, processedObject, Parameters.Platform, Parameters.GraphicsProfile, Parameters.CompressContent, Parameters.RootedOutputDirectory, outputDir);
             contentFileCache.AddOutputFile(this, outputPath);
-            ContentCache.WriteContentFileCache(this, relativeDestPath, contentFileCache);
+            ContentCache.WriteContentFileCache(this, relativeDstPath, contentFileCache);
             ContentCache.MarkUsed(contentFileCache);
-            (parentContext as ContentBuilderProcessorContext)?.ContentFileCache.AddDependency(this, contentFileCache);
         }
 
+        (parentContext as ContentBuilderProcessorContext)?.ContentFileCache.AddDependency(this, contentFileCache);
+        resultingFileCache = contentFileCache;
+
         return processedObject;
+    }
+
+    private void RunSingleFlight(
+        string relativeSrcPath,
+        ContentInfo contentInfo,
+        string relativeDstPath,
+        int buildHash,
+        ImmutableHashSet<string> previousBuildStack,
+        ContentProcessorContext? parentContext)
+    {
+        var currentThreadId = Environment.CurrentManagedThreadId;
+        InFlightBuild? ownedBuild = null;
+        InFlightBuild? existingEntry = null;
+        BuildResult? cachedBatchResult = null;
+
+        lock (_coordinatorLock)
+        {
+            if (_batchResultsInCurrentRun != null
+                && _batchResultsInCurrentRun.TryGetValue(relativeDstPath, out var completedBatchResult))
+            {
+                cachedBatchResult = completedBatchResult;
+            }
+            else if (_inFlightByPath.TryGetValue(relativeDstPath, out existingEntry))
+            {
+                if (IsCircularWait(currentThreadId, existingEntry.OwnerThreadId, previousBuildStack))
+                {
+                    throw new PipelineException($"Circular content dependency detected while building '{relativeDstPath}'!");
+                }
+
+                _threadWaitingOnPath[currentThreadId] = relativeDstPath;
+            }
+            else
+            {
+                ownedBuild = new InFlightBuild
+                {
+                    OwnerThreadId = currentThreadId,
+                };
+
+                _inFlightByPath[relativeDstPath] = ownedBuild;
+            }
+        }
+
+        if (cachedBatchResult is { } batchResult)
+        {
+            HandleSharedBuildResult(batchResult, relativeSrcPath, relativeDstPath, buildHash, parentContext);
+
+            return;
+        }
+
+        if (existingEntry != null)
+        {
+            BuildResult sharedResult;
+            try
+            {
+                sharedResult = existingEntry
+                    .Completion
+                    .Task
+                    .GetAwaiter()
+                    .GetResult();
+            }
+            finally
+            {
+                lock (_coordinatorLock)
+                {
+                    _threadWaitingOnPath.Remove(currentThreadId);
+                }
+            }
+
+            HandleSharedBuildResult(sharedResult, relativeSrcPath, relativeDstPath, buildHash, parentContext);
+
+            return;
+        }
+
+        Debug.Assert(ownedBuild != null);
+
+        IContentFileCache? producedFileCache = null;
+        var failed = true;
+        _activeBuildStack.Value = previousBuildStack.Add(relativeDstPath);
+        try
+        {
+            ExecuteBuild(relativeSrcPath, contentInfo, writeToDisk: true, relativeDstPath, parentContext, out producedFileCache);
+            failed = false;
+        }
+        finally
+        {
+            _activeBuildStack.Value = previousBuildStack;
+            var finalResult = new BuildResult(relativeSrcPath, buildHash, producedFileCache, failed);
+            lock (_coordinatorLock)
+            {
+                if (_batchResultsInCurrentRun != null)
+                {
+                    _batchResultsInCurrentRun[relativeDstPath] = finalResult;
+                }
+
+                _inFlightByPath.Remove(relativeDstPath);
+            }
+
+            ownedBuild.Completion.SetResult(finalResult);
+        }
+    }
+
+    private void HandleSharedBuildResult(
+        BuildResult sharedResult,
+        string relativeSrcPath,
+        string relativeDstPath,
+        int buildHash,
+        ContentProcessorContext? parentContext)
+    {
+        // A different source or different build settings targeting the same output would overwrite each other's .xnb.
+        // Checked first so a failed first writer won't hide the conflict.
+        if (!PathComparer.Equals(sharedResult.RelativeSourcePath, relativeSrcPath)
+            || sharedResult.BuildHash != buildHash)
+        {
+            throw new PipelineException($"Content collision: '{relativeSrcPath}' and '{sharedResult.RelativeSourcePath}' both build to '{relativeDstPath}'.");
+        }
+
+        if (sharedResult.Failed)
+        {
+            throw new SkipLogException();
+        }
+
+        if (sharedResult.FileCache != null)
+        {
+            ContentCache.MarkUsed(sharedResult.FileCache);
+            (parentContext as ContentBuilderProcessorContext)?.ContentFileCache.AddDependency(this, sharedResult.FileCache);
+        }
+    }
+
+    private bool IsCircularWait(int currentThreadId, int existingOwnerThreadId, ImmutableHashSet<string> activeBuildStack)
+    {
+        if (currentThreadId == existingOwnerThreadId)
+        {
+            return true;
+        }
+
+        // Follow the chain of waiting threads:
+        // Owner thread -> waited path -> in-flight thread -> waited path -> ...
+        var inFlightThreadId = existingOwnerThreadId;
+        while (_threadWaitingOnPath.TryGetValue(inFlightThreadId, out var waitedPath)
+            && _inFlightByPath.TryGetValue(waitedPath, out var inFlightEntry))
+        {
+            // Check if the thread we want to wait on is waiting on us in return.
+            // Cycle found if the chain leads back to currentThreadId
+            if (currentThreadId == inFlightEntry.OwnerThreadId
+                // Or to a dependency on current active build stack.
+                // This is to prevent missing dependencies created by using something like Task.Run(), etc.
+                || activeBuildStack.Contains(waitedPath))
+            {
+                Debug.WriteLine($"Circular dependency detected! Current Thread: {currentThreadId}, In-flight Thread: {inFlightEntry.OwnerThreadId}, Waited Path: {waitedPath}");
+
+                return true;
+            }
+
+            inFlightThreadId = inFlightEntry.OwnerThreadId;
+        }
+
+        return false;
     }
 
     /// <summary>
@@ -293,6 +588,11 @@ public abstract class ContentBuilder
         if (Parameters.Rebuild)
             ContentCache.CleanCache(this);
 
+        FailedToBuild = 0;
+        SucceededToBuild = 0;
+        _content.Clear();
+        _outputContent.Clear();
+
         var contentCollection = GetContentCollection();
         ScanFiles(contentCollection, Parameters.RootedSourceDirectory);
 
@@ -329,14 +629,34 @@ public abstract class ContentBuilder
             if (Path.GetFileName(filePath).StartsWith('.'))
                 continue;
 
-            var relativePath = Path.GetRelativePath(Parameters.RootedSourceDirectory, filePath);
-            relativePath = relativePath.Sanitize();
-            if (contentCollection.GetContentInfo(relativePath, out List<ContentInfo> contentInfos) && contentInfos.Count > 0)
+            var relativeSrcPath = Path.GetRelativePath(Parameters.RootedSourceDirectory, filePath);
+            relativeSrcPath = relativeSrcPath.Sanitize();
+            if (contentCollection.GetContentInfo(relativeSrcPath, out List<ContentInfo> contentInfos) && contentInfos.Count > 0)
             {
-                _content[relativePath] = contentInfos;
+                List<ContentInfo> validContentInfos = [];
                 foreach (var contentInfo in contentInfos)
                 {
-                    _outputContent[Path.Combine(contentInfo.ContentRoot, relativePath.GetDestinationPath(contentInfo.ShouldBuild, contentInfo.GetOutputPath))] = relativePath;
+                    var outputPath = Path.Combine(contentInfo.ContentRoot,
+                        relativeSrcPath.GetDestinationPath(contentInfo.ShouldBuild, contentInfo.GetOutputPath)).Sanitize();
+
+                    if (_outputContent.TryGetValue(outputPath, out var existingSrcPath))
+                    {
+                        Logger.PushFile(filePath);
+                        Logger.Log(LogLevel.Error, $"Content collision: '{relativeSrcPath}' and '{existingSrcPath}' both build to '{outputPath}'.");
+                        Logger.PopFile();
+
+                        Interlocked.Increment(ref _failedToBuild);
+
+                        continue;
+                    }
+
+                    _outputContent[outputPath] = relativeSrcPath;
+                    validContentInfos.Add(contentInfo);
+                }
+
+                if (validContentInfos.Count > 0)
+                {
+                    _content[relativeSrcPath] = validContentInfos;
                 }
             }
         }
@@ -344,12 +664,31 @@ public abstract class ContentBuilder
 
     private bool RunBuild()
     {
+        _batchResultsInCurrentRun = new Dictionary<string, BuildResult>(PathComparer);
+
+        var contentToBuild = new List<(string RelativeSrcPath, ContentInfo ContentInfo)>();
         foreach (var pair in _content)
         {
-            foreach(var contentInfo in pair.Value)
+            foreach (var contentInfo in pair.Value)
             {
-                BuildAndWriteContent(pair.Key, contentInfo);
+                contentToBuild.Add((pair.Key, contentInfo));
             }
+        }
+
+        var parallelOptions = new ParallelOptions
+        {
+            MaxDegreeOfParallelism = Parameters.MaxDegreeOfParallelism,
+        };
+        try
+        {
+            Parallel.ForEach(contentToBuild, parallelOptions, item =>
+            {
+                BuildAndWriteContent(item.RelativeSrcPath, item.ContentInfo);
+            });
+        }
+        finally
+        {
+            _batchResultsInCurrentRun = null;
         }
 
         if (!Parameters.SkipClean && FailedToBuild == 0)
@@ -428,8 +767,8 @@ public abstract class ContentBuilder
             {
                 foreach (var contentInfo in contentInfos)
                 {
-                    var finalOutputPath = Path.Combine(contentInfo.ContentRoot, inputPath.GetDestinationPath(contentInfo.ShouldBuild, contentInfo.GetOutputPath));
-                    if (finalOutputPath != outputPath)
+                    var finalOutputPath = Path.Combine(contentInfo.ContentRoot, inputPath.GetDestinationPath(contentInfo.ShouldBuild, contentInfo.GetOutputPath)).Sanitize();
+                    if (!PathComparer.Equals(finalOutputPath, outputPath))
                     {
                         continue;
                     }

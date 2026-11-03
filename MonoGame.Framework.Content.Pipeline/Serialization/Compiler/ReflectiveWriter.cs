@@ -9,7 +9,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
 {
     class ReflectiveWriter<T>() : ContentTypeWriter(typeof(T))
     {
-        private static readonly HashSet<MemberInfo> SharedResources = [];
+        private readonly HashSet<MemberInfo> _sharedResources = [];
 
         private PropertyInfo[] _properties = [];
         private FieldInfo[] _fields = [];
@@ -84,7 +84,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
             }
             else if (contentSerializerAttribute.SharedResource)
             {
-                SharedResources.Add(property);
+                _sharedResources.Add(property);
             }
 
             return true;
@@ -109,13 +109,13 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
             }
             else if (contentSerializerAttribute.SharedResource)
             {
-                SharedResources.Add(field);
+                _sharedResources.Add(field);
             }
 
             return true;
         }
 
-        private static void Write(object parent, ContentWriter output, MemberInfo member)
+        private void Write(object parent, ContentWriter output, MemberInfo member)
         {
             var property = member as PropertyInfo;
             var field = member as FieldInfo;
@@ -135,7 +135,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
                 memberObject = field!.GetValue(parent);
             }
 
-            if (SharedResources.Contains(member))
+            if (_sharedResources.Contains(member))
                 output.WriteSharedResource(memberObject);
             else
             {
