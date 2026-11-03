@@ -12,6 +12,7 @@
     <IsAotCompatible>false</IsAotCompatible>
 	  <IsTrimmable>false</IsTrimmable>
     <PackageReadmeFile>README-packages.md</PackageReadmeFile>
+    <Nullable>enable</Nullable>
   </PropertyGroup>
 
   <ItemGroup>
