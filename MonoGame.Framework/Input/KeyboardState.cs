@@ -12,17 +12,25 @@ namespace Microsoft.Xna.Framework.Input
     /// </summary>
 	public struct KeyboardState
     {
-        private const byte CapsLockModifier = 1;
-        private const byte NumLockModifier = 2;
+        private const byte CapsLockToggle = 1;
+        private const byte NumLockToggle = 2;
+
+        /// <summary>
+        /// Returns a <see cref="KeyboardState"/> with no keys or modifiers set.
+        /// </summary>
+        public static KeyboardState Empty = default;
 
         // Used for the common situation where GetPressedKeys will return an empty array
         private static Keys[] empty = new Keys[0];
+
+        // Used to mask out modifier keys when checking for any key presses
+        private static KeyboardState modifiers = new KeyboardState(Keys.LeftShift, Keys.RightShift, Keys.LeftControl, Keys.RightControl, Keys.LeftAlt, Keys.RightAlt);
 
         #region Key Data
 
         // Array of 256 bits:
         private uint _keys0, _keys1, _keys2, _keys3, _keys4, _keys5, _keys6, _keys7;
-        private byte _modifiers;
+        private byte _toggles;
 
         bool InternalGetKey(Keys key)
         {
@@ -94,13 +102,26 @@ namespace Microsoft.Xna.Framework.Input
 
         #region XNA Interface
 
+        internal KeyboardState(uint keys0, uint keys1, uint keys2, uint keys3, uint keys4, uint keys5, uint keys6, uint keys7, byte toggles) : this()
+        {
+            _keys0 = keys0;
+            _keys1 = keys1;
+            _keys2 = keys2;
+            _keys3 = keys3;
+            _keys4 = keys4;
+            _keys5 = keys5;
+            _keys6 = keys6;
+            _keys7 = keys7;
+            _toggles = toggles;
+        }
+
         internal KeyboardState(List<Keys> keys, bool capsLock = false, bool numLock = false) : this()
         {
-            _modifiers = (byte)(0 | (capsLock ? CapsLockModifier : 0) | (numLock ? NumLockModifier : 0));
+            _toggles = (byte)(0 | (capsLock ? CapsLockToggle : 0) | (numLock ? NumLockToggle : 0));
 
             if (keys != null)
-                foreach (Keys k in keys)
-                    InternalSetKey(k);
+                for (var i = 0; i < keys.Count; i++)
+                    InternalSetKey(keys[i]);
         }
 
         /// <summary>
@@ -111,11 +132,11 @@ namespace Microsoft.Xna.Framework.Input
         /// <param name="numLock">Num Lock state.</param>
         public KeyboardState(Keys[] keys, bool capsLock = false, bool numLock = false) : this()
         {
-            _modifiers = (byte)(0 | (capsLock ? CapsLockModifier : 0) | (numLock ? NumLockModifier : 0));
+            _toggles = (byte)(0 | (capsLock ? CapsLockToggle : 0) | (numLock ? NumLockToggle : 0));
 
             if (keys != null)
-                foreach (Keys k in keys)
-                    InternalSetKey(k);
+                for (var i = 0; i < keys.Length; i++)
+                    InternalSetKey(keys[i]);
         }
 
         /// <summary>
@@ -125,8 +146,8 @@ namespace Microsoft.Xna.Framework.Input
         public KeyboardState(params Keys[] keys) : this()
         {
             if (keys != null)
-                foreach (Keys k in keys)
-                    InternalSetKey(k);
+                for (var i = 0; i < keys.Length; i++)
+                    InternalSetKey(keys[i]);
         }
 
         /// <summary>
@@ -136,7 +157,7 @@ namespace Microsoft.Xna.Framework.Input
         {
             get
             {
-                return (_modifiers & CapsLockModifier) > 0;
+                return (_toggles & CapsLockToggle) > 0;
             }
         }
 
@@ -147,7 +168,7 @@ namespace Microsoft.Xna.Framework.Input
         {
             get
             {
-                return (_modifiers & NumLockModifier) > 0;
+                return (_toggles & NumLockToggle) > 0;
             }
         }
 
@@ -159,6 +180,48 @@ namespace Microsoft.Xna.Framework.Input
         public KeyState this[Keys key]
         {
             get { return InternalGetKey(key) ? KeyState.Down : KeyState.Up; }
+        }
+
+        /// <summary>
+        /// Gets whether any key is currently pressed.
+        /// </summary>
+        /// <param name="includeModifiers">Whether to include modifier keys in the query.</param>
+        /// <returns>true if any key is pressed; false otherwise.</returns>
+        public bool AnyKeyDown(bool includeModifiers = true)
+        {
+            if(includeModifiers)
+                return (_keys0 | _keys1 | _keys2 | _keys3 | _keys4 | _keys5 | _keys6 | _keys7) != 0;
+            else
+                return (_keys0 & ~modifiers._keys0) != 0
+                    || (_keys1 & ~modifiers._keys1) != 0
+                    || (_keys2 & ~modifiers._keys2) != 0
+                    || (_keys3 & ~modifiers._keys3) != 0
+                    || (_keys4 & ~modifiers._keys4) != 0
+                    || (_keys5 & ~modifiers._keys5) != 0
+                    || (_keys6 & ~modifiers._keys6) != 0
+                    || (_keys7 & ~modifiers._keys7) != 0;
+        }
+
+        /// <summary>
+        /// Gets whether any of the specified keys are currently pressed.
+        /// </summary>
+        /// <param name="keys">The keys to query.</param>
+        /// <param name="includeModifiers">Whether to include modifier keys in the query.</param>
+        /// <returns>true if any of the specified keys are pressed; false otherwise.</returns>
+        public bool AnyKeyDown(KeyboardState keys, bool includeModifiers = true)
+        {
+            return (this & keys).AnyKeyDown(includeModifiers);
+        }
+
+        /// <summary>
+        /// Gets whether any key, excluding the specified keys, is currently pressed.
+        /// </summary>
+        /// <param name="keys">The keys to query.</param>
+        /// <param name="includeModifiers">Whether to include modifier keys in the query.</param>
+        /// <returns>true if any key, excluding the specified keys, is pressed; false otherwise.</returns>
+        public bool AnyKeyDownExcept(KeyboardState keys, bool includeModifiers = true)
+        {
+            return (this & ~keys).AnyKeyDown(includeModifiers);
         }
 
         /// <summary>
@@ -320,6 +383,89 @@ namespace Microsoft.Xna.Framework.Input
         public override bool Equals(object obj)
         {
             return obj is KeyboardState && this == (KeyboardState)obj;
+        }
+
+        /// <summary>
+        /// Performs a bitwise AND operation between two <see cref="KeyboardState"/> instances.
+        /// </summary>
+        /// <param name="a"><see cref="KeyboardState"/> instance to the left of the bitwise AND operator.</param>
+        /// <param name="b"><see cref="KeyboardState"/> instance to the right of the bitwise AND operator.</param>
+        /// <returns>A <see cref="KeyboardState"/> containing only the keys and toggles present in both instances.</returns>
+        public static KeyboardState operator &(KeyboardState a, KeyboardState b)
+        {
+            return new KeyboardState(
+                a._keys0 & b._keys0,
+                a._keys1 & b._keys1,
+                a._keys2 & b._keys2,
+                a._keys3 & b._keys3,
+                a._keys4 & b._keys4,
+                a._keys5 & b._keys5,
+                a._keys6 & b._keys6,
+                a._keys7 & b._keys7,
+                (byte)(a._toggles & b._toggles)
+            );
+        }
+
+        /// <summary>
+        /// Performs a bitwise OR operation between two <see cref="KeyboardState"/> instances.
+        /// </summary>
+        /// <param name="a"><see cref="KeyboardState"/> instance to the left of the bitwise OR operator.</param>
+        /// <param name="b"><see cref="KeyboardState"/> instance to the right of the bitwise OR operator.</param>
+        /// <returns>A <see cref="KeyboardState"/> containing all the keys and toggles present in either instance.</returns>
+        public static KeyboardState operator |(KeyboardState a, KeyboardState b)
+        {
+            return new KeyboardState(
+                a._keys0 | b._keys0,
+                a._keys1 | b._keys1,
+                a._keys2 | b._keys2,
+                a._keys3 | b._keys3,
+                a._keys4 | b._keys4,
+                a._keys5 | b._keys5,
+                a._keys6 | b._keys6,
+                a._keys7 | b._keys7,
+                (byte)(a._toggles | b._toggles)
+            );
+        }
+
+        /// <summary>
+        /// Performs a bitwise XOR operation between two <see cref="KeyboardState"/> instances.
+        /// </summary>
+        /// <param name="a"><see cref="KeyboardState"/> instance to the left of the bitwise XOR operator.</param>
+        /// <param name="b"><see cref="KeyboardState"/> instance to the right of the bitwise XOR operator.</param>
+        /// <returns>A <see cref="KeyboardState"/> containing only the keys and toggles present in one instance but not both.</returns>
+        public static KeyboardState operator ^(KeyboardState a, KeyboardState b)
+        {
+            return new KeyboardState(
+                a._keys0 ^ b._keys0,
+                a._keys1 ^ b._keys1,
+                a._keys2 ^ b._keys2,
+                a._keys3 ^ b._keys3,
+                a._keys4 ^ b._keys4,
+                a._keys5 ^ b._keys5,
+                a._keys6 ^ b._keys6,
+                a._keys7 ^ b._keys7,
+                (byte)(a._toggles ^ b._toggles)
+            );
+        }
+
+        /// <summary>
+        /// Performs a bitwise NOT operation on a <see cref="KeyboardState"/> instance.
+        /// </summary>
+        /// <param name="obj"><see cref="KeyboardState"/> instance to perform the bitwise NOT operation on.</param>
+        /// <returns>A <see cref="KeyboardState"/> with all the keys and toggles inverted.</returns>
+        public static KeyboardState operator ~(KeyboardState obj)
+        {
+            return new KeyboardState(
+                ~obj._keys0,
+                ~obj._keys1,
+                ~obj._keys2,
+                ~obj._keys3,
+                ~obj._keys4,
+                ~obj._keys5,
+                ~obj._keys6,
+                ~obj._keys7,
+                (byte)~obj._toggles
+            );
         }
 
         #endregion
