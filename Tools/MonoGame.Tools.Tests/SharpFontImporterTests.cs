@@ -42,10 +42,15 @@ namespace MonoGame.Tests.ContentPipeline
                 var goldenGlyph = sourceOfTruthGlyphs.First(c => c.Character == impGlyph.Character);
                 Assert.NotNull(goldenGlyph, "Source of truth did not contain glyph to test against");
 
+                // Metric-only glyphs use a one-pixel placeholder while retaining their total advance.
+                ABCGlyphData expectedGlyph = impGlyph.Data.IsMetricOnly && impGlyph.Data.XAdvance > 0
+                    ? new ABCGlyphData(goldenGlyph.Character, goldenGlyph.SpacingA, 1, goldenGlyph.SpacingB + goldenGlyph.SpacingC - 1)
+                    : goldenGlyph;
+
                 //Check your ABC's!
-                Assert.That(impGlyph.Data.CharacterWidths.A, Is.EqualTo(goldenGlyph.SpacingA), $"A mismatch for '{goldenGlyph.Character}'");
-                Assert.That(impGlyph.Data.CharacterWidths.B, Is.EqualTo(goldenGlyph.SpacingB), $"B mismatch for '{goldenGlyph.Character}'");
-                Assert.That(impGlyph.Data.CharacterWidths.C, Is.EqualTo(goldenGlyph.SpacingC), $"C mismatch for '{goldenGlyph.Character}'");
+                Assert.That(impGlyph.Data.CharacterWidths.A, Is.EqualTo(expectedGlyph.SpacingA), $"A mismatch for '{expectedGlyph.Character}'");
+                Assert.That(impGlyph.Data.CharacterWidths.B, Is.EqualTo(expectedGlyph.SpacingB), $"B mismatch for '{expectedGlyph.Character}'");
+                Assert.That(impGlyph.Data.CharacterWidths.C, Is.EqualTo(expectedGlyph.SpacingC), $"C mismatch for '{expectedGlyph.Character}'");
             }
         }
 
