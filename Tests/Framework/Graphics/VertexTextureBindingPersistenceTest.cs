@@ -5,6 +5,7 @@
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using NUnit.Framework;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -133,6 +134,8 @@ namespace MonoGame.Tests.Graphics
 #endif
         public void VertexTextureSurvivesFrameBoundaries_BackBuffer()
         {
+            if (OperatingSystem.IsMacOS()) Assert.Ignore("Skipping test due to x64 Rosetta issue for now on MacOS");
+
             SetUpVertexTextureFetch();
 
             var counts = new List<int>();
@@ -169,6 +172,8 @@ namespace MonoGame.Tests.Graphics
 #endif
         public void VertexTextureSurvivesRenderTargetAndSpriteBatchHistory()
         {
+            if (OperatingSystem.IsMacOS()) Assert.Ignore("Skipping test due to x64 Rosetta issue for now on MacOS");
+
             SetUpVertexTextureFetch();
 
             // Back buffer, then render-target frames composited with SpriteBatch, then
@@ -185,13 +190,15 @@ namespace MonoGame.Tests.Graphics
 
             AssertEveryFrameDrew(counts);
         }
-        
+
         [Test]
 #if DESKTOPGL
         [Ignore("Vertex Textures are not implemented for OpenGL")]
 #endif
         public void VertexTextureWorksWhenRebindingEveryFrame()
         {
+            if (OperatingSystem.IsMacOS()) Assert.Ignore("Skipping test due to x64 Rosetta issue for now on MacOS");
+
             SetUpVertexTextureFetch();
 
             var counts = new List<int>();
