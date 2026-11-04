@@ -68,7 +68,8 @@ namespace Microsoft.Xna.Framework.Audio
                 {
                     case ALSourceState.Playing:
                     case ALSourceState.Paused:
-                        return;
+                        if (Ready) return;
+                        break;
 
                     case ALSourceState.Stopped:
                         lock (prepareMutex)
@@ -139,11 +140,11 @@ namespace Microsoft.Xna.Framework.Audio
 
         public void Stop()
         {
-            var state = AL.GetSourceState(alSourceId);
-            ALHelper.CheckError("Failed to get source state.");
-
             lock (stopMutex)
             {
+                var state = AL.GetSourceState(alSourceId);
+                ALHelper.CheckError("Failed to get source state.");
+
                 lock (prepareMutex)
                 {
                     // Remove the stream first, so the streamer does not report a stopped stream as finished
@@ -157,6 +158,7 @@ namespace Microsoft.Xna.Framework.Audio
                     ReachedEnd = false;
                 }
             }
+
             AL.Source(alSourceId, ALSourcei.Buffer, 0);
             ALHelper.CheckError("Failed to free source from buffers.");
         }
@@ -165,6 +167,9 @@ namespace Microsoft.Xna.Framework.Audio
         {
             lock (prepareMutex)
             {
+                if (Reader == null)
+                    return;
+
                 Reader.TimePosition = pos;
                 ReachedEnd = false;
                 AL.SourceStop(alSourceId);
@@ -189,7 +194,15 @@ namespace Microsoft.Xna.Framework.Audio
 
         public TimeSpan GetLength()
         {
-            return Reader.TotalTime;
+            // Close() and Open() replace the Reader under this lock, on the streamer thread for looped or repeating
+            // streams, so it can become null between the check and the read
+            lock (prepareMutex)
+            {
+                if (Reader == null)
+                    return TimeSpan.Zero;
+
+                return Reader.TotalTime;
+            }
         }
 
         float volume;
@@ -207,19 +220,22 @@ namespace Microsoft.Xna.Framework.Audio
 
         public void Dispose()
         {
-            var state = AL.GetSourceState(alSourceId);
-            ALHelper.CheckError("Failed to get the source state.");
-            if (state == ALSourceState.Playing || state == ALSourceState.Paused)
-                StopPlayback();
-
-            lock (prepareMutex)
+            lock (stopMutex)
             {
+                var state = AL.GetSourceState(alSourceId);
+                ALHelper.CheckError("Failed to get the source state.");
+                if (state == ALSourceState.Playing || state == ALSourceState.Paused)
+                    StopPlayback();
+
                 OggStreamer.Instance.RemoveStream(this);
 
-                if (state != ALSourceState.Initial)
-                    Empty();
+                lock (prepareMutex)
+                {
+                    if (state != ALSourceState.Initial)
+                        Empty();
 
-                Close();
+                    Close();
+                }
             }
 
             OpenALSoundController.Instance.RecycleSource(alSourceId);
