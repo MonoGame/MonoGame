@@ -180,7 +180,7 @@ namespace Microsoft.Xna.Framework
             _graphicsDevice.PresentationParameters.PresentationInterval = _synchronizedWithVerticalRetrace ? PresentInterval.Default : PresentInterval.Immediate;
             _graphicsDevice.PresentationParameters.IsFullScreen = _wantFullScreen;
 
-            // TODO: We probably should be resetting the whole 
+            // TODO: We probably should be resetting the whole
             // device if this changes as we are targeting a different
             // hardware feature level.
             _graphicsDevice.GraphicsProfile = GraphicsProfile;
@@ -246,8 +246,8 @@ namespace Microsoft.Xna.Framework
 
             // Set the new display size on the touch panel.
             //
-            // TODO: In XNA this seems to be done as part of the 
-            // GraphicsDevice.DeviceReset event... we need to get 
+            // TODO: In XNA this seems to be done as part of the
+            // GraphicsDevice.DeviceReset event... we need to get
             // those working.
             //
             TouchPanel.DisplayWidth = _graphicsDevice.PresentationParameters.BackBufferWidth;
@@ -289,8 +289,6 @@ namespace Microsoft.Xna.Framework
 
 #if MONOMAC || DESKTOPGL
             presentationParameters.IsFullScreen = _wantFullScreen;
-#elif WEB
-            presentationParameters.IsFullScreen = false;
 #else
             // Set "full screen"  as default
             presentationParameters.IsFullScreen = true;
@@ -322,8 +320,8 @@ namespace Microsoft.Xna.Framework
 
             // Set the new display size on the touch panel.
             //
-            // TODO: In XNA this seems to be done as part of the 
-            // GraphicsDevice.DeviceReset event... we need to get 
+            // TODO: In XNA this seems to be done as part of the
+            // GraphicsDevice.DeviceReset event... we need to get
             // those working.
             //
             TouchPanel.DisplayWidth = _graphicsDevice.PresentationParameters.BackBufferWidth;
@@ -387,7 +385,7 @@ namespace Microsoft.Xna.Framework
                 Game.Activity.Window.SetFlags(WindowManagerFlags.ForceNotFullscreen, WindowManagerFlags.ForceNotFullscreen);
         }
 #endif
-        
+
         /// <summary>
         /// Indicates if DX9 style pixel addressing or current standard
         /// pixel addressing should be used. This flag is set to
@@ -531,7 +529,7 @@ namespace Microsoft.Xna.Framework
 #if ANDROID
             float preferredAspectRatio = (float)PreferredBackBufferWidth /
                                          (float)PreferredBackBufferHeight;
-            float displayAspectRatio = (float)GraphicsDevice.DisplayMode.Width / 
+            float displayAspectRatio = (float)GraphicsDevice.DisplayMode.Width /
                                        (float)GraphicsDevice.DisplayMode.Height;
 
             float adjustedAspectRatio = preferredAspectRatio;

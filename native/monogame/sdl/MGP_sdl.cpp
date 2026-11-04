@@ -7,6 +7,13 @@
 #include "mg_common.h"
 
 #include <SDL.h>
+#include <string>
+
+#if defined(__EMSCRIPTEN__)
+#include <emscripten/html5.h>
+#include "MGP_sdl_browser.h"
+#include "../web/MGP_web.h"
+#endif
 
 #if _WIN32
 #include <combaseapi.h>
@@ -17,8 +24,42 @@ struct MGP_Platform
 {
     std::vector<MGP_Window*> windows;
     std::queue<MGP_Event> queued_events;
+    std::string currentDropFilePath;
     std::map<mgint, SDL_GameController*> controllers;
 };
+
+// TODO: Implementation is for web only, other platforms this is stub
+//       Implement android/ios if/when those platforms are moved to native.
+MG_EXPORT mgbyte MGP_KeyboardInput_Show(const char* title, const char* description, const char* defaultText, mgbyte password)
+{
+#if defined(__EMSCRIPTEN__)
+    return MGP_Web_KeyboardInput_Show(title, description, defaultText, password);
+#else
+    return 0;
+#endif
+}
+
+// TODO: Implementation is for web only, other platforms this is stub
+//       Implement android/ios if/when those platforms are moved to native.
+MG_EXPORT mgbyte MGP_KeyboardInput_GetResult(void*& result, mgbyte& cancelled)
+{
+#if defined(__EMSCRIPTEN__)
+    return MGP_Web_KeyboardInput_GetResult(result, cancelled);
+#else
+    result = nullptr;
+    cancelled = 1;
+    return 0;
+#endif
+}
+
+// TODO: Implementation is for web only, other platforms this is stub
+//       Implement android/ios if/when those platforms are moved to native.
+MG_EXPORT void MGP_KeyboardInput_Cancel()
+{
+#if defined(__EMSCRIPTEN__)
+    MGP_Web_KeyboardInput_Cancel();
+#endif
+}
 
 static std::map<int, MGKeys> s_keymap
 {
@@ -181,6 +222,10 @@ struct MGP_Window
 
     SDL_Window* window = nullptr;
     SDL_Window* retiredWindow = nullptr;
+
+#if defined(__EMSCRIPTEN__)
+    mgbyte allowUserResizing = false;
+#endif
 #if defined(MG_OPENGL)
     mgint contextMajorVersion = 4;
     mgint contextMinorVersion = 1;
@@ -207,14 +252,23 @@ MGP_Platform* MGP_Platform_Create(MGGameRunBehavior& behavior)
     // to have the debugger stop on that allocation so you can
     // identify the source of the memory leak.
     //
-    //_CrtSetBreakAlloc(327);
+	//_CrtSetBreakAlloc(327);
+
+#if defined(__EMSCRIPTEN__)
+    SDL_SetHint(SDL_HINT_TOUCH_MOUSE_EVENTS, "0");
+#endif
 
 	if (SDL_WasInit(0) == 0) {
-		if (SDL_Init(
-			SDL_INIT_VIDEO |
-			SDL_INIT_JOYSTICK |
-			SDL_INIT_GAMECONTROLLER |
-			SDL_INIT_HAPTIC) < 0)
+        Uint32 initFlags =
+            SDL_INIT_VIDEO |
+            SDL_INIT_JOYSTICK |
+            SDL_INIT_GAMECONTROLLER;
+
+#if !defined(__EMSCRIPTEN__)
+        initFlags |= SDL_INIT_HAPTIC;
+#endif
+
+		if (SDL_Init(initFlags) < 0)
 		{
 			printf("SDL_Init failed: %s\n", SDL_GetError());
             fflush(stdout);
@@ -228,7 +282,11 @@ MGP_Platform* MGP_Platform_Create(MGGameRunBehavior& behavior)
 	SDL_SetHint("SDL_VIDEO_MINIMIZE_ON_FOCUS_LOSS", "0");
 	SDL_SetHint("SDL_JOYSTICK_ALLOW_BACKGROUND_EVENTS", "1");
 
+#if defined(__EMSCRIPTEN__)
+    behavior = MGGameRunBehavior::Asynchronous;
+#else
 	behavior = MGGameRunBehavior::Synchronous;
+#endif
 
 	auto platform = new MGP_Platform();
 	return platform;
@@ -237,6 +295,10 @@ MGP_Platform* MGP_Platform_Create(MGGameRunBehavior& behavior)
 void MGP_Platform_Destroy(MGP_Platform* platform)
 {
 	assert(platform != nullptr);
+
+#if defined(__EMSCRIPTEN__)
+    MGP_Web_OnPlatformDestroyed(platform);
+#endif
 
 	// Destroy any active windows that may have been leaked.
 	for (auto window : platform->windows)
@@ -286,7 +348,11 @@ MGMonoGamePlatform MGP_Platform_GetPlatform()
 #elif MG_DIRECTX12
     return MGMonoGamePlatform::WindowsDX12;
 #elif MG_OPENGL
+#if defined(__EMSCRIPTEN__)
+    return MGMonoGamePlatform::WebGL;
+#else
     return MGMonoGamePlatform::DesktopGL;
+#endif
 #else
     assert(false);
     return (MGMonoGamePlatform)-1;
@@ -308,6 +374,56 @@ MGGraphicsBackend MGP_Platform_GetGraphicsBackend()
 
 }
 
+mgint MGP_Touch_GetMaximumTouchCount()
+{
+#if defined(__EMSCRIPTEN__)
+    return MGP_Web_GetMaximumTouchCount();
+#else
+    return 0;
+#endif
+}
+
+MG_EXPORT mgbyte MGP_Accelerometer_IsSupported()
+{
+#if defined(__EMSCRIPTEN__)
+    return MGP_Web_Accelerometer_IsSupported();
+#else
+    return 0;
+#endif
+}
+
+MG_EXPORT MGSensorState MGP_Accelerometer_GetState()
+{
+#if defined(__EMSCRIPTEN__)
+    return MGP_Web_Accelerometer_GetState();
+#else
+    return MGSensorState::NotSupported;
+#endif
+}
+
+MG_EXPORT void MGP_Accelerometer_Start()
+{
+#if defined(__EMSCRIPTEN__)
+    MGP_Web_Accelerometer_Start();
+#endif
+}
+
+MG_EXPORT void MGP_Accelerometer_Stop()
+{
+#if defined(__EMSCRIPTEN__)
+    MGP_Web_Accelerometer_Stop();
+#endif
+}
+
+MG_EXPORT mgbyte MGP_Accelerometer_GetReading(mgfloat& x, mgfloat& y, mgfloat& z, mgint& sequence)
+{
+#if defined(__EMSCRIPTEN__)
+    return MGP_Web_Accelerometer_GetReading(x, y, z, sequence);
+#else
+    return 0;
+#endif
+}
+
 static MGP_Window* MGP_WindowFromId(MGP_Platform* platform, Uint32 windowId)
 {
     assert(platform != nullptr);
@@ -320,6 +436,31 @@ static MGP_Window* MGP_WindowFromId(MGP_Platform* platform, Uint32 windowId)
 
     return nullptr;
 }
+
+#if defined(__EMSCRIPTEN__)
+static bool MGP_Sdl_HasBrowserPointerLock()
+{
+    EmscriptenPointerlockChangeEvent status = {};
+    return emscripten_get_pointerlock_status(&status) == EMSCRIPTEN_RESULT_SUCCESS
+        && status.isActive != 0;
+}
+
+static bool MGP_Sdl_IsBrowserPointerLockPending()
+{
+    return MGP_Web_IsPointerLockEnabled() != 0
+        && SDL_GetRelativeMouseMode() == SDL_TRUE
+        && !MGP_Sdl_HasBrowserPointerLock();
+}
+
+void MGP_Sdl_PushEvent(MGP_Platform* platform, const MGP_Event& event_)
+{
+    assert(platform != nullptr);
+
+    MGP_Event queuedEvent = event_;
+    queuedEvent.Timestamp = SDL_GetTicks();
+    platform->queued_events.push(queuedEvent);
+}
+#endif
 
 static int UTF8ToUnicode(int utf8)
 {
@@ -428,6 +569,12 @@ mgbyte MGP_Platform_PollEvent(MGP_Platform* platform, MGP_Event& event_)
     {
         event_ = platform->queued_events.front();
         platform->queued_events.pop();
+
+#if defined(__EMSCRIPTEN__)
+        if (event_.Type == MGEventType::DropComplete)
+            MGP_Web_OnDropCompleteDispatched();
+#endif
+
         return true;
     }
 
@@ -512,6 +659,12 @@ mgbyte MGP_Platform_PollEvent(MGP_Platform* platform, MGP_Event& event_)
             break;
 
         case SDL_EventType::SDL_MOUSEMOTION:
+#if defined(__EMSCRIPTEN__)
+            // SDL receives absolute hover coordinates until the browser confirms the
+            // requested lock. Retain the game's logical cursor position during that gap.
+            if (MGP_Sdl_IsBrowserPointerLockPending())
+                break;
+#endif
             event_.Type = MGEventType::MouseMove;
             event_.MouseMove.Window = MGP_WindowFromId(platform, ev.motion.windowID);
             event_.MouseMove.X = ev.motion.x;
@@ -551,6 +704,39 @@ mgbyte MGP_Platform_PollEvent(MGP_Platform* platform, MGP_Event& event_)
                     break;
             }
             return true;
+
+        case SDL_EventType::SDL_FINGERDOWN:
+        case SDL_EventType::SDL_FINGERMOTION:
+        case SDL_EventType::SDL_FINGERUP:
+        {
+            MGP_Window* window = MGP_WindowFromId(platform, ev.tfinger.windowID);
+            if (window == nullptr)
+                break;
+
+            mgint width = 0;
+            mgint height = 0;
+            SDL_GetWindowSize(window->window, &width, &height);
+
+            switch (ev.type)
+            {
+                case SDL_EventType::SDL_FINGERDOWN:
+                    event_.Type = MGEventType::TouchPressed;
+                    break;
+                case SDL_EventType::SDL_FINGERMOTION:
+                    event_.Type = MGEventType::TouchMoved;
+                    break;
+                case SDL_EventType::SDL_FINGERUP:
+                    event_.Type = MGEventType::TouchReleased;
+                    break;
+            }
+
+            event_.Timestamp = ev.tfinger.timestamp;
+            event_.Touch.Window = window;
+            event_.Touch.Id = static_cast<mgint>(ev.tfinger.fingerId);
+            event_.Touch.X = static_cast<mgint>(ev.tfinger.x * width);
+            event_.Touch.Y = static_cast<mgint>(ev.tfinger.y * height);
+            return true;
+        }
 
         case SDL_EventType::SDL_KEYDOWN:
         {
@@ -646,18 +832,55 @@ mgbyte MGP_Platform_PollEvent(MGP_Platform* platform, MGP_Event& event_)
             switch (ev.window.event)
             {
             case SDL_WINDOWEVENT_RESIZED:
+            {
+#if defined(__EMSCRIPTEN__)
+                // The host reports adaptive layout in device pixels. SDL reports
+                // its browser resize callback in CSS pixels, which would otherwise
+                // overwrite the drawing-buffer dimensions after every layout change.
+                if (MGP_Web_IsBrowserCanvasResizeManaged() != 0)
+                    break;
+#endif
+                event_.Type = MGEventType::WindowResized;
+                event_.Window.Data1 = ev.window.data1;
+                event_.Window.Data2 = ev.window.data2;
+                return true;
+            }
+
             case SDL_WINDOWEVENT_SIZE_CHANGED:
+#if defined(__EMSCRIPTEN__)
+                // A programmatic SDL_SetWindowSize uses SIZE_CHANGED. It remains
+                // independent from host-managed browser layout resizing.
+                if (MGP_Web_IsDuplicateBrowserResize(
+                    reinterpret_cast<MGP_Window*>(event_.Window.Window),
+                    ev.window.data1,
+                    ev.window.data2))
+                {
+                    break;
+                }
+#endif
                 event_.Type = MGEventType::WindowResized;
                 event_.Window.Data1 = ev.window.data1;
                 event_.Window.Data2 = ev.window.data2;
                 return true;
                 break;
             case SDL_WINDOWEVENT_FOCUS_GAINED:
+#if defined(__EMSCRIPTEN__)
+                // BrowserWindow owns the browser focus lifecycle. SDL still
+                // receives this callback to maintain its internal input state.
+                break;
+#else
                 event_.Type = MGEventType::WindowGainedFocus;
                 return true;
+#endif
             case SDL_WINDOWEVENT_FOCUS_LOST:
+#if defined(__EMSCRIPTEN__)
+                // BrowserWindow owns the browser focus lifecycle. SDL still
+                // resets pressed keys before this event reaches MonoGame.
+                break;
+#else
                 event_.Type = MGEventType::WindowLostFocus;
                 return true;
+#endif
             case SDL_WINDOWEVENT_MOVED:
                 event_.Type = MGEventType::WindowMoved;
                 event_.Window.Data1 = ev.window.data1;
@@ -676,11 +899,10 @@ mgbyte MGP_Platform_PollEvent(MGP_Platform* platform, MGP_Event& event_)
             event_.Type = MGEventType::DropFile;
             event_.Drop.Window = MGP_WindowFromId(platform, ev.drop.windowID);
 
-            static char TempPath[MAX_PATH_SIZE];
-            snprintf(TempPath, MAX_PATH_SIZE, "%s", ev.drop.file);
+            platform->currentDropFilePath = ev.drop.file;
             SDL_free(ev.drop.file);
 
-            event_.Drop.File = TempPath;
+            event_.Drop.File = const_cast<char*>(platform->currentDropFilePath.c_str());
             return true;
         }
 
@@ -796,7 +1018,11 @@ static mgbyte MGP_Window_CreateNativeWindowInternal(
 #if defined(MG_VULKAN) || defined(MG_DIRECTX12)
 	flags |= SDL_WINDOW_VULKAN;
 #elif defined(MG_OPENGL)
-
+#if defined(__EMSCRIPTEN__)
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_ES);
+#else
     if (!MGP_Window_DetectOpenGLVersion(window->contextMajorVersion, window->contextMinorVersion))
     {
         return false;
@@ -807,18 +1033,19 @@ static mgbyte MGP_Window_CreateNativeWindowInternal(
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, window->contextMajorVersion);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, window->contextMinorVersion);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
+#endif
     SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
-    SDL_GL_SetAttribute(SDL_GL_RED_SIZE, windowCreateInfo != nullptr ? windowCreateInfo->redSize : 8);
-    SDL_GL_SetAttribute(SDL_GL_GREEN_SIZE, windowCreateInfo != nullptr ? windowCreateInfo->greenSize : 8);
-    SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE, windowCreateInfo != nullptr ? windowCreateInfo->blueSize : 8);
-    SDL_GL_SetAttribute(SDL_GL_ALPHA_SIZE, windowCreateInfo != nullptr ? windowCreateInfo->alphaSize : 8);
-    SDL_GL_SetAttribute(SDL_GL_FRAMEBUFFER_SRGB_CAPABLE, windowCreateInfo != nullptr ? windowCreateInfo->framebufferSrgbCapable : 0);
-    SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, windowCreateInfo != nullptr ? windowCreateInfo->depthSize : 24);
-    SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, windowCreateInfo != nullptr ? windowCreateInfo->stencilSize : 8);
-    SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, windowCreateInfo != nullptr ? windowCreateInfo->multiSampleBuffers : 0);
-    SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, windowCreateInfo != nullptr ? windowCreateInfo->multiSampleSamples : 0);
+    SDL_GL_SetAttribute(SDL_GL_RED_SIZE, windowCreateInfo != nullptr ? windowCreateInfo->RedSize : 8);
+    SDL_GL_SetAttribute(SDL_GL_GREEN_SIZE, windowCreateInfo != nullptr ? windowCreateInfo->GreenSize : 8);
+    SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE, windowCreateInfo != nullptr ? windowCreateInfo->BlueSize : 8);
+    SDL_GL_SetAttribute(SDL_GL_ALPHA_SIZE, windowCreateInfo != nullptr ? windowCreateInfo->AlphaSize : 8);
+    SDL_GL_SetAttribute(SDL_GL_FRAMEBUFFER_SRGB_CAPABLE, windowCreateInfo != nullptr ? windowCreateInfo->FramebufferSrgbCapable : 0);
+    SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, windowCreateInfo != nullptr ? windowCreateInfo->DepthSize : 24);
+    SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, windowCreateInfo != nullptr ? windowCreateInfo->StencilSize : 8);
+    SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, windowCreateInfo != nullptr ? windowCreateInfo->MultiSampleBuffers : 0);
+    SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, windowCreateInfo != nullptr ? windowCreateInfo->MultiSampleSamples : 0);
     SDL_GL_SetAttribute(SDL_GL_ACCELERATED_VISUAL, 1);
-#if defined(__APPLE__)
+#if defined(__APPLE__) && !defined(__EMSCRIPTEN__)
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_FLAGS, SDL_GL_CONTEXT_FORWARD_COMPATIBLE_FLAG);
 #else
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_FLAGS, 0);
@@ -841,6 +1068,10 @@ static mgbyte MGP_Window_CreateNativeWindowInternal(
 
     window->windowId = SDL_GetWindowID(window->window);
 
+#if defined(__EMSCRIPTEN__)
+    MGP_Web_OnWindowCreated(window);
+#endif
+
 #if defined(MG_OPENGL)
     if (windowCreateInfo != nullptr)
     {
@@ -857,7 +1088,7 @@ MGP_Window* MGP_Window_Create(
     mgint& width,
     mgint& height,
     const char* title,
-    const MGP_WindowCreateInfo* windowCreateInfo)
+    MGP_WindowCreateInfo* windowCreateInfo)
 {
     assert(platform != nullptr);
     assert(width > 0);
@@ -885,7 +1116,7 @@ mgbyte MGP_Window_CreateNativeWindow(
     mgint& width,
     mgint& height,
     const char* title,
-    const MGP_WindowCreateInfo* windowCreateInfo)
+    MGP_WindowCreateInfo* windowCreateInfo)
 {
     assert(window != nullptr);
     return MGP_Window_CreateNativeWindowInternal(window, width, height, title, windowCreateInfo);
@@ -896,7 +1127,7 @@ mgbyte MGP_Window_BeginRecreateNativeWindow(
     mgint& width,
     mgint& height,
     const char* title,
-    const MGP_WindowCreateInfo* windowCreateInfo)
+    MGP_WindowCreateInfo* windowCreateInfo)
 {
     assert(window != nullptr);
     assert(window->window != nullptr);
@@ -965,7 +1196,7 @@ void MGP_Window_FinalizeRecreateNativeWindow(MGP_Window* window)
     if (window->retiredWindow == nullptr)
         return;
 
-    // The new GL conext is current, so we can get rid of the old SDL window now.
+    // The new GL context is current, so we can get rid of the old SDL window now.
     SDL_DestroyWindow(window->retiredWindow);
     window->retiredWindow = nullptr;
 }
@@ -975,7 +1206,11 @@ void MGP_Window_Destroy(MGP_Window* window)
 	assert(window != nullptr);
 	assert(window->platform != nullptr);
 
-	if(window->window != nullptr);
+#if defined(__EMSCRIPTEN__)
+    MGP_Web_OnWindowDestroyed(window);
+#endif
+
+	if(window->window != nullptr)
 	    SDL_DestroyWindow(window->window);
 
     if (window->retiredWindow != nullptr)
@@ -997,6 +1232,10 @@ void MGP_Window_DestroyNativeWindow(MGP_Window* window)
     // destroying it or WGL could keep a dead window/pixel-format binding alive.
     if (SDL_GL_GetCurrentWindow() == window->window)
         SDL_GL_MakeCurrent(nullptr, nullptr);
+#endif
+
+#if defined(__EMSCRIPTEN__)
+    MGP_Web_OnNativeWindowDestroyed(window);
 #endif
 
     SDL_DestroyWindow(window->window);
@@ -1031,12 +1270,16 @@ mgbyte MGP_Window_GetAllowUserResizing(MGP_Window* window)
 	assert(window != nullptr);
 	assert(window->window != nullptr);
 
+#if defined(__EMSCRIPTEN__)
+    return window->allowUserResizing;
+#else
 	auto flags = SDL_GetWindowFlags(window->window);
 
 	if ((flags & SDL_WINDOW_RESIZABLE) != 0)
 		return true;
 
 	return false;
+#endif
 }
 
 void MGP_Window_SetAllowUserResizing(MGP_Window* window, mgbyte allow)
@@ -1044,7 +1287,11 @@ void MGP_Window_SetAllowUserResizing(MGP_Window* window, mgbyte allow)
 	assert(window != nullptr);
 	assert(window->window != nullptr);
 
+#if defined(__EMSCRIPTEN__)
+    window->allowUserResizing = allow;
+#else
 	SDL_SetWindowResizable(window->window, allow ? SDL_TRUE : SDL_FALSE);
+#endif
 }
 
 mgbyte MGP_Window_GetIsBorderless(MGP_Window* window)
@@ -1064,6 +1311,18 @@ void MGP_Window_SetIsBorderless(MGP_Window* window, mgbyte borderless)
 	assert(window != nullptr);
 
 	SDL_SetWindowBordered(window->window, borderless ? SDL_FALSE : SDL_TRUE);
+}
+
+mgbyte MGP_Window_GetIsFullscreen(MGP_Window* window)
+{
+    assert(window != nullptr);
+
+#if defined(__EMSCRIPTEN__)
+    return MGP_Web_GetBrowserFullscreen(window);
+#else
+    Uint32 flags = SDL_GetWindowFlags(window->window);
+    return (flags & SDL_WINDOW_FULLSCREEN) != 0 ? 1 : 0;
+#endif
 }
 
 void MGP_Window_SetTitle(MGP_Window* window, const char* title)
@@ -1137,6 +1396,10 @@ void MGP_Window_EnterFullScreen(MGP_Window* window, mgbyte useHardwareModeSwitch
 {
     assert(window != nullptr);
 
+#if defined(__EMSCRIPTEN__)
+    (void)useHardwareModeSwitch;
+    MGP_Web_RequestBrowserFullscreen(window, 1);
+#else
     Uint32 flags;
     if (useHardwareModeSwitch)
         flags = SDL_WINDOW_FULLSCREEN;
@@ -1144,12 +1407,18 @@ void MGP_Window_EnterFullScreen(MGP_Window* window, mgbyte useHardwareModeSwitch
         flags = SDL_WINDOW_FULLSCREEN_DESKTOP;
 
     SDL_SetWindowFullscreen(window->window, flags);
+#endif
 }
 
 void MGP_Window_ExitFullScreen(MGP_Window* window)
 {
     assert(window != nullptr);
+
+#if defined(__EMSCRIPTEN__)
+    MGP_Web_RequestBrowserFullscreen(window, 0);
+#else
     SDL_SetWindowFullscreen(window->window, 0);
+#endif
 }
 
 mgint MGP_Window_ShowMessageBox(MGP_Window* window, const char* title, const char* description, const char* buttons, mgint count)
@@ -1195,11 +1464,22 @@ void MGP_Mouse_SetVisible(MGP_Platform* platform, mgbyte visible)
 {
     assert(platform != nullptr);
     SDL_ShowCursor(visible ? SDL_ENABLE : SDL_DISABLE);
+
+#if defined(__EMSCRIPTEN__)
+    if (MGP_Web_IsPointerLockEnabled() != 0)
+    {
+        // Browsers cannot move the physical cursor. Relative mode acquires Pointer Lock
+        // from the next canvas click so hidden-cursor center-warp cameras retain
+        // unbounded movement without making every logical warp a capture request.
+        SDL_SetRelativeMouseMode(visible ? SDL_FALSE : SDL_TRUE);
+    }
+#endif
 }
 
 void MGP_Mouse_WarpPosition(MGP_Window* window, mgint x, mgint y)
 {
     assert(window != nullptr);
+
     SDL_WarpMouseInWindow(window->window, x, y);
 }
 
@@ -1315,4 +1595,3 @@ mgbyte MGP_GamePad_SetVibration(MGP_Platform* platform, mgint identifer, mgfloat
     auto supported = SDL_GameControllerRumble(pair->second, (mgushort)(leftMotor * 0xFFFF), (mgushort)(rightMotor * 0xFFFF), INT_MAX);
     return supported == 0;
 }
-

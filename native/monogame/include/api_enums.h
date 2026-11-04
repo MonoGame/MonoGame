@@ -303,6 +303,10 @@ enum class MGEventType : mguint
     ControllerStateChange = 15,
     DropFile = 16,
     DropComplete = 17,
+    WindowFullscreenChanged = 18,
+    TouchPressed = 19,
+    TouchMoved = 20,
+    TouchReleased = 21,
 };
 
 enum class MGKeys : mgint
@@ -553,6 +557,16 @@ enum class MGSystemCursor : mgint
     SizeAll = 9,
     No = 10,
     Hand = 11,
+};
+
+enum class MGSensorState : mgint
+{
+    NotSupported = 0,
+    Ready = 1,
+    Initializing = 2,
+    NoData = 3,
+    NoPermissions = 4,
+    Disabled = 5,
 };
 
 enum class MGGamePadType : mgint

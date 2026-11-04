@@ -237,6 +237,14 @@ struct MGP_MouseWheelEvent
     mgint ScrollH;
 };
 
+struct MGP_TouchEvent
+{
+    void* Window;
+    mgint Id;
+    mgint X;
+    mgint Y;
+};
+
 struct MGP_DropEvent
 {
     void* Window;
@@ -267,12 +275,26 @@ union {
     MG_FIELD_OFFSET(12, MGP_MouseMoveEvent, MouseMove);
     MG_FIELD_OFFSET(12, MGP_MouseButtonEvent, MouseButton);
     MG_FIELD_OFFSET(12, MGP_MouseWheelEvent, MouseWheel);
+    MG_FIELD_OFFSET(12, MGP_TouchEvent, Touch);
     MG_FIELD_OFFSET(12, MGP_DropEvent, Drop);
     MG_FIELD_OFFSET(12, MGP_WindowEvent, Window);
     MG_FIELD_OFFSET(12, MGP_ControllerEvent, Controller);
 };
 };
 #pragma pack(pop)
+
+struct MGP_WindowCreateInfo
+{
+    mgint RedSize;
+    mgint GreenSize;
+    mgint BlueSize;
+    mgint AlphaSize;
+    mgint FramebufferSrgbCapable;
+    mgint DepthSize;
+    mgint StencilSize;
+    mgint MultiSampleBuffers;
+    mgint MultiSampleSamples;
+};
 
 struct MGP_ControllerCaps
 {
@@ -295,4 +317,3 @@ struct MGP_NativeGraphicsHandles
     mgint QueueFamilyIndex;
     mgint QueueIndex;
 };
-

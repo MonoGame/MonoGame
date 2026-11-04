@@ -49,7 +49,7 @@ namespace Microsoft.Xna.Framework.Media
             get { return disposed; }
         }
 
-#if ANDROID || OPENAL || WEB || IOS || NATIVE || NO_AUDIO
+#if ANDROID || OPENAL || IOS || NATIVE || NO_AUDIO
         internal delegate void FinishedPlayingHandler(object sender, EventArgs args);
 #if !DESKTOPGL
         event FinishedPlayingHandler DonePlaying;
@@ -99,7 +99,7 @@ namespace Microsoft.Xna.Framework.Media
             Dispose(true);
             GC.SuppressFinalize(this);
         }
-        
+
         void Dispose(bool disposing)
         {
             if (!disposed)
@@ -143,8 +143,8 @@ namespace Microsoft.Xna.Framework.Media
 			{
 				return false;
 			}
-			
-			return Equals(obj as Song);  
+
+			return Equals(obj as Song);
 		}
 
         /// <summary>
@@ -171,6 +171,15 @@ namespace Microsoft.Xna.Framework.Media
         /// <summary>
         /// Gets the duration of the <see cref="Song"/>.
         /// </summary>
+        /// <remarks>
+        /// <para>
+        /// On the browser target, a <see cref="Song"/> created through <see cref="FromUri(string, Uri)"/>
+        /// reports <see cref="TimeSpan.Zero"/> because media metadata becomes available asynchronously.
+        /// </para>
+        /// <para>
+        /// Load Songs through the Content Pipeline when the duration must be known before playback.
+        /// </para>
+        /// </remarks>
         public TimeSpan Duration
         {
             get { return _duration; }

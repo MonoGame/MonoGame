@@ -9,6 +9,9 @@ using Android.Content.PM;
 #if IOS
 using UIKit;
 #endif
+#if NATIVE
+using MonoGame.Interop;
+#endif
 
 
 namespace Microsoft.Xna.Framework.Input.Touch
@@ -53,6 +56,9 @@ namespace Microsoft.Xna.Framework.Input.Touch
                     maximumTouchCount = 5;
                 else //Pad
                     maximumTouchCount = 11;
+#elif NATIVE
+                maximumTouchCount = MGP.Touch_GetMaximumTouchCount();
+                isConnected = maximumTouchCount > 0;
 #else
                 //Touch isn't implemented in OpenTK, so no linux or mac https://github.com/opentk/opentk/issues/80
                 isConnected = false;
