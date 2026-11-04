@@ -73,6 +73,7 @@ add_library(mgruntime STATIC
     "${MONOGAME_NATIVE_ROOT}/opengl/MGG_OpenGL.cpp"
     "${MONOGAME_NATIVE_ROOT}/sdl/MGP_sdl.cpp"
     "${MONOGAME_NATIVE_ROOT}/faudio/MGA_faudio.cpp"
+    "${MONOGAME_NATIVE_ROOT}/web/MG_Storage_web.cpp"
     "${MONOGAME_NATIVE_ROOT}/web/MGM_web.cpp"
     "${MONOGAME_NATIVE_ROOT}/web/MGP_web.cpp")
 
