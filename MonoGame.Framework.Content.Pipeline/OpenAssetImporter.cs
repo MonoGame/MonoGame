@@ -263,6 +263,17 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
 
             _context = context;
 
+            if (!AssimpLibrary.Instance.IsLibraryLoaded)
+            {
+                // try loading from the BaseDirectory first for Release apps.
+                var path = Path.Combine(AppContext.BaseDirectory, AssimpLibrary.Instance.DefaultLibraryName);
+                if (File.Exists(path))
+                {
+                    _context.Logger.Log(LogLevel.Info, $"Loading assimp from {path}");
+                    AssimpLibrary.Instance.LoadLibrary(path);
+                }
+            }
+
             if (CurrentPlatform.OS == OS.Linux && !AssimpLibrary.Instance.IsLibraryLoaded)
             {
                 var path = Path.Combine(AppContext.BaseDirectory, "runtimes", CurrentPlatform.Rid, "native", AssimpLibrary.Instance.DefaultLibraryName);

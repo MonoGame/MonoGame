@@ -243,7 +243,10 @@ public partial class GraphicsDevice
             _viewport.MinDepth,
             _viewport.MaxDepth);
 
-        PlatformApplyDefaultRenderTarget();
+        if (_currentRenderTargetCount == 0)
+        {
+            PlatformApplyDefaultRenderTarget();
+        }
     }
 
     private unsafe void PlatformClear(ClearOptions options, Vector4 color, float depth, int stencil)
@@ -308,20 +311,6 @@ public partial class GraphicsDevice
     private unsafe void PlatformApplyDefaultRenderTarget()
     {
         BeginFrame();
-
-        _viewport = new Viewport(
-            0,
-            0,
-            PresentationParameters.BackBufferWidth,
-            PresentationParameters.BackBufferHeight,
-            _viewport.MinDepth,
-            _viewport.MaxDepth);
-
-        _scissorRectangle = new Rectangle(
-            0,
-            0,
-            PresentationParameters.BackBufferWidth,
-            PresentationParameters.BackBufferHeight);
 
         // OpenGL leaves these bindings stale after a render target switch.
         // Need to set this to dirty so the state gets pushed again on the next apply.
@@ -605,7 +594,7 @@ public partial class GraphicsDevice
     {
         ApplyState(true);
 
-        MGG.GraphicsDevice_DrawIndexedInstanced(Handle, primitiveType, primitiveCount, startIndex, baseVertex, instanceCount);
+        MGG.GraphicsDevice_DrawIndexedInstanced(Handle, primitiveType, primitiveCount, startIndex, baseVertex, baseInstance, instanceCount);
     }
 
     private unsafe void PlatformGetBackBufferData<T>(Rectangle? rect, T[] data, int startIndex, int count) where T : struct
@@ -642,5 +631,25 @@ public partial class GraphicsDevice
         MGG.GraphicsDevice_GetTitleSafeArea(ref x, ref y, ref width, ref height);
 
         return new Rectangle(x, y, width, height);
+    }
+
+    /// <summary>
+    /// Retrieves the native graphics API handles for XR or external interop.
+    /// <see cref="NativeGraphicsHandles.LogicalDevice"/> is populated for all native backends.
+    /// <see cref="NativeGraphicsHandles.PhysicalDevice"/> and <see cref="NativeGraphicsHandles.Queue"/> are populated for <see cref="GraphicsBackend.Vulkan"/> and <see cref="GraphicsBackend.DirectX12"/>.
+    /// Check <see cref="NativeGraphicsHandles.Backend"/> for backend-specific field availability.
+    /// </summary>
+    public unsafe NativeGraphicsHandles GetNativeHandles()
+    {
+        MGG.GraphicsDevice_GetNativeHandles(Handle, out var native);
+
+        return new NativeGraphicsHandles(
+            (GraphicsBackend)native.Backend,
+            native.Instance,
+            native.PhysicalDevice,
+            native.LogicalDevice,
+            native.Queue,
+            native.QueueFamilyIndex,
+            native.QueueIndex);
     }
 }

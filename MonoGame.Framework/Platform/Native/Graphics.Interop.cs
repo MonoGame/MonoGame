@@ -317,7 +317,7 @@ internal static unsafe partial class MGG
     public static extern void GraphicsDevice_DrawIndexed(MGG_GraphicsDevice* device, PrimitiveType primitiveType, int primitiveCount, int indexStart, int vertexStart);
 
     [DllImport(MGP.MonoGameNativeDLL, EntryPoint = "MGG_GraphicsDevice_DrawIndexedInstanced", ExactSpelling = true)]
-    public static extern void GraphicsDevice_DrawIndexedInstanced(MGG_GraphicsDevice* device, PrimitiveType primitiveType, int primitiveCount, int indexStart, int vertexStart, int instanceCount);
+    public static extern void GraphicsDevice_DrawIndexedInstanced(MGG_GraphicsDevice* device, PrimitiveType primitiveType, int primitiveCount, int indexStart, int vertexStart, int baseInstance, int instanceCount);
 
     [DllImport(MGP.MonoGameNativeDLL, EntryPoint = "MGG_GraphicsDevice_ResolveRenderTargets", ExactSpelling = true)]
     public static extern void GraphicsDevice_ResolveRenderTargets(MGG_GraphicsDevice* device);
@@ -413,6 +413,17 @@ internal static unsafe partial class MGG
         int multiSampleCount,
         RenderTargetUsage usage);
 
+    [DllImport(MGP.MonoGameNativeDLL, EntryPoint = "MGG_RenderTarget_WrapNativeHandle", ExactSpelling = true)]
+    public static extern MGG_Texture* RenderTarget_WrapNativeHandle(
+        MGG_GraphicsDevice* device,
+        nint nativeHandle,
+        SurfaceFormat format,
+        int width,
+        int height,
+        DepthFormat depthFormat,
+        int multiSampleCount,
+        byte externalPresentation);
+
     [DllImport(MGP.MonoGameNativeDLL, EntryPoint = "MGG_Texture_Destroy", ExactSpelling = true)]
     public static extern void Texture_Destroy(MGG_GraphicsDevice* device, MGG_Texture* texture);
 
@@ -491,6 +502,27 @@ internal static unsafe partial class MGG
 
     [DllImport(MGP.MonoGameNativeDLL, EntryPoint = "MGG_OcclusionQuery_GetResult", ExactSpelling = true)]
     public static extern byte OcclusionQuery_GetResult(MGG_GraphicsDevice* device, MGG_OcclusionQuery* query, out int pixelCount);
+
+    #endregion
+
+    #region Native Interop
+
+    [StructLayout(LayoutKind.Sequential)]
+    internal struct MGP_NativeGraphicsHandles
+    {
+        public int Backend;
+        public nint Instance;
+        public nint PhysicalDevice;
+        public nint LogicalDevice;
+        public nint Queue;
+        public int QueueFamilyIndex;
+        public int QueueIndex;
+    }
+
+    [DllImport(MGP.MonoGameNativeDLL, EntryPoint = "MGG_GraphicsDevice_GetNativeHandles", ExactSpelling = true)]
+    public static extern void GraphicsDevice_GetNativeHandles(
+        MGG_GraphicsDevice* device,
+        out MGP_NativeGraphicsHandles handles);
 
     #endregion
 }

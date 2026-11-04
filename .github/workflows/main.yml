@@ -45,7 +45,7 @@ jobs:
           swap-storage: true
 
       - name: Clone repository
-        uses: actions/checkout@v5
+        uses: actions/checkout@v7
         with:
           submodules: recursive
 
@@ -55,7 +55,7 @@ jobs:
           echo "runner.arch=${{ runner.arch }}"
 
       - name: Setup .NET Core SDK
-        uses: actions/setup-dotnet@v5
+        uses: actions/setup-dotnet@v6
         with:
           dotnet-version: '${{ env.DotnetVersion }}'
           global-json-file: "./global.json"
@@ -108,7 +108,7 @@ jobs:
           echo "${GITHUB_WORKSPACE}/premake-core/bin/release" >> "$GITHUB_PATH"
 
       - name: Setup Java
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v6
         with:
           distribution: 'microsoft'
           java-version: '17'
@@ -190,6 +190,27 @@ jobs:
         run: |
           dotnet workload install macos ios --version ${{ env.DotnetVersion }}
 
+      - name: Run Vulkan Storage Tests
+        if: runner.os != 'Linux' || runner.arch != 'ARM64'
+        run: dotnet MonoGame.Tests.dll --where="Category == Storage" --timeout=300000
+        env:
+          CI: true
+        working-directory: Artifacts/Tests/DesktopVK/Release
+
+      - name: Run DesktopGL4 Storage Tests
+        if: runner.os != 'Linux' || runner.arch != 'ARM64'
+        run: dotnet MonoGame.Tests.dll --where="Category == Storage" --timeout=300000
+        env:
+          CI: true
+        working-directory: Artifacts/Tests/DesktopGL4/Release
+
+      - name: Run DirectX 12 Storage Tests
+        if: runner.os == 'Windows'
+        run: dotnet MonoGame.Tests.dll --where="Category == Storage" --timeout=300000
+        env:
+          CI: true
+        working-directory: Artifacts/Tests/WindowsDX12/Release
+
       - name: Test generated Nuget packages
         if: runner.os != 'Linux'
         run: dotnet run --project build/Build.csproj -- --target=TestNuGet --framework net9.0
@@ -215,7 +236,7 @@ jobs:
         contents: write
     steps:
         - name: Clone Repository
-          uses: actions/checkout@v5
+          uses: actions/checkout@v7
           with:
             submodules: recursive
 
@@ -224,7 +245,7 @@ jobs:
             echo '{ "sdk": { "version": "${{ env.DotnetVersion }}" } }' > global.json
 
         - name: Setup .NET Core SDK
-          uses: actions/setup-dotnet@v5
+          uses: actions/setup-dotnet@v6
           with:
             dotnet-version: '${{ env.DotnetVersion }}'
             global-json-file: "./global.json"
@@ -247,7 +268,7 @@ jobs:
         contents: write
     steps:
         - name: Clone Repository
-          uses: actions/checkout@v5
+          uses: actions/checkout@v7
           with:
             submodules: recursive
 
@@ -256,7 +277,7 @@ jobs:
             echo '{ "sdk": { "version": "${{ env.DotnetVersion }}" } }' > global.json
 
         - name: Setup .NET Core SDK
-          uses: actions/setup-dotnet@v5
+          uses: actions/setup-dotnet@v6
           with:
             dotnet-version: '${{ env.DotnetVersion }}'
 
@@ -279,7 +300,7 @@ jobs:
         contents: write
     steps:
         - name: Clone Repository
-          uses: actions/checkout@v4
+          uses: actions/checkout@v7
           with:
             submodules: recursive
 
@@ -288,7 +309,7 @@ jobs:
             echo '{ "sdk": { "version": "${{ env.DotnetVersion }}" } }' > global.json
 
         - name: Setup .NET Core SDK
-          uses: actions/setup-dotnet@v5
+          uses: actions/setup-dotnet@v6
           with:
             dotnet-version: '${{ env.DotnetVersion }}'
             global-json-file: "./global.json"
@@ -357,7 +378,7 @@ jobs:
         shell: ${{ matrix.shell }}
     steps:
       - name: Clone repository
-        uses: actions/checkout@v5
+        uses: actions/checkout@v7
         with:
           submodules: recursive
 
@@ -376,7 +397,7 @@ jobs:
           echo '{ "sdk": { "version": "${{ env.DotnetVersion }}", "workloadVersion": "${{ env.DotnetVersion }}" } }' > global.json
 
       - name: Setup .NET Core SDK
-        uses: actions/setup-dotnet@v5
+        uses: actions/setup-dotnet@v6
         with:
           dotnet-version: '${{ env.DotnetVersion }}'
           global-json-file: "./global.json"
@@ -390,7 +411,7 @@ jobs:
         if: runner.environment == 'github-hosted' && runner.os == 'Linux'
         run: |
           sudo apt-get update
-          sudo apt-get install -y xvfb
+          sudo apt-get install -y xvfb libgl1
 
       - name: Check Vulkan
         if: runner.environment != 'github-hosted' && runner.os == 'macos'
@@ -421,30 +442,52 @@ jobs:
           xcode-version: '${{ env.XCodeVersion }}'
 
       - name: Download tests-desktopgl-${{ matrix.platform }}
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: tests-desktopgl-${{ matrix.platform }}
           path: tests-desktopgl
           
       - name: Download tests-windowsdx-${{ matrix.platform }}
         if: runner.os == 'Windows' && runner.environment != 'github-hosted'
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: tests-windowsdx-${{ matrix.platform }}
           path: tests-windowsdx
           
       - name: Download tests-windowsdx12-${{ matrix.platform }}
         if: runner.os == 'Windows' && runner.environment != 'github-hosted'
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: tests-windowsdx12-${{ matrix.platform }}
           path: tests-windowsdx12
 
       - name: Download tests-desktopvk-${{ matrix.platform }}
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: tests-desktopvk-${{ matrix.platform }}
           path: tests-desktopvk
+
+      - name: Download tests-desktopgl4-${{ matrix.platform }}
+        if: runner.arch != 'ARM64'
+        uses: actions/download-artifact@v8
+        with:
+          name: tests-desktopgl4-${{ matrix.platform }}
+          path: tests-desktopgl4
+
+      # Run storage tests for Vulkan and GL4
+      - name: Run Vulkan Storage Tests
+        if: runner.arch != 'ARM64'
+        run: dotnet MonoGame.Tests.dll --where="Category == Storage" --timeout=300000
+        env:
+          CI: true
+        working-directory: tests-desktopvk
+
+      - name: Run DesktopGL4 Storage Tests
+        if: runner.arch != 'ARM64'
+        run: dotnet MonoGame.Tests.dll --where="Category == Storage" --timeout=300000
+        env:
+          CI: true
+        working-directory: tests-desktopgl4
 
       # Run the DirectX 11 tests in two steps: first the audio, then the rest.
       # This is because the audio tests has some incompatibilities within the runner with ContentManagerTests.
@@ -463,6 +506,13 @@ jobs:
         working-directory: tests-windowsdx
         
       # Run DirectX 12 tests in separate groups.
+      - name: Run DirectX 12 Storage Tests
+        if: runner.os == 'Windows'
+        run: dotnet MonoGame.Tests.dll --where="Category == Storage" --timeout=300000
+        env:
+          CI: true
+        working-directory: tests-windowsdx12
+
       - name: Run DirectX 12 Audio Tests
         if: runner.os == 'Windows' && runner.environment != 'github-hosted'
         run: dotnet MonoGame.Tests.dll --where="Category == Audio || Category == Song" --timeout=300000

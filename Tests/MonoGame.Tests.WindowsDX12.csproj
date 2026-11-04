@@ -7,7 +7,7 @@
     <IsPackable>false</IsPackable>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <GenerateProgramFile>false</GenerateProgramFile>
-    <DefineConstants>WINDOWS;DIRECTX12</DefineConstants>
+    <DefineConstants>WINDOWS;DIRECTX12;NATIVE</DefineConstants>
     <Platforms>AnyCPU;ARM64;x64</Platforms>
   </PropertyGroup>
 

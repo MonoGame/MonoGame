@@ -27,8 +27,7 @@ namespace Microsoft.Xna.Framework.Media
             SharpDX.MediaFoundation.MediaSource mediaSource;
             {
                 using SourceResolver resolver = new SourceResolver();
-
-                SharpDX.IUnknown source = resolver.CreateObjectFromURL(FilePath,
+                using ComObject source = (ComObject)resolver.CreateObjectFromURL(FilePath,
                     SourceResolverFlags.MediaSource,
                     null,
                     out ObjectType objectType);
@@ -37,17 +36,7 @@ namespace Microsoft.Xna.Framework.Media
                     throw new NotSupportedException($"{FilePath} is not a media source.");
                 }
 
-                try
-                {
-                    mediaSource = SharpDX.ComObject.As<SharpDX.MediaFoundation.MediaSource>(source);
-                }
-                finally
-                {
-                    if (source is IDisposable disposableSource)
-                    {
-                        disposableSource.Dispose();
-                    }
-                }
+                mediaSource = source.QueryInterface<SharpDX.MediaFoundation.MediaSource>();
             }
 
             PresentationDescriptor presDesc;
