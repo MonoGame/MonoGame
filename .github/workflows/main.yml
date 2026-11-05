@@ -109,7 +109,7 @@ jobs:
 
       - name: Install Full Vulkan SDK
         if: runner.os == 'macos'
-        uses: humbletim/install-vulkan-sdk@v1.2.1
+        uses: humbletim/install-vulkan-sdk@main
         with:
           version: 1.4.363.1
           cache: true
