@@ -104,6 +104,15 @@ public partial class SoundEffectInstance : IDisposable
             MGA.Voice_ClearFilterMode(Voice);
     }
 
+    internal unsafe void PlatformClearBuffer()
+    {
+        if (Voice != null)
+        {
+            MGA.Voice_Destroy(Voice);
+            Voice = null;
+        }
+    }
+
     private unsafe void PlatformDispose(bool disposing)
     {
         if (disposing)

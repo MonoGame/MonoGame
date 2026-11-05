@@ -10,23 +10,14 @@ public sealed class BuildNativeTask : FrostingTask<BuildContext>
     {
         var buildPremake = new BuildPremake();
         buildPremake.Run(context, "mgruntime", "native/monogame", "monogame.sln");
+        buildPremake.Run(context, "mgpipeline", "native/pipeline", "pipeline.sln");
 
         context.DotNetPack(context.GetProjectPath(ProjectType.Framework, "Native"), context.DotNetPackSettings);
         context.DotNetPack("src/NuGetPackages/MonoGame.Framework/MonoGame.Framework.csproj", context.DotNetPackSettings);
 
-        if (context.Environment.Platform.Family == PlatformFamily.Windows)
-        {
-            context.DotNetPack("src/NuGetPackages/MonoGame.Runtime.Windows.DX12/MonoGame.Runtime.Windows.DX12.csproj", context.DotNetPackSettings);
-            context.DotNetPack("src/NuGetPackages/MonoGame.Runtime.Windows.Vulkan/MonoGame.Runtime.Windows.Vulkan.csproj", context.DotNetPackSettings);
-        }
-        else if (context.Environment.Platform.Family == PlatformFamily.OSX)
-        {
-            context.DotNetPack("src/NuGetPackages/MonoGame.Runtime.Mac.Vulkan/MonoGame.Runtime.Mac.Vulkan.csproj", context.DotNetPackSettings);
-        }
-        else
-        {
-            context.DotNetPack("src/NuGetPackages/MonoGame.Runtime.Linux.Vulkan/MonoGame.Runtime.Linux.Vulkan.csproj", context.DotNetPackSettings);
-        }
+        // MonoGame.Runtime.* NuGet packages are packed in the "Pack Native Runtime" task,
+        // which downloads native binaries from all platform/arch build agents first.
+        // This is necessary because Linux arm64 and x64 are built on separate runners.
 
         context.PublishBinaries("Native");
     }

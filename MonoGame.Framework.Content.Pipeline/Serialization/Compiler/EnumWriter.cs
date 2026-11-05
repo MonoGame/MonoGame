@@ -2,7 +2,7 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
-using System;
+using System.Globalization;
 
 namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
 {
@@ -13,8 +13,8 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
     [ContentTypeWriter]
     class EnumWriter<T> : BuiltInContentWriter<T>
     {
-        Type _underlyingType;
-        ContentTypeWriter _underlyingTypeWriter;
+        private Type _underlyingType = null!;
+        private ContentTypeWriter _underlyingTypeWriter = null!;
 
         /// <inheritdoc/>
         internal override void OnAddedToContentWriter(ContentWriter output)
@@ -24,14 +24,8 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
             _underlyingTypeWriter = output.GetTypeWriter(_underlyingType);
         }
 
-        public override string GetRuntimeReader(TargetPlatform targetPlatform)
-        {
-            return "Microsoft.Xna.Framework.Content.EnumReader`1[[" + GetRuntimeType(targetPlatform) + "]]";
-        }
+        public override string GetRuntimeReader(TargetPlatform targetPlatform) => $"Microsoft.Xna.Framework.Content.EnumReader`1[[{GetRuntimeType(targetPlatform)}]]";
 
-        protected internal override void Write(ContentWriter output, T value)
-        {
-            output.WriteRawObject(Convert.ChangeType(value, _underlyingType), _underlyingTypeWriter);
-        }
+        protected override void Write(ContentWriter output, T value) => output.WriteRawObject(Convert.ChangeType(value, _underlyingType, CultureInfo.InvariantCulture), _underlyingTypeWriter);
     }
 }

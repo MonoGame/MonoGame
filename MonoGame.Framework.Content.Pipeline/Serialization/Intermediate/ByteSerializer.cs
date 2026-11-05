@@ -2,27 +2,14 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
-using System.Collections.Generic;
 using System.Xml;
 
-namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Intermediate
+namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Intermediate;
+
+[ContentTypeSerializer]
+class ByteSerializer() : ElementSerializer<byte>("byte", 1)
 {
-    [ContentTypeSerializer]
-    class ByteSerializer : ElementSerializer<byte>
-    {
-        public ByteSerializer() :
-            base("byte", 1)
-        {
-        }
+    protected override byte Deserialize(string[] inputs, ref int index) => XmlConvert.ToByte(inputs[index++]);
 
-        protected internal override byte Deserialize(string[] inputs, ref int index)
-        {
-            return XmlConvert.ToByte(inputs[index++]);
-        }
-
-        protected internal override void Serialize(byte value, List<string> results)
-        {
-            results.Add(XmlConvert.ToString(value));
-        }
-    }
+    protected override void Serialize(byte value, List<string> results) => results.Add(XmlConvert.ToString(value));
 }

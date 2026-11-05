@@ -2,10 +2,7 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
-using System;
-using System.IO;
 using Microsoft.Xna.Framework.Graphics;
-using System.Collections.Generic;
 using System.Reflection;
 
 namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
@@ -15,7 +12,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
     /// </summary>
     public sealed class ContentCompiler
     {
-        readonly Dictionary<Type, Type> typeWriterMap = new Dictionary<Type, Type>();
+        private readonly Dictionary<Type, Type> _typeWriterMap = [];
 
         /// <summary>
         /// Initializes a new instance of ContentCompiler.
@@ -28,7 +25,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
         /// <summary>
         /// Iterates through all loaded assemblies and finds the content type writers.
         /// </summary>
-        void GetTypeWriters()
+        private void GetTypeWriters()
         {
             var assemblies = AppDomain.CurrentDomain.GetAssemblies();
             foreach (var assembly in assemblies)
@@ -51,11 +48,11 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
                     if (Attribute.IsDefined(type, typeof(ContentTypeWriterAttribute)))
                     {
                         // Find the content type this writer implements
-                        Type baseType = type.BaseType;
+                        var baseType = type.BaseType;
                         while ((baseType != null) && (baseType.GetGenericTypeDefinition() != contentTypeWriterType))
                             baseType = baseType.BaseType;
                         if (baseType != null)
-                            typeWriterMap.Add(baseType, type);
+                            _typeWriterMap.Add(baseType, type);
                     }
                 }
             }
@@ -69,32 +66,31 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
         /// <remarks>This should be called from the ContentTypeWriter.Initialize method.</remarks>
         public ContentTypeWriter GetTypeWriter(Type type)
         {
-            ContentTypeWriter result = null;
+            ContentTypeWriter? result;
             var contentTypeWriterType = typeof(ContentTypeWriter<>).MakeGenericType(type);
-            Type typeWriterType;
 
             if (type == typeof(Array))
                 result = new ArrayWriter<Array>();
-            else if (typeWriterMap.TryGetValue(contentTypeWriterType, out typeWriterType))
-                result = (ContentTypeWriter)Activator.CreateInstance(typeWriterType);
+            else if (_typeWriterMap.TryGetValue(contentTypeWriterType, out var typeWriterType))
+                result = (ContentTypeWriter)Activator.CreateInstance(typeWriterType)!;
             else if (type.IsArray)
             {
                 var writerType = type.GetArrayRank() == 1 ? typeof(ArrayWriter<>) : typeof(MultiArrayWriter<>);
 
-                result = (ContentTypeWriter)Activator.CreateInstance(writerType.MakeGenericType(type.GetElementType()));
-                typeWriterMap.Add(contentTypeWriterType, result.GetType());
+                result = (ContentTypeWriter)Activator.CreateInstance(writerType.MakeGenericType(type.GetElementType()!))!;
+                _typeWriterMap.Add(contentTypeWriterType, result.GetType());
             }
             else if (type.IsEnum)
             {
-                result = (ContentTypeWriter)Activator.CreateInstance(typeof(EnumWriter<>).MakeGenericType(type));
-                typeWriterMap.Add(contentTypeWriterType, result.GetType());
+                result = (ContentTypeWriter)Activator.CreateInstance(typeof(EnumWriter<>).MakeGenericType(type))!;
+                _typeWriterMap.Add(contentTypeWriterType, result.GetType());
             }
             else if (type.IsGenericType)
             {
                 var inputTypeDef = type.GetGenericTypeDefinition();
 
-                Type chosen = null;
-                foreach (var kvp in typeWriterMap)
+                Type? chosen = null;
+                foreach (var kvp in _typeWriterMap)
                 {
                     var args = kvp.Key.GetGenericArguments();
 
@@ -119,30 +115,30 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
                 try
                 {
                     if (chosen == null)
-                        result = (ContentTypeWriter)Activator.CreateInstance(typeof(ReflectiveWriter<>).MakeGenericType(type));
+                        result = (ContentTypeWriter)Activator.CreateInstance(typeof(ReflectiveWriter<>).MakeGenericType(type))!;
                     else
                     {
                         var concreteType = type.GetGenericArguments();
-                        result = (ContentTypeWriter)Activator.CreateInstance(chosen.MakeGenericType(concreteType));
+                        result = (ContentTypeWriter)Activator.CreateInstance(chosen.MakeGenericType(concreteType))!;
                     }
 
                     // save it for next time.
-                    typeWriterMap.Add(contentTypeWriterType, result.GetType());
+                    _typeWriterMap.Add(contentTypeWriterType, result.GetType());
                 }
                 catch (Exception)
                 {
-                    throw new InvalidContentException(String.Format("Could not find ContentTypeWriter for type '{0}'", type.Name));
+                    throw new InvalidContentException($"Could not find ContentTypeWriter for type '{type.Name}'");
                 }
             }
             else
             {
-                result = (ContentTypeWriter)Activator.CreateInstance(typeof(ReflectiveWriter<>).MakeGenericType(type));
-                typeWriterMap.Add(contentTypeWriterType, result.GetType());
+                result = (ContentTypeWriter)Activator.CreateInstance(typeof(ReflectiveWriter<>).MakeGenericType(type))!;
+                _typeWriterMap.Add(contentTypeWriterType, result.GetType());
             }
 
 
-            var initMethod = result.GetType().GetMethod("Initialize", BindingFlags.NonPublic | BindingFlags.Instance);
-            initMethod.Invoke(result, new object[] { this });
+            var initMethod = result.GetType().GetMethod("Initialize", BindingFlags.NonPublic | BindingFlags.Instance)!;
+            initMethod.Invoke(result, [this]);
 
             return result;
         }
@@ -159,12 +155,10 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
         /// <param name="referenceRelocationPath">The path of the XNB file, used to calculate relative paths for external references.</param>
         public void Compile(Stream stream, object content, TargetPlatform targetPlatform, GraphicsProfile targetProfile, bool compressContent, string rootDirectory, string referenceRelocationPath)
         {
-            using (var writer = new ContentWriter(this, stream, targetPlatform, targetProfile, compressContent, rootDirectory, referenceRelocationPath))
-            {
-                writer.WriteObject(content);
-                writer.FinalizeContent();
-                writer.Flush();
-            }
+            using var writer = new ContentWriter(this, stream, targetPlatform, targetProfile, compressContent, rootDirectory, referenceRelocationPath);
+            writer.WriteObject(content);
+            writer.FinalizeContent();
+            writer.Flush();
         }
     }
 }

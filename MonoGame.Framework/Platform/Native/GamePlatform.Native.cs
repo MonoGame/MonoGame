@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using MonoGame.Interop;
 using System.Threading;
+using Microsoft.Xna.Framework.Input.Touch;
 
 namespace Microsoft.Xna.Framework;
 
@@ -33,6 +34,10 @@ class NativeGamePlatform : GamePlatform
     {
         GameRunBehavior behavior;
         Handle = MGP.Platform_Create(out behavior);
+        if (Handle == null)
+        {
+            throw new NoSuitableGraphicsDeviceException("Failed to initialize SDL platform!");
+        }
 
         DefaultRunBehavior = behavior;
 
@@ -51,7 +56,13 @@ class NativeGamePlatform : GamePlatform
         get
         {
             if (_system == null)
+            {
                 _system = MGG.GraphicsSystem_Create();
+                if (_system == null)
+                {
+                    throw new NoSuitableGraphicsDeviceException("Failed to initialize graphics system!");
+                }
+            }
 
             return _system;
         }
@@ -170,6 +181,15 @@ class NativeGamePlatform : GamePlatform
                     {
                         window.MouseState.X = event_.MouseMove.X;
                         window.MouseState.Y = event_.MouseMove.Y;
+
+                        if (window.MouseState.LeftButton == ButtonState.Pressed)
+                        {
+                            window.TouchPanelState.AddEvent(
+                                0,
+                                TouchLocationState.Moved,
+                                new Vector2(event_.MouseMove.X, event_.MouseMove.Y),
+                                true);
+                        }
                     }
                     break;
                 }
@@ -193,10 +213,21 @@ class NativeGamePlatform : GamePlatform
                     {
                         var state = event_.Type == EventType.MouseButtonDown ? ButtonState.Pressed : ButtonState.Released;
 
+                        window.MouseState.X = event_.MouseButton.X;
+                        window.MouseState.Y = event_.MouseButton.Y;
+
                         switch (event_.MouseButton.Button)
                         {
                             case MouseButton.Left:
                                 window.MouseState.LeftButton = state;
+                                TouchLocationState touchState = state == ButtonState.Pressed
+                                                                ? TouchLocationState.Pressed
+                                                                : TouchLocationState.Released;
+                                window.TouchPanelState.AddEvent(
+                                    0,
+                                    touchState,
+                                    new Vector2(event_.MouseButton.X, event_.MouseButton.Y),
+                                    true);
                                 break;
                             case MouseButton.Right:
                                 window.MouseState.RightButton = state;
@@ -339,6 +370,12 @@ class NativeGamePlatform : GamePlatform
             _window.Destroy();
             _window = null;
             Window = null;
+        }
+        
+        if (_system != null)
+        {
+            MGG.GraphicsSystem_Destroy(_system);
+            _system = null;
         }
 
         if (Handle != null)

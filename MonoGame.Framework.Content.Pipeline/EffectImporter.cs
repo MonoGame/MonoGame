@@ -2,7 +2,6 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
-using System.IO;
 using Microsoft.Xna.Framework.Content.Pipeline.Graphics;
 
 namespace Microsoft.Xna.Framework.Content.Pipeline
@@ -14,13 +13,6 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
     public class EffectImporter : ContentImporter<EffectContent>
     {
         /// <summary>
-        /// Initializes a new instance of EffectImporter.
-        /// </summary>
-        public EffectImporter()
-        {
-        }
-
-        /// <summary>
         /// Called by the XNA Framework when importing an .fx file to be used as a game asset. This is the method called by the XNA Framework when an asset is to be imported into an object that can be recognized by the Content Pipeline.
         /// </summary>
         /// <param name="filename">Name of a game asset file.</param>
@@ -28,11 +20,12 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
         /// <returns>Resulting game asset.</returns>
         public override EffectContent Import(string filename, ContentImporterContext context)
         {
-            var effect = new EffectContent();
-            effect.Identity = new ContentIdentity(filename);
-            using (var reader = new StreamReader(filename))
-                effect.EffectCode = reader.ReadToEnd();
-            return effect;
+            using var reader = new StreamReader(filename);
+            return new EffectContent
+            {
+                Identity = new ContentIdentity(filename),
+                EffectCode = reader.ReadToEnd()
+            };
         }
     }
 }

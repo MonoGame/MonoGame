@@ -4,6 +4,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.Contracts;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
@@ -18,12 +19,13 @@ using NUnit.Framework.Constraints;
 
 namespace MonoGame.Tests 
 {
+	[RunOnUiTestFixture]
 	partial class GameTest 
     {
 		public static class Properties 
         {
-			[TestFixture]
 			[Category("GameTest")]
+			[RunOnUiTestFixture]
 			public class Components : ReadOnlyPropertyFixtureBase<GameComponentCollection> 
             {
 				public Components ()
@@ -39,8 +41,8 @@ namespace MonoGame.Tests
 				}
 			}
 
-			[TestFixture]
 			[Category("GameTest")]
+			[RunOnUiTestFixture]
 			public class Content : ReadWritePropertyFixtureBase<ContentManager> {
 				public Content ()
 					: base (g => g.Content)
@@ -71,8 +73,8 @@ namespace MonoGame.Tests
 				}
 			}
 
-			[TestFixture]
 			[Category("GameTest")]
+			[RunOnUiTestFixture]
 			public class GraphicsDevice_ : ReadOnlyPropertyFixtureBase<GraphicsDevice> {
 				public GraphicsDevice_ ()
 					: base (g => g.GraphicsDevice)
@@ -120,8 +122,8 @@ namespace MonoGame.Tests
 				}
 			}
 
-			[TestFixture]
 			[Category("GameTest")]
+			[RunOnUiTestFixture]
 			public class InactiveSleepTime : ReadWritePropertyFixtureBase<TimeSpan> {
 				public InactiveSleepTime ()
 					: base (g => g.InactiveSleepTime)
@@ -138,8 +140,8 @@ namespace MonoGame.Tests
 				}
 			}
 
-			[TestFixture]
 			[Category("GameTest")]
+			[RunOnUiTestFixture]
 			public class IsActive : ReadOnlyPropertyFixtureBase<bool> {
 				public IsActive ()
 					: base (g => g.IsActive)
@@ -148,8 +150,8 @@ namespace MonoGame.Tests
 				}
 			}
 
-			[TestFixture]
 			[Category("GameTest")]
+			[RunOnUiTestFixture]
 			public class IsFixedTimeStep : ReadWritePropertyFixtureBase<bool> {
 				public IsFixedTimeStep ()
 					: base (g => g.IsFixedTimeStep)
@@ -163,8 +165,8 @@ namespace MonoGame.Tests
 				public override void Cannot_set_illegal_value (Tuple<bool, Type> valueAndException) { }
 			}
 
-			[TestFixture]
 			[Category("GameTest")]
+			[RunOnUiTestFixture]
 			public class IsMouseVisible : ReadWritePropertyFixtureBase<bool> {
 				public IsMouseVisible ()
 					: base (g => g.IsMouseVisible)
@@ -178,8 +180,8 @@ namespace MonoGame.Tests
 				public override void Cannot_set_illegal_value (Tuple<bool, Type> valueAndException) { }
 			}
 
-			[TestFixture]
 			[Category("GameTest")]
+			[RunOnUiTestFixture]
 			public class LaunchParameters_ : ReadOnlyPropertyFixtureBase<LaunchParameters> {
 				public LaunchParameters_ ()
 					: base (g => g.LaunchParameters)
@@ -194,8 +196,8 @@ namespace MonoGame.Tests
 				}
 			}
 
-			[TestFixture]
 			[Category("GameTest")]
+			[RunOnUiTestFixture]
 			public class Services : ReadOnlyPropertyFixtureBase<GameServiceContainer> {
 				public Services ()
 					: base (g => g.Services)
@@ -210,8 +212,8 @@ namespace MonoGame.Tests
 				}
 			}
 
-			[TestFixture]
 			[Category("GameTest")]
+			[RunOnUiTestFixture]
 			public class TargetElapsedTime : ReadWritePropertyFixtureBase<TimeSpan> {
 				public TargetElapsedTime ()
 					: base (g => g.TargetElapsedTime)
@@ -227,8 +229,8 @@ namespace MonoGame.Tests
 				}
 			}
 
-			[TestFixture]
 			[Category("GameTest")]
+			[RunOnUiTestFixture]
 			public class Window : ReadOnlyPropertyFixtureBase<GameWindow> {
 				public Window ()
 					: base (g => g.Window)
@@ -250,6 +252,7 @@ namespace MonoGame.Tests
 				}
 			}
 
+			[RunOnUiTestFixture]
 			public abstract class PropertyFixtureBase<PropertyT> : FixtureBase {
 				private Func<Game, PropertyT> _getter;
 				protected PropertyFixtureBase (Expression<Func<Game, PropertyT> > propertyExpression)
@@ -331,6 +334,7 @@ namespace MonoGame.Tests
 				}
 			}
 
+			[RunOnUiTestFixture]
 			public abstract class ReadOnlyPropertyFixtureBase<PropertyT> : PropertyFixtureBase<PropertyT> {
 				protected ReadOnlyPropertyFixtureBase (
 					Expression<Func<Game, PropertyT> > propertyExpression)
@@ -347,6 +351,7 @@ namespace MonoGame.Tests
 				}
 			}
 
+			[RunOnUiTestFixture]
 			public abstract class ReadWritePropertyFixtureBase<PropertyT> : PropertyFixtureBase<PropertyT> {
 				protected ReadWritePropertyFixtureBase (
 					Expression<Func<Game, PropertyT>> propertyExpression)

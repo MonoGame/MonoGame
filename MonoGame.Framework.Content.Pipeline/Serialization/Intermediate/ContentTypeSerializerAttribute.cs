@@ -2,61 +2,50 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
-using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Reflection;
 
-namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Intermediate
+namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Intermediate;
+
+/// <summary>
+/// Used to identify custom ContentTypeSerializer classes.
+/// </summary>
+[AttributeUsage(AttributeTargets.Class, AllowMultiple = false)]
+public sealed class ContentTypeSerializerAttribute : Attribute
 {
-    /// <summary>
-    /// Used to identify custom ContentTypeSerializer classes. 
-    /// </summary>
-    [AttributeUsage(AttributeTargets.Class, AllowMultiple = false)]
-    public sealed class ContentTypeSerializerAttribute : Attribute
+    private static ReadOnlyCollection<Type>? _types;
+    private static readonly object _lock = new();
+
+    internal static ReadOnlyCollection<Type> GetTypes()
     {
-        /// <summary>
-        /// Initializes an instance of the ContentTypeSerializerAttribute.
-        /// </summary>
-        public ContentTypeSerializerAttribute()
+        lock (_lock)
         {
-        }
-
-
-        private static readonly object _lock = new object();
-
-        private static ReadOnlyCollection<Type> _types;
-
-        static internal ReadOnlyCollection<Type> GetTypes()
-        {
-            lock (_lock)
+            if (_types == null)
             {
-                if (_types == null)
+                var found = new List<Type>();
+                var assemblies = AppDomain.CurrentDomain.GetAssemblies();
+                foreach (var assembly in assemblies)
                 {
-                    var found = new List<Type>();
-                    var assemblies = AppDomain.CurrentDomain.GetAssemblies();
-                    foreach (var assembly in assemblies)
+                    try
                     {
-                        try
+                        var types = assembly.GetTypes();
+                        foreach (var type in types)
                         {
-                            var types = assembly.GetTypes();
-                            foreach (var type in types)
-                            {
-                                var attributes = type.GetCustomAttributes(typeof (ContentTypeSerializerAttribute), false);
-                                if (attributes.Length > 0)
-                                    found.Add(type);
-                            }
-                        }
-                        catch (System.Reflection.ReflectionTypeLoadException ex)
-                        {
-                            Console.WriteLine("Warning: " + ex.Message);
+                            var attributes = type.GetCustomAttributes(typeof(ContentTypeSerializerAttribute), false);
+                            if (attributes.Length > 0)
+                                found.Add(type);
                         }
                     }
-
-                    _types = new ReadOnlyCollection<Type>(found);
+                    catch (ReflectionTypeLoadException ex)
+                    {
+                        Console.WriteLine($"Warning: {ex.Message}");
+                    }
                 }
-            }
 
-            return _types;
+                _types = new ReadOnlyCollection<Type>(found);
+            }
         }
+
+        return _types;
     }
 }

@@ -29,43 +29,43 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
         /// <inheritdoc cref="BasicMaterialContent.Alpha"/>
         public float? Alpha
         {
-            get { return GetValueTypeProperty<float>(AlphaKey); }
-            set { SetProperty(AlphaKey, value); }
+            get => GetValueTypeProperty<float>(AlphaKey);
+            set => SetProperty(AlphaKey, value);
         }
 
         /// <inheritdoc cref="BasicMaterialContent.DiffuseColor"/>
         public Vector3? DiffuseColor
         {
-            get { return GetValueTypeProperty<Vector3>(DiffuseColorKey); }
-            set { SetProperty(DiffuseColorKey, value); }
+            get => GetValueTypeProperty<Vector3>(DiffuseColorKey);
+            set => SetProperty(DiffuseColorKey, value);
         }
 
         /// <inheritdoc cref="BasicMaterialContent.EmissiveColor"/>
         public Vector3? EmissiveColor
         {
-            get { return GetValueTypeProperty<Vector3>(EmissiveColorKey); }
-            set { SetProperty(EmissiveColorKey, value); }
+            get => GetValueTypeProperty<Vector3>(EmissiveColorKey);
+            set => SetProperty(EmissiveColorKey, value);
         }
 
         /// <inheritdoc cref="BasicMaterialContent.SpecularColor"/>
         public Vector3? SpecularColor
         {
-            get { return GetValueTypeProperty<Vector3>(SpecularColorKey); }
-            set { SetProperty(SpecularColorKey, value); }
+            get => GetValueTypeProperty<Vector3>(SpecularColorKey);
+            set => SetProperty(SpecularColorKey, value);
         }
 
         /// <inheritdoc cref="BasicMaterialContent.SpecularPower"/>
         public float? SpecularPower
         {
-            get { return GetValueTypeProperty<float>(SpecularPowerKey); }
-            set { SetProperty(SpecularPowerKey, value); }
+            get => GetValueTypeProperty<float>(SpecularPowerKey);
+            set => SetProperty(SpecularPowerKey, value);
         }
 
         /// <inheritdoc cref="BasicMaterialContent.Texture"/>
-        public ExternalReference<TextureContent> Texture
+        public ExternalReference<TextureContent>? Texture
         {
-            get { return GetTexture(TextureKey); }
-            set { SetTexture(TextureKey, value); }
+            get => GetTexture(TextureKey);
+            set => SetTexture(TextureKey, value);
         }
 
         /// <summary>
@@ -73,8 +73,8 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
         /// </summary>
         public int? WeightsPerVertex
         {
-            get { return GetValueTypeProperty<int>(WeightsPerVertexKey); }
-            set { SetProperty(WeightsPerVertexKey, value); }
+            get => GetValueTypeProperty<int>(WeightsPerVertexKey);
+            set => SetProperty(WeightsPerVertexKey, value);
         }
     }
 }

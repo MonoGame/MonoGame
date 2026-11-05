@@ -2,9 +2,7 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
-using System;
 using Microsoft.Xna.Framework.Content.Pipeline.Audio;
-using System.IO;
 using MonoGame.Framework.Content.Pipeline.Builder;
 
 namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
@@ -15,24 +13,11 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
     [ContentProcessor(DisplayName = "Song - MonoGame")]
     public class SongProcessor : ContentProcessor<AudioContent, SongContent>
     {
-        ConversionQuality _quality = ConversionQuality.Best;
-
         /// <summary>
         /// Gets or sets the target format quality of the audio content.
         /// </summary>
         /// <value>The ConversionQuality of this audio data.</value>
-        public ConversionQuality Quality 
-        { 
-            get { return _quality; } 
-            set { _quality = value; } 
-        }
-
-        /// <summary>
-        /// Initializes a new instance of SongProcessor.
-        /// </summary>
-        public SongProcessor()
-        {
-        }
+        public ConversionQuality Quality { get; set; } = ConversionQuality.Best;
 
         /// <summary>
         /// Builds the content for the source audio.
@@ -47,15 +32,21 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
 
             // Convert and write out the song media file.
             var profile = AudioProfile.ForPlatform(context.TargetPlatform);
-            var finalQuality = profile.ConvertStreamingAudio(context.TargetPlatform, _quality, input, ref songFileName);
+            var finalQuality = profile.ConvertStreamingAudio(context.TargetPlatform, Quality, input, ref songFileName);
 
             // Let the pipeline know about the song file so it can clean things up.
             context.AddOutputFile(songFileName);
-            if (_quality != finalQuality)
-                context.Logger.LogMessage("Failed to convert using \"{0}\" quality, used \"{1}\" quality", _quality, finalQuality);
+            if (Quality != finalQuality)
+            {
+                context.Logger.Log(LogLevel.Info, $"Failed to convert using \"{Quality}\" quality, used \"{finalQuality}\" quality");
+            }
 
             // Return the XNB song content.
-            return new SongContent(PathHelper.GetRelativePath(Path.GetDirectoryName(context.OutputFilename) + Path.DirectorySeparatorChar, songFileName), input.Duration);
+            return new SongContent
+            {
+                FileName = PathHelper.GetRelativePath(Path.GetDirectoryName(context.OutputFilename) + Path.DirectorySeparatorChar, songFileName),
+                Duration = input.Duration
+            };
         }
     }
 }

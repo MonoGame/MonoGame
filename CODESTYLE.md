@@ -265,6 +265,23 @@ namespace MyNamespace
 }
 ```
 
+## Nullable Reference Types
+
+MonoGame may enable nullable reference types over time.  Nullable annotations should be treated as part of the API contract, not as a general code cleanup task.
+
+When working in nullable enabled code, use the following guidelines:
+
+* Do annotate public API according to the intended contract.  If a parameter, return value, property, event, or field can be `null`, mark it nullable.  If it must not be `null`, leave it non nullable and  preserve any required runtime validation.
+* Do not add nullable annotations only to make compiler warnings disappear.  The annotation should describe the behavior MonoGame intends to support.
+* Do keep runtime null checks where they protected behavior or provide useful exceptions.  Nullable annotation help callers at compile time, but consumers may have nullable disabled or may call MonoGame from code the compiler cannot fully analyze.
+* Do prefer small, focused pull requests when adding nullable annotations.  Avoid mixing nullable annotation changes with unrelated refactoring or behavior changes.
+* Do update XML documentation when nullability changes clarify or affect the public contract.
+* Do use nullable flow analysis attributes from `System.Diagnostics.CodeAnalysis` when they describe the contract better than `?` alone.  Common examples include `[NoNulLWhen]`, `[MaybeNullWhen]`, `[NotNullIfNotNull]`, `[MemberNotNull]`, and `[MemberNotNulLWhen]`.
+* Do use the null forgiving operator (`!`) sparingly.  It is acceptable when a value is guaranteed by MonoGame's lifecycle or platform initializations but the compiler cannot prove the assignment.  Prefer this only wen `null` is not a valid runtime state after initialization.
+* Do not replace ordinary calls with null conditional calls only to silence warnings.  For example, avoid changing required object usage from `foo.Bar()` to `foo?.Bar()` unless skipping the call when `foo` is `null` is the intended behavior.
+
+Nullable annotations should improve the experience for consumers who enable nullable reference types in their own projects without creating unnecessary noise for typical MonoGame code.
+
 ## Useful Links
 
 [C# Coding Conventions (MSDN)](http://msdn.microsoft.com/en-us/library/ff926074.aspx)

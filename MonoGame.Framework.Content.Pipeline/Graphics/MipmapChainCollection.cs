@@ -2,7 +2,6 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
-using System;
 using System.Collections.ObjectModel;
 
 namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
@@ -19,7 +18,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
         internal MipmapChainCollection(int count, bool fixedSize)
         {
             for (var i = 0; i < count; i++)
-                Add(new MipmapChain());
+                Add([]);
 
             _fixedSize = fixedSize;
         }

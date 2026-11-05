@@ -1670,7 +1670,42 @@ namespace Microsoft.Xna.Framework
         /// <returns>Hash code of this <see cref="Matrix"/>.</returns>
         public override int GetHashCode()
         {
-            return (((((((((((((((this.M11.GetHashCode() + this.M12.GetHashCode()) + this.M13.GetHashCode()) + this.M14.GetHashCode()) + this.M21.GetHashCode()) + this.M22.GetHashCode()) + this.M23.GetHashCode()) + this.M24.GetHashCode()) + this.M31.GetHashCode()) + this.M32.GetHashCode()) + this.M33.GetHashCode()) + this.M34.GetHashCode()) + this.M41.GetHashCode()) + this.M42.GetHashCode()) + this.M43.GetHashCode()) + this.M44.GetHashCode());
+            unchecked
+            {
+                int hash1 = 17;
+                int hash2 = 17;
+                int hash3 = 17;
+                int hash4 = 17;
+
+                hash1 = hash1 * 31 + M11.GetHashCode();
+                hash2 = hash2 * 31 + M12.GetHashCode();
+                hash3 = hash3 * 31 + M13.GetHashCode();
+                hash4 = hash4 * 31 + M14.GetHashCode();
+
+                hash1 = hash1 * 31 + M21.GetHashCode();
+                hash2 = hash2 * 31 + M22.GetHashCode();
+                hash3 = hash3 * 31 + M23.GetHashCode();
+                hash4 = hash4 * 31 + M24.GetHashCode();
+
+                hash1 = hash1 * 31 + M31.GetHashCode();
+                hash2 = hash2 * 31 + M32.GetHashCode();
+                hash3 = hash3 * 31 + M33.GetHashCode();
+                hash4 = hash4 * 31 + M34.GetHashCode();
+
+                hash1 = hash1 * 31 + M41.GetHashCode();
+                hash2 = hash2 * 31 + M42.GetHashCode();
+                hash3 = hash3 * 31 + M43.GetHashCode();
+                hash4 = hash4 * 31 + M44.GetHashCode();
+
+                int mix = 17;
+
+                mix = mix * 31 + hash1;
+                mix = mix * 31 + hash2;
+                mix = mix * 31 + hash3;
+                mix = mix * 31 + hash4;
+
+                return mix;
+            }
         }
 
         /// <summary>

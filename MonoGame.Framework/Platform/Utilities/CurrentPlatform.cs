@@ -80,16 +80,24 @@ namespace MonoGame.Framework.Utilities
             }
         }
 
+        public static Architecture Architecture
+        {
+            get
+            {
+                return RuntimeInformation.OSArchitecture;
+            }
+        }
+
         public static string Rid
         {
             get
             {
                 if (CurrentPlatform.OS == OS.Windows && Environment.Is64BitProcess)
-                    return "win-x64";
+                    return CurrentPlatform.Architecture == Architecture.Arm64 ? "win-arm64" : "win-x64";
                 else if (CurrentPlatform.OS == OS.Windows && !Environment.Is64BitProcess)
                     return "win-x86";
                 else if (CurrentPlatform.OS == OS.Linux)
-                    return "linux-x64";
+                    return CurrentPlatform.Architecture == Architecture.Arm64 ? "linux-arm64" :"linux-x64";
                 else if (CurrentPlatform.OS == OS.MacOSX)
                     return "osx";
                 else

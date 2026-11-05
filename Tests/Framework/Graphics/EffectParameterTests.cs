@@ -1,4 +1,4 @@
-﻿// MonoGame - Copyright (C) MonoGame Foundation, Inc
+// MonoGame - Copyright (C) MonoGame Foundation, Inc
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
@@ -11,8 +11,8 @@ namespace MonoGame.Tests.Graphics
 {
     // TODO: Bring this suite of tests to the other APIs - it's a good check that they all handle params similarly.
 #if VULKAN
-    [TestFixture]
     [NonParallelizable]
+    [RunOnUiTestFixture]
     class EffectParameterTests : GraphicsDeviceTestFixtureBase
     {
         private Effect _effect;
@@ -93,7 +93,6 @@ namespace MonoGame.Tests.Graphics
         }
 
         [Test]
-        [RunOnUI]
         public void BooleanParameter()
         {
             _effect.CurrentTechnique = _effect.Techniques["TestBoolean"];
@@ -108,7 +107,6 @@ namespace MonoGame.Tests.Graphics
         }
 
         [Test]
-        [RunOnUI]
         public void IntParameter()
         {
             _effect.CurrentTechnique = _effect.Techniques["TestInt"];
@@ -126,7 +124,6 @@ namespace MonoGame.Tests.Graphics
         }
 
         [Test]
-        [RunOnUI]
         public void IntArrayParameter()
         {
             _effect.CurrentTechnique = _effect.Techniques["TestIntArray"];
@@ -143,7 +140,6 @@ namespace MonoGame.Tests.Graphics
         }
 
         [Test]
-        [RunOnUI]
         public void MatrixParameter()
         {
             _effect.CurrentTechnique = _effect.Techniques["TestMat"];
@@ -166,7 +162,6 @@ namespace MonoGame.Tests.Graphics
         }
 
         [Test]
-        [RunOnUI]
         public void MatrixArrayParameter()
         {
             _effect.CurrentTechnique = _effect.Techniques["TestMatArray"];
@@ -213,7 +208,6 @@ namespace MonoGame.Tests.Graphics
         }
 
         [Test]
-        [RunOnUI]
         public void Matrix3x3Parameter()
         {
             _effect.CurrentTechnique = _effect.Techniques["TestMat3x3"];
@@ -235,7 +229,6 @@ namespace MonoGame.Tests.Graphics
         }
 
         [Test]
-        [RunOnUI]
         public void QuaternionParameter()
         {
             _effect.CurrentTechnique = _effect.Techniques["TestQuat"];
@@ -251,7 +244,6 @@ namespace MonoGame.Tests.Graphics
         }
 
         [Test]
-        [RunOnUI]
         public void FloatParameter()
         {
             _effect.CurrentTechnique = _effect.Techniques["TestFloat"];
@@ -266,7 +258,6 @@ namespace MonoGame.Tests.Graphics
         }
 
         [Test]
-        [RunOnUI]
         public void FloatArrayParameter()
         {
             _effect.CurrentTechnique = _effect.Techniques["TestFloatArray"];
@@ -281,7 +272,6 @@ namespace MonoGame.Tests.Graphics
         }
 
         [Test]
-        [RunOnUI]
         public void Texture2DParameter()
         {
             Texture2D tex2d = new Texture2D(gd, 2, 2);
@@ -302,7 +292,6 @@ namespace MonoGame.Tests.Graphics
         }
 
         [Test]
-        [RunOnUI]
         public void Texture3DParameter()
         {
             Texture3D tex3d = new Texture3D(gd, 2, 2, 2, false, SurfaceFormat.Color);
@@ -331,7 +320,6 @@ namespace MonoGame.Tests.Graphics
         }
 
         [Test]
-        [RunOnUI]
         public void TextureCubeParameter()
         {
             TextureCube textureCube = new TextureCube(gd, 2, false, SurfaceFormat.Color);
@@ -362,7 +350,6 @@ namespace MonoGame.Tests.Graphics
         }
 
         [Test]
-        [RunOnUI]
         public void TestVec2()
         {
             _effect.CurrentTechnique = _effect.Techniques["TestVec2"];
@@ -377,7 +364,6 @@ namespace MonoGame.Tests.Graphics
         }
 
         [Test]
-        [RunOnUI]
         public void TestVec2Array()
         {
             _effect.CurrentTechnique = _effect.Techniques["TestVec2Array"];
@@ -398,7 +384,6 @@ namespace MonoGame.Tests.Graphics
         }
 
         [Test]
-        [RunOnUI]
         public void TestVec3()
         {
             _effect.CurrentTechnique = _effect.Techniques["TestVec3"];
@@ -413,7 +398,6 @@ namespace MonoGame.Tests.Graphics
         }
 
         [Test]
-        [RunOnUI]
         public void TestVec3Array()
         {
             _effect.CurrentTechnique = _effect.Techniques["TestVec3Array"];
@@ -434,7 +418,6 @@ namespace MonoGame.Tests.Graphics
         }
 
         [Test]
-        [RunOnUI]
         public void TestVec4()
         {
             _effect.CurrentTechnique = _effect.Techniques["TestVec4"];
@@ -450,7 +433,6 @@ namespace MonoGame.Tests.Graphics
         }
 
         [Test]
-        [RunOnUI]
         public void TestVec4Array()
         {
             _effect.CurrentTechnique = _effect.Techniques["TestVec4Array"];

@@ -8,6 +8,7 @@ using MonoGame.Framework.Content.Pipeline.Builder.Server;
 using MonoGame.Framework.Utilities;
 using System.Collections;
 using System.Diagnostics.Contracts;
+using System.Globalization;
 using System.Reflection;
 using YamlDotNet.Core;
 using YamlDotNet.Core.Events;
@@ -28,10 +29,10 @@ static class ContentBuilderHelper
             var color = new Color();
             var split = scalar.Value.Split(",");
 
-            color.R = byte.Parse(split[0]);
-            color.G = byte.Parse(split[1]);
-            color.B = byte.Parse(split[2]);
-            color.A = byte.Parse(split[3]);
+            color.R = byte.Parse(split[0], CultureInfo.InvariantCulture);
+            color.G = byte.Parse(split[1], CultureInfo.InvariantCulture);
+            color.B = byte.Parse(split[2], CultureInfo.InvariantCulture);
+            color.A = byte.Parse(split[3], CultureInfo.InvariantCulture);
 
             return color;
         }
@@ -226,7 +227,7 @@ static class ContentBuilderHelper
         return true;
     }
 
-    public static void HashTypeAndProperties(object importerOrProcessor, ref Hash hash)
+    public static void HashTypeAndProperties(object? importerOrProcessor, ref Hash hash)
     {
         // Use the YAML serializer to generate a string with the
         // type and properties of this importer/processor.

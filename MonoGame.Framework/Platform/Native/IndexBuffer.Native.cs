@@ -18,7 +18,7 @@ public partial class IndexBuffer
     {
         var indexBytes = indexElementSize == IndexElementSize.SixteenBits ? 2 : 4;
 
-        Handle = MGG.Buffer_Create(GraphicsDevice.Handle, BufferType.Index, indexCount * indexBytes);
+        Handle = MGG.Buffer_Create(GraphicsDevice.Handle, BufferType.Index, _isDynamic, indexCount * indexBytes);
     }
 
     private unsafe void PlatformGraphicsDeviceResetting()

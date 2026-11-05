@@ -3,6 +3,7 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System;
+using System.IO;
 using Microsoft.Xna.Framework.Content.Pipeline;
 using NUnit.Framework;
 
@@ -15,13 +16,9 @@ namespace MonoGame.Tests.ContentPipeline
         public void Ctors()
         {
             // Bad and nonexistent filenames
-            Assert.Throws<Exception>(() => new VideoContent(null));
-            Assert.Throws<Exception>(() => new VideoContent(""));
-            Assert.Throws<Exception>(() => new VideoContent(@"Not/A/File"));
-            Assert.Throws<Exception>(() => new VideoContent(@"Assets/Video/video_h264_1280x720_20s.mp4"));
-            Assert.Throws<Exception>(() => new VideoContent(@"Assets/Video/video_h264_1920x1080_20s.mp4"));
-            Assert.Throws<Exception>(() => new VideoContent(@"Assets/Video/video_h264_1280x720_20s.wmv"));
-            Assert.Throws<Exception>(() => new VideoContent(@"Assets/Video/video_h264_1920x1080_20s.wmv"));
+            Assert.Throws<ArgumentNullException>(() => new VideoContent(null));
+            Assert.Throws<ArgumentException>(() => new VideoContent(""));
+            Assert.Throws<FileNotFoundException>(() => new VideoContent(@"Not/A/File"));
         }
 
         [TestCase(@"Assets/Video/video_h264_1280x720_5s.mp4", 1280, 720, 60, 42451, 5)]

@@ -10,27 +10,20 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Intermediate
     [ContentTypeSerializer]
     class ListSerializer<T> : ContentTypeSerializer<List<T>>
     {
-        private ContentTypeSerializer _itemSerializer;
+        private ContentTypeSerializer _itemSerializer = null!;
 
-        public ListSerializer() :
-            base("list")
+        public ListSerializer() : base("list")
         {
         }
 
-        public override bool CanDeserializeIntoExistingObject
-        {
-            get { return true; }
-        }
+        public override bool CanDeserializeIntoExistingObject => true;
 
         protected internal override void Initialize(IntermediateSerializer serializer)
         {
             _itemSerializer = serializer.GetTypeSerializer(typeof(T));
         }
 
-        public override bool ObjectIsEmpty(List<T> value)
-        {
-            return value.Count == 0;
-        }
+        public override bool ObjectIsEmpty(List<T>? value) => value == null || value.Count == 0;
 
         protected internal override void ScanChildren(IntermediateSerializer serializer, ChildCallback callback, List<T> value)
         {
@@ -38,18 +31,21 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Intermediate
                 callback(_itemSerializer, item);
         }
 
-        protected internal override List<T> Deserialize(IntermediateReader input, ContentSerializerAttribute format, List<T> existingInstance)
+        protected internal override List<T> Deserialize(IntermediateReader input, ContentSerializerAttribute format, List<T>? existingInstance)
         {
-            var result = existingInstance ?? new List<T>();
+            var result = existingInstance ?? [];
 
-            var elementSerializer = _itemSerializer as ElementSerializer<T>;
-            if (elementSerializer != null)
+            if (_itemSerializer is ElementSerializer<T> elementSerializer)
+            {
                 elementSerializer.Deserialize(input, result);
+            }
             else
             {
                 // Create the item serializer attribute.
-                var itemFormat = new ContentSerializerAttribute();
-                itemFormat.ElementName = format.CollectionItemName;
+                var itemFormat = new ContentSerializerAttribute
+                {
+                    ElementName = format.CollectionItemName
+                };
 
                 // Read all the items.
                 while (input.MoveToElement(itemFormat.ElementName))
@@ -64,18 +60,23 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Intermediate
 
         protected internal override void Serialize(IntermediateWriter output, List<T> value, ContentSerializerAttribute format)
         {
-            var elementSerializer = _itemSerializer as ElementSerializer<T>;
-            if (elementSerializer != null)
+            if (_itemSerializer is ElementSerializer<T> elementSerializer)
+            {
                 elementSerializer.Serialize(output, value);
+            }
             else
             {
                 // Create the item serializer attribute.
-                var itemFormat = new ContentSerializerAttribute();
-                itemFormat.ElementName = format.CollectionItemName;
+                var itemFormat = new ContentSerializerAttribute
+                {
+                    ElementName = format.CollectionItemName
+                };
 
                 // Read all the items.
                 foreach (var item in value)
+                {
                     output.WriteObject(item, itemFormat, _itemSerializer);
+                }
             }
         }
     }

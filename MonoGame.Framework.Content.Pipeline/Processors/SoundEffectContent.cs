@@ -2,39 +2,35 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
-using System;
-using System.Collections.ObjectModel;
-using System.Collections.Generic;
-using System.Linq;
+namespace Microsoft.Xna.Framework.Content.Pipeline.Processors;
 
-namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
+/// <summary>
+/// Represents a processed sound effect.
+/// </summary>
+public sealed class SoundEffectContent
 {
     /// <summary>
-    /// Represents a processed sound effect.
+    /// Gets the byte metadata that describes the <see cref="Data"/> byte array.
     /// </summary>
-    public sealed class SoundEffectContent
-    {
-        internal byte[] format;
-        internal byte[] data;
-        internal int loopStart;
-        internal int loopLength;
-        internal int duration;
+    public required byte[] Format { get; init; }
 
-        /// <summary>
-        /// Initializes a new instance of the SoundEffectContent class.
-        /// </summary>
-        /// <param name="format">The WAV header.</param>
-        /// <param name="data">The audio waveform data.</param>
-        /// <param name="loopStart">The start of the loop segment (must be block aligned).</param>
-        /// <param name="loopLength">The length of the loop segment (must be block aligned).</param>
-        /// <param name="duration">The duration of the wave file in milliseconds.</param>
-        internal SoundEffectContent(IEnumerable<byte> format, IEnumerable<byte> data, int loopStart, int loopLength, int duration)
-        {
-            this.format = format.ToArray();
-            this.data = data.ToArray();
-            this.loopStart = loopStart;
-            this.loopLength = loopLength;
-            this.duration = duration;
-        }
-    }
+    /// <summary>
+    /// Gets the byte data of the sound effect.
+    /// </summary>
+    public required byte[] Data { get; init; }
+
+    /// <summary>
+    /// Get the start point at which the sound effect should loop.
+    /// </summary>
+    public required int LoopStart { get; init; }
+
+    /// <summary>
+    /// Gets the end point at which sound effect loops.
+    /// </summary>
+    public required int LoopLength { get; init; }
+
+    /// <summary>
+    /// Gets the duration of the sound effect.
+    /// </summary>
+    public required int Duration { get; init; }
 }

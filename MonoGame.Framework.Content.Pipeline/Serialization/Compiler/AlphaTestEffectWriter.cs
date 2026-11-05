@@ -5,19 +5,18 @@
 using Microsoft.Xna.Framework.Content.Pipeline.Graphics;
 using Microsoft.Xna.Framework.Graphics;
 
-namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler
+namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler;
+
+[ContentTypeWriter]
+class AlphaTestEffectWriter : BuiltInContentWriter<AlphaTestMaterialContent>
 {
-    [ContentTypeWriter]
-    class AlphaTestEffectWriter : BuiltInContentWriter<AlphaTestMaterialContent>
+    protected override void Write(ContentWriter output, AlphaTestMaterialContent value)
     {
-        protected internal override void Write(ContentWriter output, AlphaTestMaterialContent value)
-        {
-            output.WriteExternalReference(value.Textures.ContainsKey(AlphaTestMaterialContent.TextureKey) ? value.Texture : null);
-            output.Write((int)(value.AlphaFunction.HasValue ? value.AlphaFunction.Value : CompareFunction.Greater));
-            output.Write((int)(value.ReferenceAlpha.HasValue ? value.ReferenceAlpha.Value : 0));
-            output.Write(value.DiffuseColor.GetValueOrDefault());
-            output.Write(value.Alpha.GetValueOrDefault());
-            output.Write(value.VertexColorEnabled.GetValueOrDefault());
-        }
+        output.WriteExternalReference(value.Textures.ContainsKey(AlphaTestMaterialContent.TextureKey) ? value.Texture : null);
+        output.Write((int)(value.AlphaFunction ?? CompareFunction.Greater));
+        output.Write(value.ReferenceAlpha ?? 0);
+        output.Write(value.DiffuseColor.GetValueOrDefault());
+        output.Write(value.Alpha.GetValueOrDefault());
+        output.Write(value.VertexColorEnabled.GetValueOrDefault());
     }
 }

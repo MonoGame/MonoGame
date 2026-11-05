@@ -10,7 +10,11 @@ public sealed class BuildAndroidTask : FrostingTask<BuildContext>
     public override void Run(BuildContext context)
     {
         var arguments = new DotNetMSBuildSettings();
-        arguments.WithProperty("AndroidSdkDirectory", System.Environment.GetEnvironmentVariable ("ANDROID_HOME"));
+        var androidHome = Environment.GetEnvironmentVariable("ANDROID_HOME");
+        if (!string.IsNullOrWhiteSpace(androidHome))
+        {
+            arguments.WithProperty("AndroidSdkDirectory", androidHome);
+        }
         arguments.WithProperty("AcceptAndroidSDKLicenses", "true");
         arguments.WithTarget("InstallAndroidDependencies");
         var installSettings = new DotNetBuildSettings

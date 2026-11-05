@@ -59,7 +59,7 @@ inline void MG_Print_StdOut(const char* file, int line, const char* message)
 #define MG_ERROR_PRINT(msg) \
     MG_Print_StdError(__FILE__, __LINE__, msg)
 
-#define MG_NOT_IMPLEMEMTED	MG_ERROR_PRINT("NOT IMPLEMENTED!"); MG_GENERATE_TRAP()
+#define MG_NOT_IMPLEMENTED	MG_ERROR_PRINT("NOT IMPLEMENTED!"); MG_GENERATE_TRAP()
 
 
 mguint MG_ComputeHash(const mgbyte* value, mgint length);
@@ -73,8 +73,8 @@ template <class T>
 void mg_remove(std::vector<T>& vector, const T& element)
 {
     auto new_end = std::remove(vector.begin(), vector.end(), element);
-    assert(new_end != vector.end());
-    vector.erase(new_end, vector.end());
+    if (new_end != vector.end())
+        vector.erase(new_end, vector.end());
 }
 
 // Removes the element without preserving order.

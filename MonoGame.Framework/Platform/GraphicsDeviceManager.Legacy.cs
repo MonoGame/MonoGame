@@ -7,7 +7,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input.Touch;
 
 #if ANDROID
-using Android.Views;
+using global::Android.Views;
 #endif
 
 namespace Microsoft.Xna.Framework
@@ -380,7 +380,7 @@ namespace Microsoft.Xna.Framework
         {
             if (IsFullScreen)
 			{
-				Game.Activity.Window.ClearFlags(Android.Views.WindowManagerFlags.ForceNotFullscreen);
+				Game.Activity.Window.ClearFlags(global::Android.Views.WindowManagerFlags.ForceNotFullscreen);
                 Game.Activity.Window.SetFlags(WindowManagerFlags.Fullscreen, WindowManagerFlags.Fullscreen);
 			}
             else
@@ -580,7 +580,7 @@ namespace Microsoft.Xna.Framework
             TouchPanel.DisplayWidth = newClientBounds.Width;
             TouchPanel.DisplayHeight = newClientBounds.Height;
 
-            Android.Util.Log.Debug("MonoGame", "GraphicsDeviceManager.ResetClientBounds: newClientBounds=" + newClientBounds.ToString());
+            global::Android.Util.Log.Debug("MonoGame", "GraphicsDeviceManager.ResetClientBounds: newClientBounds=" + newClientBounds.ToString());
 #endif
         }
 

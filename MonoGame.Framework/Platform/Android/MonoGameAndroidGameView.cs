@@ -6,11 +6,11 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using Android.Content;
-using Android.Media;
-using Android.Runtime;
-using Android.Util;
-using Android.Views;
+using global::Android.Content;
+using global::Android.Media;
+using global::Android.Runtime;
+using global::Android.Util;
+using global::Android.Views;
 using Javax.Microedition.Khronos.Egl;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
@@ -1098,9 +1098,9 @@ namespace Microsoft.Xna.Framework
                     System.Threading.Thread bgThread = new System.Threading.Thread(
                         o =>
                         {
-                            Android.Util.Log.Debug("MonoGame", "Begin reloading graphics content");
+                            global::Android.Util.Log.Debug("MonoGame", "Begin reloading graphics content");
                             Microsoft.Xna.Framework.Content.ContentManager.ReloadGraphicsContent();
-                            Android.Util.Log.Debug("MonoGame", "End reloading graphics content");
+                            global::Android.Util.Log.Debug("MonoGame", "End reloading graphics content");
 
                             // DeviceReset events
                             _game.graphicsDeviceManager.OnDeviceReset(EventArgs.Empty);

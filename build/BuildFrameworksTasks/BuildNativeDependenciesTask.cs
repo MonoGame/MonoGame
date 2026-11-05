@@ -1,3 +1,5 @@
+using System.Runtime.InteropServices;
+
 namespace BuildScripts;
 
 [TaskName("Build Native Dependencies")]
@@ -5,60 +7,80 @@ public sealed class BuildNativeDependenciesTask : FrostingTask<BuildContext>
 {
     public override void Run(BuildContext context)
     {
-        BuildSDL2(context);
-        BuildFAudio(context);
+        if (context.Environment.Platform.Family == PlatformFamily.Windows)
+        {
+            // Cross-compile both architectures on the same x64 runner
+            BuildDependenciesForArch(context, "x64");
+            BuildDependenciesForArch(context, "arm64");
+        }
+        else
+        {
+            // Linux/macOS: build for the host architecture only
+            var arch = RuntimeInformation.OSArchitecture == Architecture.Arm64 ? "arm64" : "x64";
+            BuildDependenciesForArch(context, arch);
+        }
     }
 
-    private void BuildSDL2(BuildContext context)
+    private void BuildDependenciesForArch(BuildContext context, string targetArch)
+    {
+        BuildSDL2(context, targetArch);
+        BuildFAudio(context, targetArch);
+    }
+
+    private void BuildSDL2(BuildContext context, string targetArch)
     {
         var sdlSourceDir = "native/monogame/external/sdl2/sdl";
-        var sdlBuildDir = System.IO.Path.Combine(sdlSourceDir, "build");
+        var sdlBuildDir = System.IO.Path.Combine(sdlSourceDir, "build", targetArch);
+        if (context.Environment.Platform.Family != PlatformFamily.Windows)
+            sdlBuildDir = System.IO.Path.Combine(sdlSourceDir, "build");
 
         RecreateDirectory(context, sdlBuildDir);
 
         var configureArgs = new ProcessArgumentBuilder()
-            .Append("-S").AppendQuoted(context.MakeAbsolute(new DirectoryPath(sdlSourceDir)).FullPath)
-            .Append("-B").AppendQuoted(context.MakeAbsolute(new DirectoryPath(sdlBuildDir)).FullPath)
+            .Append("-S").AppendQuoted(context.MakeAbsoluteForDocker(new DirectoryPath(sdlSourceDir)).FullPath)
+            .Append("-B").AppendQuoted(context.MakeAbsoluteForDocker(new DirectoryPath(sdlBuildDir)).FullPath)
             .Append("-DSDL_STATIC=ON")
             .Append("-DSDL_TEST=OFF");
 
-        AppendPlatformCMakeArgs(configureArgs, context, isSDL: true);
+        AppendPlatformCMakeArgs(configureArgs, context, isSDL: true, targetArch);
 
         RunCMake(context, configureArgs, "SDL2 CMake configuration failed!");
 
         RunCMakeBuild(context, sdlBuildDir, "Release", "SDL2 build failed!");
     }
 
-    private void BuildFAudio(BuildContext context)
+    private void BuildFAudio(BuildContext context, string targetArch)
     {
         var faudioSourceDir = "native/monogame/external/faudio";
-        var faudioBuildDir = System.IO.Path.Combine(faudioSourceDir, "build");
+        var faudioBuildDir = System.IO.Path.Combine(faudioSourceDir, "build", targetArch);
+        if (context.Environment.Platform.Family != PlatformFamily.Windows)
+            faudioBuildDir = System.IO.Path.Combine(faudioSourceDir, "build");
 
         RecreateDirectory(context, faudioBuildDir);
 
         var sdlIncludeDir = System.IO.Path.Combine("native/monogame/external/sdl2/sdl", "include");
 
         var configureArgs = new ProcessArgumentBuilder()
-            .Append("-S").AppendQuoted(context.MakeAbsolute(new DirectoryPath(faudioSourceDir)).FullPath)
-            .Append("-B").AppendQuoted(context.MakeAbsolute(new DirectoryPath(faudioBuildDir)).FullPath)
+            .Append("-S").AppendQuoted(context.MakeAbsoluteForDocker(new DirectoryPath(faudioSourceDir)).FullPath)
+            .Append("-B").AppendQuoted(context.MakeAbsoluteForDocker(new DirectoryPath(faudioBuildDir)).FullPath)
             .Append("-DBUILD_SHARED_LIBS=OFF")
-            .Append($"-DCMAKE_C_STANDARD_INCLUDE_DIRECTORIES={context.MakeAbsolute(new DirectoryPath(sdlIncludeDir))}")
-            .Append($"-DCMAKE_CXX_STANDARD_INCLUDE_DIRECTORIES={context.MakeAbsolute(new DirectoryPath(sdlIncludeDir))}")
+            .Append($"-DCMAKE_C_STANDARD_INCLUDE_DIRECTORIES=\"{context.MakeAbsoluteForDocker(new DirectoryPath(sdlIncludeDir)).FullPath}\"")
+            .Append($"-DCMAKE_CXX_STANDARD_INCLUDE_DIRECTORIES=\"{context.MakeAbsoluteForDocker(new DirectoryPath(sdlIncludeDir)).FullPath}\"")
             .Append("-DBUILD_SDL3=OFF");
 
-        AppendPlatformCMakeArgs(configureArgs, context, isSDL: false);
+        AppendPlatformCMakeArgs(configureArgs, context, isSDL: false, targetArch);
 
         RunCMake(context, configureArgs, "FAudio CMake configuration failed!");
 
         RunCMakeBuild(context, faudioBuildDir, "Release", "FAudio build failed!");
     }
 
-    private void AppendPlatformCMakeArgs(ProcessArgumentBuilder args, BuildContext context, bool isSDL)
+    private void AppendPlatformCMakeArgs(ProcessArgumentBuilder args, BuildContext context, bool isSDL, string targetArch)
     {
         switch (context.Environment.Platform.Family)
         {
             case PlatformFamily.Windows:
-                args.Append("-A").Append("x64");
+                args.Append("-A").Append(targetArch == "arm64" ? "ARM64" : "x64");
                 if (isSDL)
                 {
                     args.Append("-DSDL_FORCE_STATIC_VCRT=ON");
@@ -83,8 +105,7 @@ public sealed class BuildNativeDependenciesTask : FrostingTask<BuildContext>
 
     private void RunCMake(BuildContext context, ProcessArgumentBuilder args, string errorMessage)
     {
-        var settings = new ProcessSettings { Arguments = args };
-        if (context.StartProcess("cmake", settings) != 0)
+        if (context.StartProcessWithDocker("cmake", "", args) != 0)
         {
             throw new Exception(errorMessage);
         }
@@ -94,7 +115,7 @@ public sealed class BuildNativeDependenciesTask : FrostingTask<BuildContext>
     {
         var buildArgs = new ProcessArgumentBuilder()
             .Append("--build")
-            .AppendQuoted(context.MakeAbsolute(new DirectoryPath(buildDir)).FullPath)
+            .AppendQuoted(context.MakeAbsoluteForDocker(new DirectoryPath(buildDir)).FullPath)
             .Append("--config").Append(config)
             .Append("--parallel");
 

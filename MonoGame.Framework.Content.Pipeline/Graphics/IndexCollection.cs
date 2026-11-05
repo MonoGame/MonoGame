@@ -3,7 +3,6 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using System.Collections.ObjectModel;
-using System.Collections.Generic;
 
 namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 {
@@ -26,7 +25,9 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
         public void AddRange(IEnumerable<int> indices)
         {
             foreach (var t in indices)
+            {
                 Add(t);
+            }
         }
     }
 }

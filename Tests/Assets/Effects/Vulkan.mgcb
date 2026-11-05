@@ -97,3 +97,9 @@
 /processor:EffectProcessor
 /processorParam:DebugMode=Auto
 /build:ParameterTypes.fx
+
+#begin VertexInterpolationTest.fx
+/importer:EffectImporter
+/processor:EffectProcessor
+/processorParam:DebugMode=Auto
+/build:VertexInterpolationTest.fx

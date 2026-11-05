@@ -76,10 +76,10 @@ public abstract class ContentBuilder
     /// <param name="relativeDstPath">Optional name of the final compiled content.</param>
     /// <param name="parentContext">Set when building content dependencies by the ContentProcessorContext.</param>
     /// <returns>The complete name of the final compiled content including the content root.</returns>
-    public string BuildAndWriteContent(string relativeSrcPath, ContentInfo contentInfo, string? relativeDstPath = null, ContentProcessorContext? parentContext = null)
+    public string? BuildAndWriteContent(string relativeSrcPath, ContentInfo contentInfo, string? relativeDstPath = null, ContentProcessorContext? parentContext = null)
     {
         // If we get a absolute path to a source asset try
-        // to make it relative as ProcessContent expects that. 
+        // to make it relative as ProcessContent expects that.
         if (Path.IsPathRooted(relativeSrcPath))
         {
             if (parentContext != null)
@@ -103,11 +103,7 @@ public abstract class ContentBuilder
             {
                 Logger.Log(LogLevel.Error, $"Content failed to build: {ex}");
             }
-            if (parentContext != null)
-            {
-                throw new SkipLogException();
-            }
-            return null;
+            return parentContext != null ? throw new SkipLogException() : null;
         }
         finally
         {
@@ -218,7 +214,7 @@ public abstract class ContentBuilder
             fileCopyCache.AddOutputFile(this, outputPath);
             ContentCache.WriteContentFileCache(this, relativeDestPath, fileCopyCache);
             ContentCache.MarkUsed(fileCopyCache);
-            (parentContext as ContentBuilderProcessorContext)?.ContentFileCache.AddDependency(this, fileCache);
+            (parentContext as ContentBuilderProcessorContext)?.ContentFileCache.AddDependency(this, fileCopyCache);
             return null;
         }
 
@@ -340,7 +336,7 @@ public abstract class ContentBuilder
                 _content[relativePath] = contentInfos;
                 foreach (var contentInfo in contentInfos)
                 {
-                    _outputContent[Path.Combine(contentInfo.ContentRoot, contentInfo.GetOutputPath(relativePath))] = relativePath;
+                    _outputContent[Path.Combine(contentInfo.ContentRoot, relativePath.GetDestinationPath(contentInfo.ShouldBuild, contentInfo.GetOutputPath))] = relativePath;
                 }
             }
         }
@@ -405,7 +401,7 @@ public abstract class ContentBuilder
             if (request != null)
             {
                 BuildAndWriteContent(request.InputPath, request.ContentInfo);
-                request.Args.FilePath = Path.Combine(Parameters.RootedOutputDirectory, Path.Combine(request.ContentInfo.ContentRoot, request.ContentInfo.GetOutputPath(request.InputPath)));
+                request.Args.FilePath = Path.Combine(Parameters.RootedOutputDirectory, Path.Combine(request.ContentInfo.ContentRoot, request.InputPath.GetDestinationPath(request.ContentInfo.ShouldBuild, request.ContentInfo.GetOutputPath))).Sanitize();
                 request.Server.NotifyContentRequestCompiled();
             }
             else
@@ -432,12 +428,13 @@ public abstract class ContentBuilder
             {
                 foreach (var contentInfo in contentInfos)
                 {
-                    if (contentInfo.GetOutputPath(inputPath) != outputPath)
+                    var finalOutputPath = Path.Combine(contentInfo.ContentRoot, inputPath.GetDestinationPath(contentInfo.ShouldBuild, contentInfo.GetOutputPath));
+                    if (finalOutputPath != outputPath)
                     {
                         continue;
                     }
 
-                    if (ContentCache.ReadContentFileCache(this, outputPath) is not null)
+                    if (ContentCache.ReadContentFileCache(this, outputPath) is ContentFileCache fileCache && fileCache.IsValid(this, contentInfo))
                     {
                         // we've already found a valid cached version of content, so no need for any compilation here
                         args.FilePath = Path.Combine(Parameters.RootedOutputDirectory, outputPath);

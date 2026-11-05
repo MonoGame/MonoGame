@@ -2,8 +2,6 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
-using System;
-
 namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Intermediate
 {
     /// <summary>
@@ -26,10 +24,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Intermediate
         /// Gets a value indicating whether this component may load data into an existing object or if
         /// it must it construct a new instance of the object before loading the data.
         /// </summary>
-        public virtual bool CanDeserializeIntoExistingObject
-        {
-            get { return false; }
-        }
+        public virtual bool CanDeserializeIntoExistingObject => false;
 
         /// <summary>
         /// Gets the target type.
@@ -42,11 +37,11 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Intermediate
         public string XmlTypeName { get; private set; }
 
         /// <summary/>
-        protected internal abstract object Deserialize(IntermediateReader input, ContentSerializerAttribute format, object existingInstance);
+        protected internal abstract object? Deserialize(IntermediateReader input, ContentSerializerAttribute format, object? existingInstance);
 
         /// <summary/>
         protected internal virtual void Initialize(IntermediateSerializer serializer)
-        {     
+        {
         }
 
         /// <summary>
@@ -54,20 +49,17 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Serialization.Intermediate
         /// </summary>
         /// <param name="value">The object to test.</param>
         /// <returns><c>true</c> if the object is empty; otherwise, <c>false</c>.</returns>
-        public virtual bool ObjectIsEmpty(object value)
-        {
-            return false;
-        }
+        public virtual bool ObjectIsEmpty(object? value) => false;
 
         /// <summary/>
-        protected internal virtual void ScanChildren(IntermediateSerializer serializer, ChildCallback callback, object value)
+        protected internal virtual void ScanChildren(IntermediateSerializer serializer, ChildCallback callback, object? value)
         {
         }
 
         /// <summary/>
-        protected internal abstract void Serialize(IntermediateWriter output, object value, ContentSerializerAttribute format);
+        protected internal abstract void Serialize(IntermediateWriter output, object? value, ContentSerializerAttribute format);
 
         /// <summary/>
-        internal protected delegate void ChildCallback(ContentTypeSerializer typeSerializer, object value);
+        protected internal delegate void ChildCallback(ContentTypeSerializer typeSerializer, object? value);
     }
 }

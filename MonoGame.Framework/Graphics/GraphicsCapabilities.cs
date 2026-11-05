@@ -66,6 +66,11 @@ namespace Microsoft.Xna.Framework.Graphics
         /// </summary>
         internal bool SupportsAtitc { get; private set; }
 
+        /// <summary>
+        /// Gets the support for ASTC
+        /// </summary>
+        internal bool SupportsAstc { get; private set; }
+
         internal bool SupportsTextureMaxLevel { get; private set; }
 
         /// <summary>
@@ -109,16 +114,6 @@ namespace Microsoft.Xna.Framework.Graphics
         /// supported.
         /// </summary>
         internal int MaxTextureAnisotropy { get; private set; }
-
-        // The highest possible MSCount
-        private const int MultiSampleCountLimit = 32;
-
-        private int _maxMultiSampleCount;
-
-        internal int MaxMultiSampleCount
-        {
-            get { return _maxMultiSampleCount; }
-        }
 
         internal bool SupportsInstancing { get; private set; }
 

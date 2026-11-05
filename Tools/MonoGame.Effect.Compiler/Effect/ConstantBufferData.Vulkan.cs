@@ -70,24 +70,24 @@ namespace MonoGame.Effect
             else if (member.Type is SpirvTypeVector svVector)
                 return svVector.Dimensions * svVector.ElementType.Width / 8;
             else if (member.Type is SpirvTypeMatrix svMatrix)
-                return member.MatrixStride.Value * svMatrix.Columns;
+                return member.MatrixStride * svMatrix.Columns;
             else if (member.Type is SpirvTypeArray svArray)
-                return svArray.ArrayStride.Value * svArray.Length;
+                return svArray.ArrayStride * svArray.Length;
             else
                 return 4;
         }
 
         public static ConstantBufferData BuildFromSpirvStruct(SpirvTypeStruct svStruct)
         {
-            var cbuffer = new ConstantBufferData(svStruct.Name);
-            var byOffset = svStruct.Members.OrderBy(m => m.Offset.Value);
+            var cbuffer = new ConstantBufferData(svStruct.Name ?? svStruct.Id);
+            var byOffset = svStruct.Members.OrderBy(m => m.Offset);
 
             foreach (var member in byOffset)
             {
                 var param = new EffectObject.d3dx_parameter();
                 param.name = member.Name;
                 param.semantic = string.Empty;
-                param.bufferOffset = (int)member.Offset.Value;
+                param.bufferOffset = (int)member.Offset;
 
                 (param.rows, param.columns, param.class_) = DimensionsForType(member.Type);
                 param.type = ToParamType(member.Type);
@@ -124,9 +124,12 @@ namespace MonoGame.Effect
                 cbuffer.ParameterOffset.Add(param.bufferOffset);
             }
 
-            var lastItem = svStruct.Members.MaxBy(mem => mem.Offset.Value);
-            cbuffer.Size = (int)(lastItem.Offset.Value + PaddingSizeForMember(lastItem));
-            cbuffer.Size = ((cbuffer.Size + 15) / 16) * 16;
+            var lastItem = svStruct.Members.MaxBy(mem => mem.Offset);
+            if (lastItem != null)
+            {
+                cbuffer.Size = (int)(lastItem.Offset + PaddingSizeForMember(lastItem));
+                cbuffer.Size = ((cbuffer.Size + 15) / 16) * 16;
+            }
 
             return cbuffer;
         }

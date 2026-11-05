@@ -4,32 +4,34 @@
 
 using System;
 using System.IO;
+using AM = global::Android.Media;
+using AN = global::Android.Net;
 
 namespace Microsoft.Xna.Framework.Media
 {
     public sealed partial class Song : IEquatable<Song>, IDisposable
     {
-        static Android.Media.MediaPlayer _androidPlayer;
+        static AM.MediaPlayer _androidPlayer;
         static Song _playingSong;
 
         private Album album;
         private Artist artist;
         private Genre genre;
         private TimeSpan position;
-        private Android.Net.Uri assetUri;
+        private AN.Uri assetUri;
 
-        public Android.Net.Uri AssetUri
+        public AN.Uri AssetUri
         {
             get { return this.assetUri; }
         }
 
         static Song()
         {
-            _androidPlayer = new Android.Media.MediaPlayer();
+            _androidPlayer = new AM.MediaPlayer();
             _androidPlayer.Completion += AndroidPlayer_Completion;
         }
 
-        internal Song(Album album, Artist artist, Genre genre, string name, TimeSpan duration, Android.Net.Uri assetUri)
+        internal Song(Album album, Artist artist, Genre genre, string name, TimeSpan duration, AN.Uri assetUri)
         {
             this.album = album;
             this.artist = artist;

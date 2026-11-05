@@ -13,7 +13,7 @@ using NUnit.Framework;
 using MonoGame.Tests.Components;
 
 namespace MonoGame.Tests.Visual {
-	[RunOnUI]
+	[RunOnUiTestFixture]
 	class VisualTestFixtureBase {
 		private VisualTestGame _game;
 		protected VisualTestGame Game { get { return _game; } }

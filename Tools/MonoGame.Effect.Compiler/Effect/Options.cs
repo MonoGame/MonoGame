@@ -7,7 +7,7 @@ namespace MonoGame.Effect
     public class Options
     {
         [CommandLineParser.Required]
-        public string SourceFile;
+        public string SourceFile = string.Empty;
 
         [CommandLineParser.Required]
         [CommandLineParser.Name("OutputFile", "\t - The output file path.  Use a .h extension to generate a C header file.")]
@@ -20,6 +20,6 @@ namespace MonoGame.Effect
         public bool Debug;
 
         [CommandLineParser.Name("Defines", "\t - Semicolon-delimited define assignments")]
-        public string Defines;
+        public string? Defines;
     }
 }

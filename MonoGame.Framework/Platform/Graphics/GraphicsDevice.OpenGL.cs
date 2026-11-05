@@ -23,6 +23,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
 #if !GLES
         private DrawBuffersEnum[] _drawBuffers;
+        private DrawBuffersEnum[] _maskedDrawBuffers;
 #endif
 
         enum ResourceType
@@ -253,6 +254,11 @@ namespace Microsoft.Xna.Framework.Graphics
             }
 
             Context.MakeCurrent(windowInfo);
+
+#if DESKTOPGL
+            RetryMSAAIfNeeded(ref windowInfo);
+#endif
+
             Context.SwapInterval = PresentationParameters.PresentationInterval.GetSwapInterval();
 
             Context.MakeCurrent(windowInfo);
@@ -326,10 +332,59 @@ namespace Microsoft.Xna.Framework.Graphics
             GL.GetInteger(GetPName.MaxDrawBuffers, out maxDrawBuffers);
             GraphicsExtensions.CheckGLError ();
 			_drawBuffers = new DrawBuffersEnum[maxDrawBuffers];
+            _maskedDrawBuffers = new DrawBuffersEnum[maxDrawBuffers];
 			for (int i = 0; i < maxDrawBuffers; i++)
+            {
 				_drawBuffers[i] = (DrawBuffersEnum)(FramebufferAttachment.ColorAttachment0Ext + i);
+                _maskedDrawBuffers[i] = DrawBuffersEnum.None;
+            }
 #endif
         }
+
+#if DESKTOPGL
+        // SDL might select a non-MSAA default framebuffer for an MSSAA request.
+        // We can't get the actual sample count until **after** a context is created.
+        // This will retry with lower powers of two until a context is created that has samples.
+        private void RetryMSAAIfNeeded(ref WindowInfo windowInfo)
+        {
+            if (PresentationParameters.MultiSampleCount <= 1 || HasMultiSampleBackBuffer())
+                return;
+
+            ((GraphicsContext)Context).DisposeImmediately();
+            Context = null;
+
+            int multiSampleCount = PresentationParameters.MultiSampleCount;
+            while (multiSampleCount > 2)
+            {
+                multiSampleCount /= 2;
+                PresentationParameters.MultiSampleCount = multiSampleCount;
+                GraphicsDeviceManager.CreateOpenGLWindow(PresentationParameters);
+
+                windowInfo = new WindowInfo(SdlGameWindow.Instance.Handle);
+                Context = GL.CreateContext(windowInfo);
+                Context.MakeCurrent(windowInfo);
+
+                if (HasMultiSampleBackBuffer())
+                    return;
+
+                ((GraphicsContext)Context).DisposeImmediately();
+                Context = null;
+            }
+
+            PresentationParameters.MultiSampleCount = 0;
+            GraphicsDeviceManager.CreateOpenGLWindow(PresentationParameters);
+            windowInfo = new WindowInfo(SdlGameWindow.Instance.Handle);
+            Context = GL.CreateContext(windowInfo);
+            Context.MakeCurrent(windowInfo);
+        }
+
+        private static bool HasMultiSampleBackBuffer()
+        {
+            GL.GetInteger(GetPName.SampleBuffers, out int sampleBuffers);
+            GL.GetInteger(GetPName.Samples, out int samples);
+            return sampleBuffers > 0 && samples > 0;
+        }
+#endif
 
         private void PlatformInitialize()
         {
@@ -343,6 +398,14 @@ namespace Microsoft.Xna.Framework.Graphics
             _shaderProgram = null;
 
             framebufferHelper = FramebufferHelper.Create(this);
+
+            var backBufferFormat = PresentationParameters.BackBufferFormat;
+            if (GraphicsCapabilities.SupportsSRgb &&
+                (backBufferFormat == SurfaceFormat.ColorSRgb || backBufferFormat == SurfaceFormat.Bgr32SRgb || backBufferFormat == SurfaceFormat.Bgra32SRgb))
+            {
+                GL.Enable(EnableCap.FramebufferSrgb);
+                GraphicsExtensions.CheckGLError();
+            }
 
             // Force resetting states
             this.PlatformApplyBlend(true);
@@ -372,16 +435,24 @@ namespace Microsoft.Xna.Framework.Graphics
             // So overwrite these states with what is needed to perform
             // the clear correctly and restore it afterwards.
             //
-		    var prevScissorRect = ScissorRectangle;
 		    var prevDepthStencilState = DepthStencilState;
             var prevBlendState = BlendState;
-            ScissorRectangle = _viewport.Bounds;
             // DepthStencilState.Default has the Stencil Test disabled; 
             // make sure stencil test is enabled before we clear since
             // some drivers won't clear with stencil test disabled
             DepthStencilState = this.clearDepthStencilState;
 		    BlendState = BlendState.Opaque;
             ApplyState(false);
+
+            var prevScissorTestEnable = _lastRasterizerState.ScissorTestEnable;
+
+            // Clear should affect the whole active target, not only the
+            // current viewport-sized scissor rectangle, to match XNA behavior
+            if (prevScissorTestEnable)
+            {
+                GL.Disable(EnableCap.ScissorTest);
+                GraphicsExtensions.CheckGLError();
+            }
 
             ClearBufferMask bufferMask = 0;
             if ((options & ClearOptions.Target) == ClearOptions.Target)
@@ -427,7 +498,12 @@ namespace Microsoft.Xna.Framework.Graphics
 #endif
            		
             // Restore the previous render state.
-		    ScissorRectangle = prevScissorRect;
+            if (prevScissorTestEnable)
+            {
+                GL.Enable(EnableCap.ScissorTest);
+                GraphicsExtensions.CheckGLError();
+            }
+
 		    DepthStencilState = prevDepthStencilState;
 		    BlendState = prevBlendState;
         }
@@ -636,11 +712,19 @@ namespace Microsoft.Xna.Framework.Graphics
             var depth = 0;
             var stencil = 0;
             
-            if (preferredMultiSampleCount > 0 && this.framebufferHelper.SupportsBlitFramebuffer)
+            var sampleCount = GetClampedMultisampleCount(preferredFormat, preferredMultiSampleCount);
+            if (sampleCount > 0 && preferredDepthFormat != DepthFormat.None)
+            {
+                GL.GetInteger(GetPName.MaxSamples, out int maxDepthMultiSampleCount);
+                GraphicsExtensions.CheckGLError();
+                sampleCount = Math.Min(sampleCount, maxDepthMultiSampleCount);
+            }
+            
+            if (sampleCount > 0 && this.framebufferHelper.SupportsBlitFramebuffer)
             {
                 this.framebufferHelper.GenRenderbuffer(out color);
                 this.framebufferHelper.BindRenderbuffer(color);
-                this.framebufferHelper.RenderbufferStorageMultisample(preferredMultiSampleCount, (int)RenderbufferStorage.Rgba8, width, height);
+                this.framebufferHelper.RenderbufferStorageMultisample(sampleCount, (int)RenderbufferStorage.Rgba8, width, height);
             }
 
             if (preferredDepthFormat != DepthFormat.None)
@@ -690,7 +774,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 {
                     this.framebufferHelper.GenRenderbuffer(out depth);
                     this.framebufferHelper.BindRenderbuffer(depth);
-                    this.framebufferHelper.RenderbufferStorageMultisample(preferredMultiSampleCount, (int)depthInternalFormat, width, height);
+                    this.framebufferHelper.RenderbufferStorageMultisample(sampleCount, (int)depthInternalFormat, width, height);
                     if (preferredDepthFormat == DepthFormat.Depth24Stencil8)
                     {
                         stencil = depth;
@@ -698,16 +782,13 @@ namespace Microsoft.Xna.Framework.Graphics
                         {
                             this.framebufferHelper.GenRenderbuffer(out stencil);
                             this.framebufferHelper.BindRenderbuffer(stencil);
-                            this.framebufferHelper.RenderbufferStorageMultisample(preferredMultiSampleCount, (int)stencilInternalFormat, width, height);
+                            this.framebufferHelper.RenderbufferStorageMultisample(sampleCount, (int)stencilInternalFormat, width, height);
                         }
                     }
                 }
             }
-
-            if (color != 0)
-                renderTarget.GLColorBuffer = color;
-            else
-                renderTarget.GLColorBuffer = renderTarget.GLTexture;
+            
+            renderTarget.GLColorBuffer = color;
             renderTarget.GLDepthBuffer = depth;
             renderTarget.GLStencilBuffer = stencil;
         }
@@ -717,48 +798,44 @@ namespace Microsoft.Xna.Framework.Graphics
             var color = 0;
             var depth = 0;
             var stencil = 0;
-            var colorIsRenderbuffer = false;
 
             color = renderTarget.GLColorBuffer;
             depth = renderTarget.GLDepthBuffer;
             stencil = renderTarget.GLStencilBuffer;
-            colorIsRenderbuffer = color != renderTarget.GLTexture;
 
             if (color != 0)
-            {
-                if (colorIsRenderbuffer)
-                    this.framebufferHelper.DeleteRenderbuffer(color);
-                if (stencil != 0 && stencil != depth)
-                    this.framebufferHelper.DeleteRenderbuffer(stencil);
-                if (depth != 0)
-                    this.framebufferHelper.DeleteRenderbuffer(depth);
+                this.framebufferHelper.DeleteRenderbuffer(color);
+            if (stencil != 0 && stencil != depth)
+                this.framebufferHelper.DeleteRenderbuffer(stencil);
+            if (depth != 0)
+                this.framebufferHelper.DeleteRenderbuffer(depth);
 
-                var bindingsToDelete = new List<RenderTargetBinding[]>();
-                foreach (var bindings in this.glFramebuffers.Keys)
+            // Remove cached framebuffer bindings that still reference this render target.
+            var bindingsToDelete = new List<RenderTargetBinding[]>();
+            foreach (var bindings in this.glFramebuffers.Keys)
+            {
+                foreach (var binding in bindings)
                 {
-                    foreach (var binding in bindings)
+                    if (binding.RenderTarget == renderTarget)
                     {
-                        if (binding.RenderTarget == renderTarget)
-                        {
-                            bindingsToDelete.Add(bindings);
-                            break;
-                        }
+                        bindingsToDelete.Add(bindings);
+                        break;
                     }
                 }
+            }
 
-                foreach (var bindings in bindingsToDelete)
+            foreach (var bindings in bindingsToDelete)
+            {
+                var fbo = 0;
+                if (this.glFramebuffers.TryGetValue(bindings, out fbo))
                 {
-                    var fbo = 0;
-                    if (this.glFramebuffers.TryGetValue(bindings, out fbo))
-                    {
-                        this.framebufferHelper.DeleteFramebuffer(fbo);
-                        this.glFramebuffers.Remove(bindings);
-                    }
-                    if (this.glResolveFramebuffers.TryGetValue(bindings, out fbo))
-                    {
-                        this.framebufferHelper.DeleteFramebuffer(fbo);
-                        this.glResolveFramebuffers.Remove(bindings);
-                    }
+                    this.framebufferHelper.DeleteFramebuffer(fbo);
+                    this.glFramebuffers.Remove(bindings);
+                }
+                if (this.glResolveFramebuffers.TryGetValue(bindings, out fbo))
+                {
+                    this.framebufferHelper.DeleteFramebuffer(fbo);
+                    this.glResolveFramebuffers.Remove(bindings);
                 }
             }
         }
@@ -823,6 +900,49 @@ namespace Microsoft.Xna.Framework.Graphics
             }
         }
 
+#if !GLES
+        private static uint GetDrawBufferMask(int drawBufferCount)
+        {
+            if (drawBufferCount <= 0)
+                return 0u;
+
+            if (drawBufferCount >= 32)
+                return uint.MaxValue;
+
+            return (1u << drawBufferCount) - 1u;
+        }
+
+        private void ApplyRenderTargetDrawBuffers(ShaderProgram shaderProgram)
+        {
+            if (_currentRenderTargetCount <= 0)
+                return;
+
+            uint fragmentOutputMask = shaderProgram != null
+                                      ? shaderProgram.FragmentOutputMask
+                                      : 0u;
+            
+            uint activeDrawBufferMask = GetDrawBufferMask(_currentRenderTargetCount);
+            
+            if (fragmentOutputMask == 0u ||
+                (fragmentOutputMask & activeDrawBufferMask) == activeDrawBufferMask)
+            {
+                GL.DrawBuffers(_currentRenderTargetCount, _drawBuffers);
+                GraphicsExtensions.CheckGLError();
+                return;
+            }
+
+            for (int i = 0; i < _currentRenderTargetCount; ++i)
+            {
+                _maskedDrawBuffers[i] = (fragmentOutputMask & (1u << i)) != 0u
+                                        ? _drawBuffers[i]
+                                        : DrawBuffersEnum.None;
+            }
+
+            GL.DrawBuffers(_currentRenderTargetCount, _maskedDrawBuffers);
+            GraphicsExtensions.CheckGLError();
+        }
+#endif
+
         private IRenderTarget PlatformApplyRenderTargets()
         {
             var glFramebuffer = 0;
@@ -832,14 +952,16 @@ namespace Microsoft.Xna.Framework.Graphics
                 this.framebufferHelper.BindFramebuffer(glFramebuffer);
                 var renderTargetBinding = this._currentRenderTargetBindings[0];
                 var renderTarget = renderTargetBinding.RenderTarget as IRenderTarget;
-                this.framebufferHelper.FramebufferRenderbuffer((int)FramebufferAttachment.DepthAttachment, renderTarget.GLDepthBuffer, 0);
-                this.framebufferHelper.FramebufferRenderbuffer((int)FramebufferAttachment.StencilAttachment, renderTarget.GLStencilBuffer, 0);
+                if (renderTarget.GLDepthBuffer != 0)
+                    this.framebufferHelper.FramebufferRenderbuffer((int)FramebufferAttachment.DepthAttachment, renderTarget.GLDepthBuffer, 0);
+                if (renderTarget.GLStencilBuffer != 0)
+                    this.framebufferHelper.FramebufferRenderbuffer((int)FramebufferAttachment.StencilAttachment, renderTarget.GLStencilBuffer, 0);
                 for (var i = 0; i < this._currentRenderTargetCount; ++i)
                 {
                     renderTargetBinding = this._currentRenderTargetBindings[i];
                     renderTarget = renderTargetBinding.RenderTarget as IRenderTarget;
                     var attachement = (int)(FramebufferAttachment.ColorAttachment0 + i);
-                    if (renderTarget.GLColorBuffer != renderTarget.GLTexture)
+                    if (renderTarget.GLColorBuffer != 0)
                         this.framebufferHelper.FramebufferRenderbuffer(attachement, renderTarget.GLColorBuffer, 0);
                     else
                         this.framebufferHelper.FramebufferTexture2D(attachement, (int)renderTarget.GetFramebufferTarget(renderTargetBinding), renderTarget.GLTexture, 0, renderTarget.MultiSampleCount);
@@ -855,7 +977,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 this.framebufferHelper.BindFramebuffer(glFramebuffer);
             }
 #if !GLES
-            GL.DrawBuffers(this._currentRenderTargetCount, this._drawBuffers);
+            ApplyRenderTargetDrawBuffers(_shaderProgram);
 #endif
 
             // Reset the raster state because we flip vertices
@@ -903,6 +1025,11 @@ namespace Microsoft.Xna.Framework.Graphics
                 GraphicsExtensions.CheckGLError();
                 _shaderProgram = shaderProgram;
             }
+
+#if !GLES
+            if (IsRenderTargetBound)
+                ApplyRenderTargetDrawBuffers(shaderProgram);
+#endif
 
             var posFixupLoc = shaderProgram.GetUniformLocation("posFixup");
             if (posFixupLoc == -1)
@@ -1264,11 +1391,13 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             return new Rectangle(x, y, width, height);
         }
-        
-        internal void PlatformSetMultiSamplingToMaximum(PresentationParameters presentationParameters, out int quality)
+
+        internal int PlatformGetMaxMultiSampleCount(SurfaceFormat sformat)
         {
-            presentationParameters.MultiSampleCount = 4;
-            quality = 0;
+            // For OpenGL we don't seem to check the correct setting per-format.
+            int maxMultiSampleCount;
+            GL.GetInteger(GetPName.MaxSamples, out maxMultiSampleCount);
+            return maxMultiSampleCount;
         }
 
         internal void OnPresentationChanged()

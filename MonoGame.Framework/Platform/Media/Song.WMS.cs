@@ -26,12 +26,17 @@ namespace Microsoft.Xna.Framework.Media
 
             SharpDX.MediaFoundation.MediaSource mediaSource;
             {
-                SourceResolver resolver = new SourceResolver();
+                using SourceResolver resolver = new SourceResolver();
+                using ComObject source = (ComObject)resolver.CreateObjectFromURL(FilePath,
+                    SourceResolverFlags.MediaSource,
+                    null,
+                    out ObjectType objectType);
+                if (objectType != ObjectType.MediaSource)
+                {
+                    throw new NotSupportedException($"{FilePath} is not a media source.");
+                }
 
-                ComObject source = resolver.CreateObjectFromURL(FilePath, SourceResolverFlags.MediaSource);
                 mediaSource = source.QueryInterface<SharpDX.MediaFoundation.MediaSource>();
-                resolver.Dispose();
-                source.Dispose();
             }
 
             PresentationDescriptor presDesc;
