@@ -1183,7 +1183,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
                     }
 
                     // Apply transformation pivot.
-                    var transform = pivot.GetTransform(scale, rotation, translation);
+                    var transform = pivot.GetTransform(scaleKeys.Count > 0 ? scale : null, rotationKeys.Count > 0 ? rotation : null, translationKeys.Count > 0 ? translation : null);
 
                     long ticks = (long)(time * (TimeSpan.TicksPerSecond / aiAnimation.TicksPerSecond));
                     channel.Add(new AnimationKeyframe(TimeSpan.FromTicks(ticks), transform));
