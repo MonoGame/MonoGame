@@ -311,6 +311,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
             // This flag is very important when PostProcessSteps.FindDegenerates is used
             // because FindDegenerates converts degenerate triangles to points and lines!
             importer.SetConfig(new Assimp.Configs.RemoveDegeneratePrimitivesConfig(true));
+            importer.SetConfig(new Assimp.Configs.RemoveDegeneratePrimitivesCheckAreaConfig(false));
 
             // FBXIgnoreUpDirectionConfig(true) can be set to ignore the up direction for custom axis.
             importer.SetConfig(new Assimp.Configs.FBXIgnoreUpDirectionConfig(IgnoreFbxUpDirection));
