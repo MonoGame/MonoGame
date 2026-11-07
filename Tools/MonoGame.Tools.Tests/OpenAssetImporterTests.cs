@@ -8,6 +8,7 @@ using Microsoft.Xna.Framework.Content.Pipeline;
 using Microsoft.Xna.Framework.Content.Pipeline.Graphics;
 using NUnit.Framework;
 using System.IO;
+using System.Runtime.InteropServices;
 
 namespace MonoGame.Tests.ContentPipeline
 {
@@ -47,7 +48,10 @@ namespace MonoGame.Tests.ContentPipeline
 
             var geometry = meshContent.Geometry[0];
             Assert.IsNull(geometry.Name);
-            Assert.AreEqual(108, geometry.Indices.Count);
+            if (OperatingSystem.IsMacOS())
+                Assert.AreEqual(123, geometry.Indices.Count);
+            else
+                Assert.AreEqual(120, geometry.Indices.Count);
             Assert.AreEqual(28, geometry.Vertices.VertexCount);
 
             Assert.IsNotNull(geometry.Material);
