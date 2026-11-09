@@ -968,7 +968,6 @@ static mgbyte MGP_Window_DetectOpenGLVersion(int &majorVersion, int &minorVersio
     {
         for (int minor = minorVersion; minor >= 1; --minor)
         {
-            printf("Trying OpenGL version %d.%d\n", major, minor);
             SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, major);
             SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, minor);
             SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
@@ -978,7 +977,6 @@ static mgbyte MGP_Window_DetectOpenGLVersion(int &majorVersion, int &minorVersio
             {
                 majorVersion = major;
                 minorVersion = minor;
-                printf("Detected OpenGL version %d.%d\n", majorVersion, minorVersion);
                 SDL_GL_DeleteContext(tempContext);
                 SDL_DestroyWindow(tempWindow);
                 return true;
@@ -1027,8 +1025,6 @@ static mgbyte MGP_Window_CreateNativeWindowInternal(
     {
         return false;
     }
-
-    printf("Using OpenGL version %d.%d\n", window->contextMajorVersion, window->contextMinorVersion);
 
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, window->contextMajorVersion);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, window->contextMinorVersion);
