@@ -386,6 +386,52 @@ namespace
         device->context.MakeCurrent();
     }
 
+    std::vector<GLint> GetCompressedUploadFormats(MGG_GraphicsDevice* device)
+    {
+        if (device->context.functions.CompressedTexImage2D == nullptr
+            || device->context.functions.CompressedTexSubImage2D == nullptr)
+        {
+            return {};
+        }
+
+        if (glGetError() != GL_NO_ERROR)
+            MGGL_FAIL("Compressed texture capability query failed", "an OpenGL error occurred before querying formats");
+
+        GLint count = 0;
+        glGetIntegerv(GL_NUM_COMPRESSED_TEXTURE_FORMATS, &count);
+        if (glGetError() != GL_NO_ERROR || count < 0)
+            MGGL_FAIL("Compressed texture capability query failed", "could not query compressed format count");
+
+        std::vector<GLint> formats(static_cast<size_t>(count));
+        if (count > 0)
+            glGetIntegerv(GL_COMPRESSED_TEXTURE_FORMATS, formats.data());
+        if (glGetError() != GL_NO_ERROR)
+            MGGL_FAIL("Compressed texture capability query failed", "could not query compressed formats");
+
+#if !defined(__EMSCRIPTEN__)
+        // GL_COMPRESSED_TEXTURE_FORMATS doesn't always return every supported format.
+        // See issue 17: https://registry.khronos.org/OpenGL/extensions/ARB/ARB_texture_compression.txt
+
+        // OpenGL 3.1 context and the S3TC extension gaurentees the following formats:
+        if (HasOpenGLExtension("GL_EXT_texture_compression_s3tc"))
+        {
+            formats.push_back(GL_COMPRESSED_RGB_S3TC_DXT1_EXT);
+            formats.push_back(GL_COMPRESSED_RGBA_S3TC_DXT1_EXT);
+            formats.push_back(GL_COMPRESSED_RGBA_S3TC_DXT3_EXT);
+            formats.push_back(GL_COMPRESSED_RGBA_S3TC_DXT5_EXT);
+            formats.push_back(GL_COMPRESSED_SRGB_S3TC_DXT1_EXT);
+            formats.push_back(GL_COMPRESSED_SRGB_ALPHA_S3TC_DXT3_EXT);
+            formats.push_back(GL_COMPRESSED_SRGB_ALPHA_S3TC_DXT5_EXT);
+        }
+#endif
+        return formats;
+    }
+
+    bool SupportsCompressedUpload(const std::vector<GLint>& formats, GLenum format)
+    {
+        return std::find(formats.begin(), formats.end(), static_cast<GLint>(format)) != formats.end();
+    }
+
     bool SupportsOpenGLDepthClamp(MGG_GraphicsDevice* device)
     {
         assert(device != nullptr);
@@ -1682,6 +1728,9 @@ namespace
 
         if (texture->isCompressed)
         {
+            if (x % texture->blockWidth != 0 || y % texture->blockHeight != 0)
+                MGGL_FAIL("Invalid texture region", "compressed texture offsets must be block aligned");
+
             mgint mipBlockWidth = GetTextureBlockCount(mipWidth, texture->blockWidth);
             mgint mipBlockHeight = GetTextureBlockCount(mipHeight, texture->blockHeight);
             mgint regionBlockX = x / texture->blockWidth;
@@ -1694,6 +1743,15 @@ namespace
                 || z + resolvedDepth > mipDepth)
             {
                 MGGL_FAIL("Invalid texture region", "requested compressed texture region exceeds texture bounds");
+            }
+
+            // Managed callers round compressed regions up to blocks, including partial edge blocks.
+            resolvedWidth = std::min(resolvedWidth, mipWidth - x);
+            resolvedHeight = std::min(resolvedHeight, mipHeight - y);
+            if ((resolvedWidth % texture->blockWidth != 0 && resolvedWidth != mipWidth)
+                || (resolvedHeight % texture->blockHeight != 0 && resolvedHeight != mipHeight))
+            {
+                MGGL_FAIL("Invalid texture region", "compressed texture extents must be block aligned or span the mip dimension");
             }
         }
     }
@@ -2074,16 +2132,9 @@ namespace
             MGGL_FAIL("Unsupported texture depth", "non-3D textures use depth 1; array textures need separate support");
 
         TextureFormatInfo formatInfo = GetTextureFormatInfo(format);
-        if (formatInfo.isCompressed
-            && ((device->context.functions.CompressedTexImage2D == nullptr)
-                || (device->context.functions.CompressedTexSubImage2D == nullptr)
-                || (device->context.functions.GetCompressedTexImage == nullptr)
-                || !(HasOpenGLExtension("GL_EXT_texture_compression_s3tc")
-                     || HasOpenGLExtension("GL_OES_texture_compression_S3TC")
-                     || HasOpenGLExtension("GL_EXT_texture_compression_dxt3")
-                     || HasOpenGLExtension("GL_EXT_texture_compression_dxt5"))))
+        if (formatInfo.isCompressed && !SupportsCompressedUpload(GetCompressedUploadFormats(device), formatInfo.internalFormat))
         {
-            MGGL_FAIL("Unsupported surface format", "OpenGL compressed textures require S3TC support from the current driver");
+            MGGL_FAIL("Unsupported surface format", "the current context does not support uploading the requested compressed format");
         }
 
         MGG_Texture* texture = new MGG_Texture();
@@ -2182,6 +2233,9 @@ namespace
             mgint mipWidth = GetMipExtent(width, level);
             mgint mipHeight = GetMipExtent(height, level);
             mgint mipDepth = GetMipExtent(depth, level);
+            std::vector<mgbyte> compressedData;
+            if (formatInfo.isCompressed)
+                compressedData.resize(static_cast<size_t>(GetTextureByteCount(texture, mipWidth, mipHeight, 1)));
 
             if (type == MGTextureType::Cube)
             {
@@ -2197,7 +2251,7 @@ namespace
                             mipHeight,
                             0,
                             GetTextureByteCount(texture, mipWidth, mipHeight, 1),
-                            nullptr);
+                            compressedData.data());
                     }
                     else
                     {
@@ -2238,7 +2292,7 @@ namespace
                     mipHeight,
                     0,
                     GetTextureByteCount(texture, mipWidth, mipHeight, 1),
-                    nullptr);
+                    compressedData.data());
             }
             else
             {
@@ -2253,6 +2307,9 @@ namespace
                     texture->pixelType,
                     nullptr);
             }
+
+            if (formatInfo.isCompressed && glGetError() != GL_NO_ERROR)
+                MGGL_FAIL("Compressed texture allocation failed", "OpenGL rejected a compressed mip or cube face allocation");
         }
 
         EndTextureEdit(device, texture, previousActiveTexture, previousBinding);
@@ -2496,18 +2553,20 @@ void MGG_GraphicsDevice_GetCaps(MGG_GraphicsDevice* device, MGG_GraphicsDevice_C
     {
         EnsureContext(device);
 
-        supportsS3tc = (device->context.functions.CompressedTexImage2D != nullptr)
-            && (device->context.functions.CompressedTexSubImage2D != nullptr)
-            && (device->context.functions.GetCompressedTexImage != nullptr)
-            && (HasOpenGLExtension("GL_EXT_texture_compression_s3tc")
-                || HasOpenGLExtension("GL_OES_texture_compression_S3TC")
-                || HasOpenGLExtension("GL_EXT_texture_compression_dxt3")
-                || HasOpenGLExtension("GL_EXT_texture_compression_dxt5"));
-        supportsDxt1 = supportsS3tc || HasOpenGLExtension("GL_EXT_texture_compression_dxt1");
+        const std::vector<GLint> compressedFormats = GetCompressedUploadFormats(device);
+        // Shared content readers use these flags for both linear and sRGB formats.
+        supportsDxt1 = SupportsCompressedUpload(compressedFormats, GL_COMPRESSED_RGB_S3TC_DXT1_EXT)
+            && SupportsCompressedUpload(compressedFormats, GL_COMPRESSED_RGBA_S3TC_DXT1_EXT)
+            && SupportsCompressedUpload(compressedFormats, GL_COMPRESSED_SRGB_S3TC_DXT1_EXT);
+        supportsS3tc = supportsDxt1
+            && SupportsCompressedUpload(compressedFormats, GL_COMPRESSED_RGBA_S3TC_DXT3_EXT)
+            && SupportsCompressedUpload(compressedFormats, GL_COMPRESSED_RGBA_S3TC_DXT5_EXT)
+            && SupportsCompressedUpload(compressedFormats, GL_COMPRESSED_SRGB_ALPHA_S3TC_DXT3_EXT)
+            && SupportsCompressedUpload(compressedFormats, GL_COMPRESSED_SRGB_ALPHA_S3TC_DXT5_EXT);
         supportsDepthClamp = SupportsOpenGLDepthClamp(device);
-        supportsNonPowerOfTwo =
-            HasOpenGLExtension("GL_ARB_texture_non_power_of_two") ||
-            HasOpenGLExtension("GL_OES_texture_npot");
+
+        // NPOT support is part of GL 2.0, our contexts already guarentee it.
+        supportsNonPowerOfTwo = true;
         supportsTextureFilterAnisotropic = HasOpenGLExtension("GL_EXT_texture_filter_anisotropic");
 
         GLint reportedVertexTextureUnits = 0;
@@ -4058,6 +4117,8 @@ void MGG_Texture_SetData(MGG_GraphicsDevice* device, MGG_Texture* texture, mgint
         MGGL_FAIL("Texture upload size mismatch", "byte count does not match the upload region");
 
     mgbyte* uploadData = data;
+    if (texture->isCompressed && glGetError() != GL_NO_ERROR)
+        MGGL_FAIL("Compressed texture upload failed", "an OpenGL error occurred before uploading compressed data");
     GLint unpackAlignment = GetTexturePixelStoreAlignment(texture);
 #if defined(__EMSCRIPTEN__)
     std::vector<mgbyte> convertedData;
@@ -4125,6 +4186,9 @@ void MGG_Texture_SetData(MGG_GraphicsDevice* device, MGG_Texture* texture, mgint
                 normalizedBytes,
                 uploadData);
         }
+
+        if (glGetError() != GL_NO_ERROR)
+            MGGL_FAIL("Compressed texture upload failed", "OpenGL rejected the compressed texture data or region");
     }
     else if (texture->type == MGTextureType::_3D)
     {
