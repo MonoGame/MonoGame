@@ -135,7 +135,6 @@ void OpenGLFunctions::Load()
     GetUniformLocation = reinterpret_cast<PFNGLGETUNIFORMLOCATIONPROC>(LoadProcAddress("glGetUniformLocation"));
     LinkProgram = reinterpret_cast<PFNGLLINKPROGRAMPROC>(LoadProcAddress("glLinkProgram"));
     MapBuffer = reinterpret_cast<PFNGLMAPBUFFERPROC>(LoadOptionalProcAddress("glMapBuffer"));
-    DrawElementsBaseVertex = reinterpret_cast<PFNGLDRAWELEMENTSBASEVERTEXPROC>(LoadOptionalProcAddress("glDrawElementsBaseVertex"));
     RenderbufferStorage = reinterpret_cast<PFNGLRENDERBUFFERSTORAGEPROC>(LoadProcAddress("glRenderbufferStorage"));
     RenderbufferStorageMultisample = reinterpret_cast<PFNGLRENDERBUFFERSTORAGEMULTISAMPLEPROC>(LoadOptionalProcAddress("glRenderbufferStorageMultisample"));
     SamplerParameterf = reinterpret_cast<PFNGLSAMPLERPARAMETERFPROC>(LoadProcAddress("glSamplerParameterf"));

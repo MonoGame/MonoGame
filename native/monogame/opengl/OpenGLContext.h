@@ -67,7 +67,6 @@ struct OpenGLFunctions
     PFNGLDRAWELEMENTSINSTANCEDPROC DrawElementsInstanced = nullptr;
     PFNGLENDQUERYPROC EndQuery = nullptr;
     PFNGLGENVERTEXARRAYSPROC GenVertexArrays = nullptr;
-    PFNGLDRAWELEMENTSBASEVERTEXPROC DrawElementsBaseVertex = nullptr;
     PFNGLENABLEVERTEXATTRIBARRAYPROC EnableVertexAttribArray = nullptr;
     MGGLGETTEXIMAGEPROC GetTexImage = nullptr;
     PFNGLFRAMEBUFFERRENDERBUFFERPROC FramebufferRenderbuffer = nullptr;

@@ -26,7 +26,6 @@ function getCanvasResizePolicy(value) {
  * The configuration resolved from package defaults and project settings.
  *
  * @typedef {object} BrowserHostConfiguration
- * @property {string} applicationName
  * @property {HTMLCanvasElement} canvas
  * @property {HTMLDialogElement | null} keyboardDialog
  * @property {string} contentBaseUri
@@ -51,7 +50,6 @@ function getCanvasResizePolicy(value) {
  * @property {HTMLElement} root Element that contains the game canvas.
  * @property {HTMLCanvasElement} canvas Canvas supplied to the browser runtime.
  * @property {HTMLDialogElement=} keyboardDialog Application owned dialog inside root with marked title, description, input, and cancel elements and a form. Omit when keyboard dialogs are unsupported.
- * @property {string=} applicationName Application name used for host diagnostics.
  * @property {string=} runtimeScriptUri URI of the .NET browser runtime script.
  * @property {string=} contentBaseUri Base URI used to resolve published content.
  * @property {string=} startupContentManifestUri URI of the startup content manifest.
@@ -142,7 +140,6 @@ class MonoGameWebHost {
 
         const canvasResizePolicy = options.canvasResizePolicy ?? CanvasResizePolicy.Adaptive;
         const config = {
-            applicationName: options.applicationName ?? "MonoGame.Web",
             canvas,
             contentBaseUri: options.contentBaseUri ?? "./",
             startupContentManifestUri: options.startupContentManifestUri ?? "_monogame/content-manifest.txt",
@@ -341,7 +338,7 @@ class MonoGameWebHost {
             return;
         }
 
-        const browserGameExports = this.resolveExportPath(exportsRoot, "MonoGame.Runtime.Browser.WebGL2.BrowserGame");
+        const browserGameExports = exportsRoot?.MonoGame?.Runtime?.Browser?.WebGL2?.BrowserGame ?? null;
         if (browserGameExports == null) {
             throw new BrowserHostError(HostStage.ManagedExports, "browser_game_exports_missing", "The browser runtime does not expose BrowserGame.");
         }
@@ -388,26 +385,6 @@ class MonoGameWebHost {
         }
 
         return mainAssemblyName;
-    }
-
-    /**
-     * Returns a managed export from its dot separated path.
-     *
-     * @param {object} root Managed exports root.
-     * @param {string} path Export path to resolve.
-     * @returns {object | null} Requested export, or `null` when the path is missing.
-     */
-    resolveExportPath(root, path) {
-        let current = root;
-        for (const part of path.split(".")) {
-            if (current == null) {
-                return null;
-            }
-
-            current = current[part];
-        }
-
-        return current ?? null;
     }
 
     /** Reports the first frame completed by the Emscripten-managed loop. */
@@ -570,6 +547,5 @@ globalThis.MonoGameWebHost = {
         }
 
         await activeHost.content.stageAssetPackAsync(assetPackName);
-    },
-    stageContentManifestAsync: (manifestUri) => activeHost?.content.stageContentManifestAsync(manifestUri)
+    }
 };

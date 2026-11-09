@@ -11,7 +11,7 @@ import {
 const MaximumStagedDropBytes = 64 * 1024 * 1024;
 
 /**
- * Handles browser canvas, lifecycle, fullscreen, and motion events for the native runtime.
+ * Handles browser canvas, lifecycle, fullscreen, and file drop events for the native runtime.
  */
 export class BrowserWindow {
     /**
@@ -90,7 +90,7 @@ export class BrowserWindow {
             return;
         }
 
-        this.host.native.setPointerLockEnabled(this.host.config.pointerLockEnabled ? 1 : 0);
+        this.host.native.setPointerLockEnabled(1);
     }
 
     /** Prevents SDL browser callbacks from overriding Adaptive canvas sizing. */
@@ -198,7 +198,6 @@ export class BrowserWindow {
     /**
      * Forwards page and window focus changes to the native runtime.
      *
-     * @throws {BrowserHostError} When the runtime cannot receive focus changes.
      */
     observeBrowserLifecycle() {
         const notifyFocus = (focused) => this.host.native?.notifyFocusChange(focused ? 1 : 0);
@@ -215,7 +214,6 @@ export class BrowserWindow {
     /**
      * Forwards confirmed browser fullscreen changes and request failures.
      *
-     * @throws {BrowserHostError} When the runtime cannot receive fullscreen changes.
      */
     observeFullscreen() {
         const reportFullscreenChange = () => {
@@ -236,7 +234,6 @@ export class BrowserWindow {
      * Stages browser-dropped files in the Emscripten filesystem and forwards their paths through the native event queue.
      *
      * @param {{ mkdirTree: Function, rmdir: Function, unlink: Function, writeFile: Function }} fileSystem Emscripten filesystem.
-     * @throws {BrowserHostError} When the runtime cannot receive browser file drops.
      */
     observeFileDrop(fileSystem) {
         this.dropFileSystem = fileSystem;

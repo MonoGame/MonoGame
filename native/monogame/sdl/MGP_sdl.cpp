@@ -847,6 +847,7 @@ mgbyte MGP_Platform_PollEvent(MGP_Platform* platform, MGP_Event& event_)
             }
 
             case SDL_WINDOWEVENT_SIZE_CHANGED:
+            {
 #if defined(__EMSCRIPTEN__)
                 // A programmatic SDL_SetWindowSize uses SIZE_CHANGED. It remains
                 // independent from host-managed browser layout resizing.
@@ -862,7 +863,7 @@ mgbyte MGP_Platform_PollEvent(MGP_Platform* platform, MGP_Event& event_)
                 event_.Window.Data1 = ev.window.data1;
                 event_.Window.Data2 = ev.window.data2;
                 return true;
-                break;
+            }
             case SDL_WINDOWEVENT_FOCUS_GAINED:
 #if defined(__EMSCRIPTEN__)
                 // BrowserWindow owns the browser focus lifecycle. SDL still
