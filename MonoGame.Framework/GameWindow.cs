@@ -154,7 +154,10 @@ namespace Microsoft.Xna.Framework
         /// This event is raised when user drops a file into the game window
         /// </summary>
         /// <remarks>
-        /// This event is only supported on desktop platforms.
+        /// This event is only supported on desktop and browser platforms.
+		/// On browser platforms, paths identify temporary files copied into the
+		/// Emscripten virtual filesystem. Copy a file's contents from the event
+		/// handler when they must be retained after the drop completes.
         /// </remarks>
         public event EventHandler<FileDropEventArgs> FileDrop;
 

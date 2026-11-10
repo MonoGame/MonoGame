@@ -191,6 +191,11 @@ public partial class GraphicsDevice
         }
     }
 
+    internal unsafe void PlatformOnWindowResized()
+    {
+        OnPresentationChanged();
+    }
+
     private unsafe void UpdateBackBufferMultiSampleCount(int requestedMultiSampleCount)
     {
         int actualMultiSampleCount = MGG.GraphicsDevice_GetBackBufferMultiSampleCount(Handle);

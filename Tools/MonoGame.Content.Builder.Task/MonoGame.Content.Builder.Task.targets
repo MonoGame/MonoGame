@@ -203,7 +203,7 @@
     DependsOnTargets="RunContentBuilder"
     Condition="('$(EnableMGCBItems)' == 'true' OR '@(MonoGameContentReference)' != '') And '$(DesignTimeBuild)' != 'true'"
     Outputs="%(ExtraContent.RecursiveDir)%(ExtraContent.Filename)%(ExtraContent.Extension)"
-    BeforeTargets="BeforeCompile"
+    BeforeTargets="BeforeCompile;ResolveProjectStaticWebAssets;ResolveCurrentProjectStaticWebAssetsInputs"
     AfterTargets="ResolveProjectReferences">
 
     <!-- Call CreateItem on each piece of ExtraContent so it's easy to switch the item type by platform. -->
@@ -211,10 +211,31 @@
       Include="%(ExtraContent.FullPath)"
       AdditionalMetadata="Link=$(PlatformResourcePrefix)%(ExtraContent.ContentDir)%(ExtraContent.RecursiveDir)%(ExtraContent.Filename)%(ExtraContent.Extension);CopyToOutputDirectory=PreserveNewest"
       Condition="'%(ExtraContent.Filename)' != ''">
-      <Output TaskParameter="Include" ItemName="Content" Condition="'$(MonoGamePlatform)' != 'Android' And '$(MonoGamePlatform)' != 'iOS' And '$(MonoGamePlatform)' != 'MacOSX'" />
+      <Output TaskParameter="Include" ItemName="Content" Condition="'$(MonoGamePlatform)' != 'Android' And '$(MonoGamePlatform)' != 'iOS' And '$(MonoGamePlatform)' != 'MacOSX' And '$(MonoGamePlatform)' != 'WebGL2'" />
       <Output TaskParameter="Include" ItemName="BundleResource" Condition="'$(MonoGamePlatform)' == 'MacOSX' Or '$(MonoGamePlatform)' == 'iOS'" />
       <Output TaskParameter="Include" ItemName="AndroidAsset" Condition="'$(MonoGamePlatform)' == 'Android'" />
     </CreateItem>
+
+    <!-- Browser static-asset discovery requires MGCB output under wwwroot, while MGCB retains its normal output directory. -->
+    <MakeDir
+      Directories="@(ExtraContent->'$(MSBuildProjectDirectory)\wwwroot\%(ContentDir)%(RecursiveDir)')"
+      Condition="'$(MonoGamePlatform)' == 'WebGL2'" />
+
+    <Copy
+      SourceFiles="@(ExtraContent)"
+      DestinationFiles="@(ExtraContent->'$(MSBuildProjectDirectory)\wwwroot\%(ContentDir)%(RecursiveDir)%(Filename)%(Extension)')"
+      SkipUnchangedFiles="true"
+      Condition="'$(MonoGamePlatform)' == 'WebGL2'" />
+
+    <ItemGroup Condition="'$(MonoGamePlatform)' == 'WebGL2'">
+      <_WebContent Include="@(ExtraContent)">
+        <StaticWebAssetPath>$([System.String]::Copy('wwwroot\%(ContentDir)%(RecursiveDir)%(Filename)%(Extension)').Replace('/','\'))</StaticWebAssetPath>
+      </_WebContent>
+      <Content Remove="@(_WebContent->'%(StaticWebAssetPath)')" />
+      <Content Include="@(_WebContent->'%(StaticWebAssetPath)')">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+    </ItemGroup>
 
   </Target>
 

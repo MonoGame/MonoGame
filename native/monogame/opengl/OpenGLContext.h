@@ -1,3 +1,7 @@
+// MonoGame - Copyright (C) MonoGame Foundation, Inc
+// This file is subject to the terms and conditions defined in
+// file 'LICENSE.txt', which is part of this source code package.
+
 #pragma once
 
 #include "api_enums.h"
@@ -7,11 +11,21 @@
 #include <SDL_opengl.h>
 #include <SDL_opengl_glext.h>
 
-// SDL declares glGetTexImage here, but this header set does not expose PFNGLGETTEXIMAGEPROC.
 using MGGLCOMPRESSEDTEXIMAGE2DPROC = decltype(&glCompressedTexImage2D);
 using MGGLCOMPRESSEDTEXSUBIMAGE2DPROC = decltype(&glCompressedTexSubImage2D);
+#if defined(__EMSCRIPTEN__)
+using MGGLGETTEXIMAGEPROC = void (*)(GLenum target, GLint level, GLenum format, GLenum type, void* pixels);
+using MGGLGETCOMPRESSEDTEXIMAGEPROC = void (*)(GLenum target, GLint level, void* img);
+
+// Emscripten's SDL OpenGL headers omit these WebGL2 declarations. Direct calls
+// retain the procedures in the final browser binary.
+extern "C" void glFramebufferTextureLayer(GLenum target, GLenum attachment, GLuint texture, GLint level, GLint layer);
+extern "C" void glGetBufferSubData(GLenum target, GLintptr offset, GLsizeiptr size, void* data);
+#else
+// SDL declares glGetTexImage, but its headers do not expose PFNGLGETTEXIMAGEPROC.
 using MGGLGETTEXIMAGEPROC = decltype(&glGetTexImage);
 using MGGLGETCOMPRESSEDTEXIMAGEPROC = decltype(&glGetCompressedTexImage);
+#endif
 
 struct OpenGLFunctions
 {
@@ -19,7 +33,7 @@ struct OpenGLFunctions
     PFNGLATTACHSHADERPROC AttachShader = nullptr;
     PFNGLBINDATTRIBLOCATIONPROC BindAttribLocation = nullptr;
     PFNGLBLENDCOLORPROC BlendColor = nullptr;
-    PFNGLBLENDEQUATIONSEPARATEEXTPROC BlendEquationSeparate = nullptr;
+    PFNGLBLENDEQUATIONSEPARATEPROC BlendEquationSeparate = nullptr;
     PFNGLBLENDEQUATIONSEPARATEIPROC BlendEquationSeparatei = nullptr;
     PFNGLBLENDFUNCSEPARATEPROC BlendFuncSeparate = nullptr;
     PFNGLBLENDFUNCSEPARATEIPROC BlendFuncSeparatei = nullptr;
@@ -53,7 +67,6 @@ struct OpenGLFunctions
     PFNGLDRAWELEMENTSINSTANCEDPROC DrawElementsInstanced = nullptr;
     PFNGLENDQUERYPROC EndQuery = nullptr;
     PFNGLGENVERTEXARRAYSPROC GenVertexArrays = nullptr;
-    PFNGLDRAWELEMENTSBASEVERTEXPROC DrawElementsBaseVertex = nullptr;
     PFNGLENABLEVERTEXATTRIBARRAYPROC EnableVertexAttribArray = nullptr;
     MGGLGETTEXIMAGEPROC GetTexImage = nullptr;
     PFNGLFRAMEBUFFERRENDERBUFFERPROC FramebufferRenderbuffer = nullptr;

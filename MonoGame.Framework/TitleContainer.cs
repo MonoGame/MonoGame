@@ -16,6 +16,7 @@ namespace Microsoft.Xna.Framework
     public static partial class TitleContainer
     {
         static partial void PlatformInit();
+        static partial void PlatformCheckStreamPath(string name);
 
         static TitleContainer()
         {
@@ -43,6 +44,8 @@ namespace Microsoft.Xna.Framework
             if (string.IsNullOrEmpty(name))
                 throw new ArgumentNullException(nameof(name));
 
+            PlatformCheckStreamPath(name);
+
             // We do not accept absolute paths here.
             if (Path.IsPathRooted(name))
                 throw new ArgumentException("Invalid filename. TitleContainer.OpenStream requires a relative path.", name);
@@ -51,7 +54,8 @@ namespace Microsoft.Xna.Framework
             {
                 var task = Task.Run(() => ContentProvider.FetchContent(name));
                 task.Wait();
-                var response = task.Result;
+                bool response = task.Result;
+
                 if (!response)
                 {
                     throw new Exception($"Content client failed to get a valid response for content: {name}");
@@ -99,9 +103,10 @@ namespace Microsoft.Xna.Framework
                 return null;
             }
 
-            var safeName = NormalizeRelativePath(name);
             try
             {
+                PlatformCheckStreamPath(name);
+                var safeName = NormalizeRelativePath(name);
                 return PlatformOpenStream(safeName);
             }
             catch { }
