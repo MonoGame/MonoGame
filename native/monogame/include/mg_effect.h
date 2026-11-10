@@ -34,6 +34,7 @@ void MGG_EffectResource_GetBytecode(const char* name, mgbyte * &bytecode, mgint 
 {
 	MG_HANDLE_BUILTIN_EFFECT(AlphaTestEffect, bytecode, size)
 	else MG_HANDLE_BUILTIN_EFFECT(BasicEffect, bytecode, size)
+	else MG_HANDLE_BUILTIN_EFFECT(DistanceFieldSpriteEffect, bytecode, size)
 	else MG_HANDLE_BUILTIN_EFFECT(DualTextureEffect, bytecode, size)
 	else MG_HANDLE_BUILTIN_EFFECT(EnvironmentMapEffect, bytecode, size)
 	else MG_HANDLE_BUILTIN_EFFECT(SkinnedEffect, bytecode, size)
