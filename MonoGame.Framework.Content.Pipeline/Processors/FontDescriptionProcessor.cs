@@ -102,7 +102,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
                 {
                     foreach (GlyphData glyph in glyphData)
                     {
-                        var src    = glyph.Subrect;
+                        var src    = glyph.SubRect;
                         int newW   = src.Width  + 2 * sdfPad;
                         int newH   = src.Height + 2 * sdfPad;
                         // PixelBitmapContent is zero-initialised (transparent black).
@@ -110,7 +110,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
                         BitmapContent.Copy(glyph.Bitmap, src,
                             padded, new Rectangle(sdfPad, sdfPad, src.Width, src.Height));
                         glyph.Bitmap  = padded;
-                        glyph.Subrect = new Rectangle(0, 0, newW, newH);
+                        glyph.SubRect = new Rectangle(0, 0, newW, newH);
                         // The padded quad's top-left is sdfPad pixels earlier in each axis;
                         // shift YOffset up so Cropping.Y keeps the glyph body on the baseline.
                         glyph.YOffset -= sdfPad;
