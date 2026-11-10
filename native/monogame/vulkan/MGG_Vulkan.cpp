@@ -8,6 +8,7 @@
 
 #include "AlphaTestEffect.vk.mgfxo.h"
 #include "BasicEffect.vk.mgfxo.h"
+#include "DistanceFieldSpriteEffect.vk.mgfxo.h"
 #include "DualTextureEffect.vk.mgfxo.h"
 #include "EnvironmentMapEffect.vk.mgfxo.h"
 #include "SkinnedEffect.vk.mgfxo.h"

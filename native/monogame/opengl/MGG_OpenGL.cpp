@@ -3,6 +3,7 @@
 #include "mg_common.h"
 #include "AlphaTestEffect.ogl.mgfxo.h"
 #include "BasicEffect.ogl.mgfxo.h"
+#include "DistanceFieldSpriteEffect.ogl.mgfxo.h"
 #include "DualTextureEffect.ogl.mgfxo.h"
 #include "EnvironmentMapEffect.ogl.mgfxo.h"
 #include "SkinnedEffect.ogl.mgfxo.h"

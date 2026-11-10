@@ -9,6 +9,7 @@
 #if defined(MG_XBOXONE)
 #include "AlphaTestEffect.xb.mgfxo.h"
 #include "BasicEffect.xb.mgfxo.h"
+#include "DistanceFieldSpriteEffect.xb.mgfxo.h"
 #include "DualTextureEffect.xb.mgfxo.h"
 #include "EnvironmentMapEffect.xb.mgfxo.h"
 #include "SkinnedEffect.xb.mgfxo.h"
@@ -16,6 +17,7 @@
 #elif defined(MG_XBOXSERIES)
 #include "AlphaTestEffect.xs.mgfxo.h"
 #include "BasicEffect.xs.mgfxo.h"
+#include "DistanceFieldSpriteEffect.xs.mgfxo.h"
 #include "DualTextureEffect.xs.mgfxo.h"
 #include "EnvironmentMapEffect.xs.mgfxo.h"
 #include "SkinnedEffect.xs.mgfxo.h"
@@ -23,6 +25,7 @@
 #else
 #include "AlphaTestEffect.dx12.mgfxo.h"
 #include "BasicEffect.dx12.mgfxo.h"
+#include "DistanceFieldSpriteEffect.dx12.mgfxo.h"
 #include "DualTextureEffect.dx12.mgfxo.h"
 #include "EnvironmentMapEffect.dx12.mgfxo.h"
 #include "SkinnedEffect.dx12.mgfxo.h"
