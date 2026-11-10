@@ -11,6 +11,15 @@ namespace MonoGame.Tests.Graphics
     [RunOnUiTestFixture]
     class Texture3DTest : GraphicsDeviceTestFixtureBase
     {
+        [SetUp]
+        public override void SetUp()
+        {
+            base.SetUp();
+
+            if (!gd.GraphicsCapabilities.SupportsMapBuffer)
+                Assert.Ignore("Texture3D is not supported on OpenGL ES versions below 3.0.");
+        }
+
         [Test]
         [TestCase(1, 1, 1)]
         [TestCase(8, 8, 8)]
