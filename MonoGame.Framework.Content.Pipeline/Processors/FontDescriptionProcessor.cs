@@ -144,7 +144,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
                     }
                     else
                     {
-                        float width = texRect.Width;
+                        float width = texRect.Width - 2 * sdfPad;
 
                         // Whitespace glyphs can carry advance entirely in their metrics.
                         // Preserve that advance when kerning is disabled so spacing matches XNA.
@@ -153,7 +153,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
                             width = glyph.Data.XAdvance;
                         }
 
-                        output.Kerning.Add(new Vector3(0, texRect.Width - 2 * sdfPad, 0));
+                        output.Kerning.Add(new Vector3(0, width, 0));
                     }
                 }
 
