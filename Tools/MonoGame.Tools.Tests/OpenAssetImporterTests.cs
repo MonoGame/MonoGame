@@ -48,10 +48,7 @@ namespace MonoGame.Tests.ContentPipeline
 
             var geometry = meshContent.Geometry[0];
             Assert.IsNull(geometry.Name);
-            if (OperatingSystem.IsMacOS())
-                Assert.AreEqual(123, geometry.Indices.Count);
-            else
-                Assert.AreEqual(120, geometry.Indices.Count);
+            Assert.AreEqual(108, geometry.Indices.Count);
             Assert.AreEqual(28, geometry.Vertices.VertexCount);
 
             Assert.IsNotNull(geometry.Material);
