@@ -40,14 +40,18 @@ namespace MonoGame.Tests.ContentPipeline
             float M41,
             float M42,
             float M43,
-            float M44);
-
-        private string AnimationTransformSnapshotToString(AnimationTransformSnapshot snapshot)
+            float M44)
         {
-            return "{M11:" + snapshot.M11 + " M12:" + snapshot.M12 + " M13:" + snapshot.M13 + " M14:" + snapshot.M14 + "}"
-                + " {M21:" + snapshot.M21 + " M22:" + snapshot.M22 + " M23:" + snapshot.M23 + " M24:" + snapshot.M24 + "}"
-                + " {M31:" + snapshot.M31 + " M32:" + snapshot.M32 + " M33:" + snapshot.M33 + " M34:" + snapshot.M34 + "}"
-                + " {M41:" + snapshot.M41 + " M42:" + snapshot.M42 + " M43:" + snapshot.M43 + " M44:" + snapshot.M44 + "}";
+            public Matrix ToMatrix()
+            {
+                return new Matrix()
+                {
+                    M11 = this.M11,M12 = this.M12,M13 = this.M13,M14 = this.M14,
+                    M21 = this.M21,M22 = this.M22,M23 = this.M23,M24 = this.M14,
+                    M31 = this.M31,M32 = this.M32,M33 = this.M33,M34 = this.M14,
+                    M41 = this.M41,M42 = this.M42,M43 = this.M43,M44 = this.M14,
+                };
+            }
         }
 
         private void SaveAnimations(string file, IEnumerable<NodeContent> allnodes)
@@ -149,25 +153,11 @@ namespace MonoGame.Tests.ContentPipeline
                         foreach (var kf in keyframes)
                         {
                             var snapshotKf = snapshotKeyframes[i];
+                            var transform = snapshotKf.Transform.ToMatrix();
                             Assert.AreEqual(snapshotKf.TimeTicks, kf.Time.Ticks, $"Animation keyframe time mismatch for: {node.Name}.{animationName}.{nodeName}");
-                            if (snapshotKf.Transform.M11 != kf.Transform.M11 ||
-                                snapshotKf.Transform.M12 != kf.Transform.M12 ||
-                                snapshotKf.Transform.M13 != kf.Transform.M13 ||
-                                snapshotKf.Transform.M14 != kf.Transform.M14 ||
-                                snapshotKf.Transform.M21 != kf.Transform.M21 ||
-                                snapshotKf.Transform.M22 != kf.Transform.M22 ||
-                                snapshotKf.Transform.M23 != kf.Transform.M23 ||
-                                snapshotKf.Transform.M24 != kf.Transform.M24 ||
-                                snapshotKf.Transform.M31 != kf.Transform.M31 ||
-                                snapshotKf.Transform.M32 != kf.Transform.M32 ||
-                                snapshotKf.Transform.M33 != kf.Transform.M33 ||
-                                snapshotKf.Transform.M34 != kf.Transform.M34 ||
-                                snapshotKf.Transform.M41 != kf.Transform.M41 ||
-                                snapshotKf.Transform.M42 != kf.Transform.M42 ||
-                                snapshotKf.Transform.M43 != kf.Transform.M43 ||
-                                snapshotKf.Transform.M44 != kf.Transform.M44)
+                            if (MatrixComparer.Epsilon.Equals(transform, kf.Transform))
                             {
-                                Assert.Fail($"Animation keyframe transform mismatch for: {node.Name}.{animationName}.{nodeName} {AnimationTransformSnapshotToString(snapshotKf.Transform)} != {kf.Transform.ToString()}");
+                                Assert.Fail($"Animation keyframe transform mismatch for: {node.Name}.{animationName}.{nodeName} {transform} != {kf.Transform}");
                             }
                             i++;
                         }
