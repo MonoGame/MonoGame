@@ -256,6 +256,14 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
         /// </summary>
         public bool PreservePivots {get; set; } = true;
 
+        /// <summary>
+        /// Gets or Sets if we enable or disable primitive area checks.
+        /// Disable this is your model is small and you are finding that 
+        /// faces are being removed.
+        /// <defaultValue>true</defaultValue>
+        /// </summary>
+        public bool RemoveDegeneratePrimitivesCheckArea { get; set; } = true;
+
         public override NodeContent Import(string filename, ContentImporterContext context)
         {
             ArgumentNullException.ThrowIfNull(filename);
@@ -311,7 +319,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
             // This flag is very important when PostProcessSteps.FindDegenerates is used
             // because FindDegenerates converts degenerate triangles to points and lines!
             importer.SetConfig(new Assimp.Configs.RemoveDegeneratePrimitivesConfig(true));
-            importer.SetConfig(new Assimp.Configs.RemoveDegeneratePrimitivesCheckAreaConfig(false));
+            importer.SetConfig(new Assimp.Configs.RemoveDegeneratePrimitivesCheckAreaConfig(RemoveDegeneratePrimitivesCheckArea));
 
             // FBXIgnoreUpDirectionConfig(true) can be set to ignore the up direction for custom axis.
             importer.SetConfig(new Assimp.Configs.FBXIgnoreUpDirectionConfig(IgnoreFbxUpDirection));
