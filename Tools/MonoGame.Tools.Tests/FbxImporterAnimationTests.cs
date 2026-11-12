@@ -42,6 +42,14 @@ namespace MonoGame.Tests.ContentPipeline
             float M43,
             float M44);
 
+        private string AnimationTransformSnapshotToString(AnimationTransformSnapshot snapshot)
+        {
+            return "{M11:" + snapshot.M11 + " M12:" + snapshot.M12 + " M13:" + snapshot.M13 + " M14:" + snapshot.M14 + "}"
+                + " {M21:" + snapshot.M21 + " M22:" + snapshot.M22 + " M23:" + snapshot.M23 + " M24:" + snapshot.M24 + "}"
+                + " {M31:" + snapshot.M31 + " M32:" + snapshot.M32 + " M33:" + snapshot.M33 + " M34:" + snapshot.M34 + "}"
+                + " {M41:" + snapshot.M41 + " M42:" + snapshot.M42 + " M43:" + snapshot.M43 + " M44:" + snapshot.M44 + "}";
+        }
+
         private void SaveAnimations(string file, IEnumerable<NodeContent> allnodes)
         {
             var animations = new SortedDictionary<string, AnimationSnapshotEntry>(StringComparer.Ordinal);
@@ -159,7 +167,7 @@ namespace MonoGame.Tests.ContentPipeline
                                 snapshotKf.Transform.M43 != kf.Transform.M43 ||
                                 snapshotKf.Transform.M44 != kf.Transform.M44)
                             {
-                                Assert.Fail($"Animation keyframe transform mismatch for: {node.Name}.{animationName}.{nodeName}");
+                                Assert.Fail($"Animation keyframe transform mismatch for: {node.Name}.{animationName}.{nodeName} {AnimationTransformSnapshotToString(snapshotKf.Transform)} != {kf.Transform.ToString()}");
                             }
                             i++;
                         }
