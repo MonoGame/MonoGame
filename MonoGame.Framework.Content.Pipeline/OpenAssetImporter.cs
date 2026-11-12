@@ -258,7 +258,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
 
         /// <summary>
         /// Gets or Sets if we enable or disable primitive area checks.
-        /// Disable this is your model is small and you are finding that 
+        /// Disable this if your model is small and you are finding that 
         /// faces are being removed.
         /// <defaultValue>true</defaultValue>
         /// </summary>
