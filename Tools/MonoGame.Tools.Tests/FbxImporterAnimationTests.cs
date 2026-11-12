@@ -92,6 +92,7 @@ namespace MonoGame.Tests.ContentPipeline
         [TestCase("Assets/Models/run.fbx", "Assets/Models/run.json")]
         [TestCase("Assets/Models/idle.fbx", "Assets/Models/idle.json")]
         [TestCase("Assets/Models/jump.fbx", "Assets/Models/jump.json")]
+        [TestCase("Assets/Models/Dude/dude_2011.fbx", "Assets/Models/Dude/dude.json")]
         public void CheckImportedAnimations(string fbx, string json)
         {
             var context = new TestImporterContext("TestObj", "TestBin");
