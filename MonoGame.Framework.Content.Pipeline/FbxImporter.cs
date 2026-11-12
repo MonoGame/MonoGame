@@ -22,6 +22,14 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
         /// Gets or Sets if the Pivots for an FBX file are preserved or not.
         /// </summary>
         public bool PreservePivots { get; set; } = true; 
+
+        /// <summary>
+        /// Gets or Sets if we enable or disable primitive area checks.
+        /// Disable this if your model is small and you are finding that 
+        /// faces are being removed.
+        /// </summary>
+        public bool RemoveDegeneratePrimitivesCheckArea { get; set; } = true;
+
         /// <inheritdoc/>
         public override NodeContent Import(string filename, ContentImporterContext context)
         {
@@ -31,7 +39,8 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
             var importer = new OpenAssetImporter("FbxImporter", true)
             {
                 PreservePivots = this.PreservePivots,
-                IgnoreFbxUpDirection = this.IgnoreFbxUpDirection
+                IgnoreFbxUpDirection = this.IgnoreFbxUpDirection,
+                RemoveDegeneratePrimitivesCheckArea = this.RemoveDegeneratePrimitivesCheckArea,
             };
             return importer.Import(filename, context);
         }
