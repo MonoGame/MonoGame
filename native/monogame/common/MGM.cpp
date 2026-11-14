@@ -320,16 +320,89 @@ struct MGM_Video
 {
 	MG_Asset* assetHandle = nullptr;
 	mglong assetLength = 0;
-	nestegg* container = nullptr;
 	const char* filepath = nullptr;
 	MGM_VideoDecoder* videoDecoder = nullptr;
 	MGM_AudioDecoder* audioDecoder = nullptr;
+	MGM_VideoContainer* videoContainer = nullptr;
 	mgbool looped = false;
 	mgulong duration = 0;
 	MGM_AudioDecoderInfo audioInfo;
 	MGM_VideoDecoderInfo videoInfo;
 	std::thread decoderThread;
 };
+
+struct MGM_VideoContainer_Webm : MGM_VideoContainer
+{
+
+	nestegg* context;
+
+	virtual ~MGM_VideoContainer_Webm();
+	virtual void Initialize(MG_Asset* asset);
+	virtual bool Decode(mgbyte*& buffer, mguint& size, MGV_TYPE& type);
+};
+
+static int64_t
+nestegg_io_read(void * p, size_t length, void * asset)
+{
+	assert(asset != nullptr);
+	MG_Asset* handle = (MG_Asset*)asset;
+	return MG_Asset_Read(handle, (mgbyte*)p, length);
+}
+
+static int
+nestegg_io_seek(int64_t offset, int whence, void * asset)
+{
+	assert(asset != nullptr);
+	MG_Asset* handle = (MG_Asset*)asset;
+	return MG_Asset_Seek(handle, offset, whence);
+}
+
+static int64_t
+nestegg_io_tell(void * asset)
+{
+	assert(asset != nullptr);
+	MG_Asset* handle = (MG_Asset*)asset;
+	return MG_Asset_Tell(handle);
+}
+
+MGM_VideoContainer_Webm::~MGM_VideoContainer_Webm()
+{
+	nestegg_destroy(context);
+}
+
+void MGM_VideoContainer_Webm::Initialize(MG_Asset* asset)
+{
+
+	nestegg_io io = {
+		nestegg_io_read,
+		nestegg_io_seek,
+		nestegg_io_tell,
+		asset
+		};
+	nestegg_init(&context, io, NULL, 0);
+}
+
+bool MGM_VideoContainer_Webm::Decode(mgbyte*& buffer, mguint& size, MGV_TYPE& type)
+{
+	nestegg_packet* packet;
+	size = 0;
+	unsigned int track = 0; 
+	type = MGV_TYPE::VIDEO;
+	if (nestegg_read_packet(context, &packet) == -1)
+	{
+		return false;
+	}
+	nestegg_packet_track(packet, &track);
+	int eggTrackType = nestegg_track_type(context, track);
+	switch (eggTrackType)
+	{
+		case NESTEGG_TRACK_AUDIO:
+			type = MGV_TYPE::AuDIO;
+		case NESTEGG_TRACK_VIDEO:
+			type = MGV_TYPE::VIDEO;
+	}
+	return false;
+}
 
 struct MGM_VideoDecoder_Dav1d : MGM_VideoDecoder
 {
@@ -629,30 +702,6 @@ MGG_Texture* MGM_VideoDecoder_Decode(MGM_VideoDecoder* decoder)
 	return decoder->Decode();
 }
 
-static int64_t
-nestegg_io_read(void * p, size_t length, void * asset)
-{
-	assert(asset != nullptr);
-	MG_Asset* handle = (MG_Asset*)asset;
-	return MG_Asset_Read(handle, (mgbyte*)p, length);
-}
-
-static int
-nestegg_io_seek(int64_t offset, int whence, void * asset)
-{
-	assert(asset != nullptr);
-	MG_Asset* handle = (MG_Asset*)asset;
-	return MG_Asset_Seek(handle, offset, whence);
-}
-
-static int64_t
-nestegg_io_tell(void * asset)
-{
-	assert(asset != nullptr);
-	MG_Asset* handle = (MG_Asset*)asset;
-	return MG_Asset_Tell(handle);
-}
-
 // Decodes the video and audio stream in a separate thread.
 static void MGM_Video_DecodeStream(MGM_Video* video, mgulong generation)
 {
@@ -663,22 +712,33 @@ static void MGM_Video_DecodeStream(MGM_Video* video, mgulong generation)
 		MG_Asset_Close(video->assetHandle);
 		return;
 	}
-	nestegg_io io = {
-		nestegg_io_read,
-		nestegg_io_seek,
-		nestegg_io_tell,
-		video->assetHandle
-		};
-	nestegg_init(&video->container, io, nullptr, -1);
+	video->videoContainer->Initialize(video->assetHandle);
 	while (true)
 	{
-		nestegg_packet * pkt;
-		if (nestegg_read_packet(video->container, &pkt) != 0)
+		mguint size = 0;
+		mgbyte* buffer = nullptr;
+		MGV_TYPE type;
+		bool finished = video->videoContainer->Decode(buffer, size, type);
+		if (finished)
 		{
-			break;
+			return;
 		}
+		/*
+		if (frame.type == MGV_TYPE_VIDEO)
+		{
+		}
+		else if (frame.type == MGV_TYPE_AuDIO)
+		{
+		}
+		else {
+			/// error
+		}
+
+		
+		
+		*/
 	}
-	nestegg_destroy(video->container);
+	video->videoContainer->~MGM_VideoContainer();
 	MG_Asset_Close(video->assetHandle);
 }
 

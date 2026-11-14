@@ -3,9 +3,11 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 #include "mg_common.h"
+#include "api_MG_Asset.h"
 
 struct MGM_AudioDecoderInfo;
 struct MGG_Texture;
+enum class MGV_TYPE : mguint { VIDEO = 0, AuDIO = 1 };
 
 
 /// <summary>
@@ -17,6 +19,15 @@ struct MGM_AudioDecoder
 	virtual void Initialize(const char* filepath, MGM_AudioDecoderInfo& info) = 0;
 	virtual void SetPosition(mgulong timeMs) = 0;
 	virtual bool Decode(mgbyte*& buffer, mguint& size) = 0;
+};
+
+/// <summary>
+/// </summary>
+struct MGM_VideoContainer
+{
+	virtual ~MGM_VideoContainer() {}
+	virtual void Initialize(MG_Asset* asset) = 0;
+	virtual bool Decode(mgbyte*& buffer, mguint& size, MGV_TYPE& type) = 0;
 };
 
 
