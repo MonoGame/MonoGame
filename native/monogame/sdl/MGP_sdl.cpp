@@ -779,7 +779,7 @@ static mgbyte MGP_Window_CreateNativeWindowInternal(
     mgint& width,
     mgint& height,
     const char* title,
-    const MGP_WindowCreateInfo* windowCreateInfo)
+    MGP_WindowCreateInfo* windowCreateInfo)
 {
 	assert(window!= nullptr);
     assert(width > 0);
@@ -857,7 +857,7 @@ MGP_Window* MGP_Window_Create(
     mgint& width,
     mgint& height,
     const char* title,
-    const MGP_WindowCreateInfo* windowCreateInfo)
+    MGP_WindowCreateInfo* windowCreateInfo)
 {
     assert(platform != nullptr);
     assert(width > 0);
@@ -885,7 +885,7 @@ mgbyte MGP_Window_CreateNativeWindow(
     mgint& width,
     mgint& height,
     const char* title,
-    const MGP_WindowCreateInfo* windowCreateInfo)
+    MGP_WindowCreateInfo* windowCreateInfo)
 {
     assert(window != nullptr);
     return MGP_Window_CreateNativeWindowInternal(window, width, height, title, windowCreateInfo);
@@ -896,7 +896,7 @@ mgbyte MGP_Window_BeginRecreateNativeWindow(
     mgint& width,
     mgint& height,
     const char* title,
-    const MGP_WindowCreateInfo* windowCreateInfo)
+    MGP_WindowCreateInfo* windowCreateInfo)
 {
     assert(window != nullptr);
     assert(window->window != nullptr);

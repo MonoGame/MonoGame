@@ -318,7 +318,7 @@ namespace MonoGame.Tests {
 		private static readonly string EffectFolder = Path.Combine (AssetFolder, "Effects");
 		private static readonly string ModelFolder = Path.Combine (AssetFolder, "Models");
         private static readonly string XmlFolder = Path.Combine(AssetFolder, "Xml");
-        private static readonly string VideoFolder = Path.Combine(AssetFolder, "Videos");
+        private static readonly string VideoFolder = Path.Combine(AssetFolder, "Video");
         private const string CapturedFrameFolder = "CapturedFrames";
 		private const string CapturedFrameDiffFolder = "Diffs";
 

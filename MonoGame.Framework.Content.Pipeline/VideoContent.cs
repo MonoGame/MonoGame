@@ -72,6 +72,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
             }
 
             var lines = stdout.Split(Environment.NewLine.ToCharArray(), StringSplitOptions.RemoveEmptyEntries);
+            
             foreach (var line in lines)
             {
                 if (!line.Contains('='))
@@ -79,6 +80,9 @@ namespace Microsoft.Xna.Framework.Content.Pipeline
 
                 var key = line[..line.IndexOf('=')];
                 var value = line[(line.IndexOf('=') + 1)..];
+                if (value == "N/A")
+                    continue;
+
                 switch (key)
                 {
                     case "duration":
