@@ -117,6 +117,7 @@
 
   <Import Project="..\Switch2\MonoGame.Framework.Content.Pipeline.targets" Condition="exists('..\Switch2\MonoGame.Framework.Content.Pipeline.targets')" />
   <Import Project="..\Switch\MonoGame.Framework.Content.Pipeline.targets" Condition="exists('..\Switch\MonoGame.Framework.Content.Pipeline.targets')" />
+  <Import Project="..\Switch2\MonoGame.Framework.Content.Pipeline.targets" Condition="exists('..\Switch2\MonoGame.Framework.Content.Pipeline.targets')" />
   <Import Project="..\XBoxOne\MonoGame.Framework.Content.Pipeline.targets" Condition="exists('..\XBoxOne\MonoGame.Framework.Content.Pipeline.targets')" />
   <Import Project="..\PlayStation4\MonoGame.Framework.Content.Pipeline.targets" Condition="exists('..\PlayStation4\MonoGame.Framework.Content.Pipeline.targets')" />
   <Import Project="..\PlayStation5\MonoGame.Framework.Content.Pipeline.targets" Condition="exists('..\PlayStation5\MonoGame.Framework.Content.Pipeline.targets')" />
@@ -125,6 +126,7 @@
 
   <Import Project="..\Switch2\MonoGame.Effect.Compiler.targets" Condition="exists('..\Switch2\MonoGame.Effect.Compiler.targets')" />
   <Import Project="..\Switch\MonoGame.Effect.Compiler.targets" Condition="exists('..\Switch\MonoGame.Effect.Compiler.targets')" />
+  <Import Project="..\Switch2\MonoGame.Effect.Compiler.targets" Condition="exists('..\Switch2\MonoGame.Effect.Compiler.targets')" />
   <Import Project="..\XBoxOne\MonoGame.Effect.Compiler.targets" Condition="exists('..\XBoxOne\MonoGame.Effect.Compiler.targets')" />
   <Import Project="..\PlayStation4\MonoGame.Effect.Compiler.targets" Condition="exists('..\PlayStation4\MonoGame.Effect.Compiler.targets')" />
   <Import Project="..\PlayStation5\MonoGame.Effect.Compiler.targets" Condition="exists('..\PlayStation5\MonoGame.Effect.Compiler.targets')" />
