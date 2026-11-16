@@ -48,6 +48,7 @@ namespace Microsoft.Xna.Framework.Content
             '5', // PlayStation5
             'O', // XboxOne
             'S', // Nintendo Switch
+            'Z', // Nintendo Switch 2
             'b', // WebAssembly and Bridge.NET
             'V', // DesktopVK
             'G', // Windows GDK

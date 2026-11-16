@@ -41,7 +41,7 @@
         <Output TaskParameter="Output" ItemName="ContentReferences"/>
     </CollectContentReferences>
 
-    <Error Text="The MonoGamePlatform property was not defined in the project!  It must be set to Windows, WindowsGL, WindowsDX12, MacOSX, iOS, Linux, DesktopGL, DesktopVK, RaspberryPi, Android, NativeClient, PlayStation4, PSVita, XboxOne or PlayStationMobile."
+    <Error Text="The MonoGamePlatform property was not defined in the project!  It must be set to Windows, WindowsGL, WindowsDX12, MacOSX, iOS, Linux, DesktopGL, DesktopVK, RaspberryPi, Android, NativeClient, PlayStation4, PlayStation5, PSVita, Switch, Switch2, XboxOne or PlayStationMobile."
        Condition="	'$(MonoGamePlatform)' != 'Windows' And
 			'$(MonoGamePlatform)' != 'iOS' And 
 			'$(MonoGamePlatform)' != 'Android' And 
@@ -52,7 +52,9 @@
 			'$(MonoGamePlatform)' != 'NativeClient' And 
 			'$(MonoGamePlatform)' != 'RaspberryPi' And 
 			'$(MonoGamePlatform)' != 'PlayStation4' And 
-			'$(MonoGamePlatform)' != 'PlayStation5' And 
+			'$(MonoGamePlatform)' != 'PlayStation5' And
+			'$(MonoGamePlatform)' != 'Switch' And
+			'$(MonoGamePlatform)' != 'Switch2' And 
 			'$(MonoGamePlatform)' != 'XboxOne' And 
 			'$(MonoGamePlatform)' != 'WindowsGL' And 
 			'$(MonoGamePlatform)' != 'WindowsDX12'" />
