@@ -204,7 +204,7 @@ namespace Microsoft.Xna.Framework.Graphics
             selectedMultiSampleCount = multiSampleCount;
 
             // fallback for unsupported renderTarget surface formats.
-            if (selectedFormat == SurfaceFormat.Alpha8 ||
+            if ((selectedFormat == SurfaceFormat.Alpha8 && graphicsProfile == GraphicsProfile.Reach) ||
                 selectedFormat == SurfaceFormat.NormalizedByte2 ||
                 selectedFormat == SurfaceFormat.NormalizedByte4 ||
                 selectedFormat == SurfaceFormat.Dxt1 ||

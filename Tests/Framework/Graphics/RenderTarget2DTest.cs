@@ -127,7 +127,7 @@ namespace MonoGame.Tests.Graphics
         [Test]
         [TestCase(SurfaceFormat.Color, SurfaceFormat.Color)]
         // unsupported renderTarget formats
-        [TestCase(SurfaceFormat.Alpha8, SurfaceFormat.Color)]
+        [TestCase(SurfaceFormat.Alpha8, SurfaceFormat.Alpha8)]
         [TestCase(SurfaceFormat.Dxt1, SurfaceFormat.Color)]
         [TestCase(SurfaceFormat.Dxt3, SurfaceFormat.Color)]
         [TestCase(SurfaceFormat.Dxt5, SurfaceFormat.Color)]
