@@ -7,6 +7,7 @@ import { BrowserAccelerometer } from "./browser-accelerometer.js";
 import { BrowserContent } from "./browser-content.js";
 import { BrowserKeyboard } from "./browser-keyboard.js";
 import { BrowserHostError, CanvasResizePolicy, HostStage } from "./browser-host-common.js";
+import { BrowserStorage, getStorageFreeSpace, storageTotalSpace } from "./browser-storage.js";
 import { BrowserWindow } from "./browser-window.js";
 
 let activeHost = null;
@@ -538,6 +539,9 @@ export function start(options) {
 
 /** Provides host services called by the browser native runtime. */
 globalThis.MonoGameWebHost = {
+    createStorage: () => new BrowserStorage(),
+    getStorageFreeSpace,
+    storageTotalSpace,
     getActiveHost: () => activeHost,
     notifyManagedFirstFrame: () => activeHost?.notifyManagedFirstFrame(),
     notifyManagedFailure: (message, details) => activeHost?.reportManagedFailure(message, details),
