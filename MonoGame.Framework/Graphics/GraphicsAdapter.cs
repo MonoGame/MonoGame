@@ -214,6 +214,14 @@ namespace Microsoft.Xna.Framework.Graphics
 			
             // fallback for unsupported renderTarget surface formats.
             if ((selectedFormat == SurfaceFormat.Alpha8 && graphicsProfile == GraphicsProfile.Reach) ||
+                (selectedFormat == SurfaceFormat.Single && graphicsProfile == GraphicsProfile.Reach) ||
+                (selectedFormat == SurfaceFormat.Vector2 && graphicsProfile == GraphicsProfile.Reach) ||
+                (selectedFormat == SurfaceFormat.Vector4 && graphicsProfile == GraphicsProfile.Reach) ||
+                (selectedFormat == SurfaceFormat.HalfSingle && graphicsProfile == GraphicsProfile.Reach) ||
+                (selectedFormat == SurfaceFormat.HalfVector2 && graphicsProfile == GraphicsProfile.Reach) ||
+                (selectedFormat == SurfaceFormat.HalfVector4 && graphicsProfile == GraphicsProfile.Reach) ||
+                (selectedFormat == SurfaceFormat.Rg32 && graphicsProfile == GraphicsProfile.Reach) ||
+                (selectedFormat == SurfaceFormat.Rgba64 && graphicsProfile == GraphicsProfile.Reach) ||
                 selectedFormat == SurfaceFormat.NormalizedByte2 ||
                 selectedFormat == SurfaceFormat.NormalizedByte4 ||
                 selectedFormat == SurfaceFormat.Dxt1 ||
