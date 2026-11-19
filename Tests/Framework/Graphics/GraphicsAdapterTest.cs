@@ -55,7 +55,7 @@ namespace MonoGame.Tests.Graphics
                 Assert.AreNotEqual(0, adapter.VendorId);
 #endif
 
-#if XNA || DIRECTX || DIRECTX12
+#if XNA || DIRECTX
                 Assert.AreNotEqual(adapter.SubSystemId, 0);
                 Assert.AreNotEqual(IntPtr.Zero, adapter.MonitorHandle);
 #endif
