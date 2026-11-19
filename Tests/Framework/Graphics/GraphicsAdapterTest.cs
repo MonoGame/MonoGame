@@ -4,6 +4,7 @@
 
 using System;
 using System.Linq;
+using System.Text;
 using Microsoft.Xna.Framework.Graphics;
 using NUnit.Framework;
 
@@ -116,6 +117,14 @@ namespace MonoGame.Tests.Graphics
         // unsupported renderTarget formats
         [TestCase(GraphicsProfile.Reach, SurfaceFormat.Alpha8, SurfaceFormat.Color, false)]
         [TestCase(GraphicsProfile.HiDef, SurfaceFormat.Alpha8, SurfaceFormat.Alpha8, true)]
+        [TestCase(GraphicsProfile.Reach, SurfaceFormat.Single, SurfaceFormat.Color, false)]
+        [TestCase(GraphicsProfile.HiDef, SurfaceFormat.Single, SurfaceFormat.Single, true)]
+        [TestCase(GraphicsProfile.Reach, SurfaceFormat.Vector2, SurfaceFormat.Color, false)]
+        [TestCase(GraphicsProfile.HiDef, SurfaceFormat.Vector2, SurfaceFormat.Vector2, true)]
+        [TestCase(GraphicsProfile.Reach, SurfaceFormat.Vector4, SurfaceFormat.Color, false)]
+        [TestCase(GraphicsProfile.HiDef, SurfaceFormat.Vector4, SurfaceFormat.Vector4, true)]
+        [TestCase(GraphicsProfile.Reach, SurfaceFormat.Rgba64, SurfaceFormat.Color, false)]
+        [TestCase(GraphicsProfile.HiDef, SurfaceFormat.Rgba64, SurfaceFormat.Rgba64, true)]
         [TestCase(GraphicsProfile.Reach, SurfaceFormat.Dxt1, SurfaceFormat.Color, false)]
         [TestCase(GraphicsProfile.HiDef, SurfaceFormat.Dxt1, SurfaceFormat.Color, false)]
         [TestCase(GraphicsProfile.Reach, SurfaceFormat.Dxt3, SurfaceFormat.Color, false)]
