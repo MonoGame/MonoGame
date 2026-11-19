@@ -129,8 +129,10 @@ namespace MonoGame.Tests.Graphics
         // unsupported renderTarget formats
         [TestCase(SurfaceFormat.Alpha8, SurfaceFormat.Alpha8)]
         [TestCase(SurfaceFormat.Rgba1010102, SurfaceFormat.Rgba1010102)]
+#if !DESKTOPGL
         [TestCase(SurfaceFormat.Rg32, SurfaceFormat.Rg32)]
         [TestCase(SurfaceFormat.Rgba64, SurfaceFormat.Rgba64)]
+#endif
         [TestCase(SurfaceFormat.Single, SurfaceFormat.Single)]
         [TestCase(SurfaceFormat.Vector2, SurfaceFormat.Vector2)]
         [TestCase(SurfaceFormat.Vector4, SurfaceFormat.Vector4)]
