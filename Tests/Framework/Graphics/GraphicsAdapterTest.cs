@@ -50,7 +50,11 @@ namespace MonoGame.Tests.Graphics
 
                 Assert.That(adapter.DeviceName, Is.Not.Null.Or.Empty);
                 Assert.That(adapter.Description, Is.Not.Null.Or.Empty);
+#if VULKAN
+                Assert.AreNotEqual(0, adapter.Revision);
+#else
                 Assert.GreaterOrEqual(adapter.Revision, 0);
+#endif
 #if !DESKTOPGL4
                 Assert.AreNotEqual(0, adapter.DeviceId);
                 Assert.AreNotEqual(0, adapter.VendorId);
