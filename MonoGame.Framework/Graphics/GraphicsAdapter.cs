@@ -222,6 +222,11 @@ namespace Microsoft.Xna.Framework.Graphics
                 (selectedFormat == SurfaceFormat.HalfVector4 && graphicsProfile == GraphicsProfile.Reach) ||
                 (selectedFormat == SurfaceFormat.Rg32 && graphicsProfile == GraphicsProfile.Reach) ||
                 (selectedFormat == SurfaceFormat.Rgba64 && graphicsProfile == GraphicsProfile.Reach) ||
+                (selectedFormat == SurfaceFormat.Bgra4444 && graphicsProfile == GraphicsProfile.Reach) ||
+                (selectedFormat == SurfaceFormat.Rgba1010102 && graphicsProfile == GraphicsProfile.Reach) ||
+                (selectedFormat == SurfaceFormat.Rg32 && graphicsProfile == GraphicsProfile.Reach) ||
+                (selectedFormat == SurfaceFormat.Rgba64 && graphicsProfile == GraphicsProfile.Reach) ||
+                (selectedFormat == SurfaceFormat.HdrBlendable && graphicsProfile == GraphicsProfile.Reach) ||
                 selectedFormat == SurfaceFormat.NormalizedByte2 ||
                 selectedFormat == SurfaceFormat.NormalizedByte4 ||
                 selectedFormat == SurfaceFormat.Dxt1 ||
