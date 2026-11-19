@@ -225,11 +225,17 @@ if(NOT DEFINED DOTNET_EMSCRIPTEN_NODE_JS OR "${DOTNET_EMSCRIPTEN_NODE_JS}" STREQ
 endif()
 
 if(NOT DEFINED DOTNET_EMSCRIPTEN_PYTHON OR "${DOTNET_EMSCRIPTEN_PYTHON}" STREQUAL "" OR NOT EXISTS "${DOTNET_EMSCRIPTEN_PYTHON}")
-    monogame_find_workload_path(
-        DOTNET_EMSCRIPTEN_PYTHON
-        "Microsoft.NET.Runtime.Emscripten.*.Python.*"
-        "${_monogamePythonRelativeSuffix}"
-        "the .NET Emscripten Python runtime")
+    if(CMAKE_HOST_WIN32)
+        monogame_find_workload_path(
+            DOTNET_EMSCRIPTEN_PYTHON
+            "Microsoft.NET.Runtime.Emscripten.*.Python.*"
+            "${_monogamePythonRelativeSuffix}"
+            "the .NET Emscripten Python runtime")
+    else()
+        unset(DOTNET_EMSCRIPTEN_PYTHON CACHE)
+        unset(DOTNET_EMSCRIPTEN_PYTHON)
+        find_program(DOTNET_EMSCRIPTEN_PYTHON NAMES python3 REQUIRED)
+    endif()
 endif()
 
 if(NOT DEFINED DOTNET_EMSCRIPTEN_SEED_CACHE_ROOT OR "${DOTNET_EMSCRIPTEN_SEED_CACHE_ROOT}" STREQUAL "" OR NOT EXISTS "${DOTNET_EMSCRIPTEN_SEED_CACHE_ROOT}")
@@ -252,7 +258,10 @@ get_filename_component(_monogameNativeRoot "${CMAKE_CURRENT_LIST_DIR}/.." ABSOLU
 get_filename_component(_monogameSourceRoot "${_monogameNativeRoot}/../.." ABSOLUTE)
 set(MONOGAME_BROWSER_OUTPUT_ROOT "${_monogameSourceRoot}/Artifacts/native/mgruntime/webgl2/browser-wasm" CACHE PATH "Browser native archive output root")
 get_filename_component(_monogameEmscriptenToolsRoot "${DOTNET_EMSCRIPTEN_ROOT_PATH}/.." ABSOLUTE)
-get_filename_component(_monogamePythonRoot "${DOTNET_EMSCRIPTEN_PYTHON}" DIRECTORY)
+set(_monogamePythonRoot "")
+if(CMAKE_HOST_WIN32)
+    get_filename_component(_monogamePythonRoot "${DOTNET_EMSCRIPTEN_PYTHON}" DIRECTORY)
+endif()
 set(_monogameRealEmscriptenPlatformFile "${DOTNET_EMSCRIPTEN_ROOT_PATH}/cmake/Modules/Platform/Emscripten.cmake")
 
 set(DOTNET_EMSCRIPTEN_CACHE_ROOT "${MONOGAME_BROWSER_OUTPUT_ROOT}/toolchain/cache" CACHE PATH "Writable Emscripten cache root")
