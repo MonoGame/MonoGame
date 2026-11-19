@@ -479,7 +479,7 @@ void MGG_GraphicsAdapter_GetInfo(MGG_GraphicsAdapter* adapter, MGG_GraphicsAdapt
 
 			UINT num = 0;
 			DXGI_FORMAT format = DXGI_FORMAT_R8G8B8A8_UNORM;
-			UINT flags = 0;//DXGI_ENUM_MODES_INTERLACED;
+			UINT flags = DXGI_ENUM_MODES_INTERLACED;
 			pOutput->GetDisplayModeList(format, flags, &num, 0);
 
 			DXGI_MODE_DESC* pDescs = new DXGI_MODE_DESC[num];
@@ -513,6 +513,11 @@ void MGG_GraphicsAdapter_GetInfo(MGG_GraphicsAdapter* adapter, MGG_GraphicsAdapt
 			++i;
 		}
 #endif
+	}
+
+	if (adapter->modes.size() == 0)
+	{
+		adapter->modes.push_back(currentDisplayMode);
 	}
 
 	info.DisplayModeCount = adapter->modes.size();
