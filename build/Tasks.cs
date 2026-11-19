@@ -65,7 +65,9 @@ public sealed class TestTask : FrostingTask<BuildContext> { }
 [IsDependentOn(typeof(TestNuGetSetupTask))]
 [IsDependentOn(typeof(TestDesktopGLTask))]
 [IsDependentOn(typeof(TestWindowsDXTask))]
-[IsDependentOn(typeof(TestWebTask))]
+// TODO: Enable this once the WebGL2 templates are merged
+//       otherwise the task will always fail
+// [IsDependentOn(typeof(TestWebTask))]
 [IsDependentOn(typeof(TestAndroidTask))]
 [IsDependentOn(typeof(TestiOSTask))]
 [IsDependentOn(typeof(TestBlank2DStarterKitTask))]

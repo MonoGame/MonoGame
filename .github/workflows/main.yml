@@ -67,12 +67,15 @@ jobs:
       - name: Setup DotNet on Windows
         if: runner.environment == 'github-hosted' && runner.os == 'windows'
         run: |
-          dotnet workload install android ios wasm-tools --version ${{ env.DotnetVersion }}
+          dotnet workload install android ios --version ${{ env.DotnetVersion }}
 
       - name: Setup DotNet on linux
         if: runner.environment == 'github-hosted' && runner.os == 'Linux' && runner.arch == 'x64'
         run: |
-          dotnet workload install android wasm-tools --version ${{ env.DotnetVersion }}
+          dotnet workload install android --version ${{ env.DotnetVersion }}
+
+      - name: Setup WebAssembly Dependencies
+        run: dotnet workload install wasm-tools --version ${{ env.DotnetVersion }}
 
       - name: Update Homebrew
         if: runner.environment == 'github-hosted' && runner.os == 'macos'
@@ -82,7 +85,7 @@ jobs:
       - name: Setup DotNet on MacOS
         if: runner.environment == 'github-hosted' && runner.os == 'macos'
         run: |
-          dotnet workload install macos ios wasm-tools --version ${{ env.DotnetVersion }}
+          dotnet workload install macos ios --version ${{ env.DotnetVersion }}
 
       - name: Pin xcode version
         uses: maxim-lobanov/setup-xcode@v1
@@ -163,8 +166,8 @@ jobs:
       - name: Build
         if: runner.os == 'Linux' && runner.arch == 'ARM64'
         run: |
-          dotnet run --project build/Build.csproj -- --target="Build Shaders"
-          dotnet run --project build/Build.csproj -- --target="Build Native"
+          # Calling Build WebGl2 invokes "Build Native", including the "Build Shaders" dependency build.
+          dotnet run --project build/Build.csproj -- --target="Build WebGL2"
           dotnet run --project build/Build.csproj -- --target="Build Content Pipeline"
         env:
           DOTNET_SYSTEM_NET_SECURITY_NOREVOCATIONCHECKBYDEFAULT: 1 # android compilation is failing randomly due to downloads from microsofts website during it
