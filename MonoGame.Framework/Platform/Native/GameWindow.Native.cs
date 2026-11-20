@@ -32,6 +32,7 @@ internal class NativeGameWindow : GameWindow
     private int _positionY;
     private bool _hasWindowCreateInfo;
     private bool _hasPendingWindowCreateInfo;
+    private bool _hasAppliedInitialPresentation;
 
     private int _width;
     private int _height;
@@ -347,7 +348,10 @@ internal class NativeGameWindow : GameWindow
             MGP.Window_SetPosition(_handle, _positionX, _positionY);
 
         if (IsFullScreen)
+        {
             MGP.Window_EnterFullScreen(_handle, (byte)(HardwareModeSwitch ? 1 : 0));
+            IsFullScreen = MGP.Window_GetIsFullscreen(_handle) != 0;
+        }
 
         if (_visible)
             MGP.Window_Show(_handle, 1);
@@ -375,24 +379,35 @@ internal class NativeGameWindow : GameWindow
 
     public unsafe void OnPresentationChanged(PresentationParameters pp)
     {
-        if (pp.IsFullScreen && pp.HardwareModeSwitch && IsFullScreen && HardwareModeSwitch)
+        bool isInitialPresentation = !_hasAppliedInitialPresentation;
+        _hasAppliedInitialPresentation = true;
+
+        if (pp.IsFullScreen
+            && (!IsFullScreen || pp.HardwareModeSwitch != HardwareModeSwitch))
         {
-            // Nothing changed... what do we do here?
-        }
-        else if (pp.IsFullScreen && (!IsFullScreen || pp.HardwareModeSwitch != HardwareModeSwitch))
-        {
-            IsFullScreen = pp.IsFullScreen;
             HardwareModeSwitch = pp.HardwareModeSwitch;
 
             if (HasCreatedWindow)
+            {
                 MGP.Window_EnterFullScreen(_handle, (byte)(HardwareModeSwitch ? 1 : 0));
+                IsFullScreen = MGP.Window_GetIsFullscreen(_handle) != 0;
+            }
+            else
+            {
+                IsFullScreen = true;
+            }
         }
-        else if (!pp.IsFullScreen && IsFullScreen)
+        else if (!pp.IsFullScreen)
         {
-            IsFullScreen = pp.IsFullScreen;
-
             if (HasCreatedWindow)
+            {
                 MGP.Window_ExitFullScreen(_handle);
+                IsFullScreen = MGP.Window_GetIsFullscreen(_handle) != 0;
+            }
+            else
+            {
+                IsFullScreen = false;
+            }
         }
 
         if (_width == pp.BackBufferWidth && _height == pp.BackBufferHeight)
@@ -403,6 +418,14 @@ internal class NativeGameWindow : GameWindow
 
         if (HasCreatedWindow)
             MGP.Window_SetClientSize(_handle, pp.BackBufferWidth, pp.BackBufferHeight);
+
+        if (!isInitialPresentation)
+            OnClientSizeChanged();
+    }
+
+    internal void FullscreenChanged(bool fullscreen)
+    {
+        IsFullScreen = fullscreen;
     }
 
     public unsafe void ClientResize(int width, int height)

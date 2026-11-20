@@ -3,6 +3,7 @@ namespace BuildScripts;
 
 [TaskName("Build Native")]
 [IsDependentOn(typeof(BuildMGFXCTask))]
+[IsDependentOn(typeof(BuildShadersTask))]
 [IsDependentOn(typeof(BuildNativeDependenciesTask))]
 public sealed class BuildNativeTask : FrostingTask<BuildContext>
 {
