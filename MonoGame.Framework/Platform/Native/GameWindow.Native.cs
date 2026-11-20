@@ -405,7 +405,17 @@ internal class NativeGameWindow : GameWindow
             MGP.Window_SetClientSize(_handle, pp.BackBufferWidth, pp.BackBufferHeight);
     }
 
-    public unsafe void ClientResize(int width, int height)
+    public void ClientResize(int width, int height)
+    {
+        ClientResize(width, height, true);
+    }
+
+    internal void OnWindowResized(int width, int height)
+    {
+        ClientResize(width, height, false);
+    }
+
+    private unsafe void ClientResize(int width, int height, bool setWindowSize)
     {
         if (_width == width && _height == height)
             return;
@@ -413,30 +423,10 @@ internal class NativeGameWindow : GameWindow
         _width = width;
         _height = height;
 
-        if (HasCreatedWindow)
+        if (setWindowSize && HasCreatedWindow)
             MGP.Window_SetClientSize(_handle, width, height);
 
-        var graphicsDevice = _platform.Game.GraphicsDevice;
-
-        var presentationParameters = graphicsDevice.PresentationParameters;
-        presentationParameters.BackBufferWidth = width;
-        presentationParameters.BackBufferHeight = height;
-
-        // Recreate the native swapchain to match the new window dimensions.
-        // This is not necessary for OpenGL, because backbuffer is tied to the window surface.
-        // But it is necessary for the native backends, as it is for DX11.
-        MGG.GraphicsDevice_ResizeSwapchain(
-            graphicsDevice.Handle,
-            presentationParameters.DeviceWindowHandle,
-            width,
-            height,
-            presentationParameters.BackBufferFormat,
-            presentationParameters.DepthStencilFormat,
-            presentationParameters.MultiSampleCount,
-            presentationParameters.PresentationInterval.GetSyncInterval());
-
-        graphicsDevice.Viewport = new Viewport(0, 0, width, height);
-        graphicsDevice.ScissorRectangle = new Rectangle(0, 0, width, height);
+        _platform.Game.GraphicsDevice?.OnClientResize(width, height);
 
         OnClientSizeChanged();
     }

@@ -4,12 +4,13 @@
 
 #if NATIVE
 
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Storage;
+using MonoGame.Framework.Utilities;
+using NUnit.Framework;
 using System;
 using System.IO;
 using System.Linq;
-using NUnit.Framework;
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Storage;
 
 namespace MonoGame.Tests.Framework
 {
@@ -17,18 +18,19 @@ namespace MonoGame.Tests.Framework
     [Category("Storage")]
     public class StorageDeviceTests
     {
-        const string MY_GAME_TITLE = "MyGame";
-        const string MY_GAME_CONTAINER = "Save1";
-
         const long ContainerSize = 256 * 1024;
+
+        // We parameterize this for those who rely on continuous testing tools with concurrency.
+        static readonly string TestGameTitle = $"TestGame_{PlatformInfo.GraphicsBackend}";
+        static readonly string TestGameContainer = "Save1";
 
         [Test]
         public void OpenContainer_WhenPlayerIndexIsNotNull_ShouldReturnContainer_OnSuccess()
         {
-            var device = new StorageDevice(MY_GAME_TITLE, PlayerIndex.One);
-            var container = device.OpenContainer(MY_GAME_CONTAINER, ContainerSize);
+            var device = new StorageDevice(TestGameTitle, PlayerIndex.One);
+            var container = device.OpenContainer(TestGameContainer, ContainerSize);
             Assert.IsNotNull(container);
-            Assert.AreEqual(MY_GAME_CONTAINER, container.ContainerName);
+            Assert.AreEqual(TestGameContainer, container.ContainerName);
             Assert.AreEqual(device, container.StorageDevice);
             Assert.AreNotEqual(0, device.TotalSpace);
             Assert.AreNotEqual(0, device.FreeSpace);
@@ -40,7 +42,7 @@ namespace MonoGame.Tests.Framework
         [Test]
         public void OpenContainer_WhenPlayerIndexIsNotNull_ShouldThrowException_OnInvalidContainerName()
         {
-            var device = new StorageDevice(MY_GAME_TITLE, PlayerIndex.One);
+            var device = new StorageDevice(TestGameTitle, PlayerIndex.One);
             Assert.Throws<ArgumentNullException>(() => device.OpenContainer(null,1), "A container name must be provided. (Parameter 'containerName')");
             Assert.Throws<ArgumentNullException>(() => device.OpenContainer(string.Empty,1), "A container name must be provided. (Parameter 'containerName')");
             Assert.Throws<ArgumentOutOfRangeException>(() => device.OpenContainer("foo", -1), "A container must provide a greater than 0 required file size.");
@@ -63,8 +65,8 @@ namespace MonoGame.Tests.Framework
         [Test]
         public void CreateFile_ShouldCreateFileInMemory_AndPersistContents()
         {
-            var device = new StorageDevice(MY_GAME_TITLE, PlayerIndex.One);
-            var container = device.OpenContainer(MY_GAME_CONTAINER, ContainerSize);
+            var device = new StorageDevice(TestGameTitle, PlayerIndex.One);
+            var container = device.OpenContainer(TestGameContainer, ContainerSize);
             string fileName = "testfile.txt";
             string fileContent = "Hello, MonoGame!";
 
@@ -91,8 +93,8 @@ namespace MonoGame.Tests.Framework
         [Test]
         public void DeleteFile_ShouldRemoveFileFromMemory()
         {
-            var device = new StorageDevice(MY_GAME_TITLE, PlayerIndex.One);
-            var container = device.OpenContainer(MY_GAME_CONTAINER, ContainerSize);
+            var device = new StorageDevice(TestGameTitle, PlayerIndex.One);
+            var container = device.OpenContainer(TestGameContainer, ContainerSize);
             string fileName = "deletefile.txt";
             string fileContent = "Delete me!";
 
@@ -119,8 +121,8 @@ namespace MonoGame.Tests.Framework
         [Test]
         public void CreateDirectory_ShouldAddDirectoryToMemory()
         {
-            var device = new StorageDevice(MY_GAME_TITLE,PlayerIndex.One);
-            var container = device.OpenContainer(MY_GAME_CONTAINER, ContainerSize);
+            var device = new StorageDevice(TestGameTitle,PlayerIndex.One);
+            var container = device.OpenContainer(TestGameContainer, ContainerSize);
             string dirName = "TestDir";
             container.CreateDirectory(dirName);
             Assert.IsTrue(container.DirectoryExists(dirName));
@@ -132,8 +134,8 @@ namespace MonoGame.Tests.Framework
         [Test]
         public void DeleteDirectory_ShouldRemoveDirectoryFromMemory()
         {
-            var device = new StorageDevice(MY_GAME_TITLE,PlayerIndex.One);
-            var container = device.OpenContainer(MY_GAME_CONTAINER, ContainerSize);
+            var device = new StorageDevice(TestGameTitle,PlayerIndex.One);
+            var container = device.OpenContainer(TestGameContainer, ContainerSize);
             string dirName = "DeleteDir";
             container.CreateDirectory(dirName);
             Assert.IsTrue(container.DirectoryExists(dirName));
@@ -147,8 +149,8 @@ namespace MonoGame.Tests.Framework
         [Test]
         public void GetDirectoryNames_ShouldReturnAllCreatedDirectories()
         {
-            var device = new StorageDevice(MY_GAME_TITLE,PlayerIndex.One);
-            var container = device.OpenContainer(MY_GAME_CONTAINER, ContainerSize);
+            var device = new StorageDevice(TestGameTitle,PlayerIndex.One);
+            var container = device.OpenContainer(TestGameContainer, ContainerSize);
             string[] dirs = { "DirA", "DirB", "DirC" };
             foreach (var d in dirs)
                 container.CreateDirectory(d);
@@ -163,8 +165,8 @@ namespace MonoGame.Tests.Framework
         [Test]
         public void DirectoryExists_ShouldReturnFalseForNonexistentDirectory()
         {
-            var device = new StorageDevice(MY_GAME_TITLE, PlayerIndex.One);
-            var container = device.OpenContainer(MY_GAME_CONTAINER, ContainerSize);
+            var device = new StorageDevice(TestGameTitle, PlayerIndex.One);
+            var container = device.OpenContainer(TestGameContainer, ContainerSize);
             Assert.IsFalse(container.DirectoryExists("NoSuchDir"));
             container.Dispose();
             device.Dispose();
@@ -173,8 +175,8 @@ namespace MonoGame.Tests.Framework
         [Test]
         public void GetDirectoryNames_WithPattern_ShouldFilterResults()
         {
-            var device = new StorageDevice(MY_GAME_TITLE, PlayerIndex.One);
-            var container = device.OpenContainer(MY_GAME_CONTAINER, ContainerSize);
+            var device = new StorageDevice(TestGameTitle, PlayerIndex.One);
+            var container = device.OpenContainer(TestGameContainer, ContainerSize);
             string[] dirs = { "DirA", "DirB", "DirC" };
             foreach (var d in dirs)
                 container.CreateDirectory(d);
@@ -214,8 +216,8 @@ namespace MonoGame.Tests.Framework
         [Test]
         public void GetFileNames_ShouldReturnAllCreatedFiles()
         {
-            var device = new StorageDevice(MY_GAME_TITLE, PlayerIndex.One);
-            var container = device.OpenContainer(MY_GAME_CONTAINER, ContainerSize);
+            var device = new StorageDevice(TestGameTitle, PlayerIndex.One);
+            var container = device.OpenContainer(TestGameContainer, ContainerSize);
             string[] files = { "fileA.txt", "fileB.txt", "fileC.txt" };
             foreach (var f in files)
             {
@@ -236,8 +238,8 @@ namespace MonoGame.Tests.Framework
         [Test]
         public void GetFileNames_WithPattern_ShouldFilterResults()
         {
-            var device = new StorageDevice(MY_GAME_TITLE, PlayerIndex.One);
-            var container = device.OpenContainer(MY_GAME_CONTAINER, ContainerSize);
+            var device = new StorageDevice(TestGameTitle, PlayerIndex.One);
+            var container = device.OpenContainer(TestGameContainer, ContainerSize);
             string[] files = { "fileA.txt", "fileB.txt", "fileC.txt" };
             foreach (var f in files)
             {
@@ -278,8 +280,8 @@ namespace MonoGame.Tests.Framework
             var file_name = "folder/file1.txt";
             string fileContent = "Persisted!";
 
-            var device = new StorageDevice(MY_GAME_TITLE, PlayerIndex.One);
-            var container = device.OpenContainer(MY_GAME_CONTAINER, ContainerSize);
+            var device = new StorageDevice(TestGameTitle, PlayerIndex.One);
+            var container = device.OpenContainer(TestGameContainer, ContainerSize);
 
             // These should throw.
             Assert.Throws(typeof(DirectoryNotFoundException), () => container.CreateFile(file_name));
@@ -323,13 +325,16 @@ namespace MonoGame.Tests.Framework
             var file_name = "file1.txt";
             string fileContent = "Persisted!";
 
-            var container_path = GetContainerPath(MY_GAME_TITLE, container_name);
+            var container_path = GetContainerPath(TestGameTitle, container_name);
             if (Directory.Exists(container_path))
+            {
+                ClearReadOnlyFlag(container_path);
                 Directory.Delete(container_path, true);
+            }
 
             // First write the new container to disk and commit it.
             {
-                var device = new StorageDevice(MY_GAME_TITLE, PlayerIndex.One);
+                var device = new StorageDevice(TestGameTitle, PlayerIndex.One);
                 var container = device.OpenContainer(container_name, ContainerSize);
                 using (var stream = container.CreateFile(file_name))
                 using (var writer = new StreamWriter(stream))
@@ -347,13 +352,16 @@ namespace MonoGame.Tests.Framework
             {
                 var crash_path = container_path.Replace(container_name, $"~{container_name}");
                 if (Directory.Exists(crash_path))
+                {
+                    ClearReadOnlyFlag(crash_path);
                     Directory.Delete(crash_path, true);
+                }
                 Directory.Move(container_path, crash_path);
             }
 
             // Check that the crash recovered the content.
             {
-                var device = new StorageDevice(MY_GAME_TITLE, PlayerIndex.One);
+                var device = new StorageDevice(TestGameTitle, PlayerIndex.One);
                 var container = device.OpenContainer(container_name, ContainerSize);
                 Assert.IsTrue(container.FileExists(file_name));
 
@@ -378,8 +386,8 @@ namespace MonoGame.Tests.Framework
 
             // First write the new container to disk and commit it.
             {
-                var device = new StorageDevice(MY_GAME_TITLE, PlayerIndex.One);
-                var container = device.OpenContainer(MY_GAME_CONTAINER, ContainerSize);
+                var device = new StorageDevice(TestGameTitle, PlayerIndex.One);
+                var container = device.OpenContainer(TestGameContainer, ContainerSize);
 
                 // Create directories
                 foreach (var d in dirs)
@@ -403,8 +411,8 @@ namespace MonoGame.Tests.Framework
 
             // Now load the written container and verify its content.
             {
-                var device2 = new StorageDevice(MY_GAME_TITLE, PlayerIndex.One);
-                var container2 = device2.OpenContainer(MY_GAME_CONTAINER, ContainerSize);
+                var device2 = new StorageDevice(TestGameTitle, PlayerIndex.One);
+                var container2 = device2.OpenContainer(TestGameContainer, ContainerSize);
 
                 // Check directories
                 var foundDirs = container2.GetDirectoryNames();
@@ -430,8 +438,8 @@ namespace MonoGame.Tests.Framework
 
             // Now test cleaning up the container content.
             {
-                var device3 = new StorageDevice(MY_GAME_TITLE, PlayerIndex.One);
-                var container3 = device3.OpenContainer(MY_GAME_CONTAINER, ContainerSize);
+                var device3 = new StorageDevice(TestGameTitle, PlayerIndex.One);
+                var container3 = device3.OpenContainer(TestGameContainer, ContainerSize);
 
                 // Delete the directories.
                 foreach (var d in dirs)
@@ -448,8 +456,8 @@ namespace MonoGame.Tests.Framework
 
             // Final test to ensure the container doesn't include our stuff.
             {
-                var device4 = new StorageDevice(MY_GAME_TITLE, PlayerIndex.One);
-                var container4 = device4.OpenContainer(MY_GAME_CONTAINER, ContainerSize);
+                var device4 = new StorageDevice(TestGameTitle, PlayerIndex.One);
+                var container4 = device4.OpenContainer(TestGameContainer, ContainerSize);
 
                 foreach (var d in dirs)
                     Assert.IsFalse(container4.DirectoryExists(d));
@@ -462,11 +470,34 @@ namespace MonoGame.Tests.Framework
 
             // One more... delete the container.
             {
-                var device5 = new StorageDevice(MY_GAME_TITLE, PlayerIndex.One);
-                device5.DeleteContainer(MY_GAME_CONTAINER);
+                var device5 = new StorageDevice(TestGameTitle, PlayerIndex.One);
+                device5.DeleteContainer(TestGameContainer);
 
                 // TODO: Add ContainerExists!
             }
+        }
+
+        /// <summary>
+        /// Clears the ReadOnly flag on a container if it's set.
+        /// </summary>
+        /// <remarks>
+        /// If MyDocuments is on OneDrive, etc. containers get ReadOnly flags set automatically as part of the sync process.
+        /// This causes delete operations to fail, so we should clear the flag before deleting.
+        /// This is obviously not fool-proof, but it's good enough.
+        /// </remarks>
+        /// <param name="containerPath">Path to container folder.</param>
+        private static bool ClearReadOnlyFlag(string containerPath)
+        {
+            var existingAttributes = File.GetAttributes(containerPath);
+            if ((existingAttributes & FileAttributes.ReadOnly) == FileAttributes.ReadOnly)
+            {
+                File.SetAttributes(containerPath,
+                    existingAttributes & ~FileAttributes.ReadOnly);
+
+                return true;
+            }
+
+            return false;
         }
     }
 }

@@ -327,8 +327,60 @@ namespace MonoGame.Tests.Graphics
             Assert.IsTrue(invoked);
 
             game.Dispose();
-
         }
+
+#if VULKAN || DIRECTX12 || DESKTOPGL4
+        [Test]
+        [TestCase(true)]
+        [TestCase(false)]
+        public void PreferredBackBufferSizeLargerThanDefaultRendersFullBackBuffer(bool applySizeInCtor)
+        {
+            var width = 860;
+            var height = 600;
+
+            using var game = new TestGameBase();
+            using var gdm = new GraphicsDeviceManager(game);
+
+            gdm.PreferredBackBufferWidth = width;
+            gdm.PreferredBackBufferHeight = height;
+
+            if (applySizeInCtor)
+            {
+                gdm.ApplyChanges();
+            }
+
+            game.InitializeOnly();
+
+            var device = game.GraphicsDevice;
+
+            Assert.AreEqual(width, game.Window.ClientBounds.Width);
+            Assert.AreEqual(height, game.Window.ClientBounds.Height);
+            Assert.AreEqual(width, device.PresentationParameters.BackBufferWidth);
+            Assert.AreEqual(height, device.PresentationParameters.BackBufferHeight);
+            Assert.AreEqual(width, device.Viewport.Width);
+            Assert.AreEqual(height, device.Viewport.Height);
+            Assert.AreEqual(width, device.ScissorRectangle.Width);
+            Assert.AreEqual(height, device.ScissorRectangle.Height);
+
+            using var white = new Texture2D(device, 1, 1);
+            white.SetData(new[] { Color.White });
+
+            using var spriteBatch = new SpriteBatch(device);
+
+            device.Clear(Color.MonoGameOrange);
+            spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.Opaque);
+            spriteBatch.Draw(white, new Rectangle(10, 10, 50, 50), Color.Red);
+            spriteBatch.Draw(white, new Rectangle(width - 50, height - 50, 40, 40), Color.Indigo);
+            spriteBatch.End();
+
+            var pixels = new Color[width * height];
+            device.GetBackBufferData(pixels);
+
+            Assert.AreEqual(Color.Red, pixels[25 * width + 25]);
+            Assert.AreEqual(Color.MonoGameOrange, pixels[300 * width + 400]);
+            Assert.AreEqual(Color.Indigo, pixels[(height - 30) * width + (width - 30)]);
+        }
+#endif
     }
 
     [RunOnUiTestFixture]
@@ -455,6 +507,46 @@ namespace MonoGame.Tests.Graphics
             {
                 game.Window.ClientSizeChanged -= OnClientSizeChanged;
             }
+        }
+
+        [Test]
+        public void ApplyChangesLargerThanInitialBackBufferRendersFullBackBuffer()
+        {
+            var width = 840;
+            var height = 600;
+
+            gd.Clear(Color.Black);
+            gd.Present();
+
+            gdm.PreferredBackBufferWidth = width;
+            gdm.PreferredBackBufferHeight = height;
+            gdm.ApplyChanges();
+
+            Assert.AreEqual(width, game.Window.ClientBounds.Width);
+            Assert.AreEqual(height, game.Window.ClientBounds.Height);
+            Assert.AreEqual(width, gd.PresentationParameters.BackBufferWidth);
+            Assert.AreEqual(height, gd.PresentationParameters.BackBufferHeight);
+            Assert.AreEqual(width, gd.Viewport.Width);
+            Assert.AreEqual(height, gd.Viewport.Height);
+            Assert.AreEqual(width, gd.ScissorRectangle.Width);
+            Assert.AreEqual(height, gd.ScissorRectangle.Height);
+
+            using var white = new Texture2D(gd, 1, 1);
+            white.SetData(new[] { Color.White });
+            using var spriteBatch = new SpriteBatch(gd);
+
+            gd.Clear(Color.CornflowerBlue);
+            spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.Opaque);
+            spriteBatch.Draw(white, new Rectangle(10, 10, 40, 40), Color.Red);
+            spriteBatch.Draw(white, new Rectangle(width - 50, height - 50, 40, 40), Color.Lime);
+            spriteBatch.End();
+
+            var pixels = new Color[width * height];
+            gd.GetBackBufferData(pixels);
+
+            Assert.AreEqual(Color.Red, pixels[25 * width + 25]);
+            Assert.AreEqual(Color.CornflowerBlue, pixels[300 * width + 400]);
+            Assert.AreEqual(Color.Lime, pixels[(height - 25) * width + (width - 25)]);
         }
 #endif
 
