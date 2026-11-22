@@ -230,7 +230,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 selectedFormat = SurfaceFormat.Color;
 
 
-            return (format == selectedFormat) && (depthFormat == selectedDepthFormat) && (multiSampleCount == selectedMultiSampleCount);
+            return PlatformIsSurfaceFormatSupported(this, selectedFormat) && (format == selectedFormat) && (depthFormat == selectedDepthFormat) && (multiSampleCount == selectedMultiSampleCount);
 		}
 
         /*
@@ -428,7 +428,7 @@ namespace Microsoft.Xna.Framework.Graphics
             }
         }
 
-        private bool PlatformIsSurfaceFormatSupported(SurfaceFormat surfaceFormat)
+        private bool PlatformIsSurfaceFormatSupported(GraphicsAdapter adapter, SurfaceFormat surfaceFormat)
         {
             return true;
         }
