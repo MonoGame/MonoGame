@@ -238,7 +238,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 selectedFormat == SurfaceFormat.Dxt5SRgb)
                 selectedFormat = SurfaceFormat.Color;
 
-            return (format == selectedFormat) && (depthFormat == selectedDepthFormat) && (multiSampleCount == selectedMultiSampleCount);
+            return PlatformIsSurfaceFormatSupported(this, selectedFormat) && (format == selectedFormat) && (depthFormat == selectedDepthFormat) && (multiSampleCount == selectedMultiSampleCount);
 		}
 
         /// <summary>

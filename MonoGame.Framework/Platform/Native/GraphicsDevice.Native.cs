@@ -82,6 +82,34 @@ public partial class GraphicsDevice
         SupportsInstancing = caps.SupportsInstancing;
         SupportsBaseIndexInstancing = caps.SupportsBaseIndexInstancing;
         SupportsSeparateBlendStates = caps.SupportsSeparateBlendStates;
+
+        var supportedFormats = Adapter.SupportedFormats;
+        supportedFormats.Clear();
+        supportedFormats.Add(SurfaceFormat.Color);
+        supportedFormats.Add(SurfaceFormat.Bgr565);
+        supportedFormats.Add(SurfaceFormat.Bgra4444);
+        supportedFormats.Add(SurfaceFormat.Bgra5551);
+        supportedFormats.Add(SurfaceFormat.Alpha8);
+        if (SupportsNormalized)
+        {
+            supportedFormats.Add(SurfaceFormat.Rgba1010102);
+            supportedFormats.Add(SurfaceFormat.Rg32);
+            supportedFormats.Add(SurfaceFormat.Rgba64);
+            supportedFormats.Add(SurfaceFormat.NormalizedByte2);
+            supportedFormats.Add(SurfaceFormat.NormalizedByte4);
+        }
+        if (SupportsFloatTextures)
+        {
+            supportedFormats.Add(SurfaceFormat.Single);
+            supportedFormats.Add(SurfaceFormat.Vector2);
+            supportedFormats.Add(SurfaceFormat.Vector4);
+        }
+        if (SupportsHalfFloatTextures)
+        {
+            supportedFormats.Add(SurfaceFormat.HalfSingle);
+            supportedFormats.Add(SurfaceFormat.HalfVector2);
+            supportedFormats.Add(SurfaceFormat.HalfVector4);
+        }
     }
 
     private unsafe void PlatformSetup()

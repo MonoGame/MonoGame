@@ -428,6 +428,11 @@ namespace Microsoft.Xna.Framework.Graphics
             }
         }
 
+        private bool PlatformIsSurfaceFormatSupported(SurfaceFormat surfaceFormat)
+        {
+            return true;
+        }
+
         /// <summary>
         /// Returns a value that indicates whether the specified graphics profile is supported by the current adapter.
         /// </summary>

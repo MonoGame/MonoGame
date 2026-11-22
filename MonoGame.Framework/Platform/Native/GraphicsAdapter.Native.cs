@@ -14,6 +14,8 @@ partial class GraphicsAdapter
 {
     internal unsafe MGG_GraphicsAdapter* Handle;
 
+    internal HashSet<SurfaceFormat> SupportedFormats = new HashSet<SurfaceFormat>();
+
     private static unsafe void PlatformInitializeAdapters(out ReadOnlyCollection<GraphicsAdapter> adapters)
     {
         var found = new List<GraphicsAdapter>();
@@ -63,6 +65,11 @@ partial class GraphicsAdapter
         }
 
         adapters = new ReadOnlyCollection<GraphicsAdapter>(found);
+    }
+
+    private bool PlatformIsSurfaceFormatSupported(GraphicsAdapter adapter, SurfaceFormat surfaceFormat)
+    {
+        return adapter.SupportedFormats.Contains(surfaceFormat);
     }
 
     private bool PlatformIsProfileSupported(GraphicsProfile graphicsProfile)
