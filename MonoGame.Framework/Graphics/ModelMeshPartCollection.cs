@@ -15,7 +15,7 @@ namespace Microsoft.Xna.Framework.Graphics
         /// class that is a read-only wrapper around the specified list.
         /// </summary>
         /// <param name="list">The list to wrap.</param>
-		public ModelMeshPartCollection(IList<ModelMeshPart> list)
+		internal ModelMeshPartCollection(IList<ModelMeshPart> list)
 			: base(list)
 		{
 

@@ -16,7 +16,7 @@ namespace Microsoft.Xna.Framework.Graphics
         /// </summary>
         /// <param name="graphicsDevice">The graphicss device.</param>
         /// <param name="parts">Parts of this mesh.</param>
-		public ModelMesh(GraphicsDevice graphicsDevice, System.Collections.Generic.List<ModelMeshPart> parts)
+		internal ModelMesh(GraphicsDevice graphicsDevice, System.Collections.Generic.List<ModelMeshPart> parts)
 		{
 			// TODO: Complete member initialization
 			this.graphicsDevice = graphicsDevice;
@@ -58,7 +58,7 @@ namespace Microsoft.Xna.Framework.Graphics
         /// Gets the collection of <see cref="ModelMeshPart"/> objects that make up this mesh.
         /// Each part of a mesh is composed of a set of primitives that share the same material.
         /// </summary>
-        public ModelMeshPartCollection MeshParts { get; set; }
+        public ModelMeshPartCollection MeshParts { get; private set; }
 
         /// <summary>
         /// Gets the name of this mesh.
@@ -70,7 +70,7 @@ namespace Microsoft.Xna.Framework.Graphics
         /// The parent bone of a mesh contains a transformation matrix that describes
         /// how the mesh is located relative to any parent meshes in a model.
         /// </summary>
-        public ModelBone ParentBone { get; set; }
+        public ModelBone ParentBone { get; internal set; }
 
         /// <summary>
         /// Gets or sets an object identifying this mesh.
