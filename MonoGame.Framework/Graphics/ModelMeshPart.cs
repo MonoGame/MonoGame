@@ -29,6 +29,11 @@ namespace Microsoft.Xna.Framework.Graphics
             }
             set 
             {
+                if (parent == null)
+                {
+                    throw new InvalidOperationException("Can't set Effect for ModelMeshPart with parent.");
+                }
+
                 if (value == _effect)
                     return;
 
@@ -105,6 +110,9 @@ namespace Microsoft.Xna.Framework.Graphics
 		
 		internal ModelMesh parent;
 
-        internal ModelMeshPart() { }
+        /// <summary>
+        /// Creates a new ModelMeshPart
+        /// </summary>
+        public ModelMeshPart() { }
 	}
 }
