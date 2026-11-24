@@ -32,7 +32,6 @@ internal class NativeGameWindow : GameWindow
     private int _positionY;
     private bool _hasWindowCreateInfo;
     private bool _hasPendingWindowCreateInfo;
-    private bool _hasAppliedInitialPresentation;
 
     private int _width;
     private int _height;
@@ -379,9 +378,6 @@ internal class NativeGameWindow : GameWindow
 
     public unsafe void OnPresentationChanged(PresentationParameters pp)
     {
-        bool isInitialPresentation = !_hasAppliedInitialPresentation;
-        _hasAppliedInitialPresentation = true;
-
         if (pp.IsFullScreen
             && (!IsFullScreen || pp.HardwareModeSwitch != HardwareModeSwitch))
         {
@@ -418,9 +414,6 @@ internal class NativeGameWindow : GameWindow
 
         if (HasCreatedWindow)
             MGP.Window_SetClientSize(_handle, pp.BackBufferWidth, pp.BackBufferHeight);
-
-        if (!isInitialPresentation)
-            OnClientSizeChanged();
     }
 
     internal void FullscreenChanged(bool fullscreen)
