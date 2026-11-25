@@ -60,7 +60,7 @@ namespace Microsoft.Xna.Framework
         /// </returns>
         public override bool Equals(object obj)
         {
-            return (obj is Ray) && this.Equals((Ray)obj);
+            return (obj is Ray other) && this.Equals(other);
         }
 
         /// <summary>
