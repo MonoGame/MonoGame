@@ -41,6 +41,17 @@ namespace Microsoft.Xna.Framework
             Microphone.UpdateMicrophones();
 #if NATIVE
             MediaPlayer.PlatformUpdate();
+#elif DESKTOPGL || ANGLE
+            try
+            {
+                var controller = OpenALSoundController.Instance;
+                controller?.ProcessDeviceChanges();
+            }
+            catch (NoAudioHardwareException)
+            {
+                // Audio system not initialized, skip device change check
+                // Should we log this?
+            }
 #endif
         }
 
@@ -50,4 +61,3 @@ namespace Microsoft.Xna.Framework
         }
     }
 }
-
