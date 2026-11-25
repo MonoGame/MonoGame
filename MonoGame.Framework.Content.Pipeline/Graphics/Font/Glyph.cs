@@ -48,5 +48,8 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
         public float XAdvance;
 
         public ABCFloat CharacterWidths;
+
+        // True when the glyph has layout metrics but FreeType did not rasterize any pixels.
+        public bool IsMetricOnly;
     }
 }

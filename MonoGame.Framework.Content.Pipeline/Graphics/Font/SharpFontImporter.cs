@@ -120,22 +120,19 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
                 glyphBitmap.SetPixelData(gpixelAlphas);
             }
 
+            bool isMetricOnly = glyphBitmap == null;
             if (glyphBitmap == null)
             {
-                var gHA = face->glyph->metrics.horiAdvance.Value >> 6;
-                var gVA = face->size->metrics.height.Value >> 6;
-
-                gHA = gHA > 0 ? gHA : gVA;
-                gVA = gVA > 0 ? gVA : gHA;
-
-                glyphBitmap = new PixelBitmapContent<byte>((int)gHA, (int)gVA);
+                glyphBitmap = new PixelBitmapContent<byte>(1, 1);
+                glyphBitmap.SetPixelData(new byte[] { 0 });
             }
 
             // I wouldn't say I'm a 100% sure, but I feel a lot surer about this than what it was before.
             var abc = new ABCFloat();
             abc.A = face->glyph->bitmap_left;
             abc.B = face->glyph->bitmap.width;
-            abc.C = (face->glyph->metrics.horiAdvance.Value >> 6) - (abc.A + abc.B);
+            int advance = (int)(face->glyph->metrics.horiAdvance.Value >> 6);
+            abc.C = advance - (abc.A + abc.B);
 
             // nkast fix, but only when necessary, this way we can have nice arial fonts without breaking the crucial Kingthings Petrock.
             if ((*face->glyph).bitmap_left < 0)
@@ -144,12 +141,20 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
                 abc.B += face->glyph->bitmap_left;
             }
 
+            if (isMetricOnly && advance > 0)
+            {
+                // Represent a positive-advance metric-only glyph with one pixel while C preserves its full advance.
+                abc.B = 1;
+                abc.C = advance - (abc.A + abc.B);
+            }
+
             return new GlyphData(glyphIndex, glyphBitmap)
             {
                 XOffset = face->glyph->bitmap_left,
-                XAdvance = face->glyph->metrics.horiAdvance.Value >> 6,
+                XAdvance = advance,
                 YOffset = -(face->glyph->metrics.horiBearingY.Value >> 6),
-                CharacterWidths = abc
+                CharacterWidths = abc,
+                IsMetricOnly = isMetricOnly
             };
         }
 

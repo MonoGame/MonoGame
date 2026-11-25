@@ -99,7 +99,9 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
                     var texRect = glyph.Data.SubRect;
                     output.Glyphs.Add(texRect);
 
-                    var cropping = new Rectangle(0, (int)(glyph.Data.YOffset - yOffsetMin), (int)glyph.Data.XAdvance, output.VerticalLineSpacing);
+                    var cropping = glyph.Data.IsMetricOnly
+                        ? new Rectangle(0, 0, 1, 1)
+                        : new Rectangle(0, (int)(glyph.Data.YOffset - yOffsetMin), (int)glyph.Data.XAdvance, output.VerticalLineSpacing);
                     output.Cropping.Add(cropping);
 
                     // Set the optional character kerning.
@@ -112,11 +114,17 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Processors
                     {
                         float width = texRect.Width;
 
-                        // Whitespace glyphs can carry advance entirely in their metrics.
-                        // Preserve that advance when kerning is disabled so spacing matches XNA.
-                        if (glyph.Data.CharacterWidths.B <= 0 && glyph.Data.XAdvance > width)
+                        if (glyph.Data.IsMetricOnly)
                         {
-                            width = glyph.Data.XAdvance;
+                            // TODO: When we move from XNA Compat, this needs to
+                            //       be looked at again
+                            //      Honestly, I don't like this, but here we are...
+                            // XNA gives blank glyphs 1/3 of the font's pixel size when kerning is turned off
+                            // So this is to match that behavior so word spacing stays consistent with XNA
+                            width = glyph.Data.XAdvance > 0
+                                // Point-to-pixel is 96 DPI / 72 points-per-inch (~1.33)
+                                ? (float)Math.Ceiling(input.Size * 96.0f / 72.0f / 3.0f)
+                                : 0.0f;
                         }
 
                         output.Kerning.Add(new Vector3(0, width, 0));
