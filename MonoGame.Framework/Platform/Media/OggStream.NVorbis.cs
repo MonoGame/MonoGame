@@ -31,6 +31,7 @@ namespace Microsoft.Xna.Framework.Audio
         internal VorbisReader Reader { get; private set; }
         internal bool Ready { get; private set; }
         internal bool Preparing { get; private set; }
+        internal bool ReachedEnd { get; set; }
 
         public Action FinishedAction { get; private set; }
         public int BufferCount { get; private set; }
@@ -143,15 +144,18 @@ namespace Microsoft.Xna.Framework.Audio
             {
                 var state = AL.GetSourceState(alSourceId);
                 ALHelper.CheckError("Failed to get source state.");
-                if (state == ALSourceState.Playing || state == ALSourceState.Paused)
-                    StopPlayback();
-
-                OggStreamer.Instance.RemoveStream(this);
 
                 lock (prepareMutex)
                 {
+                    // Remove the stream first, so the streamer does not report a stopped stream as finished
+                    OggStreamer.Instance.RemoveStream(this);
+
+                    if (state == ALSourceState.Playing || state == ALSourceState.Paused)
+                        StopPlayback();
+
                     if (state != ALSourceState.Initial)
                         Empty(); // force the queued buffers to be unqueued to avoid issues on Mac
+                    ReachedEnd = false;
                 }
             }
 
@@ -161,28 +165,44 @@ namespace Microsoft.Xna.Framework.Audio
 
         public void SeekToPosition(TimeSpan pos)
         {
-            if (Reader == null)
-                return;
+            lock (prepareMutex)
+            {
+                if (Reader == null)
+                    return;
 
-            Reader.TimePosition = pos;
-            AL.SourceStop(alSourceId);
-            ALHelper.CheckError("Failed to stop source.");
+                Reader.TimePosition = pos;
+                ReachedEnd = false;
+                AL.SourceStop(alSourceId);
+                ALHelper.CheckError("Failed to stop source.");
+                // Unqueue the buffers decoded before the seek, so they cannot be played again
+                Empty();
+            }
         }
 
         public TimeSpan GetPosition()
         {
-            if (Reader == null)
-                return TimeSpan.Zero;
+            // Close() and Open() replace the Reader under this lock, on the streamer thread for looped or repeating
+            // streams, so it can become null between the check and the read
+            lock (prepareMutex)
+            {
+                if (Reader == null)
+                    return TimeSpan.Zero;
 
-            return Reader.TimePosition;
+                return Reader.TimePosition;
+            }
         }
 
         public TimeSpan GetLength()
         {
-            if (Reader == null)
-                return TimeSpan.Zero;
+            // Close() and Open() replace the Reader under this lock, on the streamer thread for looped or repeating
+            // streams, so it can become null between the check and the read
+            lock (prepareMutex)
+            {
+                if (Reader == null)
+                    return TimeSpan.Zero;
 
-            return Reader.TotalTime;
+                return Reader.TotalTime;
+            }
         }
 
         float volume;
@@ -268,6 +288,7 @@ namespace Microsoft.Xna.Framework.Audio
         internal void Open(bool precache = false)
         {
             Reader = new VorbisReader(oggFileName);
+            ReachedEnd = false;
 
             if (precache)
             {
@@ -312,8 +333,6 @@ namespace Microsoft.Xna.Framework.Audio
         readonly Thread underlyingThread;
         volatile bool cancelled;
 
-        bool pendingFinish;
-
         public float UpdateRate { get; private set; }
         public int BufferSize { get; private set; }
 
@@ -335,7 +354,6 @@ namespace Microsoft.Xna.Framework.Audio
         {
             UpdateRate = updateRate;
             BufferSize = bufferSize;
-            pendingFinish = false;
 
             underlyingThread = new Thread(EnsureBuffersFilled)
             {
@@ -382,7 +400,7 @@ namespace Microsoft.Xna.Framework.Audio
 
             return readSamples != BufferSize;
         }
-      
+
         internal void CastBuffer(float[] inBuffer, short[] outBuffer, int length)
         {
             for (int i = 0; i < length; i++)
@@ -413,8 +431,6 @@ namespace Microsoft.Xna.Framework.Audio
                             if (!streams.Contains(stream))
                                 continue;
 
-                        bool finished = false;
-
                         int queued;
                         AL.GetSource(stream.alSourceId, ALGetSourcei.BuffersQueued, out queued);
                         ALHelper.CheckError("Failed to fetch queued buffers.");
@@ -434,12 +450,12 @@ namespace Microsoft.Xna.Framework.Audio
                             tempBuffers = stream.alBufferIds.Skip(queued).ToArray();
 
                         int bufferFilled = 0;
-                        for (int i = 0; i < tempBuffers.Length && !pendingFinish; i++)
+                        for (int i = 0; i < tempBuffers.Length && !stream.ReachedEnd; i++)
                         {
-                            finished |= FillBuffer(stream, tempBuffers[i]);
+                            bool endOfData = FillBuffer(stream, tempBuffers[i]);
                             bufferFilled++;
 
-                            if (finished)
+                            if (endOfData)
                             {
                                 if (stream.IsLooped)
                                 {
@@ -448,14 +464,18 @@ namespace Microsoft.Xna.Framework.Audio
                                 }
                                 else
                                 {
-                                    pendingFinish = true;
+                                    stream.ReachedEnd = true;
                                 }
                             }
                         }
 
-                        if (pendingFinish && queued == 0)
+                        if (bufferFilled > 0)
                         {
-                            pendingFinish = false;
+                            AL.SourceQueueBuffers(stream.alSourceId, bufferFilled, tempBuffers);
+                            ALHelper.CheckError("Failed to queue buffers.");
+                        }
+                        else if (stream.ReachedEnd && queued == processed)
+                        {
                             lock (iterationMutex)
                                 streams.Remove(stream);
 
@@ -463,12 +483,7 @@ namespace Microsoft.Xna.Framework.Audio
                             // Otherwise, we risk a deadlock when downstream Stop() locks stopMutex.
                             finishedAction = stream.FinishedAction;
                         }
-                        else if (!finished && bufferFilled > 0) // queue only successfully filled buffers
-                        {
-                            AL.SourceQueueBuffers(stream.alSourceId, bufferFilled, tempBuffers);
-                            ALHelper.CheckError("Failed to queue buffers.");
-                        }
-                        else if (!stream.IsLooped)
+                        else
                             continue;
                     }
 
