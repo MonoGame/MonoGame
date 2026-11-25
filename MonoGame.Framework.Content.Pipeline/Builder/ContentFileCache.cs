@@ -9,6 +9,9 @@ namespace MonoGame.Framework.Content.Pipeline.Builder;
 
 record ContentFileCache : IContentFileCache
 {
+    // ContentFileCache instances are compared by reference (ReferenceEquals), not record value equality.
+    private readonly object _syncLock = new();
+
     public string ContentRoot { get; init; } = "";
 
     public bool ShouldBuild { get; init; } = false;
@@ -47,7 +50,12 @@ record ContentFileCache : IContentFileCache
         }
 
         var lastModifiedTime = File.GetLastWriteTimeUtc(fullDependencyPath);
-        Dependencies[relativeDependencyPath.Sanitize()] = lastModifiedTime;
+
+        var sanitized = relativeDependencyPath.Sanitize();
+        lock (_syncLock)
+        {
+            Dependencies[sanitized] = lastModifiedTime;
+        }
     }
 
     public void RemoveDependency(ContentBuilder builder, string dependencyPath)
@@ -60,19 +68,31 @@ record ContentFileCache : IContentFileCache
 
     public void AddDependency(ContentBuilder builder, IContentFileCache fileCache)
     {
-        if (fileCache is not ContentFileCache cache)
+        if (fileCache is not ContentFileCache cache || ReferenceEquals(this, cache))
         {
             return;
         }
 
-        foreach (var dependency in cache.Dependencies)
+        KeyValuePair<string, DateTime>[] dependencySnapshot;
+        KeyValuePair<string, DateTime>[] outputSnapshot;
+
+        lock (cache._syncLock)
         {
-            Dependencies[dependency.Key] = dependency.Value;
+            dependencySnapshot = [.. cache.Dependencies];
+            outputSnapshot = [.. cache.Outputs];
         }
 
-        foreach (var output in cache.Outputs)
+        lock (_syncLock)
         {
-            Outputs[output.Key] = output.Value;
+            foreach (var dependency in dependencySnapshot)
+            {
+                Dependencies[dependency.Key] = dependency.Value;
+            }
+
+            foreach (var output in outputSnapshot)
+            {
+                Outputs[output.Key] = output.Value;
+            }
         }
     }
 
@@ -98,7 +118,12 @@ record ContentFileCache : IContentFileCache
         }
 
         var lastModifiedTime = File.GetLastWriteTimeUtc(fullOutputPath);
-        Outputs[relativeOutputPath.Sanitize()] = lastModifiedTime;
+
+        var sanitized = relativeOutputPath.Sanitize();
+        lock (_syncLock)
+        {
+            Outputs[sanitized] = lastModifiedTime;
+        }
     }
 
     public void RemoveOutputFile(ContentBuilder builder, string outputPath)
@@ -107,6 +132,42 @@ record ContentFileCache : IContentFileCache
             Path.GetRelativePath(builder.Parameters.RootedOutputDirectory, outputPath) :
             outputPath;
         Outputs.Remove(relativeOutputFile);
+    }
+
+    // TODO: We can remove this once we are entirely happy with the parallel builds.
+    // It's added solely to have a comparison between serial and parallel builds in the tests.
+    internal void EnsureDeterministicOrder()
+    {
+        lock (_syncLock)
+        {
+            SortDictionary(Dependencies);
+            SortDictionary(Outputs);
+        }
+    }
+
+    /// <summary>
+    /// Sorts the dictionary relying on insert-order.
+    /// </summary>
+    /// <remarks>
+    /// Should be called within <see cref="_syncLock"/> lock.
+    /// </remarks>
+    /// <param name="dictionary">Dictionary to sort.</param>
+    private static void SortDictionary(Dictionary<string, DateTime> dictionary)
+    {
+        if (dictionary.Count <= 1)
+        {
+            return;
+        }
+
+        var sorted = dictionary
+            .OrderBy(static kvp => kvp.Key, StringComparer.Ordinal)
+            .ToArray();
+
+        dictionary.Clear();
+        foreach (var (key, value) in sorted)
+        {
+            dictionary[key] = value;
+        }
     }
 
     public bool IsValid(ContentBuilder builder, ContentInfo info)
@@ -124,7 +185,16 @@ record ContentFileCache : IContentFileCache
             }
         }
 
-        foreach (var (dependencyFile, cachedModifiedTime) in Dependencies)
+        KeyValuePair<string, DateTime>[] dependencySnapshot;
+        KeyValuePair<string, DateTime>[] outputSnapshot;
+
+        lock (_syncLock)
+        {
+            dependencySnapshot = [.. Dependencies];
+            outputSnapshot = [.. Outputs];
+        }
+
+        foreach (var (dependencyFile, cachedModifiedTime) in dependencySnapshot)
         {
             var dependencyFilePath = Path.Combine(builder.Parameters.RootedSourceDirectory, dependencyFile);
             var modifiedTime = File.GetLastWriteTimeUtc(dependencyFilePath);
@@ -135,7 +205,7 @@ record ContentFileCache : IContentFileCache
             }
         }
 
-        foreach (var (outputPath, cachedModifiedTime) in Outputs)
+        foreach (var (outputPath, cachedModifiedTime) in outputSnapshot)
         {
             var outputFilePath = Path.Combine(builder.Parameters.RootedOutputDirectory, outputPath);
             var modifiedTime = File.GetLastWriteTimeUtc(outputFilePath);

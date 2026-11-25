@@ -75,6 +75,7 @@ static class ContentBuilderHelper
         public required PropertyInfo PropertyInfo { get; init; }
     }
 
+    private static readonly object _serializerLock = new();
     private static readonly HashSet<AssemblyName> _loadedAssemblies = [];
     private static readonly List<FileEndingImporterPair> _importers = [];
     private static readonly List<ProcessorInfo> _processors = [];
@@ -86,6 +87,10 @@ static class ContentBuilderHelper
 
     public static void LoadAssemblies()
     {
+        _importers.Clear();
+        _processors.Clear();
+        _serverOptions.Clear();
+
         var assemblies = AppDomain.CurrentDomain.GetAssemblies();
 
         foreach (var a in assemblies)
@@ -117,8 +122,9 @@ static class ContentBuilderHelper
 
                 if (t.GetInterface(nameof(IContentImporter)) != null)
                 {
-                    serializer.WithTagMapping("!" + t.ToString(), t);
-                    deserializer.WithTagMapping("!" + t.ToString(), t);
+                    var tagName = "!" + t.ToString().Replace('+', '.');
+                    serializer.WithTagMapping(tagName, t);
+                    deserializer.WithTagMapping(tagName, t);
 
                     var importerInfo = new ImporterInfo
                     {
@@ -140,8 +146,9 @@ static class ContentBuilderHelper
                 }
                 else if (t.GetInterface(nameof(IContentProcessor)) != null)
                 {
-                    serializer.WithTagMapping("!" + t.ToString(), t);
-                    deserializer.WithTagMapping("!" + t.ToString(), t);
+                    var tagName = "!" + t.ToString().Replace('+', '.');
+                    serializer.WithTagMapping(tagName, t);
+                    deserializer.WithTagMapping(tagName, t);
 
                     _processors.Add(new ProcessorInfo
                     {
@@ -213,11 +220,26 @@ static class ContentBuilderHelper
                 }
             }
         }
+        else if (obj1 is IDictionary dict1 && obj2 is IDictionary dict2)    // if dictionary, go through each entry to check if they match
+        {
+            if (dict1.Count != dict2.Count)
+            {
+                return false;
+            }
+
+            foreach (DictionaryEntry entry in dict1)
+            {
+                if (!dict2.Contains(entry.Key) || !ArePropsEqual(entry.Value, dict2[entry.Key]))
+                {
+                    return false;
+                }
+            }
+        }
         else // deal with complex objects by checking each property
         {
             foreach (var prop in obj1.GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance))
             {
-                if (prop.CanRead && !ArePropsEqual(prop.GetValue(obj1), prop.GetValue(obj2)))
+                if (prop.CanRead && prop.GetIndexParameters().Length == 0 && !ArePropsEqual(prop.GetValue(obj1), prop.GetValue(obj2)))
                 {
                     return false;
                 }
@@ -231,7 +253,16 @@ static class ContentBuilderHelper
     {
         // Use the YAML serializer to generate a string with the
         // type and properties of this importer/processor.
-        var text = Serializer.Serialize(importerOrProcessor);
+        string text;
+        lock (_serializerLock)
+        {
+            if (Serializer == null)
+            {
+                LoadAssemblies();
+            }
+
+            text = Serializer!.Serialize(importerOrProcessor);
+        }
 
         // Normalize Windows line endings so we get
         // consistent strings across all systems.

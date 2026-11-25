@@ -112,7 +112,8 @@ namespace MonoGame.Effect
             const int SlotOffset = 32;
 
             var outputPath = Path.GetDirectoryName(shaderResult.OutputFilePath) ?? "";
-            var sourceFileName = Path.GetFileNameWithoutExtension(shaderResult.FilePath) + "." + shaderFunction;
+            var uniqueToken = Guid.NewGuid().ToString("N")[..8];
+            var sourceFileName = $"{Path.GetFileNameWithoutExtension(shaderResult.FilePath)}.{shaderFunction}.{uniqueToken}";
 
             // TODO: We have no intermediate folder in 2MGFX for temp stuff
             // that isn't content, but could be useful later.  So just putting

@@ -7,6 +7,8 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Security.Cryptography;
+using System.Text;
 using System.Text.RegularExpressions;
 using Microsoft.Win32;
 using Microsoft.Xna.Framework.Graphics;
@@ -101,10 +103,27 @@ namespace MonoGame.Effect
                 if (shaderResult.Debug)
                 {
                     toolArgs += "/Zi ";
+                    string uniqueToken;
+                    if (string.IsNullOrEmpty(shaderResult.OutputFilePath))
+                    {
+                        // For cases where we don't have a file path, e.g: ShaderResult.FromString()
+                        uniqueToken = Guid.NewGuid().ToString("N")[..8];
+                    }
+                    else
+                    {
+                        // For cases where we're compiling from file, so that it's deterministic.
+                        var tokenBytes = SHA256.HashData(
+                            Encoding.UTF8.GetBytes(
+                                shaderResult.OutputFilePath + "|" + shaderResult.FileContent));
+
+                        uniqueToken = Convert
+                            .ToHexString(tokenBytes)[..8]
+                            .ToLowerInvariant();
+                    }
                     string outPdb = Path.GetFileNameWithoutExtension(shaderResult.FilePath);
                     outPdb += "_" + shaderFunction;
-                    outPdb += isVertexShader ? "_vs" : "_ps";
-                    outPdb += ".pdb";
+                    outPdb += isVertexShader ? "_vs_" : "_ps_";
+                    outPdb += uniqueToken + ".pdb";
                     Directory.CreateDirectory("ShaderSymbols");
                     toolArgs += "/Fd ShaderSymbols\\" + outPdb + " ";
                 }

@@ -33,8 +33,7 @@ public class ContextScopeFactoryTests
                 try
                 {
                     await Task.Delay(10);
-                    // get the context and make sure it is the
-                    //  the scope from the original task
+                    // Get the context and make sure it is the scope from the original task.
                     var retrievedCtx = ContextScopeFactory.ActiveContext;
                     Assert.That(ctx, Is.EqualTo(retrievedCtx));
                 }
@@ -108,6 +107,55 @@ public class ContextScopeFactoryTests
 
         await Task.WhenAll(tasks);
         Assert.That(errorCount, Is.EqualTo(0), "there were exceptions thrown in the task looping.");
+    }
+
+    /// <summary>
+    /// Verifies that when a parent scope is active before child tasks are forked in an async scope,
+    /// children pushing and popping their own nested scopes don't corrupt parent or siblings.
+    /// </summary>
+    [Test]
+    public async Task ContextScopeFactory_AsyncScope_IsolatedNestedContexts()
+    {
+        var tasks = new List<Task>();
+        long errorCount = 0;
+        using var parentContext = new NoOpContext(999);
+        ContextScopeFactory.BeginContext(parentContext);
+
+        Parallel.For(0, 128, new ParallelOptions{ MaxDegreeOfParallelism = 4 }, i =>
+        {
+            var capturedIndex = i + 1;
+            var task = Task.Run(async () =>
+            {
+                try
+                {
+                    // ReSharper disable AccessToDisposedClosure
+                    Assert.That(ContextScopeFactory.ActiveContext, Is.EqualTo(parentContext));
+
+                    using (var childContext = new NoOpContext(capturedIndex))
+                    {
+                        ContextScopeFactory.BeginContext(childContext);
+
+                        await Task.Delay(10);
+
+                        Assert.That(ContextScopeFactory.ActiveContext, Is.EqualTo(childContext));
+                    }
+
+                    Assert.That(ContextScopeFactory.ActiveContext, Is.EqualTo(parentContext));
+                    // ReSharper restore AccessToDisposedClosure
+                }
+                catch (Exception ex)
+                {
+                    Interlocked.Increment(ref errorCount);
+                    Console.WriteLine($"exception {ex.GetType().Name} - {ex.Message} \n {ex.StackTrace}");
+                }
+            });
+            tasks.Add(task);
+        });
+
+        await Task.WhenAll(tasks);
+
+        Assert.That(ContextScopeFactory.ActiveContext, Is.EqualTo(parentContext));
+        Assert.That(errorCount, Is.EqualTo(0), "there were exceptions thrown in child tasks nested inside async scope.");
     }
 
     /// <summary>
