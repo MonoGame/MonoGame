@@ -100,6 +100,12 @@ public partial class GraphicsDevice
         // sample count after caps are updated.
         int requestedMultiSampleCount = NormalizeMultiSampleCount(PresentationParameters.MultiSampleCount, MaxMultiSampleCount);
 
+        if (NativeGameWindow.Instance is { } nativeWindow
+            && PresentationParameters.DeviceWindowHandle == nativeWindow.Handle)
+        {
+            nativeWindow.OnPresentationChanged(PresentationParameters);
+        }
+
         MGG.GraphicsDevice_ResizeSwapchain(
                 Handle,
                 PresentationParameters.DeviceWindowHandle,
@@ -143,6 +149,12 @@ public partial class GraphicsDevice
             NativeGameWindow window = NativeGameWindow.Instance;
             if (window != null)
                 window.ApplyPendingNativeWindowChanges(PresentationParameters);
+        }
+
+        if (NativeGameWindow.Instance is { } nativeWindow
+            && PresentationParameters.DeviceWindowHandle == nativeWindow.Handle)
+        {
+            nativeWindow.OnPresentationChanged(PresentationParameters);
         }
 
         // Now resize the back buffer.
@@ -189,6 +201,31 @@ public partial class GraphicsDevice
             _currentFrame = -1;
             BeginFrame();
         }
+    }
+
+    internal unsafe void OnClientResize(int width, int height)
+    {
+        PresentationParameters.BackBufferWidth = width;
+        PresentationParameters.BackBufferHeight = height;
+
+        // Recreate the native swapchain to match the new window dimensions.
+        // This is not necessary for OpenGL, because backbuffer is tied to the window surface.
+        // But it is necessary for the native backends, as it is for DX11.
+        MGG.GraphicsDevice_ResizeSwapchain(
+            Handle,
+            PresentationParameters.DeviceWindowHandle,
+            width,
+            height,
+            PresentationParameters.BackBufferFormat,
+            PresentationParameters.DepthStencilFormat,
+            PresentationParameters.MultiSampleCount,
+            PresentationParameters.PresentationInterval.GetSyncInterval());
+
+        // Reset the current frame so that we begin a new frame with the new swapchain.
+        _currentFrame = -1;
+
+        Viewport = new Viewport(0, 0, width, height);
+        ScissorRectangle = new Rectangle(0, 0, width, height);
     }
 
     private unsafe void UpdateBackBufferMultiSampleCount(int requestedMultiSampleCount)

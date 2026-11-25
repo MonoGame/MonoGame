@@ -114,10 +114,10 @@ class NativeGamePlatform : GamePlatform
                     break;
 
                 case EventType.WindowResized:
-                { 
+                {
                     var window = NativeGameWindow.FromHandle(event_.Window.Window);
                     if (window != null)
-                        window.ClientResize(event_.Window.Data1, event_.Window.Data2);
+                        window.OnWindowResized(event_.Window.Data1, event_.Window.Data2);
                     break;
                 }
 
@@ -274,7 +274,7 @@ class NativeGamePlatform : GamePlatform
                 case EventType.DropComplete:
                 {
                     var window = NativeGameWindow.FromHandle(event_.Drop.Window);
-                    if (window != null )
+                    if (window != null)
                         window.OnFileDrop(new FileDropEventArgs(_dropList.ToArray()));
                     _dropList.Clear();
                     break;
@@ -285,9 +285,9 @@ class NativeGamePlatform : GamePlatform
 
     private bool ShouldExit()
     {
-        if (    Keyboard.Keys.Contains(Keys.F4) &&
-                (   Keyboard.Keys.Contains(Keys.LeftAlt) ||
-                    Keyboard.Keys.Contains(Keys.RightAlt)))
+        if (Keyboard.Keys.Contains(Keys.F4)
+            && (Keyboard.Keys.Contains(Keys.LeftAlt)
+                || Keyboard.Keys.Contains(Keys.RightAlt)))
         {
             return Window.AllowAltF4;
         }

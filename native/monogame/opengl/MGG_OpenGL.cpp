@@ -2128,6 +2128,7 @@ mgbyte MGG_GraphicsDevice_ResizeSwapchain(
     device->vertexArray = device->context.defaultVertexArray;
     device->context.BindDefaultVertexArray();
     ClearCurrentRenderTargets(device);
+    device->isInFrame = false;
     device->inputLayout = nullptr;
     device->currentProgram = nullptr;
     device->context.width = width;
@@ -2825,9 +2826,10 @@ void MGG_GraphicsDevice_DrawIndexedInstanced(
     mgint indexSizeInBytes = GetIndexElementSizeInBytes(device->indexElementSize);
     intptr_t indexByteOffset = static_cast<intptr_t>(indexStart) * indexSizeInBytes;
 
-	if (baseInstance > 0)
+    if (baseInstance > 0)
 	{
 		// TODO: Fix me!
+        // GraphicsDeviceTest.DrawInstancedPrimitivesUsesBaseInstance will fail until this path is implemented.
 	}
 	else
 	{	
@@ -2837,7 +2839,7 @@ void MGG_GraphicsDevice_DrawIndexedInstanced(
 	        ToIndexType(device->indexElementSize),
 	        reinterpret_cast<const void*>(indexByteOffset),
 	        instanceCount);
-		}
+	}
 }
 
 void MGG_GraphicsDevice_ResolveRenderTargets(MGG_GraphicsDevice* device)
