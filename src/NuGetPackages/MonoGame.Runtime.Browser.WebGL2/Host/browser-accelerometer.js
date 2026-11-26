@@ -1,0 +1,194 @@
+// MonoGame - Copyright (C) MonoGame Foundation, Inc
+// This file is subject to the terms and conditions defined in
+// file 'LICENSE.txt', which is part of this source code package.
+
+import { SensorState } from "./browser-host-common.js";
+
+/** Handles browser accelerometer permission and device-motion readings. */
+export class BrowserAccelerometer {
+    /**
+     * Creates the browser accelerometer service.
+     *
+     * @param {object} host Browser host coordinator.
+     */
+    constructor(host) {
+        this.host = host;
+        this.accelerometerListener = null;
+        this.canvas = host.config.canvas;
+        this.permissionGestureListener = null;
+        this.permissionRequestPending = false;
+        this.isRequested = false;
+        this.hasReceivedReading = false;
+    }
+
+    /** @returns {boolean} Whether the browser supports device-motion events. */
+    isSupported() {
+        return typeof DeviceMotionEvent !== "undefined";
+    }
+
+    /** @returns {boolean} Whether motion permission requires a user gesture. */
+    isPermissionRequired() {
+        return this.isSupported()
+            && typeof DeviceMotionEvent.requestPermission === "function";
+    }
+
+    /**
+     * Returns the accelerometer state without prompting for permission.
+     *
+     * @returns {number} Accelerometer state.
+     */
+    request() {
+        if (!this.isSupported()) {
+            return SensorState.NotSupported;
+        }
+
+        this.isRequested = true;
+
+        if (this.accelerometerListener != null) {
+            return this.hasReceivedReading ? SensorState.Ready : SensorState.NoData;
+        }
+
+        if (!this.isPermissionRequired()) {
+            return this.start();
+        }
+
+        this.addPermissionGestureListener();
+        return SensorState.Initializing;
+    }
+
+    /** Stops motion event delivery without changing browser permission. */
+    stop() {
+        this.isRequested = false;
+        this.hasReceivedReading = false;
+        this.removePermissionGestureListener();
+        if (this.accelerometerListener != null) {
+            globalThis.removeEventListener("devicemotion", this.accelerometerListener);
+            this.accelerometerListener = null;
+        }
+    }
+
+    /** Stops motion delivery and releases the host canvas reference. */
+    dispose() {
+        this.stop();
+        this.canvas = null;
+    }
+
+    /** Adds the one-shot canvas gesture handler required by browsers such as iOS Safari. */
+    addPermissionGestureListener() {
+        if (this.canvas == null || this.permissionGestureListener != null) {
+            return;
+        }
+
+        this.permissionGestureListener = () => {
+            void this.requestPermissionFromCanvasGestureAsync();
+        };
+        this.canvas.addEventListener("touchend", this.permissionGestureListener, { passive: true });
+    }
+
+    /** Removes the pending canvas gesture handler. */
+    removePermissionGestureListener() {
+        if (this.canvas != null && this.permissionGestureListener != null) {
+            this.canvas.removeEventListener("touchend", this.permissionGestureListener);
+            this.permissionGestureListener = null;
+        }
+    }
+
+    /**
+     * Requests browser motion permission from the direct canvas gesture and reports a denial to the native runtime.
+     *
+     * @returns {Promise<boolean>} Whether permission was granted.
+     */
+    async requestPermissionFromCanvasGestureAsync() {
+        if (!this.isRequested || this.permissionRequestPending || this.host.native == null || !this.isSupported()) {
+            return false;
+        }
+
+        if (this.accelerometerListener != null) {
+            return true;
+        }
+
+        if (!this.isPermissionRequired()) {
+            this.start();
+            return true;
+        }
+
+        this.permissionRequestPending = true;
+        try {
+            const permission = await DeviceMotionEvent.requestPermission();
+            if (permission !== "granted") {
+                this.notifyState(SensorState.NoPermissions);
+                return false;
+            }
+
+            if (!this.isRequested) {
+                return false;
+            }
+
+            this.start();
+            return true;
+        }
+        catch {
+            this.notifyState(SensorState.NoPermissions);
+            return false;
+        }
+        finally {
+            this.permissionRequestPending = false;
+            this.removePermissionGestureListener();
+        }
+    }
+
+    /** Reports a sensor state when the managed runtime remains available. */
+    notifyState(state) {
+        this.host.native?.notifyAccelerometerState(state);
+    }
+
+    /** Starts forwarding device motion readings and waits for the first valid reading. */
+    start() {
+        this.hasReceivedReading = false;
+        if (this.accelerometerListener == null) {
+            this.accelerometerListener = (event) => {
+                const acceleration = event.accelerationIncludingGravity;
+                if (acceleration?.x == null || acceleration?.y == null || acceleration?.z == null) {
+                    return;
+                }
+
+                // Browser motion uses meters per second squared;
+                // MonoGame accelerometer readings are expressed in standard gravity units.
+                // So we convert by dividing by 9.80665
+                if (this.host.native != null) {
+                    const [x, y] = this.compensateForScreenOrientation(
+                        acceleration.x,
+                        acceleration.y);
+                    this.host.native.notifyAccelerometerReading(
+                        x / 9.80665,
+                        y / 9.80665,
+                        acceleration.z / 9.80665);
+
+                    if (!this.hasReceivedReading) {
+                        this.hasReceivedReading = true;
+                        this.notifyState(SensorState.Ready);
+                    }
+                }
+            };
+            globalThis.addEventListener("devicemotion", this.accelerometerListener);
+        }
+
+        this.notifyState(SensorState.NoData);
+        return SensorState.NoData;
+    }
+
+    /** Converts device-axis acceleration to the current screen orientation. */
+    compensateForScreenOrientation(x, y) {
+        const angle = globalThis.screen?.orientation?.angle;
+        switch (Number.isFinite(angle) ? angle : 0) {
+            case 90:
+                return [y, -x];
+            case 180:
+                return [-x, -y];
+            case 270:
+                return [-y, x];
+            default:
+                return [x, y];
+        }
+    }
+}

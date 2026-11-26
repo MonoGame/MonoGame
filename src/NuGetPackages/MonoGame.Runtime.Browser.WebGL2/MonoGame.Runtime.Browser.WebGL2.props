@@ -1,0 +1,30 @@
+<Project>
+
+  <PropertyGroup>
+    <!-- Match this with the application's Content.RootDirectory. -->
+    <MonoGameBrowserContentRoot Condition="'$(MonoGameBrowserContentRoot)' == ''">Content</MonoGameBrowserContentRoot>
+    <MonoGamePlatform Condition="'$(RuntimeIdentifier)' == 'browser-wasm' and '$(MonoGamePlatform)' == ''">WebGL2</MonoGamePlatform>
+    <UserRuntimeConfig Condition="'$(UserRuntimeConfig)' == '' and !Exists('$(MSBuildProjectDirectory)\runtimeconfig.template.json') and Exists('$(MSBuildThisFileDirectory)Host\browser.runtimeconfig.template.json')">$(MSBuildThisFileDirectory)Host\browser.runtimeconfig.template.json</UserRuntimeConfig>
+    <EmccExtraLDFlags Condition="'$(RuntimeIdentifier)' == 'browser-wasm'">$(EmccExtraLDFlags) -sMIN_WEBGL_VERSION=2 -sMAX_WEBGL_VERSION=2</EmccExtraLDFlags>
+    <AllowUnsafeBlocks Condition="'$(RuntimeIdentifier)' == 'browser-wasm'">true</AllowUnsafeBlocks>
+  </PropertyGroup>
+
+  <ItemGroup Condition="'$(RuntimeIdentifier)' == 'browser-wasm'">
+    <NativeFileReference Include="$(MSBuildThisFileDirectory)..\runtimes\browser-wasm\native\mgruntime.a" />
+    <NativeFileReference Include="$(MSBuildThisFileDirectory)..\runtimes\browser-wasm\native\libFAudio.a" />
+    <NativeFileReference Include="$(MSBuildThisFileDirectory)..\runtimes\browser-wasm\native\libSDL2.a" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(RuntimeIdentifier)' == 'browser-wasm'">
+    <Content Include="$(MSBuildThisFileDirectory)Host\*.js"
+             Link="wwwroot\_monogame\%(Filename)%(Extension)"
+             CopyToOutputDirectory="PreserveNewest"
+             CopyToPublishDirectory="PreserveNewest" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(RuntimeIdentifier)' == 'browser-wasm'">
+    <Compile Include="$(MSBuildThisFileDirectory)WebInterop.cs" Link="MonoGame\Runtime\Browser\WebGL2\WebInterop.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)BrowserGame.cs" Link="MonoGame\Runtime\Browser\WebGL2\BrowserGame.cs" />
+  </ItemGroup>
+
+</Project>

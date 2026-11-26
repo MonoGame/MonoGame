@@ -74,6 +74,9 @@ jobs:
         run: |
           dotnet workload install android --version ${{ env.DotnetVersion }}
 
+      - name: Setup WebAssembly Dependencies
+        run: dotnet workload install wasm-tools --version ${{ env.DotnetVersion }}
+
       - name: Update Homebrew
         if: runner.environment == 'github-hosted' && runner.os == 'macos'
         run: |
@@ -163,8 +166,8 @@ jobs:
       - name: Build
         if: runner.os == 'Linux' && runner.arch == 'ARM64'
         run: |
-          dotnet run --project build/Build.csproj -- --target="Build Shaders"
-          dotnet run --project build/Build.csproj -- --target="Build Native"
+          # Calling Build WebGl2 invokes "Build Native", including the "Build Shaders" dependency build.
+          dotnet run --project build/Build.csproj -- --target="Build WebGL2"
           dotnet run --project build/Build.csproj -- --target="Build Content Pipeline"
         env:
           DOTNET_SYSTEM_NET_SECURITY_NOREVOCATIONCHECKBYDEFAULT: 1 # android compilation is failing randomly due to downloads from microsofts website during it
