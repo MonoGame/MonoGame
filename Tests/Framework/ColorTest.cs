@@ -302,7 +302,20 @@ namespace MonoGame.Tests.Framework
             {
                 Color color = Color.FromHSV(hue, 1, 1);
                 color.ToHSV(out float h, out _, out _); 
-                Assert.LessOrEqual(Math.Abs(hue - h), 0.25f);
+                Assert.LessOrEqual(Math.Abs(hue - h), 0.25f, $"Hue mismatch at {hue} degrees. Got {h}.");
+            }
+        }
+
+
+        [Test]
+        public void HSL_Conversion()
+        {
+            for (float hue = 0.0f; hue <= 359.0f; hue += 1f)
+            {
+                Color color = Color.FromHSL(hue, 100, 50);
+                color.ToHSL(out float h, out _, out _);
+
+                Assert.LessOrEqual(Math.Abs(hue - h), 0.25f, $"Hue mismatch at {hue} degrees. Got {h}.");
             }
         }
 
