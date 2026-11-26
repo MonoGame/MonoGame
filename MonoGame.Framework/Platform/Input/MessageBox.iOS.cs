@@ -1,4 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Runtime.Versioning;
 using System.Threading.Tasks;
 using UIKit;
 
@@ -6,39 +9,61 @@ namespace Microsoft.Xna.Framework.Input
 {
     public static partial class MessageBox
     {
-        private static TaskCompletionSource<int?> tcs;
-        private static UIAlertView alert;
+        private static TaskCompletionSource<int?> _tcs;
+        private static UIAlertController _alert;
 
         private static Task<int?> PlatformShow(string title, string description, List<string> buttons)
         {
-            tcs = new TaskCompletionSource<int?>();
+            _tcs = new TaskCompletionSource<int?>();
             UIApplication.SharedApplication.InvokeOnMainThread(delegate
             {
-                alert = new UIAlertView();
-                alert.Title = title;
-                alert.Message = description;
+                _alert = UIAlertController.Create(title, description, UIAlertControllerStyle.Alert);
                 foreach (string button in buttons)
-                    alert.AddButton(button);
-                alert.Dismissed += (sender, e) =>
                 {
-                    if (!tcs.Task.IsCompleted)
-					    tcs.SetResult((int)e.ButtonIndex);
-                };
-                alert.Show();
+                    UIAlertAction action = UIAlertAction.Create(button, UIAlertActionStyle.Default, Handler);
+                    _alert.AddAction(action);
+                }
+
+                UIViewController rootViewController;
+                if(UIDevice.CurrentDevice.CheckSystemVersion(13, 0))
+                    rootViewController = GetRootViewController();
+                else
+                    rootViewController = UIApplication.SharedApplication.KeyWindow?.RootViewController;
+
+                rootViewController?.PresentViewController(_alert, true, null);
+                return;
+
+                void Handler(UIAlertAction action)
+                {
+                    if (!_tcs.Task.IsCompleted)
+                    {
+                        _tcs.SetResult(Array.IndexOf(_alert.Actions,action));
+                    }
+                }
             });
 
-            return tcs.Task;
+            return _tcs.Task;
         }
 
         private static void PlatformCancel(int? result)
         {
-            if (!tcs.Task.IsCompleted)
-                tcs.SetResult(result);
+            if (!_tcs.Task.IsCompleted)
+                _tcs.SetResult(result);
 
             UIApplication.SharedApplication.InvokeOnMainThread(delegate
             {
-                alert.DismissWithClickedButtonIndex(0, true);
+                _alert.DismissViewController(true, null);
             });
         }
+
+        [SupportedOSPlatform("ios13.0")]
+        private static UIViewController GetRootViewController() =>
+            UIApplication.SharedApplication.ConnectedScenes
+                .OfType<UIWindowScene>()
+                .FirstOrDefault(scene => scene.ActivationState == UISceneActivationState.ForegroundActive)?
+                .Windows
+                .FirstOrDefault(w => w.IsKeyWindow)?
+                .RootViewController;
+
     }
 }

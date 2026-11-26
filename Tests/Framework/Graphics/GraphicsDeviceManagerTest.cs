@@ -1,4 +1,4 @@
-﻿// MonoGame - Copyright (C) MonoGame Foundation, Inc
+// MonoGame - Copyright (C) MonoGame Foundation, Inc
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
@@ -401,7 +401,7 @@ namespace MonoGame.Tests.Graphics
             Assert.AreEqual(0, count);
         }
 
-#if VULKAN || DIRECTX12
+#if VULKAN || DIRECTX12 || DESKTOPGL4
         [Test]
         public void BackBufferAndViewportUpdateOnResize()
         {
@@ -414,6 +414,47 @@ namespace MonoGame.Tests.Graphics
             Assert.AreEqual(height, gd.PresentationParameters.BackBufferHeight);
             Assert.AreEqual(width, gd.Viewport.Width);
             Assert.AreEqual(height, gd.Viewport.Height);
+        }
+
+        [Test]
+        public void CustomViewportPreservedOnClientSizeChanged()
+        {
+            int targetWidth = 100;
+            int targetHeight = 50;
+            int customWidth = 40;
+            int customHeight = 30;
+
+            void OnClientSizeChanged(object sender, EventArgs args)
+            {
+                gd.Viewport = new Viewport(0, 0, customWidth, customHeight);
+                gd.ScissorRectangle = new Rectangle(0, 0, customWidth, customHeight);
+            }
+
+            game.Window.ClientSizeChanged += OnClientSizeChanged;
+            try
+            {
+                ((NativeGameWindow)game.Window).ClientResize(targetWidth, targetHeight);
+
+                // Check if the viewport and scissor are preserved after ClientResize().
+                Assert.AreEqual(customWidth, gd.Viewport.Width);
+                Assert.AreEqual(customHeight, gd.Viewport.Height);
+                Assert.AreEqual(customWidth, gd.ScissorRectangle.Width);
+                Assert.AreEqual(customHeight, gd.ScissorRectangle.Height);
+
+                // Check if viewport and scissor survive multiple resizes.
+                customWidth = 80;
+                customHeight = 60;
+                ((NativeGameWindow)game.Window).ClientResize(200, 100);
+
+                Assert.AreEqual(customWidth, gd.Viewport.Width);
+                Assert.AreEqual(customHeight, gd.Viewport.Height);
+                Assert.AreEqual(customWidth, gd.ScissorRectangle.Width);
+                Assert.AreEqual(customHeight, gd.ScissorRectangle.Height);
+            }
+            finally
+            {
+                game.Window.ClientSizeChanged -= OnClientSizeChanged;
+            }
         }
 #endif
 
