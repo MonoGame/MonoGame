@@ -13,7 +13,7 @@ namespace MonoGame.Tests.Graphics
     [NonParallelizable]
     [RunOnUiTestFixture]
     class GraphicsAdapterTest
-#if VULKAN || DESKTOPGL4
+#if NATIVE
      : GraphicsDeviceTestFixtureBase
 #endif
     {
