@@ -105,6 +105,9 @@ internal static unsafe partial class MGM
 
     [DllImport(MGP.MonoGameNativeDLL, EntryPoint = "MGM_Song_GetPosition", ExactSpelling = true)]
     public static extern ulong Song_GetPosition(MGM_Song* song);
+     
+    [DllImport(MGP.MonoGameNativeDLL, EntryPoint = "MGM_Song_SetPosition", ExactSpelling = true)]
+    public static extern void Song_SetPosition(MGM_Song* song, ulong position);
 
     [DllImport(MGP.MonoGameNativeDLL, EntryPoint = "MGM_Song_GetDuration", ExactSpelling = true)]
     public static extern ulong Song_GetDuration(MGM_Song* song);

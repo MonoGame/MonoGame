@@ -71,12 +71,12 @@ public sealed partial class Song : IEquatable<Song>, IDisposable
 
         set
         {
-            if (_voice == null)
+            if (_song == null)
             {
                 throw new InvalidOperationException("Song is not initialized.");
             }
 
-            MGA.Voice_SetPosition(_voice, (ulong)value.Milliseconds);
+            MGM.Song_SetPosition(_song, (ulong)value.Milliseconds);
         }
     }
 
