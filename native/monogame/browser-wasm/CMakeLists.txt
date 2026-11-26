@@ -1,0 +1,94 @@
+cmake_minimum_required(VERSION 3.20)
+
+project(MonoGameBrowserWasm LANGUAGES C CXX)
+
+if(NOT CMAKE_SYSTEM_NAME STREQUAL "Emscripten")
+    message(FATAL_ERROR "MonoGame browser-wasm native archives must be configured with the Emscripten toolchain.")
+endif()
+
+if(NOT CMAKE_CONFIGURATION_TYPES AND NOT CMAKE_BUILD_TYPE)
+    set(CMAKE_BUILD_TYPE Release CACHE STRING "Build type" FORCE)
+endif()
+
+set(CMAKE_C_STANDARD 11)
+set(CMAKE_C_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
+get_filename_component(MONOGAME_NATIVE_ROOT "${CMAKE_CURRENT_LIST_DIR}/.." ABSOLUTE)
+get_filename_component(MONOGAME_SOURCE_ROOT "${MONOGAME_NATIVE_ROOT}/../.." ABSOLUTE)
+set(_monogameSdl2Root "${MONOGAME_NATIVE_ROOT}/external/sdl2/sdl")
+
+set(SDL_SHARED OFF CACHE BOOL "" FORCE)
+set(SDL_STATIC ON CACHE BOOL "" FORCE)
+set(SDL_TEST OFF CACHE BOOL "" FORCE)
+set(SDL_TESTS OFF CACHE BOOL "" FORCE)
+set(SDL2_DISABLE_SDL2MAIN ON CACHE BOOL "" FORCE)
+set(SDL2_DISABLE_INSTALL ON CACHE BOOL "" FORCE)
+set(SDL_AUDIO ON CACHE BOOL "" FORCE)
+set(SDL_VIDEO ON CACHE BOOL "" FORCE)
+set(SDL_EVENTS ON CACHE BOOL "" FORCE)
+set(SDL_JOYSTICK ON CACHE BOOL "" FORCE)
+set(SDL_FILE ON CACHE BOOL "" FORCE)
+set(SDL_RENDER OFF CACHE BOOL "" FORCE)
+set(SDL_HAPTIC OFF CACHE BOOL "" FORCE)
+set(SDL_HIDAPI OFF CACHE BOOL "" FORCE)
+set(SDL_POWER OFF CACHE BOOL "" FORCE)
+set(SDL_LOADSO OFF CACHE BOOL "" FORCE)
+set(SDL_FILESYSTEM OFF CACHE BOOL "" FORCE)
+set(SDL_SENSOR OFF CACHE BOOL "" FORCE)
+set(SDL_LOCALE OFF CACHE BOOL "" FORCE)
+set(SDL_MISC OFF CACHE BOOL "" FORCE)
+set(SDL_OPENGL OFF CACHE BOOL "" FORCE)
+set(SDL_OPENGLES ON CACHE BOOL "" FORCE)
+set(SDL_DISKAUDIO OFF CACHE BOOL "" FORCE)
+set(SDL_DUMMYAUDIO OFF CACHE BOOL "" FORCE)
+set(SDL_DUMMYVIDEO OFF CACHE BOOL "" FORCE)
+set(SDL_OFFSCREEN OFF CACHE BOOL "" FORCE)
+set(SDL_VIRTUAL_JOYSTICK OFF CACHE BOOL "" FORCE)
+add_subdirectory("${_monogameSdl2Root}" sdl2)
+
+set_target_properties(SDL2-static PROPERTIES
+    DEBUG_POSTFIX ""
+    OUTPUT_NAME "SDL2"
+    ARCHIVE_OUTPUT_DIRECTORY "${MONOGAME_BROWSER_OUTPUT_ROOT}/$<CONFIG>")
+
+set(BUILD_SHARED_LIBS OFF CACHE BOOL "" FORCE)
+set(BUILD_SDL3 OFF CACHE BOOL "" FORCE)
+set(XNASONG OFF CACHE BOOL "" FORCE)
+set(FAUDIO_INSTALL OFF CACHE BOOL "" FORCE)
+set(SDL2_INCLUDE_DIRS "${_monogameSdl2Root}/include" CACHE PATH "" FORCE)
+set(SDL2_LIBRARIES SDL2-static CACHE STRING "" FORCE)
+add_subdirectory("${MONOGAME_NATIVE_ROOT}/external/faudio" faudio)
+set_target_properties(FAudio-static PROPERTIES
+    ARCHIVE_OUTPUT_DIRECTORY "${MONOGAME_BROWSER_OUTPUT_ROOT}/$<CONFIG>")
+
+add_library(mgruntime STATIC
+    "${MONOGAME_NATIVE_ROOT}/common/MGI.cpp"
+    "${MONOGAME_NATIVE_ROOT}/common/MG_Asset.cpp"
+    "${MONOGAME_NATIVE_ROOT}/common/mg_audio.cpp"
+    "${MONOGAME_NATIVE_ROOT}/common/mg_hash.cpp"
+    "${MONOGAME_NATIVE_ROOT}/common/mg_library.cpp"
+    "${MONOGAME_NATIVE_ROOT}/opengl/OpenGLContext.cpp"
+    "${MONOGAME_NATIVE_ROOT}/opengl/MGG_OpenGL.cpp"
+    "${MONOGAME_NATIVE_ROOT}/sdl/MGP_sdl.cpp"
+    "${MONOGAME_NATIVE_ROOT}/faudio/MGA_faudio.cpp"
+    "${MONOGAME_NATIVE_ROOT}/web/MG_Storage_web.cpp"
+    "${MONOGAME_NATIVE_ROOT}/web/MGM_web.cpp"
+    "${MONOGAME_NATIVE_ROOT}/web/MGP_web.cpp")
+
+target_compile_definitions(mgruntime PRIVATE MG_SDL2 MG_OPENGL)
+target_compile_options(mgruntime PRIVATE "-Wno-warn-absolute-paths")
+target_link_libraries(mgruntime PRIVATE FAudio-static)
+target_include_directories(mgruntime PRIVATE
+    "${MONOGAME_NATIVE_ROOT}/include"
+    "${MONOGAME_NATIVE_ROOT}/common"
+    "${MONOGAME_NATIVE_ROOT}/sdl"
+    "${MONOGAME_NATIVE_ROOT}/opengl"
+    "${_monogameSdl2Root}/include"
+    "${MONOGAME_SOURCE_ROOT}/external/stb")
+
+set_target_properties(mgruntime PROPERTIES
+    PREFIX ""
+    OUTPUT_NAME "mgruntime"
+    ARCHIVE_OUTPUT_DIRECTORY "${MONOGAME_BROWSER_OUTPUT_ROOT}/$<CONFIG>")

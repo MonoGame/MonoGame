@@ -646,6 +646,8 @@ namespace Microsoft.Xna.Framework.Graphics
 			this.GetData(0, null, data, 0, data.Length);
 		}
 
+        static partial void PlatformOpenFromFileStream(string path, ref Stream stream, ref bool handled);
+
         /// <summary>
         /// Creates a <see cref="Texture2D"/> from a file, supported formats bmp, gif, jpg, png, tif and dds (only for simple textures).
         /// May work with other formats, but will not work with tga files.
@@ -663,7 +665,14 @@ namespace Microsoft.Xna.Framework.Graphics
             if (path == null)
                 throw new ArgumentNullException("path");
 
-            using (var stream = File.OpenRead(path))
+            Stream stream = null;
+            bool handled = false;
+            PlatformOpenFromFileStream(path, ref stream, ref handled);
+
+            if (!handled)
+                stream = File.OpenRead(path);
+
+            using (stream)
                 return FromStream(graphicsDevice, stream, colorProcessor);
         }
 
