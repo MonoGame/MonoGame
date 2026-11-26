@@ -2009,11 +2009,11 @@ namespace Microsoft.Xna.Framework
             if (delta == 0f)
                 h = 0.0f;
             else if (max == r)
-                h = (float)(60.0 * (((g - b) / delta) % 6.0));
+                h = (float)(60.0 * ((g - b) / delta));
             else if (max == g)
-                h = (float)(60.0 * (((b - r) / delta) + 2.0));
+                h = (float)(60.0 * ((b - r) / delta + 2.0));
             else
-                h = (float)((60.0 * (((r - g) / delta)) + 4.0));
+                h = (float)(60.0 * ((r - g) / delta + 4.0));
 
             if (h < 0.0f)
                 h += 360.0f;

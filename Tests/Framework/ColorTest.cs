@@ -1,5 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Audio;
 using NUnit.Framework;
+using System;
 
 namespace MonoGame.Tests.Framework
 {
@@ -291,6 +293,19 @@ namespace MonoGame.Tests.Framework
 
             Assert.AreEqual(color1, color2);
 
+        }
+
+        [Test]
+        public void HSV_Conversion()
+        {
+            for(float hue = 0.0f; hue <= 359.0f; hue += 1f)
+            {
+                Color color = Color.FromHSV(hue, 1, 1);
+                color.ToHSV(out float h, out _, out _);
+                var diff = hue - h;
+                Assert.LessOrEqual(diff, 1f);
+                Assert.GreaterOrEqual(diff, -1f);
+            }
         }
 
         [Test]
