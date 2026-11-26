@@ -301,10 +301,8 @@ namespace MonoGame.Tests.Framework
             for(float hue = 0.0f; hue <= 359.0f; hue += 1f)
             {
                 Color color = Color.FromHSV(hue, 1, 1);
-                color.ToHSV(out float h, out _, out _);
-                var diff = hue - h;
-                Assert.LessOrEqual(diff, 1f);
-                Assert.GreaterOrEqual(diff, -1f);
+                color.ToHSV(out float h, out _, out _); 
+                Assert.LessOrEqual(Math.Abs(hue - h), 0.25f);
             }
         }
 
