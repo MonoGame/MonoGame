@@ -954,6 +954,9 @@ namespace MonoGame.Tests.Graphics
         {
             var t = content.Load<Texture2D>(Paths.Texture ("random_16px_dxt"));
 
+            // Catch unexpected Color fallback.
+            Assert.AreEqual(SurfaceFormat.Dxt1, t.Format);
+
             var b = new byte[t.Width*t.Height/2];
             var b2 = new byte[t.Width*t.Height/2];
 
