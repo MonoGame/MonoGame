@@ -111,6 +111,11 @@ namespace Microsoft.Xna.Framework.Graphics
             return adapter;
         }
 
+        private bool PlatformIsSurfaceFormatSupported(GraphicsAdapter adapter, SurfaceFormat surfaceFormat)
+        {
+            return true;
+        }
+
         private bool PlatformIsProfileSupported(GraphicsProfile graphicsProfile)
         {
             if(UseReferenceDevice)

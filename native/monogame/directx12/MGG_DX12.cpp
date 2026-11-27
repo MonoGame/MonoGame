@@ -515,6 +515,11 @@ void MGG_GraphicsAdapter_GetInfo(MGG_GraphicsAdapter* adapter, MGG_GraphicsAdapt
 #endif
 	}
 
+	if (adapter->modes.size() == 0)
+	{
+		adapter->modes.push_back(currentDisplayMode);
+	}
+
 	info.DisplayModeCount = adapter->modes.size();
 	info.DisplayModes = adapter->modes.data();
 	info.CurrentDisplayMode = currentDisplayMode;

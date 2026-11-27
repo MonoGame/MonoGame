@@ -4,19 +4,24 @@
 
 using System;
 using System.Linq;
+using System.Text;
 using Microsoft.Xna.Framework.Graphics;
 using NUnit.Framework;
 
 namespace MonoGame.Tests.Graphics
 {
-    [TestFixture]
+    [NonParallelizable]
+    [RunOnUiTestFixture]
     class GraphicsAdapterTest
+#if NATIVE
+     : GraphicsDeviceTestFixtureBase
+#endif
     {
         // HACK: Only enable for XNA and DirectX which are the 
         // only platforms which currently correctly implement 
         // the GraphicsAdapter API.
         // TODO: Enable this for DIRECTX12 as well, and find a solution to display scaling.
-#if XNA || DIRECTX
+#if XNA || DIRECTX || NATIVE
         private static bool Equals(DisplayMode m1, DisplayMode m2)
         {
             return m1.Width == m2.Width &&
@@ -45,18 +50,28 @@ namespace MonoGame.Tests.Graphics
 
                 Assert.That(adapter.DeviceName, Is.Not.Null.Or.Empty);
                 Assert.That(adapter.Description, Is.Not.Null.Or.Empty);
-                Assert.AreNotEqual(0, adapter.DeviceId);
-                Assert.AreNotEqual(IntPtr.Zero, adapter.MonitorHandle);
-                Assert.AreNotEqual(0, adapter.VendorId);
-                Assert.AreNotEqual(adapter.SubSystemId, 0);
+#if VULKAN
+                Assert.AreNotEqual(0, adapter.Revision);
+#else
                 Assert.GreaterOrEqual(adapter.Revision, 0);
+#endif
+#if !DESKTOPGL4
+                Assert.AreNotEqual(0, adapter.DeviceId);
+                Assert.AreNotEqual(0, adapter.VendorId);
+#endif
 
+#if XNA || DIRECTX
+                Assert.AreNotEqual(adapter.SubSystemId, 0);
+                Assert.AreNotEqual(IntPtr.Zero, adapter.MonitorHandle);
+#endif
                 Assert.IsNotNull(adapter.CurrentDisplayMode); 
                 Assert.IsNotNull(adapter.SupportedDisplayModes);
                 Assert.GreaterOrEqual(adapter.SupportedDisplayModes.Count(), 1);
 
+#if !DESKTOPGL4
                 // This Assert can fail on laptops or systems with onboard graphics.
                 Assert.AreEqual(1, adapter.SupportedDisplayModes.Count(m => Equals(m, adapter.CurrentDisplayMode)));
+#endif
 
                 // Seems like XNA treats aspect ratios above 16:10 as wide screen. A 1680x1050 display (exactly 16:10) was considered not to be wide screen.
                 // MonoGame considers ratios equal or greater than 16:10 to be wide screen.
@@ -84,8 +99,10 @@ namespace MonoGame.Tests.Graphics
                     Assert.GreaterOrEqual(mode.TitleSafeArea.Top, 0);
                     Assert.Less(mode.TitleSafeArea.Left, mode.TitleSafeArea.Right);
                     Assert.Less(mode.TitleSafeArea.Top, mode.TitleSafeArea.Bottom);
+#if !DESKTOPGL4
                     Assert.LessOrEqual(mode.TitleSafeArea.Width, mode.Width);
                     Assert.LessOrEqual(mode.TitleSafeArea.Height, mode.Height);
+#endif
                 }
             }
         }
@@ -103,7 +120,27 @@ namespace MonoGame.Tests.Graphics
         [TestCase(GraphicsProfile.HiDef, SurfaceFormat.Color, SurfaceFormat.Color, true)]
         // unsupported renderTarget formats
         [TestCase(GraphicsProfile.Reach, SurfaceFormat.Alpha8, SurfaceFormat.Color, false)]
-        [TestCase(GraphicsProfile.HiDef, SurfaceFormat.Alpha8, SurfaceFormat.Color, false)]
+        [TestCase(GraphicsProfile.HiDef, SurfaceFormat.Alpha8, SurfaceFormat.Alpha8, true)]
+        [TestCase(GraphicsProfile.Reach, SurfaceFormat.Bgr565, SurfaceFormat.Bgr565, true)]
+        [TestCase(GraphicsProfile.HiDef, SurfaceFormat.Bgr565, SurfaceFormat.Bgr565, true)]
+        [TestCase(GraphicsProfile.Reach, SurfaceFormat.Bgra5551, SurfaceFormat.Bgra5551, true)]
+        [TestCase(GraphicsProfile.HiDef, SurfaceFormat.Bgra5551, SurfaceFormat.Bgra5551, true)]
+        [TestCase(GraphicsProfile.Reach, SurfaceFormat.Bgra4444, SurfaceFormat.Color, false)]
+        [TestCase(GraphicsProfile.HiDef, SurfaceFormat.Bgra4444, SurfaceFormat.Bgra4444, true)]
+        [TestCase(GraphicsProfile.Reach, SurfaceFormat.Rgba1010102, SurfaceFormat.Color, false)]
+        [TestCase(GraphicsProfile.HiDef, SurfaceFormat.Rgba1010102, SurfaceFormat.Rgba1010102, true)]
+        [TestCase(GraphicsProfile.Reach, SurfaceFormat.Rg32, SurfaceFormat.Color, false)]
+        [TestCase(GraphicsProfile.HiDef, SurfaceFormat.Rg32, SurfaceFormat.Rg32, true)]
+        [TestCase(GraphicsProfile.Reach, SurfaceFormat.Rgba64, SurfaceFormat.Color, false)]
+        [TestCase(GraphicsProfile.HiDef, SurfaceFormat.Rgba64, SurfaceFormat.Rgba64, true)]
+        [TestCase(GraphicsProfile.Reach, SurfaceFormat.Single, SurfaceFormat.Color, false)]
+        [TestCase(GraphicsProfile.HiDef, SurfaceFormat.Single, SurfaceFormat.Single, true)]
+        [TestCase(GraphicsProfile.Reach, SurfaceFormat.Vector2, SurfaceFormat.Color, false)]
+        [TestCase(GraphicsProfile.HiDef, SurfaceFormat.Vector2, SurfaceFormat.Vector2, true)]
+        [TestCase(GraphicsProfile.Reach, SurfaceFormat.Vector4, SurfaceFormat.Color, false)]
+        [TestCase(GraphicsProfile.HiDef, SurfaceFormat.Vector4, SurfaceFormat.Vector4, true)]
+        [TestCase(GraphicsProfile.Reach, SurfaceFormat.Rgba64, SurfaceFormat.Color, false)]
+        [TestCase(GraphicsProfile.HiDef, SurfaceFormat.Rgba64, SurfaceFormat.Rgba64, true)]
         [TestCase(GraphicsProfile.Reach, SurfaceFormat.Dxt1, SurfaceFormat.Color, false)]
         [TestCase(GraphicsProfile.HiDef, SurfaceFormat.Dxt1, SurfaceFormat.Color, false)]
         [TestCase(GraphicsProfile.Reach, SurfaceFormat.Dxt3, SurfaceFormat.Color, false)]
@@ -139,7 +176,7 @@ namespace MonoGame.Tests.Graphics
             Assert.AreEqual(selectedDepthFormat, DepthFormat.None);
             Assert.AreEqual(selectedMultiSampleCount, 0);
         }
-#endif // XNA || DIRECTX
+#endif // XNA || DIRECTX || NATIVE
     }
 }
 
