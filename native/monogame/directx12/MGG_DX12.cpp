@@ -2465,7 +2465,7 @@ MGG_Texture* MGG_RenderTarget_WrapNativeHandle(
 	mgint multiSampleCount,
 	mgbyte externalPresentation)
 {
-	if (!device || !nativeHandle || !device->resources)
+	if (!device || !nativeHandle || !device->resources || width <= 0 || height <= 0)
 	{
 		return nullptr;
 	}

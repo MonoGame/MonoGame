@@ -2009,11 +2009,11 @@ namespace Microsoft.Xna.Framework
             if (delta == 0f)
                 h = 0.0f;
             else if (max == r)
-                h = (float)(60.0 * (((g - b) / delta) % 6.0));
+                h = (float)(60.0 * ((g - b) / delta));
             else if (max == g)
                 h = (float)(60.0 * (((b - r) / delta) + 2.0));
             else
-                h = (float)((60.0 * (((r - g) / delta)) + 4.0));
+                h = (float)(60.0 * ((r - g) / delta + 4.0));
 
             if (h < 0.0f)
                 h += 360.0f;
@@ -2051,7 +2051,7 @@ namespace Microsoft.Xna.Framework
 
             // value
             v = (float)(max * 100.0);
-        } 
+        }
 
         /// <summary>
         /// Converts the Hue value to either an R, G or B value
@@ -2062,16 +2062,17 @@ namespace Microsoft.Xna.Framework
         /// <returns>the hue for R, G or B</returns>
         private static float HtoRGB(float c, float x, float rh)
         {
+            rh = ((rh % 1.0f) + 1.0f) % 1.0f;
+
             if ((6 * rh) < 1)
                 return (c + (x - c) * 6 * rh);
             if ((2 * rh) < 1)
                 return x;
             if ((3 * rh) < 2)
                 return (c + (x - c) * ((2.0f / 3.0f) - rh) * 6);
-            else
-                return c;
+            return c;
         }
-        
+
         /// <summary>
         /// Creates a <see cref="Color"/> from HSL values
         /// </summary>
@@ -2084,8 +2085,8 @@ namespace Microsoft.Xna.Framework
             s /= 100;
             l /= 100;
             //converting hue to be between 1 and 0
+            h = ((h % 360.0f) + 360.0f) % 360.0f;
             h /= 360.0f;
-            h %= 1;
 
             float r, g, b; //defining values for easier colour conversion at end
 

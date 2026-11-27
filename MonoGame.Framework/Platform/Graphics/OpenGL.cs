@@ -324,6 +324,8 @@ namespace MonoGame.OpenGL
         TextureBinding2D = 0x8069,
         MaxTextureMaxAnisotropyExt = 0x84FF,
         MaxSamples = 0x8D57,
+        SampleBuffers = 0x80A8,
+        Samples = 0x80A9,
     }
 
     internal enum StringName

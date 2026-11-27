@@ -89,17 +89,36 @@ void CommandContext::Reset()
     };
     cmdList->SetDescriptorHeaps(_countof(descriptorHeaps), descriptorHeaps);
 
+	// Re-bind the render targets.
+    if (!m_currentRTV.empty())
+    {
+        std::vector<D3D12_RESOURCE_BARRIER> batch;
+
+        for (auto texture : m_currentRT)
+            texture->TransitionBatched(batch, D3D12_RESOURCE_STATE_RENDER_TARGET);
+
+        Texture::SendTransitionBatch(batch, cmdList);
+
+        auto num_rtvs = static_cast<UINT>(m_currentRTV.size());
+        auto rtvs = m_currentRTV.data();
+
+        if (m_currentDepthStencil)
+            SetRenderTargets(num_rtvs, rtvs, m_currentDepthStencil->GetDSV());
+        else
+            SetRenderTargets(num_rtvs, rtvs);
+    }
+
     m_cbOffset = 0;
 }
 
 void CommandContext::Reset(unsigned int currentFrame) {
     m_backBufferIndex = currentFrame;
 
-    Reset();
-
     m_currentRT.clear();
     m_currentRTV.clear();
     m_currentDepthStencil = nullptr;
+
+    Reset();
 }
 
 uint64_t CommandContext::Close() {

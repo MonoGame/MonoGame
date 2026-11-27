@@ -347,7 +347,10 @@ internal class NativeGameWindow : GameWindow
             MGP.Window_SetPosition(_handle, _positionX, _positionY);
 
         if (IsFullScreen)
+        {
             MGP.Window_EnterFullScreen(_handle, (byte)(HardwareModeSwitch ? 1 : 0));
+            IsFullScreen = MGP.Window_GetIsFullscreen(_handle) != 0;
+        }
 
         if (_visible)
             MGP.Window_Show(_handle, 1);
@@ -375,24 +378,32 @@ internal class NativeGameWindow : GameWindow
 
     public unsafe void OnPresentationChanged(PresentationParameters pp)
     {
-        if (pp.IsFullScreen && pp.HardwareModeSwitch && IsFullScreen && HardwareModeSwitch)
+        if (pp.IsFullScreen
+            && (!IsFullScreen || pp.HardwareModeSwitch != HardwareModeSwitch))
         {
-            // Nothing changed... what do we do here?
-        }
-        else if (pp.IsFullScreen && (!IsFullScreen || pp.HardwareModeSwitch != HardwareModeSwitch))
-        {
-            IsFullScreen = pp.IsFullScreen;
             HardwareModeSwitch = pp.HardwareModeSwitch;
 
             if (HasCreatedWindow)
+            {
                 MGP.Window_EnterFullScreen(_handle, (byte)(HardwareModeSwitch ? 1 : 0));
+                IsFullScreen = MGP.Window_GetIsFullscreen(_handle) != 0;
+            }
+            else
+            {
+                IsFullScreen = true;
+            }
         }
-        else if (!pp.IsFullScreen && IsFullScreen)
+        else if (!pp.IsFullScreen)
         {
-            IsFullScreen = pp.IsFullScreen;
-
             if (HasCreatedWindow)
+            {
                 MGP.Window_ExitFullScreen(_handle);
+                IsFullScreen = MGP.Window_GetIsFullscreen(_handle) != 0;
+            }
+            else
+            {
+                IsFullScreen = false;
+            }
         }
 
         if (_width == pp.BackBufferWidth && _height == pp.BackBufferHeight)
@@ -403,6 +414,11 @@ internal class NativeGameWindow : GameWindow
 
         if (HasCreatedWindow)
             MGP.Window_SetClientSize(_handle, pp.BackBufferWidth, pp.BackBufferHeight);
+    }
+
+    internal void FullscreenChanged(bool fullscreen)
+    {
+        IsFullScreen = fullscreen;
     }
 
     public unsafe void ClientResize(int width, int height)
@@ -421,8 +437,6 @@ internal class NativeGameWindow : GameWindow
         var presentationParameters = graphicsDevice.PresentationParameters;
         presentationParameters.BackBufferWidth = width;
         presentationParameters.BackBufferHeight = height;
-        graphicsDevice.Viewport = new Viewport(0, 0, width, height);
-        graphicsDevice.ScissorRectangle = new Rectangle(0, 0, width, height);
 
         // Recreate the native swapchain to match the new window dimensions.
         // This is not necessary for OpenGL, because backbuffer is tied to the window surface.
@@ -436,6 +450,9 @@ internal class NativeGameWindow : GameWindow
             presentationParameters.DepthStencilFormat,
             presentationParameters.MultiSampleCount,
             presentationParameters.PresentationInterval.GetSyncInterval());
+
+        graphicsDevice.Viewport = new Viewport(0, 0, width, height);
+        graphicsDevice.ScissorRectangle = new Rectangle(0, 0, width, height);
 
         OnClientSizeChanged();
     }

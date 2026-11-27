@@ -1,56 +1,74 @@
-﻿using System.Threading.Tasks;
+﻿using System.Linq;
+using System.Runtime.Versioning;
+using System.Threading.Tasks;
 using UIKit;
 
 namespace Microsoft.Xna.Framework.Input
 {
     public static partial class KeyboardInput
     {
-        private static TaskCompletionSource<string> tcs;
-        private static UIAlertView alert;
+        private static TaskCompletionSource<string> _tcs;
+        private static UIAlertController _alert;
 
         private static Task<string> PlatformShow(string title, string description, string defaultText, bool usePasswordMode)
         {
-            tcs = new TaskCompletionSource<string>();
+            _tcs = new TaskCompletionSource<string>();
 
             UIApplication.SharedApplication.InvokeOnMainThread(delegate
             {
-                alert = new UIAlertView();
-                alert.Title = title;
-                alert.Message = description;
-                alert.AlertViewStyle = usePasswordMode ? UIAlertViewStyle.SecureTextInput : UIAlertViewStyle.PlainTextInput;
-                alert.AddButton("Cancel");
-                alert.AddButton("Ok");
-                UITextField alertTextField = alert.GetTextField(0);
-                alertTextField.KeyboardType = UIKeyboardType.ASCIICapable;
-                alertTextField.AutocorrectionType = UITextAutocorrectionType.No;
-                alertTextField.AutocapitalizationType = UITextAutocapitalizationType.Sentences;
-                alertTextField.Text = defaultText;
-                alert.Dismissed += (sender, e) =>
+                _alert = UIAlertController.Create(title, description, UIAlertControllerStyle.Alert);
+                UIAlertAction cancelButton = UIAlertAction.Create("Cancel", UIAlertActionStyle.Cancel, Handler);
+                UIAlertAction okButton = UIAlertAction.Create("Ok", UIAlertActionStyle.Default, Handler);
+                _alert.AddAction(cancelButton);
+                _alert.AddAction(okButton);
+                _alert.AddTextField(alertTextField =>
                 {
-                    if (!tcs.Task.IsCompleted)
-                        tcs.SetResult(e.ButtonIndex == System.IntPtr.Zero ? null : alert.GetTextField(0).Text);
-                };
+                    alertTextField.SecureTextEntry = usePasswordMode;
+                    alertTextField.KeyboardType = UIKeyboardType.ASCIICapable;
+                    alertTextField.AutocorrectionType = UITextAutocorrectionType.No;
+                    alertTextField.AutocapitalizationType = UITextAutocapitalizationType.Sentences;
+                    alertTextField.Text = defaultText;
+                });
 
-                // UIAlertView's textfield does not show keyboard in iOS8
-                // http://stackoverflow.com/questions/25563108/uialertviews-textfield-does-not-show-keyboard-in-ios8
-                if (UIDevice.CurrentDevice.CheckSystemVersion(8, 0))
-                    alert.Presented += (sender, args) => alertTextField.SelectAll(alert);
+                UIViewController rootViewController;
+                if(UIDevice.CurrentDevice.CheckSystemVersion(13, 0))
+                    rootViewController = GetRootViewController();
+                else
+                    rootViewController = UIApplication.SharedApplication.KeyWindow?.RootViewController;
 
-                alert.Show();
+                rootViewController?.PresentViewController(_alert, true, null);
+                return;
+
+                void Handler(UIAlertAction action)
+                {
+                    if (!_tcs.Task.IsCompleted)
+                    {
+                        _tcs.SetResult(action.Style == UIAlertActionStyle.Cancel ? null : _alert.TextFields[0].Text);
+                    }
+                }
             });
 
-            return tcs.Task;
+            return _tcs.Task;
         }
 
         private static void PlatformCancel(string result)
         {
-            if (!tcs.Task.IsCompleted)
-                tcs.SetResult(result);
+            if (!_tcs.Task.IsCompleted)
+                _tcs.SetResult(result);
 
             UIApplication.SharedApplication.InvokeOnMainThread(delegate
             {
-                alert.DismissWithClickedButtonIndex(0, true);
+                _alert.DismissViewController(true, null);
             });
         }
+
+        [SupportedOSPlatform("ios13.0")]
+        private static UIViewController GetRootViewController() =>
+            UIApplication.SharedApplication.ConnectedScenes
+                .OfType<UIWindowScene>()
+                .FirstOrDefault(scene => scene.ActivationState == UISceneActivationState.ForegroundActive)?
+                .Windows
+                .FirstOrDefault(w => w.IsKeyWindow)?
+                .RootViewController;
     }
 }

@@ -1,0 +1,48 @@
+{
+  "version": 6,
+  "cmakeMinimumRequired": {
+    "major": 3,
+    "minor": 20,
+    "patch": 0
+  },
+  "configurePresets": [
+    {
+      "name": "browser-wasm-base",
+      "hidden": true,
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/../build/${presetName}"
+    },
+    {
+      "name": "browser-wasm-runtime-base",
+      "hidden": true,
+      "inherits": "browser-wasm-base",
+      "cacheVariables": {
+        "CMAKE_TOOLCHAIN_FILE": "${sourceDir}/DotNetEmscripten.cmake"
+      }
+    },
+    {
+      "name": "browser-wasm-debug",
+      "inherits": "browser-wasm-runtime-base",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug"
+      }
+    },
+    {
+      "name": "browser-wasm-release",
+      "inherits": "browser-wasm-runtime-base",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release"
+      }
+    }
+  ],
+  "buildPresets": [
+    {
+      "name": "browser-wasm-debug",
+      "configurePreset": "browser-wasm-debug"
+    },
+    {
+      "name": "browser-wasm-release",
+      "configurePreset": "browser-wasm-release"
+    }
+  ]
+}

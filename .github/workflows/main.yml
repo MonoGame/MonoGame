@@ -62,7 +62,7 @@ jobs:
           
       - name: Setup Android Dependencies
         if: runner.arch != 'arm64'
-        uses: monogame/monogame-actions/install-android-dependencies@v1.0.3
+        uses: monogame/monogame-actions/install-android-dependencies@v1
 
       - name: Setup DotNet on Windows
         if: runner.environment == 'github-hosted' && runner.os == 'windows'
@@ -73,6 +73,9 @@ jobs:
         if: runner.environment == 'github-hosted' && runner.os == 'Linux' && runner.arch == 'x64'
         run: |
           dotnet workload install android --version ${{ env.DotnetVersion }}
+
+      - name: Setup WebAssembly Dependencies
+        run: dotnet workload install wasm-tools --version ${{ env.DotnetVersion }}
 
       - name: Update Homebrew
         if: runner.environment == 'github-hosted' && runner.os == 'macos'
@@ -132,10 +135,10 @@ jobs:
         run: echo "::remove-matcher owner=csc::"
 
       - name: Setup Wine
-        uses: monogame/monogame-actions/install-wine@v1.0.3
+        uses: monogame/monogame-actions/install-wine@v1
 
       - name: Install Fonts
-        uses: monogame/monogame-actions/install-fonts@v1.0.3
+        uses: monogame/monogame-actions/install-fonts@v1
         
       - name: Install SDL2 deps on Linux
         if: runner.os == 'Linux'
@@ -163,8 +166,8 @@ jobs:
       - name: Build
         if: runner.os == 'Linux' && runner.arch == 'ARM64'
         run: |
-          dotnet run --project build/Build.csproj -- --target="Build Shaders"
-          dotnet run --project build/Build.csproj -- --target="Build Native"
+          # Calling Build WebGl2 invokes "Build Native", including the "Build Shaders" dependency build.
+          dotnet run --project build/Build.csproj -- --target="Build WebGL2"
           dotnet run --project build/Build.csproj -- --target="Build Content Pipeline"
         env:
           DOTNET_SYSTEM_NET_SECURITY_NOREVOCATIONCHECKBYDEFAULT: 1 # android compilation is failing randomly due to downloads from microsofts website during it
@@ -429,11 +432,11 @@ jobs:
 
       - name: Setup Wine
         if: runner.environment == 'github-hosted'
-        uses: monogame/monogame-actions/install-wine@v1.0.3
+        uses: monogame/monogame-actions/install-wine@v1
 
       - name: Install Fonts
         if: runner.environment == 'github-hosted'
-        uses: monogame/monogame-actions/install-fonts@v1.0.3
+        uses: monogame/monogame-actions/install-fonts@v1
 
       - name: Pin xcode version
         uses: maxim-lobanov/setup-xcode@v1
