@@ -87,7 +87,7 @@ namespace Microsoft.Xna.Framework
                 (3.0 * value2 - value1 - 3.0 * value3 + value4) * amountCubed));
         }
 
- 	/// <summary>
+ 	    /// <summary>
         /// Restricts a value to be within a specified range.
         /// </summary>
         /// <param name="value">The value to clamp.</param>
