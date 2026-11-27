@@ -444,7 +444,7 @@ namespace Microsoft.Xna.Framework.Graphics
             Opaque = new BlendState("BlendState.Opaque", Blend.One, Blend.Zero);
 		}
 
-	    internal BlendState Clone()
+	    public BlendState Clone()
 	    {
 	        return new BlendState(this);
 	    }
