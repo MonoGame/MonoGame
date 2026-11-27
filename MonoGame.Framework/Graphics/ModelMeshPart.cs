@@ -29,6 +29,11 @@ namespace Microsoft.Xna.Framework.Graphics
             }
             set 
             {
+                if (parent == null)
+                {
+                    throw new InvalidOperationException("Can't set Effect for ModelMeshPart with parent.");
+                }
+
                 if (value == _effect)
                     return;
 
@@ -92,7 +97,12 @@ namespace Microsoft.Xna.Framework.Graphics
         /// </summary>
 		public int VertexOffset { get; set; }
 
-		internal int VertexBufferIndex { get; set; }
+        /// <summary>
+        /// Gets the <see cref="BoundingSphere"/> that encompasses this mesh part.
+        /// </summary>
+        public BoundingSphere BoundingSphere { get; set; }
+
+        internal int VertexBufferIndex { get; set; }
 
 		internal int IndexBufferIndex { get; set; }
 
@@ -101,10 +111,8 @@ namespace Microsoft.Xna.Framework.Graphics
 		internal ModelMesh parent;
 
         /// <summary>
-        /// Using this constructor is strongly discouraged. Adding meshes to models at runtime is
-        /// not supported and may lead to <see cref="NullReferenceException"/>s if parent is not set.
+        /// Creates a new ModelMeshPart
         /// </summary>
-        [Obsolete("This constructor is deprecated and will be made internal in a future release.")]
         public ModelMeshPart() { }
 	}
 }

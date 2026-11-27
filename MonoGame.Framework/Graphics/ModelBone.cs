@@ -33,7 +33,7 @@ namespace Microsoft.Xna.Framework.Graphics
         /// <summary>
         /// Gets the index of this bone in the <see cref="Model.Bones">Model.Bones</see> collection.
         /// </summary>
-		public int Index { get; set; }
+		public int Index { get; internal set; }
 
         /// <summary>
         /// Gets the name of this bone.
@@ -43,7 +43,7 @@ namespace Microsoft.Xna.Framework.Graphics
         /// <summary>
         /// Gets the parent of this bone.
         /// </summary>
-		public ModelBone Parent { get; set; }
+		public ModelBone Parent { get; internal set; }
 
 		internal Matrix transform;
         /// <summary>
@@ -60,13 +60,18 @@ namespace Microsoft.Xna.Framework.Graphics
 		/// </summary>
 		public Matrix ModelTransform {
 			get;
-			set;
+			internal set;
 		}
+
+        /// <summary>
+        /// Gets or sets an object identifying this bone.
+        /// </summary>
+		public object Tag { get; set; }
 
         /// <summary>
         /// Creates a new collection of <see cref="ModelBone"/> to denote the child bones in this model.
         /// </summary>
-		public ModelBone ()	
+		internal ModelBone ()	
 		{
 			Children = new ModelBoneCollection(new List<ModelBone>());
 		}

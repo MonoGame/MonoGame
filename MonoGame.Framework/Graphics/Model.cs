@@ -32,7 +32,7 @@ namespace Microsoft.Xna.Framework.Graphics
         /// <summary>
         /// Root bone for this model.
         /// </summary>
-        public ModelBone Root { get; set; }
+        public ModelBone Root { get; internal set; }
 
         /// <summary>
         /// Custom attached object.
@@ -62,7 +62,7 @@ namespace Microsoft.Xna.Framework.Graphics
         /// <exception cref="ArgumentNullException">
         /// <paramref name="meshes"/> is null.
         /// </exception>
-        public Model(GraphicsDevice graphicsDevice, List<ModelBone> bones, List<ModelMesh> meshes)
+        internal Model(GraphicsDevice graphicsDevice, List<ModelBone> bones, List<ModelMesh> meshes)
 		{
             if (graphicsDevice == null)
             {
@@ -75,6 +75,23 @@ namespace Microsoft.Xna.Framework.Graphics
 			Bones = new ModelBoneCollection(bones);
 			Meshes = new ModelMeshCollection(meshes);
 		}
+
+        /// <summary>
+        /// Constructs a model. 
+        /// </summary>
+        /// <param name="bones">The collection of bones.</param>
+        /// <param name="meshes">The collection of meshes.</param>
+        /// <exception cref="ArgumentNullException">
+        /// <paramref name="bones"/> is null.
+        /// </exception>
+        /// <exception cref="ArgumentNullException">
+        /// <paramref name="meshes"/> is null.
+        /// </exception>
+        internal Model(List<ModelBone> bones, List<ModelMesh> meshes)
+        {
+            Bones = new ModelBoneCollection(bones);
+            Meshes = new ModelMeshCollection(meshes);
+        }
 
         internal void BuildHierarchy()
 		{
