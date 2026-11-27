@@ -9,6 +9,24 @@
 
 #include "api_common.h"
 
+struct MGCP_EffectOptions
+{
+    void* EffectFilePath;
+    void* Defines;
+    void* Profile;
+    mgbool Debug;
+    void* DebugSymbolPath;
+};
+
+struct MGCP_Effect
+{
+    mgint Size;
+    mgint Version;
+    void* bytecode;
+    void* errorsAndWarnings;
+    void* handle;
+};
+
 struct MGCP_Bitmap
 {
     mgint width;

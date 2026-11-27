@@ -1,0 +1,63 @@
+<!--
+  MonoGame - Copyright (C) MonoGame Foundation, Inc
+  This file is subject to the terms and conditions defined in
+  file 'LICENSE.txt', which is part of this source code package.
+-->
+
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+	<ItemGroup>
+		<!-- Windows x64 -->
+		<Content Include="$(MSBuildThisFileDirectory)..\Artifacts\native\mgpipeline\windows\x64\$(Configuration)\mgpipeline.dll" Condition="Exists('$(MSBuildThisFileDirectory)..\Artifacts\native\mgpipeline\windows\x64\$(Configuration)\mgpipeline.dll')" Visible="false">
+			<Link>runtimes\win-x64\native\mgpipeline.dll</Link>
+			<PackagePath>runtimes\win-x64\native</PackagePath>
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</Content>
+		<!-- Windows arm64 -->
+		<Content Include="$(MSBuildThisFileDirectory)..\Artifacts\native\mgpipeline\windows\arm64\$(Configuration)\mgpipeline.dll" Condition="Exists('$(MSBuildThisFileDirectory)..\Artifacts\native\mgpipeline\windows\arm64\$(Configuration)\mgpipeline.dll')" Visible="false">
+			<Link>runtimes\win-arm64\native\mgpipeline.dll</Link>
+			<PackagePath>runtimes\win-arm64\native</PackagePath>
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</Content>
+		<!-- Linux x64 -->
+		<Content Include="$(MSBuildThisFileDirectory)..\Artifacts\native\mgpipeline\linux\x64\$(Configuration)\libmgpipeline.so" Condition="Exists('$(MSBuildThisFileDirectory)..\Artifacts\native\mgpipeline\linux\x64\$(Configuration)\libmgpipeline.so')" Visible="false">
+			<Link>runtimes\linux-x64\native\libmgpipeline.so</Link>
+			<PackagePath>runtimes\linux-x64\native</PackagePath>
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</Content>
+		<!-- Linux arm64 -->
+		<Content Include="$(MSBuildThisFileDirectory)..\Artifacts\native\mgpipeline\linux\arm64\$(Configuration)\libmgpipeline.so" Condition="Exists('$(MSBuildThisFileDirectory)..\Artifacts\native\mgpipeline\linux\arm64\$(Configuration)\libmgpipeline.so')" Visible="false">
+			<Link>runtimes\linux-arm64\native\libmgpipeline.so</Link>
+			<PackagePath>runtimes\linux-arm64\native</PackagePath>
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</Content>
+		<!-- macOS (universal binary) -->
+		<Content Include="$(MSBuildThisFileDirectory)..\Artifacts\native\mgpipeline\macosx\$(Configuration)\libmgpipeline.dylib" Condition="Exists('$(MSBuildThisFileDirectory)..\Artifacts\native\mgpipeline\macosx\$(Configuration)\libmgpipeline.dylib')" Visible="false">
+			<PackagePath>runtimes\osx\native</PackagePath>
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</Content>
+	</ItemGroup>
+	
+	<Target Name="BuildMGCPW" Condition="'$(DisableNativeBuild)' != 'True' and '$(OS)' == 'Windows_NT'" BeforeTargets="CollectPackageReferences">
+		<Exec Command="&quot;$(MSBuildProgramFiles32)\Microsoft Visual Studio\Installer\vswhere.exe&quot; -latest -requires Microsoft.Component.MSBuild -find MSBuild\**\Bin\MSBuild.exe" ConsoleToMSBuild="true">
+			<Output TaskParameter="ConsoleOutput" PropertyName="MGMSBuild" />
+		</Exec>
+		<!-- Generate Multi-Arch Solution -->
+		<Exec Command="premake5 vs2022" WorkingDirectory="$(MSBuildThisFileDirectory)../native/pipeline/" />
+		<!-- Build x64 -->
+		<Exec Command="&quot;$(MGMSBuild)&quot; pipeline.sln /p:Configuration=$(Configuration) /p:Platform=x64" WorkingDirectory="$(MSBuildThisFileDirectory)../native/pipeline/" />
+		<!-- Build arm64 (cross-compile on same host) when building from CI -->
+		<Exec Command="&quot;$(MGMSBuild)&quot; pipeline.sln /p:Configuration=$(Configuration) /p:Platform=ARM64" WorkingDirectory="$(MSBuildThisFileDirectory)../native/pipeline/" Condition="'$(BuildingInsideVisualStudio)' != 'true'" />
+	</Target>
+
+	<Target Name="BuildMGCPU" Condition="'$(DisableNativeBuild)' != 'True' and '$(OS)' != 'Windows_NT'" BeforeTargets="CollectPackageReferences">
+		<PropertyGroup>
+			<!-- Linux/macOS: build for the host architecture (no cross-compilation) -->
+			<NativeArch Condition="'$([System.Runtime.InteropServices.RuntimeInformation]::OSArchitecture)' == 'Arm64'">arm64</NativeArch>
+			<NativeArch Condition="'$(NativeArch)' == ''">x64</NativeArch>
+		</PropertyGroup>
+		<Exec Command="premake5 --mg-arch=$(NativeArch) gmake" WorkingDirectory="$(MSBuildThisFileDirectory)../native/pipeline/" />
+		<Exec Command="make config=$(Configuration.ToLower())" WorkingDirectory="$(MSBuildThisFileDirectory)../native/pipeline/" />
+	</Target>
+
+</Project>

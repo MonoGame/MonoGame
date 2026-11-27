@@ -2,54 +2,129 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
+using MonoGame.Framework.Content.Pipeline.Interop;
+using SharpDX.D3DCompiler;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.RegularExpressions;
-using CppNet;
 
-namespace MonoGame.Effect.Compiler
+namespace MonoGame.Effect.Compiler;
+
+public static class Program
 {
-    public static class Program
+    // HACK!
+    static void RegisterNativeResolver()
     {
-        private static readonly List<(string, string)> sourceFiles = new();
-
-        private static readonly Regex lineColumnRegex = new(@"\((\d*)(,)?(\d*)?(-)?(\d*)?\)", RegexOptions.Compiled);
-
-        public static int Main(string[] args)
+        System.Runtime.InteropServices.NativeLibrary.SetDllImportResolver(typeof(MGCP).Assembly, (name, asm, searchPath) =>
         {
-            if (!Environment.Is64BitProcess)
+            if (name == "mgpipeline")
             {
-                Console.Error.WriteLine("The MonoGame content tools only work on a 64bit OS.");
-                return -1;
+                var dir = Path.GetDirectoryName(asm.Location)!;
+                var path = Path.Combine(dir, "runtimes", "win-x64", "native", "mgpipeline.dll");
+                return System.Runtime.InteropServices.NativeLibrary.Load(path); // throws with a clearer error if this fails
             }
+            return IntPtr.Zero; // anything else: default probing
+        });
+    }
 
-            var options = new Options();
-            var parser = new CommandLineParser(options);
-            parser.Title = "mgfxc - The MonoGame Effect compiler.";
 
-            if (!parser.ParseCommandLine(args))
-                return 1;
+    private static readonly List<(string, string)> sourceFiles = new();
 
-            var sourceFilepath = Path.GetFullPath(options.SourceFile);
+    private static readonly Regex lineColumnRegex = new(@"\((\d*)(,)?(\d*)?(-)?(\d*)?\)", RegexOptions.Compiled);
 
-            var nativeSourceFilepath = ConvertToNative(sourceFilepath);
+    public static int Main(string[] args)
+    {
+        RegisterNativeResolver();
 
-            sourceFiles.Add((sourceFilepath, nativeSourceFilepath));
+        if (!Environment.Is64BitProcess)
+        {
+            Console.Error.WriteLine("The MonoGame content tools only work on a 64bit OS.");
+            return -1;
+        }
 
-            var sourceDirectory = Path.GetDirectoryName(sourceFilepath) ?? "";
-            sourceFiles.Add((sourceDirectory, ConvertToNative(sourceDirectory)));
+        var options = new Options();
+        var parser = new CommandLineParser(options);
+        parser.Title = "mgfxc - The MonoGame Effect compiler.";
 
-            // Validate the input file exits.
-            if (!File.Exists(sourceFilepath))
+        if (!parser.ParseCommandLine(args))
+            return 1;
+
+        var sourceFilepath = Path.GetFullPath(options.SourceFile);
+
+        var nativeSourceFilepath = ConvertToNative(sourceFilepath);
+
+        sourceFiles.Add((sourceFilepath, nativeSourceFilepath));
+
+        var sourceDirectory = Path.GetDirectoryName(sourceFilepath) ?? "";
+        sourceFiles.Add((sourceDirectory, ConvertToNative(sourceDirectory)));
+
+        // Validate the input file exits.
+        if (!File.Exists(sourceFilepath))
+        {
+            Console.Error.WriteLine("The input file '{0}' was not found!", nativeSourceFilepath);
+            return 1;
+        }
+
+        // Get the output path and directory.
+        var outputFilepath = Path.GetFullPath(options.OutputFile);
+        var outputDirectory = Path.GetDirectoryName(outputFilepath) ?? Path.GetPathRoot(outputFilepath) ?? "";
+
+        byte[] bytecode;
+
+        // NOTE: This is the new shader compiler path that uses the
+        // native mgpipeline which will eventually replace the old shader
+        // compiler on all platforms.
+        if (options.Profile == ShaderProfile.DirectX_12)
+        {
+            // Call the native pipeline to compile the full effect.
+            var effect_options = new MGCP_EffectOptions();
+            effect_options.Create(
+                sourceFilepath,
+                options.Defines,
+                options.Profile.Name,
+                options.Debug,
+                outputDirectory);
+
+            //Console.WriteLine(RuntimeInformation.ProcessArchitecture);
+            //Console.WriteLine(RuntimeInformation.RuntimeIdentifier);
+            //Console.WriteLine(AppContext.GetData("NATIVE_DLL_SEARCH_DIRECTORIES"));
+
+            var effect = new MGCP_Effect();
+            int errors = MGCP.EffectCompiler_Compile(ref effect_options, out effect);
+
+            var errorsAndWarnings = effect.GetErrorsAndWarnings();
+            if (!string.IsNullOrEmpty(errorsAndWarnings))
+                Console.Error.WriteLine(ConvertMessage(errorsAndWarnings));
+
+            bytecode = effect.GetBytecode();
+
+            /*
+            foreach (var dependency in shaderResult.Dependencies)
             {
-                Console.Error.WriteLine("The input file '{0}' was not found!", nativeSourceFilepath);
-                return 1;
-            }
+                var dependencyNativeFilename = ConvertToNative(dependency);
+                Console.WriteLine("Dependency: " + dependencyNativeFilename);
 
+                sourceFiles.Add((dependency, dependencyNativeFilename));
+            }
+            */
+
+            // Cleanup internal state.
+            MGCP.EffectCompiler_Free(ref effect);
+
+            // If the effect build failed then exit.
+            if (errors > 0)
+            {
+                Console.Error.WriteLine("Failed to compile '{0}'!", nativeSourceFilepath);
+                return errors;
+            }
+        }
+        else
+        {
             // TODO: This would be where we would decide the user
             // is trying to convert an FX file to a MGFX glsl file.
             //
@@ -109,133 +184,134 @@ namespace MonoGame.Effect.Compiler
                 return 1;
             }
 
-            // Get the output file path.
-            if (options.OutputFile == string.Empty)
-                options.OutputFile = Path.GetFileNameWithoutExtension(sourceFilepath) + ".mgfxo";
-
-            var outputFilepath = Path.GetFullPath(options.OutputFile);
-            var nativeOutputFilepath = ConvertToNative(outputFilepath);
-
-            // Write out the effect to a runtime format.
-            try
+            using (var binary = new MemoryStream())
             {
-                bool writeHeader = outputFilepath.EndsWith(".h", StringComparison.OrdinalIgnoreCase);
-                if (writeHeader)
+                using (var writer = new BinaryWriter(binary))
+                    effect.Write(writer, options);
+                bytecode = binary.ToArray();
+            }
+
+        }
+
+        // Get the output file path.
+        if (options.OutputFile == string.Empty)
+            options.OutputFile = Path.GetFileNameWithoutExtension(sourceFilepath) + ".mgfxo";
+
+        var nativeOutputFilepath = ConvertToNative(outputFilepath);
+
+        // Write out the effect to a runtime format.
+        try
+        {
+            bool writeHeader = outputFilepath.EndsWith(".h", StringComparison.OrdinalIgnoreCase);
+            if (writeHeader)
+            {
+                using (var stream = new FileStream(outputFilepath, FileMode.Create, FileAccess.Write))
                 {
-                    using (var stream = new FileStream(outputFilepath, FileMode.Create, FileAccess.Write))
-                    using (var binary = new MemoryStream())
+                    var code = new StringBuilder();
+                    var data = bytecode;
+                    for (int i = 0; i < data.Length; i++)
                     {
-                        // Write the shader to the binary file.                        
-                        using (var writer = new BinaryWriter(binary))
-                            effect.Write(writer, options);
+                        if (i % 12 == 0)
+                            code.Append(CultureInfo.InvariantCulture, $"{Environment.NewLine}\t");
 
-                        var code = new StringBuilder();
-                        var data = binary.ToArray();
-                        for (int i = 0; i < data.Length; i++)
-                        {
-                            if (i % 12 == 0)
-                                code.Append(CultureInfo.InvariantCulture, $"{Environment.NewLine}\t");
+                        code.Append("0x");
+                        code.Append(data[i].ToString("x2", CultureInfo.InvariantCulture));
+                        code.Append(", ");
+                    }
 
-                            code.Append("0x");
-                            code.Append(data[i].ToString("x2", CultureInfo.InvariantCulture));
-                            code.Append(", ");
-                        }
+                    // Remove the trailing ", "
+                    code.Remove(code.Length - 2, 2);
 
-                        // Remove the trailing ", "
-                        code.Remove(code.Length - 2, 2);
+                    var symbol = Path.GetFileName(outputFilepath);
+                    symbol = symbol.Substring(0, symbol.Length - 2);
+                    symbol = symbol.Replace('.', '_');
 
-                         var symbol = Path.GetFileName(outputFilepath);
-                        symbol = symbol.Substring(0, symbol.Length - 2);
-                        symbol = symbol.Replace('.', '_');
+                    var guard = $"{symbol.ToUpper(CultureInfo.InvariantCulture)}_H";
 
-                        var guard = $"{symbol.ToUpper(CultureInfo.InvariantCulture)}_H";
+                    // Write the header.
+                    using (var text = new StreamWriter(stream))
+                    {
+                        text.WriteLine($$"""
+                                // This code was auto generated by the MonoGame Effect Compiler.
+                                // Do not modify it by hand. Use MGFXC.EXE to regenerate it.
+                                //
+                                // Source: {{Path.GetFileName(sourceFilepath)}}
+                                // Profile: {{options.Profile.Name}}
+                                // Defines: {{options.Defines}}
+                                // Debug: {{options.Debug}}
+                                // Size: {{data.Length}} bytes
+                                // Version: {{EffectObject.Version}}
 
-                        // Write the header.
-                        using (var text = new StreamWriter(stream))
-                        {
-                            text.WriteLine($$"""
-                                    // This code was auto generated by the MonoGame Effect Compiler.
-                                    // Do not modify it by hand. Use MGFXC.EXE to regenerate it.
-                                    //
-                                    // Source: {{Path.GetFileName(sourceFilepath)}}
-                                    // Profile: {{options.Profile.Name}}
-                                    // Defines: {{options.Defines}}
-                                    // Debug: {{options.Debug}}
-                                    // Size: {{data.Length}} bytes
-                                    // Version: {{EffectObject.Version}}
+                                #ifndef {{guard}}
+                                #define {{guard}}
 
-                                    #ifndef {{guard}}
-                                    #define {{guard}}
+                                static const unsigned char {{symbol}}[] = {{{code.ToString()}}
+                                };
 
-                                    static const unsigned char {{symbol}}[] = {{{code}}
-                                    };
-
-                                    #endif // {{guard}}
-                                    """);
-                        }
+                                #endif // {{guard}}
+                                """);
                     }
                 }
-                else
-                {
-                    using (var stream = new FileStream(outputFilepath, FileMode.Create, FileAccess.Write))
-                    using (var writer = new BinaryWriter(stream))
-                        effect.Write(writer, options);
-                }
             }
-            catch (Exception ex)
+            else
             {
-                Console.Error.WriteLine(ConvertMessage(ex.Message));
-                Console.Error.WriteLine("Failed to write '{0}'!", nativeOutputFilepath);
-                return 1;
+                // Just write it to disk.
+                File.WriteAllBytes(outputFilepath, bytecode);
             }
-
-            // We finished succesfully.
-            Console.WriteLine("Compiled '{0}' to '{1}'.", nativeSourceFilepath, nativeOutputFilepath);
-            return 0;
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine(ConvertMessage(ex.Message));
+            Console.Error.WriteLine("Failed to write '{0}'!", nativeOutputFilepath);
+            return 1;
         }
 
-        private static string ConvertToNative(string path)
+        // We finished succesfully.
+        Console.WriteLine("Compiled '{0}' to '{1}'.", nativeSourceFilepath, nativeOutputFilepath);
+        return 0;
+    }
+
+    private static string ConvertToNative(string path)
+    {
+        return path.Replace('\\', '/');
+    }
+
+    private static string ConvertMessage(string sourceString)
+    {
+        sourceString = sourceString.Replace("\\\\", "\\");
+
+        foreach (var (originalFilename, newFilename) in sourceFiles)
+            sourceString = sourceString.Replace(originalFilename, newFilename);
+
+        sourceString = lineColumnRegex.Replace(sourceString, ReplaceRowAndColumn);
+
+        return sourceString;
+    }
+
+    private static string ReplaceRowAndColumn(Match match)
+    {
+        var groups = match.Groups;
+        if (groups.Count != 6)
+            return match.Value;
+
+        var result = $"({groups[1]}," + (groups[2].Success && groups[3].Value != "0" ? groups[3] : "1");
+        if (groups[4].Success)
+            result += $",{groups[1]},{int.Parse(groups[5].ValueSpan, CultureInfo.InvariantCulture) + 1}";
+        result += ")";
+
+        return result;
+    }
+
+    private class ConsoleEffectCompilerOutput : IEffectCompilerOutput
+    {
+        public void WriteWarning(string file, int line, int column, string message)
         {
-            return path.Replace('\\', '/');
+            Console.Error.WriteLine($"{ConvertToNative(file)}({line},{column}): warning PREPROCESS01: {ConvertMessage(message)}");
         }
 
-        private static string ConvertMessage(string sourceString)
+        public void WriteError(string file, int line, int column, string message)
         {
-            sourceString = sourceString.Replace("\\\\", "\\");
-
-            foreach (var (originalFilename, newFilename) in sourceFiles)
-                sourceString = sourceString.Replace(originalFilename, newFilename);
-
-            sourceString = lineColumnRegex.Replace(sourceString, ReplaceRowAndColumn);
-
-            return sourceString;
-        }
-
-        private static string ReplaceRowAndColumn(Match match)
-        {
-            var groups = match.Groups;
-            if (groups.Count != 6)
-                return match.Value;
-
-            var result = $"({groups[1]}," + (groups[2].Success && groups[3].Value != "0" ? groups[3] : "1");
-            if (groups[4].Success)
-                result += $",{groups[1]},{int.Parse(groups[5].ValueSpan, CultureInfo.InvariantCulture) + 1}";
-            result += ")";
-
-            return result;
-        }
-
-        private class ConsoleEffectCompilerOutput : IEffectCompilerOutput
-        {
-            public void WriteWarning(string file, int line, int column, string message)
-            {
-                Console.Error.WriteLine($"{ConvertToNative(file)}({line},{column}): warning PREPROCESS01: {ConvertMessage(message)}");
-            }
-
-            public void WriteError(string file, int line, int column, string message)
-            {
-                throw new Exception($"{ConvertToNative(file)}({line},{column}): error PREPROCESS01: {ConvertMessage(message)}");
-            }
+            throw new Exception($"{ConvertToNative(file)}({line},{column}): error PREPROCESS01: {ConvertMessage(message)}");
         }
     }
 }

@@ -37,6 +37,11 @@ function pipeline_native()
 
     filter "system:windows"
     defines {"STBI_WINDOWS_UTF8", "STBIW_WINDOWS_UTF8"}
+    links {
+        "../../external/slang/lib/slang.lib",
+        "../../external/dxc/lib/x64/dxcompiler.lib",
+        "../../external/dxc/lib/x64/dxil.lib",
+    }
 
     filter "system:linux"
     pic "On"
@@ -46,8 +51,15 @@ function pipeline_native()
     targetname "mgpipeline"
     cppdialect "C++17"
 
-    files {"include/**.h", "*.cpp"}
-    includedirs {"include", "../monogame/include", "../../external/stb"}
+    files {"include/**.h", "*.cpp", "*.h", "../monogame/common/mg_hash.cpp"}
+    includedirs {
+        "include",
+        "../monogame/include",
+        "../../external/stb",
+        "../../external/slang/include",
+        "../../external/simplecpp",
+        "../../external/dxc/inc"
+    }
 end
 
 workspace "pipeline"

@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
@@ -15,6 +15,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
 
   <PropertyGroup>
@@ -24,6 +25,13 @@
     <NoWarn>NU5100;NU5118;NETSDK1206</NoWarn>
   </PropertyGroup>
 
+  <!-- Make sure we link the native mgpipeline dynamic library. -->
+  <Import Project="..\..\MonoGame.Framework.Content.Pipeline\mgpipeline.targets" />
+
+  <ItemGroup>
+    <None Remove="mgfxc_wine_setup.sh" />
+  </ItemGroup>
+
   <ItemGroup>
     <Compile Include="..\..\MonoGame.Framework.Content.Pipeline\ExternalTool.cs" />
     <Compile Include="..\..\MonoGame.Framework.Content.Pipeline\LoadedTypeCollection.cs">
@@ -32,10 +40,16 @@
     <Compile Include="..\..\MonoGame.Framework.Content.Pipeline\TargetPlatform.cs">
       <Link>TargetPlatform.cs</Link>
     </Compile>
+	  <Compile Include="..\..\MonoGame.Framework\Platform\Native\MGHandleAttribute.cs">
+		  <Link>MGHandleAttribute.cs</Link>
+	  </Compile>
+	  <Compile Include="..\..\MonoGame.Framework.Content.Pipeline\Native\Effect.Interop.cs">
+		  <Link>Effect.Interop.cs</Link>
+	  </Compile>
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\MonoGame.Framework\MonoGame.Framework.DesktopGL.csproj">
+    <ProjectReference Include="..\..\MonoGame.Framework\MonoGame.Framework.Native.csproj">
       <IncludeAssets>compile</IncludeAssets>
     </ProjectReference>
   </ItemGroup>
