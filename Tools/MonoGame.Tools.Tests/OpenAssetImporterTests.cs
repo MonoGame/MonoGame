@@ -8,6 +8,7 @@ using Microsoft.Xna.Framework.Content.Pipeline;
 using Microsoft.Xna.Framework.Content.Pipeline.Graphics;
 using NUnit.Framework;
 using System.IO;
+using System.Runtime.InteropServices;
 
 namespace MonoGame.Tests.ContentPipeline
 {
