@@ -86,10 +86,22 @@ struct OpenGLResourceCommand
     bool isComplete = false;
 };
 
+struct OpenGLClearState
+{
+    std::array<MGColorWriteChannels, 4> colorWriteMasks = {
+        MGColorWriteChannels::All, MGColorWriteChannels::All,
+        MGColorWriteChannels::All, MGColorWriteChannels::All
+    };
+    bool depthWriteEnabled = true;
+    GLuint stencilWriteMask = ~0u;
+    bool scissorEnabled = false;
+};
+
 struct MGG_GraphicsDevice
 {
     SDL_Window* window = nullptr;
     OpenGLContext context;
+    uint64_t contextGeneration = 0;
     mgint frame = 0;
     mgbool isInFrame = false;
     mgint backBufferWidth = 0;
@@ -100,6 +112,7 @@ struct MGG_GraphicsDevice
     MGG_BlendState* blendState = nullptr;
     MGG_DepthStencilState* depthStencilState = nullptr;
     MGG_RasterizerState* rasterizerState = nullptr;
+    OpenGLClearState clearState;
     GLuint vertexArray = 0;
     MGG_Buffer* indexBuffer = nullptr;
     MGIndexElementSize indexElementSize = MGIndexElementSize::SixteenBits;
@@ -169,6 +182,7 @@ struct MGG_Texture
     mgint multiSampleCount = 0;
     MGRenderTargetUsage renderTargetUsage = MGRenderTargetUsage::DiscardContents;
     GLuint framebuffer = 0;
+    uint64_t validatedSingleTargetGeneration = 0;
     GLuint resolveFramebuffer = 0;
     GLuint colorRenderbuffer = 0;
     GLuint depthRenderbuffer = 0;
@@ -1176,6 +1190,24 @@ namespace
         alpha = (mask & static_cast<mgint>(MGColorWriteChannels::Alpha)) != 0 ? GL_TRUE : GL_FALSE;
     }
 
+    bool SupportsSeparateBlendStates(const MGG_GraphicsDevice* device)
+    {
+        const auto& functions = device->context.functions;
+        return functions.BlendEquationSeparatei != nullptr &&
+               functions.BlendFuncSeparatei != nullptr &&
+               functions.ColorMaski != nullptr;
+    }
+
+    void ApplyColorWriteMask(MGG_GraphicsDevice* device, bool indexed, GLuint index, MGColorWriteChannels channels)
+    {
+        GLboolean red, green, blue, alpha;
+        ToColorMask(channels, red, green, blue, alpha);
+        if (indexed)
+            device->context.functions.ColorMaski(index, red, green, blue, alpha);
+        else
+            glColorMask(red, green, blue, alpha);
+    }
+
     MGDepthFormat GetActiveDepthFormat(const MGG_GraphicsDevice* device)
     {
         assert(device != nullptr);
@@ -2008,6 +2040,11 @@ namespace
         device->context.functions.BindRenderbuffer(GL_RENDERBUFFER, static_cast<GLuint>(previousRenderbuffer));
     }
 
+    bool CanReuseSingleTargetFramebuffer(const MGG_Texture* texture)
+    {
+        return texture->type == MGTextureType::_2D && !texture->isExternal && texture->multiSampleCount == 0;
+    }
+
     void ConfigureRenderTargetFramebuffers(MGG_GraphicsDevice* device, MGG_Texture* texture)
     {
         assert(device != nullptr);
@@ -2094,6 +2131,9 @@ namespace
         GLenum framebufferStatus = device->context.functions.CheckFramebufferStatus(GL_FRAMEBUFFER);
         if (framebufferStatus != GL_FRAMEBUFFER_COMPLETE)
             MGGL_FAIL("OpenGL framebuffer incomplete", "framebuffer status check failed");
+
+        if (CanReuseSingleTargetFramebuffer(texture))
+            texture->validatedSingleTargetGeneration = device->contextGeneration;
 
         if (texture->multiSampleCount > 0)
         {
@@ -2629,9 +2669,7 @@ void MGG_GraphicsDevice_GetCaps(MGG_GraphicsDevice* device, MGG_GraphicsDevice_C
     caps.SupportsNormalized = true;
     caps.SupportsInstancing = true;
     caps.SupportsBaseIndexInstancing = true;
-    caps.SupportsSeparateBlendStates = device->context.functions.BlendEquationSeparatei != nullptr &&
-                                       device->context.functions.BlendFuncSeparatei != nullptr &&
-                                       device->context.functions.ColorMaski != nullptr;
+    caps.SupportsSeparateBlendStates = SupportsSeparateBlendStates(device);
 }
 
 mgint MGG_GraphicsDevice_GetBackBufferMultiSampleCount(MGG_GraphicsDevice* device)
@@ -2665,8 +2703,16 @@ mgbyte MGG_GraphicsDevice_ResizeSwapchain(
 
     SDL_Window* window = static_cast<SDL_Window*>(nativeWindowHandle);
 
+    SDL_GLContext previousContext = device->context.handle;
     if (!device->context.Create(window))
         return 0;
+
+    // A replacement context starts with OpenGL defaults even when resources are shared.
+    if (device->context.handle != previousContext)
+    {
+        ++device->contextGeneration;
+        device->clearState = {};
+    }
 
     device->window = window;
     device->vertexArray = device->context.defaultVertexArray;
@@ -2742,59 +2788,50 @@ void MGG_GraphicsDevice_Clear(MGG_GraphicsDevice* device, MGClearOptions options
     if (restoreDrawBuffers)
         ApplyAllCurrentDrawBuffers(device);
 
-    GLboolean colorWriteMask[4] = {};
-    GLboolean depthWriteMask = GL_FALSE;
-    GLint stencilWriteMask = 0;
-    GLint scissorBox[4] = {};
-    GLboolean scissorTestEnabled = glIsEnabled(GL_SCISSOR_TEST);
-    GLboolean depthTestEnabled = glIsEnabled(GL_DEPTH_TEST);
-    GLboolean stencilTestEnabled = glIsEnabled(GL_STENCIL_TEST);
+    const auto& state = device->clearState;
+    const GLbitfield mask = ToClearMask(options);
+    const bool indexed = SupportsSeparateBlendStates(device);
+    const GLuint colorMaskCount = (mask & GL_COLOR_BUFFER_BIT) == 0 ? 0 :
+        indexed ? static_cast<GLuint>(state.colorWriteMasks.size()) : 1;
+    const bool overrideDepthMask = (mask & GL_DEPTH_BUFFER_BIT) != 0 && !state.depthWriteEnabled;
+    const bool overrideStencilMask = (mask & GL_STENCIL_BUFFER_BIT) != 0 && state.stencilWriteMask != ~0u;
 
-    glGetBooleanv(GL_COLOR_WRITEMASK, colorWriteMask);
-    glGetBooleanv(GL_DEPTH_WRITEMASK, &depthWriteMask);
-    glGetIntegerv(GL_STENCIL_WRITEMASK, &stencilWriteMask);
-    glGetIntegerv(GL_SCISSOR_BOX, scissorBox);
-
-    glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
-    glDepthMask(GL_TRUE);
-    glStencilMask(static_cast<GLuint>(~0u));
+    for (GLuint index = 0; index < colorMaskCount; ++index)
+    {
+        if (state.colorWriteMasks[index] != MGColorWriteChannels::All)
+            ApplyColorWriteMask(device, indexed, index, MGColorWriteChannels::All);
+    }
+    if (overrideDepthMask)
+        glDepthMask(GL_TRUE);
+    if (overrideStencilMask)
+        glStencilMask(~0u);
 
     // Clear should affect the whole active target, not only the
     // current viewport-sized scissor rectangle, to match XNA behavior
-    if (scissorTestEnabled)
+    if (state.scissorEnabled)
         glDisable(GL_SCISSOR_TEST);
 
-    if ((static_cast<mgint>(options) & static_cast<mgint>(MGClearOptions::DepthBuffer)) != 0)
-        glEnable(GL_DEPTH_TEST);
-
-    if ((static_cast<mgint>(options) & static_cast<mgint>(MGClearOptions::Stencil)) != 0)
-        glEnable(GL_STENCIL_TEST);
-
+    // glClear honors write masks and scissor but ignores depth and stencil tests.
     glClearColor(color.X, color.Y, color.Z, color.W);
     glClearDepth(depth);
     glClearStencil(stencil);
-    glClear(ToClearMask(options));
+    glClear(mask);
 
-    glColorMask(colorWriteMask[0], colorWriteMask[1], colorWriteMask[2], colorWriteMask[3]);
-    glDepthMask(depthWriteMask);
-    glStencilMask(static_cast<GLuint>(stencilWriteMask));
-    glScissor(scissorBox[0], scissorBox[1], scissorBox[2], scissorBox[3]);
+    for (GLuint index = 0; index < colorMaskCount; ++index)
+    {
+        if (state.colorWriteMasks[index] != MGColorWriteChannels::All)
+            ApplyColorWriteMask(device, indexed, index, state.colorWriteMasks[index]);
+    }
+    if (overrideDepthMask)
+        glDepthMask(GL_FALSE);
+    if (overrideStencilMask)
+        glStencilMask(state.stencilWriteMask);
 
     if (restoreDrawBuffers)
         ApplyCurrentDrawBuffers(device);
 
-    if (scissorTestEnabled)
+    if (state.scissorEnabled)
         glEnable(GL_SCISSOR_TEST);
-
-    if (depthTestEnabled)
-        glEnable(GL_DEPTH_TEST);
-    else
-        glDisable(GL_DEPTH_TEST);
-
-    if (stencilTestEnabled)
-        glEnable(GL_STENCIL_TEST);
-    else
-        glDisable(GL_STENCIL_TEST);
 }
 
 void MGG_GraphicsDevice_Present(MGG_GraphicsDevice* device, mgint currentFrame, mgint syncInterval)
@@ -2841,9 +2878,7 @@ void MGG_GraphicsDevice_SetBlendState(MGG_GraphicsDevice* device, MGG_BlendState
         glDisable(GL_BLEND);
 
     device->context.functions.BlendColor(factorR, factorG, factorB, factorA);
-    bool supportsSeparateBlendStates = device->context.functions.BlendEquationSeparatei != nullptr &&
-                                       device->context.functions.BlendFuncSeparatei != nullptr &&
-                                       device->context.functions.ColorMaski != nullptr;
+    bool supportsSeparateBlendStates = SupportsSeparateBlendStates(device);
     if (supportsSeparateBlendStates)
     {
         for (GLuint i = 0; i < std::size(state->infos); ++i)
@@ -2861,12 +2896,8 @@ void MGG_GraphicsDevice_SetBlendState(MGG_GraphicsDevice* device, MGG_BlendState
                 ToBlendFactor(info.alphaSourceBlend),
                 ToBlendFactor(info.alphaDestBlend));
 
-            GLboolean writeRed = GL_TRUE;
-            GLboolean writeGreen = GL_TRUE;
-            GLboolean writeBlue = GL_TRUE;
-            GLboolean writeAlpha = GL_TRUE;
-            ToColorMask(info.colorWriteChannels, writeRed, writeGreen, writeBlue, writeAlpha);
-            device->context.functions.ColorMaski(i, writeRed, writeGreen, writeBlue, writeAlpha);
+            ApplyColorWriteMask(device, true, i, info.colorWriteChannels);
+            device->clearState.colorWriteMasks[i] = info.colorWriteChannels;
         }
     }
     else
@@ -2882,12 +2913,8 @@ void MGG_GraphicsDevice_SetBlendState(MGG_GraphicsDevice* device, MGG_BlendState
             ToBlendFactor(info.alphaSourceBlend),
             ToBlendFactor(info.alphaDestBlend));
 
-        GLboolean writeRed = GL_TRUE;
-        GLboolean writeGreen = GL_TRUE;
-        GLboolean writeBlue = GL_TRUE;
-        GLboolean writeAlpha = GL_TRUE;
-        ToColorMask(info.colorWriteChannels, writeRed, writeGreen, writeBlue, writeAlpha);
-        glColorMask(writeRed, writeGreen, writeBlue, writeAlpha);
+        ApplyColorWriteMask(device, false, 0, info.colorWriteChannels);
+        device->clearState.colorWriteMasks[0] = info.colorWriteChannels;
     }
 
     device->blendState = state;
@@ -2911,6 +2938,7 @@ void MGG_GraphicsDevice_SetDepthStencilState(MGG_GraphicsDevice* device, MGG_Dep
 
     glDepthFunc(ToCompareFunction(info.depthBufferFunction));
     glDepthMask(info.depthBufferWriteEnable ? GL_TRUE : GL_FALSE);
+    device->clearState.depthWriteEnabled = info.depthBufferWriteEnable;
 
     if (info.stencilEnable)
         glEnable(GL_STENCIL_TEST);
@@ -2953,6 +2981,7 @@ void MGG_GraphicsDevice_SetDepthStencilState(MGG_GraphicsDevice* device, MGG_Dep
     }
 
     glStencilMask(static_cast<GLuint>(info.stencilWriteMask));
+    device->clearState.stencilWriteMask = static_cast<GLuint>(info.stencilWriteMask);
 
     device->depthStencilState = state;
 }
@@ -2992,6 +3021,7 @@ void MGG_GraphicsDevice_SetRasterizerState(MGG_GraphicsDevice* device, MGG_Raste
         glEnable(GL_SCISSOR_TEST);
     else
         glDisable(GL_SCISSOR_TEST);
+    device->clearState.scissorEnabled = info.scissorTestEnable;
 
     if (info.depthBias != 0.0f || info.slopeScaleDepthBias != 0.0f)
     {
@@ -3107,6 +3137,8 @@ void MGG_GraphicsDevice_SetRenderTargets(MGG_GraphicsDevice* device, MGG_Texture
 
     device->context.functions.BindFramebuffer(GL_FRAMEBUFFER, firstTarget->framebuffer);
     mgint multiSampleCount = firstTarget->multiSampleCount;
+    const bool singleOwnedTarget = count == 1 && arraySlices[0] == 0 && CanReuseSingleTargetFramebuffer(firstTarget);
+    const bool reuseAttachments = singleOwnedTarget && firstTarget->validatedSingleTargetGeneration == device->contextGeneration;
 
     for (mgint i = 0; i < count; ++i)
     {
@@ -3131,32 +3163,42 @@ void MGG_GraphicsDevice_SetRenderTargets(MGG_GraphicsDevice* device, MGG_Texture
         if (target->type != MGTextureType::_2D && target->type != MGTextureType::Cube)
             MGGL_FAIL("Unsupported render target shape", "need array render target binding");
 
-        GLenum attachment = GL_COLOR_ATTACHMENT0 + i;
-        AttachFramebufferColorTarget(device, GL_FRAMEBUFFER, attachment, target, arraySlice);
+        if (!reuseAttachments)
+            AttachFramebufferColorTarget(device, GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + i, target, arraySlice);
         device->currentRenderTargets[i] = target;
         device->currentRenderTargetSlices[i] = arraySlice;
     }
 
     for (mgint i = count; i < MaxRenderTargetBindings; ++i)
     {
-        device->context.functions.FramebufferRenderbuffer(
-            GL_FRAMEBUFFER,
-            GL_COLOR_ATTACHMENT0 + i,
-            GL_RENDERBUFFER,
-            0);
+        if (!reuseAttachments)
+        {
+            device->context.functions.FramebufferRenderbuffer(
+                GL_FRAMEBUFFER,
+                GL_COLOR_ATTACHMENT0 + i,
+                GL_RENDERBUFFER,
+                0);
+        }
         device->currentRenderTargets[i] = nullptr;
         device->currentRenderTargetSlices[i] = 0;
     }
-
-    GLenum framebufferStatus = device->context.functions.CheckFramebufferStatus(GL_FRAMEBUFFER);
-    if (framebufferStatus != GL_FRAMEBUFFER_COMPLETE)
-        MGGL_FAIL("OpenGL framebuffer incomplete", "render target binding left the framebuffer incomplete");
 
     device->currentRenderTarget = firstTarget;
     device->currentRenderTargetCount = count;
     device->currentFramebuffer = firstTarget->framebuffer;
     ApplyCurrentDrawBuffers(device);
     glReadBuffer(GL_COLOR_ATTACHMENT0);
+
+    if (!reuseAttachments)
+    {
+        GLenum framebufferStatus = device->context.functions.CheckFramebufferStatus(GL_FRAMEBUFFER);
+        if (framebufferStatus != GL_FRAMEBUFFER_COMPLETE)
+            MGGL_FAIL("OpenGL framebuffer incomplete", "render target binding left the framebuffer incomplete");
+
+        // An MRT bind changes this framebuffer's attachments until the next single-target bind.
+        firstTarget->validatedSingleTargetGeneration = singleOwnedTarget ? device->contextGeneration : 0;
+    }
+
     ApplyPosFixup(device);
 }
 
@@ -3426,7 +3468,7 @@ void MGG_GraphicsDevice_ResolveRenderTargets(MGG_GraphicsDevice* device)
 
     if (UsesMultisampledRenderTarget(device->currentRenderTargets[0]))
     {
-        bool restoreScissor = device->rasterizerState != nullptr && device->rasterizerState->info.scissorTestEnable;
+        bool restoreScissor = device->clearState.scissorEnabled;
         if (restoreScissor)
             glDisable(GL_SCISSOR_TEST);
 
