@@ -25,7 +25,8 @@
     <!-- NU5100 - NuGet warns if we copy assemblies but don't reference them. -->
     <!-- NU5118 - NuGet warns if we duplicate include executable. -->
     <!-- NETSDK1206 - Disable nuget rid complaining. -->
-    <NoWarn>CS1591;NU5100;NU5118;NETSDK1206</NoWarn>
+    <!-- CS0618 - Disable obsolete warnings. -->
+    <NoWarn>CS1591;NU5100;NU5118;NETSDK1206;NU5104;CS0618</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>
@@ -62,16 +63,17 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="AssimpNetter" Version="6.0.4.0" />
+    <PackageReference Include="AssimpNetter" Version="6.0.5.0" ExcludeAssets="native;build" />
+    <PackageReference Include="MonoGame.Library.Assimp" Version="6.0.5.1" />
     <PackageReference Include="BCnEncoder.Net" Version="2.1.0" />
     <PackageReference Include="Microsoft.VisualBasic" Version="10.3.0" />
-    <PackageReference Include="MonoGame.Library.FreeType" Version="2.13.2.3" />
-    <PackageReference Include="MonoGame.Library.MojoShader" Version="1.0.0.5" />
-    <PackageReference Include="MonoGame.Tool.Basisu" Version="2.0.2.1" />
-    <PackageReference Include="MonoGame.Tool.Crunch" Version="1.0.4.7" />
-    <PackageReference Include="MonoGame.Tool.Dxc" Version="1.8.2505.11" />
-    <PackageReference Include="MonoGame.Tool.FFmpeg" Version="7.0.0.10" />
-    <PackageReference Include="MonoGame.Tool.FFprobe" Version="7.0.0.10" />
+    <PackageReference Include="MonoGame.Library.FreeType" Version="2.13.2.5" />
+    <PackageReference Include="MonoGame.Library.MojoShader" Version="1.0.0.7" />
+    <PackageReference Include="MonoGame.Tool.Basisu" Version="2.0.2.3" />
+    <PackageReference Include="MonoGame.Tool.Crunch" Version="1.0.4.8" />
+    <PackageReference Include="MonoGame.Tool.Dxc" Version="1.9.2607.1" />
+    <PackageReference Include="MonoGame.Tool.FFmpeg" Version="7.0.0.11" />
+    <PackageReference Include="MonoGame.Tool.FFprobe" Version="7.0.0.11" />
     <PackageReference Include="SharpDX" Version="4.2.0" />
     <PackageReference Include="SharpDX.D3DCompiler" Version="4.2.0" />
     <PackageReference Include="LibKTX" Version="0.9.2" />
@@ -146,7 +148,7 @@
       <NativeArch Condition="'$([System.Runtime.InteropServices.RuntimeInformation]::OSArchitecture)' == 'Arm64'">arm64</NativeArch>
       <NativeArch Condition="'$(NativeArch)' == ''">x64</NativeArch>
     </PropertyGroup>
-    <Exec Command="premake5 --arch=$(NativeArch) gmake" WorkingDirectory="../native/pipeline/" />
+    <Exec Command="premake5 --mg-arch=$(NativeArch) gmake" WorkingDirectory="../native/pipeline/" />
     <Exec Command="make config=$(Configuration.ToLower())" WorkingDirectory="../native/pipeline/" />
   </Target>
 

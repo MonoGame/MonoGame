@@ -86,6 +86,26 @@ struct MGG_GraphicsDevice_Caps
     mgint MaxVertexTextureSlots;
     mgint MaxVertexBufferSlots;
     mgint ShaderProfile;
+    mgint MaxTextureAnisotropy;
+    mgint MaxMultiSampleCount;
+    mgbool SupportsNonPowerOfTwo;
+    mgbool SupportsTextureFilterAnisotropic;
+    mgbool SupportsDepth24;
+    mgbool SupportsPackedDepthStencil;
+    mgbool SupportsDepthNonLinear;
+    mgbool SupportsTextureMaxLevel;
+    mgbool SupportsDxt1;
+    mgbool SupportsS3tc;
+    mgbool SupportsSRgb;
+    mgbool SupportsDepthClamp;
+    mgbool SupportsTextureArrays;
+    mgbool SupportsVertexTextures;
+    mgbool SupportsFloatTextures;
+    mgbool SupportsHalfFloatTextures;
+    mgbool SupportsNormalized;
+    mgbool SupportsInstancing;
+    mgbool SupportsBaseIndexInstancing;
+    mgbool SupportsSeparateBlendStates;
 };
 
 struct Vector4
@@ -162,6 +182,17 @@ struct MGG_InputElement
     mguint InstanceDataStepRate;
 };
 
+struct MGM_SongInfo
+{
+    mgulong duration;
+};
+
+struct MGM_SongEvent
+{
+    MGSongEventType type;
+    mgulong generation;
+};
+
 struct MGM_AudioDecoderInfo
 {
     mgint samplerate;
@@ -195,6 +226,8 @@ struct MGP_MouseButtonEvent
 {
     void* Window;
     MGMouseButton Button;
+    mgint X;
+    mgint Y;
 };
 
 struct MGP_MouseWheelEvent
@@ -202,6 +235,14 @@ struct MGP_MouseWheelEvent
     void* Window;
     mgint Scroll;
     mgint ScrollH;
+};
+
+struct MGP_TouchEvent
+{
+    void* Window;
+    mgint Id;
+    mgint X;
+    mgint Y;
 };
 
 struct MGP_DropEvent
@@ -234,12 +275,26 @@ union {
     MG_FIELD_OFFSET(12, MGP_MouseMoveEvent, MouseMove);
     MG_FIELD_OFFSET(12, MGP_MouseButtonEvent, MouseButton);
     MG_FIELD_OFFSET(12, MGP_MouseWheelEvent, MouseWheel);
+    MG_FIELD_OFFSET(12, MGP_TouchEvent, Touch);
     MG_FIELD_OFFSET(12, MGP_DropEvent, Drop);
     MG_FIELD_OFFSET(12, MGP_WindowEvent, Window);
     MG_FIELD_OFFSET(12, MGP_ControllerEvent, Controller);
 };
 };
 #pragma pack(pop)
+
+struct MGP_WindowCreateInfo
+{
+    mgint RedSize;
+    mgint GreenSize;
+    mgint BlueSize;
+    mgint AlphaSize;
+    mgint FramebufferSrgbCapable;
+    mgint DepthSize;
+    mgint StencilSize;
+    mgint MultiSampleBuffers;
+    mgint MultiSampleSamples;
+};
 
 struct MGP_ControllerCaps
 {
@@ -252,3 +307,13 @@ struct MGP_ControllerCaps
     mgbool HasVoiceSupport;
 };
 
+struct MGP_NativeGraphicsHandles
+{
+    MGGraphicsBackend Backend;
+    void* Instance;
+    void* PhysicalDevice;
+    void* LogicalDevice;
+    void* Queue;
+    mgint QueueFamilyIndex;
+    mgint QueueIndex;
+};

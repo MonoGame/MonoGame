@@ -16,6 +16,20 @@
             "stopAtEntry": false
         },
         {
+            "name": "Build",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "build-build",
+            "program": "${workspaceFolder}/build/bin/Debug/net8.0/Build",
+            "cwd": "${workspaceFolder}/build",
+            "console": "internalConsole",
+            "stopAtEntry": false,
+            "args": [
+                "--target",
+                "Build Native"
+            ]
+        },
+        {
             "name": "MGCB Editor (Mac)",
             "type": "coreclr",
             "request": "launch",

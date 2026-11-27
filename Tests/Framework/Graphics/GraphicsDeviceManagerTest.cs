@@ -1,4 +1,4 @@
-﻿// MonoGame - Copyright (C) MonoGame Foundation, Inc
+// MonoGame - Copyright (C) MonoGame Foundation, Inc
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
@@ -118,7 +118,14 @@ namespace MonoGame.Tests.Graphics
                 Assert.False(pp.IsFullScreen);
                 Assert.AreEqual(PresentInterval.One, pp.PresentationInterval);
                 Assert.AreEqual(new Rectangle(0, 0, 800, 480), pp.Bounds);
+
+#if DESKTOPGL4
+                // Native OpenGL doesn't create the actual SDL window until graphics initialization,
+                // after the final presentation parameters have been configured.
+                Assert.AreEqual(IntPtr.Zero, pp.DeviceWindowHandle);
+#else
                 Assert.AreNotEqual(IntPtr.Zero, pp.DeviceWindowHandle);
+#endif
                 Assert.AreEqual(DisplayOrientation.Default, pp.DisplayOrientation);
                 Assert.AreEqual(RenderTargetUsage.DiscardContents, pp.RenderTargetUsage);
                 Assert.AreEqual(0, pp.MultiSampleCount);
@@ -347,7 +354,7 @@ namespace MonoGame.Tests.Graphics
             Assert.AreEqual(1, resetCount);
             Assert.AreEqual(1, resettingCount);
         }
-        
+
         [Test]
         public void NewDeviceDoesNotTriggerReset()
         {
@@ -394,7 +401,7 @@ namespace MonoGame.Tests.Graphics
             Assert.AreEqual(0, count);
         }
 
-#if VULKAN || DIRECTX12
+#if VULKAN || DIRECTX12 || DESKTOPGL4
         [Test]
         public void BackBufferAndViewportUpdateOnResize()
         {
@@ -407,6 +414,47 @@ namespace MonoGame.Tests.Graphics
             Assert.AreEqual(height, gd.PresentationParameters.BackBufferHeight);
             Assert.AreEqual(width, gd.Viewport.Width);
             Assert.AreEqual(height, gd.Viewport.Height);
+        }
+
+        [Test]
+        public void CustomViewportPreservedOnClientSizeChanged()
+        {
+            int targetWidth = 100;
+            int targetHeight = 50;
+            int customWidth = 40;
+            int customHeight = 30;
+
+            void OnClientSizeChanged(object sender, EventArgs args)
+            {
+                gd.Viewport = new Viewport(0, 0, customWidth, customHeight);
+                gd.ScissorRectangle = new Rectangle(0, 0, customWidth, customHeight);
+            }
+
+            game.Window.ClientSizeChanged += OnClientSizeChanged;
+            try
+            {
+                ((NativeGameWindow)game.Window).ClientResize(targetWidth, targetHeight);
+
+                // Check if the viewport and scissor are preserved after ClientResize().
+                Assert.AreEqual(customWidth, gd.Viewport.Width);
+                Assert.AreEqual(customHeight, gd.Viewport.Height);
+                Assert.AreEqual(customWidth, gd.ScissorRectangle.Width);
+                Assert.AreEqual(customHeight, gd.ScissorRectangle.Height);
+
+                // Check if viewport and scissor survive multiple resizes.
+                customWidth = 80;
+                customHeight = 60;
+                ((NativeGameWindow)game.Window).ClientResize(200, 100);
+
+                Assert.AreEqual(customWidth, gd.Viewport.Width);
+                Assert.AreEqual(customHeight, gd.Viewport.Height);
+                Assert.AreEqual(customWidth, gd.ScissorRectangle.Width);
+                Assert.AreEqual(customHeight, gd.ScissorRectangle.Height);
+            }
+            finally
+            {
+                game.Window.ClientSizeChanged -= OnClientSizeChanged;
+            }
         }
 #endif
 
@@ -435,6 +483,8 @@ namespace MonoGame.Tests.Graphics
         [TestCase(true)]
 #if DESKTOPGL
         [Ignore("Expected not 1024 but got 1024. Needs Investigating")]
+#elif DESKTOPGL4
+        [Ignore("OpenGL backbuffer MSAA is not implemented yet for the native backend")]
 #endif
         public void MSAAEnabled(bool enabled)
         {
@@ -530,7 +580,59 @@ namespace MonoGame.Tests.Graphics
             }, "GraphicsDevice.Reset(PresentationParameters)");
         }
 
-#if DIRECTX
+#if DESKTOPGL4
+        [Test]
+        public void ApplyChangesRecreatesNativeWindowWhenDepthStencilFormatChanges()
+        {
+            var game = new TestGameBase();
+            var gdm = new GraphicsDeviceManager(game);
+
+            game.InitializeOnly();
+
+            IntPtr oldWindowHandle = game.GraphicsDevice.PresentationParameters.DeviceWindowHandle;
+
+            gdm.PreferredDepthStencilFormat = DepthFormat.None;
+            gdm.ApplyChanges();
+
+            var pp = game.GraphicsDevice.PresentationParameters;
+            Assert.AreEqual(DepthFormat.None, pp.DepthStencilFormat);
+            Assert.AreEqual(game.Window.Handle, pp.DeviceWindowHandle);
+            Assert.AreNotEqual(IntPtr.Zero, pp.DeviceWindowHandle);
+            Assert.AreNotEqual(oldWindowHandle, pp.DeviceWindowHandle);
+
+            game.Dispose();
+        }
+
+        [Test]
+        public void ApplyChangesRecreatesNativeWindowWhenBackBufferFormatChangesToSrgb()
+        {
+            var game = new TestGameBase();
+            var gdm = new GraphicsDeviceManager(game);
+
+            game.InitializeOnly();
+
+            if (!game.GraphicsDevice.GraphicsCapabilities.SupportsSRgb)
+            {
+                game.Dispose();
+                Assert.Ignore("OpenGL sRGB backbuffer support is unavailable on this device.");
+            }
+
+            IntPtr oldWindowHandle = game.GraphicsDevice.PresentationParameters.DeviceWindowHandle;
+
+            gdm.PreferredBackBufferFormat = SurfaceFormat.ColorSRgb;
+            gdm.ApplyChanges();
+
+            var pp = game.GraphicsDevice.PresentationParameters;
+            Assert.AreEqual(SurfaceFormat.ColorSRgb, pp.BackBufferFormat);
+            Assert.AreEqual(game.Window.Handle, pp.DeviceWindowHandle);
+            Assert.AreNotEqual(IntPtr.Zero, pp.DeviceWindowHandle);
+            Assert.AreNotEqual(oldWindowHandle, pp.DeviceWindowHandle);
+
+            game.Dispose();
+        }
+#endif
+
+#if DIRECTX || DESKTOPGL4
         [Test]
         public void TooHighMultiSampleCountClampedToMaxSupported()
         {
@@ -558,7 +660,7 @@ namespace MonoGame.Tests.Graphics
             gdm.GraphicsDevice.Reset(pp3);
             Assert.AreEqual
                 (maxMultiSampleCount, gdm.GraphicsDevice.PresentationParameters.MultiSampleCount);
-            
+
         }
 #endif
     }

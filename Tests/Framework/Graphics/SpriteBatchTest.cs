@@ -411,7 +411,7 @@ namespace MonoGame.Tests.Graphics {
         }
 
         [Test]
-#if DESKTOPGL
+#if DESKTOPGL|| DESKTOPGL4
         // OpenGL produces a slightly different result.
         // I think this is due to differences in how downsampling is done by default
         // (it makes a big difference here because the textures are so small).

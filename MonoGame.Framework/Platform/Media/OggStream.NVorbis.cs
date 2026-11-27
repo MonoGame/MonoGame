@@ -67,7 +67,8 @@ namespace Microsoft.Xna.Framework.Audio
                 {
                     case ALSourceState.Playing:
                     case ALSourceState.Paused:
-                        return;
+                        if (Ready) return;
+                        break;
 
                     case ALSourceState.Stopped:
                         lock (prepareMutex)
@@ -138,13 +139,13 @@ namespace Microsoft.Xna.Framework.Audio
 
         public void Stop()
         {
-            var state = AL.GetSourceState(alSourceId);
-            ALHelper.CheckError("Failed to get source state.");
-            if (state == ALSourceState.Playing || state == ALSourceState.Paused)
-                StopPlayback();
-
             lock (stopMutex)
             {
+                var state = AL.GetSourceState(alSourceId);
+                ALHelper.CheckError("Failed to get source state.");
+                if (state == ALSourceState.Playing || state == ALSourceState.Paused)
+                    StopPlayback();
+
                 OggStreamer.Instance.RemoveStream(this);
 
                 lock (prepareMutex)
@@ -153,12 +154,16 @@ namespace Microsoft.Xna.Framework.Audio
                         Empty(); // force the queued buffers to be unqueued to avoid issues on Mac
                 }
             }
+
             AL.Source(alSourceId, ALSourcei.Buffer, 0);
             ALHelper.CheckError("Failed to free source from buffers.");
         }
 
         public void SeekToPosition(TimeSpan pos)
         {
+            if (Reader == null)
+                return;
+
             Reader.TimePosition = pos;
             AL.SourceStop(alSourceId);
             ALHelper.CheckError("Failed to stop source.");
@@ -174,6 +179,9 @@ namespace Microsoft.Xna.Framework.Audio
 
         public TimeSpan GetLength()
         {
+            if (Reader == null)
+                return TimeSpan.Zero;
+
             return Reader.TotalTime;
         }
 
@@ -192,19 +200,22 @@ namespace Microsoft.Xna.Framework.Audio
 
         public void Dispose()
         {
-            var state = AL.GetSourceState(alSourceId);
-            ALHelper.CheckError("Failed to get the source state.");
-            if (state == ALSourceState.Playing || state == ALSourceState.Paused)
-                StopPlayback();
-
-            lock (prepareMutex)
+            lock (stopMutex)
             {
+                var state = AL.GetSourceState(alSourceId);
+                ALHelper.CheckError("Failed to get the source state.");
+                if (state == ALSourceState.Playing || state == ALSourceState.Paused)
+                    StopPlayback();
+
                 OggStreamer.Instance.RemoveStream(this);
 
-                if (state != ALSourceState.Initial)
-                    Empty();
+                lock (prepareMutex)
+                {
+                    if (state != ALSourceState.Initial)
+                        Empty();
 
-                Close();
+                    Close();
+                }
             }
 
             OpenALSoundController.Instance.RecycleSource(alSourceId);

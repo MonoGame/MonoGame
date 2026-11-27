@@ -10,11 +10,16 @@ namespace Microsoft.Xna.Framework
     {
         partial void PlatformInitialize(PresentationParameters presentationParameters)
         {
-            var backBufferFormat = _game.graphicsDeviceManager.PreferredBackBufferFormat;
-            var surfaceFormat = backBufferFormat.GetColorFormat();
-            var depthStencilFormat = _game.graphicsDeviceManager.PreferredDepthStencilFormat;
+            CreateOpenGLWindow(presentationParameters);
+        }
 
-            // TODO Need to get this data from the Presentation Parameters
+        internal static void CreateOpenGLWindow(PresentationParameters presentationParameters)
+        {
+            var backBufferFormat = presentationParameters.BackBufferFormat;
+            var surfaceFormat = backBufferFormat.GetColorFormat();
+            var depthStencilFormat = presentationParameters.DepthStencilFormat;
+            presentationParameters.MultiSampleCount = GraphicsDevice.NormalizeMultiSampleCount(presentationParameters.MultiSampleCount, 0);
+
             Sdl.GL.SetAttribute(Sdl.GL.Attribute.RedSize, surfaceFormat.R);
             Sdl.GL.SetAttribute(Sdl.GL.Attribute.GreenSize, surfaceFormat.G);
             Sdl.GL.SetAttribute(Sdl.GL.Attribute.BlueSize, surfaceFormat.B);
@@ -54,8 +59,20 @@ namespace Microsoft.Xna.Framework
                 Sdl.GL.SetAttribute(Sdl.GL.Attribute.MultiSampleBuffers, 1);
                 Sdl.GL.SetAttribute(Sdl.GL.Attribute.MultiSampleSamples, presentationParameters.MultiSampleCount);
             }
+            else
+            {
+                // Since SDL retains the GL Attributes between window creations
+                // we need to clear the MSAA request for fallback
+                Sdl.GL.SetAttribute(Sdl.GL.Attribute.MultiSampleBuffers, 0);
+                Sdl.GL.SetAttribute(Sdl.GL.Attribute.MultiSampleSamples, 0);
+            }
 
-            ((SdlGameWindow)SdlGameWindow.Instance).CreateWindow();
+            SdlGameWindow window = (SdlGameWindow)SdlGameWindow.Instance;
+            window.CreateWindow();
+
+            // Calling CreateWindow above replaces the SDL window
+            // so we need to update the handle for the presentation parameters.
+            presentationParameters.DeviceWindowHandle = window.Handle;
         }
     }
 }

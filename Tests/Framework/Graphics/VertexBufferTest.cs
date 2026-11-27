@@ -17,7 +17,7 @@ namespace MonoGame.Tests.Graphics
     [RunOnUiTestFixture]
     class VertexBufferTest : GraphicsDeviceTestFixtureBase
     {
-        VertexPositionTexture[] savedData = new VertexPositionTexture[] 
+        VertexPositionTexture[] savedData = new VertexPositionTexture[]
         {
             new VertexPositionTexture(new Vector3(1,2,3), new Vector2(0.1f,0.2f)),
             new VertexPositionTexture(new Vector3(4,5,6), new Vector2(0.3f,0.4f)),
@@ -26,12 +26,12 @@ namespace MonoGame.Tests.Graphics
         };
         public Span<VertexPositionTexture> savedDataAsSpan => savedData.AsSpan();
         VertexPositionTexture vertexZero = new VertexPositionTexture(Vector3.Zero, Vector2.Zero);
-        
+
         [Test]
         //[TestCase(true)]
         [TestCase(false)]
         public void ShouldSetAndGetData(bool dynamic)
-        {   
+        {
             var vertexBuffer = (dynamic)
                 ?new DynamicVertexBuffer(gd, typeof(VertexPositionTexture), savedData.Length, BufferUsage.None)
                 :new VertexBuffer(gd, typeof(VertexPositionTexture), savedData.Length, BufferUsage.None);
@@ -83,7 +83,7 @@ namespace MonoGame.Tests.Graphics
 
             vertexBuffer.Dispose();
         }
-        
+
         [Test]
         //[TestCase(true)]
         [TestCase(false)]
@@ -206,7 +206,7 @@ namespace MonoGame.Tests.Graphics
                 var readDataBytes = new byte[savedDataBytes.Length];
                 vertexBuffer.GetData(0, readDataBytes, 0, elementCount, vertexStride);
                 Assert.AreEqual(
-                    savedDataBytes.Take(elementCount).ToArray(), 
+                    savedDataBytes.Take(elementCount).ToArray(),
                     readDataBytes.Take(elementCount).ToArray());
             }
 
@@ -311,7 +311,7 @@ namespace MonoGame.Tests.Graphics
                     BufferUsage.None);
             var dataSpan = new Span<VertexPositionTexture>();
             if (shouldSucceed)
-            { 
+            {
                 dataSpan = new Span<VertexPositionTexture>(testData, destinationStartIndex, elementCount);
             }
             else
@@ -409,7 +409,7 @@ namespace MonoGame.Tests.Graphics
             vertexBuffer.SetData(savedData);
 
             var readData = new Vector2[4];
-            var vertexStride = VertexPositionTexture.VertexDeclaration.VertexStride;                
+            var vertexStride = VertexPositionTexture.VertexDeclaration.VertexStride;
             var offsetInBytes = VertexPositionTexture.VertexDeclaration.GetVertexElements()[1].Offset;
             vertexBuffer.GetData(offsetInBytes, readData, 0, 4, vertexStride);
             Assert.AreEqual(savedData[0].TextureCoordinate, readData[0]);
@@ -502,7 +502,7 @@ namespace MonoGame.Tests.Graphics
             Assert.That(ex.Message, Is.EqualTo("An error occurred while preparing to draw. "
                 + "This is probably because the current vertex declaration does not include all the elements "
                 + "required by the current vertex shader. The current vertex declaration includes these elements: "
-#if VULKAN || DIRECTX12
+#if VULKAN || DIRECTX12 || DESKTOPGL4
                 + "POSITION0."));
 #else
                 + "NORMAL0, TEXCOORD0."));
@@ -515,7 +515,7 @@ namespace MonoGame.Tests.Graphics
         [Test]
         public void NullDeviceShouldThrowArgumentNullException()
         {
-            Assert.Throws<ArgumentNullException>(() => 
+            Assert.Throws<ArgumentNullException>(() =>
             {
                 var vertexBuffer = new VertexBuffer(null, typeof(VertexPositionTexture), 3, BufferUsage.None);
                 vertexBuffer.Dispose();

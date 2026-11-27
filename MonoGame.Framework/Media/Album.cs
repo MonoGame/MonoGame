@@ -10,9 +10,10 @@ using CoreGraphics;
 using MediaPlayer;
 using UIKit;
 #elif ANDROID
-using Android.Content;
-using Android.Graphics;
-using Android.Provider;
+using global::Android.Content;
+using global::Android.Graphics;
+using global::Android.Provider;
+using AN = global::Android.Net;
 #endif
 
 namespace Microsoft.Xna.Framework.Media
@@ -40,7 +41,7 @@ namespace Microsoft.Xna.Framework.Media
 #if IOS && !TVOS
         private MPMediaItemArtwork thumbnail;
 #elif ANDROID
-        private Android.Net.Uri thumbnail;
+        private AN.Uri thumbnail;
 #endif
 
         /// <summary>
@@ -144,7 +145,7 @@ namespace Microsoft.Xna.Framework.Media
             this.thumbnail = thumbnail;
         }
 #elif ANDROID
-        internal Album(SongCollection songCollection, string name, Artist artist, Genre genre, Android.Net.Uri thumbnail)
+        internal Album(SongCollection songCollection, string name, Artist artist, Genre genre, AN.Uri thumbnail)
             : this(songCollection, name, artist, genre)
         {
             this.thumbnail = thumbnail;

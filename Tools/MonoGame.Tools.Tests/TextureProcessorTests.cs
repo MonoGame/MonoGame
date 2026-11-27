@@ -5,15 +5,20 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content.Pipeline;
 using Microsoft.Xna.Framework.Content.Pipeline.Graphics;
 using Microsoft.Xna.Framework.Content.Pipeline.Processors;
-using NUnit.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Graphics.PackedVector;
 using MonoGame.Framework.Content;
+using NUnit.Framework;
 
 namespace MonoGame.Tests.ContentPipeline
 {
     [TestFixture]
     class TextureProcessorTests
     {
+        private const string Dxt1CubeMipsPath = "Assets/Textures/SampleCube64DXT1Mips.dds";
+        private const string Dxt3NonPowerOfTwoPath = "Assets/Textures/Dxt3NonPowerOfTwo.dds";
+        private const string Dxt3ProcessorOptionsPath = "Assets/Textures/Dxt3ProcessorOptions.dds";
+
         [Test]
         public void ValidateDefaults()
         {
@@ -32,6 +37,241 @@ namespace MonoGame.Tests.ContentPipeline
             var dest = new byte[Marshal.SizeOf(typeof(Color)) * content.Width * content.Height];
             Buffer.BlockCopy(src, 0, dest, 0, dest.Length);
             content.SetPixelData(dest);
+        }
+
+        private static Texture2DContent ImportDxt3(string path)
+        {
+            TextureImporter importer = new TextureImporter();
+            TestImporterContext context = new TestImporterContext("TestObj", "TestBin");
+            Texture2DContent content = (Texture2DContent)importer.Import(path, context);
+            SurfaceFormat format;
+
+            Assert.IsTrue(content.Faces[0][0].TryGetFormat(out format));
+            Assert.AreEqual(SurfaceFormat.Dxt3, format);
+
+            return content;
+        }
+
+        private static TextureCubeContent ImportDxt1Cubemap()
+        {
+            TextureImporter importer = new TextureImporter();
+            TestImporterContext context = new TestImporterContext("TestObj", "TestBin");
+            TextureCubeContent content = (TextureCubeContent)importer.Import(Dxt1CubeMipsPath, context);
+            SurfaceFormat format;
+
+            Assert.IsTrue(content.Faces[0][0].TryGetFormat(out format));
+            Assert.AreEqual(SurfaceFormat.Dxt1, format);
+
+            return content;
+        }
+
+        [Test]
+        public void Process_CompressedDxt3_DefaultSettings_DecodesAndAppliesDefaults()
+        {
+            TestProcessorContext context = new TestProcessorContext(TargetPlatform.Windows, "dummy.xnb");
+            TextureProcessor processor = new TextureProcessor();
+            Texture2DContent input = ImportDxt3(Dxt3ProcessorOptionsPath);
+
+            TextureContent output = processor.Process(input, context);
+
+            Assert.AreEqual(1, output.Faces.Count);
+            Assert.AreEqual(1, output.Faces[0].Count);
+            Assert.IsInstanceOf<PixelBitmapContent<Color>>(output.Faces[0][0]);
+
+            PixelBitmapContent<Color> bitmap = (PixelBitmapContent<Color>)output.Faces[0][0];
+            Assert.AreEqual(new Color(136, 0, 0, 136), bitmap.GetPixel(0, 0));
+            Assert.AreEqual(Color.Transparent, bitmap.GetPixel(4, 0));
+            Assert.AreEqual(Color.Lime, bitmap.GetPixel(0, 4));
+            Assert.AreEqual(Color.Blue, bitmap.GetPixel(4, 4));
+        }
+
+        [Test]
+        public void Process_CompressedDxt1Cubemap_AllFacesAndMips_DecodesEveryBitmap()
+        {
+            TestProcessorContext context = new TestProcessorContext(TargetPlatform.Windows, "dummy.xnb");
+            TextureProcessor processor = new TextureProcessor
+            {
+                ColorKeyEnabled = false,
+                PremultiplyAlpha = false,
+                TextureFormat = TextureProcessorOutputFormat.Color
+            };
+            TextureCubeContent input = ImportDxt1Cubemap();
+
+            TextureContent output = processor.Process(input, context);
+
+            Assert.AreEqual(6, output.Faces.Count);
+
+            foreach (MipmapChain face in output.Faces)
+            {
+                Assert.AreEqual(7, face.Count);
+
+                int size = 64;
+                foreach (BitmapContent bitmap in face)
+                {
+                    Assert.IsInstanceOf<PixelBitmapContent<Color>>(bitmap);
+                    Assert.AreEqual(size, bitmap.Width);
+                    Assert.AreEqual(size, bitmap.Height);
+                    size /= 2;
+                }
+            }
+        }
+
+        [Test]
+        public void Process_CompressedDxt3_PremultiplyAlphaEnabled_PremultipliesAlpha()
+        {
+            TestProcessorContext context = new TestProcessorContext(TargetPlatform.Windows, "dummy.xnb");
+            TextureProcessor processor = new TextureProcessor
+            {
+                ColorKeyEnabled = false,
+                PremultiplyAlpha = true,
+                TextureFormat = TextureProcessorOutputFormat.Color
+            };
+            Texture2DContent input = ImportDxt3(Dxt3ProcessorOptionsPath);
+
+            TextureContent output = processor.Process(input, context);
+
+            Assert.IsInstanceOf<PixelBitmapContent<Color>>(output.Faces[0][0]);
+
+            PixelBitmapContent<Color> bitmap = (PixelBitmapContent<Color>)output.Faces[0][0];
+
+            // The top-left block of the test image is red (255, 0, 0) with an alpha of 53.3%.
+            // If premultiply alpha works, red is 255 * 0.533 = 135.9, which rounds to 136.
+            // So the expected color is (136, 0, 0, 136).
+            Assert.AreEqual(new Color(136, 0, 0, 136), bitmap.GetPixel(0, 0));
+        }
+
+        [Test]
+        public void Process_CompressedDxt3_GenerateMipmapsEnabled_GeneratesMipmapChain()
+        {
+            TestProcessorContext context = new TestProcessorContext(TargetPlatform.Windows, "dummy.xnb");
+            TextureProcessor processor = new TextureProcessor
+            {
+                ColorKeyEnabled = false,
+                GenerateMipmaps = true,
+                PremultiplyAlpha = false,
+                TextureFormat = TextureProcessorOutputFormat.Color
+            };
+            Texture2DContent input = ImportDxt3(Dxt3ProcessorOptionsPath);
+
+            TextureContent output = processor.Process(input, context);
+
+            Assert.AreEqual(1, output.Faces.Count);
+            Assert.AreEqual(4, output.Faces[0].Count);
+
+            int size = 8;
+            foreach (BitmapContent bitmap in output.Faces[0])
+            {
+                Assert.IsInstanceOf<PixelBitmapContent<Color>>(bitmap);
+                Assert.AreEqual(size, bitmap.Width);
+                Assert.AreEqual(size, bitmap.Height);
+                size /= 2;
+            }
+        }
+
+        [Test]
+        public void Process_CompressedDxt3_PremultiplyAlphaAndMipmapsEnabled_AppliesBothOptions()
+        {
+            TestProcessorContext context = new TestProcessorContext(TargetPlatform.Windows, "dummy.xnb");
+            TextureProcessor processor = new TextureProcessor
+            {
+                ColorKeyEnabled = false,
+                GenerateMipmaps = true,
+                PremultiplyAlpha = true,
+                TextureFormat = TextureProcessorOutputFormat.Color
+            };
+            Texture2DContent input = ImportDxt3(Dxt3ProcessorOptionsPath);
+
+            TextureContent output = processor.Process(input, context);
+
+            // Mipmaps generated
+            Assert.AreEqual(4, output.Faces[0].Count);
+            Assert.IsInstanceOf<PixelBitmapContent<Color>>(output.Faces[0][0]);
+
+            // Premultiply alpha applied
+            PixelBitmapContent<Color> bitmap = (PixelBitmapContent<Color>)output.Faces[0][0];
+            Assert.AreEqual(new Color(136, 0, 0, 136), bitmap.GetPixel(0, 0));
+        }
+
+        [Test]
+        public void Process_CompressedDxt3_ResizeToPowerOfTwoEnabled_ResizesToNextPowerOfTwo()
+        {
+            TestProcessorContext context = new TestProcessorContext(TargetPlatform.Windows, "dummy.xnb");
+            TextureProcessor processor = new TextureProcessor
+            {
+                ColorKeyEnabled = false,
+                PremultiplyAlpha = false,
+                ResizeToPowerOfTwo = true,
+                TextureFormat = TextureProcessorOutputFormat.Color
+            };
+            Texture2DContent input = ImportDxt3(Dxt3NonPowerOfTwoPath);
+
+            TextureContent output = processor.Process(input, context);
+
+            Assert.IsInstanceOf<PixelBitmapContent<Color>>(output.Faces[0][0]);
+
+            PixelBitmapContent<Color> bitmap = (PixelBitmapContent<Color>)output.Faces[0][0];
+
+            // Image is 6x5, resize power of two should have resized it to 8x8
+            Assert.AreEqual(8, bitmap.Width);
+            Assert.AreEqual(8, bitmap.Height);
+            Assert.AreEqual(Color.Lime, bitmap.GetPixel(0, 0));
+
+            // Ensure pixels are correct in the new resized region
+            Assert.AreEqual(Color.Lime, bitmap.GetPixel(7, 7));
+        }
+
+        [Test]
+        public void Process_CompressedDxt3_ColorKeyEnabled_ReplacesMatchingColor()
+        {
+            TestProcessorContext context = new TestProcessorContext(TargetPlatform.Windows, "dummy.xnb");
+            TextureProcessor processor = new TextureProcessor
+            {
+                ColorKeyColor = Color.Magenta,
+                ColorKeyEnabled = true,
+                PremultiplyAlpha = false,
+                TextureFormat = TextureProcessorOutputFormat.Color
+            };
+            Texture2DContent input = ImportDxt3(Dxt3ProcessorOptionsPath);
+
+            TextureContent output = processor.Process(input, context);
+
+            Assert.IsInstanceOf<PixelBitmapContent<Color>>(output.Faces[0][0]);
+
+            PixelBitmapContent<Color> bitmap = (PixelBitmapContent<Color>)output.Faces[0][0];
+
+            // Top-right block of the image is magenta, so with color key enabled
+            // it should now be transparent.
+            Assert.AreEqual(Color.Transparent, bitmap.GetPixel(4, 0));
+
+            // And it should not have affected other colors.
+            Assert.AreEqual(Color.Lime, bitmap.GetPixel(0, 4));
+        }
+
+        [Test]
+        public void Process_CompressedDxt3_NoChangeWithColorKey_PreservesDxt3Output()
+        {
+            TestProcessorContext context = new TestProcessorContext(TargetPlatform.Windows, "dummy.xnb");
+            TextureProcessor processor = new TextureProcessor
+            {
+                ColorKeyColor = Color.Magenta,
+                ColorKeyEnabled = true,
+                PremultiplyAlpha = false,
+                TextureFormat = TextureProcessorOutputFormat.NoChange
+            };
+            Texture2DContent input = ImportDxt3(Dxt3ProcessorOptionsPath);
+
+            using IDisposable scope = ContextScopeFactory.BeginContext(context);
+            TextureContent output = processor.Process(input, context);
+
+            Assert.IsInstanceOf<Dxt3BitmapContent>(output.Faces[0][0]);
+
+            PixelBitmapContent<Vector4> bitmap = new PixelBitmapContent<Vector4>(8, 8);
+            BitmapContent.Copy(output.Faces[0][0], bitmap);
+
+            // Ensures that the color key enabled change still occurs even
+            // though the output format is set to no change to ensure that
+            // the texture was processed before it was converted back to DXT3.
+            Assert.AreEqual(0f, bitmap.GetPixel(4, 0).W);
         }
 
         [Test]

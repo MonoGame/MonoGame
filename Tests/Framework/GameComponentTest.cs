@@ -12,9 +12,6 @@ namespace MonoGame.Tests.Framework
     public static class GameComponentTest
     {
         [Test]
-#if DESKTOPGL
-        [Ignore("This crashes inside SDL on Mac!")]
-#endif
         public static void InitializeOrderTest()
         {
             var game = new TestGameBase();

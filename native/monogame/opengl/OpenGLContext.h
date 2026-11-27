@@ -1,0 +1,128 @@
+// MonoGame - Copyright (C) MonoGame Foundation, Inc
+// This file is subject to the terms and conditions defined in
+// file 'LICENSE.txt', which is part of this source code package.
+
+#pragma once
+
+#include "api_enums.h"
+#include "mg_common.h"
+
+#include <SDL.h>
+#include <SDL_opengl.h>
+#include <SDL_opengl_glext.h>
+
+using MGGLCOMPRESSEDTEXIMAGE2DPROC = decltype(&glCompressedTexImage2D);
+using MGGLCOMPRESSEDTEXSUBIMAGE2DPROC = decltype(&glCompressedTexSubImage2D);
+#if defined(__EMSCRIPTEN__)
+using MGGLGETTEXIMAGEPROC = void (*)(GLenum target, GLint level, GLenum format, GLenum type, void* pixels);
+using MGGLGETCOMPRESSEDTEXIMAGEPROC = void (*)(GLenum target, GLint level, void* img);
+
+// Emscripten's SDL OpenGL headers omit these WebGL2 declarations. Direct calls
+// retain the procedures in the final browser binary.
+extern "C" void glFramebufferTextureLayer(GLenum target, GLenum attachment, GLuint texture, GLint level, GLint layer);
+extern "C" void glGetBufferSubData(GLenum target, GLintptr offset, GLsizeiptr size, void* data);
+#else
+// SDL declares glGetTexImage, but its headers do not expose PFNGLGETTEXIMAGEPROC.
+using MGGLGETTEXIMAGEPROC = decltype(&glGetTexImage);
+using MGGLGETCOMPRESSEDTEXIMAGEPROC = decltype(&glGetCompressedTexImage);
+#endif
+
+struct OpenGLFunctions
+{
+    PFNGLACTIVETEXTUREPROC ActiveTexture = nullptr;
+    PFNGLATTACHSHADERPROC AttachShader = nullptr;
+    PFNGLBINDATTRIBLOCATIONPROC BindAttribLocation = nullptr;
+    PFNGLBLENDCOLORPROC BlendColor = nullptr;
+    PFNGLBLENDEQUATIONSEPARATEPROC BlendEquationSeparate = nullptr;
+    PFNGLBLENDEQUATIONSEPARATEIPROC BlendEquationSeparatei = nullptr;
+    PFNGLBLENDFUNCSEPARATEPROC BlendFuncSeparate = nullptr;
+    PFNGLBLENDFUNCSEPARATEIPROC BlendFuncSeparatei = nullptr;
+    PFNGLBINDBUFFERPROC BindBuffer = nullptr;
+    PFNGLBINDFRAMEBUFFERPROC BindFramebuffer = nullptr;
+    PFNGLBINDRENDERBUFFERPROC BindRenderbuffer = nullptr;
+    PFNGLBINDSAMPLERPROC BindSampler = nullptr;
+    PFNGLBINDVERTEXARRAYPROC BindVertexArray = nullptr;
+    PFNGLBLITFRAMEBUFFERPROC BlitFramebuffer = nullptr;
+    PFNGLBUFFERDATAPROC BufferData = nullptr;
+    PFNGLBUFFERSUBDATAPROC BufferSubData = nullptr;
+    PFNGLCHECKFRAMEBUFFERSTATUSPROC CheckFramebufferStatus = nullptr;
+    PFNGLCOLORMASKIPROC ColorMaski = nullptr;
+    PFNGLCOMPILESHADERPROC CompileShader = nullptr;
+    MGGLCOMPRESSEDTEXIMAGE2DPROC CompressedTexImage2D = nullptr;
+    MGGLCOMPRESSEDTEXSUBIMAGE2DPROC CompressedTexSubImage2D = nullptr;
+    PFNGLCREATEPROGRAMPROC CreateProgram = nullptr;
+    PFNGLCREATESHADERPROC CreateShader = nullptr;
+    PFNGLDELETEBUFFERSPROC DeleteBuffers = nullptr;
+    PFNGLDELETEFRAMEBUFFERSPROC DeleteFramebuffers = nullptr;
+    PFNGLDELETEPROGRAMPROC DeleteProgram = nullptr;
+    PFNGLDELETEQUERIESPROC DeleteQueries = nullptr;
+    PFNGLDELETERENDERBUFFERSPROC DeleteRenderbuffers = nullptr;
+    PFNGLDELETESAMPLERSPROC DeleteSamplers = nullptr;
+    PFNGLDELETESHADERPROC DeleteShader = nullptr;
+    PFNGLDELETEVERTEXARRAYSPROC DeleteVertexArrays = nullptr;
+    PFNGLDETACHSHADERPROC DetachShader = nullptr;
+    PFNGLDISABLEVERTEXATTRIBARRAYPROC DisableVertexAttribArray = nullptr;
+    PFNGLBEGINQUERYPROC BeginQuery = nullptr;
+    PFNGLDRAWBUFFERSPROC DrawBuffers = nullptr;
+    PFNGLDRAWELEMENTSINSTANCEDPROC DrawElementsInstanced = nullptr;
+    PFNGLENDQUERYPROC EndQuery = nullptr;
+    PFNGLGENVERTEXARRAYSPROC GenVertexArrays = nullptr;
+    PFNGLENABLEVERTEXATTRIBARRAYPROC EnableVertexAttribArray = nullptr;
+    MGGLGETTEXIMAGEPROC GetTexImage = nullptr;
+    PFNGLFRAMEBUFFERRENDERBUFFERPROC FramebufferRenderbuffer = nullptr;
+    PFNGLFRAMEBUFFERTEXTURE2DPROC FramebufferTexture2D = nullptr;
+    PFNGLGENERATEMIPMAPPROC GenerateMipmap = nullptr;
+    PFNGLGENBUFFERSPROC GenBuffers = nullptr;
+    PFNGLGENFRAMEBUFFERSPROC GenFramebuffers = nullptr;
+    PFNGLGENQUERIESPROC GenQueries = nullptr;
+    PFNGLGENRENDERBUFFERSPROC GenRenderbuffers = nullptr;
+    PFNGLGENSAMPLERSPROC GenSamplers = nullptr;
+    MGGLGETCOMPRESSEDTEXIMAGEPROC GetCompressedTexImage = nullptr;
+    PFNGLGETATTRIBLOCATIONPROC GetAttribLocation = nullptr;
+    PFNGLGETPROGRAMINFOLOGPROC GetProgramInfoLog = nullptr;
+    PFNGLGETPROGRAMIVPROC GetProgramiv = nullptr;
+    PFNGLGETQUERYOBJECTUIVPROC GetQueryObjectuiv = nullptr;
+    PFNGLGETSHADERINFOLOGPROC GetShaderInfoLog = nullptr;
+    PFNGLGETSHADERIVPROC GetShaderiv = nullptr;
+    PFNGLGETUNIFORMLOCATIONPROC GetUniformLocation = nullptr;
+    PFNGLLINKPROGRAMPROC LinkProgram = nullptr;
+    PFNGLMAPBUFFERPROC MapBuffer = nullptr;
+    PFNGLRENDERBUFFERSTORAGEPROC RenderbufferStorage = nullptr;
+    PFNGLRENDERBUFFERSTORAGEMULTISAMPLEPROC RenderbufferStorageMultisample = nullptr;
+    PFNGLSAMPLERPARAMETERFPROC SamplerParameterf = nullptr;
+    PFNGLSAMPLERPARAMETERFVPROC SamplerParameterfv = nullptr;
+    PFNGLSAMPLERPARAMETERIPROC SamplerParameteri = nullptr;
+    PFNGLSHADERSOURCEPROC ShaderSource = nullptr;
+    PFNGLSTENCILFUNCSEPARATEPROC StencilFuncSeparate = nullptr;
+    PFNGLSTENCILOPSEPARATEPROC StencilOpSeparate = nullptr;
+    PFNGLTEXIMAGE3DPROC TexImage3D = nullptr;
+    PFNGLTEXSUBIMAGE3DPROC TexSubImage3D = nullptr;
+    PFNGLUNIFORM1IPROC Uniform1i = nullptr;
+    PFNGLUNIFORM4FVPROC Uniform4fv = nullptr;
+    PFNGLUNIFORM4IVPROC Uniform4iv = nullptr;
+    PFNGLUNMAPBUFFERPROC UnmapBuffer = nullptr;
+    PFNGLUSEPROGRAMPROC UseProgram = nullptr;
+    PFNGLVERTEXATTRIBDIVISORPROC VertexAttribDivisor = nullptr;
+    PFNGLVERTEXATTRIBPOINTERPROC VertexAttribPointer = nullptr;
+
+    void Load();
+};
+
+struct OpenGLContext
+{
+    SDL_Window* window = nullptr;
+    SDL_GLContext handle = nullptr;
+    OpenGLFunctions functions;
+    GLuint defaultVertexArray = 0;
+    mgint width = 0;
+    mgint height = 0;
+    mgint syncInterval = 0;
+    mgint majorVersion = 0;
+    mgint minorVersion = 0;
+
+    bool Create(SDL_Window* nextWindow);
+    void Destroy();
+    void MakeCurrent();
+    void SetSwapInterval(mgint nextSyncInterval);
+    void BindDefaultVertexArray();
+};

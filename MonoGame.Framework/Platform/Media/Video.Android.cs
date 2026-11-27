@@ -5,6 +5,8 @@
 using System;
 using System.IO;
 using System.Linq;
+using AM = global::Android.Media;
+using AN = global::Android.Net;
 
 namespace Microsoft.Xna.Framework.Media
 {
@@ -13,11 +15,11 @@ namespace Microsoft.Xna.Framework.Media
     /// </summary>
     public sealed partial class Video : IDisposable
     {
-        internal Android.Media.MediaPlayer Player;
+        internal AM.MediaPlayer Player;
 
         private void PlatformInitialize()
         {
-            Player = new Android.Media.MediaPlayer();
+            Player = new AM.MediaPlayer();
             if (Player != null)
             {
                 var afd = Game.Activity.Assets.OpenFd(FileName);
