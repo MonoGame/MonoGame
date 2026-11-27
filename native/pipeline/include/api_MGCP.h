@@ -13,6 +13,8 @@
 
 
 
+MG_EXPORT mgint MP_EffectCompiler_Compile(MGCP_EffectOptions& options, MGCP_Effect& result);
+MG_EXPORT void MP_EffectCompiler_Free(MGCP_Effect& result);
 MG_EXPORT void* MP_ImportBitmap(const char* importPath, MGCP_Bitmap& bitmap);
 MG_EXPORT void MP_FreeBitmap(MGCP_Bitmap& bitmap);
 MG_EXPORT void* MP_ResizeBitmap(MGCP_Bitmap& srcBitmap, MGCP_Bitmap& dstBitmap);

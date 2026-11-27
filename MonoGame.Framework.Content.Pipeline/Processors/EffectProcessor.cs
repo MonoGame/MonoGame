@@ -2,9 +2,11 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
-using System.Text.RegularExpressions;
 using Microsoft.Xna.Framework.Content.Pipeline.Graphics;
 using MonoGame.Effect;
+using MonoGame.Framework.Content.Pipeline.Interop;
+using System.Runtime.InteropServices;
+using System.Text.RegularExpressions;
 
 namespace Microsoft.Xna.Framework.Content.Pipeline.Processors;
 
@@ -42,68 +44,119 @@ public class EffectProcessor : ContentProcessor<EffectContent, CompiledEffectCon
             throw new InvalidContentException("Passed EffectContent input is invalid!");
         }
 
-        var options = new Options
-        {
-            SourceFile = input.Identity.SourceFilename,
-            Profile = ShaderProfile.GetProfileForPlatform(context.TargetPlatform),
-            Debug = DebugMode == EffectProcessorDebugMode.Debug,
-            Defines = Defines,
-            OutputFile = context.OutputFilename
-        };
+        byte[] bytecode;
 
-        // Parse the MGFX file expanding includes, macros, and returning the techniques.
-        ShaderResult shaderResult;
-        try
+        if (context.TargetPlatform == TargetPlatform.WindowsDX12)
         {
-            shaderResult = ShaderResult.FromFile(options.SourceFile, options,
-                new ContentPipelineEffectCompilerOutput(context));
+            // Call the native pipeline to compile the full effect.
+            var effect_options = new MGCP_EffectOptions();
+            effect_options.Create(
+                input.Identity.SourceFilename,
+                Defines,
+                context.TargetPlatform.ToString(),
+                DebugMode == EffectProcessorDebugMode.Debug,
+                Path.GetDirectoryName(context.OutputFilename) ?? "");
 
-            // Add the include dependencies so that if they change
-            // it will trigger a rebuild of this effect.
-            foreach (var dep in shaderResult.Dependencies)
-                context.AddDependency(dep);
-        }
-        catch (InvalidContentException)
-        {
-            throw;
-        }
-        catch (Exception ex)
-        {
-            // TODO: Extract good line numbers from mgfx parser!
-            throw new InvalidContentException(ex.Message, input.Identity, ex);
-        }
+            var effect = new MGCP_Effect();
+            int errors = MGCP.EffectCompiler_Compile(ref effect_options, out effect);
 
-        // Create the effect object.
-        EffectObject? effect;
-        var shaderErrorsAndWarnings = string.Empty;
-        try
-        {
-            effect = EffectObject.CompileEffect(shaderResult, out shaderErrorsAndWarnings);
+            var errorsAndWarnings = effect.GetErrorsAndWarnings();
+            if (!string.IsNullOrEmpty(errorsAndWarnings))
+            {
+                ProcessErrorsAndWarnings(errors > 0, errorsAndWarnings, input.Identity, context);
+                throw new InvalidContentException("Failed to compile the effect!");
+            }
 
-            // If there were any additional output files we register
-            // them so that the cleanup process can manage them.
-            foreach (var outfile in shaderResult.AdditionalOutputFiles)
-                context.AddOutputFile(outfile);
-        }
-        catch (ShaderCompilerException)
-        {
-            // This will log any warnings and errors and throw.
-            ProcessErrorsAndWarnings(true, shaderErrorsAndWarnings, input.Identity, context);
-            throw;
-        }
+            bytecode = effect.GetBytecode();
 
-        // Process any warning messages that the shader compiler might have produced.
-        ProcessErrorsAndWarnings(false, shaderErrorsAndWarnings, input.Identity, context);
+            /*
+            foreach (var dependency in shaderResult.Dependencies)
+            {
+                var dependencyNativeFilename = ConvertToNative(dependency);
+                Console.WriteLine("Dependency: " + dependencyNativeFilename);
+
+                sourceFiles.Add((dependency, dependencyNativeFilename));
+            }
+             // TODO: If the effect emits extra output files... like debug files
+            // we need to return those here so we can clean them up later.
+                // If there were any additional output files we register
+                // them so that the cleanup process can manage them.
+                foreach (var outfile in shaderResult.AdditionalOutputFiles)
+                    context.AddOutputFile(outfile);          
+            */
+
+            // Cleanup internal state.
+            MGCP.EffectCompiler_Free(ref effect);
+        }
+        else
+        {
+            var options = new Options
+            {
+                SourceFile = input.Identity.SourceFilename,
+                Profile = ShaderProfile.GetProfileForPlatform(context.TargetPlatform),
+                Debug = DebugMode == EffectProcessorDebugMode.Debug,
+                Defines = Defines,
+                OutputFile = context.OutputFilename
+            };
+
+            // Parse the MGFX file expanding includes, macros, and returning the techniques.
+            ShaderResult shaderResult;
+            try
+            {
+                shaderResult = ShaderResult.FromFile(options.SourceFile, options,
+                    new ContentPipelineEffectCompilerOutput(context));
+
+                // Add the include dependencies so that if they change
+                // it will trigger a rebuild of this effect.
+                foreach (var dep in shaderResult.Dependencies)
+                    context.AddDependency(dep);
+            }
+            catch (InvalidContentException)
+            {
+                throw;
+            }
+            catch (Exception ex)
+            {
+                // TODO: Extract good line numbers from mgfx parser!
+                throw new InvalidContentException(ex.Message, input.Identity, ex);
+            }
+
+            // Create the effect object.
+            EffectObject? effect;
+            var shaderErrorsAndWarnings = string.Empty;
+            try
+            {
+                effect = EffectObject.CompileEffect(shaderResult, out shaderErrorsAndWarnings);
+
+                // If there were any additional output files we register
+                // them so that the cleanup process can manage them.
+                foreach (var outfile in shaderResult.AdditionalOutputFiles)
+                    context.AddOutputFile(outfile);
+            }
+            catch (ShaderCompilerException)
+            {
+                // This will log any warnings and errors and throw.
+                ProcessErrorsAndWarnings(true, shaderErrorsAndWarnings, input.Identity, context);
+                throw;
+            }
+
+            // Process any warning messages that the shader compiler might have produced.
+            ProcessErrorsAndWarnings(false, shaderErrorsAndWarnings, input.Identity, context);
+
+            // Get the bytecode array.
+            using (var stream = new MemoryStream())
+            {
+                using (var writer = new BinaryWriter(stream))
+                    effect.Write(writer, options);
+                bytecode = stream.ToArray();
+            }
+        }
 
         // Write out the effect to a runtime format.
         CompiledEffectContent result;
         try
         {
-            using var stream = new MemoryStream();
-            using var writer = new BinaryWriter(stream);
-            effect.Write(writer, options);
-
-            result = new CompiledEffectContent(stream.GetBuffer());
+            result = new CompiledEffectContent(bytecode);
         }
         catch (Exception ex)
         {
