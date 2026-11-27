@@ -1,11 +1,15 @@
-<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk.StaticWebAssets">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <StaticWebAssetBasePath>_monogame</StaticWebAssetBasePath>
+  </PropertyGroup>
 
   <ItemGroup>
     <None Include="BrowserGame.cs" Pack="true" PackagePath="buildTransitive" />
     <None Include="WebInterop.cs" Pack="true" PackagePath="buildTransitive" />
-    <None Include="MonoGame.Runtime.Browser.WebGL2.props" Pack="true" PackagePath="buildTransitive" />
     <None Include="MonoGame.Runtime.Browser.WebGL2.targets" Pack="true" PackagePath="buildTransitive" />
-    <None Include="Host\*.js" Pack="true" PackagePath="buildTransitive\Host" />
+    <Content Include="wwwroot\*.js" CopyToPublishDirectory="PreserveNewest" />
     <None Include="Host\browser.runtimeconfig.template.json" Pack="true" PackagePath="buildTransitive\Host" />
 
     <Content Include="..\..\..\Artifacts\native\mgruntime\webgl2\browser-wasm\Release\libSDL2.a"
