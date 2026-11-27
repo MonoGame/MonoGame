@@ -538,6 +538,36 @@ namespace MonoGame.Tests.Graphics {
             Assert.That(pixel[0], Is.EqualTo(Color.Red));
         }
 
+#if !XNA
+        [Test]
+        public void Draw_SeparateSpriteBatches_ReuseDeviceIndexBuffer()
+        {
+            using Texture2D texture = new Texture2D(gd, 1, 1);
+            texture.SetData(new Color[] { Color.White });
+            gd.Clear(Color.Black);
+            IndexBuffer indices;
+
+            using (SpriteBatch first = new SpriteBatch(gd))
+            {
+                first.Begin();
+                first.Draw(texture, new Rectangle(10, 10, 4, 4), Color.Red);
+                first.Draw(texture, new Rectangle(20, 10, 4, 4), Color.Green);
+                first.End();
+                indices = gd.Indices;
+            }
+
+            _spriteBatch.Begin();
+            _spriteBatch.Draw(texture, new Rectangle(30, 10, 4, 4), Color.Blue);
+            _spriteBatch.End();
+
+            Color[] pixel = new Color[1];
+            gd.GetBackBufferData(new Rectangle(31, 11, 1, 1), pixel, 0, 1);
+            Assert.That(gd.Indices, Is.SameAs(indices));
+            Assert.That(indices.IsDisposed, Is.False);
+            Assert.That(pixel[0], Is.EqualTo(Color.Blue));
+        }
+#endif
+
         [Test]
         public void Draw_DeferredBatchExceedsChunkSize_DrawsSpritesInBothChunks()
         {

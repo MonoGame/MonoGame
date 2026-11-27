@@ -85,6 +85,10 @@ namespace Microsoft.Xna.Framework.Graphics
         private IndexBuffer _indexBuffer;
         private bool _indexBufferDirty;
 
+        private DynamicVertexBuffer _spriteBatchVertexBuffer;
+        private IndexBuffer _spriteBatchIndexBuffer;
+        private bool _spriteBatchIndexBufferInvalidated;
+
         private readonly RenderTargetBinding[] _currentRenderTargetBindings = new RenderTargetBinding[8];
         private int _currentRenderTargetCount;
         private readonly RenderTargetBinding[] _tempRenderTargetBinding = new RenderTargetBinding[1];
@@ -812,6 +816,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
                 // Remove references to resources that have been garbage collected.
                 _resources.RemoveWhere(wr => !wr.IsAlive);
+                _spriteBatchIndexBufferInvalidated = true;
             }
         }
 
@@ -1157,6 +1162,41 @@ namespace Microsoft.Xna.Framework.Graphics
 
                 _vertexBuffersDirty |= _vertexBuffers.Set(vertexBuffers);
             }
+        }
+
+        internal void BindSpriteBatchBuffers(VertexPositionColorTexture[] vertices, short[] indices, int spriteCount)
+        {
+            int vertexCount = 4 * spriteCount;
+            int indexCount = 6 * spriteCount;
+
+            if (_spriteBatchVertexBuffer == null || _spriteBatchVertexBuffer.IsDisposed || _spriteBatchVertexBuffer.VertexCount < vertexCount)
+            {
+                DynamicVertexBuffer buffer = new DynamicVertexBuffer(this, VertexPositionColorTexture.VertexDeclaration, vertexCount, BufferUsage.WriteOnly);
+                _spriteBatchVertexBuffer?.Dispose();
+                _spriteBatchVertexBuffer = buffer;
+            }
+
+            if (_spriteBatchIndexBuffer == null || _spriteBatchIndexBuffer.IsDisposed || _spriteBatchIndexBufferInvalidated || _spriteBatchIndexBuffer.IndexCount < indexCount)
+            {
+                IndexBuffer buffer = new IndexBuffer(this, IndexElementSize.SixteenBits, indexCount, BufferUsage.WriteOnly);
+                try
+                {
+                    buffer.SetData(indices, 0, indexCount);
+                }
+                catch
+                {
+                    buffer.Dispose();
+                    throw;
+                }
+
+                _spriteBatchIndexBuffer?.Dispose();
+                _spriteBatchIndexBuffer = buffer;
+                _spriteBatchIndexBufferInvalidated = false;
+            }
+
+            _spriteBatchVertexBuffer.SetData(vertices, 0, vertexCount, SetDataOptions.Discard);
+            SetVertexBuffer(_spriteBatchVertexBuffer);
+            SetIndexBuffer(_spriteBatchIndexBuffer);
         }
 
         private void SetIndexBuffer(IndexBuffer indexBuffer)

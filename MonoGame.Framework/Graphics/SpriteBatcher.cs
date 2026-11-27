@@ -54,10 +54,6 @@ namespace Microsoft.Xna.Framework.Graphics
 
         private VertexPositionColorTexture[] _vertexArray;
 
-        private DynamicVertexBuffer _vertexBuffer;
-
-        private DynamicIndexBuffer _indexBuffer;
-
         private TextureRun[] _textureRuns;
 
         public SpriteBatcher(GraphicsDevice device, int capacity = 0)
@@ -148,41 +144,6 @@ namespace Microsoft.Xna.Framework.Graphics
             _index = newIndex;
 
             _vertexArray = new VertexPositionColorTexture[4 * numBatchItems];
-        }
-
-        private void EnsureBufferCapacity(int numBatchItems)
-        {
-            int vertexCount = 4 * numBatchItems;
-            int indexCount = 6 * numBatchItems;
-
-            if (_vertexBuffer != null
-                && _vertexBuffer.VertexCount >= vertexCount
-                && _indexBuffer != null
-                && _indexBuffer.IndexCount >= indexCount)
-            {
-                return;
-            }
-
-            if (_vertexBuffer != null)
-            {
-                _vertexBuffer.Dispose();
-            }
-
-            if (_indexBuffer != null)
-            {
-                _indexBuffer.Dispose();
-            }
-
-            _vertexBuffer = new DynamicVertexBuffer(
-                _device,
-                VertexPositionColorTexture.VertexDeclaration,
-                vertexCount,
-                BufferUsage.WriteOnly);
-            _indexBuffer = new DynamicIndexBuffer(
-                _device,
-                IndexElementSize.SixteenBits,
-                indexCount,
-                BufferUsage.WriteOnly);
         }
 
         private void EnsureTextureRunCapacity(int numBatchItems)
@@ -303,7 +264,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		}
 
         /// <summary>
-        /// Draws each existing processing chunk after uploading its vertices and indices once.
+        /// Draws each processing chunk after uploading its vertices to the device's shared buffers.
         /// </summary>
         /// <param name="effect">The custom effect to apply to the geometry.</param>
         private unsafe void DrawBufferedBatch(Effect effect)
@@ -314,7 +275,6 @@ namespace Microsoft.Xna.Framework.Graphics
             while (batchCount > 0)
             {
                 int numBatchesToProcess = Math.Min(batchCount, MaxBatchSize);
-                EnsureBufferCapacity(numBatchesToProcess);
                 EnsureTextureRunCapacity(numBatchesToProcess);
 
                 int textureRunCount = 0;
@@ -366,18 +326,7 @@ namespace Microsoft.Xna.Framework.Graphics
                         numBatchesToProcess - textureRunStart);
                 }
 
-                _vertexBuffer.SetData(
-                    _vertexArray,
-                    0,
-                    4 * numBatchesToProcess,
-                    SetDataOptions.Discard);
-                _indexBuffer.SetData(
-                    _index,
-                    0,
-                    6 * numBatchesToProcess,
-                    SetDataOptions.Discard);
-                _device.SetVertexBuffer(_vertexBuffer);
-                _device.Indices = _indexBuffer;
+                _device.BindSpriteBatchBuffers(_vertexArray, _index, numBatchesToProcess);
 
                 // Draw each texture run in its original order from the uploaded chunk.
                 try
@@ -472,24 +421,6 @@ namespace Microsoft.Xna.Framework.Graphics
                     0,
                     textureRun.StartSprite * 6,
                     textureRun.SpriteCount * 2);
-            }
-        }
-
-        /// <summary>
-        /// Releases the buffers owned by this batcher.
-        /// </summary>
-        public void Dispose()
-        {
-            if (_vertexBuffer != null)
-            {
-                _vertexBuffer.Dispose();
-                _vertexBuffer = null;
-            }
-
-            if (_indexBuffer != null)
-            {
-                _indexBuffer.Dispose();
-                _indexBuffer = null;
             }
         }
 
