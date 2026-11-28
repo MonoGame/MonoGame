@@ -29,6 +29,9 @@ namespace MonoGame.Tests.Graphics
         {
             base.SetUp();
 
+            if (!gd.GraphicsCapabilities.SupportsMapBuffer)
+                Assert.Ignore("Texture3D is not supported on OpenGL ES versions below 3.0.");
+
             reference = new Color[a];
 
             t = new Texture3D(game.GraphicsDevice, w, h, d, false, SurfaceFormat.Color);

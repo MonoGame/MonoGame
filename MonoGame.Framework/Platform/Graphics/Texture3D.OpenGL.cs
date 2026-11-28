@@ -11,12 +11,14 @@ namespace Microsoft.Xna.Framework.Graphics
 {
     public partial class Texture3D : Texture
     {
+        private GraphicsDevice _graphicsDevice;
 
         private void PlatformConstruct(GraphicsDevice graphicsDevice, int width, int height, int depth, bool mipMap, SurfaceFormat format, bool renderTarget)
         {
-#if GLES
-            throw new NotSupportedException("OpenGL ES 2.0 doesn't support 3D textures.");
-#else
+            _graphicsDevice = graphicsDevice;
+            if (!_graphicsDevice.GraphicsCapabilities.SupportsMapBuffer)
+                throw new NotSupportedException("Texture3D is not supported on OpenGL ES versions below 3.0.");
+
             this.glTarget = TextureTarget.Texture3D;
 
             Threading.BlockOnUIThread(() =>
@@ -35,7 +37,6 @@ namespace Microsoft.Xna.Framework.Graphics
 
             if (mipMap)
                 throw new NotImplementedException("Texture3D does not yet support mipmaps.");
-#endif
         }
 
         private void PlatformSetData<T>(
@@ -43,9 +44,9 @@ namespace Microsoft.Xna.Framework.Graphics
             int left, int top, int right, int bottom, int front, int back,
             T[] data, int startIndex, int elementCount)
         {
-#if GLES
-            throw new NotSupportedException("OpenGL ES 2.0 doesn't support 3D textures.");
-#else
+            if (!_graphicsDevice.GraphicsCapabilities.SupportsMapBuffer)
+                throw new NotSupportedException("Texture3D.SetData is not supported on OpenGL ES versions below 3.0.");
+
             var width = right - left;
             var height = bottom - top;
             var depth = back - front;
@@ -69,14 +70,16 @@ namespace Microsoft.Xna.Framework.Graphics
                     dataHandle.Free();
                 }
             });
-#endif
         }
 
         private void PlatformGetData<T>(int level, int left, int top, int right, int bottom, int front, int back, T[] data, int startIndex, int elementCount)
              where T : struct
         {
 #if GLES
-            throw new NotSupportedException("OpenGL ES 2.0 doesn't support 3D textures.");
+                // Note: glGetTexImage is not available in GLES, even in 3.0+
+                // We would need to use framebuffer + glReadPixels as a workaround
+                // For now, this will only work on desktop OpenGL
+                throw new NotSupportedException("Texture3D.GetData is not supported on OpenGL ES.");
 #else
             var width = right - left;
             var height = bottom - top;
