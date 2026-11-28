@@ -49,7 +49,7 @@ internal unsafe class ReadOnlyAssetStream : Stream
 
         int bytesRead;
         fixed (byte* b = buffer)
-            bytesRead = MG.AssetRead(_asset, b, count);
+            bytesRead = MG.AssetRead(_asset, b + offset, count);
         _position += bytesRead;
 
         return bytesRead;
