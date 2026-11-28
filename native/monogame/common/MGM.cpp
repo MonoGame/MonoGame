@@ -468,6 +468,18 @@ mgulong MGM_Song_GetPosition(MGM_Song* song)
 	return song->duration > 0 ? position % song->duration : position;
 }
 
+void MGM_Song_SetPosition(MGM_Song* song, mgulong position)
+{
+	if (song == nullptr)
+		return;
+
+	MGM_Song_StopInternal(song, 1);
+	MGM_AudioDecoder_SetPosition(song->decoder, position);
+
+	song->stopped.store(false);
+	song->decoderThread = std::thread(MGM_Song_DecodeStream, song, 0);
+}
+
 mgulong MGM_Song_GetDuration(MGM_Song* song)
 {
 	return song != nullptr ? song->duration : 0;

@@ -1,4 +1,4 @@
-// MonoGame - Copyright (C) MonoGame Foundation, Inc
+﻿// MonoGame - Copyright (C) MonoGame Foundation, Inc
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
@@ -67,6 +67,16 @@ public sealed partial class Song : IEquatable<Song>, IDisposable
 
             ulong milliseconds = MGM.Song_GetPosition(_song);
             return TimeSpan.FromMilliseconds(milliseconds);
+        }
+
+        set
+        {
+            if (_song == null)
+            {
+                throw new InvalidOperationException("Song is not initialized.");
+            }
+
+            MGM.Song_SetPosition(_song, (ulong)value.Milliseconds);
         }
     }
 

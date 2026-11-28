@@ -1,4 +1,4 @@
-// MonoGame - Copyright (C) MonoGame Foundation, Inc
+﻿// MonoGame - Copyright (C) MonoGame Foundation, Inc
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 
@@ -20,7 +20,7 @@ namespace Microsoft.Xna.Framework.Audio
         private float _pan;
         private float _volume;
         private float _pitch;
-        private bool _isLooped;
+        private bool _isLooped; 
 
         /// <summary>Enables or Disables whether the SoundEffectInstance should repeat after playback.</summary>
         /// <remarks>This value has no effect on an already playing sound.</remarks>
@@ -78,7 +78,36 @@ namespace Microsoft.Xna.Framework.Audio
             }
         }
 
-        /// <summary>Gets or sets the volume of the SoundEffectInstance.</summary>
+        /// <summary>
+        /// The current playback offset position of the <see cref="SoundEffectInstance"/>.
+        /// </summary>
+        /// <remarks>
+        /// Assigning a value works reliably for uncompressed formats (e.g. PCM WAV). Other formats may cause incorrect behavior.
+        /// </remarks>
+        /// <value>Ranging from <see cref="TimeSpan.Zero"/> to the length of the audio track.</value>
+        /// <exception cref="InvalidOperationException">(only for OpenAL!) Thrown if the assigned value is the duration of the track (or a later moment),
+        /// or if a value is assigned while <see langword="this" /> instance is playing.</exception>
+        public TimeSpan Offset
+        {
+            get { return PlatformGetOffset(); }
+            set
+            {
+                if (value >= _effect.Duration)
+                {
+                    throw new InvalidOperationException(
+                        "The new position cannot be at a later position than the duration of the sound effect! (or the duration itself)");
+                }
+
+                if (State == SoundState.Playing)
+                {
+                    throw new InvalidOperationException("You cannot set the offset while the sound is playing!");
+                }
+
+                PlatformSetOffset(value);
+            }
+        }
+
+        /// <summary>Gets or sets the volume of the <see cref="SoundEffectInstance"/>.</summary>
         /// <value>Volume, ranging from 0.0 (silence) to 1.0 (full volume). Volume during playback is scaled by SoundEffect.MasterVolume.</value>
         /// <remarks>
         /// This is the volume relative to SoundEffect.MasterVolume. Before playback, this Volume property is multiplied by SoundEffect.MasterVolume when determining the final mix volume.
@@ -169,12 +198,9 @@ namespace Microsoft.Xna.Framework.Audio
 
             // We don't need to check if we're at the instance play limit
             // if we're resuming from a paused state.
-            if (state != SoundState.Paused)
-            {
-                if (!SoundEffectInstancePool.SoundsAvailable)
-                    throw new InstancePlayLimitException();
-            }
-            
+            if (!SoundEffectInstancePool.SoundsAvailable)
+                throw new InstancePlayLimitException();
+
             // For non-XAct sounds we need to be sure the latest
             // master volume level is applied before playback.
             if (!_isXAct)

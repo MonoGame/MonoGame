@@ -67,8 +67,9 @@ namespace MonoGame.OpenAL
 
     internal enum ALSourcef
     {
-        Pitch = 0x1003,
         Gain = 0x100A,
+        Offset = 0x1024,
+        Pitch = 0x1003,
         ReferenceDistance = 0x1020,
         StereoAngles = 0x1030
     }
@@ -80,7 +81,7 @@ namespace MonoGame.OpenAL
         BuffersQueued = 0x1015,
         BuffersProcessed = 0x1016,
     }
-
+     
     internal enum ALSourceState
     {
         Initial = 0x1011,
@@ -390,8 +391,12 @@ namespace MonoGame.OpenAL
         internal static extern void alSourcefv(int sourceId, ALSourcef i, float[] values);
 
         [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
+        internal static extern void alGetSourcef(int sourceId, ALSourcef f, out float state);
+
+        [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
         internal static extern void alGetSourcei(int sourceId, ALGetSourcei i, out int state);
         internal static void GetSource(int sourceId, ALGetSourcei i, out int state) => alGetSourcei(sourceId, i, out state);
+        
 
         internal static ALSourceState GetSourceState(int sourceId)
         {
